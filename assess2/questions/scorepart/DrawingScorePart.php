@@ -194,13 +194,13 @@ class DrawingScorePart implements ScorePart
             for ($i =0;$i<count($ansdots) - ($isclosed?0:1);$i++) {
                 $totaladj++;
                 /*if ($i==count($ansdots)-1) {
-					if (!isset($matchstu[$i]) || !isset($matchstu[0])) {
-						$diff = -1;
-					} else {
-						$diff = abs($matchstu[0]-$matchstu[$i]);
-					}
-				} else {
-				*/
+          if (!isset($matchstu[$i]) || !isset($matchstu[0])) {
+            $diff = -1;
+          } else {
+            $diff = abs($matchstu[0]-$matchstu[$i]);
+          }
+        } else {
+        */
                 if (!isset($matchstu[$i]) || !isset($matchstu[$i+1])) {
                     $diff = -1;
                 } else {
@@ -273,9 +273,9 @@ class DrawingScorePart implements ScorePart
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
                 //curves: function
-                //	  function, xmin, xmax
+                //    function, xmin, xmax
                 //dot:  x,y
-                //	x,y,"closed" or "open"
+                //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
                     $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
@@ -451,20 +451,20 @@ class DrawingScorePart implements ScorePart
                         $ybp = $ytopix($yb);
 
                         /*old without shift
-						//treat like x=ab^y
-						if (!is_nan($y1)) {
-							$yap = $y1p;
-							$xap = $x1p;
-							$yb = @$func($x1-1);
-							$xbp = $x1p - $pixelsperx;
-						} else {
-							$yap = $y3p;
-							$xap = $x3p;
-							$yb = @$func($x3+1);
-							$xbp = $x3p + $pixelsperx;
-						}
-						$ybp = $settings[7] - ($yb-$settings[2])*$pixelspery - $imgborder;
-						*/
+            //treat like x=ab^y
+            if (!is_nan($y1)) {
+              $yap = $y1p;
+              $xap = $x1p;
+              $yb = @$func($x1-1);
+              $xbp = $x1p - $pixelsperx;
+            } else {
+              $yap = $y3p;
+              $xap = $x3p;
+              $yb = @$func($x3+1);
+              $xbp = $x3p + $pixelsperx;
+            }
+            $ybp = $settings[7] - ($yb-$settings[2])*$pixelspery - $imgborder;
+            */
                         if ($ybp>$yap) {
                             $base = safepow(($vertasyp-$xbp)/($vertasyp-$xap), 1/($ybp-$yap));
                         } else {
@@ -575,28 +575,28 @@ class DrawingScorePart implements ScorePart
                         $anscuberoots[$key] = array($h, $k, 1/$invstr);
                     } else if (preg_match('/\^[^2]/',$function[0])) { //exponential
                         /*
-						To do general exponential, we'll need 3 points.
-						Need to solve y = ab^x + c for a, b, c
-						If x1, x2, and x3 are equally spaced, then
-						b = ((y3-y2)/(y2-y1))^(1/(x3-x2))
+            To do general exponential, we'll need 3 points.
+            Need to solve y = ab^x + c for a, b, c
+            If x1, x2, and x3 are equally spaced, then
+            b = ((y3-y2)/(y2-y1))^(1/(x3-x2))
 
-						y1 = ab^x1 + c,  y2 = ab^x2 + c
-						y1 - ab^x1 = y2 - ab^x2
-						a(b^x2 - b^x1) = y2 - y1
-						a = (y2 - y1)/(b^x2 - b^x1)
-						c = y1 - a*b^x1
+            y1 = ab^x1 + c,  y2 = ab^x2 + c
+            y1 - ab^x1 = y2 - ab^x2
+            a(b^x2 - b^x1) = y2 - y1
+            a = (y2 - y1)/(b^x2 - b^x1)
+            c = y1 - a*b^x1
 
-						y = ab^x
-						*/
+            y = ab^x
+            */
 
                         $base = safepow(($y3p-$y2p)/($y2p-$y1p), 1/($x3p-$x2p));
                         $str = ($y1p - $y2p)/(safepow($base, $x2p-$xop) - safepow($base, $x1p-$xop));
                         $asy = $y1p + $str*safepow($base, $x1p-$xop);
 
                         /* old version
-						$base = safepow(($yop-$y3p)/($yop-$y1p), 1/($x3p-$x1p));
-						$str = ($yop-$y3p)/safepow($base,$x3p-$xop);
-						*/
+            $base = safepow(($yop-$y3p)/($yop-$y1p), 1/($x3p-$x1p));
+            $str = ($yop-$y3p)/safepow($base,$x3p-$xop);
+            */
 
                         $ansexps[$key] = array($str, $base, $asy);
 
@@ -996,19 +996,19 @@ class DrawingScorePart implements ScorePart
                         }
 
                         /*
-						slope based grading
-						if (abs($correctdy)>abs($correctdx)) {
-							$m = $correctdx/$correctdy;
-							$stum = $studx/$study;
-						} else {
-							$m = $correctdy/$correctdx;
-							$stum =$study/$studx;
-						}
-						$toladj = pow(10,-1-6*abs($m));
-						if (abs($m-$stum)/abs($m+$toladj)>$deftol*$reltolerance) {
-							continue;
-						}
-						*/
+            slope based grading
+            if (abs($correctdy)>abs($correctdx)) {
+              $m = $correctdx/$correctdy;
+              $stum = $studx/$study;
+            } else {
+              $m = $correctdy/$correctdx;
+              $stum =$study/$studx;
+            }
+            $toladj = pow(10,-1-6*abs($m));
+            if (abs($m-$stum)/abs($m+$toladj)>$deftol*$reltolerance) {
+              continue;
+            }
+            */
                         $scores[$key] = 1;
                         break;
                     }
@@ -1170,7 +1170,7 @@ class DrawingScorePart implements ScorePart
                 $scores[$key] = 0;
                 for ($i=0; $i<count($exps); $i++) {
                     //if (abs($ansexp[0]-$exps[$i][0])>$defpttol*$reltolerance) {
-                    //	continue;
+                    //  continue;
                     //}
                     //check base
                     if (abs($ansexp[1]-$exps[$i][4])/(abs($ansexp[1]-1)+1e-18)>$deftol*$reltolerance) {
@@ -1265,11 +1265,11 @@ class DrawingScorePart implements ScorePart
         } else if ($answerformat[0]=="inequality") {
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
             /*$x1 = 1/3*$settings[0] + 2/3*$settings[1];
-			$x2 = 2/3*$settings[0] + 1/3*$settings[1];
-			$x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
-			$x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
-			$ymid = ($settings[2]+$settings[3])/2;
-			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;*/
+      $x2 = 2/3*$settings[0] + 1/3*$settings[1];
+      $x1p = ($x1 - $settings[0])*$pixelsperx + $imgborder;
+      $x2p = ($x2 - $settings[0])*$pixelsperx + $imgborder;
+      $ymid = ($settings[2]+$settings[3])/2;
+      $ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;*/
             $epsilon = ($settings[1]-$settings[0])/97;
             $x1 = 1/4*$settings[1] + 3/4*$settings[0] + $epsilon;
             $x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
@@ -1436,18 +1436,32 @@ class DrawingScorePart implements ScorePart
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-                    $pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
-                    $pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;
-                    if (count($function)==2 || $function[2]=='closed') {
-                        $ansdots[$key] = array($pixx,$pixy);
-                    } else {
-                        $ansodots[$key] = array($pixx,$pixy);
-                    }
+                $pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
+                $pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;
+                $newdot = array($pixx, $pixy);
+                if (count($function)==2 || $function[2]=='closed') {
+                  if (!in_array($newdot, $ansdots)) { // no duplicates
+                    $ansdots[$key] = $newdot;
+                  }
                 } else {
-                    $xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
-                    $xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
-                    $anslines[$key] = array($xminpix,$xmaxpix);
+                  if (!in_array($newdot, $ansodots)) { // no duplicates
+                    $ansodots[$key] = $newdot;
+                  }
                 }
+              } else {
+                $xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
+                $xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
+                $overlap = false;
+                foreach ($anslines as $lk=>$line) {
+                  if ($line[0] <= $xmaxpix && $line[1] >= $xminpix) { // overlap
+                    $anslines[$lk] = array(min($line[0], $xminpix), max($line[1], $xmaxpix));
+                    $overlap = true;
+                  }
+                }
+                if (!$overlap) {
+                  $anslines[$key] = array($xminpix,$xmaxpix);
+                }
+              }
             }
 
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
@@ -1577,9 +1591,9 @@ class DrawingScorePart implements ScorePart
                 if ($function=='') { continue; }
                 $function = explode(',',$function);
                 //curves: function
-                //	  function, xmin, xmax
+                //    function, xmin, xmax
                 //dot:  x,y
-                //	x,y,"closed" or "open"
+                //  x,y,"closed" or "open"
                 //form: function, color, xmin, xmax, startmaker, endmarker
                 if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
                     $pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
@@ -1735,8 +1749,8 @@ class DrawingScorePart implements ScorePart
             //divide up over all the lines
             $percentunmatcheddrawn = $percentunmatcheddrawn;
             //if ($GLOBALS['myrights']==100) {
-            //	print_r($anslines);
-            //	print_r($linedata);
+            //  print_r($anslines);
+            //  print_r($linedata);
             //}
             foreach ($anslines as $key=>$answerline) {
                 if ($stcnts[$key]<2) {
