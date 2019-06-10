@@ -9,9 +9,15 @@ TODOs:
   Need to revisit showhints throughout display code
   Test accounting Qs
 > Click on '-' in GB to create new record for student (?)
-  Set timelimitexp in by_question and use it for making practice mode available,
-    and for making grades avail in gradebook using after take setting
+  Set timelimitexp in by_question and use it for preventing latepass use
   Make sure we're honoring user prefs for livepreview, graph, draw, math disp
+  Remove timelimit warning from course page click
+  Give out-of-time submission notice
+  Changed closed view warning
+> Update LTI grade
+    In by_question mode, update on question submission
+    In by_assessment mode, update on assessment submission
+  Having links in LTI home adjust to UIver
 
 To discuss:
   Syntax error warnings: error icon w hoverover vs displaying error
@@ -24,7 +30,6 @@ Separate:
   Bundle support JS/css on build
   Improve build documentation
 
-
 Minor TODOs:
   Add "latepass won't help you" warning on Closed page
   Prop types
@@ -33,6 +38,7 @@ Minor TODOs:
   Handle "right answer wrong format"
   Matrix syntax warning messages
   Teacher view-as-student bypassing restrictions
+  Fix icon alignment in question selector when only one of retake/retry are there
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -102,6 +108,7 @@ X Pre-generate dates in backend as strings:
   Individual question scores: 1 decimal place
   Part scores: 2 decimal places
   Answeights: 3 decimal places
+
 X Newver /course/chgassessments.php
 x Make sure assess_record.score only updates in by_assess mode on submission
 X Better way to tell if there is a submitted take (status |= 64)
