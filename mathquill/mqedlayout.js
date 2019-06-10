@@ -620,9 +620,10 @@ MQeditor.setConfig({
 // set the default MathQuill config.
 var MQ = MathQuill.getInterface(MathQuill.getInterface.MAX);
 MQ.config({
+  spaceBehavesLikeTab: true,
   leftRightIntoCmdGoes: 'up',
   supSubsRequireOperand: true,
-  charsThatBreakOutOfSupSub: '=<> ',
+  charsThatBreakOutOfSupSub: '=<>',
   charsThatBreakOutOfSupSubVar: "+-(",
   charsThatBreakOutOfSupSubOp: "+-(",
   restrictMismatchedBrackets: true,

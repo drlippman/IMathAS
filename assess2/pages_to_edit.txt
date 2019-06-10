@@ -10,7 +10,9 @@ TODOs:
   Teacher view-as-student working
   Test accounting Qs
   Click on '-' in GB to create new record for student (?)
-  Syntax error warnings in MQ mode
+  Build process for js/css
+  Set timelimitexp in by question and use it for making practice mode available,
+    and for making grades avail in gradebook using after take setting
 
 To discuss:
   Syntax error warnings: error icon w hoverover vs displaying error
@@ -29,7 +31,7 @@ Minor TODOs:
   Make sure MQ is disabled on Print page, or just turn off
   tinymce drag handle showing when question is not active (doesn't honor visibility: hidden on parent)
   Handle "right answer wrong format"
-
+  Matrix syntax warning messages
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -69,6 +71,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Syntax error warnings in MQ mode
 X Update disallowed variables list
 X Newver /course/gb-viewasid.php
 X Some display of penalties in Gradebook view;
