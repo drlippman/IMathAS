@@ -6,6 +6,7 @@ export const store = Vue.observable({
   APIbase: null,
   aid: null,
   cid: null,
+  uid: null,
   queryString: '',
   inTransit: false,
   errorMsg: null,

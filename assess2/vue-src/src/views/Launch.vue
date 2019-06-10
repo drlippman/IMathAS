@@ -55,6 +55,10 @@
         >
           {{ $t('launch.doreset') }}
         </button>
+      </p>
+      <p v-if="aInfo.view_as_stu" class="noticetext">
+        {{ $t('launch.view_as_stu', {name: aInfo.stu_fullname}) }}
+      </p>
       <p>
         <button
           v-if="okToLaunch"
@@ -159,9 +163,9 @@ export default {
       return true;
     },
     showReset () {
-      return this.aInfo.is_teacher && (
-        this.aInfo.has_active_attempt || this.aInfo.prev_attempts.length > 0
-      );
+      return this.aInfo.is_teacher &&
+        !this.aInfo.view_as_stu &&
+        (this.aInfo.has_active_attempt || this.aInfo.prev_attempts.length > 0);
     },
     hasExit () {
       return (window.exiturl && window.exiturl !== '');

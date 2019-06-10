@@ -171,14 +171,23 @@ router.beforeEach((to, from, next) => {
   // if no assessinfo, or if cid/aid has changed, load data
   let querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
   let queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
+  let queryuid = null;
+  if (window.location.search.match(/uid=/)) {
+    queryuid = window.location.search.replace(/^.*uid=(\d+).*$/, '$1');
+  }
   if (store.assessInfo === null ||
     store.cid !== querycid ||
-    store.aid !== queryaid
+    store.aid !== queryaid ||
+    store.uid !== queryuid
   ) {
     store.cid = querycid;
     window.cid = querycid; // some other functions need this in global scope
     store.aid = queryaid;
+    store.uid = queryuid;
     store.queryString = '?cid=' + store.cid + '&aid=' + store.aid;
+    if (store.uid !== null) {
+      store.queryString += '&uid=' + store.uid;
+    }
     actions.loadAssessData(() => next());
   } else {
     next();

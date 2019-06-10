@@ -75,6 +75,20 @@ if ($assessInfoOut['displaymethod'] === 'livepoll') {
 // indicate if teacher or tutor user
 $assessInfoOut['can_view_all'] = $canViewAll;
 $assessInfoOut['is_teacher'] = $isteacher;
+if ($canViewAll && $userid !== $uid) {
+  $assessInfoOut['view_as_stu'] = 1;
+  $query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
+  $query .= "imas_students AS istu ON istu.userid=iu.id WHERE ";
+  $query .= "iu.id=? AND istu.courseid=?";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array($uid, $cid));
+  $row = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($row === false) {
+    echo '{"error": "invalid_uid"}';
+    exit;
+  }
+  $assessInfoOut['stu_fullname'] = $row['LastName'] . ', ' . $row['FirstName'];
+}
 
 //set is_lti and is_diag
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0;

@@ -7,10 +7,8 @@ TODOs:
   ~ Perhaps GB detail display that shows part, date submitted (scored), and penalties applied
     Will need to add submission date to parts output object
   Need to revisit showhints throughout display code
->  Teacher view-as-student working
   Test accounting Qs
->  Click on '-' in GB to create new record for student (?)
-  Build process for js/css
+> Click on '-' in GB to create new record for student (?)
   Set timelimitexp in by_question and use it for making practice mode available,
     and for making grades avail in gradebook using after take setting
   Make sure we're honoring user prefs for livepreview, graph, draw, math disp
@@ -34,6 +32,7 @@ Minor TODOs:
   tinymce drag handle showing when question is not active (doesn't honor visibility: hidden on parent)
   Handle "right answer wrong format"
   Matrix syntax warning messages
+  Teacher view-as-student bypassing restrictions
 
 Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
@@ -73,6 +72,8 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Teacher view-as-student working
+X Build process for js
 X Syntax error warnings in MQ mode
 X Update disallowed variables list
 X Newver /course/gb-viewasid.php
