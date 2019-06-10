@@ -1,20 +1,14 @@
 TODOs:
   Need to revisit showhints throughout display code
-> Click on '-' in GB to create new record for student (?)
-  Set timelimitexp in by_question and use it for preventing latepass use
-  Make sure we're honoring user prefs for livepreview, graph, draw, math disp
   Give out-of-time submission notice
+  Build migration function
 
 To discuss:
   Syntax error warnings: error icon w hoverover vs displaying error
-  Overtime in by_question: "submit" assessment?
 
 Separate:
   Collate CSS
   Add a11y landmarks / skip navigation
-  Build migration function
-  Bundle support JS/css on build
-  Improve build documentation
 
 Minor TODOs:
   Add "latepass won't help you" warning on Closed page
@@ -66,6 +60,9 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Click on '-' in GB to create new record for student
+X Improve build documentation
+X Shell script for building min JS
 X Add overtime penalty and grace period
 X Remove timelimit warning from course page, GB, calendar clicks
 X Changed closed view warning on expired timelimit

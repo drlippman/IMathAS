@@ -79,8 +79,29 @@ $assess_info->applyTimelimitMultiplier($studata['timelimitmult']);
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
 if (!$assess_record->hasRecord()) {
-  echo '{"error": "invalid_record"}';
-  exit;
+  // if there's no record yet, and we're a teacher, create a record
+  if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+    $isGroup = $assess_info->getSetting('isgroup');
+    if ($isGroup > 0) {
+      if ($isGroup == 3) {
+        $groupsetid = $assess_info->getSetting('groupsetid');
+        list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
+        if ($stugroupid == 0) {
+          // no group yet - can't do anything
+          echo '{"error": "need_group"}';
+          exit;
+        }
+      }
+      // creating for group
+      $assess_record->createRecord($current_members, $stugroupid, false, '');
+    } else { // not group
+      // creating for self
+      $assess_record->createRecord(false, 0, false, '');
+    }
+  } else {
+    echo '{"error": "invalid_record"}';
+    exit;
+  }
 }
 
 //fields to extract from assess info for inclusion in output
