@@ -6824,15 +6824,29 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
 					$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
 					$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;
+					$newdot = array($pixx, $pixy);
 					if (count($function)==2 || $function[2]=='closed') {
-						$ansdots[$key] = array($pixx,$pixy);
+						if (!in_array($newdot, $ansdots)) { // no duplicates
+							$ansdots[$key] = $newdot; 
+						}
 					} else {
-						$ansodots[$key] = array($pixx,$pixy);
+						if (!in_array($newdot, $ansodots)) { // no duplicates
+							$ansodots[$key] = $newdot;
+						}
 					}
 				} else {
 					$xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
 					$xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
-					$anslines[$key] = array($xminpix,$xmaxpix);
+					$overlap = false;
+					foreach ($anslines as $lk=>$line) {
+						if ($line[0] <= $xmaxpix && $line[1] >= $xminpix) { // overlap
+							$anslines[$lk] = array(min($line[0], $xminpix), max($line[1], $xmaxpix));
+							$overlap = true;
+						}
+					}
+					if (!$overlap) {
+						$anslines[$key] = array($xminpix,$xmaxpix);
+					}
 				}
 			}
 
