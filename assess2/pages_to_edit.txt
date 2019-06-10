@@ -7,15 +7,17 @@ TODOs:
   ~ Perhaps GB detail display that shows part, date submitted (scored), and penalties applied
     Will need to add submission date to parts output object
   Need to revisit showhints throughout display code
-  Teacher view-as-student working
+>  Teacher view-as-student working
   Test accounting Qs
-  Click on '-' in GB to create new record for student (?)
+>  Click on '-' in GB to create new record for student (?)
   Build process for js/css
   Set timelimitexp in by_question and use it for making practice mode available,
     and for making grades avail in gradebook using after take setting
+  Make sure we're honoring user prefs for livepreview, graph, draw, math disp
 
 To discuss:
   Syntax error warnings: error icon w hoverover vs displaying error
+  Overtime in by_question: "submit" assessment?
 
 Separate:
   Collate CSS

@@ -109,7 +109,7 @@ if (!$assessInfoOut['has_active_attempt']) {
 }
 
 // adjust output if time limit is expired in by_question mode
-if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
+/*if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   $assessInfoOut['submitby'] == 'by_question' &&
   time() > $assessInfoOut['timelimit_grace']
 ) {
@@ -119,7 +119,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
     $assessInfoOut['show_reset'] = true;
   }
 }
-
+*/
 //load group members, if applicable
 if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
   list ($stugroupid, $groupmembers) = AssessUtils::getGroupMembers($uid, $assess_info->getSetting('groupsetid'));
