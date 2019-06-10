@@ -16,7 +16,7 @@ IMathAS is designed for simple installation with minimal requirements.  The syst
 2.  Alternatively, if you have shell access to your server, enter the directory you want IMathAS in, and checkout the code from Github. Using Git greatly simplifies upgrading.
 3.  Create a database for IMathAS
 4.  Open a browser and access `/install.php`. This script will write the `config.php` file, change directory permissions and set up the database. It will also create local copies of `loginpage.php`, `infoheader.php`, and `newinstructor.php`.  At the end of the install you will be given the opportunity to install a small set of example questions.
-5.  Check to make sure the following directories have directory permissions to allow the web server to write files into them: 
+5.  Check to make sure the following directories have directory permissions to allow the web server to write files into them:
     -   `/assessment/libsassessment/qimages`
     -   `/admin/import`
     -   `/course/files`
@@ -40,7 +40,7 @@ These are all added to the `config.php` by the install script.
 -   `$dbserver`: The address of your database server. Probably www.yoursite.edu or localhost
 -   `$dbname`: The name of the IMathAS database
 -   `$dbusername`: The username of the IMathAS database user.
--   `$dbpassword`: The password for the IMathAS database user. 
+-   `$dbpassword`: The password for the IMathAS database user.
 -   `$installname`: The name of your installation, for personalization.
 -   `$longloginprompt`: How you want to prompt new students for a username
 -   `$loginprompt`: How you want to prompt students for a username.  
@@ -59,9 +59,9 @@ These are all added to the `config.php` by the install script.
 
 ### System Defaults
 
-Many system defaults can be adjusted using config changes. 
+Many system defaults can be adjusted using config changes.
 
-- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options. 
+- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options.
 - Gradebook settings.  Most defaults can be defined.  For example, `$CFG['GBS']['defgbmode']` allows you to define the default gradebook mode.  See `/course/gbsettings.php` for all options.
 - Forum settings.  A few defaults can be defined.  See `/course/addforum.php` for all options.
 - Course settings.  Most default can be defined, and most can be forced to a value.  For example, `$CFG['CPS']['theme'] = array("modern.css",1);` sets the default theme but allows the user to change it.  Using `0` instead of `1` in the second position would set the default and not allow the user to change it.  See `/admin/forms.php` for all options.
@@ -78,7 +78,7 @@ Many system defaults can be adjusted using config changes.
 -  `$CFG['use_csrfp']`: Set this to true to enable cross-site request forgery protection.
 - File Storage:  By default, all user-uploaded files are stored on the webserver.  The system supports using Amazon S3 for file storage instead.  To use S3:
     - Set `$AWSkey`, `$AWSsecret`, `$AWSbucket` to your AWS key, secret, and bucket name respectively.  
-    - `$GLOBALS['CFG']['GEN']['AWSforcoursefiles']`:   If the variables above are set, by default S3 will be used only for user uploads through the text editor, and local storage will still be used for course files and question images.  Set this option to true to also use S3 for these types of files. 
+    - `$GLOBALS['CFG']['GEN']['AWSforcoursefiles']`:   If the variables above are set, by default S3 will be used only for user uploads through the text editor, and local storage will still be used for course files and question images.  Set this option to true to also use S3 for these types of files.
 - `$CFG['GEN']['noFileBrowser']`: Set this to true to prevent the use of the file and image uploads through the text editor.  Do not define this to allow use of the file browser.
 - `$CFG['GEN']['sendquestionproblemsthroughcourse']`:  By default, clicking the "Report problem with question" will open email.  To send using an IMathAS message instead, set this option to a course ID, ideally one that all instructors are participants in.
 - `$CFG['GEN']['qerrorsendto']`:  Normally question errors are reported to the question author.  To have them sent do a different user, set this option.  Set to a user ID to send to that user.  You can also force the delivery method by defining this is an array of `array(userid, sendmethod, title, alsosendtoowner)`, like `array(2, "email", "Contact Support", true)`.  The email address for the specified user ID will be used.  If alsosendtoowner is set to true, the message will be sent both to the question owner as well.
@@ -94,7 +94,7 @@ These provide additional validation options beyond `$loginformat`.
 - `$CFG['acct']['emailFormat']`:  A regular expression to check email addresses with
 - `$CFG['acct']['passwordMinlength']`:  Minimum password length.  Defaults to 6.
 - `$CFG['acct']['passwordFormat']`:  A regular expression or array of regexs to check the password against.  If an array is given, _all_ regexes must match against the password.
-- `$CFG['acct']['importLoginformat']`:  If set, this regular expression replaces `$loginformat` when using the  "import students from file" option. 
+- `$CFG['acct']['importLoginformat']`:  If set, this regular expression replaces `$loginformat` when using the  "import students from file" option.
 - `$CFG['acct']['SIDformaterror']`: A message to display if the username/SID has invalid format.
 - `$CFG['acct']['passwordFormaterror']`: A message to display if the password has invalid format.
 - `$CFG['acct']['emailFormaterror']`: A message to display if the email has invalid format.
@@ -122,7 +122,7 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 - `$CFG['GEN']['logopad']`: Set to something like "50px" to override the default padding on `<span class="padright">` used to leave room for `$smallheaderlogo`.
 - `$CFG['GEN']['homelinkbox']`:  Set to anything to hide the default site tools from the upper right of the Home page.
 - `$CFG['GEN']['hidedefindexmenu']`: Set to anything to hide the "Change User Info" and "Change password" links from the upper right of the Home page.
-- `$CFG['GEN']['hometitle']`:  Set to a message to display at the top of the Home page, in place of "Welcome to _____, ______" 
+- `$CFG['GEN']['hometitle']`:  Set to a message to display at the top of the Home page, in place of "Welcome to _____, ______"
 - `$CFG['CPS']['leftnavtools']`:  Set to `"limited"` to remove from the course left navigation tools that are also in the top navigation.  Set to false to remove the entire Tools block from the course left navigation.
 - `$CFG['GEN']['deflicense']`:  The default license for new questions.  See `/course/moddataset.php` for valid values.  Defaults to 1 (IMathAS community license).
 - `$CFG['GEN']['defGroupType']`: Set to change the default group type for newly created groups (def: 0)
@@ -138,7 +138,7 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
     - To operate properly, the `/admin/processltiqueue.php` script needs to be called regularly, ideally once a minute.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to  `/admin/processltiqueue.php?authcode=####` using the code you define.
     - `$CFG['LTI']['queuedelay']` defines the delay (in minutes) between the students' last submission and when the score is sent to the LMS.  Defaults to 5.
     - `$CFG['LTI']['logltiqueue']` set to true to log LTI queue results in /admin/import/ltiqueue.log
- 
+
 ### Email
 By default, emails are sent using the built-in PHP `mail()` function.  This can sometimes have reliability issue, so there are options to override the mail sender or reduce the use of email in the system.
 - `$CFG['GEN']['noEmailButton']`:  Set to true to remove the "Email" option from the Roster and Gradebook
@@ -146,7 +146,7 @@ By default, emails are sent using the built-in PHP `mail()` function.  This can 
 - `$CFG['email']['new_acct_bcclist']`: Set to an array of email addresses to add to the "Bcc" field on new instructor approval emails.
 - `$CFG['email']['handler']`:  Use this to override the default mail sending mechanism.  Set to `array('filename.php', 'functionname')`, where `filename.php` contains the function `functionname` that accepts the arguments described in `/includes/email.php`.
     - The system ships with support for Amazon SES (in us-west-2), by defining `$CFG['email']['handler'] = array('mailses.php', 'send_SESemail');`.  You'll also need to define:
-      - `$CFG['email']['SES_KEY_ID']` or an environment variable `SES_KEY_ID` 
+      - `$CFG['email']['SES_KEY_ID']` or an environment variable `SES_KEY_ID`
       -  `$CFG['email']['SES_SECRET_KEY']` or an environment variable `SES_SECRET_KEY`
       - `$CFG['email']['SES_SERVER']` or the default of `email.us-west-2.amazonaws.com` will be used.
     - `$CFG['email']['handlerpriority']` can be set to define a breakpoint between using the default `mail()` delivery and the custom handler.   See `/includes/email.php` for values.
@@ -185,16 +185,37 @@ Options:
 - `$CFG['cleanup']['delay']`:    a number of days to delay after notifying the teacher before emptying the course (def: 120)
 - `$CFG['cleanup']['msgfrom']`:  the userid to send notification message from (def: 0)
 - `$CFG['cleanup']['keepsent']`:   set =0 to keep a copy of sent notifications in sent list
-- `$CFG['cleanup']['allowoptout']`:   (default: true) set to false to prevent teachers opting out 
+- `$CFG['cleanup']['allowoptout']`:   (default: true) set to false to prevent teachers opting out
 - `$CFG['cleanup']['groups']`: You can specify different old/delay values for different groups by defining
 `$CFG['cleanup']['groups'] = array(groupid => array('old'=>days, 'delay'=>days));`
 
-### Additional Feature Setup
-#### LivePoll
+## Additional Feature Setup
+### LivePoll
 IMathAS supports a clicker-style assessment format called LivePoll.  To use it, a Node websocket server must be set up to handle the live syncing.  You can find the code and basic setup instructions on the [IMathAS-Extras](https://github.com/drlippman/imathas-extras) Github page.  Once set up, define:
 - `$CFG['GEN']['livepollserver']`: The address for the websocket server, like `livepoll.mysite.com`.  The system assumes the server is running on port 3000.
 - `$CFG['GEN']['livepollpassword']`:  This can optionally be defined to provide additional security to livepoll by signing all messages sent via sockets.
 
-#### Pandoc
+### Pandoc
 IMathAS can convert assessments to Word format using pandoc setup as a web service.  It doesn't use pandoc locally for security and stability reasons.  To enable converting assessments to word, you'll need to install pandoc on a webserver and set up the front end found on the [IMathAS-Extras](https://github.com/drlippman/imathas-extras) Github page.  Once set up, define:
 - `$CFG['GEN']['pandocserver']`:  The address for the pandoc server, like `pandoc.mysite.com` or `pandoc.mysite.com/path`, to where `html2docx.php` is installed.
+
+## Modifying the System
+
+### Building
+Most of the system does not require a build process if changes are made.  
+There are a couple exceptions.
+
+If you change any of the javascript files with a `_min.js` version, you'll need
+to re-minify the javascript.  You can do this using the shell script
+`/assess2/vue-src/buildmin.sh`.
+
+If you change any of the Vue files for the assessment player, you'll need to
+re-build the distribution files.  See `/assess2/vue-src/README.md` for more
+info, and how to configure your system for development mode testing.
+
+If tinymce is changed, or the plugins used are changed, you will need to run
+`/tinymce4/maketinymcebundle.php` to re-generate `tinymce_bundled.js`.
+
+### Changing Mathquill
+The version of Mathquill used in this repo has it's source in the repo
+`https://github.com/drlippman/mathquill`, in the `imathas-master` branch.
