@@ -396,7 +396,7 @@
 			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
 			if ($submitby == 'by_question') {
-				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s (%s)</td>",
+				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
 			} else {
 				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</td>",
@@ -450,8 +450,12 @@
 	//echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 
 	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
-	echo "Note: Average Score, Tries, Regens, and Times only counts those who attempted the problem<br/>";
-	echo 'All averages only include those who have started the assessment</p>';
+	echo "Note: Average Score, Tries, Regens, and Times only counts those who attempted the problem.<br/>";
+	echo 'Average Score is based on raw score, before any penalties are applied.<br/>';
+	echo 'All averages only include those who have started the assessment.</p>';
+	if ($submitby == 'by_assessment') {
+		echo '<p>Note: Average time only includes time on the scored assessment attempt.</p>';
+	}
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
 	if ($stm->fetchColumn(0)>0) {
