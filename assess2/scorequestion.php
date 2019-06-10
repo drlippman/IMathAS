@@ -287,6 +287,17 @@ if ($end_attempt) {
 // save record if needed
 $assess_record->saveRecordIfNeeded();
 
+if ($assessInfoOut['submitby'] == 'by_question') {
+  // update LTI grade
+  $lti_sourcedid = $assess_info->getSetting('lti_sourcedid');
+  if (strlen($lti_sourcedid) > 1) {
+    $gbscore = $assess_record->getGbScore();
+    require_once("../includes/ltioutcomes.php");
+    $aidposs = $assess_info->getSetting('ptsposs');
+    calcandupdateLTIgrade($lti_sourcedid, $aid, $gbscore['gbscore'], false, $aidposs);
+  }
+}
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

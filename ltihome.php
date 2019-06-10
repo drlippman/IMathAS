@@ -428,10 +428,18 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	echo "<h2>LTI Placement of " . Sanitize::encodeStringForDisplay($line['name']) . "</h2>";
-	echo "<p><a href=\"assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
-	echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
-	if ($role == 'teacher') {
-		echo "| <a href=\"course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Item Analysis</a>";
+	if ($line['ver'] > 1) {
+		echo "<p><a href=\"assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
+		echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
+		if ($role == 'teacher') {
+			echo "| <a href=\"course/gb-itemanalysis2.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Item Analysis</a>";
+		}
+	} else {
+		echo "<p><a href=\"assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
+		echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
+		if ($role == 'teacher') {
+			echo "| <a href=\"course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Item Analysis</a>";
+		}
 	}
 	echo "</p>";
 

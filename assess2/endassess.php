@@ -57,6 +57,15 @@ if ($assess_record->hasActiveAttempt()) {
   exit;
 }
 
+// update LTI grade
+$lti_sourcedid = $assess_info->getSetting('lti_sourcedid');
+if (strlen($lti_sourcedid) > 1) {
+  $gbscore = $assess_record->getGbScore();
+  require_once("../includes/ltioutcomes.php");
+  $aidposs = $assess_info->getSetting('ptsposs');
+  calcandupdateLTIgrade($lti_sourcedid, $aid, $gbscore['gbscore'], true, $aidposs);
+}
+
 // grab any assessment info fields that may have updated:
 // has_active_attempt, timelimit_expires,
 // prev_attempts (if we just closed out a version?)
@@ -104,7 +113,7 @@ if ($assessInfoOut['showscores'] != 'none') {
   );
 }
 
-//prep date display 
+//prep date display
 prepDateDisp($assessInfoOut);
 
 //output JSON object
