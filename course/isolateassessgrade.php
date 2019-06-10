@@ -78,7 +78,11 @@
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
 
-	echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
+	if ($aver > 1 ) {
+		echo '<div class="cpmid"><a href="gb-itemanalysis2.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
+	} else {
+		echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
+	}
 	/*$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 	$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 	$stm = $DBH->prepare($query);
@@ -273,7 +277,7 @@
 		} else {
 			$thisenddate = $enddate;
 		}
-		if ($line['id']==null) {
+		if ($line['starttime']==null) {
 			if ($aver > 1) {
 				$querymap = array(
 					'gbmode' => $gbmode,
@@ -433,7 +437,11 @@
 	if ($hassection && !$hidesection) {
 		echo '<td></td>';
 	}
-	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=isolate\">";
+	if ($aver > 1 ) {
+		echo "<td><a href=\"gb-itemanalysis2.php?cid=$cid&aid=$aid&from=isolate\">";
+	} else {
+		echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=isolate\">";
+	}
 	if ($n>0) {
 		echo round($tot/$n,1);
 	} else {

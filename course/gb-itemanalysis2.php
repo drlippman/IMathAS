@@ -49,10 +49,10 @@
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
-	
-	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit FROM imas_assessments WHERE id=:id");
+
+	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit,submitby FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit) = $stm->fetch(PDO::FETCH_NUM);
+	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit, $submitby) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -263,7 +263,7 @@
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
-		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
+		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail2.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
 	}
 	echo '</p>';
 	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
@@ -271,8 +271,18 @@
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th>";
 	//echo "<th scope=\"col\">Average Score<br/>All</th>";
-	echo "<th scope=\"col\" title=\"Average score for all students who attempted this question\">Average Score<br/>Attempted</th><th title=\"Average number of attempts and regens (new versions)\" scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\" title=\"Percentage of students who have not started this question yet\">% Incomplete</th>";
-	echo "<th scope=\"col\" title=\"Average time a student worked on this question, and average time per attempt on this question\">Time per student<br/> (per attempt)</th>";
+	echo "<th scope=\"col\" title=\"Average score for all students who attempted this question\">Average Score</th>";
+	if ($submitby == 'by_question') {
+		echo "<th title=\"Average number of tries and regens (new versions)\" scope=\"col\">Average Tries<br/>(Regens)</th>";
+	} else {
+		echo "<th title=\"Average number of tries\" scope=\"col\">Average Tries</th>";
+	}
+	echo "<th scope=\"col\" title=\"Percentage of students who have not started this question yet\">% Incomplete</th>";
+	if ($submitby == 'by_question') {
+		echo "<th scope=\"col\" title=\"Average time a student worked on this question, and average time per version of this question\">Average time per student<br/> (per version)</th>";
+	} else {
+		echo "<th scope=\"col\" title=\"Average time a student worked on this question, and average time per attempt on this question\">Average time per student</th>";
+	}
 	if ($showhints==1) {
 		echo '<th scope="col" title="Percentage of students who clicked on help resources in the question, if available">Clicked on Help</th>';
 	}
@@ -347,7 +357,7 @@
 					$avgatt = round($attempts[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgreg = round($regens[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgtot = round($timeontask[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
-                    $avgtota = round($timeontaskperversion[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
+          $avgtota = round($timeontaskperversion[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					if ($avgtot==0) {
 						$avgtot = 'N/A';
 					} else {
@@ -362,6 +372,7 @@
 					$avgatt = 0;
 					$avgreg = 0;
 					$avgtot = 0;
+					$avgtota = 0;
 				}
 			} else {
 				$avg = "NA";
@@ -376,23 +387,33 @@
 				echo '<span class="noticetext">Withdrawn</span> ';
 			}
 			echo Sanitize::encodeStringForDisplay($descrips[$qid]) . "</td>";
-			echo "<td><a href=\"gradeallq.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&asid=average&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "\" ";
+			echo "<td><a href=\"gradeallq2.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid&asid=average&aid=" . Sanitize::onlyInt($aid) . "&qid=" . Sanitize::onlyInt($qid) . "\" ";
 			if (isset($needmanualgrade[$qid])) {
 				echo 'class="manualgrade" ';
 			}
 			echo ">Grade</a></td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></td>",
+			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
-			echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s (%s)</td>",
+			if ($submitby == 'by_question') {
+				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s (%s)</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
-			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s%%</td>",
+			} else {
+				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=att',500,500);return false;\">%s</td>",
+                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt));
+			}
+			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=incomp',500,500);return false;\">%s%%</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($pi));
-			echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</td>",
+			if ($submitby == 'by_question') {
+				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s (%s)</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot), Sanitize::encodeStringForDisplay($avgtota));
+			} else {
+				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</td>",
+                $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
+			}
 			if ($showhints==1) {
 				if ($showextref[$qid] && $qcnt[$qid]!=$qincomplete[$qid]) {
-					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
+					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
                         $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])));
 				} else {
 					echo '<td class="c">N/A</td>';
@@ -429,7 +450,7 @@
 	//echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 
 	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
-	echo "Note: Average Attempts, Regens, and Time only counts those who attempted the problem<br/>";
+	echo "Note: Average Score, Tries, Regens, and Times only counts those who attempted the problem<br/>";
 	echo 'All averages only include those who have started the assessment</p>';
 	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
 	$stm->execute(array(':assessmentid'=>$aid));
@@ -440,8 +461,8 @@
 	if ($isteacher) {
 		echo '<div class="cpmid">Experimental:<br/>';
 		echo "<a href=\"gb-itemresults2.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
-	
-		echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
+
+		echo "<a href=\"gb-aidexport2.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
 	}
 	require("../footer.php");
 

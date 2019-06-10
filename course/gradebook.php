@@ -904,7 +904,11 @@ function gbstudisp($stu) {
 				if ($gbt[0][1][$i][6]==0) {//online
 					if ($stu==-1) { //in averages
 						if (isset($gbt[1][1][$i][0])) { //has score
-							echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid={$gbt[0][1][$i][7]}\">";
+							if ($gbt[0][1][$i][15] > 1) {
+								echo "<a href=\"gb-itemanalysis2.php?stu=$stu&cid=$cid&aid={$gbt[0][1][$i][7]}\">";
+							} else {
+								echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid={$gbt[0][1][$i][7]}\">";
+							}
 							$haslink = true;
 						}
 					} else {
@@ -1697,7 +1701,11 @@ function gbinstrdisp() {
 								$avgtip = '';
 							}
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
-							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
+							if ($gbt[0][1][$i][15] > 1) {
+								echo "<a href=\"gb-itemanalysis2.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
+							} else {
+								echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
+							}
 							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {

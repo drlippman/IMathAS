@@ -161,7 +161,7 @@
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 		}
 
-		if ($line['id']==null) {
+		if ($line['starttime']==null) {
 			$querymap = array(
 				'gbmode' => $gbmode,
 				'cid' => $cid,
@@ -238,7 +238,11 @@
 		echo "</tr>";
 	}
 	echo '<tr><td>Average</td>';
-	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=gisolate\">";
+	if ($aver > 1 ) {
+		echo "<td><a href=\"gb-itemanalysis2.php?cid=$cid&aid=$aid&from=gisolate\">";
+	} else {
+		echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=gisolate\">";
+	}
 	if ($n>0) {
 		echo round($tot/$n,1);
 	} else {
