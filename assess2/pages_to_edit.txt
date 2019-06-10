@@ -11,7 +11,7 @@ TODOs:
   Test accounting Qs
   Click on '-' in GB to create new record for student (?)
   Build process for js/css
-  Set timelimitexp in by question and use it for making practice mode available,
+  Set timelimitexp in by_question and use it for making practice mode available,
     and for making grades avail in gradebook using after take setting
 
 To discuss:

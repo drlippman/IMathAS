@@ -3,7 +3,7 @@
     <i class="far fa-clock"></i>
     <span
       v-if="open"
-      :class = "{noticetext: hours===0 && 60*minutes+seconds<warningTime}"
+      :class = "{noticetext: hours === 0 && 60*minutes+seconds < warningTime}"
     >
       {{ timeString }}
     </span>
@@ -43,7 +43,7 @@ export default {
       let now = new Date().getTime();
       this.timeString = '';
       let remaining = Math.max(0, this.end * 1000 - now);
-      if (remaining == 0 && this.grace > 0) {
+      if (remaining === 0 && this.grace > 0) {
         remaining = Math.max(0, this.grace * 1000 - now);
         this.timeString += this.$t('timer.overtime') + ' ';
       }

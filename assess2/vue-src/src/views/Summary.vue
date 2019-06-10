@@ -18,7 +18,7 @@
               <summary-score-list />
               <p>&nbsp;</p>
               <summary-categories
-                v-if="hasCategories" 
+                v-if="hasCategories"
                 :data = "ainfo.questions"
               />
             </vue-tab>

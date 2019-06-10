@@ -183,7 +183,7 @@ export const actions = {
     }
 
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
-    
+
     // figure out non-blank questions to submit
     let lastLoaded = [];
     let changedQuestions = this.getChangedQuestions(qns);
@@ -413,7 +413,6 @@ export const actions = {
       });
   },
   handleTimelimitUp () {
-    console.log("time limit up");
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
       let tosub = Object.keys(this.getChangedQuestions());

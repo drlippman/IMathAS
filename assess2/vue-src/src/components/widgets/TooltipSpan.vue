@@ -23,7 +23,7 @@ export default {
   props: ['tip'],
   data: function () {
     return {
-      open: false,
+      open: false
     };
   },
   methods: {

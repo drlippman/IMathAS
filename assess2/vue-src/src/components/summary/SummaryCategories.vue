@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import { store } from '../../basicstore';
 
 export default {
   name: 'SummaryCategories',

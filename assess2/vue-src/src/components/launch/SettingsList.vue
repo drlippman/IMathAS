@@ -170,7 +170,6 @@ export default {
             timeobj.alert = this.$t('setlist.time_expires', { date: expires });
           }
         } else if (!store.timelimit_grace_expired) {
-
           timeobj.alert = this.$t('setlist.time_grace_expires', {
             date: settings.timelimit_expires_disp,
             grace: settings.timelimit_grace_disp
