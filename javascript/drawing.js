@@ -2277,9 +2277,12 @@ reads/writes values from "qn"+id
 
 */
 var normslider = {idnums:[], curslider:{el: null, startpos: [0,0], outnode: null}};
-function addnormslider(k) {
+function addnormslider(k, rendernow) {
 	if (arraysearch(k,normslider.idnums)==-1) { //not in there yet.  First load
 		normslider.idnums.push(k);
+		if (rendernow === true) {
+			slideronpageload(k);
+		}
 	} else {
 		//resubmit.  Must be on embedded reload.  call pageload
 		slideronpageload(k);

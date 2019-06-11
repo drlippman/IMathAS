@@ -1,15 +1,23 @@
 TODOs:
+  New question generator:
+    Need to capture anything echoed and bundle as an error report or something
+    Error reporting - figure out how to get question errors
   Need to revisit showhints throughout display code
-
   Newver /course/gb-rescoreq.php
-    - Should be simpler, since we have stored stuans for most question types and
-      can replicate clientside eval
+    Rescore all versions.  In HW-style, keep best version, ditch rest.
+    Still give option of using first or last try.
+      Keep the rescored try, ditch rest
+  Migrations:
+    If setting defregens = old defattempts, also need to set defregenpenalty = defpenalty
+    AsGo: always as hw-style, set defregens = 1
+  Copy course: make sure to set UIver of new course
 
-To discuss:
-  Syntax error warnings: error icon w hoverover vs displaying error
-  How rescoreq should work
-    Which version? Which try?
-  "Show each score as submitted" - should this be quiz-style with 1 take?
+Bugs:
+  Need to initialize nosolninf handler (select one soln on typing) - qtypes1 #2
+  Need to review stuans / stuansval storage for calcmatrix w answersize,
+    and stuansval storage for calcmatrix
+
+
 
 Separate:
   Collate CSS
@@ -27,7 +35,7 @@ Minor TODOs:
   Add some display of time when submission were made in GB
   Test accounting Qs
   Review stuanswers/val for matrix/calcmatrix types
-
+  Syntax error warnings: error icon w hoverover vs displaying error
 
 Future Todos:
   Build modal for redeeming latepasses for LTI users.

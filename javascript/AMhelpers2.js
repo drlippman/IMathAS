@@ -64,7 +64,7 @@ TODO: capture any errors echoed during question generation and append
 to question output or something.
 
  */
-
+var initstack = [];
 
 var imathasAssess = (function($) {
 
@@ -125,7 +125,7 @@ function init(paramarr, enableMQ) {
     } else if (params.format === 'credit') {
       document.getElementById("qn"+qn).addEventListener('keyup', editcredit);
     } else if (params.format === 'normslider') {
-      imathasDraw.addnormslider(qn);
+      imathasDraw.addnormslider(qn, true);
     }
     if (params.tip) {
       if (el = document.getElementById("qn"+qn+"-0")) {
@@ -147,6 +147,10 @@ function init(paramarr, enableMQ) {
     }
     initShowAnswer();
   }
+  for (var i=0; i<initstack.length; i++) {
+        var foo = initstack[i]();
+  }
+  initstack.length = 0;
 }
 
 // setup tip focus/blur handlers
@@ -575,7 +579,7 @@ function preformat(qn, text, qtype, calcformat) {
   } else if (qtype == 'numfunc') {
     text = AMnumfuncPrepVar(qn, text)[1];
   } else if (qtype == 'calcntuple') {
-    text = text.replace(/</g, '(:').replace(/>/g, ':)');
+    text = text.replace(/<+/g, '(:').replace(/>+/g, ':)');
   } else if (qtype == 'calculated') {
     if (calcformat.indexOf('list')==-1 && calcformat.indexOf('set')==-1) {
       text = text.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
@@ -829,6 +833,7 @@ function processCalcNtuple(fullstr, format) {
   var res = NaN;
   var dec;
   fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
+  fullstr = fullstr.replace(/<<(.*)>>/, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;
   }

@@ -112,7 +112,7 @@ class IntervalAnswerBox implements AnswerBox
     			$params['helper'] = 1;
     		}
     		if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
-    			$classes[] = 'pseudohidden';
+    			$classes[] = 'hidden';
     			$params['format'] = 'normslider';
     		}
 

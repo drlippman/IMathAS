@@ -74,13 +74,7 @@ class ComplexAnswerBox implements AnswerBox
     		];
     		$params['tip'] = $shorttip;
         $params['longtip'] = $tip;
-    		if ($useeqnhelper) {
-    			$params['helper'] = 1;
-    		}
-    		if (!isset($hidepreview) && $GLOBALS['sessiondata']['userprefs']['livepreview']==1) {
-    			$params['preview'] = 1;
-    		}
-
+    		
     		$out .= '<input ' .
     						Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .

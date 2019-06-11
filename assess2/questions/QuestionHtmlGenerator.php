@@ -361,10 +361,10 @@ class QuestionHtmlGenerator
                 if (strpos($toevalqtxt, '<div') !== false || strpos($toevalqtxt, '<table') !== false) {
                     $toevalqtxt = sprintf(
                         '<div class=\\"%s\\" style=\\"display:block\\">%s</div>',
-                        $questionColor, $evalQuestionText);
+                        $questionColor, $toevalqtxt);
                 } else {
-                    $toevalqtxt = sprintf('<div class="%s">%s</div>',
-                        $questionColor, $evalQuestionText);
+                    $toevalqtxt = sprintf('<div class=\\"%s\\">%s</div>',
+                        $questionColor, $toevalqtxt);
                 }
             }
             if (!isset($showanswer)) {

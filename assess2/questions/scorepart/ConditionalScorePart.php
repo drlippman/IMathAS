@@ -49,15 +49,21 @@ class ConditionalScorePart implements ScorePart
             $tol = $reltolerance;
         }
         $correct = true;
-        if (!is_array($answer)) { //single boolean
+        if (!is_array($answer)) { //single boolean or decimal score
             if ($answer===true) {
                 $scorePartResult->setRawScore(1);
                 return $scorePartResult;
-            } else if ($answer===false) {
+            } else if ($answer===false || $answer===null) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             } else {
-                return $answer;
+                if ($answer < 0) {
+                  $answer = 0;
+                } else if ($answer > 1) {
+                  $answer = 1;
+                }
+                $scorePartResult->setRawScore($answer);
+                return $scorePartResult;
             }
         }
         if (is_array($answer) && is_string($answer[0])) {  //if single {'function',$f,$g) type, make array

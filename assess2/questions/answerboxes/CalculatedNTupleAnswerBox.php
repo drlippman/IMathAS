@@ -92,7 +92,7 @@ class CalculatedNTupleAnswerBox implements AnswerBox
     		];
     		$params['tip'] = $shorttip;
         $params['longtip'] = $tip;
-    		$params['calcformat'] = $answerformat;
+    		$params['calcformat'] = $answerformat.(($answerformat=='')?'':',').$displayformat;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}

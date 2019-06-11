@@ -1635,7 +1635,9 @@ class AssessRecord
         $stuanswersval[$qn+1] = null;
         continue;
       }
-      for ($pn = 0; $pn < count($curq['answeights']); $pn++) {
+      // Conditional doesn't use answeights, so also need to look at tries
+      $numParts = max(count($curq['answeights']), count($curq['tries']));
+      for ($pn = 0; $pn < $numParts; $pn++) {
         if (!isset($curq['tries'][$pn])) {
           $stuansparts[$pn] = null;
           $stuansvalparts[$pn] = null;
@@ -1646,7 +1648,7 @@ class AssessRecord
         }
       }
       // stuanswers array is 1-indexed
-      if (isset($curq['answeights']) && count($curq['answeights']) > 1) {
+      if ($numParts > 1) {
         $stuanswers[$qn+1] = $stuansparts;
         $stuanswersval[$qn+1] = $stuansvalparts;
       } else {

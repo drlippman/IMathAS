@@ -113,29 +113,29 @@ $questionSet = [
     'uniqueid' => 1552587894535728,
     'description' => 'matrix plain',
     'qtype' => 'matrix',
-    'control' => '$answer="[(1,2),(3,4)]"',
-    'qtext' => '<p>Enter [(1,2),(3,4)]</p>'
+    'control' => '$answer="[(1,2),(3,4)]"'."\n".'$stua=$stuanswers[$thisq]'."\n".'$stuav=$stuanswersval[$thisq]',
+    'qtext' => '<p>Enter [(1,2),(3,4)]. Stua: $stua. Stuaval: $stuav</p>'
   ],
   16=>[
     'uniqueid' => 1552587894535729,
     'description' => 'calcmatrix plain',
     'qtype' => 'calcmatrix',
-    'control' => '$answerformat="fraction"'."\n".'$answer="[(1/2,2),(3,4)]"',
-    'qtext' => '<p>Enter [(1/2,2),(3,4)]</p>'
+    'control' => '$answerformat="fraction"'."\n".'$answer="[(1/2,2),(3,4)]"'."\n".'$stua=$stuanswers[$thisq]'."\n".'$stuav=$stuanswersval[$thisq]',
+    'qtext' => '<p>Enter [(1/2,2),(3,4)]. Stua: $stua. Stuaval: $stuav</p>'
   ],
   17=>[
     'uniqueid' => 1552587894535730,
     'description' => 'matrix sized',
     'qtype' => 'matrix',
-    'control' => '$answersize="2,3"'."\n".'$answer="[(1,2,3),(4,5,6)]"',
-    'qtext' => '<p>Enter `[(1,2),(3,4)]`</p>'
+    'control' => '$answersize="2,3"'."\n".'$answer="[(1,2,3),(4,5,6)]"'."\n".'$stua=$stuanswers[$thisq]'."\n".'$stuav=$stuanswersval[$thisq]',
+    'qtext' => '<p>Enter `[(1,2,3),(3,4,6)]`. Stua: $stua. Stuaval: $stuav</p>'
   ],
   18=>[
     'uniqueid' => 1552587894535731,
     'description' => 'calcmatrix sized',
     'qtype' => 'calcmatrix',
-    'control' => '$answerformat="fraction"'."\n".'$answersize="2,3"'."\n".'$answer="[(1/2,2,3),(4,5,6)]"',
-    'qtext' => '<p>Enter `[(1/2,2,3),(4,5,6)]`</p>'
+    'control' => '$answerformat="fraction"'."\n".'$answersize="2,3"'."\n".'$answer="[(1/2,2,3),(4,5,6)]"'."\n".'$stua=$stuanswers[$thisq]'."\n".'$stuav=$stuanswersval[$thisq]',
+    'qtext' => '<p>Enter `[(1/2,2,3),(4,5,6)]`. Stua: $stua. Stuaval: $stuav</p>'
   ],
   19=>[
     'uniqueid' => 1552587894535732,
@@ -157,6 +157,156 @@ $questionSet = [
     'qtype' => 'numfunc',
     'control' => '$answerformat = "equation"'."\n".'$a=rand(1,20)'."\n".'$variables="x,y"'."\n".'$answer="y=x-$a"',
     'qtext' => '<p>Enter `y=x-$a`</p>'
+  ],
+  22=>[
+    'uniqueid' => 1552587894535735,
+    'description' => 'Simple matching',
+    'qtype' => 'matching',
+    'control' => '$questions = array("Apple","Banana","Cucumber")'."\n".'$answers = array("A","B","C")'."\n".'$displayformat="select"',
+    'qtext' => '<p>Match each word with its first letter</p>'
+  ],
+  23=>[
+    'uniqueid' => 1552587894535736,
+    'description' => 'basic complex',
+    'qtype' => 'complex',
+    'control' => '$a,$b=diffrands(1,50,2)'."\n".'$answer="$a+$b i"',
+    'qtext' => '<p>Enter `$a + $b i`</p>'
+  ],
+  24=>[
+    'uniqueid' => 1552587894535737,
+    'description' => 'interval',
+    'qtype' => 'interval',
+    'control' => '$a=rand(-10,10)'."\n".'$answer="[$a,oo)"',
+    'qtext' => '<p>Enter [$a,oo)</p>'
+  ],
+  25=>[
+    'uniqueid' => 1552587894535738,
+    'description' => 'interval - normal curve',
+    'qtype' => 'interval',
+    'control' => '$answerformat="normalcurve"'."\n".'$answer="(-2,1)"',
+    'qtext' => '<p>Sketch the region corresponding to `P(-2 lt z lt 1)`</p>'
+  ],
+  26=>[
+    'uniqueid' => 1552587894535739,
+    'description' => 'number w nosolninf',
+    'qtype' => 'number',
+    'control' => '$answerformat="nosolninf"'."\n".'$answer=randfrom(array("DNE",5))',
+    'qtext' => '<p>Enter: $answer</p>'
+  ],
+  27=>[
+    'uniqueid' => 1552587894535740,
+    'description' => 'ntuple',
+    'qtype' => 'ntuple',
+    'control' => '$displayformat="point"'."\n".'$a,$b=diffrands(-10,10,2)'."\n".'$answer="($a,$b)"',
+    'qtext' => '<p>Enter the point ($a,$b)</p>'
+  ],
+  28=>[
+    'uniqueid' => 1552587894535741,
+    'description' => 'calc ntuple vector',
+    'qtype' => 'calcntuple',
+    'control' => '$displayformat="vector"'."\n".'$a,$b=diffrands(-10,10,2)'."\n".'$answer="<$a,$b>"',
+    'qtext' => '<p>Enter the vector `(:$a,$b:)`</p>'
+  ],
+  29=>[
+    'uniqueid' => 1552587894535742,
+    'description' => 'old draw',
+    'qtype' => 'draw',
+    'control' => '$snaptogrid=1'."\n".'$answers=array("1,1","1,3")',
+    'qtext' => '<p>Plot the dots (1,1) and (1,3)</p>'
+  ],
+  30=>[
+    'uniqueid' => 1552587894535743,
+    'description' => 'essay no editor',
+    'qtype' => 'essay',
+    'control' => '',
+    'qtext' => '<p>Enter something</p>'
+  ],
+  31=>[
+    'uniqueid' => 1552587894535744,
+    'description' => 'essay w editor w takeanything',
+    'qtype' => 'essay',
+    'control' => '$displayformat = "editor"'."\n".'$scoremethod="takeanything"',
+    'qtext' => '<p>Enter something</p>'
+  ],
+  32=>[
+    'uniqueid' => 1552587894535745,
+    'description' => 'essay w editor Takeanythingorblank',
+    'qtype' => 'essay',
+    'control' => '$displayformat = "editor"'."\n".'$scoremethod="takeanythingorblank"',
+    'qtext' => '<p>Enter something or nothing</p>'
+  ],
+  33=>[
+    'uniqueid' => 1552587894535746,
+    'description' => 'string',
+    'qtype' => 'string',
+    'control' => '$answer="cat"',
+    'qtext' => '<p>Enter "cat"</p>'
+  ],
+  34=>[
+    'uniqueid' => 1552587894535747,
+    'description' => 'Simple file w takeanythingorblank',
+    'qtype' => 'file',
+    'control' => '$scoremethod="takeanythingorblank"',
+    'qtext' => '<p>Upload your work here (or leave it blank)</p>'
+  ],
+  35=> [
+    'uniqueid' => 1552587894535748,
+    'description' => 'multipart w mixed parts',
+    'qtype' => 'multipart',
+    'control' => '$anstypes="calculated,calcinterval,calccomplex"'."\n".'$answerformat[1]="fraction"'."\n".'$a = rand(2,100)'."\n".'$answer = array("sqrt($a)","(1/$a,oo)","$a+i")',
+    'qtext' => 'Type<br/>: `sqrt($a)`: $answerbox[0]<br/>`(1/$a,oo)`: $answerbox[1]<br/>`$a+i`: $answerbox[2]'
+  ],
+  36=> [
+    'uniqueid' => 1552587894535749,
+    'description' => 'Basic conditional',
+    'qtype' => 'conditional',
+    'control' => '$anstypes="number,calculated"'."\n".'$stua=getstuans($stuanswers,$thisq,0)'."\n".'$stub=getstuans($stuanswersval,$thisq,1)'."\n".'$answer = ($stua+$stub == 5)',
+    'qtext' => 'Enter two numbers that add to 5'
+  ],
+  37=>[
+    'uniqueid' => 1552587894535750,
+    'description' => 'string w typeahead',
+    'qtype' => 'string',
+    'control' => '$displayformat="typeahead"'."\n".'$questions=array("linear","quadratic","cubic","quartic")',
+    'qtext' => '<p>Enter "quadratic". You should see a suggestions list</p>'
+  ],
+  38=>[
+    'uniqueid' => 1552587894535751,
+    'description' => 'accounting w blanks and credit/debit',
+    'qtype' => 'multipart',
+    'control' => '$hidetips = true'."\n".'$abstolerance = .01'."\n".'$scoremethod = "acct"'."\n".'loadlibrary("acct")'."\n".'$furn = rrand(4000,7000,500)'."\n".'$furnc = rrand(1500,2500,500)'."\n".'$ops = array("Cash","Accounts Receivable","Supplies","Equipment","Accounts Payable","Notes Payable","Common Stock","Retained Earnings","Service Revenue","Rent Expense","Furniture", "Prepaid Insurance","Advertising Expense","Unearned Revenue","Wages Expense","Interest Expense","Salaries Expense","Prepaid Rent")'."\n".'$ja[0][\'date\'] = ""'."\n".'$ja[0][\'debits\'] = array("Furniture", $furn)'."\n".'$ja[0][\'credits\'] = array("Cash",$furnc, "Accounts Payable", $furn - $furnc)'."\n".'$jea = makejournal($ja, 0, $ops, $anstypes, $questions, $answer, $showanswer, $displayformat, $answerboxsize)'."\n".'$answer = scorejournal($stuanswers[$thisq], $answer, $ja, 0)',
+    'qtext' => '<p>Journalize: Purchased office furniture for $$furn, paying $$furnc cash. The balance must be paid within 60 days.</p><p>$jea</p>'
+  ],
+  39=>[
+    'uniqueid' => 1552587894535752,
+    'description' => 'number w hints',
+    'qtype' => 'number',
+    'control' => '$answer=3'."\n".'$hints = array("","After 1 miss","After 2 or more misses")',
+    'qtext' => '<p>The answer is 3. Get it wrong to see hints</p><p>$hintloc</p>'
+  ],
+  40=>[
+    'uniqueid' => 1552587894535753,
+    'description' => 'Question w detailed soln',
+    'qtype' => 'number',
+    'control' => '$a = rand(1,100)'."\n".'$answer = $a',
+    'qtext' => 'Type $a',
+    'extref' => 'video!!https://www.youtube.com/watch?v=zc2CpyRtjvY!!1',
+    'solutionopts' => 7,
+    'solution' => 'This is a detailed solution.  Enter enter $a, you click in the box and type $a.'
+  ],
+  41=>[
+    'uniqueid' => 1552587894535754,
+    'description' => 'geogebra and inline JS',
+    'qtype' => 'number',
+    'control' => '$a,$b=diffrands(-4,4,2)'."\n".'$answer=$a'."\n".'loadlibrary("geogebra")'."\n".'$geogebrainit = array("setValue(\\"h\\",$b)")'."\n".'$geogebraget = array("getValue(\\"h\\")")'."\n".'$g = addGeogebra("701939",600,400,$geogebrainit,array(),$geogebraget,$thisq)',
+    'qtext' => '<p>The answer is $a. The geogebra should be initialized with a shift of $b, and the answerbox value should fill on submit</p><p>Test 2 inline JS: <span onclick="this.style.display=\'none\'">Clicking this should make it disappear</span></p><p>Test 3 JS: <span id="test1">Clicking this should make it disappear</span><script type="text/javascript">$("#test1").on("click", function(e){e.target.style.display="none";});</script></p><p>Test 4 JS: <span id="test2">Clicking this should make it disappear</span><script type="text/javascript">$(function() {$("#test2").on("click", function(e){e.target.style.display="none";});});</script></p>'
+  ],
+  42=>[
+    'uniqueid' => 1552587894535755,
+    'description' => 'multipart w changing anstypes',
+    'qtype' => 'multipart',
+    'control' => '$anstypes = "number"'."\n".'$anstypes = "number,number" if ($attemptn > 0)'."\n".'$requestclearla = true if ($attemptn == 1)',
+    'qtext' => '<p>One the first try there should be 1 answerblank. On second there should be two and the first entered answer should be cleared</p>'
   ]
 ];
 
@@ -940,13 +1090,13 @@ $assessGroups = [
     'assessments' => [
       [
         'name' => 'Qtypes 1',
-        'summary' => 'number,calculated,calcntuple,calccomplex,calcinterval',
+        'summary' => 'number,calculated,numfunc,choices,multans,matching',
         'startdate' =>  -2*24,
         'enddate' => 24*7,
         'reviewdate' => 2000000000,
         'noprint' => 1,
         'displaymethod' => 'skip',
-        'ptsposs' => 10,
+        'ptsposs' => 40,
         'submitby' => 'by_question',
         'showscores' => 'during',
         'showans' => 'after_lastattempt',
@@ -955,14 +1105,16 @@ $assessGroups = [
         'defattempts' => 100,
         'ver' => 2,
         'questions' => [
-          0=>['questionsetid' => 0],
-          1=>['questionsetid' => 9],
-          2=>['questionsetid' => 11],
-          3=>['questionsetid' => 12],
-          4=>['questionsetid' => 13],
-          5=>['questionsetid' => 14]
+          0=>['questionsetid' => 3],
+          1=>['questionsetid' => 26],
+          2=>['questionsetid' => 9],
+          3=>['questionsetid' => 10],
+          4=>['questionsetid' => 21],
+          5=>['questionsetid' => 5],
+          6=>['questionsetid' => 6],
+          7=>['questionsetid' => 22]
         ],
-        'itemorder' => [0,1,2,3,4,5]
+        'itemorder' => [0,1,2,3,4,5,6,7]
       ],
       [
         'name' => 'Qtypes 2',
@@ -972,7 +1124,7 @@ $assessGroups = [
         'reviewdate' => 2000000000,
         'noprint' => 1,
         'displaymethod' => 'skip',
-        'ptsposs' => 10,
+        'ptsposs' => 20,
         'submitby' => 'by_question',
         'showscores' => 'during',
         'showans' => 'after_lastattempt',
@@ -990,13 +1142,13 @@ $assessGroups = [
       ],
       [
         'name' => 'Qtypes 3',
-        'summary' => 'numfunc,draw,string w preview',
+        'summary' => 'complex.interval,ntuple',
         'startdate' =>  -2*24,
         'enddate' => 24*7,
         'reviewdate' => 2000000000,
         'noprint' => 1,
         'displaymethod' => 'skip',
-        'ptsposs' => 10,
+        'ptsposs' => 45,
         'submitby' => 'by_question',
         'showscores' => 'during',
         'showans' => 'after_lastattempt',
@@ -1005,21 +1157,26 @@ $assessGroups = [
         'defattempts' => 100,
         'ver' => 2,
         'questions' => [
-          0=>['questionsetid' => 10],
-          1=>['questionsetid' => 19],
-          2=>['questionsetid' => 20],
-          3=>['questionsetid' => 21]
+          0=>['questionsetid' => 23],
+          1=>['questionsetid' => 12],
+          2=>['questionsetid' => 24],
+          3=>['questionsetid' => 25],
+          4=>['questionsetid' => 13],
+          5=>['questionsetid' => 14],
+          6=>['questionsetid' => 27],
+          7=>['questionsetid' => 11],
+          8=>['questionsetid' => 28]
         ],
-        'itemorder' => [0,1,2,3]
+        'itemorder' => [0,1,2,3,4,5,6,7,8]
       ],
       [
-        'name' => 'More Question types',
-        'summary' => 'choices, multiple-answer, file',
+        'name' => 'Qtypes 4',
+        'summary' => 'draw,multipart,conditional',
         'startdate' =>  -2*24,
         'enddate' => 24*7,
         'reviewdate' => 2000000000,
         'displaymethod' => 'skip',
-        'ptsposs' => 15,
+        'ptsposs' => 30,
         'submitby' => 'by_question',
         'showscores' => 'during',
         'showans' => 'after_lastattempt',
@@ -1030,12 +1187,69 @@ $assessGroups = [
         'defpenalty' => 0,
         'ver' => 2,
         'questions' => [
-          0=>['questionsetid' => 5],
-          1=>['questionsetid' => 6],
-          2=>['questionsetid' => 7]
+          0=>['questionsetid' => 19],
+          1=>['questionsetid' => 29],
+          2=>['questionsetid' => 1],
+          3=>['questionsetid' => 35],
+          4=>['questionsetid' => 2],
+          5=>['questionsetid' => 36]
         ],
-        'itemorder' => [0,1,2]
+        'itemorder' => [0,1,2,3,4,5]
       ],
+      [
+        'name' => 'Qtypes 5',
+        'summary' => 'string, essay, file',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 35,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 30],
+          1=>['questionsetid' => 31],
+          2=>['questionsetid' => 32],
+          3=>['questionsetid' => 33],
+          4=>['questionsetid' => 20],
+          5=>['questionsetid' => 7],
+          6=>['questionsetid' => 34]
+        ],
+        'itemorder' => [0,1,2,3,4,5,6]
+      ],
+      [
+        'name' => 'Qtypes 6',
+        'summary' => 'accounting, hints, solutions, weird stuff',
+        'startdate' =>  -2*24,
+        'enddate' => 24*7,
+        'reviewdate' => 2000000000,
+        'displaymethod' => 'skip',
+        'ptsposs' => 25,
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'defregens' => 3,
+        'defregenpenalty' => 0,
+        'defpoints' => 5,
+        'defattempts' => 2,
+        'defpenalty' => 0,
+        'ver' => 2,
+        'questions' => [
+          0=>['questionsetid' => 38],
+          1=>['questionsetid' => 39],
+          2=>['questionsetid' => 40],
+          3=>['questionsetid' => 41],
+          4=>['questionsetid' => 42]
+        ],
+        'itemorder' => [0,1,2,3,4]
+      ]
     ]
   ],
   [

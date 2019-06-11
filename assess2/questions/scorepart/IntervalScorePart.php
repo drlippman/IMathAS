@@ -47,7 +47,7 @@ class IntervalScorePart implements ScorePart
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
         }
-        
+
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         $givenans = normalizemathunicode($givenans);
@@ -61,7 +61,7 @@ class IntervalScorePart implements ScorePart
 
         $ansformatsHasList = in_array('list',$ansformats);
         $givenans = str_replace('u', 'U', $givenans);
-        $scorePartResult->setLastAnswerAsGiven($givenansval);
+        $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($hasNumVal) {
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
@@ -224,6 +224,7 @@ class IntervalScorePart implements ScorePart
             $correct = 1;
             break;
         }
-        return $correct;
+        $scorePartResult->setRawScore($correct);
+        return $scorePartResult;
     }
 }

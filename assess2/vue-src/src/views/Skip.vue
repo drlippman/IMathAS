@@ -77,6 +77,9 @@ export default {
   visibility: hidden;
   position: absolute;
 }
+.questionpane.inactive {
+  margin-left: -10000px;
+}
 .questionpane {
   margin: 15px 15px;
   max-width: 700px;

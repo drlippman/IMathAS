@@ -48,7 +48,7 @@ class NTupleScorePart implements ScorePart
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
         }
-        
+
         if (!isset($answerformat)) { $answerformat = '';}
         $givenans = normalizemathunicode($givenans);
         $givenans = str_replace(array('(:',':)','<<','>>'), array('<','>','<','>'), $givenans);
@@ -63,8 +63,8 @@ class NTupleScorePart implements ScorePart
             }
         }
 
+        $scorePartResult->setLastAnswerAsGiven($givenans);
         if ($anstype=='ntuple') {
-            $scorePartResult->setLastAnswerAsGiven($givenans);
             $gaarr = $this->parseNtuple($givenans, false, true);
         } else if ($anstype=='calcntuple') {
             // parse and evaluate

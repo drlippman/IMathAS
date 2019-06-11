@@ -51,7 +51,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         if (!isset($sz)) { $sz = 20;}
-        if ($multi>0) { $qn = $multi*1000+$qn;}
+        if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         if (isset($ansprompt)) {
           $out .= "<label for=\"qn$qn\">$ansprompt</label>";
         }

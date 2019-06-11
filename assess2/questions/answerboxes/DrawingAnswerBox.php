@@ -81,7 +81,7 @@ class DrawingAnswerBox implements AnswerBox
     		if (!isset($snaptogrid)) {
     			$snaptogrid = 0;
     		}
-    		if ($multi>0) { $qn = $multi*1000+$qn;}
+        if ($multi) { $qn = ($qn+1)*1000+$partnum; }
     		$imgborder = 5;
 
     		if (!isset($answerformat)) {

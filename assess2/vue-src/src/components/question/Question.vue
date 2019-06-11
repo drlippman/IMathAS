@@ -151,7 +151,7 @@ export default {
     },
     addDirtyTrackers () {
       var self = this;
-      window.$('#questionwrap' + this.qn).find('input,select,textarea')
+      window.$('#questionwrap' + this.qn).find('input[name],select[name],textarea[name]')
         .off('focus.dirtytrack').off('change.dirtytrack')
         .on('focus.dirtytrack', function () {
         // TODO: Does this work for checkboxes/radios?
@@ -179,7 +179,7 @@ export default {
             if (m !== null) {
               var qn = m[2] * 1;
               var pn = 0;
-              if (qn > 1000) {
+              if (qn >= 1000) {
                 pn = qn % 1000;
                 qn = Math.floor(qn / 1000 + 0.001) - 1;
               }
