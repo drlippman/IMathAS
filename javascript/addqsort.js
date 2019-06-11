@@ -1074,7 +1074,7 @@ function generateTable() {
 				text_segment_count++;
 				//html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
 				//html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
-				if (displaymethod=="Embed") {
+				if (displaymethod=="Embed" || displaymethod=='full') {
 					html += "<td colspan="+(totalcols-4)+" id=\"textsegdescr"+i+"\" class=\"description-cell\">";
 					if (curitems[j][3]==1) {
 						var header_contents= curitems[j][4];
