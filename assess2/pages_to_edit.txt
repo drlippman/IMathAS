@@ -3,6 +3,10 @@ TODOs:
   Give out-of-time submission notice
   Build migration function
 
+  Newver /course/gb-rescoreq.php
+    - Should be simpler, since we have stored stuans for most question types and
+      can replicate clientside eval
+      
 To discuss:
   Syntax error warnings: error icon w hoverover vs displaying error
 
@@ -21,28 +25,14 @@ Minor TODOs:
   Fix icon alignment in question selector when only one of retake/retry are there
   Add some display of time when submission were made in GB
   Test accounting Qs
-
-Newver /course/gb-itemanalysis.php
-  - For by-assessment, should we could all attempts? or just scored?
-  - For by-question, should we just count scored version for timespent, or all versions?
-  - Do we estimate per-try times, or just leave them out?
-Newver /course/gb-itemanalysisdetail.php
-Newver /course/gb-itemresults.php
-  - Might be a little easier now, if we're storing unrand selection
-  - Probably can't do this one until displayq refactor is integrated
-Newver /course/gb-aidexport.php
-  - Ditto on above
-
-Newver /course/gb-rescoreq.php
-  - Should be simpler, since we have stored stuans for most question types and
-    can replicate clientside eval
-
+  Review stuanswers/val for matrix/calcmatrix types
 
 
 Future Todos:
   Build modal for redeeming latepasses for LTI users.
   Figure better way to handle change of user prefs.
   migrate itemorder to JSON format
+
 
 Delay for later (since they work with displayq2 for now):
   Edit/Rewrite testquestion.php
@@ -60,6 +50,16 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Newver /course/gb-itemanalysis.php
+  - For by-assessment, should we could all attempts? or just scored?
+  - For by-question, should we just count scored version for timespent, or all versions?
+  - Do we estimate per-try times, or just leave them out?
+X Newver /course/gb-itemanalysisdetail.php
+X Newver /course/gb-itemresults.php
+  - Might be a little easier now, if we're storing unrand selection
+  - Probably can't do this one until displayq refactor is integrated
+X Newver /course/gb-aidexport.php
+  - Ditto on above
 X Click on '-' in GB to create new record for student
 X Improve build documentation
 X Shell script for building min JS
