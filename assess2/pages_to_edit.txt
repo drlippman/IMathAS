@@ -6,9 +6,12 @@ TODOs:
   Newver /course/gb-rescoreq.php
     - Should be simpler, since we have stored stuans for most question types and
       can replicate clientside eval
-      
+
 To discuss:
   Syntax error warnings: error icon w hoverover vs displaying error
+  How rescoreq should work
+    Which version? Which try?
+  "Show each score as submitted" - should this be quiz-style with 1 take?
 
 Separate:
   Collate CSS

@@ -32,7 +32,7 @@ $vueData = array(
 	'gbcategory' => $line['gbcategory'],
 	'gbcatOptions' => $gbcats,
 	'caltag' => $line['caltag'],
-	'shuffle' => ($line['shuffle']&(1+16)) > 0,
+	'shuffle' => ($line['shuffle']&(1+16)),
 	'noprint' => $line['noprint'] > 0,
 	'sameseed' => ($line['shuffle']&2) > 0,
 	'samever' => ($line['shuffle']&4) > 0,
@@ -356,7 +356,7 @@ $vueData = array(
 
 			<label class=form for="shuffle">Shuffle item order:</label>
 			<span class=formright>
-				<select name="shuffle" id="shuffle">
+				<select name="shuffle" id="shuffle" v-model="shuffle">
 					<option value="0">No</option>
 					<option value="1">All</option>
 					<option value="16">All but first</option>
