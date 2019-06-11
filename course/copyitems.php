@@ -301,6 +301,8 @@ if (!(isset($teacherid))) {
 					$copystickyposts = false;
 				}
 
+				// indicate this course's assess version so settings can be migrated
+				$convertAssessVer = $courseUIver;
 				if ($_POST['whattocopy']=='all') {
 					copyallsub($items,'0',$newitems,$gbcats);
 				} else {
@@ -376,24 +378,26 @@ if (!(isset($teacherid))) {
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 			$items = false;
 
-			$stm = $DBH->prepare("SELECT id,itemorder,picicons,name FROM imas_courses WHERE id IN (?,?)");
+			$stm = $DBH->prepare("SELECT id,itemorder,picicons,name,UIver FROM imas_courses WHERE id IN (?,?)");
 			$stm->execute(array($_POST['ctc'], $cid));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['id']==$ctc) {
 					$items = unserialize($row['itemorder']);
 					$picicons = $row['picicons'];
 					$ctcname = $row['name'];
+					$sourceUIver = $row['UIver'];
 				}
 				if ($row['id']==$cid) {
 					$existblocks = array();
 					buildexistblocks(unserialize($row['itemorder']),'0');
+					$destUIver = $row['UIver'];
 				}
 			}
 			if ($items===false) {
 				echo 'Error with course to copy';
 				exit;
 			}
-			
+
 			$ids = array();
 			$types = array();
 			$names = array();
@@ -475,6 +479,15 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['action']) && $_GET['action']=="select") {
 
 //DISPLAY BLOCK FOR SECOND STEP - selecting course item
+
+// if source is using assess2 and dest is not, bail
+if ($sourceUIver > $destUIver) {
+	echo '<p>The course you selected is using a newer version of assessments than
+	your course. It is not possible to convert assessment back to an older format, sorry.</p>';
+	require("../footer.php");
+	exit;
+}
+
 ?>
 	<script type="text/javascript">
 
@@ -489,7 +502,7 @@ if ($overwriteBody==1) {
 	}
 	</script>
 	<p>Copying course: <b><?php echo Sanitize::encodeStringForDisplay($ctcname);?></b></p>
-	
+
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
 	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
@@ -608,6 +621,13 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	</table>
 	</fieldset>
 	</div>
+<?php
+	if ($sourceUIver < $destUIver) {
+		echo '<p class="noticetext">Note: The course you are copying from is using
+			an older version of assessments. They will be auto-converted to the current
+			version, but you should review the settings after they are copied.</p>';
+	}
+?>
 	<p><input type=submit value="Copy Items"></p>
 	</form>
 <?php
@@ -631,15 +651,15 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		echo '<span id=templatename></span>';
 		echo '</span>';
 		echo '</p>';
-		echo '<p>'._('Or, select from the course list below').'</p>';		
+		echo '<p>'._('Or, select from the course list below').'</p>';
 	} else {
 		echo '<p>'._('Course List').'</p>';
 	}
 	//this displays the actual course list
 	require("../includes/coursecopylist.php");
-	
+
 	writeEkeyField()
-?>	
+?>
 		<input type=submit value="Select Course Items">
 		<p>&nbsp;</p>
 	</form>

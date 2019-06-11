@@ -202,6 +202,14 @@ function migrateAssessSettings1to2($settings) {
     $settings['isgroup'] = 2;
   }
 
+  // handle overtime timelimit
+  if ($settings['timelimit'] > 0) {
+    $settings['overtime_grace'] = min($settings['timelimit'], 300);
+    $settings['overtime_penalty'] = 0;
+  }
+
+  $settings['ver'] = 2;
+
   return $settings;
 }
 

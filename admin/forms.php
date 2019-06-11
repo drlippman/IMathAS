@@ -534,6 +534,7 @@ switch($_GET['action']) {
 					$latepasshrs = $ctcinfo['latepasshrs'];
 					$deflatepass = $ctcinfo['deflatepass'];
 					$showlatepass = $ctcinfo['showlatepass'];
+					$sourceUIver = $ctcinfo['UIver'];
 					$theme = $ctcinfo['theme'];
 					$msgset = $ctcinfo['msgset'];
 				}
@@ -677,6 +678,12 @@ switch($_GET['action']) {
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
 			echo '</span><br class=form>';
+			if ($sourceUIver < 2) {
+				echo '<span class=form>'._('Upgrade assessment version (Beta - use with caution)').'</span>';
+				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
+				echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
+				echo '</label></span><br class=form>';
+			}
 			echo '</div>';
 			//TODO:  FINISH ME ****
 		}
@@ -829,7 +836,12 @@ switch($_GET['action']) {
 		echo 'Additional Options';
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
-
+		if ($_GET['action']=='addcourse' && $ctc == 0) {
+			echo '<span class=form>'._('Use new assessment version').'</span>';
+			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
+			echo _('Select this option to set your new course to use the new version of assessments. This feature is still in Beta - use with caution.');
+			echo '</label></span><br class=form>';
+		}
 		if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1]==1) {
 			echo '<span class="form">Auto-assign LatePasses on course enroll:</span><span class="formright">';
 			echo '<input type="text" size="3" name="deflatepass" value="'.Sanitize::encodeStringForDisplay($deflatepass).'"/> LatePasses</span><br class="form" />';
