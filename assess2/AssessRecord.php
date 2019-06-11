@@ -2524,7 +2524,7 @@ class AssessRecord
       $base *= (1 - $exceptionpenalty / 100);
       $penalties[] = array('type'=>'late', 'pct'=>$exceptionpenalty);
     }
-    if ($timelimitEnd > 0 && $overtimePenalty > 0 && $subtime > $timelimitEnd+5) {
+    if ($timelimitEnd > 0 && $overtimePenalty > 0 && $subtime > $timelimitEnd+10) {
       $base *= (1 - $overtimePenalty / 100);
       $penalties[] = array('type'=>'overtime', 'pct'=>$overtimePenalty);
     }

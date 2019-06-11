@@ -62,11 +62,7 @@ function migrateAssessSettings1to2($settings) {
     } else if ($showans == 'J') {
       $settings['showans'] = 'jump_to_answer';
     } else if ($showans == 'I' || $showans == '0') {
-      if ($settings['defattempts'] == 1) {
-        $settings['showans'] = 'with_score';
-      } else {
-        $settings['showans'] = 'after_1';
-      }
+      $settings['showans'] = 'after_1';
     } else if (is_numeric($showans)) {
       $settings['showans'] = 'after_'.$showans;
     }

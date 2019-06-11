@@ -275,6 +275,8 @@ export const actions = {
             this.copySettings(response);
           }
           return;
+        } else {
+          store.errorMsg = null;
         }
         // clear out initValues for this question so they get re-set
         for (let k = 0; k < qns.length; k++) {
@@ -416,8 +418,11 @@ export const actions = {
   handleTimelimitUp () {
     if (store.assessInfo.has_active_attempt) {
       // submit dirty questions and end attempt
-      let tosub = Object.keys(this.getChangedQuestions());
-      this.submitQuestion(tosub, true);
+      store.errorMsg = 'timesup_submitting';
+      setTimeout(() => {
+        let tosub = Object.keys(this.getChangedQuestions());
+        this.submitQuestion(tosub, true);
+      }, 1000);
     }
     // store.timelimit_expired = true;
   },

@@ -127,6 +127,7 @@
     "not_avail": "The assessment is not currently available",
     "not_ready": "The assessment is not ready for this action",
     "timelimit_expired": "Timelimit has expired",
+    "timesup_submitting": "Timelimit has expired. Submitting now.",
     "out_of_regens": "No more Try a Similar Question remain",
     "need_group": "Cannot start the assessment until you have been added to a group",
     "out_of_attempts": "You have used all your assessment attempts",

@@ -1,7 +1,5 @@
 TODOs:
   Need to revisit showhints throughout display code
-  Give out-of-time submission notice
-  Build migration function
 
   Newver /course/gb-rescoreq.php
     - Should be simpler, since we have stored stuans for most question types and
@@ -53,6 +51,8 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Give out-of-time submission notice
+X Build migration function
 X Newver /course/gb-itemanalysis.php
   - For by-assessment, should we could all attempts? or just scored?
   - For by-question, should we just count scored version for timespent, or all versions?

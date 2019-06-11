@@ -46,6 +46,7 @@
         :href="printLink"
         class = "noextlink"
         target = "_blank"
+        :title = "$t('print.print_version')"
         :aria-label = "$t('print.print_version')"
       >
         <icons name="print" size="medium"/>

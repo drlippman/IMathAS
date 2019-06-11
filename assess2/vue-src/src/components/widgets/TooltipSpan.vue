@@ -3,24 +3,26 @@
     @keydown.esc = "triggerOpen(false)"
     class="dropdown-wrap"
     @mouseover = "triggerOpen(true)"
-    @mouseout = "triggerOpen(false)"
+    @mouseleave = "triggerOpen(false)"
     @touchstart = "triggerOpen"
   >
     <slot></slot>
-    <div
-      class = "dropdown-pane tooltip-pane"
-      ref = "pane"
-      v-if = "open"
-    >
-      {{ tip }}
-    </div>
+    <transition name="fade">
+      <div
+        class = "dropdown-pane tooltip-pane"
+        ref = "pane"
+        v-if = "open"
+      >
+        {{ tip }}
+      </div>
+    </transition>
   </span>
 </template>
 
 <script>
 export default {
   name: 'TooltipSpan',
-  props: ['tip'],
+  props: ['tip', 'show'],
   data: function () {
     return {
       open: false
