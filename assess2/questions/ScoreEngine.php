@@ -608,9 +608,9 @@ class ScoreEngine
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
         if (E_WARNING == $errno || E_ERROR == $errno) {
-            printf('<p>Caught %s in the question code: %s on line %s</p>',
+            printf('<p>Caught %s in the question code: %s on line %s in file %s</p>',
                 ErrorHandler::ERROR_CODES[$errno],
-                Sanitize::encodeStringForDisplay($errstr), $errline);
+                Sanitize::encodeStringForDisplay($errstr), $errline, $errfile);
         }
 
         // True = Don't execute the PHP internal error handler.

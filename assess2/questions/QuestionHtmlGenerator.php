@@ -306,6 +306,9 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
+            if ($scoremethod == 'acct') {
+              $jsParams['submitall'] = 1;
+            }
         } else {
             // Generate answer boxes. (non-multipart question)
             $questionColor = $this->getAnswerColorFromRawScore(

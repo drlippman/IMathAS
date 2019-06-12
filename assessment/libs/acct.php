@@ -310,7 +310,7 @@ function scorestatement($stua, $answer, $s, $sn) {
 					if (trim(strtolower($stua[$i]))==trim(strtolower($answer[$k]))) {
 						$matchtype = $k;
 						break;
-					} else if (abs($stua[$i+1]-$answer[$k+1])<.01) {
+					} else if (abs(floatval($stua[$i+1])-floatval($answer[$k+1]))<.01) {
 						$matchval = $k;
 					}
 					$k += 2;
@@ -518,7 +518,9 @@ function scorejournal($stua, $answer, $j, $sn) {
 				if (trim(strtolower($stua[$i]))==trim(strtolower($answer[$k]))) {
 					$matchtype = $k;
 					break;
-				} else if (($answer[$k+1]=='' && $stua[$i+1]=='' &&  abs($stua[$i+2]-$answer[$k+2])<.01) || ($answer[$k+2]=='' && $stua[$i+2]=='' && abs($stua[$i+1]-$answer[$k+1])<.01)) {
+				} else if (($answer[$k+1]=='' && $stua[$i+1]=='' && abs(floatval($stua[$i+2]) - floatval($answer[$k+2]))<.01) ||
+					($answer[$k+2]=='' && $stua[$i+2]=='' && abs(floatval($stua[$i+1])-floatval($answer[$k+1]))<.01)
+				) {
 					$matchval = $k;
 				}
 			}
@@ -1171,7 +1173,7 @@ function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 		//look for match in left column
 		$foundmatch = false;
 		foreach($leftentries as $loc=>$val) {
-			if (abs($stua[$sn+2*$i] - $val)<.01) {
+			if (abs(floatval($stua[$sn+2*$i]) - $val)<.01) {
 				$answer[$sn+2*$i] = $val;
 				unset($leftentries[$loc]);
 				$foundmatch = true;
@@ -1188,7 +1190,7 @@ function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 		//look for match in right column
 		$foundmatch = false;
 		foreach($rightentries as $loc=>$val) {
-			if (abs($stua[$sn+2*$i+1] - $val)<.01) {
+			if (abs(floatval($stua[$sn+2*$i+1]) - $val)<.01) {
 				$answer[$sn+2*$i+1] = $val;
 				unset($rightentries[$loc]);
 				$foundmatch = true;
@@ -1196,7 +1198,7 @@ function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn) {
 			}
 		}
 		if (!$foundmatch) {
-			$answer[$sn+2*$i+1] = $stua[$sn+2*$i+1] + 50000;
+			$answer[$sn+2*$i+1] = floatval($stua[$sn+2*$i+1]) + 50000;
 		} else if (trim($origstua[$sn+2*$i+1])=='') {
 			$answer[$sn+2*$i+1] = '';
 		}

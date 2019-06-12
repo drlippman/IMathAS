@@ -156,7 +156,7 @@ class NumberAnswerBox implements AnswerBox
     		}	else if ($displayformat=='hidden') {
     			$classes[] = 'pseudohidden';
     		}	else if ($displayformat=='debit') {
-    			$params['format'] = $anstype;
+    			$params['format'] = 'debit';
     			$classes[] = 'textright';
     		} else if ($displayformat=='credit') {
     			$params['format'] = 'credit';

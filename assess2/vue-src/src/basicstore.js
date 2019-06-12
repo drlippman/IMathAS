@@ -646,7 +646,9 @@ export const actions = {
       if (store.assessInfo.questions[qn].hasOwnProperty('jsparams')) {
         let curqparams = store.assessInfo.questions[qn].jsparams;
         for (let qref in curqparams) {
-          if (curqparams[qref].hasOwnProperty('submitblank')) {
+          if (curqparams.submitall ||
+            (qref.match(/\d/) && curqparams[qref].hasOwnProperty('submitblank'))
+          ) {
             let pn = 0;
             if (qref > 1000) {
               pn = qref % 1000;

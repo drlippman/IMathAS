@@ -125,6 +125,7 @@ function init(paramarr, enableMQ) {
       document.getElementById("qn"+qn).addEventListener('keyup', editdebit);
     } else if (params.format === 'credit') {
       document.getElementById("qn"+qn).addEventListener('keyup', editcredit);
+      initcreditboxes();
     } else if (params.format === 'normslider') {
       imathasDraw.addnormslider(qn, true);
     }
@@ -264,6 +265,43 @@ function setupDraw(qn) {
       imathasDraw.adda11ydraw(qn);
     });
   }
+}
+
+function isBlank(str) {
+	return (!str || 0 === str.length || /^\s*$/.test(str));
+}
+function editdebit(e) {
+  var el = e.target;
+	var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	if (!isBlank(el.value) && descr.hasClass("iscredit")) {
+    var leftpad = descr.css('padding-left');
+		if (descr.is('select')) {
+			descr.css('margin-right',20);
+		} else {
+			descr.width('');
+		}
+		descr.css('padding-left','');
+		descr.removeClass("iscredit");
+	}
+}
+function editcredit(e) {
+  var el = e.target;
+	var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	if (!isBlank(el.value) && !descr.hasClass("iscredit")) {
+    var leftpad = parseInt(descr.css('padding-left'));
+		if (descr.is('select')) {
+			descr.css('margin-right',0);
+		} else {
+			descr.width(descr.width()-20);
+		}
+		descr.css('padding-left',20+leftpad);
+		descr.addClass("iscredit");
+	}
+}
+function initcreditboxes() {
+	$('.creditbox').each(function(i, el) {
+		editcredit({target: el});
+	});
 }
 
 var LivePreviews = [];

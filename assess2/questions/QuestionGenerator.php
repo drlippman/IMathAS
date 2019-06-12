@@ -182,8 +182,8 @@ class QuestionGenerator
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
         $this->addError(sprintf(
-            _('<p>Caught warning in the question code: %s on line %d</p>'),
-            $errstr, $errline));
+            _('<p>Caught warning in the question code: %s on line %d in file %s</p>'),
+            $errstr, $errline, $errfile));
 
         // True = Don't execute the PHP internal error handler.
         // False = Populate $php_errormsg.
