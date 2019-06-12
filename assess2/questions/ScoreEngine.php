@@ -61,6 +61,7 @@ class ScoreEngine
     private $dbh;
     private $randWrapper;
     private $userRights;
+    private $errors = array(); // Populated by this class' error handlers.
 
     public function __construct(PDO $dbh, Rand $randWrapper)
     {
@@ -79,6 +80,10 @@ class ScoreEngine
         // This lets various parts of IMathAS know that question HTML is
         // NOT being generated for display.
         $GLOBALS['inquestiondisplay'] = false;
+
+        set_error_handler(array($this, 'evalErrorHandler'));
+        set_exception_handler(array($this, 'evalExceptionHandler'));
+        ob_start();
 
         $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed());
 
@@ -109,9 +114,6 @@ class ScoreEngine
          * Evals
          */
 
-        set_error_handler(array($this, 'evalErrorHandler'));
-        set_exception_handler(array($this, 'evalExceptionHandler'));
-
         // User's rights are used during exception handling.
         $this->userRights = $scoreQuestionParams->getUserRights();
 
@@ -119,13 +121,16 @@ class ScoreEngine
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $attemptn = $scoreQuestionParams->getAttemptNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
+        try {
+          eval(interpret('control', $quesData['qtype'], $quesData['control']));
+          $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
+          eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
+        } catch (\Throwable $t) {
+          $this->addError(
+              _('Caught error while evaluating the code in this question: ')
+              . $t->getMessage());
+        }
 
-        eval(interpret('control', $quesData['qtype'], $quesData['control']));
-        $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
-        eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
-
-        restore_error_handler();
-        restore_exception_handler();
 
         /*
 		 * Correct mistakes made by question writers.
@@ -235,6 +240,14 @@ class ScoreEngine
               $scoreResult['lastAnswerAsNumber'] = $stuanswersval[$thisq];
             }
         }
+
+        restore_error_handler();
+        restore_exception_handler();
+        $errors = ob_get_clean();
+        if ($errors != '') {
+          $this->addError($errors);
+        }
+        $scoreResult['errors'] = $this->errors;
 
         return $scoreResult;
     }
@@ -593,6 +606,16 @@ class ScoreEngine
     }
 
     /**
+     * Add an error message to the array of errors for this question.
+     *
+     * @param string $errorMessage The error message.
+     */
+    private function addError(string $errorMessage): void
+    {
+        $this->errors[] = $errorMessage;
+    }
+
+    /**
      * Warning handler for evals.
      *
      * @param int $errno
@@ -608,9 +631,9 @@ class ScoreEngine
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
         if (E_WARNING == $errno || E_ERROR == $errno) {
-            printf('<p>Caught %s in the question code: %s on line %s in file %s</p>',
+            $this->addError(sprintf('Caught %s in the question code: %s on line %s in file %s',
                 ErrorHandler::ERROR_CODES[$errno],
-                Sanitize::encodeStringForDisplay($errstr), $errline, $errfile);
+                $errstr, $errline, $errfile));
         }
 
         // True = Don't execute the PHP internal error handler.
@@ -629,11 +652,10 @@ class ScoreEngine
         ErrorHandler::evalExceptionHandler($t);
 
         if ($this->userRights > 10) {
-            echo '<p>Caught error in evaluating the code in this question: ';
-            echo Sanitize::encodeStringForDisplay($t->getMessage());
-            echo '</p>';
+            $this->addError('Caught error in evaluating the code in this question: '.
+            $t->getMessage());
         } else {
-            echo '<p>Something went wrong with this question.  Tell your teacher.</p>';
+            $this->addError('Something went wrong with this question.  Tell your teacher.');
         }
     }
 }

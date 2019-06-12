@@ -15,6 +15,13 @@
       <icons name="alert" color="warn" size="medium" />
       {{ $t('question.withdrawn') }}
     </p>
+    <div v-if = "errorsToShow.length > 0" class="small">
+      <ul>
+        <li v-for = "error in errorsToShow">
+          {{ error }}
+        </li>
+      </ul>
+    </div>
     <div
       v-if = "questionContentLoaded"
       v-html="questionData.html"
@@ -124,6 +131,18 @@ export default {
         store.assessInfo.help_features.message === true ||
         store.assessInfo.help_features.forum > 0)) ||
         (this.questionData.jsparams && this.questionData.jsparams.helps.length > 0));
+    },
+    errorsToShow () {
+      let errors = [];
+      if (store.assessInfo.hasOwnProperty('scoreerrors') &&
+        store.assessInfo.scoreerrors.hasOwnProperty(this.qn)
+      ) {
+        errors = errors.concat(store.assessInfo.scoreerrors[this.qn]);
+      }
+      if (this.questionData.hasOwnProperty('errors')) {
+        errors = errors.concat(this.questionData.errors);
+      }
+      return errors;
     }
   },
   methods: {

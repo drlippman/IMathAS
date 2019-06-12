@@ -166,6 +166,7 @@ if (count($qns) > 0) {
   $submission = $assess_record->addSubmission($now);
 
   // Score the questions
+  $scoreErrors = array();
   foreach ($qns as $k=>$qn) {
     if (!isset($timeactive[$k])) {
       $timeactive[$k] = 0;
@@ -177,7 +178,11 @@ if (count($qns) > 0) {
         $parts_to_score[$pn] = false;
       }
     }
-    $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score);
+
+    $errors = $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score);
+    if (count($errors)>0) {
+      $scoreErrors[$qn] = $errors;
+    }
   }
 
   // If it's full test, we'll score time at the assessment attempt level
@@ -281,6 +286,9 @@ if ($end_attempt) {
   $assessInfoOut['questions'] = array();
   foreach ($qns as $qn) {
     $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
+  }
+  if (count($scoreErrors)>0) {
+    $assessInfoOut['scoreerrors'] = $scoreErrors;
   }
 }
 

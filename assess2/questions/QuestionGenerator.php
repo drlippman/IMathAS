@@ -84,6 +84,7 @@ class QuestionGenerator
         set_error_handler(array($this, 'evalErrorHandler'));
         set_exception_handler(array($this, 'evalExceptionHandler'));
 
+
         $questionHtmlGenerator = new QuestionHtmlGenerator($this->dbh,
             $this->randWrapper, $this->questionParams);
         $question = $questionHtmlGenerator->getQuestion();
@@ -181,9 +182,11 @@ class QuestionGenerator
     {
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
-        $this->addError(sprintf(
-            _('<p>Caught warning in the question code: %s on line %d in file %s</p>'),
-            $errstr, $errline, $errfile));
+        if (E_WARNING == $errno || E_ERROR == $errno) {
+          $this->addError(sprintf(
+              _('Caught warning in the question code: %s on line %d in file %s'),
+              $errstr, $errline, $errfile));
+        }
 
         // True = Don't execute the PHP internal error handler.
         // False = Populate $php_errormsg.
@@ -201,7 +204,7 @@ class QuestionGenerator
         ErrorHandler::evalExceptionHandler($t);
 
         $this->addError(
-            _('<p>Caught error while evaluating the code in this question: ')
+            _('<p>Caught error while evaluating this question: ')
             . Sanitize::encodeStringForDisplay($t->getMessage())
             . '</p>');
     }

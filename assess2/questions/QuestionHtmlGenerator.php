@@ -108,6 +108,10 @@ class QuestionHtmlGenerator
      */
     public function getQuestion(): Question
     {
+        ob_start();
+
+        $GLOBALS['inquestiondisplay'] = true;
+
         $doShowAnswer = $this->questionParams->getShowAnswer();
         if (ShowAnswer::ALWAYS == $doShowAnswer) {
             $nosabutton = true;
@@ -139,9 +143,15 @@ class QuestionHtmlGenerator
         // Eval the question writer's question code.
         // In older questions, code is broken up into three parts.
         // In "modern" questions, the last two parts are empty.
-        eval(interpret('control', $quesData['qtype'], $quesData['control']));
-        eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol']));
-        eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
+        try {
+          eval(interpret('control', $quesData['qtype'], $quesData['control']));
+          eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol']));
+          eval(interpret('answer', $quesData['qtype'], $quesData['answer']));
+        } catch (\Throwable $t) {
+          $this->addError(
+              _('Caught error while evaluating the code in this question: ')
+              . $t->getMessage());
+        }
 
         $toevalqtxt = interpret('qtext', $quesData['qtype'], $quesData['qtext']);
         $toevalqtxt = str_replace('\\', '\\\\', $toevalqtxt);
@@ -277,6 +287,10 @@ class QuestionHtmlGenerator
                         $this->questionParams->getLastRawScores(), $atIdx, $answeights[$atIdx])
                     : '';
 
+                if (isset($requestclearla)) {
+                  $lastAnswersAllParts[$atIdx] = '';
+                  $questionColor = '';
+                }
                 $answerBoxParams = new AnswerBoxParams();
                 $answerBoxParams
                     ->setQuestionWriterVars($questionWriterVars)
@@ -317,6 +331,11 @@ class QuestionHtmlGenerator
             $lastAnswer = $stuanswers[$thisq];
             if (is_array($lastAnswer)) { // happens with autosaves
               $lastAnswer = $lastAnswer[0];
+            }
+
+            if (isset($requestclearla)) {
+              $lastAnswer = '';
+              $questionColor = '';
             }
 
             $answerBoxParams = new AnswerBoxParams();
@@ -412,7 +431,8 @@ class QuestionHtmlGenerator
          * Question content (raw HTML) is stored in: $evaledqtext
          */
 
-        eval("\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
+        try {
+          eval("\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
 
         /*
          * Eval the solution code.
@@ -420,7 +440,12 @@ class QuestionHtmlGenerator
          * Solution content (raw HTML) is stored in: $evaledsoln
          */
 
-        eval("\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
+         eval("\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
+       } catch (\Throwable $t) {
+          $this->addError(
+              _('Caught error while evaluating the text in this question: ')
+              . $t->getMessage());
+        }
         $detailedSolutionContent = $this->getDetailedSolutionContent($evaledsoln);
 
         /*
@@ -529,6 +554,11 @@ class QuestionHtmlGenerator
         /*
 		 * All done!
 		 */
+
+        $errors = ob_get_clean();
+        if ($errors != '') {
+          $this->addError($errors);
+        }
 
         $question = new Question(
             $evaledqtext,

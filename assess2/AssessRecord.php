@@ -1110,7 +1110,7 @@ class AssessRecord
         ) ||
         $this->teacherInGb;
       $out['info'] = $generate_html;
-      list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave']) =
+      list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave'], $out['errors']) =
         $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow, $generate_html === 2);
       if ($out['usedautosave']) {
         $autosave = $this->getAutoSaves($qn);
@@ -1365,7 +1365,7 @@ class AssessRecord
    * @param  boolean $force_answers force display of answers (def: false)
    * @param  string  $tryToShow     Try to show answers for: 'last' (def) or 'scored'
    * @param  boolean $includeCorrect  True to include 'ans' array in jsparams (def false)
-   * @return array (questionhtml, answeights)
+   * @return array (html, jsparams, answeights, usedautosaves, errors)
    */
   public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false, $tryToShow = 'last', $includeCorrect = false) {
     // get assessment attempt data for given version
@@ -1435,7 +1435,7 @@ class AssessRecord
         $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
       }
     }
-    $attemptn = (count($partattemptn) == 0) ? 0 : min($partattemptn);
+    $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
 
     /*
     // TODO: move this to displayq input
@@ -1496,7 +1496,7 @@ class AssessRecord
       $jsparams['stuans'] = $stuanswers[$qn+1];
     }
 
-    return array($qout, $jsparams, $answeights, $usedAutosave);
+    return array($qout, $jsparams, $answeights, $usedAutosave, $question->getErrors());
   }
 
   private function parseScripts($html) {
@@ -1532,7 +1532,7 @@ class AssessRecord
    * @param  int  $timeactive     Time the question was active, in ms
    * @param  int  $submission     The submission number, from addSubmission
    * @param  array $parts_to_score  an array, true if part is to be scored/recorded
-   * @return void
+   * @return string errors, if any
    */
   public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true) {
     $qver = $this->getQuestionVer($qn);
@@ -1546,7 +1546,7 @@ class AssessRecord
       // figure out try #
       $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
     }
-    $attemptn = (count($partattemptn) == 0) ? 0 : min($partattemptn);
+    $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
 
     $data = array();
     /*
@@ -1590,6 +1590,7 @@ class AssessRecord
         ->setQnpointval($qsettings['points_possible']);
 
     $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
+
     $scores = $scoreResult['scores'];
     $rawparts = $scoreResult['rawScores'];
     $partla = $scoreResult['lastAnswerAsGiven'];
@@ -1621,6 +1622,7 @@ class AssessRecord
     $singlescore = (count($partla) > 1 && count($scores) == 1);
     $this->recordTry($qn, $data, $singlescore);
 
+    return $scoreResult['errors'];
   }
 
   /**

@@ -193,6 +193,7 @@ export const actions = {
     // figure out non-blank questions to submit
     let lastLoaded = [];
     let changedQuestions = this.getChangedQuestions(qns);
+
     if (Object.keys(changedQuestions).length === 0 && !endattempt) {
       store.errorMsg = 'nochange';
       return;
