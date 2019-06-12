@@ -5,15 +5,13 @@ TODOs:
     Still give option of using first or last try.
       Keep the rescored try, ditch rest
 
+  Build test cases for showscores/showans/gb settings
+
 Bugs:
-  Need to review stuans / stuansval storage for calcmatrix w answersize,
-    and stuansval storage for calcmatrix
+  A11y: Enter key handlers on input boxes to submit?
 
 To discuss:
-  Acct: submit all at once (no parts) ?  QuestionHtmlGenerator 310
-  Show answer after 2 tries - how does this work for multipart?
-    If after 2 tries on ALL parts, will need to adjust for already-correct questions
-    What about when a single showanswer is defined?
+
 
 Separate:
   Collate CSS
@@ -32,12 +30,18 @@ Minor TODOs:
   Test accounting Qs
   Review stuanswers/val for matrix/calcmatrix types
   Syntax error warnings: error icon w hoverover vs displaying error
+  Review showanswer button stuff in HtmlGenerator (use setShowAnswerButton instead?)
 
 Future Todos:
   Build modal for redeeming latepasses for LTI users.
   Figure better way to handle change of user prefs.
-  migrate itemorder to JSON format
-
+  Migrate itemorder to JSON format
+  Improve Show Answer to a key:
+    Show key icon next to the answer box (or next to score marker in choices/etc)
+    When key is clicked, hide syntax warnings and Preview button
+      Still show preview if not in MQ (maybe prefix with Your Answer:)
+    If answer box is focused again, hide the key and reshow warnings
+  Condense syntax warnings into an icon, with tooltip display of warning.
 
 Delay for later (since they work with displayq2 for now):
   Edit/Rewrite testquestion.php
@@ -55,6 +59,16 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X On single-part manual score questions, show scoredetail as neutral, and skip
+  score display
+X Multipart questions:
+    x Show answers by-parts when tries > specified
+    x If single showanswer, then all parts need to meet threshold (or be right)
+X Conditional: Need to turn on submitall
+X Drawing: clear LA on regen
+X Review matrix/calcmatrix stuans/stuansval.
+    One difference: calcmatrix (not sized) has different stuansval format
+      Old: [(0.5,2)(3,4)].  New: 0.5|2|3|4, like in sized matrix
 X Error reporting - capture, add try/catch, show in front end
 X Give out-of-time submission notice
 X Build migration function

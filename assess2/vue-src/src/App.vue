@@ -408,4 +408,10 @@ ol.lalpha li { margin-top: .7em;}
    background: #ddd;
  }
 
+ .dsbox {
+   border: 1px solid #ccc;
+   background-color: #eef;
+   padding: 8px;
+ }
+
 </style>

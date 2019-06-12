@@ -63,10 +63,18 @@ export default {
   },
   computed: {
     showScores () {
+      // don't show score on single manual-scored part
+      if (this.qdata.hasOwnProperty('parts') &&
+        (this.qdata.parts.length === 1 && this.qdata.parts[0].req_manual)
+      ) {
+        return false;
+      }
       return (store.assessInfo.showscores === 'during');
     },
     status () {
-      if (!this.showScores || !this.qdata.hasOwnProperty('parts')) {
+      if (!this.showScores || !this.qdata.hasOwnProperty('parts') ||
+        (this.qdata.parts.length === 1 && this.qdata.parts[0].req_manual)
+      ) {
         return 'neutral';
       }
       let correct = 0;
@@ -87,7 +95,9 @@ export default {
       }
     },
     hasManualScore () {
-      if (!this.showScores || !this.qdata.hasOwnProperty('parts')) {
+      if (store.assessInfo.showscores !== 'during' ||
+        !this.qdata.hasOwnProperty('parts')
+      ) {
         return false;
       }
       for (let i = 0; i < this.qdata.parts.length; i++) {

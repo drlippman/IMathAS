@@ -6828,7 +6828,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$newdot = array($pixx, $pixy);
 					if (count($function)==2 || $function[2]=='closed') {
 						if (!in_array($newdot, $ansdots)) { // no duplicates
-							$ansdots[$key] = $newdot; 
+							$ansdots[$key] = $newdot;
 						}
 					} else {
 						if (!in_array($newdot, $ansodots)) { // no duplicates
@@ -6850,7 +6850,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			}
-			
+
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
 
 			if ($lines=='') {

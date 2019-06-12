@@ -71,8 +71,8 @@ class CalculatedMatrixScorePart implements ScorePart
                     $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
                 }
             }
-            $scorePartResult->setLastAnswerAsGiven($givenanslist);
-            $scorePartResult->setLastAnswerAsNumber($givenanslistvals);
+            $scorePartResult->setLastAnswerAsGiven(implode('|',$givenanslist));
+            $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         } else {
             $givenans = preg_replace('/\)\s*,\s*\(/','),(', $givenans);
             $givenanslist = explode(',', str_replace('),(', ',', substr($givenans,2,-2)));
@@ -85,7 +85,7 @@ class CalculatedMatrixScorePart implements ScorePart
             }
             //this may not be backwards compatible
             $scorePartResult->setLastAnswerAsGiven($givenans);
-            $scorePartResult->setLastAnswerAsNumber($givenanslistvals);
+            $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
         }
 
         //handle nosolninf case

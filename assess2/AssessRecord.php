@@ -1439,11 +1439,18 @@ class AssessRecord
         $showansparts[$pn] = true;  // show after jump to answer pressed
       } else if ($qsettings['showans'] === 'with_score' && $showscores && $partattemptn[$pn] > 0) {
         $showansparts[$pn] = true; // show with score
-      } else if ($qsettings['showans'] === 'after_n' && $partattemptn[$pn] > $qsettings['showans_aftern']) {
+      } else if ($qsettings['showans'] === 'after_n' && $partattemptn[$pn] >= $qsettings['showans_aftern']) {
         $showansparts[$pn] = true; // show after n attempts
       } else {
         $showansparts[$pn] = false;
-        $showans = false;
+        // don't want correct answers to block general showans
+        if ($showscores && $partattemptn[$pn] > 0 &&
+          $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] == 1
+        ) {
+          // don't block showans
+        } else {
+          $showans = false;
+        }
       }
       if ($showscores && $partattemptn[$pn] > 0) {
         $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
@@ -1486,6 +1493,7 @@ class AssessRecord
         ->setQuestionSeed($qver['seed'])
         ->setShowHints($this->assess_info->getQuestionSetting($qver['qid'], 'showhints'))
         ->setShowAnswer($showans)
+        ->setShowAnswerParts($showansparts)
         ->setShowAnswerButton(true)
         ->setStudentAttemptNumber($attemptn)
         ->setStudentPartAttemptCount($partattemptn)
@@ -1649,7 +1657,7 @@ class AssessRecord
     // get data structure for this question
     $assessver = $this->getAssessVer($ver);
     $stuanswers = array();
-    $stuanswerval = array();
+    $stuanswersval = array();
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
       $bcnt = 0;
       $question_versions = $assessver['questions'][$qn]['question_versions'];
@@ -1676,7 +1684,7 @@ class AssessRecord
           $stuansvalparts[$pn] = null;
         } else {
           $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
-          $stuansparts[$pn] = isset($lasttry['unrand']) ? $lasttry['unrand'] : $lasttry['stuans'];
+          $stuansparts[$pn] = $lasttry['stuans'];
           $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
         }
       }
@@ -1690,7 +1698,7 @@ class AssessRecord
       }
 
     }
-    return array($stuanswers, $stuanswerval);
+    return array($stuanswers, $stuanswersval);
   }
 
   /**

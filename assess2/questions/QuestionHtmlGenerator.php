@@ -113,6 +113,7 @@ class QuestionHtmlGenerator
         $GLOBALS['inquestiondisplay'] = true;
 
         $doShowAnswer = $this->questionParams->getShowAnswer();
+        $doShowAnswerParts = $this->questionParams->getShowAnswerParts();
         if (ShowAnswer::ALWAYS == $doShowAnswer) {
             $nosabutton = true;
         } else {
@@ -320,7 +321,7 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
-            if ($scoremethod == 'acct') {
+            if ($scoremethod == 'acct' || $quesData['qtype'] == 'conditional') {
               $jsParams['submitall'] = 1;
             }
         } else {
@@ -419,8 +420,8 @@ class QuestionHtmlGenerator
 
         // This variable must be named $showanswerloc, as it may be used by
         // the question writer.
-        $showanswerloc = $this->getShowAnswerLocation($doShowAnswer, $answerbox,
-            $entryTips, $displayedAnswersForParts, $questionWriterVars);
+        $showanswerloc = $this->getShowAnswerLocation($doShowAnswer, $doShowAnswerParts,
+          $answerbox, $entryTips, $displayedAnswersForParts, $questionWriterVars);
 
         /*
          * Eval the question code.
@@ -510,27 +511,29 @@ class QuestionHtmlGenerator
          * Later, we may handle these separately on the front-end
          */
 
-        if ($doShowAnswer) {
-          $sadiv = '<div>';
-          if (!is_array($showanswerloc) && strpos($toevalqtxt,'$showanswerloc')===false) {
-            $sadiv .= '<div>'.$showanswerloc.'</div>';
-          } else if (is_array($showanswerloc)) {
-            foreach ($showanswerloc as $iidx => $saloc) {
+        $sadiv = '';
+        if (!is_array($showanswerloc) && $doShowAnswer && strpos($toevalqtxt,'$showanswerloc')===false) {
+          $sadiv .= '<div>'.$showanswerloc.'</div>';
+        } else if (is_array($showanswerloc)) {
+          foreach ($showanswerloc as $iidx => $saloc) {
+            if (is_array($doShowAnswerParts) && $doShowAnswerParts[$iidx]) {
               $sadiv .= '<div>'.$saloc.'</div>';
             }
           }
-          // display detailed solution, if allowed and set
-          if (($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
-            if ($nosabutton) {
-              $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
-            } else {
-              $sadiv .= "<div><input class=\"dsbtn\" type=button value=\""._('Show Detailed Solution')."\" />";
-              $sadiv .= filter(" <div class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
-            }
-          }
-          $sadiv .= '</div>';
-          $evaledqtext .= $sadiv;
         }
+        // display detailed solution, if allowed and set
+        if ($doShowAnswer && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
+          if ($nosabutton) {
+            $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
+          } else {
+            $sadiv .= "<div><input class=\"dsbtn\" type=button value=\""._('Show Detailed Solution')."\" />";
+            $sadiv .= filter(" <div class=\"hidden dsbox\">$evaledsoln </div></div>\n");
+          }
+        }
+        if ($sadiv !== '') {
+          $evaledqtext .= '<div>'.$sadiv.'</div>';
+        }
+
 
         /*
          * Add help text / hints.
@@ -739,6 +742,7 @@ class QuestionHtmlGenerator
      * Get the "Show Answer" button location.
      *
      * @param int $doShowAnswer @see ShowAnswer
+     * @param array|string $doShowAnswerParts @see ShowAnswer
      * @param string|array $answerBoxes String for single answer box, array for multiple.
      * @param array $entryTips Tooltips displayed for answer boxes.
      * @param array $displayedAnswersForParts
@@ -746,6 +750,7 @@ class QuestionHtmlGenerator
      * @return array|string
      */
     private function getShowAnswerLocation(int $doShowAnswer,
+                                           $doShowAnswerParts,
                                            $answerBoxes,
                                            array $entryTips,
                                            array $displayedAnswersForParts,
@@ -774,7 +779,7 @@ class QuestionHtmlGenerator
 
         $showanswerloc = '';
 
-        if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
+        if (isset($showanswer) && !is_array($showanswer) && $doshowans) {  //single showanswer defined
             $showanswerloc = (isset($showanswerstyle) && $showanswerstyle == 'inline') ? '<span>' : '<div>';
             if ($nosabutton) {
                 $showanswerloc .= filter(_('Answer:') . " $showanswer\n");
@@ -783,11 +788,12 @@ class QuestionHtmlGenerator
                 $showanswerloc .= filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span>\n");
             }
             $showanswerloc .= (isset($showanswerstyle) && $showanswerstyle == 'inline') ? '</span>' : '</div>';
-        } else if ($doshowans) {
+        } else {
             $showanswerloc = array();
             foreach ($entryTips as $iidx => $entryTip) {
-                $showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle == 'inline') ? '<span>' : '<div>';
-                if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx] !== '') {
+              if ($doshowans || (is_array($doShowAnswerParts) && $doShowAnswerParts[$iidx])) {
+                $showanswerloc[$iidx] = '';
+                if ((!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx] !== '') {
                     if (strpos($shanspt[$iidx], '[AB') !== false) {
                         foreach ($shanspt as $subiidx => $sarep) {
                             if (strpos($shanspt[$iidx], '[AB' . $subiidx . ']') !== false) {
@@ -803,17 +809,22 @@ class QuestionHtmlGenerator
                         // $shanspt can contain HTML.
                         $showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span>\n");
                     }
-                } else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
-                    if (isset($showanswer[$iidx])) {
-                        if ($nosabutton) {
-                            $showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">" . filter(_('Answer:') . " {$showanswer[$iidx]}</span>\n");
-                        } else {
-                            $showanswerloc[$iidx] .= "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\"" . _('Show Answer') . "\" />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
-                            $showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span>\n");
-                        }
+                } else if (isset($showanswer) && is_array($showanswer) && isset($showanswer[$iidx])) { //use part specific showanswer
+                    if ($nosabutton) {
+                        $showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">" . filter(_('Answer:') . " {$showanswer[$iidx]}</span>\n");
+                    } else {
+                        $showanswerloc[$iidx] .= "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\"" . _('Show Answer') . "\" />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+                        $showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span>\n");
                     }
                 }
-                $showanswerloc[$iidx] .= (isset($showanswerstyle) && $showanswerstyle == 'inline') ? '</span>' : '</div>';
+                if ($showanswerloc[$iidx] == '') {
+                  unset($showanswerloc[$iidx]);
+                } else {
+                  $showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle == 'inline')
+                    ? '<span>'.$showanswerloc[$iidx].'</span>'
+                    : '<div>'.$showanswerloc[$iidx].'</div>';
+                }
+              }
             }
             if (!is_array($answerBoxes) && count($showanswerloc) == 1) { //not a multipart question
                 $showanswerloc = str_replace($qnidx . '-0"', $qnidx . '"', $showanswerloc[0]);

@@ -170,6 +170,14 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
+        // clear drawing last answer if regen
+        if (regen && store.assessInfo.questions[qn].jsparams) {
+          for (let i in store.assessInfo.questions[qn].jsparams) {
+            if (store.assessInfo.questions[qn].jsparams[i].qtype === 'draw') {
+              window.imathasDraw.clearcanvas(i);
+            }
+          }
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');

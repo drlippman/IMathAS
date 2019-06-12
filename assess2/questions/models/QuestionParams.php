@@ -23,6 +23,7 @@ class QuestionParams
 
     // Orig: $doshowans - int, from displayq2.php
     private $showAnswer;    // @see ShowAnswer.php
+    private $showAnswerParts;
     // Orig: $nosabutton - bool, from displayq2.php
     private $showAnswerButton;
 
@@ -290,7 +291,7 @@ class QuestionParams
     }
 
     /**
-     * Defines how answers are displayed. @see ShowAnswer
+     * Defines whether answers are displayed. @see ShowAnswer
      *
      * Originally "$doshowans" from displayq2.php.
      *
@@ -303,7 +304,7 @@ class QuestionParams
     }
 
     /**
-     * Defines how answers are displayed. @see ShowAnswer
+     * Defines whether answers are displayed. @see ShowAnswer
      *
      * Originally "$doshowans" from displayq2.php.
      *
@@ -315,6 +316,30 @@ class QuestionParams
     {
         $this->showAnswer = $showAnswer;
         return $this;
+    }
+
+    /**
+     * Defines whether answers for parts are shown
+     *
+     * @param array $showAnswerParts
+     * @return QuestionParams
+     * @see ShowAnswer
+     */
+    public function setShowAnswerParts(?array $showAnswerParts): QuestionParams
+    {
+        $this->showAnswerParts = $showAnswerParts;
+        return $this;
+    }
+
+    /**
+     * Defines whether answers for parts are shown
+     *
+     * @return array
+     * @see ShowAnswer
+     */
+    public function getShowAnswerParts(): ?array
+    {
+        return $this->showAnswerParts;
     }
 
     /**

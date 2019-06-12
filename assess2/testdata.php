@@ -308,6 +308,13 @@ $questionSet = [
     'qtype' => 'multipart',
     'control' => '$anstypes = "number"'."\n".'$anstypes = "number,number" if ($attemptn > 0)'."\n".'$requestclearla = true if ($attemptn == 1)',
     'qtext' => '<p>One the first try there should be 1 answerblank. On second there should be two and the first entered answer should be cleared</p>'
+  ],
+  43=> [
+    'uniqueid' => 1552587894535756,
+    'description' => 'Simple multi-part number question, one showans',
+    'qtype' => 'multipart',
+    'control' => '$anstypes="number,number,number"'."\n".'$showanswer = "This is a single showanswer"'."\n".'$a = rands(1,100,3)'."\n".'$answer = $a',
+    'qtext' => '(singlescore). Math test: `4/6`. Type<br/>$a[0]: $answerbox[0]<br/>$a[1]: $answerbox[1]<br/>$a[2]: $answerbox[2]'
   ]
 ];
 
@@ -1193,9 +1200,10 @@ $assessGroups = [
           2=>['questionsetid' => 1],
           3=>['questionsetid' => 35],
           4=>['questionsetid' => 2],
-          5=>['questionsetid' => 36]
+          5=>['questionsetid' => 36],
+          6=>['questionsetid' => 43]
         ],
-        'itemorder' => [0,1,2,3,4,5]
+        'itemorder' => [0,1,2,3,4,5,6]
       ],
       [
         'name' => 'Qtypes 5',
