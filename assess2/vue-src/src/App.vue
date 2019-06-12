@@ -384,4 +384,28 @@ ol.lalpha li { margin-top: .7em;}
 
 .spaced li { margin-bottom: .3em;}
 
+.suggestion_list {
+   background: white;
+   border: 1px solid #ccc;
+   box-shadow: 1px 3px 8px 0 rgba(0,0,0,0.25);
+   padding: 0px;
+ }
+
+ .suggestion_list ul {
+   padding: 0;
+   margin: 0;
+   list-style-type: none;
+ }
+
+ .suggestion_list a {
+   display: inline-block;
+   text-decoration: none;
+   color: navy;
+   padding: 4px 8px;
+ }
+
+ .suggestion_list .selected {
+   background: #ddd;
+ }
+
 </style>
