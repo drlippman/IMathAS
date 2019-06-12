@@ -9,7 +9,6 @@ TODOs:
       Keep the rescored try, ditch rest
 
 Bugs:
-  Need to initialize nosolninf handler (select one soln on typing) - qtypes1 #2
   Need to review stuans / stuansval storage for calcmatrix w answersize,
     and stuansval storage for calcmatrix
   Requestclearla

@@ -157,13 +157,12 @@ function init(paramarr, enableMQ) {
     if (params.usetinymce) {
       initeditor("textareas","mceEditor");
     }
-    initShowAnswer();
   }
+  initShowAnswer();
+  initqsclickchange();
   if (paramarr.scripts) {
     function handleScript(arr, cnt) {
       if (arr[cnt][0] == 'code') {
-        console.log("evaling code at window");
-        console.log(arr[cnt][1]);
         window.eval(arr[cnt][1]);
         if (arr.length > cnt+1) {
           handleScript(arr, cnt+1);
@@ -200,6 +199,17 @@ function setupTips(id, tip, longtip) {
   el.addEventListener('click', function() {
     reshrinkeh(id);
   });
+}
+
+function initqsclickchange() {
+	$('input[id^=qs][value=spec]').each(function(i,qsel) {
+		$(qsel).siblings('input[type=text]').off('keyup.qsclickchange')
+		 .on('keyup.qsclickchange', function(e) {
+			if (e.keyCode != 8 && e.keyCode != 46) {
+				$(qsel).prop("checked",true);
+			}
+		 });
+	});
 }
 
 function initShowAnswer() {
