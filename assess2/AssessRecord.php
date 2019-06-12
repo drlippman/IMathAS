@@ -1484,16 +1484,33 @@ class AssessRecord
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
 
-    $qout = $question->getQuestionContent();
+    list($qout,$scripts) = $this->parseScripts($question->getQuestionContent());
     $jsparams = $question->getJsParams();
     $jsparams['helps'] = $question->getExternalReferences();
     $answeights = $question->getAnswerPartWeights();
+    if (count($scripts) > 0) {
+      $jsparams['scripts'] = $scripts;
+    }
     if ($includeCorrect) {
       $jsparams['ans'] = $question->getCorrectAnswersForParts();
       $jsparams['stuans'] = $stuanswers[$qn+1];
     }
 
     return array($qout, $jsparams, $answeights, $usedAutosave);
+  }
+
+  private function parseScripts($html) {
+    $scripts = array();
+    preg_match_all("|<script([^>]*)>(.*?)</script>|s", $html, $matches, PREG_SET_ORDER);
+    foreach ($matches as $match) {
+      if (strlen(trim($match[2])) == 0 && preg_match('/src="(.*?)"/', $match[1], $sub)) {
+        $scripts[] = array('src', $sub[1]);
+      } else {
+        $scripts[] = array('code', $match[2]);
+      }
+    }
+    $html = preg_replace("|<script([^>]*)>(.*?)</script>|s", '', $html);
+    return array($html, $scripts);
   }
 
   /**

@@ -299,7 +299,7 @@ $questionSet = [
     'description' => 'geogebra and inline JS',
     'qtype' => 'number',
     'control' => '$a,$b=diffrands(-4,4,2)'."\n".'$answer=$a'."\n".'loadlibrary("geogebra")'."\n".'$geogebrainit = array("setValue(\\"h\\",$b)")'."\n".'$geogebraget = array("getValue(\\"h\\")")'."\n".'$g = addGeogebra("701939",600,400,$geogebrainit,array(),$geogebraget,$thisq)',
-    'qtext' => '<p>The answer is $a. The geogebra should be initialized with a shift of $b, and the answerbox value should fill on submit</p><p>Test 2 inline JS: <span onclick="this.style.display=\'none\'">Clicking this should make it disappear</span></p><p>Test 3 JS: <span id="test1">Clicking this should make it disappear</span><script type="text/javascript">$("#test1").on("click", function(e){e.target.style.display="none";});</script></p><p>Test 4 JS: <span id="test2">Clicking this should make it disappear</span><script type="text/javascript">$(function() {$("#test2").on("click", function(e){e.target.style.display="none";});});</script></p>'
+    'qtext' => '<p>The answer is $a. The geogebra should be initialized with a shift of $b, and the answerbox value should fill on submit</p><p>$g</p><p>Test 2 inline JS: <span onclick="this.style.display=\'none\'">Clicking this should make it disappear</span></p><p>Test 3 JS: <span id="test1">Clicking this should make it disappear</span><script type="text/javascript">$("#test1").on("click", function(e){e.target.style.display="none";});</script></p><p>Test 4 JS: <span id="test2">Clicking this should make it disappear</span><script type="text/javascript">$(function() { $("#test2").on("click", function(e){e.target.style.display="none";});});</script></p>'
   ],
   42=>[
     'uniqueid' => 1552587894535755,

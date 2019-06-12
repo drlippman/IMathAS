@@ -57,7 +57,7 @@ export default {
             helps[i].title = this.$t('helps.read');
           } else if (helps[i].label === 'ex') {
             helps[i].icon = 'file';
-            helps[i].title = this.$t('helps.written_Example');
+            helps[i].title = this.$t('helps.written_example');
           } else {
             helps[i].icon = 'file';
             helps[i].title = helps[i].label;

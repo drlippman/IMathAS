@@ -65,6 +65,7 @@ to question output or something.
 
  */
 var initstack = [];
+var callbackstack = {};
 
 var imathasAssess = (function($) {
 
@@ -146,6 +147,25 @@ function init(paramarr, enableMQ) {
       initeditor("textareas","mceEditor");
     }
     initShowAnswer();
+  }
+  if (paramarr.scripts) {
+    function handleScript(arr, cnt) {
+      if (arr[cnt][0] == 'code') {
+        console.log("evaling code at window");
+        console.log(arr[cnt][1]);
+        window.eval(arr[cnt][1]);
+        if (arr.length > cnt+1) {
+          handleScript(arr, cnt+1);
+        }
+      } else {
+        jQuery.getScript(arr[cnt][1]).always(function() {
+          if (arr.length > cnt+1) {
+            handleScript(arr, cnt+1);
+          }
+        })
+      }
+    }
+    handleScript(paramarr.scripts, 0);
   }
   for (var i=0; i<initstack.length; i++) {
         var foo = initstack[i]();

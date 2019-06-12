@@ -183,6 +183,11 @@ export const actions = {
       qns = [qns];
     }
 
+    for (let k = 0; k < qns.length; k++) {
+      if (callbackstack.hasOwnProperty(qns[k])) {
+    		callbackstack[qns[k]](qns[k]);
+    	}
+    }
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
 
     // figure out non-blank questions to submit
