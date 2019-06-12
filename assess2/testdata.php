@@ -282,7 +282,8 @@ $questionSet = [
     'description' => 'number w hints',
     'qtype' => 'number',
     'control' => '$answer=3'."\n".'$hints = array("","After 1 miss","After 2 or more misses")',
-    'qtext' => '<p>The answer is 3. Get it wrong to see hints</p><p>$hintloc</p>'
+    'qtext' => '<p>The answer is 3. Get it wrong to see hints</p><p>$hintloc</p>',
+    'extref' => 'video!!https://www.youtube.com/watch?v=zc2CpyRtjvY!!1'
   ],
   40=>[
     'uniqueid' => 1552587894535753,

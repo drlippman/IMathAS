@@ -7,10 +7,6 @@ TODOs:
     Rescore all versions.  In HW-style, keep best version, ditch rest.
     Still give option of using first or last try.
       Keep the rescored try, ditch rest
-  Migrations:
-    If setting defregens = old defattempts, also need to set defregenpenalty = defpenalty
-    AsGo: always as hw-style, set defregens = 1
-  Copy course: make sure to set UIver of new course
 
 Bugs:
   Need to initialize nosolninf handler (select one soln on typing) - qtypes1 #2

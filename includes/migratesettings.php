@@ -71,6 +71,8 @@ function migrateAssessSettings1to2($settings) {
       $settings['submitby'] = 'by_assessment';
       $settings['keepscore'] = 'last';
       $settings['defregens'] = $settings['defattempts'];
+      $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
+      $settings['defpenalty'] = 0;
       $settings['defattempts'] = 1;
     } else {
       $settings['submitby'] = 'by_question';
@@ -82,6 +84,8 @@ function migrateAssessSettings1to2($settings) {
     $settings['submitby'] = 'by_assessment';
     $settings['keepscore'] = 'best';
     $settings['defregens'] = $settings['defattempts'];
+    $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
+    $settings['defpenalty'] = 0;
     $settings['defattempts'] = 1;
     $settings['showscores'] = 'at_end';
     $settings['showans'] = 'never';
@@ -98,6 +102,8 @@ function migrateAssessSettings1to2($settings) {
     $settings['submitby'] = 'by_assessment';
     $settings['keepscore'] = 'best';
     $settings['defregens'] = $settings['defattempts'];
+    $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
+    $settings['defpenalty'] = 0;
     $settings['defattempts'] = 1;
     $settings['showscores'] = 'at_end';
     if ($showans == 'V' || $showans == 'N' || $showans == 'A') {
@@ -106,14 +112,17 @@ function migrateAssessSettings1to2($settings) {
       $settings['showans'] = 'after_take';
     }
   } else if ($testtype == "AsGo") {
-    $settings['submitby'] = 'by_assessment';
-    $settings['keepscore'] = 'best';
+    $settings['showscores'] = 'during';
     if ($reattDiffVer) {
+      $settings['submitby'] = 'by_assessment';
+      $settings['keepscore'] = 'best';
       $settings['defregens'] = $settings['defattempts'];
+      $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
+      $settings['defpenalty'] = 0;
       $settings['defattempts'] = 1;
     } else {
+      $settings['submitby'] = 'by_question';
       $settings['defregens'] = 1;
-      $settings['showscores'] = 'during';
       if ($showans == 'V' || $showans == 'N' || $showans == 'A') {
         $settings['showans'] = 'never';
       } else if ($showans == 'F' || $showans == 'R') {
@@ -207,6 +216,16 @@ function migrateAssessSettings1to2($settings) {
   $settings['ver'] = 2;
 
   return $settings;
+}
+
+getBasePenalty($pen) {
+  if ($pen[0]=='S') {
+    return substr($pen,2);
+  } else if ($pen[0]=='L') {
+    return substr($pen,1);
+  } else {
+    return $pen;
+  }
 }
 
 function migrateQuestionSettings1to2($settings, $defaults) {
