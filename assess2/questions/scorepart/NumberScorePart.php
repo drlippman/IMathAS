@@ -56,17 +56,17 @@ class NumberScorePart implements ScorePart
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
         if ($answer==='' && $givenans==='') {
-            $scorePartResult->setScoreMessages(1);
+            $scorePartResult->setRawScore(1);
             return $scorePartResult;
         }
 
 
         if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
-            $scorePartResult->setScoreMessages(0);
+            $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
         if (in_array('integer',$ansformats) && preg_match('/\..*[1-9]/',$givenans)) {
-            $scorePartResult->setScoreMessages(0);
+            $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
 
@@ -102,30 +102,30 @@ class NumberScorePart implements ScorePart
 
         if ($answer==='') {
             if (trim($givenans)==='') {
-                $scorePartResult->setScoreMessages(1);
+                $scorePartResult->setRawScore(1);
                 return $scorePartResult;
             } else {
-                $scorePartResult->setScoreMessages(0);
+                $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
         }
         if ($answer==='0 or ') {
             if (trim($givenans)==='' || trim($givenans)==='0') {
-                $scorePartResult->setScoreMessages(1);
+                $scorePartResult->setRawScore(1);
                 return $scorePartResult;
             } else {
-                $scorePartResult->setScoreMessages(0);
+                $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
         }
         if ($givenans == null) {
-            $scorePartResult->setScoreMessages(0);
+            $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
         if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
             $givenans = trim($givenans);
             if ($givenans{0}!='{' || substr($givenans,-1)!='}') {
-                $scorePartResult->setScoreMessages(0);
+                $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
             $answer = str_replace(array('{','}'),'', $answer);
@@ -188,7 +188,7 @@ class NumberScorePart implements ScorePart
 
         if (in_array('orderedlist',$ansformats)) {
             if (count($gamasterarr)!=count($anarr)) {
-                $scorePartResult->setScoreMessages(0);
+                $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
         }

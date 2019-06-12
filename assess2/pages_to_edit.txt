@@ -11,6 +11,9 @@ Bugs:
 
 To discuss:
   Acct: submit all at once (no parts) ?  QuestionHtmlGenerator 310
+  Show answer after 2 tries - how does this work for multipart?
+    If after 2 tries on ALL parts, will need to adjust for already-correct questions
+    What about when a single showanswer is defined?
 
 Separate:
   Collate CSS

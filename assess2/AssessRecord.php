@@ -1264,6 +1264,19 @@ class AssessRecord
     $parts = array();
     $scoredTry = array_fill(0, count($answeights), -1);
     $is_singlescore = !empty($qver['singlescore']);
+    // look for any "don't count" scores and adjust answeights
+    // This is ugly :(
+    for ($pn = 0; $pn < count($answeights); $pn++) {
+      $max = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) - 1 : -1;
+      $min = ($try === 'last') ? $max : 0;
+      for ($pa = $min; $pa <= $max; $pa++) {
+        if ($qver['tries'][$pn][$pa]['raw'] == -1 && $answeights[$pn] > 0) {
+          // indicates it's a "don't count in score"
+          $answeightTot -= $answeights[$pn];
+          $answeights[$pn] = 0;
+        }
+      }
+    }
     // loop over each part
     for ($pn = 0; $pn < count($answeights); $pn++) {
       $partpenalty = array();
@@ -1329,6 +1342,7 @@ class AssessRecord
         $partrawscores[$pn] = $overrides[$pn];
         $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
       }
+
       if ($is_singlescore) {
         $parts[$pn] = array(
           'try' => count($qver['tries'][$pn]),

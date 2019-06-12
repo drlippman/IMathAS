@@ -505,6 +505,12 @@ class ScoreEngine
             if (isset($scoremethod) && $scoremethod == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
                     $scores[$partnum] = $raw[$partnum] - 1;  //0 if correct, -1 if wrong
+                    // scores isn't actually used - only raw is
+                    // Need to indicate to score engine to not count this if
+                    // stu was correct.
+                    // -1 means "don't count it", 0 means it was wrong
+                    // orig is 0 for wrong, 1 for right, so just need to invert it
+                    $raw[$partnum] = -1*$raw[$partnum];
                 } else {
                     $scores[$partnum] = $raw[$partnum];
                     $accpts++;
@@ -512,6 +518,7 @@ class ScoreEngine
             } else {
                 $scores[$partnum] = ($raw[$partnum] < 0) ? 0 : round($raw[$partnum] * $answeights[$partnum]/$answeightTot, 4);
             }
+
             $raw[$partnum] = round($raw[$partnum], 2);
             $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
             $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();

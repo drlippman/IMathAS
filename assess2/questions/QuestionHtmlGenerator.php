@@ -321,7 +321,7 @@ class QuestionHtmlGenerator
                 }
             }
             if ($scoremethod == 'acct') {
-              //$jsParams['submitall'] = 1;
+              $jsParams['submitall'] = 1;
             }
         } else {
             // Generate answer boxes. (non-multipart question)
