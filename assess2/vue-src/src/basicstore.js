@@ -192,9 +192,9 @@ export const actions = {
     }
 
     for (let k = 0; k < qns.length; k++) {
-      if (callbackstack.hasOwnProperty(qns[k])) {
-    		callbackstack[qns[k]](qns[k]);
-    	}
+      if (window.callbackstack.hasOwnProperty(qns[k])) {
+        window.callbackstack[qns[k]](qns[k]);
+      }
     }
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
 

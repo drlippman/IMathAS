@@ -136,7 +136,7 @@ function init(paramarr, enableMQ) {
         autoSuggestLists[params.autosuggest] = params[params.autosuggest];
       }
       if (autoSuggestLists.hasOwnProperty(params.autosuggest)) {
-        let a = new AutoSuggest(document.getElementById("qn"+qn), autoSuggestLists[params.autosuggest]);
+        autoSuggestObjects[qn] = new AutoSuggest(document.getElementById("qn"+qn), autoSuggestLists[params.autosuggest]);
       }
     }
     if (params.tip) {
@@ -1902,3 +1902,4 @@ function AutoSuggest(elem, suggestions)
 //counter to help create unique ID's
 var AutoSuggestIdCounter = 0;
 var autoSuggestLists = {};
+var autoSuggestObjects = {};

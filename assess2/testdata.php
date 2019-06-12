@@ -318,6 +318,27 @@ $questionSet = [
   ]
 ];
 
+$simpleA = [
+  'startdate' =>  -2*24,
+  'enddate' => 24*7,
+  'reviewdate' => 2000000000,
+  'displaymethod' => 'skip',
+  'ptsposs' => 10,
+  'submitby' => 'by_question',
+  'keepscore' => 'best',
+  'defregens' => 3,
+  'defregenpenalty' => 0,
+  'defpoints' => 5,
+  'defattempts' => 2,
+  'defpenalty' => 0,
+  'ver' => 2,
+  'questions' => [
+    0=>['questionsetid' => 0],
+    1=>['questionsetid' => 1],
+  ],
+  'itemorder' => [0,1]
+];
+
 // ensure each assessment keys a unique key, regardless of the group it's in
 $assessGroups = [
   [
@@ -1315,6 +1336,106 @@ $assessGroups = [
         ],
         'itemorder' => [0,1]
       ]
+    ]
+  ],
+  [
+    'name' => 'Scores/Answers/Views',
+    'assessments' => [
+      array_merge($simpleA, [
+        'name' => 'HW - Immediate show',
+        'summary' => 'During assess, scores should show immediately, answers after last try.<br/>Work and scores should be viewing in GB immediately, and answers after due date.',
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'viewingb' => 'immediately',
+        'scoresingb' => 'immediately',
+        'ansingb' => 'after_due'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'HW - Delayed in GB',
+        'summary' => 'During assess, scores should show immediately, answers after last try.<br/>Scores should be viewing in GB immediately, But work should only show after due date, and answers should never show.',
+        'submitby' => 'by_question',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'viewingb' => 'after_due',
+        'scoresingb' => 'immediately',
+        'ansingb' => 'never'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'HW - No scores during',
+        'summary' => 'During assess, no scores should show during, but multiple tries allowed to change answer.<br/>Work should be reviewable in GB immediately, but scores should not show until after due date.',
+        'submitby' => 'by_question',
+        'defregens' => 1,
+        'showscores' => 'never',
+        'showans' => 'never',
+        'viewingb' => 'immediately',
+        'scoresingb' => 'after_due',
+        'ansingb' => 'after_due'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'Quiz - no scores during, in GB after',
+        'summary' => 'During assess, no scores show.<br/>Work, scores, and ans should be viewable in GB after a take is submitted.',
+        'submitby' => 'by_assessment',
+        'showscores' => 'never',
+        'showans' => 'never',
+        'viewingb' => 'after_take',
+        'scoresingb' => 'after_take',
+        'ansingb' => 'after_take'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'Quiz - total at end',
+        'summary' => 'During assess, only total score shows at end of attempt.<br/>Work should be viewable in GB always; scores after a take is submitted (but only total score until after due date?), answers after due date.',
+        'submitby' => 'by_assessment',
+        'defattempts' => 1,
+        'showscores' => 'total',
+        'showans' => 'never',
+        'viewingb' => 'immediately',
+        'scoresingb' => 'after_take',
+        'ansingb' => 'after_due'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'Quiz - scores at end',
+        'summary' => 'During assess, scores and ans show at end of attempt.<br/>Work should never be viewable in GB; scores after a take is submitted',
+        'submitby' => 'by_assessment',
+        'defattempts' => 1,
+        'showscores' => 'at_end',
+        'showans' => 'after_take',
+        'viewingb' => 'never',
+        'scoresingb' => 'after_take',
+        'ansingb' => 'never'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'Quiz - typical',
+        'summary' => 'During assess, scores show on each, ans after last try.<br/>Work and answers are viewable in GB after take; scores immediately (what does this mean?)<br/>Best score is kept',
+        'submitby' => 'by_assessment',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'viewingb' => 'after_take',
+        'scoresingb' => 'immediately',
+        'ansingb' => 'after_take'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'Quiz - keep last',
+        'summary' => 'Last score is used for grade',
+        'submitby' => 'by_assessment',
+        'keepscore' => 'last',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'viewingb' => 'after_take',
+        'scoresingb' => 'immediately',
+        'ansingb' => 'after_take'
+      ]),
+      array_merge($simpleA, [
+        'name' => 'Quiz - avg',
+        'summary' => 'Average score is used for grade',
+        'submitby' => 'by_assessment',
+        'keepscore' => 'average',
+        'showscores' => 'during',
+        'showans' => 'after_lastattempt',
+        'viewingb' => 'after_take',
+        'scoresingb' => 'immediately',
+        'ansingb' => 'after_take'
+      ])
     ]
   ]
 ];

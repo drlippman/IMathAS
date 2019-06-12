@@ -274,7 +274,6 @@ export default {
       return false;
     },
     submitby () {
-      console.log(store.assessInfo.submitby);
       return store.assessInfo.submitby;
     }
   },
