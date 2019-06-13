@@ -1433,6 +1433,9 @@ class AssessRecord
       // figure out if we should show answers
       if ($force_answers) {
         $showansparts[$pn] = true;
+      } else if ($qsettings['showans'] === 'never') {
+        $showansparts[$pn] = false;
+        $showans = false;
       } else if ($qsettings['showans'] === 'after_lastattempt' && $partattemptn[$pn] === $trylimit) {
         $showansparts[$pn] = true;  // show after last attempt
       } else if (!empty($qsettings['jump_to_answer']) && !empty($qver['jumptoans'])) {

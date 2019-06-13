@@ -74,6 +74,10 @@ var MQeditor = (function($) {
           class: "mathquill-math-field",
           text: initval
         });
+        var m;
+        if ((m = el.className.match(/(ansred|ansyel|ansgrn)/)) !== null) {
+          span.addClass(m[0]);
+        }
         var size = (el.hasAttribute("size") ? (el.size > 3 ? el.size/1.8 : el.size) : 10);
         span.css("min-width", size + "em");
         span.insertAfter(el);

@@ -114,6 +114,7 @@ class QuestionHtmlGenerator
 
         $doShowAnswer = $this->questionParams->getShowAnswer();
         $doShowAnswerParts = $this->questionParams->getShowAnswerParts();
+        
         if (ShowAnswer::ALWAYS == $doShowAnswer) {
             $nosabutton = true;
         } else {
@@ -512,11 +513,15 @@ class QuestionHtmlGenerator
          */
 
         $sadiv = '';
-        if (!is_array($showanswerloc) && $doShowAnswer && strpos($toevalqtxt,'$showanswerloc')===false) {
+        if (!is_array($showanswerloc) && $doShowAnswer &&
+          strpos($toevalqtxt,'$showanswerloc')===false
+        ) {
           $sadiv .= '<div>'.$showanswerloc.'</div>';
         } else if (is_array($showanswerloc)) {
           foreach ($showanswerloc as $iidx => $saloc) {
-            if (is_array($doShowAnswerParts) && $doShowAnswerParts[$iidx]) {
+            if (is_array($doShowAnswerParts) && $doShowAnswerParts[$iidx] &&
+              strpos($toevalqtxt,'$showanswerloc['.$iidx.']')===false
+            ) {
               $sadiv .= '<div>'.$saloc.'</div>';
             }
           }
@@ -531,7 +536,7 @@ class QuestionHtmlGenerator
           }
         }
         if ($sadiv !== '') {
-          $evaledqtext .= '<div>'.$sadiv.'</div>';
+          $evaledqtext .= '<div class="autoshowans">'.$sadiv.'</div>';
         }
 
 

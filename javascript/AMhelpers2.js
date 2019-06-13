@@ -158,7 +158,7 @@ function init(paramarr, enableMQ) {
       initeditor("textareas","mceEditor");
     }
   }
-  initShowAnswer();
+  initShowAnswer2();
   initqsclickchange();
   if (paramarr.scripts) {
     function handleScript(arr, cnt) {
@@ -210,6 +210,55 @@ function initqsclickchange() {
 			}
 		 });
 	});
+}
+
+function initShowAnswer2() {
+  var icon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>';
+  $("input.sabtn + span.hidden, input.sabtn + div.hidden").each(function(i, el) {
+
+    var qref = el.id.substring(3);
+    var inref = qref;
+    if (inref.indexOf('-') !== -1) {
+      var pts = inref.split('-');
+      inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
+    }
+    var key = $('<span>', {'class': 'keywrap'}).append(
+      $('<button>', {
+        type: 'button',
+        'aria-controls': 'ans'+qref,
+        'aria-expanded': 'false',
+        'class': 'keybtn',
+        'aria-label': _('View Key'),
+        title: _('View Key')
+      }).on('click', function(e) {
+          var curstate = (e.currentTarget.getAttribute('aria-expanded') == 'true');
+          e.currentTarget.setAttribute('aria-expanded', curstate ? 'false' : 'true');
+          $("#ans"+qref).toggle(!curstate);
+        })
+        .html(icon)
+    );
+    if ($(el).closest('.autoshowans').length > 0) {
+      var wrap = $("#qnwrap"+inref);
+      if (wrap.length > 0) {
+        key.append($(el).hide().removeClass("hidden"))
+          .addClass("inwrap");
+        $("#showansbtn"+qref).remove();
+        wrap.append(key);
+        return;
+      }
+      var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref);
+      if (inbox.length > 0) {
+        key.append($(el).hide().removeClass("hidden"));
+        inbox.after(key);
+        $("#showansbtn"+qref).remove();
+        return;
+      }
+    }
+    // not in autoshowans or no match, so don't want to relocate, just refresh
+    var parel = $(el).parent();
+    key.append($(el).hide().removeClass("hidden"));
+    parel.empty().append(key);
+  });
 }
 
 function initShowAnswer() {

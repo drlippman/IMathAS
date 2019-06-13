@@ -245,7 +245,24 @@ export default {
       // add in timeactive from autosave, if exists
       this.timeActive += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
+
+      let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
+      svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
+      let svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.partial') + '">';
+      svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
+      let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
+      svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+      window.$('#questionwrap' + this.qn).find('.scoremarker').remove();
+      window.$('#questionwrap' + this.qn).find('div.ansgrn,table.ansgrn').append(svgchk);
+      window.$('#questionwrap' + this.qn).find('div.ansyel,table.ansyel').append(svgychk);
+      window.$('#questionwrap' + this.qn).find('div.ansred,table.ansred').append(svgx);
+
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
+
+      window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
+      window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
+      window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
+      
       actions.setRendered(this.qn);
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
@@ -254,19 +271,6 @@ export default {
           }
         });
       };
-      let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
-      svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
-      let svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.partial') + '">';
-      svgchk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
-      let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
-      svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
-      window.$('#questionwrap' + this.qn).find('.scoremarker').remove();
-      window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
-      window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
-      window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
-      window.$('#questionwrap' + this.qn).find('div.ansgrn,table.ansgrn').append(svgchk);
-      window.$('#questionwrap' + this.qn).find('div.ansyel,table.ansyel').append(svgychk);
-      window.$('#questionwrap' + this.qn).find('div.ansred,table.ansred').append(svgx);
     },
     setInitValues () {
       var regex = new RegExp('^(qn|tc|qs)\\d');
@@ -380,23 +384,23 @@ input.red {
   margin: 16px 0;
 }
 .ansgrn {
-  border: 1px solid #090;
+  border: 1px solid #090 !important;
 }
 .ansred {
-  border: 1px solid #900;
+  border: 1px solid #900 !important;
 }
 .ansyel {
-  border: 1px solid #fb0;
+  border: 1px solid #fb0 !important;
 }
-input[type=text].ansgrn {
+input[type=text].ansgrn, .mq-editable-field.ansgrn {
   padding-right: 17px;
   background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9ImdyZWVuIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwb2x5bGluZSBwb2ludHM9IjIwIDYgOSAxNyA0IDEyIj48L3BvbHlsaW5lPjwvc3ZnPg==");
 }
-input[type=text].ansred {
+input[type=text].ansred, .mq-editable-field.ansred {
   padding-right: 17px;
   background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigxNTMsMCwwKSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMTggNiBMNiAxOCBNNiA2IEwxOCAxOCIgLz48L3N2Zz4=");
 }
-input[type=text].ansyel {
+input[type=text].ansyel, .mq-editable-field.ansyel {
   padding-right: 17px;
   background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsMTg3LDApIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0gNS4zLDEwLjYgOSwxNC4yIDE4LjUsNC42IDIxLjQsNy40IDksMTkuOCAyLjcsMTMuNSB6IiAvPjwvc3ZnPg==");
 }

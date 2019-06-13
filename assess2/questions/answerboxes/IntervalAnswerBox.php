@@ -73,6 +73,7 @@ class IntervalAnswerBox implements AnswerBox
     			$shorttip = _('Enter an interval using interval notation');
     		}
     		if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
+          $out .= '<div id="qnwrap'.$qn.'" class="'.$colorbox.'">';
     			$out .=  '<div style="background:#fff;padding:10px;">';
     			$out .=  '<p style="margin:0px";>Shade: <select id="shaderegions'.$qn.'" onchange="imathasDraw.chgnormtype(this.id.substring(12));"><option value="1L">' . _('Left of a value') . '</option><option value="1R">' . _('Right of a value') . '</option>';
     			$out .=  '<option value="2B">' . _('Between two values') . '</option><option value="2O">' . _('2 regions') . '</option></select>. ' . _('Click and drag the arrows to adjust the values.');
@@ -89,7 +90,7 @@ class IntervalAnswerBox implements AnswerBox
     			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif" alt="Interval pointer"/>';
     			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid1txt'.$qn.'"></div>';
     			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid2txt'.$qn.'"></div>';
-    			$out .=  '</div></div>';
+    			$out .=  '</div></div></div>';
     		} else if (in_array('normalcurve',$ansformats)) {
     			$out .= _('Enter an interval corresponding to the region to be shaded');
     		}

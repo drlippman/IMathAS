@@ -599,7 +599,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 			$infsoln = $anspromptp[2];
 		}
 	}
-	$out .= '<div class="'.$colorbox.'">';
+	$out .= '<div id="qnwrap'.$qn.'" class="'.$colorbox.'">';
 	$out .= '<ul class="likelines">';
 	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
 	if ($la=='DNE' || $la=='oo') {
@@ -619,7 +619,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 		$out .= '<li><input type="radio" id="qs'.$qn.'-i" name="qs'.$qn.'" value="inf" '.($laqs=='oo'?'checked':'').'><label for="qs'.$qn.'-i">'.$infsoln.'</label></li>';
 	}
 	$out .= '</ul>';
-	$out .= '<span class="floatright">'.getcolormark($colorbox).'</span>';
+	//$out .= '<span class="floatright">'.getcolormark($colorbox).'</span>';
 	$out .= '</div>';
 
 	if (preg_match('/^inf/',$answer) || $answer==='oo' || $answer===$infsoln) {

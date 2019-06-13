@@ -416,5 +416,29 @@ ol.lalpha li { margin-top: .7em;}
    background-color: #eef;
    padding: 8px;
  }
+ .keywrap {
+   display: inline-block;
+   padding: 0;
+   margin: 1px 0 1px 2px;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   vertical-align: middle;
+ }
+ .keywrap [id^=ans] {
+   padding: 2px 8px;
+ }
+ .keybtn {
+   height: 28px;
+   padding: 4px;
+   margin: -1px;
+   border: 1px solid #ccc;
+   vertical-align: middle;
+ }
+ .keywrap.inwrap {
+   vertical-align: top;
+ }
+ .keywrap.inwrap .keybtn {
+   vertical-align: top;
+ }
 
 </style>
