@@ -218,7 +218,7 @@ function migrateAssessSettings1to2($settings) {
   return $settings;
 }
 
-getBasePenalty($pen) {
+function getBasePenalty($pen) {
   if ($pen[0]=='S') {
     return substr($pen,2);
   } else if ($pen[0]=='L') {
