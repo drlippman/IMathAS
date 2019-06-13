@@ -187,7 +187,7 @@ export default {
       // Practice is secondary if we can use latepass
       if (this.settings.can_use_latepass > 0 && this.settings.available === 'practice') {
         return this.$t('closed.do_practice');
-      } else if (window.exiturl && window.exiturl !== '') {
+      } else if (window.exiturl && window.exiturl !== '' && this.primaryAction !== 'exit') {
         return this.$t('closed.exit');
       } else {
         return '';
