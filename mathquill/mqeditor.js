@@ -266,7 +266,8 @@ var MQeditor = (function($) {
         //convert to input format
         latex = config.fromMQ(latex);
       }
-  		document.getElementById(el.id.substring(8)).value = latex;
+  		//document.getElementById(el.id.substring(8)).value = latex;
+      $("#"+el.id.substring(8)).val(latex).trigger('input');
       if (config.hasOwnProperty('onEdit')) {
         config.onEdit(el.id, latex);
       }

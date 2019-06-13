@@ -262,7 +262,7 @@ export default {
       window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
       window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
       window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
-      
+
       actions.setRendered(this.qn);
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
@@ -391,6 +391,9 @@ input.red {
 }
 .ansyel {
   border: 1px solid #fb0 !important;
+}
+div.ansgrn, div.ansred, div.ansyel {
+  margin: -1px;
 }
 input[type=text].ansgrn, .mq-editable-field.ansgrn {
   padding-right: 17px;

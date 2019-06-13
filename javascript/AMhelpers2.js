@@ -160,6 +160,7 @@ function init(paramarr, enableMQ) {
   }
   initShowAnswer2();
   initqsclickchange();
+  initClearScoreMarkers();
   if (paramarr.scripts) {
     function handleScript(arr, cnt) {
       if (arr[cnt][0] == 'code') {
@@ -210,6 +211,27 @@ function initqsclickchange() {
 			}
 		 });
 	});
+}
+
+function initClearScoreMarkers() {
+  $('input[id^=qs],input[id^=qn],select[id^=qn]').on('input change', function(e) {
+    var m;
+    var target = e.currentTarget
+    if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
+      $(target).removeClass(m[0]);
+      if (target.type == 'hidden') { // may be MQ box
+        $("#mqinput-"+target.id).removeClass(m[0]);
+      }
+    } else {
+      var wrap = $(target).closest("[id^=qnwrap]");
+      if (wrap.length > 0 &&
+        ((m = wrap[0].className.match(/(ansgrn|ansred|ansyel)/)) !== null)
+      ) {
+        wrap.removeClass(m[0]);
+        wrap.find(".scoremarker").remove();
+      }
+    }
+  });
 }
 
 function initShowAnswer2() {

@@ -469,7 +469,6 @@ class DrawingAnswerBox implements AnswerBox
     			$la = str_replace(';,' , ';' , $la);
 
     			if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
-    			if ($colorbox!='') { $out .= '</div>';}
 
     			$attributes = [
     				'type' => 'hidden',
@@ -488,6 +487,8 @@ class DrawingAnswerBox implements AnswerBox
     				$params['livepoll_drawinit'] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
     			}
     		}
+        if ($colorbox!='') { $out .= '</div>';}
+        
     		if ($revertgraphdisp) {
     			$GLOBALS['sessiondata']['graphdisp']=0;
     		}
