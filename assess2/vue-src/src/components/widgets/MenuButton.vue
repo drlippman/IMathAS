@@ -186,7 +186,10 @@ export default {
           this.curSelected = 0;
         } else if (key === 'end') {
           this.curSelected = this.options.length - 1;
-        } else if (!!this.searchby && this.options[0].hasOwnProperty(this.searchby) && ((key >= '0' && key <= '9') || (key >= 'a' && key <= 'z'))) {
+        } else if (!!this.searchby &&
+          this.options[Object.keys(this.options)[0]].hasOwnProperty(this.searchby) &&
+          ((key >= '0' && key <= '9') || (key >= 'a' && key <= 'z'))
+        ) {
           this.keybuffer += key;
           this.processKeyBuffer(false);
           setTimeout(() => this.processKeyBuffer(true), 300);

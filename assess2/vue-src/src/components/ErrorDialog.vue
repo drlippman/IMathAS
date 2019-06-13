@@ -60,10 +60,11 @@ export default {
   position: fixed;
   background-color: #000;
   opacity: .5;
+  z-index: 1900;
 }
 .dialog {
   position: fixed;
-  z-index: 10;
+  z-index: 2000;
   background-color: #fff;
   left: 50%;
   top: 30%;

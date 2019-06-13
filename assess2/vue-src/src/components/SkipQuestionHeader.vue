@@ -4,7 +4,7 @@
 
         <menu-button id="qnav"
           :options = "navOptions"
-          :selected = "dispqn"
+          :selected = "curOption"
           @change = "changeQuestion"
           searchby = "dispqn"
         >
@@ -106,21 +106,33 @@ export default {
       return (store.assessInfo.intro !== '');
     },
     navOptions () {
-      var out = {};
+      var out = [];
       if (this.hasIntro) {
-        out[0] = {
+        out.push({
           internallink: '/skip/0',
           dispqn: 0,
           withdrawn: 0
-        };
+        });
       }
       for (let qn in store.assessInfo.questions) {
         let dispqn = parseInt(qn) + 1;
-        out[dispqn] = store.assessInfo.questions[qn];
-        out[dispqn].internallink = '/skip/' + dispqn;
-        out[dispqn].dispqn = dispqn;
+        let thisoption = {
+          internallink: '/skip/' + dispqn,
+          dispqn: dispqn
+        };
+        for (let i in store.assessInfo.questions[qn]) {
+          thisoption[i] = store.assessInfo.questions[qn][i];
+        }
+        out.push(thisoption);
       }
       return out;
+    },
+    curOption () {
+      if (this.hasIntro) {
+        return this.dispqn;
+      } else {
+        return this.dispqn - 1;
+      }
     },
     showNextPrev () {
       return (Object.keys(this.navOptions).length > 1);
