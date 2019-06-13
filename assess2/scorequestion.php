@@ -206,13 +206,14 @@ if (count($qns) > 0) {
 if ($end_attempt) {
   // sets assessment attempt as submitted and updates status
   $assess_record->setStatus(false, true);
+  // Recalculate scores based on submitted assessment.
+  // Since we already retotaled for newly submitted questions, we can
+  // just reuse existing question scores
+  $assess_record->reTotalAssess(array());
 } else if ($assessInfoOut['submitby'] == 'by_question') {
   // checks to see if all questions are attempted and updates status
   $assess_record->checkByQuestionStatus();
 }
-
-// Record record
-$assess_record->saveRecord();
 
 if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
@@ -292,8 +293,8 @@ if ($end_attempt) {
   }
 }
 
-// save record if needed
-$assess_record->saveRecordIfNeeded();
+// Record record
+$assess_record->saveRecord();
 
 if ($assessInfoOut['submitby'] == 'by_question') {
   // update LTI grade

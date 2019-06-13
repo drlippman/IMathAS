@@ -582,7 +582,7 @@ export const actions = {
       return;
     }
     // for draw questions, overwrite blank to the expected blank format
-    if (store.assessInfo.questions[qn].jsparams[qref].qtype == 'draw' && val === '') {
+    if (store.assessInfo.questions[qn].jsparams[qref].qtype === 'draw' && val === '') {
       val = ';;;;;;;;';
     }
     if (!store.initValues[qn].hasOwnProperty(fieldname)) {

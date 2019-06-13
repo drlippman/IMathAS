@@ -1447,7 +1447,7 @@ class AssessRecord
       } else {
         $showansparts[$pn] = false;
         // don't want correct answers to block general showans
-        if ($showscores && $partattemptn[$pn] > 0 &&
+        if ($showscores && $partattemptn[$pn] > 0 && $numParts > 1 &&
           $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] == 1
         ) {
           // don't block showans

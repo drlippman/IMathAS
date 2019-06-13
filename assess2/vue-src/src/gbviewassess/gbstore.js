@@ -288,7 +288,10 @@ export const actions = {
       for (qv = 0; qv < qdata[i].length; qv++) {
         if (qdata[i][qv].hasOwnProperty('scored')) {
           Vue.set(store.curQver, i, qv);
+          continue;
         }
+        // if no scored found, show last
+        Vue.set(store.curQver, i, qdata[i].length - 1);
       }
     }
   },

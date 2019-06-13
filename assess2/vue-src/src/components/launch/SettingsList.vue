@@ -121,7 +121,7 @@ export default {
       if (settings.keepscore === 'best') {
         substr += this.$t('setlist.keep_highest');
       } else if (settings.keepscore === 'average') {
-        substr += this.$t('setlist.keep_highest');
+        substr += this.$t('setlist.keep_average');
       } else if (settings.keepscore === 'last') {
         substr += this.$t('setlist.keep_last');
       }

@@ -51,6 +51,10 @@ $assess_record->loadRecord($uid);
 if ($assess_record->hasActiveAttempt()) {
   $assess_record->scoreAutosaves();
   $assess_record->setStatus(false, true);
+  // Recalculate scores based on submitted assessment.
+  // Since we already retotaled for newly submitted questions, we can
+  // just reuse existing question scores
+  $assess_record->reTotalAssess(array());
   $assess_record->saveRecord();
 } else {
   echo '{"error": "no_active_attempt"}';

@@ -29,7 +29,7 @@ export default {
       ) {
         return this.$t('setlist.keep_highest_q');
       } else if (this.ainfo.keepscore === 'average') {
-        return this.$t('setlist.keep_highest');
+        return this.$t('setlist.keep_average');
       } else if (this.ainfo.keepscore === 'last') {
         return this.$t('setlist.keep_last');
       } else {

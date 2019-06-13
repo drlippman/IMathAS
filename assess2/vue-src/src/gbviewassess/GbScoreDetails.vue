@@ -174,7 +174,7 @@ export default {
           } else {
             out.push(Math.round(1000 * this.qdata.scoreoverride[i] * this.answeights[i] * this.qdata.points_possible) / 1000);
           }
-        } else if (this.maxTry === 0) { // not attempted
+        } else if (this.maxTry === 0 || !this.qdata.parts[i].hasOwnProperty('score')) { // not attempted or not showing
           out.push('N/A');
         } else {
           out.push(this.qdata.parts[i].score);

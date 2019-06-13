@@ -1,8 +1,10 @@
 TODOs:
   Need to revisit showhints throughout display code
   Test clearing attempts
-
+  Refactor ErrorDialog to be usable in GBViewAssess
+  
 Bugs:
+  favicon and page title
   A11y: Enter key handlers on input boxes to submit?
 
 To discuss:
