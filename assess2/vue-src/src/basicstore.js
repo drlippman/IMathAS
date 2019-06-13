@@ -570,9 +570,10 @@ export const actions = {
     }
     // only record initvalue if we don't already have one
     let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
+    let qref = m[2];
     let pn = 0;
-    if (m[2] > 1000) {
-      pn = pn = m[2] % 1000;
+    if (qref > 1000) {
+      pn = qref % 1000;
     }
     if (store.assessInfo.questions[qn].hasOwnProperty('usedautosave') &&
       store.assessInfo.questions[qn].usedautosave.indexOf(pn) !== -1
@@ -580,7 +581,10 @@ export const actions = {
       // was loaded from autosave, so don't record as init initValue
       return;
     }
-
+    // for draw questions, overwrite blank to the expected blank format
+    if (store.assessInfo.questions[qn].jsparams[qref].qtype == 'draw' && val === '') {
+      val = ';;;;;;;;';
+    }
     if (!store.initValues[qn].hasOwnProperty(fieldname)) {
       store.initValues[qn][fieldname] = val;
     }

@@ -1592,7 +1592,7 @@ class AssessRecord
     $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
     */
 
-    list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
+    list($stuanswers, $stuanswersval) = $this->getStuanswers();
 
     $scoreEngine = new ScoreEngine($this->DBH, $GLOBALS['RND']);
 
@@ -1890,6 +1890,116 @@ class AssessRecord
     // update out of attempts, if needed
     $this->updateStatus();
     return $maxAscore;
+  }
+
+  /**
+   * Regrade a question, by re-submitting the stored stuans.
+   * For by_question assessments, this will only save the best-scored question
+   * version, allowing the student to reclaim their regens.
+   *
+   * Should have code for this question reloaded, and settings for all others.
+   *
+   * @param  int $qid    Question ID
+   * @param  string $try Try to regrade: 'first' or 'last'
+   * @return void
+   */
+  public function regradeQuestion($qid, $try='first') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $qsettings = $this->assess_info->getQuestionSettings($qid);
+
+    $this->parseData();
+    $qnsAffected = array();
+    // loop through all the assessment versions
+    for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
+      $curAver = &$this->data['assess_versions'][$av];
+      if (!$by_question) {
+        list($stuanswers, $stuanswersval) = $this->getStuanswers($av);
+      }
+      // loop through the question numbers
+      for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
+        // loop through the question versions
+        for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
+          $curQver = &$curAver['questions'][$qn]['question_versions'][$qv];
+          if ($curQver['qid'] != $qid) {
+            continue;
+          }
+          $qnsAffected[] = $qn;
+          // regrade it.
+          $_POST = array(); // total hack job here.
+          $partattemptn = array();
+          for ($pn = 0; $pn < count($curQver['answeights']); $pn++) {
+            if (!isset($curQver['tries'][$pn]) || count($curQver['tries'][$pn]) == 0) {
+              $stuans = '';
+              $partattemptn[$pn] = 0;
+            } else if ($try == 'first') {
+              $stuans = $curQver['tries'][$pn][0]['stuans'];
+              $partattemptn[$pn] = 0;
+            } else { // get last
+              $stuans = $curQver['tries'][$pn][count($curQver['tries'][$pn]) - 1]['stuans'];
+              $partattemptn[$pn] = count($curQver['tries'][$pn]);
+            }
+            $_POST['qn'.(($qn+1)*1000 + $pn)] = $stuans;
+            if ($pn == 0 && count($curQver['answeights'])==1) {
+              $_POST['qn'.$qn] = $stuans;
+            }
+          }
+          $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
+
+          if ($by_question) {
+            list($stuanswers, $stuanswersval) = $this->getStuanswers($qv);
+          }
+          $scoreEngine = new ScoreEngine($this->DBH, $GLOBALS['RND']);
+
+          $scoreQuestionParams = new ScoreQuestionParams();
+          $scoreQuestionParams
+              ->setUserRights($GLOBALS['myrights'])
+              ->setRandWrapper($GLOBALS['RND'])
+              ->setQuestionNumber($qn)
+              ->setQuestionData($this->assess_info->getQuestionSetData($qsettings['questionsetid']))
+              ->setAssessmentId($this->assess_info->getSetting('id'))
+              ->setDbQuestionSetId($qsettings['questionsetid'])
+              ->setQuestionSeed($curQver['seed'])
+              ->setGivenAnswer($_POST['qn'.$qn])
+              ->setAttemptNumber($attemptn)
+              ->setAllQuestionAnswers($stuanswers)
+              ->setAllQuestionAnswersAsNum($stuanswersval)
+              ->setQnpointval($qsettings['points_possible']);
+
+          $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
+          $rawparts = $scoreResult['rawScores'];
+          $partla = $scoreResult['lastAnswerAsGiven'];
+          $partlaNum = $scoreResult['lastAnswerAsNumber'];
+
+          // overwrite scores and only keep newly rescored try
+          foreach ($partla as $pn=>$v) {
+            if (isset($rawparts[$pn])) {
+              if (!isset($curQver['tries'][$pn]) || count($curQver['tries'][$pn]) == 0) {
+                continue; // no submission originally
+              } else if ($try == 'first') {
+                $tryToUse = $curQver['tries'][$pn][0];
+              } else {
+                $tryToUse = $curQver['tries'][$pn][count($curQver['tries'][$pn]) - 1];
+              }
+              $tryToUse['raw'] = $rawparts[$pn];
+              $curQver['tries'][$pn] = array($tryToUse);
+            }
+          }
+        }
+      }
+    }
+    $this->reTotalAssess();
+    if ($by_question) {
+      $qnsAffected = array_unique($qnsAffected);
+      $curQuestions = &$this->data['assess_versions'][0]['questions'];
+      // Loop through affected question numbers
+      foreach ($qnsAffected as $qn) {
+        // grab scored version
+        $bestVer = $curQuestions[$qn]['question_versions'][$curQuestions[$qn]['scored_version']];
+        // only keep that version
+        $curQuestions[$qn]['question_versions'] = array($bestVer);
+        $curQuestions[$qn]['scored_version'] = 0;
+      }
+    }
   }
 
   /**
@@ -2787,6 +2897,12 @@ class AssessRecord
         $this->data = array();
       }
     }
+  }
+
+  public function dumpData () {
+    echo '<pre>';
+    print_r($this->data);
+    echo '<pre>';
   }
 
 }

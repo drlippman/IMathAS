@@ -1,11 +1,5 @@
 TODOs:
   Need to revisit showhints throughout display code
-  Newver /course/gb-rescoreq.php
-    Rescore all versions.  In HW-style, keep best version, ditch rest.
-    Still give option of using first or last try.
-      Keep the rescored try, ditch rest
-
-  Build test cases for showscores/showans/gb settings
 
 Bugs:
   A11y: Enter key handlers on input boxes to submit?
@@ -59,6 +53,12 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Newver /course/gb-rescoreq.php
+    Rescore all versions.  In HW-style, keep best version, ditch rest.
+    Still give option of using first or last try.
+      Keep the rescored try, ditch rest
+X Build test cases for showscores/showans/gb settings
+X Drawing: shouldn't submit if nothing drawn
 X On single-part manual score questions, show scoredetail as neutral, and skip
   score display
 X Multipart questions:

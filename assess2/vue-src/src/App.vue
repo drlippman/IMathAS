@@ -90,6 +90,9 @@ input, .mq-editable-field {
   border-radius: 4px;
   margin: 1px 0;
 }
+input[type=radio], input[type=checkbox] {
+  margin: 1px 4px 1px 0;
+}
 button.slim {
   padding: 0px 12px;
 }
