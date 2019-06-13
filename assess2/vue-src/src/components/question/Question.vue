@@ -17,7 +17,7 @@
     </p>
     <div v-if = "errorsToShow.length > 0" class="small">
       <ul>
-        <li v-for = "error in errorsToShow">
+        <li v-for = "(error,index) in errorsToShow" :key="index">
           {{ error }}
         </li>
       </ul>

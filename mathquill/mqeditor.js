@@ -84,7 +84,8 @@ var MQeditor = (function($) {
 
         var thisMQconfig = {
           handlers: {
-            edit: onMQedit
+            edit: onMQedit,
+            enter: onMQenter
           }
         };
         if (config.hasOwnProperty("getLayoutstyle")) {
@@ -272,6 +273,15 @@ var MQeditor = (function($) {
         config.onEdit(el.id, latex);
       }
   	}
+  }
+
+  /*
+    Handle the enter
+   */
+  function onMQenter(mf) {
+    if (config.hasOwnProperty('onEnter')) {
+      config.onEnter(mf.el().id);
+    }
   }
 
   /*

@@ -157,6 +157,7 @@ function init(paramarr, enableMQ) {
     if (params.usetinymce) {
       initeditor("textareas","mceEditor");
     }
+    initEnterHandler(qn);
   }
   initShowAnswer2();
   initqsclickchange();
@@ -214,7 +215,9 @@ function initqsclickchange() {
 }
 
 function initClearScoreMarkers() {
-  $('input[id^=qs],input[id^=qn],select[id^=qn]').on('input change', function(e) {
+  $('input[id^=qs],input[id^=qn],select[id^=qn]')
+    .off('input.clearmarkers change.clearmarkers')
+    .on('input.clearmarkers change.clearmarkers', function(e) {
     var m;
     var target = e.currentTarget
     if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
@@ -232,6 +235,26 @@ function initClearScoreMarkers() {
       }
     }
   });
+}
+
+function initEnterHandler(qn) {
+	$("#questionwrap"+qn+" input[type=text][name^=qn]").off("keydown.enterhandler")
+	  .on("keydown.enterhandler", function(e) {
+		if (e.which==13) {
+			e.preventDefault();
+			var btn = $(this).closest(".questionwrap").find(".submitbtnwrap .primary");
+      if (!btn.is(':disabled')) {
+        btn.trigger('click');
+      }
+		}
+	});
+}
+
+function handleMQenter(id) {
+  var btn = $("#"+id).closest(".questionwrap").find(".submitbtnwrap .primary");
+  if (!btn.is(':disabled')) {
+    btn.trigger('click');
+  }
 }
 
 function initShowAnswer2() {
@@ -281,6 +304,19 @@ function initShowAnswer2() {
     key.append($(el).hide().removeClass("hidden"));
     parel.empty().append(key);
   });
+
+  // setup detailed solutions button the old way
+  $("input.dsbtn + div.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
+	$("input.dsbtn").each(function() {
+		var idnext = $(this).siblings("div:first-of-type").attr("id");
+		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
+		  .off("click.sashow").on("click.sashow", function() {
+			$(this).attr("aria-expanded",true)
+		  	  .siblings("div:first-of-type")
+				.attr("aria-expanded",true).attr("aria-hidden",false)
+				.removeClass("hidden");
+		});
+	});
 }
 
 function initShowAnswer() {
@@ -1547,7 +1583,8 @@ return {
   preSubmitForm: preSubmitForm,
   preSubmit: preSubmit,
   clearLivePreviewTimeouts: clearLivePreviewTimeouts,
-  syntaxCheckMQ: syntaxCheckMQ
+  syntaxCheckMQ: syntaxCheckMQ,
+  handleMQenter: handleMQenter
 };
 
 }(jQuery));

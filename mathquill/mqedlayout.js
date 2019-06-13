@@ -614,7 +614,8 @@ MQeditor.setConfig({
   onTab: myMQeditor.onTab,
   toMQ: AMtoMQ,
   fromMQ: MQtoAM,
-  onEdit: imathasAssess.syntaxCheckMQ
+  onEdit: imathasAssess.syntaxCheckMQ,
+  onEnter: imathasAssess.handleMQenter
 });
 
 // set the default MathQuill config.
