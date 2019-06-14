@@ -9,6 +9,7 @@ export const store = Vue.observable({
   uid: null,
   queryString: '',
   inTransit: false,
+  autoSaving: false,
   errorMsg: null,
   lastLoaded: [],
   inProgress: false,
@@ -332,18 +333,21 @@ export const actions = {
   doAutosave (qn, partnum, timeactive) {
     window.clearTimeout(store.autosaveTimer);
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
-      store.autosaveQueue[qn] = [];
+      Vue.set(store.autosaveQueue, qn, []);
+      //store.autosaveQueue[qn] = [];
     }
     if (store.autosaveQueue[qn].indexOf(partnum) === -1) {
       store.autosaveQueue[qn].push(partnum);
     }
-    store.autosaveTimeactive[qn] = timeactive;
+    Vue.set(store.autosaveTimeactive, qn, timeactive);
+    //store.autosaveTimeactive[qn] = timeactive;
     store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
   },
   clearAutosave (qns) {
     for (let i in qns) {
       if (store.autosaveQueue.hasOwnProperty(qns[i])) {
-        delete store.autosaveQueue[qns[i]];
+        Vue.delete(store.autosaveQueue, qns[i]);
+        //delete store.autosaveQueue[qns[i]];
       }
     }
     if (Object.keys(store.autosaveQueue).length === 0) {
@@ -359,6 +363,7 @@ export const actions = {
       return;
     }
     store.inTransit = true;
+    store.autoSaving = true;
     let lastLoaded = {};
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     let data = new FormData();
@@ -427,6 +432,7 @@ export const actions = {
       })
       .always(response => {
         store.inTransit = false;
+        store.autoSaving = false;
       });
   },
   handleTimelimitUp () {

@@ -176,8 +176,12 @@ export const actions = {
         // can tell if we change anything
         for (let key in store.scoreOverrides) {
           if (key === 'gen') {
-            store.assessInfo.gbscore = store.scoreOverrides[key];
-            store.assessInfo.scoreoverride = store.scoreOverrides[key];
+            if (store.scoreOverrides['gen'] === '') {
+              delete store.assessInfo.scoreoverride;
+            } else {
+              store.assessInfo.gbscore = store.scoreOverrides['gen'];
+              store.assessInfo.scoreoverride = store.scoreOverrides['gen'];
+            }
             continue;
           }
           let pts = key.split(/-/);
@@ -228,7 +232,7 @@ export const actions = {
           return;
         }
         // TODO: update displayed data rather than just exiting
-        if (store.clearAttempts.type === 'all') {
+        if (store.clearAttempts.type === 'all' && keepver === 0) {
           // cleared all - exit
           window.location = store.exitUrl;
         } else {
@@ -284,11 +288,11 @@ export const actions = {
   setQverAsScored (aver) {
     let qdata = store.assessInfo.assess_versions[aver].questions;
     let qv;
-    for (let i = 0; i < qdata.length; i++) {
+    qloop: for (let i = 0; i < qdata.length; i++) {
       for (qv = 0; qv < qdata[i].length; qv++) {
         if (qdata[i][qv].hasOwnProperty('scored')) {
           Vue.set(store.curQver, i, qv);
-          continue;
+          continue qloop;
         }
         // if no scored found, show last
         Vue.set(store.curQver, i, qdata[i].length - 1);

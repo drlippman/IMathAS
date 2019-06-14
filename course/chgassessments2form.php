@@ -738,8 +738,11 @@ var app = new Vue({
 			if (this.defattempts == 1 && this.subtype != 'by_question') {
 				// if we only have 1 try, and not HW mode, show all options
 				out = [nochange,during, at_end, total, none];
-			} else if (this.subtype == 'by_question' && this.defregens>1) {
+			} else if ((this.subtype == 'by_question' && this.defregens>1) ||
+			 	(this.defattempts > 1 && this.subtype != 'by_question')
+			) {
 				// if we're in HW mode, and allowing multiple versions, must show score immediately
+				// likewise if in quiz mode and allow multiple tries
 				out = [nochange,during];
 			} else {
 				// otherwise, give option of immediately (typical) or no scores shown
@@ -871,12 +874,14 @@ var app = new Vue({
 				});
 			}
 
-			if (this.showscores == 'during') {
+			if (this.showscores == 'during' && this.subtype == 'by_question') {
 				out = [{
 					'value': 'immediately',
 					'text': _('Immediately')
 				}];
-			} else if (this.showscores == 'at_end') {
+			} else if (this.showscores == 'at_end' ||
+					(this.showscores == 'during' && this.subtype == 'by_assessment')
+			) {
 				out = [{
 					'value': 'after_take',
 					'text': _('After the assessment version is submitted')

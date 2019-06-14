@@ -2,13 +2,18 @@ TODOs:
   Need to revisit showhints throughout display code
   Test clearing attempts
   Refactor ErrorDialog to be usable in GBViewAssess
-  
+  Submit Assessment: show confirm
+  Skip question selector. Period after question #.
+
 Bugs:
-  favicon and page title
   A11y: Enter key handlers on input boxes to submit?
-
+  Quiz - total at end with no work: gbscore should report as N/A
+  
 To discuss:
-
+  N/A in gradebook
+    Hide score disp at attempt selector, version selector, score details level
+    Score in GB line: replace with "Not yet available"
+      If possible, display when it will show (after due date, etc)
 
 Separate:
   Collate CSS
@@ -56,6 +61,11 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X No scores during in Quiz-style: limit to 1 try
+X Eliminate scoresingb=immediately for by_assessment and only do after_take
+X Quiz-style with 1 try in Skip Around: should there by some kind of button?
+    Add an assessment-level "Save work" button that does autosave ?
+    Have label adjust to "Saving..." then "Saved" and revert to "Save work"
 X Checks/X's after MQ boxes
 X Newver /course/gb-rescoreq.php
     Rescore all versions.  In HW-style, keep best version, ditch rest.

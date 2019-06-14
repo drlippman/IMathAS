@@ -33,7 +33,7 @@ if (!$isActualTeacher && !$istutor) {
   echo '{"error": "no_access"}';
   exit;
 }
-//validate inputs
+// validate inputs
 check_for_required('GET', array('aid', 'cid', 'uid'));
 check_for_required('POST', array('type', 'keepver'));
 $cid = Sanitize::onlyInt($_GET['cid']);
@@ -49,7 +49,7 @@ if ($type == 'qver') {
   $qver = Sanitize::onlyInt($_POST['qver']);
 }
 
-//load settings without questions
+// load settings without questions
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 if ($istutor) {
   $tutoredit = $assess_info->getSetting('tutoredit');
@@ -58,6 +58,8 @@ if ($istutor) {
     exit;
   }
 }
+// get question point values for retotal later
+$assess_info->loadQuestionSettings('all', false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);

@@ -2426,10 +2426,15 @@ class AssessRecord
   public function setGbScoreOverrides($scores) {
     $this->parseData();
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-
+    $doRetotal = false;
     if (isset($scores['gen'])) { // general score override
-      $this->data['scoreoverride'] = floatval($scores['gen']);
-      $this->assessRecord['score'] = floatval($scores['gen']);
+      if ($scores['gen'] === '') {
+        unset($this->data['scoreoverride']);
+        $doRetotal = true;
+      } else {
+        $this->data['scoreoverride'] = floatval($scores['gen']);
+        $this->assessRecord['score'] = floatval($scores['gen']);
+      }
       unset($scores['gen']);
     } else {
       // TODO: Do we want to do this?
@@ -2457,7 +2462,7 @@ class AssessRecord
       // TODO: how do we handle overrides for unattempted questions?
       $qdata['scoreoverride'][$pn] = floatval($score);
     }
-    if (!empty($scores)) {
+    if (!empty($scores) || $doRetotal) {
       $this->reTotalAssess();
     }
   }
@@ -2503,16 +2508,19 @@ class AssessRecord
   public function gbClearAttempts($type, $keepver, $av=0, $qn=0, $qv=0) {
     $this->parseData();
     if ($type == 'all' && $keepver == 1) {
+
       // delete all old assessment attempts
       $cnt_aver = count($this->data['assess_versions']);
-      for ($i=$cnt_aver-2; $i>=0; $i--) {
-        unset($this->data['assess_versions'][$i]);
+      if ($cnt_aver > 1) {
+        array_splice($this->data['assess_versions'], 0, $cnt_aver - 1);
       }
+
       // clear out remaining version
       $this->gbClearAttempts('attempt', $keepver, 0);
     } else if ($type == 'attempt' && $keepver == 0) {
       //delete this attempt
-      unset($this->data['assess_versions'][$av]);
+      array_splice($this->data['assess_versions'], $av, 1);
+
       if (count($this->data['assess_versions']) == 0) {
         // need to rebuild a new version so we have one
         $this->buildNewAssessVersion(false);
@@ -2528,9 +2536,10 @@ class AssessRecord
       for ($qn=0; $qn<count($aver['questions']); $qn++) {
         // delete all old question versions
         $cnt_qver = count($aver['questions'][$qn]['question_versions']);
-        for ($i=$cnt_qver-2; $i>=0; $i--) {
-          unset($aver['questions'][$qn]['question_versions'][$i]);
+        if ($cnt_qver > 1) {
+          array_splice($aver['questions'][$qn]['question_versions'], 0, $cnt_qver - 1);
         }
+
         // for current version, reset tries
         $qver = &$aver['questions'][$qn]['question_versions'][0];
         $qver = array(
@@ -2552,7 +2561,7 @@ class AssessRecord
           'tries' => array()
         );
       } else {
-        unset($qvers[$qv]);
+        array_splice($qvers, $qv, 1);
       }
     } else if ($type == 'qver' && $keepver == 1) {
       $aver = &$this->data['assess_versions'][$av];

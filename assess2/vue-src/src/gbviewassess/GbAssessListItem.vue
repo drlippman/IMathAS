@@ -30,8 +30,8 @@ export default {
     verStatus () {
       if (this.option.status === -1) {
         return this.$t('gradebook.not_started');
-      } else if (this.option.status === 0) {
-        return this.$t('gradebook.not_submitted' && this.submitby === 'by_assessment');
+      } else if (this.option.status === 0 && this.submitby === 'by_assessment') {
+        return this.$t('gradebook.not_submitted');
       } else if (this.option.status === 1 || this.option.status === 2) {
         let out = '';
         if (this.submitby === 'by_question') {

@@ -111,7 +111,10 @@
     "warn_unattempted": "There appears to be unattempted questions. Are you sure you want to submit now?",
     "withdrawn": "Question withdrawn",
     "enable_mq": "Enable equation editor",
-    "disable_mq": "Disable equation editor"
+    "disable_mq": "Disable equation editor",
+    "work_save": "Save work",
+    "work_saved": "Work saved",
+    "work_saving": "Saving..."
   },
   "text": {
     "hide": "Hide text",
@@ -152,9 +155,9 @@
   },
   "summary": {
     "no_total": "Your assessment has been submitted.",
-    "viewwork_immediately": "You can view your work and scores in the gradebook",
-    "viewwork_after_take": "You can view your work and scores in the gradebook",
-    "viewwork_after_due": "You can view your work and scores in the gradebook after the due date",
+    "viewwork_immediately": "You can view your work and scores in the gradebook.",
+    "viewwork_after_take": "You can view your work and scores in the gradebook.",
+    "viewwork_after_due": "You can view your work and scores in the gradebook after the due date.",
     "viewwork_never": "",
     "score": "Score",
     "recordedscore": "Recorded Score",

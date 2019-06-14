@@ -40,7 +40,7 @@ function migrateAssessSettings1to2($settings) {
   } else { // All others
     if ($settings['submitby'] == 'by_question') {
       $settings['viewingb'] = 'immediately';
-      $settings['scoresingb'] = 'after_due';
+      $settings['scoresingb'] = 'immediately';
       $settings['ansingb'] = 'after_due';
     } else {
       $settings['viewingb'] = 'immediately';

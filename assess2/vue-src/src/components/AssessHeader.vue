@@ -11,13 +11,21 @@
         <span class="answeredinfo">{{ curAnswered }}</span>
       </div>
     </div>
-
+    <div class="assess-header">
     <timer v-if="ainfo.timelimit > 0"
       :total="ainfo.timelimit"
       :end="ainfo.timelimit_expires"
       :grace="ainfo.timelimit_grace">
     </timer>
 
+    <button
+      v-if = "saveWorkLabel != ''"
+      class = "secondary"
+      @click = "handleSaveWork"
+      :disabled = "!canSubmit"
+    >
+      {{ saveWorkLabel }}
+    </button>
     <button
       v-if = "assessSubmitLabel != ''"
       :class="{primary: ainfo.submitby === 'by_assessment' }"
@@ -26,6 +34,7 @@
     >
       {{ assessSubmitLabel }}
     </button>
+
 
     <menu-button
       v-if="ainfo.resources.length > 0"
@@ -67,6 +76,7 @@
       <span class="switch-toggle__ui"></span>
     </button>
     <lti-menu v-if="ainfo.is_lti" />
+    </div>
   </div>
 </template>
 
@@ -139,6 +149,19 @@ export default {
         // return this.$t('header.done');
       }
     },
+    saveWorkLabel () {
+      if (this.ainfo.submitby === 'by_assessment') {
+        if (store.autoSaving) {
+          return this.$t('header.work_saving');
+        } else if (Object.keys(store.autosaveQueue).length === 0) {
+          return this.$t('header.work_saved');
+        } else {
+          return this.$t('header.work_save');
+        }
+      } else {
+        return '';
+      }
+    },
     showPrint () {
       return (this.ainfo.noprint !== 1);
     },
@@ -181,6 +204,15 @@ export default {
       } else {
         // don't want to submit if by_question
         // actions.submitQuestion(-1, true);
+      }
+    },
+    handleSaveWork () {
+      if (Object.keys(store.autosaveQueue).length === 0) {
+        // nothing to save, so fake it
+        store.autoSaving = true;
+        setTimeout(() => store.autoSaving = false, 300);
+      } else {
+        actions.submitAutosave();
       }
     },
     toggleMQuse () {

@@ -1376,6 +1376,7 @@ $assessGroups = [
         'name' => 'Quiz - no scores during, in GB after',
         'summary' => 'During assess, no scores show.<br/>Work, scores, and ans should be viewable in GB after a take is submitted.',
         'submitby' => 'by_assessment',
+        'defattempts' => 1,
         'showscores' => 'none',
         'showans' => 'never',
         'viewingb' => 'after_take',
@@ -1454,7 +1455,7 @@ $studatarec = array(
   'hw1' => array(
     'scoreddata' => '{"submissions":[6,10,21,34,41,45,55,58,63],"autosaves":[],"scored_version":0,"assess_versions":[{"starttime":1560052898,"lastchange":1560052961,"status":0,"score":18.3,"questions":[{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q0!","seed":7069,"tries":[[{"sub":0,"time":6,"stuans":"66","stuansval":"","raw":0},{"sub":1,"time":10,"stuans":"77","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[1]}],"time":16},{"score":3.33,"rawscore":0.6667,"scored_version":0,"question_versions":[{"qid":"!Q1!","seed":7976,"tries":{"0":[{"sub":2,"time":10,"stuans":"39","stuansval":"","raw":1}],"2":[{"sub":2,"time":10,"stuans":"71","stuansval":"","raw":1}]},"answeights":[1,1,1],"scored_try":[0,-1,0]}],"time":10},{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q2!","seed":3888,"tries":[[{"sub":3,"time":2,"stuans":"33","stuansval":"","raw":0},{"sub":4,"time":9,"stuans":"76","stuansval":"","raw":1}]],"answeights":[1],"scored_try":[1]},{"qid":"!Q2!","seed":1631,"tries":[[{"sub":5,"time":12,"stuans":"33","stuansval":"","raw":0}]],"answeights":[1]}],"time":23},{"score":5,"rawscore":1,"scored_version":0,"question_versions":[{"qid":"!Q3!","seed":4534,"tries":[[{"sub":6,"time":6,"stuans":"21","stuansval":"","raw":0},{"sub":7,"time":8,"stuans":"30","stuansval":"","raw":1}],[{"sub":6,"time":6,"stuans":"33","stuansval":"","raw":0},{"sub":8,"time":14,"stuans":"36","stuansval":"","raw":1}],[{"sub":6,"time":6,"stuans":"54","stuansval":"","raw":0},{"sub":8,"time":14,"stuans":"39","stuansval":"","raw":1}]],"answeights":[1,1,1],"scored_try":[1,1,1]}],"time":28}]}]}',
     'score' => 18.30,
-    'status' => 0,
+    'status' => 16,
     'timeontask' => 77
   ),
   'q1' => array(

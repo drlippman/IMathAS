@@ -38,7 +38,7 @@
       <div>
         <strong>
           {{ $t('gradebook.gb_score') }}:
-          <span v-if="aData.scoreoverride && canEdit">
+          <span v-if="aData.hasOwnProperty('scoreoverride') && canEdit">
             <input id="assessoverride" size=4
               :value = "aData.scoreoverride"
               @input = "setScoreOverride"
@@ -48,7 +48,7 @@
             {{ aData.gbscore }}
           </span> / {{ aData.points_possible }}
         </strong>
-        <span v-if="aData.scoreoverride">
+        <span v-if="aData.hasOwnProperty('scoreoverride')">
           ({{ $t('gradebook.overridden') }})
         </span>
         <span v-else-if="canEdit">
@@ -478,13 +478,15 @@ export default {
       actions.setFeedback(null, content);
     },
     setScoreOverride (evt) {
-      this.assessOverride = evt.target.value;
+      this.assessOverride = evt.target.value.trim();
       store.saving = '';
     },
     submitChanges () {
       if (this.showOverride && this.assessOverride !== '') {
         store.scoreOverrides['gen'] = this.assessOverride;
-      } else if (this.aData.scoreoverride && this.assessOverride !== this.aData.scoreoverride) {
+      } else if (this.aData.hasOwnProperty('scoreoverride') &&
+        this.assessOverride !== this.aData.scoreoverride
+      ) {
         store.scoreOverrides['gen'] = this.assessOverride;
       } else {
         delete store.scoreOverrides['gen'];
@@ -527,8 +529,9 @@ export default {
       window.location = url;
     },
     showAllAns () {
-      window.$("span[id^='ans']").removeClass('hidden');
+      window.$("span[id^='ans']").removeClass('hidden').show();
       window.$('.sabtn').replaceWith('<span>Answer: </span>');
+      window.$('.keybtn').attr('aria-expanded', 'true');
     },
     beforeUnload (evt) {
       if (Object.keys(store.scoreOverrides).length > 0 ||
