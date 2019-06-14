@@ -1362,6 +1362,7 @@ class AssessRecord
         );
       }
     }
+
     $qScore = array_sum($partscores);
     $qRawscore = 0;
     for ($pn = 0; $pn < count($answeights); $pn++) {
@@ -2199,7 +2200,13 @@ class AssessRecord
       $out['scored_version'] = 0;
     } else {
       $out['scored_version'] = $this->data['scored_version'];
-      $out['gbscore'] = floatval($this->assessRecord['score']);
+      if ($scoresInGb =='after_take' &&
+        $this->data['assess_versions'][$out['scored_version']]['status'] < 1
+      ) {
+        $out['gbscore'] = 'N/A';
+      } else {
+        $out['gbscore'] = floatval($this->assessRecord['score']);
+      }
       if (isset($this->data['scoreoverride'])) {
         $out['scoreoverride'] = $this->data['scoreoverride'];
       }

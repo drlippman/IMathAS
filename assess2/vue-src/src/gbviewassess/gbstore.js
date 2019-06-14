@@ -184,6 +184,7 @@ export const actions = {
             }
             continue;
           }
+          // TODO: this isn't enough. Need to update qdata.gbscore too
           let pts = key.split(/-/);
           let qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
           if (qdata.parts[pts[3]]) {

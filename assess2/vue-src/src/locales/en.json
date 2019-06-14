@@ -363,6 +363,9 @@
     "view_edit": "View/Edit Question",
     "show_all_ans": "Show All Answers",
     "no_versions": "No assessment attempts available to view yet",
-    "minutes": "minutes"
+    "minutes": "minutes",
+    "avail_never": "Grade is currently hidden by the teacher.",
+    "avail_after_take": "Will show after you submit an assessment attempt.",
+    "avail_after_due": "Will show after the due date."
   }
 }

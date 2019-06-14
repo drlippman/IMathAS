@@ -42,11 +42,16 @@
             <input id="assessoverride" size=4
               :value = "aData.scoreoverride"
               @input = "setScoreOverride"
-            />
+            />/{{ aData.points_possible }}
           </span>
           <span v-else>
-            {{ aData.gbscore }}
-          </span> / {{ aData.points_possible }}
+            <span v-if="aData.gbscore === 'N/A'">
+              {{ $t('gradebook.avail_' + aData.scoresingb) }}
+            </span>
+            <span v-else>
+              {{ aData.gbscore }}/{{ aData.points_possible }}
+            </span>
+          </span>
         </strong>
         <span v-if="aData.hasOwnProperty('scoreoverride')">
           ({{ $t('gradebook.overridden') }})
@@ -166,10 +171,10 @@
                 @setversion = "changeQuestionVersion"
                 class = "med-left"
               />
-              <span v-else>
+              <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
                 {{ $t('gradebook.score') }}:
                 <strong>
-                  {{ qdata[curQver[qn]].score }}/{{ qdata[curQver[qn]].points_possible }}
+                  {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
                 </strong>
               </span>
 

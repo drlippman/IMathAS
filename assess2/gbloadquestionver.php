@@ -73,5 +73,8 @@ $assess_record->parseData();
 // get requested question version
 $assessInfoOut = $assess_record->getGbQuestionVersionData($qn, true, $ver);
 
+// generating answeights may have changed the record; save if needed
+$assess_record->saveRecordIfNeeded();
+
 //output JSON object
 echo json_encode($assessInfoOut);

@@ -71,6 +71,9 @@ $assess_record->parseData();
 // get requested assessment version
 $assessInfoOut = $assess_record->getGbAssessVerData($ver, true);
 
+// generating answeights may have changed the record; save if needed
+$assess_record->saveRecordIfNeeded();
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

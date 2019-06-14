@@ -12,7 +12,7 @@
         <icons name="more" size="medium"/>
       </template>
     </menu-button>
-    <div>
+    <div v-if="canedit || (qdata.hasOwnProperty('score') && qdata.score !== 'N/A')">
       {{ $t('gradebook.score') }}:
       <span
         v-for="(poss,i) in partPoss"
@@ -200,6 +200,13 @@ export default {
     isPractice () {
       return store.ispractice;
     },
+    isLastVersion () {
+      let avercnt = store.assessInfo.assess_versions.length - 1;
+      if (store.assessInfo.has_practice) {
+        avercnt--;
+      }
+      return (store.curAver === avercnt);
+    },
     maxTry () {
       let maxtry = 0;
       for (let i = 0; i < this.qdata.parts.length; i++) {
@@ -255,7 +262,7 @@ export default {
           link: this.questionErrorUrl
         }
       ];
-      if (!this.isPractice) {
+      if (!this.isPractice && this.isLastVersion) {
         out.push({
           label: this.$t('gradebook.clear_qwork'),
           onclick: () => this.clearWork()

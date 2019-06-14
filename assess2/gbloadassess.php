@@ -168,6 +168,9 @@ if ($assessInfoOut['has_practice']) {
   );
 }
 
+// generating answeights may have changed the record; save if needed 
+$assess_record->saveRecordIfNeeded();
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

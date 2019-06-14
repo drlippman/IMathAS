@@ -92,7 +92,7 @@ export default {
       return (store.assessInfo.submitby === 'by_question');
     },
     isLastAttempt () {
-      let avercnt = store.assessInfo.assess_versions.length;
+      let avercnt = store.assessInfo.assess_versions.length - 1;
       if (store.assessInfo.has_practice) {
         avercnt--;
       }

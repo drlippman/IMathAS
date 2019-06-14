@@ -1,7 +1,7 @@
 <template>
   <span>
     {{ attemptNum }}.
-    <span v-if="option.hasOwnProperty('score')">
+    <span v-if="option.hasOwnProperty('score') && option.score !== 'N/A'">
       {{$t('gradebook.score')}}: <strong>{{ score }}</strong>
     </span>
   </span>
