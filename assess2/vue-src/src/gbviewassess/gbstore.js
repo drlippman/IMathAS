@@ -26,7 +26,7 @@ export const store = Vue.observable({
 });
 
 export const actions = {
-  loadGbAssessData (callback) {
+  loadGbAssessData (callback, keepversion) {
     if (store.assessInfo === null && window.gbAssessData) {
       store.assessInfo = window.gbAssessData;
       if (typeof callback !== 'undefined') {
@@ -89,7 +89,8 @@ export const actions = {
           ver = store.assessInfo.assess_versions.length - 1;
         }
         // set into store
-        store.assessInfo.assess_versions[ver] = response;
+        Vue.set(store.assessInfo.assess_versions, ver, response);
+
         // set current versions to scored versions
         store.curAver = ver;
         this.setQverAsScored(ver);
@@ -110,10 +111,12 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  loadGbQuestionVersion (qn, ver) {
+  loadGbQuestionVersion (qn, ver, forceload, beforeSet) {
     let qs = store.queryString + '&ver=' + ver + '&qn=' + qn;
     qs += '&practice=' + (store.ispractice ? 1 : 0);
-    if (store.assessInfo.assess_versions[store.curAver].questions[qn][ver].html !== null) {
+    if (store.assessInfo.assess_versions[store.curAver].questions[qn][ver].html !== null &&
+      forceload !== true
+    ) {
       // already have html loaded - just switch displayed version
       Vue.set(store.curQver, qn, ver);
       return;
@@ -133,9 +136,14 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
-        store.assessInfo.assess_versions[store.curAver].questions[qn][ver] =
-          Object.assign(store.assessInfo.assess_versions[store.curAver].questions[qn][ver], response);
-        // set current versions to scored versions
+        if (beforeSet) {
+          beforeSet();
+        }
+        Vue.set(store.assessInfo.assess_versions[store.curAver].questions[qn],
+          ver,
+          Object.assign(store.assessInfo.assess_versions[store.curAver].questions[qn][ver], response)
+        );
+        // set current versions to this version
         Vue.set(store.curQver, qn, ver);
       })
       .fail((xhr, textStatus, errorThrown) => {
@@ -236,20 +244,42 @@ export const actions = {
         if (store.clearAttempts.type === 'all' && keepver === 0) {
           // cleared all - exit
           window.location = store.exitUrl;
-        } else {
-          // TODO: be more surgical.  For now, we'll just reload everything
-          store.assessInfo = null;
+        } else if (store.clearAttempts.type === 'all') {
+          // reload whole mess
           actions.loadGbAssessData();
-          /*
-            If we can return the new version:
-
-          store.assessInfo = response;
-          // set current versions to scored versions
-          store.curAver = response.scored_version;
-          this.setQverAsScored(response.scored_version);
-
-           */
+        } else {
+          store.assessInfo.gbscore = response.gbscore;
+          store.assessInfo.scored_version = response.scored_version;
+          if (store.clearAttempts.type === 'attempt') {
+            if (response.hasOwnProperty('newver')) {
+              // replace assessment attempt
+              Vue.set(store.assessInfo.assess_versions, data.aver, response.newver);
+            } else {
+              // delete version
+              store.assessInfo.assess_versions.splice(data.aver, 1);
+              actions.loadGbAssessVersion(response.scored_version, false);
+            }
+          } else if (store.clearAttempts.type === 'qver') {
+            Vue.set(store.assessInfo.assess_versions[data.aver], 'score', response.assessinfo.score);
+            Vue.set(store.assessInfo.assess_versions[data.aver], 'status', response.assessinfo.status);
+            if (response.hasOwnProperty('newver')) {
+              // replace assessment attempt
+              Vue.set(store.assessInfo.assess_versions[data.aver].questions[data.qn], data.qver, response.newver);
+              // set scored
+              Vue.set(store.assessInfo.assess_versions[data.aver].questions[data.qn][response.qinfo.scored_version], 'scored', true);
+            } else {
+              // update curQver to new scored version, and set that version as scored
+              // use callback to delete this version on response
+              actions.loadGbQuestionVersion(data.qn, response.qinfo.scored_version, true,
+                () => {
+                  store.assessInfo.assess_versions[data.aver].questions[data.qn].splice(data.qver, 1)
+                  Vue.set(store.assessInfo.assess_versions[data.aver].questions[data.qn][response.qinfo.scored_version], 'scored', true);
+                }
+              );
+            }
+          }
         }
+        // clear out any affected score overrides
       })
       .fail(response => {
         this.handleError('send_fail');

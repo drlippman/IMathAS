@@ -77,14 +77,33 @@ if ($type == 'all' && $keepver == 0) {
 } else if ($type == 'all' && $keepver == 1) {
   $assess_record->gbClearAttempts($type, $keepver);
 } else if ($type == 'attempt') {
-  $assess_record->gbClearAttempts($type, $keepver, $aver);
+  $replacedDeleted = $assess_record->gbClearAttempts($type, $keepver, $aver);
 } else if ($type == 'qver') {
-  $assess_record->gbClearAttempts($type, $keepver, $aver, $qn, $qver);
+  $replacedDeleted = $assess_record->gbClearAttempts($type, $keepver, $aver, $qn, $qver);
 }
 // recalculated totals based on removed attempts
 $assess_record->reTotalAssess();
+
+// get gbscore and scored_version
+$assessInfoOut = $assess_record->getGbScore();
+$assessInfoOut['replaced_deleted'] = $replacedDeleted;
+if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
+  $assessInfoOut['newver'] = $assess_record->getGbAssessVerData($aver, true);
+} else if ($type == 'qver') {
+  $by_question = ($assess_info->getSetting('submitby') === 'by_question');
+  $assessInfoOut['assessinfo'] = $assess_record->getGbAssessVerData($aver, false);
+  // get scored version
+  $assessInfoOut['qinfo'] = $assess_record->getGbQuestionInfo($qn, $aver);
+
+  if ($replacedDeleted || $keepver == 1) {
+    $assessInfoOut['newver'] = $assess_record->getGbQuestionVersionData($qn, true, $by_question ? $qver : $aver);
+  }
+}
+
 $assess_record->saveRecord();
 
 // TODO: return updated data
-echo '{"success": "saved"}';
+//echo '{"success": "saved"}';
+//output JSON object
+echo json_encode($assessInfoOut);
 exit;

@@ -43,8 +43,11 @@ export default {
   },
   watch: {
     qdata: function (newVal, oldVal) {
-      this.rendered = false;
-      this.$nextTick(this.renderInit);
+      console.log(typeof newVal);
+      if (newVal !== null) {
+        this.rendered = false;
+        this.$nextTick(this.renderInit);
+      }
     }
   }
 };

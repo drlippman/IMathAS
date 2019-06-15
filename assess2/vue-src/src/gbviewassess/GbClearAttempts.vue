@@ -46,7 +46,7 @@
             {{ $t('gradebook.clear_qver_regen_msg2') }}
           </label>
         </p>
-        <p>
+        <p v-if="isLastQAttempt">
           <label>
             <input type="radio" value="1" v-model="type">
             {{ $t('gradebook.clear_qver_msg') }}
@@ -97,6 +97,10 @@ export default {
         avercnt--;
       }
       return (store.curAver === avercnt);
+    },
+    isLastQAttempt () {
+      let qvercnt = store.assessInfo.assess_versions[store.curAver].questions[store.clearAttempts.qn].length - 1;
+      return (store.curQver[store.clearAttempts.qn] === qvercnt);
     }
   },
   methods: {

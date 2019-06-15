@@ -336,7 +336,7 @@ class AssessRecord
    */
   public function buildNewQuestionVersion($qn, $qid, $forceseed = -1) {
     list($oldquestions, $oldseeds) = $this->getOldQuestions();
-    list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds);
+    list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
     // build question data
     $newver = array(
       'qid' => $question,
@@ -2317,6 +2317,27 @@ class AssessRecord
   }
 
   /**
+   * Get scored version on a question
+   * @param  int $qn   question number
+   * @param  string|int $aver Assessment version number, or 'scored'
+   * @return array
+   */
+  public function getGbQuestionInfo($qn, $aver = 'scored') {
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    if ($by_question) {
+      $aver = 0;
+    } else if ($aver === 'scored') {
+      $aver = $this->data['scored_version'];
+    }
+    $qinfo = $this->data['assess_versions'][$aver]['questions'][$qn];
+    $out = array(
+      'scored_version' => $qinfo['scored_version'],
+      'score' => $qinfo['score']
+    );
+    return $out;
+  }
+
+  /**
    * Get the specific details on a question version
    * @param  int  $qn                Question number
    * @param  boolean $generate_html Whether to return HTML of question
@@ -2514,6 +2535,7 @@ class AssessRecord
 
   public function gbClearAttempts($type, $keepver, $av=0, $qn=0, $qv=0) {
     $this->parseData();
+    $replacedDeleted = false;
     if ($type == 'all' && $keepver == 1) {
 
       // delete all old assessment attempts
@@ -2531,6 +2553,7 @@ class AssessRecord
       if (count($this->data['assess_versions']) == 0) {
         // need to rebuild a new version so we have one
         $this->buildNewAssessVersion(false);
+        $replacedDeleted = true;
       }
     } else if ($type == 'attempt' && $keepver == 1) {
       // want to clear work on this attempt but keep latest version
@@ -2555,18 +2578,20 @@ class AssessRecord
           'tries' => array()
         );
       }
+      $replacedDeleted = true;
     } else if ($type == 'qver' && $keepver == 0) {
       // delete question version entirely
       $aver = &$this->data['assess_versions'][$av];
       $qvers = &$aver['questions'][$qn]['question_versions'];
       if (count($qvers) == 1) { // only 1 ver, so will need to rebuild it
         list($oldquestions, $oldseeds) = $this->getOldQuestions();
-        list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds);
+        list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qvers[0]['qid'], $oldseeds, $oldquestions);
         $qvers[0] = array(
           'qid' => $question,
           'seed' => $seed,
           'tries' => array()
         );
+        $replacedDeleted = true;
       } else {
         array_splice($qvers, $qv, 1);
       }
@@ -2579,8 +2604,10 @@ class AssessRecord
         'seed' => $qver['seed'],
         'tries' => array()
       );
+      $replacedDeleted = true;
     }
     $this->updateStatus();
+    return $replacedDeleted;
   }
 
   /**

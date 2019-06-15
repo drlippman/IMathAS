@@ -45,7 +45,7 @@
             />/{{ aData.points_possible }}
           </span>
           <span v-else>
-            <span v-if="aData.gbscore === 'N/A'">
+            <span v-if="!canEdit && aData.gbscore === 'N/A'">
               {{ $t('gradebook.avail_' + aData.scoresingb) }}
             </span>
             <span v-else>

@@ -34,7 +34,7 @@ export default {
         };
         if (this.versions[i].hasOwnProperty('score')) {
           thisoption.score = this.versions[i].score;
-          thisoption.scored = i === this.selected;
+          thisoption.scored = (this.versions[i].hasOwnProperty('scored')==true);
         }
         out.push(thisoption);
       }
