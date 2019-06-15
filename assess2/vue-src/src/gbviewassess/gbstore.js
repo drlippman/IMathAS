@@ -251,6 +251,13 @@ export const actions = {
           store.assessInfo.gbscore = response.gbscore;
           store.assessInfo.scored_version = response.scored_version;
           if (store.clearAttempts.type === 'attempt') {
+            // clear out any score overrides associated with this version
+            var regex = new RegExp('^' + data.aver + '-');
+            for (let key in store.scoreOverrides) {
+              if (key.match(regex)) {
+                Vue.delete(store.scoreOverrides, key);
+              }
+            }
             if (response.hasOwnProperty('newver')) {
               // replace assessment attempt
               Vue.set(store.assessInfo.assess_versions, data.aver, response.newver);
@@ -260,6 +267,13 @@ export const actions = {
               actions.loadGbAssessVersion(response.scored_version, false);
             }
           } else if (store.clearAttempts.type === 'qver') {
+            // clear out any score overrides associated with this version
+            var regex = new RegExp('^' + data.aver + '-' + data.qn + '-' + data.qver + '-');
+            for (let key in store.scoreOverrides) {
+              if (key.match(regex)) {
+                Vue.delete(store.scoreOverrides, key);
+              }
+            }
             Vue.set(store.assessInfo.assess_versions[data.aver], 'score', response.assessinfo.score);
             Vue.set(store.assessInfo.assess_versions[data.aver], 'status', response.assessinfo.status);
             if (response.hasOwnProperty('newver')) {

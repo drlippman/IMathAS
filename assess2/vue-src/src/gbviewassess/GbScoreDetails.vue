@@ -7,6 +7,7 @@
       position = "right"
       nobutton = "true"
       noarrow = "true"
+      :id = "'qmore' + qn"
     >
       <template v-slot:button>
         <icons name="more" size="medium"/>

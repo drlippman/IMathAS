@@ -102,8 +102,6 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
 
 $assess_record->saveRecord();
 
-// TODO: return updated data
-//echo '{"success": "saved"}';
 //output JSON object
 echo json_encode($assessInfoOut);
 exit;
