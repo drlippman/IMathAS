@@ -189,7 +189,7 @@ export default {
             if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
               changed = true;
             }
-          } else if (this.type !== 'file' && val !== window.$(this).attr('data-lastval')) {
+          } else if (/*this.type !== 'file' &&*/ val !== window.$(this).attr('data-lastval')) {
             changed = true;
           }
           if (changed) {

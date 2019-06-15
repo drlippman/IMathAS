@@ -596,20 +596,67 @@ class AssessRecord
       $data[$qn]['timeactive'] = $timeactive;
     }
     $tosave = array();
+    $qref = ($qn+1)*1000 + $pn;
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
-        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.(($qn+1)*1000 + $pn).'\\b)/', $key)) {
+        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)/', $key)) {
           $data[$qn]['post'][$key] = $val;
         }
-      } else if (preg_match('/^(qn|tc|qs)'.(($qn+1)*1000 + $pn).'\\b/', $key)) {
+      } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b/', $key)) {
         $data[$qn]['post'][$key] = $val;
       }
       if (isset($data[$qn]['post'][$key])) {
         $data[$qn]['stuans'][$pn] = $val; // TODO: fix this
       }
     }
+    $filestr = '';
+    if (isset($_FILES["qn$qref"])) {
+      $filestr = $this->autosaveFile($qref);
+    } else if ($pn == 0 && isset($_FILES["qn$qn"])) {
+      $filestr = $this->autosaveFile($qn);
+    }
+    if ($filestr !== '') {
+      $data[$qn]['stuans'][$pn] = $filestr;
+    }
 
     $this->need_to_record = true;
+  }
+
+  /**
+   * Save a file upload as part of autosaving
+   * @param  int $qref   The file input reference: $_FILES['"qn$qnref"']
+   * @return string  saved file identifier, or empty string on failure
+   */
+  private function autosaveFile($qref) {
+    $randstr = '';
+
+    $chars = 'abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789';
+    $m = microtime(true);
+    $res = '';
+    $in = floor($m)%1000000000;
+    while ($in>0) {
+        $i = $in % 62;
+        $in = floor($in/62);
+        $randstr .= $chars[$i];
+    }
+    $in = floor(10000*($m-floor($m)));
+    while ($in>0) {
+        $i = $in % 62;
+        $in = floor($in/62);
+        $randstr .= $chars[$i];
+    }
+
+    $s3asid = $this->curAid . '/' . $randstr;
+    if (is_uploaded_file($_FILES["qn$qref"]['tmp_name'])) {
+      $filename = basename(str_replace('\\','/',$_FILES["qn$qref"]['name']));
+      $filename = preg_replace('/[^\w\.]/','',$filename);
+      $s3object = "adata/$s3asid/$filename";
+      require_once(__DIR__."/../includes/filehandler.php");
+      if (storeuploadedfile("qn$qref",$s3object)) {
+        return "@FILE:$s3asid/$filename@";
+      }
+    }
+    return '';
   }
 
   /**

@@ -382,7 +382,7 @@ export const actions = {
         if (el.name.match(regex)) {
           if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
             if (el.type === 'file') {
-              // don't autosave files
+              data.append(el.name, el.files[0]);  
             } else {
               data.append(el.name, el.value);
             }
