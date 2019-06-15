@@ -27,13 +27,16 @@ export default {
     navOptions () {
       var out = [];
       for (let i = 0; i < this.versions.length; i++) {
-        out.push({
+        let thisoption = {
           ver: i,
-          score: this.versions[i].score,
           status: this.versions[i].status,
           lastchange_disp: this.versions[i].lastchange_disp,
           onclick: () => this.$emit('setversion', i)
-        });
+        }
+        if (this.versions[i].hasOwnProperty('score')) {
+          thisoption.score = this.versions[i].score;
+        }
+        out.push(thisoption);
       }
       return out;
     }

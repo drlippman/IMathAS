@@ -2,21 +2,17 @@ TODOs:
   Need to revisit showhints throughout display code
   Test clearing attempts
   Refactor ErrorDialog to be usable in GBViewAssess
-  Submit Assessment: show confirm
-  Skip question selector. Period after question #.
-  Test autosave on radio buttons / checkboxes
   Figure out file upload autosave.  Could:
     Submit file on autosave.
     On restore, display: "Autosaved file:" and submit something to tell backend to use autosave
     Selecting a file would clear the "Autosaved file" note and input field
-  practice score showing in GB
 
 Bugs:
   A11y: Enter key handlers on input boxes to submit?
-  Quiz - total at end with no work: gbscore should report as N/A
 
 To discuss:
-
+  Do we want to be able to clear a score override at a question level?
+    Probably not necessary
 
 Separate:
   Collate CSS
@@ -65,6 +61,8 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Submit Assessment: show confirm?
+X Test autosave on radio buttons / checkboxes
 X N/A in gradebook
     Hide score disp at attempt selector, version selector, score details level
     Score in GB line: replace with "Not yet available"

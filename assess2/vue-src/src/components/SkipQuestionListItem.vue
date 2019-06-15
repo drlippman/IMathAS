@@ -7,7 +7,7 @@
         :title = "nameHover"
       >
         {{ nameDisp }}
-      </span>
+      </span>&nbsp;
       {{ scoreDisplay }}
     </span>
     <span class="redoicon">
@@ -57,7 +57,7 @@ export default {
         str += this.option.canretry ? ')' : ']';
         return str;
       } else {
-        return this.$tc('header.pts', this.option.points_possible);
+        return '(' + this.$tc('header.pts', this.option.points_possible) + ')';
       }
     }
   }

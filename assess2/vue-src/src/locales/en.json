@@ -114,7 +114,8 @@
     "disable_mq": "Disable equation editor",
     "work_save": "Save work",
     "work_saved": "Work saved",
-    "work_saving": "Saving..."
+    "work_saving": "Saving...",
+    "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?"
   },
   "text": {
     "hide": "Hide text",
