@@ -65,6 +65,8 @@ $assess_record->setGbFeedbacks($feedbacks);
 $assess_record->saveRecord();
 
 $out = $assess_record->getGbScore();
+$out['assess_info'] = $assess_record->getGbAssessScoresAndQVersions();
+$out['newscores'] = $assess_record->getScoresAfterOverrides($scores);
 
 // update LTI grade
 $lti_sourcedid = $assess_info->getSetting('lti_sourcedid');

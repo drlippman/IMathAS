@@ -192,15 +192,39 @@ export const actions = {
             }
             continue;
           }
-          // TODO: this isn't enough. Need to update qdata.gbscore too
+          // Update part score
           let pts = key.split(/-/);
           let qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
           if (qdata.parts[pts[3]]) {
             qdata.parts[pts[3]].score = Math.round(1000 * store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible) / 1000;
           }
         }
+        // update question scores
+        for (let key in response.newscores) {
+          let pts = key.split(/-/);
+          Vue.set(
+            store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]],
+            'score',
+            response.newscores[key]
+          );
+        }
         store.assessInfo.gbscore = response.gbscore;
         store.assessInfo.scored_version = response.scored_version;
+        // Update question scored version
+        for (let an = 0; an < response.assess_info.length; an++) {
+          store.assessInfo.assess_versions[an].score = response.assess_info[an].score;
+          for (let qn = 0; qn < response.assess_info[an].scoredvers.length; qn++) {
+            let qvers = store.assessInfo.assess_versions[an].questions[qn];
+            for (let qv = 0; qv < qvers.length; qv++) {
+              if (qv == response.assess_info[an].scoredvers[qn]) {
+                qvers[qv].scored = true;
+              } else if (qvers[qv].scored) {
+                Vue.delete(qvers[qv], 'scored');
+              }
+            }
+          }
+        }
+        // Update assessment scores
         store.scoreOverrides = {};
         store.feedbacks = {};
       })

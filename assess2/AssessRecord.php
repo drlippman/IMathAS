@@ -406,6 +406,30 @@ class AssessRecord
   }
 
   /**
+   * Gets an array for each assessment version of the current score
+   * and an array of score and question info. Each question info has
+   * scored_version and an array of scores for each version
+   *
+   * @return array , each an array with keys (score, scoredvers)
+   */
+  public function getGbAssessScoresAndQVersions() {
+    $this->parseData();
+    $out = array();
+    for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
+      $curAver = $this->data['assess_versions'][$av];
+      $aout = array();
+      for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
+        $aout[] = $curAver['questions'][$qn]['scored_version'];
+      }
+      $out[] = array(
+        'score' => $curAver['score'],
+        'scoredvers' => $aout
+      );
+    }
+    return $out;
+  }
+
+  /**
    * Determine if there is an active assessment attempt
    * @return boolean true if there is an active assessment attempt
    */
@@ -2464,9 +2488,6 @@ class AssessRecord
         $this->assessRecord['score'] = floatval($scores['gen']);
       }
       unset($scores['gen']);
-    } else {
-      // TODO: Do we want to do this?
-      //unset($this->data['scoreoverride']);
     }
     foreach ($scores as $key=>$score) {
       $keyparts = explode('-', $key);
@@ -2493,6 +2514,46 @@ class AssessRecord
     if (!empty($scores) || $doRetotal) {
       $this->reTotalAssess();
     }
+  }
+
+  /**
+   * Get updated scores for questions for which overrides have been set
+   * @param  array $scores array with keys av-qn-qv-pn, or scored-qn-pn
+   * @return array of scores with keys av-qn-qv
+   */
+  public function getScoresAfterOverrides($scores) {
+    unset($scores['gen']);
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $scoreOut = array();
+    foreach ($scores as $key=>$score) {
+      $keyparts = explode('-', $key);
+      if ($keyparts[0] === 'scored') {
+        $qn = intval($keyparts[1]);
+        $pn = intval($keyparts[2]);
+        if ($by_question) {
+          $av = 0;
+          $qv = $this->data['assess_versions'][0]['questions'][$qn]['scored_version'];
+        } else {
+          $av = $this->data['scored_version'];
+          $qv = 0;
+        }
+      } else {
+        list($av,$qn,$qv,$pn) = array_map('intval', $keyparts);
+      }
+      if (isset($scoreOut["$av-$qn-$qv"])) {
+        continue;
+      }
+      $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
+      if (isset($qdata['scoreoverride'])) {
+        list($qScore, $qRawscore, $parts, $scoredTry) =
+          $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all', $qdata['scoreoverride']);
+      } else {
+        list($qScore, $qRawscore, $parts, $scoredTry) =
+          $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all');
+      }
+      $scoreOut["$av-$qn-$qv"] = $qScore;
+    }
+    return $scoreOut;
   }
 
   /**
