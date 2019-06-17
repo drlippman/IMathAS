@@ -30,6 +30,11 @@ class FileUploadAnswerBox implements AnswerBox
         $multi = $this->answerBoxParams->getIsMultiPartQuestion();
         $partnum = $this->answerBoxParams->getQuestionPartNumber();
         $la = $this->answerBoxParams->getStudentLastAnswers();
+        $autosave = '';
+        // if there's an autosave, then $la will be an array
+        if (is_array($la)) {
+          list($la, $autosave) = $la;
+        }
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
         $assessmentId = $this->answerBoxParams->getAssessmentId();
@@ -82,7 +87,7 @@ class FileUploadAnswerBox implements AnswerBox
     					$url = getasidfileurl($file);
     					$extension = substr($url,strrpos($url,'.')+1,3);
     					$filename = basename($file);
-    					$out .= "<br/>" . _('Last file uploaded:') . " <a href=\"$url\" target=\"_new\">$filename</a>";
+    					$out .= "<br/>" . _('Last file submitted:') . " <a href=\"$url\" target=\"_new\">$filename</a>";
     					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\" />";
     					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
     						$out .= " <span aria-expanded=\"false\" aria-controls=\"img$qn\" class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
