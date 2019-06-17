@@ -612,8 +612,10 @@ class AssessRecord
     $filestr = '';
     if (isset($_FILES["qn$qref"])) {
       $filestr = $this->autosaveFile($qref);
+      $data[$qn]['post']["qn$qref"] = $filestr;
     } else if ($pn == 0 && isset($_FILES["qn$qn"])) {
       $filestr = $this->autosaveFile($qn);
+      $data[$qn]['post']["qn$qn"] = $filestr;
     }
     if ($filestr !== '') {
       $data[$qn]['stuans'][$pn] = $filestr;
@@ -2926,7 +2928,7 @@ class AssessRecord
    * @param  int  $qn         The question number
    * @return array of autosave data
    */
-  private function getAutoSaves($qn) {
+  public function getAutoSaves($qn) {
     $this->parseData();
     if (isset($this->data['autosaves'][$qn])) {
       return $this->data['autosaves'][$qn];

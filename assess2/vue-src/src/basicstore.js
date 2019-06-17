@@ -249,8 +249,12 @@ export const actions = {
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if (el.name.match(regex)) {
           if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
-            if (el.type === 'file') {
+            if (el.type === 'file' && el.files.length > 0) {
               data.append(el.name, el.files[0]);
+            } else if (el.type === 'file') {
+              if (document.getElementById(el.name + '-autosave')) {
+                data.append(el.name, 'file-autosave');
+              }
             } else {
               data.append(el.name, el.value);
             }
@@ -382,7 +386,11 @@ export const actions = {
         if (el.name.match(regex)) {
           if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
             if (el.type === 'file') {
-              data.append(el.name, el.files[0]);  
+              if (el.files.length === 0) {
+                data.append(el.name, '');
+              } else {
+                data.append(el.name, el.files[0]);
+              }
             } else {
               data.append(el.name, el.value);
             }
@@ -641,6 +649,8 @@ export const actions = {
             if ((el.checked === true) !== (actions.getInitValue(qn, el.name) === '1')) {
               thisChanged = true;
             }
+          } else if (el.type === 'file' && document.getElementById(el.name + '-autosave') !== null) {
+            thisChanged = true; // file with autosave input
           } else {
             if (el.value !== actions.getInitValue(qn, el.name)) {
               thisChanged = true;

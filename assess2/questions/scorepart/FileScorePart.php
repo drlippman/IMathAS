@@ -41,27 +41,17 @@ class FileScorePart implements ScorePart
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+
         $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
         $filename = preg_replace('/[^\w\.]/','',$filename);
         $hasfile = false;
         require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
         if (trim($filename)=='') {
-            $found = false;
-            if ($_POST["lf$qn"]!='') {
-                if ($multi>0) {
-                    if (strpos($GLOBALS['lastanswers'][$multi-1],'@FILE:'.$_POST["lf$qn"].'@')!==false) {
-                        $found = true;
-                    }
-                } else {
-                    if (strpos($GLOBALS['lastanswers'][$qn],'@FILE:'.$_POST["lf$qn"].'@')!==false) {
-                        $found = true;
-                    }
-                }
-            }
-            if ($found) {
-                $scorePartResult->setLastAnswerAsGiven('@FILE:'.$_POST["lf$qn"].'@');
+            if (is_string($givenans) && substr($givenans,0,5) === '@FILE') { // has an autosaved file
+                $scorePartResult->setLastAnswerAsGiven($givenans);
                 if ($answerformat=='excel') {
-                    $zip = new ZipArchive;
+                  // TODO if we want to resurrect this
+                    /*$zip = new ZipArchive;
                     if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
                         $doc = new DOMDocument();
                         $doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'));
@@ -70,7 +60,7 @@ class FileScorePart implements ScorePart
                         $scorePartResult->addScoreMessage(_(' Unable to open Excel file'));
                         $scorePartResult->setRawScore(0);
                         return $scorePartResult;
-                    }
+                    }*/
                 }
                 $hasfile = true;
             } else {
