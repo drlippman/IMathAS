@@ -51,30 +51,35 @@
     </menu-button>
 
     <div v-if = "showPrint">
-      <a
-        :href="printLink"
-        class = "noextlink"
-        target = "_blank"
-        :title = "$t('print.print_version')"
-        :aria-label = "$t('print.print_version')"
-      >
-        <icons name="print" size="medium"/>
-      </a>
+      <tooltip-span :tip="$t('print.print_version')">
+        <a
+          :href="printLink"
+          class = "noextlink"
+          target = "_blank"
+          :aria-label = "$t('print.print_version')"
+        >
+          <icons name="print" size="medium"/>
+        </a>
+      </tooltip-span>
     </div>
-    <button
-      @click="toggleMQuse"
-      :class="{plain:true, 'switch-toggle':true}"
-      :title="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
-      :aria-label="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
-      :aria-pressed="MQenabled"
+    <tooltip-span
+      :tip="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+      style="display: inline-block"
     >
-      <icons
-        :name="MQenabled ? 'eqned' : 'eqnedoff'"
-        :color="MQenabled ? '#060' : '#600'"
-        size="medium"
-      />
-      <span class="switch-toggle__ui"></span>
-    </button>
+      <button
+        @click="toggleMQuse"
+        :class="{plain:true, 'switch-toggle':true}"
+        :aria-label="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+        :aria-pressed="MQenabled"
+      >
+        <icons
+          :name="MQenabled ? 'eqned' : 'eqnedoff'"
+          :color="MQenabled ? '#060' : '#600'"
+          size="medium"
+        />
+        <span class="switch-toggle__ui"></span>
+      </button>
+    </tooltip-span>
     <lti-menu v-if="ainfo.is_lti" />
     </div>
   </div>
@@ -85,6 +90,7 @@ import Timer from '@/components/Timer.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
+import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 
 import { store, actions } from '../basicstore';
 
@@ -93,6 +99,7 @@ export default {
   components: {
     Timer,
     MenuButton,
+    TooltipSpan,
     Icons,
     LtiMenu
   },

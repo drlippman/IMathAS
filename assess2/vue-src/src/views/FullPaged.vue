@@ -16,11 +16,12 @@
       <div
         v-for = "(pageData,pagenum) in allPages"
         :key = "pagenum"
-        :class="{inactive: pagenum !== page, questionpane: true}"
+        :class="{inactive: pagenum !== page}"
         :aria-hidden = "pagenum !== page"
       >
         <div v-if = "pageData[0].questions.length === 0">
           <inter-question-text-list
+            class = "questionpane"
             pos="all"
             :page="pagenum"
             :active = "pagenum === page"
@@ -31,6 +32,7 @@
             v-for="curqn in pageData[0].questions" :key="curqn"
           >
             <inter-question-text-list
+              class = "questionpane"
               pos="beforeexact"
               :qn="curqn"
               :key="'iqt'+curqn"
@@ -39,7 +41,7 @@
             />
             <full-question-header :qn = "curqn" />
             <question
-              class = "med-left"
+              class = "questionpane"
               :qn="curqn"
               :active = "pagenum === page"
               :key="'q'+curqn"
@@ -104,17 +106,5 @@ export default {
 </script>
 
 <style>
-.inactive {
-  visibility: hidden;
-  position: absolute;
-}
-.questionpane {
-  margin: 15px 15px;
-  max-width: 700px;
-  overflow: visible;
-}
-.scrollpane {
-  width: 100%;
-  overflow-x: auto;
-}
+
 </style>

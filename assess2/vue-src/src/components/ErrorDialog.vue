@@ -1,6 +1,6 @@
 <template>
   <div class="fullwrap">
-    <div class="overlay" />
+    <div class="dialog-overlay" />
     <div class="dialog">
       <div class="pane-header flexrow">
         <div style="flex-grow: 1">
@@ -49,14 +49,14 @@ export default {
 </script>
 
 <style>
-.fullwrap, .overlay {
+.fullwrap, .dialog-overlay {
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
 }
-.overlay {
+.dialog-overlay {
   position: fixed;
   background-color: #000;
   opacity: .5;

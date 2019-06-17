@@ -266,7 +266,7 @@ import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
-
+import '../assess2.css';
 // import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
