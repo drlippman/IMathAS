@@ -197,7 +197,7 @@ export default {
       }
     },
     handleBlur () {
-      //this.closetimer = setTimeout(() => { this.open = false; }, 50);
+      this.closetimer = setTimeout(() => { this.open = false; }, 50);
     },
     handleFocus () {
       clearTimeout(this.closetimer);
