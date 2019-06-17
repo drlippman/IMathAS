@@ -1486,7 +1486,13 @@ class AssessRecord
         $stuanswers[$qn+1][$pn] = '';
         $stuanswersval[$qn+1][$pn] = '';
       } else if (isset($autosave['stuans'][$pn])) {
-        $stuanswers[$qn+1][$pn] = $autosave['stuans'][$pn];
+        if (strpos($autosave['stuans'][$pn], '@FILE') !== false) {
+          // it's  a file autosave.  As a bit of a hack we'll make an array
+          // with both the last submitted answer and the autosave
+          $stuanswers[$qn+1][$pn] = array($stuanswers[$qn+1][$pn], $autosave['stuans'][$pn]);
+        } else {
+          $stuanswers[$qn+1][$pn] = $autosave['stuans'][$pn];
+        }
         $usedAutosave[] = $pn;
       }
       /* These cases should already be handled in $stuanswers grab
