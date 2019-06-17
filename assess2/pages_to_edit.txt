@@ -6,6 +6,8 @@ TODOs:
     Submit file on autosave.
     On restore, display: "Autosaved file:" and submit something to tell backend to use autosave
     Selecting a file would clear the "Autosaved file" note and input field
+    Need to pass "used autosave" to file answerbox display, so it can adjust language
+    Will have to have a way to clear autosave, if student decides they don't want to submit it.
 
 Bugs:
   A11y: Enter key handlers on input boxes to submit?

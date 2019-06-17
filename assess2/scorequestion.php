@@ -165,6 +165,26 @@ if (count($qns) > 0) {
   // Record a submission
   $submission = $assess_record->addSubmission($now);
 
+  // Handle file autosaves - get file storage string from autosave
+  foreach ($_POST as $k => $v) {
+    if ($v === 'file-autosave') {
+      $qref = substr($k,2);
+      if ($qref >= 1000) {
+        $qn = Math.floor($qref/1000) - 1;
+        $pn = $qref % 1000;
+      } else {
+        $qn = $qref;
+        $pn = 0;
+      }
+      $autosaves = $assess_record->getAutoSaves($qn);
+      if (isset($autosaves['stuans'][$pn])) {
+        $_POST[$k] = $autosaves['stuans'][$pn];
+      }
+    } else if (is_string($v) && substr($v,0,5) === '@FILE') {
+      unset($_POST[$k]); // prevent faked file autosave loads
+    }
+  }
+
   // Score the questions
   $scoreErrors = array();
   foreach ($qns as $k=>$qn) {

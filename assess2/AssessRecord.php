@@ -596,20 +596,69 @@ class AssessRecord
       $data[$qn]['timeactive'] = $timeactive;
     }
     $tosave = array();
+    $qref = ($qn+1)*1000 + $pn;
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
-        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.(($qn+1)*1000 + $pn).'\\b)/', $key)) {
+        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)/', $key)) {
           $data[$qn]['post'][$key] = $val;
         }
-      } else if (preg_match('/^(qn|tc|qs)'.(($qn+1)*1000 + $pn).'\\b/', $key)) {
+      } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b/', $key)) {
         $data[$qn]['post'][$key] = $val;
       }
       if (isset($data[$qn]['post'][$key])) {
         $data[$qn]['stuans'][$pn] = $val; // TODO: fix this
       }
     }
+    $filestr = '';
+    if (isset($_FILES["qn$qref"])) {
+      $filestr = $this->autosaveFile($qref);
+      $data[$qn]['post']["qn$qref"] = $filestr;
+    } else if ($pn == 0 && isset($_FILES["qn$qn"])) {
+      $filestr = $this->autosaveFile($qn);
+      $data[$qn]['post']["qn$qn"] = $filestr;
+    }
+    if ($filestr !== '') {
+      $data[$qn]['stuans'][$pn] = $filestr;
+    }
 
     $this->need_to_record = true;
+  }
+
+  /**
+   * Save a file upload as part of autosaving
+   * @param  int $qref   The file input reference: $_FILES['"qn$qnref"']
+   * @return string  saved file identifier, or empty string on failure
+   */
+  private function autosaveFile($qref) {
+    $randstr = '';
+
+    $chars = 'abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789';
+    $m = microtime(true);
+    $res = '';
+    $in = floor($m)%1000000000;
+    while ($in>0) {
+        $i = $in % 62;
+        $in = floor($in/62);
+        $randstr .= $chars[$i];
+    }
+    $in = floor(10000*($m-floor($m)));
+    while ($in>0) {
+        $i = $in % 62;
+        $in = floor($in/62);
+        $randstr .= $chars[$i];
+    }
+
+    $s3asid = $this->curAid . '/' . $randstr;
+    if (is_uploaded_file($_FILES["qn$qref"]['tmp_name'])) {
+      $filename = basename(str_replace('\\','/',$_FILES["qn$qref"]['name']));
+      $filename = preg_replace('/[^\w\.]/','',$filename);
+      $s3object = "adata/$s3asid/$filename";
+      require_once(__DIR__."/../includes/filehandler.php");
+      if (storeuploadedfile("qn$qref",$s3object)) {
+        return "@FILE:$s3asid/$filename@";
+      }
+    }
+    return '';
   }
 
   /**
@@ -1439,7 +1488,13 @@ class AssessRecord
         $stuanswers[$qn+1][$pn] = '';
         $stuanswersval[$qn+1][$pn] = '';
       } else if (isset($autosave['stuans'][$pn])) {
-        $stuanswers[$qn+1][$pn] = $autosave['stuans'][$pn];
+        if (strpos($autosave['stuans'][$pn], '@FILE') !== false) {
+          // it's  a file autosave.  As a bit of a hack we'll make an array
+          // with both the last submitted answer and the autosave
+          $stuanswers[$qn+1][$pn] = array($stuanswers[$qn+1][$pn], $autosave['stuans'][$pn]);
+        } else {
+          $stuanswers[$qn+1][$pn] = $autosave['stuans'][$pn];
+        }
         $usedAutosave[] = $pn;
       }
       /* These cases should already be handled in $stuanswers grab
@@ -2873,7 +2928,7 @@ class AssessRecord
    * @param  int  $qn         The question number
    * @return array of autosave data
    */
-  private function getAutoSaves($qn) {
+  public function getAutoSaves($qn) {
     $this->parseData();
     if (isset($this->data['autosaves'][$qn])) {
       return $this->data['autosaves'][$qn];

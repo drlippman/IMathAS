@@ -154,6 +154,9 @@ function init(paramarr, enableMQ) {
     if (params.qtype === 'draw') {
       setupDraw(qn);
     }
+    if (params.qtype === 'file') {
+      initFileAlt(document.getElementById("qn"+qn));
+    }
     if (params.usetinymce) {
       initeditor("textareas","mceEditor");
     }
@@ -238,7 +241,7 @@ function initClearScoreMarkers() {
 }
 
 function initEnterHandler(qn) {
-	$("#questionwrap"+qn+" input[type=text][name^=qn]").off("keydown.enterhandler")
+	$("input[type=text][name=qn"+qn+"]").off("keydown.enterhandler")
 	  .on("keydown.enterhandler", function(e) {
 		if (e.which==13) {
 			e.preventDefault();

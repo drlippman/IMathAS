@@ -1212,6 +1212,37 @@ a.dropdown-toggle.arrow-down:hover {
 	text-decoration: none;
 }
 
+.filealt {
+ opacity: 0;
+ position: absolute;
+ width: 1px;
+ height: 1px;
+ overflow: hidden;
+}
+.filealt + label {
+	display: inline-block;
+  margin: 0 4px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+.has-focus + label,
+.filealt:focus + label,
+.filealt:active + label {
+  outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+.filealt-btn {
+  padding: 2px 8px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+	border-radius: 4px;
+	display: inline-block;
+	margin: -1px;
+}
+.filealt-label {
+  padding: 2px 16px 2px 8px;
+}
+
 .katex {
 	font-size: 1.1em !important;
 }

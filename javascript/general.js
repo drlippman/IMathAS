@@ -987,6 +987,24 @@ jQuery(document).ready(function($) {
 	$(".grouptoggle img").attr("alt", "expand/collapse");
 });
 
+// restyled file uploads
+function initFileAlt(el) {
+	var label = jQuery(el).next().find(".filealt-label");
+	var origLabel = label.attr('data-def') || label.html();
+	jQuery(el).off("focus.filealt, blur.filealt, click.filealt, change.filealt")
+		.on("focus.filealt", function(e) { jQuery(e.target).addClass("has-focus");} )
+		.on("blur.filealt", function(e) { jQuery(e.target).removeClass("has-focus");} )
+		.on("click.filealt", function(e) { label.html(origLabel); } )
+		.on("change.filealt", function(e) {
+			var fileName = '';
+			fileName = e.target.value.split(/(\\|\/)/g).pop();
+			if (fileName) {
+				label.html(fileName);
+			}
+		});
+}
+jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
+
 //https://github.com/davatron5000/FitVids.js
 (function( $ ){
 
