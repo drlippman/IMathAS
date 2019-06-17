@@ -116,14 +116,4 @@ export default {
 </script>
 
 <style>
-.flexpanes {
-  display: flex;
-  flex-flow: row wrap;
-}
-.flexpanes > div + div{
-  border-left: 1px solid #ddd;
-  border-top: 1px solid #ddd;
-  margin-top: -1px;
-}
-
 </style>

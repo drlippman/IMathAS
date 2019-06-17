@@ -268,19 +268,7 @@ export default {
 </script>
 
 <style>
-.inactive {
-  visibility: hidden;
-  position: absolute;
-}
-.questionpane {
-  margin: 15px 15px;
-  max-width: 700px;
-  overflow: visible;
-}
-.scrollpane {
-  width: 100%;
-  overflow-x: auto;
-}
+
 #livepoll_qsettings > label {
   margin-right: 8px;
 }

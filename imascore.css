@@ -145,7 +145,7 @@ div.block.grouptoggle {
 div.block.grouptoggle + div.blockitems {
 	margin-top: 0px
 }
-div.hidden {
+.hidden {
 	display:none;
 }
 .showinmobile {
@@ -732,32 +732,58 @@ a.abutton {
 a.abutton, a.abutton:hover, a.abutton:focus {
 	text-decoration: none;
 }
-input[type=submit],input[type=button], button, a.abutton {
+input[type=submit],input[type=button], button, a.abutton, span.fakebutton {
 	color: #000;
 	background-color: #eee;
 	border-radius: 4px;
 	border: 1px solid #ccc;
 	font: inherit;
-	height:1.5em;
+	/*height:1.5em;
 	line-height: 1.5em;
-	padding: 0 8px;
+	padding: 0 8px;*/
+	padding: 3px 12px;
 	margin: 2px 3px;
 }
-input[type=submit].secondarybtn,input[type=button].secondarybtn, button.secondarybtn {
-	background-color: #f9f9f9;
-}
-input[type=submit]:hover, button:hover,input[type=button]:hover, a.abutton:hover {
-	background-color: #e3e3ff;
-}
+input[type=submit]:hover, button:hover,input[type=button]:hover, a.abutton:hover,
 input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus {
 	background-color: #e3e3ff;
 }
-input[type=submit]:disabled,input[type=button]:disabled {
-	color: #666;
+input[type=submit]:disabled,input[type=button]:disabled, button:disabled {
+  opacity: .5;
 }
 input[type=submit]:disabled:hover,input[type=button]:disabled:hover {
 	background-color: #eee;
 }
+input[type=submit].primary,input[type=button].primary, button.primary, a.abutton.primary {
+  color: #fff;
+  background-color: #1E74D1;
+}
+input[type=submit].primary:enabled:hover, button.primary:enabled:hover,input[type=button].primary:enabled:hover, a.abutton.primary:hover,
+input[type=submit].primary:focus, button.primary:focus,input[type=button].primary:focus, a.abutton.primary:focus {
+  background-color: #175aa2;
+}
+
+input[type=submit].secondarybtn,input[type=button].secondarybtn, button.secondarybtn {
+	color: #000;
+	background-color: #f9f9f9;
+}
+input[type=submit].secondarybtn:enabled:hover,input[type=button].secondarybtn:enabled:hover, button.secondarybtn:enabled:hover,
+input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, button.secondarybtn:focus {
+  background-color: #ddd;
+}
+
+button.slim {
+  padding: 0px 12px;
+}
+button.nopad {
+  padding: 0;
+}
+button.plain {
+  border: 0;
+  background-color: transparent;
+}
+
+
 #GB_overlay {
   position: fixed;
   margin: auto;
@@ -895,7 +921,8 @@ a[target=_blank]::after {
 	display: inline-block;
 	background: url(img/extlink.png) center right no-repeat;
 }
-.mce-content-body a[target=_blank]:after {
+.mce-content-body a[target=_blank]:after,
+a[target=_blank].noextlink::after {
 	display: none;
 }
 .mce-content-body span.AMedit {border: 1px solid #ff0000;}

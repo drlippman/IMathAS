@@ -13,31 +13,30 @@
         <icons name="square-check" />
         {{ scoreDisplay }}
       </span>
-      <span
+      <tooltip-span
         v-if="qn >= 0 && curQData.canretry && showretry !== false"
-        :title="$tc('qinfo.tries_remaining', curQData.tries_remaining)">
+        :tip="$tc('qinfo.tries_remaining', curQData.tries_remaining)">
         <icons name="retry"/>
         {{ curQData.tries_remaining }}
-      </span>
-      <span
+      </tooltip-span> 
+      <tooltip-span
         v-if="qn >= 0 && curQData.canregen && showretry !== false"
-        :title="$tc('qinfo.regens_remaining', curQData.regens_remaining)">
+        :tip="$tc('qinfo.regens_remaining', curQData.regens_remaining)">
         <icons name="retake"/>
         {{ curQData.regens_remaining }}
-      </span>
+      </tooltip-span>
+      <dropdown
+        :id="'qd-dd-'+qn"
+        class="question-details"
+        v-if="showDetails"
+      >
+        <template v-slot:button>
+          <icons name="info" size="medium"/>
+          {{ $t('header.details') }}
+        </template>
+        <question-details-pane :qn="qn" />
+      </dropdown>
     </div>
-
-    <dropdown
-      :id="'qd-dd-'+qn"
-      class="question-details"
-      v-if="showDetails"
-    >
-      <template v-slot:button>
-        <icons name="info" size="medium"/>
-        {{ $t('header.details') }}
-      </template>
-      <question-details-pane :qn="qn" />
-    </dropdown>
 
   </div>
 </template>
@@ -45,6 +44,7 @@
 <script>
 import QuestionDetailsPane from '@/components/QuestionDetailsPane.vue';
 import Dropdown from '@/components/widgets/Dropdown.vue';
+import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
 
@@ -54,6 +54,7 @@ export default {
   components: {
     QuestionDetailsPane,
     Dropdown,
+    TooltipSpan,
     Icons
   },
   data: function () {
