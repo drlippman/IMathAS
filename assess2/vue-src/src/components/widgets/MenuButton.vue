@@ -11,7 +11,7 @@
       :id = "id"
       ref = "button"
       :tabindex = "open?-1:0"
-      :class = "{'nobutton': !!nobutton}"
+      :class = "{'nobutton': !!nobutton, 'flex-nowrap-center': true}"
       aria-haspopup = "true"
       :aria-controls = "id + '_wrap'"
       :aria-expanded = "open?'true':'false'"
@@ -197,7 +197,7 @@ export default {
       }
     },
     handleBlur () {
-      this.closetimer = setTimeout(() => { this.open = false; }, 50);
+      //this.closetimer = setTimeout(() => { this.open = false; }, 50);
     },
     handleFocus () {
       clearTimeout(this.closetimer);
@@ -268,7 +268,8 @@ li.menubutton-header {
     width: 12px;
 }
 .mb_downarrow {
-  margin-left: 10px;
+  margin-left: 8px;
+  margin-right: -5px;
 }
 
 .menubutton ul::-webkit-scrollbar-track {

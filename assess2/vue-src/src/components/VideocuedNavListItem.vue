@@ -72,11 +72,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.questionnav {
-  display: inline-block;
-  border: 1px solid #ccc;
-  padding: 5px 10px;
-}
 .greentext {
   color: #090;
 }
@@ -88,17 +83,5 @@ export default {
 }
 .bluetext {
   color: #009;
-}
-.qname-wrap {
-  display: inline-block;
-  min-width: 12em;
-}
-.qstatusicon {
-  margin-right: 4px;
-}
-.redoicon {
-  display: inline-block;
-  width: 40px;
-  text-align: right;
 }
 </style>

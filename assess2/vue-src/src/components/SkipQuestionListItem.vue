@@ -1,7 +1,7 @@
 <template>
-  <span>
+  <span class="flex-nowrap-center">
+    <icons :name="statusIcon" class="qstatusicon" />
     <span class="qname-wrap">
-      <icons :name="statusIcon" class="qstatusicon" />
       <span
         :class="{greystrike: option.withdrawn > 0}"
         :title = "nameHover"
@@ -86,15 +86,19 @@ export default {
 .qname-wrap {
   display: inline-block;
   min-width: 12em;
+  flex-grow: 1;
+}
+@media only screen and (max-width: 480px) {
+  .qname-wrap {
+    min-width: 8em;
+  }
 }
 .qstatusicon {
   margin-right: 4px;
 }
 .redoicon {
   display: inline-block;
-  width: 40px;
-  text-align: right;
-  white-space: nowrap;
+  width: 48px;
 }
 .redoicon > * {
   margin-left: 8px;

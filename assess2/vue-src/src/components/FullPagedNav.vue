@@ -102,7 +102,8 @@ export default {
 <style>
 .subheader {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
+  align-items: stretch;
   border-bottom: 1px solid #ccc;
 }
 .subheader > * {

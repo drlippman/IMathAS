@@ -1247,6 +1247,13 @@ a.dropdown-toggle.arrow-down:hover {
 	font-size: 1.1em !important;
 }
 
+.flex-nowrap-center {
+	display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper, .fw1000 .midwrapper {
 	max-width: 1000px;
 	margin: auto;
