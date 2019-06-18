@@ -11,47 +11,48 @@
         <span class="answeredinfo">{{ curAnswered }}</span>
       </div>
     </div>
-    <div class="assess-header">
+
     <timer v-if="ainfo.timelimit > 0"
       :total="ainfo.timelimit"
       :end="ainfo.timelimit_expires"
       :grace="ainfo.timelimit_grace">
     </timer>
 
-    <button
-      v-if = "saveWorkLabel != ''"
-      class = "secondary"
-      @click = "handleSaveWork"
-      :disabled = "!canSubmit"
-    >
-      {{ saveWorkLabel }}
-    </button>
-    <button
-      v-if = "assessSubmitLabel != ''"
-      :class="{primary: ainfo.submitby === 'by_assessment' }"
-      @click="handleSubmit"
-      :disabled = "!canSubmit"
-    >
-      {{ assessSubmitLabel }}
-    </button>
+    <div class="flexgroup" v-if = "assessSubmitLabel != ''">
+      <button
+        v-if = "saveWorkLabel != ''"
+        class = "secondary"
+        @click = "handleSaveWork"
+        :disabled = "!canSubmit"
+      >
+        {{ saveWorkLabel }}
+      </button>
+      <button
+        v-if = "assessSubmitLabel != ''"
+        :class="{primary: ainfo.submitby === 'by_assessment' }"
+        @click="handleSubmit"
+        :disabled = "!canSubmit"
+      >
+        {{ assessSubmitLabel }}
+      </button>
+    </div>
 
+    <div class="assess-header">
+      <menu-button
+        v-if="ainfo.resources.length > 0"
+        id="resource-dropdown" position="right"
+        :header = "$t('header.resources_header')"
+        nobutton = "true"
+        noarrow = "true"
+        :options = "ainfo.resources"
+        searchby = "title"
+      >
+        <template v-slot:button>
+          <icons name="file" size="medium"/>
+        </template>
+      </menu-button>
 
-    <menu-button
-      v-if="ainfo.resources.length > 0"
-      id="resource-dropdown" position="right"
-      :header = "$t('header.resources_header')"
-      nobutton = "true"
-      noarrow = "true"
-      :options = "ainfo.resources"
-      searchby = "title"
-    >
-      <template v-slot:button>
-        <icons name="file" size="medium"/>
-      </template>
-    </menu-button>
-
-    <div v-if = "showPrint">
-      <tooltip-span :tip="$t('print.print_version')">
+      <tooltip-span v-if = "showPrint" :tip="$t('print.print_version')">
         <a
           :href="printLink"
           class = "noextlink"
@@ -61,27 +62,28 @@
           <icons name="print" size="medium"/>
         </a>
       </tooltip-span>
-    </div>
-    <tooltip-span
-      :tip="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
-      style="display: inline-block"
-    >
-      <button
-        @click="toggleMQuse"
-        :class="{plain:true, 'switch-toggle':true}"
-        :aria-label="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
-        :aria-pressed="MQenabled"
+
+      <tooltip-span
+        :tip="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+        style="display: inline-block"
       >
-        <icons
-          :name="MQenabled ? 'eqned' : 'eqnedoff'"
-          :color="MQenabled ? '#060' : '#600'"
-          size="medium"
-        />
-        <span class="switch-toggle__ui"></span>
-      </button>
-    </tooltip-span>
-    <lti-menu v-if="ainfo.is_lti" />
+        <button
+          @click="toggleMQuse"
+          :class="{plain:true, 'switch-toggle':true}"
+          :aria-label="MQenabled?$t('header.disable_mq'):$t('header.enable_mq')"
+          :aria-pressed="MQenabled"
+        >
+          <icons
+            :name="MQenabled ? 'eqned' : 'eqnedoff'"
+            :color="MQenabled ? '#060' : '#600'"
+            size="medium"
+          />
+          <span class="switch-toggle__ui"></span>
+        </button>
+      </tooltip-span>
+      <lti-menu v-if="ainfo.is_lti" />
     </div>
+
   </div>
 </template>
 
@@ -239,7 +241,7 @@ export default {
 .assess-header {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
+  /*justify-content: space-between;*/
   align-items: center;
 }
 .assess-header.practice {

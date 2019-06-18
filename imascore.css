@@ -1254,6 +1254,9 @@ a.dropdown-toggle.arrow-down:hover {
   justify-content: space-between;
   align-items: center;
 }
+.inlinediv {
+	display: inline-block;
+}
 
 .fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper, .fw1000 .midwrapper {
 	max-width: 1000px;

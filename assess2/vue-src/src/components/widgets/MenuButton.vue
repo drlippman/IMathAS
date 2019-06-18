@@ -127,13 +127,20 @@ export default {
     },
     setMenuHeight () {
       let wrapper = document.getElementById(this.id + '_wrap');
+      let bndbox = wrapper.getBoundingClientRect();
       let wrapperHeight = wrapper.clientHeight;
-      let wrapperTop = wrapper.getBoundingClientRect().top;
+      let wrapperTop = bndbox.top;
       let windowHeight = window.innerHeight;
       if (wrapperTop + wrapperHeight > windowHeight - 30) {
         wrapper.style.height = (windowHeight - wrapperTop - 30) + 'px';
       } else {
         wrapper.style.height = 'auto';
+      }
+      wrapper.style.left = '';
+      wrapper.style.right = '';
+      if (bndbox.left < 0) {
+        wrapper.style.left = '0px';
+        wrapper.style.right = 'auto';
       }
     },
     scrollToCurrent () {
@@ -197,7 +204,7 @@ export default {
       }
     },
     handleBlur () {
-      this.closetimer = setTimeout(() => { this.open = false; }, 50);
+      //this.closetimer = setTimeout(() => { this.open = false; }, 50);
     },
     handleFocus () {
       clearTimeout(this.closetimer);
@@ -210,6 +217,7 @@ export default {
 <style>
 .menubutton {
   position: relative;
+  display: inline-block;
 }
 .menubutton-right {
   right: 0px;

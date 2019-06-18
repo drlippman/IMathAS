@@ -54,10 +54,13 @@ export default {
       } else {
         this.$nextTick(() => {
           this.$refs.pane.style.right = '';
+          this.$refs.pane.style.left = '';
           let bndbox = this.$refs.pane.getBoundingClientRect();
           let pageWidth = document.documentElement.clientWidth;
           if (bndbox.right > pageWidth) {
             this.$refs.pane.style.right = '12px';
+          } else if (bndbox.left < 0) {
+            this.$refs.pane.style.left = '12px';
           }
         });
       }
