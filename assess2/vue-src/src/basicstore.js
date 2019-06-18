@@ -105,6 +105,11 @@ export const actions = {
         response = this.processSettings(response);
         store.assessInfo = Object.assign({}, store.assessInfo, response);
 
+        // clear out trackers, in case we're retaking
+        store.autosaveQueue = {};
+        store.autosaveTimeactive = {};
+        store.initValues = {};
+        store.initTimes = {};
         // route to correct display
         if (response.error) {
           this.handleError(response.error);
