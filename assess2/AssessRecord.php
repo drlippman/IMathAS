@@ -1488,7 +1488,7 @@ class AssessRecord
         $stuanswers[$qn+1][$pn] = '';
         $stuanswersval[$qn+1][$pn] = '';
       } else if (isset($autosave['stuans'][$pn])) {
-        if (strpos($autosave['stuans'][$pn], '@FILE') !== false) {
+        if (is_string($autosave['stuans'][$pn]) && strpos($autosave['stuans'][$pn], '@FILE') !== false) {
           // it's  a file autosave.  As a bit of a hack we'll make an array
           // with both the last submitted answer and the autosave
           $stuanswers[$qn+1][$pn] = array($stuanswers[$qn+1][$pn], $autosave['stuans'][$pn]);

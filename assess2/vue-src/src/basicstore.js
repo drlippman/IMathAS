@@ -653,7 +653,9 @@ export const actions = {
         if ((m = el.name.match(regex)) !== null) {
           let thisChanged = false;
           if (el.type === 'radio' || el.type === 'checkbox') {
-            if ((el.checked === true) !== (actions.getInitValue(qn, el.name) === '1')) {
+            if (el.checked && el.value !== actions.getInitValue(qn, el.name)) {
+              thisChanged = true;
+            } else if (!el.checked && el.value === actions.getInitValue(qn, el.name)) {
               thisChanged = true;
             }
           } else if (el.type === 'file' && document.getElementById(el.name + '-autosave') !== null) {

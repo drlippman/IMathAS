@@ -173,9 +173,8 @@ export default {
       window.$('#questionwrap' + this.qn).find('input[name],select[name],textarea[name]')
         .off('focus.dirtytrack').off('change.dirtytrack')
         .on('focus.dirtytrack', function () {
-        // TODO: Does this work for checkboxes/radios?
           if (this.type === 'radio' || this.type === 'checkbox') {
-            window.$(this).attr('data-lastval', this.checked ? 1 : 0);
+            // focus doesn't make sense here
           } else {
             window.$(this).attr('data-lastval', window.$(this).val());
           }
@@ -186,9 +185,9 @@ export default {
           let val = window.$(this).val();
           let changed = false;
           if (this.type === 'radio' || this.type === 'checkbox') {
-            if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
+            //if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
               changed = true;
-            }
+            //}
           } else if (/*this.type !== 'file' &&*/ val !== window.$(this).attr('data-lastval')) {
             changed = true;
           }
@@ -278,8 +277,10 @@ export default {
       window.$('#questionwrap' + this.qn).find('input,select,textarea')
         .each(function (index, el) {
           if (el.name.match(regex)) {
-            if (el.type === 'radio' || el.type === 'checked') {
-              actions.setInitValue(thisqn, el.name, el.checked ? 1 : 0);
+            if (el.type === 'radio' || el.type === 'checkbox') {
+              if (el.checked) {
+                actions.setInitValue(thisqn, el.name, el.value);
+              }
             } else {
               actions.setInitValue(thisqn, el.name, window.$(el).val());
             }
