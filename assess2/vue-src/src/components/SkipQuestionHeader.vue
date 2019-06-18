@@ -1,7 +1,6 @@
 <template>
   <div id="skip-question-header">
     <div style="flex-grow: 1" id="skip-question-select">
-
         <menu-button id="qnav"
           :options = "navOptions"
           :selected = "curOption"
@@ -36,42 +35,18 @@
           <icons name="right" />
         </router-link>
     </div>
-    <div class="headericons">
-      <tooltip-span
-        v-if="qn >= 0 && curQData.canretry"
-        :tip="retryInfo.msg"
-      >
-        <icons name="retry"/>
-        {{ retryInfo.cnt }}
-      </tooltip-span>
-      <tooltip-span
-        v-if="qn >= 0 && curQData.canregen"
-        :tip="$tc('qinfo.regens_remaining', curQData.regens_remaining)"
-      >
-        <icons name="retake"/>
-        {{ curQData.regens_remaining }}
-      </tooltip-span>
-      <dropdown
-        :id="'qd-dd-'+qn"
-        class="question-details"
-        v-if="showDetails"
-      >
-        <template v-slot:button>
-          <icons name="info" size="medium"/>
-          {{ $t('header.details') }}
-        </template>
-        <question-details-pane :qn="qn" />
-      </dropdown>
-
-    </div>
+    <question-header-icons
+      :showscore = "false"
+      :curQData = "curQData"
+      :qn = "qn"
+      :showretry = "true"
+    />
   </div>
 </template>
 
 <script>
-import QuestionDetailsPane from '@/components/QuestionDetailsPane.vue';
+import QuestionHeaderIcons from '@/components/QuestionHeaderIcons.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
-import Dropdown from '@/components/widgets/Dropdown.vue';
-import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 import SkipQuestionListItem from '@/components/SkipQuestionListItem.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
@@ -80,11 +55,9 @@ export default {
   name: 'SkipQuestionHeader',
   props: ['qn'],
   components: {
-    QuestionDetailsPane,
-    Dropdown,
+    QuestionHeaderIcons,
     Icons,
     MenuButton,
-    TooltipSpan,
     SkipQuestionListItem
   },
   data: function () {
@@ -137,38 +110,6 @@ export default {
     showNextPrev () {
       return (Object.keys(this.navOptions).length > 1);
     },
-    showDetails () {
-      if (this.qn < 0) {
-        return false;
-      }
-      let hasCategory = this.curQData.hasOwnProperty('category') && this.curQData.category !== '';
-      return (this.curQData.has_details ||
-        hasCategory ||
-        this.curQData.hasOwnProperty('gbscore')
-      );
-    },
-    retryInfo () {
-      if (this.qn < 0) {
-        return {};
-      }
-      let trymsg;
-      let trycnt;
-      if (this.curQData.hasOwnProperty('tries_remaining_range')) {
-        let range = this.curQData.tries_remaining_range;
-        trymsg = this.$t('qinfo.tries_remaining_range', {
-          min: range[0],
-          max: range[1]
-        });
-        trycnt = range[0] + '-' + range[1];
-      } else {
-        trymsg = this.$tc('qinfo.tries_remaining', this.curQData.tries_remaining);
-        trycnt = this.curQData.tries_remaining;
-      }
-      return {
-        msg: trymsg,
-        cnt: trycnt
-      };
-    }
   },
   methods: {
     changeQuestion (newqn) {

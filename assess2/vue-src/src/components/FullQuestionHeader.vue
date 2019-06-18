@@ -8,43 +8,17 @@
         {{ $t('question_n', { n: dispqn }) }}
       </strong>
     </div>
-    <div class="headericons">
-      <span>
-        <icons name="square-check" />
-        {{ scoreDisplay }}
-      </span>
-      <tooltip-span
-        v-if="qn >= 0 && curQData.canretry && showretry !== false"
-        :tip="$tc('qinfo.tries_remaining', curQData.tries_remaining)">
-        <icons name="retry"/>
-        {{ curQData.tries_remaining }}
-      </tooltip-span> 
-      <tooltip-span
-        v-if="qn >= 0 && curQData.canregen && showretry !== false"
-        :tip="$tc('qinfo.regens_remaining', curQData.regens_remaining)">
-        <icons name="retake"/>
-        {{ curQData.regens_remaining }}
-      </tooltip-span>
-      <dropdown
-        :id="'qd-dd-'+qn"
-        class="question-details"
-        v-if="showDetails"
-      >
-        <template v-slot:button>
-          <icons name="info" size="medium"/>
-          {{ $t('header.details') }}
-        </template>
-        <question-details-pane :qn="qn" />
-      </dropdown>
-    </div>
-
+    <question-header-icons
+      :showscore = "true"
+      :curQData = "curQData"
+      :qn = "qn"
+      :showretry = "showretry"
+    />
   </div>
 </template>
 
 <script>
-import QuestionDetailsPane from '@/components/QuestionDetailsPane.vue';
-import Dropdown from '@/components/widgets/Dropdown.vue';
-import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
+import QuestionHeaderIcons from '@/components/QuestionHeaderIcons.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
 
@@ -52,9 +26,7 @@ export default {
   name: 'SkipQuestionHeader',
   props: ['qn', 'showretry'],
   components: {
-    QuestionDetailsPane,
-    Dropdown,
-    TooltipSpan,
+    QuestionHeaderIcons,
     Icons
   },
   data: function () {
@@ -79,32 +51,12 @@ export default {
         return this.curQData.status;
       }
     },
-    scoreDisplay () {
-      if (this.dispqn === 0) {
-        return '';
-      } else if (this.curQData.hasOwnProperty('gbscore') && this.curQData.tries_max > 1) {
-        return this.curQData.gbscore + '/' + this.$tc('header.pts', this.curQData.points_possible);
-      } else {
-        return this.$tc('header.pts', this.curQData.points_possible);
-      }
-    },
     nameHover () {
       if (this.curQData.withdrawn !== 0) {
         return this.$t('header.withdrawn');
       } else {
         return '';
       }
-    },
-    showDetails () {
-      if (this.qn < 0) {
-        return false;
-      }
-      let curQData = store.assessInfo.questions[this.qn];
-      let hasCategory = curQData.hasOwnProperty('category') && curQData.category !== '';
-      return (curQData.has_details ||
-        hasCategory ||
-        curQData.hasOwnProperty('gbscore')
-      );
     }
   }
 };
