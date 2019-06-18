@@ -1,0 +1,123 @@
+<html><body>
+<h1>Macro Library sagecell_vcrp</h1>
+<p>Sagecell integration documentation, Version 2.0, June 2019</p>
+
+<p>
+This library provides functions to create SageCells and transfer their output into answerboxes. To use the library in a question, make sure to call
+</p>
+<pre>loadlibrary("sagecell1");</pre>
+<p>
+before calling the functions.
+</p>
+
+<ul>
+<li><a href="#sagecell">sagecell</a></li>
+<li><a href="#sagecellTransfer">sagecellTransfer</a></li>
+<li><a href="#sagecellEssay">sagecellEssay</a></li>
+<li><a href="#sagecellEssayTransfer">sagecellEssayTransfer</a></li>
+</ul>
+<p>Macros with <i>Essay</i> in their name store the SageCell input script, as modified by the student, as answer to a question (part) of type <code>essay</code>. <p>Macros with <i>Transfer</i> in their name let the student transfer the SageCell output result as answer to a particular question part.
+</p>
+<h3><a name="sagecell">sagecell</a></h3>
+<p>
+<code>sagecell(script)</code> generates a SageCell with content <code>script</code>.
+</p>
+<p>
+<b>Usage example: </b><br/>
+<b>Question type: </b><code>function</code><br/>
+<b>Question Code:</b><code><br/>
+loadlibrary("sagecell_vcrp")<br/>
+$a=rand(2,8)<br/>
+$answer="-$a cos(x)"<br/>
+$script="<br/>
+x=var(x)<br/>
+integral(sin(x),x)"<br/>
+$cell = sagecell($script)</code>,<br/> 
+<b>Question Text:</b><br/>
+<code>
+<p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
+$cell<br/>
+$answerbox<br/>
+</code>
+</p>
+
+<h3><a name="sagecellTransfer">sagecellTransfer</a></h3>
+<p>
+<code>sagecellTransfer(script,questionNr,[label,partNr])</code> generates a SageCell with content <code>script</code> and a button with <code>label</code> (default: "Transfer"). Clicking the button transfers the content of the SageCell output into the answerbox. For multipart questions, <code>partNr</code> determines the index of the target answerbox.
+</p>
+<b>Usage example: </b><br/>
+<b>Question type: </b><code>function</code><br/>
+<b>Question Code:</b><code><br/>
+loadlibrary("sagecell_vcrp")<br/>
+$a=rand(2,8)<br/>
+$answer="-$a cos(x)"<br/>
+$script="<br/>
+x=var(x)<br/>
+integral(sin(x),x)"<br/>
+$cell = sagecellTransfer($script,$thisq,"Use as Answer")</code>,<br/> 
+<b>Question Text:</b><br/>
+<code>
+<p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
+$cell<br/>
+$answerbox<br/>
+</code>
+</p>
+
+<p>The following macros store the script edited by the student as answer to a question part of type <code>essay</code></p>
+<h3><a name="sagecellEssay">sagecellEssay</a></h3>
+<p>
+<code>sagecellEssay(script [,essayPart])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to a question of type <code>essay</code>.
+<p>
+<b>Usage example: </b><br/>
+<b>Question type: </b><code>essay</code><br/>
+<b>Question Code:</b><code><br/>
+loadlibrary("sagecell_vcrp")<br/>
+$a=rand(2,8)<br/>
+$showanswer="Your cell should evaluate to `-$a cos(x)`."<br/>
+$script="<br/>
+x=var(x)<br/>
+integral(sin(x),x)"<br/>
+$cell = sagecellEssay($script)</code><br/> 
+<b>Question Text:</b><br/>
+<code>
+<p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
+$cell<br/>
+</code>
+</p>
+<p>The modified script can be obtained with <code>$stuanswers[0]</code></p>
+</p>
+<p>
+For multipart and conditional questions, <code>sagecellEssay(script,essayPart)</code> the script modified by the student is stored as an answer to part <code>essayPart</code> which must be of type <code>essay</code>.
+</p>
+<h3><a name="sagecellEssayTransfer">sagecellEssayTransfer</a></h3>
+<p>
+<code>sagecellEssayTransfer(script,questionNr,essayPart,Part[, label])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to question part <code>essayPart</code> which must be of type <code>essay</code>.
+<p>The question must be <code>multipart</code> or <code>conditional</code></p>
+<p>
+A button with label <code>label</code> is added, which transfers the sagecell output to <code>$answerbox[Part]</code>.
+</p>
+<p>
+<b>Usage example: </b><br/>
+<b>Question type: </b><code>multipart</code><br/>
+<b>Question Code:</b><code><br/>
+loadlibrary("sagecell_vcrp")<br/>
+$anstypes="essay,number"<br/>
+$answeights="0,1"<br/>
+$scoremethod="singlescore"<br/>
+$a=rand(2,8)<br/>
+$answer[1]="-$a cos(x)"<br/>
+$script="<br/>
+x=var(x)<br/>
+integral(sin(x),x)"<br/>
+$cell = sagecellEssayTransfer($script,$thisq,0,1,"Use as Answer")</code>,<br/> 
+<b>Question Text:</b><br/>
+<code>
+<p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
+$cell<br/>
+$answerbox[1]<br/>
+</code>
+</p>
+<p>The modified script can be obtained with <code>getstuans($stuanswers,$thisq,0)</code></p>
+</body>
+</html>
+   
