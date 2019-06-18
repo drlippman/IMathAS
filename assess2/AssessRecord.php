@@ -599,17 +599,37 @@ class AssessRecord
     $qref = ($qn+1)*1000 + $pn;
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
-        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)/', $key, $match)) {
+        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)(-\d+)?/', $key, $match)) {
           $data[$qn]['post'][$key] = $val;
           $thisref = $match[2];
+          $subref = $match[3];
         }
-      } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b/', $key)) {
+      } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b(-\d+)?/', $key, $match)) {
         $data[$qn]['post'][$key] = $val;
         $thisref = $qref;
+        $subref = $match[2];
       }
-      if (isset($data[$qn]['post'][$key])) {
-        // TODO: Fix for matching
-        if (isset($_SESSION['choicemap'][$thisref])) {
+      if (isset($data[$qn]['post'][$key]) && ($subref == '' || $subref == '-0')) {
+        if ($subref == '-0') { // matrix or matching
+          $tmp = array();
+          $spc = 0;
+          while (isset($_POST["qn$thisref-$spc"])) {
+              $tmp[] = $_POST["qn$thisref-$spc"];
+              $spc++;
+          }
+          if (isset($_SESSION['choicemap'][$thisref])) { // matching
+            // matching - map back to unrandomized values
+            list($randqkeys, $randakeys) = $_SESSION['choicemap'][$thisref];
+            $mapped = array();
+            foreach ($tmp as $k=>$v) {
+              $mapped[$randqkeys[$k]] = $randakeys[$v];
+            }
+            ksort($mapped);
+            $val = implode('|', $mapped);
+          } else { //matrix
+            $val = implode('|', $tmp);
+          }
+        } else if (isset($_SESSION['choicemap'][$thisref])) {
           if (is_array($val)) {
             foreach ($val as $k => $v) {
               $val[$k] = $_SESSION['choicemap'][$thisref][$v];

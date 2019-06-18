@@ -204,7 +204,7 @@ export default {
       }
     },
     handleBlur () {
-      //this.closetimer = setTimeout(() => { this.open = false; }, 50);
+      this.closetimer = setTimeout(() => { this.open = false; }, 50);
     },
     handleFocus () {
       clearTimeout(this.closetimer);
@@ -213,7 +213,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 .menubutton {
   position: relative;
