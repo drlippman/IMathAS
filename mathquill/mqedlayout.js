@@ -14,14 +14,14 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 2,
             contents: [
-              {l:'\\left(\\right)', c:'t', w:'('},
+              {l:'\\left(\\right)', c:'i', w:'()'},
               {l:'x^{}', c:'t', w:'^', nb:1},
               {l:'\\pi', nb:1},
               {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1},
               {l:'\\infty'},
               {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1},
               {p:'DNE', 'sm':2},
-              {l:'\\left|\\right|', c:'t', w:'|', nb:1}
+              {l:'\\left|\\right|', c:'i', w:'||'},
             ]
           },
           {s:.1},
@@ -182,8 +182,8 @@ var myMQeditor = (function($) {
               {p:'n'},{p:'m'},
               {b:'&#x232B;', c:'k', w:'Backspace', s:1.5},
               {l:'\\left[\\right]', c:'i', w:'[]'},
-              {l:'\\lbrace{\\rbrace}', c:'t', w:'{'},
-              {l:'\\langle{}', c:'c', w:'\\langle'},
+              {l:'\\lbrace{\\rbrace}', c:'i', w:['\\left\\{','\\right\\}']},
+              {l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']},
               {p:'Space', s:2, c:'t', w:' '},
               {p:'%'},
               {p:','},
@@ -211,8 +211,8 @@ var myMQeditor = (function($) {
               {l:'x_{}', c:'t', w:'_', nb:1},
               {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1},
               {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1},
-              {l:'\\left(\\right)', c:'t', w:'('},
-              {l:'\\left|\\right|', c:'t', w:'|', nb:1},
+              {l:'\\left(\\right)', c:'i', w:'()'},
+              {l:'\\left|\\right|', c:'i', w:'||'},
               {l:'\\pi', nb:1},
               {l:'\\infty'},
               {p:'DNE', 'sm':2}
@@ -474,7 +474,7 @@ var myMQeditor = (function($) {
       baselayout.tabs[0].tabcontent.unshift({
         flow: 'row',
         s: 1,
-        contents: [{l:'\\lbrace{\\rbrace}', c:'t', w:'{'}]
+        contents: [{l:'\\lbrace{\\rbrace}', c:'i', w:['\\left\\{','\\right\\}']}]
       }, {s:.1});
     } else if (qtype.match(/complex/)) {
       baselayout.tabs[0].tabcontent.unshift({
@@ -486,7 +486,7 @@ var myMQeditor = (function($) {
       baselayout.tabs[0].tabcontent.unshift({
         flow: 'row',
         s: 1,
-        contents: [{l:'\\langle{}', c:'c', w:'\\langle'}]
+        contents: [{l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']}]
       }, {s:.1});
     }
     return baselayout;

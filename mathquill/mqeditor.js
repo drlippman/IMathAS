@@ -516,6 +516,8 @@ var MQeditor = (function($) {
     } else if (cmdtype == 'c') {
       // do MQ cmd
       curMQfield.cmd(cmdval);
+    } else if (cmdtype == 'l') {
+      curMQfield.latex(cmdval);
     } else if (cmdtype=='w') {
       // do MQ write
       curMQfield.write(cmdval);
@@ -564,9 +566,13 @@ var MQeditor = (function($) {
       if (!sel) {
         sel = '';
       }
-      var leftsym = cmdval.charAt(0);
-      var rightsym = cmdval.charAt(1);
-  		curMQfield.write('\\left'+leftsym+sel+'\\right'+rightsym);
+      if (typeof cmdval === 'string') {
+        var leftsym = cmdval.charAt(0);
+        var rightsym = cmdval.charAt(1);
+    		curMQfield.write('\\left'+leftsym+sel+'\\right'+rightsym);
+      } else {
+        curMQfield.write(cmdval[0]+sel+cmdval[1]);
+      }
       if (sel=='') {
         curMQfield.keystroke('Left');
       }
