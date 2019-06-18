@@ -12,6 +12,7 @@
     </span>
     <span class="redoicon">
       <icons name="retry" v-if="canRetry" />
+      <icons name="retake" v-if="canRegen" />
     </span>
   </span>
 </template>
@@ -63,6 +64,13 @@ export default {
       if (this.option.type === 'q') {
         let qdata = store.assessInfo.questions[this.option.qn];
         return qdata.canretry;
+      }
+      return false;
+    },
+    canRegen () {
+      if (this.option.type === 'q') {
+        let qdata = store.assessInfo.questions[this.option.qn];
+        return qdata.regens_remaining;
       }
       return false;
     }
