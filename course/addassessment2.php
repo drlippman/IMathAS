@@ -125,6 +125,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['intro'] = Sanitize::incomingHtml($_POST['intro']);
 		}
     require_once("../includes/parsedatetime.php");
+		$toset['avail'] = Sanitize::onlyInt($_POST['avail']);
     if ($_POST['avail']==1) {
       if ($_POST['sdatetype']=='0') {
         $toset['startdate'] = 0;
