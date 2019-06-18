@@ -223,7 +223,7 @@ export default {
       if (Object.keys(store.autosaveQueue).length === 0) {
         // nothing to save, so fake it
         store.autoSaving = true;
-        setTimeout(() => store.autoSaving = false, 300);
+        setTimeout(() => { store.autoSaving = false; }, 300);
       } else {
         actions.submitAutosave();
       }

@@ -109,7 +109,7 @@ export default {
     },
     showNextPrev () {
       return (Object.keys(this.navOptions).length > 1);
-    },
+    }
   },
   methods: {
     changeQuestion (newqn) {

@@ -187,10 +187,8 @@ export default {
           let val = window.$(this).val();
           let changed = false;
           if (this.type === 'radio' || this.type === 'checkbox') {
-            //if ((this.checked === true) !== (this.getAttribute('data-lastval') === '1')) {
-              changed = true;
-            //}
-          } else if (/*this.type !== 'file' &&*/ val !== window.$(this).attr('data-lastval')) {
+            changed = true;
+          } else if (val !== window.$(this).attr('data-lastval')) {
             changed = true;
           }
           if (changed) {

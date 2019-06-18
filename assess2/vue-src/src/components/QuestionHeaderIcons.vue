@@ -35,7 +35,6 @@ import QuestionDetailsPane from '@/components/QuestionDetailsPane.vue';
 import Dropdown from '@/components/widgets/Dropdown.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 import Icons from '@/components/widgets/Icons.vue';
-import { store } from '../basicstore';
 
 export default {
   name: 'QuestionHeaderIcons',
@@ -93,5 +92,5 @@ export default {
       );
     }
   }
-}
+};
 </script>

@@ -347,20 +347,17 @@ export const actions = {
     window.clearTimeout(store.autosaveTimer);
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
       Vue.set(store.autosaveQueue, qn, []);
-      //store.autosaveQueue[qn] = [];
     }
     if (store.autosaveQueue[qn].indexOf(partnum) === -1) {
       store.autosaveQueue[qn].push(partnum);
     }
     Vue.set(store.autosaveTimeactive, qn, timeactive);
-    //store.autosaveTimeactive[qn] = timeactive;
     store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
   },
   clearAutosave (qns) {
     for (let i in qns) {
       if (store.autosaveQueue.hasOwnProperty(qns[i])) {
         Vue.delete(store.autosaveQueue, qns[i]);
-        //delete store.autosaveQueue[qns[i]];
       }
     }
     if (Object.keys(store.autosaveQueue).length === 0) {
