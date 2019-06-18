@@ -171,15 +171,17 @@ export default {
     addDirtyTrackers () {
       var self = this;
       window.$('#questionwrap' + this.qn).find('input[name],select[name],textarea[name]')
-        .off('focus.dirtytrack').off('change.dirtytrack')
+        .off('focus.dirtytrack').off('change.dirtytrack').off('input.dirtytrack')
         .on('focus.dirtytrack', function () {
           if (this.type === 'radio' || this.type === 'checkbox') {
             // focus doesn't make sense here
           } else {
             window.$(this).attr('data-lastval', window.$(this).val());
           }
-
           actions.clearAutosaveTimer();
+        })
+        .on('input.dirtytrack', function () {
+          store.somethingDirty = true;
         })
         .on('change.dirtytrack', function () {
           let val = window.$(this).val();
@@ -192,6 +194,7 @@ export default {
             changed = true;
           }
           if (changed) {
+            store.somethingDirty = true;
             let name = window.$(this).attr('name');
             let m = name.match(/^(qs|qn|tc)(\d+)/);
             if (m !== null) {

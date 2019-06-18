@@ -162,7 +162,9 @@ export default {
       if (this.ainfo.submitby === 'by_assessment') {
         if (store.autoSaving) {
           return this.$t('header.work_saving');
-        } else if (Object.keys(store.autosaveQueue).length === 0) {
+        } else if (Object.keys(store.autosaveQueue).length === 0 &&
+          !store.somethingDirty
+        ) {
           return this.$t('header.work_saved');
         } else {
           return this.$t('header.work_save');

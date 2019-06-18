@@ -185,6 +185,11 @@ var MQeditor = (function($) {
       lastlayoutstyle !== config.curlayoutstyle
     ) {
       rebuild = true;
+      // trigger change on last field
+      if (curMQfield !== null) {
+        $("#"+curMQfield.el().id.substring(8)).trigger('change');
+      }
+
       // new field; need to build the panel
       // update the layout based on the element
       if (config.hasOwnProperty("getLayout")) {
@@ -221,6 +226,7 @@ var MQeditor = (function($) {
     }
     positionEditor(mqel);
     curMQfield = MQ.MathField(mqel[0]);
+    $("#"+mqel[0].id.substring(8)).triggerHandler('focus');
     if (config.hasOwnProperty('onShow')) {
       config.onShow(mqel[0], config.curlayoutstyle, rebuild);
     }
@@ -235,7 +241,9 @@ var MQeditor = (function($) {
     } else {
       $("#mqeditor").hide();
     }
+    $("#"+curMQfield.el().id.substring(8)).trigger('change');
   }
+
 
   /*
     Positions the editor below the MQ field, if layoutstyle dictates

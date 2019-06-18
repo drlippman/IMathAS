@@ -18,6 +18,7 @@ export const store = Vue.observable({
   initValues: {},
   initTimes: {},
   autosaveTimer: null,
+  somethingDirty: false,
   timelimit_timer: null,
   timelimit_expired: false,
   timelimit_grace_expired: false,
@@ -193,6 +194,7 @@ export const actions = {
       });
   },
   submitQuestion (qns, endattempt, timeactive, partnum) {
+    store.somethingDirty = false;
     this.clearAutosaveTimer();
     if (typeof qns !== 'object') {
       qns = [qns];
@@ -341,6 +343,7 @@ export const actions = {
       });
   },
   doAutosave (qn, partnum, timeactive) {
+    store.somethingDirty = false;
     window.clearTimeout(store.autosaveTimer);
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
       Vue.set(store.autosaveQueue, qn, []);
@@ -368,6 +371,7 @@ export const actions = {
     window.clearTimeout(store.autosaveTimer);
   },
   submitAutosave (async) {
+    store.somethingDirty = false;
     this.clearAutosaveTimer();
     if (Object.keys(store.autosaveQueue).length === 0) {
       return;
@@ -461,6 +465,7 @@ export const actions = {
     // store.timelimit_expired = true;
   },
   endAssess () {
+    store.somethingDirty = false;
     this.clearAutosaveTimer();
     store.inTransit = true;
     store.errorMsg = null;
