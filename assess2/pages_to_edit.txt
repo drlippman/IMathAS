@@ -2,12 +2,7 @@ TODOs:
   Need to revisit showhints throughout display code
   Test clearing attempts
   Refactor ErrorDialog to be usable in GBViewAssess
-  Figure out file upload autosave.  Could:
-    Submit file on autosave.
-    On restore, display: "Autosaved file:" and submit something to tell backend to use autosave
-    Selecting a file would clear the "Autosaved file" note and input field
-    Need to pass "used autosave" to file answerbox display, so it can adjust language
-    Will have to have a way to clear autosave, if student decides they don't want to submit it.
+  Update "Work saved" on input rather than on change.
 
 Bugs:
   A11y: Enter key handlers on input boxes to submit?
@@ -63,6 +58,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Figure out file upload autosave.
 X Submit Assessment: show confirm?
 X Test autosave on radio buttons / checkboxes
 X N/A in gradebook

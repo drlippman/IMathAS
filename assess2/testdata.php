@@ -128,7 +128,7 @@ $questionSet = [
     'description' => 'matrix sized',
     'qtype' => 'matrix',
     'control' => '$answersize="2,3"'."\n".'$answer="[(1,2,3),(4,5,6)]"'."\n".'$stua=$stuanswers[$thisq]'."\n".'$stuav=$stuanswersval[$thisq]',
-    'qtext' => '<p>Enter `[(1,2,3),(3,4,6)]`. Stua: $stua. Stuaval: $stuav</p>'
+    'qtext' => '<p>Enter `[(1,2,3),(4,5,6)]`. Stua: $stua. Stuaval: $stuav</p>'
   ],
   18=>[
     'uniqueid' => 1552587894535731,

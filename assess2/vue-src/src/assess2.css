@@ -275,6 +275,9 @@ input[type=radio], input[type=checkbox] {
   display: flex;
   flex-flow: row nowrap;
 }
+.flexrow.wrap {
+  flex-flow: row wrap;
+}
 .scrollpane {
   width: 100%;
   overflow-x: auto;

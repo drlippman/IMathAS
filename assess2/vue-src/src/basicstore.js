@@ -188,6 +188,7 @@ export const actions = {
       });
   },
   submitQuestion (qns, endattempt, timeactive, partnum) {
+    this.clearAutosaveTimer();
     if (typeof qns !== 'object') {
       qns = [qns];
     }
@@ -355,14 +356,14 @@ export const actions = {
       }
     }
     if (Object.keys(store.autosaveQueue).length === 0) {
-      window.clearTimeout(store.autosaveTimer);
+      this.clearAutosaveTimer();
     }
   },
   clearAutosaveTimer () {
     window.clearTimeout(store.autosaveTimer);
   },
   submitAutosave (async) {
-    window.clearTimeout(store.autosaveTimer);
+    this.clearAutosaveTimer();
     if (Object.keys(store.autosaveQueue).length === 0) {
       return;
     }
@@ -455,6 +456,7 @@ export const actions = {
     // store.timelimit_expired = true;
   },
   endAssess () {
+    this.clearAutosaveTimer();
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
