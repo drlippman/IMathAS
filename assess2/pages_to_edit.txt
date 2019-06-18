@@ -2,31 +2,24 @@ TODOs:
   Need to revisit showhints throughout display code
   Test clearing attempts
   Refactor ErrorDialog to be usable in GBViewAssess
-  Update "Work saved" on input rather than on change.
 
 Bugs:
-  A11y: Enter key handlers on input boxes to submit?
 
 To discuss:
-  Do we want to be able to clear a score override at a question level?
-    Probably not necessary
 
 Separate:
   Collate CSS
   Add a11y landmarks / skip navigation
 
 Minor TODOs:
-  Add "latepass won't help you" warning on Closed page
+! Add "latepass won't help you" warning on Closed page
   Prop types
   Make sure MQ is disabled on Print page, or just turn off
   tinymce drag handle showing when question is not active (doesn't honor visibility: hidden on parent)
   Handle "right answer wrong format"
-  Matrix syntax warning messages
+! Matrix syntax warning messages
   Teacher view-as-student bypassing restrictions
-  Fix icon alignment in question selector when only one of retake/retry are there
   Add some display of time when submission were made in GB
-  Test accounting Qs
-  Review stuanswers/val for matrix/calcmatrix types
   Syntax error warnings: error icon w hoverover vs displaying error
   Review showanswer button stuff in HtmlGenerator (use setShowAnswerButton instead?)
 
@@ -58,6 +51,8 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Enter key handlers on input boxes to submit?
+X Update "Work saved" on input rather than on change.
 X Figure out file upload autosave.
 X Submit Assessment: show confirm?
 X Test autosave on radio buttons / checkboxes

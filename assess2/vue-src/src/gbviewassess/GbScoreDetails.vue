@@ -359,7 +359,6 @@ export default {
   },
   watch: {
     qdata: function (newVal, oldVal) {
-      console.log("here");
       this.initCurScores();
     }
   }

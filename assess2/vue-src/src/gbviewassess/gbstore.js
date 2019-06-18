@@ -216,7 +216,7 @@ export const actions = {
           for (let qn = 0; qn < response.assess_info[an].scoredvers.length; qn++) {
             let qvers = store.assessInfo.assess_versions[an].questions[qn];
             for (let qv = 0; qv < qvers.length; qv++) {
-              if (qv == response.assess_info[an].scoredvers[qn]) {
+              if (qv === response.assess_info[an].scoredvers[qn]) {
                 qvers[qv].scored = true;
               } else if (qvers[qv].scored) {
                 Vue.delete(qvers[qv], 'scored');
@@ -276,7 +276,7 @@ export const actions = {
           store.assessInfo.scored_version = response.scored_version;
           if (store.clearAttempts.type === 'attempt') {
             // clear out any score overrides associated with this version
-            var regex = new RegExp('^' + data.aver + '-');
+            let regex = new RegExp('^' + data.aver + '-');
             for (let key in store.scoreOverrides) {
               if (key.match(regex)) {
                 Vue.delete(store.scoreOverrides, key);
@@ -292,7 +292,7 @@ export const actions = {
             }
           } else if (store.clearAttempts.type === 'qver') {
             // clear out any score overrides associated with this version
-            var regex = new RegExp('^' + data.aver + '-' + data.qn + '-' + data.qver + '-');
+            let regex = new RegExp('^' + data.aver + '-' + data.qn + '-' + data.qver + '-');
             for (let key in store.scoreOverrides) {
               if (key.match(regex)) {
                 Vue.delete(store.scoreOverrides, key);
@@ -310,7 +310,7 @@ export const actions = {
               // use callback to delete this version on response
               actions.loadGbQuestionVersion(data.qn, response.qinfo.scored_version, true,
                 () => {
-                  store.assessInfo.assess_versions[data.aver].questions[data.qn].splice(data.qver, 1)
+                  store.assessInfo.assess_versions[data.aver].questions[data.qn].splice(data.qver, 1);
                   Vue.set(store.assessInfo.assess_versions[data.aver].questions[data.qn][response.qinfo.scored_version], 'scored', true);
                 }
               );

@@ -32,7 +32,7 @@ export default {
           status: this.versions[i].status,
           lastchange_disp: this.versions[i].lastchange_disp,
           onclick: () => this.$emit('setversion', i)
-        }
+        };
         if (this.versions[i].hasOwnProperty('score')) {
           thisoption.score = this.versions[i].score;
         }
