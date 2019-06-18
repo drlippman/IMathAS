@@ -56,6 +56,8 @@ class MultipleAnswerScorePart implements ScorePart
             $randqkeys = $RND->array_rand($questions,count($questions));
             $RND->shuffle($randqkeys);
         }
+        $questions[] = _('None of these');
+        array_push($randqkeys, count($questions)-1);
         if (trim($answers)=='') {
             $akeys = array();
         } else {
@@ -76,6 +78,12 @@ class MultipleAnswerScorePart implements ScorePart
                 $score -= $deduct;
             }
         }
+
+        //check for "none of these" checked
+        if (isset($_POST["qn$qn"][count($questions)-1])) {
+          $score = (trim($answers) === '') ? 1 : 0;
+        }
+
         // just store unrandomized last answers
         $scorePartResult->setLastAnswerAsGiven(implode('|',$origla));
         if (isset($scoremethod)) {

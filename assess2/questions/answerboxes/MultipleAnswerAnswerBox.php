@@ -63,6 +63,8 @@ class MultipleAnswerAnswerBox implements AnswerBox
 			$randkeys = $RND->array_rand($questions,count($questions));
 			$RND->shuffle($randkeys);
 		}
+    $questions[] = _('None of these');
+    array_push($randkeys,count($questions)-1);
 		$_SESSION['choicemap'][$qn] = $randkeys;
 		if (isset($GLOBALS['capturechoices'])) {
       $params['livepoll_choices'] = $questions;

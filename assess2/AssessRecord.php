@@ -599,14 +599,27 @@ class AssessRecord
     $qref = ($qn+1)*1000 + $pn;
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
-        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)/', $key)) {
+        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)/', $key, $match)) {
           $data[$qn]['post'][$key] = $val;
+          $thisref = $match[2];
         }
       } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b/', $key)) {
         $data[$qn]['post'][$key] = $val;
+        $thisref = $qref;
       }
       if (isset($data[$qn]['post'][$key])) {
-        $data[$qn]['stuans'][$pn] = $val; // TODO: fix this
+        // TODO: Fix for matching
+        if (isset($_SESSION['choicemap'][$thisref])) {
+          if (is_array($val)) {
+            foreach ($val as $k => $v) {
+              $val[$k] = $_SESSION['choicemap'][$thisref][$v];
+            }
+            $val = implode('|', $val);
+          } else {
+            $val = $_SESSION['choicemap'][$thisref][$val];
+          }
+        }
+        $data[$qn]['stuans'][$pn] = $val;
       }
     }
     $filestr = '';

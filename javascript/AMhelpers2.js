@@ -157,6 +157,9 @@ function init(paramarr, enableMQ) {
     if (params.qtype === 'file') {
       initFileAlt(document.getElementById("qn"+qn));
     }
+    if (params.qtype === 'multans') {
+      initMultAns(qn);
+    }
     if (params.usetinymce) {
       initeditor("textareas","mceEditor");
     }
@@ -395,6 +398,18 @@ function setupDraw(qn) {
       imathasDraw.adda11ydraw(qn);
     });
   }
+}
+
+function initMultAns(qn) {
+  var boxes = $('input[name^="qn'+qn+'["]');
+  console.log(boxes);
+  boxes.on('change', function () {
+    if (this.checked && this.value == boxes.length-1) {
+      boxes.not(':last').prop('checked', false);
+    } else if (this.checked) {
+      boxes.last().prop('checked', false);
+    }
+  });
 }
 
 function isBlank(str) {
