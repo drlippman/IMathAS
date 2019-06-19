@@ -93,7 +93,7 @@ if (isset($typelist['Assessment'])) {
         'values' => array()
       );
     }
-    $out['assessment_sessions']['values'][] = array_values($row);
+    $out['questions']['values'][] = array_values($row);
   }
   $stm = $DBH->query("SELECT * FROM imas_assessment_sessions WHERE assessmentid IN ($idlist)");
   while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
