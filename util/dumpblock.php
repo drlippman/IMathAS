@@ -157,6 +157,36 @@ if (isset($typelist['Forum'])) {
     }
     $out['forums']['values'][] = array_values($row);
   }
+  $stm = $DBH->query("SELECT * FROM imas_forum_posts WHERE forumid IN ($idlist)");
+  while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if (!isset($out['forum_posts'])) {
+      $out['forum_posts'] = array(
+        'fields' => array_keys($row),
+        'values' => array()
+      );
+    }
+    $out['forum_posts']['values'][] = array_values($row);
+  }
+  $stm = $DBH->query("SELECT * FROM imas_forum_threads WHERE forumid IN ($idlist)");
+  while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if (!isset($out['forum_threads'])) {
+      $out['forum_threads'] = array(
+        'fields' => array_keys($row),
+        'values' => array()
+      );
+    }
+    $out['forum_threads']['values'][] = array_values($row);
+  }
+  $stm = $DBH->query("SELECT ifv.* FROM imas_forum_views AS ifv JOIN imas_forum_threads AS ift ON ifv.threadid=ift.id WHERE ift.forumid IN ($idlist)");
+  while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if (!isset($out['forum_views'])) {
+      $out['forum_views'] = array(
+        'fields' => array_keys($row),
+        'values' => array()
+      );
+    }
+    $out['forum_views']['values'][] = array_values($row);
+  }
 }
 
 if (isset($typelist['Wiki'])) {
