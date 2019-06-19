@@ -210,7 +210,4 @@ export default {
 .settings-list .small svg {
   padding: 0 10px 0 0;
 }
-.subdued {
-  color: #637381;
-}
 </style>

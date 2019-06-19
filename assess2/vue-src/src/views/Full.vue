@@ -30,6 +30,15 @@
         :qn="lastQ"
       />
     </div>
+    <p v-if = "showSubmit">
+      <button
+        type = "button"
+        class = "primary"
+        @click = "submitAssess"
+      >
+        {{ $t('header.assess_submit') }}
+      </button>
+    </p>
   </div>
 </template>
 
@@ -38,7 +47,7 @@ import AssessHeader from '@/components/AssessHeader.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
-import { store } from '../basicstore';
+import { store, actions } from '../basicstore';
 
 export default {
   name: 'Full',
@@ -61,6 +70,14 @@ export default {
     },
     lastQ () {
       return store.assessInfo.questions.length - 1;
+    },
+    showSubmit () {
+      return (store.assessInfo.submitby === 'by_assessment');
+    }
+  },
+  methods: {
+    submitAssess () {
+      actions.submitAssessment();
     }
   }
 };

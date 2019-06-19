@@ -279,6 +279,7 @@
     "correct": "Correct",
     "partial": "Partially correct",
     "dot": "Dot",
+    "attempted": "Attempted",
     "unattempted": "Unattempted",
     "print": "Print",
     "left": "Previous",

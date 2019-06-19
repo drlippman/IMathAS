@@ -65,6 +65,15 @@
             </router-link>
           </p>
         </div>
+        <p v-else-if = "showSubmit">
+          <button
+            type = "button"
+            class = "primary"
+            @click = "submitAssess"
+          >
+            {{ $t('header.assess_submit') }}
+          </button>
+        </p>
       </div>
     </div>
   </div>
@@ -76,7 +85,7 @@ import FullPagedNav from '@/components/FullPagedNav.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
-import { store } from '../basicstore';
+import { store, actions } from '../basicstore';
 
 export default {
   name: 'FullPaged',
@@ -96,6 +105,14 @@ export default {
     },
     intro () {
       return store.assessInfo.intro;
+    },
+    showSubmit () {
+      return (store.assessInfo.submitby === 'by_assessment');
+    }
+  },
+  methods: {
+    submitAssess () {
+      actions.submitAssessment();
     }
   },
   mounted () {

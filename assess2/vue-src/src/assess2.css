@@ -269,7 +269,7 @@ input[type=radio], input[type=checkbox] {
   margin: 1px 4px 1px 0;
 }
 .subdued {
-  color: #aaa;
+  color: #757575;
 }
 .flexrow {
   display: flex;

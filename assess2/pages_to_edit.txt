@@ -1,9 +1,10 @@
 TODOs:
   Need to revisit showhints throughout display code
-  Test clearing attempts
   Refactor ErrorDialog to be usable in GBViewAssess
 
 Bugs:
+  Math in Paged Full titles not rendered
+    Can't figure out how to fix this
 
 To discuss:
 
