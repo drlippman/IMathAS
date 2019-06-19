@@ -9,6 +9,7 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#stdev">stdev</a></li>
 <li><a href="#absmeandev">absmeandev</a></li>
 <li><a href="#percentile">percentile</a></li>
+<li><a href="#interppercentile">interppercentile</a></li>
 <li><a href="#Nplus1percentile">Nplus1percentile</a></li>
 <li><a href="#quartile">quartile</a></li>
 <li><a href="#TIquartile">TIquartile</a></li>
@@ -65,6 +66,15 @@ absmeandev(array)
 percentile(array,percentile)
 <BR>example: percentile($a,30) would find the 30th percentile of the data
 <BR>Calculates using the p/100*(N) method (e.g. Triola)
+
+<BR><h3><a name="interppercentile">interppercentile</a></h3>
+<BR>interppercentile(array, percentile, [mode])
+<BR>Interpolated percentile. Finds the percentile using an interpolated method.
+<BR>&nbsp; mode=1 (def): Matches Excel's PERCENTILE.EXC, JMP, and recommended by NIST
+<BR>&nbsp; &nbsp; except that this function will return the lowest/highest value if needed.
+<BR>&nbsp; mode=2: Matches Excel's PERCENTILE.INC (and older percentile)
+<BR>&nbsp; mode=3: Matches Mathlab's prctile function
+
 <BR><h3><a name="Nplus1percentile">Nplus1percentile</a></h3>
 Nplus1percentile(array,percentile)
 <BR>example: percentile($a,30) would find the 30th percentile of the data
@@ -159,8 +169,8 @@ normrand(mu,sigma,n, [rnd])
 <BR>specify rnd to round to that many digits
 <BR><h3><a name="expdistrand">expdistrand</a></h3>
 normrand(mu, n, [rnd])
-<BR>returns an array of n random numbers that are exponentially distributed 
-<BR>with given mean mu. 
+<BR>returns an array of n random numbers that are exponentially distributed
+<BR>with given mean mu.
 <BR>specify rnd to round to that many digits (default 3)
 <BR><h3><a name="boxplot">boxplot</a></h3>
 boxplot(array,axislabel,[options])
