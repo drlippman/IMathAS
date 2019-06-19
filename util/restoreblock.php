@@ -31,7 +31,8 @@ function loadData($table, $fields, $valuearr) {
 }
 
 $toload = ['items','assessments','questions','assessment_sessions','exceptions',
-  'inlinetext','linkedtext','forums','wikis','drillassess','drillassess_sessions'];
+  'inlinetext','linkedtext','forums','forum_posts','forum_threads','forum_views',
+  'wikis','drillassess','drillassess_sessions'];
 foreach ($data as $k=>$v) {
   if (in_array($k, $toload)) {
     loadData("imas_$k", $v['fields'], $v['values']);
