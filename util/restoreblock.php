@@ -9,6 +9,10 @@ if (!isset($_GET['cid'])) {
   echo "Need to specify cid";
   exit;
 }
+
+set_time_limit(600);
+$DBH->beginTransaction();
+
 if (!isset($_FILES['userfile'])) {
   require("../header.php");
   echo '<form id="qform" enctype="multipart/form-data" method=post action="restoreblock.php?cid='.$cid.'">';
@@ -48,4 +52,8 @@ if (isset($data['blockobject'])) {
 $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 $stm->execute(array(':id'=>$cid, ':itemorder'=>serialize($items)));
 
+$DBH->commit();
+
+error_log("Block restoration complete! Course ID: " . intval($cid));
 echo "DONE";
+
