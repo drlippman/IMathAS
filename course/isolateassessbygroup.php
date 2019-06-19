@@ -22,7 +22,7 @@
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
 	}
-	
+
 	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
@@ -223,7 +223,7 @@
 	}
 	echo "</a></td><td>".Sanitize::onlyFloat($pct)."</td></tr>";
 	echo "</tbody></table>";
-	echo "<script> initSortTable('myTable',Array('S','N','N'),true);</script>";
+	echo "<script> initSortTable('myTable',Array('S','N','N'),true,false);</script>";
 	require("../footer.php");
 
 
