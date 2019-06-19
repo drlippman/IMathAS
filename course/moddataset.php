@@ -222,12 +222,12 @@
 				} else {
 					$outputmsg .= "Library Assignments Updated. ";
 				}
-			
+
 				$stm = $DBH->prepare("SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm->execute(array(':qsetid'=>$_GET['id']));
 				$imgcnt = $stm->rowCount();
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$_POST['imgvar-'.$row[0]] = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[0]]); 
+					$_POST['imgvar-'.$row[0]] = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[0]]);
 					if (isset($_POST['delimg-'.$row[0]])) {
 						if (substr($row[1],0,4)!='http') {
 							$stm2 = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
@@ -302,7 +302,7 @@
 				$stm->execute(array(':qsetid'=>$_GET['templateid']));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if (!isset($_POST['delimg-'.$row[3]])) {
-						$_POST['imgvar-'.$row[3]] = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[3]]); 
+						$_POST['imgvar-'.$row[3]] = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[3]]);
 						if ($row[0]!=$_POST['imgvar-'.$row[3]] || $row[2]!=$_POST['imgalt-'.$row[3]]) {
 							$newvar = $_POST['imgvar-'.$row[3]];
 							$newalt = $_POST['imgalt-'.$row[3]];
@@ -357,7 +357,7 @@
 					//$filename = basename($_FILES['imgfile']['name']);
 					$userfilename = preg_replace('/[^\w\.]/','',basename(str_replace('\\','/',$_FILES['imgfile']['name'])));
 					$filename = $userfilename;
-	
+
 					//$uploadfile = $uploaddir . $filename;
 					//$t=0;
 					//while(file_exists($uploadfile)){
@@ -687,6 +687,7 @@
 			$author = $myname;
 			$inlibssafe = implode(',', array_map('intval', explode(',',$inlibs)));
 			if (!isset($_GET['id']) || isset($_GET['template'])) {
+				$oklibs = array();
 				$stm = $DBH->query("SELECT id,ownerid,userights,groupid FROM imas_libraries WHERE id IN ($inlibssafe)");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if ($row[2] == 8 || ($row[3]==$groupid && ($row[2]%3==2)) || $row[1]==$userid) {
@@ -703,7 +704,7 @@
 	if (!$myq) {
 		$addmod = 'View';
 	}
-	
+
 	$inlibssafe = implode(',', array_map('intval', explode(',',$inlibs)));
 
 	$lnames = array();
@@ -790,7 +791,7 @@
 	$placeinhead .= '
 	   var controlEditor;
 	   var qEditor = [];
-	
+
 	  function toggleeditor(el) {
 	     var qtextbox =  document.getElementById(el);
 	     if ((el=="qtext" && editoron==0) || (el=="solution" && seditoron==0)) {
@@ -814,8 +815,8 @@
 	     	tinymce.remove("#"+el);
 	     	qtextbox.rows -= 3;
 	     	qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
-	     	setupQtextEditor(el);        
-	     }    
+	     	setupQtextEditor(el);
+	     }
 	     if (el.match(/qtext/)) {
 	     	editoron = 1 - editoron;
 	     	//document.cookie = "qeditoron="+editoron;
@@ -1166,8 +1167,8 @@ Display with the "Show Answer"<br/>
 </div>
 <div id=imgbox>
 <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
-Image file: <input type="file" name="imgfile" <?php if (!$myq) {echo 'disabled';};?>/> 
-  assign to variable: <input type="text" name="newimgvar" size="6" <?php if (!$myq) {echo 'disabled';};?>/> 
+Image file: <input type="file" name="imgfile" <?php if (!$myq) {echo 'disabled';};?>/>
+  assign to variable: <input type="text" name="newimgvar" size="6" <?php if (!$myq) {echo 'disabled';};?>/>
   Description: <input type="text" size="20" name="newimgalt" value="" <?php if (!$myq) {echo 'disabled';};?>/><br/>
 <div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
 	Images:

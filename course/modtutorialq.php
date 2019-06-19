@@ -921,6 +921,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$author = $myname;
 	$inlibssafe = implode(',', array_map('intval', explode(',',$inlibs)));
 	if (!isset($_GET['id']) || isset($_GET['template'])) {
+		$oklibs = array();
 		$stm = $DBH->query("SELECT id,ownerid,userights,groupid FROM imas_libraries WHERE id IN ($inlibssafe)");
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($row[2] == 8 || ($row[3]==$groupid && ($row[2]%3==2)) || $row[1]==$userid) {
