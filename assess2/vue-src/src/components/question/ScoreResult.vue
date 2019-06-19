@@ -20,13 +20,22 @@
         {{ $t('scoreresult.manual_grade') }}
       </p>
       <p v-if="showRetryButtons">
-        <button
-          v-if = "qdata.canretry"
-          type = "button"
-          @click = "expanded = false"
+        <router-link
+          v-if = "showNext"
+          :to="'/skip/' + (this.qn + 2)"
+          tag="button"
+          :aria-label="$t('next')"
         >
-          <icons name="retry" />
-          {{ $t('scoreresult.retry') }}
+          <icons name="right" />
+          {{ $t('scoreresult.next') }}
+        </router-link>
+        <button
+          v-if = "showSubmit"
+          type = "button"
+          class = "primary"
+          @click = "submitAssess"
+        >
+          {{ $t('header.assess_submit') }}
         </button>
         <button
           v-if = "qdata.canregen"
@@ -36,6 +45,9 @@
           <icons name="retake" />
           {{ $t('scoreresult.trysimilar') }}
         </button>
+        <span v-if = "qdata.canretry">
+          {{ $t('scoreresult.retryq') }}
+        </span>
       </p>
     </div>
   </transition>
@@ -111,11 +123,24 @@ export default {
     },
     showRetryButtons () {
       return (store.assessInfo.displaymethod !== 'livepoll');
+    },
+    showNext () {
+      return (store.assessInfo.displaymethod === 'skip' &&
+        this.qn < store.assessInfo.questions.length - 1
+      );
+    },
+    showSubmit () {
+      return (store.assessInfo.submitby === 'by_assessment' &&
+        this.qn === store.assessInfo.questions.length - 1
+      );
     }
   },
   methods: {
     trySimilar () {
       actions.loadQuestion(this.qn, true);
+    },
+    submitAssess () {
+      actions.submitAssessment();
     }
   }
 };

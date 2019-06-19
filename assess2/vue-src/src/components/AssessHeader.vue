@@ -185,39 +185,7 @@ export default {
   },
   methods: {
     handleSubmit () {
-      if (confirm(this.$t('header.confirm_assess_submit'))) {
-        if (this.ainfo.submitby === 'by_assessment') {
-          let qAttempted = 0;
-          let changedQuestions = actions.getChangedQuestions();
-          for (let i in this.ainfo.questions) {
-            if (this.ainfo.questions[i].try > 0 ||
-              changedQuestions.hasOwnProperty(i)
-            ) {
-              qAttempted++;
-            }
-          }
-          let nQuestions = this.ainfo.questions.length;
-          if (qAttempted === nQuestions ||
-            confirm(this.$t('header.warn_unattempted'))
-          ) {
-            // TODO: Check if we should always submit all
-            if (this.ainfo.showscores === 'during') {
-              // check for dirty questions and submit them
-              actions.submitQuestion(Object.keys(changedQuestions), true);
-            } else {
-              // submit them all
-              var qns = [];
-              for (let k = 0; k < this.ainfo.questions.length; k++) {
-                qns.push(k);
-              }
-              actions.submitQuestion(qns, true);
-            }
-          }
-        } else {
-          // don't want to submit if by_question
-          // actions.submitQuestion(-1, true);
-        }
-      }
+      actions.submitAssessment();
     },
     handleSaveWork () {
       if (Object.keys(store.autosaveQueue).length === 0) {

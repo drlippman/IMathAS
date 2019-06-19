@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from './router';
+import i18n from './i18n';
 
 export const store = Vue.observable({
   assessInfo: null,
@@ -192,6 +193,41 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  submitAssessment() {
+    if (confirm(i18n.t('header.confirm_assess_submit'))) {
+      if (store.assessInfo.submitby === 'by_assessment') {
+        let qAttempted = 0;
+        let changedQuestions = this.getChangedQuestions();
+        for (let i in store.assessInfo.questions) {
+          if (store.assessInfo.questions[i].try > 0 ||
+            changedQuestions.hasOwnProperty(i)
+          ) {
+            qAttempted++;
+          }
+        }
+        let nQuestions = store.assessInfo.questions.length;
+        if (qAttempted === nQuestions ||
+          confirm(i18n.t('header.warn_unattempted'))
+        ) {
+          // TODO: Check if we should always submit all
+          if (store.assessInfo.showscores === 'during') {
+            // check for dirty questions and submit them
+            this.submitQuestion(Object.keys(changedQuestions), true);
+          } else {
+            // submit them all
+            var qns = [];
+            for (let k = 0; k < store.assessInfo.questions.length; k++) {
+              qns.push(k);
+            }
+            this.submitQuestion(qns, true);
+          }
+        }
+      } else {
+        // don't want to submit if by_question
+        // actions.submitQuestion(-1, true);
+      }
+    }
   },
   submitQuestion (qns, endattempt, timeactive, partnum) {
     store.somethingDirty = false;

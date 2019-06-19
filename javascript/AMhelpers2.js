@@ -402,7 +402,6 @@ function setupDraw(qn) {
 
 function initMultAns(qn) {
   var boxes = $('input[name^="qn'+qn+'["]');
-  console.log(boxes);
   boxes.on('change', function () {
     if (this.checked && this.value == boxes.length-1) {
       boxes.not(':last').prop('checked', false);

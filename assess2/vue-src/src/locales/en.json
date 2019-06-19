@@ -147,6 +147,8 @@
     "incorrect": "Incorrect",
     "partial": "Partially correct",
     "retry": "Retry this question",
+    "next": "Next question",
+    "retryq": "You can retry this question below",
     "trysimilar": "Try a similar question",
     "scorepts": "{pts} of {poss} pts | {pts} of {poss} pts",
     "scorelast": "Score on last try:",
