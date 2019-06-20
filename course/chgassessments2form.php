@@ -45,6 +45,9 @@ $vueData = array(
 	'dochgpassword' => false,
 	'assmpassword' => '',
 	'reqscoretype' => 'DNC',
+	'reqscoreaid' => 'DNC',
+	'reqscore' => 1,
+	'reqscorecalctype' => 0,
 	'chgreqscore' => false,
 	'showhints' => 'DNC',
 	'msgtoinstr' => 'DNC',
@@ -71,6 +74,7 @@ $vueData = array(
 			<span class=form>Summary:</span>
 			<span class=formright>
 				Copy from: <select name="summary" v-model="summary">
+					<option value="DNC">Do not copy</option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -81,6 +85,7 @@ $vueData = array(
 			<span class=form>Instructions:</span>
 			<span class=formright>
 				Copy from: <select name="intro" v-model="intro">
+					<option value="DNC">Do not copy</option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -91,6 +96,7 @@ $vueData = array(
 			<span class=form>Dates and Times:</span>
 			<span class=formright>
 				Copy from: <select name="dates" v-model="dates">
+					<option value="DNC">Do not copy</option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -121,6 +127,7 @@ $vueData = array(
 			<span class=form>End of Assessment Messages:</span>
 			<span class=formright>
 				Copy from: <select name="copyendmsg" v-model="copyendmsg">
+					<option value="DNC">Do not copy</option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -153,13 +160,14 @@ $vueData = array(
 			<span class=form>Copy assessment options:</span>
 			<span class=formright>
 				Copy from: <select name="copyopts" v-model="copyopts">
+					<option value="DNC">Do not copy</option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
 				</select>
 			</span><br class=form />
 		</div>
-		<div v-if="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
+		<div v-show="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
 		<div style="padding-top:4px;">
 			<a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 	 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a>
@@ -483,6 +491,26 @@ $vueData = array(
 				</span><br class=form />
 			</div>
 
+			<div :class="{highlight:reqscoreaid !== 'DNC'}">
+				<label for="reqscoreaid" class=form>Show based on another assessment:</label>
+				<span class=formright>
+					<select id="reqscoreaid" name="reqscoreaid" v-model="reqscoreaid">
+						<option value="DNC">Do not change</option>
+						<option value="0">No prerequisite</option>
+						<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
+							{{ assess.label }}
+						</option>
+					</select>
+					<span id="reqscorewrap" v-if="reqscoreaid !== 'DNC' && reqscoreaid > 0">
+						with a score of
+						<input type=text size=4 name="reqscore" v-model="reqscore" />
+						<select name="reqscorecalctype" v-model="reqscorecalctype">
+							<option value="0">Points</option>
+							<option value="1">Percent</option>
+						</select>
+					</span>
+				</span><br class=form />
+			</div>
 			<div :class="{highlight:reqscoretype !== 'DNC'}">
 				<label for="reqscoreshowtype" class=form>Show based on another assessment display: </label>
 				<span class=formright>
@@ -493,12 +521,7 @@ $vueData = array(
 					</select>
 				</span><br class=form />
 			</div>
-			<div :class="{highlight:chgreqscore}">
-				<label for="clearreq" class=form>Clear "show based on another assessment" settings.</label>
-				<span class=formright>
-					<input type="checkbox" id="clearreq" name="chgreqscore" v-model="chgreqscore"/>
-				</span><br class=form />
-			</div>
+
 		</div>
 
 		<div class="block grouptoggle">

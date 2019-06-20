@@ -234,6 +234,21 @@ if (!(isset($teacherid))) {
 				$qarr[':password'] = Sanitize::stripHtmlTags($_POST['assmpassword']);
 			}
 
+			if ($_POST['chgreqscoreaid'] !== 'DNC') {
+				$sets[] = "reqscore=:reqscore";
+				if ($_POST['reqscoreaid'] > 0) {
+					$qarr[':reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
+				} else {
+					$qarr[':reqscore'] = 0;
+				}
+				$sets[] = "reqscoreaid=:reqscoreaid";
+				$qarr[':reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
+				if ($_POST['reqscorecalctype']==1) {
+					$sets[] = "reqscoretype=(reqscoretype | 2)";
+				} else {
+					$sets[] = "reqscoretype=(reqscoretype & ~2)";
+				}
+			}
 			if ($_POST['reqscoretype'] !== 'DNC') {
 				if ($_POST['reqscoretype']==0) {
 					$sets[] = 'reqscore=ABS(reqscore)';
@@ -241,11 +256,6 @@ if (!(isset($teacherid))) {
 				} else {
 					$sets[] = 'reqscoretype=(reqscoretype | 1)';
 				}
-			}
-
-			if (isset($_POST['chgreqscore'])) {
-				$sets[] = "reqscore=0";
-				$sets[] = "reqscoreaid=0";
 			}
 
 			if ($_POST['showhints'] !== 'DNC') {
@@ -454,10 +464,7 @@ if (!(isset($teacherid))) {
 		} else {
 			$page_assessListMsg = "";
 			$i=0;
-			$page_assessSelect = array(array(
-				'val' => 'DNC',
-				'label' => 'Do not copy'
-			));
+			$page_assessSelect = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_assessSelect[] = array(
 					'val' => $row[0],
