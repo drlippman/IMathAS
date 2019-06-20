@@ -1169,9 +1169,15 @@ function processSizedMatrix(qn) {
 }
 
 function processCalcMatrix(fullstr, format) {
-  fullstr = fullstr.replace('[','(');
-  fullstr = fullstr.replace(']',')');
+  var okformat = true;
+  fullstr = fullstr.replace(/\[/g, '(');
+  fullstr = fullstr.replace(/\]/g, ')');
   fullstr = fullstr.replace(/\s+/g,'');
+  if (fullstr.length < 2 || fullstr.charAt(0) !== '(' || 
+    fullstr.charAt(fullstr.length-1) !== ')'
+  ) {
+    okformat = false;
+  }
   fullstr = fullstr.substring(1,fullstr.length-1);
   var err = '';
   var rowlist = [];
@@ -1188,7 +1194,6 @@ function processCalcMatrix(fullstr, format) {
     }
   }
   rowlist.push(fullstr.substring(lastcut+1,fullstr.length-1));
-  var okformat = true;
   var lastnumcols = -1;
   if (MCdepth !== 0) {
     okformat = false;
@@ -1215,7 +1220,7 @@ function processCalcMatrix(fullstr, format) {
     outcalc[i] = '(' + outcalc[i].join(',') + ')';
   }
   if (!okformat) {
-    err += _('Invalid matrix format')+'. ';
+    err = _('Invalid matrix format')+'. ';
   }
   return {
     err: err,
