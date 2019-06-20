@@ -1,6 +1,6 @@
 <template>
   <div class="fullwrap" ref="wrap">
-    <div class="dialog-overlay" tabindex="-1">
+    <div class="dialog-overlay" tabindex="-1" @click="clearError">
       <div
         class="dialog"
         ref="dialog"
@@ -9,6 +9,7 @@
         aria-labelledby="error_hdr"
         aria-describedby="error_body"
         tabindex="-1"
+        @click.stop
       >
         <div class="pane-header flexrow" id="error_hdr">
           <div style="flex-grow: 1">
