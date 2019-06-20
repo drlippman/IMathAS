@@ -1,7 +1,6 @@
 TODOs:
   Need to revisit showhints throughout display code
   Refactor ErrorDialog to be usable in GBViewAssess
-  Test CSRFP
 
 Test:
   Instructor preview

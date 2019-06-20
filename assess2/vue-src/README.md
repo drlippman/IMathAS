@@ -10,6 +10,9 @@ For development, add to your /config.php the line
 which will adjust course page links to assessments to use the Vue dev
 server at localhost:8080.
 
+Note you will also have to disable `$CFG['use_csrfp']` when using the above
+option.
+
 You may need to adjust /assess2/vue-src/public/index.html, editing the
 `APIbase` line to point to have the correct web path to the assess2 directory.
 

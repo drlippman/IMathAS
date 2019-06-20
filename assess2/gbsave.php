@@ -16,7 +16,7 @@
  * Returns: success or error message
  */
 
-$init_skip_csrfp = true; // TODO: get CSRFP to work
+
 $no_session_handler = 'json_error';
 require_once("../init.php");
 require_once("./common_start.php");
