@@ -137,7 +137,7 @@ export const actions = {
             } else {
               Router.push('/full');
             }
-          } else if (store.assessInfo.displaymethod === 'videocued') {
+          } else if (store.assessInfo.displaymethod === 'video_cued') {
             Router.push('/videocued');
           } else if (store.assessInfo.displaymethod === 'livepoll') {
             Router.push('/livepoll');

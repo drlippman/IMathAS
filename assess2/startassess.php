@@ -228,7 +228,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 }
 
 // grab video cues if needed
-if ($assess_info->getSetting('displaymethod') === 'videocued') {
+if ($assess_info->getSetting('displaymethod') === 'video_cued') {
   $viddata = $assess_info->getVideoCues();
   $assessInfoOut['videoid'] = $viddata['vidid'];
   $assessInfoOut['videoar'] = $viddata['vidar'];
