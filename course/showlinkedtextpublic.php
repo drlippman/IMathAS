@@ -80,16 +80,20 @@
 		echo "<html><body>No item specified.</body></html>\n";
 		exit;
 	}
-	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id");
-	$stm->execute(array(':id'=>intval($_GET['id'])));
+	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>intval($_GET['id']), ':cid'=>$cid));
+	if ($stm->rowCount()==0) {
+		echo "Invalid ID";
+		exit;
+	}
 	list($text,$title) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
-	
+
 	echo '<div id="headershowlinkedtext" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($titlesimp).'</h1></div>';
-	
+
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo Sanitize::outgoingHtml(filter($text));
 	echo '</div>';

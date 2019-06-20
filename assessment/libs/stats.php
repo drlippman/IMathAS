@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.10, Nov 17, 2017
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -141,6 +141,46 @@ function Nplus1percentile($a,$p) {
 	} else {
 		return (($a[floor($l)-1]+$a[ceil($l)-1])/2);
 	}
+}
+
+// interppercentile(array, percentile, [mode])
+// Interpolated percentile. Finds the percentile using an interpolated method.
+// mode=1 (def): Matches Excel's PERCENTILE.EXC, JMP, and recommended by NIST
+//   except that this function will return the lowest/highest value if needed.
+// mode=2: Matches Excel's PERCENTILE.INC (and older percentile)
+// mode=3: Matches Mathlab's prctile function
+function interppercentile($a, $p, $mode=1) {
+  if (!is_array($a)) {
+		echo 'percentile expects an array';
+		return false;
+	}
+	if ($p<0 || $p>100) {
+		echo 'invalid percentage';
+		return false;
+	}
+	sort($a, SORT_NUMERIC);
+	if ($p==0) {
+		return $a[0];
+	} else if ($p==100) {
+		return $a[count($a)-1];
+	}
+  $N = count($a);
+  $p = $p/100;
+  if ($mode == 3) { // c=1/2
+    $x = $N*$p + 1/2;
+  } else if ($mode == 2) { // c=1
+    $x = $p*($N-1) + 1;
+  } else { // c = 0
+    $x = $p*($N+1);
+  }
+  if ($x < 1) {
+    return $a[0];
+  }
+  $f = floor($x);
+  if ($f >= $N) {
+    return $a[$N-1];
+  }
+  return $a[$f-1] + ($x-$f)*($a[$f] - $a[$f-1]);
 }
 
 //quartile(array,quartile)
@@ -451,7 +491,8 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
-	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+
+	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,20,15);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
@@ -462,11 +503,12 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$startlabel = $start;
 	} //else {
-		$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+    $maxx = 2*max($a);
+		$outst .= "axes($maxx,$step,1,null,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 		$x = $startlabel;
 		$tm = -.02*$maxfreq;
 		$tx = .02*$maxfreq;
-		while ($x <= $a[count($a)-1]+1) {
+		while ($x <= $a[count($a)-1]+$cw) {
 			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
 			$x+= $cw;
 		}
@@ -734,7 +776,7 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 		return array();
 	}
 	global $RND;
-	
+
 	$out = array();
 	for ($i=0; $i<$n; $i++) {
 		$out[] = -$mu*log($RND->rand(1,32768)/32768);
@@ -1291,6 +1333,13 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	foreach ($gridi as $i=>$v) {
 		$grid[$i] = $v;
 	}
+  if (strpos($grid[0],'0:')!==false) {
+		$grid[0] = substr($grid[0],2);
+	}
+  if (strpos($grid[2],'0:')!==false) {
+		$grid[2] = substr($grid[2],2);
+	}
+
 	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
 		return false;
@@ -1304,7 +1353,7 @@ function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.0
 	$showanswer = null;
 	list($r,$m,$b) = linreg($xarr,$yarr);
 	if ($line!='') {
-		$lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3]);
+		$lines = gettwopointlinedata($line,$grid[0],$grid[1],$grid[2],$grid[3],$grid[6],$grid[7]);
 		if ($lines[0][0]==$lines[0][2]) {
 			$stum = 100000;
 		} else {

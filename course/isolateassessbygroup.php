@@ -255,7 +255,7 @@
 	}
 	echo "</a></td><td>".Sanitize::onlyFloat($pct)."</td></tr>";
 	echo "</tbody></table>";
-	echo "<script> initSortTable('myTable',Array('S','N','N'),true);</script>";
+	echo "<script> initSortTable('myTable',Array('S','N','N'),true,false);</script>";
 	require("../footer.php");
 
 

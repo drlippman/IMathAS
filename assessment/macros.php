@@ -1945,7 +1945,7 @@ $tensth = array("",""," twentieth", " thirtieth", " fortieth", " fiftieth", " si
 $triplets = array( "", " thousand", " million", " billion", " trillion", " quadrillion", " quintillion", " sextillion", " septillion", " octillion", " nonillion");
 $placevals = array( "", "tenth", "hundredth", "thousandth", "ten-thousandth", "hundred-thousandth", "millionth", "ten-millionth", "hundred-millionth", "billionth");
  // recursive fn, converts three digits per pass
-function convertTri($num, $tri, $doth=false) {
+function convertTri($num, $tri, $doth=false, $addcommas=false) {
   global $ones, $onesth, $tens, $tensth, $triplets;
 
   // chunk the number, ...rxyy
@@ -1982,15 +1982,16 @@ function convertTri($num, $tri, $doth=false) {
   // is some output to be modified...
   if ($str != "")
    $str .= $triplets[$tri];
-
   // continue recursing?
-  if ($r > 0)
-   return convertTri($r, $tri+1).$str;
-  else
+  if ($r > 0) {
+   $prev = convertTri($r, $tri+1, false, $addcommas);
+   return $prev.(($addcommas && $prev != '' && $str != '')?',':'').$str;
+  } else {
    return $str;
+  }
  }
 
-function numtowords($num,$doth=false,$addcontractiontonum=false) {
+function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false) {
 	global $placevals;
 
 	if ($addcontractiontonum) {
@@ -2022,7 +2023,7 @@ function numtowords($num,$doth=false,$addcontractiontonum=false) {
 	$dec = 	$num-$int;
 
 	if ($int>0) {
-		$out .= convertTri($int,0,$doth);
+		$out .= convertTri($int,0,$doth,$addcommas);
 		if (abs($dec)>1e-9) {
 			$out .= " and ";
 		}

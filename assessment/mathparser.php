@@ -140,7 +140,7 @@ class MathParser
     if (count($allowedfuncs) > 0) {
       $this->functions = $allowedfuncs;
     } else {
-      $this->functions = explode(',', 'arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
+      $this->functions = explode(',', 'arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
     }
 
     //build regex's for matching symbols
@@ -302,10 +302,10 @@ class MathParser
         continue;
       } else if (ctype_digit($c) || $c=='.') {
         // if it's a number/decimal value
-        preg_match('/^(\d*\.?\d*)/', substr($str,$n), $matches);
+        preg_match('/^(\d*\.?\d*(E-?\d+)?)/', substr($str,$n), $matches);
         $tokens[] = [
           'type'=>'number',
-          'symbol'=>$matches[1]
+          'symbol'=> $matches[1]
         ];
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
@@ -664,18 +664,18 @@ class MathParser
    */
   private function evalNode($node) {
     if ($node['type'] === 'number') {
-      return $node['symbol'];
+      return floatval($node['symbol']);
     } else if ($node['type'] === 'variable') {
-      if ($node['symbol'] === 'pi') {
+      if (isset($this->variableValues[$node['symbol']])) {
+        return $this->variableValues[$node['symbol']];
+      } else if ($node['symbol'] === 'pi') {
         return M_PI;
       } else if ($node['symbol'] === 'e') {
         return M_E;
-      }
-      if (!isset($this->variableValues[$node['symbol']])) {
+      } else {
         throw new MathParserException("Variable found without a provided value");
         return;
       }
-      return $this->variableValues[$node['symbol']];
     } else if ($node['type'] === 'function') {
       // find the value of the input to the function
       $insideval = $this->evalNode($node['input']);

@@ -29,8 +29,10 @@ var Nested = function(listid, newoptions) {
 	};
 
 	function initialize(listid, newoptions) {
-
-		options = Object.assign(getOptions(), newoptions);
+		options = getOptions();
+		for (var i in newoptions) {
+			options[i] = newoptions[i];
+		}
 		if (!options.expandKey.match(/^(control|shift)$/)) {
 			options.expandKey = 'shift';
 		}
@@ -100,7 +102,7 @@ var Nested = function(listid, newoptions) {
 			var sub = el.find(options.parentTag);
 			if (sub) {
 				if (noblockcookie) {
-					if (sub.css('display') == 'none') {
+					if (sub.length == 0 || sub.css('display') == 'none') {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
 					} else {
@@ -111,7 +113,7 @@ var Nested = function(listid, newoptions) {
 					oblist = oblist.split(',');
 					var obn = el.attr("obn");
 					var loc = arraysearch(obn,oblist);
-					if (sub.css('display') == 'none') {
+					if (sub.length == 0 || sub.css('display') == 'none') {
 						sub.css('display', 'block');
 						el.removeClass(options.collapseClass);
 						if (loc==-1) {oblist.push(obn);}
@@ -193,7 +195,7 @@ var Nested = function(listid, newoptions) {
 			if (dir == 'up') {
 				move = 'before'; dest = $(over);
 			} else {
-				sub = $(over).find(options.childTag);
+				sub = $(over).find(options.childTag).first();
 				if (sub && sub.height() > 0) {
 					move = 'before'; dest = sub;
 				} else {
@@ -251,6 +253,7 @@ var Nested = function(listid, newoptions) {
 				} else if (move == 'before') {
 					$(el).insertBefore(dest);
 				}
+
 				el.moved = true;
 				if (prevParent.children().length==0) prevParent.remove();
 				if (!haschanged) {

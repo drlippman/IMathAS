@@ -463,11 +463,11 @@
 	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
 	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
-		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true,false);</script>";
 	} else if ($hassection && !$hidesection) {
-		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true,false);</script>";
 	} else {
-		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true,false);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";

@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 
 	require("../init.php");
-	
+
 	//Look to see if a hook file is defined, and include if it is
 	if (isset($CFG['hooks']['assessment/showtest'])) {
 		require(__DIR__.'/../'.$CFG['hooks']['assessment/showtest']);
@@ -177,14 +177,14 @@
 		//check reqscore
 		if ($isRealStudent && abs($adata['reqscore'])>0 && $adata['reqscoreaid']>0 && !$waivereqscore && !$isreview) {
 			$isBlocked = false;
-			
+
 			$query = "SELECT ias.bestscores,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_sessions AS ias ON ias.assessmentid=ia.id AND ias.userid=:userid ";
 			$query .= "WHERE ia.id=:assessmentid";
 			$bestscores_stm = $DBH->prepare($query);
 			$bestscores_stm->execute(array(':assessmentid'=>$adata['reqscoreaid'], ':userid'=>$userid));
 			list($prereqscore,$reqscoreptsposs,$reqscorename) = $bestscores_stm->fetch(PDO::FETCH_NUM);
-			
+
 			if ($prereqscore === null) {
 				$isBlocked = true;
 			} else {
@@ -195,7 +195,7 @@
 					$prereqscoretot += getpts($prereqscore[$i]);
 				}
 				$isBlocked = false;
-				
+
 				if ($adata['reqscoretype']&2) { //using percent-based
 					if ($reqscoreptsposs==-1) {
 						require("../includes/updateptsposs.php");
@@ -220,7 +220,7 @@
 				require("../footer.php");
 				exit;
 			}
-			
+
 		}
 
 		//check for password
@@ -1975,7 +1975,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							if ($v[1]==$next+2) {//right divider
 								echo '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;" aria-controls="intropiece'.$k.'" aria-expanded="true">';
 								echo _('Hide Question Information'), '</a></div>';
-								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';								
+								echo '<div class="intro" role=region aria-label="'._('Pre-question text').'" aria-expanded="true" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
 							}
 						}
 					}
@@ -2298,7 +2298,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
 				$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$qn&amp;page=$page&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$qn";
 				echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
-					
+
 				//echo "<p><a href=\"showtest.php?regen=$qn&page=$page#embedqwrapper$qn\">", _('Try another similar question'), "</a></p>\n";
 			}
 			if (hasreattempts($qn)) {
@@ -2502,7 +2502,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				ob_start();
 				$anstypes = displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],1,$thisshowhints,$attempts[$qn],false,$clearla,false,array());
 				$out = array("html"=>ob_get_clean(),'choices'=>array(),'ans'=>0, 'randkeys'=>0,'drawinit'=>0);
-				if (isset($GLOBALS['choicesdata'][$qn])) {
+				if (isset($GLOBALS['choicesdata'][$qn]) && count($GLOBALS['choicesdata'][$qn])>3) {
 					$out["choices"] = $GLOBALS['choicesdata'][$qn][1];
 					$out["ans"] = $GLOBALS['choicesdata'][$qn][2];
 					$out["randkeys"] = $GLOBALS['choicesdata'][$qn][3];
@@ -2647,7 +2647,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 			}
 			$reattempting = array();
-			
+
 			if ($numdisplayed > 0) {
 				echo '<br/><input type="submit" class="btn" value="', _('Submit'), '" />';
 				echo '<input type="submit" class="btn" name="saveforlater" value="', _('Save answers'), '" onclick="var c=confirm(\'', _('This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'), '\');if (c){$(this).attr(\'data-clicked\',1);};return c;" />';
@@ -2954,7 +2954,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
 							$regenhref = $GLOBALS['basesiteurl'].'/assessment/'."showtest.php?regen=$i&amp;r=".Sanitize::randomQueryStringParam()."#embedqwrapper$i";
 							echo '<p><button type=button onclick="window.location.href=\''.$regenhref.'\'">'._('Try another similar question').'</button></p>';
-				
+
 							//echo "<p><a href=\"showtest.php?regen=$i#embedqwrapper$i\">", _('Try another similar question'), "</a></p>\n";
 						}
 						if ($showeachscore) {
@@ -3225,9 +3225,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 	function showembednavbar($pginfo,$curpg) {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
-		
+
 		echo '<div class="navbar fixedonscroll" role="navigation" aria-label="'._("Page and question navigation").'">';
-		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";		
+		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";
 		echo "<h3>", _('Pages'), "</h3>\n";
 		echo '<ul class="navlist">';
 		$jsonbits = array();
@@ -3361,7 +3361,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
-		
+
 		echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
 		echo "<a href=\"#beginquestions\" class=\"screenreader\">", _('Skip Navigation'), "</a>\n";
 		$extrefs = json_decode($extrefs, true);

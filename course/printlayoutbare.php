@@ -144,7 +144,7 @@ if ($overwriteBody==1) {
 
 ?>
 	<style type="text/css">
-	
+
 		div.maintest {
 			position: absolute;
 			top: 0px;
@@ -393,9 +393,18 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 		$laparts = explode("&",$la);
 		foreach ($anstypes as $kidx=>$anstype) {
 			list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
+      if (!isset($showanswer)) {
+        $showanswer = array();
+      }
+      if (is_array($showanswer) && !isset($showanswer[$kidx])) {
+        $showanswer[$kidx] = $shans[$kidx];
+      }
 		}
 	} else {
 		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+    if (!isset($showanswer)) {
+      $showanswer = $shans[0];
+    }
 	}
 
 	echo "<div class=q>";
@@ -410,8 +419,26 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	echo "<div>\n";
 	//echo $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
+  // fix [AB] fields
+  if (strpos($evaledqtext,'[AB')!==false) {
+		if (is_array($answerbox)) {
+			foreach($answerbox as $iidx=>$abox) {
+				if (strpos($evaledqtext,'[AB'.$iidx.']')!==false) {
+					$evaledqtext = str_replace('[AB'.$iidx.']', $abox, $evaledqtext);
+					$toevalqtxt .= '$answerbox['.$iidx.']';  //to prevent autoadd
+				}
+			}
+		} else {
+			$evaledqtext = str_replace('[AB]', $answerbox, $evaledqtext);
+			$toevalqtxt .= '$answerbox';
+		}
+	}
+  // remove [SAB] fields
+  $evaledqtext = preg_replace('/\[SAB\d*\]/','',$evaledqtext);
+
 	echo printfilter(filter($evaledqtext));
 	echo "</div>\n"; //end question div
+
 
 	if (strpos($toevalqtxt,'$answerbox')===false) {
 		if (is_array($answerbox)) {
@@ -434,8 +461,9 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	if (!isset($showanswer)) {
 		return $shans;
 	} else {
+    if (is_array($showanswer)) {
+      ksort($showanswer);
+    }
 		return $showanswer;
 	}
 }
-
-?>

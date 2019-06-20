@@ -15,7 +15,7 @@
 	} else {
 		$asid = Sanitize::onlyInt($_GET['asid']);
 	}
-	
+
 	if (!isset($_GET['uid']) && !$isteacher && !$istutor) {
 		$get_uid = $userid;
 	} else {
@@ -99,7 +99,7 @@
 						$doadd = false;
 						$row = $stm->fetch(PDO::FETCH_ASSOC);
 						$fieldstocopyarr = explode(',',$fieldstocopy);
-						$insrow = ":".implode(',:',$fieldstocopyarr);	
+						$insrow = ":".implode(',:',$fieldstocopyarr);
 						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
 						$query .= "VALUES (:stuid,$insrow)";
 						$stm = $DBH->prepare($query);
@@ -112,7 +112,7 @@
 			}
 			$stugroupmem[] = $get_uid;
 
-			if ($doadd) {			
+			if ($doadd) {
 				require("../assessment/asidutil.php");
 				list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 				//$starttime = time();
@@ -191,7 +191,7 @@
 			':userid' => $get_uid
 		));
 		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
-		
+
 	}
 	if (isset($_REQUEST['breakfromgroup']) && $isteacher) {
 		if (isset($_POST['breakfromgroup']) && $_POST['breakfromgroup']=="confirmed") {
@@ -396,14 +396,15 @@
 	//OUTPUTS
 	if ($links==0) { //View/Edit full assessment
 		require("../assessment/displayq2.php");
-		
+
 		if (isset($_GET['update']) && ($isteacher || $istutor)) {
 			if (isoktorec($asid)) {
 				$stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE id=:id");
 				$stm->execute(array(':id'=>$asid));
 				$bestscores = $stm->fetchColumn(0);
 				$bsp = explode(';',$bestscores);
-
+				$oldScores = explode(',', $bsp[0]);
+				
 				$scores = array();
 				$feedback = array();
 				$i = 0;
@@ -411,7 +412,6 @@
 					$j=0;
 					$scpt = array();
 					if (isset($_POST["sb-$i-0"])) {
-
 						while (isset($_POST["sb-$i-$j"])) {
 							if ($_POST["sb-$i-$j"]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
 								$scpt[$j] = $_POST["sb-$i-$j"];
@@ -419,6 +419,10 @@
 								$scpt[$j] = -1;
 							}
 							$j++;
+						}
+						if (count($scpt) < count(explode('~', $oldScores[$i]))) {
+							echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
+							exit;
 						}
 						$scores[$i] = implode('~',$scpt);
 					} else {
@@ -428,10 +432,14 @@
 							$scores[$i] = -1;
 						}
 					}
-					if (trim(strip_tags($_POST["fb-$i"])) != '') { 
+					if (trim(strip_tags($_POST["fb-$i"])) != '') {
 						$feedback["Q$i"] = Sanitize::incomingHtml($_POST["fb-$i"]);
 					}
 					$i++;
+				}
+				if (count($scores) < count($oldScores)) {
+					echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
+					exit;
 				}
 				$scorelist = implode(",",$scores);
 				if (count($bsp)>1) { //tack on rawscores and firstscores
@@ -490,7 +498,7 @@
 		if ($isteacher || $istutor) {
 			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=031417"></script>';
 			require("../includes/rubric.php");
-			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=120617"></script>';
+			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042519"></script>';
 			if ($sessiondata['useed']!=0) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}
@@ -662,17 +670,17 @@
 		}
 		$saenddate = $line['enddate'];
 		unset($exped);
-		
+
 		require_once("../includes/exceptionfuncs.php");
 		$exceptionfuncs = new ExceptionFuncs($get_uid, $cid, true, $stuLP, $latepasshrs);
 		$excepadata = array(
-			'id'=>$line['assessmentid'], 
+			'id'=>$line['assessmentid'],
 			'allowlate'=>$line['allowlate'],
 			'enddate'=>$line['enddate'],
 			'startdate'=>$line['startdate'],
 			'LPcutoff'=>$line['LPcutoff']
 			);
-			
+
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$get_uid, ':assessmentid'=>$line['assessmentid']));
 		$useexception = false;
@@ -720,7 +728,7 @@
 		}
 		if ($myrights == 100 && $line['lti_sourcedid']!='') {
 			echo '<p class=small>LTI sourced_id: '.Sanitize::encodeStringForDisplay($line['lti_sourcedid']).'</p>';
-		}	
+		}
 		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$asid}&update=true\">\n";
 
 		if ($isteacher) {
@@ -850,7 +858,7 @@
 		echo ' <button type="button" id="prevtoggle" onclick="previewall()">'._('Preview All').'</button></p>';
 		$total = 0;
 		$GLOBALS['capturedrawinit'] = true;
-		
+
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
 			if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
@@ -910,7 +918,7 @@
 				if ($canedit) {
 					echo " (parts: ";
 					$prts = explode(', ',$parts);
-					for ($j=0;$j<count($prts);$j++) {
+					for ($j=0;$j<count($answeights[$questions[$i]]);$j++) {
 						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"sb-$i-$j\" value=\"{$prts[$j]}\">";
 						if ($rubric[$questions[$i]]!=0) {
 							echo printrubriclink($rubric[$questions[$i]],$answeights[$questions[$i]][$j],"scorebox$i-$j","fb-$i",($i+1).' pt '.($j+1));
@@ -946,7 +954,7 @@
 					echo '<div id="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
 				}
 				echo '</span>';
-					
+
 				if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
 					echo '<div class="iscorrect isperfect">';
 				} else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
@@ -1056,7 +1064,7 @@
 					if (isset($extref[$questions[$i]])) {
 						echo "&nbsp; Had help available: ";
 						foreach ($extref[$questions[$i]] as $v) {
-							$extrefpt = explode('!!',$v);                                                                                                                                                     
+							$extrefpt = explode('!!',$v);
 							echo '<a href="'.$extrefpt[1].'" target="_blank">'.$extrefpt[0].'</a> ';
 						}
 					}
@@ -1154,7 +1162,7 @@
 
 		if (($isteacher || $istutor) && $asid!="new") {
 			echo '<div class="cpmid">';
-			echo '<a href="gb-viewasid.php?stu=$stu&asid='.$asid.'&from='.$from.'&cid='.$cid.'&uid='.$get_uid.'&links=0">';
+			echo '<a href="gb-viewasid.php?stu='.$stu.'&asid='.$asid.'&from='.$from.'&cid='.$cid.'&uid='.$get_uid.'&links=0">';
 			echo _('Show Score Details');
 			echo '</a>';
 			echo '</div>';
@@ -1383,7 +1391,7 @@ function sandboxgetweights($code,$seed) {
 		}
 	}
 	if (!isset($answeights)) {
-		if (!isset($anstypes)) { 
+		if (!isset($anstypes)) {
 			//this shouldn't happen unless the code crashed
 			return array(1);
 		}

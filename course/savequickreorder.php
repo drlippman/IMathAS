@@ -66,7 +66,8 @@
 		$sub[$existingid]['name'] = $val;
 	 }
  }
-
+ // do it again to capture block name changes
+ $newitems = additems2($order);
  $itemlist = serialize($newitems);
  $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
  $stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));

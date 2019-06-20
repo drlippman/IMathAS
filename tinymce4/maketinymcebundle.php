@@ -69,7 +69,7 @@ class TinyMCE_Compressor {
 		"expires"    => "30d",
 		"cache_dir"  => "",
 		"compress"   => true,
-		"files"      => "",
+		"files"      => "",                    
 		"source"     => true,
 	);
 
@@ -144,10 +144,12 @@ class TinyMCE_Compressor {
 		for ($i = 0; $i < count($allFiles); $i++) {
 			$file = $allFiles[$i];
 
-			if (file_exists($file . ".min.js"))  {
+			/*if (file_exists($file . ".min.js"))  {
 				$file .= ".min.js";
-			} else if ($this->settings["source"] && file_exists($file . ".js")) {
+			} else*/ if ($this->settings["source"] && file_exists($file . ".js")) {
 				$file .= ".js";
+			} else if (file_exists($file . ".min.js"))  {
+				$file .= ".min.js";
 			} else {
 				$file = "";
 			}
@@ -170,6 +172,9 @@ class TinyMCE_Compressor {
 		// Mark all themes, plugins and languages as done
 		$buffer .= 'tinymce.each("' . implode(',', $files) . '".split(","),function(f){tinymce.ScriptLoader.markDone(tinyMCE.baseURL+"/"+f+".js");});';
 
+		//now minify
+		//$buffer = minify($buffer);
+		
 		// Stream contents to client
 		file_put_contents("tinymce_bundled.js", $buffer);
 	}
@@ -187,15 +192,15 @@ class TinyMCE_Compressor {
 		if (substr($content, 0, 3) === pack("CCC", 0xef, 0xbb, 0xbf)) {
 			$content = substr($content, 3);
 		}
-		if (substr_count($content,"\n")>10 && strpos($file,'tinymce.min.js')===false) {
+		/*if (substr_count($content,"\n")>10 && strpos($file,'tinymce.min.js')===false) {
 			$content = minify($content);
 			echo "Minifying $file<br/>";
 			if (trim($content)=='') {
 				echo "Error with minification<br/>";
 			}
-		} else {
+		} else {*/
 			echo "Adding $file<br/>";
-		}
+		//}
 
 		return $content;
 	}

@@ -757,7 +757,7 @@ function gbstudisp($stu) {
 	if ($stu>0 && $isteacher) {
 		echo '<th></th>';
 	}
-	echo '<th>', _('Item'), '</th><th>', _('Possible'), '</th><th>', _('Grade'), '</th><th>', _('Percent'), '</th>';
+	echo '<th>', _('Item'), '</th><th>', _('Percent'), '</th><th>', _('Grade'), '</th><th>', _('Possible'), '</th>';
 	if ($stu>0 && $isteacher) {
 		echo '<th>', _('Time Spent (In Questions)'), '</th>';
 		$sarr = "false,'S','N','N','N','N'";
@@ -882,21 +882,18 @@ function gbstudisp($stu) {
 			}
 
 			echo '</td>';
+
 			echo '<td>';
-
-			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
-				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
-			} else {
-				echo $gbt[0][1][$i][2].'&nbsp;', _('pts');
-				if ($gbt[0][1][$i][4]==2) {
-					echo ' (EC)';
+			if (isset($gbt[1][1][$i][0]) && is_numeric($gbt[1][1][$i][0])) {
+				if ($gbt[0][1][$i][2]>0) {
+					echo round(100*$gbt[1][1][$i][0]/$gbt[0][1][$i][2],1).'%';
 				}
+			} else {
+				echo '0%';
 			}
-			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
-				echo ' (PT)';
-			}
+			echo '</td>';
 
-			echo '</td><td>';
+			echo '<td>';
 
 			$haslink = false;
 
@@ -1052,15 +1049,22 @@ function gbstudisp($stu) {
 			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
 				echo '<sub>d</sub>';
 			}
-			echo '</td><td>';
-			if (isset($gbt[1][1][$i][0]) && is_numeric($gbt[1][1][$i][0])) {
-				if ($gbt[0][1][$i][2]>0) {
-					echo round(100*$gbt[1][1][$i][0]/$gbt[0][1][$i][2],1).'%';
-				}
+			echo '</td>';
+
+			echo '<td>';
+			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
+				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
 			} else {
-				echo '0%';
+				echo $gbt[0][1][$i][2].'&nbsp;', _('pts');
+				if ($gbt[0][1][$i][4]==2) {
+					echo ' (EC)';
+				}
+			}
+			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
+				echo ' (PT)';
 			}
 			echo '</td>';
+
 			if ($stu>0 && $isteacher) {
 				if ($gbt[1][1][$i][7] > -1) {
 					echo '<td>'.$gbt[1][1][$i][7].' min ('.$gbt[1][1][$i][8].' min)</td>';
