@@ -105,10 +105,6 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     $qn => $assess_record->getQuestionObject($qn, false, true, true)
   );
 
-  //TODO: ^^ gets the html, but we also need to get all the other stuff
-  // needed by livepoll for handling of student results
-  // drawinit, choices, etc. showtest 2500
-
   //TODO: ? pull any existing results (in case we refreshed)
 
   // extract seed

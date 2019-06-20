@@ -140,7 +140,9 @@
     "fast_regen": "Hey, how about slowing down and trying the problem before hitting Try a Similar Question?  Wait 5 seconds before trying again.",
     "nochange": "Your answers have not changed since your last submission.",
     "noserver": "The site is not responding",
-    "parseerror": "Server sent an invalid response"
+    "parseerror": "Server sent an invalid response",
+    "livepoll_wrongquestion": "Submitted question is not the current question.",
+    "livepoll_notopen": "This question is not open for submissions."
   },
   "scoreresult": {
     "correct": "Correct",

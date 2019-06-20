@@ -153,7 +153,6 @@ export default {
       data.score = JSON.parse(data.score);
       data.ans = JSON.parse(data.ans);
       this.$set(store.livepollResults[this.curqn], data.user, data);
-      // TODO: update results. Hopefully will happen automatically
     },
     showHandler (data) {
       if (data.action === 'showq') {
@@ -211,7 +210,6 @@ export default {
       }
     },
     closeInput () {
-      // TODO: how do we use the global show answers setting?
       clearTimeout(this.livepollTimer);
       let nextState = this.showAnswers ? 4 : 3;
       if (store.livepollSettings.showResultsAfter) {

@@ -89,7 +89,7 @@ if (!$in_practice &&
   $assess_record->hasActiveAttempt() &&
   $assess_info->getSetting('timelimit') > 0 &&
   (($assess_info->getSetting('timelimit_type') == 'kick_out' &&
-    $now > $assess_record->getTimeLimitExpires() + 10) || // TODO: adjust
+    $now > $assess_record->getTimeLimitExpires() + 10) ||
     ($assess_info->getSetting('timelimit_type') == 'allow_overtime' &&
     $now > $assess_record->getTimeLimitGrace() + 10))
 ) {
@@ -110,10 +110,10 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $stm->execute(array(':assessmentid'=>$aid));
   $livepollStatus = $stm->fetch(PDO::FETCH_ASSOC);
   if ($livepollStatus['curquestion'] - 1 !== $qns[0]) {
-    echo '{"error": "livepoll_wrongquestion"}'; //TODO: translate this
+    echo '{"error": "livepoll_wrongquestion"}';
     exit;
   } else if ($livepollStatus['curstate'] != 2) {
-    echo '{"error": "livepoll_notopen"}';  //TODO: translate this
+    echo '{"error": "livepoll_notopen"}';
     exit;
   }
 }

@@ -551,7 +551,6 @@ export default {
   },
   created () {
     window.$(window).on('beforeunload', this.beforeUnload);
-    // TODO: Also need to run this on updated?
     if (typeof window.APIbase !== 'undefined') {
       store.APIbase = window.APIbase;
     } else {

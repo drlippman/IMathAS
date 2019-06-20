@@ -1,6 +1,14 @@
 TODOs:
   Need to revisit showhints throughout display code
   Refactor ErrorDialog to be usable in GBViewAssess
+  Test CSRFP
+
+Test:
+  Instructor preview
+  Practice mode as student
+  If teacher sets assess override, does it show in student attempt results?
+  Multipart in livepoll (update notes in scorequestion.php)
+  Overtime
 
 Bugs:
   Math in Paged Full titles not rendered
@@ -18,11 +26,11 @@ Minor TODOs:
   Make sure MQ is disabled on Print page, or just turn off
   tinymce drag handle showing when question is not active (doesn't honor visibility: hidden on parent)
   Handle "right answer wrong format"
-! Matrix syntax warning messages
   Teacher view-as-student bypassing restrictions
   Add some display of time when submission were made in GB
   Syntax error warnings: error icon w hoverover vs displaying error
   Review showanswer button stuff in HtmlGenerator (use setShowAnswerButton instead?)
+  Categories that are assessments: provide link to them in summary view
 
 Future Todos:
   Build modal for redeeming latepasses for LTI users.
@@ -52,6 +60,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Matrix syntax warning messages
 X Enter key handlers on input boxes to submit?
 X Update "Work saved" on input rather than on change.
 X Figure out file upload autosave.

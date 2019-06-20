@@ -4,8 +4,6 @@
  * (c) 2019 David Lippman
  */
 
-// TODO: calc and record assessment-level timeontask
-
 require_once(__DIR__ . '/AssessUtils.php');
 require_once(__DIR__ . '/../filter/filter.php');
 require_once(__DIR__ . '/questions/QuestionGenerator.php');
@@ -756,7 +754,7 @@ class AssessRecord
 
       $this->scoreQuestion(
           $qn,    // question number
-          0,      // time active.  TODO: record this w autosave
+          $qdata['timeactive'],      // time active
           $submission,    // submission #
           $parts_to_score
       );
@@ -1515,8 +1513,6 @@ class AssessRecord
       // figure out try #
       $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
 
-      // TODO: Rework this to use stuanswers?  Or dont even need if we Rework
-      // displayq to use stuanswers
       if ($clearans) {
         $stuanswers[$qn+1][$pn] = '';
         $stuanswersval[$qn+1][$pn] = '';
@@ -1573,31 +1569,6 @@ class AssessRecord
       }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
-
-    /*
-    // TODO: move this to displayq input
-    // TODO: pass stuanswers, stuanswersval
-    $GLOBALS['qdatafordisplayq'] = $this->assess_info->getQuestionSetData($qsettings['questionsetid']);
-    // TODO:  pass as input
-    $GLOBALS['lastanswers'] = array($qn => implode('&', $lastans));
-    $GLOBALS['lastansweights'] = array(1);
-
-    list($qout,$jsparams) = displayq(
-        $qn,                            // question number
-        $qsettings['questionsetid'],    // questionset ID
-        $qver['seed'],                  // seed
-        $showans,                       // whether to show answers
-        $qsettings['showhints'],        // whether to show hints
-        $attemptn,                      // the attempt number //TODO: make by-part
-        $partattemptn,                  // the attempt number by-part
-        true,                          // return question text rather than echo
-        $clearans,                      // whether to clear last ans //TODO: move here
-        $qcolors,                        // array of part scores for score marking
-        $stuanswers,
-        $stuanswersval
-    );
-    */
-    //TODO!!
 
     $questionParams = new QuestionParams();
     $questionParams
@@ -1687,26 +1658,6 @@ class AssessRecord
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
 
     $data = array();
-    /*
-    // TODO: move this to displayq input
-    // TODO: pass stuanswers, stuanswersval
-
-    $GLOBALS['qdatafordisplayq'] = $this->assess_info->getQuestionSetData($qsettings['questionsetid']);
-    list($scores, $rawscores) = scoreq(
-      $qn,                            // question number
-      $qsettings['questionsetid'],    // questionset ID
-      $qver['seed'],                  // seed
-      $_POST['qn'.$qn],               // the default answerbox
-      $attemptn,                      // the attempt number //TODO: make by-part
-      $qsettings['points_possible']   // points possible for the question
-    );
-
-    // TODO need better way to get student's answer and unrand and such
-    // TODO: rework this to handle singlescore questions
-    $rawparts = explode('~', $rawscores);
-    $scores = explode('~', $scores);
-    $partla = explode('&', $GLOBALS['lastanswers'][$qn]);
-    */
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers();
 
@@ -1745,7 +1696,7 @@ class AssessRecord
         $data[$k] = array(
           'sub' => $submission,
           'time' => round($timeactive/1000),
-          'stuans' => $v   // TODO: this is wrong for most types
+          'stuans' => $v  
         );
         if (isset($partlaNum[$k])) {
           $data[$k]['stuansval'] = $partlaNum[$k];
@@ -2596,7 +2547,6 @@ class AssessRecord
       if (!isset($qdata['scoreoverride'])) {
         $qdata['scoreoverride'] = array();
       }
-      // TODO: how do we handle overrides for unattempted questions?
       $qdata['scoreoverride'][$pn] = floatval($score);
     }
     if (!empty($scores) || $doRetotal) {
@@ -2816,7 +2766,7 @@ class AssessRecord
 
   /**
    * Collect the previous tries, organized by part number
-   * TODO: eliminate the displayed/current try
+   *
    * @param  array $trydata  Data from a question version 'tries' array
    * @return array
    */
