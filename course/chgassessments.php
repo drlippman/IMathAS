@@ -202,7 +202,7 @@ if (!(isset($teacherid))) {
 			}
 			if (isset($_POST['chgeqnhelper'])) {
 				$sets[] = "eqnhelper=:eqnhelper";
-				$qarr[':eqnhelper'] = Sanitize::onlyInt($_POST['eqnhelper']);	
+				$qarr[':eqnhelper'] = Sanitize::onlyInt($_POST['eqnhelper']);
 			}
 			if (isset($_POST['chgextrefs'])) {
 				$extrefs = array();
@@ -220,7 +220,7 @@ if (!(isset($teacherid))) {
 				}
 				$extrefencoded = json_encode($extrefs);
 				$sets[] = "extrefs=:extrefs";
-				$qarr[':extrefs'] = $extrefencoded;	
+				$qarr[':extrefs'] = $extrefencoded;
 
 			}
 			if (isset($_POST['chgcaltag'])) {
@@ -254,10 +254,7 @@ if (!(isset($teacherid))) {
 					$sets[] = "deffeedbacktext=''";
 				}
 			}
-			if (isset($_POST['chgreqscore'])) {
-				$sets[] = "reqscore=0";
-				$sets[] = "reqscoreaid=0";
-			}
+
 			if (isset($_POST['chgistutorial'])) {
 				if (isset($_POST['istutorial'])) {
 					$sets[] = "istutorial=1";
@@ -281,12 +278,27 @@ if (!(isset($teacherid))) {
 			}
 		}
 		if (isset($_POST['chgavail'])) {
-			$sets[] = "avail=:avail";	
+			$sets[] = "avail=:avail";
 			$qarr[':avail'] = Sanitize::onlyInt($_POST['avail']);
 		}
 		if (isset($_POST['chgreview'])) {
 			$sets[] = "reviewdate=:reviewdate";
 			$qarr[':reviewdate'] = isset($_POST['doreview'])?2000000000:0;
+		}
+		if (isset($_POST['chgreqscoreaid'])) {
+			$sets[] = "reqscore=:reqscore";
+			if ($_POST['reqscoreaid'] > 0) {
+				$qarr[':reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
+			} else {
+				$qarr[':reqscore'] = 0;
+			}
+			$sets[] = "reqscoreaid=:reqscoreaid";
+			$qarr[':reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
+			if ($_POST['reqscorecalctype']==1) {
+				$sets[] = "reqscoretype=(reqscoretype | 2)";
+			} else {
+				$sets[] = "reqscoretype=(reqscoretype & ~2)";
+			}
 		}
 		if (isset($_POST['chgreqscoretype'])) {
 			if ($_POST['reqscoretype']==0) {
@@ -317,14 +329,14 @@ if (!(isset($teacherid))) {
 			}
 			$sets[] = "LPcutoff=:LPcutoff";
 			$qarr[':LPcutoff'] = $row[3];
-		} 
-		if (isset($_POST['chgcopyendmsg'])) {	
+		}
+		if (isset($_POST['chgcopyendmsg'])) {
 			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyendmsg'])));
 			$sets[] = "endmsg=:endmsg";
 			$qarr[':endmsg'] = $stm->fetchColumn(0);
 		}
-		
+
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
 			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)");
@@ -527,13 +539,13 @@ function addextref(el) {
 	html += '<label for=newextreflabel'+newextrefcnt+'>Label:</label>';
 	html += '<input id=newextreflabel'+newextrefcnt+' name=newextreflabel'+newextrefcnt+' size=10 /> ';
 	html += '<label for=newextreflink'+newextrefcnt+'>Link:</label>';
-	html += '<input id=newextreflink'+newextrefcnt+' name=newextreflink'+newextrefcnt+' size=30 />';		
+	html += '<input id=newextreflink'+newextrefcnt+' name=newextreflink'+newextrefcnt+' size=30 />';
 	html += '<button type=button onclick="removeextref(this)">Remove</button><br/></span>';
 	newextrefcnt++;
 	$(el).before(html);
 }
 function removeextref(el) {
-	$(el).closest(".aextref").remove();	
+	$(el).closest(".aextref").remove();
 }
 function valform() {
 	if ($("#qform input:checkbox[name='checked[]']:checked").length == 0) {
@@ -559,7 +571,14 @@ $(function() {
 			$(this).parents("tr").removeClass("odd");
 		}*/
 	});
-})
+	$("#reqscoreaid").attr("aria-controls", "reqscorewrap")
+		.attr("aria-expanded", $("#reqscoreaid").val()>0)
+		.on("change", function() {
+			var rqshow = ($(this).val()>0);
+			$("#reqscorewrap").toggle(rqshow);
+			$(this).attr("aria-expanded", rqshow);
+	});
+});
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
@@ -694,7 +713,7 @@ $(function() {
 ?>
 				</td>
 			</tr>
-			
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgdisplaymethod" class="chgbox"/></td>
 				<td class="r">Display method: </td>
@@ -795,7 +814,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 
 				</td>
 			</tr>
-			
+
 			<tr class="coptr highlight">
 				<td colspan="3"><strong>Additional Display Options</strong></td>
 			</tr>
@@ -849,7 +868,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<input type="checkbox" name="istutorial"/>
 				</td>
 			</tr>
-			
+
 			<tr class="coptr highlight">
 				<td colspan="3"><strong>Time Limit and Access Control</strong></td>
 			</tr>
@@ -876,6 +895,22 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td><input type=text name="assmpassword" value="" autocomplete="off"></td>
 			</tr>
 			<tr class="coptr">
+				<td><input type="checkbox" name="chgreqscoreaid" class="chgbox"/></td>
+				<td class="r">Show based on another assessment:</td>
+				<td>
+				<?php
+					writeHtmlSelect("reqscoreaid",$page_assessSelect['val'],$page_assessSelect['label'],
+						0, "No prerequisite", 0);
+				?>
+				<span id="reqscorewrap" style="display:none">
+					with a score of <input type=text size=4 name=reqscore value="1" />
+					<?php
+						writeHtmlSelect("reqscorecalctype", array(0,1), array(_('points'), _('percent')), 0);
+					?>
+				</span>
+				</td>
+			</tr>
+			<tr class="coptr">
 				<td><input type="checkbox" name="chgreqscoretype" class="chgbox"/></td>
 				<td class="r">"Show based on another assessment" display:</td>
 				<td>
@@ -884,11 +919,6 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<option value="1">Show greyed until requirement is met</option>
 				</select>
 				</td>
-			</tr>
-			<tr class="coptr">
-				<td></td>
-				<td class="r">Clear "show based on another assessment" settings.</td>
-				<td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
 			</tr>
 			<tr class="coptr highlight">
 				<td colspan="3"><strong>Help and Hints</strong></td>
@@ -952,7 +982,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				</select>
 				</td>
 			</tr>
-			
+
 			<tr class="coptr highlight">
 				<td colspan="3"><strong>Grading and Feedback</strong></td>
 			</tr>
@@ -1007,7 +1037,7 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 
 
 
-			
+
 <?php
 /* removed because gets too confusing with group sets
 			<tr class="coptr">
@@ -1028,8 +1058,8 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 			</tr>
 */
 ?>
-			
-			
+
+
 			<tr>
 				<td></td>
 				<td class="r">Define end of assessment messages?</td>
