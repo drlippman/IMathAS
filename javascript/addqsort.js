@@ -163,7 +163,7 @@ function editorSetup(editor) {
 		var type = getTypeForSelector("#"+this.id);
 		var max_height = $("#"+this.id).css("max-height");
 		//if the editor is collapsed, expand it
-		if ( max_height !== undefined && max_height !== "none") {
+		if ( max_height !== undefined && max_height !== "none" && max_height !== "") {
 			expandAndStyleTextSegment("#textseg"+type+i) ;
 		}
 	});
@@ -311,7 +311,7 @@ function expandTextSegment(selector) {
 	// middle height and avoid race condition
 
 	//smoothly set the height to the natural height
-	$(selector).animate({height: natural_height, width: natural_width},200, function() {
+	$(selector).stop(true).animate({height: natural_height, width: natural_width},200, function() {
 
 		// when complete...
 		var i = getIndexForSelector(selector);
@@ -354,7 +354,7 @@ function collapseTextSegment(selector) {
 	$(selector).addClass("collapsingsemaphore");
 
 	//smoothly set the height to the collapsed height
-	$(selector).animate({height: collapsed_height},200, function() {
+	$(selector).stop(true).animate({height: collapsed_height},200, function() {
 
 		//when animation completes, set max-height
 		$(selector).css("max-height",collapsed_height);

@@ -100,12 +100,5 @@ export default {
 };
 </script>
 <style>
-.pane-header {
-  border-bottom: 1px solid #ccc;
-  padding: 16px 20px;
-  font-weight: bold;
-}
-.pane-body {
-  padding: 16px 20px;
-}
+
 </style>

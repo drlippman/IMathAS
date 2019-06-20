@@ -72,6 +72,7 @@
         <button
           v-if="canEdit"
           type="button"
+          class="slim"
           @click="clearAttempts('all')"
         >
           {{ $t('gradebook.clear_all') }}

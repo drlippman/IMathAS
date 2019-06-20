@@ -325,6 +325,7 @@
     "feedback": "Feedback",
     "general_feedback": "General feedback",
     "use_in_msg": "Use in Message",
+    "clear_hdr": "Delete confirmation",
     "clear_all": "Delete all attempts",
     "clear_attempt": "Delete this attempt",
     "clear_qwork": "Delete work on question",

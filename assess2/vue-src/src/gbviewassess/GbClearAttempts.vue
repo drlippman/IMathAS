@@ -1,11 +1,18 @@
 <template>
   <div
     v-if="showModal"
-    class="modalwrap"
-    @keydown.esc = "close"
+    class="dialog-overlay"
+    ref = "wrap"
   >
-    <div class="modal" role="alertdialog" aria-modal="true">
-      <div v-if="showType === 'all'">
+    <div
+      class="dialog pane-body"
+      role="alertdialog"
+      aria-modal="true"
+      :aria-label="$t('gradebook.clear_hdr')"
+      aria-describedby="clearoptions"
+      tabindex="-1"
+    >
+      <div v-if="showType === 'all'" class="clearoptions">
         <p>
           <label>
             <input type="radio" value="0" v-model="type">
@@ -19,7 +26,7 @@
           </label>
         </p>
       </div>
-      <div v-else-if="showType === 'attempt'">
+      <div v-else-if="showType === 'attempt'" class="clearoptions">
         <p>
           <label>
             <input type="radio" value="0" v-model="type">
@@ -33,7 +40,7 @@
           </label>
         </p>
       </div>
-      <div v-else-if="showType === 'qver'">
+      <div v-else-if="showType === 'qver'" class="clearoptions">
         <p v-if="isByQuestion">
           <label>
             <input type="radio" value="0" v-model="type">
@@ -70,15 +77,14 @@
 
 <script>
 import { store, actions } from './gbstore';
-
-// TODO: Need to trap tab focus inside dialog
-// TODO: Need to set focus in modal on opening
+import '../components/a11y-dialog';
 
 export default {
   name: 'GbClearAttempts',
   data: function () {
     return {
-      type: 0
+      type: 0,
+      dialog: null
     };
   },
   computed: {
@@ -106,6 +112,8 @@ export default {
   methods: {
     close () {
       store.clearAttempts.show = false;
+      window.$(document).off('keyup.dialog');
+      this.dialog.destroy();
     },
     doAction () {
       actions.clearAttempt(this.type);
@@ -113,31 +121,18 @@ export default {
   },
   updated () {
     if (store.clearAttempts.show) {
-      window.$('.modal').find('input').focus();
+      window.$(document).on('keyup.dialog', (event) => {
+        if (event.key === 'Escape') {
+          this.close();
+        }
+      });
+      this.dialog = new A11yDialog(this.$refs.wrap);
+      this.dialog.show();
     }
   }
 };
 </script>
 
 <style>
-.modalwrap {
-  position: fixed;
-  display: flex;
-  align-items: center;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, .5);
-  transition: opacity .3s ease;
-}
-.modal {
-  width: 300px;
-  margin: auto;
-  background-color: #fff;
-  padding: 12px;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-}
+
 </style>

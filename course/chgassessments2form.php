@@ -178,12 +178,12 @@ $vueData = array(
 		</div>
 		<div class="blockitems">
 			<div :class="{highlight:displaymethod !== 'DNC'}">
-				<label class=form for="displaymethod">Display method:</label>
+				<label class=form for="displaymethod">Display style:</label>
 				<span class=formright>
 					<select name="displaymethod" id="displaymethod" v-model="displaymethod">
 						<option value="DNC">Do not change</option>
-						<option value="skip">Skip Around</option>
-						<option value="full">Full Test</option>
+						<option value="skip">One question at a time</option>
+						<option value="full">All questions at once, or in pages</option>
 						<option value="video_cued">Video Cued</option>
 						<?php if (isset($CFG['GEN']['livepollserver'])) {
 							echo '<option value="livepoll">Live Poll</option>';

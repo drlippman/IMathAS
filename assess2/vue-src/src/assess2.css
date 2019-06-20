@@ -271,18 +271,7 @@ input[type=radio], input[type=checkbox] {
 .subdued {
   color: #757575;
 }
-.flexrow {
-  display: flex;
-  flex-flow: row nowrap;
-}
-.flexrow.wrap {
-  flex-flow: row wrap;
-}
-.flexgroup {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-}
+
 .scrollpane {
   width: 100%;
   overflow-x: auto;

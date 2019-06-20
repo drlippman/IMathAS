@@ -34,14 +34,7 @@ export default {
   margin: 0;
   min-width: 160px;
 }
-.pane-header {
-  border-bottom: 1px solid #ccc;
-  padding: 16px 20px;
-  font-weight: bold;
-}
-.pane-body {
-  padding: 16px 20px;
-}
+
 #resource-list {
   list-style-type: none;
   margin: 0;

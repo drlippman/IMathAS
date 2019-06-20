@@ -312,10 +312,8 @@
 			if ($row[5]=='essay' || $row[5]=='file') {
 				$needmanualgrade[$row[1]] = true;
 			} else if ($row[5]=='multipart') {
-				if (preg_match('/anstypes.*?(".*?"|array\(.*?\))/',$row[6],$matches)) {
-					if (strpos($matches[1],'essay')!==false || strpos($matches[1],'file')!==false) {
-						$needmanualgrade[$row[1]] = true;
-					}
+				if (preg_match('/anstypes.*?(essay|file)/', $row[6])) {
+					$needmanualgrade[$row[1]] = true;
 				}
 			}
 			if ($row[8]!='' && ($row[7]==2 || ($row[7]==0 && $showhints==1))) {

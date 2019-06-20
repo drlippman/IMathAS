@@ -77,7 +77,8 @@ $vueData = array(
 	'reqscorecalctype' => ($line['reqscoretype']&2) > 0 ? 1 : 0,
 	'reqscoreaid' => $line['reqscoreaid'],
 	'reqscoreOptions' => $otherAssessments,
-	'taken' => $taken
+	'taken' => $taken,
+	'showDisplayDialog' => false
 );
 
 // skipmathrender class is needed to prevent katex parser from mangling
@@ -184,16 +185,17 @@ $vueData = array(
 			Core Options
 		</div>
 		<div class="blockitems">
-			<label class=form for="displaymethod">Display method:</label>
+			<label class=form for="displaymethod">Display style:</label>
 			<span class=formright>
 				<select name="displaymethod" id=displaymethod v-model="displaymethod">
-					<option value="skip">Skip Around</option>
-					<option value="full">Full Test</option>
+					<option value="skip">One question at a time</option>
+					<option value="full">All questions at once, or in pages</option>
 					<option value="video_cued">Video Cued</option>
 					<?php if (isset($CFG['GEN']['livepollserver'])) {
 						echo '<option value="livepoll">Live Poll</option>';
 					}?>
 				</select>
+				<a href="#" id="dispdetails" @click.prevent="doShowDisplayDialog">Details</a>
 			</span><br class=form />
 
 			<label class="form" for="subtype">Submission type:</label>
@@ -662,6 +664,46 @@ $vueData = array(
 		</div>
 
 	</fieldset>
+	<div v-if="showDisplayDialog" class="fullwrap">
+		<div class="dialog-overlay">
+			<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialoghdr">
+	      <div class="pane-header flexrow">
+	        <div style="flex-grow: 1" id="dialoghdr">
+	          Display Styles
+	        </div>
+	        <button
+	          type = "button"
+	          class = "plain slim"
+	          aria-label = "Close"
+	          @click = "closeDisplayDialog"
+						@keydown.tab.prevent
+	        >
+	          X
+	        </button>
+	      </div>
+	      <div class="pane-body">
+					<p><strong>One question at a time</strong>: Students will
+						see one question at a time, and can jump between them in any order</p>
+					<p><strong>All questions at once, or in pages</strong>: In this style,
+						students will typically see all the questions on the screen at once.
+						If desired, you can break the questions into pages on the Add/Remove
+						Questions page by clicking the +Text button and selecting the New Page
+						option.</p>
+					<p><strong>Video Cued</strong>: In this style, the questions pop up
+						automatically at specified times while watching a YouTube video. On the
+						Add/Remove Questions page, after adding the questions to the assessment,
+						click Define Video Cues to specify the video and times to display the
+						questions.</p>
+					<?php if (isset($CFG['GEN']['livepollserver'])) { ?>
+					<p><strong>LivePoll</strong>: This is a clicker-style display, requiring
+						students to be in the assessment at the same time as the teacher. The
+						teacher opens a question for students to answer, and results can be
+						viewed live as they are submitted.</p>
+					<?php } ?>
+	      </div>
+			</div>
+    </div>
+	</div>
 </div>
 <script type="text/javascript">
 var app = new Vue({
@@ -894,6 +936,22 @@ var app = new Vue({
 		addExtref() {
 			this.extrefs.push({'label':'', 'link':''});
 			this.extrefs = this.extrefs.slice();
+		},
+		doShowDisplayDialog() {
+			this.showDisplayDialog = true;
+			this.$nextTick(function() {
+				$(".dialog .pane-header button").focus();
+			});
+			var self = this;
+			$(document).on('keyup', function(e) {
+				if (e.key == 'Escape') {
+					self.closeDisplayDialog();
+				}
+			})
+		},
+		closeDisplayDialog() {
+			this.showDisplayDialog = false;
+			$("#dispdetails").focus();
 		}
 	}
 });
