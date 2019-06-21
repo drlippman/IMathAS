@@ -194,7 +194,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  submitAssessment() {
+  submitAssessment () {
     if (confirm(i18n.t('header.confirm_assess_submit'))) {
       if (store.assessInfo.submitby === 'by_assessment') {
         let qAttempted = 0;

@@ -43,7 +43,7 @@ export default {
   data: function () {
     return {
       dialog: null
-    }
+    };
   },
   components: {
     Icons
@@ -67,10 +67,10 @@ export default {
         this.clearError();
       }
     });
-    this.dialog = new A11yDialog(this.$refs.wrap);
+    this.dialog = new window.A11yDialog(this.$refs.wrap);
     this.dialog.show();
   },
-  beforeDestroy() {
+  beforeDestroy () {
     window.$(document).off('keyup.dialog');
     this.dialog.destroy();
   }

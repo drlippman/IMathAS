@@ -126,7 +126,7 @@ export default {
           this.close();
         }
       });
-      this.dialog = new A11yDialog(this.$refs.wrap);
+      this.dialog = new window.A11yDialog(this.$refs.wrap);
       this.dialog.show();
     }
   }

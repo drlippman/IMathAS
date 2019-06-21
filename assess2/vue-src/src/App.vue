@@ -63,7 +63,7 @@ export default {
         return this.$t('unload.unsubmitted_assessment');
       }
     },
-    clearError() {
+    clearError () {
       store.errorMsg = null;
     }
   },
