@@ -44,7 +44,13 @@ class AssessUtils
   public static function checkPotentialGroupMembers($potential_group_members, $groupsetid) {
     global $DBH;
     if (!is_array($potential_group_members)) {
+      if ($potential_group_members == '') {
+        return array();
+      }
       $potential_group_members = explode(',', $potential_group_members);
+    }
+    if (count($potential_group_members) == 0) {
+      return array();
     }
     $ph = Sanitize::generateQueryPlaceholders($potential_group_members);
 

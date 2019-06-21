@@ -160,7 +160,7 @@
 		if ($aver == 1) {
 			$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 		} else {
-			$stm = $DBH->prepare("SELECT userid,score,scoredata FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+			$stm = $DBH->prepare("SELECT userid,score,scoreddata FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 		}
 		$stm->execute(array(':assessmentid'=>$assesssnapaid));
 		while($row = $stm->fetch(PDO::FETCH_NUM)) {

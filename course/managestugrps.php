@@ -163,7 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					//if no asid exists already, but the students we're adding have one, use one (which?) of theirs
 					//otherwise do nothing
 					if ($aver>1) {
-						$fieldstocopy = 'assessmentid,agroupid,timeontask,startime,lastchange,score,status,scoredata,practicedata,ver';
+						$fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
 						$rowgrptest = '';
 						$query = "SELECT $fieldstocopy ";
 						$query .= "FROM imas_assessment_records WHERE agroupid=:agroupid AND assessmentid=:assessmentid";

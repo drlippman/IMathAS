@@ -92,7 +92,11 @@ if (!$canViewAll &&
   // get current group and members
   list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
   $current_members = array_keys($current_members); // we just want the user IDs
-  $potential_group_members = explode(',', $_POST['new_group_members']);
+  if (trim($_POST['new_group_members']) == '') {
+    $potential_group_members = array();
+  } else {
+    $potential_group_members = explode(',', $_POST['new_group_members']);
+  }
   $available_new_members = AssessUtils::checkPotentialGroupMembers($potential_group_members, $groupsetid);
 
   if ($stugroupid == 0) {
@@ -103,6 +107,7 @@ if (!$canViewAll &&
 
     $available_new_members[] = $uid;
   }
+
   // see if we are starting a new group or adding to existing one.
   // need to check that the user wasn't added to another group since initial launch
   // in which case we won't add the group members
@@ -117,9 +122,29 @@ if (!$canViewAll &&
     $query = 'INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ';
     $query .= implode(',', $vals);
     $stm = $DBH->prepare($query);
+
     $stm->execute($qarr);
   }
   $current_members = array_merge($current_members, $available_new_members);
+
+  // if we already have an assess record, need to copy it to new group members
+  if ($assess_record->hasRecord()) {
+    // get current record
+    $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
+    $query = "SELECT $fieldstocopy FROM ";
+    $query .= "imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid";
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
+    $rowgrpdata = $stm->fetch(PDO::FETCH_NUM);
+    // now copy it to others
+    $ph = Sanitize::generateQueryPlaceholders($rowgrpdata);
+    $query = "REPLACE INTO imas_assessment_records (userid,$fieldstocopy) ";
+    $query .= "VALUES (?,$ph)";
+    $stm = $DBH->prepare($query);
+    foreach ($available_new_members as $gm_uid) {
+      $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
+    }
+  }
 }
 
 // if there is no active assessment record, time to create one

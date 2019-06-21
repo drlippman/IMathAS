@@ -448,9 +448,9 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 	$tomaybedel = [];
 	$tolookupaid = [];
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$scoredata = gzdecode($row['scoreddata']);
+		$scoreddata = gzdecode($row['scoreddata']);
 		$practicedata = $row['practicedata']==''?'':gzdecode($row['practicedata']);
-		preg_match_all('/@FILE:(.+?)@/', $scoredata.$practicedata, $matches);
+		preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $matches);
 		foreach ($matches[1] as $file) {
 			// if it's a group asssess, we'll look to see if anyone else is using
 			// the same file later
@@ -473,13 +473,13 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 		// look up other assessment records for same assessment but other students
 		// Remove any tomaybedel files that are used elsewhere
 		$aidlist2 = implode(',', $tolookupaid);
-		$query = "SELECT assessmentid,scoredata,practicedata FROM imas_assessment_records ";
+		$query = "SELECT assessmentid,scoreddata,practicedata FROM imas_assessment_records ";
 		$query .= "WHERE assessmentid IN ($aidlist2) AND userid NOT IN ($userlist)";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$scoredata = gzdecode($row['scoredata']);
+			$scoreddata = gzdecode($row['scoreddata']);
 			$practicedata = gzdecode($row['practicedata']);
-			preg_match_all('/@FILE:(.+?)@/', $scoredata.$practicedata, $exmatch);
+			preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $exmatch);
 			//remove from tolookup list all files found in other sessions
 			$tomaybedel = array_diff($tomaybedel, $exmatch[1]);
 			if (count($tomaybedel)===0) {
