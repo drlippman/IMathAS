@@ -6,7 +6,11 @@
 
     <router-view v-if="assessInfoLoaded"/>
 
-    <error-dialog v-if="hasError" />
+    <error-dialog
+      v-if="hasError"
+      :errormsg="errorMsg"
+      @clearerror="clearError"
+    />
   </div>
 </template>
 
@@ -25,6 +29,9 @@ export default {
     },
     hasError () {
       return (store.errorMsg !== null);
+    },
+    errorMsg () {
+      return store.errorMsg;
     },
     assessName () {
       return store.assessInfo.name;
@@ -55,6 +62,9 @@ export default {
         evt.preventDefault();
         return this.$t('unload.unsubmitted_assessment');
       }
+    },
+    clearError() {
+      store.errorMsg = null;
     }
   },
   created () {

@@ -256,6 +256,11 @@
         <div style="margin-bottom:100px"></div>
       </div>
     </div>
+    <error-dialog
+      v-if="hasError"
+      :errormsg="errorMsg"
+      @clearerror="clearError"
+    />
   </div>
 </template>
 
@@ -267,8 +272,8 @@ import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
+import ErrorDialog from '@/components/ErrorDialog.vue';
 import '../assess2.css';
-// import ErrorDialog from '@/components/ErrorDialog.vue';
 
 export default {
   components: {
@@ -434,6 +439,9 @@ export default {
     },
     hasError () {
       return (store.errorMsg !== null);
+    },
+    errorMsg () {
+      return store.errorMsg;
     }
   },
   methods: {
@@ -530,7 +538,7 @@ export default {
     },
     makeException () {
       let url = store.APIbase + '../course/exception.php';
-      url += '?cid=' + store.cid + '&aid=' + store.aid + '&uid' + store.uid;
+      url += '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
       url += '&from=gb';
       window.location = url;
     },
@@ -547,6 +555,9 @@ export default {
         evt.returnValue = 'You have unsaved changes';
         return 'You have unsaved changes';
       }
+    },
+    clearError() {
+      store.errorMsg = null;
     }
   },
   created () {

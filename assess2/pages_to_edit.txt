@@ -1,6 +1,6 @@
 TODOs:
   Need to revisit showhints throughout display code
-  Refactor ErrorDialog to be usable in GBViewAssess
+
 
 Test:
   Instructor preview
@@ -8,6 +8,7 @@ Test:
   If teacher sets assess override, does it show in student attempt results?
   Multipart in livepoll (update notes in scorequestion.php)
   Overtime
+  hinttext, hints, etc.
 
 Bugs:
   Math in Paged Full titles not rendered
@@ -59,6 +60,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Refactor ErrorDialog to be usable in GBViewAssess
 X Matrix syntax warning messages
 X Enter key handlers on input boxes to submit?
 X Update "Work saved" on input rather than on change.

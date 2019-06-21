@@ -34,12 +34,12 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
 import Icons from '@/components/widgets/Icons.vue';
 import './a11y-dialog';
 
 export default {
   name: 'ErrorDialog',
+  props: ['errormsg'],
   data: function () {
     return {
       dialog: null
@@ -50,15 +50,15 @@ export default {
   },
   computed: {
     errorMsg () {
-      return this.$t('error.' + store.errorMsg);
+      return this.$t('error.' + this.errormsg);
     }
   },
   methods: {
     clearError () {
-      if (store.errorMsg === 'no_session') {
+      if (this.errormsg === 'no_session') {
         window.location.reload();
       }
-      store.errorMsg = null;
+      this.$emit('clearerror');
     }
   },
   mounted () {
