@@ -100,6 +100,14 @@
 		$scoredata[$line['agroupid']] = $line;
 	}
 
+	if ($aver>1) {
+		if (!empty($CFG['assess2-use-vue-dev'])) {
+			$assessGbUrl = "http://localhost:8080/gbviewassess.html?";
+		} else {
+			$assessGbUrl = "../assess2/gbviewassess.php?";
+		}
+	}
+
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 
 	echo "<table id=myTable class=gb><thead><tr><th>Group</th>";
@@ -162,27 +170,51 @@
 		}
 
 		if ($line['starttime']==null) {
-			$querymap = array(
-				'gbmode' => $gbmode,
-				'cid' => $cid,
-				'asid' => 'new',
-				'uid' => $line['userid'],
-				'from' => 'gisolate',
-				'aid' => $aid
-			);
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'gisolate',
+					'aid' => $aid
+				);
 
-			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+			} else {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'asid' => 'new',
+					'uid' => $line['userid'],
+					'from' => 'gisolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+			}
 		} else {
-			$querymap = array(
-                'gbmode' => $gbmode,
-                'cid' => $cid,
-                'asid' => $line['id'],
-                'uid' => $line['userid'],
-                'from' => 'gisolate',
-				'aid' => $aid
-			);
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'gisolate',
+					'aid' => $aid
+				);
 
-      echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			} else {
+				$querymap = array(
+	                'gbmode' => $gbmode,
+	                'cid' => $cid,
+	                'asid' => $line['id'],
+	                'uid' => $line['userid'],
+	                'from' => 'gisolate',
+					'aid' => $aid
+				);
+
+	      echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			}
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(NC)";

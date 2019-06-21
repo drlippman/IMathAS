@@ -136,6 +136,7 @@
     "need_group": "Cannot start the assessment until you have been added to a group",
     "out_of_attempts": "You have used all your assessment attempts",
     "already_submitted": "Submission rejected. You have submitted this assessment elsewhere since it was displayed here, so the question(s) you were trying to submit may be out of date.",
+    "no_active_attempt": "You do not have an active attempt",
     "no_session": "Your login session expired. To continue you will need to log in again.",
     "fast_regen": "Hey, how about slowing down and trying the problem before hitting Try a Similar Question?  Wait 5 seconds before trying again.",
     "nochange": "Your answers have not changed since your last submission.",

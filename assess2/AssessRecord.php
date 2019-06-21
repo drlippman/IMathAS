@@ -494,6 +494,7 @@ class AssessRecord
       return false;
     }
     $submitby = $this->assess_info->getSetting('submitby');
+
     if ($this->is_practice) {
       if ($active) {
         $this->assessRecord['status'] |= 16;
@@ -1696,7 +1697,7 @@ class AssessRecord
         $data[$k] = array(
           'sub' => $submission,
           'time' => round($timeactive/1000),
-          'stuans' => $v  
+          'stuans' => $v
         );
         if (isset($partlaNum[$k])) {
           $data[$k]['stuansval'] = $partlaNum[$k];
@@ -2715,6 +2716,9 @@ class AssessRecord
    * @return void
    */
   private function updateStatus() {
+    if ($this->is_practice) {
+      return;
+    }
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $outOfAttempts = false;
     if ($by_question) {

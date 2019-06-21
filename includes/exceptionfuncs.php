@@ -74,7 +74,7 @@ class ExceptionFuncs {
 		if (!$this->isstu) {
 			return;
 		}
-		$stm = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND (type='gbviewasid' OR type='assessreview')");
+		$stm = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')");
 		$stm->execute(array(':courseid'=>$this->cid, ':userid'=>$this->uid));
 		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 			$this->viewedassess[] = $r[0];

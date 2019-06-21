@@ -148,7 +148,7 @@ if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
     //if can add group members, get available people
     $query = 'SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu ';
     $query .= 'JOIN imas_students AS istu ON istu.userid=iu.id AND istu.courseid=? ';
-    $query .= 'WHERE iu.id NOT IN (SELECT isgm.id FROM imas_stugroupmembers AS isgm ';
+    $query .= 'WHERE iu.id NOT IN (SELECT isgm.userid FROM imas_stugroupmembers AS isgm ';
     $query .= 'JOIN imas_stugroups as isg ON isg.id=isgm.stugroupid AND ';
     $query .= 'isg.groupsetid=?) AND iu.id<>? ORDER BY iu.FirstName, iu.LastName';
     $stm = $DBH->prepare($query);

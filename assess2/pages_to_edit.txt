@@ -1,7 +1,5 @@
 TODOs:
   Need to revisit showhints throughout display code
-
-
 Test:
   Instructor preview
   Practice mode as student
@@ -13,6 +11,10 @@ Test:
 Bugs:
   Math in Paged Full titles not rendered
     Can't figure out how to fix this
+  Group select option on addassess2 not defaulting to create new
+  ! Adding new member to group should copy the assessment
+  Gradebook: override of 0 not saving
+
 
 To discuss:
 

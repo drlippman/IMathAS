@@ -91,15 +91,15 @@ if (!$canViewAll &&
   $groupsetid = $assess_info->getSetting('groupsetid');
   // get current group and members
   list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
-
+  $current_members = array_keys($current_members); // we just want the user IDs
   $potential_group_members = explode(',', $_POST['new_group_members']);
   $available_new_members = AssessUtils::checkPotentialGroupMembers($potential_group_members, $groupsetid);
 
   if ($stugroupid == 0) {
     // need to create a new stugroup for user and group
-    $stm = $this->DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',?)");
+    $stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',?)");
 		$stm->execute(array($groupsetid));
-    $stugroupid = $this->DBH->lastInsertId();
+    $stugroupid = $DBH->lastInsertId();
 
     $available_new_members[] = $uid;
   }
@@ -116,7 +116,7 @@ if (!$canViewAll &&
     }
     $query = 'INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ';
     $query .= implode(',', $vals);
-    $stm = $this->DBH->prepare($query);
+    $stm = $DBH->prepare($query);
     $stm->execute($qarr);
   }
   $current_members = array_merge($current_members, $available_new_members);
@@ -127,7 +127,9 @@ if (!$assess_record->hasRecord()) {
   // if it's a user-created group, we've already gotten group members above
   // Handle pre-created group case
   if (!$canViewAll && $assess_info->getSetting('isgroup') == 3) {
+    $groupsetid = $assess_info->getSetting('groupsetid');
     list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
+    $current_members = array_keys($current_members); // we just want the user IDs
     if ($stugroupid == 0) {
       // no group yet - can't do anything
       echo '{"error": "need_group"}';

@@ -27,7 +27,7 @@ class AssessUtils
     $stugroupid = 0;
     $stm->execute(array($groupsetid, $userid));
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-      $users[$row['id']] = array($row['FirstName'], $row['LastName']);
+      $users[$row['id']] = $row['FirstName'] . ' ' . $row['LastName'];
       $stugroupid = $row['stugroupid'];
     }
     return array($stugroupid, $users);
@@ -56,7 +56,7 @@ class AssessUtils
     $stm->execute(array_merge(array($groupsetid), $potential_group_members));
     $in_group = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 
-    return array_keys(array_diff($potential_group_members, $in_group));
+    return array_values(array_diff($potential_group_members, $in_group));
   }
 
   /**
@@ -100,7 +100,7 @@ class AssessUtils
     $users = array();
     $stm->execute(array($groupid));
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-      $users[$row['id']] = array($row['FirstName'], $row['LastName']);
+      $users[$row['id']] = $row['FirstName'] . ' ' . $row['LastName'];
     }
     return $users;
   }

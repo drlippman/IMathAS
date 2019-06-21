@@ -81,8 +81,6 @@ $include_from_assess_info = array(
   'showscores', 'timelimit', 'points_possible'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
-//get attempt info
-$assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 
 // grab all questions settings and scores, based on end-of-assessment settings
 $assess_info->loadQuestionSettings('all', false);
@@ -92,6 +90,7 @@ $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores,
 $assessInfoOut['score'] = $assess_record->getAttemptScore();
 $totalScore = $assessInfoOut['score'];
 $assessInfoOut['has_active_attempt'] = false;
+$assessInfoOut['has_unsubmitted_scored'] = false;
 
 //get prev attempt info
 if ($assessInfoOut['submitby'] == 'by_assessment') {

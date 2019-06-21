@@ -217,6 +217,13 @@
 		echo "<th>Due Date</th>";
 	}
 	echo "<th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
+
+	if (!empty($CFG['assess2-use-vue-dev'])) {
+		$assessGbUrl = "http://localhost:8080/gbviewassess.html?";
+	} else {
+		$assessGbUrl = "../assess2/gbviewassess.php?";
+	}
+
 	$now = time();
 	$lc = 1;
 	$n = 0;
@@ -287,7 +294,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
 			} else {
 				$querymap = array(
 					'gbmode' => $gbmode,
@@ -325,7 +332,7 @@
 					'aid' => $aid
 				);
 
-				echo '<td><a href="gb-viewasid2.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">';
 			} else {
 				$querymap = array(
 					'gbmode' => $gbmode,

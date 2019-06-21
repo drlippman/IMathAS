@@ -300,7 +300,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     //is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
     //if so, cannot handle
     $updategroupset='';
-    if (isset($_GET['id']) && $isgroup>0 && $groupsetid>0) {
+    if (isset($_GET['id']) && $toset['isgroup']>0 && $toset['groupsetid']>0) {
       $isok = true;
       $stm = $DBH->prepare("SELECT isgroup FROM imas_assessments WHERE id=:id");
       $stm->execute(array(':id'=>$assessmentId));
@@ -316,7 +316,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             exit;
         }
       }
-      $updategroupset = Sanitize::onlyInt($groupsetid);
+      $updategroupset = $toset['groupsetid'];
     }
 
     if ($toset['isgroup']>0 && isset($_POST['groupsetid']) && $toset['groupsetid']==0) {
@@ -332,7 +332,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$_GET['id']));
 			$curassess = $stm->fetch(PDO::FETCH_ASSOC);
 
-      if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
+      if ($toset['isgroup']==0) { //set agroupid=0 if switching from groups to not groups
         if ($curassess['isgroup']>0) {
           $stm = $DBH->prepare("UPDATE imas_assessment_records SET agroupid=0 WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
