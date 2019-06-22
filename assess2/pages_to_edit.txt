@@ -1,5 +1,10 @@
 TODOs:
   Need to revisit showhints throughout display code
+  Set up aria-regions, maybe skip-nav link
+  Look at aria-live for questions region ?
+  between-question text no left margin, maybe in colored box w/padding
+    always show
+
 Test:
   Instructor preview
   Practice mode as student
@@ -11,9 +16,9 @@ Test:
 Bugs:
   Math in Paged Full titles not rendered
     Can't figure out how to fix this
-  Group select option on addassess2 not defaulting to create new
-  ! Adding new member to group should copy the assessment
-  Gradebook: override of 0 not saving
+  Gradebook: override of non-attempted can't be changed to 0
+  Course page: Change review mode to practice mode
+  Get HTML entities to render in paged nav
 
 
 To discuss:

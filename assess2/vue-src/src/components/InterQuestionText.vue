@@ -1,31 +1,36 @@
 <template>
-  <div :class="{'interqtext': true, 'right': !expanded}" ref="main">
-    <button
-      type = "button"
-      :class = "{plain: true, floatright: expanded, togglebtn: true}"
-      :aria-label = "expanded ? $t('text.hide') : $t('text.show')"
-      :aria-expanded = "expanded ? 'true' : 'false'"
-      @click = "expanded = !expanded"
-    >
-      <icons v-if="expanded" name="close" />
-      <span v-else>{{ $t('text.show') }}</span>
-    </button>
-    <div v-show="expanded" v-html="textobj.html" />
-  </div>
+  <div v-show="expanded" v-html="textobj.html" />
+
 </template>
 
 <script>
-import Icons from '@/components/widgets/Icons.vue';
+/* hidable version:
+
+<div :class="{'interqtext': true, 'right': !expanded}" ref="main">
+  <button
+    type = "button"
+    :class = "{plain: true, floatright: expanded, togglebtn: true}"
+    :aria-label = "expanded ? $t('text.hide') : $t('text.show')"
+    :aria-expanded = "expanded ? 'true' : 'false'"
+    @click = "expanded = !expanded"
+  >
+    <icons v-if="expanded" name="close" />
+    <span v-else>{{ $t('text.show') }}</span>
+  </button>
+
+</div>
+*/
+//import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'InterQuestionText',
   props: ['textobj', 'active'],
   components: {
-    Icons
+    //Icons
   },
   data: function () {
     return {
-      expanded: false,
+      expanded: true, //false,
       rendered: false
     };
   },
@@ -42,7 +47,7 @@ export default {
     }
   },
   mounted () {
-    this.expanded = this.textobj.expanded;
+    //this.expanded = this.textobj.expanded;
     if (this.active && this.expanded) {
       this.renderMath();
     }
