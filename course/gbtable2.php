@@ -1334,6 +1334,7 @@ function gbtable() {
 		} else	if (($l['status']&4)>0) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 3;  //over time
+			$countthisone =true;
 		} else { //regular score available to students
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 0;  //no other info

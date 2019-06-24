@@ -2721,10 +2721,16 @@ class AssessRecord
     }
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $outOfAttempts = false;
+    $overtime = false;
     if ($by_question) {
       // check if there are unattempted questions
       $allQattempted = true;
       $curAver = $this->data['assess_versions'][0];
+      if (!empty($curAver['timelimit_end'])) {
+        if ($curAver['lastchange'] > $curAver['timelimit_end'] + 10) {
+          $overtime = true;
+        }
+      }
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
         for ($qv = 0; $qv < count($curAver['questions'][$qn]['question_versions']); $qv++) {
           $curQver = $curAver['questions'][$qn]['question_versions'][$qv];
@@ -2751,6 +2757,13 @@ class AssessRecord
       }
       $hasSubmitted = false;
       for ($av=0; $av < count($this->data['assess_versions']); $av++) {
+        if (!empty($this->data['assess_versions'][$av]['timelimit_end'])) {
+          if ($this->data['assess_versions'][$av]['lastchange'] >
+            $this->data['assess_versions'][$av]['timelimit_end'] + 10
+          ) {
+            $overtime = true;
+          }
+        }
         if ($this->data['assess_versions'][$av]['status'] == 1) {
           $hasSubmitted = true;
         }
@@ -2765,6 +2778,11 @@ class AssessRecord
       $this->assessRecord['status'] |= 32;
     } else {
       $this->assessRecord['status'] = $this->assessRecord['status'] & ~32;
+    }
+    if ($overtime) {
+      $this->assessRecord['status'] |= 4;
+    } else {
+      $this->assessRecord['status'] = $this->assessRecord['status'] & ~4;
     }
   }
 

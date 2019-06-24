@@ -12,11 +12,8 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  Math in Paged Full titles not rendered
-    Can't figure out how to fix this
-  Gradebook: override of non-attempted can't be changed to 0
-
-
+  Overtime penalty should be applied by-part - current ignored for multipart
+  Not marked as overtime
 
 To discuss:
 
@@ -35,6 +32,7 @@ Minor TODOs:
   Syntax error warnings: error icon w hoverover vs displaying error
   Review showanswer button stuff in HtmlGenerator (use setShowAnswerButton instead?)
   Categories that are assessments: provide link to them in summary view
+  Math in Paged Full titles not rendered
 
 Future Todos:
   Build modal for redeeming latepasses for LTI users.
@@ -65,6 +63,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Gradebook: override of non-attempted can't be changed to 0
 X Course page: Change review mode to practice mode
 X Get HTML entities to render in paged nav
 X Skip header: add score info to right icon group

@@ -287,7 +287,8 @@ export default {
   },
   methods: {
     updateScore (pn, evt) {
-      actions.setScoreOverride(this.qn, pn, this.curScores[pn] / this.partPoss[pn]);
+      let partposs = this.qdata.points_possible * this.answeights[pn];
+      actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
     },
     updateFeedback (evt) {
       let content;
