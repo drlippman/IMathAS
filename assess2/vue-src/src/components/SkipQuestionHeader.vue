@@ -1,6 +1,8 @@
 <template>
   <div id="skip-question-header">
-    <div style="flex-grow: 1" id="skip-question-select">
+    <div style="flex-grow: 1" id="skip-question-select"
+      role="navigation" :aria-label="$t('regions.qnav')"
+    >
         <menu-button id="qnav"
           :options = "navOptions"
           :selected = "curOption"

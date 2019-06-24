@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" role="main" aria-live="polite">
     <div v-if="!assessInfoLoaded">
       {{ $t('loading') }}
     </div>

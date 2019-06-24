@@ -1,5 +1,7 @@
 <template>
-  <div :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}">
+  <div :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
+    role="region" :aria-label="$t('regions.aheader')"
+  >
     <div style="flex-grow: 1">
       <h1>{{ ainfo.name }}</h1>
       <div>

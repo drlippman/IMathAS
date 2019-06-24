@@ -1,5 +1,5 @@
 <template>
-  <div class="subheader">
+  <div class="subheader" role="navigation" :aria-label="$t('regions.qvidnav')">
     <menu-button id="qnav"
       :options = "navOptions"
       :selected = "curOption"

@@ -40,7 +40,7 @@
         {{ $t('question_n', { n: curqn+1 }) }}
       </h2>
     </div>
-    <div class="scrollpane">
+    <div class="scrollpane" :aria-label="$t('regions.questions')">
       <livepoll-settings
         class = "questionpane"
         v-if = "isTeacher && (curstate === 0 || curqn === -1)"

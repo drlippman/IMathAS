@@ -2,7 +2,7 @@
   <div class="home">
     <assess-header />
     <full-paged-nav :page="page" />
-    <div class="scrollpane">
+    <div class="scrollpane" role="region" :aria-label="$t('regions.questions')">
       <div
         class = "questionpane introtext"
         v-show = "page === 0 && intro !== ''"

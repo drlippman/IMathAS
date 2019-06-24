@@ -14,7 +14,7 @@
         @jumpto="jumpTo"
       />
     </videocued-nav>
-    <div class="scrollpane">
+    <div class="scrollpane" role="region" :aria-label="$t('regions.q_and_vid')">
       <div
         class = "questionpane introtext"
         v-show = "cue == -1"

@@ -1,14 +1,11 @@
 TODOs:
   Need to revisit showhints throughout display code
-  Set up aria-regions, maybe skip-nav link
-  Look at aria-live for questions region ?
 
 Test:
   Instructor preview
   Practice mode as student
   If teacher sets assess override, does it show in student attempt results?
   Multipart in livepoll (update notes in scorequestion.php)
-  Overtime
   hinttext, hints, etc.
 
 Bugs:
@@ -63,6 +60,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Set up aria-regions, aria-live
 X Gradebook: override of non-attempted can't be changed to 0
 X Course page: Change review mode to practice mode
 X Get HTML entities to render in paged nav

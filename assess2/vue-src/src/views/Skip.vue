@@ -2,7 +2,7 @@
   <div class="home">
     <assess-header></assess-header>
     <skip-question-header :qn="qn"/>
-    <div class="scrollpane">
+    <div class="scrollpane" role="region" :aria-label="$t('regions.questions')">
       <div
         class = "questionpane introtext"
         v-show = "qn == -1"

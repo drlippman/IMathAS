@@ -375,5 +375,13 @@
     "avail_never": "Grade is currently hidden by the teacher.",
     "avail_after_take": "Will show after you submit an assessment attempt.",
     "avail_after_due": "Will show after the due date."
+  },
+  "regions": {
+    "questions": "Questions and text",
+    "q_and_vid": "Video and questions",
+    "pagenav": "Page navigation",
+    "qnav": "Question navigation",
+    "qvidnav": "Video and question navigation",
+    "aheader": "Assessment info"
   }
 }

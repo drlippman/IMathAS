@@ -1,6 +1,8 @@
 <template>
   <div class="subheader">
-    <div class="flexrow" style="flex-grow:1">
+    <div class="flexrow" style="flex-grow:1"
+      role="navigation" :aria-label="$t('regions.qnav')"
+    >
       <menu-button id="qnav"
         :options = "navOptions"
         :selected = "dispqn"
