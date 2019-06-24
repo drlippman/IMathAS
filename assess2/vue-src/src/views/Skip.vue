@@ -4,7 +4,7 @@
     <skip-question-header :qn="qn"/>
     <div class="scrollpane">
       <div
-        class = "questionpane"
+        class = "questionpane introtext"
         v-show = "qn == -1"
         key = "-1"
         v-html = "intro"
@@ -13,7 +13,7 @@
       <div
         v-for="curqn in questionArray"
         :key="curqn"
-        :class="{inactive: curqn != qn, questionpane: true}"
+        :class="{inactive: curqn != qn}"
         :aria-hidden = "curqn != qn"
       >
         <inter-question-text-list

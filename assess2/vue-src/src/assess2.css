@@ -292,6 +292,13 @@ input[type=radio], input[type=checkbox] {
   max-width: 700px;
   overflow: visible;
 }
+.questionpane.introtext {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #f3f3f9;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 .inactive {
   visibility: hidden;
   position: absolute;

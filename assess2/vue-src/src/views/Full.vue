@@ -3,7 +3,7 @@
     <assess-header></assess-header>
     <div class="scrollpane">
       <div
-        class = "questionpane"
+        class = "questionpane introtext"
         v-if = "intro != ''"
         v-html = "intro"
       />
@@ -15,19 +15,19 @@
           pos="beforeexact"
           :qn="curqn"
           :key="'iqt'+curqn"
+          :active = "true"
         />
         <full-question-header :qn = "curqn" />
         <question
-          class="questionpane"
           :qn="curqn"
           active="true"
           :key="'q'+curqn"
         />
       </div>
       <inter-question-text-list
-        class = "questionpane"
         pos="after"
         :qn="lastQ"
+        :active = "true"
       />
     </div>
     <p v-if = "showSubmit">

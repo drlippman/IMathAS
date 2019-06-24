@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="texts.length > 0" class = "questionpane introtext">
     <inter-question-text
       v-for = "(textitem,index) in texts"
       :textobj = "textitem"

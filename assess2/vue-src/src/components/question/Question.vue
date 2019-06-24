@@ -1,5 +1,5 @@
 <template>
-  <div class = "questionwrap">
+  <div class = "questionwrap questionpane">
     <div v-if = "!questionContentLoaded">
       {{ $t('loading') }}
     </div>

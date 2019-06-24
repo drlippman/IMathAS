@@ -16,7 +16,7 @@
     </videocued-nav>
     <div class="scrollpane">
       <div
-        class = "questionpane"
+        class = "questionpane introtext"
         v-show = "cue == -1"
         key = "-1"
         v-html = "intro"
@@ -39,7 +39,7 @@
         v-for="curqn in questionArray"
         :key="curqn"
         :aria-hidden = "curqn != qn"
-        :class="{inactive: curqn != qn, questionpane: true}"
+        :class="{inactive: curqn != qn}"
       >
         <inter-question-text-list
           pos = "before"

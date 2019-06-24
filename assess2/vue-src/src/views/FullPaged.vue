@@ -4,7 +4,7 @@
     <full-paged-nav :page="page" />
     <div class="scrollpane">
       <div
-        class = "questionpane"
+        class = "questionpane introtext"
         v-show = "page === 0 && intro !== ''"
       >
         <h2>{{ $t('intro') }}</h2>
@@ -21,7 +21,6 @@
       >
         <div v-if = "pageData[0].questions.length === 0">
           <inter-question-text-list
-            class = "questionpane"
             pos="all"
             :page="pagenum"
             :active = "pagenum === page"
@@ -32,7 +31,6 @@
             v-for="curqn in pageData[0].questions" :key="curqn"
           >
             <inter-question-text-list
-              class = "questionpane"
               pos="beforeexact"
               :qn="curqn"
               :key="'iqt'+curqn"
@@ -41,7 +39,6 @@
             />
             <full-question-header :qn = "curqn" />
             <question
-              class = "questionpane"
               :qn="curqn"
               :active = "pagenum === page"
               :key="'q'+curqn"
