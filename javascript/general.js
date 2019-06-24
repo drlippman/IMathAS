@@ -144,7 +144,7 @@ function tipshow(el,tip, e) {
 		tipobj.style.top = (p[1]+20) + "px";
 	} else {
 		tipobj.style.top = (p[1]-tipobj.offsetHeight) + "px";
-	}	
+	}
 }
 
 function tipout(e) {
@@ -339,7 +339,7 @@ function GB_show(caption,url,width,height) {
 			  .css("margin", 0);
 			jQuery("#GB_window").append($("<div/>", {id: "GB_frameoverlay"}));
 			jQuery("body").css("user-select","none");
-			
+
 			if (e.type == 'touchstart') {
 				jQuery(window).on('touchmove.GBmove', GB_move)
 				 .on('touchend.GBmove', GB_drop);
@@ -353,7 +353,7 @@ function GB_show(caption,url,width,height) {
 				var touch = e.originalEvent.changedTouches[0] || e.originalEvent.touches[0];
 			}
 			var gbwin = document.getElementById("GB_window");
-			
+
 			jQuery("#GB_window").css("left", gbwin.getBoundingClientRect().left)
 			  .css("top", gbwin.getBoundingClientRect().top)
 			  .css("margin", 0)
@@ -361,10 +361,10 @@ function GB_show(caption,url,width,height) {
 			  .data("original_h", $(gbwin).height())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY);
-			  
+
 			jQuery("#GB_window").append($("<div/>", {id: "GB_frameoverlay"}));
 			jQuery("body").css("user-select","none");
-			
+
 			if (e.type == 'touchstart') {
 				jQuery(window).on('touchmove.GBresize', GB_resize)
 				 .on('touchend.GBresize', GB_endresize);
@@ -845,7 +845,7 @@ function sendLTIresizemsg() {
 		parent.postMessage(JSON.stringify({subject:'lti.frameResize', height: default_height}), '*');
 	}
 }
-	
+
 jQuery(document).ready(function($) {
 	$(window).on("message", function(e) {
 		if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/lti\.frameResize/)) {
@@ -976,7 +976,7 @@ jQuery(document).ready(function($) {
 						$(this).children("img").attr("src", "../img/collapse.gif");
 						$(this).next(".blockitems").slideDown();
 					}
-				}	
+				}
 			});
 	});
 	$(".grouptoggle img").attr("alt", "expand/collapse");
@@ -1126,6 +1126,7 @@ function initSageCell(base) {
 		if (typeof jQuery(ta).attr("id") != "undefined") {
 				url += '&update_id='+jQuery(ta).attr("id");
 		}
+		url += '&evallabel=' + encodeURIComponent(_('Evaluate'));
 		jQuery(ta).addClass("allowupdate").hide()
 		.after(jQuery("<iframe/>", {
 				id: frame_id,
@@ -1147,7 +1148,7 @@ function setActiveTab(el) {
 	jQuery(el).closest(".tablist").find("a[role=tab]").attr("aria-selected",false);
 	jQuery(el).attr("aria-selected",true);
 	jQuery(el).parent().addClass("active");
-	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);    
+	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);
 	var tabpanelid = tabid.replace(/tab/,"tabpanel");
 	jQuery(el).closest(".tabwrap").find("#"+tabpanelid).show().attr("aria-hidden",false);
 }
