@@ -13,10 +13,14 @@ before calling the functions.
 <ul>
 <li><a href="#sagecell">sagecell</a></li>
 <li><a href="#sagecellTransfer">sagecellTransfer</a></li>
+<li><a href="#sagecellTransferMulti">sagecellTransferMulti</a></li>
 <li><a href="#sagecellEssay">sagecellEssay</a></li>
 <li><a href="#sagecellEssayTransfer">sagecellEssayTransfer</a></li>
+<li><a href="#sagecellEssayTransferMulti">sagecellEssayTransferMulti</a></li>
 </ul>
-<p>Macros with <i>Essay</i> in their name store the SageCell input script, as modified by the student, as answer to a question (part) of type <code>essay</code>. <p>Macros with <i>Transfer</i> in their name let the student transfer the SageCell output result as answer to a particular question part.
+<p>Macros with <i>Essay</i> in their name store the SageCell input script, as modified by the student, as answer to a question (part) of type <code>essay</code>. </p>
+<p>Macros with just <i>Transfer</i> in their name let the student transfer the SageCell output result as answer to a particular question part.</p>
+<p>Macros with <i>TransferMulti</i> in their name let the student choose to which question the SageCell output will be transferred as an answer.
 </p>
 <h3><a name="sagecell">sagecell</a></h3>
 <p>
@@ -32,7 +36,7 @@ $answer="-$a cos(x)"<br/>
 $script="<br/>
 x=var(x)<br/>
 integral(sin(x),x)"<br/>
-$cell = sagecell($script)</code>,<br/> 
+$cell = sagecell($script)</code>,<br/>
 <b>Question Text:</b><br/>
 <code>
 <p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
@@ -54,13 +58,19 @@ $answer="-$a cos(x)"<br/>
 $script="<br/>
 x=var(x)<br/>
 integral(sin(x),x)"<br/>
-$cell = sagecellTransfer($script,$thisq,"Use as Answer")</code>,<br/> 
+$cell = sagecellTransfer($script,$thisq,"Use as Answer")</code>,<br/>
 <b>Question Text:</b><br/>
 <code>
 <p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
 $cell<br/>
 $answerbox<br/>
 </code>
+</p>
+
+<h3><a name="sagecellTransferMulti">sagecellTransferMulti</a></h3>
+<p>
+  <code>sagecellTransferMulti(script,questionNr,labels,parts)</code> generates a single SageCell with content <code>script</code> and a series of buttons with labels from the array <code>labels</code>.
+  <code>Parts</code> must be an array of numbers of parts to which the SageCell output will be transferred. For example, the <em>i<sup>th</sup></em> button will have the label <code>labels[i]</code> and will transfers the content of the SageCell output into <code>answerbox[Parts[i]]</code> (<em>i</em> starting from 0).
 </p>
 
 <p>The following macros store the script edited by the student as answer to a question part of type <code>essay</code></p>
@@ -77,7 +87,7 @@ $showanswer="Your cell should evaluate to `-$a cos(x)`."<br/>
 $script="<br/>
 x=var(x)<br/>
 integral(sin(x),x)"<br/>
-$cell = sagecellEssay($script)</code><br/> 
+$cell = sagecellEssay($script)</code><br/>
 <b>Question Text:</b><br/>
 <code>
 <p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
@@ -91,10 +101,10 @@ For multipart and conditional questions, <code>sagecellEssay(script,essayPart)</
 </p>
 <h3><a name="sagecellEssayTransfer">sagecellEssayTransfer</a></h3>
 <p>
-<code>sagecellEssayTransfer(script,questionNr,essayPart,Part[, label])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to question part <code>essayPart</code> which must be of type <code>essay</code>.
+<code>sagecellEssayTransfer(script,questionNr,essayPart,part[, label])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to question part <code>essayPart</code> which must be of type <code>essay</code>.
 <p>The question must be <code>multipart</code> or <code>conditional</code></p>
 <p>
-A button with label <code>label</code> is added, which transfers the sagecell output to <code>$answerbox[Part]</code>.
+A button with label <code>label</code> is added, which transfers the sagecell output to <code>$answerbox[part]</code>.
 </p>
 <p>
 <b>Usage example: </b><br/>
@@ -109,7 +119,7 @@ $answer[1]="-$a cos(x)"<br/>
 $script="<br/>
 x=var(x)<br/>
 integral(sin(x),x)"<br/>
-$cell = sagecellEssayTransfer($script,$thisq,0,1,"Use as Answer")</code>,<br/> 
+$cell = sagecellEssayTransfer($script,$thisq,0,1,"Use as Answer")</code>,<br/>
 <b>Question Text:</b><br/>
 <code>
 <p>Modify the Sagecell below to find the integral of `$a sin(x)`</p><br/>
@@ -118,6 +128,17 @@ $answerbox[1]<br/>
 </code>
 </p>
 <p>The modified script can be obtained with <code>getstuans($stuanswers,$thisq,0)</code></p>
+
+<h3><a name="sagecellEssayTransferMulti">sagecellEssayTransferMulti</a></h3>
+<p>
+  <code>sagecellEssayTransferMulti(script,questionNr,essayPart,parts, labels)</code> generates a SageCell with content
+  <code>script</code>. The script, as modified by the student, is stored as answer to question part
+  <code>essayPart</code> which must be of type <code>essay</code>.
+  <p>The question must be <code>multipart</code> or <code>conditional</code></p>
+  <p>A series of buttons with labels from the array <code>labels</code> is added.
+  <code>Parts</code> must be an array of numbers of parts to which the SageCell output will be transferred. For example,
+  the <em>i<sup>th</sup></em> button will have the label <code>labels[i]</code> and will transfers the content of the
+  SageCell output into <code>answerbox[parts[i]]</code> (<em>i</em> starting from 0).
+</p>
 </body>
 </html>
-   
