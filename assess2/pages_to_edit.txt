@@ -2,8 +2,11 @@ TODOs:
   Need to revisit showhints throughout display code
   Set up aria-regions, maybe skip-nav link
   Look at aria-live for questions region ?
-  between-question text no left margin, maybe in colored box w/padding
-    always show
+  Skip header: add score info to right icon group
+    Remove score from nav?  Or keep in dropdown but not in selected box
+    tooltip saying it's recorded score
+  HW mode: Add score summary to nav
+  Tooltip click dismiss (double handler)
 
 Test:
   Instructor preview
@@ -67,6 +70,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X between-question text no left margin, maybe in colored box w/padding, always show
 X Refactor ErrorDialog to be usable in GBViewAssess
 X Matrix syntax warning messages
 X Enter key handlers on input boxes to submit?
