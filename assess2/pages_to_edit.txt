@@ -9,8 +9,7 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  Overtime penalty should be applied by-part - current ignored for multipart
-  Not marked as overtime
+
 
 To discuss:
 
