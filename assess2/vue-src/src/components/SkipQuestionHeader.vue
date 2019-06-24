@@ -7,8 +7,13 @@
           @change = "changeQuestion"
           searchby = "dispqn"
         >
-          <template v-slot="{ option }">
-            <skip-question-list-item :option="option" />
+          <template v-slot="{ option, selected }">
+            <skip-question-list-item
+              :showretry="anyHaveRetry"
+              :showretake="anyHaveRetake"
+              :option="option"
+              :selected="selected"
+            />
           </template>
         </menu-button>
 
@@ -36,7 +41,7 @@
         </router-link>
     </div>
     <question-header-icons
-      :showscore = "false"
+      :showscore = "showScore"
       :curQData = "curQData"
       :qn = "qn"
       :showretry = "true"
@@ -99,6 +104,25 @@ export default {
         out.push(thisoption);
       }
       return out;
+    },
+    showScore () {
+      return store.assessInfo.questions[this.qn].hasOwnProperty('gbscore');
+    },
+    anyHaveRetry () {
+      for (let qn in store.assessInfo.questions) {
+        if (store.assessInfo.questions[qn].canretry) {
+          return true;
+        }
+      }
+      return false;
+    },
+    anyHaveRetake () {
+      for (let qn in store.assessInfo.questions) {
+        if (store.assessInfo.questions[qn].regens_remaining) {
+          return true;
+        }
+      }
+      return false;
     },
     curOption () {
       if (this.hasIntro) {

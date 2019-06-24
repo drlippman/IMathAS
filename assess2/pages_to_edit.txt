@@ -2,11 +2,6 @@ TODOs:
   Need to revisit showhints throughout display code
   Set up aria-regions, maybe skip-nav link
   Look at aria-live for questions region ?
-  Skip header: add score info to right icon group
-    Remove score from nav?  Or keep in dropdown but not in selected box
-    tooltip saying it's recorded score
-  HW mode: Add score summary to nav
-  Tooltip click dismiss (double handler)
 
 Test:
   Instructor preview
@@ -20,8 +15,7 @@ Bugs:
   Math in Paged Full titles not rendered
     Can't figure out how to fix this
   Gradebook: override of non-attempted can't be changed to 0
-  Course page: Change review mode to practice mode
-  Get HTML entities to render in paged nav
+
 
 
 To discuss:
@@ -53,6 +47,7 @@ Future Todos:
     If answer box is focused again, hide the key and reshow warnings
   Condense syntax warnings into an icon, with tooltip display of warning.
   Get "Save work" button to change oninput rather than onblur
+  HW mode: Add score summary to nav
 
 Delay for later (since they work with displayq2 for now):
   Edit/Rewrite testquestion.php
@@ -70,6 +65,11 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Course page: Change review mode to practice mode
+X Get HTML entities to render in paged nav
+X Skip header: add score info to right icon group
+X Remove score from currently selected, but keep in nav
+X tooltip saying it's recorded score
 X between-question text no left margin, maybe in colored box w/padding, always show
 X Refactor ErrorDialog to be usable in GBViewAssess
 X Matrix syntax warning messages

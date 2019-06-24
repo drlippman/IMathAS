@@ -7,11 +7,15 @@
         :title = "nameHover"
       >
         {{ nameDisp }}
-      </span>&nbsp;
+      </span>
+    </span>
+    <span v-if="scoreDisplay !== '' && !selected" class="subdued">
       {{ scoreDisplay }}
     </span>
-    <span class="redoicon">
+    <span class="redoicon" v-if="showretry && !selected">
       <icons name="retry" v-if="option.canretry" />
+    </span>
+    <span class="redoicon" v-if="showretake && !selected">
       <icons name="retake" v-if="option.regens_remaining" />
     </span>
   </span>
@@ -22,7 +26,7 @@ import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'SkipQuestionListItem',
-  props: ['option'],
+  props: ['option', 'showretry', 'showretake', 'selected'],
   components: {
     Icons
   },
@@ -51,11 +55,13 @@ export default {
     scoreDisplay () {
       if (this.option.dispqn === 0) {
         return '';
-      } else if (this.option.hasOwnProperty('gbscore')) {
+      } /*else if (this.option.hasOwnProperty('gbscore')) {
         let str = this.option.canretry ? '(' : '[';
         str += this.option.gbscore + '/' + this.option.points_possible;
         str += this.option.canretry ? ')' : ']';
         return str;
+      }*/ else if (this.option.hasOwnProperty('gbscore') && this.option.tries_max > 1) {
+        return this.option.gbscore + '/' + this.$tc('header.pts', this.option.points_possible);
       } else {
         return '(' + this.$tc('header.pts', this.option.points_possible) + ')';
       }
@@ -85,25 +91,17 @@ export default {
 }
 .qname-wrap {
   display: inline-block;
-  min-width: 12em;
   flex-grow: 1;
+  margin-right:24px;
 }
-@media only screen and (max-width: 480px) {
-  .qname-wrap {
-    min-width: 8em;
-  }
-}
+
 .qstatusicon {
   margin-right: 4px;
 }
 .redoicon {
   display: inline-block;
-  width: 48px;
+  width: 24px;
   text-align: right;
-}
-
-.redoicon > * {
-  margin-left: 8px;
 }
 
 </style>

@@ -147,7 +147,8 @@ export default {
       wrong: '#900',
       correct: '#090',
       partial: '#fb0',
-      warn: '#900'
+      warn: '#900',
+      subdued: '#757575'
     };
   },
   props: ['name', 'size', 'color', 'alt'],

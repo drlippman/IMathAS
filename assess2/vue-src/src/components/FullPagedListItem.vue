@@ -2,10 +2,10 @@
   <span class="flex-nowrap-center">
     <span class="qname-wrap">
       <icons :name="statusIcon" class="qstatusicon" />
-      {{ nameDisp }}
-      <span class="subdued nowrap">
-        {{ qStatus }}
-      </span>
+      <span v-html="nameDisp"/>
+    </span>
+    <span class="subdued nowrap">
+      {{ qStatus }}
     </span>
   </span>
 </template>

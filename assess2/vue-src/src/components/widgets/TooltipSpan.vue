@@ -1,10 +1,12 @@
 <template>
   <span
-    @keydown.esc = "triggerOpen(false)"
+    @keydown.esc = "triggerOpen($event,false)"
     class="dropdown-wrap"
-    @mouseover = "triggerOpen(true)"
-    @mouseleave = "triggerOpen(false)"
+    @mouseover = "triggerOpen($event,true)"
+    @mouseleave = "triggerOpen($event,false)"
     @touchstart = "triggerOpen"
+    @blur = "triggerOpen($event,false)"
+    tabindex = "-1"
   >
     <slot></slot>
     <transition name="fade">
@@ -29,7 +31,7 @@ export default {
     };
   },
   methods: {
-    triggerOpen (val) {
+    triggerOpen (event, val) {
       if (typeof val === 'boolean') {
         this.open = val;
       } else {
@@ -44,6 +46,12 @@ export default {
             this.$refs.pane.style.right = '12px';
           }
         });
+      }
+      if (event.type === 'touchstart' && this.open) {
+        event.currentTarget.focus();
+      }
+      if (event.type === 'touchstart' && event.cancelable) {
+        event.preventDefault();
       }
     }
   }

@@ -1,9 +1,12 @@
 <template>
   <div class="headericons">
-    <span v-if="showscore">
+    <tooltip-span
+      v-if="showscore"
+      :tip="$t('qdetails.gbscore')"
+    >
       <icons name="square-check" />
       {{ scoreDisplay }}
-    </span>
+    </tooltip-span>
     <tooltip-span
       v-if="qn >= 0 && curQData.canretry && showretry !== false"
       :tip="retryInfo.msg">

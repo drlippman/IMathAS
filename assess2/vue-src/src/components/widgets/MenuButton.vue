@@ -18,7 +18,7 @@
       @click = "toggleOpen"
       @keydown.space.prevent = "toggleOpen"
     >
-      <slot v-if="!hasButton" :option="options[selected]"></slot>
+      <slot v-if="!hasButton" :option="options[selected]" :selected="true"></slot>
       <slot v-if="hasButton" name=button></slot>
       <icons class="mb_downarrow" v-if="!noarrow" name="downarrow" size="micro"/>
     </button>
@@ -49,7 +49,7 @@
           role = "menuitem"
           tabindex = "-1"
         >
-          <slot v-if="hasSlot" :option="option"></slot>
+          <slot v-if="hasSlot" :option="option" :selected="false"></slot>
           <template v-else>
             {{option.label}}
           </template>

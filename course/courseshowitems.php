@@ -918,8 +918,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo "<div class=title><b><a href=\"$assessUrl\"";
 
-				   echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate).'.';
-				   if ($line['reviewdate']!=2000000000) {
+					 if ($line['ver']>1) {
+						 echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Practice'), $enddate).'.';
+					 } else {
+				   	echo ">".Sanitize::encodeStringForDisplay($line['name'])."</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $enddate).'.';
+					 }
+					 if ($line['reviewdate']!=2000000000) {
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
 				   if ($canuselatepass) {
@@ -935,7 +939,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   } else if (isset($sessiondata['stuview']) && $line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600) {
 					echo _(' LatePass Allowed');
 				   }
-				   echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i>");
+					 if ($line['ver']>1) {
+						 echo filter("<br/><i>" . _('This assessment is in practice mode - no scores will be saved') . "</i>");
+					 } else {
+				   	echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i>");
+					 }
 				   echo '</div>'; //title
 				   if ($canedit) {
 				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
@@ -1021,7 +1029,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   } else {
 					   $show = sprintf(_('Available %1$s until %2$s'), $startdate, $enddate);
 					   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
-						   $show .= sprintf(_(', Review until %s'), $reviewdate);
+							 if ($line['ver']>1) {
+						   	$show .= sprintf(_(', Practice until %s'), $reviewdate);
+							 } else {
+								 $show .= sprintf(_(', Review until %s'), $reviewdate);
+							 }
 					   }
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
@@ -2117,13 +2129,21 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '<b><span id="A' . $typeid . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   //echo '<b>'.$line['name'].'</b> ';
 			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
-				   $show = sprintf(_('Review until %s'), $reviewdate);
+					 if ($line['ver']>1) {
+						 $show = sprintf(_('Practice until %s'), $reviewdate);
+					 } else {
+				   	 $show = sprintf(_('Review until %s'), $reviewdate);
+					 }
 				   //echo '<b>'.$line['name'].'</b> ';
 				   echo '<b><span id="A' . $typeid . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 			   } else {
 				   $show = sprintf(_('Available %1$s to %2$s'), $startdate, $enddate);
 				   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
-					   $show .= sprintf(_(', review until %s'), $reviewdate);
+						 if ($line['ver']>1) {
+							 $show .= sprintf(_(', practice until %s'), $reviewdate);
+						 } else {
+					   	 $show .= sprintf(_(', review until %s'), $reviewdate);
+						 }
 				   }
 				   //echo '<i><b>'.$line['name'].'</b></i> ';
 				   echo '<i><b><span id="A' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b></i>";
