@@ -26,7 +26,7 @@ if ($from=='isolate') {
   $exitUrl = $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid";
 }
 
-$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
+$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
 $inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
 $isdiag = isset($sessiondata['isdiag']);
 if ($isdiag) {
@@ -64,9 +64,9 @@ $nologo = true;
 $useeditor = 1;
 require('../header.php');
 
-if (!$isltilimited && !$inTreeReader && !$isdiag) {
+if ((!$isltilimited || $sessiondata['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
-  if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+  if ($isltilimited) {
     echo "$breadcrumbbase ";
   } else {
     echo $breadcrumbbase . ' <a href="../course/course.php?cid='.$cid.'">';

@@ -50,9 +50,9 @@ $nologo = true;
 $useeditor = 1;
 require('../header.php');
 
-if (!$isltilimited && !$inTreeReader && !$isdiag) {
+if ((!$isltilimited || $sessiondata['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
-  if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+  if ($isltilimited) {
     echo "$breadcrumbbase ", _('Assessment'), "</div>";
   } else {
     echo $breadcrumbbase . ' <a href="../course/course.php?cid='.$cid.'">';
