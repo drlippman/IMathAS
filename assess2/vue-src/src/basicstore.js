@@ -897,7 +897,7 @@ export const actions = {
       // if we have pages, add a question list to the last page
       if (data.interquestion_pages.length > 0) {
         let qs = [];
-        for (let j = lastDisplayBefore; j < data.interquestion_text[data.interquestion_text.length - 1].displayBefore; j++) {
+        for (let j = lastDisplayBefore; j < data.questions.length; j++) {
           qs.push(j);
         }
         data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;

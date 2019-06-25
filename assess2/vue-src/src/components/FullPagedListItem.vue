@@ -1,7 +1,7 @@
 <template>
   <span class="flex-nowrap-center">
     <span class="qname-wrap">
-      <icons :name="statusIcon" class="qstatusicon" />
+      <icons v-if="statusIcon !== 'none'" :name="statusIcon" class="qstatusicon" />
       {{ nameDisp }}
     </span>
     <span class="subdued nowrap">

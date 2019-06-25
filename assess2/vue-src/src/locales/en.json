@@ -297,7 +297,8 @@
     "eqnedoff": "Equation editor disabled",
     "more": "More",
     "clipboard": "Clipboard",
-    "rubric": "Rubric"
+    "rubric": "Rubric",
+    "none": ""
   },
   "gradebook": {
     "detail_title": "Review Assessment Attempts",

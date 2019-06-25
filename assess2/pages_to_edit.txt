@@ -9,8 +9,8 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-
-
+  Teacher has unsubmitted quiz attempt, reset option not showing.
+  
 To discuss:
 
 Separate:
