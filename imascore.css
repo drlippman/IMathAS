@@ -40,7 +40,7 @@ h4 {
 h5,h6 {
 	font-size: 1em;
 }
-	
+
 div.pagetitle h2, div.pagetitle h1 {
 	margin: 10px 0px 20px 0px;
 }
@@ -138,14 +138,14 @@ div.blockitems, div.blockitems div.blockitems div.blockitems {
 	margin-top: -10px;
 	margin-bottom: 10px;
 }
-div.block.grouptoggle { 
-	margin-bottom: 0px; 
-	margin-top: 10px 
-} 
-div.block.grouptoggle + div.blockitems { 
-	margin-top: 0px 
+div.block.grouptoggle {
+	margin-bottom: 0px;
+	margin-top: 10px
 }
-div.hidden {
+div.block.grouptoggle + div.blockitems {
+	margin-top: 0px
+}
+.hidden {
 	display:none;
 }
 .showinmobile {
@@ -194,7 +194,7 @@ ul.nomark li {
 	margin-left: 0px;
 	padding-left: 0px;
 }
-	
+
 ul.qview {
 	list-style-type: none;
 	margin-left: 12px;
@@ -245,7 +245,7 @@ td.c, input.c {
 td.r {
 	text-align: right;
 }
-span.form {
+span.form, label.form {
 	display: block;
 	width: 200px;
 	float: left;
@@ -292,7 +292,7 @@ span#leftcontenttoggle.leftcontentactive {
 }
 
 @media only screen and (max-width: 760px) {
-	span.form {
+	span.form, label.form {
 		width: auto;
 		float: none;
 		text-align: left;
@@ -461,7 +461,7 @@ img.faded {
 	color: #999;
 }
 .itemgrey {
-	opacity: .5;	
+	opacity: .5;
 }
 div.ddmenu {
 	position: absolute;
@@ -553,7 +553,7 @@ div.tips:after {
 	border-color: rgba(204, 255, 255, 0);
 	border-top-color: #cff;
 	border-width: 6px;
-	margin-left: -6px;        
+	margin-left: -6px;
 }
 div.tips:before {
 	border-color: rgba(145, 213, 213, 0);
@@ -732,32 +732,61 @@ a.abutton {
 a.abutton, a.abutton:hover, a.abutton:focus {
 	text-decoration: none;
 }
-input[type=submit],input[type=button], button, a.abutton {
+input[type=submit],input[type=button], button, a.abutton, span.fakebutton {
 	color: #000;
 	background-color: #eee;
 	border-radius: 4px;
 	border: 1px solid #ccc;
 	font: inherit;
-	height:1.5em;
+	/*height:1.5em;
 	line-height: 1.5em;
-	padding: 0 8px;
+	padding: 0 8px;*/
+	padding: 3px 12px;
 	margin: 2px 3px;
 }
-input[type=submit].secondarybtn,input[type=button].secondarybtn, button.secondarybtn {
-	background-color: #f9f9f9;
-}
-input[type=submit]:hover, button:hover,input[type=button]:hover, a.abutton:hover {
-	background-color: #e3e3ff;
-}
+input[type=submit]:hover, button:hover,input[type=button]:hover, a.abutton:hover,
 input[type=submit]:focus, button:focus,input[type=button]:focus, a.abutton:focus {
 	background-color: #e3e3ff;
 }
-input[type=submit]:disabled,input[type=button]:disabled {
-	color: #666;
+input[type=submit]:disabled,input[type=button]:disabled, button:disabled {
+  opacity: .5;
 }
 input[type=submit]:disabled:hover,input[type=button]:disabled:hover {
 	background-color: #eee;
 }
+input[type=submit].primary,input[type=button].primary, button.primary, a.abutton.primary {
+  color: #fff;
+  background-color: #1E74D1;
+}
+input[type=submit].primary:enabled:hover, button.primary:enabled:hover,input[type=button].primary:enabled:hover, a.abutton.primary:hover,
+input[type=submit].primary:focus, button.primary:focus,input[type=button].primary:focus, a.abutton.primary:focus {
+  background-color: #175aa2;
+}
+
+input[type=submit].secondarybtn,input[type=button].secondarybtn, button.secondarybtn {
+	color: #000;
+	background-color: #f9f9f9;
+}
+input[type=submit].secondarybtn:enabled:hover,input[type=button].secondarybtn:enabled:hover, button.secondarybtn:enabled:hover,
+input[type=submit].secondarybtn:focus,input[type=button].secondarybtn:focus, button.secondarybtn:focus {
+  background-color: #ddd;
+}
+
+button.slim {
+  padding: 0px 12px;
+}
+button.nopad {
+  padding: 0;
+}
+button.plain {
+  border: 0;
+  background-color: transparent;
+}
+button.plain:hover, button.plain:active {
+	background-color: #e3e3ff;
+}
+
+
 #GB_overlay {
   position: fixed;
   margin: auto;
@@ -846,6 +875,60 @@ input[type=submit]:disabled:hover,input[type=button]:disabled:hover {
 	text-decoration: none;
 }
 
+.fullwrap, .dialog-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.dialog-overlay {
+  position: fixed;
+  z-index: 1900;
+	background-color: rgba(0, 0, 0, .5);
+  transition: opacity .3s ease;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.dialog {
+  position: fixed;
+  z-index: 2000;
+  background-color: #fff;
+	width: 50%;
+	min-width: 300px;
+	max-width: 700px;
+	border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+}
+.dialog button.slim {
+  margin-right: -12px;
+  margin-top: -3px;
+}
+
+[v-cloak] {display: none}
+
+.flexrow {
+  display: flex;
+  flex-flow: row nowrap;
+}
+.flexrow.wrap {
+  flex-flow: row wrap;
+}
+.flexgroup {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+.pane-header {
+  border-bottom: 1px solid #ccc;
+  padding: 16px 20px;
+  font-weight: bold;
+}
+.pane-body {
+  padding: 16px 20px;
+}
 ol li ol {
 	list-style-type: lower-alpha;
 }
@@ -895,10 +978,11 @@ a[target=_blank]::after {
 	display: inline-block;
 	background: url(img/extlink.png) center right no-repeat;
 }
-.mce-content-body a[target=_blank]:after {
+.mce-content-body a[target=_blank]:after,
+a[target=_blank].noextlink::after {
 	display: none;
 }
-.mce-content-body span.AMedit {border: 1px solid #ff0000;} 
+.mce-content-body span.AMedit {border: 1px solid #ff0000;}
 div.forumgrp img {
 	max-width: 90%;
 	height: auto;
@@ -1177,16 +1261,58 @@ a.dropdown-toggle.arrow-down:hover {
 }
 
 .arrow-down::after {
-	content: "\25bc"; 
-	padding-left: 0.2em; 
-	font-size:70%; 
+	content: "\25bc";
+	padding-left: 0.2em;
+	font-size:70%;
 	position:relative;
 	top:-.2em;
 	text-decoration: none;
 }
 
+.filealt {
+ opacity: 0;
+ position: absolute;
+ width: 1px;
+ height: 1px;
+ overflow: hidden;
+}
+.filealt + label {
+	display: inline-block;
+  margin: 0 4px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+.has-focus + label,
+.filealt:focus + label,
+.filealt:active + label {
+  outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+.filealt-btn {
+  padding: 2px 8px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+	border-radius: 4px;
+	display: inline-block;
+	margin: -1px;
+}
+.filealt-label {
+  padding: 2px 16px 2px 8px;
+}
+
 .katex {
 	font-size: 1.1em !important;
+}
+
+
+.flex-nowrap-center {
+	display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.inlinediv {
+	display: inline-block;
 }
 
 .fw1000 div#headercontent, .fw1000 div#navlistcont,.fw1000 .footerwrapper, .fw1000 .midwrapper {

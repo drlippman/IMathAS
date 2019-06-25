@@ -2563,6 +2563,41 @@ function forminlinebutton($label,$content,$style='button',$outstyle='block') {
 	return $out;
 }
 
+function ineqtointerval($str, $var) {
+	if ($str === 'DNE') {
+		return $str;
+	}
+	$str = strtolower($str);
+	$var = strtolower($var);
+	if (preg_match('/all\s*real/', $str)) {
+		return '(-oo,oo)';
+	}
+	$pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
+	$cnt = count($pieces);
+	$pieces = array_map('trim', $pieces);
+	if ($cnt != 3 && $cnt != 5) {
+		return false; //invalid
+	} else if ($cnt == 5 && ($pieces[1][0] != $pieces[3][0] || $pieces[2] != $var)) {
+		return false; // mixes > with <
+	}
+	if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='>') {
+		return ($pieces[1]=='>'?'(':'[') . $pieces[2] . ',oo)';
+	} else if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='<') {
+		return '(-oo,' . $pieces[2] . ($pieces[1]=='<'?')':']');
+	} else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='>') {
+		return '(-oo,' . $pieces[0] . ($pieces[1]=='>'?')':']');
+	} else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='<') {
+		return ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',oo)';
+	} else if ($cnt==5 && $pieces[1][0]=='<') {
+		return ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',' .
+			$pieces[4] . ($pieces[3]=='<'?')':']');
+	} else if ($cnt==5 && $pieces[1][0]=='>') {
+		return ($pieces[3]=='>'?'(':'[') . $pieces[4] . ',' .
+			$pieces[0] . ($pieces[1]=='>'?')':']');
+	}
+	return false;
+}
+
 function intervaltoineq($str,$var) {
 	if ($str=='DNE') {
 		return 'DNE';
@@ -3623,6 +3658,9 @@ function getscorenonzero() {
 function getiscorrect() {
 	global $rawscores;
 	$out = array();
+	if (!is_array($rawscores)) {
+		return $out;
+	}
 	foreach ($rawscores as $i=>$v) {
 		if (strpos($v,'~')===false) {
 			$out[$i+1] = ($v<0)?-1:(($v==1)?1:0);
@@ -4056,7 +4094,6 @@ function checkMinMax($min, $max, $isint, $funcname) {
 	}
 	return array($min,$max);
 }
-
 
 
 ?>

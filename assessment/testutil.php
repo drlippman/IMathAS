@@ -144,7 +144,7 @@ function sandboxgetweights($code,$seed,$attemptn) {
 		}
 	}
 	if (!isset($answeights)) {
-		if (!isset($anstypes)) { 
+		if (!isset($anstypes)) {
 			//this shouldn't happen unless the code crashed
 			return array(1);
 		}
@@ -410,7 +410,7 @@ function printscore($sc,$qn) {
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		$scarr = explode('~',$sc);
-		
+
 		$ptposs = $qi[$questions[$qn]]['answeights'];
 		if (!is_array($ptposs)) {
 			//this shouldn't happen, but handle code breaking issues
@@ -422,7 +422,7 @@ function printscore($sc,$qn) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
+
 		if (strpos($thisraw,'-2')!==false) {
 			$rawarr = explode('~',$thisraw);
 			foreach ($rawarr as $k=>$v) {
@@ -516,7 +516,7 @@ function scorequestion($qn, $rectime=true) {
 	global $regenonreattempt, $sessiondata;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
-	
+
 	if (!isset($questions[$qn]) || $questions[$qn]===0) {
 		echo "Something went wrong... (TU-SQ1)";
 		return 0;
@@ -645,12 +645,12 @@ function recordtestdata($limit=false, $updateLTI=true) {
 				':bestseeds'=>$bestseedslist, ':bestattempts'=>$bestattemptslist, ':bestscores'=>$bestscorelist,
 				':bestlastanswers'=>$bestlalist, ':endtime'=>$now, ':reattempting'=>$reattemptinglist, ':timeontask'=>$timeslist,
 				':questions'=>$questionlist);
-			
+
 			if ($updateLTI && isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) {
 				//update lti record.  We only do this for single assessment placements
-	
+
 				require_once("../includes/ltioutcomes.php");
-	
+
 				$total = 0;
 				$allans = true;
 				for ($i =0; $i < count($bestscores);$i++) {
@@ -790,8 +790,9 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 		}
 	}
 	if (!$seqinactive) {
-		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
-	} else {
+    displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,
+            $thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
+  } else {
 		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,false,$attempts[$qn],false,$regen,$seqinactive,$colors);
 	}
 }

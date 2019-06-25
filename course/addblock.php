@@ -170,9 +170,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$blockcnt++;
 	}
 	$itemorder = serialize($items);
+
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
 	$DBH->commit();
+
 	header(sprintf('Location: %s/course/course.php?cid=%s&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'], $cid));
 
 	exit;
@@ -369,7 +371,7 @@ if ($overwriteBody==1) {
 
 <?php echo $formTitle; ?>
 
-<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::onlyInt($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
+<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
 	<span class=form>Title: </span>
 	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>" required></span>
 	<BR class=form>
@@ -428,7 +430,7 @@ if ($overwriteBody==1) {
 			_('Show greyed out before start date, hide after end date'),
 			_('Hide before start date, show greyed out after end date'),
 			_('Show greyed out before and after'),
-		), $contentbehavior); 
+		), $contentbehavior);
 	?>
 	</span><br class=form />
 	<div class="expando">
@@ -446,12 +448,12 @@ if ($overwriteBody==1) {
 	<span class=formright>
 	<input type=checkbox name=innav value="1" <?php writeHtmlChecked($innav,'1') ?> /> List block in student left navigation
 	</span><br class=form />
-	
+
 	<span class=form>Public:</span>
 	<span class=formright>
 	<input type=checkbox name=public value="1" <?php writeHtmlChecked($public,'1') ?> /> Make items publicly accessible<sup>*</sup>
 	</span><br class=form />
-	
+
 
 	<span class=form>Block colors:</span>
 	<span class=formright>

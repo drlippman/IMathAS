@@ -136,6 +136,12 @@ if ($canviewall && !empty($_GET['stu'])) {
 	$stu = 0;
 }
 
+if (!empty($CFG['assess2-use-vue-dev'])) {
+	$assessGbUrl = "http://localhost:8080/gbviewassess.html";
+} else {
+	$assessGbUrl = "../assess2/gbviewassess.php";
+}
+
 //HANDLE ANY POSTS
 if ($isteacher) {
 	if (isset($_GET['togglenewflag'])) {
@@ -291,6 +297,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 				GB_show(_("Feedback"), "showfeedbackall.php?cid="+cid+"&stu="+id, 600, 600);
 			} else if (type=="F") {
 				GB_show(_("Feedback"), "viewforumgrade.php?embed=true&cid="+cid+"&uid="+uid+"&fid="+id, 600, 600);
+			} else if (type=="A2") {
+				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id+"&uid="+uid, 600, 600);
 			} else {
 				GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 600, 600);
 			}
@@ -590,6 +598,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 function gbstudisp($stu) {
 	global $DBH,$CFG,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	global $includeduedate, $includelastchange,$latepasshrs,$latepasses,$hidelocked,$exceptionfuncs;
+	global $assessGbUrl;
+
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -767,8 +777,10 @@ function gbstudisp($stu) {
 			$sarr .= ",'D'";
 		}
 		//echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
-		echo '<th>', _('Feedback'), '<br/>';
-		echo '<a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($stu).',\'all\')">', _('View All'), '</a>';
+		echo '<th>', _('Feedback');
+		// Disable for now, since we can't do this for assess2 right now
+		//echo '<br/>';
+		//echo '<a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($stu).',\'all\')">', _('View All'), '</a>';
 		echo '</th>';
 		$sarr .= ",'N'";
 	}
@@ -809,8 +821,12 @@ function gbstudisp($stu) {
 			$showlink = false;
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
 				$showlink = true;
-				echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
-				if (abs($gbt[0][1][$i][13])>0) {
+				if ($gbt[0][1][$i][15] > 1) {
+					echo '<a href="../assess2/?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'"';
+				} else {
+					echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
+				}
+				if (abs($gbt[0][1][$i][13])>0 && $gbt[0][1][$i][15]==1) {
 					$tlwrds = '';
 					$timelimit = abs($gbt[0][1][$i][13])*$gbt[1][4][4];
 					if ($timelimit>3600) {
@@ -885,35 +901,60 @@ function gbstudisp($stu) {
 				if ($gbt[0][1][$i][6]==0) {//online
 					if ($stu==-1) { //in averages
 						if (isset($gbt[1][1][$i][0])) { //has score
-							echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid={$gbt[0][1][$i][7]}\">";
+							if ($gbt[0][1][$i][15] > 1) {
+								echo "<a href=\"gb-itemanalysis2.php?stu=$stu&cid=$cid&aid={$gbt[0][1][$i][7]}\">";
+							} else {
+								echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid={$gbt[0][1][$i][7]}\">";
+							}
 							$haslink = true;
 						}
 					} else {
 						if (isset($gbt[1][1][$i][0])) { //has score
-							$querymap = array(
-                                'stu' => $stu,
-                                'cid' => $cid,
-                                'asid' => $gbt[1][1][$i][4],
-                                'uid' => $gbt[1][4][0]
-                            );
+							if ($gbt[0][1][$i][15] > 1) { // assess2
+								$querymap = array(
+	                                'stu' => $stu,
+	                                'cid' => $cid,
+	                                'aid' => $gbt[0][1][$i][7],
+	                                'uid' => $gbt[1][4][0]
+	                            );
 
-							echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+								echo '<a href="'.$assessGbUrl.'?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+							} else {
+								$querymap = array(
+	                                'stu' => $stu,
+	                                'cid' => $cid,
+	                                'asid' => $gbt[1][1][$i][4],
+	                                'uid' => $gbt[1][4][0]
+	                            );
 
+								echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+							}
 							if ($afterduelatepass) {
 								echo ' onclick="return confirm(\''._('If you view this assignment, you will not be able to use a LatePass on it').'\');"';
 							}
 							echo ">";
 							$haslink = true;
 						} else if ($isteacher) {
-                            $querymap = array(
-                                'stu' => $stu,
-                                'cid' => $cid,
-                                'aid' => $gbt[0][1][$i][7],
-                                'uid' => $gbt[1][4][0],
-                                'asid' => 'new'
-                            );
+							if ($gbt[0][1][$i][15] > 1) { // assess2
+								$querymap = array(
+                    'stu' => $stu,
+                    'cid' => $cid,
+                    'aid' => $gbt[0][1][$i][7],
+                    'uid' => $gbt[1][4][0]
+                );
 
-                            echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
+								echo '<a href="'.$assessGbUrl.'?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+							} else {
+                $querymap = array(
+                    'stu' => $stu,
+                    'cid' => $cid,
+                    'aid' => $gbt[0][1][$i][7],
+                    'uid' => $gbt[1][4][0],
+                    'asid' => 'new'
+                );
+
+                echo '<a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
+							}
 							$haslink = true;
 						}
 					}
@@ -1058,7 +1099,11 @@ function gbstudisp($stu) {
 				if ($gbt[1][1][$i][1]==0) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
-					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][4]).',\'A\')">', _('View Feedback'), '</a></td>';
+					if ($gbt[0][1][$i][15]>1) { //assess2
+						echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[0][1][$i][7]).',\'A2\','.Sanitize::onlyInt($gbt[1][4][0]).')">', _('View Feedback'), '</a></td>';
+					} else {
+						echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][4]).',\'A\')">', _('View Feedback'), '</a></td>';
+					}
 				} else if ($gbt[0][1][$i][6]==1) { //offline
 					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][2]).',\'O\')">', _('View Feedback'), '</a></td>';
 				} else if ($gbt[0][1][$i][6]==3) { //exttool
@@ -1429,6 +1474,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
 	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents;
+	global $assessGbUrl;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
@@ -1544,7 +1590,12 @@ function gbinstrdisp() {
 			//links
 			if ($gbt[0][1][$i][6]==0 ) { //online
 				if ($isteacher) {
-					echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
+					if (!empty($gbt[0][1][$i][15]) && $gbt[0][1][$i][15]>1) {
+						$addassess = 'addassessment2.php';
+					} else {
+						$addassess = 'addassessment.php';
+					}
+					echo "<br/><a class=small href=\"$addassess?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
 					echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">", _('[Isolate]'), "</a>";
 					if ($gbt[0][1][$i][10]==true) {
 						echo "<br/><a class=small href=\"isolateassessbygroup.php?cid=$cid&amp;aid={$gbt[0][1][$i][7]}\">", _('[By Group]'), "</a>";
@@ -1654,11 +1705,19 @@ function gbinstrdisp() {
 								$avgtip = '';
 							}
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
-							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
+							if ($gbt[0][1][$i][15] > 1) {
+								echo "<a href=\"gb-itemanalysis2.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
+							} else {
+								echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
+							}
 							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
+							if ($gbt[0][1][$j][15] > 1) { // assess2
+								echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">";
+							} else {
+								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;uid={$gbt[$i][4][0]}\">";
+							}
 						}
 
 						echo $gbt[$i][1][$j][0];
@@ -1686,7 +1745,11 @@ function gbinstrdisp() {
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
 						} else if ($isteacher) {
-							echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
+							if ($gbt[0][1][$j][15] > 1) { // assess2
+								echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
+							} else {
+								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
+							}
 						} else {
 							echo '-';
 						}

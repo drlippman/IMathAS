@@ -62,7 +62,6 @@ if ($isteacher || $istutor) {
 	exit;
 }
 
-
 //DISPLAY
 require("gbtable2.php");
 require("../includes/htmlutil.php");
@@ -232,7 +231,12 @@ function gbinstrdisp() {
 		//links
 		if ($isteacher) {
 			if ($gbt[0][1][$i][6]==0) { //online
-				echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
+				if (!empty($gbt[0][1][$i][15]) && $gbt[0][1][$i][15]>1) {
+					$addassess = 'addassessment2.php';
+				} else {
+					$addassess = 'addassessment.php';
+				}
+				echo "<br/><a class=small href=\"$addassess?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 				echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
 			} else if ($gbt[0][1][$i][6]==1) { //offline
 				echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";

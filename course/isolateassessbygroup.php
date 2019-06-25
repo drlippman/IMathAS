@@ -23,19 +23,23 @@
 		$gbmode = $stm->fetchColumn(0);
 	}
 
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder,$groupsetid,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
+			return false;
+		}
+		function showfb2(aid,uid,type) {
+			GB_show(_("Feedback"), "showfeedback2.php?cid="+cid+"&type="+type+"&aid="+aid+"&uid="+uid, 500, 500);
 			return false;
 		}
 		</script>';
@@ -83,12 +87,25 @@
 //	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 
 	$scoredata = array();
-	$query = "SELECT ias.agroupid,ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM ";
-	$query .= "imas_assessment_sessions AS ias WHERE ias.assessmentid=:assessmentid GROUP BY ias.agroupid";
+	if ($aver>1) {
+		$query = "SELECT iar.agroupid,iar.userid,iar.starttime,iar.lastchange,iar.score,iar.status,iar.timeontask FROM ";
+		$query .= "imas_assessment_records AS iar WHERE iar.assessmentid=:assessmentid GROUP BY iar.agroupid";
+	} else {
+		$query = "SELECT ias.agroupid,ias.id,ias.userid,ias.bestscores,ias.starttime,ias.endtime,ias.feedback FROM ";
+		$query .= "imas_assessment_sessions AS ias WHERE ias.assessmentid=:assessmentid GROUP BY ias.agroupid";
+	}
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':assessmentid'=>$aid));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$scoredata[$line['agroupid']] = $line;
+	}
+
+	if ($aver>1) {
+		if (!empty($CFG['assess2-use-vue-dev'])) {
+			$assessGbUrl = "http://localhost:8080/gbviewassess.html?";
+		} else {
+			$assessGbUrl = "../assess2/gbviewassess.php?";
+		}
 	}
 
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
@@ -137,42 +154,73 @@
 			$line = $scoredata[$gid];
 		}
 		$total = 0;
-		$sp = explode(';',$line['bestscores']);
-		$scores = explode(",",$sp[0]);
-		if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
-		for ($i=0;$i<count($scores);$i++) {
-			$total += getpts($scores[$i]);
-		}
-		$timeused = $line['endtime']-$line['starttime'];
-
-		if ($line['id']==null) {
-			$querymap = array(
-				'gbmode' => $gbmode,
-				'cid' => $cid,
-				'asid' => 'new',
-				'uid' => $line['userid'],
-				'from' => 'gisolate',
-				'aid' => $aid
-			);
-
-			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+		if ($aver > 1) {
+			$total = $line['score'];
+			$timeused = $line['lastchange'] - $line['starttime'];
+			$isOvertime = ($line['status']&4) == 4;
 		} else {
-			$querymap = array(
-                'gbmode' => $gbmode,
-                'cid' => $cid,
-                'asid' => $line['id'],
-                'uid' => $line['userid'],
-                'from' => 'gisolate',
-				'aid' => $aid
-			);
+			$sp = explode(';',$line['bestscores']);
+			$scores = explode(",",$sp[0]);
+			if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
+			for ($i=0;$i<count($scores);$i++) {
+				$total += getpts($scores[$i]);
+			}
+			$timeused = $line['endtime']-$line['starttime'];
+			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
+		}
 
-      echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+		if ($line['starttime']==null) {
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'gisolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+			} else {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'asid' => 'new',
+					'uid' => $line['userid'],
+					'from' => 'gisolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a></td><td>-</td><td></td>';
+			}
+		} else {
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'gisolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			} else {
+				$querymap = array(
+	                'gbmode' => $gbmode,
+	                'cid' => $cid,
+	                'asid' => $line['id'],
+	                'uid' => $line['userid'],
+	                'from' => 'gisolate',
+					'aid' => $aid
+				);
+
+	      echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			}
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(NC)";
 			} else 	if ($IP==1 && $enddate>$now) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(IP)";
-			} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
+			} else	if ($isOvertime) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(PT)";
@@ -188,20 +236,32 @@
 			} else {
 				echo '<td></td>';
 			}
-			$feedback = json_decode($line['feedback']);
-			if ($feedback===null) {
-				$hasfeedback = ($line['feedback'] != '');
+			if ($aver > 1 ) {
+				$hasfeedback = (($line['status']&8) == 8 || $deffeedbacktext !== '');
 			} else {
-				$hasfeedback = false;
-				foreach ($feedback as $k=>$v) {
-					if ($v != '' && $v != '<p></p>') {
-						$hasfeedback = true;
-						break;
+				$feedback = json_decode($line['feedback']);
+				if ($feedback===null) {
+					$hasfeedback = ($line['feedback'] != '');
+				} else {
+					$hasfeedback = false;
+					foreach ($feedback as $k=>$v) {
+						if ($v != '' && $v != '<p></p>') {
+							$hasfeedback = true;
+							break;
+						}
 					}
 				}
 			}
 			if ($hasfeedback) {
-				echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">', _('[Show Feedback]'), '</a></td>';
+				if ($aver > 1 ) {
+					echo '<td><a href="#" class="small feedbacksh pointer" ';
+					echo 'onclick="return showfb2('.$aid.','.Sanitize::onlyInt($line['userid']).',\'A\')">';
+					echo _('[Show Feedback]'), '</a></td>';
+				} else {
+					echo '<td><a href="#" class="small feedbacksh pointer" ';
+					echo 'onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">';
+					echo _('[Show Feedback]'), '</a></td>';
+				}
 			} else {
 				echo '<td></td>';
 			}
@@ -210,7 +270,11 @@
 		echo "</tr>";
 	}
 	echo '<tr><td>Average</td>';
-	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=gisolate\">";
+	if ($aver > 1 ) {
+		echo "<td><a href=\"gb-itemanalysis2.php?cid=$cid&aid=$aid&from=gisolate\">";
+	} else {
+		echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=gisolate\">";
+	}
 	if ($n>0) {
 		echo round($tot/$n,1);
 	} else {

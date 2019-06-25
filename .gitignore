@@ -4,3 +4,5 @@
 /c3.php
 *.php~
 *.js~
+mathjax-b
+HTMLPurifier

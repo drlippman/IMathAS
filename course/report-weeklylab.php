@@ -139,39 +139,47 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	}
 
 	//pull assessment data
-	//We're pulling the assessment info (name, itemorder) along with scores to
-	//reduce number of database pulls at the expense of pulling more data
-	$query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ias.timeontask, ia.id, ia.defpoints, ia.itemorder, ia.ptsposs ";
-	$query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
-	$query .= " where (ia.courseid=:courseid and endtime > :rangestart ) ";
-	$query .= " order by ias.userid ";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid, ':rangestart'=>$rangestart));
+  $query = "SELECT id, name, minscore, defpoints, itemorder, ptsposs
+            FROM imas_assessments WHERE courseid=:courseid";
+  $stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+  $assessmentInfo = array();
+  $totalAttemptCount = 0;
+  while($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+    $aid = $line['id'];
+    $assessmentInfo[$aid]['name'] = $line['name'];
+    $assessmentInfo[$aid]['attempts'] = 0;
+    $assessmentInfo[$aid]['possible'] = $line['ptsposs'];
+    $assessmentInfo[$aid]['minscore'] = $line['minscore'];
+    $assessmentInfo[$aid]['totalPointsEarned'] = 0;
+    $assessmentInfo[$aid]['nocreditstulist'] = array();
+    $assessmentInfo[$aid]['gotcreditstulist'] = array();
+  }
+  /*
+  $query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ias.timeontask, ia.id, ia.defpoints, ia.itemorder, ia.ptsposs ";
+  $query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
+  $query .= " where (ia.courseid=:courseid and endtime > :rangestart ) ";
+  $query .= " order by ias.userid ";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':courseid'=>$cid, ':rangestart'=>$rangestart));
+  */
+  $totalAttemptCount = 0;
 
-	$assessmentInfo = array();
-	$totalAttemptCount = 0;
+  $ph = Sanitize::generateQueryPlaceholders($assessmentInfo);
+  $qarr = array_keys($assessmentInfo);
+  $qarr[] = $rangestart;
+
+  // orig assess data
+  $query = "SELECT assessmentid, userid, bestscores, timeontask FROM imas_assessment_sessions
+            WHERE assessmentid IN ($ph) AND endtime > ?";
+  $stm = $DBH->prepare($query);
+  $stm->execute($qarr);
 	while($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$uid = $line['userid'];
 		if (!isset($st[$uid])) { continue; } //not a student we're reporting on
-		$aid = $line['id'];
+		$aid = $line['assessmentid'];
 		$totalAttemptCount++;
-
-		if ($line['ptsposs']==-1) {
-			require_once("../includes/updateptsposs.php");
-			$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);
-		}
-		//store assessment info
-		if (!isset($assessmentInfo[$aid])) {
-			$assessmentInfo[$aid]['name'] = $line['name'];
-			$assessmentInfo[$aid]['attempts'] = 1;
-			$assessmentInfo[$aid]['possible'] = $line['ptsposs'];
-			$assessmentInfo[$aid]['minscore'] = $line['minscore'];
-			$assessmentInfo[$aid]['totalPointsEarned'] = 0;
-			$assessmentInfo[$aid]['nocreditstulist'] = array();
-			$assessmentInfo[$aid]['gotcreditstulist'] = array();
-		} else {
-			$assessmentInfo[$aid]['attempts']++;
-		}
+    $assessmentInfo[$aid]['attempts']++;
 
 		//get student scores
 		$sp = explode(';', $line['bestscores']);   //scores:rawscores
@@ -204,7 +212,50 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 				$assessmentInfo[$aid]['gotcreditstulist'][] = $uid;
 			}
 		}
+	}
 
+  // assess2 data
+  $query = "SELECT assessmentid, userid, score, timeontask FROM imas_assessment_records
+            WHERE assessmentid IN ($ph) AND lastchange > ?";
+  $stm = $DBH->prepare($query);
+  $stm->execute($qarr);
+	while($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$uid = $line['userid'];
+		if (!isset($st[$uid])) { continue; } //not a student we're reporting on
+		$aid = $line['assessmentid'];
+		$totalAttemptCount++;
+    $assessmentInfo[$aid]['attempts']++;
+
+		//get student scores
+		$pts = $line['score'];
+
+		$st[$uid]['totalTimeOnTask'] += array_sum(explode(',',str_replace('~',',',$line['timeontask'])));
+		$st[$uid]['totalPointsOnAttempted'] += $pts;
+		$st[$uid]['totalPointsPossibleOnAttempted'] += $assessmentInfo[$aid]['possible'];
+		$assessmentInfo[$aid]['totalPointsEarned'] += $pts;
+
+		if ($assessmentInfo[$aid]['minscore']!=0 && $useminscore) { //use minscore
+			$minscore = $assessmentInfo[$aid]['minscore'];
+			if (($minscore<10000 && $pts<$minscore) || ($minscore>10000 && $pts<($minscore-10000)/100*$assessmentInfo[$aid]['possible'])) {
+				//student did not get credit
+				$st[$uid]['stuNocreditAssessList'][] = $aid;
+				$assessmentInfo[$aid]['nocreditstulist'][] = $uid;
+			} else {
+				//student did get credit
+				$st[$uid]['stuCreditAssessList'][] = $aid;
+				$assessmentInfo[$aid]['gotcreditstulist'][] = $uid;
+			}
+		} else { //no minscore, so use alternate break value
+			if (100*$pts/$assessmentInfo[$aid]['possible'] < $breakpercent) {
+				//student did not get credit
+				$st[$uid]['stuNocreditAssessList'][] = $aid;
+				$assessmentInfo[$aid]['nocreditstulist'][] = $uid;
+			} else {
+				//student did get credit
+				$st[$uid]['stuCreditAssessList'][] = $aid;
+				$assessmentInfo[$aid]['gotcreditstulist'][] = $uid;
+			}
+		}
 	}
 
 	$totalstudents = count($st);
@@ -404,6 +455,7 @@ uasort($assessmentInfo, function($a,$b) {return strcasecmp($a['name'],$b['name']
 
 $i = 0;
 foreach ($assessmentInfo as $aid=>$ainfo) {
+  if ($ainfo['attempts'] == 0) { continue; } // skip assessments with no work
 	if ($i%2!=0) {
 		echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">";
 	} else {

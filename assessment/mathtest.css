@@ -210,18 +210,18 @@ table.p3longdiv td.right {
 	padding: 0px;
 }
 table.p3longdiv td.bottomborder {
-	border-bottom:1px solid black; 
-	text-align: right; 
+	border-bottom:1px solid black;
+	text-align: right;
 	padding: 0px;
 }
 table.p3longdiv td.topborder {
-	border-top:1px solid black; 
-	text-align: right; 
+	border-top:1px solid black;
+	text-align: right;
 	padding: 0px;
 }
-table.p3longdiv td.topleftborder { 
+table.p3longdiv td.topleftborder {
 	border-left: 1px solid black;
-	border-top: 1px solid black; 
+	border-top: 1px solid black;
 	text-align: right;
 	padding: 0px;
 }
@@ -973,7 +973,7 @@ a[rel*=noopener]:after {
 .mce-content-body a[target=_blank]:after {
 	display: none;
 }
-.mce-content-body span.AMedit {border: 1px solid #ff0000;} 
+.mce-content-body span.AMedit {border: 1px solid #ff0000;}
 .clearfix:after {
     content: " ";
     display: block;

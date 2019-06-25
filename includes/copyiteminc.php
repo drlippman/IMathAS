@@ -1,7 +1,7 @@
 <?php
 
 require_once(__DIR__."/updateptsposs.php");
-
+require_once(__DIR__."/migratesettings.php");
 //boost operation time
 
 ini_set("max_input_time", "900");
@@ -33,7 +33,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	global $DBH;
 	global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
-	global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti;
+	global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti, $convertAssessVer;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -221,11 +221,17 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		  ':enddate'=>$row['enddate'], ':avail'=>$row['avail'], ':caltag'=>$row['caltag'], ':itemdescr'=>$row['itemdescr'], ':itemids'=>$row['itemids'],
 			':scoretype'=>$row['scoretype'], ':showtype'=>$row['showtype'], ':n'=>$row['n'], ':classbests'=>$row['classbests'], ':showtostu'=>$row['showtostu']));
 		$newtypeid = $DBH->lastInsertId();
-	}else if ($itemtype == "Assessment") {
-		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
-		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
-		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$stm = $DBH->prepare("SELECT name,summary,intro,startdate,enddate,reviewdate,LPcutoff,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,posttoforum,ptsposs,extrefs FROM imas_assessments WHERE id=:id");
+	} else if ($itemtype == "Assessment") {
+		$query = "SELECT name,summary,intro,startdate,enddate,reviewdate,LPcutoff,
+			timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,
+			defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,
+			allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,
+			deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,
+			istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,
+			posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,
+			ansingb,defregens,defregenpenalty,ver,keepscore,overtime_grace,overtime_penalty
+			FROM imas_assessments WHERE id=:id";
+		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$typeid));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($row['ptsposs']==-1) {
@@ -282,11 +288,20 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		$row['name'] .= $_POST['append'];
 
 		$row['courseid'] = $cid;
-		
+
 		if (isset($datesbylti) && $datesbylti==true) {
 			$row['date_by_lti'] = 1;
 		} else {
 			$row['date_by_lti'] = 0;
+		}
+
+		$itemorder = $row['itemorder'];
+		unset($row['itemorder']);
+
+		$aver = $row['ver'];
+		if (isset($convertAssessVer) && $convertAssessVer > $aver) {
+			$row = migrateAssessSettings($row, $aver, $convertAssessVer);
+			$questionDefaults = array('defattempts' => $row['defattempts']);
 		}
 
 		$fields = implode(",", array_keys($row));
@@ -308,9 +323,8 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		$assessnewid[$typeid] = $newtypeid;
 		$thiswithdrawn = array();
 		$needToUpdatePtsPoss = false;
-		$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$typeid));
-		$itemorder = $stm->fetchColumn(0);
+
+		// remap itemorder
 		if (trim($itemorder)!='') {
 			$flat = preg_replace('/\d+\|\d+~/','',$itemorder);
 			$flat = str_replace('~',',',$itemorder);
@@ -323,11 +337,17 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 			}
 			$flat = implode(',', $goodqs);
 			//$flat is santized above
-			$stm = $DBH->query("SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,withdrawn,fixedseeds FROM imas_questions WHERE id IN ($flat)");
+			$query = "SELECT id,questionsetid,points,attempts,penalty,category,regen,
+				showans,showhints,rubric,withdrawn,fixedseeds FROM imas_questions
+				WHERE id IN ($flat)";
+			$stm = $DBH->query($query);
 			$inssph = array(); $inss = array();
 			$insorder = array();
 
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (isset($convertAssessVer) && $convertAssessVer > $aver) {
+					$row = migrateQuestionSettings($row, $questionDefaults, $aver, $convertAssessVer);
+				}
 				if ($row['withdrawn']>0) {
 					$needToUpdatePtsPoss = true;
 				}
@@ -410,7 +430,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 				$newitemorder = implode(',',$newaitems);
 				$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$newitemorder, ':id'=>$newtypeid));
-				//Temporary: force recalculation of points possible on copying, 
+				//Temporary: force recalculation of points possible on copying,
 				// to fix any lingering buggy ptsposs values
 				//if ($needToUpdatePtsPoss) {
 					$newptsposs = updatePointsPossible($newtypeid, $newitemorder, $srcdefpoints);

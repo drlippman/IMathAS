@@ -207,9 +207,9 @@ function newXMLoverPost($url, $request, $requestHeaders, $method = 'POST') {
 	//From https://github.com/IMSGlobal/LTI-Tool-Provider-Library-PHP/blob/master/src/HTTPMessage.php
 	//Stephen P Vickers <svickers@imsglobal.org> copyright IMS Global Learning Consortium Inc
 	//License: http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
-	
+
 	$ok = false; $resp = '';
-	
+
 	// Try using curl if available
 	if (function_exists('curl_init')) {
 		$resp = '';
@@ -301,26 +301,36 @@ if (!function_exists("getpts")) {
 
 $aidtotalpossible = array();
 //use this if we don't know the total possible
-function calcandupdateLTIgrade($sourcedid,$aid,$scores,$sendnow=false) {
+function calcandupdateLTIgrade($sourcedid,$aid,$scores,$sendnow=false,$aidposs=-1) {
 	global $DBH, $aidtotalpossible;
-	if (!isset($aidtotalpossible[$aid])) {
-		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$aid));
-		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		if ($line['ptsposs']==-1) {
-			$line['ptsposs'] = updatePointsPossible($aid, $line['itemorder'], $line['defpoints']);
-		}
-		$aidtotalpossible[$aid] = $line['ptsposs'];
-	}
-	$total = 0;
+  if ($aidposs == -1) {
+    if (isset($aidtotalpossible[$aid])) {
+      $aidposs = $aidtotalpossible[$aid];
+    } else {
+  		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
+  		$stm->execute(array(':id'=>$aid));
+  		$line = $stm->fetch(PDO::FETCH_ASSOC);
+  		if ($line['ptsposs']==-1) {
+  			$line['ptsposs'] = updatePointsPossible($aid, $line['itemorder'], $line['defpoints']);
+  		}
+  		$aidposs = $line['ptsposs'];
+  	}
+  }
 	$allans = true;
-	for ($i =0; $i < count($scores);$i++) {
-		if ($allans && strpos($scores[$i],'-1')!==FALSE) {
-			$allans = false;
-		}
-		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
-	}
-	$grade = min(1, max(0,$total/$aidtotalpossible[$aid]));
+  if (is_array($scores)) {
+    // old assesses
+    $total = 0;
+  	for ($i =0; $i < count($scores);$i++) {
+  		if ($allans && strpos($scores[$i],'-1')!==FALSE) {
+  			$allans = false;
+  		}
+  		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
+  	}
+  } else {
+    // new assesses
+    $total = $scores;
+  }
+	$grade = min(1, max(0,$total/$aidposs));
 	$grade = number_format($grade,8);
 	return updateLTIgrade('update',$sourcedid,$aid,$grade,$allans||$sendnow);
 }
@@ -328,7 +338,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores,$sendnow=false) {
 //use this if we know the grade, or want to delete
 function updateLTIgrade($action,$sourcedid,$aid,$grade=0,$sendnow=false) {
 	global $DBH,$sessiondata,$testsettings,$cid,$CFG,$userid;
-	
+
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
 		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
 		if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k
@@ -559,7 +569,7 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 	} else {
 	    return false;
 	}
-	
+
 	$hash = base64_encode(sha1($postBody, TRUE));
 
     $parms = array('oauth_body_hash' => $hash);
@@ -578,7 +588,7 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 
     $header = array($acc_req->to_header());
     $header[] = "Content-Type: application/xml";
-	
+
     return array('body'=>$postBody, 'header'=>$header);
 }
 
@@ -592,13 +602,13 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 
 function addToLTIQueue($sourcedid, $grade, $sendnow=false) {
 	global $DBH, $CFG;
-	
+
 	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
 
 	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon) ';
 	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon) ON DUPLICATE KEY UPDATE ';
 	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),failures=0 ';
-	
+
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(
 		':hash' => md5($sourcedid),
@@ -606,7 +616,7 @@ function addToLTIQueue($sourcedid, $grade, $sendnow=false) {
 		':grade' => $grade,
 		':sendon' => (time() + ($sendnow?0:$LTIdelay))
 	));
-	
+
 	return ($stm->rowCount()>0);
 }
 ?>

@@ -55,13 +55,13 @@
 		}
 	}
 
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
 
 
 	$placeinhead .= '<script type="text/javascript">
@@ -69,12 +69,20 @@
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
 			return false;
 		}
+		function showfb2(aid,uid,type) {
+			GB_show(_("Feedback"), "showfeedback2.php?cid="+cid+"&type="+type+"&aid="+aid+"&uid="+uid, 500, 500);
+			return false;
+		}
 		</script>';
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
 
-	echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
+	if ($aver > 1 ) {
+		echo '<div class="cpmid"><a href="gb-itemanalysis2.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
+	} else {
+		echo '<div class="cpmid"><a href="gb-itemanalysis.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
+	}
 	/*$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 	$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 	$stm = $DBH->prepare($query);
@@ -163,10 +171,15 @@
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$excused[$row[0]] = 1;
 	}
-
-	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
-	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
-	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
+	if ($aver>1) {
+		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
+		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
+		$query .= "LEFT JOIN imas_assessment_records AS iar ON iu.id=iar.userid AND iar.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
+	} else {
+		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
+		$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
+		$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
+	}
 	if ($secfilter != -1) {
 		$query .= " AND istu.section=:section ";
 	}
@@ -204,6 +217,13 @@
 		echo "<th>Due Date</th>";
 	}
 	echo "<th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
+
+	if (!empty($CFG['assess2-use-vue-dev'])) {
+		$assessGbUrl = "http://localhost:8080/gbviewassess.html?";
+	} else {
+		$assessGbUrl = "../assess2/gbviewassess.php?";
+	}
+
 	$now = time();
 	$lc = 1;
 	$n = 0;
@@ -212,6 +232,9 @@
 	$tottime = 0;
 	$tottimeontask = 0;
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($aver==1) {
+			$line['lastchange'] = $line['endtime'];
+		}
 		if ($lc%2!=0) {
 			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">";
 		} else {
@@ -235,15 +258,23 @@
 			if ($line['code']==null) {$line['code']='';}
 			printf("<td>%s</td>", Sanitize::encodeStringForDisplay($line['code']));
 		}
-		$total = 0;
-		$sp = explode(';',$line['bestscores']);
-		$scores = explode(",",$sp[0]);
-		if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
-		for ($i=0;$i<count($scores);$i++) {
-			$total += getpts($scores[$i]);
+		if ($aver>1) {
+			$total = $line['score'];
+			$timeused = $line['lastchange'] - $line['starttime'];
+			$timeontask = $line['timeontask'];
+			$isOvertime = ($line['status']&4) == 4;
+		} else {
+			$total = 0;
+			$sp = explode(';',$line['bestscores']);
+			$scores = explode(",",$sp[0]);
+			if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
+			for ($i=0;$i<count($scores);$i++) {
+				$total += getpts($scores[$i]);
+			}
+			$timeused = $line['endtime']-$line['starttime'];
+			$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
+			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 		}
-		$timeused = $line['endtime']-$line['starttime'];
-		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
 			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
@@ -253,17 +284,29 @@
 		} else {
 			$thisenddate = $enddate;
 		}
-		if ($line['id']==null) {
-			$querymap = array(
-				'gbmode' => $gbmode,
-				'cid' => $cid,
-				'asid' => 'new',
-				'uid' => $line['userid'],
-				'from' => 'isolate',
-				'aid' => $aid
-			);
+		if ($line['starttime']==null) {
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
 
-			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+			} else {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'asid' => 'new',
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
+			}
 			if ($useexception) {
 				if ($exceptions[$line['userid']][2]>0) {
 					echo '<sup>LP</sup>';
@@ -280,16 +323,28 @@
 			}
 			echo "<td></td><td></td>";
 		} else {
-			$querymap = array(
-				'gbmode' => $gbmode,
-				'cid' => $cid,
-				'asid' => $line['id'],
-				'uid' => $line['userid'],
-				'from' => 'isolate',
-				'aid' => $aid
-			);
+			if ($aver > 1) {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
 
-			echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+				echo '<td><a href="' . $assessGbUrl . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			} else {
+				$querymap = array(
+					'gbmode' => $gbmode,
+					'cid' => $cid,
+					'asid' => $line['id'],
+					'uid' => $line['userid'],
+					'from' => 'isolate',
+					'aid' => $aid
+				);
+
+				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
+			}
 			if ($thisenddate>$now) {
 				echo '<i>'.Sanitize::onlyFloat($total);
 			} else {
@@ -300,7 +355,7 @@
 				echo "&nbsp;(NC)";
 			} else 	if ($IP==1 && $thisenddate>$now) {
 				echo "&nbsp;(IP)";
-			} else	if (($timelimit>0) &&($timeused > $timelimit*$line['timelimitmult'])) {
+			} else	if ($isOvertime) {
 				echo "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
 				echo "&nbsp;(PT)";
@@ -328,19 +383,19 @@
 			} else {
 				echo '<td>&nbsp;</td>';
 			}
-			if ($line['endtime']==0) {
+			if ($line['lastchange']==0) {
 				if ($line['starttime']==0) {
 					echo '<td>Never started</td>';
 				} else {
 					echo '<td>Never submitted</td>';
 				}
 			} else {
-				echo '<td>'.tzdate("n/j/y g:ia",$line['endtime']).'</td>';
+				echo '<td>'.tzdate("n/j/y g:ia",$line['lastchange']).'</td>';
 			}
 			if ($includeduedate) {
 				echo '<td>'.tzdate("n/j/y g:ia",$thisenddate).'</td>';
 			}
-			if ($line['endtime']==0 || $line['starttime']==0) {
+			if ($line['lastchange']==0 || $line['starttime']==0) {
 				echo '<td>&nbsp;</td>';
 			} else {
 				echo '<td>'.round($timeused/60).' min';
@@ -352,21 +407,33 @@
 				$tottime += $timeused;
 				$ntime++;
 			}
-
-			$feedback = json_decode($line['feedback']);
-			if ($feedback===null) {
-				$hasfeedback = ($line['feedback'] != '');
+			if ($aver > 1 ) {
+				$hasfeedback = (($line['status']&8) == 8 || $deffeedbacktext !== '');
 			} else {
-				$hasfeedback = false;
-				foreach ($feedback as $k=>$v) {
-					if ($v != '' && $v != '<p></p>') {
-						$hasfeedback = true;
-						break;
+				$feedback = json_decode($line['feedback']);
+				if ($feedback===null) {
+					$hasfeedback = ($line['feedback'] != '');
+				} else {
+					$hasfeedback = false;
+					foreach ($feedback as $k=>$v) {
+						if ($v != '' && $v != '<p></p>') {
+							$hasfeedback = true;
+							break;
+						}
 					}
 				}
 			}
+			//TODO: FINISH CHANGES
 			if ($hasfeedback) {
-				echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">', _('[Show Feedback]'), '</a></td>';
+				if ($aver > 1 ) {
+					echo '<td><a href="#" class="small feedbacksh pointer" ';
+					echo 'onclick="return showfb2('.$aid.','.Sanitize::onlyInt($line['userid']).',\'A\')">';
+					echo _('[Show Feedback]'), '</a></td>';
+				} else {
+					echo '<td><a href="#" class="small feedbacksh pointer" ';
+					echo 'onclick="return showfb('.Sanitize::onlyInt($line['id']).',\'A\')">';
+					echo _('[Show Feedback]'), '</a></td>';
+				}
 			} else {
 				echo '<td></td>';
 			}
@@ -377,7 +444,11 @@
 	if ($hassection && !$hidesection) {
 		echo '<td></td>';
 	}
-	echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=isolate\">";
+	if ($aver > 1 ) {
+		echo "<td><a href=\"gb-itemanalysis2.php?cid=$cid&aid=$aid&from=isolate\">";
+	} else {
+		echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=isolate\">";
+	}
 	if ($n>0) {
 		echo round($tot/$n,1);
 	} else {

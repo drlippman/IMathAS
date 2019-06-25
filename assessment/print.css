@@ -1,16 +1,17 @@
-div.navbar,div.breadcrumb { 
+div.navbar,div.breadcrumb {
 	display:none;
 }
 div.intro,div.review,div.question {
 	background-color: #fff;
 	border: 0px;
 }
-div.inset { 
-	margin-left: 0px; 
+div.inset {
+	margin-left: 0px;
 }
 input.text {
 	border: 0px;
 	border-bottom: 1px solid #000;
+	border-radius: 0px;
 }
 p.tips {
 	display: none;

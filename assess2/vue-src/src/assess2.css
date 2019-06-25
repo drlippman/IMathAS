@@ -1,0 +1,334 @@
+/* Should move to imascore.css */
+
+
+/* General assessment player support styles */
+
+.ehdd {
+  position: absolute;
+  background: #669;
+  display:none;
+  color: #fff;
+  font-size: 75%;
+  padding: 0px 4px;
+  opacity: 0.9;
+}
+.eh {
+  position: absolute;
+  background: #669;
+  color: #fff;
+  display: none;
+  padding: 0px 4px;
+  font-size: 75%;
+  opacity: 0.9;
+}
+.suggestion_list {
+   background: white;
+   border: 1px solid #ccc;
+   box-shadow: 1px 3px 8px 0 rgba(0,0,0,0.25);
+   padding: 0px;
+ }
+
+ .suggestion_list ul {
+   padding: 0;
+   margin: 0;
+   list-style-type: none;
+ }
+
+ .suggestion_list a {
+   display: inline-block;
+   text-decoration: none;
+   color: navy;
+   padding: 4px 8px;
+ }
+
+ .suggestion_list .selected {
+   background: #ddd;
+ }
+
+ .dsbox {
+   border: 1px solid #ccc;
+   background-color: #eef;
+   padding: 8px;
+ }
+ .keywrap {
+   display: inline-block;
+   padding: 0;
+   margin: 1px 0 1px 2px;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   vertical-align: middle;
+ }
+ .keywrap [id^=ans] {
+   padding: 2px 8px;
+ }
+ .keybtn {
+   height: 28px;
+   padding: 4px;
+   margin: -1px;
+   border: 1px solid #ccc;
+   vertical-align: middle;
+ }
+ .keywrap.inwrap {
+   vertical-align: top;
+ }
+ .keywrap.inwrap .keybtn {
+   vertical-align: top;
+ }
+
+/* Question type supports */
+div.choice {
+  padding: 5px;
+  float: left;
+  text-align: center;
+}
+div.float {
+  float:left;
+}
+
+div.match {
+  float:left;
+  padding: 5px;
+  padding-right: 30px;
+}
+div.spacer {
+  clear: both;
+  height: 1px;
+  padding: 0px;
+}
+p.centered {
+  text-align: center;
+}
+
+table.p3longdiv {
+  border-spacing: 0px;
+  border-collapse: collapse;
+}
+table.p3longdiv td.right {
+  text-align: right;
+  padding: 0px;
+}
+table.p3longdiv td.bottomborder {
+  border-bottom:1px solid black;
+  text-align: right;
+  padding: 0px;
+}
+table.p3longdiv td.topborder {
+  border-top:1px solid black;
+  text-align: right;
+  padding: 0px;
+}
+table.p3longdiv td.topleftborder {
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  text-align: right;
+  padding: 0px;
+}
+table.stats {
+  margin-left: 20px;
+  border-collapse: collapse;
+  background: #eef;
+}
+table.stats tbody tr td {
+  border: 1px solid #000;
+  padding: 1px 10px;
+}
+table.stats tbody tr td {
+  text-align: right;
+}
+table td.left {
+  text-align: left;
+}
+table.stats thead tr th {
+  border: 1px solid #000;
+  padding: 1px 10px;
+  text-align: center;
+  background: #eff;
+  border-bottom: 3px solid #000;
+}
+table.stats tbody tr th {
+  border: 1px solid #000;
+  padding: 1px 10px;
+  text-align: center;
+  background: #eff;
+  border-right: 3px solid #000;
+}
+table.scores td {
+  padding-right: 20px;
+}
+span.spanbutton {
+  padding: 1px 3px;
+  border: 2px outset #f9f;
+  background: #f9f;
+  cursor: default;
+}
+span.spanbutton:active {
+  border: 2px inset #f9f;
+  background: #fcf;
+  cursor: default;
+}
+span.spanbutton:hover {
+  background: #fcf;
+}
+table.longdiv {
+  border-collapse: collapse;
+  border: 0px;
+}
+table.longdiv td {
+  padding: 3px;
+}
+td.barslefttop {
+  border-left: 1px solid #000;
+  border-top: 1px solid #000;
+}
+td.matrixleft {
+  border: 1px solid #000;
+  border-width: 1px 0px 1px 1px;
+  margin: 0px;
+  padding: 0px;
+}
+td.matrixright {
+  border: 1px solid #000;
+  border-width: 1px 1px 1px 0px;
+  margin: 0px;
+  padding: 0px;
+}
+table.paddedtable tr.onepixel { line-height: 1px;}
+table.paddedtable td.matrixtopborder {border-top:1px solid black;padding:0;}
+table.paddedtable td.matrixtopleftborder { border-left:1px solid black;border-top:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixtoprightborder { border-right:1px solid black;border-top:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixleftborder { border-left:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixrightborder { border-right:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixbottomleftborder { border-left:1px solid black;border-bottom:1px solid black;padding:0;width:5px; }
+table.paddedtable td.matrixbottomrightborder { border-right:1px solid black;border-bottom:1px solid black;padding:0;width:5px; }
+table.paddedtable td.nopad { padding:0;  width: 5px;}
+
+table.paddedtable td, table.paddedtable th {
+  padding: 2px 5px;
+}
+td.c, table.stats tbody td.c {
+  text-align: center;
+}
+td.r, table.stats tbody td.r {
+  text-align: right;
+}
+td.l, table.stats tbody td.l {
+  text-align: left;
+}
+
+ul.nomark {
+  padding-left: 40px;
+}
+div.toppad {
+  padding-top: 5px;
+}
+ul.likelines {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+ul.likelines li {
+  margin-bottom: .4em;
+}
+
+ul.nomark {list-style-type: none;}
+ul.nomark li { margin-top: .7em;}
+ol.lalpha {list-style-type: lower-alpha;}
+ol.lalpha li { margin-top: .7em;}
+
+.spaced li { margin-bottom: .3em;}
+
+.drawtools {
+  margin-left: 8px;
+}
+.drawtools img {
+  vertical-align: middle;
+}
+.drawtools [data-drawaction] {
+  border: 1px solid #ccc;
+  padding: 2px;
+  cursor: pointer;
+}
+.drawtools span[data-drawaction] {
+  padding: 2px 8px;
+}
+.drawtools [data-drawaction]:hover {
+  background-color: #EDF4FC;
+}
+.drawtools [data-drawaction].sel {
+  background-color: #E6F0F9;
+}
+
+/* General layout styles used many places */
+input, .mq-editable-field {
+  border: 1px solid #999;
+  padding: 4px 6px;
+  border-radius: 4px;
+  margin: 1px 0;
+}
+input[type=radio], input[type=checkbox] {
+  margin: 1px 4px 1px 0;
+}
+.subdued {
+  color: #757575;
+}
+
+.scrollpane {
+  width: 100%;
+  overflow-x: auto;
+  background-image: linear-gradient(to right, white, white), linear-gradient(to right, white, white), linear-gradient(to right, rgba(0,0,0,.25), rgba(255,255,255,0)), linear-gradient(to left, rgba(0,0,0,.25), rgba(255,255,255,0));
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: inherit;
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+.headerpane {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+}
+
+.questionpane {
+  margin: 15px 15px;
+  max-width: 700px;
+  overflow: visible;
+}
+@media only screen and (max-width: 480px) {
+  .questionpane {
+    margin: 15px 4px;
+  }
+}
+.questionpane.introtext {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #f3f3f9;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.inactive {
+  visibility: hidden;
+  position: absolute;
+  margin-left: -10000px;
+}
+.flexpanes {
+  display: flex;
+  flex-flow: row wrap;
+}
+.flexpanes > div + div{
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  margin-top: -1px;
+}
+.no-margin-top {
+  margin-top: 0;
+}
+.ind1 {
+  margin-left: 20px;
+}
+.med-below {
+  margin-bottom: 16px;
+}
+.med-left {
+  margin-left: 16px;
+}
+
+/* mobile adjustments */

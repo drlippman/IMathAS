@@ -112,9 +112,9 @@ class Sanitize
 	public static function encodeStringForJavascript($string)
 	{
 		$string = (string) $string; //force to string type
-		$string = json_encode($string, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG); 
+		$string = json_encode($string, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG);
 		return mb_substr($string, 1, -1);
-		
+
 		/*$safeString = '';
 
 		$stringLength = strlen($string);
@@ -184,12 +184,12 @@ class Sanitize
 	* @param $url the url to sanitize
 	* @return string the sanitized url, for inclusion in an href
 	*/
-	public static function encodeUrlForHref($url) 
+	public static function encodeUrlForHref($url)
 	{
 		$url = filter_var($url, FILTER_SANITIZE_URL);
 		return htmlspecialchars($url, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), false);
 	}
-	
+
 	/**
 	 * An alias for Sanitize::url().
 	 * TODO: Remove this after merges between all repos are complete and all references to fullUrl() are removed.
@@ -287,6 +287,23 @@ class Sanitize
 	}
 
 	/**
+	 * Convert an array of key=>value pairs into a space-separated string of
+	 * attributes that can be added to an HTML element
+	 * @param  array $args  key=>value pairs
+	 * @return string  of space separated key="value"
+	 */
+	public static function generateAttributeString($args) {
+		$out = '';
+		foreach ($args as $k=>$v) {
+			$out .= preg_replace('/[^\w\-_]/','', $k) .
+							'="' .
+							htmlspecialchars($v, ENT_QUOTES | ENT_HTML401, ini_get("default_charset"), false) .
+							'" ';
+		}
+		return $out;
+	}
+
+	/**
 	 * Sanitize a complete URL query string. (Everything after and without the '?' character in a URL)
 	 *
 	 * Example input: "name=MyName&cid=994&color=blue"
@@ -330,7 +347,7 @@ class Sanitize
 	 */
 	public static function onlyInt($data)
 	{
-		return filter_var($data, FILTER_SANITIZE_NUMBER_INT);
+		return (int) filter_var($data, FILTER_SANITIZE_NUMBER_INT);
 	}
 
 	/**
@@ -341,7 +358,7 @@ class Sanitize
 	 */
 	public static function onlyFloat($data)
 	{
-		return filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+		return (float) filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 	}
 
 	/**
@@ -418,7 +435,7 @@ class Sanitize
 	{
 		return filter_var($address, FILTER_SANITIZE_EMAIL);
 	}
-	
+
 	/**
 	 * Sanitize an email address, including one with display name.
 	 *
@@ -539,16 +556,16 @@ class Sanitize
 	public static function incomingHtml($unsafeContent) {
 		return myhtmLawed($unsafeContent);
 	}
-	
+
 	/**
-	 * Generate a random string for the query string 
+	 * Generate a random string for the query string
 	 *
 	 * @return string The sanitized content.
 	 */
 	public static function randomQueryStringParam() {
 		return uniqid();
 	}
-	
+
 	/**
 	 * A function for exporting text within a .imas
 	 * export file. Since this format is intended to

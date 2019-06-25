@@ -118,9 +118,9 @@
 		//any old items will not get copied.
 		$viddata = serialize($newviddata);
 	}
-	
+
 	$DBH->beginTransaction();
-	
+
 	//update question point values
 	$ptschanged = false;
 	if (isset($_POST['pts'])) {
@@ -131,14 +131,14 @@
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($newpts['qn'.$row['id']])) {
 				continue;  //shouldn't happen
-			} 
+			}
 			if ($row['points'] != $newpts['qn'.$row['id']]) {
 				$upd_pts->execute(array($newpts['qn'.$row['id']], $row['id']));
 				$ptschanged = true;
 			}
 		}
 	}
-	
+
 	$qarr = array(':itemorder'=>$_REQUEST['order'], ':viddata'=>$viddata, ':intro'=>$new_intro, ':id'=>$aid, ':courseid'=>$cid);
 	$query = "UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata,intro=:intro";
 	if (isset($_POST['defpts'])) {
@@ -159,6 +159,18 @@
 		//update points possible
 		require_once("../includes/updateptsposs.php");
 		updatePointsPossible($aid, $_REQUEST['order'], $defpoints);
+
+		// Delete any teacher or tutor attempts on this assessment
+		$query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+			imas_teachers AS usr ON usr.userid=iar.userid AND usr.courseid=?
+			WHERE iar.assessmentid=?';
+		$stm = $DBH->prepare($query);
+		$stm->execute(array($cid, $aid));
+		$query = 'DELETE iar FROM imas_assessment_records AS iar JOIN
+			imas_tutors AS usr ON usr.userid=iar.userid AND usr.courseid=?
+			WHERE iar.assessmentid=?';
+		$stm = $DBH->prepare($query);
+		$stm->execute(array($cid, $aid));
 
 		echo "OK";
 	} else {

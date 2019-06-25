@@ -5,8 +5,17 @@
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 
+$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+if (!isset($allowedmacros)) {
+  $allowedmacros = $mathfuncs;
+}
+
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
-$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights');
+$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la',
+  '$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips',
+  '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros',
+  '$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights',
+  '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)

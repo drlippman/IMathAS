@@ -100,18 +100,27 @@ function showitemtree($items,$parent,$greyitems=0) {
 				   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 					   $showgreyedout = true;
 				   }
-				   $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
-				   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
+					 if ($line['ver']>1) {
+						 $stm = $DBH->prepare("SELECT score FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
+					 } else {
+				   	 $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
+					 }
+					 $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
 				   if ($stm->rowCount()==0) {
 					   $nothidden = false;
 				   } else {
-					   $scores = explode(';',$stm->fetchColumn(0));
+						 if ($line['ver']>1) {
+							 $score = $stm->fetchColumn(0);
+						 } else {
+					   	 $scores = explode(';',$stm->fetchColumn(0));
+							 $score = getpts($scores[0]);
+						 }
 					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if (round(100*getpts($scores[0])/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+					   	   if (round(100*$score/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
 							   $nothidden = false;
 						   }
 					   } else { //points based
-						   if (round(getpts($scores[0]),1)+.02<abs($line['reqscore'])) {
+						   if (round($score,1)+.02<abs($line['reqscore'])) {
 							   $nothidden = false;
 						   }
 					   }

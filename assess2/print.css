@@ -1,0 +1,35 @@
+div.navbar,div.breadcrumb { 
+	display:none;
+}
+div.intro,div.review,div.question {
+	background-color: #fff;
+	border: 0px;
+}
+div.inset {
+	margin-left: 0px;
+}
+input.text {
+	border: 0px;
+	border-bottom: 1px solid #000;
+}
+p.tips {
+	display: none;
+}
+input.btn {
+	display: none;
+}
+#bannerimg {
+	display: none;
+}
+div.question {
+	page-break-inside: avoid;
+}
+div.nobreak {
+	page-break-inside:avoid;
+}
+.headerwrapper {
+	display:none;
+}
+.drawtools {
+	display:none;
+}

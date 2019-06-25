@@ -67,14 +67,14 @@
 
 			printf(" <input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addgrades.php?stu=%s&cid=%s&gbitem=%d&grades=all'\" />",
 				Sanitize::encodeUrlParam($_GET['stu']), $cid, Sanitize::encodeUrlParam($_GET['del']));
-			
+
 			echo '</p></form>';
 			require("../footer.php");
 			exit;
 		}
 
 	}
-	
+
 	if ($gbItem != 'new') {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_gbitems WHERE id=?");
 		$stm->execute(array($gbItem));
@@ -83,18 +83,18 @@
 			exit;
 		}
 	}
-	
-		
+
+
 	//get excusals
 	$excused = array();
 	if ($gbItem != 'new') {
 		$stm = $DBH->prepare("SELECT userid FROM imas_excused WHERE type='O' AND typeid=:id");
-		$stm->execute(array(':id'=>$gbItem));	
+		$stm->execute(array(':id'=>$gbItem));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$excused[$row[0]] = 1;
 		}
 	}
-	
+
 	if (isset($_POST['name']) && $isteacher) {
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['sdatetype']=='0') {
@@ -148,24 +148,38 @@
 			}
 		}
 	}
-	
+
 	if (isset($_POST['assesssnap'])) {
 		$assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
 		$post_points = Sanitize::onlyFloat($_POST['points']);
-		
+
 		//doing assessment snapshot
-		$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+		$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=:assessmentid");
+		$stm->execute(array(':assessmentid'=>$assesssnapaid));
+		$aver = $stm->fetchColumn(0);
+		if ($aver == 1) {
+			$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+		} else {
+			$stm = $DBH->prepare("SELECT userid,score,scoreddata FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+		}
 		$stm->execute(array(':assessmentid'=>$assesssnapaid));
 		while($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$sp = explode(';',$row[1]);
-			$sc = explode(',',$sp[0]);
-			$tot = 0;
-			$att = 0;
-			foreach ($sc as $v) {
-				if (strpos($v,'-1')===false) {
-					$att++;
+			if ($aver == 1) {
+				$sp = explode(';',$row[1]);
+				$sc = explode(',',$sp[0]);
+				$tot = 0;
+				$att = 0;
+				foreach ($sc as $v) {
+					if (strpos($v,'-1')===false) {
+						$att++;
+					}
+					$tot += getpts($v);
 				}
-				$tot += getpts($v);
+			} else {
+				$tot = $row[1];
+				if ($assesssnaptype>0) {
+					//TODO-assessrecord: figure out $attper, the % of questions attempted
+				}
 			}
 			$assesssnaptype = (int) Sanitize::onlyInt($_POST['assesssnaptype']);
 			$assesssnapatt = (float) Sanitize::onlyFloat($_POST['assesssnapatt']);
@@ -728,7 +742,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 					Sanitize::encodeStringForDisplay($feedback[$row[0]]));
 			} else {
 				printf('<td><div class="fbbox" id="feedback%d">%s</div></td>',
-					Sanitize::encodeStringForDisplay($row[0]), 
+					Sanitize::encodeStringForDisplay($row[0]),
 					Sanitize::outgoingHtml($feedback[$row[0]]));
 			}
 			echo '<td></td>';

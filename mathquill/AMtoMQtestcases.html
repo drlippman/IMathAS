@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="mathquill-basic.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="mathquill.js"></script>
+<script src="AMtoMQ.js?v=3"></script>
+</head>
+<body>
+<input type="button" onclick="loadcase(0)" value="testcase 1"/>
+<input type="button" onclick="loadcase(1)" value="testcase 2"/>
+<input type="button" onclick="loadcase(2)" value="testcase 3"/>
+<input type="button" onclick="loadcase(3)" value="testcase 4"/>
+<input type="button" onclick="loadcase(4)" value="testcase 5"/>
+<input type="button" onclick="loadcase(5)" value="testcase 6"/>
+<input type="button" onclick="loadcase(6)" value="testcase 7"/>
+<input type="button" onclick="loadcase(7)" value="testcase 8"/>
+<input type="button" onclick="loadcase(8)" value="testcase 9"/>
+<input type="button" onclick="loadcase(9)" value="testcase 10"/>
+<input type="button" onclick="loadcase(10)" value="testcase 11"/>
+<br/>
+
+
+<p>Test name/notes: <span id="testnotes">Default load</span></p>
+Initial MathQuill:  <span id="editable-math" class="mathquill-editable">e^{3x+4}-5</span><br/>
+MathQuill's latex output: <textarea id="latex-source" style="width:60%;vertical-align:top"></textarea><br/>
+Converted to AsciiMath: <textarea id="am-source" style="width:60%;vertical-align:top"></textarea><br/>
+<span id="doesitmatch"></span><br/>
+Converted back to TeX: <textarea id="amt-source" style="width:60%;vertical-align:top"></textarea><br/>
+Re-rendered using MathQuill: <span id="output-math" class="mathquill-editable">4\left|x+1\right|</span>
+<script type="text/javascript">
+
+var testcases = [ //each is TeX, Asciimath
+	['3^{-1}+2^4+\\left(2+3\\right)^2-3^{2+3}', '3^-1+2^4+(2+3)^2-3^(2+3)', 'Forms of Exponents'],   //forms of exponents
+	['\\sqrt{2+3}+\\nthroot{3}{5}+\\frac{3}{4}-\\frac{2}{3+4}+\\frac{-1}{-5}', 'sqrt(2+3)+root(3)(5)+3/4-2/(3+4)+(-1)/(-5)', 'Roots and fractions'], //roots and fractions
+	['4+\\left|2 + 3\\right|+1','4+abs(2+3)+1', 'Absolute values.  Mathquill can\'t do nested abs'], //absolute values
+	['3+\\left(2+\\left(3+4\\right)\\right)+3', '3+(2+(3+4))+3', 'Nested parens'], //nested parens
+	['\\sin^{-1}\\left(\\theta\\right)+\\cos\\left(\\frac{\\pi}{2}x+3\\right)-\\tan^2\\left(x\\right)', 'sin^-1(theta)+cos((pi)/2x+3)-tan^2(x)','Trig arctrig and pi'], //pi, trig, arctrig
+	['\\log\\left(x+3\\right)+\\infty+\\log_2\\left(x\\right)+\\varnothing+DNE', 'log(x+3)+oo+log_2(x)+DNE+DNE', 'Logs and special chars.  DNE is still ok as entry, but this allows \\varnothing as alternative'],  //logs and special chars
+	['27\\frac{2}{3}', '27 2/3', 'Mixed number'],  //mixed number
+	['2=4+2<9\\le10\\text{ or }3>5\\text{all real numbers}', '2=4+2<9<=10 or 3>5all real numbers', 'Equations and inequalities. '],  //equations and inequalities
+	['\\left(2,3\\right)+\\langle{\\frac{2}{3},4}+\\left\\{2,3,4\\right\\}', '(2,3)+<<2/3,4>>+{2,3,4}', 'Points and vectors.  To distinguish angle brackets from inequalities, I\'ll need to adjust the grader to accept &lt;&lt;2,3&gt;&gt; for vector input. MathQuill has a weird format for langle.  '], //points and vectors
+	['\\left(1,2\\right]\\cup\\left[2,3\\right)\\cup(3,4)\\cup[4,5]', '(1,2]U[2,3)U(3,4)U[4,5]', 'Intervals. IMathAS uses U as input for union, but that is not really AsciiMath, so this is a bit hacked up.'],
+	['\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}', '[(1,2),(3,4)]', 'Matrices.']
+];
+var latexMath, latexSource, amSource, AMTsource, outMath;
+var MQ = MathQuill.getInterface(2);
+
+$(function() {
+
+  latexMath = MQ.MathField($('#editable-math')[0]);
+  latexSource = $('#latex-source');
+  amSource = $('#am-source');
+  AMTSource = $('#amt-source');
+  outMath = MQ.MathField($('#output-math')[0]);
+
+  $('#editable-math').on('keydown keypress', function() {
+    setTimeout(function() {
+      var latex = latexMath.latex();
+      latexSource.val(latex);
+      var AMout = MQtoAM(latex);
+      amSource.val(AMout);
+      var AMTout = AMtoMQ(AMout);
+      AMTSource.val(AMTout);
+      outMath.latex(AMTout);
+    });
+  }).keydown().focus();
+});
+
+$(function() {
+  amSource.bind('keydown keypress', function() {
+    setTimeout(function() {
+      var AMout = amSource.val();
+      var AMTout = AMtoMQ(AMout);
+      AMTSource.val(AMTout);
+      outMath.latex(AMTout);
+    });
+  }).keydown().focus();
+});
+$(function() {
+  AMTSource.bind('keydown keypress', function() {
+    setTimeout(function() {
+      var AMTout = AMTSource.val();
+      outMath.latex(AMTout);
+    });
+  }).keydown().focus();
+});
+
+function loadcase(n) {
+	$('#testnotes').html(testcases[n][2]);
+	latexMath.latex(testcases[n][0]);
+
+	      var latex = latexMath.latex();
+	      latexSource.val(latex);
+	      var AMout = MQtoAM(latex);
+	      if (AMout != testcases[n][1]) {
+	      	     $("#doesitmatch").html('<span style="color:red">Does not match expected AsciiMath output. Expected'+testcases[n][1]+'</span>');
+	      } else {
+	      	     $("#doesitmatch").html('<span style="color:green">Matches expected AsciiMath output</span>');
+	      }
+	      amSource.val(AMout);
+	      var AMTout = AMtoMQ(AMout);
+	      AMTSource.val(AMTout);
+	      outMath.latex(AMTout);
+
+}
+
+
+</script>
+</body>
+</html>

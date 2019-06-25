@@ -24,7 +24,7 @@ if (!(isset($teacherid))) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 	$aid = Sanitize::onlyInt($_GET['id']);
-	
+
 	if ($_POST['remove']=="really") {
 		$DBH->beginTransaction();
 		$stm = $DBH->prepare("DELETE FROM imas_assessments WHERE id=:id AND courseid=:courseid");
@@ -33,6 +33,8 @@ if (!(isset($teacherid))) {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$aid));
+			$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
 
 			$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
@@ -62,7 +64,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 			}
-			
+
 			$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=0 WHERE reqscoreaid=:assessmentid AND courseid=:courseid");
 			$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 		}
@@ -96,7 +98,7 @@ if ($overwriteBody==1) {
 
 	<form method="POST" action="deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>
-	<button type=submit name="remove" value="really">Yes, Delete</button>		
+	<button type=submit name="remove" value="really">Yes, Delete</button>
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
 	</p>
 	</form>

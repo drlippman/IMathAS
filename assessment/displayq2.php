@@ -282,6 +282,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['nocolormark'])) {  //no colors
 		$qcolors = array();
 	}
+	$GLOBALS['lastansweights'] = array();
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		if (!isset($anstypes) && $GLOBALS['myrights']>10) {
 			echo 'Error in question: missing $anstypes for multipart or conditional question';
@@ -310,6 +311,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					$answeights = array(1);
 				}
 			}
+			$GLOBALS['lastansweights'] = $answeights;
 		}
 		$laparts = explode("&",$la);
 
@@ -334,7 +336,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$showanswer = _('Answers may vary');
 		}
 	}
-
 
 	if ($returnqtxt) {
 		//$toevalqtxt = preg_replace('/\$answerbox(\[\d+\])?/','',$toevalqtxt);
@@ -4729,7 +4730,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
 						} else if ($anans=="-oo" && $givenans=="-oo") {
 							if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
-						}
+							}
 					} else if (is_numeric($givenans)) {
 						if (isset($reqsigfigs)) {
 							$tocheck = preg_replace('/\s*(\*|x|X|×|✕)\s*10\s*\^/','E',$orarr[$j]);
@@ -4981,7 +4982,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$varvals = array();
 				for($j=0; $j < count($variables); $j++) {
 					$varvals[$variables[$j]] = $tps[$i][$j];
-				}
+					}
 				$realans = $answerfunc($varvals);
 
 				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";

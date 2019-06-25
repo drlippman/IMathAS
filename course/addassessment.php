@@ -6,6 +6,12 @@
 require("../init.php");
 require("../includes/htmlutil.php");
 
+if ($courseUIver > 1) {
+	if (!isset($_GET['id'])) {
+		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
+			$GLOBALS['basesiteurl'], $cid));
+	}
+}
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -41,11 +47,19 @@ if (isset($_GET['id'])) {
 }
 
 if (isset($_GET['id'])) {
-	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
+	$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
 	$stm->execute(array(intval($_GET['id'])));
-	if ($stm->rowCount()==0 || $stm->fetchColumn(0) != $_GET['cid']) {
+	$row = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($row === null || $row['courseid'] != $_GET['cid']) {
 		echo "Invalid ID";
 		exit;
+	} else if ($row['ver']>1) {
+		if ($courseUIver==1) {
+			echo "Uh oh - new version assessment in an old version course";
+			exit;
+		}
+		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
+			$GLOBALS['basesiteurl'], $cid, $_GET['id']));
 	}
 }
 
@@ -212,7 +226,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             } else if ($skippenalty_post>0) {
                 $defpenalty = 'S'.$skippenalty_post.$defpenalty;
             }
-            
+
             $extrefs = array();
             $labelkeys = preg_grep('/extreflabel/', array_keys($_POST));
             foreach ($labelkeys as $extkey) {
@@ -227,7 +241,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             	}
             }
             $extrefencoded = json_encode($extrefs);
-            
+
 		if ($_POST['reqscoreshowtype']==-1 || $reqscore==0) {
 			$reqscore = 0;
 			$reqscoretype = 0;
@@ -324,7 +338,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$_POST['intro'] = Sanitize::incomingHtml($_POST['intro']);
 		}
-		
+
 		if (isset($_GET['id'])) {  //already have id; update
 			$stm = $DBH->prepare("SELECT isgroup,intro,itemorder,deffeedbacktext FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
@@ -363,8 +377,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 }
                 if (isset($_POST['defpenalty'])) {
                     $query .= ",defpenalty=:defpenalty";
-                    $qarr[':defpenalty'] = $defpenalty;	
-                } 
+                    $qarr[':defpenalty'] = $defpenalty;
+                }
                 if (isset($_POST['defpoints']) && $defpoints>0) {
                     $query .= ",defpoints=:defpoints";
                     $qarr[':defpoints'] = $defpoints;
@@ -388,13 +402,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $qarr[':cid'] = $cid;
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
-			
+
 			//update ptsposs field
 			if ($stm->rowCount()>0 && isset($_POST['defpoints'])) {
 				require_once("../includes/updateptsposs.php");
 				updatePointsPossible($_GET['id'], $curassess['itemorder'], $_POST['defpoints']);
 			}
-			
+
 			if ($deffb!=$curassess['deffeedbacktext']) {
 				//removed default feedback text; remove it from existing attempts
 				$updatefb = $DBH->prepare("UPDATE imas_assessment_sessions SET feedback=? WHERE id=?");
@@ -634,7 +648,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
             if ($line['LPcutoff']==0) {
             	    if ($GLOBALS['courseenddate']<2000000000) { //default to course enddate, if set
-            	    	    $lpdate = tzdate("m/d/Y",$GLOBALS['courseenddate']); 
+            	    	    $lpdate = tzdate("m/d/Y",$GLOBALS['courseenddate']);
             	    } else {
             	    	    $lpdate = $edate;
             	    }
@@ -664,7 +678,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             } else if ($line['reqscore']<0 || $line['reqscoretype']&1) {
             	    $reqscoredisptype=1;
             } else {
-            	   $reqscoredisptype=0; 
+            	   $reqscoredisptype=0;
             }
             if ($taken) {
                 $page_isTakenMsg = "<p>This assessment has already been taken.  Modifying some settings will mess up those assessment attempts, and those inputs ";
@@ -855,13 +869,13 @@ if ($overwriteBody==1) {
 		html += '<label for=newextreflabel'+newextrefcnt+'>Label:</label>';
 		html += '<input id=newextreflabel'+newextrefcnt+' name=newextreflabel'+newextrefcnt+' size=10 /> ';
 		html += '<label for=newextreflink'+newextrefcnt+'>Link:</label>';
-		html += '<input id=newextreflink'+newextrefcnt+' name=newextreflink'+newextrefcnt+' size=30 />';		
+		html += '<input id=newextreflink'+newextrefcnt+' name=newextreflink'+newextrefcnt+' size=30 />';
 		html += '<button type=button onclick="removeextref(this)">Remove</button><br/></span>';
 		newextrefcnt++;
 		$(el).before(html);
 	}
 	function removeextref(el) {
-		$(el).closest(".aextref").remove();	
+		$(el).closest(".aextref").remove();
 	}
 	$(function() {
 		$("input[name=dolpcutoff]").on("click", function() {
@@ -947,9 +961,9 @@ if ($overwriteBody==1) {
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Prevent access<br/>
 			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="$('#datediv').slideDown(100);"/>Allow access<br/>
 		</span><br class="form"/>
-		
+
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
-		
+
 		<span class=form>Due date</span>
 		<span class=formright>
 			The course setting is enabled for dates to be set via LTI.<br/>
@@ -1042,7 +1056,7 @@ if ($overwriteBody==1) {
 					<option value="Homework" <?php if ($testtype=="Homework") {echo "SELECTED";} ?>>Homework: Show score on each question as it's submitted &amp; allow similar question to replace missed question</option>
 				</select>
 			</span><BR class=form>
-			
+
 			<span class=form>Default attempts per problem (0 for unlimited): </span>
 			<span class=formright>
 				<input type=text size=4 name=defattempts value="<?php echo Sanitize::encodeStringForDisplay($line['defattempts']); ?>" >
@@ -1099,7 +1113,7 @@ if ($overwriteBody==1) {
 				</select>
 				</span>
 			</span><br class=form>
-			
+
 			<span class=form>Gradebook Category:</span>
 			<span class=formright>
 
@@ -1107,7 +1121,7 @@ if ($overwriteBody==1) {
 	writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
 ?>
 			</span><br class=form>
-	
+
 		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
@@ -1115,7 +1129,7 @@ if ($overwriteBody==1) {
 		   Additional Display Options
 		 </div>
 		 <div class="blockitems hidden">
-			
+
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
 				<input name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
@@ -1136,7 +1150,7 @@ if ($overwriteBody==1) {
 				<input name="showqcat" type="radio" value="1" <?php writeHtmlChecked($showqcat,"1"); ?>>In Points Possible bar <br />
 				<input name="showqcat" type="radio" value="2" <?php writeHtmlChecked($showqcat,"2"); ?>>In navigation bar (Skip-Around only)
 			</span><br class="form" />
-		 
+
 			<span class=form>Make hard to print?</span>
 			<span class=formright>
 				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes
@@ -1147,24 +1161,24 @@ if ($overwriteBody==1) {
 				<input type="checkbox" name="sameseed" <?php writeHtmlChecked($line['shuffle']&2,2); ?>>
 				<i>Don't use "Homework" mode or "Reattempts different versions" if you use this setting</i>
 			</span><BR class=form>
-			
+
 			<span class=form>All students same version of questions: </span>
 			<span class=formright>
 				<input type="checkbox" name="samever" <?php writeHtmlChecked($line['shuffle']&4,4); ?>>
 			</span><BR class=form>
-			
+
 			<span class=form>Display for tutorial-style questions: </span>
 			<span class=formright>
 				<input type="checkbox" name="istutorial" <?php writeHtmlChecked($line['istutorial'],1); ?>>
 			</span><BR class=form>
 		 </div>
-		
+
 		 <div class="block grouptoggle">
 		   <img class="mida" src="../img/expand.gif" />
 		   Time Limit and Access Control
 		 </div>
 		 <div class="blockitems hidden">
-		
+
 			<span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
 				<?php
@@ -1175,21 +1189,21 @@ if ($overwriteBody==1) {
 				<br/>
 				<label><input type="checkbox" name="dolpcutoff" <?php writeHtmlChecked($line['LPcutoff']>0,true); ?>
 					aria-controls="lpcutoffwrap" aria-expanded="<?php echo ($line['LPcutoff']==0)?'false':'true';?>"/>
-					Restrict by date. 
+					Restrict by date.
 				</label>
 				<span id=lpcutoffwrap <?php if ($line['LPcutoff']==0) {echo 'style="display: none;"';}?>>
-				<label for=lpcutoff>No extensions past</label> 
+				<label for=lpcutoff>No extensions past</label>
 				<input type=text size=10 name="lpdate" value="<?php echo $lpdate;?>">
 				<a href="#" onClick="displayDatePicker('lpdate', this, 'edate', 'due date'); return false">
 				<img src="../img/cal.gif" alt="Calendar"/></a>
 				at <input type=text size=8 name=lptime value="<?php echo $lptime;?>">
 				</span>
 			</span><BR class=form>
-			
+
 			<span class=form>Time Limit (minutes, 0 for no time limit): </span>
 			<span class=formright><input type=text size=4 name=timelimit value="<?php echo Sanitize::onlyFloat(abs($timelimit));?>">
 				<input type="checkbox" name="timelimitkickout" <?php if ($timelimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
-			
+
 			<span class=form>Require Password (blank for none):</span>
 			<span class=formright><input type="password" name="assmpassword" id="assmpassword" value="<?php echo Sanitize::encodeStringForDisplay($line['password']); ?>" autocomplete="new-password"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
 
@@ -1214,7 +1228,7 @@ if ($overwriteBody==1) {
 ?>
 			</span></span><br class=form>
 		 </div>
-		 
+
 		 <div class="block grouptoggle">
 		   <img class="mida" src="../img/expand.gif" />
 		   Help and Hints
@@ -1231,7 +1245,7 @@ if ($overwriteBody==1) {
 				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr'],1); ?>/> Show "Message instructor about this question" links<br/>
 				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> Show "Post this question to forum" links, to forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
 			</span><br class=form>
-			
+
 			<span class=form>Assessment resource links</span>
 			<span class=formright>
 <?php
@@ -1295,7 +1309,7 @@ if ($overwriteBody==1) {
 				<input type=radio name="pcntingb" value="0" <?php writeHtmlChecked($pcntingb,0,0); ?> /> Don't count in grade total and hide from students<br/>
 				<input type=radio name="pcntingb" value="3" <?php writeHtmlChecked($pcntingb,3,0); ?> /> Don't count in grade total<br/>
 			</span><br class=form />
-			
+
 			<span class=form>Minimum score to receive credit: </span>
 			<span class=formright>
 				<input type=text size=4 name=minscore value="<?php echo Sanitize::encodeStringForDisplay($line['minscore']); ?>">
@@ -1308,7 +1322,7 @@ if ($overwriteBody==1) {
 				Use? <input type="checkbox" name="usedeffb" <?php writeHtmlChecked($usedeffb,true); ?>><br/>
 				Text: <input type="text" size="60" name="deffb" value="<?php echo Sanitize::encodeStringForDisplay($deffb); ?>" />
 			</span><br class="form" />
-			
+
 <?php
 		if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
 ?>
@@ -1348,13 +1362,13 @@ if ($overwriteBody==1) {
 				</select>
 			</span><br class="form" />
 		 </div>
-		 
+
 		 <div class="block grouptoggle">
 		   <img class="mida" src="../img/expand.gif" />
 		   Group Assessment
 		 </div>
 		 <div class="blockitems hidden">
-		 
+
 			<span class=form>Group assessment: </span>
 			<span class=formright>
 				<input type="radio" name="isgroup" value="0" <?php writeHtmlChecked($line['isgroup'],0); ?> />Not a group assessment<br/>
@@ -1362,12 +1376,12 @@ if ($overwriteBody==1) {
 				<input type="radio" name="isgroup" value="2" <?php  writeHtmlChecked($line['isgroup'],2); ?> />Students can add members without passwords<br/>
 				<input type="radio" name="isgroup" value="3" <?php  writeHtmlChecked($line['isgroup'],3); ?> />Students cannot add members, and can't start the assessment until you add them to a group
 			</span><br class="form" />
-			
+
 			<span class=form>Max group members (if group assessment): </span>
 			<span class=formright>
 				<input type="text" name="groupmax" value="<?php echo Sanitize::encodeStringForDisplay($line['groupmax']); ?>" />
 			</span><br class="form" />
-			
+
 			<span class="form">Use group set:<?php
 				if ($taken) {
 					if ($line['isgroup']==0) {

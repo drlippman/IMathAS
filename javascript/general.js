@@ -414,6 +414,8 @@ function GB_show(caption,url,width,height) {
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
 		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
+	} else {
+		document.getElementById("GB_frameholder").style.height = "auto";
 	}
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
@@ -957,12 +959,17 @@ function groupToggleAll(dir) {
 jQuery(document).ready(function($) {
 	$(".grouptoggle").each(function() {
 		var id = randID();
-		$(this).next(".blockitems")
-			.hide()
-			.removeClass("hidden")
-			.attr("id", "bi"+id);
+		var blockitem = $(this).next(".blockitems");
+		var initclosed = blockitem.hasClass("hidden");
+		if (initclosed) {
+			blockitem.hide().removeClass("hidden");
+		} else {
+			blockitem.show();
+		}
+		blockitem.attr("id", "bi"+id);
+
 		$(this).attr("id", id).attr("aria-controls", "bi"+id)
-			.attr("aria-expanded", false)
+			.attr("aria-expanded", !initclosed)
 			.attr("tabindex", 0)
 			.css("cursor", "pointer")
 			.on("click keydown", function(e) {
@@ -981,6 +988,24 @@ jQuery(document).ready(function($) {
 	});
 	$(".grouptoggle img").attr("alt", "expand/collapse");
 });
+
+// restyled file uploads
+function initFileAlt(el) {
+	var label = jQuery(el).next().find(".filealt-label");
+	var origLabel = label.attr('data-def') || label.html();
+	jQuery(el).off("focus.filealt, blur.filealt, click.filealt, change.filealt")
+		.on("focus.filealt", function(e) { jQuery(e.target).addClass("has-focus");} )
+		.on("blur.filealt", function(e) { jQuery(e.target).removeClass("has-focus");} )
+		.on("click.filealt", function(e) { label.html(origLabel); } )
+		.on("change.filealt", function(e) {
+			var fileName = '';
+			fileName = e.target.value.split(/(\\|\/)/g).pop();
+			if (fileName) {
+				label.html(fileName);
+			}
+		});
+}
+jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
 
 //https://github.com/davatron5000/FitVids.js
 (function( $ ){
@@ -1143,13 +1168,12 @@ jQuery(function() {
 });
 
 function setActiveTab(el) {
-	var tabid = el.id;
 	jQuery(el).closest(".tabwrap").find("li.active").removeClass("active");
 	jQuery(el).closest(".tablist").find("a[role=tab]").attr("aria-selected",false);
 	jQuery(el).attr("aria-selected",true);
 	jQuery(el).parent().addClass("active");
 	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);
-	var tabpanelid = tabid.replace(/tab/,"tabpanel");
+	var tabpanelid = el.getAttribute('aria-controls');
 	jQuery(el).closest(".tabwrap").find("#"+tabpanelid).show().attr("aria-hidden",false);
 }
 

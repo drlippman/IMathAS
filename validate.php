@@ -461,7 +461,7 @@
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
 			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
-			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php');
+			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php','index.php','gbviewassess.php','autosave.php','endassess.php','getscores.php','livepollstatus.php','loadassess.php','loadquestion.php','scorequestion.php','startassess.php','uselatepass.php');
 			//call hook, if defined
 			if (function_exists('allowedInAssessment')) {
 				$allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());
@@ -471,7 +471,11 @@
 				$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
 				$cid = Sanitize::courseId($stm->fetchColumn(0));
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+        if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
+          header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+        } else {
+				  header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+        }
 				exit;
 			}
 		} else if ($sessiondata['ltirole']=='instructor') {
@@ -560,7 +564,7 @@
 				}
 			}
 		}
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs,imas_courses.startdate,imas_courses.enddate ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs,imas_courses.startdate,imas_courses.enddate,imas_courses.UIver ";
 		$query .= "FROM imas_courses JOIN imas_users ON imas_users.id=imas_courses.ownerid WHERE imas_courses.id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$cid));
@@ -591,6 +595,7 @@
 			$courseenddate = $crow['enddate'];
 			$picicons = $crow['picicons'];
 			$latepasshrs = $crow['latepasshrs'];
+      $courseUIver = $crow['UIver'];
 
 			if (isset($studentid) && !$inInstrStuView && ((($crow['available'])&1)==1 || time()<$crow['startdate'])) {
 				echo "This course is not available at this time";
@@ -630,7 +635,16 @@
 
  if (!$verified) {
 	if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
-		if (!isset($loginpage)) {
+    if (isset($no_session_handler)) {
+      if ($no_session_handler === 'json_error') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo '{"error": "no_session"}';
+      } else {
+        call_user_func($no_session_handler);
+      }
+      exit;
+    }
+    if (!isset($loginpage)) {
 			 $loginpage = "loginpage.php";
 		}
 		require($loginpage);

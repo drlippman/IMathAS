@@ -11,6 +11,7 @@ if (!isset($teacherid)) {
 	exit;
 }
 
+
 function convertintro($current_intro) {
 	if (($intro=json_decode($current_intro,true))!==null) { //is json intro
 		return false;
@@ -129,10 +130,15 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 	require("../footer.php");
 	exit;
 } else {
-	$stm = $DBH->prepare("SELECT intro,itemorder FROM imas_assessments WHERE id=:id AND courseid=:courseid");
+	$stm = $DBH->prepare("SELECT intro,itemorder,ver FROM imas_assessments WHERE id=:id AND courseid=:courseid");
 	$stm->execute(array(':id'=>$aid, ':courseid'=>$cid));
 	if ($stm->rowCount()==0) {echo "Invalid id"; exit;}
-	list($current_intro_json,$qitemorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($current_intro_json,$qitemorder,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	if ($aver>1) {
+		$addassess = 'addassessment2.php';
+	} else {
+		$addassess = 'addassessment.php';
+	}
 
 	list($introjson,$isembed) = convertintro($current_intro_json);
 	if ($introjson===false) {
@@ -143,11 +149,11 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 	if (isset($_POST['convert'])) {
 		$stm = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
 		$stm->execute(array(':id'=>$aid, ':intro'=>json_encode($introjson)));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addassessment.php?id=$aid&cid=$cid&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addassess?id=$aid&cid=$cid&r=" . Sanitize::randomQueryStringParam());
 	} else {
 		$qcnt = substr_count($qitemorder, ',')+1;
 		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
-		$curBreadcrumb .= "<a href=\"addassessment.php?cid=$cid&id=$aid\">"._("Modify Assessment")."</a>";
+		$curBreadcrumb .= "<a href=\"$addassess?cid=$cid&id=$aid\">"._("Modify Assessment")."</a>";
 		require("../header.php");
 		echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt '._('Convert Intro').'</div>';
 		echo '<div id="headeraddlinkedtext" class="pagetitle"><h1>'._('Convert Intro').'</h1></div>';
@@ -201,12 +207,12 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 			}
 		}
 		echo '<p>'._('Do you want to convert this assessment?').'</p>';
-		
+
 		echo '<form method="POST" action="'.sprintf('convertintro.php?cid=%d&aid=%d',$cid,$aid).'">';
 		echo '<p><button type=submit name="convert" value="one">'._('Convert').'</button>';
-		echo '<button type="button" class="secondarybtn" onClick="window.location=\''.sprintf('addassessment.php?cid=%d&aid=%d',$cid,$aid).'\'">'._('Nevermind').'</button></p>';
+		echo '<button type="button" class="secondarybtn" onClick="window.location=\''.sprintf('%s?cid=%d&aid=%d',$addassess,$cid,$aid).'\'">'._('Nevermind').'</button></p>';
 		echo '</form>';
-		
+
 		echo '<p>&nbsp;</p>';
 		echo '<form method="POST" action="'.sprintf('convertintro.php?cid=%d&aid=%d',$cid,$aid).'" onsubmit="return confirm(\'Are you SURE??? This is risky and can NOT be undone. Make sure you have a backup just in case something goes wrong.\');">';
 		echo '<p><button type="submit" name="convert" value="all">'._('Convert All Assessments in Course').'</button></p>';

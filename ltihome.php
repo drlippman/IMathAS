@@ -157,7 +157,7 @@ if (!empty($createcourse)) {
 		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		copyrubrics();
 		$DBH->commit();
-		
+
 		//call hook, if defined
 		if (function_exists('onAddCourse')) {
 			onAddCourse($cid, $userid);
@@ -245,7 +245,7 @@ if (!empty($createcourse)) {
 					'placementAdvice' => array(
 						'presentationDocumentTarget' => $target
 					)
-				)	
+				)
 			)
 		);
 		if ($placementtype=='assess' && $ptsposs>0) {
@@ -261,8 +261,8 @@ if (!empty($createcourse)) {
 				)
 			);
 		}
-		echo '<html><head><script type="text/javascript"> 
-			window.onload = function() { 
+		echo '<html><head><script type="text/javascript">
+			window.onload = function() {
 				document.getElementById("theform").submit();
 			}
 			</script></head>';
@@ -280,7 +280,7 @@ if (!empty($createcourse)) {
 		$acc_req = OAuthRequest::from_consumer_and_token($consumer, false, 'POST', $sessiondata['lti_selection_return'], $params);
 		$acc_req->sign_request($hmac_method, $consumer, false);
 		$newparms = $acc_req->get_parameters();
-		
+
 		echo '<body><form id="theform" method="post" action="'.Sanitize::encodeStringForDisplay($sessiondata['lti_selection_return']).'">';
 		//output form fields
 		foreach($newparms as $key => $value ) {
@@ -352,7 +352,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 		echo '</optgroup>';
 	}
-	
+
 	$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
 	$query .= "iu.groupid=:groupid AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
 	$stm = $DBH->prepare($query);
@@ -368,7 +368,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 		echo '</optgroup>';
 	}
-	
+
 	echo '</select>';
 	echo '<p id="termsbox" style="display:none;">This course has special <a id="termsurl">Terms of Use</a>.  By copying this course, you agree to these terms.</p>';
 	echo '<input type="Submit" value="Link Course"/>';
@@ -395,7 +395,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	}
 
 	echo '<br/> <select name="setplacement"> ';
-	
+
 	if (isset($sessiondata['lti_selection_type']) && $sessiondata['lti_selection_type']=='link') {
 		echo '<option value="course">Whole Course Placement</option>';
 	}
@@ -424,14 +424,22 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo "<p><a href=\"course/course.php?cid=" . Sanitize::courseId($cid) . "\">Enter course</a></p>";
 	echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';
 } else if ($placementtype=='assess') {
-	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti,ver FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	echo "<h2>LTI Placement of " . Sanitize::encodeStringForDisplay($line['name']) . "</h2>";
-	echo "<p><a href=\"assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
-	echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
-	if ($role == 'teacher') {
-		echo "| <a href=\"course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Item Analysis</a>";
+	if ($line['ver'] > 1) {
+		echo "<p><a href=\"assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
+		echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
+		if ($role == 'teacher') {
+			echo "| <a href=\"course/gb-itemanalysis2.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Item Analysis</a>";
+		}
+	} else {
+		echo "<p><a href=\"assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">Preview assessment</a> | ";
+		echo "<a href=\"course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Grade list</a> ";
+		if ($role == 'teacher') {
+			echo "| <a href=\"course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">Item Analysis</a>";
+		}
 	}
 	echo "</p>";
 
@@ -440,7 +448,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	if ($line['avail']==0) {
 		echo 'Currently unavailable to students.';
 	} else if ($line['date_by_lti']==1) {
-		echo 'Waiting for the LMS to send a date';	
+		echo 'Waiting for the LMS to send a date';
 	} else if ($line['date_by_lti']>1) {
 		echo 'Default due date set by LMS. Available until: '.formatdate($line['enddate']).'.';
 		echo '</p><p>';
@@ -461,7 +469,12 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	}
 	echo '</p>';
 	if ($role == 'teacher') {
-		echo "<p><a href=\"course/addassessment.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">Settings</a> | ";
+		if ($line['ver']>1) {
+			$addassess = 'addassessment2.php';
+		} else {
+			$addassess = 'addassessment.php';
+		}
+		echo "<p><a href=\"course/$addassess?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">Settings</a> | ";
 		echo "<a href=\"course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">Questions</a></p>";
 		if ($sessiondata['ltiitemtype']==-1) {
 			echo '<p><a href="ltihome.php?chgplacement=true">Change placement</a></p>';

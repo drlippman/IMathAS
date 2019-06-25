@@ -94,31 +94,50 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	if (isset($typelookups['Assessment']) && !$ispublic) {
 		$placeholders = Sanitize::generateQueryPlaceholders($typelookups['Assessment']);
 		if ($limited) {
-			$tosel = 'id,name,summary';
+			$tosel = 'id,name,summary,ver';
 		} else {
-			$tosel = 'id,name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,ptsposs,date_by_lti';
+			$tosel = 'id,name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,ptsposs,date_by_lti,scoresingb,ver';
 		}
 		$stm = $DBH->prepare("SELECT $tosel FROM imas_assessments WHERE id IN ($placeholders)");
 		$stm->execute(array_keys($typelookups['Assessment']));
+		$oldAssesses = array();
+		$newAssesses = array();
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Assessment';
 			$itemshowdata[$typelookups['Assessment'][$line['id']]] = $line;
-			if ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&1)) {
+			if ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&1 || $viewall)) {
 				if (!isset($assessPreReqsToLookup[$line['reqscoreaid']])) {
 					$assessPreReqsToLookup[$line['reqscoreaid']] = array();
 				}
 				$assessPreReqsToLookup[$line['reqscoreaid']][] = $line['id'];
 			}
+			if ($line['ver'] > 1) {
+				$newAssesses[] = $line['id'];
+			} else {
+				$oldAssesses[] = $line['id'];
+			}
 		}
 		if (!$limited && !$viewall) {
-			$stm = $DBH->prepare("SELECT assessmentid,bestscores FROM imas_assessment_sessions WHERE assessmentid IN ($placeholders) AND userid=?");
-			$stm->execute(array_merge(array_keys($typelookups['Assessment']), array($userid)));
-			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-				$scores = explode(';', $line['bestscores']);
-				if (preg_match('/(^|,|~)\.?\d/', $scores[0])) {
-					//ptsstatus: 1: some questions unattempted, 2: all questions attempted
-					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (strpos($scores[0],"-1")===false)?2:1;
-					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = getpts($scores[0]);
+			if (count($oldAssesses) > 0) {
+				$ph2 = Sanitize::generateQueryPlaceholders($oldAssesses);
+				$stm = $DBH->prepare("SELECT assessmentid,bestscores FROM imas_assessment_sessions WHERE assessmentid IN ($ph2) AND userid=?");
+				$stm->execute(array_merge($oldAssesses, array($userid)));
+				while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+					$scores = explode(';', $line['bestscores']);
+					if (preg_match('/(^|,|~)\.?\d/', $scores[0])) {
+						//ptsstatus: 1: some questions unattempted, 2: all questions attempted
+						$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (strpos($scores[0],"-1")===false)?2:1;
+						$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = getpts($scores[0]);
+					}
+				}
+			}
+			if (count($newAssesses) > 0) {
+				$ph2 = Sanitize::generateQueryPlaceholders($newAssesses);
+				$stm = $DBH->prepare("SELECT assessmentid,score,status FROM imas_assessment_records WHERE assessmentid IN ($ph2) AND userid=?");
+				$stm->execute(array_merge($newAssesses, array($userid)));
+				while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (($line['status']&3)>0)?1:2;
+					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = $line['score'];
 				}
 			}
 		}

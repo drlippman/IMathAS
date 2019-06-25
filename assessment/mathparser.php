@@ -18,6 +18,26 @@ function parseMath($str, $vars = '', $allowedfuncs = array()) {
   return $parser;
 }
 
+function parseMathQuiet($str, $vars = '', $allowedfuncs = array()) {
+  try {
+    $parser = new MathParser($vars, $allowedfuncs);
+    $parser->parse($str);
+  } catch (Throwable $t) {
+    if ($GLOBALS['myrights'] > 10) {
+      echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
+      echo ". Error: ".$t->getMessage();
+    }
+    return false;
+  } catch (Exception $t) { //fallback for PHP5
+    if ($GLOBALS['myrights'] > 10) {
+      echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
+      echo ". Error: ".$t->getMessage();
+    }
+    return false;
+  }
+  return $parser;
+}
+
 /**
  * Utility front-end for Parser
  * Returns a function that can be evaluated like ->evaluate would be
@@ -200,7 +220,7 @@ class MathParser
    * numeric values
    *
    * @param  array  $variableValues  Associative array of variables values
-   * @return [type]          [description]
+   * @return float  value of the function
    */
   function evaluate($variableValues = array()) {
     foreach ($this->variables as $v) {
@@ -213,6 +233,22 @@ class MathParser
     }
     $this->variableValues = $variableValues;
     return $this->evalNode($this->AST);
+  }
+
+  /**
+   * Same as evaluate, but returns NaN if there's an error rather than
+   * throwing an exception
+   * @param  array  $variableValues  Associative array of variables values
+   * @return float  value of the function
+   */
+  function evaluateQuiet($variableValues = array()) {
+    try {
+      return $this->evaluate($variableValues);
+    } catch (Throwable $t) {
+      return sqrt(-1);
+    } catch (Exception $t) { //fallback for PHP5
+      return sqrt(-1);
+    }
   }
 
   /**
