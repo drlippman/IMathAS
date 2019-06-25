@@ -92,7 +92,7 @@ if (isset($sessiondata['ltiitemtype']) && ($sessiondata['mathdisp']==1 || $sessi
 }
 
 if (!isset($sessiondata['mathdisp'])) {
-	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathrenderer="none";</script>';
+	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
 	//don't load MathJax async when using mathgraphcheck; it needs to check immediately
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
@@ -117,7 +117,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	} else {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathrenderer="MathJax";function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>';
 	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==6) {
 	//Katex experimental
@@ -154,11 +154,11 @@ if (!isset($sessiondata['mathdisp'])) {
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathrenderer=\"Image\"; function rendermathnode(el) {AMprocessNode(el);}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\"; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathrenderer=\"Image\";function rendermathnode(el) {AMprocessNode(el);}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\";function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==0) {
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathrenderer=\"none\";function rendermathnode(el) {}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"none\";function rendermathnode(el) {}</script>";
 }
 echo "<script src=\"$imasroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
