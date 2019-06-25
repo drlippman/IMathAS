@@ -15,6 +15,7 @@ $query = "CREATE TABLE `imas_assessment_records` (
 		`lastchange` INT(10) UNSIGNED NOT NULL DEFAULT '0',
 		`score` DECIMAL(9,2) UNSIGNED NOT NULL DEFAULT '0',
 		`status` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+		`timelimitexp` INT(10) UNSIGNED NOT NULL DEFAULT '0',
 		`scoreddata` MEDIUMBLOB NOT NULL,
 		`practicedata` MEDIUMBLOB NOT NULL,
 
