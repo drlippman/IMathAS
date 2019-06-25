@@ -4,7 +4,7 @@
 $DBH->beginTransaction();
 
 $query = "ALTER TABLE `imas_questions`
- 	MODIFY showhints TINYINT(1) NOT NULL DEFAULT -1";
+ 	MODIFY showhints TINYINT(1) NOT NULL DEFAULT 0";
 $res = $DBH->query($query);
 if ($res===false) {
 	echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";

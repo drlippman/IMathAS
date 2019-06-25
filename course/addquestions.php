@@ -75,10 +75,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$checked = $_POST['nchecked'];
 			foreach ($checked as $qsetid) {
-				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
-				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :questionsetid);";
+				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid,showhints) ";
+				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :questionsetid, :showhints);";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':assessmentid'=>$aid, ':points'=>9999, ':attempts'=>9999, ':penalty'=>9999, ':questionsetid'=>$qsetid));
+				$stm->execute(array(':assessmentid'=>$aid, ':points'=>9999, ':attempts'=>9999,
+					':penalty'=>9999, ':questionsetid'=>$qsetid,
+					':showhints' => ($aver > 1) ? -1 : 0
+				));
 				$qids[] = $DBH->lastInsertId();
 			}
 			//add to itemorder
