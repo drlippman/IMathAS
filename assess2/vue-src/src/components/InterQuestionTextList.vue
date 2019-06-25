@@ -51,7 +51,6 @@ export default {
       } else if (this.pos === 'after') {
         return this.postText;
       } else {
-        console.log(this.preText);
         return this.preText;
       }
     },

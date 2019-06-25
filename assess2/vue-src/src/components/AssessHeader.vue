@@ -10,7 +10,7 @@
         >
           {{ curScorePoints }}
         </span>
-        <span class="answeredinfo">{{ curAnswered }}</span>
+        <span class="med-left subdued">{{ curAnswered }}</span>
       </div>
     </div>
 
@@ -229,13 +229,7 @@ export default {
 .assess-header h1 {
   margin: .4em 0 .2em;
 }
-.answeredinfo {
-  color: #666666;
-  margin-left: 20px;
-}
-.bigicon {
-  font-size: 130%;
-}
+
 .practicenotice {
   color: #C00;
   font-style: italic;

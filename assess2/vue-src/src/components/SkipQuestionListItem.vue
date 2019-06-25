@@ -1,6 +1,6 @@
 <template>
   <span class="flex-nowrap-center">
-    <icons :name="statusIcon" class="qstatusicon" />
+    <icons :name="statusIcon" class="qstatusicon" v-if="option.dispqn > 0" />
     <span class="qname-wrap">
       <span
         :class="{greystrike: option.withdrawn > 0}"
@@ -93,6 +93,7 @@ export default {
   display: inline-block;
   flex-grow: 1;
   margin-right:24px;
+  min-width: 8em;
 }
 
 .qstatusicon {

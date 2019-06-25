@@ -292,6 +292,11 @@ input[type=radio], input[type=checkbox] {
   max-width: 700px;
   overflow: visible;
 }
+@media only screen and (max-width: 480px) {
+  .questionpane {
+    margin: 15px 4px;
+  }
+}
 .questionpane.introtext {
   margin: 15px 0;
   padding: 12px;

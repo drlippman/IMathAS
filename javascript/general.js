@@ -414,6 +414,8 @@ function GB_show(caption,url,width,height) {
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
 		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
+	} else {
+		document.getElementById("GB_frameholder").style.height = "auto";
 	}
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {

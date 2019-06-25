@@ -108,7 +108,11 @@ export default {
       return out;
     },
     showScore () {
-      return store.assessInfo.questions[this.qn].hasOwnProperty('gbscore');
+      if (this.qn > -1) {
+        return store.assessInfo.questions[this.qn].hasOwnProperty('gbscore');
+      } else {
+        return false;
+      }
     },
     anyHaveRetry () {
       for (let qn in store.assessInfo.questions) {
