@@ -50,7 +50,10 @@ $answerbox<br/>
 <code>sagecellTransfer(script,questionNr,[label,partNr,format])</code> generates a SageCell with content <code>script</code> and a button with <code>label</code> (default: "Transfer"). Clicking the button transfers the content of the SageCell output into the answerbox. For multipart questions, <code>partNr</code> determines the index of the target answerbox.
 </p>
 <p>
-  If the output is to be interpreted as a list, set <code>format</code> to <code>'list'</code>.
+  If the output is to be interpreted as a list or matrix, set <code>format</code> to <code>'list'</code> or <code>'matrix'</code> respectively. For matrix questions <code>$answersize</code> must not be set in the question control code. <b>Note:</b> Applying the <code>matrix</code> format to non-nmeric matrices may yield weird results. In case of doubt use format <code>'any'</code> instead to let the student adapt the matrix syntax.
+</p>
+<p>
+  <b>Note:</b> When the <code>format</code> parameter is used outside a multipart or conditional question, use -1 for the <code>partNr</code> parameter.
 </p>
 <b>Usage example: </b><br/>
 <b>Question type: </b><code>function</code><br/>
@@ -76,16 +79,20 @@ $answerbox<br/>
   <code>Parts</code> must be an array of numbers of parts to which the SageCell output will be transferred. For example, the <em>i<sup>th</sup></em> button will have the label <code>labels[i]</code> and will transfers the content of the SageCell output into <code>$answerbox[parts[i]]</code> (<em>i</em> starting from 0).
 </p>
 <p>
-  <code>formats</code> is a list of formats which can be <code>'any'</code> or <code>'list'</code>. Set <code>formats[i]</code> to <code>'list'</code> if <code>$answerbox[parts[i]]</code> expects a list as input.
+  <code>formats</code> is a list of formats which can be <code>'any'</code>, <code>'list'</code> or <code>'matrix'</code>. Set <code>formats[i]</code> to <code>'list'</code> or <code>'matrix'</code> repectively, if <code>$answerbox[parts[i]]</code> expects a list or matrix as input.
 </p>
-
+<p>
+ For matrix questions <code>$answersize</code> must not be set in the question
+  control code. <b>Note:</b> Applying the <code>matrix</code> format to non-nmeric matrices may yield weird results. In
+  case of doubt use format <code>'any'</code> instead to let the student adapt the matrix syntax.
+</p>
 <p>The following macros store the script edited by the student as answer to a question part of type <code>essay</code></p>
 <h3><a name="sagecellEssay">sagecellEssay</a></h3>
 <p>
 <code>sagecellEssay(script [,essayPart])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to a question of type <code>essay</code>.
 </p>
 <p>
-  If the output is to be interpreted as a list, set <code>format</code> to <code>list</code>.
+  If the output is to be interpreted as a list or matrix, set <code>format</code> to <code>'list'</code> or <code>'matrix'</code> respectively. For matrix questions <code>$answersize</code> must not be set in the question control code. <b>Note:</b> Applying the <code>matrix</code> format to non-nmeric matrices may yield weird results. In case of doubt use format <code>'any'</code> instead to let the student adapt the matrix syntax.
 </p>
 <p>
 <b>Usage example: </b><br/>
@@ -117,8 +124,12 @@ For multipart and conditional questions, <code>sagecellEssay(script,essayPart)</
 A button with label <code>label</code> is added, which transfers the sagecell output to <code>$answerbox[part]</code>.
 </p>
 <p>
-  If the output is to be interpreted as a list, set <code>format</code> to <code>'list'</code>.
+  If the output is to be interpreted as a list or matrix, set <code>format</code> to <code>'list'</code> or
+  <code>'matrix'</code> respectively. For matrix questions <code>$answersize</code> must not be set in the question
+  control code. <b>Note:</b> Applying the <code>matrix</code> format to non-nmeric matrices may yield weird results. In
+  case of doubt use format <code>'any'</code> instead to let the student adapt the matrix syntax.
 </p>
+
 <p>
 <b>Usage example: </b><br/>
 <b>Question type: </b><code>multipart</code><br/>
@@ -154,8 +165,14 @@ $answerbox[1]<br/>
   SageCell output into <code>answerbox[parts[i]]</code> (<em>i</em> starting from 0).
 </p>
 <p>
-  <code>formats</code> is a list of formats which can be <code>'any'</code> or <code>'list'</code>. Set
-  <code>formats[i]</code> to <code>'list'</code> if <code>$answerbox[parts[i]]</code> expects a list as input.
+  <code>formats</code> is a list of formats which can be <code>'any'</code>, <code>'list'</code> or
+  <code>'matrix'</code>. Set <code>formats[i]</code> to <code>'list'</code> or <code>'matrix'</code> repectively, if
+  <code>$answerbox[parts[i]]</code> expects a list or matrix as input.
+</p>
+<p>
+  For matrix questions <code>$answersize</code> must not be set in the question
+  control code. <b>Note:</b> Applying the <code>matrix</code> format to non-nmeric matrices may yield weird results. In
+  case of doubt use format <code>'any'</code> instead to let the student adapt the matrix syntax.
 </p>
 </body>
 </html>

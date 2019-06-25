@@ -30,7 +30,14 @@ $fns="<script>function getSageOutput_$ref (el) {
         if (start > -1 && end > -1)
           sageOutput=sageOutput.substring(start+1,end);
       }
-	$('input[id=\'tc$ref\'],input[id=\'qn$ref\'').val(sageOutput);
+      if ('$format' == 'matrix') {
+        sageOutput=sageOutput.replace(/ /g,',');
+        sageOutput=sageOutput.replace(/\[/g,'(');
+        sageOutput=sageOutput.replace(/\]/g,')');
+        sageOutput=sageOutput.replace(/\)\s*\(/g,'),(');
+        sageOutput='['+sageOutput+']';
+      }
+	    $('input[id=\'tc$ref\'],input[id=\'qn$ref\'').val(sageOutput);
     } else {
       alert('Please evaluate cell');
     }
@@ -57,6 +64,13 @@ for ($i=0;$i<count($parts);$i++) {
         var end=sageOutput.lastIndexOf(']');
         if (start > -1 && end > -1)
           sageOutput=sageOutput.substring(start+1,end);
+      }
+      if ($i < $fl && '$formats[$i]' == 'matrix') {
+        sageOutput=sageOutput.replace(/ /g,',');
+        sageOutput=sageOutput.replace(/\[/g,'(');
+        sageOutput=sageOutput.replace(/\]/g,')');
+        sageOutput=sageOutput.replace(/\)\s*\(/g,'),(');
+        sageOutput='['+sageOutput+']';
       }
 	    $('input[id=\'tc$ref\'],input[id=\'qn$ref\'').val(sageOutput);
     } else {
@@ -87,6 +101,13 @@ function sagecellEssayTransfer($script,$q,$essayPart,$part,$label="Transfer",$fo
         if (start > -1 && end > -1)
           sageOutput=sageOutput.substring(start+1,end);
       }
+      if ('$format' == 'matrix') {
+        sageOutput=sageOutput.replace(/ /g,',');
+        sageOutput=sageOutput.replace(/\[/g,'(');
+        sageOutput=sageOutput.replace(/\]/g,')');
+        sageOutput=sageOutput.replace(/\)\s*\(/g,'),(');
+        sageOutput='['+sageOutput+']';
+      }
 	    $('input[id=\'tc$ref\'],input[id=\'qn$ref\'').val(sageOutput);
     } else {
       alert('Please evaluate cell first');
@@ -114,6 +135,13 @@ for ($i=0;$i<count($parts);$i++) {
         var end=sageOutput.lastIndexOf(']');
         if (start > -1 && end > -1)
           sageOutput=sageOutput.substring(start+1,end);
+      }
+      if ($i < $fl && '$formats[$i]' == 'matrix') {
+        sageOutput=sageOutput.replace(/ /g,',');
+        sageOutput=sageOutput.replace(/\[/g,'(');
+        sageOutput=sageOutput.replace(/\]/g,')');
+        sageOutput=sageOutput.replace(/\)\s*\(/g,'),(');
+        sageOutput='['+sageOutput+']';
       }
 	    $('input[id=\'tc$ref\'],input[id=\'qn$ref\'').val(sageOutput);
     } else {
