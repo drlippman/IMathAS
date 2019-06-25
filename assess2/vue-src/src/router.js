@@ -194,5 +194,7 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-
+router.afterEach((to, from) => {
+  Vue.nextTick(window.sendLTIresizemsg);
+});
 export default router;
