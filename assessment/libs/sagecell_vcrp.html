@@ -47,7 +47,10 @@ $answerbox<br/>
 
 <h3><a name="sagecellTransfer">sagecellTransfer</a></h3>
 <p>
-<code>sagecellTransfer(script,questionNr,[label,partNr])</code> generates a SageCell with content <code>script</code> and a button with <code>label</code> (default: "Transfer"). Clicking the button transfers the content of the SageCell output into the answerbox. For multipart questions, <code>partNr</code> determines the index of the target answerbox.
+<code>sagecellTransfer(script,questionNr,[label,partNr,format])</code> generates a SageCell with content <code>script</code> and a button with <code>label</code> (default: "Transfer"). Clicking the button transfers the content of the SageCell output into the answerbox. For multipart questions, <code>partNr</code> determines the index of the target answerbox.
+</p>
+<p>
+  If the output is to be interpreted as a list, set <code>format</code> to <code>'list'</code>.
 </p>
 <b>Usage example: </b><br/>
 <b>Question type: </b><code>function</code><br/>
@@ -69,14 +72,21 @@ $answerbox<br/>
 
 <h3><a name="sagecellTransferMulti">sagecellTransferMulti</a></h3>
 <p>
-  <code>sagecellTransferMulti(script,questionNr,labels,parts)</code> generates a single SageCell with content <code>script</code> and a series of buttons with labels from the array <code>labels</code>.
-  <code>Parts</code> must be an array of numbers of parts to which the SageCell output will be transferred. For example, the <em>i<sup>th</sup></em> button will have the label <code>labels[i]</code> and will transfers the content of the SageCell output into <code>answerbox[Parts[i]]</code> (<em>i</em> starting from 0).
+  <code>sagecellTransferMulti(script,questionNr,labels,parts[,formats])</code> generates a single SageCell with content <code>script</code> and a series of buttons with labels from the array <code>labels</code>.
+  <code>Parts</code> must be an array of numbers of parts to which the SageCell output will be transferred. For example, the <em>i<sup>th</sup></em> button will have the label <code>labels[i]</code> and will transfers the content of the SageCell output into <code>$answerbox[parts[i]]</code> (<em>i</em> starting from 0).
+</p>
+<p>
+  <code>formats</code> is a list of formats which can be <code>'any'</code> or <code>'list'</code>. Set <code>formats[i]</code> to <code>'list'</code> if <code>$answerbox[parts[i]]</code> expects a list as input.
 </p>
 
 <p>The following macros store the script edited by the student as answer to a question part of type <code>essay</code></p>
 <h3><a name="sagecellEssay">sagecellEssay</a></h3>
 <p>
 <code>sagecellEssay(script [,essayPart])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to a question of type <code>essay</code>.
+</p>
+<p>
+  If the output is to be interpreted as a list, set <code>format</code> to <code>list</code>.
+</p>
 <p>
 <b>Usage example: </b><br/>
 <b>Question type: </b><code>essay</code><br/>
@@ -101,10 +111,13 @@ For multipart and conditional questions, <code>sagecellEssay(script,essayPart)</
 </p>
 <h3><a name="sagecellEssayTransfer">sagecellEssayTransfer</a></h3>
 <p>
-<code>sagecellEssayTransfer(script,questionNr,essayPart,part[, label])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to question part <code>essayPart</code> which must be of type <code>essay</code>.
+<code>sagecellEssayTransfer(script,questionNr,essayPart,part[, label,format])</code> generates a SageCell with content <code>script</code>. The script, as modified by the student, is stored as answer to question part <code>essayPart</code> which must be of type <code>essay</code>.
 <p>The question must be <code>multipart</code> or <code>conditional</code></p>
 <p>
 A button with label <code>label</code> is added, which transfers the sagecell output to <code>$answerbox[part]</code>.
+</p>
+<p>
+  If the output is to be interpreted as a list, set <code>format</code> to <code>'list'</code>.
 </p>
 <p>
 <b>Usage example: </b><br/>
@@ -131,7 +144,7 @@ $answerbox[1]<br/>
 
 <h3><a name="sagecellEssayTransferMulti">sagecellEssayTransferMulti</a></h3>
 <p>
-  <code>sagecellEssayTransferMulti(script,questionNr,essayPart,parts, labels)</code> generates a SageCell with content
+  <code>sagecellEssayTransferMulti(script,questionNr,essayPart,parts, labels[,formats])</code> generates a SageCell with content
   <code>script</code>. The script, as modified by the student, is stored as answer to question part
   <code>essayPart</code> which must be of type <code>essay</code>.
   <p>The question must be <code>multipart</code> or <code>conditional</code></p>
@@ -139,6 +152,10 @@ $answerbox[1]<br/>
   <code>Parts</code> must be an array of numbers of parts to which the SageCell output will be transferred. For example,
   the <em>i<sup>th</sup></em> button will have the label <code>labels[i]</code> and will transfers the content of the
   SageCell output into <code>answerbox[parts[i]]</code> (<em>i</em> starting from 0).
+</p>
+<p>
+  <code>formats</code> is a list of formats which can be <code>'any'</code> or <code>'list'</code>. Set
+  <code>formats[i]</code> to <code>'list'</code> if <code>$answerbox[parts[i]]</code> expects a list as input.
 </p>
 </body>
 </html>
