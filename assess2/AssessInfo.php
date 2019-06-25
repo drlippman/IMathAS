@@ -976,7 +976,15 @@ class AssessInfo
     } else {
       $settings['intro'] = $introjson[0];
       $settings['interquestion_text'] = array_slice($introjson, 1);
+      foreach ($settings['interquestion_text'] as $k=>$v) {
+        if (isset($v['pagetitle'])) {
+          $settings['interquestion_text'][$k]['pagetitle'] = html_entity_decode($v['pagetitle']);
+        }
+      }
     }
+
+    // decode entities in title
+    $settings['name'] = html_entity_decode($settings['name']);
 
     //unpack resources
     $settings['resources'] = array();

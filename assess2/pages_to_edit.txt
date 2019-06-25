@@ -59,6 +59,11 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Paged with Intro - Intro should show on it's own page
+X Clicking "Next page" at bottom should scroll back to top
+X HTML entities in assessment titles
+X Mass change copy options didn't change defpenalty
+X Defregen penalty not displaying (showing as false)
 X Set up aria-regions, aria-live
 X Gradebook: override of non-attempted can't be changed to 0
 X Course page: Change review mode to practice mode

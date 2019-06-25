@@ -5,7 +5,7 @@
     <div class="scrollpane" role="region" :aria-label="$t('regions.questions')">
       <div
         class = "questionpane introtext"
-        v-show = "page === 0 && intro !== ''"
+        v-show = "page === -1 && intro !== ''"
       >
         <h2>{{ $t('intro') }}</h2>
         <div

@@ -155,7 +155,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$toset['submitby'] = Sanitize::stripHtmlTags($_POST['subtype']);
 		$toset['defregens'] = Sanitize::onlyInt($_POST['defregens']);
 		$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern']);
-		if ($defregenpenalty_aftern > 1 && $_POST['defregens'] > 1) {
+		if ($defregenpenalty_aftern > 1 && $_POST['defregenpenalty'] > 0 && $_POST['defregens'] > 1) {
 			$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . Sanitize::onlyInt($_POST['defregenpenalty']);
 		} else {
 			$toset['defregenpenalty'] = Sanitize::onlyInt($_POST['defregenpenalty']);
@@ -165,7 +165,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$toset['defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
 		$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern']);
-		if ($defattemptpenalty_aftern > 1 && $toset['defattempts'] > 1) {
+		if ($defattemptpenalty_aftern > 1 && $_POST['defattemptpenalty'] > 0 && $toset['defattempts'] > 1) {
 			$toset['defpenalty'] = 'S' . $defattemptpenalty_aftern . Sanitize::onlyInt($_POST['defattemptpenalty']);
 		} else {
 			$toset['defpenalty'] = Sanitize::onlyInt($_POST['defattemptpenalty']);
@@ -652,7 +652,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $defattemptpenalty = $line['defpenalty'];
 				$defattemptpenalty_aftern = 1;
       }
-			if ($line['defpenalty']{0}==='S') {
+			if ($line['defregenpenalty']{0}==='S') {
 				$defregenpenalty = substr($line['defregenpenalty'],2);
 				$defregenpenalty_aftern = $line['defregenpenalty']{1};
       } else {

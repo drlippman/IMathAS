@@ -47,10 +47,10 @@ if (!(isset($teacherid))) {
 
 		$sets = array();
 		$qarr = array();
-		if (isset($_POST['docopyopt'])) {
+		if ($_POST['copyopts'] != 'DNC') {
 			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,noprint,istutorial,allowlate,timelimit,password,reqscoretype,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopt'])));
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
@@ -415,7 +415,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['removeperq'])) {
 			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0,showhints=-1,fixedseeds=NULL WHERE assessmentid IN ($checkedlist)");
 		}
-		if (isset($_POST['docopyopt']) || $_POST['defpoints'] !== '' || isset($_POST['removeperq'])) {
+		if ($_POST['copyopts'] != 'DNC' || $_POST['defpoints'] !== '' || isset($_POST['removeperq'])) {
 			//update points possible
 			require_once("../includes/updateptsposs.php");
 			foreach ($checked as $aid) {
