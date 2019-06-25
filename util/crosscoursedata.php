@@ -18,7 +18,7 @@ $curBreadcrumb .= ' <a href="../admin/admin2.php">Admin</a>';
 if ($myrights == 100) {
 	$curBreadcrumb .= ' &gt; <a href="utils.php">Utilities</a>';
 }
-$curBreadcrumb .= ' &gt; Cross-Course Results'; 
+$curBreadcrumb .= ' &gt; Cross-Course Results';
 
 function reporterror($err) {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
@@ -65,7 +65,7 @@ $ts = microtime(true);
 $days = intval($_REQUEST['days']);
 $old = time() - (empty($days)?30:$days)*24*60*60;
 $anregex = '[[:<:]]'.$basecourse.'[[:>:]]';
-$query = 'SELECT ic.id,ic.ancestors,ic.name FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id 
+$query = 'SELECT ic.id,ic.ancestors,ic.name FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id
 	  JOIN imas_students AS istu ON istu.courseid=ic.id WHERE
 	  iu.groupid=? AND ic.ancestors REGEXP ?
 	  GROUP BY istu.courseid
@@ -82,7 +82,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$courses[] = $row['id'];
 	$coursenames[$row['id']] = $row['name'];
 	//get ancestor copy depth
-	$coursedepth[$row['id']] = array_search($basecourse, explode(',', $row['ancestors']));	
+	$coursedepth[$row['id']] = array_search($basecourse, explode(',', $row['ancestors']));
 }
 
 if (count($courses)==0) {
@@ -100,7 +100,7 @@ $query .= "WHERE it.courseid IN ($phcids) GROUP BY it.courseid";
 $stm = $DBH->prepare($query);
 $stm->execute($courses);
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-	$teachers[$row['courseid']] = $row['teachers'];	
+	$teachers[$row['courseid']] = $row['teachers'];
 }
 
 //echo "Teacher lookup done: ".(microtime(true)-$ts).'<br>';
@@ -112,7 +112,7 @@ $stm->execute(array($basecourse));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$row['qcnt'] = substr_count($row['itemorder'], ',');
 	unset($row['itemorder']);
-	
+
 	if ($row['ptsposs']==-1) {
 		require_once("../includes/updateptsposs.php");
 		$row['ptsposs'] = updatePointsPossible($row['id']);
@@ -169,7 +169,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$sp = explode(';', $row['bestscores']);
 	$scores = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
 	$total = array_sum(explode(',', $scores));
-	
+
 	$baseassess = $assesscopies[$row['assessmentid']]['source'];
 	$assesscourse = $assesscopies[$row['assessmentid']]['course'];
 	if (!isset($assessresults[$baseassess])) {
@@ -186,14 +186,18 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 //form output rows
 $headerrow = array('Assessment');
 foreach ($courses as $courseid) {
-	$headerrow[] = $coursenames[$courseid].' ('.$teachers[$courseid].')';
+	$headerrow[] = $coursenames[$courseid].' ID'.$courseid.' ('.$teachers[$courseid].')';
 }
 
 //form body rows
 $bodydata = array();
 $bodyheaderinfo = array();
 foreach ($assessdata as $aid=>$ainfo) {
-	$bodyheaderinfo[] = array('id'=>$aid, 'name'=>$ainfo['name']);
+	if ($_REQUEST['output']=='html') {
+		$bodyheaderinfo[] = array('id'=>$aid, 'name'=>$ainfo['name']);
+	} else {
+		$bodydata[] = $ainfo['name'];
+	}
 	$outrow = array();
 	foreach ($courses as $courseid) {
 		if (!isset($assessresults[$aid][$courseid])) {
@@ -263,4 +267,3 @@ function getpts($sc) {
 		return round($tot,1);
 	}
 }
-	  

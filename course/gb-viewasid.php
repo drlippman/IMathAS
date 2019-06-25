@@ -403,7 +403,8 @@
 				$stm->execute(array(':id'=>$asid));
 				$bestscores = $stm->fetchColumn(0);
 				$bsp = explode(';',$bestscores);
-
+				$oldScores = explode(',', $bsp[0]);
+				
 				$scores = array();
 				$feedback = array();
 				$i = 0;
@@ -411,7 +412,6 @@
 					$j=0;
 					$scpt = array();
 					if (isset($_POST["sb-$i-0"])) {
-
 						while (isset($_POST["sb-$i-$j"])) {
 							if ($_POST["sb-$i-$j"]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
 								$scpt[$j] = $_POST["sb-$i-$j"];
@@ -419,6 +419,10 @@
 								$scpt[$j] = -1;
 							}
 							$j++;
+						}
+						if (count($scpt) < count(explode('~', $oldScores[$i]))) {
+							echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
+							exit;
 						}
 						$scores[$i] = implode('~',$scpt);
 					} else {
@@ -432,6 +436,10 @@
 						$feedback["Q$i"] = Sanitize::incomingHtml($_POST["fb-$i"]);
 					}
 					$i++;
+				}
+				if (count($scores) < count($oldScores)) {
+					echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
+					exit;
 				}
 				$scorelist = implode(",",$scores);
 				if (count($bsp)>1) { //tack on rawscores and firstscores
@@ -910,7 +918,7 @@
 				if ($canedit) {
 					echo " (parts: ";
 					$prts = explode(', ',$parts);
-					for ($j=0;$j<count($prts);$j++) {
+					for ($j=0;$j<count($answeights[$questions[$i]]);$j++) {
 						echo "<input type=text size=2 id=\"scorebox$i-$j\" name=\"sb-$i-$j\" value=\"{$prts[$j]}\">";
 						if ($rubric[$questions[$i]]!=0) {
 							echo printrubriclink($rubric[$questions[$i]],$answeights[$questions[$i]][$j],"scorebox$i-$j","fb-$i",($i+1).' pt '.($j+1));

@@ -287,7 +287,7 @@ if ($overwriteBody==1) {
 	} else {
 		$pandocurl = 'http://'.$CFG['GEN']['pandocserver'];
 	}
-	
+
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
@@ -301,7 +301,7 @@ if ($overwriteBody==1) {
 	echo '<form id="theform" method="post" action="'.$pandocurl.'/html2docx.php">';
 	echo '<p><label><input type="checkbox" name="darkgrid"> '._('Darken graph grid lines').'</label><br/>';
 	echo '<label><input type="checkbox" name="doubleimgs"> '._('Double image sizes').'</label></p>';
-	
+
 	echo '<p><input type="submit" value="'._("Convert to Word").'"/> ';
 	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'">'._('Change print settings').'</a></p>';
 	echo '<textarea name="html" style="visibility:hidden">'.Sanitize::encodeStringForDisplay($out).'</textarea>';
@@ -428,12 +428,21 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 			if (($anstype=='matrix' || $anstype=='calcmatrix') && isset($answersize)) {
 				$options['answersize'] = $oldoptionsanswersize;
 			}
+      if (!isset($showanswer)) {
+        $showanswer = array();
+      }
+      if (is_array($showanswer) && !isset($showanswer[$kidx])) {
+        $showanswer[$kidx] = $shans[$kidx];
+      }
 		}
 	} else {
 		if ($qdata['qtype']=='matrix' || $qdata['qtype']=='calcmatrix') {
 			unset($options['answersize']); //pandoc doesn't like nested tables
 		}
 		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+    if (!isset($showanswer)) {
+      $showanswer = $shans[0];
+    }
 	}
 
 	$retstrout .= "<div class=q>";
@@ -448,6 +457,23 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	$retstrout .= "<div>\n";
 	//$retstrout .= $toevalqtext;
 	eval("\$evaledqtext = \"$toevalqtxt\";");
+  // fix [AB] fields
+  if (strpos($evaledqtext,'[AB')!==false) {
+		if (is_array($answerbox)) {
+			foreach($answerbox as $iidx=>$abox) {
+				if (strpos($evaledqtext,'[AB'.$iidx.']')!==false) {
+					$evaledqtext = str_replace('[AB'.$iidx.']', $abox, $evaledqtext);
+					$toevalqtxt .= '$answerbox['.$iidx.']';  //to prevent autoadd
+				}
+			}
+		} else {
+			$evaledqtext = str_replace('[AB]', $answerbox, $evaledqtext);
+			$toevalqtxt .= '$answerbox';
+		}
+	}
+  // remove [SAB] fields
+  $evaledqtext = preg_replace('/\[SAB\d*\]/','',$evaledqtext);
+
 	$retstrout .= printfilter(filter($evaledqtext));
 	$retstrout .= "</div>\n"; //end question div
 
@@ -472,8 +498,9 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	if (!isset($showanswer)) {
 		return array($retstrout,$shans);
 	} else {
+    if (is_array($showanswer)) {
+      ksort($showanswer);
+    }
 		return array($retstrout,$showanswer);
 	}
 }
-
-?>

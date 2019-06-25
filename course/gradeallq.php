@@ -140,6 +140,10 @@
 					if ($line['agroupid']==0) { continue;}
 					foreach ($grpscores[$line['agroupid']] as $loc=>$sv) {
 						if (is_array($sv)) {
+							if (count($sv) < count(explode('~', $scores[$loc]))) {
+								echo "Oh-oh: score didn't seem to be submitted properly. Aborting";
+								exit;
+							}
 							$scores[$loc] = implode('~',$sv);
 						} else {
 							$scores[$loc] = $sv;
@@ -157,6 +161,10 @@
 				} else {
 					foreach ($allscores[$line['id']] as $loc=>$sv) {
 						if (is_array($sv)) {
+							if (count($sv) < count(explode('~', $scores[$loc]))) {
+								echo "Oh-oh: score didn't seem to be submitted properly. Aborting";
+								exit;
+							}
 							$scores[$loc] = implode('~',$sv);
 						} else {
 							$scores[$loc] = $sv;

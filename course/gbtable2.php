@@ -858,6 +858,11 @@ function gbtable() {
 	$sturow = array();
 	$timelimitmult = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		if (isset($sturow[$line['id']])) {
+			// this shouldn't happen, but could if there were two
+			// imas_student records for the same user/course.
+			continue;
+		}
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		$cattotpast[$ln] = array();
 		$cattotpastec[$ln] = array();

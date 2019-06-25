@@ -1983,10 +1983,12 @@ function convertTri($num, $tri, $doth=false, $addcommas=false) {
   if ($str != "")
    $str .= $triplets[$tri];
   // continue recursing?
-  if ($r > 0)
-   return convertTri($r, $tri+1, false, $addcommas).($addcommas?',':'').$str;
-  else
+  if ($r > 0) {
+   $prev = convertTri($r, $tri+1, false, $addcommas);
+   return $prev.(($addcommas && $prev != '' && $str != '')?',':'').$str;
+  } else {
    return $str;
+  }
  }
 
 function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false) {

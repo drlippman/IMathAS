@@ -266,10 +266,10 @@ class MathParser
         continue;
       } else if (ctype_digit($c) || $c=='.') {
         // if it's a number/decimal value
-        preg_match('/^(\d*\.?\d*)/', substr($str,$n), $matches);
+        preg_match('/^(\d*\.?\d*(E-?\d+)?)/', substr($str,$n), $matches);
         $tokens[] = [
           'type'=>'number',
-          'symbol'=>$matches[1]
+          'symbol'=> $matches[1]
         ];
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
@@ -628,7 +628,7 @@ class MathParser
    */
   private function evalNode($node) {
     if ($node['type'] === 'number') {
-      return $node['symbol'];
+      return floatval($node['symbol']);
     } else if ($node['type'] === 'variable') {
       if (isset($this->variableValues[$node['symbol']])) {
         return $this->variableValues[$node['symbol']];

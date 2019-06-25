@@ -15,7 +15,7 @@
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	
+
 	if ($isteacher) {
 		if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
 			$calledfrom='isolateassess';
@@ -40,7 +40,7 @@
 	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$includeduedate = (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
-	
+
 	if (isset($tutorsection) && $tutorsection!='') {
 		$secfilter = $tutorsection;
 	} else {
@@ -54,7 +54,7 @@
 			$secfilter = -1;
 		}
 	}
-	
+
 	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
@@ -62,8 +62,8 @@
 		exit;
 	}
 	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-	
-	
+
+
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
@@ -102,7 +102,7 @@
 	} else {
 		$sortorder = "name";
 	}
-	
+
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
@@ -399,11 +399,11 @@
 	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
 	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
-		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true,false);</script>";
 	} else if ($hassection && !$hidesection) {
-		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true,false);</script>";
 	} else {
-		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true,false);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";

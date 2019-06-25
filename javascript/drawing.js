@@ -1430,7 +1430,11 @@ function encodeDraw() {
 	var outline = [];
 	for (var i=0;i<lines[curTarget].length; i++) {
 		var prevlen = lines[curTarget][i].length;
-		outline = pathsimplify(lines[curTarget][i]);
+		if (targets[curTarget].dotline == 0) {
+			outline = pathsimplify(lines[curTarget][i]);
+		} else {
+			outline = lines[curTarget][i];
+		}
 		if (i!=0) {
 			out += ';';
 		}
