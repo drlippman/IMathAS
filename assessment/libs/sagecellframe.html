@@ -44,7 +44,7 @@ function initcell() {
 	observeDOM($(".sagecell_output")[0], frameresize);
 	if (update_id != "") {
 			observeDOM($(".sagecell_input")[0], function() {
-				var code = $(".sagecell_commands").val();		
+				var code = $(".sagecell_commands").val();
 				window.parent.postMessage( JSON.stringify({
 					subject: "imathas.update",
 					id: update_id,
@@ -67,14 +67,16 @@ function frameresize() {
 	      subject: "lti.frameResize",
 	      height: default_height,
 	      frame_id: frame_id
-	  }), "*");	
+	  }), "*");
 }
 $(function() {
 	var code = getUrlParameter("code") || "";
+	var evallabel = getUrlParameter("evallabel") || "Evaluate";
 	sagecell.makeSagecell({
 		inputLocation: '#mycell',
 		code: code,
 		callback: initcell,
+		evalButtonText: evallabel,
 		hide: ["permalink", "fullScreen"]
 	});
 });

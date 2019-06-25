@@ -1151,6 +1151,7 @@ function initSageCell(base) {
 		if (typeof jQuery(ta).attr("id") != "undefined") {
 				url += '&update_id='+jQuery(ta).attr("id");
 		}
+		url += '&evallabel=' + encodeURIComponent(_('Evaluate'));
 		jQuery(ta).addClass("allowupdate").hide()
 		.after(jQuery("<iframe/>", {
 				id: frame_id,
