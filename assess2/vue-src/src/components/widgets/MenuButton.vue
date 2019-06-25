@@ -1,6 +1,6 @@
 <template>
   <div class="menubutton"
-    @keyup.esc="toggleOpen(true)"
+    @keyup.esc="toggleOpen(false)"
     @keydown.up.prevent = "handleUpDown(-1)"
     @keydown.down.prevent = "handleUpDown(1)"
     @keydown = "handleKeys"
@@ -22,40 +22,42 @@
       <slot v-if="hasButton" name=button></slot>
       <icons class="mb_downarrow" v-if="!noarrow" name="downarrow" size="micro"/>
     </button>
-    <ul
-      v-if="open"
-      role = "menu"
-      :aria-labelledby="id"
-      :aria-activedescendant="id + '_' + curSelected"
-      :id = "id + '_wrap'"
-      tabindex = "-1"
-      :class = "{'menubutton-right': position=='right'}"
-    >
-      <li v-if="!!header" class="menubutton-header">
-        {{ header }}
-      </li>
-      <li v-for="(option,index) in options" :key="index"
-        @click = "handleClick(index)"
-        :class="{'listsubitem': option.subitem}"
+    <transition name="fade">
+      <ul
+        v-if="open"
+        role = "menu"
+        :aria-labelledby="id"
+        :aria-activedescendant="id + '_' + curSelected"
+        :id = "id + '_wrap'"
+        tabindex = "-1"
+        :class = "{'menubutton-right': position=='right'}"
       >
-        <component
-          v-bind = "getLinkProps(option,index)"
-          @click = "toggleOpen"
-          @mouseover = "curSelected = index"
-          @click.native = "toggleOpen"
-          @mouseover.native = "curSelected = index"
-          :id = "id + '_' + index"
-          :class="{'menubutton-focus': index==curSelected}"
-          role = "menuitem"
-          tabindex = "-1"
+        <li v-if="!!header" class="menubutton-header">
+          {{ header }}
+        </li>
+        <li v-for="(option,index) in options" :key="index"
+          @click = "handleClick(index)"
+          :class="{'listsubitem': option.subitem}"
         >
-          <slot v-if="hasSlot" :option="option" :selected="false"></slot>
-          <template v-else>
-            {{option.label}}
-          </template>
-        </component>
-      </li>
-    </ul>
+          <component
+            v-bind = "getLinkProps(option,index)"
+            @click = "toggleOpen"
+            @mouseover = "curSelected = index"
+            @click.native = "toggleOpen"
+            @mouseover.native = "curSelected = index"
+            :id = "id + '_' + index"
+            :class="{'menubutton-focus': index==curSelected}"
+            role = "menuitem"
+            tabindex = "-1"
+          >
+            <slot v-if="hasSlot" :option="option" :selected="false"></slot>
+            <template v-else>
+              {{option.label}}
+            </template>
+          </component>
+        </li>
+      </ul>
+    </transition>
   </div>
 </template>
 

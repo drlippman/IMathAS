@@ -304,7 +304,7 @@ export default {
   border-radius: 100%;
   height: 1em;
   right: .75em;
-  transition: right .1825s ease-in-out;
+  transition: right .1s ease-in-out;
   width: 1em;
   box-shadow: 1px 2px 2px 0px rgba(0,0,0,0.25);
 }
@@ -316,7 +316,7 @@ export default {
   height: .5em;
   top: .25em;
   right: 0em;
-  transition: background .2s ease-in-out;
+  transition: background .1s ease-in-out;
   width: 1.75em;
 }
 

@@ -19,14 +19,16 @@
     >
       <slot name=button></slot>
     </span>
-    <div
-      class = "dropdown-pane"
-      :id = "id + '_pane'"
-      ref = "pane"
-      v-if = "open"
-    >
-      <slot />
-    </div>
+    <transition name="fade">
+      <div
+        class = "dropdown-pane"
+        :id = "id + '_pane'"
+        ref = "pane"
+        v-if = "open"
+      >
+        <slot />
+      </div>
+    </transition>
   </span>
 </template>
 
