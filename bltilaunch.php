@@ -126,7 +126,7 @@ if (isset($_GET['launch'])) {
 			$stm->execute(array(':userid'=>$userid,':courseid'=>$cid,':typeid'=>$aid,':viewtime'=>$now));
 		}
 		if ($aver > 1) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&id=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid=$aid");
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid");
 		}
@@ -1584,7 +1584,7 @@ if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwr
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
 		if ($aver > 1) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&id=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid=$aid");
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 		}
@@ -1657,7 +1657,7 @@ if (isset($_GET['launch'])) {
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
 		if ($aver > 1) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&id=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid=$aid");
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid");
 		}
@@ -2683,7 +2683,7 @@ if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsess
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'assesslti', ':typeid'=>$aid, ':viewtime'=>$now, ':info'=>''));
 		}
 		if ($aver > 1) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&id=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid=$aid");
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$aid&ltilaunch=true");
 		}
