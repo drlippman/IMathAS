@@ -12,7 +12,7 @@ if (empty($_GET['cid']) || empty($_GET['aid'])) {
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 
-$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
+$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
 $inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
 $isdiag = isset($sessiondata['isdiag']);
 if ($isdiag) {
