@@ -174,7 +174,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
 			$query .= "WHERE assessmentid=:assessmentid AND userid=:userid ";
 			$query .= "UNION ";
-			$query = "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
+			$query .= "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
 			$query .= "JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ";
 			$query .= "WHERE assessmentid=:assessmentid2 AND userid=:userid2 ";
 
