@@ -69,7 +69,7 @@ $out['assess_info'] = $assess_record->getGbAssessScoresAndQVersions();
 $out['newscores'] = $assess_record->getScoresAfterOverrides($scores);
 
 // update LTI grade
-$lti_sourcedid = $assess_info->getSetting('lti_sourcedid');
+$lti_sourcedid = $assess_record->getLTIsourcedId();
 if (strlen($lti_sourcedid) > 1) {
   require_once("../includes/ltioutcomes.php");
   calcandupdateLTIgrade($lti_sourcedid,$aid,$out['gbscore'],true);

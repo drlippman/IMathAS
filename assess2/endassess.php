@@ -62,7 +62,7 @@ if ($assess_record->hasActiveAttempt()) {
 }
 
 // update LTI grade
-$lti_sourcedid = $assess_info->getSetting('lti_sourcedid');
+$lti_sourcedid = $assess_record->getLTIsourcedId();
 if (strlen($lti_sourcedid) > 1) {
   $gbscore = $assess_record->getGbScore();
   require_once("../includes/ltioutcomes.php");

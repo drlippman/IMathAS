@@ -457,6 +457,18 @@ class AssessRecord
   }
 
   /**
+   * Get the LTI sourcedid
+   * @return string  LTI sourcedide
+   */
+  public function getLTIsourcedId() {
+    if (empty($this->assessRecord)) {
+      //no assessment record at all
+      return '';
+    }
+    return $this->assessRecord['lti_sourcedid'];
+  }
+
+  /**
    * For by-question submission, check if all questions have been attempted,
    * and update status if so
    * @return boolean true if all questions attempted
