@@ -1512,6 +1512,7 @@ if ($linkparts[0]=='aid') {
 
 	$sessiondata['ltitlwrds'] = $tlwrds;
 	$sessiondata['ltiitemtype']=0;
+	$sessiondata['ltiitemver']=$aver;
 	$sessiondata['ltiitemid'] = $aid;
 
 	$sessiondata['lticanuselatepass'] = false;
@@ -2615,6 +2616,7 @@ if ($keyparts[0]=='aid') {
 	//this sessiondata tells WAMAP to limit access to the specific resouce requested
 	$sessiondata['ltitlwrds'] = $tlwrds;
 	$sessiondata['ltiitemtype']=0;
+	$sessiondata['ltiitemver']=$aver;
 	$sessiondata['ltiitemid'] = $aid;
 }  else if ($keyparts[0]=='cid') { //is cid
 	$sessiondata['ltiitemtype']=1;

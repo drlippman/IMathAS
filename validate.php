@@ -461,7 +461,7 @@
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
 			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
-			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php');
+			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php','index.php','gbviewassess.php');
 			//call hook, if defined
 			if (function_exists('allowedInAssessment')) {
 				$allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());
@@ -471,7 +471,11 @@
 				$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
 				$cid = Sanitize::courseId($stm->fetchColumn(0));
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+        if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
+          header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+        } else {
+				  header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+        }
 				exit;
 			}
 		} else if ($sessiondata['ltirole']=='instructor') {
