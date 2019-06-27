@@ -215,7 +215,8 @@
   "timer": {
     "hrs": "hr | hrs",
     "min": "min | mins",
-    "overtime": "Overtime"
+    "overtime": "Overtime",
+    "show": "Show timelimit countdown"
   },
   "helps": {
     "message_instructor": "Message instructor",

@@ -1,20 +1,28 @@
 <template>
-  <div id="timerbox" @click="toggleShow" tabindex=0>
-    <i class="far fa-clock"></i>
+  <button type="button" class="plain" id="timerbox" @click="toggleShow">
+    <icons name="timer" size="small" />
     <span
       v-if="open"
       :class = "{noticetext: hours === 0 && 60*minutes+seconds < warningTime}"
     >
       {{ timeString }}
     </span>
-    <span v-if="open">&times;</span>
-  </div>
+    <icons v-if="open" name="close" size="small" color="subdued" />
+    <span v-else class="sronly">
+      {{ $t('timer.show') }}
+    </span>
+  </button>
 </template>
 
 <script>
+import Icons from '@/components/widgets/Icons.vue';
+
 export default {
   name: 'Timer',
   props: ['end', 'total', 'grace'],
+  components: {
+    Icons
+  },
   data: function () {
     return {
       hours: 0,

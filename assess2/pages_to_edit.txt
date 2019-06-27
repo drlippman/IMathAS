@@ -10,7 +10,8 @@ Test:
 
 Bugs:
   Teacher has unsubmitted quiz attempt, reset option not showing.
-  
+  Improve a11y for Timer toggle (aria-live, announce certain times?)
+
 To discuss:
 
 Separate:
