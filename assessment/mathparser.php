@@ -205,6 +205,12 @@ class MathParser
    * @return array  Builds syntax tree in class, but also returns it
    */
   public function parse($str) {
+    // Rewrite sin^(-1) as arcsin
+    $str = str_replace(
+      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)","sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
+      array("arcsin","arccos","arctan","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
+      $str
+    );
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();

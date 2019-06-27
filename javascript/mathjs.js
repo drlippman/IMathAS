@@ -122,44 +122,45 @@ function mathjs(st,varlist) {
 	  }
 	  st = st.replace(new RegExp("("+varlist+")","gi"), function(match,p1) {
 		 for (var i=0; i<vararr.length;i++) {
-			if (vararr[i]==p1 || (!foundaltcap[i] && vararr[i].toLowerCase()==p1.toLowerCase())) { 
+			if (vararr[i]==p1 || (!foundaltcap[i] && vararr[i].toLowerCase()==p1.toLowerCase())) {
 				return '(@v'+i+'@)';
-			}	
+			}
 		 }});
   } else {
   	  st = st.replace(/pi/g, "(pi)");
   }
   //temp store of scientific notation
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
-  
+
   //convert named constants
   st = st.replace(/e/g, "(E)");
-  
+
   //restore functions
   st = st.replace(/@(\d+)@/g, indextofunc);
-  
+
   //convert functions
   st = st.replace(/log_([a-zA-Z\d\.]+)\s*\(/g,"nthlog($1,");
   st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
-  st = st.replace(/(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)\^-1/g,"arc$1");
+  st = st.replace(/(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)\^(-1|\(-1\))/g,"arc$1");
   st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\s*\(/g,"$1n($2,");
+  st = st.replace(/(sin|cos|tan|sec|csc|cot)\^\((\d+)\)\s*\(/g,"$1n($2,");
   st = st.replace(/root\s*\((\d+)\)\s*\(/g,"nthroot($1,");
-  	
+
   //add implicit mult for "3 4"
   st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
-  
+
   //clean up
   st = st.replace(/#/g,"");
   st = st.replace(/\s/g,"");
-  
+
   //restore variables
   if (varlist != null && varlist != '') {
     st = st.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vararr[contents];
        });
   }
-  
+
   //add implicit multiplication
   st = st.replace(/([0-9])([\(a-zA-Z])/g,"$1*$2");
   st = st.replace(/(!)([0-9\(a-zA-Z])/g,"$1*$2");

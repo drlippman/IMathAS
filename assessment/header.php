@@ -93,13 +93,13 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=052819" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=062619" type="text/javascript"></script>';
 
 //assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 /*
 
 echo '<script src="' . $imasroot . '/javascript/general.js?v=112918" type="text/javascript"></script>';
-echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=021919" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/mathjs.js?v=062619" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=051719" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/drawing.js?v=052819" type="text/javascript"></script>';
