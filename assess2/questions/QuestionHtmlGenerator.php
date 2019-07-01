@@ -322,7 +322,9 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
-            if ($scoremethod == 'acct' || $quesData['qtype'] == 'conditional') {
+            if ((isset($scoremethod) && $scoremethod == 'acct') ||
+              $quesData['qtype'] == 'conditional'
+            ) {
               $jsParams['submitall'] = 1;
             }
         } else {
@@ -796,7 +798,7 @@ class QuestionHtmlGenerator
         } else {
             $showanswerloc = array();
             foreach ($entryTips as $iidx => $entryTip) {
-              if ($doshowans || (is_array($doShowAnswerParts) && $doShowAnswerParts[$iidx])) {
+              if ($doshowans || (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))) {
                 $showanswerloc[$iidx] = '';
                 if ((!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx] !== '') {
                     if (strpos($shanspt[$iidx], '[AB') !== false) {

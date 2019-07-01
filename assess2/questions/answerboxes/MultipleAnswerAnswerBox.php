@@ -77,6 +77,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
     } else {
 		  $labits = explode('|',$la);
     }
+    if (!isset($displayformat)) {
+      $displayformat = 'list';
+    }
+    
 		if ($displayformat == 'column') { $displayformat = '2column';}
 
 		if (substr($displayformat,1)=='column') {
