@@ -240,7 +240,7 @@ if (isset($_POST['SID'])) {
 			if ($stm2->rowCount()>0) {
 				$d = $stm2->fetch(PDO::FETCH_NUM);
 			} else {
-				$stm2 = $DBH->prepare("SELECT id,starttime FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid");
+				$stm2 = $DBH->prepare("SELECT userid,starttime FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid");
 				$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$paid));
 				if ($stm2->rowCount()>0) {
 					$d = $stm2->fetch(PDO::FETCH_NUM);
