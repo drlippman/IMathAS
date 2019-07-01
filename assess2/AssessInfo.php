@@ -527,7 +527,7 @@ class AssessInfo
           if ($qid['replace'] == true) {
             //select with replacement
             for ($i=0; $i < $qid['n']; $i++) {
-              $qout[] = $qid['qids'][array_rand($qid['qids'], 1)];
+              $qout[] = intval($qid['qids'][array_rand($qid['qids'], 1)]);
             }
           } else {
             //select without replacement
@@ -544,18 +544,18 @@ class AssessInfo
             }
 
             for ($i=0; $i < min($qid['n'], count($qid['qids'])); $i++) {
-              $qout[] = $qid['qids'][$i];
+              $qout[] = intval($qid['qids'][$i]);
             }
             //if we want more than there are questions
             if ($qid['n'] > count($qid['qids'])) {
               for ($i = count($qid['qids']); $i < $qid['n']; $i++) {
-                $qout[] = $qid['qids'][array_rand($qid['qids'], 1)];
+                $qout[] = intval($qid['qids'][array_rand($qid['qids'], 1)]);
               }
             }
           }
         }
       } else {
-        $qout[] = $qid;
+        $qout[] = intval($qid);
       }
     }
 
@@ -677,6 +677,9 @@ class AssessInfo
         } while ($looplimit < 10 && in_array($newseed, $oldseeds));
       }
     }
+    // make sure they're ints
+    $newq = intval($newq);
+    $newseed = intval($newseed);
     return array($newq, $newseed);
   }
 
@@ -875,7 +878,7 @@ class AssessInfo
     }
 
     if (!empty($settings['fixedseeds'])) {
-      $settings['fixedseeds'] = explode(',', $settings['fixedseeds']);
+      $settings['fixedseeds'] = array_map('intval', explode(',', $settings['fixedseeds']));
     } else {
       $settings['fixedseeds'] = null;
     }
@@ -1044,8 +1047,10 @@ class AssessInfo
             'type' => 'pool',
             'n' => $pts[0],
             'replace' => ($pts[1]==1),
-            'qids' => array_slice($sub, 1)
+            'qids' => array_map('intval', array_slice($sub, 1))
           );
+        } else {
+          $order[$k] = intval($v);
         }
       }
       $settings['itemorder'] = $order;
