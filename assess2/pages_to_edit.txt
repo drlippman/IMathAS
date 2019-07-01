@@ -9,10 +9,10 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  Teacher has unsubmitted quiz attempt, reset option not showing.
-  Improve a11y for Timer toggle (aria-live, announce certain times?)
 
 To discuss:
+  Re-enabled teacher option to disable equation editor?
+  Add a11y option for disabling equation editor?  Or tie to drawing entry or text editor options?
 
 Separate:
   Collate CSS

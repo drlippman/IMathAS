@@ -1285,7 +1285,13 @@ if ($overwriteBody==1) {
 		?>'">
 
 		<input type=button value="Define End Messages" title="Customize messages to display based on the assessment score" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
-		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))">
+		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php
+			if ($aver > 1) {
+				echo $imasroot . '/assess2/?cid=' . $cid . '&aid=' . $aid;
+			} else {
+				echo $imasroot . '/assessment/showtest.php?cid=' . $cid . '&id=' . $aid;
+			}
+		?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))">
 	</p>
 
 <?php
