@@ -114,7 +114,7 @@ class QuestionHtmlGenerator
 
         $doShowAnswer = $this->questionParams->getShowAnswer();
         $doShowAnswerParts = $this->questionParams->getShowAnswerParts();
-        
+
         if (ShowAnswer::ALWAYS == $doShowAnswer) {
             $nosabutton = true;
         } else {
@@ -211,11 +211,11 @@ class QuestionHtmlGenerator
 
         // These are also needed by the answer box generator.
         $varsForAnswerBoxGenerator = array();
-        foreach (self::VARS_FOR_ANSWERBOX_GENERATOR as $var) {
-            if (!isset(${$var})) {
+        foreach (self::VARS_FOR_ANSWERBOX_GENERATOR as $vargenKey) {
+            if (!isset(${$vargenKey})) {
                 continue;
             }
-            $varsForAnswerBoxGenerator[$var] = ${$var};
+            $varsForAnswerBoxGenerator[$vargenKey] = ${$vargenKey};
         }
 
         /*
