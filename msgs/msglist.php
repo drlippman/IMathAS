@@ -81,7 +81,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$msgset = $stm->fetchColumn(0);
 		$msgmonitor = (floor($msgset/5)&1);
 		$msgset = $msgset%5;
-		
+
 		$isauth = false;
 		$isteacher = false;
 		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=? AND courseid=?");
@@ -97,7 +97,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			}
 		}
 		if (!$isauth) {
-			echo '[]'; 
+			echo '[]';
 			exit;
 		}
 
@@ -735,7 +735,7 @@ function chgfilter() {
 		echo " >".Sanitize::encodeStringForDisplay($v)."</option>";
 	}
 	echo "</select> ";
-	
+
 	echo '<label for="filteruid">By sender</label>: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
 	if ($filteruid==0) {
 		echo 'selected="selected" ';
@@ -775,7 +775,7 @@ function chgfilter() {
 	</thead>
 	<tbody>
 <?php
-  $offset = ($page-1)*$threadsperpage;
+  $offset = max(0, ($page-1)*$threadsperpage);
 
   $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
