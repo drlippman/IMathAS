@@ -859,9 +859,11 @@ jQuery(document).ready(function($) {
 			} else {
 				var frames = document.getElementsByTagName('iframe');
 				for (var i = 0; i < frames.length; i++) {
-				    if (frames[i].contentWindow === e.originalEvent.source) {
-					$(frames[i]).height(edata.height); //the height sent from iframe
-					break;
+				    if (frames[i].contentWindow === e.originalEvent.source &&
+							!frames[i].hasAttribute('data-noresize')
+						) {
+							$(frames[i]).height(edata.height); //the height sent from iframe
+							break;
 				    }
 				}
 			}

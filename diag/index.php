@@ -267,6 +267,8 @@ if (isset($_POST['SID'])) {
 			//$sessiondata['graphdisp'] = 1;
 			$sessiondata['useed'] = 1;
 			$sessiondata['isdiag'] = $diagid;
+			$sessiondata['diag_aver'] = $aVer;
+			
 			$enc = base64_encode(serialize($sessiondata));
 			if (!empty($_POST['tzname'])) {
 				$tzname = $_POST['tzname'];

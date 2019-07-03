@@ -1,13 +1,31 @@
 TODOs:
-  Need to revisit showhints throughout display code
+  /apple-touch-icon.png
+  /apple-touch-icon-precomposed.png
+  Add support for "requires previous to be attempted"
+    Menubutton:
+      Show option disabled
+      Don't highlight on mouseover
+      Skip in keyboard navigation
+    Skip navigation
+      Skip in next/prev navigation
+    Set based on status of previous
+      If regen, should still count as attempted
   Add assess2 alts to showtest in:
-    actions.php
-    treereader.php
+    X actions.php
+    X treereader.php
+      TEST
     validate - isdiag block
     validate - locked for assessment
+  Convert old embedded intros on upgrade
   Equation editor - make blur triggers in Firefox. Alt for closing?
   [SAB2] showing.  Also, test $showanswerloc
-  Full display, intro and text at beginning; intro showing with text rather than intro page
+  X Full display, intro and text at beginning; intro showing with text rather than intro page
+  Add a11y option for disabling equation editor?  Or tie to drawing entry or text editor options?
+    Yes. If easy, add separate option. If not, tie to text editor
+    Pass to front end
+  In full display, separation between question and header. Line above too or instead?
+    Increase margin above question
+    Add overline
 
 Test:
   Instructor preview
@@ -17,11 +35,17 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
+  gbviewassess slow to load
+    initeditor taking WAY too long
+  gbviewassess breadcrumb to gradebook.php
+  gbviewassess: Had help available info?
+  viewmsg.php: Add space at bottom of page
+  addquestions: Settings button needs to point to addassessment2
 
 To discuss:
-  Re-enabled teacher option to disable equation editor?
-  Add a11y option for disabling equation editor?  Or tie to drawing entry or text editor options?
-  In full display, separation between question and header. Line above too or instead?
+  (No) Editor covers submit button
+  (No) Re-enable teacher option to disable equation editor?
+  (No) One question in order / groups of questions in order?
 
 Separate:
   Collate CSS
@@ -52,6 +76,7 @@ Future Todos:
   Condense syntax warnings into an icon, with tooltip display of warning.
   Get "Save work" button to change oninput rather than onblur
   HW mode: Add score summary to nav
+  Add grouping options for force order
 
 Delay for later (since they work with displayq2 for now):
   Edit/Rewrite testquestion.php

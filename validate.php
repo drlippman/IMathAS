@@ -428,10 +428,12 @@
 	}
 	if (isset($sessiondata['isdiag'])) { // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		$urlparts = parse_url($_SERVER['PHP_SELF']);
-		if (!in_array(basename($urlparts['path']),array('showtest.php','ltiuserprefs.php'))) {
+		if ($sessiondata['diag_aver'] == 1 &&
+      !in_array(basename($urlparts['path']),array('showtest.php','ltiuserprefs.php'))
+    ) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?r=".Sanitize::randomQueryStringParam());
 			exit;
-		}
+		} // TODO: handle assess2 case
 	}
 
 	if (isset($sessiondata['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
@@ -459,7 +461,11 @@
 				exit;
 			}
 		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
-			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
+      if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
+        $breadcrumbbase = "<a href=\"$imasroot/assess2/?cid=".Sanitize::courseId($_GET['cid'])."&aid={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
+      } else {
+        $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
+      }
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
 			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php','index.php','gbviewassess.php','autosave.php','endassess.php','getscores.php','livepollstatus.php','loadassess.php','loadquestion.php','scorequestion.php','startassess.php','uselatepass.php');
 			//call hook, if defined
@@ -603,10 +609,16 @@
 			}
 			$lockaid = $crow['lockaid']; //ysql_result($result,0,2);
 			if (isset($studentid) && $lockaid>0) {
-				if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+				if (($courseUIver == 1 && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) ||
+          ($courseUIver > 1 && strpos($_SERVER['PHP_SELF'],'assess2/')===false)
+        ) {
 					require("header.php");
 					echo '<p>This course is currently locked for an assessment</p>';
-					echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+          if ($courseUIver > 1) {
+            echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+          } else {
+            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+          }
 					require("footer.php");
 					//header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
 					exit;

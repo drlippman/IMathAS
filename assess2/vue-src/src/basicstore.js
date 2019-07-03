@@ -353,7 +353,7 @@ export const actions = {
         this.copySettings(response);
 
         // update tree reader with score
-        if (document.referrer.match(/treereader/) && !store.assessInfo.in_practice) {
+        if (!store.assessInfo.in_practice && window.inTreeReader) {
           this.updateTreeReader();
         }
 
@@ -758,7 +758,7 @@ export const actions = {
       status = 1;
     }
     try {
-      top.updateTRunans(store.curAid, status);
+      top.updateTRunans(store.aid, status);
     } catch (e) {}
   },
   enableMQ () {
