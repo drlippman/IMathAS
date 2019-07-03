@@ -1,5 +1,13 @@
 TODOs:
   Need to revisit showhints throughout display code
+  Add assess2 alts to showtest in:
+    actions.php
+    treereader.php
+    validate - isdiag block
+    validate - locked for assessment
+  Equation editor - make blur triggers in Firefox. Alt for closing?
+  [SAB2] showing.  Also, test $showanswerloc
+  Full display, intro and text at beginning; intro showing with text rather than intro page
 
 Test:
   Instructor preview
@@ -13,6 +21,7 @@ Bugs:
 To discuss:
   Re-enabled teacher option to disable equation editor?
   Add a11y option for disabling equation editor?  Or tie to drawing entry or text editor options?
+  In full display, separation between question and header. Line above too or instead?
 
 Separate:
   Collate CSS
