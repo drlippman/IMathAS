@@ -19,12 +19,12 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  gbviewassess slow to load
-    initeditor taking WAY too long
   gbviewassess breadcrumb to gradebook.php
   gbviewassess: Had help available info?
   viewmsg.php: Add space at bottom of page
   addquestions: Settings button needs to point to addassessment2
+  In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
+  In math parser, if pi is a variable, treat it as such rather than as the constant
 
 To discuss:
   (No) Editor covers submit button

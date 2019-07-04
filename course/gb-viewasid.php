@@ -404,7 +404,7 @@
 				$bestscores = $stm->fetchColumn(0);
 				$bsp = explode(';',$bestscores);
 				$oldScores = explode(',', $bsp[0]);
-				
+
 				$scores = array();
 				$feedback = array();
 				$i = 0;
@@ -862,13 +862,13 @@
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
 			if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
-				echo 'class="iscorrect isperfect"';
+				echo 'class="iscorrect isperfect bigquestionwrap"';
 			} else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
-				echo 'class="iscorrect"';
+				echo 'class="iscorrect bigquestionwrap"';
 			} else if ($scores[$i]==-1) {
-				echo 'class="notanswered"';
+				echo 'class="notanswered bigquestionwrap"';
 			} else {
-				echo 'class="iswrong"';
+				echo 'class="iswrong bigquestionwrap"';
 			}
 			echo ' id="qwrap'.($i+1).'"';
 			$totalpossible += $pts[$questions[$i]];
