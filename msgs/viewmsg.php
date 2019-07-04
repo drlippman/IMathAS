@@ -263,5 +263,6 @@
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+1 WHERE id=:id");
 		$stm->execute(array(':id'=>$msgid));
 	}
+	echo '<p>&nbsp;</p>';
 	require("../footer.php");
 ?>

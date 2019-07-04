@@ -39,7 +39,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if ($row === null || $row['courseid'] != $cid) {
 		echo "Invalid ID";
 		exit;
-	} else if ($row['ver']>1) {
+	} else if ($row['ver'] > 1) {
 		$addassess = 'addassessment2.php';
 	} else {
 		$addassess = 'addassessment.php';
@@ -423,7 +423,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	}
 
-	$address = $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid";
+	$address = $GLOBALS['basesiteurl'] . "/course/$addassess?cid=$cid&aid=$aid";
 
 	$placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';

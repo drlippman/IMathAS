@@ -11,6 +11,7 @@ TODOs:
       Skip in next/prev navigation
     Set based on status of previous
       If regen, should still count as attempted
+
 Test:
   Instructor preview
   Practice mode as student
@@ -19,14 +20,13 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  gbviewassess breadcrumb to gradebook.php
-  gbviewassess: Had help available info?
-  viewmsg.php: Add space at bottom of page
-  addquestions: Settings button needs to point to addassessment2
+  gradeallq2: Can we move showanswer and display key icon like in assessment?
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
   In math parser, if pi is a variable, treat it as such rather than as the constant
 
 To discuss:
+  Add input/scorebox highlighting on gbviewassess and gradeallq2 pages?
+    gradeallq2: input box ids are repeated
   (No) Editor covers submit button
   (No) Re-enable teacher option to disable equation editor?
   (No) One question in order / groups of questions in order?
@@ -78,6 +78,11 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X gbviewassess: Had help available info?
+X gbviewassess breadcrumb to gradebook.php
+X viewmsg.php: Add space at bottom of page
+X addquestions: Settings button needs to point to addassessment2
+X gradeallq2: breadcrumb should be to gb-itemanalysis2
 X In full display, separation between question and header. Line above too or instead?
     Increase margin above question
     Add overline

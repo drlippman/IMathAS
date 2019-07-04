@@ -69,25 +69,25 @@ if ((!$isltilimited || $sessiondata['ltirole']!='learner') && !$inTreeReader && 
   if ($isltilimited) {
     echo "$breadcrumbbase ";
   } else {
-    echo $breadcrumbbase . ' <a href="../course/course.php?cid='.$cid.'">';
+    echo $breadcrumbbase . ' <a href="'.$imasroot.'/course/course.php?cid='.$cid.'">';
     echo Sanitize::encodeStringForDisplay($coursename);
     echo '</a> &gt; ';
   }
   if ($stu>0) {
-    echo "<a href=\"gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> ";
-    echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">"._('Student Detail')."</a> &gt; ";
+    echo "<a href=\"$imasroot/course/gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> ";
+    echo "&gt; <a href=\"$imasroot/course/gradebook.php?stu=$stu&cid=$cid\">"._('Student Detail')."</a> &gt; ";
   } else if ($from=="isolate") {
-    echo " <a href=\"gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> ";
-    echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">"._('View Scores')."</a> &gt; ";
+    echo " <a href=\"$imasroot/course/gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> ";
+    echo "&gt; <a href=\"$imasroot/course/isolateassessgrade.php?cid=$cid&aid=$aid\">"._('View Scores')."</a> &gt; ";
   } else if ($from=="gisolate") {
-    echo "<a href=\"gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> ";
-    echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">"._('View Group Scores')."</a> &gt; ";
+    echo "<a href=\"$imasroot/course/gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> ";
+    echo "&gt; <a href=\"$imasroot/course/isolateassessbygroup.php?cid=$cid&aid=$aid\">"._('View Group Scores')."</a> &gt; ";
   } else if ($from=='stugrp') {
-    echo "<a href=\"managestugrps.php?cid=$cid&aid=$aid\">"._('Student Groups')."</a> &gt; ";
+    echo "<a href=\"$imasroot/course/managestugrps.php?cid=$cid&aid=$aid\">"._('Student Groups')."</a> &gt; ";
   } else if ($from=='gbtesting') {
-    echo "<a href=\"gb-testing.php?stu=0&cid=$cid\">"._('Diagnostic Gradebook')."</a> &gt; ";
+    echo "<a href=\"$imasroot/course/gb-testing.php?stu=0&cid=$cid\">"._('Diagnostic Gradebook')."</a> &gt; ";
   } else {
-    echo "<a href=\"gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> &gt; ";
+    echo "<a href=\"$imasroot/course/gradebook.php?stu=0&cid=$cid\">"._('Gradebook')."</a> &gt; ";
   }
   echo _('Assessment Detail');
   echo '</div>';

@@ -283,6 +283,29 @@ export default {
     },
     submitby () {
       return store.assessInfo.submitby;
+    },
+    qHelps () {
+      if (this.qdata.jsparams) {
+        let helps = this.qdata.jsparams.helps;
+        for (let i in helps) {
+          if (helps[i].label === 'video') {
+            helps[i].icon = 'video';
+            helps[i].title = this.$t('helps.video');
+          } else if (helps[i].label === 'read') {
+            helps[i].icon = 'file';
+            helps[i].title = this.$t('helps.read');
+          } else if (helps[i].label === 'ex') {
+            helps[i].icon = 'file';
+            helps[i].title = this.$t('helps.written_example');
+          } else {
+            helps[i].icon = 'file';
+            helps[i].title = helps[i].label;
+          }
+        }
+        return helps;
+      } else {
+        return [];
+      }
     }
   },
   methods: {
@@ -313,29 +336,6 @@ export default {
     initCurScores () {
       this.$set(this, 'curScores', this.initScores);
       this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
-    },
-    qHelps () {
-      if (this.qdata.jsparams) {
-        let helps = this.qdata.jsparams.helps;
-        for (let i in helps) {
-          if (helps[i].label === 'video') {
-            helps[i].icon = 'video';
-            helps[i].title = this.$t('helps.video');
-          } else if (helps[i].label === 'read') {
-            helps[i].icon = 'file';
-            helps[i].title = this.$t('helps.read');
-          } else if (helps[i].label === 'ex') {
-            helps[i].icon = 'file';
-            helps[i].title = this.$t('helps.written_Example');
-          } else {
-            helps[i].icon = 'file';
-            helps[i].title = helps[i].label;
-          }
-        }
-        return helps;
-      } else {
-        return [];
-      }
     },
     showRubric (pn) {
       if (!window.imasrubrics) {
