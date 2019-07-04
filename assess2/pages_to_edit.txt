@@ -1,32 +1,23 @@
 TODOs:
-  /apple-touch-icon.png
-  /apple-touch-icon-precomposed.png
-  Add support for "requires previous to be attempted"
-    Menubutton:
-      Show option disabled
-      Don't highlight on mouseover
-      Skip in keyboard navigation
-    Skip navigation
-      Skip in next/prev navigation
-    Set based on status of previous
-      If regen, should still count as attempted
-  Add assess2 alts to showtest in:
-    X actions.php
-    X treereader.php
-      TEST
-    validate - isdiag block
-    validate - locked for assessment
-  Convert old embedded intros on upgrade
   Equation editor - make blur triggers in Firefox. Alt for closing?
   [SAB2] showing.  Also, test $showanswerloc
-  X Full display, intro and text at beginning; intro showing with text rather than intro page
   Add a11y option for disabling equation editor?  Or tie to drawing entry or text editor options?
     Yes. If easy, add separate option. If not, tie to text editor
     Pass to front end
   In full display, separation between question and header. Line above too or instead?
     Increase margin above question
     Add overline
-
+    /apple-touch-icon.png
+    /apple-touch-icon-precomposed.png
+    Add support for "requires previous to be attempted"
+      Menubutton:
+        Show option disabled
+        Don't highlight on mouseover
+        Skip in keyboard navigation
+      Skip navigation
+        Skip in next/prev navigation
+      Set based on status of previous
+        If regen, should still count as attempted
 Test:
   Instructor preview
   Practice mode as student
@@ -94,6 +85,15 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Convert old embedded intros on upgrade
+X Full display, intro and text at beginning; intro showing with text rather than intro page
+X Add assess2 alts to showtest in:
+  X actions.php
+  X treereader.php
+    x TEST
+  X validate - isdiag block
+  X validate - locked for assessment
+    x TEST
 X Paged with Intro - Intro should show on it's own page
 X Clicking "Next page" at bottom should scroll back to top
 X HTML entities in assessment titles

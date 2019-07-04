@@ -2,6 +2,7 @@
 // IMathAS: Assessment settings migration
 // (c) 2019 David Lippman
 
+require(__DIR__ . '/convertintro.php');
 
 function migrateAssessSettings($settings, $oldUIver, $newUIver) {
   if ($oldUIver == 1 && $newUIver == 2) {
@@ -211,6 +212,12 @@ function migrateAssessSettings1to2($settings) {
   if ($settings['timelimit'] > 0) {
     $settings['overtime_grace'] = min($settings['timelimit'], 300);
     $settings['overtime_penalty'] = 0;
+  }
+
+  // convert intro to new format, if needed
+  $newintrojson = convertintro($settings['intro']);
+  if ($newintrojson !== false) {
+    $settings['intro'] = json_encode($newintrojson[0]);
   }
 
   $settings['ver'] = 2;
