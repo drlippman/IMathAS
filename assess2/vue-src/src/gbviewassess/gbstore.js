@@ -57,6 +57,12 @@ export const actions = {
           if (typeof callback !== 'undefined') {
             callback();
           }
+          // initialize editor
+          Vue.nextTick(() => {
+            if (typeof window.tinyMCE !== 'undefined') {
+              window.initeditor('divs', 'fbbox', null, true);
+            }
+          });
         })
         .fail((xhr, textStatus, errorThrown) => {
           this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');

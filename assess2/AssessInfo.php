@@ -641,11 +641,11 @@ class AssessInfo
       }
       //if it's a pool, pick an unused question from the pool
       if (isset($group) && $grouptype == 'pool') {
-        $unused = array_diff($pool, $oldquestions);
+        $unused = array_diff($group, $oldquestions);
         if (count($unused) == 0) {
           //if all of them have been used, just make sure we don't pick
           //the current one again
-          $unused = array_diff($pool, array($oldquestion));
+          $unused = array_diff($group, array($oldquestion));
         }
         $newq = $unused[array_rand($unused,1)];
       }

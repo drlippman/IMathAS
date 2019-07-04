@@ -210,6 +210,7 @@
             v-else-if="canEdit"
             rows="2"
             class="fbbox"
+            id="genfbbox"
             v-html="assessFeedback"
             @input="updateFeedback"
           />

@@ -313,9 +313,6 @@ export default {
     initCurScores () {
       this.$set(this, 'curScores', this.initScores);
       this.showfeedback = (this.qdata.feedback !== null && this.qdata.feedback.length > 0);
-      if (this.useEditor) {
-        window.initeditor('divs', 'fbbox', null, true);
-      }
     },
     qHelps () {
       if (this.qdata.jsparams) {
@@ -361,6 +358,9 @@ export default {
   watch: {
     qdata: function (newVal, oldVal) {
       this.initCurScores();
+      if (this.useEditor) {
+        window.initeditor('exact', 'fb'+this.qn, null, true);
+      }
     }
   }
 };

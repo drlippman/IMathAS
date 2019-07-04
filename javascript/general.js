@@ -540,7 +540,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 	//for (var i in tinymce.editors) {
 	//	tinymce.editors[i].remove();
 	//}
-	tinymce.remove();
+	tinymce.remove(selectorstr);
 	tinymce.init(edsetup);
 
 };
