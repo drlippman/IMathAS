@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <assess-header></assess-header>
-    <div class="scrollpane" role="region" :aria-label="$t('regions.questions')">
+    <div class="scrollpane fulldisp" role="region" :aria-label="$t('regions.questions')">
       <div
         class = "questionpane introtext"
         v-if = "intro != ''"

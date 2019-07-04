@@ -29,6 +29,7 @@
         <div v-else>
           <div
             v-for="curqn in pageData[0].questions" :key="curqn"
+            class="fullpaged"
           >
             <inter-question-text-list
               pos="beforeexact"

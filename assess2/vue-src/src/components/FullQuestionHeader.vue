@@ -69,8 +69,23 @@ export default {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
   padding: 8px 0;
+}
+.fulldisp > div > div:first-of-type {
+  margin-top: 32px;
+}
+.fulldisp > div:first-of-type > div:first-of-type {
   margin-top: 16px;
+}
+.fulldisp > div:first-of-type > div:first-of-type.full-question-header {
+  border-top: 0;
+}
+.fullpaged > div:first-of-type {
+  margin-top: 32px;
+}
+.fullpaged:first-of-type > div:first-of-type {
+  margin-top: 15px;
 }
 .full-question-header > * {
   margin-right: 10px;
