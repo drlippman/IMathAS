@@ -114,7 +114,7 @@ if (isset($_GET['showscored'])) {
 	$pts = getpts($after);
 
 	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
-	
+
 	if (isset($_POST['auth'])) {
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
 		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($_POST['auth'])));
@@ -206,7 +206,7 @@ function getansweights($code,$seed) {
 }
 
 function sandboxgetweights($code,$seed) {
-	srand($seed);
+	$GLOBALS['RND']->srand($seed);
 	try {
 		eval(interpret('control','multipart',$code));
 	} catch (Throwable $thrownerror) {

@@ -434,8 +434,8 @@ function getansweights($code,$seed) {
 }
 
 function sandboxgetweights($code,$seed) {
-	srand($seed);
-	try {  
+	$GLOBALS['RND']->srand($seed);
+	try {
 		eval(interpret('control','multipart',$code));
 	} catch (Throwable $t) {
 		if ($GLOBALS['myrights']>10) {
@@ -445,7 +445,7 @@ function sandboxgetweights($code,$seed) {
 		}
 	}
 	if (!isset($answeights)) {
-		if (!isset($anstypes)) { 
+		if (!isset($anstypes)) {
 			//this shouldn't happen unless the code crashed
 			return array(1);
 		}

@@ -343,7 +343,7 @@ function getansweights($code,$seed) {
 }
 
 function sandboxgetweights($code,$seed) {
-	srand($seed);
+	$GLOBALS['RND']->srand($seed);
 	try {
 		eval(interpret('control','multipart',$code));
 	} catch (Throwable $thrownerror) {

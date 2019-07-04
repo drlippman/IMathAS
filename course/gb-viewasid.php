@@ -1361,7 +1361,7 @@ function getansweights($qi,$code) {
 }
 
 function sandboxgetweights($code,$seed) {
-	srand($seed);
+	$GLOBALS['RND']->srand($seed);
 	$code = interpret('control','multipart',$code);
 	if (($p=strrpos($code,'answeights'))!==false) {
 		$np = strpos($code,"\n",$p);
