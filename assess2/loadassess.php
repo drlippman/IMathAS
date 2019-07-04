@@ -170,6 +170,9 @@ if ($assessInfoOut['is_diag']) {
   $assessInfoOut['diag_userid'] = substr($username,0,strpos($username,'~'));
 }
 
+$assessInfoOut['useMQ'] = (!isset($sessiondata['userprefs']['useeqed']) || 
+  $sessiondata['userprefs']['useeqed'] == 1);
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

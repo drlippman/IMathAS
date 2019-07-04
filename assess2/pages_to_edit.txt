@@ -1,8 +1,5 @@
 TODOs:
   Equation editor - make blur triggers in Firefox. Alt for closing?
-  Add a11y option for disabling equation editor?  Or tie to drawing entry or text editor options?
-    Yes. If easy, add separate option. If not, tie to text editor
-    Pass to front end
   In full display, separation between question and header. Line above too or instead?
     Increase margin above question
     Add overline
@@ -84,6 +81,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Add a11y option for disabling equation editor
 X [SAB2] showing.  Also, test $showanswerloc
 X Convert old embedded intros on upgrade
 X Full display, intro and text at beginning; intro showing with text rather than intro page

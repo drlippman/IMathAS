@@ -922,6 +922,13 @@ export const actions = {
       // save for later
       store.livepollServer = data.livepoll_server;
     }
+    if (data.hasOwnProperty('useMQ')) {
+      if (data.useMQ === true && !store.enableMQ) {
+        this.enableMQ();
+      } else if (data.useMQ === false && store.enableMQ) {
+        this.disableMQ();
+      }
+    }
     return data;
   }
 };
