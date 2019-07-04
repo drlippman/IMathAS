@@ -176,6 +176,10 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
+        if (regen && store.assessInfo.questions[qn].jsparams) {
+          // clear out before overwriting
+          window.imathasAssess.clearparams(store.assessInfo.questions[qn].jsparams);
+        }
         response = this.processSettings(response);
         this.copySettings(response);
         // clear drawing last answer if regen

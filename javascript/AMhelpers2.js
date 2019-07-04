@@ -71,6 +71,13 @@ var imathasAssess = (function($) {
 
 var allParams = {};
 
+function clearparams(paramarr) {
+  var qn;
+  for (qn in paramarr) {
+    delete allParams[qn];
+  }
+}
+
 function init(paramarr, enableMQ) {
   var qn, params, i, el, str;
   for (qn in paramarr) {
@@ -724,7 +731,11 @@ function processByType(qn) {
   } else if (params.hasOwnProperty('matrixsize')) {
     res = processSizedMatrix(qn);
   } else {
-    var str = document.getElementById('qn'+qn).value;
+    var el = document.getElementById('qn'+qn);
+    if (!el) {
+      return false;
+    }
+    var str = el.value;
     str = normalizemathunicode(str);
     str = str.replace(/^\s+/,'').replace(/\s+$/,'');
     if (str.match(/^\s*$/)) {
@@ -1173,7 +1184,7 @@ function processCalcMatrix(fullstr, format) {
   fullstr = fullstr.replace(/\[/g, '(');
   fullstr = fullstr.replace(/\]/g, ')');
   fullstr = fullstr.replace(/\s+/g,'');
-  if (fullstr.length < 2 || fullstr.charAt(0) !== '(' || 
+  if (fullstr.length < 2 || fullstr.charAt(0) !== '(' ||
     fullstr.charAt(fullstr.length-1) !== ')'
   ) {
     okformat = false;
@@ -1603,6 +1614,7 @@ function scopedmatheval(c) {
 
 return {
   init: init,
+  clearparams: clearparams,
   preSubmitForm: preSubmitForm,
   preSubmit: preSubmit,
   clearLivePreviewTimeouts: clearLivePreviewTimeouts,
