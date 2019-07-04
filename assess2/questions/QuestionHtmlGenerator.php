@@ -474,6 +474,7 @@ class QuestionHtmlGenerator
         }
 
         if (strpos($evaledqtext, '[SAB') !== false) {
+
             if (!isset($showanswerloc)) { // $showanswerloc may be defined by the question writer.
                 $evaledqtext = preg_replace('/\[SAB\d*\]/', '', $evaledqtext);
             } else if (is_array($showanswerloc)) {
@@ -798,8 +799,8 @@ class QuestionHtmlGenerator
         } else {
             $showanswerloc = array();
             foreach ($entryTips as $iidx => $entryTip) {
+              $showanswerloc[$iidx] = '';
               if ($doshowans || (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))) {
-                $showanswerloc[$iidx] = '';
                 if ((!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx] !== '') {
                     if (strpos($shanspt[$iidx], '[AB') !== false) {
                         foreach ($shanspt as $subiidx => $sarep) {
@@ -833,7 +834,7 @@ class QuestionHtmlGenerator
                 }
               }
             }
-            if (!is_array($answerBoxes) && count($showanswerloc) == 1) { //not a multipart question
+            if (!is_array($answerBoxes) && count($showanswerloc) < 2) { //not a multipart question
                 $showanswerloc = str_replace($qnidx . '-0"', $qnidx . '"', $showanswerloc[0]);
             }
         }

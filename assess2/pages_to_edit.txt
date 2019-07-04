@@ -1,6 +1,5 @@
 TODOs:
   Equation editor - make blur triggers in Firefox. Alt for closing?
-  [SAB2] showing.  Also, test $showanswerloc
   Add a11y option for disabling equation editor?  Or tie to drawing entry or text editor options?
     Yes. If easy, add separate option. If not, tie to text editor
     Pass to front end
@@ -9,15 +8,15 @@ TODOs:
     Add overline
     /apple-touch-icon.png
     /apple-touch-icon-precomposed.png
-    Add support for "requires previous to be attempted"
-      Menubutton:
-        Show option disabled
-        Don't highlight on mouseover
-        Skip in keyboard navigation
-      Skip navigation
-        Skip in next/prev navigation
-      Set based on status of previous
-        If regen, should still count as attempted
+  Add support for "requires previous to be attempted"
+    Menubutton:
+      Show option disabled
+      Don't highlight on mouseover
+      Skip in keyboard navigation
+    Skip navigation
+      Skip in next/prev navigation
+    Set based on status of previous
+      If regen, should still count as attempted
 Test:
   Instructor preview
   Practice mode as student
@@ -85,6 +84,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X [SAB2] showing.  Also, test $showanswerloc
 X Convert old embedded intros on upgrade
 X Full display, intro and text at beginning; intro showing with text rather than intro page
 X Add assess2 alts to showtest in:
