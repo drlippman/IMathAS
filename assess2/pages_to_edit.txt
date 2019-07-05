@@ -78,6 +78,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Add hovertips for resources, details?
 X gbviewassess: Had help available info?
 X gbviewassess breadcrumb to gradebook.php
 X viewmsg.php: Add space at bottom of page

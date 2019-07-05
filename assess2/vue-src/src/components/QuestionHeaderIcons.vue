@@ -23,6 +23,7 @@
       :id="'qd-dd-'+qn"
       class="question-details"
       v-if="showDetails"
+      :tip = "$t('qdetails.question_details')"
     >
       <template v-slot:button>
         <icons name="info" size="medium"/>

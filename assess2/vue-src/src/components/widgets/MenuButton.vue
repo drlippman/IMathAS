@@ -19,7 +19,9 @@
       @keydown.space.prevent = "toggleOpen"
     >
       <slot v-if="!hasButton" :option="options[selected]" :selected="true"></slot>
-      <slot v-if="hasButton" name=button></slot>
+      <tooltip-span :show="!open" :tip="header">
+        <slot v-if="hasButton" name=button></slot>
+      </tooltip-span>
       <icons class="mb_downarrow" v-if="!noarrow" name="downarrow" size="micro"/>
     </button>
     <transition name="fade">
@@ -66,6 +68,7 @@
 // https://www.w3.org/TR/wai-aria-practices/examples/menu-button/menu-button-actions-active-descendant.html
 
 import Icons from '@/components/widgets/Icons.vue';
+import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 
 export default {
   name: 'MenuButton',
@@ -75,7 +78,8 @@ export default {
   },
   props: ['options', 'selected', 'id', 'header', 'nobutton', 'noarrow', 'position', 'searchby'],
   components: {
-    Icons
+    Icons,
+    TooltipSpan
   },
   data: function () {
     return {

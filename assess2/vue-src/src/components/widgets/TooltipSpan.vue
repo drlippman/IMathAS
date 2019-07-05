@@ -32,7 +32,9 @@ export default {
   },
   methods: {
     triggerOpen (event, val) {
-      if (typeof val === 'boolean') {
+      if (this.show === false) {
+        this.open = false;
+      } else if (typeof val === 'boolean') {
         this.open = val;
       } else {
         this.open = !this.open;

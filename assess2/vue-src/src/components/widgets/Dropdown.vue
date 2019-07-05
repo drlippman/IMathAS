@@ -17,7 +17,9 @@
       :aria-controls = "id + '_pane'"
       :aria-expanded = "open?'true':'false'"
     >
-      <slot name=button></slot>
+      <tooltip-span :show="!open && tip" :tip="tip">
+        <slot name=button></slot>
+      </tooltip-span>
     </span>
     <transition name="fade">
       <div
@@ -34,10 +36,14 @@
 
 <script>
 // based on https://www.w3.org/TR/wai-aria-practices/#disclosure
+import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 
 export default {
   name: 'Dropdown',
-  props: ['id', 'position'],
+  props: ['id', 'position', 'tip'],
+  components: {
+    TooltipSpan
+  },
   data: function () {
     return {
       open: false,
