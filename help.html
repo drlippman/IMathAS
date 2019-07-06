@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>IMathAS Help</title>
-<meta charset="utf-8" /> 
+<meta charset="utf-8" />
 <style>
 table td {
 	padding: 1px 10px;
@@ -1393,7 +1393,7 @@ attempts, or forum threads.</p>
 
 <p>On Export, start by selecting the items you wish to export.
 If you export an item currently contained in a block and do not export the block, the item
-will be exported as an item on the main course page.  There are options on whether or not to 
+will be exported as an item on the main course page.  There are options on whether or not to
 include course and gradebook settings in the export.</p>
 
 <p>On Import, first provide the import file.  If there are assessment questions that do not
@@ -1427,14 +1427,14 @@ username or password, so they will only be able to access IMathAS resources thro
 
 <p>IMathAS supports several types of LTI integration, including whole course single-signon,
    and new links created from the LMS.</p>
-   
-<p>The recommended integration technique is to setup individual LTI links for each 
+
+<p>The recommended integration technique is to setup individual LTI links for each
    assessment.  This is necessary if you want the grade to be returned from IMathAS
    to your LMS.  The easiest way to set up LTI links in the LMS is to use the
-   Export feature in IMathAS to create links and import those into your LMS. To do this, 
-   go to Course Items -> Export, select the items you want to export, 
+   Export feature in IMathAS to create links and import those into your LMS. To do this,
+   go to Course Items -> Export, select the items you want to export,
    your LMS, and Download the CC Export.  Then follow the appropriate instructions below.</p>
-   
+
 <p>Alternatively, you can manually create individual links to assignments, or you
    can create a single link that launches your entire IMathAS course.  Be aware
    that in many LMSs, manually created links to assignments will lose their association
@@ -1452,7 +1452,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	<p>To import the cartridge in Canvas:</p>
 	<ul>
 		<li>Go to Settings, then Import Course Content</li>
-		<li>For Content Type, select Canvas Course Export Package.  
+		<li>For Content Type, select Canvas Course Export Package.
 			Select the export file from your computer,
 			and select All Content.  Click Import.</li>
 		<li>If you have a course-level configuration, skip ahead.
@@ -1471,10 +1471,10 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>In Canvas, click one of the assessment links in your course.</li>
 	<li>If this is your first time using this key and secret, IMathAS will
 	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-	    establish a connection between your LMS account and your IMathAS account.  
-	    You will not need to do this step again, and students will not be asked to sign in 
+	    establish a connection between your LMS account and your IMathAS account.
+	    You will not need to do this step again, and students will not be asked to sign in
 	    and will not need a IMathAS account.</li>
-	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course
 	    or create a copy.</li>
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
@@ -1488,17 +1488,17 @@ username or password, so they will only be able to access IMathAS resources thro
 		    Canvas to set the due dates in IMathAS.</li>
 		<li>Any new items added in IMathAS, including new assessments, will not
 		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
-		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately
 		    every time the student completes a question, but the LMS may delay updating the grade.</li>
 		</ul>
 	</li>
 	</ul>
-	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended.
 	   With this type of key, students will not have or need a username for IMathAS, and they must
 	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
 	   grades are passed from IMathAS back to the LMS.
-	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
-	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS
+	   into IMathAS while allowing direct login to IMathAS as well, then you can
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
@@ -1517,26 +1517,26 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>For the Config URL, enter <code>https://yourIMathASsite/canvas.php</code></li>
 		<li>Click Submit</li>
 	</ul>
-	
+
 	<p>To create a link to an individual assessment, in Canvas:</p>
 	<ul>
 		<li>Go to the Assignments page, and click +Assignment</li>
 		<li>Under Submission Type, select "External Tool"</li>
-		<li>Click on the "Find" button, then on the IMathAS tool 
+		<li>Click on the "Find" button, then on the IMathAS tool
 		    (or whatever name you used when you created the tool)</li>
 		<li>If this is your first time using this key and secret, IMathAS will
 			ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-			establish a connection between your LMS account and your IMathAS account.  
-			You will not need to do this step again, and students will not be asked to sign in 
+			establish a connection between your LMS account and your IMathAS account.
+			You will not need to do this step again, and students will not be asked to sign in
 			and will not need a IMathAS account.</li>
-		<li>If this is your first link from this course, IMathAS will ask you to 
+		<li>If this is your first link from this course, IMathAS will ask you to
 			select the IMathAS course you want to connect your LMS course with.</li>
 		<li>Select the assignment you want to link to, and click Make Placement.</li>
 		<li>Click the Select button</li>
 		<li>Finish setting up the assignment in Canvas</li>
 		<li>Assignments set up this way will receive grade return from IMathAS</li>
 	</ul>
-	
+
 	<p>To create a single link to your entire IMathAS course, in Canvas:</p>
 	<ul>
 		<li>On the Modules page, click on the + button inside a module</li>
@@ -1544,10 +1544,10 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>Click on the IMathAS tool (or whatever name you used when you created the tool)</li>
 		<li>If this is your first time using this key and secret, IMathAS will
 			ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-			establish a connection between your LMS account and your IMathAS account.  
-			You will not need to do this step again, and students will not be asked to sign in 
+			establish a connection between your LMS account and your IMathAS account.
+			You will not need to do this step again, and students will not be asked to sign in
 			and will not need a IMathAS account.</li>
-		<li>If this is your first link from this course, IMathAS will ask you to 
+		<li>If this is your first link from this course, IMathAS will ask you to
 			select the IMathAS course you want to connect your LMS course with.</li>
 		<li>Select "Whole Course Placement" and click Make Placement.</li>
 		<li>Click Add Item</li>
@@ -1564,7 +1564,7 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>Click Import Package</li>
 		<li>Select the export file from your computer, click Select All
 		    to select all course materials, then click Submit.</li>
-		<li>If your school has a global key and secret setup, skip ahead.  
+		<li>If your school has a global key and secret setup, skip ahead.
 		    If you need to set up a course-level configuration, follow these steps.
 			<ul>
 			<li>To to Packages and Utilities, then Manage LTI Links</li>
@@ -1582,7 +1582,7 @@ username or password, so they will only be able to access IMathAS resources thro
 			<ul>
 			<li>Return to the main course page in Blackboard.</li>
 			<li>For each assessment link that was imported, use the drop-down menu and select Edit</li>
-			<li>Set the Enable Evaluation option to Yes, specify the points possible (it does not 
+			<li>Set the Enable Evaluation option to Yes, specify the points possible (it does not
 			    need to match the points possible in IMathAS), and set a Due Date if desired.</li>
 			</ul>
 		</li>
@@ -1592,10 +1592,10 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>In BlackBoard, click one of the assessment links in your course.</li>
 	<li>If this is your first time using this key and secret, IMathAS will
 	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-	    establish a connection between your LMS account and your IMathAS account.  
-	    You will not need to do this step again, and students will not be asked to sign in 
+	    establish a connection between your LMS account and your IMathAS account.
+	    You will not need to do this step again, and students will not be asked to sign in
 	    and will not need a IMathAS account.</li>
-	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course
 	    or create a copy.</li>
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
@@ -1608,17 +1608,17 @@ username or password, so they will only be able to access IMathAS resources thro
 		    in the LMS will not automatically be updated.</li>
 		<li>Any new items added in IMathAS, including new assessments, will not
 		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
-		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately
 		    every time the student completes a question, but the LMS may delay updating the grade.</li>
 		</ul>
 	</li>
 	</ul>
-	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended.
 	   With this type of key, students will not have or need a username for IMathAS, and they must
 	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
 	   grades are passed from IMathAS back to the LMS.
-	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
-	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS
+	   into IMathAS while allowing direct login to IMathAS as well, then you can
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
@@ -1632,7 +1632,7 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>Click Import Package</li>
 		<li>Select the export file from your computer, click Select All
 		    to select all course materials, then click Submit.</li>
-		<li>If your school has a global key and secret setup, skip ahead.  
+		<li>If your school has a global key and secret setup, skip ahead.
 		    If you need to set up a course-level configuration, follow these steps.
 			<ul>
 			<li>To to Packages and Utilities, then Manage LTI Links</li>
@@ -1650,7 +1650,7 @@ username or password, so they will only be able to access IMathAS resources thro
 			<ul>
 			<li>Return to the main course page in Blackboard.</li>
 			<li>For each assessment link that was imported, use the drop-down menu and select Edit</li>
-			<li>Set the Enable Evaluation option to Yes, specify the points possible (it does not 
+			<li>Set the Enable Evaluation option to Yes, specify the points possible (it does not
 			    need to match the points possible in IMathAS), and set a Due Date if desired.</li>
 			</ul>
 		</li>
@@ -1660,10 +1660,10 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>In BlackBoard, click one of the assessment links in your course.</li>
 	<li>If this is your first time using this key and secret, IMathAS will
 	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-	    establish a connection between your LMS account and your IMathAS account.  
-	    You will not need to do this step again, and students will not be asked to sign in 
+	    establish a connection between your LMS account and your IMathAS account.
+	    You will not need to do this step again, and students will not be asked to sign in
 	    and will not need a IMathAS account.</li>
-	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course
 	    or create a copy.</li>
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
@@ -1676,17 +1676,17 @@ username or password, so they will only be able to access IMathAS resources thro
 		    in the LMS will not automatically be updated.</li>
 		<li>Any new items added in IMathAS, including new assessments, will not
 		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
-		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately
 		    every time the student completes a question, but the LMS may delay updating the grade.</li>
 		</ul>
 	</li>
 	</ul>
-	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended.
 	   With this type of key, students will not have or need a username for IMathAS, and they must
 	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
 	   grades are passed from IMathAS back to the LMS.
-	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
-	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS
+	   into IMathAS while allowing direct login to IMathAS as well, then you can
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
@@ -1706,28 +1706,28 @@ username or password, so they will only be able to access IMathAS resources thro
 			</ul></li>
 		<li>If you are setting up a link to an individual assessment, set
 			"Enabled Evaluation" to Yes, and enter the points possible.  Whole
-			course links to not return grades, so there is no need to enabled 
+			course links to not return grades, so there is no need to enabled
 			evaluation for those.</li>
 		<li>Click Submit</li>
 		<li>If the link you just created shows "(invalid link)" next to the name,
-			they you'll need to ask your BlackBoard administrator to approve 
+			they you'll need to ask your BlackBoard administrator to approve
 			LTI connections to IMathAS.</li>
 		<li>Click on the link you just created.</li>
 		<li>If this is your first time using this key and secret, IMathAS will
 			ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-			establish a connection between your LMS account and your IMathAS account.  
-			You will not need to do this step again, and students will not be asked to sign in 
+			establish a connection between your LMS account and your IMathAS account.
+			You will not need to do this step again, and students will not be asked to sign in
 			and will not need a IMathAS account.</li>
-		<li>If this is your first link from this course, IMathAS will ask you to 
+		<li>If this is your first link from this course, IMathAS will ask you to
 			select the IMathAS course you want to connect your LMS course with.</li>
 		<li>Select the assignment you want to link with, or select "Whole Course Placement"
-			if you want a single link to your entire IMathAS course, then 
+			if you want a single link to your entire IMathAS course, then
 			click Make Placement.</li>
 	</ul>
-	
-	
+
+
 	<p>Be aware assessment links created manually in this way will lose their association
-   with IMathAS assessments when the course is copied in BlackBoard, so using the 
+   with IMathAS assessments when the course is copied in BlackBoard, so using the
    Export/Import process is recommened if you are creating individual assessment links.</p>
 </div> <!-- h3 -->
 <div class=h3>
@@ -1739,12 +1739,12 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>Go to Course Admin, and select Import/Export/Copy Components.</li>
 		<li>Select Import Components, and "from a File"</li>
 		<li>Choose the export file and click Import All Components.</li>
-		<li>If you have a global key and secret, you can skip ahead. 
+		<li>If you have a global key and secret, you can skip ahead.
 		    If you need to set up a course-level configuration, follow these steps.
 			<ul>
 			<li>Go to Course Admin, and click External Learning Tools</li>
-			<li>Click on Manage Tool Providers.  If you do not see this link, 
-			   then your LMS administrators have blocked your ability to self-configure the connection.  
+			<li>Click on Manage Tool Providers.  If you do not see this link,
+			   then your LMS administrators have blocked your ability to self-configure the connection.
 			   You will need to ask for them to set up a global tool provider.</li>
 			<li>Click New Tool Provider</li>
 			<li>For the Launch Point enter the address shown on the Export page</li>
@@ -1772,10 +1772,10 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>In Brightspace, click one of the assessment links in your course.</li>
 	<li>If this is your first time using this key and secret, IMathAS will
 	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-	    establish a connection between your LMS account and your IMathAS account.  
-	    You will not need to do this step again, and students will not be asked to sign in 
+	    establish a connection between your LMS account and your IMathAS account.
+	    You will not need to do this step again, and students will not be asked to sign in
 	    and will not need a IMathAS account.</li>
-	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course
 	    or create a copy.</li>
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
@@ -1789,17 +1789,17 @@ username or password, so they will only be able to access IMathAS resources thro
 		    in the LMS will not automatically be updated.</li>
 		<li>Any new items added in IMathAS, including new assessments, will not
 		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
-		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately
 		    every time the student completes a question, but the LMS may delay updating the grade.</li>
 		</ul>
 	</li>
 	</ul>
-	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended.
 	   With this type of key, students will not have or need a username for IMathAS, and they must
 	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
 	   grades are passed from IMathAS back to the LMS.
-	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
-	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS
+	   into IMathAS while allowing direct login to IMathAS as well, then you can
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
@@ -1814,8 +1814,8 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>Follow the prompts to import the content.</li>
 		<li>Turn on editing for your course.</li>
 		<li>For one of the assessment, use the Edit dropdown and select Edit Settings.</li>
-		<li>If the Launch URL does not display the warning <em>Tool configuration not found for this URL</em>, 
-		   then you must have an existing key and secret set up, and can skip ahead.  
+		<li>If the Launch URL does not display the warning <em>Tool configuration not found for this URL</em>,
+		   then you must have an existing key and secret set up, and can skip ahead.
 		   If you do see that warning, then follow these steps.
 			<ul>
 			<li>Click the + sign located directly after the External tool type pulldown (in some versions, this is labeled Preconfigured Tool) </li>
@@ -1834,10 +1834,10 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>In Moodle, click one of the assessment links in your course.</li>
 	<li>If this is your first time using this key and secret, IMathAS will
 	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-	    establish a connection between your LMS account and your IMathAS account.  
-	    You will not need to do this step again, and students will not be asked to sign in 
+	    establish a connection between your LMS account and your IMathAS account.
+	    You will not need to do this step again, and students will not be asked to sign in
 	    and will not need a IMathAS account.</li>
-	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course
 	    or create a copy.</li>
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
@@ -1851,17 +1851,17 @@ username or password, so they will only be able to access IMathAS resources thro
 		    in the LMS will not automatically be updated.</li>
 		<li>Any new items added in IMathAS, including new assessments, will not
 		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
-		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately
 		    every time the student completes a question, but the LMS may delay updating the grade.</li>
 		</ul>
 	</li>
 	</ul>
-	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended.
 	   With this type of key, students will not have or need a username for IMathAS, and they must
 	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
 	   grades are passed from IMathAS back to the LMS.
-	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
-	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS
+	   into IMathAS while allowing direct login to IMathAS as well, then you can
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
@@ -1877,10 +1877,10 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>In your LMS, click one of the assessment links in your course.</li>
 	<li>If this is your first time using this key and secret, IMathAS will
 	    ask you, the teacher, to sign into your IMathAS account.  This is necessary to
-	    establish a connection between your LMS account and your IMathAS account.  
-	    You will not need to do this step again, and students will not be asked to sign in 
+	    establish a connection between your LMS account and your IMathAS account.
+	    You will not need to do this step again, and students will not be asked to sign in
 	    and will not need a IMathAS account.</li>
-	<li>Follow the prompts to associate the LMS course with your existing IMathAS course 
+	<li>Follow the prompts to associate the LMS course with your existing IMathAS course
 	    or create a copy.</li>
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
@@ -1893,17 +1893,17 @@ username or password, so they will only be able to access IMathAS resources thro
 		    in the LMS will not automatically be updated.</li>
 		<li>Any new items added in IMathAS, including new assessments, will not
 		    automatically show up in the LMS; you would need to repeat the export/import process.</li>
-		<li>If configured, grades will be sent from IMathAS to the LMS immediately 
+		<li>If configured, grades will be sent from IMathAS to the LMS immediately
 		    every time the student completes a question, but the LMS may delay updating the grade.</li>
 		</ul>
 	</li>
 	</ul>
-	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended. 
+	<p>Note:  When configuring a course-level configuration, the use of a key in the form <code>LTIkey_###_1</code> is recommended.
 	   With this type of key, students will not have or need a username for IMathAS, and they must
 	   access assignments via the LMS.  This is usually desired when doing integration, and is necessary to ensure
 	   grades are passed from IMathAS back to the LMS.
-	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS 
-	   into IMathAS while allowing direct login to IMathAS as well, then you can 
+	   If, however, you are not interested in grade return, and simply want to provide single-signon from your LMS
+	   into IMathAS while allowing direct login to IMathAS as well, then you can
 	   use a key of the form <code>LTIkey_###_0</code> instead.  This will require students to have or create an
 	   account on IMathAS, which they'll have to log into once to establish the connection.</p>
 </div> <!-- h3 -->
@@ -1920,12 +1920,12 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>A Secret:  use the LTI secret shown in your IMathAS Course Settings</li>
 		<li>Launch/Tool URL:  <code>https://yourIMathASsite/bltilaunch.php</code></li>
 	</ul>
-	
+
 	<p>The process to set up LTI links varies by LMS, so consult your LMS for
 		details.</p>
-	
+
 	<p>Be aware assessment links created manually in this way will lose their association
-   with IMathAS assessments when the course is copied in the LMS, so using the 
+   with IMathAS assessments when the course is copied in the LMS, so using the
    Export/Import process is recommened if you are creating individual assessment links
    and your LMS supports it.</p>
 </div>  <!-- h3 -->
@@ -2054,7 +2054,7 @@ $showanswer = "Do this first. &lt;br/&gt;Then do this."
 </pre>
 
 <p><strong>Comments</strong></p>
-<p>You can insert comments in your code by starting the comment with two forward slashes: //this is a comment.  
+<p>You can insert comments in your code by starting the comment with two forward slashes: //this is a comment.
 Typically it's best to put comments on their own line, but they can also be placed after a line of code.</p>
 
 <h3 id="conditionals">Conditionals</h3>
@@ -2182,7 +2182,7 @@ can be omitted.</p>
 <li><strong>nonzerorrand(min,max,p)</strong>:  Returns a nonzero real number between min and max in steps of p</li>
 <li><strong>randfrom(list or array)</strong>: Return an element of the list/array.  Examples of lists: &quot;2,4,6,8&quot;, or &quot;red,green,blue&quot;</li>
 <li><strong>randname(),randmalename(),randfemalename()</strong>:  Returns a random first name</li>
-<li><strong>randnamewpronouns()</strong>:  Returns a random first name with pronouns in the order: subjective, objective, possessive (singular), possessive (plural).  
+<li><strong>randnamewpronouns()</strong>:  Returns a random first name with pronouns in the order: subjective, objective, possessive (singular), possessive (plural).
 	Use: $name,$heshe,$himher,$hisher,$hishers = randnamewpronouns()</li>
 </ul>
 
@@ -2219,7 +2219,7 @@ The following macros create graphs or tables:
 <li><strong>showarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
     as column headers.  Alternatively you can call this function with arguments
     showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "r", or "l" to center, left-align, or right align data,
-	  or can be an array with $opts["align"] for alignment, and $opts["caption"] to add a caption to the table.  To align each column differently, provide a 
+	  or can be an array with $opts["align"] for alignment, and $opts["caption"] to add a caption to the table.  To align each column differently, provide a
 	  a string with a character for each column, like "rcc"</li>
 <li><strong>showdataarray(array,[columns])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
     in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
@@ -2253,7 +2253,7 @@ The following macros create graphs or tables:
 					<li><strong>Examples:</strong>: "dot,3,4", "dot,1,1,open",  "dot,3,3,,blue,A"</li>
 		</ul>
 			</li>
-			<li><strong>text</strong>: For placing text labels. A string containing at least the 
+			<li><strong>text</strong>: For placing text labels. A string containing at least the
 				first four of: "text,x,y,label,color,location,angle"
 				<ul>
 					<li>text: the literal word text</li>
@@ -2300,7 +2300,7 @@ The following macros create graphs or tables:
 <li><strong>adddrawcommand(plot,commands)</strong>:  Inserts arbitrary asciisvg drawing commands into an existing
     plot created with showplot or other drawing tools.</li>
 <li><strong>showasciisvg(string,[width,height,alttext])</strong>:  If you know the ASCIIsvg language, this will set up an svg with "string" as the script.
-    optionally you can specify the width and height (in pixels) for the svg.  For accessibility, you should always try to 
+    optionally you can specify the width and height (in pixels) for the svg.  For accessibility, you should always try to
     include alttext, which is text that displays to people requesting non-visual alternatives.</li>
 <li><strong>replacealttext(image or graph, alttext)</strong>: Replaces the alt text (alt tag) in the image or graph with the specified text. This alt text
     will replace the autogenerated textual description for graphs produced by showplot.</li>
@@ -2571,6 +2571,7 @@ available in each library</p>
 <tr><td>^</td><td>Powers.  2^3 = 8.</td></tr>
 <tr><td>e, pi</td><td>The standard constants</td></tr>
 <tr><td>%</td><td>Modulus (remainder after division.  5%2 = 1)</td></tr>
+<tr><td>mod(p,n)</td><td>Modulus. This version gives positive results for modulus of negative numbers.</td></tr>
 <tr><td>!</td><td>Factorial</td></tr>
 <tr><td>sqrt</td><td>Square root</td></tr>
 <tr><td>sin,cos,tan,cot,sinh,cosh</td><td>Standard trig function.  Be sure to enter as sin(2), not sin 2</td></tr>
@@ -2704,8 +2705,8 @@ Notes (important!):
 </p>
 <p>
 1) If the student has not answered the question, then $stuanswers[N] === null, with the exception of drop-down select
-questions, where $stuanswers[N] == "NA" if no selection is made.  
-If used in an equation, it will take on the value 0.  
+questions, where $stuanswers[N] == "NA" if no selection is made.
+If used in an equation, it will take on the value 0.
 To prevent divide-by-zero errors and to prevent students from exploiting this, it is highly recommended that you do something like:
 </p>
 <pre>
@@ -2918,7 +2919,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
 <dt>$reqsigfigs = a number </dt>
-	<dd>Defines the significant figure accuracy required.  Only valid for "decimal", "scinot", and "scinotordec" $answerformat options. 
+	<dd>Defines the significant figure accuracy required.  Only valid for "decimal", "scinot", and "scinotordec" $answerformat options.
 	Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  If you use the "=2" form, it will also round your $answer if needed for the $showanswer.
@@ -2931,7 +2932,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
 	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
 	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times. <br/>
-	Be aware that if you search for "5,=1", it will match both 5 and 15 and 2.5, since all three strings contain a 5.  When 
+	Be aware that if you search for "5,=1", it will match both 5 and 15 and 2.5, since all three strings contain a 5.  When
 	searching for numbers, you can avoid this by putting a "#" before the number, like "#5,=1", which would match the 5 but not 15 or 0.5.
 	Beware this type of search ignores signs.<br/>
 	You can	use just "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
@@ -3094,7 +3095,7 @@ A student is asked to enter a function
 <dt>$answer = string </dt>
 	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)".  You can
 	specify multiple acceptable answers by separating with "or", like $answer="x^2 or x^4"<br/>
-	Note: The system will accept any algebraically equivalent answer. To only allow answers of a 
+	Note: The system will accept any algebraically equivalent answer. To only allow answers of a
 	specific format, you'll also need to define $requiretimes (see below).</dd>
 </dl>
 
@@ -3127,7 +3128,7 @@ A student is asked to enter a function
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
 	values or raise numbers to very large powers.<br/>
-	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". 
+	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions".
 	$ansprompt can override the default statements like this:
 	$ansprompt = "One function, f(x)=;No such function exists"
 	</dd>
@@ -3383,7 +3384,7 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
 <dt>$scoremethod = "byelement" </dt>
-	<dd>By default, the whole n-tuple must be correct to receive any credit.  
+	<dd>By default, the whole n-tuple must be correct to receive any credit.
 	Set $scoremethod = "byelement" to give partial credit if only some elements of
 	the n-tuple are correct.</dd>
 <dt>$reltolerance = a decimal value </dt>
@@ -3435,7 +3436,7 @@ rather than just numbers, such as (5/3, 2/3).
 	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
 <dt>$scoremethod = "byelement" </dt>
-	<dd>By default, the whole n-tuple must be correct to receive any credit.  
+	<dd>By default, the whole n-tuple must be correct to receive any credit.
 	Set $scoremethod = "byelement" to give partial credit if only some elements of
 	the n-tuple are correct.</dd>
 <dt>$reltolerance = a decimal value </dt>
