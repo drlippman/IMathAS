@@ -15,7 +15,7 @@ import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'FullPagedListItem',
-  props: ['option'],
+  props: ['option', 'selected'],
   components: {
     Icons
   },

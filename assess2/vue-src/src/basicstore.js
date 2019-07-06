@@ -257,6 +257,7 @@ export const actions = {
     }
 
     store.inTransit = true;
+    window.MQeditor.resetEditor();
 
     this.clearAutosave(qns);
     // don't store time active when full-test

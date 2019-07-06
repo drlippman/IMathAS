@@ -122,7 +122,7 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	$out .= '</div>';
 	return $out;
 }
-function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess) {
+function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver) {
 	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
@@ -134,7 +134,11 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess) {
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" .  _('Move') .  '</a></li>';
 	$out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" .  _('Delete') .  "</a></li>";
 	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" .  _('Copy') .  "</a></li>";
-	$out .= " <li><a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">" .  _('Grades') .  "</a></li>";
+	if ($ver > 1) {
+		$out .= " <li><a href=\"gb-itemanalysis2.php?cid=$cid&aid=$typeid\">" .  _('Grades') .  "</a></li>";
+	} else {
+		$out .= " <li><a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">" .  _('Grades') .  "</a></li>";
+	}
 	$out .= " <li><a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">" . _('Stats') . '</a></li>';
 	$out .= '</ul>';
 	$out .= '</div>';
@@ -903,7 +907,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</div>'; //title
 
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
 				   }
 				   echo '</div>'; //itemhdr
 
@@ -946,7 +950,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					 }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -964,7 +968,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				}
 				echo '</div>'; //title
 				if ($canedit) {
-					echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
+					echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
 				}
 
 				echo '</div>'; //itemhdr
@@ -992,7 +996,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -1015,7 +1019,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -1058,7 +1062,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");

@@ -61,7 +61,7 @@ export default {
 </script>
 
 <style>
-.tooltip-pane {
+.dropdown-pane.tooltip-pane {
   border-radius: 8px;
   padding: 8px;
   max-width: 300px;

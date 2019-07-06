@@ -38,12 +38,14 @@
               :page="pagenum"
               :active = "pagenum === page"
             />
-            <full-question-header :qn = "curqn" />
-            <question
-              :qn="curqn"
-              :active = "pagenum === page"
-              :key="'q'+curqn"
-            />
+            <div>
+              <full-question-header :qn = "curqn" />
+              <question
+                :qn="curqn"
+                :active = "pagenum === page"
+                :key="'q'+curqn"
+              />
+            </div>
           </div>
 
           <inter-question-text-list

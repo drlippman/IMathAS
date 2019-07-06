@@ -20,13 +20,19 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  gradeallq2: Can we move showanswer and display key icon like in assessment?
+  gradeallq2:
+    Need to enable MQ or LivePreview
+    Need to move Show Answer to key
+    Need to initialize drawings
+    Need to adjust question numbering to avoid ID conflicts in drawing, etc.
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
   In math parser, if pi is a variable, treat it as such rather than as the constant
 
 To discuss:
   Add input/scorebox highlighting on gbviewassess and gradeallq2 pages?
     gradeallq2: input box ids are repeated
+  Add way to reshow intro without leaving question
+    Use case: embedding calculator into intro
   (No) Editor covers submit button
   (No) Re-enable teacher option to disable equation editor?
   (No) One question in order / groups of questions in order?
@@ -78,6 +84,15 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Hitting enter to submit didn't blur/hide equation editor
+X Fix font italization issue in mathquill in firefox
+X Show Answer showing: single part question has $showanswer defined, not placed
+X Paged: assessment is scrolling to top after submission, rather than to question top
+X Next/Prev in Paged jump location because dropdown changes size
+X Error with answeights stored as strings
+X Essay questions: in GB display as text rather than in editor
+X MathJax not defined error in gbviewassess
+    May be race condition issue?  Adjust rendermathnode to check if MathJax exists, and setTimeout if not
 X Add hovertips for resources, details?
 X gbviewassess: Had help available info?
 X gbviewassess breadcrumb to gradebook.php

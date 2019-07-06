@@ -1,12 +1,12 @@
 <template>
-  <div class="subheader" role="navigation" :aria-label="$t('regions.pagenav')">
+  <div class="subheader pagenav" role="navigation" :aria-label="$t('regions.pagenav')">
     <menu-button id="qnav"
       :options = "navOptions"
       :selected = "disppage"
       searchby = "title"
     >
-      <template v-slot="{ option }">
-        <full-paged-list-item :option="option" />
+      <template v-slot="{ option, selected }">
+        <full-paged-list-item :option="option" :selected="selected"/>
       </template>
     </menu-button>
 
@@ -108,5 +108,9 @@ export default {
 }
 .subheader > * {
   margin: 4px 0;
+}
+.pagenav > .menubutton {
+  flex-grow: 1;
+  max-width: 650px;
 }
 </style>

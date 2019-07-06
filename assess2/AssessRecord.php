@@ -1300,6 +1300,7 @@ class AssessRecord
     } else {
       $curq = &$question_versions[$ver];
     }
+    $answeights = array_map('floatval', $answeights);
     if ($answeights !== $curq['answeights']) {
       $curq['answeights'] = $answeights;
       $this->need_to_record = true;
@@ -2448,7 +2449,7 @@ class AssessRecord
     } else {
       $showScores = false;
     }
-
+    $GLOBALS['useeditor'] = 'review'; //hacky
     $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver);
     if ($generate_html) { // only include this if we're displaying the question
       $out['qid'] = $qdata['qid'];

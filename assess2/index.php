@@ -2,7 +2,7 @@
 // IMathAS: Main launch page for assess2 assessment player
 // (c) 2019 David Lippman
 
-$lastupdate = '20190704';
+$lastupdate = '20190706';
 
 require('../init.php');
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
@@ -32,12 +32,12 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/drawing_min.js" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2_min.js?v=070419" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2_min.js?v=070619" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips_min.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs_min.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ_min.js" type="text/javascript"></script>
   <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
-  <script src="'.$imasroot.'/mathquill/mqeditor_min.js" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mqeditor_min.js?v=070619" type="text/javascript"></script>
   <script src="'.$imasroot.'/mathquill/mqedlayout_min.js" type="text/javascript"></script>
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';

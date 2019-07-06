@@ -117,8 +117,15 @@ if (!isset($sessiondata['mathdisp'])) {
 	} else {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>';
-	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
+		function rendermathnode(node) {
+			if (MathJax) {
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
+			} else {
+				setTimeout(function() {rendermathnode(node);}, 100);
+			}
+		}</script>';
+	echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
 } else if ($sessiondata['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';

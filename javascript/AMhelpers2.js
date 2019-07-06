@@ -299,17 +299,17 @@ function initShowAnswer2() {
     if ($(el).closest('.autoshowans').length > 0) {
       var wrap = $("#qnwrap"+inref);
       if (wrap.length > 0) {
+        $(el).prev(".sabtn").remove();
         key.append($(el).hide().removeClass("hidden"))
           .addClass("inwrap");
-        $("#showansbtn"+qref).remove();
         wrap.append(key);
         return;
       }
       var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref);
       if (inbox.length > 0) {
+        $(el).prev(".sabtn").remove();
         key.append($(el).hide().removeClass("hidden"));
         inbox.after(key);
-        $("#showansbtn"+qref).remove();
         return;
       }
     }

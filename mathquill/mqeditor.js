@@ -143,6 +143,7 @@ var MQeditor = (function($) {
     $(mqel).find(".mq-textarea > *")
       .on('focus.mqeditor', showEditor)
       .on('blur.mqeditor', function() {
+        console.log("blur called");
         blurTimer = setTimeout(hideEditor, 100);
       });
   }
@@ -242,6 +243,14 @@ var MQeditor = (function($) {
       $("#mqeditor").hide();
     }
     $("#"+curMQfield.el().id.substring(8)).trigger('change');
+  }
+
+  /*
+    Hide the editor and clear curMQfield
+   */
+  function resetEditor() {
+    clearTimeout(blurTimer);
+    $("#mqeditor").hide();
   }
 
 
@@ -614,6 +623,7 @@ var MQeditor = (function($) {
     toggleMQ: toggleMQ,
     toggleMQAll: toggleMQAll,
     attachEditor: attachEditor,
-    getLayoutstyle: getLayoutstyle
+    getLayoutstyle: getLayoutstyle,
+    resetEditor: resetEditor
   }
 })(jQuery);
