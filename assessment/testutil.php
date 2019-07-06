@@ -106,7 +106,7 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 //which might be randomizer determined, hence the seed
 function getansweights($qi,$code) {
 	global $seeds,$questions,$attempts;
-	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
+	if (preg_match('/^\s*\$scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
 	$i = array_search($qi,$questions);
