@@ -38,6 +38,18 @@ export default {
     this.updateTimer();
     this.interval = setInterval(this.updateTimer, 1000);
   },
+  mounted () {
+    var s = window.$("#timerbox");
+		var pos = s.offset();
+		$(window).scroll(function() {
+		   var windowpos = window.$(window).scrollTop();
+		   if (windowpos >= pos.top) {
+		     s.addClass("sticky");
+		   } else {
+		     s.removeClass("sticky");
+		   }
+		 });
+  },
   beforeDestroy () {
     clearInterval(this.interval);
   },
@@ -86,5 +98,14 @@ export default {
   border: 1px solid #ccc;
   padding: 5px;
   cursor: pointer;
+}
+#timerbox.sticky {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  padding: 5px;
+  display: block;
+  background-color: #fff;
+  z-index: 10;
 }
 </style>

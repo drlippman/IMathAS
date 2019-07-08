@@ -28,7 +28,6 @@ Bugs:
 To discuss:
   Add way to reshow intro without leaving question
     Use case: embedding calculator into intro
-  Float timer at top when scroll past it (?)
   (No) Editor covers submit button
   (No) Re-enable teacher option to disable equation editor?
   (No) One question in order / groups of questions in order?
@@ -80,6 +79,8 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+
+X Float timer at top when scroll past it
 X Add input/scorebox highlighting on gbviewassess and gradeallq2 pages?
 X gradeallq2:
   X Need to enable MQ or LivePreview
