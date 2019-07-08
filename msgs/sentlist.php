@@ -249,7 +249,7 @@ function chgfilter() {
 	</thead>
 	<tbody>
 <?php
-	$offset = ($page-1)*$threadsperpage;
+	$offset = max(0, ($page-1)*$threadsperpage);
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users ";
 	$query .= "WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom=:msgfrom AND (imas_msgs.isread&4)=0 ";
 	$qarr = array(':msgfrom'=>$userid);
