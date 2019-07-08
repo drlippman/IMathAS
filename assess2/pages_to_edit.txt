@@ -20,19 +20,15 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  gradeallq2:
-    Need to enable MQ or LivePreview
-    Need to move Show Answer to key
-    Need to initialize drawings
-    Need to adjust question numbering to avoid ID conflicts in drawing, etc.
+  Time limit overtimes when not allowed
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
   In math parser, if pi is a variable, treat it as such rather than as the constant
+  Average not showing until not IP
 
 To discuss:
-  Add input/scorebox highlighting on gbviewassess and gradeallq2 pages?
-    gradeallq2: input box ids are repeated
   Add way to reshow intro without leaving question
     Use case: embedding calculator into intro
+  Float timer at top when scroll past it (?)
   (No) Editor covers submit button
   (No) Re-enable teacher option to disable equation editor?
   (No) One question in order / groups of questions in order?
@@ -84,6 +80,12 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Add input/scorebox highlighting on gbviewassess and gradeallq2 pages?
+X gradeallq2:
+  X Need to enable MQ or LivePreview
+  X Need to move Show Answer to key
+  X Need to initialize drawings
+  X Need to adjust question numbering to avoid ID conflicts in drawing, etc.
 X Hitting enter to submit didn't blur/hide equation editor
 X Fix font italization issue in mathquill in firefox
 X Show Answer showing: single part question has $showanswer defined, not placed

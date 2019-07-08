@@ -23,7 +23,7 @@
           v-if="canedit && !isPractice"
           type="text"
           size="4"
-          :id="'sc'+qn+'-'+i"
+          :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
           v-model="curScores[i]"
           @input="updateScore(i, $event)"
         /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
@@ -346,7 +346,7 @@ export default {
       window.imasrubric_show(
         this.qdata.rubric,
         this.qdata.points_possible,
-        'sc' + this.qn + '-' + pn,
+        'scorebox' + this.qn + (this.partPoss.length > 1 ? '-' + pn : ''),
         'fb' + this.qn,
         this.qn,
         600

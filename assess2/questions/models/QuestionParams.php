@@ -10,6 +10,7 @@ class QuestionParams
 {
     private $dbQuestionSetId;   // Orig: $qidx
     private $questionNumber;    // Orig: $qnidx
+    private $displayQuestionNumber;
     private $assessmentId = 0;
     private $questionId = 0; // imas_questions.id
     private $questionSeed;      // Orig: $seed
@@ -72,6 +73,19 @@ class QuestionParams
     }
 
     /**
+     * Get this question's number.
+     *
+     * This IS the number that is visible to students and instructors.
+     * This is NOT the imas_questionset row ID.
+     *
+     * @return int
+     */
+    public function getDisplayQuestionNumber(): ?int
+    {
+        return $this->displayQuestionNumber;
+    }
+
+    /**
      * Set this question's number.
      *
      * This IS the number that is visible to students and instructors.
@@ -83,6 +97,22 @@ class QuestionParams
     public function setQuestionNumber(?int $questionNumber): QuestionParams
     {
         $this->questionNumber = $questionNumber;
+        $this->displayQuestionNumber = $questionNumber;
+        return $this;
+    }
+
+    /**
+     * Set this question's display number.
+     *
+     * This IS the number that is visible to students and instructors.
+     * This is NOT the imas_questionset row ID.
+     *
+     * @param int $displayQuestionNumber
+     * @return QuestionParams
+     */
+    public function setDisplayQuestionNumber(?int $displayQuestionNumber): QuestionParams
+    {
+        $this->displayQuestionNumber = $displayQuestionNumber;
         return $this;
     }
 

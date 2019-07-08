@@ -261,19 +261,20 @@
 	}
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=060319"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=060319"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=060319"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=070819"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js" type="text/javascript"></script>
+	$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2_min.js?v=070819" type="text/javascript"></script>';
+	$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips_min.js" type="text/javascript"></script>';
+	$placeinhead .= '<script src="'.$imasroot.'/javascript/drawing_min.js" type="text/javascript"></script>';
+	$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs_min.js" type="text/javascript"></script>';
+	$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ_min.js" type="text/javascript"></script>
 	  <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mqeditor.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mqedlayout.js" type="text/javascript"></script>
+	  <script src="'.$imasroot.'/mathquill/mqeditor_min.js" type="text/javascript"></script>
+	  <script src="'.$imasroot.'/mathquill/mqedlayout_min.js" type="text/javascript"></script>
 	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
 	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 	$placeinhead .= "<script type=\"text/javascript\">";
@@ -448,7 +449,7 @@
 		// find this question id in list
 		$lockeys = array_keys($questions,$qid);
 		foreach ($lockeys as $loc) {
-			$qdata = $assess_record->getGbQuestionVersionData($loc, true);
+			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
 			if ($groupdup) {
 				echo '<div class="groupdup">';
 			}
@@ -484,9 +485,9 @@
 			}
 			echo '<div class="questionwrap">';
 			echo $qdata['html'];
-			echo '<script type="text/javacript">
+			echo '<script type="text/javascript">
 				$(function() {
-					imathasAssess.init('.json_encode($qdata['jsparams']).', true);
+					imathasAssess.init('.json_encode($qdata['jsparams']).', false);
 				});
 				</script>';
 			echo '</div>';
@@ -522,7 +523,7 @@
 				$ptposs = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);
 
 				if ($canedit) {
-					$boxid = (count($qdata['answeights'])>1) ? "$cnt-$loc-$pn" : $cnt;
+					$boxid = (count($qdata['answeights'])>1) ? "$cnt-$pn" : $cnt;
 					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					if ($rubric != 0) {
@@ -598,6 +599,11 @@
 	}
 	echo "</form>";
 	echo '<p>&nbsp;</p>';
+	$placeinfooter = '<div id="ehdd" class="ehdd">
+    <span id="ehddtext"></span>
+    <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span>
+  	</div>
+		<div id="eh" class="eh"></div>';
 	$useeqnhelper = 0;
 	require("../footer.php");
 ?>

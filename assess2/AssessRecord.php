@@ -37,6 +37,7 @@ class AssessRecord
   private $now = 0;
   private $need_to_record = false;
   private $penalties = array();
+  private $dispqn = null;
 
   /**
    * Construct object
@@ -1603,6 +1604,9 @@ class AssessRecord
         ->setScoreNonZero($scorenonzero)
         ->setScoreIsCorrect($scoreiscorrect)
         ->setLastRawScores($qcolors);
+    if ($this->dispqn !== null) {
+      $questionParams->setDisplayQuestionNumber($this->dispqn);
+    }
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
@@ -2419,9 +2423,10 @@ class AssessRecord
    * @param  int  $qn                Question number
    * @param  boolean $generate_html Whether to return HTML of question
    * @param  string  $ver           'scored' or particular assess/question version
+   * @param  int|null $dispqn       qn to use for display; null for default
    * @return array
    */
-  public function getGbQuestionVersionData($qn, $generate_html = false, $ver = 'scored') {
+  public function getGbQuestionVersionData($qn, $generate_html = false, $ver = 'scored', $dispqn = null) {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if ($by_question) {
       $aver = 0;
@@ -2450,7 +2455,11 @@ class AssessRecord
       $showScores = false;
     }
     $GLOBALS['useeditor'] = 'review'; //hacky
+    if ($dispqn !== null) {
+      $this->dispqn = $dispqn;
+    }
     $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver);
+    $this->dispqn = null;
     if ($generate_html) { // only include this if we're displaying the question
       $out['qid'] = $qdata['qid'];
       $out['qsetid'] = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');

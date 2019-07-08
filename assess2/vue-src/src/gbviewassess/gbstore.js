@@ -57,11 +57,12 @@ export const actions = {
           if (typeof callback !== 'undefined') {
             callback();
           }
-          // initialize editor
+          // initialize editor and answerbox highlighting
           Vue.nextTick(() => {
             if (typeof window.tinyMCE !== 'undefined') {
               window.initeditor('divs', 'fbbox', null, true);
             }
+            window.initAnswerboxHighlights();
           });
         })
         .fail((xhr, textStatus, errorThrown) => {
@@ -109,6 +110,14 @@ export const actions = {
         } else if (store.orig_submitby !== null) {
           store.assessInfo.submitby = store.orig_submitby;
         }
+
+        // initialize editor and answerbox highlighting
+        Vue.nextTick(() => {
+          if (typeof window.tinyMCE !== 'undefined') {
+            window.initeditor('divs', 'fbbox', null, true);
+          }
+          window.initAnswerboxHighlights();
+        });
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -151,6 +160,11 @@ export const actions = {
         );
         // set current versions to this version
         Vue.set(store.curQver, qn, ver);
+
+        // initialize answerbox highlighting
+        Vue.nextTick(() => {
+          window.initAnswerboxHighlights();
+        });
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');

@@ -298,7 +298,7 @@ class QuestionHtmlGenerator
                     ->setQuestionWriterVars($questionWriterVars)
                     ->setVarsForAnswerBoxGenerator($varsForAnswerBoxGenerator)
                     ->setAnswerType($anstype)
-                    ->setQuestionNumber($this->questionParams->getQuestionNumber())
+                    ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                     ->setIsMultiPartQuestion($this->isMultipart())
                     ->setQuestionPartNumber($atIdx)
                     ->setAssessmentId($this->questionParams->getAssessmentId())
@@ -310,7 +310,7 @@ class QuestionHtmlGenerator
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();
                 $entryTips[$atIdx] = $answerBoxGenerator->getEntryTip();
-                $qnRef = ($this->questionParams->getQuestionNumber()+1)*1000 + $atIdx;
+                $qnRef = ($this->questionParams->getDisplayQuestionNumber()+1)*1000 + $atIdx;
                 $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
                 $jsParams[$qnRef]['qtype'] = $anstype;
                 $displayedAnswersForParts[$atIdx] = $answerBoxGenerator->getCorrectAnswerForPart();
@@ -347,7 +347,7 @@ class QuestionHtmlGenerator
                 ->setQuestionWriterVars($questionWriterVars)
                 ->setVarsForAnswerBoxGenerator($varsForAnswerBoxGenerator)
                 ->setAnswerType($quesData['qtype'])
-                ->setQuestionNumber($this->questionParams->getQuestionNumber())
+                ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                 ->setAssessmentId($this->questionParams->getAssessmentId())
                 ->setIsMultiPartQuestion(false)
                 ->setStudentLastAnswers($lastAnswer)
@@ -358,7 +358,7 @@ class QuestionHtmlGenerator
 
             $answerbox = $answerBoxGenerator->getAnswerBox();
             $entryTips[0] = $answerBoxGenerator->getEntryTip();
-            $qnRef = $this->questionParams->getQuestionNumber();
+            $qnRef = $this->questionParams->getDisplayQuestionNumber();
             $jsParams[$qnRef] = $answerBoxGenerator->getJsParams();
             $jsParams[$qnRef]['qtype'] = $quesData['qtype'];
             $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
@@ -717,7 +717,7 @@ class QuestionHtmlGenerator
      */
     private function adjustPreviewLocation($answerbox, string $toevalqtxt, $previewloc)
     {
-        $qnidx = $this->questionParams->getQuestionNumber();
+        $qnidx = $this->questionParams->getDisplayQuestionNumber();
 
         if (is_array($answerbox)) {
             foreach ($answerbox as $iidx => $abox) {
@@ -765,7 +765,7 @@ class QuestionHtmlGenerator
                                            array $questionWriterVars
     )
     {
-        $qnidx = $this->questionParams->getQuestionNumber();
+        $qnidx = $this->questionParams->getDisplayQuestionNumber();
         $shanspt = $displayedAnswersForParts;
 
         if (ShowAnswer::ALWAYS == $doShowAnswer) {
@@ -851,7 +851,7 @@ class QuestionHtmlGenerator
     {
         $showhints = $this->questionParams->getShowHints();
         $qdata = $this->questionParams->getQuestionData();
-        $qnidx = $this->questionParams->getQuestionNumber();
+        $qnidx = $this->questionParams->getDisplayQuestionNumber();
         $qidx = $this->questionParams->getDbQuestionSetId();
         $qid = $this->questionParams->getQuestionId();
 
