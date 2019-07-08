@@ -160,7 +160,7 @@
 				}
 				$duedate = tzdate('D m/d/Y g:i a',$due);
 				if ($adata['ver'] > 1) {
-					$stm = $DBH->prepare("SELECT id FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
+					$stm = $DBH->prepare("SELECT userid FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
 						echo " | <a href=\"$imasroot/course/gb-viewasid2.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
