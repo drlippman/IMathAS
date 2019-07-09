@@ -31,7 +31,7 @@ class ErrorHandler
         error_log(sprintf('Caught error by QuestionGenerator in %s:%s -- %s',
             $errfile, $errline, $errstr));
 
-        if (extension_loaded('newrelic')) {
+        if (extension_loaded('newrelic') && $errno !== E_NOTICE) {
             newrelic_notice_error($errno, $errstr, $errfile, $errline, $errcontext);
         }
 
