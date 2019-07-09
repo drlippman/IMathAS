@@ -6828,7 +6828,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$newdot = array($pixx, $pixy);
 					if (count($function)==2 || $function[2]=='closed') {
 						if (!in_array($newdot, $ansdots)) { // no duplicates
-							$ansdots[$key] = $newdot; 
+							$ansdots[$key] = $newdot;
 						}
 					} else {
 						if (!in_array($newdot, $ansodots)) { // no duplicates
@@ -6838,6 +6838,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else {
 					$xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
 					$xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
+					if ($xminpix == $xmaxpix) { continue; } // skip if zero-length line
 					$overlap = false;
 					foreach ($anslines as $lk=>$line) {
 						if ($line[0] <= $xmaxpix && $line[1] >= $xminpix) { // overlap
@@ -7201,8 +7202,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 		$totscore = 0;
+		$pcnt = 0;
 		foreach ($scores as $key=>$score) {
-			$totscore += $score*$partweights[$key];
+			$totscore += $score*$partweights[$pcnt];
+			$pcnt++;
 		}
 		if ($extrastuffpenalty>0) {
 			$totscore = max($totscore*(1-$extrastuffpenalty),0);

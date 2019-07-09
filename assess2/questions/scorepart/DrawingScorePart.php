@@ -1451,7 +1451,8 @@ class DrawingScorePart implements ScorePart
               } else {
                 $xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
                 $xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
-                $overlap = false;
+                if ($xminpix == $xmaxpix) { continue; } // skip if zero-length line
+      					$overlap = false;
                 foreach ($anslines as $lk=>$line) {
                   if ($line[0] <= $xmaxpix && $line[1] >= $xminpix) { // overlap
                     $anslines[$lk] = array(min($line[0], $xminpix), max($line[1], $xmaxpix));
@@ -1814,8 +1815,10 @@ class DrawingScorePart implements ScorePart
             }
         }
         $totscore = 0;
+        $pcnt = 0;
         foreach ($scores as $key=>$score) {
-            $totscore += $score*$partweights[$key];
+            $totscore += $score*$partweights[$pcnt];
+            $pcnt++;
         }
         if ($extrastuffpenalty>0) {
             $totscore = max($totscore*(1-$extrastuffpenalty),0);
