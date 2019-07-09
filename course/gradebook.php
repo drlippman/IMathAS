@@ -1240,28 +1240,37 @@ function gbstudisp($stu) {
 			if ($gbt[0][4][0]==0) { //using points based
 				echo '<td>', _('Total'), '</td>';
 				if (($show&1)==1) {
-					$pct = round(100*$gbt[1][3][0]/$gbt[1][3][4], 1);
+					if ($gbt[1][3][4] > 0) {}
+					$pct = ($gbt[1][3][4] > 0) ? round(100*$gbt[1][3][0]/$gbt[1][3][4], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][0]).'/'.Sanitize::onlyFloat($gbt[1][3][4]).' ('.$pct.'%)</td>';
 				}
 				if (($show&2)==2) {
-					$pct = round(100*$gbt[1][3][3]/$gbt[1][3][7], 1);
+					$pct = ($gbt[1][3][7] > 0) ? round(100*$gbt[1][3][3]/$gbt[1][3][7], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][3]).'/'.Sanitize::onlyFloat($gbt[1][3][7]).' ('.$pct.'%)</td>';
 				}
 				if (($show&4)==4) {
-					$pct = round(100*$gbt[1][3][1]/$gbt[1][3][5], 1);
+					$pct = ($gbt[1][3][5] > 0) ? round(100*$gbt[1][3][1]/$gbt[1][3][5], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][1]).'/'.Sanitize::onlyFloat($gbt[1][3][5]).' ('.$pct.'%)</td>';
 				}
 				if (($show&8)==8) {
-					$pct = round(100*$gbt[1][3][2]/$gbt[1][3][6], 1);
+					$pct = ($gbt[1][3][6] > 0) ? round(100*$gbt[1][3][2]/$gbt[1][3][6], 1) : 0;
 					echo '<td>'.Sanitize::onlyFloat($gbt[1][3][2]).'/'.Sanitize::onlyFloat($gbt[1][3][6]).' ('.$pct.'%)</td>';
 				}
 
 			} else {
 				echo '<td>', _('Weighted Total'), '</td>';
-				if (($show&1)==1) {echo '<td>'.round(100*$gbt[1][3][0]/$gbt[1][3][4], 1).'%</td>';}
-				if (($show&2)==2) {echo '<td>'.round(100*$gbt[1][3][3]/$gbt[1][3][7], 1).'%</td>';}
-				if (($show&4)==4) {echo '<td>'.round(100*$gbt[1][3][1]/$gbt[1][3][5], 1).'%</td>';}
-				if (($show&8)==8) {echo '<td>'.round(100*$gbt[1][3][2]/$gbt[1][3][6], 1).'%</td>';}
+				if (($show&1)==1) {
+					echo '<td>'.(($gbt[1][3][4] > 0) ? round(100*$gbt[1][3][0]/$gbt[1][3][4], 1) : 0) .'%</td>';
+				}
+				if (($show&2)==2) {
+					echo '<td>'.(($gbt[1][3][7] > 0) ? round(100*$gbt[1][3][3]/$gbt[1][3][7], 1) : 0) .'%</td>';
+				}
+				if (($show&4)==4) {
+					echo '<td>'.(($gbt[1][3][5] > 0) ? round(100*$gbt[1][3][1]/$gbt[1][3][5], 1) : 0) .'%</td>';
+				}
+				if (($show&8)==8) {
+					echo '<td>'.(($gbt[1][3][6] > 0) ? round(100*$gbt[1][3][2]/$gbt[1][3][6], 1) : 0) .'%</td>';
+				}
 			}
 			echo '</tr>';
 
