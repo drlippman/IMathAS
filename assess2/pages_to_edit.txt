@@ -12,7 +12,7 @@ TODOs:
     Set based on status of previous
       If regen, should still count as attempted
   importitems: handle new ver
-  
+
 Test:
   Instructor preview
   Practice mode as student
@@ -29,6 +29,7 @@ Bugs:
 To discuss:
   Add way to reshow intro without leaving question
     Use case: embedding calculator into intro
+    Maybe resource option to open in modal?
   (No) Editor covers submit button
   (No) Re-enable teacher option to disable equation editor?
   (No) One question in order / groups of questions in order?
@@ -81,6 +82,8 @@ Delay for later:
     Punt on these by just disabling the regen option for now.
 
 
+X Full credit all manually-graded / full credit all on gradeallq2 not working
+X gradeallq2: need to rescale the answeights
 X Float timer at top when scroll past it
 X Add input/scorebox highlighting on gbviewassess and gradeallq2 pages?
 X gradeallq2:

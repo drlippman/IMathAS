@@ -450,6 +450,8 @@
 		$lockeys = array_keys($questions,$qid);
 		foreach ($lockeys as $loc) {
 			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
+			$answeightTot = array_sum($qdata['answeights']);
+			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
 			if ($groupdup) {
 				echo '<div class="groupdup">';
 			}
@@ -551,10 +553,10 @@
 				}
 				$fullscores = implode(',', $fullscores);
 
-				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$loc.',0,\'scorebox'.$cnt.'-\','.count($qdata['answeights']).',['.$fullscores.']);return false;">Full credit all parts</a>';
+				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($qdata['answeights']).',['.$fullscores.']);return false;">Full credit all parts</a>';
 				if (count($togr)>0) {
 					$togr = implode(',',$togr);
-					echo ' | <a href="#" onclick="quickgrade('.$loc.',1,\'scorebox'.$cnt.'-\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
+					echo ' | <a href="#" onclick="quickgrade('.$cnt.',1,\'scorebox\',['.$togr.'],['.$fullscores.']);return false;">Full credit all manually-graded parts</a>';
 				}
 			} else if ($canedit) {
 				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
