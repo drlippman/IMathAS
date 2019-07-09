@@ -11,7 +11,8 @@ TODOs:
       Skip in next/prev navigation
     Set based on status of previous
       If regen, should still count as attempted
-
+  importitems: handle new ver
+  
 Test:
   Instructor preview
   Practice mode as student

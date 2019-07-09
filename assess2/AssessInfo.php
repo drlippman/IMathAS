@@ -519,7 +519,6 @@ class AssessInfo
     if ($oldquestions !== false && $oldseeds !== false) {
       $oldseeds = array_combine($oldquestions, $oldseeds);
     }
-
     foreach ($this->assessData['itemorder'] as $qid) {
       //if is some type of grouping of questions
       if (is_array($qid)) {
@@ -1043,12 +1042,21 @@ class AssessInfo
         $sub = explode('~', $v);
         if (count($sub)>1) {
           $pts = explode('|', $sub[0]);
-          $order[$k] = array(
-            'type' => 'pool',
-            'n' => $pts[0],
-            'replace' => ($pts[1]==1),
-            'qids' => array_map('intval', array_slice($sub, 1))
-          );
+          if (count($pts)==1) { //really old assessment format
+            $order[$k] = array(
+              'type' => 'pool',
+              'n' => 1,
+              'replace' => 0,
+              'qids' => array_map('intval', $sub)
+            );
+          } else {
+            $order[$k] = array(
+              'type' => 'pool',
+              'n' => $pts[0],
+              'replace' => ($pts[1]==1),
+              'qids' => array_map('intval', array_slice($sub, 1))
+            );
+          }
         } else {
           $order[$k] = intval($v);
         }
