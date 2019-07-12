@@ -21,17 +21,7 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  X Blanks in the GB instead of dashes?
-  X Graph theory written assignemnt settings migration issue?
-  X gbviewassess "Return to gradebook" link.
-  X gbviewassess "Save Changes" needs nearby indicator it's done; exit after
-  X gbviewssess vertical scrollbars on some questions  (scrollpane)
-  ? gbviewassess breadcrumb triggering change warning after save?
-  X gbviewassess initanswerboxhighlights error in gbstore
-  X gradeallq2: hide full/half/none scoreboxes (for now, at least)
-  X Quick grade feedback not working
   ? gradeallq2: unexpected token ) on 100
-  X viewmsg assignment link bad link
   Time limit overtimes when not allowed
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
   In math parser, if pi is a variable, treat it as such rather than as the constant
@@ -93,7 +83,17 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
-
+X New course UIver not copying on add new course
+X Blanks in the GB instead of dashes?
+X Graph theory written assignemnt settings migration issue?
+X gbviewassess "Return to gradebook" link.
+X gbviewassess "Save Changes" needs nearby indicator it's done; exit after
+X gbviewssess vertical scrollbars on some questions  (scrollpane)
+? gbviewassess breadcrumb triggering change warning after save?
+X gbviewassess initanswerboxhighlights error in gbstore
+X gradeallq2: hide full/half/none scoreboxes (for now, at least)
+X Quick grade feedback not working
+X viewmsg assignment link bad link
 X Full credit all manually-graded / full credit all on gradeallq2 not working
 X gradeallq2: need to rescale the answeights
 X Float timer at top when scroll past it

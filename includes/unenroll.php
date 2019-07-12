@@ -1,5 +1,7 @@
 <?php
 
+require(__DIR__.'/migratesettings.php');
+
 //util function for unenrolling students
 //$cid = courseid
 //$tounenroll = array of userids
@@ -7,7 +9,7 @@
 //$deloffline = delete offline items from gradebook
 //$unwithdraw = unset any withdrawn questions
 //$delwikirev = delete wiki revisions, 1: all, 2: group wikis only
-function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false) {
+function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false,$upgradeassess=false) {
 	global $DBH, $userid;
 	$cid = intval($cid);
 	$stulist = implode(',', array_map('intval', $tounenroll));
@@ -169,6 +171,53 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 
 	if ($withwithdrawn=='remove' || $usereplaceby) {
 		$msg = updateassess($cid, $withwithdraw=='remove', $usereplaceby);
+	}
+
+	if ($upgradeassess) {
+		$stm = $DBH->prepare("UPDATE imas_courses SET UIver=2 WHERE id=?");
+		$stm->execute(array($cid));
+		if (count($assesses)>0) {
+			$stm = $DBH->query("SELECT * FROM imas_assessments WHERE id IN ($aidlist)");
+			$stm2 = null;
+			$stm3 = null;
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if ($stm2 === null) {
+					$sets = [];
+					foreach ($row as $k=>$v) {
+						if ($k !== 'id') {
+							$sets[] = "$k=:$k";
+						}
+					}
+					$stm2 = $DBH->prepare("UPDATE imas_assessments SET ".implode(',', $sets). " WHERE id=:id");
+				}
+				$row = migrateAssessSettings($row, 1, 2); // TODO: generalize
+				$qarr = [];
+				foreach ($row as $k=>$v) {
+					$qarr[':'.$k] = $v;
+				}
+				$stm2->execute($qarr);
+				// now the questions
+				$qstm = $DBH->prepare("SELECT * FROM imas_questions WHERE assessmentid=?");
+				$qstm->execute(array($row['id']));
+				while ($qrow = $qstm->fetch(PDO::FETCH_ASSOC)) {
+					if ($stm3 === null) {
+						$sets = [];
+						foreach ($qrow as $k=>$v) {
+							if ($k !== 'id') {
+								$sets[] = "$k=:$k";
+							}
+						}
+						$stm3 = $DBH->prepare("UPDATE imas_questions SET ".implode(',', $sets). " WHERE id=:id");
+					}
+					$qrow = migrateQuestionSettings($qrow, $row, 1, 2); // TODO: generalize
+					$qarr = [];
+					foreach ($qrow as $k=>$v) {
+						$qarr[':'.$k] = $v;
+					}
+					$stm3->execute($qarr);
+				}
+			}
+		}
 	}
 
 
