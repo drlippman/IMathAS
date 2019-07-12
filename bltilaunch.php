@@ -800,9 +800,10 @@ if ($stm->rowCount()==0) {
 						$copycourse = "no";
 					}
 				}
-				$stm = $DBH->prepare('SELECT jsondata FROM imas_courses WHERE id=:aidsourcecid');
+				$stm = $DBH->prepare('SELECT jsondata,UIver FROM imas_courses WHERE id=:aidsourcecid');
 				$stm->execute(array(':aidsourcecid'=>$aidsourcecid));
-				$aidsourcejsondata = json_decode($stm->fetchColumn(0), true);
+				list($aidsourcejsondata,$sourceUIver) = $stm->fetch(PDO::FETCH_NUM);
+				$aidsourcejsondata = json_decode($aidsourcejsondata, true);
 				$blockLTICopyOfCopies = ($aidsourcejsondata!==null && !empty($aidsourcejsondata['blockLTICopyOfCopies']));
 
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {
@@ -857,18 +858,21 @@ if ($stm->rowCount()==0) {
 							a copy of the $installname assignments can be made for you automatically and associated with
 							this LMS course.</p>
 							<ul class=nomark>
-							<li><input name=\"docoursecopy\" type=\"radio\" value=\"useexisting\" checked />Associate this LMS course with my existing course (ID $aidsourcecid) on $installname</li>
-							<li><input name=\"docoursecopy\" type=\"radio\" value=\"makecopy\" />Create a copy of my existing course (ID $aidsourcecid) on $installname</li>";
+							<li><input name=\"docoursecopy\" type=\"radio\" value=\"useexisting\" checked onclick=\"$('#usenew').hide()\" />Associate this LMS course with my existing course (ID $aidsourcecid) on $installname</li>
+							<li><input name=\"docoursecopy\" type=\"radio\" value=\"makecopy\" onclick=\"$('#usenew').show()\"/>Create a copy of my existing course (ID $aidsourcecid) on $installname</li>";
 						if (count($othercourses)>0 && !$blockLTICopyOfCopies) {
-							echo '<li><input name="docoursecopy" type="radio" value="copyother" />Create a copy of another course: <select name="othercoursecid">';
+							echo '<li><input name="docoursecopy" type="radio" value="copyother" onclick="$(\'#usenew\').show()" />Create a copy of another course: <select name="othercoursecid">';
 							foreach ($othercourses as $k=>$v) {
 								echo '<option value="'.$k.'">'.Sanitize::encodeStringForDisplay($v.' (Course ID '.$k.')').'</option>';
 							}
 							echo '</select></li>';
 							echo $advuseother;
 						}
-						echo "	</ul>
-							<p>The first option is best if this is your first time using this $installname course.  The second option
+						echo "	</ul>";
+						if ($sourceUIver == 1) {
+							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
+						}
+						echo "<p>The first option is best if this is your first time using this $installname course.  The second option
 							may be preferrable if you have copied the course in your LMS and want your students records to
 							show in a separate $installname course.</p>
 							<p><input type=\"submit\" value=\"Continue\"/> (this may take a few moments - please be patient)</p>";
@@ -890,6 +894,9 @@ if ($stm->rowCount()==0) {
 							echo '</ul>';
 						} else {
 							echo "<input name=\"docoursecopy\" type=\"hidden\" value=\"makecopy\" />";
+						}
+						if ($sourceUIver == 1) {
+							echo '<p><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
 						}
 						echo "<p><input type=\"submit\" value=\"Create a copy on $installname\"/> (this may take a few moments - please be patient)</p>";
 					}
@@ -970,7 +977,7 @@ if ($stm->rowCount()==0) {
 					$gbcats[$frid] = $DBH->lastInsertId();
 				}
 				$copystickyposts = true;
-				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs,dates_by_lti,deflatepass FROM imas_courses WHERE id=:id");
+				$stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs,dates_by_lti,deflatepass,UIver FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$sourcecid));
 				$r = $stm->fetch(PDO::FETCH_NUM);
 
@@ -980,6 +987,13 @@ if ($stm->rowCount()==0) {
 				$latepasshrs = $r[3];
 				$datesbylti = $r[4];
 				$deflatepass = $r[5];
+				$sourceUIver = $r[6];
+				if (isset($_POST['usenewassess'])) {
+					$destUIver = 2;
+					$convertAssessVer = 2;
+				} else {
+					$destUIver = $sourceUIver;
+				}
 				if ($ancestors=='') {
 					$ancestors = intval($sourcecid);
 				} else {
@@ -1037,8 +1051,8 @@ if ($stm->rowCount()==0) {
 				doaftercopy($sourcecid);
 
 				$itemorder = serialize($newitems);
-				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,deflatepass=:deflatepass,dates_by_lti=:datesbylti WHERE id=:id");
-				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':deflatepass'=>$deflatepass, ':datesbylti'=>$datesbylti, ':id'=>$destcid));
+				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,deflatepass=:deflatepass,dates_by_lti=:datesbylti,UIver=:UIver WHERE id=:id");
+				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':deflatepass'=>$deflatepass, ':datesbylti'=>$datesbylti, ':UIver'=>$destUIver, ':id'=>$destcid));
 
 				$offlinerubrics = array();
 				/*
