@@ -943,7 +943,7 @@ function gbstudisp($stu) {
                     'uid' => $gbt[1][4][0]
                 );
 
-								echo '<a href="'.$assessGbUrl.'?' . Sanitize::generateQueryStringFromMap($querymap) . "\"";
+								echo '<a href="'.$assessGbUrl.'?' . Sanitize::generateQueryStringFromMap($querymap) . "\">";
 							} else {
                 $querymap = array(
                     'stu' => $stu,

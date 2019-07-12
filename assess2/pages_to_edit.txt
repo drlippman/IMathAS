@@ -21,6 +21,17 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
+  X Blanks in the GB instead of dashes?
+  Graph theory written assignemnt settings migration issue?
+  gbviewassess "Return to gradebook" link.
+  gbviewassess "Save Changes" needs nearby indicator it's done.
+  gbviewssess vertical scrollbars on some questions  (scrollpane)
+  gbviewassess breadcrumb triggering change warning after save?
+  gbviewassess initanswerboxhighlights error in gbstore
+  gradeallq2: hide full/half/none scoreboxes
+  gradeallq2: unexpected token ) on 100
+  rubric: fixed rather than absolute so it doesn't scroll with page?
+  viewmsg assignment link bad link
   Time limit overtimes when not allowed
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
   In math parser, if pi is a variable, treat it as such rather than as the constant
