@@ -158,6 +158,10 @@ function migrateAssessSettings1to2($settings) {
   if ($settings['defattempts'] == 0) {
     $settings['defattempts'] = 100;
   }
+  // can't do unlimited regens anymore
+  if ($settings['defregens'] == 0) {
+    $settings['defregens'] = 100;
+  }
 
   // convert 'after n missed attempts' or 'on last attempt' penalties
   if ($settings['defpenalty'][0] == 'S') {
