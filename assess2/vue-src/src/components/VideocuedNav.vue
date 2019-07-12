@@ -5,8 +5,8 @@
       :selected = "curOption"
       searchby = "title"
     >
-      <template v-slot="{ option }">
-        <videocued-nav-list-item :option="option" />
+      <template v-slot="{ option, selected }">
+        <videocued-nav-list-item :option="option" :selected="selected" />
       </template>
     </menu-button>
     <slot></slot>

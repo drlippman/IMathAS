@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span class="flex-nowrap-center">
     <span class="qname-wrap">
       <icons :name="statusIcon" class="qstatusicon" />
       <span
@@ -10,8 +10,10 @@
       </span>
       {{ scoreDisplay }}
     </span>
-    <span class="redoicon">
+    <span class="redoicon" v-if="!selected">
       <icons name="retry" v-if="canRetry" />
+    </span>
+    <span class="redoicon" v-if="!selected">
       <icons name="retake" v-if="canRegen" />
     </span>
   </span>
@@ -23,7 +25,7 @@ import { store } from '../basicstore';
 
 export default {
   name: 'VideocuedNavListItem',
-  props: ['option'],
+  props: ['option', 'selected'],
   components: {
     Icons
   },
