@@ -2,7 +2,7 @@
 // IMathAS: Assess2 gradebook details page
 // (c) 2019 David Lippman
 
-$lastupdate = '20190708';
+$lastupdate = '20190712';
 
 require('../init.php');
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
@@ -49,6 +49,7 @@ $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2_min.js?v=07081
 $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips_min.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs_min.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/rubric_min.js" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/gb-scoretools.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ_min.js" type="text/javascript"></script>
   <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
   <script src="'.$imasroot.'/mathquill/mqeditor_min.js" type="text/javascript"></script>

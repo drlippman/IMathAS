@@ -173,7 +173,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  saveChanges () {
+  saveChanges (exit) {
     let qs = store.queryString;
     store.inTransit = true;
     store.saving = 'saving';
@@ -200,6 +200,10 @@ export const actions = {
           return;
         }
         store.saving = 'saved';
+        if (exit) {
+          window.location = window.exiturl;
+          return;
+        }
         // update store.assessInfo with the new scores so it
         // can tell if we change anything
         for (let key in store.scoreOverrides) {

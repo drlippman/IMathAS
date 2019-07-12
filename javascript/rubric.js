@@ -149,7 +149,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 	} else {
 		var pastfb = $("textarea[name="+feedbackid+"]").val();
 	}
-	
+
 	var pttot = imasrubric_getpttot(rubricid);
 	if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown and feedback
 		var score = 0;
@@ -167,7 +167,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 		}
 		if (feedback != '') {
 			feedback = '<ul class=nomark>'+feedback+'</ul>';
-		} 
+		}
 		document.getElementById(scoreboxid).value = score;
 		if (imasrubrics[rubricid].type==1) {
 			if (clearexisting) {
@@ -192,7 +192,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 		}
 		if (feedback != '') {
 			feedback = '<ul class=nomark>'+feedback+'</ul>';
-		} 
+		}
 		if (clearexisting) {
 			if (window.tinymce) {
 				tinymce.get(feedbackid).setContent(feedback);
@@ -227,7 +227,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 			}
 		}
 	}
-	
+
 	if (p = feedbackid.match(/^fb-(\d+)/)) {
 		revealfb(p[1]);
 	}
@@ -296,7 +296,7 @@ function quicksetscore(el,score,clickel) {
 
 function quicksetfb(el) {
 	var feedback = $(el).text();
-	var feedbackid = $(el).closest(".review").find(".fbbox").attr("id");
+	var feedbackid = $(el).closest(".review, .scoredetails").find(".fbbox").attr("id");
 	if (window.tinymce) {
 		tinymce.get(feedbackid).setContent(feedback);
 	} else {

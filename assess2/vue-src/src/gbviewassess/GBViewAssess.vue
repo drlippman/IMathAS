@@ -223,14 +223,19 @@
           <button
             v-if = "canEdit"
             type = "button"
+            :disabled = "!canSubmit"
             class = "primary"
-            @click = "submitChanges"
+            @click = "submitChanges(true)"
           >
             {{ $t('gradebook.save') }}
           </button>
+          <span v-if="savedMsg !== ''" class="noticetext">
+            {{ savedMsg }}
+          </span>
           <button
             type = "button"
             class = "secondary"
+            :disabled = "!canSubmit"
             @click = "exit"
           >
             {{ $t('gradebook.return') }}
@@ -243,6 +248,7 @@
           <button
             v-if = "canEdit"
             type = "button"
+            :disabled = "!canSubmit"
             class = "primary"
             @click = "submitChanges"
           >
@@ -303,6 +309,9 @@ export default {
     },
     canEdit () {
       return store.assessInfo['can_edit_scores'];
+    },
+    canSubmit () {
+      return (!store.inTransit);
     },
     useEditor () {
       return (typeof window.tinyMCE !== 'undefined');
@@ -496,7 +505,7 @@ export default {
       this.assessOverride = evt.target.value.trim();
       store.saving = '';
     },
-    submitChanges () {
+    submitChanges (exit) {
       if (this.showOverride && this.assessOverride !== '') {
         store.scoreOverrides['gen'] = this.assessOverride;
       } else if (this.aData.hasOwnProperty('scoreoverride') &&
@@ -506,26 +515,11 @@ export default {
       } else {
         delete store.scoreOverrides['gen'];
       }
-      actions.saveChanges();
+      var doexit = (exit === true);
+      actions.saveChanges(doexit);
     },
     exit () {
-      window.location = store.exitUrl;
-    },
-    setExitUrl (from) {
-      let page = '';
-      if (from === 'isolate') {
-        page = 'isolateassessgrade.php';
-      } else if (from === 'gisolate') {
-        page = 'isolateassessbygroup.php';
-      } else if (from === 'stugrp') {
-        page = 'managestugrps.php';
-      } else if (from === 'gisolate') {
-        page = 'gb-testing.php';
-      } else if (from === 'gisolate') {
-        page = 'gradebook.php';
-      }
-      let qs = '?cid=' + store.cid + '&aid=' + store.aid + '&stu=' + store.stu;
-      store.exitUrl = store.APIbase + '../course/' + page + qs;
+      window.location = window.exiturl;
     },
     clearAttempts (type) {
       store.clearAttempts.type = type;
@@ -572,7 +566,6 @@ export default {
     let querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
     let queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
     let queryuid = window.location.search.replace(/^.*uid=(\d+).*$/, '$1');
-    let queryfrom = window.location.search.replace(/^.*from=(\w+).*$/, '$1');
     let querystu = window.location.search.replace(/^.*stu=(\d+).*$/, '$1');
     if (store.assessInfo === null ||
       store.cid !== querycid ||
@@ -585,7 +578,6 @@ export default {
       store.uid = queryuid;
       store.stu = querystu;
       store.queryString = '?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
-      this.setExitUrl(queryfrom);
       actions.loadGbAssessData();
     }
   }

@@ -261,7 +261,7 @@
 	}
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=060319"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=071219"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=070819"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
@@ -479,12 +479,15 @@
 			}
 
 			$teacherreview = $line['userid'];
-
+			/*
+			To re-enable, need to define before $qdata, but figure another way to
+			get answeights/points.
 			if ($qtype=='multipart') {
 				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$answeights);
 			} else {
 				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
 			}
+			*/
 			echo '<div class="questionwrap">';
 			echo $qdata['html'];
 			echo '<script type="text/javascript">

@@ -163,7 +163,7 @@
 					$stm = $DBH->prepare("SELECT userid FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
-						echo " | <a href=\"$imasroot/course/gb-viewasid2.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
 						if ($due<2000000000) {
 							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
 						}
