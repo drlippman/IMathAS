@@ -308,7 +308,7 @@
 					$content .= printrubriclink($rubric,$pointspos,"score".Sanitize::onlyInt($line['id']), "feedback".Sanitize::onlyInt($line['id'])).' ';
 				}
 			} else if (($line['userid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
-				$content .= "<span class=red> ".Sanitize::onlyInt($scores[$line['id']])." pts</span> ";
+				$content .= "<span class=red> ".Sanitize::onlyFloat($scores[$line['id']])." pts</span> ";
 			}
 		}
 		//$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=".Sanitize::onlyInt($line['threadid'])."\">Thread</a> ";

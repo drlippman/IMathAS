@@ -659,7 +659,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';
-				echo '<input type="text" size="4" name="points" id="points" value="'.Sanitize::onlyFloat($points).'" /></span><br class="form" />';
+				echo '<input type="text" size="4" name="points" id="points" value="'.Sanitize::encodeStringForDisplay($points).'" /></span><br class="form" />';
 			}
 			if ($_GET['modify']=='reply') {
 				echo "<div class=submit><input type=submit value='Post Reply'></div>\n";
