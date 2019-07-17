@@ -5551,6 +5551,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				array_pop($ansdots);
 			}
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
+			$stuclosed = false;
 			if ($lines=='') {
 				$line = array();
 				$extrapolys = 0;
@@ -5564,6 +5565,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 				if ($isclosed && ($line[0][0]-$line[count($line)-1][0])*($line[0][0]-$line[count($line)-1][0]) + ($line[0][1]-$line[count($line)-1][1])*($line[0][1]-$line[count($line)-1][1]) <=25*max(1,$reltolerance)) {
 					array_pop($line);
+					$stuclosed = true;
 				}
 			}
 
@@ -5575,11 +5577,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			}
-			if ($isclosed && isset($matchstu[0])) {
+			if ($isclosed && $stuclosed && isset($matchstu[0])) {
 				$matchstu[count($ansdots)] = $matchstu[0];
 			}
 
 			$totaladj = 0;  $correctadj = 0;
+
 			for ($i =0;$i<count($ansdots) - ($isclosed?0:1);$i++) {
 				$totaladj++;
 				/*if ($i==count($ansdots)-1) {

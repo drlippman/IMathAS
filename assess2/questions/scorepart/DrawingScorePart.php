@@ -157,6 +157,7 @@ class DrawingScorePart implements ScorePart
                 $ansdots[$key] = array($pixx,$pixy);
             }
             $isclosed = false;
+            $stuclosed = false;
             if (abs($ansdots[0][0]-$ansdots[count($ansdots)-1][0])<.01 && abs($ansdots[0][1]-$ansdots[count($ansdots)-1][1])<.01) {
                 $isclosed = true;
                 array_pop($ansdots);
@@ -175,6 +176,7 @@ class DrawingScorePart implements ScorePart
                 }
                 if ($isclosed && ($line[0][0]-$line[count($line)-1][0])*($line[0][0]-$line[count($line)-1][0]) + ($line[0][1]-$line[count($line)-1][1])*($line[0][1]-$line[count($line)-1][1]) <=25*max(1,$reltolerance)) {
                     array_pop($line);
+                    $stuclosed = true;
                 }
             }
 
@@ -186,7 +188,7 @@ class DrawingScorePart implements ScorePart
                     }
                 }
             }
-            if ($isclosed && isset($matchstu[0])) {
+            if ($isclosed && $stuclosed && isset($matchstu[0])) {
                 $matchstu[count($ansdots)] = $matchstu[0];
             }
 
