@@ -108,7 +108,7 @@ export default {
         return {
           is: 'a',
           href: option.link,
-          target: '_blank'
+          target: option.target || '_blank'
         };
       } else {
         return {

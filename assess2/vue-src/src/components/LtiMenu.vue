@@ -54,7 +54,8 @@ export default {
       if (store.assessInfo['lti_showmsg']) {
         out.push({
           label: this.$tc('lti.msgs', store.assessInfo['lti_msgcnt']),
-          link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid
+          link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid,
+          target: '_self'
         });
       }
       // view scored assessment link
@@ -63,13 +64,15 @@ export default {
       ) {
         out.push({
           label: this.$t('closed.view_scored'),
-          link: store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid
+          link: store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid,
+          target: '_self'
         });
       }
       if (store.assessInfo['can_use_latepass']) {
         out.push({
           label: this.$t('lti.use_latepass'),
-          link: store.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid
+          link: store.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid,
+          target: '_self'
         });
       }
       return out;
