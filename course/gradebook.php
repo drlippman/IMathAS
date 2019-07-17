@@ -816,7 +816,7 @@ function gbstudisp($stu) {
 					echo '<td></td>';
 				}
 			}
-			echo '<td class="cat'.Sanitize::onlyInt($gbt[0][1][$i][1]).'">';
+			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'">';
 
 			$showlink = false;
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
@@ -1153,7 +1153,7 @@ function gbstudisp($stu) {
 				//} else {
 					echo '<tr class="grid">';
 				//}
-				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]).'</span>';
+				echo '<td class="cat'.Sanitize::onlyFloat($gbt[0][2][$i][1]%10).'"><span class="cattothdr">'.Sanitize::encodeStringForDisplay($gbt[0][2][$i][0]).'</span>';
 				if (isset($gbt[0][2][$i][11])) {  //category weight
 					echo ' ('.Sanitize::onlyFloat($gbt[0][2][$i][11]).'%)';
 				}
@@ -1344,7 +1344,7 @@ function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
 			} else if ($availshow==0 && $gbt[0][2][$i][2]==1) { //don't show cur in past view
 				continue;
 			}
-			echo '<th class="cat'.$gbt[0][2][$i][1].'"><div><span class="cattothdr">';
+			echo '<th class="cat'.($gbt[0][2][$i][1]%10).'"><div><span class="cattothdr">';
 			if ($availshow<3) {
 				echo $gbt[0][2][$i][0].'<br/>';
 				if ($gbt[0][4][0]==0) { //using points based
@@ -1581,7 +1581,7 @@ function gbinstrdisp() {
 				continue;
 			}
 			//name and points
-			echo '<th class="cat'.$gbt[0][1][$i][1].'"><div>'.$gbt[0][1][$i][0].'<br/>';
+			echo '<th class="cat'.($gbt[0][1][$i][1]%10).'"><div>'.$gbt[0][1][$i][0].'<br/>';
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
 				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
 			} else {
