@@ -59,7 +59,8 @@ if (isset($CFG['locale'])) {
 		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
 	}
 }
-if (!isset($sessiondata['coursetheme']) && isset($coursetheme)) {
+
+if (isset($coursetheme)) {
 	$sessiondata['coursetheme'] = $coursetheme;
 }
 if (isset($sessiondata['coursetheme'])) {
