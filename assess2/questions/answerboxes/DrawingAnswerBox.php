@@ -73,8 +73,9 @@ class DrawingAnswerBox implements AnswerBox
 
         }
 
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
-    		if (!is_array($answers)) {
+        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+
+        if (!is_array($answers)) {
     			settype($answers,"array");
     		}
     		$answers = array_map('clean', $answers);
@@ -488,7 +489,7 @@ class DrawingAnswerBox implements AnswerBox
     			}
     		}
         if ($colorbox!='') { $out .= '</div>';}
-        
+
     		if ($revertgraphdisp) {
     			$GLOBALS['sessiondata']['graphdisp']=0;
     		}
