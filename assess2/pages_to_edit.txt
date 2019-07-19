@@ -30,6 +30,8 @@ Bugs:
   Average not showing until not IP
 
 To discuss:
+  Some way to submit all unsubmitted assessment attempts?
+    Or at least some designation in GB.
   Add way to reshow intro without leaving question
     Use case: embedding calculator into intro
     Maybe resource option to open in modal?

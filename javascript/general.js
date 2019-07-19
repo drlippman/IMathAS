@@ -490,7 +490,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		branding: false,
 		resize: "both",
 		width: '100%',
-		content_style: "body {background-color: #ffffff !important;}",
+		content_style: "body {background-color: " + (coursetheme.match(/_dark/) ? "#000" : "#fff") + " !important;}",
 		table_class_list: [{title: "None", value:''},
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
