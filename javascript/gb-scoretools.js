@@ -56,10 +56,10 @@ function previewallfiles() {
 	$("span.clickable").trigger("click");
 }
 function allvisfullcred() {
-	$(".fullcredlink").not(function() {return $(this).closest(".pseudohidden").length}).trigger("click");
+	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
 }
 function allvisnocred() {
-	$("input[name^=ud]").not(function() {return $(this).closest(".pseudohidden").length}).val("0");
+	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
 }
 function preprint() {
 	$("span[id^='ans']").removeClass("hidden");

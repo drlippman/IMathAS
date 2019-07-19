@@ -21,8 +21,6 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  LTI menu: latepass link should stay in same tab.
-    Make sure redeem latepass page redirects back to new assessplayer
   ? gradeallq2: unexpected token ) on 100
   Time limit overtimes when not allowed
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
@@ -87,6 +85,9 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X itemanalysis2: Full Credit to visible question giving points for non-visible ones
+X LTI menu: latepass link should stay in same tab.
+    Make sure redeem latepass page redirects back to new assessplayer
 X New course UIver not copying on add new course
 X Blanks in the GB instead of dashes?
 X Graph theory written assignemnt settings migration issue?
