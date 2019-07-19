@@ -43,6 +43,9 @@ if (isset($CFG['GEN']['favicon'])) {
 } else {
 	echo '<link rel="shortcut icon" href="/favicon.ico" />';
 }
+if (isset($CFG['GEN']['appleicon'])) {
+	echo '<link rel="apple-touch-icon" href="'.$CFG['GEN']['appleicon'].'" />';
+}
 if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }

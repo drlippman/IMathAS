@@ -117,6 +117,7 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 - `$CFG['CPS']['themelist']`: a comma-separated list of theme css files to allow as themes.
 - `$CFG['CPS']['themenames']`: a comma-separated list of display names for the theme css files you included in `themelist`.
 - `$CFG['GEN']['favicon']`:  Set this to override the default `/favicon.ico` path for a site favicon.
+- `$CFG['GEN']['appleicon']`:  Set this add a path for an apple-touch-icon.
 - `$CFG['GEN']['headerscriptinclude']`:  Set to a file path, relative to web root.  This file is included at the end of the `<head>` on every page.  Handy for including custom script tags or additional CSS files.
 - `$CFG['GEN']['headerinclude']`:  Set to a file path, relative to web root.  This file is included in the `<div class="headerwrapper">` at the top of the body on all pages.  Handy for custom headers.
 - `$CFG['GEN']['logopad']`: Set to something like "50px" to override the default padding on `<span class="padright">` used to leave room for `$smallheaderlogo`.
