@@ -63,7 +63,7 @@ div.blockitems div.blockitems {
 
 /*Icons*/
 div.icon {
-	color:#00d;	
+	color:#00d;
 	border: 1px solid #00f;
 	font-weight: bolder;
 }
@@ -98,7 +98,7 @@ table.gb thead th, table.gbl thead th, table.gbl thead th.locked {
 	background-color: #000;
 }
 tr.even, tr.even td {
-	background-color: #000;	
+	background-color: #000;
 }
 tr.odd, tr.odd td {
 	background-color: #101;
@@ -210,12 +210,12 @@ div.seqqinfoinactive {
 
 }
 div.todoquestion {
-	background-color: #221; 
-	border: 0px; 
+	background-color: #221;
+	border: 0px;
 }
 /*all questions*/
 div.question {
-	background-color: #000; 
+	background-color: #000;
 	border: 1px solid #bbd;
 }
 
@@ -249,5 +249,15 @@ span.done {
 a.newnote {
 	font-size: 90%;
 }
-
-
+table.stats {
+	background-color: #006;
+}
+table.stats thead tr th {
+	background-color: #036;
+}
+.drawtools span {
+	color: #000;
+}
+div.tips {
+	color: #000;
+}
