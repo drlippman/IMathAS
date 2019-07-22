@@ -65,6 +65,7 @@ to question output or something.
 
  */
 var initstack = [];
+var loadedscripts = [];
 var callbackstack = {};
 
 var imathasAssess = (function($) {
@@ -178,16 +179,23 @@ function init(paramarr, enableMQ) {
   if (paramarr.scripts) {
     function handleScript(arr, cnt) {
       if (arr[cnt][0] == 'code') {
-        window.eval(arr[cnt][1]);
+        try {
+          window.eval(arr[cnt][1]);
+        } catch (e) { console.log("Error executing question script:" + arr[cnt][1]);}
         if (arr.length > cnt+1) {
           handleScript(arr, cnt+1);
         }
-      } else {
+      } else if (loadedscripts.indexOf(arr[cnt][1]) == -1) {
         jQuery.getScript(arr[cnt][1]).always(function() {
+          loadedscripts.push(arr[cnt][1]);
           if (arr.length > cnt+1) {
             handleScript(arr, cnt+1);
           }
         })
+      } else {
+        if (arr.length > cnt+1) {
+          handleScript(arr, cnt+1);
+        }
       }
     }
     handleScript(paramarr.scripts, 0);
