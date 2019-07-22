@@ -889,11 +889,11 @@ jQuery(document).ready(function($) {
 
 jQuery(document).ready(function($) {
 	if (typeof isImathasAssessment != 'undefined') {
-		$('a:not([target])').each(addBlankTarget);
+		$('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
 	}
 	$('a').each(setuptracklinks).each(addNoopener);
-	$('a[href*="youtu"]').each(setupvideoembeds);
-	$('a[href*="vimeo"]').each(setupvideoembeds);
+	$('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
 	$('body').fitVids();
 });
 
