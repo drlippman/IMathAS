@@ -101,6 +101,36 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {
   }
 }
 
+class OAuthSignatureMethod_HMAC_SHA256 extends OAuthSignatureMethod {
+  function get_name() {
+    return "HMAC-SHA256";
+  }
+
+  public function build_signature($request, $consumer, $token) {
+    global $OAuth_last_computed_signature;
+    $OAuth_last_computed_signature = false;
+
+    $base_string = $request->get_signature_base_string();
+    $request->base_string = $base_string;
+
+    $key_parts = array(
+      $consumer->secret,
+      ($token) ? $token->secret : ""
+    );
+
+    $key_parts = OAuthUtil::urlencode_rfc3986($key_parts);
+    $key = implode('&', $key_parts);
+
+    if (function_exists("hash_hmac")) {
+	    $computed_signature =  base64_encode(hash_hmac('sha256', $base_string, $key, true));
+    } else {
+	    $computed_signature = base64_encode(custom_hmac('sha256', $base_string, $key, true));
+    }
+    $OAuth_last_computed_signature = $computed_signature;
+    return $computed_signature;
+  }
+}
+
 class OAuthSignatureMethod_PLAINTEXT extends OAuthSignatureMethod {
   public function get_name() {
     return "PLAINTEXT";
@@ -246,7 +276,7 @@ class OAuthRequest {
       }*/
      // Add POST Parameters if they exist
       //$parameters = array_merge($parameters, $ourpost);
-      
+
       // It's a POST request of the proper content-type, so parse POST
       // parameters and add those overriding any duplicates from GET
       if ($http_method == "POST"
@@ -255,8 +285,8 @@ class OAuthRequest {
               $post_data = OAuthUtil::parse_parameters(file_get_contents(self::$POST_INPUT));
               $parameters = array_merge($parameters, $post_data);
       }
-      
-      if (isset($parameters['resource_link_description']) && 
+
+      if (isset($parameters['resource_link_description']) &&
       	      !empty($parameters['ext_lms']) && substr($parameters['ext_lms'],0,3)=='bb-') {
       	      $parameters['resource_link_description'] = str_replace('><br><',">\r\n<",$parameters['resource_link_description']);
       }

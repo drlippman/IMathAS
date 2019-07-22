@@ -21,6 +21,8 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
+  Large number answers not working (qn-val)
+  JSXgraph questions not working - MOM 75910 for example
   ? gradeallq2: unexpected token ) on 100
   Time limit overtimes when not allowed
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable

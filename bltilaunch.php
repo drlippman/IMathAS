@@ -529,6 +529,8 @@ if (isset($_GET['launch'])) {
 	$server = new OAuthServer($store);
 	$method = new OAuthSignatureMethod_HMAC_SHA1();
 	$server->add_signature_method($method);
+	$method2 = new OAuthSignatureMethod_HMAC_SHA256();
+	$server->add_signature_method($method2);
 	$request = OAuthRequest::from_request();
 	$base = $request->get_signature_base_string();
 	try {
