@@ -116,6 +116,8 @@ In addition to the `$CFG['CPS']['theme']` option described above for setting the
 
 - `$CFG['CPS']['themelist']`: a comma-separated list of theme css files to allow as themes.
 - `$CFG['CPS']['themenames']`: a comma-separated list of display names for the theme css files you included in `themelist`.
+- `$CFG['CPS']['usecourselevel']`: add a course-level selector to the course settings page. Set to `'required'` to make it required.  This pulls the
+course list from the course browser options, so you must also have `$CFG['coursebrowser']` set.
 - `$CFG['GEN']['favicon']`:  Set this to override the default `/favicon.ico` path for a site favicon.
 - `$CFG['GEN']['appleicon']`:  Set this add a path for an apple-touch-icon.
 - `$CFG['GEN']['headerscriptinclude']`:  Set to a file path, relative to web root.  This file is included at the end of the `<head>` on every page.  Handy for including custom script tags or additional CSS files.
