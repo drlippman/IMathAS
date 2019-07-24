@@ -201,6 +201,8 @@ export const actions = {
         }
         store.saving = 'saved';
         if (exit) {
+          store.scoreOverrides = {};
+          store.feedbacks = {};
           window.location = window.exiturl;
           return;
         }

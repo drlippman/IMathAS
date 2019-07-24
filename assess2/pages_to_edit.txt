@@ -21,6 +21,7 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
+  gbviewassess.php: don't do Save Changes redirect until submission completes
   Large number answers not working (qn-val)
   JSXgraph questions not working - MOM 75910 for example
   ? gradeallq2: unexpected token ) on 100
