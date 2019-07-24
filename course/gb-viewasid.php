@@ -398,6 +398,7 @@
 		require("../assessment/displayq2.php");
 
 		if (isset($_GET['update']) && ($isteacher || $istutor)) {
+			$haderror = false;
 			if (isoktorec($asid)) {
 				$stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE id=:id");
 				$stm->execute(array(':id'=>$asid));
@@ -421,8 +422,8 @@
 							$j++;
 						}
 						if (count($scpt) < count(explode('~', $oldScores[$i]))) {
-							echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
-							exit;
+							echo "Warning: on question ".($i+1)." the number of score parts submitted does not match the number of parts originally in the student's work. You should check that the score total is accurate.<br>";
+							$haderror = true;
 						}
 						$scores[$i] = implode('~',$scpt);
 					} else {
@@ -477,6 +478,11 @@
 				}
 			} else {
 				echo "No authority to change scores.";
+				exit;
+			}
+			if ($haderror) {
+				echo '<p>Scores were saved, but with warnings. You should check everything looks ok. ';
+				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&aid=$aid&asid=$asid&from=$from&uid=$get_uid\">Back</a></p>";
 				exit;
 			}
 			if ($from=='isolate') {
