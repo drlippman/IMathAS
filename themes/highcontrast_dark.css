@@ -23,7 +23,9 @@ a:hover {
 	text-decoration: underline;
 	color: #ffeeee;
 }
-
+a.abutton {
+	color: #000;
+}
 /*Container for course items*/
 div.item {
 	/*border: 1px solid #000;*/
