@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed July 25-27, 2018
 // licensed under GPL version 2 or later
 //
-// File Version : 7.3
+// File Version : 7.3.1
 //
 
 global $allowedmacros;
@@ -12,7 +12,7 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros, "formpoly3fromstring", "dividepoly3", "longdivisionpoly3", "writepoly3");
+array_push($allowedmacros, "formpoly3fromstring", "formpoly3fromresults", "dividepoly3", "longdivisionpoly3", "writepoly3");
 
 include_once("fractions.php");  // fraction routine
 
@@ -91,7 +91,7 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 
 			// process the $rawcoefficientreturn into a fraction
 			$slash = strpos($rawcoefficientreturn,"/");
-			$temp = substr($rawcoefficientreturn,0,$slash);
+			//$temp = substr($rawcoefficientreturn,0,$slash);
 			if($slash>-2) {
 				$length = strlen($rawcoefficientreturn);
 				$coefficients[$i][0] = substr($rawcoefficientreturn,0,$slash); // top
@@ -139,6 +139,38 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 		return null;
  	}
 }
+
+// function formpoly3fromresults(results, [IsFraction=TRUE])
+// Creates an array of coefficients whose position in the array
+// corresponds to the power of the variable
+// Each element is stored in the form of an array(numerator, denominator).
+//
+// INPUTS:
+//
+// $results: from dividepoly3 $results[*][1]
+//
+// Optional
+// IsFraction: a boolan that stores the the coeificients as fractions
+//
+// Example: $quotient = formpoly3fromstring($results[0][1])
+//
+//
+function formpoly3fromresults($results, $IsFraction=TRUE)
+{
+	if(is_null(results)) {
+		echo "formpoly3fromresults - the polynomial is null - FAIL.<br/>\r\n";
+        return null;
+	}
+
+    $power = $results[0];
+    for ($i = 0; $i < $power; $i++) {
+        $returnval[$i] = array(0,1);
+    }
+
+    $returnval[$power] = $results[1];
+	return $returnval;
+}
+
 
 // internal only
 function poly3_breakmonomial($variable, $monominal)
@@ -457,7 +489,7 @@ function poly3_decimalsubtract($minuend,$subtrahend){
 //  $result[0][1] = the power, array(numerator, denominator) (quotient for this step)
 //  $result[0][2] = a poly3 polynomial by multipling $result[0][1] and the divisor
 //  $result[0][3] = the poly3 polynomial that needs to be subtracted (-$result[0][2])
-//  $result[0][1] = the resultant divided (at least 1 power smaller than the previous
+//  $result[1][0] = the resultant divided (at least 1 power smaller than the previous
 //  etc.
 //
 //
@@ -906,16 +938,16 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 				if (!array_key_exists($k,$difference)) {
 					// remainder
 					if(($k==$remainderColumn)&&($i ==($rows-1))) {
-						if($showZeroRemainder){
-						    $line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";
-						} else {
-						    $line2 .= "<td class='right'>&nbsp;</td>";
-						}
+                        if($showZeroRemainder){
+                            $line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";
+                        } else {
+                            $line2 .= "<td class='right'>&nbsp;</td>";
+                        }
 					}
 					else {
 						$line2 .= "<td class='right'>&nbsp;</td>";
 					}
-				}
+                }
 				else {
 					if($IsFraction) {
 						$coefarray = $difference[$k];
@@ -933,33 +965,33 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 						$sign = "";
 					}
 					if($coef==0){
-						if($HideZeroDifference) {
-						    if(($k==$remainderColumn)&&($i ==($rows-1))){
-							if($showZeroRemainder){
-							    $line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";
-							} else {
-							    $line2 .= "<td class='right'>&nbsp;</td>";
-							}
-			
-						    }
-						    else {
-							$line2 .= "<td class='right'>&nbsp;</td>";
-						    }
-			
-						}
-						else {
-						    $line2 .= "<td class='right'>$MathSymbol+0".poly3_variablepower($k,$variable)."$MathSymbol</td>";
-						}
-					}
+                        if($HideZeroDifference) {
+                            if(($k==$remainderColumn)&&($i ==($rows-1))){
+                                if($showZeroRemainder){
+                                    $line2 .= "<td class='right'>$MathSymbol"."0$MathSymbol</td>";
+                                } else {
+                                    $line2 .= "<td class='right'>&nbsp;</td>";
+                                }
+
+                            }
+                            else {
+                                $line2 .= "<td class='right'>&nbsp;</td>";
+                            }
+
+                        }
+                        else {
+                            $line2 .= "<td class='right'>$MathSymbol+0".poly3_variablepower($k,$variable)."$MathSymbol</td>";
+                        }
+                    }
 					else {
-						$showZeroRemainder = false;
-						$line2.= "<td class='right'>$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$MathSymbol</td>";
+                        $showZeroRemainder = false;
+                        $line2.= "<td class='right'>$MathSymbol$sign".poly3_coefficientstring($coefarray,$coef,$k).poly3_variablepower($k,$variable)."$MathSymbol</td>";
 					}
-			}
-		    }
-		    $Table .= $line1."</tr>\r\n";
-		    $Table .= $line2."</tr>\r\n";
-		}
+                }
+            }
+            $Table .= $line1."</tr>\r\n";
+            $Table .= $line2."</tr>\r\n";
+        }
 	}
 
 	$Table .= "</table>\r\n";
@@ -967,6 +999,7 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 	return $Table;
 }
 
+// File version : 7.4	- Fixed documentation Bug. Added formpoly3fromresults.
 // File version : 7.3	- Bug in the poly3_breakmonomial - missing th "+" sign, bug in the divide when the Remiander constant was 0 but the first degree remainder was not
 // File version : 7.2	- Bug in the divide fraction routine were I was not stopping when the divisor had a greater powere then the dividend.
 // File version : 7.1	- Changed ($quotientPower != NULL) to !is_null($quotientPower) - the former would skip constants.

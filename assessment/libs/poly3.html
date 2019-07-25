@@ -9,6 +9,7 @@ File Version : 6
 </p>
 <ul>
 <li><a href="#formpoly3fromstring">formpoly3fromstring</a></li>
+<li><a href="#formpoly3fromresults">formpoly3fromresults</a></li>
 <li><a href="#writepoly3">writepoly3</a></li>
 <li><a href="#dividepoly3">dividepoly3</a></li>
 <li><a href="#longdivisionpoly3">longdivisionpoly3</a></li>
@@ -32,6 +33,22 @@ IsFraction: a boolan that stores the the coeificients as fractions
 <p>
 Example: $dividend = formpolyfromstring("x","3x^4+2x^2+1") <br/>
 $dividend = array("1,0,2,0,3")
+</p>
+
+<h3><a name="formpoly3fromresults">formpoly3fromresults</a></h3>
+<p>
+Creates an array of coefficients whose position in the array
+corresponds to the power of the variable
+Each element is stored in the form of an array(numerator, denominator).
+</p>
+<p>
+INPUTS:<br/>
+$results: from dividepoly3 $results[*][1]<br/>
+<br/>
+Optional<br/>
+IsFraction: a boolan that stores the the coeificients as fractions<br/>
+<br/>
+Example: $quotient = formpoly3fromstring($results[0][1])
 </p>
 
 <h3><a name="writepoly3">writepoly3</a></h3>
@@ -76,7 +93,7 @@ $result will contain an array in the following form <br/>
  $result[0][1] = the power, array(numerator, denominator) <br/>
  $result[0][2] = a poly3 polynomial by multipling $result[0][1] and the divisor <br/>
  $result[0][3] = the poly3 polynomial that needs to be subtracted (-$result[0][2]) <br/>
- $result[0][1] = the resultant divided (at least 1 power smaller than the previous <br/>
+ $result[1][0] = the resultant divided (at least 1 power smaller than the previous <br/>
  etc.
 </p>
 

@@ -21,9 +21,9 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  gbviewassess.php: don't do Save Changes redirect until submission completes
   Large number answers not working (qn-val)
   JSXgraph questions not working - MOM 75910 for example
+    Need to modify library, and existing questions
   ? gradeallq2: unexpected token ) on 100
   Time limit overtimes when not allowed
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
@@ -88,6 +88,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X gbviewassess.php: don't do Save Changes redirect until submission completes
 X itemanalysis2: Full Credit to visible question giving points for non-visible ones
 X LTI menu: latepass link should stay in same tab.
     Make sure redeem latepass page redirects back to new assessplayer
