@@ -50,6 +50,7 @@ $sessiondata['secsalt'] = "12345";
 $cid = "embedq";
 $showtips = 2;
 $useeqnhelper = 4;
+$courseUIver = 1;
 
 $placeinhead = '<style type="text/css"> html,body {margin:0px;} </style>';
 

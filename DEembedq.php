@@ -21,6 +21,7 @@ $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 3;
 $showtips = 2;
 $useeqnhelper = 4;
+$courseUIver = 1;
 
 if (isset($_GET['jssubmit']) && $_GET['jssubmit']==1) {
 	$jssubmit = true;

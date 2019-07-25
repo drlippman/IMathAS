@@ -68,6 +68,7 @@ foreach(array('graphdisp','mathdisp','useed') as $key) {
 $showtips = 2;
 $useeqnhelper = 4;
 $useeditor = 1;
+$courseUIver = 1;
 $sessiondata['secsalt'] = "12345";
 $cid = "embedq";
 
