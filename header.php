@@ -122,7 +122,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	}
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
 		function rendermathnode(node) {
-			if (MathJax) {
+			if (window.MathJax) {
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
 			} else {
 				setTimeout(function() {rendermathnode(node);}, 100);
