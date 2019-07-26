@@ -14,7 +14,7 @@
         <div class="pane-header flexrow" id="error_hdr">
           <div style="flex-grow: 1">
             <icons name="alert" />
-            {{ $t('error.error') }}
+            {{ errorTitle }}
           </div>
           <button
             type = "button"
@@ -49,8 +49,14 @@ export default {
     Icons
   },
   computed: {
+    isError () {
+      return (typeof this.errormsg == 'string');
+    },
+    errorTitle () {
+      return this.isError ? this.$t('error.error') : this.errormsg.title;
+    },
     errorMsg () {
-      return this.$t('error.' + this.errormsg);
+      return this.isError ? this.$t('error.' + this.errormsg) : this.errormsg.msg;
     }
   },
   methods: {

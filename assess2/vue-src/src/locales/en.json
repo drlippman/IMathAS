@@ -226,8 +226,10 @@
     "written_example": "Written Example"
   },
   "unload": {
-    "unsubmitted_questions": "You have entered answered that have not yet been submitted. Are you sure you want to leave?",
-    "unsubmitted_assessment": "You have attempted every question, but have not submitted your assessment yet. Don't forget to come back and do that."
+    "alert": "Alert",
+    "unsubmitted_questions": "You have entered answers that have not yet been submitted. Are you sure you want to leave?",
+    "unsubmitted_assessment": "You have not submitted your assessment for grading yet. Don't forget to come back and do that.",
+    "unsubmitted_done_assessment": "You have attempted every question, but have not submitted your assessment yet. Don't forget to come back and do that."
   },
   "pages": {
     "next": "Next Page"

@@ -34,7 +34,6 @@ To discuss:
   In new player, skip, is there any way to get to a score summary and
     end message display?
   Some way to submit all unsubmitted assessment attempts?
-    Or at least some designation in GB.
   Add way to reshow intro without leaving question
     Use case: embedding calculator into intro
     Maybe resource option to open in modal?
@@ -90,6 +89,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X GB designation of unsubmitted attempts.
 X gbviewassess.php: don't do Save Changes redirect until submission completes
 X itemanalysis2: Full Credit to visible question giving points for non-visible ones
 X LTI menu: latepass link should stay in same tab.

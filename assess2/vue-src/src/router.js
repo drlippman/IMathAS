@@ -123,7 +123,6 @@ const router = new Router({
       name: 'summary',
       component: Summary,
       beforeEnter: (to, from, next) => {
-        console.log(store.assessInfo.submitby);
         // if active attempt or not avail, route to Launch
         if ((store.assessInfo.available === 'yes' ||
           (store.assessInfo.available === 'practice' && store.assessInfo.in_practice)) &&

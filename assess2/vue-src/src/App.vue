@@ -23,6 +23,11 @@ export default {
   components: {
     ErrorDialog
   },
+  data: function () {
+    return {
+      prewarned: false
+    };
+  },
   computed: {
     assessInfoLoaded () {
       return (store.assessInfo !== null);
@@ -57,11 +62,20 @@ export default {
       }
       if (Object.keys(actions.getChangedQuestions()).length > 0) {
         evt.preventDefault();
+        this.prewarned = false;
         return this.$t('unload.unsubmitted_questions');
-      } else if (store.assessInfo.submitby === 'by_assessment' && !unanswered) {
+      } else if (store.assessInfo.submitby === 'by_assessment' &&
+        store.assessInfo.has_active_attempt &&
+        !this.prewarned
+      ) {
         evt.preventDefault();
-        return this.$t('unload.unsubmitted_assessment');
+        if (!unanswered) {
+          return this.$t('unload.unsubmitted_done_assessment');
+        } else {
+          return this.$t('unload.unsubmitted_assessment');
+        }
       }
+      this.prewarned = false;
     },
     clearError () {
       store.errorMsg = null;
@@ -69,6 +83,21 @@ export default {
   },
   created () {
     window.$(window).on('beforeunload', this.beforeUnload);
+    // Give a warning if the assessment is quiz-style and not submitted
+    // We're attaching this to breadcrumbs and nav buttons to avoid the default
+    // beforeunload
+    var warning = this.$t('unload.unsubmitted_assessment');
+    var self = this;
+    window.$('a').not('#app a, a[href="#"]').on('click', function (e) {
+      if (store.assessInfo.submitby === 'by_assessment' && store.assessInfo.has_active_attempt) {
+        if (!window.confirm(warning)) {
+          e.preventDefault();
+          return false;
+        } else {
+          self.prewarned = true;
+        }
+      }
+    });
   }
 };
 </script>
