@@ -113,7 +113,7 @@ row[1][1][0] first score - assessment
 row[1][1][0][0] = score
 row[1][1][0][1] = 0 no comment, 1 has comment - is comment in includecomments
 row[1][1][0][2] = show gbviewasid link: 0 no, 1 yes,
-row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT  + 10 if still active
+row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT, 5 UA  + 10 if still active
 row[1][1][0][4] = asid, or 'new' (or userid for assess2)
 row[1][1][0][5] = bitwise for dropped: 1 in past & 2 in cur & 4 in future & 8 attempted
 row[1][1][0][6] = 1 if had exception, = 2 if was latepass
@@ -1297,8 +1297,13 @@ function gbtable() {
 
 		if (($l['status']&3)>0 && ($thised>$now || !empty($GLOBALS['alwaysshowIP']))) {
 			$IP=1;
+			$UA=0;
+		} else if (($l['status']&1)>0 && $thised<$now) {
+			$IP=0;
+			$UA=1;
 		} else {
 			$IP=0;
+			$UA=0;
 		}
 
 		$hasSubmittedTake = ($l['status']&64)>0;
@@ -1332,11 +1337,15 @@ function gbtable() {
 				$gb[$row][1][$col][3] = 1;  //no credit
 				$pts = 0;
 			}
-		} else 	if ($IP==1) {
+		} else if ($IP==1) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;
-		} else	if (($l['status']&4)>0) {
+		} else if ($UA==1) {
+			$gb[$row][1][$col][0] = $pts; //the score
+			$gb[$row][1][$col][3] = 5;  //unsubmitted attempt
+			$countthisone =true;
+		} else if (($l['status']&4)>0) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 3;  //over time
 			$countthisone =true;

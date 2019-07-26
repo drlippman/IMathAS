@@ -381,7 +381,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "</div>";
 	}
 	gbstudisp($stu);
-	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>x</sup> Excused score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
+	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>x</sup> Excused score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
 
 	require("../footer.php");
 
@@ -581,7 +581,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$gbt = gbinstrdisp();
 	echo "</form>";
 	echo "</div>";
-	echo _('Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
+	echo _('Meanings:  IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score, <sup>x</sup> Excused score, <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
 	require("../footer.php");
 
 	/*if ($isteacher) {
@@ -1019,6 +1019,8 @@ function gbstudisp($stu) {
 					echo ' (NC)';
 				} else if ($gbt[1][1][$i][3]==2) {
 					echo ' (IP)';
+				} else if ($gbt[1][1][$i][3]==5) {
+					echo ' (UA)';
 				} else if ($gbt[1][1][$i][3]==3) {
 					echo ' (OT)';
 				} else if ($gbt[1][1][$i][3]==4) {
@@ -1740,6 +1742,8 @@ function gbinstrdisp() {
 							echo ' (NC)';
 						} else if ($gbt[$i][1][$j][3]==2) {
 							echo ' (IP)';
+						} else if ($gbt[$i][1][$j][3]==5) {
+							echo ' (UA)';
 						} else if ($gbt[$i][1][$j][3]==3) {
 							echo ' (OT)';
 						} else if ($gbt[$i][1][$j][3]==4) {

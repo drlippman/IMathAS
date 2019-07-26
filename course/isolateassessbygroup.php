@@ -158,10 +158,13 @@
 			$total = $line['score'];
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$isOvertime = ($line['status']&4) == 4;
+			$IP = ($line['status']&3)>0;
+			$UA = ($line['status']&1)>0;
 		} else {
 			$sp = explode(';',$line['bestscores']);
 			$scores = explode(",",$sp[0]);
 			if (in_array(-1,$scores)) { $IP=1;} else {$IP=0;}
+			$UA = 0;
 			for ($i=0;$i<count($scores);$i++) {
 				$total += getpts($scores[$i]);
 			}
@@ -218,9 +221,11 @@
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(NC)";
-			} else 	if ($IP==1 && $enddate>$now) {
+			} else if ($IP==1 && $enddate>$now) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(IP)";
-			} else	if ($isOvertime) {
+			} else if ($UA==1 && $enddate<$now) {
+				echo Sanitize::onlyFloat($total) . "&nbsp;(UA)";
+			} else if ($isOvertime) {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
 				echo Sanitize::onlyFloat($total) . "&nbsp;(PT)";

@@ -263,6 +263,8 @@
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$timeontask = $line['timeontask'];
 			$isOvertime = ($line['status']&4) == 4;
+			$IP = ($line['status']&3)>0;
+			$UA = ($line['status']&1)>0;
 		} else {
 			$total = 0;
 			$sp = explode(';',$line['bestscores']);
@@ -274,6 +276,7 @@
 			$timeused = $line['endtime']-$line['starttime'];
 			$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
+			$UA = 0;
 		}
 		$useexception = false;
 		if (isset($exceptions[$line['userid']])) {
@@ -355,6 +358,8 @@
 				echo "&nbsp;(NC)";
 			} else 	if ($IP==1 && $thisenddate>$now) {
 				echo "&nbsp;(IP)";
+			} else 	if ($UA==1 && $thisenddate<$now) {
+				echo "&nbsp;(UA)";
 			} else	if ($isOvertime) {
 				echo "&nbsp;(OT)";
 			} else if ($assessmenttype=="Practice") {
@@ -476,7 +481,7 @@
 	} else {
 		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true,false);</script>";
 	}
-	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
+	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";
 	echo '</form>';
 	require("../footer.php");
