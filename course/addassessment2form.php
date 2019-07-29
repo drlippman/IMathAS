@@ -557,7 +557,7 @@ $vueData = array(
 		<div class="blockitems hidden">
 			<label for="cntingb" class=form>Count:</label>
 			<span class=formright>
-				<select name="cntingb" id="cntingb">
+				<select name="cntingb" id="cntingb" v-model="cntingb">
 					<option value="1">Count in Gradebook</option>
 					<option value="0">Don't count in grade total and hide from students</option>
 					<option value="3">Don't count in grade total</option>
