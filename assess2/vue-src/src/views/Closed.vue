@@ -59,7 +59,7 @@
         </button>
       </p>
 
-      <div v-if = "canViewAll && showReset">
+      <p v-if = "canViewAll && showReset">
         {{ $t('launch.resetmsg') }}
         <br/>
         <button
@@ -69,20 +69,17 @@
         >
           {{ $t('launch.doreset') }}
         </button>
-      </div>
-      <div v-else-if = "canViewAll">
-        <p>
+      </p>
+      <p v-if = "canViewAll">
         {{ $t('closed.teacher_preview') }}
-        </p>
-        <p>
-          <button
-            class = "primary"
-            @click = "teacherPreview"
-          >
-            {{ $t('closed.teacher_preview_button') }}
-          </button>
-        </p>
-      </div>
+        <br/>
+        <button
+          class = "primary"
+          @click = "teacherPreview"
+        >
+          {{ $t('closed.teacher_preview_button') }}
+        </button>
+      </p>
 
     </div>
     <div v-if="settings.hasOwnProperty('prev_attempts') && settings.prev_attempts.length > 0" >
@@ -213,7 +210,15 @@ export default {
       return store.assessInfo.can_view_all;
     },
     showReset () {
-      return store.assessInfo.hasOwnProperty('show_reset');
+      return store.assessInfo.hasOwnProperty('show_reset') ||
+      (
+        store.assessInfo.is_teacher &&
+        !store.assessInfo.view_as_stu &&
+        (store.assessInfo.has_active_attempt ||
+          store.assessInfo.prev_attempts.length > 0 ||
+          store.assessInfo.has_unsubmitted_scored
+        )
+      )
     }
   },
   methods: {

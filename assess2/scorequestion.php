@@ -69,6 +69,9 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
   $end_attempt = false;
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
+  if ($canViewAll) {
+    $assess_info->overrideAvailable('yes');
+  }
 } else {
   echo '{"error": "not_avail"}';
   exit;

@@ -1,46 +1,57 @@
 <template>
   <div id="skip-question-header">
-    <div style="flex-grow: 1" id="skip-question-select"
-      role="navigation" :aria-label="$t('regions.qnav')"
-    >
-        <menu-button id="qnav"
-          :options = "navOptions"
-          :selected = "curOption"
-          @change = "changeQuestion"
-          searchby = "dispqn"
-        >
-          <template v-slot="{ option, selected }">
-            <skip-question-list-item
-              :showretry="anyHaveRetry"
-              :showretake="anyHaveRetake"
-              :option="option"
-              :selected="selected"
-            />
-          </template>
-        </menu-button>
+    <div class="flexrow wrap" style="flex-grow: 1">
+      <div id="skip-question-select"
+        role="navigation" :aria-label="$t('regions.qnav')"
+      >
+          <menu-button id="qnav"
+            :options = "navOptions"
+            :selected = "curOption"
+            @change = "changeQuestion"
+            searchby = "dispqn"
+          >
+            <template v-slot="{ option, selected }">
+              <skip-question-list-item
+                :showretry="anyHaveRetry"
+                :showretake="anyHaveRetake"
+                :option="option"
+                :selected="selected"
+              />
+            </template>
+          </menu-button>
 
-        <router-link
-          :to="'/skip/'+ (dispqn-1)"
-          tag="button"
-          :disabled="qn < (this.hasIntro ? 0 : 1)"
-          class="secondarybtn"
-          id="qprev"
-          :aria-label="$t('previous')"
-          v-if = "showNextPrev"
+          <router-link
+            :to="'/skip/'+ (dispqn-1)"
+            tag="button"
+            :disabled="qn < (this.hasIntro ? 0 : 1)"
+            class="secondarybtn"
+            id="qprev"
+            :aria-label="$t('previous')"
+            v-if = "showNextPrev"
+          >
+            <icons name="left"/>
+          </router-link>
+          <router-link
+            :to="'/skip/' + (dispqn+1)"
+            tag="button"
+            :disabled="qn>=ainfo.questions.length-1"
+            class="secondarybtn"
+            id="qnext"
+            :aria-label="$t('next')"
+            v-if = "showNextPrev"
+          >
+            <icons name="right" />
+          </router-link>
+        </div>
+        <button
+          v-if = "ainfo.submitby === 'by_assessment'"
+          class="primary"
+          id="skipheadersubmit"
+          @click="handleSubmit"
+          :disabled = "!canSubmit"
         >
-          <icons name="left"/>
-        </router-link>
-        <router-link
-          :to="'/skip/' + (dispqn+1)"
-          tag="button"
-          :disabled="qn>=ainfo.questions.length-1"
-          class="secondarybtn"
-          id="qnext"
-          :aria-label="$t('next')"
-          v-if = "showNextPrev"
-        >
-          <icons name="right" />
-        </router-link>
+          {{ $t('header.assess_submit') }}
+        </button>
     </div>
     <question-header-icons
       :showscore = "showScore"
@@ -56,7 +67,7 @@ import QuestionHeaderIcons from '@/components/QuestionHeaderIcons.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import SkipQuestionListItem from '@/components/SkipQuestionListItem.vue';
 import Icons from '@/components/widgets/Icons.vue';
-import { store } from '../basicstore';
+import { store, actions } from '../basicstore';
 
 export default {
   name: 'SkipQuestionHeader',
@@ -75,6 +86,9 @@ export default {
   computed: {
     ainfo () {
       return store.assessInfo;
+    },
+    canSubmit () {
+      return (!store.inTransit);
     },
     curQData () {
       return store.assessInfo.questions[this.qn];
@@ -144,6 +158,9 @@ export default {
   methods: {
     changeQuestion (newqn) {
       // this.$router.push({ path: '/skip/' + newqn});
+    },
+    handleSubmit () {
+      actions.submitAssessment();
     }
   }
 };
@@ -171,7 +188,7 @@ export default {
 }
 
 #skip-question-select #qprev, #skip-question-select #qnext {
-    margin: 0;
+  margin: 0;
 }
 #qprev, #qnext {
   padding: 0px 8px;
@@ -184,6 +201,9 @@ export default {
 #qnext {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+#skip-question-select #qnext {
+  margin-right: 12px;
 }
 .headericons > * {
   margin-left: 8px;

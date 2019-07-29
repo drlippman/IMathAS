@@ -413,6 +413,13 @@ class AssessInfo
     );
   }
 
+  /*
+    Override the "available" setting
+   */
+  public function overrideAvailable($val) {
+    $this->assessData['available'] = $val;
+  }
+
   /**
    * Set the 'available' assessData based on other settings
    */

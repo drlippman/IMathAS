@@ -20,17 +20,23 @@
       :grace="ainfo.timelimit_grace">
     </timer>
 
-    <div class="flexgroup" v-if = "assessSubmitLabel != ''">
+    <div class="flexgroup" v-if = "saveInHeader">
       <button
-        v-if = "saveWorkLabel != ''"
+        v-if = "saveStatus === 3"
         class = "secondary"
         @click = "handleSaveWork"
         :disabled = "!canSubmit"
       >
-        {{ saveWorkLabel }}
+        {{ $t('header.work_save') }}
       </button>
+      <span
+        v-if = "saveStatus === 1 || saveStatus === 2"
+        class = "noticetext"
+      >
+        {{ saveStatus === 1 ? $t('header.work_saving') : $t('header.work_saved') }}
+      </span>
       <button
-        v-if = "assessSubmitLabel != ''"
+        v-if = "assessSubmitLabel !== ''"
         :class="{primary: ainfo.submitby === 'by_assessment' }"
         @click="handleSubmit"
         :disabled = "!canSubmit"
@@ -151,8 +157,11 @@ export default {
       let nQuestions = this.ainfo.questions.length;
       return this.$t('header.answered', { n: this.qAttempted, tot: nQuestions });
     },
+    saveInHeader () {
+      return (this.ainfo.submitby === 'by_assessment');
+    },
     assessSubmitLabel () {
-      if (this.ainfo.submitby === 'by_assessment') {
+      if (this.ainfo.submitby === 'by_assessment' && this.ainfo.displaymethod !== 'skip') {
         return this.$t('header.assess_submit');
       } else {
         // don't have
@@ -160,19 +169,20 @@ export default {
         // return this.$t('header.done');
       }
     },
-    saveWorkLabel () {
+    saveStatus () {
+      // returns 0 if nothing to display, 1 if saving, 2 if saved, 3 if ready to save
       if (this.ainfo.submitby === 'by_assessment') {
         if (store.autoSaving) {
-          return this.$t('header.work_saving');
+          return 1;
         } else if (Object.keys(store.autosaveQueue).length === 0 &&
           !store.somethingDirty
         ) {
-          return this.$t('header.work_saved');
+          return 2;
         } else {
-          return this.$t('header.work_save');
+          return 3;
         }
       } else {
-        return '';
+        return 0;
       }
     },
     showPrint () {

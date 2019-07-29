@@ -165,7 +165,10 @@ export default {
     showReset () {
       return this.aInfo.is_teacher &&
         !this.aInfo.view_as_stu &&
-        (this.aInfo.has_active_attempt || this.aInfo.prev_attempts.length > 0);
+        (this.aInfo.has_active_attempt ||
+          this.aInfo.prev_attempts.length > 0 ||
+          this.aInfo.has_unsubmitted_scored
+        );
     },
     hasExit () {
       return (window.exiturl && window.exiturl !== '');

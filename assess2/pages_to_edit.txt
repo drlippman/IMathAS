@@ -1,4 +1,5 @@
 TODOs:
+  Investigate: Add "Summary" view to question navigation in HW-mode, skip.
   Equation editor - make blur triggers in Firefox. Alt for closing?
   /apple-touch-icon.png
   /apple-touch-icon-precomposed.png
@@ -89,6 +90,9 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Move Submit Assessment to Skip header, after next/prev
+X Check answer button color to secondary
+X Instructor preview of quizzes broken
 X GB designation of unsubmitted attempts.
 X gbviewassess.php: don't do Save Changes redirect until submission completes
 X itemanalysis2: Full Credit to visible question giving points for non-visible ones

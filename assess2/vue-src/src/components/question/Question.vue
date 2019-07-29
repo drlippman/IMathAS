@@ -36,7 +36,7 @@
       <button
         type = "button"
         @click = "submitQuestion"
-        class = "primary"
+        :class = "submitClass"
         :disabled = "!canSubmit"
       >
         {{ submitLabel }}
@@ -101,6 +101,10 @@ export default {
           this.state === 2
       )
       );
+    },
+    submitClass () {
+      return (store.assessInfo.submitby === 'by_assessment') ?
+        'secondary' : 'primary';
     },
     showScore () {
       return (store.inProgress &&
