@@ -131,7 +131,7 @@ function setupLivePreview(qn) {
 			  }
 
 			};
-			if (typeof MathJax != "undefined") {
+			if (mathRenderer=="MathJax") {
 				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
 				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
 			} else {
