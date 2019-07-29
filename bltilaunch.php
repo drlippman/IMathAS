@@ -57,6 +57,45 @@ function reporterror($err) {
 	exit;
 }
 
+function generateToolState() {
+	if (function_exists("random_bytes")) {
+		$token = bin2hex(random_bytes(64));
+	} elseif (function_exists("openssl_random_pseudo_bytes")) {
+		$token = bin2hex(openssl_random_pseudo_bytes(64));
+	} else {
+		$token = '';
+		for ($i = 0; $i < 64; ++$i) {
+			$r = mt_rand (0, 35);
+			if ($r < 26) {
+				$c = chr(ord('a') + $r);
+			} else {
+				$c = chr(ord('0') + $r - 26);
+			}
+			$token .= $c;
+		}
+	}
+	return substr($token, 0, 64);
+}
+function do112relaunch() {
+	if (!isset($_REQUEST['platform_state'])) {
+		reporterror("Missing platform_state");
+	}
+
+	$_SESSION['lti_tool_state'] = generateToolState();
+	echo '<html><body><form id="theform" method="POST" action="'.Sanitize::encodeStringForDisplay($_REQUEST['relaunch_url']).'">
+		<input type=hidden name="tool_state" value="'.Sanitize::encodeUrlParam($_SESSION['lti_tool_state']).'">
+		<input type=hidden name="platform_state" value="'.Sanitize::encodeUrlParam($_REQUEST['platform_state']).'">
+		</form><script>document.getElementById("theform").submit();</script></body></html>';
+	exit;
+}
+
+function verify112relaunch() {
+	if ($_REQUEST['tool_state'] != $_SESSION['lti_tool_state']) {
+		reporterror("Invalid tool_state");
+		exit;
+	}
+}
+
 //start session
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',86400);
@@ -485,9 +524,15 @@ if (isset($_GET['launch'])) {
 		reporterror("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again");
 	}
 	if (empty($_REQUEST['user_id'])) {
+		if (isset($_REQUEST['relaunch_url'])) {
+			do112relaunch();
+		}
 		reporterror("Unable to launch - User information not provided (user_id is required)");
 	} else {
 		$ltiuserid = $_REQUEST['user_id'];
+	}
+	if (!empty($_REQUEST['tool_state'])) {
+		verify112relaunch();
 	}
 
 	if (empty($_REQUEST['context_id'])) {
@@ -1986,9 +2031,15 @@ if (isset($_GET['launch'])) {
 		reporterror("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again");
 	}
 	if (empty($_REQUEST['user_id'])) {
+		if (isset($_REQUEST['relaunch_url'])) {
+			do112relaunch();
+		}
 		reporterror("Unable to launch - User information not provided (user_id is required)");
 	} else {
 		$ltiuserid = $_REQUEST['user_id'];
+	}
+	if (!empty($_REQUEST['tool_state'])) {
+		verify112relaunch();
 	}
 
 	if (empty($_REQUEST['context_id'])) {
