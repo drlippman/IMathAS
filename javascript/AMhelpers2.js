@@ -1319,40 +1319,45 @@ function ineqtointerval(strw, intendedvar) {
   } else if (strw.match(/DNE/)) {
     return ['DNE'];
   }
-  var pat, interval;
-  if (pat = strw.match(/^(.*?)(<=?|>=?)(.*?)(<=?|>=?)(.*?)$/)) {
-    if (simplifyVariable(pat[3]) != simpvar) { // wrong var
-      return ['', 'wrongvar'];
-    } else if (pat[2].charAt(0) != pat[4].charAt(0)) { // mixes > and <
+  var pat, interval, out = [];
+  var strpts = strw.split(/\s*or\s*/);
+	for (var i=0; i<strpts.length; i++) {
+		str = strpts[i];
+    if (pat = str.match(/^(.*?)(<=?|>=?)(.*?)(<=?|>=?)(.*?)$/)) {
+      if (simplifyVariable(pat[3]) != simpvar) { // wrong var
+        return ['', 'wrongvar'];
+      } else if (pat[2].charAt(0) != pat[4].charAt(0)) { // mixes > and <
+        return ['', 'invalid'];
+      }
+      if (pat[2].charAt(0)=='<') {
+        interval = (pat[2]=='<'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='<'?')':']');
+      } else {
+        interval = (pat[2]=='>'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='>'?')':']');
+      }
+      out.push(interval);
+    } else if (pat = str.match(/^(.*?)(<=?|>=?)(.*?)$/)) {
+      if (simplifyVariable(pat[1])== simpvar) { // x> or x<
+        if (pat[2].charAt(0)=='<') { // x<
+          interval = '(-oo,' + pat[3] + (pat[2]=='<'?')':']');
+        } else { // x>
+          interval = (pat[2]=='>'?'(':'[') + pat[3] + ',oo)';
+        }
+        out.push(interval);
+      } else if (simplifyVariable(pat[3])== simpvar) { // 3<x or 3>x
+        if (pat[2].charAt(0)=='<') { // 3<x
+          interval = (pat[2]=='<'?'(':'[') + pat[1] + ',oo)';
+        } else { // x>
+          interval = '(-oo,' + pat[1] + (pat[2]=='>'?')':']');
+        }
+        out.push(interval);
+      } else {
+        return ['', 'wrongvar'];
+      }
+    } else {
       return ['', 'invalid'];
     }
-    if (pat[2].charAt(0)=='<') {
-      interval = (pat[2]=='<'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='<'?')':']');
-    } else {
-      interval = (pat[2]=='<'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='<'?')':']');
-    }
-    return [interval];
-  } else if (pat = strw.match(/^(.*?)(<=?|>=?)(.*?)$/)) {
-    if (simplifyVariable(pat[1])== simpvar) { // x> or x<
-      if (pat[2].charAt(0)=='<') { // x<
-        interval = '(-oo,' + pat[3] + (pat[2]=='<'?')':']');
-      } else { // x>
-        interval = (pat[2]=='<'?'(':'[') + pat[3] + ',oo)';
-      }
-      return [interval];
-    } else if (simplifyVariable(pat[3])== simpvar) { // 3<x or 3>x
-      if (pat[2].charAt(0)=='<') { // 3<x
-        interval = (pat[2]=='<'?'(':'[') + pat[1] + ',oo)';
-      } else { // x>
-        interval = '(-oo,' + pat[1] + (pat[2]=='<'?')':']');
-      }
-      return [interval];
-    } else {
-      return ['', 'wrongvar'];
-    }
-  } else {
-    return ['', 'invalid'];
   }
+  return [out.join("U")];
 }
 
 function parsecomplex(v) {
