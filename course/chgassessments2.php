@@ -234,7 +234,7 @@ if (!(isset($teacherid))) {
 				$qarr[':password'] = Sanitize::stripHtmlTags($_POST['assmpassword']);
 			}
 
-			if ($_POST['chgreqscoreaid'] !== 'DNC') {
+			if ($_POST['reqscoreaid'] !== 'DNC') {
 				$sets[] = "reqscore=:reqscore";
 				if ($_POST['reqscoreaid'] > 0) {
 					$qarr[':reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
@@ -378,7 +378,7 @@ if (!(isset($teacherid))) {
 			$sets[] = "LPcutoff=:LPcutoff";
 			$qarr[':LPcutoff'] = $row[3];
 		}
-		if ($_POST['chgcopyendmsg'] !== 'DNC') {
+		if ($_POST['copyendmsg'] !== 'DNC') {
 			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyendmsg'])));
 			$sets[] = "endmsg=:endmsg";
