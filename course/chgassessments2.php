@@ -214,9 +214,9 @@ if (!(isset($teacherid))) {
 			}
 
 			if ($_POST['timelimit'] !== '') {
-				$sets[] = "overtimegrace=:overtimegrace";
+				$sets[] = "overtime_grace=:overtimegrace";
 				$sets[] = "timelimit=:timelimit";
-				$sets[] = "overtimepenalty=:overtimepenalty";
+				$sets[] = "overtime_penalty=:overtimepenalty";
 				$timelimit = -1*round(Sanitize::onlyFloat($_POST['timelimit'])*60);
 				if (isset($_POST['allowovertime']) && $_POST['overtimegrace'] > 0) {
 					$timelimit = -1*$timelimit;
