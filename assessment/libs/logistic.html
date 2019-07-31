@@ -1,0 +1,43 @@
+<html>
+  <body>
+    <h1>Macro Library Logistic</h1>
+    <p>
+      Logistic regression functions, Version 1, July 2019
+    </p>
+    <ul>
+      <li><a href="#logisticregression">logisticregression</a></li>
+      <li><a href="#logisticpredict">logisticpredict</a></li>
+      <li><a href="#logisticsolve">logisticsolve</a></li>
+    </ul>
+
+    <h3><a name="logisticregression">logisticregression</a></h3>
+    <p>
+      logisticregression(x_array,y_array)
+    </p>
+    <p>
+      Fits a logistic curve to the data given in x_array and y_array.
+      Returns an <code>array(a,b,c)</code>, which are the coefficients for the
+      logistic curve <code>c / (1 + a e^(-b x))</code>.  The values will be accurate to
+      4 or 5 significant digits, but likely will not exactly match regression preformed
+      by other technology.
+    </p>
+
+    <h3><a name="logisticpredict">logisticpredict</a></h3>
+    <p>
+      logisticpredict(coefficients, x)
+    </p>
+    <p>
+      Uses an array of coefficients, returned by logisticregression, to predict the
+      output for the given x value.
+    </p>
+
+    <h3><a name="logisticsolve">logisticsolve</a></h3>
+    <p>
+      logisticsolve(coefficients, y)
+    </p>
+    <p>
+      Uses an array of coefficients, returned by logisticregression, to solve for
+      an input given a y value.
+    </p>
+  </body>
+</html>
