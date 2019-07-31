@@ -393,10 +393,9 @@ function setupDraw(qn) {
   window.drawla[qn] = todraw;
   window.canvases[qn] = allParams[qn].canvas;
   imathasDraw.initCanvases(qn);
-  var drawbtns = document.getElementById("qn"+qn).parentNode.querySelectorAll("[data-drawaction]");
-  for (i=0; i<drawbtns.length; i++) {
-    drawbtns[i].addEventListener('click', function() {
-      var target = event.target;
+  document.getElementById('drawtools'+qn).addEventListener('click', function(event) {
+    var target = event.target;
+    if (target.hasAttribute('data-drawaction')) {
       var action = target.getAttribute('data-drawaction');
       var qn = target.getAttribute('data-qn');
       if (action === 'clearcanvas') {
@@ -405,11 +404,11 @@ function setupDraw(qn) {
         var val = target.getAttribute('data-val');
         imathasDraw.settool(target, qn, val);
       }
-    });
-  }
+    }
+  });
   var a11ydrawbtn = document.getElementById("qn"+qn).parentNode.querySelector(".a11ydrawadd");
   if (a11ydrawbtn) {
-    a11ydrawbtn.addEventListener('click', function() {
+    a11ydrawbtn.addEventListener('click', function(event) {
       var qn = event.target.getAttribute('data-qn');
       imathasDraw.adda11ydraw(qn);
     });
