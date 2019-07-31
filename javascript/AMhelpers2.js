@@ -517,12 +517,12 @@ function setupLivePreview(qn, skipinitial) {
 			  RenderBuffer: function() {
 			      if (mathRenderer=="MathJax") {
 				      MathJax.Hub.Queue(
-					["Typeset",MathJax.Hub,this.buffer],
-					["PreviewDone",this]
+					      ["Typeset",MathJax.Hub,this.buffer],
+					      ["PreviewDone",this]
 				      );
 			      } else if (mathRenderer=="Katex") {
 			      	      renderMathInElement(this.buffer);
-				      if (typeof MathJax != "undefined" && $(this.buffer).children(".mj").length>0) {//has MathJax elements
+				      if (typeof MathJax != "undefined" && MathJax.version && $(this.buffer).children(".mj").length>0) {//has MathJax elements
 					      MathJax.Hub.Queue(["PreviewDone",this]);
 				      } else {
 					      this.PreviewDone();
