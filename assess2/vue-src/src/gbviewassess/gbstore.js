@@ -316,6 +316,9 @@ export const actions = {
               store.assessInfo.assess_versions.splice(data.aver, 1);
               actions.loadGbAssessVersion(response.scored_version, false);
             }
+            if (data.aver > 0) {
+              store.curAver = data.aver - 1;
+            }
           } else if (store.clearAttempts.type === 'qver') {
             // clear out any score overrides associated with this version
             let regex = new RegExp('^' + data.aver + '-' + data.qn + '-' + data.qver + '-');

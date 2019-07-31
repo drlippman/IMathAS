@@ -90,6 +90,8 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X On Delete this attempt, need to update attempt selector to other version
+X Single assessment exception page redirect not working (reporting invalid assessment ID)
 X Move Submit Assessment to Skip header, after next/prev
 X Check answer button color to secondary
 X Instructor preview of quizzes broken

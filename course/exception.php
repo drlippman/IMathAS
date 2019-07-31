@@ -29,6 +29,17 @@ if (isset($_GET['from'])) {
 	$from = 'gb';
 }
 
+if (!isset($_GET['asid']) || $asid == 0) {
+	//assess 2
+	$backurl = $GLOBALS['basesiteurl'] . "/assess2/gbviewassess.php?"
+		. Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'aid' => $aid, 'uid' => $uid,
+			'stu' => $stu, 'from' => $from, 'r' => $rpq));
+} else {
+	$backurl = $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?"
+		. Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'asid' => $asid, 'uid' => $uid,
+			'stu' => $stu, 'from' => $from, 'r' => $rpq));
+}
+
 $curBreadcrumb = $breadcrumbbase;
 if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
 	$curBreadcrumb .= "<a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
@@ -47,7 +58,8 @@ if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
 	}
 }
-$curBreadcrumb .= "<a href=\"gb-viewasid.php?cid=$cid&asid=" . Sanitize::onlyInt($asid) . "&uid=" . Sanitize::onlyInt($uid) . "\">Assessment Detail</a> &gt Make Exception\n";
+
+$curBreadcrumb .= "<a href=\"$backurl\">Assessment Detail</a> &gt Make Exception\n";
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -145,15 +157,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?cid=$cid&asid=" . Sanitize::onlyInt($asid) . "&uid=" . Sanitize::onlyInt($uid) . "&stu=" . Sanitize::onlyInt($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $backurl);
 
 	} else if (isset($_GET['clear'])) {
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['clear']));
 		$rpq =  Sanitize::randomQueryStringParam();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?"
-			. Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'asid' => $asid, 'uid' => $uid,
-				'stu' => $stu, 'from' => $from, 'r' => $rpq)));
+		header('Location: ' . $backurl);
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$uid));
