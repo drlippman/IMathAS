@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Batch create instructors
 //(c) 2017 David Lippman for Lumen Learning
- 
+
 
 ini_set("max_input_time", "1600");
 ini_set("max_execution_time", "1600");
@@ -85,11 +85,11 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     //log new account
 	$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
 	$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $newuserid:: Group: $newusergroupid, manually added by $userid"));
-	
+
 	$reqdata = array('added'=>$now, 'actions'=>array(array('by'=>$userid, 'on'=>$now, 'status'=>11, 'via'=>'batchcreate')));
 	$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
 	$stm->execute(array($newuserid, $now, json_encode($reqdata)));
-	
+
     //copy courses
     $i = 5;
     while (isset($data[$i]) && $data[$i]!='' && intval($data[$i])>0) {
@@ -119,12 +119,12 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
       }
       echo "Copying course {$sourcecid}<br/>";
       $uid = $newuserid;
-      
+
       $blockcnt = 1;
       $itemorder = serialize(array());
       $DBH->beginTransaction();
-      $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,istemplate,deftime,deflatepass,theme,ltisecret,blockcnt) ";
-      $query .= "SELECT name,:ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,showlatepass,:itemorder,available,0,deftime,deflatepass,theme,'',1 ";
+      $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,UIver,showlatepass,itemorder,available,istemplate,deftime,deflatepass,theme,ltisecret,blockcnt) ";
+      $query .= "SELECT name,:ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,UIver,showlatepass,:itemorder,available,0,deftime,deflatepass,theme,'',1 ";
       $query .= "FROM imas_courses WHERE id=:sourceid";
       $stm = $DBH->prepare($query);
       $stm->execute(array(':ownerid'=>$uid, ':itemorder'=>$itemorder, ':sourceid'=>$sourcecid));
@@ -256,7 +256,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
   } else {
   	  echo '<a href="utils.php">Utilities</a>';
   }
-  
+
   echo '</p>';
 } else {
   require("../header.php");
