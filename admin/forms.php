@@ -629,7 +629,7 @@ switch($_GET['action']) {
 				echo '<span class=form>'._('Copying: ').'</span><span class=formright>';
 				echo '<strong>'.Sanitize::encodeStringForDisplay($ctcinfo['name']).'</strong>';
 				echo '<input type="hidden" id="usetemplate" name="usetemplate" value="'.Sanitize::encodeStringForDisplay($ctc).'" />';
-				echo '<input type=hidden name=ekey value="'.Sanitize::encodeStringForDisplay($ctcekey).'"/>';
+				echo '<input type=hidden name=ctcekey value="'.Sanitize::encodeStringForDisplay($ctcekey).'"/>';
 				echo '<input type=hidden name=termsagree value="1"/>';
 			}
 			echo ' <a class=small href="addcourse.php?for='.Sanitize::onlyInt($for).'">Change</a>';

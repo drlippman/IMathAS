@@ -719,7 +719,7 @@ switch($_POST['action']) {
 				$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
 				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $courseownerid) ||
 					($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
-					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {
+					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ctcekey']) {
 						//did not provide valid enrollment key
 						$_POST['usetemplate'] = 0; //skip copying
 					}
