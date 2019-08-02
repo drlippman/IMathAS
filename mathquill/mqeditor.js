@@ -143,7 +143,6 @@ var MQeditor = (function($) {
     $(mqel).find(".mq-textarea > *")
       .on('focus.mqeditor', showEditor)
       .on('blur.mqeditor', function() {
-        console.log("blur called");
         blurTimer = setTimeout(hideEditor, 100);
       });
   }

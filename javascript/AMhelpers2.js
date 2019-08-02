@@ -236,27 +236,32 @@ function initqsclickchange() {
 	});
 }
 
-function initClearScoreMarkers() {
-  $('input[id^=qs],input[id^=qn],select[id^=qn]')
-    .off('input.clearmarkers change.clearmarkers')
-    .on('input.clearmarkers change.clearmarkers', function(e) {
-    var m;
-    var target = e.currentTarget
-    if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
-      $(target).removeClass(m[0]);
-      if (target.type == 'hidden') { // may be MQ box
-        $("#mqinput-"+target.id).removeClass(m[0]);
-      }
-    } else {
-      var wrap = $(target).closest("[id^=qnwrap]");
-      if (wrap.length > 0 &&
-        ((m = wrap[0].className.match(/(ansgrn|ansred|ansyel)/)) !== null)
-      ) {
-        wrap.removeClass(m[0]);
-        wrap.find(".scoremarker").remove();
-      }
+function clearScoreMarkers(e) {
+  var m;
+  var target = e.currentTarget
+  if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
+    $(target).removeClass(m[0]);
+    if (target.type == 'hidden') { // may be MQ box
+      $("#mqinput-"+target.id).removeClass(m[0]);
     }
-  });
+  } else {
+    var wrap = $(target).closest("[id^=qnwrap]");
+    if (wrap.length > 0 &&
+      ((m = wrap[0].className.match(/(ansgrn|ansred|ansyel)/)) !== null)
+    ) {
+      wrap.removeClass(m[0]);
+      wrap.find(".scoremarker").remove();
+    }
+  }
+}
+
+function initClearScoreMarkers() {
+  $('input[id^=qn]')
+    .off('input.clearmarkers')
+    .on('input.clearmarkers', clearScoreMarkers);
+  $('input[id^=qs],select[id^=qn]')
+    .off('change.clearmarkers')
+    .on('change.clearmarkers', clearScoreMarkers);
 }
 
 function initEnterHandler(qn) {
