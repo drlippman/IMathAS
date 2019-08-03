@@ -63,8 +63,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
 			$randkeys = $RND->array_rand($questions,count($questions));
 			$RND->shuffle($randkeys);
 		}
-    $questions[] = _('None of these');
-    array_push($randkeys,count($questions)-1);
+    if (count($questions) > 1) {
+      $questions[] = _('None of these');
+      array_push($randkeys,count($questions)-1);
+    }
 		$_SESSION['choicemap'][$qn] = $randkeys;
 		if (isset($GLOBALS['capturechoices'])) {
       $params['livepoll_choices'] = $questions;
@@ -80,7 +82,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
     if (!isset($displayformat)) {
       $displayformat = 'list';
     }
-    
+
 		if ($displayformat == 'column') { $displayformat = '2column';}
 
 		if (substr($displayformat,1)=='column') {
