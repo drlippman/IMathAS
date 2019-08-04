@@ -304,27 +304,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 			}
 			return false;
 		}
-		function showhidefb(el,n) {
-			el.style.display="none";
-			document.getElementById("feedbackholder"+n).style.display = "inline";
-			return false;
-			}
-		function showhideallfb(s) {
-			s.style.display="none";
-			var els = document.getElementsByTagName("a");
-			for (var i=0;i<els.length;i++) {
-				if (els[i].className.match("feedbacksh")) {
-					els[i].style.display="none";
-				}
-			}
-			var els = document.getElementsByTagName("span");
-			for (var i=0;i<els.length;i++) {
-				if (els[i].id.match("feedbackholder")) {
-					els[i].style.display="inline";
-				}
-			}
-			return false;
-		}</script>';
+	</script>';
 
 	require("../header.php");
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
@@ -776,11 +756,9 @@ function gbstudisp($stu) {
 			echo '<th>'._('Due Date').'</th>';
 			$sarr .= ",'D'";
 		}
-		//echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
 		echo '<th>', _('Feedback');
-		// Disable for now, since we can't do this for assess2 right now
-		//echo '<br/>';
-		//echo '<a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($stu).',\'all\')">', _('View All'), '</a>';
+		echo '<br/>';
+		echo '<a href="#" class="small feedbacksh pointer" onclick="return showfb('.Sanitize::onlyInt($stu).',\'all\')">', _('View All'), '</a>';
 		echo '</th>';
 		$sarr .= ",'N'";
 	}
