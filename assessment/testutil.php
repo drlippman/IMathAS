@@ -845,19 +845,27 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 		}
 		if ($attempts[$qn]>0 && $showeachscore) {
 			if (strpos($scores[$qn],'~')===false) {
-				echo "<br/>", _('Score on last attempt:'). " ".($scores[$qn]<0? 'N/A':$scores[$qn]).". ". _('Score in gradebook:'), " ".($bestscores[$qn]<0? 'N/A':$bestscores[$qn]);
+				echo "<br/>", _('Score on last attempt:'). " ".($scores[$qn]<0? 'N/A':$scores[$qn]).". ";
 			} else {
-				echo "<br/>", _('Score on last attempt:'), " (" . str_replace('~', ', ',$scores[$qn]) . '), ';
-				echo _('Score in gradebook:'), " (" . str_replace('~', ', ',$bestscores[$qn]) . '), ';
-				$ptposs = $qi[$questions[$qn]]['answeights'];
-				for ($i=0; $i<count($ptposs)-1; $i++) {
-					$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
+				echo "<br/>", _('Score on last attempt:'), " (" . str_replace('~', ', ',$scores[$qn]) . '). ';
+			}
+			if (strpos($bestscores[$qn],'~')===false) {
+				echo _('Score in gradebook:'), " ".($bestscores[$qn]<0? 'N/A':$bestscores[$qn]);
+			} else {
+				echo _('Score in gradebook:'), " (" . str_replace('~', ', ',$bestscores[$qn]) . ') ';
+				if (isset($qi[$questions[$qn]]['answeights']) &&
+					count($qi[$questions[$qn]]['answeights']) == substr_count($bestscores[$qn], '~') + 1
+				) {
+					$ptposs = $qi[$questions[$qn]]['answeights'];
+					for ($i=0; $i<count($ptposs)-1; $i++) {
+						$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
+					}
+					//adjust for rounding
+					$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
+					$ptposs[count($ptposs)-1] += $diff;
+					$ptposs = implode(', ',$ptposs);
+					echo ', ', _('Out of:'), " ($ptposs)";
 				}
-				//adjust for rounding
-				$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
-				$ptposs[count($ptposs)-1] += $diff;
-				$ptposs = implode(', ',$ptposs);
-				echo _('Out of:'), " ($ptposs)";
 			}
 		}
 
