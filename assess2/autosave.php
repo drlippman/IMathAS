@@ -118,7 +118,7 @@ if (!$assess_record->checkVerification($verification)) {
   // grab question settings data with HTML to update front-end
   $showscores = $assess_info->showScoresDuring();
   $assessInfoOut['questions'] = array();
-  foreach ($qns as $qn) {
+  foreach ($qns as $qn=>$parts) {
     $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
   }
   $assessInfoOut['error'] = "already_submitted";
