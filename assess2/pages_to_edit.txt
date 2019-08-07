@@ -1,4 +1,5 @@
 TODOs:
+  In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
   Investigate: Add "Summary" view to question navigation in HW-mode, skip.
   Equation editor - make blur triggers in Firefox. Alt for closing?
   /apple-touch-icon.png
@@ -32,9 +33,6 @@ Bugs:
   Average not showing until not IP
 
 To discuss:
-  For LTI users (and others?) provide link to gradebook if there are previous
-    quiz takes and can review in GB.
-  Show quiz score in GB for teacher, even if not submitted?
   In new player, skip, is there any way to get to a score summary and
     end message display?
   Some way to submit all unsubmitted assessment attempts?
@@ -61,6 +59,7 @@ Minor TODOs:
   Review showanswer button stuff in HtmlGenerator (use setShowAnswerButton instead?)
   Categories that are assessments: provide link to them in summary view
   Math in Paged Full titles not rendered
+  In gradebook, if can retake, provide retake link back to assessment.
 
 Future Todos:
   Build modal for redeeming latepasses for LTI users.

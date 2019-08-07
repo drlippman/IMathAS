@@ -23,7 +23,6 @@ class FunctionExpressionScorePart implements ScorePart
 
         $scorePartResult = new ScorePartResult();
 
-        $RND = $this->scoreQuestionParams->getRandWrapper();
         $options = $this->scoreQuestionParams->getVarsForScorePart();
         $qn = $this->scoreQuestionParams->getQuestionNumber();
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
@@ -143,9 +142,9 @@ class FunctionExpressionScorePart implements ScorePart
                 if ($fromto[2*$j+1]==$fromto[2*$j]) {
                     $tps[$i][$j] = $fromto[2*$j];
                 } else if ($restrictvartoint[$j]) {
-                    $tps[$i][$j] = $RND->rand($fromto[2*$j],$fromto[2*$j+1]);
+                    $tps[$i][$j] = rand($fromto[2*$j],$fromto[2*$j+1]);
                 } else {
-                    $tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
+                    $tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
                 }
             }
         }
