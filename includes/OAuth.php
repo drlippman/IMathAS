@@ -407,16 +407,14 @@ class OAuthRequest {
   public function get_normalized_http_url() {
     $parts = parse_url($this->http_url);
 
-    $port = @$parts['port'];
-    $scheme = $parts['scheme'];
-    $host = $parts['host'];
-    $path = @$parts['path'];
-
-    $port or $port = ($scheme == 'https') ? '443' : '80';
+    $scheme = (isset($parts['scheme'])) ? $parts['scheme'] : 'http';
+    $port = (isset($parts['port'])) ? $parts['port'] : (($scheme == 'https') ? '443' : '80');
+    $host = (isset($parts['host'])) ? strtolower($parts['host']) : '';
+    $path = (isset($parts['path'])) ? $parts['path'] : '';
 
     if (($scheme == 'https' && $port != '443')
         || ($scheme == 'http' && $port != '80')) {
-      $host = "$host:$port";
+        $host = "$host:$port";
     }
     return "$scheme://$host$path";
   }
