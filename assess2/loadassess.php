@@ -90,6 +90,9 @@ if ($canViewAll && $userid !== $uid) {
   $assessInfoOut['stu_fullname'] = $row['LastName'] . ', ' . $row['FirstName'];
 }
 
+// set userid
+$assessInfoOut['userid'] = $uid;
+
 //set is_lti and is_diag
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0;
 $assessInfoOut['is_diag'] = isset($sessiondata['isdiag']);
@@ -170,7 +173,7 @@ if ($assessInfoOut['is_diag']) {
   $assessInfoOut['diag_userid'] = substr($username,0,strpos($username,'~'));
 }
 
-$assessInfoOut['useMQ'] = (!isset($sessiondata['userprefs']['useeqed']) || 
+$assessInfoOut['useMQ'] = (!isset($sessiondata['userprefs']['useeqed']) ||
   $sessiondata['userprefs']['useeqed'] == 1);
 
 //prep date display

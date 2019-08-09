@@ -190,7 +190,8 @@
     "scored_attempts": "Scored Attempts",
     "all_attempts": "All Attempts",
     "date": "Date",
-    "score": "Score"
+    "score": "Score",
+    "viewingb": "Review work in gradebook"
   },
   "penalties": {
     "applied": "Penalties applied",

@@ -1,5 +1,4 @@
 TODOs:
-  In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
   Investigate: Add "Summary" view to question navigation in HW-mode, skip.
   Equation editor - make blur triggers in Firefox. Alt for closing?
   /apple-touch-icon.png
@@ -92,6 +91,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
 X On Delete this attempt, need to update attempt selector to other version
 X Single assessment exception page redirect not working (reporting invalid assessment ID)
 X Move Submit Assessment to Skip header, after next/prev

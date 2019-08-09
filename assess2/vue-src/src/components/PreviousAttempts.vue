@@ -22,6 +22,9 @@
         </td>
       </tr>
     </table>
+    <p v-if="showGbLink">
+      <a :href="gbUrl">{{ $t('prev.viewingb') }}</a>
+    </p>
   </div>
 </template>
 
@@ -40,6 +43,20 @@ export default {
     },
     ainfo () {
       return store.assessInfo;
+    },
+    showGbLink () {
+      let viewingb = store.assessInfo.viewingb;
+      return ((viewingb == 'immediately' || viewingb == 'after_take') &&
+        this.prevAttempts.length > 0 &&
+        !store.assessInfo.can_view_all
+      );
+    },
+    gbUrl () {
+      let url = 'gbviewassess.php?';
+      url += 'cid=' + store.cid;
+      url += '&aid=' + store.aid;
+      url += '&uid=' + store.assessInfo.userid;
+      return url;
     }
   }
 };
