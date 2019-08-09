@@ -1767,6 +1767,10 @@ if (isset($_GET['launch'])) {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of ".Sanitize::encodeStringForDisplay($sessiondata['ltitlwrds']).".  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($sessiondata['ltitlwrds']).".</p>";
 		echo '<div class="textright"><input type="submit" value="Continue" /></div>';
+
+		if ($sessiondata['lticanuselatepass']) {
+			echo "<p><a href=\"$imasroot/course/redeemlatepass.php?from=ltitimelimit&cid=".Sanitize::encodeUrlParam($sessiondata['ltiitemcid'])."&aid=".Sanitize::encodeUrlParam($sessiondata['ltiitemid'])."\">", _('Use LatePass'), "</a></p>";
+		}
 	} else {
 		echo ">";
 	}
@@ -2686,6 +2690,17 @@ if ($keyparts[0]=='aid') {
 	$sessiondata['ltiitemtype']=0;
 	$sessiondata['ltiitemver']=$aver;
 	$sessiondata['ltiitemid'] = $aid;
+
+	$sessiondata['lticanuselatepass'] = false;
+	if ($_SESSION['ltirole']!='instructor' && $line['allowlate']>0) {
+		$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$latepasshrs = $stm->fetchColumn(0);
+		require_once("./includes/exceptionfuncs.php");
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $latepasses, $latepasshrs);
+		list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptionrow, $line);
+		$sessiondata['lticanuselatepass'] = $canuselatepass;
+	}
 }  else if ($keyparts[0]=='cid') { //is cid
 	$sessiondata['ltiitemtype']=1;
 	$sessiondata['ltiitemid'] = $cid;
