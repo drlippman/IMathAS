@@ -906,7 +906,8 @@ export const actions = {
           qs.push(j);
         }
         data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
-        delete data.interquestion_text;
+        // don't delete, as we may use it for print version
+        // delete data.interquestion_text;
       } else {
         delete data.interquestion_pages;
       }
