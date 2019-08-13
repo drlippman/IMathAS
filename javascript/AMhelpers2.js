@@ -191,19 +191,21 @@ function init(paramarr, enableMQ) {
           if (arr.length > cnt+1) {
             handleScript(arr, cnt+1);
           }
-        })
+        });
       } else {
         if (arr.length > cnt+1) {
           handleScript(arr, cnt+1);
         }
       }
+      if (arr.length <= cnt+1) {
+        for (var i=0; i<initstack.length; i++) {
+              var foo = initstack[i]();
+        }
+        initstack.length = 0;
+      }
     }
     handleScript(paramarr.scripts, 0);
   }
-  for (var i=0; i<initstack.length; i++) {
-        var foo = initstack[i]();
-  }
-  initstack.length = 0;
 }
 
 // setup tip focus/blur handlers

@@ -33,13 +33,16 @@ function loadJSX() {
     echo getJSXscript();
 }
 function getJSXscript () {
-		//return '<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>'
+  if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+		return '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>';
+  } else {
 		return '<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
 			var jsxgloadscript = document.createElement("script");
 			jsxgloadscript.src = "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js";
 			document.getElementsByTagName("head")[0].appendChild(jsxgloadscript);
 			JXGscriptloaded = true;
 		}</script>';
+  }
 }
 
 ####################################

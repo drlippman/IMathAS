@@ -111,6 +111,7 @@ class QuestionHtmlGenerator
         ob_start();
 
         $GLOBALS['inquestiondisplay'] = true;
+        $GLOBALS['assessver'] = 2;
 
         $doShowAnswer = $this->questionParams->getShowAnswer();
         $doShowAnswerParts = $this->questionParams->getShowAnswerParts();
