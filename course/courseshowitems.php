@@ -763,6 +763,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 								 }
 						   }
 					   }
+
 					   if ($nothidden) {
 						   if ($line['reqscoretype']&2) { //using percent-based
 						   	   if ($line['reqscoreptsposs']>0 &&

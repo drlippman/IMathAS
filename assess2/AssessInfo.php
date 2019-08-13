@@ -459,7 +459,7 @@ class AssessInfo
 			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
 			$query .= "WHERE ia.id=?";
       $stm = $this->DBH->prepare($query);
-      $stm->execute(array($uid, $this->curAid));
+      $stm->execute(array($uid, $this->assessData['reqscoreaid']));
       list($prereqscore,$reqscoreptsposs) = $stm->fetch(PDO::FETCH_NUM);
       if ($prereqscore === null) {
 				$isBlocked = true;

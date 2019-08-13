@@ -105,7 +105,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Assessment';
 			$itemshowdata[$typelookups['Assessment'][$line['id']]] = $line;
-			if ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&1 || $viewall)) {
+			if ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&3 || $viewall)) {
 				if (!isset($assessPreReqsToLookup[$line['reqscoreaid']])) {
 					$assessPreReqsToLookup[$line['reqscoreaid']] = array();
 				}
