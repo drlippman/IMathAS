@@ -55,7 +55,6 @@ export default {
       let url = 'gbviewassess.php?';
       url += 'cid=' + store.cid;
       url += '&aid=' + store.aid;
-      url += '&uid=' + store.assessInfo.userid;
       return url;
     }
   }

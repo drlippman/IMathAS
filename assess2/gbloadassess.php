@@ -26,7 +26,7 @@ header('Content-Type: application/json; charset=utf-8');
 check_for_required('GET', array('aid', 'cid'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-if ($isRealStudent) {
+if ($isRealStudent || empty($_GET['uid'])) {
   $uid = $userid;
 } else {
   $uid = Sanitize::onlyInt($_GET['uid']);
@@ -168,7 +168,7 @@ if ($assessInfoOut['has_practice']) {
   );
 }
 
-// generating answeights may have changed the record; save if needed 
+// generating answeights may have changed the record; save if needed
 $assess_record->saveRecordIfNeeded();
 
 //prep date display
