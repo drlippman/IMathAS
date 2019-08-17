@@ -304,7 +304,7 @@ var myMQeditor = (function($) {
               {l:'\\left(\\right]', c:'i', w:'(]'},
               {l:'\\left[\\right)', c:'i', w:'[)'},
               {l:'\\infty'},
-              {l:'-\\infty', c:'w'},
+              {l:'-\\infty', c:'w', w:'-\\infty'},
               {l:'\\cup'},
               {s:1}
             ]
@@ -397,20 +397,24 @@ var myMQeditor = (function($) {
         ];
         baselayout.tabs[0].tabcontent[2] = {
           flow:'row',
-          s:3,
+          s:4,
           contents: [
             {b:'7'},
             {b:'8'},
             {b:'9'},
+            {s:1},
             {b:'4'},
             {b:'5'},
             {b:'6'},
+            {s:1},
             {b:'1'},
             {b:'2'},
             {b:'3'},
+            {b:'-'},
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
-            calcformat.match(/(list|set)/) ? {'b':','} : {s:1}
+            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            {s:1}
           ]
         };
       } else {
@@ -590,7 +594,6 @@ var myMQeditor = (function($) {
       if (tabid.match(/mqeditor-0-tabpanel/)) {
         $(".mqed-tipholder").show();
       } else {
-        console.log("hide");
         $(".mqed-tipholder").hide();
       }
     }
