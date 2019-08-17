@@ -2166,8 +2166,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					 }
 				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
-				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=" . Sanitize::onlyInt($typeid) . "\">", _('Grades'), "</a>";
-				   echo '</span>';
+					 if ($line['ver']>1) {
+						 echo " | <a href=\"gb-itemanalysis2.php?cid=$cid&aid=" . Sanitize::onlyInt($typeid) . "\">", _('Grades'), "</a>";
+					 } else {
+					 	echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=" . Sanitize::onlyInt($typeid) . "\">", _('Grades'), "</a>";
+					 }
+					 echo '</span>';
 			   }
 			   echo "</li>";
 
