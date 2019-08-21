@@ -123,7 +123,12 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	  	  $url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
 		  $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a></span>";
 	  	  $html .= "</canvas>";
-	  	  $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');});</script>";
+				$init = "var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');";
+				if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+					$html .= "<script type=\"text/javascript\"> $init </script>";
+				} else {
+					$html .= "<script type=\"text/javascript\">$(window).on('load',function() { $init });</script>";
+				}
 	  }
 	  return $html;
 
@@ -271,7 +276,12 @@ function spacecurve($func,$tmin,$tmax) {
 
 		 $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></span>";
 	  	 $html .= "</canvas>";
-	  	 $html .= "<script type=\"text/javascript\">$(window).on('load',function() {var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');});</script>";
+			 $init = "var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');";
+			 if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+				 $html .= "<script type=\"text/javascript\"> $init </script>";
+			 } else {
+				 $html .= "<script type=\"text/javascript\">$(window).on('load',function() { $init });</script>";
+			 }
 	}
 
 	  return $html;
