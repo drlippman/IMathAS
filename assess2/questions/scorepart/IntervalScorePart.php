@@ -153,7 +153,7 @@ class IntervalScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsNumber(
                 parsedIntervalToString($gaarr, $ansformatsHasList));
         }
-        if ($gaarr === false) {
+        if ($gaarr === false && $givenans!=='DNE') {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
