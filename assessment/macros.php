@@ -3795,16 +3795,6 @@ function scoremultiorder($stua, $answer, $swap, $type='string') {
 	return $newans;
 }
 
-function sign($a,$str=false) {
-	if ($str==="onlyneg") {
-		return ($a<0)?"-":"";
-	} else if ($str !== false) {
-		return ($a<0)?"-":"+";
-	} else {
-		return ($a<0)?-1:1;
-	}
-}
-
 function lensort($a,$b) {
 	return strlen($b)-strlen($a);
 }
