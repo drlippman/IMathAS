@@ -1694,7 +1694,7 @@ function gbinstrdisp() {
 								$avgtip = '';
 							}
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
-							if ($gbt[0][1][$i][15] > 1) {
+							if ($gbt[0][1][$j][15] > 1) {
 								echo "<a href=\"gb-itemanalysis2.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
 							} else {
 								echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
