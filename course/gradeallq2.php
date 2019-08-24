@@ -192,7 +192,10 @@
 					$assess_record->saveRecord();
 				}
 
-				if (count($adjustedScores) > 0 && strlen($line['lti_sourcedid'])>1) {
+				// Normally it'd only make sense to update LTI scores that changed. But
+				// this is a common trick to force score resends, so until another way
+				// is added, this is removed:  count($adjustedScores) > 0 &&
+				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
 					$gbscore = $assess_record->getGbScore();
