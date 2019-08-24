@@ -349,7 +349,7 @@ $vueData = array(
 				</div>
 			</div> <!-- core grouping -->
 
-			<div class="clear">
+			<div :class="{highlight:gbcategory != 'DNC'}">
 				<label class="form" for="gbcategory">
 					Gradebook Category:
 				</label>
