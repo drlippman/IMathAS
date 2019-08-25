@@ -265,7 +265,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=071219"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=071919"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=082519"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';

@@ -46,7 +46,7 @@ function hideNA() {
 	$(".notanswered").toggle();
 }
 function showallans() {
-	$("span[id^='ans']").removeClass("hidden");
+	$("span[id^='ans']").removeClass("hidden").show();
 	$(".sabtn").replaceWith("<span>Answer: </span>");
 }
 function previewall() {
