@@ -107,10 +107,12 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	  } else {
 	  	 if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
-			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 		  } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		  }
+			if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1)) {
+				$html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
+			}
 	  	  $GLOBALS['3dplotcnt'] = $r;
 	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
 	  	  $html .= 'role="img" tabindex="0" aria-label="'.Sanitize::encodeStringForDisplay($alt).'" ';
@@ -261,11 +263,13 @@ function spacecurve($func,$tmin,$tmax) {
 			  $count++;
 		 }
 
-	  	 if (!isset($GLOBALS['3dplotcnt'])) {
+	   if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
-			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 		 } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
+		 }
+		 if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1)) {
+			 $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 		 }
 	  	 $GLOBALS['3dplotcnt'] = $r;
 	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
