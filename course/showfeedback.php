@@ -72,7 +72,7 @@ if ($type=='A') {
 			$qfb = '';
 			foreach ($qdata['question_versions'] as $qv => $qver) {
 				if (!empty($qver['feedback'])) {
-					if ($by_question) {
+					if ($by_question && count($qdata['question_versions']) > 1) {
 						$qfb .= '<p>'.sprintf(_('Feedback on Version %d:'), $qv+1).'</p>';
 					}
 					$qfb .= '<div class="fbbox">'.Sanitize::outgoingHtml($qver['feedback']).'</div>';
