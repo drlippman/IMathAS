@@ -31,7 +31,7 @@
 					$attempts = trim($_POST['attempts'.$qsetid]);
 					$showhints = intval($_POST['showhints'.$qsetid]);
 					if ($points=='' || $points==$defpoints) { $points = 9999;}
-					if ($attempts=='') {$attempts = 9999;}
+					if ($attempts=='' || intval($attempts)==0) {$attempts = 9999;}
 					if ($points==9999 && isset($_POST['pointsforparts']) && $_POST['qparts'.$qsetid]>1 && !isset($_POST['addasgroup'])) {
 						$points = intval($_POST['qparts'.$qsetid]);
 					}
@@ -109,7 +109,7 @@
 				$attempts = trim($_POST['attempts'.$qid]);
 				$showhints = intval($_POST['showhints'.$qid]);
 				if ($points=='') { $points = 9999;}
-				if ($attempts=='') {$attempts = 9999;}
+				if ($attempts=='' || intval($attempts)==0) {$attempts = 9999;}
 				$stm = $DBH->prepare("UPDATE imas_questions SET attempts=:attempts,showhints=:showhints WHERE id=:id");
 				$stm->execute(array(':attempts'=>$attempts, ':showhints'=>$showhints, ':id'=>$qid));
 				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
@@ -250,7 +250,7 @@ if (isset($_POST['checked'])) { //modifying existing
 				$qrows[$row['id']] .= '</tr>';
 			}
 			echo "<th>Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
-			echo '<th>Tries (0 for unlimited)<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
+			echo '<th>Tries<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
 			echo '<th>Show hints &amp; video buttons?<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
 			echo "<th>Additional Copies to Add<br/>&nbsp;</th></tr></thead>";
 			echo "<tbody>";

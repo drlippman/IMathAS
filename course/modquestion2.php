@@ -38,7 +38,12 @@ if (!(isset($teacherid))) {
 			$_POST['copies'] = 1;
 		} else {
 			if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
-			if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
+			if (trim($_POST['attempts'])=="" || intval($_POST['attempts'])==0) {
+        $attempts=9999;
+      } else {
+        $attempts = intval($_POST['attempts']);
+      }
+
 			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
 			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
 			if ($penalty!=9999) {
@@ -249,7 +254,7 @@ if (isset($_GET['id'])) {
 	echo '<button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($qsetid).')">'._('Preview').'</button>';
 ?>
 </p>
-<form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
+<form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
 <p>Leave items blank to use the assessment's default values.
 <input type="submit" value="<?php echo ('Save Settings');?>"></p>
 
@@ -261,7 +266,7 @@ if (!isset($_GET['id'])) {
 <?php
 }
 ?>
-<span class=form>Tries allowed on each version of this problem (0 for unlimited):</span>
+<span class=form>Tries allowed on each version of this problem:</span>
 <span class=formright> <input type=text size=3 name=attempts value="<?php echo Sanitize::encodeStringForDisplay($line['attempts']);?>">
   <br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defattempts']);?></i>
 </span><BR class=form>
