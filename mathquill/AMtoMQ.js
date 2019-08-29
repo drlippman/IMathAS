@@ -797,7 +797,6 @@ function MQtoAM(tex,display) {
 			tex = tex.substring(0,i) + tex.substring(i+4);
 		}
 	}
-  console.log(tex);
 	//separate un-braced subscripts using latex rules
 	tex = tex.replace(/_(\d)(\d)/g, '_$1 $2');
 	tex = tex.replace(/\^(\d)(\d)/g, '^$1 $2');
@@ -815,6 +814,5 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
   tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2');  //change /(x^n) to /x^n
 	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
-	console.log(tex);
 	return tex;
 }
