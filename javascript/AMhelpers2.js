@@ -1599,11 +1599,12 @@ function singlevaleval(evalstr, format) {
     evalstr = evalstr.replace(/%/,'') + '/100';
   }
   if (format.indexOf('mixed')!=-1) {
-    evalstr = evalstr.replace(/(-?\s*\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
+    evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
   }
   if (format.indexOf('scinot')!=-1) {
       evalstr = evalstr.replace("xx","*");
   }
+  console.log(evalstr);
   try {
     var res = scopedmatheval(evalstr);
     return [res, ''];

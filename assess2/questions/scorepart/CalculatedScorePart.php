@@ -179,9 +179,9 @@ class CalculatedScorePart implements ScorePart
             }
             $givenansval = implode(',', $numvalarr);
             $scorePartResult->setLastAnswerAsNumber($givenansval);
-        } {
-        $numvalarr = explode(',', $givenansval);
-    }
+        } else {
+          $numvalarr = explode(',', $givenansval);
+        }
 
         if (in_array('exactlist',$ansformats)) {
             $gaarr = array_map('trim',explode(',',$givenans));
