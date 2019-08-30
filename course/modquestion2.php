@@ -38,7 +38,7 @@ if (!(isset($teacherid))) {
 			$_POST['copies'] = 1;
 		} else {
 			if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
-			if (trim($_POST['attempts'])=="" || intval($_POST['attempts'])==0) {
+			if (trim($_POST['attempts'])=="" || intval($_POST['attempts'])<=0) {
         $attempts=9999;
       } else {
         $attempts = intval($_POST['attempts']);
