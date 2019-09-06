@@ -163,7 +163,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 	//echo 'got response with hash'.$user_data['hash'].'<br/>';
 	//echo htmlentities($response);
 	//var_dump($request_info);
-	if ($reponse === false || strpos($response, 'success')===false) { //failed
+	if ($response === false || strpos($response, 'success')===false) { //failed
 		//on call failure, we'll update failure count and push back sendon
 		$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*(failures+1)*300,failures=failures+1 WHERE hash=?');
 		$setfailed->execute(array($user_data['hash']));
