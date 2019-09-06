@@ -39,7 +39,7 @@
 			return false;
 		}
 		function showfb2(aid,uid,type) {
-			GB_show(_("Feedback"), "showfeedback2.php?cid="+cid+"&type="+type+"&aid="+aid+"&uid="+uid, 500, 500);
+			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+aid+"&uid="+uid, 500, 500);
 			return false;
 		}
 		</script>';
@@ -260,7 +260,7 @@
 			if ($hasfeedback) {
 				if ($aver > 1 ) {
 					echo '<td><a href="#" class="small feedbacksh pointer" ';
-					echo 'onclick="return showfb2('.$aid.','.Sanitize::onlyInt($line['userid']).',\'A\')">';
+					echo 'onclick="return showfb2('.$aid.','.Sanitize::onlyInt($line['userid']).',\'A2\')">';
 					echo _('[Show Feedback]'), '</a></td>';
 				} else {
 					echo '<td><a href="#" class="small feedbacksh pointer" ';
