@@ -1266,6 +1266,7 @@ function processNumfunc(qn, fullstr, format) {
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
   var totesteqn = strprocess[0];
+  var remapVars = strprocess[2].split('|');
 
   if (fullstr.match(/=/)) {
     if (!iseqn) {
@@ -1282,19 +1283,18 @@ function processNumfunc(qn, fullstr, format) {
 	  reg = new RegExp("("+fvars.join('|')+")\\(","g");
 	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
   }
-
-  totesteqn = prepWithMath(mathjs(totesteqn,vars.join('|')));
+  totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
   var i,j,totest,testval,res;
   var successfulEvals = 0;
   for (j=0; j < 20; j++) {
     totest = 'var DNE=1;';
-    for (i=0; i < vars.length; i++) {
+    for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
       if (domain[i][2]) { //integers
         testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
       } else { //any real between min and max
         testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
       }
-      totest += 'var ' + vars[i] + '=' + testval + ';';
+      totest += 'var ' + remapVars[i] + '=' + testval + ';';
     }
     res = scopedeval(totest + totesteqn);
     if (res !== 'synerr') {
@@ -1604,7 +1604,6 @@ function singlevaleval(evalstr, format) {
   if (format.indexOf('scinot')!=-1) {
       evalstr = evalstr.replace("xx","*");
   }
-  console.log(evalstr);
   try {
     var res = scopedmatheval(evalstr);
     return [res, ''];

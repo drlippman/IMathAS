@@ -48,7 +48,7 @@ $placeinhead .= '<script src="'.$imasroot.'/javascript/drawing_min.js" type="tex
 $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2_min.js?v=070819" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips_min.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs_min.js" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/rubric_min.js?v=082419" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/rubric_min.js?v=090619" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/gb-scoretools.js" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ_min.js" type="text/javascript"></script>
   <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
