@@ -227,8 +227,8 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 			}
 		}
 	}
-	$("#"+feedbackid).trigger('input');
-	$("#"+scoreboxid).trigger('input');
+	document.getElementById(feedbackid).dispatchEvent(new CustomEvent('input'));
+	document.getElementById(scoreboxid).dispatchEvent(new CustomEvent('input'));
 
 	if (p = feedbackid.match(/^fb-(\d+)/)) {
 		revealfb(p[1]);
