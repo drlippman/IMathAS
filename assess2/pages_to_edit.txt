@@ -15,7 +15,6 @@ TODOs:
   importitems: handle new ver
 
 Misc:
-  Encoding error on saving in gradeallq2 for an unsubmitted file upload question
   On assessment summary page, showing review, make sure it shows last attempt, not best attempt
     When shuffle is enabled, this is causing the wrong answers to show in the wrong boxes
     "Random students" issue
@@ -31,6 +30,7 @@ Misc:
   Update MOM help file to remove non-MOM features
   gbtable2, line 2141/2147: rounding before dividing causing issues - maybe move rounding
     to gradebook display?
+  Re-add "save answer" button on one try in quiz mode?
 
 Test:
   Instructor preview
@@ -109,6 +109,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Encoding error on saving in gradeallq2 for an unsubmitted file upload question
 X In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
 X On Delete this attempt, need to update attempt selector to other version
 X Single assessment exception page redirect not working (reporting invalid assessment ID)

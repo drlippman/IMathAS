@@ -2500,8 +2500,12 @@ class AssessRecord
       } else {
         $ptsposs = $assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
       }
-      $answeightTot = array_sum($qdata['answeights']);
-      $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
+      if (!isset($qdata['answeights'])) {
+        $adjscore = round($score/$ptsposs, 5);
+      } else {
+        $answeightTot = array_sum($qdata['answeights']);
+        $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
+      }
       $out[$av.'-'.$qn.'-'.$qv.'-'.$pn] = $adjscore;
     }
     return $out;
