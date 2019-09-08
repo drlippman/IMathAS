@@ -246,6 +246,12 @@ if ($in_practice) {
 }
 $assessInfoOut = array_merge($assessInfoOut, $assess_info->extractSettings($include_from_assess_info));
 
+// filter interquestion text html
+foreach ($assessInfoOut['interquestion_text'] as $k=>$v) {
+  $assessInfoOut['interquestion_text'][$k]['text'] = filter($v['text']);
+}
+$assessInfoOut['intro'] = filter($assessInfoOut['intro']);
+
 $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
 

@@ -887,14 +887,19 @@ jQuery(document).ready(function($) {
 	});
 });
 
-jQuery(document).ready(function($) {
+
+function initlinkmarkup(base) {
 	if (typeof isImathasAssessment != 'undefined') {
-		$('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
+		$(base).find('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
 	}
-	$('a').each(setuptracklinks).each(addNoopener);
-	$('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
-	$('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
-	$('body').fitVids();
+	$(base).find('a').each(setuptracklinks).each(addNoopener);
+	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).fitVids();
+}
+
+jQuery(document).ready(function($) {
+	initlinkmarkup('body');
 });
 
 jQuery.fn.isolatedScroll = function() {

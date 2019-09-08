@@ -1,5 +1,5 @@
 <template>
-  <div v-show="expanded" v-html="textobj.html" />
+  <div v-show="expanded" v-html="textobj.html" ref="main" />
 
 </template>
 
@@ -36,9 +36,10 @@ export default {
   },
   methods: {
     renderMath () {
-      setTimeout(window.drawPics, 100);
-      window.rendermathnode(this.$refs.main);
       this.rendered = true;
+      setTimeout(window.drawPics, 100);
+      window.initlinkmarkup(this.$refs.main);
+      window.rendermathnode(this.$refs.main);
     }
   },
   updated () {

@@ -15,13 +15,8 @@ TODOs:
   importitems: handle new ver
 
 Misc:
-  On assessment summary page, showing review, make sure it shows last attempt, not best attempt
-    When shuffle is enabled, this is causing the wrong answers to show in the wrong boxes
-    "Random students" issue
-  [+] in assessment text
-  [EMBED: ] tags (is filter being run?)
   Make sure "use latepass" option is available before time limit starts, old assess LTI
-  Bug where "# of tries on each version" is changed to 1 when there is a penalty of 25% after 2 tries.  Not saving (prob seeing invalid value)
+  Bug when "# of tries on each version" is changed to 1 when there is a penalty of 25% after 2 tries.  Not saving (prob seeing invalid value)
   Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
   No between question text in Practice Mode?
   No between question text in Print version?  (when paged, at least)
@@ -109,6 +104,10 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X [+] in assessment text
+X [EMBED: ] tags (is filter being run?)
+X On assessment summary page, showing review, make sure it shows last attempt, not best attempt
+    When shuffle is enabled, this is causing the wrong answers to show in the wrong boxes
 X Encoding error on saving in gradeallq2 for an unsubmitted file upload question
 X In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
 X On Delete this attempt, need to update attempt selector to other version
