@@ -242,7 +242,7 @@ if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
   $showscores = $assess_info->showScoresAtEnd();
   $reshowQs = $assess_info->reshowQuestionsAtEnd();
-  $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
+  $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'last');
   $assessInfoOut['score'] = $assess_record->getAttemptScore();
   $totalScore = $assessInfoOut['score'];
   $assessInfoOut['has_active_attempt'] = false;
