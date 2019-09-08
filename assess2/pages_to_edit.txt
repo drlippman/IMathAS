@@ -28,9 +28,7 @@ Misc:
   No between question text in Print version?  (when paged, at least)
   Chem stuff
   To chat with Deborah: - Better notification for new message in LTI mode.
-  Update MOM help file to remove non-MOM features
-  gbtable2, line 2141/2147: rounding before dividing causing issues - maybe move rounding
-    to gradebook display?
+  Update MOM help file to remove non-MOM feature
 
 Test:
   Instructor preview
@@ -109,6 +107,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X gbtable2, line 2141/2147: rounding before dividing causing issues - maybe move rounding to gradebook display?
 X In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
 X On Delete this attempt, need to update attempt selector to other version
 X Single assessment exception page redirect not working (reporting invalid assessment ID)
