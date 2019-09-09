@@ -688,6 +688,7 @@ function outcometable() {
 		$scoreddata = json_decode(gzdecode($l['scoreddata']), true);
 		$assessver = $scoreddata['assess_versions'][$scoreddata['scored_version']];
 		$pts = array();
+		$ptsposs = array();
 		foreach ($assessver['questions'] as $qn => $qdata) {
 			$qver = $qdata['question_versions'][$qdata['scored_version']];
 			$qid = $qver['qid'];
@@ -888,7 +889,7 @@ function outcometable() {
 
 		//zero out past due items
 		foreach($gb[0][1] as $col=>$inf) {
-			if ($gb[0][1][$col][2]>0 || count($gb[$ln][1][$col][1])>0) {continue;} //skip if current, or if already set
+			if ($gb[0][1][$col][2]>0 || (isset($gb[$ln][1][$col][1]) && count($gb[$ln][1][$col][1])>0)) {continue;} //skip if current, or if already set
 			if ($inf[4]==0 && count($possible[$assessidx[$inf[5]]])==0) {continue;} //assess has no outcomes
 
 			$gb[$ln][1][$col] = array();
