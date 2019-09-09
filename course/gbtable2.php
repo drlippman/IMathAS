@@ -2139,7 +2139,7 @@ function gbtable() {
 							$gb[$ln][3][$stype] += $cats[$cat][5]*$v/$catpossstu[$stype][$cat];
 						}
 					}
-					$gb[$ln][3][$stype] = round($gb[$ln][3][$stype], 1);
+					$gb[$ln][3][$stype] = round($gb[$ln][3][$stype], 3);
 				}
 				if (isset($catpossstu[$stype]) && is_array($catpossstu[$stype])) {
 					foreach ($catpossstu[$stype] as $cat=>$v) {
@@ -2147,7 +2147,7 @@ function gbtable() {
 							$gb[$ln][3][4+$stype] += $cats[$cat][5];
 						}
 					}
-					$gb[$ln][3][4+$stype] = round($gb[$ln][3][4+$stype], 1);
+					$gb[$ln][3][4+$stype] = round($gb[$ln][3][4+$stype], 3);
 				}
 			}
 		} else {  //points possible grades
@@ -2165,6 +2165,7 @@ function gbtable() {
 			}
 		}
 	}
+
 	if ($limuser<1) {
 		//create averages
 		$gb[$ln][0][0] = "Averages";
