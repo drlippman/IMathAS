@@ -223,7 +223,7 @@ $vueData = array(
 				</label>
 				<input type=number min=1 max=100 size=3 id="defregens"
 					name="defregens" v-model.number="defregens" />
-				<span v-show="defregens > 1">
+				<span v-if="defregens > 1">
 					<br/>
 					With a penalty of
 					<input type=number min=0 max=100 size=3 id="defregenpenalty"
@@ -236,7 +236,7 @@ $vueData = array(
 						full-credit versions
 					</span>
 					<br/>
-					<span v-show="subtype == 'by_assessment'">
+					<span v-if="subtype == 'by_assessment'">
 						<label for="keepscore">
 							Score to keep:
 						<label>
@@ -257,7 +257,7 @@ $vueData = array(
 				</label>
 				<input type=number min=1 max=100 size=3 id="defattempts"
 					name="defattempts" v-model.number="defattempts" />
-				<span v-show="defattempts>1">
+				<span v-if="defattempts>1">
 					<br/>
 					With a penalty of
 					<input type=number min=0 max=100 size=3 id="defattemptpenalty"

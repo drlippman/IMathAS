@@ -116,6 +116,8 @@ if (!(isset($teacherid))) {
 							}
 						}
 					}
+				} else {
+					$defregenpenalty = 0;
 				}
 			}
 			if ($submitby == 'by_assessment') {
@@ -147,6 +149,8 @@ if (!(isset($teacherid))) {
 							}
 						}
 					}
+				} else {
+					$defattemptpenalty = 0;
 				}
 			}
 			$showscores = Sanitize::simpleASCII($_POST['showscores']);

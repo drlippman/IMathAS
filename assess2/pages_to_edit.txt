@@ -16,10 +16,7 @@ TODOs:
 
 Misc:
   Make sure "use latepass" option is available before time limit starts, old assess LTI
-  Bug when "# of tries on each version" is changed to 1 when there is a penalty of 25% after 2 tries.  Not saving (prob seeing invalid value)
   Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
-  No between question text in Practice Mode?
-  No between question text in Print version?  (when paged, at least)
   Chem stuff
   To chat with Deborah: - Better notification for new message in LTI mode.
   Update MOM help file to remove non-MOM features
@@ -104,6 +101,9 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Bug when "# of tries on each version" is changed to 1 when there is a penalty of 25% after 2 tries.  Not saving (prob seeing invalid value)
+X No between question text in Practice Mode?
+X No between question text in Print version?  (when paged, at least)
 X [+] in assessment text
 X [EMBED: ] tags (is filter being run?)
 X On assessment summary page, showing review, make sure it shows last attempt, not best attempt
