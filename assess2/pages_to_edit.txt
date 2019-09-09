@@ -19,9 +19,7 @@ Misc:
   Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
   Chem stuff
   To chat with Deborah: - Better notification for new message in LTI mode.
-  Update MOM help file to remove non-MOM features
-  gbtable2, line 2141/2147: rounding before dividing causing issues - maybe move rounding
-    to gradebook display?
+  Update MOM help file to remove non-MOM feature
   Re-add "save answer" button on one try in quiz mode?
 
 Test:
@@ -109,6 +107,7 @@ X [EMBED: ] tags (is filter being run?)
 X On assessment summary page, showing review, make sure it shows last attempt, not best attempt
     When shuffle is enabled, this is causing the wrong answers to show in the wrong boxes
 X Encoding error on saving in gradeallq2 for an unsubmitted file upload question
+X gbtable2, line 2141/2147: rounding before dividing causing issues - maybe move rounding to gradebook display?
 X In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
 X On Delete this attempt, need to update attempt selector to other version
 X Single assessment exception page redirect not working (reporting invalid assessment ID)
