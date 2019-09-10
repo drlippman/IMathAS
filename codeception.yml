@@ -17,7 +17,6 @@ coverage:
         - .git/*
         - javascript/*
         - katex/*
-        - mathjax/*
         - migrations/*
         - tests/*
         - tinymce4/*
