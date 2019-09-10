@@ -5,6 +5,7 @@
 
 require_once("../includes/htmLawed.php");
 require_once("../includes/updateptsposs.php");
+require_once("../includes/migratesettings.php");
 
 //used during confirmation step
 function getsubinfo($items,$parent,$pre) {
@@ -734,6 +735,7 @@ private function insertAssessment() {
 	$db_fields['assessment'] = array_values(array_intersect(explode(',', $db_fields['assessment']), array_keys($this->data['items'][$this->toimportbytype['Assessment'][0]]['data'])));
 	$contentlen = 0;
 	$tomap = array();
+	$defaults = array();
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
 		$tomap[] = $toimport;
 		$thisitemdata = $this->data['items'][$toimport]['data'];
@@ -783,11 +785,18 @@ private function insertAssessment() {
 		//we'll resolve these later
 		$thisitemdata['reqscoreaid'] = 0;
 		$thisitemdata['itemorder'] = '';
+
+		// update settings if needed
+		if ($thisitemdata['ver'] < $GLOBALS['courseUIver']) {
+			$thisitemdata = migrateAssessSettings($thisitemdata, $thisitemdata['ver'], $GLOBALS['courseUIver']);
+			$defaults[$toimport] = $thisitemdata;
+		}
 		$contentlen += strlen($thisitemdata['intro']);
 		$exarr[] = $this->cid;
 		foreach ($db_fields['assessment'] as $field) {
 			$exarr[] = $thisitemdata[$field];
 		}
+
 		if ($contentlen>5E5) { //do a batch add if more than 500,000 chars in intro
 			$ph = Sanitize::generateQueryPlaceholdersGrouped($exarr,count($db_fields['assessment'])+1);
 			$stm = $DBH->prepare("INSERT INTO imas_assessments (courseid,".implode(',',$db_fields['assessment']).") VALUES $ph");
@@ -829,6 +838,15 @@ private function insertAssessment() {
 			//record points if needed
 			if ($this->data['questions'][$qid]['points']<9999) {
 				$qpoints[$qid] = $this->data['questions'][$qid]['points'];
+			}
+			// adjust settings if needed
+			if ($this->data['items'][$toimport]['data']['ver'] < $GLOBALS['courseUIver']) {
+				$this->data['questions'][$qid] = migrateQuestionSettings(
+					$this->data['questions'][$qid],
+					$defaults[$toimport],
+					$this->data['items'][$toimport]['data']['ver'],
+					$GLOBALS['courseUIver']
+				);
 			}
 			//add in assessmentid
 			$exarr[] = $this->typemap['Assessment'][$toimport];

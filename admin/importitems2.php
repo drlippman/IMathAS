@@ -177,6 +177,14 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 	echo $page_fileHiddenInput;
 	echo '<h2>'._('Course').': '.$data['course']['name'].'</h2>';
 
+  if ($data['course']['UIver'] > $courseUIver) {
+    echo '<p class=noticetext>'._('The import file is for a more recent assessment version than this course - cannot import.').'</p>';
+    require("../footer.php");
+    exit;
+  } else if ($data['course']['UIver'] < $courseUIver) {
+    echo '<p class=noticetext>'._('The import file is for an older assessment version than this course - assessments will be upgraded.').'</p>';
+  }
+
 	if ($myrights==100) {
 		echo '<p><input type="checkbox" name="importasteacher" id="importasteacher" checked /> Import as course owner (for ownership when updating or adding questions).</p>';
 	}
