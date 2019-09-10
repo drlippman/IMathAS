@@ -15,6 +15,9 @@ TODOs:
   importitems: handle new ver
 
 Misc:
+  test variable case insensitivity in new player
+  Can't preview password-protected assessment (gives invalid password error)
+  JSX document.write - how to address??
   Make sure "use latepass" option is available before time limit starts, old assess LTI
   Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
   Chem stuff
