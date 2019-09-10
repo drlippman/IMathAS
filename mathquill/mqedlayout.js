@@ -414,7 +414,7 @@ var myMQeditor = (function($) {
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
             calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
-            {s:1}
+            calcformat.match(/point/) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
           ]
         };
       } else {
@@ -457,6 +457,12 @@ var myMQeditor = (function($) {
           {l:'\\infty'},
           {p:'DNE', 'sm':2},
         ];
+        if (calcformat.match(/point/)) {
+          baselayout.tabs[0].tabcontent[0].contents.push(
+            {l:'\\left(\\right)', c:'t', w:'('},
+            {s: 3}
+          );
+        }
       }
     }
     // for both

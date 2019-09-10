@@ -38,7 +38,7 @@ $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs_min.js" type="text
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ_min.js?v=082919" type="text/javascript"></script>
   <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
   <script src="'.$imasroot.'/mathquill/mqeditor_min.js?v=081719" type="text/javascript"></script>
-  <script src="'.$imasroot.'/mathquill/mqedlayout_min.js?v=081719" type="text/javascript"></script>
+  <script src="'.$imasroot.'/mathquill/mqedlayout_min.js?v=091019" type="text/javascript"></script>
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 if ($isltilimited || $inTreeReader) {
