@@ -1633,6 +1633,9 @@ class AssessRecord
       if (strlen(trim($match[2])) == 0 && preg_match('/src="(.*?)"/', $match[1], $sub)) {
         $scripts[] = array('src', $sub[1]);
       } else {
+        if (preg_match('/document\.write.*?script.*?src="(.*?)"/', $match[2], $sub)) {
+          $scripts[] = array('src', $sub[1]);
+        }
         $scripts[] = array('code', $match[2]);
       }
     }
