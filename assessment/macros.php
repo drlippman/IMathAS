@@ -3173,6 +3173,10 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
+	if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+		// don't have access to rawscores via global, so just abort
+		return '';
+	}
 	$qn = $thisq-1;
 	if (strpos($rawscores[$qn],'~')===false) {
 		$res = ($rawscores[$qn]<0)?-1:(($rawscores[$qn]==1)?1:0);
