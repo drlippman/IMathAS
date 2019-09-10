@@ -64,7 +64,7 @@ final class SanitizeTest extends TestCase
 		$result = Sanitize::encodeStringForDisplay(
 			"<h1 color='blue'>Here &amp; there.</h1> <h1 color=\"red\">It works!</h1>");
 		$this->assertEquals("&lt;h1 color=&#039;blue&#039;&gt;Here &amp; there.&lt;/h1&gt;"
-			. " &lt;h2 color=&quot;red&quot;&gt;It works!&lt;/h2&gt;", $result);
+			. " &lt;h1 color=&quot;red&quot;&gt;It works!&lt;/h1&gt;", $result);
 	}
 
 	/*
@@ -233,12 +233,6 @@ final class SanitizeTest extends TestCase
 	{
 		$result = Sanitize::onlyInt("asdf123asdf");
 		$this->assertEquals(123, $result);
-	}
-
-	public function testOnlyIntLargerThanPhpMax()
-	{
-		$result = Sanitize::onlyInt(PHP_INT_MAX . "1234567890");
-		$this->assertEquals(PHP_INT_MAX . "1234567890", $result);
 	}
 
 	/*
