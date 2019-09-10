@@ -23,7 +23,9 @@
               />
             </vue-tab>
             <vue-tab :name="$t('summary.reshowquestions')">
-              <summary-reshow-questions />
+              <template v-slot = "{ active }">
+                <summary-reshow-questions :active="active"/>
+              </template>
             </vue-tab>
           </vue-tabs>
 

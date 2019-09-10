@@ -7,8 +7,9 @@
       />
       <question
         :qn = "curqn"
-        :key="'q'+curqn"
-        active = "true"
+        :key="'sq'+curqn"
+        :active = "active"
+        :disabled = "true"
       />
     </div>
   </div>
@@ -21,6 +22,7 @@ import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 
 export default {
   name: 'SummaryReshowQuestions',
+  props: ['active'],
   components: {
     Question,
     FullQuestionHeader

@@ -153,6 +153,8 @@ export default {
     loadQuestionIfNeeded () {
       if (!this.questionContentLoaded && this.active && store.errorMsg === null) {
         actions.loadQuestion(this.qn, false, false);
+      } else if (this.questionContentLoaded && this.active && !this.questionData.rendered) {
+        this.renderAndTrack();
       }
     },
     submitQuestion () {
@@ -239,7 +241,7 @@ export default {
       }
     },
     renderAndTrack () {
-      if (this.questionData.rendered) {
+      if (this.questionData.rendered || !this.active) {
         return;
       }
       setTimeout(window.drawPics, 100);
@@ -261,13 +263,6 @@ export default {
       window.$('#questionwrap' + this.qn).find('div.ansyel,table.ansyel').append(svgychk);
       window.$('#questionwrap' + this.qn).find('div.ansred,table.ansred').append(svgx);
 
-      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
-
-      window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
-      window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
-      window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
-
-      actions.setRendered(this.qn);
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
           if (el.name.match(/^(qn|tc|qs)\d/)) {
@@ -275,6 +270,15 @@ export default {
           }
         });
       };
+
+      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
+
+      window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
+      window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
+      window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
+
+      actions.setRendered(this.qn);
+
     },
     setInitValues () {
       var regex = new RegExp('^(qn|tc|qs)\\d');

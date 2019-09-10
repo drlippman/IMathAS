@@ -6,7 +6,7 @@
     :aria-labelledby="control"
     class="vuetabpanel"
   >
-    <slot></slot>
+    <slot :active="active"></slot>
   </div>
 </template>
 

@@ -259,7 +259,7 @@ ol.lalpha li { margin-top: .7em;}
 }
 
 /* General layout styles used many places */
-input, .mq-editable-field {
+input, .mq-editable-field, .mathquill-math-field {
   border: 1px solid #999;
   padding: 4px 6px;
   border-radius: 4px;

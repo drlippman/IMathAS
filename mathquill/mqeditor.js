@@ -103,8 +103,13 @@ var MQeditor = (function($) {
           };
           thisMQconfig.keyboardPassthrough = true;
         }
-        mqfield = MQ.MathField(span[0], thisMQconfig).config(MQconfig);
-        attachEditor(span);
+
+        if (el.disabled) {
+          mqfield = MQ.StaticMath(span[0]);
+        } else {
+          mqfield = MQ.MathField(span[0], thisMQconfig).config(MQconfig);
+          attachEditor(span);
+        }
 
       } else { // has existing MQ input
         mqfield.show();
