@@ -158,6 +158,7 @@
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
             class = "bigquestionwrap"
+            :id = "'qwrap' + qn"
           >
             <div class="headerpane">
               <strong>

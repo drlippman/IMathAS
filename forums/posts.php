@@ -573,7 +573,7 @@ function printchildren($base,$restricttoowner=false) {
 					$qn = $matches[1];
 					$r = $stm->fetch(PDO::FETCH_ASSOC);
 					if ($r['ver'] > 1) {
-						echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid2.php?cid=$cid&uid={$ownerid[$child]}&aid={$r['id']}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
+						echo " <a class=\"small\" href=\"$imasroot/assess2/gbviewassess.php?cid=$cid&uid={$ownerid[$child]}&aid={$r['id']}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
 					} else if ($r['id'] !== null) {
 						echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r['asid']}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
 					}

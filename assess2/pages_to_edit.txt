@@ -12,18 +12,17 @@ TODOs:
       Skip in next/prev navigation
     Set based on status of previous
       If regen, should still count as attempted
-  importitems: handle new ver
 
 Misc:
-  test variable case insensitivity in new player
+  Fix variable case insensitivity in new player
   Can't preview password-protected assessment (gives invalid password error)
-  JSX document.write - how to address??
   Make sure "use latepass" option is available before time limit starts, old assess LTI
   Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
   Chem stuff
   To chat with Deborah: - Better notification for new message in LTI mode.
   Update MOM help file to remove non-MOM feature
   Re-add "save answer" button on one try in quiz mode?
+    Maybe placebo button that just does autosave
 
 Test:
   Instructor preview
@@ -102,6 +101,8 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Intercept document.write and try to handle
+X importitems: handle new ver
 X Bug when "# of tries on each version" is changed to 1 when there is a penalty of 25% after 2 tries.  Not saving (prob seeing invalid value)
 X No between question text in Practice Mode?
 X No between question text in Print version?  (when paged, at least)
