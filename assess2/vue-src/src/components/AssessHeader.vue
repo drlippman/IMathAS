@@ -89,6 +89,13 @@
           <span class="switch-toggle__ui"></span>
         </button>
       </tooltip-span>
+      <tooltip-span
+        v-if="ainfo.is_lti && ainfo.lti_showmsg"
+        :tip="$tc('lti.msgs', ainfo.lti_msgcnt)"
+        style="display: inline-block"
+      >
+        <lti-msgs />
+      </tooltip-span>
       <lti-menu v-if="ainfo.is_lti" />
     </div>
 
@@ -100,6 +107,7 @@ import Timer from '@/components/Timer.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
+import LtiMsgs from '@/components/LtiMsgs.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 
 import { store, actions } from '../basicstore';
@@ -111,7 +119,8 @@ export default {
     MenuButton,
     TooltipSpan,
     Icons,
-    LtiMenu
+    LtiMenu,
+    LtiMsgs
   },
   data: function () {
     return {

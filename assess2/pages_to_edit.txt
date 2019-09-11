@@ -18,7 +18,6 @@ Misc:
   Make sure "use latepass" option is available before time limit starts, old assess LTI
   Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
   Chem stuff
-  To chat with Deborah: - Better notification for new message in LTI mode.
   Update MOM help file to remove non-MOM feature
   Re-add "save answer" button on one try in quiz mode?
     Maybe placebo button that just does autosave
@@ -41,6 +40,7 @@ Bugs:
   Average not showing until not IP
 
 To discuss:
+  Some kind of polling for new messages in LTI?
   In new player, skip, is there any way to get to a score summary and
     end message display?
   Some way to submit all unsubmitted assessment attempts?
@@ -100,6 +100,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Better notification for new message in LTI mode.
 X Fix variable case insensitivity in new player
 X Intercept document.write and try to handle
 X importitems: handle new ver

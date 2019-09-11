@@ -5,6 +5,8 @@
     nobutton = "true"
     noarrow = "true"
     searchby = "label"
+    id="ltimenubutton"
+    :header = "$t('lti.more')"
   >
     <template v-slot:button>
       <icons name="more" size="medium"/>
@@ -51,13 +53,15 @@ export default {
           );
         }
       });
+      /*
+      Moved to separate msgs icon
       if (store.assessInfo['lti_showmsg']) {
         out.push({
           label: this.$tc('lti.msgs', store.assessInfo['lti_msgcnt']),
           link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid,
           target: '_self'
         });
-      }
+      }*/
       // view scored assessment link
       if (store.assessInfo.in_practice &&
           store.assessInfo['prev_attempts'].length > 0

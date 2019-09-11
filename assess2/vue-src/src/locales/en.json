@@ -268,6 +268,7 @@
     "frequency": "Frequency"
   },
   "lti": {
+    "more": "More options",
     "userprefs": "User Preferences",
     "msgs": "Messages | Messages (1 new) | Messages ({n} new)",
     "use_latepass": "Redeem LatePass"
