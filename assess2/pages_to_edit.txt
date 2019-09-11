@@ -14,7 +14,6 @@ TODOs:
       If regen, should still count as attempted
 
 Misc:
-  Fix variable case insensitivity in new player
   Can't preview password-protected assessment (gives invalid password error)
   Make sure "use latepass" option is available before time limit starts, old assess LTI
   Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
@@ -101,6 +100,7 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Fix variable case insensitivity in new player
 X Intercept document.write and try to handle
 X importitems: handle new ver
 X Bug when "# of tries on each version" is changed to 1 when there is a penalty of 25% after 2 tries.  Not saving (prob seeing invalid value)

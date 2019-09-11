@@ -725,6 +725,20 @@ function preSubmit(qn) {
   }
 }
 
+function preSubmitString(name, str) {
+  var qn = parseInt(name.substr(2));
+  if (!allParams.hasOwnProperty(qn)) {
+    return str;
+  }
+  var params = allParams[qn];
+  str = normalizemathunicode(str);
+  str = str.replace(/^\s+/,'').replace(/\s+$/,'');
+  if (params.qtype == 'numfunc') {
+    str = AMnumfuncPrepVar(qn, str)[0];
+  }
+  return str;
+}
+
 /**
  * Processes each question type.  Return object has:
  *   .str:  the input, formatted for rendering
@@ -1636,6 +1650,7 @@ return {
   clearparams: clearparams,
   preSubmitForm: preSubmitForm,
   preSubmit: preSubmit,
+  preSubmitString: preSubmitString,
   clearLivePreviewTimeouts: clearLivePreviewTimeouts,
   syntaxCheckMQ: syntaxCheckMQ,
   handleMQenter: handleMQenter

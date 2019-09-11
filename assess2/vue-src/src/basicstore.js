@@ -305,7 +305,7 @@ export const actions = {
                 data.append(el.name, 'file-autosave');
               }
             } else {
-              data.append(el.name, el.value);
+              data.append(el.name, window.imathasAssess.preSubmitString(el.name, el.value));
             }
           }
         }
