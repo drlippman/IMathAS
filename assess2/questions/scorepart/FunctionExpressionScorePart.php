@@ -72,6 +72,8 @@ class FunctionExpressionScorePart implements ScorePart
 
         $correct = true;
 
+        $givenans = str_replace(',','', $givenans);
+        
         if (!isset($variables)) { $variables = "x";}
         $variables = array_map('trim',explode(",",$variables));
         $ofunc = array();

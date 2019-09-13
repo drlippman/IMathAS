@@ -30,6 +30,10 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
+  Commas in numfunc answers
+  possible race condition: https://lumenlearning.atlassian.net/browse/IM-354
+  "Review work in GB" stuck on loading page
+  - make sure error msgs display
   Large number answers not working (qn-val)
   JSXgraph questions not working - MOM 75910 for example
     Need to modify library, and existing questions

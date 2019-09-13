@@ -734,7 +734,7 @@ function preSubmitString(name, str) {
   str = normalizemathunicode(str);
   str = str.replace(/^\s+/,'').replace(/\s+$/,'');
   if (params.qtype == 'numfunc') {
-    str = AMnumfuncPrepVar(qn, str)[0];
+    str = AMnumfuncPrepVar(qn, str)[3];
   }
   return str;
 }
@@ -846,9 +846,9 @@ function AMnumfuncPrepVar(qn,str) {
   	  str = str.replace(/lamda/, 'lambda');
   }
 
-  str = str.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
   var foundaltcap = [];
   var dispstr = str;
+
   dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
@@ -884,6 +884,7 @@ function AMnumfuncPrepVar(qn,str) {
   	  return vars[contents];
        });
 
+  var submitstr = str;
   //quote out multiletter variables
   var varstoquote = new Array(); var regmod;
   for (var i=0; i<vars.length; i++) {
@@ -903,6 +904,7 @@ function AMnumfuncPrepVar(qn,str) {
 		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
 		  	dispstr = dispstr.replace(remvarparen, vars[i]);
 		  	str = str.replace(remvarparen, vars[i]);
+        submitstr = submitstr.replace(remvarparen, vars[i]);
 		  	if (varpts[1].length>1 && greekletters.indexOf(varpts[1].toLowerCase())==-1) {
 		  		varpts[1] = '"'+varpts[1]+'"';
 		  	}
@@ -935,7 +937,7 @@ function AMnumfuncPrepVar(qn,str) {
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\^([\d\.]+)([^\d\.])/g, "$1g^$2{::}$3");
   	  dispstr = dispstr.replace(/([^a-zA-Z])g\(/g, "$1g{::}(");
   }
-  return [str,dispstr,vars.join("|")];
+  return [str,dispstr,vars.join("|"),submitstr];
 }
 
 
@@ -1280,6 +1282,7 @@ function processNumfunc(qn, fullstr, format) {
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
   var totesteqn = strprocess[0];
+  totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
   var remapVars = strprocess[2].split('|');
 
   if (fullstr.match(/=/)) {
