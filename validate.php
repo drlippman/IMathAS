@@ -467,7 +467,10 @@
         $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
       }
 			$urlparts = parse_url($_SERVER['PHP_SELF']);
-			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php','index.php','gbviewassess.php','autosave.php','endassess.php','getscores.php','livepollstatus.php','loadassess.php','loadquestion.php','scorequestion.php','startassess.php','uselatepass.php');
+			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php',
+        'redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php',
+        'index.php','gbviewassess.php','autosave.php','endassess.php','getscores.php','livepollstatus.php','loadassess.php',
+        'loadquestion.php','scorequestion.php','startassess.php','uselatepass.php','gbloadassess.php','gbloadassessver.php','gbloadquestionver.php');
 			//call hook, if defined
 			if (function_exists('allowedInAssessment')) {
 				$allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());

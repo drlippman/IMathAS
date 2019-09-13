@@ -234,7 +234,7 @@ export default {
         if (this.settings.can_use_latepass === 0 ||
           window.confirm(this.$t('closed.confirm'))
         ) {
-          window.location = store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid;
+          window.location = store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
         }
       } else if (this.primaryAction === 'exit') {
         // exit assessment

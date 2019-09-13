@@ -68,7 +68,7 @@ export default {
       ) {
         out.push({
           label: this.$t('closed.view_scored'),
-          link: store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid,
+          link: store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid,
           target: '_self'
         });
       }
