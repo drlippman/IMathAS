@@ -75,28 +75,6 @@ class NTupleScorePart implements ScorePart
                 $gaarr = $this->parseNtuple($givenans, false, true);
                 $scorePartResult->setLastAnswerAsNumber($this->ntupleToString($gaarr));
             }
-            //test for correct format, if specified
-            if (checkreqtimes($givenans,$requiretimes)==0) {
-                $scorePartResult->setRawScore(0);
-                return $scorePartResult;
-            }
-
-            //parse the ntuple without evaluating
-            $tocheck = $this->parseNtuple($givenans, false, false);
-
-            if ($answer != 'DNE' && $answer != 'oo') {
-                foreach($tocheck as $chkme) {
-                    foreach ($chkme['vals'] as $chkval) {
-                        if ($chkval != 'oo' && $chkval != '-oo') {
-                            if (!checkanswerformat($chkval,$ansformats)) {
-                                //perhaps should just elim bad answer rather than all?
-                                $scorePartResult->setRawScore(0);
-                                return $scorePartResult;
-                            }
-                        }
-                    }
-                }
-            }
         }
         if ($givenans == null) {
             $scorePartResult->setRawScore(0);
@@ -120,6 +98,36 @@ class NTupleScorePart implements ScorePart
             } else {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
+            }
+        } else if (strtoupper($givenans)=='DNE' || $givenans=='oo') {
+          $scorePartResult->setRawScore(0);
+          return $scorePartResult;
+        }
+
+        // check formats for calcntuple
+        if ($anstype=='calcntuple') {
+
+            //test for correct format, if specified
+            if (checkreqtimes($givenans,$requiretimes)==0) {
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
+
+            //parse the ntuple without evaluating
+            $tocheck = $this->parseNtuple($givenans, false, false);
+
+            if ($answer != 'DNE' && $answer != 'oo') {
+                foreach($tocheck as $chkme) {
+                    foreach ($chkme['vals'] as $chkval) {
+                        if ($chkval != 'oo' && $chkval != '-oo') {
+                            if (!checkanswerformat($chkval,$ansformats)) {
+                                //perhaps should just elim bad answer rather than all?
+                                $scorePartResult->setRawScore(0);
+                                return $scorePartResult;
+                            }
+                        }
+                    }
+                }
             }
         }
 
