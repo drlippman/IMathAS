@@ -839,17 +839,23 @@ function boxplot($arr,$label="",$options = array()) {
 			$iqr = $q3-$q1;
 			$lfence = $q1 - 1.5*$iqr;
 			$rfence = $q3 + 1.5*$iqr;
+      $mininside = 1e50;
+      $maxinside = -1e50;
 			foreach ($a as $v) {
 				if ($v<$lfence || $v>$rfence) {
 					$outliers[] = $v*1;
-				}
+				} else if ($v < $mininside) {
+          $mininside = $v*1;
+        } else if ($v > $maxinside) {
+          $maxinside = $v*1;
+        }
 			}
 			if (count($outliers)>0) {
 				if ($lfence>$min) {
-					$min = $lfence;
+					$min = $mininside;
 				}
 				if ($rfence<$max) {
-					$max = $rfence;
+					$max = $maxinside;
 				}
 			}
 		}
