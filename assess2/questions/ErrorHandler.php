@@ -28,13 +28,14 @@ class ErrorHandler
     public static function evalErrorHandler(int $errno, string $errstr, string $errfile,
                                             int $errline, array $errcontext): bool
     {
+      if (E_WARNING == $errno || E_ERROR == $errno) {
         error_log(sprintf('Caught error by QuestionGenerator in %s:%s -- %s',
             $errfile, $errline, $errstr));
 
-        if (extension_loaded('newrelic') && $errno !== E_NOTICE) {
+        if (extension_loaded('newrelic')) {
             newrelic_notice_error($errno, $errstr, $errfile, $errline, $errcontext);
         }
-
+      }
         // True = Don't execute the PHP internal error handler.
         // False = Populate $php_errormsg.
         // Reference: https://secure.php.net/manual/en/function.set-error-handler.php
