@@ -150,6 +150,17 @@ var MQeditor = (function($) {
       .on('blur.mqeditor', function() {
         blurTimer = setTimeout(hideEditor, 100);
       });
+    $(mqel).on('click.mqeditor', function(e) {
+      // hack to handle MQ entries inside radio button labels
+      var p = $(e.target).closest("label");
+      if (p.length > 0) {
+        if (p.attr("for") !== 'undefined') {
+          $("#" + p.attr("for")).prop("checked",true);
+        }
+        e.stopPropagation();
+        return false;
+      }
+    });
   }
 
   /*
@@ -290,6 +301,11 @@ var MQeditor = (function($) {
       }
   		//document.getElementById(el.id.substring(8)).value = latex;
       $("#"+el.id.substring(8)).val(latex).trigger('input');
+      // handle nosolninf, since not traditional input
+      if (latex != '') {
+        $("#"+el.id.substring(8)).siblings("input[id^=qs][value=spec]").prop("checked",true);
+      }
+
       if (config.hasOwnProperty('onEdit')) {
         config.onEdit(el.id, latex);
       }
