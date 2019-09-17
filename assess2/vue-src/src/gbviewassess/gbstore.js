@@ -63,6 +63,9 @@ export const actions = {
               window.initeditor('divs', 'fbbox', null, true);
             }
             window.initAnswerboxHighlights();
+            if (window.location.hash && document.getElementById(window.location.hash)) {
+              document.getElementById(window.location.hash).scrollIntoView();
+            }
           });
         })
         .fail((xhr, textStatus, errorThrown) => {
