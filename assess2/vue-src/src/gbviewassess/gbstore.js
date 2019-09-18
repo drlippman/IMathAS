@@ -293,10 +293,11 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
+
         // TODO: update displayed data rather than just exiting
-        if (store.clearAttempts.type === 'all' && keepver === 0) {
+        if (store.clearAttempts.type === 'all' && data.keepver === 0) {
           // cleared all - exit
-          window.location = store.exitUrl;
+          window.location = window.exiturl;
         } else if (store.clearAttempts.type === 'all') {
           // reload whole mess
           actions.loadGbAssessData();
