@@ -469,7 +469,7 @@ class AssessInfo
 					if (round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
 						$isBlocked = true;
 					}
-				} else if ($prereqscoretot+.02<abs($this->assessData['reqscore'])) { //points based
+				} else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
 					$isBlocked = true;
 				}
       }

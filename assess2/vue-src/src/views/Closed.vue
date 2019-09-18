@@ -17,7 +17,7 @@
         </button>
       </p>
 
-      <p v-if="settings.can_use_latepass > 0">
+      <p v-if="settings.can_use_latepass > 0 && this.settings.available !== 'needprereq'">
         {{ $tc('closed.latepassn', settings.latepasses_avail) }}
         <br/>
         {{ latepassExtendMsg }}
@@ -155,7 +155,7 @@ export default {
       });
     },
     primaryButton () {
-      if (this.settings.can_use_latepass > 0) {
+      if (this.settings.can_use_latepass > 0 && this.settings.available !== 'needprereq') {
         return this.$tc('closed.use_latepass', this.settings.can_use_latepass);
       } else if (this.settings.available === 'practice') {
         return this.$t('closed.do_practice');
@@ -168,7 +168,7 @@ export default {
       }
     },
     primaryAction () {
-      if (this.settings.can_use_latepass > 0) {
+      if (this.settings.can_use_latepass > 0 && this.settings.available !== 'needprereq') {
         return 'latepass';
       } else if (this.settings.available === 'practice') {
         return 'practice';
