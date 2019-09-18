@@ -252,7 +252,11 @@ function newXMLoverPost($url, $request, $requestHeaders, $method = 'POST') {
 				echo "error: ";
 				echo htmlentities(curl_error());
 			}*/
-		}
+		} else {
+      if (curl_errno($ch)) {
+        $resp = curl_error($ch);
+      }
+    }
 		curl_close($ch);
 	} else {
 		// Try using fopen if curl was not available
