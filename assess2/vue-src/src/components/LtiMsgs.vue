@@ -6,7 +6,7 @@
     :aria-label = "$tc('lti.msgs', msgcnt)"
   >
     <icons name="message" size="medium"/>
-    <div class="badgeicon">
+    <div class="badgeicon" v-if="msgcnt > 0">
       {{ msgcnt }}
     </div>
   </a>
