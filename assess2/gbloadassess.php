@@ -168,6 +168,8 @@ if ($assessInfoOut['has_practice']) {
   );
 }
 
+$assessInfoOut['lti_sourcedid'] = $assess_record->getLTIsourcedId();
+
 // generating answeights may have changed the record; save if needed
 $assess_record->saveRecordIfNeeded();
 
