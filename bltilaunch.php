@@ -1601,7 +1601,6 @@ $sessiondata['ltiorg'] = $SESS['ltiorg'];
 $sessiondata['ltirole'] = $SESS['ltirole'];
 $sessiondata['lti_context_id']  = $SESS['lti_context_id'];
 $sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
-$sessiondata['lti_lis_result_sourcedid']  = $SESS['lti_lis_result_sourcedid'];
 if ($linkparts[0]=='aid') {
 	$sessiondata['lti_lis_result_sourcedid'.$aid]  = $SESS['lti_lis_result_sourcedid'];
 }
@@ -2719,7 +2718,6 @@ $sessiondata['ltiorg'] = $SESS['ltiorg'];
 $sessiondata['ltirole'] = $SESS['ltirole'];
 $sessiondata['lti_context_id']  = $SESS['lti_context_id'];
 $sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
-$sessiondata['lti_lis_result_sourcedid']  = $SESS['lti_lis_result_sourcedid'];
 // record it with aid for safety
 if ($keyparts[0]=='aid') {
 	$sessiondata['lti_lis_result_sourcedid'.$aid]  = $SESS['lti_lis_result_sourcedid'];
