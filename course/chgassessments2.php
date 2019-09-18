@@ -198,6 +198,11 @@ if (!(isset($teacherid))) {
 				$qarr[':gbcategory'] = Sanitize::onlyInt($_POST['gbcategory']);
 			}
 
+			if ($_POST['caltag'] !== '') {
+				$sets[] = "caltag=:caltag";
+				$qarr[':caltag'] = Sanitize::stripHtmlTags($_POST['caltag']);
+			}
+
 			if ($_POST['noprint'] !== 'DNC') {
 				$sets[] = "noprint=:noprint";
 				$qarr[':noprint'] = Sanitize::onlyInt($_POST['noprint']);
