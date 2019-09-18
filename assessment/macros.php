@@ -2395,6 +2395,9 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 	if (floor($d)==$d) {
 		return floor($d);
 	}
+	if (abs($d)<1e-12) {
+		return '0';
+	}
 	if ($d<0) {
 		$sign = '-';
 	} else {
