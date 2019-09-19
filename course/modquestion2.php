@@ -52,8 +52,11 @@ if (!(isset($teacherid))) {
           $penalty = 'S' . $penalty_aftern . $penalty;
         }
 			}
-
-			$regen = $_POST['allowregen'];
+      if (isset($_POST['allowregen'])) {
+			  $regen = Sanitize::onlyInt($_POST['allowregen']);
+      } else {
+        $regen = 0;
+      }
 			$showans = $_POST['showans'];
 			$rubric = intval($_POST['rubric']);
 			$showhints = intval($_POST['showhints']);
