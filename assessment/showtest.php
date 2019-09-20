@@ -376,8 +376,9 @@
 
 			}
 			$deffeedbacktext = $adata['deffeedbacktext'];
-			if (isset($sessiondata['lti_lis_result_sourcedid']) && strlen($sessiondata['lti_lis_result_sourcedid'])>1) {
-				$ltisourcedid = $sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
+
+			if (isset($sessiondata['lti_lis_result_sourcedid'.$aid]) && strlen($sessiondata['lti_lis_result_sourcedid'.$aid])>1) {
+				$ltisourcedid = $sessiondata['lti_lis_result_sourcedid'.$aid].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
 			} else {
 				$ltisourcedid = '';
 			}
@@ -515,8 +516,8 @@
 				$sessiondata['timelimitmult'] = 1.0;
 			}
 
-			if (isset($sessiondata['lti_lis_result_sourcedid'])) {
-				$altltisourcedid = $sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
+			if (isset($sessiondata['lti_lis_result_sourcedid'.$aid])) {
+				$altltisourcedid = $sessiondata['lti_lis_result_sourcedid'.$aid].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
 				if ($altltisourcedid != $line['lti_sourcedid']) {
 					$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET lti_sourcedid=:lti_sourcedid WHERE id=:id");
 					$stm->execute(array(':lti_sourcedid'=>$altltisourcedid, ':id'=>$line['id']));
