@@ -43,7 +43,7 @@ if ($myrights<20) {
 			$chk = "&checked=0";
 		} else {
 			$chk = '';
-		}                                      
+		}
 		if ($onlychk==1) {
 		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','$loc',true);";
 		} else {
@@ -51,7 +51,7 @@ if ($myrights<20) {
 		}
 	}
 
-	
+
 	$lastanswers = array();
 	$scores = array();
 	$rawscores = array();
@@ -113,6 +113,7 @@ $sessiondata['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
 
 $useeqnhelper = $eqnhelper;
+$useOldassessUI = true;
 
 require("../assessment/header.php");
 
@@ -157,8 +158,8 @@ if ($overwriteBody==1) {
 			document.getElementById("brokenmsgok").style.display = (tagged==1)?"none":"block";
 			if (tagged==1) {alert("Make sure you also contact the question author or support so they know why you marked the question as broken");}
 		}
-		
-		$(window).on('beforeunload', function() { 
+
+		$(window).on('beforeunload', function() {
 			if (window.opener && !window.opener.closed  && window.opener.sethighlightrow) {
 				window.opener.sethighlightrow(-1);
 			}
@@ -307,7 +308,7 @@ if ($overwriteBody==1) {
 
 	printf("<p>Question id: %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));
 	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> to report problems</p>";
-	
+
 	printf("<p>Description: %s</p><p>Author: %s</p>", Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
 	echo "<p>Last Modified: $lastmod</p>";

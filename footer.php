@@ -19,10 +19,12 @@ if (isset($CFG['GEN']['translatewidgetID'])) {
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	//echo "<script type=\"text/javascript\">initEditor();</script>\n";
 }
-if ($courseUIver == 1 && isset($useeqnhelper) && ($useeqnhelper==1 || $useeqnhelper==2)) {
+if (($courseUIver == 1 || isset($useOldassessUI)) && isset($useeqnhelper)
+	&& ($useeqnhelper==1 || $useeqnhelper==2)) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/assessment/eqnhelper.html");
-} else if ($courseUIver == 1 && isset($useeqnhelper) && ($useeqnhelper==3 || $useeqnhelper==4)) {
+} else if (($courseUIver == 1 || isset($useOldassessUI)) && isset($useeqnhelper)
+	&& ($useeqnhelper==3 || $useeqnhelper==4)) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require("$curdir/assessment/mathquilled.html");
 	require("$curdir/assessment/eqnhelperbasic.html");
