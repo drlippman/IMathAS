@@ -150,10 +150,12 @@ export default {
     }
   },
   methods: {
-    loadQuestionIfNeeded () {
+    loadQuestionIfNeeded (skiprender) {
       if (!this.questionContentLoaded && this.active && store.errorMsg === null) {
         actions.loadQuestion(this.qn, false, false);
-      } else if (this.questionContentLoaded && this.active && !this.questionData.rendered) {
+      } else if (this.questionContentLoaded && this.active
+        && !this.questionData.rendered && skiprender !== true)
+      {
         this.renderAndTrack();
       }
     },
@@ -306,7 +308,7 @@ export default {
     }
   },
   created () {
-    this.loadQuestionIfNeeded();
+    this.loadQuestionIfNeeded(true);
   },
   mounted () {
     if (this.questionContentLoaded) {

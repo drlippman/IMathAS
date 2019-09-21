@@ -1376,6 +1376,12 @@ class AssessRecord
     $exceptionPenalty = $this->assess_info->getSetting('exceptionpenalty');
     $overtimePenalty = $this->assess_info->getSetting('overtime_penalty');
 
+    if (empty($qsettings['points_possible'])) {
+      error_log("empty points possible. QID ".$qver['qid'].
+        ". qn $qn in ver $ver try $try of aid ".
+        $this->curAid." by userid ".$this->$curUid);
+    }
+
     $answeights = isset($qver['answeights']) ? $qver['answeights'] : array(1);
     $answeightTot = array_sum($answeights);
     $partscores = array_fill(0, count($answeights), 0);
