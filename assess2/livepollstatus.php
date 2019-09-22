@@ -88,7 +88,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   // look up question HTML. Also grab seed
   // get current question version
-  $qid = $assess_record->getQuestionId($qn);
+  list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
   // do regen if requested
   if (!empty($_POST['forceregen'])) {
     // need to temporarily override shuffle setting to bypass the
@@ -98,7 +98,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   }
 
   // load question settings and code
-  $assess_info->loadQuestionSettings(array($qid), true);
+  $assess_info->loadQuestionSettings($qidstoload, true);
 
   // get question object. Not showing scores in this state.
   $assessInfoOut['questions'] = array(
@@ -134,8 +134,8 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   $stm->execute(array($newQuestion, $newState, $now, $aid));
 
   // load question seed
-  $qid = $assess_record->getQuestionId($qn);
-  $assess_info->loadQuestionSettings(array($qid), false);
+  list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
+  $assess_info->loadQuestionSettings($qidstoload, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
 
@@ -177,8 +177,8 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   $stm->execute(array($newQuestion, $newState, $aid));
 
   // lookup question seed
-  $qid = $assess_record->getQuestionId($qn);
-  $assess_info->loadQuestionSettings(array($qid), false);
+  list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
+  $assess_info->loadQuestionSettings($qidstoload, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
 

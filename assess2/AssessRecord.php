@@ -1844,11 +1844,25 @@ class AssessRecord
    * Gets the question ID for the given question number
    * @param  int  $qn             Question Number
    * @param  string  $ver         version #, or 'last'
-   * @return int  question ID
+   * @return array(int current question ID, array all question IDs)
    */
   public function getQuestionId($qn, $ver = 'last') {
-    $curq = $this->getQuestionVer($qn, $ver);
-    return $curq['qid'];
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    $assessver = $this->getAssessVer($ver);
+    $outall = array();
+    $question_versions = $assessver['questions'][$qn]['question_versions'];
+    if (!$by_question || $ver === 'last') {
+      $curq = $question_versions[count($question_versions) - 1];
+    } else if ($ver === 'scored') {
+      $curq = $question_versions[$assessver['questions'][$qn]['scored_version']];
+    } else {
+      $curq = $question_versions[$ver];
+    }
+    $out = $curq['qid'];
+    foreach ($question_versions as $qver) {
+      $outall[] = $qver['qid'];
+    }
+    return array($out, $outall);
   }
 
   /**

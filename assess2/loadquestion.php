@@ -128,10 +128,10 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 }
 
 // get current question version
-$qid = $assess_record->getQuestionId($qn);
+list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
 
 // load question settings and code
-$assess_info->loadQuestionSettings(array($qid), true);
+$assess_info->loadQuestionSettings($qidstoload, true);
 
 // For livepoll, verify seed and generate new question version if needed
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
