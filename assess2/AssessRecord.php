@@ -1379,7 +1379,8 @@ class AssessRecord
     if (empty($qsettings['points_possible'])) {
       error_log("empty points possible. QID ".$qver['qid'].
         ". qn $qn in ver $ver try $try of aid ".
-        $this->curAid." by userid ".$this->$curUid);
+        $this->curAid." by userid ".$this->curUid
+        . ". Request URI: ".$_SERVER['REQUEST_URI']);
     }
 
     $answeights = isset($qver['answeights']) ? $qver['answeights'] : array(1);
