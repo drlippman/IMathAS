@@ -1376,7 +1376,7 @@ class AssessRecord
     $exceptionPenalty = $this->assess_info->getSetting('exceptionpenalty');
     $overtimePenalty = $this->assess_info->getSetting('overtime_penalty');
 
-    if (empty($qsettings['points_possible'])) {
+    if (empty($qsettings['points_possible']) && $qsettings['points_possible'] !== 0) {
       error_log("empty points possible. QID ".$qver['qid'].
         ". qn $qn in ver $ver try $try of aid ".
         $this->curAid." by userid ".$this->curUid
