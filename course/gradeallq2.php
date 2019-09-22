@@ -447,7 +447,7 @@
 		}
 
 		// get an array of qn=>qid
-		$questions = $assess_record->getQuestionIds('all', 'scored');
+		list($questions, $toloadquestions) = $assess_record->getQuestionIds('all', 'scored');
 
 		// find this question id in list
 		$lockeys = array_keys($questions,$qid);

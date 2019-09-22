@@ -147,10 +147,10 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 
 if (count($qns) > 0) {
   // get current question version ids
-  $qids = $assess_record->getQuestionIds($qns);
+  list($qids, $toloadqids) = $assess_record->getQuestionIds($qns);
 
   // load question settings and code
-  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $qids, true);
+  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $toloadqids, true);
 
   // Verify confirmation values (to ensure it hasn't been submitted since)
   if (!$assess_record->checkVerification($verification)) {

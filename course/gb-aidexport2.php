@@ -142,7 +142,7 @@ if (isset($_POST['options'])) {
 				// The 2 for generate_html tells it to tack on the 'ans' and 'stuans'
 				// to jsparams.
 				$question_objects = $assess_record->getAllQuestionObjects(true, true, $dobca ? 2 : false, 'scored');
-				$questionIds = $assess_record->getQuestionIds(range(0,count($question_objects)-1), 'scored');
+				list($questionIds, $toloadqids) = $assess_record->getQuestionIds(range(0,count($question_objects)-1), 'scored');
 				if (!$dobca && $doba) {
 					list($stuanswers, $stuanswersval) = $assess_record->getStuanswers('scored');
 				}

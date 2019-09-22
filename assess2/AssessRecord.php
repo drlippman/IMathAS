@@ -749,8 +749,8 @@ class AssessRecord
 
     // Load the question code
     $qns = array_keys($autosaves);
-    $qids = $this->getQuestionIds($qns);
-    $this->assess_info->loadQuestionSettings($qids, true);
+    list($qids, $toloadqids) = $this->getQuestionIds($qns);
+    $this->assess_info->loadQuestionSettings($toloadqids, true);
 
     // add a submission
     $submission = $this->addSubmission($maxtime + $this->assessRecord['starttime']);
@@ -1855,12 +1855,16 @@ class AssessRecord
    * Gets the question IDs for the given question numbers
    * @param  array  $qns           Array of Question Numbers
    * @param  string  $ver         version #, or 'last'
-   * @return array  question IDs, indexed by question number
+   * @return array(active,all)
+   *   active: array  active question IDs, indexed by question number
+   *   all: array IDs for all question IDs used for these question numbers
+   *    (accounts for pooled questions)
    */
   public function getQuestionIds($qns, $ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $assessver = $this->getAssessVer($ver);
     $out = array();
+    $outall = array();
     if ($qns === 'all') {
       $qns = range(0, count($assessver['questions']) - 1);
     }
@@ -1874,8 +1878,11 @@ class AssessRecord
         $curq = $question_versions[$ver];
       }
       $out[$qn] = $curq['qid'];
+      foreach ($question_versions as $qver) {
+        $outall[] = $qver['qid'];
+      }
     }
-    return $out;
+    return array($out, array_unique($outall));
   }
 
   /**
