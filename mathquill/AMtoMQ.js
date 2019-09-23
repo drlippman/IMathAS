@@ -734,23 +734,15 @@ return function(str) {
 n\frac{num}{denom} to n num/denom
 */
 function MQtoAM(tex,display) {
-	//alert(tex);
+  var nested,lb,rb,isfuncleft,curpos,c,i;
 	tex = tex.replace(/\\:/g,' ');
 	if (!display) {
-		while ((i=tex.indexOf('\\left|'))!=-1) { //found a left |
-			nested = 0;
-			do {
-				lb = tex.indexOf('\\left|',i+1);
-				rb = tex.indexOf('\\right|',i+1);
-				if (lb !=-1 && lb < rb) {	//if another left |
-					nested++;
-				} else if (rb!=-1 && (lb == -1 || rb < lb)) {  //if right |
-					nested--;
-				}
-			} while (nested>0 && rb!=-1);  //until nested back to 0 or no right |
+    while ((i = tex.lastIndexOf('\\left|'))!=-1) { //found a left |)
+      rb = tex.indexOf('\\right|',i+1);
 			if (rb!=-1) {  //have a right |  - replace with abs( )
-				tex = tex.substring(0,rb) + ")" + tex.substring(rb+7);
-				tex = tex.substring(0,i) + "abs(" + tex.substring(i+6);
+        isfuncleft = tex.substring(0,i).match(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|ln|log|exp|sin|cos|tan|sec|csc|cot)(\^\d+)?$/);
+				tex = tex.substring(0,rb) + ")" + (isfuncleft?')':'') + tex.substring(rb+7);
+				tex = tex.substring(0,i) + (isfuncleft?'(':'') + "abs(" + tex.substring(i+6);
 			} else {
 				tex = tex.substring(0,i) + "|" + tex.substring(i+6);
 			}
