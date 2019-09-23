@@ -822,13 +822,13 @@ class AssessInfo
     } else {
       if ($settings['penalty'][0]==='L') {
         $settings['retry_penalty_after'] = 'last';
-        $settings['retry_penalty'] = substr($settings['penalty'], 1);
+        $settings['retry_penalty'] = intval(substr($settings['penalty'], 1));
       } else if ($settings['penalty'][0]==='S') {
-        $settings['retry_penalty_after'] = $settings['penalty'][1];
-        $settings['retry_penalty'] = substr($settings['penalty'], 2);
+        $settings['retry_penalty_after'] = intval($settings['penalty'][1]);
+        $settings['retry_penalty'] = intval(substr($settings['penalty'], 2));
       } else {
         $settings['retry_penalty_after'] = 1;
-        $settings['retry_penalty'] = $settings['penalty'];
+        $settings['retry_penalty'] = intval($settings['penalty']);
       }
     }
     if ($settings['regenpenalty'] == 9999) {
@@ -836,11 +836,11 @@ class AssessInfo
       $settings['regen_penalty_after'] = $defaults['defregenpenalty_after'];
     } else {
       if ($settings['regenpenalty'][0]==='S') {
-        $settings['regen_penalty_after'] = $settings['regenpenalty'][1];
-        $settings['regen_penalty'] = substr($settings['regenpenalty'], 2);
+        $settings['regen_penalty_after'] = intval($settings['regenpenalty'][1]);
+        $settings['regen_penalty'] = intval(substr($settings['regenpenalty'], 2));
       } else {
         $settings['regen_penalty_after'] = 1;
-        $settings['regen_penalty'] = $settings['regenpenalty'];
+        $settings['regen_penalty'] = intval($settings['regenpenalty']);
       }
     }
     if ($settings['regen'] == 1 || $defaults['submitby'] == 'by_assessment') {
@@ -917,19 +917,20 @@ class AssessInfo
     //break apara defpenalty, defregenpenalty
     if ($settings['defpenalty'][0]==='L') {
       $settings['defpenalty_after'] = 'last';
-      $settings['defpenalty'] = substr($settings['defpenalty'], 1);
+      $settings['defpenalty'] = intval(substr($settings['defpenalty'], 1));
     } else if ($settings['defpenalty'][0]==='S') {
-      $settings['defpenalty_after'] = $settings['defpenalty'][1];
-      $settings['defpenalty'] = substr($settings['defpenalty'], 2);
+      $settings['defpenalty_after'] = intval($settings['defpenalty'][1]);
+      $settings['defpenalty'] = intval(substr($settings['defpenalty'], 2));
     } else {
       $settings['defpenalty_after'] = 1;
     }
 
     if ($settings['defregenpenalty'][0]==='S') {
       $settings['defregenpenalty_after'] = intval($settings['defregenpenalty'][1]);
-      $settings['defregenpenalty'] = substr($settings['defregenpenalty'], 2)*1;
+      $settings['defregenpenalty'] = intval(substr($settings['defregenpenalty'], 2));
     } else {
       $settings['defregenpenalty_after'] = 1;
+      $settings['defregenpenalty'] = intval($settings['defregenpenalty']);
     }
 
     // if LivePoll, force all stu same random seed
@@ -943,8 +944,8 @@ class AssessInfo
     if ($settings['submitby'] == 'by_assessment') {
       $settings['allowed_attempts'] = $settings['defregens'];
       $settings['retake_penalty'] = array(
-        'penalty' => $settings['defregenpenalty']*1,
-        'n' => $settings['defregenpenalty_after']*1
+        'penalty' => intval($settings['defregenpenalty']),
+        'n' => intval($settings['defregenpenalty_after'])
       );
     }
 

@@ -30,6 +30,7 @@ function migrateAssessSettings1to2($settings) {
   if ($testtype == "Homework" || $testtype == "Practice") {
     $settings['submitby'] = 'by_question';
     $settings['defregens'] = 100;
+    $settings['defregenpenalty'] = 0;
     $settings['showscores'] = 'during';
     if ($showans == 'V' || $showans == 'N') {
       $settings['showans'] = 'never';
