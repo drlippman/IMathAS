@@ -40,6 +40,11 @@
         <strong>{{ $t('qdetails.category') }}:</strong>
         {{ qinfo.category }}
       </p>
+      <p class="small subdued" style="text-align:right">
+        <a target="license" :href="licenseUrl">
+          {{ $t('qdetails.license') }}
+        </a>
+      </p>
     </div>
   </div>
 </template>
@@ -95,6 +100,9 @@ export default {
     },
     submitby () {
       return store.assessInfo.submitby;
+    },
+    licenseUrl () {
+      return window.imasroot + '/course/showlicense.php?id=' + this.qinfo.questionsetid;
     }
   }
 };

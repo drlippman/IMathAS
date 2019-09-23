@@ -211,7 +211,8 @@
     "category": "Category",
     "gbscore": "Recorded score",
     "bestpractice": "Best practice score",
-    "lastscore": "Score on last try"
+    "lastscore": "Score on last try",
+    "license": "License"
   },
   "timer": {
     "hrs": "hr | hrs",
