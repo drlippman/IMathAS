@@ -553,7 +553,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['showscores'] = isset($CFG['AMS2']['showscores'])?$CFG['AMS2']['showscores']:'during';
 					$line['showans'] = isset($CFG['AMS2']['showans'])?$CFG['AMS2']['showans']:'after_lastattempt';
 					$line['viewingb'] = isset($CFG['AMS2']['viewingb'])?$CFG['AMS2']['viewingb']:'immediately';
-					$line['scoresingb'] = isset($CFG['AMS2']['scoresingb'])?$CFG['AMS2']['scoresingb']:'in_gb';
+					$line['scoresingb'] = isset($CFG['AMS2']['scoresingb'])?$CFG['AMS2']['scoresingb']:'immediately';
 					$line['ansingb'] = isset($CFG['AMS2']['ansingb'])?$CFG['AMS2']['ansingb']:'after_due';
 					$line['gbcategory'] = 0;
 					$line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';

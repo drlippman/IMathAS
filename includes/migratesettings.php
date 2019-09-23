@@ -25,31 +25,6 @@ function migrateAssessSettings1to2($settings) {
   list($testtype,$showans) = explode('-', $settings['deffeedback']);
   $reattDiffVer = ($settings['shuffle']&8)==8;
 
-  // map showans to viewingb, scoresingb, ansingb
-  if ($showans == 'V') { // Never, but allow students to review
-    $settings['viewingb'] = 'immediately';
-    $settings['scoresingb'] = 'never';
-    $settings['ansingb'] = 'never';
-  } else if ($showans == 'N') { // Never, and don't allow students to review
-    $settings['viewingb'] = 'never';
-    $settings['scoresingb'] = 'never';
-    $settings['ansingb'] = 'never';
-  } else if ($showans == 'A') { // After the due date
-    $settings['viewingb'] = 'after_due';
-    $settings['scoresingb'] = 'after_due';
-    $settings['ansingb'] = 'after_due';
-  } else { // All others
-    if ($settings['submitby'] == 'by_question') {
-      $settings['viewingb'] = 'immediately';
-      $settings['scoresingb'] = 'immediately';
-      $settings['ansingb'] = 'after_due';
-    } else {
-      $settings['viewingb'] = 'immediately';
-      $settings['scoresingb'] = 'after_take';
-      $settings['ansingb'] = 'after_take';
-    }
-  }
-
   // map testtype and showans to submitby, showscores, showans
   $settings['deffeedback'] = '';
   if ($testtype == "Homework" || $testtype == "Practice") {
@@ -88,14 +63,8 @@ function migrateAssessSettings1to2($settings) {
     $settings['defregenpenalty'] = getBasePenalty($settings['defpenalty']);
     $settings['defpenalty'] = 0;
     $settings['defattempts'] = 1;
-    $settings['showscores'] = 'at_end';
+    $settings['showscores'] = 'total';
     $settings['showans'] = 'never';
-    if ($showans != 'V' && $showans != 'N') {
-      // override above - doesn't make sense to show detailed score
-      // until after due date in this mode
-      $settings['scoresingb'] = 'after_due';
-      $settings['ansingb'] = 'after_due';
-    }
   } else if ($testtype == "EachAtEnd" ||
       $testtype == "EndReview" ||
       $testtype == "EndReviewWholeTest"
@@ -135,6 +104,45 @@ function migrateAssessSettings1to2($settings) {
       } else if (is_numeric($showans)) {
         $settings['showans'] = 'after_'.$showans;
       }
+    }
+  }
+
+  // map showans to viewingb, scoresingb, ansingb
+  if ($showans == 'V') { // Never, but allow students to review
+    $settings['viewingb'] = 'immediately';
+    $settings['scoresingb'] = 'never';
+    $settings['ansingb'] = 'never';
+  } else if ($showans == 'N') { // Never, and don't allow students to review
+    $settings['viewingb'] = 'never';
+    $settings['scoresingb'] = 'never';
+    $settings['ansingb'] = 'never';
+  } else if ($showans == 'A') { // After the due date
+    $settings['viewingb'] = 'after_due';
+    $settings['scoresingb'] = 'after_due';
+    $settings['ansingb'] = 'after_due';
+  } else { // All others
+    if ($settings['submitby'] == 'by_question') {
+      $settings['viewingb'] = 'immediately';
+      $settings['scoresingb'] = 'immediately';
+      $settings['ansingb'] = 'after_due';
+    } else {
+      $settings['viewingb'] = 'immediately';
+      $settings['scoresingb'] = 'after_take';
+      $settings['ansingb'] = 'after_take';
+    }
+  }
+  if ($testtype == "EndScore" && ($showans != 'V' && $showans != 'N')) {
+    // override above - doesn't make sense to show detailed score
+    // until after due date in this mode
+    $settings['viewingb'] = 'after_due';
+    $settings['ansingb'] = 'after_due';
+  }
+  // fix possible invalid settings
+  if ($settings['showscores'] == 'during') {
+    if ($settings['submitby'] == 'by_question') {
+      $settings['scoresingb'] = 'immediately';
+    } else {
+      $settings['scoresingb'] = 'after_take';
     }
   }
 
