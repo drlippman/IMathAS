@@ -19,6 +19,7 @@ if (isset($CFG['GEN']['translatewidgetID'])) {
 if (isset($useeditor) && $sessiondata['useed']==1) {
 	//echo "<script type=\"text/javascript\">initEditor();</script>\n";
 }
+if (!isset($courseUIver)) { $courseUIver = 1;}
 if (($courseUIver == 1 || isset($useOldassessUI)) && isset($useeqnhelper)
 	&& ($useeqnhelper==1 || $useeqnhelper==2)) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -30,10 +31,11 @@ if (($courseUIver == 1 || isset($useOldassessUI)) && isset($useeqnhelper)
 	require("$curdir/assessment/eqnhelperbasic.html");
 }
 
-if ((isset($testsettings) && $testsettings['showtips']==2) || ($courseUIver == 1 && isset($showtips) && $showtips==2)) {
+if ((isset($testsettings) && $testsettings['showtips']==2) ||
+	(($courseUIver == 1 || isset($useOldassessUI)) && isset($showtips) && $showtips==2)
+) {
 	echo '<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">' . _('[more..]') . '</span></div>';
 	echo '<div id="eh" class="eh"></div>';
-
 }
 if (isset($placeinfooter)) {
 	echo $placeinfooter;
