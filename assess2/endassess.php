@@ -47,6 +47,9 @@ if ($isstudent) {
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
 
+// grab all questions settings
+$assess_info->loadQuestionSettings('all', false);
+
 // if have active scored record end it
 if ($assess_record->hasActiveAttempt()) {
   $assess_record->scoreAutosaves();
@@ -82,8 +85,7 @@ $include_from_assess_info = array(
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
-// grab all questions settings and scores, based on end-of-assessment settings
-$assess_info->loadQuestionSettings('all', false);
+// grab all questions scores, based on end-of-assessment settings
 $showscores = $assess_info->showScoresAtEnd();
 $reshowQs = $assess_info->reshowQuestionsAtEnd();
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
