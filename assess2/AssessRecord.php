@@ -1923,7 +1923,7 @@ class AssessRecord
     $aScoredVer = 0;
     $allAssessVerScores = array();
     $totalTime = 0;
-
+    $lastAver = count($this->data['assess_versions']) - 1;
     // loop through all the assessment versions
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
       $curAver = &$this->data['assess_versions'][$av];
@@ -1931,9 +1931,12 @@ class AssessRecord
       // loop through the question numbers
       $aVerScore = 0;
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
-        // if not rescoring this question, or if withdrawn, use existing score
+        // if not rescoring this question, or if withdrawn, 
+        // or retotalling indiv questions and not latest assess version, 
+        // use existing score
         if (($rescoreQs !== 'all' && !in_array($qn, $rescoreQs)) ||
-            !empty($curAver['questions'][$qn]['withdrawn'])
+            !empty($curAver['questions'][$qn]['withdrawn']) ||
+        	($rescoreQs !== 'all' && $av < $lastAver)
         ) {
           $aVerScore += $curAver['questions'][$qn]['score'];
           $verTime += $curAver['questions'][$qn]['time'];
