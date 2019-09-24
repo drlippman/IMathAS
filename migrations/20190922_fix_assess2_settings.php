@@ -11,7 +11,6 @@ if ($res===false) {
 	return false;
 }
 
-$DBH->commit();
 
 $query = "UPDATE `imas_assessments` SET scoresingb='after_take' WHERE ver=2 AND showscores='during' AND submitby='by_assessment'";
 $res = $DBH->query($query);
