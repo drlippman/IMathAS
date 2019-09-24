@@ -72,6 +72,7 @@ class AssessInfo
       }
 
       $this->assessData = self::normalizeSettings($assessData);
+
       $this->setAvailable();
   }
 
@@ -1078,7 +1079,7 @@ class AssessInfo
 
     foreach ($settings as $k=>$v) {
       //convert numeric strings to numbers
-      if (is_string($v) && is_numeric($v)) {
+      if (is_string($v) && is_numeric($v) && $k != 'name') {
         $settings[$k] = $v + 0;
       }
     }
