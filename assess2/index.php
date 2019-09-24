@@ -9,6 +9,10 @@ if (empty($_GET['cid']) || empty($_GET['aid'])) {
   echo 'Error - need to specify course ID and assessment ID in URL';
   exit;
 }
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) { // loaded by a NON-teacher
+  echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll.";
+  exit;
+}
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 

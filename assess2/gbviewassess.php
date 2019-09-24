@@ -9,6 +9,10 @@ if (empty($_GET['cid']) || empty($_GET['aid'])) {
   echo 'Error - need to specify course ID and assessment ID in URL';
   exit;
 }
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+  echo 'Error - you do not have access to this course';
+  exit;
+}
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $stu = Sanitize::onlyInt($_GET['stu']);
