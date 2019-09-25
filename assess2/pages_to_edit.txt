@@ -30,13 +30,8 @@ Test:
   hinttext, hints, etc.
 
 Bugs:
-  Commas in numfunc answers
   possible race condition: https://lumenlearning.atlassian.net/browse/IM-354
-  "Review work in GB" stuck on loading page
-  - make sure error msgs display
   Large number answers not working (qn-val)
-  JSXgraph questions not working - MOM 75910 for example
-    Need to modify library, and existing questions
   ? gradeallq2: unexpected token ) on 100
   Time limit overtimes when not allowed
   In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
@@ -104,6 +99,9 @@ Delay for later:
   ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
     Punt on these by just disabling the regen option for now.
 
+X Commas in numfunc answers
+X "Review work in GB" stuck on loading page
+X JSXgraph questions not working - MOM 75910 for example
 X Better notification for new message in LTI mode.
 X Fix variable case insensitivity in new player
 X Intercept document.write and try to handle
