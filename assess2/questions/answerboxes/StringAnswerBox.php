@@ -184,7 +184,9 @@ class StringAnswerBox implements AnswerBox
     			$sa .= $answer;
     		}
 
-        if ($scoremethod == 'takeanythingorblank' && trim($la) == '') {
+        if (($scoremethod == 'takeanythingorblank' && trim($la) == '') ||
+          $scoremethod = 'submitblank'
+        ) {
           $params['submitblank'] = 1;
         }
 
