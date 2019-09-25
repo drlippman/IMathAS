@@ -155,6 +155,11 @@ export const actions = {
     store.inTransit = true;
     if (regen) {
       this.clearInitValue(qn);
+      if (store.assessInfo.hasOwnProperty('scoreerrors') &&
+        store.assessInfo.scoreerrors.hasOwnProperty(qn)
+      ) {
+        delete store.assessInfo.scoreerrors[qn];
+      }
     }
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
@@ -349,6 +354,11 @@ export const actions = {
         // clear out initValues for this question so they get re-set
         for (let k = 0; k < qns.length; k++) {
           let qn = qns[k];
+          if (store.assessInfo.hasOwnProperty('scoreerrors') &&
+            store.assessInfo.scoreerrors.hasOwnProperty(qn)
+          ) {
+            delete store.assessInfo.scoreerrors[qn];
+          }
           if (store.initValues.hasOwnProperty(qn)) {
             delete store.initValues[qn];
           }
