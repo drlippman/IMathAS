@@ -361,7 +361,7 @@ var Node = P(function(_) {
   _.isEmpty = function() {
     return this.ends[L] === 0 && this.ends[R] === 0;
   };
-  
+
   _.isStyleBlock = function() {
     return false;
   };
@@ -4127,7 +4127,7 @@ var Variable = P(Symbol, function(_, super_) {
 
 Options.p.autoCommands = { _maxLength: 0 };
 optionProcessors.autoCommands = function(cmds) {
-  if (!/^[a-z]+(?: [a-z]+)*$/i.test(cmds)) {
+  if (!/^\^?[a-z]+(?: \^?[a-z]+)*$/i.test(cmds)) {
     throw '"'+cmds+'" not a space-delimited list of only letters';
   }
   var list = cmds.split(' '), dict = {}, maxLength = 0;
@@ -4160,13 +4160,17 @@ var Letter = P(Variable, function(_, super_) {
         str = l.letter + str, l = l[L], i += 1;
       }
       // check for an autocommand, going thru substrings longest to shortest
+      i = 0;
       while (str.length) {
-        if (autoCmds.hasOwnProperty(str)) {
+        if (autoCmds.hasOwnProperty(str) ||
+          (i==0 && autoCmds.hasOwnProperty('^'+str))
+        ) {
           for (var i = 1, l = this; i < str.length; i += 1, l = l[L]);
           Fragment(l, this).remove();
           cursor[L] = l[L];
           return LatexCmds[str](str).createLeftOf(cursor);
         }
+        i++;
         str = str.slice(1);
       }
     }
@@ -4532,7 +4536,7 @@ var PlusMinus = P(BinaryOperator, function(_) {
 
       return 'mq-binary-operator';
     };
-    
+
     if (dir === R) return; // ignore if sibling only changed on the right
     this.jQ[0].className = determineOpClassType(this);
     return this;
@@ -5153,6 +5157,7 @@ var Hat = LatexCmds.hat = P(MathCommand, function(_, super_) {
 });
 
 var NthRoot =
+LatexCmds.root =
 LatexCmds.nthroot = P(SquareRoot, function(_, super_) {
   _.htmlTemplate =
       '<sup class="mq-nthroot mq-non-leaf">&0</sup>'
@@ -6168,7 +6173,7 @@ CharCmds['\\'] = P(MathCommand, function(_, super_) {
 //allow addition of new commands via config
 //cmds is object: {symbol:[symboltype, latex, entity]}
 //where symboltype is "VanillaSymbol", "BinaryOperator", or "Variable"
-optionProcessors.addCommands = function(cmds) {	
+optionProcessors.addCommands = function(cmds) {
   for (var str in cmds) {
     if (LatexCmds.hasOwnProperty(str)) {
       throw '"' + str + '" is a built-in operator name';
@@ -6183,7 +6188,7 @@ optionProcessors.addCommands = function(cmds) {
     } else if (cmds[str][0] == 'Variable') {
       LatexCmds[str] = bind(Variable, cmds[str][1], cmds[str][2]);
     } else {
-      throw '"' + str + '" is using an unsupported symbol type';	    
+      throw '"' + str + '" is using an unsupported symbol type';
     }
   }
 };

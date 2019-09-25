@@ -637,7 +637,7 @@ MQ.config({
   charsThatBreakOutOfSupSubVar: "+-(",
   charsThatBreakOutOfSupSubOp: "+-(",
   restrictMismatchedBrackets: true,
-  autoCommands: 'pi theta sqrt oo',
+  autoCommands: 'pi theta root sqrt ^oo',
   autoParenOperators: true,
   addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;']},
 });
