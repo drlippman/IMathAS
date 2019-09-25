@@ -91,10 +91,10 @@ class FunctionExpressionAnswerBox implements AnswerBox
     		$i=0;
     		while ($i<count($fromto)) {
     			if (isset($fromto[$i+2]) && $fromto[$i+2]=='integers') {
-    				$domaingroups[] = array($fromto[$i], $fromto[$i+1], true);
+    				$domaingroups[] = array(intval($fromto[$i]), intval($fromto[$i+1]), true);
     				$i += 3;
     			} else if (isset($fromto[$i+1])) {
-    				$domaingroups[] = array($fromto[$i], $fromto[$i+1], false);
+    				$domaingroups[] = array(floatval($fromto[$i]), floatval($fromto[$i+1]), false);
     				$i += 2;
     			} else {
     				break;
