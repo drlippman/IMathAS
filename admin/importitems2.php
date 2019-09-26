@@ -110,6 +110,9 @@ if (!(isset($teacherid))) {
 		$hasoffline = isset($data['offline']);
 		$hascalitems = isset($data['calitems']);
 		$hasstickyposts = isset($data['stickyposts']);
+    if (!isset($data['course']['UIver'])) {
+      $data['course']['UIver'] = 1;
+    }
 	}
 }
 /******* begin html output ********/

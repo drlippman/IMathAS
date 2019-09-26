@@ -787,6 +787,9 @@ private function insertAssessment() {
 		$thisitemdata['itemorder'] = '';
 
 		// update settings if needed
+		if (!isset($thisitemdata['ver'])) {
+			$thisitemdata['ver'] = 1;
+		}
 		if ($thisitemdata['ver'] < $GLOBALS['courseUIver']) {
 			$thisitemdata = migrateAssessSettings($thisitemdata, $thisitemdata['ver'], $GLOBALS['courseUIver']);
 			$defaults[$toimport] = $thisitemdata;
