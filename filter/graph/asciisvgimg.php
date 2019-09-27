@@ -812,9 +812,9 @@ function ASpath($arg) {
 		$pt = array();
 		for ($i=0;$i<count($arg);$i++) {
 			if ($i%2==0) { //x coord
-				$pt[$i] = $arg[$i]*$this->xunitlength + $this->origin[0];
+				$pt[$i] = $this->evalifneeded($arg[$i])*$this->xunitlength + $this->origin[0];
 			} else {
-				$pt[$i] = $this->height - $arg[$i]*$this->yunitlength - $this->origin[1];
+				$pt[$i] = $this->height - $this->evalifneeded($arg[$i])*$this->yunitlength - $this->origin[1];
 			}
 		}
 		$color = $this->fill;
@@ -1027,13 +1027,13 @@ function ASslopefield($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
 	$func = $arg[0];
 	if (count($arg)>1) {
-		$dx = $arg[1];
+		$dx = $this->evalifneeded($arg[1]);
 		if ($dx*1==0) { $dx = 1;}
 	} else {
 		$dx = 1;
 	}
 	if (count($arg)>2) {
-		$dy = $arg[2];
+		$dy = $this->evalifneeded($arg[2]);
 		if ($dy*1==0) { $dy = 1;}
 	} else {
 		$dy = 1;
