@@ -62,9 +62,9 @@ export default {
     updateTimer: function () {
       let now = new Date().getTime();
       this.timeString = '';
-      let remaining = Math.max(0, this.end * 1000 - now);
+      let remaining = Math.max(0, this.end - now);
       if (remaining === 0 && this.grace > 0) {
-        remaining = Math.max(0, this.grace * 1000 - now);
+        remaining = Math.max(0, this.grace - now);
         this.timeString += this.$t('timer.overtime') + ' ';
       }
       if (!this.gaveWarning && remaining < this.warningTime * 1000) {

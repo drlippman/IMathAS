@@ -105,6 +105,7 @@ $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
+  $assessInfoOut['timelimit_expiresin'] = $assessInfoOut['timelimit_expires'] - $now;
   $assessInfoOut['timelimit_grace'] = $assess_record->getTimeLimitGrace();
 }
 

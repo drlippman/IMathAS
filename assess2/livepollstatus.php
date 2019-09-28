@@ -55,10 +55,6 @@ $assess_record->loadRecord($uid);
 
 
 // grab any assessment info fields that may have updated:
-// has_active_attempt, timelimit_expires,
-// prev_attempts (if we just closed out a version?)
-// and those not yet loaded:
-// help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
   'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',

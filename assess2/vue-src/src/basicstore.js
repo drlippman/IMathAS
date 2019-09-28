@@ -857,26 +857,31 @@ export const actions = {
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
     }
-    if (data.hasOwnProperty('timelimit_expires')) {
+    if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
-      let now = new Date();
-      let expires = new Date(data.timelimit_expires * 1000);
-      if (expires > now) {
-        if (data.timelimit_grace > 0) {
-          let grace = new Date(data.timelimit_grace * 1000);
-          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace - now);
+      let now = new Date().getTime();
+      let expires = data.timelimit_expiresin * 1000;
+      let grace = data.timelimit_gracein * 1000;
+      data['timelimit_local_expires'] = now + expires;
+      if (grace > 0) {
+        data['timelimit_local_grace'] = now + grace;
+      } else {
+        data['timelimit_local_grace'] = 0;
+      }
+      if (expires > 0) {
+        if (data.timelimit_gracein > 0) {
+          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
         } else {
-          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires - now);
+          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires);
         }
         store.timelimit_expired = false;
         store.timelimit_grace_expired = false;
       } else {
         store.timelimit_expired = true;
         store.timelimit_grace_expired = true;
-        if (data.timelimit_grace > 0) {
-          let grace = new Date(data.timelimit_grace * 1000);
-          if (grace > now) {
-            store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace - now);
+        if (data.timelimit_gracein > 0) {
+          if (grace > 0) {
+            store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
             store.timelimit_grace_expired = false;
           }
         }

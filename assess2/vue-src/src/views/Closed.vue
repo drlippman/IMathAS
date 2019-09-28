@@ -136,10 +136,9 @@ export default {
       );
     },
     hasActiveMsg () {
-      if (this.settings.hasOwnProperty('timelimit_expires')) {
-        let expires = new Date(this.settings.timelimit_expires * 1000);
-        let now = new Date();
-        if (expires < now) {
+      if (this.settings.hasOwnProperty('timelimit_expiresin')) {
+        let expires = this.settings.timelimit_expiresin * 1000;
+        if (expires < 0) {
           return this.$t('closed.unsubmitted_overtime');
         } else {
           return this.$t('closed.unsubmitted_pastdue');
