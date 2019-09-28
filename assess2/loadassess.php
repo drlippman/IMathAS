@@ -107,6 +107,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
   $assessInfoOut['timelimit_expiresin'] = $assessInfoOut['timelimit_expires'] - $now;
   $assessInfoOut['timelimit_grace'] = $assess_record->getTimeLimitGrace();
+  $assessInfoOut['timelimit_gracein'] = $assessInfoOut['timelimit_grace'] - $now;
 }
 
 // if not available, see if there is an unsubmitted scored attempt
