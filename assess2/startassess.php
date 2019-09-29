@@ -65,7 +65,7 @@ $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
 
 // check password, if needed
-if (!$in_practice &&
+if (!$in_practice && !$canViewAll &&
   (!isset($sessiondata['assess2-'.$aid]) || $sessiondata['assess2-'.$aid] != $in_practice) &&
   !$assess_info->checkPassword($_POST['password'])
 ) {
