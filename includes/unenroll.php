@@ -127,7 +127,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$DBH->query($query); //values already sanitized
 		}
 
-
+		// delete grade excusals
+		$query = "DELETE FROM imas_excused WHERE courseid=$cid AND userid IN ($stulist)";
+		$DBH->query($query); //values already sanitized
 
 	}
 	if ($delforum && count($forums)>0) {
