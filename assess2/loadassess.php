@@ -107,7 +107,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
   $assessInfoOut['timelimit_expiresin'] = $assessInfoOut['timelimit_expires'] - $now;
   $assessInfoOut['timelimit_grace'] = $assess_record->getTimeLimitGrace();
-  $assessInfoOut['timelimit_gracein'] = $assessInfoOut['timelimit_grace'] - $now;
+  $assessInfoOut['timelimit_gracein'] = max($assessInfoOut['timelimit_grace'] - $now, 0);
 }
 
 // if not available, see if there is an unsubmitted scored attempt
@@ -130,7 +130,7 @@ if (!$assessInfoOut['has_active_attempt']) {
 // adjust output if time limit is expired in by_question mode
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   $assessInfoOut['submitby'] == 'by_question' &&
-  time() > $assessInfoOut['timelimit_grace']
+  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires'])
 ) {
   $assessInfoOut['has_active_attempt'] = false;
   $assessInfoOut['can_retake'] = false;
