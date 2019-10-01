@@ -450,7 +450,7 @@ export const actions = {
                 data.append(el.name, el.files[0]);
               }
             } else {
-              data.append(el.name, el.value);
+              data.append(el.name, window.imathasAssess.preSubmitString(el.name, el.value));
             }
           }
         }

@@ -850,6 +850,7 @@ function AMnumfuncPrepVar(qn,str) {
   var dispstr = str;
 
   dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
 		  str = str.replace("E","varE");
@@ -927,7 +928,9 @@ function AMnumfuncPrepVar(qn,str) {
   }
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
-
+  str = str.replace(/@(\d+)@/g, indextofunc);
+  submitstr = submitstr.replace(/@(\d+)@/g, indextofunc);
+  
   //Correct rendering when f or g is a variable not a function
   if (vl.match(/\bf\b/) && !fvarslist.match(/\bf\b/)) {
   	  dispstr = dispstr.replace(/([^a-zA-Z])f\^([\d\.]+)([^\d\.])/g, "$1f^$2{::}$3");
