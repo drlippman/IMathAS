@@ -171,25 +171,32 @@ END;
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$row = $stm->fetch(PDO::FETCH_NUM);
-	$itemarr = explode(',',$row[0]);
-	foreach ($itemarr as $k=>$v) {
+	$itemarrinit = explode(',',$row[0]);
+	$itemarr = array();
+	$itemnum = array();
+	foreach ($itemarrinit as $k=>$v) {
 		if (($p=strpos($v,'~'))!==false) {
-			$itemarr[$k] = substr($v,$p+1);
+			$parts = explode('~', $v);
+			for ($i=1;$i < count($parts);$i++) {
+				$itemarr[] = $parts[$i];
+				$itemnum[$parts[$i]] = ($k+1).'-'.$i;
+			}
+		} else {
+			$itemarr[] = $v;
+			$itemnum[$v] = ($k+1);
 		}
 	}
-	$itemarr = implode(',',$itemarr);
-	$itemarr = str_replace('~',',',$itemarr);
-	$itemarr = explode(',', $itemarr);
 
 	echo '<div id="headercategorize" class="pagetitle"><h1>Categorize Questions</h1></div>';
 	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
+	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
 
 	foreach($itemarr as $qid) {
 		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
-		echo "<td>" . Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td><td>";
+		echo "<td>Q" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . '</td><td>';
+		echo Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td><td>";
 		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", Sanitize::onlyInt($qid), Sanitize::onlyInt($qsetids[$qid]));
 		echo "<select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
