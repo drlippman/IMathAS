@@ -58,8 +58,11 @@ class MultipleAnswerScorePart implements ScorePart
         }
         $qcnt = count($questions);
         if ($qcnt > 1) {
-          $questions[] = _('None of these');
-          array_push($randqkeys, $qcnt);
+          $qstr = strtolower(implode(' ', $questions));
+          if (strpos($qstr, 'none of') === false) {
+            $questions[] = _('None of these');
+            array_push($randqkeys, $qcnt);
+          }
         }
         if (trim($answers)=='') {
             $akeys = array();
