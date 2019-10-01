@@ -930,7 +930,7 @@ function AMnumfuncPrepVar(qn,str) {
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
   str = str.replace(/@(\d+)@/g, indextofunc);
   submitstr = submitstr.replace(/@(\d+)@/g, indextofunc);
-  
+
   //Correct rendering when f or g is a variable not a function
   if (vl.match(/\bf\b/) && !fvarslist.match(/\bf\b/)) {
   	  dispstr = dispstr.replace(/([^a-zA-Z])f\^([\d\.]+)([^\d\.])/g, "$1f^$2{::}$3");
@@ -1151,7 +1151,7 @@ function processCalcComplex(fullstr, format) {
       }
     }
     err + syntaxcheckexpr(str, format);
-    prep = prepWithMath(mathjs(str));
+    prep = prepWithMath(mathjs(str,'i'));
     real = scopedeval('var i=0;'+prep);
     imag = scopedeval('var i=1;'+prep);
     imag2 = scopedeval('var i=-1;'+prep);
