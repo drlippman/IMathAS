@@ -49,7 +49,6 @@ class MatrixScorePart implements ScorePart
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
         }
 
-
         if ($givenans==='oo' || $givenans==='DNE') {
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else if (isset($answersize)) {
@@ -57,12 +56,17 @@ class MatrixScorePart implements ScorePart
             for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
                 $givenanslist[$i] = $_POST["qn$qn-$i"];
             }
+            $N = $sizeparts[0];
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
             $givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
-            if (substr_count($answer,'),(')!=substr_count($_POST["qn$qn"],'),(')) {$correct = false;}
+            $N = substr_count($answer,'),(')+1;
+            if ($N != substr_count($_POST["qn$qn"],'),(')+1) {
+              $scorePartResult->setRawScore(0);
+              return $scorePartResult;
+            }
         }
 
         //handle nosolninf case
@@ -117,6 +121,30 @@ class MatrixScorePart implements ScorePart
             }
         }
 
+        if (in_array('ref',$ansformats)) {
+          // reduce correct answer to rref
+          $answerlist = $this->rref($answerlist, $N);
+          $M = count($answerlist) / $N;
+          for ($r=0;$r<$N;$r++) {
+            $c = 0;
+            while (abs($answerlist[$r*$M+$c]) < 1e-10 && $c < $M) {
+              if (abs($givenanslist[$r*$M+$c]) > 1e-10) {
+                $correct = false; // nonzero where 0 expected
+              }
+              $c++;
+            }
+            if ($c < $M) { // if there's a first non-zero entry, should be 1
+              if (abs($givenanslist[$r*$M+$c] - 1) > 1e-10) {
+                $correct = false;
+              }
+            }
+          }
+          // now reduce given answer to rref
+          if ($correct) {
+            $givenanslist = $this->rref($givenanslist, $N);
+          }
+        }
+
         for ($i=0; $i<count($answerlist); $i++) {
             if (!is_numeric($givenanslist[$i])) {
                 $correct = false;
@@ -143,4 +171,51 @@ class MatrixScorePart implements ScorePart
             return $scorePartResult;
         }
     }
+
+    /*
+      Row reduce a matrix specified by the array of values $A with $N rows
+     */
+    private function rref($A, $N)
+    {
+      $M = count($A) / $N;
+      $r = 0;  $c = 0;
+      while ($r < $N && $c < $M) {
+        if ($A[$r*$M+$c] == 0) { //swap only if there's a 0 entry
+          $max = $r;
+          for ($i = $r+1; $i < $N; $i++) {
+            if (abs($A[$i*$M+$c]) > abs($A[$max*$M+$c])) {
+              $max = $i;
+            }
+          }
+          if ($max != $r) { // swap rows
+            for ($j=0; $j<$M; $j++) {
+              $temp = $A[$r*$M+$j];
+              $A[$r*$M+$j] = $A[$max*$M+$j];
+              $A[$max*$M+$j] = $temp;
+            }
+          }
+        }
+        if (abs($A[$r*$M+$c]) < 1e-10) {
+          $c++;
+          continue;
+        }
+        //scale pivot row
+        $div = $A[$r*$M+$c];
+        for ($j = $c; $j < $M; $j++) {
+          $A[$r*$M+$j] = $A[$r*$M+$j] / $div;
+        }
+
+        //get zeros above/below
+        for ($i = 0; $i < $N; $i++) {
+          if ($i == $r) { continue;}
+          $mult = $A[$i*$M+$c];
+          if ($mult == 0) { continue; }
+          for ($j = $c; $j < $M; $j++) {
+            $A[$i*$M+$j] = $A[$i*$M+$j] - $mult*$A[$r*$M+$j];
+          }
+        }
+        $r++; $c++;
+    }
+    return $A;
+  }
 }
