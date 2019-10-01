@@ -192,11 +192,11 @@ export default {
           store.somethingDirty = true;
         })
         .on('change.dirtytrack', function () {
-          let val = window.$(this).val();
+          let val = window.$(this).val().trim();
           let changed = false;
           if (this.type === 'radio' || this.type === 'checkbox') {
             changed = true;
-          } else if (val !== window.$(this).attr('data-lastval')) {
+          } else if (val !== window.$(this).attr('data-lastval') && val !== '') {
             changed = true;
           }
           if (changed) {

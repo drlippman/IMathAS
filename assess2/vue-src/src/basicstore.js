@@ -714,7 +714,7 @@ export const actions = {
           } else if (el.type === 'file' && document.getElementById(el.name + '-autosave') !== null) {
             thisChanged = true; // file with autosave input
           } else {
-            if (el.value !== actions.getInitValue(qn, el.name)) {
+            if (el.value.trim() !== actions.getInitValue(qn, el.name) && el.value.trim() !== '') {
               thisChanged = true;
             }
           }
