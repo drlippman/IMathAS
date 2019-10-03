@@ -553,9 +553,9 @@ class AssessRecord
         if (!$active && $this->data['assess_versions'][$lastver]['lastchange'] === 0) {
           $this->data['assess_versions'][$lastver]['lastchange'] = $this->now;
         }
-        if (!$active && $this->data['lastchange'] === 0) {
-          $this->data['lastchange'] = $this->now;
-        }
+        if (!$active && intval($this->assessRecord['lastchange']) === 0) {
+          $this->assessRecord['lastchange'] = $this->now;
+        } 
         // if there's a time limit, set the time limit
         if ($active && $this->assess_info->getSetting('timelimit') > 0) {
           $this->data['assess_versions'][$lastver]['timelimit_end'] =
@@ -1931,8 +1931,8 @@ class AssessRecord
       // loop through the question numbers
       $aVerScore = 0;
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
-        // if not rescoring this question, or if withdrawn, 
-        // or retotalling indiv questions and not latest assess version, 
+        // if not rescoring this question, or if withdrawn,
+        // or retotalling indiv questions and not latest assess version,
         // use existing score
         if (($rescoreQs !== 'all' && !in_array($qn, $rescoreQs)) ||
             !empty($curAver['questions'][$qn]['withdrawn']) ||
