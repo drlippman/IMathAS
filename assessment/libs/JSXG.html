@@ -91,6 +91,7 @@ $board = JSXG_createAxes("plot{$thisq}", $ops);
     <li>$ops['range']=[(float) min, (float) max, (float) default] sets the range for the slider. If default isn't provided, the average of min and max will be used.</li>
     <li>$ops['name']=name sets the display name of the slider, which will be displayed next to the slider value. </li>
     <li>$ops['snapWidth']=(float) sets the snap width of the slider. Setting this to 1 will make the slider snap in integer increments. Continous slide by default.</li>
+    <li>$ops['precision']=(int) sets the number of decimal places to show on the value in the slider. Defaults to 2.</li>
     <li>$ops['color']=(string) sets the color of the slider and slider value. Should be a string with a color name, or color value recognizable by CSS (e.g., 'rgb(0,100,250)').</li>
   </ul>
   <h4>Example</h4>

@@ -221,6 +221,7 @@ function JSXG_addSlider($board, $sname, $ops=array()){
   $snapWidth = $ops['snapWidth']!==null ? $ops['snapWidth'] : -1;
   $withLabel = $ops['withLabel']!==null ? $ops['withLabel'] : "true";
   $color = $ops['color']!==null ? $ops['color'] : 'purple';
+  $precision = $ops['precision']!==null ? $ops['precision'] : 2;
 
   // Create the slider.
   $out .= "var param{$label}_{$sname} = board_{$label}.create('slider', [
@@ -238,6 +239,7 @@ function JSXG_addSlider($board, $sname, $ops=array()){
           ], {
             snapWidth: {$snapWidth},
             withLabel: {$withLabel},
+            precision: {$precision},
             name: '{$name}',
             snapWidth: {$snapWidth},
             baseline: {fixed:true, highlight:false},
