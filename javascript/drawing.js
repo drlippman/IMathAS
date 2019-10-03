@@ -105,6 +105,27 @@ var tpModeN = {
 	"10": 3, "10.2": 3, "10.3": 3, "10.4": 3};
 var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
 
+function reset() {
+	clearAllDrawListners();
+	targets.length = 0;
+	imgs.length = 0;
+	targetOuts.length = 0;
+	a11ytargets.length = 0;
+	lines.length = 0;
+	dots.length = 0;
+	odots.length = 0;
+	tplines.length = 0;
+	tptypes.length = 0;
+	ineqlines.length = 0;
+	ineqtypes.length = 0;
+	drawstyle.length = 0;
+	drawlocky.length = 0;
+	curTarget = null;
+	curLine = null;
+	dragObj = null;
+	curTPcurve = null;
+	curIneqcurve = null;
+}
 
 function clearcanvas(tarnum) {
 	lines[tarnum].length = 0;
@@ -2616,6 +2637,7 @@ function shadeParabola(ctx,Vx,Vy,x,y,shX,shY,sw,sh){
 }
 
 var drawexport = {
+	reset:reset,
 	initCanvases:initCanvases,
 	clearcanvas:clearcanvas,
 	clearlastline:clearlastline,

@@ -103,6 +103,9 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
+        // reset drawing handler
+        window.imathasDraw.reset();
+
         // overwrite properties with those from response
         response = this.processSettings(response);
         store.assessInfo = Object.assign({}, store.assessInfo, response);
