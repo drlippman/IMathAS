@@ -57,7 +57,7 @@ class MultipleAnswerScorePart implements ScorePart
             $RND->shuffle($randqkeys);
         }
         $qcnt = count($questions);
-        if ($qcnt > 1) {
+        if ($qcnt > 1 && trim($answers) == "") {
           $qstr = strtolower(implode(' ', $questions));
           if (strpos($qstr, 'none of') === false) {
             $questions[] = _('None of these');
