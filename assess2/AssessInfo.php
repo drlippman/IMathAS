@@ -111,7 +111,7 @@ class AssessInfo
       $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
 
     if ($useexception) {
-      if (empty($this->exception[3]) || $this->exception[2] > 0) { 
+      if (empty($this->exception[3]) || $this->exception[2] > 0) {
         //if not LTI-set, or if LP used, show orig due date
         $this->assessData['original_enddate'] = $this->assessData['enddate'];
         if ($this->exception[2] == 0) {
@@ -908,8 +908,8 @@ class AssessInfo
   * @return array             Normalized $settings.
   */
   static function normalizeSettings($settings) {
-    // set global assessver
-    $GLOBALS['assessver'] = $settings['ver'];
+    // set global assessUIver
+    $GLOBALS['assessUIver'] = $settings['ver'];
     $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);
     $GLOBALS['showtips'] = $settings['showtips'];
 

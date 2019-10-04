@@ -33,7 +33,7 @@ function loadJSX() {
     echo getJSXscript();
 }
 function getJSXscript () {
-  if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+  if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 		return '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>';
   } else {
 		return '<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
