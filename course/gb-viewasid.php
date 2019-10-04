@@ -415,7 +415,7 @@
 					if (isset($_POST["sb-$i-0"])) {
 						while (isset($_POST["sb-$i-$j"])) {
 							if ($_POST["sb-$i-$j"]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
-								$scpt[$j] = $_POST["sb-$i-$j"];
+								$scpt[$j] = floatval($_POST["sb-$i-$j"]);
 							} else {
 								$scpt[$j] = -1;
 							}
@@ -427,8 +427,8 @@
 						}
 						$scores[$i] = implode('~',$scpt);
 					} else {
-						if ($_POST['sb-'.$i]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
-							$scores[$i] = $_POST['sb-'.$i];
+						if ($_POST['sb-'.$i]!='N/A') {
+							$scores[$i] = floatval($_POST['sb-'.$i]);
 						} else {
 							$scores[$i] = -1;
 						}
@@ -438,7 +438,7 @@
 					}
 					$i++;
 				}
-				if (count($scores) < count($oldScores)) {
+				if (count($scores) != count($oldScores)) {
 					echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
 					exit;
 				}
