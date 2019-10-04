@@ -80,6 +80,7 @@ class ScoreEngine
         // This lets various parts of IMathAS know that question HTML is
         // NOT being generated for display.
         $GLOBALS['inquestiondisplay'] = false;
+        $GLOBALS['assessver'] = 2;
 
         set_error_handler(array($this, 'evalErrorHandler'));
         set_exception_handler(array($this, 'evalExceptionHandler'));
