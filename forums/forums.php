@@ -81,7 +81,7 @@
 			$anyforumsgroup = true;
 		}
 	}
-	
+
 	//pull exceptions, as they may extend the enddate
 	$exceptions = array();
 	if (isset($studentid) && count($forumdata)>0) {
@@ -557,7 +557,7 @@ if ($searchtype == 'thread') {
 			 echo "<a href=\"thread.php?cid=$cid&forum=" . Sanitize::onlyInt($line['id']) . "&page=-1\" class=noticetext >New Posts (" . Sanitize::encodeStringForDisplay($newcnt[$line['id']]) . ")</a>";
 		}
 		echo "</td>\n";
-		if (isset($threadcount[$line['id']])) {
+		if (isset($threadcount[$line['id']]) && $threadcount[$line['id']] > 0) {
 			$threads = $threadcount[$line['id']];
 			$posts = $postcount[$line['id']];
 			$lastpost = tzdate("F j, Y, g:i a",$maxdate[$line['id']]);

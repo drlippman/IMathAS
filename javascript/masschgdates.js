@@ -127,10 +127,10 @@ Date.prototype.getWeekDays = function(d) {
     };
 
  $(function() {
- 	$('img[src*="swap.gif"]').css("cursor","pointer");	
+ 	$('img[src*="swap.gif"]').css("cursor","pointer");
  	$('span[id^="availname"]').css("cursor","pointer").each(function(i,el) {
  		$(el).on('click',function() {
- 			MCDtoggle("a",el.id.substring(9));		
+ 			MCDtoggle("a",el.id.substring(9));
  		});
  	});
  });
@@ -148,11 +148,11 @@ Date.prototype.getWeekDays = function(d) {
 	if (Hours > 12)
 		Hours -= 12;
 	return (Hours + ':' + leadingZero(d.getMinutes()) + ' ' + ampm);
-	  
+
   }
   var basesdates = new Array(); var baseedates = new Array(); var baserdates = new Array();
   var basefpdates = new Array(); var basefrdates = new Array(); var baselpdates = new Array();
-  
+
   var globd = new Date();
   function ob(el) {
 	 globd.setTime(Date.parse(el.value));
@@ -226,7 +226,7 @@ Date.prototype.getWeekDays = function(d) {
 		   globd.setTime(Date.parse(newstartdate));
 		   var shortd = globd.SHORTDAYS[globd.getDay()];
 		   if (newstartdate!=0 && newstartdate!=2000000000 && basearr[st]!="NA") {
-			  var newstarttime = document.getElementById(type+"time"+st).value; 
+			  var newstarttime = document.getElementById(type+"time"+st).value;
 			  for (var i=st+1;i<basearr.length;i++) {
 				  if (usecb && !document.getElementById("cb"+i).checked) {
 					  continue;
@@ -242,7 +242,7 @@ Date.prototype.getWeekDays = function(d) {
 		   }
 	  }
   }
-  
+
   function copydown(st,type,limit) {
 	  var usecb = false;
 	  var cbs = document.getElementsByTagName("input");
@@ -281,7 +281,7 @@ Date.prototype.getWeekDays = function(d) {
 			  newstarttime = newstarttime.replace(/^\s*(\d+:\d+)(am|pm)/,"$1 $2");
 			  newstarttime = newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2");
 			  d.setTime(Date.parse(newstartdate + ' ' + newstarttime));
-			  db.setTime(basearr[st]*1000); 
+			  db.setTime(basearr[st]*1000);
 			  if (usebusdays) {
 				  var daydiff = db.getWeekDays(d); //days
 			  } else {
@@ -323,7 +323,7 @@ Date.prototype.getWeekDays = function(d) {
 			  break;
 		  }
 	  }
-	 
+
 	  senddownsub('s',basesdates,st,usebusdays,usecb);
 	  senddownsub('e',baseedates,st,usebusdays,usecb);
 	 /* if (baserdates[st]!="NA") {
@@ -375,7 +375,7 @@ Date.prototype.getWeekDays = function(d) {
   	if (type=='a') {
 		var curval = $('#avail'+cnt).val();
 		if (baserdates[cnt]=='NA') {
-			curval = (curval+1)%3;	
+			curval = (curval+1)%3;
 		} else {
 			curval = 1-curval;
 		}
@@ -403,7 +403,7 @@ Date.prototype.getWeekDays = function(d) {
 			typeinput.value = 0;
 		}
 	}
-	  
+
   }
   function MCDtoggleselected(form) {
 	  var type = document.getElementById("swaptype").value;
@@ -427,7 +427,7 @@ Date.prototype.getWeekDays = function(d) {
 						$('#availname'+cnt).text(availnames[to]);
 						$(els[i]).closest('tr').find('td.togdis').addClass('dis');
 					}
-					
+
 				} else {
 					if (to=="dates") { //swap from A/N to date
 						document.getElementById(type+"span0"+cnt).className="hide";
@@ -443,7 +443,7 @@ Date.prototype.getWeekDays = function(d) {
 							} else {
 								document.getElementById(type+"dateanN"+cnt).checked=true;
 							}
-						} 
+						}
 					}
 				}
 			} catch (e) { };
@@ -456,32 +456,32 @@ Date.prototype.getWeekDays = function(d) {
   	if (MCDrepeatcounter==0) {setTimeout(function() {MCDrepeatcounter=0;},500);}
   	MCDrepeatcounter++;
   	if (MCDrepeatcounter>2) {return;}
-  	
+
   	var val = el.checked;
   	var thisid = parseInt(el.id.substr(2));
   	var els = el.form.getElementsByTagName("input");
 	  for (var i=0; i<els.length; i++) {
-		  if (els[i].type=='checkbox' && els[i].id.match(/cb/)) { 
+		  if (els[i].type=='checkbox' && els[i].id.match(/cb/)) {
 		  	  curid = parseInt(els[i].id.substr(2));
 		  	  if (curid>thisid) {
 		  	  	if (els[i].value > lvl) {
 		  	  		els[i].checked = val;
 		  	  	} else {
 		  	  		break;
-		  	  	} 
+		  	  	}
 		  	  }
 		  }
   	}
   }
-  
-  function chkAll(frm, mark) {  
+
+  function chkAll(frm, mark) {
   	var els = frm.getElementsByTagName("input");
 	  for (var i=0; i<els.length; i++) {
-		  if (els[i].type=='checkbox' && els[i].id!='ca') {   
-			  try{     
-				  if(els[i].type == "checkbox" && els[i].id != 'ca') {  
-					  els[i].checked = mark;     
-				  }   
+		  if (els[i].type=='checkbox' && els[i].id!='ca') {
+			  try{
+				  if(els[i].type == "checkbox" && els[i].id != 'ca') {
+					  els[i].checked = mark;
+				  }
   			  } catch(er) {}
 		  }
   	}
@@ -498,12 +498,12 @@ Date.prototype.getWeekDays = function(d) {
 
   		if (document.getElementById("sdatetype"+i).value == 0) {
   			out.push(0);
-  		} else { 
+  		} else {
   			out.push(document.getElementById("sdate"+i).value + "~" + document.getElementById("stime"+i).value);
   		}
   		if (document.getElementById("edatetype"+i).value == 0) {
   			out.push(2000000000);
-  		} else { 
+  		} else {
   			out.push(document.getElementById("edate"+i).value + "~" + document.getElementById("etime"+i).value);
   		}
   		if (includeassess && document.getElementById("rdatetype"+i)) {
@@ -511,7 +511,7 @@ Date.prototype.getWeekDays = function(d) {
   				out.push("N");
   			} else {
   				out.push("A");
-  			} 
+  			}
   		} else {
   			out.push('NA');
   		}
@@ -524,7 +524,7 @@ Date.prototype.getWeekDays = function(d) {
   				}
   			} else {
   				out.push(document.getElementById("fpdate"+i).value + "~" + document.getElementById("fptime"+i).value);
-  			} 
+  			}
   		} else {
   			out.push('NA');
   		}
@@ -537,7 +537,7 @@ Date.prototype.getWeekDays = function(d) {
   				}
   			} else {
   				out.push(document.getElementById("frdate"+i).value + "~" + document.getElementById("frtime"+i).value);
-  			} 
+  			}
   		} else {
   			out.push('NA');
   		}
@@ -546,7 +546,7 @@ Date.prototype.getWeekDays = function(d) {
   				out.push("N");
   			} else {
   				out.push(document.getElementById("lpdate"+i).value + "~" + document.getElementById("lptime"+i).value);
-  			} 
+  			}
   		} else {
   			out.push('NA');
   		}
@@ -558,13 +558,13 @@ Date.prototype.getWeekDays = function(d) {
   		newel.type = "hidden";
   		newel.value = out.join(",");
   		frm.appendChild(newel);
-  	} 
+  	}
   }
-  
+
   function chgswaptype(el) {
   	  var elout = document.getElementById("swapselected");
   	  elout.options.length = 0;
-  	 
+
   	  if (el.value=='a') {
   	  	   elout.options[elout.options.length] = new Option('Hidden','0',false,false);
   	  	   elout.options[elout.options.length] = new Option('By Dates','1',false,false);
@@ -584,14 +584,14 @@ Date.prototype.getWeekDays = function(d) {
   	  }
 
   }
-  
+
   function toggleMCDincforum() {
   	  var cookiereg = new RegExp('mcdincforum'+cid+'=[^;]*','i');
   	  if (includeforums) {
   	  	$('#MCDforumtoggle').text(_('Show Forum Dates'));
-  	  	$('td.mcf, th.mcf').hide();  	  	
+  	  	$('td.mcf, th.mcf').hide();
   	  } else {
-  	  	$('#MCDforumtoggle').text(_('Hide Forum Dates'));  
+  	  	$('#MCDforumtoggle').text(_('Hide Forum Dates'));
   	  	$('td.mcf, th.mcf').show();
   	  }
   	  includeforums = !includeforums;
@@ -600,14 +600,14 @@ Date.prototype.getWeekDays = function(d) {
   	  var cookiereg = new RegExp('mcdincassess'+cid+'=[^;]*','i');
   	  if (includeassess) {
   	  	$('#MCDassesstoggle').text(_('Show Assessment Dates'));
-  	  	$('td.mca, th.mca').hide();  	  	
+  	  	$('td.mca, th.mca').hide();
   	  } else {
-  	  	$('#MCDassesstoggle').text(_('Hide Assessment Dates'));  
+  	  	$('#MCDassesstoggle').text(_('Hide Assessment Dates'));
   	  	$('td.mca, th.mca').show();
   	  }
   	  includeassess = !includeassess;
   }
-  
+
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately
 	//can use getHours()*60+getMinutes() to get minutes into day, then multiply to get ms for timediff
 	//then use date object, set to basesdate, use addDays or addBizDays to add the days, and setTime(getTime()+d) for time diff.
@@ -634,7 +634,7 @@ Date.prototype.getWeekDays = function(d) {
 				document.getElementById("sdate"+i).value = nicedate;
 				nicetime = makenicetime(d);
 				document.getElementById("stime"+i).value = nicetime;
-			}	
+			}
 		}
 	  }
 	  var newstartdate = document.getElementById("edate"+st).value;
@@ -646,7 +646,7 @@ Date.prototype.getWeekDays = function(d) {
 			newstarttime = timeel.value;
 			var curdate = Date.parse(newstartdate + ' ' + newstarttime.replace(/^\s*(\d+)\s*(am|pm)/,"$1:00 $2"))/1000;
 		}
-		
+
 		var timediff = curdate - baseedates[st];
 		baseedates[st] = curdate;
 		for (var i=st+1;i<baseedates.length;i++) {
@@ -659,7 +659,7 @@ Date.prototype.getWeekDays = function(d) {
 				document.getElementById("edate"+i).value = nicedate;
 				nicetime = makenicetime(d);
 				document.getElementById("etime"+i).value = nicetime;
-			}	
+			}
 		}
 	  }
 	 var newstartdate = document.getElementById("rdate"+st).value;
@@ -683,9 +683,8 @@ Date.prototype.getWeekDays = function(d) {
 				document.getElementById("rdate"+i).value = nicedate;
 				nicetime = makenicetime(d);
 				document.getElementById("rtime"+i).value = nicetime;
-			}	
+			}
 		}
 	  }
   }
   */
-
