@@ -243,7 +243,7 @@ $include_from_assess_info = array(
   'extended_with', 'timelimit', 'timelimit_type', 'allowed_attempts',
   'latepasses_avail', 'latepass_extendto', 'showscores', 'intro',
   'interquestion_text', 'resources', 'category_urls', 'help_features',
-  'points_possible'
+  'points_possible', 'showcat'
 );
 if ($in_practice) {
   array_push($include_from_assess_info, 'displaymethod', 'showscores',

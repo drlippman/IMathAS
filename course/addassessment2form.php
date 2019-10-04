@@ -37,6 +37,7 @@ $vueData = array(
 	'sameseed' => ($line['shuffle']&2) > 0,
 	'samever' => ($line['shuffle']&4) > 0,
 	'istutorial' => $line['istutorial'] > 0,
+	'showcat' => $line['showcat'] > 0,
 	'allowlate' => $line['allowlate']%10,
 	'latepassafterdue' => $line['allowlate']>10,
 	'dolpcutoff' => $line['LPcutoff']>0,
@@ -385,6 +386,11 @@ $vueData = array(
 				<label>
 					<input type="checkbox" value="1" name="istutorial" v-model="istutorial" />
 					Suppress default score result display
+				</label>
+				<br/>
+				<label>
+					<input type="checkbox" value="1" name="showcat" v-model="showcat" />
+					Show question categories in Question Details (if defined)
 				</label>
 			</span><br class=form />
 		</div>

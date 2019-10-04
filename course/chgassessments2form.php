@@ -35,6 +35,7 @@ $vueData = array(
 	'caltag' => '',
 	'shuffle' => 'DNC',
 	'istutorial' => 'DNC',
+	'showcat' => 'DNC',
 	'samever' => 'DNC',
 	'noprint' => 'DNC',
 	'allowlate' => 'DNC',
@@ -413,6 +414,16 @@ $vueData = array(
 				<label class=form for="istutorial">Suppress default score result display</label>
 				<span class=formright>
 					<select name="istutorial" id="istutorial" v-model="istutorial">
+						<option value="DNC">Do not change</option>
+						<option value="0">No</option>
+						<option value="1">Yes</option>
+					</select>
+				</span><br class=form />
+			</div>
+			<div :class="{highlight:showcat != 'DNC'}">
+				<label class=form for="showcat">Show question categories in Question Details (if defined)</label>
+				<span class=formright>
+					<select name="showcat" id="showcat" v-model="showcat">
 						<option value="DNC">Do not change</option>
 						<option value="0">No</option>
 						<option value="1">Yes</option>

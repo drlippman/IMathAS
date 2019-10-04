@@ -199,6 +199,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['samever'])) { $toset['shuffle'] += 4;}
 		$toset['istutorial'] = empty($_POST['istutorial']) ? 0 : 1;
 		$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
+		$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
 
 		// time limit and access control
 		$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);

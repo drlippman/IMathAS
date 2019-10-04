@@ -48,7 +48,7 @@ if (!(isset($teacherid))) {
 		$sets = array();
 		$qarr = array();
 		if ($_POST['copyopts'] != 'DNC') {
-			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,noprint,istutorial,allowlate,timelimit,password,reqscoretype,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
+			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
@@ -211,6 +211,10 @@ if (!(isset($teacherid))) {
 			if ($_POST['istutorial'] !== 'DNC') {
 				$sets[] = "istutorial=:istutorial";
 				$qarr[':istutorial'] = Sanitize::onlyInt($_POST['istutorial']);
+			}
+			if ($_POST['showcat'] !== 'DNC') {
+				$sets[] = "showcat=:showcat";
+				$qarr[':showcat'] = Sanitize::onlyInt($_POST['showcat']);
 			}
 
 			if ($_POST['allowlate'] !== 'DNC') {

@@ -93,7 +93,8 @@ export default {
       }
     },
     hasCategory () {
-      return (this.qinfo.hasOwnProperty('category') &&
+      return (store.assessInfo.showcat === 1 &&
+        this.qinfo.hasOwnProperty('category') &&
         this.qinfo.category !== '' &&
         this.qinfo.category !== null
       );
