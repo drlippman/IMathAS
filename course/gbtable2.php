@@ -1973,9 +1973,18 @@ function gbtable() {
 		}
 		foreach($exttoolidx as $aid=>$i) {
 			$col = $exttoolcol[$aid];
+			//remove excused
 			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
 				for ($j=0;$j<4;$j++) {
 					unset($catpossstu[$j][$category[$i]][$col]);
+				}
+			}
+			// remove from attempted if cur but no stu score
+			if (!isset($gb[$ln][1][$col][0]) && $gb[0][1][$col][3]==1) {
+				if ($gb[0][1][$col][4]==1) {
+					unset($catpossstu[3][$category[$i]][$col]);
+				} else if ($gb[0][1][$col][4]==2) {
+					unset($catpossstuec[3][$category[$i]][$col]);
 				}
 			}
 		}
@@ -1984,6 +1993,14 @@ function gbtable() {
 			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
 				for ($j=0;$j<4;$j++) {
 					unset($catpossstu[$j][$category[$i]][$col]);
+				}
+			}
+			// remove from attempted if cur but no stu score
+			if (!isset($gb[$ln][1][$col][0]) && $gb[0][1][$col][3]==1) {
+				if ($gb[0][1][$col][4]==1) {
+					unset($catpossstu[3][$category[$i]][$col]);
+				} else if ($gb[0][1][$col][4]==2) {
+					unset($catpossstuec[3][$category[$i]][$col]);
 				}
 			}
 		}
