@@ -515,7 +515,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$extrefval = 0;
 		if ($aver > 1) {
-			if (($line['showhints']==-1 && ($showhintsdef&2)==2) || ($line['showhints']&2)==2) {
+			if (($line['showhints']==-1 && ($showhintsdef&2)==2) ||
+				($line['showhints'] > -1 && ($line['showhints']&2)==2)
+			) {
 				$extrefval += 1;
 			}
 		} else {
