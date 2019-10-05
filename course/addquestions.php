@@ -788,7 +788,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if (isset($search) && ($searchall==0 || $searchlikes!='' || $searchmine==1)) {
 				$qarr = $searchlikevals;
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
 				$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
@@ -811,7 +811,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 				}
-				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
+				$query .= " ORDER BY imas_library_items.libid,imas_questionset.broken,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
 					$query .= " LIMIT 300";
 					$offset = 0;
@@ -889,8 +889,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						}
 						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
+						if ($line['broken'] > 0) {
+							$line['description'] = '('._('Reported Broken').') '.$line['description'];
+						}
 						if (in_array($i,$existingq)) {
 							$page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</span>';
+						} else if ($line['broken'] > 0) {
+							$page_questionTable[$i]['desc'] = '<span style="color: #f66"><i>'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</i></span>';
 						} else {
 							$page_questionTable[$i]['desc'] = filter(Sanitize::encodeStringForDisplay($line['description']));
 						}
@@ -925,6 +930,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib=".Sanitize::encodeUrlParam($line['libid'])."\">List lib</a>";
 						} else {
 							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
+							$page_questionTable[$i]['broken'] = intval($line['broken']);
 							$page_questionTable[$i]['libitemid'] = Sanitize::encodeStringForDisplay($line['libitemid']);
 						}
 						$page_questionTable[$i]['extref'] = '';
