@@ -73,7 +73,7 @@ class FunctionExpressionScorePart implements ScorePart
         $correct = true;
 
         $givenans = str_replace(',','', $givenans);
-        
+
         if (!isset($variables)) { $variables = "x";}
         $variables = array_map('trim',explode(",",$variables));
         $ofunc = array();
@@ -259,7 +259,9 @@ class FunctionExpressionScorePart implements ScorePart
                 //echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
                 if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
                 if (in_array('equation',$ansformats)) {  //if equation, store ratios
-                    if (abs($realans)>.000001 && is_numeric($givenansvals[$i])) {
+                    if (isNaN($givenansvals[$i])) {
+                        $stunan++;
+                    } elseif (abs($realans)>.000001 && is_numeric($givenansvals[$i])) {
                         $ratios[] = $givenansvals[$i]/$realans;
                         if (abs($givenansvals[$i])<=.00000001 && $realans!=0) {
                             $cntzero++;
