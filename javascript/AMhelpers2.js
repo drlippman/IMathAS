@@ -423,14 +423,17 @@ function setupDraw(qn) {
 }
 
 function initMultAns(qn) {
-  var boxes = $('input[name^="qn'+qn+'["]');
-  boxes.on('change', function () {
-    if (this.checked && this.value == boxes.length-1) {
-      boxes.not(':last').prop('checked', false);
-    } else if (this.checked) {
-      boxes.last().prop('checked', false);
-    }
-  });
+  var hasnone = $("#qnwrap"+qn).find('label:last').text().match(/none\s+of/i);
+  if (hasnone) {
+    var boxes = $('input[name^="qn'+qn+'["]');
+    boxes.on('change', function () {
+      if (this.checked && this.value == boxes.length-1) {
+        boxes.not(':last').prop('checked', false);
+      } else if (this.checked) {
+        boxes.last().prop('checked', false);
+      }
+    });
+  }
 }
 
 function isBlank(str) {
