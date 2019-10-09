@@ -78,6 +78,7 @@ $vueData = array(
 	'reqscorecalctype' => ($line['reqscoretype']&2) > 0 ? 1 : 0,
 	'reqscoreaid' => $line['reqscoreaid'],
 	'reqscoreOptions' => $otherAssessments,
+	'copyfrom' => 0,
 	'taken' => $taken,
 	'showDisplayDialog' => false
 );
@@ -176,7 +177,27 @@ $vueData = array(
 
 	<fieldset>
 		<legend>Assessment Options</legend>
-
+		<div v-if="reqscoreOptions.length > 0">
+			<label class=form for="copyfrom">
+				Copy Options from:
+			</label>
+			<span class=formright>
+				<select name="copyfrom" v-model="copyfrom">
+					<option value="0">None - use settings below</option>
+					<option v-for="option in reqscoreOptions" :value="option.value" :key="option.value">
+						{{ option.text }}
+					</option>
+				</select>
+				<span v-if="taken && copyfrom > 0" class="noticetext">
+					<br/>
+					Warning: Changing settings after students have started may require
+					converting their data, and lead to loss of data on earlier attempts.
+					This will occur if converting between Homework-style and Quiz-style.
+				</span>
+			</span><br class=form />
+		</div>
+		<div v-show="copyfrom == 0">
+			<hr v-if="reqscoreOptions.length > 0" />
 		<div>
 			<a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 	 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a>
@@ -668,7 +689,7 @@ $vueData = array(
 				</span><br class="form" />
 			</div>
 		</div>
-
+		</div>
 	</fieldset>
 	<div v-if="showDisplayDialog" class="fullwrap">
 		<div class="dialog-overlay">

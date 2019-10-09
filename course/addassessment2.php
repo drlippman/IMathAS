@@ -150,159 +150,183 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
 		// Core options
-		$toset['displaymethod'] = Sanitize::stripHtmlTags($_POST['displaymethod']);
-
-		$toset['submitby'] = Sanitize::stripHtmlTags($_POST['subtype']);
-		$toset['defregens'] = Sanitize::onlyInt($_POST['defregens']);
-		$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern']);
-		if ($toset['defregens'] == 1) {
-			$toset['defregenpenalty'] = 0;
-		} else if ($defregenpenalty_aftern > 1 && $_POST['defregenpenalty'] > 0) {
-			$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . Sanitize::onlyInt($_POST['defregenpenalty']);
-		} else {
-			$toset['defregenpenalty'] = Sanitize::onlyInt($_POST['defregenpenalty']);
-		}
-		if (isset($_POST['keepscore'])) {
-			$toset['keepscore'] = Sanitize::simpleString($_POST['keepscore']);
-		}
-
-
-		$toset['defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
-		$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern']);
-		if ($toset['defattempts'] == 1) {
-			$toset['defpenalty'] = 0;
-		} else if ($defattemptpenalty_aftern > 1 && $_POST['defattemptpenalty'] > 0) {
-			$toset['defpenalty'] = 'S' . $defattemptpenalty_aftern . Sanitize::onlyInt($_POST['defattemptpenalty']);
-		} else {
-			$toset['defpenalty'] = Sanitize::onlyInt($_POST['defattemptpenalty']);
-		}
-
-		$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);
-		if ($toset['showscores'] == 'none') {
-			$toset['showans'] = 'never';
-		} else {
-			$toset['showans'] = Sanitize::simpleString($_POST['showans']);
-		}
-		$toset['viewingb'] = Sanitize::simpleString($_POST['viewingb']);
-		$toset['scoresingb'] = Sanitize::simpleString($_POST['scoresingb']);
-		if ($toset['viewingb'] == 'never' || $toset['scoresingb'] == 'never') {
-			$toset['ansingb'] = 'never';
-		} else {
-			$toset['ansingb'] = Sanitize::simpleString($_POST['ansingb']);
-		}
-		$toset['gbcategory'] = Sanitize::onlyInt($_POST['gbcategory']);
-
-		// additional display options
-		$toset['caltag'] = Sanitize::stripHtmlTags($_POST['caltag']);
-		$toset['shuffle'] = Sanitize::onlyInt($_POST['shuffle']);
-		if (isset($_POST['sameseed'])) { $toset['shuffle'] += 2;}
-		if (isset($_POST['samever'])) { $toset['shuffle'] += 4;}
-		$toset['istutorial'] = empty($_POST['istutorial']) ? 0 : 1;
-		$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
-		$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
-
-		// time limit and access control
-		$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);
-    if (isset($_POST['latepassafterdue']) && $toset['allowlate']>0) {
-      $toset['allowlate'] += 10;
-    }
-
-    if (isset($_POST['dolpcutoff']) && trim($_POST['lpdate']) != '' && trim($_POST['lptime']) != '') {
-    	$toset['LPcutoff'] = parsedatetime($_POST['lpdate'],$_POST['lptime'],0);
-    	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $toset['LPcutoff']) ||
-				$toset['LPcutoff']<$enddate
-			) {
-    		$toset['LPcutoff'] = 0; //don't really set if it matches course end date or is before
-    	}
-    } else {
-    	$toset['LPcutoff'] = 0;
-    }
-
-		$toset['timelimit'] = -1*round(Sanitize::onlyFloat($_POST['timelimit'])*60);
-		$toset['overtime_grace'] = 0;
-		$toset['overtime_penalty'] = 0;
-    if (isset($_POST['allowovertime']) && $_POST['overtimegrace'] > 0) {
-        $toset['timelimit'] = -1*$toset['timelimit'];
-				$toset['overtime_grace'] = round(Sanitize::onlyFloat($_POST['overtimegrace'])*60);
-				$toset['overtime_penalty'] = Sanitize::onlyInt($_POST['overtimepenalty']);
-    }
-
-		$toset['password'] = trim(Sanitize::stripHtmlTags($_POST['assmpassword']));
-
-		$toset['reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
-		if ($_POST['reqscoreshowtype']==-1 || $toset['reqscore']==0) {
-			$toset['reqscore'] = 0;
-			$toset['reqscoretype'] = 0;
-			$toset['reqscoreaid'] = 0;
-		} else {
-			$toset['reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
-			$toset['reqscoretype'] = 0;
-			if ($_POST['reqscoreshowtype']==1) {
-				$toset['reqscoretype'] |= 1;
+		if ($_POST['copyfrom'] > 0) { // copy options from another assessment
+			$fields = array('displaymethod','submitby','defregens','defregenpenalty',
+									'keepscore','defattempts','defpenalty','showscores','showans',
+									'viewingb','scoresingb','ansingb','gbcategory','caltag','shuffle',
+									'istutorial','noprint','showcat','allowlate','LPcutoff',
+									'timelimit','overtime_grace','overtime_penalty','password',
+									'reqscore','reqscoretype','reqscoreaid','showhints',
+									'msgtoinstr','eqnhelper','posttoforum','extrefs','showtips',
+									'cntingb','minscore','deffeedbacktext','tutoredit','exceptionpenalty',
+									'defoutcome','isgroup','groupsetid','groupmax');
+			$fieldlist = implode(',', $fields);
+			$stm = $DBH->prepare("SELECT $fieldlist FROM imas_assessments WHERE id=:id AND courseid=:cid");
+			$stm->execute(array(':id'=>intval($_POST['copyfrom']), ':cid'=>$cid));
+			$row = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($row !== false) {
+				foreach ($row as $k=>$v) {
+					$toset[$k] = $v;
+				}
 			}
-			if ($_POST['reqscorecalctype']==1) {
-				$toset['reqscoretype'] |= 2;
+		} else { // set using values selected
+			$toset['displaymethod'] = Sanitize::stripHtmlTags($_POST['displaymethod']);
+
+			$toset['submitby'] = Sanitize::stripHtmlTags($_POST['subtype']);
+			$toset['defregens'] = Sanitize::onlyInt($_POST['defregens']);
+			$defregenpenalty_aftern = Sanitize::onlyInt($_POST['defregenpenaltyaftern']);
+			if ($toset['defregens'] == 1) {
+				$toset['defregenpenalty'] = 0;
+			} else if ($defregenpenalty_aftern > 1 && $_POST['defregenpenalty'] > 0) {
+				$toset['defregenpenalty'] = 'S' . $defregenpenalty_aftern . Sanitize::onlyInt($_POST['defregenpenalty']);
+			} else {
+				$toset['defregenpenalty'] = Sanitize::onlyInt($_POST['defregenpenalty']);
 			}
-		}
+			if (isset($_POST['keepscore'])) {
+				$toset['keepscore'] = Sanitize::simpleString($_POST['keepscore']);
+			}
 
-		// help and hints
-		$toset['showhints'] = empty($_POST['showhints']) ? 0 : 1;
-		$toset['showhints'] |= empty($_POST['showextrefs']) ? 0 : 2;
 
-		$toset['msgtoinstr'] = empty($_POST['msgtoinstr']) ? 0 : 1;
+			$toset['defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
+			$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern']);
+			if ($toset['defattempts'] == 1) {
+				$toset['defpenalty'] = 0;
+			} else if ($defattemptpenalty_aftern > 1 && $_POST['defattemptpenalty'] > 0) {
+				$toset['defpenalty'] = 'S' . $defattemptpenalty_aftern . Sanitize::onlyInt($_POST['defattemptpenalty']);
+			} else {
+				$toset['defpenalty'] = Sanitize::onlyInt($_POST['defattemptpenalty']);
+			}
 
-		$toset['eqnhelper'] = 2;
+			$toset['showscores'] = Sanitize::simpleString($_POST['showscores']);
+			if ($toset['showscores'] == 'none') {
+				$toset['showans'] = 'never';
+			} else {
+				$toset['showans'] = Sanitize::simpleString($_POST['showans']);
+			}
+			$toset['viewingb'] = Sanitize::simpleString($_POST['viewingb']);
+			$toset['scoresingb'] = Sanitize::simpleString($_POST['scoresingb']);
+			if ($toset['viewingb'] == 'never' || $toset['scoresingb'] == 'never') {
+				$toset['ansingb'] = 'never';
+			} else {
+				$toset['ansingb'] = Sanitize::simpleString($_POST['ansingb']);
+			}
+			$toset['gbcategory'] = Sanitize::onlyInt($_POST['gbcategory']);
 
-		if (!isset($_POST['doposttoforum'])) {
-      $toset['posttoforum'] = 0;
-    } else {
-			$toset['posttoforum'] = Sanitize::onlyInt($_POST['posttoforum']);
-		}
+			// additional display options
+			$toset['caltag'] = Sanitize::stripHtmlTags($_POST['caltag']);
+			$toset['shuffle'] = Sanitize::onlyInt($_POST['shuffle']);
+			if (isset($_POST['sameseed'])) { $toset['shuffle'] += 2;}
+			if (isset($_POST['samever'])) { $toset['shuffle'] += 4;}
+			$toset['istutorial'] = empty($_POST['istutorial']) ? 0 : 1;
+			$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
+			$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
 
-		$extrefs = array();
-			if (isset($_POST['extreflabels'])) {
-			foreach ($_POST['extreflabels'] as $k=>$label) {
-				$label = trim(Sanitize::stripHtmlTags($label));
-	    	$link = trim(Sanitize::url($_POST['extreflinks'][$k]));
-	    	if ($label != '' && $link != '') {
-	    		$extrefs[] = array(
-	    			'label' => $label,
-	    			'link' => $link
-	    		);
+			// time limit and access control
+			$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);
+	    if (isset($_POST['latepassafterdue']) && $toset['allowlate']>0) {
+	      $toset['allowlate'] += 10;
+	    }
+
+	    if (isset($_POST['dolpcutoff']) && trim($_POST['lpdate']) != '' && trim($_POST['lptime']) != '') {
+	    	$toset['LPcutoff'] = parsedatetime($_POST['lpdate'],$_POST['lptime'],0);
+	    	if (tzdate("m/d/Y",$GLOBALS['courseenddate']) == tzdate("m/d/Y", $toset['LPcutoff']) ||
+					$toset['LPcutoff']<$enddate
+				) {
+	    		$toset['LPcutoff'] = 0; //don't really set if it matches course end date or is before
 	    	}
+	    } else {
+	    	$toset['LPcutoff'] = 0;
+	    }
+
+			$toset['timelimit'] = -1*round(Sanitize::onlyFloat($_POST['timelimit'])*60);
+			$toset['overtime_grace'] = 0;
+			$toset['overtime_penalty'] = 0;
+	    if (isset($_POST['allowovertime']) && $_POST['overtimegrace'] > 0) {
+	        $toset['timelimit'] = -1*$toset['timelimit'];
+					$toset['overtime_grace'] = round(Sanitize::onlyFloat($_POST['overtimegrace'])*60);
+					$toset['overtime_penalty'] = Sanitize::onlyInt($_POST['overtimepenalty']);
+	    }
+
+			$toset['password'] = trim(Sanitize::stripHtmlTags($_POST['assmpassword']));
+
+			$toset['reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
+			if ($_POST['reqscoreshowtype']==-1 || $toset['reqscore']==0) {
+				$toset['reqscore'] = 0;
+				$toset['reqscoretype'] = 0;
+				$toset['reqscoreaid'] = 0;
+			} else {
+				$toset['reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
+				$toset['reqscoretype'] = 0;
+				if ($_POST['reqscoreshowtype']==1) {
+					$toset['reqscoretype'] |= 1;
+				}
+				if ($_POST['reqscorecalctype']==1) {
+					$toset['reqscoretype'] |= 2;
+				}
+			}
+
+			// help and hints
+			$toset['showhints'] = empty($_POST['showhints']) ? 0 : 1;
+			$toset['showhints'] |= empty($_POST['showextrefs']) ? 0 : 2;
+
+			$toset['msgtoinstr'] = empty($_POST['msgtoinstr']) ? 0 : 1;
+
+			$toset['eqnhelper'] = 2;
+
+			if (!isset($_POST['doposttoforum'])) {
+	      $toset['posttoforum'] = 0;
+	    } else {
+				$toset['posttoforum'] = Sanitize::onlyInt($_POST['posttoforum']);
+			}
+
+			$extrefs = array();
+				if (isset($_POST['extreflabels'])) {
+				foreach ($_POST['extreflabels'] as $k=>$label) {
+					$label = trim(Sanitize::stripHtmlTags($label));
+		    	$link = trim(Sanitize::url($_POST['extreflinks'][$k]));
+		    	if ($label != '' && $link != '') {
+		    		$extrefs[] = array(
+		    			'label' => $label,
+		    			'link' => $link
+		    		);
+		    	}
+				}
+			}
+			$toset['extrefs'] = json_encode($extrefs);
+
+			$toset['showtips'] = Sanitize::onlyInt($_POST['showtips']);
+
+			// grading and feedback
+			$toset['cntingb'] = Sanitize::onlyInt($_POST['cntingb']);
+
+			$toset['minscore'] = Sanitize::onlyInt($_POST['minscore']);
+	    if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $toset['minscore']>0) {
+	      $toset['minscore'] += 10000;
+	    }
+
+			if (isset($_POST['usedeffb'])) {
+	      $toset['deffeedbacktext'] = Sanitize::incomingHtml($_POST['deffb']);
+	    } else {
+	      $toset['deffeedbacktext'] = '';
+	    }
+
+			$toset['tutoredit'] = Sanitize::onlyInt($_POST['tutoredit']);
+			$toset['exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
+			$toset['defoutcome'] = Sanitize::onlyInt($_POST['defoutcome']);
+
+			// group assessmentid
+	    $toset['isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
+			if ($toset['isgroup'] > 0) {
+				$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid']);
+				$toset['groupmax'] = Sanitize::onlyInt($_POST['groupmax']);
+			} else {
+				$toset['groupsetid'] = 0;
+				$toset['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']:6;
 			}
 		}
-		$toset['extrefs'] = json_encode($extrefs);
 
-		$toset['showtips'] = Sanitize::onlyInt($_POST['showtips']);
 
-		// grading and feedback
-		$toset['cntingb'] = Sanitize::onlyInt($_POST['cntingb']);
 
-		$toset['minscore'] = Sanitize::onlyInt($_POST['minscore']);
-    if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $toset['minscore']>0) {
-      $toset['minscore'] += 10000;
-    }
-
-		if (isset($_POST['usedeffb'])) {
-      $toset['deffeedbacktext'] = Sanitize::incomingHtml($_POST['deffb']);
-    } else {
-      $toset['deffeedbacktext'] = '';
-    }
-
-		$toset['tutoredit'] = Sanitize::onlyInt($_POST['tutoredit']);
-		$toset['exceptionpenalty'] = Sanitize::onlyInt($_POST['exceptionpenalty']);
-		$toset['defoutcome'] = Sanitize::onlyInt($_POST['defoutcome']);
-
-		// group assessmentid
-    $toset['isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
-		if ($toset['isgroup'] > 0) {
-			$toset['groupsetid'] = Sanitize::onlyInt($_POST['groupsetid']);
-			$toset['groupmax'] = Sanitize::onlyInt($_POST['groupmax']);
-		} else {
-			$toset['groupsetid'] = 0;
-			$toset['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']:6;
-		}
 
     //is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
     //if so, cannot handle
@@ -698,6 +722,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       $stm->execute(array(':courseid'=>$cid));
       $otherAssessments = array();
       while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				if (isset($_GET['id']) && $row[0]==$_GET['id']) { continue; }
 				$otherAssessments[] = array(
 					'value' => $row[0],
 					'text' => $row[1]
