@@ -317,7 +317,7 @@ export default {
     updateFeedback (evt) {
       let content;
       if (this.useEditor) {
-        content = window.tinymce.activeEditor.getContent();
+        content = window.tinymce.get('fb'+this.qn).getContent();
       } else {
         content = evt.target.value;
       }
