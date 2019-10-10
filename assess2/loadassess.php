@@ -96,6 +96,9 @@ $assessInfoOut['userid'] = $uid;
 //set is_lti and is_diag
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0;
 $assessInfoOut['is_diag'] = isset($sessiondata['isdiag']);
+if ($assessInfoOut['is_lti']) {
+  $assessInfoOut['has_ltisourcedid'] = !empty($sessiondata['lti_lis_result_sourcedid'.$aid]);
+}
 
 //set has password
 $assessInfoOut['has_password'] = $assess_info->hasPassword();
