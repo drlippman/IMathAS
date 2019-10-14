@@ -60,6 +60,14 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
   exit;
 }
 
+// reject if no lti_sourcedid and we expect it
+if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
+  empty($sessiondata['lti_lis_result_sourcedid'.$aid])
+) {
+  echo '{"error": "need_relaunch"}';
+  exit;
+}
+
 // load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);

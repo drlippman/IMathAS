@@ -91,7 +91,8 @@ export const actions = {
         practice: dopractice,
         password: password,
         new_group_members: newGroupMembers.join(','),
-        cur_group: store.assessInfo.stugroupid
+        cur_group: store.assessInfo.stugroupid,
+        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid)?1:0
       },
       xhrFields: {
         withCredentials: true
@@ -760,6 +761,12 @@ export const actions = {
     return changed;
   },
   handleError (error) {
+    if (store.assessInfo.hasOwnProperty('is_lti') &&
+      store.assessInfo.is_lti &&
+      error === 'no_session'
+    ) {
+      error = 'lti_no_session';
+    }
     store.errorMsg = error;
   },
   updateTreeReader () {

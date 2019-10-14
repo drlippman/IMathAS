@@ -1545,7 +1545,7 @@ if ($linkparts[0]=='aid') {
 	$stm->execute(array(':id'=>$aid));
 	list($timelimit, $aver) = $stm->fetch(PDO::FETCH_NUM);
 	$timelimit = abs($timelimit * $timelimitmult);
-	if ($timelimit>0) {
+	if ($timelimit>0 && $aver==1) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);
 			$tlrem = $timelimit % 3600;
@@ -2662,7 +2662,7 @@ if ($keyparts[0]=='aid') {
 	$stm->execute(array(':id'=>$aid));
 	list($timelimit, $aver) = $stm->fetch(PDO::FETCH_NUM);
 	$timelimit = abs($timelimit * $timelimitmult);
-	if ($timelimit>0) {
+	if ($timelimit>0 && $aver==1) {
 		 if ($timelimit>3600) {
 			$tlhrs = floor($timelimit/3600);
 			$tlrem = $timelimit % 3600;
