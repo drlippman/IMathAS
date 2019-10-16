@@ -915,6 +915,8 @@ class AssessInfo
     $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);
     $GLOBALS['showtips'] = $settings['showtips'];
 
+    $settings['enddate_in'] = $settings['enddate'] - time();
+    
     // adjust for language change
     $settings['deftries'] = $settings['defattempts'];
 

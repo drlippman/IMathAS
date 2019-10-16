@@ -58,8 +58,8 @@ $assess_record->loadRecord($uid);
 
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(
-  'name', 'summary', 'available', 'startdate', 'enddate', 'original_enddate',
-  'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
+  'name', 'summary', 'available', 'startdate', 'enddate', 'enddate_in', 
+  'original_enddate', 'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
