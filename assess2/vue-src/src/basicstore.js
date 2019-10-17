@@ -23,6 +23,8 @@ export const store = Vue.observable({
   timelimit_timer: null,
   timelimit_expired: false,
   timelimit_grace_expired: false,
+  timelimit_restricted: 0,
+  enddate_timer: null,
   inPrintView: false,
   enableMQ: true,
   livepollServer: '',
@@ -867,11 +869,37 @@ export const actions = {
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
     }
+    if (data.hasOwnProperty('enddate_in')) {
+      clearTimeout(store.enddate_timer);
+      let now = new Date().getTime();
+      let dueat = data.enddate_in * 1000;
+      data['enddate_local'] = now + dueat;
+      store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
+      // TODO: implement handleDueDate
+    }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
+      clearTimeout(store.enddate_timer); // no need for it w timelimit timer
       let now = new Date().getTime();
-      let expires = data.timelimit_expiresin * 1000;
-      let grace = data.timelimit_gracein * 1000;
+      let expires, grace;
+      store.timelimit_restricted = 0;
+      if (data.enddate_in < data.timelimit_expiresin) { //due before timelimit up
+        store.timelimit_restricted = 1;
+        expires = data.enddate_in * 1000;
+      } else {
+        expires = data.timelimit_expiresin * 1000;
+      }
+      if (data.enddate_in < data.timelimit_gracein) { //due before grace period up
+        if (store.timelimit_restricted === 1) {
+          // time limit also restricted - no grace
+          grace = 0;
+        } else {
+          store.timelimit_restricted = 2;
+          grace = data.enddate_in * 1000;
+        }
+      } else {
+        grace = data.timelimit_gracein * 1000;
+      }
       data['timelimit_local_expires'] = now + expires;
       if (grace > 0) {
         data['timelimit_local_grace'] = now + grace;
@@ -879,7 +907,7 @@ export const actions = {
         data['timelimit_local_grace'] = 0;
       }
       if (expires > 0) {
-        if (data.timelimit_gracein > 0) {
+        if (data.timelimit_gracein > 0 && grace > 0) {
           store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
         } else {
           store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires);
@@ -895,6 +923,12 @@ export const actions = {
             store.timelimit_grace_expired = false;
           }
         }
+      }
+    } else if (data.timelimit > 0) { // haven't started timed assessment yet
+      if (data.enddate_in < data.timelimit) {
+        store.timelimit_restricted = 1;
+      } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
+        store.timelimit_restricted = 2;
       }
     }
     if (data.hasOwnProperty('interquestion_text')) {

@@ -273,6 +273,8 @@ $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
+  // These values are adjusted for timelimit multiplier, but are not limited
+  // by the due date
   $assessInfoOut['timelimit_expiresin'] = $assess_record->getTimeLimitExpires() - $now;
   $assessInfoOut['timelimit_gracein'] = max($assess_record->getTimeLimitGrace() - $now, 0);
 }
