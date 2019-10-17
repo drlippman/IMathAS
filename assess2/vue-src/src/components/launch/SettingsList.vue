@@ -176,7 +176,9 @@ export default {
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
           let expires = settings.timelimit_expires_disp;
-          if (settings.overtime_grace > 0) {
+          if (settings.overtime_grace > 0 &&
+              settings.timelimit_grace > settings.timelimit_expires
+          ) {
             timeobj.alert = this.$t('setlist.time_expires_wgrace', {
               date: expires,
               grace: settings.timelimit_grace_disp

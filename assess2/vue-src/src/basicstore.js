@@ -881,25 +881,16 @@ export const actions = {
       clearTimeout(store.timelimit_timer);
       clearTimeout(store.enddate_timer); // no need for it w timelimit timer
       let now = new Date().getTime();
-      let expires, grace;
-      store.timelimit_restricted = 0;
-      if (data.enddate_in < data.timelimit_expiresin) { //due before timelimit up
-        store.timelimit_restricted = 1;
-        expires = data.enddate_in * 1000;
-      } else {
-        expires = data.timelimit_expiresin * 1000;
-      }
-      if (data.enddate_in < data.timelimit_gracein) { //due before grace period up
-        if (store.timelimit_restricted === 1) {
-          // time limit also restricted - no grace
-          grace = 0;
-        } else {
+      if (data.hasOwnProperty('timelimit_expires')) {
+        if (data.timelimit_expires == data.enddate) {
+          store.timelimit_restricted = 1;
+        } else if (data.timelimit_grace == data.enddate) {
           store.timelimit_restricted = 2;
-          grace = data.enddate_in * 1000;
         }
-      } else {
-        grace = data.timelimit_gracein * 1000;
       }
+      let expires = data.timelimit_expiresin * 1000;
+      let grace = data.timelimit_gracein * 1000;
+
       data['timelimit_local_expires'] = now + expires;
       if (grace > 0) {
         data['timelimit_local_grace'] = now + grace;
@@ -907,7 +898,7 @@ export const actions = {
         data['timelimit_local_grace'] = 0;
       }
       if (expires > 0) {
-        if (data.timelimit_gracein > 0 && grace > 0) {
+        if (data.timelimit_gracein > 0) {
           store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
         } else {
           store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires);
