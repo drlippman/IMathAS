@@ -843,6 +843,9 @@ private function insertAssessment() {
 				$qpoints[$qid] = $this->data['questions'][$qid]['points'];
 			}
 			// adjust settings if needed
+			if (!isset($this->data['items'][$toimport]['data']['ver'])) {
+				$this->data['items'][$toimport]['data']['ver'] = 1;
+			}
 			if ($this->data['items'][$toimport]['data']['ver'] < $GLOBALS['courseUIver']) {
 				$this->data['questions'][$qid] = migrateQuestionSettings(
 					$this->data['questions'][$qid],
