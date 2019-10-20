@@ -9,7 +9,6 @@
           {{ row.str }}
         </div>
         <div class="noticetext" v-if="!!row.altstr">
-          <icons name="alert" size="small" />
           {{ row.altstr }}
         </div>
         <div class="small subdued" v-if="!!row.sub">
