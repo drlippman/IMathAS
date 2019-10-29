@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 28
+// File Version : 29
 //
 
 global $allowedmacros;
@@ -1189,24 +1189,32 @@ function simplexdisplaylatex() {
 			$isPivot = false;
 			if(!is_null($pivots)) {
 				for ($pivotloop=0; $pivotloop<count($pivots); $pivotloop++) {
-					$currentpoint = $pivots[$pivotloop];
-					if((count($currentpoint)>0)&&(!is_null($currentpoint[0]))&&($currentpoint[0]>=0)) {
-						$prow = $currentpoint[0];
-	  				}
-	  				else {
-						$prow = -1;
-	  				}
-	  				if((count($currentpoint)>1)&&(!is_null($currentpoint[1]))&&($currentpoint[1]>=0)) {
-						$pcol = $currentpoint[1];
-	  				}
-	  				else {
-						$pcol = -1;
-	  				}
+                    $currentpoint = $pivots[$pivotloop];
+                    // patched 2019-10-28
+                    // not tracked down was this wouldn't be an array...
+                    if(!is_array($currentpoint)) {
+                        $prow = -1;
+                        $pcol = -1;
+                        echo "currentpoint is not an array - ".htmlentities($currentpoint).".<br/>\r\n";
+                    } else {
+                        if((count($currentpoint)>0)&&(!is_null($currentpoint[0]))&&($currentpoint[0]>=0)) {
+                            $prow = $currentpoint[0];
+                        }
+                        else {
+                            $prow = -1;
+                        }
+                        if((count($currentpoint)>1)&&(!is_null($currentpoint[1]))&&($currentpoint[1]>=0)) {
+                            $pcol = $currentpoint[1];
+                        }
+                        else {
+                            $pcol = -1;
+                        }
 
-					if(($prow==$rloop)&&($pcol==$cloop)) {
-						$isPivot = TRUE;
-						break;
-					}
+                        if(($prow==$rloop)&&($pcol==$cloop)) {
+                            $isPivot = TRUE;
+                            break;
+                        }
+                    }
 				}
 			}
 
@@ -2397,7 +2405,7 @@ function simplexsolve2() {
 	$objectivereached = array();	// list of solution that have been optimized
 	$sm = simplextoarray($sm);		// make sure that all elements are fraction arrays
 	$rows = 0;						// set to the initial simplex matrix row
-	$simplexsets[$rows] = array();	// set initial condition
+	$simplexsets[$rows] = null;     // set initial condition
 	$columns = 0;					// set to the initial simplex matrix column
 	$parentcolumn = 0;				// set to the current active column
 	$exitwhile = FALSE;				// flag to exit loop
@@ -2412,6 +2420,8 @@ function simplexsolve2() {
 		$objectivereached[count($objectivereached)] = $solution;
 	}
 
+    $hasmixedconstraints = simplexhasmixedconstrants($sm);
+
 	do {
 		// step 3
 		$pivots = NULL;
@@ -2421,7 +2431,7 @@ function simplexsolve2() {
 		   $pivotpoint = NULL;
 
 			// step 1 - See if this is a mixed constraint simplex matrix
-			if(simplexhasmixedconstrants($sm))
+           if($hasmixedconstraints)
 			{
 				$pivotpointList	  = simplexfindpivotpointmixed($sm);
 		   		$PivotPointCondition = $pivotpointList[0];
@@ -2447,6 +2457,9 @@ function simplexsolve2() {
 			//								   , all pivot points
 			//								   , simplex matrix
 			//								   , soluiton
+            if(is_null($simplexsets[$rows])) {
+                $simplexsets[$rows] = array();
+			}
 			$simplexsets[$row][$columns] = array($parentcolumn, $PivotPointCondition, NULL, NULL, $sm, $solution);
 			$exitwhile = TRUE;
 			break;
@@ -2484,12 +2497,17 @@ function simplexsolve2() {
 		// step 6
 		//  parent column, pivot, all pivot points, simplex matrix, solution
 		$rowflag = count($simplexsets);
+
+        if(is_null($simplexsets[$rows])) {
+            $simplexsets[$rows] = array();
+        }
+
 		$simplexsets[$rows++][$columns] = array($parentcolumn, $PivotPointCondition, $pivotpoint, $pivots, $sm, $solution);
 
 		// step 7
-		if($rowflag<$rows) {
-			$simplexsets[$rows] = array();
-		}
+		//if($rowflag<$rows) {
+		//	$simplexsets[$rows] = array();
+		//}
 
 		// step 8
 		$parentcolumn = $columns;
@@ -3152,7 +3170,11 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change Log
-// 2018-xx-xx
+// 2019-xx-xx
+//
+// 2019-10-28 ver 29 - Fixed bug in sinplexsolve2 that added an extra row to some tableaus
+//                     patched code in simplexdisplaylatex at 1193 $currentpoint was not an ordered pair - it was a single value.
+//
 //
 // 2018-07-28 Add the ability to suppress the objective column in the following:
 //			simplexdisplaylatex,
@@ -3204,3 +3226,5 @@ function simplexsolve($sm,$type,$showfractions=1) {
 // 2014-09-18 Added simplexsetentry and correct help file typos.
 // 2014-06-06 Updated, sorted, and fixed help file information
 // 2014-06-02 Bug fixes and added simplexreadtoanswerarray
+
+?>
