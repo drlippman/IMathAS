@@ -2149,6 +2149,10 @@ class AssessRecord
       // keep latest assessment version
       $cntVer = count($this->data['assess_versions']);
       $latestAver = $this->data['assess_versions'][$cntVer-1];
+      if ($latestAver['status'] == 1) {
+        // had status "submitted" - reset to active
+        $latestAver['status'] = 0;
+      }
       $this->data['assess_versions'] = array($latestAver);
       $this->data['scored_version'] = 0;
     } else if ($newFormat == 'by_assessment') {
