@@ -698,7 +698,9 @@ class AssessInfo
    * @return void
    */
   public function overridePracticeSettings() {
-    $this->assessData['displaymethod'] = 'skip';
+    if ($this->assessData['displaymethod'] != 'video_cued') {
+      $this->assessData['displaymethod'] = 'skip';
+    }
     $this->assessData['submitby'] = 'by_question';
     $this->assessData['showscores'] = 'during';
     $this->assessData['showans'] = 'with_score';
