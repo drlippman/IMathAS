@@ -79,7 +79,7 @@
         </button>
       </div>
 
-      <div v-if="canEdit">
+      <div v-if="canEdit && aData.has_active_attempt">
         <a :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
         </a> |
