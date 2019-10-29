@@ -140,7 +140,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   if ($canViewAll) {
     $assessInfoOut['show_reset'] = true;
   }
-  $assessInfoOut['available'] = "pasttime";
+  $assessInfoOut['pasttime'] = 1;
 }
 
 //load group members, if applicable
