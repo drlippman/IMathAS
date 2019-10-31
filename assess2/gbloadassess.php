@@ -72,7 +72,7 @@ if ($studata === false) {
   exit;
 }
 
-$assess_info->loadException($uid, $isstudent, $studata['latepass'], $latepasshrs, $courseenddate);
+$assess_info->loadException($uid, true, $studata['latepass'], $latepasshrs, $courseenddate);
 $assess_info->applyTimelimitMultiplier($studata['timelimitmult']);
 
 //load user's assessment record - start with scored data
