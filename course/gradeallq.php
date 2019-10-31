@@ -742,12 +742,12 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
 	} else {
-		$p=strrpos($code,'answeights');
+		$p=strrpos($code,'anstypes');
 		$np = strpos($code,"\n",$p);
 		if ($np !== false) {
 			$code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
 		} else {
-			$code .= ';if(isset($answeights)){return;};';
+			$code .= ';if(isset($anstypes)){return;};';
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
