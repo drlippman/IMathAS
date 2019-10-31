@@ -64,6 +64,8 @@
         cols="60"
         :value = "qdata.feedback"
         @input="updateFeedback"
+        @paste="pasteFeedback"
+        @cut="pasteFeedback"
       ></textarea>
       <div
         v-else-if="canedit"
@@ -72,6 +74,8 @@
         class="fbbox"
         v-html="qdata.feedback"
         @input="updateFeedback"
+        @paste="pasteFeedback"
+        @cut="pasteFeedback"
       />
       <div
         v-else
@@ -313,6 +317,9 @@ export default {
     updateScore (pn, evt) {
       let partposs = this.qdata.points_possible * this.answeights[pn];
       actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
+    },
+    pasteFeedback(evt) {
+      setTimeout(()=>this.updateFeedback(evt), 50);
     },
     updateFeedback (evt) {
       let content;
