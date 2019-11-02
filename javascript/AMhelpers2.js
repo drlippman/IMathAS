@@ -997,9 +997,10 @@ function processCalcInterval(fullstr, format, ineqvar) {
     }
     fullstr = conv[0];
   }
-  var strarr = [], submitstrarr = []; dispstrarr = [];
+  var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
+    joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {
       if (fullstr.charAt(pos)==',') {
@@ -1063,13 +1064,13 @@ function processCalcInterval(fullstr, format, ineqvar) {
     return {
       err: err,
       dispvalstr: dispstrarr.join(' "or" '),
-      submitstr:  submitstrarr.join('U')
+      submitstr:  submitstrarr.join(joinchar)
     };
   } else {
     return {
       err: err,
       dispvalstr: submitstrarr.join(' uu '),
-      submitstr: submitstrarr.join('U')
+      submitstr: submitstrarr.join(joinchar)
     };
   }
 }
