@@ -86,7 +86,7 @@ function init(paramarr, enableMQ) {
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
-    if (params.helper && params.qtype.match(/^(calc|numfunc|string)/)) { //want mathquill
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
       str = params.qtype;
       if (params.calcformat) {
