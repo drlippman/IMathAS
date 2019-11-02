@@ -780,6 +780,7 @@ function processByType(qn) {
       case 'calculated':
         res = processCalculated(str, params.calcformat);
         break;
+      case 'interval':
       case 'calcinterval':
         res = processCalcInterval(str, params.calcformat, params.vars);
         break;
@@ -812,7 +813,7 @@ function processByType(qn) {
  */
 function preformat(qn, text, qtype, calcformat) {
   text = normalizemathunicode(text);
-  if (qtype == 'calcinterval') {
+  if (qtype.match(/interval/)) {
     if (!calcformat.match(/inequality/)) {
       text = text.replace(/U/g,"uu");
     } else {

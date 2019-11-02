@@ -50,6 +50,12 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         if (!isset($variables)) { $variables = 'x';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
+        if ($anstype == 'interval') {
+          $ansformats[] = 'decimal';
+          $answerformat = implode(',', $ansformats);
+          $anstype = 'calcinterval';
+        }
+
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         if (isset($ansprompt)) {
