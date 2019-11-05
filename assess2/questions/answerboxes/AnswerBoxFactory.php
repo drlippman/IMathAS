@@ -102,8 +102,7 @@ class AnswerBoxFactory
                 return new FunctionExpressionAnswerBox($answerBoxParams);
                 break;
             case 'interval':
-                //return new IntervalAnswerBox($answerBoxParams);
-                return new CalculatedIntervalAnswerBox($answerBoxParams);
+                return new IntervalAnswerBox($answerBoxParams);
                 break;
             case 'matching':
                 return new MatchingAnswerBox($answerBoxParams);
