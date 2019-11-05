@@ -35,6 +35,15 @@
         </span>
       </div>
 
+      <div v-if="aData.latepass_blocked_by_practice">
+        {{ $t('gradebook.latepass_blocked_practice') }}
+        <button
+          type="button"
+          @click="clearLPblock"
+        >
+          {{ $t('gradebook.clear_latepass_block' )}}
+        </button>
+      </div>
       <div>
         <strong>
           {{ $t('gradebook.gb_score') }}:
@@ -534,6 +543,9 @@ export default {
     clearAttempts (type) {
       store.clearAttempts.type = type;
       store.clearAttempts.show = true;
+    },
+    clearLPblock () {
+      actions.clearLPblock();
     },
     submitVersion () {
       actions.endAssess();

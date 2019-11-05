@@ -267,6 +267,10 @@ export const actions = {
         store.inTransit = false;
       });
   },
+  clearLPblock () {
+    store.clearAttempts.type = 'practiceview';
+    this.clearAttempt(true);
+  },
   clearAttempt (keepver) {
     let data = {
       type: store.clearAttempts.type,
@@ -304,6 +308,8 @@ export const actions = {
         } else if (store.clearAttempts.type === 'all') {
           // reload whole mess
           actions.loadGbAssessData();
+        } else if (store.clearAttempts.type === 'practiceview') {
+          store.assessInfo.latepass_blocked_by_practice = data.latepass_blocked_by_practice;
         } else {
           store.assessInfo.gbscore = response.gbscore;
           store.assessInfo.scored_version = response.scored_version;
