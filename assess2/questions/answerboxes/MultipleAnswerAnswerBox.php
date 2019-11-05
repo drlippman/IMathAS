@@ -63,9 +63,13 @@ class MultipleAnswerAnswerBox implements AnswerBox
 			$randkeys = $RND->array_rand($questions,count($questions));
 			$RND->shuffle($randkeys);
 		}
-    if (count($questions) > 1) {
-      $questions[] = _('None of these');
-      array_push($randkeys,count($questions)-1);
+    if (count($questions) > 1 && trim($answers) == "") {
+      $qstr = strtolower(implode(' ', $questions));
+      if (strpos($qstr, 'none of') === false) {
+        $questions[] = _('None of these');
+        array_push($randkeys,count($questions)-1);
+        $answers = count($questions)-1;
+      }
     }
 		$_SESSION['choicemap'][$qn] = $randkeys;
 		if (isset($GLOBALS['capturechoices'])) {

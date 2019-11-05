@@ -3176,25 +3176,33 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
-	if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
-		// don't have access to rawscores via global, so just abort
-		return '';
-	}
-	$qn = $thisq-1;
-	if (strpos($rawscores[$qn],'~')===false) {
-		$res = ($rawscores[$qn]<0)?-1:(($rawscores[$qn]==1)?1:0);
-	} else {
-		$sp = explode('~',$rawscores[$qn]);
-		if ($partn===null) {
-			$res = 1;
-			for ($j=0;$j<count($sp);$j++) {
-				if ($sp[$j]!=1) {
-					$res=0;
-					break;
-				}
-			}
+	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
+		$val = $GLOBALS['assess2-curq-iscorrect'];
+		if ($partn !== null && is_array($GLOBALS['assess2-curq-iscorrect'])) {
+			$res = $GLOBALS['assess2-curq-iscorrect'][$partn];
 		} else {
-			$res = ($sp[$partn]==1)?1:0;
+			$res = $GLOBALS['assess2-curq-iscorrect'];
+		}
+		if ($res > 0 && $res < 1) {
+			$res = 0;
+		}
+	} else {
+		$qn = $thisq-1;
+		if (strpos($rawscores[$qn],'~')===false) {
+			$res = ($rawscores[$qn]<0)?-1:(($rawscores[$qn]==1)?1:0);
+		} else {
+			$sp = explode('~',$rawscores[$qn]);
+			if ($partn===null) {
+				$res = 1;
+				for ($j=0;$j<count($sp);$j++) {
+					if ($sp[$j]!=1) {
+						$res=0;
+						break;
+					}
+				}
+			} else {
+				$res = ($sp[$partn]==1)?1:0;
+			}
 		}
 	}
 	if ($res==-1) {

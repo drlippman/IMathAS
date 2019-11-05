@@ -60,12 +60,20 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
   exit;
 }
 
+// reject if no lti_sourcedid and we expect it
+if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
+  empty($sessiondata['lti_lis_result_sourcedid'.$aid])
+) {
+  echo '{"error": "need_relaunch"}';
+  exit;
+}
+
 // load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
 
 // check password, if needed
-if (!$in_practice &&
+if (!$in_practice && !$canViewAll &&
   (!isset($sessiondata['assess2-'.$aid]) || $sessiondata['assess2-'.$aid] != $in_practice) &&
   !$assess_info->checkPassword($_POST['password'])
 ) {
@@ -243,7 +251,7 @@ $include_from_assess_info = array(
   'extended_with', 'timelimit', 'timelimit_type', 'allowed_attempts',
   'latepasses_avail', 'latepass_extendto', 'showscores', 'intro',
   'interquestion_text', 'resources', 'category_urls', 'help_features',
-  'points_possible'
+  'points_possible', 'showcat'
 );
 if ($in_practice) {
   array_push($include_from_assess_info, 'displaymethod', 'showscores',
@@ -265,8 +273,8 @@ $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
-  $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
-  $assessInfoOut['timelimit_grace'] = $assess_record->getTimeLimitGrace();
+  $assessInfoOut['timelimit_expiresin'] = $assess_record->getTimeLimitExpires() - $now;
+  $assessInfoOut['timelimit_gracein'] = max($assess_record->getTimeLimitGrace() - $now, 0);
 }
 
 // grab video cues if needed

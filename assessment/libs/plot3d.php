@@ -110,7 +110,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		  } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		  }
-			if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1)) {
+			if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
 				$html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 			}
 	  	  $GLOBALS['3dplotcnt'] = $r;
@@ -126,7 +126,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		  $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a></span>";
 	  	  $html .= "</canvas>";
 				$init = "var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height'}, 'plot3d$r');";
-				if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+				if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 					$html .= "<script type=\"text/javascript\"> $init </script>";
 				} else {
 					$html .= "<script type=\"text/javascript\">$(window).on('load',function() { $init });</script>";
@@ -268,7 +268,7 @@ function spacecurve($func,$tmin,$tmax) {
 		 } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		 }
-		 if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1)) {
+		 if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
 			 $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 		 }
 	  	 $GLOBALS['3dplotcnt'] = $r;
@@ -281,7 +281,7 @@ function spacecurve($func,$tmin,$tmax) {
 		 $html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></span>";
 	  	 $html .= "</canvas>";
 			 $init = "var plot3d$r = new Viewer3D({verts: '$verts', curves: true, width: '$width', height:'$height'}, 'plot3d$r');";
-			 if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+			 if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 				 $html .= "<script type=\"text/javascript\"> $init </script>";
 			 } else {
 				 $html .= "<script type=\"text/javascript\">$(window).on('load',function() { $init });</script>";

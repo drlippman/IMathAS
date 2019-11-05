@@ -553,8 +553,8 @@ class AssessRecord
         if (!$active && $this->data['assess_versions'][$lastver]['lastchange'] === 0) {
           $this->data['assess_versions'][$lastver]['lastchange'] = $this->now;
         }
-        if (!$active && $this->data['lastchange'] === 0) {
-          $this->data['lastchange'] = $this->now;
+        if (!$active && intval($this->assessRecord['lastchange']) === 0) {
+          $this->assessRecord['lastchange'] = $this->now;
         }
         // if there's a time limit, set the time limit
         if ($active && $this->assess_info->getSetting('timelimit') > 0) {
@@ -1583,6 +1583,15 @@ class AssessRecord
         $showansparts[$pn] = true; // show with score
       } else if ($qsettings['showans'] === 'after_n' && $partattemptn[$pn] >= $qsettings['showans_aftern']) {
         $showansparts[$pn] = true; // show after n attempts
+      } else if (
+        ($qsettings['showans'] === 'after_lastattempt' ||
+         $qsettings['showans'] === 'after_n'
+        ) && (
+          $partattemptn[$pn]  > 0 &&
+          $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] == 1
+        )
+      ) {
+        $showansparts[$pn] = true; // got part right
       } else {
         $showansparts[$pn] = false;
         // don't want correct answers to block general showans
@@ -1931,8 +1940,8 @@ class AssessRecord
       // loop through the question numbers
       $aVerScore = 0;
       for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
-        // if not rescoring this question, or if withdrawn, 
-        // or retotalling indiv questions and not latest assess version, 
+        // if not rescoring this question, or if withdrawn,
+        // or retotalling indiv questions and not latest assess version,
         // use existing score
         if (($rescoreQs !== 'all' && !in_array($qn, $rescoreQs)) ||
             !empty($curAver['questions'][$qn]['withdrawn']) ||
@@ -2140,6 +2149,10 @@ class AssessRecord
       // keep latest assessment version
       $cntVer = count($this->data['assess_versions']);
       $latestAver = $this->data['assess_versions'][$cntVer-1];
+      if ($latestAver['status'] == 1) {
+        // had status "submitted" - reset to active
+        $latestAver['status'] = 0;
+      }
       $this->data['assess_versions'] = array($latestAver);
       $this->data['scored_version'] = 0;
     } else if ($newFormat == 'by_assessment') {

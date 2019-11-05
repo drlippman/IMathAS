@@ -166,6 +166,8 @@ function deleteCourse($cid) {
 	$stm->execute(array(':courseid'=>$cid));
 	$stm = $DBH->prepare("DELETE FROM imas_content_track WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
+	$stm = $DBH->prepare("DELETE FROM imas_excused WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
 
 	$DBH->commit();
 }

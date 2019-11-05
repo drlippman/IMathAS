@@ -91,7 +91,8 @@ export const actions = {
         practice: dopractice,
         password: password,
         new_group_members: newGroupMembers.join(','),
-        cur_group: store.assessInfo.stugroupid
+        cur_group: store.assessInfo.stugroupid,
+        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid)?1:0
       },
       xhrFields: {
         withCredentials: true
@@ -103,6 +104,9 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
+        // reset drawing handler
+        window.imathasDraw.reset();
+
         // overwrite properties with those from response
         response = this.processSettings(response);
         store.assessInfo = Object.assign({}, store.assessInfo, response);
@@ -450,7 +454,7 @@ export const actions = {
                 data.append(el.name, el.files[0]);
               }
             } else {
-              data.append(el.name, el.value);
+              data.append(el.name, window.imathasAssess.preSubmitString(el.name, el.value));
             }
           }
         }
@@ -714,7 +718,7 @@ export const actions = {
           } else if (el.type === 'file' && document.getElementById(el.name + '-autosave') !== null) {
             thisChanged = true; // file with autosave input
           } else {
-            if (el.value !== actions.getInitValue(qn, el.name)) {
+            if (el.value.trim() !== actions.getInitValue(qn, el.name) && el.value.trim() !== '') {
               thisChanged = true;
             }
           }
@@ -757,6 +761,12 @@ export const actions = {
     return changed;
   },
   handleError (error) {
+    if (store.assessInfo.hasOwnProperty('is_lti') &&
+      store.assessInfo.is_lti &&
+      error === 'no_session'
+    ) {
+      error = 'lti_no_session';
+    }
     store.errorMsg = error;
   },
   updateTreeReader () {
@@ -857,26 +867,31 @@ export const actions = {
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
     }
-    if (data.hasOwnProperty('timelimit_expires')) {
+    if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
-      let now = new Date();
-      let expires = new Date(data.timelimit_expires * 1000);
-      if (expires > now) {
-        if (data.timelimit_grace > 0) {
-          let grace = new Date(data.timelimit_grace * 1000);
-          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace - now);
+      let now = new Date().getTime();
+      let expires = data.timelimit_expiresin * 1000;
+      let grace = data.timelimit_gracein * 1000;
+      data['timelimit_local_expires'] = now + expires;
+      if (grace > 0) {
+        data['timelimit_local_grace'] = now + grace;
+      } else {
+        data['timelimit_local_grace'] = 0;
+      }
+      if (expires > 0) {
+        if (data.timelimit_gracein > 0) {
+          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
         } else {
-          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires - now);
+          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires);
         }
         store.timelimit_expired = false;
         store.timelimit_grace_expired = false;
       } else {
         store.timelimit_expired = true;
         store.timelimit_grace_expired = true;
-        if (data.timelimit_grace > 0) {
-          let grace = new Date(data.timelimit_grace * 1000);
-          if (grace > now) {
-            store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace - now);
+        if (data.timelimit_gracein > 0) {
+          if (grace > 0) {
+            store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
             store.timelimit_grace_expired = false;
           }
         }

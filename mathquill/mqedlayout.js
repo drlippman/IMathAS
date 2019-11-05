@@ -166,6 +166,36 @@ var myMQeditor = (function($) {
         ]
       },
       {
+        p:'=<%',
+        enabled: true,
+        tabcontent: [
+          {
+            flow: 'row',
+            s: 5,
+            contents: [
+              {p:'[', s:.5},
+              {p:']', s:.5},
+              {p:'{', s:.5},
+              {p:'}', s:.5},
+              {p:'(', s:.5},
+              {p:')', s:.5},
+              {l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']},
+              {l:'\\left|\\right|', c:'i', w:'||'},
+              {p:'='},
+              {l:'\\lt'},
+              {l:'\\gt'},
+              {l:'\\le'},
+              {l:'\\ge'},
+              {p:'%'},
+              {p:','},
+              {p:'*'},
+              {p:'!'},
+              {p:'?'}
+            ]
+          }
+        ]
+      },
+      {
         p:'ABC',
         enabled: true,
         tabcontent: [
@@ -181,12 +211,10 @@ var myMQeditor = (function($) {
               {p:'z'},{p:'x'},{p:'c'},{p:'v'},{p:'b'},
               {p:'n'},{p:'m'},
               {b:'&#x232B;', c:'k', w:'Backspace', s:1.5},
-              {l:'\\left[\\right]', c:'i', w:'[]'},
-              {l:'\\lbrace{\\rbrace}', c:'i', w:['\\left\\{','\\right\\}']},
-              {l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']},
-              {p:'Space', s:2, c:'t', w:' '},
               {p:'%'},
               {p:','},
+              {p:'Space', s:5, c:'t', w:' '},
+              {p:'.'},
               {b:'&larr;', c:'k', w:'Left'},
               {b:'&rarr;', c:'k', w:'Right'}
             ]
@@ -387,7 +415,7 @@ var myMQeditor = (function($) {
     var baselayout = [];
     if (layoutstyle === 'OSK') {
       baselayout = $.extend(true, [], mobileLayout3);
-      if (calcformat.match(/(fraction|mixednumber|fracordec)/)) {
+      if (calcformat.match(/(fraction|mixednumber|fracordec)/) && qtype != 'numfunc') {
         baselayout.tabs[0].tabcontent[0].s = 1;
         baselayout.tabs[0].tabcontent[0].contents = [
           {l:'\\frac{n}{}', c:'t', w:'/'},
@@ -414,7 +442,8 @@ var myMQeditor = (function($) {
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
             calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
-            calcformat.match(/point/) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
+            ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
+              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
           ]
         };
       } else {
@@ -457,7 +486,8 @@ var myMQeditor = (function($) {
           {l:'\\infty'},
           {p:'DNE', 'sm':2},
         ];
-        if (calcformat.match(/point/)) {
+        if ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
+          calcformat.match(/point/)) {
           baselayout.tabs[0].tabcontent[0].contents.push(
             {l:'\\left(\\right)', c:'t', w:'('},
             {s: 3}

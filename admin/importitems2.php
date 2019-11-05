@@ -40,7 +40,10 @@ if (!(isset($teacherid))) {
 	$uploaddir = __DIR__.'/import/';
 	$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
 	$data = json_decode(file_get_contents($uploadfile), true);
-
+  if (!isset($data['course']['UIver'])) {
+    $data['course']['UIver'] = 1;
+  }
+  
 	$options = array();
 	foreach (array('courseopt','gbsetup','offline','calitems','stickyposts') as $n) {
 		if (isset($_POST['import'.$n])) {
@@ -110,6 +113,9 @@ if (!(isset($teacherid))) {
 		$hasoffline = isset($data['offline']);
 		$hascalitems = isset($data['calitems']);
 		$hasstickyposts = isset($data['stickyposts']);
+    if (!isset($data['course']['UIver'])) {
+      $data['course']['UIver'] = 1;
+    }
 	}
 }
 /******* begin html output ********/

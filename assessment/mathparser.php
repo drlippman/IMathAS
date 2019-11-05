@@ -118,6 +118,7 @@ class MathParser
   private $operandStack = [];
   private $AST = [];
   private $regex = '';
+  private $funcregex = '';
   private $numvarregex = '';
   private $variableValues = [];
 
@@ -147,6 +148,7 @@ class MathParser
     $allwords = array_merge($this->functions, $this->variables);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
     $this->regex = '/^('.implode('|',$allwords).')/';
+    $this->funcregex = '/^('.implode('|',$this->functions).')/i';
     $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', $this->variables).')/';
 
     //define operators
@@ -211,6 +213,7 @@ class MathParser
       array("arcsin","arccos","arctan","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
       $str
     );
+    $str = str_replace('\\','',$str);
     $str = preg_replace('/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/', 'log_$1(', $str);
     $this->tokenize($str);
     $this->handleImplicit();
@@ -298,6 +301,9 @@ class MathParser
    * @return void   The tokens are stored into the class
    */
   public function tokenize($str) {
+    $str = preg_replace_callback($this->funcregex, function($m) {
+      return strtolower($m[0]);
+    }, $str);
     $tokens = [];
     $len = strlen($str);
     $n = 0;

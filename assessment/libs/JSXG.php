@@ -33,7 +33,7 @@ function loadJSX() {
     echo getJSXscript();
 }
 function getJSXscript () {
-  if (isset($GLOBALS['assessver']) && $GLOBALS['assessver'] > 1) {
+  if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 		return '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>';
   } else {
 		return '<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
@@ -221,6 +221,7 @@ function JSXG_addSlider($board, $sname, $ops=array()){
   $snapWidth = $ops['snapWidth']!==null ? $ops['snapWidth'] : -1;
   $withLabel = $ops['withLabel']!==null ? $ops['withLabel'] : "true";
   $color = $ops['color']!==null ? $ops['color'] : 'purple';
+  $precision = $ops['precision']!==null ? $ops['precision'] : 2;
 
   // Create the slider.
   $out .= "var param{$label}_{$sname} = board_{$label}.create('slider', [
@@ -238,6 +239,7 @@ function JSXG_addSlider($board, $sname, $ops=array()){
           ], {
             snapWidth: {$snapWidth},
             withLabel: {$withLabel},
+            precision: {$precision},
             name: '{$name}',
             snapWidth: {$snapWidth},
             baseline: {fixed:true, highlight:false},

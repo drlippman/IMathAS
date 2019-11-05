@@ -96,6 +96,9 @@ $assessInfoOut['userid'] = $uid;
 //set is_lti and is_diag
 $assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0;
 $assessInfoOut['is_diag'] = isset($sessiondata['isdiag']);
+if ($assessInfoOut['is_lti']) {
+  $assessInfoOut['has_ltisourcedid'] = !empty($sessiondata['lti_lis_result_sourcedid'.$aid]);
+}
 
 //set has password
 $assessInfoOut['has_password'] = $assess_info->hasPassword();
@@ -105,7 +108,9 @@ $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
+  $assessInfoOut['timelimit_expiresin'] = $assessInfoOut['timelimit_expires'] - $now;
   $assessInfoOut['timelimit_grace'] = $assess_record->getTimeLimitGrace();
+  $assessInfoOut['timelimit_gracein'] = max($assessInfoOut['timelimit_grace'] - $now, 0);
 }
 
 // if not available, see if there is an unsubmitted scored attempt
@@ -128,14 +133,14 @@ if (!$assessInfoOut['has_active_attempt']) {
 // adjust output if time limit is expired in by_question mode
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   $assessInfoOut['submitby'] == 'by_question' &&
-  time() > $assessInfoOut['timelimit_grace']
+  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires'])
 ) {
   $assessInfoOut['has_active_attempt'] = false;
   $assessInfoOut['can_retake'] = false;
   if ($canViewAll) {
     $assessInfoOut['show_reset'] = true;
   }
-  $assessInfoOut['available'] = "pasttime";
+  $assessInfoOut['pasttime'] = 1;
 }
 
 //load group members, if applicable

@@ -138,12 +138,14 @@
     "already_submitted": "Submission rejected. You have submitted this assessment elsewhere since it was displayed here, so the question(s) you were trying to submit may be out of date.",
     "no_active_attempt": "You do not have an active attempt",
     "no_session": "Your login session expired. To continue you will need to log in again.",
+    "lti_no_session": "Your session expired. Please go back to your LMS and open the assignment again.",
     "fast_regen": "Hey, how about slowing down and trying the problem before hitting Try a Similar Question?  Wait 5 seconds before trying again.",
     "nochange": "Your answers have not changed since your last submission.",
     "noserver": "The site is not responding",
     "parseerror": "Server sent an invalid response",
     "livepoll_wrongquestion": "Submitted question is not the current question.",
-    "livepoll_notopen": "This question is not open for submissions."
+    "livepoll_notopen": "This question is not open for submissions.",
+    "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again."
   },
   "scoreresult": {
     "correct": "Correct",

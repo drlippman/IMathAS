@@ -87,9 +87,11 @@ class AssessInfo
    * @return void
    */
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
-    if (!$isstu && isset($_SESSION['lti_duedate'])) {
+    if (!$isstu && $this->assessData['date_by_lti'] > 0 && isset($_SESSION['lti_duedate'])) {
       // fake exception for teachers from LTI
       $this->exception = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+    } else if (!$isstu) {
+      $this->exception = false;
     } else {
       $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
@@ -111,7 +113,8 @@ class AssessInfo
       $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
 
     if ($useexception) {
-      if (empty($this->exception[3])) { //if not LTI-set, show orig due date
+      if (empty($this->exception[3]) || $this->exception[2] > 0) {
+        //if not LTI-set, or if LP used, show orig due date
         $this->assessData['original_enddate'] = $this->assessData['enddate'];
         if ($this->exception[2] == 0) {
           $this->assessData['extended_with'] = array('type'=>'manual');
@@ -716,7 +719,9 @@ class AssessInfo
    * @return void
    */
   public function overridePracticeSettings() {
-    $this->assessData['displaymethod'] = 'skip';
+    if ($this->assessData['displaymethod'] != 'video_cued') {
+      $this->assessData['displaymethod'] = 'skip';
+    }
     $this->assessData['submitby'] = 'by_question';
     $this->assessData['showscores'] = 'during';
     $this->assessData['showans'] = 'with_score';
@@ -928,8 +933,8 @@ class AssessInfo
   * @return array             Normalized $settings.
   */
   static function normalizeSettings($settings) {
-    // set global assessver
-    $GLOBALS['assessver'] = $settings['ver'];
+    // set global assessUIver
+    $GLOBALS['assessUIver'] = $settings['ver'];
     $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);
     $GLOBALS['showtips'] = $settings['showtips'];
 

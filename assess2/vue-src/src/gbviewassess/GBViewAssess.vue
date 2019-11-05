@@ -88,7 +88,7 @@
         </button>
       </div>
 
-      <div v-if="canEdit">
+      <div v-if="canEdit && aData.has_active_attempt">
         <a :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
         </a> |
@@ -215,6 +215,8 @@
             cols="60"
             :value = "assessFeedback"
             @input="updateFeedback"
+            @paste="pasteFeedback"
+            @cut="pasteFeedback"
           ></textarea>
           <div
             v-else-if="canEdit"
@@ -223,6 +225,8 @@
             id="genfbbox"
             v-html="assessFeedback"
             @input="updateFeedback"
+            @paste="pasteFeedback"
+            @cut="pasteFeedback"
           />
           <div
             v-else
@@ -299,7 +303,8 @@ export default {
     GbQuestionSelect,
     GbScoreDetails,
     GbClearAttempts,
-    SummaryCategories
+    SummaryCategories,
+    ErrorDialog
   },
   data: function () {
     return {
@@ -502,6 +507,9 @@ export default {
         actions.loadGbQuestionVersion(qn, val);
       }
     },
+    pasteFeedback(evt) {
+      setTimeout(()=>this.updateFeedback(evt), 50);
+    },
     updateFeedback (evt) {
       let content;
       if (this.useEditor) {
@@ -509,6 +517,7 @@ export default {
       } else {
         content = evt.target.value;
       }
+      console.log("content:" + content);
       actions.setFeedback(null, content);
     },
     setScoreOverride (evt) {

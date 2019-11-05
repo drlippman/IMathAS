@@ -47,7 +47,7 @@ class ComplexScorePart implements ScorePart
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
         }
-        
+
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -130,6 +130,9 @@ class ComplexScorePart implements ScorePart
         $ganumarr = array();
         foreach ($gaarr as $j=>$givenans) {
             $gaparts = $this->parsesloppycomplex($givenans);
+            if ($gaparts === false) {  //invalid - skip it
+              continue;
+            }
             if (!in_array('exactlist',$ansformats)) {
                 // don't add if we already have it in the list
                 foreach ($ganumarr as $prevvals) {
@@ -145,6 +148,9 @@ class ComplexScorePart implements ScorePart
         $annumarr = array();
         foreach ($anarr as $i=>$answer) {
             $ansparts = $this->parsesloppycomplex($answer);
+            if ($ansparts === false) {  //invalid - skip it
+              continue;
+            }
             if (!in_array('exactlist',$ansformats)) {
                 foreach ($annumarr as $prevvals) {
                     if (abs($ansparts[0]-$prevvals[0])<1e-12 && abs($ansparts[1]-$prevvals[1])<1e-12) {
@@ -199,6 +205,9 @@ class ComplexScorePart implements ScorePart
 
     private function parsesloppycomplex($v) {
         $func = makeMathFunction($v, 'i');
+        if ($func===false) {
+          return false;
+        }
         $a = $func(['i'=>0]);
         $apb = $func(['i'=>1]);
         return array($a,$apb-$a);

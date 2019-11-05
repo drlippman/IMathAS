@@ -241,7 +241,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=072818\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=100319\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }
@@ -281,9 +281,9 @@ if ($overwriteBody==1) {
 	} else {
 		$filter = "all";
 	}
-	
+
 //	}
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=100319\"></script>";
 	//$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
 	//		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;}
 	//		td {padding: .1em .4em;}</style>';
@@ -306,7 +306,7 @@ if ($overwriteBody==1) {
 	} else {
 		$placeinhead .= '<script type="text/javascript">var includeforums = true;</script>';
 	}
-	
+
 	require("../header.php");
 
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -581,7 +581,7 @@ if ($overwriteBody==1) {
 	$nowpts = explode('-', date("G-i-s", $now));
 	$defnow  = $now - $nowpts[2] - $nowpts[1]*60 - $nowpts[0]*60*60 + 60*$coursedeftime;
 	$defsnow  = $now - $nowpts[2] - $nowpts[1]*60 - $nowpts[0]*60*60 + 60*$coursedefstime;
-	
+
 	if ($orderby==0) {
 		asort($startdates);
 		$keys = array_keys($startdates);
@@ -627,7 +627,7 @@ if ($overwriteBody==1) {
 		$lpdatebase = ($LPcutoffs[$i]==0)?$edatebase+7*24*60*60:$LPcutoffs[$i];
 		$fpdatebase = ($fpdates[$i]==0 || $fpdates[$i]==2000000000)?$defnow:$fpdates[$i];
 		$frdatebase = ($frdates[$i]==0 || $frdates[$i]==2000000000)?$defnow+7*24*60*60:$frdates[$i];
-		
+
 		echo Sanitize::encodeStringForDisplay($names[$i])."<input type=hidden id=\"id" . Sanitize::encodeStringForDisplay($cnt) . "\" value=\"" . Sanitize::encodeStringForDisplay($ids[$i]) . "\"/></div>";
 		echo "<script> basesdates[$cnt] = ". Sanitize::onlyInt($sdatebase) . ";";
 		echo "baseedates[$cnt] = ". Sanitize::onlyInt($edatebase) . ";";
@@ -651,12 +651,12 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"1\"/>";
 		}
-		
+
 		echo '<span id="sspan0'.$cnt.'" class="'.($startdates[$i]==0?'show':'hide').'" onclick="MCDtoggle(\'s\','.$cnt.')">';
 		echo _('Always').'</span>';
-		
+
 		echo '<span id="sspan1'.$cnt.'" class="'.($startdates[$i]==0?'hide':'show').'">';
-		
+
 		if ($startdates[$i]==0) {
 			$sdate = tzdate("m/d/Y", $sdatebase);
 			$stime = $defstime;
@@ -679,10 +679,10 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"1\"/>";
 		}
-		
+
 		echo '<span id="espan0'.$cnt.'" class="'.($enddates[$i]==2000000000?'show':'hide').'" onclick="MCDtoggle(\'e\','.$cnt.')">';
 		echo _('Always').'</span>';
-		
+
 		echo '<span id="espan1'.$cnt.'" class="'.($enddates[$i]==2000000000?'hide':'show').'">';
 
 		if ($enddates[$i]==2000000000) {
@@ -730,7 +730,7 @@ if ($overwriteBody==1) {
 			}
 			echo '<span id="lpspan0'.$cnt.'" class="'.($LPcutoffs[$i]==0?'show':'hide').'" onclick="MCDtoggle(\'lp\','.$cnt.')">';
 			echo _('No limit').'</span>';
-			
+
 			echo '<span id="lpspan1'.$cnt.'" class="'.($LPcutoffs[$i]==0?'hide':'show').'">';
 			echo "<input type=text size=10 id=\"lpdate$cnt\" name=\"lpdate$cnt\" value=\"$lpdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"lpd$cnt\">".getshortday($lpdatebase).'</span>';
@@ -812,7 +812,7 @@ if ($overwriteBody==1) {
 				echo "<span id=\"frspan1$cnt\" class=\"show\">";
 			}
 			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
-				$frdate = tzdate("m/d/Y",$frbasedate);
+				$frdate = tzdate("m/d/Y",$frdatebase);
 				$frtime = $deftime;
 			} else {
 				$frdate = tzdate("m/d/Y",$frdates[$i]);
@@ -820,7 +820,7 @@ if ($overwriteBody==1) {
 			}
 
 			echo "<input type=text size=10 id=\"frdate$cnt\" name=\"frdate$cnt\" value=\"$frdate\" onblur=\"ob(this)\"/>(";
-			echo "<span id=\"frd$cnt\">".getshortday($frbasedate).'</span>';
+			echo "<span id=\"frd$cnt\">".getshortday($frdatebase).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].frdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].frdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('frdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 

@@ -423,14 +423,17 @@ function setupDraw(qn) {
 }
 
 function initMultAns(qn) {
-  var boxes = $('input[name^="qn'+qn+'["]');
-  boxes.on('change', function () {
-    if (this.checked && this.value == boxes.length-1) {
-      boxes.not(':last').prop('checked', false);
-    } else if (this.checked) {
-      boxes.last().prop('checked', false);
-    }
-  });
+  var hasnone = $("#qnwrap"+qn).find('label:last').text().match(/none\s+of/i);
+  if (hasnone) {
+    var boxes = $('input[name^="qn'+qn+'["]');
+    boxes.on('change', function () {
+      if (this.checked && this.value == boxes.length-1) {
+        boxes.not(':last').prop('checked', false);
+      } else if (this.checked) {
+        boxes.last().prop('checked', false);
+      }
+    });
+  }
 }
 
 function isBlank(str) {
@@ -850,6 +853,7 @@ function AMnumfuncPrepVar(qn,str) {
   var dispstr = str;
 
   dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
 		  str = str.replace("E","varE");
@@ -927,6 +931,8 @@ function AMnumfuncPrepVar(qn,str) {
   }
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
+  str = str.replace(/@(\d+)@/g, indextofunc);
+  submitstr = submitstr.replace(/@(\d+)@/g, indextofunc);
 
   //Correct rendering when f or g is a variable not a function
   if (vl.match(/\bf\b/) && !fvarslist.match(/\bf\b/)) {
@@ -991,9 +997,10 @@ function processCalcInterval(fullstr, format, ineqvar) {
     }
     fullstr = conv[0];
   }
-  var strarr = [], submitstrarr = []; dispstrarr = [];
+  var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
+    joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {
       if (fullstr.charAt(pos)==',') {
@@ -1057,13 +1064,13 @@ function processCalcInterval(fullstr, format, ineqvar) {
     return {
       err: err,
       dispvalstr: dispstrarr.join(' "or" '),
-      submitstr:  submitstrarr.join('U')
+      submitstr:  submitstrarr.join(joinchar)
     };
   } else {
     return {
       err: err,
       dispvalstr: submitstrarr.join(' uu '),
-      submitstr: submitstrarr.join('U')
+      submitstr: submitstrarr.join(joinchar)
     };
   }
 }
@@ -1148,7 +1155,7 @@ function processCalcComplex(fullstr, format) {
       }
     }
     err + syntaxcheckexpr(str, format);
-    prep = prepWithMath(mathjs(str));
+    prep = prepWithMath(mathjs(str,'i'));
     real = scopedeval('var i=0;'+prep);
     imag = scopedeval('var i=1;'+prep);
     imag2 = scopedeval('var i=-1;'+prep);
