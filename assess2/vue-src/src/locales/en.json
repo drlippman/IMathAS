@@ -383,7 +383,9 @@
     "minutes": "minutes",
     "avail_never": "Grade is currently hidden by the teacher.",
     "avail_after_take": "Will show after you submit an assessment attempt.",
-    "avail_after_due": "Will show after the due date."
+    "avail_after_due": "Will show after the due date.",
+    "latepass_blocked_practice": "Use of a LatePass is currently blocked because the student viewed the assessment in practice mode.",
+    "clear_latepass_block": "Clear Block"
   },
   "regions": {
     "questions": "Questions and text",

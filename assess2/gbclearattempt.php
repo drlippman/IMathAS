@@ -80,6 +80,12 @@ if ($type == 'all' && $keepver == 0) {
   $replacedDeleted = $assess_record->gbClearAttempts($type, $keepver, $aver);
 } else if ($type == 'qver') {
   $replacedDeleted = $assess_record->gbClearAttempts($type, $keepver, $aver, $qn, $qver);
+} else if ($type == 'practiceview') {
+  $stm = $DBH->prepare("DELETE FROM imas_content_track WHERE typeid=:typeid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')");
+  $stm->execute(array(
+    ':typeid' => $aid,
+    ':userid' => $uid
+  ));
 }
 // recalculated totals based on removed attempts
 $assess_record->reTotalAssess();
@@ -98,6 +104,8 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
   if ($replacedDeleted || $keepver == 1) {
     $assessInfoOut['newver'] = $assess_record->getGbQuestionVersionData($qn, true, $by_question ? $qver : $aver);
   }
+} else if ($type == 'practiceview') {
+  $assessInfoOut['latepass_blocked_by_practice'] = false;
 }
 
 $assess_record->saveRecord();

@@ -74,6 +74,7 @@ if ($studata === false) {
 
 $assess_info->loadException($uid, true, $studata['latepass'], $latepasshrs, $courseenddate);
 $assess_info->applyTimelimitMultiplier($studata['timelimitmult']);
+$assess_info->getLatePassBlockedByView();
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -109,7 +110,7 @@ $include_from_assess_info = array(
   'name', 'submitby', 'enddate', 'can_use_latepass', 'hasexception',
   'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
   'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
-  'scoresingb', 'viewingb'
+  'scoresingb', 'viewingb', 'latepass_blocked_by_practice'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
