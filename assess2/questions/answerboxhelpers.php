@@ -353,6 +353,9 @@ function parseInterval($str, $islist = false) {
 
 function parsedIntervalToString($parsed, $islist) {
 	$out = [];
+  if ($parsed === false) {
+    return '';
+  }
 	foreach ($parsed as $int) {
 		$out[] = $int['lb'] . $int['vals'][0] . ',' . $int['vals'][1] . $int['rb'];
 	}
