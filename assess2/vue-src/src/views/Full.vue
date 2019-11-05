@@ -6,6 +6,7 @@
         class = "questionpane introtext"
         v-if = "intro != ''"
         v-html = "intro"
+        ref = "introtext"
       />
 
       <div
@@ -79,6 +80,10 @@ export default {
     submitAssess () {
       actions.submitAssessment();
     }
+  },
+  mounted () {
+    setTimeout(window.drawPics, 100);
+    window.rendermathnode(this.$refs.introtext);
   }
 };
 </script>
