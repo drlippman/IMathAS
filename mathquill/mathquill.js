@@ -2004,7 +2004,6 @@ var saneKeyboardEvents = (function() {
       // on keydown too, FWIW).
       //
       // And by nifty, we mean dumb (but useful sometimes).
-      console.log(e);
       textarea.focus();
 
       checkTextareaFor(pastedText);

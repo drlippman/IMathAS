@@ -86,7 +86,7 @@ function init(paramarr, enableMQ) {
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
-    if (params.helper && params.qtype.match(/^(calc|numfunc|string)/)) { //want mathquill
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
       str = params.qtype;
       if (params.calcformat) {
@@ -780,6 +780,7 @@ function processByType(qn) {
       case 'calculated':
         res = processCalculated(str, params.calcformat);
         break;
+      case 'interval':
       case 'calcinterval':
         res = processCalcInterval(str, params.calcformat, params.vars);
         break;
@@ -812,7 +813,7 @@ function processByType(qn) {
  */
 function preformat(qn, text, qtype, calcformat) {
   text = normalizemathunicode(text);
-  if (qtype == 'calcinterval') {
+  if (qtype.match(/interval/)) {
     if (!calcformat.match(/inequality/)) {
       text = text.replace(/U/g,"uu");
     } else {

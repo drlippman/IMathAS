@@ -43,13 +43,19 @@ class IntervalScorePart implements ScorePart
         if (!isset($variables)) { $variables = 'x';}
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+
+        $ansformats = array_map('trim',explode(',',$answerformat));
+
+        if ($anstype == 'interval') {
+          $ansformats[] = 'decimal';
+          $anstype = 'calcinterval';
+        }
+
         $hasNumVal = !empty($_POST["qn$qn-val"]);
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
         }
-
-        $ansformats = array_map('trim',explode(',',$answerformat));
-
+        
         $givenans = normalizemathunicode($givenans);
 
         if (in_array('nosoln',$ansformats)) {
