@@ -53,7 +53,8 @@ export default {
         event.currentTarget.focus();
       }
       if (event.type === 'touchstart' && event.cancelable) {
-        event.preventDefault();
+        // Disabled - was preventing activating menus inside tooltipspans
+        //event.preventDefault();
       }
     }
   }
