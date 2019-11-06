@@ -415,7 +415,7 @@ var myMQeditor = (function($) {
     var baselayout = [];
     if (layoutstyle === 'OSK') {
       baselayout = $.extend(true, [], mobileLayout3);
-      if (calcformat.match(/(decimal)/) && qtype != 'numfunc') {
+      if (calcformat.match(/\bdecimal/) && qtype != 'numfunc') {
         baselayout.tabs[0].tabcontent[0].s = 1;
         baselayout.tabs[0].tabcontent[0].contents = [
           {l:'\\infty'},
@@ -507,7 +507,7 @@ var myMQeditor = (function($) {
       }
     } else {
       baselayout = $.extend(true, [], underLayout3);
-      if (calcformat.match(/(decimal)/)) {
+      if (calcformat.match(/\bdecimal/)) {
         baselayout.tabs[0].tabcontent[0].s = 3;
         baselayout.tabs[0].tabcontent[0].contents = [
           {l:'\\infty'},
@@ -533,7 +533,7 @@ var myMQeditor = (function($) {
       }
     }
     // for both
-    if (!calcformat.match(/(fraction|mixednumber|fracordec|decimal)/)) {
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
