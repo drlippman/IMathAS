@@ -64,19 +64,13 @@
         cols="60"
         :value = "qdata.feedback"
         @input="updateFeedback"
-        @paste="pasteFeedback"
-        @cut="pasteFeedback"
       ></textarea>
-      <div
+      <tinymce-input
         v-else-if="canedit"
-        rows="2"
         :id="'fb'+qn"
-        class="fbbox"
-        v-html="qdata.feedback"
-        @input="updateFeedback"
-        @paste="pasteFeedback"
-        @cut="pasteFeedback"
-      />
+        :value = "qdata.feedback"
+        @input = "updateFeedback"
+      ></tinymce-input>
       <div
         v-else
         v-html="qdata.feedback"
@@ -131,6 +125,7 @@ import GbAllTries from '@/gbviewassess/GbAllTries';
 import GbPenalties from '@/gbviewassess/GbPenalties';
 import Icons from '@/components/widgets/Icons';
 import MenuButton from '@/components/widgets/MenuButton';
+import TinymceInput from '@/components/TinymceInput.vue';
 
 export default {
   name: 'GbScoreDetails',
@@ -139,7 +134,8 @@ export default {
     GbAllTries,
     GbPenalties,
     MenuButton,
-    Icons
+    Icons,
+    TinymceInput
   },
   data: function () {
     return {
@@ -317,9 +313,6 @@ export default {
     updateScore (pn, evt) {
       let partposs = this.qdata.points_possible * this.answeights[pn];
       actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
-    },
-    pasteFeedback(evt) {
-      setTimeout(()=>this.updateFeedback(evt), 50);
     },
     updateFeedback (evt) {
       let content;

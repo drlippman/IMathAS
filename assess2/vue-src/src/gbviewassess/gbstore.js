@@ -59,9 +59,6 @@ export const actions = {
           }
           // initialize editor and answerbox highlighting
           Vue.nextTick(() => {
-            if (typeof window.tinyMCE !== 'undefined') {
-              window.initeditor('divs', 'fbbox', null, true);
-            }
             window.initAnswerboxHighlights();
             if (window.location.hash) {
               let el = document.getElementById(window.location.hash.substring(1));
@@ -119,9 +116,6 @@ export const actions = {
 
         // initialize editor and answerbox highlighting
         Vue.nextTick(() => {
-          if (typeof window.tinyMCE !== 'undefined') {
-            window.initeditor('divs', 'fbbox', null, true);
-          }
           window.initAnswerboxHighlights();
         });
       })
@@ -240,6 +234,24 @@ export const actions = {
             response.newscores[key]
           );
         }
+        // update feedbacks in store
+        for (let key in store.feedbacks) {
+          let pts = key.split(/-/);
+          if (pts[1] === 'g') { // general feedback
+            Vue.set(
+              store.assessInfo.assess_versions[pts[0]],
+              'feedback',
+              store.feedbacks[key]
+            );
+          } else { // question feedback
+            Vue.set(
+              store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]],
+              'feedback',
+              store.feedbacks[key]
+            );
+          }
+        }
+
         store.assessInfo.gbscore = response.gbscore;
         store.assessInfo.scored_version = response.scored_version;
         // Update question scored version

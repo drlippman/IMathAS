@@ -215,19 +215,13 @@
             cols="60"
             :value = "assessFeedback"
             @input="updateFeedback"
-            @paste="pasteFeedback"
-            @cut="pasteFeedback"
           ></textarea>
-          <div
+          <tinymce-input
             v-else-if="canEdit"
-            rows="2"
-            class="fbbox"
             id="genfbbox"
-            v-html="assessFeedback"
-            @input="updateFeedback"
-            @paste="pasteFeedback"
-            @cut="pasteFeedback"
-          />
+            :value = "assessFeedback"
+            @input = "updateFeedback"
+          ></tinymce-input>
           <div
             v-else
             v-html="assessFeedback"
@@ -294,6 +288,7 @@ import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
+import TinymceInput from '@/components/TinymceInput.vue';
 import '../assess2.css';
 
 export default {
@@ -304,7 +299,8 @@ export default {
     GbScoreDetails,
     GbClearAttempts,
     SummaryCategories,
-    ErrorDialog
+    ErrorDialog,
+    TinymceInput
   },
   data: function () {
     return {
@@ -507,9 +503,6 @@ export default {
         actions.loadGbQuestionVersion(qn, val);
       }
     },
-    pasteFeedback(evt) {
-      setTimeout(()=>this.updateFeedback(evt), 50);
-    },
     updateFeedback (evt) {
       let content;
       if (this.useEditor) {
@@ -517,7 +510,6 @@ export default {
       } else {
         content = evt.target.value;
       }
-      console.log("content:" + content);
       actions.setFeedback(null, content);
     },
     setScoreOverride (evt) {
