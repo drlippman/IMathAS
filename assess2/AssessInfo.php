@@ -168,7 +168,7 @@ class AssessInfo
   public function getLatePassBlockedByView() {
     if ($this->assessData['hasexception']) {
       list($useexception,$LPblocked) =
-        $this->exceptionfuncs->getCanUseAssessException(
+        $this->exceptionfunc->getCanUseAssessException(
           $this->exception,
           $this->assessData,
           false,
