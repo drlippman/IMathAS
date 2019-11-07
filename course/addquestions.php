@@ -777,7 +777,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$lnamesarr[0] = "Unassigned";
 				$libsortorder[0] = 0;
 			}
-			$stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
+			$stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist) ORDER BY FIELD(id,$llist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$lnamesarr[$row[1]] = $row[0];
 				$libsortorder[$row[1]] = $row[2];
@@ -811,7 +811,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 				}
-				$query .= " ORDER BY imas_library_items.libid,imas_questionset.broken,imas_library_items.junkflag,imas_questionset.id";
+				$query .= " ORDER BY FIELD(imas_library_items.libid,$llist),imas_questionset.broken,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
 					$query .= " LIMIT 300";
 					$offset = 0;
