@@ -19,6 +19,17 @@ $pagetitle = _("Drill Assessment");
 
 $cid = intval($_GET['cid']);
 $daid = intval($_GET['daid']);
+$now = time();
+
+if (isset($studentid) && !isset($sessiondata['stuview']) &&
+	!isset($_GET['start']) && !isset($_GET['score'])
+) {
+	$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+	$query .= "(:userid, :courseid, :type, :typeid, :viewtime)";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'drill', ':typeid'=>$daid, ':viewtime'=>$now));
+}
+
 $stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
 $stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
 if ($stm->rowCount()==0) {

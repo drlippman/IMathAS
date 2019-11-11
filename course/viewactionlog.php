@@ -36,7 +36,7 @@ echo '<h2>Activity Log for '.Sanitize::encodeStringForDisplay($row[0]).', '.Sani
 
 
 $actions = array();
-$lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array());
+$lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array(), 'dr'=>array(),);
 $stm = $DBH->prepare("SELECT type,typeid,viewtime,info FROM imas_content_track WHERE userid=:userid AND courseid=:courseid ORDER BY viewtime DESC");
 $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -116,6 +116,16 @@ if (count($lookups['forums'])>0) {
 	$stm->execute(array_values($lookuplist));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$forumnames[$row[0]] = $row[1];
+	}
+}
+$drnames = array();
+if (count($lookups['dr'])>0) {
+	$lookuplist = array_map('intval', array_unique($lookups['dr']));
+	$query_placeholders = Sanitize::generateQueryPlaceholders($lookuplist);
+	$stm = $DBH->prepare("SELECT id,name FROM imas_drillassess WHERE id IN ($query_placeholders)");
+	$stm->execute(array_values($lookuplist));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$drnames[$row[0]] = $row[1];
 	}
 }
 
@@ -202,6 +212,9 @@ foreach ($actions as $r) {
 	case 'forummod':
 		$fp = explode(';',$r[3]);
 		$actionmsg =  'Modified post/reply <a target="_blank" href="../forums/posts.php?cid='.$cid.'&forum='.Sanitize::encodeUrlParam($fp[0]).'&thread='.Sanitize::encodeUrlParam($fp[1]).'">'.Sanitize::encodeStringForDisplay($fpnames[$r[1]]).'</a> in forum '.Sanitize::encodeStringForDisplay($forumnames[$fp[0]]);
+		break;
+	case 'drill':
+		$actionmsg =  'Opened Drill '.Sanitize::encodeStringForDisplay($drnames[$r[1]]);
 		break;
 	default:
 		if (isset($_GET['showall'])) {

@@ -14,7 +14,7 @@ if (!isset($teacherid) && !isset($tutorid)) {
 $stype = $_GET['type'];
 $typeid = Sanitize::onlyInt($_GET['id']);
 
-if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
+if ($typeid==0 || !in_array($stype,array('I','L','A','W','F','D'))) {
 	$overwritebody = true;
 	$body = 'Invalid request';
 } else {
@@ -37,6 +37,9 @@ if ($typeid==0 || !in_array($stype,array('I','L','A','W','F'))) {
 		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND ((type='forumpost' AND info=:typeid) OR (type='forumreply' AND info LIKE :likeid))");
 		$qarr[':likeid'] = "$typeid;%";
 		$stm2 = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
+	} else if ($stype=='D') {
+		$stm = $DBH->prepare("SELECT userid,type,info FROM imas_content_track WHERE courseid=:courseid AND type='drill' AND typeid=:typeid");
+		$stm2 = $DBH->prepare("SELECT name FROM imas_drillassess WHERE id=:id");
 	}
 	$stm->execute($qarr);
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -144,7 +147,7 @@ if ($overwritebody) {
 		}
 		$viewedBtn = '<a class=small href="#" onclick="sendMsg(\''.implode('-', $didviewIDs).'\');return false;">'._('Send Message').'</a>';
 		$notviewedBtn = '<a class=small href="#" onclick="sendMsg(\''.implode('-', $notviewIDs).'\');return false;">'._('Send Message').'</a>';
-		
+
 		echo '<h3>'.$descrips[$ident].'</h3>';
 		echo '<table class="gb"><thead>';
 		if ($stype=='F') {
