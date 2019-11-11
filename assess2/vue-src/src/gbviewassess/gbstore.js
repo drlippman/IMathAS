@@ -431,7 +431,7 @@ export const actions = {
     let qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
     let key = av + '-' + qn + '-' + qv + '-' + pn;
     if (qdata.parts[pn] && qdata.parts[pn].try > 0 &&
-      (score === '' || Math.abs(score - qdata.parts[pn].rawscore) < 0.001)
+      (score === '' || Math.abs(score - qdata.parts[pn].score/qdata.parts[pn].points_possible) < 0.001)
     ) {
       // same as existing - don't submit as an override
       delete store.scoreOverrides[key];
