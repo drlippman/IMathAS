@@ -1782,21 +1782,21 @@ class AssessRecord
       }
       $stuansparts = array();
       $stuansvalparts = array();
-      if (!isset($curq['answeights'])) {
+      if (!isset($curq['answeights']) || count($curq['tries'])==0) {
         // question hasn't been displayed yet
         $stuanswers[$qn+1] = null;
         $stuanswersval[$qn+1] = null;
         continue;
       }
       // Conditional doesn't use answeights, so also need to look at tries
-      $numParts = max(count($curq['answeights']), count($curq['tries']));
+      $numParts = max(count($curq['answeights']), max(array_keys($curq['tries']))+1);
       for ($pn = 0; $pn < $numParts; $pn++) {
         if (!isset($curq['tries'][$pn])) {
           $stuansparts[$pn] = null;
           $stuansvalparts[$pn] = null;
         } else {
           $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
-          $stuansparts[$pn] = $lasttry['stuans'];
+          $stuansparts[$pn] = ($lasttry['stuans'] === '') ? null : $lasttry['stuans'];
           $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
         }
       }
@@ -1839,7 +1839,7 @@ class AssessRecord
       }
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
-      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
+      foreach ($curq['tries'] as $pn => $v) {
         $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
         $scorenonzeroparts[$pn] = $lasttry['raw'] > 0;
         $scoreiscorrectparts[$pn] = $lasttry['raw'] > .99;
