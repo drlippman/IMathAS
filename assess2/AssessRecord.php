@@ -1411,9 +1411,11 @@ class AssessRecord
         // no tries yet
         $parts[$pn] = array(
           'try' => 0,
-          'score' => 0,
-          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
+          'score' => 0
         );
+        if (!$is_singlescore) {
+          $parts[$pn]['points_possible'] = round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
+        }
         // apply by-part overrides, if set
         if (isset($overrides[$pn])) {
           $partrawscores[$pn] = $overrides[$pn];
@@ -1753,7 +1755,8 @@ class AssessRecord
       }
     }
 
-    $singlescore = (count($partla) > 1 && count($scores) == 1);
+    $singlescore = (count($answeights) > 1 && count($scores) == 1);
+
     $this->recordTry($qn, $data, $singlescore);
 
     return $scoreResult['errors'];
@@ -1782,21 +1785,21 @@ class AssessRecord
       }
       $stuansparts = array();
       $stuansvalparts = array();
-      if (!isset($curq['answeights'])) {
+      if (!isset($curq['answeights']) || count($curq['tries'])==0) {
         // question hasn't been displayed yet
         $stuanswers[$qn+1] = null;
         $stuanswersval[$qn+1] = null;
         continue;
       }
       // Conditional doesn't use answeights, so also need to look at tries
-      $numParts = max(count($curq['answeights']), count($curq['tries']));
+      $numParts = max(count($curq['answeights']), max(array_keys($curq['tries']))+1);
       for ($pn = 0; $pn < $numParts; $pn++) {
         if (!isset($curq['tries'][$pn])) {
           $stuansparts[$pn] = null;
           $stuansvalparts[$pn] = null;
         } else {
           $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
-          $stuansparts[$pn] = $lasttry['stuans'];
+          $stuansparts[$pn] = ($lasttry['stuans'] === '') ? null : $lasttry['stuans'];
           $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
         }
       }
@@ -1839,7 +1842,7 @@ class AssessRecord
       }
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
-      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
+      foreach ($curq['tries'] as $pn => $v) {
         $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
         $scorenonzeroparts[$pn] = $lasttry['raw'] > 0;
         $scoreiscorrectparts[$pn] = $lasttry['raw'] > .99;
