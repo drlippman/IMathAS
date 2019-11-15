@@ -1411,9 +1411,11 @@ class AssessRecord
         // no tries yet
         $parts[$pn] = array(
           'try' => 0,
-          'score' => 0,
-          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
+          'score' => 0
         );
+        if (!$is_singlescore) {
+          $parts[$pn]['points_possible'] = round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
+        }
         // apply by-part overrides, if set
         if (isset($overrides[$pn])) {
           $partrawscores[$pn] = $overrides[$pn];
@@ -1753,7 +1755,8 @@ class AssessRecord
       }
     }
 
-    $singlescore = (count($partla) > 1 && count($scores) == 1);
+    $singlescore = (count($answeights) > 1 && count($scores) == 1);
+
     $this->recordTry($qn, $data, $singlescore);
 
     return $scoreResult['errors'];
