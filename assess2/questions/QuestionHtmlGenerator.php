@@ -140,11 +140,11 @@ class QuestionHtmlGenerator
             $GLOBALS['assess2-curq-iscorrect'] = $scoreiscorrect[$thisq-1] ? 1 : 0;
           } else {
             $GLOBALS['assess2-curq-iscorrect'] = array();
-            foreach ($partattemptn as $k=>$v) {
-              if ($v==0) {
-                $GLOBALS['assess2-curq-iscorrect'][$k] = -1;
+            foreach ($partattemptn as $kidx=>$iidx) {
+              if ($iidx==0) {
+                $GLOBALS['assess2-curq-iscorrect'][$kidx] = -1;
               } else {
-                $GLOBALS['assess2-curq-iscorrect'][$k] = $scoreiscorrect[$thisq-1][$k] ? 1 : 0;
+                $GLOBALS['assess2-curq-iscorrect'][$kidx] = $scoreiscorrect[$thisq-1][$kidx] ? 1 : 0;
               }
             }
           }
@@ -152,8 +152,8 @@ class QuestionHtmlGenerator
 
         if ($quesData['hasimg'] > 0) {
             // We need to "unpack" this into locally scoped variables.
-            foreach ($this->getImagesAsHtml() as $k => $v) {
-                ${$k} = $v;
+            foreach ($this->getImagesAsHtml() as $kidx => $iidx) {
+                ${$kidx} = $iidx;
             }
         }
 
