@@ -1211,6 +1211,7 @@ class AssessRecord
     }
 
     $out['seed'] = $curq['seed'];
+    $out['singlescore'] = !empty($curq['singlescore']);
 
     if ($generate_html) {
       $showscores = $this->assess_info->getSetting('showscores');
@@ -1411,11 +1412,9 @@ class AssessRecord
         // no tries yet
         $parts[$pn] = array(
           'try' => 0,
-          'score' => 0
+          'score' => 0,
+          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
         );
-        if (!$is_singlescore) {
-          $parts[$pn]['points_possible'] = round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
-        }
         // apply by-part overrides, if set
         if (isset($overrides[$pn])) {
           $partrawscores[$pn] = $overrides[$pn];
@@ -1471,24 +1470,14 @@ class AssessRecord
         $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
       }
 
-      if ($is_singlescore) {
-        $parts[$pn] = array(
-          'try' => count($qver['tries'][$pn]),
-          'rawscore' => round($partrawscores[$pn],4)
-        );
-        if ($pn==0) {
-          $parts[$pn]['penalties'] = $partpenalty;
-        }
-      } else {
-        $parts[$pn] = array(
-          'try' => count($qver['tries'][$pn]),
-          'score' => round($partscores[$pn],3),
-          'rawscore' => round($partrawscores[$pn],4),
-          'penalties' => $partpenalty,
-          'req_manual' => $partReqManual,
-          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
-        );
-      }
+      $parts[$pn] = array(
+        'try' => count($qver['tries'][$pn]),
+        'score' => round($partscores[$pn],3),
+        'rawscore' => round($partrawscores[$pn],4),
+        'penalties' => $partpenalty,
+        'req_manual' => $partReqManual,
+        'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
+      );
     }
 
     $qScore = array_sum($partscores);
