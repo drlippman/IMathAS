@@ -243,8 +243,6 @@ class ScoreEngine
                   $stuanswers[$thisq][$iidx] = null;
                 }
               }
-              // duplicate rawscore for all parts
-              $scoreResult['rawScores'] = array_fill(0,count($anstypes),$scoreResult['rawScores'][0]);
               $scoreResult['lastAnswerAsGiven'] = $stuanswers[$thisq];
               $scoreResult['lastAnswerAsNumber'] = $stuanswersval[$thisq];
             }

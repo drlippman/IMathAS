@@ -1755,7 +1755,7 @@ class AssessRecord
       }
     }
 
-    $singlescore = (count($answeights) > 1 && count($scores) == 1);
+    $singlescore = ((count($partsla) > 1 || count($answeights) > 1) && count($scores) == 1);
 
     $this->recordTry($qn, $data, $singlescore);
 

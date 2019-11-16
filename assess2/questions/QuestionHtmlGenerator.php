@@ -258,21 +258,23 @@ class QuestionHtmlGenerator
 
             // Calculate answer weights.
             // $answeights - question writer defined
-            if (isset($answeights)) {
-      				if (!is_array($answeights)) {
-      					$answeights = explode(",",$answeights);
-      				}
-      				$answeights = array_map('trim', $answeights);
-      				if (count($answeights) != count($anstypes)) {
-      					$answeights = array_fill(0, count($anstypes), 1);
-      				}
-      			} else {
-      				if (count($anstypes)>1) {
-      					$answeights = array_fill(0, count($anstypes), 1);
-      				} else {
-      					$answeights = array(1);
-      				}
-      			}
+            if ($quesData['qtype'] == "multipart") {
+              if (isset($answeights)) {
+        				if (!is_array($answeights)) {
+        					$answeights = explode(",",$answeights);
+        				}
+        				$answeights = array_map('trim', $answeights);
+        				if (count($answeights) != count($anstypes)) {
+        					$answeights = array_fill(0, count($anstypes), 1);
+        				}
+        			} else {
+        				if (count($anstypes)>1) {
+        					$answeights = array_fill(0, count($anstypes), 1);
+        				} else {
+        					$answeights = array(1);
+        				}
+        			}
+            }
 
             // Get the answers to all parts of this question.
             $lastAnswersAllParts = $stuanswers[$thisq];
