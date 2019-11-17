@@ -192,7 +192,7 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
   if ($isteacher) {
     // trigger additional jsParams for livepoll results display
     $GLOBALS['capturedrawinit'] = true;
-    $GLOBALS['capturechoices'] = true;
+    $GLOBALS['capturechoiceslivepoll'] = true;
   }
 } else {
   $showscores = $assess_info->showScoresDuring();

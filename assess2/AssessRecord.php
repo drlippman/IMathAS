@@ -2505,6 +2505,10 @@ class AssessRecord
     if ($dispqn !== null) {
       $this->dispqn = $dispqn;
     }
+    $GLOBALS['choicesdata'] = array();
+    $GLOBALS['drawinitdata'] = array();
+    $GLOBALS['capturechoices'] = true;
+    $GLOBALS['capturedrawinit'] = true;
     $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver);
     $this->dispqn = null;
     if ($generate_html) { // only include this if we're displaying the question
@@ -2517,7 +2521,7 @@ class AssessRecord
       }
       $out['timeactive'] = $this->calcTimeActive($qdata);
       $out['feedback'] = $qdata['feedback'];
-      $out['other_tries'] = $this->getPreviousTries($qdata['tries']);
+      $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $qn, $out);
     }
     return $out;
   }
@@ -2863,14 +2867,51 @@ class AssessRecord
    * Collect the previous tries, organized by part number
    *
    * @param  array $trydata  Data from a question version 'tries' array
+   * @param  int $qn   Question number
+   * @param  array $qout   Data generated from question object generation
    * @return array
    */
-  private function getPreviousTries($trydata) {
+  private function getPreviousTries($trydata, $qn, $qout) {
     $out = array();
     for ($pn = 0; $pn < count($trydata); $pn++) {
       $out[$pn] = array();
+      if ($pn == 0 && isset($qout['jsparams'][$qn])) {
+        $partref = $qn;
+        $qtype = $qout['jsparams'][$qn]['qtype'];
+      } else if (isset($qout['jsparams'][($qn+1)*1000 + $pn])) {
+        $partref = ($qn+1)*1000 + $pn;
+        $qtype = $qout['jsparams'][$partref]['qtype'];
+      } else {
+        $qtype = '';
+      }
       for ($tn = 0; $tn < count($trydata[$pn]); $tn++) {
-        $out[$pn][] = $trydata[$pn][$tn]['stuans'];
+        if ($qtype == 'choices') {
+          $out[$pn][] = $GLOBALS['choicesdata'][$partref][$trydata[$pn][$tn]['stuans']];
+        } else if ($qtype == 'multans') {
+          $pts = explode('|',$trydata[$pn][$tn]['stuans']);
+          $outstr = '';
+          foreach ($pts as $ptval) {
+            $outstr .= $GLOBALS['choicesdata'][$partref][$ptval].'<br/>';
+          }
+          $out[$pn][] = $outstr;
+        } else if ($qtype == 'matching') {
+          $pts = explode('|',$trydata[$pn][$tn]['stuans']);
+          $qrefarr = array_flip($GLOBALS['choicesdata'][$partref][0]);
+          $outptarr = array();
+          foreach ($pts as $k=>$ptval) {
+            $outptarr[$qrefarr[$k]] = $GLOBALS['choicesdata'][$partref][1][$ptval];
+          }
+          ksort($outptarr);
+          $out[$pn][] = implode('<br/>',$outptarr);
+        } else if ($qtype == 'draw') {
+          $out[$pn][] = array(
+            'draw',
+            $trydata[$pn][$tn]['stuans'],
+            $GLOBALS['drawinitdata'][$partref]
+          );
+        } else {
+          $out[$pn][] = Sanitize::encodeStringForDisplay($trydata[$pn][$tn]['stuans']);
+        }
       }
     }
     return $out;

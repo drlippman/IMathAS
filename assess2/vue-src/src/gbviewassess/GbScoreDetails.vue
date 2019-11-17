@@ -102,6 +102,7 @@
     <gb-all-tries
       v-if="showAllTries"
       :tries="qdata.other_tries"
+      :qn="qn"
     />
     <gb-penalties
       v-if="showPenalties"
