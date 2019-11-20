@@ -608,6 +608,7 @@ class AssessRecord
       $data[$qn]['timeactive'] = $timeactive;
     }
     $tosave = array();
+
     $qref = ($qn+1)*1000 + $pn;
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
@@ -615,11 +616,15 @@ class AssessRecord
           $data[$qn]['post'][$key] = $val;
           $thisref = $match[2];
           $subref = $match[3];
+        } else {
+          continue;
         }
       } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b(-\d+)?/', $key, $match)) {
         $data[$qn]['post'][$key] = $val;
         $thisref = $qref;
         $subref = $match[2];
+      } else {
+        continue;
       }
       if (isset($data[$qn]['post'][$key]) && ($subref == '' || $subref == '-0')) {
         if ($subref == '-0') { // matrix or matching
