@@ -2013,9 +2013,9 @@ class AssessRecord
     if (!$this->is_practice) {
       if (isset($this->data['scoreoverride'])) {
         $this->assessRecord['score'] = $this->data['scoreoverride'];
-      } else if ($keepscore === 'average') {
+      } else if ($keepscore === 'average' && count($allAssessVerScores) > 0) {
         $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),1);
-      } else { // best, last, or by_question
+      } else if (count($allAssessVerScores) > 0) { // best, last, or by_question
         $this->assessRecord['score'] = round($allAssessVerScores[$this->data['scored_version']], 1);
       }
       $this->assessRecord['timeontask'] = $totalTime;
