@@ -317,7 +317,7 @@
 	}
 
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=092817\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=112519\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {

@@ -435,7 +435,7 @@ function addsuggest() {
 	var namev = document.getElementById("qaname").value;
 	var scorev = document.getElementById("qascore").value;
 	if (window.tinymce) {
-		var feedbv = tinymce.get("qafeedback").getContent(); 
+		var feedbv = tinymce.get("qafeedback").getContent();
 	} else {
 		var feedbv = document.getElementById("qafeedback").value;
 	}
@@ -559,6 +559,7 @@ function togglefeedback(btn) {
 function doonblur(value) {
 	if (value=='') {return ('');}
 	if (value.match(/^\s*X\s*$/i)) {return 'X';}
+	value = value.replace(/\b0+(\d+)/g, '$1');
 	try {
 		return (eval(mathjs(value)));
 	} catch (e) {
@@ -597,7 +598,7 @@ function sendtoall(w,type) {
 					else if (type==0) { el.value = el.value+toall;}
 					else if (type==2) { el.value = toall;}
 				}
-				
+
 			}
 		 } else if (w==0) {
 			if (document.getElementById("toallgrade").value.match(/\d/)) {
