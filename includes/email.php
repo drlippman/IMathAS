@@ -42,7 +42,7 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 	}
 	foreach ($email as $k=>$v) {
 		$email[$k] = Sanitize::fullEmailAddress(trim($v));
-		if ($email[$k] == '' || $email[$k] == 'none@none.com') {
+		if ($email[$k] == '' || $email[$k] == 'none@none.com' || substr($email[$k],0,7) === 'BOUNCED') {
 			unset($email[$k]);
 		}
 	}
@@ -51,13 +51,13 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 	}
 	foreach ($replyto as $k=>$v) {
 		$replyto[$k] = Sanitize::fullEmailAddress(trim($v));
-		if ($replyto[$k] == '' || $replyto[$k] == 'none@none.com') {
+		if ($replyto[$k] == '' || $replyto[$k] == 'none@none.com' || substr($email[$k],0,7) === 'BOUNCED') {
 			unset($replyto[$k]);
 		}
 	}
 	foreach ($bccList as $k=>$v) {
 		$bccList[$k] = Sanitize::fullEmailAddress(trim($v));
-		if ($bccList[$k] == '' || $bccList[$k] == 'none@none.com') {
+		if ($bccList[$k] == '' || $bccList[$k] == 'none@none.com' || substr($email[$k],0,7) === 'BOUNCED') {
 			unset($bccList[$k]);
 		}
 	}
