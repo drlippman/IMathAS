@@ -177,6 +177,13 @@ export default {
   methods: {
     startAssess () {
       let timelimit = this.aInfo.timelimit;
+      if (this.aInfo.has_password) {
+        // hacky fix for when the password is entered programatically
+        let v = document.getElementById('assmpass');
+        if (v && v.value != this.password) {
+          this.password = v.value;
+        }
+      }
       if (timelimit === 0 || confirm(this.$t('launch.timewarning'))) {
         let pwval = this.password;
         this.password = '';
