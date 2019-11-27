@@ -37,7 +37,14 @@ function disableEmail($email) {
 $postBody = file_get_contents('php://input');
 
 // JSON decode the body to an array of message data
-$message = json_decode($postBody, true);
+$sns = json_decode($postBody, true);
+
+if ($sns['Type'] == 'Notification') {
+	$message = json_decode($sns['Message'], true);
+} else {
+	exit;
+}
+
 $cnt = 0;
 if ($message) {
 	if ($message['notificationType'] == 'Bounce' &&
