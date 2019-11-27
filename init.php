@@ -38,9 +38,10 @@ if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init
 }
 
 if (isset($_SESSION['ratelimiter']) && isset($CFG['GEN']['ratelimit']) &&
+	$_SERVER['REQUEST_METHOD'] === 'POST' &&
 	microtime(true)-$_SESSION['ratelimiter'] < $CFG['GEN']['ratelimit']
 ) {
-	echo "Slow down";
+	echo "Slow down: ".(microtime(true)-$_SESSION['ratelimiter']);
 	$_SESSION['ratelimiter'] = microtime(true);
 	exit;
 } else {
