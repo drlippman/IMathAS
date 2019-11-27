@@ -29,7 +29,7 @@ if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
 function disableEmail($email) {
 	global $DBH;
 	$stm = $DBH->prepare("UPDATE imas_users SET email=CONCAT('BOUNCED', email) WHERE email=?");
-	$stm->execute($email);
+	$stm->execute(array($email));
 }
 
 
