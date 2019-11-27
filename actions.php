@@ -248,6 +248,22 @@ require_once("includes/sanitize.php");
 			if ($stm->rowCount()>0) {
 				list($id,$email,$rights) = $stm->fetch(PDO::FETCH_NUM);
 
+				if (substr($email,0,7)==='BOUNCED') {
+					require("header.php");
+					echo '<p>';
+					echo _('The email address on record for this username is invalid.').' ';
+					if ($myrights < 20) {
+						echo _('Contact your teacher for help resetting your password.');
+					} else {
+						echo _('Contact the system administrator for help resetting your password:').' ';
+						$addr = isset($accountapproval) ? $accountapproval : $sendfrom;
+						echo $addr.'.';
+					}
+					echo '</p>';
+					require("footer.php");
+					exit;
+				}
+
 				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 				$code = '';
 				for ($i=0;$i<10;$i++) {
@@ -350,7 +366,7 @@ require_once("includes/sanitize.php");
 			if ($stm->rowCount() > 0) {
 				echo "Your account can only be accessed through your school's learning management system. <a href=\"index.php\">Return to login page</a>";
 			} else {
-				echo "No usernames match this email address <a href=\"index.php\">Return to login page</a>";
+				echo "No usernames match this email address, or the email address provided is invalid. <a href=\"index.php\">Return to login page</a>";
 			}
 			exit;
 		}
