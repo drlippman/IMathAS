@@ -26,13 +26,6 @@ if (isset($_SERVER['HTTP_X_AMZ_SNS_MESSAGE_TYPE'])) {
 	respondOK(); //send 200 response now
 }
 
-function disableEmail($email) {
-	global $DBH;
-	$stm = $DBH->prepare("UPDATE imas_users SET email=CONCAT('BOUNCED', email) WHERE email=?");
-	$stm->execute(array($email));
-}
-
-
 // Fetch the raw POST body containing the message
 $postBody = file_get_contents('php://input');
 
@@ -45,24 +38,28 @@ if ($sns['Type'] == 'Notification') {
 	exit;
 }
 
-$cnt = 0;
+$emails = array();
 if ($message) {
 	if ($message['notificationType'] == 'Bounce' &&
 		$message['bounce']['bounceType'] == 'Permanent'
 	) {
 		foreach ($message['bounce']['bouncedRecipients'] as $bouncers) {
 			if ($bouncers['action'] == 'failed') {
-				disableEmail($bouncers['emailAddress']);
-				$cnt++;
+				$emails[] = $bouncers['emailAddress'];
 			}
 		}
 	}
 	if ($message['notificationType'] == 'Complaint') {
 		foreach ($message['complaint']['complainedRecipients'] as $bouncers) {
-			disableEmail($bouncers['emailAddress']);
-			$cnt++;
+			$emails[] = $bouncers['emailAddress'];
 		}
 	}
 }
 
-echo "Done; $cnt updated";
+if (count($emails) > 0) {
+	$ph = Sanitize::generateQueryPlaceholders($emails);
+	$stm = $DBH->prepare("UPDATE imas_users SET email=CONCAT('BOUNCED', email) WHERE email IN ($ph)");
+	$stm->execute($emails);
+}
+
+echo "Done";
