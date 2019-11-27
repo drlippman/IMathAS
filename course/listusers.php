@@ -194,6 +194,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$stm->execute(array(':courseid'=>$cid));
 			$stuemails = array();
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$row[2] = str_replace('BOUNCED','',$row[2]);
 				$stuemails[] = Sanitize::encodeStringForDisplay($row[0]) . ' ' . Sanitize::encodeStringForDisplay($row[1]) .  ' &lt;' . Sanitize::encodeStringForDisplay($row[2]) . '&gt;';
 			}
 			$stuemails = implode('; ',$stuemails);
@@ -225,7 +226,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$msgout .= '<p>Username left unchanged</p>';
 				}
 				$query = "UPDATE imas_users SET FirstName=:FirstName,LastName=:LastName";
-	
+
 				$qarr = array(':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname']);
 				if ($updateusername) {
 					$query .= ",SID=:SID";
@@ -259,7 +260,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 			} else {
-				$msgout = '<p>Username, name, email, and password left unchanged.</p>';	
+				$msgout = '<p>Username, name, email, and password left unchanged.</p>';
 			}
 			$code = $_POST['code'];
 			$section = $_POST['section'];
@@ -626,8 +627,8 @@ if ($overwriteBody==1) {
 			<span class="formright"><input type="checkbox" name="hidefromcourselist" value="1" <?php if ($lineStudent['hidefromcourselist']>0) {echo ' checked="checked" ';} ?>/></span><br class=form>
 			<span class=form><label for="doresetpw">Reset password?</label></span>
 			<span class=formright>
-				<input <?php echo $disabled;?> type=checkbox name="doresetpw" id="doresetpw" value="1" onclick="$('#newpwwrap').toggle(this.checked)" /> 
-				<span id="newpwwrap" style="display:none"><label for="pw1">Set temporary password to:</label> 
+				<input <?php echo $disabled;?> type=checkbox name="doresetpw" id="doresetpw" value="1" onclick="$('#newpwwrap').toggle(this.checked)" />
+				<span id="newpwwrap" style="display:none"><label for="pw1">Set temporary password to:</label>
 				<input type=text size=20 name="pw1" id="pw1" /></span>
 			</span><br class=form />
 			<div class=submit><input type=submit value="Update Info"></div>
@@ -764,6 +765,7 @@ if ($overwriteBody==1) {
 			if ($line['section']==null) {
 				$line['section'] = '';
 			}
+			$line['email'] = str_replace('BOUNCED', '', $line['email']);
 			$icons = '';
 			$numstu++;
 			if ($line['locked']>0) {

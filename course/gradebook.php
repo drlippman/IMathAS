@@ -676,7 +676,9 @@ function gbstudisp($stu) {
 			//echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
 			if (!isset($CFG['GEN']['noEmailButton'])) {
 				echo "<a href=\"#\" onclick=\"GB_show('Send Email','$imasroot/course/sendmsgmodal.php?to=" . Sanitize::onlyInt($stu) . "&sendtype=email&cid=" . Sanitize::courseId($cid) . "',800,'auto')\" title=\"Send Email\">", _('Email'), "</a> | ";
-			} else if ($stuemail != '' && $stuemail != 'none@none.com' && filter_var($stuemail, FILTER_VALIDATE_EMAIL)) {
+			} else if ($stuemail != '' && $stuemail != 'none@none.com' &&
+				substr($stuemail,0,7) !== 'BOUNCED' && filter_var($stuemail, FILTER_VALIDATE_EMAIL)
+			) {
 				echo '<a href="mailto:'.Sanitize::emailAddress($stuemail).'">', _('Email'), '</a> | ';
 			}
 
