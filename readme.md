@@ -87,6 +87,8 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['UP']`:  An associative array overriding the default User Preference values.  See the `$prefdefaults` definition in `/includes/userprefs.php` for the appropriate format.
 - `$CFG['GEN']['extrefsize']`: Set to an array of (width,height) to set the popup size for Text and Written Solution question help buttons
 - `$CFG['GEN']['vidextrefsize']`: Set to an array of (width,height) to set the popup size for Video question help buttons
+- `$CFG['GEN']['ratelimit']`: Set to a number of seconds (like 0.2) to limit the rate at
+ which pages can be accessed/refreshed.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.

@@ -33,6 +33,16 @@ if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init
 		require_once(__DIR__ . "/csrfp/simplecsrfp.php");
 		csrfProtector::init();
 	}
+} else {
+	session_start();
 }
 
-
+if (isset($_SESSION['ratelimiter']) && isset($CFG['GEN']['ratelimit']) &&
+	microtime(true)-$_SESSION['ratelimiter'] < $CFG['GEN']['ratelimit']
+) {
+	echo "Slow down";
+	$_SESSION['ratelimiter'] = microtime(true);
+	exit;
+} else {
+	$_SESSION['ratelimiter'] = microtime(true);
+}
