@@ -1173,12 +1173,15 @@ class AssessRecord
       for ($pn = 0; $pn < count($answeights); $pn++) {
         // get part details
         $parttry = isset($curq['tries'][$pn]) ? count($curq['tries'][$pn]) : 0;
-        $try = min($try, $parttry);
-        if ($parttry === 0) {
+        if ($answeights[$pn] > 0) {
+          // overall try is minimum of all individual part tries that have weight
+          $try = min($try, $parttry);
+        }
+        if ($parttry === 0 && $answeights[$pn] > 0) {
           // if any parts are unattempted, mark question as such
           $status = 'unattempted';
         }
-        if ($include_scores) {
+        if ($include_scores && $answeights[$pn] > 0) {
           if ($status != 'unattempted') {
             if ($parts[$pn]['rawscore'] > .99) {
               $status = ($status === 'incorrect' || $status === 'partial') ? 'partial': 'correct';
