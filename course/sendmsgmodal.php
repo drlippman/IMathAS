@@ -4,12 +4,19 @@
 
 require("../init.php");
 
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
+	 require("../header.php");
+	 echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
+	 require("../footer.php");
+	 exit;
+}
+
 $flexwidth = true;
 $nologo = true;
 
 if (isset($_POST['message'])) {
 	require_once("../includes/email.php");
-	
+
 	$origmessage = Sanitize::incomingHtml($_POST['message']);
 	$subject = Sanitize::stripHtmlTags($_POST['subject']);
 	if (trim($subject)=='') {
@@ -19,7 +26,7 @@ if (isset($_POST['message'])) {
 		$subject .= ' - Marked Broken';
 	}
 	$sendlist = array(array('to'=>$_POST['sendto'], 'sendtype'=>$_POST['sendtype']));
-	
+
 	//if it's an error report, and we've said we want a copy elsewhere, add that to the send list
 	if (isset($_POST['iserrreport']) && isset($CFG['GEN']['qerrorsendto']) && !empty($CFG['GEN']['qerrorsendto'][3])) {
 		$sendlist[] = array('to'=>$CFG['GEN']['qerrorsendto'][0], 'sendtype'=>$CFG['GEN']['qerrorsendto'][1]);
@@ -27,9 +34,9 @@ if (isset($_POST['message'])) {
 	$error = '';
 	foreach ($sendlist as $sendcnt=>$sendinfo) {
 		$msgto = Sanitize::onlyInt($sendinfo['to']);
-		
+
 		if (isset($_POST['iserrreport']) && $sendcnt>0) { //copy going to specified
-			$message = '<p><b>This message was also sent to the question owner.</b></p>'.$origmessage;	
+			$message = '<p><b>This message was also sent to the question owner.</b></p>'.$origmessage;
 		} else {
 			$message = $origmessage;
 		}
@@ -41,7 +48,7 @@ if (isset($_POST['message'])) {
 			$stm->execute(array(':title'=>$subject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
 				':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
 			$msgid = $DBH->lastInsertId();
-			
+
 			$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$msgto));
 			list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
@@ -73,9 +80,9 @@ if (isset($_POST['message'])) {
 				$stm->execute(array(':id'=>$userid));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				$self = Sanitize::simpleASCII("{$row[0]} {$row[1]}") ." <". Sanitize::emailAddress($row[2]).">";
-				
-				send_email($addy, $sendfrom, $subject, $message, array($self), array(), 5); 
-				
+
+				send_email($addy, $sendfrom, $subject, $message, array($self), array(), 5);
+
 				if ($sendcnt == 0) {
 					$success = _('Email sent');
 				}
@@ -101,9 +108,9 @@ if (isset($_POST['message'])) {
 } else {
 	$useeditor = "message";
 	require("../header.php");
-	
+
 	$iserrreport = false;
-	
+
 	if (isset($_GET['quoteq'])) {
 		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
 		require("../assessment/displayq2.php");
@@ -119,7 +126,7 @@ if (isset($_POST['message'])) {
 				}, $message);
 		}
 		$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-		
+
 		$qinfo = 'Question ID '.Sanitize::onlyInt($parts[1]).', seed '.Sanitize::onlyInt($parts[2]);
 		$message = '<p> </p><br/><hr/>'.$qinfo.'<br/><br/>'.$message;
 		$courseid = $cid;
@@ -162,12 +169,12 @@ if (isset($_POST['message'])) {
 		$message = '';
 		$courseid=$cid;
 	}
-	
+
 	$msgto = Sanitize::onlyInt($_GET['to']);
 	$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 	$stm->execute(array(':id'=>$msgto));
 	list($firstname, $lastname, $email) = $stm->fetch(PDO::FETCH_NUM);
-	
+
 	if ($_GET['sendtype']=='msg') {
 		echo '<h1>New Message</h1>';
 		$to = Sanitize::stripHtmlTags("$lastname, $firstname");

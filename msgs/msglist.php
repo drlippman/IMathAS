@@ -145,12 +145,58 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
+			$msgToPost = Sanitize::onlyInt($_POST['to']);
+
+			// validate message settings allow this
+			$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cidP));
+			$msgset = ($stm->fetchColumn(0))%5;
+			$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
+			$stm->execute(array($cidP));
+			$teacherList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+			$stm = $DBH->prepare("SELECT userid FROM imas_tutors WHERE courseid=?");
+			$stm->execute(array($cidP));
+			$tutorList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
+			$stm->execute(array($cidP));
+			$studentList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+
+			$isvalid = false;
+			if (in_array($userid, $studentList)) { // sender is student
+				if ($msgset == 2 && in_array($msgToPost, $studentList)) { //only can send to student
+					$isvalid = true;
+				} else if ($msgset == 1 && // only can send to teacher
+					(in_array($msgToPost, $teacherList) || in_array($msgToPost, $tutorList))
+				) {
+					$isvalid = true;
+				} else if ($msgset == 0 && (
+					in_array($msgToPost, $studentList) ||
+					in_array($msgToPost, $teacherList) ||
+					in_array($msgToPost, $tutorList)
+				)) {
+					$isvalid = true;
+				}
+			} else if (in_array($userid, $teacherList) || in_array($userid, $tutorList)) { // sender is teacher or tutor
+				if ($msgset < 4 && (
+					in_array($msgToPost, $studentList) ||
+					in_array($msgToPost, $teacherList) ||
+					in_array($msgToPost, $tutorList)
+				)) {
+					$isvalid = true;
+				}
+			}
+			if (!$isvalid) {
+				require("../header.php");
+				echo 'You are not permitted to send a message to that user in this course.';
+				require("../footer.php");
+				exit;
+			}
+
       $messagePost = Sanitize::incomingHtml($_POST['message']);
 			$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
 			if (trim($subjectPost)=='') {
 				$subjectPost = '('._('none').')';
 			}
-			$msgToPost = Sanitize::onlyInt($_POST['to']);
 
       $now = time();
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
