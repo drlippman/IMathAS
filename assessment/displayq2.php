@@ -3950,9 +3950,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$GLOBALS['partlastanswer'] = implode("|",$givenanslist);
 		} else {
 			$givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
+			$answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
 			$GLOBALS['partlastanswer'] = $givenans;
 			$givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
-			if (substr_count($answer,'),(')!=substr_count($_POST["qn$qn"],'),(')) {$correct = false;}
+			if (substr_count($answer,'),(')!=substr_count($givenans,'),(')) {$correct = false;}
 		}
 
 		//handle nosolninf case
