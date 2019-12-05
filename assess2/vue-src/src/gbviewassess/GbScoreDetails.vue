@@ -47,7 +47,7 @@
         v-if="canedit && !isPractice && showfeedback === false"
         type="button"
         class="slim"
-        @click="showfeedback = true"
+        @click="revealFeedback"
       >
         {{ $t('gradebook.add_feedback') }}
       </button>
@@ -63,12 +63,14 @@
         rows="2"
         cols="60"
         :value = "qdata.feedback"
+        ref = "fbbox"
         @input="updateFeedback"
       ></textarea>
       <tinymce-input
         v-else-if="canedit"
         :id="'fb'+qn"
         :value = "qdata.feedback"
+        ref = "fbbox"
         @input = "updateFeedback"
       ></tinymce-input>
       <div
@@ -352,6 +354,10 @@ export default {
         this.qn,
         600
       );
+    },
+    revealFeedback () {
+      this.showfeedback = true;
+      this.$nextTick(() => this.$refs.fbbox.focus());
     }
   },
   mounted () {

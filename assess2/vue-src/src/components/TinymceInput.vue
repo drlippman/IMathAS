@@ -61,6 +61,9 @@ export default {
     },
     updateValue: function (value) {
         this.$emit('input', value);
+    },
+    focus: function () {
+      this.objTinymce.focus();
     }
   },
   watch: {
