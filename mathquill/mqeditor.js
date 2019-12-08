@@ -106,6 +106,7 @@ var MQeditor = (function($) {
 
         if (el.disabled) {
           mqfield = MQ.StaticMath(span[0]);
+          span.addClass("disabled");
         } else {
           mqfield = MQ.MathField(span[0], thisMQconfig).config(MQconfig);
           attachEditor(span);
