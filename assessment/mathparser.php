@@ -213,7 +213,7 @@ class MathParser
       array("arcsin","arccos","arctan","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
       $str
     );
-    $str = str_replace('\\','',$str);
+    $str = str_replace(array('\\','[',']'), array('','(',')'), $str);
     $str = preg_replace('/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/', 'log_$1(', $str);
     $this->tokenize($str);
     $this->handleImplicit();
