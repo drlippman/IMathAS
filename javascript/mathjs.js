@@ -141,6 +141,7 @@ function mathjs(st,varlist) {
   //convert functions
   st = st.replace(/log_([a-zA-Z\d\.]+)\s*\(/g,"nthlog($1,");
   st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/g,"nthlog($1,");
+  st = st.replace(/log_(\(@v\d+@\))\s*\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
   st = st.replace(/(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)\^(-1|\(-1\))/g,"arc$1");
   st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\s*\(/g,"$1n($2,");
