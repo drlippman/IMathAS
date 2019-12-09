@@ -1,0 +1,172 @@
+<html>
+  <body>
+    <h1>Macro Library sagecell_vcrp</h1>
+    <p>Sagecell integration documentation, Version 3.0, June 2019</p>
+
+    <p>
+      This library provides functions to create SageCells and transfer their
+      output into answerboxes. To use the library in a question, make sure to
+      call
+    </p>
+    <pre>loadlibrary("sagecell_vcrp");</pre>
+    <p>
+      before calling the functions.
+    </p>
+
+    <ul>
+      <li><a href="#sagecell">sagecell</a></li>
+      <li><a href="#sagecellButton">sagecellButton</a></li>
+      <br />
+      <li><a href="#UseCases">Use Cases</a></li>
+    </ul>
+
+    <h3 id="sagecell">sagecell</h3>
+    <p>
+      <code>sagecell([script,thisq,essayPart,sageName])</code> generates code
+      for a SageCell with content <code>script</code> which can be used in
+      <code>Question Text</code>.
+    </p>
+    <p>
+      If the output produced by sage is to be reused as an answer,
+      <code>thisq</code> must be instantiated with <code>$thisq</code>.
+    </p>
+    <p>
+      If the SageCell script edited by the student is to be inspected, it can be
+      saved as an answer to a question (part) of type <code>essay</code>. If the
+      script is the only expected answer, the question must be of type
+      <code>essay</code> and the parameter <code>essayPart</code> must be
+      instantiated with <code>"essay"</code>. If the question is of type
+      <code>multipart</code> or <code>conditional</code>,
+      <code>essayPart</code> must be instantiated with the number <i>n</i> of
+      the <code>essay</code> part to be used for saving the script. Do not put
+      <code>$answerbox[n]</code> into the question text.
+    </p>
+    <p>
+      If the script is not to be saved, <code>essayPart</code> should be
+      instantiated with <code>"none"</code>, which is also it's default value.
+    </p>
+    <p>
+      If the question uses more than one SageCells the output of which needs to
+      be accessed, they may be distinguished by the value of the parameter
+      <code>sageName</code>.
+    </p>
+
+    <h3 id="sagecellButton">sagecellButton</h3>
+    <p>
+      <code>sagecellButton([label, part, format, sageName])</code>
+      generates code for a button to transfer SageCell output into an answerbox.
+      This code can be used in <code>Question Text</code>.
+    </p>
+    <p>
+      The parameter <code>label</code> can be used to specify the text to be
+      shown on the button. In questions of type <code>multipart</code> or
+      <code>conditional</code>, the argument <code>part</code> must specify the
+      number <i>n</i> if a click on the button is to transfer the output of the
+      SageCell into <code>$answerbox[n]</code>. If the question doesn't have
+      parts, use <code>"none"</code> as value for <code>part</code>, which is
+      also the default.
+    </p>
+    <p>
+      If the output is to be interpreted as a list or matrix, set
+      <code>format</code> to <code>'list'</code> or
+      <code>'matrix'</code> respectively. For matrix questions
+      <code>$answersize</code> must not be set in the question control code.
+      <b>Note:</b> Applying the <code>matrix</code> format to non-nmeric
+      matrices may yield weird results. In case of doubt use format
+      <code>'any'</code> instead to let the student adapt the matrix syntax.
+    </p>
+    <p>
+      If the question uses more than one SageCells the output of which needs to
+      be accessed, they may be distinguished by the value of the parameter
+      <code>sageName</code>.
+    </p>
+
+    <h3 id="UseCases">Use Cases</h3>
+    <h4>Just adding a SageCell</h4>
+
+    <dl>
+      <dt>In Question Control:</dt>
+      <dd><code>$cell=sagecell()</code></dd>
+      <dt>In Question Text:</dt>
+      <dd><code>$cell</code></dd>
+    </dl>
+
+    <h4>Adding a SageCell with Script</h4>
+    <dl>
+      <dt>In Question Control:</dt>
+      <dd>
+        <code>
+          $script="x=var(x)<br />
+          integral(sin(x),x)<br />
+          "<br />
+          $cell = sagecell($script)
+        </code>
+      </dd>
+      <dt>In Question Text:</dt>
+      <dd><code>$cell</code></dd>
+    </dl>
+
+    <h4>
+      Adding a SageCell and Button to Transfer SageCell Output (single part
+      question)
+    </h4>
+    <dl>
+      <dt>In Question Control:</dt>
+      <dd>
+        <code>
+          $cell = sagecell("",$thisq)<br />
+          $button=sagecellButton()
+        </code>
+      </dd>
+      <dt>In Question Text:</dt>
+      <dd>
+        <code>
+          $cell<br />
+          $button $answerbox
+        </code>
+      </dd>
+    </dl>
+
+    <h4>
+      Adding a SageCell and Button to Transfer SageCell Output (multipart
+      question)
+    </h4>
+    <dl>
+      <dt>In Question Control:</dt>
+      <dd>
+        <code>
+          $cell = sagecell("",$thisq)<br />
+          $button=sagecellButton("Get Answer to Part 3",2)
+        </code>
+      </dd>
+      <dt>In Question Text:</dt>
+      <dd>
+        <code>
+          $cell<br />
+          $button $answerbox[2]
+        </code>
+      </dd>
+    </dl>
+
+    <h4>
+      Getting a Numerical Matrix as Answer from Sage and Saving the Sage Script
+      in Part 0
+    </h4>
+    <dl>
+      <dt>In Question Control:</dt>
+      <dd>
+        <code>
+          $cell = sagecell("",$thisq,0)<br />
+          $button=sagecellButton("Get Answer to Part 2",2,"matrix")
+        </code>
+      </dd>
+      <dt>In Question Text:</dt>
+      <dd>
+        <code>
+          $cell<br />
+          $button $answerbox[2]
+        </code>
+      </dd>
+    </dl>
+  </body>
+</html>

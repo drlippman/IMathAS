@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <h1>Macro Library terms</h1>
+    <p>Library for testing the syntax of terms.</p>
+    <p>
+      <ul>
+        <li><a href="#isSumOf">isSumOf</a></li>
+        <li><a href="#isProductOf">isProductOf</a></li>
+        <li><a href="#getPolynomialDegree">getPolynomialDegree</a></li>
+        <li><a href="#isPolynomic">isPolynomic</a></li>
+        <li><a href="#isInstanceOf">isInstanceOf</a></li>
+      </ul>
+    </p>
+
+    <h3 id="isSumOf">isSumOf</h3>
+    <p>
+      <code>isSumOf(termString [,vars,sloppyString])</code> calculates the array of summands of the term given in
+      <code>termString</code>. If the term is not a sum, an array is returned having the given term as its only member.
+      The parameter <code>vars</code> is a comma-separated list of all variables in <code>termString</code>. It is optional
+      and defaults to 'x'.<br/> If <code>sloppyString</code> contains '+' - which is the case by default - a difference <code>t1-t2</code> is considered as a sum of <code>t1</code> and <code>-t2</code>.
+    </p>
+
+    <h3 id="isProductOf">isProductOf</h3>
+    <p>
+      <code>isProductOf(termString [,vars,sloppyString])</code> calculates the array of factors of the term given in <code>termString</code>. If the term is not a product, an array is returned having the given term as its only member.
+      The parameter <code>vars</code> is a comma-separated list of all variables in <code>termString</code>. It is optional
+      and defaults to 'x'.<br /> If <code>sloppyString</code> contains '*' - which is <b>not</b> the case by default - a quotient <code>t1/t2</code> is considered
+      as a product of <code>t1</code> and <code>1/t2</code>.
+    </p>
+
+    <h3 id="getPolynomialDegree">getPolynomialDegree</h3>
+    <p>
+    <code>getPolynomialDegree(termString [,vars,pvar])</code> tests whether a term given in <code>termString</code> is a polynomial in a particular variable given in <code>pvar</code> which defaults to 'x'.</p>
+    <p>
+      A polynomial, as understood here, is a sum of products of powers of the polynomial variable and terms not containing the polynomial variable. No particular order of the subterms is expected.
+    </p>
+    <p>The parameter <code>vars</code> is a comma-separated list of all variables in        <code>termString</code>. It is optional and defaults to 'x'.
+    </p>
+    <p>The function returns an upper estimate of the degree of the polynomial resp. -1 if <code>termString</code> is not a polynomial. Note that the actual degree of the polynomial may be lower because some coefficients evaluate to 0.
+    </p>
+    <h4>Usage example</h4>
+    <p>
+      <div>
+        <code>loadlibrary('terms)</code><br/>
+        <code>getPolynomialDegree('x^2-x^3sin(y)*x+3','x,y','x') // 4</code>
+      </div>
+    </p>
+    <h3 id="isPolynomic">isPolynomic</h3>
+    <p>
+      <code>isPolynomic(termString [,vars,pvar])</code> tests whether a given term in the variable <code>pvar</code>, defaulting to 'x', can be obtained from this variable and  and terms not containing this variable by addition, multiplication and power only. <code>vars</code>, defaulting to 'x', must contain all variables in <code>termString</code>.
+    </p>
+    <h3 id="isInstanceOf">isInstanceOf</h3>
+    <p>
+      <code>isInstanceOf(termString,templateString [,variableString,sloppyString])</code> tests whether the term in <code>termString</code> is an instance of one of the terms in <code>templateString</code>. <code>templateString</code> is a '|'-separated list of terms. The parameter <code>variableString</code> must be a ,-separated list of all variables occuring in <code>termString</code> or <code>templateString</code>. <code>variableString</code> defaults to "x,y,z". <code>sloppyString</code> is a list of + and * defaulting to <code>'+'</code>. If + resp. * is in this list, <code>t1-t2</code> resp. <code>t1/t2</code> may be handled as <code>t1+(-t2)</code> resp. <code>t1*(1/t2)</code> if this allows additional
+      matches.
+    </p>
+    <p><code>isInstanceOf</code> returns the result of the match and, in case of success, the matching template and the matching instantiation of the template variables.</p>
+    <h4>Usage example</h4>
+    <p>
+      <div>
+        <code>
+          loadlibrary('terms')
+</code><br />
+<code>
+          $match = isInstanceOf('1+x-y','x+(y-z)|x+y+z','x,y,z')
+        </code>
+      </div>
+      gives
+      <div>
+        <code>
+          $match['result'] = true
+          </code><br/>
+          <code>
+          $match['template'] = "x+y+z"
+          </code><br />
+          <code>
+          $match['instantiation']['x'] = "1"
+          </code><br />
+          <code>
+          $match['instantiation']['y'] = "x"
+          </code><br/>
+          <code>
+            $match['instantiation']['z'] = "(-y)"
+        </code>
+      </div>
+    </p>
+  </body>
+</html>

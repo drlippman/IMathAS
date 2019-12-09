@@ -122,4 +122,6 @@ var i18njs = {
 "received.":
 "erhalten.",
 
+"Evaluate.":
+"Auswerten.",
 };
