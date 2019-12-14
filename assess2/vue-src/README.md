@@ -30,6 +30,12 @@ npm run serve
 ```
 npm run build
 ```
+If you modify any of the external javascript, be sure to also run this to
+rebuild minified javascript files.  You may want to edit index.php to change
+the v= date to force reload.
+```
+./buildmin.sh
+```
 
 ### Run your tests
 ```
