@@ -219,10 +219,10 @@ class DrawingAnswerBox implements AnswerBox
     		} else {
     			$plot = showplot($backg,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     		}
-    		if (is_array($settings[4]) && count($settings[4]>2)) {
+    		if (is_array($settings[4]) && count($settings[4])>2) {
     			$plot = addlabel($plot,$settings[1],0,$settings[4][2],"black","aboveleft");
     		}
-    		if (is_array($settings[5]) && count($settings[5]>2)) {
+    		if (is_array($settings[5]) && count($settings[5])>2) {
     			$plot = addlabel($plot,0,$settings[3],$settings[5][2],"black","belowright");
     		}
     		if (isset($grid) && (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false)) {
