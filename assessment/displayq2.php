@@ -584,9 +584,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 			for ($i=0;$i<count($extref);$i++) {
 				$extrefpt = explode('!!',$extref[$i]);
-				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
+				if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
+				if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
+					strpos($extrefpt[1],'youtu.be.com/')!==false ||
+					strpos($extrefpt[1],'vimeo.com/')!==false
+				) {
 					$extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
-					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
 					echo formpopup($extrefpt[0],$extrefpt[1],$vidextrefwidth,$vidextrefheight,"button",true,"video",$qref);
 				} else if ($extrefpt[0]=='read') {
 					echo formpopup("Read",$extrefpt[1],$extrefwidth,$extrefheight,"button",true,"text",$qref);
