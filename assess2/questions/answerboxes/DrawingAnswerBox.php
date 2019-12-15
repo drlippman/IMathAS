@@ -194,7 +194,7 @@ class DrawingAnswerBox implements AnswerBox
     			$sclinglbl = "$xlbl:$ylbl";
     			$sclinggrid = "$xgrid:$ygrid";
     		}
-    		if ($snaptogrid>0) {
+    		if ($snaptogrid !== 0) {
     			list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
     			if (abs($newwidth - $settings[6])/$settings[6]<.1) {
     				$settings[6] = $newwidth;
@@ -468,8 +468,6 @@ class DrawingAnswerBox implements AnswerBox
     			//fix la's that were encoded incorrectly
     			$la = str_replace(',,' , ',' , $la);
     			$la = str_replace(';,' , ';' , $la);
-
-    			if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
 
     			$attributes = [
     				'type' => 'hidden',
