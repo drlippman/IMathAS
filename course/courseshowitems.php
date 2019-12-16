@@ -792,7 +792,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					 	if ($assessUseVueDev) {
 					 		$assessUrl = "http://localhost:8080/?cid=$cid&aid=$typeid";
 						} else {
-							$assessUrl = "../assess2/?cid=$cid&aid=$typeid";
+							$assessUrl = "../assess2/index.php?cid=$cid&aid=$typeid";
 						}
 				 } else {
 					 $thisaddassess = "addassessment.php";
