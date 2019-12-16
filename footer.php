@@ -40,6 +40,11 @@ if ((isset($testsettings) && $testsettings['showtips']==2) ||
 if (isset($placeinfooter)) {
 	echo $placeinfooter;
 }
+
+$curdir = rtrim(dirname(__FILE__), '/\\');
+if (isset($CFG['GEN']['footerscriptinclude'])) {
+	require("$curdir/{$CFG['GEN']['footerscriptinclude']}");
+}
 ?>
 </body>
 </html>
