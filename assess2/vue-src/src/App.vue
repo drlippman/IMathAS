@@ -11,17 +11,20 @@
       :errormsg="errorMsg"
       @clearerror="clearError"
     />
+    <due-dialog v-if="showDueDialog"/>
   </div>
 </template>
 
 <script>
 import { store, actions } from './basicstore';
 import ErrorDialog from '@/components/ErrorDialog.vue';
+import DueDialog from '@/components/DueDialog.vue';
 import './assess2.css';
 
 export default {
   components: {
-    ErrorDialog
+    ErrorDialog,
+    DueDialog
   },
   data: function () {
     return {
@@ -40,6 +43,9 @@ export default {
     },
     assessName () {
       return store.assessInfo.name;
+    },
+    showDueDialog () {
+      return store.show_enddate_dialog;
     }
   },
   methods: {
@@ -60,7 +66,9 @@ export default {
           unanswered = false;
         }
       }
-      if (Object.keys(actions.getChangedQuestions()).length > 0) {
+      if (store.noUnload) {
+
+      } else if (Object.keys(actions.getChangedQuestions()).length > 0) {
         evt.preventDefault();
         this.prewarned = false;
         return this.$t('unload.unsubmitted_questions');
