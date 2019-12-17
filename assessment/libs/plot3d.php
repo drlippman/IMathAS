@@ -88,11 +88,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	  }
 
 	  if ($oldschool || isset($GLOBALS['sessiondata']['useflash'])) {
-	  	  if (!isset($GLOBALS['3dplotcnt'])) {
-			  $r = 1;
-		  } else {
-			  $r = $GLOBALS['3dplotcnt']+1;
-		  }
+	  	$r = uniqid();
 		  $GLOBALS['3dplotcnt'] = $r;
 		  $html .= "<div id=\"plot3d$r\">";
 		  $html .= '<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>';
@@ -105,11 +101,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
 		  $html .= '</script>';
 	  } else {
-	  	 if (!isset($GLOBALS['3dplotcnt'])) {
-			  $r = 1;
-		  } else {
-			  $r = $GLOBALS['3dplotcnt']+1;
-		  }
+	  	$r = uniqid();
 			if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
 				$html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 			}
@@ -224,11 +216,7 @@ function spacecurve($func,$tmin,$tmax) {
 				  $count++;
 			  }
 		  }
-		  if (!isset($GLOBALS['3dplotcnt'])) {
-			  $r = 1;
-		  } else {
-			  $r = $GLOBALS['3dplotcnt']+1;
-		  }
+		  $r = uniqid();
 		  $GLOBALS['3dplotcnt'] = $r;
 		  $html .= "<div id=\"plot3d$r\">";
 		  $html .= '<p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>';
@@ -263,11 +251,7 @@ function spacecurve($func,$tmin,$tmax) {
 			  $count++;
 		 }
 
-	   if (!isset($GLOBALS['3dplotcnt'])) {
-			  $r = 1;
-		 } else {
-			  $r = $GLOBALS['3dplotcnt']+1;
-		 }
+	   $r = uniqid();
 		 if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
 			 $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
 		 }

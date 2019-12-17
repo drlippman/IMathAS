@@ -2317,7 +2317,7 @@ The following macros create graphs or tables:
 <li><strong>gettwopointlinedata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing
   question and pulls out the two-point line data.  Returns an array of lines, each of form array(x1,y1,x2,y2) giving the coordinates
   of the two points used.</li>
-  <li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing question
+<li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing question
   and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'lineseg', 'ray', 'parab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
   'rationa', 'exp', 'log', 'sin', 'cos', 'abs', 'vector', 'circle'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
   the two points used.  They are returned in the order clicked.  For example, with 'parab' type, the first point is the vertex and the
@@ -2331,6 +2331,11 @@ The following macros create graphs or tables:
 <li><strong>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing
   question and pulls out the lines data, which includes polygons.  Returns an array, with an element for each line/curve draw.  Each of those
   elements will be an array of points on that line/curve.  Each of those points is array (x,y).</li>
+<li><strong>getineqdata(stuans, [type, xmin, xmax, ymin, ymax, drawing width, drawing height])</strong>:  Takes a $stuanswers from a drawing question
+  and pulls out the inequalities data for the given curve type.  Type should be one of 'linear' or 'quadratic'.
+	Returns an array of curve data, each of form array(style,x1,y1,x2,y2,x3,y3) giving the coordinates of
+  the three points used.  They are returned in the order clicked.  style will be either 'ne' for strict inequality (dashed line),
+	or 'eq' for inequality with equality (solid line).</li>
 <li><strong>getsnapwidthheight(xmin, xmax, ymin, ymax, drawing width, drawing height, snaptogrid)</strong>:  Takes drawing grid info and a snaptogrid
   value or string, and returns an array(width,height) giving a closeby drawing width and height that will guarantee that the snaptogrid values
   fall on exact drawing pixel locations.</li>

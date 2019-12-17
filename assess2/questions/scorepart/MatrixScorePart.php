@@ -59,11 +59,12 @@ class MatrixScorePart implements ScorePart
             $N = $sizeparts[0];
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
+            $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
             $givenans = preg_replace('/\)\s*,\s*\(/','),(',$givenans);
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $givenanslist = explode(",",preg_replace('/[^\d,\.\-]/','',$givenans));
             $N = substr_count($answer,'),(')+1;
-            if ($N != substr_count($_POST["qn$qn"],'),(')+1) {
+            if ($N != substr_count($givenans, '),(') + 1) {
               $scorePartResult->setRawScore(0);
               return $scorePartResult;
             }

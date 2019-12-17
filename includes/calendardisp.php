@@ -882,9 +882,10 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 		} else {
 			$addto[] = $item;
 			$folderholder[$item] = $folder;
-			$greyitems[$item] = $curblockgrey;
 			if ($ishidden) {
 				$hiddenholder[$item] = true;
+			} else {
+				$greyitems[$item] = $curblockgrey;
 			}
 		}
 	}

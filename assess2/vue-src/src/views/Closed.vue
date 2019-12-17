@@ -122,7 +122,7 @@ export default {
         return this.$t('closed.pastdue', { ed: this.settings.enddate_disp });
       } else if (this.settings.available === 'needprereq') {
         return this.$t('closed.needprereq');
-      } else if (this.settings.available === 'pasttime') {
+      } else if (this.settings.hasOwnProperty('pasttime')) {
         return this.$t('closed.pasttime');
       } else if (this.settings.has_active_attempt === false && this.settings.can_retake === false) {
         return this.$t('closed.no_attempts');
@@ -149,26 +149,13 @@ export default {
     },
     showLatePassOffer () {
       return (this.settings.available !== 'needprereq' &&
-        this.settings.available !== 'pasttime');
+        !this.settings.hasOwnProperty('pasttime'));
     },
     latepassExtendMsg () {
       return this.$tc('closed.latepass_needed', this.settings.can_use_latepass, {
         n: this.settings.can_use_latepass,
         date: this.settings.latepass_extendto_disp
       });
-    },
-    primaryButton () {
-      if (this.settings.can_use_latepass > 0 && this.showLatePassOffer) {
-        return this.$tc('closed.use_latepass', this.settings.can_use_latepass);
-      } else if (this.settings.available === 'practice') {
-        return this.$t('closed.do_practice');
-      } else if (this.canViewScored) {
-        return this.$t('closed.view_scored');
-      } else if (window.exiturl && window.exiturl !== '') {
-        return this.$t('closed.exit');
-      } else {
-        return '';
-      }
     },
     primaryAction () {
       if (this.settings.can_use_latepass > 0 && this.showLatePassOffer) {
@@ -183,11 +170,14 @@ export default {
         return '';
       }
     },
-    secondaryButton () {
-      // Practice is secondary if we can use latepass
-      if (this.settings.can_use_latepass > 0 && this.settings.available === 'practice') {
+    primaryButton () {
+      if (this.primaryAction === 'latepass') {
+        return this.$tc('closed.use_latepass', this.settings.can_use_latepass);
+      } else if (this.primaryAction === 'practice') {
         return this.$t('closed.do_practice');
-      } else if (window.exiturl && window.exiturl !== '' && this.primaryAction !== 'exit') {
+      } else if (this.primaryAction === 'view_scored') {
+        return this.$t('closed.view_scored');
+      } else if (this.primaryAction === 'exit') {
         return this.$t('closed.exit');
       } else {
         return '';
@@ -195,10 +185,22 @@ export default {
     },
     secondaryAction () {
       // Practice is secondary if we can use latepass
-      if (this.settings.can_use_latepass > 0 && this.settings.available === 'practice') {
+      if (this.settings.can_use_latepass > 0 && this.showLatePassOffer &&
+        this.settings.available === 'practice'
+      ) {
         return 'practice';
       } else if (window.exiturl && window.exiturl !== '' && this.primaryAction !== 'exit') {
         return 'exit';
+      } else {
+        return '';
+      }
+    },
+    secondaryButton () {
+      // Practice is secondary if we can use latepass
+      if (this.secondaryAction === 'practice') {
+        return this.$t('closed.do_practice');
+      } else if (this.secondaryAction === 'exit') {
+        return this.$t('closed.exit');
       } else {
         return '';
       }

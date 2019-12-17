@@ -205,7 +205,7 @@
 			$msgset = $stm->fetchColumn(0);
 			$msgmonitor = floor($msgset/5);
 			$msgset = $msgset%5;
-			if ($msgset<3 || $isteacher) {
+			if ($msgset<3 || ($isteacher && $msgset < 4)) {
 				$cansendmsgs = true;
 				if ($msgset==1 && !$isteacher) { //check if sending to teacher
 					$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid and courseid=:courseid");

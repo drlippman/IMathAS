@@ -115,6 +115,9 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT * FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($myrights < 75 && substr($line['email'],0,7)==='BOUNCED') {
+			$line['email'] = '';
+		}
 		echo '<script type="text/javascript">function togglechgpw(val) { document.getElementById("pwinfo").style.display=val?"":"none"; } ';
 		echo 'function togglechgmfa(val) { document.getElementById("mfainfo").style.display = val?"":"none";}</script>';
 		if ($gb == '') {
@@ -153,12 +156,12 @@ switch($_GET['action']) {
 				echo 'Using the app, scan the QR code below. Once it is set up, enter the code provided in the box.</span><BR class=form>';
 				echo '<span class=form>QR Code:</span><span class=formright><span id="mfaqrcode"></span> </span><br class=form>';
 				echo "<span class=form><label for=\"mfaverify\">Enter code from app:</label></span> <input class=form id=mfaverify name=mfaverify size=8> <br class=form>\n";
-				echo '</div>'; 
+				echo '</div>';
 			} else {
 				echo '<span class=form><label for="delmfa">2-factor Authentication</label></span>';
 				echo '<span class="formright">2-factor authentication is currently enabled.  <input type="checkbox" name="delmfa" id="delmfa" /> '._('Disable').'</span><br class="form" />';
 			}
-				
+
 		}
 		echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email value=\"".Sanitize::emailAddress($line['email'])."\"><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";

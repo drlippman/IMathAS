@@ -72,7 +72,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
       }
     }
 		$_SESSION['choicemap'][$qn] = $randkeys;
-		if (isset($GLOBALS['capturechoices'])) {
+    if (isset($GLOBALS['capturechoices'])) {
+      $GLOBALS['choicesdata'][$qn] = $questions;
+    }
+		if (isset($GLOBALS['capturechoiceslivepoll'])) {
       $params['livepoll_choices'] = $questions;
       $params['livepoll_ans'] = $answers;
       $params['livepoll_randkeys'] = $randkeys;

@@ -294,6 +294,7 @@ private function importCourseOpt() {
 	$exarr = array();
 	if (!isset($CFG['CPS'])) { $CFG['CPS'] = array();}
 	foreach ($db_fields['course'] as $field) {
+		if ($field == 'ver') { continue; } // don't want to overwrite course ver in import
 		//check if in export, and if CFG allows setting
 		if (isset($this->data['course'][$field]) && (!isset($CFG['CPS'][$field]) || $CFG['CPS'][$field][1]!=0)) {
 			$sets[] = $field.'=?';
@@ -733,6 +734,9 @@ private function insertAssessment() {
 	$this->typemap['Assessment'] = array();
 	$exarr = array();
 	$db_fields['assessment'] = array_values(array_intersect(explode(',', $db_fields['assessment']), array_keys($this->data['items'][$this->toimportbytype['Assessment'][0]]['data'])));
+	if (!in_array('ver', $db_fields['assessment'])) {
+		$db_fields['assessment'][] = 'ver';
+	}
 	$contentlen = 0;
 	$tomap = array();
 	$defaults = array();
@@ -794,6 +798,7 @@ private function insertAssessment() {
 			$thisitemdata = migrateAssessSettings($thisitemdata, $thisitemdata['ver'], $GLOBALS['courseUIver']);
 			$defaults[$toimport] = $thisitemdata;
 		}
+
 		$contentlen += strlen($thisitemdata['intro']);
 		$exarr[] = $this->cid;
 		foreach ($db_fields['assessment'] as $field) {
@@ -843,6 +848,9 @@ private function insertAssessment() {
 				$qpoints[$qid] = $this->data['questions'][$qid]['points'];
 			}
 			// adjust settings if needed
+			if (!isset($this->data['items'][$toimport]['data']['ver'])) {
+				$this->data['items'][$toimport]['data']['ver'] = 1;
+			}
 			if ($this->data['items'][$toimport]['data']['ver'] < $GLOBALS['courseUIver']) {
 				$this->data['questions'][$qid] = migrateQuestionSettings(
 					$this->data['questions'][$qid],

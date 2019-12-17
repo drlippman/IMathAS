@@ -415,7 +415,36 @@ var myMQeditor = (function($) {
     var baselayout = [];
     if (layoutstyle === 'OSK') {
       baselayout = $.extend(true, [], mobileLayout3);
-      if (calcformat.match(/(fraction|mixednumber|fracordec)/) && qtype != 'numfunc') {
+      if (calcformat.match(/\bdecimal/) && qtype != 'numfunc') {
+        baselayout.tabs[0].tabcontent[0].s = 1;
+        baselayout.tabs[0].tabcontent[0].contents = [
+          {l:'\\infty'},
+          {p:'DNE', 'sm':2},
+        ];
+        baselayout.tabs[0].tabcontent[2] = {
+          flow:'row',
+          s:4,
+          contents: [
+            {b:'7'},
+            {b:'8'},
+            {b:'9'},
+            {s:1},
+            {b:'4'},
+            {b:'5'},
+            {b:'6'},
+            {s:1},
+            {b:'1'},
+            {b:'2'},
+            {b:'3'},
+            {b:'-'},
+            {b:'0'},
+            {'b':'.'},
+            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
+              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
+          ]
+        };
+      } else if (calcformat.match(/(fraction|mixednumber|fracordec)/) && qtype != 'numfunc') {
         baselayout.tabs[0].tabcontent[0].s = 1;
         baselayout.tabs[0].tabcontent[0].contents = [
           {l:'\\frac{n}{}', c:'t', w:'/'},
@@ -478,7 +507,15 @@ var myMQeditor = (function($) {
       }
     } else {
       baselayout = $.extend(true, [], underLayout3);
-      if (calcformat.match(/(fraction|mixednumber|fracordec)/)) {
+      if (calcformat.match(/\bdecimal/)) {
+        baselayout.tabs[0].tabcontent[0].s = 3;
+        baselayout.tabs[0].tabcontent[0].contents = [
+          {l:'\\infty'},
+          {p:'DNE', 'sm':2},
+          ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
+            calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
+        ];
+      } else if (calcformat.match(/(fraction|mixednumber|fracordec)/)) {
         baselayout.tabs[0].tabcontent[0].s = 4;
         baselayout.tabs[0].tabcontent[0].contents = [
           {l:'\\frac{n}{}', c:'t', w:'/'},
@@ -496,13 +533,13 @@ var myMQeditor = (function($) {
       }
     }
     // for both
-    if (!calcformat.match(/(fraction|mixednumber|fracordec)/)) {
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
       }
     }
-    if (qtype=='calcinterval') {
+    if (qtype.match(/interval/)) {
       if (calcformat.match(/inequality/)) {
         baselayout.tabs[3].enabled = true;
       } else {

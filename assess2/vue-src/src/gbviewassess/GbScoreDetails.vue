@@ -47,7 +47,7 @@
         v-if="canedit && !isPractice && showfeedback === false"
         type="button"
         class="slim"
-        @click="showfeedback = true"
+        @click="revealFeedback"
       >
         {{ $t('gradebook.add_feedback') }}
       </button>
@@ -63,16 +63,16 @@
         rows="2"
         cols="60"
         :value = "qdata.feedback"
+        ref = "fbbox"
         @input="updateFeedback"
       ></textarea>
-      <div
+      <tinymce-input
         v-else-if="canedit"
-        rows="2"
         :id="'fb'+qn"
-        class="fbbox"
-        v-html="qdata.feedback"
-        @input="updateFeedback"
-      />
+        :value = "qdata.feedback"
+        ref = "fbbox"
+        @input = "updateFeedback"
+      ></tinymce-input>
       <div
         v-else
         v-html="qdata.feedback"
@@ -104,6 +104,7 @@
     <gb-all-tries
       v-if="showAllTries"
       :tries="qdata.other_tries"
+      :qn="qn"
     />
     <gb-penalties
       v-if="showPenalties"
@@ -127,6 +128,7 @@ import GbAllTries from '@/gbviewassess/GbAllTries';
 import GbPenalties from '@/gbviewassess/GbPenalties';
 import Icons from '@/components/widgets/Icons';
 import MenuButton from '@/components/widgets/MenuButton';
+import TinymceInput from '@/components/TinymceInput.vue';
 
 export default {
   name: 'GbScoreDetails',
@@ -135,7 +137,8 @@ export default {
     GbAllTries,
     GbPenalties,
     MenuButton,
-    Icons
+    Icons,
+    TinymceInput
   },
   data: function () {
     return {
@@ -351,6 +354,10 @@ export default {
         this.qn,
         600
       );
+    },
+    revealFeedback () {
+      this.showfeedback = true;
+      this.$nextTick(() => this.$refs.fbbox.focus());
     }
   },
   mounted () {

@@ -156,6 +156,7 @@ function getDrillDD($i, $typeid, $parent, $itemid) {
 	$out .= " <li><a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" . _('Delete') . "</a></li>";
 	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" . _('Copy') . "</a></li>";
 	$out .= " <li><a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">" . _('Scores') . '</a></li>';
+	$out .= " <li><a href=\"contentstats.php?cid=$cid&type=D&id=$typeid\">" . _('Stats') . '</a></li>';
 	$out .= '</ul>';
 	$out .= '</div>';
 	return $out;

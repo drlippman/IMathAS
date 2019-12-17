@@ -5,6 +5,7 @@
     </label>
     <input
       :value="value"
+      id="assmpass"
       type="password"
       autocomplete="off"
       @input="handleInput"

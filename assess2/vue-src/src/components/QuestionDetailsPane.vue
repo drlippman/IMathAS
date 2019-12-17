@@ -69,7 +69,8 @@ export default {
       return (this.qinfo.hasOwnProperty('parts') &&
         this.qinfo.parts.length > 1 &&
         this.qinfo.withdrawn === 0 &&
-        this.qinfo.parts[0].hasOwnProperty('points_possible')
+        this.qinfo.parts[0].hasOwnProperty('points_possible') &&
+        !this.qinfo.singlescore
       );
     },
     hasOnePartPenalties () {

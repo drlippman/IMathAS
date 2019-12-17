@@ -956,7 +956,13 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 
   dx = (dx==null?xunitlength:dx*xunitlength);
   dy = (dy==null?dx:dy*yunitlength);
-  fontsize = Math.floor(Math.min(Math.abs(dx)/1.5, Math.abs(dy)/1.5,16));//alert(fontsize)
+  if (!dox) {
+    fontsize = Math.floor(Math.min(Math.abs(dy)/1.5, 16));//alert(fontsize)
+  } else if (!doy) {
+    fontsize = Math.floor(Math.min(Math.abs(dx)/1.5, 16));//alert(fontsize)
+  } else {
+    fontsize = Math.floor(Math.min(Math.abs(dx)/1.5, Math.abs(dy)/1.5,16));//alert(fontsize)
+  }
   ticklength = fontsize/4;
   if (xgrid!=null) gdx = xgrid;
   if (ygrid!=null) gdy = ygrid;

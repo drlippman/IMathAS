@@ -132,7 +132,6 @@ class ScoreEngine
               . $t->getMessage());
         }
 
-
         /*
 		 * Correct mistakes made by question writers.
 		 */
@@ -237,6 +236,13 @@ class ScoreEngine
             $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $quesData);
             if ($quesData['qtype'] == "conditional") {
               // Store just-build $stuanswers as lastanswer for conditional
+              // in case there was no POST (like multans checkbox), null out
+              // stuanswers
+              for ($iidx=0;$iidx<count($anstypes);$iidx++) {
+                if (!isset($stuanswers[$thisq][$iidx])) {
+                  $stuanswers[$thisq][$iidx] = null;
+                }
+              }
               $scoreResult['lastAnswerAsGiven'] = $stuanswers[$thisq];
               $scoreResult['lastAnswerAsNumber'] = $stuanswersval[$thisq];
             }

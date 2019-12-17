@@ -86,7 +86,7 @@ function init(paramarr, enableMQ) {
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
-    if (params.helper && params.qtype.match(/^(calc|numfunc|string)/)) { //want mathquill
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
       str = params.qtype;
       if (params.calcformat) {
@@ -780,6 +780,7 @@ function processByType(qn) {
       case 'calculated':
         res = processCalculated(str, params.calcformat);
         break;
+      case 'interval':
       case 'calcinterval':
         res = processCalcInterval(str, params.calcformat, params.vars);
         break;
@@ -812,7 +813,7 @@ function processByType(qn) {
  */
 function preformat(qn, text, qtype, calcformat) {
   text = normalizemathunicode(text);
-  if (qtype == 'calcinterval') {
+  if (qtype.match(/interval/)) {
     if (!calcformat.match(/inequality/)) {
       text = text.replace(/U/g,"uu");
     } else {
@@ -997,9 +998,10 @@ function processCalcInterval(fullstr, format, ineqvar) {
     }
     fullstr = conv[0];
   }
-  var strarr = [], submitstrarr = []; dispstrarr = [];
+  var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
+    joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {
       if (fullstr.charAt(pos)==',') {
@@ -1063,13 +1065,13 @@ function processCalcInterval(fullstr, format, ineqvar) {
     return {
       err: err,
       dispvalstr: dispstrarr.join(' "or" '),
-      submitstr:  submitstrarr.join('U')
+      submitstr:  submitstrarr.join(joinchar)
     };
   } else {
     return {
       err: err,
       dispvalstr: submitstrarr.join(' uu '),
-      submitstr: submitstrarr.join('U')
+      submitstr: submitstrarr.join(joinchar)
     };
   }
 }

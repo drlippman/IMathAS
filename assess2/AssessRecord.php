@@ -608,6 +608,7 @@ class AssessRecord
       $data[$qn]['timeactive'] = $timeactive;
     }
     $tosave = array();
+
     $qref = ($qn+1)*1000 + $pn;
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
@@ -615,11 +616,15 @@ class AssessRecord
           $data[$qn]['post'][$key] = $val;
           $thisref = $match[2];
           $subref = $match[3];
+        } else {
+          continue;
         }
       } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b(-\d+)?/', $key, $match)) {
         $data[$qn]['post'][$key] = $val;
         $thisref = $qref;
         $subref = $match[2];
+      } else {
+        continue;
       }
       if (isset($data[$qn]['post'][$key]) && ($subref == '' || $subref == '-0')) {
         if ($subref == '-0') { // matrix or matching
@@ -1177,12 +1182,15 @@ class AssessRecord
       for ($pn = 0; $pn < count($answeights); $pn++) {
         // get part details
         $parttry = isset($curq['tries'][$pn]) ? count($curq['tries'][$pn]) : 0;
-        $try = min($try, $parttry);
-        if ($parttry === 0) {
+        if ($answeights[$pn] > 0) {
+          // overall try is minimum of all individual part tries that have weight
+          $try = min($try, $parttry);
+        }
+        if ($parttry === 0 && $answeights[$pn] > 0) {
           // if any parts are unattempted, mark question as such
           $status = 'unattempted';
         }
-        if ($include_scores) {
+        if ($include_scores && $answeights[$pn] > 0) {
           if ($status != 'unattempted') {
             if ($parts[$pn]['rawscore'] > .99) {
               $status = ($status === 'incorrect' || $status === 'partial') ? 'partial': 'correct';
@@ -1220,6 +1228,7 @@ class AssessRecord
     }
 
     $out['seed'] = $curq['seed'];
+    $out['singlescore'] = !empty($curq['singlescore']);
 
     if ($generate_html) {
       $showscores = $this->assess_info->getSetting('showscores');
@@ -1478,24 +1487,14 @@ class AssessRecord
         $partscores[$pn] = round($overrides[$pn] * $qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3);
       }
 
-      if ($is_singlescore) {
-        $parts[$pn] = array(
-          'try' => count($qver['tries'][$pn]),
-          'rawscore' => round($partrawscores[$pn],4)
-        );
-        if ($pn==0) {
-          $parts[$pn]['penalties'] = $partpenalty;
-        }
-      } else {
-        $parts[$pn] = array(
-          'try' => count($qver['tries'][$pn]),
-          'score' => round($partscores[$pn],3),
-          'rawscore' => round($partrawscores[$pn],4),
-          'penalties' => $partpenalty,
-          'req_manual' => $partReqManual,
-          'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
-        );
-      }
+      $parts[$pn] = array(
+        'try' => count($qver['tries'][$pn]),
+        'score' => round($partscores[$pn],3),
+        'rawscore' => round($partrawscores[$pn],4),
+        'penalties' => $partpenalty,
+        'req_manual' => $partReqManual,
+        'points_possible' => round($qsettings['points_possible'] * $answeights[$pn]/$answeightTot,3)
+      );
     }
 
     $qScore = array_sum($partscores);
@@ -1762,7 +1761,8 @@ class AssessRecord
       }
     }
 
-    $singlescore = (count($partla) > 1 && count($scores) == 1);
+    $singlescore = ((count($partla) > 1 || count($answeights) > 1) && count($scores) == 1);
+
     $this->recordTry($qn, $data, $singlescore);
 
     return $scoreResult['errors'];
@@ -1791,21 +1791,21 @@ class AssessRecord
       }
       $stuansparts = array();
       $stuansvalparts = array();
-      if (!isset($curq['answeights'])) {
+      if (!isset($curq['answeights']) || count($curq['tries'])==0) {
         // question hasn't been displayed yet
         $stuanswers[$qn+1] = null;
         $stuanswersval[$qn+1] = null;
         continue;
       }
       // Conditional doesn't use answeights, so also need to look at tries
-      $numParts = max(count($curq['answeights']), count($curq['tries']));
+      $numParts = max(count($curq['answeights']), max(array_keys($curq['tries']))+1);
       for ($pn = 0; $pn < $numParts; $pn++) {
         if (!isset($curq['tries'][$pn])) {
           $stuansparts[$pn] = null;
           $stuansvalparts[$pn] = null;
         } else {
           $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
-          $stuansparts[$pn] = $lasttry['stuans'];
+          $stuansparts[$pn] = ($lasttry['stuans'] === '') ? null : $lasttry['stuans'];
           $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
         }
       }
@@ -1848,7 +1848,7 @@ class AssessRecord
       }
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
-      for ($pn = 0; $pn < count($curq['tries']); $pn++) {
+      foreach ($curq['tries'] as $pn => $v) {
         $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
         $scorenonzeroparts[$pn] = $lasttry['raw'] > 0;
         $scoreiscorrectparts[$pn] = $lasttry['raw'] > .99;
@@ -2025,9 +2025,9 @@ class AssessRecord
     if (!$this->is_practice) {
       if (isset($this->data['scoreoverride'])) {
         $this->assessRecord['score'] = $this->data['scoreoverride'];
-      } else if ($keepscore === 'average') {
+      } else if ($keepscore === 'average' && count($allAssessVerScores) > 0) {
         $this->assessRecord['score'] = round(array_sum($allAssessVerScores)/count($allAssessVerScores),1);
-      } else { // best, last, or by_question
+      } else if (count($allAssessVerScores) > 0) { // best, last, or by_question
         $this->assessRecord['score'] = round($allAssessVerScores[$this->data['scored_version']], 1);
       }
       $this->assessRecord['timeontask'] = $totalTime;
@@ -2158,6 +2158,10 @@ class AssessRecord
       // keep latest assessment version
       $cntVer = count($this->data['assess_versions']);
       $latestAver = $this->data['assess_versions'][$cntVer-1];
+      if ($latestAver['status'] == 1) {
+        // had status "submitted" - reset to active
+        $latestAver['status'] = 0;
+      }
       $this->data['assess_versions'] = array($latestAver);
       $this->data['scored_version'] = 0;
     } else if ($newFormat == 'by_assessment') {
@@ -2518,6 +2522,10 @@ class AssessRecord
     if ($dispqn !== null) {
       $this->dispqn = $dispqn;
     }
+    $GLOBALS['choicesdata'] = array();
+    $GLOBALS['drawinitdata'] = array();
+    $GLOBALS['capturechoices'] = true;
+    $GLOBALS['capturedrawinit'] = true;
     $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver);
     $this->dispqn = null;
     if ($generate_html) { // only include this if we're displaying the question
@@ -2530,7 +2538,7 @@ class AssessRecord
       }
       $out['timeactive'] = $this->calcTimeActive($qdata);
       $out['feedback'] = $qdata['feedback'];
-      $out['other_tries'] = $this->getPreviousTries($qdata['tries']);
+      $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $qn, $out);
     }
     return $out;
   }
@@ -2876,14 +2884,51 @@ class AssessRecord
    * Collect the previous tries, organized by part number
    *
    * @param  array $trydata  Data from a question version 'tries' array
+   * @param  int $qn   Question number
+   * @param  array $qout   Data generated from question object generation
    * @return array
    */
-  private function getPreviousTries($trydata) {
+  private function getPreviousTries($trydata, $qn, $qout) {
     $out = array();
     for ($pn = 0; $pn < count($trydata); $pn++) {
       $out[$pn] = array();
+      if ($pn == 0 && isset($qout['jsparams'][$qn])) {
+        $partref = $qn;
+        $qtype = $qout['jsparams'][$qn]['qtype'];
+      } else if (isset($qout['jsparams'][($qn+1)*1000 + $pn])) {
+        $partref = ($qn+1)*1000 + $pn;
+        $qtype = $qout['jsparams'][$partref]['qtype'];
+      } else {
+        $qtype = '';
+      }
       for ($tn = 0; $tn < count($trydata[$pn]); $tn++) {
-        $out[$pn][] = $trydata[$pn][$tn]['stuans'];
+        if ($qtype == 'choices') {
+          $out[$pn][] = $GLOBALS['choicesdata'][$partref][$trydata[$pn][$tn]['stuans']];
+        } else if ($qtype == 'multans') {
+          $pts = explode('|',$trydata[$pn][$tn]['stuans']);
+          $outstr = '';
+          foreach ($pts as $ptval) {
+            $outstr .= $GLOBALS['choicesdata'][$partref][$ptval].'<br/>';
+          }
+          $out[$pn][] = $outstr;
+        } else if ($qtype == 'matching') {
+          $pts = explode('|',$trydata[$pn][$tn]['stuans']);
+          $qrefarr = array_flip($GLOBALS['choicesdata'][$partref][0]);
+          $outptarr = array();
+          foreach ($pts as $k=>$ptval) {
+            $outptarr[$qrefarr[$k]] = $GLOBALS['choicesdata'][$partref][1][$ptval];
+          }
+          ksort($outptarr);
+          $out[$pn][] = implode('<br/>',$outptarr);
+        } else if ($qtype == 'draw') {
+          $out[$pn][] = array(
+            'draw',
+            $trydata[$pn][$tn]['stuans'],
+            $GLOBALS['drawinitdata'][$partref]
+          );
+        } else {
+          $out[$pn][] = Sanitize::encodeStringForDisplay($trydata[$pn][$tn]['stuans']);
+        }
       }
     }
     return $out;

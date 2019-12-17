@@ -435,6 +435,7 @@
 		}
 		$sp = explode(';', $line['bestscores']);
 		$scores = explode(",",$sp[0]);
+		if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
 		$attempts = explode(",",$line['bestattempts']);
 		if ($ver=='graded') {
 			$seeds = explode(",",$line['bestseeds']);
@@ -515,7 +516,17 @@
 			} else {
 				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
 			}
-			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
+			if (isset($rawscores[$loc])) {
+				//$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+				if (strpos($rawscores[$loc],'~')!==false) {
+					$colors = explode('~',$rawscores[$loc]);
+				} else {
+					$colors = array($rawscores[$loc]);
+				}
+			} else {
+				$colors = array();
+			}
+			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc],false,false,false,$colors);
 
 
 			echo "<div class=review>";
@@ -742,12 +753,12 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
 	} else {
-		$p=strrpos($code,'answeights');
+		$p=strrpos($code,'anstypes');
 		$np = strpos($code,"\n",$p);
 		if ($np !== false) {
 			$code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
 		} else {
-			$code .= ';if(isset($answeights)){return;};';
+			$code .= ';if(isset($anstypes)){return;};';
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}

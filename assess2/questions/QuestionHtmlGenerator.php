@@ -140,11 +140,11 @@ class QuestionHtmlGenerator
             $GLOBALS['assess2-curq-iscorrect'] = $scoreiscorrect[$thisq-1] ? 1 : 0;
           } else {
             $GLOBALS['assess2-curq-iscorrect'] = array();
-            foreach ($partattemptn as $k=>$v) {
-              if ($v==0) {
-                $GLOBALS['assess2-curq-iscorrect'][$k] = -1;
+            foreach ($partattemptn as $kidx=>$iidx) {
+              if ($iidx==0) {
+                $GLOBALS['assess2-curq-iscorrect'][$kidx] = -1;
               } else {
-                $GLOBALS['assess2-curq-iscorrect'][$k] = $scoreiscorrect[$thisq-1][$k] ? 1 : 0;
+                $GLOBALS['assess2-curq-iscorrect'][$kidx] = $scoreiscorrect[$thisq-1][$kidx] ? 1 : 0;
               }
             }
           }
@@ -152,8 +152,8 @@ class QuestionHtmlGenerator
 
         if ($quesData['hasimg'] > 0) {
             // We need to "unpack" this into locally scoped variables.
-            foreach ($this->getImagesAsHtml() as $k => $v) {
-                ${$k} = $v;
+            foreach ($this->getImagesAsHtml() as $kidx => $iidx) {
+                ${$kidx} = $iidx;
             }
         }
 
@@ -209,6 +209,12 @@ class QuestionHtmlGenerator
             $anstypes = array_map('trim', $anstypes);
         }
 
+        if ($quesData['qtype'] == 'conditional') {
+            if (!isset($showanswer)) {
+                $showanswer = _('Answers may vary');
+            }
+        }
+
         /*
          * Package local variables for the answer box generator.
          */
@@ -251,23 +257,23 @@ class QuestionHtmlGenerator
             }
 
             // Calculate answer weights.
+            // $answeights - question writer defined
             if ($quesData['qtype'] == "multipart") {
-                // $answeights - question writer defined
-                if (isset($answeights)) {
-          				if (!is_array($answeights)) {
-          					$answeights = explode(",",$answeights);
-          				}
-          				$answeights = array_map('trim', $answeights);
-          				if (count($answeights) != count($anstypes)) {
-          					$answeights = array_fill(0, count($anstypes), 1);
-          				}
-          			} else {
-          				if (count($anstypes)>1) {
-          					$answeights = array_fill(0, count($anstypes), 1);
-          				} else {
-          					$answeights = array(1);
-          				}
-          			}
+              if (isset($answeights)) {
+        				if (!is_array($answeights)) {
+        					$answeights = explode(",",$answeights);
+        				}
+        				$answeights = array_map('trim', $answeights);
+        				if (count($answeights) != count($anstypes)) {
+        					$answeights = array_fill(0, count($anstypes), 1);
+        				}
+        			} else {
+        				if (count($anstypes)>1) {
+        					$answeights = array_fill(0, count($anstypes), 1);
+        				} else {
+        					$answeights = array(1);
+        				}
+        			}
             }
 
             // Get the answers to all parts of this question.
@@ -410,9 +416,6 @@ class QuestionHtmlGenerator
                     $toevalqtxt = sprintf('<div class=\\"%s\\">%s</div>',
                         $questionColor, $toevalqtxt);
                 }
-            }
-            if (!isset($showanswer)) {
-                $showanswer = _('Answers may vary');
             }
         }
 
@@ -891,7 +894,10 @@ class QuestionHtmlGenerator
                 }
                 for ($i = 0; $i < count($extref); $i++) {
                     $extrefpt = explode('!!', $extref[$i]);
-                    if ($extrefpt[0] == 'video' || strpos($extrefpt[1], 'youtube.com/watch') !== false) {
+                    if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
+            					strpos($extrefpt[1],'youtu.be.com/')!==false ||
+            					strpos($extrefpt[1],'vimeo.com/')!==false
+            				) {
                         $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
                         $externalReferences[] = [
                           'label' => $extrefpt[0],

@@ -1008,7 +1008,13 @@ function initFileAlt(el) {
 			var fileName = '';
 			fileName = e.target.value.split(/(\\|\/)/g).pop();
 			if (fileName) {
-				label.html(fileName);
+				var maxFileSize = 10000*1024; // 10MB
+        if (this.files[0].size > maxFileSize) {
+          alert(_('This file is too large - maximum size is 10MB'));
+          $(this).val('');
+        } else {
+					label.html(fileName);
+				}
 			}
 		});
 }

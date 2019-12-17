@@ -35,6 +35,15 @@
         </span>
       </div>
 
+      <div v-if="aData.latepass_blocked_by_practice">
+        {{ $t('gradebook.latepass_blocked_practice') }}
+        <button
+          type="button"
+          @click="clearLPblock"
+        >
+          {{ $t('gradebook.clear_latepass_block' )}}
+        </button>
+      </div>
       <div>
         <strong>
           {{ $t('gradebook.gb_score') }}:
@@ -79,7 +88,7 @@
         </button>
       </div>
 
-      <div v-if="canEdit">
+      <div v-if="canEdit && aData.has_active_attempt">
         <a :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
         </a> |
@@ -207,14 +216,12 @@
             :value = "assessFeedback"
             @input="updateFeedback"
           ></textarea>
-          <div
+          <tinymce-input
             v-else-if="canEdit"
-            rows="2"
-            class="fbbox"
             id="genfbbox"
-            v-html="assessFeedback"
-            @input="updateFeedback"
-          />
+            :value = "assessFeedback"
+            @input = "updateFeedback"
+          ></tinymce-input>
           <div
             v-else
             v-html="assessFeedback"
@@ -281,6 +288,7 @@ import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
+import TinymceInput from '@/components/TinymceInput.vue';
 import '../assess2.css';
 
 export default {
@@ -290,7 +298,9 @@ export default {
     GbQuestionSelect,
     GbScoreDetails,
     GbClearAttempts,
-    SummaryCategories
+    SummaryCategories,
+    ErrorDialog,
+    TinymceInput
   },
   data: function () {
     return {
@@ -525,6 +535,9 @@ export default {
     clearAttempts (type) {
       store.clearAttempts.type = type;
       store.clearAttempts.show = true;
+    },
+    clearLPblock () {
+      actions.clearLPblock();
     },
     submitVersion () {
       actions.endAssess();

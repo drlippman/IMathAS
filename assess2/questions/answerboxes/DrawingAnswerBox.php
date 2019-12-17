@@ -194,7 +194,7 @@ class DrawingAnswerBox implements AnswerBox
     			$sclinglbl = "$xlbl:$ylbl";
     			$sclinggrid = "$xgrid:$ygrid";
     		}
-    		if ($snaptogrid>0) {
+    		if ($snaptogrid !== 0) {
     			list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
     			if (abs($newwidth - $settings[6])/$settings[6]<.1) {
     				$settings[6] = $newwidth;
@@ -219,10 +219,10 @@ class DrawingAnswerBox implements AnswerBox
     		} else {
     			$plot = showplot($backg,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     		}
-    		if (is_array($settings[4]) && count($settings[4]>2)) {
+    		if (is_array($settings[4]) && count($settings[4])>2) {
     			$plot = addlabel($plot,$settings[1],0,$settings[4][2],"black","aboveleft");
     		}
-    		if (is_array($settings[5]) && count($settings[5]>2)) {
+    		if (is_array($settings[5]) && count($settings[5])>2) {
     			$plot = addlabel($plot,0,$settings[3],$settings[5][2],"black","belowright");
     		}
     		if (isset($grid) && (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false)) {
@@ -469,8 +469,6 @@ class DrawingAnswerBox implements AnswerBox
     			$la = str_replace(',,' , ',' , $la);
     			$la = str_replace(';,' , ';' , $la);
 
-    			if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
-
     			$attributes = [
     				'type' => 'hidden',
     				'name' => "qn$qn",
@@ -485,6 +483,7 @@ class DrawingAnswerBox implements AnswerBox
     							'" />';
 
     			if (isset($GLOBALS['capturedrawinit'])) {
+            $GLOBALS['drawinitdata'][$qn] = [$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
     				$params['livepoll_drawinit'] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
     			}
     		}

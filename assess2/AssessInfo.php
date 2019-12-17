@@ -161,6 +161,27 @@ class AssessInfo
   }
 
   /**
+   * Determine whether latepass use is being blocked by practice mode access
+   * Also sets assessData['latepass_blocked_by_practice']
+   * @return boolean
+   */
+  public function getLatePassBlockedByView() {
+    if ($this->assessData['hasexception']) {
+      list($useexception,$LPblocked) =
+        $this->exceptionfunc->getCanUseAssessException(
+          $this->exception,
+          $this->assessData,
+          false,
+          true
+        );
+    } else {
+      $LPblocked = $this->exceptionfunc->getLatePassBlockedByView($this->assessData,0);
+    }
+    $this->assessData['latepass_blocked_by_practice'] = $LPblocked;
+    return $this->assessData['latepass_blocked_by_practice'];
+  }
+
+  /**
    * Look up whether prereq has been waived
    * @return boolean true if prereq is waived
    */
@@ -698,7 +719,9 @@ class AssessInfo
    * @return void
    */
   public function overridePracticeSettings() {
-    $this->assessData['displaymethod'] = 'skip';
+    if ($this->assessData['displaymethod'] != 'video_cued') {
+      $this->assessData['displaymethod'] = 'skip';
+    }
     $this->assessData['submitby'] = 'by_question';
     $this->assessData['showscores'] = 'during';
     $this->assessData['showans'] = 'with_score';

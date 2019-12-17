@@ -109,18 +109,22 @@ class IntervalAnswerBox implements AnswerBox
     		];
     		$params['tip'] = $shorttip;
         $params['longtip'] = $tip;
+        $params['calcformat'] = 'decimal';
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}
     		if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
     			$classes[] = 'hidden';
     			$params['format'] = 'normslider';
+          $params['helper'] = 0;
     		}
 
     		$out .= '<input ' .
     						Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';
+                
+        $preview .= "<span id=p$qn></span> ";
 
     		if (in_array('nosoln',$ansformats))  {
     			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, 'interval');

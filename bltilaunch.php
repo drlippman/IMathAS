@@ -1240,9 +1240,9 @@ if ($stm->rowCount()==0) {
 					$sourceitemid = $stm->fetchColumn(0);
 					$cid = $destcid;
 
-					$stm = $DBH->prepare("SELECT itemorder,dates_by_lti FROM imas_courses WHERE id=:id");
+					$stm = $DBH->prepare("SELECT itemorder,dates_by_lti,UIver FROM imas_courses WHERE id=:id");
 					$stm->execute(array(':id'=>$cid));
-					list($items,$datesbylti) = $stm->fetch(PDO::FETCH_NUM);
+					list($items,$datesbylti,$convertAssessVer) = $stm->fetch(PDO::FETCH_NUM);
 					$items = unserialize($items);
 					$newitem = copyitem($sourceitemid,array());
 					$stm = $DBH->prepare("SELECT typeid FROM imas_items WHERE id=:id");
@@ -2429,19 +2429,23 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 					} else {
 						// no assessment with same title - need to copy assessment from destination to source course
 						require_once("includes/copyiteminc.php");
+						$cid = $destcid;
+						$stm = $DBH->prepare("SELECT itemorder,dates_by_lti,UIver FROM imas_courses WHERE id=:id");
+						$stm->execute(array(':id'=>$cid));
+						list($items,$datesbylti,$convertAssessVer) = $stm->fetch(PDO::FETCH_NUM);
+						$items = unserialize($items);
+
 						$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid=:typeid");
 						$stm->execute(array(':typeid'=>$_SESSION['place_aid'][1]));
 						if ($stm->rowCount()==0) {
 							reporterror("Error.  Assessment ID '{$_SESSION['place_aid'][1]}' not found.");
 						}
-						$cid = $destcid;
+						
 						$newitem = copyitem($stm->fetchColumn(0),array());
 						$stm = $DBH->prepare("SELECT typeid FROM imas_items WHERE id=:id");
 						$stm->execute(array(':id'=>$newitem));
 						$aid = $stm->fetchColumn(0);
-						$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-						$stm->execute(array(':id'=>$cid));
-						$items = unserialize($stm->fetchColumn(0));
+
 						$items[] = $newitem;
 						$items = serialize($items);
 						$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");

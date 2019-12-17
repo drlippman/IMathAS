@@ -129,7 +129,7 @@ class AssessUtils
     foreach ($ips as $ip) {
       $ip = explode('.', $ip);
       $thisIPok = true;
-      for ($i=0;$i<3;$i++) {
+      for ($i=0;$i<4;$i++) {
         $pts = explode('-', $ip[$i]);
         if (count($pts) == 2 && $userip[$i] >= $pts[0] && $userip[$i] <= $pts[0]) {
           continue;
