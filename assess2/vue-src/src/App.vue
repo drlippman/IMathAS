@@ -11,17 +11,20 @@
       :errormsg="errorMsg"
       @clearerror="clearError"
     />
+    <confirm-dialog  v-if="showConfirm"/>
   </div>
 </template>
 
 <script>
 import { store, actions } from './basicstore';
 import ErrorDialog from '@/components/ErrorDialog.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import './assess2.css';
 
 export default {
   components: {
-    ErrorDialog
+    ErrorDialog,
+    ConfirmDialog
   },
   data: function () {
     return {
@@ -37,6 +40,9 @@ export default {
     },
     errorMsg () {
       return store.errorMsg;
+    },
+    showConfirm () {
+      return (store.confirmObj !== null);
     },
     assessName () {
       return store.assessInfo.name;
