@@ -236,10 +236,15 @@ export default {
         actions.startAssess(true, '', []);
       } else if (this.primaryAction === 'view_scored') {
         // view scored assess
-        if (this.settings.can_use_latepass === 0 ||
-          window.confirm(this.$t('closed.confirm'))
-        ) {
+        if (this.settings.can_use_latepass === 0) {
           window.location = store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
+        } else {
+          store.confirmObj = {
+            body: 'closed.confirm',
+            action: () => {
+              window.location = store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
+            }
+          };
         }
       } else if (this.primaryAction === 'exit') {
         // exit assessment
@@ -248,11 +253,15 @@ export default {
     },
     handleSecondary () {
       if (this.secondaryAction === 'practice' &&
-        (this.settings.can_use_latepass === 0 ||
-        window.confirm(this.$t('closed.confirm')))
+        this.settings.can_use_latepass === 0
       ) {
         // start practice mode
         actions.startAssess(true, '', []);
+      } else if (this.secondaryAction === 'practice') {
+        store.confirmObj = {
+          body: 'closed.confirm',
+          action: () => { actions.startAssess(true, '', []); }
+        };
       } else if (this.secondaryAction === 'exit') {
         // exit assessment
         window.location = window.exiturl;

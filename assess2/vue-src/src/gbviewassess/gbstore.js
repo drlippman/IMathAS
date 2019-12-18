@@ -12,6 +12,7 @@ export const store = Vue.observable({
   inTransit: false,
   saving: '',
   errorMsg: null,
+  confirmObj: null,
   curAver: 0,
   ispractice: false,
   curQver: [],

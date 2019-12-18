@@ -11,7 +11,11 @@
       :errormsg="errorMsg"
       @clearerror="clearError"
     />
-    <confirm-dialog  v-if="showConfirm"/>
+    <confirm-dialog
+      v-if="confirmObj !== null"
+      :data="confirmObj"
+      @close="closeConfirm"
+    />
   </div>
 </template>
 
@@ -41,8 +45,8 @@ export default {
     errorMsg () {
       return store.errorMsg;
     },
-    showConfirm () {
-      return (store.confirmObj !== null);
+    confirmObj () {
+      return store.confirmObj;
     },
     assessName () {
       return store.assessInfo.name;
@@ -66,7 +70,9 @@ export default {
           unanswered = false;
         }
       }
-      if (Object.keys(actions.getChangedQuestions()).length > 0) {
+      if (Object.keys(actions.getChangedQuestions()).length > 0 &&
+        !this.prewarned
+      ) {
         evt.preventDefault();
         this.prewarned = false;
         return this.$t('unload.unsubmitted_questions');
@@ -85,6 +91,9 @@ export default {
     },
     clearError () {
       store.errorMsg = null;
+    },
+    closeConfirm () {
+      store.confirmObj = null;
     }
   },
   created () {
@@ -96,12 +105,15 @@ export default {
     var self = this;
     window.$('a').not('#app a, a[href="#"]').on('click', function (e) {
       if (store.assessInfo.submitby === 'by_assessment' && store.assessInfo.has_active_attempt) {
-        if (!window.confirm(warning)) {
-          e.preventDefault();
-          return false;
-        } else {
-          self.prewarned = true;
-        }
+        e.preventDefault();
+        store.confirmObj = {
+          body: 'unload.unsubmitted_assessment',
+          action: () => {
+            self.prewarned = true;
+            window.location = e.target.href;
+          }
+        };
+        return false;
       }
     });
   }

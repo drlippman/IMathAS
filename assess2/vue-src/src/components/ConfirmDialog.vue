@@ -36,10 +36,10 @@
 <script>
 import Icons from '@/components/widgets/Icons.vue';
 import './a11y-dialog';
-import { store } from '../basicstore';
 
 export default {
   name: 'ConfirmDialog',
+  props: ['data'],
   data: function () {
     return {
       dialog: null
@@ -50,24 +50,27 @@ export default {
   },
   computed: {
     confirmBody () {
-      return this.$t(store.confirmObj.body);
+      return this.$t(this.data.body);
     },
     okMessage () {
-      return store.confirmObj.ok ? store.confirmObj.ok : this.$t('confirm.ok');
+      return this.$t(this.data.ok ? this.data.ok : 'confirm.ok');
     },
     cancelMessage () {
-      return store.confirmObj.cancel ? store.confirmObj.cancel : this.$t('confirm.cancel');
+      return this.$t(this.data.cancel ? this.data.cancel : 'confirm.cancel');
     }
   },
   methods: {
     doCancel () {
-      store.confirmObj = null;
+      if (typeof this.data.cancelaction === 'function') {
+        this.data.cancelaction();
+      }
+      this.$emit('close');
     },
     doOk () {
-      if (typeof store.confirmObj.action === 'function') {
-        store.confirmObj.action();
+      if (typeof this.data.action === 'function') {
+        this.data.action();
       }
-      store.confirmObj = null;
+      this.$emit('close');
     }
   },
   mounted () {
