@@ -42,6 +42,13 @@
     "teacher_preview": "This assessment is closed to students, but you can preview it.",
     "teacher_preview_button": "Preview Assessment"
   },
+  "duedialog": {
+    "due": "Due Date Reached",
+    "nowdue": "This assessment is due now.",
+    "byq_unsubmitted": "You have work that has not yet been submitted for grading.",
+    "bya_unsubmitted": "This assessment attempt has not been submitted for grading.",
+    "submitnow": "Submit for grading"
+  },
   "setlist": {
     "practice": "This assessment is in un-graded practice mode.",
     "points_possible": "{pts} points possible.",
@@ -65,7 +72,9 @@
     "time_grace_expires": "Your current assessment time limit expired at {date}. The grace period ends {grace}.",
     "timelimit": "Time limit: {time}.",
     "timelimit_wgrace": "Time limit: {time}, with a grace period of {grace} subject to a {penalty}% penalty.",
-    "timelimit_extend": "Extended from the original {time}."
+    "timelimit_extend": "Extended from the original {time}.",
+    "timelimit_restricted": "Because of the upcoming due date, your time limit will expire at the due date, {due}.",
+    "timelimit_wgrace_restricted": "Time limit: {time}, with a grace period subject to a {penalty}% penalty which expires at the due date, {due}."
   },
   "group": {
     "isgroup": "This is a group assessment.",
