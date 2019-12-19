@@ -62,7 +62,9 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 
 // reject if no lti_sourcedid and we expect it
 if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
-  empty($sessiondata['lti_lis_result_sourcedid'.$aid])
+  (empty($sessiondata['lti_lis_result_sourcedid'.$aid]) ||
+   empty($sessiondata['lti_outcomeurl'])
+  )
 ) {
   echo '{"error": "need_relaunch"}';
   exit;
@@ -216,7 +218,9 @@ if ($isRealStudent) {
 }
 
 // update lti_sourcedid if needed
-if (!empty($sessiondata['lti_lis_result_sourcedid'.$aid])) {
+if (!empty($sessiondata['lti_lis_result_sourcedid'.$aid]) &&
+  !empty($sessiondata['lti_outcomeurl'])
+) {
   $altltisourcedid = $sessiondata['lti_lis_result_sourcedid'.$aid].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
   $assess_record->updateLTIsourcedId($altltisourcedid);
 }
