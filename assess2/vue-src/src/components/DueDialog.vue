@@ -70,9 +70,6 @@ export default {
     settings () {
       return store.assessInfo;
     },
-    latepassUrl () {
-      return store.APIbase + '../course/redeemlatepass.php?cid=' + store.cid + '&aid=' + store.aid;
-    },
     latepassExtendMsg () {
       return this.$tc('closed.latepass_needed', this.settings.can_use_latepass, {
         n: this.settings.can_use_latepass,
@@ -80,7 +77,8 @@ export default {
       });
     },
     hasUnsubmitted () {
-      return (Object.keys(actions.getChangedQuestions()).length > 0);
+      return (this.settings.submitby === 'by_assessment' ||
+        Object.keys(actions.getChangedQuestions()).length > 0);
     },
     unsubmittedMessage () {
       if (this.settings.submitby === 'by_question') {
