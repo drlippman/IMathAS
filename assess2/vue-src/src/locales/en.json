@@ -124,7 +124,8 @@
     "work_save": "Save work",
     "work_saved": "Work saved",
     "work_saving": "Saving...",
-    "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?"
+    "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
+    "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?"
   },
   "text": {
     "hide": "Hide text",
@@ -155,6 +156,10 @@
     "livepoll_wrongquestion": "Submitted question is not the current question.",
     "livepoll_notopen": "This question is not open for submissions.",
     "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again."
+  },
+  "confirm": {
+    "ok": "OK",
+    "cancel": "Cancel"
   },
   "scoreresult": {
     "correct": "Correct",

@@ -12,6 +12,7 @@ export const store = Vue.observable({
   inTransit: false,
   autoSaving: false,
   errorMsg: null,
+  confirmObj: null,
   lastLoaded: [],
   inProgress: false,
   autosaveQueue: {},
@@ -212,21 +213,24 @@ export const actions = {
       });
   },
   submitAssessment () {
-    if (confirm(i18n.t('header.confirm_assess_submit'))) {
-      if (store.assessInfo.submitby === 'by_assessment') {
-        let qAttempted = 0;
-        let changedQuestions = this.getChangedQuestions();
-        for (let i in store.assessInfo.questions) {
-          if (store.assessInfo.questions[i].try > 0 ||
-            changedQuestions.hasOwnProperty(i)
-          ) {
-            qAttempted++;
-          }
-        }
-        let nQuestions = store.assessInfo.questions.length;
-        if (qAttempted === nQuestions ||
-          confirm(i18n.t('header.warn_unattempted'))
+    let warnMsg = 'header.confirm_assess_submit';
+    if (store.assessInfo.submitby === 'by_assessment') {
+      let qAttempted = 0;
+      let changedQuestions = this.getChangedQuestions();
+      for (let i in store.assessInfo.questions) {
+        if (store.assessInfo.questions[i].try > 0 ||
+          changedQuestions.hasOwnProperty(i)
         ) {
+          qAttempted++;
+        }
+      }
+      let nQuestions = store.assessInfo.questions.length;
+      if (qAttempted !== nQuestions) {
+        warnMsg = 'header.confirm_assess_unattempted_submit';
+      }
+      store.confirmObj = {
+        body: warnMsg,
+        action: () => {
           // TODO: Check if we should always submit all
           if (store.assessInfo.showscores === 'during') {
             // check for dirty questions and submit them
@@ -240,9 +244,6 @@ export const actions = {
             this.submitQuestion(qns, true);
           }
         }
-      } else {
-        // don't want to submit if by_question
-        // actions.submitQuestion(-1, true);
       }
     }
   },
