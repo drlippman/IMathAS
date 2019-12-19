@@ -19,6 +19,15 @@ if (isset($CFG['hooks']['init'])) {
 	require($CFG['hooks']['init']);
 }
 
+// setup session stuff
+if (isset($sessionpath)) { session_save_path($sessionpath);}
+ini_set('session.gc_maxlifetime',86400);
+ini_set('auto_detect_line_endings',true);
+$hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
+if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
+	session_set_cookie_params(0, '/', '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
+}
+
 // Store PHP sessions in the database.
 require_once(__DIR__ . "/includes/session.php");
 if (!isset($use_local_sessions)) {
