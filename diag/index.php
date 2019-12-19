@@ -7,9 +7,7 @@
 		 $urlmode = 'http://';
 	 }
 
-	if (isset($sessionpath)) { session_save_path($sessionpath);}
- 	ini_set('session.gc_maxlifetime',86400);
-	session_start();
+	// session already started in init
 	$sessionid = session_id();
 
 	function decodeSelector($sel) {
@@ -268,7 +266,7 @@ if (isset($_POST['SID'])) {
 			$sessiondata['useed'] = 1;
 			$sessiondata['isdiag'] = $diagid;
 			$sessiondata['diag_aver'] = $aVer;
-			
+
 			$enc = base64_encode(serialize($sessiondata));
 			if (!empty($_POST['tzname'])) {
 				$tzname = $_POST['tzname'];
