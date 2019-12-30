@@ -33,7 +33,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("\t", ' ', $str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
-		$str = str_replace("&\n"," ",$str);
+    $str = preg_replace('/&\s*\n/', ' ', $str);
 		$r =  interpretline($str.';',$anstype,$countcnt).';';
 		return $r;
 	}
