@@ -1142,7 +1142,7 @@ function rrand($min,$max,$p=0) {
 	list($min,$max) = checkMinMax($min, $max, false, 'rrand');
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
-	$out = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
+	$out = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p + 1e-12)), $rn);
 	if ($rn==0) { $out = (int) $out;}
 	return( $out );
 }
@@ -1166,9 +1166,9 @@ function rrands($min,$max,$p=0,$n=0) {
 	list($min,$max) = checkMinMax($min, $max, false, 'rrands');
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
-
+	$maxi = floor(($max-$min)/$p + 1e-12);
 	for ($i = 0; $i < $n; $i++) {
-		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
+		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
 		if ($rn==0) { $r[$i] = (int) $r[$i];}
 	}
 	return $r;
@@ -1235,14 +1235,15 @@ function nonzerorrand($min,$max,$p=0) {
 	list($min,$max) = checkMinMax($min, $max, false, 'nonzerorrand');
 	if ($min == 0 && $max == 0) { return 0; }
 	if ($p<=0) {echo "Error with nonzerorrand: need to set positive step size"; return $min;}
-	if (floor(($max-$min)/$p)==0) {
+	$maxi = floor(($max-$min)/$p + 1e-12);
+	if ($maxi==0) {
 		return $min;
 	}
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
 
 	do {
-		$ret = round($min + $p*$GLOBALS['RND']->rand(0,floor(($max-$min)/$p)), $rn);
+		$ret = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
 	} while (abs($ret)< 1e-14);
 	if ($rn==0) { $ret = (int) $ret;}
 	return $ret;
@@ -1269,7 +1270,8 @@ function nonzerorrands($min,$max,$p=0,$n=0) {
 	list($min,$max) = checkMinMax($min, $max, false, 'nonzerorrands');
 
 	if ($p<=0) {echo "Error with nonzerorrands: need to set positive step size"; return array_fill(0,$n,$min);}
-	if (floor(($max-$min)/$p)==0) {
+	$maxi = floor(($max-$min)/$p + 1e-12);
+	if ($maxi==0) {
 		return array_fill(0, $n, $min);
 	}
 
@@ -1277,7 +1279,7 @@ function nonzerorrands($min,$max,$p=0,$n=0) {
 
 	for ($i = 0; $i < $n; $i++) {
 		do {
-			$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,($max-$min)/$p), $rn);
+			$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
 			if ($rn==0) { $r[$i] = (int) $r[$i];}
 		} while (abs($r[$i]) <1e-14);
 	}
@@ -1323,13 +1325,13 @@ function diffrrands($min,$max,$p=0,$n=0, $nonzero=false) {
 
 	if ($p<=0) {echo "Error with diffrrands: need to set positive step size"; return array_fill(0,$n,$min);}
 
-	if (floor(($max-$min)/$p)==0) {
+	$maxi = floor(($max-$min)/$p + 1e-12);
+
+	if ($maxi==0) {
 		echo "Error with diffrrands: step size is greater than max-min"; return array_fill(0,$n,$min);
 	}
 
 	$rn = max(0, getRoundNumber($p), getRoundNumber($min));
-
-	$maxi = floor(($max-$min)/$p);
 
 	if ($n<.1*$maxi) {
 		$out = array();
