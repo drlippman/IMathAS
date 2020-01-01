@@ -11,6 +11,7 @@ $doembed = false;
 if (strpos($url,'youtube.com/watch')!==false) {
 	//youtube
 	$vidid = substr($url,strrpos($url,'v=')+2);
+  $vidid = str_replace(array('?','%3F','%3D'),array('&','&','='),$vidid);
 	if (strpos($vidid,'&')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'&'));
 	}
@@ -39,6 +40,7 @@ if (strpos($url,'youtube.com/watch')!==false) {
 if (strpos($url,'youtu.be/')!==false) {
 	//youtube
 	$vidid = substr($url,strpos($url,'.be/')+4);
+  $vidid = str_replace(array('?','%3F','%3D'),array('&','&','='),$vidid);
 	if (strpos($vidid,'#')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'#'));
 	}

@@ -680,6 +680,7 @@ function togglevideoembed() {
 	} else {
 		var href = jQuery(this).prev().attr('href');
 		var qsconn = '?';
+		href = href.replace(/%3F/g,'?').replace(/%3D/g,'=');
 		if (href.match(/youtube\.com/)) {
 			if (href.indexOf('playlist?list=')>-1) {
 				var vidid = href.split('list=')[1].split(/[#&]/)[0];
