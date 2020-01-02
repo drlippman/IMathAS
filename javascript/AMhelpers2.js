@@ -1631,6 +1631,9 @@ function singlevaleval(evalstr, format) {
   }
   try {
     var res = scopedmatheval(evalstr);
+    if (res === '') {
+      return [NaN, _("syntax incomplete")+". "];
+    }
     return [res, ''];
   } catch(e) {
     return [NaN, _("syntax incomplete")+". "];
