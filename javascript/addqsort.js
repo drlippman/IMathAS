@@ -921,12 +921,17 @@ function expandqgrp(i) {
 }
 function updateqgrpcookie() {
 	var closegrp = [];
+	var qcnt = 0;
 	for (var i=0; i<itemarray.length; i++) {
+		if (itemarray[i][0]=="text") {
+			continue;
+		}
 		if (itemarray[i].length<5) {  //is group
 			if (itemarray[i][3]==0) {
-				closegrp.push(i);
+				closegrp.push(qcnt);
 			}
 		}
+		qcnt++;
 	}
 	document.cookie = 'closeqgrp-' +curaid+'='+ closegrp.join(',');
 }
