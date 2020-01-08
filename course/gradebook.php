@@ -389,7 +389,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$showwidthtoggle = (strpos($coursetheme, '_fw')!==false);
 
 	$placeinhead .= "</script>\n";
-	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } td.trld {display:table-cell;vertical-align:middle;} </style>";
+	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } div.trld {display:table-cell;vertical-align:middle;white-space: nowrap;} </style>";
 	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
 
 	require("../header.php");
