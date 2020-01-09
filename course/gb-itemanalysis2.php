@@ -53,6 +53,7 @@
 	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit,submitby FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit, $submitby) = $stm->fetch(PDO::FETCH_NUM);
+	$showhints = (($showhints&2)==2);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
 		exit;
@@ -283,7 +284,7 @@
 	} else {
 		echo "<th scope=\"col\" title=\"Average time a student worked on this question, and average time per attempt on this question\">Average time per student</th>";
 	}
-	if ($showhints==1) {
+	if ($showhints) {
 		echo '<th scope="col" title="Percentage of students who clicked on help resources in the question, if available">Clicked on Help</th>';
 	}
 	echo "<th scope=\"col\">Preview</th></tr></thead>\n";
@@ -316,7 +317,7 @@
 					$needmanualgrade[$row[1]] = true;
 				}
 			}
-			if ($row[8]!='' && ($row[7]==2 || ($row[7]==0 && $showhints==1))) {
+			if ($row[8]!='' && (($row[7]&2)==2 || ($row[7]==-1 && $showhints))) {
 				$showextref[$row[1]] = true;
 			} else {
 				$showextref[$row[1]] = false;
@@ -409,7 +410,7 @@
 				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=time',500,500);return false;\">%s</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgtot));
 			}
-			if ($showhints==1) {
+			if ($showhints) {
 				if ($showextref[$qid] && $qcnt[$qid]!=$qincomplete[$qid]) {
 					echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=help',500,500);return false;\">%.0f%%</td>",
                         $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), round(100*$vidcnt[$qid]/($qcnt[$qid] - $qincomplete[$qid])));
