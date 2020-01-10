@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from './router';
-import i18n from './i18n';
+import { i18n } from './i18n';
 
 export const store = Vue.observable({
   assessInfo: null,
