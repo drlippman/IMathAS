@@ -2,6 +2,7 @@ const path = require('path');
 
 module.exports = {
   outputDir: path.resolve(__dirname, '../vue'),
+  publicPath: './vue/',
   pluginOptions: {
     i18n: {
       locale: 'en',
