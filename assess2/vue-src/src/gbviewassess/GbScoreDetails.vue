@@ -320,7 +320,7 @@ export default {
     updateFeedback (evt) {
       let content;
       if (this.useEditor) {
-        content = window.tinymce.get('fb'+this.qn).getContent();
+        content = evt;
       } else {
         content = evt.target.value;
       }
@@ -366,9 +366,6 @@ export default {
   watch: {
     qdata: function (newVal, oldVal) {
       this.initCurScores();
-      if (this.useEditor) {
-        window.initeditor('exact', 'fb'+this.qn, null, true);
-      }
     }
   }
 };

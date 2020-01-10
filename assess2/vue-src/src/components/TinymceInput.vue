@@ -1,7 +1,7 @@
 <template>
   <div
     :id="computedId"
-    v-html="value"
+    ref="inbox"
     class="fbbox"
     :rows="rows"
   ></div>
@@ -36,6 +36,7 @@ export default {
   },
   mounted: function () {
     var component = this;
+    this.$refs.inbox.innerHTML = this.value;
     window.initeditor("exact", this.computedId, null, true, function(ed) {
       ed.on('change keyup undo redo', function (e) {
         component.updateValue(ed.getContent());
@@ -69,8 +70,8 @@ export default {
   watch: {
     value: function (newValue, oldValue) {
       // if v-model content change programmability
-      if (this.value !== this.objTinymce.getContent()) {
-        this.objTinymce.setContent(this.value);
+      if (newValue !== this.objTinymce.getContent()) {
+        this.objTinymce.setContent(newValue);
       }
     }
   }

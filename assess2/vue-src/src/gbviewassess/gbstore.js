@@ -258,6 +258,9 @@ export const actions = {
         for (let an = 0; an < response.assess_info.length; an++) {
           store.assessInfo.assess_versions[an].score = response.assess_info[an].score;
           for (let qn = 0; qn < response.assess_info[an].scoredvers.length; qn++) {
+            if (!store.assessInfo.assess_versions[an].hasOwnProperty('questions')) {
+              continue; // questions not loaded for this version
+            }
             let qvers = store.assessInfo.assess_versions[an].questions[qn];
             for (let qv = 0; qv < qvers.length; qv++) {
               if (qv === response.assess_info[an].scoredvers[qn]) {
@@ -312,7 +315,6 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
-
         // TODO: update displayed data rather than just exiting
         if (store.clearAttempts.type === 'all' && data.keepver === 0) {
           // cleared all - exit
