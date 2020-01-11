@@ -69,9 +69,6 @@ export const actions = {
         if (typeof callback !== 'undefined' && callback !== null) {
           callback();
         }
-        if (doreset === true) {
-          Router.push('/');
-        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
