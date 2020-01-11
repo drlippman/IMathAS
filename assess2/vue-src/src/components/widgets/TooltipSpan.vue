@@ -32,7 +32,9 @@ export default {
   },
   methods: {
     triggerOpen (event, val) {
-      if (this.show === false) {
+      if (typeof this.tip == 'undefined' || this.tip == '') {
+        return;
+      } else if (this.show === false) {
         this.open = false;
       } else if (typeof val === 'boolean') {
         this.open = val;

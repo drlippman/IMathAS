@@ -41,12 +41,26 @@
           @click = "handleClick(index)"
           :class="{'listsubitem': option.subitem}"
         >
+          <router-link
+            v-if = "option.internallink"
+            :to = "option.internallink"
+            @click.native = "toggleOpen"
+            @mouseover.native = "curSelected = index"
+            :id = "id + '_' + index"
+            :class="{'menubutton-focus': index==curSelected}"
+            role = "menuitem"
+            tabindex = "-1"
+          >
+            <slot v-if="hasSlot" :option="option" :selected="false"></slot>
+            <template v-else>
+              {{option.label}}
+            </template>
+          </router-link>
           <component
+            v-else
             v-bind = "getLinkProps(option,index)"
             @click = "toggleOpen"
             @mouseover = "curSelected = index"
-            @click.native = "toggleOpen"
-            @mouseover.native = "curSelected = index"
             :id = "id + '_' + index"
             :class="{'menubutton-focus': index==curSelected}"
             role = "menuitem"
