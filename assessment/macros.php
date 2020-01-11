@@ -2,7 +2,8 @@
 //IMathAS:  Core randomizers and display macros
 //(c) 2006 David Lippman
 
-
+require_once(__DIR__ . '/../includes/Rand.php');
+$RND = new Rand();
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs","dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod");
 array_push($allowedmacros,"numtowords","randname","randnamewpronouns","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbackbasic","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand","mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates","prettysmallnumber","makeprettynegative");
@@ -3921,124 +3922,6 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 	}
 	return false;
 }
-
-class Rand {
-	private $seed;
-	private $randmax;
-
-	function __construct() {
-		$this->seed = rand();
-		$this->randmax = getrandmax();
-	}
-
-	public function srand($n=0) {
-		if ($n==0) {
-			srand();
-			if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
-				$this->seed = rand();
-			}
-		} else {
-			$n = (int)$n;
-			if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
-				$this->seed = $n;
-			} else {
-				srand($n);
-			}
-		}
-	}
-
-	public function rand($min=0,$max=null) {  //simple xorshift
-		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
-			if ($max===null) {
-				$max = $this->randmax;
-			}
-			$min = (int)$min;
-			$max = (int)$max;
-			if ($min < $max) {
-				if ($GLOBALS['assessver']>1) {
-					$this->seed = ($this->seed^($this->seed << 13)) & 0xffffffff;
-					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
-					$this->seed = ($this->seed^($this->seed >> 17)) & 0xffffffff;
-					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
-					$this->seed = ($this->seed^($this->seed << 5)) & 0x7fffffff;
-				} else { //broken; assessver=1 only
-					$this->seed ^= ($this->seed << 13);
-					$this->seed ^= ($this->seed >> 17);
-					$this->seed ^= ($this->seed << 5);
-					$this->seed &= 0x7fffffff;
-				}
-				return ($this->seed % ($max + 1 - $min)) + $min;
-			} else if($min > $max){
-				return $this->rand($max,$min);
-			} else if ($min == $max) {
-				return $min;
-			}
-		} else {
-			if ($max===null) {
-				return rand();
-			} else {
-				return rand($min,$max);
-			}
-		}
-	}
-
-	public function shuffle(&$arr) {
-		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
-			for ($i=count($arr)-1;$i>0;$i--) {
-				if ($GLOBALS['assessver']>1) {
-					$this->seed = ($this->seed^($this->seed << 13)) & 0xffffffff;
-					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
-					$this->seed = ($this->seed^($this->seed >> 17)) & 0xffffffff;
-					if ($this->seed >  0x7fffffff) { $this->seed -= 0x100000000;}
-					$this->seed = ($this->seed^($this->seed << 5)) & 0x7fffffff;
-				} else { //broken; assessver=1 only
-					$this->seed ^= ($this->seed << 13);
-					$this->seed ^= ($this->seed >> 17);
-					$this->seed ^= ($this->seed << 5);
-					$this->seed &= 0x7fffffff;
-				}
-				$j = $this->seed % ($i+1); //$this->rand(0,$i);
-				if ($i!=$j) {
-					$tmp = $arr[$j];
-					$arr[$j] = $arr[$i];
-					$arr[$i] = $tmp;
-				}
-			}
-		} else {
-			shuffle($arr);
-		}
-	}
-
-	public function str_shuffle($str) {
-		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
-			$arr = str_split($str);
-			$this->shuffle($arr);
-			return implode('', $arr);
-		} else {
-			return str_shuffle($str);
-		}
-	}
-
-	public function array_rand($arr, $n=1) {
-		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
-			$keys = array_keys($arr);
-			if ($n==1) {
-				$n = $this->rand(0,count($keys)-1);
-				return $keys[$n];
-			} else if ($n==count($arr)) { //no point in shuffling since php's internal function doesn't shuffle
-				return $keys;
-			} else {
-				$n = (int)$n;
-				$this->shuffle($keys);
-				return array_slice($keys,0,$n);
-			}
-		} else {
-			return array_rand($arr,$n);
-		}
-	}
-
-}
-$RND = new Rand();
 
 function evalMathPHP($str,$vl) {
 	return evalReturnValue('return ('.mathphp($str,$vl).');', $str);

@@ -5,7 +5,7 @@
  */
 
 require_once(__DIR__ . '/../includes/exceptionfuncs.php');
-
+require_once(__DIR__ . '/../includes/Rand.php');
 /**
  * Primary class for working with assessment settings
  */
@@ -547,7 +547,13 @@ class AssessInfo
   public function assignQuestionsAndSeeds($ispractice = false, $attempt = 0, $oldquestions = false, $oldseeds = false) {
     $qout = array();
     $seeds = array();
+    $RND = new Rand();
 
+    if ($this->assessData['shuffle']&4) { 
+      // if set for all students same random seed, it makes sense they'd get
+      // the same questions from pool and shuffle order as well
+      $RND->srand($this->curAid + $attempt + ($ispractice ? 1000 : 0));
+    }
     if ($oldquestions !== false && $oldseeds !== false) {
       $oldseeds = array_combine($oldquestions, $oldseeds);
     }
@@ -558,7 +564,7 @@ class AssessInfo
           if ($qid['replace'] == true) {
             //select with replacement
             for ($i=0; $i < $qid['n']; $i++) {
-              $qout[] = intval($qid['qids'][array_rand($qid['qids'], 1)]);
+              $qout[] = intval($qid['qids'][$RND->array_rand($qid['qids'], 1)]);
             }
           } else {
             //select without replacement
@@ -567,11 +573,11 @@ class AssessInfo
               //in selection
               $unused = array_diff($qid['qids'], $oldquestions);
               $used = array_intersect($qid['qids'], $oldquestions);
-              shuffle($unused);
-              shuffle($used);
+              $RND->shuffle($unused);
+              $RND->shuffle($used);
               $qid['qids'] = array_merge($unused, $used);
             } else {
-              shuffle($qid['qids']);
+              $RND->shuffle($qid['qids']);
             }
 
             for ($i=0; $i < min($qid['n'], count($qid['qids'])); $i++) {
@@ -580,7 +586,7 @@ class AssessInfo
             //if we want more than there are questions
             if ($qid['n'] > count($qid['qids'])) {
               for ($i = count($qid['qids']); $i < $qid['n']; $i++) {
-                $qout[] = intval($qid['qids'][array_rand($qid['qids'], 1)]);
+                $qout[] = intval($qid['qids'][$RND->array_rand($qid['qids'], 1)]);
               }
             }
           }
@@ -592,11 +598,11 @@ class AssessInfo
 
     if ($this->assessData['shuffle']&1) {
       //shuffle all
-      shuffle($qout);
+      $RND->shuffle($qout);
     } else if ($this->assessData['shuffle']&16) {
       //shuffle all but first
       $firstq = array_shift($qout);
-      shuffle($qout);
+      $RND->shuffle($qout);
       array_unshift($qout, $firstq);
     }
 
