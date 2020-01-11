@@ -245,7 +245,7 @@ export default {
       // TODO
       let quoteq = this.qn + '-' + this.qdata.qsetid + '-' + this.qdata.seed +
         '-' + store.aid + '-' + store.assessInfo.ver;
-      let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
+      let qs = 'add=new&cid=' + store.cid +
         '&quoteq=' + quoteq + '&to=' + store.uid;
       return store.APIbase + '../msgs/msglist.php?' + qs;
       // TODO: get GB to work for this.
