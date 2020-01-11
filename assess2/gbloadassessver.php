@@ -62,6 +62,7 @@ if (!$assess_record->hasRecord()) {
 if ($practicever) {
   $assess_record->setInPractice(true);
 }
+$assess_record->setInGb(true);
 // indicate whether teacher/tutor for viewing scores/answers
 if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
   $assess_record->setTeacherInGb(true);

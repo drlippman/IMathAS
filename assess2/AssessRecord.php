@@ -33,6 +33,7 @@ class AssessRecord
   private $tmpdata = null;
   private $is_practice = false;
   private $status = 'no_record';
+  private $inGb = false;
   private $teacherInGb = false;
   private $now = 0;
   private $need_to_record = false;
@@ -93,6 +94,14 @@ class AssessRecord
       $this->data = $tmp;
     }
     $this->is_practice = $is_practice;
+  }
+
+  /**
+   * Set if viewing in GB. Influences whether autosaves are used
+   * @param bool $val true if viewing in GB
+   */
+  public function setInGb($val) {
+    $this->inGb = $val;
   }
 
   /**
@@ -1515,7 +1524,11 @@ class AssessRecord
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
     $showscores = ($force_scores || ($this->assess_info->getSetting('showscores') === 'during'));
     // see if there is autosaved answers to redisplay
-    $autosave = $this->getAutoSaves($qn);
+    if ($this->inGb) {
+      $autosave = array();
+    } else {
+      $autosave = $this->getAutoSaves($qn);
+    }
 
     $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
 

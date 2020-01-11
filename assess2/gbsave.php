@@ -55,6 +55,7 @@ $assess_info->loadQuestionSettings('all', false);
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
+$assess_record->setInGb(true);
 if (!$assess_record->hasRecord()) {
   echo '{"error": "invalid_record"}';
   exit;

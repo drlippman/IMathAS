@@ -79,6 +79,7 @@ $assess_info->getLatePassBlockedByView();
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
+$assess_record->setInGb(true);
 if (!$assess_record->hasRecord()) {
   // if there's no record yet, and we're a teacher, create a record
   if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
