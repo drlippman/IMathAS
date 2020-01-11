@@ -261,7 +261,7 @@ $vueData = array(
 					<span v-if="subtype == 'by_assessment'">
 						<label for="keepscore">
 							Score to keep:
-						<label>
+						</label>
 						<select id="keepscore" name="keepscore" v-model="keepscore">
 							<option value="best">Best</option>
 							<option value="last">Last</option>
@@ -606,7 +606,7 @@ $vueData = array(
 				<label>
 					<input type="checkbox" name="usedeffb" v-model="usedeffb">
 					Use default feedback text
-				<label>
+				</label>
 				<span v-show="usedeffb">
 					<br/>
 					Text:
@@ -737,7 +737,7 @@ var app = new Vue({
 	el: '#app',
   data: <?php echo json_encode($vueData); ?>,
 	computed: {
-		showscoresOptions() {
+		showscoresOptions: function() {
 			var during = {
 				'value': 'during',
 				'text': _('On each question immediately')
@@ -774,7 +774,7 @@ var app = new Vue({
 			}
 			return out;
 		},
-		showansOptions() {
+		showansOptions: function() {
 			//TODO: revisit after_take vs with_score
 
 			var never = {
@@ -827,7 +827,7 @@ var app = new Vue({
 			}
 			return out;
 		},
-		viewInGbOptions() {
+		viewInGbOptions: function() {
 			/*
 			‘immediately’: Immediately - can always view it
 			‘after_take’: After an assessment version is done
@@ -859,7 +859,7 @@ var app = new Vue({
 			}
 			return out;
 		},
-		scoresInGbOptions() {
+		scoresInGbOptions: function() {
 			/*
 			‘immediately’: Immediately - can always view it
 			‘after_take’: After an assessment version is done
@@ -915,7 +915,7 @@ var app = new Vue({
 			return out;
 
 		},
-		ansInGbOptions() {
+		ansInGbOptions: function() {
 			/*
 			‘after_attempt’: After an assessment version is done
 			‘after_due’: After it’s due
@@ -951,7 +951,7 @@ var app = new Vue({
 		}
 	},
 	methods: {
-		valueInOptions(optArr, value) {
+		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
 				if (optArr[i].value == value) {
@@ -960,11 +960,11 @@ var app = new Vue({
 			}
 			return false;
 		},
-		addExtref() {
+		addExtref: function() {
 			this.extrefs.push({'label':'', 'link':''});
 			this.extrefs = this.extrefs.slice();
 		},
-		doShowDisplayDialog() {
+		doShowDisplayDialog: function() {
 			this.showDisplayDialog = true;
 			this.$nextTick(function() {
 				$(".dialog .pane-header button").focus();
@@ -976,7 +976,7 @@ var app = new Vue({
 				}
 			})
 		},
-		closeDisplayDialog() {
+		closeDisplayDialog: function() {
 			this.showDisplayDialog = false;
 			$("#dispdetails").focus();
 		}
