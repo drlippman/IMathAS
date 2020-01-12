@@ -69,6 +69,10 @@ export default {
   },
   watch: {
     value: function (newValue, oldValue) {
+      if (typeof newValue !== 'string') {
+        // handle null and undefined
+        newValue = '';
+      }
       // if v-model content change programmability
       if (newValue !== this.objTinymce.getContent()) {
         this.objTinymce.setContent(newValue);

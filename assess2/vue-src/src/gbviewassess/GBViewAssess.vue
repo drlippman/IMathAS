@@ -206,27 +206,13 @@
             />
           </div>
         </div>
-        <div>
-          {{ $t('gradebook.general_feedback') }}:
-          <textarea
-            v-if="canEdit && !useEditor"
-            class="fbbox"
-            rows="2"
-            cols="60"
-            :value = "assessFeedback"
-            @input="updateFeedback"
-          ></textarea>
-          <tinymce-input
-            v-else-if="canEdit"
-            id="genfbbox"
-            :value = "assessFeedback"
-            @input = "updateFeedback"
-          ></tinymce-input>
-          <div
-            v-else
-            v-html="assessFeedback"
-          />
-        </div>
+        <gb-feedback
+          :show="true"
+          :canedit = "canEdit"
+          :useeditor = "useEditor"
+          :value = "assessFeedback"
+          @update = "updateFeedback"
+        />
         <div>
           <button
             v-if = "canEdit"
@@ -288,7 +274,7 @@ import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
-import TinymceInput from '@/components/TinymceInput.vue';
+import GbFeedback from '@/gbviewassess/GbFeedback.vue';
 import '../assess2.css';
 
 export default {
@@ -300,7 +286,7 @@ export default {
     GbClearAttempts,
     SummaryCategories,
     ErrorDialog,
-    TinymceInput
+    GbFeedback
   },
   data: function () {
     return {
@@ -503,14 +489,8 @@ export default {
         actions.loadGbQuestionVersion(qn, val);
       }
     },
-    updateFeedback (evt) {
-      let content;
-      if (this.useEditor) {
-        content = window.tinymce.activeEditor.getContent();
-      } else {
-        content = evt.target.value;
-      }
-      actions.setFeedback(null, content);
+    updateFeedback (val) {
+      actions.setFeedback(null, val);
     },
     setScoreOverride (evt) {
       this.assessOverride = evt.target.value.trim();

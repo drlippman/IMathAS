@@ -52,32 +52,14 @@
         {{ $t('gradebook.add_feedback') }}
       </button>
     </div>
-    <div
-      v-show="showfeedback"
-    >
-      {{ $t('gradebook.feedback') }}:<br/>
-      <textarea
-        v-if="canedit && !useEditor"
-        class="fbbox"
-        :name="'fb'+qn"
-        rows="2"
-        cols="60"
-        :value = "qdata.feedback"
-        ref = "fbbox"
-        @input="updateFeedback"
-      ></textarea>
-      <tinymce-input
-        v-else-if="canedit"
-        :id="'fb'+qn"
-        :value = "qdata.feedback"
-        ref = "fbbox"
-        @input = "updateFeedback"
-      ></tinymce-input>
-      <div
-        v-else
-        v-html="qdata.feedback"
-      />
-    </div>
+    <gb-feedback
+      :show="showfeedback"
+      :canedit = "canedit"
+      :useeditor = "useEditor"
+      ref = "fbbox"
+      :value = "qdata.feedback"
+      @update = "updateFeedback"
+    />
 
     <div v-if="showfull">
       <span v-if="qdata.timeactive.total > 0">
@@ -128,7 +110,7 @@ import GbAllTries from '@/gbviewassess/GbAllTries';
 import GbPenalties from '@/gbviewassess/GbPenalties';
 import Icons from '@/components/widgets/Icons';
 import MenuButton from '@/components/widgets/MenuButton';
-import TinymceInput from '@/components/TinymceInput.vue';
+import GbFeedback from '@/gbviewassess/GbFeedback';
 
 export default {
   name: 'GbScoreDetails',
@@ -138,7 +120,7 @@ export default {
     GbPenalties,
     MenuButton,
     Icons,
-    TinymceInput
+    GbFeedback
   },
   data: function () {
     return {
@@ -317,14 +299,12 @@ export default {
       let partposs = this.qdata.points_possible * this.answeights[pn];
       actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
     },
-    updateFeedback (evt) {
-      let content;
-      if (this.useEditor) {
-        content = evt;
-      } else {
-        content = evt.target.value;
-      }
-      actions.setFeedback(this.qn, content);
+    revealFeedback () {
+      this.showfeedback = true;
+      this.$nextTick(() => this.$refs.fbbox.focus());
+    },
+    updateFeedback (val) {
+      actions.setFeedback(this.qn, val);
     },
     allFull () {
       for (let i = 0; i < this.answeights.length; i++) {
@@ -354,10 +334,6 @@ export default {
         this.qn,
         600
       );
-    },
-    revealFeedback () {
-      this.showfeedback = true;
-      this.$nextTick(() => this.$refs.fbbox.focus());
     }
   },
   mounted () {
