@@ -432,8 +432,14 @@ export const actions = {
     // compare new score against existing value
     let qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
     let key = av + '-' + qn + '-' + qv + '-' + pn;
+    let scoreChanged = true;
+    if (qdata.singlescore) {
+      scoreChanged = (Math.abs(score - qdata.rawscore) > 0.001);
+    } else {
+      scoreChanged = (Math.abs(score - qdata.parts[pn].score/qdata.parts[pn].points_possible) > 0.001);
+    }
     if (qdata.parts[pn] && qdata.parts[pn].try > 0 &&
-      (score === '' || Math.abs(score - qdata.parts[pn].score/qdata.parts[pn].points_possible) < 0.001)
+      (score === '' || !scoreChanged)
     ) {
       // same as existing - don't submit as an override
       delete store.scoreOverrides[key];

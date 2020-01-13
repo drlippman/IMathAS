@@ -132,7 +132,7 @@ export default {
   },
   computed: {
     answeights () {
-      if (!this.qdata.answeights) { // if answeights not generated yet
+      if (!this.qdata.answeights || this.qdata.singlescore) { // if answeights not generated yet
         return [1];
       } else {
         let answeights = this.qdata.answeights.map(x => parseFloat(x));
@@ -150,7 +150,9 @@ export default {
     initScores () {
       var out = [];
       for (let i = 0; i < this.answeights.length; i++) {
-        if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
+        if (this.qdata.singlescore) {
+          out.push(this.qdata.score);
+        } else if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
           // handle the case of a single override
           let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
           partscore = Math.round(1000 * partscore) / 1000;

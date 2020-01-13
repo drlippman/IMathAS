@@ -2515,13 +2515,14 @@ class AssessRecord
     $scoresInGb = $this->assess_info->getSetting('scoresingb');
     if ($this->teacherInGb ||
       $scoresInGb == 'immediately' ||
-      ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
+      ($scoresInGb == 'after_take' && $this->data['assess_versions'][$aver]['status'] == 1) ||
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'))
     ) {
       $showScores = true;
     } else {
       $showScores = false;
     }
+
     $GLOBALS['useeditor'] = 'review'; //hacky
     if ($dispqn !== null) {
       $this->dispqn = $dispqn;
@@ -2531,6 +2532,7 @@ class AssessRecord
     $GLOBALS['capturechoices'] = true;
     $GLOBALS['capturedrawinit'] = true;
     $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver);
+    $out['showscores'] = $scoresInGb;
     $this->dispqn = null;
     if ($generate_html) { // only include this if we're displaying the question
       $out['qid'] = $qdata['qid'];
@@ -2643,10 +2645,14 @@ class AssessRecord
         list($av,$qn,$qv,$pn) = array_map('intval', $keyparts);
       }
       $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
-      if (!isset($qdata['scoreoverride'])) {
-        $qdata['scoreoverride'] = array();
+      if (!empty($qdata['singlescore'])) {
+        $qdata['scoreoverride'] = floatval($score);
+      } else {
+        if (!isset($qdata['scoreoverride'])) {
+          $qdata['scoreoverride'] = array();
+        }
+        $qdata['scoreoverride'][$pn] = floatval($score);
       }
-      $qdata['scoreoverride'][$pn] = floatval($score);
     }
     if (!empty($scores) || $doRetotal) {
       $this->reTotalAssess();
