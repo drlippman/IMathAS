@@ -15,6 +15,7 @@
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
+	$now = time();
 
 	if ($isteacher) {
 		if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
@@ -24,6 +25,13 @@
 		if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
+		}
+		if (isset($_POST['submitua'])) {
+			require('../assess2/AssessHelpers.php');
+			AssessHelpers::submitAllUnsumitted($cid, $aid);
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
 		}
 	}
 
@@ -197,10 +205,25 @@
 	} else {
 		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid, ':courseid2'=>$cid));
 	}
+	$lines = array();
+	$hasUA = 0;
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$lines[] = $line;
+		if ($aver > 1 && ($line['status']&1)>0) {
+			$hasUA++;
+		}
+	}
 
+	echo '<form method="post" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
+
+	if ($hasUA > 0) {
+		echo '<p>',_('One or more students has unsubmitted assessment attempts.');
+		echo ' <button type="submit" name="submitua" value="submitua">',_('Submit Now'),'</button>';
+		echo '<br/><span class=small>',_('This will only submit the assignment if it is past due or the time limit has expired.');
+		echo '</span></p>';
+	}
 
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-	echo '<form method="post" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
 	echo '<p>',_('With selected:');
 	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
 	echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
@@ -224,14 +247,13 @@
 		$assessGbUrl = "../assess2/gbviewassess.php?";
 	}
 
-	$now = time();
 	$lc = 1;
 	$n = 0;
 	$ntime = 0;
 	$tot = 0;
 	$tottime = 0;
 	$tottimeontask = 0;
-	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+	foreach ($lines as $line) {
 		if ($aver==1) {
 			$line['lastchange'] = $line['endtime'];
 		}
