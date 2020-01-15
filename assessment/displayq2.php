@@ -1357,7 +1357,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					$out .= '<div class="match"><ul class=nomark>';
 				}
-				$out .= "<li><input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
+				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
 				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
 			} else {
