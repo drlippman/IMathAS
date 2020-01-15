@@ -545,7 +545,7 @@ export default {
         return 'You have unsaved changes';
       }
     },
-    clearError() {
+    clearError () {
       store.errorMsg = null;
     }
   },

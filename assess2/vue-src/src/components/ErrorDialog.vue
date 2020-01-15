@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     isError () {
-      return (typeof this.errormsg == 'string');
+      return (typeof this.errormsg === 'string');
     },
     errorTitle () {
       return this.isError ? this.$t('error.error') : this.errormsg.title;

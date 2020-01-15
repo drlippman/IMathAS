@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     triggerOpen (event, val) {
-      if (typeof this.tip == 'undefined' || this.tip == '') {
+      if (typeof this.tip === 'undefined' || this.tip === '') {
         return;
       } else if (this.show === false) {
         this.open = false;
@@ -56,7 +56,7 @@ export default {
       }
       if (event.type === 'touchstart' && event.cancelable) {
         // Disabled - was preventing activating menus inside tooltipspans
-        //event.preventDefault();
+        // event.preventDefault();
       }
     }
   }

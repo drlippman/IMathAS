@@ -436,7 +436,7 @@ export const actions = {
     if (qdata.singlescore) {
       scoreChanged = (Math.abs(score - qdata.rawscore) > 0.001);
     } else {
-      scoreChanged = (Math.abs(score - qdata.parts[pn].score/qdata.parts[pn].points_possible) > 0.001);
+      scoreChanged = (Math.abs(score - qdata.parts[pn].score / qdata.parts[pn].points_possible) > 0.001);
     }
     if (qdata.parts[pn] && qdata.parts[pn].try > 0 &&
       (score === '' || !scoreChanged)
@@ -445,7 +445,7 @@ export const actions = {
       delete store.scoreOverrides[key];
     } else {
       // different score - submit as override. Save raw score (0-1)?.
-      store.scoreOverrides[key] = Math.round(10000*score)/10000;
+      store.scoreOverrides[key] = Math.round(10000 * score) / 10000;
     }
     store.saving = '';
   },

@@ -89,7 +89,7 @@ export const actions = {
         password: password,
         new_group_members: newGroupMembers.join(','),
         cur_group: store.assessInfo.stugroupid,
-        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid)?1:0
+        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid) ? 1 : 0
       },
       xhrFields: {
         withCredentials: true

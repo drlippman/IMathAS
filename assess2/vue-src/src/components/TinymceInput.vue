@@ -16,52 +16,49 @@
 export default {
   name: 'TinymceInput',
   props: {
-    id: {default: null},
-    value: {default: ''},
-    rows: {default: 2}
+    id: { default: null },
+    value: { default: '' },
+    rows: { default: 2 }
   },
-  data: function() {
+  data: function () {
     return {
       objTinymce: null
-    }
+    };
   },
   computed: {
     computedId: function () {
       if (this.id === 'editor' || this.id === '' || this.id === null) {
-        return 'editor-' + this.guidGenerator(); //put default value on computedId
+        return 'editor-' + this.guidGenerator(); // put default value on computedId
       } else {
         return this.id;
       }
     }
   },
   mounted: function () {
-    var component = this;
     this.$refs.inbox.innerHTML = this.value;
-    window.initeditor("exact", this.computedId, null, true, function(ed) {
-      ed.on('change keyup undo redo', function (e) {
-        component.updateValue(ed.getContent());
-      });
-      component.objTinymce = ed;
-    });
+    this.initEditor();
   },
   updated: function () {
-    var component = this;
-    window.initeditor("exact", this.computedId, null, true, function(ed) {
-      ed.on('change keyup undo redo', function (e) {
-        component.updateValue(ed.getContent());
-      });
-      component.objTinymce = ed;
-    });
+    this.initEditor();
   },
   methods: {
     guidGenerator: function () {
-      function s4() {
+      function s4 () {
         return Math.random().toString(36).substr(2, 9);
       }
       return 'ed-' + s4() + '-' + s4();
     },
+    initEditor () {
+      var component = this;
+      window.initeditor('exact', this.computedId, null, true, function (ed) {
+        ed.on('change keyup undo redo', function (e) {
+          component.updateValue(ed.getContent());
+        });
+        component.objTinymce = ed;
+      });
+    },
     updateValue: function (value) {
-        this.$emit('input', value);
+      this.$emit('input', value);
     },
     focus: function () {
       this.objTinymce.focus();
@@ -79,5 +76,5 @@ export default {
       }
     }
   }
-}
+};
 </script>

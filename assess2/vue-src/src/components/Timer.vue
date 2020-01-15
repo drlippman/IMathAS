@@ -39,16 +39,16 @@ export default {
     this.interval = setInterval(this.updateTimer, 1000);
   },
   mounted () {
-    var s = window.$("#timerbox");
-		var pos = s.offset();
-		$(window).scroll(function() {
-		   var windowpos = window.$(window).scrollTop();
-		   if (windowpos >= pos.top) {
-		     s.addClass("sticky");
-		   } else {
-		     s.removeClass("sticky");
-		   }
-		 });
+    var s = window.$('#timerbox');
+    var pos = s.offset();
+    window.$(window).scroll(function () {
+      var windowpos = window.$(window).scrollTop();
+      if (windowpos >= pos.top) {
+        s.addClass('sticky');
+      } else {
+        s.removeClass('sticky');
+      }
+    });
   },
   beforeDestroy () {
     clearInterval(this.interval);

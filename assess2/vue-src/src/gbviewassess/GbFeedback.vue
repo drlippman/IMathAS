@@ -29,7 +29,7 @@ import TinymceInput from '@/components/TinymceInput.vue';
 
 export default {
   name: 'GbFeedback',
-  props: ['show','canedit', 'useeditor', 'value'],
+  props: ['show', 'canedit', 'useeditor', 'value'],
   components: {
     TinymceInput
   },

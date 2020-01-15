@@ -223,7 +223,7 @@ export default {
           store.assessInfo.prev_attempts.length > 0 ||
           store.assessInfo.has_unsubmitted_scored
         )
-      )
+      );
     }
   },
   methods: {

@@ -115,12 +115,12 @@ import { store, actions } from '../basicstore';
 export default {
   name: 'AssessHeader',
   components: {
-    Timer,
-    MenuButton,
-    TooltipSpan,
     Icons,
     LtiMenu,
-    LtiMsgs
+    LtiMsgs,
+    MenuButton,
+    Timer,
+    TooltipSpan
   },
   data: function () {
     return {
