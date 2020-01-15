@@ -38,13 +38,22 @@ class AssessHelpers
 
       $assess_record = new AssessRecord($DBH, $assess_info, false);
       $assess_record->setRecord($line);
+      $assess_record->parseData();
 
       // need to check if assessment is still available for student
       $assess_info->loadException($line['userid'], true);
       if ($assess_info->getSetting('available') === 'yes') {
-        $timeLimitExp = $assess_record->getTimeLimitExpires();
-        if ($timeLimitExp == 0 || $timeLimitExp > time()) {
-          // skip if still available to student and no time limit or not expired
+        // skip if still available to student and no time limit or not expired
+        if (abs($assess_info->getSetting('timelimit')) > 0) {
+          // has a time limit
+          $timeLimitExp = max(
+            $assess_record->getTimeLimitExpires(),
+            $assess_record->getTimeLimitGrace()
+          );
+          if ($timeLimitExp == 0 || $timeLimitExp > time()) {
+            continue;
+          }
+        } else {
           continue;
         }
       }
