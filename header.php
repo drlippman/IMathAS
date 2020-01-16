@@ -107,7 +107,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $sessiondata['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
+		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=011520\" type=\"text/javascript\"></script>\n";
 	}
 	//Contrib not hosted in CDN yet
 	echo '<script type="text/x-mathjax-config">
