@@ -122,4 +122,7 @@ var i18njs = {
 "received.":
 "erhalten.",
 
+"[more..]":
+"[mehr..]"
+
 };
