@@ -760,6 +760,7 @@ class AssessRecord
         $maxtime = $qdata['time'];
       }
     }
+    $submission_time = $maxtime + $this->assessRecord['starttime'];
 
     // Load the question code
     $qns = array_keys($autosaves);
@@ -767,7 +768,7 @@ class AssessRecord
     $this->assess_info->loadQuestionSettings($toloadqids, true);
 
     // add a submission
-    $submission = $this->addSubmission($maxtime + $this->assessRecord['starttime']);
+    $submission = $this->addSubmission($submission_time);
 
     // score the questions
     foreach ($autosaves as $qn=>$qdata) {
@@ -790,6 +791,12 @@ class AssessRecord
 
     // clear out all autosaves
     $this->data['autosaves'] = array();
+
+    // Set this as last change if later than existing last change
+    $lastver = count($this->data['assess_versions']) - 1;
+    if ($submission_time > $this->data['assess_versions'][$lastver]['lastchange']) {
+      $this->setLastChange($submission_time);
+    }
 
     // Recalculate scores
     $this->reTotalAssess($qns);

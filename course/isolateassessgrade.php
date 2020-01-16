@@ -15,6 +15,7 @@
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
+	$now = time();
 
 	if ($isteacher) {
 		if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
@@ -24,6 +25,13 @@
 		if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
+		}
+		if (isset($_POST['submitua'])) {
+			require('../assess2/AssessHelpers.php');
+			AssessHelpers::submitAllUnsumitted($cid, $aid);
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
 		}
 	}
 
@@ -55,13 +63,13 @@
 		}
 	}
 
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	if ($stm->rowCount()==0) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
 
 
 	$placeinhead .= '<script type="text/javascript">
@@ -173,6 +181,7 @@
 	}
 	if ($aver>1) {
 		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
+		$query .= "IF((iar.status&1)=1,iar.scoreddata,'') AS scoreddata,";
 		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
 		$query .= "LEFT JOIN imas_assessment_records AS iar ON iu.id=iar.userid AND iar.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
 	} else {
@@ -197,10 +206,41 @@
 	} else {
 		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid, ':courseid2'=>$cid));
 	}
+	$lines = array();
+	$hasUA = 0;
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$line['useexception'] = false;
+		if (isset($exceptions[$line['userid']])) {
+			$line['useexception'] = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
+			if ($line['useexception']) {
+				$line['thisenddate'] = $exceptions[$line['userid']][1];
+			}
+		} else {
+			$line['thisenddate'] = $enddate;
+		}
+		$lines[] = $line;
+		if ($aver > 1 && ($line['status']&1)>0) {
+			// identify as unsubmitted if past due, or time limit is expired
+			$data = json_decode(gzdecode($line['scoreddata']), true);
+			$time_exp = $data['assess_versions'][count($data['assess_versions'])-1]['timelimit_end'];
+			if ($now > $line['thisenddate'] ||
+				(abs($timelimit) > 0 && $now > $time_exp + $overtime_grace * $line['timelimitmult'])
+			) {
+				$hasUA++;
+			}
+		}
+	}
 
+	echo '<form method="post" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
+
+	if ($hasUA > 0) {
+		echo '<p>',_('One or more students has unsubmitted assessment attempts.');
+		echo ' <button type="submit" name="submitua" value="submitua">',_('Submit Now'),'</button>';
+		echo '<br/><span class=small>',_('This will only submit the assignment if it is past due or the time limit has expired.');
+		echo '</span></p>';
+	}
 
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-	echo '<form method="post" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
 	echo '<p>',_('With selected:');
 	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
 	echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
@@ -224,14 +264,13 @@
 		$assessGbUrl = "../assess2/gbviewassess.php?";
 	}
 
-	$now = time();
 	$lc = 1;
 	$n = 0;
 	$ntime = 0;
 	$tot = 0;
 	$tottime = 0;
 	$tottimeontask = 0;
-	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+	foreach ($lines as $line) {
 		if ($aver==1) {
 			$line['lastchange'] = $line['endtime'];
 		}
@@ -278,15 +317,7 @@
 			$isOvertime = ($timelimit>0) && ($timeused > $timelimit*$line['timelimitmult']);
 			$UA = 0;
 		}
-		$useexception = false;
-		if (isset($exceptions[$line['userid']])) {
-			$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
-			if ($useexception) {
-				$thisenddate = $exceptions[$line['userid']][1];
-			}
-		} else {
-			$thisenddate = $enddate;
-		}
+
 		if ($line['starttime']==null) {
 			if ($aver > 1) {
 				$querymap = array(
@@ -310,7 +341,7 @@
 
 				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">-</a>';
 			}
-			if ($useexception) {
+			if ($line['useexception']) {
 				if ($exceptions[$line['userid']][2]>0) {
 					echo '<sup>LP</sup>';
 				} else {
@@ -322,7 +353,7 @@
 			}
 			echo "</td><td>-</td><td></td>";
 			if ($includeduedate) {
-				echo '<td>'.tzdate("n/j/y g:ia",$thisenddate).'</td>';
+				echo '<td>'.tzdate("n/j/y g:ia", $line['thisenddate']).'</td>';
 			}
 			echo "<td></td><td></td>";
 		} else {
@@ -348,7 +379,7 @@
 
 				echo '<td><a href="gb-viewasid.php?' . Sanitize::generateQueryStringFromMap($querymap) . '">';
 			}
-			if ($thisenddate>$now) {
+			if ($line['thisenddate'] > $now) {
 				echo '<i>'.Sanitize::onlyFloat($total);
 			} else {
 				echo Sanitize::onlyFloat($total);
@@ -356,9 +387,9 @@
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo "&nbsp;(NC)";
-			} else 	if ($IP==1 && $thisenddate>$now) {
+			} else 	if ($IP==1 && $line['thisenddate'] > $now) {
 				echo "&nbsp;(IP)";
-			} else 	if ($UA==1 && $thisenddate<$now) {
+			} else 	if ($UA==1 && $line['thisenddate'] < $now) {
 				echo "&nbsp;(UA)";
 			} else	if ($isOvertime) {
 				echo "&nbsp;(OT)";
@@ -368,11 +399,11 @@
 				$tot += $total;
 				$n++;
 			}
-			if ($thisenddate>$now) {
+			if ($line['thisenddate'] > $now) {
 				echo '</i>';
 			}
 			echo '</a>';
-			if ($useexception) {
+			if ($line['useexception']) {
 				if ($exceptions[$line['userid']][2]>0) {
 					echo '<sup>LP</sup>';
 				} else {
@@ -398,7 +429,7 @@
 				echo '<td>'.tzdate("n/j/y g:ia",$line['lastchange']).'</td>';
 			}
 			if ($includeduedate) {
-				echo '<td>'.tzdate("n/j/y g:ia",$thisenddate).'</td>';
+				echo '<td>'.tzdate("n/j/y g:ia", $line['thisenddate']).'</td>';
 			}
 			if ($line['lastchange']==0 || $line['starttime']==0) {
 				echo '<td>&nbsp;</td>';
