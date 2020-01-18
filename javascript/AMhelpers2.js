@@ -885,6 +885,8 @@ function AMnumfuncPrepVar(qn,str) {
 			return '@v'+i+'@';
 		}
 	 }});
+  // fix display of /n!
+  dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
