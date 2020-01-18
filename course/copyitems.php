@@ -308,7 +308,7 @@ if (!(isset($teacherid))) {
 				} else {
 					copysub($items,'0',$newitems,$gbcats,isset($_POST['copyhidden']));
 				}
-				doaftercopy($_POST['ctc']);
+				doaftercopy($_POST['ctc'], $newitems);
 				$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));
 				$items = unserialize($stm->fetchColumn(0));

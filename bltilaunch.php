@@ -1089,7 +1089,7 @@ if ($stm->rowCount()==0) {
 				$cid = $destcid; //needed for copyiteminc
 				require_once("includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);
-				doaftercopy($sourcecid);
+				doaftercopy($sourcecid, $newitems);
 
 				$itemorder = serialize($newitems);
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,deflatepass=:deflatepass,dates_by_lti=:datesbylti,UIver=:UIver,level=:level WHERE id=:id");

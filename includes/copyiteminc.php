@@ -487,7 +487,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 
 }
 
-function doaftercopy($sourcecid) {
+function doaftercopy($sourcecid, &$newitems) {
 	global $DBH;
 	global $cid,$reqscoretrack,$categoryassessmenttrack,$assessnewid,$forumtrack,$posttoforumtrack;
 	if (intval($cid)==intval($sourcecid)) {
@@ -535,6 +535,16 @@ function doaftercopy($sourcecid) {
 	}
 	if (!$samecourse) {
 		handleextoolcopy($sourcecid);
+		removeGrouplimits($newitems);
+	}
+}
+
+function removeGrouplimits(&$items) {
+	foreach ($items as $k=>$item) {
+		if (is_array($item)) {
+			$item['grouplimit'] = array();
+			removeGrouplimits($items[$k]['items']);
+		}
 	}
 }
 
