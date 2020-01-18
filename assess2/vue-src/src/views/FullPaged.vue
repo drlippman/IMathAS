@@ -55,26 +55,26 @@
             :active = "pagenum === page"
           />
         </div>
-        <div v-if = "page < allPages.length - 1">
-          <p>&nbsp;</p>
-          <p>
-            <router-link
-              :to="'/full/page/'+ (page+2)"
-            >
-              {{ $t('pages.next') }}
-            </router-link>
-          </p>
-        </div>
-        <p v-else-if = "showSubmit">
-          <button
-            type = "button"
-            class = "primary"
-            @click = "submitAssess"
+      </div>
+      <div v-if = "page < allPages.length - 1">
+        <p>&nbsp;</p>
+        <p>
+          <router-link
+            :to="'/full/page/'+ (page+2)"
           >
-            {{ $t('header.assess_submit') }}
-          </button>
+            {{ $t('pages.next') }}
+          </router-link>
         </p>
       </div>
+      <p v-else-if = "showSubmit">
+        <button
+          type = "button"
+          class = "primary"
+          @click = "submitAssess"
+        >
+          {{ $t('header.assess_submit') }}
+        </button>
+      </p>
     </div>
   </div>
 </template>
