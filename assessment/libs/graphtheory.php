@@ -308,7 +308,7 @@ function graphkruskal($g) {
 	$steps = 0;
 	while (count($addededges)<$n-1) {
 		$steps++;
-		if (count($c)==0) {break;}
+		if (count($keys) == 0) {break;}
 		$c = array_shift($keys);
 		if ($clusters[$edges[$c][0]] != $clusters[$edges[$c][1]]) {
 			$addededges[] = $c;
