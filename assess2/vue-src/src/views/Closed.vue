@@ -33,7 +33,7 @@
         {{ $t('closed.will_block_latepass') }}
       </p>
 
-      <p v-if="settings.is_lti && settings.viewingb != 'never'">
+      <p v-if="canViewScored">
         {{ $t('closed.can_view_scored') }}
         <span v-if="settings.can_use_latepass > 0">
           <br/>
@@ -49,6 +49,13 @@
           @click = "handlePrimary"
         >
           {{ primaryButton }}
+        </button>
+        <button
+          v-if = "canViewScored"
+          class = "secondarybtn"
+          @click = "handleViewScored"
+        >
+          {{ $t('closed.view_scored') }}
         </button>
         <button
           v-if = "secondaryButton != ''"
@@ -162,8 +169,6 @@ export default {
         return 'latepass';
       } else if (this.settings.available === 'practice') {
         return 'practice';
-      } else if (this.canViewScored) {
-        return 'view_scored';
       } else if (window.exiturl && window.exiturl !== '') {
         return 'exit';
       } else {
@@ -175,8 +180,6 @@ export default {
         return this.$tc('closed.use_latepass', this.settings.can_use_latepass);
       } else if (this.primaryAction === 'practice') {
         return this.$t('closed.do_practice');
-      } else if (this.primaryAction === 'view_scored') {
-        return this.$t('closed.view_scored');
       } else if (this.primaryAction === 'exit') {
         return this.$t('closed.exit');
       } else {
@@ -184,8 +187,8 @@ export default {
       }
     },
     secondaryAction () {
-      // Practice is secondary if we can use latepass
-      if (this.settings.can_use_latepass > 0 && this.showLatePassOffer &&
+      // Practice is secondary if something else is primary
+      if (this.primaryAction !== 'practice' &&
         this.settings.available === 'practice'
       ) {
         return 'practice';
@@ -207,6 +210,7 @@ export default {
     },
     canViewScored () {
       return (this.settings.is_lti &&
+        !this.canViewAll &&
         this.settings.viewingb !== 'never' &&
         (this.settings.available === 'practice' || this.settings.available === 'pastdue')
       );
@@ -227,6 +231,14 @@ export default {
     }
   },
   methods: {
+    handleViewScored () {
+      // view scored assess
+      if (this.settings.can_use_latepass === 0 ||
+        window.confirm(this.$t('closed.confirm'))
+      ) {
+        window.location = store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
+      }
+    },
     handlePrimary () {
       if (this.primaryAction === 'latepass') {
         // redeem latepass
@@ -234,13 +246,6 @@ export default {
       } else if (this.primaryAction === 'practice') {
         // start practice mode
         actions.startAssess(true, '', []);
-      } else if (this.primaryAction === 'view_scored') {
-        // view scored assess
-        if (this.settings.can_use_latepass === 0 ||
-          window.confirm(this.$t('closed.confirm'))
-        ) {
-          window.location = store.APIbase + 'gbviewassess.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
-        }
       } else if (this.primaryAction === 'exit') {
         // exit assessment
         window.location = window.exiturl;
