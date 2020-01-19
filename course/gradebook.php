@@ -584,6 +584,11 @@ function gbstudisp($stu) {
 		$availshow=1;
 		$hidepast = true;
 	}
+	$equivavailshow = $availshow;
+	if ($availshow == 3) {
+		$equivavailshow = 1; // treat past & attempted like past & available
+	}
+
 	$now = time();
 	$hasoutcomes = false;
 	if ($stu>0) {
@@ -775,7 +780,7 @@ function gbstudisp($stu) {
 			} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
 				continue;
 			}
-			if ($gbt[0][1][$i][3]>$availshow) {
+			if ($gbt[0][1][$i][3]>$equivavailshow) {
 				continue;
 			}
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
@@ -1124,7 +1129,7 @@ function gbstudisp($stu) {
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			//$donedbltop = false;
 			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
-				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
+				if ($equivavailshow<2 && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
 					continue;
@@ -1472,7 +1477,12 @@ function gbinstrdisp() {
 		$availshow=1;
 		$hidepast = true;
 	}
+	$equivavailshow = $availshow;
+	if ($availshow == 3) {
+		$equivavailshow = 1; // treat past & attempted like past & available
+	}
 	$gbt = gbtable();
+
 	if ($avgontop) {
 		$avgrow = array_pop($gbt);
 		array_splice($gbt,1,0,array($avgrow));
@@ -1553,7 +1563,7 @@ function gbinstrdisp() {
 			} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
 				continue;
 			}
-			if ($gbt[0][1][$i][3]>$availshow) {
+			if ($gbt[0][1][$i][3]>$equivavailshow) {
 				continue;
 			}
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
@@ -1669,7 +1679,7 @@ function gbinstrdisp() {
 				} else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
 					continue;
 				}
-				if ($gbt[0][1][$j][3]>$availshow) {
+				if ($gbt[0][1][$j][3]>$equivavailshow) {
 					continue;
 				}
 				if ($hidepast && $gbt[0][1][$j][3]==0) {
