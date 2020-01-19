@@ -9,6 +9,7 @@
       type="password"
       autocomplete="off"
       @input="handleInput"
+      @keyup.enter="$emit('onenter')"
     >
   </div>
 </template>

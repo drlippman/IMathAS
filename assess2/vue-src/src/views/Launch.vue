@@ -12,7 +12,7 @@
           <div>
             <icons name="lock" size="small"/>
           </div>
-          <password-entry v-model="password"/>
+          <password-entry v-model="password" @onenter="startAssess"/>
         </div>
         <div class="flexrow" v-if="aInfo.isgroup > 0">
           <div>
@@ -176,6 +176,7 @@ export default {
   },
   methods: {
     startAssess () {
+      if (!this.okToLaunch) { return; }
       let timelimit = this.aInfo.timelimit;
       if (this.aInfo.has_password) {
         // hacky fix for when the password is entered programatically
