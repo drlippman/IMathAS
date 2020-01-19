@@ -198,7 +198,10 @@
                 if (in_array(-1, $scoredQuestion['scored_try'])) {
                     $qincomplete[$questionId] += 1;
                 }
-            }
+            } else {
+							// not even tried yet 
+							$qincomplete[$questionId] += 1;
+						}
 
             // Time spent per version.
             $timeontaskperversion[$questionId] += $questionData['time'] / ($regens[$questionId] + 1);
