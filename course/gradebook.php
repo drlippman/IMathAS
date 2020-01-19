@@ -280,7 +280,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=021319"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=011920"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -1331,7 +1331,11 @@ function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
 			} else if ($availshow==0 && $gbt[0][2][$i][2]==1) { //don't show cur in past view
 				continue;
 			}
-			echo '<th class="cat'.($gbt[0][2][$i][1]%10).'"><div><span class="cattothdr">';
+			echo '<th class="cat'.($gbt[0][2][$i][1]%10).'"';
+			if ($gbt[0][4][0]==0) { //using points based
+				echo ' data-pts="'.$gbt[0][2][$i][3+$availshow].'"';
+			}
+			echo '><div><span class="cattothdr">';
 			if ($availshow<3) {
 				echo $gbt[0][2][$i][0].'<br/>';
 				if ($gbt[0][4][0]==0) { //using points based
@@ -1573,7 +1577,8 @@ function gbinstrdisp() {
 				continue;
 			}
 			//name and points
-			echo '<th class="cat'.($gbt[0][1][$i][1]%10).'"><div>'.$gbt[0][1][$i][0].'<br/>';
+			echo '<th class="cat'.($gbt[0][1][$i][1]%10).'" data-pts="'.$gbt[0][1][$i][2].'">';
+			echo '<div>'.$gbt[0][1][$i][0].'<br/>';
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
 				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
 			} else {
