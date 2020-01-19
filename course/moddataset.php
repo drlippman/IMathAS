@@ -376,7 +376,11 @@
 					//	$t++;
 					//}
 					$result_array = getimagesize($_FILES['imgfile']['tmp_name']);
-					if ($result_array === false) {
+					$extension = pathinfo($_FILES['imgfile']['name'], PATHINFO_EXTENSION);
+					$mimetype = mime_content_type($_FILES['imgfile']['tmp_name']);
+					$is_alt_img = (in_array($mimetype, ['image/svg+xml']) &&
+						in_array($extension, ['svg']));
+					if ($result_array === false && !$is_alt_img) {
 						$errmsg .= "<p>File is not image file</p>";
 					} else {
 						if (($filename=storeuploadedqimage('imgfile',$filename))!==false) {
