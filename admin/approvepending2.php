@@ -6,8 +6,7 @@ if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/approvepending'])) {
-    $prepend = '/' == substr($CFG['hooks']['admin/approvepending'], 0, 1) ? '' : __DIR__ . '/../';
-    require($prepend . $CFG['hooks']['admin/approvepending']);
+	require($CFG['hooks']['admin/approvepending']);
 }
 
 $newStatus = Sanitize::onlyInt($_POST['newstatus']);
@@ -184,12 +183,13 @@ function getGroups() {
 
 //add fields based on your new instructor request form
 //and then add the "search" entry
-$reqFields = array(
-	'school' => 'School',
-	'phone' => 'Phone',
-	'search' => 'Search'
-);
-
+if (empty($reqFields)) {
+    $reqFields = array(
+        'school' => 'School',
+        'phone' => 'Phone',
+        'search' => 'Search'
+    );
+}
 
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/fuse.min.js\"></script>";
@@ -229,7 +229,7 @@ if (!isset($_GET['from'])) {
 	$curBreadcrumb .= "&gt; <a href=\"../util/utils.php\">Utilities</a> &gt; ";
 }
 
-require("../header.php");
+require(IMATHAS_DIR . "/header.php");
 echo '<div class="breadcrumb">'. $curBreadcrumb . $pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -280,6 +280,8 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	  <li>
       	    <button @click="chgStatus(status, userindex, 11)">Approve Request</button>
       	    <button @click="chgStatus(status, userindex, 10)">Deny Request</button>
+      	    <br/>
+      	    With an Approve or Deny, an email is automatically sent to the requester.
       	  </li>
       	</ul>
       </li>
@@ -445,4 +447,4 @@ var app = new Vue({
 </script>
 
 <?php
-require("../footer.php");
+require(IMATHAS_DIR . "/footer.php");
