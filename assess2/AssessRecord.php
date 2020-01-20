@@ -1853,23 +1853,28 @@ class AssessRecord
         $curq = $question_versions[$ver];
       }
       if (count($curq['tries']) == 0) {
-        $scorenonzero[$qn] = 0;
-        $scoreiscorrect[$qn] = 0;
+        $scorenonzero[$qn+1] = -1;
+        $scoreiscorrect[$qn+1] = -1;
         continue;
       }
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
       foreach ($curq['tries'] as $pn => $v) {
-        $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
-        $scorenonzeroparts[$pn] = $lasttry['raw'] > 0;
-        $scoreiscorrectparts[$pn] = $lasttry['raw'] > .99;
+        if (count($curq['tries'][$pn]) == 0) {
+          $scorenonzeroparts[$pn] = -1;
+          $scoreiscorrectparts[$pn] = -1;
+        } else {
+          $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
+          $scorenonzeroparts[$pn] = ($lasttry['raw'] > 0) ? 1 : 0;
+          $scoreiscorrectparts[$pn] = ($lasttry['raw'] > .99) ? 1 : 0;
+        }
       }
       if (count($scorenonzeroparts) > 1) {
-        $scorenonzero[$qn] = $scorenonzeroparts;
-        $scoreiscorrect[$qn] = $scoreiscorrectparts;
+        $scorenonzero[$qn+1] = $scorenonzeroparts;
+        $scoreiscorrect[$qn+1] = $scoreiscorrectparts;
       } else {
-        $scorenonzero[$qn] = $scorenonzeroparts[0];
-        $scoreiscorrect[$qn] = $scoreiscorrectparts[0];
+        $scorenonzero[$qn+1] = $scorenonzeroparts[0];
+        $scoreiscorrect[$qn+1] = $scoreiscorrectparts[0];
       }
 
     }
