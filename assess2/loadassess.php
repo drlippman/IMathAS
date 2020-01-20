@@ -63,7 +63,7 @@ $include_from_assess_info = array(
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
-  'noprint', 'overtime_penalty', 'overtime_grace'
+  'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 

@@ -128,7 +128,11 @@ export default {
         // past due
         return this.$t('closed.pastdue', { ed: this.settings.enddate_disp });
       } else if (this.settings.available === 'needprereq') {
-        return this.$t('closed.needprereq');
+        return this.$t('closed.needprereq') + ' ' +
+          this.$t('closed.prereqreq', {
+            score: this.settings.reqscorevalue,
+            name: this.settings.reqscorename
+          });
       } else if (this.settings.hasOwnProperty('pasttime')) {
         return this.$t('closed.pasttime');
       } else if (this.settings.has_active_attempt === false && this.settings.can_retake === false) {

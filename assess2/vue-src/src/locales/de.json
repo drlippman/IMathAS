@@ -24,6 +24,7 @@
     "pastdue": "Dieser Test war am {ed} fällig.",
     "pasttime": "Die Zeit für diesen test ist abgelaufen.",
     "needprereq": "Sie haben noch nicht die Voraussetzungen erfüllt, um an diesem Test zu arbeiten.",
+    "prereqreq": "Eine Punktzahl von {score} für {name} ist erforderlich.",
     "no_attempts": "Sie haben alle Versuche für diesen Test verbraucht.",
     "latepassn": "Sie können einmal verspätet einreichen. | Sie können {n} mal verspätet einreichen.",
     "latepass_needed": "Sie können bis zum {date} eine verspätete Einreichung nutzen um diesen Test erneut zu öffnen | Sie können bis zum {date} {n} verspätete Einreichungen nutzen um diesen test erneut zu öffnen",

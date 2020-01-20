@@ -480,12 +480,12 @@ class AssessInfo
         $this->assessData['reqscoreaid'] > 0 &&
         !$this->waiveReqScore()
     ) {
-      $query = "SELECT iar.score,ia.ptsposs FROM imas_assessments AS ia LEFT JOIN ";
+      $query = "SELECT iar.score,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
 			$query .= "WHERE ia.id=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->assessData['reqscoreaid']));
-      list($prereqscore,$reqscoreptsposs) = $stm->fetch(PDO::FETCH_NUM);
+      list($prereqscore,$reqscoreptsposs,$prereqname) = $stm->fetch(PDO::FETCH_NUM);
       if ($prereqscore === null) {
 				$isBlocked = true;
 			} else {
@@ -500,6 +500,9 @@ class AssessInfo
       }
       if ($isBlocked) {
         $this->assessData['available'] = 'needprereq';
+        $this->assessData['reqscorename'] = $prereqname;
+        $this->assessData['reqscorevalue'] = ($this->assessData['reqscore']) .
+          (($this->assessData['reqscoretype']&2) ? '%' : ' '._('points'));
       }
     }
   }
@@ -549,7 +552,7 @@ class AssessInfo
     $seeds = array();
     $RND = new Rand();
 
-    if ($this->assessData['shuffle']&4) { 
+    if ($this->assessData['shuffle']&4) {
       // if set for all students same random seed, it makes sense they'd get
       // the same questions from pool and shuffle order as well
       $RND->srand($this->curAid + $attempt + ($ispractice ? 1000 : 0));
