@@ -57,6 +57,7 @@
       :canedit = "canedit"
       :useeditor = "useEditor"
       ref = "fbbox"
+      :qn = "qn"
       :value = "qdata.feedback"
       @update = "updateFeedback"
     />

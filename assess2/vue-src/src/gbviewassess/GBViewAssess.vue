@@ -207,6 +207,7 @@
           </div>
         </div>
         <gb-feedback
+          qn="gen"
           :show="true"
           :canedit = "canEdit"
           :useeditor = "useEditor"

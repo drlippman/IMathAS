@@ -4,6 +4,7 @@
     <textarea
       v-if="canedit && !useeditor"
       class="fbbox"
+      :id="'fb' + qn"
       ref = "fbbox"
       rows="2"
       cols="60"
@@ -13,6 +14,7 @@
     <tinymce-input
       v-else-if="canedit"
       ref = "fbbox"
+      :id="'fb' + qn"
       :value = "value"
       @input = "updateFeedback"
     ></tinymce-input>
@@ -29,7 +31,7 @@ import TinymceInput from '@/components/TinymceInput.vue';
 
 export default {
   name: 'GbFeedback',
-  props: ['show', 'canedit', 'useeditor', 'value'],
+  props: ['show', 'canedit', 'useeditor', 'value', 'qn'],
   components: {
     TinymceInput
   },
