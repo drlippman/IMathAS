@@ -101,6 +101,11 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
     echo '{"error": "livepoll_wrongquestion"}';
     exit;
   }
+  // override showscores value to prevent score marks
+  if ($livepollStatus['curstate'] != 4) {
+    $assess_info->overrideSetting('showscores', 'at_end');
+    $assess_info->overrideSetting('showans', 'never');
+  }
 }
 
 // If in practice, now we overwrite settings
@@ -185,10 +190,7 @@ if ($jumpToAnswer) {
 // grab question settings data with HTML
 if ($assess_info->getSetting('displaymethod') === 'livepoll') {
   $showscores = ($livepollStatus['curstate'] == 4);
-  // override showscores value to prevent score marks
-  if (!$showscores) {
-    $assessInfoOut['showscores'] = 'at_end';
-  }
+
   if ($isteacher) {
     // trigger additional jsParams for livepoll results display
     $GLOBALS['capturedrawinit'] = true;

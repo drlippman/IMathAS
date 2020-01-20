@@ -119,6 +119,9 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
     echo '{"error": "livepoll_notopen"}';
     exit;
   }
+  // override settings to prevent score/key display
+  $assess_info->overrideSetting('showscores', 'at_end');
+  $assess_info->overrideSetting('showans', 'never');
 }
 
 // If in practice, now we overwrite settings
@@ -271,8 +274,6 @@ if ($end_attempt) {
   if ($assess_info->getSetting('displaymethod') === 'livepoll') {
     // don't show scores until question is closed for livepoll
     $showscores = false;
-    $assess_info->overrideSetting('showscores', 'at_end');
-    $assessInfoOut['showscores'] = 'at_end';
 
     if (!$isteacher) {
       // call the livepoll server with the result
