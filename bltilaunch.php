@@ -43,6 +43,17 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
+	 $errormsg = 'This launch was made insecurely (using http instead of https). ';
+ 	 $errormsg .= $installname.' requires secure launches to protect student data. ';
+	 $ltirole = strtolower($_REQUEST['roles']);
+	 if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false || strpos($ltirole,'contentdeveloper')!== false) {
+	 	 $errormsg .= 'Please update the links or tool in the LMS to use https (aka SSL). ';
+	 	 if ($_REQUEST['tool_consumer_info_product_family_code'] == 'moodle') {
+	 	 	 $errormsg .= 'In Moodle, you can do this by clicking the "Edit preconfigured tool" icon, scrolling down to Privacy, and clicking the Force SSL checkbox. ';
+	 	 	 $errormsg .= 'If you do not have access to do this, you might need to ask your LMS administrator to enable the Force SSL option. ';
+	 	 }
+	 }
+ 	 reporterror($errormsg);
  }
 if ($enablebasiclti!=true) {
 	echo "BasicLTI not enabled";
