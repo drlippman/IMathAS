@@ -156,18 +156,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 				$stm = $DBH->prepare($query);
 				$stm->execute($insarr);
-				$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE groupsetid=:groupsetid");
+				$stm = $DBH->prepare("SELECT id,ver FROM imas_assessments WHERE groupsetid=:groupsetid");
 				$stm->execute(array(':groupsetid'=>$grpsetid));
-				while (($aid = $stm->fetch(PDO::FETCH_NUM)) && $grpsetid>0) {
+				while ((list($aid,$aver) = $stm->fetch(PDO::FETCH_NUM)) && $grpsetid>0) {
 					//if asid exists for this grpid, need to update students.
 					//if no asid exists already, but the students we're adding have one, use one (which?) of theirs
 					//otherwise do nothing
-					$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
-					$rowgrptest = '';
-					$query = "SELECT $fieldstocopy ";
-					$query .= "FROM imas_assessment_sessions WHERE agroupid=:agroupid AND assessmentid=:assessmentid";
+					if ($aver>1) {
+						$fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
+						$rowgrptest = '';
+						$query = "SELECT $fieldstocopy ";
+						$query .= "FROM imas_assessment_records WHERE agroupid=:agroupid AND assessmentid=:assessmentid";
+					} else {
+						$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,timeontask,ver';
+						$rowgrptest = '';
+						$query = "SELECT $fieldstocopy ";
+						$query .= "FROM imas_assessment_sessions WHERE agroupid=:agroupid AND assessmentid=:assessmentid";
+					}
 					$stm2 = $DBH->prepare($query);
-					$stm2->execute(array(':agroupid'=>$grpid, ':assessmentid'=>$aid[0]));
+					$stm2->execute(array(':agroupid'=>$grpid, ':assessmentid'=>$aid));
 					if ($stm2->rowCount()>0) {
 						//asid already exists for group - use it
 						$rowgrptest = $stm2->fetch(PDO::FETCH_ASSOC);
@@ -175,18 +182,32 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					} else {
 						//use asid from first student assessment
 						$grpasidexists = false;
-						$query = "SELECT id,$fieldstocopy ";
-						$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid=:assessmentid";
+						if ($aver > 1) {
+							$query = "SELECT userid,$fieldstocopy ";
+							$query .= "FROM imas_assessment_records WHERE userid IN ($stulist) AND assessmentid=:assessmentid";
+						} else {
+							$query = "SELECT id,$fieldstocopy ";
+							$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid=:assessmentid";
+						}
 						$stm2 = $DBH->prepare($query);
-						$stm2->execute(array(':assessmentid'=>$aid[0]));
+						$stm2->execute(array(':assessmentid'=>$aid));
 						if ($stm2->rowCount()>0) {
+							// first student - grab their data to copy to others
 							$rowgrptest = $stm2->fetch(PDO::FETCH_ASSOC);
-							$srcasid = $rowgrptest['id'];
-							unset($rowgrptest['id']);
-							$rowgrptest['agroupid'] = $grpid;
-							while ($row = $stm2->fetch(PDO::FETCH_ASSOC)) {
-								deleteasidfilesfromstring2($row['lastanswers'].$row['bestlastanswers'],'id',$row['id'],$row['assessmentid']);
+
+							// remaining students: delete any files in their existing records
+							// since we'll be overwriting them
+							if ($aver > 1) {
+								$otherstus = array_diff($stustoadd, array($rowgrptest['userid']));
+								deleteAssess2FilesOnUnenroll($otherstus, array($aid), array($aid));
+							} else {
+								while ($row = $stm2->fetch(PDO::FETCH_ASSOC)) {
+									deleteasidfilesfromstring2($row['lastanswers'].$row['bestlastanswers'],'id',$row['id'],$row['assessmentid']);
+								}
 							}
+							unset($rowgrptest['id']);
+							unset($rowgrptest['userid']);
+							$rowgrptest['agroupid'] = $grpid;
 						}
 					}
 					if ($rowgrptest != '') {  //if an assessment session already exists
@@ -197,8 +218,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$stustoadd = array_merge($stustoadd,$existinggrpmembers);
 						}
 						foreach ($stustoadd as $stuid) {
-							$stm2 = $DBH->prepare("SELECT id,agroupid FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
-							$stm2->execute(array(':userid'=>$stuid, ':assessmentid'=>$aid[0]));
+							if ($aver > 1) {
+								$stm2 = $DBH->prepare("SELECT agroupid FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid");
+							} else {
+								$stm2 = $DBH->prepare("SELECT id,agroupid FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
+							}
+							$stm2->execute(array(':userid'=>$stuid, ':assessmentid'=>$aid));
 							if ($stm2->rowCount()>0) {
 								$loginfo .= "updating ias for $stuid.";
 								$row = $stm2->fetch(PDO::FETCH_NUM);
@@ -207,8 +232,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									$sets[] = "$val=:$val";
 								}
 								$setslist = implode(',',$sets);
-								$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET $setslist WHERE id=:id");
-								$stm2->execute(array(':id'=>$row[0]) + $rowgrptest);
+								if ($aver > 1) {
+									$stm2 = $DBH->prepare("UPDATE imas_assessment_records SET $setslist WHERE userid=:userid AND assessmentid=:assessmentid");
+									$stm2->execute(array(':userid'=>$stuid, ':assessmentid'=>$aid) + $rowgrptest);
+								} else {
+									$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET $setslist WHERE id=:id");
+									$stm2->execute(array(':id'=>$row[0]) + $rowgrptest);
+								}
 								//$query = "UPDATE imas_assessment_sessions SET assessmentid='{$rowgrptest[0]}',agroupid='{$rowgrptest[1]}',questions='{$rowgrptest[2]}'";
 								//$query .= ",seeds='{$rowgrptest[3]}',scores='{$rowgrptest[4]}',attempts='{$rowgrptest[5]}',lastanswers='{$rowgrptest[6]}',";
 								//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
@@ -216,8 +246,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								//$query = "UPDATE imas_assessment_sessions SET agroupid='$agroupid' WHERE id='{$row[0]}'";
 							} else {
 								$loginfo .= "inserting ias for $stuid.";
-								$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
-								$query .= "VALUES (:stuid,$insrow)";
+								if ($aver > 1) {
+									$query = "INSERT INTO imas_assessment_records (userid,$fieldstocopy) ";
+									$query .= "VALUES (:stuid,$insrow)";
+								} else {
+									$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
+									$query .= "VALUES (:stuid,$insrow)";
+								}
 								$stm2 = $DBH->prepare($query);
 								$stm2->execute(array(':stuid'=>$stuid) + $rowgrptest);
 							}
@@ -327,7 +362,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_grpsetname = $stm->fetchColumn(0);
 			$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Create Random Groups";
 		}
-			
+
 	} else if (isset($_GET['rengrp'])) {
 		//renaming groupset
 		$renGrp = sanitize::onlyInt($_GET['rengrp']);
@@ -578,13 +613,13 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['removeall'])) {
 		echo '<h3>Remove ALL group members</h3>';
 		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
-		
+
 		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'removeall'=>Sanitize::onlyInt($_GET['removeall'])));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
 		echo '</form>';
-		
+
 	} else if (isset($_GET['addrandgrps']) && !empty($grpsetid)) {
 		//add new group set
 		echo '<h3>Create random student groups</h3>';
@@ -593,9 +628,9 @@ if ($overwriteBody==1) {
 		echo '<span class=formright><input type=text size=2 id=grpsize name=grpsize value=4 /></span><br class=form />';
 		echo '<span class=form><label for=grpadj>'._('Unequal groups').'</label>:</span>';
 		echo '<span class=formright><select id=grpadj name=grpadj>';
-		echo ' <option value="0" selected>'._('Make smaller groups if needed').'</option>'; 
-		echo ' <option value="1">'._('Make larger groups if needed').'</option>'; 
-		echo ' <option value="2">'._('Make smaller or larger groups if needed').'</option>'; 
+		echo ' <option value="0" selected>'._('Make smaller groups if needed').'</option>';
+		echo ' <option value="1">'._('Make larger groups if needed').'</option>';
+		echo ' <option value="2">'._('Make smaller or larger groups if needed').'</option>';
 		echo '</select></span><br class=form />';
 		echo '<span class=form>'._('Locked students:').'</span>';
 		echo '<span class=formright><label><input type=checkbox name=inclocked />'._('Include locked students').'</label></span><br class=form />';
@@ -605,14 +640,14 @@ if ($overwriteBody==1) {
 	} else if (isset($_GET['remove']) && $_GET['grpid']) {
 		echo '<h3>Remove group member</h3>';
 		echo "<p>Are you SURE you want to remove <b>" . Sanitize::encodeStringForDisplay($page_stuname) . "</b> from the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
-		
+
 		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'grpid'=>Sanitize::onlyInt($_GET['grpid']), 'remove'=>Sanitize::onlyInt($_GET['remove'])));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
 		echo '</form>';
-		
-		
+
+
 	} else if (isset($_GET['grpsetid'])) {
 		?>
 		<script type="text/javascript">

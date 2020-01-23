@@ -677,7 +677,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 //percents: array of pie percents (should total 100%)
 //labels: array of labels for each pie piece
 //uses Google Charts API
-function piechart($pcts,$labels,$w=350,$h=150) {
+function piechart($pcts,$labels,$w=250,$h=130) {
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
 		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
@@ -690,7 +690,7 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 		return $out;
 	}
 	$uniqueid = uniqid('pie');
-	$out = '<div id="'.$uniqueid.'" style="width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
+	$out = '<div id="'.$uniqueid.'" style="display:inline-block;width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
 	//load google charts loader if needed
 	$out .= '<script type="text/javascript">
 		if (typeof window.chartqueue == "undefined") {
@@ -710,13 +710,15 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 		$rows[] = $row;
 	}
 
+  $cw = $w - 20;
+  $ch = $h - 20;
 	$out .= 'function '.$uniqueid.'() {
 		var data = new google.visualization.DataTable();
 		data.addColumn("string", "Data");
 		data.addColumn("number", "Percentage");
 		data.addRows(['.implode(',', $rows).']);
 		var chart = new google.visualization.PieChart(document.getElementById("'.$uniqueid.'"));
-		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}});
+		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}, chartArea:{left:10, top:10, width:'.$cw.', height:'.$ch.'}});
 	}';
 
 	//load it
@@ -839,17 +841,23 @@ function boxplot($arr,$label="",$options = array()) {
 			$iqr = $q3-$q1;
 			$lfence = $q1 - 1.5*$iqr;
 			$rfence = $q3 + 1.5*$iqr;
+      $mininside = 1e50;
+      $maxinside = -1e50;
 			foreach ($a as $v) {
 				if ($v<$lfence || $v>$rfence) {
 					$outliers[] = $v*1;
-				}
+				} else if ($v < $mininside) {
+          $mininside = $v*1;
+        } else if ($v > $maxinside) {
+          $maxinside = $v*1;
+        }
 			}
 			if (count($outliers)>0) {
 				if ($lfence>$min) {
-					$min = $lfence;
+					$min = $mininside;
 				}
 				if ($rfence<$max) {
-					$max = $rfence;
+					$max = $maxinside;
 				}
 			}
 		}

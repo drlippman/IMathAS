@@ -14,7 +14,15 @@ if (isset($_POST['mergefrom'])) {
 			$seta[$n - 1] = $aid;
 		}
 	}
-	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,reqscore,reqscoreaid';
+	//$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,allowlate,exceptionpenalty,noprint,avail,groupmax,endmsg,deffeedbacktext,eqnhelper,caltag,calrtag,reqscore,reqscoreaid';
+	$fieldstocopy = 'name,summary,intro,startdate,enddate,reviewdate,LPcutoff,';
+	$fieldstocopy .= 'timelimit,minscore,displaymethod,defpoints,defattempts,deffeedback,';
+	$fieldstocopy .= 'defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,';
+	$fieldstocopy .= 'allowlate,exceptionpenalty,noprint,avail,groupmax,isgroup,groupsetid,endmsg,';
+	$fieldstocopy .= 'deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,';
+	$fieldstocopy .= 'istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,';
+	$fieldstocopy .= 'posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,';
+	$fieldstocopy .= 'ansingb,defregens,defregenpenalty,ver,keepscore,overtime_grace,overtime_penalty';
 	$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$seta[0]));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -231,12 +239,8 @@ if (isset($_POST['mergefrom'])) {
 		echo "<li><input type=\"text\" size=\"2\" name=\"mergefrom[" . Sanitize::onlyInt($id) . "]\" />" . Sanitize::encodeStringForDisplay($assess[$id]) . "</li>";
 	}
 	echo '</ul>';
-	echo '<p>Include assessment name as headers in intro? <input type="checkbox" name="nameasheader" value="1"/></p>';
-	echo '<p>Intro merge type:<br/><input type="radio" name="mergetype" value="0" checked="checked" />Just merge text (and adjust existing [QUESTION #] tags) ';
-	echo '<br/><input type="radio" name="mergetype" value="1" /> Add Embed [QUESTION #] tags ';
-	echo ' <br/><input type="radio" name="mergetype" value="2" /> Add Skip Around [Q #] tags ';
-	echo ' <br/><input type="radio" name="mergetype" value="3" /> Merge text, convert [QUESTION #] tags to Skip Around [Q #] tags ';
-	echo ' <br/><input type="checkbox" name="addpages" value="1" />Add Page [PAGE] tags </p> ';
+	echo '<input type="hidden" name="mergetype" value="0"/>';
+
 	echo '<input type="submit" value="Go">';
 	echo '</form>';
 	require("../footer.php");

@@ -14,6 +14,7 @@ $stm = $DBH->prepare($query);
 $stm->execute(array(':courseid'=>$cid));
 $stuemails = array();
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+	$row[2] = str_replace('BOUNCED', '', $row[2]);
 	$stuemails[] = $row[0].' '.$row[1]. ' &lt;'.$row[2].'&gt;';
 }
 $stuemails = implode('; ',$stuemails);

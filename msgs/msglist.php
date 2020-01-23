@@ -81,7 +81,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$msgset = $stm->fetchColumn(0);
 		$msgmonitor = (floor($msgset/5)&1);
 		$msgset = $msgset%5;
-		
+
 		$isauth = false;
 		$isteacher = false;
 		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=? AND courseid=?");
@@ -97,7 +97,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			}
 		}
 		if (!$isauth) {
-			echo '[]'; 
+			echo '[]';
 			exit;
 		}
 
@@ -145,12 +145,58 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
+			$msgToPost = Sanitize::onlyInt($_POST['to']);
+
+			// validate message settings allow this
+			$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cidP));
+			$msgset = ($stm->fetchColumn(0))%5;
+			$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
+			$stm->execute(array($cidP));
+			$teacherList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+			$stm = $DBH->prepare("SELECT userid FROM imas_tutors WHERE courseid=?");
+			$stm->execute(array($cidP));
+			$tutorList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
+			$stm->execute(array($cidP));
+			$studentList = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+
+			$isvalid = false;
+			if (in_array($userid, $studentList)) { // sender is student
+				if ($msgset == 2 && in_array($msgToPost, $studentList)) { //only can send to student
+					$isvalid = true;
+				} else if ($msgset == 1 && // only can send to teacher
+					(in_array($msgToPost, $teacherList) || in_array($msgToPost, $tutorList))
+				) {
+					$isvalid = true;
+				} else if ($msgset == 0 && (
+					in_array($msgToPost, $studentList) ||
+					in_array($msgToPost, $teacherList) ||
+					in_array($msgToPost, $tutorList)
+				)) {
+					$isvalid = true;
+				}
+			} else if (in_array($userid, $teacherList) || in_array($userid, $tutorList)) { // sender is teacher or tutor
+				if ($msgset < 4 && (
+					in_array($msgToPost, $studentList) ||
+					in_array($msgToPost, $teacherList) ||
+					in_array($msgToPost, $tutorList)
+				)) {
+					$isvalid = true;
+				}
+			}
+			if (!$isvalid) {
+				require("../header.php");
+				echo 'You are not permitted to send a message to that user in this course.';
+				require("../footer.php");
+				exit;
+			}
+
       $messagePost = Sanitize::incomingHtml($_POST['message']);
 			$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
 			if (trim($subjectPost)=='') {
 				$subjectPost = '('._('none').')';
 			}
-			$msgToPost = Sanitize::onlyInt($_POST['to']);
 
       $now = time();
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -735,7 +781,7 @@ function chgfilter() {
 		echo " >".Sanitize::encodeStringForDisplay($v)."</option>";
 	}
 	echo "</select> ";
-	
+
 	echo '<label for="filteruid">By sender</label>: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
 	if ($filteruid==0) {
 		echo 'selected="selected" ';
@@ -775,7 +821,7 @@ function chgfilter() {
 	</thead>
 	<tbody>
 <?php
-  $offset = ($page-1)*$threadsperpage;
+  $offset = max(0, ($page-1)*$threadsperpage);
 
   $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";

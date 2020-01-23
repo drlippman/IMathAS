@@ -77,6 +77,8 @@ function delitembyid($itemid) {
 		deleteallaidfiles($typeid);
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$typeid));
+		$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+		$stm->execute(array(':assessmentid'=>$typeid));
 
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':assessmentid'=>$typeid));
@@ -86,10 +88,10 @@ function delitembyid($itemid) {
 		$stm->execute(array(':id'=>$typeid));
 		$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$typeid));
-		
+
 		$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=0 WHERE reqscoreaid=:assessmentid AND courseid=:courseid");
 		$stm->execute(array(':assessmentid'=>$typeid, ':courseid'=>$cid));
-		
+
 	} else if ($itemtype == "Drill") {
 		$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid=:drillassessid");
 		$stm->execute(array(':drillassessid'=>$typeid));

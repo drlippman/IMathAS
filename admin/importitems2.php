@@ -40,7 +40,10 @@ if (!(isset($teacherid))) {
 	$uploaddir = __DIR__.'/import/';
 	$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
 	$data = json_decode(file_get_contents($uploadfile), true);
-
+  if (!isset($data['course']['UIver'])) {
+    $data['course']['UIver'] = 1;
+  }
+  
 	$options = array();
 	foreach (array('courseopt','gbsetup','offline','calitems','stickyposts') as $n) {
 		if (isset($_POST['import'.$n])) {
@@ -110,6 +113,9 @@ if (!(isset($teacherid))) {
 		$hasoffline = isset($data['offline']);
 		$hascalitems = isset($data['calitems']);
 		$hasstickyposts = isset($data['stickyposts']);
+    if (!isset($data['course']['UIver'])) {
+      $data['course']['UIver'] = 1;
+    }
 	}
 }
 /******* begin html output ********/
@@ -176,6 +182,14 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 } else {
 	echo $page_fileHiddenInput;
 	echo '<h2>'._('Course').': '.$data['course']['name'].'</h2>';
+
+  if ($data['course']['UIver'] > $courseUIver) {
+    echo '<p class=noticetext>'._('The import file is for a more recent assessment version than this course - cannot import.').'</p>';
+    require("../footer.php");
+    exit;
+  } else if ($data['course']['UIver'] < $courseUIver) {
+    echo '<p class=noticetext>'._('The import file is for an older assessment version than this course - assessments will be upgraded.').'</p>';
+  }
 
 	if ($myrights==100) {
 		echo '<p><input type="checkbox" name="importasteacher" id="importasteacher" checked /> Import as course owner (for ownership when updating or adding questions).</p>';

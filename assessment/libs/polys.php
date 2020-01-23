@@ -3,7 +3,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder");
+array_push($allowedmacros,"formpoly","formpolyfromroots","writepoly","addpolys","subtpolys","multpolys","scalepoly","roundpoly","quadroot","getcoef","polypower","checkpolypowerorder","derivepoly");
 
 
 //formpoly(coefficients,powers or degree)
@@ -266,6 +266,16 @@ function checkpolypowerorder($p,$ord='dec') {
 	return true;
 }
 
-
+// derivative of polynomial
+function derivepoly($p) {
+	$out = array();
+	for ($i=0;$i<count($p);$i++) {
+		if ($p[$i][1] == 0) { continue; }
+		$out[$i] = array();
+		$out[$i][0] = $p[$i][0]*$p[$i][1];
+		$out[$i][1] = $p[$i][1]-1;
+	}
+	return $out;
+}
 
 ?>

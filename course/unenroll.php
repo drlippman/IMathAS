@@ -13,7 +13,7 @@ ini_set("max_execution_time", "600");
 		exit;
 	}
 	$get_uid = Sanitize::simpleString($_GET['uid']);
-	
+
 	if (isset($_POST['dounenroll'])) { //do unenroll - postback
 		if ($get_uid=="selected") {
 			$tounenroll = explode(",",$_POST['tounenroll']);
@@ -41,9 +41,9 @@ ini_set("max_execution_time", "600");
 			$withwithdraw = false;
 		}
 		$DBH->beginTransaction();
-		unenrollstu($cid,$tounenroll,($get_uid=="all" || isset($_POST['delforumposts'])),($get_uid=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev, isset($_POST['usereplaceby']));
+		unenrollstu($cid,$tounenroll,($get_uid=="all" || isset($_POST['delforumposts'])),($get_uid=="all" && isset($_POST['removeoffline'])),$withwithdraw,$delwikirev, isset($_POST['usereplaceby']), isset($_POST['upgradeassessver']));
 		$DBH->commit();
-		
+
 		if ($get_uid=="all") {
 			$updcrs = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
 			$updcrs->execute(array($cid));
@@ -149,6 +149,11 @@ ini_set("max_execution_time", "600");
 			<p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis,
 				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
 			</p>
+			<?php if ($courseUIver == 1) { ?>
+			<p><input type=checkbox name="upgradeassessver" value="1" />
+				Upgrade course to use new assessment interface. This feature is still in Beta - use with caution.
+			</p>
+			<?php } ?>
 
 <?php
 			//<p>Also remove any withdrawn questions? <input type="checkbox" name="removewithdrawn" value="1" checked="checked"/></p>

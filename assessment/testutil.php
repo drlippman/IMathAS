@@ -106,7 +106,7 @@ function getquestioninfo($qns,$testsettings,$preloadqsdata=false) {
 //which might be randomizer determined, hence the seed
 function getansweights($qi,$code) {
 	global $seeds,$questions,$attempts;
-	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
+	if (preg_match('/^\s*\$scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
 	$i = array_search($qi,$questions);
@@ -114,7 +114,7 @@ function getansweights($qi,$code) {
 }
 
 function sandboxgetweights($code,$seed,$attemptn) {
-	srand($seed);
+	$GLOBALS['RND']->srand($seed);
 	$code = interpret('control','multipart',$code);
 	if (($p=strrpos($code,'answeights'))!==false) {
 		$np = strpos($code,"\n",$p);
@@ -125,12 +125,12 @@ function sandboxgetweights($code,$seed,$attemptn) {
 		}
 		//$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
 	} else {
-		$p=strrpos($code,'answeights');
+		$p=strrpos($code,'anstypes');
 		$np = strpos($code,"\n",$p);
 		if ($np !== false) {
 			$code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
 		} else {
-			$code .= ';if(isset($answeights)){return;};';
+			$code .= ';if(isset($anstypes)){return;};';
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
@@ -144,7 +144,7 @@ function sandboxgetweights($code,$seed,$attemptn) {
 		}
 	}
 	if (!isset($answeights)) {
-		if (!isset($anstypes)) { 
+		if (!isset($anstypes)) {
 			//this shouldn't happen unless the code crashed
 			return array(1);
 		}
@@ -410,7 +410,7 @@ function printscore($sc,$qn) {
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		$scarr = explode('~',$sc);
-		
+
 		$ptposs = $qi[$questions[$qn]]['answeights'];
 		if (!is_array($ptposs)) {
 			//this shouldn't happen, but handle code breaking issues
@@ -422,7 +422,7 @@ function printscore($sc,$qn) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
+
 		if (strpos($thisraw,'-2')!==false) {
 			$rawarr = explode('~',$thisraw);
 			foreach ($rawarr as $k=>$v) {
@@ -516,7 +516,7 @@ function scorequestion($qn, $rectime=true) {
 	global $regenonreattempt, $sessiondata;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
-	
+
 	if (!isset($questions[$qn]) || $questions[$qn]===0) {
 		echo "Something went wrong... (TU-SQ1)";
 		return 0;
@@ -645,12 +645,12 @@ function recordtestdata($limit=false, $updateLTI=true) {
 				':bestseeds'=>$bestseedslist, ':bestattempts'=>$bestattemptslist, ':bestscores'=>$bestscorelist,
 				':bestlastanswers'=>$bestlalist, ':endtime'=>$now, ':reattempting'=>$reattemptinglist, ':timeontask'=>$timeslist,
 				':questions'=>$questionlist);
-			
+
 			if ($updateLTI && isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) {
 				//update lti record.  We only do this for single assessment placements
-	
+
 				require_once("../includes/ltioutcomes.php");
-	
+
 				$total = 0;
 				$allans = true;
 				for ($i =0; $i < count($bestscores);$i++) {
@@ -790,8 +790,9 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 		}
 	}
 	if (!$seqinactive) {
-		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
-	} else {
+    displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,
+            $thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
+  } else {
 		displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,false,$attempts[$qn],false,$regen,$seqinactive,$colors);
 	}
 }
@@ -844,19 +845,27 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 		}
 		if ($attempts[$qn]>0 && $showeachscore) {
 			if (strpos($scores[$qn],'~')===false) {
-				echo "<br/>", _('Score on last attempt:'). " ".($scores[$qn]<0? 'N/A':$scores[$qn]).". ". _('Score in gradebook:'), " ".($bestscores[$qn]<0? 'N/A':$bestscores[$qn]);
+				echo "<br/>", _('Score on last attempt:'). " ".($scores[$qn]<0? 'N/A':$scores[$qn]).". ";
 			} else {
-				echo "<br/>", _('Score on last attempt:'), " (" . str_replace('~', ', ',$scores[$qn]) . '), ';
-				echo _('Score in gradebook:'), " (" . str_replace('~', ', ',$bestscores[$qn]) . '), ';
-				$ptposs = $qi[$questions[$qn]]['answeights'];
-				for ($i=0; $i<count($ptposs)-1; $i++) {
-					$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
+				echo "<br/>", _('Score on last attempt:'), " (" . str_replace('~', ', ',$scores[$qn]) . '). ';
+			}
+			if (strpos($bestscores[$qn],'~')===false) {
+				echo _('Score in gradebook:'), " ".($bestscores[$qn]<0? 'N/A':$bestscores[$qn]);
+			} else {
+				echo _('Score in gradebook:'), " (" . str_replace('~', ', ',$bestscores[$qn]) . ') ';
+				if (isset($qi[$questions[$qn]]['answeights']) &&
+					count($qi[$questions[$qn]]['answeights']) == substr_count($bestscores[$qn], '~') + 1
+				) {
+					$ptposs = $qi[$questions[$qn]]['answeights'];
+					for ($i=0; $i<count($ptposs)-1; $i++) {
+						$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
+					}
+					//adjust for rounding
+					$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
+					$ptposs[count($ptposs)-1] += $diff;
+					$ptposs = implode(', ',$ptposs);
+					echo ', ', _('Out of:'), " ($ptposs)";
 				}
-				//adjust for rounding
-				$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
-				$ptposs[count($ptposs)-1] += $diff;
-				$ptposs = implode(', ',$ptposs);
-				echo _('Out of:'), " ($ptposs)";
 			}
 		}
 
@@ -1038,8 +1047,10 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions where allowed'), "</p>";
 		} else if ($noindivscores) {
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
+		} else if (canimproveany()) {
+			echo "<p>", _('<a href="showtest.php?reattempt=canimprove">Reattempt assessment</a> on questions missed where allowed'), "</p>";
 		} else {
-			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions missed where allowed'), "</p>";
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on all questions where allowed'), "</p>";
 		}
 	} else {
 		echo "<p>", _('No attempts left on current versions of questions.'), "</p>\n";

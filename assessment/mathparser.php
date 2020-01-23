@@ -18,6 +18,26 @@ function parseMath($str, $vars = '', $allowedfuncs = array()) {
   return $parser;
 }
 
+function parseMathQuiet($str, $vars = '', $allowedfuncs = array()) {
+  try {
+    $parser = new MathParser($vars, $allowedfuncs);
+    $parser->parse($str);
+  } catch (Throwable $t) {
+    if ($GLOBALS['myrights'] > 10) {
+      echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
+      echo ". Error: ".$t->getMessage();
+    }
+    return false;
+  } catch (Exception $t) { //fallback for PHP5
+    if ($GLOBALS['myrights'] > 10) {
+      echo "Parse error on: ".Sanitize::encodeStringForDisplay($str);
+      echo ". Error: ".$t->getMessage();
+    }
+    return false;
+  }
+  return $parser;
+}
+
 /**
  * Utility front-end for Parser
  * Returns a function that can be evaluated like ->evaluate would be
@@ -98,6 +118,7 @@ class MathParser
   private $operandStack = [];
   private $AST = [];
   private $regex = '';
+  private $funcregex = '';
   private $numvarregex = '';
   private $variableValues = [];
 
@@ -120,13 +141,14 @@ class MathParser
     if (count($allowedfuncs) > 0) {
       $this->functions = $allowedfuncs;
     } else {
-      $this->functions = explode(',', 'arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
+      $this->functions = explode(',', 'arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
     }
 
     //build regex's for matching symbols
     $allwords = array_merge($this->functions, $this->variables);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
     $this->regex = '/^('.implode('|',$allwords).')/';
+    $this->funcregex = '/^('.implode('|',$this->functions).')/i';
     $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', $this->variables).')/';
 
     //define operators
@@ -185,6 +207,14 @@ class MathParser
    * @return array  Builds syntax tree in class, but also returns it
    */
   public function parse($str) {
+    // Rewrite sin^(-1) as arcsin
+    $str = str_replace(
+      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)","sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
+      array("arcsin","arccos","arctan","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
+      $str
+    );
+    $str = str_replace(array('\\','[',']'), array('','(',')'), $str);
+    $str = preg_replace('/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/', 'log_$1(', $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
@@ -200,7 +230,7 @@ class MathParser
    * numeric values
    *
    * @param  array  $variableValues  Associative array of variables values
-   * @return [type]          [description]
+   * @return float  value of the function
    */
   function evaluate($variableValues = array()) {
     foreach ($this->variables as $v) {
@@ -213,6 +243,22 @@ class MathParser
     }
     $this->variableValues = $variableValues;
     return $this->evalNode($this->AST);
+  }
+
+  /**
+   * Same as evaluate, but returns NaN if there's an error rather than
+   * throwing an exception
+   * @param  array  $variableValues  Associative array of variables values
+   * @return float  value of the function
+   */
+  function evaluateQuiet($variableValues = array()) {
+    try {
+      return $this->evaluate($variableValues);
+    } catch (Throwable $t) {
+      return sqrt(-1);
+    } catch (Exception $t) { //fallback for PHP5
+      return sqrt(-1);
+    }
   }
 
   /**
@@ -255,6 +301,9 @@ class MathParser
    * @return void   The tokens are stored into the class
    */
   public function tokenize($str) {
+    $str = preg_replace_callback($this->funcregex, function($m) {
+      return strtolower($m[0]);
+    }, $str);
     $tokens = [];
     $len = strlen($str);
     $n = 0;
@@ -1198,4 +1247,13 @@ function acot($x) {
     throw new MathParserException("Invalid input for arccot");
   }
   return atan(1/$x);
+}
+function sign($a,$str=false) {
+	if ($str==="onlyneg") {
+		return ($a<0)?"-":"";
+	} else if ($str !== false) {
+		return ($a<0)?"-":"+";
+	} else {
+		return ($a<0)?-1:1;
+	}
 }

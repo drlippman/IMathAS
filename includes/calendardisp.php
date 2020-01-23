@@ -16,7 +16,7 @@ require_once("filehandler.php");
 function showcalendar($refpage) {
 global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
-global $tzoffset, $tzname, $editingon, $exceptionfuncs;
+global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver;
 
 $now= time();
 
@@ -126,8 +126,19 @@ if (!isset($teacherid)) {
 $byid = array();
 $k = 0;
 $bestscores_stm = null;
-$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
-$stm->execute(array(':courseid'=>$cid));
+if ($latepasses > 0 && $courseUIver > 1) {
+	$query = 'SELECT ia.id,ia.name,ia.startdate,ia.enddate,ia.LPcutoff,ia.reviewdate,';
+	$query .= 'ia.gbcategory,ia.reqscore,ia.reqscoreaid,ia.reqscoretype,ia.timelimit,';
+	$query .= 'ia.allowlate,ia.caltag,ia.calrtag,ia.ver,iar.status ';
+	$query .= 'FROM imas_assessments AS ia LEFT JOIN imas_assessment_records AS iar ';
+	$query .= 'ON ia.id=iar.assessmentid AND iar.userid=:uid WHERE ia.avail=1 AND ';
+	$query .= 'ia.date_by_lti<>1 AND ia.courseid=:courseid AND ia.enddate<2000000000 ORDER BY ia.name';
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':uid'=>$userid));
+} else {
+	$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag,ver FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
+	$stm->execute(array(':courseid'=>$cid));
+}
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
 	$canuselatepass = false;
@@ -140,6 +151,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 	} else {
 		$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($row);
+	}
+	if (isset($row['status']) && ($row['status']&32)==32) {
+		$canuselatepass = 0;
 	}
 	//2: start, 3: end, 4: review
 	//if enddate past end of calendar
@@ -169,44 +183,55 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 	$showgrayedout = false;
 	if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0)) {
-		   if ($bestscores_stm===null) { //only prepare once
-			 $query = "SELECT ias.bestscores,ia.ptsposs FROM imas_assessment_sessions AS ias ";
-			 $query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
-			 $query .= "WHERE assessmentid=:assessmentid AND userid=:userid";
-			 $bestscores_stm = $DBH->prepare($query);
-		   }
-		   $bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
-		   if ($bestscores_stm->rowCount()==0) {
-		   	   if ($row['reqscore']<0 || $row['reqscoretype']&1) {
-		   	   	   $showgrayedout = true;
-		   	   } else {
-		   	   	   continue;
-		   	   }
-		   } else {
-			   list($scores,$reqscoreptsposs) = $bestscores_stm->fetch(PDO::FETCH_NUM);
-			   $scores = explode(';', $scores);
-			   if ($row['reqscoretype']&2) { //using percent-based
-				if ($reqscoreptsposs==-1) {
-					require("../includes/updateptsposs.php");
-					$reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
-				}
-				if (round(100*getpts($scores[0])/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
-					if ($row['reqscore']<0 || $row['reqscoretype']&1) {
-						$showgrayedout = true;
-					} else {
-						continue;
-					}
-				}
-			   } else { //points based
-				if (round(getpts($scores[0]),1)+.02<abs($row['reqscore'])) {
-					if ($row['reqscore']<0 || $row['reqscoretype']&1) {
-						$showgrayedout = true;
-					} else {
-						continue;
-					}
-				}
-			   }
-		   }
+		if ($bestscores_stm===null) { //only prepare once
+			$query = "SELECT ias.bestscores,ia.ptsposs,ia.ver FROM imas_assessment_sessions AS ias ";
+			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
+			$query .= "WHERE assessmentid=:assessmentid AND userid=:userid ";
+			$query .= "UNION ";
+			$query .= "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
+			$query .= "JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ";
+			$query .= "WHERE assessmentid=:assessmentid2 AND userid=:userid2 ";
+
+			$bestscores_stm = $DBH->prepare($query);
+		}
+		$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid,
+			':assessmentid2'=>$row['reqscoreaid'], ':userid2'=>$userid));
+	   if ($bestscores_stm->rowCount()==0) {
+	   	   if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+	   	   	   $showgrayedout = true;
+	   	   } else {
+	   	   	   continue;
+	   	   }
+	   } else {
+			 list($scores,$reqscoreptsposs,$reqaver) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+			 if ($reqaver > 1) {
+				 $reqascore = $scores;
+			 } else {
+				 $scores = explode(';', $scores);
+				 $reqascore = getpts($scores[0]);
+			 }
+			 if ($row['reqscoretype']&2) { //using percent-based
+				 if ($reqscoreptsposs==-1) {
+					 require("../includes/updateptsposs.php");
+					 $reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
+				 }
+				 if (round(100*$reqascore/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
+					 if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+						 $showgrayedout = true;
+					 } else {
+						 continue;
+					 }
+				 }
+			 } else { //points based
+				 if (round($reqascore,1)+.02<abs($row['reqscore'])) {
+					 if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+						 $showgrayedout = true;
+					 } else {
+						 continue;
+					 }
+				 }
+			 }
+		 }
 	}
 	if ($row['reviewdate']<$uppertime && $row['reviewdate']>$exlowertime && (($row['reviewdate']>0 && $now>$row['enddate']) || $editingon)) { //has review, and we're past enddate
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['reviewdate']));
@@ -219,7 +244,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"time"=>$time,
 			"tag"=>$tag,
 			"color"=> $colors,
-			"name"=> $row['name']
+			"name"=> $row['name'],
+			'ver'=> $row['ver']
 		);
 		if ($now<$row['reviewdate'] || isset($teacherid)) {
 			$json['id'] = $row['id'];
@@ -268,7 +294,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"color"=> $colors,
 			"allowlate"=>$lp,
 			"undolate"=>$ulp,
-			"name"=> $row['name']
+			"name"=> $row['name'],
+			'ver'=> $row['ver']
 		);
 		if ($now<$row['enddate'] || $row['reviewdate']>$now || isset($teacherid) || $lp==1) {
 			$json['id'] = $row['id'];
@@ -276,7 +303,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ((($now>$row['enddate'] && $now>$row['reviewdate']) || $showgrayedout) && !isset($teacherid)) {
 			$json['inactive']=true;
 		}
-		if ($row['timelimit']!=0) {
+		if ($row['timelimit']!=0 && $row['ver']==1) {
 			$json['timelimit']=true;
 		}
 		if (isset($teacherid)) {
@@ -289,7 +316,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"type"=>"AS",
 			"typeref"=>$row['id'],
 			"tag"=>$tag,
-			"name"=> $row['name']
+			"name"=> $row['name'],
+			'ver'=> $row['ver']
 		);
 		$byid['AS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']) ,$tag,'',$json,$row['name'],$status);
 	}
@@ -542,7 +570,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$replytag = htmlentities($replytag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	if ($row['postby']!=2000000000) { //($row['postby']>$now || isset($teacherid))
-		
+
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['postby']));
 		$colors = makecolor2($row['startdate'],$row['postby'],$now);
 		if ($editingon) {$colors='';}
@@ -637,7 +665,7 @@ foreach ($itemsimporder as $item) {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
 				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && $datetype=='S') {
-					continue;  //always skip start date when not avail	
+					continue;  //always skip start date when not avail
 				}
 				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['A'.$datetype.$itemsassoc[$item][1]][5]==1 && !isset($teacherid)) {
 					continue;  //only skip if before the start date - always show after due date
@@ -660,10 +688,10 @@ foreach ($itemsimporder as $item) {
 		foreach (array('S','E','P','R') as $datetype) {
 			if (isset($byid['F'.$datetype.$itemsassoc[$item][1]])) {
 				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && ($datetype=='S' || $datetype=='E')) {
-					continue;  //always skip start and end dates when not avail	
+					continue;  //always skip start and end dates when not avail
 				}
 				if (($greyitems[$item]&$byid['F'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['F'.$datetype.$itemsassoc[$item][1]][5]==1
-					&& !isset($teacherid)) { 
+					&& !isset($teacherid)) {
 					continue; //only skip if before the start date - always show after postby/replyby date
 				}
 				$moday = $byid['F'.$datetype.$itemsassoc[$item][1]][0];
@@ -868,9 +896,10 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 		} else {
 			$addto[] = $item;
 			$folderholder[$item] = $folder;
-			$greyitems[$item] = $curblockgrey;
 			if ($ishidden) {
 				$hiddenholder[$item] = true;
+			} else {
+				$greyitems[$item] = $curblockgrey;
 			}
 		}
 	}

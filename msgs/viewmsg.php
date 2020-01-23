@@ -140,7 +140,7 @@
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$qn = $matches[1];
 			$aname = $matches[2];
-			$stm = $DBH->prepare("SELECT id,startdate,enddate,allowlate,LPcutoff FROM imas_assessments WHERE (name=:name OR name=:name2) AND courseid=:courseid");
+			$stm = $DBH->prepare("SELECT id,startdate,enddate,allowlate,LPcutoff,ver FROM imas_assessments WHERE (name=:name OR name=:name2) AND courseid=:courseid");
 			$stm->execute(array(':name'=>$aname, ':name2'=>htmlentities($aname), ':courseid'=>$line['courseid']));
 			if ($stm->rowCount()>0) {
 				$adata = $stm->fetch(PDO::FETCH_ASSOC);
@@ -159,19 +159,30 @@
 					}
 				}
 				$duedate = tzdate('D m/d/Y g:i a',$due);
-				$stm = $DBH->prepare("SELECT id FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
-				$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
-				if ($stm->rowCount()>0) {
-					$asid = $stm->fetchColumn(0);
-					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
-					if ($due<2000000000) {
-						echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
+				if ($adata['ver'] > 1) {
+					$stm = $DBH->prepare("SELECT userid FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
+					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
+					if ($stm->rowCount()>0) {
+						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						if ($due<2000000000) {
+							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
+						}
+					}
+				} else {
+					$stm = $DBH->prepare("SELECT id FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
+					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
+					if ($stm->rowCount()>0) {
+						$asid = $stm->fetchColumn(0);
+						echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						if ($due<2000000000) {
+							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
+						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	echo "</td></tr><tr><td><b>Sent:</b></td><td>$senddate</td></tr>";
 	echo "<tr><td><b>Subject:</b></td><td>".Sanitize::encodeStringForDisplay($line['title']);
 	if ($myrights>=20 && preg_match('/Question\s+ID\s+(\d+),\s+seed\s+(\d+)/',$line['message'],$matches)) {
@@ -194,7 +205,7 @@
 			$msgset = $stm->fetchColumn(0);
 			$msgmonitor = floor($msgset/5);
 			$msgset = $msgset%5;
-			if ($msgset<3 || $isteacher) {
+			if ($msgset<3 || ($isteacher && $msgset < 4)) {
 				$cansendmsgs = true;
 				if ($msgset==1 && !$isteacher) { //check if sending to teacher
 					$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid and courseid=:courseid");
@@ -252,5 +263,6 @@
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+1 WHERE id=:id");
 		$stm->execute(array(':id'=>$msgid));
 	}
+	echo '<p>&nbsp;</p>';
 	require("../footer.php");
 ?>

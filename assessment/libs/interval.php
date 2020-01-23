@@ -23,7 +23,7 @@ function forminterval($min,$max,$mint,$maxt) {
 	}
 	return $out;
 }
-	
+
 
 //linegraph(intervals,[xmin,xmax,xscl,width,height])
 //Creates a line graph
@@ -36,7 +36,7 @@ function linegraph($intvs) {
 	for ($i = 1; $i < func_num_args(); $i++) {
 		$settings[$i-1] = func_get_arg($i);
 	}
-	
+
 	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},-.5,.5);";
 	$alt = "Line Graph, x {$settings[0]} to {$settings[1]}.";
 	$commands .= 'axes('.$settings[2].',1,1,0,0,1,"off"); stroke="blue"; strokewidth=2;';
@@ -99,7 +99,7 @@ function linegraph($intvs) {
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$settings[3]' height='$settings[4]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
 	}
-	
+
 }
 
 //linegraphbrackets(intervals,[xmin,xmax,xscl,width,height])
@@ -113,7 +113,7 @@ function linegraphbrackets($intvs) {
 	for ($i = 1; $i < func_num_args(); $i++) {
 		$settings[$i-1] = func_get_arg($i);
 	}
-	
+
 	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},-.5,.5);";
 	$alt = "Line Graph, x {$settings[0]} to {$settings[1]}.";
 	$commands .= 'axes('.$settings[2].',1,1,0,0,1,"off"); stroke="blue"; strokewidth=2;';
@@ -174,20 +174,20 @@ function linegraphbrackets($intvs) {
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$settings[3]' height='$settings[4]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
 	}
-	
+
 }
 
 
 //intervalstodraw(interval,xmin,xmax)
-//converts an interval like (-oo,4]U(3,5] into an array of strings 
-//suitable for use as $answers for a drawing question with 
+//converts an interval like (-oo,4]U(3,5] into an array of strings
+//suitable for use as $answers for a drawing question with
 //$answerformat = 'numberline'
 //also provide xmin and xmax, the min and max of the drawing grid
 //if different than the default -5 to 5
 function intervalstodraw($intvs,$xmin=-5,$xmax=5) {
 	$intvs = explode('U',$intvs);
 	$out = array();
-	foreach ($intvs as $intv) {	
+	foreach ($intvs as $intv) {
 		$intv = str_replace(' ','',$intv);
 		$parts = explode(',',$intv);
 		$ssym = $parts[0]{0};
@@ -195,14 +195,16 @@ function intervalstodraw($intvs,$xmin=-5,$xmax=5) {
 		$esym = substr($parts[1],-1);
 		$max = substr($parts[1],0,strlen($parts[1])-1);
 		$dot = '';
-		
+
 		if ($max=='oo' || $max>$xmax) {
 			$max= $xmax+1;
 		}
 		if ($min=='-oo' || $min<$xmin) {
-			$min = $xmin-1;	
-		} 
-		$out[] = "0,$min,$max";
+			$min = $xmin-1;
+		}
+		if ($min != $max) {
+			$out[] = "0,$min,$max";
+		}
 		if ($min>=$xmin) {
 			if ($ssym=='[') {
 				$out[] = "$min,0,closed";
@@ -210,14 +212,14 @@ function intervalstodraw($intvs,$xmin=-5,$xmax=5) {
 				$out[] = "$min,0,open";
 			}
 		}
-		if ($max<=$xmax) {
+		if ($max<=$xmax && $min != $max) {
 			if ($esym==']') {
 				$out[] = "$max,0,closed";
 			} else {
 				$out[] = "$max,0,open";
 			}
 		}
-		
+
 	}
 	return $out;
 }

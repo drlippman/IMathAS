@@ -47,7 +47,7 @@
 	} else {
 		$secfilter = -1;
 	}
-	
+
 	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext,courseid,tutoredit FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext,$assesscourseid,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
@@ -250,7 +250,7 @@
 		}
 
 	}
-	
+
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
 	$sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
@@ -435,6 +435,7 @@
 		}
 		$sp = explode(';', $line['bestscores']);
 		$scores = explode(",",$sp[0]);
+		if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
 		$attempts = explode(",",$line['bestattempts']);
 		if ($ver=='graded') {
 			$seeds = explode(",",$line['bestseeds']);
@@ -452,13 +453,13 @@
 			}
 			echo "<div ";
 			if (getpts($scores[$loc])==$points) {
-				echo 'class="iscorrect"';
+				echo 'class="iscorrect bigquestionwrap"';
 			} else if (getpts($scores[$loc])>0) {
-				echo 'class="isnonzero"';
+				echo 'class="isnonzero bigquestionwrap"';
 			} else if ($scores[$loc]==-1) {
-				echo 'class="notanswered"';
+				echo 'class="notanswered bigquestionwrap"';
 			} else {
-				echo 'class="iswrong"';
+				echo 'class="iswrong bigquestionwrap"';
 			}
 			echo '>';
 
@@ -471,9 +472,9 @@
 				}
 				echo '</select></p>';
 			}
-			
+
 			echo "<p class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></p>';
-			    
+
 			if (!$groupdup) {
 				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
@@ -515,7 +516,17 @@
 			} else {
 				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
 			}
-			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
+			if (isset($rawscores[$loc])) {
+				//$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+				if (strpos($rawscores[$loc],'~')!==false) {
+					$colors = explode('~',$rawscores[$loc]);
+				} else {
+					$colors = array($rawscores[$loc]);
+				}
+			} else {
+				$colors = array();
+			}
+			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc],false,false,false,$colors);
 
 
 			echo "<div class=review>";
@@ -558,7 +569,7 @@
 						if ($j>0) { echo ', ';}
 						echo Sanitize::encodeStringForDisplay($prts[$j]);
 					}
-					
+
 				}
 
 			}
@@ -723,7 +734,7 @@
 	}
 function getansweights($qi,$code) {
 	global $seeds,$questions;
-	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
+	if (preg_match('/^\s*\$scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
 	$i = array_search($qi,$questions);
@@ -731,7 +742,7 @@ function getansweights($qi,$code) {
 }
 
 function sandboxgetweights($code,$seed) {
-	srand($seed);
+	$GLOBALS['RND']->srand($seed);
 	$code = interpret('control','multipart',$code);
 	if (($p=strrpos($code,'answeights'))!==false) {
 		$np = strpos($code,"\n",$p);
@@ -742,12 +753,12 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
 	} else {
-		$p=strrpos($code,'answeights');
+		$p=strrpos($code,'anstypes');
 		$np = strpos($code,"\n",$p);
 		if ($np !== false) {
 			$code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
 		} else {
-			$code .= ';if(isset($answeights)){return;};';
+			$code .= ';if(isset($anstypes)){return;};';
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}
@@ -761,7 +772,7 @@ function sandboxgetweights($code,$seed) {
 		}
 	}
 	if (!isset($answeights)) {
-		if (!isset($anstypes)) { 
+		if (!isset($anstypes)) {
 			//this shouldn't happen unless the code crashed
 			return array(1);
 		}

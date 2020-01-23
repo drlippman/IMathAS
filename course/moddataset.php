@@ -257,10 +257,20 @@
 					}
 				}
 				if ($replaceby!=0) {
-					$query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
-					$query .= "SET imas_questions.questionsetid=:replaceby WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid=:questionsetid";
+					$query = 'UPDATE imas_questions JOIN imas_assessments ON imas_assessments.id=imas_questions.assessmentid ';
+					$query .= 'LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
+					$query .= 'SET imas_questions.questionsetid=:replaceby WHERE imas_assessments.ver=1 AND ';
+					$query .= 'imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid=:questionsetid';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':replaceby'=>$replaceby, ':questionsetid'=>$qsetid));
+
+					$query = 'UPDATE imas_questions JOIN imas_assessments ON imas_assessments.id=imas_questions.assessmentid ';
+					$query .= 'LEFT JOIN imas_assessment_records ON imas_questions.assessmentid = imas_assessment_records.assessmentid ';
+					$query .= 'SET imas_questions.questionsetid=:replaceby WHERE imas_assessments.ver>1 AND ';
+					$query .= 'imas_assessment_records.id IS NULL AND imas_questions.questionsetid=:questionsetid';
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':replaceby'=>$replaceby, ':questionsetid'=>$qsetid));
+
 				}
 			}
 
@@ -366,7 +376,11 @@
 					//	$t++;
 					//}
 					$result_array = getimagesize($_FILES['imgfile']['tmp_name']);
-					if ($result_array === false) {
+					$extension = pathinfo($_FILES['imgfile']['name'], PATHINFO_EXTENSION);
+					$mimetype = mime_content_type($_FILES['imgfile']['tmp_name']);
+					$is_alt_img = (in_array($mimetype, ['image/svg+xml']) &&
+						in_array($extension, ['svg']));
+					if ($result_array === false && !$is_alt_img) {
 						$errmsg .= "<p>File is not image file</p>";
 					} else {
 						if (($filename=storeuploadedqimage('imgfile',$filename))!==false) {
@@ -480,8 +494,9 @@
 			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
 		} else {
 			if ($frompot==1) {
-				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-				$outputmsg .=  "<a href=\"modquestion.php?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
+				$modquestion = (!empty($courseUIver) && $courseUIver > 1) ? 'modquestion2.php' : 'modquestion.php';
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
 			}
 			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
 		}

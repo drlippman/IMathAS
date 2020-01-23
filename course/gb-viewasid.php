@@ -398,13 +398,14 @@
 		require("../assessment/displayq2.php");
 
 		if (isset($_GET['update']) && ($isteacher || $istutor)) {
+			$haderror = false;
 			if (isoktorec($asid)) {
 				$stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE id=:id");
 				$stm->execute(array(':id'=>$asid));
 				$bestscores = $stm->fetchColumn(0);
 				$bsp = explode(';',$bestscores);
 				$oldScores = explode(',', $bsp[0]);
-				
+
 				$scores = array();
 				$feedback = array();
 				$i = 0;
@@ -414,20 +415,20 @@
 					if (isset($_POST["sb-$i-0"])) {
 						while (isset($_POST["sb-$i-$j"])) {
 							if ($_POST["sb-$i-$j"]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
-								$scpt[$j] = $_POST["sb-$i-$j"];
+								$scpt[$j] = floatval($_POST["sb-$i-$j"]);
 							} else {
 								$scpt[$j] = -1;
 							}
 							$j++;
 						}
 						if (count($scpt) < count(explode('~', $oldScores[$i]))) {
-							echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
-							exit;
+							echo "Warning: on question ".($i+1)." the number of score parts submitted does not match the number of parts originally in the student's work. You should check that the score total is accurate.<br>";
+							$haderror = true;
 						}
 						$scores[$i] = implode('~',$scpt);
 					} else {
-						if ($_POST['sb-'.$i]!='N/A' && $_POST["sb-$i-$j"]!='NA') {
-							$scores[$i] = $_POST['sb-'.$i];
+						if ($_POST['sb-'.$i]!='N/A') {
+							$scores[$i] = floatval($_POST['sb-'.$i]);
 						} else {
 							$scores[$i] = -1;
 						}
@@ -437,7 +438,7 @@
 					}
 					$i++;
 				}
-				if (count($scores) < count($oldScores)) {
+				if (count($scores) != count($oldScores)) {
 					echo "Uh oh - scores didn't seem to get submitted correctly.  Aborting.";
 					exit;
 				}
@@ -477,6 +478,11 @@
 				}
 			} else {
 				echo "No authority to change scores.";
+				exit;
+			}
+			if ($haderror) {
+				echo '<p>Scores were saved, but with warnings. You should check everything looks ok. ';
+				echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&aid=$aid&asid=$asid&from=$from&uid=$get_uid\">Back</a></p>";
 				exit;
 			}
 			if ($from=='isolate') {
@@ -729,7 +735,7 @@
 		if ($myrights == 100 && $line['lti_sourcedid']!='') {
 			echo '<p class=small>LTI sourced_id: '.Sanitize::encodeStringForDisplay($line['lti_sourcedid']).'</p>';
 		}
-		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$asid}&update=true\">\n";
+		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$asid}&links=$links&update=true\">\n";
 
 		if ($isteacher) {
 			echo "<div class=\"cpmid\"><a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$asid}&from=$from&uid=$get_uid&clearattempt=true\" onmouseover=\"tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')\" onmouseout=\"tipout()\">Clear Attempt</a> | ";
@@ -862,13 +868,13 @@
 		for ($i=0; $i<count($questions);$i++) {
 			echo "<div ";
 			if ($canedit && getpts($scores[$i])==$pts[$questions[$i]]) {
-				echo 'class="iscorrect isperfect"';
+				echo 'class="iscorrect isperfect bigquestionwrap"';
 			} else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i])==$pts[$questions[$i]])) {
-				echo 'class="iscorrect"';
+				echo 'class="iscorrect bigquestionwrap"';
 			} else if ($scores[$i]==-1) {
-				echo 'class="notanswered"';
+				echo 'class="notanswered bigquestionwrap"';
 			} else {
-				echo 'class="iswrong"';
+				echo 'class="iswrong bigquestionwrap"';
 			}
 			echo ' id="qwrap'.($i+1).'"';
 			$totalpossible += $pts[$questions[$i]];
@@ -1353,7 +1359,7 @@ function printscore($sc) {
 //which might be randomizer determined, hence the seed
 function getansweights($qi,$code) {
 	global $seeds,$questions;
-	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
+	if (preg_match('/^\s*\$scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
 	$i = array_search($qi,$questions);
@@ -1361,7 +1367,7 @@ function getansweights($qi,$code) {
 }
 
 function sandboxgetweights($code,$seed) {
-	srand($seed);
+	$GLOBALS['RND']->srand($seed);
 	$code = interpret('control','multipart',$code);
 	if (($p=strrpos($code,'answeights'))!==false) {
 		$np = strpos($code,"\n",$p);
@@ -1372,12 +1378,12 @@ function sandboxgetweights($code,$seed) {
 		}
 		//$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
 	} else {
-		$p=strrpos($code,'answeights');
+		$p=strrpos($code,'anstypes');
 		$np = strpos($code,"\n",$p);
 		if ($np !== false) {
 			$code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
 		} else {
-			$code .= ';if(isset($answeights)){return;};';
+			$code .= ';if(isset($anstypes)){return;};';
 		}
 		//$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
 	}

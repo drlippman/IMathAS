@@ -64,6 +64,9 @@ function removeallgroupmembers($grpid) {
 	$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE agroupid=$grpid";
 	$stm = $DBH->query($query); //sanitized above - no need for prepared
 
+	$stm = $DBH->prepare("UPDATE imas_assessment_records SET agroupid=0 WHERE agroupid=?");
+	$stm->execute(array($grpid));
+
 	$now = time();
 
 	if (isset($GLOBALS['CFG']['log'])) {
@@ -82,6 +85,9 @@ function removegroupmember($grpid, $uid) {
 	//update any assessment sessions using this group
 	$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE agroupid=$grpid AND userid=$uid";
 	$stm = $DBH->query($query); //sanitized above - no need for prepared
+
+	$stm = $DBH->prepare("UPDATE imas_assessment_records SET agroupid=0 WHERE agroupid=? AND userid=?");
+	$stm->execute(array($grpid, $uid));
 
 	$now = time();
 	if (isset($GLOBALS['CFG']['log'])) {

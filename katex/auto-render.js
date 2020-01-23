@@ -150,6 +150,7 @@ var renderMathInText = function(text, delimiters) {
             } else if (math.indexOf("\\displaystyle")==-1) {
             	    math = "\\displaystyle "+math;
             }
+            math = math.replace(/\$/g,'\\$');
             try {
             	//bit of a hack since katex can't handle the alignment pieces of matrices
                 katex.render(math.replace(/matrix}{[clr]+}/,'matrix}'), span, {
@@ -170,7 +171,7 @@ var renderMathInText = function(text, delimiters) {
                 } else {
                 	span.innerHTML = "\\("+data[i].data+"\\)";
                 }
-                if (typeof MathJax != "undefined") {
+                if (typeof MathJax != "undefined" && MathJax.version) {
                 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,span]);
                 	usedMathJax = true;
                 }
@@ -214,8 +215,8 @@ var defaultOptions = {
 
     ignoredTags: [
         "script", "noscript", "style", "textarea", "pre", "code"
-    ], 
-    
+    ],
+
     ignoreClass: "skipmathrender"
 };
 
@@ -246,7 +247,7 @@ var renderMathInElement = function(elem, options) {
     	    options.ignoreClassRegex = null;
     }
     usedMathJax = false;
-    
+
     renderElem(elem, options.delimiters, options.ignoredTags, options.ignoreClassRegex);
     if (window.hasOwnProperty("katexDoneCallback")) {
     	    if (usedMathJax && typeof MathJax != "undefined") {

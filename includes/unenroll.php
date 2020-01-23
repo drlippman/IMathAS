@@ -1,5 +1,7 @@
 <?php
 
+require(__DIR__.'/migratesettings.php');
+
 //util function for unenrolling students
 //$cid = courseid
 //$tounenroll = array of userids
@@ -7,7 +9,7 @@
 //$deloffline = delete offline items from gradebook
 //$unwithdraw = unset any withdrawn questions
 //$delwikirev = delete wiki revisions, 1: all, 2: group wikis only
-function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false) {
+function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false,$upgradeassess=false) {
 	global $DBH, $userid;
 	$cid = intval($cid);
 	$stulist = implode(',', array_map('intval', $tounenroll));
@@ -27,9 +29,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	$forumlist = implode(',',$forums);
 
 	$assesses = array();
-	$stm = $DBH->query("SELECT id FROM imas_assessments WHERE courseid=$cid");
+	$groupassess = array();
+	$stm = $DBH->query("SELECT id,isgroup FROM imas_assessments WHERE courseid=$cid");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$assesses[] = $row[0];
+		if ($row[1]>0) {
+			$groupassess[] = $row[0];
+		}
 	}
 	$aidlist =  implode(',',$assesses);
 
@@ -79,8 +85,11 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		//new
 		if (count($assesses)>0) {
 			deleteasidfilesbyquery2('userid',$tounenroll,$assesses);
+			deleteAssess2FilesOnUnenroll($tounenroll, $assesses, $groupassess);
 			//deleteasidfilesbyquery(array('assessmentid'=>$assesses, 'userid'=>$tounenroll));
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
+			$DBH->query($query); //values already sanitized
+			$query = "DELETE FROM imas_assessment_records WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
 			$query = "DELETE FROM imas_exceptions WHERE itemtype='A' AND assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
@@ -118,7 +127,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$DBH->query($query); //values already sanitized
 		}
 
-
+		// delete grade excusals
+		$query = "DELETE FROM imas_excused WHERE courseid=$cid AND userid IN ($stulist)";
+		$DBH->query($query); //values already sanitized
 
 	}
 	if ($delforum && count($forums)>0) {
@@ -164,6 +175,53 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		$msg = updateassess($cid, $withwithdraw=='remove', $usereplaceby);
 	}
 
+	if ($upgradeassess) {
+		$stm = $DBH->prepare("UPDATE imas_courses SET UIver=2 WHERE id=?");
+		$stm->execute(array($cid));
+		if (count($assesses)>0) {
+			$stm = $DBH->query("SELECT * FROM imas_assessments WHERE id IN ($aidlist)");
+			$stm2 = null;
+			$stm3 = null;
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if ($stm2 === null) {
+					$sets = [];
+					foreach ($row as $k=>$v) {
+						if ($k !== 'id') {
+							$sets[] = "$k=:$k";
+						}
+					}
+					$stm2 = $DBH->prepare("UPDATE imas_assessments SET ".implode(',', $sets). " WHERE id=:id");
+				}
+				$row = migrateAssessSettings($row, 1, 2); // TODO: generalize
+				$qarr = [];
+				foreach ($row as $k=>$v) {
+					$qarr[':'.$k] = $v;
+				}
+				$stm2->execute($qarr);
+				// now the questions
+				$qstm = $DBH->prepare("SELECT * FROM imas_questions WHERE assessmentid=?");
+				$qstm->execute(array($row['id']));
+				while ($qrow = $qstm->fetch(PDO::FETCH_ASSOC)) {
+					if ($stm3 === null) {
+						$sets = [];
+						foreach ($qrow as $k=>$v) {
+							if ($k !== 'id') {
+								$sets[] = "$k=:$k";
+							}
+						}
+						$stm3 = $DBH->prepare("UPDATE imas_questions SET ".implode(',', $sets). " WHERE id=:id");
+					}
+					$qrow = migrateQuestionSettings($qrow, $row, 1, 2); // TODO: generalize
+					$qarr = [];
+					foreach ($qrow as $k=>$v) {
+						$qarr[':'.$k] = $v;
+					}
+					$stm3->execute($qarr);
+				}
+			}
+		}
+	}
+
 
 	if (count($tounenroll)>0) {
 		$query = "DELETE FROM imas_students WHERE userid IN ($stulist) AND courseid=$cid";
@@ -175,7 +233,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		$query = "DELETE FROM imas_content_track WHERE userid IN ($stulist) AND courseid=$cid";
 		$DBH->query($query); //values already sanitized
 	}
-	
+
 	$lognote = "Unenroll in $cid run by $userid via script ".basename($_SERVER['PHP_SELF']);
 	$lognote .= ". Unenrolled: $stulist";
 	$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");

@@ -453,6 +453,7 @@ switch($_GET['action']) {
 			$latepasshrs = $line['latepasshrs'];
 			$jsondata = json_decode($line['jsondata'], true);
 			$dates_by_lti = $line['dates_by_lti'];
+			$courselevel = $line['level'];
 			if ($jsondata===null || !isset($jsondata['browser'])) {
 				$browser = array();
 			} else {
@@ -484,6 +485,7 @@ switch($_GET['action']) {
 			$deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
 			$latepasshrs = isset($CFG['CPS']['latepasshrs'])?$CFG['CPS']['latepasshrs'][0]:24;
 			$ltisecret = "";
+			$courselevel = '';
 			$browser = array();
 			$blockLTICopyOfCopies = false;
 			$dates_by_lti = 0;
@@ -534,8 +536,10 @@ switch($_GET['action']) {
 					$latepasshrs = $ctcinfo['latepasshrs'];
 					$deflatepass = $ctcinfo['deflatepass'];
 					$showlatepass = $ctcinfo['showlatepass'];
+					$sourceUIver = $ctcinfo['UIver'];
 					$theme = $ctcinfo['theme'];
 					$msgset = $ctcinfo['msgset'];
+					$courselevel = $ctcinfo['level'];
 				}
 			} else {
 				$ctc = 0;
@@ -605,6 +609,10 @@ switch($_GET['action']) {
 				}
 			});
 		})
+		function courselevelchg(el) {
+			$("#courselevelotherwrap").toggle(el.value == "other");
+			$("#courselevelother").prop("required", el.value == "other" && el.required);
+		}
 		</script>';
 		echo '<input type=hidden name=action value="'.Sanitize::encodeStringForDisplay($_GET['action']) .'" />';
 		if ($_GET['action']=='addcourse') {
@@ -621,7 +629,7 @@ switch($_GET['action']) {
 				echo '<span class=form>'._('Copying: ').'</span><span class=formright>';
 				echo '<strong>'.Sanitize::encodeStringForDisplay($ctcinfo['name']).'</strong>';
 				echo '<input type="hidden" id="usetemplate" name="usetemplate" value="'.Sanitize::encodeStringForDisplay($ctc).'" />';
-				echo '<input type=hidden name=ekey value="'.Sanitize::encodeStringForDisplay($ctcekey).'"/>';
+				echo '<input type=hidden name=ctcekey value="'.Sanitize::encodeStringForDisplay($ctcekey).'"/>';
 				echo '<input type=hidden name=termsagree value="1"/>';
 			}
 			echo ' <a class=small href="addcourse.php?for='.Sanitize::onlyInt($for).'">Change</a>';
@@ -636,6 +644,30 @@ switch($_GET['action']) {
 		}
 		echo "<span class=form>Course name:</span><input class=form type=text size=80 name=\"coursename\" value=\"".Sanitize::encodeStringForDisplay($name)."\"><BR class=form>\n";
 		echo "<span class=form>Enrollment key:</span><input class=form type=text size=30 name=\"ekey\" value=\"".Sanitize::encodeStringForDisplay($ekey)."\"><BR class=form>\n";
+
+		if (isset($CFG['CPS']['usecourselevel']) && isset($CFG['coursebrowser'])) {
+			$browserprops = json_decode(file_get_contents(__DIR__.'/../javascript/'.$CFG['coursebrowser'], false, null, 25), true);
+			if (isset($browserprops['level'])) {
+				$levelother = '';
+				if (substr($courselevel,0,5) == 'other') {
+					$levelother = substr($courselevel, 5);
+					$courselevel = 'other';
+				}
+				echo '<span class=form>Course Level:</span>';
+				echo '<span class=formright>';
+				writeHtmlSelect('courselevel',
+					array_keys($browserprops['level']['options']),
+					array_values($browserprops['level']['options']),
+					$courselevel,
+					_('Select a level'),
+					'',
+					'onchange="courselevelchg(this)"' . ($CFG['CPS']['usecourselevel'] === 'required' ? ' required':'')
+				);
+				echo '<span id="courselevelotherwrap"' . ($courselevel === 'other' ? '' : ' style="display:none;"') . '>';
+				echo '<br/>Specify: <input id="courselevelother" name="courselevelother" size=30 value="'.Sanitize::encodeStringForDisplay($levelother).'" /></span>';
+				echo '</span><br class=form>';
+			}
+		}
 
 		if ($_GET['action']=="modify" && $line['cleanupdate']>0) {
 			$courseid = Sanitize::courseId($_GET['id']);
@@ -677,6 +709,12 @@ switch($_GET['action']) {
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
 			echo '</span><br class=form>';
+			if ($sourceUIver < 2) {
+				echo '<span class=form>'._('Upgrade assessment version (Beta - use with caution)').'</span>';
+				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
+				echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
+				echo '</label></span><br class=form>';
+			}
 			echo '</div>';
 			//TODO:  FINISH ME ****
 		}
@@ -829,7 +867,12 @@ switch($_GET['action']) {
 		echo 'Additional Options';
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
-
+		if ($_GET['action']=='addcourse' && $ctc == 0) {
+			echo '<span class=form>'._('Use new assessment version').'</span>';
+			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
+			echo _('Select this option to set your new course to use the new version of assessments. This feature is still in Beta - use with caution.');
+			echo '</label></span><br class=form>';
+		}
 		if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1]==1) {
 			echo '<span class="form">Auto-assign LatePasses on course enroll:</span><span class="formright">';
 			echo '<input type="text" size="3" name="deflatepass" value="'.Sanitize::encodeStringForDisplay($deflatepass).'"/> LatePasses</span><br class="form" />';

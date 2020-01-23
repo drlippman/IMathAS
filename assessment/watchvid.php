@@ -11,6 +11,7 @@ $doembed = false;
 if (strpos($url,'youtube.com/watch')!==false) {
 	//youtube
 	$vidid = substr($url,strrpos($url,'v=')+2);
+  $vidid = str_replace(array('?','%3F','%3D'),array('&','&','='),$vidid);
 	if (strpos($vidid,'&')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'&'));
 	}
@@ -18,6 +19,7 @@ if (strpos($url,'youtube.com/watch')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'#'));
 	}
 	$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
+  $vidid = preg_replace('/[^A-Za-z0-9_-]/','',$vidid);
 	$timestart = '?rel=0';
 	if (strpos($url,'start=')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
@@ -38,13 +40,18 @@ if (strpos($url,'youtube.com/watch')!==false) {
 if (strpos($url,'youtu.be/')!==false) {
 	//youtube
 	$vidid = substr($url,strpos($url,'.be/')+4);
+  $vidid = str_replace(array('%3F','%26','%3D'),array('?','&','='),$vidid);
 	if (strpos($vidid,'#')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'#'));
 	}
 	if (strpos($vidid,'?')!==false) {
 		$vidid = substr($vidid,0,strpos($vidid,'?'));
 	}
+  if (strpos($vidid,'&')!==false) {
+		$vidid = substr($vidid,0,strpos($vidid,'&'));
+	}
 	$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
+  $vidid = preg_replace('/[^A-Za-z0-9_-]/','',$vidid);
 	$timestart = '?rel=0';
 	if (strpos($url,'start=')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
@@ -65,6 +72,7 @@ if (strpos($url,'youtu.be/')!==false) {
 if (strpos($url,'vimeo.com/')!==false) {
 	//youtube
 	$vidid = substr($url,strpos($url,'.com/')+5);
+  $vidid = preg_replace('/[^0-9]/','',$vidid);
 	$doembed = true;
 	$videoUrl = 'http://player.vimeo.com/video/'.$vidid;
 	$out = '<iframe width="853" height="480" src="'.Sanitize::url($videoUrl).'" frameborder="0" allowfullscreen></iframe>';
@@ -80,6 +88,8 @@ if ($doembed) {
 	echo '</head>';
 	echo '<body><div style="width:100%">'.$out.'</div></body></html>';
 } else {
-	header("Location:". Sanitize::url($url));
+  http_response_code(403);
+  exit;
+	//header("Location:". Sanitize::url($url));
 }
 ?>

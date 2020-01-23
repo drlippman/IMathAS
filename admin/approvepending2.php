@@ -26,10 +26,10 @@ if (!empty($newStatus)) {
 		'by'=>$userid,
 		'on'=>time(),
 		'status'=>$newStatus);
-	
+
 	$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=?,reqdata=? WHERE userid=?");
 	$stm->execute(array($newStatus, json_encode($reqdata), $instId));
-	
+
 	if ($newStatus==10) { //deny
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
@@ -39,11 +39,11 @@ if (!empty($newStatus)) {
 				unenrollstu($rcid, array(intval($instId)));
 			}
 		}
-		
+
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
-		
+
 		//call hook, if defined
 		if (function_exists('getDenyMessage')) {
 			$message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
@@ -54,18 +54,18 @@ if (!empty($newStatus)) {
 			$message .= 'so your account has been converted to a student account. If you believe you should have an instructor account, ';
 			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
 		}
-		
+
 		//call hook, if defined
 		if (function_exists('getDenyBcc')) {
-			$CFG['email']['new_acct_bcclist'] = getDenyBcc();	
+			$CFG['email']['new_acct_bcclist'] = getDenyBcc();
 		}
-		
+
 		require_once("../includes/email.php");
-		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom, 
-			$installname._(' Account Status'), $message, 
-			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(), 
+		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
+			$installname._(' Account Status'), $message,
+			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
 			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
-		
+
 	} else if ($newStatus==11) { //approve
 		if ($_POST['group']>-1) {
 			$group = Sanitize::onlyInt($_POST['group']);
@@ -82,14 +82,14 @@ if (!empty($newStatus)) {
 		} else {
 			$group = 0;
 		}
-		
+
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
 		$stm->execute(array(':groupid'=>$group, ':id'=>$instId));
-		
+
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
-		
+
 		//call hook, if defined
 		if (function_exists('getApproveMessage')) {
 			$message = getApproveMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
@@ -97,18 +97,18 @@ if (!empty($newStatus)) {
 			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
 			$message .= '<p>Welcome to '.$installname.'.  Your account has been activated, and you\'re all set to log in as an instructor using the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b> and the password you provided.</p>';
 		}
-		
+
 		//call hook, if defined
 		if (function_exists('getApproveBcc')) {
-			$CFG['email']['new_acct_bcclist'] = getApproveBcc();	
+			$CFG['email']['new_acct_bcclist'] = getApproveBcc();
 		}
-		
+
 		require_once("../includes/email.php");
-		send_email($row['email'], !empty($accountapproval)?$accountapproval:$sendfrom, 
-			$installname._(' Account Approval'), $message, 
-			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(), 
+		send_email($row['email'], !empty($accountapproval)?$accountapproval:$sendfrom,
+			$installname._(' Account Approval'), $message,
+			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
 			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
-		
+
 	}
 	echo "OK";
 	exit;
@@ -121,7 +121,7 @@ function getReqData() {
 	$query .= 'FROM imas_instr_acct_reqs AS ir JOIN imas_users AS iu ';
 	$query .= 'ON ir.userid=iu.id WHERE ir.status<10 ORDER BY ir.status,ir.reqdate';
 	$stm = $DBH->query($query);
-	
+
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($out[$row['status']])) {
@@ -147,6 +147,9 @@ function getReqData() {
 		}
 		$out[$row['status']][] = $userdata;
 	}
+	array_walk_recursive($out, function(&$item) {
+		$item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+	});
 	return $out;
 }
 
@@ -169,7 +172,7 @@ function getGroups() {
 	$stm = $DBH->query($query);
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		if (preg_match('/(gmail|yahoo|hotmail|me\.com)/', $row['domain'])) {
+		if (empty($row['domain']) || preg_match('/(gmail|yahoo|hotmail|me\.com)/', $row['domain'])) {
 			$row['domain'] = '';
 		}
 		$row['name'] = preg_replace('/\s+/', ' ', trim($row['name']));
@@ -215,7 +218,7 @@ $placeinhead .= '<style type="text/css">
  .userdata li {
  	margin: 5px 0px;
  }
- 
+
  </style>';
 
 $pagetitle = _('Approve Instructor Accounts');
@@ -281,7 +284,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       </li>
     </ul>
   </div>
-  
+
 </div>
 
 <script type="text/javascript">
@@ -328,7 +331,7 @@ var app = new Vue({
 		statusMsg: "",
 		group: 0,
 		newgroup: ""
-	}, 
+	},
 	computed: {
 		suggestedGroups: function() {
 			if (this.activeUser==-1) {
@@ -418,7 +421,7 @@ var app = new Vue({
 			    self.statusMsg = msg;
 			  }
 			}).fail(function(msg) {
-			  self.statusMsg = msg;		
+			  self.statusMsg = msg;
 			});
 		},
 		clone: function(obj) {
@@ -442,4 +445,3 @@ var app = new Vue({
 
 <?php
 require("../footer.php");
-

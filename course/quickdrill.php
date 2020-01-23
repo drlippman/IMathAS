@@ -90,14 +90,14 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 		} else {
 			$stuname = $userfullname;
 		}
-		
+
 		$message  = "<h3>This is an automated message.  Do not respond to this email</h3>\r\n";
 		$message .= "<p>Quick Drill Results for ".Sanitize::encodeStringForDisplay($stuname)."</p>";
 		$message .= "<p>$out</p>";
-		
+
 		require_once("../includes/email.php");
-		
-		send_email($_GET['email'], $sendfrom, 'QuickDrill Results', $message, array(), array(), 8); 
+
+		send_email($_GET['email'], $sendfrom, 'QuickDrill Results', $message, array(), array(), 8);
 
 		echo "<p>Email Sent</p>";
 	}
@@ -431,7 +431,7 @@ function getansweights($code,$seed) {
 }
 
 function sandboxgetweights($code,$seed) {
-	srand($seed);
+	$GLOBALS['RND']->srand($seed);
 	try {
 		eval(interpret('control','multipart',$code));
 	} catch (Throwable $thrownerror) {
@@ -540,7 +540,7 @@ function linkgenerator() {
  <title>Quick Drill Link Generator</title>
  <script type="text/javascript">
  var baseaddr = "<?php echo $addr;?>";
- 
+
  function makelink() {
 	 var id = document.getElementById("qid").value;
 	 if (id=='') {alert("Question ID is required"); return false;}
@@ -550,7 +550,7 @@ function linkgenerator() {
 	 var val = document.getElementById("val").value;
 	 if (mode!='none' && val=='') { alert("need to specify N"); return false;}
 	 var url = baseaddr + '?id=' + encodeURIComponent(id) + '&sa='+encodeURIComponent(sa);
-	 
+
 	 if (cid != '') {
 		url += '&cid='+encodeURIComponent(cid);
 	 }

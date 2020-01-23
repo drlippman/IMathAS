@@ -11,7 +11,7 @@
 			$nologo = true;
 		}
 	}
-	
+
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
@@ -24,18 +24,31 @@
 		if (intval($_POST['aidselect'])!=0) {
 			$limitaid = $_POST['aidselect'];
 			$limittype = $_POST['limittype'];
+			$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=?");
+			$stm->execute(array($limitaid));
+			$aver = $stm->fetchColumn(0);
 
 			if ($limittype=='comp') {
-				$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
-				$query .= "IAS.bestscores NOT LIKE '%-1%' AND IAS.assessmentid=:assessmentid";
+				if ($aver > 1) {
+					$query = "SELECT iar.userid FROM imas_assessment_records AS iar WHERE ";
+					$query .= "(iar.status&3)>0 AND iar.assessmentid=:assessmentid";
+				} else {
+					$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
+					$query .= "IAS.bestscores NOT LIKE '%-1%' AND IAS.assessmentid=:assessmentid";
+				}
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$limitaid));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$toignore[] = $row[0];
 				}
 			} else if ($limittype=='start') {
-				$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
-				$query .= "IAS.assessmentid=:assessmentid";
+				if ($aver > 1) {
+					$query = "SELECT iar.userid FROM imas_assessment_records AS iar WHERE ";
+					$query .= "iar.assessmentid=:assessmentid";
+				} else {
+					$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
+					$query .= "IAS.assessmentid=:assessmentid";
+				}
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$limitaid));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -83,7 +96,7 @@
 
 			require_once("../includes/email.php");
 			require_once("../includes/FCM.php");
-			
+
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]), $messagePost);
@@ -99,7 +112,7 @@
 					}
 					if (isset($FCMtokens[$msgto])) {
 						$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($cid)."&msgid=$msgid";
-						sendFCM($FCMtokens[$msgto], "Msg from: ".Sanitize::encodeStringForDisplay($from), 
+						sendFCM($FCMtokens[$msgto], "Msg from: ".Sanitize::encodeStringForDisplay($from),
 							Sanitize::encodeStringForDisplay($subjectPost), $url);
 					}
 				}
@@ -155,24 +168,24 @@
 			require("../filter/filter.php");
 			$message = filter($messagePost);
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$GLOBALS['basesiteurl'] .'/',$message);
-			
+
 			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			$self = Sanitize::simpleASCII("{$row[0]} {$row[1]}"). ' <'. Sanitize::emailAddress($row[2]) .'>';
-			
+
 			$message = "<p><b>Note:</b>This email was sent by ".htmlentities($self)." from $installname. If you need to reply, make sure your reply goes to their email address.</p><p></p>".$message;
 			$teacheraddys = array();
 			if ($_POST['self']!="none") {
 				$teacheraddys[] = $self;
 			}
-			
+
 			require_once("../includes/email.php");
-		
+
 			foreach ($emailaddys as $k=>$addy) {
-				send_email($addy, $sendfrom, $subjectPost, 
+				send_email($addy, $sendfrom, $subjectPost,
 					str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),
-					array($self), array(), 5); 
+					array($self), array(), 5);
 			}
 
 			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
@@ -204,9 +217,9 @@
 					}
 				}
 			}
-			
+
 			foreach ($teacheraddys as $addy) {
-				send_email($addy, $sendfrom, $subjectPost, $message, array($self), array(), 5); 
+				send_email($addy, $sendfrom, $subjectPost, $message, array($self), array(), 5);
 			}
 		}
 		if ($calledfrom=='lu') {

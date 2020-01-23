@@ -5,6 +5,7 @@
 
 require_once("../includes/htmLawed.php");
 require_once("../includes/updateptsposs.php");
+require_once("../includes/migratesettings.php");
 
 //used during confirmation step
 function getsubinfo($items,$parent,$pre) {
@@ -293,6 +294,7 @@ private function importCourseOpt() {
 	$exarr = array();
 	if (!isset($CFG['CPS'])) { $CFG['CPS'] = array();}
 	foreach ($db_fields['course'] as $field) {
+		if ($field == 'ver') { continue; } // don't want to overwrite course ver in import
 		//check if in export, and if CFG allows setting
 		if (isset($this->data['course'][$field]) && (!isset($CFG['CPS'][$field]) || $CFG['CPS'][$field][1]!=0)) {
 			$sets[] = $field.'=?';
@@ -732,8 +734,12 @@ private function insertAssessment() {
 	$this->typemap['Assessment'] = array();
 	$exarr = array();
 	$db_fields['assessment'] = array_values(array_intersect(explode(',', $db_fields['assessment']), array_keys($this->data['items'][$this->toimportbytype['Assessment'][0]]['data'])));
+	if (!in_array('ver', $db_fields['assessment'])) {
+		$db_fields['assessment'][] = 'ver';
+	}
 	$contentlen = 0;
 	$tomap = array();
+	$defaults = array();
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
 		$tomap[] = $toimport;
 		$thisitemdata = $this->data['items'][$toimport]['data'];
@@ -783,11 +789,22 @@ private function insertAssessment() {
 		//we'll resolve these later
 		$thisitemdata['reqscoreaid'] = 0;
 		$thisitemdata['itemorder'] = '';
+
+		// update settings if needed
+		if (!isset($thisitemdata['ver'])) {
+			$thisitemdata['ver'] = 1;
+		}
+		if ($thisitemdata['ver'] < $GLOBALS['courseUIver']) {
+			$thisitemdata = migrateAssessSettings($thisitemdata, $thisitemdata['ver'], $GLOBALS['courseUIver']);
+			$defaults[$toimport] = $thisitemdata;
+		}
+
 		$contentlen += strlen($thisitemdata['intro']);
 		$exarr[] = $this->cid;
 		foreach ($db_fields['assessment'] as $field) {
 			$exarr[] = $thisitemdata[$field];
 		}
+
 		if ($contentlen>5E5) { //do a batch add if more than 500,000 chars in intro
 			$ph = Sanitize::generateQueryPlaceholdersGrouped($exarr,count($db_fields['assessment'])+1);
 			$stm = $DBH->prepare("INSERT INTO imas_assessments (courseid,".implode(',',$db_fields['assessment']).") VALUES $ph");
@@ -829,6 +846,18 @@ private function insertAssessment() {
 			//record points if needed
 			if ($this->data['questions'][$qid]['points']<9999) {
 				$qpoints[$qid] = $this->data['questions'][$qid]['points'];
+			}
+			// adjust settings if needed
+			if (!isset($this->data['items'][$toimport]['data']['ver'])) {
+				$this->data['items'][$toimport]['data']['ver'] = 1;
+			}
+			if ($this->data['items'][$toimport]['data']['ver'] < $GLOBALS['courseUIver']) {
+				$this->data['questions'][$qid] = migrateQuestionSettings(
+					$this->data['questions'][$qid],
+					$defaults[$toimport],
+					$this->data['items'][$toimport]['data']['ver'],
+					$GLOBALS['courseUIver']
+				);
 			}
 			//add in assessmentid
 			$exarr[] = $this->typemap['Assessment'][$toimport];

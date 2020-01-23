@@ -627,18 +627,26 @@ switch($_POST['action']) {
 		if (trim($_POST['coursename'])=='') {
 			$_POST['coursename'] = '(No name provided)';
 		}
+		if (isset($_POST['courselevel'])) {
+			$_POST['courselevel'] = Sanitize::stripHtmlTags($_POST['courselevel']);
+			if ($_POST['courselevel'] == 'other') {
+				$_POST['courselevel'] .= Sanitize::stripHtmlTags($_POST['courselevelother']);
+			}
+		} else {
+			$_POST['courselevel'] = '';
+		}
 
 		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,hideicons=:hideicons,available=:available,lockaid=:lockaid,picicons=:picicons,showlatepass=:showlatepass,";
 			if ($updateJsonData) {
 				$query .= "jsondata=:jsondata,";
 			}
-			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass,latepasshrs=:latepasshrs,dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate,cleanupdate=:cleanupdate WHERE id=:id";
+			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass,latepasshrs=:latepasshrs,dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate,cleanupdate=:cleanupdate,level=:level WHERE id=:id";
 			$qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
 				':picicons'=>$picicons, ':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset,
 				':toolset'=>$toolset, ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':istemplate'=>$istemplate,
 				':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':latepasshrs'=>$latepasshrs, ':cleanupdate'=>$cleanupdate,':id'=>$_GET['id']);
+				':latepasshrs'=>$latepasshrs, ':cleanupdate'=>$cleanupdate, ':level'=> $_POST['courselevel'], ':id'=>$_GET['id']);
 			if ($myrights<75) {
 				$query .= " AND ownerid=:ownerid";
 				$qarr[':ownerid']=$userid;
@@ -678,6 +686,9 @@ switch($_POST['action']) {
 				}
 			}
 		} else { //new course
+
+			$destUIver = isset($_POST['newassessver']) ? 2 : 1;
+
 			$blockcnt = 1;
 			$itemorder = serialize(array());
 
@@ -699,14 +710,33 @@ switch($_POST['action']) {
 				}
 			}
 
+			if (isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+				//additional validation of permission to copy
+				$query = "SELECT ic.name,ic.enrollkey,ic.copyrights,ic.ownerid,iu.groupid,ic.UIver FROM imas_courses AS ic JOIN imas_users AS iu ";
+				$query .= "ON ic.ownerid=iu.id WHERE ic.id=:id";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':id'=>intval($_POST['usetemplate'])));
+				$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
+				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $courseownerid) ||
+					($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
+					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ctcekey']) {
+						//did not provide valid enrollment key
+						$_POST['usetemplate'] = 0; //skip copying
+					}
+				}
+				if ($_POST['usetemplate'] > 0 && $ctcinfo['UIver'] > 1) {
+					$destUIver = $ctcinfo['UIver'];
+				}
+			}
+
 			$DBH->beginTransaction();
-			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,ltisecret,dates_by_lti,blockcnt) VALUES ";
-			$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :ltisecret, :ltidates, :blockcnt);";
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,level,ltisecret,dates_by_lti,blockcnt,UIver) VALUES ";
+			$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :level, :ltisecret, :ltidates, :blockcnt, :UIver);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$courseownerid, ':enrollkey'=>$_POST['ekey'], ':hideicons'=>$hideicons, ':picicons'=>$picicons,
 				':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':toolset'=>$toolset, ':showlatepass'=>$showlatepass,
 				':itemorder'=>$itemorder, ':available'=>$avail, ':istemplate'=>$istemplate, ':deftime'=>$deftime, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt));
+				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':level'=>$_POST['courselevel'], ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt, ':UIver'=>$destUIver));
 			$cid = $DBH->lastInsertId();
 
 			//call hook, if defined
@@ -726,21 +756,7 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES (:courseid, :useweights, :orderby, :defgbmode, :usersort)");
 			$stm->execute(array(':courseid'=>$cid, ':useweights'=>$useweights, ':orderby'=>$orderby, ':defgbmode'=>$defgbmode, ':usersort'=>$usersort));
 
-			if (isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
-				//additional validation of permission to copy
-				$query = "SELECT ic.name,ic.enrollkey,ic.copyrights,ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ";
-				$query .= "ON ic.ownerid=iu.id WHERE ic.id=:id";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':id'=>$ctc));
-				$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
-				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $courseownerid) ||
-					($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
-					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {
-						//did not provide valid enrollment key
-						$_POST['usetemplate'] = 0; //skip copying
-					}
-				}
-			}
+
 			if (isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
 
 				$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid=:courseid");
@@ -827,8 +843,9 @@ switch($_POST['action']) {
 				$usereplaceby = "all";
 				$newitems = array();
 				require("../includes/copyiteminc.php");
+				$convertAssessVer = $destUIver;
 				copyallsub($items,'0',$newitems,$gbcats);
-				doaftercopy($_POST['usetemplate']);
+				doaftercopy($_POST['usetemplate'], $newitems);
 				$itemorder = serialize($newitems);
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':id'=>$cid));
@@ -1152,6 +1169,8 @@ switch($_POST['action']) {
 			while ($row = $sstm->fetch(PDO::FETCH_NUM)) {
 				$uid = $row[0];
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid");
+				$stm->execute(array(':userid'=>$uid));
+				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=:userid");
 				$stm->execute(array(':userid'=>$uid));
 				$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:userid");
 				$stm->execute(array(':userid'=>$uid));

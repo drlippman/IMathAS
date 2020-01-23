@@ -414,6 +414,8 @@ function GB_show(caption,url,width,height) {
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
 		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
+	} else {
+		document.getElementById("GB_frameholder").style.height = "auto";
 	}
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
@@ -488,7 +490,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		branding: false,
 		resize: "both",
 		width: '100%',
-		content_style: "body {background-color: #ffffff !important;}",
+		content_style: "body {background-color: " + (coursetheme.match(/_dark/) ? "#000" : "#fff") + " !important;}",
 		table_class_list: [{title: "None", value:''},
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
@@ -538,7 +540,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 	//for (var i in tinymce.editors) {
 	//	tinymce.editors[i].remove();
 	//}
-	tinymce.remove();
+	tinymce.remove(selectorstr);
 	tinymce.init(edsetup);
 
 };
@@ -678,6 +680,7 @@ function togglevideoembed() {
 	} else {
 		var href = jQuery(this).prev().attr('href');
 		var qsconn = '?';
+		href = href.replace(/%3F/g,'?').replace(/%3D/g,'=');
 		if (href.match(/youtube\.com/)) {
 			if (href.indexOf('playlist?list=')>-1) {
 				var vidid = href.split('list=')[1].split(/[#&]/)[0];
@@ -857,9 +860,11 @@ jQuery(document).ready(function($) {
 			} else {
 				var frames = document.getElementsByTagName('iframe');
 				for (var i = 0; i < frames.length; i++) {
-				    if (frames[i].contentWindow === e.originalEvent.source) {
-					$(frames[i]).height(edata.height); //the height sent from iframe
-					break;
+				    if (frames[i].contentWindow === e.originalEvent.source &&
+							!frames[i].hasAttribute('data-noresize')
+						) {
+							$(frames[i]).height(edata.height); //the height sent from iframe
+							break;
 				    }
 				}
 			}
@@ -883,14 +888,19 @@ jQuery(document).ready(function($) {
 	});
 });
 
-jQuery(document).ready(function($) {
+
+function initlinkmarkup(base) {
 	if (typeof isImathasAssessment != 'undefined') {
-		$('a:not([target])').each(addBlankTarget);
+		$(base).find('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
 	}
-	$('a').each(setuptracklinks).each(addNoopener);
-	$('a[href*="youtu"]').each(setupvideoembeds);
-	$('a[href*="vimeo"]').each(setupvideoembeds);
-	$('body').fitVids();
+	$(base).find('a').each(setuptracklinks).each(addNoopener);
+	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).fitVids();
+}
+
+jQuery(document).ready(function($) {
+	initlinkmarkup('body');
 });
 
 jQuery.fn.isolatedScroll = function() {
@@ -957,12 +967,17 @@ function groupToggleAll(dir) {
 jQuery(document).ready(function($) {
 	$(".grouptoggle").each(function() {
 		var id = randID();
-		$(this).next(".blockitems")
-			.hide()
-			.removeClass("hidden")
-			.attr("id", "bi"+id);
+		var blockitem = $(this).next(".blockitems");
+		var initclosed = blockitem.hasClass("hidden");
+		if (initclosed) {
+			blockitem.hide().removeClass("hidden");
+		} else {
+			blockitem.show();
+		}
+		blockitem.attr("id", "bi"+id);
+
 		$(this).attr("id", id).attr("aria-controls", "bi"+id)
-			.attr("aria-expanded", false)
+			.attr("aria-expanded", !initclosed)
 			.attr("tabindex", 0)
 			.css("cursor", "pointer")
 			.on("click keydown", function(e) {
@@ -981,6 +996,30 @@ jQuery(document).ready(function($) {
 	});
 	$(".grouptoggle img").attr("alt", "expand/collapse");
 });
+
+// restyled file uploads
+function initFileAlt(el) {
+	var label = jQuery(el).next().find(".filealt-label");
+	var origLabel = label.attr('data-def') || label.html();
+	jQuery(el).off("focus.filealt, blur.filealt, click.filealt, change.filealt")
+		.on("focus.filealt", function(e) { jQuery(e.target).addClass("has-focus");} )
+		.on("blur.filealt", function(e) { jQuery(e.target).removeClass("has-focus");} )
+		.on("click.filealt", function(e) { label.html(origLabel); } )
+		.on("change.filealt", function(e) {
+			var fileName = '';
+			fileName = e.target.value.split(/(\\|\/)/g).pop();
+			if (fileName) {
+				var maxFileSize = 10000*1024; // 10MB
+        if (this.files[0].size > maxFileSize) {
+          alert(_('This file is too large - maximum size is 10MB'));
+          $(this).val('');
+        } else {
+					label.html(fileName);
+				}
+			}
+		});
+}
+jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
 
 //https://github.com/davatron5000/FitVids.js
 (function( $ ){
@@ -1047,7 +1086,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 	$(document).on("keydown", function (e) {
-	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input[type='number']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]), textarea, [contenteditable='true']")) {
+	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input[type='number']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]),input[type='url']:not([readonly]),input[type='email']:not([readonly]), textarea, [contenteditable='true']")) {
 		e.preventDefault();
 	    }
 	});
@@ -1143,13 +1182,12 @@ jQuery(function() {
 });
 
 function setActiveTab(el) {
-	var tabid = el.id;
 	jQuery(el).closest(".tabwrap").find("li.active").removeClass("active");
 	jQuery(el).closest(".tablist").find("a[role=tab]").attr("aria-selected",false);
 	jQuery(el).attr("aria-selected",true);
 	jQuery(el).parent().addClass("active");
 	jQuery(el).closest(".tabwrap").find(".tabpanel").hide().attr("aria-hidden",true);
-	var tabpanelid = tabid.replace(/tab/,"tabpanel");
+	var tabpanelid = el.getAttribute('aria-controls');
 	jQuery(el).closest(".tabwrap").find("#"+tabpanelid).show().attr("aria-hidden",false);
 }
 
@@ -1172,6 +1210,8 @@ function setActiveTab(el) {
   var toggle   = '[data-toggle="dropdown"]'
   var Dropdown = function (element) {
     $(element).on('click.bs.dropdown', this.toggle)
+		var $parent = getParent($(element));
+		$parent.find('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
   }
 
   Dropdown.VERSION = '3.3.5'
@@ -1241,6 +1281,7 @@ function setActiveTab(el) {
       $parent
         .toggleClass('open')
         .trigger('shown.bs.dropdown', relatedTarget)
+
     }
 
     return false
@@ -1316,5 +1357,9 @@ function setActiveTab(el) {
     .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
     .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+	$(function() {
+		$('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
+	});
 
 }(jQuery);

@@ -1,0 +1,342 @@
+TODOs:
+  Investigate: Add "Summary" view to question navigation in HW-mode, skip.
+  Equation editor - make blur triggers in Firefox. Alt for closing?
+  /apple-touch-icon.png
+  /apple-touch-icon-precomposed.png
+  Add support for "requires previous to be attempted"
+    Menubutton:
+      Show option disabled
+      Don't highlight on mouseover
+      Skip in keyboard navigation
+    Skip navigation
+      Skip in next/prev navigation
+    Set based on status of previous
+      If regen, should still count as attempted
+
+Misc:
+  Can't preview password-protected assessment (gives invalid password error)
+  Make sure "use latepass" option is available before time limit starts, old assess LTI
+  Make sure other settings that get hidden are updated as well - might be related to the scores showing as NA issue.
+  Chem stuff
+  Update MOM help file to remove non-MOM feature
+  Re-add "save answer" button on one try in quiz mode?
+    Maybe placebo button that just does autosave
+
+Test:
+  Instructor preview
+  Practice mode as student
+  If teacher sets assess override, does it show in student attempt results?
+  Multipart in livepoll (update notes in scorequestion.php)
+  hinttext, hints, etc.
+
+Bugs:
+  possible race condition: https://lumenlearning.atlassian.net/browse/IM-354
+  Large number answers not working (qn-val)
+  ? gradeallq2: unexpected token ) on 100
+  Time limit overtimes when not allowed
+  In variable escaping, make sure not to overwrite "pi" if only i, I, or p is a variable
+  In math parser, if pi is a variable, treat it as such rather than as the constant
+  Average not showing until not IP
+
+To discuss:
+  Some kind of polling for new messages in LTI?
+  In new player, skip, is there any way to get to a score summary and
+    end message display?
+  Some way to submit all unsubmitted assessment attempts?
+  Add way to reshow intro without leaving question
+    Use case: embedding calculator into intro
+    Maybe resource option to open in modal?
+  (No) Editor covers submit button
+  (No) Re-enable teacher option to disable equation editor?
+  (No) One question in order / groups of questions in order?
+
+Separate:
+  Collate CSS
+  Add a11y landmarks / skip navigation
+
+Minor TODOs:
+! Add "latepass won't help you" warning on Closed page
+  Prop types
+  Make sure MQ is disabled on Print page, or just turn off
+  tinymce drag handle showing when question is not active (doesn't honor visibility: hidden on parent)
+  Handle "right answer wrong format"
+  Teacher view-as-student bypassing restrictions
+  Add some display of time when submission were made in GB
+  Syntax error warnings: error icon w hoverover vs displaying error
+  Review showanswer button stuff in HtmlGenerator (use setShowAnswerButton instead?)
+  Categories that are assessments: provide link to them in summary view
+  Math in Paged Full titles not rendered
+  In gradebook, if can retake, provide retake link back to assessment.
+
+Future Todos:
+  Build modal for redeeming latepasses for LTI users.
+  Figure better way to handle change of user prefs.
+  Migrate itemorder to JSON format
+  Improve Show Answer to a key:
+    Show key icon next to the answer box (or next to score marker in choices/etc)
+    When key is clicked, hide syntax warnings and Preview button
+      Still show preview if not in MQ (maybe prefix with Your Answer:)
+    If answer box is focused again, hide the key and reshow warnings
+  Condense syntax warnings into an icon, with tooltip display of warning.
+  Get "Save work" button to change oninput rather than onblur
+  HW mode: Add score summary to nav
+  Add grouping options for force order
+  rubric: fixed rather than absolute so it doesn't scroll with page?
+
+Delay for later (since they work with displayq2 for now):
+  Edit/Rewrite testquestion.php
+  Edit /forums/posthandler.php
+  Edit/Rewrite embedq.php
+  Edit/Rewrite multiembedq.php
+Delay for later:
+  Edit/Rewrite /util/crosscoursedata.php
+  Edit/Rewrite /util/crosscoursedatadetail.php
+  ~ Edit /course/exception.php  (need to handle or rewrite "force regen" option)
+    - What if they're out of regens?
+    - For by-assessment, do we force new take?
+      - If so, how do we communicate that, especially in massexception where diff
+        assessments might have diff types
+  ~ Edit /course/massexception.php (need to handle or rewrite "force regen")
+    Punt on these by just disabling the regen option for now.
+
+X Commas in numfunc answers
+X "Review work in GB" stuck on loading page
+X JSXgraph questions not working - MOM 75910 for example
+X Better notification for new message in LTI mode.
+X Fix variable case insensitivity in new player
+X Intercept document.write and try to handle
+X importitems: handle new ver
+X Bug when "# of tries on each version" is changed to 1 when there is a penalty of 25% after 2 tries.  Not saving (prob seeing invalid value)
+X No between question text in Practice Mode?
+X No between question text in Print version?  (when paged, at least)
+X [+] in assessment text
+X [EMBED: ] tags (is filter being run?)
+X On assessment summary page, showing review, make sure it shows last attempt, not best attempt
+    When shuffle is enabled, this is causing the wrong answers to show in the wrong boxes
+X Encoding error on saving in gradeallq2 for an unsubmitted file upload question
+X gbtable2, line 2141/2147: rounding before dividing causing issues - maybe move rounding to gradebook display?
+X In quiz-style, if settings allow, provide link to gradebook to review previous attempts.
+X On Delete this attempt, need to update attempt selector to other version
+X Single assessment exception page redirect not working (reporting invalid assessment ID)
+X Move Submit Assessment to Skip header, after next/prev
+X Check answer button color to secondary
+X Instructor preview of quizzes broken
+X GB designation of unsubmitted attempts.
+X gbviewassess.php: don't do Save Changes redirect until submission completes
+X itemanalysis2: Full Credit to visible question giving points for non-visible ones
+X LTI menu: latepass link should stay in same tab.
+    Make sure redeem latepass page redirects back to new assessplayer
+X New course UIver not copying on add new course
+X Blanks in the GB instead of dashes?
+X Graph theory written assignemnt settings migration issue?
+X gbviewassess "Return to gradebook" link.
+X gbviewassess "Save Changes" needs nearby indicator it's done; exit after
+X gbviewssess vertical scrollbars on some questions  (scrollpane)
+? gbviewassess breadcrumb triggering change warning after save?
+X gbviewassess initanswerboxhighlights error in gbstore
+X gradeallq2: hide full/half/none scoreboxes (for now, at least)
+X Quick grade feedback not working
+X viewmsg assignment link bad link
+X Full credit all manually-graded / full credit all on gradeallq2 not working
+X gradeallq2: need to rescale the answeights
+X Float timer at top when scroll past it
+X Add input/scorebox highlighting on gbviewassess and gradeallq2 pages?
+X gradeallq2:
+  X Need to enable MQ or LivePreview
+  X Need to move Show Answer to key
+  X Need to initialize drawings
+  X Need to adjust question numbering to avoid ID conflicts in drawing, etc.
+X Hitting enter to submit didn't blur/hide equation editor
+X Fix font italization issue in mathquill in firefox
+X Show Answer showing: single part question has $showanswer defined, not placed
+X Paged: assessment is scrolling to top after submission, rather than to question top
+X Next/Prev in Paged jump location because dropdown changes size
+X Error with answeights stored as strings
+X Essay questions: in GB display as text rather than in editor
+X MathJax not defined error in gbviewassess
+    May be race condition issue?  Adjust rendermathnode to check if MathJax exists, and setTimeout if not
+X Add hovertips for resources, details?
+X gbviewassess: Had help available info?
+X gbviewassess breadcrumb to gradebook.php
+X viewmsg.php: Add space at bottom of page
+X addquestions: Settings button needs to point to addassessment2
+X gradeallq2: breadcrumb should be to gb-itemanalysis2
+X In full display, separation between question and header. Line above too or instead?
+    Increase margin above question
+    Add overline
+X Add a11y option for disabling equation editor
+X [SAB2] showing.  Also, test $showanswerloc
+X Convert old embedded intros on upgrade
+X Full display, intro and text at beginning; intro showing with text rather than intro page
+X Add assess2 alts to showtest in:
+  X actions.php
+  X treereader.php
+    x TEST
+  X validate - isdiag block
+  X validate - locked for assessment
+    x TEST
+X Paged with Intro - Intro should show on it's own page
+X Clicking "Next page" at bottom should scroll back to top
+X HTML entities in assessment titles
+X Mass change copy options didn't change defpenalty
+X Defregen penalty not displaying (showing as false)
+X Set up aria-regions, aria-live
+X Gradebook: override of non-attempted can't be changed to 0
+X Course page: Change review mode to practice mode
+X Get HTML entities to render in paged nav
+X Skip header: add score info to right icon group
+X Remove score from currently selected, but keep in nav
+X tooltip saying it's recorded score
+X between-question text no left margin, maybe in colored box w/padding, always show
+X Refactor ErrorDialog to be usable in GBViewAssess
+X Matrix syntax warning messages
+X Enter key handlers on input boxes to submit?
+X Update "Work saved" on input rather than on change.
+X Figure out file upload autosave.
+X Submit Assessment: show confirm?
+X Test autosave on radio buttons / checkboxes
+X N/A in gradebook
+    Hide score disp at attempt selector, version selector, score details level
+    Score in GB line: replace with "Not yet available"
+      If possible, display when it will show (after due date, etc)
+X No scores during in Quiz-style: limit to 1 try
+X Eliminate scoresingb=immediately for by_assessment and only do after_take
+X Quiz-style with 1 try in Skip Around: should there by some kind of button?
+    Add an assessment-level "Save work" button that does autosave ?
+    Have label adjust to "Saving..." then "Saved" and revert to "Save work"
+X Checks/X's after MQ boxes
+X Newver /course/gb-rescoreq.php
+    Rescore all versions.  In HW-style, keep best version, ditch rest.
+    Still give option of using first or last try.
+      Keep the rescored try, ditch rest
+X Build test cases for showscores/showans/gb settings
+X Drawing: shouldn't submit if nothing drawn
+X On single-part manual score questions, show scoredetail as neutral, and skip
+  score display
+X Multipart questions:
+    x Show answers by-parts when tries > specified
+    x If single showanswer, then all parts need to meet threshold (or be right)
+X Conditional: Need to turn on submitall
+X Drawing: clear LA on regen
+X Review matrix/calcmatrix stuans/stuansval.
+    One difference: calcmatrix (not sized) has different stuansval format
+      Old: [(0.5,2)(3,4)].  New: 0.5|2|3|4, like in sized matrix
+X Error reporting - capture, add try/catch, show in front end
+X Give out-of-time submission notice
+X Build migration function
+X Newver /course/gb-itemanalysis.php
+  - For by-assessment, should we could all attempts? or just scored?
+  - For by-question, should we just count scored version for timespent, or all versions?
+  - Do we estimate per-try times, or just leave them out?
+X Newver /course/gb-itemanalysisdetail.php
+X Newver /course/gb-itemresults.php
+  - Might be a little easier now, if we're storing unrand selection
+  - Probably can't do this one until displayq refactor is integrated
+X Newver /course/gb-aidexport.php
+  - Ditto on above
+X Click on '-' in GB to create new record for student
+X Improve build documentation
+X Shell script for building min JS
+X Add overtime penalty and grace period
+X Remove timelimit warning from course page, GB, calendar clicks
+X Changed closed view warning on expired timelimit
+X Having links in LTI home adjust to UIver
+X Update LTI grade
+    In by_question mode, update on question submission
+    In by_assessment mode, update on assessment submission
+X Teacher view-as-student working
+X Build process for js
+X Syntax error warnings in MQ mode
+X Update disallowed variables list
+X Newver /course/gb-viewasid.php
+X Some display of penalties in Gradebook view;
+X Category summary in GBviewassess
+X Default feedback text (only tack on at point of viewing)
+X Dynamically set eqnhelper/showtips in AssessInfo
+X Get "no submission" warning to not block
+X Don't give "answers haven't changed" warning on assessment submit
+X Use $clearans in getQuestionHtml, refactor $lastans in that function.
+    See if autosaves are being used - might need to rework $lastans stuff to
+    overwrite $stuanswers.
+X Pre-generate dates in backend as strings:
+    enddate (need to have a way to tell if <2000000000)
+    original_enddate
+    timelimit_expires
+    latepass_extendto
+      Add _disp version
+    Previous attempts date
+      'date' (get submitted attempts)
+      add 'date_disp'
+    gb assessver lastchange (need way tell if 0)
+      Add 'lastchange_disp' for display date
+~ Rounding: (verify this is happening correctly)
+  Final rounding in GB (1 decimal place)
+  Individual question scores: 1 decimal place
+  Part scores: 2 decimal places
+  Answeights: 3 decimal places
+
+X Newver /course/chgassessments.php
+x Make sure assess_record.score only updates in by_assess mode on submission
+X Better way to tell if there is a submitted take (status |= 64)
+X Edit /course/gbtable2.php
+X Edit /includes/exceptionfuncs.php
+X Edit /course/outcometable.php
+X Newver /course/modquestion.php
+X Newver /course/modquestiongrid.php
+X Newver /course/gradeallq.php
+    - Only scored version implemented
+X? Edit /includes/loaditemshowdata.php (check status)
+X Edit /includes/unenrollphp
+X Edit /includes/filehandler.php  (need to look for uploaded files (or not? - maybe just leave and start auto-deleting old files))
+X Edit/Rewrite /course/showfeedback.php  (showfeedback2, with aid=, uid=)
+X Edit /course/report-weeklylab.php
+X Edit /diag/index.php
+X Edit /course/course.php  (need to decide how to delete teacher tries)
+X Edit /course/gradebook.php
+X Edit /includes/delcourse.php
+X Edit /actions.php
+X Edit /admin/actions.php
+X Edit /course/addgrades.php
+X Edit /course/coursemap.php
+X Edit /course/courseshowitems.php
+X Edit /course/deleteassessment.php
+X Edit /course/delitembyid.php
+X Edit /course/masssend.php  (how to determine not complete (status&3>0?))
+X Edit /course/treereader.php  (need to read status)
+X Edit /includes/calendardata.php (look up prereq scores)
+X Edit /includes/calendardisp.php (look up prereq scores)
+X Edit /includes/stugroups.php  (update i_a_r agroupid; make sure nothing fancier needs to happen)
+X Edit /course/managestugrps.php
+X Edit /course/moddataset.php  (need to do replaceby)
+X Edit /msgs/viewmsg.php  (need link to gb-viewasid)
+X Edit /forums/posts.php (need link to gb-viewasid)
+X Edit /course/isolateassessbygroup.php
+X Edit /course/isolatessessgrade.php
+X Edit /course/addquestions.php  (test withdraw handling)
+
+Delay /admin/federationpull.php
+Delay /util/mergescores.php
+Delay /util/mergestus.php
+Delay /util/copystudata.php
+Ignore/Rewrite /util/rescoreassess.php
+Ignore /course/improveoerassess.php
+Ignore /calcqtimes.php
+
+
+X GET novideo icon displaying right in addquestions
+X Figure out extref display on questions
+X Print Version: Remove blue box, make Print version primary
+  X Disable input boxes if possible
+  X Fix styling (no curved borders)
+x Exception: timelimit check (latepass isn't useful)
+  need to check if retakes remain & if not, whether latest attempt timelimit is expired
+  Maybe store latepass_useless time (def 2000000000) at i_a_r level?
+  Won't auto-update if assess setting is changed.
+X Look into recclick tracking for question helps and assessment visits
+X Implement keepscore options: best, last, average
+X Make sure assess scoreoverride is considered in reTotalAssess
+X Takeanythingorblank??
+  pass jsparam to front end.  Include in submission anything on first try
+  with "submitblank" param set.
+X store timeontask for whole assessment attempt when in full-test-view
+  use min of submitted lastloaded values to compute total time on screen

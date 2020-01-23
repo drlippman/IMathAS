@@ -18,7 +18,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=051519";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=072419";?>" type="text/css" />
 <?php
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
@@ -42,6 +42,9 @@ if (isset($CFG['GEN']['favicon'])) {
 	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
 } else {
 	echo '<link rel="shortcut icon" href="/favicon.ico" />';
+}
+if (isset($CFG['GEN']['appleicon'])) {
+	echo '<link rel="apple-touch-icon" href="'.$CFG['GEN']['appleicon'].'" />';
 }
 if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
@@ -67,7 +70,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=030119"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=121819"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();
@@ -92,7 +95,7 @@ if (isset($sessiondata['ltiitemtype']) && ($sessiondata['mathdisp']==1 || $sessi
 }
 
 if (!isset($sessiondata['mathdisp'])) {
-	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathrenderer="none";</script>';
+	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
 	//don't load MathJax async when using mathgraphcheck; it needs to check immediately
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
@@ -104,7 +107,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $sessiondata['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
+		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=011520\" type=\"text/javascript\"></script>\n";
 	}
 	//Contrib not hosted in CDN yet
 	echo '<script type="text/x-mathjax-config">
@@ -117,8 +120,15 @@ if (!isset($sessiondata['mathdisp'])) {
 	} else {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathrenderer="MathJax";function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>';
-	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
+		function rendermathnode(node) {
+			if (window.MathJax) {
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
+			} else {
+				setTimeout(function() {rendermathnode(node);}, 100);
+			}
+		}</script>';
+	echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
 } else if ($sessiondata['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
@@ -140,11 +150,11 @@ if (!isset($sessiondata['mathdisp'])) {
 		echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css" />';
 		//echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">';
-		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>';
+		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">';
+		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>';
 		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
-	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=120118"></script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=073119"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex";</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
@@ -154,11 +164,11 @@ if (!isset($sessiondata['mathdisp'])) {
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathrenderer=\"Image\"; function rendermathnode(el) {AMprocessNode(el);}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\"; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathrenderer=\"Image\";function rendermathnode(el) {AMprocessNode(el);}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\";function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==0) {
-	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathrenderer=\"none\";function rendermathnode(el) {}</script>";
+	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"none\";function rendermathnode(el) {}</script>";
 }
 echo "<script src=\"$imasroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {

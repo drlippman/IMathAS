@@ -1,127 +1,92 @@
 var i18njs = {
-"not a valid fraction":
-"kein gültiger Bruch",
+  "not a valid fraction": "kein gültiger Bruch",
 
-" invalid entry format":
-" ungültiges Eingabeformat",
+  " invalid entry format": " ungültiges Eingabeformat",
 
-"not a valid mixed number":
-"keine gültige gemischte Zahl",
+  "not a valid mixed number": "keine gültige gemischte Zahl",
 
-"not valid scientific notation":
-"keine gültige wissenschaftliche Schreibweise",
+  "not valid scientific notation":
+    "keine gültige wissenschaftliche Schreibweise",
 
-"no trig functions allowed":
-"keine trigonometrischen Funktionen erlaubt",
+  "no trig functions allowed": "keine trigonometrischen Funktionen erlaubt",
 
-"no decimals allowed":
-"keine Dezimalstellen erlaubt",
+  "no decimals allowed": "keine Dezimalstellen erlaubt",
 
-"syntax incomplete":
-"Syntax unvollständig",
+  "syntax incomplete": "Syntax unvollständig",
 
-"undefined":
-"undefiniert",
+  undefined: "undefiniert",
 
-"unmatched parens":
-"unvollständige Klammerung",
+  "unmatched parens": "unvollständige Klammerung",
 
-"use $1 instead of $2":
-"benutzten Sie $1 anstelle von $2",
+  "use $1 instead of $2": "benutzten Sie $1 anstelle von $2",
 
-"use function notation":
-"benutzen Sie Funktionsnotation",
+  "use function notation": "benutzen Sie Funktionsnotation",
 
-"no answer given":
-"keine Antwort eingegeben",
+  "no answer given": "keine Antwort eingegeben",
 
-"syntax ok":
-"Syntax OK",
+  "syntax ok": "Syntax OK",
 
-"syntax error":
-"Syntaxfehler",
+  "syntax error": "Syntaxfehler",
 
-"warning":
-"Warnung",
+  warning: "Warnung",
 
-"syntax error: this is not an equation":
-"Syntaxfehler: Dies ist keine Gleichung",
+  "syntax error: this is not an equation":
+    "Syntaxfehler: Dies ist keine Gleichung",
 
-"You have already submitted this page.  Please be patient while your submission is processed.":
-"Sie haben diese Seite bereits abgegeben. Bitte gedulden Sie sich, während Ihre Eingabe bearbeitet wird.",
+  "You have already submitted this page.  Please be patient while your submission is processed.":
+    "Sie haben diese Seite bereits abgegeben. Bitte gedulden Sie sich, während Ihre Eingabe bearbeitet wird.",
 
-"Submitting...":
-"Verarbeitung läuft ...",
+  "Submitting...": "Verarbeitung läuft ...",
 
-"Error Submitting.":
-"Fehler bei der Verarbeitung.",
+  "Error Submitting.": "Fehler bei der Verarbeitung.",
 
-"Submission Error":
-"Verarbeitungfehler",
+  "Submission Error": "Verarbeitungfehler",
 
-"Show Answers When Closed":
-"Zeige Antworten beim Schliessen",
+  "Show Answers When Closed": "Zeige Antworten beim Schliessen",
 
-"Clear results and generate a new version of this question":
-"Lösche Ergebnisse und generiere eine neue Version dieser Frage",
+  "Clear results and generate a new version of this question":
+    "Lösche Ergebnisse und generiere eine neue Version dieser Frage",
 
-"Saved":
-"Gespeichert",
+  Saved: "Gespeichert",
 
-"Error":
-"Fehler",
+  Error: "Fehler",
 
-"Show Answers":
-"Zeige Antworten",
+  "Show Answers": "Zeige Antworten",
 
-"Closing Student Input...":
-"Schliesse Studenteneingabe...",
+  "Closing Student Input...": "Schliesse Studenteneingabe...",
 
-"Open Student Input":
-"Öffne Studenteneingabe",
+  "Open Student Input": "Öffne Studenteneingabe",
 
-"Opening Student Input...":
-"Öffne Studenteneingabe...",
+  "Opening Student Input...": "Öffne Studenteneingabe...",
 
-"Close Student Input":
-"Schliesse Studenteneingabe",
+  "Close Student Input": "Schliesse Studenteneingabe",
 
-"Loading...":
-"Laden...",
+  "Loading...": "Laden...",
 
-"Question":
-"Frage",
+  Question: "Frage",
 
-"Frequency":
-"Anzahl",
+  Frequency: "Anzahl",
 
-"Answer":
-"Antwort",
+  Answer: "Antwort",
 
-"student":
-"Student",
+  student: "Student",
 
-"students":
-"Studenten",
+  students: "Studenten",
 
-"Waiting for the instructor to start a question":
-"Warten, dass der Dozent eine Frage startet",
+  "Waiting for the instructor to start a question":
+    "Warten, dass der Dozent eine Frage startet",
 
-"Submit":
-"Abschicken",
+  Submit: "Abschicken",
 
-"Saving...":
-"Speichern...",
+  "Saving...": "Speichern...",
 
-"result":
-"Ergebnis",
+  result: "Ergebnis",
 
-"results":
-"Ergebnisse",
+  results: "Ergebnisse",
 
-"received.":
-"erhalten.",
+  "received.": "erhalten.",
 
-"Evaluate.":
-"Auswerten.",
+  "Evaluate.": "Auswerten.",
+
+  "[more..]": "[mehr..]"
 };

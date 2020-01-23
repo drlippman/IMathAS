@@ -36,6 +36,10 @@ $loadgraphfilter = true;
 $hidedrawcontrols = true;
 $assessver = 2;
 
+$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
+$stm->execute(array(':id'=>$aid));
+$line = $stm->fetch(PDO::FETCH_ASSOC);
+
 
 if ($overwriteBody==1) {
 	require("../header.php");
@@ -50,6 +54,8 @@ if ($overwriteBody==1) {
 	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
 
 	echo "<h1>"._('Generate Word Version')."</h1>";
+
+  echo '<h2>'.Sanitize::encodeStringForDisplay($line['name']).'</h2>';
 
 	echo '<p>This page will help you create a copy of this assessment as a Word 2007+ file that you can then edit for printing.</p>';
 
@@ -74,9 +80,6 @@ if ($overwriteBody==1) {
 	require_once("$curdir/../filter/filter.php");
 
 	$out = '<!DOCTYPE html><html><body>';
-	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 	if (($introjson=json_decode($line['intro']))!==null) { //is json intro
 		$line['intro'] = $introjson[0];

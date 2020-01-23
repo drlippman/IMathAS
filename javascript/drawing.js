@@ -105,6 +105,27 @@ var tpModeN = {
 	"10": 3, "10.2": 3, "10.3": 3, "10.4": 3};
 var tpHasAsymp = { "7.4": 1, "7.5": 1, "8.2": 1, "8.5": 1, "8.6": 1};
 
+function reset() {
+	clearAllDrawListners();
+	targets.length = 0;
+	imgs.length = 0;
+	targetOuts.length = 0;
+	a11ytargets.length = 0;
+	lines.length = 0;
+	dots.length = 0;
+	odots.length = 0;
+	tplines.length = 0;
+	tptypes.length = 0;
+	ineqlines.length = 0;
+	ineqtypes.length = 0;
+	drawstyle.length = 0;
+	drawlocky.length = 0;
+	curTarget = null;
+	curLine = null;
+	dragObj = null;
+	curTPcurve = null;
+	curIneqcurve = null;
+}
 
 function clearcanvas(tarnum) {
 	lines[tarnum].length = 0;
@@ -364,7 +385,7 @@ function encodea11ydraw() {
 
 function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky,snaptogrid) {
 	var tarel = document.getElementById(target);
-	
+
 	if ($(tarel).is(":hidden")) {
 		$(tarel).on("mouseover.imathasdrawwait touchstart.imathasdrawwait", function() {
 				$(tarel).off("mouseover.imathasdrawwait touchstart.imathasdrawwait");
@@ -444,7 +465,7 @@ function drawTarget(x,y) {
 			nocanvaswarning = true;
 			alert("Your browser does not support drawing answer entry.  Please try again using Internet Explorer 6+ (Windows), FireFox 1.5+ (Win/Mac), Safari 1.3+ (Mac), Opera 9+ (Win/Mac), or Camino (Mac)");
 		}
-	}                       
+	}
 
 	ctx.fillStyle = "rgb(0,0,255)";
 	ctx.lineWidth = 2;
@@ -840,7 +861,7 @@ function drawTarget(x,y) {
 					ctx.lineTo(targets[curTarget].imgwidth,y2);
 				} else {
 					var stretch = (y2-tplines[curTarget][i][0][1])/safepow(x2-tplines[curTarget][i][0][0], 1/3);
-					var cury = 0;				
+					var cury = 0;
 					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 1) {
 						cury = stretch*safepow(curx-tplines[curTarget][i][0][0], 1/3) + tplines[curTarget][i][0][1];
 						//if (curx==90) {console.log(originy+","+tplines[curTarget][i][0][0]+","+tplines[curTarget][i][0][1]+","+curx+","+cury)};
@@ -1273,7 +1294,7 @@ function drawTarget(x,y) {
 	}
 	if (curTPcurve === null && tpHasAsymp.hasOwnProperty(targets[curTarget].mode)) { //has asymptotes
 		ctx.strokeStyle = "rgb(200,200,200)";
-			
+
 		if (targets[curTarget].mode == 8.5) { //shifted exp, no current curve
 			ctx.dashedLine(5,y,targets[curTarget].imgwidth,y);
 		} else if (targets[curTarget].mode == 8.6) { //shifted log, no current curve
@@ -1290,7 +1311,7 @@ function drawTarget(x,y) {
 		ctx.beginPath();
 		ctx.strokeStyle = "rgb(0,0,255)";
 	}
-	
+
 	var linefirstx, linefirsty, linelastx, linelasty;
 	ctx.fillStyle = 'rgba(0,0,255,.5)';
 	for (var i=0;i<lines[curTarget].length; i++) {
@@ -1489,7 +1510,7 @@ function encodeDraw() {
 		targetOuts[curTarget].value = out;
 		if (dochange) {
 			$(targetOuts[curTarget]).trigger("change");
-		} 
+		}
 	}
 }
 var clickcnt=0;
@@ -1552,7 +1573,7 @@ function drawMouseDown(ev) {
 
 			var foundpt = findnearpoint(curTarget,mouseOff);
 			if (foundpt!=null) {
-				if (targets[curTarget].mode==-1) { //if in erase 
+				if (targets[curTarget].mode==-1) { //if in erase
 					deleteCurve(foundpt[0], foundpt[1]);
 					return;
 				}
@@ -1730,7 +1751,7 @@ function findnearpoint(thetarget,mouseOff) {
 	} else {
 		var chkdist = 25;
 	}
-	
+
 	if (targets[thetarget].mode==0 || targets[thetarget].mode==0.5 || targets[thetarget].mode==-1) { //if in line mode
 		for (var i=0;i<lines[thetarget].length;i++) { //check lines
 			for (var j=lines[thetarget][i].length-1; j>=0;j--) {
@@ -1740,21 +1761,21 @@ function findnearpoint(thetarget,mouseOff) {
 				}
 			}
 		}
-	} 
+	}
 	if (targets[thetarget].mode==1 || targets[thetarget].mode==-1) {
 		for (var i=0; i<dots[thetarget].length;i++) { //check dots
 			if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 				return [1,i];
 			}
 		}
-	} 
+	}
 	if (targets[thetarget].mode==2 || targets[thetarget].mode==-1) {
 		for (var i=0; i<odots[thetarget].length;i++) { //check opendots
 			if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 				return [2,i];
 			}
 		}
-	} 
+	}
 	if ((targets[thetarget].mode>=5 && targets[thetarget].mode<10) || targets[thetarget].mode==-1) { //if in tpline mode
 		for (var i=0;i<tplines[thetarget].length;i++) { //check lines
 			for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
@@ -1768,7 +1789,7 @@ function findnearpoint(thetarget,mouseOff) {
 				}
 			}
 		}
-	} 
+	}
 	if ((targets[thetarget].mode>=10 && targets[thetarget].mode<11) || targets[thetarget].mode==-1) { //if in ineqline mode
 		for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
 			for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
@@ -2062,7 +2083,7 @@ function drawMouseMove(ev) {
 					if (foundpt==null) {
 						setCursor('pen');
 						//targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), auto';
-						
+
 						if (tpHasAsymp.hasOwnProperty(targets[curTarget].mode) && tempTarget !== null) {
 							drawTarget(mouseOff.x,mouseOff.y);
 						}
@@ -2073,7 +2094,7 @@ function drawMouseMove(ev) {
 						}
 						//targets[curTarget].el.style.cursor = 'move';
 					}
-					 
+
 				}
 			} else { //dragging
 				setCursor('move');
@@ -2106,7 +2127,7 @@ function drawMouseMove(ev) {
 }
 function setCursor(cursor, target) {
 	target = target || curTarget;
-	
+
 	if (targets[target].cursor != cursor) {
 		if (cursor=='move') {
 			targets[target].el.style.cursor = cursor;
@@ -2181,7 +2202,7 @@ function initCanvases(k) {
 	$(document).on("mousemove.imathasdraw", drawMouseMove);
 	$(".drawcanvas").on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 	$(document).on("mousedown.imathasdraw", drawMouseDown);
-	
+
 	try {
 
 		CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen) {
@@ -2281,9 +2302,12 @@ reads/writes values from "qn"+id
 
 */
 var normslider = {idnums:[], curslider:{el: null, startpos: [0,0], outnode: null}};
-function addnormslider(k) {
+function addnormslider(k, rendernow) {
 	if (arraysearch(k,normslider.idnums)==-1) { //not in there yet.  First load
 		normslider.idnums.push(k);
+		if (rendernow === true) {
+			slideronpageload(k);
+		}
 	} else {
 		//resubmit.  Must be on embedded reload.  call pageload
 		slideronpageload(k);
@@ -2613,6 +2637,7 @@ function shadeParabola(ctx,Vx,Vy,x,y,shX,shY,sw,sh){
 }
 
 var drawexport = {
+	reset:reset,
 	initCanvases:initCanvases,
 	clearcanvas:clearcanvas,
 	clearlastline:clearlastline,

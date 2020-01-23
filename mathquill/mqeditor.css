@@ -1,0 +1,178 @@
+.mqeditor {
+  position: absolute;
+  /*font-size: 18px;*/
+  width: 400px;
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.4);
+  background-color: #fafafa;
+  border: 1px solid #ccc;
+}
+.mqeditor.fixedbottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.4);
+  border: 0;
+  border-top: 1px solid #ccc;
+}
+.mqed-row, .mqed-col {
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.mqed-row {
+  flex-flow: row nowrap;
+}
+.mqed-col {
+  flex-flow: column nowrap;
+  height: 100%;
+}
+.mqed-col .atend {
+  margin-top: auto;
+}
+.mqed-row > .mqed-btn-cont {
+  flex-grow: 1;
+}
+.mqed-btn-cont {
+  position: relative;
+  height: 40px;
+  display: inline-block;
+  text-align: center;
+}
+.mqed-subpanel .mqed-btn-cont {
+  height: 38.5px;
+}
+.mqed-btn {
+  font-size: 16px;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  border: 1px solid #ccc;
+  background: #fff;
+  margin: 0;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  /*font-family: KaTeX_Main, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;*/
+}
+.mqed-btn.mq-math-mode {
+  font-size: 18px;
+}
+.mqed-btn:hover {
+  background-color: #f2f2ff !important;
+}
+.mqed-btn:active, .mqed-btn.mactive, .mqed-btn.active {
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+}
+.mqed-btn.mqed-navkey {
+  background-color: #eee;
+}
+.mqed-btn.mqed-digitkey {
+  background-color: #eee;
+}
+.mqed-tab {
+  border: 0;
+  background-color: transparent;
+  color: #339;
+  border-radius: 0;
+  font-size: 100%;
+  border-bottom: 2px solid #ccc;
+}
+.mqed-tabpanel {
+  position: relative;
+}
+.mqed-tabrow {
+  background-color: #fff;
+  margin-bottom: 4px;
+}
+.mqed-tabrow > .mqed-btn-cont {
+  flex-grow: unset;
+  height: auto;
+}
+.mqed-tabrow > .mqed-btn-cont > .mqed-btn {
+  position: static;
+  padding: 4px 8px;
+  margin-left: 4px;
+}
+.mqed-tab.mqed-activetab {
+  border-bottom: 2px solid #009;
+  color: #006;
+  background-color: #fafafa;
+  box-shadow: none;
+}
+
+.mqed-btn .mq-root-block {
+  padding: 0;
+}
+
+/* Get the empty boxes to look decent */
+.mqed-btn .mq-empty {
+  background-color: inherit;
+}
+.mqed-btn .mq-sqrt-stem.mq-empty {
+  width: 3px;
+}
+.mqed-btn .mq-sup.mq-empty, .mqed-btn .mq-sub.mq-empty {
+  border: 1px solid #ccc;
+  height: 12px;
+  width: 8px;
+  margin-bottom: 0px !important;
+}
+.mqed-btn .mq-paren + .mq-empty {
+  width: 8px;
+  height: 18px;
+}
+.mqed-btn .mq-paren + .mq-empty::after {
+  visibility: visible;
+  display: inline-block;
+  content: " ";
+  border: 1px solid #ccc;
+  width: 6px;
+  height: 12px;
+  margin-top:2px;
+}
+.mqed-btn .mq-numerator.mq-empty, .mqed-btn .mq-denominator.mq-empty {
+  height: 14px;
+}
+.mqed-btn .mq-numerator.mq-empty {
+  height: 12px;
+  margin-bottom: 2px;
+}
+.mqed-btn .mq-denominator.mq-empty::after,
+.mqed-btn .mq-numerator.mq-empty::after {
+  visibility: visible;
+  display: inline-block;
+  content: " ";
+  border: 1px solid #ccc;
+  width: 6px;
+  height: 10px;
+}
+
+/* this prevents iOS from zooming in on input */
+@supports (-webkit-overflow-scrolling: touch) {
+  input[type=text] {
+    font-size: 16px;
+  }
+}
+.mqed-tipholder {
+  margin-top: -38px;
+  padding: 4px;
+  min-height: 34px;
+  font-size: 80%;
+  background-color: #669;
+  color:#fff;
+  border-top-right-radius: 4px;
+  position:relative;
+}
+.mqed-tipholder a:link, .mqed-tipholder a:visited {
+  color: #fff;
+}

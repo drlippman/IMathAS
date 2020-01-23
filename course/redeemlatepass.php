@@ -130,7 +130,7 @@
 		} else {
 			$LPneeded = 1;
 		}
-		
+
 		if ($canuselatepass) {
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
 			$stm->execute(array(':lps'=>$LPneeded, ':lps2'=>$LPneeded, ':userid'=>$userid, ':courseid'=>$cid));
@@ -154,6 +154,8 @@
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
+		} else if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid={$sessiondata['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
 		}
@@ -173,9 +175,9 @@
 		//$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a>\n";
 		//$curBreadcrumb .= " Redeem LatePass\n";
 		//echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
-		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit,LPcutoff FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit,LPcutoff,ver FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
-		list($allowlate,$enddate,$startdate,$timelimit,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM);
+		list($allowlate,$enddate,$startdate,$timelimit,$LPcutoff,$aVer) =$stm->fetch(PDO::FETCH_NUM);
 		if ($LPcutoff<$enddate) {
 			$LPcutoff = 0;  //ignore nonsensical values
 		}
@@ -215,8 +217,8 @@
 		}
 		$limitedByCourseEnd = (strtotime("+".($latepasshrs*$LPneeded)." hours", $thised) > $courseenddate && ($LPcutoff==0 || $LPcutoff>$courseenddate));
 		$limitedByLPcutoff = ($LPcutoff>0 && strtotime("+".($latepasshrs*$LPneeded)." hours", $thised) > $LPcutoff && $LPcutoff<$courseenddate);
-		
-		$timelimitstatus = $exceptionfuncs->getTimelimitStatus($aid);
+
+		$timelimitstatus = $exceptionfuncs->getTimelimitStatus($aid, $aVer);
 
 		if ($latepasses==0) { //shouldn't get here if 0
 			echo "<p>You have no late passes remaining.</p>";
@@ -253,6 +255,8 @@
 				echo '<p class="noticetext">'._('Reminder: You have already started this assessment, and it has a time limit.  Using a LatePass does <b>not</b> extend or pause the time limit, only the due date.').'</p>';
 			} else if ($timelimitstatus=='expired') {
 				echo '<p class="noticetext">'._('Your time limit has expired on this assessment.  Using a LatePass does <b>not</b> extend the time limit, so there is no reason to use a LatePass.').'</p>';
+			} else if ($timelimitstatus=='outofattempts') {
+				echo '<p class="noticetext">'._('You have used all your attempts on this question.  Using a LatePass does <b>not</b> add another attempt, so there is no reason to use a LatePass.').'</p>';
 			}
 			echo '<p><input type="hidden" name="confirm" value="true" />';
 			echo '<input type="hidden" name="from" value="'.Sanitize::encodeStringForDisplay($from).'" />';
@@ -262,9 +266,11 @@
 			if ($from=='ltitimelimit') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../bltilaunch.php?accessibility=ask'\"/>";
 			} else if ($from=='gb') {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid'\"/>";	
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid'\"/>";
 			} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+			} else if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assess2/?cid=$cid&aid={$sessiondata['ltiitemid']}'\"/>";
 			} else {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
 			}

@@ -57,12 +57,12 @@ function setupLivePreview(qn) {
 			  RenderBuffer: function() {
 			      if (mathRenderer=="MathJax") {
 				      MathJax.Hub.Queue(
-					["Typeset",MathJax.Hub,this.buffer],
-					["PreviewDone",this]
+								["Typeset",MathJax.Hub,this.buffer],
+								["PreviewDone",this]
 				      );
 			      } else if (mathRenderer=="Katex") {
 			      	      renderMathInElement(this.buffer);
-				      if (typeof MathJax != "undefined" && $(this.buffer).children(".mj").length>0) {//has MathJax elements
+				      if (typeof MathJax != "undefined" && MathJax.version && $(this.buffer).children(".mj").length>0) {//has MathJax elements
 					      MathJax.Hub.Queue(["PreviewDone",this]);
 				      } else {
 					      this.PreviewDone();
@@ -131,7 +131,7 @@ function setupLivePreview(qn) {
 			  }
 
 			};
-			if (typeof MathJax != "undefined") {
+			if (mathRenderer=="MathJax") {
 				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
 				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
 			} else {
@@ -964,6 +964,8 @@ function AMnumfuncPrepVar(qn,str) {
 			return '@v'+i+'@';
 		}
 	 }});
+	// fix display of /n!
+	dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });

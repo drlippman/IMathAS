@@ -2,13 +2,13 @@
 
 //also make sure you have in the header:
 // $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
-// and 
+// and
 
 function showUserPrefsForm() {
 	global $CFG, $sessiondata, $tzname;
-	
+
 	require_once(dirname(__FILE__)."/htmlutil.php");
-	
+
 	$prefs = array();
 	$prefs['mathdisp'] = array(
 		'1'=>_('MathJax - best display and best for screenreaders'),
@@ -25,12 +25,15 @@ function showUserPrefsForm() {
 	$prefs['useed'] = array(
 		'1'=>_('Rich text editor with formatting buttons'),
 		'0'=>_('Plain text entry'));
+	$prefs['useeqed'] = array(
+		'1'=>_('Equation editor with entry palette'),
+		'0'=>_('Calculator-style text entry'));
 	$prefs['tztype'] = array(
 		'0'=>_('Use timezone as reported by the browser'),
 		'1'=>_('Use a specific timezone for this session only'),
 		'2'=>_('Always show times based on a specific timezone'));
 	$prefs['usertheme'] = array(
-		'0'=>_('Use instructor chosen course theme')); 
+		'0'=>_('Use instructor chosen course theme'));
 	if (isset($CFG['GEN']['stuthemes'])) {
 		foreach ($CFG['GEN']['stuthemes'] as $k=>$v) {
 			$prefs['usertheme'][$k] = $v;
@@ -47,6 +50,7 @@ function showUserPrefsForm() {
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
+		'useeqed'=>1,
 		'tztype'=>0,
 		'usertheme'=>0,
 		'livepreview'=>1);
@@ -55,10 +59,11 @@ function showUserPrefsForm() {
 		'graphdisp'=>_('Graph Display'),
 		'drawentry'=>_('Drawing Entry'),
 		'useed'=>_('Text Editor'),
+		'useeqed'=>_('Math Entry'),
 		'usertheme'=>_('Course styling and contrast'),
 		'livepreview'=>_('Live preview'),
 		'tztype'=>_('Time Zone'));
-	
+
 	foreach($prefdefaults as $k=>$v) {
 		if (isset($CFG['UP'][$k])) {
 			$prefdefaults[$k] = $CFG['UP'][$k];
@@ -67,9 +72,9 @@ function showUserPrefsForm() {
 		$prefs[$k][$prefdefaults[$k]] = '* '.$prefs[$k][$prefdefaults[$k]];
 	}
 	$sessiondata['userprefs']['tztype'] = isset($sessiondata['userprefs']['tzname'])?2:0;
-	
+
 	$timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
-			
+
 	echo '<fieldset id="userinfoprefs"><legend>'._('Accessibility and Display Preferences').'</legend>';
 	echo '<p>'._('Default settings are indicated with a *').'</p>';
 	foreach ($prefdescript as $key=>$descrip) {
@@ -88,9 +93,9 @@ function showUserPrefsForm() {
 				$("#tztype option[value=0]").text(oldval + ": "+jstz.determine().name());
 				if ($("#tztype").val()==0 && $("#settimezone").val()!=jstz.determine().name()) {
 					$("#tztype").val(1);
-				}	
+				}
 				$("#tztype").on("change", function() {
-					if ($(this).val()==0) { 
+					if ($(this).val()==0) {
 						$("#tzset").hide();
 						$("#settimezone").val(jstz.determine().name());
 					} else {
@@ -106,7 +111,7 @@ function showUserPrefsForm() {
 
 function storeUserPrefs() {
 	global $CFG, $DBH, $sessiondata, $userid, $tzname, $sessionid;
-	
+
 	//save user prefs.  Get existing
 	$currentuserprefs = array();
 	$stm = $DBH->prepare("SELECT item,id,value FROM imas_user_prefs WHERE userid=:id");
@@ -119,6 +124,7 @@ function storeUserPrefs() {
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
+		'useeqed'=>1,
 		'usertheme'=>0,
 		'livepreview'=>1);
 	foreach($prefdefaults as $k=>$v) {
@@ -155,7 +161,7 @@ function storeUserPrefs() {
 		$stm = $DBH->prepare("UPDATE imas_sessions SET tzname=:tzname WHERE sessionid=:sessionid");
 		$stm->execute(array(':tzname'=>$tzname, ':sessionid'=>$sessionid));
 	}
-	if ($_POST['tztype']==2) { //using a permanant fixed timezone - record it     
+	if ($_POST['tztype']==2) { //using a permanant fixed timezone - record it
 		$sessiondata['userprefs']['tzname'] = $tzname;
 		if (isset($currentuserprefs['tzname'])) {
 			$stm = $DBH->prepare("UPDATE imas_user_prefs SET value=:value WHERE id=:id");
@@ -179,15 +185,16 @@ function storeUserPrefs() {
 
 function generateuserprefs($writetosession=false) {
 	global $DBH, $CFG, $sessiondata, $sessionid, $userid;
-	
+
 	$sessiondata['userprefs'] = array();
 	$prefdefaults = array(
 		'mathdisp'=>1,
 		'graphdisp'=>1,
 		'drawentry'=>1,
 		'useed'=>1,
+		'useeqed'=>1,
 		'livepreview'=>1);
-	
+
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$stm = $DBH->prepare("SELECT item,value FROM imas_user_prefs WHERE userid=:id");
 		$stm->execute(array(':id'=>$userid));

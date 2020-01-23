@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MathQuill Editor Demo</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script type="text/javascript" src="../javascript/jquery.min.js"></script>
+  <script type="text/javascript" src="mathquill.js?v=042819"></script>
+  <link rel="stylesheet" type="text/css" href="mathquill-basic.css" />
+  <link rel="stylesheet" type="text/css" href="mqeditor.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+  <script type="text/javascript" src="AMtoMQ.js"></script>
+  <script type="text/javascript" src="mqeditor.js"></script>
+  <script type="text/javascript" src="mqedlayout.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    @supports (-webkit-overflow-scrolling: touch) {
+      input[type=text] {
+        font-size: 16px;
+      }
+    }
+    .mqed-tipholder {
+      margin-top: -38px;
+      padding: 4px;
+      min-height: 34px;
+      font-size: 80%;
+      background-color: #eef;
+      border-top-right-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <button type="button" onclick="MQeditor.toggleMQAll('input')">Toggle</button>
+  <p>Basic: <input type="text" id="in1" data-mq="calculated"/></p>
+  <p>List: <input type="text" id="in9" data-mq="calculated,list" data-tip="Enter a list of mathematical expressions"/></p>
+  <p>Fraction: <input type="text" id="in2" data-mq="calculated,fraction"/></p>
+  <p>Matrix: <input type="text" id="in3" data-mq="calcmatrix" /></p>
+  <p>Interval: <input type="text" id="in4" data-mq="calcinterval" /></p>
+  <p>Ineq: <input type="text" id="in5" data-mq="calcinterval,inequality" data-mq-vars="x"/></p>
+  <p>Vector: <input type="text" id="in6" data-mq="calcntuple,vector" /></p>
+  <p>Set: <input type="text" id="in10" data-mq="calculated,set" /></p>
+  <p>Equation: <input type="text" id="in7" data-mq="numfunc,equation" data-mq-vars="x,y" /></p>
+  <p>More vars: <input type="text" id="in8" data-mq="numfunc" data-mq-vars="x,y,theta,p_0,mu_1" /></p>
+</body>
+</html>

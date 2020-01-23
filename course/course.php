@@ -42,6 +42,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE id=:id LIMIT 1");
 		$stm->execute(array(':id'=>$sessiondata['sessiontestid']));
 	}
+	//TODO-assessver: figure out how to delete instructor attempts for new version
 
 	if (isset($teacherid) && isset($_GET['from']) && isset($_GET['to'])) {
 		$from = $_GET['from'];
@@ -370,7 +371,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=072518\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=061019\"></script>";
 if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -530,7 +531,13 @@ if ($overwriteBody==1) {
 		</p>
 
 		<p><b><?php echo _('Mass Change'); ?></b><br/>
-			<a href="chgassessments.php?cid=<?php echo $cid ?>"><?php echo _('Assessments'); ?></a><br/>
+			<?php
+			if ($courseUIver>1) {
+				echo '<a href="chgassessments2.php?cid='.$cid.'">'. _('Assessments') .'</a><br/>';
+			} else {
+				echo '<a href="chgassessments.php?cid='.$cid.'">'. _('Assessments') .'</a><br/>';
+			}
+			?>
 			<a href="chgforums.php?cid=<?php echo $cid ?>"><?php echo _('Forums'); ?></a><br/>
 			<a href="chgblocks.php?cid=<?php echo $cid ?>"><?php echo _('Blocks'); ?></a><br/>
 			<a href="masschgdates.php?cid=<?php echo $cid ?>"><?php echo _('Dates'); ?></a><br/>

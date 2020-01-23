@@ -13,15 +13,17 @@ function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLa
 	if (isset($defaultLabel) && isset($defaultVal)) {
 		echo "		<option value=\"".Sanitize::encodeStringForDisplay($defaultVal)."\" selected>".Sanitize::encodeStringForDisplay($defaultLabel)."</option>\n";
 	}
-	for ($i=0;$i<count($valList);$i++) {
-		if ((isset($selectedVal)) && (strcmp($valList[$i],$selectedVal)==0)) {
-			echo "		<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\" selected>".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
-		} else {
-			echo "		<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\">".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
+	if (is_array($valList)) {
+		for ($i=0;$i<count($valList);$i++) {
+			if ((isset($selectedVal)) && (strcmp($valList[$i],$selectedVal)==0)) {
+				echo "		<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\" selected>".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
+			} else {
+				echo "		<option value=\"".Sanitize::encodeStringForDisplay($valList[$i])."\">".Sanitize::encodeStringForDisplay($labelList[$i])."</option>\n";
+			}
 		}
 	}
-	echo "</select>\n";	
-} 
+	echo "</select>\n";
+}
 
 function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$defaultLabel=null) {
 	echo "<div class=\"multisel\"><select name=\"{$name}[]\" id=\"$name\">";
@@ -40,7 +42,7 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 				echo '<option value="'.Sanitize::encodeStringForDisplay($oc[0]).'">'.Sanitize::encodeStringForDisplay($labelList[$oc[0]]).'</option>';
 			}
 		}
-		if ($ingrp) { echo '</optgroup>';}	
+		if ($ingrp) { echo '</optgroup>';}
 	} else {
 		$val = array();
 		for ($i=0;$i<count($valList);$i++) {
@@ -55,7 +57,7 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 			echo '<input type="hidden" name="'.$name.'[]" value="'.Sanitize::encodeStringForDisplay($v).'"/>'
 				.(is_array($valList[0])?Sanitize::encodeStringForDisplay($labelList[$v]):Sanitize::encodeStringForDisplay($val[$v]));
 			echo '</div>';
-		}		
+		}
 	}
 	echo '</div>';
 }
@@ -69,8 +71,8 @@ function writeHtmlChecked ($var,$test,$notEqual=null) {
 	} else {
 		if ($var==$test) {
 			echo "checked ";
-		}	
-	}		
+		}
+	}
 }
 
 //writeHtmlChecked is used for checking the appropriate radio box on html forms
@@ -82,8 +84,8 @@ function getHtmlChecked ($var,$test,$notEqual=null) {
 	} else {
 		if ($var==$test) {
 			return "checked ";
-		}	
-	}		
+		}
+	}
 }
 
 //writeHtmlSelected is used for selecting the appropriate entry in a select item
@@ -95,8 +97,8 @@ function writeHtmlSelected ($var,$test,$notEqual=null) {
 	} else {
 		if ($var==$test) {
 			echo 'selected="selected"';
-		}	
-	}		
+		}
+	}
 }
 
 //writeHtmlSelected is used for selecting the appropriate entry in a select item
@@ -108,8 +110,8 @@ function getHtmlSelected ($var,$test,$notEqual=null) {
 	} else {
 		if ($var==$test) {
 			return 'selected="selected"';
-		}	
-	}		
+		}
+	}
 }
 
 ?>

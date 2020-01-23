@@ -106,7 +106,12 @@ function resizeiframe() {
 	var windowheight = document.documentElement.clientHeight;
 	var theframe = document.getElementById("readerframe");
 	var framepos = findPos(theframe);
-	var height =  (windowheight - framepos[1] - 15);
+	var footer = $(".footerwrapper");
+	var footerheight = 0;
+	if (footer.length > 0) {
+		footerheight = footer.height();
+	}
+	var height =  (windowheight - framepos[1] - 15 - footerheight);
 	theframe.style.height =height + "px";
 }
 
@@ -138,7 +143,9 @@ function toggletreereadernav() {
 
 	treereadernavstate = (treereadernavstate+1)%2;
 }
+
 function updateTRunans(aid, status) {
+	console.log(aid + "," + status);
 	var urlbase = "' . $GLOBALS['basesiteurl'] . '";
 	if (status==0) {
 		document.getElementById("aimg"+aid).src = urlbase+"/img/q_fullbox.gif";
@@ -233,8 +240,9 @@ $foundopenitem = '';
 
 $astatus = array();
 if (!$viewall) {
-	$query = "SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
-	$query .= "WHERE ia.courseid=:courseid AND ias.userid=:userid";
+	$query = "SELECT ia.id,ia.ver,ias.bestscores FROM imas_assessments AS ia ";
+	$query .= "JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
+	$query .= "WHERE ia.courseid=:courseid AND ias.userid=:userid AND ia.ver=1";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -249,6 +257,20 @@ if (!$viewall) {
 				}
 			}
 			$astatus[$row[0]] = 0; //unstarted
+		}
+	}
+	$query = "SELECT ia.id,ia.ver,iar.status,iar.lastchange FROM imas_assessments AS ia ";
+	$query .= "JOIN imas_assessment_records AS iar ON ia.id=iar.assessmentid ";
+	$query .= "WHERE ia.courseid=:courseid AND iar.userid=:userid AND ia.ver>1";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if (($row['status']&3)==0) {
+			$astatus[$row['id']] = 2; //completed
+		} else if ($row['lastchange']>0) {
+			$astatus[$row['id']] = 1; //something done
+		} else {
+			$astatus[$row['id']] = 0; //unstarted
 		}
 	}
 	$exceptions = array();
@@ -278,7 +300,7 @@ if (!$viewall) {
 }
 
 function printlist($items) {
-	global $DBH,$cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions, $exceptionfuncs;
+	global $DBH,$CFG,$cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions, $exceptionfuncs;
 	$out = '';
 	$isopen = false;
 	foreach ($items as $item) {
@@ -318,7 +340,7 @@ function printlist($items) {
 			if ($line['itemtype']=='Assessment') {
 				//TODO check availability, timelimit, etc.
 				//TODO: reqscoreaid, latepasses
-				 $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,displaymethod FROM imas_assessments WHERE id=:id");
+				 $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,displaymethod,ver FROM imas_assessments WHERE id=:id");
 				 $stm->execute(array(':id'=>$typeid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if (isset($exceptions[$item])) {
@@ -330,13 +352,24 @@ function printlist($items) {
 				 }
 				 if ($viewall || ($line['avail']==1 && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
 					 if ($openitem=='' && $foundfirstitem=='') {
-						 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true;
+						 if ($line['ver'] > 1) {
+							 $foundfirstitem = '/assess2/?cid='.$cid.'&amp;aid='.Sanitize::encodeUrlParam($typeid);
+						 } else {
+							 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid);
+						 }
+						 $isopen = true;
 					 }
 					 if ($itemtype.$typeid===$openitem) {
-						 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true; $opentxt = ' aria-selected="true" ';
+						 if ($line['ver'] > 1) {
+							 $foundopenitem = '/assess2/?cid='.$cid.'&amp;aid='.Sanitize::encodeUrlParam($typeid);
+						 } else {
+							 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid);
+						 }
+						 $isopen = true;
+						 $opentxt = ' aria-selected="true" ';
 					 }
 					 $out .= '<li '.$opentxt.'>';
-					 if ($line['displaymethod']!='Embed') {
+					 if ($line['displaymethod']!='Embed' && $line['displaymethod']!='skip' && $line['displaymethod']!='full') {
 						 $out .=  '<img src="'.$imasroot.'/img/assess_tiny.png" alt="Assessment"> ';
 					 } else {
 						 if (!isset($astatus[$typeid]) || $astatus[$typeid]==0) {
@@ -381,7 +414,15 @@ function printlist($items) {
 					 } else {
 						 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
 					 }
-					 $out .= '<a tabindex="-1" href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
+					 if ($line['ver'] > 1) {
+						 if (!empty($CFG['assess2-use-vue-dev'])) {
+							 $out .= '<a tabindex="-1" href="http://localhost:8080/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
+						 } else {
+						 	$out .= '<a tabindex="-1" href="'.$imasroot.'/assess2/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
+						 }
+					 } else {
+						 $out .= '<a tabindex="-1" href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
+					 }
 				 }
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
@@ -500,7 +541,7 @@ echo $ul[0];
 <div id="bmrecout" style="display:none;"></div>
 </div>
 <div id="centercontent" role="main">
-<iframe id="readerframe" name="readerframe" title="Selected Content" style="width:100%; border:1px solid #ccc;" src="<?php echo $imasroot . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
+<iframe id="readerframe" name="readerframe" data-noresize="true" title="Selected Content" style="width:100%; border:1px solid #ccc;" src="<?php echo $imasroot . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
 </div>
 <?php
 require("../footer.php");

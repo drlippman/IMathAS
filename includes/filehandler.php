@@ -181,10 +181,10 @@ function downsizeimage($fileinfo) {
 		try {
 			$exif = exif_read_data($fileinfo['tmp_name']);
 		} catch (Exception $exp) {
-			$exif = false;	
+			$exif = false;
 		}
 		$changed = false;
-		if ($imgdata!==false && $imgdata['mime'] == 'image/jpeg' && 
+		if ($imgdata!==false && $imgdata['mime'] == 'image/jpeg' &&
 		   (min($imgdata[0],$imgdata[1])>1000 || (isset($exif['Orientation']) && $exif['Orientation']>1)) &&
 		   ($imgdata[0]*$imgdata[1]*3*2/1048576 < 80)) {  //make sure mem use will be under 80MB
 			if (min($imgdata[0],$imgdata[1])>1000) {
@@ -431,6 +431,88 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 	return count($deled);
 }
 
+// Delete files from assess2 records on unenroll.
+function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
+	global $DBH;
+	if (count($aids) == 0 || count($tounenroll) == 0) {
+		return 0;
+	}
+	// look up any assessment records for these users/aids and pull out any
+	// file uploads in them
+	$aidlist = implode(',', array_map('intval', $aids));
+	$userlist = implode(',', array_map('intval', $tounenroll));
+	$query = "SELECT assessmentid,scoreddata,practicedata FROM imas_assessment_records ";
+	$query .= "WHERE assessmentid IN ($aidlist) AND userid IN ($userlist)";
+	$stm = $DBH->query($query);
+	$todel = [];
+	$tomaybedel = [];
+	$tolookupaid = [];
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$scoreddata = gzdecode($row['scoreddata']);
+		$practicedata = $row['practicedata']==''?'':gzdecode($row['practicedata']);
+		preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $matches);
+		foreach ($matches[1] as $file) {
+			// if it's a group asssess, we'll look to see if anyone else is using
+			// the same file later
+			if (in_array($row['assessmentid'], $groupassess)) {
+				if (!in_array($file, $tomaybedel)) {
+					$tomaybedel[] = $file;
+				}
+				if (!in_array($row['assessmentid'], $tolookupaid)) {
+					$tolookupaid[] = $row['assessmentid'];
+				}
+			} else {
+				if (!in_array($file,$todel)) {
+					$todel[] = $file;
+				}
+			}
+		}
+	}
+	if (count($tolookupaid)>0) {
+		// these are the group assessments that had files.
+		// look up other assessment records for same assessment but other students
+		// Remove any tomaybedel files that are used elsewhere
+		$aidlist2 = implode(',', $tolookupaid);
+		$query = "SELECT assessmentid,scoreddata,practicedata FROM imas_assessment_records ";
+		$query .= "WHERE assessmentid IN ($aidlist2) AND userid NOT IN ($userlist)";
+		$stm = $DBH->query($query);
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$scoreddata = gzdecode($row['scoreddata']);
+			$practicedata = gzdecode($row['practicedata']);
+			preg_match_all('/@FILE:(.+?)@/', $scoreddata.$practicedata, $exmatch);
+			//remove from tolookup list all files found in other sessions
+			$tomaybedel = array_diff($tomaybedel, $exmatch[1]);
+			if (count($tomaybedel)===0) {
+				break;
+			}
+		}
+	}
+	// combine the lists
+	$todel = array_unique(array_merge($todel, $tomaybedel));
+
+	$deled = array();
+
+	if (getfilehandlertype('filehandlertype') == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		foreach($todel as $file) {
+			if (in_array($file,$deled)) { continue;}
+			$s3object = "adata/$file";
+			if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
+				$deled[] = $file;
+			}
+		}
+	} else {
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
+		foreach($todel as $file) {
+			if (in_array($file,$deled)) { continue;}
+			if (unlink(realpath($base.'/adata/'.$file))) {
+				$deled[] = $file;
+				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
+			}
+		}
+	}
+	return count($deled);
+}
 
 function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 	global $DBH;

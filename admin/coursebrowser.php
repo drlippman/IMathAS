@@ -3,10 +3,10 @@
 //(c) 2017 David Lippman
 
 //Use of course browser requires setting $CFG['coursebrowser'] in your config.php
-//to a javascript file in /javascript/.  See coursebrowserprops.js.dist for an 
+//to a javascript file in /javascript/.  See coursebrowserprops.js.dist for an
 //example.  In that file, you can specify whatever characteristics you want
 //provided when promoting a course.
-//For a dropdown, specify "options".  
+//For a dropdown, specify "options".
 //For a multi-select, specify "options" and add "multi": true
 //For strings, put "type": "string"
 //For textarea, put "type": "textarea"
@@ -37,11 +37,11 @@ if (($myrights == 100 || ($myspecialrights&32)==32) && isset($_GET['forgrp'])) {
 /*** Utility functions ***/
 function getCourseBrowserJSON() {
   global $DBH, $browserprops, $dispgroupid;
-  
+
   $stm = $DBH->prepare("SELECT parent FROM imas_groups WHERE id=?");
   $stm->execute(array($dispgroupid));
   $supergroupid = $stm->fetchColumn(0);
-  
+
   $query = "SELECT ic.id,ic.name,ic.jsondata,iu.FirstName,iu.LastName,ig.name AS groupname,ig.parent,ic.istemplate,iu.groupid ";
   $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id JOIN imas_groups AS ig ON iu.groupid=ig.id ";
   $query .= "WHERE ((ic.istemplate&17)>0 OR ((ic.istemplate&2)>0 AND iu.groupid=?)";
@@ -59,7 +59,7 @@ function getCourseBrowserJSON() {
     if (!isset($jsondata['browser'])) {
       $jsondata['browser'] = array();
     }
-    
+
     $jsondata['browser']['id'] = $row['id'];
     if (empty($jsondata['browser']['owner'])) {
     	    $jsondata['browser']['owner'] = $row['FirstName'].' '. $row['LastName']. ' ('.$row['groupname'].')';
@@ -67,15 +67,15 @@ function getCourseBrowserJSON() {
      if (!isset($jsondata['browser']['name'])) {
     	    $jsondata['browser']['name'] = $row['name'];
     }
-   
+
     if (($row['istemplate']&2)==2 && $row['groupid']==$dispgroupid) { //group template for user's group
-    	$jsondata['browser']['coursetype'] = 0;	    
+    	$jsondata['browser']['coursetype'] = 0;
     } else if (($row['istemplate']&32)==32 && $row['parent']==$supergroupid) { //super-group template for user's group
-    	$jsondata['browser']['coursetype'] = 0;  
+    	$jsondata['browser']['coursetype'] = 0;
     } else if (($row['istemplate']&1)==1) { //global template
-    	$jsondata['browser']['coursetype'] = 1;	        
+    	$jsondata['browser']['coursetype'] = 1;
     } else {
-    	$jsondata['browser']['coursetype'] = 2;	        
+    	$jsondata['browser']['coursetype'] = 2;
     }
     $courseinfo[] = $jsondata['browser'];
   }
@@ -121,13 +121,13 @@ function getCourseBrowserJSON() {
   			}
   		} else {
   			if ($aval != $bval) {
-  				return (($aval < $bval)? -1 : 1)*($sortinf['asc']?1:-1);	
+  				return (($aval < $bval)? -1 : 1)*($sortinf['asc']?1:-1);
   			}
   		}
-  	}	 
+  	}
   	return 0;
   });
-  
+
   return json_encode($courseinfo);
 }
 
@@ -161,11 +161,11 @@ if (!isset($_GET['embedded'])) {
 	<ul>
 </div>
 <div id="filters">
-	Filter results: 
+	Filter results:
 	<span v-for="propname in propsToFilter" class="dropdown-wrap">
 		<button @click="showFilter = (showFilter==propname)?'':propname">
 			{{ courseBrowserProps[propname].name }} {{ catprops[propname].length > 0 ? '('+catprops[propname].length+')': '' }}
-			<span class="arrow-down2" :class="{rotated: showFilter==propname}"></span>	
+			<span class="arrow-down2" :class="{rotated: showFilter==propname}"></span>
 		</button>
 		<transition name="fade" @enter="adjustpos">
 			<ul v-if="showFilter == propname" class="filterwrap">
@@ -202,16 +202,16 @@ if (!isset($_GET['embedded'])) {
 			<td v-if="!Array.isArray(propval)"> {{ propval }} </td>
 			<td v-if="Array.isArray(propval)">
 				<ul class="nomark">
-					<li v-for="subprop in propval"> 
-						{{ courseBrowserProps[propname].options[subprop] }} 
+					<li v-for="subprop in propval">
+						{{ courseBrowserProps[propname].options[subprop] }}
 					</li>
 				</ul>
 			</td>
 		</tr>
-	
+
 		</tbody></table>
-		<p v-for="(propval,propname) in course" 
-		   v-if="courseBrowserProps[propname] && courseBrowserProps[propname].type && courseBrowserProps[propname].type=='textarea'" 
+		<p v-for="(propval,propname) in course"
+		   v-if="courseBrowserProps[propname] && courseBrowserProps[propname].type && courseBrowserProps[propname].type=='textarea'"
 		   class="pre-line"
 		>{{ propval }}</p>
 	</div>
@@ -334,6 +334,9 @@ new Vue({
 					}
 				}
 			}
+			if (activeTypes.indexOf(this.activeTab) === -1) {
+				this.activeTab = activeTypes[0];
+			}
 			return activeTypes;
 		},
 		useTabs: function () {
@@ -342,7 +345,7 @@ new Vue({
 		},
 		filteredCourses: function() {
 			var selectedCourses = [];
-			
+
 			var includeCourse = true;
 			for (var i=0; i<courses.length; i++) {
 				if (this.useTabs && courses[i].coursetype != this.activeTab) {
@@ -360,7 +363,7 @@ new Vue({
 					} else if (this.courseBrowserProps[prop].hasall) {
 						//only include if ALL selected filters are included
 						if (!this.catprops[prop].every(function(v) {
-							return courses[i][prop].indexOf(v) >= 0;	
+							return courses[i][prop].indexOf(v) >= 0;
 						})) {
 							includeCourse = false;
 							break;
@@ -368,7 +371,7 @@ new Vue({
 					} else if (typeof courses[i][prop] == 'object') {
 						//only include if ONE of the filter items is in course
 						if (!this.catprops[prop].some(function(v) {
-							return courses[i][prop].indexOf(v) >= 0;	
+							return courses[i][prop].indexOf(v) >= 0;
 						})) {
 							includeCourse = false;
 							break;
@@ -387,14 +390,14 @@ new Vue({
 			}
 			return selectedCourses;
 		}
-	}, 
+	},
 	created: function() {
 		document.addEventListener('click', this.clickaway);
 	},
 	mounted: function() {
 		$("#fixedfilters + #card-deck-wrap").css("margin-top", $("#fixedfilters").outerHeight() + 10);
 	}
-	
+
 });
 </script>
 <?php

@@ -55,7 +55,8 @@
 			echo 'open the file.  Click <b>Save</b> to save the file to your computer, or <b>Open</b> to open the gradebook in Excel ';
 			echo 'or whatever program your computer has set to open .csv spreadsheet files</p>';
 			echo '<p>A CSV (comma separated values) file will just contain data, and can be opened in most spreadsheet programs</p>';
-			echo '<p>Using the Download for Excel button will generate an HTML file that Excel can open, and will most likely preserve coloring and other formatting</p>';
+			echo '<p>Using the Download for Excel button will generate an HTML file that Excel can open, preserving coloring and other formatting. ';
+			echo 'Excel may show a "File format and extension don\'t match" warning. This is expected; hit Yes to open the file.</p>';
 		} else {
 			echo '<div class="submit"><input type=submit value="Email Gradebook" /></div>';
 		}
