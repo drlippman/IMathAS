@@ -720,6 +720,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   } else {
 			   	   $canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($line);
 			   }
+				 if (!empty($line['outofattempts'])) {
+					 $canuselatepass = 0;
+				 }
 			   if ($line['enddate']==2000000000 && $courseenddate<2000000000) {
 			   	   $line['enddate'] = $courseenddate;
 			   }

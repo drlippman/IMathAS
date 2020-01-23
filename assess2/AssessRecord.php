@@ -68,6 +68,10 @@ class AssessRecord
       $this->assessRecord = null;
     } else {
       $this->hasRecord = true;
+      if (($this->assessRecord['status']&32)==32) {
+        //out of attempts, so disable can_use_latepass
+        $this->assess_info->overrideSetting('can_use_latepass', 0);
+      }
     }
     $this->tmpdata = null;
   }

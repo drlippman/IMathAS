@@ -1267,6 +1267,9 @@ function gbtable() {
 		} else {
 			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
 		}
+		if (($l['status']&32)==32) { // out of attempts
+			$canuselatepass = 0;
+		}
 		//if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
 
 		if ($useexception) {
