@@ -42,7 +42,7 @@ $now = time();
 
 // load settings including question info
 $assess_info = new AssessInfo($DBH, $aid, $cid, 'all');
-$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
+$assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
@@ -253,9 +253,8 @@ $assess_info->processIntro();
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
   'extended_with', 'timelimit', 'timelimit_type', 'allowed_attempts',
-  'latepasses_avail', 'latepass_extendto', 'showscores', 'intro',
-  'interquestion_text', 'resources', 'category_urls', 'help_features',
-  'points_possible', 'showcat'
+  'showscores', 'intro', 'interquestion_text', 'resources', 'category_urls',
+  'help_features', 'points_possible', 'showcat'
 );
 if ($in_practice) {
   array_push($include_from_assess_info, 'displaymethod', 'showscores',

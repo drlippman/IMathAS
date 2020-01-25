@@ -109,8 +109,13 @@ class AssessInfo
 
     $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
-    list($useexception, $canundolatepass, $canuselatepass) =
-      $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
+    if ($latepasses > 0) {
+      list($useexception, $canundolatepass, $canuselatepass) =
+        $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
+    } else {
+      $useexception = $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, true);
+      $canuselatepass = false;
+    }
 
     if ($useexception) {
       if (empty($this->exception[3]) || $this->exception[2] > 0) {
