@@ -7119,7 +7119,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					//if there are more ans pts than drawn, want to match up better than this;
 					//mark it for coming back to
 					//if less ans pts than drawn, that's already accounted for in $percentoffpts
-					if ($anslineptcnt[$k]>count($linedata[$k])) {
+					if (!isset($linedata[$k]) || $anslineptcnt[$k]>count($linedata[$k])) {
 						$unmatchedanspts[$k] = 1;
 						continue;
 					}
@@ -7138,6 +7138,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//go back and match up drawn points with unmatched answer points
 			//we have more answer points than drawn points here
 			foreach (array_keys($unmatchedanspts) as $k) {
+				if (!isset($linedata[$k])) {continue;}
 				for ($i=0; $i<count($linedata[$k]); $i++) {
 					$minerr = $settings[7];
 					$minerrkey = -1;
