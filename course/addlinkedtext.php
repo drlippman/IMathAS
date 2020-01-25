@@ -10,9 +10,9 @@ require("../includes/parsedatetime.php");
 
 ini_set("max_input_time", "120");
 ini_set("max_execution_time", "120");
-ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "10485760");
-ini_set("post_max_size", "10485760");
+ini_set("memory_limit", "31457280");
+ini_set("upload_max_filesize", "31457280");
+ini_set("post_max_size", "31457280");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -340,7 +340,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$gradeoutcomes = array();
 			}
-			
+
 			$savetitle = _("Save Changes");
 		} else {
 			//set defaults
@@ -524,7 +524,7 @@ if ($overwriteBody==1) {
 		</div>
 		<div id="fileinput" <?php if ($type != 'file') {echo 'style="display:none;"';}?>>
 			<span class="form">File</span>
-			<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="31457280" />
 			<span class="formright">
 			<?php if ($filename != '') {
 				require_once("../includes/filehandler.php");
@@ -535,7 +535,7 @@ if ($overwriteBody==1) {
 				echo 'Attach ';
 			}
 			?>
-			file (Max 10MB)<sup>*</sup>: <input name="userfile" type="file" />
+			file (Max 30MB): <input name="userfile" type="file" />
 			</span><br class="form">
 		</div>
 		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>
@@ -654,8 +654,7 @@ if ($overwriteBody==1) {
 ?>
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
-
-	<p><sup>*</sup>Avoid quotes in the filename</p>
+	<p>&nbsp;</p>
 <?php
 }
 	require("../footer.php");
