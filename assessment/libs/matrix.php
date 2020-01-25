@@ -19,7 +19,7 @@ array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum"
 	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
 
 //matrix(vals,rows,cols)
-//Creates a new matrix item.  
+//Creates a new matrix item.
 //Use matrixformat() to create display or $answer from a matrix item
 //vals: list or array of numbers to form matrix values: R1C1,R1C2,...,R2C1,R2C2,...
 //rows, cols: dimensions of matrix
@@ -228,11 +228,11 @@ $Tableau .= "<tbody>\r\n";
     $Tableau .= "<tr>\r\n";
     if($rloop==0) {
         if($matrixname!="") {
-            if(count($headers)>0) { $matricnamerows = $rows+1; } else { $matricnamerows = $rows; }
+            if(!empty($headers)) { $matricnamerows = $rows+1; } else { $matricnamerows = $rows; }
             $Tableau.= "<td rowspan='$matricnamerows'> $matrixname </td>\r\n";
         }
 
-        if(count($headers)>0)  {
+        if(!empty($headers))  {
             if($rowheader!="") {
                 $Tableau.= "<th scope=\"col\">$rowheader</th>\r\n";
             } else {
@@ -260,7 +260,7 @@ $Tableau .= "<tbody>\r\n";
         }
     }
 
-    if(count($rownames)>0)  {
+    if(!empty($rownames))  {
         if(($rownames[$rloop]!=null)&&($rownames[$rloop]!="")) {
             $Tableau.= "<th scope=\"row\">".$rownames[$rloop]."</th>\r\n";
         } else {
@@ -405,7 +405,7 @@ function matrixsystemdisp($m,$v=null,$leftbracket=true) {
 				$firstout = true;
 				$out .= $v[$j];
 			}
-			
+
 		}
 		$out .= ')';
 	}
@@ -463,7 +463,7 @@ function matrixgetcol($m,$c, $asArray=false) {
 
 //matrixgetsubmatrix(matrix,rowselector,colselector)
 //gets submatrix.  rowselector and colselector are strings
-//with format:  "start:end".  ":" to select all 
+//with format:  "start:end".  ":" to select all
 function matrixgetsubmatrix($m,$rs,$cs) {
 	$rsp = explode(':',$rs);
 	if (count($rsp)<2) {
@@ -533,7 +533,7 @@ function matrixdiff($m,$n) {
 		}
 	}
 	return $m;
-}			
+}
 
 //matrixscalar(matrix,n)
 //Multiplies the matrix times the number n
@@ -544,7 +544,7 @@ function matrixscalar($m,$n) {
 		}
 	}
 	return $m;
-}	
+}
 
 //matrixprod(matrix1,matrix2)
 //Calculates the matrix product matrix1*matrix2
@@ -595,7 +595,7 @@ function matrixrowscale($m,$r,$n) {
 	}
 	return $m;
 }
-	
+
 //matrixrowswap(matrix,row1,row2)
 //swaps rows in matrix
 //matrix rows are 0-indexed; first row is row 0
@@ -603,7 +603,7 @@ function matrixrowswap($m,$r,$t) {
 	$temp = $m[$t];
 	$m[$t] = $m[$r];
 	$m[$r] = $temp;
-	return $m;	
+	return $m;
 }
 
 //matrixrowcombine(matrix,row1,a,row2,b,endrow)
@@ -650,7 +650,7 @@ function matrixtranspose($m) {
 			$n[$c][$r] = $m[$r][$c];
 		}
 	}
-	return $n;	
+	return $n;
 }
 
 //randinvertible(n)
@@ -667,7 +667,7 @@ function matrixrandinvertible($n) {
 		$m = matrixrowcombine($m,$sr,$mult[$i],$er,1,$er);
 	}
 	for ($i=4; $i>-1; $i--) {
-		$mi = matrixrowcombine($mi,$ops[$i][0],-1*$mult[$i],$ops[$i][1],1,$ops[$i][1]);	
+		$mi = matrixrowcombine($mi,$ops[$i][0],-1*$mult[$i],$ops[$i][1],1,$ops[$i][1]);
 	}
 	return array($m,$mi);
 }
@@ -733,7 +733,7 @@ function matrixinversefrac($m) {
 //A and b are both matrices
 //A is nxn, b is nxm
 //returns nxm matrix x so Ax = b
-function matrixsolve($A, $b, $silenterror=false) {    
+function matrixsolve($A, $b, $silenterror=false) {
 	if (count($A) != count($A[0])) {
 		echo "can only solve for square matrices A, sorry"; return $b;
 	}
@@ -759,7 +759,7 @@ function matrixsolve($A, $b, $silenterror=false) {
           $max = $i;
       $temp = $A[$p]; $A[$p] = $A[$max]; $A[$max] = $temp;
       $t    = $b[$p]; $b[$p] = $b[$max]; $b[$max] = $t;
-     
+
       // check if matrix is singular
       if (abs($A[$p][$p]) <= 1e-10) {
       	      if ($silenterror) {
@@ -784,7 +784,7 @@ function matrixsolve($A, $b, $silenterror=false) {
     $x = array();
     for ($c=0;$c<$M;$c++) {
 	    $x[$c] = array_fill(0, $N-1, 0);
-	
+
 	    // back substitution
 	    for ($i = $N - 1; $i >= 0; $i--) {
 	      $sum = 0.0;
@@ -802,9 +802,9 @@ function matrixsolve($A, $b, $silenterror=false) {
 //A and b are both matrices
 //A is nxn, b is nxm
 //returns nxm matrix x so Ax = b
-//entries may be fractions (as strings), so don't 
-//try to use the result in calculations. 
-function matrixsolvefrac($A, $b, $asString=true) {    
+//entries may be fractions (as strings), so don't
+//try to use the result in calculations.
+function matrixsolvefrac($A, $b, $asString=true) {
 	if (count($A) != count($A[0])) {
 		echo "can only solve for square matrices A, sorry"; return $b;
 	}
@@ -829,7 +829,7 @@ function matrixsolvefrac($A, $b, $asString=true) {
     	    	    $b[$r][$c] = fractionparse($b[$r][$c]);
     	    }
     }
-    
+
     // forward elimination
     for ($p=0; $p<$N; $p++) {
 
@@ -838,10 +838,10 @@ function matrixsolvefrac($A, $b, $asString=true) {
       for ($i = $p+1; $i < $N; $i++)
         if (abs($A[$i][$p][0]/$A[$i][$p][1]) > abs($A[$max][$p][0]/$A[$max][$p][1]))
           $max = $i;
-  
+
       $temp = $A[$p]; $A[$p] = $A[$max]; $A[$max] = $temp;
       $t    = $b[$p]; $b[$p] = $b[$max]; $b[$max] = $t;
-     
+
       // check if matrix is singular
       if (abs($A[$p][$p][0]/$A[$p][$p][1]) <= 1e-10) {echo("Solve failed: Matrix is singular or nearly singular"); return $b;}
 
@@ -862,7 +862,7 @@ function matrixsolvefrac($A, $b, $asString=true) {
     $x = array();
     for ($c=0;$c<$M;$c++) {
 	    $x[$c] = array_fill(0, $N-1, array(0,1));
-	
+
 	    // back substitution
 	    for ($i = $N - 1; $i >= 0; $i--) {
 	      $sum = array(0,1);
@@ -887,10 +887,10 @@ function matrixsolvefrac($A, $b, $asString=true) {
 //A is a matrix
 //rref = true for rref, false for echelon (default)
 //frac = true for fraction output, false for decimal output (default)
-//  if true, entries may be fractions (as strings), so don't 
-//  try to use the result in calculations. 
+//  if true, entries may be fractions (as strings), so don't
+//  try to use the result in calculations.
 //NOTE:  In most cases, using matrixrandunreduce is a better option than using this!
-function matrixreduce($A, $rref = false, $frac = false) {    
+function matrixreduce($A, $rref = false, $frac = false) {
 	include_once("fractions.php");
     // number of rows
     $N  = count($A);
@@ -907,7 +907,7 @@ function matrixreduce($A, $rref = false, $frac = false) {
     	    	    $A[$r][$c] = fractionparse($A[$r][$c]);
     	    }
     }
-   
+
     $r = 0;  $c = 0;
     while ($r < $N && $c < $M) {
     	    if ($A[$r][$c][0]==0) { //swap only if there's a 0 entry
@@ -917,16 +917,16 @@ function matrixreduce($A, $rref = false, $frac = false) {
 				$max = $i;
 			    }
 		    }
-		    if ($max != $r) { 
+		    if ($max != $r) {
 			$temp = $A[$r]; $A[$r] = $A[$max]; $A[$max] = $temp;
 		    }
     	    }
-    	    
+
     	    if (abs($A[$r][$c][0]/$A[$r][$c][1]) <= 1e-10) {
     	    	    $c++;
     	    	    continue;
     	    }
-    	    
+
     	    //scale pivot row
     	    if ($rref) {
 		    $divisor = $A[$r][$c];
@@ -934,7 +934,7 @@ function matrixreduce($A, $rref = false, $frac = false) {
 			    $A[$r][$j] = fractiondivide($A[$r][$j],$divisor);
 		    }
     	    }
- 
+
     	    for ($i = ($rref?0:$r+1); $i < $N; $i++) {
     	    	    if ($i==$r) {continue;}
     	    	    $mult = fractiondivide($A[$i][$c],$A[$r][$c]);
@@ -944,10 +944,10 @@ function matrixreduce($A, $rref = false, $frac = false) {
     	    	    	    $A[$i][$j] = fractionsubtract($A[$i][$j], fractionmultiply($mult,$A[$r][$j]));
     	    	    }
     	    }
-    	 
+
     	    $r++; $c++;
     }
-    
+
     for ($r=0;$r<$N;$r++) {
     	    for ($c=0;$c<$M;$c++) {
     	    	    if ($frac) {
@@ -992,14 +992,14 @@ function matrixround($m,$d) {
 	$r = count($m);
 	for ($i=0; $i<$r; $i++) {
 		for ($j=0; $j<$c; $j++) {
-			$m[$i][$j] = round($m[$i][$j], $d);		
+			$m[$i][$j] = round($m[$i][$j], $d);
 		}
 	}
 	return $m;
 }
 
 //polyregression(x,y,n)
-//find a nth degree polynomial that best fits the data 
+//find a nth degree polynomial that best fits the data
 //x,y arrays of data
 //returns an array (intercept, linear coeff, quad coeff, ...)
 function polyregression($x,$y,$n) {
@@ -1027,7 +1027,7 @@ function arrayIsZeroVector($v){
 			return(false);
 		}
 	}
-	return(true);	
+	return(true);
 }
 
 
@@ -1097,7 +1097,7 @@ function matrixIsEigVec($m,$v){
 	}
 
 	$product = matrixprod($m,matrix($v,count($v),1));
-	
+
 	$mv = array($v); //make $v the first row of $mv
 	$mv[1] = array();
 	for ($i=0;$i<count($v);$i++) {
@@ -1134,7 +1134,7 @@ function matrixIsEigVal($m,$L){
 //returns a matrix whose rows are a basis of the row space of matrix
 function matrixGetRowSpace($m){
 	$m = matrixreduce($m,true,false);
-	
+
 	$retMatrix = array();
 	for ($i=0;$i<count($m);$i++) {
 		if(!arrayIsZeroVector($m[$i])){
@@ -1144,7 +1144,7 @@ function matrixGetRowSpace($m){
 		}
 	}
 	return $retMatrix;
-	
+
 }
 //matrixGetColumnSpace(matrix)
 //matrix:  the matrix that we are finding the column space
@@ -1168,7 +1168,7 @@ function matrixAxbHasSolution($A,$b){
 			$hasnonzero = false;
 			for ($c=0;$c<$lastCol;$c++) { //for each column other than last
 				if ($testMatrix[$r][$c] != 0) {
-					$hasnonzero = true;  //found one	
+					$hasnonzero = true;  //found one
 					break; //don't need to keep looking
 				}
 			}
@@ -1228,7 +1228,7 @@ function matrixGetMinor($A,$rowNo,$colNo){
 			if($i!=$rowNo&&$j!=$colNo){
 				$retVal[$m][$n] = $A[$i][$j];
 				$n++;
-			}		
+			}
 		}
 		if($i!=$rowNo){
 			$m++;
@@ -1275,7 +1275,7 @@ function matrixRandomSpan($m){
 	else{
 		//add a new row copied from a random row, then unreduce
 		$m[] = $m[$GLOBALS['RND']->rand(0,count($m)-1)];
-		return matrixrandunreduce($m,5); 
+		return matrixrandunreduce($m,5);
 	}
 
 }
