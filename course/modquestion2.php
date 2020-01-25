@@ -47,7 +47,7 @@ if (!(isset($teacherid))) {
 			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
 			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
 			if ($penalty!=9999) {
-        $penalty_aftern = Sanitize::onlyInt($_POST['penaltyaftern']);
+        $penalty_aftern = Sanitize::onlyInt($_POST['penalty_aftern']);
 				if ($penalty_aftern > 1 && $attempts > 1) {
           $penalty = 'S' . $penalty_aftern . $penalty;
         }
