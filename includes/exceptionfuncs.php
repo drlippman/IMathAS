@@ -197,6 +197,9 @@ class ExceptionFuncs {
 		if ($now < $adata['enddate'] || $this->latepasses == 0 || $adata['allowlate']<10) {
 			return false;
 		}
+		if ($this->viewedassess===null) {
+			$this->getViewedAssess();
+		}
 		$canUseIfUnblocked = $this->getCanUseAssessLatePass($adata, $latepasscnt, true);
 		if ($canUseIfUnblocked && in_array($adata['id'],$this->viewedassess)) {
 			return true;
