@@ -4976,12 +4976,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					return 0;
 				}
 				$answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
-				unset($ratios);
-			} else if (in_array('toconst',$ansformats)) {
-				unset($diffs);
-				unset($realanss);
 			}
-
 
 			if ($answer == '') {
 				return 0;
@@ -4999,6 +4994,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$stunan = 0;
 			$ysqrtot = 0;
 			$reldifftot = 0;
+			$ratios = array();
+			$diffs = array();
+			$realanss = array();
 			for ($i = 0; $i < 20; $i++) {
 				$varvals = array();
 				for($j=0; $j < count($variables); $j++) {

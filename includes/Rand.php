@@ -65,6 +65,12 @@ class Rand {
 	}
 
 	public function shuffle(&$arr) {
+		if (!is_array($arr)) {
+			if ($GLOBALS['myrights']>10) {
+				echo _('Input to shuffle must be an array');
+			}
+			return;
+		}
 		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
 			for ($i=count($arr)-1;$i>0;$i--) {
 				if ($GLOBALS['assessver']>1) {

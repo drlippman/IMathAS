@@ -252,7 +252,12 @@ class NTupleScorePart implements ScorePart
                 }
             }
         }
-        if ($gaarrcnt<=count($anarr)) {
+        if (count($anarr)==0) { // no answers
+            if ($GLOBALS['myrights']>10) {
+              echo _('Eeek: No valid $answer values provided');
+            }
+            $score = 0;
+        } else if ($gaarrcnt<=count($anarr)) {
             $score = $correct/count($anarr);
         } else {
             $score = $correct/count($anarr) - ($gaarrcnt-count($anarr))/$extrapennum;  //take off points for extranous stu answers

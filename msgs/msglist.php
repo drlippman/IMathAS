@@ -549,21 +549,21 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		}
 	}
 	if (isset($_POST['unread'])) {
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
   		$query = "UPDATE imas_msgs SET isread=(isread&~1) WHERE id IN ($checklist) AND (isread&1)=1";
       $DBH->query($query);
 	 }
 	}
 	if (isset($_POST['markread'])) {
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
       $query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
       $DBH->query($query);
 	  }
 	}
 	if (isset($_POST['remove'])) {
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
   		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
       $DBH->query($query);

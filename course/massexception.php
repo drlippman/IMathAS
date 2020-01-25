@@ -171,6 +171,9 @@
 			exit;
 		}
 	}
+	if (empty($_POST['checked'])) {
+		$_POST['checked'] = array();
+	}
 
 
 	$pagetitle = "Manage Exceptions";

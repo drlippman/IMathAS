@@ -226,13 +226,8 @@ class FunctionExpressionScorePart implements ScorePart
                     return $scorePartResult;
                 }
                 $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
-                unset($ratios);
-            } else if (in_array('toconst',$ansformats)) {
-                unset($diffs);
-                unset($realanss);
             }
-
-
+            
             if ($answer == '') {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
@@ -250,6 +245,9 @@ class FunctionExpressionScorePart implements ScorePart
             $stunan = 0;
             $ysqrtot = 0;
             $reldifftot = 0;
+            $ratios = array();
+      			$diffs = array();
+      			$realanss = array();
             for ($i = 0; $i < 20; $i++) {
                 $varvals = array();
                 for($j=0; $j < count($variables); $j++) {

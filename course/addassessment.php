@@ -702,7 +702,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $page_formActionTag .= "&tb=" . Sanitize::encodeUrlParam($totb);
             $stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
             $stm->execute(array(':courseid'=>$cid));
-            $page_copyFromSelect = array();
+            $page_copyFromSelect = array('val'=>array(), 'label'=>array());
             $i=0;
             if ($stm->rowCount()>0) {
                 while ($row = $stm->fetch(PDO::FETCH_NUM)) {

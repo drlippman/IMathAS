@@ -1516,6 +1516,7 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 function prepchoicedisp($v,$choicesdata) {
 	if ($v=='') {return '';}
 	foreach ($choicesdata[1] as $k=>$c) {
+		if (is_array($c)) { continue; } // invalid
 		$sh = strip_tags($c);
 		if (trim($sh)=='' || strpos($c,'<table')!==false) {
 			$sh = "[view]";
