@@ -16,10 +16,11 @@ require_once(__DIR__ . "/config.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['init'])) {
-	require($CFG['hooks']['init']);
+	require_once($CFG['hooks']['init']);
 }
 
 // setup session stuff
+if (!function_exists('disallowsSameSiteNone')) {
 function disallowsSameSiteNone () {
 	// based on https://devblogs.microsoft.com/aspnet/upcoming-samesite-cookie-changes-in-asp-net-and-asp-net-core/
 	$userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -41,6 +42,7 @@ function disallowsSameSiteNone () {
 	}
 
 	return false;
+}
 }
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',86400);
