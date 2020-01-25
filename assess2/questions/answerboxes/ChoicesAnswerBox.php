@@ -45,8 +45,8 @@ class ChoicesAnswerBox implements AnswerBox
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
 
         if (!is_array($questions)) {
-            throw new RuntimeException(_('Eeek!  $questions is not defined or needs to be an array'));
-            return;
+            echo _('Eeek!  $questions is not defined or needs to be an array');
+            $questions = array();
         }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
