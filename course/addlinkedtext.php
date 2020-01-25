@@ -95,6 +95,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$processingerror = false;
+		$newfileid = 0;
 		if ($_POST['linktype']=='text') {
 			$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
 		} else if ($_POST['linktype']=='file') {
@@ -121,6 +122,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$uploaderror = true;
 						} else {
 							$_POST['text'] = "file:$filename";
+							$stm = $DBH->prepare("INSERT INTO imas_linked_files (filename) VALUES (?) ");
+							$stm->execute(array($filename));
+							$newfileid = $DBH->lastInsertId();
 						}
 
 					}
@@ -207,40 +211,57 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$outcomes = implode(',',$outcomes);
 		if (!empty($linkid)) {  //already have id; update
-			$stm = $DBH->prepare("SELECT text FROM imas_linkedtext WHERE id=:id");
+			$stm = $DBH->prepare("SELECT text,fileid FROM imas_linkedtext WHERE id=:id");
 			$stm->execute(array(':id'=>$linkid));
-			$text = trim($stm->fetchColumn(0));
+			list($text,$oldfileid) = $stm->fetch(PDO::FETCH_NUM);
+			$text = trim($text);
 			if (substr($text,0,5)=='file:') { //has file
 				if ($_POST['text']!=$text) { //if not same file, delete old if not used
-					$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
-					$stm->execute(array(':text'=>$text));
-					if ($stm->rowCount()==1) {
-						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-						$filename = substr($text,5);
-						deletecoursefile($filename);
-						//if (file_exists($uploaddir . $filename)) {
-						//	unlink($uploaddir . $filename);
-						//}
+					if ($oldfileid > 0) {
+						// had a file id - can use that approach
+						$stm = $DBH->prepare("SELECT count(id) FROM imas_linkedtext WHERE fileid=?");
+						$stm->execute(array($oldfileid));
+						if ($stm->fetchColumn(0) == 1) { // only one use of this file
+							$filename = substr($text,5);
+							deletecoursefile($filename);
+							$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
+							$stm->execute(array($oldfileid));
+						}
+					} else {
+						// no file id - old file, so do it the old way
+						$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
+						$stm->execute(array(':text'=>$text));
+						if ($stm->rowCount()==1) {
+							//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+							$filename = substr($text,5);
+							deletecoursefile($filename);
+							//if (file_exists($uploaddir . $filename)) {
+							//	unlink($uploaddir . $filename);
+							//}
+						}
 					}
+				} else {
+					// same file, so keep fileid
+					$newfileid = $oldfileid;
 				}
 			}
 			if (!$processingerror) {
 				$available = sanitize::onlyInt($_POST['avail']);
 				$target = Sanitize::onlyInt($_POST['target']);
 				$query = "UPDATE imas_linkedtext SET title=:title,summary=:summary,text=:text,startdate=:startdate,enddate=:enddate,avail=:avail,";
-				$query .= "oncal=:oncal,caltag=:caltag,target=:target,outcomes=:outcomes,points=:points WHERE id=:id";
+				$query .= "oncal=:oncal,caltag=:caltag,target=:target,outcomes=:outcomes,points=:points,fileid=:fileid WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'], ':startdate'=>$startdate,
 					':enddate'=>$enddate, ':avail'=>$available, ':oncal'=>$oncal, ':caltag'=>$caltag, ':target'=>$target,
-					':outcomes'=>$outcomes, ':points'=>$points, ':id'=>$linkid));
+					':outcomes'=>$outcomes, ':points'=>$points, ':fileid'=>$newfileid, ':id'=>$linkid));
 			}
 		} else if (!$processingerror) { //add new
-			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) VALUES ";
-			$query .= "(:courseid, :title, :summary, :text, :startdate, :enddate, :avail, :oncal, :caltag, :target, :outcomes, :points);";
+			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points,fileid) VALUES ";
+			$query .= "(:courseid, :title, :summary, :text, :startdate, :enddate, :avail, :oncal, :caltag, :target, :outcomes, :points, :fileid);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'],
 				':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag,
-				':target'=>$_POST['target'], ':outcomes'=>$outcomes, ':points'=>$points));
+				':target'=>$_POST['target'], ':outcomes'=>$outcomes, ':points'=>$points, ':fileid'=>$newfileid));
 			$newtextid = $DBH->lastInsertId();
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "(:courseid, 'LinkedText', :typeid);";

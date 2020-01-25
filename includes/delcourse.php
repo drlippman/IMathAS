@@ -102,10 +102,20 @@ function deleteCourse($cid) {
 	$stm->execute(array(':courseid'=>$cid));
 
 	//delete linked text files
-	$stm = $DBH->prepare("SELECT text,points,id FROM imas_linkedtext WHERE courseid=:courseid");
+	$stm = $DBH->prepare("SELECT text,points,id,fileid FROM imas_linkedtext WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		if (strpos($row[0], 'file:'.$cid.'/') === 0) { // if file is from this course
+		$fileid = $row[3];
+		if ($fileid > 0) { // has file id - can use that approach
+			$stm = $DBH->prepare("SELECT count(id) FROM imas_linkedtext WHERE fileid=?");
+			$stm->execute(array($fileid));
+			if ($stm->fetchColumn(0) == 1) { // only one use of this file
+				$filename = substr($row[0],5);
+				deletecoursefile($filename);
+				$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
+				$stm->execute(array($fileid));
+			}
+		} else if (strpos($row[0], 'file:'.$cid.'/') === 0) { // if file is from this course
 			$stm2 = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
 			$stm2->execute(array(':text'=>$row[0]));
 			if ($stm2->rowCount()==1) {

@@ -29,10 +29,19 @@ function delitembyid($itemid) {
 
 
 	} else if ($itemtype == "LinkedText") {
-		$stm = $DBH->prepare("SELECT text,points FROM imas_linkedtext WHERE id=:id");
+		$stm = $DBH->prepare("SELECT text,points,fileid FROM imas_linkedtext WHERE id=:id");
 		$stm->execute(array(':id'=>$typeid));
-		list($text,$points) = $stm->fetch(PDO::FETCH_NUM);
-		if (strpos($text, 'file:'.$cid.'/') === 0) { //delete file if not used
+		list($text,$points,$fileid) = $stm->fetch(PDO::FETCH_NUM);
+		if ($fileid > 0) { // has file id - can use that approach
+			$stm = $DBH->prepare("SELECT count(id) FROM imas_linkedtext WHERE fileid=?");
+			$stm->execute(array($fileid));
+			if ($stm->fetchColumn(0) == 1) { // only one use of this file
+				$filename = substr($text,5);
+				deletecoursefile($filename);
+				$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
+				$stm->execute(array($fileid));
+			}
+		} else if (strpos($text, 'file:'.$cid.'/') === 0) { //delete file if not used
 			$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
 			$stm->execute(array(':text'=>$text));
 			if ($stm->rowCount()==1) {
@@ -41,7 +50,7 @@ function delitembyid($itemid) {
 				//unlink($uploaddir . $filename);
 				deletecoursefile($filename);
 			}
-		} 
+		}
 		if ($points>0) {
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
 			$stm->execute(array(':gradetypeid'=>$typeid));
