@@ -53,7 +53,7 @@ export default {
       if (this.ainfo.submitby === 'by_question') {
         return 0;
       }
-      let curAttempt = this.ainfo.prev_attempts.length + 1;
+      let curAttempt = this.ainfo.prev_attempts.length;
       if (curAttempt > this.ainfo.retake_penalty.n) {
         return this.ainfo.retake_penalty.penalty * (curAttempt - this.ainfo.retake_penalty.n);
       }

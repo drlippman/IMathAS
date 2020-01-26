@@ -126,9 +126,10 @@ export default {
         substr += this.$t('setlist.keep_last');
       }
 
-      if (settings.prev_attempts.length > 0 && settings.retake_penalty > 0) {
-        let penalty = settings.prev_attempts.length * settings.retake_penalty;
-        alertstr = this.$t('retake_penalty', { p: penalty });
+      let nextAttempt = settings.prev_attempts.length+1;
+      if (nextAttempt > settings.retake_penalty.n) {
+        let penalty = settings.retake_penalty.penalty * (nextAttempt - settings.retake_penalty.n);
+        alertstr = this.$t('setlist.retake_penalty', { p: penalty });
       }
 
       return {
