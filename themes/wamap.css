@@ -1,0 +1,457 @@
+/*General settings - fonts, overall page background, etc*/
+html {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Trebuchet MS", "Arial", "Helvetica", sans-serif;
+  font-size: 90%;
+  margin: 0;
+  padding: 0;
+}
+
+body.fw1000 {
+  background-color: #f5f2ed;
+  background-image: url(../img/simplebg.png);
+  background-position: center top;
+  background-repeat: repeat-y;
+}
+.fw1000 .midwrapper {
+  max-width: 980px;
+}
+
+.fw1000 #headercontent {
+  padding: 0px 10px;
+}
+.notfw .headerwrapper {
+  /*padding: 0px 10px;*/
+}
+
+/*Link styles*/
+a:link {
+  text-decoration: none;
+}
+a:visited {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/*Container for course items*/
+div.item {
+  /*border: 1px solid #000;*/
+  background-color: #fff;
+}
+
+/*Container for editor*/
+div.editor {
+  border: 1px solid #000;
+}
+
+/*Default block container*/
+div.block,
+div.blockitems div.blockitems div.block {
+  /*border: 1px solid #000;*/
+  background-color: #ddf;
+}
+
+/*Default block item container*/
+div.blockitems,
+div.blockitems div.blockitems div.blockitems {
+  /*border: 1px solid #000;*/
+  border-top: 0px;
+  background-color: #eef;
+}
+
+/*Second level default block container*/
+div.blockitems div.block {
+  background-color: #dfd;
+}
+
+/*Second level default block item container */
+div.blockitems div.blockitems {
+  background-color: #efe;
+}
+
+/*toggles for instronly items inside item wrappers */
+div.item:hover span.instronly,
+div.block:hover span.instronly {
+  visibility: visible;
+}
+span.instronly {
+  visibility: hidden;
+}
+
+/*Icons*/
+div.icon {
+  color: #00d;
+  border: 1px solid #00f;
+  font-weight: bolder;
+}
+
+/*Breadcrumb bar*/
+div.breadcrumb {
+  /*border: 1px solid #000;*/
+  border: 0px;
+  background-color: #ddddff;
+  margin: 0px -10px;
+  padding-left: 10px;
+}
+
+/*Control panels*/
+div.cp {
+  /*border: 1px solid #000;*/
+  background-color: #ddd;
+}
+div.cpmid {
+  /*border: 1px solid #000;*/
+  background-color: #ddd;
+}
+
+table thead th {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/*Tables */
+table.gb thead th,
+table.gbl thead th,
+table.gbl thead th.locked {
+  border-bottom: 2px solid #00f;
+  background-color: #eef;
+}
+tr.even,
+tr.even td {
+  background-color: #fff;
+}
+tr.odd,
+tr.odd td {
+  background-color: #dfd;
+}
+tr.bordered td {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+tr.highlight,
+tr.highlight td {
+  background-color: #ddf;
+}
+tr.grid td {
+  border: 1px solid #000;
+}
+tr.dbltop td {
+  border-top: 3px double #000;
+}
+table.gbl td.locked,
+table.gbl th.locked {
+  border-right: 2px solid #00f;
+}
+
+/*Category header colors*/
+table.gb .catdf {
+  background-color: #eef;
+}
+table.gb .cat0 {
+  background-color: #ddf;
+}
+table.gb .cat1 {
+  background-color: #dfd;
+}
+table.gb .cat2 {
+  background-color: #fdd;
+}
+table.gb .cat3 {
+  background-color: #dff;
+}
+table.gb .cat4 {
+  background-color: #ffd;
+}
+table.gb .cat5 {
+  background-color: #fdf;
+}
+table.gb .cat6 {
+  background-color: #aaf;
+}
+table.gb .cat7 {
+  background-color: #afa;
+}
+table.gb .cat8 {
+  background-color: #faa;
+}
+table.gb .cat9 {
+  background-color: #aff;
+}
+.cattothdr {
+  font-variant: small-caps;
+}
+
+/*Fake look of links for Javascript onclicks*/
+span.link {
+  text-decoration: underline;
+  color: #00f;
+  cursor: pointer;
+}
+
+/*Containers for instructor leftbar, main content*/
+#leftcontent {
+  background: #eee;
+  /*border:1px solid #000;*/
+  color: #000;
+  padding-left: 10px;
+  left: 10px;
+}
+
+#centercontent {
+  background: #fff;
+}
+.midwrapper {
+  padding-left: 10px;
+  padding-right: 10px;
+  position: relative;
+}
+div.ddmenu {
+  padding: 5px;
+  background: #f2f2f2;
+  border: 1px solid #c3cac2;
+  position: absolute;
+  right: auto;
+  text-align: left;
+  visibility: hidden;
+  margin: 0px;
+  z-index: 100;
+}
+div.ddmenu li {
+  padding-bottom: 2px;
+}
+div.ddmenu ul.nomark li {
+  margin-top: 0px;
+}
+div.ddmenu ul.nomark {
+  padding-left: 0px;
+  margin-left: 15px;
+}
+/*colors and borders for assessments*/
+/*seq question css*/
+div.curquestion {
+}
+div.inactive {
+  border: 1px solid #bbd;
+}
+div.prequestion {
+  border: 1px solid #bbd;
+}
+hr.seq {
+}
+div.seqqinfocur {
+}
+div.seqqinfocur span.current {
+}
+div.seqqinfoavail {
+}
+div.seqqinfoinactive {
+}
+div.todoquestion {
+  background-color: #ffffcc;
+  border: 0px;
+}
+/*all questions*/
+div.question {
+  background-color: #f3f3ff;
+  border: 1px solid #bbd;
+  width: auto;
+}
+div.inset {
+  margin-right: 0px;
+}
+
+div.review {
+  /*info bar*/
+  margin-top: -6px;
+  background-color: #e0ffe0;
+  border: 1px solid #bbd;
+  width: auto;
+}
+div.intro {
+  border: 0px;
+  background-color: #ffe;
+}
+div.navbar {
+  background: #e0ffe0;
+  border: 1px solid #bbd;
+  color: #000;
+}
+div.navbar a {
+  color: blue;
+}
+span.current {
+  background-color: #ffa;
+}
+span.done {
+  text-decoration: line-through;
+}
+
+#headerlogo {
+  right: 0px;
+  top: 0px;
+  width: 30px;
+}
+span.padright {
+  padding-right: 40px;
+}
+.headerwrapper {
+  background: #fff;
+  border: 0px;
+  margin: 0;
+  margin: 0px;
+  margin-bottom: 0px;
+  /*height: 94px;*/
+  border-bottom: 2px solid #440044;
+}
+.headerwrapper h1 {
+  margin: 0;
+  padding: 30px 20px 0px;
+  color: #ae131e;
+  font-weight: normal;
+}
+
+div#headercontent {
+  height: 65px;
+  padding: 0px 10px;
+}
+div#navlistcont {
+  /*height: 24px;*/
+}
+div#headerbarlogo {
+  /*background: transparent url(../img/otbslogo.gif) no-repeat scroll left bottom;*/
+  padding-top: 10px;
+  height: 50px;
+  overflow: hidden;
+}
+div#headerbarlogo img {
+  vertical-align: -60%;
+}
+div#headerrightlinks {
+  text-align: right;
+  float: right;
+  margin-top: 15px;
+  color: #666;
+}
+div#headermenu {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: none;
+  cursor: pointer;
+}
+#headermidlinks {
+  padding-left: 40px;
+}
+div#headerhome,
+div#homelinkbox {
+  padding-top: 8px;
+}
+a.newnote,
+a.newnote:link,
+a.newnote:visited {
+  color: #f00;
+}
+
+@media only screen and (max-width: 700px) {
+  div#headerrightlinks {
+    display: none;
+  }
+  #headermidlinks {
+    display: none;
+  }
+  div#headermenu {
+    display: block;
+  }
+  div#headerbarlogo {
+    padding-top: 5px;
+    height: 35px;
+  }
+  div#headercontent {
+    height: 45px;
+  }
+  div#headerbarlogo img {
+    height: 35px;
+  }
+}
+@media only screen and (max-width: 700px) {
+  #headerhome h2 {
+    font-size: medium;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  #navlist {
+    display: none;
+  }
+  #navlist.menuexpanded,
+  ul#headermobilemenulist.menuexpanded {
+    display: block;
+  }
+  ul#navlist li {
+    display: list-item;
+  }
+  ul#navlist li a {
+    display: block;
+    float: none;
+    border-right: none;
+    padding: 0.3em 1em;
+    line-height: 1.3em;
+    border-bottom: 1px solid #fff;
+  }
+}
+
+ul#headermobilemenulist {
+  display: none;
+}
+
+ul#headermobilemenulist {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+ul#headermobilemenulist li a {
+  display: block;
+  border-bottom: 1px solid #fff;
+  color: #fff;
+  background-color: #297bbb;
+  padding: 0.3em 1em;
+  line-height: 1.3em;
+}
+
+ul#headermobilemenulist li a:hover,
+ul#headermobilemenulist li a:focus {
+  background-color: #369;
+  text-decoration: none;
+}
+
+/* Parts copied from Wamap's imascore.css and assessment/mathtest.css */
+ul#headermobilemenulist {
+  display: none;
+}
+
+ul#headermobilemenulist {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+ul#headermobilemenulist li a {
+  display: block;
+  border-bottom: 1px solid #fff;
+  color: #fff;
+  background-color: #297bbb;
+  padding: 0.3em 1em;
+  line-height: 1.3em;
+}
+
+ul#headermobilemenulist li a:hover,
+ul#headermobilemenulist li a:focus {
+  background-color: #369;
+  text-decoration: none;
+}
