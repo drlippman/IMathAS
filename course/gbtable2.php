@@ -2058,7 +2058,11 @@ function gbtable() {
 						} else {
 							$tokeep = count($cattotstu[$stype][$cat]);
 						}
-						$cattotstu[$stype][$cat] = array_sum($catpossstu[$stype][$cat])*array_sum($cattotstu[$stype][$cat])/($tokeep);
+						if ($tokeep > 0) {
+							$cattotstu[$stype][$cat] = array_sum($catpossstu[$stype][$cat])*array_sum($cattotstu[$stype][$cat])/($tokeep);
+						} else {
+							$cattotstu[$stype][$cat] = 0;
+						}
 						if (isset($cattotstuec[$stype][$cat])) {
 							$cattotstuec[$stype][$cat] = array_sum($catpossstu[$stype][$cat])*array_sum($cattotstuec[$stype][$cat])/$tokeep;
 						}

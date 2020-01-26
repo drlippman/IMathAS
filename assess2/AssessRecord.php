@@ -142,7 +142,7 @@ class AssessRecord
     foreach ($fields as $field) {
       $qarr[':'.$field] = $this->assessRecord[$field];
     }
-    if (!$this->is_practice && $this->data !== null) {
+    if (!$this->is_practice && !empty($this->data)) {
       $fields[] = 'scoreddata';
       $encoded = json_encode($this->data);
       if ($encoded === false) {
@@ -151,7 +151,7 @@ class AssessRecord
       }
       $qarr[':scoreddata'] = gzencode($encoded);
     }
-    if ($this->is_practice && $this->data !== null) {
+    if ($this->is_practice && !empty($this->data)) {
       $fields[] = 'practicedata';
       $encoded = json_encode($this->data);
       if ($encoded === false) {
@@ -221,7 +221,7 @@ class AssessRecord
     $waspractice = $this->is_practice;
     if ($this->is_practice) {
       $this->buildAssessData($recordStart);
-      $practicetosave = ($this->data !== null) ? gzencode(json_encode($this->data)) : '';
+      $practicetosave = (!empty($this->data)) ? gzencode(json_encode($this->data)) : '';
       $this->assessRecord['practicedata'] = $practicetosave;
       $this->setInPractice(false);
     } else {
@@ -230,7 +230,7 @@ class AssessRecord
 
     //generate scored data
     $this->buildAssessData($recordStart && !$waspractice);
-    $scoredtosave = ($this->data !== null) ? gzencode(json_encode($this->data)) : '';
+    $scoredtosave = (!empty($this->data)) ? gzencode(json_encode($this->data)) : '';
     $this->assessRecord['scoreddata'] = $scoredtosave;
 
     // switch back to practice if started that way
@@ -270,7 +270,7 @@ class AssessRecord
    * @return void
    */
   public function buildAssessData($recordStart = true) {
-    if ($this->data !== null && count($this->data) > 0) {
+    if (!empty($this->data)) {
       return false;
     }
 
@@ -374,7 +374,7 @@ class AssessRecord
     $seeds = array();
     $this->parseData();
 
-    if ($this->data !== null) {
+    if (!empty($this->data)) {
       foreach ($this->data['assess_versions'] as $ver) {
         foreach ($ver['questions'] as $thisqn=>$qdata) {
           foreach ($qdata['question_versions'] as $qver) {
@@ -834,7 +834,7 @@ class AssessRecord
     }
     $this->parseData();
 
-    if ($this->data === null) {
+    if (empty($this->data)) {
       return false;
     }
     if (count($this->data['assess_versions']) == 0) {
@@ -857,7 +857,7 @@ class AssessRecord
     }
     $this->parseData();
 
-    if ($this->data === null) {
+    if (empty($this->data)) {
       return false;
     }
     if (count($this->data['assess_versions']) == 0) {
@@ -898,9 +898,9 @@ class AssessRecord
   public function canMakeNewAttempt() {
     if ($this->is_practice) {
       // if in practice, can make new if we don't have one
-      return ($this->data === null);
+      return (empty($this->data));
     } else {
-      if ($this->data === null) {
+      if (empty($this->data)) {
         // if no data, can make new
         return true;
       }
@@ -3207,7 +3207,7 @@ class AssessRecord
    * @return void
    */
   public function parseData () {
-    if ($this->data === null) {
+    if (empty($this->data)) {
       if ($this->is_practice) {
         if ($this->assessRecord['practicedata'] != '') {
           $this->data = json_decode(gzdecode($this->assessRecord['practicedata']), true);
@@ -3217,7 +3217,7 @@ class AssessRecord
           $this->data = json_decode(gzdecode($this->assessRecord['scoreddata']), true);
         }
       }
-      if ($this->data === null) {
+      if (empty($this->data)) {
         $this->data = array();
       }
     }
