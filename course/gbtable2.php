@@ -223,6 +223,7 @@ function gbtable() {
 		$orderby = $GLOBALS['setorderby'];
 	}
 
+	$gb[0] = [[],[],[],[],[]];
 	//Build user ID headers
 	$gb[0][0][0] = "Name";
 	if ($isdiag) {
@@ -889,6 +890,7 @@ function gbtable() {
 		$cattotfuture[$ln] = array();
 		$cattotcurec[$ln] = array();
 		$cattotfutureec[$ln] = array();
+		$gb[$ln] = [[],[],[],[],[]];
 		//Student ID info
 		$gb[$ln][0][0] = sprintf("%s,&nbsp;%s", Sanitize::encodeStringForDisplay($line['LastName']),
 			Sanitize::encodeStringForDisplay($line['FirstName']));
