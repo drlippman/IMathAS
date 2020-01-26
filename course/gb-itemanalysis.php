@@ -388,6 +388,7 @@
 	if ($isteacher) {
 		echo '<div class="cpmid">Experimental:<br/>';
 		echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
+		echo "<a href=\"/services/testanalyzer#imathas?cid=$cid&amp;aid=$aid&amp;ui=1\" target=\"_blank\"><b>Neu: </b>Testergebnisse analysieren</a><br/>";
 
 		echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
 	}
