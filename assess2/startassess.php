@@ -324,7 +324,7 @@ if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
 
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
-$generate_html = ($assess_info->getSetting('displaymethod') == 'full');
+$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || $_POST['in_print'] == 1);
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, $generate_html, $generate_html);
 
 // if practice, add that

@@ -87,6 +87,7 @@ export const actions = {
       data: {
         practice: dopractice,
         password: password,
+        in_print: store.inPrintView ? 1 : 0,
         new_group_members: newGroupMembers.join(','),
         cur_group: store.assessInfo.stugroupid,
         has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid) ? 1 : 0
