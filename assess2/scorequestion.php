@@ -205,7 +205,7 @@ if (count($qns) > 0) {
     }
 
     $errors = $assess_record->scoreQuestion($qn, $timeactive[$k], $submission, $parts_to_score);
-    if (count($errors)>0) {
+    if (!empty($errors)) {
       $scoreErrors[$qn] = $errors;
     }
   }
