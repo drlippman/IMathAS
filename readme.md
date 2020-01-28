@@ -99,7 +99,7 @@ These provide additional validation options beyond `$loginformat`.
 - `$CFG['acct']['importLoginformat']`:  If set, this regular expression replaces `$loginformat` when using the  "import students from file" option.
 - `$CFG['acct']['SIDformaterror']`: A message to display if the username/SID has invalid format.
 - `$CFG['acct']['passwordFormaterror']`: A message to display if the password has invalid format.
-- `$CFG['acct']['emailFormaterror']`: A message to display if the email has invalid format.
+- `$CFG['acct']['emailFormaterror']`: A message to display if the email doesn't meet the custom 'emailFormat' pattern.
 
 ### Access Limits
 - `$CFG['GEN']['addteachersrights']`: Set to the minimum rights level needed to Add/Remove Teachers in a course.  Defaults to 40 (Limited Course Creator rights).
