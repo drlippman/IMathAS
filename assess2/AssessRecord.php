@@ -1382,9 +1382,7 @@ class AssessRecord
       $regen = $ver;
     }
 
-    if (!$by_question) {
-      $retakepenalty = $this->assess_info->getSetting('retake_penalty');
-    }
+    $retakepenalty = $this->assess_info->getSetting('retake_penalty');
 
     // get data structure for this question
     $question_versions = $assessver['questions'][$qn]['question_versions'];
@@ -1467,8 +1465,8 @@ class AssessRecord
             $qsettings['retry_penalty'],  //retry penalty
             $qsettings['retry_penalty_after'], //retry penalty after
             $regen,             // the regen number
-            $by_question ? $qsettings['regen_penalty'] : $retakepenalty['penalty'],
-            $by_question ? $qsettings['regen_penalty_after'] : $retakepenalty['n'],
+            $retakepenalty['penalty'],
+            $retakepenalty['n'],
             $due_date,           // the due date
             $starttime + $submissions[$parttry['sub']], // submission time
             $exceptionPenalty,
