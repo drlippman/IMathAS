@@ -195,7 +195,7 @@ function vmsetupitemsort($numbers,$cats,$state,$qn,$part=null,$width=150) {
 // out[i] = -1 means unsorted; = 0 is first container, = 1 is second container
 function vmitemsortgetcontainers($state, $n) {
 	if (!is_array($n)) {
-		return array();
+		$n = array();
 	}
 	list($initbasestr,$initobjstr,$cont) = explode('|',$state);
 	//this is a very inelegant parsing of the container info
