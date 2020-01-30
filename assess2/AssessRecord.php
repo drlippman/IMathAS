@@ -1511,6 +1511,12 @@ class AssessRecord
     for ($pn = 0; $pn < count($answeights); $pn++) {
       $qRawscore += $partrawscores[$pn]*$answeights[$pn]/$answeightTot;
     }
+    if ($is_singlescore && $qver['singlescore'] == 'allornothing') { // apply allornothing
+      if ($qRawscore < .98) {
+        $qScore = 0;
+        $qRawscore = 0;
+      }
+    }
     return array($qScore, $qRawscore, $parts, $scoredTry);
   }
 
@@ -1774,7 +1780,8 @@ class AssessRecord
       }
     }
 
-    $singlescore = ((count($partla) > 1 || count($answeights) > 1) && count($scores) == 1);
+    //$singlescore = ((count($partla) > 1 || count($answeights) > 1) && count($scores) == 1);
+    $singlescore = empty($scoreResult['scoreMethod']) ? false : $scoreResult['scoreMethod'];
 
     $this->recordTry($qn, $data, $singlescore);
 
@@ -3123,8 +3130,8 @@ class AssessRecord
     } else {
       $curq = &$question_versions[$ver];
     }
-    if ($singlescore) {
-      $curq['singlescore'] = true;
+    if (!empty($singlescore)) {
+      $curq['singlescore'] = $singlescore;
     } else if (isset($curq['singlescore'])) {
       unset($curq['singlescore']);
     }
