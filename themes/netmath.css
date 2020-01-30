@@ -355,8 +355,9 @@ a.small:hover {
 span.spanbutton {
   font-size: 14px;
   padding: 1px 3px;
-  border: 1px solid hsl(56, 100%, 40%);
-  background: hsl(56, 100%, 40%);
+  color: #eef;
+  border: 1px solid #ccc;
+  background-color: hsl(198, 65%, 40%);
   cursor: default;
   margin: 2px;
   margin-left: 6px;
@@ -364,8 +365,8 @@ span.spanbutton {
 }
 
 span.spanbutton:hover {
-  border: 1px solid hsl(56, 100%, 50%);
-  background: hsl(56, 100%, 70%);
+  border: 1px solid #ccc;
+  background-color: #036;
 }
 
 #homelinkbox {

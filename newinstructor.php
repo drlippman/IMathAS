@@ -5,6 +5,11 @@
 	$pagetitle = "Antrag für eine Dozentenkennung";
 	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+	/* Für deutsche Meldung von jquery */
+	if (isset($CFG['locale'])) {
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
+}
+ /* End Test */
 	$nologo = true;
 	require("header.php");
 	$pagetitle = "Antrag für eine Dozentenkennung";
