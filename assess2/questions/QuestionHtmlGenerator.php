@@ -346,7 +346,9 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
-            if ((isset($scoremethod) && $scoremethod == 'acct') ||
+            if ((isset($scoremethod) &&
+                ($scoremethod == 'acct' || $scoremethod == 'singlescore' ||
+                $scoremethod == 'allornothing')) ||
               $quesData['qtype'] == 'conditional'
             ) {
               $jsParams['submitall'] = 1;

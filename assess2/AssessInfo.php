@@ -301,7 +301,7 @@ class AssessInfo
    * @return array        Associative array of extracted settings
    */
   public function getQuestionSettings($id) {
-    $by_q = array('regens_max','regen_penalty','regen_penalty_after');
+    $by_q = array('regens_max');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
       'showans','showans_aftern','points_possible','questionsetid',
       'category', 'withdrawn', 'jump_to_answer');
@@ -743,12 +743,12 @@ class AssessInfo
     $this->assessData['defregens'] = 999; // unlimited
     $this->assessData['shuffle'] &= ~4;  // disable "all stu same version"
     $this->assessData['timelimit'] = 0;
+    $this->assessData['retake_penalty'] = array('penalty'=>0, 'n'=>1);
     unset($this->assessData['allowed_attempts']);
     foreach ($this->questionData as $i=>$v) {
       $this->questionData[$i]['tries_max'] = 999; // unlimited
       $this->questionData[$i]['regens_max'] = 999; // unlimited
       $this->questionData[$i]['retry_penalty'] = 0;
-      $this->questionData[$i]['regen_penalty'] = 0;
       $this->questionData[$i]['showans'] = 'with_score';
     }
   }
@@ -872,18 +872,7 @@ class AssessInfo
         $settings['retry_penalty'] = intval($settings['penalty']);
       }
     }
-    if ($settings['regenpenalty'] == 9999) {
-      $settings['regen_penalty'] = $defaults['defregenpenalty'];
-      $settings['regen_penalty_after'] = $defaults['defregenpenalty_after'];
-    } else {
-      if ($settings['regenpenalty'][0]==='S') {
-        $settings['regen_penalty_after'] = intval($settings['regenpenalty'][1]);
-        $settings['regen_penalty'] = intval(substr($settings['regenpenalty'], 2));
-      } else {
-        $settings['regen_penalty_after'] = 1;
-        $settings['regen_penalty'] = intval($settings['regenpenalty']);
-      }
-    }
+    
     if ($settings['regen'] == 1 || $defaults['submitby'] == 'by_assessment') {
       $settings['regens_max'] = 1;
     } else {
@@ -973,6 +962,10 @@ class AssessInfo
       $settings['defregenpenalty_after'] = 1;
       $settings['defregenpenalty'] = intval($settings['defregenpenalty']);
     }
+    $settings['retake_penalty'] = array(
+      'penalty' => intval($settings['defregenpenalty']),
+      'n' => intval($settings['defregenpenalty_after'])
+    );
 
     // if LivePoll, force all stu same random seed
     // force by-question submission
@@ -984,10 +977,6 @@ class AssessInfo
     //if by-assessment, define attempt values
     if ($settings['submitby'] == 'by_assessment') {
       $settings['allowed_attempts'] = $settings['defregens'];
-      $settings['retake_penalty'] = array(
-        'penalty' => intval($settings['defregenpenalty']),
-        'n' => intval($settings['defregenpenalty_after'])
-      );
     }
 
     $settings['jump_to_answer'] = false;

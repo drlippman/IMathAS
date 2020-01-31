@@ -70,7 +70,7 @@
 		exit;
 	}
 	$userip = $_SERVER['REMOTE_ADDR'];
-	$noproctor = false;
+	$noproctor = (trim($line['pws'], " ;") === '');
 	if ($line['ips']!='') {
 		foreach (explode(',',$line['ips']) as $ip) {
 			if ($ip=='*') {
@@ -226,10 +226,20 @@ if (isset($_POST['SID'])) {
 	$stm2->execute(array(':assessmentid'=>$paid));
 	$aVer = $stm2->fetchColumn(0);
 
-	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-	$stm->execute(array(':SID'=>$diagSID));
+	$query = "SELECT iu.id,istu.id FROM imas_users AS iu ";
+	$query .= "LEFT JOIN imas_students AS istu ON iu.id=istu.userid ";
+	$query .= "AND istu.courseid=? WHERE iu.SID=?";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array($pcid, $diagSID));
 	if ($stm->rowCount()>0) {
-		$userid = $stm->fetchColumn(0);
+		list($userid, $stuid) = $stm->fetch(PDO::FETCH_NUM);
+		if ($stuid == null) { // was unenrolled from course. reenroll
+			if (!isset($_POST['timelimitmult'])) {
+				$_POST['timelimitmult'] = 1;
+			}
+			$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,timelimitmult) VALUES (:userid, :courseid, :section, :timelimitmult);");
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
+		}
 		$allowreentry = ($line['public']&4);
 		if (!in_array(strtolower($_POST['passwd']),$superpw) && (!$allowreentry || $line['reentrytime']>0)) {
 			$d = null;

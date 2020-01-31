@@ -695,9 +695,9 @@ if ($overwriteBody==1) {
 		</span><br class="form"/>
 		<span class="form">Autoscoring:</span>
 		<span class="formright">Auto-award <input type="text" size="2" name="autopostpts" value="<?php echo Sanitize::onlyInt($autopostpts);?>"> points
-		  for each of the first <input type="text" size="2" name="autopostn" value="<?php echo Sanitize::onlyInt($autopostn);?>"> posts<br/>
+		  for each of the first <input type="text" size="2" name="autopostn" value="<?php echo Sanitize::onlyInt($autopostn);?>"> posts per student<br/>
 		  Auto-award <input type="text" size="2" name="autoreplypts" value="<?php echo Sanitize::onlyInt($autoreplypts);?>"> points
-		  for each of the first <input type="text" size="2" name="autoreplyn" value="<?php echo Sanitize::onlyInt($autoreplyn);?>"> replies
+		  for each of the first <input type="text" size="2" name="autoreplyn" value="<?php echo Sanitize::onlyInt($autoreplyn);?>"> replies per student
 		 </span><br class=form />
 		<span class=form>Gradebook Category:</span>
 			<span class=formright>

@@ -1382,9 +1382,7 @@ class AssessRecord
       $regen = $ver;
     }
 
-    if (!$by_question) {
-      $retakepenalty = $this->assess_info->getSetting('retake_penalty');
-    }
+    $retakepenalty = $this->assess_info->getSetting('retake_penalty');
 
     // get data structure for this question
     $question_versions = $assessver['questions'][$qn]['question_versions'];
@@ -1467,8 +1465,8 @@ class AssessRecord
             $qsettings['retry_penalty'],  //retry penalty
             $qsettings['retry_penalty_after'], //retry penalty after
             $regen,             // the regen number
-            $by_question ? $qsettings['regen_penalty'] : $retakepenalty['penalty'],
-            $by_question ? $qsettings['regen_penalty_after'] : $retakepenalty['n'],
+            $retakepenalty['penalty'],
+            $retakepenalty['n'],
             $due_date,           // the due date
             $starttime + $submissions[$parttry['sub']], // submission time
             $exceptionPenalty,
@@ -1512,6 +1510,12 @@ class AssessRecord
     $qRawscore = 0;
     for ($pn = 0; $pn < count($answeights); $pn++) {
       $qRawscore += $partrawscores[$pn]*$answeights[$pn]/$answeightTot;
+    }
+    if ($is_singlescore && $qver['singlescore'] == 'allornothing') { // apply allornothing
+      if ($qRawscore < .98) {
+        $qScore = 0;
+        $qRawscore = 0;
+      }
     }
     return array($qScore, $qRawscore, $parts, $scoredTry);
   }
@@ -1776,7 +1780,8 @@ class AssessRecord
       }
     }
 
-    $singlescore = ((count($partla) > 1 || count($answeights) > 1) && count($scores) == 1);
+    //$singlescore = ((count($partla) > 1 || count($answeights) > 1) && count($scores) == 1);
+    $singlescore = empty($scoreResult['scoreMethod']) ? false : $scoreResult['scoreMethod'];
 
     $this->recordTry($qn, $data, $singlescore);
 
@@ -3125,8 +3130,8 @@ class AssessRecord
     } else {
       $curq = &$question_versions[$ver];
     }
-    if ($singlescore) {
-      $curq['singlescore'] = true;
+    if (!empty($singlescore)) {
+      $curq['singlescore'] = $singlescore;
     } else if (isset($curq['singlescore'])) {
       unset($curq['singlescore']);
     }
