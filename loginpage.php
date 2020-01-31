@@ -55,6 +55,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 <div class=textright><input type="submit" value="Login"></div>
 
 <div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=newuser"><?php echo 'Als neuer Student registrieren';?></a></br>
+<a href="<?php echo $imasroot; ?>/newinstructor.php"><?php echo 'Als neuer Dozent registrieren';?></a>
 </div>
 <div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=resetpw"><?php echo _('Forgot Password');?></a><br/>
 <a href="<?php echo $imasroot; ?>/forms.php?action=lookupusername"><?php echo _('Forgot Username');?></a></div>

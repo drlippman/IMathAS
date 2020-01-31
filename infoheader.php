@@ -3,8 +3,12 @@
 </div>
 
 <ul id="navlist">
-<li><a href="<?php echo $imasroot; ?>/index.php">Anmelden</a></li>
-<li><a href="<?php echo $imasroot; ?>/diag/index.php">Diagnostik</a></li>
+<li><a href="<?php echo $imasroot; ?>/index.php">Zur Startseite</a></li>
+<li><a href="<?php echo $imasroot; ?>/info/enteringanswers.php/index.php">Formeln eingeben</a></li>
+<li><a href="<?php echo $imasroot; ?>/embedq.php?theme=netmath&id=7573" target="_blank">Formeln üben</a></li>
+<li><a href="<?php echo $imasroot; ?>/newinstructor.php">Als Dozent registrieren</a><li>
+<li><a href="<?php echo $imasroot; ?>/docs/docs.php">Dokumentation (Dozenten)</a></li>
+<li><a href="<?php echo $imasroot; ?>/diag/index.php">Tests zur Diagnostik</a></li>
 </ul>
 
 <div id="header">
