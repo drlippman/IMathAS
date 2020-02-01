@@ -531,7 +531,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"></span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
-			echo Sanitize::encodeStringForDisplay($message);
+			echo Sanitize::encodeStringForDisplay($message, true);
 			echo "</textarea></div></span><br class=form>\n";
 			if ($replyto>0) {
 				echo '<span class="form"></span><span class="formright"><input type="checkbox" name="sendunread" id="sendunread" value="1"/> <label for="sendunread">'._('Mark original message unread').'</label></span><br class="form"/>';
