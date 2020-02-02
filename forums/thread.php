@@ -528,8 +528,8 @@ echo "<input type=hidden name=cid value=\"$cid\"/>";
 echo "<input type=hidden name=forum value=\"$forumid\"/>";
 
 ?>
-<label for="search">Search</label>: <input type=text name="search" id="search" /> 
-<input type=checkbox name="allforums" id="allforums" /> <label for="allforums">All forums in course?</label> 
+<label for="search">Search</label>: <input type=text name="search" id="search" />
+<input type=checkbox name="allforums" id="allforums" /> <label for="allforums">All forums in course?</label>
 <input type="submit" value="Search"/>
 </form>
 <?php
@@ -652,7 +652,7 @@ echo "</p>";
 			$stm->execute(array(':forumid'=>$forumid));
 			// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$uniqviews[$row[0]] = $row[1]-1;
+				$uniqviews[$row[0]] = $row[1];
 			}
 			$query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid,imas_forum_threads.lastposttime ";
 			$query .= "FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
