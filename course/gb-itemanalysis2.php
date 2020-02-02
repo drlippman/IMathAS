@@ -144,7 +144,7 @@
                 AND imas_students.courseid = :courseid
                 AND imas_students.locked = 0";
 	if ($secfilter!=-1) {
-		$query .= " AND enrollments.section=:section ";
+		$query .= " AND imas_students.section=:section ";
 	}
 	$stm = $DBH->prepare($query);
 	if ($secfilter!=-1) {
@@ -199,7 +199,7 @@
                     $qincomplete[$questionId] += 1;
                 }
             } else {
-							// not even tried yet 
+							// not even tried yet
 							$qincomplete[$questionId] += 1;
 						}
 
