@@ -51,7 +51,7 @@ export default {
     initEditor () {
       var component = this;
       window.initeditor('exact', this.computedId, null, true, function (ed) {
-        ed.on('change keyup undo redo', function (e) {
+        ed.on('input change keyup undo redo', function (e) {
           component.updateValue(ed.getContent());
         });
         component.objTinymce = ed;

@@ -429,7 +429,9 @@ function GB_doneload() {
 }
 function GB_hide() {
 	document.getElementById("GB_window").style.display = "none";
-	document.getElementById("GB_overlay").style.display = "none";
+	if (document.getElementById("GB_overlay")) {
+		document.getElementById("GB_overlay").style.display = "none";
+	}
 	$(document).off('keydown.GB');
 }
 
