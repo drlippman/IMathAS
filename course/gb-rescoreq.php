@@ -81,7 +81,7 @@ if (isset($_POST['record'])) {
 	$updstm = $DBH->prepare($query);
 		
 	$query = "SELECT id,ver,questions,seeds,scores,attempts,lastanswers,reattempting,";
-	$query .= "bestseeds,bestscores,bestattempts,bestlastanswers,lti_sourcedid ";
+	$query .= "bestseeds,bestscores,bestattempts,bestlastanswers,lti_sourcedid,userid ";
 	$query .= "FROM imas_assessment_sessions WHERE assessmentid=?";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($aid));
@@ -143,7 +143,7 @@ if (isset($_POST['record'])) {
 		if (strlen($row['lti_sourcedid'])>1) {
 			$bsarr = explode(';', $bestscorelist);
 			$bs = explode(',', $bsarr[0]);
-			calcandupdateLTIgrade($row['lti_sourcedid'],$aid,$bs,true);
+			calcandupdateLTIgrade($row['lti_sourcedid'],$aid,$row['userid'],$bs,true);
 		}
 	}
 	

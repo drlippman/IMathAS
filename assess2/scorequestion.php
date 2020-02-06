@@ -327,7 +327,7 @@ if ($assessInfoOut['submitby'] == 'by_question' || $end_attempt) {
     $gbscore = $assess_record->getGbScore();
     require_once("../includes/ltioutcomes.php");
     $aidposs = $assess_info->getSetting('points_possible');
-    calcandupdateLTIgrade($lti_sourcedid, $aid, $gbscore['gbscore'], false, $aidposs);
+    calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], false, $aidposs);
   }
 }
 
