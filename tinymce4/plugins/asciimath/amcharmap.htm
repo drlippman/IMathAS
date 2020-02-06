@@ -18,13 +18,13 @@
 <script type="text/javascript">
 
 function init() {
-	AMTcgiloc = top.tinymce.activeEditor.windowManager.getParams().AMTcgiloc;
+	AMTcgiloc = window.parent.tinymce.activeEditor.windowManager.getParams().AMTcgiloc;
 }
 
 function set(val) {
 	// Insert the contents from the input into the document
-	top.tinymce.activeEditor.execCommand('mceAsciimath', val);
-	top.tinymce.activeEditor.windowManager.close();
+	window.parent.tinymce.activeEditor.execCommand('mceAsciimath', val);
+	window.parent.tinymce.activeEditor.windowManager.close();
 }
 </script>
 <base target="_self" />
@@ -182,6 +182,6 @@ function set(val) {
 	<td class="character" onclick="set('Omega')" title="Omega"><div class="capomega"></div></td>
 </tr>
 </table>
-<input type="button" value="Cancel" onclick="top.tinymce.activeEditor.windowManager.close()"/>
+<input type="button" value="Cancel" onclick="window.parent.tinymce.activeEditor.windowManager.close()"/>
 </body>
 </html>
