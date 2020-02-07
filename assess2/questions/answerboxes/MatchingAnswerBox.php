@@ -126,7 +126,7 @@ class MatchingAnswerBox implements AnswerBox
     			} else {
     				$out .= '<li>';
     			}
-    			$out .= "<select name=\"qn$qn-$i\">";
+    			$out .= "<select name=\"qn$qn-$i\" id=\"qn$qn-$i\">";
     			$out .= '<option value="-" ';
     			if ($laval=='-' || strcmp($laval,'')==0) {
     				$out .= 'selected="1"';
@@ -150,7 +150,7 @@ class MatchingAnswerBox implements AnswerBox
     					$out .= ">$v</option>";
     				}
     			}
-    			$out .= "</select>&nbsp;{$questions[$randqkeys[$i]]}</li>\n";
+    			$out .= "</select>&nbsp;<label for=\"qn$qn-$i\">{$questions[$randqkeys[$i]]}</label></li>\n";
     		}
     		$out .= "</ul>\n";
     		$out .= "</div>";

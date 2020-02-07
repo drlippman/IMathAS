@@ -35,7 +35,7 @@
         </span>
       </div>
 
-      <div v-if="aData.latepass_blocked_by_practice">
+      <div v-if="canEdit && aData.latepass_blocked_by_practice">
         {{ $t('gradebook.latepass_blocked_practice') }}
         <button
           type="button"

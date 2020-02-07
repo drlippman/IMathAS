@@ -144,7 +144,7 @@
                 AND imas_students.courseid = :courseid
                 AND imas_students.locked = 0";
 	if ($secfilter!=-1) {
-		$query .= " AND enrollments.section=:section ";
+		$query .= " AND imas_students.section=:section ";
 	}
 	$stm = $DBH->prepare($query);
 	if ($secfilter!=-1) {
@@ -198,7 +198,10 @@
                 if (in_array(-1, $scoredQuestion['scored_try'])) {
                     $qincomplete[$questionId] += 1;
                 }
-            }
+            } else {
+							// not even tried yet
+							$qincomplete[$questionId] += 1;
+						}
 
             // Time spent per version.
             $timeontaskperversion[$questionId] += $questionData['time'] / ($regens[$questionId] + 1);
