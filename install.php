@@ -5,6 +5,7 @@ if (file_exists("config.php")) {
 	exit;
 }
 if (isset($_POST['dbserver'])) {
+	$_POST['imasroot'] = rtrim(trim($_POST['imasroot']), ' /');
 
 	$contents = "<?php
 //IMathAS Math Config File.  Adjust settings here!
@@ -276,7 +277,7 @@ Color shift icons from green to red as deadlines approach?<br/>
 <p>
 Path to IMathAS install.  Blank if install is in web root directory.  Might be something like "/imathas" if in a
 subdirectory.<br/>
-<input type="text" name="imasroot" value="<?php echo rtrim(dirname($_SERVER['PHP_SELF'])); ?>" />
+<input type="text" name="imasroot" value="<?php echo rtrim(dirname($_SERVER['PHP_SELF']), ' /'); ?>" />
 </p>
 
 <p>
