@@ -615,7 +615,7 @@ function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false) {
 
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(
-		':hash' => md5($key),
+		':hash' => $key,
 		':sourcedid' => $sourcedid,
 		':grade' => $grade,
 		':sendon' => (time() + ($sendnow?0:$LTIdelay))
