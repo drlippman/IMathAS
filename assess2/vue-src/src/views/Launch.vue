@@ -6,77 +6,77 @@
       <div class="med-below" v-html="aInfo.summary"></div>
 
       <settings-list />
-
-      <div class="settings-list">
-        <div class="flexrow" v-if="aInfo.has_password">
-          <div>
-            <icons name="lock" size="small"/>
+      <form id="launch-form" @submit.prevent="startAssess">
+        <div class="settings-list">
+          <div class="flexrow" v-if="aInfo.has_password">
+            <div>
+              <icons name="lock" size="small"/>
+            </div>
+            <password-entry v-model="password" @onenter="startAssess"/>
           </div>
-          <password-entry v-model="password" @onenter="startAssess"/>
-        </div>
-        <div class="flexrow" v-if="aInfo.isgroup > 0">
-          <div>
-            <icons name="group" size="small" />
+          <div class="flexrow" v-if="aInfo.isgroup > 0">
+            <div>
+              <icons name="group" size="small" />
+            </div>
+            <group-entry @update-new-group="updateNewGroup" />
           </div>
-          <group-entry @update-new-group="updateNewGroup" />
         </div>
-      </div>
-
-      <p
-        class = "noticetext"
-        v-if = "errorMsg !== null"
-      >
-        {{ errorMsg }}
-      <p>
-
-      <p
-        v-if = "timeLimitExpired !== ''"
-        class = "noticetext"
-      >
-        <icons name="alert" />
-        {{ timeLimitExpired }}
-        <br/>
-        <button
-          type="button"
-          class="primary"
-          @click="endAssess"
+  
+        <p
+          class = "noticetext"
+          v-if = "errorMsg !== null"
         >
-          {{ $t('closed.submit_now') }}
-        </button>
-      </p>
-
-      <p v-if="showReset">
-        {{ $t('launch.resetmsg') }}
-        <br/>
-        <button
-          type="button"
-          class="secondary"
-          @click="doReset"
+          {{ errorMsg }}
+        <p>
+  
+        <p
+          v-if = "timeLimitExpired !== ''"
+          class = "noticetext"
         >
-          {{ $t('launch.doreset') }}
-        </button>
-      </p>
-      <p v-if="aInfo.view_as_stu" class="noticetext">
-        {{ $t('launch.view_as_stu', {name: aInfo.stu_fullname}) }}
-      </p>
-      <p>
-        <button
-          v-if="okToLaunch"
-          type="button"
-          class="primary"
-          @click="startAssess"
-        >
-          {{ startLabel }}
-        </button>
-        <button
-          v-if="hasExit"
-          type="button"
-          class="secondary"
-          @click="exitAssess"
-        >
-          {{ $t('closed.exit') }}
-        </button>
-      </p>
+          <icons name="alert" />
+          {{ timeLimitExpired }}
+          <br/>
+          <button
+            type="button"
+            class="primary"
+            @click="endAssess"
+          >
+            {{ $t('closed.submit_now') }}
+          </button>
+        </p>
+  
+        <p v-if="showReset">
+          {{ $t('launch.resetmsg') }}
+          <br/>
+          <button
+            type="button"
+            class="secondary"
+            @click="doReset"
+          >
+            {{ $t('launch.doreset') }}
+          </button>
+        </p>
+        <p v-if="aInfo.view_as_stu" class="noticetext">
+          {{ $t('launch.view_as_stu', {name: aInfo.stu_fullname}) }}
+        </p>
+        <p>
+          <button
+            v-if="okToLaunch"
+            type="submit"
+            class="primary"
+          >
+            {{ startLabel }}
+          </button>
+          <button
+            v-if="hasExit"
+            type="button"
+            class="secondary"
+            @click="exitAssess"
+          >
+            {{ $t('closed.exit') }}
+          </button>
+        </p>
+      </form>
     </div>
     <div v-if="aInfo.hasOwnProperty('prev_attempts') && aInfo.prev_attempts.length > 0" >
       <summary-gb-score />
