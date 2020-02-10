@@ -189,9 +189,20 @@ p.imp {
 <body>
 <h1>IMathAS Install</h1>
 <?php
-if (extension_loaded("suhosin")) {
-	echo '<p><b>Warning</b>:  It appears the Suhosin PHP extension is loaded on this server.  ';
-	echo 'IMathAS cannot operate correctly with this extension.</p>';
+if (PHP_VERSION_ID < 70200) {
+	echo '<p><b>Warning</b>:  PHP 7.2 or higher is needed for full functionality.</p>';
+}
+if (!extension_loaded("mbstring")) {
+	echo '<p><b>Warning</b>:  It appears your PHP does not have the mbstring extension installed, and it is required.</p>';
+}
+if (!extension_loaded("pdo_mysql")) {
+	echo '<p><b>Warning</b>:  It appears your PHP does not have the pdo_mysql extension installed, and it is required.</p>';
+}
+if (!function_exists('gd_info')) {
+	echo '<p><b>Warning</b>:  It appears your PHP does not have the gb extension installed, which is needed for some functionality.</p>';
+}
+if (!function_exists('curl_init')) {
+	echo '<p><b>Warning</b>:  It appears your PHP does not have the curl extension installed, which is needed for some functionality.</p>';
 }
 ?>
 <p>This page will help you configure IMathAS.  The database settings <b>must</b> be
