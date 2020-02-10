@@ -165,7 +165,6 @@
 	        // Get the scored question version.
 	        $scoredQuestionIndex = $questionData['scored_version'];
             $scoredQuestion = $questionData['question_versions'][$scoredQuestionIndex];
-
             // The imas_questions.id for this question.
             $questionId = $scoredQuestion['qid'];
 
@@ -179,7 +178,30 @@
             // How many times this question was displayed to all students.
             $qcnt[$questionId] += 1;
 
-            // Total number of times this question was RE-generated for all students.
+            // The number of tries on this question. Use max tries on any part.
+            if (!empty($scoredQuestion['scored_try'])) {
+                $scoredTries = array_map(function($n) { return ++$n; }, $scoredQuestion['scored_try']);
+                $attempts[$questionId] += max($scoredTries);
+                // Figure out if any part of the question is incomplete.
+                // Skip if a score override is set.  TODO: actually look per-part
+                $untried = array_keys($scoredQuestion['scored_try'], -1);
+								if (!empty($scoredQuestion['scoreoverride'])) {
+									$overridden = array_keys($scoredQuestion['scoreoverride']);
+									if (count(array_diff($untried, $overridden)) > 0) {
+										$qincomplete[$questionId] += 1;
+										continue;
+									}
+								} else if (count($untried) > 0) {
+									$qincomplete[$questionId] += 1;
+									continue;
+								}
+            } else {
+							// not even tried yet
+							$qincomplete[$questionId] += 1;
+							continue;
+						}
+
+						// Total number of times this question was RE-generated for all students.
             // Reduce by one to exclude the first generated question.
             $regens[$questionId] += count($questionData['question_versions']) - 1;
 
@@ -188,20 +210,6 @@
 
             // Time spent on all versions of this question.
             $timeontask[$questionId] += $questionData['time'];
-
-            // The number of tries on this question. Use max tries on any part.
-            if (!empty($scoredQuestion['scored_try'])) {
-                $scoredTries = array_map(function($n) { return ++$n; }, $scoredQuestion['scored_try']);
-                $attempts[$questionId] += max($scoredTries);
-
-                // Figure out if any part of the question is incomplete.
-                if (in_array(-1, $scoredQuestion['scored_try'])) {
-                    $qincomplete[$questionId] += 1;
-                }
-            } else {
-							// not even tried yet
-							$qincomplete[$questionId] += 1;
-						}
 
             // Time spent per version.
             $timeontaskperversion[$questionId] += $questionData['time'] / ($regens[$questionId] + 1);
@@ -354,7 +362,6 @@
 					$pc2 = 'N/A';
 				}
 				$pi = round(100*$qincomplete[$qid]/$qcnt[$qid],1);
-
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
 					$avgatt = round($attempts[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgreg = round($regens[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
