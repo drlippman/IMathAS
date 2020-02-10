@@ -3257,6 +3257,9 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
+	if ($stu !== null) {
+		$stu = preg_replace('/\D/','',$stu);
+	}
 	if ($stu===null) {
 		return " ";
 	} else if (!is_numeric($stu)) {
