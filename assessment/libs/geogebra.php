@@ -5,26 +5,28 @@
 global $allowedmacros;
 array_push($allowedmacros,"addGeogebra","addGeogebraJava");
 
-//addGeogebra(url,[width,height,commands,params,callbacks,qn,part]) 
+//addGeogebra(url,[width,height,commands,params,callbacks,qn,part])
 //place a geogebra HTML5 applet.  Either include the base64ggb (grab by pressing
 // Ctrl+Shift+B), or include the "Material ID" after uploading to Geogebratube
 //if commands array is provided, execute these javascript commands
 //  (see http://wiki.geogebra.org/en/Reference:JavaScript
 //  for available commands).  For example:
 //    array('setValue("a",'.$a.')','setValue("b",'.$b.')')
-//params should be key=>value array of parameters, like 
+//params should be key=>value array of parameters, like
 //  array('framePossible'=>'true','showToolBar'=>'true')
 //  (see http://wiki.geogebra.org/en/Reference:Applet_Parameters for options)
-//if you want to pull values from Geogebra on submit, provide an array of 
+//if you want to pull values from Geogebra on submit, provide an array of
 //  geogebra commands to callback with.  For example:
 //      array('getValue("a")','getValue("b")')
-//  if doing callbacks, make sure to provide qn (the question number 
+//  if doing callbacks, make sure to provide qn (the question number
 //  (1-indexed) - usually use $thisq) and if multipart, part number (0-indexed)
 function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array(),$callback=null,$qn=null,$part=null) {
 	$out = '';
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 	$ggbid = uniqid();
-	if (!isset($GLOBALS['geogebracount'])) {
+	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
+		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
+  } else	if (!isset($GLOBALS['geogebracount'])) {
 		$GLOBALS['geogebracount'] = 0;
 		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
 	}
@@ -45,10 +47,10 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	$out .= '$(function() { applet'.$ggbid.'.inject("geogebra_container'.$ggbid.'","preferHTML5");});';
 	$out .= '</script>';
 	$out .= '<div id="geogebra_container'.$ggbid.'"><span id="ggbloadimg'.$ggbid.'">Loading Geogebra...</span></div>';
-	
+
 	//if (count($commands)>0) {
 		$out .= '<script type="text/javascript">';
-		
+
 		$out .= 'if (typeof ggbOnInit == "undefined") {';
 		$out .= '  var ggbInitStack = []; ';
 		$out .= '  function ggbOnInit(param) {';
@@ -64,7 +66,7 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	//}
 	if ($callback!=null & $qn != null) {
 		if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
-		
+
 		$out .= '<script type="text/javascript">';
 		$out .= ' callbackstack['.$qn.'] = function () {';
 		$out .= '   var ansparts = [];';
@@ -78,7 +80,7 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	return $out;
 }
 
-//addGeogebraJava(url,[width,height,commands,params,callbacks,qn,part]) 
+//addGeogebraJava(url,[width,height,commands,params,callbacks,qn,part])
 //place a geogebra Java applet, calling .ggb file specified in URL
 //if commands array is provided, execute these javascript commands
 //(see http://www.geogebra.org/en/wiki/index.php/GeoGebra_JavaScript_Methods
@@ -108,11 +110,11 @@ function addGeogebraJava($url,$width=400,$height=200,$commands=array(),$params=a
 	}
 	$out .= 'Please <a href="http://www.java.com">install Java 1.4.2</a> (or later) to use this page.';
 	$out .= '</applet>';
-	
+
 	if (count($commands)>0) {
 		$out .= '<script type="text/javascript">';
 		$out .= "function ggbOnInit{$GLOBALS['geogebracount']}() {";
-		$out .= "var applet=document.getElementById(\"geogebra{$GLOBALS['geogebracount']}\");";  
+		$out .= "var applet=document.getElementById(\"geogebra{$GLOBALS['geogebracount']}\");";
 		foreach ($commands as $com) {
 			$out .= 'applet.'.$com.';';
 		}
@@ -125,10 +127,10 @@ function addGeogebraJava($url,$width=400,$height=200,$commands=array(),$params=a
 	}
 	if ($callback!=null & $qn != null) {
 		if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
-		
+
 		$out .= '<script type="text/javascript">';
 		$out .= ' callbackstack['.$qn.'] = function () {';
-		$out .= "   var applet=document.getElementById(\"geogebra{$GLOBALS['geogebracount']}\");";  
+		$out .= "   var applet=document.getElementById(\"geogebra{$GLOBALS['geogebracount']}\");";
 		$out .= '   var ansparts = [];';
 		foreach ($callback as $com) {
 			$out .= '  ansparts.push(applet.'.$com.');';
