@@ -459,7 +459,7 @@
 	//echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 
 	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
-	echo "Note: Average Score, Tries, Regens, and Times only counts those who attempted the problem.<br/>";
+	echo "Note: Average Score, Tries, Regens, and Times only counts those who completed the problem.<br/>";
 	echo 'Average Score is based on raw score, before any penalties are applied.<br/>';
 	echo 'All averages only include those who have started the assessment.</p>';
 	if ($submitby == 'by_assessment') {
