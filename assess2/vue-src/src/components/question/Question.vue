@@ -247,6 +247,7 @@ export default {
       }
       setTimeout(window.drawPics, 100);
       window.rendermathnode(document.getElementById('questionwrap' + this.qn));
+      window.initSageCell(document.getElementById('questionwrap' + this.qn));
       this.updateTime(true);
       this.setInitValues();
       // add in timeactive from autosave, if exists

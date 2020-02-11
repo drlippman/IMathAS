@@ -28,6 +28,9 @@ if (!$isRealStudent) {
   $studentinfo = array('latepasses' => 0, 'timelimitmult' => 1);
 }
 
+// extend time for uploads
+ini_set("max_input_time", "60");
+
 /**
  * Check if the required parameters are set
  * @param  string $method   'GET' or 'POST'
