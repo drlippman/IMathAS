@@ -117,13 +117,25 @@
  $haslogin = isset($_POST['password']);
  if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
  	 if (empty($_SERVER['HTTP_REFERER'])) {
- 	 	require("header.php");
- 	 	echo '<p>You have requested guest access to a course.</p>';
- 	 	$cid = Sanitize::onlyInt($_GET['cid']);
- 	 	echo '<p><a href="'.$imasroot.'/index.php">Nevermind</a> ';
- 	 	echo '<a href="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">Continue</a></p>';
- 	 	require("footer.php");
- 	 	exit;
+     if (isset($_GET['cid'])) {
+       $cid = Sanitize::onlyInt($_GET['cid']);
+       $stm = $DBH->prepare("SELECT istemplate,available FROM imas_courses WHERE id=?");
+       $stm->execute(array($cid));
+       $row = $stm->fetch(PDO::FETCH_ASSOC);
+       if (($row['istemplate']&8)!=8 || $row['available']>=4) {
+         echo '<p>'._('This course does not allow guest access.').'</p>';
+         exit;
+       }
+     } else {
+       $cid = 0;
+     }
+
+ 	 	 require("header.php");
+ 	 	 echo '<p>You have requested guest access to a course.</p>';
+ 	 	 echo '<p><a href="'.$imasroot.'/index.php">Nevermind</a> ';
+ 	 	 echo '<a href="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">Continue</a></p>';
+ 	 	 require("footer.php");
+ 	 	 exit;
  	 }
  	 $haslogin = true;
  	 $_POST['username']='guest';
@@ -559,10 +571,18 @@
 					$tutorsection = trim($line['section']);
 				} else if ($myrights==5 && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
 					//guest user not enrolled, but trying via guestaccess; enroll
-					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES (?,?)");
-					$stm->execute(array($userid, $cid));
-					$studentid = $DBH->lastInsertId();
-					$studentinfo = array('latepasses'=>0, 'timelimitmult'=>1, 'section'=>null);
+					$stm = $DBH->prepare("SELECT istemplate,available FROM imas_courses WHERE id=?");
+          $stm->execute(array($cid));
+          $row = $stm->fetch(PDO::FETCH_ASSOC);
+          if (($row['istemplate']&8)==8 && $row['available']<4) {
+  					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES (?,?)");
+  					$stm->execute(array($userid, $cid));
+  					$studentid = $DBH->lastInsertId();
+  					$studentinfo = array('latepasses'=>0, 'timelimitmult'=>1, 'section'=>null);
+          } else {
+            echo '<p>'._('This course does not allow guest access.').'</p>';
+            exit;
+          }
 				}
 			}
 		}
