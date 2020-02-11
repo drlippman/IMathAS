@@ -1167,6 +1167,18 @@ class AssessRecord
       if ($include_scores) {
         $parts[0]['score'] = 0;
         $parts[0]['rawscore'] = 0;
+        // if there are score overrides, calculate question score and raw
+        if (isset($curq['scoreoverride']) && is_array($curq['scoreoverride'])) {
+          $raw = 0;
+          $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
+          foreach ($answeights as $k=>$v) {
+            if (!empty($curq['scoreoverride'][$k])) {
+              $raw += $v * $curq['scoreoverride'][$k];
+            }
+          }
+          $raw /= array_sum($answeights);
+          $score = $raw * $out['points_possible'];
+        }
       }
     } else {
       // treat everything like multipart
@@ -1180,10 +1192,6 @@ class AssessRecord
           list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet, $curq['scoreoverride']);
         } else {
           list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet);
-        }
-        if (isset($curq['scoreoverride']) && !is_array($curq['scoreoverride'])) {
-          $score = $curq['scoreoverride'] * $out['points_possible'];
-          $raw = $curq['scoreoverride'];
         }
       }
       $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
@@ -1228,6 +1236,11 @@ class AssessRecord
       $out['status'] = 'attempted';
     }
     if ($include_scores) {
+      // if there is a single whole-question score override, use now
+      if (isset($curq['scoreoverride']) && !is_array($curq['scoreoverride'])) {
+        $score = $curq['scoreoverride'] * $out['points_possible'];
+        $raw = $curq['scoreoverride'];
+      }
       $out['score'] = ($score != -1) ? round($score,2) : 0;
       $out['rawscore'] = ($raw != -1) ? round($raw,4) : 0;
     }
