@@ -347,7 +347,7 @@ if ($myrights==100) {
 	}
 }
 
-/*** done pulling stuff.  Time to display something ***/
+/*** done pulling stuff.  Time to display something */
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
 if (!isset($CFG['GEN']['homelinkbox'])) {
@@ -520,10 +520,10 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 
 	echo '<div class="center">';
 	if (count($data)>0) {
-		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">Change Course Order</a>';
+		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">',_('Change Course Order'),'</a>';
 	}
 	echo '</div><div class="center">';
-	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
+	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">',_('View hidden courses'),'</a>';
 	echo '</div>';
 	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
 		echo '<div class="center"><a class="abutton" href="admin/admin2.php">', _('Admin Page'), '</a></div>';

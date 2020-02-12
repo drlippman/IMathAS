@@ -88,15 +88,8 @@ $(function() {
 
 <p><?php printf('Wenn Sie Dozent sind, so können Sie <a href="%s/newinstructor.php"><b>hier eine Dozentenkennung beantragen</b></a>. Mit einer Dozentenkennung erhalten Sie Zugang zur hochschulübergreifenden Aufgabenbibliothek und können eigene Aufgaben und Tests erstellen und in das Lernmanagementsystem Ihrer Hochschule einbinden.', $imasroot)?></p>
 
-<p><?php echo 'Hilfe:'; ?>
-<ul>
-<li><a href="<?php echo $imasroot;?>/info/enteringanswers.php"><?php echo 'Hilfe für Studierende für die Eingabe von Antworten (in Englisch)'; ?></a></li>
-<li><a href="/IMathAS/embedq.php?theme=netmath&id=7573">Übung zur Eingabe von Antworten</a></li>
-<li><a href="<?php echo $imasroot;?>/docs/docs.php"><?php echo 'Dokumentation für Dozenten (in Englisch)'; ?></a></li>
-</ul>
-
 <br class=clear>
-<p class="textright"><?php printf('%s wird entwickelt von %s', $installname, ' <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2013 David Lippman');  ?><br>
+<p class="textright"><?php printf('%s wird entwickelt von %s', $installname, ' <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2020 David Lippman');  ?><br>
 <a href="https://netmath.vcrp.de/downloads/Systeme/Impressum.html" target="_blank">Impressum</a> |
 
 <a href="https://netmath.vcrp.de/downloads/Systeme/NutzungsbedingungenIMathAS.html" target="_blank">Nutzungsbedingungen</a> |
