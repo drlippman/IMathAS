@@ -1,5 +1,6 @@
 var i18njs = {"Submit":"Absenden",
 "Remove":"Entfernen",
+"Question":"Frage",
 "Line":"Linie",
 "Polygon":"Vieleck",
 "error - more than 1 i in expression":"Fehler - mehr als ein i im Ausdruck",
