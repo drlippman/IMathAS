@@ -3258,7 +3258,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		return '';
 	}
 	if ($stu !== null) {
-		$stu = preg_replace('/\D/','',$stu);
+		$stu = preg_replace('/[^\-\d\.e]/','',$stu);
 	}
 	if ($stu===null) {
 		return " ";

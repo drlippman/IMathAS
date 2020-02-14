@@ -2312,18 +2312,24 @@ class AssessRecord
    * @return void
    */
   public function doJumpToAnswer($qn, $qid) {
+    /* DL 2/12/20: disabling this for now to allow jump to ans to work for by_assess,
+       since it's available as an option there.  But it might make more sense to
+       remove it as an option on quizzes.
+       
     // only can do jump to answer for by_question submission
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if (!$by_question) {
       return false;
     }
+    */
     // make sure question settings are correct
     $allowjump = $this->assess_info->getQuestionSetting($qid, 'jump_to_answer');
     if (!$allowjump) {
       return false;
     }
-    // get last question version
-    $qvers = &$this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
+    // get last question version on last assessment version
+    $aver = count($this->data['assess_versions']) - 1;
+    $qvers = &$this->data['assess_versions'][$aver]['questions'][$qn]['question_versions'];
     $curQver = &$qvers[count($qvers)-1];
     $curQver['jumptoans'] = true;
     $this->need_to_record = true;

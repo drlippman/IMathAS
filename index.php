@@ -235,9 +235,10 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "AND imas_forums.courseid IN ($postcidlist) ";  //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
-	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
+	$query .= "AND imas_forum_threads.lastposttime>:old ORDER BY imas_forum_threads.lastposttime DESC";
+
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid, ':now'=>$now));
+	$stm->execute(array(':userid'=>$userid, ':now'=>$now, ':old'=>$now - 365*24*60*60));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
@@ -286,11 +287,12 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //is int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) AND imas_forum_threads.lastposttime<:now ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "AND imas_forum_threads.lastposttime<:now AND imas_forum_threads.lastposttime>:old ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now));
+	$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid, ':now'=>$now, ':old'=>$now - 365*24*60*60));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;

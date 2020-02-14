@@ -926,61 +926,95 @@ function matrixreduce($A, $rref = false, $frac = false) {
 		echo "You really shouldn't use matrixreduce for matrices bigger than 10 rows.";
 	}
     }
-    for ($r=0;$r<$N;$r++) {
-    	    for ($c=0;$c<$M;$c++) {
-    	    	    $A[$r][$c] = fractionparse($A[$r][$c]);
-    	    }
+		$usefraccalc = true;
+		for ($r=0;$r<$N;$r++) {
+	    for ($c=0;$c<$M;$c++) {
+				if (floor($A[$r][$c]) != $A[$r][$c]) {
+					$usefraccalc = false;
+					break 2;
+				}
+	    }
     }
+
+		if ($usefraccalc) {
+	    for ($r=0;$r<$N;$r++) {
+	    	    for ($c=0;$c<$M;$c++) {
+	    	    	    $A[$r][$c] = fractionparse($A[$r][$c]);
+	    	    }
+	    }
+		}
 
     $r = 0;  $c = 0;
     while ($r < $N && $c < $M) {
-    	    if ($A[$r][$c][0]==0) { //swap only if there's a 0 entry
+			if (($usefraccalc && $A[$r][$c][0]==0) || (!$usefraccalc && $A[$r][$c]==0)) { //swap only if there's a 0 entry
 		    $max = $r;
 		    for ($i = $r+1; $i < $N; $i++) {
-			    if (abs($A[$i][$c][0]/$A[$i][$c][1]) > abs($A[$max][$c][0]/$A[$max][$c][1])) {
-				$max = $i;
+			    if ($usefraccalc && abs($A[$i][$c][0]/$A[$i][$c][1]) > abs($A[$max][$c][0]/$A[$max][$c][1])) {
+						$max = $i;
+			    } else if (!$usefraccalc && abs($A[$i][$c]) > abs($A[$max][$c])) {
+						$max = $i;
 			    }
 		    }
 		    if ($max != $r) {
-			$temp = $A[$r]; $A[$r] = $A[$max]; $A[$max] = $temp;
+					$temp = $A[$r]; $A[$r] = $A[$max]; $A[$max] = $temp;
 		    }
-    	    }
+      }
 
-    	    if (abs($A[$r][$c][0]/$A[$r][$c][1]) <= 1e-10) {
-    	    	    $c++;
-    	    	    continue;
-    	    }
+	    if (($usefraccalc && abs($A[$r][$c][0]/$A[$r][$c][1]) <= 1e-10) ||
+			 	(!$usefraccalc && abs($A[$r][$c]) <= 1e-10)
+			) {
+	    	    $c++;
+	    	    continue;
+	    }
 
-    	    //scale pivot row
-    	    if ($rref) {
+	    //scale pivot row
+	    if ($rref) {
 		    $divisor = $A[$r][$c];
 		    for ($j = $c; $j < $M; $j++) {
-			    $A[$r][$j] = fractiondivide($A[$r][$j],$divisor);
+					if ($usefraccalc) {
+			    	$A[$r][$j] = fractiondivide($A[$r][$j],$divisor);
+					} else {
+						$A[$r][$j] /= $divisor;
+					}
 		    }
-    	    }
+	    }
 
-    	    for ($i = ($rref?0:$r+1); $i < $N; $i++) {
-    	    	    if ($i==$r) {continue;}
-    	    	    $mult = fractiondivide($A[$i][$c],$A[$r][$c]);
-    	    	    if ($mult[0]==0) {continue;}
-    	    	    for ($j = $c; $j < $M; $j++) {
-    	    	    	    //echo "Entry $i,$j:  ".fractionreduce($A[$i][$j]).' - '.fractionreduce( $mult).'*'.fractionreduce($A[$r][$j]).'<br/>';
-    	    	    	    $A[$i][$j] = fractionsubtract($A[$i][$j], fractionmultiply($mult,$A[$r][$j]));
-    	    	    }
-    	    }
+	    for ($i = ($rref?0:$r+1); $i < $N; $i++) {
+	    	    if ($i==$r) {continue;}
+						if ($usefraccalc) {
+	    	    	$mult = fractiondivide($A[$i][$c],$A[$r][$c]);
+						} else {
+							$mult = $A[$i][$c]/$A[$r][$c];
+						}
+	    	    if (($usefraccalc && $mult[0]==0) || (!$usefraccalc && $mult==0)) {continue;}
+	    	    for ($j = $c; $j < $M; $j++) {
+	    	    	 //echo "Entry $i,$j:  ".fractionreduce($A[$i][$j]).' - '.fractionreduce( $mult).'*'.fractionreduce($A[$r][$j]).'<br/>';
+							if ($usefraccalc) {
+							 	$A[$i][$j] = fractionsubtract($A[$i][$j], fractionmultiply($mult,$A[$r][$j]));
+							} else {
+								$A[$i][$j] = $A[$i][$j] - $mult * $A[$r][$j];
+								if (abs($A[$i][$j]) < 1e-10) {
+									$A[$i][$j] = 0; //treat values close to 0 as 0
+								}
+							}
+	    	    }
+	    }
 
-    	    $r++; $c++;
+	    $r++; $c++;
     }
 
-    for ($r=0;$r<$N;$r++) {
-    	    for ($c=0;$c<$M;$c++) {
-    	    	    if ($frac) {
-    	    	    	    $A[$r][$c] = fractionreduce($A[$r][$c]);
-    	    	    } else {
-    	    	    	    $A[$r][$c] = $A[$r][$c][0]/$A[$r][$c][1];
-    	    	    }
-    	    }
-    }
+		if ($usefraccalc) {
+	    for ($r=0;$r<$N;$r++) {
+	    	    for ($c=0;$c<$M;$c++) {
+	    	    	    if ($frac) {
+	    	    	    	    $A[$r][$c] = fractionreduce($A[$r][$c]);
+	    	    	    } else {
+	    	    	    	    $A[$r][$c] = $A[$r][$c][0]/$A[$r][$c][1];
+	    	    	    }
+	    	    }
+	    }
+		}
+
     return $A;
 }
 
@@ -1064,7 +1098,9 @@ function arrayIsZeroVector($v){
 function matrixGetRank($m){
 	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
 	$rowRank = 0;
+
 	$refM = matrixreduce($m,false,false);
+
 	for($i=0;$i<count($refM);$i++){
 		if(arrayIsZeroVector($refM[$i])==true){
 			return($rowRank);
@@ -1126,7 +1162,6 @@ function matrixIsEigVec($m,$v){
 	}
 
 	$product = matrixprod($m,matrix($v,count($v),1));
-
 	$mv = array($v); //make $v the first row of $mv
 	$mv[1] = array();
 	for ($i=0;$i<count($v);$i++) {
