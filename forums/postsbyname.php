@@ -235,11 +235,13 @@
 			$blockreplythreads[] = $row[0];
 		}
 	}
-	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview FROM imas_forum_posts JOIN ";
+	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview,imas_students.id AS stuid FROM imas_forum_posts JOIN ";
 	$query .= "imas_forum_threads AS ift ON ift.id=imas_forum_posts.threadid AND ift.lastposttime<:now JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid=:userid) AS ifv ON ";
-	$query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid=:forumid AND imas_forum_posts.isanon=0 ";
-	$arr = array(':userid'=>$userid, ':forumid'=>$forumid, ':now'=>$now);
+	$query .= "ifv.threadid=imas_forum_posts.threadid ";
+	$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
+	$query .= "WHERE imas_forum_posts.forumid=:forumid AND imas_forum_posts.isanon=0 ";
+	$arr = array(':userid'=>$userid, ':forumid'=>$forumid, ':now'=>$now, ":courseid"=>$cid);
 	if ($dofilter) {
 		//$query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
 		$query .= "AND (ift.stugroupid=0 OR ift.stugroupid=:stugroupid) ";
@@ -297,7 +299,7 @@
 
 		$content .= '<span class="right">';
 		if ($haspoints) {
-			if ($caneditscore && $line['userid']!=$userid) {
+			if ($caneditscore && $line['stuid']!==null) {
 				$content .= "<input type=text size=2 name=\"score[".Sanitize::onlyInt($line['id'])."]\" id=\"score".Sanitize::onlyInt($line['id'])."\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
 				if (isset($scores[$line['id']])) {
 					$content .= Sanitize::encodeStringForDisplay($scores[$line['id']]);
@@ -341,7 +343,7 @@
 		$content .= '</div>';
 		$content .= "<div id=\"m$cnt\" class=\"hidden\">".Sanitize::outgoingHtml(filter($line['message']));
 		if ($haspoints) {
-			if ($caneditscore && $line['userid']!=$userid) {
+			if ($caneditscore && $line['stuid']!==null) {
 				$content .= '<hr/>';
 				$content .= "Private Feedback: ";
 				/*echo "<textarea cols=\"50\" rows=\"2\" name=\"feedback[". Sanitize::onlyInt($line['id'])."]\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";

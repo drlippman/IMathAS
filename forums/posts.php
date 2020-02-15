@@ -205,13 +205,13 @@ if ($postbeforeview && !$canviewall) {
 
 if ($oktoshow) {
 	if ($haspoints) {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section FROM ";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section,imas_students.id AS stuid FROM ";
 		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
 		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
 		$query .= "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
 		$query .= "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
 	} else {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section FROM ";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section,imas_students.id AS stuid FROM ";
 		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
 		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
 		$query .= "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
@@ -223,6 +223,7 @@ if ($oktoshow) {
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
+	$isstu = array();
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -233,6 +234,7 @@ if ($oktoshow) {
 		if ($line['id']==$threadid) {
 			$newviews = $line['views']+1;
 		}
+		$isstu[$line['id']] = ($line['stuid'] !== null);
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['postdate'];
 		$n = 0;
@@ -476,7 +478,7 @@ function printchildren($base,$restricttoowner=false) {
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-	global $canviewall, $caneditscore, $canviewscore, $sessiondata;
+	global $canviewall, $caneditscore, $canviewscore, $sessiondata, $isstu;
 	if (!isset($CFG['CPS']['itemicons'])) {
 		$itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -660,7 +662,7 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		echo filter($message[$child]);
 		if ($haspoints) {
-			if ($caneditscore && $ownerid[$child]!=$userid) {
+			if ($caneditscore && $isstu[$child]) {
 				echo '<hr/>';
 				echo "Score: <input class=scorebox type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
 				if ($points[$child]!==null) {
