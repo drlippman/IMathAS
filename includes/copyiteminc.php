@@ -284,7 +284,9 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		}
 
 		$reqscoreaid = $row['reqscoreaid'];
-		unset($row['reqscoreaid']);
+		if ($cid != $sourcecid) { // if same course, can keep this
+			unset($row['reqscoreaid']);
+		}
 		$row['name'] .= $_POST['append'];
 
 		$row['courseid'] = $cid;
