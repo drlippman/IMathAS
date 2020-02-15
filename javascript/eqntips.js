@@ -67,6 +67,19 @@ function ehcancelclosetimer() {
 		ehclosetimer = null;
 	}
 }
+function hideAllEhTips() {
+	if (ehclosetimer) {
+		window.clearTimeout(ehclosetimer);
+		ehclosetimer = null;
+	}
+	if (ehddclosetimer) {
+		window.clearTimeout(ehddclosetimer);
+		ehddclosetimer = null;
+	}
+	curehdd = null;
+	document.getElementById("ehdd").style.display = "none";
+	document.getElementById('eh').style.display = "none";
+}
 //show eqn tip dropdown (shorttipe)
 function showehdd(eln,shorttip,qn) {
 	if (eecurel!=null && eecurel==eln) {
