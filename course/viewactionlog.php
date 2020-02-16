@@ -183,6 +183,7 @@ foreach ($actions as $r) {
 		$actionmsg =  'Opened in review mode assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]);
 		break;
 	case 'gbviewassess':
+	case 'gbviewsafe':
 	case 'gbviewasid':
 		$actionmsg =  'Viewed in gradebook assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]);
 		break;

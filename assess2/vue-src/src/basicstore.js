@@ -265,6 +265,7 @@ export const actions = {
 
     store.inTransit = true;
     window.MQeditor.resetEditor();
+    window.imathasAssess.clearTips();
 
     this.clearAutosave(qns);
     // don't store time active when full-test
@@ -517,6 +518,8 @@ export const actions = {
   endAssess () {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
+    window.MQeditor.resetEditor();
+    window.imathasAssess.clearTips();
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({

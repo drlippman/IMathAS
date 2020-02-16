@@ -1167,6 +1167,18 @@ class AssessRecord
       if ($include_scores) {
         $parts[0]['score'] = 0;
         $parts[0]['rawscore'] = 0;
+        // if there are score overrides, calculate question score and raw
+        if (isset($curq['scoreoverride']) && is_array($curq['scoreoverride'])) {
+          $raw = 0;
+          $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
+          foreach ($answeights as $k=>$v) {
+            if (!empty($curq['scoreoverride'][$k])) {
+              $raw += $v * $curq['scoreoverride'][$k];
+            }
+          }
+          $raw /= array_sum($answeights);
+          $score = $raw * $out['points_possible'];
+        }
       }
     } else {
       // treat everything like multipart
@@ -1180,10 +1192,6 @@ class AssessRecord
           list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet, $curq['scoreoverride']);
         } else {
           list($score, $raw, $parts, $scoredTry) = $this->getQuestionPartScores($qn, $ver, $tryToGet);
-        }
-        if (isset($curq['scoreoverride']) && !is_array($curq['scoreoverride'])) {
-          $score = $curq['scoreoverride'] * $out['points_possible'];
-          $raw = $curq['scoreoverride'];
         }
       }
       $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
@@ -1228,6 +1236,11 @@ class AssessRecord
       $out['status'] = 'attempted';
     }
     if ($include_scores) {
+      // if there is a single whole-question score override, use now
+      if (isset($curq['scoreoverride']) && !is_array($curq['scoreoverride'])) {
+        $score = $curq['scoreoverride'] * $out['points_possible'];
+        $raw = $curq['scoreoverride'];
+      }
       $out['score'] = ($score != -1) ? round($score,2) : 0;
       $out['rawscore'] = ($raw != -1) ? round($raw,4) : 0;
     }
@@ -2299,18 +2312,24 @@ class AssessRecord
    * @return void
    */
   public function doJumpToAnswer($qn, $qid) {
+    /* DL 2/12/20: disabling this for now to allow jump to ans to work for by_assess,
+       since it's available as an option there.  But it might make more sense to
+       remove it as an option on quizzes.
+       
     // only can do jump to answer for by_question submission
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if (!$by_question) {
       return false;
     }
+    */
     // make sure question settings are correct
     $allowjump = $this->assess_info->getQuestionSetting($qid, 'jump_to_answer');
     if (!$allowjump) {
       return false;
     }
-    // get last question version
-    $qvers = &$this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
+    // get last question version on last assessment version
+    $aver = count($this->data['assess_versions']) - 1;
+    $qvers = &$this->data['assess_versions'][$aver]['questions'][$qn]['question_versions'];
     $curQver = &$qvers[count($qvers)-1];
     $curQver['jumptoans'] = true;
     $this->need_to_record = true;
