@@ -602,7 +602,7 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
  * @param string  $sourcedid  a :|: separated string that contains the lti_sourcedid
  *  as supplied by the LMS, the return URL, the key, and keytype
  * @param string  $key       a unique key for the user/item.
- *                        Assessments use "userid-assessmentid", so other
+ *                        Assessments use "assessmentid-userid", so other
  *                        types should use something different. Max 32 char.
  * @param float  $grade     The grade to send, between 0 and 1
  * @param boolean $sendnow   true to send in the next update, false (default)
