@@ -11,17 +11,27 @@
       :errormsg="errorMsg"
       @clearerror="clearError"
     />
+    <due-dialog v-if="showDueDialog"/>
+    <confirm-dialog
+      v-if="confirmObj !== null"
+      :data="confirmObj"
+      @close="closeConfirm"
+    />
   </div>
 </template>
 
 <script>
 import { store, actions } from './basicstore';
 import ErrorDialog from '@/components/ErrorDialog.vue';
+import DueDialog from '@/components/DueDialog.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import './assess2.css';
 
 export default {
   components: {
-    ErrorDialog
+    ErrorDialog,
+    DueDialog,
+    ConfirmDialog
   },
   data: function () {
     return {
@@ -38,8 +48,14 @@ export default {
     errorMsg () {
       return store.errorMsg;
     },
+    confirmObj () {
+      return store.confirmObj;
+    },
     assessName () {
       return store.assessInfo.name;
+    },
+    showDueDialog () {
+      return store.show_enddate_dialog;
     }
   },
   methods: {
@@ -60,7 +76,11 @@ export default {
           unanswered = false;
         }
       }
-      if (Object.keys(actions.getChangedQuestions()).length > 0) {
+      if (store.noUnload) {
+
+      } else if (Object.keys(actions.getChangedQuestions()).length > 0 &&
+        !this.prewarned
+      ) {
         evt.preventDefault();
         this.prewarned = false;
         return this.$t('unload.unsubmitted_questions');
@@ -79,6 +99,9 @@ export default {
     },
     clearError () {
       store.errorMsg = null;
+    },
+    closeConfirm () {
+      store.confirmObj = null;
     }
   },
   created () {
@@ -89,12 +112,15 @@ export default {
     var self = this;
     window.$('a').not('#app a, a[href="#"]').on('click', function (e) {
       if (store.assessInfo.submitby === 'by_assessment' && store.assessInfo.has_active_attempt) {
-        if (!window.confirm(self.$t('unload.unsubmitted_assessment'))) {
-          e.preventDefault();
-          return false;
-        } else {
-          self.prewarned = true;
-        }
+        e.preventDefault();
+        store.confirmObj = {
+          body: 'unload.unsubmitted_assessment',
+          action: () => {
+            self.prewarned = true;
+            window.location = e.target.href;
+          }
+        };
+        return false;
       }
     });
   }

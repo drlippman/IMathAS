@@ -263,6 +263,11 @@
       :errormsg="errorMsg"
       @clearerror="clearError"
     />
+    <confirm-dialog
+      v-if="confirmObj !== null"
+      :data="confirmObj"
+      @close="closeConfirm"
+    />
   </div>
 </template>
 
@@ -276,6 +281,8 @@ import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
 import GbFeedback from '@/gbviewassess/GbFeedback.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import TinymceInput from '@/components/TinymceInput.vue';
 import '../assess2.css';
 
 export default {
@@ -287,7 +294,9 @@ export default {
     GbClearAttempts,
     SummaryCategories,
     ErrorDialog,
-    GbFeedback
+    TinymceInput,
+    GbFeedback,
+    ConfirmDialog
   },
   data: function () {
     return {
@@ -450,17 +459,29 @@ export default {
     },
     errorMsg () {
       return store.errorMsg;
+    },
+    confirmObj () {
+      return store.confirmObj;
     }
   },
   methods: {
     changeAssessVersion (val) {
+      if (val === store.curAver) {
+        return;  // not a change - abort
+      }
       if (Object.keys(store.scoreOverrides).length > 0 ||
         Object.keys(store.feedbacks).length > 0
       ) {
-        if (!confirm(this.$t('gradebook.unsaved_warn'))) {
-          return;
-        }
+        store.confirmObj = {
+          body: 'gradebook.unsaved_warn',
+          action: () => this.doChangeAssessVersion(val)
+        };
+      } else {
+        this.doChangeAssessVersion(val);
       }
+
+    },
+    doChangeAssessVersion (val) {
       if (val !== store.curAver) {
         if (this.aData.assess_versions[val].status === 3) {
           // requesting the practice version
@@ -471,6 +492,9 @@ export default {
       }
     },
     changeQuestionVersion (qn, val) {
+      if (val === store.curQver[qn]) {
+        return;  // same value - abort
+      }
       let hasUnsaved = false;
       let regex = new RegExp('^' + store.curAver + '-' + qn + '-');
       for (let k in store.scoreOverrides) {
@@ -483,10 +507,12 @@ export default {
           hasUnsaved = true;
         }
       }
-      if (hasUnsaved && !confirm(this.$t('gradebook.unsaved_warn'))) {
-        return;
-      }
-      if (val !== store.curQver[qn]) {
+      if (hasUnsaved) {
+        store.confirmObj = {
+          body: 'gradebook.unsaved_warn',
+          action: () => actions.loadGbQuestionVersion(qn, val)
+        };
+      } else {
         actions.loadGbQuestionVersion(qn, val);
       }
     },
@@ -548,6 +574,9 @@ export default {
     },
     clearError () {
       store.errorMsg = null;
+    },
+    closeConfirm () {
+      store.confirmObj = null;
     }
   },
   created () {

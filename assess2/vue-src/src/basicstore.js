@@ -12,6 +12,7 @@ export const store = Vue.observable({
   inTransit: false,
   autoSaving: false,
   errorMsg: null,
+  confirmObj: null,
   lastLoaded: [],
   inProgress: false,
   autosaveQueue: {},
@@ -20,9 +21,13 @@ export const store = Vue.observable({
   initTimes: {},
   autosaveTimer: null,
   somethingDirty: false,
+  noUnload: false,
   timelimit_timer: null,
   timelimit_expired: false,
   timelimit_grace_expired: false,
+  timelimit_restricted: 0,
+  enddate_timer: null,
+  show_enddate_dialog: false,
   inPrintView: false,
   enableMQ: true,
   livepollServer: '',
@@ -206,21 +211,24 @@ export const actions = {
       });
   },
   submitAssessment () {
-    if (confirm(i18n.t('header.confirm_assess_submit'))) {
-      if (store.assessInfo.submitby === 'by_assessment') {
-        let qAttempted = 0;
-        let changedQuestions = this.getChangedQuestions();
-        for (let i in store.assessInfo.questions) {
-          if (store.assessInfo.questions[i].try > 0 ||
-            changedQuestions.hasOwnProperty(i)
-          ) {
-            qAttempted++;
-          }
-        }
-        let nQuestions = store.assessInfo.questions.length;
-        if (qAttempted === nQuestions ||
-          confirm(i18n.t('header.warn_unattempted'))
+    let warnMsg = 'header.confirm_assess_submit';
+    if (store.assessInfo.submitby === 'by_assessment') {
+      let qAttempted = 0;
+      let changedQuestions = this.getChangedQuestions();
+      for (let i in store.assessInfo.questions) {
+        if (store.assessInfo.questions[i].try > 0 ||
+          changedQuestions.hasOwnProperty(i)
         ) {
+          qAttempted++;
+        }
+      }
+      let nQuestions = store.assessInfo.questions.length;
+      if (qAttempted !== nQuestions) {
+        warnMsg = 'header.confirm_assess_unattempted_submit';
+      }
+      store.confirmObj = {
+        body: warnMsg,
+        action: () => {
           // TODO: Check if we should always submit all
           if (store.assessInfo.showscores === 'during') {
             // check for dirty questions and submit them
@@ -234,9 +242,6 @@ export const actions = {
             this.submitQuestion(qns, true);
           }
         }
-      } else {
-        // don't want to submit if by_question
-        // actions.submitQuestion(-1, true);
       }
     }
   },
@@ -515,7 +520,11 @@ export const actions = {
     }
     // store.timelimit_expired = true;
   },
-  endAssess () {
+  handleDueDate () { // due date has hit
+    actions.submitAutosave();
+    store.show_enddate_dialog = true;
+  },
+  endAssess (callback) {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
     window.MQeditor.resetEditor();
@@ -537,6 +546,9 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
+        if (typeof callback === 'function') {
+          callback();
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -571,7 +583,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  redeemLatePass () {
+  redeemLatePass (callback) {
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'uselatepass.php' + store.queryString,
@@ -589,7 +601,11 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
-        Router.push('/');
+        if (typeof callback === 'function') {
+          callback();
+        } else {
+          Router.push('/');
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -597,6 +613,9 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  routeToStart () {
+    Router.push('/');
   },
   setLivepollStatus (data) {
     store.inTransit = true;
@@ -868,11 +887,28 @@ export const actions = {
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
     }
+    if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0) {
+      clearTimeout(store.enddate_timer);
+      let now = new Date().getTime();
+      let dueat = data.enddate_in * 1000;
+      data['enddate_local'] = now + dueat;
+      store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
+      // TODO: implement handleDueDate
+    }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
+      clearTimeout(store.enddate_timer); // no need for it w timelimit timer
       let now = new Date().getTime();
+      if (data.hasOwnProperty('timelimit_expires')) {
+        if (data.timelimit_expires == data.enddate) {
+          store.timelimit_restricted = 1;
+        } else if (data.timelimit_grace == data.enddate) {
+          store.timelimit_restricted = 2;
+        }
+      }
       let expires = data.timelimit_expiresin * 1000;
       let grace = data.timelimit_gracein * 1000;
+
       data['timelimit_local_expires'] = now + expires;
       if (grace > 0) {
         data['timelimit_local_grace'] = now + grace;
@@ -896,6 +932,12 @@ export const actions = {
             store.timelimit_grace_expired = false;
           }
         }
+      }
+    } else if (data.timelimit > 0) { // haven't started timed assessment yet
+      if (data.enddate_in < data.timelimit) {
+        store.timelimit_restricted = 1;
+      } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
+        store.timelimit_restricted = 2;
       }
     }
     if (data.hasOwnProperty('interquestion_text')) {
