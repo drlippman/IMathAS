@@ -21,6 +21,7 @@ array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeacct
 //$statement[#]['tottitleline'] = -1 for on last line of elements, not set or 0 for own line.  Only works if indent>0
 //$statement[#]['totneg'] = set to make total negative
 //$statement[#]['totsigns'] = array of 1,-1,etc to indicate signs for totaling
+//$statement[#]['totindent'] = number of indent for total entry.  0 if not set
 //$statement[#]['totaltotal'] = array("title", statement #, statement #)  Totals across multiple statement groups.  Neg to subtract
 //$statement[#]['totaltotalops'] = array of options for totaltotal.  If not set, totaltotal title is fixed
 //$statement[#]['totalindent'] = number of indent for totaltotal entry.  0 if not set
@@ -100,10 +101,15 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 	$grouptots = array();  $addspacer = false;
 	foreach ($s as $ix=>$sg) {
 		if (isset($sg['indent']) && $sg['indent']>0) {
-			$hdrindent = $sg['indent'] - 1;
 			$ind = $sg['indent'];
+			$hdrindent = $sg['indent'] - 1;
+			if (isset($sg['totindent'])) {
+				$totindent = $sg['totindent'];
+			} else {
+				$totindent = $sg['indent'] - 1;
+			}
 		} else {
-			$hdrindent = 0;  $ind =0;
+			$hdrindent = 0; $totindent = 0; $ind =0;
 		}
 		if ($addspacer && !isset($sg['nospacer'])) {
 			$out .= '<tr><td colspan="'.($maxind+2).'">&nbsp;</td></tr>';
@@ -202,15 +208,15 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 						}
 						natsort($sg['tottitleops']);
 						$anstypes[$sn] = 'string'; $displayformat[$sn] = $tdisptype; $questions[$sn] = $sg['tottitleops'];  $answer[$sn] = $sg['tottitle']; $answerboxsize[$sn] = $maxsizedescr;
-						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;">[AB'.$sn.']</td>';
-						$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
+						$out .= '<tr><td style="padding-left:'.($totindent+.5).'em;">[AB'.$sn.']</td>';
+						$sa .= '<tr><td style="padding-left:'.($totindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
 						$sn++;
 					} else {
-						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
-						$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
+						$out .= '<tr><td style="padding-left:'.($totindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
+						$sa .= '<tr><td style="padding-left:'.($totindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
 					}
-					$out .= $pre[$hdrindent].'<td>[AB'.$sn.']</td>'.$post[$hdrindent].'</tr>';
-					$sa .= $pre[$hdrindent].'<td class="r">'.($hasdecimals?number_format($tot,2,'.',','):number_format($tot)).'</td>'.$post[$hdrindent].$blankexp.'</tr>';
+					$out .= $pre[$totindent].'<td>[AB'.$sn.']</td>'.$post[$totindent].'</tr>';
+					$sa .= $pre[$totindent].'<td class="r">'.($hasdecimals?number_format($tot,2,'.',','):number_format($tot)).'</td>'.$post[$hdrindent].$blankexp.'</tr>';
 
 				}
 				$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answerformat[$sn] = 'parenneg'; $answer[$sn] = $tot; $answerboxsize[$sn] = $maxsizeentry;
