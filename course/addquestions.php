@@ -345,11 +345,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $updatedScore, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
 					}
 				}
 			} else {
-				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid,userid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					if (strpos($row['questions'],';')===false) {
@@ -388,7 +388,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $bestscores, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true);
 					}
 				}
 			}

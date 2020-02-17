@@ -199,7 +199,7 @@
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
 					$gbscore = $assess_record->getGbScore();
-					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$gbscore['gbscore'],true);
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true);
 				}
 			}
 		}
