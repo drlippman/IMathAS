@@ -70,12 +70,12 @@ $vueData = array(
 ?>
 <div id="app" class="skipmathrender" v-cloak>
 	<fieldset>
-		<legend>General Options</legend>
+		<legend><?php echo _('General Options'); ?></legend>
 		<div :class="{highlight:summary != 'DNC'}">
-			<span class=form>Summary:</span>
+			<span class=form><?php echo _('Summary'); ?>:</span>
 			<span class=formright>
 				Copy from: <select name="summary" v-model="summary">
-					<option value="DNC">Do not copy</option>
+					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -83,10 +83,10 @@ $vueData = array(
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:intro != 'DNC'}">
-			<span class=form>Instructions:</span>
+			<span class=form><?php echo _('Instructions'); ?>:</span>
 			<span class=formright>
 				Copy from: <select name="intro" v-model="intro">
-					<option value="DNC">Do not copy</option>
+					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -94,10 +94,10 @@ $vueData = array(
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:dates != 'DNC'}">
-			<span class=form>Dates and Times:</span>
+			<span class=form><?php echo _('Dates and Times'); ?>:</span>
 			<span class=formright>
 				Copy from: <select name="dates" v-model="dates">
-					<option value="DNC">Do not copy</option>
+					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -108,27 +108,27 @@ $vueData = array(
 			<span class=form>Show:</span>
 			<span class=formright>
 				<select name="avail" v-model="avail">
-					<option value="DNC">Do not change</option>
-					<option value="0">Hide</option>
-					<option value="1">Show By Dates</option>
+					<option value="DNC"><?php echo _('Do not change'); ?></option>
+					<option value="0"><?php echo _('Hide'); ?></option>
+					<option value="1"><?php echo _('Show By Dates'); ?></option>
 				</select>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:review != 'DNC'}">
-			<span class=form>Practice mode:</span>
+			<span class=form><?php echo _('Practice mode'); ?>:</span>
 			<span class=formright>
 				<select name="review" v-model="review">
-					<option value="DNC">Do not change</option>
-					<option value="0">Do not keep open for un-graded practice after the due date</option>
-					<option value="1">Keep open for un-graded practice after the due date</option>
+					<option value="DNC"><?php echo _('Do not change'); ?></option>
+					<option value="0"><?php echo _('Do not keep open for un-graded practice after the due date'); ?></option>
+					<option value="1"><?php echo _('Keep open for un-graded practice after the due date'); ?></option>
 				</select>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:copyendmsg != 'DNC'}">
-			<span class=form>End of Assessment Messages:</span>
+			<span class=form><?php echo _('End of Assessment Messages'); ?>:</span>
 			<span class=formright>
 				Copy from: <select name="copyendmsg" v-model="copyendmsg">
-					<option value="DNC">Do not copy</option>
+					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -136,18 +136,18 @@ $vueData = array(
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:chgendmsg}">
-			<span class=form>Define new end of assessment messages:</span>
+			<span class=form><?php echo _('Define new end of assessment messages'); ?>:</span>
 			<span class=formright>
 				<input type="checkbox" name="chgendmsg" v-model="chgendmsg"/>
-				You will be taken to a page to change these after you hit submit
+				<?php echo _('You will be taken to a page to change these after you hit submit'); ?>
 			</span><br class=form />
 		</div>
 		<div :class="{highlight:removeperq}">
-			<span class=form>Remove per-question settings</span>
+			<span class=form><?php echo _('Remove per-question settings'); ?></span>
 			<span class=formright>
 				<label>
 					<input type="checkbox" name="removeperq" v-model="removeperq"/>
-					Remove per-question settings (points, attempts, etc.) for all questions in these assessments
+					<?php echo _('Remove per-question settings (points, attempts, etc.) for all questions in these assessments'); ?>
 				</label>
 			</span><br class=form />
 		</div>
@@ -158,10 +158,10 @@ $vueData = array(
 		<input type="hidden" id="oktocopy"
 			:value = "(copyopts != 'DNC' || coreSub != 1) ? 1 : 0" />
 		<div :class="{highlight:copyopts != 'DNC'}">
-			<span class=form>Copy assessment options:</span>
+			<span class=form><?php echo _('Copy assessment options'); ?>:</span>
 			<span class=formright>
-				Copy from: <select name="copyopts" v-model="copyopts">
-					<option value="DNC">Do not copy</option>
+				<?php echo _('Copy from'); ?>: <select name="copyopts" v-model="copyopts">
+					<option value="DNC"><?php echo _('Do not copy'); ?></option>
 					<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 						{{ assess.label }}
 					</option>
@@ -170,22 +170,22 @@ $vueData = array(
 		</div>
 		<div v-show="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
 		<div style="padding-top:4px;">
-			<a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
-	 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a>
+			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All'); ?></a>
+	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All'); ?></a>
 		</div>
 		<div class="block grouptoggle">
 			<img class="mida" src="../img/collapse.gif" />
-			Core Options
+			<?php echo _('Core Options'); ?>
 		</div>
 		<div class="blockitems">
 			<div :class="{highlight:displaymethod !== 'DNC'}">
-				<label class=form for="displaymethod">Display style:</label>
+				<label class=form for="displaymethod"><?php echo _('Display style'); ?>:</label>
 				<span class=formright>
 					<select name="displaymethod" id="displaymethod" v-model="displaymethod">
-						<option value="DNC">Do not change</option>
-						<option value="skip">One question at a time</option>
-						<option value="full">All questions at once, or in pages</option>
-						<option value="video_cued">Video Cued</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="skip"><?php echo _('One question at a time'); ?></option>
+						<option value="full"><?php echo _('All questions at once, or in pages'); ?></option>
+						<option value="video_cued"><?php echo _('Video Cued'); ?></option>
 						<?php if (isset($CFG['GEN']['livepollserver'])) {
 							echo '<option value="livepoll">Live Poll</option>';
 						}?>
@@ -193,7 +193,7 @@ $vueData = array(
 				</span><br class=form />
 			</div>
 			<div :class="{highlight:defpoints !== ''}">
-				<label class=form for="defpoints">Default points per problem:</label>
+				<label class=form for="defpoints"><?php echo _('Default points per problem'); ?>:</label>
 				<span class=formright>
 					<input type=number min=1 max=100 size=3 id="defpoints"
 						name="defpoints" v-model.number="defpoints" />
@@ -202,93 +202,74 @@ $vueData = array(
 			<div :class="{warn:coreSub == 1, highlight:coreSub == 2}">
 
 				<p class="noticetext" v-if="coreSub == 1">
-					To ensure consistency, if you change one of these settings you need
-					to change them all.
+					<?php echo _('To ensure consistency, if you change one of these settings you need	to change them all.'); ?>
 				</p>
-				<label class="form" for="subtype">Submission type:</label>
+				<label class="form" for="subtype"><?php echo _('Submission type'); ?>:</label>
 				<span class="formright">
 					<select name="subtype" v-model="subtype" :required="changingCore">
-						<option value="DNC">Do not change</option>
-						<option value="by_question">Homework-style: new versions of individual questions</option>
-						<option value="by_assessment">Quiz-style: retake whole assessment with new versions</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="by_question"><?php echo _('Homework-style: new versions of individual questions'); ?></option>
+						<option value="by_assessment"><?php echo _('Quiz-style: retake whole assessment with new versions'); ?></option>
 					</select>
 					<span class="noticetext small">
 						<br/>
-						Warning: Changing this after students have started will require converting
-						their data, and lead to loss of data on earlier attempts.
+						<?php echo _('Warning: Changing this after students have started will require converting their data, and lead to loss of data on earlier attempts.'); ?>
 					</span>
 				</span><br class=form />
 
-				<span class=form>Versions:</span>
+				<span class=form><?php echo _('Versions'); ?>:</span>
 				<span class=formright>
 
 					<label for="defregens" v-show="subtype == 'by_question'">
-						Number of versions for each question:
+						<?php echo _('Number of versions for each question'); ?>:
 					</label>
 					<label for="defregens" v-show="subtype == 'by_assessment'">
-						Number of times assessment can be taken:
+						<?php echo _('Number of times assessment can be taken'); ?>:
 					</label>
 					<input type=number min=1 max=100 size=3 id="defregens"
 						name="defregens" v-model.number="defregens"
 						:required="changingCore" />
 					<span v-if="defregens > 1">
 						<br/>
-						With a penalty of
-						<input type=number min=0 max=100 size=3 id="defregenpenalty"
-							name="defregenpenalty" v-model.number="defregenpenalty"
-							 :required="changingCore" />%
-						per version
-						<span v-if="defregenpenalty>0">
-							after
-							<input type=number min=1 :max="Math.min(defregens,9)" size=3 id="defregenpenaltyaftern"
+						<?php echo sprintf(_('With a penalty of %1$s %% per version %2$s after %3$s full credit versions'), '<input type=number min=0 max=100 size=3 id="defregenpenalty"	name="defregenpenalty" v-model.number="defregenpenalty" :required="changingCore" />',
+						'<span v-if="defregenpenalty>0">','<input type=number min=1 :max="Math.min(defregens,9)" size=3 id="defregenpenaltyaftern"
 								name="defregenpenaltyaftern" v-model.number="defregenpenaltyaftern"
-								:required="changingCore" />
-							full-credit versions
+								:required="changingCore" />'); ?>
 						</span>
 						<br/>
 						<span v-if="subtype == 'by_assessment'">
 							<label for="keepscore">
-								Score to keep:
+								<?php echo _('Score to keep'); ?>:
 							</label>
 							<select id="keepscore" name="keepscore" v-model="keepscore"
 								 :required="changingCore">
-								<option value="DNC">Do not change</option>
-								<option value="best">Best</option>
-								<option value="last">Last</option>
-								<option value="average">Average</option>
+								<option value="DNC"><?php echo _('Do not change'); ?></option>
+								<option value="best"><?php echo _('Best'); ?></option>
+								<option value="last"><?php echo _('Last'); ?></option>
+								<option value="average"><?php echo _('Average'); ?></option>
 							</select>
 						</span>
 					</span>
 				</span><br class=form />
 
 
-				<span class=form>Tries:</span>
+				<span class=form><?php echo _('Tries'); ?>:</span>
 				<span class=formright>
 					<label for="defattempts">
-						Number of tries on each version of a question:
+						<?php echo _('Number of tries on each version of a question'); ?>:
 					</label>
 					<input type=number min=1 max=100 size=3 id="defattempts"
 						name="defattempts" v-model.number="defattempts"
 						 :required="changingCore" />
 					<span v-if="defattempts>1">
 						<br/>
-						With a penalty of
-						<input type=number min=0 max=100 size=3 id="defattemptpenalty"
-							name="defattemptpenalty" v-model.number="defattemptpenalty"
-							:required="changingCore" />%
-						per try
-						<span v-if="defattemptpenalty>0">
-							after
-							<input type=number min=1 :max="Math.min(defattempts,9)" size=3 id="defattemptpenaltyaftern"
-								name="defattemptpenaltyaftern" v-model.number="defattemptpenaltyaftern"
-								:required="changingCore" />
-							full-credit tries
+						<?php echo sprintf(_('With a penalty of %1$s %% per try %2$s after %3$s full-credit tries'),'<input type=number min=0 max=100 size=3 id="defattemptpenalty"	name="defattemptpenalty" v-model.number="defattemptpenalty"	:required="changingCore" />','<span v-if="defattemptpenalty>0">','<input type=number min=1 :max="Math.min(defattempts,9)" size=3 id="defattemptpenaltyaftern" name="defattemptpenaltyaftern" v-model.number="defattemptpenaltyaftern"	:required="changingCore" />'); ?>
 						</span>
 					</span>
 				</span><br class=form />
 
 				<label class="form" for="showscores">
-					During assessment, show scores:
+					<?php echo _('During assessment, show scores'); ?>:
 				</label>
 				<span class="formright">
 					<select name="showscores" id="showscores" v-model="showscores" :required="changingCore" >
@@ -300,7 +281,7 @@ $vueData = array(
 
 				<div v-if="showansOptions.length > 0">
 					<label class="form" for="showans">
-						During assessment, show answers:
+						<?php echo _('During assessment, show answers'); ?>:
 					</label>
 					<span class="formright">
 						<select name="showans" id="showans" v-model="showans" :required="changingCore">
@@ -312,7 +293,7 @@ $vueData = array(
 				</div>
 
 				<label class="form" for="viewingb">
-					Students can view their work in the gradebook:
+					<?php echo _('Students can view their work in the gradebook'); ?>:
 				</label>
 				<span class="formright">
 					<select name="viewingb" id="viewingb" v-model="viewingb" :required="changingCore">
@@ -324,7 +305,7 @@ $vueData = array(
 
 				<div v-show="scoresInGbOptions.length > 0">
 					<label class="form" for="scoresingb">
-						Students can view their scores in the gradebook:
+						<?php echo _('Students can view their scores in the gradebook'); ?>:
 					</label>
 					<span class="formright">
 						<select name="scoresingb" id="scoresingb" v-model="scoresingb"
@@ -338,7 +319,7 @@ $vueData = array(
 
 				<div v-show="ansInGbOptions.length > 0">
 					<label class="form" for="ansingb">
-						Students can view correct answers in the gradebook:
+						<?php echo _('Students can view correct answers in the gradebook'); ?>:
 					</label>
 					<span class="formright">
 						<select name="ansingb" id="ansingb" v-model="ansingb"	:required="changingCore">
@@ -352,11 +333,11 @@ $vueData = array(
 
 			<div :class="{highlight:gbcategory != 'DNC'}">
 				<label class="form" for="gbcategory">
-					Gradebook Category:
+					<?php echo _('Gradebook Category'); ?>:
 				</label>
 				<span class="formright">
 					<select name="gbcategory" id="gbcategory" v-model="gbcategory">
-						<option value="DNC">Do not change</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option v-for="(cat,id) in gbcatOptions" :value="id" :key="id">
 							{{ cat }}
 						</option>
@@ -368,65 +349,65 @@ $vueData = array(
 
 		<div class="block grouptoggle">
 			<img class="mida" src="../img/expand.gif" />
-			Additional Display Options
+			<?php echo _('Additional Display Options'); ?>
 		</div>
 		<div class="blockitems hidden">
 			<div :class="{highlight:caltag != ''}">
-				<label class="form" for="caltag">Calendar icon:</label>
+				<label class="form" for="caltag"><?php echo _('Calendar icon'); ?>:</label>
 				<span class="formright">
 					<input name="caltag" id="caltag" type=text size=8 v-model="caltag"/>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:shuffle != 'DNC'}">
-				<label class=form for="shuffle">Shuffle item order:</label>
+				<label class=form for="shuffle"><?php echo _('Shuffle item order'); ?>:</label>
 				<span class=formright>
 					<select name="shuffle" id="shuffle" v-model="shuffle">
-						<option value="DNC">Do not change</option>
-						<option value="0">No</option>
-						<option value="1">All</option>
-						<option value="16">All but first</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="1"><?php echo _('All'); ?></option>
+						<option value="16"><?php echo _('All but first'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:noprint != 'DNC'}">
-				<label class=form for="noprint">Make hard to print</label>
+				<label class=form for="noprint"><?php echo _('Make hard to print'); ?></label>
 				<span class=formright>
 					<select name="noprint" id="noprint" v-model="noprint">
-						<option value="DNC">Do not change</option>
-						<option value="0">No</option>
-						<option value="1">Yes</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="1"><?php echo _('Yes'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 			<div :class="{highlight:samever != 'DNC'}">
-				<label class=form for="samever">All students same version of questions</label>
+				<label class=form for="samever"><?php echo _('All students same version of questions'); ?></label>
 				<span class=formright>
 					<select name="samever" id="samever" v-model="samever">
-						<option value="DNC">Do not change</option>
-						<option value="0">No</option>
-						<option value="1">Yes</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="1"><?php echo _('Yes'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 			<div :class="{highlight:istutorial != 'DNC'}">
-				<label class=form for="istutorial">Suppress default score result display</label>
+				<label class=form for="istutorial"><?php echo _('Suppress default score result display'); ?></label>
 				<span class=formright>
 					<select name="istutorial" id="istutorial" v-model="istutorial">
-						<option value="DNC">Do not change</option>
-						<option value="0">No</option>
-						<option value="1">Yes</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="1"><?php echo _('Yes'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 			<div :class="{highlight:showcat != 'DNC'}">
-				<label class=form for="showcat">Show question categories in Question Details (if defined)</label>
+				<label class=form for="showcat"><?php echo _('Show question categories in Question Details (if defined)'); ?></label>
 				<span class=formright>
 					<select name="showcat" id="showcat" v-model="showcat">
-						<option value="DNC">Do not change</option>
-						<option value="0">No</option>
-						<option value="1">Yes</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="1"><?php echo _('Yes'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
@@ -434,101 +415,98 @@ $vueData = array(
 
 		<div class="block grouptoggle">
 			<img class="mida" src="../img/expand.gif" />
-			Time Limit and Access Control
+			<?php echo _('Time Limit and Access Control'); ?>
 		</div>
 		<div class="blockitems hidden">
 			<div :class="{highlight:allowlate != 'DNC'}">
-				<label for="allowlate" class=form>Allow use of LatePasses?:</label>
+				<label for="allowlate" class=form><?php echo _('Allow use of LatePasses?'); ?>:</label>
 				<span class=formright>
 					<select name="allowlate" id="allowlate" v-model="allowlate">
-						<option value="DNC">Do not change</option>
-						<option value="0">None</option>
-						<option value="1">Unlimited</option>
-						<option value="2">Up to 1</option>
-						<option value="3">Up to 2</option>
-						<option value="4">Up to 3</option>
-						<option value="5">Up to 4</option>
-						<option value="6">Up to 5</option>
-						<option value="7">Up to 6</option>
-						<option value="8">Up to 7</option>
-						<option value="9">Up to 8</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('None'); ?></option>
+						<option value="1"><?php echo _('Unlimited'); ?></option>
+						<option value="2"><?php echo _('Up to 1'); ?></option>
+						<option value="3"><?php echo _('Up to 2'); ?></option>
+						<option value="4"><?php echo _('Up to 3'); ?></option>
+						<option value="5"><?php echo _('Up to 4'); ?></option>
+						<option value="6"><?php echo _('Up to 5'); ?></option>
+						<option value="7"><?php echo _('Up to 6'); ?></option>
+						<option value="8"><?php echo _('Up to 7'); ?></option>
+						<option value="9"><?php echo _('Up to 8'); ?></option>
 					</select>
 					<span v-show="allowlate > 0">
 						<label>
 							<input type="checkbox" name="latepassafterdue">
-							Allow LatePasses after due date
+							<?php echo _('Allow LatePasses after due date'); ?>
 						</label>
 					</span>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:timelimit !== ''}">
-				<label for=timelimit class=form>Time Limit:</label>
+				<label for=timelimit class=form><?php echo _('Time Limit'); ?>:</label>
 				<span class=formright>
 					<input type=text size=4 name=timelimit id=timelimit v-model="timelimit">
-					minutes (0 for none)
+					<?php echo _('minutes (0 for none)'); ?>
 					<span v-if="timelimit !== '' && timelimit > 0">
 						<br/>
 						<label>
 							<input type="checkbox" name="allowovertime" v-model="allowovertime" />
-							Allow student to work past time limit
+							<?php echo _('Allow student to work past time limit'); ?>
 						</label>
 						<span v-if="allowovertime">
-							Grace period of
-							<input type="text" size="3" name="overtimegrace" v-model="overtimegrace" />
-							minutes with a penalty of
-							<input type="text" size="2" name="overtimepenalty" v-model="overtimepenalty" />%
+							<?php echo sprintf(_('Grace period of %s minutes with a penalty of %s %%'),'<input type="text" size="3" name="overtimegrace" v-model="overtimegrace" />','<input type="text" size="2" name="overtimepenalty" v-model="overtimepenalty" />'); ?>
 						</span>
 					</span>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:dochgpassword}">
-				<span class=form>Require Password:</span>
+				<span class=form><?php echo _('Require Password'); ?>:</span>
 				<span class=formright>
 					<label>
 						<input type="checkbox" name="dochgpassword" v-model="dochgpassword"/>
-						Change password
+						<?php echo _('Change password'); ?>
 					</label>
 					<span v-show="dochgpassword">
 						<br/>
-						<label for="assmpassword">Password (blank for none):</label>
+						<label for="assmpassword"><?php _('Password (blank for none)'); ?>:</label>
 						<input :type="revealpw?'text':'password'" name="assmpassword"
 							id="assmpassword" v-model="assmpassword" autocomplete="new-password">
 						<a v-if="assmpassword != ''" href="#" @click.prevent="revealpw = !revealpw">
-							{{ revealpw ? _('Hide') : _('Show') }}
+							{{ revealpw ? <?php echo _('Hide'); ?>: <?php echo _('Show'); ?>}}
 						</a>
 					</span>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:reqscoreaid !== 'DNC'}">
-				<label for="reqscoreaid" class=form>Show based on another assessment:</label>
+				<label for="reqscoreaid" class=form><?php echo _('Show based on another assessment'); ?>:</label>
 				<span class=formright>
 					<select id="reqscoreaid" name="reqscoreaid" v-model="reqscoreaid">
-						<option value="DNC">Do not change</option>
-						<option value="0">No prerequisite</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No prerequisite'); ?></option>
 						<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
 							{{ assess.label }}
 						</option>
 					</select>
 					<span id="reqscorewrap" v-if="reqscoreaid !== 'DNC' && reqscoreaid > 0">
-						with a score of
+						<?php echo _('with a score of'); ?>
 						<input type=text size=4 name="reqscore" v-model="reqscore" />
 						<select name="reqscorecalctype" v-model="reqscorecalctype">
-							<option value="0">Points</option>
-							<option value="1">Percent</option>
+							<option value="0"><?php echo _('Points'); ?></option>
+							<option value="1"><?php echo _('Percent'); ?></option>
 						</select>
 					</span>
 				</span><br class=form />
 			</div>
 			<div :class="{highlight:reqscoretype !== 'DNC'}">
-				<label for="reqscoreshowtype" class=form>Show based on another assessment display: </label>
+				<label for="reqscoreshowtype" class=form><?php echo _('Show based on another assessment display'); ?>: </label>
 				<span class=formright>
 					<select id="reqscoreshowtype" name="reqscoreshowtype" v-model="reqscoretype">
-						<option value="DNC">Do not change</option>
-						<option value="0">Hide until requirement is met</option>
-						<option value="1">Show greyed until requirement is met</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('Hide until requirement is met'); ?></option>
+						<option value="1"><?php echo _('Show greyed until requirement is met'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
@@ -537,34 +515,34 @@ $vueData = array(
 
 		<div class="block grouptoggle">
 			<img class="mida" src="../img/expand.gif" />
-			Help and Hints
+			<?php echo _('Help and Hints'); ?>
 		</div>
 		<div class="blockitems hidden">
 			<div :class="{highlight:showhints !== 'DNC'}">
-				<label for="showhints" class=form>Hints and Videos</label>
+				<label for="showhints" class=form><?php echo _('Hints and Videos'); ?></label>
 				<span class=formright>
 					<select name="showhints" id="showhints" v-model="showhints">
-						<option value="DNC">Do not change</option>
-			      <option value="0">No</option>
-			      <option value="1">Hints</option>
-			      <option value="2">Video/text buttons</option>
-			      <option value="3">Hints and Video/text buttons</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+			      <option value="0"><?php echo _('No'); ?></option>
+			      <option value="1"><?php echo _('Hints'); ?></option>
+			      <option value="2"><?php echo _('Video/text buttons'); ?></option>
+			      <option value="3"><?php echo _('Hints and Video/text buttons'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:msgtoinstr !== 'DNC'}">
-				<label class="form" for="msgtoinstr">Show "Message instructor about this question" links</label>
+				<label class="form" for="msgtoinstr"><?php echo _('Show "Message instructor about this question" links'); ?></label>
 				<span class=formright>
 					<select name="msgtoinstr" id="msgtoinstr" v-model="msgtoinstr">
-						<option value="DNC">Do not change</option>
-						<option value="0">No</option>
-						<option value="1">Yes</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="1"><?php echo _('Yes'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 			<div :class="{highlight:posttoforum !== 'DNC'}">
-				<label class="form" for="posttoforum">Show "Post this question to forum" links</label>
+				<label class="form" for="posttoforum"><?php echo _('Show "Post this question to forum" links'); ?></label>
 				<span class=formright>
 					<select name="posttoforum" id="posttoforum" v-model="posttoforum">
 						<option v-for="option in forumOptions" :value="option.value" :key="option.value">
@@ -575,11 +553,11 @@ $vueData = array(
 			</div>
 
 			<div :class="{highlight:dochgextref}">
-				<span class=form>Assessment resource links</span>
+				<span class=form><?php echo _('Assessment resource links'); ?></span>
 				<span class=formright>
 					<label>
 						<input type="checkbox" name="dochgextref" v-model="dochgextref" />
-						Replace existing assessment resources
+						<?php echo _('Replace existing assessment resources'); ?>
 					</label>
 					<span v-show="dochgextref">
 						<br/>
@@ -605,12 +583,12 @@ $vueData = array(
 			</div>
 
 			<div :class="{highlight:showtips !== 'DNC'}">
-				<label for="showtips" class=form>Show answer entry tips?</label>
+				<label for="showtips" class=form><?php echo _('Show answer entry tips?'); ?></label>
 				<span class=formright>
 					<select name="showtips" id="showtips" v-model="showtips">
-						<option value="DNC">Do not change</option>
-						<option value="0">No</option>
-						<option value="2">Yes, under answerbox (strongly recommended)</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No'); ?></option>
+						<option value="2"><?php echo _('Yes, under answerbox (strongly recommended)'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
@@ -619,64 +597,64 @@ $vueData = array(
 
 		<div class="block grouptoggle">
 			<img class="mida" src="../img/expand.gif" />
-			Grading and Feedback
+			<?php echo _('Grading and Feedback'); ?>
 		</div>
 		<div class="blockitems hidden">
 			<div :class="{highlight:cntingb !== 'DNC'}">
-				<label for="cntingb" class=form>Count:</label>
+				<label for="cntingb" class=form><?php echo _('Count'); ?>:</label>
 				<span class=formright>
 					<select name="cntingb" id="cntingb" v-model="cntingb">
-						<option value="DNC">Do not change</option>
-						<option value="1">Count in Gradebook</option>
-						<option value="0">Don't count in grade total and hide from students</option>
-						<option value="3">Don't count in grade total</option>
-						<option value="2">Count as Extra Credit</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="1"><?php echo _('Count in Gradebook'); ?></option>
+						<option value="0"><?php echo _("Don't count in grade total and hide from students"); ?></option>
+						<option value="3"><?php echo _("Don't count in grade total"); ?></option>
+						<option value="2"><?php echo _('Count as Extra Credit'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:minscore !== ''}">
-				<label for="minscore" class=form>Minimum score to receive credit:</label>
+				<label for="minscore" class=form><?php echo _('Minimum score to receive credit'); ?>:</label>
 				<span class=formright>
 					<input type=text size=4 name=minscore id=minscore v-model="minscore">
 					<select name="minscoretype">
-						<option value="0" selected>Points</option>
-						<option value="1">Percent</option>
+						<option value="0" selected><?php echo _('Points'); ?></option>
+						<option value="1"><?php echo _('Percent'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:usedeffb !== 'DNC'}">
-				<span class="form">Default Feedback Text:</span>
+				<span class="form"><?php echo _('Default Feedback Text'); ?>:</span>
 				<span class="formright">
 					<select name="usedeffb" v-model="usedeffb">
-						<option value="DNC">Do not change</option>
-						<option value="0">Do not use default feedback text</option>
-						<option value="1">Use default feedback text</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('Do not use default feedback text'); ?></option>
+						<option value="1"><?php echo _('Use default feedback text'); ?></option>
 					</select>
 					<span v-show="usedeffb==1">
 						<br/>
-						Text:
+						<?php echo _('Text'); ?>:
 						<textarea name="deffb" rows="4" cols="60"></textarea>
 					</span>
 				</span><br class=form />
 			</div>
 
 			<div v-if="allowinstraddtutors" :class="{highlight:tutoredit !== 'DNC'}">
-				<label for="tutoredit" class="form">Tutor Access:</label>
+				<label for="tutoredit" class="form"><?php echo _('Tutor Access'); ?>:</label>
 				<span class="formright">
 					<select name="tutoredit" id="tutoredit" v-model="tutoredit">
-						<option value="DNC">Do not change</option>
-						<option value="2">No Access</option>
-						<option value="0">View Scores</option>
-						<option value="1">View and Edit Scores</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="2"><?php echo _('No Access'); ?></option>
+						<option value="0"><?php echo _('View Scores'); ?></option>
+						<option value="1"><?php echo _('View and Edit Scores'); ?></option>
 					</select>
 				</span><br class=form />
 			</div>
 
 			<div :class="{highlight:exceptionpenalty !== ''}">
 				<label for="exceptionpenalty" class=form>
-					Penalty for questions done while in exception/LatePass:
+					<?php echo _('Penalty for questions done while in exception/LatePass'); ?>:
 				</label>
 				<span class=formright>
 					<input type=text size=4 name="exceptionpenalty" id="exceptionpenalty"
@@ -685,11 +663,11 @@ $vueData = array(
 			</div>
 
 			<div :class="{highlight:defoutcome !== 'DNC'}" v-if="outcomeOptions.length > 0">
-				<label for="defoutcome" class="form">Default Outcome:</label>
+				<label for="defoutcome" class="form"><?php echo _('Default Outcome'); ?>:</label>
 				<span class="formright">
 					<select name="defoutcome" id="defoutcome" v-model="defoutcome">
-						<option value="DNC">Do not change</option>
-						<option value="0">No default outcome selected</option>
+						<option value="DNC"><?php echo _('Do not change'); ?></option>
+						<option value="0"><?php echo _('No default outcome selected'); ?></option>
 						<option v-for="option in outcomeOptions"
 							:key="option.value"
 							:value="option.value"
@@ -706,6 +684,7 @@ $vueData = array(
 	</fieldset>
 </div>
 <script type="text/javascript">
+
 var app = new Vue({
 	el: '#app',
   data: <?php echo json_encode($vueData); ?>,
@@ -749,23 +728,23 @@ var app = new Vue({
 		showscoresOptions: function() {
 			var nochange = {
 				'value': 'DNC',
-				'text': _('Do not change')
+				'text': <?php echo _('Do not change'); ?>
 			};
 			var during = {
 				'value': 'during',
-				'text': _('On each question immediately')
+				'text': <?php echo _('On each question immediately'); ?>
 			};
 			var at_end = {
 				'value': 'at_end',
-				'text': _('At the end of the assessment')
+				'text': <?php echo _('At the end of the assessment'); ?>
 			};
 			var total = {
 				'value': 'total',
-				'text': _('Total score only at the end')
+				'text': <?php echo _('Total score only at the end'); ?>
 			};
 			var none = {
 				'value': 'none',
-				'text': _('No scores at all')
+				'text': <?php echo _('No scores at all'); ?>
 			};
 
 			var out = [];
@@ -792,11 +771,11 @@ var app = new Vue({
 
 			var never = {
 				'value': 'never',
-				'text': _('Never')
+				'text': <?php echo _('Never'); ?>
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': _('Show with the score')
+				'text': <?php echo _('Show with the score'); ?>
 			};
 
 			var out = [];
@@ -808,15 +787,15 @@ var app = new Vue({
 				out = [
 					{
 						'value': 'after_lastattempt',
-						'text': _('After the last try on a question')
+						'text': <?php echo _('After the last try on a question'); ?>
 					},
 					never
 				];
 				for (var i=1; i<Math.min(9,this.defattempts);i++) {
 					out.push({
 						'value': 'after_'+i,
-						'text': i>1 ? _('After %d tries').replace(/%d/, i) :
-													_('After 1 try')
+						'text': i>1 ? '<?php echo _('After %d tries');?>'.replace(/%d/, i) :
+													<?php echo _('After 1 try'); ?>
 					});
 				}
 			} else if (this.showscores == 'at_end') {
@@ -824,7 +803,7 @@ var app = new Vue({
 				out = [
 					{
 						'value': 'after_take',
-						'text': _('After the assessment version is submitted')
+						'text': <?php echo _('After the assessment version is submitted'); ?>
 					},
 					never
 				];
@@ -846,26 +825,26 @@ var app = new Vue({
 			var out = [
 				{
 					'value': 'after_due',
-					'text': _('After the due date')
+					'text': <?php echo _('After the due date'); ?>
 				},
 				{
 					'value': 'immediately',
-					'text': _('Immediately - they can always view it')
+					'text': <?php echo _('Immediately - they can always view it'); ?>
 				},
 				{
 					'value': 'never',
-					'text': _('Never')
+					'text': <?php echo _('Never'); ?>
 				}
 			];
 			if (this.subtype == 'by_assessment') {
 				out.unshift({
 					'value': 'after_take',
-					'text': _('After the assessment version is submitted')
+					'text': <?php echo _('After the assessment version is submitted'); ?>
 				})
 			}
 			out.unshift({
 				'value': 'DNC',
-				'text': _('Do not change')
+				'text': <?php echo _('Do not change'); ?>
 			});
 			if (!this.valueInOptions(out, this.viewingb)) {
 				this.viewingb = out[0].value;
@@ -892,11 +871,11 @@ var app = new Vue({
 			var out = [
 				{
 					'value': 'after_due',
-					'text': _('After the due date')
+					'text': <?php echo _('After the due date'); ?>
 				},
 				{
 					'value': 'never',
-					'text': _('Never')
+					'text': <?php echo _('Never'); ?>
 				}
 			];
 			if (this.showscores !== 'during' && this.showscores !== 'at_end' &&
@@ -904,26 +883,26 @@ var app = new Vue({
 			) {
 				out.unshift({
 					'value': 'after_take',
-					'text': _('After the assessment version is submitted')
+					'text': <?php echo _('After the assessment version is submitted'); ?>
 				});
 			}
 
 			if (this.showscores == 'during' && this.subtype == 'by_question') {
 				out = [{
 					'value': 'immediately',
-					'text': _('Immediately')
+					'text': <?php echo _('Immediately'); ?>
 				}];
 			} else if (this.showscores == 'at_end' ||
 					(this.showscores == 'during' && this.subtype == 'by_assessment')
 			) {
 				out = [{
 					'value': 'after_take',
-					'text': _('After the assessment version is submitted')
+					'text': <?php echo _('After the assessment version is submitted'); ?>
 				}];
 			}
 			out.unshift({
 				'value': 'DNC',
-				'text': _('Do not change')
+				'text': <?php echo _('Do not change'); ?>
 			});
 			if (!this.valueInOptions(out, this.scoresingb)) {
 				this.scoresingb = out[0].value;
@@ -944,11 +923,11 @@ var app = new Vue({
  				var out = [
  					{
  						'value': 'after_due',
- 						'text': _('After the due date')
+ 						'text': <?php echo _('After the due date'); ?>
  					},
  					{
  						'value': 'never',
- 						'text': _('Never')
+ 						'text': <?php echo _('Never'); ?>
  					}
  				];
  				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
@@ -956,12 +935,12 @@ var app = new Vue({
 				) {
  					out.unshift({
  						'value': 'after_take',
- 						'text': _('After the assessment version is submitted')
+ 						'text': <?php echo _('After the assessment version is submitted'); ?>
  					});
  				}
 				out.unshift({
 					'value': 'DNC',
-					'text': _('Do not change')
+					'text': <?php echo _('Do not change'); ?>
 				});
 				if (!this.valueInOptions(out, this.ansingb)) {
 					this.ansingb = out[0].value;
