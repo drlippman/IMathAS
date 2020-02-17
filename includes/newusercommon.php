@@ -5,7 +5,7 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
   global $loginformat, $CFG;
 
   $extrarequired = array_diff($extrarequired,array('SID','firstname','lastname','email','pw1','pw2'));
-  
+
   if (is_array($loginformat)) {
     $loginformat = '['.implode(',', $loginformat).']';
   }
@@ -59,7 +59,7 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
     },
     messages: {
       SID: {
-        remote: _("That username is already taken. Try another."),';
+        remote: "',_("That username is already taken. Try another."),'",';
       if (isset($CFG['acct']['SIDformaterror'])) {
         echo 'pattern: "'.Sanitize::encodeStringForJavascript($CFG['acct']['SIDformaterror']).'",';
       }

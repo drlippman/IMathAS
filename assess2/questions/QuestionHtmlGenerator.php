@@ -346,7 +346,9 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
-            if ((isset($scoremethod) && $scoremethod == 'acct') ||
+            if ((isset($scoremethod) &&
+                ($scoremethod == 'acct' || $scoremethod == 'singlescore' ||
+                $scoremethod == 'allornothing')) ||
               $quesData['qtype'] == 'conditional'
             ) {
               $jsParams['submitall'] = 1;
@@ -895,7 +897,7 @@ class QuestionHtmlGenerator
                 for ($i = 0; $i < count($extref); $i++) {
                     $extrefpt = explode('!!', $extref[$i]);
                     if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
-            					strpos($extrefpt[1],'youtu.be.com/')!==false ||
+            					strpos($extrefpt[1],'youtu.be/')!==false ||
             					strpos($extrefpt[1],'vimeo.com/')!==false
             				) {
                         $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);

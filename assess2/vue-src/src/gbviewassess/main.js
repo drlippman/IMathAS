@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import GBViewAssess from './GBViewAssess.vue';
-import i18n from '../i18n';
+import { i18n } from '../i18n';
 
 Vue.config.productionTip = false;
 

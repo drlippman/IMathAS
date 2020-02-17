@@ -10,12 +10,12 @@ var AsciisvgDialog = {
 		var f = document.forms[0];
 
 		// Get the selected contents as text and place it in the input
-		this.width = top.tinymce.activeEditor.windowManager.getParams().width;
-		this.height = top.tinymce.activeEditor.windowManager.getParams().height;
-		this.isnew = top.tinymce.activeEditor.windowManager.getParams().isnew;
-		this.sscr = top.tinymce.activeEditor.windowManager.getParams().sscr;
-		this.AScgiloc = top.tinymce.activeEditor.windowManager.getParams().AScgiloc;
-		this.alignm = top.tinymce.activeEditor.windowManager.getParams().alignm;
+		this.width = window.parent.tinymce.activeEditor.windowManager.getParams().width;
+		this.height = window.parent.tinymce.activeEditor.windowManager.getParams().height;
+		this.isnew = window.parent.tinymce.activeEditor.windowManager.getParams().isnew;
+		this.sscr = window.parent.tinymce.activeEditor.windowManager.getParams().sscr;
+		this.AScgiloc = window.parent.tinymce.activeEditor.windowManager.getParams().AScgiloc;
+		this.alignm = window.parent.tinymce.activeEditor.windowManager.getParams().alignm;
 		if (ASnoSVG) {
 			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " alt="Graph"/>';
 		} else {
@@ -27,7 +27,7 @@ var AsciisvgDialog = {
 	},
 
 	insert : function() {
-		var ed = top.tinymce.activeEditor;
+		var ed = window.parent.tinymce.activeEditor;
 		// Insert the contents from the input into the document
 		if (this.isnew) {
 			if (this.alignm == "left" || this.alignm == "right") {
@@ -35,9 +35,9 @@ var AsciisvgDialog = {
 			} else {
 				aligntxt = "vertical-align: "+this.alignm+"; float: none;";
 			}
-			top.tinymce.activeEditor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" data-sscr="'+this.sscr+'" data-asciisvg="1" data-mce-placeholder="1" script=" " alt="Graph" />');
+			window.parent.tinymce.activeEditor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" data-sscr="'+this.sscr+'" data-asciisvg="1" data-mce-placeholder="1" script=" " alt="Graph" />');
 		} else {
-			el = top.tinymce.activeEditor.selection.getNode();
+			el = window.parent.tinymce.activeEditor.selection.getNode();
 			ed.dom.setAttrib(el,"sscr",this.sscr);
 			ed.dom.setAttrib(el,"data-sscr",this.sscr);
 			ed.dom.setAttrib(el,"src",this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr));
@@ -54,7 +54,7 @@ var AsciisvgDialog = {
 			}
 
 		}
-		top.tinymce.activeEditor.windowManager.close();
+		window.parent.tinymce.activeEditor.windowManager.close();
 	},
 
 	addgraph : function() {
@@ -119,7 +119,7 @@ var AsciisvgDialog = {
 	},
 
 	graphit : function() {
-		ed = top.tinymce.activeEditor;
+		ed = window.parent.tinymce.activeEditor;
 		var commands;
 		commands = "";
 

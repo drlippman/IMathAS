@@ -594,7 +594,7 @@ function scorequestion($qn, $rectime=true) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false, $updateLTI=true) {
-	global $DBH,$isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
+	global $DBH,$isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores,$userid;
 
 	if ($noraw) {
 		$bestscorelist = implode(',',$bestscores);
@@ -661,7 +661,7 @@ function recordtestdata($limit=false, $updateLTI=true) {
 				}
 				$totpossible = totalpointspossible($qi);
 				$grade = round($total/$totpossible,8);
-				$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade,$allans);
+				$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$userid,$grade,$allans);
 			}
 		}
 	}
@@ -1047,8 +1047,10 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions where allowed'), "</p>";
 		} else if ($noindivscores) {
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
+		} else if (canimproveany()) {
+			echo "<p>", _('<a href="showtest.php?reattempt=canimprove">Reattempt assessment</a> on questions missed where allowed'), "</p>";
 		} else {
-			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions missed where allowed'), "</p>";
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on all questions where allowed'), "</p>";
 		}
 	} else {
 		echo "<p>", _('No attempts left on current versions of questions.'), "</p>\n";

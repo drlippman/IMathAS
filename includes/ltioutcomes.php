@@ -305,7 +305,7 @@ if (!function_exists("getpts")) {
 
 $aidtotalpossible = array();
 //use this if we don't know the total possible
-function calcandupdateLTIgrade($sourcedid,$aid,$scores,$sendnow=false,$aidposs=-1) {
+function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1) {
 	global $DBH, $aidtotalpossible;
   if ($aidposs == -1) {
     if (isset($aidtotalpossible[$aid])) {
@@ -336,11 +336,11 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores,$sendnow=false,$aidposs=-
   }
 	$grade = min(1, max(0,$total/$aidposs));
 	$grade = number_format($grade,8);
-	return updateLTIgrade('update',$sourcedid,$aid,$grade,$allans||$sendnow);
+	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow);
 }
 
 //use this if we know the grade, or want to delete
-function updateLTIgrade($action,$sourcedid,$aid,$grade=0,$sendnow=false) {
+function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
 	global $DBH,$sessiondata,$testsettings,$cid,$CFG,$userid;
 
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
@@ -355,7 +355,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0,$sendnow=false) {
 	}
 	//if we're using the LTI message queue, and it's an update, queue it
 	if (isset($CFG['LTI']['usequeue']) && $action=='update') {
-		return addToLTIQueue($sourcedid, $grade, $sendnow);
+		return addToLTIQueue($sourcedid, $aid.'-'.$uid, $grade, $sendnow);
 	}
 
 	//otherwise, send now
@@ -597,14 +597,18 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 }
 
 
-
-/*
-  table imas_ltiqueue
-     hash, sourcedid, grade, sendon
-     index sendon
-*/
-
-function addToLTIQueue($sourcedid, $grade, $sendnow=false) {
+/**
+ * Add a grade update to the LTI queue. This only can send updates, not deletes
+ * @param string  $sourcedid  a :|: separated string that contains the lti_sourcedid
+ *  as supplied by the LMS, the return URL, the key, and keytype
+ * @param string  $key       a unique key for the user/item.
+ *                        Assessments use "assessmentid-userid", so other
+ *                        types should use something different. Max 32 char.
+ * @param float  $grade     The grade to send, between 0 and 1
+ * @param boolean $sendnow   true to send in the next update, false (default)
+ *                          to send after the $CFG-set queuedelay.
+ */
+function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false) {
 	global $DBH, $CFG;
 
 	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
@@ -615,7 +619,7 @@ function addToLTIQueue($sourcedid, $grade, $sendnow=false) {
 
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(
-		':hash' => md5($sourcedid),
+		':hash' => $key,
 		':sourcedid' => $sourcedid,
 		':grade' => $grade,
 		':sendon' => (time() + ($sendnow?0:$LTIdelay))

@@ -263,12 +263,31 @@ function loadPlayer() {
 	});
 }
 
+function fixVideoId(origid) {
+	var vidid = origid;
+	if (origid.match(/youtube\.com/)) {
+		if (origid.indexOf('playlist?list=')>-1) {
+			vidid = href.split('list=')[1].split(/[#&]/)[0];
+		} else if (origid.match(/\/embed\//)) {
+			vidid = origid.split("/embed/")[1].split(/[#&\?]/)[0];
+		} else {
+			vidid = origid.split('v=')[1].split(/[#&]/)[0];
+		}
+	} else if (origid.match(/youtu\.be/)) {
+		vidid = origid.split('.be/')[1].split(/[#&]/)[0];
+	}
+	if (vidid != origid) {
+		document.getElementById("vidid").value = vidid;
+	}
+	return vidid;
+}
+
 function loadnewvideo() {
 	if (vidid=="") {
-		vidid = document.getElementById("vidid").value;
+		vidid = fixVideoId(document.getElementById("vidid").value);
 		loadPlayer();
 	} else {
-		vidid = document.getElementById("vidid").value;
+		vidid = fixVideoId(document.getElementById("vidid").value);
 		player.cueVideoById(vidid);
 	}
 }

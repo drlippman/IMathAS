@@ -303,12 +303,13 @@ if (!(isset($teacherid))) {
 
 				// indicate this course's assess version so settings can be migrated
 				$convertAssessVer = $courseUIver;
+				$sourcecid = $ctc;
 				if ($_POST['whattocopy']=='all') {
 					copyallsub($items,'0',$newitems,$gbcats);
 				} else {
 					copysub($items,'0',$newitems,$gbcats,isset($_POST['copyhidden']));
 				}
-				doaftercopy($_POST['ctc']);
+				doaftercopy($ctc, $newitems);
 				$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));
 				$items = unserialize($stm->fetchColumn(0));

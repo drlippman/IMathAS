@@ -223,6 +223,7 @@ function gbtable() {
 		$orderby = $GLOBALS['setorderby'];
 	}
 
+	$gb[0] = [[],[],[],[],[]];
 	//Build user ID headers
 	$gb[0][0][0] = "Name";
 	if ($isdiag) {
@@ -889,6 +890,7 @@ function gbtable() {
 		$cattotfuture[$ln] = array();
 		$cattotcurec[$ln] = array();
 		$cattotfutureec[$ln] = array();
+		$gb[$ln] = [[],[],[],[],[]];
 		//Student ID info
 		$gb[$ln][0][0] = sprintf("%s,&nbsp;%s", Sanitize::encodeStringForDisplay($line['LastName']),
 			Sanitize::encodeStringForDisplay($line['FirstName']));
@@ -1266,6 +1268,9 @@ function gbtable() {
 			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
 		} else {
 			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
+		}
+		if (($l['status']&32)==32) { // out of attempts
+			$canuselatepass = 0;
 		}
 		//if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
 
@@ -2055,7 +2060,11 @@ function gbtable() {
 						} else {
 							$tokeep = count($cattotstu[$stype][$cat]);
 						}
-						$cattotstu[$stype][$cat] = array_sum($catpossstu[$stype][$cat])*array_sum($cattotstu[$stype][$cat])/($tokeep);
+						if ($tokeep > 0) {
+							$cattotstu[$stype][$cat] = array_sum($catpossstu[$stype][$cat])*array_sum($cattotstu[$stype][$cat])/($tokeep);
+						} else {
+							$cattotstu[$stype][$cat] = 0;
+						}
 						if (isset($cattotstuec[$stype][$cat])) {
 							$cattotstuec[$stype][$cat] = array_sum($catpossstu[$stype][$cat])*array_sum($cattotstuec[$stype][$cat])/$tokeep;
 						}

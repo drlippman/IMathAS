@@ -43,6 +43,17 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
+	 $errormsg = 'This launch was made insecurely (using http instead of https). ';
+ 	 $errormsg .= $installname.' requires secure launches to protect student data. ';
+	 $ltirole = strtolower($_REQUEST['roles']);
+	 if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false || strpos($ltirole,'contentdeveloper')!== false) {
+	 	 $errormsg .= 'Please update the links or tool in the LMS to use https (aka SSL). ';
+	 	 if ($_REQUEST['tool_consumer_info_product_family_code'] == 'moodle') {
+	 	 	 $errormsg .= 'In Moodle, you can do this by clicking the "Edit preconfigured tool" icon, scrolling down to Privacy, and clicking the Force SSL checkbox. ';
+	 	 	 $errormsg .= 'If you do not have access to do this, you might need to ask your LMS administrator to enable the Force SSL option. ';
+	 	 }
+	 }
+ 	 reporterror($errormsg);
  }
 if ($enablebasiclti!=true) {
 	echo "BasicLTI not enabled";
@@ -96,14 +107,7 @@ function verify112relaunch() {
 	}
 }
 
-//start session
-if (isset($sessionpath)) { session_save_path($sessionpath);}
-ini_set('session.gc_maxlifetime',86400);
-ini_set('auto_detect_line_endings',true);
-if ($_SERVER['HTTP_HOST'] != 'localhost') {
-	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST'])),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
-}
-session_start();
+//start session - session_start already called in init
 $sessionid = session_id();
 $atstarthasltiuserid = isset($_SESSION['ltiuserid']);
 $askforuserinfo = false;
@@ -546,7 +550,7 @@ if (isset($_GET['launch'])) {
 		session_regenerate_id();
 		$sessionid = session_id();
 		$_SESSION = array();
-		setcookie(session_name(),session_id(),0,'','',false,true );
+		//setcookie(session_name(),session_id(),0,'','',false,true );
 	}
 
 	/*if (empty($_REQUEST['roles'])) {
@@ -1096,7 +1100,7 @@ if ($stm->rowCount()==0) {
 				$cid = $destcid; //needed for copyiteminc
 				require_once("includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);
-				doaftercopy($sourcecid);
+				doaftercopy($sourcecid, $newitems);
 
 				$itemorder = serialize($newitems);
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,deflatepass=:deflatepass,dates_by_lti=:datesbylti,UIver=:UIver,level=:level WHERE id=:id");
@@ -1521,7 +1525,7 @@ if ($stm->rowCount()>0) {	//check that same userid, and that we're not jumping o
 		session_start();
 		session_regenerate_id();
 		$sessionid = session_id();
-		setcookie(session_name(),session_id(),0,'','',false,true );
+		//setcookie(session_name(),session_id(),0,'','',false,true );
 		$sessiondata = array();
 		$createnewsession = true;
 	} else {
@@ -1782,6 +1786,7 @@ if (isset($_GET['launch'])) {
 	<input type="hidden" id="tzoffset" name="tzoffset" value="" />
 	<input type="hidden" id="tzname" name="tzname" value="">
 	<script type="text/javascript">
+		 document.cookie = 'PHPSESSID=; path=; expires=' + new Date(0).toUTCString();
 		 $(function() {
 			var thedate = new Date();
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
@@ -2059,7 +2064,7 @@ if (isset($_GET['launch'])) {
 		session_regenerate_id();
 		$sessionid = session_id();
 		$_SESSION = array();
-		setcookie(session_name(),session_id(),0,'','',false,true );
+		//setcookie(session_name(),session_id(),0,'','',false,true );
 	}
 
 	/*if (empty($_REQUEST['roles'])) {
@@ -2440,7 +2445,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						if ($stm->rowCount()==0) {
 							reporterror("Error.  Assessment ID '{$_SESSION['place_aid'][1]}' not found.");
 						}
-						
+
 						$newitem = copyitem($stm->fetchColumn(0),array());
 						$stm = $DBH->prepare("SELECT typeid FROM imas_items WHERE id=:id");
 						$stm->execute(array(':id'=>$newitem));
@@ -2642,7 +2647,7 @@ if ($stm->rowCount()>0) {
 		session_start();
 		session_regenerate_id();
 		$sessionid = session_id();
-		setcookie(session_name(),session_id(),0,'','',false,true );
+		//setcookie(session_name(),session_id(),0,'','',false,true );
 		$sessiondata = array();
 		$createnewsession = true;
 	} else {

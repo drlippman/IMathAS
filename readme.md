@@ -10,7 +10,7 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ## Installation
 
-IMathAS is designed for simple installation with minimal requirements.  The system requires PHP 5 (7 recommended) with GD and Freetype, and MySQL 5.
+IMathAS is designed for simple installation with minimal requirements.  The system requires PHP 7.1+ with GD and Freetype, and MySQL 5.
 
 1.  Download IMathAS, extract it, and copy the files to your webserver.
 2.  Alternatively, if you have shell access to your server, enter the directory you want IMathAS in, and checkout the code from Github. Using Git greatly simplifies upgrading.
@@ -99,7 +99,7 @@ These provide additional validation options beyond `$loginformat`.
 - `$CFG['acct']['importLoginformat']`:  If set, this regular expression replaces `$loginformat` when using the  "import students from file" option.
 - `$CFG['acct']['SIDformaterror']`: A message to display if the username/SID has invalid format.
 - `$CFG['acct']['passwordFormaterror']`: A message to display if the password has invalid format.
-- `$CFG['acct']['emailFormaterror']`: A message to display if the email has invalid format.
+- `$CFG['acct']['emailFormaterror']`: A message to display if the email doesn't meet the custom 'emailFormat' pattern.
 
 ### Access Limits
 - `$CFG['GEN']['addteachersrights']`: Set to the minimum rights level needed to Add/Remove Teachers in a course.  Defaults to 40 (Limited Course Creator rights).

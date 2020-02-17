@@ -58,7 +58,7 @@ $now = time();
 
 // load settings
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
-$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
+$assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }

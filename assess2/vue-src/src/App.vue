@@ -109,7 +109,6 @@ export default {
     // Give a warning if the assessment is quiz-style and not submitted
     // We're attaching this to breadcrumbs and nav buttons to avoid the default
     // beforeunload
-    var warning = this.$t('unload.unsubmitted_assessment');
     var self = this;
     window.$('a').not('#app a, a[href="#"]').on('click', function (e) {
       if (store.assessInfo.submitby === 'by_assessment' && store.assessInfo.has_active_attempt) {

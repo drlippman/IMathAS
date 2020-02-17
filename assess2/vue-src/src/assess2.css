@@ -90,10 +90,16 @@ div.match {
   padding: 5px;
   padding-right: 30px;
 }
+div[role=radiogroup].clearfix .match {
+	padding-right: 5px;
+}
 div.spacer {
   clear: both;
   height: 1px;
   padding: 0px;
+}
+input.unind {
+	margin-left: -15px;
 }
 p.centered {
   text-align: center;
@@ -217,6 +223,7 @@ td.l, table.stats tbody td.l {
 
 ul.nomark {
   padding-left: 40px;
+  margin-left: 0px;
 }
 div.toppad {
   padding-top: 5px;
@@ -265,8 +272,9 @@ input, .mq-editable-field, .mathquill-math-field {
   border-radius: 4px;
   margin: 1px 0;
 }
+
 input[type=radio], input[type=checkbox] {
-  margin: 1px 4px 1px 0;
+  margin-right: 4px;
 }
 input[type=text]:disabled, .mathquill-math-field.disabled {
   background-color: #eee;

@@ -55,6 +55,7 @@ $assess_info->loadQuestionSettings('all', false);
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
+$assess_record->setInGb(true);
 if (!$assess_record->hasRecord()) {
   echo '{"error": "invalid_record"}';
   exit;
@@ -72,7 +73,7 @@ $out['newscores'] = $assess_record->getScoresAfterOverrides($scores);
 $lti_sourcedid = $assess_record->getLTIsourcedId();
 if (strlen($lti_sourcedid) > 1) {
   require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$out['gbscore'],true);
+  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true);
 }
 
 //prep date display

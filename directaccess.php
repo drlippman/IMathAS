@@ -82,15 +82,15 @@
 
 			if ($emailconfirmation) {
 				$id = $DBH->lastInsertId();
-				
+
 				$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
 				$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
 				$message .= "and paste it into your webbrowser:</p>\r\n";
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
-				
+
 				require_once("./includes/email.php");
-				send_email($_POST['email'], $sendfrom, $installname.' Confirmation', $message, array(), array(), 10); 
+				send_email($_POST['email'], $sendfrom, $installname.' Confirmation', $message, array(), array(), 10);
 
 				echo "<html><body>\n";
 				echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
@@ -164,7 +164,7 @@
 		 }
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		if (isset($CFG['locale'])) {
-			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.$CFG['locale'].'.min.js"></script>';
+			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
 		}
 		require("header.php");
 		//echo "<div class=\"breadcrumb\">$breadcrumbbase $coursename Access</div>";

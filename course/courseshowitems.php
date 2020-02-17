@@ -720,6 +720,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   } else {
 			   	   $canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($line);
 			   }
+				 if (!empty($line['outofattempts'])) {
+					 $canuselatepass = 0;
+				 }
 			   if ($line['enddate']==2000000000 && $courseenddate<2000000000) {
 			   	   $line['enddate'] = $courseenddate;
 			   }
@@ -1871,7 +1874,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		$html .= '</div>';
 
    	} else {
-   		$html = sprintf("<select name=addtype id=\"addtype%s-%s\" onchange=\"additem('%s','%s')\" ",
+   		$html = sprintf("<select aria-label=\"%s\" name=addtype id=\"addtype%s-%s\" onchange=\"additem('%s','%s')\" ",
+			_('Add An Item'),
 			Sanitize::encodeStringForDisplay($blk), Sanitize::encodeStringForDisplay($tb),
 			Sanitize::encodeStringForJavascript($blk), Sanitize::encodeStringForJavascript($tb));
 		if ($tb=='t') {

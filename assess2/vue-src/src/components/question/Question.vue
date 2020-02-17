@@ -103,8 +103,8 @@ export default {
       );
     },
     submitClass () {
-      return (store.assessInfo.submitby === 'by_assessment') ?
-        'secondary' : 'primary';
+      return (store.assessInfo.submitby === 'by_assessment')
+        ? 'secondary' : 'primary';
     },
     showScore () {
       return (store.inProgress &&
@@ -153,9 +153,8 @@ export default {
     loadQuestionIfNeeded (skiprender) {
       if (!this.questionContentLoaded && this.active && store.errorMsg === null) {
         actions.loadQuestion(this.qn, false, false);
-      } else if (this.questionContentLoaded && this.active
-        && !this.questionData.rendered && skiprender !== true)
-      {
+      } else if (this.questionContentLoaded && this.active &&
+        !this.questionData.rendered && skiprender !== true) {
         this.renderAndTrack();
       }
     },
@@ -249,6 +248,7 @@ export default {
       }
       setTimeout(window.drawPics, 100);
       window.rendermathnode(document.getElementById('questionwrap' + this.qn));
+      window.initSageCell(document.getElementById('questionwrap' + this.qn));
       this.updateTime(true);
       this.setInitValues();
       // add in timeactive from autosave, if exists
@@ -281,7 +281,6 @@ export default {
       window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
 
       actions.setRendered(this.qn);
-
     },
     setInitValues () {
       var regex = new RegExp('^(qn|tc|qs)\\d');

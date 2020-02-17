@@ -10,9 +10,9 @@ require("../includes/parsedatetime.php");
 
 ini_set("max_input_time", "120");
 ini_set("max_execution_time", "120");
-ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "10485760");
-ini_set("post_max_size", "10485760");
+ini_set("memory_limit", "31457280");
+ini_set("upload_max_filesize", "31457280");
+ini_set("post_max_size", "31457280");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -95,6 +95,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$processingerror = false;
+		$newfileid = 0;
 		if ($_POST['linktype']=='text') {
 			$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
 		} else if ($_POST['linktype']=='file') {
@@ -121,6 +122,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$uploaderror = true;
 						} else {
 							$_POST['text'] = "file:$filename";
+							$stm = $DBH->prepare("INSERT INTO imas_linked_files (filename) VALUES (?) ");
+							$stm->execute(array($filename));
+							$newfileid = $DBH->lastInsertId();
 						}
 
 					}
@@ -207,40 +211,57 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$outcomes = implode(',',$outcomes);
 		if (!empty($linkid)) {  //already have id; update
-			$stm = $DBH->prepare("SELECT text FROM imas_linkedtext WHERE id=:id");
+			$stm = $DBH->prepare("SELECT text,fileid FROM imas_linkedtext WHERE id=:id");
 			$stm->execute(array(':id'=>$linkid));
-			$text = trim($stm->fetchColumn(0));
+			list($text,$oldfileid) = $stm->fetch(PDO::FETCH_NUM);
+			$text = trim($text);
 			if (substr($text,0,5)=='file:') { //has file
 				if ($_POST['text']!=$text) { //if not same file, delete old if not used
-					$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
-					$stm->execute(array(':text'=>$text));
-					if ($stm->rowCount()==1) {
-						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-						$filename = substr($text,5);
-						deletecoursefile($filename);
-						//if (file_exists($uploaddir . $filename)) {
-						//	unlink($uploaddir . $filename);
-						//}
+					if ($oldfileid > 0) {
+						// had a file id - can use that approach
+						$stm = $DBH->prepare("SELECT count(id) FROM imas_linkedtext WHERE fileid=?");
+						$stm->execute(array($oldfileid));
+						if ($stm->fetchColumn(0) == 1) { // only one use of this file
+							$filename = substr($text,5);
+							deletecoursefile($filename);
+							$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
+							$stm->execute(array($oldfileid));
+						}
+					} else {
+						// no file id - old file, so do it the old way
+						$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
+						$stm->execute(array(':text'=>$text));
+						if ($stm->rowCount()==1) {
+							//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+							$filename = substr($text,5);
+							deletecoursefile($filename);
+							//if (file_exists($uploaddir . $filename)) {
+							//	unlink($uploaddir . $filename);
+							//}
+						}
 					}
+				} else {
+					// same file, so keep fileid
+					$newfileid = $oldfileid;
 				}
 			}
 			if (!$processingerror) {
 				$available = sanitize::onlyInt($_POST['avail']);
 				$target = Sanitize::onlyInt($_POST['target']);
 				$query = "UPDATE imas_linkedtext SET title=:title,summary=:summary,text=:text,startdate=:startdate,enddate=:enddate,avail=:avail,";
-				$query .= "oncal=:oncal,caltag=:caltag,target=:target,outcomes=:outcomes,points=:points WHERE id=:id";
+				$query .= "oncal=:oncal,caltag=:caltag,target=:target,outcomes=:outcomes,points=:points,fileid=:fileid WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'], ':startdate'=>$startdate,
 					':enddate'=>$enddate, ':avail'=>$available, ':oncal'=>$oncal, ':caltag'=>$caltag, ':target'=>$target,
-					':outcomes'=>$outcomes, ':points'=>$points, ':id'=>$linkid));
+					':outcomes'=>$outcomes, ':points'=>$points, ':fileid'=>$newfileid, ':id'=>$linkid));
 			}
 		} else if (!$processingerror) { //add new
-			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) VALUES ";
-			$query .= "(:courseid, :title, :summary, :text, :startdate, :enddate, :avail, :oncal, :caltag, :target, :outcomes, :points);";
+			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points,fileid) VALUES ";
+			$query .= "(:courseid, :title, :summary, :text, :startdate, :enddate, :avail, :oncal, :caltag, :target, :outcomes, :points, :fileid);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'],
 				':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag,
-				':target'=>$_POST['target'], ':outcomes'=>$outcomes, ':points'=>$points));
+				':target'=>$_POST['target'], ':outcomes'=>$outcomes, ':points'=>$points, ':fileid'=>$newfileid));
 			$newtextid = $DBH->lastInsertId();
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "(:courseid, 'LinkedText', :typeid);";
@@ -340,7 +361,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$gradeoutcomes = array();
 			}
-			
+
 			$savetitle = _("Save Changes");
 		} else {
 			//set defaults
@@ -524,7 +545,7 @@ if ($overwriteBody==1) {
 		</div>
 		<div id="fileinput" <?php if ($type != 'file') {echo 'style="display:none;"';}?>>
 			<span class="form">File</span>
-			<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="31457280" />
 			<span class="formright">
 			<?php if ($filename != '') {
 				require_once("../includes/filehandler.php");
@@ -535,7 +556,7 @@ if ($overwriteBody==1) {
 				echo 'Attach ';
 			}
 			?>
-			file (Max 10MB)<sup>*</sup>: <input name="userfile" type="file" />
+			file (Max 30MB): <input name="userfile" type="file" />
 			</span><br class="form">
 		</div>
 		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>
@@ -654,8 +675,7 @@ if ($overwriteBody==1) {
 ?>
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
-
-	<p><sup>*</sup>Avoid quotes in the filename</p>
+	<p>&nbsp;</p>
 <?php
 }
 	require("../footer.php");

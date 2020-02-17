@@ -197,6 +197,9 @@ class ExceptionFuncs {
 		if ($now < $adata['enddate'] || $this->latepasses == 0 || $adata['allowlate']<10) {
 			return false;
 		}
+		if ($this->viewedassess===null) {
+			$this->getViewedAssess();
+		}
 		$canUseIfUnblocked = $this->getCanUseAssessLatePass($adata, $latepasscnt, true);
 		if ($canUseIfUnblocked && in_array($adata['id'],$this->viewedassess)) {
 			return true;
@@ -210,9 +213,12 @@ class ExceptionFuncs {
 	// Also called internally from getCanUseAssessException using second param
 	// latepasscnt is number of latepasses already used
 	public function getCanUseAssessLatePass($adata, $latepasscnt = 0, $skipViewedCheck=false) {
+		if ($this->latepasses == 0) { // no latepasses to use; no need to check further
+			return false;
+		}
 		$now = time();
 		$canuselatepass = false;
-		if ($this->viewedassess===null) {
+		if ($this->viewedassess===null && !$skipViewedCheck) {
 			$this->getViewedAssess();
 		}
 		/*
@@ -236,9 +242,9 @@ class ExceptionFuncs {
 		if (!isset($adata['LPcutoff']) || $adata['LPcutoff']<$adata['enddate']) { //ignore nonsensical LPcutoff
 			$adata['LPcutoff'] = 0;
 		}
-		if ((!in_array($adata['id'],$this->viewedassess) || $skipViewedCheck) &&
+		if (($skipViewedCheck || !in_array($adata['id'],$this->viewedassess)) &&
 			($adata['LPcutoff']==0 || $now<$adata['LPcutoff']) &&
-			$this->latepasses>0 && $this->isstu && $adata['enddate'] < $this->courseenddate) { //basic checks
+			$this->isstu && $adata['enddate'] < $this->courseenddate) { //basic checks
 			if ($now<$adata['enddate'] && $latepassesAllowed > $latepasscnt) { //before due date and use is allowed
 				$canuselatepass = true;
 			} else if ($now>$adata['enddate'] && $adata['allowlate']>10) { //after due date and allows use after due date

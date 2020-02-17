@@ -397,7 +397,7 @@ require_once("includes/sanitize.php");
 		}
 		session_destroy();
 	} else if ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd") {
-		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
+		$stm = $DBH->prepare("SELECT password,email FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
@@ -408,6 +408,34 @@ require_once("includes/sanitize.php");
 			}
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
+
+			if ($_GET['action']=="chgpwd") {
+				require_once("./includes/email.php");
+				$message = '<p><b>'._('This is an automated message. Do not reply to this email.').'</b></p>';
+				$message .= '<p>'.sprintf(_('Hi, your account details on %s were recently changed.'), $installname).' ';
+				$message .= _('Your password was changed.');
+				$message .= '</p><p>'._('If this was you, you can disregard this email.').' ';
+				$message .= _('If you did not make these changes, please log into your account and correct the changes and change your password.').' ';
+
+				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+				$code = '';
+				for ($i=0;$i<10;$i++) {
+					$code .= substr($chars,rand(0,61),1);
+				}
+
+				$query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':code'=>$code, ':id'=>$userid));
+
+				$message .= _('If you are unable to log into your account, use the following link.'). ' ';
+				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$userid&code=$code\">";
+				$message .= _('Reset Password').'</a></p>';
+
+				send_email($line['email'], $sendfrom,
+					_('Alert:'). ' '.$installname.' '._('Account Activity'),
+					$message, array(), array(), 10
+				);
+			}
 		} else {
 			echo "<html><body>Password change failed.  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">Try Again</a>\n";
 			echo "</body></html>\n";
@@ -662,6 +690,10 @@ require_once("includes/sanitize.php");
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 
+		$stm = $DBH->prepare("SELECT email FROM imas_users WHERE id=?");
+		$stm->execute(array($userid));
+		$old_email = $stm->fetchColumn(0);
+
 		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
 		$stm = $DBH->prepare($query);
@@ -669,6 +701,7 @@ require_once("includes/sanitize.php");
 			':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$layoutstr, ':qrightsdef'=>$qrightsdef,
 			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>$_POST['theme'], ':listperpage'=>$perpage, ':uid'=>$userid));
 
+		$pwchanged = false;
 		if (isset($_POST['dochgpw'])) {
 			$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
@@ -681,6 +714,7 @@ require_once("includes/sanitize.php");
 				}
 				$stm = $DBH->prepare("UPDATE imas_users SET password = :newpw WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
+				$pwchanged = true;
 			} else {
 				require("header.php");
 				echo $pagetopper;
@@ -712,6 +746,42 @@ require_once("includes/sanitize.php");
 
 		require("includes/userprefs.php");
 		storeUserPrefs();
+
+		if ($pwchanged || trim($old_email) != trim($_POST['email'])) {
+			require_once("./includes/email.php");
+			$message = '<p><b>'._('This is an automated message. Do not reply to this email.').'</b></p>';
+			$message .= '<p>'.sprintf(_('Hi, your account details on %s were recently changed.'), $installname).' ';
+			if ($old_email != $_POST['email']) {
+				$message .= sprintf(_('Your email address was changed to %s.'), Sanitize::encodeStringForDisplay($_POST['email'])).' ';
+			}
+			if ($pwchanged) {
+				$message .= _('Your password was changed.');
+			}
+			$message .= '</p><p>'._('If this was you, you can disregard this email.').' ';
+			$message .= _('If you did not make these changes, please log into your account and correct the changes and change your password.').' ';
+
+			if ($pwchanged) {
+				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+				$code = '';
+				for ($i=0;$i<10;$i++) {
+					$code .= substr($chars,rand(0,61),1);
+				}
+
+				$query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':code'=>$code, ':id'=>$userid));
+
+				$message .= _('If you are unable to log into your account, use the following link.'). ' ';
+				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$userid&code=$code\">";
+				$message .= _('Reset Password').'</a></p>';
+			}
+
+			send_email($old_email, $sendfrom,
+				_('Alert:'). ' '.$installname.' '._('Account Activity'),
+				$message, array(), array(), 10
+			);
+
+		}
 
 
 		/* moved above

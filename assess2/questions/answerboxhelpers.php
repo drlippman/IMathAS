@@ -1,7 +1,10 @@
 <?php
 
 function isNaN( $var ) {
-     return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
+  // is_numeric catches most things, but not php-generated NAN or INF
+  // is_finite catches those
+  return (!is_numeric($var) || !is_finite($var));
+     //return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
      //possible alternative:
      //return ($var!==$var || $var*2==$var);
 }

@@ -155,7 +155,7 @@
 		} else {
 			echo '<a href="showcalendar.php?cid='.$cid.'&editing=on">'._('Enable Drag-and-drop Editing').'</a> | ';
 		}
-		echo '<a href="exportcalfeed.php?cid='.$cid.'">'._('Export Calendar Feed').'</a>';
+		//echo '<a href="exportcalfeed.php?cid='.$cid.'">'._('Export Calendar Feed').'</a>';
 		echo "</div>";
 	 }
 	 if ($editingon) {

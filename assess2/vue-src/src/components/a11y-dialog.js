@@ -3,9 +3,9 @@ The MIT License (MIT)
 Copyright (c) 2017 Edenspiekermann
 https://github.com/edenspiekermann/a11y-dialog
  */
-/* global NodeList, Element, Event, define */
+/* global NodeList, Element, Event */
 
-(function(global) {
+(function (global) {
   'use strict';
 
   var FOCUSABLE_ELEMENTS = [
@@ -22,7 +22,7 @@ https://github.com/edenspiekermann/a11y-dialog
     '[tabindex]:not([tabindex^="-"]):not([inert])'
   ];
   var TAB_KEY = 9;
-  var ESCAPE_KEY = 27;
+  // var ESCAPE_KEY = 27;
   var focusedBeforeDialog;
 
   /**
@@ -32,7 +32,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {Element} node
    * @param {(NodeList | Element | string)} targets
    */
-  function A11yDialog(node, targets) {
+  function A11yDialog (node, targets) {
     // Prebind the functions that will be bound in addEventListener and
     // removeEventListener to avoid losing references
     this._show = this.show.bind(this);
@@ -62,7 +62,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {(NodeList | Element | string)} targets
    * @return {this}
    */
-  A11yDialog.prototype.create = function(targets) {
+  A11yDialog.prototype.create = function (targets) {
     // Keep a collection of nodes to disable/enable when toggling the dialog
     this._targets =
       this._targets || collect(targets) || getSiblings(this.container);
@@ -122,7 +122,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {Event} event
    * @return {this}
    */
-  A11yDialog.prototype.show = function(event) {
+  A11yDialog.prototype.show = function (event) {
     // If the dialog is already open, abort
     if (this.shown) {
       return this;
@@ -142,7 +142,7 @@ https://github.com/edenspiekermann/a11y-dialog
 
       // Iterate over the targets to disable them by setting their `aria-hidden`
       // attribute to `true`
-      this._targets.forEach(function(target) {
+      this._targets.forEach(function (target) {
         target.setAttribute('aria-hidden', 'true');
       });
     }
@@ -170,7 +170,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {Event} event
    * @return {this}
    */
-  A11yDialog.prototype.hide = function(event) {
+  A11yDialog.prototype.hide = function (event) {
     // If the dialog is already closed, abort
     if (!this.shown) {
       return this;
@@ -186,7 +186,7 @@ https://github.com/edenspiekermann/a11y-dialog
 
       // Iterate over the targets to enable them by removing their `aria-hidden`
       // attribute
-      this._targets.forEach(function(target) {
+      this._targets.forEach(function (target) {
         target.removeAttribute('aria-hidden');
       });
     }
@@ -214,7 +214,7 @@ https://github.com/edenspiekermann/a11y-dialog
    *
    * @return {this}
    */
-  A11yDialog.prototype.destroy = function() {
+  A11yDialog.prototype.destroy = function () {
     // Hide the dialog to avoid destroying an open instance
     this.hide();
 
@@ -249,7 +249,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {string} type
    * @param {Function} handler
    */
-  A11yDialog.prototype.on = function(type, handler) {
+  A11yDialog.prototype.on = function (type, handler) {
     if (typeof this._listeners[type] === 'undefined') {
       this._listeners[type] = [];
     }
@@ -265,7 +265,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {string} type
    * @param {Function} handler
    */
-  A11yDialog.prototype.off = function(type, handler) {
+  A11yDialog.prototype.off = function (type, handler) {
     var index = this._listeners[type].indexOf(handler);
 
     if (index > -1) {
@@ -283,11 +283,11 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {string} type
    * @param {Event} event
    */
-  A11yDialog.prototype._fire = function(type, event) {
+  A11yDialog.prototype._fire = function (type, event) {
     var listeners = this._listeners[type] || [];
 
     listeners.forEach(
-      function(listener) {
+      function (listener) {
         listener(this.container, event);
       }.bind(this)
     );
@@ -300,7 +300,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @access private
    * @param {Event} event
    */
-  A11yDialog.prototype._bindKeypress = function(event) {
+  A11yDialog.prototype._bindKeypress = function (event) {
     // If the dialog is shown and the ESCAPE key is being pressed, prevent any
     // further effects from the ESCAPE key and hide the dialog, unless its role
     // is 'alertdialog', which should be modal
@@ -326,7 +326,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @access private
    * @param {Event} event
    */
-  A11yDialog.prototype._maintainFocus = function(event) {
+  A11yDialog.prototype._maintainFocus = function (event) {
     // If the dialog is shown and the focus is not within the dialog element,
     // move it back to its first focusable child
     if (this.shown && !this.container.contains(event.target)) {
@@ -340,7 +340,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {NodeList} collection
    * @return {Array<Element>}
    */
-  function toArray(collection) {
+  function toArray (collection) {
     return Array.prototype.slice.call(collection);
   }
 
@@ -352,7 +352,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {Element} [context = document]
    * @return {Array<Element>}
    */
-  function $$(selector, context) {
+  function $$ (selector, context) {
     return toArray((context || document).querySelectorAll(selector));
   }
 
@@ -363,7 +363,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {(NodeList | Element | string)} target
    * @return {Array<Element>}
    */
-  function collect(target) {
+  function collect (target) {
     if (NodeList.prototype.isPrototypeOf(target)) {
       return toArray(target);
     }
@@ -383,7 +383,7 @@ https://github.com/edenspiekermann/a11y-dialog
    *
    * @param {Element} node
    */
-  function setFocusToFirstItem(node) {
+  function setFocusToFirstItem (node) {
     var focusableChildren = getFocusableChildren(node);
     var focused = node.querySelector('[autofocus]') || focusableChildren[0];
 
@@ -398,8 +398,8 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {Element} node
    * @return {Array<Element>}
    */
-  function getFocusableChildren(node) {
-    return $$(FOCUSABLE_ELEMENTS.join(','), node).filter(function(child) {
+  function getFocusableChildren (node) {
+    return $$(FOCUSABLE_ELEMENTS.join(','), node).filter(function (child) {
       return !!(
         child.offsetWidth ||
         child.offsetHeight ||
@@ -414,7 +414,7 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {Element} node
    * @param {Event} event
    */
-  function trapTabKey(node, event) {
+  function trapTabKey (node, event) {
     var focusableChildren = getFocusableChildren(node);
     var focusedItemIndex = focusableChildren.indexOf(document.activeElement);
 
@@ -442,9 +442,9 @@ https://github.com/edenspiekermann/a11y-dialog
    * @param {Element} node
    * @return {Array<Element>}
    */
-  function getSiblings(node) {
+  function getSiblings (node) {
     var nodes = toArray(node.parentNode.childNodes);
-    var siblings = nodes.filter(function(node) {
+    var siblings = nodes.filter(function (node) {
       return node.nodeType === 1;
     });
 

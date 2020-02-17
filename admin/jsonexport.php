@@ -4,6 +4,10 @@
 //Based on work by @kdv24 and @AbeerKhakwani
 
 require("../init.php");
+if ($myrights < 100) {
+  echo "You are not authorized to use this page";
+  exit;
+}
 if (isset($_GET['cid'])) {
   $cid = Sanitize::courseId($_GET['cid']);
 

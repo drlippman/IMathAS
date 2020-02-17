@@ -345,11 +345,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $updatedScore, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
 					}
 				}
 			} else {
-				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid,userid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					if (strpos($row['questions'],';')===false) {
@@ -388,7 +388,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if (strlen($row['lti_sourcedid'])>1) {
 						//update LTI score
 						require_once("../includes/ltioutcomes.php");
-						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $bestscores, true);
+						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $bestscores, true);
 					}
 				}
 			}
@@ -431,7 +431,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=030818\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=062019\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=010420\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";

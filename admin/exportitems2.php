@@ -103,7 +103,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	if (isset($_POST['exportcourseopt'])) {
 		$stm = $DBH->prepare("SELECT itemorder,ownerid,name,".$db_fields['course']." FROM imas_courses WHERE id=:id");
 	} else {
-		$stm = $DBH->prepare("SELECT itemorder,ownerid,name FROM imas_courses WHERE id=:id");
+		$stm = $DBH->prepare("SELECT itemorder,ownerid,name,UIver FROM imas_courses WHERE id=:id");
 	}
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -316,9 +316,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$assessmap[$line['id']] = $output_item_id;
 			//check for ptsposs
 			if (isset($line['ptsposs']) && $line['ptsposs']==-1) {
-				$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);	
+				$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);
 			}
-			
+
 			unset($line['id']);
 			//map gbcategory
 			if (isset($gbmap[$line['gbcategory']])) {

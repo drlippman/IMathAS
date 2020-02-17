@@ -2,7 +2,7 @@
 //A library of Stats functions.  Version 1.10, Nov 17, 2017
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Excelquartileexc","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
@@ -245,12 +245,29 @@ function TIquartile($a,$q) {
 	}
 }
 
+function Excelquartileexc($a,$q) {
+  if (!is_array($a)) {
+		echo 'excelquartileexc expects an array';
+		return false;
+	}
+	if ($q<0 || $q>4) {
+		echo 'invalid quartile number';
+		return false;
+	}
+  sort($a, SORT_NUMERIC);
+	if ($q==0) {
+		return $a[0];
+	} else if ($q==4) {
+		return $a[count($a)-1];
+	}
+  return interppercentile($a, 25*$q);
+}
 //Excelquartile(array,quartile)
 //finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-//array of numbers.  Calculates using the Excel method.
+//array of numbers.  Calculates using the Excel method (quartile.inc)
 function Excelquartile($a,$q) {
 	if (!is_array($a)) {
-		echo 'percentile expects an array';
+		echo 'excelquartile expects an array';
 		return false;
 	}
 	if ($q<0 || $q>4) {
@@ -339,6 +356,7 @@ function allquartile($a,$q) {
 		$qs[] = percentile($a,$q*25);
 		$qs[] = Excelquartile($a,$q);
 	}
+  $qs[] = interppercentile($a, $q*25); //excel quartile.exc
 	return implode(' or ',array_unique($qs));
 }
 
@@ -677,7 +695,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 //percents: array of pie percents (should total 100%)
 //labels: array of labels for each pie piece
 //uses Google Charts API
-function piechart($pcts,$labels,$w=350,$h=150) {
+function piechart($pcts,$labels,$w=250,$h=130) {
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
 		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
@@ -690,7 +708,7 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 		return $out;
 	}
 	$uniqueid = uniqid('pie');
-	$out = '<div id="'.$uniqueid.'" style="width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
+	$out = '<div id="'.$uniqueid.'" style="display:inline-block;width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
 	//load google charts loader if needed
 	$out .= '<script type="text/javascript">
 		if (typeof window.chartqueue == "undefined") {
@@ -710,13 +728,15 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 		$rows[] = $row;
 	}
 
+  $cw = $w - 20;
+  $ch = $h - 20;
 	$out .= 'function '.$uniqueid.'() {
 		var data = new google.visualization.DataTable();
 		data.addColumn("string", "Data");
 		data.addColumn("number", "Percentage");
 		data.addRows(['.implode(',', $rows).']);
 		var chart = new google.visualization.PieChart(document.getElementById("'.$uniqueid.'"));
-		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}});
+		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}, chartArea:{left:10, top:10, width:'.$cw.', height:'.$ch.'}});
 	}';
 
 	//load it
@@ -812,6 +832,8 @@ function boxplot($arr,$label="",$options = array()) {
 			$qmethod = 'TIquartile';
 		} else if ($options['qmethod']=='Excel') {
 			$qmethod = 'Excelquartile';
+		} else if ($options['qmethod']=='Excel.exc') {
+			$qmethod = 'Excelquartileexc';
 		} else if ($options['qmethod']=='N') {
 			$qmethod = 'quartile';
 		} else if ($options['qmethod']=='Nplus1') {

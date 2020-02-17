@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require("../init.php");
-
+require("delitembyid.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -29,38 +29,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$textid = Sanitize::onlyInt($_GET['id']);
 
 	if ($_POST['remove']=="really") {
-		require_once("../includes/filehandler.php");		
+		require_once("../includes/filehandler.php");
 
 		$DBH->beginTransaction();
 		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='LinkedText' AND courseid=:courseid");
 		$stm->execute(array(':typeid'=>$textid, ':courseid'=>$cid));
 		if ($stm->rowCount()>0) {
 			$itemid = $stm->fetchColumn(0);
-			$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
-			$stm->execute(array(':id'=>$itemid));
-			$stm = $DBH->prepare("SELECT text,points FROM imas_linkedtext WHERE id=:id");
-			$stm->execute(array(':id'=>$textid));
-			$row = $stm->fetch(PDO::FETCH_NUM);
-			$text = trim($row[0]);
-			$points = $row[1];
-			if (substr($text,0,5)=='file:') { //delete file if not used
-				$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
-				$stm->execute(array(':text'=>$text));
-				if ($stm->rowCount()==1) {
-					/*$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-					$filename = substr($text,5);
-					if (file_exists($uploaddir . $filename)) {
-						unlink($uploaddir . $filename);
-					}*/
-					deletecoursefile(substr($text,5));
-				}
-			}
-			if ($points>0) {
-				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
-				$stm->execute(array(':gradetypeid'=>$textid));
-			}
-			$stm = $DBH->prepare("DELETE FROM imas_linkedtext WHERE id=:id");
-			$stm->execute(array(':id'=>$textid));
+
+			delitembyid($itemid);
+
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$cid));
 			$items = unserialize($stm->fetchColumn(0));
@@ -105,7 +83,7 @@ if ($overwriteBody==1) {
 	Are you SURE you want to delete this link item?
 	<form method="POST" action="deletelinkedtext.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>
-	<button type=submit name="remove" value="really">Yes, Delete</button>		
+	<button type=submit name="remove" value="really">Yes, Delete</button>
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
 	</p>
 	</form>

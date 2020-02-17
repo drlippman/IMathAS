@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from './router';
-import i18n from './i18n';
+import { i18n } from './i18n';
 
 export const store = Vue.observable({
   assessInfo: null,
@@ -74,9 +74,6 @@ export const actions = {
         if (typeof callback !== 'undefined' && callback !== null) {
           callback();
         }
-        if (doreset === true) {
-          Router.push('/');
-        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -95,9 +92,10 @@ export const actions = {
       data: {
         practice: dopractice,
         password: password,
+        in_print: store.inPrintView ? 1 : 0,
         new_group_members: newGroupMembers.join(','),
         cur_group: store.assessInfo.stugroupid,
-        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid)?1:0
+        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid) ? 1 : 0
       },
       xhrFields: {
         withCredentials: true
@@ -272,6 +270,7 @@ export const actions = {
 
     store.inTransit = true;
     window.MQeditor.resetEditor();
+    window.imathasAssess.clearTips();
 
     this.clearAutosave(qns);
     // don't store time active when full-test
@@ -528,6 +527,8 @@ export const actions = {
   endAssess (callback) {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
+    window.MQeditor.resetEditor();
+    window.imathasAssess.clearTips();
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({

@@ -158,6 +158,7 @@ export default {
       if (data.action === 'showq') {
         // On question show, server sends as data:
         //  action: "showq", qn: qn, seed: seed, startt:startt
+        actions.clearInitValue(data.qn);
         this.$set(store.assessInfo, 'livepoll_status', {
           curstate: 2,
           curquestion: parseInt(data.qn) + 1,

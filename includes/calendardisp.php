@@ -16,7 +16,7 @@ require_once("filehandler.php");
 function showcalendar($refpage) {
 global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
-global $tzoffset, $tzname, $editingon, $exceptionfuncs;
+global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver;
 
 $now= time();
 
@@ -126,8 +126,19 @@ if (!isset($teacherid)) {
 $byid = array();
 $k = 0;
 $bestscores_stm = null;
-$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag,ver FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
-$stm->execute(array(':courseid'=>$cid));
+if ($latepasses > 0 && $courseUIver > 1) {
+	$query = 'SELECT ia.id,ia.name,ia.startdate,ia.enddate,ia.LPcutoff,ia.reviewdate,';
+	$query .= 'ia.gbcategory,ia.reqscore,ia.reqscoreaid,ia.reqscoretype,ia.timelimit,';
+	$query .= 'ia.allowlate,ia.caltag,ia.calrtag,ia.ver,iar.status ';
+	$query .= 'FROM imas_assessments AS ia LEFT JOIN imas_assessment_records AS iar ';
+	$query .= 'ON ia.id=iar.assessmentid AND iar.userid=:uid WHERE ia.avail=1 AND ';
+	$query .= 'ia.date_by_lti<>1 AND ia.courseid=:courseid AND ia.enddate<2000000000 ORDER BY ia.name';
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':uid'=>$userid));
+} else {
+	$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag,ver FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
+	$stm->execute(array(':courseid'=>$cid));
+}
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
 	$canuselatepass = false;
@@ -140,6 +151,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 	} else {
 		$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($row);
+	}
+	if (isset($row['status']) && ($row['status']&32)==32) {
+		$canuselatepass = 0;
 	}
 	//2: start, 3: end, 4: review
 	//if enddate past end of calendar

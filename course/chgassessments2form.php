@@ -249,7 +249,7 @@ $vueData = array(
 						<span v-if="subtype == 'by_assessment'">
 							<label for="keepscore">
 								Score to keep:
-							<label>
+							</label>
 							<select id="keepscore" name="keepscore" v-model="keepscore"
 								 :required="changingCore">
 								<option value="DNC">Do not change</option>
@@ -710,7 +710,7 @@ var app = new Vue({
 	el: '#app',
   data: <?php echo json_encode($vueData); ?>,
 	computed: {
-		coreSet() {
+		coreSet: function() {
 			let tot = (this.subtype === 'DNC' ? 0 : 1) +
 				(this.defregens === '' ? 0 : 1) +
 				(this.defregens > 1 && this.defregenpenalty === '' ? 0 : 1) +
@@ -726,7 +726,7 @@ var app = new Vue({
 				(this.ansingb === 'DNC' ? 0 : 1);
 			return tot;
 		},
-		changingCore () {
+		changingCore: function () {
 			let tot = (this.subtype !== 'DNC') ||
 				(this.defregens !== '') ||
 				(this.defattempts !== '') ||
@@ -737,7 +737,7 @@ var app = new Vue({
 				(this.ansingb !== 'DNC');
 			return tot;
 		},
-		coreSub () {
+		coreSub: function () {
 			if (this.coreSet == 13) { //all set
 				return 2;
 			} else if (this.changingCore) {
@@ -746,7 +746,7 @@ var app = new Vue({
 				return 0;
 			}
 		},
-		showscoresOptions() {
+		showscoresOptions: function() {
 			var nochange = {
 				'value': 'DNC',
 				'text': _('Do not change')
@@ -787,7 +787,7 @@ var app = new Vue({
 			}
 			return out;
 		},
-		showansOptions() {
+		showansOptions: function() {
 			//TODO: revisit after_take vs with_score
 
 			var never = {
@@ -836,7 +836,7 @@ var app = new Vue({
 			}
 			return out;
 		},
-		viewInGbOptions() {
+		viewInGbOptions: function() {
 			/*
 			‘immediately’: Immediately - can always view it
 			‘after_take’: After an assessment version is done
@@ -872,7 +872,7 @@ var app = new Vue({
 			}
 			return out;
 		},
-		scoresInGbOptions() {
+		scoresInGbOptions: function() {
 			/*
 			‘immediately’: Immediately - can always view it
 			‘after_take’: After an assessment version is done
@@ -931,7 +931,7 @@ var app = new Vue({
 			return out;
 
 		},
-		ansInGbOptions() {
+		ansInGbOptions: function() {
 			/*
 			‘after_attempt’: After an assessment version is done
 			‘after_due’: After it’s due
@@ -971,7 +971,7 @@ var app = new Vue({
 		}
 	},
 	methods: {
-		valueInOptions(optArr, value) {
+		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
 				if (optArr[i].value == value) {
@@ -980,7 +980,7 @@ var app = new Vue({
 			}
 			return false;
 		},
-		addExtref() {
+		addExtref: function() {
 			this.extrefs.push({'label':'', 'link':''});
 			this.extrefs = this.extrefs.slice();
 		}

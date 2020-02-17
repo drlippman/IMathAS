@@ -42,7 +42,7 @@ $now = time();
 
 // load settings including question info
 $assess_info = new AssessInfo($DBH, $aid, $cid, 'all');
-$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
+$assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
@@ -62,7 +62,9 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 
 // reject if no lti_sourcedid and we expect it
 if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
-  empty($sessiondata['lti_lis_result_sourcedid'.$aid])
+  (empty($sessiondata['lti_lis_result_sourcedid'.$aid]) ||
+   empty($sessiondata['lti_outcomeurl'])
+  )
 ) {
   echo '{"error": "need_relaunch"}';
   exit;
@@ -216,7 +218,9 @@ if ($isRealStudent) {
 }
 
 // update lti_sourcedid if needed
-if (!empty($sessiondata['lti_lis_result_sourcedid'.$aid])) {
+if (!empty($sessiondata['lti_lis_result_sourcedid'.$aid]) &&
+  !empty($sessiondata['lti_outcomeurl'])
+) {
   $altltisourcedid = $sessiondata['lti_lis_result_sourcedid'.$aid].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
   $assess_record->updateLTIsourcedId($altltisourcedid);
 }
@@ -249,9 +253,8 @@ $assess_info->processIntro();
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
   'extended_with', 'timelimit', 'timelimit_type', 'allowed_attempts',
-  'latepasses_avail', 'latepass_extendto', 'showscores', 'intro',
-  'interquestion_text', 'resources', 'category_urls', 'help_features',
-  'points_possible', 'showcat', 'enddate_in'
+  'showscores', 'intro', 'interquestion_text', 'resources', 'category_urls',
+  'help_features', 'points_possible', 'showcat', 'enddate_in'
 );
 if ($in_practice) {
   array_push($include_from_assess_info, 'displaymethod', 'showscores',
@@ -323,7 +326,7 @@ if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
 
 // grab question settings data
 $showscores = $assess_info->showScoresDuring();
-$generate_html = ($assess_info->getSetting('displaymethod') == 'full');
+$generate_html = ($assess_info->getSetting('displaymethod') == 'full' || $_POST['in_print'] == 1);
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, $generate_html, $generate_html);
 
 // if practice, add that

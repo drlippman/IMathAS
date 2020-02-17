@@ -20,17 +20,17 @@
 
 </div>
 */
-//import Icons from '@/components/widgets/Icons.vue';
+// import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'InterQuestionText',
   props: ['textobj', 'active'],
   components: {
-    //Icons
+    // Icons
   },
   data: function () {
     return {
-      expanded: true, //false,
+      expanded: true, // false,
       rendered: false
     };
   },
@@ -48,7 +48,7 @@ export default {
     }
   },
   mounted () {
-    //this.expanded = this.textobj.expanded;
+    // this.expanded = this.textobj.expanded;
     if (this.active && this.expanded) {
       this.renderMath();
     }

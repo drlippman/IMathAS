@@ -138,6 +138,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 				while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (($line['status']&3)>0)?1:2;
 					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = $line['score'];
+					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['outofattempts'] = (($line['status']&32)==32);
 				}
 			}
 		}

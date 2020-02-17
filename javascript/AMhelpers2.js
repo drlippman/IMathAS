@@ -227,6 +227,10 @@ function setupTips(id, tip, longtip) {
   });
 }
 
+function clearTips() {
+  hideAllEhTips();
+}
+
 function initqsclickchange() {
 	$('input[id^=qs][value=spec]').each(function(i,qsel) {
 		$(qsel).siblings('input[type=text]').off('keyup.qsclickchange')
@@ -885,6 +889,8 @@ function AMnumfuncPrepVar(qn,str) {
 			return '@v'+i+'@';
 		}
 	 }});
+  // fix display of /n!
+  dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
@@ -1631,6 +1637,9 @@ function singlevaleval(evalstr, format) {
   }
   try {
     var res = scopedmatheval(evalstr);
+    if (res === '') {
+      return [NaN, _("syntax incomplete")+". "];
+    }
     return [res, ''];
   } catch(e) {
     return [NaN, _("syntax incomplete")+". "];
@@ -1664,6 +1673,7 @@ return {
   preSubmitString: preSubmitString,
   clearLivePreviewTimeouts: clearLivePreviewTimeouts,
   syntaxCheckMQ: syntaxCheckMQ,
+  clearTips: clearTips,
   handleMQenter: handleMQenter
 };
 

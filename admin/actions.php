@@ -845,7 +845,7 @@ switch($_POST['action']) {
 				require("../includes/copyiteminc.php");
 				$convertAssessVer = $destUIver;
 				copyallsub($items,'0',$newitems,$gbcats);
-				doaftercopy($_POST['usetemplate']);
+				doaftercopy($_POST['usetemplate'], $newitems);
 				$itemorder = serialize($newitems);
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':id'=>$cid));

@@ -45,7 +45,7 @@ $now = time();
 
 // load settings including question info
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
-$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
+$assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
@@ -101,6 +101,11 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
     echo '{"error": "livepoll_wrongquestion"}';
     exit;
   }
+  // override showscores value to prevent score marks
+  if ($livepollStatus['curstate'] != 4) {
+    $assess_info->overrideSetting('showscores', 'at_end');
+    $assess_info->overrideSetting('showans', 'never');
+  }
 }
 
 // If in practice, now we overwrite settings
@@ -115,8 +120,7 @@ if ($in_practice) {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
-  'showscores', 'enddate_in'
+  'extended_with', 'allowed_attempts', 'showscores', 'enddate_in'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
@@ -185,10 +189,7 @@ if ($jumpToAnswer) {
 // grab question settings data with HTML
 if ($assess_info->getSetting('displaymethod') === 'livepoll') {
   $showscores = ($livepollStatus['curstate'] == 4);
-  // override showscores value to prevent score marks
-  if (!$showscores) {
-    $assessInfoOut['showscores'] = 'at_end';
-  }
+
   if ($isteacher) {
     // trigger additional jsParams for livepoll results display
     $GLOBALS['capturedrawinit'] = true;

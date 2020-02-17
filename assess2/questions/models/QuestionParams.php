@@ -145,7 +145,7 @@ class QuestionParams
      */
     public function getQuestionId(): ?int
     {
-        return $this->assessmentId;
+        return $this->questionId;
     }
 
     /**
@@ -154,7 +154,7 @@ class QuestionParams
      * @param int $questionId The question ID.
      * @return QuestionParams
      */
-    public function setQuestionId(?int $assessmentId): QuestionParams
+    public function setQuestionId(?int $questionId): QuestionParams
     {
         $this->questionId = $questionId;
         return $this;

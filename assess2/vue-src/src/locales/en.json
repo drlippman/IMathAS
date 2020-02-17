@@ -24,6 +24,7 @@
     "pastdue": "This assessment was due {ed}.",
     "pasttime": "The timelimit has expired on this assessment.",
     "needprereq": "You have not yet met the prerequisite requirements to work on this assessment.",
+    "prereqreq": "A score of {score} on {name} is required.",
     "no_attempts": "You have used all your attempts at this assessment.",
     "latepassn": "You have one LatePass available. | You have {n} LatePass available.",
     "latepass_needed": "You can redeem one LatePass to reopen this assessment until {date} | You can redeem {n} LatePasses to reopen this assessment until {date}",

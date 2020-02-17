@@ -52,32 +52,15 @@
         {{ $t('gradebook.add_feedback') }}
       </button>
     </div>
-    <div
-      v-show="showfeedback"
-    >
-      {{ $t('gradebook.feedback') }}:<br/>
-      <textarea
-        v-if="canedit && !useEditor"
-        class="fbbox"
-        :name="'fb'+qn"
-        rows="2"
-        cols="60"
-        :value = "qdata.feedback"
-        ref = "fbbox"
-        @input="updateFeedback"
-      ></textarea>
-      <tinymce-input
-        v-else-if="canedit"
-        :id="'fb'+qn"
-        :value = "qdata.feedback"
-        ref = "fbbox"
-        @input = "updateFeedback"
-      ></tinymce-input>
-      <div
-        v-else
-        v-html="qdata.feedback"
-      />
-    </div>
+    <gb-feedback
+      :show="showfeedback"
+      :canedit = "canedit"
+      :useeditor = "useEditor"
+      ref = "fbbox"
+      :qn = "qn"
+      :value = "qdata.feedback"
+      @update = "updateFeedback"
+    />
 
     <div v-if="showfull">
       <span v-if="qdata.timeactive.total > 0">
@@ -128,7 +111,7 @@ import GbAllTries from '@/gbviewassess/GbAllTries';
 import GbPenalties from '@/gbviewassess/GbPenalties';
 import Icons from '@/components/widgets/Icons';
 import MenuButton from '@/components/widgets/MenuButton';
-import TinymceInput from '@/components/TinymceInput.vue';
+import GbFeedback from '@/gbviewassess/GbFeedback';
 
 export default {
   name: 'GbScoreDetails',
@@ -138,7 +121,7 @@ export default {
     GbPenalties,
     MenuButton,
     Icons,
-    TinymceInput
+    GbFeedback
   },
   data: function () {
     return {
@@ -150,7 +133,7 @@ export default {
   },
   computed: {
     answeights () {
-      if (!this.qdata.answeights) { // if answeights not generated yet
+      if (!this.qdata.answeights || this.qdata.singlescore) { // if answeights not generated yet
         return [1];
       } else {
         let answeights = this.qdata.answeights.map(x => parseFloat(x));
@@ -168,7 +151,9 @@ export default {
     initScores () {
       var out = [];
       for (let i = 0; i < this.answeights.length; i++) {
-        if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
+        if (this.qdata.singlescore) {
+          out.push(this.qdata.score);
+        } else if (this.qdata.scoreoverride && typeof this.qdata.scoreoverride !== 'object') {
           // handle the case of a single override
           let partscore = this.qdata.scoreoverride * this.answeights[i] * this.qdata.points_possible;
           partscore = Math.round(1000 * partscore) / 1000;
@@ -245,7 +230,7 @@ export default {
       // TODO
       let quoteq = this.qn + '-' + this.qdata.qsetid + '-' + this.qdata.seed +
         '-' + store.aid + '-' + store.assessInfo.ver;
-      let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
+      let qs = 'add=new&cid=' + store.cid +
         '&quoteq=' + quoteq + '&to=' + store.uid;
       return store.APIbase + '../msgs/msglist.php?' + qs;
       // TODO: get GB to work for this.
@@ -317,14 +302,12 @@ export default {
       let partposs = this.qdata.points_possible * this.answeights[pn];
       actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
     },
-    updateFeedback (evt) {
-      let content;
-      if (this.useEditor) {
-        content = window.tinymce.get('fb'+this.qn).getContent();
-      } else {
-        content = evt.target.value;
-      }
-      actions.setFeedback(this.qn, content);
+    revealFeedback () {
+      this.showfeedback = true;
+      this.$nextTick(() => this.$refs.fbbox.focus());
+    },
+    updateFeedback (val) {
+      actions.setFeedback(this.qn, val);
     },
     allFull () {
       for (let i = 0; i < this.answeights.length; i++) {
@@ -354,10 +337,6 @@ export default {
         this.qn,
         600
       );
-    },
-    revealFeedback () {
-      this.showfeedback = true;
-      this.$nextTick(() => this.$refs.fbbox.focus());
     }
   },
   mounted () {
@@ -366,9 +345,6 @@ export default {
   watch: {
     qdata: function (newVal, oldVal) {
       this.initCurScores();
-      if (this.useEditor) {
-        window.initeditor('exact', 'fb'+this.qn, null, true);
-      }
     }
   }
 };

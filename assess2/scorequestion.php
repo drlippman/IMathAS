@@ -58,7 +58,7 @@ $now = time();
 
 // load settings
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
-$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
+$assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
@@ -119,6 +119,9 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
     echo '{"error": "livepoll_notopen"}';
     exit;
   }
+  // override settings to prevent score/key display
+  $assess_info->overrideSetting('showscores', 'at_end');
+  $assess_info->overrideSetting('showans', 'never');
 }
 
 // If in practice, now we overwrite settings
@@ -133,8 +136,7 @@ if ($in_practice) {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
-  'showscores', 'timelimit', 'enddate_in'
+  'extended_with', 'allowed_attempts', 'showscores', 'timelimit', 'enddate_in'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
@@ -271,8 +273,6 @@ if ($end_attempt) {
   if ($assess_info->getSetting('displaymethod') === 'livepoll') {
     // don't show scores until question is closed for livepoll
     $showscores = false;
-    $assess_info->overrideSetting('showscores', 'at_end');
-    $assessInfoOut['showscores'] = 'at_end';
 
     if (!$isteacher) {
       // call the livepoll server with the result
@@ -327,7 +327,7 @@ if ($assessInfoOut['submitby'] == 'by_question' || $end_attempt) {
     $gbscore = $assess_record->getGbScore();
     require_once("../includes/ltioutcomes.php");
     $aidposs = $assess_info->getSetting('points_possible');
-    calcandupdateLTIgrade($lti_sourcedid, $aid, $gbscore['gbscore'], false, $aidposs);
+    calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], false, $aidposs);
   }
 }
 

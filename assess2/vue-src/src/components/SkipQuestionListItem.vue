@@ -55,16 +55,17 @@ export default {
     scoreDisplay () {
       if (this.option.dispqn === 0) {
         return '';
-      } /*else if (this.option.hasOwnProperty('gbscore')) {
-        let str = this.option.canretry ? '(' : '[';
-        str += this.option.gbscore + '/' + this.option.points_possible;
-        str += this.option.canretry ? ')' : ']';
-        return str;
-      }*/ else if (this.option.hasOwnProperty('gbscore') && this.option.tries_max > 1) {
+      } else if (this.option.hasOwnProperty('gbscore') && this.option.tries_max > 1) {
         return this.option.gbscore + '/' + this.$tc('header.pts', this.option.points_possible);
       } else {
         return '(' + this.$tc('header.pts', this.option.points_possible) + ')';
       }
+      /* else if (this.option.hasOwnProperty('gbscore')) {
+        let str = this.option.canretry ? '(' : '[';
+        str += this.option.gbscore + '/' + this.option.points_possible;
+        str += this.option.canretry ? ')' : ']';
+        return str;
+      } */
     }
   }
 };

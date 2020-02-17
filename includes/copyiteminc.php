@@ -92,7 +92,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		//$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate) ";
 		//$query .= "SELECT '$cid',title,summary,text,startdate,enddate FROM imas_linkedtext WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed :$query " . mysql_error());
-		$stm = $DBH->prepare("SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points FROM imas_linkedtext WHERE id=:id");
+		$stm = $DBH->prepare("SELECT title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points,fileid FROM imas_linkedtext WHERE id=:id");
 		$stm->execute(array(':id'=>$typeid));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		$istool = (substr($row['text'],0,8)=='exttool:');
@@ -117,12 +117,12 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 			}
 			$row['outcomes'] = implode(',',$newoutcomes);
 		}
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) ";
-		$query .= "VALUES (:courseid,:title,:summary,:text,:startdate,:enddate,:avail,:oncal,:caltag,:target,:outcomes,:points) ";
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points,fileid) ";
+		$query .= "VALUES (:courseid,:title,:summary,:text,:startdate,:enddate,:avail,:oncal,:caltag,:target,:outcomes,:points,:fileid) ";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid, ':title'=>$row['title'], ':summary'=>$row['summary'], ':text'=>$row['text'],
 		   ':startdate'=>$row['startdate'], ':enddate'=>$row['enddate'], ':avail'=>$row['avail'], ':oncal'=>$row['oncal'], ':caltag'=>$row['caltag'],
-			 ':target'=>$row['target'], ':outcomes'=>$row['outcomes'], ':points'=>$row['points']));
+			 ':target'=>$row['target'], ':outcomes'=>$row['outcomes'], ':points'=>$row['points'], ':fileid'=>$row['fileid']));
 		$newtypeid = $DBH->lastInsertId();
 		if ($istool) {
 			$exttooltrack[$newtypeid] = intval($tool[0]);
@@ -284,7 +284,9 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		}
 
 		$reqscoreaid = $row['reqscoreaid'];
-		unset($row['reqscoreaid']);
+		if ($cid != $sourcecid) { // if same course, can keep this
+			unset($row['reqscoreaid']);
+		}
 		$row['name'] .= $_POST['append'];
 
 		$row['courseid'] = $cid;
@@ -487,7 +489,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 
 }
 
-function doaftercopy($sourcecid) {
+function doaftercopy($sourcecid, &$newitems) {
 	global $DBH;
 	global $cid,$reqscoretrack,$categoryassessmenttrack,$assessnewid,$forumtrack,$posttoforumtrack;
 	if (intval($cid)==intval($sourcecid)) {
@@ -535,6 +537,16 @@ function doaftercopy($sourcecid) {
 	}
 	if (!$samecourse) {
 		handleextoolcopy($sourcecid);
+		removeGrouplimits($newitems);
+	}
+}
+
+function removeGrouplimits(&$items) {
+	foreach ($items as $k=>$item) {
+		if (is_array($item)) {
+			$item['grouplimit'] = array();
+			removeGrouplimits($items[$k]['items']);
+		}
 	}
 }
 

@@ -54,9 +54,13 @@ class MatchingAnswerBox implements AnswerBox
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        if (!is_array($questions) || !is_array($answers)) {
-            throw new RuntimeException(_('Eeek!  $questions or $answers is not defined or needs to be an array'));
-            return;
+        if (!is_array($questions)) {
+          echo _('Eeek!  $questions is not defined or needs to be an array');
+          $questions = array();
+        }
+        if (!is_array($answers)) {
+          echo _('Eeek!  $answers is not defined or needs to be an array');
+          $answers = array();
         }
         if (isset($matchlist)) { $matchlist = array_map('trim',explode(',',$matchlist));}
     		if ($noshuffle=="questions" || $noshuffle=='all') {
@@ -122,7 +126,7 @@ class MatchingAnswerBox implements AnswerBox
     			} else {
     				$out .= '<li>';
     			}
-    			$out .= "<select name=\"qn$qn-$i\">";
+    			$out .= "<select name=\"qn$qn-$i\" id=\"qn$qn-$i\">";
     			$out .= '<option value="-" ';
     			if ($laval=='-' || strcmp($laval,'')==0) {
     				$out .= 'selected="1"';
@@ -146,7 +150,7 @@ class MatchingAnswerBox implements AnswerBox
     					$out .= ">$v</option>";
     				}
     			}
-    			$out .= "</select>&nbsp;{$questions[$randqkeys[$i]]}</li>\n";
+    			$out .= "</select>&nbsp;<label for=\"qn$qn-$i\">{$questions[$randqkeys[$i]]}</label></li>\n";
     		}
     		$out .= "</ul>\n";
     		$out .= "</div>";

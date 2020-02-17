@@ -14,6 +14,7 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#quartile">quartile</a></li>
 <li><a href="#TIquartile">TIquartile</a></li>
 <li><a href="#Excelquartile">Excelquartile</a></li>
+<li><a href="#Excelquartileexc">Excelquartileexc</a></li>
 <li><a href="#Nplus1quartile">Nplus1quartile</a></li>
 <li><a href="#allquartile">allquartile</a></li>
 <li><a href="#median">median</a></li>
@@ -90,7 +91,13 @@ TIquartile(array,quartile)
 <BR><h3><a name="Excelquartile">Excelquartile</a></h3>
 Excelquartile(array,quartile)
 <BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the Excel method.
+<BR>array of numbers.  Calculates using the Excel method, matching the older
+  QUARTILE function or the newer QUARTILE.INC function.
+<BR><h3><a name="Excelquartileexc">Excelquartileexc</a></h3>
+Excelquartileexc(array,quartile)
+<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+<BR>array of numbers.  Calculates using the Excel method, matching
+  QUARTILE.EXC function.
 <BR><h3><a name="Nplus1quartile">Nplus1quartile</a></h3>
 Nplus1quartile(array,quartile)
 <BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an

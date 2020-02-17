@@ -86,7 +86,7 @@ function deleteCourse($cid) {
 		$stm = $DBH->prepare("SELECT filename FROM imas_instr_files WHERE itemid=:itemid");
 		$stm->execute(array(':itemid'=>$ilid[0]));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if (substr($row[0],0,4)!='http') {
+			if (substr($row[0],0,4)!='http' && strpos($row[0], $cid.'/') === 0) {
 				$stm2 = $DBH->prepare("SELECT id FROM imas_instr_files WHERE filename=:filename");
 				$stm2->execute(array(':filename'=>$row[0]));
 				if ($stm2->rowCount()==1) {
@@ -102,16 +102,28 @@ function deleteCourse($cid) {
 	$stm->execute(array(':courseid'=>$cid));
 
 	//delete linked text files
-	$stm = $DBH->prepare("SELECT text,points,id FROM imas_linkedtext WHERE courseid=:courseid AND text LIKE 'file:%'");
+	$stm = $DBH->prepare("SELECT text,points,id,fileid FROM imas_linkedtext WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$stm2 = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
-		$stm2->execute(array(':text'=>$row[0]));
-		if ($stm2->rowCount()==1) {
-			//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
-			$filename = substr($row[0],5);
-			//unlink($uploaddir . $filename);
-			deletecoursefile($filename);
+		$fileid = $row[3];
+		if ($fileid > 0) { // has file id - can use that approach
+			$stm = $DBH->prepare("SELECT count(id) FROM imas_linkedtext WHERE fileid=?");
+			$stm->execute(array($fileid));
+			if ($stm->fetchColumn(0) == 1) { // only one use of this file
+				$filename = substr($row[0],5);
+				deletecoursefile($filename);
+				$stm = $DBH->prepare("DELETE FROM imas_linked_files WHERE id=?");
+				$stm->execute(array($fileid));
+			}
+		} else if (strpos($row[0], 'file:'.$cid.'/') === 0) { // if file is from this course
+			$stm2 = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
+			$stm2->execute(array(':text'=>$row[0]));
+			if ($stm2->rowCount()==1) {
+				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
+				$filename = substr($row[0],5);
+				//unlink($uploaddir . $filename);
+				deletecoursefile($filename);
+			}
 		}
 		if ($row[1]>0) {
 			$stm2 = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
