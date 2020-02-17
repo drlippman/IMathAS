@@ -224,6 +224,7 @@
     "show": "Verbleibende Zeit anzeigen"
   },
   "helps": {
+    "help": "Fragenhilfe",
     "message_instructor": "Nachricht an Dozent",
     "post_to_forum": "Im Forum schreiben",
     "video": "Video",

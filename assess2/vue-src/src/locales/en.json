@@ -238,6 +238,7 @@
     "show": "Show timelimit countdown"
   },
   "helps": {
+    "help": "Question Help",
     "message_instructor": "Message instructor",
     "post_to_forum": "Post to forum",
     "video": "Video",
