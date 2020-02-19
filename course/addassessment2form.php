@@ -728,9 +728,6 @@ $vueData = array(
     </div>
 	</div>
 </div>
-<!-- Preliminary -possibly remove when there is an agreed solution to translation problem -->
-<script src = "../i18n/i18n.min.js"></script>;
-<!-- End Preliminary -->
 <script type="text/javascript">
 var app = new Vue({
 	el: '#app',
