@@ -6,7 +6,7 @@ import messages from './locales/en.json';
 Vue.use(VueI18n);
 
 export const i18n = new VueI18n({
-  locale: 'en',
+  locale: 'de',
   fallbackLocale: 'en',
   messages: { en: messages },
   dateTimeFormats
