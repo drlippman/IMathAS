@@ -224,13 +224,13 @@
 				$qp = getasidquery($asid);
 				//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
-				$stm = $DBH->prepare("SELECT seeds,lti_sourcedid FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid");
+				$stm = $DBH->prepare("SELECT seeds,lti_sourcedid,userid FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
-				list($seeds, $ltisourcedid) = $stm->fetch(PDO::FETCH_NUM);
+				list($seeds, $ltisourcedid, $uid) = $stm->fetch(PDO::FETCH_NUM);
 				$seeds = explode(',', $seeds);
 				if (strlen($ltisourcedid)>1) {
 					require_once("../includes/ltioutcomes.php");
-					updateLTIgrade('update',$ltisourcedid,$aid,0);
+					updateLTIgrade('update',$ltisourcedid,$aid,$uid,0);
 				}
 
 
@@ -276,91 +276,95 @@
 		if (isset($_POST['clearq'])) { //postback
 			$qp = getasidquery($asid);
 			//$whereqry = getasidquery($_GET['asid']);
-			$query = "SELECT attempts,lastanswers,reattempting,scores,seeds,bestscores,bestattempts,bestlastanswers,bestseeds,lti_sourcedid ";
+			$query = "SELECT id,attempts,lastanswers,reattempting,scores,seeds,bestscores,bestattempts,bestlastanswers,bestseeds,lti_sourcedid,userid ";
 			$query .= "FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid ORDER BY id";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
-			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			$err = '';
+			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 
-			if (strpos($line['scores'],';')===false) {
-				$noraw = true;
-				$scores = explode(",",$line['scores']);
-				$bestscores = explode(",",$line['bestscores']);
-			} else {
-				$sp = explode(';',$line['scores']);
-				$scores = explode(',', $sp[0]);
-				$rawscores = explode(',', $sp[1]);
-				$sp = explode(';',$line['bestscores']);
-				$bestscores = explode(',', $sp[0]);
-				$bestrawscores = explode(',', $sp[1]);
-				$firstrawscores = explode(',', $sp[2]);
-				$noraw = false;
-			}
-
-			$attempts = explode(",",$line['attempts']);
-			$seeds = explode(",",$line['seeds']);
-			$lastanswers = explode("~",$line['lastanswers']);
-			$reattempting = explode(',',$line['reattempting']);
-			$bestattempts = explode(",",$line['bestattempts']);
-			$bestlastanswers = explode("~",$line['bestlastanswers']);
-			$bestseeds = explode(",",$line['bestseeds']);
-
-			$clearid = $_POST['clearq'];
-			if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
-				deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
-				$scores[$clearid] = -1;
-				$attempts[$clearid] = 0;
-				$lastanswers[$clearid] = '';
-				$bestscores[$clearid] = -1;
-				$bestattempts[$clearid] = 0;
-				$bestlastanswers[$clearid] = '';
-				if (!$noraw) {
-					$rawscores[$clearid] = -1;
-					$bestrawscores[$clearid] = -1;
-					$firstscores[$clearid] = -1;
-				}
-				if (isset($_POST['regen'])) {
-					$seeds[$clearid] = rand(1,9999);
-					$bestseeds[$clearid] = $seeds[$clearid];
-				}
-
-				$loc = array_search($clearid,$reattempting);
-				if ($loc!==false) {
-					array_splice($reattempting,$loc,1);
-				}
-
-				if (!$noraw) {
-					$scorelist = implode(",",$scores).';'.implode(",",$rawscores);
-					$bestscorelist = implode(',',$bestscores).';'.implode(",",$bestrawscores).';'.implode(",",$firstscores);
-				} else {
-					$scorelist = implode(",",$scores);
-					$bestscorelist = implode(',',$bestscores);
-				}
-				$attemptslist = implode(",",$attempts);
-				$seedlist = implode(",",$seeds);
-				$bestseedlist = implode(",",$bestseeds);
-				$lalist = implode("~",$lastanswers);
-
-				$bestattemptslist = implode(',',$bestattempts);
-				$bestlalist = implode('~',$bestlastanswers);
-				$reattemptinglist = implode(',',$reattempting);
-				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,seeds=:seeds,";
-				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestlastanswers=:bestlastanswers,bestseeds=:bestseeds,reattempting=:reattempting ";
-				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid ";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':seeds'=>$seedlist,
-					':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':bestseeds'=>$bestseedlist, ':reattempting'=>$reattemptinglist));
-				if (strlen($line['lti_sourcedid'])>1) {
-					require_once("../includes/ltioutcomes.php");
-					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores,true);
-				}
-
-				header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
-			} else {
-				echo "$clearid";
-				print_r($scores);
-				echo "<p>Error.  Try again.</p>";
-			}
+        if (strpos($line['scores'],';')===false) {
+          $noraw = true;
+          $scores = explode(",",$line['scores']);
+          $bestscores = explode(",",$line['bestscores']);
+        } else {
+          $sp = explode(';',$line['scores']);
+          $scores = explode(',', $sp[0]);
+          $rawscores = explode(',', $sp[1]);
+          $sp = explode(';',$line['bestscores']);
+          $bestscores = explode(',', $sp[0]);
+          $bestrawscores = explode(',', $sp[1]);
+          $firstrawscores = explode(',', $sp[2]);
+          $noraw = false;
+        }
+  
+        $attempts = explode(",",$line['attempts']);
+        $seeds = explode(",",$line['seeds']);
+        $lastanswers = explode("~",$line['lastanswers']);
+        $reattempting = explode(',',$line['reattempting']);
+        $bestattempts = explode(",",$line['bestattempts']);
+        $bestlastanswers = explode("~",$line['bestlastanswers']);
+        $bestseeds = explode(",",$line['bestseeds']);
+  
+        $clearid = $_POST['clearq'];
+        if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
+          deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
+          $scores[$clearid] = -1;
+          $attempts[$clearid] = 0;
+          $lastanswers[$clearid] = '';
+          $bestscores[$clearid] = -1;
+          $bestattempts[$clearid] = 0;
+          $bestlastanswers[$clearid] = '';
+          if (!$noraw) {
+            $rawscores[$clearid] = -1;
+            $bestrawscores[$clearid] = -1;
+            $firstscores[$clearid] = -1;
+          }
+          if (isset($_POST['regen'])) {
+            $seeds[$clearid] = rand(1,9999);
+            $bestseeds[$clearid] = $seeds[$clearid];
+          }
+  
+          $loc = array_search($clearid,$reattempting);
+          if ($loc!==false) {
+            array_splice($reattempting,$loc,1);
+          }
+  
+          if (!$noraw) {
+            $scorelist = implode(",",$scores).';'.implode(",",$rawscores);
+            $bestscorelist = implode(',',$bestscores).';'.implode(",",$bestrawscores).';'.implode(",",$firstscores);
+          } else {
+            $scorelist = implode(",",$scores);
+            $bestscorelist = implode(',',$bestscores);
+          }
+          $attemptslist = implode(",",$attempts);
+          $seedlist = implode(",",$seeds);
+          $bestseedlist = implode(",",$bestseeds);
+          $lalist = implode("~",$lastanswers);
+  
+          $bestattemptslist = implode(',',$bestattempts);
+          $bestlalist = implode('~',$bestlastanswers);
+          $reattemptinglist = implode(',',$reattempting);
+          $query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,seeds=:seeds,";
+          $query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestlastanswers=:bestlastanswers,bestseeds=:bestseeds,reattempting=:reattempting ";
+          $query .= "WHERE id=:id";
+          $stm = $DBH->prepare($query);
+          $stm->execute(array(':id'=>$line['id'], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':seeds'=>$seedlist,
+            ':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':bestseeds'=>$bestseedlist, ':reattempting'=>$reattemptinglist));
+          if (strlen($line['lti_sourcedid'])>1) {
+            require_once("../includes/ltioutcomes.php");
+            calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$bestscores,true);
+          }
+        } else {
+          echo "$clearid";
+          print_r($scores);
+          $err = "<p>Error.  Try again.</p>";
+        }
+      }
+      if ($err == '') {
+        header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
+        exit;
+      }
 			//unset($_GET['asid']);
 			unset($_GET['clearq']);
 
@@ -467,14 +471,14 @@
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedbackout, ':id'=>$asid));
 				}
-				$stm = $DBH->prepare("SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id=:id");
+				$stm = $DBH->prepare("SELECT assessmentid,lti_sourcedid,userid FROM imas_assessment_sessions WHERE id=:id");
 				$stm->execute(array(':id'=>$asid));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				$aid = $row[0];
 				if (strlen($row[1])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
-					calcandupdateLTIgrade($row[1],$row[0],$scores,true);
+					calcandupdateLTIgrade($row[1],$row[0],$row[2],$scores,true);
 				}
 			} else {
 				echo "No authority to change scores.";

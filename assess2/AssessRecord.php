@@ -1070,6 +1070,10 @@ class AssessRecord
       $lastvernum = count($this->data['assess_versions']) - 1;
       $lastver = $this->data['assess_versions'][$lastvernum];
       $returnVal = $lastver['timelimit_end'];
+      $enddate = $this->assess_info->getSetting('enddate');
+      if ($returnVal > $enddate) {
+        $returnVal = $enddate;
+      }
     }
     if ($currently_practice) {
       $this->setInPractice(true);
@@ -1087,8 +1091,13 @@ class AssessRecord
     if ($exp === false) {
       return false;
     }
+    $enddate = $this->assess_info->getSetting('enddate');
     if ($this->assess_info->getSetting('timelimit_type') == 'allow_overtime') {
-      return $exp + $this->assess_info->getAdjustedTimelimitGrace();
+      $returnVal = $exp + $this->assess_info->getAdjustedTimelimitGrace();
+      if ($returnVal > $enddate) {
+        $returnVal = $enddate;
+      }
+      return $returnVal;
     } else {
       return 0;
     }

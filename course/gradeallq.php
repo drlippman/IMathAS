@@ -197,7 +197,7 @@
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
-					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$scores,true);
+					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$scores,true);
 				}
 			}
 		}

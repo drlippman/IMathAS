@@ -1,7 +1,7 @@
 <template>
   <ul class="helplist">
     <li>
-      Question Help:
+      {{ $t('helps.help') }}:
     </li>
     <li v-for="(qHelp,idx) in qHelps" :key="idx">
       <a href="#" @click.prevent="loadHelp(qHelp)">

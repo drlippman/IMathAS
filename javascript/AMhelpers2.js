@@ -227,6 +227,10 @@ function setupTips(id, tip, longtip) {
   });
 }
 
+function clearTips() {
+  hideAllEhTips();
+}
+
 function initqsclickchange() {
 	$('input[id^=qs][value=spec]').each(function(i,qsel) {
 		$(qsel).siblings('input[type=text]').off('keyup.qsclickchange')
@@ -1669,6 +1673,7 @@ return {
   preSubmitString: preSubmitString,
   clearLivePreviewTimeouts: clearLivePreviewTimeouts,
   syntaxCheckMQ: syntaxCheckMQ,
+  clearTips: clearTips,
   handleMQenter: handleMQenter
 };
 

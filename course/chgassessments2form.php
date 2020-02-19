@@ -687,7 +687,7 @@ $vueData = array(
 
 var app = new Vue({
 	el: '#app',
-  data: <?php echo json_encode($vueData); ?>,
+  data: '<?php echo json_encode($vueData); ?>',
 	computed: {
 		coreSet: function() {
 			let tot = (this.subtype === 'DNC' ? 0 : 1) +
@@ -728,23 +728,23 @@ var app = new Vue({
 		showscoresOptions: function() {
 			var nochange = {
 				'value': 'DNC',
-				'text': <?php echo _('Do not change'); ?>
+				'text': '<?php echo _('Do not change'); ?>'
 			};
 			var during = {
 				'value': 'during',
-				'text': <?php echo _('On each question immediately'); ?>
+				'text': '<?php echo _('On each question immediately'); ?>'
 			};
 			var at_end = {
 				'value': 'at_end',
-				'text': <?php echo _('At the end of the assessment'); ?>
+				'text': '<?php echo _('At the end of the assessment'); ?>'
 			};
 			var total = {
 				'value': 'total',
-				'text': <?php echo _('Total score only at the end'); ?>
+				'text': '<?php echo _('Total score only at the end'); ?>'
 			};
 			var none = {
 				'value': 'none',
-				'text': <?php echo _('No scores at all'); ?>
+				'text': '<?php echo _('No scores at all'); ?>'
 			};
 
 			var out = [];
@@ -771,11 +771,11 @@ var app = new Vue({
 
 			var never = {
 				'value': 'never',
-				'text': <?php echo _('Never'); ?>
+				'text': '<?php echo _('Never'); ?>'
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': <?php echo _('Show with the score'); ?>
+				'text': '<?php echo _('Show with the score'); ?>'
 			};
 
 			var out = [];
@@ -787,7 +787,7 @@ var app = new Vue({
 				out = [
 					{
 						'value': 'after_lastattempt',
-						'text': <?php echo _('After the last try on a question'); ?>
+						'text': '<?php echo _('After the last try on a question'); ?>'
 					},
 					never
 				];
@@ -795,7 +795,7 @@ var app = new Vue({
 					out.push({
 						'value': 'after_'+i,
 						'text': i>1 ? '<?php echo _('After %d tries');?>'.replace(/%d/, i) :
-													<?php echo _('After 1 try'); ?>
+													'<?php echo _('After 1 try'); ?>'
 					});
 				}
 			} else if (this.showscores == 'at_end') {
@@ -803,7 +803,7 @@ var app = new Vue({
 				out = [
 					{
 						'value': 'after_take',
-						'text': <?php echo _('After the assessment version is submitted'); ?>
+						'text': '<?php echo _('After the assessment version is submitted'); ?>'
 					},
 					never
 				];
@@ -825,26 +825,26 @@ var app = new Vue({
 			var out = [
 				{
 					'value': 'after_due',
-					'text': <?php echo _('After the due date'); ?>
+					'text': '<?php echo _('After the due date'); ?>'
 				},
 				{
 					'value': 'immediately',
-					'text': <?php echo _('Immediately - they can always view it'); ?>
+					'text': '<?php echo _('Immediately - they can always view it'); ?>'
 				},
 				{
 					'value': 'never',
-					'text': <?php echo _('Never'); ?>
+					'text': '<?php echo _('Never'); ?>'
 				}
 			];
 			if (this.subtype == 'by_assessment') {
 				out.unshift({
 					'value': 'after_take',
-					'text': <?php echo _('After the assessment version is submitted'); ?>
+					'text': '<?php echo _('After the assessment version is submitted'); ?>'
 				})
 			}
 			out.unshift({
 				'value': 'DNC',
-				'text': <?php echo _('Do not change'); ?>
+				'text': '<?php echo _('Do not change'); ?>'
 			});
 			if (!this.valueInOptions(out, this.viewingb)) {
 				this.viewingb = out[0].value;
@@ -871,11 +871,11 @@ var app = new Vue({
 			var out = [
 				{
 					'value': 'after_due',
-					'text': <?php echo _('After the due date'); ?>
+					'text': '<?php echo _('After the due date'); ?>'
 				},
 				{
 					'value': 'never',
-					'text': <?php echo _('Never'); ?>
+					'text': '<?php echo _('Never'); ?>'
 				}
 			];
 			if (this.showscores !== 'during' && this.showscores !== 'at_end' &&
@@ -883,26 +883,26 @@ var app = new Vue({
 			) {
 				out.unshift({
 					'value': 'after_take',
-					'text': <?php echo _('After the assessment version is submitted'); ?>
+					'text': '<?php echo _('After the assessment version is submitted'); ?>'
 				});
 			}
 
 			if (this.showscores == 'during' && this.subtype == 'by_question') {
 				out = [{
 					'value': 'immediately',
-					'text': <?php echo _('Immediately'); ?>
+					'text': '<?php echo _('Immediately'); ?>'
 				}];
 			} else if (this.showscores == 'at_end' ||
 					(this.showscores == 'during' && this.subtype == 'by_assessment')
 			) {
 				out = [{
 					'value': 'after_take',
-					'text': <?php echo _('After the assessment version is submitted'); ?>
+					'text': '<?php echo _('After the assessment version is submitted'); ?>'
 				}];
 			}
 			out.unshift({
 				'value': 'DNC',
-				'text': <?php echo _('Do not change'); ?>
+				'text': '<?php echo _('Do not change'); ?>'
 			});
 			if (!this.valueInOptions(out, this.scoresingb)) {
 				this.scoresingb = out[0].value;
@@ -923,11 +923,11 @@ var app = new Vue({
  				var out = [
  					{
  						'value': 'after_due',
- 						'text': <?php echo _('After the due date'); ?>
+ 						'text': '<?php echo _('After the due date'); ?>'
  					},
  					{
  						'value': 'never',
- 						'text': <?php echo _('Never'); ?>
+ 						'text': '<?php echo _('Never'); ?>'
  					}
  				];
  				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
@@ -935,12 +935,12 @@ var app = new Vue({
 				) {
  					out.unshift({
  						'value': 'after_take',
- 						'text': <?php echo _('After the assessment version is submitted'); ?>
+ 						'text': '<?php echo _('After the assessment version is submitted'); ?>'
  					});
  				}
 				out.unshift({
 					'value': 'DNC',
-					'text': <?php echo _('Do not change'); ?>
+					'text': '<?php echo _('Do not change'); ?>'
 				});
 				if (!this.valueInOptions(out, this.ansingb)) {
 					this.ansingb = out[0].value;

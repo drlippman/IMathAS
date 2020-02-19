@@ -323,7 +323,7 @@ function gbinstrdisp() {
 					if ($gbt[$i][0][0]=='Averages') {
 						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
 					} else {
-						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
+						echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}&from=gbtesting\">";
 					}
 				}
 				if (isset($gbt[$i][1][$j][0])) {
