@@ -520,3 +520,7 @@ ul#headermobilemenulist li a:focus {
 button#timerbox {
   color: black;
 }
+
+button#timerbox:focus {
+	background-color: #e0ffff;
+}
