@@ -145,7 +145,7 @@ $vueData = array(
 			<input type=text size=10 name="edate" v-model="edate">
 			<a href="#" onClick="displayDatePicker('edate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></a>
-			at <input type=text size=8 name=etime v-model="etime">
+			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime">
 		</span><br class="form"/>
 	</div>
 	<div v-show="avail==1 && datesbylti>0">
@@ -212,7 +212,7 @@ $vueData = array(
 					<option value="full"><?php echo _('All questions at once, or in pages');?></option>
 					<option value="video_cued"><?php echo _('Video Cued');?></option>
 					<?php if (isset($CFG['GEN']['livepollserver'])) {
-						echo '<option value="livepoll">Live Poll</option>';
+						echo '<option value="livepoll">',_('Live Poll'),'</option>';
 					}?>
 				</select>
 				<a href="#" id="dispdetails" @click.prevent="doShowDisplayDialog"><?php echo _('Details');?></a>
@@ -728,6 +728,7 @@ $vueData = array(
     </div>
 	</div>
 </div>
+
 <script type="text/javascript">
 var app = new Vue({
 	el: '#app',
