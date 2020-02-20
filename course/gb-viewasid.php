@@ -134,15 +134,15 @@
 	//PROCESS ANY TODOS
 	if (isset($_REQUEST['clearattempt']) && $isteacher) {
 		if (isset($_POST['clearattempt']) && $_POST['clearattempt']=='confirmed') {
-			$query = "SELECT ias.assessmentid,ias.lti_sourcedid FROM imas_assessment_sessions AS ias ";
+			$query = "SELECT ias.assessmentid,ias.lti_sourcedid,ias.userid FROM imas_assessment_sessions AS ias ";
 			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id=:id AND ia.courseid=:courseid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$asid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
-				list($aid, $ltisourcedid) = $stm->fetch(PDO::FETCH_NUM);
+				list($aid, $ltisourcedid, $uid) = $stm->fetch(PDO::FETCH_NUM);
 				if (strlen($ltisourcedid)>1) {
 					require_once("../includes/ltioutcomes.php");
-					updateLTIgrade('delete',$ltisourcedid,$aid);
+					updateLTIgrade('delete',$ltisourcedid,$aid,$uid);
 				}
 
 				$qp = getasidquery($asid);
@@ -297,7 +297,7 @@
           $firstrawscores = explode(',', $sp[2]);
           $noraw = false;
         }
-  
+
         $attempts = explode(",",$line['attempts']);
         $seeds = explode(",",$line['seeds']);
         $lastanswers = explode("~",$line['lastanswers']);
@@ -305,7 +305,7 @@
         $bestattempts = explode(",",$line['bestattempts']);
         $bestlastanswers = explode("~",$line['bestlastanswers']);
         $bestseeds = explode(",",$line['bestseeds']);
-  
+
         $clearid = $_POST['clearq'];
         if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
           deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
@@ -324,12 +324,12 @@
             $seeds[$clearid] = rand(1,9999);
             $bestseeds[$clearid] = $seeds[$clearid];
           }
-  
+
           $loc = array_search($clearid,$reattempting);
           if ($loc!==false) {
             array_splice($reattempting,$loc,1);
           }
-  
+
           if (!$noraw) {
             $scorelist = implode(",",$scores).';'.implode(",",$rawscores);
             $bestscorelist = implode(',',$bestscores).';'.implode(",",$bestrawscores).';'.implode(",",$firstscores);
@@ -341,7 +341,7 @@
           $seedlist = implode(",",$seeds);
           $bestseedlist = implode(",",$bestseeds);
           $lalist = implode("~",$lastanswers);
-  
+
           $bestattemptslist = implode(',',$bestattempts);
           $bestlalist = implode('~',$bestlastanswers);
           $reattemptinglist = implode(',',$reattempting);
