@@ -181,7 +181,7 @@ export default {
       if (this.aInfo.has_password) {
         // hacky fix for when the password is entered programatically
         let v = document.getElementById('password');
-        if (v && v.value != this.password) {
+        if (v && v.value !== this.password) {
           this.password = v.value;
         }
       }

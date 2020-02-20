@@ -90,7 +90,7 @@ export default {
         return 'neutral';
       }
       if (this.qdata.singlescore) {
-        if (this.qdata.rawscore > .99) {
+        if (this.qdata.rawscore > 0.99) {
           return 'correct';
         } else if (this.qdata.rawscore < 0.01) {
           return 'incorrect';
