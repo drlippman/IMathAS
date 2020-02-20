@@ -887,13 +887,14 @@ export const actions = {
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
     }
-    if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0) {
+    if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0
+      && data.enddate_in < 20*24*60*60 // over 20 days causes int overlow
+    ) {
       clearTimeout(store.enddate_timer);
       let now = new Date().getTime();
       let dueat = data.enddate_in * 1000;
       data['enddate_local'] = now + dueat;
       store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
-      // TODO: implement handleDueDate
     }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
