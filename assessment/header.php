@@ -249,7 +249,7 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 			</style><![endif]-->';
 	}
 	//This bundles mathquill.js, mathquilled.js, and AMtoMQ.js
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/MQbundle_min.js?v=071916\"></script>";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/MQbundle_min.js?v=021920\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 }
 

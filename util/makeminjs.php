@@ -32,7 +32,7 @@ function httpPost($url, $data)
 	        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
 	        'method'  => 'POST',
 	        'content' => http_build_query($data)
-	    ), 
+	    ),
 	    'ssl' => array(
 	    	    'verify_peer' => $ishttps,
 	    ),
@@ -43,7 +43,7 @@ function httpPost($url, $data)
 }
 
 //build assessment javascript min file
-$g = minify(file_get_contents("../javascript/general.js"));	
+$g = minify(file_get_contents("../javascript/general.js"));
 $m = minify(file_get_contents("../javascript/mathjs.js"));
 $a = minify(file_get_contents("../javascript/AMhelpers.js"));
 $c = minify(file_get_contents("../javascript/confirmsubmit.js"));
@@ -60,7 +60,7 @@ echo "Wrote assessment_min<br>";
 
 $mc = file_get_contents("../javascript/mathquill.js")."\n";
 $me = file_get_contents("../javascript/mathquilled.js")."\n";
-$ma = file_get_contents("../javascript/AMtoMQ.js")."\n";
+$ma = file_get_contents("../mathquill/AMtoMQ.js")."\n";
 
 if (trim($mc)=='' || trim($me)=='' || trim($ma)=='') {
 	echo "One or minimizations failed";

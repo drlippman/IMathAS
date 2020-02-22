@@ -282,7 +282,6 @@ import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
 import GbFeedback from '@/gbviewassess/GbFeedback.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import TinymceInput from '@/components/TinymceInput.vue';
 import '../assess2.css';
 
 export default {
@@ -294,7 +293,6 @@ export default {
     GbClearAttempts,
     SummaryCategories,
     ErrorDialog,
-    TinymceInput,
     GbFeedback,
     ConfirmDialog
   },
@@ -467,7 +465,7 @@ export default {
   methods: {
     changeAssessVersion (val) {
       if (val === store.curAver) {
-        return;  // not a change - abort
+        return; // not a change - abort
       }
       if (Object.keys(store.scoreOverrides).length > 0 ||
         Object.keys(store.feedbacks).length > 0
@@ -479,7 +477,6 @@ export default {
       } else {
         this.doChangeAssessVersion(val);
       }
-
     },
     doChangeAssessVersion (val) {
       if (val !== store.curAver) {
@@ -493,7 +490,7 @@ export default {
     },
     changeQuestionVersion (qn, val) {
       if (val === store.curQver[qn]) {
-        return;  // same value - abort
+        return; // same value - abort
       }
       let hasUnsaved = false;
       let regex = new RegExp('^' + store.curAver + '-' + qn + '-');

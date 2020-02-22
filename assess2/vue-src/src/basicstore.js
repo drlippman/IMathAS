@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from './router';
-import { i18n } from './i18n';
 
 export const store = Vue.observable({
   assessInfo: null,
@@ -242,7 +241,7 @@ export const actions = {
             this.submitQuestion(qns, true);
           }
         }
-      }
+      };
     }
   },
   submitQuestion (qns, endattempt, timeactive, partnum) {
@@ -887,22 +886,23 @@ export const actions = {
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
     }
-    if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0) {
+    if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0 &&
+      data.enddate_in < 20 * 24 * 60 * 60 // over 20 days causes int overlow
+    ) {
       clearTimeout(store.enddate_timer);
       let now = new Date().getTime();
       let dueat = data.enddate_in * 1000;
       data['enddate_local'] = now + dueat;
       store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
-      // TODO: implement handleDueDate
     }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
       clearTimeout(store.enddate_timer); // no need for it w timelimit timer
       let now = new Date().getTime();
       if (data.hasOwnProperty('timelimit_expires')) {
-        if (data.timelimit_expires == data.enddate) {
+        if (data.timelimit_expires === data.enddate) {
           store.timelimit_restricted = 1;
-        } else if (data.timelimit_grace == data.enddate) {
+        } else if (data.timelimit_grace === data.enddate) {
           store.timelimit_restricted = 2;
         }
       }

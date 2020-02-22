@@ -750,7 +750,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       }
 
 			$outcomeOptions = array();
-      if ($i>0) {//there were outcomes
+      if (count($page_outcomes)>0) {//there were outcomes
           $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
           $stm->execute(array(':id'=>$cid));
           $outcomearr = unserialize($stm->fetchColumn(0));
@@ -761,15 +761,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                   if (is_array($v)) { //outcome group
 										$outcomeOptions[] = array(
 											'value' => '',
-											'label' => $v['name'],
-											'isgroup' => true  //hacky
+											'text' => $v['name'],
+											'isgroup' => true 
 										);
                     flattenarr($v['outcomes']);
                   } else {
 										$outcomeOptions[] = array(
 											'value' => $v,
-											'label' => $page_outcomes[$v],
-											'isgroup' => true  //hacky
+											'text' => $page_outcomes[$v],
+											'isgroup' => false
 										);
                   }
               }
