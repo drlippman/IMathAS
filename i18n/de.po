@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-14 21:19+0100\n"
-"PO-Revision-Date: 2020-02-21 18:51+0100\n"
+"POT-Creation-Date: 2020-02-22 00:29+0100\n"
+"PO-Revision-Date: 2020-02-22 00:48+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: assessment/showtest.php:2311 assessment/showtest.php:2653
 #: assessment/showtest.php:2740 assessment/showtest.php:2942 forms.php:114
 #: forms.php:393 forms.php:409 forms.php:430 javascript/livepoll.js:123
-#: multiembedq.php:188 multiembedq.php:284
+#: multiembedq.php:188 multiembedq.php:284 admin/forms.php:1211
 msgid "Submit"
 msgstr "Absenden"
 
@@ -216,7 +216,7 @@ msgstr "Wie möchten Sie diesen Kurs beginnen?"
 msgid "Start with a blank course"
 msgstr "Mit einem leeren Kurs beginnen"
 
-#: admin/addcourse.php:50 course/copyitems.php:646
+#: admin/addcourse.php:50 course/copyitems.php:646 course/copyitems.php:647
 msgid "Copy a template or promoted course"
 msgstr "Einen Template-Kurs oder einen veröffentlichten Kurs kopieren"
 
@@ -267,34 +267,34 @@ msgid "Guest"
 msgstr "Gast"
 
 #: admin/admin2.php:11 admin/groupreportdetails.php:10 admin/userdetails.php:10
-#: course/course.php:694 msgs/msglist.php:351 admin/userreportdetails.php:11
-#: admin/userreports.php:11
+#: admin/userreportdetails.php:11 admin/userreports.php:11
+#: course/course.php:694 msgs/msglist.php:351
 msgid "Student"
 msgstr "Student"
 
 #: admin/admin2.php:12 admin/groupreportdetails.php:11 admin/userdetails.php:11
-#: admin/userreportdetails.php:12 admin/userreports.php:12
-#: util/listnewteachers.php:60
+#: admin/userreports.php:12 util/listnewteachers.php:60
+#: admin/userreportdetails.php:12
 msgid "Pending"
 msgstr "Ausstehend"
 
 #: admin/admin2.php:13 admin/groupreportdetails.php:12 admin/userdetails.php:12
-#: admin/userreportdetails.php:13 admin/userreports.php:13
+#: admin/userreports.php:13 admin/userreportdetails.php:13
 msgid "Tutor/TA/Proctor"
 msgstr "Tutor/Assistent"
 
 #: admin/admin2.php:14 admin/groupreportdetails.php:13 admin/userdetails.php:13
-#: admin/userreportdetails.php:14 admin/userreports.php:14
+#: admin/userreports.php:14 admin/userreportdetails.php:14
 msgid "Teacher"
 msgstr "Lehrer"
 
 #: admin/admin2.php:15 admin/groupreportdetails.php:14 admin/userdetails.php:14
-#: admin/userreportdetails.php:15 admin/userreports.php:15
+#: admin/userreports.php:15 admin/userreportdetails.php:15
 msgid "LimCourseCreator"
 msgstr "Kurseigentümer"
 
 #: admin/admin2.php:16 admin/groupreportdetails.php:15 admin/userdetails.php:15
-#: admin/userreportdetails.php:16 admin/userreports.php:16
+#: admin/userreports.php:16 admin/userreportdetails.php:16
 msgid "GroupAdmin"
 msgstr "Gruppen-Administrator"
 
@@ -388,7 +388,7 @@ msgstr "Benutzername"
 #: admin/admin2.php:195 admin/admin2.php:287 admin/groupreportdetails.php:225
 #: admin/userdetails.php:193 admin/userreportdetails.php:275
 #: admin/userreports.php:157 admin/userreports.php:223 course/gradebook.php:683
-#: course/gradebook.php:687 course/listusers.php:752 forms.php:421
+#: forms.php:421 course/gradebook.php:687 course/listusers.php:752
 msgid "Email"
 msgstr "E-Mail"
 
@@ -627,7 +627,7 @@ msgstr ""
 
 #: admin/forms.php:886
 msgid "Send teachers a message when students enroll"
-msgstr "Lehrer benachrichtigen, wenn sich ein Student einschreibt"
+msgstr "Nachricht an Dozent schicken, wenn sich ein Student einschreibt"
 
 #: admin/forms.php:889
 msgid "Send"
@@ -704,6 +704,8 @@ msgstr "Kursvorgänger"
 #: course/addassessment2form.php:886 course/addassessment2form.php:934
 #: course/chgassessments2form.php:774 course/chgassessments2form.php:836
 #: course/chgassessments2form.php:878 course/chgassessments2form.php:930
+#: course/addassessment2form.php:779 course/addassessment2form.php:845
+#: course/addassessment2form.php:884 course/addassessment2form.php:932
 msgid "Never"
 msgstr "Niemals"
 
@@ -792,7 +794,7 @@ msgstr "Neue Diagnostik hinzufügen"
 msgid "No Diagnostics to display"
 msgstr "Keine Diagnostik anzuzeigen"
 
-#: admin/listdiag.php:121
+#: admin/listdiag.php:121 admin/forms.php:728
 msgid "Available"
 msgstr "Verfügbar"
 
@@ -899,8 +901,8 @@ msgstr ""
 #: course/course.php:719 course/editsnippets.php:227
 #: course/editsnippets.php:255 course/exception.php:188
 #: course/gbsettings.php:402 course/gradebook.php:734 course/gradebook.php:1293
-#: course/managecalitems.php:161 course/latepasses.php:175
-#: course/managecalitems.php:133 course/masschgdates.php:404 forms.php:481
+#: course/latepasses.php:175 course/masschgdates.php:404 forms.php:481
+#: course/managecalitems.php:133 course/managecalitems.php:161
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -973,27 +975,27 @@ msgid "Deleted"
 msgstr "Gelöscht"
 
 #: admin/userdetails.php:84 admin/userdetails.php:109 admin/userdetails.php:135
-#: admin/userreportdetails.php:107 admin/userreportdetails.php:197
-#: admin/userreportdetails.php:223
+#: admin/userreportdetails.php:197 admin/forms.php:731
+#: admin/userreportdetails.php:223 admin/userreportdetails.php:107
 msgid "Available to students"
 msgstr "Für Studierende verfügbar"
 
 #: admin/userdetails.php:84 admin/userdetails.php:109 admin/userdetails.php:135
-#: admin/userreportdetails.php:107 admin/userreportdetails.php:197
-#: admin/userreportdetails.php:223
+#: admin/userreportdetails.php:197 admin/userreportdetails.php:223
+#: admin/userreportdetails.php:107
 msgid "Hidden from students"
 msgstr "Für Studierende unsichtbar"
 
 #: admin/userdetails.php:86 admin/userdetails.php:113 admin/userdetails.php:139
-#: admin/userreportdetails.php:109 admin/userreportdetails.php:201
-#: admin/userreportdetails.php:227
+#: admin/userreportdetails.php:201 admin/userreportdetails.php:227
+#: admin/userreportdetails.php:109
 msgid "Locked for Assessment"
 msgstr "Gesperrter Test"
 
 #: admin/userdetails.php:89 admin/userdetails.php:116 admin/userdetails.php:142
-#: admin/userdetails.php:379 admin/userreportdetails.php:112
-#: admin/userreportdetails.php:204 admin/userreportdetails.php:502
-#: admin/userreportdetails.php:230
+#: admin/userreportdetails.php:112 admin/userreportdetails.php:502
+#: admin/userreportdetails.php:230 admin/userdetails.php:379
+#: admin/userreportdetails.php:204
 msgid "Hidden on User's Home Page"
 msgstr "Auf er Startseite des Benutzers ausgeblendet"
 
@@ -1180,7 +1182,7 @@ msgstr "Neu beantragte Dozenten-Kennungen"
 
 #: assess2/AssessInfo.php:510 assessment/showtest.php:3283
 #: course/addassessment.php:1223 course/chgassessments.php:908
-#: course/addassessment2form.php:494
+#: course/addassessment2form.php:494 assess2/AssessInfo.php:511
 msgid "points"
 msgstr "Punkte"
 
@@ -1229,12 +1231,12 @@ msgstr "Musterlösung"
 
 #: assess2/displayq3.php:451 assess2/displayq3.php:488
 #: assess2/questions/QuestionHtmlGenerator.php:514 assessment/displayq2.php:493
-#: assessment/testutil.php:819 assessment/displayq2.php:533
-#: assessment/testutil.php:916 assessment/showtest.php:2993
-#: assessment/showtest.php:3052 assessment/showtest.php:3598
-#: assessment/showtest.php:3716 assessment/testutil.php:918
-#: javascript/livepoll.js:418 assess2/questions/QuestionHtmlGenerator.php:516
-#: assessment/showtest.php:3054 assessment/showtest.php:3587
+#: assessment/displayq2.php:533 assessment/showtest.php:2993
+#: assessment/showtest.php:3598 assessment/testutil.php:918
+#: assess2/questions/QuestionHtmlGenerator.php:516 assessment/showtest.php:3054
+#: assessment/showtest.php:3587 assessment/showtest.php:3052
+#: assessment/showtest.php:3716 assessment/testutil.php:819
+#: assessment/testutil.php:916 javascript/livepoll.js:418
 msgid "Question"
 msgstr "Frage"
 
@@ -2206,6 +2208,7 @@ msgstr "Fehler beim Hochladen der Datei"
 #: javascript/AMhelpers2.js:1406 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
 #: assess2/questions/answerboxhelpers.php:148 assessment/displayq2.php:7711
+#: javascript/AMhelpers2.js:1410
 msgid "error - more than 1 i in expression"
 msgstr "Fehler - mehr als ein i im Ausdruck"
 
@@ -2231,7 +2234,9 @@ msgstr "Fehler - mehr als ein i im Ausdruck"
 #: assess2/questions/answerboxhelpers.php:200
 #: assess2/questions/answerboxhelpers.php:210 assessment/displayq2.php:7733
 #: assessment/displayq2.php:7749 assessment/displayq2.php:7763
-#: assessment/displayq2.php:7773
+#: assessment/displayq2.php:7773 javascript/AMhelpers2.js:1431
+#: javascript/AMhelpers2.js:1447 javascript/AMhelpers2.js:1458
+#: javascript/AMhelpers2.js:1469
 msgid "error - invalid form"
 msgstr "Fehler - ungültige Form"
 
@@ -2653,6 +2658,7 @@ msgid "Diagnostic Gradebook"
 msgstr "Diagnostik-Punkteübersicht"
 
 #: assess2/gbviewassess.php:91 course/gb-viewasid.php:579
+#: course/gb-viewasid.php:583
 msgid "Assessment Detail"
 msgstr "Test-Details"
 
@@ -3224,7 +3230,7 @@ msgstr "Fällig in unter "
 msgid "Due in "
 msgstr "Fällig in "
 
-#: assessment/showtest.php:1483 course/exportcalfeed.php:36
+#: assessment/showtest.php:1483 course/exportcalfeed.php:36 admin/forms.php:882
 msgid "hours"
 msgstr "Stunden"
 
@@ -3247,14 +3253,14 @@ msgstr "Stunde"
 #: assessment/showtest.php:1523 assessment/showtest.php:1530
 #: course/courseshowitems.php:859 course/courseshowitems.php:866
 #: course/drillassess.php:233 course/gradebook.php:824 course/gradebook.php:831
-#: course/treereader.php:395 course/treereader.php:402
+#: course/treereader.php:402 course/treereader.php:395
 msgid "minute"
 msgstr "Minute"
 
 #: assessment/showtest.php:1525 assessment/showtest.php:1532
 #: course/courseshowitems.php:861 course/courseshowitems.php:868
 #: course/drillassess.php:236 course/gradebook.php:826 course/gradebook.php:833
-#: course/treereader.php:397 course/treereader.php:404
+#: course/treereader.php:404 course/treereader.php:397
 msgid "second"
 msgstr "Sekunde"
 
@@ -4179,11 +4185,11 @@ msgstr "Zeige vor dem Start- und nach dem End-Datum ausgegraut"
 msgid "Create Forum"
 msgstr "Forum anlegen"
 
-#: course/addgrades.php:66
+#: course/addgrades.php:66 course/addgrades.php:71
 msgid "Delete Item"
 msgstr "Element löschen"
 
-#: course/addgrades.php:622
+#: course/addgrades.php:622 course/addgrades.php:634
 msgid "Use Quicksearch Entry"
 msgstr "Verwende Schnellsuche"
 
@@ -4418,15 +4424,15 @@ msgstr "Los"
 msgid "Convert All Assessments in Course"
 msgstr "Alle Tests im Kurs konvertieren"
 
-#: course/copyitems.php:648
+#: course/copyitems.php:648 course/copyitems.php:649
 msgid "Browse Courses"
 msgstr "Kursübersicht"
 
-#: course/copyitems.php:654
+#: course/copyitems.php:654 course/copyitems.php:655
 msgid "Or, select from the course list below"
 msgstr "Oder wählen Sie aus der untenstehenden Kursliste"
 
-#: course/copyitems.php:656
+#: course/copyitems.php:656 course/copyitems.php:657
 msgid "Course List"
 msgstr "Kursliste"
 
@@ -4507,6 +4513,7 @@ msgstr "Neu"
 
 #: course/course.php:504 course/course.php:578 course/courseshowitems.php:1872
 #: course/exportcalfeed.php:59 course/moveitem.php:156 header.php:280
+#: admin/forms.php:949
 msgid "Calendar"
 msgstr "Kalender"
 
@@ -4601,11 +4608,13 @@ msgstr "Aus dem Kurs austragen"
 
 #: course/course.php:631 forums/posts.php:462 msgs/msghistory.php:147
 #: course/addassessment2form.php:200 course/chgassessments2form.php:173
+#: forums/posts.php:464
 msgid "Expand All"
 msgstr "Alle ausklappen"
 
 #: course/course.php:632 forums/posts.php:463 msgs/msghistory.php:148
 #: course/addassessment2form.php:201 course/chgassessments2form.php:174
+#: forums/posts.php:465
 msgid "Collapse All"
 msgstr "Alle einklappen"
 
@@ -4842,7 +4851,7 @@ msgstr ""
 #: course/courseshowitems.php:1064 course/courseshowitems.php:1545
 #: course/courseshowitems.php:1657
 msgid "LatePasses Allowed"
-msgstr "Verspätetes Einreichen erlaubt"
+msgstr "Verspätetes Einreichen mit Kulanz-Guthaben erlaubt"
 
 #: course/courseshowitems.php:898 course/courseshowitems.php:1064
 #: course/courseshowitems.php:1545 course/courseshowitems.php:1657
@@ -5439,8 +5448,8 @@ msgstr "Gesamtpunktzahl"
 
 #: course/gb-export.php:202 course/gb-export.php:204 course/gb-export.php:235
 #: course/gb-export.php:484 course/gradebook.php:1043 course/gradebook.php:1045
-#: course/gradebook.php:1583 course/gradebook.php:1311
-#: course/gradebook.php:1342 course/gradebook.php:1585
+#: course/gradebook.php:1311 course/gradebook.php:1585
+#: course/gradebook.php:1342 course/gradebook.php:1583
 msgid "pts"
 msgstr "Pkt"
 
@@ -5580,7 +5589,7 @@ msgstr ""
 "bereits bearbeiteten Teile zu erhalten."
 
 #: course/gb-viewasid.php:181 course/gb-viewasid.php:269
-#: course/gb-viewasid.php:380
+#: course/gb-viewasid.php:380 course/gb-viewasid.php:384
 msgid "Really Clear"
 msgstr "Wirklich löschen"
 
@@ -5588,50 +5597,53 @@ msgstr "Wirklich löschen"
 msgid "Really Separate"
 msgstr "Wirklich trennen"
 
-#: course/gb-viewasid.php:381
+#: course/gb-viewasid.php:381 course/gb-viewasid.php:385
 msgid "Really Clear and Regen"
 msgstr "Wirklich löschen und neu erzeugen"
 
-#: course/gb-viewasid.php:589
+#: course/gb-viewasid.php:589 course/gb-viewasid.php:593
 msgid "Show Score Summary"
 msgstr "Zeige Punktezusammenfassung"
 
-#: course/gb-viewasid.php:860
+#: course/gb-viewasid.php:860 course/gb-viewasid.php:864
 msgid "Hide Correct Questions"
 msgstr "Korrekt beantwortete Fragen ausblenden"
 
 #: course/gb-viewasid.php:861 javascript/gb-scoretools.js:32
+#: course/gb-viewasid.php:865
 msgid "Hide Perfect Questions"
 msgstr "Perfekt beantwortete Fragen ausblenden"
 
 #: course/gb-viewasid.php:862 course/gradeallq.php:328
 #: course/gradeallq2.php:335 javascript/gb-scoretools.js:43
+#: course/gb-viewasid.php:866
 msgid "Hide Unanswered Questions"
 msgstr "Unbeantwortete Fragen ausblenden"
 
 #: course/gb-viewasid.php:863 course/gradeallq.php:330
-#: course/gradeallq2.php:337
+#: course/gradeallq2.php:337 course/gb-viewasid.php:867
 msgid "Show All Answers"
 msgstr "Alle Antworten anzeigen"
 
-#: course/gb-viewasid.php:864
+#: course/gb-viewasid.php:864 course/gb-viewasid.php:868
 msgid "Preview All"
 msgstr "Vorschau"
 
 #: course/gb-viewasid.php:956 course/gb-viewasid.php:1081
-#: course/gradebook.php:766
+#: course/gradebook.php:766 course/gb-viewasid.php:1085
+#: course/gb-viewasid.php:960
 msgid "Feedback"
 msgstr "Hinweise"
 
-#: course/gb-viewasid.php:1125
+#: course/gb-viewasid.php:1125 course/gb-viewasid.php:1129
 msgid "General Instructor Feedback"
 msgstr "Allgemeine Rückmeldung vom Lehrer"
 
-#: course/gb-viewasid.php:1172
+#: course/gb-viewasid.php:1172 course/gb-viewasid.php:1176
 msgid "Show Score Details"
 msgstr "Zeige Punkte-Details"
 
-#: course/gb-viewasid.php:1281
+#: course/gb-viewasid.php:1281 course/gb-viewasid.php:1285
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
@@ -5874,7 +5886,7 @@ msgstr "Klein"
 msgid "Big"
 msgstr "Groß"
 
-#: course/gradebook.php:438
+#: course/gradebook.php:438 admin/forms.php:940
 msgid "Off"
 msgstr "Aus"
 
@@ -6363,7 +6375,7 @@ msgstr "keine"
 msgid "Messages Sent"
 msgstr "Gesendete Nachrichten"
 
-#: course/masssend.php:234 forums/posts.php:731
+#: course/masssend.php:234 forums/posts.php:731 forums/posts.php:733
 msgid "Close"
 msgstr "Schließen"
 
@@ -6431,7 +6443,7 @@ msgid "After assessment version is submitted"
 msgstr "Nachdem die Test-Version eingereicht ist"
 
 #: course/modquestion2.php:216 course/addassessment2form.php:808
-#: course/chgassessments2form.php:797
+#: course/chgassessments2form.php:797 course/addassessment2form.php:806
 #, php-format
 msgid "After %d tries"
 msgstr "Nach %d Versuchen"
@@ -7179,7 +7191,7 @@ msgstr "Alles Markierungen löschen"
 msgid "New Forum Posts"
 msgstr "Neue Forenbeiträge"
 
-#: forums/listlikes.php:24 forums/posts.php:629
+#: forums/listlikes.php:24 forums/posts.php:629 forums/posts.php:631
 msgid "Post Likes"
 msgstr "Likes für Beitrag"
 
@@ -7224,35 +7236,35 @@ msgstr "Hinweise zum Beantworten von Beiträgen"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: forums/posts.php:244 forums/posts.php:246
+#: forums/posts.php:244 forums/posts.php:246 forums/posts.php:248
 msgid "Re"
 msgstr "Wg"
 
-#: forums/posts.php:440
+#: forums/posts.php:440 forums/posts.php:442
 msgid "Post"
 msgstr "Beitrag"
 
-#: forums/posts.php:464 msgs/msghistory.php:149
+#: forums/posts.php:464 msgs/msghistory.php:149 forums/posts.php:466
 msgid "Show All"
 msgstr "Alle anzeigen"
 
-#: forums/posts.php:465 msgs/msghistory.php:150
+#: forums/posts.php:465 msgs/msghistory.php:150 forums/posts.php:467
 msgid "Hide All"
 msgstr "Alle ausblenden"
 
-#: forums/posts.php:550
+#: forums/posts.php:550 forums/posts.php:552
 msgid "Posted by"
 msgstr "Verfasst von"
 
-#: forums/postsbyname.php:257
+#: forums/postsbyname.php:257 forums/postsbyname.php:259
 msgid "Hide Posts"
 msgstr "Beiträge ausblenden"
 
-#: forums/postsbyname.php:258
+#: forums/postsbyname.php:258 forums/postsbyname.php:260
 msgid "Hide Replies"
 msgstr "Antworten ausblenden"
 
-#: forums/postsbyname.php:259 forums/thread.php:619
+#: forums/postsbyname.php:259 forums/thread.php:619 forums/postsbyname.php:261
 msgid "Mark all Read"
 msgstr "Alle als Gelesen markieren"
 
@@ -7668,7 +7680,7 @@ msgstr "Anonym"
 
 #: javascript/AMhelpers.js:215 javascript/AMhelpers2.js:1521
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1525
 msgid "Invalid use of a comma."
 msgstr "Ungültige Verwendung des Komma."
 
@@ -7678,6 +7690,7 @@ msgstr "Ungültige Verwendung des Komma."
 #: javascript/AMhelpers2.js:1166 javascript/AMhelpers2.js:1637
 #: javascript/AMhelpers2.js:1641 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
+#: javascript/AMhelpers2.js:1170 javascript/AMhelpers2.js:1645
 msgid "syntax incomplete"
 msgstr "Syntax unvollständig"
 
@@ -7702,18 +7715,19 @@ msgstr "nicht beantwortet"
 #: javascript/AMhelpers.js:368 javascript/AMhelpers2.js:998
 #: javascript/AMhelpers2.js:1033 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
+#: javascript/AMhelpers2.js:1002 javascript/AMhelpers2.js:1037
 msgid "invalid inequality notation"
 msgstr "Ungültige Ungleichungs-Schreibweise"
 
 #: javascript/AMhelpers.js:370 javascript/AMhelpers2.js:1035
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1039
 msgid "invalid interval notation"
 msgstr "ungültige Intervallschreibweise"
 
 #: javascript/AMhelpers.js:559 javascript/AMhelpers2.js:1133
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1137
 msgid "Invalid notation"
 msgstr "Ungültige Schreibweise"
 
@@ -7725,7 +7739,7 @@ msgstr "Syntax OK"
 #: javascript/AMhelpers.js:1087 javascript/AMhelpers.js:1090
 #: javascript/AMhelpers.js:1097 javascript/AMhelpers2.js:1333
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1337
 msgid "syntax error"
 msgstr "Syntaxfehler"
 
@@ -7736,108 +7750,109 @@ msgstr "Warnung"
 #: javascript/AMhelpers.js:1108 javascript/AMhelpers.js:1182
 #: javascript/AMhelpers2.js:1557 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
+#: javascript/AMhelpers2.js:1561
 msgid "Your answer contains an unrecognized symbol"
 msgstr "Ihre Antwort enthält ein unbekanntes Symbol"
 
 #: javascript/AMhelpers.js:1112 javascript/AMhelpers2.js:1306
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1310
 msgid "syntax error: this is not an equation"
 msgstr "Syntaxfehler: Das ist keine Gleichung"
 
 #: javascript/AMhelpers.js:1113 javascript/AMhelpers2.js:1300
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1304
 msgid "syntax error: you gave an equation, not an expression"
 msgstr "Syntaxfehler: Sie haben eine Gleichung eingegeben, keinen Ausdruck"
 
 #: javascript/AMhelpers.js:1154 javascript/AMhelpers2.js:1529
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1533
 msgid " invalid entry format"
 msgstr " Ungültiges Eingabeformat"
 
 #: javascript/AMhelpers.js:1160 javascript/AMhelpers2.js:1535
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1539
 msgid "not a valid fraction"
 msgstr "Kein gültiger Bruch"
 
 #: javascript/AMhelpers.js:1164 javascript/AMhelpers2.js:1539
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1543
 msgid "not a valid mixed number"
 msgstr "keine gültige gemischte Zahl"
 
 #: javascript/AMhelpers.js:1172 javascript/AMhelpers2.js:1547
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1551
 msgid "not valid scientific notation"
 msgstr "keine gültige wissenschaftliche Schreibweise"
 
 #: javascript/AMhelpers.js:1174 javascript/AMhelpers2.js:1549
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1553
 msgid "not valid decimal or scientific notation"
 msgstr "keine gültige Dezimal- oder wissenschaftliche Schreibweise"
 
 #: javascript/AMhelpers.js:1179 javascript/AMhelpers2.js:1554
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1558
 msgid " not a valid integer or decimal number"
 msgstr " keine ganze Zahl oder Dezimalzahl"
 
 #: javascript/AMhelpers.js:1190 javascript/AMhelpers2.js:1565
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1569
 msgid "no trig functions allowed"
 msgstr "Trigonometrische Funktionen (sin, cos, etc.) sind nicht erlaubt"
 
 #: javascript/AMhelpers.js:1192 javascript/AMhelpers2.js:1567
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1571
 msgid "no decimals allowed"
 msgstr "Dezimalwerte sind nicht erlaubt"
 
 #: javascript/AMhelpers.js:1195 javascript/AMhelpers2.js:1570
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1574
 msgid "mixed numbers are not allowed"
 msgstr "Gemischte Zahlen sind nicht erlaubt"
 
 #: javascript/AMhelpers.js:1212 javascript/AMhelpers2.js:1587
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1591
 msgid "unmatched parens"
 msgstr "Klammerfehler"
 
 #: javascript/AMhelpers.js:1215 javascript/AMhelpers2.js:1590
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1594
 msgid "unmatched absolute value bars"
 msgstr "Die Striche für den Absolutbetrag passen nicht"
 
 #: javascript/AMhelpers.js:1224 javascript/AMhelpers2.js:1599
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1603
 msgid "use function notation"
 msgstr "Funktionsschreibweise verwenden"
 
 #: javascript/AMhelpers.js:1224 javascript/AMhelpers2.js:1599
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1603
 msgid "use $1 instead of $2"
 msgstr "Benutze $1 statt $2"
 
 #: javascript/AMhelpers.js:1229 javascript/AMhelpers2.js:1604
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1608
 msgid " Check your variables - you might be using an incorrect one"
 msgstr " Überprüfen Sie Ihre Variablen! Verwenden Sie nur zulässige Variable"
 
 #: javascript/AMhelpers.js:1236 javascript/AMhelpers2.js:1611
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1615
 msgid ""
 " You may want to use abs(x) instead of |x| for absolute values to avoid "
 "ambiguity"
@@ -7847,7 +7862,7 @@ msgstr ""
 
 #: javascript/AMhelpers.js:1242 javascript/AMhelpers2.js:1617
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
-#: javascript/assessment_min.js:3
+#: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1621
 msgid " Do not use the percent symbol, %"
 msgstr " Benutzen Sie nicht das Prozentzeichen %"
 
@@ -7893,21 +7908,22 @@ msgstr ""
 
 #: javascript/AMhelpers2.js:305 javascript/AMhelpers2.js:306
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
+#: javascript/AMhelpers2.js:309 javascript/AMhelpers2.js:310
 msgid "View Key"
 msgstr "Schlüssel ansehen"
 
 #: javascript/AMhelpers2.js:997 javascript/AMhelpers2_min.js:1
-#: javascript/assess2_min.js:2
+#: javascript/assess2_min.js:2 javascript/AMhelpers2.js:1001
 msgid "you may have used the wrong variable"
 msgstr "Sie haben vielleicht die falsche Variable verwendet"
 
 #: javascript/AMhelpers2.js:1274 javascript/AMhelpers2_min.js:1
-#: javascript/assess2_min.js:2
+#: javascript/assess2_min.js:2 javascript/AMhelpers2.js:1278
 msgid "Invalid matrix format"
 msgstr "Ungültiges Format der Matrix"
 
 #: javascript/AMhelpers2.js:1302 javascript/AMhelpers2_min.js:1
-#: javascript/assess2_min.js:2
+#: javascript/assess2_min.js:2 javascript/AMhelpers2.js:1306
 msgid "syntax error: your equation should only contain one equal sign"
 msgstr ""
 "Syntaxfehler: Ihre Gleichung sollte nur ein Gleichheitszeichen enthalten"
@@ -9626,34 +9642,41 @@ msgid "Show video/text buttons when available?"
 msgstr "Zeige Video/Text-Schaltflächen wenn verfügbar?"
 
 #: course/addassessment2form.php:742 course/chgassessments2form.php:735
+#: course/addassessment2form.php:740
 msgid "On each question immediately"
 msgstr "Sofort bei jeder Frage"
 
 #: course/addassessment2form.php:746 course/chgassessments2form.php:739
+#: course/addassessment2form.php:744
 msgid "At the end of the assessment"
 msgstr "Am Ende des Tests"
 
 #: course/addassessment2form.php:750 course/chgassessments2form.php:743
+#: course/addassessment2form.php:748
 msgid "Total score only at the end"
 msgstr "Gesamtpunktzahl erst am Ende"
 
 #: course/addassessment2form.php:754 course/chgassessments2form.php:747
+#: course/addassessment2form.php:752
 msgid "No scores at all"
 msgstr "Keine Punkte anzeigen"
 
 #: course/addassessment2form.php:785 course/chgassessments2form.php:778
+#: course/addassessment2form.php:783
 msgid "Show with the score"
 msgstr "Mit der Punktzahl anzeigen"
 
 #: course/addassessment2form.php:797 course/chgassessments2form.php:790
+#: course/addassessment2form.php:795
 msgid "After the last try on a question"
 msgstr "Nach dem letzten Versuch einer Frage"
 
-#: course/addassessment2form.php:801
+#: course/addassessment2form.php:801 course/addassessment2form.php:799
 msgid "After the last try or Jump to Answer button"
 msgstr "Nach dem letzten Versuch oder beim Klick auf die Antwort-Schaltfläche"
 
 #: course/addassessment2form.php:809 course/chgassessments2form.php:798
+#: course/addassessment2form.php:807
 msgid "After 1 try"
 msgstr "Nach 1 Versuch"
 
@@ -9662,19 +9685,180 @@ msgstr "Nach 1 Versuch"
 #: course/addassessment2form.php:942 course/chgassessments2form.php:806
 #: course/chgassessments2form.php:842 course/chgassessments2form.php:886
 #: course/chgassessments2form.php:900 course/chgassessments2form.php:938
+#: course/addassessment2form.php:815 course/addassessment2form.php:851
+#: course/addassessment2form.php:892 course/addassessment2form.php:906
+#: course/addassessment2form.php:940
 msgid "After the assessment version is submitted"
 msgstr "Nachdem die Test-Version eingereicht wurde"
 
 #: course/addassessment2form.php:839 course/addassessment2form.php:882
 #: course/addassessment2form.php:930 course/chgassessments2form.php:828
 #: course/chgassessments2form.php:874 course/chgassessments2form.php:926
+#: course/addassessment2form.php:837 course/addassessment2form.php:880
+#: course/addassessment2form.php:928
 msgid "After the due date"
 msgstr "Nach Fälligkeit des Tests"
 
 #: course/addassessment2form.php:843 course/chgassessments2form.php:832
+#: course/addassessment2form.php:841
 msgid "Immediately - they can always view it"
 msgstr "Sofort - sie können das immer sehen"
 
 #: course/addassessment2form.php:901 course/chgassessments2form.php:893
+#: course/addassessment2form.php:899
 msgid "Immediately"
 msgstr "Sofort"
+
+#: admin/forms.php:365 admin/forms.php:646
+msgid "Enrollment key"
+msgstr "Kurs-Passwort"
+
+#: admin/forms.php:529
+msgid "Incorrect enrollment key provided"
+msgstr "Falsches Kurspasswort"
+
+#: admin/forms.php:645
+msgid "Course name"
+msgstr "Kursname"
+
+#: admin/forms.php:752
+msgid "Course start/end dates"
+msgstr "Kursanfangs-/Enddaten"
+
+#: admin/forms.php:752
+msgid "Blank for no limit"
+msgstr "Leer für keine Begrenzung"
+
+#: admin/forms.php:773
+msgid "Default start/end time for new items"
+msgstr "Standardstart-/Endzeit für neue Teile"
+
+#: admin/forms.php:780
+msgid "Allow students to self-<u>un</u>enroll"
+msgstr "Studierende können sich selbst <u>ab</u>melden"
+
+#: admin/forms.php:787
+msgid "Allow studentsAllow students to self-enroll"
+msgstr "Studierende können sich selbst anmelden"
+
+#: admin/forms.php:796
+msgid "Allow other instructors to copy course items"
+msgstr "Andere Dozenten können Kursteile kopieren"
+
+#: admin/forms.php:799
+msgid "Require enrollment key from everyone"
+msgstr "Kurs-Passwort von allen fordern"
+
+#: admin/forms.php:801
+msgid "No key required for group members, require key from others"
+msgstr "Kein Kurs-Passwort von Gruppenmitgliedern aber von allen anderen"
+
+#: admin/forms.php:803
+msgid "No key required from anyone"
+msgstr "Kein Kurs-Passwort erforderlich"
+
+#: admin/forms.php:816
+msgid ""
+"View <a target=\"_blank\" href=\"../help.php?section=lti\">integration setup "
+"instructions"
+msgstr ""
+"Anleitung zur <a target=\"_blank\" href=\"../help.php?section=lti\">LTI-"
+"Einbindung"
+
+#: admin/forms.php:850
+msgid "Allow the LMS to set assessment due dates"
+msgstr "Freischaltung durch LMS erlauben"
+
+#: admin/forms.php:850
+msgid "Only supported by Canvas"
+msgstr "Nur vom LMS Canvas unterstützt"
+
+#: admin/forms.php:855
+msgid "LMS course copies always copy from this original course"
+msgstr "Kopien von Kursen im LMS kopieren immer von diesem Kurs"
+
+#: admin/forms.php:877
+msgid "Auto-assign LatePasses on course enroll"
+msgstr "Kulanz-Guthaben beim Einschreiben automatisch zuordnen"
+
+#: admin/forms.php:881
+msgid "Late Passes extend the due date by"
+msgstr "Kulanz-Guthaben verlängert die Fälligkeit um"
+
+#: admin/forms.php:893
+msgid "Theme"
+msgstr "Design"
+
+#: admin/forms.php:928
+msgid "Message System"
+msgstr "Kursnachrichten"
+
+#: admin/forms.php:932
+msgid "On for send and receive"
+msgstr "Zum Senden und Empfangen"
+
+#: admin/forms.php:934
+msgid "On for receive, students can only send to instructor"
+msgstr "Zum Empfangen, Studierende können nur an Dozenten senden"
+
+#: admin/forms.php:936
+msgid "On for receive, students can only send to students"
+msgstr "Zum Empfangen, Studierende können nur an Studierende senden"
+
+#: admin/forms.php:938
+msgid "On for receive, students cannot send"
+msgstr "Zum Empfangen, Studierende können nicht senden"
+
+#: admin/forms.php:942
+msgid "Enable monitoring of student-to-student messages "
+msgstr "Überwachen der Nachrichten zwischen Studierenden ermöglichen "
+
+#: admin/forms.php:946
+msgid "Navigation Links for Students"
+msgstr "Kurs-Menü für Studierende"
+
+#: admin/forms.php:953
+msgid "Forum List"
+msgstr "Foren"
+
+#: admin/forms.php:959
+msgid "Show remaining LatePasses on student gradebook page"
+msgstr ""
+"Zeige das verbleibende Kulanz-Guthaben der Studierenden in der Punkte-"
+"Übersicht"
+
+#: admin/forms.php:967
+msgid "Mark course as template"
+msgstr "Dies ist eine Kurs-Vorlage"
+
+#: admin/forms.php:972
+msgid "Mark as group template course"
+msgstr "Dies ist eine Kurs-Vorlage für die Gruppe"
+
+#: admin/forms.php:977
+msgid "Mark as super-group template course"
+msgstr "Dies ist eine Kurs-Vorlage für die Obergruppe"
+
+#: admin/forms.php:982
+msgid "Mark as global template course"
+msgstr "Dies ist eine globale Kurs-Vorlage"
+
+#: admin/forms.php:987
+msgid "Mark as self-enroll course"
+msgstr "Kurs erlaubt Selbst-Registrierung"
+
+#: admin/forms.php:991
+msgid "Mark as guest-access course"
+msgstr "Kurs erlaubt Gast-Anmeldung ohne Passwort als 'guest'"
+
+#: admin/forms.php:635
+msgid "Change"
+msgstr "Ändern"
+
+#: admin/forms.php:867
+msgid "Additional Options"
+msgstr "Weitere Einstellungen"
+
+#: admin/forms.php:878
+msgid "LatePasses"
+msgstr "Kulanz-Guthaben"
