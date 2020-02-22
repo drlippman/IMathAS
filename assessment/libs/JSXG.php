@@ -38,9 +38,13 @@ function getJSXscript () {
   } else {
 		return '<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
 			var jsxgloadscript = document.createElement("script");
-			jsxgloadscript.src = "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js";
+      jsxgloadscript.src = "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.7/jsxgraphcore.js";
+      jsxgloadscript.onload = function(){
+        JXG.Options.text.cssDefaultStyle = "font-family:Serif;";
+        JXG.Options.axis.lastArrow.size = 5;
+      };
 			document.getElementsByTagName("head")[0].appendChild(jsxgloadscript);
-			JXGscriptloaded = true;
+      JXGscriptloaded = true;
 		}</script>';
   }
 }
@@ -50,10 +54,13 @@ function getJSXscript () {
 # Set up a board. Auxillary functions
 function JSXG_setUpBoard($label, $width=350, $height=350, $centered=true){
   $cntrd = $centered===true ? "margin:auto;" : "";
+  $ratio = 100*($height/$width);
   // Start output string by getting script
   $out = getJSXscript();
   // make board
-  $out .= "<div id='jxgboard_{$label}' style='background-color:#FFF; width:{$width}px; height:{$height}px; {$cntrd}'></div>";
+  $out .= "<div class='jxgboardwrapper' style='max-width:{$width}px; max-height:{$height}px; {$cntrd}'>";
+  $out .= "<div id='jxgboard_{$label}' style='background-color:#FFF; width:100%; height:0px; padding-bottom:{$ratio}%;'></div>";
+  $out .= "</div>";
   // Start script
   $out .= "<script type='text/javascript'>";
   // We build construction function inline, push function to initstack to load async
