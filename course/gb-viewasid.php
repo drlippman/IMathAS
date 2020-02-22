@@ -282,7 +282,6 @@
 			$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
 			$err = '';
 			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-
         if (strpos($line['scores'],';')===false) {
           $noraw = true;
           $scores = explode(",",$line['scores']);
@@ -348,8 +347,8 @@
           $query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,seeds=:seeds,";
           $query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestlastanswers=:bestlastanswers,bestseeds=:bestseeds,reattempting=:reattempting ";
           $query .= "WHERE id=:id";
-          $stm = $DBH->prepare($query);
-          $stm->execute(array(':id'=>$line['id'], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':seeds'=>$seedlist,
+          $stm2 = $DBH->prepare($query);
+          $stm2->execute(array(':id'=>$line['id'], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':seeds'=>$seedlist,
             ':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':bestseeds'=>$bestseedlist, ':reattempting'=>$reattemptinglist));
           if (strlen($line['lti_sourcedid'])>1) {
             require_once("../includes/ltioutcomes.php");
