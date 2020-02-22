@@ -73,7 +73,7 @@ $out['newscores'] = $assess_record->getScoresAfterOverrides($scores);
 $lti_sourcedid = $assess_record->getLTIsourcedId();
 if (strlen($lti_sourcedid) > 1) {
   require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$out['gbscore'],true);
+  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true);
 }
 
 //prep date display

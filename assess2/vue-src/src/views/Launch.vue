@@ -181,15 +181,24 @@ export default {
       if (this.aInfo.has_password) {
         // hacky fix for when the password is entered programatically
         let v = document.getElementById('password');
-        if (v && v.value != this.password) {
+        if (v && v.value !== this.password) {
           this.password = v.value;
         }
       }
-      if (timelimit === 0 || confirm(this.$t('launch.timewarning'))) {
-        let pwval = this.password;
-        this.password = '';
-        actions.startAssess(false, pwval, this.newGroupMembers);
+      if (timelimit === 0) {
+        this.reallyStartAssess();
+      } else {
+        store.confirmObj = {
+          body: 'launch.timewarning',
+          ok: 'launch.start_assess',
+          action: () => this.reallyStartAssess()
+        };
       }
+    },
+    reallyStartAssess () {
+      let pwval = this.password;
+      this.password = '';
+      actions.startAssess(false, pwval, this.newGroupMembers);
     },
     endAssess () {
       actions.endAssess();

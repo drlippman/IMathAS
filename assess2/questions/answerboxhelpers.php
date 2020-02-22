@@ -691,6 +691,7 @@ function normalizemathunicode($str) {
 	//these are the slim vector unicodes: u2329 and u232a
 	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
 	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
+  $str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;
 }

@@ -35,6 +35,7 @@
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
+	$from = Sanitize::simpleString($_GET['from']);
 
 	if (isset($_GET['del']) && $isteacher) {
 		$delItem = Sanitize::onlyInt($_GET['del']);
@@ -45,9 +46,13 @@
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
 				$stm->execute(array(':gradetypeid'=>$delItem));
 			}
-
-			header(sprintf('Location: %s/course/gradebook.php?stu=%s&cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
-				Sanitize::encodeUrlParam($_GET['stu']), $cid));
+			if ($from == 'gbtesting') {
+				header(sprintf('Location: %s/course/gb-testing.php?stu=%s&cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
+					Sanitize::encodeUrlParam($_GET['stu']), $cid));
+			} else {
+				header(sprintf('Location: %s/course/gradebook.php?stu=%s&cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
+					Sanitize::encodeUrlParam($_GET['stu']), $cid));
+			}
 			exit;
 		} else {
 			require("../header.php");
@@ -284,6 +289,9 @@
 		if ($isnewitem && isset($_POST['doupload'])) {
 			header(sprintf('Location: %s/course/uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
                 Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($gbItem)));
+		} else if ($from == 'gbtesting') {
+			header(sprintf('Location: %s/course/gb-testing.php?stu=%s&gbmode=%s&cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
+                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid));
 		} else {
 			header(sprintf('Location: %s/course/gradebook.php?stu=%s&gbmode=%s&cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
                 Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid));
@@ -374,7 +382,11 @@
 	require("../includes/rubric.php");
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+	if ($from == 'gbtesting') {
+		echo "&gt; <a href=\"gb-testing.php?stu=0&cid=$cid\">Gradebook</a> ";
+	} else {
+		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+	}
 	if ($_GET['stu']>0) {
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Student Detail</a> ";
 	} else if ($_GET['stu']==-1) {
@@ -388,9 +400,9 @@
 		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h1>Modify Offline Grades</h1></div>";
 	}
 
-    printf("<form id=\"mainform\" method=post action=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&gbitem=%s&grades=%s\">",
+    printf("<form id=\"mainform\" method=post action=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&gbitem=%s&grades=%s&from=%s\">",
         Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid,
-        Sanitize::encodeUrlParam($gbItem), Sanitize::encodeUrlParam($_GET['grades']));
+        Sanitize::encodeUrlParam($gbItem), Sanitize::encodeUrlParam($_GET['grades']), $from);
 
 	if ($_GET['grades']=='all') {
 	    if (!isset($_GET['isolate'])) {

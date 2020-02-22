@@ -163,9 +163,10 @@ export default {
       actions.submitQuestion(this.qn, false, this.timeActive);
     },
     jumpToAnswer () {
-      if (confirm(this.$t('question.jump_warn'))) {
-        actions.loadQuestion(this.qn, false, true);
-      }
+      store.confirmObj = {
+        body: 'question.jump_warn',
+        action: () => actions.loadQuestion(this.qn, false, true)
+      };
     },
     updateTime (goingActive) {
       if (this.timeActivated === null || goingActive) {

@@ -126,12 +126,13 @@ class AssessInfo
         } else {
           $this->assessData['extended_with'] = array(
             'type' => 'latepass',
-            'n' => $this->exception[2]
+            'n' => intval($this->exception[2])
           );
         }
       }
-      $this->assessData['startdate'] = $this->exception[0];
-      $this->assessData['enddate'] = $this->exception[1];
+      $this->assessData['startdate'] = intval($this->exception[0]);
+      $this->assessData['enddate'] = intval($this->exception[1]);
+      $this->assessData['enddate_in'] = $this->assessData['enddate'] - time() - 5;
       $this->setAvailable();
     }
 
@@ -940,6 +941,8 @@ class AssessInfo
     $GLOBALS['assessUIver'] = $settings['ver'];
     $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);
     $GLOBALS['showtips'] = $settings['showtips'];
+
+    $settings['enddate_in'] = $settings['enddate'] - time() - 5;
 
     // adjust for language change
     $settings['deftries'] = $settings['defattempts'];

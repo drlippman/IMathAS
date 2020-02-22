@@ -72,7 +72,7 @@ class AssessHelpers
         if (strlen($lti_sourcedid) > 1) {
           $gbscore = $assess_record->getGbScore();
           $aidposs = $assess_info->getSetting('points_possible');
-          calcandupdateLTIgrade($lti_sourcedid, $aid, $gbscore['gbscore'], true, $aidposs);
+          calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
         }
         $cnt++;
       }

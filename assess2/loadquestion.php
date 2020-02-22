@@ -120,7 +120,7 @@ if ($in_practice) {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'showscores'
+  'extended_with', 'allowed_attempts', 'showscores', 'enddate_in'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info

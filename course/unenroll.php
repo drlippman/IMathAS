@@ -151,7 +151,7 @@ ini_set("max_execution_time", "600");
 			</p>
 			<?php if ($courseUIver == 1) { ?>
 			<p><input type=checkbox name="upgradeassessver" value="1" />
-				Upgrade course to use new assessment interface. This feature is still in Beta - use with caution.
+				Upgrade course to use new assessment interface.
 			</p>
 			<?php } ?>
 

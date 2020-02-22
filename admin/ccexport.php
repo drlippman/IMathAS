@@ -211,7 +211,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		</ul>
 		</fieldset>
 		<p><button type="submit" name="carttype" value="imscc">Download Common Cartridge</button></p>
-		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button> (Beta - Recommended)</p>
+		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button> (Recommended)</p>
 		<p><a href="../help.php?section=ltibb" target="_blank">BlackBoard Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
 		<ul>

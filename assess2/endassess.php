@@ -70,7 +70,7 @@ if (strlen($lti_sourcedid) > 1) {
   $gbscore = $assess_record->getGbScore();
   require_once("../includes/ltioutcomes.php");
   $aidposs = $assess_info->getSetting('points_possible');
-  calcandupdateLTIgrade($lti_sourcedid, $aid, $gbscore['gbscore'], true, $aidposs);
+  calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], true, $aidposs);
 }
 
 // grab any assessment info fields that may have updated:
