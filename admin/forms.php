@@ -388,8 +388,8 @@ switch($_GET['action']) {
 					}
 
 					echo '<span class="form">LTI Key:</span>';
-					echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
-					echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
+					echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 ('._('to only allow access through the LMS'),') ',_('or'),'<br/>';
+					echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 ('.sprintf(_('to allow students to login directly to %s'),$installname).')';
 					echo '</span><br class="form" />';
 
 					echo '<span class="form">LTI Secret:</span>';
@@ -565,7 +565,7 @@ switch($_GET['action']) {
 
 		if (isset($_GET['cid'])) {
 			$cid = Sanitize::courseId($_GET['cid']);
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Course Settings</div>";
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Course Settings")."</div>";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h1>';
 		if ($_GET['action']=='modify') {
@@ -784,7 +784,7 @@ switch($_GET['action']) {
 			if (($allowunenroll&1)==1) { echo "checked=1";}
 			echo '/> Yes </span><br class=form />';
 
-			echo "<span class=form>",_("Allow studentsAllow students to self-enroll"),"</span><span class=formright>";
+			echo "<span class=form>",_("Allow students to self-enroll"),"</span><span class=formright>";
 			echo '<input type=radio name="allowenroll" value="2" ';
 			if (($allowunenroll&2)==2) { echo "checked=1";}
 			echo '/> No <input type=radio name="allowenroll" value="0" ';
@@ -813,7 +813,7 @@ switch($_GET['action']) {
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
 
-			echo '<p>',_('View <a target="_blank" href="../help.php?section=lti">integration setup instructions'),'</a></p>';
+			echo '<p>',sprintf(_('View %s integration setup instructions %s'),'<a target="_blank" href="../help.php?section=lti">','</a>'),'</p>';
 
 			if (isset($_GET['id'])) {
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
@@ -831,8 +831,8 @@ switch($_GET['action']) {
 					}
 
 					echo '<span class="form">LTI Key:</span>';
-					echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 (to only allow access through the LMS) or <br/>';
-					echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 (to allow students to login directly to '.$installname.')';
+					echo '<span class="formright">LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_1 ('._('to only allow access through the LMS'),') ',_('or'), '<br/>';
+					echo ' LTIkey_'.Sanitize::encodeStringForDisplay($_GET['id']).'_0 ('.sprintf(_('to allow students to login directly to %s'),$installname).')';
 					echo '</span><br class="form" />';
 
 					echo '<span class="form">LTI Secret (max 10 chars)</span>';

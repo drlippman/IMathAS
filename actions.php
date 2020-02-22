@@ -274,7 +274,7 @@ require_once("includes/sanitize.php");
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':code'=>$code, ':id'=>$id));
 
-				$message  = "<h3>".sprintf('This is an automated message from %s. Do not respond to this email',$installname)."</h3>\r\n";
+				$message  = "<h3>".sprintf(_('This is an automated message from %s. Do not respond to this email'),$installname)."</h3>\r\n";
 				$message .= "<p>"._('Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ');
 				$message .= _("If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You will then be prompted to choose a new password.")."</p>";
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code\">";
