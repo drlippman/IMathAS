@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-22 00:29+0100\n"
-"PO-Revision-Date: 2020-02-22 00:48+0100\n"
+"POT-Creation-Date: 2020-02-22 21:38+0100\n"
+"PO-Revision-Date: 2020-02-22 21:39+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -545,6 +545,7 @@ msgid "Add a new course for this user"
 msgstr "Einen neuen Kurs für diesen benutzer hinzufügen"
 
 #: admin/forms.php:358 admin/forms.php:572 course/course.php:547
+#: admin/forms.php:568
 msgid "Course Settings"
 msgstr "Kurseinstellungen"
 
@@ -562,7 +563,7 @@ msgstr "Beginnen mit:"
 
 #: admin/forms.php:627
 msgid "A blank course"
-msgstr "Ein leerer Kurs"
+msgstr "Leerer Kurs"
 
 #: admin/forms.php:629
 msgid "Copying: "
@@ -2658,7 +2659,7 @@ msgid "Diagnostic Gradebook"
 msgstr "Diagnostik-Punkteübersicht"
 
 #: assess2/gbviewassess.php:91 course/gb-viewasid.php:579
-#: course/gb-viewasid.php:583
+#: course/gb-viewasid.php:583 course/gb-viewasid.php:582
 msgid "Assessment Detail"
 msgstr "Test-Details"
 
@@ -5590,6 +5591,7 @@ msgstr ""
 
 #: course/gb-viewasid.php:181 course/gb-viewasid.php:269
 #: course/gb-viewasid.php:380 course/gb-viewasid.php:384
+#: course/gb-viewasid.php:383
 msgid "Really Clear"
 msgstr "Wirklich löschen"
 
@@ -5598,52 +5600,61 @@ msgid "Really Separate"
 msgstr "Wirklich trennen"
 
 #: course/gb-viewasid.php:381 course/gb-viewasid.php:385
+#: course/gb-viewasid.php:384
 msgid "Really Clear and Regen"
 msgstr "Wirklich löschen und neu erzeugen"
 
 #: course/gb-viewasid.php:589 course/gb-viewasid.php:593
+#: course/gb-viewasid.php:592
 msgid "Show Score Summary"
 msgstr "Zeige Punktezusammenfassung"
 
 #: course/gb-viewasid.php:860 course/gb-viewasid.php:864
+#: course/gb-viewasid.php:863
 msgid "Hide Correct Questions"
 msgstr "Korrekt beantwortete Fragen ausblenden"
 
 #: course/gb-viewasid.php:861 javascript/gb-scoretools.js:32
-#: course/gb-viewasid.php:865
+#: course/gb-viewasid.php:865 course/gb-viewasid.php:864
 msgid "Hide Perfect Questions"
 msgstr "Perfekt beantwortete Fragen ausblenden"
 
 #: course/gb-viewasid.php:862 course/gradeallq.php:328
 #: course/gradeallq2.php:335 javascript/gb-scoretools.js:43
-#: course/gb-viewasid.php:866
+#: course/gb-viewasid.php:866 course/gb-viewasid.php:865
 msgid "Hide Unanswered Questions"
 msgstr "Unbeantwortete Fragen ausblenden"
 
 #: course/gb-viewasid.php:863 course/gradeallq.php:330
 #: course/gradeallq2.php:337 course/gb-viewasid.php:867
+#: course/gb-viewasid.php:866
 msgid "Show All Answers"
 msgstr "Alle Antworten anzeigen"
 
 #: course/gb-viewasid.php:864 course/gb-viewasid.php:868
+#: course/gb-viewasid.php:867
 msgid "Preview All"
 msgstr "Vorschau"
 
 #: course/gb-viewasid.php:956 course/gb-viewasid.php:1081
 #: course/gradebook.php:766 course/gb-viewasid.php:1085
-#: course/gb-viewasid.php:960
+#: course/gb-viewasid.php:960 course/gb-viewasid.php:959
+#: course/gb-viewasid.php:1084
 msgid "Feedback"
 msgstr "Hinweise"
 
 #: course/gb-viewasid.php:1125 course/gb-viewasid.php:1129
+#: course/gb-viewasid.php:1128
 msgid "General Instructor Feedback"
 msgstr "Allgemeine Rückmeldung vom Lehrer"
 
 #: course/gb-viewasid.php:1172 course/gb-viewasid.php:1176
+#: course/gb-viewasid.php:1175
 msgid "Show Score Details"
 msgstr "Zeige Punkte-Details"
 
 #: course/gb-viewasid.php:1281 course/gb-viewasid.php:1285
+#: course/gb-viewasid.php:1284
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
@@ -9301,7 +9312,7 @@ msgstr " Benutzer haben diese Email-Adresse und wurden angeschrieben"
 msgid "Return to login page"
 msgstr "Zurück zur Anmeldeseite"
 
-#: actions.php:342
+#: actions.php:342 actions.php:277
 #, php-format
 msgid "This is an automated message from %s. Do not respond to this email"
 msgstr ""
@@ -9862,3 +9873,118 @@ msgstr "Weitere Einstellungen"
 #: admin/forms.php:878
 msgid "LatePasses"
 msgstr "Kulanz-Guthaben"
+
+#: admin/actions.php:904
+msgid " Course Creation Confirmation"
+msgstr " Kurs erstellt"
+
+#: admin/actions.php:905
+msgid "Your course has been created"
+msgstr "Ihr Kurs wurde erstellt"
+
+#: admin/actions.php:906
+msgid ""
+"For students to enroll in this course via direct login, you will need to "
+"provide them two things"
+msgstr "Damit Studierende sich in Ihrem Kurs anmelden können, benötigen sie"
+
+#: admin/actions.php:909
+#, php-format
+msgid ""
+"Tell them to leave the enrollment key blank, since you didn't specify one.  "
+"The enrollment key acts like a course password to prevent random strangers "
+"from enrolling in your course.  If you want to set an enrollment key, %s "
+"modify your course settings %s"
+msgstr ""
+"Sagen Sie ihnen, dass sie das Feld für das Kurs-Passwort leer lassen sollen. "
+"Wenn Sie ein Kurspasswort setzen wollen, so ändern Sie Ihre %s "
+"Kurseinstellungen %s"
+
+#: admin/actions.php:911
+msgid "The enrollment key"
+msgstr "Das Kurs-Passwort"
+
+#: admin/actions.php:916
+msgid ""
+"If you plan to integrate this course with your school's Learning Management "
+"System (LMS), "
+msgstr ""
+"Wenn Sie diesen Kurs in das Lernmanagement-System (LMS) Ihrer Einrichtung "
+"integrieren wollen, "
+
+#: admin/actions.php:918
+msgid ""
+"it looks like your school may already have a school-wide LTI key and secret "
+"established - check with your LMS admin. "
+msgstr ""
+"es sieht so aus, als ob Ihre Einrichtung Key und Secret für die LTI-"
+"Verbindung bereits für alle eingerichtet hat - setzen Sie sich mit dem "
+"Administrator Ihres LMS in Verbindung. "
+
+#: admin/actions.php:919
+msgid "If so, you will not need to set up a course-level configuration. "
+msgstr ""
+"Wenn das so ist, brauchen Sie es nicht mehr auf Kursebene zu konfigurieren. "
+
+#: admin/actions.php:920
+msgid ""
+"If you do need to set up a course-level configuration for some reason, the "
+"key and secret can be found in your course settings"
+msgstr ""
+"Wenn Sie eine Konfiguration auf Kursebene benötigen, so finden Sie Key und "
+"Secret in Ihren Kurseinstellungen"
+
+#: admin/actions.php:922
+msgid ""
+"here is the information you will need to set up a course-level "
+"configuration, since your school does not appear to have a school-wide LTI "
+"key and secret established."
+msgstr ""
+"so ist hier die Information, die Sie benötigen um die LTI-Verbindung auf "
+"Kursebene zu konfigurieren, da Ihre Einrichtung anscheinend Key und Secret "
+"nicht global eingerichtet hat."
+
+#: admin/actions.php:925
+msgid ""
+"If you forget these later, you can find them by viewing your course settings."
+msgstr ""
+"Wenn Sie dies später vergessen, so finden Sie die Informationen in Ihren "
+"Kurseinstellungen."
+
+#: admin/actions.php:928
+msgid "Enter the Course"
+msgstr "Zum Kurs"
+
+#: admin/forms.php:713
+msgid "Upgrade assessment version"
+msgstr "Test in neue Version konvertieren"
+
+#: admin/forms.php:787
+msgid "Allow students to self-enroll"
+msgstr "Studierende können sich selbst einschreiben"
+
+#: admin/forms.php:816
+#, php-format
+msgid "View %s integration setup instructions %s"
+msgstr "%s Anleitung zur LMS-Integration %s ansehen"
+
+#: admin/forms.php:873
+msgid ""
+"Select this option to set your new course to use the new version of "
+"assessments."
+msgstr ""
+"Wählen Sie diese Option aus, um für den neuen Kurs für die Verwendung des "
+"neuen Test-Formats zu aktivieren."
+
+#: admin/actions.php:907
+msgid "The course ID"
+msgstr "Kurs-ID"
+
+#: admin/forms.php:391 admin/forms.php:834
+msgid "to only allow access through the LMS"
+msgstr "Zugang nur über das LMS"
+
+#: admin/forms.php:392 admin/forms.php:835
+#, php-format
+msgid "to allow students to login directly to %s"
+msgstr "Mit direkter Anmeldung in %s"

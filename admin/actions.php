@@ -901,34 +901,31 @@ switch($_POST['action']) {
 			$hasGroupLTI = ($stm->fetchColumn() !== false);
 
 			require("../header.php");
-			echo '<div class="breadcrumb">'.$breadcrumbbase.' Course Creation Confirmation</div>';
-			echo '<h1>Your course has been created!</h1>';
-			echo '<p>For students to enroll in this course via direct login, you will need to provide them two things:<ol>';
-			echo '<li>The course ID: <b>'.$cid.'</b></li>';
+			echo '<div class="breadcrumb">'.$breadcrumbbase._(' Course Creation Confirmation').'</div>';
+			echo '<h1>',_('Your course has been created'),'!</h1>';
+			echo '<p>',_('For students to enroll in this course via direct login, you will need to provide them two things'),':<ol>';
+			echo '<li>',_('The course ID'),': <b>'.$cid.'</b></li>';
 			if (trim($_POST['ekey'])=='') {
-				echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
-				echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
-				echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
+				echo '<li>',sprintf(_('Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, %s modify your course settings %s'),'<a href="forms.php?action=modify&id='.$cid.'">','</a>'),'</li>';
 			} else {
-				echo '<li>The enrollment key: <b>'.$_POST['ekey'].'</b></li>';
+				echo '<li>',_('The enrollment key'),': <b>'.$_POST['ekey'].'</b></li>';
 			}
 			echo '</ol></p>';
 
 			if (empty($CFG['LTI']['noCourseLevel'])) {
-				echo '<p>If you plan to integrate this course with your school\'s Learning Management System (LMS), ';
+				echo '<p>',_('If you plan to integrate this course with your school\'s Learning Management System (LMS), ');
 				if ($hasGroupLTI) {
-					echo 'it looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
-					echo 'If so, you will not need to set up a course-level configuration. ';
-					echo 'If you do need to set up a course-level configuration for some reason, the key and secret can be found in your course settings</p>';
+					echo _('it looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ');
+					echo _('If so, you will not need to set up a course-level configuration. ');
+					echo _('If you do need to set up a course-level configuration for some reason, the key and secret can be found in your course settings'),'</p>';
 				} else {
-					echo 'here is the information you will need to set up a course-level configuration, ';
-					echo 'since your school does not appear to have a school-wide LTI key and secret established.</p>';
+					echo _('here is the information you will need to set up a course-level configuration, since your school does not appear to have a school-wide LTI key and secret established.'),'</p>';
 					echo '<ul class=nomark><li>Key: LTIkey_'.$cid.'_1</li>';
 					echo '<li>Secret: '.Sanitize::encodeStringForDisplay($ltisecret).'</li></ul>';
-					echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
+					echo '<p>',_('If you forget these later, you can find them by viewing your course settings.'),'</p>';
 				}
 			}
-			echo '<a href="../course/course.php?cid='.$cid.'">Enter the Course</a>';
+			echo '<a href="../course/course.php?cid='.$cid.'">',_('Enter the Course'),'</a>';
 			require("../footer.php");
 			exit;
 		}
