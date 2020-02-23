@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-22 21:38+0100\n"
-"PO-Revision-Date: 2020-02-22 21:39+0100\n"
+"POT-Creation-Date: 2020-02-23 19:11+0100\n"
+"PO-Revision-Date: 2020-02-23 19:17+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3907,6 +3907,7 @@ msgid "Last Attempt:"
 msgstr "Letzter Versuch:"
 
 #: assessment/showtest.php:3740 assessment/showtest.php:3747
+#: admin/forms.php:391 admin/forms.php:834
 msgid "or"
 msgstr "oder"
 
@@ -9988,3 +9989,24 @@ msgstr "Zugang nur über das LMS"
 #, php-format
 msgid "to allow students to login directly to %s"
 msgstr "Mit direkter Anmeldung in %s"
+
+#: course/course.php:645
+msgid "Welcome to your course"
+msgstr "Willkommen in Ihrem Kurs"
+
+#: course/course.php:646
+#, php-format
+msgid ""
+"To start by copying from another course, use the %s Course Items: Copy %s "
+"link along the left side of the screen."
+msgstr ""
+"Um Elemente eines anderen Kurses zu kopieren verwenden Sie den Link %s "
+"Kurselemente: Kopieren%s im Kursmenü auf der linken Seite des Bildschirms."
+
+#: course/course.php:647
+msgid ""
+"If you want to build from scratch, use the \"Add An Item\" pulldown below to "
+"get started."
+msgstr ""
+"Wenn Sie neu beginnen wollen wählen Sie aus dem \"Hinzufügen\"-Menü unten "
+"ein Kurselement aus."
