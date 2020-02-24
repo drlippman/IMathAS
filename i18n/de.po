@@ -3,19 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: mathquill/mathquill.js:1530 mathquill/mathquill.min.js:1
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-23 19:11+0100\n"
-"PO-Revision-Date: 2020-02-23 19:17+0100\n"
-"Language: de\n"
+"POT-Creation-Date: 2020-02-24 17:02+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Last-Translator: Ingo Dahn <dahn@vcrp.de>\n"
-"Language-Team: \n"
-"X-Generator: Poedit 2.3\n"
 
 #: DEembedq.php:171 OEAembedq.php:314 assessment/showtest.php:292
 #: assessment/showtest.php:1925 assessment/showtest.php:1969
@@ -241,7 +242,8 @@ msgstr "Fortfahren"
 #: course/gradebook.php:333 course/gradebook.php:485 course/outcomemap.php:162
 #: includes/userutils.php:23 includes/userutils.php:44
 #: includes/userutils.php:70 util/listnewteachers.php:153
-#: util/listnewteachers.php:204
+#: util/listnewteachers.php:204 javascript/addqsort.js:1082
+#: javascript/addqsort.js:1088
 msgid "Default"
 msgstr "Standard"
 
@@ -401,7 +403,9 @@ msgstr "Rolle"
 #: admin/admin2.php:197 admin/admin2.php:246 admin/listdiag.php:128
 #: admin/userdetails.php:188 admin/userlti.php:171
 #: admin/userreportdetails.php:267 admin/userreports.php:159
-#: admin/userreports.php:196 forms.php:138
+#: admin/userreports.php:196 forms.php:138 javascript/addqsort.js:1146
+#: javascript/addqsort.js:1222 javascript/addqsort.js:1152
+#: javascript/addqsort.js:1228
 msgid "Group"
 msgstr "Gruppe"
 
@@ -445,7 +449,7 @@ msgstr "Löschen"
 msgid "Last Login"
 msgstr "Letzte Anmeldung"
 
-#: admin/admin2.php:290 admin/admin2.php:309
+#: admin/admin2.php:290 admin/admin2.php:309 course/addquestions.php:985
 msgid "Edit"
 msgstr "Ändern"
 
@@ -812,6 +816,7 @@ msgstr "Eigentümer"
 #: course/modquestiongrid.php:147 course/chgassessments2form.php:390
 #: course/chgassessments2form.php:400 course/chgassessments2form.php:410
 #: course/chgassessments2form.php:540 course/chgassessments2form.php:380
+#: course/addquestions.php:975
 msgid "Yes"
 msgstr "Ja"
 
@@ -1088,7 +1093,10 @@ msgstr "Benutzer ID (remote)"
 #: admin/userlti.php:177 admin/userlti.php:199 admin/userlti.php:227
 #: javascript/assess2_min.js:1 javascript/assessment_min.js:5
 #: javascript/drawing.js:311 javascript/drawing_min.js:1
-#: course/addassessment2form.php:558
+#: course/addassessment2form.php:558 javascript/addqsort.js:1269
+#: javascript/addqsort.js:1389 javascript/addqsort.js:1640
+#: javascript/addqsort.js:1275 javascript/addqsort.js:1395
+#: javascript/addqsort.js:1646 javascript/addqsort.js:1647
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -1108,7 +1116,8 @@ msgstr "contextid/label"
 msgid "Click a contextid above to list the associated placements"
 msgstr "Wählen Sie oben eine contextid um die zugeordneten Tests anzuzeigen"
 
-#: admin/userlti.php:223
+#: admin/userlti.php:223 course/addquestions.php:1350
+#: course/addquestions.php:1477 javascript/addqsort.js:1080
 msgid "Type"
 msgstr "Typ"
 
@@ -1249,6 +1258,7 @@ msgstr ""
 
 #: assess2/displayq3.php:524 assess2/questions/QuestionHtmlGenerator.php:556
 #: assessment/displayq2.php:655 assess2/questions/QuestionHtmlGenerator.php:558
+#: course/addquestions.php:962
 msgid "Detailed Solution"
 msgstr "Detaillierte Lösung"
 
@@ -1563,7 +1573,8 @@ msgstr "Ihre Antwort"
 #: assessment/displayq2.php:2796 course/modquestion.php:242
 #: course/modquestion2.php:257 course/modquestiongrid.php:231
 #: course/modquestiongrid.php:308 course/modquestiongrid2.php:240
-#: course/modquestiongrid2.php:320
+#: course/modquestiongrid2.php:320 course/addquestions.php:1350
+#: course/addquestions.php:1477 javascript/addqsort.js:1078
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -2671,6 +2682,7 @@ msgstr "[mehr..]"
 
 #: assess2/index.php:56 assess2/index.php:60 assessment/showtest.php:1210
 #: assessment/showtest.php:1214 course/courseshowitems.php:1823
+#: course/addquestions.php:1539
 msgid "Assessment"
 msgstr "Test"
 
@@ -2715,7 +2727,7 @@ msgstr "Eeek!  $questions ist nicht definiert oder muss ein Array sein"
 msgid "None of these"
 msgstr "Keine davon"
 
-#: assess2/questions/models/Question.php:164
+#: assess2/questions/models/Question.php:164 course/addquestions.php:955
 msgid "Video"
 msgstr "Video"
 
@@ -3907,7 +3919,7 @@ msgid "Last Attempt:"
 msgstr "Letzter Versuch:"
 
 #: assessment/showtest.php:3740 assessment/showtest.php:3747
-#: admin/forms.php:391 admin/forms.php:834
+#: admin/forms.php:391 admin/forms.php:834 course/addquestions.php:1534
 msgid "or"
 msgstr "oder"
 
@@ -3946,6 +3958,7 @@ msgid "Question %d of %d"
 msgstr "Frage %d von %d"
 
 #: assessment/testutil.php:824 assessment/testutil.php:1004
+#: javascript/addqsort.js:1395 javascript/addqsort.js:1401
 msgid "Question Withdrawn"
 msgstr "Frage zurückgezogen"
 
@@ -4132,6 +4145,8 @@ msgstr "Dies wird alle Änderungen auf dieser Seite verwerfen"
 
 #: course/addassessment.php:902 course/addassessment2.php:843
 #: course/gb-rescoreq.php:212 course/gb-rescoreq2.php:53
+#: course/addquestions.php:15 course/addquestions.php:19
+#: course/addquestions.php:22 course/addquestions.php:1187
 #, php-format
 msgid "Add/Remove Questions"
 msgstr "Fragen hinzufügen/entfernen"
@@ -4247,7 +4262,7 @@ msgstr "Als defekt markiert"
 msgid "Assessment Settings"
 msgstr "Testeinstellungen"
 
-#: course/addquestions.php:1280
+#: course/addquestions.php:1280 course/addquestions.php:1276
 msgid ""
 "You can break your assessment into pages by using the +Text button and "
 "selecting the New Page option."
@@ -4256,18 +4271,21 @@ msgstr ""
 "verwenden und die Option Neue Seite auswählen."
 
 #: course/addquestions.php:1430 course/manageqset.php:1295
+#: course/addquestions.php:1426
 msgid "Search cut off at 300 results"
 msgstr "Suche nach 300 Ergebnissen abgeschnitten"
 
-#: course/addquestions.php:1431
+#: course/addquestions.php:1431 course/addquestions.php:1427
 msgid "Showing "
 msgstr "Zeige "
 
 #: course/addquestions.php:1434 course/showlinkedtext.php:154
+#: course/addquestions.php:1430
 msgid "Previous"
 msgstr "Zurück"
 
 #: course/addquestions.php:1438 course/showlinkedtext.php:165
+#: course/addquestions.php:1434
 msgid "Next"
 msgstr "Weiter"
 
@@ -4306,7 +4324,8 @@ msgstr "Blöcke ändern"
 #: course/gradebook.php:507 course/gradebook.php:527 course/gradebook.php:1125
 #: course/gradebook.php:1514 forms.php:447 forms.php:459 forms.php:471
 #: forums/newthreads.php:102 course/addassessment2form.php:382
-#: course/chgassessments2form.php:368
+#: course/chgassessments2form.php:368 course/addquestions.php:1343
+#: course/addquestions.php:1469 course/addquestions.php:1533
 msgid "All"
 msgstr "Alle"
 
@@ -4314,7 +4333,9 @@ msgstr "Alle"
 #: course/gradebook.php:527 course/gradebook.php:735 course/listusers.php:706
 #: forms.php:447 forms.php:459 forms.php:471 forums/newthreads.php:102
 #: index.php:95 course/addassessment2form.php:424
-#: course/chgassessments2form.php:426
+#: course/chgassessments2form.php:426 course/addquestions.php:1249
+#: course/addquestions.php:1343 course/addquestions.php:1469
+#: course/addquestions.php:1533
 msgid "None"
 msgstr "Keine"
 
@@ -4610,13 +4631,15 @@ msgstr "Aus dem Kurs austragen"
 
 #: course/course.php:631 forums/posts.php:462 msgs/msghistory.php:147
 #: course/addassessment2form.php:200 course/chgassessments2form.php:173
-#: forums/posts.php:464
+#: forums/posts.php:464 javascript/addqsort.js:1685 javascript/addqsort.js:1691
+#: javascript/addqsort.js:1692
 msgid "Expand All"
 msgstr "Alle ausklappen"
 
 #: course/course.php:632 forums/posts.php:463 msgs/msghistory.php:148
 #: course/addassessment2form.php:201 course/chgassessments2form.php:174
-#: forums/posts.php:465
+#: forums/posts.php:465 javascript/addqsort.js:1689 javascript/addqsort.js:1695
+#: javascript/addqsort.js:1696
 msgid "Collapse All"
 msgstr "Alle einklappen"
 
@@ -5655,7 +5678,8 @@ msgid "Show Score Details"
 msgstr "Zeige Punkte-Details"
 
 #: course/gb-viewasid.php:1281 course/gb-viewasid.php:1285
-#: course/gb-viewasid.php:1284
+#: course/gb-viewasid.php:1284 javascript/addqsort.js:1608
+#: javascript/addqsort.js:1614 javascript/addqsort.js:1615
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
@@ -5665,7 +5689,8 @@ msgstr "Kommentare speichern"
 
 #: course/gbsettings.php:283 course/gradebook.php:424
 #: course/addassessment2form.php:596 course/chgassessments2form.php:497
-#: course/chgassessments2form.php:621
+#: course/chgassessments2form.php:621 javascript/addqsort.js:1078
+#: javascript/addqsort.js:1084
 msgid "Points"
 msgstr "Punkte"
 
@@ -5910,7 +5935,8 @@ msgstr "Ein"
 msgid "Offline Grades"
 msgstr "Offline-Bewertungen"
 
-#: course/gradebook.php:449
+#: course/gradebook.php:449 course/addquestions.php:982
+#: course/addquestions.php:1477
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -5923,8 +5949,9 @@ msgid "Color:"
 msgstr "Farbe:"
 
 #: course/gradebook.php:527 course/gradebook.php:735
+#: course/addquestions.php:1249 course/addquestions.php:1343
 msgid "Check:"
-msgstr "Überprüfen:"
+msgstr "Markieren:"
 
 #: course/gradebook.php:530
 msgid "With Selected"
@@ -7186,7 +7213,8 @@ msgstr ""
 "Einträge aus jedem Kurs. Wählen Sie die Kurse, die in der Forumsübersicht "
 "berücksichtigt werden sollen."
 
-#: forms.php:447 forms.php:459 forms.php:471
+#: forms.php:447 forms.php:459 forms.php:471 course/addquestions.php:1469
+#: course/addquestions.php:1533
 msgid "Check"
 msgstr "Auswahl"
 
@@ -7244,7 +7272,8 @@ msgstr "Hinweise zum Verfassen von Beiträgen"
 msgid "Reply Instructions"
 msgstr "Hinweise zum Beantworten von Beiträgen"
 
-#: forums/posthandler.php:536
+#: forums/posthandler.php:536 course/addquestions.php:1350
+#: course/addquestions.php:1477 javascript/addqsort.js:1075
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -7952,28 +7981,29 @@ msgstr "Schnellsuche ausblenden"
 msgid "Show Quicksearch Entry"
 msgstr "Schnellsuche einblenden"
 
-#: javascript/addqsort.js:601
+#: javascript/addqsort.js:601 javascript/addqsort.js:677
 msgid "Are you sure you want to remove this question?"
 msgstr "Sind Sie sicher, dass Sie diese Frage entfernen wollen?"
 
-#: javascript/addqsort.js:603
+#: javascript/addqsort.js:603 javascript/addqsort.js:679
 msgid "Are you sure you want to remove this text segment?"
 msgstr "Sind Sie sicher, dass Sie diesen Textabschnitt löschen möchten?"
 
-#: javascript/addqsort.js:615
+#: javascript/addqsort.js:615 javascript/addqsort.js:692
 msgid "Are you sure you want to remove ALL questions in this group?"
 msgstr "Sind Sie sicher, dass Sie ALLE Fragen dieser Gruppe entfernen wollen?"
 
-#: javascript/addqsort.js:641
+#: javascript/addqsort.js:641 javascript/addqsort.js:721
 msgid "Are you sure you want to remove these questions?"
 msgstr "Sind Sie sicher, dass Sie diese Fragen löschen wollen?"
 
-#: javascript/addqsort.js:796
+#: javascript/addqsort.js:796 javascript/addqsort.js:901
 msgid "Are you sure you want to clear all attempts on this question?"
 msgstr ""
 "Stellen Sie sicher, dass Sie alle Versuche zu dieser Frage löschen wollen?"
 
-#: javascript/addqsort.js:1312
+#: javascript/addqsort.js:1312 javascript/addqsort.js:1776
+#: javascript/addqsort.js:1782 javascript/addqsort.js:1783
 msgid ""
 "There are unsaved changes in a question intro text box.  Press OK to discard "
 "those changes and continue with the most recent action.  Press Cancel to "
@@ -7983,7 +8013,8 @@ msgstr ""
 "Klicken Sie OK um diese Änderungen zu verwerfen und mit der letzten Aktion "
 "fortzufahren. Klicken Sie Abbrechen um ohne Aktion auf der Seite zu bleiben."
 
-#: javascript/addqsort.js:1322
+#: javascript/addqsort.js:1322 javascript/addqsort.js:1788
+#: javascript/addqsort.js:1794 javascript/addqsort.js:1795
 msgid " Saving Changes... "
 msgstr " Speichere Änderungen... "
 
@@ -9179,6 +9210,7 @@ msgstr ""
 "sobald sie eingehen."
 
 #: course/addassessment2form.php:95 course/chgassessments2form.php:75
+#: course/addquestions.php:1539
 msgid "Summary"
 msgstr "Zusammenfassung (für die Kursseite)"
 
@@ -10010,3 +10042,461 @@ msgid ""
 msgstr ""
 "Wenn Sie neu beginnen wollen wählen Sie aus dem \"Hinzufügen\"-Menü unten "
 "ein Kurselement aus."
+
+#: course/addquestions.php:28
+msgid "You need to log in as a teacher to access this page"
+msgstr "Sie müssen sich als Dozent anmelden um auf diese Seite zuzugreifen"
+
+#: course/addquestions.php:31
+msgid "You need to access this page from the course page menu"
+msgstr "Auf diese Seite können Sie nur über das Kursmenü zugreifen"
+
+#: course/addquestions.php:40
+msgid "Invalid ID"
+msgstr "Ungültige ID"
+
+#: course/addquestions.php:64 course/addquestions.php:131
+msgid "No questions selected"
+msgstr "Keine Fragen ausgewählt"
+
+#: course/addquestions.php:64 course/addquestions.php:131
+msgid "Go back"
+msgstr "Zurück"
+
+#: course/addquestions.php:167
+msgid ""
+"Are you SURE you want to delete all attempts (grades) for this assessment?"
+msgstr ""
+"Sind Sie SICHER, dass Sie alle Versuche (Noten) für diesen Test löschen "
+"wollen?"
+
+#: course/addquestions.php:406
+msgid "Withdraw Question"
+msgstr "Frage entfernen"
+
+#: course/addquestions.php:409
+msgid "This question is part of a group of questions"
+msgstr "Diese Frage gehört zu einer Fragengruppe"
+
+#: course/addquestions.php:410
+msgid ""
+"Set points possible and all student scores to zero <b>for all questions in "
+"group</b>"
+msgstr ""
+"Mögliche Punkte und erreichte Punkte aller Studierenden <b>für alle Fragen "
+"in der Gruppe</b> auf NULL(0)  setzen"
+
+#: course/addquestions.php:411
+msgid "Set all student scores to points possible <b>for all questions in group"
+msgstr ""
+"Alle Studierenden erhalte alle möglichen Punkte <b>für alle Fragen in der "
+"Gruppe"
+
+#: course/addquestions.php:412
+msgid "Set all student scores to points possible <b>for this question only"
+msgstr ""
+"Alle Studierenden erhalten alle möglichen Punkte <b>nur für diese Frage"
+
+#: course/addquestions.php:414
+msgid "Set points possible and all student scores to zero"
+msgstr ""
+"Die möglichen Punkte und alle Punkte der Studierenden auf NULL (0) setzen"
+
+#: course/addquestions.php:415
+msgid "Set all student scores to points possible"
+msgstr "Alle Studierenden erhalten die maximal möglichen Punkte"
+
+#: course/addquestions.php:417
+msgid "This action can <b>not</b> be undone"
+msgstr "Diese Aktion kann <b>nicht</b> rückgängig gemacht werden"
+
+#: course/addquestions.php:930
+msgid "List lib"
+msgstr "Bibliothek"
+
+#: course/addquestions.php:958
+msgid "Help Resource"
+msgstr "Hilfsmaterial"
+
+#: course/addquestions.php:973
+msgid "Private"
+msgstr "Privat"
+
+#: course/addquestions.php:987 course/addquestions.php:1093
+#: javascript/addqsort.js:1568 javascript/addqsort.js:1574
+#: javascript/addqsort.js:1575
+msgid "View Code"
+msgstr "Code ansehen"
+
+#: course/addquestions.php:990 course/addquestions.php:1094
+#: javascript/addqsort.js:1634 javascript/addqsort.js:1640
+#: javascript/addqsort.js:1641
+msgid "Template"
+msgstr "Als Vorlage"
+
+#: course/addquestions.php:1194
+msgid "Warning"
+msgstr "Warnung"
+
+#: course/addquestions.php:1195
+msgid ""
+"This assessment has already been taken.  Adding or removing questions, or "
+"changing a\tquestion's settings (point value, penalty, attempts) now would "
+"majorly mess things up. If you want to make these changes, you need to clear "
+"all existing assessment attempts"
+msgstr ""
+"Dieser Test wurde bereits bearbeitet. Fragen hinzuzufügen, zu löschen oder "
+"Fragen-Einstellungen (Punkte, Punktabzüge, Versuche) jetzt zu ändern würde "
+"den Test erheblich durcheinanderbringen. Wenn Sie diese Änderungen vornehmen "
+"wollen, so müssen Sie zunächst alle Versuche des Tests löschen"
+
+#: course/addquestions.php:1202
+msgid "Questions in Assessment"
+msgstr "Fragen im Test"
+
+#: course/addquestions.php:1206
+msgid "No Questions currently in assessment"
+msgstr "Test hat keine Fragen"
+
+#: course/addquestions.php:1210
+msgid "How do I find questions to add?"
+msgstr "Wo kann ich Fragen für den Test finden?"
+
+#: course/addquestions.php:1213
+msgid ""
+"You are currently set to select questions from the question libraries.  If "
+"you would like to select questions from assessments you've already created, "
+"click the <b>Select From Assessments</b> button below"
+msgstr ""
+"Sie fügen Fragen aus der Fragen-Bibliothek hinzu. Wenn Sie lieber Fragen aus "
+"Tests nehmen wollen, die Sie früher angelegt haben, so wählen Sie unten "
+"<b>Auswahl aus Tests</b>"
+
+#: course/addquestions.php:1214
+msgid "To find questions to add from the question libraries:"
+msgstr "Um Fragen aus der Fragen-Bibliothek zu finden:"
+
+#: course/addquestions.php:1215
+msgid ""
+"Click the <b>Select Libraries</b> button below to pop open the library "
+"selector"
+msgstr ""
+"Klicken Sie unten auf <b>Bibliotheken auswählen</b> um die "
+"Bibliotheksauswahl zu öffnen"
+
+#: course/addquestions.php:1216
+msgid ""
+"In the library selector, open up the topics of interest, and click the "
+"checkbox to select libraries to use"
+msgstr ""
+"In der Bibliotheksauswahl öffnen klicken Sie auf die Kontrollkästchen der "
+"Unterbibliotheken, die Sie interessieren"
+
+#: course/addquestions.php:1217
+msgid ""
+"Scroll down in the library selector, and click the <b>Use Libraries</b> "
+"button"
+msgstr ""
+"Scrollen Sie in der Bibliotheksauswahl nach unten unt klicken Sie auf die "
+"Schaltfläche <b>Bibliotheken verwenden</b>"
+
+#: course/addquestions.php:1218
+msgid ""
+"On this page, click the <b>Search</b> button to list the questions in the "
+"libraries selected.<br/>  You can limit the listing by entering a sepecific "
+"search term in the box provided first, or leave it blank to view all "
+"questions in the chosen libraries"
+msgstr ""
+"Klicken Sie auf dieser Seite auf die <b>Suchen</b>-Schaltfläche um die "
+"Fragen in den ausgewählten Bibliotheken anzuzeigen.</br> Sie können die "
+"Suche durch Eingabe eines spezifischen Suchbegriffs im ersten Eingabefeld "
+"eingrenzen oder dieses Feld ler lassen, um alle Fragen in den gewählten "
+"Bibliotheken zu sehen"
+
+#: course/addquestions.php:1221
+msgid ""
+"You are currently set to select questions existing assessments.  If you "
+"would like to select questions from the question libraries, click the "
+"<b>Select From Libraries</b> button below"
+msgstr ""
+"Sie wollen Fragen aus anderen Tests wählen. Wenn Sie lieber Fragen aus der "
+"Fragen-Bibliothek wählen möchten, so klicken Sie unten auf die Schaltfläche "
+"<b>Aus Bibliothek auswählen</b>"
+
+#: course/addquestions.php:1222
+msgid "To find questions to add from existing assessments:"
+msgstr "Um Fragen aus anderen Tests zu finden, die Sie hinzufügen können:"
+
+#: course/addquestions.php:1223
+msgid ""
+"Use the checkboxes to select the assessments you want to pull questions from"
+msgstr ""
+"Markieren Sie die Kontrollkästchen um die Tests auszuwählen, aus denen Sie "
+"Fragen übernehmen möchten"
+
+#: course/addquestions.php:1224
+msgid ""
+"Click <b>Use these Assessments</b> button to list the questions in the "
+"assessments selected"
+msgstr ""
+"Klicken Sie auf die Schaltfläche <b>Diese Tests verwenden</b> um die Fragen "
+"in den ausgewählten Tests anzuzeigen"
+
+#: course/addquestions.php:1227
+msgid "To select questions and add them:"
+msgstr "Um Fragen auszuwählen und hinzuzufügen:"
+
+#: course/addquestions.php:1228
+msgid ""
+"Click the <b>Preview</b> button after the question description to view an "
+"example of the question"
+msgstr ""
+"Klicken Sie auf die <b>Vorschau</b>-Schaltfläche neben der Beschreibung um "
+"ein Beispiel der Frage zu sehen"
+
+#: course/addquestions.php:1229
+msgid "Use the checkboxes to mark the questions you want to use"
+msgstr ""
+"Verwenden Sie die Kontrollkästchen um die Fragen auszuwählen, die Sie "
+"verwenden möchten"
+
+#: course/addquestions.php:1230
+msgid ""
+"Click the <b>Add</b> button above the question list to add the questions to "
+"your assessment"
+msgstr ""
+"Klicken Sie auf die Schaltfläche <b>Hinzufügen</b> über der Fragenliste, um "
+"die Fragen zu Ihrem Test hinzuzufügen"
+
+#: course/addquestions.php:1262
+msgid "Assessment points total:"
+msgstr "Gesamtpunktzahl für den Test:"
+
+#: course/addquestions.php:1280
+msgid "Exit back to course page"
+msgstr "Zurück zur Kurs-Seite"
+
+#: course/addquestions.php:1281
+msgid "Modify assessment settings"
+msgstr "Test-Einstellungen ändern"
+
+#: course/addquestions.php:1282
+msgid "Categorize questions by outcome or other groupings"
+msgstr "Fragen nach Lernziel oder anderen Kriterien kategorisieren"
+
+#: course/addquestions.php:1291
+msgid "Customize messages to display based on the assessment score"
+msgstr "Nachricht in Abhängigkeit von der Punktzahl anpassen"
+
+#: course/addquestions.php:1292
+msgid "Preview this assessment"
+msgstr "Test-Vorschau"
+
+#: course/addquestions.php:1335
+msgid "Must provide a search term when searching all libraries"
+msgstr "Um in der Bibliothek zu suchen muss ein Suchbegriff angegeben werden"
+
+#: course/addquestions.php:1338
+msgid "No Questions matched search"
+msgstr "Keine passenden Fragen gefunden"
+
+#: course/addquestions.php:1352 course/addquestions.php:1477
+msgid "Times Used"
+msgstr "Mal verwendet"
+
+#: course/addquestions.php:1353
+msgid "Average time, in minutes, this question has taken students"
+msgstr "Mittlere Zeit in Minuten, die die Studierenden benötigt haben"
+
+#: course/addquestions.php:1353 javascript/addqsort.js:1082
+msgid "Avg Time"
+msgstr "Mtl. Zeit"
+
+#: course/addquestions.php:1354 course/addquestions.php:1477
+msgid "Mine"
+msgstr "Meine"
+
+#: course/addquestions.php:1354 javascript/addqsort.js:1090
+#: javascript/addqsort.js:1096
+msgid "Actions"
+msgstr "Aktionen"
+
+#: course/addquestions.php:1355
+msgid "Flag a question if it is in the wrong library"
+msgstr "Frage markieren, die in einer falschen Bibliothek ist"
+
+#: course/addquestions.php:1355
+msgid "Wrong Lib"
+msgstr "Falche Bibliothek"
+
+#: course/addquestions.php:1398
+msgid "Avg score on first try: "
+msgstr "Mtl. Pkte. bei 1. Versuch "
+
+#: course/addquestions.php:1399
+msgid "Avg time on first try: "
+msgstr "Mtl. Zeit beim 1. Versuch "
+
+#: course/addquestions.php:1441
+#, php-format
+msgid "Questions %s in gray %s have been added to the assessment."
+msgstr "Fragen %s in grau %s wurden bereits zum Test hinzugefügt."
+
+#: course/addquestions.php:1460
+msgid "No Assessments Selected.  Select at least one assessment."
+msgstr "Kein Test gewählt. Wählen Sie wenigstens einen Test."
+
+#: course/addquestions.php:411
+msgid ""
+"Set all student scores to points possible <b>for all questions in group</b>"
+msgstr ""
+"Alle Studierenden erhalten <b>für alle Fragen der Gruppe</b> die maximal "
+"möglichen Punkte"
+
+#: course/addquestions.php:412
+msgid "Set all student scores to points possible <b>for this question only</b>"
+msgstr ""
+"Alle Studierenden erhalten <b>nur für diese Frage</b> die maximal möglichen "
+"Punkte"
+
+#: course/addquestions.php:1251
+msgid "With Selected:"
+msgstr "Ausgewählte:"
+
+#: course/addquestions.php:1309 course/addquestions.php:1456
+msgid "Potential Questions"
+msgstr "Mögliche Fragen"
+
+#: course/addquestions.php:1312
+msgid "In Libraries"
+msgstr "In Bibliothek"
+
+#: course/addquestions.php:1325
+msgid "Mine only"
+msgstr "Nur meine"
+
+#: course/addquestions.php:1328
+msgid "Exclude added"
+msgstr "Gewählte ausschließen"
+
+#: course/addquestions.php:1477
+msgid "Source"
+msgstr "Quelltext"
+
+#: course/addquestions.php:1477
+msgid "Use as Template"
+msgstr "Als Vorlage verwenden"
+
+#: course/addquestions.php:1531
+msgid "Choose assessments to take questions from"
+msgstr "Wähle Tests um Fragen zu übernehmen"
+
+#: course/addquestions.php:1318
+msgid "Search"
+msgstr "Suche"
+
+#: course/addquestions.php:1322
+msgid "Search all libs"
+msgstr "In allen Bibliotheken"
+
+#: javascript/addqsort.js:1073
+msgid "Order"
+msgstr "Reihenfolge"
+
+#: javascript/addqsort.js:1148 javascript/addqsort.js:1154
+msgid "choosing "
+msgstr "wähle "
+
+#: javascript/addqsort.js:1151 javascript/addqsort.js:1157
+msgid " without"
+msgstr " ohne"
+
+#: javascript/addqsort.js:1153 javascript/addqsort.js:1159
+msgid " with"
+msgstr " mit"
+
+#: javascript/addqsort.js:1155 javascript/addqsort.js:1161
+msgid " replacement"
+msgstr " Ersetzen"
+
+#: javascript/addqsort.js:1202 javascript/addqsort.js:1208
+msgid "Collapse"
+msgstr "Schließen"
+
+#: javascript/addqsort.js:1211 javascript/addqsort.js:1217
+msgid "Expand"
+msgstr "Öffnen"
+
+#: javascript/addqsort.js:1225 javascript/addqsort.js:1231
+msgid "Select"
+msgstr "Auswählen"
+
+#: javascript/addqsort.js:1235 javascript/addqsort.js:1241
+msgid "from group of "
+msgstr "aus der Gruppe von "
+
+#: javascript/addqsort.js:1248 javascript/addqsort.js:1254
+msgid "Without"
+msgstr "Ohne"
+
+#: javascript/addqsort.js:1252 javascript/addqsort.js:1258
+msgid "With"
+msgstr "Mit"
+
+#: javascript/addqsort.js:1327 javascript/addqsort.js:1343
+#: javascript/addqsort.js:1376 javascript/addqsort.js:1333
+#: javascript/addqsort.js:1349 javascript/addqsort.js:1382
+msgid "Expand and Edit"
+msgstr "Öffnen und bearbeiten"
+
+#: javascript/addqsort.js:1544 javascript/addqsort.js:1550
+#: javascript/addqsort.js:1551
+msgid "Change Settings"
+msgstr "Einstellungen ändern"
+
+#: javascript/addqsort.js:1557 javascript/addqsort.js:1563
+#: javascript/addqsort.js:1564
+msgid "Edit Code"
+msgstr "Code bearbeiten"
+
+#: javascript/addqsort.js:1580 javascript/addqsort.js:1586
+#: javascript/addqsort.js:1587
+msgid "Edit Personal Copy"
+msgstr "Persönliche Kopie bearbeiten"
+
+#: javascript/addqsort.js:1603 javascript/addqsort.js:1609
+#: javascript/addqsort.js:1610
+msgid "Withdraw"
+msgstr "Entfernen"
+
+#: javascript/addqsort.js:1623 javascript/addqsort.js:1629
+#: javascript/addqsort.js:1630
+msgid "Re-score Question"
+msgstr "Frage neu bewerten"
+
+#: javascript/addqsort.js:1680 javascript/addqsort.js:1686
+#: javascript/addqsort.js:1687
+msgid "Insert Instructions or Video for Question"
+msgstr "Anleitung oder Video für Frage einfügen"
+
+#: javascript/addqsort.js:1708 javascript/addqsort.js:1714
+#: javascript/addqsort.js:1715
+msgid "WARNING: All question in a group should be given the same point values"
+msgstr "WARNUNG: Alle Fragen in der Gruppe sollten den selben Punktwert haben"
+
+#: javascript/addqsort.js:1760 javascript/addqsort.js:1766
+#: javascript/addqsort.js:1767
+msgid ""
+"If you are using page titles, you need to have a page title at the beginning."
+msgstr ""
+"Wenn Sie Seitentitel verwenden, so brauchen Sie einen Seitentitel am Anfang."
+
+#: javascript/addqsort.js:1765 javascript/addqsort.js:1767
+#: javascript/addqsort.js:1771 javascript/addqsort.js:1773
+#: javascript/addqsort.js:1772 javascript/addqsort.js:1774
+msgid "First Page Title"
+msgstr "Titel der ersten Seite"
+
+#: course/addquestions.php:1407 javascript/addqsort.js:1537
+msgid "Action"
+msgstr "Aktion"
