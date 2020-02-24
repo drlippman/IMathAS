@@ -1459,18 +1459,22 @@ function generateTable() {
         html += "<td>" + curitems[j][1] + "</td>";
         if (beentaken) {
           html +=
-            "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc" +
+            "<td><button type='button' onClick=\"previewq('curqform','qc" +
             ln +
             "'," +
             curitems[j][1] +
-            ',false,false)"/></td>'; //Preview
+            ',false,false)">' +
+            _("Preview") +
+            "</button></td>"; //Preview
         } else {
           html +=
-            "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc" +
+            "<td><button type='button' onClick=\"previewq('curqform','qc" +
             ln +
             "'," +
             curitems[j][1] +
-            ',true,false)"/></td>'; //Preview
+            ',true,false)">' +
+            _("Preview") +
+            "</button></td>"; //Preview
         }
         html += "<td>" + curitems[j][3] + "</td>"; //question type
         html += "<td class=c>";

@@ -899,7 +899,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						} else {
 							$page_questionTable[$i]['desc'] = filter(Sanitize::encodeStringForDisplay($line['description']));
 						}
-						$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\"/>";
+						$page_questionTable[$i]['preview'] = "<button type=\"button\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyInt($line['id']).",true,false)\">"._("Preview")."</button>";
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
@@ -1085,7 +1085,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 					//$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
 					$page_assessmentQuestions[$x]['qsetid'][$y] = $qsetid[$qid];
-					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyFloat($qsetid[$qid]).",true)\"/>";
+					$page_assessmentQuestions[$x]['preview'][$y] = "<button type=\"button\" onClick=\"previewq('selq','qo$ln',".Sanitize::onlyFloat($qsetid[$qid]).",true)\"/>"._("Preview")."</button>";
 					$page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
 					$page_assessmentQuestions[$x]['times'][$y] = $qsetusecnts[$qsetid[$qid]];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;
@@ -1248,9 +1248,9 @@ if ($overwriteBody==1) {
 
 		<?php echo _('Check:') ?> <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)"><?php echo _('None') ?></a>
 
-		<?php echo _('With Selected:') ?> <input type=button value="Remove" onclick="removeSelected()" />
-				<input type=button value="Group" onclick="groupSelected()" />
-				<input type="submit" value="Change Settings" onclick="return confirm_textseg_dirty()"/>
+		<?php echo _('With Selected:') ?> <button type="button" onclick="removeSelected()"><?php echo _('Remove'); ?></button>
+				<button type="button" onclick="groupSelected()" ><?php echo _('Group'); ?></button>
+				<button type="submit" onclick="return confirm_textseg_dirty()"><?php echo _("Change Settings"); ?></button>
 
 <?php
 		}
@@ -1277,25 +1277,25 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<p>
-		<input type=button value="Done" title=<?php echo '"'._("Exit back to course page"),'"'; ?> onClick="window.location='course.php?cid=<?php echo $cid ?>'">
-		<input type=button value="Assessment Settings" title=<?php echo '"'._("Modify assessment settings").'"'; ?> onClick="window.location='<?php echo $address;?>?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'">
-		<input type=button value="Categorize Questions" title=<?php echo '"'._("Categorize questions by outcome or other groupings").'"'; ?> onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
-		<input type=button value="Create Print Version" onClick="window.location='<?php
+		<button type="button" title=<?php echo '"'._("Exit back to course page"),'"'; ?> onClick="window.location='course.php?cid=<?php echo $cid ?>'"><?php echo _("Done"); ?></button>
+		<button type="button" title=<?php echo '"'._("Modify assessment settings").'"'; ?> onClick="window.location='<?php echo $address;?>?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"><?php echo _("Assessment Settings"); ?></button>
+		<button type="button" title=<?php echo '"'._("Categorize questions by outcome or other groupings").'"'; ?> onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"><?php echo _("Categorize Questions"); ?></button>
+		<button type="button" onClick="window.location='<?php
 		if (isset($CFG['GEN']['pandocserver'])) {
 			echo 'printlayoutword.php?cid='.$cid.'&aid='.$aid;
 		} else {
 			echo 'printtest.php?cid='.$cid.'&aid='.$aid;
 		}
-		?>'">
+		?>'"><?php echo _("Create Print Version"); ?></button>
 
-		<input type=button value="Define End Messages" title=<?php echo '"'._("Customize messages to display based on the assessment score").'"'; ?> onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
-		<input type=button value="Preview" title=<?php echo '"'._("Preview this assessment").'"'; ?> onClick="window.open('<?php
+		<button type="button" title=<?php echo '"'._("Customize messages to display based on the assessment score").'"'; ?> onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"><?php echo _("Define End Messages"); ?></button>
+		<button type="button" title=<?php echo '"'._("Preview this assessment").'"'; ?> onClick="window.open('<?php
 			if ($aver > 1) {
 				echo $imasroot . '/assess2/?cid=' . $cid . '&aid=' . $aid;
 			} else {
 				echo $imasroot . '/assessment/showtest.php?cid=' . $cid . '&id=' . $aid;
 			}
-		?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))">
+		?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"><?php echo _("Preview"); ?></button>
 	</p>
 
 <?php
@@ -1312,8 +1312,8 @@ if ($overwriteBody==1) {
 		<?php echo _('In Libraries'); ?>:
 		<span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames); ?></span>
 		<input type=hidden name="libs" id="libs"  value="<?php echo Sanitize::encodeStringForDisplay($searchlibs); ?>">
-		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
-		or <input type=button value="Select From Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'">
+		<button type="button" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" ><?php echo _("Select Libraries"); ?></button>
+		<?php echo _("or"); ?> <button type="button" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'"><?php echo _("Select From Assessments"); ?></button>
 		<br>
 		<?php echo _('Search') ?>:
 		<input type=text size=15 name=search value="<?php echo $search ?>">
@@ -1326,8 +1326,8 @@ if ($overwriteBody==1) {
 		<span tabindex="0" data-tip="Exclude questions already in assessment" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
 		<?php echo _('Exclude added'); ?></span>
-		<input type=submit value=Search>
-		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
+		<button type="submit"><?php echo _("Search"); ?></button>
+		<button type="button" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'"><?php echo _("Add New Question") ?></button>
 
 	</form>
 <?php
@@ -1341,9 +1341,9 @@ if ($overwriteBody==1) {
 		<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
 
 		<?php echo _('Check:'); ?> <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)"><?php echo _('None'); ?></a>
-		<input name="add" type=submit value="Add" />
-		<input name="addquick" type=submit value="Add (using defaults)">
-		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
+		<button name="add" type=submit ><?php echo _("Add") ?></button>
+		<button name="addquick" type=submit ><?php echo _("Add (using defaults)") ?></button>
+		<button type="button" onclick="previewsel('selq')" ><?php echo _("Preview Selected" ); ?></button>
 
 		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">
 			<thead>
@@ -1462,14 +1462,14 @@ if ($overwriteBody==1) {
 ?>
 	<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
 
-		<input type=button value="Select Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearassmt=1'">
-		or <input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
+		<button type="button" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearassmt=1'"><?php echo _("Select Assessments"); ?></button>
+		<?php echo _("or") ?> <button type="button" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'"><?php echo _("Select From Libraries"); ?></button>
 		<br/>
 
 		<?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)"><?php echo _('None'); ?></a>
-		<input name="add" type=submit value="Add" />
-		<input name="addquick" type=submit value="Add Selected (using defaults)">
-		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
+		<button name="add" type="submit" /><?php echo _("Add") ?></button>
+		<button name="addquick" type="submit" ><?php echo _("Add Selected (using defaults)"); ?></button>
+		<button type="button" onclick="previewsel('selq')" ><?php echo _("Preview Selected") ?></button>
 
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
