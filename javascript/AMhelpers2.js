@@ -779,6 +779,8 @@ function processByType(qn) {
       return {str: 'DNE', displvalstr: '', submitstr: 'DNE'};
     } else if (str.match(/^\s*oo\s*$/i)) {
       return {str: 'oo', displvalstr: '', submitstr: 'oo'};
+    } else if (str.match(/^\s*-oo\s*$/i)) {
+      return {str: '-oo', displvalstr: '', submitstr: '-oo'};
     }
     switch (params.qtype) {
       case 'calculated':
@@ -1519,7 +1521,7 @@ function singlevalsyntaxcheck(str,format) {
   str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	if (str.match(/DNE/i)) {
 		 return '';
-	} else if (str.match(/oo$/) || str.match(/oo\W/)) {
+	} else if (str.match(/-?oo$/) || str.match(/-?oo\W/)) {
 		 return '';
 	} else if (str.match(/,/)) {
     return _("Invalid use of a comma.");
