@@ -1148,72 +1148,76 @@ function gbstudisp($stu) {
 				if (($show&1)==1) { //past
 					echo '<td>';
 					//show points in points-based mode
-					if ($gbt[0][4][0]==0) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][0]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][4]).' (';
-					}
-					if ($gbt[1][2][$i][4]>0) {
-						echo round(100*$gbt[1][2][$i][0]/$gbt[1][2][$i][4],1).'%';
+					if ($gbt[1][2][$i][4] == 0) {
+						echo 'N/A';
 					} else {
-						echo '0%';
-					}
-					if ($gbt[0][4][0]==0) {
-						echo ')';
-					} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
-						echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][0]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][4]).')';
+						if ($gbt[0][4][0]==0) {
+							echo Sanitize::onlyFloat($gbt[1][2][$i][0]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][4]).' (';
+						}
+						echo round(100*$gbt[1][2][$i][0]/$gbt[1][2][$i][4],1).'%';
+
+						if ($gbt[0][4][0]==0) {
+							echo ')';
+						} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
+							echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][0]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][4]).')';
+						}
 					}
 					echo '</td>';
 				}
 				if (($show&2)==2) { //past and attempted
 					echo '<td>';
 					//show points in points-based mode
-					if ($gbt[0][4][0]==0) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][3]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][7]).' (';
-					}
-					if ($gbt[1][2][$i][7]>0) {
-						echo round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][7],1).'%';
+					if ($gbt[1][2][$i][7] == 0) {
+						echo 'N/A';
 					} else {
-						echo '0%';
-					}
-					if ($gbt[0][4][0]==0) {
-						echo ')';
-					} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
-						echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][3]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][7]).')';
+						if ($gbt[0][4][0]==0) {
+							echo Sanitize::onlyFloat($gbt[1][2][$i][3]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][7]).' (';
+						}
+						echo round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][7],1).'%';
+
+						if ($gbt[0][4][0]==0) {
+							echo ')';
+						} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
+							echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][3]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][7]).')';
+						}
 					}
 					echo '</td>';
 				}
 				if (($show&4)==4) { //past and avail
 					echo '<td>';
-					//show points in points-based mode
-					if ($gbt[0][4][0]==0) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][1]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][5]).' (';
-					}
-					if ($gbt[1][2][$i][5]>0) {
-						echo round(100*$gbt[1][2][$i][1]/$gbt[1][2][$i][5],1).'%';
+					if ($gbt[1][2][$i][5] == 0) {
+						echo 'N/A';
 					} else {
-						echo '0%';
-					}
-					if ($gbt[0][4][0]==0) {
-						echo ')';
-					} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
-						echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][1]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][5]).')';
+					//show points in points-based mode
+						if ($gbt[0][4][0]==0) {
+							echo Sanitize::onlyFloat($gbt[1][2][$i][1]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][5]).' (';
+						}
+						echo round(100*$gbt[1][2][$i][1]/$gbt[1][2][$i][5],1).'%';
+
+						if ($gbt[0][4][0]==0) {
+							echo ')';
+						} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
+							echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][1]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][5]).')';
+						}
 					}
 					echo '</td>';
 				}
 				if (($show&8)==8) { //all
 					echo '<td>';
-					//show points in points-based mode
-					if ($gbt[0][4][0]==0) {
-						echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).' (';
-					}
-					if ($gbt[1][2][$i][6]>0) {
-						echo round(100*$gbt[1][2][$i][2]/$gbt[1][2][$i][6],1).'%';
+					if ($gbt[1][2][$i][6] == 0) {
+						echo 'N/A';
 					} else {
-						echo '0%';
-					}
-					if ($gbt[0][4][0]==0) {
-						echo ')';
-					} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
-						echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).')';
+						//show points in points-based mode
+						if ($gbt[0][4][0]==0) {
+							echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).' (';
+						}
+						echo round(100*$gbt[1][2][$i][2]/$gbt[1][2][$i][6],1).'%';
+						
+						if ($gbt[0][4][0]==0) {
+							echo ')';
+						} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
+							echo ' ('.Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).')';
+						}
 					}
 					echo '</td>';
 				}
