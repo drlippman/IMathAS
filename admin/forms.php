@@ -780,16 +780,16 @@ switch($_GET['action']) {
 			echo "<span class=form>",_("Allow students to self-<u>un</u>enroll"),"</span><span class=formright>";
 			echo '<input type=radio name="allowunenroll" value="0" ';
 			if (($allowunenroll&1)==0) { echo "checked=1";}
-			echo '/> No <input type=radio name="allowunenroll" value="1" ';
+			echo '/> ',_('No'),' <input type=radio name="allowunenroll" value="1" ';
 			if (($allowunenroll&1)==1) { echo "checked=1";}
-			echo '/> Yes </span><br class=form />';
+			echo '/> ',_('Yes'),' </span><br class=form />';
 
 			echo "<span class=form>",_("Allow students to self-enroll"),"</span><span class=formright>";
 			echo '<input type=radio name="allowenroll" value="2" ';
 			if (($allowunenroll&2)==2) { echo "checked=1";}
-			echo '/> No <input type=radio name="allowenroll" value="0" ';
+			echo '/> ',_('No'),' <input type=radio name="allowenroll" value="0" ';
 			if (($allowunenroll&2)==0) { echo "checked=1";}
-			echo '/> Yes </span><br class=form />';
+			echo '/> ',_('Yes'),' </span><br class=form />';
 		}
 
 		if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1]==1) {
