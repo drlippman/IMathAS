@@ -5,7 +5,7 @@
  header('P3P: CP="ALL CUR ADM OUR"');
 
  $curdir = rtrim(dirname(__FILE__), '/\\');
- require("i18n/i18n.php");
+ // require("i18n/i18n.php");
  //Look to see if a hook file is defined, and include if it is
  if (isset($CFG['hooks']['validate'])) {
 	require($CFG['hooks']['validate']);

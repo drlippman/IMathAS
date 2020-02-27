@@ -15,7 +15,8 @@ if (!file_exists(__DIR__ . "/config.php")) {
 }
 
 require_once(__DIR__ . "/config.php");
-
+// TESTING:
+require_once(__DIR__ . "/i18n/i18n.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['init'])) {

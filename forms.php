@@ -14,7 +14,7 @@ if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!
 	}
 	$coursetheme = $defaultcoursetheme;
 }
-require_once("i18n/i18n.php");
+// require_once("i18n/i18n.php");
 require("includes/htmlutil.php");
 
 if (isset($_GET['greybox'])) {
