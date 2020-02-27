@@ -51,6 +51,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="'.$imasroot.'/javascript/jquery.min.js"></script>';
 } else {
 	echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>';
+	echo '<script>window.jQuery || document.write(\'<script src="'.$imasroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 
 if (isset($CFG['locale'])) {
