@@ -62,7 +62,7 @@ $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jq
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $installname <$sendfrom>\r\n";
-			$subject = "New Instructor Account Request";
+			$subject =   "Antrag f&uuml;r eine Dozentenkennung";
 			$message = "Name: {$_POST['firstname']} {$_POST['lastname']} <br/>\n";
 			$message .= "Email: {$_POST['email']} <br/>\n";
 			$message .= "School: {$_POST['school']} <br/>\n";
@@ -82,7 +82,8 @@ $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jq
 
 			$message = "<p>Ihr Antrag für eine Dozentenkennung wurde abgeschickt.</p>  ";
 			$message .= "<p>Ihr Antrag wird geprüft; bitte haben Sie etwas Geduld.</p>";
-			mail($_POST['email'],$subject,$message,$headers);
+			$message1 = $message."<p>Mit freundlichen Grüßen</p><p>Ihr IMathAS-Administrator</p>";
+			mail($_POST['email'],$subject,$message1,$headers);
 
 			echo $message;
 			require("footer.php");
