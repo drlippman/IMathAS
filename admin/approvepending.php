@@ -46,12 +46,12 @@ if (isset($_GET['go'])) {
 		$row = $stm->fetch(PDO::FETCH_NUM);
 
 		$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row[0]).'</p>';
-		$message .= '<p>Welcome to '.$installname.'.  Your account has been activated, and you\'re all set to log in as an instructor using the username <b>'.Sanitize::encodeStringForDisplay($row[1]).'</b> and the password you provided.</p>';
+		$message .= '<p>'.sprintf(_('Welcome to %s.  Your account has been activated, and you\'re all set to log in as an instructor using the username %s and the password you provided.'),$installname,'<b>'.Sanitize::encodeStringForDisplay($row[1].'</b>')).'</p>';
 
 		require_once("../includes/email.php");
-		send_email($row[2], !empty($accountapproval)?$accountapproval:$sendfrom, 
-			$installname._(' Account Approval'), $message, 
-			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(), 
+		send_email($row[2], !empty($accountapproval)?$accountapproval:$sendfrom,
+			$installname._(' Account Approval'), $message,
+			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
 			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
 
 	}
