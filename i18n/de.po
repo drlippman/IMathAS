@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-02-25 19:57+0100\n"
-"PO-Revision-Date: 2020-02-25 19:58+0100\n"
+"PO-Revision-Date: 2020-02-28 15:59+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -638,9 +638,9 @@ msgid ""
 "Select this option to set your new course to use the new version of "
 "assessments. This feature is still in Beta - use with caution."
 msgstr ""
-"Wählen Sie diese Option aus, um für den neuen Kurs für die Verwendung des "
-"neuen Test-Formats zu aktivieren. Diese Funktion ist immer noch im Beta-Test "
-"- mit Vorsicht verwenden."
+"Wählen Sie diese Option aus, um für den neuen Kurs  die Verwendung des neuen "
+"Test-Formats zu aktivieren. Diese Funktion ist immer noch im Beta-Test - mit "
+"Vorsicht verwenden."
 
 #: admin/forms.php:886
 msgid "Send teachers a message when students enroll"
@@ -4463,9 +4463,15 @@ msgstr "Wollen Sie diesen Test konvertieren?"
 msgid "Convert"
 msgstr "Konvertieren"
 
-#: course/convertintro.php:114
+#: course/convertintro.php:114 admin/diagonetime.php:151
+#: admin/externaltools.php:127 admin/forms.php:72 admin/forms.php:99
+#: admin/forms.php:142 admin/forms.php:1324 admin/forms.php:1474
+#: admin/forms.php:1512 admin/transfercourse.php:141
+#: course/addassessment.php:128 course/addassessment2.php:104 forms.php:373
+#: validate.php:135
+#, php-format
 msgid "Nevermind"
-msgstr "Los"
+msgstr "Hat sich erledigt"
 
 #: course/convertintro.php:119
 msgid "Convert All Assessments in Course"
@@ -7154,9 +7160,15 @@ msgid ""
 "assessment.  You can elect to have all templated questions be assigned to "
 "this library."
 msgstr ""
-"Die Standard-Fragenbibliothek wird für alle (für einen Test angelegten) "
-"Kopien von Aufgaben anderer Autoren verwendet. Sie könne auch festlegen, "
-"dass alle abgeleiteten Aufgaben in diese Bibliothek aufgenommen werden."
+"Alle Aufgaben, die Sie neu erstellen sowie Kopien von Aufgaben anderer "
+"Autoren, die Sie für einen Test modifizieren, werden automatisch in die "
+"Standard-Fragenbibliothek eingeordnet. Sie sollten sich dafür in einem Ihrer "
+"Kurse eine persönliche Unterbibliothek der Nutzerbibliotheken anlegen. Diese "
+"Bibliothek sollte offen für alle sein, so dass Ihre Aufgaben grundsätzlich "
+"von anderen gefunden werden können. Unabhängig davon können Sie einzelne "
+"Aufgaben als privat kennzeichnen, so dass  sie bei der Suche nur für Sie "
+"angezeigt werden. Sie können auch festlegen, dass alle abgeleiteten Aufgaben "
+"in Ihre Standard-Bibliothek aufgenommen werden."
 
 #: forms.php:311
 msgid "Update Info"
@@ -10646,7 +10658,7 @@ msgstr ""
 
 #: actions.php:138 actions.php:137
 msgid " Confirmation"
-msgstr " Bestätigung"
+msgstr " Best&auml;tigung"
 
 #: actions.php:145 actions.php:144
 msgid ""
@@ -10722,7 +10734,7 @@ msgstr ""
 #: actions.php:230 actions.php:229
 #, php-format
 msgid "Confirmed.  Please %s Log In %s"
-msgstr "Bestätigt. Bitte %s Melden Sie sich an %s"
+msgstr "Bestätigt. Bitte %s melden Sie sich an %s"
 
 #: actions.php:211 actions.php:210
 msgid ""
@@ -10741,3 +10753,12 @@ msgid ""
 msgstr ""
 "Wenn Sie ein Konto erstellen wollen, weil Sie Ihren Benutzernamen vergessen "
 "haben, können Sie stattdessen %s Ihren Benutzernamen suchen%s."
+
+#: admin/approvepending.php:49 admin/approvepending2.php:98
+#, php-format
+msgid ""
+"Welcome to %s.  Your account has been activated, and you're all set to log "
+"in as an instructor using the username %s and the password you provided."
+msgstr ""
+"Willkommen bei %s. Ihre Kennung wurde aktiviert und alles ist für Ihre "
+"Anmeldung mit dem Benutzernamen %s und dem gewählten Passwort bereit."
