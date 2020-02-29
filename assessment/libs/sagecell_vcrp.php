@@ -6,11 +6,14 @@ array_push($allowedmacros,"sagecell", "sagecellButton" );
 
 function sagecell($script="",$q=0,$essayPart="none",$id="sagecell") {
 $cid='sagecell_vcrp_'.$id;
-$fns="<script>function getSageOutput_$id (part=-1,format='any') {
-    var ref=$q-1;
+$fns="<script>function getSageOutput_$id (ob,part=-1,format='any') {
+    let sagecellVCRP_jq=$(ob).closest('.question').find('#$cid');
+    let qnr=parseInt(sagecellVCRP_jq.attr('qnr'),10);
+    let ref1=qnr-1;
     if (part >= 0)
-      ref=$q*1000+part;
-    var iframe=$(\"#\"+'$cid').find('.sagecellframe')[0];
+      ref1=qnr*1000+part;
+
+    let iframe=sagecellVCRP_jq.find('.sagecellframe')[0];
     var output=iframe.contentWindow.document.getElementsByClassName('sagecell_sessionOutput');
     if (output.length) {
       var sageOutput=output[0].textContent;
@@ -27,18 +30,18 @@ $fns="<script>function getSageOutput_$id (part=-1,format='any') {
         sageOutput=sageOutput.replace(/\)\s*\(/g,'),(');
         sageOutput='['+sageOutput+']';
       }
-	    $('input[id=\'tc'+ref+'\'],input[id=\'qn'+ref+'\']').val(sageOutput);
+	    $('input[id=\'tc'+ref1+'\'],input[id=\'qn'+ref1+'\']').val(sageOutput);
     } else {
       alert('Please evaluate cell');
     }
   }
 </script>";
 if ($essayPart === 'none') {
-  return "<div id='$cid' class='sagetransfer'><pre class='converttosagecell'>".$script."</pre>".$fns."</div>";
+  return "<div id='$cid' class='sagetransfer' qnr='$q'><pre class='converttosagecell'>".$script."</pre>".$fns."</div>";
 } else {
   $ansPart = ($essayPart === "essay" ? '[AB]' : '[AB'.strval($essayPart).']');
 
-	return "<div id='$cid' class='sagetransfer'><div class='converttosagecell'>$ansPart<pre class='hidden'>$script</pre></div>$fns</div>";
+	return "<div id='$cid' class='sagetransfer' qnr='$q'><div class='converttosagecell'>$ansPart<pre class='hidden'>$script</pre></div>$fns</div>";
 }
 
 }
@@ -54,7 +57,7 @@ function sagecellButton($label="Transfer",$part="none",$format='any',$id="sagece
     default:
       $parts=$part;
   }
-  return "<input type='button' value='$label' onClick='getSageOutput_$id($parts,\"$format\")'>";
+  return "<input type='button' value='$label' onClick='getSageOutput_$id(this,$parts,\"$format\")'>";
 }
 
 ?>
