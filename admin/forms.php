@@ -211,7 +211,7 @@ switch($_GET['action']) {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['LastName']).'"';
 		}
 		echo "><BR class=form>\n";
-		echo "<span class=form>Email:</span> <input class=form type=text size=40 name=email ";
+		echo "<span class=form>Email:</span> <input class=form type=email size=40 name=email ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['email']).'"';
 		}
