@@ -1202,7 +1202,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
 				} else {
 					echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
-					echo "<span id=\"myname\">".('User Preferences')."</span>";
+					echo "<span id=\"myname\">".('User Preferences')."</span></a>";
 				}
 				echo '</span>';
 			}
@@ -1222,7 +1222,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a></p>";
 		} else {
 			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
-			echo "<span id=\"myname\">".('User Preferences')."</span></p>";
+			echo "<span id=\"myname\">".('User Preferences')."</span></a></p>";
 		}
 		$out = '';
 		if ($testsettings['msgtoinstr']==1 && $coursemsgset<4) {
@@ -1261,7 +1261,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a></p>";
 		} else {
 			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
-			echo "<span id=\"myname\">".('User Preferences')."</span></p>";
+			echo "<span id=\"myname\">".('User Preferences')."</span></a></p>";
 		}
 		echo '</div>';
 	}
