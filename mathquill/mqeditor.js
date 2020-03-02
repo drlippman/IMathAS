@@ -110,6 +110,17 @@ var MQeditor = (function($) {
         } else {
           mqfield = MQ.MathField(span[0], thisMQconfig).config(MQconfig);
           attachEditor(span);
+          // if original input has input changed programmatically and change
+          // event triggered, update mathquill. Requires .trigger('change',true);
+          $(el).on('change', function(e, setval) {
+            if (setval) {
+              var val = el.value;
+              if (config.hasOwnProperty('toMQ')) {
+                val = config.toMQ(val);
+              }
+              mqfield.latex(val);
+            }
+          });
         }
 
       } else { // has existing MQ input
@@ -278,10 +289,12 @@ var MQeditor = (function($) {
     	var mqfield = $(ref).closest(".mathquill-math-field");
     	var offset = mqfield.offset();
     	var height = mqfield.outerHeight();
-      var editorWidth = document.getElementById("mqeditor").offsetWidth;
       var editorLeft = offset.left;
-      if (editorLeft + editorWidth > document.documentElement.clientWidth) {
-        editorLeft = document.documentElement.clientWidth - editorWidth-5;
+      if (document.getElementById("mqeditor")) {
+        var editorWidth = document.getElementById("mqeditor").offsetWidth;
+        if (editorLeft + editorWidth > document.documentElement.clientWidth) {
+          editorLeft = document.documentElement.clientWidth - editorWidth-5;
+        }
       }
     	$("#mqeditor").css("top", offset.top + height + 3).css("left", editorLeft);
     } else {
