@@ -7,8 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2020-02-25 19:57+0100\n"
 "PO-Revision-Date: 2020-02-28 15:59+0100\n"
+=======
+"POT-Creation-Date: 2020-03-03 00:19+0100\n"
+"PO-Revision-Date: 2020-03-03 00:21+0100\n"
+>>>>>>> 2584a042b9349af1bfa63f5fed98bd28769f8ee4
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,6 +28,7 @@ msgstr ""
 #: assessment/showtest.php:2740 assessment/showtest.php:2942 forms.php:114
 #: forms.php:393 forms.php:409 forms.php:430 javascript/livepoll.js:123
 #: multiembedq.php:188 multiembedq.php:284 admin/forms.php:1211
+#: directaccess.php:135
 msgid "Submit"
 msgstr "Absenden"
 
@@ -344,7 +350,8 @@ msgstr "Wähle Gruppe"
 msgid "Administration"
 msgstr "Administration"
 
-#: admin/admin2.php:163 admin/admin2.php:340
+#: admin/admin2.php:163 admin/admin2.php:340 course/moddataset.php:958
+#: course/moddataset.php:964
 msgid "Manage Question Set"
 msgstr "Fragensatz verwalten"
 
@@ -373,7 +380,7 @@ msgstr "Neuen Benutzer hinzufügen"
 msgid "Batch Add Instructors"
 msgstr "Dozenten in Serie hinzufügen"
 
-#: admin/admin2.php:179
+#: admin/admin2.php:179 admin/forms.php:1530 index.php:530
 msgid "Find Student"
 msgstr "Finde Student"
 
@@ -432,6 +439,7 @@ msgstr ""
 #: course/courseshowitems.php:2087 course/courseshowitems.php:2227
 #: course/courseshowitems.php:2274 course/courseshowitems.php:2321
 #: course/courseshowitems.php:2368 course/courseshowitems.php:2415
+#: course/moddataset.php:649
 msgid "Modify"
 msgstr "Anpassen"
 
@@ -781,6 +789,7 @@ msgstr "Kurselemente importieren"
 
 #: admin/importitems2.php:184 admin/listdiag.php:123 admin/userlti.php:195
 #: index.php:610 index.php:673 index.php:612 index.php:675 header.php:266
+#: header.php:267 index.php:616 index.php:679
 msgid "Course"
 msgstr "Kurs"
 
@@ -844,6 +853,7 @@ msgstr "Ja"
 #: course/chgassessments2form.php:399 course/chgassessments2form.php:409
 #: course/chgassessments2form.php:526 course/chgassessments2form.php:539
 #: course/chgassessments2form.php:590 admin/forms.php:783 admin/forms.php:790
+#: course/addlinkedtext.php:649
 msgid "No"
 msgstr "Nein"
 
@@ -931,15 +941,15 @@ msgid "Add Course Group"
 msgstr "Kurs-Gruppe anlegen"
 
 #: admin/modcourseorder.php:189 admin/unhidefromcourselist.php:90 index.php:570
-#: index.php:572
+#: index.php:572 index.php:576
 msgid "Unavailable"
 msgstr "Nicht verfügbar"
 
-#: admin/modcourseorder.php:193 index.php:574 index.php:576
+#: admin/modcourseorder.php:193 index.php:574 index.php:576 index.php:580
 msgid "Starts "
 msgstr "Beginnt "
 
-#: admin/modcourseorder.php:197 index.php:578 index.php:580
+#: admin/modcourseorder.php:197 index.php:578 index.php:580 index.php:584
 msgid "Ended "
 msgstr "Endet "
 
@@ -981,7 +991,7 @@ msgid "Remove yourself as a co-teacher"
 msgstr "Sich selbst als Lehrer aus dem Kurs entfernen"
 
 #: admin/unhidefromcourselist.php:86 admin/unhidefromcourselist.php:103
-#: index.php:512 index.php:567 index.php:514 index.php:569
+#: index.php:512 index.php:567 index.php:514 index.php:569 index.php:573
 msgid "course is scheduled for cleanup"
 msgstr "Kurs ist zur Bereinigung vorgesehen"
 
@@ -2664,7 +2674,7 @@ msgstr "Eine Lösung: "
 #: course/course.php:500 course/course.php:585 course/gradebook.php:292
 #: course/gradebook.php:318 course/gradebook.php:397 course/gradebook.php:400
 #: course/outcomereport.php:137 course/redeemlatepass.php:37
-#: course/redeemlatepass.php:172 header.php:283
+#: course/redeemlatepass.php:172 header.php:283 header.php:284
 msgid "Gradebook"
 msgstr "Punkteübersicht"
 
@@ -2674,7 +2684,7 @@ msgid "Student Detail"
 msgstr "Studenten-Details"
 
 #: assess2/gbviewassess.php:80 course/addassessment2form.php:619
-#: course/chgassessments2form.php:649
+#: course/chgassessments2form.php:649 course/addlinkedtext.php:443
 msgid "View Scores"
 msgstr "Punkte ansehen"
 
@@ -2749,10 +2759,11 @@ msgid "None of these"
 msgstr "Keine davon"
 
 #: assess2/questions/models/Question.php:164 course/addquestions.php:955
+#: course/moddataset.php:1211
 msgid "Video"
 msgstr "Video"
 
-#: assess2/questions/models/Question.php:166
+#: assess2/questions/models/Question.php:166 course/moddataset.php:1212
 msgid "Read"
 msgstr "Lesen"
 
@@ -2783,7 +2794,8 @@ msgstr ""
 "Geben Sie Ihre Antwort als mit Zahlen gefüllte Matrix wie ((2,3,4),(3,4,5)) "
 "ein."
 
-#: assessment/header.php:296 header.php:260
+#: assessment/header.php:296 header.php:260 assessment/header.php:297
+#: header.php:261
 msgid "Course Navigation"
 msgstr "Kurs-Navigation"
 
@@ -3082,7 +3094,8 @@ msgid "Error DupASID."
 msgstr "Fehler DupASID."
 
 #: assessment/showtest.php:393 actions.php:294 actions.php:301 actions.php:298
-#: actions.php:291 actions.php:290 actions.php:297
+#: actions.php:291 actions.php:290 actions.php:297 admin/forms.php:1574
+#: course/addlinkedtext.php:120
 msgid "Try again"
 msgstr "Veruchen Sie es erneut"
 
@@ -3160,6 +3173,7 @@ msgstr "Dies wird alle nicht gespeicherte Arbeit verwerfen."
 
 #: assessment/showtest.php:1232 course/course.php:484 course/course.php:571
 #: index.php:362 msgs/msglist.php:608 index.php:364 header.php:268
+#: header.php:269
 msgid "Messages"
 msgstr "Nachrichten"
 
@@ -3211,7 +3225,7 @@ msgstr ""
 "Jedes Gruppenmitglied (ausser dem gerade angemeldetem Studenten), dass "
 "hinzugefügt werden soll, muss hier seinen Namen auswählen."
 
-#: assessment/showtest.php:1410 loginpage.php:53
+#: assessment/showtest.php:1410 loginpage.php:53 directaccess.php:204
 msgid "Password"
 msgstr "Passwort"
 
@@ -3325,6 +3339,7 @@ msgstr "verbleibend"
 #: course/listusers.php:715 javascript/posts.js:35 javascript/posts.js:56
 #: course/addassessment2form.php:110 course/chgassessments2form.php:112
 #: course/chgassessments2form.php:477 course/addassessment2form.php:479
+#: course/addlinkedtext.php:621
 msgid "Hide"
 msgstr "Verstecken"
 
@@ -3943,6 +3958,7 @@ msgstr "Letzter Versuch:"
 #: assessment/showtest.php:3740 assessment/showtest.php:3747
 #: admin/forms.php:391 admin/forms.php:834 course/addquestions.php:1534
 #: course/addquestions.php:1316 course/addquestions.php:1466
+#: admin/actions.php:318
 msgid "or"
 msgstr "oder"
 
@@ -4170,6 +4186,7 @@ msgstr "Dies wird alle Änderungen auf dieser Seite verwerfen"
 #: course/gb-rescoreq.php:212 course/gb-rescoreq2.php:53
 #: course/addquestions.php:15 course/addquestions.php:19
 #: course/addquestions.php:22 course/addquestions.php:1187
+#: course/moddataset.php:950
 #, php-format
 msgid "Add/Remove Questions"
 msgstr "Fragen hinzufügen/entfernen"
@@ -4325,7 +4342,9 @@ msgstr "Neues Wiki"
 msgid "Yes, I'm Sure"
 msgstr "Ja, ich bin sicher"
 
-#: course/assessendmsg.php:113
+#: course/assessendmsg.php:113 course/moddataset.php:1136
+#: course/moddataset.php:1148 course/moddataset.php:1167
+#: course/moddataset.php:1251
 msgid "Save"
 msgstr "Speichern"
 
@@ -4541,7 +4560,7 @@ msgid "Communication"
 msgstr "Kommunikation"
 
 #: course/course.php:486 course/course.php:541 course/course.php:575
-#: header.php:272
+#: header.php:272 header.php:273
 msgid "Forums"
 msgstr "Foren"
 
@@ -4553,7 +4572,7 @@ msgstr "Werkzeuge"
 msgid "Outcomes"
 msgstr "Themen"
 
-#: course/course.php:499 header.php:276
+#: course/course.php:499 header.php:276 header.php:277
 msgid "Roster"
 msgstr "Teilnehmerliste"
 
@@ -4566,7 +4585,7 @@ msgstr "Neu"
 
 #: course/course.php:504 course/course.php:578 course/courseshowitems.php:1872
 #: course/exportcalfeed.php:59 course/moveitem.php:156 header.php:280
-#: admin/forms.php:949
+#: admin/forms.php:949 header.php:281
 msgid "Calendar"
 msgstr "Kalender"
 
@@ -4634,7 +4653,7 @@ msgid "Help"
 msgstr "Hilfe"
 
 #: course/course.php:549 course/course.php:605 index.php:360 index.php:362
-#: header.php:286
+#: header.php:286 header.php:287
 msgid "Log Out"
 msgstr "Abmelden"
 
@@ -5101,7 +5120,8 @@ msgstr "Hinzufügen..."
 msgid "Add Inline Text"
 msgstr "Eingebetteten Text"
 
-#: course/courseshowitems.php:1893
+#: course/courseshowitems.php:1893 course/addlinkedtext.php:31
+#: course/addlinkedtext.php:32
 msgid "Add Link"
 msgstr "Link hinzufügen"
 
@@ -5699,24 +5719,25 @@ msgstr "Vorschau"
 #: course/gb-viewasid.php:956 course/gb-viewasid.php:1081
 #: course/gradebook.php:766 course/gb-viewasid.php:1085
 #: course/gb-viewasid.php:960 course/gb-viewasid.php:959
-#: course/gb-viewasid.php:1084
+#: course/gb-viewasid.php:1084 course/gb-viewasid.php:961
+#: course/gb-viewasid.php:1086
 msgid "Feedback"
 msgstr "Hinweise"
 
 #: course/gb-viewasid.php:1125 course/gb-viewasid.php:1129
-#: course/gb-viewasid.php:1128
+#: course/gb-viewasid.php:1128 course/gb-viewasid.php:1130
 msgid "General Instructor Feedback"
 msgstr "Allgemeine Rückmeldung vom Lehrer"
 
 #: course/gb-viewasid.php:1172 course/gb-viewasid.php:1176
-#: course/gb-viewasid.php:1175
+#: course/gb-viewasid.php:1175 course/gb-viewasid.php:1177
 msgid "Show Score Details"
 msgstr "Zeige Punkte-Details"
 
 #: course/gb-viewasid.php:1281 course/gb-viewasid.php:1285
 #: course/gb-viewasid.php:1284 javascript/addqsort.js:1608
 #: javascript/addqsort.js:1614 javascript/addqsort.js:1615
-#: javascript/addqsort.js:1619
+#: javascript/addqsort.js:1619 course/gb-viewasid.php:1286
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
@@ -5876,6 +5897,7 @@ msgid "Hide all"
 msgstr "Alle verbergen"
 
 #: course/gradebook.php:350 course/gradebook.php:502
+#: course/addlinkedtext.php:619
 msgid "Show:"
 msgstr "Anzeigen:"
 
@@ -5974,7 +5996,8 @@ msgstr "Offline-Bewertungen"
 
 #: course/gradebook.php:449 course/addquestions.php:982
 #: course/addquestions.php:1477 course/addquestions.php:1344
-#: course/addquestions.php:1470
+#: course/addquestions.php:1470 course/moddataset.php:610
+#: course/moddataset.php:718
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -6000,7 +6023,7 @@ msgid "Send a message to the selected students"
 msgstr "Schicke eine Nachricht an die ausgewählten Studierenden"
 
 #: course/gradebook.php:532 course/gradebook.php:691 index.php:610
-#: index.php:612
+#: index.php:612 index.php:616
 msgid "Message"
 msgstr "Nachricht"
 
@@ -6850,7 +6873,8 @@ msgstr "Bitte geben Sie ID, Vor- und Nachnamen ein."
 #: actions.php:521 actions.php:572 actions.php:457 actions.php:469
 #: actions.php:481 actions.php:518 actions.php:569 actions.php:60
 #: actions.php:435 actions.php:434 actions.php:456 actions.php:468
-#: actions.php:480 actions.php:517 actions.php:568
+#: actions.php:480 actions.php:517 actions.php:568 actions.php:714
+#: admin/actions.php:318
 msgid "Try Again"
 msgstr "Erneut versuchen"
 
@@ -6887,11 +6911,11 @@ msgstr "Sie haben diesen Diagnose-Test bereits durchgeführt."
 msgid "Your window to complete this diagnostic has expired."
 msgstr "Ihr Zeitfenster zum Abschließen dieses Diagnose-Tests ist abgelaufen."
 
-#: diag/index.php:360 forms.php:45 diag/index.php:370
+#: diag/index.php:360 forms.php:45 diag/index.php:370 directaccess.php:263
 msgid "Enter First Name:"
 msgstr "Vorname:"
 
-#: diag/index.php:361 forms.php:46 diag/index.php:371
+#: diag/index.php:361 forms.php:46 diag/index.php:371 directaccess.php:264
 msgid "Enter Last Name:"
 msgstr "Nachname:"
 
@@ -6948,19 +6972,19 @@ msgstr "Punkte für letzte Frage:"
 msgid "New Student Signup"
 msgstr "Als Student registrieren"
 
-#: forms.php:43
+#: forms.php:43 directaccess.php:261
 msgid "Choose a password:"
 msgstr "Passwort wählen:"
 
-#: forms.php:44
+#: forms.php:44 directaccess.php:262
 msgid "Confirm password:"
 msgstr "Passwort bestätigen:"
 
-#: forms.php:47 forms.php:169
+#: forms.php:47 forms.php:169 directaccess.php:265
 msgid "Enter E-mail address:"
 msgstr "E-Mail-Adresse eingeben:"
 
-#: forms.php:48 forms.php:170
+#: forms.php:48 forms.php:170 directaccess.php:271
 msgid "Notify me by email when I receive a new message:"
 msgstr "Benachrichtige mich per E-Mail, wenn ich eine neue Nachricht erhalte:"
 
@@ -7637,7 +7661,7 @@ msgstr "Standardeinstellungen sind gekennzeichnet mit einem *"
 msgid "Set timezone to:"
 msgstr "Setze Zeitzone auf:"
 
-#: index.php:71 index.php:78 index.php:594 index.php:596
+#: index.php:71 index.php:78 index.php:594 index.php:596 index.php:600
 msgid "Hide from course list"
 msgstr "Nicht in der Kursliste anzeigen"
 
@@ -7653,7 +7677,7 @@ msgstr "Benutzerprofil ändern"
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: index.php:372 index.php:529 index.php:374 index.php:531
+#: index.php:372 index.php:529 index.php:374 index.php:531 index.php:534
 msgid "Admin Page"
 msgstr "Administrationsbereich"
 
@@ -7708,70 +7732,73 @@ msgstr ""
 msgid "Enroll in a New Class"
 msgstr "In einen neuen Kurs einschreiben"
 
-#: index.php:583 index.php:585
+#: index.php:583 index.php:585 index.php:589
 msgid "Lockdown"
 msgstr "Sperren"
 
-#: index.php:586 index.php:588
+#: index.php:586 index.php:588 index.php:592
 #, php-format
 msgid "Messages (%d)"
 msgstr "Nachrichten (%d)"
 
-#: index.php:590 index.php:592
+#: index.php:590 index.php:592 index.php:596
 msgid "Posts ("
 msgstr "Beiträge ("
 
-#: index.php:602 index.php:603 index.php:604 index.php:605
+#: index.php:602 index.php:603 index.php:604 index.php:605 index.php:608
+#: index.php:609
 msgid "New messages"
 msgstr "Neue Nachrichten"
 
-#: index.php:606 index.php:608
+#: index.php:606 index.php:608 index.php:612
 msgid "No new messages"
 msgstr "Keine neuen Nachrichten"
 
-#: index.php:610 msgs/viewmsg.php:123 index.php:612
+#: index.php:610 msgs/viewmsg.php:123 index.php:612 index.php:616
 msgid "From"
 msgstr "Von"
 
-#: index.php:610 index.php:612
+#: index.php:610 index.php:612 index.php:616
 msgid "Sent"
 msgstr "Gesendet"
 
-#: index.php:615 index.php:679 index.php:617 index.php:681
+#: index.php:615 index.php:679 index.php:617 index.php:681 index.php:621
+#: index.php:685
 msgid "No Subject"
 msgstr "Kein Betreff"
 
 #: index.php:632 msgs/msglist.php:889 msgs/newmsglist.php:114
-#: msgs/viewmsg.php:128 index.php:634
+#: msgs/viewmsg.php:128 index.php:634 index.php:638
 msgid "[System Message]"
 msgstr "[System-Nachricht]"
 
 #: index.php:634 msgs/msglist.php:891 msgs/newmsglist.php:116
-#: msgs/viewmsg.php:130 index.php:636
+#: msgs/viewmsg.php:130 index.php:636 index.php:640
 msgid "[Deleted]"
 msgstr "[Gelöscht]"
 
-#: index.php:652 index.php:657 index.php:654 index.php:659
+#: index.php:652 index.php:657 index.php:654 index.php:659 index.php:658
+#: index.php:663
 msgid "New forum posts"
 msgstr "Neue Forenbeiträge"
 
-#: index.php:660 index.php:662
+#: index.php:660 index.php:662 index.php:666
 msgid "No new posts"
 msgstr "Keine neuen Beiträge"
 
-#: index.php:673 index.php:675
+#: index.php:673 index.php:675 index.php:679
 msgid "Thread"
 msgstr "Thema"
 
-#: index.php:673 index.php:675
+#: index.php:673 index.php:675 index.php:679
 msgid "Started By"
 msgstr "Gestartet von"
 
-#: index.php:673 index.php:675
+#: index.php:673 index.php:675 index.php:679
 msgid "Last Post"
 msgstr "Letzter Beitrag"
 
-#: index.php:695 index.php:697
+#: index.php:695 index.php:697 index.php:701
 msgid "Anonymous"
 msgstr "Anonym"
 
@@ -8406,44 +8433,47 @@ msgstr "Punktliste"
 
 #: javascript/assessment_min.js:1 javascript/general.js:670
 #: javascript/general.js:730 javascript/general.js:732
-#: javascript/general.js:672
+#: javascript/general.js:672 javascript/general.js:679
+#: javascript/general.js:739
 msgid "Hide video"
 msgstr "Video ausblenden"
 
 #: javascript/assessment_min.js:1 javascript/general.js:671
-#: javascript/general.js:673
+#: javascript/general.js:673 javascript/general.js:680
 msgid "Hide embedded video"
 msgstr "Eingebettetes Video ausblenden"
 
 #: javascript/assessment_min.js:1 javascript/general.js:677
 #: javascript/general.js:742 javascript/general.js:744
-#: javascript/general.js:679
+#: javascript/general.js:679 javascript/general.js:686
+#: javascript/general.js:751
 msgid "Watch video here"
 msgstr "Video hier ansehen"
 
 #: javascript/assessment_min.js:1 javascript/general.js:678
 #: javascript/general.js:743 javascript/general.js:745
-#: javascript/general.js:680
+#: javascript/general.js:680 javascript/general.js:687
+#: javascript/general.js:752
 msgid "Embed video here"
 msgstr "Video hier einbetten"
 
 #: javascript/assessment_min.js:1 javascript/general.js:1014
-#: javascript/general.js:1016
+#: javascript/general.js:1016 javascript/general.js:1023
 msgid "This file is too large - maximum size is 10MB"
 msgstr "Die Datei ist zu groß - maximale Größe 10MB"
 
 #: javascript/assessment_min.js:1 javascript/general.js:1168
-#: javascript/general.js:1170
+#: javascript/general.js:1170 javascript/general.js:1177
 msgid "Evaluate"
 msgstr "Auswerten"
 
 #: javascript/assessment_min.js:1 javascript/general.js:1093
-#: javascript/general.js:1095
+#: javascript/general.js:1095 javascript/general.js:1102
 msgid "Navigation breadcrumbs"
 msgstr "Brotkrumennavigation"
 
 #: javascript/assessment_min.js:1 javascript/general.js:1094
-#: javascript/general.js:1096
+#: javascript/general.js:1096 javascript/general.js:1103
 msgid "Control link group"
 msgstr "Gruppe von Kontroll-Links"
 
@@ -8583,11 +8613,11 @@ msgstr ""
 "Konnte keine Sitzung einrichten.  Überprüfen Sie, dass ihr Browser Cookies "
 "erlaubt"
 
-#: loginpage.php:43
+#: loginpage.php:43 directaccess.php:201
 msgid "Login Error.  Try Again"
 msgstr "Fehler - versuchen Sie es noch einmal"
 
-#: loginpage.php:59 loginpage.php:60
+#: loginpage.php:59 loginpage.php:60 directaccess.php:211
 msgid "Forgot Password"
 msgstr "Passwort vergessen"
 
@@ -9161,19 +9191,23 @@ msgid "Count"
 msgstr "Speichern"
 
 #: course/addassessment2form.php:585 course/chgassessments2form.php:608
+#: course/addlinkedtext.php:598
 msgid "Count in Gradebook"
 msgstr "In der Punkteübersicht speichern"
 
 #: course/addassessment2form.php:586 course/chgassessments2form.php:609
+#: course/addlinkedtext.php:599
 msgid "Don't count in grade total and hide from students"
 msgstr ""
 "Nicht für die Gesamtpunktzahl anrechnen und nicht für Studierende anzeigen"
 
 #: course/addassessment2form.php:587 course/chgassessments2form.php:610
+#: course/addlinkedtext.php:600
 msgid "Don't count in grade total"
 msgstr "Nicht für die Gesamtpunktzahl anrechnen"
 
 #: course/addassessment2form.php:588 course/chgassessments2form.php:611
+#: course/addlinkedtext.php:601
 msgid "Count as Extra Credit"
 msgstr "Als Zusatzpunkte werten"
 
@@ -9198,6 +9232,7 @@ msgid "No Access"
 msgstr "Kein Zugang"
 
 #: course/addassessment2form.php:620 course/chgassessments2form.php:650
+#: course/addlinkedtext.php:443
 msgid "View and Edit Scores"
 msgstr "Punkte sehen und korrigieren"
 
@@ -9304,7 +9339,7 @@ msgstr "Zusammenfassung (für die Kursseite)"
 msgid "Intro/Instructions"
 msgstr "Einführung/Anleitungen (Bei Start des Tests)"
 
-#: course/addassessment2form.php:114
+#: course/addassessment2form.php:114 course/addlinkedtext.php:622
 msgid "Show by Dates"
 msgstr "Anzeigen nach Datum"
 
@@ -9491,7 +9526,7 @@ msgstr "Die Passwortänderung ist fehlgeschlagen"
 msgid "Error: Guests can't enroll in courses"
 msgstr "Fehler: Gäste können sich nicht in Kurse einschreiben"
 
-#: actions.php:454 actions.php:451 actions.php:450
+#: actions.php:454 actions.php:451 actions.php:450 course/moddataset.php:960
 msgid "Home"
 msgstr "Startseite"
 
@@ -9746,7 +9781,7 @@ msgstr "Reihenfolge der Kurse ändern"
 msgid "View hidden courses"
 msgstr "Ausgeblendete Kurse anzeigen"
 
-#: validate.php:126 validate.php:583
+#: validate.php:126 validate.php:583 validate.php:582
 msgid "This course does not allow guest access."
 msgstr "Dieser Kurs erlaubt keinen Gastzugang."
 
@@ -10135,15 +10170,16 @@ msgstr ""
 "Wenn Sie neu beginnen wollen wählen Sie aus dem \"Hinzufügen\"-Menü unten "
 "ein Kurselement aus."
 
-#: course/addquestions.php:28
+#: course/addquestions.php:28 course/addlinkedtext.php:51
+#: course/moddataset.php:17
 msgid "You need to log in as a teacher to access this page"
 msgstr "Sie müssen sich als Dozent anmelden um auf diese Seite zuzugreifen"
 
-#: course/addquestions.php:31
+#: course/addquestions.php:31 course/addlinkedtext.php:54
 msgid "You need to access this page from the course page menu"
 msgstr "Auf diese Seite können Sie nur über das Kursmenü zugreifen"
 
-#: course/addquestions.php:40
+#: course/addquestions.php:40 course/addlinkedtext.php:44
 msgid "Invalid ID"
 msgstr "Ungültige ID"
 
@@ -10210,7 +10246,7 @@ msgstr "Bibliothek"
 msgid "Help Resource"
 msgstr "Hilfsmaterial"
 
-#: course/addquestions.php:973
+#: course/addquestions.php:973 course/moddataset.php:1016
 msgid "Private"
 msgstr "Privat"
 
@@ -10609,7 +10645,7 @@ msgstr "Druckversion"
 msgid "Define End Messages"
 msgstr "Schlussnachricht definieren"
 
-#: course/addquestions.php:1315
+#: course/addquestions.php:1315 course/moddataset.php:1095
 msgid "Select Libraries"
 msgstr "Bibliotheken auswählen"
 
@@ -10647,7 +10683,7 @@ msgid "This is an automated message from %s.  Do not respond to this email"
 msgstr ""
 "Dies ist eine automatische Nachricht von %s. Antworten Sie nicht darauf"
 
-#: actions.php:134 actions.php:133
+#: actions.php:134 actions.php:133 directaccess.php:87
 #, php-format
 msgid ""
 "To complete your %s registration, please click on the following link, or "
@@ -10656,11 +10692,11 @@ msgstr ""
 "Um Ihre %s-Registrierung abzuschließen, klicken Sie bitte auf den folgenden "
 "Link, oder kopieren Sie ihn und fügen Sie ihn in Ihren Webbrowser ein:"
 
-#: actions.php:138 actions.php:137
+#: actions.php:138 actions.php:137 directaccess.php:92
 msgid " Confirmation"
 msgstr " Best&auml;tigung"
 
-#: actions.php:145 actions.php:144
+#: actions.php:145 actions.php:144 directaccess.php:95
 msgid ""
 "Registration recorded.  You should shortly receive an email with "
 "confirmation instructions."
@@ -10762,3 +10798,776 @@ msgid ""
 msgstr ""
 "Willkommen bei %s. Ihre Kennung wurde aktiviert und alles ist für Ihre "
 "Anmeldung mit dem Benutzernamen %s und dem gewählten Passwort bereit."
+
+#: admin/forms.php:1529 admin/actions.php:50 admin/actions.php:309
+#: admin/actions.php:418
+msgid "You don't have the authority for this action"
+msgstr "Für diese Aktion haben Sie nicht die nötigen Rechte"
+
+#: admin/forms.php:1532
+msgid "Enter all or part of the name, email, or username:"
+msgstr ""
+"Geben Sie einen Teil des Namens, der E-Mail-Adresse oder des Benutzernamens "
+"ein:"
+
+#: actions.php:714
+msgid "Password change failed."
+msgstr "Änderung des Passworts fehlgeschlagen."
+
+#: admin/actions.php:58
+msgid "invalid id"
+msgstr "ungültige ID"
+
+#: admin/actions.php:317
+msgid "Username is already used."
+msgstr "Der Benutzername ist bereits vergeben."
+
+#: admin/actions.php:319
+msgid "Change rights for existing user"
+msgstr "Rechte für einen existierenden Benutzer ändern"
+
+#: admin/actions.php:429
+msgid "You must agree to the terms of use to copy this course."
+msgstr ""
+"Sie müssen den Nutzungsbedingungen zustimmen, um diesen Kurs zu kopieren."
+
+#: admin/coursebrowser.php:191
+msgid "No matches found"
+msgstr "Keine Treffer gefunden"
+
+#: admin/forms.php:1574
+msgid "No matches"
+msgstr "Keine Treffer"
+
+#: bltilaunch.php:92
+msgid "Missing platform_state"
+msgstr "Fehlender platform_state"
+
+#: bltilaunch.php:105
+msgid "Invalid tool_state"
+msgstr "Ungültiger tool_state"
+
+#: bltilaunch.php:132 bltilaunch.php:193 bltilaunch.php:1688
+#: bltilaunch.php:1750
+msgid ""
+"No authorized session exists. This is most likely caused by your browser "
+"blocking third-party cookies.  Please adjust your browser settings and try "
+"again."
+msgstr ""
+"Es gibt keine autorisierte Sitzung. Das liegt höchstwahrscheinlich daran, "
+"dass Ihr Browser Cookies von Dritten blockiert. Bitte korrigieren Sie Ihre "
+"Browser-Einstellungen und versuchen Sie es erneut."
+
+#: bltilaunch.php:165 bltilaunch.php:834 bltilaunch.php:1349
+#: bltilaunch.php:1722 bltilaunch.php:2123 bltilaunch.php:2163
+#: bltilaunch.php:2503
+msgid "This assignment does not appear to exist anymore."
+msgstr "Es sieht so aus, als ob dieser Test nicht mehr existiert."
+
+#: bltilaunch.php:482 bltilaunch.php:2031
+msgid "No session recorded"
+msgstr "Keine Sitzung aufgezeichnet"
+
+#: bltilaunch.php:495 bltilaunch.php:1440 bltilaunch.php:2550
+msgid "invalid course identifier in folder view launch"
+msgstr "ungültige Kurs-ID beim Start der Ordner-Ansicht"
+
+#: bltilaunch.php:517 bltilaunch.php:1462 bltilaunch.php:2586
+msgid "invalid folder identifier in folder view launch"
+msgstr "Ungültige Ordner-ID beim Start der Ordner-Ansicht"
+
+#: bltilaunch.php:528 bltilaunch.php:2042
+msgid ""
+"Insufficient launch information. This might indicate your browser is set to "
+"restrict third-party cookies. Check your browser settings and try again"
+msgstr ""
+"Unvollständige Start-Information. Das könnte darauf hinweisen, dass Ihr "
+"Browser Cookies von Dritten zu sehr einschränkt. Prüfen Sie Ihre Browser-"
+"Einstellungen und versuchen Sie es erneut"
+
+#: bltilaunch.php:534 bltilaunch.php:2048
+msgid "Unable to launch - User information not provided (user_id is required)"
+msgstr ""
+"Kann nicht starten - Benutzerinformation fehlt (user_id ist erforderlich)"
+
+#: bltilaunch.php:543 bltilaunch.php:2057
+msgid ""
+"Unable to launch - Course information not provided (context_id is required)"
+msgstr ""
+"Kann nicht starten - Kurs-Information nicht angegeben (context_id ist "
+"erforderlich)"
+
+#: bltilaunch.php:567 bltilaunch.php:2081
+msgid "Unable to launch - oauth_consumer_key (resource key) is required"
+msgstr ""
+"Kann nicht starten - oauth_consumer_key (resource key) ist erforderlich"
+
+#: bltilaunch.php:959
+msgid ""
+"Course link not established yet.  Notify your instructor they need to click "
+"this assignment to set it up."
+msgstr ""
+"Verbindung zum Kurs noch nicht hergestellt. Informieren Sie Ihren Dozenten, "
+"dass er auf diesen Test klicken muss um ihn einzurichten."
+
+#: bltilaunch.php:1276 bltilaunch.php:2468
+msgid "This placement is not yet set up"
+msgstr "Dieser Test ist noch nicht eingerichtet"
+
+#: bltilaunch.php:1291 bltilaunch.php:2477
+msgid "Invalid placement type"
+msgstr "Ungültiger Test-Typ"
+
+#: bltilaunch.php:1318
+msgid ""
+"You are not an instructor on the course and folder this link is pointing to. "
+"Auto-copying is not currently supported for folder-level links."
+msgstr ""
+"Sie sind in dem Kurs und Ordner, auf den dieser Link zeigt. Für Links auf "
+"Ordner-Niveau wird Auto-Kopie gegenwärtig nicht unterstützt."
+
+#: bltilaunch.php:1321
+msgid ""
+"Course connection not established yet.  Notify your instructor they need to "
+"click this link to set it up."
+msgstr ""
+"Verbindung zum Kurs noch nicht hergestellt. Informieren Sie Ihren Dozenten, "
+"dass er auf diesen Test klicken muss um ihn einzurichten."
+
+#: bltilaunch.php:1326
+msgid ""
+"This course in the LMS is not associated with the course this link is "
+"pointing to."
+msgstr ""
+"Dieser Kurs im LMS ist mit dem Kurs, auf den der Link zeigt, nicht verbunden."
+
+#: bltilaunch.php:1339 bltilaunch.php:2493
+msgid "This course is not available"
+msgstr "Dieser Kurs ist nicht verfügbar"
+
+#: bltilaunch.php:1467 bltilaunch.php:2591
+msgid "invalid key. unknown action type"
+msgstr "ungültiger Key. ungültiger ActionType"
+
+#: bltilaunch.php:2356
+msgid "Course link not established yet"
+msgstr "Kurs-Link noch nicht eingerichtet"
+
+#: bltilaunch.php:2446
+#, php-format
+msgid "Error.  Assessment ID %s not found."
+msgstr "Fehler. Test-ID %s nicht gefunden."
+
+#: bltilaunch.php:2560
+msgid "not authorized to view folders in this course"
+msgstr "nicht berechtigt, Ordner in diesem Kurs anzusehen"
+
+#: course/addlinkedtext.php:28 course/addlinkedtext.php:29
+msgid "Modify Link"
+msgstr "Link bearbeiten"
+
+#: course/addlinkedtext.php:112
+msgid "File type is not allowed"
+msgstr "Datei-Typ nicht erlaubt"
+
+#: course/addlinkedtext.php:115
+msgid "File size too large"
+msgstr "Datei zu groß"
+
+#: course/addlinkedtext.php:116 course/addlinkedtext.php:121
+msgid "File upload error"
+msgstr "Fehler beim Hochladen der Datei"
+
+#: course/addlinkedtext.php:198
+msgid "Enter summary here (displays on course page)"
+msgstr "Zusammenfassung hier eingeben (wird auf der Kurs-Seite angezeigt)"
+
+#: course/addlinkedtext.php:294
+msgid "Error uploading file!"
+msgstr "Fehler beim Hochladen der Datei!"
+
+#: course/addlinkedtext.php:296
+msgid "Error with your submission"
+msgstr "Fehler beim Einreichen"
+
+#: course/addlinkedtext.php:419
+msgid "Select a tool..."
+msgstr "Wähle ein Werkzeug..."
+
+#: course/addlinkedtext.php:430
+msgid "Invalid tool was selected"
+msgstr "Ungültiges Werkzeug ausgewählt"
+
+#: course/addlinkedtext.php:443
+msgid "No access to scores"
+msgstr "Kein Zugang zu Punkten"
+
+#: course/addlinkedtext.php:517
+msgid "Summary: (shows on course page)"
+msgstr "Zusammenfassung: (Wird auf der Kurs-Seite angezeigt)"
+
+#: course/addlinkedtext.php:523
+msgid "Link type:"
+msgstr "Link-Typ:"
+
+#: course/addlinkedtext.php:526
+msgid "Page of text"
+msgstr "Text-Seite"
+
+#: course/addlinkedtext.php:527
+msgid "Web link"
+msgstr "Web-Link"
+
+#: course/addlinkedtext.php:528
+msgid "File"
+msgstr "Datei"
+
+#: course/addlinkedtext.php:529 course/addlinkedtext.php:563
+msgid "External Tool"
+msgstr "Externes Werkzeug"
+
+#: course/addlinkedtext.php:554
+msgid "Current file:"
+msgstr "Aktuelle Datei:"
+
+#: course/addlinkedtext.php:554
+msgid "Replace"
+msgstr "Ersetzen"
+
+#: course/addlinkedtext.php:556
+msgid "Attach "
+msgstr "Anfügen "
+
+#: course/addlinkedtext.php:568
+msgid "Custom parameters:"
+msgstr "Spezifische Parameter:"
+
+#: course/addlinkedtext.php:569
+msgid "Custom launch URL:"
+msgstr "Spezifische Start-URL:"
+
+#: course/addlinkedtext.php:571
+msgid "No Tools defined yet"
+msgstr "Noch keine Werkzeuge definiert"
+
+#: course/addlinkedtext.php:575
+msgid "Add or edit an external tool"
+msgstr "Externes Werkzeug hinzufügen oder bearbeiten"
+
+#: course/addlinkedtext.php:579
+msgid "If this tool returns scores, do you want to record them?"
+msgstr "Möchten Sie Punkte speichern, falls das Werkzeug Punkte liefert?"
+
+#: course/addlinkedtext.php:585
+msgid "Points:"
+msgstr "Punkte:"
+
+#: course/addlinkedtext.php:589
+msgid "Gradebook Category:"
+msgstr "Punkte-Kategorie:"
+
+#: course/addlinkedtext.php:603
+msgid "Tutor Access:"
+msgstr "Zugang für Tutoren:"
+
+#: course/addlinkedtext.php:613
+msgid "Open page in:"
+msgstr "Öffne Seite in:"
+
+#: course/addlinkedtext.php:615
+msgid "Current window"
+msgstr "Aktuellem Fenster"
+
+#: course/addlinkedtext.php:616
+msgid "New window"
+msgstr "Neuen Fenster"
+
+#: course/addlinkedtext.php:623
+msgid "Show Always"
+msgstr "Immer anzeigen"
+
+#: course/addlinkedtext.php:627
+msgid "Available After:"
+msgstr "Anzeigen nach:"
+
+#: course/addlinkedtext.php:630
+msgid "Always until end date"
+msgstr "Immer bis zur Fälligkeit"
+
+#: course/addlinkedtext.php:638
+msgid "Available Until:"
+msgstr "Verfügbar bis:"
+
+#: course/addlinkedtext.php:639
+msgid "Always after start date"
+msgstr "Immer ab Start"
+
+#: course/addlinkedtext.php:647 course/addlinkedtext.php:656
+msgid "Place on Calendar?"
+msgstr "Im Kalender anzeigen?"
+
+#: course/addlinkedtext.php:650
+msgid "Yes, on Available after date (will only show after that date)"
+msgstr "Ja, ab Start-datum (wird erst nach diesem Datum angezeigt)"
+
+#: course/addlinkedtext.php:651
+msgid "Yes, on Available until date"
+msgstr "Ja, am Fälligkeits-Datum"
+
+#: course/addlinkedtext.php:652 course/addlinkedtext.php:663
+msgid "With tag:"
+msgstr "Mit Tag:"
+
+#: course/addlinkedtext.php:668
+msgid "Associate Outcomes:"
+msgstr "Lernergebnis zuordnen:"
+
+#: course/addlinkedtext.php:669
+msgid "Select an outcome..."
+msgstr "Wähle ein Lernergebnis..."
+
+#: course/moddataset.php:222
+msgid "Question Updated."
+msgstr "Frage aktualisiert."
+
+#: course/moddataset.php:224
+msgid "Library Assignments Updated."
+msgstr "Bibliotheks-Zuordnung aktualisiert."
+
+#: course/moddataset.php:335
+msgid "Local copy of Question Created"
+msgstr "Lokale Kopie der Frage erstellt"
+
+#: course/moddataset.php:338
+msgid "Question Added to QuestionSet."
+msgstr "Frage zum Fragen-Katalog hinzugefügt."
+
+#: course/moddataset.php:353
+msgid "The file you are trying to upload is too big."
+msgstr "Die Datei, die Sie hochladen möchten, ist zu groß."
+
+#: course/moddataset.php:356
+msgid "The file you are trying upload was only partially uploaded."
+msgstr "Die Datei, die Sie hochladen möchten, wurde nur teilweise hochgeladen."
+
+#: course/moddataset.php:359
+msgid "There was a problem with your upload."
+msgstr "Es gab ein Problem beim Hochladen Ihrer Datei."
+
+#: course/moddataset.php:363
+msgid "Need to specify variable for image to be referenced by"
+msgstr "Geben Sie eine Variable an, mit der das Bild referenziert werden kann"
+
+#: course/moddataset.php:365
+#, php-format
+msgid "%s is not an allowed variable name"
+msgstr "%s ist als Variablenname nicht erlaubt"
+
+#: course/moddataset.php:385
+msgid "File is not image file"
+msgstr "Datei ist keine Bild-Datei"
+
+#: course/moddataset.php:395
+msgid "Error uploading image file!"
+msgstr "Fehler beim Hochladen der Bid-Datei!"
+
+#: course/moddataset.php:495
+msgid "Return to Question Set Management"
+msgstr "Zurück zum Fragen-Katalog"
+
+#: course/moddataset.php:499
+msgid "Add Question to Assessment using Defaults"
+msgstr "Frage mit Standard-Einstellungen zum Test hinzufügen"
+
+#: course/moddataset.php:500
+msgid "Add Question to Assessment"
+msgstr "Frage zum test hinzufügen"
+
+#: course/moddataset.php:502
+msgid "Return to Assessment"
+msgstr "Zurück zum Test"
+
+#: course/moddataset.php:775
+msgid "Question Editor"
+msgstr "Fragen-Editor"
+
+#: course/moddataset.php:950 course/moddataset.php:954
+msgid "Modify Questions"
+msgstr "Fragen bearbeiten"
+
+#: course/moddataset.php:954
+msgid "Add Drill Assessment"
+msgstr "Trainings-Test (Drill) hinzufügen"
+
+#: course/moddataset.php:958 course/moddataset.php:964
+msgid "Modify Question"
+msgstr "Frage bearbeiten"
+
+#: course/moddataset.php:972
+msgid "QuestionSet Question"
+msgstr "Frage im Fragen-Katalog"
+
+#: course/moddataset.php:976
+msgid "This question appears to be a Tutorial Style question."
+msgstr "Dies scheint eine Frage im Tutoren-Stil zu sein."
+
+#: course/moddataset.php:976
+msgid "Open in the tutorial question editor"
+msgstr "Im Editor für den Tutoren-Stil öffnen"
+
+#: course/moddataset.php:980
+msgid ""
+"This question has been marked for deletion.  This might indicate there is an "
+"error in the question. It is recommended you discontinue use of this "
+"question when possible"
+msgstr ""
+"Diese Frage ist zum Löschen vorgesehen. Das könnte darauf hindeuten, dass es "
+"in der Frage einen Fehler gibt. Es wird empfohlen, dass Sie diese Frage "
+"nicht mehr verwenden, falls möglich"
+
+#: course/moddataset.php:984
+msgid "This question is currently being used in "
+msgstr "Diese Frage wird gegenwärtig in "
+
+#: course/moddataset.php:986
+msgid " assessments that are not yours.  "
+msgstr " Tests von Anderen verwendet. "
+
+#: course/moddataset.php:988
+msgid "one assessment that is not yours.  "
+msgstr "einem Test eines Anderen verwendet. "
+
+#: course/moddataset.php:990
+msgid ""
+"In consideration of the other users, if you want to make changes other than "
+"minor fixes to this question, consider creating a new version of this "
+"question instead."
+msgstr ""
+"Wenn Sie an dieser Frage mehr als kleine Korrekturen vornehmen wollen, so "
+"sollten Sie, mit Rücksicht auf die anderen Benutzer, stattdessen eine neue "
+"Version dieser Frage anlegen."
+
+#: course/moddataset.php:994
+#, php-format
+msgid "%sTemplate this question%s for use in this assessment.  "
+msgstr "%sDiese Frage als Vorlage %s für eine Frage in diesem Test verwenden. "
+
+#: course/moddataset.php:995
+msgid ""
+"This will let you modify the question for this assessment only without "
+"affecting the library version being used in other assessments."
+msgstr ""
+"Das ermöglicht es Ihnen, die Frage nur für diesen Test zu modifizieren, ohne "
+"die Version der Frage zu verändern, die in anderen Tests benutzt wird."
+
+#: course/moddataset.php:998
+msgid ""
+"This question is not set to allow you to modify the code.  You can only view "
+"the code and make additional library assignments"
+msgstr ""
+"Sie dürfen den Code dieser Frage nicht modifizieren. Sie dürfen den Code nur "
+"ansehen und die Frage zusätzlich in Bibliotheken einordnen"
+
+#: course/moddataset.php:1042
+msgid ""
+"You should only modify the attribution if you are SURE you are removing all "
+"portions of the question that require the attribution"
+msgstr ""
+"Sie sollten die Lizenz-Merkmale nur bearbeiten wenn Sie SICHER sind dass Sie "
+"alle Teile der Frage entfernt haben, die diese Merkmale erfordern"
+
+#: course/moddataset.php:1134
+msgid "Common Control"
+msgstr "Fragen-Logik (Common Control)"
+
+#: course/moddataset.php:1138 course/moddataset.php:1150
+#: course/moddataset.php:1169 course/moddataset.php:1253
+msgid "Quick Save and Preview"
+msgstr "Speichern und Vorschau"
+
+#: course/moddataset.php:1141
+msgid "disabled"
+msgstr "deaktiviert"
+
+#: course/moddataset.php:1146
+msgid "Question Text"
+msgstr "Fragen-Text"
+
+#: course/moddataset.php:1164
+msgid "Detailed Solution:"
+msgstr "Musterlösung:"
+
+#: course/moddataset.php:1173
+msgid "Uses random variables from the question."
+msgstr "Verwendet die Zufallsvariablen aus der Frage."
+
+#: course/moddataset.php:1175
+msgid "Be sure to include the question you are solving in the text"
+msgstr "Denken Sie daran, die Frage so einzubinden, wie Siue sie im Text lösen"
+
+#: course/moddataset.php:1180
+msgid "Display with the \"Show Answer\""
+msgstr "Mit Antwort anzeigen"
+
+#: course/moddataset.php:1185
+msgid "Image file:"
+msgstr "Bild-Datei:"
+
+#: course/moddataset.php:1186
+msgid "assign to variable:"
+msgstr "zuordnen zur Variablen:"
+
+#: course/moddataset.php:1187 course/moddataset.php:1203
+msgid "Description:"
+msgstr "Beschreibung:"
+
+#: course/moddataset.php:1189
+msgid "Images:"
+msgstr "Bild:"
+
+#: course/moddataset.php:1202
+msgid "Variable:"
+msgstr "Variable:"
+
+#: course/moddataset.php:1210
+msgid "Help button: Type:"
+msgstr "Hilfe-Schaltfläche: Typ:"
+
+#: course/moddataset.php:1220
+msgid "Help buttons:"
+msgstr "Hilfe-Schaltflächen:"
+
+#: course/moddataset.php:1235
+msgid "Mark question as deprecated and suggest alternative?"
+msgstr "Frage als veraltet kennzeichnen und Alternative vorschlagen?"
+
+#: course/moddataset.php:1239
+msgid "Suggested replacement ID:"
+msgstr "ID der vorgeschlagenen Alternative:"
+
+#: course/moddataset.php:1243
+msgid "Do not use this unless you know what you're doing"
+msgstr "Verwenden Sie dies nur, wenn Sie wissen, was Sie tun"
+
+#: course/moddataset.php:1246
+msgid "This question is currently marked as deleted."
+msgstr "Diese Frage ist zurzeit zum Löschen vorgesehen."
+
+#: course/moddataset.php:1246
+msgid "Un-delete question"
+msgstr "Lösch-Vermerk aufheben"
+
+#: directaccess.php:15
+msgid ""
+"Invalid address.  Address must be directaccess.php?cid=###, where ### is "
+"your courseid"
+msgstr ""
+"Ungültige URL. Die URL muss …/directaccess.php?cid=### sein, wobei ### Ihre "
+"Kurs_ID ist"
+
+#: directaccess.php:37
+msgid "Please provide the enrollment key"
+msgstr "Bitte geben Sie ein Kurs-Passwort ein"
+
+#: directaccess.php:41
+msgid "Enrollment key is invalid."
+msgstr "Kurs-Passwort ist ungültig."
+
+#: directaccess.php:86
+#, php-format
+msgid "This is an automated message from %s.  Do not respond to this email."
+msgstr ""
+"Dies ist eine automatische Nachricht von %s. Antworten Sie nicht darauf."
+
+#: directaccess.php:96
+msgid "Back to login page"
+msgstr "Zurück zur Anmeldeseite"
+
+#: directaccess.php:133
+msgid "Incorrect enrollment key.  Try again."
+msgstr "Falsches Kurs-Passwort. Erneut versuchen."
+
+#: directaccess.php:134 directaccess.php:275
+msgid "Course Enrollment Key:"
+msgstr "Kurs-Passwort:"
+
+#: directaccess.php:188
+#, php-format
+msgid "Do you already have an account on %s?"
+msgstr "Haben Sie schon eine Benutzerkennung auf %s?"
+
+#: directaccess.php:190 directaccess.php:191
+msgid "checked"
+msgstr "ausgewählt"
+
+#: directaccess.php:198
+msgid "Already have an account"
+msgstr "Sie haben schon eine Kennung"
+
+#: directaccess.php:199
+msgid "Login"
+msgstr "Anmelden"
+
+#: directaccess.php:199
+#, php-format
+msgid ""
+"If you have an account on %s but are not enrolled in this course, logging in "
+"below will enroll you in this course."
+msgstr ""
+"Wenn Sie eine Kennung bei %s haben, aber in diesen Kurs nicht eingeschrieben "
+"sind, so werden Sie dort eingeschrieben, wenn Sie sich anmelden."
+
+#: directaccess.php:207
+msgid "Course Enrollment Key"
+msgstr "Kurs-Passwort"
+
+#: directaccess.php:210
+msgid "Login and Enroll"
+msgstr "Anmelden und Einschreiben"
+
+#: directaccess.php:213
+#, php-format
+msgid ""
+"JavaScript is not enabled.  JavaScript is required for %s.  Please enable "
+"JavaScript and reload this page"
+msgstr ""
+"JavaScript ist deaktiviert. JavaScript wird für %s benötigt. Bitte "
+"aktivieren Sie JavaScript und laden Sie diese Seite erneut"
+
+#: directaccess.php:254
+msgid "New Student Enrollment"
+msgstr "Anmeldung eines neuen Studenten"
+
+#: directaccess.php:268
+msgid ""
+"If you are registered at a Washington Community College, enter your Student "
+"ID Number:"
+msgstr ""
+"Wenn Sie in einem Washington Community College eingeschrieben sind, so geben "
+"Sie Ihre Matrikelnr. an:"
+
+#: ltisessionsetup.php:22
+msgid "Session established. Go back to your LMS and try again."
+msgstr ""
+"Sitzung eingerichtet. Gehen Sie zurück in Ihr KMS und versuchen Sie es "
+"erneut."
+
+#: ltisessionsetup.php:26
+#, php-format
+msgid ""
+"Redirecting you back to your LMS...<br/>If you aren't redirected in 5 "
+"seconds, %s click here %s."
+msgstr ""
+"Sie werden zu Ihrem LMS zurückgeleitet...<br/>Wenn Sie in 5 Sekunden nicht "
+"in Ihrem LMS sind, so %s Klicken Sie hier %s."
+
+#: validate.php:53
+#, php-format
+msgid "Error.  Please %s try again%s"
+msgstr "Fehler. Bitte %s erneut versuchen %s"
+
+#: validate.php:147
+msgid ""
+"Unable to establish a session. This is most likely caused by your browser "
+"blocking third-party cookies.  Please adjust your browser settings and try "
+"again."
+msgstr ""
+"Sitzung konnte nicht eingerichtet werden. Das liegt höchstwahrscheinlich "
+"daran, dass Ihr Browser Cookies von Dritten blockiert. Bitte korrigieren Sie "
+"Ihre Browser-Einstellungen und versuchen Sie es erneut."
+
+#: validate.php:234
+msgid ""
+"You have not yet confirmed your registration.  You must respond to the email "
+"that was sent to you by IMathAS."
+msgstr ""
+"Sie haben Ihre Registrierung noch nicht bestätigt. Sie müssen auf die E-Mail "
+"antworten, die IMathAS Ihnen geschickt hat."
+
+#: validate.php:519
+msgid ""
+"You have been locked out of this course by your instructor.  Please see your "
+"instructor for more information."
+msgstr ""
+"Sie wurden für diesen Kurs geblockt. Bitte wenden Sie sich für mehr "
+"Informationen an Ihren Dozenten."
+
+#: validate.php:622
+msgid "This course is not available at this time"
+msgstr "Dieser Kurs ist zurzeit nicht verfügbar"
+
+#: validate.php:631
+msgid "This course is currently locked for an assessment"
+msgstr "Dieser Kurs ist für einen Test gesperrt"
+
+#: validate.php:633
+msgid "Go to Assessment"
+msgstr "Zum Test"
+
+#: validate.php:633 validate.php:635
+msgid "Go Back"
+msgstr "Zurück"
+
+#: course/moddataset.php:675
+msgid "Enter description here"
+msgstr "Beschreibung hier eingeben"
+
+#: course/moddataset.php:721
+msgid "View"
+msgstr "Ansehen"
+
+#: course/moddataset.php:1013
+msgid "Use Rights:"
+msgstr "Nutzungsrechte:"
+
+#: course/moddataset.php:1019
+msgid "Allow use by all"
+msgstr "Jeder darf nutzen"
+
+#: course/moddataset.php:1022
+msgid "Allow use by all and modifications by group"
+msgstr "Jeder darf nutzen; Bearbeitung durch Gruppe"
+
+#: course/moddataset.php:1025
+msgid "Allow use by all and modifications by all"
+msgstr "Jeder darf nutzen und bearbeiten"
+
+#: course/moddataset.php:1027
+msgid "License:"
+msgstr "Lizenz:"
+
+#: course/moddataset.php:1035
+msgid "Add additional attribution"
+msgstr "Zusätzliche Bedingungen hinzufügen"
+
+#: course/moddataset.php:1094
+msgid "My library assignments:"
+msgstr "Meine Einordnung in Bibliotheken:"
+
+#: course/moddataset.php:1102
+msgid "Question type:"
+msgstr "Fragen-Typ:"
+
+#: course/moddataset.php:1127
+msgid "Writing Questions Help"
+msgstr "Fragen schreiben - Hilfe"
+
+#: course/moddataset.php:1128
+msgid "Macro Library Help"
+msgstr "Makro-Bibliotheken - Hilfe"
+
+#: course/moddataset.php:1130
+msgid "Tutorial Style editor"
+msgstr "Editor im Tutoren-Stil"
+
+#: course/moddataset.php:1158
+msgid "Add a detailed solution"
+msgstr "Musterlösung hinzufügen"
+
+#: course/moddataset.php:1147 course/moddataset.php:1166
+msgid "Toggle Editor"
+msgstr "Editor umschalten"
+
+#: course/moddataset.php:1178
+msgid "Use this as a \"written example\" help button"
+msgstr "Verwende dies für \"Musterlösung\"-Schaltfläche"
