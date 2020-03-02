@@ -860,11 +860,13 @@
 			$qsdata[$r['qid']] = $r;
 		}
 
-		echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Correct Questions').'</button>';
-		echo ' <button type="button" id="hptoggle" onclick="hideperfect()">'._('Hide Perfect Questions').'</button>';
-		echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
-		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
-		echo ' <button type="button" id="prevtoggle" onclick="previewall()">'._('Preview All').'</button></p>';
+		if ($canedit) {
+			echo '<p><button type="button" id="hctoggle" onclick="hidecorrect()">'._('Hide Correct Questions').'</button>';
+			echo ' <button type="button" id="hptoggle" onclick="hideperfect()">'._('Hide Perfect Questions').'</button>';
+			echo ' <button type="button" id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
+			echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
+			echo ' <button type="button" id="prevtoggle" onclick="previewall()">'._('Preview All').'</button></p>';
+		}
 		$total = 0;
 		$GLOBALS['capturedrawinit'] = true;
 

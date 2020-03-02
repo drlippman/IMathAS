@@ -42,9 +42,9 @@ switch($_GET['action']) {
 		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">",_('Choose a password:'),"</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">",_('Confirm password:'),"</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"firstname\">",_('Enter First Name:'),"</label></span> <input class=\"form\" type=\"text\" size=20 id=firstname name=firstname><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form\" type=\"text\" size=20 id=lastname name=lastname><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form\" type=\"text\" size=60 id=email name=email><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"firstname\">",_('Enter First Name:'),"</label></span> <input class=\"form\" type=\"text\" size=20 id=firstname name=firstname autocomplete=\"given-name\"><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form\" type=\"text\" size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form\" type=\"text\" size=60 id=email name=email autocomplete=\"email\"><BR class=\"form\">\n";
 		echo "<span class=form><label for=\"msgnot\">",_('Notify me by email when I receive a new message:'),"</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot checked=\"checked\" /></span><BR class=form>\n";
 		if (isset($studentTOS)) {
 			echo "<span class=form><label for=\"agree\">",_('I have read and agree to the Terms of Use (below)'),"</label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
@@ -129,8 +129,8 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('User Profile'),'</h1></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>',_('Profile Settings'),'</legend>';
-		echo "<span class=form><label for=\"firstname\">",_('Enter First Name'),":</label></span> <input class=form type=text size=20 id=firstname name=firstname value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
-		echo "<span class=form><label for=\"lastname\">",_('Enter Last Name'),":</label></span> <input class=form type=text size=20 id=lastname name=lastname value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
+		echo "<span class=form><label for=\"firstname\">",_('Enter First Name'),":</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
+		echo "<span class=form><label for=\"lastname\">",_('Enter Last Name'),":</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
 		if ($myrights>10 && $groupid>0) {
 			$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
 			$stm->execute(array(':id'=>$groupid));
@@ -166,7 +166,7 @@ switch($_GET['action']) {
 			}
 
 		}
-		echo "<span class=form><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=form type=text size=60 id=email name=email value=\"".Sanitize::emailAddress($line['email'])."\"><BR class=form>\n";
+		echo "<span class=form><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=form type=text size=60 id=email name=email autocomplete=\"email\" value=\"".Sanitize::emailAddress($line['email'])."\"><BR class=form>\n";
 		echo "<span class=form><label for=\"msgnot\">",_('Notify me by email when I receive a new message:'),"</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
 		echo " /></span><BR class=form>\n";

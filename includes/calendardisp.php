@@ -90,7 +90,7 @@ for ($i=2;$i<26;$i++) {
 	echo '>'.$i.'</option>';
 }
 echo '</select> weeks. ';
-echo '<a href="#" onclick="hidevisualcal();return false;" aria-label="'._('Hide visual calendar and display events list').'" title="'._('Hide visual calendar and display events list').'" aria-controls="caleventslist">';
+echo '<a href="#" onclick="hidevisualcal();return false;" title="'._('Hide visual calendar and display events list').'" aria-controls="caleventslist">';
 echo _('Events List').'</a>';
 echo '</div>';
 echo '<div class=center><a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'" aria-label="'.sprintf(_('Back %d weeks'),$callength).'">&lt; &lt;</a> ';

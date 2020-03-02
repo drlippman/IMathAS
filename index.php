@@ -522,14 +522,18 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 
 	echo '<div class="center">';
 	if (count($data)>0) {
-		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">Change Course Order</a>';
+		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">',_('Change Course Order'),'</a><br/>';
 	}
-	echo '</div><div class="center">';
-	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
+	//echo '</div><div class="center">';
+	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">',_('View hidden courses'),'</a> ';
+	if ($type=='teach' && count($data)>0) {
+		echo '<br/><a class="small" href="admin/forms.php?action=findstudent&from=home">',_('Find Student'),'</a> ';
+	}
 	echo '</div>';
 	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
 		echo '<div class="center"><a class="abutton" href="admin/admin2.php">', _('Admin Page'), '</a></div>';
 	}
+
 	echo '</div>';
 	echo '</div>';
 }

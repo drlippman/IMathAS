@@ -4836,7 +4836,7 @@ var SupSub = P(MathCommand, function(_, super_) {
       if (cursor[L] && !cursor[R] && !cursor.selection
           && this.parent[L] instanceof Variable
       ) {
-          if ((this.parent[L].isItalic !== false
+          if ((this.parent[L].isItalic !== false && this.parent[L].letter !== 'e'
             && cursor.options.charsThatBreakOutOfSupSubVar.indexOf(ch) > -1)
             || (this.parent[L].isPartOfOperator
             && cursor.options.charsThatBreakOutOfSupSubOp.indexOf(ch) > -1)

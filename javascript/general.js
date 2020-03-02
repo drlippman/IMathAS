@@ -157,6 +157,13 @@ function tipout(e) {
 	}
 	curtipel = null;
 }
+jQuery(function() {
+	jQuery(document).on('keyup', function(e) {
+		if (e.which == 27 && curtipel !== null) {
+			tipout();
+		}
+	})
+});
 
 var popupwins = [];
 function popupwindow(id,content,width,height,scroll) {
