@@ -251,9 +251,9 @@ export const actions = {
       qns = [qns];
     }
 
-    for (let k = 0; k < qns.length; k++) {
-      if (window.callbackstack.hasOwnProperty(qns[k])) {
-        window.callbackstack[qns[k]](qns[k]);
+    for (let k in window.callbackstack) {
+      if (qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
+        window.callbackstack[k](k);
       }
     }
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
