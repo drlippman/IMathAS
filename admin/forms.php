@@ -69,7 +69,7 @@ switch($_GET['action']) {
 		echo "<p>Are you sure you want to delete the course <b>".Sanitize::encodeStringForDisplay($name)."</b>?</p>\n";
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="delete">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
+		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "anonuser":
@@ -96,7 +96,7 @@ switch($_GET['action']) {
 		echo '<p>Anonymization does NOT delete the user\'s courses or course work</p>';
 
 		echo '<p><button type=submit name="action" value="anonuser">'._('Anonymize').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
+		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "deladmin":
@@ -139,7 +139,7 @@ switch($_GET['action']) {
 		writeHtmlSelect('transferto',array_keys($otherusers),array_values($otherusers), $userid);
 		echo '</p>';
 		echo '<p><button type=submit name="action" value="deladmin">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
+		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "chgrights":
@@ -1321,7 +1321,7 @@ switch($_GET['action']) {
 		echo '</strong>?</p>';
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="delltidomaincred">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
+		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "modltidomaincred":
@@ -1471,7 +1471,7 @@ switch($_GET['action']) {
 		echo '</strong>?</p>';
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="delgroup">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
+		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "modgroup":
@@ -1509,7 +1509,7 @@ switch($_GET['action']) {
 		echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="removediag">'._('Delete').'</button>';
-		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
+		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 
 		break;
@@ -1526,10 +1526,10 @@ switch($_GET['action']) {
 		echo '</form>';
 		break;
 	case "findstudent":
-		if ($myrights < 20) { echo "You don't have the authority for this action"; break;}
-		echo '<div id="headerforms" class="pagetitle"><h1>Find Student</h1></div>';
+		if ($myrights < 20) { echo _("You don't have the authority for this action"); break;}
+		echo '<div id="headerforms" class="pagetitle"><h1>',_('Find Student'),'</h1></div>';
 		echo '<form method="post" action="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">';
-		echo '<p>Enter all or part of the name, email, or username: ';
+		echo '<p>',_('Enter all or part of the name, email, or username:'),' ';
 		echo '<input type=text size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo']).'"/></p>';
 		echo '<input type="submit">';
 		echo '</form>';
@@ -1571,7 +1571,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 			if ($stm->rowCount()==0) {
-				echo '<p>No matches <a href="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">Try again</a></p>';
+				echo '<p>',_('No matches'),' <a href="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">',_('Try again'),'</a></p>';
 			} else {
 				echo '<table class="gb"><thead><th>Student</th><th>Username</th><th>Course</th>';
 				if ($from!='home' && $myrights>=75) {

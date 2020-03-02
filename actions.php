@@ -711,7 +711,7 @@ require_once("includes/sanitize.php");
 			} else {
 				require("header.php");
 				echo $pagetopper;
-				echo "Password change failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+				echo _("Password change failed."),"  <a href=\"forms.php?action=chguserinfo$gb\">",_("Try Again"),"</a>\n";
 				require("footer.php");
 				exit;
 			}
