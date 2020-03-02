@@ -47,7 +47,7 @@ switch($_POST['action']) {
 		$stm->execute(array(':userid'=>$be, ':sessionid'=>$sessionid));
 		break;
 	case "chgrights":
-		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo _("You don't have the authority for this action"); break;}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
@@ -55,7 +55,7 @@ switch($_POST['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($oldrights,$oldgroupid) = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
-			echo "invalid id";
+			echo _("invalid id");
 			exit;
 		} else if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
 			echo "You don't have the authority for this action";
@@ -306,7 +306,7 @@ switch($_POST['action']) {
 		}
 		break;
 	case "newadmin":
-		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo _("You don't have the authority for this action"); break;}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
@@ -314,9 +314,9 @@ switch($_POST['action']) {
 		$stm->execute(array(':SID'=>$_POST['SID']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
-			echo "<html><body>Username is already used.\n";
-			echo "<a href=\"forms.php?action=newadmin\">Try Again</a> or ";
-			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">Change rights for existing user</a></body></html>\n";
+			echo "<html><body>",_("Username is already used."),"\n";
+			echo "<a href=\"forms.php?action=newadmin\">",_("Try Again"),"</a> ",_("or")," ";
+			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">",_("Change rights for existing user"),"</a></body></html>\n";
 			exit;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
@@ -415,7 +415,7 @@ switch($_POST['action']) {
 		break;
 	case "modify":
 	case "addcourse":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 40) { echo _("You don't have the authority for this action"); break;}
 		require_once("../includes/parsedatetime.php");
 
 		if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
@@ -426,7 +426,7 @@ switch($_POST['action']) {
 			if ($terms[0]!='') {
 				if (!isset($_POST['termsagree'])) {
 					require("../header.php");
-					echo '<p>You must agree to the terms of use to copy this course.</p>';
+					echo '<p>',_('You must agree to the terms of use to copy this course.'),'</p>';
 					require("../footer.php");
 					exit;
 				} else {
