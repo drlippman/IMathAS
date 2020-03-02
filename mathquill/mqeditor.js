@@ -111,9 +111,9 @@ var MQeditor = (function($) {
           mqfield = MQ.MathField(span[0], thisMQconfig).config(MQconfig);
           attachEditor(span);
           // if original input has input changed programmatically and change
-          // event triggered, update mathquill. Requires .trigger('change',true);
-          $(el).on('change', function(e, setval) {
-            if (setval) {
+          // event triggered, update mathquill.
+          $(el).on('change', function(e, fromblur) {
+            if (!fromblur) {
               var val = el.value;
               if (config.hasOwnProperty('toMQ')) {
                 val = config.toMQ(val);
@@ -215,7 +215,7 @@ var MQeditor = (function($) {
       rebuild = true;
       // trigger change on last field
       if (curMQfield !== null) {
-        $("#"+curMQfield.el().id.substring(8)).trigger('change');
+        $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
       }
 
       // new field; need to build the panel
@@ -269,7 +269,7 @@ var MQeditor = (function($) {
     } else {
       $("#mqeditor").hide();
     }
-    $("#"+curMQfield.el().id.substring(8)).trigger('change');
+    $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
   }
 
   /*
