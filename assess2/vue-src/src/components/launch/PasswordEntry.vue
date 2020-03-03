@@ -5,10 +5,12 @@
     </label>
     <input
       :value="value"
-      id="assmpass"
+      id="password"
+      name="password"
       type="password"
       autocomplete="off"
       @input="handleInput"
+      @keyup.enter="$emit('onenter')"
     >
   </div>
 </template>

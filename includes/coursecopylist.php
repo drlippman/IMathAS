@@ -2,7 +2,7 @@
 //IMathAS:  Copy Course Items course list
 
 if (isset($_GET['loadothergroup']) || isset($_GET['loadothers']) || isset($_POST['cidlookup'])) {
-	require("../init.php");	
+	require("../init.php");
 }
 
 if (!isset($myrights) || $myrights<20) {
@@ -21,11 +21,11 @@ if (isset($_POST['cidlookup'])) {
 	} else {
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		$out = array(
-			"id"=>Sanitize::onlyInt($row['id']), 
+			"id"=>Sanitize::onlyInt($row['id']),
 			"name"=>Sanitize::encodeStringForDisplay($row['name'] . ' ('.$row['LastName'].', '.$row['FirstName'].')'),
 			"termsurl"=>Sanitize::url($row['termsurl']));
 		$out['needkey'] = !($row['copyrights'] == 2 || ($row['copyrights'] == 1 && $row['groupid']==$groupid));
-		echo json_encode($out);
+		echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
 	}
 	exit;
 } else if (isset($_GET['loadothers'])) {
@@ -33,7 +33,7 @@ if (isset($_POST['cidlookup'])) {
 	if ($stm->rowCount()>0) {
 		$page_hasGroups=true;
 		$grpnames = array();
-		$grpnames[] = array('id'=>0,'name'=>"Default Group");
+		$grpnames[] = array('id'=>0,'name'=>_("Default Group"));
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['id']==$groupid) {continue;}
 			$grpnames[] = $row;
@@ -60,7 +60,7 @@ if (isset($_POST['cidlookup'])) {
 		$myCourses[$line['id']] = $line;
 		$myCoursesDefaultOrder[] = $line['id'];
 	}
-	
+
 	$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
 	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 	$courseTreeResult = $DBH->prepare($query);
@@ -89,7 +89,7 @@ function printCourseOrder($order, $data, &$printed) {
 			printCourseLine($data[$item]);
 			$printed[] = $item;
 		}
-	}		
+	}
 }
 function printCourseLine($data) {
 	echo '<li><span class=dd>-</span> ';
@@ -115,7 +115,7 @@ function writeCourseInfo($line, $skipcopyright=2) {
 	if ($line['copyrights']<$skipcopyright) {
 		echo "&copy;\n";
 	} else {
-		echo " <a href=\"$imasroot/course/course.php?cid=" . Sanitize::courseId($line['id']) . "\" target=\"_blank\" class=\"small\">Preview</a>";
+		echo " <a href=\"$imasroot/course/course.php?cid=" . Sanitize::courseId($line['id']) . "\" target=\"_blank\" class=\"small\">"._("Preview")."</a>";
 	}
 }
 
@@ -147,12 +147,12 @@ function writeOtherGrpTemplates($grptemplatelist) {
 function writeEkeyField() {
 ?>
 	<p id="ekeybox" style="display:none;">
-	For courses marked with &copy;, you must supply the course enrollment key to show permission to copy the course.<br/>
-	Enrollment key: <input type=text name=ekey id=ekey size=30></p>
+	<?php echo _('For courses marked with &copy;, you must supply the course enrollment key to show permission to copy the course.'); ?><br/>
+	<?php echo _('Enrollment key:'); ?> <input type=text name=ekey id=ekey size=30></p>
 
 	<p id="termsbox" style="display:none;">
-	This course has additional <a target="_blank" href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>
-	<input type="checkbox" name="termsagree" /> I agree to the Terms of Use specified in the link above.</p>
+	<?php echo sprintf(_('This course has additional %sTerms of Use %s you must agree to before copying the course.'),'<a target="_blank" href="" id="termsurl">','</a>'); ?>'<br/>
+	<input type="checkbox" name="termsagree" /> <?php echo _('I agree to the Terms of Use specified in the link above.'); ?></p>
 <?php
 }
 
@@ -176,7 +176,7 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 				<?php
 			}
 	 } else {
-		 echo '<li>No other users</li>';
+		 echo '<li>'. _('No other users').'</li>';
 	 }
 
 } else if (isset($_GET['loadothergroup'])) { //loading others subblock
@@ -224,17 +224,17 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 
 <?php
 	 } else {
-		 echo '<li>No group members with courses</li>';
+		 echo '<li>'._('No group members with courses').'</li>';
 	 }
 
 } else {  //display course list selection
-?>	
+?>
 	<ul class=base>
 <?php
 	if (!isset($skipthiscourse)) {
 ?>
 		<li><span class=dd>-</span>
-			<input type=radio name=ctc value="<?php echo $cid ?>" checked=1>This Course</li>
+			<input type=radio name=ctc value="<?php echo $cid ?>" checked=1><?php echo _('This Course'); ?></li>
 <?php
 	}
 ?>
@@ -243,7 +243,7 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 				<span class=btn id="bmine">+</span>
 			</span>
 			<span class=hdr onClick="toggle('mine')">
-				<span id="nmine" >My Courses</span>
+				<span id="nmine" ><?php echo _('My Courses'); ?></span>
 			</span>
 			<ul class=hide id="mine">
 <?php
@@ -268,7 +268,7 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 				<span class=btn id="bgrp">+</span>
 			</span>
 			<span class=hdr onClick="toggle('grp')">
-				<span id="ngrp" >My Group's Courses</span>
+				<span id="ngrp" ><?php echo _("My Group's Courses"); ?></span>
 			</span>
 			<ul class=hide id="grp">
 
@@ -316,7 +316,7 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 				<span class=btn id="bother">+</span>
 			</span>
 			<span class=hdr onClick="toggle('other');loadothers();">
-				<span id="nother" >Other's Courses</span>
+				<span id="nother" ><?php echo _("Other's Courses"); ?></span>
 			</span>
 			<ul class=hide id="other">
 
@@ -359,7 +359,7 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 			<span class=btn id="bgtemplate">+</span>
 		</span>
 		<span class=hdr onClick="toggle('gtemplate')">
-			<span id="ngtemplate" >Group Template Courses</span>
+			<span id="ngtemplate" ><?php echo _('Group Template Courses'); ?></span>
 		</span>
 		<ul class=hide id="gtemplate">
 
@@ -379,10 +379,10 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 	}
 ?>
 	</ul>
-	
-	<p>Or, lookup using course ID: 
+
+	<p><?php echo _('Or, lookup using course ID:'); ?>
 		<input type="text" size="7" id="cidlookup" />
-		<button type="button" onclick="lookupcid()">Look up course</button>
+		<button type="button" onclick="lookupcid()"><?php echo _('Look up course'); ?></button>
 		<span id="cidlookupout" style="display:none;"><br/>
 			<input type=radio name=ctc value=0 id=cidlookupctc />
 			<span id="cidlookupname"></span>

@@ -63,7 +63,7 @@ if (isset($CFG['addcourse']['copybutton'])) {
 }
 echo '</button></p>';
 echo '<div id=copyoptions style="display:none; padding-left: 20px">';
-echo '<p>Select a course to copy</p>';
+echo '<p>',_('Select a course to copy'),'</p>';
 $skipthiscourse = true;
 $cid = 0;
 require("../includes/coursecopylist.php");

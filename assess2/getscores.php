@@ -45,26 +45,35 @@ if ($isstudent) {
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
 
-// if have active scored record end it
-if ($assess_record->hasActiveAttempt()) {
-  echo '{"error": "active_attempt"}';
+if (!$assess_record->hasRecord()) {
+  echo '{"error": "not_ready"}';
   exit;
 }
-
 // grab any assessment info fields that may have updated:
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
   'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
-  'showscores', 'timelimit', 'points_possible'
+  'showscores', 'timelimit', 'points_possible', 'timelimit_grace', 'timelimit_expires'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 
+// adjust output if in by_question mode - to handle showwork after
+if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['submitby'] == 'by_question') {
+  $assessInfoOut['has_active_attempt'] = false;
+}
+
+// if have active scored record end it
+if ($assessInfoOut['has_active_attempt']) {
+  echo '{"error": "active_attempt"}';
+  exit;
+}
+
 // grab all questions settings and scores, based on end-of-assessment settings
-$assess_info->loadQuestionSettings('all', false);
 $showscores = $assess_info->showScoresAtEnd();
 $reshowQs = $assess_info->reshowQuestionsAtEnd();
+$assess_info->loadQuestionSettings('all', $reshowQs);
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
 $assessInfoOut['score'] = $assess_record->getAttemptScore();
 $totalScore = $assessInfoOut['score'];
@@ -98,4 +107,4 @@ if ($assessInfoOut['showscores'] != 'none') {
 prepDateDisp($assessInfoOut);
 
 //output JSON object
-echo json_encode($assessInfoOut);
+echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

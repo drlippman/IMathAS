@@ -17,6 +17,8 @@ require("../includes/copyiteminc.php");
 require("../includes/loaditemshowdata.php");
 require("itemexportfields.php");
 
+mb_substitute_character("none");
+
 $db_fields['block'] = explode(',', $db_fields['block']);
 
 
@@ -50,6 +52,16 @@ function exportcopysub($items,$parent,&$addtoarr) {
 	}
 }
 
+/*function encode_recurse(&$item) {
+	foreach ($item as $k=>$v) {
+		if (is_array($v)) {
+			encode_recurse($item[$k]);
+		} else if (is_string($v)) {
+			$item[$k] = mb_convert_encoding($item[$k], "UTF-8");
+		}
+	}
+}*/
+
 $storebase = $imasroot.'/filestore/';
 $storebaseenc = str_replace('/', '\\/', $storebase);
 $absbase = $GLOBALS['basesiteurl'].'/filestore/';
@@ -72,8 +84,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } elseif (isset($_POST['export'])) { //STEP 2 DATA PROCESSING, OUTPUT FILE HERE
-	header('Content-type: text/imas');
-	header("Content-Disposition: attachment; filename=\"imasitemexport-$cid.imas\"");
 
 	$checked = $_POST['checked'];
 	$output = array();
@@ -103,7 +113,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	if (isset($_POST['exportcourseopt'])) {
 		$stm = $DBH->prepare("SELECT itemorder,ownerid,name,".$db_fields['course']." FROM imas_courses WHERE id=:id");
 	} else {
-		$stm = $DBH->prepare("SELECT itemorder,ownerid,name FROM imas_courses WHERE id=:id");
+		$stm = $DBH->prepare("SELECT itemorder,ownerid,name,UIver FROM imas_courses WHERE id=:id");
 	}
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -316,9 +326,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$assessmap[$line['id']] = $output_item_id;
 			//check for ptsposs
 			if (isset($line['ptsposs']) && $line['ptsposs']==-1) {
-				$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);	
+				$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);
 			}
-			
+
 			unset($line['id']);
 			//map gbcategory
 			if (isset($gbmap[$line['gbcategory']])) {
@@ -532,7 +542,18 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 
 	//dump it!
-	echo json_encode($output, JSON_FORCE_OBJECT|JSON_HEX_TAG);
+	$out = json_encode($output, JSON_FORCE_OBJECT|JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);
+	if ($out === false) {
+		header('Content-type: text/plain');
+		echo 'Error generating output (error ' . json_last_error() . ')';
+		if ($myrights == 100) {
+			print_r($output);
+		}
+	} else {
+		header('Content-type: text/imas');
+		header("Content-Disposition: attachment; filename=\"imasitemexport-$cid.imas\"");
+		echo $out;
+	}
 	exit;
 
 } else { //STEP 1 DATA PROCESSING, INITIAL LOAD

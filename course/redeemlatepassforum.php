@@ -9,7 +9,7 @@
 	$from = $_GET['from'];
 	
 	require("../includes/exceptionfuncs.php");
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
@@ -30,7 +30,7 @@
 	if (isset($_GET['undo'])) {
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
-		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Un-use LatePass</div>";
@@ -245,7 +245,7 @@
 		//TO HERE - TODO keep going
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase ";
-		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		echo "Redeem LatePass</div>\n";

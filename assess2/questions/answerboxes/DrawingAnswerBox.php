@@ -203,10 +203,10 @@ class DrawingAnswerBox implements AnswerBox
     				$settings[7] = $newheight;
     			}
     		}
-    		if ($GLOBALS['sessiondata']['userprefs']['drawentry']==1 && $GLOBALS['sessiondata']['graphdisp']==0) {
+    		if ($_SESSION['userprefs']['drawentry']==1 && $_SESSION['graphdisp']==0) {
     			//can't imagine why someone would pick this, but if they do, need to set graphdisp to 2 temporarily
     			$revertgraphdisp = true;
-    			$GLOBALS['sessiondata']['graphdisp']=2;
+    			$_SESSION['graphdisp']=2;
     		} else {
     			$revertgraphdisp = false;
     		}
@@ -240,7 +240,7 @@ class DrawingAnswerBox implements AnswerBox
     		if (isset($GLOBALS['hidedrawcontrols'])) {
     			$out .= $plot;
     		} else {
-    			if ($GLOBALS['sessiondata']['userprefs']['drawentry']==0) { //accessible entry
+    			if ($_SESSION['userprefs']['drawentry']==0) { //accessible entry
     				$bg = 'a11ydraw:'.implode(',', $answerformat);
     				$out .= '<p>'._('Graph to add drawings to:').'</p>';
     				$out .= '<p>'.$plot.'</p>';
@@ -254,15 +254,15 @@ class DrawingAnswerBox implements AnswerBox
     					$dotline = 2;
     				}
     			} else {
-    				$bg = getgraphfilename($plot);
-    				/*
-    				someday: overlay canvas over SVG.  Sizing not working in mobile and don't feel like figuring it out yet
-    				$out .= '<div class="drawcanvas" style="position:relative;background-color:#fff;width:'.$settings[6].'px;height:'.$settings[7].'px;">';
-    				$out .= '<div class="canvasbg" style="position:absolute;top:0;left:0;">'.$plot.'</div><div class="drawcanvasholder" style="position:absolute;top:0;left:0;z-index:2">';
+    				//$bg = getgraphfilename($plot);
+
+    				$plot = str_replace('<embed','<embed data-nomag=1',$plot); //hide mag
+    				//overlay canvas over SVG.
+    				$out .= '<div class="drawcanvas" style="position:relative;width:'.$settings[6].'px;height:'.$settings[7].'px">';
+    				$out .= '<div class="canvasbg" style="position:absolute;top:0px;left:0px;">'.$plot.'</div>';
+    				$out .= '<div class="drawcanvasholder" style="position:relative;top:0;left:0;z-index:2">';
     				$out .= "<canvas id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
     				$out .= '</div></div>';
-    				*/
-    				$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 
     				$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
     				$out .= "<span data-drawaction=\"clearcanvas\" data-qn=\"$qn\">" . _('Clear All') . "</span> ";
@@ -476,7 +476,7 @@ class DrawingAnswerBox implements AnswerBox
     				'value' => $la,
     				'autocomplete' => 'off'
     			];
-    			$params['canvas'] = [$qn,$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
+    			$params['canvas'] = [$qn,'',$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
     			$out .= '<input ' .
     							Sanitize::generateAttributeString($attributes) .
@@ -490,7 +490,7 @@ class DrawingAnswerBox implements AnswerBox
         if ($colorbox!='') { $out .= '</div>';}
 
     		if ($revertgraphdisp) {
-    			$GLOBALS['sessiondata']['graphdisp']=0;
+    			$_SESSION['graphdisp']=0;
     		}
     		$tip = _('Enter your answer by drawing on the graph.');
     		if (isset($answers)) {

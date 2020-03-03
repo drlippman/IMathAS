@@ -46,7 +46,7 @@ if (isset($_POST['snippets'])) {
 	}
 	$jsondata['snippets'] = $safesnips;
 	$stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
-	$stm->execute(array(':jsondata'=>json_encode($jsondata), ':id'=>$userid));
+	$stm->execute(array(':jsondata'=>json_encode($jsondata, JSON_INVALID_UTF8_IGNORE), ':id'=>$userid));
 
 	echo _("Snippets saved");
 

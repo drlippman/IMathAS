@@ -140,7 +140,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
 		}
-		echo json_encode($opts);
+		echo json_encode($opts, JSON_INVALID_UTF8_IGNORE);
 		exit;
 	}
 	if (isset($_GET['add'])) {
@@ -281,7 +281,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				</script>';
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
-			if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 				echo "<a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 			}
 			if ($type=='sent') {
@@ -531,7 +531,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"></span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
-			echo Sanitize::encodeStringForDisplay($message);
+			echo Sanitize::encodeStringForDisplay($message, true);
 			echo "</textarea></div></span><br class=form>\n";
 			if ($replyto>0) {
 				echo '<span class="form"></span><span class="formright"><input type="checkbox" name="sendunread" id="sendunread" value="1"/> <label for="sendunread">'._('Mark original message unread').'</label></span><br class="form"/>';
@@ -549,21 +549,21 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		}
 	}
 	if (isset($_POST['unread'])) {
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
   		$query = "UPDATE imas_msgs SET isread=(isread&~1) WHERE id IN ($checklist) AND (isread&1)=1";
       $DBH->query($query);
 	 }
 	}
 	if (isset($_POST['markread'])) {
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
       $query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
       $DBH->query($query);
 	  }
 	}
 	if (isset($_POST['remove'])) {
-		if (count($_POST['checked'])>0) {
+		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
   		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
       $DBH->query($query);
@@ -588,14 +588,14 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js?v=072217\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $GLOBALS['basesiteurl'] . "/msgs/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
-	if (isset($sessiondata['ltiitemtype'])) {
+	if (isset($_SESSION['ltiitemtype'])) {
 		$nologo = true;
 	}
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
-	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo " Message List</div>";

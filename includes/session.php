@@ -3,6 +3,8 @@
 class SessionDBHandler implements SessionHandlerInterface
 {
 	private $db;
+	private $readLastAccess = 0;
+	private $readHash = '';
 
 	/**
 	 * SessionHandler constructor.
@@ -73,10 +75,12 @@ class SessionDBHandler implements SessionHandlerInterface
 	 */
 	public function read($sessionId)
 	{
-		$stm = $this->db->prepare('SELECT `data` FROM php_sessions WHERE id = :id');
+		$stm = $this->db->prepare('SELECT `data`,`access` FROM php_sessions WHERE id = :id');
 		$stm->bindParam(':id', $sessionId);
 
 		if ($stm->execute() && ($row = $stm->fetch())) {
+			$this->readLastAccess = $row['access'];
+			$this->readHash = md5($row['data']);
 			return $row['data'];
 		} else {
 			return '';
@@ -88,6 +92,12 @@ class SessionDBHandler implements SessionHandlerInterface
 	 */
 	public function write($sessionId, $sessionData)
 	{
+		if (md5($sessionData) === $this->readHash &&
+			time() - $this->readLastAccess < 300
+		) {
+			// no change to data, and little time has elapsed, so skip update
+			return true;
+		}
 		//$stm = $this->db->prepare('REPLACE INTO php_sessions VALUES (:sessionId, :lastAccessTime, :sessionData)');
 		$query = 'INSERT INTO php_sessions (id,access,data) VALUES (:sessionId, :lastAccessTime, :sessionData) ';
 		$query .= 'ON DUPLICATE KEY UPDATE access=:lastAccessTime2,data=:sessionData2';

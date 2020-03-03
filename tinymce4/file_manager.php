@@ -121,14 +121,14 @@ function switchDivs() {
 if ($type=="img") {
 ?>
 
-	extension = ['.png','.gif','.jpg','.jpeg'];
+	extension = ['.png','.gif','.jpg','.jpeg','.svg'];
 	isok = false;
 	var thisext = fieldvalue.substr(fieldvalue.lastIndexOf('.')).toLowerCase();
 	for(var i = 0; i < extension.length; i++) {
 		if(thisext == extension[i]) { isok = true; }
 	}
 	if (!isok) {
-		alert("File must be an image file: .png, .gif, .jpg");
+		alert("File must be an image file: .png, .gif, .jpg, .svg");
 		return false;
 	}
 <?php
@@ -198,7 +198,7 @@ if (isset($_REQUEST['showfiles'])) {
 		<input type="hidden" name="MAX_FILE_SIZE" value="10485760" /> <!-- ~10mb -->
 		<?php
 		if ($type=="img") {
-			echo '<input type="file" name="uploaded_file" id="uploaded_file" accept=".gif,.png,.jpg,.jpeg"><br/>';
+			echo '<input type="file" name="uploaded_file" id="uploaded_file" accept=".gif,.png,.jpg,.jpeg,.svg"><br/>';
 			echo $strings["imagetypes"].'<br/>';
 
 		} else {

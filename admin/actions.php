@@ -44,11 +44,13 @@ switch($_POST['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
 		$be = $_REQUEST['uid'];
-		$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
-		$stm->execute(array(':userid'=>$be, ':sessionid'=>$sessionid));
+		$_SESSION['userid'] = $be;
 		break;
 	case "chgrights":
-		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { 
+			echo _("You don't have the authority for this action"); 
+			break;
+		}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
@@ -56,7 +58,7 @@ switch($_POST['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($oldrights,$oldgroupid) = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
-			echo "invalid id";
+			echo _("invalid id");
 			exit;
 		} else if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
 			echo "You don't have the authority for this action";
@@ -307,7 +309,7 @@ switch($_POST['action']) {
 		}
 		break;
 	case "newadmin":
-		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo _("You don't have the authority for this action"); break;}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
@@ -315,9 +317,9 @@ switch($_POST['action']) {
 		$stm->execute(array(':SID'=>$_POST['SID']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
-			echo "<html><body>Username is already used.\n";
-			echo "<a href=\"forms.php?action=newadmin\">Try Again</a> or ";
-			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">Change rights for existing user</a></body></html>\n";
+			echo "<html><body>",_("Username is already used."),"\n";
+			echo "<a href=\"forms.php?action=newadmin\">",_("Try Again"),"</a> ",_("or")," ";
+			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">",_("Change rights for existing user"),"</a></body></html>\n";
 			exit;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
@@ -404,9 +406,6 @@ switch($_POST['action']) {
 		}
 		break;
 	case "logout":
-		$sessionid = session_id();
-		$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=:sessionid");
-		$stm->execute(array(':sessionid'=>$sessionid));
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
 			setcookie(session_name(), '', time()-42000, '/', '',false ,true );
@@ -416,7 +415,7 @@ switch($_POST['action']) {
 		break;
 	case "modify":
 	case "addcourse":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 40) { echo _("You don't have the authority for this action"); break;}
 		require_once("../includes/parsedatetime.php");
 
 		if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
@@ -427,7 +426,7 @@ switch($_POST['action']) {
 			if ($terms[0]!='') {
 				if (!isset($_POST['termsagree'])) {
 					require("../header.php");
-					echo '<p>You must agree to the terms of use to copy this course.</p>';
+					echo '<p>',_('You must agree to the terms of use to copy this course.'),'</p>';
 					require("../footer.php");
 					exit;
 				} else {
@@ -846,7 +845,7 @@ switch($_POST['action']) {
 				require("../includes/copyiteminc.php");
 				$convertAssessVer = $destUIver;
 				copyallsub($items,'0',$newitems,$gbcats);
-				doaftercopy($_POST['usetemplate']);
+				doaftercopy($_POST['usetemplate'], $newitems);
 				$itemorder = serialize($newitems);
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes WHERE id=:id");
 				$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':id'=>$cid));
@@ -902,34 +901,31 @@ switch($_POST['action']) {
 			$hasGroupLTI = ($stm->fetchColumn() !== false);
 
 			require("../header.php");
-			echo '<div class="breadcrumb">'.$breadcrumbbase.' Course Creation Confirmation</div>';
-			echo '<h1>Your course has been created!</h1>';
-			echo '<p>For students to enroll in this course via direct login, you will need to provide them two things:<ol>';
-			echo '<li>The course ID: <b>'.$cid.'</b></li>';
+			echo '<div class="breadcrumb">'.$breadcrumbbase._(' Course Creation Confirmation').'</div>';
+			echo '<h1>',_('Your course has been created'),'!</h1>';
+			echo '<p>',_('For students to enroll in this course via direct login, you will need to provide them two things'),':<ol>';
+			echo '<li>',_('The course ID'),': <b>'.$cid.'</b></li>';
 			if (trim($_POST['ekey'])=='') {
-				echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
-				echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
-				echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
+				echo '<li>',sprintf(_('Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, %s modify your course settings %s'),'<a href="forms.php?action=modify&id='.$cid.'">','</a>'),'</li>';
 			} else {
-				echo '<li>The enrollment key: <b>'.$_POST['ekey'].'</b></li>';
+				echo '<li>',_('The enrollment key'),': <b>'.$_POST['ekey'].'</b></li>';
 			}
 			echo '</ol></p>';
 
 			if (empty($CFG['LTI']['noCourseLevel'])) {
-				echo '<p>If you plan to integrate this course with your school\'s Learning Management System (LMS), ';
+				echo '<p>',_('If you plan to integrate this course with your school\'s Learning Management System (LMS), ');
 				if ($hasGroupLTI) {
-					echo 'it looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
-					echo 'If so, you will not need to set up a course-level configuration. ';
-					echo 'If you do need to set up a course-level configuration for some reason, the key and secret can be found in your course settings</p>';
+					echo _('it looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ');
+					echo _('If so, you will not need to set up a course-level configuration. ');
+					echo _('If you do need to set up a course-level configuration for some reason, the key and secret can be found in your course settings'),'</p>';
 				} else {
-					echo 'here is the information you will need to set up a course-level configuration, ';
-					echo 'since your school does not appear to have a school-wide LTI key and secret established.</p>';
+					echo _('here is the information you will need to set up a course-level configuration, since your school does not appear to have a school-wide LTI key and secret established.'),'</p>';
 					echo '<ul class=nomark><li>Key: LTIkey_'.$cid.'_1</li>';
 					echo '<li>Secret: '.Sanitize::encodeStringForDisplay($ltisecret).'</li></ul>';
-					echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
+					echo '<p>',_('If you forget these later, you can find them by viewing your course settings.'),'</p>';
 				}
 			}
-			echo '<a href="../course/course.php?cid='.$cid.'">Enter the Course</a>';
+			echo '<a href="../course/course.php?cid='.$cid.'">',_('Enter the Course'),'</a>';
 			require("../footer.php");
 			exit;
 		}
@@ -986,143 +982,6 @@ switch($_POST['action']) {
 			}
 		}
 		break;
-	/*
-	removed from production code - security risk
-	case "importmacros":
-		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
-		$uploaddir = rtrim(dirname("../config.php"), '/\\') .'/assessment/libs/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			if (strpos($uploadfile,'.php')!==FALSE) {
-				$handle = fopen($uploadfile, "r");
-				$atstart = true;
-				if ($handle) {
-					while (!feof($handle)) {
-						$buffer = fgets($handle, 4096);
-						if (strpos($buffer,"//")===0) {
-							$trimmed = trim(substr($buffer,2));
-							if ($trimmed{0}!='<' && substr($trimmed,-1)!='>') {
-								$numspaces = strlen(substr($buffer,2)) - strlen(ltrim(substr($buffer,2)));
-								$comments .= str_repeat('&nbsp;', $numspaces);
-								$comments .= $trimmed . '<br/>';
-							} else {
-								$comments .= $trimmed;
-							}
-						} else if (strpos($buffer,"function")===0) {
-							$func = substr($buffer,9,strpos($buffer,"(")-9);
-							if ($comments!='') {
-								$outlines .= "<h2><a name=\"$func\">$func</a></h2>\n";
-								$funcs[] = $func;
-								$outlines .= $comments;
-								$comments = '';
-							}
-						} else if ($atstart && trim($buffer)=='') {
-							$startcomments = $comments;
-							$atstart = false;
-							$comments = '';
-						} else {
-							$comments = '';
-						}
-					}
-				}
-				fclose($handle);
-				$lib = basename($uploadfile,".php");
-				$outfile = fopen($uploaddir . $lib.".html", "w");
-				fwrite($outfile,"<html><body>\n<h1>Macro Library $lib</h1>\n");
-				fwrite($outfile,$startcomments);
-				fwrite($outfile,"<ul>\n");
-				foreach($funcs as $func) {
-					fwrite($outfile,"<li><a href=\"#$func\">$func</a></li>\n");
-				}
-				fwrite($outfile,"</ul>\n");
-				fwrite($outfile, $outlines);
-				fclose($outfile);
-			}
-			break;
-		} else {
-			require("../header.php");
-			echo "<p>Error uploading file!</p>\n";
-			require("../footer.php");
-			exit;
-		}
-	*/
-	case "importqimages":
-		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			if (strpos($uploadfile,'.tar.gz')!==FALSE) {
-				include("../includes/tar.class.php");
-				require_once("../includes/filehandler.php");
-				$tar = new tar();
-				$tar->openTAR($uploadfile);
-				if ($tar->hasFiles()) {
-					if (getfilehandlertype('filehandlertypecfiles') == 's3') {
-						$n = $tar->extractToS3("qimages","public");
-					} else {
-						$n = $tar->extractToDir("../assessment/qimages/");
-					}
-					require("../header.php");
-					echo "<p>Extracted $n files.  <a href=\"admin2.php\">Continue</a></p>\n";
-					require("../footer.php");
-					exit;
-				} else {
-					require("../header.php");
-					echo "<p>File appears to contain nothing</p>\n";
-					require("../footer.php");
-					exit;
-				}
-
-			}
-			unlink($uploadfile);
-			break;
-		} else {
-			require("../header.php");
-			echo "<p>Error uploading file!</p>\n";
-			require("../footer.php");
-			exit;
-		}
-	case "importcoursefiles":
-		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
-				require_once("../includes/filehandler.php");
-				$zip = new ZipArchive();
-				$res = $zip->open($uploadfile);
-				$ne = 0;  $ns = 0;
-				if ($res===true) {
-					for($i = 0; $i < $zip->numFiles; $i++) {
-						//if (file_exists("../course/files/".$zip->getNameIndex($i))) {
-						if (doesfileexist('cfile',$zip->getNameIndex($i))) {
-							$ns++;
-						} else {
-							$zip->extractTo("../course/files/", array($zip->getNameIndex($i)));
-							relocatecoursefileifneeded("../course/files/".$zip->getNameIndex($i),$zip->getNameIndex($i));
-							$ne++;
-						}
-					}
-					require("../header.php");
-					echo "<p>Extracted $ne files.  Skipped $ns files.  <a href=\"admin2.php\">Continue</a></p>\n";
-					require("../footer.php");
-					exit;
-				} else {
-					require("../header.php");
-					echo "<p>File appears to contain nothing</p>\n";
-					require("../footer.php");
-					exit;
-				}
-
-			}
-			unlink($uploadfile);
-			break;
-		} else {
-			require("../header.php");
-			echo "<p>Error uploading file!</p>\n";
-			require("../footer.php");
-			exit;
-		}
 	case "removeself":
 		if ($myrights < 20) {
 			echo 'Error: Unauthorized';
@@ -1302,8 +1161,7 @@ switch($_POST['action']) {
 			//check that code is valid and not a replay
 			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
 			   ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
-				$sessiondata['mfaverified'] = true;
-				writesessiondata();
+				$_SESSION['mfaverified'] = true;
 				$mfadata['last'] = $_POST['mfatoken'];
 				$mfadata['laston'] = time();
 				if (isset($_POST['mfatrust'])) {

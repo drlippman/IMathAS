@@ -346,7 +346,9 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
-            if ((isset($scoremethod) && $scoremethod == 'acct') ||
+            if ((isset($scoremethod) &&
+                ($scoremethod == 'acct' || $scoremethod == 'singlescore' ||
+                $scoremethod == 'allornothing')) ||
               $quesData['qtype'] == 'conditional'
             ) {
               $jsParams['submitall'] = 1;
@@ -595,7 +597,7 @@ class QuestionHtmlGenerator
         $question = new Question(
             $evaledqtext,
             $jsParams,
-            isset($answeights) ? $answeights : array(1),
+            ($quesData['qtype'] == "multipart" && isset($answeights)) ? $answeights : array(1),
             $evaledsoln,
             $detailedSolutionContent,
             $displayedAnswersForParts,
@@ -886,8 +888,8 @@ class QuestionHtmlGenerator
             if ($qdata['extref'] != '') {
                 $extref = explode('~~', $qdata['extref']);
 
-                if ($qid > 0 && (!isset($GLOBALS['sessiondata']['isteacher'])
-                        || $GLOBALS['sessiondata']['isteacher'] == false) && !isset($GLOBALS['sessiondata']['stuview'])) {
+                if ($qid > 0 && (!isset($_SESSION['isteacher'])
+                        || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
                     $qref = $qid . '-' . ($qnidx + 1);
                 } else {
                     $qref = '';
@@ -895,7 +897,7 @@ class QuestionHtmlGenerator
                 for ($i = 0; $i < count($extref); $i++) {
                     $extrefpt = explode('!!', $extref[$i]);
                     if (strpos($extrefpt[1],'youtube.com/watch')!==false ||
-            					strpos($extrefpt[1],'youtu.be.com/')!==false ||
+            					strpos($extrefpt[1],'youtu.be/')!==false ||
             					strpos($extrefpt[1],'vimeo.com/')!==false
             				) {
                         $extrefpt[1] = $GLOBALS['basesiteurl'] . "/assessment/watchvid.php?url=" . Sanitize::encodeUrlParam($extrefpt[1]);
@@ -920,7 +922,7 @@ class QuestionHtmlGenerator
                 }
             }
             if (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != '') {
-                $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $GLOBALS['sessiondata']['secsalt']);
+                $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $_SESSION['secsalt']);
                 $addr .= '&t=' . ($qdata['solutionopts'] & 1) . '&cid=' . $GLOBALS['cid'];
                 if ($GLOBALS['cid'] == 'embedq' && isset($GLOBALS['theme'])) {
                     $addr .= '&theme=' . Sanitize::encodeUrlParam($GLOBALS['theme']);

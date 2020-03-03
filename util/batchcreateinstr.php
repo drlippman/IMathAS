@@ -209,7 +209,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
       $usereplaceby = "all";
       $newitems = array();
       copyallsub($items,'0',$newitems,$gbcats);
-      doaftercopy($sourcecid);
+      doaftercopy($sourcecid, $newitems);
       $itemorder = serialize($newitems);
       $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs WHERE id=:id");
       $stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':id'=>$cid));

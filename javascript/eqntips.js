@@ -19,12 +19,12 @@ function showeh(eln) {
 	var eh = document.getElementById('eh');
 	if (eln != ehcurel) {
 		ehcurel = eln;
-		var p = findPos(el);
+		var offset = jQuery(el).offset();
 		eh.style.display = "block";
 		//eh.style.left = p[0] + "px";
 		//eh.style.top = (p[1]-eh.offsetHeight) + "px"; // + el.offsetHeight
-		eh.style.left = p[0] + "px";
-		eh.style.top = (p[1] + el.offsetHeight) + "px";
+		eh.style.left = offset.left + "px";
+		eh.style.top = (offset.top + el.offsetHeight) + "px";
 	} else {
 		eh.style.display = "none";
 		ehcurel = null;
@@ -67,6 +67,19 @@ function ehcancelclosetimer() {
 		ehclosetimer = null;
 	}
 }
+function hideAllEhTips() {
+	if (ehclosetimer) {
+		window.clearTimeout(ehclosetimer);
+		ehclosetimer = null;
+	}
+	if (ehddclosetimer) {
+		window.clearTimeout(ehddclosetimer);
+		ehddclosetimer = null;
+	}
+	curehdd = null;
+	document.getElementById("ehdd").style.display = "none";
+	document.getElementById('eh').style.display = "none";
+}
 //show eqn tip dropdown (shorttipe)
 function showehdd(eln,shorttip,qn) {
 	if (eecurel!=null && eecurel==eln) {
@@ -83,14 +96,14 @@ function showehdd(eln,shorttip,qn) {
 	if (eln!=ehcurel) { //if new el, change position and content
 		var ehdd = document.getElementById("ehdd");
 		var el = document.getElementById(eln);
-		var p = findPos(el);
+		var offset = jQuery(el).offset();
 		document.getElementById("ehddtext").innerHTML = shorttip;
 		document.getElementById("eh").innerHTML = document.getElementById("tips"+qn).innerHTML;
 		ehdd.style.display = "block";
 		//ehdd.style.left = p[0] + "px";
 		//ehdd.style.top = (p[1] - ehdd.offsetHeight) + "px";
-		ehdd.style.left = p[0] + "px";
-		ehdd.style.top = (p[1] + el.offsetHeight) + "px";
+		ehdd.style.left = offset.left + "px";
+		ehdd.style.top = (offset.top + el.offsetHeight) + "px";
 		//ehdd.style.top = (p[1] + el.offsetHeight) + "px";
 		//ehdd.style.width = el.offsetWidth + "px";
 
@@ -103,9 +116,9 @@ function updateehpos() {
 	var eh = document.getElementById("eh");
 	var ehdd = document.getElementById("ehdd");
 	var el = document.getElementById(curehdd || ehcurel);
-	var p = findPos(el);
-	eh.style.left = p[0] + "px";
-	eh.style.top = (p[1] + el.offsetHeight) + "px";
-	ehdd.style.left = p[0] + "px";
-	ehdd.style.top = (p[1] + el.offsetHeight) + "px";
+	var offset = jQuery(el).offset();
+	eh.style.left = offset.left + "px";
+	eh.style.top = (offset.top + el.offsetHeight) + "px";
+	ehdd.style.left = offset.left + "px";
+	ehdd.style.top = (offset.top + el.offsetHeight) + "px";
 }

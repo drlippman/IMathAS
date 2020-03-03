@@ -35,7 +35,7 @@
         </span>
       </div>
 
-      <div v-if="aData.latepass_blocked_by_practice">
+      <div v-if="canEdit && aData.latepass_blocked_by_practice">
         {{ $t('gradebook.latepass_blocked_practice') }}
         <button
           type="button"
@@ -197,6 +197,9 @@
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
               />
+              <gb-showwork
+                :work = "qdata[curQver[qn]].work"
+              />
             </div>
             <gb-score-details
               :showfull = "showQuestion[qn]"
@@ -206,27 +209,14 @@
             />
           </div>
         </div>
-        <div>
-          {{ $t('gradebook.general_feedback') }}:
-          <textarea
-            v-if="canEdit && !useEditor"
-            class="fbbox"
-            rows="2"
-            cols="60"
-            :value = "assessFeedback"
-            @input="updateFeedback"
-          ></textarea>
-          <tinymce-input
-            v-else-if="canEdit"
-            id="genfbbox"
-            :value = "assessFeedback"
-            @input = "updateFeedback"
-          ></tinymce-input>
-          <div
-            v-else
-            v-html="assessFeedback"
-          />
-        </div>
+        <gb-feedback
+          qn="gen"
+          :show="true"
+          :canedit = "canEdit"
+          :useeditor = "useEditor"
+          :value = "assessFeedback"
+          @update = "updateFeedback"
+        />
         <div>
           <button
             v-if = "canEdit"
@@ -276,31 +266,40 @@
       :errormsg="errorMsg"
       @clearerror="clearError"
     />
+    <confirm-dialog
+      v-if="confirmObj !== null"
+      :data="confirmObj"
+      @close="closeConfirm"
+    />
   </div>
 </template>
 
 <script>
 import { store, actions } from './gbstore';
 import GbQuestion from '@/gbviewassess/GbQuestion.vue';
+import GbShowwork from '@/gbviewassess/GbShowwork.vue';
 import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
 import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
 import GbClearAttempts from '@/gbviewassess/GbClearAttempts.vue';
 import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
-import TinymceInput from '@/components/TinymceInput.vue';
+import GbFeedback from '@/gbviewassess/GbFeedback.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import '../assess2.css';
 
 export default {
   components: {
     GbQuestion,
+    GbShowwork,
     GbAssessSelect,
     GbQuestionSelect,
     GbScoreDetails,
     GbClearAttempts,
     SummaryCategories,
     ErrorDialog,
-    TinymceInput
+    GbFeedback,
+    ConfirmDialog
   },
   data: function () {
     return {
@@ -463,17 +462,28 @@ export default {
     },
     errorMsg () {
       return store.errorMsg;
+    },
+    confirmObj () {
+      return store.confirmObj;
     }
   },
   methods: {
     changeAssessVersion (val) {
+      if (val === store.curAver) {
+        return; // not a change - abort
+      }
       if (Object.keys(store.scoreOverrides).length > 0 ||
         Object.keys(store.feedbacks).length > 0
       ) {
-        if (!confirm(this.$t('gradebook.unsaved_warn'))) {
-          return;
-        }
+        store.confirmObj = {
+          body: 'gradebook.unsaved_warn',
+          action: () => this.doChangeAssessVersion(val)
+        };
+      } else {
+        this.doChangeAssessVersion(val);
       }
+    },
+    doChangeAssessVersion (val) {
       if (val !== store.curAver) {
         if (this.aData.assess_versions[val].status === 3) {
           // requesting the practice version
@@ -484,6 +494,9 @@ export default {
       }
     },
     changeQuestionVersion (qn, val) {
+      if (val === store.curQver[qn]) {
+        return; // same value - abort
+      }
       let hasUnsaved = false;
       let regex = new RegExp('^' + store.curAver + '-' + qn + '-');
       for (let k in store.scoreOverrides) {
@@ -496,21 +509,17 @@ export default {
           hasUnsaved = true;
         }
       }
-      if (hasUnsaved && !confirm(this.$t('gradebook.unsaved_warn'))) {
-        return;
-      }
-      if (val !== store.curQver[qn]) {
+      if (hasUnsaved) {
+        store.confirmObj = {
+          body: 'gradebook.unsaved_warn',
+          action: () => actions.loadGbQuestionVersion(qn, val)
+        };
+      } else {
         actions.loadGbQuestionVersion(qn, val);
       }
     },
-    updateFeedback (evt) {
-      let content;
-      if (this.useEditor) {
-        content = window.tinymce.activeEditor.getContent();
-      } else {
-        content = evt.target.value;
-      }
-      actions.setFeedback(null, content);
+    updateFeedback (val) {
+      actions.setFeedback(null, val);
     },
     setScoreOverride (evt) {
       this.assessOverride = evt.target.value.trim();
@@ -565,8 +574,11 @@ export default {
         return 'You have unsaved changes';
       }
     },
-    clearError() {
+    clearError () {
       store.errorMsg = null;
+    },
+    closeConfirm () {
+      store.confirmObj = null;
     }
   },
   created () {

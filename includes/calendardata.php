@@ -247,7 +247,7 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 				$calevents[] = array('FP'.$row['id'],$row['postby'], $row['name'], _('Posts Due: ').$row['name']);
 			}
 			if ($row['replyby']!=2000000000) {
-				$calevents[] = array('FR'.$row['id'],$row['postby'], $row['name'], _('Replies Due: ').$row['name']);
+				$calevents[] = array('FR'.$row['id'],$row['replyby'], $row['name'], _('Replies Due: ').$row['name']);
 			}
 		}
 	}

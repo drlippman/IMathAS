@@ -44,10 +44,10 @@ export default {
   name: 'QuestionHeaderIcons',
   props: ['showscore', 'curQData', 'qn', 'showretry'],
   components: {
-    QuestionDetailsPane,
     Dropdown,
-    TooltipSpan,
-    Icons
+    Icons,
+    QuestionDetailsPane,
+    TooltipSpan
   },
   computed: {
     dispqn () {

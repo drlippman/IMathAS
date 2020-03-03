@@ -64,6 +64,8 @@ if (!$assess_record->hasRecord()) {
 if ($practicever) {
   $assess_record->setInPractice(true);
 }
+$assess_record->setInGb(true);
+
 // indicate whether teacher/tutor for viewing scores/answers
 if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
   $assess_record->setTeacherInGb(true);
@@ -77,4 +79,4 @@ $assessInfoOut = $assess_record->getGbQuestionVersionData($qn, true, $ver);
 $assess_record->saveRecordIfNeeded();
 
 //output JSON object
-echo json_encode($assessInfoOut);
+echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

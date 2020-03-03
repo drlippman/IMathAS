@@ -3,7 +3,7 @@
 //(c) 2010 David Lippman
 
 require("./init_without_validate.php");
-require("i18n/i18n.php");
+
 require("includes/DEutil.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 
@@ -16,9 +16,9 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 require("./assessment/displayq2.php");
 $GLOBALS['assessver'] = 1;
 
-$sessiondata = array();
-$sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 3;
+$_SESSION = array();
+$_SESSION['graphdisp'] = 1;
+$_SESSION['mathdisp'] = 3;
 $showtips = 2;
 $useeqnhelper = 4;
 $courseUIver = 1;
@@ -35,7 +35,7 @@ if (empty($_GET['id'])) {
 }
 
 $qsetid=intval($_GET['id']);
-$sessiondata['coursetheme'] = $coursetheme;
+$_SESSION['coursetheme'] = $coursetheme;
 
 $page_formAction = "DEembedq.php?id=$qsetid";
 

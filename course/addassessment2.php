@@ -159,7 +159,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									'reqscore','reqscoretype','reqscoreaid','showhints',
 									'msgtoinstr','eqnhelper','posttoforum','extrefs','showtips',
 									'cntingb','minscore','deffeedbacktext','tutoredit','exceptionpenalty',
-									'defoutcome','isgroup','groupsetid','groupmax');
+									'defoutcome','isgroup','groupsetid','groupmax','showwork');
 			$fieldlist = implode(',', $fields);
 			$stm = $DBH->prepare("SELECT $fieldlist FROM imas_assessments WHERE id=:id AND courseid=:cid");
 			$stm->execute(array(':id'=>intval($_POST['copyfrom']), ':cid'=>$cid));
@@ -220,6 +220,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['istutorial'] = empty($_POST['istutorial']) ? 0 : 1;
 			$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
 			$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
+			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']);
 
 			// time limit and access control
 			$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);
@@ -584,6 +585,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
 					$line['shuffle'] = isset($CFG['AMS']['shuffle'])?$CFG['AMS']['shuffle']:0;
 					$line['noprint'] = isset($CFG['AMS']['noprint'])?$CFG['AMS']['noprint']:0;
+					$line['showwork'] = isset($CFG['AMS']['showwork'])?$CFG['AMS']['showwork']:0;
           $line['istutorial'] = 0;
 					$line['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']:11;
           $line['LPcutoff'] = 0;
@@ -750,7 +752,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       }
 
 			$outcomeOptions = array();
-      if ($i>0) {//there were outcomes
+      if (count($page_outcomes)>0) {//there were outcomes
           $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
           $stm->execute(array(':id'=>$cid));
           $outcomearr = unserialize($stm->fetchColumn(0));
@@ -761,15 +763,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                   if (is_array($v)) { //outcome group
 										$outcomeOptions[] = array(
 											'value' => '',
-											'label' => $v['name'],
-											'isgroup' => true  //hacky
+											'text' => $v['name'],
+											'isgroup' => true
 										);
                     flattenarr($v['outcomes']);
                   } else {
 										$outcomeOptions[] = array(
 											'value' => $v,
-											'label' => $page_outcomes[$v],
-											'isgroup' => true  //hacky
+											'text' => $page_outcomes[$v],
+											'isgroup' => false
 										);
                   }
               }

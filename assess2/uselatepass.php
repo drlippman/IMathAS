@@ -57,7 +57,7 @@ $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $late
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate',
   'extended_with', 'latepasses_avail', 'latepass_extendto',
-  'can_use_latepass'
+  'can_use_latepass', 'enddate_in'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -65,4 +65,4 @@ $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 prepDateDisp($assessInfoOut);
 
 //output JSON object
-echo json_encode($assessInfoOut);
+echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

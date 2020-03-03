@@ -1,6 +1,6 @@
 <?php
 
-//Adapted from OWASP Foundation's CSRFP Protector 
+//Adapted from OWASP Foundation's CSRFP Protector
 //Licensed under the Apache License, Version 2.0
 
 if (!defined('__CSRF_PROTECTOR__')) {
@@ -32,29 +32,29 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		public static $config = array(
 			'failedAuthAction' => 'block',
 			'tokenLength' => 10,
-			'logDirectory' => "log", 
+			'logDirectory' => "log",
 			'jsUrl' => ''  //set in init, after basesiteurl is defined
 		);
-		
+
 		public static function init($length = null, $action = null)
 		{
-			global $userid, $sessiondata;
+			global $userid;
 			if (empty($userid)) { //only run if $userid is set
 				return;
 			}
-			
+
 			if ($GLOBALS['CFG']['use_csrfp']==='log') {
 				self::$config['failedAuthAction'] = 'log';
 			}
-			
+
 			self::$config['jsUrl'] = $GLOBALS['basesiteurl'] . "/csrfp/js/simplecsrfprotector.js";
-			
+
 			// Authorise the incoming request
-			if (isset($sessiondata[CSRFP_TOKEN])) {
+			if (isset($_SESSION[CSRFP_TOKEN])) {
 				self::authorizePost();
 			}
-			
-			if (!isset($sessiondata[CSRFP_TOKEN])) {
+
+			if (!isset($_SESSION[CSRFP_TOKEN])) {
 				self::refreshToken();
 			}
 
@@ -64,7 +64,6 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		}
 		public static function authorizePost()
 		{
-			global $sessiondata;
 			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 				// look for token in payload else from header
@@ -75,8 +74,8 @@ if (!defined('__CSRF_PROTECTOR__')) {
 
 					//action in case of failed validation
 					self::failedValidationAction();
-				} 
-			} 
+				}
+			}
 		}
 
 		/*
@@ -118,9 +117,8 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		 * bool - true if its valid else false
 		 */
 		private static function isValidToken($token) {
-			global $sessiondata;
-			if (!isset($sessiondata[CSRFP_TOKEN])) return false;
-			return ($sessiondata[CSRFP_TOKEN] == $token);
+			if (!isset($_SESSION[CSRFP_TOKEN])) return false;
+			return ($_SESSION[CSRFP_TOKEN] == $token);
 		}
 
 		/*
@@ -143,7 +141,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			static::logCSRFattack();
 
 			if (self::$config['failedAuthAction']==='log') {
-				//just log - no action	
+				//just log - no action
 			} else {
 				if (isset($GLOBALS['CFG']['csrfp_error_message'])) {
 					exit($GLOBALS['CFG']['csrfp_error_message']);
@@ -168,11 +166,9 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		 */
 		public static function refreshToken()
 		{
-			global $sessiondata;
 			$token = self::generateAuthToken();
 
-			$sessiondata[CSRFP_TOKEN] = $token;
-			writesessiondata();
+			$_SESSION[CSRFP_TOKEN] = $token;
 		}
 		/*
 		 * Function: generateAuthToken
@@ -191,7 +187,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			$randLength = 64;
 
 			$tokenLength = self::$config['tokenLength'];
-			
+
 			//#todo - if $length > 128 throw exception
 
 			if (function_exists("random_bytes")) {
@@ -212,7 +208,7 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			}
 			return substr($token, 0, $tokenLength);
 		}
-		
+
 		/*
 		* Function: get_csrf_input_tag
 		*
@@ -221,15 +217,14 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		*/
 		private static function get_csrf_input_tag()
 		{
-			global $sessiondata;
 			$out = '<input type="hidden" name="'.CSRFP_TOKEN.'" ';
-			$out .= 'class="'.CSRFP_TOKEN.'" value="'.$sessiondata[CSRFP_TOKEN].'" />';
+			$out .= 'class="'.CSRFP_TOKEN.'" value="'.$_SESSION[CSRFP_TOKEN].'" />';
 			return $out;
 		}
 
 		/*
 		 * Function: output_header_code
-		 * outputs the token information and script tag 
+		 * outputs the token information and script tag
 		 * for placement into the <head>
 		 *
 		 * Return:
@@ -237,18 +232,17 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		 */
 		public static function output_header_code()
 		{
-			global $sessiondata;
 			$out = '<script type="text/javascript" src="' . self::$config['jsUrl'] . '"></script>';
 			$out .= '<script type="text/javascript">';
-			$out .= 'CSRFP.setToken("'.$sessiondata[CSRFP_TOKEN].'");</script>';
+			$out .= 'CSRFP.setToken("'.$_SESSION[CSRFP_TOKEN].'");</script>';
 
 			return $out;
 		}
-		
+
 
 		/*
 		 * Function: ob_handler
-		 * Rewrites <form> on the fly to add CSRF tokens to them. 
+		 * Rewrites <form> on the fly to add CSRF tokens to them.
 		 *
 		 * Parameters:
 		 * $buffer - output buffer to which all output are stored
@@ -292,7 +286,6 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		 */
 		protected static function logCSRFattack()
 		{
-			global $sessiondata;
 			//miniature version of the log
 			$log = array();
 			$log['timestamp'] = time();
@@ -302,15 +295,13 @@ if (!defined('__CSRF_PROTECTOR__')) {
 			$log['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 			$log['query'] = $_POST;
 
-			if (!isset($sessiondata[CSRFP_TOKEN])) {
+			if (!isset($_SESSION[CSRFP_TOKEN])) {
 				$log['csrfp_token'] = "not set";
 			} else {
-				$log['csrfp_token'] = $sessiondata[CSRFP_TOKEN];
+				$log['csrfp_token'] = $_SESSION[CSRFP_TOKEN];
 			}
-			global $DBH;
-			$stm = $DBH->prepare("SELECT time FROM imas_sessions WHERE sessionid=?");
-			$stm->execute(array(session_id()));
-			$log['session_time'] = $stm->fetchColumn(0);
+
+			$log['session_time'] = $_SESSION['time'];
 
 			//remove password from query
 			if (isset($log['query']['password'])) {
@@ -347,5 +338,3 @@ if (!defined('__CSRF_PROTECTOR__')) {
 		}
 	};
 }
-
-			

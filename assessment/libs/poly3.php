@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed July 25-27, 2018
 // licensed under GPL version 2 or later
 //
-// File Version : 7.3.1
+// File Version : 7.5
 //
 
 global $allowedmacros;
@@ -95,12 +95,17 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 			if($slash>-2) {
 				$length = strlen($rawcoefficientreturn);
 				$coefficients[$i][0] = substr($rawcoefficientreturn,0,$slash); // top
-				$coefficients[$i][1] = substr($rawcoefficientreturn,($slash+1),$length);; // bot
+				$coefficients[$i][1] = substr($rawcoefficientreturn,($slash+1),$length); // bot
 			}
 			else {
 				$coefficients[$i][0] = $rawcoefficientreturn; // top
 				$coefficients[$i][1] = 1; // bot
 			}
+
+            // 2020-01-23
+            // make integers - to avoid the error of nonnumeric in fractionadd
+            $coefficients[$i][0] = intval($coefficients[$i][0],10); // top
+            $coefficients[$i][1] = intval($coefficients[$i][1],10); // bot
 		}
 
 		// Now add any like terms coefficient
@@ -109,7 +114,7 @@ function formpoly3fromstring($variable, $polynomialstring, $IsFraction=TRUE)
 
 			// does the power exist?
 			if (!isset($monoresults[$currentpower])) {
-				$monoresults[$currentpower]=$coefficients[$i];
+				$monoresults[$currentpower]= $coefficients[$i];
 			}
 			else {
 				$monoresults[$currentpower]=fractionadd($monoresults[$currentpower],$coefficients[$i]);
@@ -292,6 +297,7 @@ function writepoly3($poly3, $variable="x", $IsFraction=TRUE, $HideZero=TRUE)
 }
 
 // internal only
+//https://github.com/drlippman/IMathAS/blob/7f838e9160cc10d51b128def17862c9b9f43acea/assessment/macros.php
 function poly3_reducefraction($top, $bot){
 	$gcf = gcd($top,$bot);
   	$top /= $gcf;
@@ -999,6 +1005,8 @@ function longdivisionpoly3($dividend, $divisor, $variable="x", $IsFraction=1, $d
 	return $Table;
 }
 
+// File version : 7.5   - Fixed warning in formpoly3fromstring for non-numeric value encountered on line 179 in file /var/app/current/assessment/libs/fraction.php
+//                        
 // File version : 7.4	- Fixed documentation Bug. Added formpoly3fromresults.
 // File version : 7.3	- Bug in the poly3_breakmonomial - missing th "+" sign, bug in the divide when the Remiander constant was 0 but the first degree remainder was not
 // File version : 7.2	- Bug in the divide fraction routine were I was not stopping when the divisor had a greater powere then the dividend.

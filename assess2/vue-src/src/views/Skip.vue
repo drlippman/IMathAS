@@ -24,6 +24,7 @@
         <question
           :qn="curqn"
           :active="curqn == qn"
+          :getwork="1"
         />
         <inter-question-text-list
           pos = "after"
@@ -68,6 +69,7 @@ export default {
   mounted () {
     setTimeout(window.drawPics, 100);
     window.rendermathnode(this.$refs.introtext);
+    window.jQuery(this.$refs.introtext).fitVids();
   }
 };
 </script>

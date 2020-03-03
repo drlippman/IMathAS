@@ -1,7 +1,10 @@
 <?php
 
 function isNaN( $var ) {
-     return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
+  // is_numeric catches most things, but not php-generated NAN or INF
+  // is_finite catches those
+  return (!is_numeric($var) || !is_finite($var));
+     //return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
      //possible alternative:
      //return ($var!==$var || $var*2==$var);
 }
@@ -410,7 +413,7 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("decimal", $ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!is_numeric($totest) || !preg_match('/^\-?[\d\.]+$/',$totest)) {
+		if (!is_numeric($totest) || !preg_match('/^\-?(\d+|\d+\.\d*|\d*\.\d+)([eE]\-?\d+)?$/',$totest)) {
 			return false;
 		}
 	}
@@ -688,6 +691,7 @@ function normalizemathunicode($str) {
 	//these are the slim vector unicodes: u2329 and u232a
 	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
 	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
+  $str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;
 }

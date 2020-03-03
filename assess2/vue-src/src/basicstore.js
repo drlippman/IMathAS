@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from './router';
-import i18n from './i18n';
 
 export const store = Vue.observable({
   assessInfo: null,
@@ -9,20 +8,27 @@ export const store = Vue.observable({
   cid: null,
   uid: null,
   queryString: '',
+  inAssess: false,
   inTransit: false,
   autoSaving: false,
   errorMsg: null,
+  confirmObj: null,
   lastLoaded: [],
   inProgress: false,
   autosaveQueue: {},
   autosaveTimeactive: {},
   initValues: {},
   initTimes: {},
+  work: {},
   autosaveTimer: null,
   somethingDirty: false,
+  noUnload: false,
   timelimit_timer: null,
   timelimit_expired: false,
   timelimit_grace_expired: false,
+  timelimit_restricted: 0,
+  enddate_timer: null,
+  show_enddate_dialog: false,
   inPrintView: false,
   enableMQ: true,
   livepollServer: '',
@@ -46,6 +52,7 @@ export const actions = {
     }
     store.inTransit = true;
     store.errorMsg = null;
+    store.inAssess = false;
     window.$.ajax({
       url: store.APIbase + 'loadassess.php' + qs,
       dataType: 'json',
@@ -69,9 +76,6 @@ export const actions = {
         if (typeof callback !== 'undefined' && callback !== null) {
           callback();
         }
-        if (doreset === true) {
-          Router.push('/');
-        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -90,9 +94,10 @@ export const actions = {
       data: {
         practice: dopractice,
         password: password,
+        in_print: store.inPrintView ? 1 : 0,
         new_group_members: newGroupMembers.join(','),
         cur_group: store.assessInfo.stugroupid,
-        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid)?1:0
+        has_ltisourcedid: (store.assessInfo.is_lti && store.assessInfo.has_ltisourcedid) ? 1 : 0
       },
       xhrFields: {
         withCredentials: true
@@ -116,6 +121,8 @@ export const actions = {
         store.autosaveTimeactive = {};
         store.initValues = {};
         store.initTimes = {};
+        store.work = {};
+        store.inAssess = true;
         // route to correct display
         if (response.error) {
           this.handleError(response.error);
@@ -208,21 +215,24 @@ export const actions = {
       });
   },
   submitAssessment () {
-    if (confirm(i18n.t('header.confirm_assess_submit'))) {
-      if (store.assessInfo.submitby === 'by_assessment') {
-        let qAttempted = 0;
-        let changedQuestions = this.getChangedQuestions();
-        for (let i in store.assessInfo.questions) {
-          if (store.assessInfo.questions[i].try > 0 ||
-            changedQuestions.hasOwnProperty(i)
-          ) {
-            qAttempted++;
-          }
-        }
-        let nQuestions = store.assessInfo.questions.length;
-        if (qAttempted === nQuestions ||
-          confirm(i18n.t('header.warn_unattempted'))
+    let warnMsg = 'header.confirm_assess_submit';
+    if (store.assessInfo.submitby === 'by_assessment') {
+      let qAttempted = 0;
+      let changedQuestions = this.getChangedQuestions();
+      for (let i in store.assessInfo.questions) {
+        if (store.assessInfo.questions[i].try > 0 ||
+          changedQuestions.hasOwnProperty(i)
         ) {
+          qAttempted++;
+        }
+      }
+      let nQuestions = store.assessInfo.questions.length;
+      if (qAttempted !== nQuestions) {
+        warnMsg = 'header.confirm_assess_unattempted_submit';
+      }
+      store.confirmObj = {
+        body: warnMsg,
+        action: () => {
           // TODO: Check if we should always submit all
           if (store.assessInfo.showscores === 'during') {
             // check for dirty questions and submit them
@@ -236,11 +246,67 @@ export const actions = {
             this.submitQuestion(qns, true);
           }
         }
-      } else {
-        // don't want to submit if by_question
-        // actions.submitQuestion(-1, true);
-      }
+      };
     }
+  },
+  submitWork () {
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    store.inTransit = true;
+    let data = {};
+    for (let qn in store.work) {
+      data[qn] = store.work[qn];
+    }
+    if (Object.keys(data).length === 0) { // nothing to submit
+      if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+        Router.push('/summary');
+      } else if (store.assessInfo.available === 'yes') {
+        Router.push('/');
+      } else {
+        window.location = window.exiturl;
+      }
+      return;
+    }
+    window.$.ajax({
+      url: store.APIbase + 'savework.php' + store.queryString,
+      type: 'POST',
+      dataType: 'json',
+      data: { work: data },
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          if (response.error === 'already_submitted') {
+            response = this.processSettings(response);
+            this.copySettings(response);
+          }
+          return;
+        } else {
+          store.errorMsg = null;
+        }
+        // copy into questions for reload later if needed
+        for (let qn in store.work) {
+          Vue.set(store.assessInfo.questions[parseInt(qn)], 'work', store.work[qn]);
+          delete store.work[qn];
+        }
+
+        if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+          Router.push('/summary');
+        } else if (store.assessInfo.available === 'yes') {
+          Router.push('/');
+        } else {
+          window.location = window.exiturl;
+        }
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
   },
   submitQuestion (qns, endattempt, timeactive, partnum) {
     store.somethingDirty = false;
@@ -249,9 +315,9 @@ export const actions = {
       qns = [qns];
     }
 
-    for (let k = 0; k < qns.length; k++) {
-      if (window.callbackstack.hasOwnProperty(qns[k])) {
-        window.callbackstack[qns[k]](qns[k]);
+    for (let k in window.callbackstack) {
+      if (qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
+        window.callbackstack[k](k);
       }
     }
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
@@ -267,6 +333,7 @@ export const actions = {
 
     store.inTransit = true;
     window.MQeditor.resetEditor();
+    window.imathasAssess.clearTips();
 
     this.clearAutosave(qns);
     // don't store time active when full-test
@@ -319,6 +386,9 @@ export const actions = {
           }
         }
       });
+      if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+        data.append('sw' + qn, store.work[qn]);
+      }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
     };
     data.append('toscoreqn', JSON.stringify(changedQuestions));
@@ -366,6 +436,9 @@ export const actions = {
           if (store.initValues.hasOwnProperty(qn)) {
             delete store.initValues[qn];
           }
+          if (store.work.hasOwnProperty(qn)) {
+            delete store.work[qn];
+          }
         }
 
         response = this.processSettings(response);
@@ -376,9 +449,21 @@ export const actions = {
           this.updateTreeReader();
         }
 
+        let hasShowWorkAfter = false;
+        for (let k = 0; k < store.assessInfo.questions.length; k++) {
+          if (store.assessInfo.questions[k].showwork & 2) {
+            hasShowWorkAfter = true;
+            break;
+          }
+        }
+
         if (endattempt) {
           store.inProgress = false;
-          Router.push('/summary');
+          if (hasShowWorkAfter && !store.assessInfo.in_practice) {
+            Router.push('/showwork');
+          } else {
+            Router.push('/summary');
+          }
         } else if (qns.length === 1) {
           // scroll to score result
           Vue.nextTick(() => {
@@ -438,6 +523,10 @@ export const actions = {
       let regexpts = [];
       for (let k in store.autosaveQueue[qn]) {
         let pn = store.autosaveQueue[qn][k];
+        if (pn === 'sw') {
+          data.append('sw' + qn, store.work[qn]);
+          continue;
+        }
         if (pn === 0) {
           regexpts.push(qn);
         }
@@ -494,6 +583,15 @@ export const actions = {
           }
           return;
         }
+        for (let qn in store.autosaveQueue) {
+          for (let k in store.autosaveQueue[qn]) {
+            if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
+              Vue.set(store.assessInfo.questions[parseInt(qn)].parts_entered,
+                store.autosaveQueue[qn][k], 1);
+            }
+          }
+        }
+
         // clear autosave queue
         store.autosaveQueue = {};
       })
@@ -516,9 +614,15 @@ export const actions = {
     }
     // store.timelimit_expired = true;
   },
-  endAssess () {
+  handleDueDate () { // due date has hit
+    actions.submitAutosave();
+    store.show_enddate_dialog = true;
+  },
+  endAssess (callback) {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
+    window.MQeditor.resetEditor();
+    window.imathasAssess.clearTips();
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -536,6 +640,9 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
+        if (typeof callback === 'function') {
+          callback();
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -570,7 +677,33 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  redeemLatePass () {
+  getQuestions () {
+    store.inTransit = true;
+    window.$.ajax({
+      url: store.APIbase + 'getquestions.php' + store.queryString,
+      type: 'GET',
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        response = this.processSettings(response);
+        this.copySettings(response);
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
+  redeemLatePass (callback) {
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'uselatepass.php' + store.queryString,
@@ -588,7 +721,11 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
-        Router.push('/');
+        if (typeof callback === 'function') {
+          callback();
+        } else {
+          Router.push('/');
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -596,6 +733,9 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  routeToStart () {
+    Router.push('/');
   },
   setLivepollStatus (data) {
     store.inTransit = true;
@@ -644,14 +784,22 @@ export const actions = {
   },
   setInitValue (qn, fieldname, val) {
     if (!store.initValues.hasOwnProperty(qn)) {
-      store.initValues[qn] = {};
+      Vue.set(store.initValues, qn, {});
     }
     // only record initvalue if we don't already have one
-    let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
-    let qref = m[2];
     let pn = 0;
-    if (qref > 1000) {
-      pn = qref % 1000;
+    if (fieldname.match(/^sw/)) {
+      pn = 'sw';
+    } else {
+      let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
+      let qref = m[2];
+      if (qref > 1000) {
+        pn = qref % 1000;
+      }
+      // for draw questions, overwrite blank to the expected blank format
+      if (store.assessInfo.questions[qn].jsparams[qref].qtype === 'draw' && val === '') {
+        val = ';;;;;;;;';
+      }
     }
     if (store.assessInfo.questions[qn].hasOwnProperty('usedautosave') &&
       store.assessInfo.questions[qn].usedautosave.indexOf(pn) !== -1
@@ -659,10 +807,7 @@ export const actions = {
       // was loaded from autosave, so don't record as init initValue
       return;
     }
-    // for draw questions, overwrite blank to the expected blank format
-    if (store.assessInfo.questions[qn].jsparams[qref].qtype === 'draw' && val === '') {
-      val = ';;;;;;;;';
-    }
+
     if (!store.initValues[qn].hasOwnProperty(fieldname)) {
       store.initValues[qn][fieldname] = val;
     }
@@ -705,6 +850,14 @@ export const actions = {
     let m;
     for (let k = 0; k < qns.length; k++) {
       let qn = qns[k];
+
+      if (store.assessInfo.questions[qn].showwork && store.work.hasOwnProperty(qn)) {
+        if (store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+          if (!changed.hasOwnProperty(qn)) {
+            changed[qn] = [];
+          }
+        }
+      }
       var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn * 1 + 1) + '\\d{3})');
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if ((m = el.name.match(regex)) !== null) {
@@ -805,7 +958,7 @@ export const actions = {
         store.assessInfo.questions = [];
       }
       for (let i in response.questions) {
-        store.assessInfo.questions[parseInt(i)] = response.questions[i];
+        Vue.set(store.assessInfo.questions, parseInt(i), response.questions[i]);
       }
       delete response.questions;
     }
@@ -867,11 +1020,29 @@ export const actions = {
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
     }
+    if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0 &&
+      data.enddate_in < 20 * 24 * 60 * 60 // over 20 days causes int overlow
+    ) {
+      clearTimeout(store.enddate_timer);
+      let now = new Date().getTime();
+      let dueat = data.enddate_in * 1000;
+      data['enddate_local'] = now + dueat;
+      store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
+    }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
+      clearTimeout(store.enddate_timer); // no need for it w timelimit timer
       let now = new Date().getTime();
+      if (data.hasOwnProperty('timelimit_expires')) {
+        if (data.timelimit_expires === data.enddate) {
+          store.timelimit_restricted = 1;
+        } else if (data.timelimit_grace === data.enddate) {
+          store.timelimit_restricted = 2;
+        }
+      }
       let expires = data.timelimit_expiresin * 1000;
       let grace = data.timelimit_gracein * 1000;
+
       data['timelimit_local_expires'] = now + expires;
       if (grace > 0) {
         data['timelimit_local_grace'] = now + grace;
@@ -895,6 +1066,12 @@ export const actions = {
             store.timelimit_grace_expired = false;
           }
         }
+      }
+    } else if (data.timelimit > 0) { // haven't started timed assessment yet
+      if (data.enddate_in < data.timelimit) {
+        store.timelimit_restricted = 1;
+      } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
+        store.timelimit_restricted = 2;
       }
     }
     if (data.hasOwnProperty('interquestion_text')) {

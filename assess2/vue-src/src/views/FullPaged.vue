@@ -44,6 +44,7 @@
                 :qn="curqn"
                 :active = "pagenum === page"
                 :key="'q'+curqn"
+                :getwork="1"
               />
             </div>
           </div>
@@ -55,26 +56,26 @@
             :active = "pagenum === page"
           />
         </div>
-        <div v-if = "page < allPages.length - 1">
-          <p>&nbsp;</p>
-          <p>
-            <router-link
-              :to="'/full/page/'+ (page+2)"
-            >
-              {{ $t('pages.next') }}
-            </router-link>
-          </p>
-        </div>
-        <p v-else-if = "showSubmit">
-          <button
-            type = "button"
-            class = "primary"
-            @click = "submitAssess"
+      </div>
+      <div v-if = "page < allPages.length - 1">
+        <p>&nbsp;</p>
+        <p>
+          <router-link
+            :to="'/full/page/'+ (page+2)"
           >
-            {{ $t('header.assess_submit') }}
-          </button>
+            {{ $t('pages.next') }}
+          </router-link>
         </p>
       </div>
+      <p v-else-if = "showSubmit">
+        <button
+          type = "button"
+          class = "primary"
+          @click = "submitAssess"
+        >
+          {{ $t('header.assess_submit') }}
+        </button>
+      </p>
     </div>
   </div>
 </template>
@@ -118,6 +119,7 @@ export default {
   mounted () {
     setTimeout(window.drawPics, 100);
     window.rendermathnode(this.$refs.introtext);
+    window.jQuery(this.$refs.introtext).fitVids();
   }
 };
 </script>

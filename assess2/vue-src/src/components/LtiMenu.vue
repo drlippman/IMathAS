@@ -61,7 +61,7 @@ export default {
           link: store.APIbase + '../msgs/msglist.php?cid=' + store.cid,
           target: '_self'
         });
-      }*/
+      } */
       // view scored assessment link
       if (store.assessInfo.in_practice &&
           store.assessInfo['prev_attempts'].length > 0

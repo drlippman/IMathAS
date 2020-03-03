@@ -37,7 +37,7 @@
       </span>
       <button
         v-if = "assessSubmitLabel !== ''"
-        :class="{primary: ainfo.submitby === 'by_assessment' }"
+        :class="{ primary: primarySubmit, secondary: !primarySubmit }"
         @click="handleSubmit"
         :disabled = "!canSubmit"
       >
@@ -109,30 +109,37 @@ import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
 import LtiMsgs from '@/components/LtiMsgs.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
-
+import { attemptedMixin } from '@/mixins/attemptedMixin';
 import { store, actions } from '../basicstore';
 
 export default {
   name: 'AssessHeader',
   components: {
-    Timer,
-    MenuButton,
-    TooltipSpan,
     Icons,
     LtiMenu,
-    LtiMsgs
+    LtiMsgs,
+    MenuButton,
+    Timer,
+    TooltipSpan
   },
   data: function () {
     return {
       resourceMenuShowing: false
     };
   },
+  mixins: [attemptedMixin],
   computed: {
     ainfo () {
       return store.assessInfo;
     },
     canSubmit () {
       return (!store.inTransit);
+    },
+    primarySubmit () {
+      // primary if by_assessment and all questions loaded
+      return (this.ainfo.submitby === 'by_assessment' &&
+        Object.keys(store.initValues).length === this.ainfo.questions.length
+      );
     },
     curScorePoints () {
       let pointsPossible = 0;
@@ -155,8 +162,8 @@ export default {
     },
     qAttempted () {
       let qAttempted = 0;
-      for (let i in this.ainfo.questions) {
-        if (this.ainfo.questions[i].try > 0) {
+      for (let i = 0; i < this.qsAttempted.length; i++) {
+        if (this.qsAttempted[i] === 1) {
           qAttempted++;
         }
       }
@@ -170,7 +177,7 @@ export default {
       return (this.ainfo.submitby === 'by_assessment');
     },
     assessSubmitLabel () {
-      if (this.ainfo.submitby === 'by_assessment' && this.ainfo.displaymethod !== 'skip') {
+      if (this.ainfo.submitby === 'by_assessment') {
         return this.$t('header.assess_submit');
       } else {
         // don't have

@@ -61,6 +61,16 @@ function allvisfullcred() {
 function allvisnocred() {
 	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
 }
+function toggleWork(el) {
+	var next = $(el).next();
+	if (next.is(':hidden')) {
+		el.innerText = _('Hide Work');
+		next.show();
+	} else {
+		el.innerText = _('Show Work');
+		next.hide();
+	}
+}
 function preprint() {
 	$("span[id^='ans']").removeClass("hidden");
 	$(".sabtn").replaceWith("<span>Answer: </span>");

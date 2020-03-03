@@ -332,7 +332,15 @@ span.left {
 	float: left;
 }
 
-
+.screenreader, .sr-only {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	color: transparent;
+}
 
 br.form {
 	clear: left;
@@ -995,7 +1003,7 @@ div.multiselitem {
 	margin-bottom: 2px;
 }
 .videoembedbtn {
-	color: #999;
+	color: #757575;
 	cursor: pointer;
 }
 .ind1 {

@@ -2,7 +2,7 @@
 // IMathAS: Main launch page for assess2 assessment player
 // (c) 2019 David Lippman
 
-$lastupdate = '20191126';
+$lastupdate = '20200329';
 
 require('../init.php');
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
@@ -16,11 +16,11 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 
-$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
+$isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
 $inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
-$isdiag = isset($sessiondata['isdiag']);
+$isdiag = isset($_SESSION['isdiag']);
 if ($isdiag) {
-  $diagid = Sanitize::onlyInt($sessiondata['isdiag']);
+  $diagid = Sanitize::onlyInt($_SESSION['isdiag']);
   $hideAllHeaderNav = true;
 }
 
@@ -35,8 +35,8 @@ $placeinhead .= '</script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=092419" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=010120" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=030120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 if ($isltilimited || $inTreeReader) {
@@ -50,7 +50,7 @@ $nologo = true;
 $useeditor = 1;
 require('../header.php');
 
-if ((!$isltilimited || $sessiondata['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
+if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
   if ($isltilimited) {
     echo "$breadcrumbbase ", _('Assessment'), "</div>";

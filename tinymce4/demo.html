@@ -10,14 +10,15 @@ tinymce.init({
     plugins: [
         "advlist image charmap anchor",
         "searchreplace code link textcolor",
-        "media table paste asciimath asciisvg"
+        "media table paste asciimath asciisvg attach"
     ],
-    menubar: "edit insert format table tools ",
+    menubar: "edit insert format table tools",
     //toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | asciimath asciimathcharmap asciisvg",
-    toolbar: "alignleft aligncenter alignright | bullist numlist outdent indent | forecolor backcolor | bold italic subscript superscript | link unlink image | asciimath asciimathcharmap asciisvg",
+    toolbar: "alignleft aligncenter alignright | bullist numlist outdent indent | forecolor backcolor | bold italic subscript superscript | link unlink image | asciimath asciimathcharmap asciisvg attach",
     extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
     AScgiloc : 'http://localhost/imathas/filter/graph/svgimg.php',
     ASdloc : 'http://localhost/imathas/javascript/d.svg',
+    images_upload_url: '/imathas/tinymce4/upload_handler.php'
 });
 </script>
 </head>
@@ -25,7 +26,7 @@ tinymce.init({
 <form method="post" action="somepage">
     <textarea name="content" style="width:100%" rows=30>
     &lt;p&gt;
-Include text along with math equations like &lt;span class="AM"&gt;`x=(-b+-sqrt(b^2-4ac))/(2a)`&lt;/span&gt; in your documents   
+Include text along with math equations like &lt;span class="AM"&gt;`x=(-b+-sqrt(b^2-4ac))/(2a)`&lt;/span&gt; in your documents
 &lt;/p&gt;
 &lt;p&gt;
 Click on the math formula to edit the AsciiMath expression used to generate it.

@@ -24,6 +24,7 @@
     "pastdue": "This assessment was due {ed}.",
     "pasttime": "The timelimit has expired on this assessment.",
     "needprereq": "You have not yet met the prerequisite requirements to work on this assessment.",
+    "prereqreq": "A score of {score} on {name} is required.",
     "no_attempts": "You have used all your attempts at this assessment.",
     "latepassn": "You have one LatePass available. | You have {n} LatePass available.",
     "latepass_needed": "You can redeem one LatePass to reopen this assessment until {date} | You can redeem {n} LatePasses to reopen this assessment until {date}",
@@ -41,6 +42,13 @@
     "exit": "Exit",
     "teacher_preview": "This assessment is closed to students, but you can preview it.",
     "teacher_preview_button": "Preview Assessment"
+  },
+  "duedialog": {
+    "due": "Due Date Reached",
+    "nowdue": "This assessment is due now.",
+    "byq_unsubmitted": "You have work that has not yet been submitted for grading.",
+    "bya_unsubmitted": "This assessment attempt has not been submitted for grading.",
+    "submitnow": "Submit for grading"
   },
   "setlist": {
     "practice": "This assessment is in un-graded practice mode.",
@@ -65,7 +73,9 @@
     "time_grace_expires": "Your current assessment time limit expired at {date}. The grace period ends {grace}.",
     "timelimit": "Time limit: {time}.",
     "timelimit_wgrace": "Time limit: {time}, with a grace period of {grace} subject to a {penalty}% penalty.",
-    "timelimit_extend": "Extended from the original {time}."
+    "timelimit_extend": "Extended from the original {time}.",
+    "timelimit_restricted": "Because of the upcoming due date, your time limit will expire at the due date, {due}.",
+    "timelimit_wgrace_restricted": "Time limit: {time}, with a grace period subject to a {penalty}% penalty which expires at the due date, {due}."
   },
   "group": {
     "isgroup": "This is a group assessment.",
@@ -96,14 +106,15 @@
     "saveans": "Save Answer",
     "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question.",
     "jump_to_answer": "Jump to Answer",
-    "jump_warn": "This will use up your remaining tries at this version of the question."
+    "jump_warn": "This will use up your remaining tries at this version of the question.",
+    "showwork": "Show work here by typing it or attaching a file or picture"
   },
   "header": {
     "score": "Score: {pts}/{poss}",
     "practicescore": "Practice score: {pts}/{poss}",
     "possible": "{poss} points possible",
     "answered": "{n}/{tot} answered",
-    "assess_submit": "Submit Assessment",
+    "assess_submit": "Submit and End",
     "done": "Done",
     "resources_header": "Resources",
     "pts": "1 pt | {n} pts",
@@ -115,7 +126,8 @@
     "work_save": "Save work",
     "work_saved": "Work saved",
     "work_saving": "Saving...",
-    "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?"
+    "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
+    "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?"
   },
   "text": {
     "hide": "Hide text",
@@ -146,6 +158,10 @@
     "livepoll_wrongquestion": "Submitted question is not the current question.",
     "livepoll_notopen": "This question is not open for submissions.",
     "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again."
+  },
+  "confirm": {
+    "ok": "OK",
+    "cancel": "Cancel"
   },
   "scoreresult": {
     "correct": "Correct",
@@ -223,6 +239,7 @@
     "show": "Show timelimit countdown"
   },
   "helps": {
+    "help": "Question Help",
     "message_instructor": "Message instructor",
     "post_to_forum": "Post to forum",
     "video": "Video",
@@ -233,7 +250,8 @@
     "alert": "Alert",
     "unsubmitted_questions": "You have entered answers that have not yet been submitted. Are you sure you want to leave?",
     "unsubmitted_assessment": "You have not submitted your assessment for grading yet. Don't forget to come back and do that.",
-    "unsubmitted_done_assessment": "You have attempted every question, but have not submitted your assessment yet. Don't forget to come back and do that."
+    "unsubmitted_done_assessment": "You have attempted every question, but have not submitted your assessment yet. Don't forget to come back and do that.",
+    "unsubmitted_work": "You have unsubmitted work. If you leave now your work will be lost. Are you sure you want to leave?"
   },
   "pages": {
     "next": "Next Page"
@@ -247,6 +265,7 @@
     "show_qs": "Show Questions"
   },
   "videocued": {
+    "start": "Start video",
     "continue": "Continue video to {title}",
     "skipto": "Jump video to {title}"
   },
@@ -291,6 +310,7 @@
     "partial": "Partially correct",
     "dot": "Dot",
     "attempted": "Attempted",
+    "partattempted": "Partially attempted",
     "unattempted": "Unattempted",
     "print": "Print",
     "left": "Previous",
@@ -385,7 +405,17 @@
     "avail_after_take": "Will show after you submit an assessment attempt.",
     "avail_after_due": "Will show after the due date.",
     "latepass_blocked_practice": "Use of a LatePass is currently blocked because the student viewed the assessment in practice mode.",
-    "clear_latepass_block": "Clear Block"
+    "clear_latepass_block": "Clear Block",
+    "showwork": "View Work",
+    "hidework": "Hide Work"
+  },
+  "work": {
+    "add": "Add Work",
+    "hide": "Hide work entry",
+    "noquestions": "No questions require work",
+    "save": "Save Work",
+    "save_continue": "Save Work and Continue",
+    "add_prev": "You can still show or attach work for the previous attempt"
   },
   "regions": {
     "questions": "Questions and text",

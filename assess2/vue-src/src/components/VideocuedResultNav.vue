@@ -1,9 +1,17 @@
 <template>
   <div
-    v-if = "showNav"
+    v-if = "qn === -1 || showNav"
   >
     <button
-      v-if = "hasNextVid"
+      v-if="qn === -1 && cue === -1"
+      @click = "startVid"
+      class = "primary"
+    >
+      {{ $t('videocued.start') }}
+    </button>
+
+    <button
+      v-if = "qn > -1 && hasNextVid"
       @click = "nextVidLink"
       :class="{'primary': status !== 'correct' || !showSkip}"
     >
@@ -11,7 +19,7 @@
     </button>
 
     <button
-      v-if = "showSkip"
+      v-if = "qn > -1 && showSkip"
       @click = "skipLink"
       class="primary"
     >
@@ -92,6 +100,9 @@ export default {
       } else {
         this.$emit('jumpto', this.cue + 1, 'v');
       }
+    },
+    startVid () {
+      this.$emit('jumpto', 0, 'v');
     }
   }
 };

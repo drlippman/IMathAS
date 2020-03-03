@@ -48,7 +48,7 @@ if (!(isset($teacherid))) {
 		$sets = array();
 		$qarr = array();
 		if ($_POST['copyopts'] != 'DNC') {
-			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
+			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
@@ -77,6 +77,11 @@ if (!(isset($teacherid))) {
 				} else {
 					$turnoffshuffle +=4;
 				}
+			}
+
+			if ($_POST['showwork'] !== 'DNC') {
+				$sets[] = "showwork=:showwork";
+				$qarr[':showwork'] = Sanitize::onlyInt($_POST['showwork']);
 			}
 
 			if ($_POST['displaymethod'] !== 'DNC') {
@@ -300,7 +305,7 @@ if (!(isset($teacherid))) {
 					}
 				}
 				$sets[] = "extrefs=:extrefs";
-				$qarr[':extrefs'] = json_encode($extrefs);
+				$qarr[':extrefs'] = json_encode($extrefs, JSON_INVALID_UTF8_IGNORE);
 			}
 
 			if ($_POST['showtips'] !== 'DNC') {
@@ -417,7 +422,7 @@ if (!(isset($teacherid))) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if (($introjson=json_decode($row['intro']))!==null) { //is json intro
 					$introjson[0] = $newintro;
-					$outintro = json_encode($introjson);
+					$outintro = json_encode($introjson, JSON_INVALID_UTF8_IGNORE);
 				} else {
 					$outintro = $newintro;
 				}

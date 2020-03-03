@@ -5,8 +5,11 @@
         <icons :name="row.icon" size="small"/>
       </div>
       <div>
-        <div>
+        <div :class="{'strikethrough':!!row.altstr}">
           {{ row.str }}
+        </div>
+        <div class="noticetext" v-if="!!row.altstr">
+          {{ row.altstr }}
         </div>
         <div class="small subdued" v-if="!!row.sub">
           {{ row.sub }}
@@ -126,9 +129,10 @@ export default {
         substr += this.$t('setlist.keep_last');
       }
 
-      if (settings.prev_attempts.length > 0 && settings.retake_penalty > 0) {
-        let penalty = settings.prev_attempts.length * settings.retake_penalty;
-        alertstr = this.$t('retake_penalty', { p: penalty });
+      let nextAttempt = settings.prev_attempts.length + 1;
+      if (nextAttempt > settings.retake_penalty.n) {
+        let penalty = settings.retake_penalty.penalty * (nextAttempt - settings.retake_penalty.n);
+        alertstr = this.$t('setlist.retake_penalty', { p: penalty });
       }
 
       return {
@@ -153,6 +157,17 @@ export default {
       } else {
         timeobj.str = this.$t('setlist.timelimit', { time: this.formatTimeLimit(mytime) });
       }
+      if (store.timelimit_restricted === 1) { // time limit restricted
+        timeobj.altstr = this.$t('setlist.timelimit_restricted', {
+          due: settings.enddate_disp
+        });
+      } else if (store.timelimit_restricted === 2) { // grace restricted
+        timeobj.altstr = this.$t('setlist.timelimit_wgrace_restricted', {
+          time: this.formatTimeLimit(mytime),
+          due: settings.enddate_disp,
+          penalty: settings.overtime_penalty
+        });
+      }
       if (settings.timelimit_multiplier > 1) {
         timeobj.sub = this.$t('setlist.timelimit_extend', {
           time: this.formatTimeLimit(settings.timelimit)
@@ -161,7 +176,9 @@ export default {
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
           let expires = settings.timelimit_expires_disp;
-          if (settings.overtime_grace > 0) {
+          if (settings.overtime_grace > 0 &&
+              settings.timelimit_grace > settings.timelimit_expires
+          ) {
             timeobj.alert = this.$t('setlist.time_expires_wgrace', {
               date: expires,
               grace: settings.timelimit_grace_disp
@@ -204,10 +221,13 @@ export default {
 .settings-list .flexrow {
   margin-bottom: 16px;
 }
-.settings-list svg {
+.settings-list .flexrow > div:first-child svg {
   padding: 0 15px;
 }
-.settings-list .small svg {
+.settings-list svg {
   padding: 0 10px 0 0;
+}
+.strikethrough {
+  text-decoration: line-through;
 }
 </style>

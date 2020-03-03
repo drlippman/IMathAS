@@ -12,6 +12,7 @@ export const store = Vue.observable({
   inTransit: false,
   saving: '',
   errorMsg: null,
+  confirmObj: null,
   curAver: 0,
   ispractice: false,
   curQver: [],
@@ -258,6 +259,9 @@ export const actions = {
         for (let an = 0; an < response.assess_info.length; an++) {
           store.assessInfo.assess_versions[an].score = response.assess_info[an].score;
           for (let qn = 0; qn < response.assess_info[an].scoredvers.length; qn++) {
+            if (!store.assessInfo.assess_versions[an].hasOwnProperty('questions')) {
+              continue; // questions not loaded for this version
+            }
             let qvers = store.assessInfo.assess_versions[an].questions[qn];
             for (let qv = 0; qv < qvers.length; qv++) {
               if (qv === response.assess_info[an].scoredvers[qn]) {
@@ -312,7 +316,6 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
-
         // TODO: update displayed data rather than just exiting
         if (store.clearAttempts.type === 'all' && data.keepver === 0) {
           // cleared all - exit
@@ -430,14 +433,20 @@ export const actions = {
     // compare new score against existing value
     let qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
     let key = av + '-' + qn + '-' + qv + '-' + pn;
+    let scoreChanged = true;
+    if (qdata.singlescore) {
+      scoreChanged = (Math.abs(score - qdata.rawscore) > 0.001);
+    } else if (qdata.parts[pn]) {
+      scoreChanged = (Math.abs(score - qdata.parts[pn].score / qdata.parts[pn].points_possible) > 0.001);
+    }
     if (qdata.parts[pn] && qdata.parts[pn].try > 0 &&
-      (score === '' || Math.abs(score - qdata.parts[pn].score/qdata.parts[pn].points_possible) < 0.001)
+      (score === '' || !scoreChanged)
     ) {
       // same as existing - don't submit as an override
       delete store.scoreOverrides[key];
     } else {
       // different score - submit as override. Save raw score (0-1)?.
-      store.scoreOverrides[key] = Math.round(10000*score)/10000;
+      store.scoreOverrides[key] = Math.round(10000 * score) / 10000;
     }
     store.saving = '';
   },

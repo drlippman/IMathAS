@@ -22,11 +22,14 @@ if (!$isteacher && !$istutor && !$isstudent) {
 
 $canViewAll = $isteacher || $istutor;
 $isActualTeacher = $isteacher && !isset($instrPreviewId);
-$isRealStudent = (isset($studentid) && !isset($sessiondata['stuview']));
+$isRealStudent = (isset($studentid) && !isset($_SESSION['stuview']));
 
 if (!$isRealStudent) {
   $studentinfo = array('latepasses' => 0, 'timelimitmult' => 1);
 }
+
+// extend time for uploads
+ini_set("max_input_time", "60");
 
 /**
  * Check if the required parameters are set
@@ -70,7 +73,7 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
 
 $useeditor = 1;
 
-if (isset($CFG['GEN']['keeplastactionlog']) && isset($sessiondata['loginlog'.$testsettings['courseid']])) {
+if (isset($CFG['GEN']['keeplastactionlog']) && isset($_SESSION['loginlog'.$testsettings['courseid']])) {
   $stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
   $stm->execute(array(':lastaction'=>time(), ':id'=>$_GET['cid']));
 }

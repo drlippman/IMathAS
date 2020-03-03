@@ -150,6 +150,9 @@ div.match {
 	padding: 5px;
 	padding-right: 30px;
 }
+div[role=radiogroup].clearfix .match {
+	padding-right: 5px;
+}
 
 div.spacer {
 	clear: both;

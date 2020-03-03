@@ -90,10 +90,16 @@ div.match {
   padding: 5px;
   padding-right: 30px;
 }
+div[role=radiogroup].clearfix .match {
+	padding-right: 5px;
+}
 div.spacer {
   clear: both;
   height: 1px;
   padding: 0px;
+}
+input.unind {
+	margin-left: -15px;
 }
 p.centered {
   text-align: center;
@@ -215,8 +221,26 @@ td.l, table.stats tbody td.l {
   text-align: left;
 }
 
+@media only screen and (max-width: 700px) {
+  table[role=presentation] > tbody > tr > td,
+	table[role=presentation] > tbody > tr > th,
+	table[role=presentation] > thead > tr > td,
+	table[role=presentation] > thead > tr > th
+	{
+		display: block;
+	}
+	table.responsive > tbody > tr > td,
+	table.responsive > tbody > tr > th,
+	table.responsive > thead > tr > td,
+	table.responsive > thead > tr > th
+	{
+		display: block;
+	}
+}
+
 ul.nomark {
   padding-left: 40px;
+  margin-left: 0px;
 }
 div.toppad {
   padding-top: 5px;
@@ -257,6 +281,9 @@ ol.lalpha li { margin-top: .7em;}
 .drawtools [data-drawaction].sel {
   background-color: #E6F0F9;
 }
+.drawcanvas {
+	margin-bottom: 5px;
+}
 
 /* General layout styles used many places */
 input, .mq-editable-field, .mathquill-math-field {
@@ -265,8 +292,9 @@ input, .mq-editable-field, .mathquill-math-field {
   border-radius: 4px;
   margin: 1px 0;
 }
+
 input[type=radio], input[type=checkbox] {
-  margin: 1px 4px 1px 0;
+  margin-right: 4px;
 }
 input[type=text]:disabled, .mathquill-math-field.disabled {
   background-color: #eee;
@@ -294,20 +322,46 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
 
 .questionpane {
   margin: 15px 15px;
+  overflow: visible;
+}
+.questionwrap {
+  position: relative;
+}
+.questionpane.introtext, .questionpane > .question > .question {
   max-width: 700px;
   overflow: visible;
 }
+.questionwrap .question {
+  background-color: transparent;
+  border: 0;
+}
+.questionpane > .question {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background-image: linear-gradient(to right, white, white), linear-gradient(to right, white, white), linear-gradient(to right, rgba(0,0,0,.25), rgba(255,255,255,0)), linear-gradient(to left, rgba(0,0,0,.25), rgba(255,255,255,0));
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: inherit;
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
+  margin: 12px 0;
+  padding: 1px;
+}
+
 @media only screen and (max-width: 480px) {
   .questionpane {
     margin: 15px 4px;
   }
 }
-.questionpane.introtext {
-  margin: 15px 0;
+.introtext {
   padding: 12px;
   background-color: #f3f3f9;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+.questionpane.introtext {
+  margin: 15px 0;
 }
 .inactive {
   visibility: hidden;
@@ -336,4 +390,57 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   margin-left: 16px;
 }
 
-/* mobile adjustments */
+table.tchart {
+	border-collapse: collapse;
+}
+table.tchart td {
+	min-width: 3em;
+}
+table.acctstatement {
+	border-collapse: collapse;
+}
+table.acctstatement th, table.acctstatement td {
+	border: 1px solid #eee;
+	background-color: #fff;
+	padding: 1px 5px;
+}
+
+table.acctstatement thead th {
+	text-align: center;
+	z-index: 20;
+	background-color: #eef;
+	font-weight: bold;
+	border-bottom: 2px solid #333;
+	padding: 5px;
+}
+table.acctstatement.noborder  td {
+	border: 0px;
+}
+input.iscredit {
+  padding-left: 2em;
+}
+
+span.inlinebtn {
+	cursor: pointer;
+	border: 1px solid #000;
+	padding: 5px 10px;
+	line-height: 1em;
+	display: inline-block;
+	background: #efe;
+	margin: 10px;
+}
+span.inlinebtn:hover {
+	background: #dfd;
+}
+.feedbackwrap {
+	display: block;
+	padding: 5px;
+	background: #fff;
+	border: 1px solid #ccc;
+}
+.feedbackwrap.correct {
+	background: #efe;
+}
+.feedbackwrap.incorrect {
+	background: #fee;
+}

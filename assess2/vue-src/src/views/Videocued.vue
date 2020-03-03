@@ -8,7 +8,6 @@
     >
       <videocued-result-nav
         class="med-left"
-        v-if = "qn != -1"
         :qn = "qn"
         :cue = "cue"
         @jumpto="jumpTo"
@@ -53,6 +52,7 @@
         <question
           :qn="curqn"
           :active="curqn == qn"
+          :getwork="1"
         />
         <inter-question-text-list
           pos = "after"

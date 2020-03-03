@@ -20,6 +20,7 @@
 <script>
 import QuestionHeaderIcons from '@/components/QuestionHeaderIcons.vue';
 import Icons from '@/components/widgets/Icons.vue';
+import { attemptedMixin } from '@/mixins/attemptedMixin';
 import { store } from '../basicstore';
 
 export default {
@@ -29,6 +30,7 @@ export default {
     QuestionHeaderIcons,
     Icons
   },
+  mixins: [attemptedMixin],
   data: function () {
     return {
 
@@ -48,6 +50,13 @@ export default {
       if (this.dispqn === 0) {
         return 'none';
       } else {
+        if (this.curQData.status === 'unattempted') {
+          if (this.qsAttempted[this.qn] === 1) {
+            return 'attempted';
+          } else if (this.qsAttempted[this.qn] > 0) {
+            return 'partattempted';
+          }
+        }
         return this.curQData.status;
       }
     },

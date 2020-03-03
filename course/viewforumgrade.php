@@ -102,7 +102,7 @@
 	$showlink = ($caneditscore || time()<$row[5]);
 
 	$pagetitle = "View Forum Grade";
-	if ($caneditscore && $sessiondata['useed']!=0) {
+	if ($caneditscore && $_SESSION['useed']!=0) {
 		$useeditor = "noinit";
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 		$placeinhead .= '<style type="text/css">
@@ -183,7 +183,7 @@
 			echo "\" /> </td>";
 			//echo "<td><textarea cols=40 rows=1 id=\"feedback".Sanitize::encodeStringForDisplay($row[0])."\" name=\"feedback[".Sanitize::encodeStringForDisplay($row[0])."]\">".Sanitize::encodeStringForDisplay($scores[$row[0]][1])."</textarea></td>";
 			$postid = Sanitize::onlyInt($row[0]);
-			if ($sessiondata['useed']==0) {
+			if ($_SESSION['useed']==0) {
 				echo "<td><textarea class=scorebox cols=\"40\" rows=\"1\" name=\"feedback$postid\" id=\"feedback$postid\">";
 				if ($scores[$row[0]][1]!==null) {
 					echo Sanitize::encodeStringForDisplay($scores[$row[0]][1]);
@@ -217,7 +217,7 @@
 			}
 			echo "\" /> </td>";
 			//echo "<td><textarea cols=40 rows=1 id=\"feedback0\" name=\"feedback[0]\">".Sanitize::encodeStringForDisplay($scores[0][1])."</textarea></td>";
-			if ($sessiondata['useed']==0) {
+			if ($_SESSION['useed']==0) {
 				echo "<td><textarea class=scorebox cols=\"40\" rows=\"1\" name=\"feedback0\" id=\"feedback0\">";
 				if ($scores[0][1]!==null) {
 					echo Sanitize::encodeStringForDisplay($scores[0][1]);

@@ -157,6 +157,13 @@ function tipout(e) {
 	}
 	curtipel = null;
 }
+jQuery(function() {
+	jQuery(document).on('keyup', function(e) {
+		if (e.which == 27 && curtipel !== null) {
+			tipout();
+		}
+	})
+});
 
 var popupwins = [];
 function popupwindow(id,content,width,height,scroll) {
@@ -429,7 +436,9 @@ function GB_doneload() {
 }
 function GB_hide() {
 	document.getElementById("GB_window").style.display = "none";
-	document.getElementById("GB_overlay").style.display = "none";
+	if (document.getElementById("GB_overlay")) {
+		document.getElementById("GB_overlay").style.display = "none";
+	}
 	$(document).off('keydown.GB');
 }
 
@@ -1210,6 +1219,8 @@ function setActiveTab(el) {
   var toggle   = '[data-toggle="dropdown"]'
   var Dropdown = function (element) {
     $(element).on('click.bs.dropdown', this.toggle)
+		var $parent = getParent($(element));
+		$parent.find('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
   }
 
   Dropdown.VERSION = '3.3.5'
@@ -1279,6 +1290,7 @@ function setActiveTab(el) {
       $parent
         .toggleClass('open')
         .trigger('shown.bs.dropdown', relatedTarget)
+
     }
 
     return false
@@ -1354,5 +1366,9 @@ function setActiveTab(el) {
     .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
     .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+	$(function() {
+		$('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
+	});
 
 }(jQuery);

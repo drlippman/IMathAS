@@ -5,7 +5,7 @@
 header("Content-Type: text/plain");
 
 require("../init_without_validate.php");
-require("../i18n/i18n.php");
+
 require("mbxfilter.php");
 require("../assessment/displayq2.php");
 
@@ -16,27 +16,27 @@ require("../assessment/displayq2.php");
  }
 $basesiteurl = $urlmode  . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot;
 
-$sessiondata = array();
+$_SESSION = array();
 $prefdefaults = array(
 	'mathdisp'=>1,
 	'graphdisp'=>2,
 	'drawentry'=>1,
 	'useed'=>0,
 	'livepreview'=>0);
-$sessiondata['userprefs'] = array();
+$_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
-	$sessiondata['userprefs'][$key] = $def;
+	$_SESSION['userprefs'][$key] = $def;
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
-	$sessiondata[$key] = $sessiondata['userprefs'][$key];
+	$_SESSION[$key] = $_SESSION['userprefs'][$key];
 }
-$sessiondata['texdisp'] = true;
+$GLOBALS['texdisp'] = true;
 
 $showtips = 0;
 $useeqnhelper = 0;
-$sessiondata['drill']['cid'] = 0;
-$sessiondata['drill']['sa'] = 0;
-$sessiondata['secsalt'] = "12345";
+$_SESSION['drill']['cid'] = 0;
+$_SESSION['drill']['sa'] = 0;
+$_SESSION['secsalt'] = "12345";
 $cid = "mbx";
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
@@ -51,7 +51,7 @@ if (isset($_GET['seed'])) {
 }
 
 foreach ($qsetlist as $qn=>$qsetid) {
-	mbxproc($qn,$qsetid,$seed);	
+	mbxproc($qn,$qsetid,$seed);
 }
 
 function mbxproc($qn,$qsetid,$seed) {
@@ -105,7 +105,7 @@ function mbxproc($qn,$qsetid,$seed) {
   } else if ($displayformat=="select" || $displayformat=="horiz" || $displayformat=="column" || $displayformat=="2column" || $displayformat=="inline") {
   	 unset($displayformat);
   }
-  
+
   //pack options
   if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
   if (isset($displayformat)) {$options['displayformat'] = $displayformat;}

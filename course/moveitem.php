@@ -1,4 +1,4 @@
-<?php 
+<?php
 //IMathAS: Move item dialog
 //(c) 2017 David Lippman
 
@@ -8,13 +8,13 @@ $cid = Sanitize::courseId($_GET['cid']);
 if (!isset($teacherid)) {
 	echo 'You must be a teacher to access this page';
 	exit;
-}                       
+}
 //$itemtomove will be imas_items.id or 'B'.block['id']
 $itemtomove = $_REQUEST['item'];
 $curblock = $_REQUEST['block'];
 if (!preg_match('/^B?[0-9]+$/',$itemtomove) || !preg_match('/^[0-9\-]+$/',$curblock)) {
 	echo 'Invalid item or block format';
-	exit;	
+	exit;
 }
 
 $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
@@ -24,11 +24,11 @@ $items = unserialize($stm->fetchColumn(0));
 if (isset($_POST['newblock'])) {
 	if (!preg_match('/^[0-9\-]+$/',$_POST['newblock'])) {
 		echo 'Invalid block format';
-		exit;	
+		exit;
 	}
 	if (!preg_match('/^[0-9a-zA-Z\-]+$/',$_POST['moveafter'])) {
 		echo 'Invalid move dest format';
-		exit;	
+		exit;
 	}
 	$blocktree = explode('-',$curblock);
 	$sub =& $items;
@@ -40,7 +40,7 @@ if (isset($_POST['newblock'])) {
 	} else {
 		$curblockitems =& $sub;
 	}
-	
+
 	$blocktree = explode('-',$_POST['newblock']);
 	$sub =& $items;
 	for ($i=1;$i<count($blocktree)-1;$i++) {
@@ -71,7 +71,7 @@ if (isset($_POST['newblock'])) {
 	$actualitem = $curblockitems[$k];
 	//remove from array
 	array_splice($curblockitems,$k,1);
-	
+
 	$moveafter = $_POST['moveafter'];
 	$newloc = -1;
 	if ($moveafter=='top') {
@@ -98,11 +98,11 @@ if (isset($_POST['newblock'])) {
 	} else {
 		array_splice($newblockitems,$newloc,0,$actualitem);
 	}
-	
+
 	$itemlist = serialize($items);
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
-	
+
 	echo 'OK';
 	exit;
 }
@@ -169,8 +169,8 @@ $flexwidth = true;
 $nologo = true;
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/moveitem.js"></script>';
 $placeinhead .= '<script type="text/javascript">
-  var blockinfo = '.json_encode($briefitems).';
-  var iteminfo = '.json_encode($iteminfo).';
+  var blockinfo = '.json_encode($briefitems, JSON_INVALID_UTF8_IGNORE).';
+  var iteminfo = '.json_encode($iteminfo, JSON_INVALID_UTF8_IGNORE).';
   var item = "'.$itemtomove.'";
   var block = "'.$curblock.'";
   </script>';
@@ -192,7 +192,7 @@ require("../header.php");
 </p>
 
 <p>
-<button type="button" onclick="cancelmove()" class="secondarybtn">Cancel</button> 
+<button type="button" onclick="cancelmove()" class="secondarybtn">Cancel</button>
 <button type="button" onclick="moveitem()">Move</button></p>
 
 <p class="noticetext" id="error"></p>

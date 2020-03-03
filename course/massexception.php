@@ -126,6 +126,8 @@
 					//this is not group-safe
 					$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
+					$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid");
+					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
 				}
 
 			}
@@ -170,6 +172,9 @@
 			require("masssend.php");
 			exit;
 		}
+	}
+	if (empty($_POST['checked'])) {
+		$_POST['checked'] = array();
 	}
 
 

@@ -227,6 +227,10 @@ function setupTips(id, tip, longtip) {
   });
 }
 
+function clearTips() {
+  hideAllEhTips();
+}
+
 function initqsclickchange() {
 	$('input[id^=qs][value=spec]').each(function(i,qsel) {
 		$(qsel).siblings('input[type=text]').off('keyup.qsclickchange')
@@ -775,6 +779,8 @@ function processByType(qn) {
       return {str: 'DNE', displvalstr: '', submitstr: 'DNE'};
     } else if (str.match(/^\s*oo\s*$/i)) {
       return {str: 'oo', displvalstr: '', submitstr: 'oo'};
+    } else if (str.match(/^\s*-oo\s*$/i)) {
+      return {str: '-oo', displvalstr: '', submitstr: '-oo'};
     }
     switch (params.qtype) {
       case 'calculated':
@@ -885,6 +891,8 @@ function AMnumfuncPrepVar(qn,str) {
 			return '@v'+i+'@';
 		}
 	 }});
+  // fix display of /n!
+  dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
@@ -1035,6 +1043,9 @@ function processCalcInterval(fullstr, format, ineqvar) {
       break;
     }
     for (j=0; j<2; j++) {
+      if (format.indexOf('decimal')!=-1 && vals[j].match(/[\d\.]e\-?\d/)) {
+        vals[j] = vals[j].replace(/e/,"E"); // allow 3e-4 in place of 3E-4 for decimal answers
+      }
       err += singlevalsyntaxcheck(vals[j], format);
       err += syntaxcheckexpr(vals[j], format);
       if (vals[j].match(/^\s*\-?oo\s*$/)) {
@@ -1513,7 +1524,7 @@ function singlevalsyntaxcheck(str,format) {
   str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	if (str.match(/DNE/i)) {
 		 return '';
-	} else if (str.match(/oo$/) || str.match(/oo\W/)) {
+	} else if (str.match(/-?oo$/) || str.match(/-?oo\W/)) {
 		 return '';
 	} else if (str.match(/,/)) {
     return _("Invalid use of a comma.");
@@ -1548,7 +1559,7 @@ function singlevalsyntaxcheck(str,format) {
 		  	}
 		  }
 	} else if (format.indexOf('decimal')!=-1 && format.indexOf('nodecimal')==-1) {
-		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)([eE]\-?\d+)?$/)) {
 			return (_(" not a valid integer or decimal number")+". ");
 		}
 	} else if (!onlyAscii.test(str)) {
@@ -1667,6 +1678,7 @@ return {
   preSubmitString: preSubmitString,
   clearLivePreviewTimeouts: clearLivePreviewTimeouts,
   syntaxCheckMQ: syntaxCheckMQ,
+  clearTips: clearTips,
   handleMQenter: handleMQenter
 };
 

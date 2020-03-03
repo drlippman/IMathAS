@@ -9,7 +9,7 @@
 	}
 	/*** master php includes *******/
 	require("../init_without_validate.php");
-	require("../i18n/i18n.php");
+
 	require("courseshowitems.php");
 
 

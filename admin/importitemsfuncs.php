@@ -30,6 +30,14 @@ function getsubinfo($items,$parent,$pre) {
 	}
 }
 
+function ecount($v) {
+	if (is_array($v)) {
+		return count($v);
+	} else {
+		return 0;
+	}
+}
+
 class ImportItemClass
 {
 
@@ -215,12 +223,12 @@ public function importdata($data, $cid, $checked, $options) {
 	return array(
 		'Questions Added'=>$this->qsadded,
 		'Questions Updated'=>$this->qmodcnt,
-		'InlineText Imported'=>count($this->typemap['InlineText']),
-		'Linked Imported'=>count($this->typemap['LinkedText']),
-		'Forums Imported'=>count($this->typemap['Forum']),
-		'Assessments Imported'=>count($this->typemap['Assessment']),
-		'Drills Imported'=>count($this->typemap['Drill']),
-		'Wikis Imported'=>count($this->typemap['Wiki'])
+		'InlineText Imported'=>ecount($this->typemap['InlineText']),
+		'Linked Imported'=>ecount($this->typemap['LinkedText']),
+		'Forums Imported'=>ecount($this->typemap['Forum']),
+		'Assessments Imported'=>ecount($this->typemap['Assessment']),
+		'Drills Imported'=>ecount($this->typemap['Drill']),
+		'Wikis Imported'=>ecount($this->typemap['Wiki'])
 		);
 }
 

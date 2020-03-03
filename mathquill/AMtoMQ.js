@@ -714,7 +714,7 @@ return function(str) {
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
   str = str.replace(/all\s+real\s+numbers/g,'"all real numbers"');
   str = str.replace(/(\)|\])\s*u\s*(\(|\[)/g,"$1U$2");
-  str = str.replace(/DNE/g,'"DNE"');
+  str = str.replace(/\bDNE\b/gi,'"DNE"');
   if (str.match(/\S/)==null) {
 	  return "";
   }
@@ -760,6 +760,7 @@ function MQtoAM(tex,display) {
   });
 	tex = tex.replace(/\\le(?!f)/g,'<=');
 	tex = tex.replace(/\\ge/g,'>=');
+  tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
 	tex = tex.replace(/\\cup/g,'U');
@@ -806,5 +807,6 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\^\((-?[\d\.]+)\)/g,'^$1');
   tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2');  //change /(x^n) to /x^n
 	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
+  tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
 	return tex;
 }

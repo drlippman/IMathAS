@@ -4,6 +4,10 @@
 //Based on work by @kdv24 and @AbeerKhakwani
 
 require("../init.php");
+if ($myrights < 100) {
+  echo "You are not authorized to use this page";
+  exit;
+}
 if (isset($_GET['cid'])) {
   $cid = Sanitize::courseId($_GET['cid']);
 
@@ -26,7 +30,7 @@ if (isset($_GET['cid'])) {
   parseItemorder($items);
 
   //  exports the modules array as json
-  $outputjson = json_encode($output_array, JSON_HEX_TAG);
+  $outputjson = json_encode($output_array, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);
   header("Content-type: application/json");
   header('Content-Disposition: attachment; filename="results.json"');
   header('Content-Length: ' . strlen($outputjson));

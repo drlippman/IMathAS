@@ -5,7 +5,7 @@
  */
 
 require_once(__DIR__ . '/../includes/exceptionfuncs.php');
-
+require_once(__DIR__ . '/../includes/Rand.php');
 /**
  * Primary class for working with assessment settings
  */
@@ -109,8 +109,13 @@ class AssessInfo
 
     $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
-    list($useexception, $canundolatepass, $canuselatepass) =
-      $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
+    if ($latepasses > 0) {
+      list($useexception, $canundolatepass, $canuselatepass) =
+        $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData);
+    } else {
+      $useexception = $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, true);
+      $canuselatepass = false;
+    }
 
     if ($useexception) {
       if (empty($this->exception[3]) || $this->exception[2] > 0) {
@@ -121,12 +126,13 @@ class AssessInfo
         } else {
           $this->assessData['extended_with'] = array(
             'type' => 'latepass',
-            'n' => $this->exception[2]
+            'n' => intval($this->exception[2])
           );
         }
       }
-      $this->assessData['startdate'] = $this->exception[0];
-      $this->assessData['enddate'] = $this->exception[1];
+      $this->assessData['startdate'] = intval($this->exception[0]);
+      $this->assessData['enddate'] = intval($this->exception[1]);
+      $this->assessData['enddate_in'] = $this->assessData['enddate'] - time() - 5;
       $this->setAvailable();
     }
 
@@ -296,10 +302,10 @@ class AssessInfo
    * @return array        Associative array of extracted settings
    */
   public function getQuestionSettings($id) {
-    $by_q = array('regens_max','regen_penalty','regen_penalty_after');
+    $by_q = array('regens_max');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
       'showans','showans_aftern','points_possible','questionsetid',
-      'category', 'withdrawn', 'jump_to_answer');
+      'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
     foreach ($base as $field) {
       $out[$field] = $this->questionData[$id][$field];
@@ -480,12 +486,12 @@ class AssessInfo
         $this->assessData['reqscoreaid'] > 0 &&
         !$this->waiveReqScore()
     ) {
-      $query = "SELECT iar.score,ia.ptsposs FROM imas_assessments AS ia LEFT JOIN ";
+      $query = "SELECT iar.score,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
 			$query .= "WHERE ia.id=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->assessData['reqscoreaid']));
-      list($prereqscore,$reqscoreptsposs) = $stm->fetch(PDO::FETCH_NUM);
+      list($prereqscore,$reqscoreptsposs,$prereqname) = $stm->fetch(PDO::FETCH_NUM);
       if ($prereqscore === null) {
 				$isBlocked = true;
 			} else {
@@ -500,6 +506,9 @@ class AssessInfo
       }
       if ($isBlocked) {
         $this->assessData['available'] = 'needprereq';
+        $this->assessData['reqscorename'] = $prereqname;
+        $this->assessData['reqscorevalue'] = ($this->assessData['reqscore']) .
+          (($this->assessData['reqscoretype']&2) ? '%' : ' '._('points'));
       }
     }
   }
@@ -522,12 +531,15 @@ class AssessInfo
   }
 
   /**
-   * Determine whether we are reshowing scored questions at end
-   * @return boolean  true if showing scores during
+   * Determine whether we are reshowing questions at end
+   * @return boolean  true if showing question at end
    */
   public function reshowQuestionsAtEnd() {
-    $showscores = $this->assessData['showscores'];
-    return ($showscores == 'at_end' || $showscores == 'during');
+    //$showscores = $this->assessData['showscores'];
+    //return ($showscores == 'at_end' || $showscores == 'during');
+    $viewingb = $this->assessData['viewingb'];
+    return ($viewingb == 'immediately' || $viewingb == 'after_take' ||
+      ($viewingb == 'after_due' && time() > $this->assessData['enddate']));
   }
 
 
@@ -547,7 +559,13 @@ class AssessInfo
   public function assignQuestionsAndSeeds($ispractice = false, $attempt = 0, $oldquestions = false, $oldseeds = false) {
     $qout = array();
     $seeds = array();
+    $RND = new Rand();
 
+    if ($this->assessData['shuffle']&4) {
+      // if set for all students same random seed, it makes sense they'd get
+      // the same questions from pool and shuffle order as well
+      $RND->srand($this->curAid + $attempt + ($ispractice ? 1000 : 0));
+    }
     if ($oldquestions !== false && $oldseeds !== false) {
       $oldseeds = array_combine($oldquestions, $oldseeds);
     }
@@ -558,7 +576,7 @@ class AssessInfo
           if ($qid['replace'] == true) {
             //select with replacement
             for ($i=0; $i < $qid['n']; $i++) {
-              $qout[] = intval($qid['qids'][array_rand($qid['qids'], 1)]);
+              $qout[] = intval($qid['qids'][$RND->array_rand($qid['qids'], 1)]);
             }
           } else {
             //select without replacement
@@ -567,11 +585,11 @@ class AssessInfo
               //in selection
               $unused = array_diff($qid['qids'], $oldquestions);
               $used = array_intersect($qid['qids'], $oldquestions);
-              shuffle($unused);
-              shuffle($used);
+              $RND->shuffle($unused);
+              $RND->shuffle($used);
               $qid['qids'] = array_merge($unused, $used);
             } else {
-              shuffle($qid['qids']);
+              $RND->shuffle($qid['qids']);
             }
 
             for ($i=0; $i < min($qid['n'], count($qid['qids'])); $i++) {
@@ -580,7 +598,7 @@ class AssessInfo
             //if we want more than there are questions
             if ($qid['n'] > count($qid['qids'])) {
               for ($i = count($qid['qids']); $i < $qid['n']; $i++) {
-                $qout[] = intval($qid['qids'][array_rand($qid['qids'], 1)]);
+                $qout[] = intval($qid['qids'][$RND->array_rand($qid['qids'], 1)]);
               }
             }
           }
@@ -592,11 +610,11 @@ class AssessInfo
 
     if ($this->assessData['shuffle']&1) {
       //shuffle all
-      shuffle($qout);
+      $RND->shuffle($qout);
     } else if ($this->assessData['shuffle']&16) {
       //shuffle all but first
       $firstq = array_shift($qout);
-      shuffle($qout);
+      $RND->shuffle($qout);
       array_unshift($qout, $firstq);
     }
 
@@ -729,12 +747,12 @@ class AssessInfo
     $this->assessData['defregens'] = 999; // unlimited
     $this->assessData['shuffle'] &= ~4;  // disable "all stu same version"
     $this->assessData['timelimit'] = 0;
+    $this->assessData['retake_penalty'] = array('penalty'=>0, 'n'=>1);
     unset($this->assessData['allowed_attempts']);
     foreach ($this->questionData as $i=>$v) {
       $this->questionData[$i]['tries_max'] = 999; // unlimited
       $this->questionData[$i]['regens_max'] = 999; // unlimited
       $this->questionData[$i]['retry_penalty'] = 0;
-      $this->questionData[$i]['regen_penalty'] = 0;
       $this->questionData[$i]['showans'] = 'with_score';
     }
   }
@@ -832,6 +850,7 @@ class AssessInfo
   * @return array            Normalized $settings array.
   */
   static function normalizeQuestionSettings($settings, $defaults) {
+
     if ($settings['points'] == 9999) {
       $settings['points_possible'] = $defaults['defpoints'];
     } else {
@@ -858,18 +877,7 @@ class AssessInfo
         $settings['retry_penalty'] = intval($settings['penalty']);
       }
     }
-    if ($settings['regenpenalty'] == 9999) {
-      $settings['regen_penalty'] = $defaults['defregenpenalty'];
-      $settings['regen_penalty_after'] = $defaults['defregenpenalty_after'];
-    } else {
-      if ($settings['regenpenalty'][0]==='S') {
-        $settings['regen_penalty_after'] = intval($settings['regenpenalty'][1]);
-        $settings['regen_penalty'] = intval(substr($settings['regenpenalty'], 2));
-      } else {
-        $settings['regen_penalty_after'] = 1;
-        $settings['regen_penalty'] = intval($settings['regenpenalty']);
-      }
-    }
+
     if ($settings['regen'] == 1 || $defaults['submitby'] == 'by_assessment') {
       $settings['regens_max'] = 1;
     } else {
@@ -910,6 +918,10 @@ class AssessInfo
       $settings['showhints'] = $defaults['showhints'];
     }
 
+    if ($settings['showwork'] == -1) {
+      $settings['showwork'] = $defaults['showwork'];
+    }
+
     if (!empty($settings['fixedseeds'])) {
       $settings['fixedseeds'] = array_map('intval', explode(',', $settings['fixedseeds']));
     } else {
@@ -938,6 +950,8 @@ class AssessInfo
     $GLOBALS['useeqnhelper'] = ($settings['eqnhelper'] > 0);
     $GLOBALS['showtips'] = $settings['showtips'];
 
+    $settings['enddate_in'] = $settings['enddate'] - time() - 5;
+
     // adjust for language change
     $settings['deftries'] = $settings['defattempts'];
 
@@ -959,6 +973,10 @@ class AssessInfo
       $settings['defregenpenalty_after'] = 1;
       $settings['defregenpenalty'] = intval($settings['defregenpenalty']);
     }
+    $settings['retake_penalty'] = array(
+      'penalty' => intval($settings['defregenpenalty']),
+      'n' => intval($settings['defregenpenalty_after'])
+    );
 
     // if LivePoll, force all stu same random seed
     // force by-question submission
@@ -970,10 +988,6 @@ class AssessInfo
     //if by-assessment, define attempt values
     if ($settings['submitby'] == 'by_assessment') {
       $settings['allowed_attempts'] = $settings['defregens'];
-      $settings['retake_penalty'] = array(
-        'penalty' => intval($settings['defregenpenalty']),
-        'n' => intval($settings['defregenpenalty_after'])
-      );
     }
 
     $settings['jump_to_answer'] = false;

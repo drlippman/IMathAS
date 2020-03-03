@@ -31,7 +31,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	$stm->execute(array(':id'=>$cid));
 	list($items, $datesbylti, $ltisecret) = $stm->fetch(PDO::FETCH_NUM);
 	$items = unserialize($items);
-	
+
 	$ids = array();
 	$types = array();
 	$names = array();
@@ -41,7 +41,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	$prespace = array();
 	$itemshowdata = loadItemShowData($items,false,true,false,false,false,true);
 	getsubinfo($items,'0','',false,'|- ');
-	
+
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 	$stm->execute(array($groupid));
 	$hasGroupLTI = ($stm->fetchColumn() !== false);
@@ -71,11 +71,11 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		$groupLTInote .= '</li></ul>';
 	}
 
-	
-	
-	
+
+
+
 	$pagetitle = "CC Export";
-	
+
 	$placeinhead = '<script type="text/javascript">
 	 function updatewhichsel(el) {
 	   if (el.value=="select") { $("#itemselectwrap").show();}
@@ -101,12 +101,14 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">"
 		. Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; Export For Another LMS</div>\n";
-	
+
 	echo '<div class="cpmid">';
 	if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
-		echo '<a href="exportitems2.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a> | ';
+		echo '<a href="exportitems2.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a> ';
 	}
-	echo '<a href="jsonexport.php?cid='. $cid.'" name="button">Export OEA JSON</a>';
+	if ($myrights == 100) {
+		echo '| <a href="jsonexport.php?cid='. $cid.'" name="button">Export OEA JSON</a>';
+	}
 	echo '</div>';
 
 	echo '<h2>Export For Another LMS</h2>';
@@ -115,7 +117,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	echo '<p>Since LMSs cannot support the type of question types that this system ';
 	echo 'does, assessments are exported as LTI (learning tools interoperability) placements back to this system.  Not all LMSs ';
 	echo 'support this standard yet, so your assessments may not transfer.</p>';
-	
+
 	if ($enablebasiclti==false) {
 		echo '<p class="noticetext">Note: Your system does not currently have LTI enabled.  Contact your system administrator</p>';
 	}
@@ -143,7 +145,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		if (strpos($types[$i],'Block')!==false) {
 			echo '<input type=checkbox name="checked[]" id="'.Sanitize::encodeStringForDisplay($parents[$i]).'" ';
 			echo 'onClick="chkgrp(this.form, \''.Sanitize::encodeStringForDisplay($ids[$i]).'\', this.checked);" ';
-			echo 'value="'.Sanitize::encodeStringForDisplay($ids[$i]).'">';			
+			echo 'value="'.Sanitize::encodeStringForDisplay($ids[$i]).'">';
 		} else {
 			echo '<input type=checkbox name="checked[]" id="'.Sanitize::encodeStringForDisplay($parents[$i].'.'.$ids[$i]).'" ';
 			echo 'value="'.Sanitize::encodeStringForDisplay($ids[$i]).'">';
@@ -207,9 +209,9 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		<ul class="nomark bboptlist">
 		  <li><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname;?> due dates for assessments</li>
 		</ul>
-		</fieldset>   
+		</fieldset>
 		<p><button type="submit" name="carttype" value="imscc">Download Common Cartridge</button></p>
-		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button> (Beta - Recommended)</p>
+		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button> (Recommended)</p>
 		<p><a href="../help.php?section=ltibb" target="_blank">BlackBoard Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
 		<ul>
@@ -242,9 +244,9 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		<?php echo $keyInfo; ?>
 		<li>Launch URL: <?php echo $GLOBALS['basesiteurl'].'/bltilaunch.php';?> </li>
 		</ul>
-		
+
 	</div>
-	
+
 	<?php
 
 	echo '</form>';

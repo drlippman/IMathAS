@@ -45,7 +45,7 @@ $now = time();
 
 // load settings including question info
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
-$assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
+$assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
@@ -101,6 +101,11 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
     echo '{"error": "livepoll_wrongquestion"}';
     exit;
   }
+  // override showscores value to prevent score marks
+  if ($livepollStatus['curstate'] != 4) {
+    $assess_info->overrideSetting('showscores', 'at_end');
+    $assess_info->overrideSetting('showans', 'never');
+  }
 }
 
 // If in practice, now we overwrite settings
@@ -115,8 +120,7 @@ if ($in_practice) {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
-  'showscores'
+  'extended_with', 'allowed_attempts', 'showscores', 'enddate_in'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
@@ -144,30 +148,29 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
 
 // Try a Similar Question, if requested
 if ($doRegen) {
-  if (!isset($sessiondata['regendelay'])) {
-    $sessiondata['regendelay'] = 2;
+  if (!isset($_SESSION['regendelay'])) {
+    $_SESSION['regendelay'] = 2;
   }
-  if (isset($sessiondata['lastregen'])) {
-    if ($now-$sessiondata['lastregen']<$sessiondata['regendelay']) {
-      $sessiondata['regendelay'] = 5;
-      if (!isset($sessiondata['regenwarnings'])) {
-        $sessiondata['regenwarnings'] = 1;
+  if (isset($_SESSION['lastregen'])) {
+    if ($now-$_SESSION['lastregen']<$_SESSION['regendelay']) {
+      $_SESSION['regendelay'] = 5;
+      if (!isset($_SESSION['regenwarnings'])) {
+        $_SESSION['regenwarnings'] = 1;
       } else {
-        $sessiondata['regenwarnings']++;
+        $_SESSION['regenwarnings']++;
       }
-      if ($sessiondata['regenwarnings']>10) {
+      if ($_SESSION['regenwarnings']>10) {
         $stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
         $stm->execute(array(':time'=>$now, ':log'=>"Over 10 regen warnings triggered by $userid"));
       }
       echo '{"error": "fast_regen"}';
       exit;
     }
-    if ($now - $sessiondata['lastregen'] > 20) {
-      $sessiondata['regendelay'] = 2;
+    if ($now - $_SESSION['lastregen'] > 20) {
+      $_SESSION['regendelay'] = 2;
     }
   }
-  $sessiondata['lastregen'] = $now;
-  writesessiondata();
+  $_SESSION['lastregen'] = $now;
   if ($assess_record->canRegenQuestion($qn, $qid)) {
     $qid = $assess_record->buildNewQuestionVersion($qn, $qid);
     $assess_info->loadQuestionSettings(array($qid), true);
@@ -185,10 +188,7 @@ if ($jumpToAnswer) {
 // grab question settings data with HTML
 if ($assess_info->getSetting('displaymethod') === 'livepoll') {
   $showscores = ($livepollStatus['curstate'] == 4);
-  // override showscores value to prevent score marks
-  if (!$showscores) {
-    $assessInfoOut['showscores'] = 'at_end';
-  }
+
   if ($isteacher) {
     // trigger additional jsParams for livepoll results display
     $GLOBALS['capturedrawinit'] = true;
@@ -208,4 +208,4 @@ $assess_record->saveRecordIfNeeded();
 prepDateDisp($assessInfoOut);
 
 //output JSON object
-echo json_encode($assessInfoOut);
+echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

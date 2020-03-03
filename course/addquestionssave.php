@@ -37,7 +37,7 @@
 			}
 		}
 		array_unshift($new_text_segments_json, $current_intro);
-		$new_intro = json_encode($new_text_segments_json);
+		$new_intro = json_encode($new_text_segments_json, JSON_INVALID_UTF8_IGNORE);
 	} else {
 		$new_intro = $current_intro;
 	}

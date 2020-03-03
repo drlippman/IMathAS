@@ -20,7 +20,7 @@
 <script>
 export default {
   name: 'GbAllTries',
-  props: ['tries','qn'],
+  props: ['tries', 'qn'],
   data: function () {
     return {
       rendered: false,
@@ -34,22 +34,13 @@ export default {
       for (pn in this.tries) {
         let partout = [];
         for (tn in this.tries[pn]) {
-          if (typeof this.tries[pn][tn] == 'object' && this.tries[pn][tn][0] == 'draw') {
+          if (typeof this.tries[pn][tn] === 'object' && this.tries[pn][tn][0] === 'draw') {
             // drawing
-            let la = this.tries[pn][tn][1].replace(/\(/g,"[").replace(/\)/g,"]").split(";;");
-          	if (la[0]!='') {
-          		la[0] = '['+la[0].replace(/;/g,"],[")+"]";
-          	}
-          	la = '[['+la.join('],[')+']]';
             let id = this.qn + '-' + pn + '-' + tn;
-            window.canvases["GBR"+id] = this.tries[pn][tn][2].slice();
-            let drawwidth = canvases["GBR"+id][6];
-          	let drawheight = canvases["GBR"+id][7];
-          	window.canvases["GBR"+id].unshift("GBR"+id);
-          	window.drawla["GBR"+id] = JSON.parse(la);
-            this.drawToRender.push("GBR"+id);
-            partout[tn] = '<canvas class="drawcanvas" id="canvasGBR'+id+'" width='+drawwidth+' height='+drawheight+'></canvas>';
-          	partout[tn] += '<input type="hidden" id="qnGBR'+id+'"/>'
+            let drawwidth = this.tries[pn][tn][2][6];
+            let drawheight = this.tries[pn][tn][2][7];
+            partout[tn] = '<canvas class="drawcanvas" id="canvasGBR' + id + '" width=' + drawwidth + ' height=' + drawheight + '></canvas>';
+            partout[tn] += '<input type="hidden" id="qnGBR' + id + '"/>';
           } else {
             partout[tn] = this.tries[pn][tn];
           }
@@ -66,8 +57,25 @@ export default {
       }
       setTimeout(window.drawPics, 100);
       window.rendermathnode(this.$refs.trywrap);
-      for (let i=0; i < this.drawToRender.length; i++) {
-        imathasDraw.initCanvases(this.drawToRender[i]);
+
+      // initialize any drawing canvases
+      let pn, tn;
+      for (pn in this.tries) {
+        for (tn in this.tries[pn]) {
+          if (typeof this.tries[pn][tn] === 'object' && this.tries[pn][tn][0] === 'draw') {
+            // drawing
+            let la = this.tries[pn][tn][1].replace(/\(/g, '[').replace(/\)/g, ']').split(';;');
+            if (la[0] !== '') {
+              la[0] = '[' + la[0].replace(/;/g, '],[') + ']';
+            }
+            la = '[[' + la.join('],[') + ']]';
+            let id = this.qn + '-' + pn + '-' + tn;
+            window.canvases['GBR' + id] = this.tries[pn][tn][2].slice();
+            window.canvases['GBR' + id].unshift('GBR' + id);
+            window.drawla['GBR' + id] = JSON.parse(la);
+            window.imathasDraw.initCanvases('GBR' + id);
+          }
+        }
       }
     }
   },

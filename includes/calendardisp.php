@@ -16,7 +16,7 @@ require_once("filehandler.php");
 function showcalendar($refpage) {
 global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
-global $tzoffset, $tzname, $editingon, $exceptionfuncs;
+global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver;
 
 $now= time();
 
@@ -90,7 +90,7 @@ for ($i=2;$i<26;$i++) {
 	echo '>'.$i.'</option>';
 }
 echo '</select> weeks. ';
-echo '<a href="#" onclick="hidevisualcal();return false;" aria-label="'._('Hide visual calendar and display events list').'" title="'._('Hide visual calendar and display events list').'" aria-controls="caleventslist">';
+echo '<a href="#" onclick="hidevisualcal();return false;" title="'._('Hide visual calendar and display events list').'" aria-controls="caleventslist">';
 echo _('Events List').'</a>';
 echo '</div>';
 echo '<div class=center><a href="'.$refpage.'.php?calpageshift='.($pageshift-1).'&cid='.$cid.'" aria-label="'.sprintf(_('Back %d weeks'),$callength).'">&lt; &lt;</a> ';
@@ -126,8 +126,19 @@ if (!isset($teacherid)) {
 $byid = array();
 $k = 0;
 $bestscores_stm = null;
-$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag,ver FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
-$stm->execute(array(':courseid'=>$cid));
+if ($latepasses > 0 && $courseUIver > 1) {
+	$query = 'SELECT ia.id,ia.name,ia.startdate,ia.enddate,ia.LPcutoff,ia.reviewdate,';
+	$query .= 'ia.gbcategory,ia.reqscore,ia.reqscoreaid,ia.reqscoretype,ia.timelimit,';
+	$query .= 'ia.allowlate,ia.caltag,ia.calrtag,ia.ver,iar.status ';
+	$query .= 'FROM imas_assessments AS ia LEFT JOIN imas_assessment_records AS iar ';
+	$query .= 'ON ia.id=iar.assessmentid AND iar.userid=:uid WHERE ia.avail=1 AND ';
+	$query .= 'ia.date_by_lti<>1 AND ia.courseid=:courseid AND ia.enddate<2000000000 ORDER BY ia.name';
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':uid'=>$userid));
+} else {
+	$stm = $DBH->prepare("SELECT id,name,startdate,enddate,LPcutoff,reviewdate,gbcategory,reqscore,reqscoreaid,reqscoretype,timelimit,allowlate,caltag,calrtag,ver FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
+	$stm->execute(array(':courseid'=>$cid));
+}
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
 	$canuselatepass = false;
@@ -140,6 +151,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 	} else {
 		$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($row);
+	}
+	if (isset($row['status']) && ($row['status']&32)==32) {
+		$canuselatepass = 0;
 	}
 	//2: start, 3: end, 4: review
 	//if enddate past end of calendar
@@ -759,6 +773,9 @@ foreach ($itemsimporder as $item) {
 	}
 
 }
+if ($editingon) {
+	addBlockItems($itemorder,'0',$tags,$colors,$assess,$names,$itemidref);
+}
 
 $stm = $DBH->prepare("SELECT title,tag,date,id FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid=:courseid ORDER BY title");
 $stm->execute(array(':courseid'=>$cid));
@@ -792,7 +809,7 @@ foreach ($dates as $moday=>$val) {
 
 echo '<script type="text/javascript">';
 echo "cid = $cid;";
-echo "caleventsarr = ".json_encode($jsarr, JSON_HEX_TAG).";";
+echo "caleventsarr = ".json_encode($jsarr, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE).";";
 echo '$(function() {
 	$(".cal td").off("click.cal").on("click.cal", function() { showcalcontents(this); })
 	 .off("keyup.cal").on("keyup.cal", function(e) { if(e.which==13) {showcalcontents(this);} })
@@ -887,6 +904,43 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 			} else {
 				$greyitems[$item] = $curblockgrey;
 			}
+		}
+	}
+}
+function addBlockItems($items, $parent, &$tags,&$colors,&$assess,&$names,&$itemidref) {
+	foreach ($items as $i=>$item) {
+		if (is_array($item)) {
+			if ($item['startdate'] > 0) {
+				$moday = tzdate('Y-n-j',$item['startdate']);
+				$json = array(
+					"type"=>"BS",
+					"typeref"=>'BS'.$item['id'].';'.$parent.'-'.$i,
+					"tag"=>"B",
+					"name"=> $item['name']
+				);
+				$k = count($tags);
+				$tags[$k] = 'B';
+				$colors[$k] = '';
+				$assess[$moday][$k] = $json;
+				$names[$k] = $item['name'];
+				$itemidref[$k] = 'BS'.$item['id'].';'.$parent.'-'.$i;
+			}
+			if ($item['enddate'] < 2000000000) {
+				$moday = tzdate('Y-n-j',$item['enddate']);
+				$json = array(
+					"type"=>"BE",
+					"typeref"=>'BE'.$item['id'].';'.$parent.'-'.$i,
+					"tag"=>"B",
+					"name"=> $item['name']
+				);
+				$k = count($tags);
+				$tags[$k] = 'B';
+				$colors[$k] = '';
+				$assess[$moday][$k] = $json;
+				$names[$k] = $item['name'];
+				$itemidref[$k] = 'BE'.$item['id'].';'.$parent.'-'.$i;
+			}
+			addBlockItems($item['items'],$parent.'-'.$i, $tags,$colors,$assess,$names,$itemidref);
 		}
 	}
 }

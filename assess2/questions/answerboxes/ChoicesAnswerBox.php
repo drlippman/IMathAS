@@ -45,8 +45,8 @@ class ChoicesAnswerBox implements AnswerBox
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
 
         if (!is_array($questions)) {
-            throw new RuntimeException(_('Eeek!  $questions is not defined or needs to be an array'));
-            return;
+            echo _('Eeek!  $questions is not defined or needs to be an array');
+            $questions = array();
         }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -98,7 +98,7 @@ class ChoicesAnswerBox implements AnswerBox
     		if ($displayformat == "select") {
     			$msg = '?';
     			foreach ($questions as $qv) {
-    				if (strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
+    				if (mb_strlen(html_entity_decode($qv))>3) { //strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
     					$msg = _('Select an answer');
     					break;
     				}
@@ -136,7 +136,7 @@ class ChoicesAnswerBox implements AnswerBox
     					}
     					$out .= '<div class="match"><ul class=nomark>';
     				}
-    				$out .= "<li><input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
+    				$out .= "<li><input class=\"unind\" type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
     				if (($la!='') && ($la == $randkeys[$i])) { $out .= "CHECKED";}
     				$out .= " /><label for=\"qn$qn-$i\">{$questions[$randkeys[$i]]}</label></li> \n";
     			} else {

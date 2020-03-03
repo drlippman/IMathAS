@@ -89,7 +89,7 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 		$exception = null;
 	}
 	require_once("../includes/exceptionfuncs.php");
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
@@ -166,7 +166,7 @@ $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=010619" type="text/css" />';
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/posts.js?v=011517"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
-if ($caneditscore && $sessiondata['useed']!=0) {
+if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 }
@@ -205,13 +205,13 @@ if ($postbeforeview && !$canviewall) {
 
 if ($oktoshow) {
 	if ($haspoints) {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section FROM ";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section,imas_students.id AS stuid FROM ";
 		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
 		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
 		$query .= "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
 		$query .= "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
 	} else {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section FROM ";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section,imas_students.id AS stuid FROM ";
 		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
 		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
 		$query .= "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
@@ -223,6 +223,7 @@ if ($oktoshow) {
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
+	$isstu = array();
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -233,6 +234,7 @@ if ($oktoshow) {
 		if ($line['id']==$threadid) {
 			$newviews = $line['views']+1;
 		}
+		$isstu[$line['id']] = ($line['stuid'] !== null);
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['postdate'];
 		$n = 0;
@@ -249,7 +251,7 @@ if ($oktoshow) {
 		}
 
 		$subject[$line['id']] = $line['subject'];
-		if ($sessiondata['graphdisp']==0) {
+		if ($_SESSION['graphdisp']==0) {
 			$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
 		}
 		$message[$line['id']] = $line['message'];
@@ -476,7 +478,7 @@ function printchildren($base,$restricttoowner=false) {
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-	global $canviewall, $caneditscore, $canviewscore, $sessiondata;
+	global $canviewall, $caneditscore, $canviewscore, $isstu;
 	if (!isset($CFG['CPS']['itemicons'])) {
 		$itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -660,7 +662,7 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		echo filter($message[$child]);
 		if ($haspoints) {
-			if ($caneditscore && $ownerid[$child]!=$userid) {
+			if ($caneditscore && $isstu[$child]) {
 				echo '<hr/>';
 				echo "Score: <input class=scorebox type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
 				if ($points[$child]!==null) {
@@ -671,7 +673,7 @@ function printchildren($base,$restricttoowner=false) {
 					echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
 				}
 				echo " Private Feedback: ";
-				if ($sessiondata['useed']==0) {
+				if ($_SESSION['useed']==0) {
 					echo "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback$child\" id=\"feedback$child\">";
 					if ($feedback[$child]!==null) {
 						echo Sanitize::encodeStringForDisplay($feedback[$child]);

@@ -18,9 +18,9 @@ if (isset($dbsetup) && $dbsetup==true) {  //initial setup run from setupdb.php
 	//store in the $latest_oldstyle, which matches the version in dbsetup
 	$stm = $DBH->prepare("INSERT INTO imas_dbschema (id,ver) VALUES (:id, :ver)");
 	$stm->execute(array(':id'=>1, ':ver'=>$latest_oldstyle));
-	
+
 	$last = $latest_oldstyle;
-	
+
 	//now we'll run the new-style migration stuff
 } else {  //called from web or cli - doing upgrade
 	$c = file_get_contents("config.php");
@@ -1391,11 +1391,6 @@ unset($dbpassword);
 			 }
 		}
 		if ($last<80) {
-			$query = 'ALTER TABLE imas_sessions ADD `tzname` VARCHAR(255) NOT NULL DEFAULT \'\'';
-			 $res = $DBH->query($query);
-			 if ($res===false) {
-			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
-			 }
 			 echo "<p><b>Important</b>: This update adds improved timezone handling, fixing issues that ";
 			 echo "were occurring on servers set for UTC. Utilizing the improvements requires PHP 5.1 or higher ";
 			 echo "and requires updating your local loginpage.php file. See changes to loginpage.php.dist; changes are ";
@@ -1811,11 +1806,7 @@ unset($dbpassword);
 			echo '<p>Added assessment sessions ver</p>';
 		}
 		if ($last<114) {
-			$query = "ALTER TABLE  `imas_sessions` ADD INDEX ( `userid` )";
-			$res = $DBH->query($query);
-			if ($res===false) {
-				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
-			}
+		
 		}
 		if ($last<115) {
 			$query = "ALTER TABLE  `imas_users` ADD `FCMtoken` VARCHAR(512) NOT NULL DEFAULT '';";
@@ -1853,9 +1844,9 @@ span.instronly {
 			$query = "UPDATE imas_teachers SET hidefromcourselist=1 WHERE courseid IN ";
 			$query .= "(SELECT id FROM imas_courses WHERE available>1)";
 			$res = $DBH->query($query);
-			
+
 			$query = "UPDATE imas_courses SET available=available-2 WHERE available>1 AND available<4";
-			$res = $DBH->query($query);	
+			$res = $DBH->query($query);
 		}
 		if ($last<119) {
 			$query = "ALTER TABLE  `imas_questions` ADD `fixedseeds` TEXT NULL DEFAULT NULL;";
@@ -1864,22 +1855,22 @@ span.instronly {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			 }
 		}
-	
+
 /***
   end older DB update stuff
 ***/
-	if ($last<119) { 
+	if ($last<119) {
 		//if we just ran any of those changes, update DB, otherwise
 		//let Migrator handle updating the ver
 		$stm = $DBH->prepare("UPDATE imas_dbschema SET ver=:ver WHERE id=1");
 		$stm->execute(array(':ver'=>$latest_oldstyle));
 	}
-		
+
 	$migrator = new Migrator($DBH, (isset($dbsetup) && $dbsetup==true));
 	$migrator->migrateAll();
 
 	echo "Migrations complete.  At version ";
 	echo Sanitize::encodeStringForDisplay($migrator->getLatestVersionApplied());
-	
+
 
 ?>

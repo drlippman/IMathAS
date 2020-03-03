@@ -72,6 +72,12 @@ if (!$assess_record->hasRecord()) {
 if ($type == 'all' && $keepver == 0) {
   $stm = $DBH->prepare('DELETE FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
+  // update LTI grade
+  $lti_sourcedid = $assess_record->getLTIsourcedId();
+  if (strlen($lti_sourcedid) > 1) {
+    require_once("../includes/ltioutcomes.php");
+    updateLTIgrade('delete',$lti_sourcedid,$aid,$uid);
+  }
   echo '{"success": "saved"}';
   exit;
 } else if ($type == 'all' && $keepver == 1) {
@@ -109,6 +115,13 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
 }
 
 $assess_record->saveRecord();
+
+// update LTI grade
+$lti_sourcedid = $assess_record->getLTIsourcedId();
+if (strlen($lti_sourcedid) > 1) {
+  require_once("../includes/ltioutcomes.php");
+  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$assessInfoOut['gbscore'],true);
+}
 
 //output JSON object
 echo json_encode($assessInfoOut);

@@ -8,7 +8,7 @@
 	$aid = Sanitize::onlyInt($_GET['aid']);
 
 	require("../includes/exceptionfuncs.php");
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
@@ -30,7 +30,7 @@
 		if ($from != 'ltitimelimit') {
 			echo "$breadcrumbbase ";
 		}
-		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		if ($from == 'gb') {
@@ -85,10 +85,10 @@
 			echo "<p><a href=\"../bltilaunch.php?accessibility=ask'\">Continue</a></p>";
 		} else if ($from=='gb') {
 			echo "<p><a href=\"gradebook.php?cid=$cid\">Continue</a></p>";
-		} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		} else if ((!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
 		} else {
-			echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Continue</a></p>";
+			echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$_SESSION['ltiitemid']}\">Continue</a></p>";
 		}
 		require("../footer.php");
 
@@ -152,12 +152,12 @@
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask" . "&r=" . Sanitize::randomQueryStringParam());
 		} else if ($from=='gb') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
-		} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		} else if ((!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
-		} else if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid={$sessiondata['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
+		} else if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid={$_SESSION['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$_SESSION['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
 		}
 	} else {
 		require("../header.php");
@@ -165,7 +165,7 @@
 		if ($from != 'ltitimelimit') {
 			echo "$breadcrumbbase ";
 		}
-		if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+		if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 			echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 		}
 		if ($from == 'gb') {
@@ -267,12 +267,12 @@
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../bltilaunch.php?accessibility=ask'\"/>";
 			} else if ($from=='gb') {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid'\"/>";
-			} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+			} else if ((!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
-			} else if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assess2/?cid=$cid&aid={$sessiondata['ltiitemid']}'\"/>";
+			} else if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assess2/?cid=$cid&aid={$_SESSION['ltiitemid']}'\"/>";
 			} else {
-				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}'\"/>";
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../assessment/showtest.php?cid=$cid&id={$_SESSION['ltiitemid']}'\"/>";
 			}
 			echo "</p></form>";
 		} else {

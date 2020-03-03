@@ -4,7 +4,7 @@
     <div class="scrollpane fulldisp" role="region" :aria-label="$t('regions.questions')">
       <div
         class = "questionpane introtext"
-        v-if = "intro != ''"
+        v-if = "intro !== ''"
         v-html = "intro"
         ref = "introtext"
       />
@@ -23,6 +23,7 @@
           :qn="curqn"
           active="true"
           :key="'q'+curqn"
+          :getwork="1"
         />
       </div>
       <inter-question-text-list
@@ -83,7 +84,10 @@ export default {
   },
   mounted () {
     setTimeout(window.drawPics, 100);
-    window.rendermathnode(this.$refs.introtext);
+    if (this.intro !== '') {
+      window.rendermathnode(this.$refs.introtext);
+      window.jQuery(this.$refs.introtext).fitVids();
+    }
   }
 };
 </script>

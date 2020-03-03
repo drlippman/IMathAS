@@ -265,19 +265,17 @@ if ($overwriteBody==1) {
 
 	if (isset($_GET['orderby'])) {
 		$orderby = Sanitize::onlyInt($_GET['orderby']);
-		$sessiondata['mcdorderby'.$cid] = $orderby;
-		writesessiondata();
-	} else if (isset($sessiondata['mcdorderby'.$cid])) {
-		$orderby = $sessiondata['mcdorderby'.$cid];
+		$_SESSION['mcdorderby'.$cid] = $orderby;
+	} else if (isset($_SESSION['mcdorderby'.$cid])) {
+		$orderby = $_SESSION['mcdorderby'.$cid];
 	} else {
 		$orderby = 3;
 	}
 	if (isset($_GET['filter'])) {
 		$filter = Sanitize::simpleString($_GET['filter']);
-		$sessiondata['mcdfilter'.$cid] = $filter;
-		writesessiondata();
-	} else if (isset($sessiondata['mcdfilter'.$cid])) {
-		$filter = $sessiondata['mcdfilter'.$cid];
+		$_SESSION['mcdfilter'.$cid] = $filter;
+	} else if (isset($_SESSION['mcdfilter'.$cid])) {
+		$filter = $_SESSION['mcdfilter'.$cid];
 	} else {
 		$filter = "all";
 	}

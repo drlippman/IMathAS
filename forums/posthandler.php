@@ -560,7 +560,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
 			echo "<span class=left><div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
-			echo Sanitize::encodeStringForDisplay($line['message']);
+			echo Sanitize::encodeStringForDisplay($line['message'], true);
 			echo "</textarea></div></span><br class=form>\n";
 			if (!$isteacher && $allowanon==1) {
 				echo "<span class=form>Post Anonymously:</span><span class=formright>";
@@ -679,7 +679,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$parent[$line['id']] = $line['parent'];
 					$date[$line['id']] = $line['postdate'];
 					$subject[$line['id']] = $line['subject'];
-					if ($sessiondata['graphdisp']==0) {
+					if ($_SESSION['graphdisp']==0) {
 						$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
 					}
 					$message[$line['id']] = $line['message'];

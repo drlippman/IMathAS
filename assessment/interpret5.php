@@ -343,7 +343,7 @@ function tokenize($str,$anstype,$countcnt) {
 				return array(array('',9));
 			}
 
-		} else if ($c>="a" && $c<="z" || $c>="A" && $c<="Z") { //is str
+		} else if ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c=='_') { //is str
 			$intype = 2; //string like function name
 			do {
 				$out .= $c;
