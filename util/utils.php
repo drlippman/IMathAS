@@ -344,7 +344,6 @@ if (isset($_GET['form'])) {
 	}
 	echo '<a href="utils.php?form=lookup">User lookup</a><br/>';
 	echo '<a href="'.$imasroot.'/admin/approvepending2.php">Approve Pending Instructor Accounts</a><br/>';
-	echo '<a href="'.$imasroot.'/admin/approvepending.php">Approve Pending Instructor Accounts (old version)</a><br/>';
 	echo '<a href="utils.php?form=jumptoitem">Jump to Item</a><br/>';
 	echo '<a href="batchcreateinstr.php">Batch Create Instructor Accounts</a><br/>';
 	echo '<a href="batchanon.php">Batch Anonymize Old Accounts</a><br/>';
