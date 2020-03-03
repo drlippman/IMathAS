@@ -72,8 +72,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
 } elseif (isset($_POST['export'])) { //STEP 2 DATA PROCESSING, OUTPUT FILE HERE
-	header('Content-type: text/imas');
-	header("Content-Disposition: attachment; filename=\"imasitemexport-$cid.imas\"");
 
 	$checked = $_POST['checked'];
 	$output = array();
@@ -532,7 +530,18 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 
 	//dump it!
-	echo json_encode($output, JSON_FORCE_OBJECT|JSON_HEX_TAG);
+	$out = json_encode($output, JSON_FORCE_OBJECT|JSON_HEX_TAG);
+	if ($out === false) {
+		header('Content-type: text/plain');
+		echo 'Error generating output (error ' . json_last_error() . ')';
+		if ($myrights == 100) {
+			print_r($output);
+		}
+	} else {
+		header('Content-type: text/imas');
+		header("Content-Disposition: attachment; filename=\"imasitemexport-$cid.imas\"");
+		echo $out;
+	}
 	exit;
 
 } else { //STEP 1 DATA PROCESSING, INITIAL LOAD
