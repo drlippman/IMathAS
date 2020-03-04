@@ -50,8 +50,8 @@ ul {
 	}
 	$skipcids = implode(',',$skipcid);
 	*/
-	$query = "SELECT g.name,u.LastName,u.FirstName,c.id,c.name AS cname, COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_teachers AS t ";
-	$query .= "ON s.courseid=t.courseid AND s.lastaccess>$start ";
+    $query = "SELECT g.name,u.LastName,u.FirstName,c.id,c.name AS cname,COUNT(DISTINCT s.id),u.email FROM imas_students AS s JOIN imas_teachers AS t ";
+    $query .= "ON s.courseid=t.courseid AND s.lastaccess>$start ";
 	if ($end != $now) {
 		$query .= "AND s.lastaccess<$end ";
 	}
@@ -59,7 +59,8 @@ ul {
 	$query .= "JOIN imas_users as u ";
 	$query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id,c.id ORDER BY g.name,u.LastName,u.FirstName,c.name";
 	$stm = $DBH->query($query);
-	$lastgroup = '';  $grpcnt = 0; $grpdata = '';  $lastuser = ''; $userdata = '';
+    $lastgroup = '';  $grpcnt = 0; $grpdata = '';  $lastuser = ''; $userdata = '';
+    $grpinstrcnt = 0; $lastemail = '';
 	$seencid = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1].', '.$row[2]!=$lastuser) {
@@ -70,13 +71,15 @@ ul {
 			}
 			$userdata = '';
 			$lastuser = $row[1].', '.$row[2];
+            $lastemail = $row[6];
+            $grpinstrcnt++;
 		}
 		if ($row[0] != $lastgroup) {
 			if ($lastgroup != '') {
 				echo "<p><b>".Sanitize::encodeStringForDisplay($lastgroup)."</b>: ".Sanitize::encodeStringForDisplay($grpcnt);
 				echo '<ul>'.$grpdata.'</ul></p>';
 			}
-			$grpcnt = 0;  $grpdata = '';
+			$grpcnt = 0;  $grpdata = ''; $grpinstrcnt = 0;
 			$lastgroup = $row[0];
 		}
 		$userdata .= "<li>".Sanitize::encodeStringForDisplay($row[4]).' ('.Sanitize::encodeStringForDisplay($row[3]).'): <b>'.Sanitize::encodeStringForDisplay($row[5]).'</b>';
@@ -91,10 +94,9 @@ ul {
 	$grpdata .= '<li><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b><ul>';
 	$grpdata .= $userdata;
 	$grpdata .= '</ul></li>';
-	$userdata = '';
-	$lastuser = $row[1].', '.$row[2];
-	echo "<p><b>".Sanitize::encodeStringForDisplay($lastgroup)."</b>: ".Sanitize::encodeStringForDisplay($grpcnt);
-	echo '<ul>'.$grpdata.'</ul></p>';
+    $grpinstrcnt++;
+    echo "<p><b>" . Sanitize::encodeStringForDisplay($lastgroup) . "</b>: " . Sanitize::encodeStringForDisplay($grpcnt) . " students, " . Sanitize::encodeStringForDisplay($grpinstrcnt) . " instructors";
+    echo '<ul>'.$grpdata.'</ul></p>';
 
 ?>
 </body>
