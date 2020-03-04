@@ -17,6 +17,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//$starttime = microtime(true);
 	global $DBH, $RND, $imasroot, $myrights, $showtips, $urlmode, $CFG;
 
+	if (extension_loaded('newrelic')) { // Ensure PHP agent is available
+		// Record custom data about this web transaction
+		newrelic_add_custom_parameter ('cur_qsid', $qidx);
+	}
+
 	$qnidx = Sanitize::onlyInt($qnidx);
 	$qidx = Sanitize::onlyInt($qidx);
 	$seed = Sanitize::onlyInt($seed);
