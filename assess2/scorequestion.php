@@ -212,7 +212,7 @@ if (count($qns) > 0) {
 
   // If it's full test, we'll score time at the assessment attempt level
   if ($assess_info->getSetting('displaymethod') === 'full') {
-    $minloaded = round(min($lastloaded)/1000); // front end sends milliseconds
+    $minloaded = round(max($lastloaded)/1000); // front end sends milliseconds
     if ($minloaded > 0) {
       $assess_record->addTotalAttemptTime($now - $minloaded);
     }
