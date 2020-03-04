@@ -41,11 +41,14 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		if (is_array($sub[$blockid])) { //make sure it's really a block
 			$blockitems = $sub[$blockid]['items'];
 			$obid = $sub[$blockid]['id'];
+			$delblockname = $sub[$blockid]['name'];
 			if (count($blockitems)>0) {
 				if (isset($_POST['delcontents']) && $_POST['delcontents']==1) { //clear out contents of block
 					require("delitembyid.php");
 					delrecurse($blockitems);
 					array_splice($sub,$blockid,1); //remove block and contained items from itemorder
+					$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+					$stm->execute(array($userid,$cid,0,time(),'deleteblock','deleted block and contents:'.$delblockname));
 				} else {
 					array_splice($sub,$blockid,1,$blockitems); //remove block, replace with items in block
 				}
@@ -98,7 +101,7 @@ if ($overwriteBody==1) {
 	<p>Are you SURE you want to delete this Block?</p>
 	<p><input type=radio name="delcontents" value="0"/>Move all items out of block<br/>
 	<input type=radio name="delcontents" value="1" checked="checked"/>Also Delete all items in block</p>
-	<p><button type=submit name="remove" value="really">Yes, Delete</button>		
+	<p><button type=submit name="remove" value="really">Yes, Delete</button>
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $cid; ?>'"></p>
 	</form>
 <?php

@@ -108,6 +108,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $stm->execute(array(':assessmentid'=>$assessmentId));
                 $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));
+								$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+								$stm->execute(array($userid,$cid,$assessmentId,time(),'addassessment','cleared all attempts'));
                 $DBH->commit();
                 header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
                         $cid, $assessmentId));
@@ -441,6 +443,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
+			$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+			$stm->execute(array($userid,$cid,$assessmentId,time(),'addassessment','modified settings'));
 			$DBH->commit();
             $rqp = Sanitize::randomQueryStringParam();
 			if ($from=='gb') {
@@ -512,6 +516,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $itemorder = serialize($items);
                 $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
                 $stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+								$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+								$stm->execute(array($userid,$cid,$newaid,time(),'addassessment','added assessment'));
                 $DBH->commit();
                 header(sprintf('Location: %s/course/addquestions.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'], $cid, $newaid));
                 exit;

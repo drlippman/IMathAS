@@ -54,6 +54,8 @@ if (!(isset($teacherid))) {
 			}
 		}
 		$DBH->commit();
+		$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+		$stm->execute(array($userid,$cid,$textid,time(),'deleteinlinetext','deleted inlinetext'));
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else {

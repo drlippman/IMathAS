@@ -53,6 +53,8 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 			}
 		}
+		$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+		$stm->execute(array($userid,$cid,$daid,time(),'deletedrillassess','deleted drill'));
 		$DBH->commit();
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 
@@ -81,7 +83,7 @@ if ($overwriteBody==1) {
 	Are you SURE you want to delete this Drill Assessment and all associated student work?
 	<form method="POST" action="deletedrillassess.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>
-	<button type=submit name="remove" value="really">Yes, Delete</button>		
+	<button type=submit name="remove" value="really">Yes, Delete</button>
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
 	</p>
 	</form>

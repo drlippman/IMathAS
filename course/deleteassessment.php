@@ -68,6 +68,8 @@ if (!(isset($teacherid))) {
 			$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=0 WHERE reqscoreaid=:assessmentid AND courseid=:courseid");
 			$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 		}
+		$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+		$stm->execute(array($userid,$cid,$aid,time(),'deleteassessment','deleted assessment'));
 		$DBH->commit();
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 

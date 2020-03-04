@@ -84,6 +84,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $stm->execute(array(':assessmentid'=>$assessmentId));
           $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
+					$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+					$stm->execute(array($userid,$cid,$assessmentId,time(),'addassessment2','cleared all attempts'));
           $DBH->commit();
           header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
                   $cid, $assessmentId));
@@ -397,6 +399,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       $qarr[':cid'] = $cid;
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
+			$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+			$stm->execute(array($userid,$cid,$assessmentId,time(),'addassessment2','modified settings'));
 
 			/*  TODO: make this work in new model
 			if ($toset['deffb']!=$curassess['deffeedbacktext']) {
@@ -522,6 +526,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       $itemorder = serialize($items);
       $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
       $stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+			$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+			$stm->execute(array($userid,$cid,$newaid,time(),'addassessment2','added assessment'));
       $DBH->commit();
       header(sprintf('Location: %s/course/addquestions.php?cid=%s&aid=%d', $GLOBALS['basesiteurl'], $cid, $newaid));
       exit;
@@ -762,7 +768,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 										$outcomeOptions[] = array(
 											'value' => '',
 											'text' => $v['name'],
-											'isgroup' => true 
+											'isgroup' => true
 										);
                     flattenarr($v['outcomes']);
                   } else {

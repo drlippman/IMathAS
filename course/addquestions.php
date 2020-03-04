@@ -155,6 +155,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':assessmentid'=>$aid));
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
+			$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+			$stm->execute(array($userid,$cid,$aid,time(),'addquestions','cleared all attempts'));
+			
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		} else {

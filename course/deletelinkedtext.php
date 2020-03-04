@@ -56,6 +56,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 			}
 		}
+		$stm = $DBH->prepare("INSERT INTO imas_audit_log (userid,courseid,typeid,time,page,details) VALUES (?,?,?,?,?,?)");
+		$stm->execute(array($userid,$cid,$textid,time(),'deletelinkedtext','deleted linkedtext'));
 		$DBH->commit();
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid . "&r=" . Sanitize::randomQueryStringParam());
 
