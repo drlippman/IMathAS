@@ -49,8 +49,8 @@ $placeinhead = '
   <style type="text/css">
    div.pagetitle h2 {
   	margin-top: 0px;
-  	}
-  div.sysnotice {
+   }
+   div.sysnotice {
    	border: 1px solid #faa;
    	background-color: #fff3f3;
    	padding: 5px;
@@ -61,7 +61,7 @@ $placeinhead = '
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 if ($myrights>15) {
-  $placeinhead .= '<script type="text/javascript">$(function() {
+	$placeinhead .= '<script type="text/javascript">$(function() {
   var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
   $(".courselist-teach li[data-cid]:not(.coursegroup)").css("clear","both").each(function (i,el) {
@@ -83,6 +83,16 @@ if ($myrights>15) {
   });
   $(".dropdown-toggle").dropdown();
   });
+  function dismisssysnotice(t,el) {
+  	var noticediv = $(el).closest(".sysnotice");
+  	$.ajax({
+  		url: imasroot+"/admin/dismisssysnotice.php?n="+t
+  	}).done(function(msg) {
+  		if (msg=="OK") {
+  			noticediv.slideUp();
+  		}
+  	});
+  }
   </script>';
 }
 $nologo = true;
@@ -365,9 +375,7 @@ if (!isset($CFG['GEN']['homelinkbox'])) {
 	if ($msgtotal>0) {
 		echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), Sanitize::onlyFloat($msgtotal)), '</a>';
 	}
-	if ($myrights > 10) {
-		echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
-	} else if ($myrights > 9) {
+	if ($myrights > 9) {
 		echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
 	}
 	if ($myrights >=75) {
@@ -398,6 +406,24 @@ echo '</h1>';
 echo '</div>';
 if (isset($_SESSION['emulateuseroriginaluser'])) {
 	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
+}
+
+if ($myrights>15) {
+	/*
+	no system messages to show right now.  For new ones, use a key other than: dd
+	$stm = $DBH->prepare("SELECT custominfo FROM imas_students WHERE courseid=1 AND userid=:userid");
+	$stm->execute(array(':userid'=>$userid));
+	$custominfo = $stm->fetchColumn(0);
+	$noticetxt = '';
+	if ($custominfo!==false) {
+		$custominfo = json_decode($custominfo,true);
+		if ($installname!='WAMAP' && ($custominfo===null || !isset($custominfo['noticedismiss']) || !isset($custominfo['noticedismiss']['dd']))) {
+			echo '<div class="sysnotice">2/13/17: There are <a href="https://www.myopenmath.com/forums/posts.php?cid=1&forum=37&thread=239763&page=1">changes coming</a> ';
+			echo 'to the mission and operation of MyOpenMath. ';
+			echo '<a href="#" onclick="dismisssysnotice(\'dd\',this);return false;" class="small">[Dismiss]</a></div>';
+		}
+	}
+	*/
 }
 if ($myrights==100 && count($brokencnt)>0) {
 	echo '<div><span class="noticetext">'.Sanitize::onlyFloat(array_sum($brokencnt)).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide</div>';
@@ -432,7 +458,6 @@ if (substr($myemail,0,7)==='BOUNCED') {
 	echo '<a href="forms.php?action=chguserinfo">'._('Edit Now').'</a>.';
 	echo '</div>';
 }
-
 
 for ($i=0; $i<3; $i++) {
 	if ($i==0) {
@@ -471,7 +496,7 @@ for ($i=0; $i<3; $i++) {
 	}
 }
 
-require('./footer.php');
+require('footer.php');
 
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $courseListOrder;
@@ -522,18 +547,14 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 
 	echo '<div class="center">';
 	if (count($data)>0) {
-		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">',_('Change Course Order'),'</a><br/>';
+		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">Change Course Order</a>';
 	}
-	//echo '</div><div class="center">';
-	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">',_('View hidden courses'),'</a> ';
-	if ($type=='teach' && count($data)>0) {
-		echo '<br/><a class="small" href="admin/forms.php?action=findstudent&from=home">',_('Find Student'),'</a> ';
-	}
+	echo '</div><div class="center">';
+	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
 	echo '</div>';
 	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
 		echo '<div class="center"><a class="abutton" href="admin/admin2.php">', _('Admin Page'), '</a></div>';
 	}
-
 	echo '</div>';
 	echo '</div>';
 }
@@ -593,7 +614,7 @@ function printCourseLine($data, $type=null) {
 	}
 	if ($shownewpostnote && isset($newpostcnt[$data['id']]) && $newpostcnt[$data['id']]>0) {
 		printf(' <a class="noticetext" href="forums/newthreads.php?from=home&cid=%d">%s</a>',$data['id'],
-		_('Posts ('.Sanitize::onlyInt($newpostcnt[$data['id']]).')'));
+			_('Posts ('.Sanitize::onlyInt($newpostcnt[$data['id']]).')'));
 		// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data['id']]), '</a>';
 	}
 	if ($type != 'teach' || ($data['ownerid']==$userid && $myrights<40) || $myrights<20) {
@@ -712,6 +733,3 @@ function printPostsGadget() {
 	echo '</div>';
 	echo '</div>';
 }
-
-
-?>
