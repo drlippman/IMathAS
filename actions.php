@@ -284,6 +284,9 @@ require_once("includes/sanitize.php");
 				echo _('If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.'),'<br/>';
 				echo sprintf(_('It may help to add %s to your contacts list.'),'<b>'.Sanitize::encodeStringForDisplay($sendfrom).'</b>'),'</p>';
 				echo '<p>',_('If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.'),'</p>';
+				if (function_exists('getInstructorSupport')) {
+					getInstructorSupport($rights);
+				}
 				require("footer.php");
 				exit;
 			} else {
