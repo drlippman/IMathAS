@@ -650,6 +650,31 @@ ul#navlist li a:hover
 background-color: #369;
 color: #fff;
 }
+
+ul#headermobilemenulist {
+	display: none;
+}
+
+ul#headermobilemenulist {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+ul#headermobilemenulist li a {
+	display: block;
+	border-bottom: 1px solid #fff;
+	color: #fff;
+	background-color: #297bbb;
+	padding: .3em 1em;
+	line-height: 1.3em;
+}
+
+ul#headermobilemenulist li a:hover, ul#headermobilemenulist li a:focus {
+	background-color: #369;
+	text-decoration: none;
+}
+
 div.pagetitle h2, div.pagetitle h1 {
 	margin: 10px 0px;
 }
