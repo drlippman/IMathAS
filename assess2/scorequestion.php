@@ -163,7 +163,7 @@ if (count($qns) > 0) {
       $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
     }
     $assessInfoOut['error'] = "already_submitted";
-    echo json_encode($assessInfoOut);
+    echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);
     exit;
   }
 
@@ -283,8 +283,8 @@ if ($end_attempt) {
       $lastResults = $assess_record->getLastRawResult($qn);
       //TODO: Need to figure out the format they should be in (for multipart)
       //TODO: Or, just don't support multipart
-      $rawscores = json_encode($lastResults['raw']);
-      $lastAnswer = json_encode($lastResults['stuans']);
+      $rawscores = json_encode($lastResults['raw'], JSON_INVALID_UTF8_IGNORE);
+      $lastAnswer = json_encode($lastResults['stuans'], JSON_INVALID_UTF8_IGNORE);
 
       $toSign = $aid.$qn.$uid.$rawscores.$lastAnswer;
       $now = time();

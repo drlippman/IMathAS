@@ -768,7 +768,7 @@
 			$qsPacket['imgUrlBase'] = "$imasroot/assessment/qimages/";
 		}
 		// Return the packet
-		exit(json_encode($qsPacket));
+		exit(json_encode($qsPacket, JSON_INVALID_UTF8_IGNORE));
 	}
 
 	/// Start display ///

@@ -144,7 +144,7 @@ class AssessRecord
     }
     if (!$this->is_practice && !empty($this->data)) {
       $fields[] = 'scoreddata';
-      $encoded = json_encode($this->data);
+      $encoded = json_encode($this->data, JSON_INVALID_UTF8_IGNORE);
       if ($encoded === false) {
         echo '{"error": "encoding_error"}';
         exit;
@@ -153,7 +153,7 @@ class AssessRecord
     }
     if ($this->is_practice && !empty($this->data)) {
       $fields[] = 'practicedata';
-      $encoded = json_encode($this->data);
+      $encoded = json_encode($this->data, JSON_INVALID_UTF8_IGNORE);
       if ($encoded === false) {
         echo '{"error": "encoding_error"}';
         exit;
@@ -221,7 +221,7 @@ class AssessRecord
     $waspractice = $this->is_practice;
     if ($this->is_practice) {
       $this->buildAssessData($recordStart);
-      $practicetosave = (!empty($this->data)) ? gzencode(json_encode($this->data)) : '';
+      $practicetosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
       $this->assessRecord['practicedata'] = $practicetosave;
       $this->setInPractice(false);
     } else {
@@ -230,7 +230,7 @@ class AssessRecord
 
     //generate scored data
     $this->buildAssessData($recordStart && !$waspractice);
-    $scoredtosave = (!empty($this->data)) ? gzencode(json_encode($this->data)) : '';
+    $scoredtosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
     $this->assessRecord['scoreddata'] = $scoredtosave;
 
     // switch back to practice if started that way

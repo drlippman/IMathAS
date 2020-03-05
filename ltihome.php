@@ -269,7 +269,7 @@ if (!empty($createcourse)) {
 		$params = array(
 			'lti_message_type' => 'ContentItemSelection',
 			'lti_version' => 'LTI-1p0',
-			'content_items' => json_encode($contentitems)
+			'content_items' => json_encode($contentitems, JSON_INVALID_UTF8_IGNORE)
 		);
 		if (!empty($sessiondata['lti_selection_data'])) {
 			$params['data'] = $sessiondata['lti_selection_data'];

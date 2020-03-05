@@ -1266,7 +1266,7 @@ if ($overwriteBody==1) {
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
-		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>;
+		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
 		//$(refreshTable);

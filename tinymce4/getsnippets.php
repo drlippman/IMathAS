@@ -10,7 +10,7 @@ if ($myrights<=10) {
 } else {
 	$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id");
 	$stm->execute(array(':id'=>$userid));
-	
+
 	$jsondata = json_decode($stm->fetchColumn(0), true);
 	if ($jsondata===null) {
 		$jsondata = array();
@@ -20,5 +20,5 @@ if ($myrights<=10) {
 	} else {
 		$snippets = array();
 	}
-	echo json_encode($snippets);
+	echo json_encode($snippets, JSON_INVALID_UTF8_IGNORE);
 }

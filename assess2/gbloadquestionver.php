@@ -79,4 +79,4 @@ $assessInfoOut = $assess_record->getGbQuestionVersionData($qn, true, $ver);
 $assess_record->saveRecordIfNeeded();
 
 //output JSON object
-echo json_encode($assessInfoOut);
+echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

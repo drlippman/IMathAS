@@ -196,7 +196,7 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 		'scores' => $rawscores,
 		'jwt' => $jwtstring
 	);
-	echo '<script type="text/javascript">window.parent.postMessage(JSON.stringify('.json_encode($scoremessage,JSON_HEX_TAG).'), "*");</script>';
+	echo '<script type="text/javascript">window.parent.postMessage(JSON.stringify('.json_encode($scoremessage,JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE).'), "*");</script>';
 	exit;
 }
 

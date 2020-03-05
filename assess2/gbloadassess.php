@@ -193,4 +193,4 @@ $assess_record->saveRecordIfNeeded();
 prepDateDisp($assessInfoOut);
 
 //output JSON object
-echo json_encode($assessInfoOut);
+echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

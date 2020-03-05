@@ -2,7 +2,7 @@
 //IMathAS:  Copy Course Items course list
 
 if (isset($_GET['loadothergroup']) || isset($_GET['loadothers']) || isset($_POST['cidlookup'])) {
-	require("../init.php");	
+	require("../init.php");
 }
 
 if (!isset($myrights) || $myrights<20) {
@@ -21,11 +21,11 @@ if (isset($_POST['cidlookup'])) {
 	} else {
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		$out = array(
-			"id"=>Sanitize::onlyInt($row['id']), 
+			"id"=>Sanitize::onlyInt($row['id']),
 			"name"=>Sanitize::encodeStringForDisplay($row['name'] . ' ('.$row['LastName'].', '.$row['FirstName'].')'),
 			"termsurl"=>Sanitize::url($row['termsurl']));
 		$out['needkey'] = !($row['copyrights'] == 2 || ($row['copyrights'] == 1 && $row['groupid']==$groupid));
-		echo json_encode($out);
+		echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
 	}
 	exit;
 } else if (isset($_GET['loadothers'])) {
@@ -60,7 +60,7 @@ if (isset($_POST['cidlookup'])) {
 		$myCourses[$line['id']] = $line;
 		$myCoursesDefaultOrder[] = $line['id'];
 	}
-	
+
 	$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
 	$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=:groupid AND iu.id<>:userid AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,it.userid,ic.name";
 	$courseTreeResult = $DBH->prepare($query);
@@ -89,7 +89,7 @@ function printCourseOrder($order, $data, &$printed) {
 			printCourseLine($data[$item]);
 			$printed[] = $item;
 		}
-	}		
+	}
 }
 function printCourseLine($data) {
 	echo '<li><span class=dd>-</span> ';
@@ -228,7 +228,7 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 	 }
 
 } else {  //display course list selection
-?>	
+?>
 	<ul class=base>
 <?php
 	if (!isset($skipthiscourse)) {
@@ -379,8 +379,8 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 	}
 ?>
 	</ul>
-	
-	<p>Or, lookup using course ID: 
+
+	<p>Or, lookup using course ID:
 		<input type="text" size="7" id="cidlookup" />
 		<button type="button" onclick="lookupcid()">Look up course</button>
 		<span id="cidlookupout" style="display:none;"><br/>

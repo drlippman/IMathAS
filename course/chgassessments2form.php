@@ -687,7 +687,7 @@ $vueData = array(
 
 var app = new Vue({
 	el: '#app',
-  data: <?php echo json_encode($vueData); ?>,
+  data: <?php echo json_encode($vueData, JSON_INVALID_UTF8_IGNORE); ?>,
 	computed: {
 		coreSet: function() {
 			let tot = (this.subtype === 'DNC' ? 0 : 1) +
