@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-05 17:04+0100\n"
-"PO-Revision-Date: 2020-03-05 17:42+0100\n"
+"POT-Creation-Date: 2020-03-05 22:02+0100\n"
+"PO-Revision-Date: 2020-03-05 22:09+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +23,7 @@ msgstr ""
 #: assessment/showtest.php:2740 assessment/showtest.php:2942 forms.php:114
 #: forms.php:393 forms.php:409 forms.php:430 javascript/livepoll.js:123
 #: multiembedq.php:188 multiembedq.php:284 admin/forms.php:1211
-#: directaccess.php:135
+#: directaccess.php:135 course/testquestion.php:275
 msgid "Submit"
 msgstr "Absenden"
 
@@ -437,7 +437,7 @@ msgstr ""
 #: course/courseshowitems.php:2368 course/courseshowitems.php:2415
 #: course/moddataset.php:649
 msgid "Modify"
-msgstr "Anpassen"
+msgstr "Bearbeiten"
 
 #: admin/admin2.php:248 admin/admin2.php:261 admin/admin2.php:292
 #: admin/admin2.php:311 admin/diagonetime.php:150 admin/forms.php:71
@@ -544,7 +544,7 @@ msgstr "Diagnose-Einstellungen"
 
 #: admin/diagsetup.php:391 admin/ltiuserprefs.php:22
 #: course/viewforumgrade.php:85 actions.php:809 course/addquestions.php:1280
-#: actions.php:806 actions.php:805
+#: actions.php:806 actions.php:805 course/sendmsgmodal.php:105
 msgid "Done"
 msgstr "Erledigt"
 
@@ -3984,7 +3984,7 @@ msgid "Question ID: "
 msgstr "FragenID: "
 
 #: assessment/testutil.php:809 assessment/testutil.php:816
-#: course/testquestion.php:328
+#: course/testquestion.php:328 course/testquestion.php:326
 msgid "License"
 msgstr "Lizenz"
 
@@ -7507,7 +7507,7 @@ msgstr "Von:"
 msgid "Course:"
 msgstr "Kurs:"
 
-#: includes/email.php:100
+#: includes/email.php:100 course/sendmsgmodal.php:190
 msgid "Subject:"
 msgstr "Betreff:"
 
@@ -10174,7 +10174,7 @@ msgstr ""
 "ein Kurselement aus."
 
 #: course/addquestions.php:28 course/addlinkedtext.php:51
-#: course/moddataset.php:17 course/copyitems.php:27
+#: course/moddataset.php:17 course/copyitems.php:27 course/testquestion.php:20
 msgid "You need to log in as a teacher to access this page"
 msgstr "Sie müssen sich als Dozent anmelden um auf diese Seite zuzugreifen"
 
@@ -11334,6 +11334,8 @@ msgid "assign to variable:"
 msgstr "zuordnen zur Variablen:"
 
 #: course/moddataset.php:1187 course/moddataset.php:1203
+#: course/testquestion.php:312
+#, php-format
 msgid "Description:"
 msgstr "Beschreibung:"
 
@@ -12085,3 +12087,162 @@ msgstr "Für Studierende nicht verfügbar. Verfügbar von %s bis %s"
 #, php-format
 msgid "This assessment is housed in course ID %s"
 msgstr "Dieser Test befindet sich im Kurs mit der ID %s"
+
+#: course/testquestion.php:14
+msgid "Test Question"
+msgstr "Frage testen"
+
+#: course/testquestion.php:66
+msgid "Score on last answer: "
+msgstr "Punkte für letzte Antwort: "
+
+#: course/testquestion.php:149
+msgid "Oops, error toggling the flag"
+msgstr "Ups, Fehler beim Umschalten"
+
+#: course/testquestion.php:152
+msgid "Couldn't save changes:"
+msgstr "Konnte Änderungen nicht speichern:"
+
+#: course/testquestion.php:159
+msgid ""
+"Make sure you also contact the question author or support so they know why "
+"you marked the question as broken"
+msgstr ""
+"Bitte informieren Sie auch den Autor der Frage oder den Support, damit sie "
+"wissen, warum Sie diese Frage als fehlerhaft markiert haben"
+
+#: course/testquestion.php:275
+msgid "Submit and Regen"
+msgstr "Abschicken und Neue Version"
+
+#: course/testquestion.php:276
+msgid "White Background"
+msgstr "Weißer Hintergrund"
+
+#: course/testquestion.php:277
+msgid "Show HTML"
+msgstr "HTML anzeigen"
+
+#: course/testquestion.php:290
+msgid "Message owner"
+msgstr "Eigentümer benachrichtigen"
+
+#: course/testquestion.php:294
+msgid "Email owner"
+msgstr "Mail an den Eigentümer"
+
+#: course/testquestion.php:309
+#, php-format
+msgid "Question id:"
+msgstr "Frage-ID:"
+
+#: course/testquestion.php:310
+msgid "to report problems"
+msgstr "um Probleme zu melden"
+
+#: course/testquestion.php:312
+#, php-format
+msgid "Author:"
+msgstr "Autor:"
+
+#: course/testquestion.php:314
+msgid "Last Modified:"
+msgstr "Zuletzt modifiziert:"
+
+#: course/testquestion.php:316
+msgid ""
+"This question has been marked for deletion.  This might indicate there is an "
+"error in the question. "
+msgstr ""
+"Diese Frage ist zum Löschen vorgesehen. Das könnte darauf hindeuten, dass es "
+"in der Frage einen Fehler gibt. "
+
+#: course/testquestion.php:317
+msgid "It is recommended you discontinue use of this question when possible"
+msgstr ""
+"Es wird empfohlen, dass Sie diese Frage nicht mehr verwenden, falls möglich"
+
+#: course/testquestion.php:320
+#, php-format
+msgid ""
+"This message has been marked as deprecated, and it is recommended you use "
+"question ID %s instead.  You can find this question by searching all "
+"libraries with the ID number as the search term"
+msgstr ""
+"Diese Frage wurde als veraltet markiert. Es wird empfohlen, stattdessen die "
+"Frage mit der ID %s zu nehmen. Sie können diese Frage finden, indem sie in "
+"allen Bibliotheken nach der Fragen-ID suchen"
+
+#: course/testquestion.php:323
+msgid ""
+"This question has been marked as broken.  This indicates there might be an "
+"error with this question.  Use with caution."
+msgstr ""
+"Diese Frage wurde als fehlerhaft markiert. Das deutet darauf hin, dass es "
+"ein Problem mit der Frage geben könnte. Vor der Verwendung testen."
+
+#: course/testquestion.php:323
+msgid "Unmark as broken"
+msgstr "Markierung als fehlerhaft aufheben"
+
+#: course/testquestion.php:330
+msgid "Other Attribution: "
+msgstr "Zusätzliche Bedingungen: "
+
+#: course/testquestion.php:334
+msgid "Question is in these libraries:"
+msgstr "Die Frage ist in diesen Bibliotheken:"
+
+#: course/testquestion.php:346
+msgid "Derived from:"
+msgstr "Abgeleitet von:"
+
+#: course/testquestion.php:348
+msgid "Created by: "
+msgstr "Angelegt von: "
+
+#: course/testquestion.php:352
+msgid "Derived from work by: "
+msgstr "Abgeleitet von Fragen von: "
+
+#: course/testquestion.php:355
+msgid "UniqueID: "
+msgstr "Eindeutige ID: "
+
+#: course/sendmsgmodal.php:9
+#, php-format
+msgid ""
+"You are not enrolled in this course.  Please return to the %s Home Page%s "
+"and enroll"
+msgstr ""
+"Sie sind nicht in diesem Kurs eingeschrieben.  Bitte gehen Sie zu %s Ihrer "
+"Starttseite %s zurück und schreiben Sie sich ein"
+
+#: course/sendmsgmodal.php:26
+msgid "Marked Broken"
+msgstr "Als fehlerhaft markiert"
+
+#: course/sendmsgmodal.php:39
+msgid "This message was also sent to the question owner."
+msgstr "Diese Nachricht wurde auch an den Eigentümer der Frage gesendet."
+
+#: course/sendmsgmodal.php:134
+msgid "Problem with question ID "
+msgstr "Problem mit Frage ID "
+
+#: course/sendmsgmodal.php:179
+msgid "New Message"
+msgstr "Neue Nachricht"
+
+#: course/sendmsgmodal.php:182
+msgid "New Email"
+msgstr "Neue E-Mail"
+
+#: course/sendmsgmodal.php:189
+msgid "To:"
+msgstr "An:"
+
+#: course/sendmsgmodal.php:191
+msgid "Message:"
+msgstr "Nachricht:"
