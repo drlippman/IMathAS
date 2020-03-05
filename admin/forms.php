@@ -396,7 +396,7 @@ switch($_GET['action']) {
 					echo '<span class="formright">'.Sanitize::encodeStringForDisplay($line['ltisecret']).'</span><br class="form" />';
 
 					if (!empty($CFG['LTI']['showURLinSettings'])) {
-						echo '<span class="form">LTI Launch URL (if needed):</span>';
+						echo '<span class="form">',_('LTI Launch URL (if needed):'),'</span>';
 						echo '<span class="formright">'.Sanitize::encodeStringForDisplay($basesiteurl).'/bltilaunch.php</span><br class="form" />';
 					}
 					echo '</div>';
@@ -842,7 +842,7 @@ switch($_GET['action']) {
 					echo '</div>';
 				}
 				if (!empty($CFG['LTI']['showURLinSettings'])) {
-					echo '<span class="form">LTI Launch URL (if needed):</span>';
+					echo '<span class="form">',_('LTI Launch URL (if needed):'),'</span>';
 					echo '<span class="formright">'.Sanitize::encodeStringForDisplay($basesiteurl).'/bltilaunch.php</span><br class="form" />';
 				}
 			}
