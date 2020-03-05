@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-05 15:59+0100\n"
-"PO-Revision-Date: 2020-03-05 16:13+0100\n"
+"POT-Creation-Date: 2020-03-05 17:04+0100\n"
+"PO-Revision-Date: 2020-03-05 17:42+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -244,7 +244,7 @@ msgstr ""
 
 #: admin/addcourse.php:72 admin/forms.php:1382 assess2/AssessUtils.php:174
 #: assessment/showtest.php:1765 assessment/showtest.php:2701
-#: assessment/showtest.php:3558
+#: assessment/showtest.php:3558 ltihome.php:291
 msgid "Continue"
 msgstr "Fortfahren"
 
@@ -785,7 +785,7 @@ msgstr "Kurselemente importieren"
 
 #: admin/importitems2.php:184 admin/listdiag.php:123 admin/userlti.php:195
 #: index.php:610 index.php:673 index.php:612 index.php:675 header.php:266
-#: header.php:267 index.php:616 index.php:679
+#: header.php:267 index.php:616 index.php:679 ltihome.php:410
 msgid "Course"
 msgstr "Kurs"
 
@@ -968,7 +968,7 @@ msgstr "Wieder auf der Kursliste anzeigen"
 #: admin/unhidefromcourselist.php:76 admin/userdetails.php:396
 #: admin/userreportdetails.php:519 course/courseshowitems.php:133
 #: course/courseshowitems.php:2168 course/courseshowitems.php:2170
-#: course/gradebook.php:455 index.php:70
+#: course/gradebook.php:455 index.php:70 ltihome.php:474
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -3700,7 +3700,7 @@ msgstr "Fragen-Navigation"
 
 #: assessment/showtest.php:3040 assessment/showtest.php:3382
 #: course/course.php:511 course/courseshowitems.php:132
-#: course/courseshowitems.php:2166
+#: course/courseshowitems.php:2166 ltihome.php:475
 msgid "Questions"
 msgstr "Fragen"
 
@@ -4630,7 +4630,7 @@ msgstr "Import"
 msgid "Mass Change"
 msgstr "Serienänderung"
 
-#: course/course.php:536 course/course.php:538
+#: course/course.php:536 course/course.php:538 ltihome.php:403
 msgid "Assessments"
 msgstr "Tests"
 
@@ -5156,7 +5156,7 @@ msgstr "Außerhalb des Blocks"
 msgid "NewFlag"
 msgstr "NewFlag"
 
-#: course/courseshowitems.php:2138
+#: course/courseshowitems.php:2138 ltihome.php:463
 #, php-format
 msgid "Available until %s"
 msgstr "Verfügbar bis %s"
@@ -8818,7 +8818,7 @@ msgstr "Fälligkeitsdatum"
 msgid "The course setting is enabled for dates to be set via LTI."
 msgstr "Freischaltung erfolgt über LTI."
 
-#: course/addassessment2form.php:156
+#: course/addassessment2form.php:156 ltihome.php:449
 msgid "Waiting for the LMS to send a date"
 msgstr "Warte auf Daten vom LMS"
 
@@ -11753,7 +11753,7 @@ msgstr "Meine Kurse"
 msgid "My Group's Courses"
 msgstr "Kurse meiner Gruppe"
 
-#: includes/coursecopylist.php:362
+#: includes/coursecopylist.php:362 ltihome.php:361
 msgid "Group Template Courses"
 msgstr "Kursvorlagen der Gruppe"
 
@@ -11877,3 +11877,211 @@ msgid ""
 "If you do not already have an account on %s, please visit the site to "
 "request an account."
 msgstr ""
+"Wenn Sie noch keine Kennung bei %s haben, so besuchen Sie auf der Seite des "
+"Systems und eine Kennung beantragen."
+
+#: ltihome.php:7
+msgid "Not authorized to view this page"
+msgstr "Sie sind nicht berechtigt, diese Seite anzuzeigen"
+
+#: ltihome.php:330
+msgid "Link courses"
+msgstr "Kurse verbinden"
+
+#: ltihome.php:333
+msgid ""
+"Select a course to link with.  If it is a template course, a copy will be "
+"created for you:"
+msgstr ""
+"Wählen Sie den Kurs zu dem Sie eine Verbindung herstellen möchten. Wenn dies "
+"eine Kursvorlage ist, so wird daraus für Sie ein Kurs erstellt:"
+
+#: ltihome.php:337
+msgid "Your Courses"
+msgstr "Ihre Kurse"
+
+#: ltihome.php:345
+msgid "Template Courses"
+msgstr "Kursvorlagen"
+
+#: ltihome.php:373
+#, php-format
+msgid ""
+"This course has special %s Terms of Use %s.  By copying this course, you "
+"agree to these terms."
+msgstr ""
+"Dieser Kurs hat besondere %s Nutzungsbedingungen %s. Indem Sie diesen Kurs "
+"kopieren, stimmen Sie diesen Bedingungen zu."
+
+#: ltihome.php:374
+msgid "Link Course"
+msgstr "Kurs verbinden"
+
+#: ltihome.php:375
+#, php-format
+msgid ""
+"If you want to create a new course, log directly into %s to create new "
+"courses"
+msgstr ""
+"Wenn Sie einen neuen Kurs erstellen möchten, so melden Sie sich direkt in %s "
+"an um neue Kurse anzulegen"
+
+#: ltihome.php:379
+msgid "Link Assignment"
+msgstr "Test verbinden"
+
+#: ltihome.php:381
+msgid "Link Resource"
+msgstr "Kursmaterial verbinden"
+
+#: ltihome.php:384
+#, php-format
+msgid "This placement on your LMS has not yet been linked to content on %s. "
+msgstr ""
+"Dieses Element in Ihrem LMS wurde noch nicht mit Inhalten auf %s verbunden. "
+
+#: ltihome.php:386
+msgid "Select the assessment you'd like to use: "
+msgstr "Wählen Sie den Test, den Sie verninden möchten: "
+
+#: ltihome.php:388
+msgid ""
+"You can either do a full course placement, in which case all content of the "
+"course is available from this one placement, or you can place an individual "
+"assessment. In both cases, grades will not be returned if you set up the "
+"link in this way. "
+msgstr ""
+"Sie können hier einen ganzen Kurs mit allen Inhalten verbinden oder Sie "
+"können einen einzelnen Test verbinden. Wenn Sie dies so vornehmen, so werden "
+"in keinem der beiden Fälle Bewertungen übertragen. "
+
+#: ltihome.php:389
+msgid "For grade return, you need to create a new assignment link instead."
+msgstr ""
+"Um Bewertungen zu übertragen benötigen Sie stattdessen eine neue Verbindung "
+"zu einem Test."
+
+#: ltihome.php:390
+msgid "Select the placement you'd like to make: "
+msgstr "Wählen Sie die Verbindung, die Sie herstellen möchten: "
+
+#: ltihome.php:392
+msgid ""
+"You can either do a full course placement, in which case all content of the "
+"course is available from this one placement (but no grades are returned), or "
+"you can place an individual assessment (and grades will be returned, if "
+"supported by your LMS).  Select the placement you'd like to make: "
+msgstr ""
+"Sie können entweder einen ganzen Kurs mit allen seinen Inhalten verbinden "
+"(dann werden keine Bewertungen an das LMS zurückgegeben) oder Sie können "
+"eine Verbindung zu einem einzelnen Test herstellen(dann werden Bewertungen "
+"zurückgegeben, falls das LMS das unterstützt). Wählen Sie die Verbindung, "
+"die Sie herstellen möchten: "
+
+#: ltihome.php:398 ltihome.php:411
+msgid "Whole Course Placement"
+msgstr "Ganzen Kurs verbinden"
+
+#: ltihome.php:415
+msgid "Make Placement"
+msgstr "Verbindung herstellen"
+
+#: ltihome.php:416
+#, php-format
+msgid "If you want to create new assessments, log directly into %s"
+msgstr ""
+"Wenn Sie neue Tests erstellen wollen, so melden Sie sich direkt in %s an"
+
+#: ltihome.php:417
+#, php-format
+msgid "If your LMS course is linked with the wrong course on %s, "
+msgstr "Wenn Ihr LMS-Kurs mit dem falschen Kurs auf %s verbunden ist, "
+
+#: ltihome.php:418
+msgid "Are you SURE you want to do this? This may break existing placements."
+msgstr ""
+"Sind Sie SICHER, dass Sie das tun wollen? Dies stört existierende "
+"Verbindungen."
+
+#: ltihome.php:418
+msgid "Change course link"
+msgstr "Kurs-Verbindung ändern"
+
+#: ltihome.php:421
+msgid "LTI Placement of whole course"
+msgstr "LTI-Verbindung eines ganzen Kurses"
+
+#: ltihome.php:422
+msgid "Enter course"
+msgstr "Zum Kurs"
+
+#: ltihome.php:423 ltihome.php:477
+msgid "Change placement"
+msgstr "Verbindung ändern"
+
+#: ltihome.php:428
+#, php-format
+msgid "LTI Placement of %s"
+msgstr "LTI-Verbindung von %s"
+
+#: ltihome.php:430 ltihome.php:436
+msgid "Preview assessment"
+msgstr "Test-Vorschau"
+
+#: ltihome.php:431 ltihome.php:437
+msgid "Grade list"
+msgstr "Ergebnisübersicht"
+
+#: ltihome.php:433 ltihome.php:439
+msgid "Item Analysis"
+msgstr "Detail-Analyse"
+
+#: ltihome.php:447
+msgid "Currently unavailable to students."
+msgstr "Für Studierende nicht verfügbar."
+
+#: ltihome.php:451
+#, php-format
+msgid "Default due date set by LMS. Available until: %s."
+msgstr "Standard-Fälligkeit vom LMS gesetzt. Fällig am: %s."
+
+#: ltihome.php:454
+msgid ""
+"This default due date was set by the date reported by the LMS in your "
+"instructor launch, and may change when the first student launches the "
+"assignment. "
+msgstr ""
+"Dieses Standard-Fälligkeitsdatum wurde gesetzt, als Sie den Test als Dozent "
+"gestartet haben. Es kann sich ändern, wenn der erste Studierende den Test "
+"startet. "
+
+#: ltihome.php:456
+msgid "This default due date was set by the first student launch. "
+msgstr ""
+"Dieses Standard-Fälligkeitsdatum wurde durch den ersten Start durch einen "
+"Studierenden gesetzt. "
+
+#: ltihome.php:458
+msgid ""
+"Be aware some LMSs will send unexpected dates on instructor launches, so "
+"don't worry if the date shown in the assessment preview is different than "
+"you expected or different than the default due date. "
+msgstr ""
+"Achtung: Einige LMSsenden unerwartete Daten, wenn die Verbindung durch einen "
+"Dozenten gestartet wird. Wundern Sie sich deshalb nicht, wenn Die Test-"
+"Vorschau anders als erwartet aussieht oder wenn das Fälligkeitsdatum anders "
+"ist. "
+
+#: ltihome.php:462
+msgid "Currently available to students."
+msgstr "Für Studierende verfügbar."
+
+#: ltihome.php:465
+#, php-format
+msgid "Currently unavailable to students. Available %s until %s"
+msgstr "Für Studierende nicht verfügbar. Verfügbar von %s bis %s"
+
+#: ltihome.php:479
+#, php-format
+msgid "This assessment is housed in course ID %s"
+msgstr "Dieser Test befindet sich im Kurs mit der ID %s"
