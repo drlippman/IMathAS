@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-05 12:34+0100\n"
-"PO-Revision-Date: 2020-03-05 12:35+0100\n"
+"POT-Creation-Date: 2020-03-05 15:59+0100\n"
+"PO-Revision-Date: 2020-03-05 16:13+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1104,7 +1104,7 @@ msgstr "Benutzerverbindungen über LTI"
 
 #: admin/userlti.php:175 admin/userlti.php:197
 msgid "Key:org"
-msgstr "Key.org"
+msgstr "Key:org"
 
 #: admin/userlti.php:176
 msgid "Remote Userid"
@@ -3008,7 +3008,7 @@ msgstr ""
 #: bltilaunch.php:1778 course/courseshowitems.php:903
 #: course/courseshowitems.php:939 course/courseshowitems.php:970
 #: course/courseshowitems.php:1554 course/courseshowitems.php:1601
-#: course/gradebook.php:862 forums/thread.php:171
+#: course/gradebook.php:862 forums/thread.php:171 bltilaunch.php:1775
 msgid "Use LatePass"
 msgstr "Verspätet einreichen"
 
@@ -6910,10 +6910,12 @@ msgid "Your window to complete this diagnostic has expired."
 msgstr "Ihr Zeitfenster zum Abschließen dieses Diagnose-Tests ist abgelaufen."
 
 #: diag/index.php:360 forms.php:45 diag/index.php:370 directaccess.php:263
+#: bltilaunch.php:432
 msgid "Enter First Name:"
 msgstr "Vorname:"
 
 #: diag/index.php:361 forms.php:46 diag/index.php:371 directaccess.php:264
+#: bltilaunch.php:433
 msgid "Enter Last Name:"
 msgstr "Nachname:"
 
@@ -6970,19 +6972,19 @@ msgstr "Punkte für letzte Frage:"
 msgid "New Student Signup"
 msgstr "Als Student registrieren"
 
-#: forms.php:43 directaccess.php:261
+#: forms.php:43 directaccess.php:261 bltilaunch.php:430
 msgid "Choose a password:"
 msgstr "Passwort wählen:"
 
-#: forms.php:44 directaccess.php:262
+#: forms.php:44 directaccess.php:262 bltilaunch.php:431
 msgid "Confirm password:"
 msgstr "Passwort bestätigen:"
 
-#: forms.php:47 forms.php:169 directaccess.php:265
+#: forms.php:47 forms.php:169 directaccess.php:265 bltilaunch.php:434
 msgid "Enter E-mail address:"
 msgstr "E-Mail-Adresse eingeben:"
 
-#: forms.php:48 forms.php:170 directaccess.php:271
+#: forms.php:48 forms.php:170 directaccess.php:271 bltilaunch.php:435
 msgid "Notify me by email when I receive a new message:"
 msgstr "Benachrichtige mich per E-Mail, wenn ich eine neue Nachricht erhalte:"
 
@@ -10078,9 +10080,9 @@ msgid ""
 "it looks like your school may already have a school-wide LTI key and secret "
 "established - check with your LMS admin. "
 msgstr ""
-"es sieht so aus, als ob Ihre Einrichtung Key und Secret für die LTI-"
-"Verbindung bereits für alle eingerichtet hat - setzen Sie sich mit dem "
-"Administrator Ihres LMS in Verbindung. "
+"es sieht so aus, als ob Ihre Einrichtung Schlüssel (Key) und Passwort "
+"(Secret) für die LTI-Verbindung bereits für alle eingerichtet hat - setzen "
+"Sie sich mit dem Administrator Ihres LMS in Verbindung. "
 
 #: admin/actions.php:919
 msgid "If so, you will not need to set up a course-level configuration. "
@@ -10092,8 +10094,8 @@ msgid ""
 "If you do need to set up a course-level configuration for some reason, the "
 "key and secret can be found in your course settings"
 msgstr ""
-"Wenn Sie eine Konfiguration auf Kursebene benötigen, so finden Sie Key und "
-"Secret in Ihren Kurseinstellungen"
+"Wenn Sie eine Konfiguration auf Kursebene benötigen, so finden Sie Schlüssel "
+"(Key) und Passwort (Secret) für die LTI-Verbindung in Ihren Kurseinstellungen"
 
 #: admin/actions.php:922
 msgid ""
@@ -10102,8 +10104,8 @@ msgid ""
 "key and secret established."
 msgstr ""
 "so ist hier die Information, die Sie benötigen um die LTI-Verbindung auf "
-"Kursebene zu konfigurieren, da Ihre Einrichtung anscheinend Key und Secret "
-"nicht global eingerichtet hat."
+"Kursebene zu konfigurieren, da Ihre Einrichtung anscheinend Schlüssel (Key) "
+"und Passwort (Secret) nicht global eingerichtet hat."
 
 #: admin/actions.php:925
 msgid ""
@@ -10849,7 +10851,7 @@ msgid "Invalid tool_state"
 msgstr "Ungültiger tool_state"
 
 #: bltilaunch.php:132 bltilaunch.php:193 bltilaunch.php:1688
-#: bltilaunch.php:1750
+#: bltilaunch.php:1750 bltilaunch.php:1685 bltilaunch.php:1747
 msgid ""
 "No authorized session exists. This is most likely caused by your browser "
 "blocking third-party cookies.  Please adjust your browser settings and try "
@@ -10861,23 +10863,29 @@ msgstr ""
 
 #: bltilaunch.php:165 bltilaunch.php:834 bltilaunch.php:1349
 #: bltilaunch.php:1722 bltilaunch.php:2123 bltilaunch.php:2163
-#: bltilaunch.php:2503
+#: bltilaunch.php:2503 bltilaunch.php:831 bltilaunch.php:1346
+#: bltilaunch.php:1719 bltilaunch.php:2120 bltilaunch.php:2160
+#: bltilaunch.php:2500
 msgid "This assignment does not appear to exist anymore."
 msgstr "Es sieht so aus, als ob dieser Test nicht mehr existiert."
 
-#: bltilaunch.php:482 bltilaunch.php:2031
+#: bltilaunch.php:482 bltilaunch.php:2031 bltilaunch.php:479
+#: bltilaunch.php:2028
 msgid "No session recorded"
 msgstr "Keine Sitzung aufgezeichnet"
 
 #: bltilaunch.php:495 bltilaunch.php:1440 bltilaunch.php:2550
+#: bltilaunch.php:492 bltilaunch.php:1437 bltilaunch.php:2547
 msgid "invalid course identifier in folder view launch"
 msgstr "ungültige Kurs-ID beim Start der Ordner-Ansicht"
 
 #: bltilaunch.php:517 bltilaunch.php:1462 bltilaunch.php:2586
+#: bltilaunch.php:514 bltilaunch.php:1459 bltilaunch.php:2583
 msgid "invalid folder identifier in folder view launch"
 msgstr "Ungültige Ordner-ID beim Start der Ordner-Ansicht"
 
-#: bltilaunch.php:528 bltilaunch.php:2042
+#: bltilaunch.php:528 bltilaunch.php:2042 bltilaunch.php:525
+#: bltilaunch.php:2039
 msgid ""
 "Insufficient launch information. This might indicate your browser is set to "
 "restrict third-party cookies. Check your browser settings and try again"
@@ -10886,24 +10894,27 @@ msgstr ""
 "Browser Cookies von Dritten zu sehr einschränkt. Prüfen Sie Ihre Browser-"
 "Einstellungen und versuchen Sie es erneut"
 
-#: bltilaunch.php:534 bltilaunch.php:2048
+#: bltilaunch.php:534 bltilaunch.php:2048 bltilaunch.php:531
+#: bltilaunch.php:2045
 msgid "Unable to launch - User information not provided (user_id is required)"
 msgstr ""
 "Kann nicht starten - Benutzerinformation fehlt (user_id ist erforderlich)"
 
-#: bltilaunch.php:543 bltilaunch.php:2057
+#: bltilaunch.php:543 bltilaunch.php:2057 bltilaunch.php:540
+#: bltilaunch.php:2054
 msgid ""
 "Unable to launch - Course information not provided (context_id is required)"
 msgstr ""
 "Kann nicht starten - Kurs-Information nicht angegeben (context_id ist "
 "erforderlich)"
 
-#: bltilaunch.php:567 bltilaunch.php:2081
+#: bltilaunch.php:567 bltilaunch.php:2081 bltilaunch.php:564
+#: bltilaunch.php:2078
 msgid "Unable to launch - oauth_consumer_key (resource key) is required"
 msgstr ""
 "Kann nicht starten - oauth_consumer_key (resource key) ist erforderlich"
 
-#: bltilaunch.php:959
+#: bltilaunch.php:959 bltilaunch.php:956
 msgid ""
 "Course link not established yet.  Notify your instructor they need to click "
 "this assignment to set it up."
@@ -10911,15 +10922,17 @@ msgstr ""
 "Verbindung zum Kurs noch nicht hergestellt. Informieren Sie Ihren Dozenten, "
 "dass er auf diesen Test klicken muss um ihn einzurichten."
 
-#: bltilaunch.php:1276 bltilaunch.php:2468
+#: bltilaunch.php:1276 bltilaunch.php:2468 bltilaunch.php:1273
+#: bltilaunch.php:2465
 msgid "This placement is not yet set up"
 msgstr "Dieser Test ist noch nicht eingerichtet"
 
-#: bltilaunch.php:1291 bltilaunch.php:2477
+#: bltilaunch.php:1291 bltilaunch.php:2477 bltilaunch.php:1288
+#: bltilaunch.php:2474
 msgid "Invalid placement type"
 msgstr "Ungültiger Test-Typ"
 
-#: bltilaunch.php:1318
+#: bltilaunch.php:1318 bltilaunch.php:1315
 msgid ""
 "You are not an instructor on the course and folder this link is pointing to. "
 "Auto-copying is not currently supported for folder-level links."
@@ -10927,7 +10940,7 @@ msgstr ""
 "Sie sind in dem Kurs und Ordner, auf den dieser Link zeigt. Für Links auf "
 "Ordner-Niveau wird Auto-Kopie gegenwärtig nicht unterstützt."
 
-#: bltilaunch.php:1321
+#: bltilaunch.php:1321 bltilaunch.php:1318
 msgid ""
 "Course connection not established yet.  Notify your instructor they need to "
 "click this link to set it up."
@@ -10935,31 +10948,33 @@ msgstr ""
 "Verbindung zum Kurs noch nicht hergestellt. Informieren Sie Ihren Dozenten, "
 "dass er auf diesen Test klicken muss um ihn einzurichten."
 
-#: bltilaunch.php:1326
+#: bltilaunch.php:1326 bltilaunch.php:1323
 msgid ""
 "This course in the LMS is not associated with the course this link is "
 "pointing to."
 msgstr ""
 "Dieser Kurs im LMS ist mit dem Kurs, auf den der Link zeigt, nicht verbunden."
 
-#: bltilaunch.php:1339 bltilaunch.php:2493
+#: bltilaunch.php:1339 bltilaunch.php:2493 bltilaunch.php:1336
+#: bltilaunch.php:2490
 msgid "This course is not available"
 msgstr "Dieser Kurs ist nicht verfügbar"
 
-#: bltilaunch.php:1467 bltilaunch.php:2591
+#: bltilaunch.php:1467 bltilaunch.php:2591 bltilaunch.php:1464
+#: bltilaunch.php:2588
 msgid "invalid key. unknown action type"
 msgstr "ungültiger Key. ungültiger ActionType"
 
-#: bltilaunch.php:2356
+#: bltilaunch.php:2356 bltilaunch.php:2353
 msgid "Course link not established yet"
 msgstr "Kurs-Link noch nicht eingerichtet"
 
-#: bltilaunch.php:2446
+#: bltilaunch.php:2446 bltilaunch.php:2443
 #, php-format
 msgid "Error.  Assessment ID %s not found."
 msgstr "Fehler. Test-ID %s nicht gefunden."
 
-#: bltilaunch.php:2560
+#: bltilaunch.php:2560 bltilaunch.php:2557
 msgid "not authorized to view folders in this course"
 msgstr "nicht berechtigt, Ordner in diesem Kurs anzusehen"
 
@@ -11773,3 +11788,92 @@ msgstr "Kurse von anderen"
 #: includes/coursecopylist.php:385
 msgid "Look up course"
 msgstr "Kurs suchen"
+
+#: admin/forms.php:399 admin/forms.php:845
+msgid "LTI Launch URL (if needed):"
+msgstr "LTI-URL (wenn benötigt)"
+
+#: bltilaunch.php:46
+msgid "This launch was made insecurely (using http instead of https). "
+msgstr "Diese Verbindung ist nicht sicher (http statt https). "
+
+#: bltilaunch.php:47
+#, php-format
+msgid "%s requires secure launches to protect student data. "
+msgstr ""
+"%s erfordert eine sichere Verbindung um die Daten der Studierenden zu "
+"schützen. "
+
+#: bltilaunch.php:50
+msgid "Please update the links or tool in the LMS to use https (aka SSL). "
+msgstr ""
+"Bitte korrigieren Sie die Verbindungsdaten im LMS um https bzw. SSL zu "
+"verwenden. "
+
+#: bltilaunch.php:52
+msgid ""
+"In Moodle, you can do this by clicking the \"Edit preconfigured tool\" icon, "
+"scrolling down to Privacy, and clicking the Force SSL checkbox. "
+msgstr ""
+"In Moodle können Sie dazu auf \"Edit preconfigured tool\" klicken, zu "
+"Privacy scrollen und die Force SSL-Auswahl aktivieren. "
+
+#: bltilaunch.php:53
+msgid ""
+"If you do not have access to do this, you might need to ask your LMS "
+"administrator to enable the Force SSL option. "
+msgstr ""
+"Fallsi Sie dies nicht können, so bitten Sie Ihren Administrator die SSL-"
+"Option zu erzwingen. "
+
+#: bltilaunch.php:59
+msgid "BasicLTI not enabled"
+msgstr "BasicLTI ist nicht aktiviert"
+
+#: bltilaunch.php:420
+#, php-format
+msgid ""
+"If you already have an account on %s, enter your username and password below "
+"to enable automated signon from %s"
+msgstr ""
+"Wenn Sie schon eine Kennung bei %s haben, so geben Sie unten Ihren "
+"Benutzernamen und Ihr Passwort ein, um die automatische Anmeldung von %s aus "
+"zu aktivieren"
+
+#: bltilaunch.php:422
+#, php-format
+msgid ""
+"Enter your username and password for %s below to enable automated signon "
+"from %s"
+msgstr ""
+"Geben Sie Ihren Benutzernamen und Ihr Passwort für %s ein, um die "
+"automatische Anmeldung von %s aus zu aktivieren"
+
+#: bltilaunch.php:425
+msgid "Password:"
+msgstr "Passwort:"
+
+#: bltilaunch.php:426
+msgid "Sign In"
+msgstr "Anmelden"
+
+#: bltilaunch.php:428
+#, php-format
+msgid ""
+"If you do not already have an account on %s, provide the information below "
+"to create an account and enable automated signon from %s"
+msgstr ""
+"Wenn Sie noch keine Kennung bei %s haben, so geben Sie unten Ihre "
+"Informationen ein, um eine Kennung anzulegen und die automatische Anmeldung "
+"von %s aus zu aktivieren"
+
+#: bltilaunch.php:436
+msgid "Create Account"
+msgstr "Kennung anlegen"
+
+#: bltilaunch.php:451
+#, php-format
+msgid ""
+"If you do not already have an account on %s, please visit the site to "
+"request an account."
+msgstr ""
