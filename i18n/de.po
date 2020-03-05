@@ -7,13 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-02-25 19:57+0100\n"
-"PO-Revision-Date: 2020-02-28 15:59+0100\n"
-=======
-"POT-Creation-Date: 2020-03-03 00:19+0100\n"
-"PO-Revision-Date: 2020-03-03 00:21+0100\n"
->>>>>>> 2584a042b9349af1bfa63f5fed98bd28769f8ee4
+"POT-Creation-Date: 2020-03-05 12:34+0100\n"
+"PO-Revision-Date: 2020-03-05 12:35+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -234,8 +229,9 @@ msgid "Start with a blank course"
 msgstr "Mit einem leeren Kurs beginnen"
 
 #: admin/addcourse.php:50 course/copyitems.php:646 course/copyitems.php:647
+#: course/copyitems.php:643
 msgid "Copy a template or promoted course"
-msgstr "Einen Template-Kurs oder einen veröffentlichten Kurs kopieren"
+msgstr "Eine Kursvorlage oder einen veröffentlichten Kurs kopieren"
 
 #: admin/addcourse.php:60
 msgid "Copy from my or a colleague's course"
@@ -244,8 +240,7 @@ msgstr "Kurs eines Kollegen kopieren"
 #: admin/addcourse.php:62
 msgid "Copy from my, a colleague's, or template course"
 msgstr ""
-"Einen meiner Kurse, einen Kurs eines Kollegen oder einen Template-Kurs  "
-"kopieren"
+"Einen meiner Kurse, einen Kurs eines Kollegen oder eine Kursvorlage  kopieren"
 
 #: admin/addcourse.php:72 admin/forms.php:1382 assess2/AssessUtils.php:174
 #: assessment/showtest.php:1765 assessment/showtest.php:2701
@@ -326,6 +321,7 @@ msgstr "Ausstehende Benutzer"
 
 #: admin/admin2.php:44 admin/forms.php:427 admin/forms.php:1433
 #: admin/groupreportdetails.php:34 admin/userreports.php:37
+#: includes/coursecopylist.php:36
 msgid "Default Group"
 msgstr "Standardgruppe"
 
@@ -601,19 +597,19 @@ msgstr "Wählen Sie eine Stufe"
 msgid "Course Copy Options"
 msgstr "Einstellungen für Kurskopie"
 
-#: admin/forms.php:700
+#: admin/forms.php:700 course/copyitems.php:596 course/copyitems.php:595
 msgid "Copy offline grade items?"
 msgstr "Kurselemente kopieren, die offline bewertet werden?"
 
-#: admin/forms.php:703
+#: admin/forms.php:703 course/copyitems.php:599 course/copyitems.php:598
 msgid "Copy rubrics?"
 msgstr "Lernziele kopieren?"
 
-#: admin/forms.php:706
+#: admin/forms.php:706 course/copyitems.php:600 course/copyitems.php:599
 msgid "Copy outcomes?"
 msgstr "Themen kopieren?"
 
-#: admin/forms.php:709
+#: admin/forms.php:709 course/copyitems.php:603 course/copyitems.php:602
 msgid "Copy \"display at top\" instructor forum posts?"
 msgstr "Kopiere \"oben anzeigen\" für Dozenten-Beiträge?"
 
@@ -1143,6 +1139,7 @@ msgstr "Wählen Sie oben eine contextid um die zugeordneten Tests anzuzeigen"
 
 #: admin/userlti.php:223 course/addquestions.php:1350
 #: course/addquestions.php:1477 javascript/addqsort.js:1080
+#: course/copyitems.php:533 course/copyitems.php:532
 msgid "Type"
 msgstr "Typ"
 
@@ -1603,7 +1600,7 @@ msgstr "Ihre Antwort"
 #: course/addquestions.php:1477 javascript/addqsort.js:1078
 #: course/addquestions.php:902 course/addquestions.php:1088
 #: course/addquestions.php:1298 javascript/addqsort.js:1467
-#: javascript/addqsort.js:1476
+#: javascript/addqsort.js:1476 includes/coursecopylist.php:118
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -4368,7 +4365,7 @@ msgstr "Blöcke ändern"
 #: forums/newthreads.php:102 course/addassessment2form.php:382
 #: course/chgassessments2form.php:368 course/addquestions.php:1343
 #: course/addquestions.php:1469 course/addquestions.php:1533
-#: course/gradebook.php:1518
+#: course/gradebook.php:1518 course/copyitems.php:525 course/copyitems.php:524
 msgid "All"
 msgstr "Alle"
 
@@ -4378,7 +4375,8 @@ msgstr "Alle"
 #: index.php:95 course/addassessment2form.php:424
 #: course/chgassessments2form.php:426 course/addquestions.php:1249
 #: course/addquestions.php:1343 course/addquestions.php:1469
-#: course/addquestions.php:1533
+#: course/addquestions.php:1533 course/copyitems.php:525
+#: course/copyitems.php:524
 msgid "None"
 msgstr "Keine"
 
@@ -4496,15 +4494,15 @@ msgstr "Hat sich erledigt"
 msgid "Convert All Assessments in Course"
 msgstr "Alle Tests im Kurs konvertieren"
 
-#: course/copyitems.php:648 course/copyitems.php:649
+#: course/copyitems.php:648 course/copyitems.php:649 course/copyitems.php:645
 msgid "Browse Courses"
 msgstr "Kursübersicht"
 
-#: course/copyitems.php:654 course/copyitems.php:655
+#: course/copyitems.php:654 course/copyitems.php:655 course/copyitems.php:651
 msgid "Or, select from the course list below"
 msgstr "Oder wählen Sie aus der untenstehenden Kursliste"
 
-#: course/copyitems.php:656 course/copyitems.php:657
+#: course/copyitems.php:656 course/copyitems.php:657 course/copyitems.php:653
 msgid "Course List"
 msgstr "Kursliste"
 
@@ -6874,7 +6872,7 @@ msgstr "Bitte geben Sie ID, Vor- und Nachnamen ein."
 #: actions.php:481 actions.php:518 actions.php:569 actions.php:60
 #: actions.php:435 actions.php:434 actions.php:456 actions.php:468
 #: actions.php:480 actions.php:517 actions.php:568 actions.php:714
-#: admin/actions.php:318
+#: admin/actions.php:318 course/copyitems.php:59 course/copyitems.php:70
 msgid "Try Again"
 msgstr "Erneut versuchen"
 
@@ -7294,7 +7292,8 @@ msgstr ""
 "berücksichtigt werden sollen."
 
 #: forms.php:447 forms.php:459 forms.php:471 course/addquestions.php:1469
-#: course/addquestions.php:1533
+#: course/addquestions.php:1533 course/copyitems.php:525
+#: course/copyitems.php:524
 msgid "Check"
 msgstr "Auswahl"
 
@@ -8573,7 +8572,7 @@ msgstr ""
 "Kein Element ausgewählt. Die Aktion wird auf ALLE Elemente unterhalb dieses "
 "Elements angewendet"
 
-#: javascript/moveitem.js:17
+#: javascript/moveitem.js:17 course/copyitems.php:609 course/copyitems.php:608
 msgid "Main Course Page"
 msgstr "Zur Kursseite zurückkehren"
 
@@ -8901,7 +8900,7 @@ msgstr "Art der Einreichung"
 
 #: course/addassessment2form.php:224 course/chgassessments2form.php:211
 msgid "Homework-style: new versions of individual questions"
-msgstr "Hausarbeits-Modus:: Wechselnde Versionen der einzelnen Fragen"
+msgstr "Hausarbeits-Modus: Wechselnde Versionen der einzelnen Fragen"
 
 #: course/addassessment2form.php:225 course/chgassessments2form.php:212
 msgid "Quiz-style: retake whole assessment with new versions"
@@ -9013,7 +9012,8 @@ msgstr "Reihenfolge zufällig wählen"
 msgid "All but first"
 msgstr "Mit Ausnahme der ersten Frage"
 
-#: course/addassessment2form.php:387
+#: course/addassessment2form.php:387 course/copyitems.php:589
+#: course/copyitems.php:588
 msgid "Options"
 msgstr "Optionen"
 
@@ -9331,7 +9331,8 @@ msgstr ""
 "sobald sie eingehen."
 
 #: course/addassessment2form.php:95 course/chgassessments2form.php:75
-#: course/addquestions.php:1539
+#: course/addquestions.php:1539 course/copyitems.php:531
+#: course/copyitems.php:533 course/copyitems.php:530 course/copyitems.php:532
 msgid "Summary"
 msgstr "Zusammenfassung (für die Kursseite)"
 
@@ -10171,7 +10172,7 @@ msgstr ""
 "ein Kurselement aus."
 
 #: course/addquestions.php:28 course/addlinkedtext.php:51
-#: course/moddataset.php:17
+#: course/moddataset.php:17 course/copyitems.php:27
 msgid "You need to log in as a teacher to access this page"
 msgstr "Sie müssen sich als Dozent anmelden um auf diese Seite zuzugreifen"
 
@@ -11571,3 +11572,204 @@ msgstr "Editor umschalten"
 #: course/moddataset.php:1178
 msgid "Use this as a \"written example\" help button"
 msgstr "Verwende dies für \"Musterlösung\"-Schaltfläche"
+
+#: admin/addcourse.php:66
+msgid "Select a course to copy"
+msgstr "Wählen Sie einen Kurs zum Kopieren"
+
+#: course/copyitems.php:22
+msgid "Copy Course Items"
+msgstr "Kurselemente kopieren"
+
+#: course/copyitems.php:59
+msgid "Invalid enrollment key entered."
+msgstr "Ungültiges Kurs-Passwort eingegeben."
+
+#: course/copyitems.php:70
+msgid "Must agree to course terms of use to copy it."
+msgstr ""
+"Um den Kurs zu kopieren müssen Sie den Nutzungsbedingungen des Kurses "
+"zustimmen."
+
+#: course/copyitems.php:398
+msgid "Error with course to copy"
+msgstr "Es gibt ein Problem mit dem zu kopierenden Kurs"
+
+#: course/copyitems.php:486
+msgid ""
+"The course you selected is using a newer version of assessments than\r\n"
+"\tyour course. It is not possible to convert assessment back to an older "
+"format, sorry."
+msgstr ""
+"Der von Ihnen ausgewählte Kurs verwendet eine neuere Test-Version als Ihr "
+"Kurs. Es ist leider nicht möglich, einen Test zurück in ein älteres Format "
+"zu kopieren."
+
+#: course/copyitems.php:512 course/copyitems.php:511
+msgid "Preview source course"
+msgstr "Vorschau des Quell-Kurses"
+
+#: course/copyitems.php:519 course/copyitems.php:518
+msgid "You are about to copy ALL items in this course."
+msgstr "Sie kopieren ALLE Elemente dieses Kurses."
+
+#: course/copyitems.php:520 course/copyitems.php:519
+msgid ""
+"In most cases, you'll want to leave the options below set to their default"
+"\tvalues"
+msgstr ""
+"Normalerweise belasses Sie die folgenden Einstellungen auf ihren "
+"Standardwerten"
+
+#: course/copyitems.php:523 course/copyitems.php:522
+msgid "Select Items to Copy"
+msgstr "Zum Kopieren auswählen"
+
+#: course/copyitems.php:531 course/copyitems.php:530
+msgid "Title"
+msgstr "Titel"
+
+#: course/copyitems.php:592 course/copyitems.php:591
+msgid "Copy course settings?"
+msgstr "Kurseinstellungen kopieren?"
+
+#: course/copyitems.php:593 course/copyitems.php:592
+#, php-format
+msgid ""
+"Copy gradebook scheme and categories %s (%s will overwrite current scheme "
+"%s)?"
+msgstr ""
+"Punkteschema und -kategorien kopieren %s (%s überschreibt das aktuelle "
+"Schema %s)?"
+
+#: course/copyitems.php:595 course/copyitems.php:594
+msgid "Set all copied items as hidden to students?"
+msgstr "Alle kopierten Elemente für Studierende ausblenden?"
+
+#: course/copyitems.php:597 course/copyitems.php:596
+msgid "Remove any withdrawn questions from assessments?"
+msgstr "Alle zurückgezogenen Fragen aus den Tests entfernen?"
+
+#: course/copyitems.php:598 course/copyitems.php:597
+msgid "Use any suggested replacements for old questions?"
+msgstr "Vorgeschlagenen Ersatz für alte Fragen verwenden?"
+
+#: course/copyitems.php:601 course/copyitems.php:600
+msgid "Select calendar items to copy?"
+msgstr "Kalender-Termine zum Kopieren auswählen?"
+
+#: course/copyitems.php:605 course/copyitems.php:604
+msgid "Append text to titles?"
+msgstr "Text an Titel anhängen?"
+
+#: course/copyitems.php:606 course/copyitems.php:605
+msgid "Add to block:"
+msgstr "Hinzufügen zum Block:"
+
+#: course/copyitems.php:616 course/copyitems.php:615
+msgid "Also copy students and assessment attempt data?"
+msgstr "Daten der Studierenden und ihrer Versuche kopieren?"
+
+#: course/copyitems.php:617 course/copyitems.php:616
+msgid "NOT recommended unless you know what you are doing."
+msgstr "NICHT empfohlen (außer Sie wissen, was Sie tun)."
+
+#: course/copyitems.php:626
+msgid ""
+"Note: The course you are copying from is using\r\n"
+"\t\t\tan older version of assessments. They will be auto-converted to the "
+"current\r\n"
+"\t\t\tversion, but you should review the settings after they are copied."
+msgstr ""
+"Achtung: Der Kurs, den Sie benutzen, verwendet ein älteres Format für Tests. "
+"Die Tests werden in das aktuelle Format konvertiert, aber Sie sollten nach "
+"dem Kopieren deren Einstellungen überprüfen."
+
+#: course/copyitems.php:636 course/copyitems.php:633
+msgid "Select a course to copy items from"
+msgstr "Wählen Sie einen Kurs zum Kopieren"
+
+#: course/copyitems.php:663 course/copyitems.php:660
+msgid "Select Course Items"
+msgstr "Kurselemente auswählen"
+
+#: includes/coursecopylist.php:150
+msgid ""
+"For courses marked with &copy;, you must supply the course enrollment key to "
+"show permission to copy the course."
+msgstr ""
+"Für Kurse, die mit &copy; markiert sind, müssen Sie das Kurs-Passwort "
+"eingeben um den Kurs zu kopieren."
+
+#: includes/coursecopylist.php:151
+msgid "Enrollment key:"
+msgstr "Kurs-Passwort:"
+
+#: includes/coursecopylist.php:154
+#, php-format
+msgid ""
+"This course has additional %sTerms of Use %s you must agree to before "
+"copying the course."
+msgstr ""
+"Dieser Kurs hat besondere %sNutzungsbedingungen%s denen Sie zustimmen "
+"müssen, um den Kurs zu kopieren."
+
+#: includes/coursecopylist.php:155
+msgid "I agree to the Terms of Use specified in the link above."
+msgstr "Ich stimme den Nutzungsbedingungen aus obigem Link zu."
+
+#: includes/coursecopylist.php:179
+msgid "No other users"
+msgstr "Keine weiteren Benutzer"
+
+#: includes/coursecopylist.php:227
+msgid "No group members with courses"
+msgstr "Keine Gruppenmitglieder mit Kursen"
+
+#: includes/coursecopylist.php:237
+msgid "This Course"
+msgstr "Dieser Kurs"
+
+#: includes/coursecopylist.php:246
+msgid "My Courses"
+msgstr "Meine Kurse"
+
+#: includes/coursecopylist.php:271
+msgid "My Group's Courses"
+msgstr "Kurse meiner Gruppe"
+
+#: includes/coursecopylist.php:362
+msgid "Group Template Courses"
+msgstr "Kursvorlagen der Gruppe"
+
+#: includes/coursecopylist.php:383
+msgid "Or, lookup using course ID:"
+msgstr "Oder Kurs-ID suchen:"
+
+#: course/copyitems.php:486
+msgid ""
+"The course you selected is using a newer version of assessments than your "
+"course. It is not possible to convert assessment back to an older format, "
+"sorry."
+msgstr ""
+"Der von Ihnen ausgewählte Kurs verwendet eine neuere Test-Version als Ihr "
+"Kurs. Es ist leider nicht möglich, einen Test zurück in ein älteres Format "
+"zu kopieren."
+
+#: course/copyitems.php:625
+msgid ""
+"Note: The course you are copying from is using\tan older version of "
+"assessments. They will be auto-converted to the current\tversion, but you "
+"should review the settings after they are copied."
+msgstr ""
+"Achtung: Der Kurs, den Sie benutzen, verwendet ein älteres Format für Tests. "
+"Die Tests werden in das aktuelle Format konvertiert, aber Sie sollten nach "
+"dem Kopieren deren Einstellungen überprüfen."
+
+#: includes/coursecopylist.php:319
+msgid "Other's Courses"
+msgstr "Kurse von anderen"
+
+#: includes/coursecopylist.php:385
+msgid "Look up course"
+msgstr "Kurs suchen"
