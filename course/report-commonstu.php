@@ -20,7 +20,7 @@ if (isset($_POST['runset'])) {
 	}
 	$result = runRuleSet($rulesets[$_POST['runset']]['rules']);
 	header('Content-Type: application/json');
-	echo json_encode($result);
+	echo json_encode($result, JSON_INVALID_UTF8_IGNORE);
 	exit;
 }
 
@@ -101,13 +101,13 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 		</transition-group>
 	</div>
 	<div id="ruleDetails">
-		<p>{{currentRule.editIndex==-1?'New':'Edit'}} rule type: 
+		<p>{{currentRule.editIndex==-1?'New':'Edit'}} rule type:
 			<select v-model="currentRule.ruleType">
 			<option v-for="(option,index) in ruleTypes" :value="index">{{option}}</option>
 			</select>
 		</p>
-		<p v-if="currentRule.ruleType!='none'">Show students who 
-			<span v-if="currentRule.ruleType=='score' || currentRule.ruleType=='scores'"> had a score 
+		<p v-if="currentRule.ruleType!='none'">Show students who
+			<span v-if="currentRule.ruleType=='score' || currentRule.ruleType=='scores'"> had a score
 				<select v-model="currentRule.abovebelow">
 					<option v-for="(option,index) in abovebelowTypes" :value="index">{{option}}</option>
 				</select>
@@ -118,7 +118,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 						<option v-for="(option,index) in numassnTypes" :value="index">{{option}}</option>
 					</select> assignment(s)
 				</span>
-				that are 
+				that are
 				<select v-model="currentRule.tocnt">
 					<option v-for="(option, index) in cntTypes" :value="index">{{option}}</option>
 				</select>
@@ -151,7 +151,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 				</select>
 			</span>
 			<span v-if="currentRule.ruleType=='close'">
-				started 
+				started
 				<select v-model="currentRule.numassn">
 					<option v-for="(option,index) in numassnTypes" :value="index">{{option}}</option>
 				</select>
@@ -161,9 +161,9 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 					<option value="0">Default</option>
 					<option v-for="(option,index) in gbcatTypes" :value="index">{{option}}</option>
 				</select>
-				within <input v-model="currentRule.closeTime" size=2> hours of the due date 
+				within <input v-model="currentRule.closeTime" size=2> hours of the due date
 			</span>
-			
+
 			<select v-model="currentRule.timeframe">
 				<option v-for="(option,index) in timeframeTypes" :value="index">{{option}}</option>
 			</select>
@@ -181,7 +181,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 				<input v-model="currentRule.inlastDays" size=2> days
 			</span>
 			<span v-if="currentRule.timeframe=='between'">
-				and 
+				and
 				<input type=text size=10 name="edate" id="edate" v-model="currentRule.edate">
 				<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 				<img src="../img/cal.gif" alt="Calendar"/></a>
@@ -230,7 +230,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 <p>&nbsp;</p><p>Notes:</p>
 <ul>
 	<li>When using a day of week rule like "this week, since" or "last week, ending on",
-	    if your rule is "since Monday" or "ending on Monday" and today is a Monday, 
+	    if your rule is "since Monday" or "ending on Monday" and today is a Monday,
 	    the week used will include today.</li>
 	<li>"in the last __ days" will be the start of day that many days ago.  So if you
 	     run "in the last 2 days" anytime Wednesday, it will count from the start of the
@@ -240,7 +240,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 	<li>"Completed" is defined as every question being attempted.</li>
 	<li>For score-based rules, "past due" is based on the default due date, and does not
 	    take into account LatePasses or exceptions.</li>
-</ul>	   
+</ul>
 </div>
 
 </div>
@@ -255,7 +255,7 @@ var app = new Vue({
 			for (var i=0;i<this.allRules.length;i++) {
 				curRule = this.allRules[i];
 				thisphrase = 'who ';
-								
+
 				if (curRule.ruleType=='score' || curRule.ruleType=='scores') {
 					thisphrase += 'had a score ';
 					thisphrase += this.abovebelowTypes[curRule.abovebelow];
@@ -286,7 +286,7 @@ var app = new Vue({
 					thisphrase += ' assignment(s) in category ';
 					thisphrase += this.gbcatTypes[curRule.gbcat];
 				}
-				
+
 				if (curRule.ruleType=='close') {
 					thisphrase += ' within '+curRule.closeTime+' hours of the due date';
 				}
@@ -312,7 +312,7 @@ var app = new Vue({
 			for(var i=0;i<this.results.length;i++) {
 				stus = [];
 				for (j=0;j<this.results[i].length;j++) {
-					stus.push(this.results[i][j][1]);	
+					stus.push(this.results[i][j][1]);
 				}
 				out[i] = stus.join('-');
 			}
@@ -325,7 +325,7 @@ var app = new Vue({
 		editingRuleSet: -1,
 		allRules: [],
 		curRuleSetName: '',
-		ruleSets: <?php echo json_encode($rulesets, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>,
+		ruleSets: <?php echo json_encode($rulesets, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>,
 		currentRule: {
 			ruleType: 'none',
 			abovebelow: 0,
@@ -353,7 +353,7 @@ var app = new Vue({
 			'close': _('Last Minute')
 		},
 		abovebelowTypes: ['above','below'],
-		gbcatTypes: <?php echo json_encode($gbcats); ?>,
+		gbcatTypes: <?php echo json_encode($gbcats, JSON_INVALID_UTF8_IGNORE); ?>,
 		timeframeTypes: {
 			'since': _('since'),
 			'between': _('between'),
@@ -383,7 +383,7 @@ var app = new Vue({
 		},
 		remove: function(index) {
 			if (confirm('Are you sure you want to delete this rule?')) {
-				this.allRules.splice(index,1);		
+				this.allRules.splice(index,1);
 			}
 		},
 		addRule: function() {
@@ -485,4 +485,3 @@ var app = new Vue({
 
 <?php
 require("../footer.php");
-

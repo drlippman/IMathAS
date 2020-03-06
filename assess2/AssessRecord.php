@@ -144,7 +144,7 @@ class AssessRecord
     }
     if (!$this->is_practice && !empty($this->data)) {
       $fields[] = 'scoreddata';
-      $encoded = json_encode($this->data);
+      $encoded = json_encode($this->data, JSON_INVALID_UTF8_IGNORE);
       if ($encoded === false) {
         echo '{"error": "encoding_error"}';
         exit;
@@ -153,7 +153,7 @@ class AssessRecord
     }
     if ($this->is_practice && !empty($this->data)) {
       $fields[] = 'practicedata';
-      $encoded = json_encode($this->data);
+      $encoded = json_encode($this->data, JSON_INVALID_UTF8_IGNORE);
       if ($encoded === false) {
         echo '{"error": "encoding_error"}';
         exit;
@@ -221,7 +221,7 @@ class AssessRecord
     $waspractice = $this->is_practice;
     if ($this->is_practice) {
       $this->buildAssessData($recordStart);
-      $practicetosave = (!empty($this->data)) ? gzencode(json_encode($this->data)) : '';
+      $practicetosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
       $this->assessRecord['practicedata'] = $practicetosave;
       $this->setInPractice(false);
     } else {
@@ -230,7 +230,7 @@ class AssessRecord
 
     //generate scored data
     $this->buildAssessData($recordStart && !$waspractice);
-    $scoredtosave = (!empty($this->data)) ? gzencode(json_encode($this->data)) : '';
+    $scoredtosave = (!empty($this->data)) ? gzencode(json_encode($this->data, JSON_INVALID_UTF8_IGNORE)) : '';
     $this->assessRecord['scoreddata'] = $scoredtosave;
 
     // switch back to practice if started that way
@@ -815,6 +815,11 @@ class AssessRecord
   public function addTotalAttemptTime($time) {
     $this->parseData();
     $ver = count($this->data['assess_versions']) - 1;
+    if (!empty($this->data['assess_versions'][$ver]['lastchange'])) {
+      // the reported time might be since original load. Should never add more
+      // than the time elapsed since the last change
+      $time = min($time, time() - $this->data['assess_versions'][$ver]['lastchange']);
+    }
     if (!isset($this->data['assess_versions'][$ver]['time'])) {
       $this->data['assess_versions'][$ver]['time'] = $time;
     } else {
@@ -2324,7 +2329,7 @@ class AssessRecord
     /* DL 2/12/20: disabling this for now to allow jump to ans to work for by_assess,
        since it's available as an option there.  But it might make more sense to
        remove it as an option on quizzes.
-       
+
     // only can do jump to answer for by_question submission
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if (!$by_question) {

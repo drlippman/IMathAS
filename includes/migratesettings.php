@@ -230,7 +230,7 @@ function migrateAssessSettings1to2($settings) {
   // convert intro to new format, if needed
   $newintrojson = convertintro($settings['intro']);
   if ($newintrojson !== false) {
-    $settings['intro'] = json_encode($newintrojson[0]);
+    $settings['intro'] = json_encode($newintrojson[0], JSON_INVALID_UTF8_IGNORE);
   }
 
   $settings['ver'] = 2;

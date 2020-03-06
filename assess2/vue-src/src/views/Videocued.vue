@@ -8,7 +8,6 @@
     >
       <videocued-result-nav
         class="med-left"
-        v-if = "qn != -1"
         :qn = "qn"
         :cue = "cue"
         @jumpto="jumpTo"

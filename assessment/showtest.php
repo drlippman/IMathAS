@@ -2516,7 +2516,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				$stm = $DBH->prepare("UPDATE imas_livepoll_status SET curquestion=:curquestion,curstate=1 WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':curquestion'=>$qn, ':assessmentid'=>$testsettings['id']));
 
-				echo json_encode($out);
+				echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
 			} else {
 				displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$clearla,false,array());
 			}
@@ -3110,7 +3110,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						$LPdata[$qn][$row[0]]["ans"] = $arv[count($arv)-1];
 					}
 				}
-				$LPjson = json_encode($LPdata);
+				$LPjson = json_encode($LPdata, JSON_INVALID_UTF8_IGNORE);
 				echo '<script type="text/javascript">$(function(){livepoll.loadResults('.$LPjson.');});</script>';
 
 			} else {//stu view

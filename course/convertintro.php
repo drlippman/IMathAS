@@ -20,7 +20,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 		list($introjson,$isembed) = convertintro($row[0]);
 		if ($introjson !== false) {
 			$stm2 = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
-			$stm2->execute(array(':id'=>$row[1], ':intro'=>json_encode($introjson)));
+			$stm2->execute(array(':id'=>$row[1], ':intro'=>json_encode($introjson, JSON_INVALID_UTF8_IGNORE)));
 			$converted[] = Sanitize::encodeStringForDisplay($row[2]);
 		}
 	}
@@ -49,7 +49,7 @@ if (isset($_POST['convert']) && $_POST['convert']=='all') {
 
 	if (isset($_POST['convert'])) {
 		$stm = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
-		$stm->execute(array(':id'=>$aid, ':intro'=>json_encode($introjson)));
+		$stm->execute(array(':id'=>$aid, ':intro'=>json_encode($introjson, JSON_INVALID_UTF8_IGNORE)));
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addassess?id=$aid&cid=$cid&r=" . Sanitize::randomQueryStringParam());
 	} else {
 		$qcnt = substr_count($qitemorder, ',')+1;

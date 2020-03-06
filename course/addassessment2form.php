@@ -731,7 +731,7 @@ $vueData = array(
 <script type="text/javascript">
 var app = new Vue({
 	el: '#app',
-  data: <?php echo json_encode($vueData); ?>,
+  data: <?php echo json_encode($vueData, JSON_INVALID_UTF8_IGNORE); ?>,
 	computed: {
 		showscoresOptions: function() {
 			var during = {

@@ -79,4 +79,4 @@ if (strlen($lti_sourcedid) > 1) {
 //prep date display
 prepDateDisp($assessInfoOut);
 
-echo json_encode($out);
+echo json_encode($out, JSON_INVALID_UTF8_IGNORE);

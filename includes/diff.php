@@ -68,7 +68,7 @@ function diffsparsejson($old, $new) {
 		return '';
 	} else {
 		if (function_exists('json_encode')) {
-			return json_encode($out);
+			return json_encode($out, JSON_INVALID_UTF8_IGNORE);
 		} else {
 			require_once("JSON.php");
 			$jsonser = new Services_JSON();

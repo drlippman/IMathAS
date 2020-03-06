@@ -122,7 +122,7 @@ if (!$assess_record->checkVerification($verification)) {
     $assessInfoOut['questions'][$qn] = $assess_record->getQuestionObject($qn, $showscores, true, true);
   }
   $assessInfoOut['error'] = "already_submitted";
-  echo json_encode($assessInfoOut);
+  echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);
   exit;
 }
 

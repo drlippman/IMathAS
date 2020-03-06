@@ -239,7 +239,7 @@ END;
 		}
 	}
 
-	echo "var tree = ".json_encode($treearr).";";
+	echo "var tree = ".json_encode($treearr, JSON_INVALID_UTF8_IGNORE).";";
 	echo "</script>";  //end tree definition script
 	if (isset($_GET['base'])) {
 		$base = $_GET['base'];
@@ -285,7 +285,7 @@ END;
 				setshow($parents[$id]);
 			}
 		} else {
-			
+
 			if (isset($parents[$id]) && $parents[$id]!=0) {
 				setshow($parents[$id]);
 			}
