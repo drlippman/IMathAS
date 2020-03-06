@@ -186,7 +186,7 @@
 					$scorelist .= ';'.$sp[1].';'.$sp[2];
 				}
 				if (count($feedback)>0) {
-					$feedbackout = json_encode($feedback);
+					$feedbackout = json_encode($feedback, JSON_INVALID_UTF8_IGNORE);
 				} else {
 					$feedbackout = '';
 				}

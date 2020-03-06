@@ -453,7 +453,7 @@
 					$feedback['Z'] = Sanitize::incomingHtml($_POST['feedback']);
 				}
 				if (count($feedback)>0) {
-					$feedbackout = json_encode($feedback);
+					$feedbackout = json_encode($feedback, JSON_INVALID_UTF8_IGNORE);
 				} else {
 					$feedbackout = '';
 				}

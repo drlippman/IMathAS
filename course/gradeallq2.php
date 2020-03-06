@@ -495,7 +495,7 @@
 			echo $qdata['html'];
 			echo '<script type="text/javascript">
 				$(function() {
-					imathasAssess.init('.json_encode($qdata['jsparams']).', false);
+					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false);
 				});
 				</script>';
 			echo '</div>';

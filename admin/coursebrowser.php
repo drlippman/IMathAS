@@ -128,7 +128,7 @@ function getCourseBrowserJSON() {
   	return 0;
   });
 
-  return json_encode($courseinfo);
+  return json_encode($courseinfo, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);
 }
 
 /*** Start output ***/

@@ -140,7 +140,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
 		}
-		echo json_encode($opts);
+		echo json_encode($opts, JSON_INVALID_UTF8_IGNORE);
 		exit;
 	}
 	if (isset($_GET['add'])) {

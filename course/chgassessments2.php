@@ -300,7 +300,7 @@ if (!(isset($teacherid))) {
 					}
 				}
 				$sets[] = "extrefs=:extrefs";
-				$qarr[':extrefs'] = json_encode($extrefs);
+				$qarr[':extrefs'] = json_encode($extrefs, JSON_INVALID_UTF8_IGNORE);
 			}
 
 			if ($_POST['showtips'] !== 'DNC') {
@@ -417,7 +417,7 @@ if (!(isset($teacherid))) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if (($introjson=json_decode($row['intro']))!==null) { //is json intro
 					$introjson[0] = $newintro;
-					$outintro = json_encode($introjson);
+					$outintro = json_encode($introjson, JSON_INVALID_UTF8_IGNORE);
 				} else {
 					$outintro = $newintro;
 				}

@@ -806,7 +806,7 @@ foreach ($dates as $moday=>$val) {
 
 echo '<script type="text/javascript">';
 echo "cid = $cid;";
-echo "caleventsarr = ".json_encode($jsarr, JSON_HEX_TAG).";";
+echo "caleventsarr = ".json_encode($jsarr, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE).";";
 echo '$(function() {
 	$(".cal td").off("click.cal").on("click.cal", function() { showcalcontents(this); })
 	 .off("keyup.cal").on("keyup.cal", function(e) { if(e.which==13) {showcalcontents(this);} })

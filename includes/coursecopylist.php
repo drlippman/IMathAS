@@ -25,7 +25,7 @@ if (isset($_POST['cidlookup'])) {
 			"name"=>Sanitize::encodeStringForDisplay($row['name'] . ' ('.$row['LastName'].', '.$row['FirstName'].')'),
 			"termsurl"=>Sanitize::url($row['termsurl']));
 		$out['needkey'] = !($row['copyrights'] == 2 || ($row['copyrights'] == 1 && $row['groupid']==$groupid));
-		echo json_encode($out);
+		echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
 	}
 	exit;
 } else if (isset($_GET['loadothers'])) {
