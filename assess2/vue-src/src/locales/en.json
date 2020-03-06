@@ -263,6 +263,7 @@
     "show_qs": "Show Questions"
   },
   "videocued": {
+    "start": "Start video",
     "continue": "Continue video to {title}",
     "skipto": "Jump video to {title}"
   },
