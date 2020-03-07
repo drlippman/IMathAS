@@ -714,7 +714,7 @@ return function(str) {
   str = str.replace(/\s*\bor\b\s*/g,'" or "');
   str = str.replace(/all\s+real\s+numbers/g,'"all real numbers"');
   str = str.replace(/(\)|\])\s*u\s*(\(|\[)/g,"$1U$2");
-  str = str.replace(/DNE/g,'"DNE"');
+  str = str.replace(/\bDNE\b/gi,'"DNE"');
   if (str.match(/\S/)==null) {
 	  return "";
   }
