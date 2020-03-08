@@ -188,19 +188,19 @@ function validatevidform(el) {
 	for (var i=0; i<els.length; i++) {
 		if (els[i].name.match(/segtitle/)) {
 			if (els[i].value=="") {
-				alert(<?php echo _("Please give all segments titles"); ?>);
+				alert("<?php echo _("Please give all segments titles"); ?>");
 				els[i].focus();
 				return false;
 			}
 		} else if (els[i].name.match(/vidid/)) {
 			if (els[i].value=="") {
-				alert(<?php echo _("Please provide a video ID"); ?>);
+				alert("<?php echo _("Please provide a video ID"); ?>");
 				els[i].focus();
 				return false;
 			}
 		} else if (els[i].name.match(/segend/)) {
 			if (els[i].value=="") {
-				alert(<?php echo _("Please supply end times for all segments"); ?>);
+				alert("<?php echo _("Please supply end times for all segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -211,7 +211,7 @@ function validatevidform(el) {
 				var v = els[i].value*1;
 			}
 			if (v<lastsegtime) {
-				alert(<?php echo _("Make sure each segment's end time is later than previous segments"); ?>);
+				alert("<?php echo _("Make sure each segment's end time is later than previous segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -220,13 +220,13 @@ function validatevidform(el) {
 			hasfollowup = els[i].checked;
 		} else if (els[i].name.match(/followuptitle/) && hasfollowup) {
 			if (els[i].value=="") {
-				alert(<?php echo _("Please give all segments titles"); ?>);
+				alert("<?php echo _("Please give all segments titles"); ?>");
 				els[i].focus();
 				return false;
 			}
 		} else if (els[i].name.match(/followupend/) && hasfollowup) {
 			if (els[i].value=="") {
-				alert(<?php echo _("Please supply end times for all segments"); ?>);
+				alert("<?php echo _("Please supply end times for all segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -237,7 +237,7 @@ function validatevidform(el) {
 				var v = els[i].value*1;
 			}
 			if (v<lastsegtime) {
-				alert(<?php echo _("Make sure each segment's end time is later than previous segments"); ?>);
+				alert("<?php echo _("Make sure each segment's end time is later than previous segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -325,11 +325,11 @@ function addsegat(n) {
 	var newins = document.createElement("div");
 	newins.className = "insblock";
 	newins.id = "insat"+(curnumseg+1);
-	newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;">'+<?php echo _('Add video segment break'); ?>+'</a>';
+	newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;">'+"<?php echo _('Add video segment break'); ?>"+'</a>';
 	insat.parentNode.insertBefore(newins, insat);
 
-	var html = "'"+<?php echo _('Segment title:'); ?>+"'"+' <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
-	html += "'"+<?php echo _('Ends at:'); ?>+"'"+' <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
+	var html = "<?php echo _('Segment title:'); ?>"+' <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
+	html += "<?php echo _('Ends at:'); ?>"+' <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
 	html += '<input type="button" value="'+<?php echo _('grab'); ?>+'" onclick="grabcurvidtime('+curnumseg+',0);"/>';
 	html += ' <a href="#" onclick="return deleteseg(this);">[Delete]</a>';
 
@@ -350,7 +350,7 @@ function get_previoussibling(n) {
 }
 
 function deleteseg(el) {
-	if (confirm(<?php echo _('Are you sure you want to remove this video segment?'); ?>)) {
+	if (confirm("<?php echo _('Are you sure you want to remove this video segment?'); ?>")) {
 		var divtodelete = el.parentNode;
 		divtodelete.parentNode.removeChild(get_previoussibling(divtodelete));
 		divtodelete.parentNode.removeChild(divtodelete);

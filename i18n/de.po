@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 19:07+0100\n"
-"PO-Revision-Date: 2020-03-07 19:24+0100\n"
+"POT-Creation-Date: 2020-03-08 11:41+0100\n"
+"PO-Revision-Date: 2020-03-08 11:42+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,8 @@ msgstr ""
 #: forms.php:393 forms.php:409 forms.php:430 javascript/livepoll.js:123
 #: multiembedq.php:188 multiembedq.php:284 admin/forms.php:1211
 #: directaccess.php:135 course/testquestion.php:275
-#: course/addvideotimes.php:440
+#: course/addvideotimes.php:440 admin/importitems.php:742
+#: admin/importitems2.php:177
 msgid "Submit"
 msgstr "Absenden"
 
@@ -546,6 +547,7 @@ msgstr "Diagnose-Einstellungen"
 #: admin/diagsetup.php:391 admin/ltiuserprefs.php:22
 #: course/viewforumgrade.php:85 actions.php:809 course/addquestions.php:1280
 #: actions.php:806 actions.php:805 course/sendmsgmodal.php:105
+#: admin/importitems.php:658 admin/importitems.php:662
 msgid "Done"
 msgstr "Erledigt"
 
@@ -730,7 +732,9 @@ msgstr "Kursvorgänger"
 #: course/addassessment2form.php:884 course/addassessment2form.php:932
 #: actions.php:344 actions.php:343 course/addassessment2form.php:778
 #: course/addassessment2form.php:844 course/addassessment2form.php:883
-#: course/addassessment2form.php:931
+#: course/addassessment2form.php:931 course/addassessment2form.php:768
+#: course/addassessment2form.php:834 course/addassessment2form.php:873
+#: course/addassessment2form.php:921
 msgid "Never"
 msgstr "Niemals"
 
@@ -782,17 +786,21 @@ msgid "as course owner"
 msgstr "als Kurs-Eigentümer"
 
 #: admin/importitems2.php:25 admin/importitems2.php:26
-#: admin/importitems2.php:166
+#: admin/importitems2.php:166 admin/importitems.php:608
+#: admin/importitems.php:609 admin/importitems.php:731
+#: admin/importitems2.php:165
 msgid "Import Course Items"
 msgstr "Kurselemente importieren"
 
 #: admin/importitems2.php:184 admin/listdiag.php:123 admin/userlti.php:195
 #: index.php:610 index.php:673 index.php:612 index.php:675 header.php:266
 #: header.php:267 index.php:616 index.php:679 ltihome.php:410
+#: admin/importitems2.php:183 admin/importitems2.php:182
 msgid "Course"
 msgstr "Kurs"
 
-#: admin/importitems2.php:187
+#: admin/importitems2.php:187 admin/importitems2.php:186
+#: admin/importitems2.php:185
 msgid ""
 "The import file is for a more recent assessment version than this course - "
 "cannot import."
@@ -800,7 +808,8 @@ msgstr ""
 "Die Importdatei ist verwendet ein neueres Test-Format  als dieser Kurs und "
 "kann deshalb nicht importiert werden."
 
-#: admin/importitems2.php:191
+#: admin/importitems2.php:191 admin/importitems2.php:190
+#: admin/importitems2.php:189
 msgid ""
 "The import file is for an older assessment version than this course - "
 "assessments will be upgraded."
@@ -1145,7 +1154,8 @@ msgstr "Wählen Sie oben eine contextid um die zugeordneten Tests anzuzeigen"
 
 #: admin/userlti.php:223 course/addquestions.php:1350
 #: course/addquestions.php:1477 javascript/addqsort.js:1080
-#: course/copyitems.php:533 course/copyitems.php:532
+#: course/copyitems.php:533 course/copyitems.php:532 admin/importitems.php:789
+#: admin/importitems2.php:226
 msgid "Type"
 msgstr "Typ"
 
@@ -4192,6 +4202,7 @@ msgstr "Dies wird alle Änderungen auf dieser Seite verwerfen"
 #: course/addquestions.php:22 course/addquestions.php:1187
 #: course/moddataset.php:950 course/modquestion.php:25
 #: course/addvideotimes.php:60 course/modquestion2.php:25
+#: course/modquestiongrid2.php:176
 #, php-format
 msgid "Add/Remove Questions"
 msgstr "Fragen hinzufügen/entfernen"
@@ -4374,6 +4385,7 @@ msgstr "Blöcke ändern"
 #: course/chgassessments2form.php:368 course/addquestions.php:1343
 #: course/addquestions.php:1469 course/addquestions.php:1533
 #: course/gradebook.php:1518 course/copyitems.php:525 course/copyitems.php:524
+#: admin/importitems.php:781 admin/importitems2.php:220
 msgid "All"
 msgstr "Alle"
 
@@ -4384,7 +4396,8 @@ msgstr "Alle"
 #: course/chgassessments2form.php:426 course/addquestions.php:1249
 #: course/addquestions.php:1343 course/addquestions.php:1469
 #: course/addquestions.php:1533 course/copyitems.php:525
-#: course/copyitems.php:524
+#: course/copyitems.php:524 admin/importitems.php:781
+#: admin/importitems2.php:221 admin/importitems2.php:220
 msgid "None"
 msgstr "Keine"
 
@@ -5754,7 +5767,7 @@ msgstr "Kommentare speichern"
 #: course/gbsettings.php:283 course/gradebook.php:424
 #: course/addassessment2form.php:596 course/chgassessments2form.php:497
 #: course/chgassessments2form.php:621 javascript/addqsort.js:1078
-#: javascript/addqsort.js:1084
+#: javascript/addqsort.js:1084 course/modquestiongrid2.php:284
 msgid "Points"
 msgstr "Punkte"
 
@@ -6017,6 +6030,8 @@ msgstr "Farbe:"
 
 #: course/gradebook.php:527 course/gradebook.php:735
 #: course/addquestions.php:1249 course/addquestions.php:1343
+#: admin/importitems.php:781 admin/importitems2.php:221
+#: admin/importitems2.php:220
 msgid "Check:"
 msgstr "Markieren:"
 
@@ -6560,7 +6575,7 @@ msgstr "Nachdem die Test-Version eingereicht ist"
 
 #: course/modquestion2.php:216 course/addassessment2form.php:808
 #: course/chgassessments2form.php:797 course/addassessment2form.php:806
-#: course/addassessment2form.php:805
+#: course/addassessment2form.php:805 course/addassessment2form.php:795
 #, php-format
 msgid "After %d tries"
 msgstr "Nach %d Versuchen"
@@ -7372,6 +7387,7 @@ msgstr "Hinweise zum Beantworten von Beiträgen"
 
 #: forums/posthandler.php:536 course/addquestions.php:1350
 #: course/addquestions.php:1477 javascript/addqsort.js:1075
+#: course/modquestiongrid2.php:252 course/modquestiongrid2.php:283
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -8896,12 +8912,12 @@ msgid "One question at a time"
 msgstr "Jede Frage einzeln"
 
 #: course/addassessment2form.php:212 course/chgassessments2form.php:187
-#: course/addassessment2form.php:711
+#: course/addassessment2form.php:711 course/addassessment2form.php:710
 msgid "All questions at once, or in pages"
 msgstr "Alle Fragen auf einmal, ggf. verteilt auf mehrere Seiten"
 
 #: course/addassessment2form.php:213 course/chgassessments2form.php:188
-#: course/addassessment2form.php:716
+#: course/addassessment2form.php:716 course/addassessment2form.php:711
 msgid "Video Cued"
 msgstr "Video-gesteuert"
 
@@ -9032,7 +9048,8 @@ msgid "All but first"
 msgstr "Mit Ausnahme der ersten Frage"
 
 #: course/addassessment2form.php:387 course/copyitems.php:589
-#: course/copyitems.php:588
+#: course/copyitems.php:588 admin/importitems2.php:256
+#: admin/importitems2.php:255
 msgid "Options"
 msgstr "Optionen"
 
@@ -9332,8 +9349,8 @@ msgstr ""
 "<strong>Video-gesteuert</strong>: Bei dieser Darstellung sehen die "
 "Studierenden ein YouTube-Video. An bestimmten Stellen wird die Wiedergabe "
 "des Videos durch Fragen des Tests unterbrochen. Nachdem Sie die Fragen für "
-"den Test zusammengestellt haben klicken Sie auf Define Video Cues um das "
-"Video und die Zeiten, an denen es durch Ihre Fragen unterbrochen wird, "
+"den Test zusammengestellt haben klicken Sie auf \"In Video einordnen\" um "
+"das Video und die Zeiten, an denen es durch Ihre Fragen unterbrochen wird, "
 "festzulegen."
 
 #: course/addassessment2form.php:717
@@ -9730,6 +9747,7 @@ msgstr ""
 "Punktzahl"
 
 #: course/chgassessments2form.php:256 course/addassessment2form.php:272
+#: course/modquestiongrid2.php:253
 msgid "Tries"
 msgstr "Versuche"
 
@@ -9834,41 +9852,48 @@ msgstr "Zeige Video/Text-Schaltflächen wenn verfügbar?"
 
 #: course/addassessment2form.php:742 course/chgassessments2form.php:735
 #: course/addassessment2form.php:740 course/addassessment2form.php:739
+#: course/addassessment2form.php:729
 msgid "On each question immediately"
 msgstr "Sofort bei jeder Frage"
 
 #: course/addassessment2form.php:746 course/chgassessments2form.php:739
 #: course/addassessment2form.php:744 course/addassessment2form.php:743
+#: course/addassessment2form.php:733
 msgid "At the end of the assessment"
 msgstr "Am Ende des Tests"
 
 #: course/addassessment2form.php:750 course/chgassessments2form.php:743
 #: course/addassessment2form.php:748 course/addassessment2form.php:747
+#: course/addassessment2form.php:737
 msgid "Total score only at the end"
 msgstr "Gesamtpunktzahl erst am Ende"
 
 #: course/addassessment2form.php:754 course/chgassessments2form.php:747
 #: course/addassessment2form.php:752 course/addassessment2form.php:751
+#: course/addassessment2form.php:741
 msgid "No scores at all"
 msgstr "Keine Punkte anzeigen"
 
 #: course/addassessment2form.php:785 course/chgassessments2form.php:778
 #: course/addassessment2form.php:783 course/addassessment2form.php:782
+#: course/addassessment2form.php:772
 msgid "Show with the score"
 msgstr "Mit der Punktzahl anzeigen"
 
 #: course/addassessment2form.php:797 course/chgassessments2form.php:790
 #: course/addassessment2form.php:795 course/addassessment2form.php:794
+#: course/addassessment2form.php:784
 msgid "After the last try on a question"
 msgstr "Nach dem letzten Versuch einer Frage"
 
 #: course/addassessment2form.php:801 course/addassessment2form.php:799
-#: course/addassessment2form.php:798
+#: course/addassessment2form.php:798 course/addassessment2form.php:788
 msgid "After the last try or Jump to Answer button"
 msgstr "Nach dem letzten Versuch oder beim Klick auf die Antwort-Schaltfläche"
 
 #: course/addassessment2form.php:809 course/chgassessments2form.php:798
 #: course/addassessment2form.php:807 course/addassessment2form.php:806
+#: course/addassessment2form.php:796
 msgid "After 1 try"
 msgstr "Nach 1 Versuch"
 
@@ -9882,6 +9907,9 @@ msgstr "Nach 1 Versuch"
 #: course/addassessment2form.php:940 course/addassessment2form.php:814
 #: course/addassessment2form.php:850 course/addassessment2form.php:891
 #: course/addassessment2form.php:905 course/addassessment2form.php:939
+#: course/addassessment2form.php:804 course/addassessment2form.php:840
+#: course/addassessment2form.php:881 course/addassessment2form.php:895
+#: course/addassessment2form.php:929
 msgid "After the assessment version is submitted"
 msgstr "Nachdem die Test-Version eingereicht wurde"
 
@@ -9891,16 +9919,20 @@ msgstr "Nachdem die Test-Version eingereicht wurde"
 #: course/addassessment2form.php:837 course/addassessment2form.php:880
 #: course/addassessment2form.php:928 course/addassessment2form.php:836
 #: course/addassessment2form.php:879 course/addassessment2form.php:927
+#: course/addassessment2form.php:826 course/addassessment2form.php:869
+#: course/addassessment2form.php:917
 msgid "After the due date"
 msgstr "Nach Fälligkeit des Tests"
 
 #: course/addassessment2form.php:843 course/chgassessments2form.php:832
 #: course/addassessment2form.php:841 course/addassessment2form.php:840
+#: course/addassessment2form.php:830
 msgid "Immediately - they can always view it"
 msgstr "Sofort - sie können das immer sehen"
 
 #: course/addassessment2form.php:901 course/chgassessments2form.php:893
 #: course/addassessment2form.php:899 course/addassessment2form.php:898
+#: course/addassessment2form.php:888
 msgid "Immediately"
 msgstr "Sofort"
 
@@ -10197,6 +10229,7 @@ msgstr ""
 #: course/addquestions.php:28 course/addlinkedtext.php:51
 #: course/moddataset.php:17 course/copyitems.php:27 course/testquestion.php:20
 #: course/modquestion.php:19 course/modquestion2.php:19
+#: admin/importitems.php:616
 msgid "You need to log in as a teacher to access this page"
 msgstr "Sie müssen sich als Dozent anmelden um auf diese Seite zuzugreifen"
 
@@ -10272,6 +10305,8 @@ msgid "Help Resource"
 msgstr "Hilfsmaterial"
 
 #: course/addquestions.php:973 course/moddataset.php:1016
+#: admin/importitems.php:766 admin/importitems2.php:208
+#: admin/importitems2.php:207
 msgid "Private"
 msgstr "Privat"
 
@@ -10672,6 +10707,8 @@ msgid "Define End Messages"
 msgstr "Schlussnachricht definieren"
 
 #: course/addquestions.php:1315 course/moddataset.php:1095
+#: admin/importitems.php:779 admin/importitems2.php:219
+#: admin/importitems2.php:218
 msgid "Select Libraries"
 msgstr "Bibliotheken auswählen"
 
@@ -11021,7 +11058,8 @@ msgstr "Fehler beim Hochladen der Datei"
 msgid "Enter summary here (displays on course page)"
 msgstr "Zusammenfassung hier eingeben (wird auf der Kurs-Seite angezeigt)"
 
-#: course/addlinkedtext.php:294
+#: course/addlinkedtext.php:294 admin/importitems.php:674
+#: admin/importitems2.php:97
 msgid "Error uploading file!"
 msgstr "Fehler beim Hochladen der Datei!"
 
@@ -11565,7 +11603,8 @@ msgstr "Nutzungsrechte:"
 msgid "Allow use by all"
 msgstr "Jeder darf nutzen"
 
-#: course/moddataset.php:1022
+#: course/moddataset.php:1022 admin/importitems.php:768
+#: admin/importitems2.php:210 admin/importitems2.php:209
 msgid "Allow use by all and modifications by group"
 msgstr "Jeder darf nutzen; Bearbeitung durch Gruppe"
 
@@ -11665,7 +11704,8 @@ msgstr ""
 msgid "Select Items to Copy"
 msgstr "Zum Kopieren auswählen"
 
-#: course/copyitems.php:531 course/copyitems.php:530
+#: course/copyitems.php:531 course/copyitems.php:530 admin/importitems.php:789
+#: admin/importitems2.php:226
 msgid "Title"
 msgstr "Titel"
 
@@ -12270,12 +12310,14 @@ msgstr "An:"
 msgid "Message:"
 msgstr "Nachricht:"
 
-#: course/modquestion.php:13
+#: course/modquestion.php:13 course/modquestiongrid2.php:158
+#: course/modquestiongrid2.php:178
 msgid "Question Settings"
 msgstr "Fragenspezifische Einstellungen"
 
 #: course/modquestion.php:26 course/modquestion.php:234
 #: course/modquestion2.php:26 course/modquestion2.php:249
+#: course/modquestiongrid2.php:181
 msgid "Modify Question Settings"
 msgstr "Fragenspezifische Einstellungen bearbeiten"
 
@@ -12319,7 +12361,9 @@ msgstr "Punkte für dieses Problem:"
 #: course/modquestion.php:308 course/modquestion2.php:268
 #: course/modquestion2.php:274 course/modquestion2.php:279
 #: course/modquestion2.php:290 course/modquestion2.php:298
-#: course/modquestion2.php:307
+#: course/modquestion2.php:307 course/modquestiongrid2.php:253
+#: course/modquestiongrid2.php:254 course/modquestiongrid2.php:284
+#: course/modquestiongrid2.php:285 course/modquestiongrid2.php:286
 msgid "Default:"
 msgstr "Standardwert:"
 
@@ -12611,3 +12655,232 @@ msgstr "Diese Frage ersetzen durch die Frage mit der ID:"
 #: course/modquestion2.php:349
 msgid "blank for default"
 msgstr "Für Standard-Wert leer lassen"
+
+#: admin/importitems.php:619
+msgid "You need to access this page from a menu link"
+msgstr "Auf diese Seite können Sie nur über das Kursmenü zugreifen"
+
+#: admin/importitems.php:653
+msgid ""
+"These files pointed to by inline text items were not found and will need to "
+"be reuploaded:"
+msgstr ""
+"Diese Dateien, auf die durch Inline-Textelemente verwiesen wird, wurden "
+"nicht gefunden und müssen erneut hochgeladen werden:"
+
+#: admin/importitems.php:680
+msgid ""
+"This does not appear to be a course items file.  It may be a question or "
+"library export."
+msgstr ""
+"Dies scheint keine Datei mit Kurselementen zu sein.  Es kann sich um eine "
+"Frage oder einen Bibliotheksexport handelt."
+
+#: admin/importitems.php:737 admin/importitems2.php:173
+#: admin/importitems2.php:172
+msgid ""
+"This page will allow you to import course items previously exported from"
+"\tthis site or another site running this software."
+msgstr ""
+"Auf dieser Seite können Sie Kurselemente importieren, die zuvor von dieser "
+"Website oder einer anderen Website mit dieser Software exportiert wurden."
+
+#: admin/importitems.php:740 admin/importitems2.php:175
+msgid "Import file:"
+msgstr "Datei importieren:"
+
+#: admin/importitems.php:752
+msgid "Package Description"
+msgstr "Paketbeschreibung"
+
+#: admin/importitems.php:756 admin/importitems2.php:198
+#: admin/importitems2.php:197
+msgid ""
+"Some questions (possibly older or different versions) may already exist on "
+"the system.\tWith these questions, do you want to:"
+msgstr ""
+"Einige Fragen (möglicherweise ältere oder andere Versionen) können bereits "
+"auf dem System vorhanden sein. Wie möchten Sie mit diesen Fragen verfahren:"
+
+#: admin/importitems.php:757
+msgid "Update existing questions (if allowed),"
+msgstr "Vorhandene Fragen aktualisieren (falls zulässig),"
+
+#: admin/importitems.php:758 admin/importitems2.php:200
+#: admin/importitems2.php:199
+msgid "Keep existing questions"
+msgstr "Existierende Fragen beibehalten"
+
+#: admin/importitems.php:764 admin/importitems2.php:206
+#: admin/importitems2.php:205
+msgid "For Added Questions, Set Question Use Rights to"
+msgstr "Nutzungsrechte für hinzugefügte Fragen setzen"
+
+#: admin/importitems.php:767 admin/importitems2.php:209
+#: admin/importitems2.php:208
+msgid "Allow use, use as template, no modifications"
+msgstr "Nutzung erlauben, Nutzung als Vorlage erlauben, keine Veränderungen"
+
+#: admin/importitems.php:769 admin/importitems2.php:211
+#: admin/importitems2.php:210
+msgid "Allow use and modifications by all"
+msgstr "Jeder darf nutzen und bearbeiten"
+
+#: admin/importitems.php:771 admin/importitems2.php:213
+#: admin/importitems2.php:212
+msgid "Use rights in import, if available."
+msgstr "Nutzungsrechte aus der Importdatei verwenden, wenn möglich."
+
+#: admin/importitems.php:776 admin/importitems2.php:216
+#: admin/importitems2.php:215
+msgid "Assign Added Questions to library:"
+msgstr "Hinzugefügte Fragen einordnen in die Bibliothek:"
+
+#: admin/importitems.php:817 admin/importitems2.php:280
+#: admin/importitems2.php:279
+msgid "Import Items"
+msgstr "Kurselemente importieren"
+
+#: admin/importitems2.php:194 admin/importitems2.php:193
+msgid ""
+"Import as course owner (for ownership when updating or adding questions)."
+msgstr ""
+"Kurseigentümer als Eigentümer der hinzugefügten oder aktualisierten Fragen "
+"setzen."
+
+#: admin/importitems2.php:199 admin/importitems2.php:198
+msgid "Update existing questions (if allowed)"
+msgstr "Existierende Fragen aktualisieren (falls zulässig)"
+
+#: admin/importitems2.php:202 admin/importitems2.php:201
+msgid "Force update"
+msgstr "Aktualisierung erzwingen"
+
+#: admin/importitems2.php:259 admin/importitems2.php:258
+msgid "Import course settings? (will overwrite existing)"
+msgstr ""
+"Kurseinstellungen importieren? (Überschreibt existierende Einstellungen)"
+
+#: admin/importitems2.php:263 admin/importitems2.php:262
+msgid "Import gradebook scheme and categories? (will overwrite existing)"
+msgstr ""
+"Schema und Kategorien für Punkteübersicht importieren? (Überschreibt "
+"existierende Einstellungen)"
+
+#: admin/importitems2.php:267 admin/importitems2.php:266
+msgid "Import offline grade items?"
+msgstr "Kurselemente importieren, die offline bewertet werden?"
+
+#: admin/importitems2.php:271 admin/importitems2.php:270
+msgid "Import calendar items?"
+msgstr "Kalender-Termine importieren?"
+
+#: admin/importitems2.php:275 admin/importitems2.php:274
+msgid "Import \"display at top\" instructor forum posts?"
+msgstr ""
+"Einstellung \"Oben anzeigen\" für Forumsbeiträge des Dozenten importieren?"
+
+#: admin/importitems2.php:83
+msgid "Import Results"
+msgstr "Import-Ergebnisse"
+
+#: admin/importitems2.php:103
+msgid ""
+"This does not appear to be a course items file.  It may be a question or "
+"library export, or an older format course export."
+msgstr ""
+"Dies scheint keine Kurselementdatei zu sein.  Dabei kann es sich um einen "
+"Fragen- oder Bibliotheksexport oder einen Kursexport oder um einen "
+"Kursexport in einem älteren Format handeln."
+
+#: course/modquestiongrid2.php:8
+msgid "This page cannot be accessed directly"
+msgstr "Auf diese Seite kann nicht direkt zugegriffen werden"
+
+#: course/modquestiongrid2.php:182
+msgid ""
+"For more advanced settings, modify the settings for individual questions "
+"after adding."
+msgstr ""
+"Für genauere Einstellungen ändern Sie die Einstellungen für einzelne Fragen, "
+"nachdem Sie sie hinzugefügt haben."
+
+#: course/modquestiongrid2.php:190
+msgid "Leave items blank to use the assessment's default values"
+msgstr "Lassen Sie die Felder leer um die Standardwerte des Tests zu verwenden"
+
+#: course/modquestiongrid2.php:254 course/modquestiongrid2.php:286
+msgid "Show hints &amp; video buttons?"
+msgstr "Hinweise &amp; Video-Schaltflächen zeigen?"
+
+#: course/modquestiongrid2.php:255
+msgid "Additional Copies to Add"
+msgstr "Zusätzliche Kopien hinzufügen"
+
+#: course/modquestiongrid2.php:285
+msgid "Tries (0 for unlimited)"
+msgstr "Versuche (0 für unbegrenzt)"
+
+#: course/modquestiongrid2.php:287
+msgid "Number of Copies to Add"
+msgstr "Anzahl der zusätzlichen Kopien"
+
+#: course/modquestiongrid2.php:342
+msgid "Add as a question group?"
+msgstr "Als Fragegruppe hinzufügen?"
+
+#: course/modquestiongrid2.php:343
+msgid "Set the points equal to the number of parts for multipart?"
+msgstr "Für multipart-Fragen Punkte gleich Anzahl der Teile setzen?"
+
+#: course/addquestions.php:1274
+msgid "Define Video Cues"
+msgstr "In Video einordnen"
+
+#: course/addassessment2form.php:709
+msgid ""
+"Students will see one question at a time, and can jump between them in any "
+"order"
+msgstr ""
+"Die Studierenden sehen jede Frage einzeln und können beliebig zwischen ihnen "
+"wechseln"
+
+#: course/addassessment2form.php:710
+msgid ""
+"In this style,\tstudents will typically see all the questions on the screen "
+"at once. If desired, you can break the questions into pages on the Add/Remove"
+"\tQuestions page by clicking the +Text button and selecting the New Page "
+"option."
+msgstr ""
+"Dabei sehen die Studierenden i. Allg. alle Fragen gleichzeitig auf dem "
+"Bildschirm Sie können die Fragen bei der Zusammenstellung des Tests auch auf "
+"mehrere Seiten verteilen. Klicken Sie für den Beginn einer neuen Seite auf "
+"die +-Text-Schaltfläche und wählen Sie die Option \"Neue Seite\"."
+
+#: course/addassessment2form.php:711
+msgid ""
+"In this style, the questions pop up automatically at specified times while "
+"watching a YouTube video. On the Add/Remove Questions page, after adding the "
+"questions to the assessment,\tclick Define Video Cues to specify the video "
+"and times to display the\tquestions."
+msgstr ""
+"Bei dieser Darstellung sehen die Studierenden ein YouTube-Video. An "
+"bestimmten Stellen wird die Wiedergabe des Videos durch Fragen des Tests "
+"unterbrochen. Nachdem Sie die Fragen für den Test zusammengestellt haben "
+"klicken Sie auf \"In Video einordnen\" um das Video und die Zeiten, an denen "
+"es durch Ihre Fragen unterbrochen wird, festzulegen."
+
+#: course/addassessment2form.php:713
+msgid "LivePoll"
+msgstr "Live-Umfrage"
+
+#: course/addassessment2form.php:713
+msgid ""
+"This is a clicker-style display, requiring students to be in the assessment "
+"at the same time as the teacher. The teacher opens a question for students "
+"to answer, and results can be viewed live as they are submitted."
+msgstr ""
+"Für diese Darstellungsart sollten sich Studierende und Dozent in einem Raum "
+"befinden, z.B. in einer Vorlesung. Der Dozent gibt die Fragen einzeln für "
+"die Studierenden frei, die sie auf ihren Computern bearbeiten. Einzelne "
+"Ergebnisse werden dem Dozenten angezeigt sobald sie eingehen."
