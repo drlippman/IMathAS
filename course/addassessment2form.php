@@ -706,29 +706,18 @@ $vueData = array(
 	        </button>
 	      </div>
 	      <div class="pane-body">
-					<p><strong><?php echo _('One question at a time');?></strong>: Students will
-						see one question at a time, and can jump between them in any order</p>
-					<p><strong><?php echo _('All questions at once, or in pages');?></strong>: In this style,
-						students will typically see all the questions on the screen at once.
-						If desired, you can break the questions into pages on the Add/Remove
-						Questions page by clicking the +Text button and selecting the New Page
-						option.</p>
-					<p><strong><?php echo _('Video Cued');?></strong>: In this style, the questions pop up
-						automatically at specified times while watching a YouTube video. On the
-						Add/Remove Questions page, after adding the questions to the assessment,
-						click Define Video Cues to specify the video and times to display the
-						questions.</p>
+					<p><strong><?php echo _('One question at a time');?></strong>: <?php echo _('Students will see one question at a time, and can jump between them in any order'); ?></p>
+					<p><strong><?php echo _('All questions at once, or in pages');?></strong>: <?php echo _('In this style,	students will typically see all the questions on the screen at once. If desired, you can break the questions into pages on the Add/Remove	Questions page by clicking the +Text button and selecting the New Page option.'); ?></p>
+					<p><strong><?php echo _('Video Cued');?></strong>: <?php echo _('In this style, the questions pop up automatically at specified times while watching a YouTube video. On the Add/Remove Questions page, after adding the questions to the assessment,	click Define Video Cues to specify the video and times to display the	questions.'); ?></p>
 					<?php if (isset($CFG['GEN']['livepollserver'])) { ?>
-						students to be in the assessment at the same time as the teacher. The
-						teacher opens a question for students to answer, and results can be
-						viewed live as they are submitted.</p>
+					<strong><?php echo _('LivePoll'); ?></strong>: <?php echo _('This is a clicker-style display, requiring students to be in the assessment at the same time as the teacher. The teacher opens a question for students to answer, and results can be viewed live as they are submitted.'); ?>
+					</p>
 					<?php } ?>
 	      </div>
 			</div>
     </div>
 	</div>
 </div>
-
 <script type="text/javascript">
 var app = new Vue({
 	el: '#app',

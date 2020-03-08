@@ -1271,7 +1271,7 @@ if ($overwriteBody==1) {
 <?php
 	}
 	if ($displaymethod=='VideoCue' || $displaymethod == 'video_cued') {
-		echo '<p><input type=button value="Define Video Cues" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
+		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
 	} else if ($displaymethod == 'full') {
 		echo '<p>'._('You can break your assessment into pages by using the +Text button and selecting the New Page option.').'</p>';
 	}

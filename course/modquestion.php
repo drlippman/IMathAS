@@ -10,20 +10,20 @@ require("../includes/htmlutil.php");
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$pagetitle = "Question Settings";
+$pagetitle = _("Question Settings");
 
 
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";
+	$body = _("You need to log in as a teacher to access this page");
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
-	$curBreadcrumb .= "Modify Question Settings";
+	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
+	$curBreadcrumb .= _("Modify Question Settings");
 
 	if ($_GET['process']== true) {
 		if (isset($_GET['usedef'])) {
@@ -102,7 +102,7 @@ if (!(isset($teacherid))) {
 			}
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
-			
+
 			updatePointsPossible($aid, $itemorder, $defpoints);
 		} else {
 			updatePointsPossible($aid);
@@ -165,10 +165,10 @@ if (!(isset($teacherid))) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 		if ($stm->rowCount() > 0) {
-			$page_beenTakenMsg = "<h2>Warning</h2>\n";
-			$page_beenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
-			$page_beenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
-			$page_beenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
+			$page_beenTakenMsg = "<h2>"._("Warning")."</h2>\n";
+			$page_beenTakenMsg .= "<p>"._("This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ");
+			$page_beenTakenMsg .= _("If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts")."</p> ";
+			$page_beenTakenMsg .= "<p><input type=button value=\""._("Clear Assessment Attempts")."\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
 			$beentaken = true;
 		} else {
 			$beentaken = false;
@@ -229,11 +229,11 @@ if ($overwriteBody==1) {
 	<?php echo $page_beenTakenMsg; ?>
 
 <div id="headermodquestion" class="pagetitle"><h1>
-<?php 
+<?php
 if (isset($_GET['id'])) {
-	echo 'Modify Question Settings';
+	echo _('Modify Question Settings');
 } else {
-	echo 'New Question Settings';
+	echo _('New Question Settings');
 }
 ?>
 </h1></div>
@@ -243,92 +243,92 @@ if (isset($_GET['id'])) {
 ?>
 </p>
 <form method=post action="modquestion.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
-<p>Leave items blank to use the assessment's default values.
-<input type="submit" value="<?php echo ('Save Settings');?>"></p>
+<p><?php echo _("Leave items blank to use the assessment's default values."); ?>
+<input type="submit" value="<?php echo _('Save Settings');?>"></p>
 
 <?php
 if (!isset($_GET['id'])) {
 ?>
-<span class=form>Points for this problem:</span>
-<span class=formright> <input type=text size=4 name=points value="<?php echo Sanitize::encodeStringForDisplay($line['points']);?>"><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defpoints']);?></i></span><BR class=form>
+<span class=form><?php echo _("Points for this problem:"); ?></span>
+<span class=formright> <input type=text size=4 name=points value="<?php echo Sanitize::encodeStringForDisplay($line['points']);?>"><br/><i class="grey"><?php echo _("Default:"); ?> <?php echo Sanitize::encodeStringForDisplay($defaults['defpoints']);?></i></span><BR class=form>
 <?php
 }
 ?>
-<span class=form>Attempts allowed for this problem (0 for unlimited):</span>
-<span class=formright> <input type=text size=4 name=attempts value="<?php echo Sanitize::encodeStringForDisplay($line['attempts']);?>"><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['defattempts']);?></i></span><BR class=form>
+<span class=form><?php echo _("Attempts allowed for this problem (0 for unlimited):"); ?></span>
+<span class=formright> <input type=text size=4 name=attempts value="<?php echo Sanitize::encodeStringForDisplay($line['attempts']);?>"><br/><i class="grey"><?php echo _("Default:"); ?> <?php echo Sanitize::encodeStringForDisplay($defaults['defattempts']);?></i></span><BR class=form>
 
-<span class=form>Penalty for missed attempts:</span>
+<span class=form><?php echo _("Penalty for missed attempts:"); ?></span>
 <span class=formright><input type=text size=4 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']);?>">%
    <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
-     <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
-     <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
-     <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
-     <option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
-     <option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
-     <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
-     <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
-     <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
+     <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>><?php echo _("per missed attempt"); ?></option>
+     <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 1"); ?></option>
+     <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 2"); ?></option>
+     <option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 3"); ?></option>
+     <option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 4"); ?></option>
+     <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 5"); ?></option>
+     <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>><?php echo _("per missed attempt, after 6"); ?></option>
+     <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>><?php echo _("on last possible attempt only"); ?></option>
      </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['penalty']);?></i></span><BR class=form>
 
-<span class=form>New version on reattempt?</span>
+<span class=form><?php echo _("New version on reattempt?"); ?></span>
 <span class=formright>
     <select name="regen">
-     <option value="0" <?php if (($line['regen']%3)==0) { echo 'selected="1"';}?>>Use Default</option>
-     <option value="1" <?php if (($line['regen']%3)==1) { echo 'selected="1"';}?>>Yes, new version on reattempt</option>
-     <option value="2" <?php if (($line['regen']%3)==2) { echo 'selected="1"';}?>>No, same version on reattempt</option>
+     <option value="0" <?php if (($line['regen']%3)==0) { echo 'selected="1"';}?>><?php echo _("Use Default"); ?></option>
+     <option value="1" <?php if (($line['regen']%3)==1) { echo 'selected="1"';}?>><?php echo _("Yes, new version on reattempt"); ?></option>
+     <option value="2" <?php if (($line['regen']%3)==2) { echo 'selected="1"';}?>><?php echo _("No, same version on reattempt"); ?></option>
     </select><br/><i class="grey">Default: <?php echo $defaults['reattemptnewver'];?></i></span><br class="form"/>
 
-<span class="form">Allow &quot;Try similar problem&quot;?</span>
+<span class="form"><?php echo _("Allow &quot;Try similar problem&quot;?"); ?></span>
 <span class=formright>
     <select name="allowregen">
-     <option value="0" <?php if ($line['regen']<3) { echo 'selected="1"';}?>>Use Default</option>
-     <option value="1" <?php if ($line['regen']>=3) { echo 'selected="1"';}?>>No</option>
-</select><br/><i class="grey">Default: <?php echo $defaults['allowregen'];?></i></span><br class="form"/>
+     <option value="0" <?php if ($line['regen']<3) { echo 'selected="1"';}?>><?php echo _("Use Default"); ?></option>
+     <option value="1" <?php if ($line['regen']>=3) { echo 'selected="1"';}?>><?php echo _("No"); ?></option>
+</select><br/><i class="grey"><?php echo _("Default:"); ?> <?php echo $defaults['allowregen'];?></i></span><br class="form"/>
 
-<span class=form>Show Answers</span><span class=formright>
+<span class=form><?php echo _("Show Answers"); ?></span><span class=formright>
     <select name="showans">
-     <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>>Use Default</option>
-     <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>>Never during assessment</option>
-     <option value="F" <?php if ($line['showans']=='F') { echo 'selected="1"';}?>>Show answer after last attempt</option>
-     <option value="1" <?php if ($line['showans']=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
-     <option value="2" <?php if ($line['showans']=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
-     <option value="3" <?php if ($line['showans']=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
-     <option value="4" <?php if ($line['showans']=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
-     <option value="5" <?php if ($line['showans']=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
-     <option value="6" <?php if ($line['showans']=="6") {echo "SELECTED";} ?>>After 6 attempts</option>
-     <option value="7" <?php if ($line['showans']=="7") {echo "SELECTED";} ?>>After 7 attempts</option>
+     <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>><?php echo _("Use Default"); ?></option>
+     <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>><?php echo _("Never during assessment"); ?></option>
+     <option value="F" <?php if ($line['showans']=='F') { echo 'selected="1"';}?>><?php echo _("Show answer after last attempt"); ?></option>
+     <option value="1" <?php if ($line['showans']=="1") {echo "SELECTED";} ?>><?php echo _("After 1 attempt"); ?></option>
+     <option value="2" <?php if ($line['showans']=="2") {echo "SELECTED";} ?>><?php echo _("After 2 attempts"); ?></option>
+     <option value="3" <?php if ($line['showans']=="3") {echo "SELECTED";} ?>><?php echo _("After 3 attempts"); ?></option>
+     <option value="4" <?php if ($line['showans']=="4") {echo "SELECTED";} ?>><?php echo _("After 4 attempts"); ?></option>
+     <option value="5" <?php if ($line['showans']=="5") {echo "SELECTED";} ?>><?php echo _("After 5 attempts"); ?></option>
+     <option value="6" <?php if ($line['showans']=="6") {echo "SELECTED";} ?>><?php echo _("After 6 attempts"); ?></option>
+     <option value="7" <?php if ($line['showans']=="7") {echo "SELECTED";} ?>><?php echo _("After 7 attempts"); ?></option>
 
-    </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['showans']);?></i></span><br class="form"/>
+    </select><br/><i class="grey"><?php echo _("Default:"); ?> <?php echo Sanitize::encodeStringForDisplay($defaults['showans']);?></i></span><br class="form"/>
 
-<span class=form>Show hints and video/text buttons?</span><span class=formright>
+<span class=form><?php echo _("Show hints and video/text buttons?"); ?></span><span class=formright>
     <select name="showhints">
-     <option value="0" <?php if ($line['showhints']==0) { echo 'selected="1"';}?>>Use Default</option>
-     <option value="1" <?php if ($line['showhints']==1) { echo 'selected="1"';}?>>No</option>
-     <option value="2" <?php if ($line['showhints']==2) { echo 'selected="1"';}?>>Yes</option>
-    </select><br/><i class="grey">Default: <?php echo $defaults['showhints'];?></i></span><br class="form"/>
+     <option value="0" <?php if ($line['showhints']==0) { echo 'selected="1"';}?>><?php echo _("Use Default"); ?></option>
+     <option value="1" <?php if ($line['showhints']==1) { echo 'selected="1"';}?>><?php echo _("No"); ?></option>
+     <option value="2" <?php if ($line['showhints']==2) { echo 'selected="1"';}?>><?php echo _("Yes"); ?></option>
+    </select><br/><i class="grey"><?php echo _("Default:"); ?> <?php echo $defaults['showhints'];?></i></span><br class="form"/>
 
-<span class=form>Use Scoring Rubric</span><span class=formright>
+<span class=form><?php echo _("Use Scoring Rubric"); ?></span><span class=formright>
 <?php
     writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
-    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">Add new rubric</a> ";
-    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">Edit rubrics</a> ";
+    echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">"._("Add new rubric")."</a> ";
+    echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">"._("Edit rubrics")."</a> ";
 ?>
     </span><br class="form"/>
 <?php
 	if (isset($_GET['qsetid'])) { //adding new question
-		echo "<span class=form>Number of copies of question to add:</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";
+		echo "<span class=form>"._("Number of copies of question to add:")."</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";
 	} else if (!$beentaken) {
-		echo "<span class=form>Number, if any, of additional copies to add to assessment:</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
+		echo "<span class=form>"._("Number, if any, of additional copies to add to assessment:")."</span><span class=formright><input type=text size=4 name=copies value=\"0\"/></span><br class=form />";
 	}
 	if ($line['fixedseeds']=='') {
-		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">Advanced</a></span><br class="form"/>';
+		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'.advanced\').show();return false">'._('Advanced').'</a></span><br class="form"/>';
 	}
 	echo '<div class="advanced" id="fixedseedwrap" ';
 	if ($line['fixedseeds']=='') {
 		echo 'style="display:none;"';
 	}
 	echo '>';
-	echo '<span class="form">Restricted question seed list:</span>';
+	echo '<span class="form">'._('Restricted question seed list:').'</span>';
 	echo '<span class="formright"><input size=30 name="fixedseeds" id="fixedseeds" value="'.$line['fixedseeds'].'"/></span><br class="form"/>';
 	echo '</div>';
 	if ($line['fixedseeds']!='' && isset($_GET['id'])) {
@@ -336,18 +336,18 @@ if (!isset($_GET['id'])) {
 	}
 	if (isset($_GET['id'])) {
 		echo '<div class="advanced" style="display:none">';
-		echo '<span class="form">Replace this question with question ID: ';
+		echo '<span class="form">'._('Replace this question with question ID: ');
 		if ($beentaken) {
-			echo '<br/><span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span>';
+			echo '<br/><span class=noticetext>'._('WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it').'</span>';
 		}
 		echo '</span><span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
 		echo '</div>';
 	}
 	if ($beentaken) {
 		echo '<div class="advanced" style="display:none">';
-		echo '<span class=form>Points for this problem: <br/>';
-		echo '<span class=noticetext>WARNING: you generally should not change point values after students have started the assessment, as the points already earned by students will not be re-calculated.</span></span>';
-		echo '<span class=formright> <input type=text size=4 name=points value="'.Sanitize::encodeStringForDisplay($line['points']).'"> (blank for default)</span><BR class=form>';		
+		echo '<span class=form>'._('Points for this problem:').' <br/>';
+		echo '<span class=noticetext>'._('WARNING: you generally should not change point values after students have started the assessment, as the points already earned by students will not be re-calculated.').'</span></span>';
+		echo '<span class=formright> <input type=text size=4 name=points value="'.Sanitize::encodeStringForDisplay($line['points']).'"> (blank for default)</span><BR class=form>';
 		echo '</div>';
 	} else if (isset($_GET['id'])) {
 		echo '<input type=hidden name=points value="'.Sanitize::encodeStringForDisplay($line['points']).'" />';
