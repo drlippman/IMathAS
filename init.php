@@ -66,6 +66,11 @@ if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostpa
   }
 }
 
+// prevent errors in PHP < 7.2
+if (!defined('JSON_INVALID_UTF8_IGNORE')) {
+	define('JSON_INVALID_UTF8_IGNORE', 0);
+}
+
 // Store PHP sessions in the database.
 require_once(__DIR__ . "/includes/session.php");
 if (!isset($use_local_sessions)) {
