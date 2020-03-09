@@ -597,7 +597,7 @@ class QuestionHtmlGenerator
         $question = new Question(
             $evaledqtext,
             $jsParams,
-            isset($answeights) ? $answeights : array(1),
+            ($quesData['qtype'] == "multipart" && isset($answeights)) ? $answeights : array(1),
             $evaledsoln,
             $detailedSolutionContent,
             $displayedAnswersForParts,

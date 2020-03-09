@@ -387,11 +387,6 @@ input.red {
   border-color: #090;
   color: #090;
 }
-.questionwrap .question {
-  border: 0;
-  background-color: #fff;
-  margin: 12px 0;
-}
 .submitbtnwrap {
   margin: 16px 0;
 }
