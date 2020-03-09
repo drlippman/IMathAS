@@ -174,21 +174,21 @@ if ($overwriteBody==1) {
 		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
 		echo " if (prevnext[0][1]>0){
-				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
+				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">"._("Prev")."</a> ');
 			  } else {
-				  document.write('Prev ');
+				  document.write('"._("Prev")." ');
 			  }
 			  if (prevnext[1][1]>0){
-				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">Next</a> ');
+				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">"._("Next")."</a> ');
 			  } else {
-				  document.write('Next ');
+				  document.write('"._("Next")." ');
 			  }
 			  if (prevnext[2]!=null) {
-			  	document.write(' <span id=\"numchked\">'+prevnext[2]+'</span> checked');
+			  	document.write(' <span id=\"numchked\">'+prevnext[2]+'</span> "._("checked")."');
 				numchked = prevnext[2];
 			  }
 			  if (prevnext[3]!=null) {
-			  	document.write(' '+prevnext[3]+' remaining');
+			  	document.write(' '+prevnext[3]+' "._("remaining")."');
 			  }
 			}
 			</script>";
@@ -196,8 +196,8 @@ if ($overwriteBody==1) {
 	}
 
 	if (isset($_GET['checked'])) {
-		echo "<p id=usecheckwrap><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
-		echo "/> Mark Question for Use</p>";
+		echo "<p id=usecheckwrap><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\""._("Mark Question for Use")."\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
+		echo "/> "._("Mark Question for Use")."</p>";
 		echo "
 		  <script type=\"text/javascript\">
 		  var parentcbox = opener.document.getElementById(\"$loc\");
