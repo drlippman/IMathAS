@@ -2,7 +2,7 @@ var mqarea;
 
 var mqmousebase;
 $(function() {
-  
+
   $(window).load(function() {
         var hasTouch = 'ontouchstart' in document.documentElement;
         mqarea = $('.mathquill-editable');
@@ -10,14 +10,14 @@ $(function() {
   	mqarea.find('input,textarea').focus();
   	$('input,textarea').attr('autocapitalize', 'off');
 
-  	
+
   //	if (!hasTouch) {
   		$('#mqee td.mqeebtn').bind('mouseover mouseup', function() {
 			if (!$(this).hasClass("mqeeactive")) {
-				$(this).addClass("mqeehighlight");	
+				$(this).addClass("mqeehighlight");
 			}
 		}).bind('mousedown', function () {
-			$(this).addClass("mqeeclick");	
+			$(this).addClass("mqeeclick");
 		}).bind('mouseout', function () {
 			$(this).removeClass("mqeehighlight");
 			$(this).removeClass("mqeeclick");
@@ -42,7 +42,7 @@ $(function() {
   	//} else {
   		$('#mqee td.mqeebtn').bind('touchstart', function (e) {
   			if (e.preventDefault) {e.preventDefault()};
-			$(this).addClass("mqeeclick");	
+			$(this).addClass("mqeeclick");
 		}).bind('touchend', function (e) {
 			if (e.preventDefault) {e.preventDefault()};
 			$(this).delay(500).removeClass("mqeeclick");
@@ -61,7 +61,7 @@ $(function() {
 				$("body").unbind('touchmove',mqeetouchmove);
 				$("body").removeClass("unselectable");
 				$(this).unbind(event);
-			});	
+			});
 		});
   //	}
   	/* prevents stuff outside of mathquill from getting clicked, but also prevents
@@ -70,10 +70,10 @@ $(function() {
   			if (evt.preventDefault) {evt.preventDefault()};
   			if (evt.stopPropagation) {evt.stopPropagation()};
 		});*/
-  	
+
   });
 
-  //tabs 
+  //tabs
 //from http://www.sohtanaka.com/web-design/simple-tabs-w-css-jquery/
 $(document).ready(function() {
 
@@ -91,24 +91,24 @@ $(document).ready(function() {
 		$(activeTab).show(); //Fade in the active ID content
 		return false;
 	});
-	
+
 	//$("td.mqeebtn span.mathquill-rendered-math").mathquill().mathquill("redraw");
 });
-}); 
+});
 
 function mqPrepTabs(type,extras) {   //type: 0 basic, 1 advanced.  extras = 'interval' or 'ineq'
 	$(".tab_content").hide();
 	$("ul.tabs li").removeClass("active").each(function(index,el) {
-		if (index==0) {  	
-			if (true || type==0) { 
+		if (index==0) {
+			if (true || type==0) {
 				$(el).addClass("active").show();
 				var activeTab = $(el).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
 				$(activeTab).show();
 			} else {
 				$(el).hide();
 			}
-		} else if (index==1) {  	
-			if (false && type==1) { 
+		} else if (index==1) {
+			if (false && type==1) {
 				$(el).addClass("active").show();
 				var activeTab = $(el).find("a").attr("href"); //Find the href attribute value to identify the active tab + content
 				$(activeTab).show();
@@ -128,14 +128,14 @@ function mqPrepTabs(type,extras) {   //type: 0 basic, 1 advanced.  extras = 'int
 				$(el).hide();
 			}
 		} else {
-			if (type==1) { 
+			if (type==1) {
 				$(el).show();
 			} else {
 				$(el).hide();
 			}
-		}		
+		}
 	});
-	
+
 }
 function mqeemousemove(evt) {
 	$('#mqee').css('left', (evt.pageX - mqmousebase.left) + lasteepos.left)
@@ -146,7 +146,7 @@ function mqeemousemove(evt) {
 }
 function mqeetouchmove(evt) {
 	var touch = evt.originalEvent.changedTouches[0] || evt.originalEvent.touches[0];
-  		
+
 	$('#mqee').css('left', (touch.pageX - mqmousebase.left) + lasteepos.left)
 	  .css('top', (touch.pageY - mqmousebase.top) + lasteepos.top);
 	if (evt.preventDefault) {evt.preventDefault()};
@@ -193,14 +193,14 @@ function showeedd(eln,type,extras) {
 	cureedd = {"id":eln, "type":type, "extras": extras};
 	var dd = $("#mqeedd");
 	var el = $("#"+eln);
-	
+
 	var p = el.offset();
 	p.left += el.outerWidth();
 	dd.css('left',p.left+"px").css('top',p.top+"px").height(el.outerHeight()-2).show();
 }
 function updateeeddpos() {
 	if (!cureedd) {return;}
-	var dd = $("#mqeedd");	
+	var dd = $("#mqeedd");
 	var el = $("#"+cureedd.id);
 	var p = el.offset();
 	p.left += el.outerWidth();
@@ -228,10 +228,10 @@ function showee() {
 	mqPrepTabs(cureedd.type - 3,cureedd.extras);
 	var mqee = $("#mqee");
 	if (!lasteepos) {
-		
+
 		lasteepos = {
 			left: ($(window).width() - mqee.outerWidth())/2,
-			top: $(window).scrollTop() + ((window.innerHeight ? window.innerHeight : $(window).height()) - mqee.outerHeight())/2, 
+			top: $(window).scrollTop() + ((window.innerHeight ? window.innerHeight : $(window).height()) - mqee.outerHeight())/2,
 			scroll: $(window).scrollTop()
 		};
 	} else {
@@ -243,7 +243,7 @@ function showee() {
 	//console.log(AMtoMQ($("#"+cureedd.id).val()));
 	mqarea.mathquill('latex', AMtoMQ($("#"+cureedd.id).val()));
 	mqarea.find('input,textarea').focus();
-	
+
 }
 function hideee() {
 	$("#mqee").hide();
@@ -258,7 +258,7 @@ function savemathquill() {
 	if (btn) {
 		btn.trigger("click");
 	}
-	hideee();	
+	hideee();
 }
 
 
@@ -294,7 +294,7 @@ function eebasicinsert(ins) {
 	} else if (ins.substr(0,3)=='sym') {
 		insb = '';
 		insa = ins.substr(3);
-	} 
+	}
     if (el.setSelectionRange){
     	var pos = el.selectionEnd + insa.length + insb.length;
         el.value = el.value.substring(0,el.selectionStart) + insb + el.value.substring(el.selectionStart,el.selectionEnd) + insa + el.value.substring(el.selectionEnd,el.value.length);
@@ -302,7 +302,7 @@ function eebasicinsert(ins) {
 	//move inside empty function
 	if (len==0 && posshift>0) {
 		pos -= posshift;
-	} 
+	}
 	el.setSelectionRange(pos,pos);
     }
     else if (document.selection && document.selection.createRange) {
@@ -311,7 +311,7 @@ function eebasicinsert(ins) {
         range.text = insb + range.text + insa;
 	if (len==0 && posshift>0) {
 		range.move("character",-1*posshift);
-	} 
+	}
 	range.select();
     }
    eebasicselstore = null;
@@ -353,27 +353,27 @@ function showeebasic(eln) {
 	}
 	if (eln != eebasiccurel) {
 		eebasiccurel = eln;
-		p = findPos(el);
-		eebasic.style.top = (p[1] + el.offsetHeight) + "px";
+		var offset = jQuery(el).offset();
+		eebasic.style.top = (offset.top + el.offsetHeight) + "px";
 		eebasic.style.display = "block";
 		if (eebasic.offsetWidth<el.offsetWidth) {
-			eebasic.style.left = (p[0] + el.offsetWidth + 10 - eebasic.offsetWidth )+"px";
+			eebasic.style.left = (offset.left + el.offsetWidth + 10 - eebasic.offsetWidth )+"px";
 		} else {
-			eebasic.style.left = p[0] + "px";
+			eebasic.style.left = offset.left + "px";
 		}
-		
+
 	} else {
 		eebasic.style.display = "none";
 		eebasiccurel = null;
 	}
 	unhideebasice(0);
-	//el.focus(); 
+	//el.focus();
 	if (el.setSelectionRange){
 		el.focus();
 		//el.setSelectionRange(el.selectionStart,el.selectionEnd);
 	 } else if (document.selection && document.selection.createRange) {
 		range.select();
-	 }    
+	 }
 }
 
 
@@ -422,12 +422,12 @@ function showeebasicdd(eln,type) {
 	//if (eln!=eebasiccurel) {
 		var dd = document.getElementById("eebasicdd");
 		var el = document.getElementById(eln);
-		p = findPos(el);
+    var offset = jQuery(el).offset();
 		//dd.style.left = p[0] + "px";
 		//dd.style.top = (p[1] + el.offsetHeight) + "px";
 		//dd.style.width = el.offsetWidth + "px";
-		dd.style.left = (p[0]+el.offsetWidth) + "px";
-		dd.style.top = p[1] + "px";
+		dd.style.left = (offset.left+el.offsetWidth) + "px";
+		dd.style.top = offset.top + "px";
 		dd.style.height = (el.offsetHeight-2) + "px";
 		dd.style.lineHeight = el.offsetHeight + "px";
 		dd.style.width = "10px";

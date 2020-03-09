@@ -74,7 +74,7 @@ function eeinsert(ins) {
 	//move inside empty function
 	if (len==0 && posshift>0) {
 		pos -= posshift;
-	} 
+	}
 	el.setSelectionRange(pos,pos);
     }
     else if (document.selection && document.selection.createRange) {
@@ -83,7 +83,7 @@ function eeinsert(ins) {
         range.text = insb + range.text + insa;
 	if (len==0 && posshift>0) {
 		range.move("character",-1*posshift);
-	} 
+	}
 	range.select();
     }
    eeselstore = null;
@@ -144,22 +144,22 @@ function showee(eln) {
 	}
 	if (eln != eecurel) {
 		eecurel = eln;
-		p = findPos(el);
-		ee.style.left = p[0] + "px";
-		ee.style.top = (p[1] + el.offsetHeight) + "px";
+		var offset = jQuery(el).offset();
+		ee.style.left = offset.left + "px";
+		ee.style.top = (offset.top + el.offsetHeight) + "px";
 		ee.style.display = "block";
 	} else {
 		ee.style.display = "none";
 		eecurel = null;
 	}
 	unhideee(0);
-	//el.focus(); 
+	//el.focus();
 	if (el.setSelectionRange){
 		el.focus();
 		//el.setSelectionRange(el.selectionStart,el.selectionEnd);
 	 } else if (document.selection && document.selection.createRange) {
 		range.select();
-	 }    
+	 }
 }
 
 
@@ -211,12 +211,12 @@ function showeedd(eln) {
 	if (eln!=eecurel) {
 		var dd = document.getElementById("eedd");
 		var el = document.getElementById(eln);
-		p = findPos(el);
+		var offset = jQuery(el).offset();
 		//dd.style.left = p[0] + "px";
 		//dd.style.top = (p[1] + el.offsetHeight) + "px";
 		//dd.style.width = el.offsetWidth + "px";
-		dd.style.left = (p[0]+el.offsetWidth) + "px";
-		dd.style.top = p[1] + "px";
+		dd.style.left = (offset.left+el.offsetWidth) + "px";
+		dd.style.top = offset.top + "px";
 		dd.style.height = (el.offsetHeight-2) + "px";
 		dd.style.lineHeight = el.offsetHeight + "px";
 		dd.style.width = "10px";
@@ -228,8 +228,7 @@ function updateeeddpos() {
 	if (!cureedd) {return;}
 	var dd = document.getElementById("eedd");
 	var el = document.getElementById(cureedd);
-	p = findPos(el);
-	dd.style.left = (p[0]+el.offsetWidth) + "px";
-	dd.style.top = p[1] + "px";
+	var offset = jQuery(el).offset();
+	dd.style.left = (offset.left+el.offsetWidth) + "px";
+	dd.style.top = offset.top + "px";
 }
-	

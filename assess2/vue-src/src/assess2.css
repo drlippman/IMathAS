@@ -221,6 +221,23 @@ td.l, table.stats tbody td.l {
   text-align: left;
 }
 
+@media only screen and (max-width: 700px) {
+  table[role=presentation] > tbody > tr > td,
+	table[role=presentation] > tbody > tr > th,
+	table[role=presentation] > thead > tr > td,
+	table[role=presentation] > thead > tr > th
+	{
+		display: block;
+	}
+	table.responsive > tbody > tr > td,
+	table.responsive > tbody > tr > th,
+	table.responsive > thead > tr > td,
+	table.responsive > thead > tr > th
+	{
+		display: block;
+	}
+}
+
 ul.nomark {
   padding-left: 40px;
   margin-left: 0px;
@@ -302,13 +319,32 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
 
 .questionpane {
   margin: 15px 15px;
-  max-width: 700px;
-  overflow-x: visible;
+  overflow: visible;
 }
 .questionwrap {
   position: relative;
-  overflow-y: hidden;
 }
+.questionpane.introtext, .questionpane > .question > .question {
+  max-width: 700px;
+  overflow: visible;
+}
+.questionwrap .question {
+  background-color: transparent;
+  border: 0;
+}
+.questionpane > .question {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background-image: linear-gradient(to right, white, white), linear-gradient(to right, white, white), linear-gradient(to right, rgba(0,0,0,.25), rgba(255,255,255,0)), linear-gradient(to left, rgba(0,0,0,.25), rgba(255,255,255,0));
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: inherit;
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
+  margin: 12px 0;
+}
+
 @media only screen and (max-width: 480px) {
   .questionpane {
     margin: 15px 4px;
