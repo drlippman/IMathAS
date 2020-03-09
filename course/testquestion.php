@@ -146,17 +146,17 @@ if ($overwriteBody==1) {
 				    toggleBrokenFlagmsg(tagged);
 			    } else {
 				    alert(req.responseText);
-				    alert(<?php echo _("Oops, error toggling the flag"); ?>);
+				    alert("<?php echo _('Oops, error toggling the flag'); ?>");
 			    }
 		    } else {
-			   alert(" "+<?php echo _("Couldn't save changes:"); ?>+"\n"+ req.status + "\n" +req.statusText);
+			   alert("<?php echo _('Couldn\'t save changes:'); ?>\n"+ req.status + "\n" +req.statusText);
 		    }
 		  }
 		}
 		function toggleBrokenFlagmsg(tagged) {
 			document.getElementById("brokenmsgbad").style.display = (tagged==1)?"block":"none";
 			document.getElementById("brokenmsgok").style.display = (tagged==1)?"none":"block";
-			if (tagged==1) {alert(<?php echo _("Make sure you also contact the question author or support so they know why you marked the question as broken"); ?>);}
+			if (tagged==1) {alert("<?php echo _('Make sure you also contact the question author or support so they know why you marked the question as broken'); ?>");}
 		}
 
 		$(window).on('beforeunload', function() {
