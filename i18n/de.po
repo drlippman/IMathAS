@@ -3,20 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: mathquill/mathquill.js:1530 mathquill/mathquill.min.js:1
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-09 18:14+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2020-03-09 18:50+0100\n"
+"PO-Revision-Date: 2020-03-09 18:51+0100\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: Ingo Dahn <dahn@vcrp.de>\n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.3\n"
 
 #: DEembedq.php:171 OEAembedq.php:314 assessment/showtest.php:292
 #: assessment/showtest.php:1925 assessment/showtest.php:1969
@@ -3345,7 +3344,7 @@ msgstr "Zeitlimit"
 msgid "Time limit shortened because of due date"
 msgstr "Zeitlimit wegen Fälligkeitsdatum verkürzt"
 
-#: assessment/showtest.php:1563
+#: assessment/showtest.php:1563 course/testquestion.php:191
 msgid "remaining"
 msgstr "verbleibend"
 
@@ -4342,7 +4341,8 @@ msgid "Previous"
 msgstr "Zurück"
 
 #: course/addquestions.php:1438 course/showlinkedtext.php:165
-#: course/addquestions.php:1434
+#: course/addquestions.php:1434 course/testquestion.php:182
+#: course/testquestion.php:184
 msgid "Next"
 msgstr "Weiter"
 
@@ -11477,7 +11477,7 @@ msgstr "Kurs-Passwort:"
 msgid "Do you already have an account on %s?"
 msgstr "Haben Sie schon eine Benutzerkennung auf %s?"
 
-#: directaccess.php:190 directaccess.php:191
+#: directaccess.php:190 directaccess.php:191 course/testquestion.php:187
 msgid "checked"
 msgstr "ausgewählt"
 
@@ -12902,3 +12902,11 @@ msgid ""
 msgstr ""
 "Sind Sie <b>SICHER</b>, dass Sie diesen Test (und alle Versuche der "
 "Studierenden dazu) löschen wollen?"
+
+#: course/testquestion.php:177 course/testquestion.php:179
+msgid "Prev"
+msgstr "Zurück"
+
+#: course/testquestion.php:199 course/testquestion.php:200
+msgid "Mark Question for Use"
+msgstr "Frage zur Verwendung markieren"
