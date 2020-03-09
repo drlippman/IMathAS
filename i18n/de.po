@@ -3,19 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: mathquill/mathquill.js:1530 mathquill/mathquill.min.js:1
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-08 11:41+0100\n"
-"PO-Revision-Date: 2020-03-08 11:42+0100\n"
-"Language: de\n"
+"POT-Creation-Date: 2020-03-09 18:14+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Last-Translator: Ingo Dahn <dahn@vcrp.de>\n"
-"Language-Team: \n"
-"X-Generator: Poedit 2.3\n"
 
 #: DEembedq.php:171 OEAembedq.php:314 assessment/showtest.php:292
 #: assessment/showtest.php:1925 assessment/showtest.php:1969
@@ -282,34 +283,34 @@ msgid "Guest"
 msgstr "Gast"
 
 #: admin/admin2.php:11 admin/groupreportdetails.php:10 admin/userdetails.php:10
-#: admin/userreports.php:11 msgs/msglist.php:351 admin/userreportdetails.php:11
-#: course/course.php:694
+#: admin/userreportdetails.php:11 course/course.php:694
+#: admin/userreports.php:11 msgs/msglist.php:351
 msgid "Student"
 msgstr "Student"
 
 #: admin/admin2.php:12 admin/groupreportdetails.php:11 admin/userdetails.php:11
-#: util/listnewteachers.php:60 admin/userreportdetails.php:12
-#: admin/userreports.php:12
+#: admin/userreportdetails.php:12 admin/userreports.php:12
+#: util/listnewteachers.php:60
 msgid "Pending"
 msgstr "Ausstehend"
 
 #: admin/admin2.php:13 admin/groupreportdetails.php:12 admin/userdetails.php:12
-#: admin/userreportdetails.php:13 admin/userreports.php:13
+#: admin/userreports.php:13 admin/userreportdetails.php:13
 msgid "Tutor/TA/Proctor"
 msgstr "Tutor/Assistent"
 
 #: admin/admin2.php:14 admin/groupreportdetails.php:13 admin/userdetails.php:13
-#: admin/userreportdetails.php:14 admin/userreports.php:14
+#: admin/userreports.php:14 admin/userreportdetails.php:14
 msgid "Teacher"
 msgstr "Lehrer"
 
 #: admin/admin2.php:15 admin/groupreportdetails.php:14 admin/userdetails.php:14
-#: admin/userreportdetails.php:15 admin/userreports.php:15
+#: admin/userreports.php:15 admin/userreportdetails.php:15
 msgid "LimCourseCreator"
 msgstr "Kurseigentümer"
 
 #: admin/admin2.php:16 admin/groupreportdetails.php:15 admin/userdetails.php:15
-#: admin/userreportdetails.php:16 admin/userreports.php:16
+#: admin/userreports.php:16 admin/userreportdetails.php:16
 msgid "GroupAdmin"
 msgstr "Gruppen-Administrator"
 
@@ -406,7 +407,7 @@ msgstr "Benutzername"
 #: admin/admin2.php:195 admin/admin2.php:287 admin/groupreportdetails.php:225
 #: admin/userdetails.php:193 admin/userreportdetails.php:275
 #: admin/userreports.php:157 admin/userreports.php:223 course/gradebook.php:683
-#: course/listusers.php:752 course/gradebook.php:687 forms.php:421
+#: forms.php:421 course/gradebook.php:687 course/listusers.php:752
 msgid "Email"
 msgstr "E-Mail"
 
@@ -941,9 +942,9 @@ msgstr ""
 #: course/course.php:719 course/editsnippets.php:227
 #: course/editsnippets.php:255 course/exception.php:188
 #: course/gbsettings.php:402 course/gradebook.php:734 course/gradebook.php:1293
-#: course/masschgdates.php:404 forms.php:481 course/managecalitems.php:161
-#: course/gradebook.php:1297 course/latepasses.php:175
-#: course/managecalitems.php:133
+#: course/managecalitems.php:161 course/latepasses.php:175
+#: course/managecalitems.php:133 course/gradebook.php:1297
+#: course/masschgdates.php:404 forms.php:481
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -952,7 +953,7 @@ msgid "Add Course Group"
 msgstr "Kurs-Gruppe anlegen"
 
 #: admin/modcourseorder.php:189 admin/unhidefromcourselist.php:90 index.php:570
-#: index.php:572 index.php:576
+#: index.php:576
 msgid "Unavailable"
 msgstr "Nicht verfügbar"
 
@@ -1016,27 +1017,27 @@ msgid "Deleted"
 msgstr "Gelöscht"
 
 #: admin/userdetails.php:84 admin/userdetails.php:109 admin/userdetails.php:135
-#: admin/forms.php:731 admin/userreportdetails.php:107
-#: admin/userreportdetails.php:197 admin/userreportdetails.php:223
+#: admin/userreportdetails.php:107 admin/userreportdetails.php:223
+#: admin/forms.php:731 admin/userreportdetails.php:197
 msgid "Available to students"
 msgstr "Für Studierende verfügbar"
 
 #: admin/userdetails.php:84 admin/userdetails.php:109 admin/userdetails.php:135
-#: admin/userreportdetails.php:223 admin/userreportdetails.php:107
-#: admin/userreportdetails.php:197
+#: admin/userreportdetails.php:107 admin/userreportdetails.php:197
+#: admin/userreportdetails.php:223
 msgid "Hidden from students"
 msgstr "Für Studierende unsichtbar"
 
 #: admin/userdetails.php:86 admin/userdetails.php:113 admin/userdetails.php:139
-#: admin/userreportdetails.php:227 admin/userreportdetails.php:109
-#: admin/userreportdetails.php:201
+#: admin/userreportdetails.php:109 admin/userreportdetails.php:201
+#: admin/userreportdetails.php:227
 msgid "Locked for Assessment"
 msgstr "Gesperrter Test"
 
 #: admin/userdetails.php:89 admin/userdetails.php:116 admin/userdetails.php:142
-#: admin/userreportdetails.php:502 admin/userdetails.php:379
-#: admin/userreportdetails.php:204 admin/userreportdetails.php:112
-#: admin/userreportdetails.php:230
+#: admin/userdetails.php:379 admin/userreportdetails.php:112
+#: admin/userreportdetails.php:230 admin/userreportdetails.php:204
+#: admin/userreportdetails.php:502
 msgid "Hidden on User's Home Page"
 msgstr "Auf er Startseite des Benutzers ausgeblendet"
 
@@ -1280,12 +1281,12 @@ msgstr "Musterlösung"
 
 #: assess2/displayq3.php:451 assess2/displayq3.php:488
 #: assess2/questions/QuestionHtmlGenerator.php:514 assessment/displayq2.php:493
-#: assessment/showtest.php:2993 assessment/testutil.php:918
-#: assessment/showtest.php:3054 assessment/showtest.php:3052
-#: assessment/testutil.php:819 javascript/livepoll.js:418
-#: assess2/questions/QuestionHtmlGenerator.php:516 assessment/displayq2.php:533
-#: assessment/showtest.php:3587 assessment/showtest.php:3598
-#: assessment/showtest.php:3716 assessment/testutil.php:916
+#: assessment/testutil.php:918 assessment/showtest.php:3052
+#: javascript/livepoll.js:418 assessment/displayq2.php:533
+#: assessment/showtest.php:3598 assessment/testutil.php:916
+#: assess2/questions/QuestionHtmlGenerator.php:516 assessment/showtest.php:2993
+#: assessment/showtest.php:3054 assessment/showtest.php:3587
+#: assessment/showtest.php:3716 assessment/testutil.php:819
 msgid "Question"
 msgstr "Frage"
 
@@ -3316,14 +3317,14 @@ msgstr "Stunde"
 #: assessment/showtest.php:1523 assessment/showtest.php:1530
 #: course/courseshowitems.php:859 course/courseshowitems.php:866
 #: course/drillassess.php:233 course/gradebook.php:824 course/gradebook.php:831
-#: course/treereader.php:395 course/treereader.php:402
+#: course/treereader.php:402 course/treereader.php:395
 msgid "minute"
 msgstr "Minute"
 
 #: assessment/showtest.php:1525 assessment/showtest.php:1532
 #: course/courseshowitems.php:861 course/courseshowitems.php:868
 #: course/drillassess.php:236 course/gradebook.php:826 course/gradebook.php:833
-#: course/treereader.php:397 course/treereader.php:404
+#: course/treereader.php:404 course/treereader.php:397
 msgid "second"
 msgstr "Sekunde"
 
@@ -4402,6 +4403,7 @@ msgid "None"
 msgstr "Keine"
 
 #: course/chgoffline.php:49 course/managestugrps.php:572
+#: course/deleteassessment.php:101
 msgid "Yes, Delete"
 msgstr "Ja, Löschen"
 
@@ -4506,7 +4508,7 @@ msgstr "Konvertieren"
 #: admin/forms.php:142 admin/forms.php:1324 admin/forms.php:1474
 #: admin/forms.php:1512 admin/transfercourse.php:141
 #: course/addassessment.php:128 course/addassessment2.php:104 forms.php:373
-#: validate.php:135
+#: validate.php:135 course/deleteassessment.php:102
 #, php-format
 msgid "Nevermind"
 msgstr "Hat sich erledigt"
@@ -5544,9 +5546,9 @@ msgstr "Gesamtpunktzahl"
 
 #: course/gb-export.php:202 course/gb-export.php:204 course/gb-export.php:235
 #: course/gb-export.php:484 course/gradebook.php:1043 course/gradebook.php:1045
-#: course/gradebook.php:1585 course/gradebook.php:1583
-#: course/gradebook.php:1315 course/gradebook.php:1346
-#: course/gradebook.php:1587 course/gradebook.php:1589
+#: course/gradebook.php:1583 course/gradebook.php:1346
+#: course/gradebook.php:1589 course/gradebook.php:1315
+#: course/gradebook.php:1587
 msgid "pts"
 msgstr "Pkt"
 
@@ -10229,7 +10231,7 @@ msgstr ""
 #: course/addquestions.php:28 course/addlinkedtext.php:51
 #: course/moddataset.php:17 course/copyitems.php:27 course/testquestion.php:20
 #: course/modquestion.php:19 course/modquestion2.php:19
-#: admin/importitems.php:616
+#: admin/importitems.php:616 course/deleteassessment.php:19
 msgid "You need to log in as a teacher to access this page"
 msgstr "Sie müssen sich als Dozent anmelden um auf diese Seite zuzugreifen"
 
@@ -12884,3 +12886,19 @@ msgstr ""
 "befinden, z.B. in einer Vorlesung. Der Dozent gibt die Fragen einzeln für "
 "die Studierenden frei, die sie auf ihren Computern bearbeiten. Einzelne "
 "Ergebnisse werden dem Dozenten angezeigt sobald sie eingehen."
+
+#: course/deleteassessment.php:14 course/deleteassessment.php:15
+msgid "Delete Assessment"
+msgstr "Test löschen"
+
+#: course/deleteassessment.php:22
+msgid "You need to access this page from the link on the course page"
+msgstr "Auf diese Seite können Sie nur über das Kursmenü zugreifen"
+
+#: course/deleteassessment.php:97
+msgid ""
+"Are you <b>SURE</b> you want to delete this assessment and all associated "
+"student attempts?"
+msgstr ""
+"Sind Sie <b>SICHER</b>, dass Sie diesen Test (und alle Versuche der "
+"Studierenden dazu) löschen wollen?"
