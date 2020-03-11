@@ -413,7 +413,7 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("decimal", $ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!is_numeric($totest) || !preg_match('/^\-?[\d\.]+$/',$totest)) {
+		if (!is_numeric($totest) || !preg_match('/^\-?(\d+|\d+\.\d*|\d*\.\d+)([eE]\-?\d+)?$/',$totest)) {
 			return false;
 		}
 	}

@@ -1043,6 +1043,9 @@ function processCalcInterval(fullstr, format, ineqvar) {
       break;
     }
     for (j=0; j<2; j++) {
+      if (format.indexOf('decimal')!=-1 && vals[j].match(/[\d\.]e\-?\d/)) {
+        vals[j] = vals[j].replace(/e/,"E"); // allow 3e-4 in place of 3E-4 for decimal answers
+      }
       err += singlevalsyntaxcheck(vals[j], format);
       err += syntaxcheckexpr(vals[j], format);
       if (vals[j].match(/^\s*\-?oo\s*$/)) {
@@ -1556,7 +1559,7 @@ function singlevalsyntaxcheck(str,format) {
 		  	}
 		  }
 	} else if (format.indexOf('decimal')!=-1 && format.indexOf('nodecimal')==-1) {
-		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)$/)) {
+		if (!str.match(/^\-?(\d+|\d+\.\d*|\d*\.\d+)([eE]\-?\d+)?$/)) {
 			return (_(" not a valid integer or decimal number")+". ");
 		}
 	} else if (!onlyAscii.test(str)) {
