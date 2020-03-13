@@ -71,8 +71,8 @@ if (isset($_POST['message'])) {
 			$row[2] = trim($row[2]);
 			if ($row[2]!='' && $row[2]!='none@none.com') {
 				$addy = Sanitize::simpleASCII("{$row[0]} {$row[1]}")." <".Sanitize::emailAddress($row[2]).">";
-				$sessiondata['mathdisp']=2;
-				$sessiondata['graphdisp']=2;
+				$_SESSION['mathdisp']=2;
+				$_SESSION['graphdisp']=2;
 				require("../filter/filter.php");
 				$message = filter($message);
 				$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);

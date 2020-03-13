@@ -23,8 +23,8 @@
 	}
 
 	if ($isteacher || $istutor) {
-		if (isset($sessiondata[$cid.'gbmode'])) {
-			$gbmode =  $sessiondata[$cid.'gbmode'];
+		if (isset($_SESSION[$cid.'gbmode'])) {
+			$gbmode =  $_SESSION[$cid.'gbmode'];
 		} else {
 			$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
@@ -393,7 +393,7 @@
 		}
 	}
 	if (isset($_GET['forcegraphimg'])) {
-		$sessiondata['graphdisp'] = 2;
+		$_SESSION['graphdisp'] = 2;
 	}
 
 	//OUTPUTS
@@ -502,13 +502,13 @@
 			exit;
 		}
 		$useeditor='review';
-		$sessiondata['coursetheme'] = $coursetheme;
-		$sessiondata['isteacher'] = $isteacher;
+		$_SESSION['coursetheme'] = $coursetheme;
+		$_SESSION['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
 			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=031417"></script>';
 			require("../includes/rubric.php");
 			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042519"></script>';
-			if ($sessiondata['useed']!=0) {
+			if ($_SESSION['useed']!=0) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}
 		}
@@ -551,7 +551,7 @@
 		}
 
 		echo "<div class=breadcrumb>$breadcrumbbase ";
-		if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+		if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 			echo "<a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 
 			if ($stu>0) {
@@ -959,7 +959,7 @@
 					echo '<span id="fb-'.$i.'-wrap">';
 				}
 				echo '<br/>'._('Feedback').':<br/>';
-				if ($sessiondata['useed']==0) {
+				if ($_SESSION['useed']==0) {
 					echo '<textarea id="fb-'.$i.'" name="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::encodeStringForDisplay($feedback["Q$i"], true).'</textarea>';
 				} else {
 					echo '<div id="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
@@ -1093,7 +1093,7 @@
 		echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
 		if ($canedit && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			echo "<p>General feedback:<br/>";
-			if ($sessiondata['useed']==0) {
+			if ($_SESSION['useed']==0) {
 				echo "<textarea cols=60 rows=4 id=\"feedback\" name=\"feedback\" class=\"fbbox\">";
 				if (!empty($feedback["Z"])) {
 					echo Sanitize::encodeStringForDisplay($feedback["Z"]);
@@ -1110,7 +1110,7 @@
 				echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";
 			}
 			echo "<p><input type=submit value=\"Record Changed Grades\"> ";
-			if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+			if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 				echo "<a href=\"$backurl\">Return to GradeBook without saving</a></p>\n";
 			}
 			/*
@@ -1132,7 +1132,7 @@
 				echo Sanitize::outgoingHtml($feedback["Z"]);
 			}
 			echo "</div></p>";
-			if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+			if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 				echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 			}
 		}

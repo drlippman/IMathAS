@@ -43,8 +43,7 @@ switch($_POST['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
 		$be = $_REQUEST['uid'];
-		$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
-		$stm->execute(array(':userid'=>$be, ':sessionid'=>$sessionid));
+		$_SESSION['userid'] = $be;
 		break;
 	case "chgrights":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
@@ -403,9 +402,6 @@ switch($_POST['action']) {
 		}
 		break;
 	case "logout":
-		$sessionid = session_id();
-		$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=:sessionid");
-		$stm->execute(array(':sessionid'=>$sessionid));
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
 			setcookie(session_name(), '', time()-42000, '/', '',false ,true );
@@ -1301,8 +1297,7 @@ switch($_POST['action']) {
 			//check that code is valid and not a replay
 			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
 			   ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
-				$sessiondata['mfaverified'] = true;
-				writesessiondata();
+				$_SESSION['mfaverified'] = true;
 				$mfadata['last'] = $_POST['mfatoken'];
 				$mfadata['laston'] = time();
 				if (isset($_POST['mfatrust'])) {

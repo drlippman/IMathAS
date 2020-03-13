@@ -20,7 +20,7 @@ class ExceptionFuncs {
 		$this->cid = $cid;
 		$this->latepasses = $latepasses;
 		$this->latepasshrs = $latepasshrs;
-		$this->isstu = $isstu;  // !isset($sessiondata['stuview']) && !$actas
+		$this->isstu = $isstu;  // !isset($_SESSION['stuview']) && !$actas
 		$this->courseenddate = $GLOBALS['courseenddate'];
 	}
 	public function setLatepasses($lp) {

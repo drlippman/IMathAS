@@ -14,19 +14,17 @@ require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['secfilter'])) {
 	$secfilter = $_GET['secfilter'];
-	$sessiondata[$cid.'secfilter'] = $secfilter;
-	writesessiondata();
-} else if (isset($sessiondata[$cid.'secfilter'])) {
-	$secfilter = $sessiondata[$cid.'secfilter'];
+	$_SESSION[$cid.'secfilter'] = $secfilter;
+} else if (isset($_SESSION[$cid.'secfilter'])) {
+	$secfilter = $_SESSION[$cid.'secfilter'];
 } else {
 	$secfilter = -1;
 }
 if (isset($_GET['rmode'])) {
 	$rmode = $_GET['rmode'];
-	$sessiondata[$cid.'rmode'] = $rmode;
-	writesessiondata();
-} else if (isset($sessiondata[$cid.'rmode'])) {
-	$rmode = $sessiondata[$cid.'rmode'];
+	$_SESSION[$cid.'rmode'] = $rmode;
+} else if (isset($_SESSION[$cid.'rmode'])) {
+	$rmode = $_SESSION[$cid.'rmode'];
 } else {
 	$rmode = 0;
 }

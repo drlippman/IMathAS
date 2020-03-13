@@ -109,7 +109,7 @@ if ($myrights<20) {
 }
 
 /******* begin html output ********/
-$sessiondata['coursetheme'] = $coursetheme;
+$_SESSION['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
 
 $useeqnhelper = $eqnhelper;

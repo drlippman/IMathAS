@@ -28,23 +28,21 @@
 	}
 
 	if (isset($_GET['clearsearch'])) {
-		unset($sessiondata['forumsearchstr'.$cid]);
-		unset($sessiondata['forumsearchtype'.$cid]);
-		unset($sessiondata['forumsearchtag'.$cid]);
-		writesessiondata();
+		unset($_SESSION['forumsearchstr'.$cid]);
+		unset($_SESSION['forumsearchtype'.$cid]);
+		unset($_SESSION['forumsearchtag'.$cid]);
 		$searchtype = "none";
 	} else if(isset($_POST['searchsubmit'])) {
 		$searchstr = trim($_POST['search']);
 		$searchtype = $_POST['searchtype'];
 		$searchtag = $_POST['tagfiltersel'];
-		$sessiondata['forumsearchstr'.$cid] = $searchstr;
-		$sessiondata['forumsearchtype'.$cid] = $searchtype;
-		$sessiondata['forumsearchtag'.$cid] = $searchtag;
-		writesessiondata();
-	} else if (isset($sessiondata['forumsearchstr'.$cid])) {
-		$searchstr = $sessiondata['forumsearchstr'.$cid];
-		$searchtype = $sessiondata['forumsearchtype'.$cid];
-		$searchtag = $sessiondata['forumsearchtag'.$cid];
+		$_SESSION['forumsearchstr'.$cid] = $searchstr;
+		$_SESSION['forumsearchtype'.$cid] = $searchtype;
+		$_SESSION['forumsearchtag'.$cid] = $searchtag;
+	} else if (isset($_SESSION['forumsearchstr'.$cid])) {
+		$searchstr = $_SESSION['forumsearchstr'.$cid];
+		$searchtype = $_SESSION['forumsearchtype'.$cid];
+		$searchtag = $_SESSION['forumsearchtag'.$cid];
 	} else {
 		$searchtype = "none";
 	}

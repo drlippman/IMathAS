@@ -353,7 +353,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$domainlimited = true;
 		} else {$xmax = $winxmax;}
 
-		if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		if ($_SESSION['graphdisp']==0) {
 			if ($xmax-$xmin>2 || $xmax==$xmin) {
 				$dx = 1;
 				$stopat = ($xmax-$xmin)+1;
@@ -409,7 +409,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 				}
 			} else {
-				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
+				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $_SESSION['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
 				$y = $evalfunc(['x'=>$x]);
@@ -602,7 +602,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$commands = "setBorder(5); initPicture({$winxmin},{$winxmax},{$ymin},{$ymax});".$commands;
 	$alt = "Graphs with window x: {$winxmin} to {$winxmax}, y: {$ymin} to {$ymax}. ".$alt;
 
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
@@ -616,7 +616,7 @@ function addplotborder($plot,$left,$bottom=5,$right=5,$top=5) {
 }
 
 function replacealttext($plot, $alttext) {
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alttext;
 	} else {
 		if (strpos($plot, 'alt="')!==false) { //replace
@@ -634,7 +634,7 @@ function addlabel($plot,$x,$y,$lbl) {
 	} else {
 		$color = "black";
 	}
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $plot .= "Label &quot;$lbl&quot; at ($x,$y). ";
 	}
 	if (func_num_args()>6) {
@@ -655,7 +655,7 @@ function addlabelabs($plot,$x,$y,$lbl) {
 	} else {
 		$color = "black";
 	}
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $plot .= "Label &quot;$lbl&quot; at pixel coordinates ($x,$y).";
 	}
 	if (func_num_args()>6) {
@@ -683,7 +683,7 @@ function mergeplots($plota) {
 	}
 	for ($i=1;$i<$n;$i++) {
 		$plotb = func_get_arg($i);
-		if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		if ($_SESSION['graphdisp']==0) {
 			$newtext = preg_replace('/^Graphs.*?y:.*?to.*?\.\s/', '', $plotb);
 			$plota .= $newtext;
 		} else {
@@ -695,7 +695,7 @@ function mergeplots($plota) {
 }
 
 function addfractionaxislabels($plot,$step) {
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $plot .= "Horizontal axis labels in steps of $step.";
 	}
 	if (strpos($step,'/')===false) {
@@ -766,7 +766,7 @@ function connectthedots($xarray,$yarray,$color='black',$thick=1,$startdot='',$en
 }
 
 function showasciisvg($script, $width=200, $height=200, $alt="") {
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		if ($alt != '') {
 			return $alt;
 		} else {
@@ -1472,7 +1472,7 @@ function jointshuffle($a1,$a2) {  //optional third & fourth params $n1 and $n2
 
 
 function listtoarray($l) {
-	if (func_num_args()>1 && ($GLOBALS['sessiondata']['isteacher'] || isset($GLOBALS['teacherid']))) {
+	if (func_num_args()>1 && ($_SESSION['isteacher'] || isset($GLOBALS['teacherid']))) {
 		echo "Warning:  listtoarray expects one argument, more than one provided";
 	}
 	return array_map('trim',explode(',',$l));

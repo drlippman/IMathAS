@@ -59,7 +59,7 @@
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 		require("../includes/rubric.php");
 	}
-	if ($caneditscore && $sessiondata['useed']!=0) {
+	if ($caneditscore && $_SESSION['useed']!=0) {
 		$useeditor = "noinit";
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
@@ -352,7 +352,7 @@
 				}
 				$content .= "</textarea>";
 				*/
-				if ($sessiondata['useed']==0) {
+				if ($_SESSION['useed']==0) {
 					$content .= "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback".Sanitize::onlyInt($line['id'])."\" id=\"feedback".Sanitize::onlyInt($line['id'])."\">";
 					if ($feedback[$line['id']]!==null) {
 						$content .= Sanitize::encodeStringForDisplay($feedback[$line['id']]);

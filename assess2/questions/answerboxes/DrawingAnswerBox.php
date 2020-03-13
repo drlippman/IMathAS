@@ -203,10 +203,10 @@ class DrawingAnswerBox implements AnswerBox
     				$settings[7] = $newheight;
     			}
     		}
-    		if ($GLOBALS['sessiondata']['userprefs']['drawentry']==1 && $GLOBALS['sessiondata']['graphdisp']==0) {
+    		if ($_SESSION['userprefs']['drawentry']==1 && $_SESSION['graphdisp']==0) {
     			//can't imagine why someone would pick this, but if they do, need to set graphdisp to 2 temporarily
     			$revertgraphdisp = true;
-    			$GLOBALS['sessiondata']['graphdisp']=2;
+    			$_SESSION['graphdisp']=2;
     		} else {
     			$revertgraphdisp = false;
     		}
@@ -240,7 +240,7 @@ class DrawingAnswerBox implements AnswerBox
     		if (isset($GLOBALS['hidedrawcontrols'])) {
     			$out .= $plot;
     		} else {
-    			if ($GLOBALS['sessiondata']['userprefs']['drawentry']==0) { //accessible entry
+    			if ($_SESSION['userprefs']['drawentry']==0) { //accessible entry
     				$bg = 'a11ydraw:'.implode(',', $answerformat);
     				$out .= '<p>'._('Graph to add drawings to:').'</p>';
     				$out .= '<p>'.$plot.'</p>';
@@ -490,7 +490,7 @@ class DrawingAnswerBox implements AnswerBox
         if ($colorbox!='') { $out .= '</div>';}
 
     		if ($revertgraphdisp) {
-    			$GLOBALS['sessiondata']['graphdisp']=0;
+    			$_SESSION['graphdisp']=0;
     		}
     		$tip = _('Enter your answer by drawing on the graph.');
     		if (isset($answers)) {

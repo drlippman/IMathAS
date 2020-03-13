@@ -888,8 +888,8 @@ class QuestionHtmlGenerator
             if ($qdata['extref'] != '') {
                 $extref = explode('~~', $qdata['extref']);
 
-                if ($qid > 0 && (!isset($GLOBALS['sessiondata']['isteacher'])
-                        || $GLOBALS['sessiondata']['isteacher'] == false) && !isset($GLOBALS['sessiondata']['stuview'])) {
+                if ($qid > 0 && (!isset($_SESSION['isteacher'])
+                        || $_SESSION['isteacher'] == false) && !isset($_SESSION['stuview'])) {
                     $qref = $qid . '-' . ($qnidx + 1);
                 } else {
                     $qref = '';
@@ -922,7 +922,7 @@ class QuestionHtmlGenerator
                 }
             }
             if (($qdata['solutionopts'] & 2) == 2 && $qdata['solution'] != '') {
-                $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $GLOBALS['sessiondata']['secsalt']);
+                $addr = $GLOBALS['basesiteurl'] . "/assessment/showsoln.php?id=" . $qidx . '&sig=' . md5($qidx . $_SESSION['secsalt']);
                 $addr .= '&t=' . ($qdata['solutionopts'] & 1) . '&cid=' . $GLOBALS['cid'];
                 if ($GLOBALS['cid'] == 'embedq' && isset($GLOBALS['theme'])) {
                     $addr .= '&theme=' . Sanitize::encodeUrlParam($GLOBALS['theme']);

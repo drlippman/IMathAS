@@ -26,12 +26,12 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 
 $aid = Sanitize::onlyInt($_GET['aid']);
-$sessiondata['texdisp'] = true;
-$sessiondata['texdoubleescape'] = true;
+$_SESSION['texdisp'] = true;
+$_SESSION['texdoubleescape'] = true;
 $texusealignsformatrix = true;
 
-$sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 2;
+$_SESSION['graphdisp'] = 1;
+$_SESSION['mathdisp'] = 2;
 $loadgraphfilter = true;
 $hidedrawcontrols = true;
 $assessver = 2;

@@ -1,7 +1,7 @@
 <?php
 	require("init_without_validate.php");
-	$sessiondata['mathdisp']=1;
-	$sessiondata['graphdisp']=1;
+	$_SESSION['mathdisp']=1;
+	$_SESSION['graphdisp']=1;
 	$nologo = true;
 	require("header.php");
 	

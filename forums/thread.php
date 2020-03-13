@@ -137,7 +137,7 @@ $duedates = '';
 if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 	$exception = null; $latepasses = 0;
 	require_once("../includes/exceptionfuncs.php");
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid=:assessmentid AND userid=:userid AND (itemtype='F' OR itemtype='P' OR itemtype='R')");
 		$stm->execute(array(':assessmentid'=>$forumid, ':userid'=>$userid));
 		if ($stm->rowCount()>0) {
@@ -195,8 +195,7 @@ $now = time();
 $grpqs = '';
 if ($groupsetid>0) {
 	if (isset($_GET['ffilter'])) {
-		$sessiondata['ffilter'.$forumid] = $_GET['ffilter'];
-		writesessiondata();
+		$_SESSION['ffilter'.$forumid] = $_GET['ffilter'];
 	}
 	if (!$isteacher) {
 		$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
@@ -210,8 +209,8 @@ if ($groupsetid>0) {
 		}
 		$dofilter = true;
 	} else {
-		if (isset($sessiondata['ffilter'.$forumid]) && $sessiondata['ffilter'.$forumid]>-1) {
-			$groupid = $sessiondata['ffilter'.$forumid];
+		if (isset($_SESSION['ffilter'.$forumid]) && $_SESSION['ffilter'.$forumid]>-1) {
+			$groupid = $_SESSION['ffilter'.$forumid];
 			$dofilter = true;
 			$grpqs = "&grp=$groupid";
 		} else {
@@ -242,11 +241,10 @@ if ($groupsetid>0) {
 }
 
 if (isset($_GET['tagfilter'])) {
-	$sessiondata['tagfilter'.$forumid] = stripslashes($_GET['tagfilter']);
-	writesessiondata();
+	$_SESSION['tagfilter'.$forumid] = stripslashes($_GET['tagfilter']);
 	$tagfilter = stripslashes($_GET['tagfilter']);
-} else if (isset($sessiondata['tagfilter'.$forumid]) && $sessiondata['tagfilter'.$forumid]!='') {
-	$tagfilter = $sessiondata['tagfilter'.$forumid];
+} else if (isset($_SESSION['tagfilter'.$forumid]) && $_SESSION['tagfilter'.$forumid]!='') {
+	$tagfilter = $_SESSION['tagfilter'.$forumid];
 } else {
 	$tagfilter = '';
 }
@@ -534,8 +532,8 @@ echo "<input type=hidden name=forum value=\"$forumid\"/>";
 </form>
 <?php
 if ($isteacher && $groupsetid>0) {
-	if (isset( $sessiondata['ffilter'.$forumid])) {
-		$curfilter = $sessiondata['ffilter'.$forumid];
+	if (isset( $_SESSION['ffilter'.$forumid])) {
+		$curfilter = $_SESSION['ffilter'.$forumid];
 	} else {
 		$curfilter = -1;
 	}

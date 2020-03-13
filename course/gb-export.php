@@ -10,8 +10,8 @@
 		exit;
 	}
 	$canviewall = true;
-	if (isset($sessiondata[$cid.'gbmode'])) {
-		$gbmode =  $sessiondata[$cid.'gbmode'];
+	if (isset($_SESSION[$cid.'gbmode'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));

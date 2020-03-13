@@ -388,9 +388,6 @@ require_once("includes/sanitize.php");
 
 	require("init.php");
 	if ($_GET['action']=="logout") {
-		$sessionid = session_id();
-		$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=?");
-		$stm->execute(array($sessionid));
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
 			setcookie(session_name(), '', time()-42000, '/', null, false, true);
@@ -783,15 +780,6 @@ require_once("includes/sanitize.php");
 
 		}
 
-
-		/* moved above
-		if (isset($_POST['settimezone'])) {
-			if (date_default_timezone_set($_POST['settimezone'])) {
-				$tzname = $_POST['settimezone'];
-				$stm = $DBH->prepare("UPDATE imas_sessions SET tzname=:tzname WHERE sessionid=:sessionid");
-				$stm->execute(array(':tzname'=>$tzname, ':sessionid'=>$sessionid));
-			}
-		}*/
 	} else if ($_GET['action']=="forumwidgetsettings") {
 		$checked = $_POST['checked'];
 		$all = explode(',',$_POST['allcourses']);
@@ -810,14 +798,14 @@ require_once("includes/sanitize.php");
 	}
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="parent.GB_hide()" value="Done" /></body></html>';
-	} else if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+	} else if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
-		$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
+		$stm->execute(array(':id'=>$_SESSION['ltiitemid']));
 		$cid = Sanitize::courseId($stm->fetchColumn(0));
-		if (isset($sessiondata['ltiitemver']) && $sessiondata['ltiitemver'] > 1) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+		if (isset($_SESSION['ltiitemver']) && $_SESSION['ltiitemver'] > 1) {
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?cid=$cid&aid={$_SESSION['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$_SESSION['ltiitemid']}&r=".Sanitize::randomQueryStringParam());
 		}
 	} else {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=" . Sanitize::randomQueryStringParam());

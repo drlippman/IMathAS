@@ -163,8 +163,8 @@
 				}
 			}
 
-			$sessiondata['mathdisp']=2;
-			$sessiondata['graphdisp']=2;
+			$_SESSION['mathdisp']=2;
+			$_SESSION['graphdisp']=2;
 			require("../filter/filter.php");
 			$message = filter($messagePost);
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$GLOBALS['basesiteurl'] .'/',$message);
