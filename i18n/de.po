@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-09 18:50+0100\n"
-"PO-Revision-Date: 2020-03-09 18:51+0100\n"
+"POT-Creation-Date: 2020-03-16 15:20+0100\n"
+"PO-Revision-Date: 2020-03-16 15:20+0100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: multiembedq.php:188 multiembedq.php:284 admin/forms.php:1211
 #: directaccess.php:135 course/testquestion.php:275
 #: course/addvideotimes.php:440 admin/importitems.php:742
-#: admin/importitems2.php:177
+#: admin/importitems2.php:177 course/addvideotimes.php:439
 msgid "Submit"
 msgstr "Absenden"
 
@@ -11382,7 +11382,7 @@ msgstr "Verwendet die Zufallsvariablen aus der Frage."
 
 #: course/moddataset.php:1175
 msgid "Be sure to include the question you are solving in the text"
-msgstr "Denken Sie daran, die Frage so einzubinden, wie Siue sie im Text lösen"
+msgstr "Denken Sie daran, die Frage so einzubinden, wie Sie sie im Text lösen"
 
 #: course/moddataset.php:1180
 msgid "Display with the \"Show Answer\""
@@ -12529,22 +12529,27 @@ msgstr ""
 "vorhergehenden Segments ist"
 
 #: course/addvideotimes.php:328 course/addvideotimes.php:403
-#: course/addvideotimes.php:436
+#: course/addvideotimes.php:436 course/addvideotimes.php:402
+#: course/addvideotimes.php:435
 msgid "Add video segment break"
 msgstr "Hinzufügen einer Pause zwischen Videosegmenten"
 
 #: course/addvideotimes.php:331 course/addvideotimes.php:407
-#: course/addvideotimes.php:430
+#: course/addvideotimes.php:430 course/addvideotimes.php:406
+#: course/addvideotimes.php:429
 msgid "Segment title:"
 msgstr "Segment-Titel:"
 
 #: course/addvideotimes.php:332 course/addvideotimes.php:408
 #: course/addvideotimes.php:420 course/addvideotimes.php:431
+#: course/addvideotimes.php:407 course/addvideotimes.php:419
+#: course/addvideotimes.php:430
 msgid "Ends at:"
 msgstr "Endet bei:"
 
 #: course/addvideotimes.php:333 course/addvideotimes.php:421
-#: course/addvideotimes.php:432
+#: course/addvideotimes.php:432 course/addvideotimes.php:420
+#: course/addvideotimes.php:431 course/addvideotimes.php:408
 msgid "grab"
 msgstr "Übernehmen"
 
@@ -12572,7 +12577,7 @@ msgstr ""
 "übernehmen und anpassen.  Schreiben Sie die Zeit in der Form min:sec. Alle "
 "Zeiten müssen wenigstens eine Sekunde vor Ende des Videos liegen."
 
-#: course/addvideotimes.php:381
+#: course/addvideotimes.php:381 course/addvideotimes.php:380
 msgid ""
 "If your video contains a followup segment to a question (such as a "
 "solution), you can indicate this and specify when the followup ends.  The "
@@ -12582,31 +12587,31 @@ msgstr ""
 "Lösung), so können Sie festlegen, wann dieses Nachfolgesegment endet. Das "
 "nächste Segment startet dann am Ende des Nachfolgesegments."
 
-#: course/addvideotimes.php:386
+#: course/addvideotimes.php:386 course/addvideotimes.php:385
 msgid "Load Video"
 msgstr "Video laden"
 
-#: course/addvideotimes.php:388
+#: course/addvideotimes.php:388 course/addvideotimes.php:387
 msgid "Video Aspect Ratio:"
 msgstr "Seitenverhältnis des Videos:"
 
-#: course/addvideotimes.php:410
+#: course/addvideotimes.php:410 course/addvideotimes.php:409
 msgid "Question "
 msgstr "Frage "
 
-#: course/addvideotimes.php:413
+#: course/addvideotimes.php:413 course/addvideotimes.php:412
 msgid "Has followup?"
 msgstr "Gibt es ein Nachfolgesegment?"
 
-#: course/addvideotimes.php:419
+#: course/addvideotimes.php:419 course/addvideotimes.php:418
 msgid "Followup title:"
 msgstr "Titel für das Nachfolgesegment:"
 
-#: course/addvideotimes.php:422
+#: course/addvideotimes.php:422 course/addvideotimes.php:421
 msgid "Show link in navigation?"
 msgstr "Link in der Navigation anzeigen?"
 
-#: course/addvideotimes.php:439
+#: course/addvideotimes.php:439 course/addvideotimes.php:438
 msgid "Remainder of video segment title (if any):"
 msgstr "Titel für Restvideo (falls vorhanden):"
 
@@ -12910,3 +12915,19 @@ msgstr "Zurück"
 #: course/testquestion.php:199 course/testquestion.php:200
 msgid "Mark Question for Use"
 msgstr "Frage zur Verwendung markieren"
+
+#: course/addvideotimes.php:378
+msgid ""
+"This page allows you to setup your assessment to be cued to a video.  For "
+"each question, give a title to the video segment that leads up to that "
+"question, and select the time when that segment ends and the question should "
+"show.  You can grab this from the playing video, type the time in min:sec "
+"form.  Make sure all times are at least one second before the end of the "
+"video."
+msgstr ""
+"Auf dieser Seite können Sie Ihren Test als video-gesteuerten Test "
+"einrichten. Geben Sie jedem Videosegment, das eine Frage vorbereitet, einen "
+"Titel und wählen Sie die Zeit, zu der das Videosegment endet und die Frage "
+"angezeigt werden soll. Sie können die Zeit aus dem laufenden Video "
+"übernehmen und anpassen.  Schreiben Sie die Zeit in der Form min:sec. Alle "
+"Zeiten müssen wenigstens eine Sekunde vor Ende des Videos liegen."
