@@ -3551,7 +3551,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				if ($outmsg=='') {
 					$outmsg = $endmsg['def'];
 				}
-				if (!isset($endmsg['commonmsg'])) {$endmsg['commonmsg']='';}
+				if (!isset($endmsg['commonmsg'])) {$endmsg['commonmsg']='';} else {$outmsg .= ' ';}
 
 				if (strpos($outmsg,'redirectto:')!==false) {
 					$redirecturl = trim(substr($outmsg,11));
