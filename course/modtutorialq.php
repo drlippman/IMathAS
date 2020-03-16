@@ -23,6 +23,12 @@ function stripsmartquotes($text) {
 		return $text;
  	}
 
+function escstring($str) {
+	return str_replace(array('\\','"'), array('\\\\','\\"'), $str);
+}
+function deescstring($str) {
+	return str_replace(array('\\"','\\\\'), array('"','\\'), $str);
+}
 $isadmin = false;
 $isgrpadmin = false;
 if (!isset($_GET['aid'])) {
@@ -89,7 +95,7 @@ if (isset($_POST['text'])) {
 			$answerboxsize[$n] = intval($_POST['funcboxsize'.$n]);
 			$variables[$n] = $_POST['variables'.$n];
 		} else if ($qtypes[$n] == 'essay') {
-			$answer[$n] = '"'.str_replace('"','\\"',$_POST['essay'.$n.'-fb']).'"';
+			$answer[$n] = '"'.escstring($_POST['essay'.$n.'-fb']).'"';
 			if (isset($_POST['useeditor'.$n])) {
 				$useeditor[$n] = true;
 			}
@@ -141,9 +147,9 @@ if (isset($_POST['text'])) {
 		$partialout = array();
 		for ($i=0;$i<$qparts[0];$i++) {
 			if ($qtypes[0]=='choices') {
-				$code .= '$questions['.$i.'] = "'.str_replace('"','\\"',$questions[0][$i]).'"'."\n";
+				$code .= '$questions['.$i.'] = "'.escstring($questions[0][$i]).'"'."\n";
 			}
-			$code .= '$feedbacktxt['.$i.'] = "'.str_replace('"','\\"',$feedbacktxt[0][$i]).'"'."\n";
+			$code .= '$feedbacktxt['.$i.'] = "'.escstring($feedbacktxt[0][$i]).'"'."\n";
 			if ($partial[0][$i]!=0 || $qtypes[0]=='number' || $qtypes[0] == 'numfunc' || $qtypes[0] == 'calculated') {
 				if ($qtypes[0]=='choices') {
 					$partialout[] = $i;
@@ -162,7 +168,7 @@ if (isset($_POST['text'])) {
 			$code .= '$displayformat = "'.$_POST['qdisp0'].'"'."\n";
 			$code .= '$noshuffle = "'.$_POST['qshuffle0'].'"'."\n";
 		} else if ($qtypes[0]=='number' || $qtypes[0]=='calculated' || $qtypes[0] == 'numfunc') {
-			$code .= '$feedbacktxtdef = "'.str_replace('"','\\"',$feedbacktxtdef[0]).'"'."\n";
+			$code .= '$feedbacktxtdef = "'.escstring($feedbacktxtdef[0]).'"'."\n";
 			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
 			$code .= (($_POST['qtol0']=='abs')?'$abstolerance':'$reltolerance').' = '.$_POST['tol0']."\n";
 			if ($qtypes[0] == 'numfunc') {
@@ -176,7 +182,7 @@ if (isset($_POST['text'])) {
 				$code .= '$answerformat = "'.$answerformat[0].'"'."\n";
 			}
 		} else if ($qtypes[0]=='essay') {
-			$code .= '$feedbacktxtessay = "'.str_replace('"','\\"',$feedbacktxtessay[0]).'"'."\n";
+			$code .= '$feedbacktxtessay = "'.escstring($feedbacktxtessay[0]).'"'."\n";
 			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
 			if (isset($useeditor[0])) {
 				$code .= '$displayformat = "editor"'."\n";
@@ -193,10 +199,10 @@ if (isset($_POST['text'])) {
 			$partialout = array();
 			for ($i=0;$i<$qparts[$n];$i++) {
 				if ($qtypes[$n]=='choices') {
-					$code .= '$questions['.$n.']['.$i.'] = "'.str_replace('"','\\"',$questions[$n][$i]).'"'."\n";
+					$code .= '$questions['.$n.']['.$i.'] = "'.escstring($questions[$n][$i]).'"'."\n";
 				}
 
-				$code .= '$feedbacktxt['.$n.']['.$i.'] = "'.str_replace('"','\\"',$feedbacktxt[$n][$i]).'"'."\n";
+				$code .= '$feedbacktxt['.$n.']['.$i.'] = "'.escstring($feedbacktxt[$n][$i]).'"'."\n";
 				if ($partial[$n][$i]!=0 || $qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
 					if ($qtypes[$n]=='choices') {
 						$partialout[] = $i;
@@ -215,7 +221,7 @@ if (isset($_POST['text'])) {
 				$code .= '$displayformat['.$n.'] = "'.$_POST['qdisp'.$n].'"'."\n";
 				$code .= '$noshuffle['.$n.'] = "'.$_POST['qshuffle'.$n].'"'."\n";
 			} else if ($qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
-				$code .= '$feedbacktxtdef['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtdef[$n]).'"'."\n";
+				$code .= '$feedbacktxtdef['.$n.'] = "'.escstring($feedbacktxtdef[$n]).'"'."\n";
 				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
 				$code .= (($_POST['qtol'.$n]=='abs')?'$abstolerance[':'$reltolerance[').$n.'] = '.$_POST['tol'.$n]."\n";
 				if ($qtypes[$n] == 'numfunc') {
@@ -229,7 +235,7 @@ if (isset($_POST['text'])) {
 					$code .= '$answerformat['.$n.'] = "'.$answerformat[$n].'"'."\n";
 				}
 			} else if ($qtypes[$n]=='essay') {
-				$code .= '$feedbacktxtessay['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtessay[$n]).'"'."\n";
+				$code .= '$feedbacktxtessay['.$n.'] = "'.escstring($feedbacktxtessay[$n]).'"'."\n";
 				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
 				if (isset($useeditor[$n])) {
 					$code .= '$displayformat['.$n.'] = "editor"'."\n";
@@ -242,7 +248,7 @@ if (isset($_POST['text'])) {
 		}
 	}
 	for ($i=0;$i<$nhints;$i++) {
-		$code .= '$hinttext['.$i.'] = "'.str_replace('"','\\"',$hinttext[$i]).'"'."\n";
+		$code .= '$hinttext['.$i.'] = "'.escstring($hinttext[$i]).'"'."\n";
 	}
 
 	$code .= "\n//end stored values - Tutorial Style question\n\n";
@@ -488,7 +494,7 @@ function getqvalues($code,$type) {
 	$hinttext = array();
 	preg_match_all('/\$hinttext\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 	foreach ($matches as $m) {
-		$hinttext[$m[1]] = $m[2];
+		$hinttext[$m[1]] = deescstring($m[2]);
 	}
 	$nhints = count($hinttext);
 
@@ -516,12 +522,12 @@ function getqvalues($code,$type) {
 		$questions = array();
 		preg_match_all('/\$questions\[(\d+)\]\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$questions[$m[1]][$m[2]] = $m[3];
+			$questions[$m[1]][$m[2]] = deescstring($m[3]);
 		}
 		$feedbacktxt = array();
 		preg_match_all('/\$feedbacktxt\[(\d+)\]\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$feedbacktxt[$m[1]][$m[2]] = $m[3];
+			$feedbacktxt[$m[1]][$m[2]] = deescstring($m[3]);
 		}
 		foreach ($partialcredit as $k=>$v) {
 			$qparts[$k] = count($v)/2;
@@ -537,12 +543,12 @@ function getqvalues($code,$type) {
 		$feedbacktxtdef = array();
 		preg_match_all('/\$feedbacktxtdef\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$feedbacktxtdef[$m[1]] = $m[2];
+			$feedbacktxtdef[$m[1]] = deescstring($m[2]);
 		}
 		$feedbacktxtessay = array();
 		preg_match_all('/\$feedbacktxtessay\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$feedbacktxtessay[$m[1]] = $m[2];
+			$feedbacktxtessay[$m[1]] = deescstring($m[2]);
 		}
 		$answer = array();
 		preg_match_all('/\$answer\[(\d+)\]\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
@@ -602,7 +608,7 @@ function getqvalues($code,$type) {
 		$questions = array();
 		preg_match_all('/\$questions\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$questions[$m[1]] = $m[2];
+			$questions[$m[1]] = deescstring($m[2]);
 		}
 		if (count($questions)>0) {
 			$qparts = array(count($questions));
@@ -615,7 +621,7 @@ function getqvalues($code,$type) {
 		$feedbacktxt = array();
 		preg_match_all('/\$feedbacktxt\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$feedbacktxt[$m[1]] = $m[2];
+			$feedbacktxt[$m[1]] = deescstring($m[2]);
 		}
 
 		$displayformat = '';
@@ -626,12 +632,12 @@ function getqvalues($code,$type) {
 		$feedbacktxtdef = '';
 		preg_match_all('/\$feedbacktxtdef\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$feedbacktxtdef = $m[1];
+			$feedbacktxtdef = deescstring($m[1]);
 		}
 		$feedbacktxtessay = '';
 		preg_match_all('/\$feedbacktxtessay\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
-			$feedbacktxtessay = $m[1];
+			$feedbacktxtessay = deescstring($m[1]);
 		}
 		$answer = '';
 		preg_match_all('/\$answer\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
