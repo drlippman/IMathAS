@@ -375,8 +375,7 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
 
 <h1><?php echo _("Video Navigation and Question Cues"); ?></h1>
 <div style="float:right;"><div id="player" style="width: 453px; height: <?php echo ceil(453/$aspectRatio);?>px;"></div></div>
-<p><?php echo _("This page allows you to setup your assessment to be cued to a video.  For each question, give a title to the video segment that leads up to that question, and select the time when that segment ends and the question should show.  You can grab this from the playing video, type the time in min:sec form.  Make sure all times are at least
-one second before the end of the video."); ?></p>
+<p><?php echo _("This page allows you to setup your assessment to be cued to a video.  For each question, give a title to the video segment that leads up to that question, and select the time when that segment ends and the question should show.  You can grab this from the playing video, type the time in min:sec form.  Make sure all times are at least one second before the end of the video."); ?></p>
 
 <p><?php echo _("If your video contains a followup segment to a question (such as a solution), you can indicate this and specify when the followup ends.  The next segment will then start from the end of this followup."); ?></p>
 
@@ -406,7 +405,7 @@ for ($i=0;$i<$n;$i++) {
 		echo '<div class="vidsegblock">';
 		echo _('Segment title:').' <input type="text" size="20" name="segtitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/> ';
 		echo _('Ends at:').' <input type="text" size="4" name="segend'.$i.'" id="segend' . $i . '" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/> ';
-		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> ';
+		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',0);"/> ';
 		echo _('Question ') . (Sanitize::onlyInt($qn[$i]) + 1) . ': ' . Sanitize::encodeStringForDisplay($qtitle[$qidbynum[$qn[$i]]]);
 		echo '<input type="hidden" name="qn'.$i.'" value="' . Sanitize::encodeStringForDisplay($qn[$i]) . '"/>';
 		echo '<br/>';
