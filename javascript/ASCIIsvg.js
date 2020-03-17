@@ -1204,7 +1204,7 @@ function parseShortScript(sscript,gw,gh) {
 
 		try {
 			eval(commands);
-			if (!svgpicture.hasAttribute("viewBox")) {
+			if (!svgpicture.hasAttribute("viewBox") && !svgpicture.hasAttribute("data-nomag"))) {
 				addMagGlass();
 			}
 		} catch (e) {
