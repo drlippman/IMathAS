@@ -41,6 +41,8 @@ $tests = [
  ['log_x(9)', ['x'=>3], 2],
  ['log_2(8)',[], 3],
  ['log_(2)(8)',[], 3],
+ ['log_(4/2)(8)',[], 3],
+ ['log_(4-(2*1))(8)',[], 3],
  ['llog(l)', ['l'=>100], 200],
  ['1 && 1', [], 1],
  ['1 && 0', [], 0],
@@ -66,10 +68,16 @@ $tests = [
 
 foreach ($tests as $test) {
   $p = new MathParser(implode(',', array_keys($test[1])));
-  $p->parse($test[0]);
-  $out = $p->evaluate($test[1]);
-  if (abs($out - $test[2]) > 1e-6) {
-    echo "Test failed on {$test[0]}: $out vs {$test[2]}<br>";
+  $out = 0;
+  try {
+    $p->parse($test[0]);
+    $out = $p->evaluate($test[1]);
+    if (abs($out - $test[2]) > 1e-6) {
+      echo "Test failed on {$test[0]}: $out vs {$test[2]}<br>";
+    }
+  } catch (Throwable $t) {
+    echo "Test crashed on {$test[0]}: $out vs {$test[2]}<br>";
+    echo $t->getMessage();
   }
 }
 echo "Done";
