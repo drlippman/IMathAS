@@ -313,18 +313,23 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
-function GB_show(caption,url,width,height) {
+function GB_show(caption,url,width,height,options) {
+	options = options || {};
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
 		gb_overlay.id = "GB_overlay";
 		gb_overlay.onclick = GB_hide;
+		if (options.overlay === false) {
+			gb_overlay.style.display = "none";
+		}
 		document.getElementsByTagName("body")[0].appendChild(gb_overlay);
 		var gb_window = document.createElement("div");
 		gb_window.setAttribute("role","dialog");
 		gb_window.setAttribute("aria-labelledby","GB_title");
 		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
-		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_resizehandle"></div>';
+		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div>'
+			+ ((options.resize !== false) ? '<div id="GB_resizehandle"></div>' : '');
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
 		GB_loaded  = true;
 		jQuery("#GB_caption").on('mousedown touchstart', function(e) {
@@ -406,7 +411,9 @@ function GB_show(caption,url,width,height) {
 		}
 	}
 	document.getElementById("GB_window").style.display = "block";
-	document.getElementById("GB_overlay").style.display = "block";
+	if (options.overlay !== false) {
+		document.getElementById("GB_overlay").style.display = "block";
+	}
 	document.getElementById("GB_loading").style.display = "block";
 
 	//var de = document.documentElement;

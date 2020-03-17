@@ -46,6 +46,13 @@
     </div>
 
     <div class="assess-header">
+      <button
+        @click="showCalc"
+        :class="{plain:true}"
+      >
+        <icons name="file" size="medium"/>
+      </button>
+
       <menu-button
         v-if="ainfo.resources.length > 0"
         id="resource-dropdown" position="right"
@@ -223,6 +230,23 @@ export default {
       } else {
         actions.enableMQ();
       }
+    },
+    showCalc () {
+      var width  = window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth;
+      var height = window.innerHeight ||
+        document.documentElement.clientHeight ||
+        document.body.clientHeight;
+      width = Math.max(280, .4*width);
+      height = Math.max(300, .75*height);
+      window.GB_show(
+        this.$t('header.calculator'),
+        store.APIbase + '../course/geographcalc.html',
+        width,
+        height,
+        {overlay: false}
+      );
     }
   }
 };

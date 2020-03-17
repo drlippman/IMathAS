@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Graphing Calculator</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <style>
+    body, div, html {
+      padding: 0;
+      margin: 0;
+    }
+    #applet_container {
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <script type="text/javascript">
+      var wsize = getWindowSize();
+      var parameters = {
+        "id":"ggbApplet",
+        "appName":"graphing",
+        "width": wsize.width,
+        "height": wsize.height,
+        "showToolBar":true,
+        "borderColor":null,
+        "showMenuBar":true,
+        "allowStyleBar":true,
+        "showAlgebraInput":true,
+        "enableLabelDrags":false,
+        "enableShiftDragZoom":true,
+        "capturingThreshold":null,
+        "showToolBarHelp":false,
+        "errorDialogsActive":true,
+        "showTutorialLink":true,
+        "showLogging":true,
+        "useBrowserForJS":false,
+        "appletOnLoad": checkWindowSize
+      };
+
+      var applet = new GGBApplet(parameters, '5.0', 'applet_container');
+
+      window.onload = function() { applet.inject('applet_container'); }
+
+      function getWindowSize() {
+        var width  = window.innerWidth ||
+          document.documentElement.clientWidth ||
+          document.body.clientWidth;
+        var height = window.innerHeight ||
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+        width = Math.max(280, width);
+        height = Math.max(300, height) - 10;
+        return {width: width, height:height};
+      }
+
+      function checkWindowSize() {
+        var wsize = getWindowSize();
+        window.ggbApplet && ggbApplet.setWidth(wsize.width);
+        window.ggbApplet && ggbApplet.setHeight(wsize.height);
+      }
+
+      window.addEventListener("resize",checkWindowSize);
+
+    </script>
+    <div id="applet_container"></div>
+	</div>
+</body>
+
+</html>
