@@ -424,14 +424,22 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		drawstyle[tarnum] = 0;
 	}
 	drawlocky[tarnum] = locky;
-	imgs[tarnum] = new Image();
-	imgs[tarnum].onload = function() {
+	if (imgpath !== '') {
+		imgs[tarnum] = new Image();
+		imgs[tarnum].onload = function() {
+			var oldcurTarget = curTarget;
+			curTarget = tarnum;
+			drawTarget();
+			curTarget = oldcurTarget;
+		};
+		imgs[tarnum].src = imgpath;
+	} else {
+		imgs[tarnum] = null;
 		var oldcurTarget = curTarget;
 		curTarget = tarnum;
 		drawTarget();
 		curTarget = oldcurTarget;
-	};
-	imgs[tarnum].src = imgpath;
+	}
 }
 
 function settool(curel,tarnum,mode) {
@@ -471,7 +479,7 @@ function drawTarget(x,y) {
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = "rgb(0,0,255)";
 	ctx.clearRect(0,0,targets[curTarget].imgwidth,targets[curTarget].imgheight);
-	if (imgs[curTarget] != '') {
+	if (imgs[curTarget] !== null) {
 		ctx.drawImage(imgs[curTarget],0,0);
 	}
 	ctx.beginPath();
