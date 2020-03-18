@@ -3027,7 +3027,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				//$bg = getgraphfilename($plot);
 
 				$plot = str_replace('<embed','<embed data-nomag=1',$plot); //hide mag
-				//someday: overlay canvas over SVG.  Sizing not working in mobile and don't feel like figuring it out yet
+				//overlay canvas over SVG.
 				$out .= '<div class="drawcanvas" style="position:relative;width:'.$settings[6].'px;height:'.$settings[7].'px">';
 				$out .= '<div class="canvasbg" style="position:absolute;top:0px;left:0px;">'.$plot.'</div>';
 				$out .= '<div class="drawcanvasholder" style="position:relative;top:0;left:0;z-index:2">';
