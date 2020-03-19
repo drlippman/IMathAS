@@ -127,6 +127,14 @@
         <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
         <path d="M 9 12 h 6 M 9 16 h6"></path>
       </template>
+      <template v-else-if="name=='graphcalc'">
+        <rect x="1" y="1" width="22" height="22" rx="2" ry="2"></rect>
+        <path d="M 5,12 Q 8.5,2 12,12 t 7,0" />
+      </template>
+      <template v-else-if="name=='scicalc'">
+        <rect x="1" y="1" width="22" height="22" rx="2" ry="2"></rect>
+        <polyline points="5 12 7 12 10 18 12 7 19 7" />
+      </template>
     </svg>
     <span class="sronly" v-if="alttext.length > 0">
       {{ alttext }}

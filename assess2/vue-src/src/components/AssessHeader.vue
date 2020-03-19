@@ -50,7 +50,7 @@
         @click="showCalc"
         :class="{plain:true}"
       >
-        <icons name="file" size="medium"/>
+        <icons name="scicalc" size="medium"/>
       </button>
 
       <menu-button
