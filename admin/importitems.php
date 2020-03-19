@@ -13,7 +13,7 @@ ini_set("post_max_size", "10485760");
 require("../init.php");
 require_once(__DIR__ . "/../includes/htmLawed.php");
 require("../includes/safeunserialize.php");
-
+require_once("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
 function getsubinfo($items,$parent,$pre) {
@@ -624,9 +624,11 @@ if (!(isset($teacherid))) {
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
+		//$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
+		$filename = getimportfilepath(Sanitize::simplestring($_POST['filekey']));
 		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
-
+		deleteimport(Sanitize::simplestring($_POST['filekey']));
+		
 		$userights = $_POST['userights'];
 		$newlibs = explode(",",array_map('intval',$_POST['libs']));
 
@@ -666,20 +668,23 @@ if (!(isset($teacherid))) {
 		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay(basename($uploadfile))."\" />\n";
+
+		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile(realpath($_FILES['userfile']['tmp_name']));
+
+		if (!isset($desc)) {
+			$page_fileErrorMsg .=  "This does not appear to be a course items file.  It may be ";
+			$page_fileErrorMsg .=  "a question or library export.\n";
+		}
+
+		if ($filekey = storeimportfile('userfile')) {
+			$page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
 		} else {
 			echo "<p>Error uploading file!</p>\n";
 			echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
 			exit;
 		}
-		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($uploadfile);
-		if (!isset($desc)) {
-			$page_fileErrorMsg .=  "This does not appear to be a course items file.  It may be ";
-			$page_fileErrorMsg .=  "a question or library export.\n";
-		}
+
+
 
 		$items = safe_unserialize($itemlist);
 		$ids = array();
@@ -772,7 +777,7 @@ function chkgrp(frm, arr, mark) {
 				<option value="4">Allow use and modifications by all</option>
 			</select>
 			<br/><input type="checkbox" name="reuseqrights" checked /> Use rights in import, if available.
-			
+
 		</p>
 		<p>
 
