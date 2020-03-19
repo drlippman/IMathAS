@@ -2632,7 +2632,11 @@ class AssessRecord
         $adjscore = round($score/$ptsposs, 5);
       } else {
         $answeightTot = array_sum($qdata['answeights']);
-        $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
+        if ($qdata['answeights'][$pn] > 0) {
+          $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
+        } else {
+          $adjscore = 0;
+        }
       }
       $out[$av.'-'.$qn.'-'.$qv.'-'.$pn] = $adjscore;
     }
