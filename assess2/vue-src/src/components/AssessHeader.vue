@@ -242,7 +242,7 @@ export default {
       height = Math.max(300, .75*height);
       window.GB_show(
         this.$t('header.calculator'),
-        store.APIbase + '../course/geographcalc.html',
+        window.imasroot + '/course/geographcalc.html',
         width,
         height,
         {overlay: false}

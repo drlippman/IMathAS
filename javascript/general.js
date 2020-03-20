@@ -386,6 +386,7 @@ function GB_show(caption,url,width,height,options) {
 			}
 		});
 	}
+	document.getElementById("GB_loading").style.display = "block";
 	if (url.charAt(0)=='<') {
 		document.getElementById("GB_frameholder").innerHTML = '<div>'+url+'</div>';
 		if (url.match(/data-enlarged/)) {
@@ -393,7 +394,12 @@ function GB_show(caption,url,width,height,options) {
 		}
 		setTimeout(GB_doneload, 50);
 	} else {
-		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+		var frame = document.getElementById("GB_frame");
+		if (!frame || frame.src != url) {
+			document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+		} else {
+			GB_doneload();
+		}
 	}
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
@@ -414,7 +420,6 @@ function GB_show(caption,url,width,height,options) {
 	if (options.overlay !== false) {
 		document.getElementById("GB_overlay").style.display = "block";
 	}
-	document.getElementById("GB_loading").style.display = "block";
 
 	//var de = document.documentElement;
 	//var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
