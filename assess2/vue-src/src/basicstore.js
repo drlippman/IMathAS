@@ -663,7 +663,7 @@ export const actions = {
   },
   setInitValue (qn, fieldname, val) {
     if (!store.initValues.hasOwnProperty(qn)) {
-      store.initValues[qn] = {};
+      Vue.set(store.initValues, qn, {});
     }
     // only record initvalue if we don't already have one
     let m = fieldname.match(/^(qs|qn|tc)(\d+)/);

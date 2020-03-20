@@ -37,7 +37,7 @@
       </span>
       <button
         v-if = "assessSubmitLabel !== ''"
-        :class="{primary: ainfo.submitby === 'by_assessment' }"
+        :class="{ primary: primarySubmit, secondary: !primarySubmit }"
         @click="handleSubmit"
         :disabled = "!canSubmit"
       >
@@ -134,6 +134,12 @@ export default {
     canSubmit () {
       return (!store.inTransit);
     },
+    primarySubmit () {
+      // primary if by_assessment and all questions loaded
+      return (this.ainfo.submitby === 'by_assessment' &&
+        Object.keys(store.initValues).length === this.ainfo.questions.length
+      );
+    },
     curScorePoints () {
       let pointsPossible = 0;
       let pointsEarned = 0;
@@ -170,7 +176,7 @@ export default {
       return (this.ainfo.submitby === 'by_assessment');
     },
     assessSubmitLabel () {
-      if (this.ainfo.submitby === 'by_assessment' && this.ainfo.displaymethod !== 'skip') {
+      if (this.ainfo.submitby === 'by_assessment') {
         return this.$t('header.assess_submit');
       } else {
         // don't have
