@@ -53,6 +53,8 @@ export default {
       window.initeditor('exact', this.computedId, null, true, function (ed) {
         ed.on('input change keyup undo redo', function (e) {
           component.updateValue(ed.getContent());
+        }).on('blur', function (e) {
+          this.$emit('blur', true);
         });
         component.objTinymce = ed;
       });

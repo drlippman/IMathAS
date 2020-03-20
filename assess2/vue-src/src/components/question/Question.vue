@@ -32,6 +32,16 @@
       v-if = "showHelps"
       :qn = "qn"
     />
+
+    <div v-if="showWork">
+      {{ $t("question.showwork") }}
+      <tinymce-input
+        :id="'sw' + qn"
+        :value = "questionData.work"
+        rows = "3"
+        @input = "updateWork"
+      />
+    </div>
     <div v-if="showSubmit" class="submitbtnwrap">
       <button
         type = "button"
@@ -59,6 +69,7 @@ import { store, actions } from '../../basicstore';
 import ScoreResult from '@/components/question/ScoreResult.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import QuestionHelps from '@/components/question/QuestionHelps.vue';
+import TinymceInput from '@/components/TinymceInput.vue';
 
 export default {
   name: 'Question',
@@ -66,6 +77,7 @@ export default {
   components: {
     ScoreResult,
     QuestionHelps,
+    TinymceInput,
     Icons
   },
   data: function () {
@@ -147,6 +159,9 @@ export default {
         errors = errors.concat(this.questionData.errors);
       }
       return errors;
+    },
+    showWork () {
+      return true;
     }
   },
   methods: {
