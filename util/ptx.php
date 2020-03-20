@@ -30,7 +30,7 @@ foreach($prefdefaults as $key=>$def) {
 foreach(array('graphdisp','mathdisp','useed') as $key) {
 	$_SESSION[$key] = $_SESSION['userprefs'][$key];
 }
-$_SESSION['texdisp'] = true;
+$GLOBALS['texdisp'] = true;
 
 $showtips = 0;
 $useeqnhelper = 0;

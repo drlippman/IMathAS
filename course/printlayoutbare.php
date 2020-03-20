@@ -35,7 +35,7 @@ if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
 	$_SESSION['mathdisp'] = 2;
 }
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='tex') {
-	$_SESSION['texdisp'] = true;
+	$GLOBALS['texdisp'] = true;
 }
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
 	$printtwice = 2;
@@ -43,6 +43,7 @@ if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
 	$printtwice = 1;
 }
 
+$origgraphdisp = $_SESSION['graphdisp'];
 $_SESSION['graphdisp'] = 2;
 $assessver = 2;
 
@@ -314,7 +315,7 @@ if ($overwriteBody==1) {
 
 
 }
-
+$_SESSION['graphdisp'] = $origgraphdisp;
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
