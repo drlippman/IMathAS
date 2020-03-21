@@ -620,6 +620,12 @@ class AssessRecord
       $data[$qn]['time'] = $seconds;
       $data[$qn]['timeactive'] = $timeactive;
     }
+
+    if ($pn === 'work') { //autosaving work
+      $data[$qn]['work'] = Sanitize::incomingHtml($_POST['sw' . $qn]);
+      $this->need_to_record = true;
+      return;
+    }
     $tosave = array();
 
     $qref = ($qn+1)*1000 + $pn;
@@ -735,6 +741,8 @@ class AssessRecord
     $data = &$this->data['autosaves'];
     if ($pn === -1) {
       unset($data[$qn]);
+    } else if ($pn === 'work') {
+      unset($data[$qn]['work']);
     } else if (isset(($data[$qn]['stuans']))) {
       if (count($data[$qn]['stuans']) === 1) {
         unset($data[$qn]);
@@ -783,6 +791,9 @@ class AssessRecord
       // TODO: This is hacky.  Fix it.
       foreach ($qdata['post'] as $key=>$val) {
         $_POST[$key] = $val;
+      }
+      if (isset($qdata['work'])) {
+        $_POST['sw' . $qn] = $qdata['work'];
       }
 
       $this->scoreQuestion(
@@ -1284,7 +1295,7 @@ class AssessRecord
         ) ||
         $this->teacherInGb;
       $out['info'] = $generate_html;
-      list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave'], $out['errors']) =
+      list($out['html'], $out['jsparams'], $out['answeights'], $out['usedautosave'], $out['work'], $out['errors']) =
         $this->getQuestionHtml($qn, $ver, false, $force_scores, $force_answers, $tryToShow, $generate_html === 2);
       if ($out['usedautosave']) {
         $autosave = $this->getAutoSaves($qn);
@@ -1556,11 +1567,12 @@ class AssessRecord
    * @param  boolean $force_answers force display of answers (def: false)
    * @param  string  $tryToShow     Try to show answers for: 'last' (def) or 'scored'
    * @param  boolean $includeCorrect  True to include 'ans' array in jsparams (def false)
-   * @return array (html, jsparams, answeights, usedautosaves, errors)
+   * @return array (html, jsparams, answeights, usedautosaves, work, errors)
    */
   public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false, $tryToShow = 'last', $includeCorrect = false) {
     // get assessment attempt data for given version
     $qver = $this->getQuestionVer($qn, $ver);
+    $work = isset($qver['work']) ? $qver['work'] : '';
 
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
@@ -1581,6 +1593,11 @@ class AssessRecord
     $showans = ($numParts > 0); //true by default, unless no answeights or tries yet
     $trylimit = $qsettings['tries_max'];
     $usedAutosave = array();
+
+    if (isset($autosave['work'])) {
+      $work = $autosave['work'];
+      $usedAutosave[] = 'work';
+    }
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
     list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
@@ -1701,7 +1718,7 @@ class AssessRecord
       $jsparams['stuans'] = $stuanswers[$qn+1];
     }
 
-    return array($qout, $jsparams, $answeights, $usedAutosave, $question->getErrors());
+    return array($qout, $jsparams, $answeights, $usedAutosave, $work, $question->getErrors());
   }
 
   private function parseScripts($html) {
@@ -1757,6 +1774,12 @@ class AssessRecord
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
 
     $data = array();
+
+    // record work, if present
+    if (isset($_POST['sw' . $qn])) {
+      $data['work'] = Sanitize::incomingHtml($_POST['sw' . $qn]);
+      $this->clearAutoSave($qn, 'work');
+    }
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers();
 
@@ -3172,7 +3195,11 @@ class AssessRecord
       $hadUnattempted = $this->hasUnattemptedParts($curq);
     }
     foreach ($data as $pn=>$partdata) {
-      $curq['tries'][$pn][] = $partdata;
+      if ($pn === 'work') {
+        $curq['work'] = $partdata;
+      } else {
+        $curq['tries'][$pn][] = $partdata;
+      }
     }
     // if it's the first version, and before this we didn't have all parts
     // attempted, but now we do, then we'll record this to firstscores

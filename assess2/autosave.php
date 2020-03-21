@@ -137,6 +137,9 @@ foreach ($qns as $qn=>$parts) {
       $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
     }
   }
+  if (isset($_POST['sw' . $qn])) {  //autosaving work
+    $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
+  }
   $k++;
 }
 

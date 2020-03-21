@@ -323,7 +323,7 @@ export const actions = {
           }
         }
       });
-      if (store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+      if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
         data.append('sw'+qn, store.work[qn]);
       }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
