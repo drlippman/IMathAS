@@ -478,7 +478,7 @@ function printchildren($base,$restricttoowner=false) {
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-	global $canviewall, $caneditscore, $canviewscore, $_SESSION, $isstu;
+	global $canviewall, $caneditscore, $canviewscore, $isstu;
 	if (!isset($CFG['CPS']['itemicons'])) {
 		$itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',

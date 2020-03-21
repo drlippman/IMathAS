@@ -3723,7 +3723,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		//unset($_SESSION['sessiontestid']);
 	}
 	function leavetestmsg($or = '') {
-		global $isdiag, $diagid, $_SESSION, $testsettings;
+		global $isdiag, $diagid, $testsettings;
 		$isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
 		echo '<p>';
 		echo $or;

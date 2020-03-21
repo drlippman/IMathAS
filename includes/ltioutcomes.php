@@ -168,7 +168,6 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     }
 
     if ($response === false) {
-    	global $_SESSION;
     	if ($_SESSION['debugmode']==true) {
     		throw new Exception("Problem reading data from $endpoint, $php_errormsg");
     	} else {
@@ -341,7 +340,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
 
 //use this if we know the grade, or want to delete
 function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
-	global $DBH,$_SESSION,$testsettings,$cid,$CFG,$userid;
+	global $DBH,$testsettings,$cid,$CFG,$userid;
 
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
 		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';

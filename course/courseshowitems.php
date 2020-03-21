@@ -199,7 +199,7 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
-	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$_SESSION,$myrights,$courseenddate;
+	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
 	   global $itemshowdata, $exceptionfuncs;
 
@@ -1974,7 +1974,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$_SESSION,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$hideicons,$exceptions,$latepasses,$CFG;
 	   global $itemtypes, $iteminfo, $addassess;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {

@@ -5,7 +5,7 @@
 // and
 
 function showUserPrefsForm() {
-	global $CFG, $_SESSION, $tzname;
+	global $CFG, $tzname;
 
 	require_once(dirname(__FILE__)."/htmlutil.php");
 
@@ -110,7 +110,7 @@ function showUserPrefsForm() {
 }
 
 function storeUserPrefs() {
-	global $CFG, $DBH, $_SESSION, $userid, $tzname, $sessionid;
+	global $CFG, $DBH, $userid, $tzname, $sessionid;
 
 	//save user prefs.  Get existing
 	$currentuserprefs = array();
@@ -181,7 +181,7 @@ function storeUserPrefs() {
 }
 
 function generateuserprefs($writetosession=false) {
-	global $DBH, $CFG, $_SESSION, $sessionid, $userid;
+	global $DBH, $CFG, $sessionid, $userid;
 
 	$_SESSION['userprefs'] = array();
 	$prefdefaults = array(

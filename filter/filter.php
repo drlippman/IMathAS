@@ -18,7 +18,7 @@
 		include_once("$filterdir/graph/sscrtotext.php");
 	}
 	function mathfiltercallback($arr) {
-		global $AMT,$mathimgurl,$coursetheme,$_SESSION;
+		global $AMT,$mathimgurl,$coursetheme;
 		//$arr[1] = str_replace(array('&ne;','&quot;','&lt;','&gt;','&le;','&ge;'),array('ne','"','lt','gt','le','ge'),$arr[1]);
 		$arr[1] = str_replace(array('&ne;','&quot;','&le;','&ge;','<','>'),array('ne','"','le','ge','&lt;','&gt;'),$arr[1]);
 		$tex = $AMT->convert($arr[1]);
@@ -94,7 +94,7 @@
 	}
 
 	function filter($str) {
-		global $_SESSION,$userfullname,$urlmode,$imasroot;
+		global $userfullname,$urlmode,$imasroot;
 		if ($urlmode == 'https://') {
 			$str = str_replace(array('http://www.youtube.com','http://youtu.be'),array('https://www.youtube.com','https://youtu.be'), $str);
 		}
@@ -212,7 +212,6 @@
 		return $str;
 	}
 	function filtergraph($str) {
-		global $_SESSION;
 		if ($_SESSION['graphdisp']==2) {
 			if (strpos($str,'embed')!==FALSE) {
 				$str = preg_replace_callback('/<\s*embed.*?sscr=(.)(.+?)\1.*?>/','svgfiltersscrcallback',$str);

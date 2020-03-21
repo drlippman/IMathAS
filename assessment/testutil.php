@@ -513,7 +513,7 @@ function printscore2($sc) {
 //qi: getquestioninfo[qid]
 function scorequestion($qn, $rectime=true) {
 	global $DBH,$questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestquestions,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
-	global $regenonreattempt, $_SESSION;
+	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
 
@@ -594,7 +594,7 @@ function scorequestion($qn, $rectime=true) {
 //records everything but questions array
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false, $updateLTI=true) {
-	global $DBH,$isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$_SESSION,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores,$userid;
+	global $DBH,$isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores,$userid;
 
 	if ($noraw) {
 		$bestscorelist = implode(',',$bestscores);
@@ -678,7 +678,7 @@ function recordtestdata($limit=false, $updateLTI=true) {
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {
-	global $testsettings,$_SESSION, $testid, $isreview;
+	global $testsettings, $testid, $isreview;
 	$outstr = '';
 	preg_match_all('/@FILE:(.+?)@/',$delfrom,$matches);
 	foreach($matches[0] as $match) {
@@ -799,7 +799,7 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single,$showqnum=0) {
-	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$_SESSION,$imasroot,$CFG;
+	global $qi,$questions,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$imasroot,$CFG;
 	if (!$_SESSION['istutorial']) {
 		if ($inreview) {
 			echo '<div class="review clearfix">';
@@ -908,7 +908,7 @@ function showquestioncontactlinks($qn) {
 
 //shows top info bar for seq mode
 function seqshowqinfobar($qn,$toshow) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$_SESSION,$seeds,$isreview;
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$seeds,$isreview;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
@@ -1068,7 +1068,7 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 }
 
 function embedshowicon($qn) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$_SESSION,$seeds,$isreview;
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$seeds,$isreview;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
@@ -1132,7 +1132,7 @@ function embedshowicon($qn) {
 // like on the password entry page, latepass confirmation, etc.
 // this is light breadcrumbs rather than full
 function showEnterAssessmentBreadcrumbs($aname) {
-	global $isdiag, $_SESSION, $breadcrumbbase, $coursename;
+	global $isdiag, $breadcrumbbase, $coursename;
 	if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0)) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 		echo '&gt; ', Sanitize::encodeStringForDisplay($aname), '</div>';
