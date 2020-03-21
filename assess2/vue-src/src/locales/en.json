@@ -106,7 +106,8 @@
     "saveans": "Save Answer",
     "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question.",
     "jump_to_answer": "Jump to Answer",
-    "jump_warn": "This will use up your remaining tries at this version of the question."
+    "jump_warn": "This will use up your remaining tries at this version of the question.",
+    "showwork": "Show work here by typing it or attaching a file or picture"
   },
   "header": {
     "score": "Score: {pts}/{poss}",

@@ -305,7 +305,7 @@ class AssessInfo
     $by_q = array('regens_max');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
       'showans','showans_aftern','points_possible','questionsetid',
-      'category', 'withdrawn', 'jump_to_answer');
+      'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
     foreach ($base as $field) {
       $out[$field] = $this->questionData[$id][$field];
@@ -847,6 +847,9 @@ class AssessInfo
   * @return array            Normalized $settings array.
   */
   static function normalizeQuestionSettings($settings, $defaults) {
+    // TODO: implement this
+    $settings['showwork'] = true;
+    
     if ($settings['points'] == 9999) {
       $settings['points_possible'] = $defaults['defpoints'];
     } else {
@@ -873,7 +876,7 @@ class AssessInfo
         $settings['retry_penalty'] = intval($settings['penalty']);
       }
     }
-    
+
     if ($settings['regen'] == 1 || $defaults['submitby'] == 'by_assessment') {
       $settings['regens_max'] = 1;
     } else {

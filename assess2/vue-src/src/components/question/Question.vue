@@ -37,9 +37,11 @@
       {{ $t("question.showwork") }}
       <tinymce-input
         :id="'sw' + qn"
-        :value = "questionData.work"
+        :value = "this.work"
         rows = "3"
         @input = "updateWork"
+        @blur = "workChanged"
+        @focus = "workFocused"
       />
     </div>
     <div v-if="showSubmit" class="submitbtnwrap">
@@ -83,7 +85,9 @@ export default {
   data: function () {
     return {
       timeActivated: null,
-      timeActive: 0
+      timeActive: 0,
+      work: '',
+      lastWorkVal: ''
     };
   },
   computed: {
@@ -161,7 +165,7 @@ export default {
       return errors;
     },
     showWork () {
-      return true;
+      return store.assessInfo.questions[this.qn].showwork;
     }
   },
   methods: {
@@ -269,6 +273,8 @@ export default {
       // add in timeactive from autosave, if exists
       this.timeActive += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
+      // set work 
+      this.work = this.questionData.work;
 
       let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
       svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
@@ -312,6 +318,27 @@ export default {
             }
           }
         });
+      if (this.showWork) {
+        actions.setInitValue(thisqn, 'sw' + this.qn, this.questionData.work);
+        this.work = this.questionData.work;
+      }
+    },
+    updateWork (val) {
+      this.work = val;
+    },
+    workChanged () {
+      // changed - cue for autosave
+      if (this.work !== this.lastWorkVal) {
+        store.work[this.qn] = this.work;
+        // autosave value
+        let now = new Date();
+        let timeactive = self.timeActive + (now - self.timeActivated);
+        actions.doAutosave(this.qn, 'sw', timeactive);
+      }
+    },
+    workFocused () {
+      actions.clearAutosaveTimer();
+      this.lastWorkVal = this.work;
     }
   },
   updated () {

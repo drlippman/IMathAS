@@ -54,7 +54,9 @@ export default {
         ed.on('input change keyup undo redo', function (e) {
           component.updateValue(ed.getContent());
         }).on('blur', function (e) {
-          this.$emit('blur', true);
+          component.$emit('blur', true);
+        }).on('focus', function (e) {
+          component.$emit('focus', true);
         });
         component.objTinymce = ed;
       });

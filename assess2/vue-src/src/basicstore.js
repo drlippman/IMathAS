@@ -18,6 +18,7 @@ export const store = Vue.observable({
   autosaveTimeactive: {},
   initValues: {},
   initTimes: {},
+  work: {},
   autosaveTimer: null,
   somethingDirty: false,
   noUnload: false,
@@ -322,6 +323,9 @@ export const actions = {
           }
         }
       });
+      if (store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+        data.append('sw'+qn, store.work[qn]);
+      }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
     };
     data.append('toscoreqn', JSON.stringify(changedQuestions));
@@ -441,6 +445,10 @@ export const actions = {
       let regexpts = [];
       for (let k in store.autosaveQueue[qn]) {
         let pn = store.autosaveQueue[qn][k];
+        if (pn === 'sw') {
+          data.append('sw' + qn, store.work[qn]);;
+          continue;
+        }
         if (pn === 0) {
           regexpts.push(qn);
         }
@@ -666,11 +674,19 @@ export const actions = {
       store.initValues[qn] = {};
     }
     // only record initvalue if we don't already have one
-    let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
-    let qref = m[2];
     let pn = 0;
-    if (qref > 1000) {
-      pn = qref % 1000;
+    if (fieldname.match(/^sw/)) {
+      pn = 'sw';
+    } else {
+      let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
+      let qref = m[2];
+      if (qref > 1000) {
+        pn = qref % 1000;
+      }
+      // for draw questions, overwrite blank to the expected blank format
+      if (store.assessInfo.questions[qn].jsparams[qref].qtype === 'draw' && val === '') {
+        val = ';;;;;;;;';
+      }
     }
     if (store.assessInfo.questions[qn].hasOwnProperty('usedautosave') &&
       store.assessInfo.questions[qn].usedautosave.indexOf(pn) !== -1
@@ -678,10 +694,7 @@ export const actions = {
       // was loaded from autosave, so don't record as init initValue
       return;
     }
-    // for draw questions, overwrite blank to the expected blank format
-    if (store.assessInfo.questions[qn].jsparams[qref].qtype === 'draw' && val === '') {
-      val = ';;;;;;;;';
-    }
+
     if (!store.initValues[qn].hasOwnProperty(fieldname)) {
       store.initValues[qn][fieldname] = val;
     }
@@ -724,6 +737,14 @@ export const actions = {
     let m;
     for (let k = 0; k < qns.length; k++) {
       let qn = qns[k];
+
+      if (store.assessInfo.questions[qn].showwork && store.work.hasOwnProperty(qn)) {
+        if (store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+          if (!changed.hasOwnProperty(qn)) {
+            changed[qn] = [];
+          }
+        }
+      }
       var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn * 1 + 1) + '\\d{3})');
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if ((m = el.name.match(regex)) !== null) {
