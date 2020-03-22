@@ -847,9 +847,7 @@ class AssessInfo
   * @return array            Normalized $settings array.
   */
   static function normalizeQuestionSettings($settings, $defaults) {
-    // TODO: implement this
-    $settings['showwork'] = true;
-    
+
     if ($settings['points'] == 9999) {
       $settings['points_possible'] = $defaults['defpoints'];
     } else {
@@ -915,6 +913,10 @@ class AssessInfo
 
     if ($settings['showhints'] == -1) {
       $settings['showhints'] = $defaults['showhints'];
+    }
+
+    if ($settings['showwork'] == -1) {
+      $settings['showwork'] = $defaults['showwork'];
     }
 
     if (!empty($settings['fixedseeds'])) {
