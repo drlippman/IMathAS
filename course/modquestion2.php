@@ -309,12 +309,12 @@ if ($defaults['submitby'] == 'by_question' && $defaults['defregens'] > 1) {
      <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>>Never during assessment</option>
     </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['showans']);?></i></span><br class="form"/>
 
-<span class=form>Provide "Show Work" boxes</span><span class=formright>
+<span class=form><?php echo _('Provide "Show Work" boxes');?></span><span class=formright>
     <select name="showwork">
-     <option value="-1" <?php if ($line['showwork']=='-1') { echo 'selected="1"';}?>>Use Default</option>
-     <option value="0" <?php if ($line['showwork']=='0') { echo 'selected="1"';}?>>No</option>
-     <option value="1" <?php if ($line['showwork']=='1') { echo 'selected="1"';}?>>During Assessment</option>
-   </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['showwork']);?></i></span><br class="form"/>
+     <option value="-1" <?php if ($line['showwork']=='-1') { echo 'selected="1"';}?>><?php echo _('Use Default');?></option>
+     <option value="0" <?php if ($line['showwork']=='0') { echo 'selected="1"';}?>><?php echo _('No');?></option>
+     <option value="1" <?php if ($line['showwork']=='1') { echo 'selected="1"';}?>><?php echo _('During Assessment');?></option>
+   </select><br/><i class="grey"><?php echo _('Default:');?> <?php echo Sanitize::encodeStringForDisplay($defaults['showwork']);?></i></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>
     <select name="showhints">
