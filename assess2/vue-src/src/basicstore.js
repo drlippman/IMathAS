@@ -324,7 +324,7 @@ export const actions = {
         }
       });
       if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
-        data.append('sw'+qn, store.work[qn]);
+        data.append('sw' + qn, store.work[qn]);
       }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
     };
@@ -446,7 +446,7 @@ export const actions = {
       for (let k in store.autosaveQueue[qn]) {
         let pn = store.autosaveQueue[qn][k];
         if (pn === 'sw') {
-          data.append('sw' + qn, store.work[qn]);;
+          data.append('sw' + qn, store.work[qn]);
           continue;
         }
         if (pn === 0) {

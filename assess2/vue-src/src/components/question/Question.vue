@@ -165,7 +165,7 @@ export default {
       return errors;
     },
     showWork () {
-      return store.assessInfo.questions[this.qn].showwork;
+      return (store.assessInfo.questions[this.qn].showwork & 1);
     }
   },
   methods: {
@@ -273,7 +273,7 @@ export default {
       // add in timeactive from autosave, if exists
       this.timeActive += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
-      // set work 
+      // set work
       this.work = this.questionData.work;
 
       let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';

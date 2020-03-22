@@ -197,6 +197,9 @@
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
               />
+              <gb-showwork
+                :work = "qdata[curQver[qn]].work"
+              />
             </div>
             <gb-score-details
               :showfull = "showQuestion[qn]"
@@ -274,6 +277,7 @@
 <script>
 import { store, actions } from './gbstore';
 import GbQuestion from '@/gbviewassess/GbQuestion.vue';
+import GbShowwork from '@/gbviewassess/GbShowwork.vue';
 import GbAssessSelect from '@/gbviewassess/GbAssessSelect.vue';
 import GbQuestionSelect from '@/gbviewassess/GbQuestionSelect.vue';
 import GbScoreDetails from '@/gbviewassess/GbScoreDetails.vue';
@@ -287,6 +291,7 @@ import '../assess2.css';
 export default {
   components: {
     GbQuestion,
+    GbShowwork,
     GbAssessSelect,
     GbQuestionSelect,
     GbScoreDetails,
