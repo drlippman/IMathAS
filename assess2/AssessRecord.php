@@ -3160,6 +3160,26 @@ class AssessRecord
   }
 
   /**
+   * Save after-assessment showwork
+   * @param  array $work array of $qn => $work
+   * @return boolean|string  true if successful, errors message otherwise
+   */
+  public function saveWork($work) {
+    $this->parseData();
+    $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
+    // always saving work for last version
+    $assessver = &$this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+    foreach ($work as $qn=>$val) {
+      $question_versions = &$assessver['questions'][$qn]['question_versions'];
+      $curq = &$question_versions[count($question_versions) - 1];
+      $curq['work'] = Sanitize::incomingHtml($val);
+    }
+    if (count($work) > 0) {
+      $this->saveRecord();
+    }
+    return true;
+  }
+  /**
    * Record a try on a question
    * @param  int $qn      Question number
    * @param  array $data  Array of part datas

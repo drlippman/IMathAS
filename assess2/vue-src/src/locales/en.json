@@ -407,6 +407,12 @@
     "showwork": "View Work",
     "hidework": "Hide Work"
   },
+  "work": {
+    "add": "Add Work",
+    "noquestions": "No questions require work",
+    "save": "Save Work",
+    "save_continue": "Save Work and Continue"
+  },
   "regions": {
     "questions": "Questions and text",
     "q_and_vid": "Video and questions",

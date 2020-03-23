@@ -390,6 +390,8 @@ $vueData = array(
 				<select name="showwork" id="showwork" v-model="showwork">
 					<option value="0"><?php echo _('No');?></option>
 					<option value="1"><?php echo _('During assessment');?></option>
+					<option value="2"><?php echo _('After assessment');?></option>
+					<option value="3"><?php echo _('During or after assessment');?></option>
 				</select>
 			</span><br class=form />
 

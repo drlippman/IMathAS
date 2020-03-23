@@ -44,6 +44,7 @@
                 :qn="curqn"
                 :active = "pagenum === page"
                 :key="'q'+curqn"
+                :getwork="1"
               />
             </div>
           </div>

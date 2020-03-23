@@ -314,6 +314,8 @@ if ($defaults['submitby'] == 'by_question' && $defaults['defregens'] > 1) {
      <option value="-1" <?php if ($line['showwork']=='-1') { echo 'selected="1"';}?>><?php echo _('Use Default');?></option>
      <option value="0" <?php if ($line['showwork']=='0') { echo 'selected="1"';}?>><?php echo _('No');?></option>
      <option value="1" <?php if ($line['showwork']=='1') { echo 'selected="1"';}?>><?php echo _('During Assessment');?></option>
+     <option value="2" <?php if ($line['showwork']=='2') { echo 'selected="1"';}?>><?php echo _('After assessment');?></option>
+     <option value="3" <?php if ($line['showwork']=='3') { echo 'selected="1"';}?>><?php echo _('During or after assessment');?></option>
    </select><br/><i class="grey"><?php echo _('Default:');?> <?php echo Sanitize::encodeStringForDisplay($defaults['showwork']);?></i></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>

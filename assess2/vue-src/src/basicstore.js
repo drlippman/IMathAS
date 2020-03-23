@@ -8,6 +8,7 @@ export const store = Vue.observable({
   cid: null,
   uid: null,
   queryString: '',
+  inAssess: false,
   inTransit: false,
   autoSaving: false,
   errorMsg: null,
@@ -51,6 +52,7 @@ export const actions = {
     }
     store.inTransit = true;
     store.errorMsg = null;
+    store.inAssess = false;
     window.$.ajax({
       url: store.APIbase + 'loadassess.php' + qs,
       dataType: 'json',
@@ -119,6 +121,8 @@ export const actions = {
         store.autosaveTimeactive = {};
         store.initValues = {};
         store.initTimes = {};
+        store.work = {};
+        store.inAssess = true;
         // route to correct display
         if (response.error) {
           this.handleError(response.error);
@@ -244,6 +248,56 @@ export const actions = {
         }
       };
     }
+  },
+  submitWork () {
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    store.inTransit = true;
+    let data = {};
+    for (let qn in store.work) {
+      data[qn] = store.work[qn];
+    }
+    if (Object.keys(data).length === 0) { // nothing to submit
+      if (store.inAssess) {
+        Router.push('/summary');
+      } else {
+        Router.push('/');
+      }
+      return;
+    }
+    window.$.ajax({
+      url: store.APIbase + 'savework.php' + store.queryString,
+      type: 'POST',
+      dataType: 'json',
+      data: {work: data},
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          if (response.error === 'already_submitted') {
+            response = this.processSettings(response);
+            this.copySettings(response);
+          }
+          return;
+        } else {
+          store.errorMsg = null;
+        }
+
+        if (store.inAssess) {
+          Router.push('/summary');
+        } else {
+          Router.push('/');
+        }
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
   },
   submitQuestion (qns, endattempt, timeactive, partnum) {
     store.somethingDirty = false;
@@ -383,9 +437,21 @@ export const actions = {
           this.updateTreeReader();
         }
 
+        let hasShowWorkAfter = false;
+        for (let k = 0; k < qns.length; k++) {
+          if (store.assessInfo.questions[k].showwork & 2) {
+            hasShowWorkAfter = true;
+            break;
+          }
+        }
+
         if (endattempt) {
           store.inProgress = false;
-          Router.push('/summary');
+          if (hasShowWorkAfter && !store.assessInfo.in_practice) {
+            Router.push('/showwork');
+          } else {
+            Router.push('/summary');
+          }
         } else if (qns.length === 1) {
           // scroll to score result
           Vue.nextTick(() => {

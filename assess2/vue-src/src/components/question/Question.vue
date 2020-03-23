@@ -75,7 +75,7 @@ import TinymceInput from '@/components/TinymceInput.vue';
 
 export default {
   name: 'Question',
-  props: ['qn', 'active', 'state', 'seed', 'disabled'],
+  props: ['qn', 'active', 'state', 'seed', 'disabled', 'getwork'],
   components: {
     ScoreResult,
     QuestionHelps,
@@ -165,7 +165,8 @@ export default {
       return errors;
     },
     showWork () {
-      return (store.assessInfo.questions[this.qn].showwork & 1);
+      return ((this.getwork === 1 && store.assessInfo.questions[this.qn].showwork & 1) ||
+        (this.getwork === 2 && store.assessInfo.questions[this.qn].showwork & 2));
     }
   },
   methods: {
@@ -331,9 +332,13 @@ export default {
       if (this.work !== this.lastWorkVal) {
         store.work[this.qn] = this.work;
         // autosave value
-        let now = new Date();
-        let timeactive = self.timeActive + (now - self.timeActivated);
-        actions.doAutosave(this.qn, 'sw', timeactive);
+        if (this.getwork === 1) {
+          let now = new Date();
+          let timeactive = self.timeActive + (now - self.timeActivated);
+          actions.doAutosave(this.qn, 'sw', timeactive);
+        } else if (this.getwork === 2) {
+          this.$emit('workchanged', this.work);
+        }
       }
     },
     workFocused () {
