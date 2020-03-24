@@ -37,7 +37,7 @@
       {{ $t("question.showwork") }}
       <tinymce-input
         :id="'sw' + qn"
-        :value = "this.work"
+        :value = "questionData.work"
         rows = "3"
         @input = "updateWork"
         @blur = "workChanged"

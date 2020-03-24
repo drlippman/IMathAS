@@ -285,6 +285,10 @@ export const actions = {
         } else {
           store.errorMsg = null;
         }
+        // copy into questions for reload later if needed
+        for (let qn in store.work) {
+          Vue.set(store.assessInfo.questions[parseInt(qn)], 'work', store.work[qn]);
+        }
 
         if (store.inAssess) {
           Router.push('/summary');

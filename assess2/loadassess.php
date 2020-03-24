@@ -132,6 +132,8 @@ if (!$assessInfoOut['has_active_attempt']) {
   }
 }
 
+$assessInfoOut['showwork_after'] = $assess_record->getShowWorkAfter();
+
 // adjust output if time limit is expired in by_question mode
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   $assessInfoOut['submitby'] == 'by_question' &&

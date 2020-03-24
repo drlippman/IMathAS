@@ -411,7 +411,8 @@
     "add": "Add Work",
     "noquestions": "No questions require work",
     "save": "Save Work",
-    "save_continue": "Save Work and Continue"
+    "save_continue": "Save Work and Continue",
+    "add_prev": "You can still show or attach work for the previous attempt"
   },
   "regions": {
     "questions": "Questions and text",

@@ -313,9 +313,12 @@ class AssessRecord
     // generate the questions and seeds
     list($oldquestions, $oldseeds) = $this->getOldQuestions();
     list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($attempt);
+    $accept_work_after = (($this->assess_info->getSetting('showwork') & 2) == 2);
     // build question data
     for ($k = 0; $k < count($questions); $k++) {
       $isWithdrawn = ($this->assess_info->getQuestionSetting($questions[$k], 'withdrawn') !== 0);
+      $accept_work_after = $accept_work_after ||
+        (($this->assess_info->getQuestionSetting($questions[$k], 'showwork') & 2) == 2);
       $out['questions'][$k] = array(
         'score' => $isWithdrawn ? $this->assess_info->getQuestionSetting($questions[$k], 'points_possible') : 0,
         'rawscore' => $isWithdrawn ? 1 : 0,
@@ -335,6 +338,12 @@ class AssessRecord
     $this->data['assess_versions'][] = $out;
 
     $this->need_to_record = true;
+
+    if ($accept_work_after) { // if accept work after, set bit in status
+      $this->assessRecord['status'] |= 128;
+    } else {
+      $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
+    }
 
     $this->setStatus($recordStart, false);
   }
@@ -403,6 +412,17 @@ class AssessRecord
    */
   public function getStatus() {
     return $this->assessRecord['status'];
+  }
+
+  /**
+   * Get whether previous/cur attempt accepts work after
+   * @return boolean
+   */
+  public function getShowWorkAfter() {
+    if (empty($this->assessRecord)) {
+      return false;
+    }
+    return (($this->assessRecord['status'] & 128) == 128);
   }
 
   /**
@@ -2469,7 +2489,11 @@ class AssessRecord
    * @return array
    */
   public function getGbAssessVerData($av, $getdetails) {
-    $aver = $this->data['assess_versions'][$av];
+    if ($av === 'last') {
+      $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+    } else {
+      $aver = $this->data['assess_versions'][$av];
+    }
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $scoresInGb = $this->assess_info->getSetting('scoresingb');
     $out = array(
@@ -2512,7 +2536,7 @@ class AssessRecord
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     if ($by_question) {
       $aver = 0;
-    } else if ($ver === 'scored') {
+    } else if ($ver === 'scored' || $ver === 'last') {
       $aver = $this->data['scored_version'];
     } else {
       $aver = $ver;

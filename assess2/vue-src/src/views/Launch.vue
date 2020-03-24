@@ -45,6 +45,16 @@
         </button>
       </p>
 
+      <p v-if="canAddWork">
+        {{ $t('work.add_prev') }}<br/>
+        <button
+          type="button"
+          class="secondary"
+          @click="$router.push('/showwork')"
+        >
+          {{ $t('work.add') }}
+        </button>
+      </p>
       <p v-if="showReset">
         {{ $t('launch.resetmsg') }}
         <br/>
@@ -172,6 +182,9 @@ export default {
     },
     hasExit () {
       return (window.exiturl && window.exiturl !== '');
+    },
+    canAddWork () {
+      return (!this.aInfo.has_active_attempt && this.aInfo.showwork_after);
     }
   },
   methods: {

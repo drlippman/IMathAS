@@ -48,10 +48,28 @@ $assess_record->loadRecord($uid);
 // grab all questions settings
 $assess_info->loadQuestionSettings('all', false);
 
+// grab any assessment info fields that may have updated:
+$include_from_assess_info = array(
+  'submitby', 'timelimit', 'timelimit_grace', 'timelimit_expires'
+);
+$assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
+//get attempt info
+$assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+
+// adjust output if time limit is expired in by_question mode
+if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
+  $assessInfoOut['submitby'] == 'by_question' &&
+  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires'])
+) {
+  $assessInfoOut['has_active_attempt'] = false;
+  $assessInfoOut['can_retake'] = false;
+  $assessInfoOut['pasttime'] = 1;
+}
+
 // if have active scored record end it
 if (!$assess_record->hasRecord()) {
   echo '{"error": "not_ready"}';
-} else if ($assess_record->hasActiveAttempt()) {
+} else if ($assessInfoOut['has_active_attempt']) {
   echo '{"error": "active_attempt"}';
 } else {
   $res = $assess_record->saveWork($_POST['work']);

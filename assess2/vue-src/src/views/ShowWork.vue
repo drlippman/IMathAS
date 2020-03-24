@@ -85,7 +85,7 @@ export default {
   methods: {
     loadScoresIfNeeded () {
       if (!store.inAssess && !this.ainfo.hasOwnProperty('questions')) {
-        //actions.getGbAssessData();
+        actions.getScores();//actions.loadGbLastAssessData();
       } else if (!this.hasScore) {
         actions.getScores();
       }
