@@ -141,7 +141,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 			$row['gbcategory'] = 0;
 		}
 		$rubric = $row['rubric']; //array_pop($row);
-		$row[0] .= $_POST['append'];
+		$row['name'] .= $_POST['append'];
 		if ($row['outcomes']!='') {
 			$curoutcomes = explode(',',$row['outcomes']);
 			$newoutcomes = array();
