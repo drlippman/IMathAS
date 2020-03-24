@@ -865,6 +865,10 @@ function gbstudisp($stu) {
 				}
 
 			}
+			if (!$isteacher && !$istutor && $gbt[1][1][$i][16] == 1) {
+				echo ' <span class="small"><a href="../assess2/?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'#/showwork">[';
+				echo _('Attach Work') .']</a></span>';
+			}
 
 			echo '</td>';
 
@@ -1212,7 +1216,7 @@ function gbstudisp($stu) {
 							echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).' (';
 						}
 						echo round(100*$gbt[1][2][$i][2]/$gbt[1][2][$i][6],1).'%';
-						
+
 						if ($gbt[0][4][0]==0) {
 							echo ')';
 						} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents

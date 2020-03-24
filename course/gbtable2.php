@@ -81,6 +81,7 @@ row[0][1][0][12] = allowlate (in general)
 row[1][1][0][13] = timelimit if requested through $includetimelimit
 row[0][1][0][14] = LP cutoff
 row[0][1][0][15] = assess UI version (online only)
+row[0][1][0][16] = accepts work after assess
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -1417,6 +1418,9 @@ function gbtable() {
 			}
 		}
 
+		if (($l['status']&128)>0) { // accepting showwork after assess
+			$gb[$row][1][$col][16] = 1;
+		}
 		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 			$gb[$row][1][$col][1] = buildFeedback2($l['scoreddata']);
 			if ($gb[$row][1][$col][1] == '') {

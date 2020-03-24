@@ -45,6 +45,10 @@ if ($isstudent) {
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
 
+if (!$assess_record->hasRecord()) {
+  echo '{"error": "not_ready"}';
+  exit;
+}
 // grab any assessment info fields that may have updated:
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
@@ -70,6 +74,7 @@ if ($assessInfoOut['has_active_attempt']) {
   echo '{"error": "active_attempt"}';
   exit;
 }
+
 // grab all questions settings and scores, based on end-of-assessment settings
 $assess_info->loadQuestionSettings('all', false);
 $showscores = $assess_info->showScoresAtEnd();
