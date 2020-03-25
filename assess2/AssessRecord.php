@@ -313,12 +313,9 @@ class AssessRecord
     // generate the questions and seeds
     list($oldquestions, $oldseeds) = $this->getOldQuestions();
     list($questions, $seeds) = $this->assess_info->assignQuestionsAndSeeds($attempt);
-    $accept_work_after = (($this->assess_info->getSetting('showwork') & 2) == 2);
     // build question data
     for ($k = 0; $k < count($questions); $k++) {
       $isWithdrawn = ($this->assess_info->getQuestionSetting($questions[$k], 'withdrawn') !== 0);
-      $accept_work_after = $accept_work_after ||
-        (($this->assess_info->getQuestionSetting($questions[$k], 'showwork') & 2) == 2);
       $out['questions'][$k] = array(
         'score' => $isWithdrawn ? $this->assess_info->getQuestionSetting($questions[$k], 'points_possible') : 0,
         'rawscore' => $isWithdrawn ? 1 : 0,
@@ -338,12 +335,6 @@ class AssessRecord
     $this->data['assess_versions'][] = $out;
 
     $this->need_to_record = true;
-
-    if ($accept_work_after) { // if accept work after, set bit in status
-      $this->assessRecord['status'] |= 128;
-    } else {
-      $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
-    }
 
     $this->setStatus($recordStart, false);
   }
@@ -567,6 +558,34 @@ class AssessRecord
           $this->assessRecord['starttime'] = time();
         }
       }
+      // determine if any questions accept work after
+      $accept_work_after = (($this->assess_info->getSetting('showwork') & 2) == 2);
+      $lastver = count($this->data['assess_versions']) - 1;
+      $questions = $this->data['assess_versions'][$lastver]['questions'];
+      for ($k = 0; $k < count($questions); $k++) {
+        $qid = $questions[$k]['question_versions'][count($questions[$k]['question_versions']) - 1]['qid'];
+        $accept_work_after = $accept_work_after ||
+          (($this->assess_info->getQuestionSetting($qid, 'showwork') & 2) == 2);
+      }
+      if ($active && $submitby == 'by_question') {
+        // for by-question, set "accept work after" status on start
+        if ($accept_work_after) {
+          $this->assessRecord['status'] |= 128;
+        } else {
+          $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
+        }
+      } else if ($active && $submitby == 'by_assessment') {
+        // for by-assess, clear "accept work after" status on start
+        $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
+      } else if (!$active && $submitby == 'by_assessment') {
+        // for by-assess, set "accept work after" status on end
+        if ($accept_work_after) {
+          $this->assessRecord['status'] |= 128;
+        } else {
+          $this->assessRecord['status'] = $this->assessRecord['status'] & ~128;
+        }
+      }
+
       if ($setattempt) {
         $this->parseData();
         $lastver = count($this->data['assess_versions']) - 1;
