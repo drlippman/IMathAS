@@ -76,7 +76,7 @@ export default {
           unanswered = false;
         }
       }
-      if (store.noUnload) {
+      if (store.noUnload || !store.inProgress) {
 
       } else if (Object.keys(actions.getChangedQuestions()).length > 0 &&
         !this.prewarned

@@ -442,7 +442,7 @@ export const actions = {
         }
 
         let hasShowWorkAfter = false;
-        for (let k = 0; k < qns.length; k++) {
+        for (let k = 0; k < store.assessInfo.questions.length; k++) {
           if (store.assessInfo.questions[k].showwork & 2) {
             hasShowWorkAfter = true;
             break;

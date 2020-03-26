@@ -33,7 +33,7 @@
       :qn = "qn"
     />
 
-    <div v-if="showWork">
+    <div v-if="showWork && questionContentLoaded">
       {{ $t("question.showwork") }}
       <tinymce-input
         :id="'sw' + qn"

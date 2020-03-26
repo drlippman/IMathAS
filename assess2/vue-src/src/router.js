@@ -141,7 +141,11 @@ const router = new Router({
       component: ShowWork,
       beforeEnter: (to, from, next) => {
         // if active attempt or not avail, route to Launch
-        if (!store.assessInfo.in_practice && !store.assessInfo.has_active_attempt) {
+        if (!store.assessInfo.in_practice &&
+          (!store.assessInfo.has_active_attempt ||
+            store.assessInfo.submitby === 'by_question'
+          )
+        ) {
           next();
         } else {
           next({ path: '/', replace: true });
