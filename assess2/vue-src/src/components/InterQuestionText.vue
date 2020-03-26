@@ -40,6 +40,7 @@ export default {
       setTimeout(window.drawPics, 100);
       window.initlinkmarkup(this.$refs.main);
       window.rendermathnode(this.$refs.main);
+      window.jQuery(this.$refs.main).fitVids();
     }
   },
   updated () {
