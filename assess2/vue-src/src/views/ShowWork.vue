@@ -69,7 +69,7 @@ export default {
     mode () {
       if (!store.inAssess) {
         return 'gb';
-      } else if (store.inAssess && this.ainfo.submitby === 'by_assessment') {
+      } else if (store.inAssess) {
         return 'aftertake';
       }
     },
