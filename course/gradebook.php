@@ -39,20 +39,18 @@ if ($isteacher || $istutor) {
 if ($canviewall) {
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-		$sessiondata[$cid.'gbmode'] = $gbmode;
-		writesessiondata();
+		$_SESSION[$cid.'gbmode'] = $gbmode;
 		if (isset($_GET['setgbmodeonly'])) {
 			echo "DONE";
 			exit;
 		}
-	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $sessiondata[$cid.'gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
-		$sessiondata[$cid.'gbmode'] = $gbmode;
-		writesessiondata();
+		$_SESSION[$cid.'gbmode'] = $gbmode;
 	}
 	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
@@ -64,10 +62,9 @@ if ($canviewall) {
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
-		$sessiondata[$cid.'catfilter'] = $catfilter;
-		writesessiondata();
-	} else if (isset($sessiondata[$cid.'catfilter'])) {
-		$catfilter = $sessiondata[$cid.'catfilter'];
+		$_SESSION[$cid.'catfilter'] = $catfilter;
+	} else if (isset($_SESSION[$cid.'catfilter'])) {
+		$catfilter = $_SESSION[$cid.'catfilter'];
 	} else {
 		$catfilter = -1;
 	}
@@ -76,27 +73,24 @@ if ($canviewall) {
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			$sessiondata[$cid.'secfilter'] = $secfilter;
-			writesessiondata();
-		} else if (isset($sessiondata[$cid.'secfilter'])) {
-			$secfilter = $sessiondata[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
 	}
-	if (isset($_GET['refreshdef']) && isset($sessiondata[$cid.'catcollapse'])) {
-		unset($sessiondata[$cid.'catcollapse']);
-		writesessiondata();
+	if (isset($_GET['refreshdef']) && isset($_SESSION[$cid.'catcollapse'])) {
+		unset($_SESSION[$cid.'catcollapse']);
 	}
-	if (isset($sessiondata[$cid.'catcollapse'])) {
-		$overridecollapse = $sessiondata[$cid.'catcollapse'];
+	if (isset($_SESSION[$cid.'catcollapse'])) {
+		$overridecollapse = $_SESSION[$cid.'catcollapse'];
 	} else {
 		$overridecollapse = array();
 	}
 	if (isset($_GET['catcollapse'])) {
 		$overridecollapse[$_GET['cat']] = $_GET['catcollapse'];
-		$sessiondata[$cid.'catcollapse'] = $overridecollapse;
-		writesessiondata();
+		$_SESSION[$cid.'catcollapse'] = $overridecollapse;
 	}
 
 	//Gbmode : Links NC Dates

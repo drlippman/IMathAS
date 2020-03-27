@@ -2,13 +2,13 @@
 require_once("../includes/sanitize.php");
 
 if ($_GET['cid']==="embedq") {
-	$sessiondata = array();
+	$_SESSION = array();
 	require("../init_without_validate.php");
 	require("../i18n/i18n.php");
 	$cid = "embedq";
-	$sessiondata['secsalt'] = "12345";
-	$sessiondata['graphdisp'] = 1;
-	$sessiondata['mathdisp'] = 1;
+	$_SESSION['secsalt'] = "12345";
+	$_SESSION['graphdisp'] = 1;
+	$_SESSION['mathdisp'] = 1;
 	if (isset($_GET['theme'])) {
 		$coursetheme = 	$_GET['theme'];
 	}
@@ -19,12 +19,12 @@ if ($_GET['cid']==="embedq") {
 $id = Sanitize::onlyInt($_GET['id']);
 $sig = $_GET['sig'];
 $t = Sanitize::onlyInt($_GET['t']);
-$sessiondata['coursetheme'] = $coursetheme;
+$_SESSION['coursetheme'] = $coursetheme;
 
 $flexwidth = true;
 require("header.php");
 echo '<p><b style="font-size:110%">'._('Written Example').'</b> '._('of a similar problem').'</p>';
-if ($sig != md5($id.$sessiondata['secsalt'])) {
+if ($sig != md5($id.$_SESSION['secsalt'])) {
 	echo "invalid signature - not authorized to view the solution for this problem";
 	exit;
 }

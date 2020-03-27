@@ -221,45 +221,42 @@ if (isset($_GET['record'])) {
 		$safesearch = str_replace(' and ', ' ',$safesearch);
 		$search = $safesearch;
 		$search = str_replace('"','&quot;',$search);
-		$sessiondata['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
+		$_SESSION['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
 		if (isset($_POST['searchall'])) {
 			$searchall = 1;
 		} else {
 			$searchall = 0;
 		}
-		$sessiondata['searchall'.$cid] = $searchall;
+		$_SESSION['searchall'.$cid] = $searchall;
 		if (isset($_POST['searchmine'])) {
 			$searchmine = 1;
 		} else {
 			$searchmine = 0;
 		}
-		$sessiondata['searchmine'.$cid] = $searchmine;
+		$_SESSION['searchmine'.$cid] = $searchmine;
 		if (isset($_POST['newonly'])) {
 			$newonly = 1;
 		} else {
 			$newonly = 0;
 		}
-		$sessiondata['searchnewonly'.$cid] = $newonly;
-		writesessiondata();
+		$_SESSION['searchnewonly'.$cid] = $newonly;
 	}
 	if (isset($_POST['libs'])) {
 		if ($_POST['libs']=='') {
 			$_POST['libs'] = $userdeflib;
 		}
 		$searchlibs = Sanitize::encodeStringForDisplay($_POST['libs']);
-		//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
-		$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
-		writesessiondata();
+		//$_SESSION['lastsearchlibs'] = implode(",",$searchlibs);
+		$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
 	} else if (isset($_GET['listlib'])) {
 		$searchlibs = $_GET['listlib'];
-		$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
+		$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
 		$searchall = 0;
-		$sessiondata['searchall'.$aid] = $searchall;
-		$sessiondata['lastsearch'.$aid] = '';
+		$_SESSION['searchall'.$aid] = $searchall;
+		$_SESSION['lastsearch'.$aid] = '';
 		$searchlikes = '';
 		$search = '';
 		$safesearch = '';
-		writesessiondata();
 	}
 	$DBH->commit();
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
@@ -292,13 +289,13 @@ require("../header.php");
 /*  Get data for question searching */
 //remember search
 
-if (isset($sessiondata['lastsearch'.$cid])) {
-	$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+if (isset($_SESSION['lastsearch'.$cid])) {
+	$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
 	$search = $safesearch;
 	$search = str_replace('"','&quot;',$search);
-	$searchall = $sessiondata['searchall'.$cid];
-	$searchmine = $sessiondata['searchmine'.$cid];
-	$newonly = $sessiondata['searchnewonly'.$cid];
+	$searchall = $_SESSION['searchall'.$cid];
+	$searchmine = $_SESSION['searchmine'.$cid];
+	$newonly = $_SESSION['searchnewonly'.$cid];
 } else {
 	$search = '';
 	$searchall = 0;
@@ -327,9 +324,9 @@ if (trim($safesearch)=='') {
 	}
 }
 
-if (isset($sessiondata['lastsearchlibs'.$aid])) {
-	//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
-	$searchlibs = $sessiondata['lastsearchlibs'.$aid];
+if (isset($_SESSION['lastsearchlibs'.$aid])) {
+	//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
+	$searchlibs = $_SESSION['lastsearchlibs'.$aid];
 } else {
 	$searchlibs = $userdeflib;
 }

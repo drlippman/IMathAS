@@ -12,17 +12,16 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['editing'])) {
 		$editingon = $_GET['editing']=='on';
-		$sessiondata[$cid.'caledit'] = $editingon;
-		writesessiondata();
-	} else if (isset($sessiondata[$cid.'caledit'])) {
-		$editingon = $sessiondata[$cid.'caledit'];
+		$_SESSION[$cid.'caledit'] = $editingon;
+	} else if (isset($_SESSION[$cid.'caledit'])) {
+		$editingon = $_SESSION[$cid.'caledit'];
 	} else {
 		$editington = false;
 	}
 
 	require_once("../includes/exceptionfuncs.php");
 
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);

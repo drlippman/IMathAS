@@ -23,7 +23,7 @@
 	if (isset($instrPreviewId)) {
 		$teacherid=$instrPreviewId;
 	}
-	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	if (!isset($_SESSION['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 		echo "<html><body>";
 		echo _("You are not authorized to view this page.  If you are trying to reaccess an assessment you've already started, access it from the course page");
 		echo "</body></html>\n";
@@ -37,9 +37,9 @@
 		unset($teacherid);
 		$actas = true;
 	}
-	$isRealStudent = (isset($studentid) && !$actas && !isset($sessiondata['stuview']));
+	$isRealStudent = (isset($studentid) && !$actas && !isset($_SESSION['stuview']));
 	$latepasses = 0;
-	if (!isset($sessiondata['stuview'])) { //want to load for actas too
+	if (!isset($_SESSION['stuview'])) { //want to load for actas too
 		require_once("../includes/exceptionfuncs.php");
 		if ($isRealStudent) {
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
@@ -155,7 +155,7 @@
 					echo "<p><a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid=$aid\">", _('Use LatePass'), "</a></p>";
 				}
 
-				if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltiitemid']==$aid) {
+				if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0 && $_SESSION['ltiitemid']==$aid) {
 					//in LTI and right item
 					list($atype,$sa) = explode('-',$adata['deffeedback']);
 					if ($sa!='N') {
@@ -309,13 +309,13 @@
 		if ($isRealStudent) {
 		   $stm = $DBH->prepare("SELECT latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		   $stm->execute(array(':userid'=>$userid, ':courseid'=>$adata['courseid']));
-		   $sessiondata['latepasses'] = $stm->fetchColumn(0);
+		   $_SESSION['latepasses'] = $stm->fetchColumn(0);
 		} else {
-			$sessiondata['latepasses'] = 0;
+			$_SESSION['latepasses'] = 0;
 		}
-		$sessiondata['latepasshrs'] = $latepasshrs;
+		$_SESSION['latepasshrs'] = $latepasshrs;
 
-		$sessiondata['istutorial'] = $adata['istutorial'];
+		$_SESSION['istutorial'] = $adata['istutorial'];
 		$_SESSION['choicemap'] = array();
 		$stm = $DBH->prepare("SELECT id,agroupid,lastanswers,bestlastanswers,starttime,ver FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid ORDER BY id DESC LIMIT 1");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$_GET['id']));
@@ -356,7 +356,7 @@
 				$stm->execute(array(':userid'=>$userid, ':groupsetid'=>$adata['groupsetid']));
 				if ($stm->rowCount()>0) {
 					$stugroupid = $stm->fetchColumn(0);
-					$sessiondata['groupid'] = $stugroupid;
+					$_SESSION['groupid'] = $stugroupid;
 				} else {
 					if ($adata['isgroup']==3) {
 						echo "<html><body>", _('You are not yet a member of a group.  Contact your instructor to be added to a group.'), "  <a href=\"$imasroot/course/course.php?cid=".Sanitize::courseId($_GET['cid'])."\">Back</a></body></html>";
@@ -366,9 +366,9 @@
 					$stm->execute(array(':groupsetid'=>$adata['groupsetid']));
 					$stugroupid = $DBH->lastInsertId();
 					//if ($adata['isgroup']==3) {
-					//	$sessiondata['groupid'] = $stugroupid;
+					//	$_SESSION['groupid'] = $stugroupid;
 					//} else {
-						$sessiondata['groupid'] = 0;  //leave as 0 to trigger adding group members
+						$_SESSION['groupid'] = 0;  //leave as 0 to trigger adding group members
 					//}
 					$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid, :stugroupid)");
 					$stm->execute(array(':userid'=>$userid, ':stugroupid'=>$stugroupid));
@@ -377,8 +377,8 @@
 			}
 			$deffeedbacktext = $adata['deffeedbacktext'];
 
-			if (isset($sessiondata['lti_lis_result_sourcedid'.$aid]) && strlen($sessiondata['lti_lis_result_sourcedid'.$aid])>1) {
-				$ltisourcedid = $sessiondata['lti_lis_result_sourcedid'.$aid].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
+			if (isset($_SESSION['lti_lis_result_sourcedid'.$aid]) && strlen($_SESSION['lti_lis_result_sourcedid'.$aid])>1) {
+				$ltisourcedid = $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
 			} else {
 				$ltisourcedid = '';
 			}
@@ -392,10 +392,10 @@
 			if ($result===false) {
 				echo _('Error DupASID.') . ' <a href="showtest.php?cid='.$cid.'&aid='.$aid.'">' . _("Try again") . '</a>';
 			}
-			$sessiondata['sessiontestid'] = $DBH->lastInsertId();
+			$_SESSION['sessiontestid'] = $DBH->lastInsertId();
 
 			if ($stugroupid==0) {
-				$sessiondata['groupid'] = 0;
+				$_SESSION['groupid'] = 0;
 			} else {
 				//if a group assessment and already in a group, we'll create asids for all the group members now
 				$stm = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=:stugroupid AND userid<>:userid");
@@ -415,45 +415,43 @@
 				}
 
 			}
-			$sessiondata['isreview'] = $isreview;
+			$_SESSION['isreview'] = $isreview;
 			if (isset($teacherid) || isset($tutorid) || $actas) {
-				$sessiondata['isteacher']=true;
+				$_SESSION['isteacher']=true;
 			} else {
-				$sessiondata['isteacher']=false;
+				$_SESSION['isteacher']=false;
 			}
 			if ($actas) {
-				$sessiondata['actas']=$_GET['actas'];
-				$sessiondata['isreview'] = false;
+				$_SESSION['actas']=$_GET['actas'];
+				$_SESSION['isreview'] = false;
 			} else {
-				unset($sessiondata['actas']);
+				unset($_SESSION['actas']);
 			}
 			if (strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
-				$sessiondata['intreereader'] = true;
+				$_SESSION['intreereader'] = true;
 			} else {
-				$sessiondata['intreereader'] = false;
+				$_SESSION['intreereader'] = false;
 			}
 
 			$stm = $DBH->prepare("SELECT name,theme,msgset,toolset FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
 			$courseinfo = $stm->fetch(PDO::FETCH_ASSOC);
-			$sessiondata['courseid'] = Sanitize::courseId($_GET['cid']);
-			$sessiondata['coursename'] = $courseinfo['name'];
+			$_SESSION['courseid'] = Sanitize::courseId($_GET['cid']);
+			$_SESSION['coursename'] = $courseinfo['name'];
 			if (!isset($coursetheme)) { //should already be set from validate.php
 				$coursetheme = $courseinfo['theme'];
 			}
-			if (isset($sessiondata['userprefs']['usertheme']) && strcmp($sessiondata['userprefs']['usertheme'],'0')!=0) {
-				$coursetheme = $sessiondata['userprefs']['usertheme'];
+			if (isset($_SESSION['userprefs']['usertheme']) && strcmp($_SESSION['userprefs']['usertheme'],'0')!=0) {
+				$coursetheme = $_SESSION['userprefs']['usertheme'];
 			}
-			$sessiondata['coursetheme'] = $coursetheme;
+			$_SESSION['coursetheme'] = $coursetheme;
 
-			$sessiondata['coursetoolset'] = $courseinfo['toolset'];
+			$_SESSION['coursetoolset'] = $courseinfo['toolset'];
 			if (isset($studentinfo['timelimitmult'])) {
-				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
+				$_SESSION['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
-				$sessiondata['timelimitmult'] = 1.0;
+				$_SESSION['timelimitmult'] = 1.0;
 			}
-
-			writesessiondata();
 			session_write_close();
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
 			exit;
@@ -471,31 +469,31 @@
 				exit;
 			}
 			//Return to test.
-			$sessiondata['sessiontestid'] = $line['id'];
-			$sessiondata['isreview'] = $isreview;
+			$_SESSION['sessiontestid'] = $line['id'];
+			$_SESSION['isreview'] = $isreview;
 			if (isset($teacherid) || isset($tutorid) || $actas) {
-				$sessiondata['isteacher']=true;
+				$_SESSION['isteacher']=true;
 			} else {
-				$sessiondata['isteacher']=false;
+				$_SESSION['isteacher']=false;
 			}
 			if ($actas) {
-				$sessiondata['actas']=$_GET['actas'];
-				$sessiondata['isreview'] = false;
+				$_SESSION['actas']=$_GET['actas'];
+				$_SESSION['isreview'] = false;
 			} else {
-				unset($sessiondata['actas']);
+				unset($_SESSION['actas']);
 			}
 
 			if ($adata['isgroup']==0 || $line['agroupid']>0) {
-				$sessiondata['groupid'] = $line['agroupid'];
+				$_SESSION['groupid'] = $line['agroupid'];
 			} else if (!isset($teacherid) && !isset($tutorid)) { //isgroup>0 && agroupid==0
 				//already has asid, but broken from group
 				$stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',:groupsetid)");
 				$stm->execute(array(':groupsetid'=>$adata['groupsetid']));
 				$stugroupid = $DBH->lastInsertId();
 				if ($adata['isgroup']==3) {
-					$sessiondata['groupid'] = $stugroupid;
+					$_SESSION['groupid'] = $stugroupid;
 				} else {
-					$sessiondata['groupid'] = 0;  //leave as 0 to trigger adding group members
+					$_SESSION['groupid'] = 0;  //leave as 0 to trigger adding group members
 				}
 				$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid, :stugroupid)");
 				$stm->execute(array(':userid'=>$userid, ':stugroupid'=>$stugroupid));
@@ -506,26 +504,23 @@
 			$stm = $DBH->prepare("SELECT name,theme,msgset,toolset FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
 			$courseinfo = $stm->fetch(PDO::FETCH_ASSOC);
-			$sessiondata['courseid'] = Sanitize::courseId($_GET['cid']);
-			$sessiondata['coursename'] = $courseinfo['name'];
-			$sessiondata['coursetheme'] = $courseinfo['theme'];
-			$sessiondata['coursetoolset'] = $courseinfo['toolset'];
+			$_SESSION['courseid'] = Sanitize::courseId($_GET['cid']);
+			$_SESSION['coursename'] = $courseinfo['name'];
+			$_SESSION['coursetheme'] = $courseinfo['theme'];
+			$_SESSION['coursetoolset'] = $courseinfo['toolset'];
 			if (isset($studentinfo['timelimitmult'])) {
-				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
+				$_SESSION['timelimitmult'] = $studentinfo['timelimitmult'];
 			} else {
-				$sessiondata['timelimitmult'] = 1.0;
+				$_SESSION['timelimitmult'] = 1.0;
 			}
 
-			if (isset($sessiondata['lti_lis_result_sourcedid'.$aid])) {
-				$altltisourcedid = $sessiondata['lti_lis_result_sourcedid'.$aid].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
+			if (isset($_SESSION['lti_lis_result_sourcedid'.$aid])) {
+				$altltisourcedid = $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
 				if ($altltisourcedid != $line['lti_sourcedid']) {
 					$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET lti_sourcedid=:lti_sourcedid WHERE id=:id");
 					$stm->execute(array(':lti_sourcedid'=>$altltisourcedid, ':id'=>$line['id']));
 				}
 			}
-
-
-			writesessiondata();
 			session_write_close();
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
 		}
@@ -533,15 +528,15 @@
 	}
 
 	//already started test
-	if (!isset($sessiondata['sessiontestid'])) {
+	if (!isset($_SESSION['sessiontestid'])) {
 		echo "<html><body>", _('Error.  Access assessment from course page'), "</body></html>\n";
 		exit;
 	}
-	$testid = $sessiondata['sessiontestid'];
+	$testid = $_SESSION['sessiontestid'];
 	$asid = $testid;
-	$isteacher = $sessiondata['isteacher'];
-	if (isset($sessiondata['actas'])) {
-		$userid = $sessiondata['actas'];
+	$isteacher = $_SESSION['isteacher'];
+	if (isset($_SESSION['actas'])) {
+		$userid = $_SESSION['actas'];
 	}
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
@@ -644,7 +639,7 @@
 	$timelimitkickout = ($testsettings['timelimit']<0);
 	$testsettings['timelimit'] = abs($testsettings['timelimit']);
 	//do time limit mult
-	$testsettings['timelimit'] *= $sessiondata['timelimitmult'];
+	$testsettings['timelimit'] *= $_SESSION['timelimitmult'];
 
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 
@@ -657,7 +652,7 @@
 		exit;
 	}
 	//verify group is ok
-	if ($testsettings['isgroup']>0 && !$isteacher &&  ($line['agroupid']==0 || ($sessiondata['groupid']>0 && $line['agroupid']!=$sessiondata['groupid']))) {
+	if ($testsettings['isgroup']>0 && !$isteacher &&  ($line['agroupid']==0 || ($_SESSION['groupid']>0 && $line['agroupid']!=$_SESSION['groupid']))) {
 		echo "<html><body>", _('Error.  Looks like your group has changed for this assessment. Please reopen the assessment and try again.');
 		echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">", _('Return to course page'), "</a>";
 		echo '</body></html>';
@@ -741,7 +736,7 @@
 		}
 	} else {
 		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-		$stm2->execute(array(':userid'=>$sessiondata['actas'], ':assessmentid'=>$line['assessmentid']));
+		$stm2->execute(array(':userid'=>$_SESSION['actas'], ':assessmentid'=>$line['assessmentid']));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
 			$useexception = $exceptionfuncs->getCanUseAssessException($row, $testsettings, true);
@@ -946,33 +941,32 @@
 		recordtestdata(false, false);
 	}
 	if (isset($_GET['regen']) && $allowregen && $qi[$questions[$_GET['regen']]]['allowregen']==1) {
-		if (!isset($sessiondata['regendelay'])) {
-			$sessiondata['regendelay'] = 2;
+		if (!isset($_SESSION['regendelay'])) {
+			$_SESSION['regendelay'] = 2;
 		}
 		$doexit = false;
-		if (isset($sessiondata['lastregen'])) {
-			if ($now-$sessiondata['lastregen']<$sessiondata['regendelay']) {
-				$sessiondata['regendelay'] = 5;
+		if (isset($_SESSION['lastregen'])) {
+			if ($now-$_SESSION['lastregen']<$_SESSION['regendelay']) {
+				$_SESSION['regendelay'] = 5;
 				echo '<html><body><p>Hey, about slowing down and trying the problem before hitting regen?  Wait 5 seconds before trying again.</p><p></body></html>';
 				$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 				$stm->execute(array(':time'=>$now, ':log'=>"Quickregen triggered by $userid"));
-				if (!isset($sessiondata['regenwarnings'])) {
-					$sessiondata['regenwarnings'] = 1;
+				if (!isset($_SESSION['regenwarnings'])) {
+					$_SESSION['regenwarnings'] = 1;
 				} else {
-					$sessiondata['regenwarnings']++;
+					$_SESSION['regenwarnings']++;
 				}
-				if ($sessiondata['regenwarnings']>10) {
+				if ($_SESSION['regenwarnings']>10) {
 					$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 					$stm->execute(array(':time'=>$now, ':log'=>"Over 10 regen warnings triggered by $userid"));
 				}
 				$doexit = true;
 			}
-			if ($now - $sessiondata['lastregen'] > 20) {
-				$sessiondata['regendelay'] = 2;
+			if ($now - $_SESSION['lastregen'] > 20) {
+				$_SESSION['regendelay'] = 2;
 			}
 		}
-		$sessiondata['lastregen'] = $now;
-		writesessiondata();
+		$_SESSION['lastregen'] = $now;
 		if ($doexit) { exit;}
 		srand();
 		$toregen = $_GET['regen'];
@@ -1118,18 +1112,18 @@
 	}
 
 
-	$isdiag = isset($sessiondata['isdiag']);
+	$isdiag = isset($_SESSION['isdiag']);
 	if ($isdiag) {
-		$diagid = $sessiondata['isdiag'];
+		$diagid = $_SESSION['isdiag'];
 		$hideAllHeaderNav = true;
 	}
-	$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner');
+	$isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0 && $_SESSION['ltirole']=='learner');
 
 
-	if (isset($CFG['GEN']['keeplastactionlog']) && isset($sessiondata['loginlog'.$testsettings['courseid']])) {
+	if (isset($CFG['GEN']['keeplastactionlog']) && isset($_SESSION['loginlog'.$testsettings['courseid']])) {
 		$now = time();
 		$stm = $DBH->prepare("UPDATE imas_login_log SET lastaction=:lastaction WHERE id=:id");
-		$stm->execute(array(':lastaction'=>$now, ':id'=>$sessiondata['loginlog'.$testsettings['courseid']]));
+		$stm->execute(array(':lastaction'=>$now, ':id'=>$_SESSION['loginlog'.$testsettings['courseid']]));
 	}
 
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
@@ -1154,7 +1148,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead = '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
 		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=102518"></script>';
-		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher'] ? 'teachers':'students');
+		$livepollroom = $testsettings['id'].'-'.($_SESSION['isteacher'] ? 'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
 			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
@@ -1178,7 +1172,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			.LPshowcorrect .LPresbar, .LPshowwrong  .LPresbar {background-color: #FFFFFF;}
 			</style>';
 	}
-	if ($sessiondata['intreereader']) {
+	if ($_SESSION['intreereader']) {
 		$flexwidth = true;
 	}
 	require("header.php");
@@ -1186,10 +1180,10 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		echo '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
 	}
 
-	if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
-		if (isset($sessiondata['actas'])) {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
-			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">", _('Gradebook Detail'), "</a> ";
+	if (!$isdiag && !$isltilimited && !$_SESSION['intreereader']) {
+		if (isset($_SESSION['actas'])) {
+			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$_SESSION['coursename']}</a> ";
+			echo "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$_SESSION['actas']}\">", _('Gradebook Detail'), "</a> ";
 			echo "&gt; ", _('View as student'), "</div>";
 		} else {
 			echo "<div class=breadcrumb>";
@@ -1206,10 +1200,10 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 				echo '</span>';
 			}
-			if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+			if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
 				echo "$breadcrumbbase ", _('Assessment'), "</div>";
 			} else {
-				echo "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+				echo "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$_SESSION['coursename']}</a> ";
 
 				echo "&gt; ", _('Assessment'), "</div>";
 			}
@@ -1246,7 +1240,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo '<p>'.$out.'</p>';
 		}
 
-		if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
+		if ($_SESSION['ltiitemid']==$testsettings['id'] && $isreview) {
 			if ($testsettings['origshowans']!='N') {
 				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'">';
 				echo _('View your scored assessment'), '</a></p>';
@@ -1266,9 +1260,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		echo '</div>';
 	}
 
-	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($sessiondata['groupid']==0 || isset($_GET['addgrpmem']))) {
+	if ((!$_SESSION['isteacher'] || isset($_SESSION['actas'])) && ($testsettings['isgroup']==1 || $testsettings['isgroup']==2) && ($_SESSION['groupid']==0 || isset($_GET['addgrpmem']))) {
 		if (isset($_POST['grpsubmit'])) {
-			if ($sessiondata['groupid']==0) {
+			if ($_SESSION['groupid']==0) {
 				echo '<p>', _('Group error - lost group info'), '</p>';
 			}
 			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,ver';
@@ -1305,7 +1299,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 							$loginfo .= "$thisusername already in group. ";
 						} else {
 							$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid,:stugroupid)");
-							$stm->execute(array(':userid'=>$_POST['user'.$i], ':stugroupid'=>$sessiondata['groupid']));
+							$stm->execute(array(':userid'=>$_POST['user'.$i], ':stugroupid'=>$_SESSION['groupid']));
 
 							$fieldstocopy = explode(',',$fieldstocopy);
 							$sets = array();
@@ -1326,7 +1320,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						}
 					} else {
 						$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES (:userid,:stugroupid)");
-						$stm->execute(array(':userid'=>$_POST['user'.$i], ':stugroupid'=>$sessiondata['groupid']));
+						$stm->execute(array(':userid'=>$_POST['user'.$i], ':stugroupid'=>$_SESSION['groupid']));
 
 						$fieldphs = ':'.implode(',:', explode(',', $fieldstocopy));
 						$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES (:userid,$fieldphs)";
@@ -1344,7 +1338,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 		} else {
 			echo '<div id="headershowtest" class="pagetitle"><h1>', _('Select group members'), '</h1></div>';
-			if ($sessiondata['groupid']==0) {
+			if ($_SESSION['groupid']==0) {
 				//a group should already exist
 				$query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
 				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
@@ -1354,10 +1348,9 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					echo '<p>', _('Group error.  Please try reaccessing the assessment from the course page'), '</p>';
 				}
 				$agroupid = $stm->fetchColumn(0);
-				$sessiondata['groupid'] = $agroupid;
-				writesessiondata();
+				$_SESSION['groupid'] = $agroupid;
 			} else {
-				$agroupid = $sessiondata['groupid'];
+				$agroupid = $_SESSION['groupid'];
 			}
 
 
@@ -1366,7 +1359,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ";
 			$query .= "imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid=:stugroupid ORDER BY imas_users.LastName,imas_users.FirstName";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':stugroupid'=>$sessiondata['groupid']));
+			$stm->execute(array(':stugroupid'=>$_SESSION['groupid']));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$curgrp[0] = $row[0];
 				echo sprintf("<li>%s, %s</li>", Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
@@ -1418,7 +1411,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 	/*
 	no need to do anything in this case
-	if ((!$sessiondata['isteacher'] || isset($sessiondata['actas'])) && $testsettings['isgroup']==3  && $sessiondata['groupid']==0) {
+	if ((!$_SESSION['isteacher'] || isset($_SESSION['actas'])) && $testsettings['isgroup']==3  && $_SESSION['groupid']==0) {
 		//double check not already added to group by someone else
 		$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$testid'";
 		$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
@@ -1430,18 +1423,17 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		} else {
 			echo "<p>Someone already added you to a group.  Using that group.</p>";
 		}
-		$sessiondata['groupid'] = $agroupid;
-		writesessiondata();
+		$_SESSION['groupid'] = $agroupid;
 	}
 	*/
 
 	//if was added to existing group, need to reload $questions, etc
 	echo '<div id="headershowtest" class="pagetitle">';
 	echo "<h1>{$testsettings['name']}</h1></div>\n";
-	if (isset($sessiondata['actas'])) {
+	if (isset($_SESSION['actas'])) {
 		echo '<p style="color: red;">', _('Teacher Acting as ');
 		$stm = $DBH->prepare("SELECT LastName, FirstName FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$sessiondata['actas']));
+		$stm->execute(array(':id'=>$_SESSION['actas']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		echo $row[1].' '.$row[0];
 		echo '<p>';
@@ -1893,7 +1885,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],false,false,$attempts[$qn],false,false,false,$colors);
 					}
 					$contactlinks = showquestioncontactlinks($qn);
-					if ($contactlinks!='' && !$sessiondata['istutorial']) {
+					if ($contactlinks!='' && !$_SESSION['istutorial']) {
 						echo '<div class="review">'.$contactlinks.'</div>';
 					}
 
@@ -2252,7 +2244,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				if ($testsettings['displaymethod'] != "VideoCue") {
 					embedshowicon($qn);
 				}
-				if (!$sessiondata['istutorial']) {
+				if (!$_SESSION['istutorial']) {
 					echo '<div class="prequestion">';
 					$divopen = true;
 					if ($GLOBALS['scoremessages'] != '') {
@@ -2312,7 +2304,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo $quesout;
 
 			} else {
-				if (!$sessiondata['istutorial']) {
+				if (!$_SESSION['istutorial']) {
 					echo "<p>", _('No attempts remain on this problem.'), "</p>";
 					if ($showeachscore) {
 						//TODO i18n
@@ -2350,7 +2342,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			showqinfobar($qn,true,false,true);
 
 			echo '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
-			if ($introhaspages || $sessiondata['intreereader']) {
+			if ($introhaspages || $_SESSION['intreereader']) {
 				echo 'embedattemptedtrack["q'.$qn.'"][1]=0;';
 				if (false && $showeachscore) {
 					echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn) ? "1":"0") . ';';
@@ -2407,7 +2399,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			//}
 			exit;
 		} else if ($_GET['action']=='livepollopenq') {
-			if (!$sessiondata['isteacher']) {
+			if (!$_SESSION['isteacher']) {
 				echo '{error: "unauthorized"}';
 				exit;
 			}
@@ -2442,7 +2434,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			4:  question displaying scored
 			*/
 
-			if (!$sessiondata['isteacher']) {
+			if (!$_SESSION['isteacher']) {
 				echo '{error: "unauthorized"}';
 				exit;
 			}
@@ -2473,7 +2465,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		} else if ($_GET['action']=='livepollshowq') {
 			$qn = Sanitize::onlyInt($_GET['qn']);
 			$clearla = false;
-			if (isset($_GET['forceregen']) && $sessiondata['isteacher']) {
+			if (isset($_GET['forceregen']) && $_SESSION['isteacher']) {
 				srand();
 				do {
 					$newseed = rand(1,9999);
@@ -2490,14 +2482,14 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 			}
 
-			if (!$sessiondata['isteacher'] && ($LPinf['curquestion'] != $qn || ($LPinf['curstate'] != 2 && $LPinf['curstate'] != 3))) {
+			if (!$_SESSION['isteacher'] && ($LPinf['curquestion'] != $qn || ($LPinf['curstate'] != 2 && $LPinf['curstate'] != 3))) {
 				echo 'wrong question or not open for display';
 				echo $LPinf['curquestion'] . ','.$qn.','.$LPinf['curstate'];
 				exit;
 			}
 
 			$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
-			if (isset($_GET['includeqinfo']) && $sessiondata['isteacher']) {
+			if (isset($_GET['includeqinfo']) && $_SESSION['isteacher']) {
 				$GLOBALS['capturechoices'] = 'shuffled';
 				$GLOBALS['capturedrawinit'] = true;
 				ob_start();
@@ -2587,13 +2579,13 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		}
 		if ($testsettings['isgroup']>0) {
 			$testsettings['intro'] .= "<p><span class=noticetext >" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
-			if (!$isteacher || isset($sessiondata['actas'])) {
+			if (!$isteacher || isset($_SESSION['actas'])) {
 				$testsettings['intro'] .= _('Group Members:') . " <ul>";
 				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
 				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid=:agroupid ";
 				$query .= "AND imas_assessment_sessions.assessmentid=:assessmentid ORDER BY imas_users.LastName,imas_users.FirstName";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':agroupid'=>$sessiondata['groupid'], ':assessmentid'=>$testsettings['id']));
+				$stm->execute(array(':agroupid'=>$_SESSION['groupid'], ':assessmentid'=>$testsettings['id']));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$curgrp[] = $row[0];
 					$testsettings['intro'] .= "<li>{$row[2]}, {$row[1]}</li>";
@@ -2817,7 +2809,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$intro = filter("<div class=\"intro\" role=region aria-label=\""._('Intro or instructions')."\">{$testsettings['intro']}</div>\n");
 			if ($testsettings['displaymethod'] == "VideoCue") {
 				echo substr(trim($intro),0,-6);
-				if (!$sessiondata['istutorial'] && $testsettings['testtype']!="NoScores") {
+				if (!$_SESSION['istutorial'] && $testsettings['testtype']!="NoScores") {
 					echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 				}
 				echo '</div>';
@@ -2949,7 +2941,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 					} else {
 						$showcorrectnow = false;
 					}
-					if (!$sessiondata['istutorial']) {
+					if (!$_SESSION['istutorial']) {
 						echo '<div class="prequestion">';
 						echo "<p>", _('No attempts remain on this problem.'), "</p>";
 						if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
@@ -2989,7 +2981,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				ob_start();
 				showqinfobar($i,true,false,true);
 				$reviewbar = ob_get_clean();
-				if (!$sessiondata['istutorial']) {
+				if (!$_SESSION['istutorial']) {
 					$reviewbar = str_replace('<div class="review">','<div class="review">'._('Question').' '.($i+1).'. ', $reviewbar);
 				}
 				$quesout .= $reviewbar;
@@ -3011,13 +3003,13 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				}
 				echo '</p>';
 			}
-			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
+			if (!$_SESSION['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
 				echo "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
 			}
 
 
 			echo '</div>'; //ends either inset or formcontents div
-			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue"  && $testsettings['testtype']!="NoScores") {
+			if (!$_SESSION['istutorial'] && $testsettings['displaymethod'] != "VideoCue"  && $testsettings['testtype']!="NoScores") {
 				echo "<p><a href=\"showtest.php?action=embeddone\" ".getSummaryConfirm().">";
 				echo _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 			}
@@ -3034,7 +3026,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 
-			if ($sessiondata['isteacher']) {
+			if ($_SESSION['isteacher']) {
 				echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
 				echo '<p id="livepollactivestu" style="margin-top:0px">&nbsp;</p>';
 				echo "<h3>", _('Questions'), "</h3>\n";
@@ -3728,11 +3720,11 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 	function endtest($testsettings) {
 
-		//unset($sessiondata['sessiontestid']);
+		//unset($_SESSION['sessiontestid']);
 	}
 	function leavetestmsg($or = '') {
-		global $isdiag, $diagid, $sessiondata, $testsettings;
-		$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
+		global $isdiag, $diagid, $testsettings;
+		$isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
 		echo '<p>';
 		echo $or;
 		if ($isdiag) {
@@ -3740,7 +3732,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				echo ' '._('or').' ';
 			}
 			echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a>\n";
-		} else if ($isltilimited || $sessiondata['intreereader']) {
+		} else if ($isltilimited || $_SESSION['intreereader']) {
 
 		} else {
 			if ($or != '') {

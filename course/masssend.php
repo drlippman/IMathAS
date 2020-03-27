@@ -163,8 +163,11 @@
 				}
 			}
 
-			$sessiondata['mathdisp']=2;
-			$sessiondata['graphdisp']=2;
+			$origmathdisp = $_SESSION['mathdisp'];
+			$origgraphdisp = $_SESSION['graphdisp'];
+			$_SESSION['mathdisp']=2;
+			$_SESSION['graphdisp']=2;
+
 			require("../filter/filter.php");
 			$message = filter($messagePost);
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$GLOBALS['basesiteurl'] .'/',$message);
@@ -221,6 +224,9 @@
 			foreach ($teacheraddys as $addy) {
 				send_email($addy, $sendfrom, $subjectPost, $message, array($self), array(), 5);
 			}
+
+			$_SESSION['mathdisp'] = $origmathdisp;
+			$_SESSION['graphdisp'] = $origgraphdisp;
 		}
 		if ($calledfrom=='lu') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());

@@ -1213,44 +1213,6 @@ switch($_GET['action']) {
 			echo '<p class=small>'._('Course Ancestors').': '.Sanitize::encodeStringForDisplay($line['ancestors']).'</p>';
 		}
 		break;
-	case "importmacros":
-		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
-
-		echo "<h2>Install Macro File</h2>\n";
-		echo "<p><b>Warning:</b> Macro Files have a large security risk.  <b>Only install macro files from a trusted source</b></p>\n";
-		echo "<p><b>Warning:</b> Install will overwrite any existing macro file of the same name</p>\n";
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
-		echo '<input type=hidden name=action value="importmacros" />';
-		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n";
-		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-		echo "</form>\n";
-		break;
-
-	case "importqimages":
-		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
-		echo "<h2>Install Question Images</h2>\n";
-		echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install question images from a trusted source</b>, and where you've verified the archive only contains images.</p>\n";
-		echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n";
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
-		echo '<input type=hidden name=action value="importqimages" />';
-		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"5000000\" />\n";
-		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-		echo "</form>\n";
-		break;
-	case "importcoursefiles":
-		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
-		echo "<h2>Install Course files</h2>\n";
-		echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install course files from a trusted source</b>, and where you've verified the archive only contains regular files (no PHP files).</p>\n";
-		echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n";
-		echo "<form enctype=\"multipart/form-data\" method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
-		echo '<input type=hidden name=action value="importcoursefiles" />';
-		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\" />\n";
-		echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-		echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-		echo "</form>\n";
-		break;
 	case "deloldusers":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo "<h2>Delete Old Users</h2>\n";

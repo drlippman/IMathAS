@@ -374,20 +374,6 @@ $sql = 'CREATE TABLE `imas_firstscores` (
 $DBH->query($sql);
 echo 'imas_firstscores created<br/>';
 
-$sql = 'CREATE TABLE `imas_sessions` ('
-        . ' `sessionid` VARCHAR(32) NOT NULL, '
-        . ' `userid` INT(10) UNSIGNED NOT NULL, '
-        . ' `time` INT(10) UNSIGNED NOT NULL, '
-	. ' `tzoffset` SMALLINT(4) NOT NULL DEFAULT \'0\', '
-	. ' `tzname` VARCHAR(254) NOT NULL DEFAULT \'\', '
-	. ' `sessiondata` TEXT NOT NULL, '
-        . ' PRIMARY KEY (`sessionid`), INDEX(`time`), INDEX(`userid`) '
-        . ' )'
-        . ' ENGINE = InnoDB'
-        . ' COMMENT = \'Session data\';';
-$DBH->query($sql);
-echo 'imas_sessions created<br/>';
-
 $sql = 'CREATE TABLE `imas_inlinetext` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `courseid` INT(10) UNSIGNED NOT NULL, '

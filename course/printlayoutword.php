@@ -26,15 +26,6 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 
 $aid = Sanitize::onlyInt($_GET['aid']);
-$sessiondata['texdisp'] = true;
-$sessiondata['texdoubleescape'] = true;
-$texusealignsformatrix = true;
-
-$sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 2;
-$loadgraphfilter = true;
-$hidedrawcontrols = true;
-$assessver = 2;
 
 $stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
@@ -75,6 +66,18 @@ if ($overwriteBody==1) {
 
 
 } else {
+  $GLOBALS['texdisp'] = true;
+  $GLOBALS['texdoubleescape'] = true;
+  $texusealignsformatrix = true;
+
+  $origmathdisp = $_SESSION['mathdisp'];
+  $origgraphdisp = $_SESSION['graphdisp'];
+  $_SESSION['graphdisp'] = 1;
+  $_SESSION['mathdisp'] = 2;
+  $loadgraphfilter = true;
+  $hidedrawcontrols = true;
+  $assessver = 2;
+
 	//load filter
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/../filter/filter.php");
@@ -345,10 +348,12 @@ if ($overwriteBody==1) {
 	header('Content-Length: '.filesize($filename));
 	readfile($filename.'.docx');
 	*/
-
+  $_SESSION['mathdisp'] = $origmathdisp;
+  $_SESSION['graphdisp'] = $origgraphdisp;
+  require("../footer.php");
 	exit;
 }
-require("../footer.php");
+
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	global $RND,$DBH,$isfinal,$imasroot,$urlmode;
 	$RND->srand($seed);

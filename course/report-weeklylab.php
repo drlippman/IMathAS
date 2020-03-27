@@ -51,8 +51,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-	} else if (isset($sessiondata[$cid.'gbmode'])) {
-		$gbmode =  $sessiondata[$cid.'gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -62,22 +62,21 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 
 	if (isset($_POST['interval'])) {
 		//settings update postback
-		if (!isset($sessiondata['reportsettings-weeklylab'])) {
-			$sessiondata['reportsettings-weeklylab'] = array();
+		if (!isset($_SESSION['reportsettings-weeklylab'])) {
+			$_SESSION['reportsettings-weeklylab'] = array();
 		}
-		$sessiondata['reportsettings-weeklylab'.$cid]['interval'] = $_POST['interval'];
-		$sessiondata['reportsettings-weeklylab'.$cid]['useminscore'] = isset($_POST['useminscore']);
-		$sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
-		writesessiondata();
+		$_SESSION['reportsettings-weeklylab'.$cid]['interval'] = $_POST['interval'];
+		$_SESSION['reportsettings-weeklylab'.$cid]['useminscore'] = isset($_POST['useminscore']);
+		$_SESSION['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
 
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/report-weeklylab.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 
-	if (isset($sessiondata['reportsettings-weeklylab'.$cid])) {
-		$interval = $sessiondata['reportsettings-weeklylab'.$cid]['interval'];
-		$useminscore = $sessiondata['reportsettings-weeklylab'.$cid]['useminscore'];
-		$breakpercent = $sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'];
+	if (isset($_SESSION['reportsettings-weeklylab'.$cid])) {
+		$interval = $_SESSION['reportsettings-weeklylab'.$cid]['interval'];
+		$useminscore = $_SESSION['reportsettings-weeklylab'.$cid]['useminscore'];
+		$breakpercent = $_SESSION['reportsettings-weeklylab'.$cid]['breakpercent'];
 
 	} else {
 		$interval = '1week';

@@ -25,17 +25,17 @@ unset($init_skip_csrfp);
 require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
-$sessiondata = array();
+$_SESSION = array();
 /*
 if (isset($_GET['graphdisp'])) {
-	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
-	setcookie("multiembedq-graphdisp", $sessiondata['graphdisp']);
+	$_SESSION['graphdisp'] = intval($_GET['graphdisp']);
+	setcookie("multiembedq-graphdisp", $_SESSION['graphdisp']);
 } else if (isset($_COOKIE['multiembedq-graphdisp'])) {
-	$sessiondata['graphdisp'] = intval($_COOKIE['multiembedq-graphdisp']);
+	$_SESSION['graphdisp'] = intval($_COOKIE['multiembedq-graphdisp']);
 } else {
-	$sessiondata['graphdisp'] = 1;
+	$_SESSION['graphdisp'] = 1;
 }
-$sessiondata['mathdisp'] = 3;
+$_SESSION['mathdisp'] = 3;
 */
 $prefdefaults = array(
 	'mathdisp'=>1,
@@ -45,31 +45,31 @@ $prefdefaults = array(
 	'livepreview'=>1);
 
 $prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
-$sessiondata['userprefs'] = array();
+$_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {
-		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+		$_SESSION['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
 	} else {
-		$sessiondata['userprefs'][$key] = $def;
+		$_SESSION['userprefs'][$key] = $def;
 	}
 }
 if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
-	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
-	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$_SESSION['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$_SESSION['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	setcookie("embedquserprefs", json_encode(array(
-		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
-		'drawentry'=>$sessiondata['userprefs']['drawentry']
+		'graphdisp'=>$_SESSION['userprefs']['graphdisp'],
+		'drawentry'=>$_SESSION['userprefs']['drawentry']
 		)),0,'','',false,true);
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
-	$sessiondata[$key] = $sessiondata['userprefs'][$key];
+	$_SESSION[$key] = $_SESSION['userprefs'][$key];
 }
 
 $showtips = 2;
 $useeqnhelper = 4;
 $useeditor = 1;
 $courseUIver = 1;
-$sessiondata['secsalt'] = "12345";
+$_SESSION['secsalt'] = "12345";
 $cid = "embedq";
 
 if (isset($CFG['GEN']['JWTsecret'])) {
@@ -236,7 +236,7 @@ if ($targetid != '') {
 		$(window).on("ImathasEmbedReload", sendresizemsg);
 	});
 	</script>';
-	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+	if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 		//in case MathJax isn't loaded yet
 		$placeinhead .= '<script type="text/x-mathjax-config">
 			MathJax.Hub.Queue(function () {
@@ -246,10 +246,10 @@ if ($targetid != '') {
 	}
 }
 if ($theme != '') {
-	$sessiondata['coursetheme'] = $theme.'.css';
+	$_SESSION['coursetheme'] = $theme.'.css';
 }
 require("./assessment/header.php");
-if ($sessiondata['graphdisp'] == 1) {
+if ($_SESSION['graphdisp'] == 1) {
 	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">' . _('Enable text based alternatives for graph display and drawing entry') . '</a></div>';
 }
 echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';

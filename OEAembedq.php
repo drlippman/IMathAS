@@ -16,7 +16,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 require("./assessment/displayq2.php");
 $GLOBALS['assessver'] = 2;
 
-$sessiondata = array();
+$_SESSION = array();
 
 $prefdefaults = array(
 	'mathdisp'=>6,
@@ -26,27 +26,27 @@ $prefdefaults = array(
 	'livepreview'=>1);
 
 $prefcookie = json_decode($_COOKIE["OEAembeduserprefs"], true);
-$sessiondata['userprefs'] = array();
+$_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {
-		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+		$_SESSION['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
 	} else {
-		$sessiondata['userprefs'][$key] = $def;
+		$_SESSION['userprefs'][$key] = $def;
 	}
 }
 if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
-	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
-	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$_SESSION['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
+	$_SESSION['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	setcookie("OEAembeduserprefs", json_encode(array(
-		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
-		'drawentry'=>$sessiondata['userprefs']['drawentry']
+		'graphdisp'=>$_SESSION['userprefs']['graphdisp'],
+		'drawentry'=>$_SESSION['userprefs']['drawentry']
 		)),0,'','',false,true);
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
-	$sessiondata[$key] = $sessiondata['userprefs'][$key];
+	$_SESSION[$key] = $_SESSION['userprefs'][$key];
 }
 
-$sessiondata['secsalt'] = "12345";
+$_SESSION['secsalt'] = "12345";
 $cid = "embedq";
 $showtips = 2;
 $useeqnhelper = 4;
@@ -94,7 +94,7 @@ if (isset($_GET['frame_id'])) {
 if (isset($_REQUEST['theme'])) {
 	$theme = preg_replace('/\W/','',$_REQUEST['theme']);
 	$page_formAction .= '&theme='.$theme;
-	$sessiondata['coursetheme'] = $theme.'.css';
+	$_SESSION['coursetheme'] = $theme.'.css';
 }
 
 
@@ -129,7 +129,7 @@ $placeinhead .= '<script type="text/javascript">
 		});
 	}
 	</script>';
-if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 	//in case MathJax isn't loaded yet
 	$placeinhead .= '<script type="text/x-mathjax-config">
 		MathJax.Hub.Queue(function () {
@@ -140,7 +140,7 @@ if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
 $useeditor = 1;
 require("./assessment/header.php");
 
-if ($sessiondata['graphdisp'] == 1) {
+if ($_SESSION['graphdisp'] == 1) {
 	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';
 } else {
 	echo '<div style="float:right;"><a href="OEAembedq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&graphdisp=1">Enable visual graph display and drawing entry</a></div>';

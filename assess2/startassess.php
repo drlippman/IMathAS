@@ -62,8 +62,8 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 
 // reject if no lti_sourcedid and we expect it
 if (!$in_practice && !empty($_POST['has_ltisourcedid']) &&
-  (empty($sessiondata['lti_lis_result_sourcedid'.$aid]) ||
-   empty($sessiondata['lti_outcomeurl'])
+  (empty($_SESSION['lti_lis_result_sourcedid'.$aid]) ||
+   empty($_SESSION['lti_outcomeurl'])
   )
 ) {
   echo '{"error": "need_relaunch"}';
@@ -76,7 +76,7 @@ $assess_record->loadRecord($uid);
 
 // check password, if needed
 if (!$in_practice && !$canViewAll &&
-  (!isset($sessiondata['assess2-'.$aid]) || $sessiondata['assess2-'.$aid] != $in_practice) &&
+  (!isset($_SESSION['assess2-'.$aid]) || $_SESSION['assess2-'.$aid] != $in_practice) &&
   !$assess_info->checkPassword($_POST['password'])
 ) {
   echo '{"error": "invalid_password"}';
@@ -218,15 +218,15 @@ if ($isRealStudent) {
 }
 
 // update lti_sourcedid if needed
-if (!empty($sessiondata['lti_lis_result_sourcedid'.$aid]) &&
-  !empty($sessiondata['lti_outcomeurl'])
+if (!empty($_SESSION['lti_lis_result_sourcedid'.$aid]) &&
+  !empty($_SESSION['lti_outcomeurl'])
 ) {
-  $altltisourcedid = $sessiondata['lti_lis_result_sourcedid'.$aid].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
+  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
   $assess_record->updateLTIsourcedId($altltisourcedid);
 }
 /*
-else if (isset($sessiondata['lti_lis_result_sourcedid'])) {
-  $altltisourcedid = $sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup'];
+else if (isset($_SESSION['lti_lis_result_sourcedid'])) {
+  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
   $assess_record->updateLTIsourcedId($altltisourcedid);
 }
 */
@@ -314,7 +314,7 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
 }
 
 // get settings for LTI if needed
-if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
+if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
   if ($coursemsgset < 4 && $assessInfoOut['help_features']['message']==true) {
     $assessInfoOut['lti_showmsg'] = 1;
     // get msg count
@@ -337,8 +337,7 @@ $assess_record->saveRecordIfNeeded();
 
 // store assessment start in session data, so we know if they've gotten past
 // password at some point
-$sessiondata['assess2-'.$aid] = $in_practice;
-writesessiondata();
+$_SESSION['assess2-'.$aid] = $in_practice;
 
 //prep date display
 prepDateDisp($assessInfoOut);

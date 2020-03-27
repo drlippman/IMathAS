@@ -79,7 +79,7 @@ $parms['context_label'] = trim($coursename);
 $parms['context_type'] = 'CourseSection';
 $parms['resource_link_id'] = $cid.'-'.$linkid;
 
-if ($points>0 && isset($studentid) && !isset($sessiondata['stuview'])) {
+if ($points>0 && isset($studentid) && !isset($_SESSION['stuview'])) {
 	$sig = sha1($gradesecret.'::'.$parms['resource_link_id'].'::'.$userid);
 	$parms['lis_result_sourcedid'] = $sig.'::'.$parms['resource_link_id'].'::'.$userid;
 	$parms['lis_outcome_service_url'] = $GLOBALS['basesiteurl'] . '/admin/ltioutcomeservice.php';

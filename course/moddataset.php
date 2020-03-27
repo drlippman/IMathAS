@@ -689,11 +689,11 @@
 			$line['hasimg'] = 0;
 			$line['deleted'] = 0;
 			$line['replaceby'] = 0;
-			if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
-				$inlibs = $sessiondata['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
-			} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
-				//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
-				$inlibs = $sessiondata['lastsearchlibs'.$cid];
+			if (isset($_GET['aid']) && isset($_SESSION['lastsearchlibs'.$_GET['aid']])) {
+				$inlibs = $_SESSION['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
+			} else if (isset($_SESSION['lastsearchlibs'.$cid])) {
+				//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
+				$inlibs = $_SESSION['lastsearchlibs'.$cid];
 			} else {
 				$inlibs = $userdeflib;
 			}
@@ -774,7 +774,7 @@
 	/// Start display ///
 	$pagetitle = "Question Editor";
 	$placeinhead = '';
-	/*if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2 || $sessiondata['mathdisp']==3) {
+	/*if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==2 || $_SESSION['mathdisp']==3) {
 		//these scripts are used by the editor to make image-based math work in the editor
 		$placeinhead .= '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 		//if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}

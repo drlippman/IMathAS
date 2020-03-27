@@ -45,7 +45,7 @@ function disallowsSameSiteNone () {
 }
 }
 if (isset($sessionpath)) { session_save_path($sessionpath);}
-ini_set('session.gc_maxlifetime',86400);
+ini_set('session.gc_maxlifetime',432000);
 ini_set('auto_detect_line_endings',true);
 $hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
 if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {

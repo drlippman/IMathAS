@@ -16,11 +16,11 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 
-$isltilimited = (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0);
+$isltilimited = (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0);
 $inTreeReader = (strpos($_SERVER['HTTP_REFERER'],'treereader') !== false);
-$isdiag = isset($sessiondata['isdiag']);
+$isdiag = isset($_SESSION['isdiag']);
 if ($isdiag) {
-  $diagid = Sanitize::onlyInt($sessiondata['isdiag']);
+  $diagid = Sanitize::onlyInt($_SESSION['isdiag']);
   $hideAllHeaderNav = true;
 }
 
@@ -50,7 +50,7 @@ $nologo = true;
 $useeditor = 1;
 require('../header.php');
 
-if ((!$isltilimited || $sessiondata['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
+if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$isdiag) {
   echo "<div class=breadcrumb>";
   if ($isltilimited) {
     echo "$breadcrumbbase ", _('Assessment'), "</div>";

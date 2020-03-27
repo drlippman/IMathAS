@@ -41,7 +41,7 @@ if (!isset($_GET['asid']) || $asid == 0) {
 }
 
 $curBreadcrumb = $breadcrumbbase;
-if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 	$curBreadcrumb .= "<a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if ($stu>0) {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";

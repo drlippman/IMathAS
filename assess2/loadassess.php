@@ -96,10 +96,10 @@ if ($canViewAll && $userid !== $uid) {
 $assessInfoOut['userid'] = $uid;
 
 //set is_lti and is_diag
-$assessInfoOut['is_lti'] = isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0;
-$assessInfoOut['is_diag'] = isset($sessiondata['isdiag']);
+$assessInfoOut['is_lti'] = isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0;
+$assessInfoOut['is_diag'] = isset($_SESSION['isdiag']);
 if ($assessInfoOut['is_lti']) {
-  $assessInfoOut['has_ltisourcedid'] = !empty($sessiondata['lti_lis_result_sourcedid'.$aid]);
+  $assessInfoOut['has_ltisourcedid'] = !empty($_SESSION['lti_lis_result_sourcedid'.$aid]);
 }
 
 //set has password
@@ -180,8 +180,8 @@ if ($assessInfoOut['is_diag']) {
   $assessInfoOut['diag_userid'] = substr($username,0,strpos($username,'~'));
 }
 
-$assessInfoOut['useMQ'] = (!isset($sessiondata['userprefs']['useeqed']) ||
-  $sessiondata['userprefs']['useeqed'] == 1);
+$assessInfoOut['useMQ'] = (!isset($_SESSION['userprefs']['useeqed']) ||
+  $_SESSION['userprefs']['useeqed'] == 1);
 
 //prep date display
 prepDateDisp($assessInfoOut);

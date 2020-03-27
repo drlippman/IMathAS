@@ -47,14 +47,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$aver = $row['ver'];
 	$modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
 
-	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
+	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
-		$sessiondata['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
-		writesessiondata();
+		$_SESSION['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
 	} else {
-		if (!isset($sessiondata['selfrom'.$aid])) {
-			$sessiondata['selfrom'.$aid] = 'lib';
-			writesessiondata();
+		if (!isset($_SESSION['selfrom'.$aid])) {
+			$_SESSION['selfrom'.$aid] = 'lib';
 		}
 	}
 
@@ -489,8 +487,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	$grp0Selected = "";
-	if (isset($sessiondata['groupopt'.$aid])) {
-		$grp = $sessiondata['groupopt'.$aid];
+	if (isset($_SESSION['groupopt'.$aid])) {
+		$grp = $_SESSION['groupopt'.$aid];
 		$grp1Selected = ($grp==1) ? " selected" : "";
 	} else {
 		$grp = 0;
@@ -642,7 +640,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	unset($questionjsarr);
 
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
-	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
+	if ($_SESSION['selfrom'.$aid]=='lib') { //selecting from libraries
 
 		//remember search
 		if (isset($_POST['search'])) {
@@ -650,33 +648,32 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$safesearch = str_replace(' and ', ' ',$safesearch);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$sessiondata['lastsearch'.$cid] = $safesearch; ///str_replace(" ","+",$safesearch);
+			$_SESSION['lastsearch'.$cid] = $safesearch; ///str_replace(" ","+",$safesearch);
 			if (isset($_POST['searchall'])) {
 				$searchall = 1;
 			} else {
 				$searchall = 0;
 			}
-			$sessiondata['searchall'.$cid] = $searchall;
+			$_SESSION['searchall'.$cid] = $searchall;
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
 			} else {
 				$searchmine = 0;
 			}
-			$sessiondata['searchmine'.$cid] = $searchmine;
+			$_SESSION['searchmine'.$cid] = $searchmine;
 			if (isset($_POST['newonly'])) {
 				$newonly = 1;
 			} else {
 				$newonly = 0;
 			}
-			$sessiondata['searchnewonly'.$cid] = $newonly;
-			writesessiondata();
-		} else if (isset($sessiondata['lastsearch'.$cid])) {
-			$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+			$_SESSION['searchnewonly'.$cid] = $newonly;
+		} else if (isset($_SESSION['lastsearch'.$cid])) {
+			$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$searchall = $sessiondata['searchall'.$cid];
-			$searchmine = $sessiondata['searchmine'.$cid];
-			$newonly = $sessiondata['searchnewonly'.$cid];
+			$searchall = $_SESSION['searchall'.$cid];
+			$searchmine = $_SESSION['searchmine'.$cid];
+			$newonly = $_SESSION['searchnewonly'.$cid];
 		} else {
 			$search = '';
 			$searchall = 0;
@@ -729,23 +726,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$_POST['libs'] = $userdeflib;
 			}
 			$searchlibs = $_POST['libs'];
-			//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
-			$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
-			writesessiondata();
+			//$_SESSION['lastsearchlibs'] = implode(",",$searchlibs);
+			$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
 		} else if (isset($_GET['listlib'])) {
 			$searchlibs = $_GET['listlib'];
-			$sessiondata['lastsearchlibs'.$aid] = $searchlibs;
+			$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
 			$searchall = 0;
-			$sessiondata['searchall'.$aid] = $searchall;
-			$sessiondata['lastsearch'.$aid] = '';
+			$_SESSION['searchall'.$aid] = $searchall;
+			$_SESSION['lastsearch'.$aid] = '';
 			$searchlikes = '';
 			$searchlikevals = array();
 			$search = '';
 			$safesearch = '';
-			writesessiondata();
-		}else if (isset($sessiondata['lastsearchlibs'.$aid])) {
-			//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
-			$searchlibs = $sessiondata['lastsearchlibs'.$aid];
+		}else if (isset($_SESSION['lastsearchlibs'.$aid])) {
+			//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
+			$searchlibs = $_SESSION['lastsearchlibs'.$aid];
 		} else {
 			if (isset($CFG['AMS']['guesslib']) && count($existingq)>0) {
 				$maj = count($existingq)/2;
@@ -1020,20 +1015,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		}
 
-	} else if ($sessiondata['selfrom'.$aid]=='assm') { //select from assessments
+	} else if ($_SESSION['selfrom'.$aid]=='assm') { //select from assessments
 
 		if (isset($_GET['clearassmt'])) {
-			unset($sessiondata['aidstolist'.$aid]);
+			unset($_SESSION['aidstolist'.$aid]);
 		}
 		if (isset($_POST['achecked'])) {
 			if (count($_POST['achecked'])!=0) {
 				$aidstolist = $_POST['achecked'];
-				$sessiondata['aidstolist'.$aid] = $aidstolist;
-				writesessiondata();
+				$_SESSION['aidstolist'.$aid] = $aidstolist;
 			}
 		}
-		if (isset($sessiondata['aidstolist'.$aid])) { //list questions
-			$aidlist = implode(',', array_map('intval', $sessiondata['aidstolist'.$aid]));
+		if (isset($_SESSION['aidstolist'.$aid])) { //list questions
+			$aidlist = implode(',', array_map('intval', $_SESSION['aidstolist'.$aid]));
 			$stm = $DBH->query("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$aidnames[$row[0]] = $row[1];
@@ -1046,7 +1040,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$x=0;
 			$page_assessmentQuestions = array();
-			foreach ($sessiondata['aidstolist'.$aid] as $aidq) {
+			foreach ($_SESSION['aidstolist'.$aid] as $aidq) {
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid=:assessmentid";
 				$stm = $DBH->prepare($query);
@@ -1164,7 +1158,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 /******* begin html output ********/
 //hack to prevent the page breaking on accessible mode
-$sessiondata['useed'] = 1;
+$_SESSION['useed'] = 1;
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -1211,7 +1205,7 @@ if ($overwriteBody==1) {
 		echo "<img src=\"$imasroot/img/help.gif\" alt=\"Help\"/> ";
 		echo 'How do I find questions to add?</a>';
 		echo '<div id="helpwithadding" style="display:none">';
-		if ($sessiondata['selfrom'.$aid]=='lib') {
+		if ($_SESSION['selfrom'.$aid]=='lib') {
 			echo "<p>You are currently set to select questions from the question libraries.  If you would like to select questions from ";
 			echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
 			echo "<p>To find questions to add from the question libraries:";
@@ -1220,7 +1214,7 @@ if ($overwriteBody==1) {
 			echo " <li>Scroll down in the library selector, and click the <b>Use Libraries</b> button</li> ";
 			echo " <li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
 			echo "</ol>";
-		} else if ($sessiondata['selfrom'.$aid]=='assm') {
+		} else if ($_SESSION['selfrom'.$aid]=='assm') {
 			echo "<p>You are currently set to select questions existing assessments.  If you would like to select questions from ";
 			echo "the question libraries, click the <b>Select From Libraries</b> button below</p>";
 			echo "<p>To find questions to add from existing assessments:";
@@ -1306,7 +1300,7 @@ if ($overwriteBody==1) {
 //<input type=button value="Select Libraries" onClick="libselect()">
 
 	//POTENTIAL QUESTIONS
-	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
+	if ($_SESSION['selfrom'.$aid]=='lib') { //selecting from libraries
 		if (!$beentaken) {
 ?>
 
@@ -1454,7 +1448,7 @@ if ($overwriteBody==1) {
 			}
 		}
 
-	} else if ($sessiondata['selfrom'.$aid]=='assm') { //select from assessments
+	} else if ($_SESSION['selfrom'.$aid]=='assm') { //select from assessments
 ?>
 
 	<h2>Potential Questions</h2>
@@ -1462,7 +1456,7 @@ if ($overwriteBody==1) {
 <?php
 		if (isset($_POST['achecked']) && (count($_POST['achecked'])==0)) {
 			echo "<p>No Assessments Selected.  Select at least one assessment.</p>";
-		} elseif (isset($sessiondata['aidstolist'.$aid])) { //list questions
+		} elseif (isset($_SESSION['aidstolist'.$aid])) { //list questions
 ?>
 	<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
 

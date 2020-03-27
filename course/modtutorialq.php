@@ -914,11 +914,11 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$line['userights'] = $stm->fetchColumn(0);
 	$line['author'] = $myname;
 	$line['deleted'] = 0;
-	if (isset($_GET['aid']) && isset($sessiondata['lastsearchlibs'.$_GET['aid']])) {
-		$inlibs = $sessiondata['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
-	} else if (isset($sessiondata['lastsearchlibs'.$cid])) {
-		//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
-		$inlibs = $sessiondata['lastsearchlibs'.$cid];
+	if (isset($_GET['aid']) && isset($_SESSION['lastsearchlibs'.$_GET['aid']])) {
+		$inlibs = $_SESSION['lastsearchlibs'.Sanitize::onlyInt($_GET['aid'])];
+	} else if (isset($_SESSION['lastsearchlibs'.$cid])) {
+		//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
+		$inlibs = $_SESSION['lastsearchlibs'.$cid];
 	} else {
 		$inlibs = $userdeflib;
 	}
