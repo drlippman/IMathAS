@@ -3024,16 +3024,19 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$dotline = 2;
 				}
 			} else {
-				$bg = getgraphfilename($plot);
-				/*
-				someday: overlay canvas over SVG.  Sizing not working in mobile and don't feel like figuring it out yet
-				$out .= '<div class="drawcanvas" style="position:relative;background-color:#fff;width:'.$settings[6].'px;height:'.$settings[7].'px;">';
-				$out .= '<div class="canvasbg" style="position:absolute;top:0;left:0;">'.$plot.'</div><div class="drawcanvasholder" style="position:absolute;top:0;left:0;z-index:2">';
+				//$bg = getgraphfilename($plot);
+
+				$plot = str_replace('<embed','<embed data-nomag=1',$plot); //hide mag
+				//overlay canvas over SVG.
+				$out .= '<div class="drawcanvas" style="position:relative;width:'.$settings[6].'px;height:'.$settings[7].'px">';
+				$out .= '<div class="canvasbg" style="position:absolute;top:0px;left:0px;">'.$plot.'</div>';
+				$out .= '<div class="drawcanvasholder" style="position:relative;top:0;left:0;z-index:2">';
 				$out .= "<canvas id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 				$out .= '</div></div>';
-				*/
-				$out .= "<canvas class=\"drawcanvas\" id=\"canvas$qn\" width=\"{$settings[6]}\" height=\"{$settings[7]}\"></canvas>";
 
+				/*
+				$out .= "<canvas class="drawcanvas" id="canvas$qn" width="{$settings[6]}" height="{$settings[7]}"></canvas>";
+					*/
 				$out .= "<div><span id=\"drawtools$qn\" class=\"drawtools\">";
 				$out .= "<span onclick=\"imathasDraw.clearcanvas($qn)\">" . _('Clear All') . "</span> ";
 				//if ($answerformat[0]=='freehand' && count($answerformat)==1) {
@@ -3243,12 +3246,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= getcolormark($colorbox);
 			if ($colorbox!='') { $out .= '</div>';}
 			$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
-			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
+			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
 			if (isset($GLOBALS['capturedrawinit'])) {
 				if (!isset($GLOBALS['drawinitdata'])) {
 					$GLOBALS['drawinitdata'] = array();
 				}
-				$GLOBALS['drawinitdata'][$qn] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
+				$GLOBALS['drawinitdata'][$qn] = "'',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
 			}
 			$la = str_replace(array('(',')'),array('[',']'),$la);
 			$la = explode(';;',$la);

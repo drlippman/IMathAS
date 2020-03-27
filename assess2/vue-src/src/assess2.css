@@ -281,6 +281,9 @@ ol.lalpha li { margin-top: .7em;}
 .drawtools [data-drawaction].sel {
   background-color: #E6F0F9;
 }
+.drawcanvas {
+	margin-bottom: 5px;
+}
 
 /* General layout styles used many places */
 input, .mq-editable-field, .mathquill-math-field {
