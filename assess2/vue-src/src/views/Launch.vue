@@ -184,7 +184,10 @@ export default {
       return (window.exiturl && window.exiturl !== '');
     },
     canAddWork () {
-      return (!this.aInfo.has_active_attempt && this.aInfo.showwork_after);
+      return ((!this.aInfo.has_active_attempt ||
+        this.aInfo.submitby === 'by_question') &&
+        this.aInfo.showwork_after
+      );
     }
   },
   methods: {

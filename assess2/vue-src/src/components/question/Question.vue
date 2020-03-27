@@ -34,15 +34,23 @@
     />
 
     <div v-if="showWork && questionContentLoaded">
-      {{ $t("question.showwork") }}
-      <tinymce-input
-        :id="'sw' + qn"
-        :value = "questionData.work"
-        rows = "3"
-        @input = "updateWork"
-        @blur = "workChanged"
-        @focus = "workFocused"
-      />
+      <button
+        v-if = "getwork !== 2"
+        @click = "showWorkInput = !showWorkInput"
+      >
+        {{ showWorkInput ? $t('work.hide') : $t('work.add') }}
+      </button>
+      <div v-show="getwork === 2 || showWorkInput">
+        {{ $t("question.showwork") }}
+        <showwork-input
+          :id="'sw' + qn"
+          :value = "questionData.work"
+          rows = "3"
+          @input = "updateWork"
+          @blur = "workChanged"
+          @focus = "workFocused"
+        />
+      </div>
     </div>
     <div v-if="showSubmit" class="submitbtnwrap">
       <button
@@ -71,7 +79,7 @@ import { store, actions } from '../../basicstore';
 import ScoreResult from '@/components/question/ScoreResult.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import QuestionHelps from '@/components/question/QuestionHelps.vue';
-import TinymceInput from '@/components/TinymceInput.vue';
+import ShowworkInput from '@/components/ShowworkInput.vue';
 
 export default {
   name: 'Question',
@@ -79,7 +87,7 @@ export default {
   components: {
     ScoreResult,
     QuestionHelps,
-    TinymceInput,
+    ShowworkInput,
     Icons
   },
   data: function () {
@@ -87,7 +95,8 @@ export default {
       timeActivated: null,
       timeActive: 0,
       work: '',
-      lastWorkVal: ''
+      lastWorkVal: '',
+      showWorkInput: false
     };
   },
   computed: {

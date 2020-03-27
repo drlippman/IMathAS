@@ -530,6 +530,7 @@ class AssessRecord
       //no assessment record at all
       return false;
     }
+    $this->parseData();
     $submitby = $this->assess_info->getSetting('submitby');
 
     if ($this->is_practice) {
@@ -587,7 +588,6 @@ class AssessRecord
       }
 
       if ($setattempt) {
-        $this->parseData();
         $lastver = count($this->data['assess_versions']) - 1;
         if ($submitby == 'by_assessment') {
           // only mark as submitted if by_assessment

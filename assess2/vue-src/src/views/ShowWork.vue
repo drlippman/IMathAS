@@ -30,13 +30,18 @@
         />
         <div v-else>
           {{ $t("question.showwork") }}
-          <tinymce-input
+          <showwork-input
             :id="'sw' + curqn"
             :value = "question.work"
             rows = "3"
             @input = "workChanged(curqn, ...arguments)"
           />
         </div>
+      </div>
+      <div>
+        <button @click = "save" class="primary">
+          {{ saveLabel }}
+        </button>
       </div>
     </div>
   </div>
@@ -46,14 +51,14 @@
 import { store, actions } from '../basicstore';
 import Question from '@/components/question/Question.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
-import TinymceInput from '@/components/TinymceInput.vue';
+import ShowworkInput from '@/components/ShowworkInput.vue';
 
 export default {
   name: 'Summary',
   components: {
     Question,
     FullQuestionHeader,
-    TinymceInput
+    ShowworkInput
   },
   data: function () {
     return {
@@ -67,11 +72,7 @@ export default {
       return store.assessInfo;
     },
     mode () {
-      if (!store.inAssess) {
-        return 'gb';
-      } else if (store.inAssess) {
-        return 'aftertake';
-      }
+      return store.inAssess ? 'aftertake' : 'gb';
     },
     readyToShow () {
       return ((this.mode === 'gb' && store.assessInfo.hasOwnProperty('questions')) ||

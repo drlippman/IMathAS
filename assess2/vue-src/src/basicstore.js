@@ -257,10 +257,12 @@ export const actions = {
       data[qn] = store.work[qn];
     }
     if (Object.keys(data).length === 0) { // nothing to submit
-      if (store.inAssess) {
+      if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
         Router.push('/summary');
-      } else {
+      } else if (store.assessInfo.available === 'yes') {
         Router.push('/');
+      } else {
+        window.location = window.exiturl;
       }
       return;
     }
@@ -268,7 +270,7 @@ export const actions = {
       url: store.APIbase + 'savework.php' + store.queryString,
       type: 'POST',
       dataType: 'json',
-      data: {work: data},
+      data: { work: data },
       xhrFields: {
         withCredentials: true
       },
@@ -288,9 +290,10 @@ export const actions = {
         // copy into questions for reload later if needed
         for (let qn in store.work) {
           Vue.set(store.assessInfo.questions[parseInt(qn)], 'work', store.work[qn]);
+          delete store.work[qn];
         }
 
-        if (store.inAssess) {
+        if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
           Router.push('/summary');
         } else if (store.assessInfo.available === 'yes') {
           Router.push('/');
@@ -432,6 +435,9 @@ export const actions = {
           }
           if (store.initValues.hasOwnProperty(qn)) {
             delete store.initValues[qn];
+          }
+          if (store.work.hasOwnProperty(qn)) {
+            delete store.work[qn];
           }
         }
 
