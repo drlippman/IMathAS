@@ -10,7 +10,7 @@
         </button>
       </div>
     </div>
-    <div v-if="hasScore">
+    <div v-if="readyToShow">
       <p v-if="questions.length === 0">
         {{ $t('work.noquestions') }}
       </p>
@@ -66,6 +66,17 @@ export default {
     ainfo () {
       return store.assessInfo;
     },
+    mode () {
+      if (!store.inAssess) {
+        return 'gb';
+      } else if (store.inAssess && this.ainfo.submitby === 'by_assessment') {
+        return 'aftertake';
+      }
+    },
+    readyToShow () {
+      return ((this.mode === 'gb' && store.assessInfo.hasOwnProperty('questions')) ||
+        (this.mode === 'aftertake' && store.assessInfo.hasOwnProperty('score')));
+    },
     hasScore () {
       return store.assessInfo.hasOwnProperty('score');
     },
@@ -84,9 +95,11 @@ export default {
   },
   methods: {
     loadScoresIfNeeded () {
-      if (!store.inAssess && !this.ainfo.hasOwnProperty('questions')) {
-        actions.getScores();//actions.loadGbLastAssessData();
-      } else if (!this.hasScore) {
+      if (this.mode === 'gb' && !this.readyToShow) {
+        // for when it's accessed from gradebook
+        actions.getQuestions();
+      } else if (this.mode === 'aftertake' && !this.readyToShow) {
+        // for when it's accessed after by-assess submission
         actions.getScores();
       }
     },

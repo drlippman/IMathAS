@@ -3215,7 +3215,9 @@ class AssessRecord
     foreach ($work as $qn=>$val) {
       $question_versions = &$assessver['questions'][$qn]['question_versions'];
       $curq = &$question_versions[count($question_versions) - 1];
-      $curq['work'] = Sanitize::incomingHtml($val);
+      if (($this->assess_info->getQuestionSetting($curq['qid'], 'showwork') & 2) == 2) {
+        $curq['work'] = Sanitize::incomingHtml($val);
+      }
     }
     if (count($work) > 0) {
       $this->saveRecord();

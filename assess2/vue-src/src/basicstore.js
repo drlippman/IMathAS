@@ -292,8 +292,10 @@ export const actions = {
 
         if (store.inAssess) {
           Router.push('/summary');
-        } else {
+        } else if (store.assessInfo.available === 'yes') {
           Router.push('/');
+        } else {
+          window.location = window.exiturl;
         }
       })
       .fail((xhr, textStatus, errorThrown) => {
@@ -638,6 +640,32 @@ export const actions = {
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'getscores.php' + store.queryString,
+      type: 'GET',
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        response = this.processSettings(response);
+        this.copySettings(response);
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
+  getQuestions () {
+    store.inTransit = true;
+    window.$.ajax({
+      url: store.APIbase + 'getquestions.php' + store.queryString,
       type: 'GET',
       dataType: 'json',
       xhrFields: {
