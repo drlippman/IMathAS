@@ -1178,13 +1178,13 @@ class AssessRecord
     if (count($curq['tries']) == 0) {
       // no tries yet
       $parts[0] = array('try' => 0);
+      $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
       if ($include_scores) {
         $parts[0]['score'] = 0;
         $parts[0]['rawscore'] = 0;
         // if there are score overrides, calculate question score and raw
         if (isset($curq['scoreoverride']) && is_array($curq['scoreoverride'])) {
           $raw = 0;
-          $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
           foreach ($answeights as $k=>$v) {
             if (!empty($curq['scoreoverride'][$k])) {
               $raw += $v * $curq['scoreoverride'][$k];
@@ -1291,9 +1291,16 @@ class AssessRecord
         $out['autosave_timeactive'] = $autosave['timeactive'];
       }
       $this->setAnsweights($qn, $out['answeights'], $ver);
+      if ($out['tries_max'] == 1) {
+        $out['parts_entered'] = $this->getHasAutosaves($qn, $out['answeights']);
+      }
     } else {
       $out['html'] = null;
+      if ($out['tries_max'] == 1) {
+        $out['parts_entered'] = $this->getHasAutosaves($qn, $answeights);
+      }
     }
+
 
     return $out;
   }
@@ -3138,6 +3145,25 @@ class AssessRecord
       return $this->data['autosaves'][$qn];
     }
     return array();
+  }
+
+  /**
+   * Get what parts of which questions have autosaves
+   * @return array  qn=>array of part numbers
+   */
+  public function getHasAutoSaves($qn, $answeights) {
+    if (!is_array($answeights)) {
+      return array();
+    }
+    $out = array_fill(0, count($answeights), 0);
+    $this->parseData();
+
+    if (isset($this->data['autosaves'][$qn])) {
+      foreach ($this->data['autosaves'][$qn]['stuans'] as $pn=>$ans) {
+        $out[$pn] = 1;
+      }
+    }
+    return $out;
   }
 
   /**

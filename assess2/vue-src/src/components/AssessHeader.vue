@@ -109,7 +109,7 @@ import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
 import LtiMsgs from '@/components/LtiMsgs.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
-
+import { attemptedMixin } from '@/mixins/attemptedMixin';
 import { store, actions } from '../basicstore';
 
 export default {
@@ -127,6 +127,7 @@ export default {
       resourceMenuShowing: false
     };
   },
+  mixins: [attemptedMixin],
   computed: {
     ainfo () {
       return store.assessInfo;
@@ -161,8 +162,8 @@ export default {
     },
     qAttempted () {
       let qAttempted = 0;
-      for (let i in this.ainfo.questions) {
-        if (this.ainfo.questions[i].try > 0) {
+      for (let i = 0; i < this.qsAttempted.length; i++) {
+        if (this.qsAttempted[i] === 1) {
           qAttempted++;
         }
       }

@@ -308,6 +308,7 @@
     "partial": "Partially correct",
     "dot": "Dot",
     "attempted": "Attempted",
+    "partattempted": "Partially attempted",
     "unattempted": "Unattempted",
     "print": "Print",
     "left": "Previous",
