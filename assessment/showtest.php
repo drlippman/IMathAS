@@ -1779,7 +1779,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 					$immediatereattempt = false;
 					if (!$superdone && $showeachscore && hasreattempts($qn)) {
-						if (!(($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1)) {
+						if (!(($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)) {
 							if (!in_array($qn,$reattempting)) {
 								//$reattempting[] = $qn;
 								$immediatereattempt = true;
