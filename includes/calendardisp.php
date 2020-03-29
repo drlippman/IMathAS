@@ -773,6 +773,9 @@ foreach ($itemsimporder as $item) {
 	}
 
 }
+if ($editingon) {
+	addBlockItems($itemorder,'0',$tags,$colors,$assess,$names,$itemidref);
+}
 
 $stm = $DBH->prepare("SELECT title,tag,date,id FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid=:courseid ORDER BY title");
 $stm->execute(array(':courseid'=>$cid));
@@ -901,6 +904,43 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 			} else {
 				$greyitems[$item] = $curblockgrey;
 			}
+		}
+	}
+}
+function addBlockItems($items, $parent, &$tags,&$colors,&$assess,&$names,&$itemidref) {
+	foreach ($items as $i=>$item) {
+		if (is_array($item)) {
+			if ($item['startdate'] > 0) {
+				$moday = tzdate('Y-n-j',$item['startdate']);
+				$json = array(
+					"type"=>"BS",
+					"typeref"=>'BS'.$item['id'].';'.$parent.'-'.$i,
+					"tag"=>"B",
+					"name"=> $item['name']
+				);
+				$k = count($tags);
+				$tags[$k] = 'B';
+				$colors[$k] = '';
+				$assess[$moday][$k] = $json;
+				$names[$k] = $item['name'];
+				$itemidref[$k] = 'BS'.$item['id'].';'.$parent.'-'.$i;
+			}
+			if ($item['enddate'] < 2000000000) {
+				$moday = tzdate('Y-n-j',$item['enddate']);
+				$json = array(
+					"type"=>"BE",
+					"typeref"=>'BE'.$item['id'].';'.$parent.'-'.$i,
+					"tag"=>"B",
+					"name"=> $item['name']
+				);
+				$k = count($tags);
+				$tags[$k] = 'B';
+				$colors[$k] = '';
+				$assess[$moday][$k] = $json;
+				$names[$k] = $item['name'];
+				$itemidref[$k] = 'BE'.$item['id'].';'.$parent.'-'.$i;
+			}
+			addBlockItems($item['items'],$parent.'-'.$i, $tags,$colors,$assess,$names,$itemidref);
 		}
 	}
 }

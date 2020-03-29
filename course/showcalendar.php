@@ -54,10 +54,10 @@
 	span.calitemtitle {
 		font-size: 80%;
 	}
-	span.calitem[id^=AS],span.calitem[id^=IS],span.calitem[id^=LS],span.calitem[id^=DS],span.calitem[id^=FS] {
+	span.calitem[id^=AS],span.calitem[id^=IS],span.calitem[id^=LS],span.calitem[id^=DS],span.calitem[id^=FS],span.calitem[id^=BS] {
 		border-radius: 10px 0 0 10px;
 	}
-	span.calitem[id^=AE],span.calitem[id^=IE],span.calitem[id^=LE],span.calitem[id^=DE],span.calitem[id^=FE] {
+	span.calitem[id^=AE],span.calitem[id^=IE],span.calitem[id^=LE],span.calitem[id^=DE],span.calitem[id^=FE],span.calitem[id^=BE] {
 		border-radius: 0 10px 10px 0;
 	}
 	</style>
