@@ -1077,7 +1077,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ($gbt[1][1][$i][1]==0) { //no feedback
+				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]=='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2
@@ -1206,7 +1206,7 @@ function gbstudisp($stu) {
 							echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).' (';
 						}
 						echo round(100*$gbt[1][2][$i][2]/$gbt[1][2][$i][6],1).'%';
-						
+
 						if ($gbt[0][4][0]==0) {
 							echo ')';
 						} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents
