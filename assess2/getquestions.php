@@ -1,7 +1,7 @@
 <?php
 /*
- * IMathAS: Get scores on a completed assessment attempt
- * (c) 2019 David Lippman
+ * IMathAS: Get questions for showwork
+ * (c) 2020 David Lippman
  *
  *
  * Method: POST
@@ -49,23 +49,13 @@ if (!$assess_record->hasRecord()) {
   echo '{"error": "not_ready"}';
   exit;
 }
-// grab any assessment info fields that may have updated:
-$include_from_assess_info = array(
-  'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'latepasses_avail', 'latepass_extendto',
-  'showscores', 'timelimit', 'points_possible', 'timelimit_grace', 'timelimit_expires'
-);
-$assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
-//get attempt info
-$assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 
-// adjust output if in by_question mode - to handle showwork after
-if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['submitby'] == 'by_question') {
-  $assessInfoOut['has_active_attempt'] = false;
-}
+$assessInfoOut = array();
 
 // if have active scored record end it
-if ($assessInfoOut['has_active_attempt']) {
+if ($assess_info->getSetting('submitby') == 'by_assessment' &&
+  $assess_record->hasActiveAttempt()
+) {
   echo '{"error": "active_attempt"}';
   exit;
 }
@@ -75,33 +65,6 @@ $showscores = $assess_info->showScoresAtEnd();
 $reshowQs = $assess_info->reshowQuestionsAtEnd();
 $assess_info->loadQuestionSettings('all', $reshowQs);
 $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
-$assessInfoOut['score'] = $assess_record->getAttemptScore();
-$totalScore = $assessInfoOut['score'];
-$assessInfoOut['has_active_attempt'] = false;
-
-//get prev attempt info
-if ($assessInfoOut['submitby'] == 'by_assessment') {
-  $showPrevAttemptScores = ($assessInfoOut['showscores'] != 'none');
-  $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts($showPrevAttemptScores);
-  if ($showPrevAttemptScores) {
-    $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
-  }
-}
-
-if ($assessInfoOut['submitby'] == 'by_question') {
-  $assessInfoOut['can_retake'] = false;
-} else {
-  $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) < $assessInfoOut['allowed_attempts']);
-}
-
-// get endmsg
-if ($assessInfoOut['showscores'] != 'none') {
-  $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
-    $assess_info->getSetting('endmsg'),
-    $totalScore,
-    $assess_info->getSetting('points_possible')
-  );
-}
 
 //prep date display
 prepDateDisp($assessInfoOut);

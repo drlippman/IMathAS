@@ -52,6 +52,7 @@
         <question
           :qn="curqn"
           :active="curqn == qn"
+          :getwork="1"
         />
         <inter-question-text-list
           pos = "after"

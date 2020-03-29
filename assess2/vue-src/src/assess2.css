@@ -354,12 +354,14 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
     margin: 15px 4px;
   }
 }
-.questionpane.introtext {
-  margin: 15px 0;
+.introtext {
   padding: 12px;
   background-color: #f3f3f9;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+.questionpane.introtext {
+  margin: 15px 0;
 }
 .inactive {
   visibility: hidden;

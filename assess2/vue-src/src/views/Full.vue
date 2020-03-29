@@ -23,6 +23,7 @@
           :qn="curqn"
           active="true"
           :key="'q'+curqn"
+          :getwork="1"
         />
       </div>
       <inter-question-text-list

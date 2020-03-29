@@ -4,6 +4,7 @@ import { store, actions } from './basicstore';
 import Launch from './views/Launch.vue';
 import Closed from './views/Closed.vue';
 import Summary from './views/Summary.vue';
+import ShowWork from './views/ShowWork.vue';
 import Skip from './views/Skip.vue';
 import Full from './views/Full.vue';
 import Print from './views/Print.vue';
@@ -127,6 +128,23 @@ const router = new Router({
         if ((store.assessInfo.available === 'yes' ||
           (store.assessInfo.available === 'practice' && store.assessInfo.in_practice)) &&
           (!store.assessInfo.has_active_attempt)
+        ) {
+          next();
+        } else {
+          next({ path: '/', replace: true });
+        }
+      }
+    },
+    {
+      path: '/showwork',
+      name: 'showwork',
+      component: ShowWork,
+      beforeEnter: (to, from, next) => {
+        // if active attempt or not avail, route to Launch
+        if (!store.assessInfo.in_practice &&
+          (!store.assessInfo.has_active_attempt ||
+            store.assessInfo.submitby === 'by_question'
+          )
         ) {
           next();
         } else {

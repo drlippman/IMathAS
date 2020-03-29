@@ -50,6 +50,7 @@ $vueData = array(
 	'assmpassword' => $line['password'],
 	'revealpw' => false,
 	'showhints' => ($line['showhints']&1) > 0,
+	'showwork' => $line['showwork'],
 	'showextrefs' => ($line['showhints']&2) > 0,
 	'msgtoinstr' => $line['msgtoinstr'] > 0,
 	'doposttoforum' => $line['posttoforum'] > 0,
@@ -381,6 +382,16 @@ $vueData = array(
 					<option value="0"><?php echo _('No');?></option>
 					<option value="1"><?php echo _('All');?></option>
 					<option value="16"><?php echo _('All but first');?></option>
+				</select>
+			</span><br class=form />
+
+			<label class=form for="showwork"><?php echo _('Provide "Show Work" boxes');?>:</label>
+			<span class=formright>
+				<select name="showwork" id="showwork" v-model="showwork">
+					<option value="0"><?php echo _('No');?></option>
+					<option value="1"><?php echo _('During assessment');?></option>
+					<option value="2"><?php echo _('After assessment');?></option>
+					<option value="3"><?php echo _('During or after assessment');?></option>
 				</select>
 			</span><br class=form />
 

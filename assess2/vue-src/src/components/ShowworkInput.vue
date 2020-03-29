@@ -1,20 +1,23 @@
 <template>
-  <div
-    :id="computedId"
-    ref="inbox"
-    class="fbbox"
-    :rows="rows"
-  ></div>
+  <div class="showworkwrap">
+    <textarea
+      :id="computedId"
+      ref="inbox"
+      class="fbbox"
+      :rows="rows"
+    ></textarea>
+  </div>
 </template>
 
+<style>
+.showworkwrap {
+  max-width: 700px;
+}
+</style>
 <script>
 
-// based on Project: https://github.com/m3esma/vue-easy-tinymce
-// Copyright (c) 2018-present Mehdi Esmaeili (@m3esma)
-// Released under the MIT License.
-
 export default {
-  name: 'TinymceInput',
+  name: 'ShowworkInput',
   props: {
     id: { default: null },
     value: { default: '' },
@@ -50,16 +53,27 @@ export default {
     },
     initEditor () {
       var component = this;
-      window.initeditor('exact', this.computedId, null, true, function (ed) {
-        ed.on('input change keyup undo redo', function (e) {
-          component.updateValue(ed.getContent());
+      if (window.tinymce) {
+        window.initeditor('exact', this.computedId, null, false, function (ed) {
+          ed.on('input change keyup undo redo', function (e) {
+            component.updateValue(ed.getContent());
+          }).on('blur', function (e) {
+            component.$emit('blur', true);
+          }).on('focus', function (e) {
+            component.$emit('focus', true);
+          });
+          component.objTinymce = ed;
+        });
+      } else {
+        window.$(this.$refs.inbox).on('focus', function (e) {
+          component.$emit('focus', true);
         }).on('blur', function (e) {
           component.$emit('blur', true);
-        }).on('focus', function (e) {
-          component.$emit('focus', true);
+        }).on('input change keyup undo redo', function (e) {
+          component.updateValue(e.target.value);
         });
-        component.objTinymce = ed;
-      });
+        component.objTinymce = this.$refs.inbox;
+      }
     },
     updateValue: function (value) {
       this.$emit('input', value);
@@ -75,8 +89,14 @@ export default {
         newValue = '';
       }
       // if v-model content change programmability
-      if (newValue !== this.objTinymce.getContent()) {
-        this.objTinymce.setContent(newValue);
+      if (window.tinymce) {
+        if (newValue !== this.objTinymce.getContent()) {
+          this.objTinymce.setContent(newValue);
+        }
+      } else {
+        if (newValue !== this.objTinymce.value) {
+          this.objTinymce.value = newValue;
+        }
       }
     }
   }

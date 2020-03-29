@@ -34,6 +34,7 @@ if (!(isset($teacherid))) {
 			$showans = 0;
 			$rubric = 0;
 			$showhints = -1;
+      $showwork = -1;
 			$fixedseeds = null;
 			$_POST['copies'] = 1;
 		} else {
@@ -57,22 +58,23 @@ if (!(isset($teacherid))) {
       } else {
         $regen = 0;
       }
-			$showans = $_POST['showans'];
+			$showans = Sanitize::simpleASCII($_POST['showans']);
+      $showwork = Sanitize::onlyInt($_POST['showwork']);
 			$rubric = intval($_POST['rubric']);
 			$showhints = intval($_POST['showhints']);
 		}
 		if (isset($_GET['id'])) { //already have id - updating
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
-				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
+				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,showwork=:showwork,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':rubric'=>$rubric,
+				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':showwork'=>$showwork, ':rubric'=>$rubric,
 					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
 			} else {
-				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
+				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans, showwork=:showwork, rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
+				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':showwork'=>$showwork,
 					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$_GET['id']));
 			}
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
@@ -87,11 +89,11 @@ if (!(isset($teacherid))) {
 			$stm->execute(array(':id'=>$aid));
 			list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			for ($i=0;$i<$_POST['copies'];$i++) {
-				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,questionsetid,rubric,showhints,fixedseeds) ";
-				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :questionsetid, :rubric, :showhints, :fixedseeds)";
+				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,regen,showans,showwork,questionsetid,rubric,showhints,fixedseeds) ";
+				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :regen, :showans, :showwork, :questionsetid, :rubric, :showhints, :fixedseeds)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$aid, ':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen,
-					':showans'=>$showans, ':questionsetid'=>$_GET['qsetid'], ':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds));
+					':showans'=>$showans, ':showwork'=>$showwork, ':questionsetid'=>$_GET['qsetid'], ':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds));
 				$qid = $DBH->lastInsertId();
 
 				//add to itemorder
@@ -133,7 +135,7 @@ if (!(isset($teacherid))) {
 	} else { //DEFAULT DATA MANIPULATION
 
 		if (isset($_GET['id'])) {
-			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
+			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,showwork,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($line['penalty']{0}==='S') {
@@ -157,6 +159,7 @@ if (!(isset($teacherid))) {
 		  $penalty_aftern = 1;
 			$line['regen']=0;
 			$line['showans']='0';
+      $line['showwork']=-1;
 			$line['rubric']=0;
 			$line['showhints']=-1;
 			$qsetid = $_GET['qsetid'];
@@ -193,7 +196,7 @@ if (!(isset($teacherid))) {
 
 		//get defaults
 		$query = "SELECT defpoints,defattempts,defpenalty,defregens,";
-    $query .= "showans,submitby,showhints,shuffle FROM imas_assessments ";
+    $query .= "showans,showwork,submitby,showhints,shuffle FROM imas_assessments ";
 		$query .= "WHERE id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$aid));
@@ -223,6 +226,12 @@ if (!(isset($teacherid))) {
       $defaults['showhints'] = _('Video/text buttons');
     } else if ($defaults['showhints'] == 3) {
       $defaults['showhints'] = _('Hints and Video/text buttons');
+    }
+
+    if ($defaults['showwork'] == 0) {
+      $defaults['showwork'] = _('No');
+    } else if ($defaults['showwork'] == 1) {
+      $defaults['showwork'] = _('During Assessment');
     }
 	}
 }
@@ -299,6 +308,15 @@ if ($defaults['submitby'] == 'by_question' && $defaults['defregens'] > 1) {
      <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>>Use Default</option>
      <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>>Never during assessment</option>
     </select><br/><i class="grey">Default: <?php echo Sanitize::encodeStringForDisplay($defaults['showans']);?></i></span><br class="form"/>
+
+<span class=form><?php echo _('Provide "Show Work" boxes');?></span><span class=formright>
+    <select name="showwork">
+     <option value="-1" <?php if ($line['showwork']=='-1') { echo 'selected="1"';}?>><?php echo _('Use Default');?></option>
+     <option value="0" <?php if ($line['showwork']=='0') { echo 'selected="1"';}?>><?php echo _('No');?></option>
+     <option value="1" <?php if ($line['showwork']=='1') { echo 'selected="1"';}?>><?php echo _('During Assessment');?></option>
+     <option value="2" <?php if ($line['showwork']=='2') { echo 'selected="1"';}?>><?php echo _('After assessment');?></option>
+     <option value="3" <?php if ($line['showwork']=='3') { echo 'selected="1"';}?>><?php echo _('During or after assessment');?></option>
+   </select><br/><i class="grey"><?php echo _('Default:');?> <?php echo Sanitize::encodeStringForDisplay($defaults['showwork']);?></i></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>
     <select name="showhints">

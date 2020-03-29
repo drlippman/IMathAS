@@ -8,6 +8,7 @@ export const store = Vue.observable({
   cid: null,
   uid: null,
   queryString: '',
+  inAssess: false,
   inTransit: false,
   autoSaving: false,
   errorMsg: null,
@@ -18,6 +19,7 @@ export const store = Vue.observable({
   autosaveTimeactive: {},
   initValues: {},
   initTimes: {},
+  work: {},
   autosaveTimer: null,
   somethingDirty: false,
   noUnload: false,
@@ -50,6 +52,7 @@ export const actions = {
     }
     store.inTransit = true;
     store.errorMsg = null;
+    store.inAssess = false;
     window.$.ajax({
       url: store.APIbase + 'loadassess.php' + qs,
       dataType: 'json',
@@ -118,6 +121,8 @@ export const actions = {
         store.autosaveTimeactive = {};
         store.initValues = {};
         store.initTimes = {};
+        store.work = {};
+        store.inAssess = true;
         // route to correct display
         if (response.error) {
           this.handleError(response.error);
@@ -244,6 +249,65 @@ export const actions = {
       };
     }
   },
+  submitWork () {
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    store.inTransit = true;
+    let data = {};
+    for (let qn in store.work) {
+      data[qn] = store.work[qn];
+    }
+    if (Object.keys(data).length === 0) { // nothing to submit
+      if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+        Router.push('/summary');
+      } else if (store.assessInfo.available === 'yes') {
+        Router.push('/');
+      } else {
+        window.location = window.exiturl;
+      }
+      return;
+    }
+    window.$.ajax({
+      url: store.APIbase + 'savework.php' + store.queryString,
+      type: 'POST',
+      dataType: 'json',
+      data: { work: data },
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          if (response.error === 'already_submitted') {
+            response = this.processSettings(response);
+            this.copySettings(response);
+          }
+          return;
+        } else {
+          store.errorMsg = null;
+        }
+        // copy into questions for reload later if needed
+        for (let qn in store.work) {
+          Vue.set(store.assessInfo.questions[parseInt(qn)], 'work', store.work[qn]);
+          delete store.work[qn];
+        }
+
+        if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+          Router.push('/summary');
+        } else if (store.assessInfo.available === 'yes') {
+          Router.push('/');
+        } else {
+          window.location = window.exiturl;
+        }
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
   submitQuestion (qns, endattempt, timeactive, partnum) {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
@@ -322,6 +386,9 @@ export const actions = {
           }
         }
       });
+      if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+        data.append('sw' + qn, store.work[qn]);
+      }
       lastLoaded[k] = store.lastLoaded[qn].getTime();
     };
     data.append('toscoreqn', JSON.stringify(changedQuestions));
@@ -369,6 +436,9 @@ export const actions = {
           if (store.initValues.hasOwnProperty(qn)) {
             delete store.initValues[qn];
           }
+          if (store.work.hasOwnProperty(qn)) {
+            delete store.work[qn];
+          }
         }
 
         response = this.processSettings(response);
@@ -379,9 +449,21 @@ export const actions = {
           this.updateTreeReader();
         }
 
+        let hasShowWorkAfter = false;
+        for (let k = 0; k < store.assessInfo.questions.length; k++) {
+          if (store.assessInfo.questions[k].showwork & 2) {
+            hasShowWorkAfter = true;
+            break;
+          }
+        }
+
         if (endattempt) {
           store.inProgress = false;
-          Router.push('/summary');
+          if (hasShowWorkAfter && !store.assessInfo.in_practice) {
+            Router.push('/showwork');
+          } else {
+            Router.push('/summary');
+          }
         } else if (qns.length === 1) {
           // scroll to score result
           Vue.nextTick(() => {
@@ -441,6 +523,10 @@ export const actions = {
       let regexpts = [];
       for (let k in store.autosaveQueue[qn]) {
         let pn = store.autosaveQueue[qn][k];
+        if (pn === 'sw') {
+          data.append('sw' + qn, store.work[qn]);
+          continue;
+        }
         if (pn === 0) {
           regexpts.push(qn);
         }
@@ -591,6 +677,32 @@ export const actions = {
         store.inTransit = false;
       });
   },
+  getQuestions () {
+    store.inTransit = true;
+    window.$.ajax({
+      url: store.APIbase + 'getquestions.php' + store.queryString,
+      type: 'GET',
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        response = this.processSettings(response);
+        this.copySettings(response);
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
   redeemLatePass (callback) {
     store.inTransit = true;
     window.$.ajax({
@@ -675,11 +787,19 @@ export const actions = {
       Vue.set(store.initValues, qn, {});
     }
     // only record initvalue if we don't already have one
-    let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
-    let qref = m[2];
     let pn = 0;
-    if (qref > 1000) {
-      pn = qref % 1000;
+    if (fieldname.match(/^sw/)) {
+      pn = 'sw';
+    } else {
+      let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
+      let qref = m[2];
+      if (qref > 1000) {
+        pn = qref % 1000;
+      }
+      // for draw questions, overwrite blank to the expected blank format
+      if (store.assessInfo.questions[qn].jsparams[qref].qtype === 'draw' && val === '') {
+        val = ';;;;;;;;';
+      }
     }
     if (store.assessInfo.questions[qn].hasOwnProperty('usedautosave') &&
       store.assessInfo.questions[qn].usedautosave.indexOf(pn) !== -1
@@ -687,10 +807,7 @@ export const actions = {
       // was loaded from autosave, so don't record as init initValue
       return;
     }
-    // for draw questions, overwrite blank to the expected blank format
-    if (store.assessInfo.questions[qn].jsparams[qref].qtype === 'draw' && val === '') {
-      val = ';;;;;;;;';
-    }
+
     if (!store.initValues[qn].hasOwnProperty(fieldname)) {
       store.initValues[qn][fieldname] = val;
     }
@@ -733,6 +850,14 @@ export const actions = {
     let m;
     for (let k = 0; k < qns.length; k++) {
       let qn = qns[k];
+
+      if (store.assessInfo.questions[qn].showwork && store.work.hasOwnProperty(qn)) {
+        if (store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+          if (!changed.hasOwnProperty(qn)) {
+            changed[qn] = [];
+          }
+        }
+      }
       var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn * 1 + 1) + '\\d{3})');
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
         if ((m = el.name.match(regex)) !== null) {

@@ -106,7 +106,8 @@
     "saveans": "Save Answer",
     "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question.",
     "jump_to_answer": "Jump to Answer",
-    "jump_warn": "This will use up your remaining tries at this version of the question."
+    "jump_warn": "This will use up your remaining tries at this version of the question.",
+    "showwork": "Show work here by typing it or attaching a file or picture"
   },
   "header": {
     "score": "Score: {pts}/{poss}",
@@ -249,7 +250,8 @@
     "alert": "Alert",
     "unsubmitted_questions": "You have entered answers that have not yet been submitted. Are you sure you want to leave?",
     "unsubmitted_assessment": "You have not submitted your assessment for grading yet. Don't forget to come back and do that.",
-    "unsubmitted_done_assessment": "You have attempted every question, but have not submitted your assessment yet. Don't forget to come back and do that."
+    "unsubmitted_done_assessment": "You have attempted every question, but have not submitted your assessment yet. Don't forget to come back and do that.",
+    "unsubmitted_work": "You have unsubmitted work. If you leave now your work will be lost. Are you sure you want to leave?"
   },
   "pages": {
     "next": "Next Page"
@@ -403,7 +405,17 @@
     "avail_after_take": "Will show after you submit an assessment attempt.",
     "avail_after_due": "Will show after the due date.",
     "latepass_blocked_practice": "Use of a LatePass is currently blocked because the student viewed the assessment in practice mode.",
-    "clear_latepass_block": "Clear Block"
+    "clear_latepass_block": "Clear Block",
+    "showwork": "View Work",
+    "hidework": "Hide Work"
+  },
+  "work": {
+    "add": "Add Work",
+    "hide": "Hide work entry",
+    "noquestions": "No questions require work",
+    "save": "Save Work",
+    "save_continue": "Save Work and Continue",
+    "add_prev": "You can still show or attach work for the previous attempt"
   },
   "regions": {
     "questions": "Questions and text",

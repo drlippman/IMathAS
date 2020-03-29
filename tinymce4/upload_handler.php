@@ -14,6 +14,10 @@ ini_set("post_max_size", "10485760");
   reset ($_FILES);
   $tempkey = key($_FILES);
   $temp = current($_FILES);
+  if (Sanitize::isFilenameBlacklisted(str_replace(' ','_',$temp['name']))) {
+    header("HTTP/1.0 500 Invalid file name.");
+    return;
+  }
   $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist(str_replace(' ','_',$temp['name']));
   if (is_uploaded_file($temp['tmp_name'])){
 
@@ -31,7 +35,9 @@ ini_set("post_max_size", "10485760");
     }
 
     // Verify extension
-    if (!in_array(strtolower(pathinfo($temp['name'], PATHINFO_EXTENSION)), array("gif", "jpg", "png"))) {
+    if ($_POST['type'] == 'attach') {
+      // already checked for blacklisted earlier
+    } else if (!in_array(strtolower(pathinfo($temp['name'], PATHINFO_EXTENSION)), array("gif", "jpg", "png"))) {
         header("HTTP/1.0 500 Invalid extension.");
         return;
     }

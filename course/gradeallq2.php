@@ -262,9 +262,11 @@
 		$points = $defpoints;
 	}
 
+	$lastupdate = '032320';
+
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=071219"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=082519"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=032320"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -498,6 +500,12 @@
 				});
 				</script>';
 			echo '</div>';
+
+			if (!empty($qdata['work'])) {
+				echo '<div class="questionpane">';
+				echo '<button type="button" onclick="toggleWork(this)">'._('View Work').'</button>';
+				echo '<div class="introtext" style="display:none;">' . $qdata['work'].'</div></div>';
+			}
 
 			echo "<div class=scoredetails>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';

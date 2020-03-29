@@ -132,8 +132,10 @@ if ($canviewall && !empty($_GET['stu'])) {
 
 if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessGbUrl = "http://localhost:8080/gbviewassess.html";
+	$assessUrl = "http://localhost:8080/";
 } else {
 	$assessGbUrl = "../assess2/gbviewassess.php";
+	$assessUrl = "../assess2/";
 }
 
 //HANDLE ANY POSTS
@@ -572,7 +574,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 function gbstudisp($stu) {
 	global $DBH,$CFG,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	global $includeduedate, $includelastchange,$latepasshrs,$latepasses,$hidelocked,$exceptionfuncs;
-	global $assessGbUrl;
+	global $assessGbUrl, $assessUrl;
 
 	if ($availshow==4) {
 		$availshow=1;
@@ -801,7 +803,7 @@ function gbstudisp($stu) {
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
 				$showlink = true;
 				if ($gbt[0][1][$i][15] > 1) {
-					echo '<a href="../assess2/?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'"';
+					echo '<a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'"';
 				} else {
 					echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
 				}
@@ -857,7 +859,10 @@ function gbstudisp($stu) {
 				if ($now>$gbt[0][1][$i][11]) {
 					$afterduelatepass = true;
 				}
-
+			}
+			if (!$isteacher && !$istutor && $gbt[1][1][$i][16] == 1) {
+				echo ' <span class="small"><a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'#/showwork">[';
+				echo _('Attach Work') .']</a></span>';
 			}
 
 			echo '</td>';
