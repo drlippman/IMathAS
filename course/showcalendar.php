@@ -12,17 +12,16 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (isset($_GET['editing'])) {
 		$editingon = $_GET['editing']=='on';
-		$sessiondata[$cid.'caledit'] = $editingon;
-		writesessiondata();
-	} else if (isset($sessiondata[$cid.'caledit'])) {
-		$editingon = $sessiondata[$cid.'caledit'];
+		$_SESSION[$cid.'caledit'] = $editingon;
+	} else if (isset($_SESSION[$cid.'caledit'])) {
+		$editingon = $_SESSION[$cid.'caledit'];
 	} else {
 		$editington = false;
 	}
 
 	require_once("../includes/exceptionfuncs.php");
 
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
@@ -151,9 +150,9 @@
 	 if (isset($teacherid)) {
 		echo "<div class=\"cpmid\"><a id=\"mcelink\" href=\"managecalitems.php?from=cal&cid=$cid\">Manage Events</a> | ";
 		if ($editingon) {
-			echo '<a href="showcalendar.php?cid='.$cid.'&editing=off">'._('Disable Drag-and-drop Editing').'</a> | ';
+			echo '<a href="showcalendar.php?cid='.$cid.'&editing=off">'._('Disable Drag-and-drop Editing').'</a> ';
 		} else {
-			echo '<a href="showcalendar.php?cid='.$cid.'&editing=on">'._('Enable Drag-and-drop Editing').'</a> | ';
+			echo '<a href="showcalendar.php?cid='.$cid.'&editing=on">'._('Enable Drag-and-drop Editing').'</a> ';
 		}
 		//echo '<a href="exportcalfeed.php?cid='.$cid.'">'._('Export Calendar Feed').'</a>';
 		echo "</div>";

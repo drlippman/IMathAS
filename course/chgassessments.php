@@ -118,7 +118,7 @@ if (!(isset($teacherid))) {
 
 
 			if (isset($_POST['chgtimelimit'])) {
-				$timelimit = Sanitize::onlyInt($_POST['timelimit'])*60;
+				$timelimit = round(Sanitize::onlyFloat($_POST['timelimit'])*60);
 				if (isset($_POST['timelimitkickout'])) {
 					$timelimit = -1*$timelimit;
 				}

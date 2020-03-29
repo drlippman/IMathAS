@@ -305,8 +305,8 @@ if ($myrights<20) {
 							$ins_stm->execute(array(':libid'=>$libid, ':qsetid'=>$qsetid, ':ownerid'=>$userid, ':now'=>$now));
 						}
 						//determine which libraries to remove from; my lib assignments - newlibs
-						if ($sessiondata['lastsearchlibs'.$cid]!='') {
-							$listedlibs = explode(',', $sessiondata['lastsearchlibs'.$cid]);
+						if ($_SESSION['lastsearchlibs'.$cid]!='') {
+							$listedlibs = explode(',', $_SESSION['lastsearchlibs'.$cid]);
 						} else {
 							$listedlibs = array();
 						}
@@ -595,19 +595,19 @@ if ($myrights<20) {
 			$safesearch = str_replace(' and ', ' ',$safesearch);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$sessiondata['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
+			$_SESSION['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
 			if (isset($_POST['searchall'])) {
 				$searchall = 1;
 			} else {
 				$searchall = 0;
 			}
-			$sessiondata['searchall'.$cid] = $searchall;
+			$_SESSION['searchall'.$cid] = $searchall;
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
 			} else {
 				$searchmine = 0;
 			}
-			$sessiondata['searchmine'.$cid] = $searchmine;
+			$_SESSION['searchmine'.$cid] = $searchmine;
 
 
 			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
@@ -623,26 +623,24 @@ if ($myrights<20) {
 				} else {
 					$hidepriv = 0;
 				}
-				$sessiondata['hidepriv'.$cid] = $hidepriv;
+				$_SESSION['hidepriv'.$cid] = $hidepriv;
 				if (isset($_POST['skipfederated'])) {
 					$skipfederated = 1;
 				} else {
 					$skipfederated = 0;
 				}
-				$sessiondata['skipfederated'.$cid] = $skipfederated;
+				$_SESSION['skipfederated'.$cid] = $skipfederated;
 			}
-
-			writesessiondata();
-		} else if (isset($sessiondata['lastsearch'.$cid])) {
-			$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+		} else if (isset($_SESSION['lastsearch'.$cid])) {
+			$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$searchall = $sessiondata['searchall'.$cid];
-			$searchmine = $sessiondata['searchmine'.$cid];
+			$searchall = $_SESSION['searchall'.$cid];
+			$searchmine = $_SESSION['searchmine'.$cid];
 			$hidepriv = 0; $skipfederated = 0;
 			if ($isadmin) {
-				$hidepriv = $sessiondata['hidepriv'.$cid];
-				$skipfederated = $sessiondata['skipfederated'.$cid];
+				$hidepriv = $_SESSION['hidepriv'.$cid];
+				$skipfederated = $_SESSION['skipfederated'.$cid];
 			}
 		} else {
 			$search = '';
@@ -703,23 +701,21 @@ if ($myrights<20) {
 		    $_POST['libs'] = $userdeflib;
 		  }
 		  $searchlibs = $_POST['libs'];
-			//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
-			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
-			writesessiondata();
+			//$_SESSION['lastsearchlibs'] = implode(",",$searchlibs);
+			$_SESSION['lastsearchlibs'.$cid] = $searchlibs;
 		} else if (isset($_GET['listlib'])) {
 			$searchlibs = $_GET['listlib'];
-			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
+			$_SESSION['lastsearchlibs'.$cid] = $searchlibs;
 			$searchall = 0;
-			$sessiondata['searchall'.$cid] = $searchall;
-			$sessiondata['lastsearch'.$cid] = '';
+			$_SESSION['searchall'.$cid] = $searchall;
+			$_SESSION['lastsearch'.$cid] = '';
 			$searchlikes = '';
 			$searchlikevals = array();
 			$search = '';
 			$safesearch = '';
-			writesessiondata();
-		}else if (isset($sessiondata['lastsearchlibs'.$cid])) {
-			//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
-			$searchlibs = $sessiondata['lastsearchlibs'.$cid];
+		}else if (isset($_SESSION['lastsearchlibs'.$cid])) {
+			//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
+			$searchlibs = $_SESSION['lastsearchlibs'.$cid];
 		} else {
 			$searchlibs = $userdeflib;
 		}
@@ -1060,7 +1056,7 @@ function getnextprev(formn,loc) {
 			<input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/> Add to libraries, keeping any existing library assignments<br/>
 			<input type=radio name="action" value="1" onclick="chglibtoggle(this)"/> Add to libraries, removing existing library assignments<br/>
 			<?php
-			if ($sessiondata['searchall'.$cid]==0 && $sessiondata['lastsearchlibs'.$cid]!='0') {
+			if ($_SESSION['searchall'.$cid]==0 && $_SESSION['lastsearchlibs'.$cid]!='0') {
 				echo '<input type=radio name="action" value="3" onclick="chglibtoggle(this)"/> Add to libraries, removing library assignment in currently listed libraries<br/>';
 			}
 			?>

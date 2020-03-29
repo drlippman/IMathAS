@@ -22,6 +22,7 @@
 <script>
 import Icons from '@/components/widgets/Icons.vue';
 import { store } from '../basicstore';
+import { attemptedMixin } from '@/mixins/attemptedMixin';
 
 export default {
   name: 'VideocuedNavListItem',
@@ -29,11 +30,19 @@ export default {
   components: {
     Icons
   },
+  mixins: [attemptedMixin],
   computed: {
     statusIcon () {
       if (this.option.type === 'v' || this.option.type === 'f') {
         return 'video';
       } else if (this.option.type === 'q') {
+        if (store.assessInfo.questions[this.option.qn].status === 'unattempted') {
+          if (this.qsAttempted[this.option.qn] === 1) {
+            return 'attempted';
+          } else if (this.qsAttempted[this.option.qn] > 0) {
+            return 'partattempted';
+          }
+        }
         return store.assessInfo.questions[this.option.qn].status;
       } else {
         return 'none';

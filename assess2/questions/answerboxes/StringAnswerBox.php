@@ -137,7 +137,7 @@ class StringAnswerBox implements AnswerBox
     				$params['helper'] = 1;
     			}
     			if (!isset($hidepreview) && $displayformat == 'usepreview' &&
-            $GLOBALS['sessiondata']['userprefs']['livepreview']==1
+            $_SESSION['userprefs']['livepreview']==1
           ) {
     				$params['preview'] = 1;
     			}

@@ -19,19 +19,16 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 if (isset($_GET['public'])) {
 	require("../init_without_validate.php");
 	if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
-	ini_set('session.gc_maxlifetime',86400);
+	ini_set('session.gc_maxlifetime',432000);
 	ini_set('auto_detect_line_endings',true);
 	header('P3P: CP="ALL CUR ADM OUR"');
 	session_start();
 	$_SESSION['publicquickdrill'] = true;
-	function writesessiondata() {
-		global $sessiondata;
-		$_SESSION['data'] = base64_encode(serialize($sessiondata));
-	}
+	
 	if (!isset($_SESSION['data']) || isset($_GET['reset'])) {
-		$sessiondata = array();
+		$_SESSION = array();
 	} else {
-		$sessiondata = unserialize(base64_decode($_SESSION['data']));
+		$_SESSION = unserialize(base64_decode($_SESSION['data']));
 	}
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		$urlmode = 'https://';
@@ -40,15 +37,14 @@ if (isset($_GET['public'])) {
 	 }
 	$public = '?public=true';
 	$publica = '&public=true';
-	$sessiondata['graphdisp'] = 1;
-	$sessiondata['mathdisp'] = 2;
+	$_SESSION['graphdisp'] = 1;
+	$_SESSION['mathdisp'] = 2;
 } else {
 	require("../init.php");
 	$public = '';
 	$publica = '';
 }
 if (isset($_GET['reset'])) {
-	writesessiondata();
 	echo "Session reset";
 	exit;
 }
@@ -56,14 +52,14 @@ require("../assessment/displayq2.php");
 
 $pagetitle = "Quick Drill";
 
-if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
-	$qids = array_keys($sessiondata['drillresults']);
+if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
+	$qids = array_keys($_SESSION['drillresults']);
 	$list = implode(',', array_map('intval', $qids));
 	$stm = $DBH->query("SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description");
 	$out = '';
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$out .= "<p><b>".Sanitize::encodeStringForDisplay($row[1])."</b><ul>";
-		foreach ($sessiondata['drillresults'][$row[0]] as $item) {
+		foreach ($_SESSION['drillresults'][$row[0]] as $item) {
 			$out .= '<li>';
 			if ($item[0]=='n') {
 				$out .= $item[1].' questions completed in '.Sanitize::encodeStringForDisplay($item[2]).', score: '.Sanitize::encodeStringForDisplay($item[3]);
@@ -103,27 +99,27 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	}
 	exit;
 }
-if (isset($sessiondata['drill']) && empty($_GET['id'])) {
+if (isset($_SESSION['drill']) && empty($_GET['id'])) {
 	//load from sessiondata
-	$qsetid = $sessiondata['drill']['id'];
-	$cid = $sessiondata['drill']['cid'];
-	$sa = $sessiondata['drill']['sa'];
-	$starttime = $sessiondata['drill']['starttime'];
-	$mode = $sessiondata['drill']['mode'];
+	$qsetid = $_SESSION['drill']['id'];
+	$cid = $_SESSION['drill']['cid'];
+	$sa = $_SESSION['drill']['sa'];
+	$starttime = $_SESSION['drill']['starttime'];
+	$mode = $_SESSION['drill']['mode'];
 	if ($mode == 'cntdown') {
-		$timelimit = $sessiondata['drill']['time'];
+		$timelimit = $_SESSION['drill']['time'];
 	}
-	if (isset($sessiondata['drill']['n'])) {
-		$n = $sessiondata['drill']['n'];
+	if (isset($_SESSION['drill']['n'])) {
+		$n = $_SESSION['drill']['n'];
 	}
-	if (isset($sessiondata['drill']['nc'])) {
-		$nc = $sessiondata['drill']['nc'];
+	if (isset($_SESSION['drill']['nc'])) {
+		$nc = $_SESSION['drill']['nc'];
 	}
-	$scores = $sessiondata['drill']['scores'];
+	$scores = $_SESSION['drill']['scores'];
 
 	$showscore = ($sa==0 || $sa==1 || $sa==4);
 	if (($mode=='cntup' || $mode=='cntdown') && $starttime==0)  {
-		$sessiondata['drill']['starttime'] = time();
+		$_SESSION['drill']['starttime'] = time();
 		$starttime = time();
 	}
 
@@ -137,44 +133,43 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 		}
 		exit;
 	} else {
-		$sessiondata['drill'] = array();
-		$sessiondata['drill']['id'] = $_GET['id'];
+		$_SESSION['drill'] = array();
+		$_SESSION['drill']['id'] = $_GET['id'];
 	}
 	if (!empty($_GET['cid'])) {
-		$sessiondata['drill']['cid'] = Sanitize::courseId($_GET['cid']);
+		$_SESSION['drill']['cid'] = Sanitize::courseId($_GET['cid']);
 	}  else {
-		$sessiondata['drill']['cid'] = 0;
+		$_SESSION['drill']['cid'] = 0;
 	}
 	if (!empty($_GET['sa'])) {
-		$sessiondata['drill']['sa'] = $_GET['sa'];
+		$_SESSION['drill']['sa'] = $_GET['sa'];
 	} else {
-		$sessiondata['drill']['sa'] = 0;
+		$_SESSION['drill']['sa'] = 0;
 	}
-	$sessiondata['drill']['mode'] = 'std';
-	$sessiondata['drill']['scores'] = array();
+	$_SESSION['drill']['mode'] = 'std';
+	$_SESSION['drill']['scores'] = array();
 
 	if (!empty($_GET['t'])) {
-		$sessiondata['drill']['time'] = $_GET['t'];
-		$sessiondata['drill']['mode'] = 'cntdown';
+		$_SESSION['drill']['time'] = $_GET['t'];
+		$_SESSION['drill']['mode'] = 'cntdown';
 	}
 	if (!empty($_GET['n'])) {
-		$sessiondata['drill']['n'] = $_GET['n'];
-		$sessiondata['drill']['mode'] = 'cntup';
+		$_SESSION['drill']['n'] = $_GET['n'];
+		$_SESSION['drill']['mode'] = 'cntup';
 	}
 	if (!empty($_GET['nc'])) {
-		$sessiondata['drill']['nc'] = $_GET['nc'];
-		$sessiondata['drill']['mode'] = 'cntup';
+		$_SESSION['drill']['nc'] = $_GET['nc'];
+		$_SESSION['drill']['mode'] = 'cntup';
 	}
-	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
-		$sessiondata['drill']['starttime'] = 0;
+	if ($_SESSION['drill']['mode']=='cntup' || $_SESSION['drill']['mode']=='cntdown') {
+		$_SESSION['drill']['starttime'] = 0;
 	}
-	if (!isset($sessiondata['drillresults'])) {
-		$sessiondata['drillresults'] = array();
+	if (!isset($_SESSION['drillresults'])) {
+		$_SESSION['drillresults'] = array();
 	}
-	$sessiondata['coursetheme'] = $coursetheme;
-	writesessiondata();
+	$_SESSION['coursetheme'] = $coursetheme;
 
-	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
+	if ($_SESSION['drill']['mode']=='cntup' || $_SESSION['drill']['mode']=='cntdown') {
 		echo '<html><body>';
 		echo "<a href=\"" . $GLOBALS['basesiteurl'] . "/course/quickdrill.php$public\">Start</a>";
 		echo '</body></html>';
@@ -201,8 +196,7 @@ if (isset($_POST['seed'])) {
 		$seed = rand(1,9999);
 	}
 	$scores[] = $score;
-	$sessiondata['drill']['scores'] = $scores;
-	writesessiondata();
+	$_SESSION['drill']['scores'] = $scores;
 	$curscore = 0;
 	foreach ($scores as $score) {
 		$curscore += getpts($score);
@@ -213,7 +207,7 @@ if (isset($_POST['seed'])) {
 	$seed = rand(1,9999);
 }
 
-//$sessiondata['coursetheme'] = $coursetheme;
+//$_SESSION['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead = '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;}</style>';
 $useeditor = 1;
@@ -255,11 +249,10 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 	echo "<p>Score:  ".Sanitize::onlyFloat($curscore)." out of ".count($scores)." possible</p>";
 	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&n=$n$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
-	if (!isset($sessiondata['drillresults'][$qsetid])) {
-		$sessiondata['drillresults'][$qsetid] = array();
+	if (!isset($_SESSION['drillresults'][$qsetid])) {
+		$_SESSION['drillresults'][$qsetid] = array();
 	}
-	$sessiondata['drillresults'][$qsetid][] = array("n",$n,"$hours:$minutes:$seconds","$curscore out of ".count($scores));
-	writesessiondata();
+	$_SESSION['drillresults'][$qsetid][] = array("n",$n,"$hours:$minutes:$seconds","$curscore out of ".count($scores));
 	require("../footer.php");
 	exit;
 }
@@ -275,11 +268,10 @@ if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questio
 	echo "<p>".count($scores)." tries used</p>";
 	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
-	if (!isset($sessiondata['drillresults'][$qsetid])) {
-		$sessiondata['drillresults'][$qsetid] = array();
+	if (!isset($_SESSION['drillresults'][$qsetid])) {
+		$_SESSION['drillresults'][$qsetid] = array();
 	}
-	$sessiondata['drillresults'][$qsetid][] = array("nc",$nc,"$hours:$minutes:$seconds",count($scores).' tries used');
-	writesessiondata();
+	$_SESSION['drillresults'][$qsetid][] = array("nc",$nc,"$hours:$minutes:$seconds",count($scores).' tries used');
 	require("../footer.php");
 	exit;
 }
@@ -303,11 +295,10 @@ if ($timesup == true) { //if time has expired
 	echo "$seconds seconds</p>";
 	$addr = $GLOBALS['basesiteurl'] . "/course/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&t=$timelimit$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
-	if (!isset($sessiondata['drillresults'][$qsetid])) {
-		$sessiondata['drillresults'][$qsetid] = array();
+	if (!isset($_SESSION['drillresults'][$qsetid])) {
+		$_SESSION['drillresults'][$qsetid] = array();
 	}
-	$sessiondata['drillresults'][$qsetid][] = array("t","$hours:$minutes:$seconds","$curscore out of ".count($scores));
-	writesessiondata();
+	$_SESSION['drillresults'][$qsetid][] = array("t","$hours:$minutes:$seconds","$curscore out of ".count($scores));
 	require("../footer.php");
 	exit;
 }

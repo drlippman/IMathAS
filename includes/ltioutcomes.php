@@ -168,8 +168,7 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
     }
 
     if ($response === false) {
-    	global $sessiondata;
-    	if ($sessiondata['debugmode']==true) {
+    	if ($_SESSION['debugmode']==true) {
     		throw new Exception("Problem reading data from $endpoint, $php_errormsg");
     	} else {
     		//echo "Unable to update score via LTI.";
@@ -341,7 +340,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
 
 //use this if we know the grade, or want to delete
 function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
-	global $DBH,$sessiondata,$testsettings,$cid,$CFG,$userid;
+	global $DBH,$testsettings,$cid,$CFG,$userid;
 
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
 		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
@@ -362,8 +361,8 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
 	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
 
 	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
-		if (isset($sessiondata[$ltikey.'-'.$aid.'-secret'])) {
-			$secret = $sessiondata[$ltikey.'-'.$aid.'-secret'];
+		if (isset($_SESSION[$ltikey.'-'.$aid.'-secret'])) {
+			$secret = $_SESSION[$ltikey.'-'.$aid.'-secret'];
 		} else {
 			if ($keytype=='a') {
 				if (isset($testsettings) && isset($testsettings['ltisecret'])) {
@@ -373,8 +372,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
 					$stm->execute(array(':id'=>$aid));
 					if ($stm->rowCount()>0) {
 						$secret = $stm->fetchColumn(0);
-						$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
-						writesessiondata();
+						$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
 					} else {
 						$secret = '';
 					}
@@ -392,23 +390,21 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
 				$stm->execute(array(':id'=>$keyparts[1]));
 				if ($stm->rowCount()>0) {
 					$secret = $stm->fetchColumn(0);
-					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
-					writesessiondata();
+					$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
 				} else {
 					$secret = '';
 				}
 			} else {
-				if (isset($sessiondata['lti_origkey'])) {
+				if (isset($_SESSION['lti_origkey'])) {
 					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
-					$stm->execute(array(':SID'=>$sessiondata['lti_origkey']));
+					$stm->execute(array(':SID'=>$_SESSION['lti_origkey']));
 				} else {
 					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
 					$stm->execute(array(':SID'=>$ltikey));
 				}
 				if ($stm->rowCount()>0) {
 					$secret = $stm->fetchColumn(0);
-					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
-					writesessiondata();
+					$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
 				} else {
 					$secret = '';
 				}

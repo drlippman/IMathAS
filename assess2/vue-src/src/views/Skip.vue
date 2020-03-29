@@ -69,6 +69,7 @@ export default {
   mounted () {
     setTimeout(window.drawPics, 100);
     window.rendermathnode(this.$refs.introtext);
+    window.jQuery(this.$refs.introtext).fitVids();
   }
 };
 </script>

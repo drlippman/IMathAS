@@ -43,15 +43,6 @@
             <icons name="right" />
           </router-link>
         </div>
-        <button
-          v-if = "ainfo.submitby === 'by_assessment'"
-          class="primary"
-          id="skipheadersubmit"
-          @click="handleSubmit"
-          :disabled = "!canSubmit"
-        >
-          {{ $t('header.assess_submit') }}
-        </button>
     </div>
     <question-header-icons
       :showscore = "showScore"
@@ -67,7 +58,8 @@ import QuestionHeaderIcons from '@/components/QuestionHeaderIcons.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import SkipQuestionListItem from '@/components/SkipQuestionListItem.vue';
 import Icons from '@/components/widgets/Icons.vue';
-import { store, actions } from '../basicstore';
+import { attemptedMixin } from '@/mixins/attemptedMixin';
+import { store } from '../basicstore';
 
 export default {
   name: 'SkipQuestionHeader',
@@ -78,6 +70,7 @@ export default {
     MenuButton,
     SkipQuestionListItem
   },
+  mixins: [attemptedMixin],
   data: function () {
     return {
 
@@ -86,9 +79,6 @@ export default {
   computed: {
     ainfo () {
       return store.assessInfo;
-    },
-    canSubmit () {
-      return (!store.inTransit);
     },
     curQData () {
       return store.assessInfo.questions[this.qn];
@@ -116,6 +106,13 @@ export default {
         };
         for (let i in store.assessInfo.questions[qn]) {
           thisoption[i] = store.assessInfo.questions[qn][i];
+        }
+        if (thisoption.status === 'unattempted') {
+          if (this.qsAttempted[qn] === 1) {
+            thisoption.status = 'attempted';
+          } else if (this.qsAttempted[qn] > 0) {
+            thisoption.status = 'partattempted';
+          }
         }
         out.push(thisoption);
       }
@@ -158,9 +155,6 @@ export default {
   methods: {
     changeQuestion (newqn) {
       // this.$router.push({ path: '/skip/' + newqn});
-    },
-    handleSubmit () {
-      actions.submitAssessment();
     }
   }
 };

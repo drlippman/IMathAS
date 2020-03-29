@@ -43,8 +43,7 @@ switch($_POST['action']) {
 	case "emulateuser":
 		if ($myrights < 100 ) { break;}
 		$be = $_REQUEST['uid'];
-		$stm = $DBH->prepare("UPDATE imas_sessions SET userid=:userid WHERE sessionid=:sessionid");
-		$stm->execute(array(':userid'=>$be, ':sessionid'=>$sessionid));
+		$_SESSION['userid'] = $be;
 		break;
 	case "chgrights":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
@@ -403,9 +402,6 @@ switch($_POST['action']) {
 		}
 		break;
 	case "logout":
-		$sessionid = session_id();
-		$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=:sessionid");
-		$stm->execute(array(':sessionid'=>$sessionid));
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
 			setcookie(session_name(), '', time()-42000, '/', '',false ,true );
@@ -985,143 +981,6 @@ switch($_POST['action']) {
 			}
 		}
 		break;
-	/*
-	removed from production code - security risk
-	case "importmacros":
-		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
-		$uploaddir = rtrim(dirname("../config.php"), '/\\') .'/assessment/libs/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			if (strpos($uploadfile,'.php')!==FALSE) {
-				$handle = fopen($uploadfile, "r");
-				$atstart = true;
-				if ($handle) {
-					while (!feof($handle)) {
-						$buffer = fgets($handle, 4096);
-						if (strpos($buffer,"//")===0) {
-							$trimmed = trim(substr($buffer,2));
-							if ($trimmed{0}!='<' && substr($trimmed,-1)!='>') {
-								$numspaces = strlen(substr($buffer,2)) - strlen(ltrim(substr($buffer,2)));
-								$comments .= str_repeat('&nbsp;', $numspaces);
-								$comments .= $trimmed . '<br/>';
-							} else {
-								$comments .= $trimmed;
-							}
-						} else if (strpos($buffer,"function")===0) {
-							$func = substr($buffer,9,strpos($buffer,"(")-9);
-							if ($comments!='') {
-								$outlines .= "<h2><a name=\"$func\">$func</a></h2>\n";
-								$funcs[] = $func;
-								$outlines .= $comments;
-								$comments = '';
-							}
-						} else if ($atstart && trim($buffer)=='') {
-							$startcomments = $comments;
-							$atstart = false;
-							$comments = '';
-						} else {
-							$comments = '';
-						}
-					}
-				}
-				fclose($handle);
-				$lib = basename($uploadfile,".php");
-				$outfile = fopen($uploaddir . $lib.".html", "w");
-				fwrite($outfile,"<html><body>\n<h1>Macro Library $lib</h1>\n");
-				fwrite($outfile,$startcomments);
-				fwrite($outfile,"<ul>\n");
-				foreach($funcs as $func) {
-					fwrite($outfile,"<li><a href=\"#$func\">$func</a></li>\n");
-				}
-				fwrite($outfile,"</ul>\n");
-				fwrite($outfile, $outlines);
-				fclose($outfile);
-			}
-			break;
-		} else {
-			require("../header.php");
-			echo "<p>Error uploading file!</p>\n";
-			require("../footer.php");
-			exit;
-		}
-	*/
-	case "importqimages":
-		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			if (strpos($uploadfile,'.tar.gz')!==FALSE) {
-				include("../includes/tar.class.php");
-				require_once("../includes/filehandler.php");
-				$tar = new tar();
-				$tar->openTAR($uploadfile);
-				if ($tar->hasFiles()) {
-					if (getfilehandlertype('filehandlertypecfiles') == 's3') {
-						$n = $tar->extractToS3("qimages","public");
-					} else {
-						$n = $tar->extractToDir("../assessment/qimages/");
-					}
-					require("../header.php");
-					echo "<p>Extracted $n files.  <a href=\"admin2.php\">Continue</a></p>\n";
-					require("../footer.php");
-					exit;
-				} else {
-					require("../header.php");
-					echo "<p>File appears to contain nothing</p>\n";
-					require("../footer.php");
-					exit;
-				}
-
-			}
-			unlink($uploadfile);
-			break;
-		} else {
-			require("../header.php");
-			echo "<p>Error uploading file!</p>\n";
-			require("../footer.php");
-			exit;
-		}
-	case "importcoursefiles":
-		if ($myrights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
-				require_once("../includes/filehandler.php");
-				$zip = new ZipArchive();
-				$res = $zip->open($uploadfile);
-				$ne = 0;  $ns = 0;
-				if ($res===true) {
-					for($i = 0; $i < $zip->numFiles; $i++) {
-						//if (file_exists("../course/files/".$zip->getNameIndex($i))) {
-						if (doesfileexist('cfile',$zip->getNameIndex($i))) {
-							$ns++;
-						} else {
-							$zip->extractTo("../course/files/", array($zip->getNameIndex($i)));
-							relocatecoursefileifneeded("../course/files/".$zip->getNameIndex($i),$zip->getNameIndex($i));
-							$ne++;
-						}
-					}
-					require("../header.php");
-					echo "<p>Extracted $ne files.  Skipped $ns files.  <a href=\"admin2.php\">Continue</a></p>\n";
-					require("../footer.php");
-					exit;
-				} else {
-					require("../header.php");
-					echo "<p>File appears to contain nothing</p>\n";
-					require("../footer.php");
-					exit;
-				}
-
-			}
-			unlink($uploadfile);
-			break;
-		} else {
-			require("../header.php");
-			echo "<p>Error uploading file!</p>\n";
-			require("../footer.php");
-			exit;
-		}
 	case "removeself":
 		if ($myrights < 20) {
 			echo 'Error: Unauthorized';
@@ -1301,8 +1160,7 @@ switch($_POST['action']) {
 			//check that code is valid and not a replay
 			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
 			   ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
-				$sessiondata['mfaverified'] = true;
-				writesessiondata();
+				$_SESSION['mfaverified'] = true;
 				$mfadata['last'] = $_POST['mfatoken'];
 				$mfadata['laston'] = time();
 				if (isset($_POST['mfatrust'])) {

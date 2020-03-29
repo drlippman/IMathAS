@@ -39,6 +39,7 @@
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import FullPagedListItem from '@/components/FullPagedListItem.vue';
 import Icons from '@/components/widgets/Icons.vue';
+import { attemptedMixin } from '@/mixins/attemptedMixin';
 import { store } from '../basicstore';
 
 export default {
@@ -49,6 +50,7 @@ export default {
     MenuButton,
     FullPagedListItem
   },
+  mixins: [attemptedMixin],
   data: function () {
     return {
 
@@ -79,6 +81,8 @@ export default {
         for (let i = 0; i < this.pagesData[pn][0].questions.length; i++) {
           let qn = this.pagesData[pn][0].questions[i];
           if (store.assessInfo.questions[qn].status !== 'unattempted') {
+            numAttempted++;
+          } else if (this.qsAttempted[qn] === 1) {
             numAttempted++;
           }
         }

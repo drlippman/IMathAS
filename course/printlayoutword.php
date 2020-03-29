@@ -26,15 +26,6 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 
 $aid = Sanitize::onlyInt($_GET['aid']);
-$sessiondata['texdisp'] = true;
-$sessiondata['texdoubleescape'] = true;
-$texusealignsformatrix = true;
-
-$sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 2;
-$loadgraphfilter = true;
-$hidedrawcontrols = true;
-$assessver = 2;
 
 $stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
@@ -64,7 +55,7 @@ if ($overwriteBody==1) {
 	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3<br/><input type="radio" name="format" value="inter"/> Multiple forms grouped by question - 1a 1b 2a 2b</span><br class="form"/>';
 	echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
 	echo '<span class="form">Question separator:</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
-	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> </span><br class="form"/>';
+	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> Use PAGEBREAK for a page break</span><br class="form"/>';
 	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
 	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes checked="checked" ></span><br class="form"/>';
 
@@ -75,6 +66,18 @@ if ($overwriteBody==1) {
 
 
 } else {
+  $GLOBALS['texdisp'] = true;
+  $GLOBALS['texdoubleescape'] = true;
+  $texusealignsformatrix = true;
+
+  $origmathdisp = $_SESSION['mathdisp'];
+  $origgraphdisp = $_SESSION['graphdisp'];
+  $_SESSION['graphdisp'] = 1;
+  $_SESSION['mathdisp'] = 2;
+  $loadgraphfilter = true;
+  $hidedrawcontrols = true;
+  $assessver = 2;
+
 	//load filter
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/../filter/filter.php");
@@ -192,7 +195,7 @@ if ($overwriteBody==1) {
 
 	if ($_REQUEST['format']=='trad') {
 		for ($j=0; $j<$copies; $j++) {
-			if ($j>0) { $out .= $_REQUEST['vsep'].'<br/>';}
+			if ($j>0) { $out .= '<p>'.$_REQUEST['vsep'].'</p>';}
 
 			$headerleft = '';
 			$headerleft .= $line['name'];
@@ -213,7 +216,7 @@ if ($overwriteBody==1) {
 
 
 			for ($i=0; $i<$numq; $i++) {
-				if ($i>0) { $out .= $_REQUEST['qsep'];}
+				if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
 				list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				$out .= $newout;
 			}
@@ -222,8 +225,8 @@ if ($overwriteBody==1) {
 
 		if ($_REQUEST['keys']>0) { //print answer keys
 			for ($j=0; $j<$copies; $j++) {
-				$out .= $_REQUEST['vsep'].'<br/>';
-				$out .= '<b>Key - Form ' . ($j+1) . "</b>\n";
+				$out .= '<p>'.$_REQUEST['vsep'].'</p>';
+				$out .= '<p><b>Key - Form ' . ($j+1) . "</b></p>\n";
 				$out .= "<ol>\n";
 				for ($i=0; $i<$numq; $i++) {
 					$out .= '<li>';
@@ -256,16 +259,16 @@ if ($overwriteBody==1) {
 		$out .= "</div>\n";
 		$out .= "</div>\n";
 		for ($i=0; $i<$numq; $i++) {
-			if ($i>0) { $out .= $_REQUEST['qsep'];}
+			if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
 			for ($j=0; $j<$copies;$j++) {
-				if ($j>0) { $out .= $_REQUEST['qsep'];}
+				if ($j>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
 				list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				$out .= $newout;
 			}
 		}
 		if ($_REQUEST['keys']>0) { //print answer keys
-			$out .= $_REQUEST['vsep'].'<br/>';
-			$out .= "<b>Key</b>\n";
+			$out .= '<p>'.$_REQUEST['vsep'].'</p>';
+			$out .= "<p><b>Key</b></p>\n";
 			$out .= "<ol>\n";
 			for ($i=0; $i<count($sa); $i++) {
 				$out .= '<li>';
@@ -345,10 +348,12 @@ if ($overwriteBody==1) {
 	header('Content-Length: '.filesize($filename));
 	readfile($filename.'.docx');
 	*/
-
+  $_SESSION['mathdisp'] = $origmathdisp;
+  $_SESSION['graphdisp'] = $origgraphdisp;
+  require("../footer.php");
 	exit;
 }
-require("../footer.php");
+
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	global $RND,$DBH,$isfinal,$imasroot,$urlmode;
 	$RND->srand($seed);

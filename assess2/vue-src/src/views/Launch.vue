@@ -78,6 +78,12 @@
         >
           {{ startLabel }}
         </button>
+        <input
+          type="submit"
+          style="display:none;"
+          @click="startAssess"
+          value="Submit"
+        />
         <button
           v-if="hasExit"
           type="button"

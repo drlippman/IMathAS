@@ -583,6 +583,15 @@ export const actions = {
           }
           return;
         }
+        for (let qn in store.autosaveQueue) {
+          for (let k in store.autosaveQueue[qn]) {
+            if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
+              Vue.set(store.assessInfo.questions[parseInt(qn)].parts_entered,
+                store.autosaveQueue[qn][k], 1);
+            }
+          }
+        }
+
         // clear autosave queue
         store.autosaveQueue = {};
       })
@@ -775,7 +784,7 @@ export const actions = {
   },
   setInitValue (qn, fieldname, val) {
     if (!store.initValues.hasOwnProperty(qn)) {
-      store.initValues[qn] = {};
+      Vue.set(store.initValues, qn, {});
     }
     // only record initvalue if we don't already have one
     let pn = 0;
@@ -949,7 +958,7 @@ export const actions = {
         store.assessInfo.questions = [];
       }
       for (let i in response.questions) {
-        store.assessInfo.questions[parseInt(i)] = response.questions[i];
+        Vue.set(store.assessInfo.questions, parseInt(i), response.questions[i]);
       }
       delete response.questions;
     }

@@ -15,6 +15,7 @@ option.
 
 You may need to adjust /assess2/vue-src/public/index.html, editing the
 `APIbase` line to point to have the correct web path to the assess2 directory.
+This needs to point to your PHP server, not the Vue dev server.
 
 ## Project setup
 ```

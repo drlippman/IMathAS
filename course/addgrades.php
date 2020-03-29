@@ -301,8 +301,8 @@
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $sessiondata[$cid.'gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -315,10 +315,9 @@
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			$sessiondata[$cid.'secfilter'] = $secfilter;
-			writesessiondata();
-		} else if (isset($sessiondata[$cid.'secfilter'])) {
-			$secfilter = $sessiondata[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
@@ -376,7 +375,7 @@
 		 </style>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	$useeditor = "noinit";
-	if ($sessiondata['useed']!=0) {
+	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
 	require("../includes/rubric.php");
@@ -624,7 +623,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		}
 		*/
 		echo '<div id="gradeboxes">';
-		if ($sessiondata['useed']==0) {
+		if ($_SESSION['useed']==0) {
 			echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
 		}
 		if ($hassection) {
@@ -635,7 +634,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>";
 			echo ' <input type=button value="Add" onClick="sendtoall(0,0);"/> <input type=button value="Multiply" onclick="sendtoall(0,1)"/> <input type=button value="Replace" onclick="sendtoall(0,2)"/></span><br class="form"/>';
 			echo "<span class=form>Add/Replace to all feedback:</span><span class=formright>";
-			if ($sessiondata['useed']==0) {
+			if ($_SESSION['useed']==0) {
 				echo "<input type=text size=40 id=\"toallfeedback\" name=\"toallfeedback\"/>";
 			} else {
 				echo '<div class="fbbox" id="toallfeedback"></div>';
@@ -659,7 +658,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			echo '<td></td>';
 		}
 		echo '<td><input type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
-		if ($sessiondata['useed']==0) {
+		if ($_SESSION['useed']==0) {
 			echo '<td><textarea id="qafeedback" rows="1" cols="60"></textarea></td><td>';
 		} else {
 			echo '<td><div id="qafeedback" class="fbbox"></div></td><td>';
@@ -748,7 +747,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 				echo printrubriclink($rubric,$points,"score". Sanitize::onlyint($row[0]),"feedback". Sanitize::onlyint($row[0]));
 			}
 			echo "</td>";
-			if ($sessiondata['useed']==0) {
+			if ($_SESSION['useed']==0) {
 				printf('<td><textarea cols=60 rows=1 id="feedback%d" name="feedback%d">%s</textarea></td>',
 					Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[0]),
 					Sanitize::encodeStringForDisplay($feedback[$row[0]]));

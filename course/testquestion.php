@@ -109,7 +109,7 @@ if ($myrights<20) {
 }
 
 /******* begin html output ********/
-$sessiondata['coursetheme'] = $coursetheme;
+$_SESSION['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
 
 $useeqnhelper = $eqnhelper;
@@ -279,7 +279,7 @@ if ($overwriteBody==1) {
 
 	echo '<code id="qhtml" style="display:none">';
 	$message = displayq($qn,$_GET['qsetid'],$seed,false,false,0,true);
-	$message = printfilter(forcefiltergraph($message));
+	$message = printfilter($message);
 	$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 	$message = str_replacE('`','\`',$message);
 	echo htmlentities($message);

@@ -16,7 +16,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 
 require("./assessment/displayq2.php");
 
-$sessiondata = array();
+$_SESSION = array();
 $prefdefaults = array(
 	'mathdisp'=>1,
 	'graphdisp'=>1,
@@ -24,24 +24,24 @@ $prefdefaults = array(
 	'useed'=>1,
 	'livepreview'=>1);
 $prefcookie = json_decode($_COOKIE["embedquserprefs"], true);
-$sessiondata['userprefs'] = array();
+$_SESSION['userprefs'] = array();
 foreach($prefdefaults as $key=>$def) {
 	if ($prefcookie!==null && isset($prefcookie[$key])) {
-		$sessiondata['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
+		$_SESSION['userprefs'][$key] = filter_var($prefcookie[$key], FILTER_SANITIZE_NUMBER_INT);
 	} else {
-		$sessiondata['userprefs'][$key] = $def;
+		$_SESSION['userprefs'][$key] = $def;
 	}
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
-	$sessiondata[$key] = $sessiondata['userprefs'][$key];
+	$_SESSION[$key] = $_SESSION['userprefs'][$key];
 }
 
 $showtips = 2;
 $useeqnhelper = 4;
 $courseUIver = 1;
-$sessiondata['drill']['cid'] = 0;
-$sessiondata['drill']['sa'] = 0;
-$sessiondata['secsalt'] = "12345";
+$_SESSION['drill']['cid'] = 0;
+$_SESSION['drill']['sa'] = 0;
+$_SESSION['secsalt'] = "12345";
 $cid = "embedq";
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
@@ -53,10 +53,10 @@ $page_formAction = "embedq.php?id=$qsetid";
 
 if (isset($_GET['theme'])) {
 	$theme = preg_replace('/\W/','',$_GET['theme']);
-	$sessiondata['coursetheme'] = $theme . '.css';
+	$_SESSION['coursetheme'] = $theme . '.css';
 	$page_formAction .= "&theme=$theme";
 } else {
-	$sessiondata['coursetheme'] = $coursetheme;
+	$_SESSION['coursetheme'] = $coursetheme;
 }
 
 if (isset($_GET['noscores'])) {
@@ -167,7 +167,7 @@ if (isset($_GET['frame_id'])) {
 			});
 		}
 		</script>';
-	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
+	if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 		//in case MathJax isn't loaded yet
 		$placeinhead .= '<script type="text/x-mathjax-config">
 			MathJax.Hub.Queue(function () {

@@ -71,8 +71,11 @@ if (isset($_POST['message'])) {
 			$row[2] = trim($row[2]);
 			if ($row[2]!='' && $row[2]!='none@none.com') {
 				$addy = Sanitize::simpleASCII("{$row[0]} {$row[1]}")." <".Sanitize::emailAddress($row[2]).">";
-				$sessiondata['mathdisp']=2;
-				$sessiondata['graphdisp']=2;
+
+				$origmathdisp = $_SESSION['mathdisp'];
+				$origgraphdisp = $_SESSION['graphdisp'];
+				$_SESSION['mathdisp']=2;
+				$_SESSION['graphdisp']=2;
 				require("../filter/filter.php");
 				$message = filter($message);
 				$message = preg_replace('/<img([^>])*src="\//','<img $1 src="' . $GLOBALS['basesiteurl'] . '/',$message);
@@ -82,6 +85,9 @@ if (isset($_POST['message'])) {
 				$self = Sanitize::simpleASCII("{$row[0]} {$row[1]}") ." <". Sanitize::emailAddress($row[2]).">";
 
 				send_email($addy, $sendfrom, $subject, $message, array($self), array(), 5);
+
+				$_SESSION['mathdisp'] = $origmathdisp;
+				$_SESSION['graphdisp'] = $origgraphdisp;
 
 				if ($sendcnt == 0) {
 					$success = _('Email sent');

@@ -153,6 +153,7 @@ function parseqs($file,$touse,$rights) {
 		$nogz = false;
 		$handle = gzopen($file,"r");
 	}
+
 	$line = '';
 	while ((!$nogz || !feof($handle)) && ($nogz || !gzeof($handle))) {
 		if ($nogz) {
@@ -340,11 +341,12 @@ if ($myrights < 100) {
 
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
+		$filekey = Sanitize::simplestring($_POST['filekey']);
+		$uploadfile = getimportfilepath($filekey);
 
 		$libstoadd = array_map('intval',$_POST['libs']);
 
-		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($filename);
+		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($uploadfile);
 
 		$root = Sanitize::onlyInt(trim($_POST['parent']));
         $librights = Sanitize::onlyInt(trim($_POST['librights']));
@@ -436,7 +438,7 @@ if ($myrights < 100) {
 		}
 
 		//write questions, get qsetids
-		$qids = parseqs($filename,$touse,$qrights);
+		$qids = parseqs($uploadfile,$touse,$qrights);
 		if (count($qids)>0) {
 			//resolve any includecodefrom links
 			$qidstocheck = implode(',', array_map('intval', $qids));
@@ -522,7 +524,7 @@ if ($myrights < 100) {
 		}
 		$DBH->commit();
 
-		unlink($filename);
+		deleteimport($filekey);
 		$page_uploadSuccessMsg = "Import Successful.<br>\n";
 		$page_uploadSuccessMsg .= "New Libraries: $newl.<br>";
 		$page_uploadSuccessMsg .= "New Questions: $newq.<br>";
@@ -533,14 +535,14 @@ if ($myrights < 100) {
 
 	} elseif ($_FILES['userfile']['name']!='') { // STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
-
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay(basename($uploadfile))."\" />\n";
-		} else {
-			$page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
-		}
+		if ($filekey = storeimportfile('userfile')) {
+	    $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
+	  } else {
+	    echo "<p>Error uploading file!</p>\n";
+	    echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
+	    exit;
+	  }
+		$uploadfile = getimportfilepath($filekey);
 
 		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($uploadfile);
 

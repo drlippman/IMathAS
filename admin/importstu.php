@@ -6,6 +6,7 @@
 require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/newusercommon.php");
+require_once("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
 // Reads past the UTF-8 bom if it is there.
@@ -116,9 +117,10 @@ if (!(isset($teacherid)) && $myrights<100) {
 		$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:cid");
 		$stm->execute(array(':cid'=>$ncid));
 		$deflatepass = $stm->fetchColumn(0);
-		
-		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
-		$handle = fopen_utf8($filename,'r');
+
+    $filekey = Sanitize::simplestring($_POST['filekey']);
+    $uploadfile = getimportfilepath($filekey);
+    $handle = fopen_utf8($uploadfile,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
 		}
@@ -186,7 +188,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 		}
 
 		fclose($handle);
-		unlink($filename);
+		deleteimport($filekey);
 		$overwriteBody = 1;
 		$body = "Import Successful<br/>\n";
 		$body .= "<p>";
@@ -198,15 +200,15 @@ if (!(isset($teacherid)) && $myrights<100) {
 		$body .= "</a></p>\n";
 
 	} elseif (isset($_FILES['userfile'])) {  //STEP 2 DATA MANIPULATION
-		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
-		$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
-		if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-			$uploadfilename = basename($uploadfile);
-			$page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".Sanitize::encodeStringForDisplay($uploadfilename)."\" />\n";
-		} else {
-			$overwriteBody = 1;
-			$body = "<p>Error uploading file!</p>\n";
-		}
+    if ($filekey = storeimportfile('userfile')) {
+      $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
+    } else {
+      echo "<p>Error uploading file!</p>\n";
+      echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
+      exit;
+    }
+    $uploadfile = getimportfilepath($filekey);
+    
 		$handle = fopen_utf8($uploadfile,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
@@ -297,7 +299,7 @@ if ($overwriteBody==1) {
 ?>
 			</tbody>
 			</table>
- 
+
 <?php
 		foreach($_POST as $k=>$v) {
 			echo "<input type=hidden name=\"" . Sanitize::encodeStringForDisplay($k) . "\" value=\"".Sanitize::encodeStringForDisplay($v)."\">\n";

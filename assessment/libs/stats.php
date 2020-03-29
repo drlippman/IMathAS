@@ -506,7 +506,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		$x += $dxdiff;
 	}
 	$alt .= "</tbody></table>\n";
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	}
 
@@ -567,7 +567,7 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 		$x += $dxdiff;
 	}
 	$alt .= "</tbody></table>\n";
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	}
 	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,20,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
@@ -652,7 +652,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	}
 	$x -= 2*$gap;
 	$alt .= "</tbody></table>\n";
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	}
 	$x++;
@@ -696,7 +696,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 //labels: array of labels for each pie piece
 //uses Google Charts API
 function piechart($pcts,$labels,$w=250,$h=130) {
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
 		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
 		$out .= '<th>'._('Percent').'</th></tr>';
@@ -911,7 +911,7 @@ function boxplot($arr,$label="",$options = array()) {
 		}
 	}
 	$ycnt = $ybase-1;
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	}
 	$dw = $bigmax-$bigmin;

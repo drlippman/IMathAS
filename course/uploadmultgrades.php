@@ -9,7 +9,8 @@ function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
     $bom = fread($file, 3);
     if ($bom != b"\xEF\xBB\xBF") {
-        rewind($file);
+      fclose($file);
+      $file = @fopen($filename, $mode);
     }
     return $file;
 }
@@ -25,14 +26,11 @@ if (!(isset($teacherid))) {
 	$body = "You need to log in as a teacher to access this page";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 	$cid = Sanitize::courseId($_GET['cid']);
-	$dir = rtrim(dirname(dirname(__FILE__)), '/\\').'/admin/import/';
-	if (isset($_POST['thefile'])) {
+	if (isset($_POST['filekey'])) {
 		//already uploaded file, ready for official upload
-		$filename = Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['thefile']);
-		if (!file_exists($dir.$filename)) {
-			echo "File is missing!";
-			exit;
-		}
+    $filekey = Sanitize::simplestring($_POST['filekey']);
+    $uploadfile = getimportfilepath($filekey);
+
 		$stm = $DBH->prepare("SELECT imas_users.id,imas_users.SID FROM imas_users JOIN imas_students ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -74,7 +72,7 @@ if (!(isset($teacherid))) {
 		$adds = array();
 		$addsvals = array();
 		if (count($gbitemid)>0) {
-			$handle = fopen_utf8($dir.$filename,'r');
+			$handle = fopen_utf8($uploadfile,'r');
 			for ($i = 0; $i<$_POST['headerrows']; $i++) {
 				$line = fgetcsv($handle,4096);
 			}
@@ -128,87 +126,78 @@ if (!(isset($teacherid))) {
 				//echo $query;
 			}
 		}
-		unlink($dir.$filename);
+		deleteimport($filekey);
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/chgoffline.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		//upload file
-		if (is_uploaded_file($_FILES['userfile']['tmp_name'])) {
-			$k = 0;
-			while (file_exists($dir . "upload$k.csv")) {
-				$k++;
-			}
-			$uploadfile = "upload$k.csv";
-			if (move_uploaded_file($_FILES['userfile']['tmp_name'], $dir.$uploadfile)) {
-				//parse out header info
-				$page_fileHiddenInput = '<input type="hidden" name="thefile" value="'.$uploadfile.'" />';
-				$handle = fopen_utf8($dir.$uploadfile,'r');
-				$hrow = fgetcsv($handle,4096);
-				$columndata = array();
-				$names = array();
-				if ($_POST['headerrows']==2) {
-					$srow = fgetcsv($handle,4096);
-				}
-				fclose($handle);
-				for ($i=0; $i<count($hrow); $i++) {
-					if ($hrow[$i]=='Username') {
-						$usernamecol = $i;
-					} else if ($hrow[$i]=='Name' || $hrow[$i]=='Section' || $hrow[$i]=='Code') {
-						continue;
-					} else if (strpos(strtolower($hrow[$i]),'comment')!==false || strpos(strtolower($hrow[$i]),'feedback')!==false) {
-						$columndata[$i-1][2] = $i;
-					} else {
-						if (isset($srow[$i])) {
-							$p = explode(':',$hrow[$i]);
-							if (count($p)>1) {
-							    $names[$i] = Sanitize::stripHtmlTags($p[0]);
-							} else {
-								$names[$i] = Sanitize::stripHtmlTags($hrow[$i]);
-							}
-							$pts = intval(preg_replace('/[^\d\.]/','',$srow[$i]));
-							//if ($pts==0) {$pts = '';}
-						} else {
-							$p = explode(':',$hrow[$i]);
-							if (count($p)>1) {
-								$pts = intval(preg_replace('/[^\d\.]/','',$p[count($p)-1]));
-								$names[$i] = Sanitize::stripHtmlTags($p[0]);
-							} else {
-								$pts = 0;
-								$names[$i] = Sanitize::stripHtmlTags($hrow[$i]);
-							}
-							//if ($pts==0) {$pts = '';}
-						}
-						$columndata[$i] = array($names[$i],$pts,-1,0);
-					}
-				}
-				//look to see if any of these names have been used before
-				if (count($names)>0) {
-					$query_placeholders = Sanitize::generateQueryPlaceholders($names);
-					$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($query_placeholders) AND courseid=?");
-					$stm->execute(array_merge($names, array($cid)));
-					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-						$loc = array_search($row[1],$names);
-						if ($loc===false) {continue; } //shouldn't happen
-						$columndata[$loc][3] = $row[0];  //store existing gbitems.id
-					}
-				}
-				if (!isset($usernamecol)) {
-					$usernamecol = 1;
-				}
+    if ($filekey = storeimportfile('userfile')) {
+      $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
+    } else {
+      echo "<p>Error uploading file!</p>\n";
+      echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
+      exit;
+    }
+    $uploadfile = getimportfilepath($filekey);
+		//parse out header info
+		$handle = fopen_utf8($uploadfile,'r');
+		$hrow = fgetcsv($handle,4096);
+		$columndata = array();
+		$names = array();
+		if ($_POST['headerrows']==2) {
+			$srow = fgetcsv($handle,4096);
+		}
+		fclose($handle);
+		for ($i=0; $i<count($hrow); $i++) {
+			if ($hrow[$i]=='Username') {
+				$usernamecol = $i;
+			} else if ($hrow[$i]=='Name' || $hrow[$i]=='Section' || $hrow[$i]=='Code') {
+				continue;
+			} else if (strpos(strtolower($hrow[$i]),'comment')!==false || strpos(strtolower($hrow[$i]),'feedback')!==false) {
+				$columndata[$i-1][2] = $i;
 			} else {
-				$overwriteBody = 1;
-				$body = "<p>Error uploading file!</p>\n";
+				if (isset($srow[$i])) {
+					$p = explode(':',$hrow[$i]);
+					if (count($p)>1) {
+					    $names[$i] = Sanitize::stripHtmlTags($p[0]);
+					} else {
+						$names[$i] = Sanitize::stripHtmlTags($hrow[$i]);
+					}
+					$pts = intval(preg_replace('/[^\d\.]/','',$srow[$i]));
+					//if ($pts==0) {$pts = '';}
+				} else {
+					$p = explode(':',$hrow[$i]);
+					if (count($p)>1) {
+						$pts = intval(preg_replace('/[^\d\.]/','',$p[count($p)-1]));
+						$names[$i] = Sanitize::stripHtmlTags($p[0]);
+					} else {
+						$pts = 0;
+						$names[$i] = Sanitize::stripHtmlTags($hrow[$i]);
+					}
+					//if ($pts==0) {$pts = '';}
+				}
+				$columndata[$i] = array($names[$i],$pts,-1,0);
 			}
-		} else {
-			$overwriteBody = 1;
-			$body = "File Upload error";
+		}
+		//look to see if any of these names have been used before
+		if (count($names)>0) {
+			$query_placeholders = Sanitize::generateQueryPlaceholders($names);
+			$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($query_placeholders) AND courseid=?");
+			$stm->execute(array_merge($names, array($cid)));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$loc = array_search($row[1],$names);
+				if ($loc===false) {continue; } //shouldn't happen
+				$columndata[$loc][3] = $row[0];  //store existing gbitems.id
+			}
+		}
+		if (!isset($usernamecol)) {
+			$usernamecol = 1;
 		}
 	}
 
 	$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
 	$curBreadcrumb .=" &gt; <a href=\"chgoffline.php?stu=0&cid=$cid\">Manage Offline Grades</a> &gt; Upload Multiple Grades";
-
 
 }
 

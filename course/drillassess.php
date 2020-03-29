@@ -21,7 +21,7 @@ $cid = intval($_GET['cid']);
 $daid = intval($_GET['daid']);
 $now = time();
 
-if (isset($studentid) && !isset($sessiondata['stuview']) &&
+if (isset($studentid) && !isset($_SESSION['stuview']) &&
 	!isset($_GET['start']) && !isset($_GET['score'])
 ) {
 	$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";

@@ -424,14 +424,22 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		drawstyle[tarnum] = 0;
 	}
 	drawlocky[tarnum] = locky;
-	imgs[tarnum] = new Image();
-	imgs[tarnum].onload = function() {
+	if (imgpath !== '') {
+		imgs[tarnum] = new Image();
+		imgs[tarnum].onload = function() {
+			var oldcurTarget = curTarget;
+			curTarget = tarnum;
+			drawTarget();
+			curTarget = oldcurTarget;
+		};
+		imgs[tarnum].src = imgpath;
+	} else {
+		imgs[tarnum] = null;
 		var oldcurTarget = curTarget;
 		curTarget = tarnum;
 		drawTarget();
 		curTarget = oldcurTarget;
-	};
-	imgs[tarnum].src = imgpath;
+	}
 }
 
 function settool(curel,tarnum,mode) {
@@ -471,8 +479,9 @@ function drawTarget(x,y) {
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = "rgb(0,0,255)";
 	ctx.clearRect(0,0,targets[curTarget].imgwidth,targets[curTarget].imgheight);
-
-	ctx.drawImage(imgs[curTarget],0,0);
+	if (imgs[curTarget] !== null) {
+		ctx.drawImage(imgs[curTarget],0,0);
+	}
 	ctx.beginPath();
 	for (var i=0;i<ineqlines[curTarget].length; i++) {
 		var colornum = i%3;
@@ -2264,7 +2273,7 @@ function initCanvases(k) {
 			if (canvases[i][1].substr(0,8)=="a11ydraw") {
 				addA11yTarget(canvases[i], thisdrawla);
 			} else {
-				addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+				addTarget(canvases[i][0],'canvas'+canvases[i][0],(canvases[i][1]=='')?'':imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 			}
 		}
 	}

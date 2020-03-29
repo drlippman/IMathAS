@@ -4,7 +4,7 @@
 
 function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
     global $DBH;
-    
+
     $words = array();
     $possible_users = array();
     $hasp1 = false;
@@ -84,11 +84,6 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
 }
 
 function logout() {
-	global $DBH;
-	
-	$sessionid = session_id();
-	$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=?");
-	$stm->execute(array($sessionid));
 	$_SESSION = array();
 	if (isset($_COOKIE[session_name()])) {
 		setcookie(session_name(), '', time()-42000, '/', null, false, true);
