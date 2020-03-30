@@ -188,7 +188,7 @@ if (!isset($_GET['embedded'])) {
 </div>
 <div style="position: relative" id="card-deck-wrap">
 <transition-group name="fade" tag="div" class="card-deck">
-<div v-if="filteredCourses.length==0" key="none">No matches found</div>
+<div v-if="filteredCourses.length==0" key="none"><?php echo _('No matches found'); ?></div>
 <div v-for="(course,index) in filteredCourses" :key="course.id" class="card">
   <div class="card-body">
   	<div class="card-header" :class="'coursetype'+course.coursetype">

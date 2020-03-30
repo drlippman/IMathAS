@@ -6,7 +6,7 @@
 require("../init.php");
 
 if (!isset($teacherid)) {
-	echo "You must be a teacher to access this page";
+	echo _("You must be a teacher to access this page");
 	exit;
 }
 
@@ -101,9 +101,9 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sa
 if ($from=="cal") {
 	echo "&gt; <a href=\"showcalendar.php?cid=$cid\">Calendar</a> ";
 }
-echo "&gt; Manage Calendar Items</div>\n";
-echo '<div id="headermanagecalitems" class="pagetitle"><h1>Manage Calendar Items</h1></div>';
-echo "<p>This page allows you to add events to the calendar.  Course items automatically place themselves on the calendar.</p>";
+echo "&gt; "._("Manage Calendar Items")."</div>\n";
+echo '<div id="headermanagecalitems" class="pagetitle"><h1>'._('Manage Calendar Items').'</h1></div>';
+echo "<p>"._("This page allows you to add events to the calendar.  Course items automatically place themselves on the calendar.")."</p>";
 $stm = $DBH->prepare("SELECT id,date,title,tag FROM imas_calitems WHERE courseid=:courseid ORDER BY date");
 $stm->execute(array(':courseid'=>$cid));
 
@@ -134,7 +134,7 @@ echo '<p><button type="submit" name="submit" value="Save">'._('Save Changes').'<
 echo '<h3>Add New Events</h3>';
 echo '<table class="gb" id="newEventsTable">
 <thead>
-<tr><th>Date</th><th>Tag</th><th>Event Details</th></tr>
+<tr><th>Date</th><th>Tag</th><th>'._('Event Details').'</th></tr>
 </thead>
 <tbody>';
 $now = time();

@@ -11,13 +11,13 @@ $assessver = 2;
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$pagetitle = "Test Question";
+$pagetitle = _("Test Question");
 $asid = 0;
 
 	//CHECK PERMISSIONS AND SET FLAGS
 if ($myrights<20) {
  	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";
+	$body = _("You need to log in as a teacher to access this page");
 } else {
 	//data manipulation here
 	$useeditor = 1;
@@ -63,7 +63,7 @@ if ($myrights<20) {
 	if (isset($_POST['seed'])) {
 		list($score,$rawscores[$qn]) = scoreq($qn,$_GET['qsetid'],$_POST['seed'],$_POST['qn'.$qn],$attempt-1);
 		$scores[$qn] = $score;
-		$page_scoreMsg =  "<p>Score on last answer: ".Sanitize::encodeStringForDisplay($score)."/1</p>\n";
+		$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
 		$_SESSION['choicemap'] = array();
@@ -146,17 +146,17 @@ if ($overwriteBody==1) {
 				    toggleBrokenFlagmsg(tagged);
 			    } else {
 				    alert(req.responseText);
-				    alert("Oops, error toggling the flag");
+				    alert("<?php echo _('Oops, error toggling the flag'); ?>");
 			    }
 		    } else {
-			   alert(" Couldn't save changes:\n"+ req.status + "\n" +req.statusText);
+			   alert("<?php echo _('Couldn\'t save changes:'); ?>\n"+ req.status + "\n" +req.statusText);
 		    }
 		  }
 		}
 		function toggleBrokenFlagmsg(tagged) {
 			document.getElementById("brokenmsgbad").style.display = (tagged==1)?"block":"none";
 			document.getElementById("brokenmsgok").style.display = (tagged==1)?"none":"block";
-			if (tagged==1) {alert("Make sure you also contact the question author or support so they know why you marked the question as broken");}
+			if (tagged==1) {alert("<?php echo _('Make sure you also contact the question author or support so they know why you marked the question as broken'); ?>");}
 		}
 
 		$(window).on('beforeunload', function() {
@@ -174,21 +174,21 @@ if ($overwriteBody==1) {
 		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
 		echo " if (prevnext[0][1]>0){
-				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
+				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">"._("Prev")."</a> ');
 			  } else {
-				  document.write('Prev ');
+				  document.write('"._("Prev")." ');
 			  }
 			  if (prevnext[1][1]>0){
-				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">Next</a> ');
+				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">"._("Next")."</a> ');
 			  } else {
-				  document.write('Next ');
+				  document.write('"._("Next")." ');
 			  }
 			  if (prevnext[2]!=null) {
-			  	document.write(' <span id=\"numchked\">'+prevnext[2]+'</span> checked');
+			  	document.write(' <span id=\"numchked\">'+prevnext[2]+'</span> "._("checked")."');
 				numchked = prevnext[2];
 			  }
 			  if (prevnext[3]!=null) {
-			  	document.write(' '+prevnext[3]+' remaining');
+			  	document.write(' '+prevnext[3]+' "._("remaining")."');
 			  }
 			}
 			</script>";
@@ -196,8 +196,8 @@ if ($overwriteBody==1) {
 	}
 
 	if (isset($_GET['checked'])) {
-		echo "<p id=usecheckwrap><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
-		echo "/> Mark Question for Use</p>";
+		echo "<p id=usecheckwrap><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\""._("Mark Question for Use")."\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
+		echo "/> "._("Mark Question for Use")."</p>";
 		echo "
 		  <script type=\"text/javascript\">
 		  var parentcbox = opener.document.getElementById(\"$loc\");
@@ -272,9 +272,9 @@ if ($overwriteBody==1) {
 		$teacherid = "admin";
 	}
 	displayq($qn,$_GET['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
-	echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
-	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
-	echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
+	echo "<input type=submit value=\""._("Submit")."\"><input type=submit name=\"regen\" value=\""._("Submit and Regen")."\">\n";
+	echo "<input type=button value=\""._("White Background")."\" onClick=\"whiteout()\"/>";
+	echo "<input type=button value=\""._("Show HTML")."\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
 	echo "</form>\n";
 
 	echo '<code id="qhtml" style="display:none">';
@@ -287,11 +287,11 @@ if ($overwriteBody==1) {
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
 		$sendtype = 'msg';
-		$sendtitle = ('Message owner');
+		$sendtitle = (_('Message owner'));
 		$sendcid = $CFG['GEN']['sendquestionproblemsthroughcourse'];
 	} else {
 		$sendtype = 'email';
-		$sendtitle = ('Email owner');
+		$sendtitle = _('Email owner');
 		$sendcid = $cid;
 	}
 	if (isset($CFG['GEN']['qerrorsendto'])) {
@@ -306,34 +306,32 @@ if ($overwriteBody==1) {
 		}
 	}
 
-	printf("<p>Question id: %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));
-	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> to report problems</p>";
+	printf("<p>"._("Question id:")." %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));
+	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems")."</p>";
 
-	printf("<p>Description: %s</p><p>Author: %s</p>", Sanitize::encodeStringForDisplay($line['description']),
+	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." %s</p>", Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
-	echo "<p>Last Modified: $lastmod</p>";
+	echo "<p>"._("Last Modified:")." $lastmod</p>";
 	if ($line['deleted']==1) {
-		echo '<p class=noticetext>This question has been marked for deletion.  This might indicate there is an error in the question. ';
-		echo 'It is recommended you discontinue use of this question when possible</p>';
+		echo '<p class=noticetext>'._('This question has been marked for deletion.  This might indicate there is an error in the question. ');
+		echo _('It is recommended you discontinue use of this question when possible').'</p>';
 	}
 	if ($line['replaceby']>0) {
-	  echo '<p class=noticetext>This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
-	  echo 'by searching all libraries with the ID number as the search term</p>';
+	  echo '<p class=noticetext>'.sprintf(_('This message has been marked as deprecated, and it is recommended you use question ID %s instead.  You can find this question by searching all libraries with the ID number as the search term'),$line['replaceby']).'</p>';
 	}
 
-	echo '<p id="brokenmsgbad" class=noticetext style="display:'.(($line['broken']==1)?"block":"none").'">This question has been marked as broken.  This indicates ';
-	echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
+	echo '<p id="brokenmsgbad" class=noticetext style="display:'.(($line['broken']==1)?"block":"none").'">'._('This question has been marked as broken.  This indicates there might be an error with this question.  Use with caution.').'  <a href="#" onclick="submitBrokenFlag(0);return false;">'._('Unmark as broken').'</a></p>';
 	//echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
 
 	echo '<p>'._('License').': ';
 	$license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike','Creative Commons Attribution-ShareAlike');
 	echo $license[$line['license']];
 	if ($line['otherattribution']!='') {
-		echo '<br/>Other Attribution: '.Sanitize::encodeStringForDisplay($line['otherattribution']);
+		echo '<br/>'._('Other Attribution: ').Sanitize::encodeStringForDisplay($line['otherattribution']);
 	}
 	echo '</p>';
 
-	echo '<p>Question is in these libraries:';
+	echo '<p>'._('Question is in these libraries:');
 	echo '<ul>';
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
@@ -345,16 +343,16 @@ if ($overwriteBody==1) {
 	echo '</ul></p>';
 
 	if ($line['ancestors']!='') {
-		echo "<p>Derived from: ".Sanitize::encodeStringForDisplay($line['ancestors']);
+		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);
 		if ($line['ancestorauthors']!='') {
-			echo '<br/>Created by: '.Sanitize::encodeStringForDisplay($line['ancestorauthors']);
+			echo '<br/>'._('Created by: ').Sanitize::encodeStringForDisplay($line['ancestorauthors']);
 		}
 		echo "</p>";
 	} else if ($line['ancestorauthors']!='') {
-		echo '<p>Derived from work by: '.Sanitize::encodeStringForDisplay($line['ancestorauthors']).'</p>';
+		echo '<p>'._('Derived from work by: ').Sanitize::encodeStringForDisplay($line['ancestorauthors']).'</p>';
 	}
 	if ($myrights==100) {
-		echo '<p>UniqueID: '.Sanitize::encodeStringForDisplay($line['uniqueid']).'</p>';
+		echo '<p>'._('UniqueID: ').Sanitize::encodeStringForDisplay($line['uniqueid']).'</p>';
 	}
 }
 require("../footer.php");

@@ -5,7 +5,7 @@
  header('P3P: CP="ALL CUR ADM OUR"');
 
  $curdir = rtrim(dirname(__FILE__), '/\\');
- require("i18n/i18n.php");
+
  //Look to see if a hook file is defined, and include if it is
  if (isset($CFG['hooks']['validate'])) {
 	require($CFG['hooks']['validate']);
@@ -50,7 +50,7 @@
  //check for bad sessionids.
  if (strlen($sessionid)<10) {
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
-	echo "Error.  Please <a href=\"$imasroot/index.php\">try again</a>";
+	echo sprintf(_("Error.  Please %s try again%s","<a href=\"$imasroot/index.php\">","<a href=\"$imasroot/index.php\">","</a>"));
 	exit;
  }
  if (!empty($_SESSION['userid'])) { // logged in
@@ -99,7 +99,7 @@
 
  	 	 require("header.php");
  	 	 echo '<p>You have requested guest access to a course.</p>';
- 	 	 echo '<p><a href="'.$imasroot.'/index.php">Nevermind</a> ';
+ 	 	 echo '<p><a href="'.$imasroot.'/index.php">',_('Nevermind'),'</a> ';
  	 	 echo '<a href="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">Continue</a></p>';
  	 	 require("footer.php");
  	 	 exit;
@@ -111,7 +111,7 @@
  }
  if (isset($_GET['checksess']) && !$hasusername) {
  	echo '<html><body>';
- 	echo 'Unable to establish a session. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.';
+ 	echo _('Unable to establish a session. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.');
  	echo '</body></html>';
  	exit;
  }
@@ -188,8 +188,7 @@
 		 //
 		 if ($line['rights']==0) {
 			require("header.php");
-			echo "You have not yet confirmed your registration.  You must respond to the email ";
-			echo "that was sent to you by IMathAS.";
+			echo _("You have not yet confirmed your registration.  You must respond to the email that was sent to you by IMathAS.");
 			require("footer.php");
 			exit;
 		 }
@@ -457,7 +456,7 @@
 			$studentinfo['latepasses'] = $line['latepass'];
 			if ($line['locked']>0) {
 				require("header.php");
-				echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
+				echo "<p>",_("You have been locked out of this course by your instructor.  Please see your instructor for more information."),"</p>";
 				echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
 				require("footer.php");
 				exit;
@@ -557,7 +556,7 @@
       $courseUIver = $crow['UIver'];
 
 			if (isset($studentid) && !$inInstrStuView && ((($crow['available'])&1)==1 || time()<$crow['startdate'])) {
-				echo "This course is not available at this time";
+				echo _("This course is not available at this time");
 				exit;
 			}
 			$lockaid = $crow['lockaid']; //ysql_result($result,0,2);
@@ -566,11 +565,11 @@
           ($courseUIver > 1 && strpos($_SERVER['PHP_SELF'],'assess2/')===false)
         ) {
 					require("header.php");
-					echo '<p>This course is currently locked for an assessment</p>';
+					echo '<p>',_('This course is currently locked for an assessment'),'</p>';
           if ($courseUIver > 1) {
-            echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+            echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=".Sanitize::encodeUrlParam($lockaid)."\">",_("Go to Assessment"),"</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
           } else {
-            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
           }
 					require("footer.php");
 					//header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");

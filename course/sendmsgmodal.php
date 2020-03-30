@@ -6,7 +6,7 @@ require("../init.php");
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
 	 require("../header.php");
-	 echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
+	 echo sprintf(_("You are not enrolled in this course.  Please return to the %s Home Page%s and enroll"),"<a href=\"../index.php\">","</a>")."\n";
 	 require("../footer.php");
 	 exit;
 }
@@ -23,7 +23,7 @@ if (isset($_POST['message'])) {
 		$subject = '('._('none').')';
 	}
 	if ($myrights>10 && isset($_POST['markbroken'])) {
-		$subject .= ' - Marked Broken';
+		$subject .= ' - '._('Marked Broken');
 	}
 	$sendlist = array(array('to'=>$_POST['sendto'], 'sendtype'=>$_POST['sendtype']));
 
@@ -36,7 +36,7 @@ if (isset($_POST['message'])) {
 		$msgto = Sanitize::onlyInt($sendinfo['to']);
 
 		if (isset($_POST['iserrreport']) && $sendcnt>0) { //copy going to specified
-			$message = '<p><b>This message was also sent to the question owner.</b></p>'.$origmessage;
+			$message = '<p><b>'._('This message was also sent to the question owner.').'</b></p>'.$origmessage;
 		} else {
 			$message = $origmessage;
 		}
@@ -108,7 +108,7 @@ if (isset($_POST['message'])) {
 	} else {
 		echo $error;
 	}
-	echo '. <input type="button" onclick="top.GB_hide()" value="Done" />';
+	echo '. <input type="button" onclick="top.GB_hide()" value="'._('Done').'" />';
 	require("../footer.php");
 	exit;
 } else {
@@ -137,7 +137,7 @@ if (isset($_POST['message'])) {
 		$message = '<p> </p><br/><hr/>'.$qinfo.'<br/><br/>'.$message;
 		$courseid = $cid;
 		if (isset($parts[3]) && $parts[3] === 'reperr') {
-			$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
+			$title = _("Problem with question ID ").Sanitize::onlyInt($parts[1]);
 			$iserrreport = true;
 			$_GET['to'] = 0;
 			if (isset($CFG['GEN']['qerrorsendto'])) {
@@ -182,19 +182,19 @@ if (isset($_POST['message'])) {
 	list($firstname, $lastname, $email) = $stm->fetch(PDO::FETCH_NUM);
 
 	if ($_GET['sendtype']=='msg') {
-		echo '<h1>New Message</h1>';
+		echo '<h1>'._('New Message').'</h1>';
 		$to = Sanitize::stripHtmlTags("$lastname, $firstname");
 	} else if ($_GET['sendtype']=='email') {
-		echo '<h1>New Email</h1>';
+		echo '<h1>'._('New Email').'</h1>';
 		$to = Sanitize::stripHtmlTags("$lastname, $firstname ($email)");
 	}
 
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
 	echo '<input type="hidden" name="sendtype" value="'.Sanitize::encodeStringForDisplay($_GET['sendtype']).'"/>';
-	echo "To: $to<br/>\n";
-	echo "Subject: <input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"><br/>\n";
-	echo "Message: <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
+	echo _("To:")." $to<br/>\n";
+	echo _("Subject:")." <input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"><br/>\n";
+	echo _("Message:")." <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 	echo htmlentities($message);
 	echo "</textarea></div><br/>\n";
 	if ($iserrreport) {

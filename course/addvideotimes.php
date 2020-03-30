@@ -57,7 +57,7 @@ if (isset($_POST['vidid'])) {
 require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Video Navigation</div>\n";
+echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Video Navigation")."</div>\n";
 $stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
 $stm->execute(array(':id'=>$aid));
 $row = $stm->fetch(PDO::FETCH_NUM);
@@ -188,19 +188,19 @@ function validatevidform(el) {
 	for (var i=0; i<els.length; i++) {
 		if (els[i].name.match(/segtitle/)) {
 			if (els[i].value=="") {
-				alert("Please give all segments titles");
+				alert("<?php echo _("Please give all segments titles"); ?>");
 				els[i].focus();
 				return false;
 			}
 		} else if (els[i].name.match(/vidid/)) {
 			if (els[i].value=="") {
-				alert("Please provide a video ID");
+				alert("<?php echo _("Please provide a video ID"); ?>");
 				els[i].focus();
 				return false;
 			}
 		} else if (els[i].name.match(/segend/)) {
 			if (els[i].value=="") {
-				alert("Please supply end times for all segments");
+				alert("<?php echo _("Please supply end times for all segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -211,7 +211,7 @@ function validatevidform(el) {
 				var v = els[i].value*1;
 			}
 			if (v<lastsegtime) {
-				alert("Make sure each segment's end time is later than previous segments");
+				alert("<?php echo _("Make sure each segment's end time is later than previous segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -220,13 +220,13 @@ function validatevidform(el) {
 			hasfollowup = els[i].checked;
 		} else if (els[i].name.match(/followuptitle/) && hasfollowup) {
 			if (els[i].value=="") {
-				alert("Please give all segments titles");
+				alert("<?php echo _("Please give all segments titles"); ?>");
 				els[i].focus();
 				return false;
 			}
 		} else if (els[i].name.match(/followupend/) && hasfollowup) {
 			if (els[i].value=="") {
-				alert("Please supply end times for all segments");
+				alert("<?php echo _("Please supply end times for all segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -237,7 +237,7 @@ function validatevidform(el) {
 				var v = els[i].value*1;
 			}
 			if (v<lastsegtime) {
-				alert("Make sure each segment's end time is later than previous segments");
+				alert("<?php echo _("Make sure each segment's end time is later than previous segments"); ?>");
 				els[i].focus();
 				return false;
 			}
@@ -325,12 +325,12 @@ function addsegat(n) {
 	var newins = document.createElement("div");
 	newins.className = "insblock";
 	newins.id = "insat"+(curnumseg+1);
-	newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;">Add video segment break</a>';
+	newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;">'+"<?php echo _('Add video segment break'); ?>"+'</a>';
 	insat.parentNode.insertBefore(newins, insat);
 
-	var html = 'Segment title: <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
-	html += 'Ends at: <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
-	html += '<input type="button" value="grab" onclick="grabcurvidtime('+curnumseg+',0);"/>';
+	var html = "<?php echo _('Segment title:'); ?>"+' <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
+	html += "<?php echo _('Ends at:'); ?>"+' <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
+	html += '<input type="button" value="'+<?php echo _('grab'); ?>+'" onclick="grabcurvidtime('+curnumseg+',0);"/>';
 	html += ' <a href="#" onclick="return deleteseg(this);">[Delete]</a>';
 
 	var newseg = document.createElement("div");
@@ -350,7 +350,7 @@ function get_previoussibling(n) {
 }
 
 function deleteseg(el) {
-	if (confirm('Are you sure you want to remove this video segment?')) {
+	if (confirm("<?php echo _('Are you sure you want to remove this video segment?'); ?>")) {
 		var divtodelete = el.parentNode;
 		divtodelete.parentNode.removeChild(get_previoussibling(divtodelete));
 		divtodelete.parentNode.removeChild(divtodelete);
@@ -373,24 +373,18 @@ div.vidsegblock {
 echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
 ?>
 
-<h1>Video Navigation and Question Cues</h1>
+<h1><?php echo _("Video Navigation and Question Cues"); ?></h1>
 <div style="float:right;"><div id="player" style="width: 453px; height: <?php echo ceil(453/$aspectRatio);?>px;"></div></div>
-<p>This page allows you to setup your assessment to be cued to a video.  For each
-question, give a title to the video segment that leads up to that question, and select
-the time when that segment ends and the question should show.  You can grab this
-from the playing video, type the time in min:sec form.  Make sure all times are at least
-one second before the end of the video.</p>
+<p><?php echo _("This page allows you to setup your assessment to be cued to a video.  For each question, give a title to the video segment that leads up to that question, and select the time when that segment ends and the question should show.  You can grab this from the playing video, type the time in min:sec form.  Make sure all times are at least one second before the end of the video."); ?></p>
 
-<p>If your video contains a followup segment to a question (such as a solution),
-you can indicate this and specify when the followup ends.  The next segment will
-then start from the end of this followup.</p>
+<p><?php echo _("If your video contains a followup segment to a question (such as a solution), you can indicate this and specify when the followup ends.  The next segment will then start from the end of this followup."); ?></p>
 
 <form method="post" style="clear:both;" onsubmit="return validatevidform(this);">
 
 <p>YouTube video ID: <input type="text" name="vidid" id="vidid" value="<?php echo Sanitize::encodeStringForDisplay($vidid); ?>"/>
-<input type="button" value="Load Video" onclick="loadnewvideo()"/></p>
+<button type="button" onclick="loadnewvideo()"><?php echo _("Load Video"); ?></button></p>
 <p>
-	Video Aspect Ratio:
+	<?php echo _('Video Aspect Ratio:'); ?>
 	<select name="vidar" id="vidar" onchange="updateAR()">
 <?php
 	$ratios = array("16:9", "4:3", "3:2");
@@ -405,26 +399,26 @@ then start from the end of this followup.</p>
 
 for ($i=0;$i<$n;$i++) {
 	echo '<div class="insblock" id="insat'.$i.'">';
-	echo '<a href="#" onclick="addsegat('.$i.'); return false;">Add video segment break</a></div>';
+	echo '<a href="#" onclick="addsegat('.$i.'); return false;">'._('Add video segment break').'</a></div>';
 
 	if (isset($qn[$i])) {
 		echo '<div class="vidsegblock">';
-		echo 'Segment title: <input type="text" size="20" name="segtitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/> ';
-		echo 'Ends at: <input type="text" size="4" name="segend'.$i.'" id="segend' . $i . '" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/> ';
-		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> ';
-		echo 'Question ' . (Sanitize::onlyInt($qn[$i]) + 1) . ': ' . Sanitize::encodeStringForDisplay($qtitle[$qidbynum[$qn[$i]]]);
+		echo _('Segment title:').' <input type="text" size="20" name="segtitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/> ';
+		echo _('Ends at:').' <input type="text" size="4" name="segend'.$i.'" id="segend' . $i . '" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/> ';
+		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',0);"/> ';
+		echo _('Question ') . (Sanitize::onlyInt($qn[$i]) + 1) . ': ' . Sanitize::encodeStringForDisplay($qtitle[$qidbynum[$qn[$i]]]);
 		echo '<input type="hidden" name="qn'.$i.'" value="' . Sanitize::encodeStringForDisplay($qn[$i]) . '"/>';
 		echo '<br/>';
-		echo 'Has followup? <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
+		echo _('Has followup?').' <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
 		if ($hasfollowup[$i]) {
 			echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'">';
 		} else {
 			echo ' onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'" style="display:none;">';
 		}
-		echo 'Followup title: <input type="text" size="20" name="followuptitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($followuptitle[$i]) . '"/> ';
-		echo 'Ends at: <input type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="' . Sanitize::encodeStringForDisplay($followupendtime[$i]) . '"/> ';
-		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',1);"/> ';
-		echo 'Show link in navigation? <input type="checkbox" name="showlink'.$i.'" value="1" ';
+		echo _('Followup title:').' <input type="text" size="20" name="followuptitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($followuptitle[$i]) . '"/> ';
+		echo _('Ends at:').' <input type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="' . Sanitize::encodeStringForDisplay($followupendtime[$i]) . '"/> ';
+		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',1);"/> ';
+		echo _('Show link in navigation?').' <input type="checkbox" name="showlink'.$i.'" value="1" ';
 		if ($showlink[$i]) {
 			echo 'checked="checked"';
 		}
@@ -432,17 +426,17 @@ for ($i=0;$i<$n;$i++) {
 		echo '</div>';
 	} else {
 		echo '<div class="vidsegblock">';
-		echo 'Segment title: <input type="text" size="20" name="segtitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/> ';
-		echo 'Ends at: <input type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/> ';
-		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
+		echo _('Segment title:').' <input type="text" size="20" name="segtitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/> ';
+		echo _('Ends at:').' <input type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/> ';
+		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
 	}
 }
 echo '<div class="insblock" id="insat' . $n . '">';
-echo '<a href="#" onclick="addsegat(' . $n . '); return false;">Add video segment break</a></div>';
+echo '<a href="#" onclick="addsegat(' . $n . '); return false;">'._('Add video segment break').'</a></div>';
 
 echo '<div class="vidsegblock">';
-echo 'Remainder of video segment title (if any): <input type="text" size="20" name="finalseg" value="' . Sanitize::encodeStringForDisplay($finalsegtitle) . '"/></div>';
-echo '<p><input type="submit" value="Submit"/></p>';
+echo _('Remainder of video segment title (if any):').' <input type="text" size="20" name="finalseg" value="' . Sanitize::encodeStringForDisplay($finalsegtitle) . '"/></div>';
+echo '<p><button type="submit">'._('Submit').'</button></p>';
 echo '</form>';
 require("../footer.php");
 

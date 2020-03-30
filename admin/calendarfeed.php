@@ -1,7 +1,7 @@
 <?php
 
 require("../init_without_validate.php");
-require("../i18n/i18n.php");
+
 //replace later with some sort of access code
 require("../includes/JWT.php");
 if (!isset($_REQUEST['t'])) {
@@ -43,7 +43,7 @@ if (isset($JWTsess->F) && $a = toalarmformat($JWTsess->F)) {
 if (isset($JWTsess->T) && $a = toalarmformat($JWTsess->C)) {
 	$alarms['C'] = $a;
 }
-	
+
 require("../includes/calendardata.php");
 
 list($coursename,$calevents) = getCalendarEventData($cid, $userid);
@@ -78,7 +78,7 @@ $EOL = "\r\n";
 function calencode($v) {
 	$v = html_entity_decode($v);
 	return preg_replace('/([\,;])/','\\\$1', $v);
-	
+
 }
 
 echo 'BEGIN:VCALENDAR'.$EOL;

@@ -264,27 +264,27 @@ if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	$c = getactivetab();
 	$a[$c] = 'class="activetab"';
 
-	echo "<li><a {$a['course']} href=\"$imasroot/course/course.php?cid=$cid\">Course</a></li> ";
+	echo "<li><a {$a['course']} href=\"$imasroot/course/course.php?cid=$cid\">",_('Course'),"</a></li> ";
 	if ($coursemsgset<4) { //messages
-		echo "<li><a {$a['msg']} href=\"$imasroot/msgs/msglist.php?cid=$cid\">Messages</a></li> ";
+		echo "<li><a {$a['msg']} href=\"$imasroot/msgs/msglist.php?cid=$cid\">",_('Messages'),"</a></li> ";
 	}
 
 	if (($coursetoolset&2)==0) { //forums
-		echo "<li><a {$a['forum']} href=\"$imasroot/forums/forums.php?cid=$cid\">Forums</a></li>";
+		echo "<li><a {$a['forum']} href=\"$imasroot/forums/forums.php?cid=$cid\">",_('Forums'),"</a></li>";
 	}
 
 	if (isset($teacherid)) { //Roster
-		echo "<li><a {$a['roster']} href=\"$imasroot/course/listusers.php?cid=$cid\">Roster</a></li>\n";
+		echo "<li><a {$a['roster']} href=\"$imasroot/course/listusers.php?cid=$cid\">",_('Roster'),"</a></li>\n";
 	}
 
 	if (($coursetoolset&1)==0) { //Calendar
-		echo "<li><a {$a['cal']} href=\"$imasroot/course/showcalendar.php?cid=$cid\">Calendar</a></li>\n";
+		echo "<li><a {$a['cal']} href=\"$imasroot/course/showcalendar.php?cid=$cid\">",_('Calendar'),"</a></li>\n";
 	}
 
-	echo "<li><a {$a['gb']} href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li>"; //Gradebook
+	echo "<li><a {$a['gb']} href=\"$imasroot/course/gradebook.php?cid=$cid\">",_('Gradebook'),"</a></li>"; //Gradebook
 
 	if (!isset($haslogout)) { //Log out
-		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
+		echo "<li><a href=\"$imasroot/actions.php?action=logout\">",_('Log Out'),"</a></li>";
 	}
 	echo '</ul>';
 

@@ -605,18 +605,18 @@ function copysub($items,$parent,&$addtoarr) {
 $cid = Sanitize::courseId($_GET['cid']);
 $overwriteBody = 0;
 $body = "";
-$pagetitle = $installname . " Import Course Items";
-$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Import Course Items</div>\n";
+$pagetitle = $installname . " "._("Import Course Items");
+$curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Import Course Items")."</div>\n";
 
 //data manipulation here
 
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";
+	$body = _("You need to log in as a teacher to access this page");
 } elseif (!(isset($_GET['cid']))) {
  	$overwriteBody = 1;
-	$body = "You need to access this page from a menu link";
+	$body = _("You need to access this page from a menu link");
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
 
@@ -652,16 +652,16 @@ if (!(isset($teacherid))) {
 		$DBH->commit();
 		$rqp = Sanitize::randomQueryStringParam();
 		if (count($missingfiles)>0) {
-			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
+			echo _("These files pointed to by inline text items were not found and will need to be reuploaded:")."<br/>";
 			foreach ($missingfiles as $file) {
 				echo "$file <br/>";
 			}
 
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\" >Done</a></p>";
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\" >"._("Done")."</a></p>";
 		} else if ($myrights==100) {
 			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
 
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\" >Done</a></p>";
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\" >"._("Done")."</a></p>";
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=$rqp");
 		}
@@ -679,9 +679,12 @@ if (!(isset($teacherid))) {
 		if ($filekey = storeimportfile('userfile')) {
 			$page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
 		} else {
-			echo "<p>Error uploading file!</p>\n";
+			echo "<p>"._("Error uploading file!")."</p>\n";
 			echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
 			exit;
+		}
+		if (!isset($desc)) {
+			$page_fileErrorMsg .=  _("This does not appear to be a course items file.  It may be a question or library export.")."\n";
 		}
 
 
@@ -734,19 +737,18 @@ function chkgrp(frm, arr, mark) {
 </script>
 
 <?php echo $curBreadcrumb; ?>
-	<div id="headerimportitems" class="pagetitle"><h1>Import Course Items</h1></div>
+	<div id="headerimportitems" class="pagetitle"><h1><?php echo _('Import Course Items'); ?></h1></div>
 	<form id="qform" enctype="multipart/form-data" method=post action="importitems.php?cid=<?php echo $cid ?>">
 
 <?php
 	if ($_FILES['userfile']['name']=='') {
 ?>
-		<p>This page will allow you to import course items previously exported from
-		this site or another site running this software.</p>
+		<p><?php echo _('This page will allow you to import course items previously exported from	this site or another site running this software.'); ?></p>
 
 		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
-		<span class=form>Import file: </span>
+		<span class=form><?php echo _('Import file:'); ?> </span>
 		<span class=formright><input name="userfile" type="file" /></span><br class=form>
-		<div class=submit><input type=submit value="Submit"></div>
+		<div class=submit><button type=submit ><?php echo _("Submit"); ?></button></div>
 
 <?php
 	} else {
@@ -756,37 +758,36 @@ function chkgrp(frm, arr, mark) {
 		} else {
 			echo $page_fileHiddenInput;
 ?>
-		<h2>Package Description</h2>
+		<h2><?php echo _('Package Description'); ?></h2>
 		<?php echo Sanitize::encodeStringForDisplay($desc); ?>
 
 
-		<p>Some questions (possibly older or different versions) may already exist on the system.
-		With these questions, do you want to:<br/>
-			<input type=radio name=merge value="1" CHECKED>Update existing questions (if allowed),
-			<input type=radio name=merge value="-1">Keep existing questions
+		<p><?php echo _('Some questions (possibly older or different versions) may already exist on the system.	With these questions, do you want to:'); ?><br/>
+			<input type=radio name=merge value="1" CHECKED><?php echo _('Update existing questions (if allowed),'); ?>
+			<input type=radio name=merge value="-1"><?php echo _('Keep existing questions'); ?>
 			<?php if ($myrights==100) {
 				echo '<input type=radio name=merge value="2">Force update';
 			}?>
 		</p>
 		<p>
-			For Added Questions, Set Question Use Rights to
+			<?php echo _('For Added Questions, Set Question Use Rights to'); ?>
 			<select name=userights>
-				<option value="0">Private</option>
-				<option value="2" SELECTED>Allow use, use as template, no modifications</option>
-				<option value="3">Allow use by all and modifications by group</option>
-				<option value="4">Allow use and modifications by all</option>
+				<option value="0"><?php echo _('Private'); ?></option>
+				<option value="2" SELECTED><?php echo _('Allow use, use as template, no modifications'); ?></option>
+				<option value="3"><?php echo _('Allow use by all and modifications by group'); ?></option>
+				<option value="4"><?php echo _('Allow use and modifications by all'); ?></option>
 			</select>
-			<br/><input type="checkbox" name="reuseqrights" checked /> Use rights in import, if available.
+			<br/><input type="checkbox" name="reuseqrights" checked /> <?php echo _('Use rights in import, if available.'); ?>
 
 		</p>
 		<p>
 
-		Assign Added Questions to library:
+		<?php echo _('Assign Added Questions to library:'); ?>
 		<span id="libnames">Unassigned</span>
 		<input type=hidden name="libs" id="libs"  value="0">
-		<input type=button value="Select Libraries" onClick="libselect()"><br>
+		<button type=button onClick="libselect()"><?php echo _("Select Libraries"); ?><br>
 
-		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+		<?php echo _('Check:'); ?> <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a>
 
 
 <?php
@@ -794,7 +795,7 @@ function chkgrp(frm, arr, mark) {
 ?>
 		<table cellpadding=5 class=gb>
 		<thead>
-			<tr><th></th><th>Type</th><th>Title</th></tr>
+			<tr><th></th><th><?php echo _('Type'); ?></th><th><?php echo _('Title'); ?></th></tr>
 		</thead>
 		<tbody>
 <?php
@@ -822,7 +823,7 @@ function chkgrp(frm, arr, mark) {
 ?>
 		</tbody>
 		</table>
-		<p><input type=submit name="process" value="Import Items"></p>
+		<p><button type=submit name="process" ><?php echo _("Import Items"); ?></p>
 <?php
 			}
 		}

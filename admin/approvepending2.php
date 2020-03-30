@@ -95,7 +95,7 @@ if (!empty($newStatus)) {
 			$message = getApproveMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
 		} else {
 			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
-			$message .= '<p>Welcome to '.$installname.'.  Your account has been activated, and you\'re all set to log in as an instructor using the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b> and the password you provided.</p>';
+			$message .= '<p>'.sprintf(_('Welcome to %s.  Your account has been activated, and you\'re all set to log in as an instructor using the username %s and the password you provided.'),$installname,'<b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>').'</p>';
 		}
 
 		//call hook, if defined

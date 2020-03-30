@@ -4,7 +4,7 @@
 $init_skip_csrfp = true;
 require("./init_without_validate.php");
 unset($init_skip_csrfp);
-require("i18n/i18n.php");
+
 header('P3P: CP="ALL CUR ADM OUR"');
 $public = '?public=true';
 $publica = '&public=true';
