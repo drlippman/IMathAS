@@ -1209,6 +1209,9 @@ function generateTable() {
 					html += "<li><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></li>"; //add link
 					html += "<li><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></li>"; //add link and checkbox
 				}
+				if (j==0) {
+					html += '<li><a href="#" onclick="addtextsegment('+i+'); return false;">'+_('Add Text Before')+'</a></li>';
+				}
 				html += '</ul></div>';
 				/*
 				html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change</a></td>"; //settings
@@ -1261,9 +1264,13 @@ function generateTable() {
 	return html;
 }
 
-function addtextsegment() {
+function addtextsegment(n) {
 	if (confirm_textseg_dirty()) {
-		itemarray.push(["text","",1,0,"",1]);
+		if (typeof n === 'number') {
+			itemarray.splice(n,0,["text","",1,0,"",1]);
+		} else {
+			itemarray.push(["text","",1,0,"",1]);
+		}
 		refreshTable();
 	}
 }
