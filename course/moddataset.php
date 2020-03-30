@@ -991,7 +991,7 @@
 
 	}
 	if (isset($_GET['qid'])) {
-		echo "<p>".sprintf(_("%sTemplate this question%s for use in this assessment.  ","<a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">","</a>"));
+		echo "<p>".sprintf(_("%sTemplate this question%s for use in this assessment.  "),"<a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">","</a>");
 		echo _("This will let you modify the question for this assessment only without affecting the library version being used in other assessments.")."</p>";
 	}
 	if (!$myq) {
