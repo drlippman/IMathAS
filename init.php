@@ -15,7 +15,7 @@ if (!file_exists(__DIR__ . "/config.php")) {
 }
 
 require_once(__DIR__ . "/config.php");
-// TESTING:
+
 require_once(__DIR__ . "/i18n/i18n.php");
 
 //Look to see if a hook file is defined, and include if it is
@@ -49,7 +49,7 @@ function disallowsSameSiteNone () {
 }
 }
 if (isset($sessionpath)) { session_save_path($sessionpath);}
-ini_set('session.gc_maxlifetime',86400);
+ini_set('session.gc_maxlifetime',432000);
 ini_set('auto_detect_line_endings',true);
 $hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
 if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
@@ -89,7 +89,7 @@ if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init
 		require_once(__DIR__ . "/csrfp/simplecsrfp.php");
 		csrfProtector::init();
 	}
-} else {
+} else if (empty($init_skip_session_start)) {
 	session_start();
 }
 /*

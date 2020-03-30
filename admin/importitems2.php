@@ -37,8 +37,9 @@ if (!(isset($teacherid))) {
 } else if (isset($_POST['process'])) {
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION - do import
 
-	$uploaddir = __DIR__.'/import/';
-	$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_POST['filename']);
+  $filekey = Sanitize::simplestring($_POST['filekey']);
+  $uploadfile = getimportfilepath($filekey);
+
 	$data = json_decode(file_get_contents($uploadfile), true);
   if (!isset($data['course']['UIver'])) {
     $data['course']['UIver'] = 1;
@@ -85,19 +86,18 @@ if (!(isset($teacherid))) {
 		$body .= Sanitize::encodeStringForDisplay($k.': '.$v).'<br/>';
 	}
 	$body .= '</p><p><a href="../course/course.php?cid='.$cid.'">Done</a><p>';
-
+  deleteimport($filekey);
 } elseif ($_FILES['userfile']['name']!='') {
 	//STEP 2 DATA MANIPULATION - parse input file
 	$page_fileErrorMsg = "";
-	$uploaddir = __DIR__.'/import/';
-	$uploadfile = $uploaddir . Sanitize::sanitizeFilenameAndCheckBlacklist($_FILES['userfile']['name']);
-	if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
-		$page_fileHiddenInput = '<input type=hidden name="filename" value="'.Sanitize::encodeStringForDisplay(basename($uploadfile)).'" />';
-	} else {
+  if ($filekey = storeimportfile('userfile')) {
+    $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
+  } else {
 		echo "<p>"._("Error uploading file!")."</p>\n";
-		echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
-		exit;
-	}
+    echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
+    exit;
+  }
+  $uploadfile = getimportfilepath($filekey);
 	$data = json_decode(file_get_contents($uploadfile), true);
 	if ($data===null || !isset($data['course'])) {
 		$page_fileErrorMsg .=  _("This does not appear to be a course items file.  It may be a question or library export, or an older format course export.")."\n";

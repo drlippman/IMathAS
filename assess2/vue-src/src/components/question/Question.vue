@@ -32,6 +32,26 @@
       v-if = "showHelps"
       :qn = "qn"
     />
+
+    <div v-if="showWork && questionContentLoaded">
+      <button
+        v-if = "getwork !== 2"
+        @click = "showWorkInput = !showWorkInput"
+      >
+        {{ showWorkInput ? $t('work.hide') : $t('work.add') }}
+      </button>
+      <div v-show="getwork === 2 || showWorkInput">
+        {{ $t("question.showwork") }}
+        <showwork-input
+          :id="'sw' + qn"
+          :value = "questionData.work"
+          rows = "3"
+          @input = "updateWork"
+          @blur = "workChanged"
+          @focus = "workFocused"
+        />
+      </div>
+    </div>
     <div v-if="showSubmit" class="submitbtnwrap">
       <button
         type = "button"
@@ -59,19 +79,24 @@ import { store, actions } from '../../basicstore';
 import ScoreResult from '@/components/question/ScoreResult.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import QuestionHelps from '@/components/question/QuestionHelps.vue';
+import ShowworkInput from '@/components/ShowworkInput.vue';
 
 export default {
   name: 'Question',
-  props: ['qn', 'active', 'state', 'seed', 'disabled'],
+  props: ['qn', 'active', 'state', 'seed', 'disabled', 'getwork'],
   components: {
     ScoreResult,
     QuestionHelps,
+    ShowworkInput,
     Icons
   },
   data: function () {
     return {
       timeActivated: null,
-      timeActive: 0
+      timeActive: 0,
+      work: '',
+      lastWorkVal: '',
+      showWorkInput: false
     };
   },
   computed: {
@@ -147,6 +172,10 @@ export default {
         errors = errors.concat(this.questionData.errors);
       }
       return errors;
+    },
+    showWork () {
+      return ((this.getwork === 1 && store.assessInfo.questions[this.qn].showwork & 1) ||
+        (this.getwork === 2 && store.assessInfo.questions[this.qn].showwork & 2));
     }
   },
   methods: {
@@ -254,6 +283,8 @@ export default {
       // add in timeactive from autosave, if exists
       this.timeActive += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
+      // set work
+      this.work = this.questionData.work;
 
       let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
       svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
@@ -297,6 +328,31 @@ export default {
             }
           }
         });
+      if (this.showWork) {
+        actions.setInitValue(thisqn, 'sw' + this.qn, this.questionData.work);
+        this.work = this.questionData.work;
+      }
+    },
+    updateWork (val) {
+      this.work = val;
+    },
+    workChanged () {
+      // changed - cue for autosave
+      if (this.work !== this.lastWorkVal) {
+        store.work[this.qn] = this.work;
+        // autosave value
+        if (this.getwork === 1) {
+          let now = new Date();
+          let timeactive = self.timeActive + (now - self.timeActivated);
+          actions.doAutosave(this.qn, 'sw', timeactive);
+        } else if (this.getwork === 2) {
+          this.$emit('workchanged', this.work);
+        }
+      }
+    },
+    workFocused () {
+      actions.clearAutosaveTimer();
+      this.lastWorkVal = this.work;
     }
   },
   updated () {

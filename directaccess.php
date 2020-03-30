@@ -7,6 +7,7 @@
 	 if (!file_exists("$curdir/config.php")) {
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php?r=" . Sanitize::randomQueryStringParam());
 	 }
+	$init_skip_session_start = true;
  	require_once(__DIR__ . "/init_without_validate.php");
 	require_once(__DIR__ ."/includes/newusercommon.php");
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -107,6 +108,7 @@
 	if ($_POST['ekey']!='') {
 		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
+	$init_skip_session_start = false;
 	require("init.php");
 	$flexwidth = true;
 	if ($verified) { //already have session

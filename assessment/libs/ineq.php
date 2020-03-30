@@ -206,7 +206,7 @@ function ineqbetweenplot($funcs) {
 	}
 
 	$p = showplot($newfuncstr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		$parts = explode('<table', $p);
 		for ($i=0;$i<count($parts)-1;$i++) {
 			$parts[$i] .= ', Shaded '.$shadedir[$i];
@@ -316,7 +316,7 @@ function ineqplot($funcs) {
 		$xmin = $settings[0];
 		$xmax = $settings[1];
 
-		if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		if ($_SESSION['graphdisp']==0) {
 			$dx = 1;
 			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
 			$stopat = ($xmax-$xmin)+1;
@@ -368,7 +368,7 @@ function ineqplot($funcs) {
 		}
 		$commands .= $shades;
 	}
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
@@ -458,7 +458,7 @@ function ineqbetweenplot($funcs) {
 		$xmin = $settings[0];
 		$xmax = $settings[1];
 
-		if ($GLOBALS['sessiondata']['graphdisp']==0) {
+		if ($_SESSION['graphdisp']==0) {
 			$dx = 1;
 			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
 			$stopat = ($xmax-$xmin)+1;
@@ -517,7 +517,7 @@ function ineqbetweenplot($funcs) {
 		}
 	}
 	$commands .= $shades;
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";

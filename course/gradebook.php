@@ -39,20 +39,18 @@ if ($isteacher || $istutor) {
 if ($canviewall) {
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-		$sessiondata[$cid.'gbmode'] = $gbmode;
-		writesessiondata();
+		$_SESSION[$cid.'gbmode'] = $gbmode;
 		if (isset($_GET['setgbmodeonly'])) {
 			echo "DONE";
 			exit;
 		}
-	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $sessiondata[$cid.'gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
-		$sessiondata[$cid.'gbmode'] = $gbmode;
-		writesessiondata();
+		$_SESSION[$cid.'gbmode'] = $gbmode;
 	}
 	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
@@ -64,10 +62,9 @@ if ($canviewall) {
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
-		$sessiondata[$cid.'catfilter'] = $catfilter;
-		writesessiondata();
-	} else if (isset($sessiondata[$cid.'catfilter'])) {
-		$catfilter = $sessiondata[$cid.'catfilter'];
+		$_SESSION[$cid.'catfilter'] = $catfilter;
+	} else if (isset($_SESSION[$cid.'catfilter'])) {
+		$catfilter = $_SESSION[$cid.'catfilter'];
 	} else {
 		$catfilter = -1;
 	}
@@ -76,27 +73,24 @@ if ($canviewall) {
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			$sessiondata[$cid.'secfilter'] = $secfilter;
-			writesessiondata();
-		} else if (isset($sessiondata[$cid.'secfilter'])) {
-			$secfilter = $sessiondata[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
 	}
-	if (isset($_GET['refreshdef']) && isset($sessiondata[$cid.'catcollapse'])) {
-		unset($sessiondata[$cid.'catcollapse']);
-		writesessiondata();
+	if (isset($_GET['refreshdef']) && isset($_SESSION[$cid.'catcollapse'])) {
+		unset($_SESSION[$cid.'catcollapse']);
 	}
-	if (isset($sessiondata[$cid.'catcollapse'])) {
-		$overridecollapse = $sessiondata[$cid.'catcollapse'];
+	if (isset($_SESSION[$cid.'catcollapse'])) {
+		$overridecollapse = $_SESSION[$cid.'catcollapse'];
 	} else {
 		$overridecollapse = array();
 	}
 	if (isset($_GET['catcollapse'])) {
 		$overridecollapse[$_GET['cat']] = $_GET['catcollapse'];
-		$sessiondata[$cid.'catcollapse'] = $overridecollapse;
-		writesessiondata();
+		$_SESSION[$cid.'catcollapse'] = $overridecollapse;
 	}
 
 	//Gbmode : Links NC Dates
@@ -138,8 +132,10 @@ if ($canviewall && !empty($_GET['stu'])) {
 
 if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessGbUrl = "http://localhost:8080/gbviewassess.html";
+	$assessUrl = "http://localhost:8080/";
 } else {
 	$assessGbUrl = "../assess2/gbviewassess.php";
+	$assessUrl = "../assess2/";
 }
 
 //HANDLE ANY POSTS
@@ -578,7 +574,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 function gbstudisp($stu) {
 	global $DBH,$CFG,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	global $includeduedate, $includelastchange,$latepasshrs,$latepasses,$hidelocked,$exceptionfuncs;
-	global $assessGbUrl;
+	global $assessGbUrl, $assessUrl;
 
 	if ($availshow==4) {
 		$availshow=1;
@@ -807,7 +803,7 @@ function gbstudisp($stu) {
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
 				$showlink = true;
 				if ($gbt[0][1][$i][15] > 1) {
-					echo '<a href="../assess2/?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'"';
+					echo '<a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'"';
 				} else {
 					echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
 				}
@@ -863,7 +859,10 @@ function gbstudisp($stu) {
 				if ($now>$gbt[0][1][$i][11]) {
 					$afterduelatepass = true;
 				}
-
+			}
+			if (!$isteacher && !$istutor && $gbt[1][1][$i][16] == 1) {
+				echo ' <span class="small"><a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'#/showwork">[';
+				echo _('Attach Work') .']</a></span>';
 			}
 
 			echo '</td>';
@@ -1083,7 +1082,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ($gbt[1][1][$i][1]==0) { //no feedback
+				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]=='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2
@@ -1212,7 +1211,7 @@ function gbstudisp($stu) {
 							echo Sanitize::onlyFloat($gbt[1][2][$i][2]).'/'.Sanitize::onlyFloat($gbt[1][2][$i][6]).' (';
 						}
 						echo round(100*$gbt[1][2][$i][2]/$gbt[1][2][$i][6],1).'%';
-						
+
 						if ($gbt[0][4][0]==0) {
 							echo ')';
 						} else if ($gbt[0][2][$i][13]==0) { //if not points-based and not averaged percents

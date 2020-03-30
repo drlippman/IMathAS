@@ -47,9 +47,9 @@ if ($myrights<20) {
 
 	if (!isset($_REQUEST['lib'])) {
 
-		if (isset($sessiondata['lastsearchlibs'])) {
-			//$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
-			$inlibs = $sessiondata['lastsearchlibs'];
+		if (isset($_SESSION['lastsearchlibs'])) {
+			//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
+			$inlibs = $_SESSION['lastsearchlibs'];
 		} else {
 			$inlibs = '0';
 		}
@@ -308,7 +308,7 @@ if ($myrights<20) {
 }
 
 /******* begin html output ********/
-$sessiondata['coursetheme'] = $coursetheme;
+$_SESSION['coursetheme'] = $coursetheme;
 if ($showtips==2) {
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
 }

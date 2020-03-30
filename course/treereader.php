@@ -14,15 +14,13 @@ if (isset($teacherid) || isset($tutorid)) {
 } else {
 	$viewall = false;
 }
-if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['folder'.$cid])) {
+if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($_SESSION['folder'.$cid])) {
 	$_GET['folder'] = '0';
-	$sessiondata['folder'.$cid] = '0';
-	writesessiondata();
-} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($sessiondata['folder'.$cid]) || $sessiondata['folder'.$cid]!=$_GET['folder'])) {
-	$sessiondata['folder'.$cid] = $_GET['folder'];
-	writesessiondata();
-} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($sessiondata['folder'.$cid])) {
-	$_GET['folder'] = $sessiondata['folder'.$cid];
+	$_SESSION['folder'.$cid] = '0';
+} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($_SESSION['folder'.$cid]) || $_SESSION['folder'.$cid]!=$_GET['folder'])) {
+	$_SESSION['folder'.$cid] = $_GET['folder'];
+} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($_SESSION['folder'.$cid])) {
+	$_GET['folder'] = $_SESSION['folder'.$cid];
 }
 
 if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the student's record

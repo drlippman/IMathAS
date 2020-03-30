@@ -94,7 +94,7 @@ function linegraph($intvs) {
 			$commands .= ');';
 		}
 	}
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$settings[3]' height='$settings[4]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
@@ -169,7 +169,7 @@ function linegraphbrackets($intvs) {
 			}
 		}
 	}
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+	if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	} else {
 		return "<embed type='image/svg+xml' align='middle' width='$settings[3]' height='$settings[4]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";

@@ -1,7 +1,7 @@
 <?php
 
 require("../init_without_validate.php");
-// require("../i18n/i18n.php");
+
 //replace later with some sort of access code
 require("../includes/JWT.php");
 if (!isset($_REQUEST['t'])) {

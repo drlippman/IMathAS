@@ -11,8 +11,8 @@
 		echo "This page not available to students";
 		exit;
 	}
-	if (isset($sessiondata[$cid.'gbmode'])) {
-		$gbmode =  $sessiondata[$cid.'gbmode'];
+	if (isset($_SESSION[$cid.'gbmode'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -35,10 +35,9 @@
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			$sessiondata[$cid.'secfilter'] = $secfilter;
-			writesessiondata();
-		} else if (isset($sessiondata[$cid.'secfilter'])) {
-			$secfilter = $sessiondata[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}

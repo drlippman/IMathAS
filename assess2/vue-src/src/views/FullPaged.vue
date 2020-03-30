@@ -44,6 +44,7 @@
                 :qn="curqn"
                 :active = "pagenum === page"
                 :key="'q'+curqn"
+                :getwork="1"
               />
             </div>
           </div>
@@ -118,6 +119,7 @@ export default {
   mounted () {
     setTimeout(window.drawPics, 100);
     window.rendermathnode(this.$refs.introtext);
+    window.jQuery(this.$refs.introtext).fitVids();
   }
 };
 </script>

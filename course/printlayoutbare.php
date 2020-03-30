@@ -30,12 +30,12 @@ $nologo = true;
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
-	$sessiondata['mathdisp'] = 0;
+	$_SESSION['mathdisp'] = 0;
 } else {
-	$sessiondata['mathdisp'] = 2;
+	$_SESSION['mathdisp'] = 2;
 }
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='tex') {
-	$sessiondata['texdisp'] = true;
+	$GLOBALS['texdisp'] = true;
 }
 if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
 	$printtwice = 2;
@@ -43,7 +43,8 @@ if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
 	$printtwice = 1;
 }
 
-$sessiondata['graphdisp'] = 2;
+$origgraphdisp = $_SESSION['graphdisp'];
+$_SESSION['graphdisp'] = 2;
 $assessver = 2;
 
 if ($overwriteBody==1) {
@@ -211,7 +212,7 @@ if ($overwriteBody==1) {
 
 	for ($pt=0;$pt<$printtwice;$pt++) {
 		if ($pt==1) {
-			$sessiondata['mathdisp'] = 0;
+			$_SESSION['mathdisp'] = 0;
 			echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';;
 
 		}
@@ -314,7 +315,7 @@ if ($overwriteBody==1) {
 
 
 }
-
+$_SESSION['graphdisp'] = $origgraphdisp;
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {

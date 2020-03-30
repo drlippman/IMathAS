@@ -50,6 +50,7 @@ $vueData = array(
 	'assmpassword' => $line['password'],
 	'revealpw' => false,
 	'showhints' => ($line['showhints']&1) > 0,
+	'showwork' => $line['showwork'],
 	'showextrefs' => ($line['showhints']&2) > 0,
 	'msgtoinstr' => $line['msgtoinstr'] > 0,
 	'doposttoforum' => $line['posttoforum'] > 0,
@@ -69,7 +70,7 @@ $vueData = array(
 	'defoutcome' => $line['defoutcome'],
 	'outcomeOptions' => $outcomeOptions,
 	'isgroup' => $line['isgroup'],
-	'groupmax' => $line['groupmax'],
+	'groupmax' => ($line['groupmax'] > 2) ? $line['groupmax'] : 6,
 	'canchangegroup' => !($taken && $line['isgroup']>0),
 	'groupsetid' => $line['groupsetid'],
 	'groupOptions' => $groupOptions,
@@ -381,6 +382,16 @@ $vueData = array(
 					<option value="0"><?php echo _('No');?></option>
 					<option value="1"><?php echo _('All');?></option>
 					<option value="16"><?php echo _('All but first');?></option>
+				</select>
+			</span><br class=form />
+
+			<label class=form for="showwork"><?php echo _('Provide "Show Work" boxes');?>:</label>
+			<span class=formright>
+				<select name="showwork" id="showwork" v-model="showwork">
+					<option value="0"><?php echo _('No');?></option>
+					<option value="1"><?php echo _('During assessment');?></option>
+					<option value="2"><?php echo _('After assessment');?></option>
+					<option value="3"><?php echo _('During or after assessment');?></option>
 				</select>
 			</span><br class=form />
 
@@ -707,8 +718,8 @@ $vueData = array(
 	      </div>
 	      <div class="pane-body">
 					<p><strong><?php echo _('One question at a time');?></strong>: <?php echo _('Students will see one question at a time, and can jump between them in any order'); ?></p>
-					<p><strong><?php echo _('All questions at once, or in pages');?></strong>: <?php echo _('In this style,	students will typically see all the questions on the screen at once. If desired, you can break the questions into pages on the Add/Remove	Questions page by clicking the +Text button and selecting the New Page option.'); ?></p>
-					<p><strong><?php echo _('Video Cued');?></strong>: <?php echo _('In this style, the questions pop up automatically at specified times while watching a YouTube video. On the Add/Remove Questions page, after adding the questions to the assessment,	click Define Video Cues to specify the video and times to display the	questions.'); ?></p>
+					<p><strong><?php echo _('All questions at once, or in pages');?></strong>: <?php echo _('In this style,	students will typically see all the questions on the screen at once. If desired, you can break the questions into pages on the Add/Remove Questions page by clicking the +Text button and selecting the New Page option.'); ?></p>
+					<p><strong><?php echo _('Video Cued');?></strong>: <?php echo _('In this style, the questions pop up automatically at specified times while watching a YouTube video. On the Add/Remove Questions page, after adding the questions to the assessment, click Define Video Cues to specify the video and times to display the	questions.'); ?></p>
 					<?php if (isset($CFG['GEN']['livepollserver'])) { ?>
 					<strong><?php echo _('LivePoll'); ?></strong>: <?php echo _('This is a clicker-style display, requiring students to be in the assessment at the same time as the teacher. The teacher opens a question for students to answer, and results can be viewed live as they are submitted.'); ?>
 					</p>

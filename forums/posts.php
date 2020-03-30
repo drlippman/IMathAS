@@ -89,7 +89,7 @@ if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
 		$exception = null;
 	}
 	require_once("../includes/exceptionfuncs.php");
-	if (isset($studentid) && !isset($sessiondata['stuview'])) {
+	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
@@ -166,7 +166,7 @@ $pagetitle = "Posts";
 $placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=010619" type="text/css" />';
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/posts.js?v=011517"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
-if ($caneditscore && $sessiondata['useed']!=0) {
+if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 }
@@ -251,7 +251,7 @@ if ($oktoshow) {
 		}
 
 		$subject[$line['id']] = $line['subject'];
-		if ($sessiondata['graphdisp']==0) {
+		if ($_SESSION['graphdisp']==0) {
 			$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
 		}
 		$message[$line['id']] = $line['message'];
@@ -478,7 +478,7 @@ function printchildren($base,$restricttoowner=false) {
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-	global $canviewall, $caneditscore, $canviewscore, $sessiondata, $isstu;
+	global $canviewall, $caneditscore, $canviewscore, $isstu;
 	if (!isset($CFG['CPS']['itemicons'])) {
 		$itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -673,7 +673,7 @@ function printchildren($base,$restricttoowner=false) {
 					echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
 				}
 				echo " Private Feedback: ";
-				if ($sessiondata['useed']==0) {
+				if ($_SESSION['useed']==0) {
 					echo "<textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback$child\" id=\"feedback$child\">";
 					if ($feedback[$child]!==null) {
 						echo Sanitize::encodeStringForDisplay($feedback[$child]);

@@ -79,7 +79,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 
 	  $useragent = $_SERVER['HTTP_USER_AGENT'];
 	  $oldschool = false;
-	  if (isset($GLOBALS['sessiondata']['useflash'])) {
+	  if (isset($_SESSION['useflash'])) {
 		$oldschool = true;
 	  } else if (preg_match('/MSIE\s*(\d+)/i',$useragent,$matches)) {
 		if ($matches[1]<9) {
@@ -87,7 +87,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		}
 	  }
 
-	  if ($oldschool || isset($GLOBALS['sessiondata']['useflash'])) {
+	  if ($oldschool || isset($_SESSION['useflash'])) {
 	  	$r = uniqid();
 		  $GLOBALS['3dplotcnt'] = $r;
 		  $html .= "<div id=\"plot3d$r\">";
@@ -168,7 +168,7 @@ function spacecurve($func,$tmin,$tmax) {
 
 	$useragent = $_SERVER['HTTP_USER_AGENT'];
 	$oldschool = false;
-	if (isset($GLOBALS['sessiondata']['useflash'])) {
+	if (isset($_SESSION['useflash'])) {
 		$oldschool = true;
 	} else if (preg_match('/MSIE\s*(\d+)/i',$useragent,$matches)) {
 		if ($matches[1]<9) {

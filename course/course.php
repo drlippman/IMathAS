@@ -34,13 +34,13 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 
-	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas']) && $sessiondata['courseid']==$cid) {
+	if (isset($teacherid) && isset($_SESSION['sessiontestid']) && !isset($_SESSION['actas']) && $_SESSION['courseid']==$cid) {
 		//clean up coming out of an assessment
 		require_once("../includes/filehandler.php");
-		//deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
-		deleteasidfilesbyquery2('id',$sessiondata['sessiontestid'],null,1);
+		//deleteasidfilesbyquery(array('id'=>$_SESSION['sessiontestid']),1);
+		deleteasidfilesbyquery2('id',$_SESSION['sessiontestid'],null,1);
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE id=:id LIMIT 1");
-		$stm->execute(array(':id'=>$sessiondata['sessiontestid']));
+		$stm->execute(array(':id'=>$_SESSION['sessiontestid']));
 	}
 	//TODO-assessver: figure out how to delete instructor attempts for new version
 
@@ -138,31 +138,28 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$tutorid = $instrPreviewId;
 	}
 
-	if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['folder'.$cid])) {
+	if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($_SESSION['folder'.$cid])) {
 		$_GET['folder'] = '0';
-		$sessiondata['folder'.$cid] = '0';
-		writesessiondata();
-	} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($sessiondata['folder'.$cid]) || $sessiondata['folder'.$cid]!=$_GET['folder'])) {
-		$sessiondata['folder'.$cid] = $_GET['folder'];
-		writesessiondata();
-	} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($sessiondata['folder'.$cid])) {
-		$_GET['folder'] = $sessiondata['folder'.$cid];
+		$_SESSION['folder'.$cid] = '0';
+	} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($_SESSION['folder'.$cid]) || $_SESSION['folder'.$cid]!=$_GET['folder'])) {
+		$_SESSION['folder'.$cid] = $_GET['folder'];
+	} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($_SESSION['folder'.$cid])) {
+		$_GET['folder'] = $_SESSION['folder'.$cid];
 	}
-	if (!isset($_GET['quickview']) && !isset($sessiondata['quickview'.$cid])) {
+	if (!isset($_GET['quickview']) && !isset($_SESSION['quickview'.$cid])) {
 		$quickview = false;
 	} else if (isset($_GET['quickview'])) {
 		$quickview = $_GET['quickview'];
-		$sessiondata['quickview'.$cid] = $quickview;
-		writesessiondata();
-	} else if (isset($sessiondata['quickview'.$cid])) {
-		$quickview = $sessiondata['quickview'.$cid];
+		$_SESSION['quickview'.$cid] = $quickview;
+	} else if (isset($_SESSION['quickview'.$cid])) {
+		$quickview = $_SESSION['quickview'.$cid];
 	}
 	if ($quickview=="on") {
 		$_GET['folder'] = '0';
 		//$useleftnav = false;
 	}
-	if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) { //folder view
-		if ($sessiondata['lti_keytype']!='cc-of') {
+	if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) { //folder view
+		if ($_SESSION['lti_keytype']!='cc-of') {
 			$useleftnav = false;
 		}
 		$nocoursenav = true;
@@ -225,10 +222,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 
 	$curBreadcrumb = $breadcrumbbase;
 	if (isset($backtrack) && count($backtrack)>0) {
-		if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+		if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 			array_unshift($backtrack, array($coursename, '0'));
 			$sendcrumb = '';
-			$depth = substr_count($sessiondata['ltiitemid'][1],'-');
+			$depth = substr_count($_SESSION['ltiitemid'][1],'-');
 			for ($i=$depth;$i<count($backtrack);$i++) {
 				if ($i>$depth) {
 					$curBreadcrumb .= " &gt; ";
@@ -372,7 +369,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 }
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=061019\"></script>";
-if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
+if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
 
@@ -445,7 +442,7 @@ if ($overwriteBody==1) {
 		if (isset($instrPreviewId)) {
 			echo '<span class="noticetext">', _('Instructor Preview'), '</span> ';
 		}
-		if (isset($sessiondata['ltiitemtype'])) {
+		if (isset($_SESSION['ltiitemtype'])) {
 			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
 			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
 			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
@@ -599,7 +596,7 @@ if ($overwriteBody==1) {
 			echo '</p>';
 		}
 
-		if (!isset($sessiondata['ltiitemtype'])) { //don't show in LTI embed
+		if (!isset($_SESSION['ltiitemtype'])) { //don't show in LTI embed
 	?>
 			<p>
 			<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>

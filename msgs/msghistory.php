@@ -84,7 +84,7 @@
 		}
 
 		$subject[$line['id']] = $line['title'];
-		if ($sessiondata['graphdisp']==0) {
+		if ($_SESSION['graphdisp']==0) {
 			$line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
 		}
 		if (($p = strpos($line['message'],'<hr'))!==false) {
@@ -127,7 +127,7 @@
 
 
 	echo "<div class=breadcrumb>$breadcrumbbase ";
-	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
+	if ($cid>0 && (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0)) {
 		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	}
 	if ($type=='sent') {

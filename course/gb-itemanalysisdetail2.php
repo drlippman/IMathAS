@@ -32,10 +32,9 @@ if (isset($tutorsection) && $tutorsection!='') {
 } else {
 	if (isset($_GET['secfilter'])) {
 		$secfilter = $_GET['secfilter'];
-		$sessiondata[$cid.'secfilter'] = $secfilter;
-		writesessiondata();
-	} else if (isset($sessiondata[$cid.'secfilter'])) {
-		$secfilter = $sessiondata[$cid.'secfilter'];
+		$_SESSION[$cid.'secfilter'] = $secfilter;
+	} else if (isset($_SESSION[$cid.'secfilter'])) {
+		$secfilter = $_SESSION[$cid.'secfilter'];
 	} else {
 		$secfilter = -1;
 	}

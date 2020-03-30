@@ -116,7 +116,7 @@ class MathParser
   private $tokens = [];
   private $operatorStack = [];
   private $operandStack = [];
-  private $AST = [];
+  public $AST = [];
   private $regex = '';
   private $funcregex = '';
   private $numvarregex = '';
@@ -214,7 +214,6 @@ class MathParser
       $str
     );
     $str = str_replace(array('\\','[',']'), array('','(',')'), $str);
-    $str = preg_replace('/log_\(([a-zA-Z\/\d\.]+)\)\s*\(/', 'log_$1(', $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
@@ -396,6 +395,9 @@ class MathParser
                   'symbol'=> $sub[1]
                 ];
                 $n += strlen($sub[1]) + 1;
+              } else if ($str[$n+2] == '(') { // handle later
+                $tokens[count($tokens)-1]['symbol'] .= '_';
+                $n += 1;
               }
             } else if ($peek == '^') {
               // found something like sin^2; append power to symbol for now
@@ -484,7 +486,7 @@ class MathParser
     foreach ($this->tokens as $tokenindex => &$token) {
       if ($token['symbol'] == ')') {
         // end of sub expression - handle it
-        $this->handleSubExpression();
+        $this->handleSubExpression($tokenindex);
       } else if ($token['type'] == 'number' || $token['type'] == 'variable') {
         $this->operandStack[] = $token;
       } else if ($token['type'] == 'function') {
@@ -624,7 +626,7 @@ class MathParser
    * until we find a matching open paren
    * @return void
    */
-  private function handleSubExpression() {
+  private function handleSubExpression($tokenindex) {
     $clean = false;
     while ($popped = array_pop($this->operatorStack)) {
       if ($popped['symbol'] == '(') {
@@ -645,7 +647,17 @@ class MathParser
       if ($previous['type'] == 'function') {
         $node = array_pop($this->operatorStack); //this is the function node
         $operand = array_pop($this->operandStack);
-        $node['input'] = $operand;  // assign argument to function
+        if ($node['symbol'] == 'log_') {
+          $node['symbol'] = 'log';
+          $node['index'] = $operand;
+          $this->operatorStack[] = $node;
+          if ($this->tokens[$tokenindex+1]['symbol'] == '*') {
+            unset($this->tokens[$tokenindex+1]); // remove implicit mult
+          };
+          return;
+        } else {
+          $node['input'] = $operand;  // assign argument to function
+        }
         if (strpos($node['symbol'], '^') !== false) { // if it's sin^2, transform now
           list($subSymbol, $power) = explode('^', $node['symbol']);
           if ($power === '-1' && function_exists('a'.$subSymbol)) {

@@ -396,7 +396,7 @@ if (isset($CFG['GEN']['hometitle'])) {
 }
 echo '</h1>';
 echo '</div>';
-if (isset($sessiondata['emulateuseroriginaluser'])) {
+if (isset($_SESSION['emulateuseroriginaluser'])) {
 	echo '<p>Currenting emulating this user.  <a href="util/utils.php?unemulateuser=true">Stop emulating user</a></p>';
 }
 if ($myrights==100 && count($brokencnt)>0) {
@@ -423,7 +423,7 @@ if ($myrights==100 || ($myspecialrights&64)!=0) {
 		echo '. <a href="admin/approvepending2.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
 	}
 }
-if (isset($tzname) && isset($sessiondata['logintzname']) && $tzname!=$sessiondata['logintzname']) {
+if (isset($tzname) && isset($_SESSION['logintzname']) && $tzname!=$_SESSION['logintzname']) {
 	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';
 }
 if (substr($myemail,0,7)==='BOUNCED') {

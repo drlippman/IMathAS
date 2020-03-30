@@ -9,7 +9,7 @@ if ($courseUIver>1) {
 	$addassess = 'addassessment.php';
 }
 
-if (isset ( $studentid ) && ! isset ( $sessiondata ['stuview'] )) {
+if (isset ( $studentid ) && ! isset ( $_SESSION ['stuview'] )) {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, true, $studentinfo ['latepasses'], $latepasshrs );
 } else {
 	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, false );
@@ -199,7 +199,7 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
-	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights,$courseenddate;
+	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
 	   global $itemshowdata, $exceptionfuncs;
 
@@ -697,7 +697,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   $line['summary'] = '';
 				   }
 			   }
-			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
+			   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 			   	   $rec = "data-base=\"assesssum-$typeid\" ";
 			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
 			   }
@@ -904,7 +904,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					if ($canundolatepass) {
 						 echo " | <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
 					}
-				   } else if ($line['allowlate']>0 && isset($sessiondata['stuview'])) {
+				   } else if ($line['allowlate']>0 && isset($_SESSION['stuview'])) {
 					echo _(' LatePass Allowed');
 				   } else if ($line['allowlate']>0 && $canundolatepass) {
 				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
@@ -945,7 +945,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					}
 				   	echo '</span>';
 
-				   } else if (isset($sessiondata['stuview']) && $line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600) {
+				   } else if (isset($_SESSION['stuview']) && $line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600) {
 					echo _(' LatePass Allowed');
 				   }
 					 if ($line['ver']>1) {
@@ -1126,7 +1126,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   $line['text'] = '';
 				   }
 			   }
-			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
+			   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 			   	   $rec = "data-base=\"inlinetext-$typeid\" ";
 			   	   $line['text'] = str_replace('<a ','<a '.$rec, $line['text']);
 			   }
@@ -1356,7 +1356,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   $line['summary'] = '';
 				   }
 			   }
-			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
+			   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 			   	   $rec = "data-base=\"linkedsum-$typeid\" ";
 			   	   $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
 			   }
@@ -1417,7 +1417,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   $icon = 'html';
 			   }
-			   if (isset($studentid) && !isset($sessiondata['stuview'])) {
+			   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 			   	   $rec = "data-base=\"linkedlink-$typeid\"";
 			   } else {
 			   	   $rec = '';
@@ -1547,7 +1547,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					   echo '</span>';
 				   } else
 				   if ($duedates!='') {echo "<br/>$duedates";}
-				   if ($line['allowlate']>0 && isset($sessiondata['stuview'])) {
+				   if ($line['allowlate']>0 && isset($_SESSION['stuview'])) {
 					echo _(' LatePass Allowed');
 				   } else if (!$canedit) {
 				   	if ($canuselatepassP || $canuselatepassR) {
@@ -1743,7 +1743,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   if ($ispublic) {
 				   	   echo "<b><a href=\"../wikis/viewwikipublic.php?cid=$cid&id={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b>\n";
 				   } else {
-				   	   if (isset($studentid) && !isset($sessiondata['stuview'])) {
+				   	   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 						   $rec = "data-base=\"wiki-$typeid\"";
 					   } else {
 						   $rec = '';
@@ -1974,7 +1974,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$hideicons,$exceptions,$latepasses,$CFG;
 	   global $itemtypes, $iteminfo, $addassess;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {
