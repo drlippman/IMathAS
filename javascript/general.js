@@ -759,6 +759,60 @@ function setupvideoembeds(i,el) {
 	videoembedcounter++;
 }
 
+var fileembedcounter = 0;
+function setuppreviewembeds(i,el) {
+	if (el.href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/)) {
+		jQuery('<span/>', {
+			text: " [+]",
+			role: "button",
+			title: _("Preview file"),
+			"aria-label": _("Preview file"),
+			id: 'fileembedbtn'+fileembedcounter,
+			click: togglefileembed,
+			keydown: function (e) {if (e.which == 13) { $(this).click();}},
+			tabindex: 0,
+			"class": "videoembedbtn"
+		}).insertAfter(el);
+		jQuery(el).addClass("prepped");
+		fileembedcounter++;
+	}
+}
+
+function togglefileembed() {
+	var id = this.id.substr(12);
+	var els = jQuery('#fileiframe'+id);
+	if (els.length>0) {
+		if (els.css('display')=='none') {
+			els.show();
+			jQuery(this).text(' [-]');
+			jQuery(this).attr('title',_("Hide preview"));
+			jQuery(this).attr('aria-label',_("Hide file preview"));
+		} else {
+			els.hide();
+			jQuery(this).text(' [+]');
+			jQuery(this).attr('title',_("Preview file"));
+			jQuery(this).attr('aria-label',_("Preview file"));
+		}
+	} else {
+		var href = jQuery(this).prev().attr('href');
+		jQuery('<iframe/>', {
+			id: 'fileiframe'+id,
+			width: "80%",
+			height: 600,
+			src: 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(href),
+			frameborder: 0,
+			allowfullscreen: 1
+		}).insertAfter(jQuery(this));
+		jQuery('<br/>').insertAfter(jQuery(this));
+		jQuery(this).text(' [-]');
+		jQuery(this).attr('title',_("Hide preview"));
+		if (jQuery(this).prev().attr("data-base")) {
+			var inf = jQuery(this).prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
+		}
+	}
+}
+
 function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
@@ -905,6 +959,7 @@ function initlinkmarkup(base) {
 	$(base).find('a').each(setuptracklinks).each(addNoopener);
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	$(base).fitVids();
 }
 

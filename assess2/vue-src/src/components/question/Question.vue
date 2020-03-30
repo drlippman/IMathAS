@@ -27,6 +27,7 @@
       v-html="questionData.html"
       class = "question"
       :id="'questionwrap' + qn"
+      ref = "thisqwrap"
     />
     <question-helps
       v-if = "showHelps"
@@ -276,8 +277,9 @@ export default {
         return;
       }
       setTimeout(window.drawPics, 100);
-      window.rendermathnode(document.getElementById('questionwrap' + this.qn));
-      window.initSageCell(document.getElementById('questionwrap' + this.qn));
+      window.rendermathnode(this.$refs.thisqwrap);
+      window.initSageCell(this.$refs.thisqwrap);
+      window.initlinkmarkup(this.$refs.thisqwrap);
       this.updateTime(true);
       this.setInitValues();
       // add in timeactive from autosave, if exists
@@ -292,10 +294,10 @@ export default {
       svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
       let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
       svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
-      window.$('#questionwrap' + this.qn).find('.scoremarker').remove();
-      window.$('#questionwrap' + this.qn).find('div.ansgrn,table.ansgrn').append(svgchk);
-      window.$('#questionwrap' + this.qn).find('div.ansyel,table.ansyel').append(svgychk);
-      window.$('#questionwrap' + this.qn).find('div.ansred,table.ansred').append(svgx);
+      window.$(this.$refs.thisqwrap).find('.scoremarker').remove();
+      window.$(this.$refs.thisqwrap).find('div.ansgrn,table.ansgrn').append(svgchk);
+      window.$(this.$refs.thisqwrap).find('div.ansyel,table.ansyel').append(svgychk);
+      window.$(this.$refs.thisqwrap).find('div.ansred,table.ansred').append(svgx);
 
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
@@ -307,9 +309,9 @@ export default {
 
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
 
-      window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
-      window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
-      window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
+      window.$(this.$refs.thisqwrap).find('select.ansgrn').after(svgchk);
+      window.$(this.$refs.thisqwrap).find('select.ansyel').after(svgychk);
+      window.$(this.$refs.thisqwrap).find('select.ansred').after(svgx);
 
       actions.setRendered(this.qn);
     },

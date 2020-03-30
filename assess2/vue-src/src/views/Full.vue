@@ -86,7 +86,7 @@ export default {
     setTimeout(window.drawPics, 100);
     if (this.intro !== '') {
       window.rendermathnode(this.$refs.introtext);
-      window.jQuery(this.$refs.introtext).fitVids();
+      window.initlinkmarkup(this.$refs.introtext);
     }
   }
 };

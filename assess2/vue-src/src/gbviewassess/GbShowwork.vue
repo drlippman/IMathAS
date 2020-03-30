@@ -35,6 +35,7 @@ export default {
       }
       setTimeout(window.drawPics, 100);
       window.rendermathnode(this.$refs.workbox);
+      window.initlinkmarkup(this.$refs.workbox);
       this.rendered = true;
     }
   },
