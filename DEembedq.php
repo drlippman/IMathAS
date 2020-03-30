@@ -3,7 +3,7 @@
 //(c) 2010 David Lippman
 
 require("./init_without_validate.php");
-require("i18n/i18n.php");
+
 require("includes/DEutil.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 

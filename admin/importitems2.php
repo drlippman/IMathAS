@@ -81,7 +81,7 @@ if (!(isset($teacherid))) {
 	$res = $importer->importdata($data, $cid, $_POST['checked'], $options);
 
 	$overwriteBody = 1;
-	$body = '<h1>Import Results</h1><p>';
+	$body = '<h1>'._('Import Results').'</h1><p>';
 	foreach ($res as $k=>$v) {
 		$body .= Sanitize::encodeStringForDisplay($k.': '.$v).'<br/>';
 	}
@@ -93,15 +93,14 @@ if (!(isset($teacherid))) {
   if ($filekey = storeimportfile('userfile')) {
     $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
   } else {
-    echo "<p>Error uploading file!</p>\n";
+		echo "<p>"._("Error uploading file!")."</p>\n";
     echo Sanitize::encodeStringForDisplay($_FILES["userfile"]['error']);
     exit;
   }
   $uploadfile = getimportfilepath($filekey);
 	$data = json_decode(file_get_contents($uploadfile), true);
 	if ($data===null || !isset($data['course'])) {
-		$page_fileErrorMsg .=  "This does not appear to be a course items file.  It may be ";
-		$page_fileErrorMsg .=  "a question or library export, or an older format course export.\n";
+		$page_fileErrorMsg .=  _("This does not appear to be a course items file.  It may be a question or library export, or an older format course export.")."\n";
 	} else {
 		$ids = array();
 		$types = array();
@@ -170,13 +169,12 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 		echo '<p class="noticetext">'.$page_fileErrorMsg.'</p>';;
 	}
 ?>
-	<p>This page will allow you to import course items previously exported from
-	this site or another site running this software.</p>
+	<p><?php echo _('This page will allow you to import course items previously exported from	this site or another site running this software.'); ?></p>
 
 	<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
-	<span class=form>Import file: </span>
+	<span class=form><?php echo _('Import file:'); ?> </span>
 	<span class=formright><input name="userfile" type="file" /></span><br class=form>
-	<div class=submit><input type=submit value="Submit"></div>
+	<div class=submit><button type=submit><?php echo _('Submit'); ?></button></div>
 
 <?php
 } else {
@@ -192,41 +190,40 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
   }
 
 	if ($myrights==100) {
-		echo '<p><input type="checkbox" name="importasteacher" id="importasteacher" checked /> Import as course owner (for ownership when updating or adding questions).</p>';
+		echo '<p><input type="checkbox" name="importasteacher" id="importasteacher" checked /> '._('Import as course owner (for ownership when updating or adding questions).').'</p>';
 	}
 ?>
 
-	<p>Some questions (possibly older or different versions) may already exist on the system.
-	With these questions, do you want to:<br/>
-		<label><input type=radio name=merge value="1" CHECKED>Update existing questions (if allowed)</label>
-		<label><input type=radio name=merge value="-1">Keep existing questions</label>
+	<p><?php echo _('Some questions (possibly older or different versions) may already exist on the system.	With these questions, do you want to:'); ?><br/>
+		<label><input type=radio name=merge value="1" CHECKED><?php echo _('Update existing questions (if allowed)'); ?></label>
+		<label><input type=radio name=merge value="-1"><?php echo _('Keep existing questions'); ?></label>
 		<?php if ($myrights==100) {
-			echo '<span style="display:none" id="allowforceupdate"><label><input type=radio name=merge value="2">Force update</label></span>';
+			echo '<span style="display:none" id="allowforceupdate"><label><input type=radio name=merge value="2">'._('Force update').'</label></span>';
 		}?>
 	</p>
 	<p>
-		For Added Questions, Set Question Use Rights to
+		<?php echo _('For Added Questions, Set Question Use Rights to'); ?>
 		<select name=userights>
-			<option value="0">Private</option>
-			<option value="2" SELECTED>Allow use, use as template, no modifications</option>
-			<option value="3">Allow use by all and modifications by group</option>
-			<option value="4">Allow use and modifications by all</option>
+			<option value="0"><?php echo _('Private'); ?></option>
+			<option value="2" SELECTED><?php echo _('Allow use, use as template, no modifications'); ?></option>
+			<option value="3"><?php echo _('Allow use by all and modifications by group'); ?></option>
+			<option value="4"><?php echo _('Allow use and modifications by all'); ?></option>
 		</select>
-		<br/><input type="checkbox" name="reuseqrights" checked /> Use rights in import, if available.
+		<br/><input type="checkbox" name="reuseqrights" checked /> <?php echo _('Use rights in import, if available.'); ?>
 	</p>
 	<p>
-	Assign Added Questions to library:
+	<?php echo _('Assign Added Questions to library:'); ?>
 	<span id="libnames">Unassigned</span>
 	<input type=hidden name="libs" id="libs"  value="0">
-	<input type=button value="Select Libraries" onClick="libselect()"><br>
+	<button type="button" onClick="libselect()"><?php echo _('Select Libraries'); ?></button><br>
 
-	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+	<?php echo _('Check:'); ?> <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a>
 <?php
 	if (count($ids)>0) {
 ?>
 		<table cellpadding=5 class=gb>
 		<thead>
-			<tr><th></th><th>Type</th><th>Title</th></tr>
+			<tr><th></th><th><?php echo _('Type'); ?></th><th><?php echo _('Title'); ?></th></tr>
 		</thead>
 		<tbody>
 <?php
@@ -255,31 +252,31 @@ if ($_FILES['userfile']['name']=='' || strlen($page_fileErrorMsg)>1) {
 		</table>
 <?php
 		if ($hascourseopts || $hasgbsetup || $hasoffline || $hascalitems || $hasstickyposts) {
-			echo '<fieldset><legend>Options</legend>';
+			echo '<fieldset><legend>'._('Options').'</legend>';
 			echo '<table><tbody>';
 			if ($hascourseopts) {
-				echo '<tr><td class="r">Import course settings? (will overwrite existing)</td>';
+				echo '<tr><td class="r">'._('Import course settings? (will overwrite existing)').'</td>';
 				echo '<td><input type=checkbox name="importcourseopt"  value="1" checked/></td></tr>';
 			}
 			if ($hasgbsetup) {
-				echo '<tr><td class="r">Import gradebook scheme and categories? (will overwrite existing)</td>';
+				echo '<tr><td class="r">'._('Import gradebook scheme and categories? (will overwrite existing)').'</td>';
 				echo '<td><input type=checkbox name="importgbsetup"  value="1" checked/></td></tr>';
 			}
 			if ($hasoffline) {
-				echo '<tr><td class="r">Import offline grade items?</td>';
+				echo '<tr><td class="r">'._('Import offline grade items?').'</td>';
 				echo '<td><input type=checkbox name="importoffline"  value="1" checked/></td></tr>';
 			}
 			if ($hascalitems) {
-				echo '<tr><td class="r">Import calendar items?</td>';
+				echo '<tr><td class="r">'._('Import calendar items?').'</td>';
 				echo '<td><input type=checkbox name="importcalitems"  value="1" checked/></td></tr>';
 			}
 			if ($hasstickyposts) {
-				echo '<tr><td class="r">Import "display at top" instructor forum posts?</td>';
+				echo '<tr><td class="r">'._('Import "display at top" instructor forum posts?').'</td>';
 				echo '<td><input type=checkbox name="importstickyposts"  value="1" checked/></td></tr>';
 			}
 			echo '</tbody></table></fieldset>';
 		}
-		echo '<p><input type=submit name="process" value="Import Items"></p>';
+		echo '<p><input type=submit name="process" value="'._('Import Items').'"></p>';
 
 	}
 	echo "</form>\n";

@@ -639,9 +639,9 @@ if ($overwriteBody==1) {
    } else {
 	   if (isset($teacherid) && $quickview!='on') {
 	   	   if ($_GET['folder']=='0') {
-			echo '<p><b>Welcome to your course!</b></p>';
-			echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
-			echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
+			echo '<p><b>',_('Welcome to your course'),'!</b></p>';
+			echo '<p>',sprintf(_('To start by copying from another course, use the %s Course Items: Copy %s link along the left side of the screen.'),'<a href="copyitems.php?cid='.$cid.'">','</a>'),'</p>';
+			echo '<p>',_('If you want to build from scratch, use the "Add An Item" pulldown below to get started.'),'</p><p>&nbsp;</p>';
 	   	   }
 	   	// $_GET['folder'] is sanitized in generateadditem()
 	   	echo generateadditem($_GET['folder'],'t');

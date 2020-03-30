@@ -19,12 +19,12 @@ $body = "";
 $pagetitle = "Copy Course Items";
 $ctc = Sanitize::onlyInt($_POST['ctc']);
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Copy Course Items";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Copy Course Items");
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
 	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";
+	$body = _("You need to log in as a teacher to access this page");
 } else {
 
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -56,7 +56,7 @@ if (!(isset($teacherid))) {
 				if ($oktocopy==0) {
 					if (!isset($_POST['ekey']) || strtolower(trim($ekey)) != strtolower(trim($_POST['ekey']))) {
 						$overwriteBody = 1;
-						$body = "Invalid enrollment key entered.  <a href=\"copyitems.php?cid=$cid\">Try Again</a>";
+						$body = _("Invalid enrollment key entered.")."  <a href=\"copyitems.php?cid=$cid\">"._("Try Again")."</a>";
 					} else {
 						$oktocopy = 1;
 					}
@@ -67,7 +67,7 @@ if (!(isset($teacherid))) {
 			if (!isset($_POST['termsagree'])) {
 				$oktocopy = 0;
 				$overwriteBody = 1;
-				$body = "Must agree to course terms of use to copy it.  <a href=\"copyitems.php?cid=$cid\">Try Again</a>";
+				$body = _("Must agree to course terms of use to copy it.")."  <a href=\"copyitems.php?cid=$cid\">"._("Try Again")."</a>";
 			} else {
 				$now = time();
 				$ctc = intval($_POST['ctc']);
@@ -395,7 +395,7 @@ if (!(isset($teacherid))) {
 				}
 			}
 			if ($items===false) {
-				echo 'Error with course to copy';
+				echo _('Error with course to copy');
 				exit;
 			}
 
@@ -483,8 +483,7 @@ if ($overwriteBody==1) {
 
 // if source is using assess2 and dest is not, bail
 if ($sourceUIver > $destUIver) {
-	echo '<p>The course you selected is using a newer version of assessments than
-	your course. It is not possible to convert assessment back to an older format, sorry.</p>';
+	echo '<p>'._('The course you selected is using a newer version of assessments than your course. It is not possible to convert assessment back to an older format, sorry.').'</p>';
 	require("../footer.php");
 	exit;
 }
@@ -509,29 +508,28 @@ if ($sourceUIver > $destUIver) {
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
 	<p>What to copy:
 	<?php
-		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.Sanitize::onlyInt($ctc).'">Preview source course</a>';}
+		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.Sanitize::onlyInt($ctc).'">'._('Preview source course').'</a>';}
 	?>
 	<br/>
 	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>
 	<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"> <label for=whattocopy2>Select items to copy</label></p>
 
 	<div id="allitemsnote" style="display:none;">
-	<p class="noticetext">You are about to copy ALL items in this course.</p>
-	<p>In most cases, you'll want to leave the options below set to their default
-		values </p>
+	<p class="noticetext"><?php echo _('You are about to copy ALL items in this course.'); ?></p>
+	<p><?php echo _("In most cases, you'll want to leave the options below set to their default	values"); ?> </p>
 	</div>
 	<div id="selectitemstocopy" style="display:none;">
-	<h3>Select Items to Copy</h3>
+	<h3><?php _('Select Items to Copy'); ?></h3>
 
-	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+	<?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a>
 
 	<table cellpadding=5 class=gb>
 		<thead>
 		<?php
 		if ($picicons) {
-			echo '<tr><th></th><th>Title</th><th>Summary</th></tr>';
+			echo '<tr><th></th><th>'._('Title').'</th><th>'._('Summary').'</th></tr>';
 		} else {
-			echo '<tr><th></th><th>Type</th><th>Title</th><th>Summary</th></tr>';
+			echo '<tr><th></th><th>'._('Type').'</th><th>Title</th><th>'._('Summary').'</th></tr>';
 		}
 		?>
 
@@ -587,35 +585,35 @@ if ($sourceUIver > $destUIver) {
 </div>
 	<p> </p>
 <div id="copyoptions" style="display:none;">
-	<fieldset><legend>Options</legend>
+	<fieldset><legend><?php echo _('Options'); ?></legend>
 	<table>
 	<tbody>
-	<tr class="allon"><td class="r">Copy course settings?</td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
-	<tr class="allon"><td class="r">Copy gradebook scheme and categories<br/>(<i>will overwrite current scheme</i>)? </td><td>
+	<tr class="allon"><td class="r"><?php echo _('Copy course settings?'); ?></td><td><input type=checkbox name="copycourseopt"  value="1"/></td></tr>
+	<tr class="allon"><td class="r"><?php echo sprintf(_('Copy gradebook scheme and categories %s (%s will overwrite current scheme %s)?'),'<br/>','<i>','</i>'); ?> </td><td>
 		<input type=checkbox name="copygbsetup" value="1"/></td></tr>
-	<tr><td class="r">Set all copied items as hidden to students?</td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
-	<tr><td class="r">Copy offline grade items?</td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
-	<tr><td class="r">Remove any withdrawn questions from assessments?</td><td> <input type=checkbox name="removewithdrawn"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r">Use any suggested replacements for old questions?</td><td> <input type=checkbox name="usereplaceby"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r">Copy rubrics? </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r">Copy outcomes? </td><td><input type=checkbox name="copyoutcomes"  value="1" /></td></tr>
-	<tr><td class="r">Select calendar items to copy?</td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
+	<tr><td class="r"><?php echo _('Set all copied items as hidden to students?'); ?></td><td><input type="checkbox" name="copyhidden" value="1"/></td></tr>
+	<tr><td class="r"><?php echo _('Copy offline grade items?'); ?></td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
+	<tr><td class="r"><?php echo _('Remove any withdrawn questions from assessments?'); ?></td><td> <input type=checkbox name="removewithdrawn"  value="1" checked="checked"/></td></tr>
+	<tr><td class="r"><?php echo _('Use any suggested replacements for old questions?'); ?></td><td> <input type=checkbox name="usereplaceby"  value="1" checked="checked"/></td></tr>
+	<tr><td class="r"><?php echo _('Copy rubrics?'); ?> </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
+	<tr><td class="r"><?php echo _('Copy outcomes?'); ?> </td><td><input type=checkbox name="copyoutcomes"  value="1" /></td></tr>
+	<tr><td class="r"><?php echo _('Select calendar items to copy?'); ?></td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
 
-	<tr><td class="r">Copy "display at top" instructor forum posts? </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
+	<tr><td class="r"><?php echo _('Copy "display at top" instructor forum posts?'); ?> </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>
 
-	<tr class="selectonly"><td class="r">Append text to titles?</td><td> <input type="text" name="append"></td></tr>
-	<tr class="selectonly"><td class="r">Add to block:</td><td>
+	<tr class="selectonly"><td class="r"><?php echo _('Append text to titles?'); ?></td><td> <input type="text" name="append"></td></tr>
+	<tr class="selectonly"><td class="r"><?php echo _('Add to block:'); ?></td><td>
 
 <?php
-writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$selectedVal=null,$defaultLabel="Main Course Page",$defaultVal="none",$actions=null);
+writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$selectedVal=null,$defaultLabel=_("Main Course Page"),$defaultVal="none",$actions=null);
 ?>
 
 
 	</td></tr>
 	<?php
 	if ($myrights==100 || ($myspecialrights&32)==32 || ($myspecialrights&64)==64) {
-		echo '<tr><td class="r">Also copy students and assessment attempt data?</td>';
-		echo '<td><input type=checkbox name=copystudata value=1> NOT recommended unless you know what you are doing.</td></tr>';
+		echo '<tr><td class="r">',_('Also copy students and assessment attempt data?'),'</td>';
+		echo '<td><input type=checkbox name=copystudata value=1> ',_('NOT recommended unless you know what you are doing.'),'</td></tr>';
 	}
 	?>
 	</tbody>
@@ -624,9 +622,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	</div>
 <?php
 	if ($sourceUIver < $destUIver) {
-		echo '<p class="noticetext">Note: The course you are copying from is using
-			an older version of assessments. They will be auto-converted to the current
-			version, but you should review the settings after they are copied.</p>';
+		echo '<p class="noticetext">',_('Note: The course you are copying from is using	an older version of assessments. They will be auto-converted to the current	version, but you should review the settings after they are copied.'),'</p>';
 	}
 ?>
 	<p><input type=submit value="Copy Items"></p>
@@ -634,7 +630,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	} else { //DEFAULT DISPLAY BLOCK
 ?>
-	<h3>Select a course to copy items from</h3>
+	<h3><?php echo _('Select a course to copy items from'); ?></h3>
 
 	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=select">
 <?php
@@ -661,7 +657,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 
 	writeEkeyField()
 ?>
-		<input type=submit value="Select Course Items">
+		<input type=submit value=<?php echo '"'._('Select Course Items').'"'; ?>>
 		<p>&nbsp;</p>
 	</form>
 

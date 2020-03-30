@@ -5,7 +5,7 @@
 header("Content-Type: text/plain");
 
 require("../init_without_validate.php");
-require("../i18n/i18n.php");
+
 require("mbxfilter.php");
 require("../assessment/displayq2.php");
 
@@ -51,7 +51,7 @@ if (isset($_GET['seed'])) {
 }
 
 foreach ($qsetlist as $qn=>$qsetid) {
-	mbxproc($qn,$qsetid,$seed);	
+	mbxproc($qn,$qsetid,$seed);
 }
 
 function mbxproc($qn,$qsetid,$seed) {
@@ -105,7 +105,7 @@ function mbxproc($qn,$qsetid,$seed) {
   } else if ($displayformat=="select" || $displayformat=="horiz" || $displayformat=="column" || $displayformat=="2column" || $displayformat=="inline") {
   	 unset($displayformat);
   }
-  
+
   //pack options
   if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
   if (isset($displayformat)) {$options['displayformat'] = $displayformat;}

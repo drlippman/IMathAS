@@ -11,15 +11,15 @@ require("../init.php");
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$pagetitle = "Delete Assessment";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Assessment";
+$pagetitle = _("Delete Assessment");
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Delete Assessment");
 
 if (!(isset($teacherid))) {
 	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";
+	$body = _("You need to log in as a teacher to access this page");
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody = 1;
-	$body = "You need to access this page from the link on the course page";
+	$body = _("You need to access this page from the link on the course page");
 } elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
@@ -94,12 +94,12 @@ if ($overwriteBody==1) {
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<h2><?php echo Sanitize::encodeStringForDisplay($itemname); ?></h2>
-	Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?
+	<?php echo _("Are you <b>SURE</b> you want to delete this assessment and all associated student attempts?"); ?>
 
 	<form method="POST" action="deleteassessment.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>
-	<button type=submit name="remove" value="really">Yes, Delete</button>
-	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
+	<button type=submit name="remove" value="really"><?php echo _("Yes, Delete"); ?></button>
+	<button type="button" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'"><?php echo _("Nevermind"); ?></button>
 	</p>
 	</form>
 

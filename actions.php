@@ -33,7 +33,7 @@ require_once("includes/sanitize.php");
 		require_once("includes/newusercommon.php");
 		$error = '';
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
-			$error = "<p>You must agree to the Terms and Conditions to set up an account</p>";
+			$error = "<p>"._("You must agree to the Terms and Conditions to set up an account")."</p>";
 		}
 
 		// Sanitize form data
@@ -49,15 +49,15 @@ require_once("includes/sanitize.php");
 		if ($error != '') {
 			require("header.php");
 			if ($gb == '') {
-				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
+				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_("New User Signup"),"</div>\n";
 			}
-			echo '<div id="headerforms" class="pagetitle"><h1>New User Signup</h1></div>';
+			echo '<div id="headerforms" class="pagetitle"><h1>',_('New User Signup'),'</h1></div>';
 			echo $error;
 			//call hook, if defined
 			if (function_exists('onNewUserError')) {
 				onNewUserError();
 			} else {
-				echo '<p><a href="forms.php?action=newuser">Try Again</a></p>';
+				echo '<p><a href="forms.php?action=newuser">',_('Try Again'),'</a></p>';
 			}
 			require("footer.php");
 			exit;
@@ -103,10 +103,9 @@ require_once("includes/sanitize.php");
 					echo '<input type="hidden" name="agree" value="1" />';
 				}
 				echo '<p> </p>';
-				echo '<p>It appears an account already exists with the same email address you just entered. ';
-				echo 'If you are creating an account because you forgot your username, you can ';
-				echo '<a href="forms.php?action=lookupusername">look up your username</a> instead.</p>';
-				echo '<input type="submit" value="Create new account anyways"/>';
+				echo '<p>',_('It appears an account already exists with the same email address you just entered'),'. ';
+				echo sprintf(_('If you are creating an account because you forgot your username, you can %s look up your username %s instead.'),'<a href="forms.php?action=lookupusername">','</a>'),'</p>';
+				echo '<input type="submit" value="',_('Create new account anyways'),'"/>';
 				echo '</form>';
 				require("footer.php");
 				exit;
@@ -130,36 +129,34 @@ require_once("includes/sanitize.php");
 
 		if ($emailconfirmation) {
 			$id = $newuserid;
-			$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
-			$message .= "<p>To complete your $installname registration, please click on the following link, or copy ";
-			$message .= "and paste it into your webbrowser:</p>\r\n";
+			$message  = "<h3>".sprintf(_("This is an automated message from %s.  Do not respond to this email"),$installname)."</h3>\r\n";
+			$message .= "<p>".sprintf(_("To complete your %s registration, please click on the following link, or copy and paste it into your webbrowser:"),$installname)."</p>\r\n";
 			$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
 			$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
 			require_once("./includes/email.php");
-			send_email($_POST['email'], $sendfrom, $installname.' Confirmation', $message, array(), array(), 10);
+			send_email($_POST['email'], $sendfrom, $installname._(' Confirmation'), $message, array(), array(), 10);
 
 			require("header.php");
 			if ($gb == '') {
-				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
+				echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_("New User Signup"),"</div>\n";
 			}
-			echo '<div id="headerforms" class="pagetitle"><h1>New User Signup</h1></div>';
-			echo "Registration recorded.  You should shortly receive an email with confirmation instructions.";
-			echo "<a href=\"$imasroot/index.php\">Back to main login page</a>\n";
+			echo '<div id="headerforms" class="pagetitle"><h1>',_('New User Signup'),'</h1></div>';
+			echo _("Registration recorded.  You should shortly receive an email with confirmation instructions.");
+			echo "<a href=\"$imasroot/index.php\">",_("Back to main login page"),"</a>\n";
 			require("footer.php");
 			exit;
 
 		} else {
-			$pagetitle = 'Account Created';
+			$pagetitle = _('Account Created');
 			require("header.php");
-			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; New User Signup</div>\n";
-			echo '<div id="headerforms" class="pagetitle"><h1>New User Signup</h1></div>';
-			echo "<p>Your account with username <b>" . Sanitize::encodeStringForDisplay($_POST['SID']) . "</b> has been created.  If you forget your password, you can ask your ";
-			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
+			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_("New User Signup"),"</div>\n";
+			echo '<div id="headerforms" class="pagetitle"><h1>',_('New User Signup'),'</h1></div>';
+			echo "<p>",sprintf(_("Your account with username %s has been created.  If you forget your password, you can ask your instructor to reset your password or use the forgotten password link on the login page."),"<b>" . Sanitize::encodeStringForDisplay($_POST['SID']) . "</b>"),"</p>\n";
 			if (trim($_POST['courseid'])!='') {
 				$error = '';
 
 				if (!is_numeric($_POST['courseid'])) {
-					$error = 'Invalid course id';
+					$error = _('Invalid course id');
 				} else {
 
 					$query = "SELECT enrollkey,allowunenroll,deflatepass,msgset FROM imas_courses WHERE id=:cid AND (available=0 OR available=2)";
@@ -168,16 +165,16 @@ require_once("includes/sanitize.php");
 					$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 					if ($line==null) {
-						$error = 'Course not found';
+						$error = _('Course not found');
 					} else if (($line['allowunenroll']&2)==2) {
-						$error = 'Course is closed for self enrollment';
+						$error = _('Course is closed for self enrollment');
 					} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
-						$error = 'No enrollment key provided';
+						$error = _('No enrollment key provided');
 					} else {
 						$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
 						$_POST['ekey'] = trim($_POST['ekey']);
 						if (!in_array(strtolower($_POST['ekey']), $keylist)) {
-							$error = 'Incorrect enrollment key';
+							$error = _('Incorrect enrollment key');
 						} else {
 							if (count($keylist)>1) {
 								$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
@@ -193,7 +190,7 @@ require_once("includes/sanitize.php");
 							}
 							$stm = $DBH->prepare($query);
 							$stm->execute($array);
-							echo '<p>You have been enrolled in course ID '.Sanitize::encodeStringForDisplay($_POST['courseid']).'</p>';
+							echo '<p>',sprintf(_("You have been enrolled in course ID %s"),Sanitize::encodeStringForDisplay($_POST['courseid'])),'</p>';
 
 							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 							if ($msgOnEnroll) {
@@ -210,13 +207,12 @@ require_once("includes/sanitize.php");
 					}
 				}
 				if ($error != '') {
-					echo "<p>$error, so we were not able to enroll you in your course.  After you log in, you can ";
-					echo 'try enrolling again.  You do <b>not</b> need to create another account.</p>';
+					echo "<p>$error, ",_("so we were not able to enroll you in your course.  After you log in, you can try enrolling again.  You do <b>not</b> need to create another account."),"</p>";
 				}
 			}
 
 
-			echo "<p>You can now <a href=\"" . $GLOBALS['basesiteurl'] . "/index.php\">return to the login page</a> and login with your new username and password</p>";
+			echo "<p>",sprintf(_("You can now %s return to the login page %s and login with your new username and password"),"<a href=\"" . $GLOBALS['basesiteurl'] . "/index.php\">","</a>"),"</p>";
 			require("footer.php");
 		}
 		//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
@@ -230,12 +226,12 @@ require_once("includes/sanitize.php");
 
 		if ($stm->rowCount()>0) {
 			require("header.php");
-			echo "Confirmed.  Please <a href=\"index.php\">Log In</a>\n";
+			echo sprintf(_("Confirmed.  Please %s Log In %s"),"<a href=\"index.php\">","</a>\n");
 			require("footer.php");
 			exit;
 		} else {
 			require("header.php");
-			echo "Error.\n";
+			echo _("Error").".\n";
 			require("footer.php");
 		}
 	} else if ($_GET['action']=="resetpw") {
@@ -274,10 +270,9 @@ require_once("includes/sanitize.php");
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':code'=>$code, ':id'=>$id));
 
-				$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
-				$message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
-				$message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
-				$message .= "will then be prompted to choose a new password.</p>";
+				$message  = "<h3>".sprintf(_('This is an automated message from %s. Do not respond to this email'),$installname)."</h3>\r\n";
+				$message .= "<p>"._('Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ');
+				$message .= _("If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You will then be prompted to choose a new password.")."</p>";
 				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code\">";
 				$message .= $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$id&code=$code</a>\r\n";
 
@@ -285,21 +280,21 @@ require_once("includes/sanitize.php");
 				send_email($email, $sendfrom, $installname._(' Password Reset Request'), $message, array(), array(), 10);
 
 				require("header.php");
-				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.Sanitize::emailAddress($email).'.</b><br/> ';
-				echo 'If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.<br/>';
-				echo 'It may help to add <b>'.Sanitize::encodeStringForDisplay($sendfrom).'</b> to your contacts list.</p>';
-				echo '<p>If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.</p>';
+				echo '<p>',_('An email with a password reset link has been sent your email address on record'),': <b>'.Sanitize::emailAddress($email).'.</b><br/> ';
+				echo _('If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.'),'<br/>';
+				echo sprintf(_('It may help to add %s to your contacts list.'),'<b>'.Sanitize::encodeStringForDisplay($sendfrom).'</b>'),'</p>';
+				echo '<p>',_('If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.'),'</p>';
 				require("footer.php");
 				exit;
 			} else {
-				echo "Invalid Username.  <a href=\"index.php$gb\">Try again</a>";
+				echo _("Invalid Username"),".  <a href=\"index.php$gb\">",_("Try again"),"</a>";
 				exit;
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=" . Sanitize::randomQueryStringParam());
 		} else if (isset($_POST['pw1'])) {
 			if ($_POST['pw1']!=$_POST['pw2']) {
-				echo 'Passwords do not match.  <a href="forms.php?action=resetpw&code='.Sanitize::encodeUrlParam($_POST['code'])
-					.'&id='.Sanitize::encodeUrlParam($_POST['id']).'">Try again</a>';
+				echo _('Passwords do not match'),'.  <a href="forms.php?action=resetpw&code='.Sanitize::encodeUrlParam($_POST['code'])
+					.'&id='.Sanitize::encodeUrlParam($_POST['id']).'">',_('Try again'),'</a>';
 				exit;
 			}
 
@@ -318,13 +313,13 @@ require_once("includes/sanitize.php");
 					$query = "UPDATE imas_users SET password=:newpw,remoteaccess='' WHERE id=:id LIMIT 1";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':id'=>$_POST['id'], ':newpw'=>$newpw));
-					echo "Password Reset.  ";
-					echo "<a href=\"index.php\">Login with your new password</a>";
+					echo _("Password Reset"),".  ";
+					echo "<a href=\"index.php\">",_("Login with your new password"),"</a>";
 				} else {
 					echo _('Invalid code');
 				}
 			} else {
-				echo 'Invalid user';
+				echo _('Invalid user');
 			}
 			exit;
 		} else if (isset($_GET['code'])) {
@@ -339,20 +334,19 @@ require_once("includes/sanitize.php");
 		$stm->execute(array(':email'=>$_POST['email']));
 		if ($stm->rowCount() > 0) {
 			echo $stm->rowCount();
-			echo " usernames match this email address and were emailed.  <a href=\"index.php\">Return to login page</a>";
-
-			$message  = "<h3>This is an automated message from $installname.  Do not respond to this email</h3>\r\n";
-			$message .= "<p>Your email was entered in the Username Lookup page on $installname.  If you did not do this, you may ignore and delete this message.  ";
-			$message .= "All usernames using this email address are listed below</p><p>";
+			echo _(" usernames match this email address and were emailed"),".  <a href=\"index.php\">",_("Return to login page"),"</a>";
+			$message  = "<h3>".sprintf(_("This is an automated message from %s. Do not respond to this email"),$installname)."</h3>\r\n";
+			$message .= "<p>".sprintf(_("Your email was entered in the Username Lookup page on %s.  If you did not do this, you may ignore and delete this message."),$installname)."  ";
+			$message .= _("All usernames using this email address are listed below")."</p><p>";
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['lastaccess']==0) {
-					$lastlogin = "Never";
+					$lastlogin = _("Never");
 				} else {
 					$lastlogin = date("n/j/y g:ia",$row['lastaccess']);
 				}
-				$message .= "Username: <b>{$row['SID']}</b>.  Last logged in: $lastlogin<br/>";
+				$message .= _("Username").": <b>{$row['SID']}</b>.  "._("Last logged in").": $lastlogin<br/>";
 			}
-			$message .= "</p><p>If you forgot your password, use the Lost Password link at the login page.</p>";
+			$message .= "</p><p>"._("If you forgot your password, use the Lost Password link at the login page.")."</p>";
 
 			require_once("./includes/email.php");
 			send_email($_POST['email'], $sendfrom, $installname._(' Username Request'), $message, array(), array(), 10);
@@ -364,9 +358,9 @@ require_once("includes/sanitize.php");
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':email'=>$_POST['email']));
 			if ($stm->rowCount() > 0) {
-				echo "Your account can only be accessed through your school's learning management system. <a href=\"index.php\">Return to login page</a>";
+				echo _("Your account can only be accessed through your school's learning management system.")," <a href=\"index.php\">",_("Return to login page"),"</a>";
 			} else {
-				echo "No usernames match this email address, or the email address provided is invalid. <a href=\"index.php\">Return to login page</a>";
+				echo _("No usernames match this email address, or the email address provided is invalid.")," <a href=\"index.php\">",_("Return to login page"),"</a>";
 			}
 			exit;
 		}
@@ -434,14 +428,14 @@ require_once("includes/sanitize.php");
 				);
 			}
 		} else {
-			echo "<html><body>Password change failed.  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">Try Again</a>\n";
+			echo "<html><body>",_("Password change failed"),".  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">",_("Try Again"),"</a>\n";
 			echo "</body></html>\n";
 			exit;
 		}
 
 	} else if ($_GET['action']=="enroll") {
 		if ($myrights < 6) {
-			echo "<html><body>\nError: Guests can't enroll in courses</body></html";
+			echo "<html><body>\n",_("Error: Guests can't enroll in courses"),"</body></html";
 			exit;
 		}
 		if (isset($_POST['courseselect']) && $_POST['courseselect']>0) {
@@ -450,13 +444,13 @@ require_once("includes/sanitize.php");
 		}
 		$pagetopper = '';
 		if ($gb == '') {
-			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
+			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">"._("Home")."</a> &gt; "._("Enroll in a Course")."</div>\n";
 		}
-		$pagetopper .= '<div id="headerforms" class="pagetitle"><h1>Enroll in a Course</h1></div>';
+		$pagetopper .= '<div id="headerforms" class="pagetitle"><h1>'._('Enroll in a Course').'</h1></div>';
 		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
 			require("header.php");
 			echo $pagetopper;
-			echo "Please include Course ID.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
+			echo _("Please include Course ID."),"  <a href=\"forms.php?action=enroll$gb\">",_("Try Again"),"</a>\n";
 			require("footer.php");
 			exit;
 		}
@@ -468,19 +462,19 @@ require_once("includes/sanitize.php");
 		if ($line === false) {
 			require("header.php");
 			echo $pagetopper;
-			echo "Course not found.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
+			echo _("Course not found."),"  <a href=\"forms.php?action=enroll$gb\">",_("Try Again"),"</a>\n";
 			require("footer.php");
 			exit;
 		} else if (($line['allowunenroll']&2)==2) {
 			require("header.php");
 			echo $pagetopper;
-			echo "Course is closed for self enrollment.  Contact your instructor for access.  <a href=\"index.php\">Return to home page.</a>\n";
+			echo _("Course is closed for self enrollment.  Contact your instructor for access."),"  <a href=\"index.php\">",_("Return to home page."),"</a>\n";
 			require("footer.php");
 			exit;
 		} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
 			require("header.php");
 			echo $pagetopper;
-			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
+			echo _("Please include Enrollment Key."),"  <a href=\"forms.php?action=enroll$gb\">",_("Try Again"),"</a>\n";
 			require("footer.php");
 			exit;
 		}  else {
@@ -489,9 +483,8 @@ require_once("includes/sanitize.php");
 			if ($stm->rowCount() > 0) {
 				require("header.php");
 				echo $pagetopper;
-				echo "You are a teacher for this course, and can't enroll as a student.  Use Student View to see ";
-				echo "the class from a student's perspective, or create a dummy student account.  ";
-				echo "Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
+				echo _("You are a teacher for this course, and can't enroll as a student.  Use Student View to see the class from a student's perspective, or create a dummy student account.  ");
+				echo _("Click on the course name on the <a href=\"index.php\">main page</a> to access the course"),"\n";
 				require("footer.php");
 				exit;
 			}
@@ -500,8 +493,8 @@ require_once("includes/sanitize.php");
 			if ($stm->rowCount() > 0) {
 				require("header.php");
 				echo $pagetopper;
-				echo "You are a tutor for this course, and can't enroll as a student. ";
-				echo "Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
+				echo _("You are a tutor for this course, and can't enroll as a student. ");
+				echo _("Click on the course name on the <a href=\"index.php\">main page</a> to access the course"),"\n";
 				require("footer.php");
 				exit;
 			}
@@ -510,7 +503,7 @@ require_once("includes/sanitize.php");
 			if ($stm->rowCount() > 0) {
 				require("header.php");
 				echo $pagetopper;
-				echo "You are already enrolled in the course.  Click on the course name on the <a href=\"index.php\">main page</a> to access the course\n";
+				echo _("You are already enrolled in the course.  Click on the course name on the <a href=\"index.php\">main page</a> to access the course"),"\n";
 				require("footer.php");
 				exit;
 			} else {
@@ -518,7 +511,7 @@ require_once("includes/sanitize.php");
 				if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {
 					require("header.php");
 					echo $pagetopper;
-					echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
+					echo _("Incorrect Enrollment Key."),"  <a href=\"forms.php?action=enroll$gb\">",_("Try Again"),"</a>\n";
 					require("footer.php");
 					exit;
 				} else {
@@ -551,8 +544,8 @@ require_once("includes/sanitize.php");
 
 					require("header.php");
 					echo $pagetopper;
-					echo '<p>You have been enrolled in course ID '.Sanitize::courseId($_POST['cid']).'</p>';
-					echo "<p>Return to the <a href=\"index.php\">main page</a> and click on the course name to access the course</p>";
+					echo '<p>',_('You have been enrolled in course ID ').Sanitize::courseId($_POST['cid']).'</p>';
+					echo "<p>",_("Return to the <a href=\"index.php\">main page</a> and click on the course name to access the course"),"</p>";
 					require("footer.php");
 					exit;
 				}
@@ -564,12 +557,12 @@ require_once("includes/sanitize.php");
 		}
 	} else if ($_POST['action']=="unenroll") {
 		if ($myrights < 6) {
-			echo "<html><body>\nError: Guests can't unenroll from courses</body></html>";
+			echo "<html><body>\n",_("Error: Guests can't unenroll from courses"),"</body></html>";
 			exit;
 		}
 		if (!isset($_GET['cid'])) {
 			require("header.php");
-			echo "Course ID not specified.  <a href=\"index.php\">Try Again</a>\n";
+			echo _("Course ID not specified."),"  <a href=\"index.php\">",_("Try Again"),"</a>\n";
 			require("footer.php");
 			exit;
 		}
@@ -715,7 +708,7 @@ require_once("includes/sanitize.php");
 			} else {
 				require("header.php");
 				echo $pagetopper;
-				echo "Password change failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+				echo _("Password change failed."),"  <a href=\"forms.php?action=chguserinfo$gb\">",_("Try Again"),"</a>\n";
 				require("footer.php");
 				exit;
 			}
@@ -797,7 +790,7 @@ require_once("includes/sanitize.php");
 		}
 	}
 	if ($isgb) {
-		echo '<html><body>Changes Recorded.  <input type="button" onclick="parent.GB_hide()" value="Done" /></body></html>';
+		echo '<html><body>',_('Changes Recorded.'),'  <input type="button" onclick="parent.GB_hide()" value="',_('Done'),'" /></body></html>';
 	} else if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$_SESSION['ltiitemid']));

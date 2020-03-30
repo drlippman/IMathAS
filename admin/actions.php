@@ -46,7 +46,10 @@ switch($_POST['action']) {
 		$_SESSION['userid'] = $be;
 		break;
 	case "chgrights":
-		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { 
+			echo _("You don't have the authority for this action"); 
+			break;
+		}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
@@ -54,7 +57,7 @@ switch($_POST['action']) {
 		$stm->execute(array(':id'=>$_GET['id']));
 		list($oldrights,$oldgroupid) = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
-			echo "invalid id";
+			echo _("invalid id");
 			exit;
 		} else if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
 			echo "You don't have the authority for this action";
@@ -305,7 +308,7 @@ switch($_POST['action']) {
 		}
 		break;
 	case "newadmin":
-		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { echo _("You don't have the authority for this action"); break;}
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
@@ -313,9 +316,9 @@ switch($_POST['action']) {
 		$stm->execute(array(':SID'=>$_POST['SID']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
-			echo "<html><body>Username is already used.\n";
-			echo "<a href=\"forms.php?action=newadmin\">Try Again</a> or ";
-			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">Change rights for existing user</a></body></html>\n";
+			echo "<html><body>",_("Username is already used."),"\n";
+			echo "<a href=\"forms.php?action=newadmin\">",_("Try Again"),"</a> ",_("or")," ";
+			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">",_("Change rights for existing user"),"</a></body></html>\n";
 			exit;
 		}
 		if (isset($CFG['GEN']['newpasswords'])) {
@@ -411,7 +414,7 @@ switch($_POST['action']) {
 		break;
 	case "modify":
 	case "addcourse":
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 40) { echo _("You don't have the authority for this action"); break;}
 		require_once("../includes/parsedatetime.php");
 
 		if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
@@ -422,7 +425,7 @@ switch($_POST['action']) {
 			if ($terms[0]!='') {
 				if (!isset($_POST['termsagree'])) {
 					require("../header.php");
-					echo '<p>You must agree to the terms of use to copy this course.</p>';
+					echo '<p>',_('You must agree to the terms of use to copy this course.'),'</p>';
 					require("../footer.php");
 					exit;
 				} else {
@@ -897,34 +900,31 @@ switch($_POST['action']) {
 			$hasGroupLTI = ($stm->fetchColumn() !== false);
 
 			require("../header.php");
-			echo '<div class="breadcrumb">'.$breadcrumbbase.' Course Creation Confirmation</div>';
-			echo '<h1>Your course has been created!</h1>';
-			echo '<p>For students to enroll in this course via direct login, you will need to provide them two things:<ol>';
-			echo '<li>The course ID: <b>'.$cid.'</b></li>';
+			echo '<div class="breadcrumb">'.$breadcrumbbase._(' Course Creation Confirmation').'</div>';
+			echo '<h1>',_('Your course has been created'),'!</h1>';
+			echo '<p>',_('For students to enroll in this course via direct login, you will need to provide them two things'),':<ol>';
+			echo '<li>',_('The course ID'),': <b>'.$cid.'</b></li>';
 			if (trim($_POST['ekey'])=='') {
-				echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
-				echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
-				echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
+				echo '<li>',sprintf(_('Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, %s modify your course settings %s'),'<a href="forms.php?action=modify&id='.$cid.'">','</a>'),'</li>';
 			} else {
-				echo '<li>The enrollment key: <b>'.$_POST['ekey'].'</b></li>';
+				echo '<li>',_('The enrollment key'),': <b>'.$_POST['ekey'].'</b></li>';
 			}
 			echo '</ol></p>';
 
 			if (empty($CFG['LTI']['noCourseLevel'])) {
-				echo '<p>If you plan to integrate this course with your school\'s Learning Management System (LMS), ';
+				echo '<p>',_('If you plan to integrate this course with your school\'s Learning Management System (LMS), ');
 				if ($hasGroupLTI) {
-					echo 'it looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ';
-					echo 'If so, you will not need to set up a course-level configuration. ';
-					echo 'If you do need to set up a course-level configuration for some reason, the key and secret can be found in your course settings</p>';
+					echo _('it looks like your school may already have a school-wide LTI key and secret established - check with your LMS admin. ');
+					echo _('If so, you will not need to set up a course-level configuration. ');
+					echo _('If you do need to set up a course-level configuration for some reason, the key and secret can be found in your course settings'),'</p>';
 				} else {
-					echo 'here is the information you will need to set up a course-level configuration, ';
-					echo 'since your school does not appear to have a school-wide LTI key and secret established.</p>';
+					echo _('here is the information you will need to set up a course-level configuration, since your school does not appear to have a school-wide LTI key and secret established.'),'</p>';
 					echo '<ul class=nomark><li>Key: LTIkey_'.$cid.'_1</li>';
 					echo '<li>Secret: '.Sanitize::encodeStringForDisplay($ltisecret).'</li></ul>';
-					echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
+					echo '<p>',_('If you forget these later, you can find them by viewing your course settings.'),'</p>';
 				}
 			}
-			echo '<a href="../course/course.php?cid='.$cid.'">Enter the Course</a>';
+			echo '<a href="../course/course.php?cid='.$cid.'">',_('Enter the Course'),'</a>';
 			require("../footer.php");
 			exit;
 		}

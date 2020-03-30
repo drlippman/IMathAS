@@ -14,7 +14,7 @@
 
 	if ($myrights<20) {
 		require("../header.php");
-		echo "You need to log in as a teacher to access this page";
+		echo _("You need to log in as a teacher to access this page");
 		require("../footer.php");
 		exit;
 	}
@@ -219,9 +219,9 @@
 					':lastmoddate'=>$now, ':extref'=>$extref, ':replaceby'=>$replaceby, ':solutionopts'=>$solutionopts, ':id'=>$_GET['id']));
 
 				if ($stm->rowCount()>0) {
-					$outputmsg .= "Question Updated. ";
+					$outputmsg .= _("Question Updated.")." ";
 				} else {
-					$outputmsg .= "Library Assignments Updated. ";
+					$outputmsg .= _("Library Assignments Updated.")." ";
 				}
 
 				$stm = $DBH->prepare("SELECT id,filename,var,alttext FROM imas_qimages WHERE qsetid=:qsetid");
@@ -332,10 +332,10 @@
 			if (isset($_GET['makelocal'])) {
 				$stm = $DBH->prepare("UPDATE imas_questions SET questionsetid=:questionsetid WHERE id=:id");
 				$stm->execute(array(':questionsetid'=>$qsetid, ':id'=>$_GET['makelocal']));
-				$outputmsg .= " Local copy of Question Created ";
+				$outputmsg .= " "._("Local copy of Question Created")." ";
 				$frompot = 0;
 			} else {
-				$outputmsg .= " Question Added to QuestionSet. ";
+				$outputmsg .= " "._("Question Added to QuestionSet.")." ";
 				$frompot = 1;
 			}
 			$isok = true;
@@ -350,19 +350,19 @@
 					switch($_FILES['imgfile']['error']){
 					case 1:
 					case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
-					  $errmsg .= "The file you are trying to upload is too big.";
+					  $errmsg .= _("The file you are trying to upload is too big.");
 					  break;
 					case 3: //uploaded file was only partially uploaded
-					  $errmsg .= "The file you are trying upload was only partially uploaded.";
+					  $errmsg .= _("The file you are trying upload was only partially uploaded.");
 					  break;
 					default: //a default error, just in case!  :)
-					  $errmsg .= "There was a problem with your upload.";
+					  $errmsg .= _("There was a problem with your upload.");
 					  break;
 						}
 				} else if (trim($_POST['newimgvar'])=='') {
-					$errmsg .= "<p>Need to specify variable for image to be referenced by</p>";
+					$errmsg .= "<p>"._("Need to specify variable for image to be referenced by")."</p>";
 				} else if (in_array($_POST['newimgvar'],$disallowedvar)) {
-					$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
+					$errmsg .= "<p>".sprintf(_("%s is not an allowed variable name"),Sanitize::encodeStringForDisplay($newvar))."</p>";
 				} else {
 					$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/';
 					//$filename = basename($_FILES['imgfile']['name']);
@@ -382,7 +382,7 @@
 					$is_alt_img = (in_array($mimetype, ['image/svg+xml']) &&
 						in_array($extension, ['svg']));
 					if ($result_array === false && !$is_alt_img) {
-						$errmsg .= "<p>File is not image file</p>";
+						$errmsg .= "<p>"._("File is not image file")."</p>";
 					} else {
 						if (($filename=storeuploadedqimage('imgfile',$filename))!==false) {
 						//if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
@@ -392,7 +392,7 @@
 							$stm = $DBH->prepare("UPDATE imas_questionset SET hasimg=1 WHERE id=:id");
 							$stm->execute(array(':id'=>$qsetid));
 						} else {
-							echo "<p>Error uploading image file!</p>\n";
+							echo "<p>"._("Error uploading image file!")."</p>\n";
 							exit;
 						}
 					}
@@ -492,14 +492,14 @@
 		}
 
 		if (!isset($_GET['aid'])) {
-			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">Return to Question Set Management</a>\n";
+			$outputmsg .= "<a href=\"manageqset.php?cid=$cid\">"._("Return to Question Set Management")."</a>\n";
 		} else {
 			if ($frompot==1) {
 				$modquestion = (!empty($courseUIver) && $courseUIver > 1) ? 'modquestion2.php' : 'modquestion.php';
-				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">Add Question to Assessment using Defaults</a> | \n";
-				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Add Question to Assessment</a> | \n";
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">"._("Add Question to Assessment using Defaults")."</a> | \n";
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Add Question to Assessment")."</a> | \n";
 			}
-			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">Return to Assessment</a>\n";
+			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
 		}
 		if ($_POST['test']=="Save and Test Question") {
 			$outputmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
@@ -607,7 +607,7 @@
 					$inlibs[] = $row[0];
 				}*/
 				$locklibs = array();
-				$addmod = "Add";
+				$addmod = _("Add");
 				$stm = $DBH->prepare("SELECT qrightsdef FROM imas_users WHERE id=:id");
 				$stm->execute(array(':id'=>$userid));
 				$line['userights'] = $stm->fetchColumn(0);
@@ -646,7 +646,7 @@
 						$locklibs[] = $row[0];
 					}
 				}
-				$addmod = "Modify";
+				$addmod = _("Modify");
 				$query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
 				$query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid=:questionsetid AND imas_courses.ownerid<>:userid";
 				$stm = $DBH->prepare($query);
@@ -672,7 +672,7 @@
 			$line['qtext'] = preg_replace('/<span class="AM">(.*?)<\/span>/','$1',$line['qtext']);
 	} else {
 			$myq = true;
-			$line['description'] = "Enter description here";
+			$line['description'] = _("Enter description here");
 			$stm = $DBH->prepare("SELECT qrightsdef FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
 			$line['userights'] = $stm->fetchColumn(0);
@@ -715,10 +715,10 @@
 				} else {$inlibs = '0';}
 			}
 
-			$addmod = "Add";
+			$addmod = _("Add");
 	}
 	if (!$myq) {
-		$addmod = 'View';
+		$addmod = _('View');
 	}
 
 	$inlibssafe = implode(',', array_map('intval', explode(',',$inlibs)));
@@ -772,7 +772,7 @@
 	}
 
 	/// Start display ///
-	$pagetitle = "Question Editor";
+	$pagetitle = _("Question Editor");
 	$placeinhead = '';
 	/*if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==2 || $_SESSION['mathdisp']==3) {
 		//these scripts are used by the editor to make image-based math work in the editor
@@ -947,21 +947,21 @@
 
 	if (isset($_GET['aid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">Add/Remove Questions</a> &gt; Modify Questions</div>";
+		echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; "._("Modify Questions")."</div>";
 
 	} else if (isset($_GET['daid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">Add Drill Assessment</a> &gt; Modify Questions</div>";
+		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">"._("Add Drill Assessment")."</a> &gt; "._("Modify Questions")."</div>";
 	} else {
 		if ($_GET['cid']=="admin") {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a>";
-			echo "&gt; <a href=\"manageqset.php?cid=admin\">Manage Question Set</a> &gt; Modify Question</div>\n";
+			echo "&gt; <a href=\"manageqset.php?cid=admin\">"._("Manage Question Set")."</a> &gt; "._("Modify Question")."</div>\n";
 		} else {
-			echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
+			echo "<div class=breadcrumb><a href=\"../index.php\">"._("Home")."</a> ";
 			if ($cid>0) {
 				echo "&gt; <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 			}
-			echo " &gt; <a href=\"manageqset.php?cid=$cid\">Manage Question Set</a> &gt; Modify Question</div>\n";
+			echo " &gt; <a href=\"manageqset.php?cid=$cid\">"._("Manage Question Set")."</a> &gt; "._("Modify Question")."</div>\n";
 		}
 
 	}
@@ -969,34 +969,33 @@
 	echo "<div id='outputmsgContainer'>$outputmsg</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
-	echo "<h1>" . Sanitize::encodeStringForDisplay($addmod) . " QuestionSet Question</h1>\n";
+	echo "<h1>" . Sanitize::encodeStringForDisplay($addmod) . ": "._("QuestionSet Question"),"</h1>\n";
 	echo '</div>';
 
 	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {
-		echo '<p>This question appears to be a Tutorial Style question.  <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">Open in the tutorial question editor</a></p>';
+		echo '<p>'._('This question appears to be a Tutorial Style question.').'  <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">'._('Open in the tutorial question editor').'</a></p>';
 	}
 
 	if ($line['deleted']==1) {
-		echo '<p class=noticetext>This question has been marked for deletion.  This might indicate there is an error in the question. ';
-		echo 'It is recommended you discontinue use of this question when possible</p>';
+		echo '<p class=noticetext>'._('This question has been marked for deletion.  This might indicate there is an error in the question. It is recommended you discontinue use of this question when possible').'</p>';
 	}
 
 	if (isset($inusecnt) && $inusecnt>0 && $myq) {
-		echo '<p class=noticetext>This question is currently being used in ';
+		echo '<p class=noticetext>'._('This question is currently being used in ');
 		if ($inusecnt>1) {
-			echo Sanitize::onlyInt($inusecnt).' assessments that are not yours.  ';
+			echo Sanitize::onlyInt($inusecnt)._(' assessments that are not yours.  ');
 		} else {
-			echo 'one assessment that is not yours.  ';
+			echo _('one assessment that is not yours.  ');
 		}
-		echo 'In consideration of the other users, if you want to make changes other than minor fixes to this question, consider creating a new version of this question instead.  </p>';
+		echo _('In consideration of the other users, if you want to make changes other than minor fixes to this question, consider creating a new version of this question instead.').'  </p>';
 
 	}
 	if (isset($_GET['qid'])) {
-		echo "<p><a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">Template this question</a> for use in this assessment.  ";
-		echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
+		echo "<p>".sprintf(_("%sTemplate this question%s for use in this assessment.  ","<a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">","</a>"));
+		echo _("This will let you modify the question for this assessment only without affecting the library version being used in other assessments.")."</p>";
 	}
 	if (!$myq) {
-		echo "<p class=noticetext>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
+		echo "<p class=noticetext>"._("This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments")."</p>";
 	}
 ?>
 <form enctype="multipart/form-data" method=post action="<?php echo $formAction; // Sanitized near line 806 ?>">
@@ -1011,21 +1010,21 @@ Author: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input 
 <p>
 <?php
 if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$userid || ($line['userights']==3 && $line['groupid']==$groupid) || $isadmin || ($isgrpadmin && $line['groupid']==$groupid)) {
-	echo 'Use Rights: <select name="userights" id="userights">';
+	echo _('Use Rights:').' <select name="userights" id="userights">';
 	echo "<option value=\"0\" ";
 	if ($line['userights']==0) {echo "SELECTED";}
-	echo ">Private</option>\n";
+	echo ">"._("Private")."</option>\n";
 	echo "<option value=\"2\" ";
 	if ($line['userights']==2) {echo "SELECTED";}
-	echo ">Allow use by all</option>\n";
+	echo ">"._("Allow use by all")."</option>\n";
 	echo "<option value=\"3\" ";
 	if ($line['userights']==3) {echo "SELECTED";}
-	echo ">Allow use by all and modifications by group</option>\n";
+	echo ">"._("Allow use by all and modifications by group")."</option>\n";
 	echo "<option value=\"4\" ";
 	if ($line['userights']==4) {echo "SELECTED";}
-	echo ">Allow use by all and modifications by all</option>\n";
+	echo ">"._("Allow use by all and modifications by all")."</option>\n";
 	echo '</select><br/>';
-	echo 'License: <select name="license" id="license" onchange="checklicense()">';
+	echo _('License:').' <select name="license" id="license" onchange="checklicense()">';
 	echo '<option value="0" '.($line['license']==0?'selected':'').'>Copyrighted</option>';
 	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
 	echo '<option value="2" '.($line['license']==2?'selected':'').'>Public Domain</option>';
@@ -1033,14 +1032,14 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo '<option value="4" '.($line['license']==4?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
 	echo '</select><span id="licensewarn" class=noticetext style="font-size:80%;"></span>';
 	if ($line['otherattribution']=='') {
-		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
+		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">'._('Add additional attribution').'</a>';
 		echo '<span id="addattrspan" style="display:none;">';
 	} else {
 		echo '<br/><span id="addattrspan">';
 	}
 	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.Sanitize::encodeStringForDisplay($line['otherattribution'], true).'"/>';
 	if ($line['otherattribution']!='') {
-		echo '<br/><span class=noticetext style="font-size:80%">You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution</span>';
+		echo '<br/><span class=noticetext style="font-size:80%">'._('You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution').'</span>';
 	}
 	echo '</span>';
 
@@ -1092,15 +1091,15 @@ function decboxsize(box) {
 
 </script>
 <p>
-My library assignments: <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
-<input type=button value="Select Libraries" onClick="libselect()">
+<?php echo _('My library assignments:'); ?> <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
+<button type="button" onClick="libselect()"><?php echo _("Select Libraries"); ?></button>
 <?php
 if (isset($_GET['id']) && $myq) {
 	echo '<span id=libonlysubmit style="display:none"><input type=submit name=justupdatelibs value="Save Library Change Only"/></span>';
 } ?>
 </p>
 <p>
-Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
+<?php echo _('Question type:'); ?> <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
 	<option value="number" <?php if ($line['qtype']=="number") {echo "SELECTED";} ?>>Number</option>
 	<option value="calculated" <?php if ($line['qtype']=="calculated") {echo "SELECTED";} ?>>Calculated Number</option>
 	<option value="choices" <?php if ($line['qtype']=="choices") {echo "SELECTED";} ?>>Multiple-Choice</option>
@@ -1125,30 +1124,30 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 </select>
 </p>
 <p>
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a> |
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))"><?php echo _('Writing Questions Help'); ?></a> |
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))"><?php echo _('Macro Library Help'); ?></a>
 <?php if (!isset($_GET['id'])) {
-	echo ' | <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">Tutorial Style editor</a>';
+	echo ' | <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">'._('Tutorial Style editor').'</a>';
 }?>
 </p>
 <div id=ccbox>
-Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
+<?php echo _('Common Control'); ?>: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
 <input type=button id="solveropenbutton" value="Solver">
-<input type=submit value="Save">
+<button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
-<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()"><?php echo _('Quick Save and Preview'); ?></button>
 <span class="noticetext quickSaveNotice"></span>
 <BR>
-<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "disabled";?>><?php echo Sanitize::encodeStringForDisplay($line['control'], true);?></textarea>
+<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo _("disabled");?>><?php echo Sanitize::encodeStringForDisplay($line['control'], true);?></textarea>
 </div>
 
 
 <div id=qtbox>
-Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
-<input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
-<input type=submit value="Save">
+<?php echo _('Question Text'); ?>: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
+<button type="button" onclick="toggleeditor('qtext')" ><?php echo _("Toggle Editor"); ?></button>
+<button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
-<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()"><?php echo _('Quick Save and Preview'); ?></button>
 <span class="noticetext quickSaveNotice"></span>
 <BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+3));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['qtext'], true);?></textarea>
@@ -1156,38 +1155,38 @@ Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize(
 
 <?php
 if ($line['solution']=='') {
-	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();initsolneditor();return false;">Add a detailed solution</a></p>';
+	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();initsolneditor();return false;">'._('Add a detailed solution').'</a></p>';
 	echo '<div id="solutionwrapper" style="display:none;">';
 } else {
 	echo '<div id="solutionwrapper">';
 }
 ?>
-Detailed Solution:
+<?php echo _('Detailed Solution:'); ?>
 <span class="noselect"><span class=pointer onclick="incqtboxsize('solution')">[+]</span><span class=pointer onclick="decqtboxsize('solution')">[-]</span></span>
-<input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
-<input type=submit value="Save">
+<button type="button" onclick="toggleeditor('solution')" ><?php echo _("Toggle Editor"); ?></button>
+<button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
-<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()"><?php echo _('Quick Save and Preview'); ?></button>
 <br/>
 <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
-Uses random variables from the question.
+<?php echo _('Uses random variables from the question.'); ?>
  <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
-   <i>Be sure to include the question you are solving in the text</i>
+   <i><?php echo _('Be sure to include the question you are solving in the text'); ?></i>
  </span><br/>
 <input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
-Use this as a "written example" help button<br/>
+<?php echo _('Use this as a "written example" help button'); ?><br/>
 <input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
-Display with the "Show Answer"<br/>
+<?php echo _('Display with the "Show Answer"'); ?><br/>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['solution'], true);?></textarea>
 </div>
 <div id=imgbox>
 <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
-Image file: <input type="file" name="imgfile" <?php if (!$myq) {echo 'disabled';};?>/>
-  assign to variable: <input type="text" name="newimgvar" size="6" <?php if (!$myq) {echo 'disabled';};?>/>
-  Description: <input type="text" size="20" name="newimgalt" value="" <?php if (!$myq) {echo 'disabled';};?>/><br/>
+<?php echo _('Image file:'); ?> <input type="file" name="imgfile" <?php if (!$myq) {echo 'disabled';};?>/>
+  <?php echo _('assign to variable:'); ?> <input type="text" name="newimgvar" size="6" <?php if (!$myq) {echo 'disabled';};?>/>
+  <?php echo _('Description:'); ?> <input type="text" size="20" name="newimgalt" value="" <?php if (!$myq) {echo 'disabled';};?>/><br/>
 <div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
-	Images:
+	<?php echo _('Images:'); ?>
 	<ul id='imgList'>
 <?php
 if (isset($images['vars']) && count($images['vars'])>0) {
@@ -1200,17 +1199,17 @@ if (isset($images['vars']) && count($images['vars'])>0) {
 			$urlimg = "$imasroot/assessment/qimages/{$images['files'][$id]}";
 		}
 		echo "<li>";
-		echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\" ".($myq?'':'disabled')."/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
-		echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\" ".($myq?'':'disabled')."/> Delete? <input type=checkbox name=\"delimg-$id\" ".($myq?'':'disabled')."/>";
+		echo _("Variable:")." <input type=\"text\" name=\"imgvar-$id\" value=\"\$".Sanitize::encodeStringForDisplay($var)."\" size=\"10\" ".($myq?'':'disabled')."/> <a href=\"".Sanitize::url($urlimg)."\" target=\"_blank\">View</a> ";
+		echo _("Description:")." <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"".Sanitize::encodeStringForDisplay($images['alttext'][$id])."\" ".($myq?'':'disabled')."/> Delete? <input type=checkbox name=\"delimg-$id\" ".($myq?'':'disabled')."/>";
 		echo "</li>";
 	}
 }
 ?>
 	</ul>
 </div>
-Help button: Type: <select name="helptype" <?php if (!$myq) {echo 'disabled';};?>>
- <option value="video">Video</option>
- <option value="read">Read</option>
+<?php echo _('Help button: Type:'); ?> <select name="helptype" <?php if (!$myq) {echo 'disabled';};?>>
+ <option value="video"><?php echo _('Video'); ?></option>
+ <option value="read"><?php echo _('Read'); ?></option>
  </select>
  URL: <input type="text" name="helpurl" size="30" <?php if (!$myq) {echo 'disabled';};?>/><br/>
 <?php
@@ -1218,7 +1217,7 @@ echo '<div id="helpbtnwrap" ';
 if (count($extref)==0) {
 	echo 'class="hidden"';
 }
-echo ">Help buttons:<br/>";
+echo ">"._("Help buttons:")."<br/>";
 echo '<ul id="helpbtnlist">';
 if (count($extref)>0) {
 	for ($i=0;$i<count($extref);$i++) {
@@ -1227,31 +1226,31 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
+	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  '._('Delete?').' <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
 
 if ($myrights==100) {
-	echo '<p>Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
+	echo '<p>'._('Mark question as deprecated and suggest alternative?').' <input type="checkbox" name="doreplaceby" ';
 	if ($line['replaceby']!=0) {
 		echo 'checked="checked"';
 	}
-	echo '/> Suggested replacement ID: <input type="text" size="5" name="replaceby" value="';
+	echo '/> '._('Suggested replacement ID:').' <input type="text" size="5" name="replaceby" value="';
 	if ($line['replaceby']>0) {
 		echo $line['replaceby'];
 	}
-	echo '"/>.  <i>Do not use this unless you know what you\'re doing</i></p>';
+	echo '"/>.  <i>'._('Do not use this unless you know what you\'re doing').'</i></p>';
 }
 if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
-	echo '<p>This question is currently marked as deleted. <label><input type="checkbox" name="undelete"> Un-delete question</p>';
+	echo '<p>'._('This question is currently marked as deleted.').' <label><input type="checkbox" name="undelete"> '._('Un-delete question').'</p>';
 }
 ?>
 </div>
 <p>
-<input type=submit value="Save">
+<button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
-<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()">Quick Save and Preview</button>
+<button type="button" class="quickSaveButton" onclick="quickSaveQuestion()"><?php echo _('Quick Save and Preview'); ?></button>
 <span class="noticetext quickSaveNotice"></span>
 </p>
 </form>

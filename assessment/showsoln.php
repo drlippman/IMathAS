@@ -4,7 +4,7 @@ require_once("../includes/sanitize.php");
 if ($_GET['cid']==="embedq") {
 	$_SESSION = array();
 	require("../init_without_validate.php");
-	require("../i18n/i18n.php");
+
 	$cid = "embedq";
 	$_SESSION['secsalt'] = "12345";
 	$_SESSION['graphdisp'] = 1;

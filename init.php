@@ -13,6 +13,7 @@ if (!file_exists(__DIR__ . "/config.php")) {
 
 require_once(__DIR__ . "/config.php");
 
+require_once(__DIR__ . "/i18n/i18n.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['init'])) {
@@ -85,7 +86,7 @@ if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init
 		require_once(__DIR__ . "/csrfp/simplecsrfp.php");
 		csrfProtector::init();
 	}
-} else {
+} else if (empty($init_skip_session_start)) {
 	session_start();
 }
 /*

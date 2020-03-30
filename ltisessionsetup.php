@@ -19,13 +19,11 @@ function redirect() {
 </head>
 <?php
 if (empty($redir)) {
-	echo '<body>Session established. Go back to your LMS and try again.</body>';
+	echo '<body>',_('Session established. Go back to your LMS and try again.'),'</body>';
 } else {
 ?>
 <body onload="redirect()">
-Redirecting you back to your LMS...<br/>
-If you aren't redirected in 5 seconds,
-<a href="<?php echo $redir; ?>">click here</a>.
+<?php echo _("Redirecting you back to your LMS...<br/>If you aren't redirected in 5 seconds, %s click here %s."),"<a href=\"$redir\">","</a>" ?>
 </body>
 <?php
 }
