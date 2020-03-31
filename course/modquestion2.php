@@ -268,7 +268,7 @@ if (isset($_GET['id'])) {
 </p>
 <form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
 <p><?php echo _("Leave items blank to use the assessment's default values."); ?>
-<input type="submit" value="<?php echo ('Save Settings');?>"></p>
+<input type="submit" value="<?php echo _('Save Settings');?>"></p>
 
 <?php
 if (!isset($_GET['id'])) {
@@ -284,7 +284,7 @@ if (!isset($_GET['id'])) {
 </span><BR class=form>
 
 <span class=form><?php echo _("Penalty on Tries:"); ?></span>
-<span class=formright><input type=text size=2 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']);?>"><?php echo sprintf(_('% per try after %s full-credit tries'),'<input type=text size=1 name="penalty_aftern" value="'.Sanitize::encodeStringForDisplay($penalty_aftern).'">' ?>
+<span class=formright><input type=text size=2 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']);?>"><?php echo sprintf(_('% per try after %s full-credit tries'),'<input type=text size=1 name="penalty_aftern" value="'.Sanitize::encodeStringForDisplay($penalty_aftern).'">') ?>
    <br/><i class="grey"><?php echo _('Default:'); ?> <?php echo Sanitize::encodeStringForDisplay($defaults['penalty']);?></i>
 </span><BR class=form>
 <?php
