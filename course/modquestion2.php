@@ -268,7 +268,7 @@ if (isset($_GET['id'])) {
 </p>
 <form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
 <p><?php echo _("Leave items blank to use the assessment's default values."); ?>
-<input type="submit" value="<?php echo ('Save Settings');?>"></p>
+<input type="submit" value="<?php echo _('Save Settings');?>"></p>
 
 <?php
 if (!isset($_GET['id'])) {
