@@ -1344,7 +1344,7 @@ if ($overwriteBody==1) {
 				<tr><th>&nbsp;</th><th><?php echo _('Description'); ?></th><th>&nbsp;</th><th>ID</th><th><?php echo _('Preview'); ?></th><th><?php echo _('Type'); ?></th>
 					<?php echo $page_libRowHeader ?>
 					<th><?php echo _('Times Used'); ?></th>
-					<?php if ($page_useavgtimes) {?><th><span onmouseenter=<?php echo "\"tipshow(this,". _('Average time, in minutes, this question has taken students').")\""; ?> onmouseleave="tipout()"><?php echo _('Avg Time'); ?></span></th><?php } ?>
+					<?php if ($page_useavgtimes) {?><th><span onmouseenter=<?php echo "\"tipshow(this,'". _('Average time, in minutes, this question has taken students')."')\""; ?> onmouseleave="tipout()"><?php echo _('Avg Time'); ?></span></th><?php } ?>
 					<th><?php echo _('Mine'); ?></th><th><?php echo _('Actions'); ?></th>
 					<?php if ($searchall==0) { echo '<th><span onmouseenter="tipshow(this,\''._('Flag a question if it is in the wrong library').'\')" onmouseleave="tipout()">'._('Wrong Lib').'</span></th>';} ?>
 				</tr>
