@@ -229,7 +229,7 @@ if (!isset($_GET['from'])) {
 	$curBreadcrumb .= "&gt; <a href=\"../util/utils.php\">Utilities</a> &gt; ";
 }
 
-require(IMATHAS_DIR . "/header.php");
+require("../header.php");
 echo '<div class="breadcrumb">'. $curBreadcrumb . $pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 
@@ -447,4 +447,4 @@ var app = new Vue({
 </script>
 
 <?php
-require(IMATHAS_DIR . "/footer.php");
+require("../footer.php");

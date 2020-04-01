@@ -539,24 +539,28 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			echo _('course is scheduled for cleanup').'</p>';
 		}
 	}
-	if ($type=='take') {
-		echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
-	} else if ($type=='teach' && $myrights>39) {
-		echo '<div class="center"><a class="abutton" href="admin/addcourse.php">', _('Add New Course'), '</a></div>';
-	}
+    if ($type=='take') {
+        echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
+    } else if ($type=='teach' && $myrights>39) {
+        echo '<div class="center"><a class="abutton" href="admin/addcourse.php">', _('Add New Course'), '</a></div>';
+    }
 
-	echo '<div class="center">';
-	if (count($data)>0) {
-		echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">Change Course Order</a>';
-	}
-	echo '</div><div class="center">';
-	echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">View hidden courses</a>';
-	echo '</div>';
-	if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
-		echo '<div class="center"><a class="abutton" href="admin/admin2.php">', _('Admin Page'), '</a></div>';
-	}
-	echo '</div>';
-	echo '</div>';
+    echo '<div class="center">';
+    if (count($data)>0) {
+        echo '<a class="small" href="admin/modcourseorder.php?type='.$type.'">',_('Change Course Order'),'</a><br/>';
+    }
+    //echo '</div><div class="center">';
+    echo '<a id="unhidelink'.$type.'" '.($hashiddencourses?'':'style="display:none"').' class="small" href="admin/unhidefromcourselist.php?type='.$type.'">',_('View hidden courses'),'</a> ';
+    if ($type=='teach' && count($data)>0) {
+        echo '<br/><a class="small" href="admin/forms.php?action=findstudent&from=home">',_('Find Student'),'</a> ';
+    }
+    echo '</div>';
+    if ($type=='teach' && ($myrights>=75 || ($myspecialrights&4)==4)) {
+        echo '<div class="center"><a class="abutton" href="admin/admin2.php">', _('Admin Page'), '</a></div>';
+    }
+
+    echo '</div>';
+    echo '</div>';
 }
 
 function printCourseOrder($order, $data, $type, &$printed) {
