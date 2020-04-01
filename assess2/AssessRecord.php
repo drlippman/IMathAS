@@ -3350,16 +3350,38 @@ class AssessRecord
       }
     }
 
+    $pctscore = round(100*$scoreonfirst);
+    $qsetid = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');
     $query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
 		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
 		$stm = $this->DBH->prepare($query);
     $stm->execute(array(
       ':courseid'=> $this->assess_info->getCourseId(),
-      ':qsetid'=> $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid'),
-			':score'=> round(100*$scoreonfirst),
+      ':qsetid'=> $qsetid,
+      ':score'=> $pctscore,
       ':scoredet'=> implode('~', $scoredet),
       ':timespent'=> $timeonfirst
     ));
+    $query = "UPDATE imas_questionset SET
+		 avgn=avgn+1,
+		 varscore=((avgn-1)*varscore + (:s1 - avgscore)*((avgn-1)*(:s2 - avgscore)/avgn))/(avgn),
+		 avgscore=(avgscore*(avgn-1) + :s3)/avgn";
+		if ($timeonfirst > 0) {
+		 $query .= ",vartime=IF((avgn<200 AND :t1 BETWEEN 1 AND 3600) OR (:t2-avgtime)/sqrt(vartime)<3,
+		 	((avgn-1)*vartime + (:t3-avgtime)*((avgn-1)*(:t4 - avgtime)/avgn))/(avgn), vartime),
+		 avgtime=IF((avgn<200 AND :t5 BETWEEN 1 AND 3600) OR (:t6 - avgtime)/sqrt(vartime)<3,
+		  (avgtime*(avgn-1) + :t7)/avgn, avgtime)";
+		}
+		$query .= " WHERE id=:id";
+		$stm = $this->DBH->prepare($query);
+		if ($timeonfirst > 0) {
+			$stm->execute(array(':s1'=>$pctscore,':s2'=>$pctscore,':s3'=>$pctscore,
+				':t1'=>$timeonfirst,':t2'=>$timeonfirst,':t3'=>$timeonfirst,':t4'=>$timeonfirst,':t5'=>$timeonfirst,
+				':t6'=>$timeonfirst,':t7'=>$timeonfirst,':id'=>$qsetid));
+		} else {
+			$stm->execute(array(':s1'=>$pctscore,':s2'=>$pctscore,':s3'=>$pctscore,
+				':id'=>$qsetid));
+		}
   }
 
   /**

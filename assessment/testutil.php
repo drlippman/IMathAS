@@ -511,7 +511,7 @@ function printscore2($sc) {
 //scores a question
 //qn: question index in questions array
 //qi: getquestioninfo[qid]
-function scorequestion($qn, $rectime=true) {
+function scorequestion($qn, $rectime=true, $recAsFirst=true) {
 	global $DBH,$questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestquestions,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
@@ -555,7 +555,9 @@ function scorequestion($qn, $rectime=true) {
 	} else {
 		$scores[$qn] = $afterpenalty;
 	}
-	if (!$isreview && $attempts[$qn]==0 && strpos($lastanswers[$qn],'##')===false && !$_SESSION['isteacher']) {
+	if (!$isreview && $recAsFirst && !$_SESSION['isteacher'] && $attempts[$qn]==0 &&
+		strpos($lastanswers[$qn],'##')===false
+	) {
 		$firstrawscores[$qn] = $rawscores[$qn];
 		if ($rectime) {
 			global $timesontask;
@@ -564,11 +566,33 @@ function scorequestion($qn, $rectime=true) {
 		} else {
 			$time = 0;  //for all at once display, where time is not useful info
 		}
+		$pctscore = round(100*getpts($unitrawscore));
 		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
 		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$testsettings['courseid'], ':qsetid'=>$qi[$questions[$qn]]['questionsetid'],
-			':score'=>round(100*getpts($unitrawscore)), ':scoredet'=>$rawscores[$qn], ':timespent'=>$time));
+			':score'=>$pctscore, ':scoredet'=>$rawscores[$qn], ':timespent'=>$time));
+
+		$query = "UPDATE imas_questionset SET
+		 avgn=avgn+1,
+		 varscore=((avgn-1)*varscore + (:s1 - avgscore)*((avgn-1)*(:s2 - avgscore)/avgn))/(avgn),
+		 avgscore=(avgscore*(avgn-1) + :s3)/avgn";
+		if ($time > 0) {
+		 $query .= ",vartime=IF((avgn<200 AND :t1 BETWEEN 1 AND 3600) OR (:t2-avgtime)/sqrt(vartime)<3,
+		 	((avgn-1)*vartime + (:t3-avgtime)*((avgn-1)*(:t4 - avgtime)/avgn))/(avgn), vartime),
+		 avgtime=IF((avgn<200 AND :t5 BETWEEN 1 AND 3600) OR (:t6 - avgtime)/sqrt(vartime)<3,
+		  (avgtime*(avgn-1) + :t7)/avgn, avgtime)";
+		}
+		$query .= " WHERE id=:id";
+		$stm = $DBH->prepare($query);
+		if ($time > 0) {
+			$stm->execute(array(':s1'=>$pctscore,':s2'=>$pctscore,':s3'=>$pctscore,
+				':t1'=>$time,':t2'=>$time,':t3'=>$time,':t4'=>$time,':t5'=>$time,
+				':t6'=>$time,':t7'=>$time,':id'=>$qi[$questions[$qn]]['questionsetid']));
+		} else {
+			$stm->execute(array(':s1'=>$pctscore,':s2'=>$pctscore,':s3'=>$pctscore,
+				':id'=>$qi[$questions[$qn]]['questionsetid']));
+		}
 	}
 
 	//$scores[$qn] = $afterpenalty;
