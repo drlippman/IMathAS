@@ -33,11 +33,6 @@ if (isset($coursetheme)) {
 		$isfw = 1000;
 		$coursetheme = str_replace(array('_fw1000','_fw'),'',$coursetheme);
 	}
-	?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=042217";?>" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=051519" media="only screen and (max-width:480px)"/>
-
-<?php
 }
 if (isset($CFG['GEN']['favicon'])) {
 	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
@@ -209,6 +204,10 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
 	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
 }
+if (isset($coursetheme)) {
+	echo '<link rel="stylesheet" href="'. $imasroot . "/themes/$coursetheme?v=042217\" type=\"text/css\" />";
+}
+echo '<link rel="stylesheet" href="'. $imasroot . '/handheld.css?v=051519" media="only screen and (max-width:480px)"/>';
 if (isset($CFG['GEN']['translatewidgetID'])) {
 	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
 }
