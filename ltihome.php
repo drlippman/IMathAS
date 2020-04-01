@@ -457,7 +457,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 		echo _('Be aware some LMSs will send unexpected dates on instructor launches, so don\'t worry if the date shown in the assessment preview is different than you expected or different than the default due date. ');
 		echo '</p><p>';
-		echo_('If the LMS reports a different due date for an individual student when they open this assignment, this system will handle that by setting a due date exception. ');
+		echo _('If the LMS reports a different due date for an individual student when they open this assignment, this system will handle that by setting a due date exception. ');
 	} else if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) { //regular show
 		echo _("Currently available to students.")."  ";
 		echo sprintf(_("Available until %s"), formatdate($line['enddate']));
