@@ -1545,10 +1545,10 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> ';
 					   }
 					   echo '</span>';
-				   } else
+				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
 				   if ($line['allowlate']>0 && isset($_SESSION['stuview'])) {
-					echo _(' LatePass Allowed');
+						 echo _(' LatePass Allowed');
 				   } else if (!$canedit) {
 				   	if ($canuselatepassP || $canuselatepassR) {
 				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid\">", _('Use LatePass'), "</a>";
