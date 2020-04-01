@@ -169,7 +169,23 @@ function init(paramarr, enableMQ) {
       initMultAns(qn);
     }
     if (params.usetinymce) {
-      initeditor("textareas","mceEditor");
+      if (document.getElementById("qn"+qn).disabled &&
+        !document.getElementById("tinyprev"+qn)
+      ) {
+        var html = $("#qn"+qn).val();
+        var div = $("<div>", {"id": "tinyprev"+qn, "class": "intro"});
+        div.html(html);
+        $("#qn"+qn).hide().after(div);
+      } else {
+        initeditor("textareas","mceEditor",null,false,function(ed) {
+          ed.on('blur', function (e) {
+            tinymce.triggerSave();
+            jQuery(e.target.targetElm).triggerHandler('change');
+          }).on('focus', function (e) {
+            jQuery(e.target.targetElm).triggerHandler('focus');
+          })
+        });
+      }
     }
     initEnterHandler(qn);
   }

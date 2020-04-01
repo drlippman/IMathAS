@@ -833,8 +833,10 @@ export const actions = {
     }
     return 0;
   },
-  setRendered (qn) {
-    store.assessInfo.questions[qn].rendered = true;
+  setRendered (qn, value) {
+    if (store.assessInfo) {
+      store.assessInfo.questions[qn].rendered = value;
+    }
   },
   getChangedQuestions (qns) {
     if (typeof qns !== 'object') {
