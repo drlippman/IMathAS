@@ -5,11 +5,11 @@
 
 
 
-ini_set("max_input_time", "120");
+
 ini_set("max_execution_time", "120");
-ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "10485760");
-ini_set("post_max_size", "10485760");
+
+
+
 
   reset ($_FILES);
   $tempkey = key($_FILES);

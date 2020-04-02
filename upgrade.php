@@ -8,9 +8,9 @@ require('migrator.php');
 //old approach: change counter; increase by 1 each time a change is made
 $latest_oldstyle = 119;
 
-ini_set("max_input_time", "6000");
+
 ini_set("max_execution_time", "6000");
-ini_set("memory_limit", "104857600");
+
 
 if (isset($dbsetup) && $dbsetup==true) {  //initial setup run from setupdb.php
 

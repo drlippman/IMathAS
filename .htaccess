@@ -18,14 +18,12 @@ AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx
 AddType application/vnd.ms-excel.template.macroEnabled.12 xltm
 AddType application/vnd.openxmlformats-officedocument.spreadsheetml.template xltx
 Options -Indexes
-<IfModule mod_php5.c>
-  php_value upload_max_filesize 10M
-  php_value max_input_vars 5000
-</IfModule>
-<IfModule mod_php7.c>
-  php_value upload_max_filesize 10M
-  php_value max_input_vars 5000
-</IfModule>
+
+php_value upload_max_filesize 15M
+php_value post_max_size 128M
+php_value max_input_vars 5000
+php_value max_input_time 300
+php_value memory_limit 128M
 
 <Files "composer.json">
 deny from all
@@ -47,4 +45,3 @@ RewriteRule ^sql(.*) http://localhost/$1 [R=301,L,NC]
 RewriteRule ^db(.*) http://localhost/$1 [R=301,L,NC]
 RewriteRule ^php(.*) http://localhost/$1 [R=301,L,NC]
 RewriteRule ^pma(.*) http://localhost/$1 [R=301,L,NC]
-

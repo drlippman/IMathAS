@@ -10,9 +10,9 @@ if ($myrights<100) {
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-ini_set("max_input_time", "3600");
+
 ini_set("max_execution_time", "3600");
-ini_set("memory_limit", "712857600");
+
 
 require("header.php");
 

@@ -1,10 +1,10 @@
 <?php
 
-ini_set("max_input_time", "1600");
+
 ini_set("max_execution_time", "1600");
-ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "10485760");
-ini_set("post_max_size", "10485760");
+
+
+
 
 require("../init.php");
 if ($myrights<100) {exit;}

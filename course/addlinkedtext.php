@@ -8,11 +8,11 @@ require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 
 
-ini_set("max_input_time", "120");
+
 ini_set("max_execution_time", "120");
-ini_set("memory_limit", "31457280");
-ini_set("upload_max_filesize", "31457280");
-ini_set("post_max_size", "31457280");
+
+
+
 
 /*** pre-html data manipulation, including function code *******/
 

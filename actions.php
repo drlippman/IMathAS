@@ -1,9 +1,9 @@
 <?php
 	//IMathAS:  Basic Actions
 	//(c) 20006 David Lippman
-ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "10485760");
-ini_set("post_max_size", "10485760");
+
+
+
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['actions'])) {

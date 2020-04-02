@@ -2,9 +2,9 @@
 //IMathAS: Data dump of assessment details across course copies
 //(c) 2019 David Lippman for Lumen Learning
 
-ini_set("max_input_time", "600");
+
 ini_set("max_execution_time", "600");
-ini_set("memory_limit", "104857600");
+
 
 require("../init.php");
 

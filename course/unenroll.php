@@ -3,7 +3,7 @@
 //Included from listusers or gradebook - not called directly
 //(c) 2007 David Lippman
 
-ini_set("max_input_time", "600");
+
 ini_set("max_execution_time", "600");
 
 	if (!(isset($teacherid))) {

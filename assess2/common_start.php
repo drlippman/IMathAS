@@ -29,7 +29,7 @@ if (!$isRealStudent) {
 }
 
 // extend time for uploads
-ini_set("max_input_time", "60");
+
 
 /**
  * Check if the required parameters are set
