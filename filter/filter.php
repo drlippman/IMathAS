@@ -238,11 +238,11 @@
 	}
 	function getgraphfilename($str) {
 		$str = forcefiltergraph($str);
-		preg_match('/(\w+\.png)/',$str,$matches);
+		preg_match('/\/graph\/imgs\/(\w+\.png)/',$str,$matches);
 		return ($matches[1]);
 	}
 	function getgraphfilenames($str) {
-		preg_match_all('/(\w+\.png)/',$str,$matches,PREG_PATTERN_ORDER);
+		preg_match_all('/\/graph\/imgs\/(\w+\.png)/',$str,$matches,PREG_PATTERN_ORDER);
 		return ($matches[1]);
 	}
 	function mathentitycleanup($arr) {
