@@ -1,5 +1,8 @@
 <?php
-
+//Error checking off
+error_reporting(0);
+ini_set('display_errors', 'Off');
+// End Error checking off
 require_once(__DIR__ . "/includes/sanitize.php");
 
 // Load site config.
