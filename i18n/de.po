@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 15:20+0100\n"
-"PO-Revision-Date: 2020-03-16 15:20+0100\n"
+"POT-Creation-Date: 2020-04-01 06:14+0200\n"
+"PO-Revision-Date: 2020-04-01 06:30+0200\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,6 +26,10 @@ msgstr ""
 #: directaccess.php:135 course/testquestion.php:275
 #: course/addvideotimes.php:440 admin/importitems.php:742
 #: admin/importitems2.php:177 course/addvideotimes.php:439
+#: admin/importitems.php:751 assessment/showtest.php:1917
+#: assessment/showtest.php:1961 assessment/showtest.php:2303
+#: assessment/showtest.php:2645 assessment/showtest.php:2732
+#: assessment/showtest.php:2934 directaccess.php:137
 msgid "Submit"
 msgstr "Absenden"
 
@@ -44,6 +48,8 @@ msgstr "%1$s von %2$s"
 #: course/quickdrill.php:481 course/quickdrill.php:485 embedq.php:287
 #: embedq.php:291 assess2/questions/QuestionHtmlGenerator.php:1011
 #: assess2/questions/answerboxhelpers.php:571 assessment/displayq2.php:8012
+#: assessment/displayq2.php:8015 course/quickdrill.php:472
+#: course/quickdrill.php:476
 msgid "Correct"
 msgstr "Richtig"
 
@@ -56,6 +62,7 @@ msgstr "Richtig"
 #: course/quickdrill.php:483 embedq.php:289
 #: assess2/questions/QuestionHtmlGenerator.php:1007
 #: assess2/questions/answerboxhelpers.php:569 assessment/displayq2.php:8010
+#: assessment/displayq2.php:8013 course/quickdrill.php:474
 msgid "Incorrect"
 msgstr "Falsch"
 
@@ -68,6 +75,7 @@ msgstr "Falsch"
 #: course/quickdrill.php:487 embedq.php:293
 #: assess2/questions/QuestionHtmlGenerator.php:1019
 #: assess2/questions/answerboxhelpers.php:575 assessment/displayq2.php:8016
+#: assessment/displayq2.php:8019 course/quickdrill.php:478
 msgid "Partially correct"
 msgstr "Teilweise richtig"
 
@@ -120,6 +128,7 @@ msgstr " Anforderung von Benutzernamen"
 
 #: actions.php:414 actions.php:752 actions.php:412 actions.php:749
 #: actions.php:409 actions.php:746 actions.php:408 actions.php:745
+#: actions.php:405 actions.php:742
 msgid "This is an automated message. Do not reply to this email."
 msgstr ""
 "Dies ist eine automatisch erzeugte Nachricht. Antworten Sie nicht auf diese "
@@ -127,22 +136,26 @@ msgstr ""
 
 #: actions.php:415 actions.php:753 actions.php:413 actions.php:750
 #: actions.php:410 actions.php:747 actions.php:409 actions.php:746
+#: actions.php:406 actions.php:743
 #, php-format
 msgid "Hi, your account details on %s were recently changed."
 msgstr "Hallo, Ihre Kontodaten auf %s wurden kürzlich geändert."
 
 #: actions.php:416 actions.php:758 actions.php:414 actions.php:755
 #: actions.php:411 actions.php:752 actions.php:410 actions.php:751
+#: actions.php:407 actions.php:748
 msgid "Your password was changed."
 msgstr "Ihr Passwort wurde geändert."
 
 #: actions.php:417 actions.php:760 actions.php:415 actions.php:757
 #: actions.php:412 actions.php:754 actions.php:411 actions.php:753
+#: actions.php:408 actions.php:750
 msgid "If this was you, you can disregard this email."
 msgstr "Wenn Sie dies waren, können Sie diese E-Mail ignorieren."
 
 #: actions.php:418 actions.php:761 actions.php:416 actions.php:758
 #: actions.php:413 actions.php:755 actions.php:412 actions.php:754
+#: actions.php:409 actions.php:751
 msgid ""
 "If you did not make these changes, please log into your account and correct "
 "the changes and change your password."
@@ -152,6 +165,7 @@ msgstr ""
 
 #: actions.php:430 actions.php:774 actions.php:428 actions.php:771
 #: actions.php:425 actions.php:768 actions.php:424 actions.php:767
+#: actions.php:421 actions.php:764
 msgid "If you are unable to log into your account, use the following link."
 msgstr ""
 "Wenn Sie sich nicht bei Ihrem Konto anmelden können, verwenden Sie den "
@@ -159,21 +173,24 @@ msgstr ""
 
 #: actions.php:432 actions.php:776 admin/userreportdetails.php:288
 #: forms.php:380 actions.php:430 actions.php:773 actions.php:770
-#: actions.php:427 actions.php:426 actions.php:769
+#: actions.php:427 actions.php:426 actions.php:769 actions.php:766
 msgid "Reset Password"
 msgstr "Passwort zurücksetzen"
 
 #: actions.php:435 actions.php:780 actions.php:433 actions.php:777
 #: actions.php:430 actions.php:774 actions.php:429 actions.php:773
+#: actions.php:426 actions.php:770
 msgid "Alert:"
 msgstr "Warnung:"
 
 #: actions.php:435 actions.php:780 actions.php:433 actions.php:777
 #: actions.php:430 actions.php:774 actions.php:429 actions.php:773
+#: actions.php:426 actions.php:770
 msgid "Account Activity"
 msgstr "Aktivität der Kennung"
 
 #: actions.php:755 actions.php:752 actions.php:749 actions.php:748
+#: actions.php:745
 #, php-format
 msgid "Your email address was changed to %s."
 msgstr "Ihre E-Mail-Adresse wurde in %s geändert."
@@ -246,7 +263,8 @@ msgstr ""
 
 #: admin/addcourse.php:72 admin/forms.php:1382 assess2/AssessUtils.php:174
 #: assessment/showtest.php:1765 assessment/showtest.php:2701
-#: assessment/showtest.php:3558 ltihome.php:291
+#: assessment/showtest.php:3558 ltihome.php:291 assessment/showtest.php:1757
+#: assessment/showtest.php:2693 assessment/showtest.php:3550
 msgid "Continue"
 msgstr "Fortfahren"
 
@@ -256,7 +274,9 @@ msgstr "Fortfahren"
 #: includes/userutils.php:23 includes/userutils.php:44
 #: includes/userutils.php:70 util/listnewteachers.php:153
 #: util/listnewteachers.php:204 javascript/addqsort.js:1082
-#: javascript/addqsort.js:1088
+#: javascript/addqsort.js:1088 course/addassessment2.php:738
+#: course/chgassessments2.php:497 course/gradebook.php:329
+#: course/gradebook.php:481 javascript/addqsort.js:1080
 msgid "Default"
 msgstr "Standard"
 
@@ -282,34 +302,32 @@ msgid "Guest"
 msgstr "Gast"
 
 #: admin/admin2.php:11 admin/groupreportdetails.php:10 admin/userdetails.php:10
-#: admin/userreportdetails.php:11 course/course.php:694
-#: admin/userreports.php:11 msgs/msglist.php:351
+#: course/course.php:694 course/course.php:691 msgs/msglist.php:351
 msgid "Student"
 msgstr "Student"
 
 #: admin/admin2.php:12 admin/groupreportdetails.php:11 admin/userdetails.php:11
-#: admin/userreportdetails.php:12 admin/userreports.php:12
-#: util/listnewteachers.php:60
+#: admin/userreports.php:12 util/listnewteachers.php:60
 msgid "Pending"
 msgstr "Ausstehend"
 
 #: admin/admin2.php:13 admin/groupreportdetails.php:12 admin/userdetails.php:12
-#: admin/userreports.php:13 admin/userreportdetails.php:13
+#: admin/userreportdetails.php:13
 msgid "Tutor/TA/Proctor"
 msgstr "Tutor/Assistent"
 
 #: admin/admin2.php:14 admin/groupreportdetails.php:13 admin/userdetails.php:13
-#: admin/userreports.php:14 admin/userreportdetails.php:14
+#: admin/userreportdetails.php:14
 msgid "Teacher"
 msgstr "Lehrer"
 
 #: admin/admin2.php:15 admin/groupreportdetails.php:14 admin/userdetails.php:14
-#: admin/userreports.php:15 admin/userreportdetails.php:15
+#: admin/userreportdetails.php:15
 msgid "LimCourseCreator"
 msgstr "Kurseigentümer"
 
 #: admin/admin2.php:16 admin/groupreportdetails.php:15 admin/userdetails.php:15
-#: admin/userreports.php:16 admin/userreportdetails.php:16
+#: admin/userreportdetails.php:16
 msgid "GroupAdmin"
 msgstr "Gruppen-Administrator"
 
@@ -358,6 +376,7 @@ msgid "Manage Libraries"
 msgstr "Bibliotheken verwalten"
 
 #: admin/admin2.php:168 admin/admin2.php:345 course/course.php:519
+#: course/course.php:516
 msgid "Export Libraries"
 msgstr "Bibliotheken exportieren"
 
@@ -378,7 +397,7 @@ msgstr "Neuen Benutzer hinzufügen"
 msgid "Batch Add Instructors"
 msgstr "Dozenten in Serie hinzufügen"
 
-#: admin/admin2.php:179 admin/forms.php:1530 index.php:530
+#: admin/admin2.php:179 admin/forms.php:1530 index.php:530 admin/forms.php:1492
 msgid "Find Student"
 msgstr "Finde Student"
 
@@ -399,14 +418,14 @@ msgstr "Name"
 #: admin/admin2.php:194 admin/admin2.php:286 admin/groupreportdetails.php:224
 #: admin/userreportdetails.php:264 admin/userreports.php:156
 #: admin/userreports.php:222 assessment/showtest.php:1408 actions.php:351
-#: actions.php:348 actions.php:347
+#: actions.php:348 actions.php:347 assessment/showtest.php:1401
 msgid "Username"
 msgstr "Benutzername"
 
 #: admin/admin2.php:195 admin/admin2.php:287 admin/groupreportdetails.php:225
 #: admin/userdetails.php:193 admin/userreportdetails.php:275
 #: admin/userreports.php:157 admin/userreports.php:223 course/gradebook.php:683
-#: forms.php:421 course/gradebook.php:687 course/listusers.php:752
+#: course/listusers.php:752 course/gradebook.php:679 course/listusers.php:750
 msgid "Email"
 msgstr "E-Mail"
 
@@ -422,6 +441,8 @@ msgstr "Rolle"
 #: admin/userreports.php:196 forms.php:138 javascript/addqsort.js:1146
 #: javascript/addqsort.js:1222 javascript/addqsort.js:1152
 #: javascript/addqsort.js:1228 course/addquestions.php:1252
+#: course/addquestions.php:1246 javascript/addqsort.js:1144
+#: javascript/addqsort.js:1220
 msgid "Group"
 msgstr "Gruppe"
 
@@ -457,6 +478,7 @@ msgstr "Bearbeiten"
 #: course/courseshowitems.php:2322 course/courseshowitems.php:2369
 #: course/courseshowitems.php:2416 course/editsnippets.php:99
 #: course/editsnippets.php:244 index.php:74 msgs/viewmsg.php:238
+#: admin/forms.php:1285 admin/forms.php:1350 admin/forms.php:1435
 msgid "Delete"
 msgstr "Löschen"
 
@@ -467,10 +489,12 @@ msgid "Last Login"
 msgstr "Letzte Anmeldung"
 
 #: admin/admin2.php:290 admin/admin2.php:309 course/addquestions.php:985
+#: course/addquestions.php:980
 msgid "Edit"
 msgstr "Ändern"
 
 #: admin/admin2.php:326 course/course.php:492 course/course.php:502
+#: course/course.php:489 course/course.php:499
 msgid "Groups"
 msgstr "Gruppen"
 
@@ -500,6 +524,7 @@ msgstr "Lehrer finden"
 
 #: admin/admin2.php:356 admin/admin2.php:360 admin/admin2.php:369
 #: admin/userreports.php:256 admin/userreports.php:263 util/utils.php:269
+#: util/utils.php:265
 msgid "Go"
 msgstr "Los"
 
@@ -548,6 +573,8 @@ msgstr "Diagnose-Einstellungen"
 #: course/viewforumgrade.php:85 actions.php:809 course/addquestions.php:1280
 #: actions.php:806 actions.php:805 course/sendmsgmodal.php:105
 #: admin/importitems.php:658 admin/importitems.php:662
+#: admin/importitems.php:660 admin/importitems.php:664
+#: course/addquestions.php:1274 course/sendmsgmodal.php:111
 msgid "Done"
 msgstr "Erledigt"
 
@@ -565,7 +592,7 @@ msgstr "Einen Kurs hinzufügen"
 
 #: admin/forms.php:317
 msgid "Add a new course for this user"
-msgstr "Einen neuen Kurs für diesen benutzer hinzufügen"
+msgstr "Einen neuen Kurs für diesen Benutzer hinzufügen"
 
 #: admin/forms.php:358 admin/forms.php:572 course/course.php:547
 #: admin/forms.php:568
@@ -601,18 +628,22 @@ msgid "Course Copy Options"
 msgstr "Einstellungen für Kurskopie"
 
 #: admin/forms.php:700 course/copyitems.php:596 course/copyitems.php:595
+#: admin/forms.php:706
 msgid "Copy offline grade items?"
 msgstr "Kurselemente kopieren, die offline bewertet werden?"
 
 #: admin/forms.php:703 course/copyitems.php:599 course/copyitems.php:598
+#: admin/forms.php:709
 msgid "Copy rubrics?"
 msgstr "Lernziele kopieren?"
 
 #: admin/forms.php:706 course/copyitems.php:600 course/copyitems.php:599
+#: admin/forms.php:712
 msgid "Copy outcomes?"
 msgstr "Themen kopieren?"
 
 #: admin/forms.php:709 course/copyitems.php:603 course/copyitems.php:602
+#: admin/forms.php:715
 msgid "Copy \"display at top\" instructor forum posts?"
 msgstr "Kopiere \"oben anzeigen\" für Dozenten-Beiträge?"
 
@@ -734,7 +765,10 @@ msgstr "Kursvorgänger"
 #: course/addassessment2form.php:844 course/addassessment2form.php:883
 #: course/addassessment2form.php:931 course/addassessment2form.php:768
 #: course/addassessment2form.php:834 course/addassessment2form.php:873
-#: course/addassessment2form.php:921
+#: course/addassessment2form.php:921 course/chgassessments2form.php:788
+#: course/chgassessments2form.php:850 course/chgassessments2form.php:892
+#: course/chgassessments2form.php:944 course/gbtable2.php:923
+#: course/gradebook.php:672
 msgid "Never"
 msgstr "Niemals"
 
@@ -788,7 +822,7 @@ msgstr "als Kurs-Eigentümer"
 #: admin/importitems2.php:25 admin/importitems2.php:26
 #: admin/importitems2.php:166 admin/importitems.php:608
 #: admin/importitems.php:609 admin/importitems.php:731
-#: admin/importitems2.php:165
+#: admin/importitems2.php:165 admin/importitems.php:740
 msgid "Import Course Items"
 msgstr "Kurselemente importieren"
 
@@ -847,7 +881,10 @@ msgstr "Eigentümer"
 #: course/chgassessments2form.php:400 course/chgassessments2form.php:410
 #: course/chgassessments2form.php:540 course/chgassessments2form.php:380
 #: course/addquestions.php:975 admin/forms.php:785 admin/forms.php:792
-#: course/modquestion.php:307
+#: course/modquestion.php:307 course/addquestions.php:970
+#: course/chgassessments2form.php:394 course/chgassessments2form.php:404
+#: course/chgassessments2form.php:414 course/chgassessments2form.php:424
+#: course/chgassessments2form.php:554
 msgid "Yes"
 msgstr "Ja"
 
@@ -864,7 +901,15 @@ msgstr "Ja"
 #: course/chgassessments2form.php:590 admin/forms.php:783 admin/forms.php:790
 #: course/addlinkedtext.php:649 course/modquestion.php:285
 #: course/modquestion.php:306 course/modquestion2.php:289
-#: course/modquestion2.php:303
+#: course/modquestion2.php:303 course/addassessment2form.php:382
+#: course/addassessment2form.php:391 course/addassessment2form.php:581
+#: course/chgassessments2form.php:368 course/chgassessments2form.php:380
+#: course/chgassessments2form.php:393 course/chgassessments2form.php:403
+#: course/chgassessments2form.php:413 course/chgassessments2form.php:423
+#: course/chgassessments2form.php:540 course/chgassessments2form.php:553
+#: course/chgassessments2form.php:604 course/modquestion2.php:222
+#: course/modquestion2.php:232 course/modquestion2.php:298
+#: course/modquestion2.php:312 course/modquestion2.php:321
 msgid "No"
 msgstr "Nein"
 
@@ -880,6 +925,10 @@ msgstr ""
 #: assessment/showtest.php:1204 assessment/showtest.php:1220
 #: assessment/showtest.php:1224 assessment/showtest.php:1259
 #: assessment/showtest.php:1263 course/course.php:449
+#: assessment/showtest.php:1194 assessment/showtest.php:1198
+#: assessment/showtest.php:1214 assessment/showtest.php:1218
+#: assessment/showtest.php:1253 assessment/showtest.php:1257
+#: course/course.php:446
 msgid "User Preferences"
 msgstr "Benutzer-Einstellungen"
 
@@ -891,7 +940,7 @@ msgstr ""
 "laden und versuchen Sie es noch einmal."
 
 #: admin/modcourseorder.php:133 course/addoutcomes.php:171
-#: course/course.php:627 course/managecalitems.php:89
+#: course/course.php:627 course/managecalitems.php:89 course/course.php:624
 msgid ""
 "You have unrecorded changes.  Are you sure you want to abandon your changes?"
 msgstr ""
@@ -941,9 +990,9 @@ msgstr ""
 #: course/course.php:719 course/editsnippets.php:227
 #: course/editsnippets.php:255 course/exception.php:188
 #: course/gbsettings.php:402 course/gradebook.php:734 course/gradebook.php:1293
-#: course/managecalitems.php:161 course/latepasses.php:175
-#: course/managecalitems.php:133 course/gradebook.php:1297
-#: course/masschgdates.php:404 forms.php:481
+#: course/latepasses.php:175 course/gradebook.php:1297
+#: course/addassessment2.php:554 course/course.php:713 course/gradebook.php:730
+#: course/gradebook.php:1296 course/masschgdates.php:402 forms.php:481
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -952,7 +1001,6 @@ msgid "Add Course Group"
 msgstr "Kurs-Gruppe anlegen"
 
 #: admin/modcourseorder.php:189 admin/unhidefromcourselist.php:90 index.php:570
-#: index.php:576
 msgid "Unavailable"
 msgstr "Nicht verfügbar"
 
@@ -984,6 +1032,7 @@ msgstr "Wieder auf der Kursliste anzeigen"
 #: admin/userreportdetails.php:519 course/courseshowitems.php:133
 #: course/courseshowitems.php:2168 course/courseshowitems.php:2170
 #: course/gradebook.php:455 index.php:70 ltihome.php:474
+#: course/gradebook.php:451
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -1016,26 +1065,22 @@ msgid "Deleted"
 msgstr "Gelöscht"
 
 #: admin/userdetails.php:84 admin/userdetails.php:109 admin/userdetails.php:135
-#: admin/userreportdetails.php:107 admin/userreportdetails.php:223
-#: admin/forms.php:731 admin/userreportdetails.php:197
+#: admin/userreportdetails.php:223 admin/userreportdetails.php:197
 msgid "Available to students"
 msgstr "Für Studierende verfügbar"
 
 #: admin/userdetails.php:84 admin/userdetails.php:109 admin/userdetails.php:135
-#: admin/userreportdetails.php:107 admin/userreportdetails.php:197
-#: admin/userreportdetails.php:223
+#: admin/userreportdetails.php:197 admin/userreportdetails.php:223
 msgid "Hidden from students"
 msgstr "Für Studierende unsichtbar"
 
 #: admin/userdetails.php:86 admin/userdetails.php:113 admin/userdetails.php:139
-#: admin/userreportdetails.php:109 admin/userreportdetails.php:201
-#: admin/userreportdetails.php:227
+#: admin/userreportdetails.php:201 admin/userreportdetails.php:227
 msgid "Locked for Assessment"
 msgstr "Gesperrter Test"
 
 #: admin/userdetails.php:89 admin/userdetails.php:116 admin/userdetails.php:142
-#: admin/userdetails.php:379 admin/userreportdetails.php:112
-#: admin/userreportdetails.php:230 admin/userreportdetails.php:204
+#: admin/userreportdetails.php:112 admin/userreportdetails.php:204
 #: admin/userreportdetails.php:502
 msgid "Hidden on User's Home Page"
 msgstr "Auf er Startseite des Benutzers ausgeblendet"
@@ -1133,6 +1178,9 @@ msgstr "Benutzer ID (remote)"
 #: javascript/addqsort.js:1275 javascript/addqsort.js:1395
 #: javascript/addqsort.js:1646 javascript/addqsort.js:1647
 #: course/addquestions.php:1251 javascript/addqsort.js:1651
+#: course/addassessment2form.php:569 course/addquestions.php:1245
+#: javascript/addqsort.js:1267 javascript/addqsort.js:1387
+#: javascript/addqsort.js:1643
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -1155,7 +1203,8 @@ msgstr "Wählen Sie oben eine contextid um die zugeordneten Tests anzuzeigen"
 #: admin/userlti.php:223 course/addquestions.php:1350
 #: course/addquestions.php:1477 javascript/addqsort.js:1080
 #: course/copyitems.php:533 course/copyitems.php:532 admin/importitems.php:789
-#: admin/importitems2.php:226
+#: admin/importitems2.php:226 course/addquestions.php:1344
+#: course/addquestions.php:1471 javascript/addqsort.js:1072
 msgid "Type"
 msgstr "Typ"
 
@@ -1172,7 +1221,6 @@ msgid "Linkid"
 msgstr "Link-ID"
 
 #: admin/userreportdetails.php:70 forms.php:378 actions.php:320 actions.php:317
-#: actions.php:316
 msgid "Password Reset"
 msgstr "Passwort zurücksetzen"
 
@@ -1194,6 +1242,7 @@ msgstr "Setze temporäres Passwort auf: "
 
 #: admin/userreportdetails.php:315 admin/userreportdetails.php:356
 #: course/gradebook.php:470 util/listnewteachers.php:58
+#: course/gradebook.php:466
 msgid "Active"
 msgstr "Aktiv"
 
@@ -1232,6 +1281,7 @@ msgstr "Neu beantragte Dozenten-Kennungen"
 #: assess2/AssessInfo.php:510 assessment/showtest.php:3283
 #: course/addassessment.php:1223 course/chgassessments.php:908
 #: course/addassessment2form.php:494 assess2/AssessInfo.php:511
+#: assessment/showtest.php:3275 course/addassessment2form.php:505
 msgid "points"
 msgstr "Punkte"
 
@@ -1280,12 +1330,12 @@ msgstr "Musterlösung"
 
 #: assess2/displayq3.php:451 assess2/displayq3.php:488
 #: assess2/questions/QuestionHtmlGenerator.php:514 assessment/displayq2.php:493
-#: assessment/testutil.php:918 assessment/showtest.php:3052
-#: javascript/livepoll.js:418 assessment/displayq2.php:533
-#: assessment/showtest.php:3598 assessment/testutil.php:916
-#: assess2/questions/QuestionHtmlGenerator.php:516 assessment/showtest.php:2993
-#: assessment/showtest.php:3054 assessment/showtest.php:3587
-#: assessment/showtest.php:3716 assessment/testutil.php:819
+#: assessment/showtest.php:3052 assessment/displayq2.php:533
+#: assessment/testutil.php:916 assessment/showtest.php:2993
+#: assessment/showtest.php:3587 assessment/testutil.php:819
+#: assessment/showtest.php:2985 assessment/showtest.php:3044
+#: assessment/showtest.php:3046 assessment/showtest.php:3579
+#: assessment/showtest.php:3590 assessment/showtest.php:3708
 msgid "Question"
 msgstr "Frage"
 
@@ -1297,7 +1347,7 @@ msgstr ""
 
 #: assess2/displayq3.php:524 assess2/questions/QuestionHtmlGenerator.php:556
 #: assessment/displayq2.php:655 assess2/questions/QuestionHtmlGenerator.php:558
-#: course/addquestions.php:962
+#: course/addquestions.php:962 course/addquestions.php:957
 msgid "Detailed Solution"
 msgstr "Detaillierte Lösung"
 
@@ -1411,7 +1461,7 @@ msgstr "Geben Sie eine ganze Zahl oder eine Dezimalzahl ein"
 #: assess2/questions/answerboxes/NumberAnswerBox.php:97
 #: assess2/questions/answerboxhelpers.php:536 assessment/displayq2.php:1144
 #: assessment/displayq2.php:7977 assess2/questions/answerboxhelpers.php:539
-#: assessment/displayq2.php:7980
+#: assessment/displayq2.php:7980 assessment/displayq2.php:7983
 msgid "Enter DNE for Does Not Exist, oo for Infinity"
 msgstr ""
 "Geben Sie DNE (Does Not Exist) ein, wenn keine Antwort existiert, oder oo "
@@ -1617,6 +1667,11 @@ msgstr "Ihre Antwort"
 #: course/addquestions.php:902 course/addquestions.php:1088
 #: course/addquestions.php:1298 javascript/addqsort.js:1467
 #: javascript/addqsort.js:1476 includes/coursecopylist.php:118
+#: course/addquestions.php:897 course/addquestions.php:1082
+#: course/addquestions.php:1292 course/addquestions.php:1344
+#: course/addquestions.php:1471 course/modquestion2.php:266
+#: javascript/addqsort.js:1070 javascript/addqsort.js:1459
+#: javascript/addqsort.js:1468
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -1956,7 +2011,7 @@ msgstr ""
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:66
 #: assess2/questions/answerboxhelpers.php:534 assessment/displayq2.php:2651
 #: assessment/displayq2.php:7975 assess2/questions/answerboxhelpers.php:537
-#: assessment/displayq2.php:7978
+#: assessment/displayq2.php:7978 assessment/displayq2.php:7981
 msgid "Enter DNE for an empty set. Use oo to enter Infinity."
 msgstr "Geben Sie DNE für eine leere Menge oder oo für Unendlich ein."
 
@@ -1964,7 +2019,7 @@ msgstr "Geben Sie DNE für eine leere Menge oder oo für Unendlich ein."
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:68
 #: assess2/questions/answerboxhelpers.php:539 assessment/displayq2.php:2653
 #: assessment/displayq2.php:7980 assess2/questions/answerboxhelpers.php:542
-#: assessment/displayq2.php:7983
+#: assessment/displayq2.php:7983 assessment/displayq2.php:7986
 msgid "Use oo to enter Infinity."
 msgstr "Benutze oo um Unendlich einzugeben."
 
@@ -2079,13 +2134,13 @@ msgstr "Neues Zeichenelement hinzufügen"
 
 #: assess2/displayq3.php:3073
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:268
-#: assessment/displayq2.php:3038
+#: assessment/displayq2.php:3038 assessment/displayq2.php:3041
 msgid "Clear All"
 msgstr "Alles leeren"
 
 #: assess2/displayq3.php:3077
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:272
-#: assessment/displayq2.php:3042
+#: assessment/displayq2.php:3042 assessment/displayq2.php:3045
 msgid "Draw:"
 msgstr "Zeichnen:"
 
@@ -2093,37 +2148,37 @@ msgstr "Zeichnen:"
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:431
 #: assessment/displayq2.php:3201 javascript/assess2_min.js:1
 #: javascript/assessment_min.js:5 javascript/drawing.js:208
-#: javascript/drawing_min.js:1
+#: javascript/drawing_min.js:1 assessment/displayq2.php:3204
 msgid "Line"
 msgstr "Linie"
 
 #: assess2/displayq3.php:3238
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:433
-#: assessment/displayq2.php:3203
+#: assessment/displayq2.php:3203 assessment/displayq2.php:3206
 msgid "Line Segment"
 msgstr "Liniensegment"
 
 #: assess2/displayq3.php:3240
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:435
-#: assessment/displayq2.php:3205
+#: assessment/displayq2.php:3205 assessment/displayq2.php:3208
 msgid "Freehand Draw"
 msgstr "Freihandzeichnen"
 
 #: assess2/displayq3.php:3242
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:437
-#: assessment/displayq2.php:3207
+#: assessment/displayq2.php:3207 assessment/displayq2.php:3210
 msgid "Eraser"
 msgstr "Radiergummi"
 
 #: assess2/displayq3.php:3245
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:440
-#: assessment/displayq2.php:3210
+#: assessment/displayq2.php:3210 assessment/displayq2.php:3213
 msgid "Dot"
 msgstr "Punkt"
 
 #: assess2/displayq3.php:3247
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:442
-#: assessment/displayq2.php:3212
+#: assessment/displayq2.php:3212 assessment/displayq2.php:3215
 msgid "Open Dot"
 msgstr "Offener Punkt"
 
@@ -2133,23 +2188,24 @@ msgstr "Offener Punkt"
 #: assessment/displayq2.php:3214 assessment/displayq2.php:3217
 #: javascript/assess2_min.js:1 javascript/assessment_min.js:5
 #: javascript/drawing.js:241 javascript/drawing.js:242
-#: javascript/drawing_min.js:1
+#: javascript/drawing_min.js:1 assessment/displayq2.php:3220
 msgid "Polygon"
 msgstr "Vieleck"
 
 #: assess2/displayq3.php:3304
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:495
-#: assessment/displayq2.php:3268
+#: assessment/displayq2.php:3268 assessment/displayq2.php:3271
 msgid "Enter your answer by drawing on the graph."
 msgstr "Geben Sie Ihre Antwort ein, indem Sie zeichnen."
 
 #: assess2/displayq3.php:3510 assessment/displayq2.php:3474
+#: assessment/displayq2.php:3477
 msgid "Last file uploaded:"
 msgstr "Zuletzt hochgeladene Datei:"
 
 #: assess2/displayq3.php:3525
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:113
-#: assessment/displayq2.php:3489
+#: assessment/displayq2.php:3489 assessment/displayq2.php:3492
 msgid "Select a file to upload"
 msgstr "Wählen Sie eine Datei zum Hochladen aus"
 
@@ -2157,6 +2213,7 @@ msgstr "Wählen Sie eine Datei zum Hochladen aus"
 #: assess2/questions/scorepart/ChoicesScorePart.php:51
 #: assess2/questions/scorepart/MultipleAnswerScorePart.php:43
 #: assessment/displayq2.php:3784 assessment/displayq2.php:3838
+#: assessment/displayq2.php:3787 assessment/displayq2.php:3841
 msgid ""
 "Eeek!  $questions is not defined or needs to be an array.  Make sure "
 "$questions is defined in the Common Control section."
@@ -2166,7 +2223,7 @@ msgstr ""
 
 #: assess2/displayq3.php:3934
 #: assess2/questions/scorepart/MatchingScorePart.php:44
-#: assessment/displayq2.php:3895
+#: assessment/displayq2.php:3895 assessment/displayq2.php:3898
 msgid ""
 "Eeek!  $questions or $answers is not defined or needs to be an array.  Make "
 "sure both are defined in the Common Control section."
@@ -2177,19 +2234,19 @@ msgstr ""
 
 #: assess2/displayq3.php:4617
 #: assess2/questions/scorepart/CalculatedScorePart.php:113
-#: assessment/displayq2.php:4616
+#: assessment/displayq2.php:4616 assessment/displayq2.php:4619
 msgid "Debug info: empty, missing or invalid $answer"
 msgstr "Debuginfo: leeres, fehlendes oder ungültiges $answer"
 
 #: assess2/displayq3.php:4636
 #: assess2/questions/scorepart/CalculatedScorePart.php:133
-#: assessment/displayq2.php:4635
+#: assessment/displayq2.php:4635 assessment/displayq2.php:4638
 msgid "Debug info: empty, missing, or invalid $answer"
 msgstr "Debuginfo: leere, fehlende oder ungültiges $answer"
 
 #: assess2/displayq3.php:5092
 #: assess2/questions/scorepart/FunctionExpressionScorePart.php:289
-#: assessment/displayq2.php:5037
+#: assessment/displayq2.php:5037 assessment/displayq2.php:5040
 msgid ""
 "Debug info: function evaled to Not-a-number at all test points.  Check "
 "$domain"
@@ -2200,11 +2257,12 @@ msgstr ""
 #: assess2/displayq3.php:7321 assess2/displayq3.php:7407
 #: assess2/questions/scorepart/FileScorePart.php:133
 #: assessment/displayq2.php:7278 assessment/displayq2.php:7364
+#: assessment/displayq2.php:7281 assessment/displayq2.php:7367
 msgid " Unable to open Excel file"
 msgstr " Kann Excel Datei nicht öffnen"
 
 #: assess2/displayq3.php:7341 assess2/questions/scorepart/FileScorePart.php:80
-#: assessment/displayq2.php:7298
+#: assessment/displayq2.php:7298 assessment/displayq2.php:7301
 #, php-format
 msgid "Upload of %s: "
 msgstr "Hochladen von %s: "
@@ -2213,6 +2271,7 @@ msgstr "Hochladen von %s: "
 #: assess2/questions/scorepart/FileScorePart.php:82
 #: assess2/questions/scorepart/FileScorePart.php:83
 #: assessment/displayq2.php:7300 assessment/displayq2.php:7301
+#: assessment/displayq2.php:7303 assessment/displayq2.php:7304
 msgid "Error - Invalid file type"
 msgstr "Fehler - Ungültiger Dateityp"
 
@@ -2220,6 +2279,7 @@ msgstr "Fehler - Ungültiger Dateityp"
 #: assess2/questions/scorepart/FileScorePart.php:109
 #: assess2/questions/scorepart/FileScorePart.php:110
 #: assessment/displayq2.php:7342 assessment/displayq2.php:7343
+#: assessment/displayq2.php:7345 assessment/displayq2.php:7346
 msgid "Error - no asid"
 msgstr "Fehler - keine asid"
 
@@ -2227,11 +2287,12 @@ msgstr "Fehler - keine asid"
 #: assess2/questions/scorepart/FileScorePart.php:115
 #: assess2/questions/scorepart/FileScorePart.php:116
 #: assessment/displayq2.php:7347 assessment/displayq2.php:7348
+#: assessment/displayq2.php:7350 assessment/displayq2.php:7351
 msgid "Error - File not uploaded in preview"
 msgstr "Fehler - Datei nicht in Vorschau hochgeladen"
 
 #: assess2/displayq3.php:7415 assess2/questions/scorepart/FileScorePart.php:142
-#: assessment/displayq2.php:7372
+#: assessment/displayq2.php:7372 assessment/displayq2.php:7375
 msgid "Successful"
 msgstr "Erfolgreich"
 
@@ -2239,6 +2300,7 @@ msgstr "Erfolgreich"
 #: assess2/questions/scorepart/FileScorePart.php:146
 #: assess2/questions/scorepart/FileScorePart.php:147
 #: assessment/displayq2.php:7376 assessment/displayq2.php:7377
+#: assessment/displayq2.php:7379 assessment/displayq2.php:7380
 msgid "Error storing file"
 msgstr "Fehler beim Speichern der Datei"
 
@@ -2246,6 +2308,7 @@ msgstr "Fehler beim Speichern der Datei"
 #: assess2/questions/scorepart/FileScorePart.php:155
 #: assess2/questions/scorepart/FileScorePart.php:156
 #: assessment/displayq2.php:7384 assessment/displayq2.php:7385
+#: assessment/displayq2.php:7387 assessment/displayq2.php:7388
 msgid "Error uploading file - file too big"
 msgstr "Fehler beim Hochladen der Datei - Datei zu groß"
 
@@ -2253,6 +2316,7 @@ msgstr "Fehler beim Hochladen der Datei - Datei zu groß"
 #: assess2/questions/scorepart/FileScorePart.php:158
 #: assess2/questions/scorepart/FileScorePart.php:159
 #: assessment/displayq2.php:7387 assessment/displayq2.php:7388
+#: assessment/displayq2.php:7390 assessment/displayq2.php:7391
 msgid "Error uploading file"
 msgstr "Fehler beim Hochladen der Datei"
 
@@ -2263,6 +2327,7 @@ msgstr "Fehler beim Hochladen der Datei"
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
 #: assess2/questions/answerboxhelpers.php:148 assessment/displayq2.php:7711
 #: javascript/AMhelpers2.js:1410 javascript/AMhelpers2.js:1412
+#: assessment/displayq2.php:7714 javascript/AMhelpers2.js:1415
 msgid "error - more than 1 i in expression"
 msgstr "Fehler - mehr als ein i im Ausdruck"
 
@@ -2292,13 +2357,17 @@ msgstr "Fehler - mehr als ein i im Ausdruck"
 #: javascript/AMhelpers2.js:1447 javascript/AMhelpers2.js:1458
 #: javascript/AMhelpers2.js:1469 javascript/AMhelpers2.js:1433
 #: javascript/AMhelpers2.js:1449 javascript/AMhelpers2.js:1460
-#: javascript/AMhelpers2.js:1471
+#: javascript/AMhelpers2.js:1471 assessment/displayq2.php:7736
+#: assessment/displayq2.php:7752 assessment/displayq2.php:7766
+#: assessment/displayq2.php:7776 javascript/AMhelpers2.js:1436
+#: javascript/AMhelpers2.js:1452 javascript/AMhelpers2.js:1463
+#: javascript/AMhelpers2.js:1474
 msgid "error - invalid form"
 msgstr "Fehler - ungültige Form"
 
 #: assess2/displayq3.php:8084 assess2/questions/answerboxhelpers.php:482
 #: assessment/displayq2.php:7923 assessment/displayq2.php:7926
-#: assess2/questions/answerboxhelpers.php:485
+#: assess2/questions/answerboxhelpers.php:485 assessment/displayq2.php:7929
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4) or as an integer (like 4 or -2)"
@@ -2308,20 +2377,20 @@ msgstr ""
 
 #: assess2/displayq3.php:8085 assess2/questions/answerboxhelpers.php:483
 #: assessment/displayq2.php:7924 assessment/displayq2.php:7927
-#: assess2/questions/answerboxhelpers.php:486
+#: assess2/questions/answerboxhelpers.php:486 assessment/displayq2.php:7930
 #, php-format
 msgid "Enter a %s of fractions or integers"
 msgstr "Geben Sie ein %s von Brüchen oder ganzen Zahlen ein"
 
 #: assess2/displayq3.php:8085 assess2/questions/answerboxhelpers.php:483
 #: assessment/displayq2.php:7924 assessment/displayq2.php:7927
-#: assess2/questions/answerboxhelpers.php:486
+#: assess2/questions/answerboxhelpers.php:486 assessment/displayq2.php:7930
 msgid "Enter a fraction or integer"
 msgstr "Geben Sie einen Bruch oder eine ganze Zahl ein"
 
 #: assess2/displayq3.php:8088 assess2/questions/answerboxhelpers.php:486
 #: assessment/displayq2.php:7927 assessment/displayq2.php:7930
-#: assess2/questions/answerboxhelpers.php:489
+#: assess2/questions/answerboxhelpers.php:489 assessment/displayq2.php:7933
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6), as an integer (like 4 "
@@ -2332,7 +2401,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8089 assess2/questions/answerboxhelpers.php:487
 #: assessment/displayq2.php:7928 assessment/displayq2.php:7931
-#: assess2/questions/answerboxhelpers.php:490
+#: assess2/questions/answerboxhelpers.php:490 assessment/displayq2.php:7934
 #, php-format
 msgid "Enter a %s of reduced fractions, integers, or exact decimals"
 msgstr ""
@@ -2340,14 +2409,14 @@ msgstr ""
 
 #: assess2/displayq3.php:8089 assess2/questions/answerboxhelpers.php:487
 #: assessment/displayq2.php:7928 assessment/displayq2.php:7931
-#: assess2/questions/answerboxhelpers.php:490
+#: assess2/questions/answerboxhelpers.php:490 assessment/displayq2.php:7934
 msgid "Enter a reduced fraction, integer, or exact decimal"
 msgstr ""
 "Geben Sie einen gekürzten Bruch, eine ganze Zahl oder eine Dezimalzahl ein"
 
 #: assess2/displayq3.php:8091 assess2/questions/answerboxhelpers.php:489
 #: assessment/displayq2.php:7930 assessment/displayq2.php:7933
-#: assess2/questions/answerboxhelpers.php:492
+#: assess2/questions/answerboxhelpers.php:492 assessment/displayq2.php:7936
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6) or as an integer (like 4 "
@@ -2358,20 +2427,20 @@ msgstr ""
 
 #: assess2/displayq3.php:8092 assess2/questions/answerboxhelpers.php:490
 #: assessment/displayq2.php:7931 assessment/displayq2.php:7934
-#: assess2/questions/answerboxhelpers.php:493
+#: assess2/questions/answerboxhelpers.php:493 assessment/displayq2.php:7937
 #, php-format
 msgid "Enter a %s of reduced fractions or integers"
 msgstr "Geben Sie ein %s von gekürzten Brüchen oder ganzen Zahlen ein"
 
 #: assess2/displayq3.php:8092 assess2/questions/answerboxhelpers.php:490
 #: assessment/displayq2.php:7931 assessment/displayq2.php:7934
-#: assess2/questions/answerboxhelpers.php:493
+#: assess2/questions/answerboxhelpers.php:493 assessment/displayq2.php:7937
 msgid "Enter a reduced fraction or integer"
 msgstr "Geben Sie einen gekürzten Bruch oder eine ganze Zahl ein"
 
 #: assess2/displayq3.php:8096 assess2/questions/answerboxhelpers.php:494
 #: assessment/displayq2.php:7935 assessment/displayq2.php:7938
-#: assess2/questions/answerboxhelpers.php:497
+#: assess2/questions/answerboxhelpers.php:497 assessment/displayq2.php:7941
 #, php-format
 msgid ""
 "Enter %s as a mixed number or as an integer.  Example: 2 1/2 = 2 &frac12;"
@@ -2381,7 +2450,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8098 assess2/questions/answerboxhelpers.php:496
 #: assessment/displayq2.php:7937 assessment/displayq2.php:7940
-#: assess2/questions/answerboxhelpers.php:499
+#: assess2/questions/answerboxhelpers.php:499 assessment/displayq2.php:7943
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number or as an integer.  Example: 2 1/2 = 2 "
@@ -2392,20 +2461,20 @@ msgstr ""
 
 #: assess2/displayq3.php:8100 assess2/questions/answerboxhelpers.php:498
 #: assessment/displayq2.php:7939 assessment/displayq2.php:7942
-#: assess2/questions/answerboxhelpers.php:501
+#: assess2/questions/answerboxhelpers.php:501 assessment/displayq2.php:7945
 #, php-format
 msgid "Enter a %s of mixed numbers or integers"
 msgstr "Geben Sie ein %s von gemischten oder ganze Zahlen ein"
 
 #: assess2/displayq3.php:8100 assess2/questions/answerboxhelpers.php:498
 #: assessment/displayq2.php:7939 assessment/displayq2.php:7942
-#: assess2/questions/answerboxhelpers.php:501
+#: assess2/questions/answerboxhelpers.php:501 assessment/displayq2.php:7945
 msgid "Enter a mixed number or integer"
 msgstr "Geben Sie eine gemischte oder eine ganze Zahl ein"
 
 #: assess2/displayq3.php:8103 assess2/questions/answerboxhelpers.php:501
 #: assessment/displayq2.php:7942 assessment/displayq2.php:7945
-#: assess2/questions/answerboxhelpers.php:504
+#: assess2/questions/answerboxhelpers.php:504 assessment/displayq2.php:7948
 #, php-format
 msgid ""
 "Enter %s as a mixed number, proper or improper fraction, or as an integer.  "
@@ -2418,14 +2487,14 @@ msgstr ""
 #: assess2/questions/answerboxhelpers.php:502
 #: assess2/questions/answerboxhelpers.php:505 assessment/displayq2.php:7943
 #: assessment/displayq2.php:7946 assess2/questions/answerboxhelpers.php:508
-#: assessment/displayq2.php:7949
+#: assessment/displayq2.php:7949 assessment/displayq2.php:7952
 #, php-format
 msgid "Enter a %s of mixed numbers, fractions, or integers"
 msgstr "Geben Sie ein %s von gemischten Zahlen, Brüchen oder ganzen Zahlen ein"
 
 #: assess2/displayq3.php:8104 assess2/questions/answerboxhelpers.php:502
 #: assessment/displayq2.php:7943 assessment/displayq2.php:7946
-#: assess2/questions/answerboxhelpers.php:505
+#: assess2/questions/answerboxhelpers.php:505 assessment/displayq2.php:7949
 msgid "Enter a mixed number, proper or improper fraction, or integer"
 msgstr ""
 "Geben Sie eine gemischte Zahl, einen echten oder unechten Bruch oder eine "
@@ -2433,7 +2502,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8106 assess2/questions/answerboxhelpers.php:504
 #: assessment/displayq2.php:7945 assessment/displayq2.php:7948
-#: assess2/questions/answerboxhelpers.php:507
+#: assess2/questions/answerboxhelpers.php:507 assessment/displayq2.php:7951
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number, reduced proper or improper fraction, or "
@@ -2444,7 +2513,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8107 assess2/questions/answerboxhelpers.php:505
 #: assessment/displayq2.php:7946 assessment/displayq2.php:7949
-#: assess2/questions/answerboxhelpers.php:508
+#: assess2/questions/answerboxhelpers.php:508 assessment/displayq2.php:7952
 msgid "Enter a reduced mixed number, proper or improper fraction, or integer"
 msgstr ""
 "Geben Sie eine gekürzte gemischte Zahl, einen echten oder unechten Bruch "
@@ -2452,7 +2521,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8111 assess2/questions/answerboxhelpers.php:509
 #: assessment/displayq2.php:7950 assessment/displayq2.php:7953
-#: assess2/questions/answerboxhelpers.php:512
+#: assess2/questions/answerboxhelpers.php:512 assessment/displayq2.php:7956
 #, php-format
 msgid ""
 "Enter %s as a mixed number (like 2 1/2), fraction (like 3/5), an integer "
@@ -2463,20 +2532,20 @@ msgstr ""
 
 #: assess2/displayq3.php:8112 assess2/questions/answerboxhelpers.php:510
 #: assessment/displayq2.php:7951 assessment/displayq2.php:7954
-#: assess2/questions/answerboxhelpers.php:513
+#: assess2/questions/answerboxhelpers.php:513 assessment/displayq2.php:7957
 #, php-format
 msgid "Enter a %s of mixed numbers, fractions, or exact decimals"
 msgstr "Geben Sie ein %s von gemischten Zahlen, Brüchen oder Dezimalzahlen ein"
 
 #: assess2/displayq3.php:8112 assess2/questions/answerboxhelpers.php:510
 #: assessment/displayq2.php:7951 assessment/displayq2.php:7954
-#: assess2/questions/answerboxhelpers.php:513
+#: assess2/questions/answerboxhelpers.php:513 assessment/displayq2.php:7957
 msgid "Enter a mixed number, fraction, or exact decimal"
 msgstr "Geben Sie eine gemischte Zahl, einen Bruch oder eine Dezimalzahl ein"
 
 #: assess2/displayq3.php:8114 assess2/questions/answerboxhelpers.php:512
 #: assessment/displayq2.php:7953 assessment/displayq2.php:7956
-#: assess2/questions/answerboxhelpers.php:515
+#: assess2/questions/answerboxhelpers.php:515 assessment/displayq2.php:7959
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or "
@@ -2487,20 +2556,20 @@ msgstr ""
 
 #: assess2/displayq3.php:8115 assess2/questions/answerboxhelpers.php:513
 #: assessment/displayq2.php:7954 assessment/displayq2.php:7957
-#: assess2/questions/answerboxhelpers.php:516
+#: assess2/questions/answerboxhelpers.php:516 assessment/displayq2.php:7960
 #, php-format
 msgid "Enter a %s of fractions or exact decimals"
 msgstr "Geben Sie ein %s von Brüchen oder Ganzzahlen ein"
 
 #: assess2/displayq3.php:8115 assess2/questions/answerboxhelpers.php:513
 #: assessment/displayq2.php:7954 assessment/displayq2.php:7957
-#: assess2/questions/answerboxhelpers.php:516
+#: assess2/questions/answerboxhelpers.php:516 assessment/displayq2.php:7960
 msgid "Enter a fraction or exact decimal"
 msgstr "Geben Sie einen Bruch oder eine genaue Dezimalzahl ein"
 
 #: assess2/displayq3.php:8118 assess2/questions/answerboxhelpers.php:516
 #: assessment/displayq2.php:7957 assessment/displayq2.php:7960
-#: assess2/questions/answerboxhelpers.php:519
+#: assess2/questions/answerboxhelpers.php:519 assessment/displayq2.php:7963
 #, php-format
 msgid "Enter %s as an integer or decimal value (like 5 or 3.72)"
 msgstr ""
@@ -2508,20 +2577,20 @@ msgstr ""
 
 #: assess2/displayq3.php:8119 assess2/questions/answerboxhelpers.php:517
 #: assessment/displayq2.php:7958 assessment/displayq2.php:7961
-#: assess2/questions/answerboxhelpers.php:520
+#: assess2/questions/answerboxhelpers.php:520 assessment/displayq2.php:7964
 #, php-format
 msgid "Enter a %s of integer or decimal values"
 msgstr "Geben Sie eine %s  von ganzen Zahlen oder Dezimalzahlen ein"
 
 #: assess2/displayq3.php:8119 assess2/questions/answerboxhelpers.php:517
 #: assessment/displayq2.php:7958 assessment/displayq2.php:7961
-#: assess2/questions/answerboxhelpers.php:520
+#: assess2/questions/answerboxhelpers.php:520 assessment/displayq2.php:7964
 msgid "Enter an integer or decimal value"
 msgstr "Geben Sie eine ganze Zahl oder eine Dezimalzahl ein"
 
 #: assess2/displayq3.php:8121 assess2/questions/answerboxhelpers.php:519
 #: assessment/displayq2.php:7960 assessment/displayq2.php:7963
-#: assess2/questions/answerboxhelpers.php:522
+#: assess2/questions/answerboxhelpers.php:522 assessment/displayq2.php:7966
 #, php-format
 msgid ""
 "Enter %s as a decimal or in scientific notation.  Example: 3*10^2 = 3 "
@@ -2532,7 +2601,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8122 assess2/questions/answerboxhelpers.php:520
 #: assessment/displayq2.php:7961 assessment/displayq2.php:7964
-#: assess2/questions/answerboxhelpers.php:523
+#: assess2/questions/answerboxhelpers.php:523 assessment/displayq2.php:7967
 #, php-format
 msgid "Enter a %s of numbers using decimals or scientific notation"
 msgstr ""
@@ -2541,7 +2610,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8122 assess2/questions/answerboxhelpers.php:520
 #: assessment/displayq2.php:7961 assessment/displayq2.php:7964
-#: assess2/questions/answerboxhelpers.php:523
+#: assess2/questions/answerboxhelpers.php:523 assessment/displayq2.php:7967
 msgid "Enter a number using decimals or scientific notation"
 msgstr ""
 "Geben Sie eine Zahl als Dezimalzahl oder in wissenschaftlicher Schreibweise "
@@ -2549,7 +2618,7 @@ msgstr ""
 
 #: assess2/displayq3.php:8124 assess2/questions/answerboxhelpers.php:522
 #: assessment/displayq2.php:7963 assessment/displayq2.php:7966
-#: assess2/questions/answerboxhelpers.php:525
+#: assess2/questions/answerboxhelpers.php:525 assessment/displayq2.php:7969
 #, php-format
 msgid ""
 "Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</"
@@ -2560,20 +2629,20 @@ msgstr ""
 
 #: assess2/displayq3.php:8125 assess2/questions/answerboxhelpers.php:523
 #: assessment/displayq2.php:7964 assessment/displayq2.php:7967
-#: assess2/questions/answerboxhelpers.php:526
+#: assess2/questions/answerboxhelpers.php:526 assessment/displayq2.php:7970
 #, php-format
 msgid "Enter a %s of numbers using scientific notation"
 msgstr "Geben Sie ein %s von Zahlen in wissenschaftlicher Notation ein"
 
 #: assess2/displayq3.php:8125 assess2/questions/answerboxhelpers.php:523
 #: assessment/displayq2.php:7964 assessment/displayq2.php:7967
-#: assess2/questions/answerboxhelpers.php:526
+#: assess2/questions/answerboxhelpers.php:526 assessment/displayq2.php:7970
 msgid "Enter a number using scientific notation"
 msgstr "Geben Sie eine Zahl in wissenschaftlicher Schreibweise ein"
 
 #: assess2/displayq3.php:8127 assess2/questions/answerboxhelpers.php:525
 #: assessment/displayq2.php:7966 assessment/displayq2.php:7969
-#: assess2/questions/answerboxhelpers.php:528
+#: assess2/questions/answerboxhelpers.php:528 assessment/displayq2.php:7972
 #, php-format
 msgid ""
 "Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, "
@@ -2584,52 +2653,52 @@ msgstr ""
 
 #: assess2/displayq3.php:8128 assess2/questions/answerboxhelpers.php:526
 #: assessment/displayq2.php:7967 assessment/displayq2.php:7970
-#: assess2/questions/answerboxhelpers.php:529
+#: assess2/questions/answerboxhelpers.php:529 assessment/displayq2.php:7973
 #, php-format
 msgid "Enter a %s of mathematical expressions"
 msgstr "Geben sie ein %s von mathematischen Ausdrücken ein"
 
 #: assess2/displayq3.php:8128 assess2/questions/answerboxhelpers.php:526
 #: assessment/displayq2.php:7967 assessment/displayq2.php:7970
-#: assess2/questions/answerboxhelpers.php:529
+#: assess2/questions/answerboxhelpers.php:529 assessment/displayq2.php:7973
 msgid "Enter a mathematical expression"
 msgstr "Geben Sie einen mathematischen Ausdruck ein"
 
 #: assess2/displayq3.php:8131 assess2/questions/answerboxhelpers.php:529
 #: assessment/displayq2.php:7970 assessment/displayq2.php:7973
-#: assess2/questions/answerboxhelpers.php:532
+#: assess2/questions/answerboxhelpers.php:532 assessment/displayq2.php:7976
 msgid "Do not enter mixed numbers"
 msgstr "Keine gemischten Zahlen eingeben"
 
 #: assess2/displayq3.php:8132 assess2/questions/answerboxhelpers.php:530
 #: assessment/displayq2.php:7971 assessment/displayq2.php:7974
-#: assess2/questions/answerboxhelpers.php:533
+#: assess2/questions/answerboxhelpers.php:533 assessment/displayq2.php:7977
 msgid " (no mixed numbers)"
 msgstr " (keine gemischten Zahlen)"
 
 #: assess2/displayq3.php:8144 assess2/questions/answerboxhelpers.php:542
 #: assessment/displayq2.php:7983 assessment/displayq2.php:7986
-#: assess2/questions/answerboxhelpers.php:545
+#: assess2/questions/answerboxhelpers.php:545 assessment/displayq2.php:7989
 msgid "Decimal values are not allowed"
 msgstr "Dezimalwerte sind nicht erlaubt"
 
 #: assess2/displayq3.php:8147 assess2/questions/answerboxhelpers.php:545
 #: assessment/displayq2.php:7986 assessment/displayq2.php:7989
-#: assess2/questions/answerboxhelpers.php:548
+#: assess2/questions/answerboxhelpers.php:548 assessment/displayq2.php:7992
 #, php-format
 msgid "Enter %s accurate to the nearest integer."
 msgstr "Geben Sie %s mit einer Genauigkeit bis zur nächsten ganzen Zahl ein."
 
 #: assess2/displayq3.php:8149 assess2/questions/answerboxhelpers.php:547
 #: assessment/displayq2.php:7988 assessment/displayq2.php:7991
-#: assess2/questions/answerboxhelpers.php:550
+#: assess2/questions/answerboxhelpers.php:550 assessment/displayq2.php:7994
 #, php-format
 msgid "Enter %s accurate to %d decimal places."
 msgstr "Geben Sie %s auf %d Nachkommastellen genau ein."
 
 #: assess2/displayq3.php:8153 assess2/questions/answerboxhelpers.php:551
 #: assessment/displayq2.php:7992 assessment/displayq2.php:7995
-#: assess2/questions/answerboxhelpers.php:554
+#: assess2/questions/answerboxhelpers.php:554 assessment/displayq2.php:7998
 msgid "Trig functions (sin,cos,etc.) are not allowed"
 msgstr "Trigonometrische Funktionen (sin, cos, etc.) sind nicht erlaubt"
 
@@ -2637,6 +2706,7 @@ msgstr "Trigonometrische Funktionen (sin, cos, etc.) sind nicht erlaubt"
 #: assess2/questions/answerboxhelpers.php:570 assessment/displayq2.php:8011
 #: assess2/questions/QuestionHtmlGenerator.php:1015
 #: assess2/questions/answerboxhelpers.php:573 assessment/displayq2.php:8014
+#: assessment/displayq2.php:8017
 msgid "Correct answer, but wrong format"
 msgstr "Richtige Antwort, aber falsches Format"
 
@@ -2645,7 +2715,8 @@ msgstr "Richtige Antwort, aber falsches Format"
 #: assess2/questions/answerboxhelpers.php:640 assessment/displayq2.php:8022
 #: assessment/displayq2.php:8081 assess2/questions/answerboxhelpers.php:584
 #: assess2/questions/answerboxhelpers.php:643 assessment/displayq2.php:8025
-#: assessment/displayq2.php:8084
+#: assessment/displayq2.php:8084 assessment/displayq2.php:8028
+#: assessment/displayq2.php:8087
 msgid "No solution"
 msgstr "Keine Lösung"
 
@@ -2654,31 +2725,32 @@ msgstr "Keine Lösung"
 #: assess2/questions/answerboxhelpers.php:641 assessment/displayq2.php:8023
 #: assessment/displayq2.php:8082 assess2/questions/answerboxhelpers.php:585
 #: assess2/questions/answerboxhelpers.php:644 assessment/displayq2.php:8026
-#: assessment/displayq2.php:8085
+#: assessment/displayq2.php:8085 assessment/displayq2.php:8029
+#: assessment/displayq2.php:8088
 msgid "Infinite number of solutions"
 msgstr "Unendlich viele Lösungen"
 
 #: assess2/displayq3.php:8188 assess2/questions/answerboxhelpers.php:586
 #: assessment/displayq2.php:8027 assessment/displayq2.php:8030
-#: assess2/questions/answerboxhelpers.php:589
+#: assess2/questions/answerboxhelpers.php:589 assessment/displayq2.php:8033
 msgid "One or more solutions: "
 msgstr "Eine oder mehrere Lösungen: "
 
 #: assess2/displayq3.php:8190 assess2/questions/answerboxhelpers.php:588
 #: assessment/displayq2.php:8029 assessment/displayq2.php:8032
-#: assess2/questions/answerboxhelpers.php:591
+#: assess2/questions/answerboxhelpers.php:591 assessment/displayq2.php:8035
 msgid "Interval notation solution: "
 msgstr "Lösung in Intervallschreibweise: "
 
 #: assess2/displayq3.php:8192 assess2/questions/answerboxhelpers.php:590
 #: assessment/displayq2.php:8031 assessment/displayq2.php:8034
-#: assess2/questions/answerboxhelpers.php:593
+#: assess2/questions/answerboxhelpers.php:593 assessment/displayq2.php:8037
 msgid "Inequality notation solution: "
 msgstr "Lösung als Ungleichung: "
 
 #: assess2/displayq3.php:8194 assess2/questions/answerboxhelpers.php:592
 #: assessment/displayq2.php:8033 assessment/displayq2.php:8036
-#: assess2/questions/answerboxhelpers.php:595
+#: assess2/questions/answerboxhelpers.php:595 assessment/displayq2.php:8039
 msgid "One solution: "
 msgstr "Eine Lösung: "
 
@@ -2688,6 +2760,8 @@ msgstr "Eine Lösung: "
 #: course/gradebook.php:318 course/gradebook.php:397 course/gradebook.php:400
 #: course/outcomereport.php:137 course/redeemlatepass.php:37
 #: course/redeemlatepass.php:172 header.php:283 header.php:284
+#: course/course.php:497 course/course.php:582 course/gradebook.php:288
+#: course/gradebook.php:314 course/gradebook.php:393 course/gradebook.php:396
 msgid "Gradebook"
 msgstr "Punkteübersicht"
 
@@ -2698,6 +2772,7 @@ msgstr "Studenten-Details"
 
 #: assess2/gbviewassess.php:80 course/addassessment2form.php:619
 #: course/chgassessments2form.php:649 course/addlinkedtext.php:443
+#: course/addassessment2form.php:630 course/chgassessments2form.php:663
 msgid "View Scores"
 msgstr "Punkte ansehen"
 
@@ -2726,7 +2801,8 @@ msgstr "[mehr..]"
 
 #: assess2/index.php:56 assess2/index.php:60 assessment/showtest.php:1210
 #: assessment/showtest.php:1214 course/courseshowitems.php:1823
-#: course/addquestions.php:1539
+#: course/addquestions.php:1539 assessment/showtest.php:1208
+#: course/addquestions.php:1533
 msgid "Assessment"
 msgstr "Test"
 
@@ -2772,7 +2848,7 @@ msgid "None of these"
 msgstr "Keine davon"
 
 #: assess2/questions/models/Question.php:164 course/addquestions.php:955
-#: course/moddataset.php:1211
+#: course/moddataset.php:1211 javascript/addqsort.js:1409
 msgid "Video"
 msgstr "Video"
 
@@ -2789,6 +2865,7 @@ msgid "Categorized Score Breakdown"
 msgstr "Kategorisierte Punktzahlaufschlüsselung"
 
 #: assessment/catscores.php:62 course/gradebook.php:327
+#: course/gradebook.php:323
 msgid "Category"
 msgstr "Kategorie"
 
@@ -2892,6 +2969,8 @@ msgstr "Tortendiagramm"
 #: assessment/libs/stats.php:684 course/gradebook.php:747
 #: course/addassessment2form.php:597 course/chgassessments2form.php:498
 #: course/chgassessments2form.php:622 assessment/libs/stats.php:702
+#: course/addassessment2form.php:608 course/chgassessments2form.php:512
+#: course/chgassessments2form.php:636 course/gradebook.php:743
 msgid "Percent"
 msgstr "Prozent"
 
@@ -2939,6 +3018,7 @@ msgid "No answer selected. Try again."
 msgstr "Keine Antwort ausgewählt. Bitte erneut versuchen."
 
 #: assessment/macros.php:3263 assessment/macros.php:3266
+#: assessment/macros.php:3295
 msgid "This answer does not appear to be a valid number."
 msgstr "Diese Antwort scheint keine gültige Zahl zu sein."
 
@@ -3026,6 +3106,7 @@ msgstr ""
 #: course/courseshowitems.php:939 course/courseshowitems.php:970
 #: course/courseshowitems.php:1554 course/courseshowitems.php:1601
 #: course/gradebook.php:862 forums/thread.php:171 bltilaunch.php:1775
+#: bltilaunch.php:206 bltilaunch.php:1746 course/gradebook.php:858
 msgid "Use LatePass"
 msgstr "Verspätet einreichen"
 
@@ -3059,6 +3140,7 @@ msgstr ""
 "einreichen"
 
 #: assessment/showtest.php:169 assessment/showtest.php:1252
+#: assessment/showtest.php:1246
 msgid "View your scored assessment"
 msgstr "Ihre bepunkteten Tests anzeigen"
 
@@ -3134,6 +3216,7 @@ msgstr ""
 "erneut und versuchen Sie es ein weiteres Mal. "
 
 #: assessment/showtest.php:655 assessment/showtest.php:662
+#: assessment/showtest.php:650 assessment/showtest.php:657
 msgid "Return to course page"
 msgstr "Zur Kursseite zurückkehren"
 
@@ -3146,7 +3229,8 @@ msgstr ""
 "Bitte öffnen Sie den Test erneut und versuchen es ein weiteres Mal."
 
 #: assessment/showtest.php:689 assessment/showtest.php:714
-#: assessment/showtest.php:735
+#: assessment/showtest.php:735 assessment/showtest.php:709
+#: assessment/showtest.php:730
 msgid "Assessment is closed"
 msgstr "Test ist geschlossen"
 
@@ -3178,16 +3262,19 @@ msgstr "Als Student anzeigen"
 
 #: assessment/showtest.php:1200 assessment/showtest.php:1220
 #: assessment/showtest.php:1259 course/course.php:449
+#: assessment/showtest.php:1194 assessment/showtest.php:1214
+#: assessment/showtest.php:1253 course/course.php:446
 msgid "Edit User Preferences"
 msgstr "Benutzerspezifische Einstellungen bearbeiten"
 
 #: assessment/showtest.php:1232 assessment/showtest.php:1243
+#: assessment/showtest.php:1226 assessment/showtest.php:1237
 msgid "This will discard any unsaved work."
 msgstr "Dies wird alle nicht gespeicherte Arbeit verwerfen."
 
 #: assessment/showtest.php:1232 course/course.php:484 course/course.php:571
 #: index.php:362 msgs/msglist.php:608 index.php:364 header.php:268
-#: header.php:269
+#: header.php:269 course/course.php:568
 msgid "Messages"
 msgstr "Nachrichten"
 
@@ -3240,6 +3327,7 @@ msgstr ""
 "hinzugefügt werden soll, muss hier seinen Namen auswählen."
 
 #: assessment/showtest.php:1410 loginpage.php:53 directaccess.php:204
+#: assessment/showtest.php:1403 directaccess.php:206
 msgid "Password"
 msgstr "Passwort"
 
@@ -3281,7 +3369,7 @@ msgstr ""
 "Korrekte Antworten nach der Abgabefrist werden %d %% Punktabzug bestraft"
 
 #: assessment/showtest.php:1475 course/gradebook.php:351
-#: course/gradebook.php:503
+#: course/gradebook.php:503 course/gradebook.php:347 course/gradebook.php:499
 msgid "Past due"
 msgstr "Überfällig"
 
@@ -3299,31 +3387,41 @@ msgstr "Stunden"
 
 #: assessment/showtest.php:1485 assessment/showtest.php:3656
 #: course/drillassess.php:233 course/exportcalfeed.php:36
+#: assessment/showtest.php:1477 assessment/showtest.php:3648
 msgid "minutes"
 msgstr "Minuten"
 
 #: assessment/showtest.php:1488 assessment/showtest.php:1490
 #: assessment/showtest.php:1495 assessment/showtest.php:1500
 #: course/courseshowitems.php:708 course/addassessment2form.php:143
+#: assessment/showtest.php:1480 assessment/showtest.php:1482
+#: assessment/showtest.php:1487 assessment/showtest.php:1492
+#: course/addassessment2form.php:144
 msgid "Due"
 msgstr "Fällig"
 
 #: assessment/showtest.php:1521 course/courseshowitems.php:857
 #: course/gradebook.php:822 course/treereader.php:393
+#: assessment/showtest.php:1513 course/gradebook.php:818
+#: course/treereader.php:391
 msgid "hour"
 msgstr "Stunde"
 
 #: assessment/showtest.php:1523 assessment/showtest.php:1530
 #: course/courseshowitems.php:859 course/courseshowitems.php:866
 #: course/drillassess.php:233 course/gradebook.php:824 course/gradebook.php:831
-#: course/treereader.php:402 course/treereader.php:395
+#: course/treereader.php:395 assessment/showtest.php:1522
+#: course/gradebook.php:820 course/gradebook.php:827 course/treereader.php:393
+#: course/treereader.php:400
 msgid "minute"
 msgstr "Minute"
 
 #: assessment/showtest.php:1525 assessment/showtest.php:1532
 #: course/courseshowitems.php:861 course/courseshowitems.php:868
 #: course/drillassess.php:236 course/gradebook.php:826 course/gradebook.php:833
-#: course/treereader.php:404 course/treereader.php:397
+#: course/treereader.php:397 assessment/showtest.php:1524
+#: course/gradebook.php:822 course/gradebook.php:829 course/treereader.php:395
+#: course/treereader.php:402
 msgid "second"
 msgstr "Sekunde"
 
@@ -3345,6 +3443,7 @@ msgid "Time limit shortened because of due date"
 msgstr "Zeitlimit wegen Fälligkeitsdatum verkürzt"
 
 #: assessment/showtest.php:1563 course/testquestion.php:191
+#: assessment/showtest.php:1555
 msgid "remaining"
 msgstr "verbleibend"
 
@@ -3353,11 +3452,15 @@ msgstr "verbleibend"
 #: course/listusers.php:715 javascript/posts.js:35 javascript/posts.js:56
 #: course/addassessment2form.php:110 course/chgassessments2form.php:112
 #: course/chgassessments2form.php:477 course/addassessment2form.php:479
-#: course/addlinkedtext.php:621
+#: course/addlinkedtext.php:621 course/addassessment2form.php:111
+#: course/addassessment2form.php:490 course/chgassessments2form.php:113
+#: course/chgassessments2form.php:491 course/listusers.php:709
+#: course/listusers.php:713
 msgid "Hide"
 msgstr "Verstecken"
 
 #: assessment/showtest.php:1569 assessment/showtest.php:2583
+#: assessment/showtest.php:1561 assessment/showtest.php:2575
 msgid "In Review Mode - no scores will be saved"
 msgstr "Im Korrekturmodus - keine Bewertungen werden gespeichert"
 
@@ -3371,6 +3474,7 @@ msgstr "Zeitlimit abgelaufen"
 
 #: assessment/showtest.php:1630 assessment/showtest.php:1736
 #: javascript/AMhelpers.js:2343 javascript/assessment_min.js:3
+#: assessment/showtest.php:1622 assessment/showtest.php:1728
 msgid "Show Intro/Instructions"
 msgstr "Zeige Einführung/Anweisungen"
 
@@ -3414,6 +3518,8 @@ msgstr "Vorherige Frage"
 
 #: assessment/showtest.php:1699 assessment/showtest.php:1813
 #: assessment/showtest.php:2074 assessment/showtest.php:2265
+#: assessment/showtest.php:1691 assessment/showtest.php:1805
+#: assessment/showtest.php:2066 assessment/showtest.php:2257
 msgid "Score before penalty on last attempt: "
 msgstr "Punktzahl vor Strafe beim letzten Versuch: "
 
@@ -3427,6 +3533,8 @@ msgstr "Punktzahl in Punkteübersicht"
 
 #: assessment/showtest.php:1710 assessment/showtest.php:1841
 #: assessment/showtest.php:1853 assessment/showtest.php:2088
+#: assessment/showtest.php:1702 assessment/showtest.php:1833
+#: assessment/showtest.php:1845 assessment/showtest.php:2080
 msgid "Reattempt last question"
 msgstr "Letzte Frage erneut versuchen"
 
@@ -3441,6 +3549,9 @@ msgstr ""
 #: assessment/showtest.php:1715 assessment/showtest.php:1844
 #: assessment/showtest.php:2008 assessment/showtest.php:2094
 #: assessment/showtest.php:2301 assessment/showtest.php:2957
+#: assessment/showtest.php:1707 assessment/showtest.php:1836
+#: assessment/showtest.php:2000 assessment/showtest.php:2086
+#: assessment/showtest.php:2293 assessment/showtest.php:2949
 msgid "Try another similar question"
 msgstr "Andere ähnliche Frage versuchen"
 
@@ -3448,14 +3559,21 @@ msgstr "Andere ähnliche Frage versuchen"
 #: assessment/showtest.php:1941 assessment/showtest.php:2145
 #: assessment/showtest.php:2620 assessment/showtest.php:2674
 #: assessment/showtest.php:2705 assessment/showtest.php:2771
-#: assessment/showtest.php:2817
+#: assessment/showtest.php:2817 assessment/showtest.php:1793
+#: assessment/showtest.php:1933 assessment/showtest.php:2137
+#: assessment/showtest.php:2612 assessment/showtest.php:2666
+#: assessment/showtest.php:2697 assessment/showtest.php:2763
+#: assessment/showtest.php:2809
 msgid "Intro or instructions"
 msgstr "Zeige Einführung/Anweisungen"
 
 #: assessment/showtest.php:1752 assessment/showtest.php:1907
 #: assessment/showtest.php:1951 assessment/showtest.php:1978
 #: assessment/showtest.php:2688 assessment/showtest.php:2727
-#: assessment/showtest.php:2749
+#: assessment/showtest.php:2749 assessment/showtest.php:1899
+#: assessment/showtest.php:1943 assessment/showtest.php:1970
+#: assessment/showtest.php:2680 assessment/showtest.php:2719
+#: assessment/showtest.php:2741
 msgid "Hide Question Information"
 msgstr "Fragenhinweise verstecken"
 
@@ -3466,16 +3584,26 @@ msgstr "Fragenhinweise verstecken"
 #: assessment/showtest.php:2631 assessment/showtest.php:2689
 #: assessment/showtest.php:2693 assessment/showtest.php:2728
 #: assessment/showtest.php:2750 assessment/showtest.php:2781
-#: assessment/showtest.php:2849
+#: assessment/showtest.php:2849 assessment/showtest.php:1749
+#: assessment/showtest.php:1900 assessment/showtest.php:1904
+#: assessment/showtest.php:1944 assessment/showtest.php:1948
+#: assessment/showtest.php:1971 assessment/showtest.php:2149
+#: assessment/showtest.php:2623 assessment/showtest.php:2681
+#: assessment/showtest.php:2685 assessment/showtest.php:2720
+#: assessment/showtest.php:2742 assessment/showtest.php:2773
+#: assessment/showtest.php:2841
 msgid "Pre-question text"
 msgstr "Text vor der Frage"
 
 #: assessment/showtest.php:1756 assessment/showtest.php:1911
 #: assessment/showtest.php:1955 assessment/showtest.php:2692
+#: assessment/showtest.php:1748 assessment/showtest.php:1903
+#: assessment/showtest.php:1947 assessment/showtest.php:2684
 msgid "Show Question Information"
 msgstr "Fragenhinweise anzeigen"
 
 #: assessment/showtest.php:1778 assessment/showtest.php:2201
+#: assessment/showtest.php:1770 assessment/showtest.php:2193
 msgid ""
 "This question has been submittted since you viewed it, and that grade is "
 "shown below.  Your answer just submitted was not scored or recorded."
@@ -3488,24 +3616,34 @@ msgstr ""
 #: assessment/showtest.php:1966 assessment/showtest.php:1986
 #: assessment/showtest.php:2715 assessment/showtest.php:2737
 #: assessment/showtest.php:2893 assessment/showtest.php:2905
+#: assessment/showtest.php:1797 assessment/showtest.php:1914
+#: assessment/showtest.php:1958 assessment/showtest.php:1978
+#: assessment/showtest.php:2707 assessment/showtest.php:2729
+#: assessment/showtest.php:2885 assessment/showtest.php:2897
 msgid "Start of Questions"
 msgstr "Beginn der Fragen"
 
 #: assessment/showtest.php:1818 assessment/showtest.php:1993
 #: assessment/showtest.php:2080 assessment/showtest.php:2270
+#: assessment/showtest.php:1810 assessment/showtest.php:1985
+#: assessment/showtest.php:2072 assessment/showtest.php:2262
 msgid "Score on last attempt: "
 msgstr "Punktzahl beim letzten Versuch: "
 
 #: assessment/showtest.php:1821 assessment/showtest.php:1996
 #: assessment/showtest.php:2083 assessment/showtest.php:2273
+#: assessment/showtest.php:1813 assessment/showtest.php:1988
+#: assessment/showtest.php:2075 assessment/showtest.php:2265
 msgid "Score in gradebook: "
 msgstr "Punktzahl in Punkteübersicht: "
 
 #: assessment/showtest.php:1825 assessment/showtest.php:2276
+#: assessment/showtest.php:1817 assessment/showtest.php:2268
 msgid "Note:"
 msgstr "Hinweis:"
 
 #: assessment/showtest.php:1825 assessment/showtest.php:2276
+#: assessment/showtest.php:1817 assessment/showtest.php:2268
 msgid ""
 "This question contains parts that can not be auto-graded.  Those parts will "
 "count as a score of 0 until they are graded by your instructor"
@@ -3524,6 +3662,7 @@ msgstr ""
 ", versuchen Sie die letzte Frage erneut, oder wählen Sie eine andere Frage."
 
 #: assessment/showtest.php:1849 assessment/showtest.php:1855
+#: assessment/showtest.php:1841 assessment/showtest.php:1847
 msgid ", or select another question"
 msgstr ", oder wählen Sie eine andere Frage"
 
@@ -3538,28 +3677,37 @@ msgstr "Wählen Sie eine andere Frage aus"
 
 #: assessment/showtest.php:1869 assessment/showtest.php:2319
 #: assessment/showtest.php:2533 assessment/showtest.php:2963
+#: assessment/showtest.php:1861 assessment/showtest.php:2311
+#: assessment/showtest.php:2525 assessment/showtest.php:2955
 msgid "This question, with your last answer"
 msgstr "Diese Frage, mit Ihrer letzten Antwort"
 
 #: assessment/showtest.php:1873 assessment/showtest.php:2323
 #: assessment/showtest.php:2537 assessment/showtest.php:2965
+#: assessment/showtest.php:1865 assessment/showtest.php:2315
+#: assessment/showtest.php:2529 assessment/showtest.php:2957
 msgid " and correct answer"
 msgstr " und der korrekten Antwort"
 
 #: assessment/showtest.php:1879 assessment/showtest.php:2329
 #: assessment/showtest.php:2333 assessment/showtest.php:2543
 #: assessment/showtest.php:2547 assessment/showtest.php:2968
-#: assessment/showtest.php:2970
+#: assessment/showtest.php:2970 assessment/showtest.php:2321
+#: assessment/showtest.php:2325 assessment/showtest.php:2535
+#: assessment/showtest.php:2539 assessment/showtest.php:2960
+#: assessment/showtest.php:2962
 msgid ", is displayed below"
 msgstr ", wird unten angezeigt"
 
 #: assessment/showtest.php:1927 assessment/showtest.php:1971
-#: assessment/showtest.php:2742
+#: assessment/showtest.php:2742 assessment/showtest.php:1963
+#: assessment/showtest.php:2734
 msgid "Jump to Answer"
 msgstr "Zur Antwort springen"
 
 #: assessment/showtest.php:1927 assessment/showtest.php:1971
-#: assessment/showtest.php:2742
+#: assessment/showtest.php:2742 assessment/showtest.php:1963
+#: assessment/showtest.php:2734
 msgid ""
 "If you jump to the answer, you must generate a new version to earn credit"
 msgstr ""
@@ -3584,6 +3732,8 @@ msgstr "Diese Frage erneut versuchen"
 
 #: assessment/showtest.php:2012 assessment/showtest.php:2821
 #: assessment/showtest.php:3022 assessment/testutil.php:1066
+#: assessment/showtest.php:2004 assessment/showtest.php:2813
+#: assessment/showtest.php:3014
 msgid "When you are done, click here to see a summary of your score"
 msgstr ""
 "Wenn Sie fertig sind, klicken Sie hier um eine Zusammendassung Ihrer "
@@ -3617,17 +3767,20 @@ msgid "Question scored. <a href=\"#curq\">Continue with assessment</a>"
 msgstr "Frage bewertet. <a href=\"#curq\">Test fortsetzen</a>"
 
 #: assessment/showtest.php:2177 assessment/showtest.php:2800
+#: assessment/showtest.php:2169 assessment/showtest.php:2792
 #, php-format
 msgid "Submit Question %d"
 msgstr "Frage %d absenden"
 
 #: assessment/showtest.php:2184 assessment/showtest.php:2645
-#: assessment/showtest.php:2808
+#: assessment/showtest.php:2808 assessment/showtest.php:2637
+#: assessment/showtest.php:2800
 msgid "Post-question text"
 msgstr "Text nach der Frage"
 
 #: assessment/showtest.php:2225 assessment/showtest.php:2232
-#: assessment/showtest.php:2235
+#: assessment/showtest.php:2235 assessment/showtest.php:2224
+#: assessment/showtest.php:2227
 #, php-format
 msgid "Continue video to %s"
 msgstr "Im Video zu %s fortfahren"
@@ -3650,6 +3803,7 @@ msgid "Question scored."
 msgstr "Frage bepunktet."
 
 #: assessment/showtest.php:2316 assessment/showtest.php:2954
+#: assessment/showtest.php:2308 assessment/showtest.php:2946
 msgid "No attempts remain on this problem."
 msgstr "Keine Versuche für dieses Problem verbleibend."
 
@@ -3674,6 +3828,7 @@ msgstr ""
 "verspätet gekennzeichnet und muss vom Dozenten überprüft werden."
 
 #: assessment/showtest.php:2585 assessment/showtest.php:3015
+#: assessment/showtest.php:2577 assessment/showtest.php:3007
 msgid "Total Points Possible: "
 msgstr "Gesamt mögliche Punkte: "
 
@@ -3712,12 +3867,14 @@ msgid "Next Page"
 msgstr "Nächste Seite"
 
 #: assessment/showtest.php:3038 assessment/showtest.php:3366
+#: assessment/showtest.php:3030 assessment/showtest.php:3358
 msgid "Question navigation"
 msgstr "Fragen-Navigation"
 
 #: assessment/showtest.php:3040 assessment/showtest.php:3382
 #: course/course.php:511 course/courseshowitems.php:132
-#: course/courseshowitems.php:2166 ltihome.php:475
+#: course/courseshowitems.php:2166 ltihome.php:475 assessment/showtest.php:3032
+#: assessment/showtest.php:3374 course/course.php:508
 msgid "Questions"
 msgstr "Fragen"
 
@@ -3756,10 +3913,12 @@ msgid "Select a Question"
 msgstr "Wähle eine Frage aus"
 
 #: assessment/showtest.php:3080 javascript/livepoll.js:520
+#: assessment/showtest.php:3072
 msgid "Open Student Input"
 msgstr "Öffne Studenteneingabe"
 
 #: assessment/showtest.php:3080 javascript/livepoll.js:549
+#: assessment/showtest.php:3072
 msgid "Close Student Input"
 msgstr "Schliesse Studenteneingabe"
 
@@ -3777,6 +3936,7 @@ msgid "Show Answers When Closed"
 msgstr "Zeige Antworten wenn geschlossen"
 
 #: assessment/showtest.php:3117 javascript/livepoll.js:163
+#: assessment/showtest.php:3109
 msgid "Waiting for the instructor to start a question"
 msgstr "Warten, dass der Dozent eine Frage startet"
 
@@ -3785,7 +3945,8 @@ msgid "Video and question navigation"
 msgstr "Video- und Fragen-Navigation"
 
 #: assessment/showtest.php:3203 assessment/showtest.php:3231
-#: assessment/showtest.php:3367
+#: assessment/showtest.php:3367 assessment/showtest.php:3223
+#: assessment/showtest.php:3359
 msgid "Skip Navigation"
 msgstr "Navigation überspringen"
 
@@ -3815,6 +3976,7 @@ msgid "unattempted"
 msgstr "nicht versucht"
 
 #: assessment/showtest.php:3354 assessment/showtest.php:3506
+#: assessment/showtest.php:3346 assessment/showtest.php:3498
 msgid "Print Version"
 msgstr "Druckversion"
 
@@ -3823,6 +3985,7 @@ msgid "Resources"
 msgstr "Matrialien"
 
 #: assessment/showtest.php:3420 assessment/showtest.php:3422
+#: assessment/showtest.php:3412 assessment/showtest.php:3414
 msgid "untried"
 msgstr "unversucht"
 
@@ -3839,10 +4002,12 @@ msgid "can retry"
 msgstr "weitere Versuche möglich"
 
 #: assessment/showtest.php:3437 assessment/showtest.php:3448
+#: assessment/showtest.php:3429 assessment/showtest.php:3440
 msgid "cannot retry"
 msgstr "keine weiteren Versuche"
 
 #: assessment/showtest.php:3440 course/drillassess.php:417
+#: assessment/showtest.php:3432
 msgid "correct"
 msgstr "korrekt"
 
@@ -3871,6 +4036,7 @@ msgid "Scores:"
 msgstr "Punktzahlen:"
 
 #: assessment/showtest.php:3588 assessment/showtest.php:3599
+#: assessment/showtest.php:3580 assessment/showtest.php:3591
 msgid "Last attempt: "
 msgstr "Letzter Versuch: "
 
@@ -3879,7 +4045,8 @@ msgid "Not answered"
 msgstr "Nicht beantwortet"
 
 #: assessment/showtest.php:3592 assessment/showtest.php:3603
-#: assessment/showtest.php:3719
+#: assessment/showtest.php:3719 assessment/showtest.php:3595
+#: assessment/showtest.php:3711
 msgid "Score in Gradebook: "
 msgstr "Punktzahl in Punkteübersicht: "
 
@@ -3916,6 +4083,7 @@ msgid "Time limit exceeded by"
 msgstr "Zeitlimit überschritten um"
 
 #: assessment/showtest.php:3659 course/drillassess.php:236
+#: assessment/showtest.php:3651
 msgid "seconds"
 msgstr "Sekunden"
 
@@ -3942,6 +4110,7 @@ msgstr ""
 "Fragen, die dies zulassen und verbessert werden können"
 
 #: assessment/showtest.php:3672 assessment/testutil.php:1053
+#: assessment/showtest.php:3664
 msgid ""
 "<a href=\"showtest.php?reattempt=all\">Reattempt assessment</a> on all "
 "questions where allowed"
@@ -3950,6 +4119,7 @@ msgstr ""
 "Fragen. die dies erlauben"
 
 #: assessment/showtest.php:3677 assessment/testutil.php:1062
+#: assessment/showtest.php:3669
 msgid ""
 "<a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all "
 "questions with less than perfect scores where allowed."
@@ -3958,6 +4128,7 @@ msgstr ""
 "(alle erlaubten Fragen mit noch nicht erreichter Bestpunktzahl)"
 
 #: assessment/showtest.php:3678 assessment/testutil.php:1060
+#: assessment/showtest.php:3670
 msgid ""
 "<a href=\"showtest.php?regenall=all\">Try similar problems</a> for all "
 "questions where allowed."
@@ -3972,7 +4143,9 @@ msgstr "Letzter Versuch:"
 #: assessment/showtest.php:3740 assessment/showtest.php:3747
 #: admin/forms.php:391 admin/forms.php:834 course/addquestions.php:1534
 #: course/addquestions.php:1316 course/addquestions.php:1466
-#: admin/actions.php:318
+#: admin/actions.php:318 assessment/showtest.php:3732
+#: assessment/showtest.php:3739 course/addquestions.php:1310
+#: course/addquestions.php:1460 course/addquestions.php:1528
 msgid "or"
 msgstr "oder"
 
@@ -4012,6 +4185,7 @@ msgstr "Frage %d von %d"
 
 #: assessment/testutil.php:824 assessment/testutil.php:1004
 #: javascript/addqsort.js:1395 javascript/addqsort.js:1401
+#: javascript/addqsort.js:1393
 msgid "Question Withdrawn"
 msgstr "Frage zurückgezogen"
 
@@ -4037,7 +4211,7 @@ msgid "This is attempt %1$d of %2$d."
 msgstr "Dies ist Versuch %1$d von %2$d."
 
 #: assessment/testutil.php:844 assessment/testutil.php:1030
-#: course/gradebook.php:479
+#: course/gradebook.php:479 course/gradebook.php:475
 msgid "Category:"
 msgstr "Kategorie:"
 
@@ -4079,6 +4253,7 @@ msgstr "Teilweise korrekt - weitere Versuche möglich"
 
 #: assessment/testutil.php:937 assessment/testutil.php:961
 #: assessment/testutil.php:1094 course/treereader.php:380
+#: course/treereader.php:378
 msgid "Attempted"
 msgstr "Versucht"
 
@@ -4098,7 +4273,7 @@ msgstr "Keine Versuche mehr möglich"
 
 #: assessment/testutil.php:980 assessment/testutil.php:998
 #: assessment/testutil.php:1110 assessment/testutil.php:1126
-#: course/treereader.php:376
+#: course/treereader.php:376 course/treereader.php:374
 msgid "Unattempted"
 msgstr "Nicht versucht"
 
@@ -4163,13 +4338,14 @@ msgid "Unnamed Assessment"
 msgstr "Unbenannter Test"
 
 #: course/addassessment.php:127 course/addassessment2.php:103
-#: course/addquestions.php:169
+#: course/addquestions.php:169 course/addquestions.php:167
 msgid "Yes, Clear"
 msgstr "Ja, Löschen"
 
 #: course/addassessment.php:549 course/addassessment.php:597
 #: course/addassessment2.php:548 course/addassessment2.php:602
-#: course/chgassessments.php:1025
+#: course/chgassessments.php:1025 course/addassessment2.php:549
+#: course/addassessment2.php:604
 msgid ""
 "This assessment contains items that are not automatically graded.  Your "
 "grade may be inaccurate until your instructor grades these items."
@@ -4178,11 +4354,12 @@ msgstr ""
 "Bewertung kann unvollständig sein, bis Ihr Dozent diese Fragen bewertet hat."
 
 #: course/addassessment.php:608 course/addassessment2.php:613
+#: course/addassessment2.php:615
 msgid "Create Assessment"
 msgstr "Test anlegen"
 
 #: course/addassessment.php:615 course/addassessment2.php:620
-#: course/addquestions.php:487
+#: course/addquestions.php:487 course/addquestions.php:485
 #, php-format
 msgid ""
 "It appears this assessment is using an older [Q #] or [QUESTION #] tag. You "
@@ -4192,6 +4369,7 @@ msgstr ""
 "können eine %sKonvertierung in das neue Format%s vornehmen, wenn Sie möchten."
 
 #: course/addassessment.php:901 course/addassessment2.php:842
+#: course/addassessment2.php:844
 #, php-format
 msgid "This will discard any changes you have made on this page"
 msgstr "Dies wird alle Änderungen auf dieser Seite verwerfen"
@@ -4202,21 +4380,23 @@ msgstr "Dies wird alle Änderungen auf dieser Seite verwerfen"
 #: course/addquestions.php:22 course/addquestions.php:1187
 #: course/moddataset.php:950 course/modquestion.php:25
 #: course/addvideotimes.php:60 course/modquestion2.php:25
-#: course/modquestiongrid2.php:176
+#: course/modquestiongrid2.php:176 course/addquestions.php:1181
 #, php-format
 msgid "Add/Remove Questions"
 msgstr "Fragen hinzufügen/entfernen"
 
 #: course/addassessment.php:1213 course/addassessment2form.php:486
-#: course/chgassessments2form.php:488
+#: course/chgassessments2form.php:488 course/chgassessments2form.php:502
 msgid "No prerequisite"
 msgstr "Keine Vorausstzung"
 
 #: course/addassessment.php:1213 course/addassessment2form.php:487
+#: course/addassessment2form.php:498
 msgid "Show only after"
 msgstr "Anzeigen nach"
 
 #: course/addassessment.php:1213 course/addassessment2form.php:488
+#: course/addassessment2form.php:499
 msgid "Show greyed until"
 msgstr "Zeige ausgegraut bis zum"
 
@@ -4226,6 +4406,7 @@ msgid "percent"
 msgstr "Prozent"
 
 #: course/addassessment2.php:709 course/convertintro.php:57
+#: course/addassessment2.php:711
 msgid "Modify Assessment"
 msgstr "Test ändern"
 
@@ -4315,10 +4496,12 @@ msgid "Reported Broken"
 msgstr "Als defekt markiert"
 
 #: course/addquestions.php:1191 course/addquestions.php:1281
+#: course/addquestions.php:1185 course/addquestions.php:1275
 msgid "Assessment Settings"
 msgstr "Testeinstellungen"
 
 #: course/addquestions.php:1280 course/addquestions.php:1276
+#: course/addquestions.php:1270
 msgid ""
 "You can break your assessment into pages by using the +Text button and "
 "selecting the New Page option."
@@ -4327,11 +4510,12 @@ msgstr ""
 "verwenden und die Option Neue Seite auswählen."
 
 #: course/addquestions.php:1430 course/manageqset.php:1295
-#: course/addquestions.php:1426
+#: course/addquestions.php:1426 course/manageqset.php:1291
 msgid "Search cut off at 300 results"
 msgstr "Suche nach 300 Ergebnissen abgeschnitten"
 
 #: course/addquestions.php:1431 course/addquestions.php:1427
+#: course/addquestions.php:1421
 msgid "Showing "
 msgstr "Zeige "
 
@@ -4367,6 +4551,7 @@ msgstr "Speichern"
 
 #: course/chgassessments.php:1076 course/chgassessments2.php:748
 #: course/chgblocks.php:304 course/chgforums.php:505 course/chgoffline.php:207
+#: course/chgassessments2.php:753
 msgid "Apply Changes"
 msgstr "Änderungen speichern"
 
@@ -4387,6 +4572,12 @@ msgstr "Blöcke ändern"
 #: course/addquestions.php:1469 course/addquestions.php:1533
 #: course/gradebook.php:1518 course/copyitems.php:525 course/copyitems.php:524
 #: admin/importitems.php:781 admin/importitems2.php:220
+#: admin/importitems.php:790 course/addassessment2form.php:383
+#: course/addquestions.php:1337 course/addquestions.php:1463
+#: course/addquestions.php:1527 course/chgassessments2form.php:369
+#: course/gradeallq.php:313 course/gradeallq2.php:322 course/gradebook.php:326
+#: course/gradebook.php:351 course/gradebook.php:478 course/gradebook.php:503
+#: course/gradebook.php:523 course/gradebook.php:1124 course/gradebook.php:1517
 msgid "All"
 msgstr "Alle"
 
@@ -4399,6 +4590,12 @@ msgstr "Alle"
 #: course/addquestions.php:1533 course/copyitems.php:525
 #: course/copyitems.php:524 admin/importitems.php:781
 #: admin/importitems2.php:221 admin/importitems2.php:220
+#: admin/importitems.php:790 course/addassessment2form.php:435
+#: course/addquestions.php:1243 course/addquestions.php:1337
+#: course/addquestions.php:1463 course/addquestions.php:1527
+#: course/chgassessments2form.php:440 course/gradebook.php:428
+#: course/gradebook.php:454 course/gradebook.php:523 course/gradebook.php:731
+#: course/listusers.php:704
 msgid "None"
 msgstr "Keine"
 
@@ -4425,7 +4622,7 @@ msgstr ""
 "klicken Sie auf die Zahl in der Spalte Gelesen"
 
 #: course/contentstats.php:148 course/contentstats.php:149
-#: course/sendmsgmodal.php:202 msgs/msglist.php:539
+#: course/sendmsgmodal.php:202 msgs/msglist.php:539 course/sendmsgmodal.php:208
 msgid "Send Message"
 msgstr "Nachricht absenden"
 
@@ -4508,7 +4705,8 @@ msgstr "Konvertieren"
 #: admin/forms.php:142 admin/forms.php:1324 admin/forms.php:1474
 #: admin/forms.php:1512 admin/transfercourse.php:141
 #: course/addassessment.php:128 course/addassessment2.php:104 forms.php:373
-#: validate.php:135 course/deleteassessment.php:102
+#: validate.php:135 course/deleteassessment.php:102 admin/forms.php:1286
+#: admin/forms.php:1436 validate.php:102
 #, php-format
 msgid "Nevermind"
 msgstr "Hat sich erledigt"
@@ -4548,10 +4746,12 @@ msgstr "Zur Startseite zurückkehren"
 
 #: course/course.php:248 course/course.php:266 course/course.php:268
 #: diag/index.php:249 diag/index.php:254 diag/index.php:259 diag/index.php:264
+#: course/course.php:245 course/course.php:263 course/course.php:265
 msgid "Back"
 msgstr "Zurück"
 
 #: course/course.php:282 course/course.php:333 index.php:364 index.php:366
+#: course/course.php:279 course/course.php:330
 #, php-format
 msgid "New (%d)"
 msgstr "Neue (%d)"
@@ -4564,7 +4764,7 @@ msgstr "Dozenten-Vorschau"
 msgid "Instructor tool navigation"
 msgstr "Navigation für Dozenten"
 
-#: course/course.php:476 course/course.php:561
+#: course/course.php:476 course/course.php:561 course/course.php:558
 msgid "Views"
 msgstr "Ansichten"
 
@@ -4573,6 +4773,7 @@ msgid "Student View"
 msgstr "Studentenansicht"
 
 #: course/course.php:478 course/course.php:563 course/course.php:701
+#: course/course.php:475 course/course.php:560 course/course.php:698
 msgid "Quick Rearrange"
 msgstr "Schnelles Umordnen"
 
@@ -4581,15 +4782,15 @@ msgid "Communication"
 msgstr "Kommunikation"
 
 #: course/course.php:486 course/course.php:541 course/course.php:575
-#: header.php:272 header.php:273
+#: header.php:272 header.php:273 course/course.php:572
 msgid "Forums"
 msgstr "Foren"
 
-#: course/course.php:491 course/course.php:498
+#: course/course.php:491 course/course.php:498 course/course.php:495
 msgid "Tools"
 msgstr "Werkzeuge"
 
-#: course/course.php:493 course/course.php:503
+#: course/course.php:493 course/course.php:503 course/course.php:500
 msgid "Outcomes"
 msgstr "Themen"
 
@@ -4601,12 +4802,13 @@ msgstr "Teilnehmerliste"
 #: course/courseshowitems.php:374 course/courseshowitems.php:419
 #: course/courseshowitems.php:512 course/courseshowitems.php:554
 #: course/courseshowitems.php:604 course/gradebook.php:402
+#: course/course.php:497 course/course.php:582 course/gradebook.php:398
 msgid "New"
 msgstr "Neu"
 
 #: course/course.php:504 course/course.php:578 course/courseshowitems.php:1872
 #: course/exportcalfeed.php:59 course/moveitem.php:156 header.php:280
-#: admin/forms.php:949 header.php:281
+#: admin/forms.php:949 header.php:281 course/course.php:575
 msgid "Calendar"
 msgstr "Kalender"
 
@@ -4615,7 +4817,7 @@ msgstr "Kalender"
 msgid "Course Map"
 msgstr "Kursübersicht"
 
-#: course/course.php:512 course/gradebook.php:450
+#: course/course.php:512 course/gradebook.php:450 course/gradebook.php:446
 msgid "Manage"
 msgstr "Verwalten"
 
@@ -4641,7 +4843,7 @@ msgstr "Kurselemente"
 msgid "Copy"
 msgstr "Kopieren"
 
-#: course/course.php:527 course/gradebook.php:454
+#: course/course.php:527 course/gradebook.php:454 course/gradebook.php:450
 msgid "Export"
 msgstr "Export"
 
@@ -4654,6 +4856,7 @@ msgid "Mass Change"
 msgstr "Serienänderung"
 
 #: course/course.php:536 course/course.php:538 ltihome.php:403
+#: course/course.php:533 course/course.php:535
 msgid "Assessments"
 msgstr "Tests"
 
@@ -4702,14 +4905,16 @@ msgstr "Aus dem Kurs austragen"
 #: course/course.php:631 forums/posts.php:462 msgs/msghistory.php:147
 #: course/addassessment2form.php:200 course/chgassessments2form.php:173
 #: forums/posts.php:464 javascript/addqsort.js:1685 javascript/addqsort.js:1691
-#: javascript/addqsort.js:1696
+#: course/addassessment2form.php:201 course/chgassessments2form.php:174
+#: course/course.php:628
 msgid "Expand All"
 msgstr "Alle ausklappen"
 
 #: course/course.php:632 forums/posts.php:463 msgs/msghistory.php:148
 #: course/addassessment2form.php:201 course/chgassessments2form.php:174
 #: forums/posts.php:465 javascript/addqsort.js:1689 javascript/addqsort.js:1695
-#: javascript/addqsort.js:1700
+#: course/addassessment2form.php:202 course/chgassessments2form.php:175
+#: course/course.php:629
 msgid "Collapse All"
 msgstr "Alle einklappen"
 
@@ -4792,6 +4997,7 @@ msgstr "Statistik"
 
 #: course/courseshowitems.php:158 course/courseshowitems.php:2418
 #: course/gradebook.php:358 course/gradebook.php:423 course/gradebook.php:429
+#: course/gradebook.php:354 course/gradebook.php:419 course/gradebook.php:425
 msgid "Scores"
 msgstr "Punktzahlen"
 
@@ -4812,6 +5018,7 @@ msgstr "Punktzahlen"
 #: course/courseshowitems.php:2378 course/courseshowitems.php:2383
 #: course/masschgdates.php:264 course/masschgdates.php:656
 #: course/masschgdates.php:684 javascript/masschgdates.js:373
+#: course/masschgdates.php:654 course/masschgdates.php:682
 msgid "Always"
 msgstr "Immer"
 
@@ -4918,11 +5125,12 @@ msgid "Available until"
 msgstr "Verfügbar bis"
 
 #: course/courseshowitems.php:871 course/gradebook.php:836
-#: course/treereader.php:407
+#: course/treereader.php:407 course/treereader.php:405
 msgid " second(s)"
 msgstr " Sekunde(n)"
 
 #: course/courseshowitems.php:880 course/gradebook.php:839
+#: course/gradebook.php:835
 #, php-format
 msgid ""
 "This assessment has a time limit of %s, but that will be restricted by the "
@@ -4933,7 +5141,7 @@ msgstr ""
 "weiterzuarbeiten."
 
 #: course/courseshowitems.php:882 course/gradebook.php:841
-#: course/treereader.php:413
+#: course/treereader.php:413 course/treereader.php:411
 #, php-format
 msgid ""
 "This assessment has a time limit of %s.  Click OK to start or continue "
@@ -5105,11 +5313,12 @@ msgid "Add here:"
 msgstr "Füge hier hinzu:"
 
 #: course/courseshowitems.php:1836 course/addassessment2form.php:609
-#: course/chgassessments2form.php:637
+#: course/chgassessments2form.php:637 course/chgassessments2form.php:651
 msgid "Text"
 msgstr "Text"
 
 #: course/courseshowitems.php:1842 course/addassessment2form.php:554
+#: course/addassessment2form.php:565
 msgid "Link"
 msgstr "Link"
 
@@ -5176,6 +5385,7 @@ msgid "Out of Block"
 msgstr "Außerhalb des Blocks"
 
 #: course/courseshowitems.php:2089 course/gradebook.php:437
+#: course/gradebook.php:433
 msgid "NewFlag"
 msgstr "NewFlag"
 
@@ -5526,13 +5736,15 @@ msgstr ""
 
 #: course/gb-excuse.php:16 course/gb-excuse.php:49 course/gradebook.php:172
 #: course/gradebook.php:738 course/isolateassessgrade.php:21
-#: course/isolateassessgrade.php:245
+#: course/isolateassessgrade.php:245 course/gradebook.php:734
+#: course/isolateassessgrade.php:244
 msgid "Excuse Grade"
 msgstr "Bewertung nach Entschuldigung"
 
 #: course/gb-excuse.php:35 course/gb-excuse.php:59 course/gradebook.php:176
 #: course/gradebook.php:739 course/isolateassessgrade.php:25
-#: course/isolateassessgrade.php:246
+#: course/isolateassessgrade.php:246 course/gradebook.php:735
+#: course/isolateassessgrade.php:245
 msgid "Un-excuse Grade"
 msgstr "Keine verspäteten Eineichungen"
 
@@ -5540,15 +5752,17 @@ msgstr "Keine verspäteten Eineichungen"
 #: course/gradebook.php:1311 course/gradebook.php:1313
 #: course/outcomereport.php:249 course/outcomereport.php:321
 #: course/gradebook.php:1232 course/gradebook.php:1315
-#: course/gradebook.php:1317
+#: course/gradebook.php:1317 course/gradebook.php:1314
+#: course/gradebook.php:1316
 msgid "Total"
 msgstr "Gesamtpunktzahl"
 
 #: course/gb-export.php:202 course/gb-export.php:204 course/gb-export.php:235
 #: course/gb-export.php:484 course/gradebook.php:1043 course/gradebook.php:1045
-#: course/gradebook.php:1583 course/gradebook.php:1346
-#: course/gradebook.php:1589 course/gradebook.php:1315
-#: course/gradebook.php:1587
+#: course/gradebook.php:1346 course/gradebook.php:1315
+#: course/gradebook.php:1042 course/gradebook.php:1044
+#: course/gradebook.php:1314 course/gradebook.php:1345
+#: course/gradebook.php:1586 course/gradebook.php:1588
 msgid "pts"
 msgstr "Pkt"
 
@@ -5562,11 +5776,14 @@ msgstr "Gewichtete Gesamtpunktzahl %"
 #: course/gradebook.php:1851 course/gradebook.php:1434
 #: course/gradebook.php:1717 course/gradebook.php:1788
 #: course/gradebook.php:1830 course/gradebook.php:1855
-#: course/gradebook.php:1376
+#: course/gradebook.php:1376 course/gradebook.php:1433
+#: course/gradebook.php:1716 course/gradebook.php:1787
+#: course/gradebook.php:1829 course/gradebook.php:1854
 msgid "5-number summary:"
 msgstr "5-Zahlen-Statistik:"
 
 #: course/gb-itemanalysis.php:69 course/gb-itemanalysis2.php:70
+#: course/gb-itemanalysis.php:68 course/gb-itemanalysis2.php:69
 msgid "Grade this question for all students"
 msgstr "Diese Frage für alle Studierenden bewerten"
 
@@ -5723,12 +5940,14 @@ msgstr "Perfekt beantwortete Fragen ausblenden"
 #: course/gb-viewasid.php:862 course/gradeallq.php:328
 #: course/gradeallq2.php:335 javascript/gb-scoretools.js:43
 #: course/gb-viewasid.php:866 course/gb-viewasid.php:865
+#: course/gradeallq.php:327 course/gradeallq2.php:336
 msgid "Hide Unanswered Questions"
 msgstr "Unbeantwortete Fragen ausblenden"
 
 #: course/gb-viewasid.php:863 course/gradeallq.php:330
 #: course/gradeallq2.php:337 course/gb-viewasid.php:867
-#: course/gb-viewasid.php:866
+#: course/gb-viewasid.php:866 course/gradeallq.php:329
+#: course/gradeallq2.php:338
 msgid "Show All Answers"
 msgstr "Alle Antworten anzeigen"
 
@@ -5741,7 +5960,7 @@ msgstr "Vorschau"
 #: course/gradebook.php:766 course/gb-viewasid.php:1085
 #: course/gb-viewasid.php:960 course/gb-viewasid.php:959
 #: course/gb-viewasid.php:1084 course/gb-viewasid.php:961
-#: course/gb-viewasid.php:1086
+#: course/gb-viewasid.php:1086 course/gradebook.php:762
 msgid "Feedback"
 msgstr "Hinweise"
 
@@ -5759,6 +5978,7 @@ msgstr "Zeige Punkte-Details"
 #: course/gb-viewasid.php:1284 javascript/addqsort.js:1608
 #: javascript/addqsort.js:1614 javascript/addqsort.js:1615
 #: javascript/addqsort.js:1619 course/gb-viewasid.php:1286
+#: javascript/addqsort.js:1611
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
@@ -5770,6 +5990,9 @@ msgstr "Kommentare speichern"
 #: course/addassessment2form.php:596 course/chgassessments2form.php:497
 #: course/chgassessments2form.php:621 javascript/addqsort.js:1078
 #: javascript/addqsort.js:1084 course/modquestiongrid2.php:284
+#: course/addassessment2form.php:607 course/chgassessments2form.php:511
+#: course/chgassessments2form.php:635 course/gradebook.php:420
+#: javascript/addqsort.js:1076
 msgid "Points"
 msgstr "Punkte"
 
@@ -5780,7 +6003,9 @@ msgstr "Prozent"
 #: course/gbsettings.php:317 course/listusers.php:710 course/listusers.php:714
 #: javascript/posts.js:38 javascript/posts.js:62
 #: course/addassessment2form.php:106 course/chgassessments2form.php:477
-#: course/addassessment2form.php:479
+#: course/addassessment2form.php:479 course/addassessment2form.php:490
+#: course/chgassessments2form.php:491 course/listusers.php:708
+#: course/listusers.php:712
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -5806,7 +6031,7 @@ msgid "Feedback on Version %d:"
 msgstr "Rückmeldung zu Version %d:"
 
 #: course/gbtable2.php:2397 course/showfeedback.php:48
-#: course/showfeedback.php:82 course/gbtable2.php:2403
+#: course/showfeedback.php:82 course/gbtable2.php:2403 course/gbtable2.php:2407
 #, php-format
 msgid "Feedback on Question %d:"
 msgstr "Rückmeldung zu Frage %d:"
@@ -5816,7 +6041,7 @@ msgid "Overall feedback on this attempt:"
 msgstr "Gesamt-Rückmeldung zu diesem Versuch:"
 
 #: course/gbtable2.php:2405 course/showfeedback.php:45
-#: course/showfeedback.php:88 course/gbtable2.php:2411
+#: course/showfeedback.php:88 course/gbtable2.php:2411 course/gbtable2.php:2415
 msgid "Overall feedback:"
 msgstr "Gesamt-Rückmeldung:"
 
@@ -5825,46 +6050,46 @@ msgstr "Gesamt-Rückmeldung:"
 msgid "Feedback on attempt %d"
 msgstr "Rückmeldung zu Versuch %d"
 
-#: course/gradeallq.php:313 course/gradeallq2.php:320
+#: course/gradeallq.php:313 course/gradeallq2.php:320 course/gradeallq2.php:321
 msgid "Limit to section"
 msgstr "Begrenzen auf Abschnitt"
 
 #: course/gradeallq.php:326 course/gradeallq2.php:333
-#: javascript/gb-scoretools.js:7
+#: javascript/gb-scoretools.js:7 course/gradeallq2.php:334
 msgid "Hide Questions with Perfect Scores"
 msgstr "Fragen mit voller Punktzahl ausblenden"
 
 #: course/gradeallq.php:327 course/gradeallq2.php:334
-#: javascript/gb-scoretools.js:20
+#: javascript/gb-scoretools.js:20 course/gradeallq2.php:335
 msgid "Hide Nonzero Score Questions"
 msgstr "Blende Fragen mit mehr als 0 Punkten aus"
 
-#: course/gradeallq.php:329 course/gradeallq2.php:336
+#: course/gradeallq.php:329 course/gradeallq2.php:336 course/gradeallq2.php:337
 msgid "Prepare for Printing (Slow)"
 msgstr "Vorbereitung zum Druck (langsam)"
 
-#: course/gradeallq.php:331 course/gradeallq2.php:338
+#: course/gradeallq.php:331 course/gradeallq2.php:338 course/gradeallq2.php:339
 msgid "Preview All Files"
 msgstr "Vorschau aller Dateien"
 
 #: course/gradeallq.php:338 course/gradeallq2.php:345 javascript/rubric.js:70
-#: javascript/rubric_min.js:1
+#: javascript/rubric_min.js:1 course/gradeallq2.php:346
 msgid "Full Credit"
 msgstr "Volle Punkte"
 
-#: course/gradeallq.php:339 course/gradeallq2.php:346
+#: course/gradeallq.php:339 course/gradeallq2.php:346 course/gradeallq2.php:347
 msgid "No Credit"
 msgstr "Keine Punkte"
 
-#: course/gradeallq.php:343 course/gradeallq2.php:350
+#: course/gradeallq.php:343 course/gradeallq2.php:350 course/gradeallq2.php:351
 msgid "Quick Save"
 msgstr "Schnelles Speichern"
 
-#: course/gradeallq.php:665 course/gradeallq2.php:573
+#: course/gradeallq.php:665 course/gradeallq2.php:573 course/gradeallq2.php:580
 msgid "Question Feedback"
 msgstr "Rückmeldung zur Frage"
 
-#: course/gradeallq.php:696 course/gradeallq2.php:603
+#: course/gradeallq.php:696 course/gradeallq2.php:603 course/gradeallq2.php:610
 msgid "No submission to show"
 msgstr "Keine Einreichung anzuzeigen"
 
@@ -5900,37 +6125,39 @@ msgstr "Punkteübersichts-Studenten-Details"
 msgid "Category Totals"
 msgstr "Gesamtpunktzahlen (Kategorie)"
 
-#: course/gradebook.php:345 course/gradebook.php:497
+#: course/gradebook.php:345 course/gradebook.php:497 course/gradebook.php:493
 msgid "Not Counted:"
 msgstr "Nicht gewertet:"
 
 #: course/gradebook.php:346 course/gradebook.php:498
-#: includes/calendardisp.php:871
+#: includes/calendardisp.php:871 course/gradebook.php:494
+#: includes/calendardisp.php:874
 msgid "Show all"
 msgstr "Alle anzeigen"
 
-#: course/gradebook.php:347 course/gradebook.php:499
+#: course/gradebook.php:347 course/gradebook.php:499 course/gradebook.php:495
 msgid "Show stu view"
 msgstr "Studentenansicht zeigen"
 
-#: course/gradebook.php:348 course/gradebook.php:500
+#: course/gradebook.php:348 course/gradebook.php:500 course/gradebook.php:496
 msgid "Hide all"
 msgstr "Alle verbergen"
 
 #: course/gradebook.php:350 course/gradebook.php:502
-#: course/addlinkedtext.php:619
+#: course/addlinkedtext.php:619 course/gradebook.php:346
+#: course/gradebook.php:498
 msgid "Show:"
 msgstr "Anzeigen:"
 
-#: course/gradebook.php:352 course/gradebook.php:504
+#: course/gradebook.php:352 course/gradebook.php:504 course/gradebook.php:500
 msgid "Past &amp; Attempted"
 msgstr "Überfällig &amp; versucht"
 
-#: course/gradebook.php:353 course/gradebook.php:505
+#: course/gradebook.php:353 course/gradebook.php:505 course/gradebook.php:501
 msgid "Available Only"
 msgstr "Nur verfügbare"
 
-#: course/gradebook.php:354 course/gradebook.php:506
+#: course/gradebook.php:354 course/gradebook.php:506 course/gradebook.php:502
 msgid "Past &amp; Available"
 msgstr "Überfällig &amp; verfügbar"
 
@@ -5938,7 +6165,7 @@ msgstr "Überfällig &amp; verfügbar"
 msgid "Links:"
 msgstr "Links:"
 
-#: course/gradebook.php:357 course/gradebook.php:428
+#: course/gradebook.php:357 course/gradebook.php:428 course/gradebook.php:424
 msgid "View/Edit"
 msgstr "Anzeigen/Ändern"
 
@@ -5995,15 +6222,15 @@ msgstr "Links"
 msgid "Pics"
 msgstr "Bilder"
 
-#: course/gradebook.php:433 course/listusers.php:707
+#: course/gradebook.php:433 course/listusers.php:707 course/listusers.php:705
 msgid "Small"
 msgstr "Klein"
 
-#: course/gradebook.php:434 course/listusers.php:708
+#: course/gradebook.php:434 course/listusers.php:708 course/listusers.php:706
 msgid "Big"
 msgstr "Groß"
 
-#: course/gradebook.php:438 admin/forms.php:940
+#: course/gradebook.php:438 admin/forms.php:940 course/gradebook.php:434
 msgid "Off"
 msgstr "Aus"
 
@@ -6018,7 +6245,9 @@ msgstr "Offline-Bewertungen"
 #: course/gradebook.php:449 course/addquestions.php:982
 #: course/addquestions.php:1477 course/addquestions.php:1344
 #: course/addquestions.php:1470 course/moddataset.php:610
-#: course/moddataset.php:718
+#: course/moddataset.php:718 course/addquestions.php:1338
+#: course/addquestions.php:1464 course/addquestions.php:1471
+#: course/gradebook.php:445
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -6033,7 +6262,9 @@ msgstr "Farbe:"
 #: course/gradebook.php:527 course/gradebook.php:735
 #: course/addquestions.php:1249 course/addquestions.php:1343
 #: admin/importitems.php:781 admin/importitems2.php:221
-#: admin/importitems2.php:220
+#: admin/importitems2.php:220 course/addquestions.php:1243
+#: course/addquestions.php:1337 course/gradebook.php:523
+#: course/gradebook.php:731
 msgid "Check:"
 msgstr "Markieren:"
 
@@ -6046,7 +6277,7 @@ msgid "Send a message to the selected students"
 msgstr "Schicke eine Nachricht an die ausgewählten Studierenden"
 
 #: course/gradebook.php:532 course/gradebook.php:691 index.php:610
-#: index.php:612 index.php:616
+#: index.php:612 index.php:616 course/gradebook.php:687
 msgid "Message"
 msgstr "Nachricht"
 
@@ -6071,7 +6302,7 @@ msgid "Make due date exceptions for selected students"
 msgstr "Mache für die ausgewählten Studierenden eine Ausnahme beim Einreichen"
 
 #: course/gradebook.php:537 course/gradebook.php:737 course/gradebook.php:1294
-#: course/gradebook.php:1298
+#: course/gradebook.php:1298 course/gradebook.php:1297
 msgid "Make Exception"
 msgstr "Ausnahme machen"
 
@@ -6096,6 +6327,7 @@ msgid "Unenroll the selected students"
 msgstr "Ausgewählte Studierende austragen"
 
 #: course/gradebook.php:541 forms.php:366 forms.php:368
+#: course/gradebook.php:537
 msgid "Unenroll"
 msgstr "Austragen"
 
@@ -6121,10 +6353,12 @@ msgid "Change Info"
 msgstr "Info ändern"
 
 #: course/gradebook.php:695 course/gradebook.php:701 course/listusers.php:484
+#: course/gradebook.php:691 course/gradebook.php:697 course/listusers.php:482
 msgid "Login Log"
 msgstr "Login-Protokoll"
 
 #: course/gradebook.php:696 course/gradebook.php:702 course/listusers.php:485
+#: course/gradebook.php:692 course/gradebook.php:698 course/listusers.php:483
 msgid "Activity Log"
 msgstr "Aktivitäts-Log"
 
@@ -6154,6 +6388,7 @@ msgid "One LatePass available"
 msgstr "Einmal verspätetes Einreichen erlaubt"
 
 #: course/gradebook.php:736 course/isolateassessgrade.php:244
+#: course/gradebook.php:732 course/isolateassessgrade.php:243
 msgid "With selected:"
 msgstr "Mit ausgewählten:"
 
@@ -6165,7 +6400,7 @@ msgstr "Note"
 msgid "Possible"
 msgstr "Möglich"
 
-#: course/gradebook.php:749 course/gradebook.php:756
+#: course/gradebook.php:749 course/gradebook.php:756 course/gradebook.php:752
 msgid "Time Spent (In Questions)"
 msgstr "Benötigte Zeit (in Fragen)"
 
@@ -6188,13 +6423,15 @@ msgstr ""
 "Wenn Sie diesen Test ansehen, können Sie ihn nicht mehr verspätet einreichen"
 
 #: course/gradebook.php:1043 course/gradebook.php:1583
-#: course/gradebook.php:1587
+#: course/gradebook.php:1587 course/gradebook.php:1586
 msgid "(Not Counted)"
 msgstr "(nicht gewertet)"
 
 #: course/gradebook.php:1090 course/gradebook.php:1092
 #: course/gradebook.php:1095 course/gradebook.php:1097
-#: course/gradebook.php:1099
+#: course/gradebook.php:1099 course/gradebook.php:1091
+#: course/gradebook.php:1094 course/gradebook.php:1096
+#: course/gradebook.php:1098
 msgid "View Feedback"
 msgstr "Rückmeldung ansehen"
 
@@ -6215,10 +6452,12 @@ msgid "Past Due and Available"
 msgstr "Überfällig und verfügbar"
 
 #: course/gradebook.php:1248 course/gradebook.php:1252
+#: course/gradebook.php:1251
 msgid "Weighted Total"
 msgstr "Gewichtete Gesamtpunktzahl"
 
 #: course/gradebook.php:1269 course/gradebook.php:1273
+#: course/gradebook.php:1272
 msgid ""
 "<b>Past Due</b> total only includes items whose due date has passed.  "
 "Current assignments are not counted in this total."
@@ -6227,6 +6466,7 @@ msgstr ""
 "Tests sind dabei nicht berücksichtigt."
 
 #: course/gradebook.php:1272 course/gradebook.php:1276
+#: course/gradebook.php:1275
 msgid ""
 "<b>Past Due and Attempted</b> total includes items whose due date has "
 "passed, as well as currently available items you have started working on."
@@ -6235,6 +6475,7 @@ msgstr ""
 "sowie verfügbare Teile deren Bearbeitung Sie begonnen haben."
 
 #: course/gradebook.php:1276 course/gradebook.php:1280
+#: course/gradebook.php:1279
 msgid ""
 "<b>Past Due and Available</b> total includes items whose due date has passed "
 "as well as currently available items, even if you haven't starting working "
@@ -6245,6 +6486,7 @@ msgstr ""
 "haben."
 
 #: course/gradebook.php:1279 course/gradebook.php:1283
+#: course/gradebook.php:1282
 msgid ""
 "<b>All</b> total includes all items: past, current, and future to-be-done "
 "items."
@@ -6253,26 +6495,32 @@ msgstr ""
 "erledigende Teile."
 
 #: course/gradebook.php:1286 course/gradebook.php:1290
+#: course/gradebook.php:1289
 msgid "View Outcome Report"
 msgstr "Übersicht nach Themen ansehen"
 
 #: course/gradebook.php:1294 course/gradebook.php:1298
+#: course/gradebook.php:1297
 msgid "for selected assessments"
 msgstr "für ausgewählte Tests"
 
 #: course/gradebook.php:1353 course/gradebook.php:1357
+#: course/gradebook.php:1356
 msgid "[Collapse]"
 msgstr "[Einklappen]"
 
 #: course/gradebook.php:1355 course/gradebook.php:1359
+#: course/gradebook.php:1358
 msgid "[Expand]"
 msgstr "[Ausklappen]"
 
 #: course/gradebook.php:1530 course/gradebook.php:1534
+#: course/gradebook.php:1533
 msgid "Show Locked"
 msgstr "Gesperrte anzeigen"
 
 #: course/gradebook.php:1531 course/gradebook.php:1535
+#: course/gradebook.php:1534
 msgid "Hide Locked"
 msgstr "Gesperrte verbergen"
 
@@ -6280,6 +6528,8 @@ msgstr "Gesperrte verbergen"
 #: course/gradebook.php:1620 course/gradebook.php:1622
 #: course/gradebook.php:1608 course/gradebook.php:1618
 #: course/gradebook.php:1624 course/gradebook.php:1626
+#: course/gradebook.php:1607 course/gradebook.php:1617
+#: course/gradebook.php:1623 course/gradebook.php:1625
 msgid "[Settings]"
 msgstr "[Einstellungen]"
 
@@ -6287,14 +6537,18 @@ msgstr "[Einstellungen]"
 #: course/gradebook.php:1615 course/gradebook.php:1623
 #: course/gradebook.php:1609 course/gradebook.php:1614
 #: course/gradebook.php:1619 course/gradebook.php:1627
+#: course/gradebook.php:1608 course/gradebook.php:1613
+#: course/gradebook.php:1618 course/gradebook.php:1626
 msgid "[Isolate]"
 msgstr "[Isolieren]"
 
 #: course/gradebook.php:1607 course/gradebook.php:1611
+#: course/gradebook.php:1610
 msgid "[By Group]"
 msgstr "[Nach Gruppe]"
 
 #: course/gradebook.php:1617 course/gradebook.php:1621
+#: course/gradebook.php:1620
 msgid "[Scores]"
 msgstr "[Punktzahlen]"
 
@@ -6302,6 +6556,8 @@ msgstr "[Punktzahlen]"
 #: course/gradebook.php:1822 course/gradebook.php:1847
 #: course/gradebook.php:1713 course/gradebook.php:1784
 #: course/gradebook.php:1826 course/gradebook.php:1851
+#: course/gradebook.php:1712 course/gradebook.php:1783
+#: course/gradebook.php:1825 course/gradebook.php:1850
 msgid "Mean:"
 msgstr "Mittelwert:"
 
@@ -6311,6 +6567,7 @@ msgstr "Test-Metrik"
 
 #: course/isolateassessbygroup.php:264 course/isolateassessbygroup.php:268
 #: course/isolateassessgrade.php:467 course/isolateassessgrade.php:471
+#: course/isolateassessgrade.php:466 course/isolateassessgrade.php:470
 msgid "[Show Feedback]"
 msgstr "[Hinweise anzeigen]"
 
@@ -6439,18 +6696,22 @@ msgid "By Dates"
 msgstr "Nach Datum"
 
 #: course/masschgdates.php:361 javascript/masschgdates.js:591
+#: course/masschgdates.php:359
 msgid "Show Forum Dates"
 msgstr "Forum-Daten anzeigen"
 
 #: course/masschgdates.php:363 javascript/masschgdates.js:594
+#: course/masschgdates.php:361
 msgid "Hide Forum Dates"
 msgstr "Forum-Daten ausblenden"
 
 #: course/masschgdates.php:370 javascript/masschgdates.js:602
+#: course/masschgdates.php:368
 msgid "Show Assessment Dates"
 msgstr "Zeige Test-Daten"
 
 #: course/masschgdates.php:372 javascript/masschgdates.js:605
+#: course/masschgdates.php:370
 msgid "Hide Assessment Dates"
 msgstr "Blende Testdaten aus"
 
@@ -6507,6 +6768,7 @@ msgid "Messages Sent"
 msgstr "Gesendete Nachrichten"
 
 #: course/masssend.php:234 forums/posts.php:731 forums/posts.php:733
+#: course/masssend.php:240
 msgid "Close"
 msgstr "Schließen"
 
@@ -6553,12 +6815,14 @@ msgstr "Nach %d Versuchen"
 
 #: course/modquestion.php:209 course/modquestion2.php:214
 #: course/modquestion.php:291 course/modquestion2.php:297
+#: course/modquestion2.php:217 course/modquestion2.php:306
 msgid "Never during assessment"
 msgstr "Niemals während des Tests"
 
 #: course/modquestion.php:355 course/modquestion2.php:357
 #: course/modquestiongrid.php:268 course/modquestiongrid2.php:280
 #: course/modquestion.php:247 course/modquestion2.php:354
+#: course/modquestion2.php:271 course/modquestion2.php:372
 msgid "Save Settings"
 msgstr "Einstellungen speichern"
 
@@ -6578,6 +6842,7 @@ msgstr "Nachdem die Test-Version eingereicht ist"
 #: course/modquestion2.php:216 course/addassessment2form.php:808
 #: course/chgassessments2form.php:797 course/addassessment2form.php:806
 #: course/addassessment2form.php:805 course/addassessment2form.php:795
+#: course/chgassessments2form.php:811 course/modquestion2.php:219
 #, php-format
 msgid "After %d tries"
 msgstr "Nach %d Versuchen"
@@ -6585,16 +6850,20 @@ msgstr "Nach %d Versuchen"
 #: course/modquestion2.php:221 course/modquestiongrid2.php:151
 #: course/modquestiongrid2.php:245 course/modquestiongrid2.php:331
 #: course/chgassessments2form.php:527 course/modquestion2.php:304
+#: course/chgassessments2form.php:541 course/modquestion2.php:224
+#: course/modquestion2.php:322
 msgid "Hints"
 msgstr "Hinweise"
 
 #: course/modquestion2.php:223 course/chgassessments2form.php:528
-#: course/modquestion2.php:305
+#: course/modquestion2.php:305 course/modquestion2.php:226
+#: course/modquestion2.php:323
 msgid "Video/text buttons"
 msgstr "Video/Text-Schaltfläche"
 
 #: course/modquestion2.php:225 course/chgassessments2form.php:529
-#: course/modquestion2.php:306
+#: course/modquestion2.php:306 course/modquestion2.php:228
+#: course/modquestion2.php:324
 msgid "Hints and Video/text buttons"
 msgstr "Hinweise und Video/Text-Schaltflächen"
 
@@ -6616,7 +6885,9 @@ msgstr "Hinweise und Video-Schaltflächen"
 #: course/modquestion.php:276 course/modquestion.php:284
 #: course/modquestion.php:290 course/modquestion.php:305
 #: course/modquestion2.php:288 course/modquestion2.php:296
-#: course/modquestion2.php:302
+#: course/modquestion2.php:302 course/modquestion2.php:297
+#: course/modquestion2.php:305 course/modquestion2.php:311
+#: course/modquestion2.php:320
 msgid "Use Default"
 msgstr "Standard anwenden"
 
@@ -6695,6 +6966,7 @@ msgid "Outcomes Student Detail for: "
 msgstr "Thematische Studierenden-Information: "
 
 #: course/printlayoutword.php:56 course/printlayoutword.php:300
+#: course/printlayoutword.php:47 course/printlayoutword.php:303
 msgid "Generate Word Version"
 msgstr "Word-Version erzeugen"
 
@@ -6907,6 +7179,9 @@ msgstr "Bitte geben Sie ID, Vor- und Nachnamen ein."
 #: actions.php:435 actions.php:434 actions.php:456 actions.php:468
 #: actions.php:480 actions.php:517 actions.php:568 actions.php:714
 #: admin/actions.php:318 course/copyitems.php:59 course/copyitems.php:70
+#: actions.php:431 actions.php:453 actions.php:465 actions.php:477
+#: actions.php:514 actions.php:565 actions.php:711 admin/actions.php:320
+#: diag/index.php:104 diag/index.php:143 diag/index.php:209
 msgid "Try Again"
 msgstr "Erneut versuchen"
 
@@ -6944,12 +7219,12 @@ msgid "Your window to complete this diagnostic has expired."
 msgstr "Ihr Zeitfenster zum Abschließen dieses Diagnose-Tests ist abgelaufen."
 
 #: diag/index.php:360 forms.php:45 diag/index.php:370 directaccess.php:263
-#: bltilaunch.php:432
+#: bltilaunch.php:432 directaccess.php:265
 msgid "Enter First Name:"
 msgstr "Vorname:"
 
 #: diag/index.php:361 forms.php:46 diag/index.php:371 directaccess.php:264
-#: bltilaunch.php:433
+#: bltilaunch.php:433 directaccess.php:266
 msgid "Enter Last Name:"
 msgstr "Nachname:"
 
@@ -7006,19 +7281,21 @@ msgstr "Punkte für letzte Frage:"
 msgid "New Student Signup"
 msgstr "Als Student registrieren"
 
-#: forms.php:43 directaccess.php:261 bltilaunch.php:430
+#: forms.php:43 directaccess.php:261 bltilaunch.php:430 directaccess.php:263
 msgid "Choose a password:"
 msgstr "Passwort wählen:"
 
-#: forms.php:44 directaccess.php:262 bltilaunch.php:431
+#: forms.php:44 directaccess.php:262 bltilaunch.php:431 directaccess.php:264
 msgid "Confirm password:"
 msgstr "Passwort bestätigen:"
 
 #: forms.php:47 forms.php:169 directaccess.php:265 bltilaunch.php:434
+#: bltilaunch.php:427 directaccess.php:267
 msgid "Enter E-mail address:"
 msgstr "E-Mail-Adresse eingeben:"
 
 #: forms.php:48 forms.php:170 directaccess.php:271 bltilaunch.php:435
+#: bltilaunch.php:428 directaccess.php:273
 msgid "Notify me by email when I receive a new message:"
 msgstr "Benachrichtige mich per E-Mail, wenn ich eine neue Nachricht erhalte:"
 
@@ -7233,7 +7510,7 @@ msgid "Update Info"
 msgstr "Information aktualisieren"
 
 #: forms.php:318 forms.php:320 actions.php:454 actions.php:456 actions.php:453
-#: actions.php:451 actions.php:450 actions.php:452
+#: actions.php:451 actions.php:450 actions.php:452 actions.php:449
 msgid "Enroll in a Course"
 msgstr "In einen Kurs einschreiben"
 
@@ -7329,12 +7606,12 @@ msgstr ""
 
 #: forms.php:447 forms.php:459 forms.php:471 course/addquestions.php:1469
 #: course/addquestions.php:1533 course/copyitems.php:525
-#: course/copyitems.php:524
+#: course/copyitems.php:524 course/addquestions.php:1527
 msgid "Check"
 msgstr "Auswahl"
 
 #: forums/flaggedthreads.php:59 forums/flaggedthreads.php:61
-#: forums/flaggedthreads.php:62 forums/forums.php:182
+#: forums/flaggedthreads.php:62 forums/forums.php:182 forums/forums.php:180
 msgid "Flagged Forum Posts"
 msgstr "Markierte Forenbeiträge"
 
@@ -7390,6 +7667,8 @@ msgstr "Hinweise zum Beantworten von Beiträgen"
 #: forums/posthandler.php:536 course/addquestions.php:1350
 #: course/addquestions.php:1477 javascript/addqsort.js:1075
 #: course/modquestiongrid2.php:252 course/modquestiongrid2.php:283
+#: course/addquestions.php:1344 course/addquestions.php:1471
+#: javascript/addqsort.js:1067
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -7422,6 +7701,7 @@ msgid "Hide Replies"
 msgstr "Antworten ausblenden"
 
 #: forums/postsbyname.php:259 forums/thread.php:619 forums/postsbyname.php:261
+#: forums/thread.php:617
 msgid "Mark all Read"
 msgstr "Alle als Gelesen markieren"
 
@@ -7457,7 +7737,7 @@ msgstr "Beiträge für die Gruppe: "
 msgid "Show group members"
 msgstr "Gruppenmitglieder anzeigen"
 
-#: forums/thread.php:581 forums/thread.php:776
+#: forums/thread.php:581 forums/thread.php:776 forums/thread.php:774
 msgid "Add New Thread"
 msgstr "Neues Thema"
 
@@ -7543,6 +7823,7 @@ msgid "Course:"
 msgstr "Kurs:"
 
 #: includes/email.php:100 course/sendmsgmodal.php:190
+#: course/sendmsgmodal.php:196
 msgid "Subject:"
 msgstr "Betreff:"
 
@@ -7853,7 +8134,8 @@ msgstr "Ungültige Verwendung des Komma."
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
 #: javascript/AMhelpers2.js:1170 javascript/AMhelpers2.js:1645
 #: javascript/AMhelpers2.js:1172 javascript/AMhelpers2.js:1643
-#: javascript/AMhelpers2.js:1647
+#: javascript/AMhelpers2.js:1647 javascript/AMhelpers2.js:1175
+#: javascript/AMhelpers2.js:1646 javascript/AMhelpers2.js:1650
 msgid "syntax incomplete"
 msgstr "Syntax unvollständig"
 
@@ -7906,7 +8188,7 @@ msgstr "Syntax OK"
 #: javascript/AMhelpers.js:1097 javascript/AMhelpers2.js:1333
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
 #: javascript/assessment_min.js:3 javascript/AMhelpers2.js:1337
-#: javascript/AMhelpers2.js:1339
+#: javascript/AMhelpers2.js:1339 javascript/AMhelpers2.js:1342
 msgid "syntax error"
 msgstr "Syntaxfehler"
 
@@ -7918,6 +8200,7 @@ msgstr "Warnung"
 #: javascript/AMhelpers2.js:1557 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
 #: javascript/AMhelpers2.js:1561 javascript/AMhelpers2.js:1563
+#: javascript/AMhelpers2.js:1566
 msgid "Your answer contains an unrecognized symbol"
 msgstr "Ihre Antwort enthält ein unbekanntes Symbol"
 
@@ -8117,6 +8400,7 @@ msgstr ""
 "Syntaxfehler: Ihre Gleichung sollte nur ein Gleichheitszeichen enthalten"
 
 #: javascript/ASCIIsvg.js:203 javascript/ASCIIsvg_min.js:1
+#: javascript/ASCIIsvg.js:209
 msgid "Enlarged Graph"
 msgstr "Graph vergrößern"
 
@@ -8145,6 +8429,7 @@ msgid "Are you sure you want to remove these questions?"
 msgstr "Sind Sie sicher, dass Sie diese Fragen löschen wollen?"
 
 #: javascript/addqsort.js:796 javascript/addqsort.js:901
+#: javascript/addqsort.js:893
 msgid "Are you sure you want to clear all attempts on this question?"
 msgstr ""
 "Stellen Sie sicher, dass Sie alle Versuche zu dieser Frage löschen wollen?"
@@ -8546,6 +8831,7 @@ msgid "Show Unanswered Questions"
 msgstr "Zeige unbeantwortete Fragen"
 
 #: javascript/gb-scoretools.js:72 javascript/livepoll.js:603
+#: javascript/gb-scoretools.js:82
 msgid "Saving..."
 msgstr "Speichern..."
 
@@ -8854,6 +9140,7 @@ msgid "The course setting is enabled for dates to be set via LTI."
 msgstr "Freischaltung erfolgt über LTI."
 
 #: course/addassessment2form.php:156 ltihome.php:449
+#: course/addassessment2form.php:157
 msgid "Waiting for the LMS to send a date"
 msgstr "Warte auf Daten vom LMS"
 
@@ -8874,6 +9161,7 @@ msgid "individual student due dates may vary"
 msgstr "kann für einzelne Studierende abweichen"
 
 #: course/addassessment2form.php:169 course/chgassessments2form.php:118
+#: course/addassessment2form.php:170 course/chgassessments2form.php:119
 msgid "Practice mode"
 msgstr "Übungs-Modus"
 
@@ -8901,25 +9189,32 @@ msgstr ""
 "zwischen Hausarbeits- und Prüfung-Modus gewechselt wird."
 
 #: course/addassessment2form.php:205 course/chgassessments2form.php:178
+#: course/addassessment2form.php:206 course/chgassessments2form.php:179
 msgid "Core Options"
 msgstr "Kern-Einstellungen"
 
 #: course/addassessment2form.php:208 course/chgassessments2form.php:182
+#: course/addassessment2form.php:209 course/chgassessments2form.php:183
 msgid "Display style"
 msgstr "Darstellungsart"
 
 #: course/addassessment2form.php:211 course/chgassessments2form.php:186
-#: course/addassessment2form.php:709
+#: course/addassessment2form.php:709 course/addassessment2form.php:720
+#: course/chgassessments2form.php:187
 msgid "One question at a time"
 msgstr "Jede Frage einzeln"
 
 #: course/addassessment2form.php:212 course/chgassessments2form.php:187
 #: course/addassessment2form.php:711 course/addassessment2form.php:710
+#: course/addassessment2form.php:213 course/addassessment2form.php:721
+#: course/chgassessments2form.php:188
 msgid "All questions at once, or in pages"
 msgstr "Alle Fragen auf einmal, ggf. verteilt auf mehrere Seiten"
 
 #: course/addassessment2form.php:213 course/chgassessments2form.php:188
 #: course/addassessment2form.php:716 course/addassessment2form.php:711
+#: course/addassessment2form.php:214 course/addassessment2form.php:722
+#: course/chgassessments2form.php:189
 msgid "Video Cued"
 msgstr "Video-gesteuert"
 
@@ -8932,18 +9227,22 @@ msgid "Details"
 msgstr "Details"
 
 #: course/addassessment2form.php:221 course/chgassessments2form.php:207
+#: course/addassessment2form.php:222 course/chgassessments2form.php:208
 msgid "Submission type"
 msgstr "Art der Einreichung"
 
 #: course/addassessment2form.php:224 course/chgassessments2form.php:211
+#: course/addassessment2form.php:225 course/chgassessments2form.php:212
 msgid "Homework-style: new versions of individual questions"
 msgstr "Hausarbeits-Modus: Wechselnde Versionen der einzelnen Fragen"
 
 #: course/addassessment2form.php:225 course/chgassessments2form.php:212
+#: course/addassessment2form.php:226 course/chgassessments2form.php:213
 msgid "Quiz-style: retake whole assessment with new versions"
 msgstr "Prüfungsmodus: Neue Fragen nur bei Neustart des Tests"
 
 #: course/addassessment2form.php:229 course/chgassessments2form.php:216
+#: course/addassessment2form.php:230 course/chgassessments2form.php:217
 msgid ""
 "Warning: Changing this after students have started will require converting "
 "their data, and lead to loss of data on earlier attempts."
@@ -8953,18 +9252,22 @@ msgstr ""
 "werden gelöscht."
 
 #: course/addassessment2form.php:234 course/chgassessments2form.php:220
+#: course/addassessment2form.php:235 course/chgassessments2form.php:221
 msgid "Versions"
 msgstr "Versionen"
 
 #: course/addassessment2form.php:238 course/chgassessments2form.php:224
+#: course/addassessment2form.php:239 course/chgassessments2form.php:225
 msgid "Number of versions for each question"
 msgstr "Anzahl der Versionen für jede Frage"
 
 #: course/addassessment2form.php:241 course/chgassessments2form.php:227
+#: course/addassessment2form.php:242 course/chgassessments2form.php:228
 msgid "Number of times assessment can be taken"
 msgstr "We oft darf der Test durchgeführt werden"
 
 #: course/addassessment2form.php:247 course/addassessment2form.php:281
+#: course/addassessment2form.php:248 course/addassessment2form.php:282
 msgid "With a penalty of"
 msgstr "Mit Punktabzug von"
 
@@ -8973,6 +9276,7 @@ msgid "per version"
 msgstr "pro Version"
 
 #: course/addassessment2form.php:252 course/addassessment2form.php:286
+#: course/addassessment2form.php:253 course/addassessment2form.php:287
 msgid "after"
 msgstr "nach"
 
@@ -8981,22 +9285,27 @@ msgid "full-credit versions"
 msgstr "Versionen mit voller Punktzahl"
 
 #: course/addassessment2form.php:260 course/chgassessments2form.php:242
+#: course/addassessment2form.php:261 course/chgassessments2form.php:243
 msgid "Score to keep"
 msgstr "Gespeicherte Punkte"
 
 #: course/addassessment2form.php:263 course/chgassessments2form.php:247
+#: course/addassessment2form.php:264 course/chgassessments2form.php:248
 msgid "Best"
 msgstr "Bester Versuch"
 
 #: course/addassessment2form.php:264 course/chgassessments2form.php:248
+#: course/addassessment2form.php:265 course/chgassessments2form.php:249
 msgid "Last"
 msgstr "Letzter Versuch"
 
 #: course/addassessment2form.php:265 course/chgassessments2form.php:249
+#: course/addassessment2form.php:266 course/chgassessments2form.php:250
 msgid "Average"
 msgstr "Mittelwert"
 
 #: course/addassessment2form.php:275 course/chgassessments2form.php:259
+#: course/addassessment2form.php:276 course/chgassessments2form.php:260
 msgid "Number of tries on each version of a question"
 msgstr "Anzahl der Versuche für jede Version einer Frage"
 
@@ -9009,53 +9318,64 @@ msgid "full-credit tries"
 msgstr "Versuche mit voller Punktzahl"
 
 #: course/addassessment2form.php:295 course/chgassessments2form.php:272
+#: course/addassessment2form.php:296 course/chgassessments2form.php:273
 msgid "During assessment, show scores"
 msgstr "Anzeige von Punkten während des Tests"
 
 #: course/addassessment2form.php:307 course/chgassessments2form.php:284
+#: course/addassessment2form.php:308 course/chgassessments2form.php:285
 msgid "During assessment, show answers"
 msgstr "Anzeige von Antworten während des Tests"
 
 #: course/addassessment2form.php:319 course/chgassessments2form.php:296
+#: course/addassessment2form.php:320 course/chgassessments2form.php:297
 msgid "Students can view their work in the gradebook"
 msgstr "Studierende dürfen ihre Arbeit in der Punkteübersicht einsehen"
 
 #: course/addassessment2form.php:331 course/chgassessments2form.php:308
+#: course/addassessment2form.php:332 course/chgassessments2form.php:309
 msgid "Students can view their scores in the gradebook"
 msgstr "Studierende dürfe ihre Punkte in der Punkteübersicht einsehen"
 
 #: course/addassessment2form.php:344 course/chgassessments2form.php:322
+#: course/addassessment2form.php:345 course/chgassessments2form.php:323
 msgid "Students can view correct answers in the gradebook"
 msgstr ""
 "Studierende dürfen die korrekte Antwort in der Punkteübersicht einsehen"
 
 #: course/addassessment2form.php:356 course/chgassessments2form.php:336
+#: course/addassessment2form.php:357 course/chgassessments2form.php:337
 msgid "Gradebook Category"
 msgstr "Kategorien in der Punkteübersicht"
 
 #: course/addassessment2form.php:370 course/chgassessments2form.php:352
+#: course/addassessment2form.php:371 course/chgassessments2form.php:353
 msgid "Additional Display Options"
 msgstr "Weitere Optionen für die Darstellung"
 
 #: course/addassessment2form.php:373 course/chgassessments2form.php:356
+#: course/addassessment2form.php:374 course/chgassessments2form.php:357
 msgid "Calendar icon"
 msgstr "Kalender"
 
 #: course/addassessment2form.php:378 course/chgassessments2form.php:363
+#: course/addassessment2form.php:379 course/chgassessments2form.php:364
 msgid "Shuffle item order"
 msgstr "Reihenfolge zufällig wählen"
 
 #: course/addassessment2form.php:383 course/chgassessments2form.php:369
+#: course/addassessment2form.php:384 course/chgassessments2form.php:370
 msgid "All but first"
 msgstr "Mit Ausnahme der ersten Frage"
 
 #: course/addassessment2form.php:387 course/copyitems.php:589
 #: course/copyitems.php:588 admin/importitems2.php:256
-#: admin/importitems2.php:255
+#: admin/importitems2.php:255 course/addassessment2form.php:398
 msgid "Options"
 msgstr "Optionen"
 
 #: course/addassessment2form.php:391 course/chgassessments2form.php:375
+#: course/addassessment2form.php:402 course/chgassessments2form.php:389
 msgid "Make hard to print"
 msgstr "Drucken erschweren"
 
@@ -9064,18 +9384,22 @@ msgid "All items same random seed"
 msgstr "Für alle Fragen gleiche Zufallswerte verwenden"
 
 #: course/addassessment2form.php:401 course/chgassessments2form.php:385
+#: course/addassessment2form.php:412 course/chgassessments2form.php:399
 msgid "All students same version of questions"
 msgstr "Gleiche Version der Fragen für alle Studierenden"
 
 #: course/addassessment2form.php:406 course/chgassessments2form.php:395
+#: course/addassessment2form.php:417 course/chgassessments2form.php:409
 msgid "Suppress default score result display"
 msgstr "Standard-Anzeige des Punkte-Ergebnisses unterdrücken"
 
 #: course/addassessment2form.php:411 course/chgassessments2form.php:405
+#: course/addassessment2form.php:422 course/chgassessments2form.php:419
 msgid "Show question categories in Question Details (if defined)"
 msgstr "Fragen-Kategorie (wenn definiert) in den Details zur Frage anzeigen"
 
 #: course/addassessment2form.php:418 course/chgassessments2form.php:418
+#: course/addassessment2form.php:429 course/chgassessments2form.php:432
 msgid "Time Limit and Access Control"
 msgstr "Zeitbegrenzung und Zugangskontrolle"
 
@@ -9084,42 +9408,52 @@ msgid "Allow use of LatePasses"
 msgstr "Verspätetes Einreichen erlauben"
 
 #: course/addassessment2form.php:425 course/chgassessments2form.php:427
+#: course/addassessment2form.php:436 course/chgassessments2form.php:441
 msgid "Unlimited"
 msgstr "Unbegrenzt"
 
 #: course/addassessment2form.php:426 course/chgassessments2form.php:428
+#: course/addassessment2form.php:437 course/chgassessments2form.php:442
 msgid "Up to 1"
 msgstr "Höchstens 1 mal"
 
 #: course/addassessment2form.php:427 course/chgassessments2form.php:429
+#: course/addassessment2form.php:438 course/chgassessments2form.php:443
 msgid "Up to 2"
 msgstr "Höchstens 2 mal"
 
 #: course/addassessment2form.php:428 course/chgassessments2form.php:430
+#: course/addassessment2form.php:439 course/chgassessments2form.php:444
 msgid "Up to 3"
 msgstr "Höchstens 3 mal"
 
 #: course/addassessment2form.php:429 course/chgassessments2form.php:431
+#: course/addassessment2form.php:440 course/chgassessments2form.php:445
 msgid "Up to 4"
 msgstr "Höchstens 4 mal"
 
 #: course/addassessment2form.php:430 course/chgassessments2form.php:432
+#: course/addassessment2form.php:441 course/chgassessments2form.php:446
 msgid "Up to 5"
 msgstr "Höchstens 5 mal"
 
 #: course/addassessment2form.php:431 course/chgassessments2form.php:433
+#: course/addassessment2form.php:442 course/chgassessments2form.php:447
 msgid "Up to 6"
 msgstr "Höchstens 6 mal"
 
 #: course/addassessment2form.php:432 course/chgassessments2form.php:434
+#: course/addassessment2form.php:443 course/chgassessments2form.php:448
 msgid "Up to 7"
 msgstr "Höchstens 7 mal"
 
 #: course/addassessment2form.php:433 course/chgassessments2form.php:435
+#: course/addassessment2form.php:444 course/chgassessments2form.php:449
 msgid "Up to 8"
 msgstr "Höchstens 8 mal"
 
 #: course/addassessment2form.php:438 course/chgassessments2form.php:440
+#: course/addassessment2form.php:449 course/chgassessments2form.php:454
 msgid "Allow LatePasses after due date"
 msgstr "Verspätetes Einreichen nach Fälligkeit des Tests erlauben"
 
@@ -9132,6 +9466,7 @@ msgid "No extensions past"
 msgstr "Keine Verlängerung nach"
 
 #: course/addassessment2form.php:455 course/chgassessments2form.php:447
+#: course/addassessment2form.php:466 course/chgassessments2form.php:461
 msgid "Time Limit"
 msgstr "Zeitbegrenzung"
 
@@ -9140,6 +9475,7 @@ msgid "minutes (blank or 0 for none)"
 msgstr "Minuten (leer oder 0 für unbegrenzt)"
 
 #: course/addassessment2form.php:463 course/chgassessments2form.php:455
+#: course/addassessment2form.php:474 course/chgassessments2form.php:469
 msgid "Allow student to work past time limit"
 msgstr ""
 "Erlaube den Studierenden nach Ablauf der Zeitbegrenzung weiterzuarbeiten"
@@ -9157,6 +9493,7 @@ msgid "Require Password (blank for none)"
 msgstr "Passwort erforderlich (leer lassen für Zugang ohne Passwort)"
 
 #: course/addassessment2form.php:483 course/chgassessments2form.php:484
+#: course/addassessment2form.php:494 course/chgassessments2form.php:498
 msgid "Show based on another assessment"
 msgstr "Anzeige ist abhängig von Ergebnissen eines anderen Tests"
 
@@ -9169,10 +9506,12 @@ msgid "is obtained on"
 msgstr "erzielt in"
 
 #: course/addassessment2form.php:509 course/chgassessments2form.php:518
+#: course/addassessment2form.php:520 course/chgassessments2form.php:532
 msgid "Help and Hints"
 msgstr "Hilfen und Tips"
 
 #: course/addassessment2form.php:512 course/chgassessments2form.php:522
+#: course/addassessment2form.php:523 course/chgassessments2form.php:536
 msgid "Hints and Videos"
 msgstr "Tips und Videos"
 
@@ -9189,10 +9528,12 @@ msgid "\"Ask question\" links"
 msgstr "Link \"Frage stellen\""
 
 #: course/addassessment2form.php:529 course/chgassessments2form.php:535
+#: course/addassessment2form.php:540 course/chgassessments2form.php:549
 msgid "Show \"Message instructor about this question\" links"
 msgstr "Link \"Dozenten wegen dieser Frage benachrichtigen\" anzeigen"
 
 #: course/addassessment2form.php:534 course/chgassessments2form.php:545
+#: course/addassessment2form.php:545 course/chgassessments2form.php:559
 msgid "Show \"Post this question to forum\" links"
 msgstr "Link \"Diese Frage im Forum posten\" anzeigen"
 
@@ -9201,6 +9542,7 @@ msgid "to forum"
 msgstr "ins Forum"
 
 #: course/addassessment2form.php:546 course/chgassessments2form.php:556
+#: course/addassessment2form.php:557 course/chgassessments2form.php:570
 msgid "Assessment resource links"
 msgstr "Weitere Ressource für diesen Test"
 
@@ -9217,74 +9559,85 @@ msgid "Show answer entry tips"
 msgstr "Hinweise zur Antworteingabe anzeigen"
 
 #: course/addassessment2form.php:571 course/chgassessments2form.php:591
+#: course/addassessment2form.php:582 course/chgassessments2form.php:605
 msgid "Yes, under answerbox (strongly recommended)"
 msgstr "Ja, unter dem Eingabefeld (unbedingt zu empfehlen)"
 
 #: course/addassessment2form.php:579 course/chgassessments2form.php:600
+#: course/addassessment2form.php:590 course/chgassessments2form.php:614
 msgid "Grading and Feedback"
 msgstr "Bewertung und Rückmeldung"
 
 #: course/addassessment2form.php:582 course/chgassessments2form.php:604
+#: course/addassessment2form.php:593 course/chgassessments2form.php:618
 msgid "Count"
 msgstr "Speichern"
 
 #: course/addassessment2form.php:585 course/chgassessments2form.php:608
-#: course/addlinkedtext.php:598
+#: course/addlinkedtext.php:598 course/chgassessments2form.php:622
 msgid "Count in Gradebook"
 msgstr "In der Punkteübersicht speichern"
 
 #: course/addassessment2form.php:586 course/chgassessments2form.php:609
-#: course/addlinkedtext.php:599
+#: course/addlinkedtext.php:599 course/chgassessments2form.php:623
 msgid "Don't count in grade total and hide from students"
 msgstr ""
 "Nicht für die Gesamtpunktzahl anrechnen und nicht für Studierende anzeigen"
 
 #: course/addassessment2form.php:587 course/chgassessments2form.php:610
-#: course/addlinkedtext.php:600
+#: course/addlinkedtext.php:600 course/chgassessments2form.php:624
 msgid "Don't count in grade total"
 msgstr "Nicht für die Gesamtpunktzahl anrechnen"
 
 #: course/addassessment2form.php:588 course/chgassessments2form.php:611
-#: course/addlinkedtext.php:601
+#: course/addlinkedtext.php:601 course/chgassessments2form.php:625
 msgid "Count as Extra Credit"
 msgstr "Als Zusatzpunkte werten"
 
 #: course/addassessment2form.php:592 course/chgassessments2form.php:617
+#: course/addassessment2form.php:603 course/chgassessments2form.php:631
 msgid "Minimum score to receive credit"
 msgstr "Minimale Punktzahl um zu bestehen"
 
 #: course/addassessment2form.php:601 course/chgassessments2form.php:628
+#: course/addassessment2form.php:612 course/chgassessments2form.php:642
 msgid "Default Feedback Text"
 msgstr "Standard-Rückmeldung"
 
 #: course/addassessment2form.php:605 course/chgassessments2form.php:633
+#: course/addassessment2form.php:616 course/chgassessments2form.php:647
 msgid "Use default feedback text"
 msgstr "Verwende Standard-Rückmeldung"
 
 #: course/addassessment2form.php:615 course/chgassessments2form.php:644
+#: course/addassessment2form.php:626 course/chgassessments2form.php:658
 msgid "Tutor Access"
 msgstr "Rechte von Tutoren"
 
 #: course/addassessment2form.php:618 course/chgassessments2form.php:648
+#: course/addassessment2form.php:629 course/chgassessments2form.php:662
 msgid "No Access"
 msgstr "Kein Zugang"
 
 #: course/addassessment2form.php:620 course/chgassessments2form.php:650
-#: course/addlinkedtext.php:443
+#: course/addlinkedtext.php:443 course/chgassessments2form.php:664
 msgid "View and Edit Scores"
 msgstr "Punkte sehen und korrigieren"
 
 #: course/addassessment2form.php:626 course/chgassessments2form.php:657
+#: course/addassessment2form.php:637 course/chgassessments2form.php:671
 msgid "Penalty for questions done while in exception/LatePass"
 msgstr ""
 "Abzug für Fragen, die verspätet oder mit Ausnahmegenehmigung bearbeitet "
 "wurden"
 
 #: course/addassessment2form.php:633 course/chgassessments2form.php:666
+#: course/addassessment2form.php:644 course/chgassessments2form.php:680
 msgid "Default Outcome"
 msgstr "Standard-Ergebnis"
 
 #: course/addassessment2form.php:636 course/chgassessments2form.php:670
+#: course/addassessment2form.php:647 course/chgassessments2form.php:684
 msgid "No default outcome selected"
 msgstr "Kein Standard-Ergebnis gewählt"
 
@@ -9371,6 +9724,8 @@ msgstr ""
 #: course/addassessment2form.php:95 course/chgassessments2form.php:75
 #: course/addquestions.php:1539 course/copyitems.php:531
 #: course/copyitems.php:533 course/copyitems.php:530 course/copyitems.php:532
+#: course/addassessment2form.php:96 course/addquestions.php:1533
+#: course/chgassessments2form.php:76
 msgid "Summary"
 msgstr "Zusammenfassung (für die Kursseite)"
 
@@ -9379,6 +9734,7 @@ msgid "Intro/Instructions"
 msgstr "Einführung/Anleitungen (Bei Start des Tests)"
 
 #: course/addassessment2form.php:114 course/addlinkedtext.php:622
+#: course/addassessment2form.php:115
 msgid "Show by Dates"
 msgstr "Anzeigen nach Datum"
 
@@ -9391,6 +9747,7 @@ msgid "at"
 msgstr "um"
 
 #: course/addassessment2form.php:173 course/chgassessments2form.php:123
+#: course/addassessment2form.php:174 course/chgassessments2form.php:124
 msgid "Keep open for un-graded practice after the due date"
 msgstr "Nach Fälligkeit für unbewertetes Üben zugänglich"
 
@@ -9566,6 +9923,7 @@ msgid "Error: Guests can't enroll in courses"
 msgstr "Fehler: Gäste können sich nicht in Kurse einschreiben"
 
 #: actions.php:454 actions.php:451 actions.php:450 course/moddataset.php:960
+#: actions.php:447
 msgid "Home"
 msgstr "Startseite"
 
@@ -9658,7 +10016,9 @@ msgstr "Allgemeine Einstellungen"
 
 #: course/chgassessments2form.php:78 course/chgassessments2form.php:89
 #: course/chgassessments2form.php:100 course/chgassessments2form.php:131
-#: course/chgassessments2form.php:164
+#: course/chgassessments2form.php:164 course/chgassessments2form.php:90
+#: course/chgassessments2form.php:101 course/chgassessments2form.php:132
+#: course/chgassessments2form.php:165
 msgid "Do not copy"
 msgstr "Nicht kopieren"
 
@@ -9682,7 +10042,19 @@ msgstr "Datum/Zeit"
 #: course/chgassessments2form.php:631 course/chgassessments2form.php:647
 #: course/chgassessments2form.php:669 course/chgassessments2form.php:731
 #: course/chgassessments2form.php:847 course/chgassessments2form.php:905
-#: course/chgassessments2form.php:943
+#: course/chgassessments2form.php:943 course/chgassessments2form.php:122
+#: course/chgassessments2form.php:186 course/chgassessments2form.php:211
+#: course/chgassessments2form.php:247 course/chgassessments2form.php:341
+#: course/chgassessments2form.php:367 course/chgassessments2form.php:379
+#: course/chgassessments2form.php:392 course/chgassessments2form.php:402
+#: course/chgassessments2form.php:412 course/chgassessments2form.php:422
+#: course/chgassessments2form.php:439 course/chgassessments2form.php:501
+#: course/chgassessments2form.php:521 course/chgassessments2form.php:539
+#: course/chgassessments2form.php:552 course/chgassessments2form.php:603
+#: course/chgassessments2form.php:621 course/chgassessments2form.php:645
+#: course/chgassessments2form.php:661 course/chgassessments2form.php:683
+#: course/chgassessments2form.php:745 course/chgassessments2form.php:861
+#: course/chgassessments2form.php:919 course/chgassessments2form.php:957
 msgid "Do not change"
 msgstr "Nicht ändern"
 
@@ -9749,7 +10121,7 @@ msgstr ""
 "Punktzahl"
 
 #: course/chgassessments2form.php:256 course/addassessment2form.php:272
-#: course/modquestiongrid2.php:253
+#: course/modquestiongrid2.php:253 course/chgassessments2form.php:257
 msgid "Tries"
 msgstr "Versuche"
 
@@ -9761,6 +10133,7 @@ msgstr ""
 "Punktzahl"
 
 #: course/chgassessments2form.php:422 course/addassessment2form.php:421
+#: course/addassessment2form.php:432 course/chgassessments2form.php:436
 msgid "Allow use of LatePasses?"
 msgstr "Verspätetes Einreichen erlauben?"
 
@@ -9806,6 +10179,7 @@ msgid "Replace existing assessment resources"
 msgstr "Ressourcen für den Test ersetzen"
 
 #: course/chgassessments2form.php:586 course/addassessment2form.php:567
+#: course/addassessment2form.php:578 course/chgassessments2form.php:600
 msgid "Show answer entry tips?"
 msgstr "Hinweise zur Antworteingabe anzeigen?"
 
@@ -9821,7 +10195,7 @@ msgstr "Reihenfolge der Kurse ändern"
 msgid "View hidden courses"
 msgstr "Ausgeblendete Kurse anzeigen"
 
-#: validate.php:126 validate.php:583 validate.php:582
+#: validate.php:126 validate.php:583 validate.php:582 validate.php:519
 msgid "This course does not allow guest access."
 msgstr "Dieser Kurs erlaubt keinen Gastzugang."
 
@@ -9911,7 +10285,9 @@ msgstr "Nach 1 Versuch"
 #: course/addassessment2form.php:905 course/addassessment2form.php:939
 #: course/addassessment2form.php:804 course/addassessment2form.php:840
 #: course/addassessment2form.php:881 course/addassessment2form.php:895
-#: course/addassessment2form.php:929
+#: course/addassessment2form.php:929 course/chgassessments2form.php:820
+#: course/chgassessments2form.php:856 course/chgassessments2form.php:914
+#: course/chgassessments2form.php:952
 msgid "After the assessment version is submitted"
 msgstr "Nachdem die Test-Version eingereicht wurde"
 
@@ -9922,7 +10298,8 @@ msgstr "Nachdem die Test-Version eingereicht wurde"
 #: course/addassessment2form.php:928 course/addassessment2form.php:836
 #: course/addassessment2form.php:879 course/addassessment2form.php:927
 #: course/addassessment2form.php:826 course/addassessment2form.php:869
-#: course/addassessment2form.php:917
+#: course/addassessment2form.php:917 course/chgassessments2form.php:842
+#: course/chgassessments2form.php:888 course/chgassessments2form.php:940
 msgid "After the due date"
 msgstr "Nach Fälligkeit des Tests"
 
@@ -10244,10 +10621,12 @@ msgid "Invalid ID"
 msgstr "Ungültige ID"
 
 #: course/addquestions.php:64 course/addquestions.php:131
+#: course/addquestions.php:62 course/addquestions.php:129
 msgid "No questions selected"
 msgstr "Keine Fragen ausgewählt"
 
 #: course/addquestions.php:64 course/addquestions.php:131
+#: course/addquestions.php:62 course/addquestions.php:129
 msgid "Go back"
 msgstr "Zurück"
 
@@ -10308,24 +10687,28 @@ msgstr "Hilfsmaterial"
 
 #: course/addquestions.php:973 course/moddataset.php:1016
 #: admin/importitems.php:766 admin/importitems2.php:208
-#: admin/importitems2.php:207
+#: admin/importitems2.php:207 course/addquestions.php:968
 msgid "Private"
 msgstr "Privat"
 
 #: course/addquestions.php:987 course/addquestions.php:1093
 #: javascript/addqsort.js:1568 javascript/addqsort.js:1574
 #: javascript/addqsort.js:1575 javascript/addqsort.js:1579
+#: course/addquestions.php:982 course/addquestions.php:1087
+#: javascript/addqsort.js:1571
 msgid "View Code"
 msgstr "Code ansehen"
 
 #: course/addquestions.php:990 course/addquestions.php:1094
 #: javascript/addqsort.js:1634 javascript/addqsort.js:1640
 #: javascript/addqsort.js:1641 javascript/addqsort.js:1645
+#: course/addquestions.php:985 course/addquestions.php:1088
+#: javascript/addqsort.js:1637
 msgid "Template"
 msgstr "Als Vorlage"
 
 #: course/addquestions.php:1194 course/modquestion.php:168
-#: course/modquestion2.php:185
+#: course/modquestion2.php:185 course/modquestion2.php:188
 msgid "Warning"
 msgstr "Warnung"
 
@@ -10493,6 +10876,7 @@ msgid "No Questions matched search"
 msgstr "Keine passenden Fragen gefunden"
 
 #: course/addquestions.php:1352 course/addquestions.php:1477
+#: course/addquestions.php:1346 course/addquestions.php:1471
 msgid "Times Used"
 msgstr "Mal verwendet"
 
@@ -10501,15 +10885,17 @@ msgid "Average time, in minutes, this question has taken students"
 msgstr "Mittlere Zeit in Minuten, die die Studierenden benötigt haben"
 
 #: course/addquestions.php:1353 javascript/addqsort.js:1082
+#: course/addquestions.php:1347 javascript/addqsort.js:1074
 msgid "Avg Time"
 msgstr "Mtl. Zeit"
 
 #: course/addquestions.php:1354 course/addquestions.php:1477
+#: course/addquestions.php:1348 course/addquestions.php:1471
 msgid "Mine"
 msgstr "Meine"
 
 #: course/addquestions.php:1354 javascript/addqsort.js:1090
-#: javascript/addqsort.js:1096
+#: javascript/addqsort.js:1096 javascript/addqsort.js:1088
 msgid "Actions"
 msgstr "Aktionen"
 
@@ -10556,6 +10942,7 @@ msgid "With Selected:"
 msgstr "Ausgewählte:"
 
 #: course/addquestions.php:1309 course/addquestions.php:1456
+#: course/addquestions.php:1303 course/addquestions.php:1450
 msgid "Potential Questions"
 msgstr "Mögliche Fragen"
 
@@ -10584,6 +10971,7 @@ msgid "Choose assessments to take questions from"
 msgstr "Wähle Tests um Fragen zu übernehmen"
 
 #: course/addquestions.php:1318 course/addquestions.php:1329
+#: course/addquestions.php:1312 course/addquestions.php:1323
 msgid "Search"
 msgstr "Suche"
 
@@ -10596,74 +10984,90 @@ msgid "Order"
 msgstr "Reihenfolge"
 
 #: javascript/addqsort.js:1148 javascript/addqsort.js:1154
+#: javascript/addqsort.js:1146
 msgid "choosing "
 msgstr "wähle "
 
 #: javascript/addqsort.js:1151 javascript/addqsort.js:1157
+#: javascript/addqsort.js:1149
 msgid " without"
 msgstr " ohne"
 
 #: javascript/addqsort.js:1153 javascript/addqsort.js:1159
+#: javascript/addqsort.js:1151
 msgid " with"
 msgstr " mit"
 
 #: javascript/addqsort.js:1155 javascript/addqsort.js:1161
+#: javascript/addqsort.js:1153 javascript/addqsort.js:1250
 msgid " replacement"
 msgstr " Ersetzen"
 
 #: javascript/addqsort.js:1202 javascript/addqsort.js:1208
+#: javascript/addqsort.js:1200
 msgid "Collapse"
 msgstr "Schließen"
 
 #: javascript/addqsort.js:1211 javascript/addqsort.js:1217
+#: javascript/addqsort.js:1209
 msgid "Expand"
 msgstr "Öffnen"
 
 #: javascript/addqsort.js:1225 javascript/addqsort.js:1231
+#: javascript/addqsort.js:1223
 msgid "Select"
 msgstr "Auswählen"
 
 #: javascript/addqsort.js:1235 javascript/addqsort.js:1241
+#: javascript/addqsort.js:1233
 msgid "from group of "
 msgstr "aus der Gruppe von "
 
 #: javascript/addqsort.js:1248 javascript/addqsort.js:1254
+#: javascript/addqsort.js:1246
 msgid "Without"
 msgstr "Ohne"
 
 #: javascript/addqsort.js:1252 javascript/addqsort.js:1258
+#: javascript/addqsort.js:1250
 msgid "With"
 msgstr "Mit"
 
 #: javascript/addqsort.js:1327 javascript/addqsort.js:1343
 #: javascript/addqsort.js:1376 javascript/addqsort.js:1333
 #: javascript/addqsort.js:1349 javascript/addqsort.js:1382
+#: javascript/addqsort.js:309 javascript/addqsort.js:1325
+#: javascript/addqsort.js:1341 javascript/addqsort.js:1374
 msgid "Expand and Edit"
 msgstr "Öffnen und bearbeiten"
 
 #: javascript/addqsort.js:1544 javascript/addqsort.js:1550
 #: javascript/addqsort.js:1551 course/addquestions.php:1253
-#: javascript/addqsort.js:1555
+#: javascript/addqsort.js:1555 javascript/addqsort.js:1547
 msgid "Change Settings"
 msgstr "Einstellungen ändern"
 
 #: javascript/addqsort.js:1557 javascript/addqsort.js:1563
 #: javascript/addqsort.js:1564 javascript/addqsort.js:1568
+#: javascript/addqsort.js:1560
 msgid "Edit Code"
 msgstr "Code bearbeiten"
 
 #: javascript/addqsort.js:1580 javascript/addqsort.js:1586
 #: javascript/addqsort.js:1587 javascript/addqsort.js:1591
+#: javascript/addqsort.js:1583
 msgid "Edit Personal Copy"
 msgstr "Persönliche Kopie bearbeiten"
 
 #: javascript/addqsort.js:1603 javascript/addqsort.js:1609
 #: javascript/addqsort.js:1610 javascript/addqsort.js:1614
+#: javascript/addqsort.js:1606
 msgid "Withdraw"
 msgstr "Entfernen"
 
 #: javascript/addqsort.js:1623 javascript/addqsort.js:1629
 #: javascript/addqsort.js:1630 javascript/addqsort.js:1634
+#: javascript/addqsort.js:1626
 msgid "Re-score Question"
 msgstr "Frage neu bewerten"
 
@@ -10679,6 +11083,7 @@ msgstr "WARNUNG: Alle Fragen in der Gruppe sollten den selben Punktwert haben"
 
 #: javascript/addqsort.js:1760 javascript/addqsort.js:1766
 #: javascript/addqsort.js:1767 javascript/addqsort.js:1771
+#: javascript/addqsort.js:1770
 msgid ""
 "If you are using page titles, you need to have a page title at the beginning."
 msgstr ""
@@ -10688,11 +11093,12 @@ msgstr ""
 #: javascript/addqsort.js:1771 javascript/addqsort.js:1773
 #: javascript/addqsort.js:1772 javascript/addqsort.js:1774
 #: javascript/addqsort.js:1776 javascript/addqsort.js:1778
+#: javascript/addqsort.js:1775 javascript/addqsort.js:1777
 msgid "First Page Title"
 msgstr "Titel der ersten Seite"
 
 #: course/addquestions.php:1407 javascript/addqsort.js:1537
-#: javascript/addqsort.js:1541
+#: javascript/addqsort.js:1541 javascript/addqsort.js:1533
 msgid "Action"
 msgstr "Aktion"
 
@@ -10710,7 +11116,7 @@ msgstr "Schlussnachricht definieren"
 
 #: course/addquestions.php:1315 course/moddataset.php:1095
 #: admin/importitems.php:779 admin/importitems2.php:219
-#: admin/importitems2.php:218
+#: admin/importitems2.php:218 course/addquestions.php:1309
 msgid "Select Libraries"
 msgstr "Bibliotheken auswählen"
 
@@ -10727,6 +11133,7 @@ msgid "Add (using defaults)"
 msgstr "Hinzufügen (mit Standardeinstellung)"
 
 #: course/addquestions.php:1346 course/addquestions.php:1472
+#: course/addquestions.php:1340 course/addquestions.php:1466
 msgid "Preview Selected"
 msgstr "Vorschau für Ausgewählte"
 
@@ -10865,7 +11272,7 @@ msgstr ""
 "Anmeldung mit dem Benutzernamen %s und dem gewählten Passwort bereit."
 
 #: admin/forms.php:1529 admin/actions.php:50 admin/actions.php:309
-#: admin/actions.php:418
+#: admin/actions.php:418 admin/forms.php:1491
 msgid "You don't have the authority for this action"
 msgstr "Für diese Aktion haben Sie nicht die nötigen Rechte"
 
@@ -10914,6 +11321,8 @@ msgstr "Ungültiger tool_state"
 
 #: bltilaunch.php:132 bltilaunch.php:193 bltilaunch.php:1688
 #: bltilaunch.php:1750 bltilaunch.php:1685 bltilaunch.php:1747
+#: bltilaunch.php:130 bltilaunch.php:186 bltilaunch.php:1661
+#: bltilaunch.php:1718
 msgid ""
 "No authorized session exists. This is most likely caused by your browser "
 "blocking third-party cookies.  Please adjust your browser settings and try "
@@ -10927,7 +11336,8 @@ msgstr ""
 #: bltilaunch.php:1722 bltilaunch.php:2123 bltilaunch.php:2163
 #: bltilaunch.php:2503 bltilaunch.php:831 bltilaunch.php:1346
 #: bltilaunch.php:1719 bltilaunch.php:2120 bltilaunch.php:2160
-#: bltilaunch.php:2500
+#: bltilaunch.php:2500 bltilaunch.php:1333 bltilaunch.php:1692
+#: bltilaunch.php:2089 bltilaunch.php:2129 bltilaunch.php:2469
 msgid "This assignment does not appear to exist anymore."
 msgstr "Es sieht so aus, als ob dieser Test nicht mehr existiert."
 
@@ -10938,11 +11348,13 @@ msgstr "Keine Sitzung aufgezeichnet"
 
 #: bltilaunch.php:495 bltilaunch.php:1440 bltilaunch.php:2550
 #: bltilaunch.php:492 bltilaunch.php:1437 bltilaunch.php:2547
+#: bltilaunch.php:479 bltilaunch.php:1424 bltilaunch.php:2516
 msgid "invalid course identifier in folder view launch"
 msgstr "ungültige Kurs-ID beim Start der Ordner-Ansicht"
 
 #: bltilaunch.php:517 bltilaunch.php:1462 bltilaunch.php:2586
 #: bltilaunch.php:514 bltilaunch.php:1459 bltilaunch.php:2583
+#: bltilaunch.php:501 bltilaunch.php:1446 bltilaunch.php:2552
 msgid "invalid folder identifier in folder view launch"
 msgstr "Ungültige Ordner-ID beim Start der Ordner-Ansicht"
 
@@ -11061,7 +11473,7 @@ msgid "Enter summary here (displays on course page)"
 msgstr "Zusammenfassung hier eingeben (wird auf der Kurs-Seite angezeigt)"
 
 #: course/addlinkedtext.php:294 admin/importitems.php:674
-#: admin/importitems2.php:97
+#: admin/importitems2.php:97 admin/importitems2.php:96
 msgid "Error uploading file!"
 msgstr "Fehler beim Hochladen der Datei!"
 
@@ -11468,7 +11880,7 @@ msgstr "Zurück zur Anmeldeseite"
 msgid "Incorrect enrollment key.  Try again."
 msgstr "Falsches Kurs-Passwort. Erneut versuchen."
 
-#: directaccess.php:134 directaccess.php:275
+#: directaccess.php:134 directaccess.php:275 directaccess.php:277
 msgid "Course Enrollment Key:"
 msgstr "Kurs-Passwort:"
 
@@ -11607,6 +12019,7 @@ msgstr "Jeder darf nutzen"
 
 #: course/moddataset.php:1022 admin/importitems.php:768
 #: admin/importitems2.php:210 admin/importitems2.php:209
+#: admin/importitems.php:777
 msgid "Allow use by all and modifications by group"
 msgstr "Jeder darf nutzen; Bearbeitung durch Gruppe"
 
@@ -12319,11 +12732,12 @@ msgstr "Fragenspezifische Einstellungen"
 
 #: course/modquestion.php:26 course/modquestion.php:234
 #: course/modquestion2.php:26 course/modquestion2.php:249
-#: course/modquestiongrid2.php:181
+#: course/modquestiongrid2.php:181 course/modquestion2.php:258
 msgid "Modify Question Settings"
 msgstr "Fragenspezifische Einstellungen bearbeiten"
 
 #: course/modquestion.php:169 course/modquestion2.php:186
+#: course/modquestion2.php:189
 msgid ""
 "This assessment has already been taken.  Altering the points or penalty will "
 "not change the scores of students who already completed this question. "
@@ -12333,6 +12747,7 @@ msgstr ""
 "eingereicht haben, NICHT. "
 
 #: course/modquestion.php:170 course/modquestion2.php:187
+#: course/modquestion2.php:190
 msgid ""
 "If you want to make these changes, or add additional copies of this "
 "question, you should clear all existing assessment attempts"
@@ -12341,20 +12756,24 @@ msgstr ""
 "hinzufügen möchten, sollten Sie alle vorhandenen Test-Versuche löschen"
 
 #: course/modquestion.php:171 course/modquestion2.php:188
+#: course/modquestion2.php:191
 msgid "Clear Assessment Attempts"
 msgstr "Test-Versuche löschen"
 
 #: course/modquestion.php:236 course/modquestion2.php:251
+#: course/modquestion2.php:260
 msgid "New Question Settings"
 msgstr "Neue Fragenspezifische Einstellungen"
 
 #: course/modquestion.php:246 course/modquestion2.php:261
+#: course/modquestion2.php:270
 msgid "Leave items blank to use the assessment's default values."
 msgstr ""
 "Lassen Sie die Felder leer um die Standardwerte des Tests zu verwenden."
 
 #: course/modquestion.php:252 course/modquestion.php:348
 #: course/modquestion2.php:267 course/modquestion2.php:347
+#: course/modquestion2.php:276 course/modquestion2.php:365
 msgid "Points for this problem:"
 msgstr "Punkte für dieses Problem:"
 
@@ -12366,6 +12785,9 @@ msgstr "Punkte für dieses Problem:"
 #: course/modquestion2.php:307 course/modquestiongrid2.php:253
 #: course/modquestiongrid2.php:254 course/modquestiongrid2.php:284
 #: course/modquestiongrid2.php:285 course/modquestiongrid2.php:286
+#: course/modquestion2.php:277 course/modquestion2.php:283
+#: course/modquestion2.php:288 course/modquestion2.php:299
+#: course/modquestion2.php:316 course/modquestion2.php:325
 msgid "Default:"
 msgstr "Standardwert:"
 
@@ -12414,6 +12836,7 @@ msgid "No, same version on reattempt"
 msgstr "Nein, selbe Version bei neuem Versuch"
 
 #: course/modquestion.php:281 course/modquestion2.php:285
+#: course/modquestion2.php:294
 msgid "Allow &quot;Try similar problem&quot;?"
 msgstr "&quot;Versuche ein ähnliches Problem&quot; erlauben?"
 
@@ -12450,35 +12873,42 @@ msgid "After 7 attempts"
 msgstr "Nach 7 Versuchen"
 
 #: course/modquestion.php:303 course/modquestion2.php:300
+#: course/modquestion2.php:318
 msgid "Show hints and video/text buttons?"
 msgstr "Schaltflächen für Video/Text-Hinweise anzeigen?"
 
 #: course/modquestion.php:310 course/modquestion2.php:309
+#: course/modquestion2.php:327
 msgid "Use Scoring Rubric"
 msgstr "Neue Punkte-Rubrik"
 
 #: course/modquestion.php:313 course/modquestion2.php:312
+#: course/modquestion2.php:330
 msgid "Add new rubric"
 msgstr "Neue Rubrik hinzufügen"
 
 #: course/modquestion.php:314 course/modquestion2.php:313
+#: course/modquestion2.php:331
 msgid "Edit rubrics"
 msgstr "Rubriken bearbeiten"
 
 #: course/modquestion.php:319 course/modquestion2.php:318
+#: course/modquestion2.php:336
 msgid "Number of copies of question to add:"
 msgstr "Wieviele Frage-Kopien hinzufügen:"
 
 #: course/modquestion.php:321 course/modquestion2.php:320
+#: course/modquestion2.php:338
 msgid "Number, if any, of additional copies to add to assessment:"
 msgstr "Anzahl der zusätzlichen Kopien (falls anwendbar) für den Test:"
 
 #: course/modquestion.php:324 course/modquestion2.php:323
-#: course/modquestion2.php:334
+#: course/modquestion2.php:334 course/modquestion2.php:352
 msgid "Advanced"
 msgstr "Fortgeschritten"
 
 #: course/modquestion.php:331 course/modquestion2.php:330
+#: course/modquestion2.php:348
 msgid "Restricted question seed list:"
 msgstr "Liste der Initialwerte (seeds) für Randomisierung einschränken:"
 
@@ -12487,6 +12917,7 @@ msgid "Replace this question with question ID: "
 msgstr "Diese Frage ersetzen durch die Frage mit der ID: "
 
 #: course/modquestion.php:341 course/modquestion2.php:340
+#: course/modquestion2.php:358
 msgid ""
 "WARNING: This is NOT recommended. It will mess up the question for any "
 "student who has already attempted it, and any work they have done may look "
@@ -12497,6 +12928,7 @@ msgstr ""
 "Antworten könnten unverständlich bleiben"
 
 #: course/modquestion.php:349 course/modquestion2.php:348
+#: course/modquestion2.php:366
 msgid ""
 "WARNING: you generally should not change point values after students have "
 "started the assessment, as the points already earned by students will not be "
@@ -12693,6 +13125,7 @@ msgstr ""
 "Website oder einer anderen Website mit dieser Software exportiert wurden."
 
 #: admin/importitems.php:740 admin/importitems2.php:175
+#: admin/importitems.php:749
 msgid "Import file:"
 msgstr "Datei importieren:"
 
@@ -12931,3 +13364,99 @@ msgstr ""
 "angezeigt werden soll. Sie können die Zeit aus dem laufenden Video "
 "übernehmen und anpassen.  Schreiben Sie die Zeit in der Form min:sec. Alle "
 "Zeiten müssen wenigstens eine Sekunde vor Ende des Videos liegen."
+
+#: course/addassessment2form.php:388 course/chgassessments2form.php:376
+#: course/modquestion2.php:309
+msgid "Provide \"Show Work\" boxes"
+msgstr "Einreichen von \"Lösungsweg\" ermöglichen"
+
+#: course/addassessment2form.php:392 course/chgassessments2form.php:381
+msgid "During assessment"
+msgstr "Während des Tests"
+
+#: course/addassessment2form.php:393 course/chgassessments2form.php:382
+#: course/modquestion2.php:314
+msgid "After assessment"
+msgstr "Nach dem Test"
+
+#: course/addassessment2form.php:394 course/chgassessments2form.php:383
+#: course/modquestion2.php:315
+msgid "During or after assessment"
+msgstr "Während des Tests oder nach dem Test"
+
+#: course/addassessment2form.php:721
+msgid ""
+"In this style,\tstudents will typically see all the questions on the screen "
+"at once. If desired, you can break the questions into pages on the Add/"
+"Remove Questions page by clicking the +Text button and selecting the New "
+"Page option."
+msgstr ""
+"Dabei sehen die Studierenden i. Allg. alle Fragen gleichzeitig auf dem "
+"Bildschirm Sie können die Fragen bei der Zusammenstellung des Tests auch auf "
+"mehrere Seiten verteilen. Klicken Sie für den Beginn einer neuen Seite auf "
+"die +-Text-Schaltfläche und wählen Sie die Option \"Neue Seite\"."
+
+#: course/addassessment2form.php:722
+msgid ""
+"In this style, the questions pop up automatically at specified times while "
+"watching a YouTube video. On the Add/Remove Questions page, after adding the "
+"questions to the assessment, click Define Video Cues to specify the video "
+"and times to display the\tquestions."
+msgstr ""
+"Bei dieser Darstellung sehen die Studierenden ein YouTube-Video. An "
+"bestimmten Stellen wird die Wiedergabe des Videos durch Fragen des Tests "
+"unterbrochen. Nachdem Sie die Fragen für den Test zusammengestellt haben "
+"klicken Sie auf \"In Video einordnen\" um das Video und die Zeiten, an denen "
+"es durch Ihre Fragen unterbrochen wird, festzulegen."
+
+#: course/gradeallq2.php:506
+msgid "View Work"
+msgstr "Lösungsweg ansehen"
+
+#: course/gradebook.php:865
+msgid "Attach Work"
+msgstr "Lösungsweg hinzufügen"
+
+#: course/modquestion2.php:234 course/modquestion2.php:313
+msgid "During Assessment"
+msgstr "Während des Tests"
+
+#: javascript/addqsort.js:581
+msgid "Show for"
+msgstr "Anzeigen für"
+
+#: javascript/addqsort.js:614
+msgid "Expanded for all"
+msgstr "Ausgeklappt für alle"
+
+#: javascript/addqsort.js:1355
+msgid "New page"
+msgstr "Neue Seite"
+
+#: javascript/addqsort.js:1407
+msgid "Captioned video"
+msgstr "Video mit Untertiteln"
+
+#: javascript/addqsort.js:1417
+msgid " disabled"
+msgstr "deaktiviert"
+
+#: javascript/addqsort.js:1647
+msgid "Add Text Before"
+msgstr "Text davor einfügen"
+
+#: javascript/gb-scoretools.js:67
+msgid "Hide Work"
+msgstr "Lösungsweg ausblenden"
+
+#: javascript/gb-scoretools.js:70
+msgid "Show Work"
+msgstr "Lösungsweg einblenden"
+
+#: validate.php:76
+msgid ""
+"Your session has expired. Please go back to your LMS and open this "
+"assignment again."
+msgstr ""
+"Ihre Sitzung ist abgelaufen. Bitte gehen Sie zurück in Ihre Lernumgebung und "
+"öffnen Sie diesen Test noch einmal."
