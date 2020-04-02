@@ -11,9 +11,10 @@ $DBH->beginTransaction();
 	return false;
  }
  $query = "ALTER TABLE `imas_questionset`
-  ADD COLUMN `avgn` INT(10) NOT NULL DEFAULT '0',
+  ADD COLUMN `avgtimen` INT(10) NOT NULL DEFAULT '0',
   ADD COLUMN `avgtime` DOUBLE NOT NULL DEFAULT '0',
   ADD COLUMN `vartime` DOUBLE NOT NULL DEFAULT '0',
+  ADD COLUMN `avgscoren` INT(10) NOT NULL DEFAULT '0',
   ADD COLUMN `avgscore` DOUBLE NOT NULL DEFAULT '0',
   ADD COLUMN `varscore` DOUBLE NOT NULL DEFAULT '0'";
  $res = $DBH->query($query);
@@ -26,7 +27,8 @@ $DBH->beginTransaction();
  $query = "UPDATE imas_questionset SET
    avgtime = SUBSTRING_INDEX(SUBSTRING_INDEX(oldavgtime, ',', 2), ',', -1),
    avgscore = SUBSTRING_INDEX(SUBSTRING_INDEX(oldavgtime, ',', 3), ',', -1),
-   avgn = SUBSTRING_INDEX(SUBSTRING_INDEX(oldavgtime, ',', 4), ',', -1),
+   avgscoren = SUBSTRING_INDEX(SUBSTRING_INDEX(oldavgtime, ',', 4), ',', -1),
+   avgtimen = SUBSTRING_INDEX(SUBSTRING_INDEX(oldavgtime, ',', 4), ',', -1),
    vartime = avgtime*avgtime*11,
    varscore = 1111
    WHERE 1";

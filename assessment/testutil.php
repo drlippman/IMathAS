@@ -574,19 +574,21 @@ function scorequestion($qn, $rectime=true, $recAsFirst=true) {
 			':score'=>$pctscore, ':scoredet'=>$rawscores[$qn], ':timespent'=>$time));
 
 		$query = "UPDATE imas_questionset SET
-		 avgn=avgn+1,
-		 varscore=((avgn-1)*varscore + (:s1 - avgscore)*((avgn-1)*(:s2 - avgscore)/avgn))/(avgn),
-		 avgscore=(avgscore*(avgn-1) + :s3)/avgn,
-     vartime=IF(:t1 BETWEEN 1 AND 3600 AND (avgn<200 OR (:t2-avgtime)/sqrt(vartime)<3),
-		 	((avgn-1)*vartime + (:t3-avgtime)*((avgn-1)*(:t4 - avgtime)/avgn))/(avgn), vartime),
-		 avgtime=IF(:t5 BETWEEN 1 AND 3600 AND (avgn<200 OR (:t6 - avgtime)/sqrt(vartime)<3),
-		  (avgtime*(avgn-1) + :t7)/avgn, avgtime)
+		 avgscoren=avgscoren+1,
+		 varscore=((avgscoren-1)*varscore + (:s1 - avgscore)*((avgscoren-1)*(:s2 - avgscore)/avgscoren))/(avgscoren),
+		 avgscore=(avgscore*(avgscoren-1) + :s3)/avgscoren,
+     avgtimen=IF(:t1 BETWEEN 1 AND 3600 AND (avgtimen<200 OR (:t2-avgtime)/sqrt(vartime)<3),
+      avgtimen+1,avgtimen),
+     vartime=IF(:t3 BETWEEN 1 AND 3600 AND (avgtimen<200 OR (:t4-avgtime)/sqrt(vartime)<3),
+		 	((avgtimen-1)*vartime + (:t5-avgtime)*((avgtimen-1)*(:t6 - avgtime)/avgtimen))/(avgtimen), vartime),
+		 avgtime=IF(:t7 BETWEEN 1 AND 3600 AND (avgtimen<200 OR (:t8 - avgtime)/sqrt(vartime)<3),
+		  (avgtime*(avgtimen-1) + :t9)/avgtimen, avgtime)
      WHERE id=:id";
 		$stm = $DBH->prepare($query);
 
 		$stm->execute(array(':s1'=>$pctscore,':s2'=>$pctscore,':s3'=>$pctscore,
 			':t1'=>$time,':t2'=>$time,':t3'=>$time,':t4'=>$time,':t5'=>$time,
-			':t6'=>$time,':t7'=>$time,':id'=>$qi[$questions[$qn]]['questionsetid']));
+			':t6'=>$time,':t7'=>$time,':t8'=>$time,':t9'=>$time,':id'=>$qi[$questions[$qn]]['questionsetid']));
 
 	}
 
