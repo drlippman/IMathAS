@@ -499,7 +499,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existingq = array();
 	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
 	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
-	$query .= "iqs.solution,iqs.solutionopts,iqs.avgtime,iqs.avgscore,iqs.avgn FROM imas_questions AS iq ";
+	$query .= "iqs.solution,iqs.solutionopts,iqs.avgtime,iqs.avgscore,iqs.avgtimen FROM imas_questions AS iq ";
 	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
 	$query .= "WHERE iq.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
@@ -557,7 +557,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$timeout[0] = round($line['avgtime']/60, 1);
 		$timeout[1] = round($line['avgscore']/60, 1);
 		$timeout[2] = round($line['avgtime']/60, 1);
-		$timeout[3] = intval($line['avgn']);
+		$timeout[3] = intval($line['avgtimen']);
 
 		$questionjsarr[$line['id']] = array((int)$line['id'],
 			(int)$line['questionsetid'],
@@ -779,7 +779,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if (isset($search) && ($searchall==0 || $searchlikes!='' || $searchmine==1)) {
 				$qarr = $searchlikevals;
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.avgscore,imas_questionset.avgn,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.avgscore,imas_questionset.avgtimen,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
 				$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
@@ -894,10 +894,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
-						if ($line['avgn'] > 100) {
+						if ($line['avgtimen'] > 100) {
 							$page_useavgtimes = true;
 							$page_questionTable[$i]['avgtime'] = round($line['avgtime']/60,1);
-							$page_questionTable[$i]['qdata'] = array($line['avgscore'],$line['avgtime'],$line['avgn']);
+							$page_questionTable[$i]['qdata'] = array($line['avgscore'],$line['avgtime'],$line['avgtimen']);
 						}
 
 						if ($searchall==1) {
