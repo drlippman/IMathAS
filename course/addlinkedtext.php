@@ -545,7 +545,7 @@ if ($overwriteBody==1) {
 		</div>
 		<div id="fileinput" <?php if ($type != 'file') {echo 'style="display:none;"';}?>>
 			<span class="form">File</span>
-			<input type="hidden" name="MAX_FILE_SIZE" value="31457280" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="15000000" />
 			<span class="formright">
 			<?php if ($filename != '') {
 				require_once("../includes/filehandler.php");
