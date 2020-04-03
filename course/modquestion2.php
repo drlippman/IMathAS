@@ -232,6 +232,10 @@ if (!(isset($teacherid))) {
       $defaults['showwork'] = _('No');
     } else if ($defaults['showwork'] == 1) {
       $defaults['showwork'] = _('During Assessment');
+    } else if ($defaults['showwork'] == 2) {
+      $defaults['showwork'] = _('After assessment');
+    } else if ($defaults['showwork'] == 3) {
+      $defaults['showwork'] = _('During or after assessment');
     }
 	}
 }
