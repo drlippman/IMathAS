@@ -1188,7 +1188,7 @@ if ($stm->rowCount()==0) {
 				}
 				if (!$foundaid && count($res)>0) { //multiple results - look for the identical name
 					foreach ($res as $k=>$row) {
-						$res[$k]['loc'] = strpos($row['ancestors'], $aidtolookfor);
+						$res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
 						if ($row['name']==$aidsourcename) {
 							$aid = $row['id'];
 							$foundaid = true;

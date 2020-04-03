@@ -329,7 +329,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	</script>';
 	echo '<h2>'._('Link courses').'</h2>';
 	echo '<form method="post" action="ltihome.php">';
-	echo "<p>".sprintf_("This course on your LMS has not yet been linked to a course on %s. ",$installname);
+	echo "<p>".sprintf(_("This course on your LMS has not yet been linked to a course on %s. "),$installname);
 	echo _('Select a course to link with.  If it is a template course, a copy will be created for you:').'<br/> <select name="createcourse" onchange="updateCourseSelector(this)"> ';
 	$stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid=:userid AND ic.available<4 ORDER BY ic.name");
 	$stm->execute(array(':userid'=>$userid));
