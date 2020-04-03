@@ -556,7 +556,7 @@ if ($overwriteBody==1) {
 				echo _('Attach ');
 			}
 			?>
-			file (Max 30MB): <input name="userfile" type="file" />
+			file (Max 15MB): <input name="userfile" type="file" />
 			</span><br class="form">
 		</div>
 		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>
