@@ -48,7 +48,7 @@ if ($canviewall) {
 	$secfilter = -1;
 	$catfilter = -1;
 	$hidenc = 1;
-	$availshow = 1;	
+	$availshow = 1;
 }
 $showpics = 0;
 $lastlogin = false;
@@ -71,7 +71,7 @@ require("gbtable2.php");
 
 $includecomments = true;
 
-$gbt = gbtable($stu); 
+$gbt = gbtable($stu);
 
 $flexwidth = true;
 $nologo = true;
@@ -81,6 +81,9 @@ echo '<h1>'.sprintf(_('All Feedback For %s'), $gbt[1][0][0]).'</h1>';
 
 for ($i=0;$i<count($gbt[0][1]);$i++) {
 	if ($gbt[1][1][$i][1] == '' || $gbt[1][1][$i][1]=='<p></p>') {
+		continue;
+	}
+	if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]=='N/A') {
 		continue;
 	}
 	if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden
@@ -105,6 +108,5 @@ for ($i=0;$i<count($gbt[0][1]);$i++) {
 	echo Sanitize::outgoingHtml($gbt[1][1][$i][1]);
 	echo '</div>';
 }
-	
-require("../footer.php");
 
+require("../footer.php");
