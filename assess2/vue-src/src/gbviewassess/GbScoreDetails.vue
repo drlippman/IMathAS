@@ -331,7 +331,7 @@ export default {
       this.showfeedback = true;
       window.imasrubric_show(
         this.qdata.rubric,
-        this.qdata.points_possible,
+        this.partPoss[pn],
         'scorebox' + this.qn + (this.partPoss.length > 1 ? '-' + pn : ''),
         'fb' + this.qn,
         this.qn,
