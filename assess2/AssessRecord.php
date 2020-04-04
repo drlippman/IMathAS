@@ -661,8 +661,7 @@ class AssessRecord
     }
 
     if ($pn === 'work') { //autosaving work
-      $data[$qn]['work'] = Sanitize::incomingHtml($_POST['sw' . $qn]);
-      $this->need_to_record = true;
+      $this->saveWork([$qn => $_POST['sw' . $qn]], true);
       return;
     }
     $tosave = array();
@@ -3235,9 +3234,10 @@ class AssessRecord
   /**
    * Save after-assessment showwork
    * @param  array $work array of $qn => $work
+   * @param  boolean $during   true if being called during assess
    * @return boolean|string  true if successful, errors message otherwise
    */
-  public function saveWork($work) {
+  public function saveWork($work, $during=false) {
     $this->parseData();
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     // always saving work for last version
@@ -3245,12 +3245,12 @@ class AssessRecord
     foreach ($work as $qn=>$val) {
       $question_versions = &$assessver['questions'][$qn]['question_versions'];
       $curq = &$question_versions[count($question_versions) - 1];
-      if (($this->assess_info->getQuestionSetting($curq['qid'], 'showwork') & 2) == 2) {
+      if ($during || ($this->assess_info->getQuestionSetting($curq['qid'], 'showwork') & 2) == 2) {
         $curq['work'] = Sanitize::incomingHtml($val);
       }
     }
     if (count($work) > 0) {
-      $this->saveRecord();
+      $this->need_to_record = true;
     }
     return true;
   }
