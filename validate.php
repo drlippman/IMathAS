@@ -79,7 +79,7 @@
     }
   }
  }
- 
+
  $hasusername = isset($userid);
  $haslogin = isset($_POST['password']);
  if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
@@ -414,7 +414,8 @@
 			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php',
         'redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php',
         'index.php','gbviewassess.php','autosave.php','endassess.php','getscores.php','livepollstatus.php','loadassess.php',
-        'loadquestion.php','scorequestion.php','startassess.php','uselatepass.php','gbloadassess.php','gbloadassessver.php','gbloadquestionver.php');
+        'loadquestion.php','scorequestion.php','startassess.php','uselatepass.php','gbloadassess.php','gbloadassessver.php',
+        'gbloadquestionver.php','getquestions.php','savework.php');
 			//call hook, if defined
 			if (function_exists('allowedInAssessment')) {
 				$allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());
