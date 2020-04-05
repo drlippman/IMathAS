@@ -497,9 +497,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$questionjsarr = array();
 	$existingq = array();
-	$query = "SELECT imas_questions.id,imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts,imas_questionset.avgtime FROM imas_questions ";
-	$query .= "JOIN imas_questionset ON imas_questionset.id=imas_questions.questionsetid JOIN imas_users ON imas_questionset.ownerid=imas_users.id ";
-	$query .= "WHERE imas_questions.assessmentid=:aid";
+	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
+	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
+	$query .= "iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,iqs.meantimen FROM imas_questions AS iq ";
+	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
+	$query .= "WHERE iq.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':aid'=>$aid));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -550,19 +552,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
 			$extrefval += 8;
 		}
-		$avgtimepts = array_map('Sanitize::onlyFloat', explode(',', $line['avgtime']));
-		if ($avgtimepts[0]>0) {
-			$timeout = array(round($avgtimepts[0]/60,1));
-		} else if (isset($avgtimepts[1]) && isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-			$timeout = array(round($avgtimepts[1]/60,1));
-		} else {
-			$timeout = array(0);
-		}
-		if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-			$timeout[1] = round($avgtimepts[2]); //score
-			$timeout[2] = round($avgtimepts[1]/60,1); //time first try
-			$timeout[3] = Sanitize::onlyInt($avgtimepts[3]); //# of data
-		}
+
+		$timeout = array();
+		$timeout[0] = round($line['meantime']/60, 1);
+		$timeout[1] = round($line['meanscore']/60, 1);
+		$timeout[2] = round($line['meantime']/60, 1);
+		$timeout[3] = intval($line['meantimen']);
+
 		$questionjsarr[$line['id']] = array((int)$line['id'],
 			(int)$line['questionsetid'],
 			Sanitize::encodeStringForDisplay($line['description']),
@@ -783,7 +779,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if (isset($search) && ($searchall==0 || $searchlikes!='' || $searchmine==1)) {
 				$qarr = $searchlikevals;
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.meantime,imas_questionset.meanscore,imas_questionset.meantimen,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
 				$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
@@ -898,29 +894,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
-						$avgtimepts = explode(',', $line['avgtime']);
-						if ($avgtimepts[0]>0) {
+						if ($line['meantimen'] > 100) {
 							$page_useavgtimes = true;
-							$page_questionTable[$i]['avgtime'] = round($avgtimepts[0]/60,1);
-						} else if (isset($avgtimepts[1]) && isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-							$page_useavgtimes = true;
-							$page_questionTable[$i]['avgtime'] = round($avgtimepts[1]/60,1);
-						} else {
-							$page_questionTable[$i]['avgtime'] = '';
+							$page_questionTable[$i]['meantime'] = round($line['meantime']/60,1);
+							$page_questionTable[$i]['qdata'] = array($line['meanscore'],$line['meantime'],$line['meantimen']);
 						}
-						if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-							$page_questionTable[$i]['qdata'] = array($avgtimepts[2],$avgtimepts[1],$avgtimepts[3]);
-						}
-						/*
-						//pull firstscores data
-						$query = "SELECT qsetid,count(id),AVG(score),AVG(timespent) FROM imas_firstscores WHERE qsetid IN ($allusedqids) AND timespent>1 AND timespent<600 GROUP BY qsetid";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						while ($row = mysql_fetch_row($result)) {
-							if ($row[1]>10) {
-								$page_questionTable[$row[0]]['qdata'] = array($row[2],$row[3]);
-							}
-						}
-						*/
+
 						if ($searchall==1) {
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib=".Sanitize::encodeUrlParam($line['libid'])."\">"._("List lib")."</a>";
 						} else {
@@ -1394,7 +1373,7 @@ if ($overwriteBody==1) {
 					} else {
 						echo '<span>';
 					}
-					echo $page_questionTable[$qid]['avgtime'].'</span>'; ?></td> <?php }?>
+					echo $page_questionTable[$qid]['meantime'].'</span>'; ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
 					<td><div class="dropdown">
 					  <a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

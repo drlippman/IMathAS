@@ -3350,16 +3350,33 @@ class AssessRecord
       }
     }
 
+    $pctscore = round(100*$scoreonfirst);
+    $qsetid = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');
     $query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
 		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
 		$stm = $this->DBH->prepare($query);
     $stm->execute(array(
       ':courseid'=> $this->assess_info->getCourseId(),
-      ':qsetid'=> $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid'),
-			':score'=> round(100*$scoreonfirst),
+      ':qsetid'=> $qsetid,
+      ':score'=> $pctscore,
       ':scoredet'=> implode('~', $scoredet),
       ':timespent'=> $timeonfirst
     ));
+    $query = "UPDATE imas_questionset SET
+		 meanscoren=meanscoren+1,
+		 varscore=((meanscoren-1)*varscore + (:s1 - meanscore)*((meanscoren-1)*(:s2 - meanscore)/meanscoren))/(meanscoren),
+		 meanscore=(meanscore*(meanscoren-1) + :s3)/meanscoren,
+     meantimen=IF(:t1 BETWEEN 1 AND 3600 AND (meantimen<200 OR ABS(:t2-meantime)/sqrt(vartime)<3),
+      meantimen+1,meantimen),
+     vartime=IF(:t3 BETWEEN 1 AND 3600 AND (meantimen<200 OR ABS(:t4-meantime)/sqrt(vartime)<3),
+		 	((meantimen-1)*vartime + (:t5-meantime)*((meantimen-1)*(:t6 - meantime)/meantimen))/(meantimen), vartime),
+		 meantime=IF(:t7 BETWEEN 1 AND 3600 AND (meantimen<200 OR ABS(:t8 - meantime)/sqrt(vartime)<3),
+		  (meantime*(meantimen-1) + :t9)/meantimen, meantime)
+     WHERE id=:id";
+		$stm = $this->DBH->prepare($query);
+		$stm->execute(array(':s1'=>$pctscore,':s2'=>$pctscore,':s3'=>$pctscore,
+			':t1'=>$timeonfirst,':t2'=>$timeonfirst,':t3'=>$timeonfirst,':t4'=>$timeonfirst,':t5'=>$timeonfirst,
+			':t6'=>$timeonfirst,':t7'=>$timeonfirst,':t8'=>$timeonfirst,':t9'=>$timeonfirst,':id'=>$qsetid));
   }
 
   /**

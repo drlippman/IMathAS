@@ -1619,7 +1619,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		$introhaspages = ($testsettings['displaymethod'] == "Embed" && strpos($testsettings['intro'],'[PAGE')!==false);
 	}
 	if (!empty($_POST['backgroundsaveforlater'])) {
-		scorequestion(Sanitize::onlyInt($_POST['tosaveqn']),false);
+		scorequestion(Sanitize::onlyInt($_POST['tosaveqn']),false,false);
 		recordtestdata(true);
 		echo "Saved ".Sanitize::onlyInt($_POST['tosaveqn']);
 		exit;
