@@ -777,7 +777,11 @@ require_once("includes/sanitize.php");
 		}
 
 	} else if ($_GET['action']=="forumwidgetsettings") {
-		$checked = $_POST['checked'];
+		if (empty($_POST['checked'])) {
+			$checked = array();
+		} else {
+			$checked = $_POST['checked'];
+		}
 		$all = explode(',',$_POST['allcourses']);
 		foreach ($all as $k=>$v) {
 			$all[$k] = intval($v);
