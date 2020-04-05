@@ -14,7 +14,8 @@ function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
     $bom = fread($file, 3);
     if ($bom != b"\xEF\xBB\xBF") {
-        rewind($file);
+      fclose($file);
+      $file = @fopen($filename, $mode);
     }
     return $file;
 }
@@ -208,7 +209,7 @@ if (!(isset($teacherid)) && $myrights<100) {
       exit;
     }
     $uploadfile = getimportfilepath($filekey);
-    
+
 		$handle = fopen_utf8($uploadfile,'r');
 		if ($_POST['hdr']==1) {
 			$data = fgetcsv($handle,2096);
