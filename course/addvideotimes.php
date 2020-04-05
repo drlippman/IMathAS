@@ -325,13 +325,13 @@ function addsegat(n) {
 	var newins = document.createElement("div");
 	newins.className = "insblock";
 	newins.id = "insat"+(curnumseg+1);
-	newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;">'+"<?php echo _('Add video segment break'); ?>"+'</a>';
+	newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;"><?php echo _('Add video segment break'); ?></a>';
 	insat.parentNode.insertBefore(newins, insat);
 
-	var html = "<?php echo _('Segment title:'); ?>"+' <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
-	html += "<?php echo _('Ends at:'); ?>"+' <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
-	html += '<input type="button" value="'+<?php echo _('grab'); ?>+'" onclick="grabcurvidtime('+curnumseg+',0);"/>';
-	html += ' <a href="#" onclick="return deleteseg(this);">[Delete]</a>';
+	var html = '<?php echo _('Segment title:'); ?> <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
+	html += '<?php echo _('Ends at:'); ?> <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
+	html += '<input type="button" value="<?php echo _('grab'); ?>" onclick="grabcurvidtime('+curnumseg+',0);"/>';
+	html += ' <a href="#" onclick="return deleteseg(this);">[<?php echo _('Delete');?>]</a>';
 
 	var newseg = document.createElement("div");
 	newseg.className = "vidsegblock";
