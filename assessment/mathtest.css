@@ -366,6 +366,9 @@ table.scores td {
 	border: 1px solid #000;
 	margin-bottom: 5px;
 }
+.drawcanvas img {
+	max-width: 100% !important;
+}
 
 .clickable {
 	cursor: pointer;

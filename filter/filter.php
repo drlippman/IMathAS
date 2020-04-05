@@ -13,6 +13,7 @@
 	if ((isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==2) || isset($loadgraphfilter)) { //use image fallback for graphs
 		include("$filterdir/graph/asciisvgimg.php");
 		$AS = new AStoIMG;
+		require_once("$filterdir/../includes/filehandler.php");
 	}
 	if ((!isset($_SESSION['graphdisp']) || $_SESSION['graphdisp']==0)) {
 		include_once("$filterdir/graph/sscrtotext.php");
@@ -58,12 +59,15 @@
 			$sty = "vertical-align: middle;";
 		}
 		$fn = md5($arr[2]);
-		if (!file_exists($filterdir.'/graph/imgs/'.$fn.'.png')) {
+		if (!doesfileexist('graphimg', $fn.'.png')) {
 			$AS->AStoIMG(300,300);
 			$AS->processShortScript($arr[2]);
 			$AS->outputimage($filterdir.'/graph/imgs/'.$fn.'.png');
+			$gurl = relocategraphfileifneeded($filterdir.'/graph/imgs/'.$fn.'.png', $fn.'.png');
+		} else {
+			$gurl = getgraphfileurl($fn.'.png');
 		}
-		return ('<img src="'.$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
+		return ('<img src="'.$gurl.'" style="'.$sty.'" alt="Graphs"/>');
 	}
 	function svgfilterscriptcallback($arr) {
 		global $filterdir, $AS, $imasroot;
@@ -84,13 +88,15 @@
 		}
 		$fn = md5($arr[2].$w.$h);
 
-		if (!file_exists($filterdir.'/graph/imgs/'.$fn.'.png')) {
+		if (!doesfileexist('graphimg', $fn.'.png')) {
 			$AS->AStoIMG($w+0,$h+0);
 			$AS->processScript($arr[2]);
-			//echo $arr[2];
 			$AS->outputimage($filterdir.'/graph/imgs/'.$fn.'.png');
+			$gurl = relocategraphfileifneeded($filterdir.'/graph/imgs/'.$fn.'.png', $fn.'.png');
+		} else {
+			$gurl = getgraphfileurl($fn.'.png');
 		}
-		return ('<img src="'.$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
+		return ('<img src="'.$gurl.'" style="'.$sty.'" alt="Graphs"/>');
 	}
 
 	function filter($str) {

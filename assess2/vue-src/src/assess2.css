@@ -284,6 +284,9 @@ ol.lalpha li { margin-top: .7em;}
 .drawcanvas {
 	margin-bottom: 5px;
 }
+.drawcanvas img {
+	max-width: 100% !important;
+}
 
 /* General layout styles used many places */
 input, .mq-editable-field, .mathquill-math-field {
