@@ -135,7 +135,7 @@ https://github.com/edenspiekermann/a11y-dialog
     focusedBeforeDialog = document.activeElement;
 
     if (this.useDialog) {
-      this.dialog.showModal(event instanceof Event ? void 0 : event);
+      this.dialog.showModal(event instanceof Event ? undefined : event);
     } else {
       this.dialog.setAttribute('open', '');
       this.container.removeAttribute('aria-hidden');
@@ -179,7 +179,7 @@ https://github.com/edenspiekermann/a11y-dialog
     this.shown = false;
 
     if (this.useDialog) {
-      this.dialog.close(event instanceof Event ? void 0 : event);
+      this.dialog.close(event instanceof Event ? undefined : event);
     } else {
       this.dialog.removeAttribute('open');
       this.container.setAttribute('aria-hidden', 'true');

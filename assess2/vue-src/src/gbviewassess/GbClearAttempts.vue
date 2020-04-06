@@ -77,7 +77,7 @@
 
 <script>
 import { store, actions } from './gbstore';
-import '../components/a11y-dialog';
+import A11yDialog from '../components/a11y-dialog';
 
 export default {
   name: 'GbClearAttempts',
@@ -126,7 +126,7 @@ export default {
           this.close();
         }
       });
-      this.dialog = new window.A11yDialog(this.$refs.wrap);
+      this.dialog = new A11yDialog(this.$refs.wrap);
       this.dialog.show();
     }
   }
