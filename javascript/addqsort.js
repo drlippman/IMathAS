@@ -10,23 +10,23 @@
 // item,item,n|w/wo~item~item,item
 
 $(document).ready(function() {
-	$(window).on("beforeunload",function(){
-		if (anyEditorIsDirty()) {
-			//This message might not ever be displayed
-			return "There are unsaved changes in a question intro text box.  Press Leave Page to discard those changes and continue with the most recent action.  Press Stay on Page to return to the page without taking any action.";
-		}
-	});
+  $(window).on("beforeunload", function() {
+    if (anyEditorIsDirty()) {
+      //This message might not ever be displayed
+      return "There are unsaved changes in a question intro text box.  Press Leave Page to discard those changes and continue with the most recent action.  Press Stay on Page to return to the page without taking any action.";
+    }
+  });
 
-	//attach handler to Edit/Collapse buttons and all that are created in
-	// future calls to generateTable()
-	$(document).on("click",".text-segment-button",function(e) {
-		handleClickTextSegmentButton(e);
-	});
-	$(window).on("scroll",function() {
-		$(".text-segment-button").each(function(index,element) {
-			followButtonLocation("#"+element.id);
-		});
-	});
+  //attach handler to Edit/Collapse buttons and all that are created in
+  // future calls to generateTable()
+  $(document).on("click", ".text-segment-button", function(e) {
+    handleClickTextSegmentButton(e);
+  });
+  $(window).on("scroll", function() {
+    $(".text-segment-button").each(function(index, element) {
+      followButtonLocation("#" + element.id);
+    });
+  });
 });
 
 //find position for collapse button in the middle of the visible editor
@@ -145,12 +145,12 @@ function refreshTable() {
 
 //Show the editor toolbar on a newly created text segment
 function activateLastEditorIfBlank() {
-	last_editor = tinymce.editors[tinymce.editors.length-1];
-	if (last_editor !== undefined && last_editor.getContent()=="") {
-		tinyMCE.setActive(last_editor);
-		last_editor.fire("focus");
-		last_editor.selection.setCursorLocation();
-	}
+  last_editor = tinymce.editors[tinymce.editors.length - 1];
+  if (last_editor !== undefined && last_editor.getContent() == "") {
+    tinyMCE.setActive(last_editor);
+    last_editor.fire("focus");
+    last_editor.selection.setCursorLocation();
+  }
 }
 
 //this is called by tinycme during initialization
@@ -420,49 +420,49 @@ function collapseTextSegment(selector) {
 }
 
 function getIndexForSelector(selector) {
-	var match = selector.match(/[0-9]+$/);
-	if (match) {
-		var i = match[0];
-	}
-	//return undefined if the selector doesn't end with a digit
-	return i;
+  var match = selector.match(/[0-9]+$/);
+  if (match) {
+    var i = match[0];
+  }
+  //return undefined if the selector doesn't end with a digit
+  return i;
 }
 
 //returns "header" if the selector contains "header"
 // can be used to find a corresponding class name
 // e.g. textsegesheader3 -> edit-buttonheader3
 function getTypeForSelector(selector) {
-	if (selector.match("global")) {
-		var type = "global";
-	} else if (selector.match("header")) {
-		var type = "header";
-	} else {
-		var type = "";
-	}
-	return type;
+  if (selector.match("global")) {
+    var type = "global";
+  } else if (selector.match("header")) {
+    var type = "header";
+  } else {
+    var type = "";
+  }
+  return type;
 }
 
 //translates a selector to the corresponding editor if possible
 function getEditorForSelector(selector) {
-	var i = getIndexForSelector(selector);
-	var type = getTypeForSelector(selector);
+  var i = getIndexForSelector(selector);
+  var type = getTypeForSelector(selector);
 
-	if (i !== undefined && i.length > 0) {
-		var editor = tinymce.editors["textseg"+type+i];
-	}
-	//return undefined if the selector didn't end in a digit
-	return editor;
+  if (i !== undefined && i.length > 0) {
+    var editor = tinymce.editors["textseg" + type + i];
+  }
+  //return undefined if the selector didn't end in a digit
+  return editor;
 }
 
 function anyEditorIsDirty() {
-	var any_dirty = false;
-	for (index in tinymce.editors) {
-		if (tinymce.editors[index].isDirty()) {
-			any_dirty = true;
-			break;
-		}
-	}
-	return any_dirty;
+  var any_dirty = false;
+  for (index in tinymce.editors) {
+    if (tinymce.editors[index].isDirty()) {
+      any_dirty = true;
+      break;
+    }
+  }
+  return any_dirty;
 }
 
 function generateMoveSelect2(num) {
@@ -533,9 +533,9 @@ function generateMoveSelect2(num) {
 			tcnt++;
 		}
 		*/
-	}
-	sel += "</select>";
-	return sel;
+  }
+  sel += "</select>";
+  return sel;
 }
 
 function generateMoveSelect(num,itemarray) {
@@ -661,16 +661,16 @@ function moveitem2(from) {
 }
 
 function ungroupitem(from) {
-	if (confirm_textseg_dirty()) {
-		locparts = from.split("-");
-		var tomove = itemarray[locparts[0]][2].splice(locparts[1],1);
-		if (itemarray[locparts[0]][2].length==1) {
-			itemarray[locparts[0]] = itemarray[locparts[0]][2][0];
-		}
-		itemarray.splice(++locparts[0],0,tomove[0]);
-		submitChanges();
-	}
-	return false;
+  if (confirm_textseg_dirty()) {
+    locparts = from.split("-");
+    var tomove = itemarray[locparts[0]][2].splice(locparts[1], 1);
+    if (itemarray[locparts[0]][2].length == 1) {
+      itemarray[locparts[0]] = itemarray[locparts[0]][2][0];
+    }
+    itemarray.splice(++locparts[0], 0, tomove[0]);
+    submitChanges();
+  }
+  return false;
 }
 function removeitem(loc) {
   if (loc.indexOf("-") > -1 || itemarray[loc][0] != "text") {
@@ -895,52 +895,52 @@ function confirmclearattempts() {
 }
 
 function edittextseg(i) {
-	tinyMCE.get("textseg"+i).setContent(itemarray[i][1]);
+  tinyMCE.get("textseg" + i).setContent(itemarray[i][1]);
 
-	if (itemarray[i][3]==1) {
-		tinyMCE.get("textsegheader"+i).setContent(itemarray[i][4]);
-	}
+  if (itemarray[i][3] == 1) {
+    tinyMCE.get("textsegheader" + i).setContent(itemarray[i][4]);
+  }
 }
 
 function savetextseg(i) {
-	var any_dirty = false;
-	for (index in tinymce.editors) {
-		var editor = tinymce.editors[index];
-		if (editor.isDirty()) {
-			var i=editor.id.match(/[0-9]+$/)[0];
-			var i = getIndexForSelector("#"+editor.id);
-			var type = getTypeForSelector("#"+editor.id);
-			if (type === "") {
-				itemarray[i][1] = editor.getContent();
-				any_dirty = true;
-			} else if (editor.id.match("textsegheader")) {
-				itemarray[i][4] = strip_tags(editor.getContent());
-				any_dirty = true;
-			}
-		}
-	}
-	if (any_dirty) {
-		tinymce.activeEditor.hide();
-		submitChanges();
-	}
+  var any_dirty = false;
+  for (index in tinymce.editors) {
+    var editor = tinymce.editors[index];
+    if (editor.isDirty()) {
+      var i = editor.id.match(/[0-9]+$/)[0];
+      var i = getIndexForSelector("#" + editor.id);
+      var type = getTypeForSelector("#" + editor.id);
+      if (type === "") {
+        itemarray[i][1] = editor.getContent();
+        any_dirty = true;
+      } else if (editor.id.match("textsegheader")) {
+        itemarray[i][4] = strip_tags(editor.getContent());
+        any_dirty = true;
+      }
+    }
+  }
+  if (any_dirty) {
+    tinymce.activeEditor.hide();
+    submitChanges();
+  }
 }
-function updateTextShowN(i,old_i) {
-	if (!confirm_textseg_dirty()) {
-		//if aborted, restore old value
-		$("#showforn"+i).val(old_i);
-	} else {
-		itemarray[i][2] = 1.0*$("#showforn"+i).val();
-		submitChanges();
-	}
+function updateTextShowN(i, old_i) {
+  if (!confirm_textseg_dirty()) {
+    //if aborted, restore old value
+    $("#showforn" + i).val(old_i);
+  } else {
+    itemarray[i][2] = 1.0 * $("#showforn" + i).val();
+    submitChanges();
+  }
 }
-function updateTextShowNType(i,old_i) {
-	if (!confirm_textseg_dirty()) {
-		//if aborted, restore old value
-		$("#showforntype"+i).val(old_i);
-	} else {
-		itemarray[i][5] = $("#showforntype"+i).val()*1;
-		submitChanges();
-	}
+function updateTextShowNType(i, old_i) {
+  if (!confirm_textseg_dirty()) {
+    //if aborted, restore old value
+    $("#showforntype" + i).val(old_i);
+  } else {
+    itemarray[i][5] = $("#showforntype" + i).val() * 1;
+    submitChanges();
+  }
 }
 
 function chgpagetitle(i) {
@@ -1022,14 +1022,14 @@ function generateOutput() {
 }
 
 function collapseqgrp(i) {
-	itemarray[i][3] = 0;
-	updateqgrpcookie();
-	refreshTable();
+  itemarray[i][3] = 0;
+  updateqgrpcookie();
+  refreshTable();
 }
 function expandqgrp(i) {
-	itemarray[i][3] = 1;
-	updateqgrpcookie();
-	refreshTable();
+  itemarray[i][3] = 1;
+  updateqgrpcookie();
+  refreshTable();
 }
 function updateqgrpcookie() {
 	var closegrp = [];

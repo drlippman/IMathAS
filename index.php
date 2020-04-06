@@ -349,7 +349,7 @@ if ($myrights==100) {
 	}
 }
 
-/*** done pulling stuff.  Time to display something ***/
+/*** done pulling stuff.  Time to display something */
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
 if (!isset($CFG['GEN']['homelinkbox'])) {
