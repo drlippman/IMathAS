@@ -299,7 +299,7 @@
 		if ($aver>1) {
 			$total = $line['score'];
 			$timeused = $line['lastchange'] - $line['starttime'];
-			$timeontask = $line['timeontask'];
+			$timeontask = round($line['timeontask']/60,1);
 			$isOvertime = ($line['status']&4) == 4;
 			$IP = ($line['status']&3)>0;
 			$UA = ($line['status']&1)>0;

@@ -13,7 +13,8 @@
         {{ $t('gradebook.lastchange') }}: {{ lastchangeString }}
         <span v-if="aData.timeontask > 0">
           <br/>
-          {{ $t('gradebook.time_onscreen') }}: {{ totalTimeOnTask }}
+          {{ $tc('gradebook.time_onscreen', attemptCount) }}:
+          {{ totalTimeOnTask }}
         </span>
       </div>
 
@@ -345,6 +346,15 @@ export default {
     },
     totalTimeOnTask () {
       return Math.round(10 * this.aData.timeontask / 60) / 10 + ' ' + this.$t('gradebook.minutes');
+    },
+    attemptCount () {
+      let cnt = 0;
+      for (let i = 0; i < this.aData.assess_versions.length; i++) {
+        if (this.aData.assess_versions[i].status < 3) {
+          cnt++;
+        }
+      }
+      return cnt;
     },
     extensionString () {
       if (this.aData.extended_with.type === 'latepass') {

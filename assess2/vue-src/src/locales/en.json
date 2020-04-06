@@ -332,7 +332,7 @@
     "detail_title": "Review Assessment Attempts",
     "started": "Started",
     "lastchange": "Last Changed",
-    "time_onscreen": "Total time questions were on-screen",
+    "time_onscreen": "Total time questions were on-screen | Total time questions were on-screen (all attempts)",
     "time_on_version": "Time spent on this version",
     "due": "Due Date",
     "originally_due": "Originally Due",
