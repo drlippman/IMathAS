@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     updateTimer: function () {
-      let now = new Date().getTime();
+      const now = new Date().getTime();
       this.timeString = '';
       let remaining = Math.max(0, this.end - now);
       if (remaining === 0 && this.grace > 0) {

@@ -26,7 +26,7 @@ export default {
       return store.APIbase + '../msgs/msglist.php?cid=' + store.cid;
     },
     msgcnt () {
-      return store.assessInfo['lti_msgcnt'];
+      return store.assessInfo.lti_msgcnt;
     }
   }
 };

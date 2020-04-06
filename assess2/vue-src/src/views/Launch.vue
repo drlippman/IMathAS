@@ -153,7 +153,7 @@ export default {
       if (store.timelimit_expired && store.timelimit_grace_expired &&
           this.aInfo.has_active_attempt
       ) {
-        let expires = this.aInfo.timelimit_expires_disp;
+        const expires = this.aInfo.timelimit_expires_disp;
         return this.$t('setlist.time_expired', { date: expires });
       } else {
         return '';
@@ -199,10 +199,10 @@ export default {
   methods: {
     startAssess () {
       if (!this.okToLaunch) { return; }
-      let timelimit = this.aInfo.timelimit;
+      const timelimit = this.aInfo.timelimit;
       if (this.aInfo.has_password) {
         // hacky fix for when the password is entered programatically
-        let v = document.getElementById('password');
+        const v = document.getElementById('password');
         if (v && v.value !== this.password) {
           this.password = v.value;
         }
@@ -218,7 +218,7 @@ export default {
       }
     },
     reallyStartAssess () {
-      let pwval = this.password;
+      const pwval = this.password;
       this.password = '';
       actions.startAssess(false, pwval, this.newGroupMembers);
     },

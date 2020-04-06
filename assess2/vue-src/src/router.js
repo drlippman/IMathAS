@@ -167,7 +167,7 @@ const router = new Router({
           if (store.assessInfo.hasOwnProperty('questions')) {
             next();
           } else {
-            let dopractice = (store.assessInfo.available === 'practice');
+            const dopractice = (store.assessInfo.available === 'practice');
             actions.startAssess(dopractice, '', [], () => next());
           }
         } else {
@@ -194,8 +194,8 @@ router.beforeEach((to, from, next) => {
     store.APIbase = process.env.BASE_URL;
   }
   // if no assessinfo, or if cid/aid has changed, load data
-  let querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
-  let queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
+  const querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
+  const queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
   let queryuid = 0;
   if (window.location.search.match(/uid=/)) {
     queryuid = window.location.search.replace(/^.*uid=(\d+).*$/, '$1');

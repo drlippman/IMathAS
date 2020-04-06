@@ -29,16 +29,16 @@ export default {
   },
   computed: {
     processedTries () {
-      let out = [];
+      const out = [];
       let pn, tn;
       for (pn in this.tries) {
-        let partout = [];
+        const partout = [];
         for (tn in this.tries[pn]) {
           if (typeof this.tries[pn][tn] === 'object' && this.tries[pn][tn][0] === 'draw') {
             // drawing
-            let id = this.qn + '-' + pn + '-' + tn;
-            let drawwidth = this.tries[pn][tn][2][6];
-            let drawheight = this.tries[pn][tn][2][7];
+            const id = this.qn + '-' + pn + '-' + tn;
+            const drawwidth = this.tries[pn][tn][2][6];
+            const drawheight = this.tries[pn][tn][2][7];
             partout[tn] = '<canvas class="drawcanvas" id="canvasGBR' + id + '" width=' + drawwidth + ' height=' + drawheight + '></canvas>';
             partout[tn] += '<input type="hidden" id="qnGBR' + id + '"/>';
           } else {
@@ -69,7 +69,7 @@ export default {
               la[0] = '[' + la[0].replace(/;/g, '],[') + ']';
             }
             la = '[[' + la.join('],[') + ']]';
-            let id = this.qn + '-' + pn + '-' + tn;
+            const id = this.qn + '-' + pn + '-' + tn;
             window.canvases['GBR' + id] = this.tries[pn][tn][2].slice();
             window.canvases['GBR' + id].unshift('GBR' + id);
             window.drawla['GBR' + id] = JSON.parse(la);

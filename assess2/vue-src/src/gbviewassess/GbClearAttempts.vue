@@ -105,7 +105,7 @@ export default {
       return (store.curAver === avercnt);
     },
     isLastQAttempt () {
-      let qvercnt = store.assessInfo.assess_versions[store.curAver].questions[store.clearAttempts.qn].length - 1;
+      const qvercnt = store.assessInfo.assess_versions[store.curAver].questions[store.clearAttempts.qn].length - 1;
       return (store.curQver[store.clearAttempts.qn] === qvercnt);
     }
   },

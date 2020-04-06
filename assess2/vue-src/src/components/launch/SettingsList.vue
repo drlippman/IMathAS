@@ -129,9 +129,9 @@ export default {
         substr += this.$t('setlist.keep_last');
       }
 
-      let nextAttempt = settings.prev_attempts.length + 1;
+      const nextAttempt = settings.prev_attempts.length + 1;
       if (nextAttempt > settings.retake_penalty.n) {
-        let penalty = settings.retake_penalty.penalty * (nextAttempt - settings.retake_penalty.n);
+        const penalty = settings.retake_penalty.penalty * (nextAttempt - settings.retake_penalty.n);
         alertstr = this.$t('setlist.retake_penalty', { p: penalty });
       }
 
@@ -175,7 +175,7 @@ export default {
       }
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
-          let expires = settings.timelimit_expires_disp;
+          const expires = settings.timelimit_expires_disp;
           if (settings.overtime_grace > 0 &&
               settings.timelimit_grace > settings.timelimit_expires
           ) {
@@ -196,9 +196,9 @@ export default {
       return timeobj;
     },
     formatTimeLimit (time) {
-      let hrs = Math.floor(time / 3600);
-      let min = Math.floor(time / 60) - hrs * 60;
-      let sec = time - 60 * min - 3600 * hrs;
+      const hrs = Math.floor(time / 3600);
+      const min = Math.floor(time / 60) - hrs * 60;
+      const sec = time - 60 * min - 3600 * hrs;
       let out = '';
       if (hrs > 0) {
         out += this.$tc('hours', hrs);

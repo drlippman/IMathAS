@@ -83,8 +83,8 @@ export default {
         title: this.$t('livepoll.settings'),
         dispqn: 0
       });
-      for (let qn in store.assessInfo.questions) {
-        let dispqn = parseInt(qn) + 1;
+      for (const qn in store.assessInfo.questions) {
+        const dispqn = parseInt(qn) + 1;
         out.push({
           onclick: () => this.$emit('selectq', dispqn),
           title: this.$t('question_n', { n: dispqn }),

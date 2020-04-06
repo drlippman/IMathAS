@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     partHasPenalties () {
-      let out = [];
+      const out = [];
       for (let pn = 0; pn < this.parts.length; pn++) {
         if (this.parts[pn].hasOwnProperty('penalties') &&
           this.parts[pn].penalties.length > 0

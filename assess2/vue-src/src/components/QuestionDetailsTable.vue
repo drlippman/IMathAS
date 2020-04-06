@@ -50,7 +50,7 @@ export default {
       return !(this.showtries === false);
     },
     partHasPenalties () {
-      let out = [];
+      const out = [];
       for (let pn = 0; pn < this.parts.length; pn++) {
         if (this.parts[pn].hasOwnProperty('penalties') &&
           this.parts[pn].penalties.length > 0
@@ -61,7 +61,7 @@ export default {
       return out;
     },
     triesRemaining () {
-      let out = [];
+      const out = [];
       for (let pn = 0; pn < this.parts.length; pn++) {
         if (this.qinfo.hasOwnProperty('did_jump_to_ans')) {
           out[pn] = 0;
@@ -78,7 +78,7 @@ export default {
       return this.qinfo.hasOwnProperty('score');
     },
     partIcons () {
-      let out = [];
+      const out = [];
 
       for (let i = 0; i < this.parts.length; i++) {
         if (this.parts[i].try === 0) {

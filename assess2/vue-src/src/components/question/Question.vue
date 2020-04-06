@@ -202,7 +202,7 @@ export default {
       if (this.timeActivated === null || goingActive) {
         this.timeActivated = new Date();
       } else if (this.timeActivated !== null) {
-        let now = new Date();
+        const now = new Date();
         this.timeActive += (now - this.timeActivated);
       }
     },
@@ -222,7 +222,7 @@ export default {
           store.somethingDirty = true;
         })
         .on('change.dirtytrack', function () {
-          let val = window.$(this).val().trim();
+          const val = window.$(this).val().trim();
           let changed = false;
           if (this.type === 'radio' || this.type === 'checkbox') {
             changed = true;
@@ -231,8 +231,8 @@ export default {
           }
           if (changed) {
             store.somethingDirty = true;
-            let name = window.$(this).attr('name');
-            let m = name.match(/^(qs|qn|tc)(\d+)/);
+            const name = window.$(this).attr('name');
+            const m = name.match(/^(qs|qn|tc)(\d+)/);
             if (m !== null) {
               var qn = m[2] * 1;
               var pn = 0;
@@ -242,16 +242,16 @@ export default {
               }
 
               // autosave value
-              let now = new Date();
-              let timeactive = self.timeActive + (now - self.timeActivated);
+              const now = new Date();
+              const timeactive = self.timeActive + (now - self.timeActivated);
               actions.doAutosave(qn, pn, timeactive);
             }
           }
         });
     },
     disableOutOfTries () {
-      let trymax = this.questionData.tries_max;
-      for (let pn in this.questionData.parts) {
+      const trymax = this.questionData.tries_max;
+      for (const pn in this.questionData.parts) {
         var regex;
         if (this.questionData.parts[pn].try >= trymax) {
           // out of tries - disable inputs
@@ -344,8 +344,8 @@ export default {
         store.work[this.qn] = this.work;
         // autosave value
         if (this.getwork === 1) {
-          let now = new Date();
-          let timeactive = self.timeActive + (now - self.timeActivated);
+          const now = new Date();
+          const timeactive = self.timeActive + (now - self.timeActivated);
           actions.doAutosave(this.qn, 'sw', timeactive);
         } else if (this.getwork === 2) {
           this.$emit('workchanged', this.work);

@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     setActive (index) {
-      for (let i in this.tabs) {
+      for (const i in this.tabs) {
         this.tabs[i].active = (i * 1 === index * 1);
       }
       this.activeTab = index;
@@ -48,8 +48,8 @@ export default {
       this.$refs.tab[index].focus();
     },
     handleKey (event, index) {
-      let cnt = this.tabs.length;
-      let key = event.key.toLowerCase();
+      const cnt = this.tabs.length;
+      const key = event.key.toLowerCase();
       if (key === 'enter' || key === ' ') {
         this.setActive(index);
       } else if (key === 'arrowleft') {
@@ -65,7 +65,7 @@ export default {
   },
   mounted () {
     this.tabs = this.$children;
-    for (let i in this.tabs) {
+    for (const i in this.tabs) {
       this.tabs[i].control = this.id + '_' + i;
       this.tabs[i].id = this.id + '_' + i + '_pane';
     }

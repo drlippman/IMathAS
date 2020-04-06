@@ -27,7 +27,7 @@ export default {
     navOptions () {
       var out = [];
       for (let i = 0; i < this.versions.length; i++) {
-        let thisoption = {
+        const thisoption = {
           ver: i,
           status: this.versions[i].status,
           lastchange_disp: this.versions[i].lastchange_disp,

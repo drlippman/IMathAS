@@ -45,7 +45,7 @@ export default {
       return store.assessInfo;
     },
     showGbLink () {
-      let viewingb = store.assessInfo.viewingb;
+      const viewingb = store.assessInfo.viewingb;
       return ((viewingb === 'immediately' || viewingb === 'after_take') &&
         this.prevAttempts.length > 0 &&
         !store.assessInfo.can_view_all

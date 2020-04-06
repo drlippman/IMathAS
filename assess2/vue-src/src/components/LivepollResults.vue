@@ -44,7 +44,7 @@ export default {
     },
     params () {
       // reformat jsparams to be indexed by part number
-      let out = [];
+      const out = [];
       for (let pn = 0; pn < this.qinfo.answeights.length; pn++) {
         if (pn === 0 && this.qinfo.jsparams.hasOwnProperty(this.qn)) {
           out[pn] = this.qinfo.jsparams[this.qn];
@@ -55,10 +55,10 @@ export default {
       return out;
     },
     results () {
-      let out = [];
+      const out = [];
       for (let pn = 0; pn < this.qinfo.answeights.length; pn++) {
-        let datatots = {};
-        let scoredata = {};
+        const datatots = {};
+        const scoredata = {};
         // if has choices, initialize totals to 0
         if (this.params[pn].hasOwnProperty('livepoll_choices')) {
           for (let i = 0; i < this.params[pn].livepoll_choices.length; i++) {
@@ -66,8 +66,8 @@ export default {
             scoredata[i] = 0;
           }
         }
-        let parttype = this.params[pn].qtype;
-        let ischoices = (parttype === 'choices' || parttype === 'multans');
+        const parttype = this.params[pn].qtype;
+        const ischoices = (parttype === 'choices' || parttype === 'multans');
         // mark the correct answers for choices and multans
         if (ischoices) {
           let anss;
@@ -80,9 +80,9 @@ export default {
             scoredata[anss[i]] = 1;
           }
         }
-        let condenseddrawarr = [];
+        const condenseddrawarr = [];
         let condenseddraw;
-        for (let uid in store.livepollResults[this.qn]) {
+        for (const uid in store.livepollResults[this.qn]) {
           let stuans = store.livepollResults[this.qn][uid].ans[pn];
           if (ischoices) {
             stuans = stuans.toString().split('|');
@@ -114,7 +114,7 @@ export default {
         } // end loop over results
 
         let maxfreq = 1;
-        for (let i in datatots) {
+        for (const i in datatots) {
           if (datatots[i] > maxfreq) {
             maxfreq = datatots[i];
           }

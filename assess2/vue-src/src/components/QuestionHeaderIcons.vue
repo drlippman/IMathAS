@@ -69,7 +69,7 @@ export default {
       let trymsg;
       let trycnt;
       if (this.curQData.hasOwnProperty('tries_remaining_range')) {
-        let range = this.curQData.tries_remaining_range;
+        const range = this.curQData.tries_remaining_range;
         trymsg = this.$t('qinfo.tries_remaining_range', {
           min: range[0],
           max: range[1]
@@ -88,7 +88,7 @@ export default {
       if (this.qn < 0) {
         return false;
       }
-      let hasCategory = this.curQData.hasOwnProperty('category') &&
+      const hasCategory = this.curQData.hasOwnProperty('category') &&
         this.curQData.category !== '';
       return (this.curQData.has_details ||
         hasCategory ||

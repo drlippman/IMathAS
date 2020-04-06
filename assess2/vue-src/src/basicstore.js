@@ -200,7 +200,7 @@ export const actions = {
         this.copySettings(response);
         // clear drawing last answer if regen
         if (regen && store.assessInfo.questions[qn].jsparams) {
-          for (let i in store.assessInfo.questions[qn].jsparams) {
+          for (const i in store.assessInfo.questions[qn].jsparams) {
             if (store.assessInfo.questions[qn].jsparams[i].qtype === 'draw') {
               window.imathasDraw.clearcanvas(i);
             }
@@ -218,15 +218,15 @@ export const actions = {
     let warnMsg = 'header.confirm_assess_submit';
     if (store.assessInfo.submitby === 'by_assessment') {
       let qAttempted = 0;
-      let changedQuestions = this.getChangedQuestions();
-      for (let i in store.assessInfo.questions) {
+      const changedQuestions = this.getChangedQuestions();
+      for (const i in store.assessInfo.questions) {
         if (store.assessInfo.questions[i].try > 0 ||
           changedQuestions.hasOwnProperty(i)
         ) {
           qAttempted++;
         }
       }
-      let nQuestions = store.assessInfo.questions.length;
+      const nQuestions = store.assessInfo.questions.length;
       if (qAttempted !== nQuestions) {
         warnMsg = 'header.confirm_assess_unattempted_submit';
       }
@@ -252,8 +252,8 @@ export const actions = {
   submitWork () {
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     store.inTransit = true;
-    let data = {};
-    for (let qn in store.work) {
+    const data = {};
+    for (const qn in store.work) {
       data[qn] = store.work[qn];
     }
     if (Object.keys(data).length === 0) { // nothing to submit
@@ -288,7 +288,7 @@ export const actions = {
           store.errorMsg = null;
         }
         // copy into questions for reload later if needed
-        for (let qn in store.work) {
+        for (const qn in store.work) {
           Vue.set(store.assessInfo.questions[parseInt(qn)], 'work', store.work[qn]);
           delete store.work[qn];
         }
@@ -315,7 +315,7 @@ export const actions = {
       qns = [qns];
     }
 
-    for (let k in window.callbackstack) {
+    for (const k in window.callbackstack) {
       if (qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
         window.callbackstack[k](k);
       }
@@ -323,8 +323,8 @@ export const actions = {
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
 
     // figure out non-blank questions to submit
-    let lastLoaded = [];
-    let changedQuestions = this.getChangedQuestions(qns);
+    const lastLoaded = [];
+    const changedQuestions = this.getChangedQuestions(qns);
 
     if (Object.keys(changedQuestions).length === 0 && !endattempt) {
       store.errorMsg = 'nochange';
@@ -343,12 +343,12 @@ export const actions = {
       timeactive = [timeactive];
     }
 
-    let data = new FormData();
+    const data = new FormData();
 
     // run any pre-submit routines.  The question type wants to return a value,
     // it will get returned here.
     let valstr;
-    for (let qn in changedQuestions) {
+    for (const qn in changedQuestions) {
       if (changedQuestions[qn].length === 1 && changedQuestions[qn][0] === 0) {
         // one part, might be single part
         valstr = window.imathasAssess.preSubmit(qn);
@@ -367,7 +367,7 @@ export const actions = {
       }
     }
     for (let k = 0; k < qns.length; k++) {
-      let qn = parseInt(qns[k]);
+      const qn = parseInt(qns[k]);
 
       // add in regular input fields.
       var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn + 1) + '\\d{3})');
@@ -427,7 +427,7 @@ export const actions = {
         }
         // clear out initValues for this question so they get re-set
         for (let k = 0; k < qns.length; k++) {
-          let qn = qns[k];
+          const qn = qns[k];
           if (store.assessInfo.hasOwnProperty('scoreerrors') &&
             store.assessInfo.scoreerrors.hasOwnProperty(qn)
           ) {
@@ -495,7 +495,7 @@ export const actions = {
     store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
   },
   clearAutosave (qns) {
-    for (let i in qns) {
+    for (const i in qns) {
       if (store.autosaveQueue.hasOwnProperty(qns[i])) {
         Vue.delete(store.autosaveQueue, qns[i]);
       }
@@ -515,14 +515,14 @@ export const actions = {
     }
     store.inTransit = true;
     store.autoSaving = true;
-    let lastLoaded = {};
+    const lastLoaded = {};
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
-    let data = new FormData();
-    for (let qn in store.autosaveQueue) {
+    const data = new FormData();
+    for (const qn in store.autosaveQueue) {
       // build up regex to match the inputs for all the parts we want to save
-      let regexpts = [];
-      for (let k in store.autosaveQueue[qn]) {
-        let pn = store.autosaveQueue[qn][k];
+      const regexpts = [];
+      for (const k in store.autosaveQueue[qn]) {
+        const pn = store.autosaveQueue[qn][k];
         if (pn === 'sw') {
           data.append('sw' + qn, store.work[qn]);
           continue;
@@ -583,8 +583,8 @@ export const actions = {
           }
           return;
         }
-        for (let qn in store.autosaveQueue) {
-          for (let k in store.autosaveQueue[qn]) {
+        for (const qn in store.autosaveQueue) {
+          for (const k in store.autosaveQueue[qn]) {
             if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
               Vue.set(store.assessInfo.questions[parseInt(qn)].parts_entered,
                 store.autosaveQueue[qn][k], 1);
@@ -608,7 +608,7 @@ export const actions = {
       // submit dirty questions and end attempt
       store.errorMsg = 'timesup_submitting';
       setTimeout(() => {
-        let tosub = Object.keys(this.getChangedQuestions());
+        const tosub = Object.keys(this.getChangedQuestions());
         this.submitQuestion(tosub, true);
       }, 1000);
     }
@@ -766,12 +766,12 @@ export const actions = {
       });
   },
   getVerificationData (qns) {
-    let out = {};
-    let byQuestion = (store.assessInfo.submitby === 'by_question');
-    let assessRegen = store.assessInfo.prev_attempts.length;
-    for (let qn in qns) {
-      let parttries = [];
-      let qdata = store.assessInfo.questions[qn];
+    const out = {};
+    const byQuestion = (store.assessInfo.submitby === 'by_question');
+    const assessRegen = store.assessInfo.prev_attempts.length;
+    for (const qn in qns) {
+      const parttries = [];
+      const qdata = store.assessInfo.questions[qn];
       for (let pn = 0; pn < qdata.parts.length; pn++) {
         parttries[pn] = qdata.parts[pn].try;
       }
@@ -791,8 +791,8 @@ export const actions = {
     if (fieldname.match(/^sw/)) {
       pn = 'sw';
     } else {
-      let m = fieldname.match(/^(qs|qn|tc)(\d+)/);
-      let qref = m[2];
+      const m = fieldname.match(/^(qs|qn|tc)(\d+)/);
+      const qref = m[2];
       if (qref > 1000) {
         pn = qref % 1000;
       }
@@ -848,10 +848,10 @@ export const actions = {
         qns.push(qn);
       }
     }
-    let changed = {};
+    const changed = {};
     let m;
     for (let k = 0; k < qns.length; k++) {
-      let qn = qns[k];
+      const qn = qns[k];
 
       if (store.assessInfo.questions[qn].showwork && store.work.hasOwnProperty(qn)) {
         if (store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
@@ -882,7 +882,7 @@ export const actions = {
               changed[qn] = [];
             }
             let pn = 0;
-            let qidnum = parseInt(m[2]);
+            const qidnum = parseInt(m[2]);
             if (qidnum > 1000) {
               pn = qidnum % 1000;
             }
@@ -894,8 +894,8 @@ export const actions = {
       });
       // look to see if any have submitblank set
       if (store.assessInfo.questions[qn].hasOwnProperty('jsparams')) {
-        let curqparams = store.assessInfo.questions[qn].jsparams;
-        for (let qref in curqparams) {
+        const curqparams = store.assessInfo.questions[qn].jsparams;
+        for (const qref in curqparams) {
           if (curqparams.submitall ||
             (qref.match(/\d/) && curqparams[qref].hasOwnProperty('submitblank'))
           ) {
@@ -926,7 +926,7 @@ export const actions = {
   },
   updateTreeReader () {
     let qAttempted = 0;
-    for (let i in store.assessInfo.questions) {
+    for (const i in store.assessInfo.questions) {
       if (store.assessInfo.questions[i].try > 0) {
         qAttempted++;
       }
@@ -959,7 +959,7 @@ export const actions = {
       if (!store.assessInfo.hasOwnProperty('questions')) {
         store.assessInfo.questions = [];
       }
-      for (let i in response.questions) {
+      for (const i in response.questions) {
         Vue.set(store.assessInfo.questions, parseInt(i), response.questions[i]);
       }
       delete response.questions;
@@ -969,16 +969,16 @@ export const actions = {
   },
   processSettings (data) {
     if (data.hasOwnProperty('questions')) {
-      for (let i in data.questions) {
-        let thisq = data.questions[i];
+      for (const i in data.questions) {
+        const thisq = data.questions[i];
 
         data.questions[i].canretry = (thisq.try < thisq.tries_max);
         data.questions[i].tries_remaining = thisq.tries_max - thisq.try;
         if (thisq.hasOwnProperty('parts')) {
           let trymin = 1e10;
           let trymax = 0;
-          for (let pn in thisq.parts) {
-            let remaining = thisq.tries_max - thisq.parts[pn].try;
+          for (const pn in thisq.parts) {
+            const remaining = thisq.tries_max - thisq.parts[pn].try;
             if (remaining < trymin) {
               trymin = remaining;
             }
@@ -1014,10 +1014,10 @@ export const actions = {
       }
     }
     if (data.hasOwnProperty('showscores')) {
-      data['show_scores_during'] = (data.showscores === 'during');
+      data.show_scores_during = (data.showscores === 'during');
     }
     if (data.hasOwnProperty('regen')) {
-      data['regens_remaining'] = (data.regens_max - data.regen - 1);
+      data.regens_remaining = (data.regens_max - data.regen - 1);
     }
     if (data.hasOwnProperty('enableMQ')) {
       store.enableMQ = data.enableMQ;
@@ -1026,15 +1026,15 @@ export const actions = {
       data.enddate_in < 20 * 24 * 60 * 60 // over 20 days causes int overlow
     ) {
       clearTimeout(store.enddate_timer);
-      let now = new Date().getTime();
-      let dueat = data.enddate_in * 1000;
-      data['enddate_local'] = now + dueat;
+      const now = new Date().getTime();
+      const dueat = data.enddate_in * 1000;
+      data.enddate_local = now + dueat;
       store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
     }
     if (data.hasOwnProperty('timelimit_expiresin')) {
       clearTimeout(store.timelimit_timer);
       clearTimeout(store.enddate_timer); // no need for it w timelimit timer
-      let now = new Date().getTime();
+      const now = new Date().getTime();
       if (data.hasOwnProperty('timelimit_expires')) {
         if (data.timelimit_expires === data.enddate) {
           store.timelimit_restricted = 1;
@@ -1042,14 +1042,14 @@ export const actions = {
           store.timelimit_restricted = 2;
         }
       }
-      let expires = data.timelimit_expiresin * 1000;
-      let grace = data.timelimit_gracein * 1000;
+      const expires = data.timelimit_expiresin * 1000;
+      const grace = data.timelimit_gracein * 1000;
 
-      data['timelimit_local_expires'] = now + expires;
+      data.timelimit_local_expires = now + expires;
       if (grace > 0) {
-        data['timelimit_local_grace'] = now + grace;
+        data.timelimit_local_grace = now + grace;
       } else {
-        data['timelimit_local_grace'] = 0;
+        data.timelimit_local_grace = 0;
       }
       if (expires > 0) {
         if (data.timelimit_gracein > 0) {
@@ -1080,7 +1080,7 @@ export const actions = {
       data.interquestion_pages = [];
       let lastDisplayBefore = 0;
       // ensure proper data type on these
-      for (let i in data.interquestion_text) {
+      for (const i in data.interquestion_text) {
         data.interquestion_text[i].displayBefore = parseInt(data.interquestion_text[i].displayBefore);
         data.interquestion_text[i].displayUntil = parseInt(data.interquestion_text[i].displayUntil);
         data.interquestion_text[i].forntype = (parseInt(data.interquestion_text[i].forntype) > 0);
@@ -1089,7 +1089,7 @@ export const actions = {
           // if a new page, start a new array in interquestion_pages
           // first, add a question list to the previous page
           if (data.interquestion_pages.length > 0) {
-            let qs = [];
+            const qs = [];
             for (let j = lastDisplayBefore; j < data.interquestion_text[i].displayBefore; j++) {
               qs.push(j);
             }
@@ -1105,7 +1105,7 @@ export const actions = {
       }
       // if we have pages, add a question list to the last page
       if (data.interquestion_pages.length > 0) {
-        let qs = [];
+        const qs = [];
         for (let j = lastDisplayBefore; j < data.questions.length; j++) {
           qs.push(j);
         }
@@ -1118,7 +1118,7 @@ export const actions = {
     }
     if (data.hasOwnProperty('noprint') && data.noprint === 1) {
       // want to block printing - inject print styles
-      let styleEl = document.createElement('style');
+      const styleEl = document.createElement('style');
       styleEl.type = 'text/css';
       styleEl.media = 'print';
       styleEl.innerText = 'body { display: none;}';
@@ -1126,7 +1126,7 @@ export const actions = {
     }
     if (data.hasOwnProperty('livepoll_server') && store.livepollServer === '') {
       // inject socket script.
-      let scriptEl = document.createElement('script');
+      const scriptEl = document.createElement('script');
       scriptEl.src = 'https://' + data.livepoll_server + ':3000/socket.io/socket.io.js';
       document.head.appendChild(scriptEl);
       // save for later

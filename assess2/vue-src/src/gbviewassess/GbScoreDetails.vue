@@ -136,8 +136,8 @@ export default {
       if (!this.qdata.answeights || this.qdata.singlescore) { // if answeights not generated yet
         return [1];
       } else {
-        let answeights = this.qdata.answeights.map(x => parseFloat(x));
-        let answeightTot = answeights.reduce((a, c) => a + c);
+        const answeights = this.qdata.answeights.map(x => parseFloat(x));
+        const answeightTot = answeights.reduce((a, c) => a + c);
         return answeights.map(x => x / answeightTot);
       }
     },
@@ -180,7 +180,7 @@ export default {
       }
     },
     timeSpent () {
-      let out = Math.round(10 * this.qdata.timeactive.total / 60) / 10 + ' ' + this.$t('gradebook.minutes');
+      const out = Math.round(10 * this.qdata.timeactive.total / 60) / 10 + ' ' + this.$t('gradebook.minutes');
       // TODO: Add per-try average?
       return out;
     },
@@ -215,9 +215,9 @@ export default {
     },
     questionErrorUrl () {
       if (store.assessInfo.qerror_cid) {
-        let quoteq = '0-' + this.qdata.qsetid + '-' + this.qdata.seed +
+        const quoteq = '0-' + this.qdata.qsetid + '-' + this.qdata.seed +
           '-reperr-' + store.assessInfo.ver;
-        let qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
+        const qs = 'add=new&cid=' + store.assessInfo.qerror_cid +
           '&quoteq=' + quoteq + '&to=' + this.qdata.qowner +
           '&title=Problem%20with%20question%20id%20' +
           this.qdata.qsetid;
@@ -228,9 +228,9 @@ export default {
     },
     useInMsg () {
       // TODO
-      let quoteq = this.qn + '-' + this.qdata.qsetid + '-' + this.qdata.seed +
+      const quoteq = this.qn + '-' + this.qdata.qsetid + '-' + this.qdata.seed +
         '-' + store.aid + '-' + store.assessInfo.ver;
-      let qs = 'add=new&cid=' + store.cid +
+      const qs = 'add=new&cid=' + store.cid +
         '&quoteq=' + quoteq + '&to=' + store.uid;
       return store.APIbase + '../msgs/msglist.php?' + qs;
       // TODO: get GB to work for this.
@@ -238,7 +238,7 @@ export default {
       //  store.APIbase + '../msgs/msglist.php?'+qs, 800, 'auto');
     },
     moreOptions () {
-      let out = [
+      const out = [
         {
           label: this.$t('gradebook.use_in_msg'),
           link: this.useInMsg
@@ -275,8 +275,8 @@ export default {
     },
     qHelps () {
       if (this.qdata.jsparams) {
-        let helps = this.qdata.jsparams.helps;
-        for (let i in helps) {
+        const helps = this.qdata.jsparams.helps;
+        for (const i in helps) {
           if (helps[i].label === 'video') {
             helps[i].icon = 'video';
             helps[i].title = this.$t('helps.video');
@@ -299,7 +299,7 @@ export default {
   },
   methods: {
     updateScore (pn, evt) {
-      let partposs = this.qdata.points_possible * this.answeights[pn];
+      const partposs = this.qdata.points_possible * this.answeights[pn];
       actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
     },
     revealFeedback () {
@@ -326,7 +326,7 @@ export default {
     },
     showRubric (pn) {
       if (!window.imasrubrics) {
-        window.imasrubrics = store.assessInfo['rubrics'];
+        window.imasrubrics = store.assessInfo.rubrics;
       }
       this.showfeedback = true;
       window.imasrubric_show(

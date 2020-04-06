@@ -89,7 +89,7 @@ export default {
       if (!this.showScores) {
         return false;
       }
-      for (let i in this.ainfo.questions) {
+      for (const i in this.ainfo.questions) {
         if (this.ainfo.questions[i].hasOwnProperty('category') &&
           this.ainfo.questions[i].category !== '' &&
           this.ainfo.questions[i].category !== null

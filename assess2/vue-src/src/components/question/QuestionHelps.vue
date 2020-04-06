@@ -47,8 +47,8 @@ export default {
     },
     qHelps () {
       if (store.assessInfo.questions[this.qn].jsparams) {
-        let helps = store.assessInfo.questions[this.qn].jsparams.helps;
-        for (let i in helps) {
+        const helps = store.assessInfo.questions[this.qn].jsparams.helps;
+        for (const i in helps) {
           if (helps[i].label === 'video') {
             helps[i].icon = 'video';
             helps[i].title = this.$t('helps.video');
@@ -69,9 +69,9 @@ export default {
       }
     },
     quoteQ () {
-      let qsid = store.assessInfo.questions[this.qn].questionsetid;
-      let seed = store.assessInfo.questions[this.qn].seed;
-      let ver = 2; // TODO: send from backend
+      const qsid = store.assessInfo.questions[this.qn].questionsetid;
+      const seed = store.assessInfo.questions[this.qn].seed;
+      const ver = 2; // TODO: send from backend
       return this.qn + '-' + qsid + '-' + seed + '-' + store.aid + '-' + ver;
     },
     messageHref () {
@@ -99,10 +99,10 @@ export default {
     loadHelp (help) {
       // record click if ref is provided
       if (help.ref) {
-        let refpts = help.ref.split(/-/);
-        let prefix = 'Q' + refpts[1] + ': ';
+        const refpts = help.ref.split(/-/);
+        const prefix = 'Q' + refpts[1] + ': ';
         if (help.url.match(/watchvid\.php/)) {
-          let cp = help.url.split(/url=/);
+          const cp = help.url.split(/url=/);
           window.recclick('extref', help.ref, prefix + decodeURIComponent(cp[1]));
         } else {
           window.recclick('extref', help.ref, prefix + help.url);

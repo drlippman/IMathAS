@@ -144,7 +144,7 @@ export default {
     curScorePoints () {
       let pointsPossible = 0;
       let pointsEarned = 0;
-      for (let i in this.ainfo.questions) {
+      for (const i in this.ainfo.questions) {
         pointsPossible += this.ainfo.questions[i].points_possible * 1;
         if (this.ainfo.show_scores_during) {
           if (this.ainfo.questions[i].hasOwnProperty('gbscore')) {
@@ -170,7 +170,7 @@ export default {
       return qAttempted;
     },
     curAnswered () {
-      let nQuestions = this.ainfo.questions.length;
+      const nQuestions = this.ainfo.questions.length;
       return this.$t('header.answered', { n: this.qAttempted, tot: nQuestions });
     },
     saveInHeader () {

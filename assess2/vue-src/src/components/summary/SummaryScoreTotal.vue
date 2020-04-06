@@ -43,7 +43,7 @@ export default {
         return this.ainfo.score;
       } else {
         let score = 0;
-        for (let i in this.ainfo.questions) {
+        for (const i in this.ainfo.questions) {
           score += this.ainfo.questions[i].score;
         }
         return score;
@@ -53,7 +53,7 @@ export default {
       if (this.ainfo.submitby === 'by_question') {
         return 0;
       }
-      let curAttempt = this.ainfo.prev_attempts.length;
+      const curAttempt = this.ainfo.prev_attempts.length;
       if (curAttempt > this.ainfo.retake_penalty.n) {
         return this.ainfo.retake_penalty.penalty * (curAttempt - this.ainfo.retake_penalty.n);
       }
@@ -64,8 +64,8 @@ export default {
         return 0;
       }
       let hasLate = 0;
-      for (let i in this.ainfo.questions) {
-        let parts = this.ainfo.questions[i].parts;
+      for (const i in this.ainfo.questions) {
+        const parts = this.ainfo.questions[i].parts;
         for (let pn = 0; pn < parts.length; pn++) {
           if (parts[pn].hasOwnProperty('penalties') && parts[pn].penalties.hasOwnProperty('late')) {
             hasLate += parts[pn].penalties.late;

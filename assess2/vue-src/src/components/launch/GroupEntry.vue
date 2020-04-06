@@ -90,7 +90,7 @@ export default {
     },
     availableUsers () {
       var out = [];
-      for (let userid in store.assessInfo.group_avail) {
+      for (const userid in store.assessInfo.group_avail) {
         if (this.newGroupMembers.indexOf(userid) === -1) {
           out.push({
             id: userid,

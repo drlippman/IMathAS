@@ -18,9 +18,9 @@ export default {
   },
   computed: {
     penalties () {
-      let byQuestion = (this.submitby === 'by_question');
-      let penalties = this.part.penalties;
-      for (let i in penalties) {
+      const byQuestion = (this.submitby === 'by_question');
+      const penalties = this.part.penalties;
+      for (const i in penalties) {
         if (penalties[i].type === 'regen' && byQuestion) {
           penalties[i].type = 'trysimilar';
         }
