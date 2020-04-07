@@ -960,6 +960,7 @@ function initlinkmarkup(base) {
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
+	setupToggler(base);
 	$(base).fitVids();
 }
 
@@ -1021,6 +1022,48 @@ function _(txt) {
 
 function randID() {
 	return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function setupToggler(base) {
+	$(base).find("*[data-toggler]:not(.togglerinit)").each(function() {
+		var id = $(this).attr("id") || randID();
+		if ($(this).prop('tagName') === 'IFRAME') {
+			$(this).css("display", "block");
+		}
+		var doslide = ($(this).css("display") == 'block');
+		var showtext = $(this).attr("data-toggler");
+		var hidetext = $(this).attr("data-toggler-hide") || showtext;
+		var button = $("<button>", {
+			id: "togbtn" + id,
+			type: "button",
+			text: showtext,
+			"aria-controls": id
+		});
+		$(this).hide().attr("id",id).addClass("togglerinit").before(button);
+		button.attr("aria-expanded", false)
+		.attr("tabindex", 0)
+		.css("cursor", "pointer")
+		.on("click keydown", function(e) {
+			if (e.type=="click" || e.which==13) {
+				var targ = $("#"+$(this).attr("aria-controls"));
+				if ($(this).attr("aria-expanded") == "true") {
+					$(this).attr("aria-expanded", false).text(showtext);
+					if (doslide) {
+						targ.slideUp(300);
+					} else {
+						targ.hide();
+					}
+				} else {
+					$(this).attr("aria-expanded", true).text(hidetext);
+					if (doslide) {
+						targ.slideDown(300);
+					} else {
+						targ.show();
+					}
+				}
+			}
+		});
+	});
 }
 
 //generic grouping block toggle
