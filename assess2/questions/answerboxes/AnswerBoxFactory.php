@@ -126,7 +126,8 @@ class AnswerBoxFactory
                 // This will be caught by our custom exception handler to be
                 // displayed directly to question writers, who are not
                 // necessarily developers nor technical users.
-                throw new OutOfBoundsException("Unknown answer type. (anstype)"
+                throw new OutOfBoundsException('Unknown answer type (anstype) "'
+                    . $answerType . '".'
                     . " See question writing help for a list of valid types.");
         }
     }

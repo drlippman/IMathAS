@@ -329,7 +329,15 @@ class QuestionHtmlGenerator
                     ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
                     ->setColorboxKeyword($questionColor);
 
-                $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                try {
+                  $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                } catch (\Throwable $t) {
+                  $this->addError(
+                       _('Caught error while generating this question: ')
+                       . $t->getMessage());
+                  continue;
+                }
+
                 $answerBoxGenerator->generate();
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();

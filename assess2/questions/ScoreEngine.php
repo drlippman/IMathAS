@@ -505,7 +505,13 @@ class ScoreEngine
             // TODO: Do this a different/better way. (not accessing _POST)
 			      $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
 
-            $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+            try {
+              $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+            } catch (\Throwable $t) {
+              $this->addError(
+                  _('Caught error while evaluating the code in this question: ')
+                  . $t->getMessage());
+            }
             $scorePartResult = $scorePart->getResult();
             $raw[$partnum] = $scorePartResult->getRawScore();
 
