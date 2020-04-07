@@ -565,6 +565,10 @@ class DrawingAnswerBox implements AnswerBox
     							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
     						}
     					} else { //is function
+                			if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^(]|ln[^\(]|root[^\(]|root\(.*?\)[^\(])/', $function[0])) {
+    							echo "Invalid notation on ".Sanitize::encodeStringForDisplay($function[0]).": missing function parens";
+    							continue;
+    						}
     						$saarr[$k] = $function[0].',blue';
     						if (count($function)>2) {
     							if ($function[1] == '-oo') { $function[1] = $settings[0]-.1*($settings[1]-$settings[0]);}

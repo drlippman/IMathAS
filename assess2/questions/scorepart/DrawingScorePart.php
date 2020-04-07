@@ -396,7 +396,8 @@ class DrawingScorePart implements ScorePart
                         ($lnloc = strpos($function[0],'ln'))!==false) { //is log
 
                         $nestd = 0; $vertasy = 0;
-                        $startloc = ($logloc!==false)?($logloc+3):($lnloc+2);
+                        $startloc = strpos($function[0],'(',$logloc!==false?$loglog:$lnloc);
+
                         for ($i = $startloc; $i<strlen($function[0]); $i++) {
                             if ($function[0][$i]=='(') {
                                 $nestd++;

@@ -3346,6 +3346,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
 						}
 					} else { //is function
+						if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^(]|ln[^\(]|root[^\(]|root\(.*?\)[^\(])/', $function[0])) {
+							echo "Invalid notation on ".Sanitize::encodeStringForDisplay($function[0]).": missing function parens";
+							continue;
+						}
 						$saarr[$k] = $function[0].',blue';
 						if (count($function)>2) {
 							if ($function[1] == '-oo') { $function[1] = $settings[0]-.1*($settings[1]-$settings[0]);}
@@ -5811,7 +5815,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						($lnloc = strpos($function[0],'ln'))!==false) { //is log
 
 						$nestd = 0; $vertasy = 0;
-						$startloc = ($logloc!==false)?($logloc+3):($lnloc+2);
+						$startloc = strpos($function[0],'(',$logloc!==false?$loglog:$lnloc);
 						for ($i = $startloc; $i<strlen($function[0]); $i++) {
 							if ($function[0][$i]=='(') {
 								$nestd++;
