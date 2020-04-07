@@ -9,8 +9,8 @@
 //output submitted via AHAH is new assessment itemorder in form:
 // item,item,n|w/wo~item~item,item
 
-$(document).ready(function() {
-  $(window).on("beforeunload", function() {
+$(document).ready(function () {
+  $(window).on("beforeunload", function () {
     if (anyEditorIsDirty()) {
       //This message might not ever be displayed
       return "There are unsaved changes in a question intro text box.  Press Leave Page to discard those changes and continue with the most recent action.  Press Stay on Page to return to the page without taking any action.";
@@ -19,11 +19,11 @@ $(document).ready(function() {
 
   //attach handler to Edit/Collapse buttons and all that are created in
   // future calls to generateTable()
-  $(document).on("click", ".text-segment-button", function(e) {
+  $(document).on("click", ".text-segment-button", function (e) {
     handleClickTextSegmentButton(e);
   });
-  $(window).on("scroll", function() {
-    $(".text-segment-button").each(function(index, element) {
+  $(window).on("scroll", function () {
+    $(".text-segment-button").each(function (index, element) {
       followButtonLocation("#" + element.id);
     });
   });
@@ -32,115 +32,113 @@ $(document).ready(function() {
 //find position for collapse button in the middle of the visible editor
 // selector is the selector for the button
 function followButtonLocation(selector) {
-	var i = getIndexForSelector(selector);
-	var type = getTypeForSelector(selector);
-	//text segment which corresponds to this button
-	var text_segment_id = "#textseg"+type+i;
+  var i = getIndexForSelector(selector);
+  var type = getTypeForSelector(selector);
+  //text segment which corresponds to this button
+  var text_segment_id = "#textseg" + type + i;
 
-	if ($(text_segment_id).hasClass("collapsingsemaphore")) {
-		//don't start any animations that could complete after the
-		// current collapsing animation completes (race condition)
-		return;
-	}
+  if ($(text_segment_id).hasClass("collapsingsemaphore")) {
+    //don't start any animations that could complete after the
+    // current collapsing animation completes (race condition)
+    return;
+  }
 
-	//if the editor is collapsed or is a global button, don't do anything
+  //if the editor is collapsed or is a global button, don't do anything
   if (
     i === undefined ||
     type === "global" ||
     $(text_segment_id).hasClass("collapsed") ||
     $(text_segment_id).hasClass("collapsedheader")
   ) {
-		return;
-	}
-	var button_div = $(selector).parent();
-	var $window = $(window);
-	var container = button_div.parent();
+    return;
+  }
+  var button_div = $(selector).parent();
+  var $window = $(window);
+  var container = button_div.parent();
   var hasfocus = container.children(".mce-edit-focus").length > 0;
-	var container_height = container.height();
-	//If the editor uses a significant portion of the page, have
-	// the collapse button stay in view
-	//if (container_height >= 0.3 * $window.height() ) {
-		var offset = button_div.position();
-		var sidebar_height = button_div.height();
-		var foffset = container.offset();
-		var	padding = 5;
-		// find the middle of the visible portion of the editor
-		//var top_limit = Math.max($window.scrollTop(),foffset.top);
-		//var bottom_limit = Math.min($window.scrollTop() + $window.height(),
-		//					foffset.top + container_height) - sidebar_height;
-		//position the button_div by its top rather than bottom
-		var initial_top = button_div.css("top");
-		button_div.css("top",initial_top);
-		button_div.css("bottom","auto");
-		button_div.stop().animate({
+  var container_height = container.height();
+  //If the editor uses a significant portion of the page, have
+  // the collapse button stay in view
+  //if (container_height >= 0.3 * $window.height() ) {
+  var offset = button_div.position();
+  var sidebar_height = button_div.height();
+  var foffset = container.offset();
+  var padding = 5;
+  // find the middle of the visible portion of the editor
+  //var top_limit = Math.max($window.scrollTop(),foffset.top);
+  //var bottom_limit = Math.min($window.scrollTop() + $window.height(),
+  //					foffset.top + container_height) - sidebar_height;
+  //position the button_div by its top rather than bottom
+  var initial_top = button_div.css("top");
+  button_div.css("top", initial_top);
+  button_div.css("bottom", "auto");
+  button_div.stop().animate({
     top: Math.max(
       padding,
-					//Math.min((bottom_limit + top_limit)/2 - foffset.top,
-					//		container_height-sidebar_height - padding) )
+      //Math.min((bottom_limit + top_limit)/2 - foffset.top,
+      //		container_height-sidebar_height - padding) )
       Math.min(
         $window.scrollTop() + (hasfocus ? 60 : 0) + padding - foffset.top,
         container_height - sidebar_height - padding
       )
-    )
-		});
-	//}
+    ),
+  });
+  //}
 }
 
 //When the Edit/collapse button is clicked, call the appropriate function
 // with the appropriate selector.
 function handleClickTextSegmentButton(e) {
-	var i = getIndexForSelector("#"+e.currentTarget.id);
-	var type = getTypeForSelector("#"+e.currentTarget.id);
+  var i = getIndexForSelector("#" + e.currentTarget.id);
+  var type = getTypeForSelector("#" + e.currentTarget.id);
 
-	if (type === "global") {
-		var selector = ".textsegment";
-	} else {
-		var selector = "#textseg"+type+i;
-	}
+  if (type === "global") {
+    var selector = ".textsegment";
+  } else {
+    var selector = "#textseg" + type + i;
+  }
 
-	//toggle expand/collapse based on title of button
+  //toggle expand/collapse based on title of button
   if (
     $("#" + e.currentTarget.id)
       .attr("title")
       .match("Collapse")
   ) {
-		collapseAndStyleTextSegment(selector);
-	} else {
-		expandAndStyleTextSegment(selector) ;
-	}
+    collapseAndStyleTextSegment(selector);
+  } else {
+    expandAndStyleTextSegment(selector);
+  }
 }
 
 function refreshTable() {
-	tinymce.remove();
-	document.getElementById("curqtbl").innerHTML = generateTable();
-	updateqgrpcookie();
-	initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
-	tinymce.init({
-		selector: "h4.textsegment",
-		inline: true,
-		menubar: false,
-		statusbar: false,
-		branding: false,
-		plugins: ["charmap"],
-		toolbar: "charmap saveclose",
-		setup: editorSetup
-	});
-	activateLastEditorIfBlank();
-	$(".dropdown-toggle").dropdown();
+  tinymce.remove();
+  document.getElementById("curqtbl").innerHTML = generateTable();
+  updateqgrpcookie();
+  initeditor("selector", "div.textsegment", null, true /*inline*/, editorSetup);
+  tinymce.init({
+    selector: "h4.textsegment",
+    inline: true,
+    menubar: false,
+    statusbar: false,
+    branding: false,
+    plugins: ["charmap"],
+    toolbar: "charmap saveclose",
+    setup: editorSetup,
+  });
+  activateLastEditorIfBlank();
+  $(".dropdown-toggle").dropdown();
   $("#curqtbl input")
     .off("keydown.doblur")
-    .on("keydown.doblur", function(e) {
-			if (e.which==13) {
-				e.preventDefault();
-				$(this).blur();
-			}
-	});
-  $("[id^=pts],[id^=grppts],#defpts")
-    .off("blur.pts")
-    .on("blur.pts", updatePts);
-	if (usingASCIIMath) {
-		rendermathnode(document.getElementById("curqtbl"));
-	}
+    .on("keydown.doblur", function (e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        $(this).blur();
+      }
+    });
+  $("[id^=pts],[id^=grppts],#defpts").off("blur.pts").on("blur.pts", updatePts);
+  if (usingASCIIMath) {
+    rendermathnode(document.getElementById("curqtbl"));
+  }
 }
 
 //Show the editor toolbar on a newly created text segment
@@ -155,152 +153,152 @@ function activateLastEditorIfBlank() {
 
 //this is called by tinycme during initialization
 function editorSetup(editor) {
-	var i=this.id.match(/[0-9]+$/)[0];
+  var i = this.id.match(/[0-9]+$/)[0];
   editor.addButton("saveclose", {
-		text: "Save All",
-		title: "Save All",
+    text: "Save All",
+    title: "Save All",
     icon: "save",
-		//icon: "shrink2 mce-i-addquestions-ico",
-		classes: "dim saveclose saveclose"+i, // "mce-dim" and "mce-saveclose0"
-		//disabled: true,
-		onclick: function () {
-			highlightSaveButton(false);
-			savetextseg(); //Save all text segments
-		},
-		onPostRender: function() {
-			updateSaveButtonDimming();
-		}
-    });
-	editor.on("dirty", function() {
-		updateSaveButtonDimming();
-	});
-	editor.on("focus", function() {
-		var i=this.id.match(/[0-9]+$/)[0];
-		var type = getTypeForSelector("#"+this.id);
-		var max_height = $("#"+this.id).css("max-height");
-		//if the editor is collapsed, expand it
+    //icon: "shrink2 mce-i-addquestions-ico",
+    classes: "dim saveclose saveclose" + i, // "mce-dim" and "mce-saveclose0"
+    //disabled: true,
+    onclick: function () {
+      highlightSaveButton(false);
+      savetextseg(); //Save all text segments
+    },
+    onPostRender: function () {
+      updateSaveButtonDimming();
+    },
+  });
+  editor.on("dirty", function () {
+    updateSaveButtonDimming();
+  });
+  editor.on("focus", function () {
+    var i = this.id.match(/[0-9]+$/)[0];
+    var type = getTypeForSelector("#" + this.id);
+    var max_height = $("#" + this.id).css("max-height");
+    //if the editor is collapsed, expand it
     if (
       max_height !== undefined &&
       max_height !== "none" &&
       max_height !== ""
     ) {
-			expandAndStyleTextSegment("#textseg"+type+i) ;
-		}
-	});
-	$(".textsegment").on("mouseleave focusout", function(e) {
-		highlightSaveButton(true);
-	});
-	$(".textsegment").on("mouseenter click", function(e) {
-		//if rentering the active editor, un-highlight
+      expandAndStyleTextSegment("#textseg" + type + i);
+    }
+  });
+  $(".textsegment").on("mouseleave focusout", function (e) {
+    highlightSaveButton(true);
+  });
+  $(".textsegment").on("mouseenter click", function (e) {
+    //if rentering the active editor, un-highlight
     if (
       tinymce.activeEditor &&
       tinymce.activeEditor.id === e.currentTarget.id
     ) {
-			highlightSaveButton(false);
-		}
-	});
+      highlightSaveButton(false);
+    }
+  });
 }
 
 //Highlight all Save All buttons when the mouse leaves an editor
 function highlightSaveButton(leaving) {
-	if (anyEditorIsDirty()) {
-		var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
-		if (leaving) {
+  if (anyEditorIsDirty()) {
+    var i = tinymce.activeEditor.id.match(/[0-9]+$/)[0];
+    if (leaving) {
       $("div.mce-saveclose" + i)
         .css("transition", "background-color 0s")
-								.addClass("highlightbackground");
-		} else {
+        .addClass("highlightbackground");
+    } else {
       $("div.mce-saveclose" + i)
         .css("transition", "background-color 1s ease-out")
-								.removeClass("highlightbackground");
-		}
-	}
+        .removeClass("highlightbackground");
+    }
+  }
 }
 
 //If any editor is dirty, undim the Save All button and
 // highlight that editor
 function updateSaveButtonDimming(dim) {
-	var save_buttons = $("div.mce-saveclose");
-	if (tinyMCE.activeEditor && tinyMCE.activeEditor.isDirty()) {
-		$("div.mce-saveclose").removeClass("mce-dim");
-		//update tinymce data structure in case other editors haven't
-		// been activated
-		for (index in tinymce.editors) {
-			var editor = tinymce.editors[index];
+  var save_buttons = $("div.mce-saveclose");
+  if (tinyMCE.activeEditor && tinyMCE.activeEditor.isDirty()) {
+    $("div.mce-saveclose").removeClass("mce-dim");
+    //update tinymce data structure in case other editors haven't
+    // been activated
+    for (index in tinymce.editors) {
+      var editor = tinymce.editors[index];
       editor.buttons["saveclose"].classes = editor.buttons[
         "saveclose"
       ].classes.replace(/dim ?/g, "");
-			//could switch save to collapse icon
-			var editor_id=tinymce.activeEditor.id;
+      //could switch save to collapse icon
+      var editor_id = tinymce.activeEditor.id;
       $("#" + editor_id)
         .css("transition", "border 0s")
-								.removeClass("intro")
+        .removeClass("intro")
         .parent()
         .addClass("highlightborder");
-		}
-		var i = getIndexForSelector("#"+tinymce.activeEditor.id);
-		var type = getTypeForSelector("#"+tinymce.activeEditor.id);
-		$("#edit-button"+type+i).fadeOut();
-		//$("#edit-buttonglobal").fadeOut();
-		$("#collapse-buttonglobal").fadeOut();
-	}
-	//TODO if tinyMCE's undo is correctly reflected in isDirty(), we could
-	// re-dim the Save All button after checking all editors
+    }
+    var i = getIndexForSelector("#" + tinymce.activeEditor.id);
+    var type = getTypeForSelector("#" + tinymce.activeEditor.id);
+    $("#edit-button" + type + i).fadeOut();
+    //$("#edit-buttonglobal").fadeOut();
+    $("#collapse-buttonglobal").fadeOut();
+  }
+  //TODO if tinyMCE's undo is correctly reflected in isDirty(), we could
+  // re-dim the Save All button after checking all editors
 }
 
 function expandAndStyleTextSegment(selector) {
-	var i = getIndexForSelector(selector);
-	var type = getTypeForSelector(selector);
+  var i = getIndexForSelector(selector);
+  var type = getTypeForSelector(selector);
 
-	$(selector).each(function(index,element) {
-		expandTextSegment("#"+element.id);
-	});
-	//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
+  $(selector).each(function (index, element) {
+    expandTextSegment("#" + element.id);
+  });
+  //$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
 
-	//change the exit/collapse button for the corresponding editor
-	if (i === undefined || type === "global") {
-		//expand all
-		//$("#edit-buttonglobal").attr("title","Collapse All");
-		//$("#edit-button-spanglobal").removeClass("icon-pencil")
-		//							.addClass("icon-shrink2");
+  //change the exit/collapse button for the corresponding editor
+  if (i === undefined || type === "global") {
+    //expand all
+    //$("#edit-buttonglobal").attr("title","Collapse All");
+    //$("#edit-button-spanglobal").removeClass("icon-pencil")
+    //							.addClass("icon-shrink2");
     $("span.text-segment-icon")
       .removeClass("icon-pencil")
-									.addClass("icon-shrink2");
+      .addClass("icon-shrink2");
     $(".text-segment-button:not(.text-segment-button-global)").attr(
       "title",
       "Collapse"
     );
-	} else {
-		var editor = getEditorForSelector(selector);
-		if (editor !== undefined && editor.isDirty()) {
-			$("#edit-button"+type+i).fadeOut();
-		}
-		$("#edit-button"+type+i).attr("title","Collapse");
+  } else {
+    var editor = getEditorForSelector(selector);
+    if (editor !== undefined && editor.isDirty()) {
+      $("#edit-button" + type + i).fadeOut();
+    }
+    $("#edit-button" + type + i).attr("title", "Collapse");
     $("#edit-button-span" + type + i)
       .removeClass("icon-pencil")
-									.addClass("icon-shrink2");
-	}
+      .addClass("icon-shrink2");
+  }
 }
 
 function collapseAndStyleTextSegment(selector) {
-	var i = getIndexForSelector(selector);
-	var type = getTypeForSelector(selector);
+  var i = getIndexForSelector(selector);
+  var type = getTypeForSelector(selector);
 
-	if (i !== undefined) {
-		//Deactivate the editor
-		tinymce.editors["textseg"+type+i].fire("focusout");
-	}
+  if (i !== undefined) {
+    //Deactivate the editor
+    tinymce.editors["textseg" + type + i].fire("focusout");
+  }
 
-	collapseTextSegment(selector);
-	//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
+  collapseTextSegment(selector);
+  //$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
 
-	//toggle the button
-	if (i === undefined || type === "global") {
-		//collapse all
-		//$(".text-segment-button").attr("title","Expand and Edit");
-		//$("#edit-buttonglobal").attr("title","Expand All");
-		//this is sudden but better than letting the button
-		// float out of the editor (poss: use jQueryUI .removeClass(...,200) )
+  //toggle the button
+  if (i === undefined || type === "global") {
+    //collapse all
+    //$(".text-segment-button").attr("title","Expand and Edit");
+    //$("#edit-buttonglobal").attr("title","Expand All");
+    //this is sudden but better than letting the button
+    // float out of the editor (poss: use jQueryUI .removeClass(...,200) )
     $(".text-segment-button:not(.text-segment-button-global)")
       .parent()
       .css({ top: "", bottom: "" });
@@ -311,112 +309,114 @@ function collapseAndStyleTextSegment(selector) {
 
     $("span.text-segment-icon")
       .removeClass("icon-shrink2")
-									.removeClass("icon-enlarge2")
-									.addClass("icon-pencil");
-		//$("#edit-button-spanglobal").removeClass("icon-shrink2")
-		//							.removeClass("icon-pencil")
-		//							.addClass("icon-enlarge2");
-	} else {
-		$("#edit-button"+type+i).attr("title","Expand and Edit");
+      .removeClass("icon-enlarge2")
+      .addClass("icon-pencil");
+    //$("#edit-button-spanglobal").removeClass("icon-shrink2")
+    //							.removeClass("icon-pencil")
+    //							.addClass("icon-enlarge2");
+  } else {
+    $("#edit-button" + type + i).attr("title", "Expand and Edit");
     $("#edit-button" + type + i)
       .parent()
       .css({ top: "", bottom: "" });
     $("#edit-button-span" + type + i)
       .removeClass("icon-shrink2")
-			.addClass("icon-pencil");
-	}
+      .addClass("icon-pencil");
+  }
 }
 
 //adjust the height/width smoothly (could replace with jquery-ui)
 function expandTextSegment(selector) {
-	var type = getTypeForSelector(selector);
-	//copy max-height/max-width to height/width temporarily
-	var max_height = $(selector).css("max-height");
-	var max_width = parseInt($(selector).css("max-width"));
+  var type = getTypeForSelector(selector);
+  //copy max-height/max-width to height/width temporarily
+  var max_height = $(selector).css("max-height");
+  var max_width = parseInt($(selector).css("max-width"));
 
-	//temporarily override the max-height/max-width from class style
-	//Note: broswer doesn't reflow yet-- happens during .animate()
-	$(selector).css("max-height","none");
-	$(selector).css("max-width","none");
+  //temporarily override the max-height/max-width from class style
+  //Note: broswer doesn't reflow yet-- happens during .animate()
+  $(selector).css("max-height", "none");
+  $(selector).css("max-width", "none");
 
-	//remove wrapping for correct height measurement
-	$(selector).css("white-space","normal");
+  //remove wrapping for correct height measurement
+  $(selector).css("white-space", "normal");
 
-	//Get the unconstrained height/width of the div
-	var natural_height = parseInt($(selector).css("height"));
-	var natural_width = parseInt($(selector).css("width"));
-	$(selector).css("height",max_height);
-	$(selector).css("width",max_width);
+  //Get the unconstrained height/width of the div
+  var natural_height = parseInt($(selector).css("height"));
+  var natural_width = parseInt($(selector).css("width"));
+  $(selector).css("height", max_height);
+  $(selector).css("width", max_width);
 
-	//TODO while expanding, also gradually move collapse button to
-	// middle height and avoid race condition
+  //TODO while expanding, also gradually move collapse button to
+  // middle height and avoid race condition
 
-	//smoothly set the height to the natural height
+  //smoothly set the height to the natural height
   $(selector)
     .stop(true)
-    .animate({ height: natural_height, width: natural_width }, 200, function() {
-		// when complete...
-		var i = getIndexForSelector(selector);
-		var type = getTypeForSelector(selector);
+    .animate(
+      { height: natural_height, width: natural_width },
+      200,
+      function () {
+        // when complete...
+        var i = getIndexForSelector(selector);
+        var type = getTypeForSelector(selector);
 
-		//when animation completes...
-		// remove temporary width/max-width and other styles
-		$(selector).css("height","");
-		$(selector).css("width","");
-		$(selector).css("max-width","");
-		$(selector).css("max-height","");
+        //when animation completes...
+        // remove temporary width/max-width and other styles
+        $(selector).css("height", "");
+        $(selector).css("width", "");
+        $(selector).css("max-width", "");
+        $(selector).css("max-height", "");
 
-		$(selector).removeClass("collapsed"+type);
-		$(selector).css("white-space","");
+        $(selector).removeClass("collapsed" + type);
+        $(selector).css("white-space", "");
 
-		//ensure the collapse button is visible
-		followButtonLocation("#edit-button"+type+i);
+        //ensure the collapse button is visible
+        followButtonLocation("#edit-button" + type + i);
 
-		//If a single editor was expanded, activate the editor
-		//TODO remember whether this was a global expand
-		//     if available, also scroll to keep global button fixed
-		var i = getIndexForSelector(selector);
-		var type = getTypeForSelector(selector);
-		if (i !== undefined && type !== "global") {
-			$("#textseg"+type+i).focus();
-		}
-	});
+        //If a single editor was expanded, activate the editor
+        //TODO remember whether this was a global expand
+        //     if available, also scroll to keep global button fixed
+        var i = getIndexForSelector(selector);
+        var type = getTypeForSelector(selector);
+        if (i !== undefined && type !== "global") {
+          $("#textseg" + type + i).focus();
+        }
+      }
+    );
 }
 
 function collapseTextSegment(selector) {
-	var i = getIndexForSelector(selector);
-	var type = getTypeForSelector(selector);
-	var collapsed_height = "1.7em"; //must match .collapsed style
-	if (i === undefined || type === "global") {
-		var button = $("#edit-buttonglobal");
-	} else {
-		var button = $("#edit-button"+type+i);
-	}
-	var initialdistfromtop = button.offset().top - $(window).scrollTop();
-	$(selector).addClass("collapsingsemaphore");
+  var i = getIndexForSelector(selector);
+  var type = getTypeForSelector(selector);
+  var collapsed_height = "1.7em"; //must match .collapsed style
+  if (i === undefined || type === "global") {
+    var button = $("#edit-buttonglobal");
+  } else {
+    var button = $("#edit-button" + type + i);
+  }
+  var initialdistfromtop = button.offset().top - $(window).scrollTop();
+  $(selector).addClass("collapsingsemaphore");
 
-	//smoothly set the height to the collapsed height
+  //smoothly set the height to the collapsed height
   $(selector)
     .stop(true)
-    .animate({ height: collapsed_height }, 200, function() {
-		//when animation completes, set max-height
-		$(selector).css("max-height",collapsed_height);
-		$(selector).css("height","");
+    .animate({ height: collapsed_height }, 200, function () {
+      //when animation completes, set max-height
+      $(selector).css("max-height", collapsed_height);
+      $(selector).css("height", "");
       $(selector)
         .removeClass("collapsingsemaphore")
-					.addClass("collapsed"+type);
-		//could this be gradual?
-		$(window).scrollTop(button.offset().top - initialdistfromtop);
+        .addClass("collapsed" + type);
+      //could this be gradual?
+      $(window).scrollTop(button.offset().top - initialdistfromtop);
 
-		if (i === undefined || type === "global") {
-        $(".text-segment-button")
-          .parent()
-          .css({ top: "", bottom: "" });
-			$(".text-segment-button").each(function(index,element) {
-				followButtonLocation("#"+element.id);
-			});
-		}
-	});
+      if (i === undefined || type === "global") {
+        $(".text-segment-button").parent().css({ top: "", bottom: "" });
+        $(".text-segment-button").each(function (index, element) {
+          followButtonLocation("#" + element.id);
+        });
+      }
+    });
 }
 
 function getIndexForSelector(selector) {
@@ -467,36 +467,36 @@ function anyEditorIsDirty() {
 
 function generateMoveSelect2(num) {
   var thisistxt = itemarray[num][0] == "text";
-	num++; //adjust indexing
+  num++; //adjust indexing
   var sel = "<select id=" + num + ' onChange="moveitem2(' + num + ')">';
   var qcnt = 1;
   var tcnt = 1;
   var curistxt = false;
-	for (var i=1; i<=itemarray.length; i++) {
+  for (var i = 1; i <= itemarray.length; i++) {
     curistxt = itemarray[i - 1][0] == "text";
     sel += '<option value="' + i + '" ';
-		if (i==num) {
-			sel += "selected";
-		}
-		if (curistxt) {
-			sel += ">Text"+tcnt+"</option>";
-		} else if (itemarray[i-1].length<5 && itemarray[i-1][0]>1) {
-			sel += ">Q"+qcnt+"-"+(qcnt+itemarray[i-1][0]-1)+"</option>";
-		} else {
-			sel += ">Q"+qcnt+"</option>";
-		}
+    if (i == num) {
+      sel += "selected";
+    }
+    if (curistxt) {
+      sel += ">Text" + tcnt + "</option>";
+    } else if (itemarray[i - 1].length < 5 && itemarray[i - 1][0] > 1) {
+      sel += ">Q" + qcnt + "-" + (qcnt + itemarray[i - 1][0] - 1) + "</option>";
+    } else {
+      sel += ">Q" + qcnt + "</option>";
+    }
 
-		if (!curistxt) {
+    if (!curistxt) {
       if (itemarray[i - 1].length < 5) {
         //is group
-				qcnt += parseInt(itemarray[i-1][0]);//itemarray[i-1][2].length;
-			} else {
-				qcnt++;
-			}
-		} else {
-			tcnt++;
-		}
-		/*
+        qcnt += parseInt(itemarray[i - 1][0]); //itemarray[i-1][2].length;
+      } else {
+        qcnt++;
+      }
+    } else {
+      tcnt++;
+    }
+    /*
 		curistxt = (itemarray[i-1][0]=="text");
 		if (thisistxt) { //moveselect for text item
 			sel += "<option value=\""+i+"\" ";
@@ -538,18 +538,18 @@ function generateMoveSelect2(num) {
   return sel;
 }
 
-function generateMoveSelect(num,itemarray) {
-	num++; //adjust indexing
+function generateMoveSelect(num, itemarray) {
+  num++; //adjust indexing
   var sel = "<select id=" + num + ' onChange="moveitem2(' + num + ')">';
-	for (var i=1; i<=cnt; i++) {
+  for (var i = 1; i <= cnt; i++) {
     sel += '<option value="' + i + '" ';
-		if (i==num) {
-			sel += "selected";
-		}
-		sel += ">"+i+"</option>";
-	}
-	sel += "</select>";
-	return sel;
+    if (i == num) {
+      sel += "selected";
+    }
+    sel += ">" + i + "</option>";
+  }
+  sel += "</select>";
+  return sel;
 }
 
 function generateShowforSelect(num) {
@@ -558,42 +558,43 @@ function generateShowforSelect(num) {
   if (i > 0 && itemarray[i - 1][0] == "text") {
     //no select unless first in list
     return "";
-	}
-	while (i<itemarray.length && itemarray[i][0]=="text") {
-		i++;
-	}
-	while (i<itemarray.length && itemarray[i][0]!="text") {
+  }
+  while (i < itemarray.length && itemarray[i][0] == "text") {
+    i++;
+  }
+  while (i < itemarray.length && itemarray[i][0] != "text") {
     if (itemarray[i].length < 5) {
       //is group
-			n += itemarray[i][0]; //pick n from group
-		} else {
-			n++;
-		}
-		i++;
-	}
-	if (!(5 in itemarray[num])) {
-		itemarray[num][5] = 0;
-	}
-	if (n==0) {
+      n += itemarray[i][0]; //pick n from group
+    } else {
+      n++;
+    }
+    i++;
+  }
+  if (!(5 in itemarray[num])) {
+    itemarray[num][5] = 0;
+  }
+  if (n == 0) {
     return "";
-	} else {
+  } else {
     out =
-      _('Show for') + ' <select id="showforn' +
+      _("Show for") +
+      ' <select id="showforn' +
       num +
       '" onchange="updateTextShowN(' +
       num +
       "," +
       itemarray[num][2] +
       ')">';
-		for (j=1;j<=n;j++) {
-			out += '<option value="'+j+'"';
-			if (itemarray[num][2]==j) {
-				out += " selected";
-			}
+    for (j = 1; j <= n; j++) {
+      out += '<option value="' + j + '"';
+      if (itemarray[num][2] == j) {
+        out += " selected";
+      }
       out += ">" + j + "</option>";
-		}
+    }
     out += "</select>";
-		if (itemarray[num][2]>1) {
+    if (itemarray[num][2] > 1) {
       out +=
         '<br/><select id="showforntype' +
         num +
@@ -605,59 +606,59 @@ function generateShowforSelect(num) {
       out += "<option value=0";
       if (itemarray[num][5] == 0) {
         out += " selected";
-		}
-      out += ">"+("Closed after 1st")+"</option>";
+      }
+      out += ">" + "Closed after 1st" + "</option>";
       out += "<option value=1";
       if (itemarray[num][5] == 1) {
         out += " selected";
       }
-      out += ">"+_("Expanded for all")+"</option></select>";
+      out += ">" + _("Expanded for all") + "</option></select>";
     }
-		return out;
-	}
+    return out;
+  }
 }
 
 function moveitem2(from) {
-	if (!confirm_textseg_dirty()) {
-		//if aborted restore the original value and don't save
-		document.getElementById(from).value=from;
-	} else {
-		var todo = 0;//document.getElementById("group").value;
-		var to = document.getElementById(from).value;
-		var tomove = itemarray.splice(from-1,1);
+  if (!confirm_textseg_dirty()) {
+    //if aborted restore the original value and don't save
+    document.getElementById(from).value = from;
+  } else {
+    var todo = 0; //document.getElementById("group").value;
+    var to = document.getElementById(from).value;
+    var tomove = itemarray.splice(from - 1, 1);
     if (todo == 0) {
       //rearrange
-			itemarray.splice(to-1,0,tomove[0]);
+      itemarray.splice(to - 1, 0, tomove[0]);
     } else if (todo == 1) {
       //group
-			if (from<to) {
-				to--;
-			}
+      if (from < to) {
+        to--;
+      }
       if (itemarray[to - 1].length < 5) {
         //to is already group
         if (tomove[0].length < 5) {
           //if grouping a group
-					for (var j=0; j<tomove[0][2].length; j++) {
-						itemarray[to-1][2].push(tomove[0][2][j]);
-					}
-				} else {
-					itemarray[to-1][2].push(tomove[0]);
-				}
+          for (var j = 0; j < tomove[0][2].length; j++) {
+            itemarray[to - 1][2].push(tomove[0][2][j]);
+          }
+        } else {
+          itemarray[to - 1][2].push(tomove[0]);
+        }
       } else {
         //to is not group
-				var existing = itemarray[to-1];
+        var existing = itemarray[to - 1];
         if (tomove[0].length < 5) {
           //if grouping a group
-					tomove[0][2].push(existing);
-					itemarray[to-1] = tomove[0];
-				} else {
-					itemarray[to-1] = [1,0,[existing,tomove[0]],1];
-				}
-			}
-		}
-		submitChanges();
-	}
-		return false;
+          tomove[0][2].push(existing);
+          itemarray[to - 1] = tomove[0];
+        } else {
+          itemarray[to - 1] = [1, 0, [existing, tomove[0]], 1];
+        }
+      }
+    }
+    submitChanges();
+  }
+  return false;
 }
 
 function ungroupitem(from) {
@@ -674,83 +675,83 @@ function ungroupitem(from) {
 }
 function removeitem(loc) {
   if (loc.indexOf("-") > -1 || itemarray[loc][0] != "text") {
-		var msg = _("Are you sure you want to remove this question?");
-	} else {
-		var msg = _("Are you sure you want to remove this text segment?");
-	}
-	if (confirm(msg)) {
-		if (confirm_textseg_dirty()) {
-			doremoveitem(loc);
-			submitChanges();
-		}
-	}
-	return false;
+    var msg = _("Are you sure you want to remove this question?");
+  } else {
+    var msg = _("Are you sure you want to remove this text segment?");
+  }
+  if (confirm(msg)) {
+    if (confirm_textseg_dirty()) {
+      doremoveitem(loc);
+      submitChanges();
+    }
+  }
+  return false;
 }
 
 function removegrp(loc) {
   if (
     confirm(_("Are you sure you want to remove ALL questions in this group?"))
   ) {
-		if (confirm_textseg_dirty()) {
-			doremoveitem(loc);
-			submitChanges();
-		}
-	}
-	return false;
+    if (confirm_textseg_dirty()) {
+      doremoveitem(loc);
+      submitChanges();
+    }
+  }
+  return false;
 }
 
 function doremoveitem(loc) {
-	if (loc.indexOf("-")>-1) {
-		locparts = loc.split("-");
+  if (loc.indexOf("-") > -1) {
+    locparts = loc.split("-");
     if (itemarray[locparts[0]].length < 5) {
       //usual
-			itemarray[locparts[0]][2].splice(locparts[1],1);
-			if (itemarray[locparts[0]][2].length==1) {
-				itemarray[locparts[0]] = itemarray[locparts[0]][2][0];
-			}
+      itemarray[locparts[0]][2].splice(locparts[1], 1);
+      if (itemarray[locparts[0]][2].length == 1) {
+        itemarray[locparts[0]] = itemarray[locparts[0]][2][0];
+      }
     } else {
       //group already removed
-			itemarray.splice(locparts[0],1);
-		}
-	} else {
-		itemarray.splice(loc,1);
-	}
+      itemarray.splice(locparts[0], 1);
+    }
+  } else {
+    itemarray.splice(loc, 1);
+  }
 }
 
 function removeSelected() {
-	if (confirm(_("Are you sure you want to remove these questions?"))) {
-		if (confirm_textseg_dirty()) {
-			var form = document.getElementById("curqform");
-			var chgcnt = 0;
-			for (var e = form.elements.length-1; e >-1 ; e--) {
-				var el = form.elements[e];
+  if (confirm(_("Are you sure you want to remove these questions?"))) {
+    if (confirm_textseg_dirty()) {
+      var form = document.getElementById("curqform");
+      var chgcnt = 0;
+      for (var e = form.elements.length - 1; e > -1; e--) {
+        var el = form.elements[e];
         if (
           el.type == "checkbox" &&
           el.checked &&
           el.value != "ignore" &&
           el.id.match("qc")
         ) {
-					val = el.value.split(":");
-					doremoveitem(val[0]);
-					chgcnt++;
-				}
-			}
-			if (chgcnt>0) {
-				submitChanges();
-			}
-		}
-	}
+          val = el.value.split(":");
+          doremoveitem(val[0]);
+          chgcnt++;
+        }
+      }
+      if (chgcnt > 0) {
+        submitChanges();
+      }
+    }
+  }
 }
 
 function groupSelected() {
-	if (!confirm_textseg_dirty()) {
-		return; //user wants to abort this call
-	}
+  if (!confirm_textseg_dirty()) {
+    return; //user wants to abort this call
+  }
   var grplist = new Array();
-	var form = document.getElementById("curqform");
-	var grppoints = 0;
-	for (var e = form.elements.length-1; e >-1 ; e--) {
-		var el = form.elements[e];
+  var form = document.getElementById("curqform");
+  var grppoints = 0;
+  for (var e = form.elements.length - 1; e > -1; e--) {
+    var el = form.elements[e];
     if (
       el.type == "checkbox" &&
       el.checked &&
@@ -758,134 +759,134 @@ function groupSelected() {
       !el.value.match(":text") &&
       el.id.match("qc")
     ) {
-			val = el.value.split(":")[0];
+      val = el.value.split(":")[0];
       if (val.indexOf("-") > -1) {
         //is group
-				val = val.split("-")[0];
-				grppoints = itemarray[val][2][0][4]; //point values from first in group
-			} else {
-			}
-			isnew = true;
-			for (i=0;i<grplist.length;i++) {
-				if (grplist[i]==val) {
-					isnew = false;
-				}
-			}
-			if (isnew) {
-				grplist.push(val);
-			}
-		}
-	}
-	if (grplist.length<2) {
-		$("#curqtbl input[type=checkbox]").prop("checked",false);
-		return;
-	}
-	var to = grplist[grplist.length-1];
-	var existingcnt = 0;
+        val = val.split("-")[0];
+        grppoints = itemarray[val][2][0][4]; //point values from first in group
+      } else {
+      }
+      isnew = true;
+      for (i = 0; i < grplist.length; i++) {
+        if (grplist[i] == val) {
+          isnew = false;
+        }
+      }
+      if (isnew) {
+        grplist.push(val);
+      }
+    }
+  }
+  if (grplist.length < 2) {
+    $("#curqtbl input[type=checkbox]").prop("checked", false);
+    return;
+  }
+  var to = grplist[grplist.length - 1];
+  var existingcnt = 0;
   if (itemarray[to].length < 5) {
     //moving to existing group
-		existingcnt = itemarray[to][2].length;
-		if (grppoints == 0) {
-			grppoints = itemarray[to][2][0][4]; //point values from first in group
-		}
-	} else {
-		var existing = itemarray[to];
-		if (grppoints == 0) {
-			grppoints = existing[4]; //point values from this question
-		}
-		itemarray[to] = [1,0,[existing],1];
-		existingcnt = 1;
-	}
+    existingcnt = itemarray[to][2].length;
+    if (grppoints == 0) {
+      grppoints = itemarray[to][2][0][4]; //point values from first in group
+    }
+  } else {
+    var existing = itemarray[to];
+    if (grppoints == 0) {
+      grppoints = existing[4]; //point values from this question
+    }
+    itemarray[to] = [1, 0, [existing], 1];
+    existingcnt = 1;
+  }
   for (i = 0; i < grplist.length - 1; i++) {
     //going from last in current to first in current
-		tomove = itemarray.splice(grplist[i],1);
+    tomove = itemarray.splice(grplist[i], 1);
     if (tomove[0].length < 5) {
       //if grouping a group
-			for (var j=0; j<tomove[0][2].length; j++) {
-				//itemarray[to][2].push(tomove[0][2][j]);
-				itemarray[to][2].splice(existingcnt+j,0,tomove[0][2][j]);
-			}
-		} else {
-			//itemarray[to][2].push(tomove[0]);
-			itemarray[to][2].splice(existingcnt,0,tomove[0]);
-		}
-	}
-	for (i=0; i<itemarray[to][2].length; i++) {
-		itemarray[to][2][i][4] = grppoints;
-	}
-	submitChanges();
+      for (var j = 0; j < tomove[0][2].length; j++) {
+        //itemarray[to][2].push(tomove[0][2][j]);
+        itemarray[to][2].splice(existingcnt + j, 0, tomove[0][2][j]);
+      }
+    } else {
+      //itemarray[to][2].push(tomove[0]);
+      itemarray[to][2].splice(existingcnt, 0, tomove[0]);
+    }
+  }
+  for (i = 0; i < itemarray[to][2].length; i++) {
+    itemarray[to][2][i][4] = grppoints;
+  }
+  submitChanges();
 }
 
 function updatePts() {
-	if (!confirm_textseg_dirty()) {
-		$("[id^=pts-],[id^=grppts],#defpts").each(function() {
-			$(this).val($(this).attr("data-lastval"));
-		});
-	} else {
-		var newdefpts = Math.round($("#defpts").val());
-		var olddefpts = $("#defpts").attr("data-lastval");
-		if (newdefpts == "" || newdefpts <= 0) {
-			newdefpts = olddefpts;
-			$("#defpts").val(olddefpts);
-		}
-		var qparts,curval;
-		$("[id^=pts-]").each(function() {
+  if (!confirm_textseg_dirty()) {
+    $("[id^=pts-],[id^=grppts],#defpts").each(function () {
+      $(this).val($(this).attr("data-lastval"));
+    });
+  } else {
+    var newdefpts = Math.round($("#defpts").val());
+    var olddefpts = $("#defpts").attr("data-lastval");
+    if (newdefpts == "" || newdefpts <= 0) {
+      newdefpts = olddefpts;
+      $("#defpts").val(olddefpts);
+    }
+    var qparts, curval;
+    $("[id^=pts-]").each(function () {
       qparts = $(this).attr("id").split("-");
       curval = $(this).val().replace(/\s/g, "");
-			if (curval == "" || !curval.match(/^\d+$/) || 1.0*curval < 0) {
-				curval = $(this).attr("data-lastval");
-			}
-			if (newdefpts != olddefpts && curval==olddefpts) {
-				//update pts to match new default
-				curval = newdefpts;
-			}
+      if (curval == "" || !curval.match(/^\d+$/) || 1.0 * curval < 0) {
+        curval = $(this).attr("data-lastval");
+      }
+      if (newdefpts != olddefpts && curval == olddefpts) {
+        //update pts to match new default
+        curval = newdefpts;
+      }
       itemarray[qparts[1]][4] = curval == newdefpts ? 9999 : curval;
-		});
-		$("[id^=grppts-]").each(function() {
+    });
+    $("[id^=grppts-]").each(function () {
       qparts = $(this).attr("id").split("-");
       curval = $(this).val().replace(/\s/g, "");
-			if (curval == "" || !curval.match(/^\d+$/) || 1.0*curval < 0) {
-				curval = $(this).attr("data-lastval");
-			}
-			if (newdefpts != olddefpts && curval==olddefpts) {
-				//update pts to match new default
-				curval = newdefpts;
-			}
-			for (var i=0;i<itemarray[qparts[1]][2].length;i++) {
+      if (curval == "" || !curval.match(/^\d+$/) || 1.0 * curval < 0) {
+        curval = $(this).attr("data-lastval");
+      }
+      if (newdefpts != olddefpts && curval == olddefpts) {
+        //update pts to match new default
+        curval = newdefpts;
+      }
+      for (var i = 0; i < itemarray[qparts[1]][2].length; i++) {
         itemarray[qparts[1]][2][i][4] = curval == newdefpts ? 9999 : curval;
-			}
-		});
-		submitChanges();
-	}
+      }
+    });
+    submitChanges();
+  }
 }
 
-function updateGrpN(num,old_num) {
-	if (!confirm_textseg_dirty()) {
-		//if aborted, restore old value
-		$("#grpn"+num).val(old_num);
-	} else {
-		var nval = Math.floor(document.getElementById("grpn"+num).value*1);
+function updateGrpN(num, old_num) {
+  if (!confirm_textseg_dirty()) {
+    //if aborted, restore old value
+    $("#grpn" + num).val(old_num);
+  } else {
+    var nval = Math.floor(document.getElementById("grpn" + num).value * 1);
     if (nval < 1 || isNaN(nval)) {
       nval = 1;
     }
-		document.getElementById("grpn"+num).value = nval;
-		if (nval != itemarray[num][0]) {
-			itemarray[num][0] = nval;
-			submitChanges();
-		}
-	}
+    document.getElementById("grpn" + num).value = nval;
+    if (nval != itemarray[num][0]) {
+      itemarray[num][0] = nval;
+      submitChanges();
+    }
+  }
 }
 
-function updateGrpT(num,old_type) {
-	if (!confirm_textseg_dirty()) {
-		//if aborted, restore old value
-		$("#grptype"+num).val(old_type);
+function updateGrpT(num, old_type) {
+  if (!confirm_textseg_dirty()) {
+    //if aborted, restore old value
+    $("#grptype" + num).val(old_type);
   } else if (
     document.getElementById("grptype" + num).value != itemarray[num][1]
   ) {
-		itemarray[num][1] = document.getElementById("grptype"+num).value;
-		submitChanges();
-	}
+    itemarray[num][1] = document.getElementById("grptype" + num).value;
+    submitChanges();
+  }
 }
 
 function confirmclearattempts() {
@@ -944,31 +945,31 @@ function updateTextShowNType(i, old_i) {
 }
 
 function chgpagetitle(i) {
-	if (!confirm_textseg_dirty()) {
-		//if aborted, toggle back to previous state
+  if (!confirm_textseg_dirty()) {
+    //if aborted, toggle back to previous state
     $("#ispagetitle" + i).prop(
       "checked",
       !$("#ispagetitle" + i).prop("checked")
     );
-	} else {
-		if ($("#ispagetitle"+i).is(":checked")) {
-			itemarray[i][3] = 1;
-			if (itemarray[i][4]=="") {
-				var words = strip_tags(itemarray[i][1]).split(/\s+/);
-				if (words.length > 2) {
-					itemarray[i][4] = words.slice(0,3).join(" ");
-				} else {
-					itemarray[i][4] = "Page title (click to edit)";
-				}
-			}
-		} else {
-			itemarray[i][3] = 0;
-		}
-		submitChanges();
-	}
+  } else {
+    if ($("#ispagetitle" + i).is(":checked")) {
+      itemarray[i][3] = 1;
+      if (itemarray[i][4] == "") {
+        var words = strip_tags(itemarray[i][1]).split(/\s+/);
+        if (words.length > 2) {
+          itemarray[i][4] = words.slice(0, 3).join(" ");
+        } else {
+          itemarray[i][4] = "Page title (click to edit)";
+        }
+      }
+    } else {
+      itemarray[i][3] = 0;
+    }
+    submitChanges();
+  }
 }
 function strip_tags(txt) {
-	//return $("<div/>").html(txt).text();
+  //return $("<div/>").html(txt).text();
   return txt
     .replace(/<[^>]+>/gi, " ")
     .replace(/^\s+/, "")
@@ -982,43 +983,43 @@ function updateTextseg(i) {
 
 function generateOutput() {
   var out = "";
-	var text_segments = [];
-	var pts = {};
-	var qcnt = 0;
+  var text_segments = [];
+  var pts = {};
+  var qcnt = 0;
 
-	for (var i=0; i<itemarray.length; i++) {
+  for (var i = 0; i < itemarray.length; i++) {
     if (itemarray[i][0] == "text") {
       //is text item
-			//itemarray[i] is ['text',text,displayforN]
+      //itemarray[i] is ['text',text,displayforN]
       text_segments.push({
         displayBefore: qcnt,
         displayUntil: qcnt + itemarray[i][2] - 1,
         text: itemarray[i][1],
         ispage: itemarray[i][3],
         pagetitle: itemarray[i][4],
-        forntype: itemarray[i][5]
+        forntype: itemarray[i][5],
       });
     } else if (itemarray[i].length < 5) {
       //is group
-			if (out.length>0) {
+      if (out.length > 0) {
         out += ",";
-			}
+      }
       out += itemarray[i][0] + "|" + itemarray[i][1];
-			for (var j=0; j<itemarray[i][2].length; j++) {
+      for (var j = 0; j < itemarray[i][2].length; j++) {
         out += "~" + itemarray[i][2][j][0];
-				pts["qn"+itemarray[i][2][j][0]] = itemarray[i][2][j][4];
-			}
-			qcnt += itemarray[i][0];
-		} else {
-			if (out.length>0) {
+        pts["qn" + itemarray[i][2][j][0]] = itemarray[i][2][j][4];
+      }
+      qcnt += itemarray[i][0];
+    } else {
+      if (out.length > 0) {
         out += ",";
-			}
-			out += itemarray[i][0];
-			pts["qn"+itemarray[i][0]] = itemarray[i][4];
-			qcnt++;
-		}
-	}
-	return [out,text_segments,pts];
+      }
+      out += itemarray[i][0];
+      pts["qn" + itemarray[i][0]] = itemarray[i][4];
+      qcnt++;
+    }
+  }
+  return [out, text_segments, pts];
 }
 
 function collapseqgrp(i) {
@@ -1032,38 +1033,38 @@ function expandqgrp(i) {
   refreshTable();
 }
 function updateqgrpcookie() {
-	var closegrp = [];
-	var qcnt = 0;
-	for (var i=0; i<itemarray.length; i++) {
-		if (itemarray[i][0]=="text") {
-			continue;
-		}
+  var closegrp = [];
+  var qcnt = 0;
+  for (var i = 0; i < itemarray.length; i++) {
+    if (itemarray[i][0] == "text") {
+      continue;
+    }
     if (itemarray[i].length < 5) {
       //is group
-			if (itemarray[i][3]==0) {
-				closegrp.push(qcnt);
-			}
-		}
-		qcnt++;
-	}
+      if (itemarray[i][3] == 0) {
+        closegrp.push(qcnt);
+      }
+    }
+    qcnt++;
+  }
   document.cookie = "closeqgrp-" + curaid + "=" + closegrp.join(",");
 }
 
 function generateTable() {
-	olditemarray = itemarray;
-	itemcount = itemarray.length;
-	var alt = 0;
-	var ln = 0;
-	var pttotal = 0;
+  olditemarray = itemarray;
+  itemcount = itemarray.length;
+  var alt = 0;
+  var ln = 0;
+  var pttotal = 0;
   var html = "";
-	var totalcols = 10;
+  var totalcols = 10;
 
-	html += "<table cellpadding=5 class=gb><thead><tr>";
-	if (!beentaken) {
-		html += "<th></th>";
-	}
+  html += "<table cellpadding=5 class=gb><thead><tr>";
+  if (!beentaken) {
+    html += "<th></th>";
+  }
   html += "<th>" + _("Order") + "</th>";
-	//return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
+  //return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
   html += "<th>" + _("Description");
   html +=
     "</th><th>&nbsp;</th><th>ID</th><th>" +
@@ -1074,7 +1075,7 @@ function generateTable() {
     _("Avg Time") +
     "</th>";
   html += "<th>" + _("Points");
-	if (!beentaken) {
+  if (!beentaken) {
     html +=
       "<br/><span class=small>" +
       _("Default") +
@@ -1083,58 +1084,58 @@ function generateTable() {
       '" data-lastval="' +
       defpoints +
       '"/></span>';
-	}
-	html += "</th>";
+  }
+  html += "</th>";
   html += "<th>" + _("Actions") + "</th>";
-	html += "</thead><tbody>";
+  html += "</thead><tbody>";
   var text_segment_count = 0;
   var curqnum = 0;
   var curqitemloc = 0;
   var badgrppoints = false;
   var badthisgrppoints = false;
   var grppoints = -1;
-	for (var i=0; i<itemcount; i++) {
-		curistext = 0;
-		curisgroup = 0;
-		if (itemarray[i][0]=="text") {
-			var curitems = new Array();
-			curitems[0] = itemarray[i];
-			curistext = 1;
+  for (var i = 0; i < itemcount; i++) {
+    curistext = 0;
+    curisgroup = 0;
+    if (itemarray[i][0] == "text") {
+      var curitems = new Array();
+      curitems[0] = itemarray[i];
+      curistext = 1;
     } else if (itemarray[i].length < 5) {
       //is group
-			curitems = itemarray[i][2];
-			curisgroup = 1;
+      curitems = itemarray[i][2];
+      curisgroup = 1;
     } else {
       //not group
-			var curitems = new Array();
-			curitems[0] = itemarray[i];
-		}
-		curqitemloc = i-text_segment_count;
-		//var ms = generateMoveSelect(i,itemcount);
-		var ms = generateMoveSelect2(i);
+      var curitems = new Array();
+      curitems[0] = itemarray[i];
+    }
+    curqitemloc = i - text_segment_count;
+    //var ms = generateMoveSelect(i,itemcount);
+    var ms = generateMoveSelect2(i);
     grppoints = -1;
     badthisgrppoints = false;
-		for (var j=0; j<curitems.length; j++) {
-			if (alt == 0) {
+    for (var j = 0; j < curitems.length; j++) {
+      if (alt == 0) {
         curclass = "even";
-			} else {
+      } else {
         curclass = "odd";
-			}
-			if (curistext==1) {
+      }
+      if (curistext == 1) {
         curclass += " textsegmentrow skipmathrender";
-			}
-			html += "<tr class='"+curclass+"'>";
-			if (curisgroup) {
+      }
+      html += "<tr class='" + curclass + "'>";
+      if (curisgroup) {
         if (curitems[0][4] == 9999) {
           //points
-					curgrppoints = defpoints;
-				} else {
-					curgrppoints = curitems[0][4];
-				}
-			}
-			if (beentaken) {
-				if (curisgroup) {
-					if (j==0) {
+          curgrppoints = defpoints;
+        } else {
+          curgrppoints = curitems[0][4];
+        }
+      }
+      if (beentaken) {
+        if (curisgroup) {
+          if (j == 0) {
             html +=
               "<td>Q" +
               (curqnum + 1) +
@@ -1145,27 +1146,27 @@ function generateTable() {
               "</b>, " +
               _("choosing ") +
               itemarray[i][0];
-						if (itemarray[i][1]==0) {
+            if (itemarray[i][1] == 0) {
               html += _(" without");
-						} else if (itemarray[i][1]==1) {
+            } else if (itemarray[i][1] == 1) {
               html += _(" with");
-						}
+            }
             html += _(" replacement") + "</td>";
-						//html += "<td class=\"c nowrap\"><input size=2 class=c id=\"grppts-"+i+"\" value=\""+curgrppoints+"\" data-lastval=\""+curgrppoints+"\"/>";
+            //html += "<td class=\"c nowrap\"><input size=2 class=c id=\"grppts-"+i+"\" value=\""+curgrppoints+"\" data-lastval=\""+curgrppoints+"\"/>";
             html += '<td class="c nowrap">' + curgrppoints;
-						if (itemarray[i][0]>1) {
-							html += "ea";
-						}
-						html += "</td><td></td>";
-						html += "</tr><tr class="+curclass+">";
-					}
+            if (itemarray[i][0] > 1) {
+              html += "ea";
+            }
+            html += "</td><td></td>";
+            html += "</tr><tr class=" + curclass + ">";
+          }
           html += "<td>&nbsp;Q" + (curqnum + 1) + "-" + (j + 1);
-				} else if (curistext) {
-					//html += "<td>Text"+(text_segment_count+1);
-					html += "<td>"+ms;
-				} else {
-					html += "<td>Q"+(curqnum+1);
-				}
+        } else if (curistext) {
+          //html += "<td>Text"+(text_segment_count+1);
+          html += "<td>" + ms;
+        } else {
+          html += "<td>Q" + (curqnum + 1);
+        }
         html +=
           '<input type=hidden id="qc' +
           ln +
@@ -1174,11 +1175,11 @@ function generateTable() {
           ":" +
           curitems[j][0] +
           '"/>';
-				html += "</td>";
-			} else {
-				html += "<td>";
-				if (j==0) {
-					if (!curisgroup) {
+        html += "</td>";
+      } else {
+        html += "<td>";
+        if (j == 0) {
+          if (!curisgroup) {
             html +=
               '<input type=checkbox id="qc' +
               ln +
@@ -1189,8 +1190,8 @@ function generateTable() {
               ":" +
               curqnum +
               '"/></td><td>';
-					} else {
-						if (itemarray[i][3]==1) {
+          } else {
+            if (itemarray[i][3] == 1) {
               html +=
                 '<img src="' +
                 imasroot +
@@ -1199,7 +1200,7 @@ function generateTable() {
                 ')" alt="' +
                 _("Collapse") +
                 '"/>';
-						} else {
+            } else {
               html +=
                 '<img src="' +
                 imasroot +
@@ -1208,11 +1209,11 @@ function generateTable() {
                 ')" alt="' +
                 _("Expand") +
                 '"/>';
-						}
+            }
             html += "</td><td>";
-					}
-					html += ms;
-					if (curisgroup) {
+          }
+          html += ms;
+          if (curisgroup) {
             html +=
               "</td><td colspan=" +
               (totalcols - 4) +
@@ -1240,15 +1241,15 @@ function generateTable() {
               "," +
               itemarray[i][1] +
               ")'><option value=0 ";
-						if (itemarray[i][1]==0) {
-							html += "selected=1";
-						}
+            if (itemarray[i][1] == 0) {
+              html += "selected=1";
+            }
             html += ">" + _("Without") + "</option><option value=1 ";
-						if (itemarray[i][1]==1) {
-							html += "selected=1";
-						}
+            if (itemarray[i][1] == 1) {
+              html += "selected=1";
+            }
             html += ">" + _("With") + "</option></select>" + _(" replacement");
-						html += "</td>";
+            html += "</td>";
             html +=
               '<td class="nowrap"><input size=2 id="grppts-' +
               i +
@@ -1257,9 +1258,9 @@ function generateTable() {
               '" data-lastval="' +
               curgrppoints +
               '"/>';
-						if (itemarray[i][0]>1) {
-							html += "ea";
-						}
+            if (itemarray[i][0] > 1) {
+              html += "ea";
+            }
             html +=
               '</td><td class=c><a href="#" onclick="return removegrp(\'' +
               i +
@@ -1270,16 +1271,16 @@ function generateTable() {
               //collapsed group
               if (curitems[0][4] == 9999) {
                 //points
-								curpt = defpoints;
-							} else {
-								curpt = curitems[0][4];
-							}
-							break;
-						}
-						html += "<tr class="+curclass+"><td>";
-					}
-				}
-				if (curisgroup) {
+                curpt = defpoints;
+              } else {
+                curpt = curitems[0][4];
+              }
+              break;
+            }
+            html += "<tr class=" + curclass + "><td>";
+          }
+        }
+        if (curisgroup) {
           html +=
             '<input type=checkbox id="qc' +
             ln +
@@ -1296,13 +1297,13 @@ function generateTable() {
             "-" +
             j +
             "');\">Ungroup</a>"; //FIX
-				}
-				html += "</td>";
-			}
-			if (curistext==1) {
-				text_segment_count++;
-				//html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
-				//html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
+        }
+        html += "</td>";
+      }
+      if (curistext == 1) {
+        text_segment_count++;
+        //html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
+        //html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
         if (displaymethod == "Embed" || displaymethod == "full") {
           html +=
             "<td colspan=" +
@@ -1310,8 +1311,8 @@ function generateTable() {
             ' id="textsegdescr' +
             i +
             '" class="description-cell">';
-					if (curitems[j][3]==1) {
-						var header_contents= curitems[j][4];
+          if (curitems[j][3] == 1) {
+            var header_contents = curitems[j][4];
             html +=
               '<div style="position: relative"><h4 id="textsegheader' +
               i +
@@ -1326,8 +1327,8 @@ function generateTable() {
               '" class="text-segment-button"><span id="edit-button-spanheader' +
               i +
               '" class="icon-pencil text-segment-icon"></span></button></div></div>';
-					}
-					var contents = curitems[j][1];
+          }
+          var contents = curitems[j][1];
           html +=
             '<div class="intro intro-like"><div id="textseg' +
             i +
@@ -1342,7 +1343,7 @@ function generateTable() {
             '" class="text-segment-button"><span id="edit-button-span' +
             i +
             '" class="icon-pencil text-segment-icon"></span></button></div></div></div></td>';
-					html += '<td><input type="hidden" id="showforn'+i+'" value="1"/>';
+          html += '<td><input type="hidden" id="showforn' + i + '" value="1"/>';
           html +=
             '<label><input type="checkbox" id="ispagetitle' +
             i +
@@ -1352,9 +1353,9 @@ function generateTable() {
           if (curitems[j][3] == 1) {
             html += "checked";
           }
-          html += ">"+_("New page") + "</label></td>";
-				} else {
-					var contents = curitems[j][1];
+          html += ">" + _("New page") + "</label></td>";
+        } else {
+          var contents = curitems[j][1];
           html +=
             "<td colspan=" +
             (totalcols - 5) +
@@ -1375,48 +1376,48 @@ function generateTable() {
             '" class="text-segment-button"><span id="edit-button-span' +
             i +
             '" class="icon-pencil text-segment-icon"></span></button></div></div></div></td>';
-					html += "<td colspan=2>"+generateShowforSelect(i)+"</td>";
-				}
-				//if (beentaken) {
-				//	html += "<td></td>";
-				//} else {
+          html += "<td colspan=2>" + generateShowforSelect(i) + "</td>";
+        }
+        //if (beentaken) {
+        //	html += "<td></td>";
+        //} else {
         html +=
           '<td class=c><a href="#" onclick="return removeitem(\'' +
           i +
           "');\">" +
           _("Remove") +
           "</a></td>";
-				//}
-			} else {
-				if (beentaken && curitems[j][6]==1) {
+        //}
+      } else {
+        if (beentaken && curitems[j][6] == 1) {
           html +=
             '<td class="greystrike" title="' + _("Question Withdrawn") + '">';
-				} else {
+        } else {
           html += "<td>";
-				}
+        }
         html +=
           '<input type=hidden name="curq[]" id="oqc' +
           ln +
           '" value="' +
           curitems[j][1] +
           '"/>';
-				html += curitems[j][2]+"</td>"; //description
+        html += curitems[j][2] + "</td>"; //description
         html += '<td class="nowrap"><div';
-				if ((curitems[j][7]&16) == 16) {
+        if ((curitems[j][7] & 16) == 16) {
           html += ' class="ccvid"';
-					var altbase = _("Captioned video");
-				} else {
-					var altbase = _("Video");
-				}
-				html += ">";
-				if ((curitems[j][7]&1) == 1) {
-					var showicons = "";
-					var altadd = "";
-				} else {
-					var showicons = "_no";
-					var altadd = _(" disabled");
-				}
-				if ((curitems[j][7]&4) == 4) {
+          var altbase = _("Captioned video");
+        } else {
+          var altbase = _("Video");
+        }
+        html += ">";
+        if ((curitems[j][7] & 1) == 1) {
+          var showicons = "";
+          var altadd = "";
+        } else {
+          var showicons = "_no";
+          var altadd = _(" disabled");
+        }
+        if ((curitems[j][7] & 4) == 4) {
           html +=
             '<img src="' +
             imasroot +
@@ -1426,8 +1427,8 @@ function generateTable() {
             altbase +
             altadd +
             '"/>';
-				}
-				if ((curitems[j][7]&2) == 2) {
+        }
+        if ((curitems[j][7] & 2) == 2) {
           html +=
             '<img src="' +
             imasroot +
@@ -1436,8 +1437,8 @@ function generateTable() {
             '.png" alt="Help Resource' +
             altadd +
             '"/>';
-				}
-				if ((curitems[j][7]&8) == 8) {
+        }
+        if ((curitems[j][7] & 8) == 8) {
           html +=
             '<img src="' +
             imasroot +
@@ -1446,10 +1447,10 @@ function generateTable() {
             '.png" alt="Detailed solution' +
             altadd +
             '"/>';
-				}
-				html += "</div></td>";
-				html += "<td>"+curitems[j][1]+"</td>";
-				if (beentaken) {
+        }
+        html += "</div></td>";
+        html += "<td>" + curitems[j][1] + "</td>";
+        if (beentaken) {
           html +=
             "<td><button type='button' onClick=\"previewq('curqform','qc" +
             ln +
@@ -1458,7 +1459,7 @@ function generateTable() {
             ',false,false)">' +
             _("Preview") +
             "</button></td>"; //Preview
-				} else {
+        } else {
           html +=
             "<td><button type='button' onClick=\"previewq('curqform','qc" +
             ln +
@@ -1467,11 +1468,11 @@ function generateTable() {
             ',true,false)">' +
             _("Preview") +
             "</button></td>"; //Preview
-				}
-				html += "<td>"+curitems[j][3]+"</td>"; //question type
-				html += "<td class=c>";
-				if (curitems[j][8][0]>0) {
-					if (curitems[j][8].length>3) {
+        }
+        html += "<td>" + curitems[j][3] + "</td>"; //question type
+        html += "<td class=c>";
+        if (curitems[j][8][0] > 0) {
+          if (curitems[j][8].length > 3) {
             html +=
               "<span onmouseover=\"tipshow(this,'Avg score on first try: " +
               curitems[j][8][1] +
@@ -1482,40 +1483,40 @@ function generateTable() {
               " min<br/>N=" +
               curitems[j][8][3] +
               '\')" onmouseout="tipout()">';
-					}
-					html += curitems[j][8][0];
-					if (curitems[j][8].length>3) {
+          }
+          html += curitems[j][8][0];
+          if (curitems[j][8].length > 3) {
             html += "</span>";
-					}
-				}
-				html += "</td>";
+          }
+        }
+        html += "</td>";
         if (curitems[j][4] == 9999) {
           //points
-					curpt = defpoints;
-				} else {
-					curpt = curitems[j][4];
-				}
-				if (curisgroup) {
-					if (grppoints==-1) {
-						grppoints = curpt;
-					} else if (curpt != grppoints) {
-						badgrppoints = true;
-						//fix it
-						if (grppoints == defpoints) {
-							itemarray[i][2][j][4] = 9999;
-						} else {
-							itemarray[i][2][j][4] = grppoints;
-						}
-					}
-				}
-				if (curisgroup) {
-					html += "<td></td>";
-				//} else if (badthisgrppoints) {
-				//	html += "<td class=c><span class=noticehighlight>"+curpt+"</span></td>"; //points
-				} else {
-					if (beentaken) {
-						html += "<td class=c>"+curpt+"</td>";
-					} else {
+          curpt = defpoints;
+        } else {
+          curpt = curitems[j][4];
+        }
+        if (curisgroup) {
+          if (grppoints == -1) {
+            grppoints = curpt;
+          } else if (curpt != grppoints) {
+            badgrppoints = true;
+            //fix it
+            if (grppoints == defpoints) {
+              itemarray[i][2][j][4] = 9999;
+            } else {
+              itemarray[i][2][j][4] = grppoints;
+            }
+          }
+        }
+        if (curisgroup) {
+          html += "<td></td>";
+          //} else if (badthisgrppoints) {
+          //	html += "<td class=c><span class=noticehighlight>"+curpt+"</span></td>"; //points
+        } else {
+          if (beentaken) {
+            html += "<td class=c>" + curpt + "</td>";
+          } else {
             html +=
               '<td><input size=2 id="pts-' +
               i +
@@ -1524,8 +1525,8 @@ function generateTable() {
               '" data-lastval="' +
               curpt +
               '"/></td>'; //points
-					}
-				}
+          }
+        }
 
         html +=
           '<td class=c><div class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
@@ -1546,7 +1547,7 @@ function generateTable() {
           '">' +
           _("Change Settings") +
           "</a></li>";
-				if (curitems[j][5]==1) {
+        if (curitems[j][5] == 1) {
           html +=
             '<li><a href="moddataset.php?id=' +
             curitems[j][1] +
@@ -1559,7 +1560,7 @@ function generateTable() {
             '">' +
             _("Edit Code") +
             "</a></li>"; //edit
-				} else {
+        } else {
           html +=
             '<li><a href="moddataset.php?id=' +
             curitems[j][1] +
@@ -1582,8 +1583,8 @@ function generateTable() {
             '">' +
             _("Edit Personal Copy") +
             "</a></li>"; //edit makelocal
-				}
-				if (beentaken) {
+        }
+        if (beentaken) {
           html +=
             '<li><a href="addquestions.php?aid=' +
             curaid +
@@ -1593,8 +1594,10 @@ function generateTable() {
             curitems[j][0] +
             '" ';
           html +=
-            'onclick="return confirmclearattempts()">Clear Attempts</a></li>'; //add link
-					if (curitems[j][6]!=1) {
+            'onclick="return confirmclearattempts()">' +
+            _("Clear Attempts") +
+            "</a></li>"; //add link
+          if (curitems[j][6] != 1) {
             html +=
               '<li><a href="addquestions.php?aid=' +
               curaid +
@@ -1605,12 +1608,12 @@ function generateTable() {
               '">' +
               _("Withdraw") +
               "</a></li>";
-					} else {
+          } else {
             html +=
               "<li><span><span class=noticetext>" +
               _("Withdrawn") +
               "</span></span></li>";
-					}
+          }
           html +=
             '<li><a href="gb-rescoreq' +
             (assessver > 1 ? "2" : "") +
@@ -1625,7 +1628,7 @@ function generateTable() {
             '">' +
             _("Re-score Question") +
             "</a></li>";
-				} else {
+        } else {
           html +=
             '<li><a href="moddataset.php?id=' +
             curitems[j][1] +
@@ -1642,12 +1645,17 @@ function generateTable() {
             ');">' +
             _("Remove") +
             "</a></li>"; //add link and checkbox
-				}
-				if (j==0) {
-					html += '<li><a href="#" onclick="addtextsegment('+i+'); return false;">'+_('Add Text Before')+'</a></li>';
-				}
-				html += '</ul></div>';
-				/*
+        }
+        if (j == 0) {
+          html +=
+            '<li><a href="#" onclick="addtextsegment(' +
+            i +
+            '); return false;">' +
+            _("Add Text Before") +
+            "</a></li>";
+        }
+        html += "</ul></div>";
+        /*
 				html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change</a></td>"; //settings
 				if (curitems[j][5]==1) {
 					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
@@ -1666,26 +1674,26 @@ function generateTable() {
 					html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
 				}
 				*/
-			}
-			html += "</tr>";
-			ln++;
-		}
-		if (curistext==0) {
-			pttotal += curpt*(curisgroup?itemarray[i][0]:1);
-			curqnum += curisgroup?itemarray[i][0]:1;
-		}
-		alt = 1-alt;
-	}
-	if (beentaken) {
+      }
+      html += "</tr>";
+      ln++;
+    }
+    if (curistext == 0) {
+      pttotal += curpt * (curisgroup ? itemarray[i][0] : 1);
+      curqnum += curisgroup ? itemarray[i][0] : 1;
+    }
+    alt = 1 - alt;
+  }
+  if (beentaken) {
     html += "<tr><td></td>";
-	} else {
+  } else {
     html += "<tr><td></td><td></td>";
-	}
+  }
   html +=
     '<td colspan=8><button type="button" onclick="addtextsegment()" title="' +
     _("Insert Instructions or Video for Question") +
     '" id="add-text-button"><span class="icon-plus" style="font-size:0.8em"></span> Text</button>';
-	if (text_segment_count > 1) {
+  if (text_segment_count > 1) {
     html +=
       ' <div class="text-segment-icon text-segment-iconglobal"><button id="edit-buttonglobal" type="button" title="' +
       _("Expand All") +
@@ -1694,7 +1702,7 @@ function generateTable() {
       ' <div class="text-segment-icon text-segment-iconglobal"><button id="collapse-buttonglobal" type="button" title="' +
       _("Collapse All") +
       '" class="text-segment-button text-segment-button-global"><span id="collapse-button-spanglobal" class="icon-shrink2"></span></button></div>';
-	}
+  }
   html +=
     '<div class="text-segment-iconglobal"><img src="' +
     imasroot +
@@ -1705,29 +1713,29 @@ function generateTable() {
     "')\"/></div>";
   html += "</td><td></td><td></td></tr>";
 
-	html += "</tbody></table>";
-	if (badgrppoints) {
-		submitChanges();
+  html += "</tbody></table>";
+  if (badgrppoints) {
+    submitChanges();
     html +=
       "<p class=noticetext>" +
       _(
         "WARNING: All question in a group should be given the same point values"
       ) +
       ".</p>";
-	}
-	document.getElementById("pttotal").innerHTML = pttotal;
-	return html;
+  }
+  document.getElementById("pttotal").innerHTML = pttotal;
+  return html;
 }
 
 function addtextsegment(n) {
-	if (confirm_textseg_dirty()) {
-		if (typeof n === 'number') {
-			itemarray.splice(n,0,["text","",1,0,"",1]);
-		} else {
-    		itemarray.push(["text", "", 1, 0, "", 1]);
-		}
-		refreshTable();
-	}
+  if (confirm_textseg_dirty()) {
+    if (typeof n === "number") {
+      itemarray.splice(n, 0, ["text", "", 1, 0, "", 1]);
+    } else {
+      itemarray.push(["text", "", 1, 0, "", 1]);
+    }
+    refreshTable();
+  }
 }
 
 function check_textseg_itemarray() {
@@ -1735,98 +1743,98 @@ function check_textseg_itemarray() {
     numq,
     j,
     firstpageloc = -1;
-	for (var i=0;i<itemarray.length;i++) {
+  for (var i = 0; i < itemarray.length; i++) {
     if (itemarray[i][0] == "text") {
       //this is text item
       if (lastwastext) {
         //make sure showN matches
-				itemarray[i][2] = itemarray[i-1][2];
-			}
-			if (itemarray[i][3]==1 && firstpageloc==-1) {
-				firstpageloc = i;
-			}
-			numq = 0;
-			j = i+1;
-			while (j<itemarray.length && itemarray[j][0]!="text") {
+        itemarray[i][2] = itemarray[i - 1][2];
+      }
+      if (itemarray[i][3] == 1 && firstpageloc == -1) {
+        firstpageloc = i;
+      }
+      numq = 0;
+      j = i + 1;
+      while (j < itemarray.length && itemarray[j][0] != "text") {
         if (itemarray[j].length < 5) {
           //is group
-					numq += parseInt(itemarray[j][0]);
-				} else {
-					numq++;
-				}
-				j++;
-			}
-			//make sure isn't bigger than number of q, but is at least 1
-			itemarray[i][2] = Math.max(1, Math.min(itemarray[i][2], numq));
+          numq += parseInt(itemarray[j][0]);
+        } else {
+          numq++;
+        }
+        j++;
+      }
+      //make sure isn't bigger than number of q, but is at least 1
+      itemarray[i][2] = Math.max(1, Math.min(itemarray[i][2], numq));
 
-			lastwastext = true;
-		} else {
-			lastwastext = false;
-		}
-	}
-	if (firstpageloc>0) {
+      lastwastext = true;
+    } else {
+      lastwastext = false;
+    }
+  }
+  if (firstpageloc > 0) {
     alert(
       _(
         "If you are using page titles, you need to have a page title at the beginning."
       )
     );
-		if (itemarray[0][0]=="text") {
-			itemarray[0][3] = 1;
+    if (itemarray[0][0] == "text") {
+      itemarray[0][3] = 1;
       itemarray[0][4] = _("First Page Title");
-		} else {
+    } else {
       itemarray.unshift(["text", "", 1, 1, _("First Page Title"), 1]);
-		}
-	}
+    }
+  }
 }
 
 function confirm_textseg_dirty() {
-	if (anyEditorIsDirty()) {
+  if (anyEditorIsDirty()) {
     var discard_other_changes = confirm(
       _(
         "There are unsaved changes in a question intro text box.  Press OK to discard those changes and continue with the most recent action.  Press Cancel to return to the page without taking any action."
       )
     );
-	} else {
-		var discard_other_changes = true;
-	}
-	return discard_other_changes;
+  } else {
+    var discard_other_changes = true;
+  }
+  return discard_other_changes;
 }
 
 function submitChanges() {
-	var target = "submitnotice";
-	check_textseg_itemarray();
+  var target = "submitnotice";
+  check_textseg_itemarray();
   document.getElementById(target).innerHTML = _(" Saving Changes... ");
-	data=generateOutput();
-	var outdata = {
-			order: data[0],
-			text_order: JSON.stringify(data[1])
-	};
-	if (!beentaken) {
-		outdata["pts"] = JSON.stringify(data[2]);
+  data = generateOutput();
+  var outdata = {
+    order: data[0],
+    text_order: JSON.stringify(data[1]),
+  };
+  if (!beentaken) {
+    outdata["pts"] = JSON.stringify(data[2]);
     outdata["defpts"] = $("#defpts").val();
-	}
-	$.ajax({
-		type: "POST",
-		//url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid",
-		url: AHAHsaveurl,
-		data: outdata
-	})
-	.done(function() {
-		if (!beentaken) {
-			defpoints = $("#defpts").val();
-		}
+  }
+  $.ajax({
+    type: "POST",
+    //url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid",
+    url: AHAHsaveurl,
+    data: outdata,
+  })
+    .done(function () {
+      if (!beentaken) {
+        defpoints = $("#defpts").val();
+      }
       document.getElementById(target).innerHTML = "";
-		refreshTable();
-		updateSaveButtonDimming();
-		//scroll to top if save action puts the curqtbl out of view
+      refreshTable();
+      updateSaveButtonDimming();
+      //scroll to top if save action puts the curqtbl out of view
       if (
         $(window).scrollTop() >
         $("#curqtbl").position().top + $("#curqtbl").height()
       ) {
-			$(window).scrollTop(0);
-		}
-	})
-	.fail(function(xhr, status, errorThrown) {
+        $(window).scrollTop(0);
+      }
+    })
+    .fail(function (xhr, status, errorThrown) {
       document.getElementById(target).innerHTML =
         " Couldn't save changes:\n" +
         status +
@@ -1834,8 +1842,8 @@ function submitChanges() {
         req.statusText +
         "\nError: " +
         errorThrown;
-		itemarray = olditemarray;
-		refreshTable();
+      itemarray = olditemarray;
+      refreshTable();
     });
 }
 
