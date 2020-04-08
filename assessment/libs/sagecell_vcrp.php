@@ -7,7 +7,8 @@ array_push($allowedmacros,"sagecell", "sagecellButton" );
 function sagecell($script="",$q=0,$essayPart="none",$id="sagecell") {
 $cid='sagecell_vcrp_'.$id;
 $fns="<script>function getSageOutput_$id (ob,part=-1,format='any') {
-    let sagecellVCRP_jq=$(ob).closest('.question').find('#$cid');
+    let sagecellVCRP_jq0=$(ob).closest('.question');
+    let sagecellVCRP_jq=sagecellVCRP_jq0.find('.$cid');
     let qnr=parseInt(sagecellVCRP_jq.attr('qnr'),10);
     let ref1=qnr-1;
     if (part >= 0)
@@ -38,11 +39,11 @@ $fns="<script>function getSageOutput_$id (ob,part=-1,format='any') {
   }
 </script>";
 if ($essayPart === 'none') {
-  return "<div id='$cid' class='sagetransfer' qnr='$q'><pre class='converttosagecell'>".$script."</pre>".$fns."</div>";
+  return "<div class='$cid sagetransfer' qnr='$q'><pre class='converttosagecell'>".$script."</pre>".$fns."</div>";
 } else {
   $ansPart = ($essayPart === "essay" ? '[AB]' : '[AB'.strval($essayPart).']');
 
-	return "<div id='$cid' class='sagetransfer' qnr='$q'><div class='converttosagecell'>$ansPart<pre class='hidden'>$script</pre></div>$fns</div>";
+	return "<div class='$cid sagetransfer' qnr='$q'><div class='converttosagecell'>$ansPart<pre class='hidden'>$script</pre></div>$fns</div>";
 }
 
 }
