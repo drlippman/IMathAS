@@ -779,7 +779,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if (isset($search) && ($searchall==0 || $searchlikes!='' || $searchmine==1)) {
 				$qarr = $searchlikevals;
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.meantime,imas_questionset.meanscore,imas_questionset.meantimen,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query = "SELECT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.meantime,imas_questionset.meanscore,imas_questionset.meantimen,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
 				$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
@@ -802,7 +802,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 				}
-				$query .= " ORDER BY FIELD(imas_library_items.libid,$llist),imas_questionset.broken,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
 					$query .= " LIMIT 300";
 					$offset = 0;
@@ -840,7 +839,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$searchlimited = ($stm->rowCount()==300);
 
 					$alt=0;
-					$lastlib = -1;
 					$i=0;
 					$page_questionTable = array();
 					$page_libstouse = array();
@@ -853,32 +851,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if (isset($page_questionTable[$line['id']])) {
 							continue;
 						}
-						if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
-							/*$page_questionTable[$i]['checkbox'] = "";
-							$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
-							$page_questionTable[$i]['preview'] = "";
-							$page_questionTable[$i]['type'] = "";
-							if ($searchall==1)
-								$page_questionTable[$i]['lib'] = "";
-							$page_questionTable[$i]['times'] = "";
-							$page_questionTable[$i]['mine'] = "";
-							$page_questionTable[$i]['add'] = "";
-							$page_questionTable[$i]['src'] = "";
-							$page_questionTable[$i]['templ'] = "";
-							$lastlib = $line['libid'];
-							$i++;
-							*/
+						if (!isset($page_libqids[$line['libid']]) && isset($lnamesarr[$line['libid']])) {
 							$page_libstouse[] = $line['libid'];
-							$lastlib = $line['libid'];
 							$page_libqids[$line['libid']] = array();
-
 						}
 
-						if (isset($libsortorder[$line['libid']]) && $libsortorder[$line['libid']]==1) { //alpha
-							$page_libqids[$line['libid']][$line['id']] = $line['description'];
-						} else { //id
-							$page_libqids[$line['libid']][] = $line['id'];
-						}
+						$page_libqids[$line['libid']][] = $line['id'];
+
 						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 						if ($line['broken'] > 0) {
@@ -901,12 +880,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['qdata'] = array($line['meanscore'],$line['meantime'],$line['meantimen']);
 						}
 
+						$page_questionTable[$i]['broken'] = intval($line['broken']);
+
 						if ($searchall==1) {
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib=".Sanitize::encodeUrlParam($line['libid'])."\">"._("List lib")."</a>";
 						} else {
-							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
-							$page_questionTable[$i]['broken'] = intval($line['broken']);
 							$page_questionTable[$i]['libitemid'] = Sanitize::encodeStringForDisplay($line['libitemid']);
+							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
 						}
 						$page_questionTable[$i]['extref'] = '';
 						$page_questionTable[$i]['cap'] = 0;
@@ -978,17 +958,33 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 
-
-					//sort alpha sorted libraries
-					foreach ($page_libstouse as $libid) {
-						if ($libsortorder[$libid]==1) {
-							natcasesort($page_libqids[$libid]);
-							$page_libqids[$libid] = array_keys($page_libqids[$libid]);
+					if ($searchall==1) { // consolidate all
+						uksort($page_questionTable, function($qA,$qB) use ($page_questionTable) {
+							if ($page_questionTable[$qA]['broken'] != $page_questionTable[$qB]['broken']) {
+								return $page_questionTable[$qA]['broken'] - $page_questionTable[$qB]['broken'];
+							} else {
+								return $qA - $qB;
+							}
+						});
+						$page_libstouse = array(0);
+						$page_libqids = array(0=>array_keys($page_questionTable));
+					} else {
+						//sort alpha sorted libraries
+						foreach ($page_libstouse as $libid) {
+							usort($page_libqids[$libid], function($qA,$qB) use ($libsortorder,$page_questionTable,$page_libqids,$libid) {
+								if ($page_questionTable[$qA]['broken'] != $page_questionTable[$qB]['broken']) {
+									return $page_questionTable[$qA]['broken'] - $page_questionTable[$qB]['broken'];
+								} else if ($page_questionTable[$qA]['junkflag'] != $page_questionTable[$qB]['junkflag']) {
+									return $page_questionTable[$qA]['junkflag'] - $page_questionTable[$qB]['junkflag'];
+								} else if ($libsortorder[$libid]==1) {
+									return strnatcasecmp($page_questionTable[$qA]['desc'], $page_questionTable[$qB]['desc']);
+								} else {
+									return $qA - $qB;
+								}
+							});
 						}
 					}
-					if ($searchall==1) {
-						$page_libstouse = array_keys($page_libqids);
-					}
+
 
 				}
 			}

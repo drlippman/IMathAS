@@ -742,8 +742,8 @@ if ($myrights<20) {
 		}
 		*/
     $qarr = $searchlikevals;
-		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
-		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
+		$query = "SELECT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
+		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid ";
 		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND imas_library_items.deleted=0 AND $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 
@@ -785,7 +785,6 @@ if ($myrights<20) {
 			$query .= " AND imas_questionset.id NOT IN (SELECT iq.id FROM imas_questionset AS iq JOIN imas_library_items as ili on ili.qsetid=iq.id AND ili.deleted=0";
 			$query .= " JOIN imas_libraries AS il ON ili.libid=il.id AND il.deleted=0 WHERE il.federationlevel>0)";
 		}
-		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id ";
 		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist{0}=='0')) {
 			$query .= " LIMIT 300";
 		}
@@ -795,28 +794,28 @@ if ($myrights<20) {
 		$page_questionTable = array();
 		$page_libstouse = array();
 		$page_libqids = array();
-		$lastlib = -1;
 		$ln=1;
 		while ($line = $resultLibs->fetch(PDO::FETCH_ASSOC)) {
 			if (isset($page_questionTable[$line['id']])) {
 				continue;
 			}
-			if ($lastlib!=$line['libid'] && (isset($lnamesarr[$line['libid']]) || $searchall==1)) {
+      if (!isset($page_libqids[$line['libid']]) && isset($lnamesarr[$line['libid']])) {
 				$page_libstouse[] = $line['libid'];
-				$lastlib = $line['libid'];
 				$page_libqids[$line['libid']] = array();
 			}
-			if ($libsortorder[$line['libid']]==1) { //alpha
-				$page_libqids[$line['libid']][$line['id']] = trim($line['description']);
-			} else { //id
-				$page_libqids[$line['libid']][] = $line['id'];
-			}
+			$page_libqids[$line['libid']][] = $line['id'];
+
 			$i = $line['id'];
 
 			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
-			if ($line['userights']==0) {
+      if ($line['broken'] > 0) {
+        $line['description'] = '('._('Reported Broken').') '.$line['description'];
+      }
+      if ($line['userights']==0) {
 				$page_questionTable[$i]['desc'] = '<span class="noticetext">'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</span>';
-			} else if ($line['replaceby']>0 || $line['junkflag']>0) {
+			} else if ($line['broken'] > 0) {
+        $page_questionTable[$i]['desc'] = '<span style="color: #f66"><i>'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</i></span>';
+      } else if ($line['replaceby']>0 || $line['junkflag']>0) {
 				$page_questionTable[$i]['desc'] = '<span class="grey"><i>'.filter(Sanitize::encodeStringForDisplay($line['description'])).'</i></span>';
 			} else {
 				$page_questionTable[$i]['desc'] = filter(Sanitize::encodeStringForDisplay($line['description']));
@@ -848,6 +847,8 @@ if ($myrights<20) {
 
 			$page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,".Sanitize::onlyInt($line['id']).")\"/>";
 			$page_questionTable[$i]['type'] = $line['qtype'];
+      $page_questionTable[$i]['broken'] = intval($line['broken']);
+
 			if ($searchall==1) {
 				$page_questionTable[$i]['lib'] = "<a href=\"manageqset.php?cid=$cid&listlib={$line['libid']}\">List lib</a>";
 			} else {
@@ -897,16 +898,32 @@ if ($myrights<20) {
 			}
 		}
 
-		//sort alpha sorted libraries
-		foreach ($page_libstouse as $libid) {
-			if ($libsortorder[$libid]==1) {
-				natcasesort($page_libqids[$libid]);
-				$page_libqids[$libid] = array_keys($page_libqids[$libid]);
-			}
-		}
-		if ($searchall==1) {
-			$page_libstouse = array_keys($page_libqids);
-		}
+    if ($searchall==1) { // consolidate all
+      uksort($page_questionTable, function($qA,$qB) use ($page_questionTable) {
+        if ($page_questionTable[$qA]['broken'] != $page_questionTable[$qB]['broken']) {
+          return $page_questionTable[$qA]['broken'] - $page_questionTable[$qB]['broken'];
+        } else {
+          return $qA - $qB;
+        }
+      });
+      $page_libstouse = array(0);
+      $page_libqids = array(0=>array_keys($page_questionTable));
+    } else {
+      //sort alpha sorted libraries
+      foreach ($page_libstouse as $libid) {
+        usort($page_libqids[$libid], function($qA,$qB) use ($libsortorder,$page_questionTable,$page_libqids,$libid) {
+          if ($page_questionTable[$qA]['broken'] != $page_questionTable[$qB]['broken']) {
+            return $page_questionTable[$qA]['broken'] - $page_questionTable[$qB]['broken'];
+          } else if ($page_questionTable[$qA]['junkflag'] != $page_questionTable[$qB]['junkflag']) {
+            return $page_questionTable[$qA]['junkflag'] - $page_questionTable[$qB]['junkflag'];
+          } else if ($libsortorder[$libid]==1) {
+            return strnatcasecmp($page_questionTable[$qA]['desc'], $page_questionTable[$qB]['desc']);
+          } else {
+            return $qA - $qB;
+          }
+        });
+      }
+    }
 	}
 
 }
@@ -935,7 +952,7 @@ function previewq(formn,loc,qn) {
 }
 function sethighlightrow(loc) {
 	$("tr.highlight").removeClass("highlight");
-	$("#"+loc).closest("tr").addClass("highlight");	
+	$("#"+loc).closest("tr").addClass("highlight");
 }
 var baseaddr = '<?php echo $address ?>';
 
