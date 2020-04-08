@@ -15,6 +15,7 @@ $fns="<script>function getSageOutput_$id (ob,part=-1,format='any') {
     let iframe=sagecellVCRP_jq.find('.sagecellframe')[0];
     var output=iframe.contentWindow.document.getElementsByClassName('sagecell_sessionOutput');
     if (output.length) {
+      console.log(output.length);
       var sageOutput=output[0].textContent;
       if (format == 'list') {
         var start=sageOutput.indexOf('[');
@@ -30,8 +31,9 @@ $fns="<script>function getSageOutput_$id (ob,part=-1,format='any') {
         sageOutput='['+sageOutput+']';
       }
       console.log('#qn'+ref1);
+      console.log('abc'+sageOutput);
       $('#qn'+ref1).val('text').trigger('change');
-	    $('input[id=\'tc'+ref1+'\'],input[id=\'qn'+ref1+'\']').val(sageOutput);
+	    $('input[id=\'tc'+ref1+'\'],input[id=\'qn'+ref1+'\']').val(sageOutput).trigger('change');
     } else {
       alert('Please evaluate cell');
     }
