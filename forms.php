@@ -60,7 +60,7 @@ switch($_GET['action']) {
 
 		if (!$emailconfirmation) {
 			$doselfenroll = false;
-			$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name");
+			$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE istemplate > 0 AND (istemplate&4)=4 AND available<4 ORDER BY name");
 			if ($stm->rowCount()>0) {
 				$doselfenroll = true;
 				echo '<p><label for="courseselect">',_('Select the course you\'d like to enroll in'),'</label></p>';
@@ -320,7 +320,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Enroll in a Course'),'</h1></div>';
 		echo "<form id=\"pageform\" method=post action=\"actions.php?action=enroll$gb\">";
 		$doselfenroll = false;
-		$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name");
+		$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE istemplate > 0 AND (istemplate&4)=4 AND available<4 ORDER BY name");
 		if ($stm->rowCount()>0) {
 			$doselfenroll = true;
 			echo '<p>',_('Select the course you\'d like to enroll in'),'</p>';

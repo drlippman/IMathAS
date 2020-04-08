@@ -29,7 +29,7 @@ if (isset($_GET['end'])) {
 
 
 //pull template courses
-$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&1)=1 OR (istemplate&2)=2 ORDER BY name");
+$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE istemplate > 0 AND (istemplate&1)=1 OR (istemplate&2)=2 ORDER BY name");
 $templates = array();
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$templates[$row[0]] = $row[1];
@@ -260,4 +260,3 @@ function getFormattedApprovalDate($row) {
 function getFormattedLastLogin($row) {
 	return ($row['lastaccess'] == 0 ? _('Never') : tzdate('n/j/y', $row['lastaccess']));
 }
-

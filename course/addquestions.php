@@ -832,6 +832,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else {
 					$stm = $DBH->prepare($query);
 					$stm->execute($qarr);
+					//echo preg_replace(array_fill(0,count($qarr),'/[?]/'), $qarr, $query, 1);
 				}
 				if ($stm->rowCount()==0) {
 					$noSearchResults = true;

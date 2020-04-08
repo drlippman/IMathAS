@@ -340,7 +340,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 		echo '</optgroup>';
 	}
-	$stm = $DBH->query("SELECT id,name,copyrights,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name");
+	$stm = $DBH->query("SELECT id,name,copyrights,termsurl FROM imas_courses WHERE istemplate > 0 AND (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name");
 	if ($stm->rowCount()>0) {
 		echo '<optgroup label="'._('Template Courses').'">';
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -354,7 +354,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	}
 
 	$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
-	$query .= "iu.groupid=:groupid AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+	$query .= "iu.groupid=:groupid AND ic.istemplate > 0 AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':groupid'=>$groupid));
 	if ($stm->rowCount()>0) {

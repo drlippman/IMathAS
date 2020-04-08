@@ -135,7 +135,7 @@
 	 	$stm = $DBH->prepare($query);
 	 	$stm->execute(array(':guestcnt'=>"guestacct$guestcnt", ':homelayout'=>$homelayout));
 	 	$userid = $DBH->lastInsertId();
-	 	$query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
+	 	$query = "SELECT id FROM imas_courses WHERE istemplate > 0 AND (istemplate&8)=8 AND available<4";
 		if (isset($_GET['cid'])) { $query.= ' AND id=:id'; }
 		$stm = $DBH->prepare($query);
 		if (isset($_GET['cid'])) {
