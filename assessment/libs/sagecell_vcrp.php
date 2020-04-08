@@ -30,8 +30,6 @@ $fns="<script>function getSageOutput_$id (ob,part=-1,format='any') {
         sageOutput=sageOutput.replace(/\)\s*\(/g,'),(');
         sageOutput='['+sageOutput+']';
       }
-      console.log('#qn'+ref1);
-      console.log('abc'+sageOutput);
       $('#qn'+ref1).val('text').trigger('change');
 	    $('input[id=\'tc'+ref1+'\'],input[id=\'qn'+ref1+'\']').val(sageOutput).trigger('change');
     } else {
