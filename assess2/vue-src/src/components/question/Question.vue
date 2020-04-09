@@ -191,6 +191,9 @@ export default {
     submitQuestion () {
       this.updateTime(false);
       actions.submitQuestion(this.qn, false, this.timeActive);
+      // reset timeactive counter
+      this.timeActive = 0;
+      this.timeActivated = new Date();
     },
     jumpToAnswer () {
       store.confirmObj = {
