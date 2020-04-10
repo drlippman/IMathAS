@@ -19,24 +19,24 @@ if ($isteacher || $istutor) {
 }
 
 if ($canviewall) {
-	if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
+	if (isset($_COOKIE[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode = $_COOKIE[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
-		$_SESSION[$cid.'gbmode'] = $gbmode;
+		setsecurecookie($cid.'gbmode', $gbmode);
 	}
-	if (isset($_SESSION[$cid.'catfilter'])) {
-		$catfilter = $_SESSION[$cid.'catfilter'];
+	if (isset($_COOKIE[$cid.'catfilter'])) {
+		$catfilter = $_COOKIE[$cid.'catfilter'];
 	} else {
 		$catfilter = -1;
 	}
 	if (isset($tutorsection) && $tutorsection!='') {
 		$secfilter = $tutorsection;
 	} else {
-		if (isset($_SESSION[$cid.'secfilter'])) {
-			$secfilter = $_SESSION[$cid.'secfilter'];
+		if (isset($_COOKIE[$cid.'secfilter'])) {
+			$secfilter = $_COOKIE[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}

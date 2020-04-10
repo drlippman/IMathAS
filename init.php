@@ -67,6 +67,21 @@ if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostpa
   }
 }
 
+function setsecurecookie($name, $value, $expires=0) {
+	if ($_SERVER['HTTP_HOST'] == 'localhost' || disallowsSameSiteNone()) {
+		setcookie($name, $value, $expires);
+	} else if (PHP_VERSION_ID < 70300) {
+		setcookie($name, $value, $expires, '/; samesite=none;', '', true);
+	} else {
+		setcookie($name, $value, array(
+			'lifetime' => $expires,
+			'secure' => true,
+			'samesite'=>'None'
+		));
+	}
+	$_COOKIE[$name] = $value;
+}
+
 // prevent errors in PHP < 7.2
 if (!defined('JSON_INVALID_UTF8_IGNORE')) {
 	define('JSON_INVALID_UTF8_IGNORE', 0);

@@ -51,8 +51,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-	} else if (isset($_SESSION[$cid.'gbmode'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
+	} else if (isset($_COOKIE[$cid.'gbmode'])) {
+		$gbmode = $_COOKIE[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));

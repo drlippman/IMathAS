@@ -301,8 +301,8 @@
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-	} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
+	} else if (isset($_COOKIE[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $_COOKIE[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -315,9 +315,9 @@
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			$_SESSION[$cid.'secfilter'] = $secfilter;
-		} else if (isset($_SESSION[$cid.'secfilter'])) {
-			$secfilter = $_SESSION[$cid.'secfilter'];
+			setsecurecookie($cid.'secfilter', $secfilter);
+		} else if (isset($_COOKIE[$cid.'secfilter'])) {
+			$secfilter = $_COOKIE[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
