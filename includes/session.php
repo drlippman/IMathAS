@@ -81,6 +81,7 @@ class SessionDBHandler implements SessionHandlerInterface
 		if ($stm->execute() && ($row = $stm->fetch())) {
 			$this->readLastAccess = $row['access'];
 			$this->readHash = md5($row['data']);
+			$GLOBALS['sessionLastAccess'] = $row['access'];
 			return $row['data'];
 		} else {
 			return '';
