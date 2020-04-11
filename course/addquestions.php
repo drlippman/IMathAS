@@ -557,7 +557,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$timeout = array();
 		$timeout[0] = round($line['meantime']/60, 1);
-		$timeout[1] = round($line['meanscore']/60, 1);
+		$timeout[1] = round($line['meanscore'], 1);
 		$timeout[2] = round($line['meantime']/60, 1);
 		$timeout[3] = intval($line['meantimen']);
 
