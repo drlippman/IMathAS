@@ -1596,6 +1596,9 @@ $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];
 $_SESSION['lti_origkey'] = $SESS['ltiorigkey'];
+if (isset($SESS['lti_duedate'])) {
+	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
+}
 if (isset($SESS['selection_return'])) {
 	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
 	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'];
@@ -2700,6 +2703,9 @@ $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];
 $_SESSION['lti_origkey'] = $SESS['ltiorigkey'];
+if (isset($SESS['lti_duedate'])) {
+	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
+}
 if (isset($SESS['selection_return'])) {
 	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
 	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'];
