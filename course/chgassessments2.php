@@ -125,7 +125,7 @@ if (!(isset($teacherid))) {
 					$defregenpenalty = 0;
 				}
 			}
-			if ($submitby == 'by_assessment') {
+			if ($submitby == 'by_assessment' && $defregens > 1) {
 				if ($_POST['keepscore'] === 'DNC') {
 					$coreOK = false;
 				} else {
@@ -166,7 +166,11 @@ if (!(isset($teacherid))) {
 			}
 			$viewingb = Sanitize::simpleASCII($_POST['viewingb']);
 			$scoresingb = Sanitize::simpleASCII($_POST['scoresingb']);
-			$ansingb = Sanitize::simpleASCII($_POST['ansingb']);
+			if (!isset($_POST['ansingb'])) {
+				$ansingb = 'never';
+			} else {
+				$ansingb = Sanitize::simpleASCII($_POST['ansingb']);
+			}
 			if ($showscores === 'DNC' || $showans === 'DNC' || $viewingb === 'DNC' ||
 				$scoresingb === 'DNC' || $ansingb === 'DNC'
 			) {
