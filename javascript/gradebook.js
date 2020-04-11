@@ -171,13 +171,6 @@ function makeofflineeditable(el) {
 			    newinp.value = anchors[i].innerHTML;
 			}
 			anchors[i].parentNode.appendChild(newinp);
-			var newtxta = document.createElement("textarea");
-			newtxta.name = "feedback["+bits[1]+"]";
-			newtxta.cols = 50;
-			var feedbtd = anchors[i].parentNode.nextSibling.nextSibling.nextSibling;
-			newtxta.value = feedbtd.innerHTML;
-			feedbtd.innerHTML = "";
-			feedbtd.appendChild(newtxta);
 		}
 	}
 	document.getElementById("savechgbtn").style.display = "";
