@@ -193,8 +193,8 @@
 			exit;
 		 }
 
-		 $_SESSION['useragent'] = $_SERVER['HTTP_USER_AGENT'];
-		 $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
+		 //$_SESSION['useragent'] = $_SERVER['HTTP_USER_AGENT'];
+		 //$_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
 		 $_SESSION['secsalt'] = generaterandstring();
 
 		 if (!isset($_POST['tzoffset'])) {
@@ -281,10 +281,10 @@
  //has logged in already
  if ($hasusername) {
 	//check validity, if desired
-	if (($_SESSION['useragent'] != $_SERVER['HTTP_USER_AGENT']) || ($_SESSION['ip'] != $_SERVER['REMOTE_ADDR'])) {
+	//if (($_SESSION['useragent'] != $_SERVER['HTTP_USER_AGENT']) || ($_SESSION['ip'] != $_SERVER['REMOTE_ADDR'])) {
 		//suggests sidejacking.  Delete session and require relogin
 		//   caused issues so removed
-	}
+	//}
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
