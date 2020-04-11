@@ -90,14 +90,9 @@
 		$fixbc = '';  $pad = '';
 	}
 	if ($shownav) {
-		if (isset($_SESSION['backtrack'])) {
-			echo '<div class="breadcrumb" '.$fixbc.'>'.$_SESSION['backtrack'][0];
-			echo " &gt; ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
-		} else {
-			echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			echo "&gt; ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
-			echo '<div id="headershowlinkedtext" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($titlesimp).'</h1></div>';
-		}
+		echo "<div class=breadcrumb $fixbc>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+		echo "&gt; ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
+		echo '<div id="headershowlinkedtext" class="pagetitle"><h1>'.Sanitize::encodeStringForDisplay($titlesimp).'</h1></div>';
 	}
 	echo '<div class="linkedtextholder" style="padding-left:10px; padding-right: 10px;'.$pad.'">';
 	$navbuttons = '';
@@ -178,11 +173,7 @@
 	echo Sanitize::outgoingHtml(filter($text));
 	echo '</div>';
 	if ($shownav) {
-		if (isset($_SESSION['backtrack'])) {
-			echo "<div class=right><a href=\"course.php?cid=$cid&folder=".$_SESSION['backtrack'][1]."\">Back</a></div>\n";
-		} else {
-			echo "<div class=right><a href=\"course.php?cid=$cid\">Return to Course Page</a></div>\n";
-		}
+		echo "<div class=right><a href=\"course.php?cid=$cid\">Return to Course Page</a></div>\n";
 	}
 	require("../footer.php");
 
