@@ -22,9 +22,9 @@ if (isset($_GET['secfilter'])) {
 }
 if (isset($_GET['rmode'])) {
 	$rmode = $_GET['rmode'];
-	$_SESSION[$cid.'rmode'] = $rmode;
-} else if (isset($_SESSION[$cid.'rmode'])) {
-	$rmode = $_SESSION[$cid.'rmode'];
+	setsecurecookie($cid.'rmode', $rmode);
+} else if (isset($_COOKIE[$cid.'rmode'])) {
+	$rmode = $_COOKIE[$cid.'rmode'];
 } else {
 	$rmode = 0;
 }
