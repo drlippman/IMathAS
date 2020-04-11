@@ -352,6 +352,19 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   padding: 1px;
 }
 
+div.question img, div.intro img {
+	max-width: 90%;
+	height: auto;
+}
+
+div.txtimgwrap > img {
+	max-width: none;
+}
+
+div.question td img, div.question th img {
+	max-width: 100%;
+}
+
 @media only screen and (max-width: 480px) {
   .questionpane {
     margin: 15px 4px;
