@@ -1347,7 +1347,11 @@ class AssessRecord
       $out['html'] = null;
       if ($out['tries_max'] == 1) {
         $out['parts_entered'] = $this->getHasAutosaves($qn, $answeights);
-    }
+      }
+      if ($ver == 'last' && ($this->assess_info->getSetting('showwork') & 2) == 2) {
+        $qver = $this->getQuestionVer($qn, $ver);
+        $out['work'] = isset($qver['work']) ? $qver['work'] : '';
+      }
     }
 
 
