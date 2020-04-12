@@ -1809,6 +1809,7 @@ function submitChanges() {
 		type: "POST",
 		//url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid",
 		url: AHAHsaveurl,
+		async: false,
 		data: outdata
 	})
 	.done(function() {

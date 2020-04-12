@@ -14,6 +14,10 @@
 		echo "error: invalid ID";
 		exit;
 	}
+	if (!isset($_POST['order']) || !isset($_POST['text_order'])) {
+		echo "error: missing required values";
+		exit;
+	}
 	$itemorder = str_replace('~',',',$rawitemorder);
 	$curitems = array();
 	foreach (explode(',',$itemorder) as $qid) {
@@ -28,6 +32,10 @@
 		$current_intro = $current_intro_json; //it actually isn't JSON
 	}
 	$new_text_segments_json = json_decode($_REQUEST['text_order'],true);
+	if ($new_text_segments_json === null) {
+		echo 'Error: error in text segments.';
+		exit;
+	}
 	if (count($new_text_segments_json)>0) {
 		require_once("../includes/htmLawed.php");
 		foreach ($new_text_segments_json as $k=>$seg) {
