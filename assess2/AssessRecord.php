@@ -3356,16 +3356,18 @@ class AssessRecord
 
     $pctscore = round(100*$scoreonfirst);
     $qsetid = $this->assess_info->getQuestionSetting($qdata['qid'], 'questionsetid');
-    $query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
-		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
-		$stm = $this->DBH->prepare($query);
-    $stm->execute(array(
-      ':courseid'=> $this->assess_info->getCourseId(),
-      ':qsetid'=> $qsetid,
-      ':score'=> $pctscore,
-      ':scoredet'=> implode('~', $scoredet),
-      ':timespent'=> $timeonfirst
-    ));
+    if (empty($GLOBALS['CFG']['skip_firstscores'])) {
+      $query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
+  		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
+  		$stm = $this->DBH->prepare($query);
+      $stm->execute(array(
+        ':courseid'=> $this->assess_info->getCourseId(),
+        ':qsetid'=> $qsetid,
+        ':score'=> $pctscore,
+        ':scoredet'=> implode('~', $scoredet),
+        ':timespent'=> $timeonfirst
+      ));
+    }
     $query = "UPDATE imas_questionset SET
 		 meanscoren=meanscoren+1,
 		 varscore=((meanscoren-1)*varscore + (:s1 - meanscore)*((meanscoren-1)*(:s2 - meanscore)/meanscoren))/(meanscoren),

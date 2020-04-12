@@ -567,12 +567,13 @@ function scorequestion($qn, $rectime=true, $recAsFirst=true) {
 			$time = 0;  //for all at once display, where time is not useful info
 		}
 		$pctscore = round(100*getpts($unitrawscore));
-		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
-		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':courseid'=>$testsettings['courseid'], ':qsetid'=>$qi[$questions[$qn]]['questionsetid'],
-			':score'=>$pctscore, ':scoredet'=>$rawscores[$qn], ':timespent'=>$time));
-
+		if (empty($GLOBALS['CFG']['skip_firstscores'])) {
+			$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
+			$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$testsettings['courseid'], ':qsetid'=>$qi[$questions[$qn]]['questionsetid'],
+				':score'=>$pctscore, ':scoredet'=>$rawscores[$qn], ':timespent'=>$time));
+		}
 		$query = "UPDATE imas_questionset SET
 		 meanscoren=meanscoren+1,
 		 varscore=((meanscoren-1)*varscore + (:s1 - meanscore)*((meanscoren-1)*(:s2 - meanscore)/meanscoren))/(meanscoren),
