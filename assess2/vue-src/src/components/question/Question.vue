@@ -47,6 +47,7 @@
           :id="'sw' + qn"
           :value = "questionData.work"
           rows = "3"
+          :active = "getwork === 2 || showWorkInput"
           @input = "updateWork"
           @blur = "workChanged"
           @focus = "workFocused"

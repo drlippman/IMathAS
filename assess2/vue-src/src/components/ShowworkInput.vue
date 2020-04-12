@@ -21,7 +21,8 @@ export default {
   props: {
     id: { default: null },
     value: { default: '' },
-    rows: { default: 2 }
+    rows: { default: 2 },
+    active: { default: true }
   },
   data: function () {
     return {
@@ -39,10 +40,14 @@ export default {
   },
   mounted: function () {
     this.$refs.inbox.innerHTML = this.value;
-    this.initEditor();
+    if (this.active) {
+      this.initEditor();
+    }
   },
   updated: function () {
-    this.initEditor();
+    if (this.active) {
+      this.initEditor();
+    }
   },
   methods: {
     guidGenerator: function () {
@@ -83,6 +88,11 @@ export default {
     }
   },
   watch: {
+    active: function (newValue, oldValue) {
+      if (newValue === true && this.objTinymce === null) {
+        this.initEditor();
+      }
+    },
     value: function (newValue, oldValue) {
       if (typeof newValue !== 'string') {
         // handle null and undefined
