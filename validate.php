@@ -50,7 +50,7 @@
  //check for bad sessionids.
  if (strlen($sessionid)<10) {
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
-	echo sprintf(_("Error.  Please %s try again%s","<a href=\"$imasroot/index.php\">","<a href=\"$imasroot/index.php\">","</a>"));
+	echo sprintf(_("Error.  Please %s try again%s"),"<a href=\"$imasroot/index.php\">","<a href=\"$imasroot/index.php\">","</a>");
 	exit;
  }
  if (!empty($_SESSION['userid'])) { // logged in
