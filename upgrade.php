@@ -50,7 +50,7 @@ unset($dbpassword);
 			<p>Run upgrade.php again after making those changes</p>';
 			exit;
 	}
-	$use_local_sessions = true;
+	//$use_local_sessions = true;
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
 		$init_skip_csrfp = true;
 		require("init_without_validate.php");
@@ -1806,7 +1806,7 @@ unset($dbpassword);
 			echo '<p>Added assessment sessions ver</p>';
 		}
 		if ($last<114) {
-		
+
 		}
 		if ($last<115) {
 			$query = "ALTER TABLE  `imas_users` ADD `FCMtoken` VARCHAR(512) NOT NULL DEFAULT '';";
