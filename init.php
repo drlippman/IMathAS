@@ -91,9 +91,22 @@ if (!defined('JSON_INVALID_UTF8_IGNORE')) {
 }
 
 // Store PHP sessions in the database.
-require_once(__DIR__ . "/includes/session.php");
 if (!isset($use_local_sessions)) {
+  if (!empty($CFG['dynamodb'])) {
+  	require_once(__DIR__ . "/includes/dynamodb/DynamoDbSessionHandler.php");
+  	(new Idealstack\DynamoDbSessionsDependencyFree\DynamoDbSessionHandler([
+  		'region' => $CFG['dynamodb']['region'],
+  		'table_name' => $CFG['dynamodb']['table'],
+  		'credentials' => [
+  			'key' => $CFG['dynamodb']['key'],
+  			'secret' => $CFG['dynamodb']['secret']
+  		],
+  		'base64' => false
+  	]))->register();
+  } else {
+	require_once(__DIR__ . "/includes/session.php");
 	session_set_save_handler(new SessionDBHandler(), true);
+  }
 }
 
 // Load validate.php?
