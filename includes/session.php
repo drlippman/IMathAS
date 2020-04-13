@@ -93,6 +93,9 @@ class SessionDBHandler implements SessionHandlerInterface
 	 */
 	public function write($sessionId, $sessionData)
 	{
+		if ($sessionData == '') {
+			return true; // skip write if no data
+		}
 		if (md5($sessionData) === $this->readHash &&
 			time() - $this->readLastAccess < 300
 		) {
