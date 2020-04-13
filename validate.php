@@ -62,7 +62,9 @@
  	 		$tzname = $_SESSION['tzname'];
  	 	}
  	 }
-   if ((time()-$GLOBALS['sessionLastAccess'])>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
+
+   $lastSessionTime = isset($GLOBALS['sessionLastAccess']) ? $GLOBALS['sessionLastAccess'] : $_SESSION['time'];
+   if ((time()-$lastSessionTime)>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
     $wasLTI = isset($_SESSION['ltiitemtype']);
     unset($_SESSION['userid']);
     unset($userid);
