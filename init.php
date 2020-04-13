@@ -66,7 +66,7 @@ if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostpa
 		));
   }
 }
-
+if (!function_exists('setsecurecookie')) {
 function setsecurecookie($name, $value, $expires=0) {
 	global $imasroot;
 	if ($_SERVER['HTTP_HOST'] == 'localhost' || disallowsSameSiteNone()) {
@@ -82,6 +82,7 @@ function setsecurecookie($name, $value, $expires=0) {
 		));
 	}
 	$_COOKIE[$name] = $value;
+}
 }
 
 // prevent errors in PHP < 7.2
@@ -103,7 +104,7 @@ if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init
 		require_once(__DIR__ . "/csrfp/simplecsrfp.php");
 		csrfProtector::init();
 	}
-} else if (empty($init_skip_session_start)) {
+} else if (!empty($init_session_start)) {
 	session_start();
 }
 /*

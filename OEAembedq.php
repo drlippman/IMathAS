@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Embed a Question via iFrame
 //(c) 2010 David Lippman
-$init_skip_session_start = true;
+$init_session_start = true;
 $init_skip_csrfp = true;
 require("./init_without_validate.php");
 

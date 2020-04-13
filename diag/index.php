@@ -1,4 +1,5 @@
 <?php
+  $init_session_start = true;
 	require("../init_without_validate.php");
 
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -337,7 +338,7 @@ if (isset($_POST['SID'])) {
 	$_SESSION['time'] = $now;
 	$_SESSION['tzoffset'] = $_POST['tzoffset'];
 	$_SESSION['tzname'] = $tzname;
-	
+
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 	if ($aVer > 1) {

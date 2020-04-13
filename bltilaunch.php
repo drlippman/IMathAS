@@ -28,6 +28,7 @@
 
 header('P3P: CP="ALL CUR ADM OUR"');
 $init_skip_csrfp = true;
+$init_session_start = true;
 include("init_without_validate.php");
 unset($init_skip_csrfp);
 
