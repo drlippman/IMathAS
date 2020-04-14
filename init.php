@@ -94,7 +94,7 @@ if (!defined('JSON_INVALID_UTF8_IGNORE')) {
 if (!isset($use_local_sessions)) {
   if (!empty($CFG['redis'])) {
   	 ini_set('session.save_handler', 'redis');
-  	 ini_set('session.save_path', 'tcp://'.$CFG['redis']);
+  	 ini_set('session.save_path', $CFG['redis']);
 	} else if (!empty($CFG['dynamodb'])) {
   	require_once(__DIR__ . "/includes/dynamodb/DynamoDbSessionHandler.php");
   	(new Idealstack\DynamoDbSessionsDependencyFree\DynamoDbSessionHandler([
