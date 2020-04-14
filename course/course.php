@@ -520,7 +520,7 @@ if ($overwriteBody==1) {
 		<p><b><?php echo _('Course Items'); ?></b><br/>
 			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy'); ?></a><br/>
 			<a href="../admin/ccexport.php?cid=<?php echo $cid ?>"><?php echo _('Export'); ?></a>
-		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=75) { ?>
+		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=100) { ?>
 			<br/><a href="../admin/importitems2.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
 		<?php } ?>
 		</p>
