@@ -679,6 +679,16 @@ if ($myrights<20) {
 						unset($searchterms[$k]);
 					}
 				}
+        $wholewords = array();
+				foreach ($searchterms as $k=>$v) {
+					if (ctype_alpha($v)) {
+						$wholewords[] = '+'.$v.'*';
+						unset($searchterms[$k]);
+					}
+				}
+				if (count($wholewords)>0) {
+					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) AND ';
+				}
 				if (count($searchterms)>0) {
 					$searchlikes .= "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
 					foreach ($searchterms as $t) {
