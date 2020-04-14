@@ -214,6 +214,7 @@
      if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
        $_SESSION['tzname'] = $_POST['tzname'];
      }
+     $_SESSION['install'] = $installname;
 
 		 if (isset($CFG['GEN']['newpasswords']) && strlen($line['password'])==32) { //old password - rehash it
 		 	 $hashpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -288,6 +289,13 @@
 		//   caused issues so removed
 	//}
 	//$username = $_COOKIE['username'];
+
+	// check right server
+	if ($_SESSION['install'] != $installname) {
+    session_destroy();
+    header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php');
+    exit;
+  }
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken,forcepwreset,mfa';
