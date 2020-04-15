@@ -28,8 +28,8 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	}
 
 	if ($isteacher || $istutor) {
-		if (isset($_COOKIE[$cid.'gbmode'])) {
-			$gbmode = $_COOKIE[$cid.'gbmode'];
+		if (isset($_SESSION[$cid.'gbmode'])) {
+			$gbmode =  $_SESSION[$cid.'gbmode'];
 		} else {
 			$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));

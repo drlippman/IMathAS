@@ -40,9 +40,9 @@ if ($isteacher || $istutor) {
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			setsecurecookie($cid.'secfilter', $secfilter);
-		} else if (isset($_COOKIE[$cid.'secfilter'])) {
-			$secfilter = $_COOKIE[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
