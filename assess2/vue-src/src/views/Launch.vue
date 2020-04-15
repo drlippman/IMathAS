@@ -3,7 +3,7 @@
     <div style="flex-grow: 1">
       <h1>{{ aInfo.name }}</h1>
 
-      <div class="med-below" v-html="aInfo.summary"></div>
+      <div class="med-below" v-html="aInfo.summary" ref="summary"></div>
 
       <settings-list />
 
@@ -242,6 +242,8 @@ export default {
       script.src = 'https://' + this.aInfo.livepoll_server + ':3000/socket.io/socket.io.js';
       document.getElementsByTagName('head')[0].appendChild(script);
     }
+    setTimeout(window.drawPics, 50);
+    window.rendermathnode(this.$refs.summary);
   }
 };
 </script>
