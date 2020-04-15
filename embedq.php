@@ -48,13 +48,6 @@ if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;
 }
-if (isset($CFG['GEN']['JWTsecret'])) {
-	$JWTsecret = $CFG['GEN']['JWTsecret'];
-} else if (getenv('AWS_SECRET_KEY')) {
-	$JWTsecret = getenv('AWS_SECRET_KEY');
-} else {
-	$JWTsecret = "testing";
-}
 $qsetid=Sanitize::onlyInt($_GET['id']);
 
 $page_formAction = "embedq.php?id=$qsetid";
@@ -96,10 +89,6 @@ if ($_GET['showans']==3) {//show always
 	$showans = 0;
 }
 $qcol = array();
-if (isset($_POST['choicemap'])) {
-  $_SESSION['choicemap'] = json_decode(openssl_decrypt(base64_decode($_POST['choicemap']),
-    openssl_get_cipher_methods()[0], $JWTsecret, 0, base64_decode($_POST['iv'])) ,true);
-}
 if (isset($_POST['seed']) && isset($_POST['check'])) {
 	$rawscores = array();
 	list($score,$rawscores[0]) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
@@ -200,14 +189,6 @@ if ($page_scoreMsg != '' && !isset($_GET['noscores'])) {
 echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"" . Sanitize::encodeStringForDisplay($page_formAction) . "\" onsubmit=\"doonsubmit(this)\">\n";
 echo "<input type=\"hidden\" name=\"seed\" value=\"" . Sanitize::encodeStringForDisplay($seed) . "\" />";
 displayq(0,$qsetid,$seed,$showans,true,0,false,false,false,$qcol);
-if (!empty($_SESSION['choicemap']) && function_exists('openssl_encrypt')) {
-  $cipher = openssl_get_cipher_methods()[0];
-  $ivlen = openssl_cipher_iv_length($cipher);
-  $iv = openssl_random_pseudo_bytes($ivlen);
-  $choicemap = base64_encode(openssl_encrypt(json_encode($_SESSION['choicemap']),$cipher,$JWTsecret,0,$iv));
-  echo '<input type=hidden name=choicemap value="'.$choicemap.'" />';
-  echo '<input type=hidden name=iv value="'.base64_encode($iv).'" />';
-}
 echo "<p><input type=submit name=\"check\" value=\"" . _('Check Answer') . "\">\n";
 if (empty($_GET['noregen'])) {
 	echo " <input type=submit name=\"next\" value=\"" . _('New Question') . "\"/>\n";

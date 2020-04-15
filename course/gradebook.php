@@ -80,20 +80,17 @@ if ($canviewall) {
 			$secfilter = -1;
 		}
 	}
-	if (isset($_GET['refreshdef']) && isset($_COOKIE[$cid.'catcollapse'])) {
-		setsecurecookie($cid.'catcollapse', 0, time()-3600);
-		unset($_COOKIE[$cid.'catcollapse']);
+	if (isset($_GET['refreshdef']) && isset($_SESSION[$cid.'catcollapse'])) {
+		unset($_SESSION[$cid.'catcollapse']);
 	}
-	if (isset($_COOKIE[$cid.'catcollapse'])) {
-		$pts = explode('-',$_COOKIE[$cid.'catcollapse']);
-		$overridecollapse = array_combine(explode('.',$pts[0]), explode('.',$pts[1]));
+	if (isset($_SESSION[$cid.'catcollapse'])) {
+		$overridecollapse = $_SESSION[$cid.'catcollapse'];
 	} else {
 		$overridecollapse = array();
 	}
 	if (isset($_GET['catcollapse'])) {
 		$overridecollapse[$_GET['cat']] = $_GET['catcollapse'];
-		setsecurecookie($cid.'catcollapse', implode('.',array_keys($overridecollapse))
-			.'-'.implode('.',array_values($overridecollapse)));
+		$_SESSION[$cid.'catcollapse'] = $overridecollapse;
 	}
 
 	//Gbmode : Links NC Dates
