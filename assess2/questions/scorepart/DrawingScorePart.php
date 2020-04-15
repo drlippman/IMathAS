@@ -60,6 +60,7 @@ class DrawingScorePart implements ScorePart
         if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
         if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
 
         if (!isset($reltolerance)) {
             if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
@@ -72,6 +73,15 @@ class DrawingScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
+        if (isset($scoremethod) && $scoremethod=='takeanything') {
+          if ($givenans==';;;;;;;;') {
+              $scorePartResult->setRawScore(0);
+              return $scorePartResult;
+          } else {
+              $scorePartResult->setRawScore(1);
+              return $scorePartResult;
+          }
+        }
         $imgborder = 5; $step = 5;
         if (!isset($answerformat)) {
             $answerformat = array('line','dot','opendot');
