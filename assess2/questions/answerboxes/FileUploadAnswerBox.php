@@ -95,15 +95,12 @@ class FileUploadAnswerBox implements AnswerBox
     					$url = getasidfileurl($file);
     					$extension = substr($url,strrpos($url,'.')+1,3);
     					$filename = basename($file);
-    					$out .= "<br/>" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\">$filename</a>";
+    					$out .= "<br/>" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a>";
     					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\" />";
     					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
     						$out .= " <span aria-expanded=\"false\" aria-controls=\"img$qn\" class=\"pointer clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
     						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
-    					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
-    						$out .= " <span aria-expanded=\"false\" aria-controls=\"fileprev$qn\" class=\"pointer clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
-    						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".rawurlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
-    					}
+    					} 
               $hasPrevSubmittedFile = true;
     				}
     			} else {

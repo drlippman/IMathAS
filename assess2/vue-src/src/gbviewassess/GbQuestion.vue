@@ -3,6 +3,7 @@
     v-html="qdata.html"
     class = "questionwrap"
     :id="'questionwrap' + qn"
+    ref = "thisqwrap"
   />
 </template>
 
@@ -21,7 +22,9 @@ export default {
         return;
       }
       setTimeout(window.drawPics, 100);
-      window.rendermathnode(document.getElementById('questionwrap' + this.qn));
+      window.rendermathnode(this.$refs.thisqwrap);
+      window.initSageCell(this.$refs.thisqwrap);
+      window.initlinkmarkup(this.$refs.thisqwrap);
       window.imathasAssess.init(this.qdata.jsparams, true);
       let svgchk = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
       svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
