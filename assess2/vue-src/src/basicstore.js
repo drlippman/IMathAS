@@ -314,8 +314,8 @@ export const actions = {
     if (typeof qns !== 'object') {
       qns = [qns];
     }
-
-    for (const k in window.callbackstack) {
+    for (let k in window.callbackstack) {
+      k = parseInt(k);
       if (qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
         window.callbackstack[k](k);
       }
