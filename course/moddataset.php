@@ -1226,7 +1226,7 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  '._('Delete?').' <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
+	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  "._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
