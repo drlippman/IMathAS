@@ -799,7 +799,7 @@ function togglefileembed() {
 			id: 'fileiframe'+id,
 			width: "80%",
 			height: 600,
-			src: 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(href),
+			src: 'https://docs.google.com/viewerng/viewer?embedded=true&url=' + encodeURIComponent(href),
 			frameborder: 0,
 			allowfullscreen: 1
 		}).insertAfter(jQuery(this));
