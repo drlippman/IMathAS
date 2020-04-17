@@ -40,7 +40,7 @@
 
 	if (isset($_GET['markunread'])) {
 		$msg = Sanitize::onlyInt($_GET['msgid']);
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread-1 WHERE id=:id and isread>0");
+		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=0 WHERE id=:id and viewed>0");
 		$stm->execute(array(':id'=>$msg));
 		if ($type=='new') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
@@ -259,8 +259,8 @@
 			."\">View Conversation</a>";
 
 	}
-	if ($type!='sent' && $type!='allstu' && ($line['isread']==0 || $line['isread']==4)) {
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+1 WHERE id=:id");
+	if ($type!='sent' && $type!='allstu' && $line['viewed']==0) {
+		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=1 WHERE id=:id");
 		$stm->execute(array(':id'=>$msgid));
 	}
 	echo '<p>&nbsp;</p>';

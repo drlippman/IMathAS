@@ -1227,7 +1227,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		}
 		$out = '';
 		if ($testsettings['msgtoinstr']==1 && $coursemsgset<4) {
-			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
+			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0");
 			$stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 			$msgcnt = $stm->fetchColumn(0);
 			$out .= "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Messages'). " ";

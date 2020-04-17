@@ -59,10 +59,10 @@
 	echo "&gt; <a href=\"msglist.php?cid=$cid\">Message List</a> &gt; Student Messages</div>";
 	echo '<div id="headerallstumsglist" class="pagetitle"><h1>All Student Messages</h1></div>';
 	if ($filterstu>0) {
-		$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE courseid=:courseid AND (isread<2 OR isread>3) AND msgto=:msgto");
+		$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE courseid=:courseid AND deleted<2 AND msgto=:msgto");
 		$stm->execute(array(':courseid'=>$cid, ':msgto'=>$filterstu));
 	} else {
-		$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE courseid=:courseid AND (isread<2 OR isread>3)");
+		$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE courseid=:courseid AND deleted<2");
 		$stm->execute(array(':courseid'=>$cid));
 	}
 	$numpages = ceil($stm->fetchColumn(0)/$threadsperpage);
@@ -160,9 +160,9 @@ function chgfilter() {
 	<tbody>
 <?php
 	$offset = ($page-1)*$threadsperpage;
-	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_msgs.msgto,imas_msgs.msgfrom,imas_msgs.isread,imas_courses.name ";
+	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_msgs.msgto,imas_msgs.msgfrom,imas_courses.name ";
 	$query .= "FROM imas_msgs,imas_courses WHERE imas_courses.id=imas_msgs.courseid AND ";
-	$query .= "(imas_msgs.isread<2 OR imas_msgs.isread>3) AND imas_msgs.courseid=:courseid ";
+	$query .= "imas_msgs.deleted<2 AND imas_msgs.courseid=:courseid ";
 	if ($filterstu>0) {
 		$query .= "AND imas_msgs.msgto=:msgto";
 	}

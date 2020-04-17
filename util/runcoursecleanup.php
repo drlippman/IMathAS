@@ -61,13 +61,13 @@ $now = time();
 $old = 24*60*60*(isset($CFG['cleanup']['old'])?$CFG['cleanup']['old']:610);
 $delay = 24*60*60*(isset($CFG['cleanup']['delay'])?$CFG['cleanup']['delay']:120);
 $msgfrom = isset($CFG['cleanup']['msgfrom'])?$CFG['cleanup']['msgfrom']:0;
-$keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:4;
+$keepsent = isset($CFG['cleanup']['keepsent'])?$CFG['cleanup']['keepsent']:1;
 $clearpw = 24*60*60*(isset($CFG['cleanup']['clearoldpw'])?$CFG['cleanup']['clearoldpw']:365);
 
 //run notifications 10 in a batch
 
-$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
+$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,deleted,courseid) VALUES ";
+$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :deleted, :courseid)";
 $msgins = $DBH->prepare($query);
 
 $updcrs = $DBH->prepare("UPDATE imas_courses SET cleanupdate=? WHERE id=?");
@@ -121,7 +121,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		':msgto' => $row['ownerid'],
 		':msgfrom' => $msgfrom,
 		':senddate' => $now,
-		':isread' => $keepsent,
+		':deleted' => $keepsent,
 		':courseid' => $row['id']
 	));
 

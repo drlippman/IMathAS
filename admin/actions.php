@@ -278,13 +278,11 @@ switch($_POST['action']) {
 
 		//leave any forum posts and wiki revisions - don't want to break anything
 
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto AND isread>1");
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto");
 		$stm->execute(array(':msgto'=>$deluid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+2 WHERE msgto=:msgto AND isread<2");
-		$stm->execute(array(':msgto'=>$deluid));
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND isread>1");
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND deleted=2");
 		$stm->execute(array(':msgfrom'=>$deluid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom=:msgfrom AND isread<2");
+		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE msgfrom=:msgfrom");
 		$stm->execute(array(':msgfrom'=>$deluid));
 
 		require_once("../includes/filehandler.php");

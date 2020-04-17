@@ -194,7 +194,7 @@ require_once("includes/sanitize.php");
 
 							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 							if ($msgOnEnroll) {
-								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
 								$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
 								$stm->execute(array(':cid'=>$_POST['courseid']));
 								while ($tuid = $stm->fetchColumn(0)) {
@@ -530,7 +530,7 @@ require_once("includes/sanitize.php");
 
 					$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 					if ($msgOnEnroll) {
-						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
 						$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
 						$stm->execute(array(':cid'=>$_POST['cid']));
 						while ($tuid = $stm->fetchColumn(0)) {

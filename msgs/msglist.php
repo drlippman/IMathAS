@@ -2,27 +2,12 @@
 	//Displays Message list
 	//(c) 2006 David Lippman
 	/*
-isread:
-# to  frm
-0 NR  --
-1 R   --
-2 DR  --
-3 DNR --
-4 NR  D
-5 R   D
 
-0 - not read
-1 - read
-2 - deleted not read
-3 - deleted and read
-4 - deleted by sender
-5 - deleted by sender,read
+viewed: 0 unread, 1 read
+deleted: 0 not deleted, 1 deleted by sender, 2 deleted by reader
+tagged: 0 no, 1 yes
 
-isread is bitwise:
-1      2         4                   8
-Read   Deleted   Deleted by Sender   Tagged
-
-If (isread&2)==2 && (isread&4)==4  then should be deleted
+If deleted on both ends, delete from DB
 
 	*/
 	require("../init.php");
@@ -199,17 +184,17 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			}
 
       $now = time();
-			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-			$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
+			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,courseid) VALUES ";
+			$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :courseid)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':title'=>$subjectPost, ':message'=>$messagePost, ':msgto'=>$msgToPost,
-        ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$cidP));
+        ':msgfrom'=>$userid, ':senddate'=>$now, ':courseid'=>$cidP));
 			$msgid = $DBH->lastInsertId();
 
 			if ($_GET['replyto']>0) {
 				$query = "UPDATE imas_msgs SET replied=1";
 				if (isset($_POST['sendunread'])) {
-					$query .= ',isread=(isread&~1)';
+					$query .= ',viewed=0';
 				}
         $query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
@@ -551,24 +536,24 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	if (isset($_POST['unread'])) {
 		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
-  		$query = "UPDATE imas_msgs SET isread=(isread&~1) WHERE id IN ($checklist) AND (isread&1)=1";
-      $DBH->query($query);
+  		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=0 WHERE id IN ($checklist) AND viewed=1 AND msgto=?");
+      $stm->execute(array($userid));
 	 }
 	}
 	if (isset($_POST['markread'])) {
 		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
-      $query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
-      $DBH->query($query);
+      $stm = $DBH->prepare("UPDATE imas_msgs SET viewed=1 WHERE id IN ($checklist) AND viewed=0 AND msgto=?");
+      $stm->execute(array($userid));
 	  }
 	}
 	if (isset($_POST['remove'])) {
 		if (!empty($_POST['checked'])) {
       $checklist = implode(',', array_map('intval', $_POST['checked']));
-  		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
-      $DBH->query($query);
-  		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
-      $DBH->query($query);
+  		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND deleted=1 AND msgto=?"); // already deleted by sender
+      $stm->execute(array($userid));
+  		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=2 WHERE id IN ($checklist) AND msgto=?");
+      $stm->execute(array($userid));
   		if ($type=='new') {
   			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
   		} else {
@@ -578,10 +563,10 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
   	}
 	}
 	if (isset($_GET['removeid'])) {
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND (isread&4)=4");
-		$stm->execute(array(':id'=>$_GET['removeid']));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=(isread|2) WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['removeid']));
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND deleted=1 AND msgto=:msgto");
+		$stm->execute(array(':id'=>$_GET['removeid'], ':msgto'=>$userid));
+		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=2 WHERE id=:id AND msgto=:msgto");
+		$stm->execute(array(':id'=>$_GET['removeid'], ':msgto'=>$userid));
 	}
 
 	$pagetitle = "Messages";
@@ -645,7 +630,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	$actbar[] = '<input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available" />';
 	echo '<div class="cpmid">'.implode(' | ',$actbar).'</div>';
 
-	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND (isread&2)=0";
+	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND deleted<2";
   $qarr = array(':msgto'=>$userid);
 	if ($filtercid>0) {
 		$query .= " AND courseid=:courseid";
@@ -656,10 +641,10 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
     $qarr[':msgfrom'] = $filteruid;
 	}
 	if ($limittotagged==1) {
-		$query .= " AND (isread&8)=8";
+		$query .= " AND tagged=1";
 	}
 	if ($limittonew) {
-		$query .= " AND (isread&1)=0";
+		$query .= " AND viewed=0";
 	}
   $stm = $DBH->prepare($query);
   $stm->execute($qarr);
@@ -668,15 +653,15 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
 		$filteruid = 0;
-    $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND (isread&2)=0";
+    $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND deleted<2";
 		if ($filtercid>0) {
 			$query .= " AND courseid=:courseid";
 		}
 		if ($limittotagged==1) {
-			$query .= " AND (isread&8)=8";
+			$query .= " AND tagged=1";
 		}
 		if ($limittonew) {
-			$query .= " AND (isread&1)=0";
+			$query .= " AND viewed=0";
 		}
     $stm = $DBH->prepare($query);
     if ($filtercid>0) {
@@ -746,7 +731,7 @@ function chgfilter() {
 	$query = "SELECT imas_courses.id,imas_courses.name,";
 	$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active,";
 	$query .= "IF(istu.hidefromcourselist=1 OR itut.hidefromcourselist=1 OR iteach.hidefromcourselist=1,1,0) as hidden ";
-	$query .= "FROM imas_courses JOIN imas_msgs ON imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto=:msgto AND imas_msgs.isread&2=0 ";
+	$query .= "FROM imas_courses JOIN imas_msgs ON imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto=:msgto AND imas_msgs.deleted<2 ";
 	$query .= "LEFT JOIN imas_students AS istu ON imas_msgs.courseid=istu.courseid AND istu.userid=:uid ";
 	$query .= "LEFT JOIN imas_tutors AS itut ON imas_msgs.courseid=itut.courseid AND itut.userid=:uid2 ";
 	$query .= "LEFT JOIN imas_teachers AS iteach ON imas_msgs.courseid=iteach.courseid AND iteach.userid=:uid3 ";
@@ -833,9 +818,9 @@ function chgfilter() {
 <?php
   $offset = max(0, ($page-1)*$threadsperpage);
 
-  $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
+  $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.viewed,imas_msgs.tagged,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread&2)=0 ";
+	$query .= "imas_msgs.msgto=:msgto AND imas_msgs.deleted<2 ";
   $qarr = array(':msgto'=>$userid);
   if ($filteruid>0) {
 		$query .= "AND imas_msgs.msgfrom=:msgfrom ";
@@ -846,15 +831,16 @@ function chgfilter() {
     $qarr[':courseid']=$filtercid;
 	}
 	if ($limittotagged) {
-		$query .= "AND (imas_msgs.isread&8)=8 ";
+		$query .= "AND imas_msgs.tagged=1 ";
 	}
 	if ($limittonew) {
-		$query .= " AND (isread&1)=0 ";
+		$query .= "AND imas_msgs.viewed=0 ";
 	}
 	$query .= "ORDER BY senddate DESC ";
 	if (!$limittotagged && !$limittonew) {
 		$query .= "LIMIT $offset,$threadsperpage";// INT values
 	}
+
   $stm = $DBH->prepare($query);
   $stm->execute($qarr);
 	if ($stm->rowCount()==0) {
@@ -878,14 +864,14 @@ function chgfilter() {
 		}
 		printf("<tr id=\"tr%d\" ", Sanitize::onlyInt($line['id']));
 		$stripe = ($cnt%2==0)?'even':'odd';
-		if (($line['isread']&8)==8) {
+		if ($line['tagged'] == 1) {
 			echo 'class="tagged '.$stripe.'" ';
 		} else {
 			echo 'class="'.$stripe.'"';
 		}
 		echo "><td><input type=checkbox name=\"checked[]\" value=\"".Sanitize::onlyInt($line['id'])."\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid=".Sanitize::onlyInt($line['id'])."\">";
-		if (($line['isread']&1)==0) {
+		if ($line['viewed']==0) {
 			echo "<b>" . $line['title']. "</b>";
 		} else {
 			echo $line['title'];
@@ -915,7 +901,7 @@ function chgfilter() {
 
 		echo "</td><td>";
 		echo '<a href="#" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');return false;">';
-		if (($line['isread']&8)==8) {
+		if ($line['tagged']==1) {
 			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" alt=\"Flagged\"/>";
 		} else {
 			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" alt=\"Not flagged\"/>";
