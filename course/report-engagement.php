@@ -75,7 +75,7 @@ $forumP95Delay = $diffs[floor(.95*$forumRepliedCnt)-1];
 $t6 = microtime(true);
 
 if ($courseUIver > 1) {
-  $query = 'SELECT count(iar.id) FROM imas_assessment_records AS iar ';
+  $query = 'SELECT count(iar.userid) FROM imas_assessment_records AS iar ';
   $query .= 'JOIN imas_assessments AS ia ON ia.id=iar.assessmentid AND ia.courseid=? ';
   $query .= 'WHERE (iar.status&8)=8';
   $stm = $DBH->prepare($query);
