@@ -327,7 +327,7 @@
 	}
 	*/
 	$FCMtoken = $line['FCMtoken'];
-	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
+	$userfullname = strip_tags($line['FirstName'] . ' ' . $line['LastName']);
 	$inInstrStuView = false;
 	if (!isset($_SESSION['userprefs']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		//userprefs are missing!  They should be defined from initial session setup
