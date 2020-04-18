@@ -64,32 +64,46 @@
 		$viddata = unserialize($viddata);
 		$qorder = explode(',',$rawitemorder);
 		$qidbynum = array();
+		$k = 0;
 		for ($i=0;$i<count($qorder);$i++) {
 			if (strpos($qorder[$i],'~')!==false) {
 				$qids = explode('~',$qorder[$i]);
 				if (strpos($qids[0],'|')!==false) { //pop off nCr
-					$qidbynum[$i] = $qids[1];
+					$choose = explode('|', $qids[0]);
+					for ($j=0;$j<$choose[0];$j++) { // add the number from pool we're using
+						$qidbynum[$k] = $qids[1+$j];
+						$k++;
+					}
 				} else {
-					$qidbynum[$i] = $qids[0];
+					$qidbynum[$k] = $qids[0];
+					$k++;
 				}
 			} else {
-				$qidbynum[$i] = $qorder[$i];
+				$qidbynum[$k] = $qorder[$i];
+				$k++;
 			}
 		}
 
 		$qorder = explode(',',$_REQUEST['order']);
 		$newbynum = array();
 		if (trim($_REQUEST['order'])!='') {
+			$k=0;
 			for ($i=0;$i<count($qorder);$i++) {
 				if (strpos($qorder[$i],'~')!==false) {
 					$qids = explode('~',$qorder[$i]);
 					if (strpos($qids[0],'|')!==false) { //pop off nCr
-						$newbynum[$i] = $qids[1];
+						$choose = explode('|', $qids[0]);
+						for ($j=0;$j<$choose[0];$j++) { // add the number from pool we're using
+							$newbynum[$k] = $qids[1+$j];
+							$k++;
+						}
 					} else {
-						$newbynum[$i] = $qids[0];
+						$newbynum[$k] = $qids[0];
+						$k++;
 					}
 				} else {
-					$newbynum[$i] = $qorder[$i];
+					$newbynum[$k] = $qorder[$i];
+					$k++;
 				}
 			}
 		}
@@ -99,6 +113,11 @@
 		$newviddata = array();
 		$newviddata[0] = $viddata[0];
 		for ($i=0;$i<count($newbynum);$i++) {   //for each new item
+			if (!isset($qidbynumflip[$newbynum[$i]])) {
+				// could happen if n in group is increased
+				$newviddata[] =  array('','',$i);
+				continue;
+			}
 			$oldnum = $qidbynumflip[$newbynum[$i]];
 			$found = false; //look for old item in viddata
 			for ($j=1;$j<count($viddata);$j++) {

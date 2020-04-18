@@ -93,10 +93,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$viddata = $row[1];
 			if ($viddata != '') {
-				if ($row[0]=='') {
-					$nextnum = 0;
-				} else {
-					$nextnum = substr_count($row[0],',')+1;
+				$nextnum = 0;
+				if ($row[0]!='') {
+					foreach (explode(',', $row[0]) as $iv) {
+						if (strpos($iv,'|')!==false) {
+							$choose = explode('|', $iv);
+							$nextnum += $choose[0];
+						} else {
+							$nextnum++;
+						}
+					}
 				}
 				$numnew= count($checked);
 				$viddata = unserialize($viddata);
