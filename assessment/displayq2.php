@@ -6090,6 +6090,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$tplines = explode('),(', substr($tplines,1,strlen($tplines)-2));
 				foreach ($tplines as $k=>$val) {
 					$pts = explode(',',$val);
+					if ($pts[1]==$pts[3] && $pts[2]==$pts[4]) {
+						//the points are the same; skip it
+						unset($tplines[$k]);
+						continue;
+					}
 					if ($pts[0]==5) {
 						//line
 						if ($pts[3]==$pts[1]) {
