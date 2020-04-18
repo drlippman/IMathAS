@@ -172,7 +172,7 @@ $stm = $DBH->prepare("SELECT id,name FROM imas_courses WHERE id IN (:cidlist)");
 	}
 	$query = "SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_users.FirstName,imas_users.LastName ";
 	$query .= "FROM imas_msgs,imas_users WHERE imas_msgs.msgto=:msgto AND imas_msgs.msgfrom=imas_users.id ";
-	$query .= "AND imas_msgs.viewed=0 ORDER BY imas_msgs.senddate DESC";
+	$query .= "AND imas_msgs.viewed=0 AND deleted<2 ORDER BY imas_msgs.senddate DESC";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':msgto'=>$userid));
 	if ($stm->rowCount()>0) {
