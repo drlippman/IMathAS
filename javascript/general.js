@@ -939,12 +939,12 @@ jQuery(document).ready(function($) {
 			if ("qn" in edata) {
 				var qn = edata['qn'].replace(/[^\d]/, "");
 				if (qn != "") {
-					$("#qn"+qn).val(edata['value']);
+					$("#qn"+qn).val(edata['value']).trigger('change');
 				}
 			} else {
 				var id = edata['id'].replace(/[^\w\-]/, "");
 				if ($("#"+id).hasClass("allowupdate")) {
-					$("#"+id).val(edata['value']);
+					$("#"+id).val(edata['value']).trigger('change');;
 				}
 			}
 		}
