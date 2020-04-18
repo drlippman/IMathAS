@@ -1318,12 +1318,7 @@ class AssessRecord
     $out['singlescore'] = !empty($curq['singlescore']);
 
     if ($generate_html) {
-      $showscores = $this->assess_info->getSetting('showscores');
-      $scoresInGb = $this->assess_info->getSetting('scoresingb');
-      $force_scores = ($aver['status'] === 1 && $showscores === 'at_end') ||
-        $this->teacherInGb ||
-        ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
-        ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'));
+      $force_scores = ($include_scores && $include_parts);
       $showans = $this->assess_info->getQuestionSetting($curq['qid'], 'showans');
       $ansInGb = $this->assess_info->getSetting('ansingb');
 
@@ -2473,7 +2468,7 @@ class AssessRecord
       $scoresInGb == 'never' ||
       ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')))
     ) {
-      // don't show overall score
+      // don't show overall score;
       $out['gbscore'] = "N/A";
       $out['scored_version'] = 0;
     } else {
@@ -2500,7 +2495,18 @@ class AssessRecord
     $this->parseData();
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $out = array();
+
     $scored_aver = $by_question ? 0 : $this->data['scored_version'];
+
+    // if not showing scores, show last submitted ver
+    $scoresInGb = $this->assess_info->getSetting('scoresingb');
+    if (!$this->teacherInGb && (
+      $scoresInGb == 'never' ||
+      ($scoresInGb =='after_due' && time() < $this->assess_info->getSetting('enddate')))
+    ) {
+      $scored_aver = 0;
+    }
+
     $viewInGb = $this->assess_info->getSetting('viewingb');
     for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
       if ($viewInGb == 'after_take' && $this->data['assess_versions'][$av]['status'] != 1 &&
