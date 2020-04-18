@@ -1319,8 +1319,11 @@ class AssessRecord
 
     if ($generate_html) {
       $showscores = $this->assess_info->getSetting('showscores');
+      $scoresInGb = $this->assess_info->getSetting('scoresingb');
       $force_scores = ($aver['status'] === 1 && $showscores === 'at_end') ||
-        $this->teacherInGb;
+        $this->teacherInGb ||
+        ($scoresInGb == 'after_take' && $aver['status'] == 1) ||
+        ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'));
       $showans = $this->assess_info->getQuestionSetting($curq['qid'], 'showans');
       $ansInGb = $this->assess_info->getSetting('ansingb');
 
