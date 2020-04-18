@@ -375,7 +375,15 @@ switch($_POST['action']) {
 			$specialrights += 64;
 		}
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights);");
-		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
+		$stm->execute(array(':SID'=>$_POST['SID'],
+			':password'=>$md5pw,
+			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+			':rights'=>$_POST['newrights'],
+			':email'=>Sanitize::emailAddress($_POST['email']),
+			':groupid'=>$newgroup,
+			':homelayout'=>$homelayout,
+			':specialrights'=>$specialrights));
 		$newuserid = $DBH->lastInsertId();
 		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
 			$valbits = array();
@@ -1095,7 +1103,7 @@ switch($_POST['action']) {
 			$query = "INSERT INTO imas_users (email,FirstName,LastName,SID,password,rights,groupid) VALUES ";
 			$query .= "(:email, :FirstName, :LastName, :SID, :password, :rights, :groupid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':email'=>$_POST['ltidomain'], ':FirstName'=>$_POST['ltidomain'], ':LastName'=>'LTIcredential',
+			$stm->execute(array(':email'=>$_POST['ltidomain'], ':FirstName'=>Sanitize::stripHtmlTags($_POST['ltidomain']), ':LastName'=>'LTIcredential',
 				':SID'=>$_POST['ltikey'], ':password'=>$_POST['ltisecret'], ':rights'=>$_POST['createinstr'], ':groupid'=>$_POST['groupid']));
 		} else {
 			$query = "UPDATE imas_users SET email=:email,FirstName=:FirstName,LastName='LTIcredential',";

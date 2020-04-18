@@ -120,9 +120,9 @@ require_once("includes/sanitize.php");
 			':SID'=>$_POST['SID'],
 			':password'=>$md5pw,
 			':rights'=>$initialrights,
-			':FirstName'=>$_POST['firstname'],
-			':LastName'=>$_POST['lastname'],
-			':email'=>$_POST['email'],
+			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+			':email'=>Sanitize::emailAddress($_POST['email']),
 			':msgnotify'=>$msgnot,
 			':homelayout'=>$homelayout));
 		$newuserid = $DBH->lastInsertId();

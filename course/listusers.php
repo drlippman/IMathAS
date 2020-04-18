@@ -161,7 +161,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, 1);";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>10,
-					':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>0));
+					':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+					':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+					':email'=>Sanitize::emailAddress($_POST['email']),
+					':msgnotify'=>0));
 				$newuserid = $DBH->lastInsertId();
 				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ($newuserid,'$cid')";
 				$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");

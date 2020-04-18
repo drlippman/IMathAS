@@ -316,7 +316,11 @@ if (isset($_POST['SID'])) {
 	if (!isset($_POST['passwd'])) {
 		$_POST['passwd'] = "none";
 	}
-	$stm->execute(array(':SID'=>$diagSID, ':password'=>$_POST['passwd'], ':rights'=>10, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$eclass, ':lastaccess'=>$now));
+	$stm->execute(array(':SID'=>$diagSID, ':password'=>$_POST['passwd'], ':rights'=>10,
+    ':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+    ':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+    ':email'=>Sanitize::stripHtmlTags($eclass),
+    ':lastaccess'=>$now));
 	$userid = $DBH->lastInsertId();
 	if (!isset($_POST['timelimitmult'])) {
 		$_POST['timelimitmult'] = 1;
