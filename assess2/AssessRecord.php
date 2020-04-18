@@ -3216,6 +3216,11 @@ class AssessRecord
     return array();
   }
 
+  public function getQsWithAutosave() {
+    $this->parseData();
+    return array_keys($this->data['autosaves']);
+  }
+
   /**
    * Get what parts of which questions have autosaves
    * @return array  qn=>array of part numbers
