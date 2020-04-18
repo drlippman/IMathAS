@@ -221,6 +221,8 @@ export const actions = {
       const changedQuestions = this.getChangedQuestions();
       for (const i in store.assessInfo.questions) {
         if (store.assessInfo.questions[i].try > 0 ||
+          (store.assessInfo.questions[i].hasOwnProperty('parts_entered') &&
+           store.assessInfo.questions[i].parts_entered.indexOf(0) === -1) ||
           changedQuestions.hasOwnProperty(i)
         ) {
           qAttempted++;
