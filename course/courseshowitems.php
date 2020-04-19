@@ -200,7 +200,7 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
-	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
+	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset;
 	   global $itemshowdata, $exceptionfuncs;
 
 	   require_once("../includes/filehandler.php");
@@ -1436,12 +1436,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon($icon, "link to $icon", false);
 
 				   echo "<div class=title>";
-				   if (isset($readlinkeditems[$typeid])) {
-				   	   echo '<b class="readitem">';
-				   } else {
-				   	   echo '<b>';
-				   }
-				   echo "<a href=\"$alink\" $rec $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b>\n";
+				   echo "<b><a href=\"$alink\" $rec $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
