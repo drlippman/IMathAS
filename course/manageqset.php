@@ -651,7 +651,7 @@ if ($myrights<20) {
 			$safesearch = '';
 		}
     $searchlikevals = array();
-		$isIDsearch = false;
+		$isIDsearch = 0;
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
 		} else {
@@ -668,7 +668,7 @@ if ($myrights<20) {
 			} else if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id=? AND ";
 				$searchlikevals = array(substr($safesearch,3));
-				$isIDsearch = true;
+				$isIDsearch = substr($safesearch,3);
 			} else {
 				$searchterms = explode(" ",$safesearch);
 				$searchlikes = '';
@@ -681,27 +681,30 @@ if ($myrights<20) {
 				}
         $wholewords = array();
 				foreach ($searchterms as $k=>$v) {
-					if (ctype_alpha($v)) {
+					if (ctype_alnum($v) && strlen($v)>3) {
 						$wholewords[] = '+'.$v.'*';
 						unset($searchterms[$k]);
 					}
 				}
+				$searchlikes = '(';
 				if (count($wholewords)>0) {
-					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) AND ';
+					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
 				}
 				if (count($searchterms)>0) {
-					$searchlikes .= "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+					if (count($wholewords)>0) {
+						$searchlikes .= 'AND ';
+					}
+					$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
 					foreach ($searchterms as $t) {
 						$searchlikevals[] = "%$t%";
 					}
-
-					if (ctype_digit($safesearch)) {
-						$searchlikes .= "OR imas_questionset.id=?) AND ";
-						$searchlikevals[] = $safesearch;
-						$isIDsearch = true;
-					} else {
-						$searchlikes .= ") AND";
-					}
+				}
+				if (ctype_digit($safesearch)) {
+					$searchlikes .= "OR imas_questionset.id=?) AND ";
+					$searchlikevals[] = $safesearch;
+					$isIDsearch = $safesearch;
+				} else {
+					$searchlikes .= ") AND";
 				}
 			}
 		}
@@ -764,10 +767,10 @@ if ($myrights<20) {
 		} else if ($isgrpadmin) {
 			$query .= "AND (imas_users.groupid=? OR imas_questionset.userights>0) ";
 			$qarr[] = $groupid;
-			if ($isIDsearch) {
+			if ($isIDsearch>0) {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=? OR imas_questionset.id=?)";
 				$qarr[] = $groupid;
-				$qarr[] = $safesearch;
+				$qarr[] = $isIDsearch;
 			} else {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=?)";
 				$qarr[] = $groupid;
@@ -775,10 +778,10 @@ if ($myrights<20) {
 		} else {
 			$query .= "AND (imas_questionset.ownerid=? OR imas_questionset.userights>0) ";
 			$qarr[] = $userid;
-			if ($isIDsearch) {
+			if ($isIDsearch>0) {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=? OR imas_questionset.id=?)";
 				$qarr[] = $userid;
-				$qarr[] = $safesearch;
+				$qarr[] = $isIDsearch;
 			} else {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?)";
 				$qarr[] = $userid;
