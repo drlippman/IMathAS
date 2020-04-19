@@ -344,13 +344,13 @@
 				$pts = $defpoints;
 			}
 			if ($qcnt[$qid]>0) {
-				$avg = round($qtotal[$qid]/$qcnt[$qid],2);
+				$avg = $qtotal[$qid]/$qcnt[$qid];
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
-					$avg2 = round($qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2); //avg adjusted for not attempted
+					$avg2 = $qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]); //avg adjusted for not attempted
 				} else {
 					$avg2 = 0;
 				}
-				$avgscore[$i-1] = $avg;
+				$avgscore[$i-1] = round($avg*$pts,2);
 				$qs[$i-1] = $qid;
 
 				if ($pts>0) {
