@@ -11,6 +11,7 @@ If deleted on both ends, delete from DB
 
 	*/
 	require("../init.php");
+	require('../includes/getcourseopts.php');
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -304,48 +305,7 @@ If deleted on both ends, delete from DB
 				$msgmonitor = (floor($msgset/5)&1);
 				$msgset = $msgset%5;
 			} else {
-				$course_array = array();
-				$query = "SELECT i_c.id,i_c.name,i_c.msgset,2 AS userrole,";
-				$query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
-				$query .= "FROM imas_courses AS i_c JOIN imas_teachers ON ";
-				$query .= "i_c.id=imas_teachers.courseid WHERE imas_teachers.userid=:userid AND imas_teachers.hidefromcourselist=0 ";
-				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,1 AS userrole,";
-				$query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
-				$query .= "FROM imas_courses AS i_c JOIN imas_tutors ON ";
-				$query .= "i_c.id=imas_tutors.courseid WHERE imas_tutors.userid=:userid2 AND imas_tutors.hidefromcourselist=0 ";
-				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,0 AS userrole,";
-				$query .= "IF(UNIX_TIMESTAMP()<i_c.startdate OR UNIX_TIMESTAMP()>i_c.enddate,0,1) as active ";
-				$query .= "FROM imas_courses AS i_c JOIN imas_students ON ";
-				$query .= "i_c.id=imas_students.courseid WHERE imas_students.userid=:userid3 AND imas_students.hidefromcourselist=0 ";
-				$query .= "ORDER BY userrole DESC,active DESC, name";
-				$stm = $DBH->prepare($query);
-				$stm->execute(array(':userid'=>$userid, ':userid2'=>$userid, ':userid3'=>$userid));
-				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					if ($row['userrole']==0 && $row['msgset']%5>=3) {continue;}
-					if (!isset($course_array[$row['userrole']])) {
-						$course_array[$row['userrole']] = array();
-					}
-					$course_array[$row['userrole']][] = $row;
-				}
-				$courseopts = '';
-				for ($i=2;$i>=0;$i--) {
-					if (isset($course_array[$i])) {
-						$courseopts .= '<optgroup label="';
-						if ($i==2) { $courseopts .= _("Teaching"); }
-						else if ($i==1) { $courseopts .= _("Tutoring"); }
-						else if ($i==0) { $courseopts .= _("Student"); }
-						$courseopts .= '">';
-						foreach ($course_array[$i] as $r) {
-							if ($r['active']==0) {
-								$prefix = _('Inactive: ');
-							} else {
-								$prefix = '';
-							}
-							$courseopts .= '<option value="'.Sanitize::encodeStringForDisplay($r['id']).'">'.Sanitize::encodeStringForDisplay($prefix . $r['name']).'</option>';
-						}
-						$courseopts .= '</optgroup>';
-					}
-				}
+				$courseopts = getCourseOpts(true);
 			}
 
 			$courseid=($cid==0)?$filtercid:$cid;
@@ -727,54 +687,12 @@ function chgfilter() {
 	<form id="qform" method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 	<p><label for="filtercid">Filter by course</label>: <select id="filtercid" onchange="chgfilter()">
 <?php
-
-	$query = "SELECT imas_courses.id,imas_courses.name,";
-	$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active,";
-	$query .= "IF(istu.hidefromcourselist=1 OR itut.hidefromcourselist=1 OR iteach.hidefromcourselist=1,1,0) as hidden ";
-	$query .= "FROM imas_courses JOIN imas_msgs ON imas_courses.id=imas_msgs.courseid AND imas_msgs.msgto=:msgto AND imas_msgs.deleted<2 ";
-	$query .= "LEFT JOIN imas_students AS istu ON imas_msgs.courseid=istu.courseid AND istu.userid=:uid ";
-	$query .= "LEFT JOIN imas_tutors AS itut ON imas_msgs.courseid=itut.courseid AND itut.userid=:uid2 ";
-	$query .= "LEFT JOIN imas_teachers AS iteach ON imas_msgs.courseid=iteach.courseid AND iteach.userid=:uid3 ";
-
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':msgto'=>$userid, ':uid'=>$userid, ':uid2'=>$userid, ':uid3'=>$userid));
-	$msgcourses = array();
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		if (isset($msgcourses[$row[0]])) { continue; }// no duplicates
-		if ($row[3]==1) {
-			$prefix = _('Hidden: ');
-		} else if ($row[2]==0) {
-			$prefix = _('Inactive: ');
-		} else {
-			$prefix = '';
-		}
-		$msgcourses[$row[0]] = array($prefix . $row[1], $row[2], $row[3]); // name, active, hidden;
-	}
-	if (!isset($msgcourses[$cid]) && $cid>0) {
-		$msgcourses[$cid] = $coursename;
-	}
-	//natsort($msgcourses);
-	uasort($msgcourses, function($a,$b) {
-		if ($a[2] != $b[2]) {  // hidden
-			return $a[2] - $b[2];
-		} else if ($a[1] != $b[1]) {
-			return $b[1] - $a[1];
-		} else {
-			return strnatcasecmp($a[0],$b[0]);
-		}
-	});
 	echo "<option value=\"0\" ";
 	if ($filtercid==0) {
 		echo "selected=1 ";
 	}
 	echo ">All courses</option>";
-	foreach ($msgcourses as $k=>$v) {
-		echo "<option value=\"$k\" ";
-		if ($filtercid==$k) {
-			echo 'selected=1';
-		}
-		echo " >".Sanitize::encodeStringForDisplay($v[0])."</option>";
-	}
+	echo getCourseOpts(false, $filtercid);
 	echo "</select> ";
 
 	echo '<label for="filteruid">By sender</label>: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
@@ -787,19 +705,23 @@ function chgfilter() {
 	if ($filtercid>0) {
     	$query .= " AND imas_msgs.courseid=:courseid";
   }
-	$query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
 	$stm = $DBH->prepare($query);
   if ($filtercid>0) {
 	  $stm->execute(array(':msgto'=>$userid, ':courseid'=>$filtercid));
   } else {
     $stm->execute(array(':msgto'=>$userid));
   }
+	$senders = array();
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<option value=\"".Sanitize::onlyInt($row[0])."\" ";
-		if ($filteruid==$row[0]) {
+		$senders[$row[0]] = $row[1] . ', ' . $row[2];
+	}
+	asort($senders);
+	foreach ($senders as $sid=>$sname) {
+		echo "<option value=\"".Sanitize::onlyInt($sid)."\" ";
+		if ($filteruid==$sid) {
 			echo 'selected=1';
 		}
-		echo " >".Sanitize::encodeStringForDisplay($row[1]).", ".Sanitize::encodeStringForDisplay($row[2])."</option>";
+		echo '>' . Sanitize::encodeStringForDisplay($sname) . '</option>';
 	}
 	echo "</select></p>";
 
