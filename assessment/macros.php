@@ -1776,7 +1776,7 @@ function prettyint($n) {
 function prettyreal($n,$d=0,$comma=',') {
 	return number_format($n,$d,'.',$comma);
 }
-function prettysmallnumber($n) {
+function prettysmallnumber($n, $space=false) {
 	if (abs($n)<.01) {
 		$a = explode("E",$n);
 		if (count($a)==2) {
@@ -1785,7 +1785,11 @@ function prettysmallnumber($n) {
 			} else {
 				$sign = '';
 			}
-			$n = $sign."0.".str_repeat("0", -$a[1]-1).str_replace('.','',abs($a[0]));
+			$n = str_repeat("0", -$a[1]-1).str_replace('.','',abs($a[0]));
+			if ($space) {
+				$n = preg_replace('/(\d{3})/','$1&thinsp;', $n);
+			}
+			$n = $sign."0.".$n;
 		}
 	}
 	return $n;
