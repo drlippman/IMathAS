@@ -704,7 +704,9 @@ class MathParser
     } else if ($node['type'] === 'function') {
       // find the value of the input to the function
       $insideval = $this->evalNode($node['input']);
-
+      if (isset($node['index'])) {
+        $indexval = $this->evalNode($node['index']);
+      }
       $funcname = $node['symbol'];
       // check for syntax errors or domain issues
       switch ($funcname) {
@@ -716,6 +718,9 @@ class MathParser
         case 'log':
           if ($insideval <= 0) {
             throw new MathParserException("Invalid input to $funcname");
+          }
+          if ($indexval <= 0) {
+            throw new MathParserException("Invalid base to $funcname");
           }
           break;
         case 'arcsin':
@@ -739,7 +744,7 @@ class MathParser
           }
           break;
         case 'nthroot':
-          if ($node['index']%2==0 && $insideval<0) {
+          if ($indexval%2==0 && $insideval<0) {
             throw new MathParserException("no even root of negative");
           }
           break;
@@ -754,7 +759,7 @@ class MathParser
       //rewrite arctan to atan to match php function name
       $funcname = str_replace('arc', 'a', $funcname);
       if (!empty($node['index'])) {
-        return call_user_func($funcname, $insideval, $this->evalNode($node['index']));
+        return call_user_func($funcname, $insideval, $indexval);
       }
       return call_user_func($funcname, $insideval);
     } else if ($node['symbol'] === '~') {
