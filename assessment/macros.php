@@ -4054,5 +4054,16 @@ function checkMinMax($min, $max, $isint, $funcname) {
 	return array($min,$max);
 }
 
+function encryptval($val, $key) {
+	$cipher = "AES128";
+	$ivlen = openssl_cipher_iv_length($cipher);
+  $iv = openssl_random_pseudo_bytes($ivlen);
+	return base64_encode($iv). '.' . openssl_encrypt(json_encode($val), $cipher, $key, 0, $iv);
+}
+function decryptval($val, $key) {
+	$cipher = "AES128";
+	list($iv,$val) = explode('.', $val);
+	return json_decode(openssl_decrypt($val, $cipher, $key, 0, base64_decode($iv)), true);
+}
 
 ?>

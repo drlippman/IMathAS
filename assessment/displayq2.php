@@ -808,6 +808,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 					} else if (is_numeric($_POST["qn$partnum"])) {
 						$stuanswersval[$thisq][$kidx] = floatval($_POST["qn$partnum"]);
 					}
+					if (!empty($GLOBALS['inline_choicemap']) && !empty($_POST["qn$partnum-choicemap"])) {
+						$_SESSION['choicemap'][$partnum] = decryptval($_POST["qn$partnum-choicemap"],
+							$GLOBALS['inline_choicemap']);
+					}
 					if (isset($_SESSION['choicemap'][$partnum])) {
 						if (is_array($stuanswers[$thisq][$kidx])) { //multans
 							foreach ($stuanswers[$thisq][$kidx] as $k=>$v) {
@@ -860,6 +864,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$stuanswers[$thisq] = $_POST["qn$qnidx"];
 				if (is_numeric($_POST["qn$qnidx"])) {
 					$stuanswersval[$thisq] = floatval($_POST["qn$qnidx"]);
+				}
+				if (!empty($GLOBALS['inline_choicemap']) && !empty($_POST["qn$qnidx-choicemap"])) {
+					$_SESSION['choicemap'][$qnidx] = decryptval($_POST["qn$qnidx-choicemap"],
+						$GLOBALS['inline_choicemap']);
 				}
 				if (isset($_SESSION['choicemap'][$qnidx])) {
 					if (is_array($stuanswers[$thisq])) { //multans
@@ -1272,6 +1280,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$RND->shuffle($randkeys);
 		}
 		$_SESSION['choicemap'][$qn] = $randkeys;
+		if (!empty($GLOBALS['inline_choicemap'])) {
+			$out .= '<input type="hidden" name="qn' . $qn . '-choicemap" value="' .
+				encryptval($randkeys, $GLOBALS['inline_choicemap']) . '"/>';
+		}
 		if (isset($GLOBALS['capturechoices'])) {
 			if (!isset($GLOBALS['choicesdata'])) {
 				$GLOBALS['choicesdata'] = array();
@@ -1428,6 +1440,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$RND->shuffle($randkeys);
 		}
 		$_SESSION['choicemap'][$qn] = $randkeys;
+		if (!empty($GLOBALS['inline_choicemap'])) {
+			$out .= '<input type="hidden" name="qn' . $qn . '-choicemap" value="' .
+				encryptval($randkeys, $GLOBALS['inline_choicemap']) . '"/>';
+		}
 		if (isset($GLOBALS['capturechoices'])) {
 			if (!isset($GLOBALS['choicesdata'])) {
 				$GLOBALS['choicesdata'] = array();
@@ -7457,6 +7473,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$la = array();
 		foreach ($anstypes as $i=>$anst) {
 			$qnt = 1000*($qn+1)+$i;
+			if (!empty($GLOBALS['inline_choicemap']) && !empty($_POST["qn$qnt-choicemap"])) {
+				$_SESSION['choicemap'][$qnt] = decryptval($_POST["qn$qnt-choicemap"],
+					$GLOBALS['inline_choicemap']);
+			}
 			if (isset($_POST["tc$qnt"])) {
 				if ($anst=='calculated' || $anst=='calcmatrix') {
 					$la[$i] = $_POST["tc$qnt"].'$#$'.$_POST["qn$qnt"];
