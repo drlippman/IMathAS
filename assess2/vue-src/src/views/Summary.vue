@@ -88,7 +88,7 @@ export default {
       return (this.ainfo.showscores === 'during' || this.ainfo.showscores === 'at_end');
     },
     showReviewQ () {
-      return (this.ainfo.questions[0].html !== null);
+      return (this.ainfo.questions && this.ainfo.questions[0].html !== null);
     },
     hasCategories () {
       let hascat = false;

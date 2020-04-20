@@ -17,6 +17,8 @@ export const store = Vue.observable({
   inProgress: false,
   autosaveQueue: {},
   autosaveTimeactive: {},
+  timeActive: {},
+  timeActivated: {},
   initValues: {},
   initTimes: {},
   work: {},
@@ -121,6 +123,8 @@ export const actions = {
         store.autosaveTimeactive = {};
         store.initValues = {};
         store.initTimes = {};
+        store.timeActive = {};
+        store.timeActivated = {};
         store.work = {};
         store.inAssess = true;
         // route to correct display
@@ -310,7 +314,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  submitQuestion (qns, endattempt, timeactive, partnum) {
+  submitQuestion (qns, endattempt) {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
     if (typeof qns !== 'object') {
@@ -338,19 +342,22 @@ export const actions = {
     window.imathasAssess.clearTips();
 
     this.clearAutosave(qns);
-    // don't store time active when full-test
-    if (store.assessInfo.displaymethod === 'full') {
-      timeactive = [];
-    } else if (typeof timeactive !== 'object') {
-      timeactive = [timeactive];
-    }
 
     const data = new FormData();
 
-    // run any pre-submit routines.  The question type wants to return a value,
-    // it will get returned here.
     let valstr;
+    const timeactive = [];
     for (const qn in changedQuestions) {
+      // get timeactive values
+      if (store.assessInfo.displaymethod !== 'full') { // don't store time active when full-test
+        if (store.timeActivated.hasOwnProperty(qn)) {
+          const now = new Date();
+          store.timeActive[qn] += (now - store.timeActivated[qn]);
+        }
+        timeactive.push(store.timeActive[qn]);
+      }
+      // run any pre-submit routines.  The question type wants to return a value,
+      // it will get returned here.
       if (changedQuestions[qn].length === 1 && changedQuestions[qn][0] === 0) {
         // one part, might be single part
         valstr = window.imathasAssess.preSubmit(qn);

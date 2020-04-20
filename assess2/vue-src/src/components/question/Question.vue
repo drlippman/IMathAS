@@ -94,8 +94,6 @@ export default {
   },
   data: function () {
     return {
-      timeActivated: null,
-      timeActive: 0,
       work: '',
       lastWorkVal: '',
       showWorkInput: false
@@ -190,11 +188,10 @@ export default {
       }
     },
     submitQuestion () {
-      this.updateTime(false);
-      actions.submitQuestion(this.qn, false, this.timeActive);
+      actions.submitQuestion(this.qn, false);
       // reset timeactive counter
-      this.timeActive = 0;
-      this.timeActivated = new Date();
+      store.timeActive[this.qn] = 0;
+      store.timeActivated[this.qn] = new Date();
     },
     jumpToAnswer () {
       store.confirmObj = {
@@ -203,15 +200,15 @@ export default {
       };
     },
     updateTime (goingActive) {
-      if (this.timeActivated === null || goingActive) {
-        this.timeActivated = new Date();
-      } else if (this.timeActivated !== null) {
+      if (!store.timeActivated.hasOwnProperty(this.qn) || goingActive) {
+        store.timeActivated[this.qn] = new Date();
+      } else if (store.timeActivated.hasOwnProperty(this.qn)) {
         const now = new Date();
-        this.timeActive += (now - this.timeActivated);
+        store.timeActive[this.qn] += (now - store.timeActivated[this.qn]);
+        delete store.timeActivated[this.qn]; // so it doesn't add more on submitall
       }
     },
     addDirtyTrackers () {
-      var self = this;
       window.$('#questionwrap' + this.qn).find('input[name],select[name],textarea[name]')
         .off('focus.dirtytrack').off('change.dirtytrack').off('input.dirtytrack')
         .on('focus.dirtytrack', function () {
@@ -247,7 +244,7 @@ export default {
 
               // autosave value
               const now = new Date();
-              const timeactive = self.timeActive + (now - self.timeActivated);
+              const timeactive = store.timeActive[qn] + (now - store.timeActivated[qn]);
               actions.doAutosave(qn, pn, timeactive);
             }
           }
@@ -287,7 +284,7 @@ export default {
       this.updateTime(true);
       this.setInitValues();
       // add in timeactive from autosave, if exists
-      this.timeActive += actions.getInitTimeactive(this.qn);
+      store.timeActive[this.qn] += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
       // set work
       this.work = this.questionData.work;
@@ -349,7 +346,7 @@ export default {
         // autosave value
         if (this.getwork === 1) {
           const now = new Date();
-          const timeactive = self.timeActive + (now - self.timeActivated);
+          const timeactive = store.timeActive[this.qn] + (now - store.timeActivated[this.qn]);
           actions.doAutosave(this.qn, 'sw', timeactive);
         } else if (this.getwork === 2) {
           this.$emit('workchanged', this.work);
@@ -371,6 +368,9 @@ export default {
   },
   created () {
     this.loadQuestionIfNeeded(true);
+    if (!store.timeActive.hasOwnProperty(this.qn)) {
+      store.timeActive[this.qn] = 0;
+    }
   },
   mounted () {
     if (this.questionContentLoaded) {
