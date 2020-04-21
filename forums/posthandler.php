@@ -466,7 +466,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						if (!$isgroupedq) {
 							$query = "SELECT ift.id FROM imas_forum_posts AS ifp JOIN imas_forum_threads AS ift ON ifp.threadid=ift.id AND ifp.parent=0 ";
 							$query .= "WHERE ifp.subject=:subject AND ift.forumid=:forumid";
-							$array = array(':forumid'=>$forumid, ':subject'=>trim(strip_tags(htmlentities($line['subject']))));
+							$array = array(':forumid'=>$forumid, ':subject'=>trim(strip_tags(htmlentities(html_entity_decode($line['subject'])))));
 							if ($groupsetid >0 && !$isteacher) {
 								$query .= " AND ift.stugroupid=:groupid";
 								$array[':groupid'] =$groupid;
