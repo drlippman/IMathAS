@@ -616,7 +616,7 @@ class DrawingScorePart implements ScorePart
                     } else if (strpos($function[0],'/x')!==false || preg_match('|/\([^\)]*x|', $function[0])) {
                         $h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
                         $k = (($x1*$y1-$x2*$y2)-$h*($y1-$y2))/($x1-$x2);
-                        $c = ($y1-$k)*($x1-$h);
+                        $c = ($y1-$k)*($x1-$h) * $pixelspery/$pixelsperx; // adjust for scaling
 
                         $hp = ($h - $settings[0])*$pixelsperx + $imgborder;
                         $kp = $settings[7] - ($k-$settings[2])*$pixelspery - $imgborder;
