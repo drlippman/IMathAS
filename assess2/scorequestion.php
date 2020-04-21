@@ -199,7 +199,7 @@ if (count($qns) > 0) {
     if (!isset($timeactive[$k])) {
       $timeactive[$k] = 0;
     }
-    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn]);
+    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $qnstoscore[$qn]);
     // only score the non-blank ones
     foreach ($parts_to_score as $pn=>$v) {
       if ($v === true && !in_array($pn, $qnstoscore[$qn])) {

@@ -1853,6 +1853,10 @@ class AssessRecord
     $rawparts = $scoreResult['rawScores'];
     $partla = $scoreResult['lastAnswerAsGiven'];
     $partlaNum = $scoreResult['lastAnswerAsNumber'];
+    if (is_array($scoreResult['answeights']) && $scoreResult['answeights'] !== $qver['answeights']) {
+      // answeights changed during scoring
+      $this->setAnsweights($qn, $scoreResult['answeights']);
+    }
 
     if (count($rawparts)===1 && count($partla) > 1) {
       // force recording of all parts for conditional
@@ -2301,9 +2305,10 @@ class AssessRecord
    * Find out if a submission is allowed per-part
    * @param  int  $qn             Question #
    * @param  int  $qid            Question ID
+   * @param  array $partssubmitted  Array of part numbers submitted
    * @return array indexed by part number; true if submission allowed
    */
-  public function isSubmissionAllowed($qn, $qid) {
+  public function isSubmissionAllowed($qn, $qid, $partssubmitted) {
     $this->parseData();
 
     $by_question = ($this->assess_info->getSetting('submitby') === 'by_question');
@@ -2322,7 +2327,23 @@ class AssessRecord
     }
     $tries_max = $this->assess_info->getQuestionSetting($qid, 'tries_max');
     $out = array();
-    for ($pn = 0; $pn < count($answeights); $pn++) {
+    if (!is_array($answeights)) {
+      $errornote = 'Missing answeight. aid='.$this->curAid.',uid='.$this->curUid;
+      $errornote .= " on qn $qn. ";
+      $errornote .= $by_question ? 'by_question' : 'by_assess';
+      if ($by_question) {
+        $errornote .= ". qver " . (count($qvers) - 1);
+        $errornote .= '. record ' . json_encode($qvers[count($qvers) - 1]);
+      } else {
+        $errornote .= ". aver " . (count($this->data['assess_versions']) - 1);
+        $errornote .= '. record ' . json_encode($aver['questions'][$qn]['question_versions'][0]);
+      }
+      ob_start();
+      var_dump($answeights);
+      $errornote .= '.answeights:' . ob_get_clean();
+      error_log($errornote);
+    }
+    foreach ($partssubmitted as $pn) {
       if (!isset($tries[$pn])) {
         $out[$pn] = true;
       } else {

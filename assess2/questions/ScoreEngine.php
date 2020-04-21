@@ -543,7 +543,8 @@ class ScoreEngine
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'scoreMethod' => 'singlescore'
+                'scoreMethod' => 'singlescore',
+                'answeights' => $answeights
             );
         } else if (isset($scoremethod) && $scoremethod == "allornothing") {
             if (array_sum($scores) < .98) {
@@ -552,7 +553,8 @@ class ScoreEngine
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'scoreMethod' => 'allornothing'
+                    'scoreMethod' => 'allornothing',
+                    'answeights' => $answeights
                 );
             } else {
                 return array(
@@ -560,7 +562,8 @@ class ScoreEngine
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'scoreMethod' => 'allornothing'
+                    'scoreMethod' => 'allornothing',
+                    'answeights' => $answeights
                 );
             }
         } else if (isset($scoremethod) && $scoremethod == "acct") {
@@ -570,14 +573,16 @@ class ScoreEngine
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'scoreMethod' => 'singlescore'
+                'scoreMethod' => 'singlescore',
+                'answeights' => $answeights
             ));
         } else {
             return array(
                 'scores' => $scores,
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber
+                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                'answeights' => $answeights
             );
         }
     }
@@ -613,7 +618,8 @@ class ScoreEngine
             'scores' => array(round($score, 3)),
             'rawScores' => array(round($score, 2)),
             'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
-            'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber())
+            'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber()),
+            'answeights' => array(1)
         );
     }
 
