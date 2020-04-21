@@ -635,20 +635,22 @@
 
   function checkeditorok() {
 	  $ua = $_SERVER['HTTP_USER_AGENT'];
-	  if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) {
-	  	  preg_match('/OS (\d+)_(\d+)/',$ua,$match);
-	  	  if ($match[1]>=5) {
-	  	  	  return 1;
-	  	  } else {
-	  	  	  return 0;
-	  	  }
-	  } else if (strpos($ua,'Android')!==false) {
-	  	  preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match);
-	  	  if ($match[1]>=4) {
-	  	  	  return 1;
-	  	  } else {
-	  	  	  return 0;
-	  	  }
+	  if ((strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) &&
+	  	  preg_match('/OS (\d+)_(\d+)/',$ua,$match)
+    ) {
+  	  if ($match[1]>=5) {
+  	  	  return 1;
+  	  } else {
+  	  	  return 0;
+  	  }
+	  } else if (strpos($ua,'Android')!==false &&
+	  	preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match)
+    ) {
+  	  if ($match[1]>=4) {
+  	  	  return 1;
+  	  } else {
+  	  	  return 0;
+  	  }
 	  } else {
 		  return 1;
 	  }
