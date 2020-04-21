@@ -239,18 +239,21 @@ export const actions = {
       store.confirmObj = {
         body: warnMsg,
         action: () => {
+          /*
           // TODO: Check if we should always submit all
+
           if (store.assessInfo.showscores === 'during') {
             // check for dirty questions and submit them
             this.submitQuestion(Object.keys(changedQuestions), true);
           } else {
-            // submit them all
-            var qns = [];
-            for (let k = 0; k < store.assessInfo.questions.length; k++) {
-              qns.push(k);
-            }
-            this.submitQuestion(qns, true);
+          */
+          // submit them all
+          var qns = [];
+          for (let k = 0; k < store.assessInfo.questions.length; k++) {
+            qns.push(k);
           }
+          this.submitQuestion(qns, true);
+          // }
         }
       };
     }
@@ -435,8 +438,7 @@ export const actions = {
           store.errorMsg = null;
         }
         // clear out initValues for this question so they get re-set
-        for (let k = 0; k < qns.length; k++) {
-          const qn = qns[k];
+        for (const qn in changedQuestions) {
           if (store.assessInfo.hasOwnProperty('scoreerrors') &&
             store.assessInfo.scoreerrors.hasOwnProperty(qn)
           ) {
