@@ -132,6 +132,21 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 	}
+	if ((isset($teacherid) || isset($tutorid)) && isset($_GET['inlinetoggle'])) {
+		$inlineid = Sanitize::onlyInt($_GET['inlinetoggle']);
+		$val = Sanitize::onlyInt($_GET['val']);
+		$stm = $DBH->prepare("SELECT text FROM imas_inlinetext WHERE id=? AND courseid=?");
+		$stm->execute(array($inlineid, $cid));
+		$text = $stm->fetchColumn(0);
+		if ($text !== null) {
+			$text = str_replace(' (Active)','',$text);
+			$toggleParts = preg_split('/(<p.*?###[^<>]+?###.*\/p>)/', $text, 0, PREG_SPLIT_DELIM_CAPTURE);
+			$toggleParts[2*$val+1] = preg_replace('/###/', '### (Active)', $toggleParts[2*$val+1], 1);
+			$stm = $DBH->prepare("UPDATE imas_inlinetext SET text=? WHERE id=?");
+			$stm->execute(array(implode('',$toggleParts), $inlineid));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
+		}
+	}
 
 	//enable teacher guest access
 	if (isset($instrPreviewId)) {
@@ -380,6 +395,10 @@ if ($overwriteBody==1) {
 				var toopen = '<?php echo $jsAddress2 ?>add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $cid; ?>';
 				window.location = toopen;
 			}
+		}
+		function chgInlineToggler(el,id) {
+			var toopen = '<?php echo $jsAddress2 ?>course.php?inlinetoggle='+id+'&val='+el.value+'&cid=<?php echo $cid; ?>';
+			window.location = toopen;
 		}
 	</script>
 

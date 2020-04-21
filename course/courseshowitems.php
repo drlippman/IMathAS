@@ -201,7 +201,7 @@ $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset;
-	   global $itemshowdata, $exceptionfuncs;
+	   global $itemshowdata, $exceptionfuncs,$coursejsondata;
 
 	   require_once("../includes/filehandler.php");
 
@@ -1126,6 +1126,32 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   $line['text'] = '';
 				   }
 			   }
+				 if (strpos($line['text'], '###') !== false) {
+					 $toggleParts = preg_split('/<p.*?###([^<>]+?)###.*\/p>/', $line['text'], 0, PREG_SPLIT_DELIM_CAPTURE);
+					 if (count($toggleParts) > 1) {
+						 $n = 0;
+						 for ($i=0;$i<(count($toggleParts)-1)/2;$i++) {
+							 if (strpos($toggleParts[2*$i+1], '(Active)') !== false) {
+								 $n = $i;
+								 $toggleParts[2*$i+1] = trim(str_replace('(Active)','', $toggleParts[2*$i+1]));
+								 break;
+							 }
+						 }
+						 $line['text'] = $toggleParts[0] . $toggleParts[2*($n+1)];
+						 if ($canedit) {
+							 $toggler = '<p><select onchange="chgInlineToggler(this, '.Sanitize::onlyInt($typeid).')">';
+							 for ($i=0;$i<(count($toggleParts)-1)/2;$i++) {
+								 $toggler .= '<option value="'.$i.'" ';
+								 if ($i==$n) {
+									 $toggler .= 'selected=1';
+								 }
+								 $toggler .= '>'.Sanitize::encodeStringForDisplay($toggleParts[2*$i+1]).'</option>';
+							 }
+							 $toggler .= '</select></p>';
+							 $line['text'] = $toggler . $line['text'];
+						 }
+					 }
+				 }
 			   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 			   	   $rec = "data-base=\"inlinetext-$typeid\" ";
 			   	   $line['text'] = str_replace('<a ','<a '.$rec, $line['text']);
