@@ -81,7 +81,11 @@ class DrawingAnswerBox implements AnswerBox
     		$answers = array_map('clean', $answers);
     		if (!isset($snaptogrid)) {
     			$snaptogrid = 0;
-    		}
+    		} else {
+          $snapparts = explode(':', $snaptogrid);
+          $snapparts = array_map('evalbasic', $snapparts);
+          $snaptogrid = implode(':', $snapparts);
+        }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
     		$imgborder = 5;
 
@@ -476,7 +480,7 @@ class DrawingAnswerBox implements AnswerBox
     				'value' => $la,
     				'autocomplete' => 'off'
     			];
-          
+
           $settings = array_map('floatval', $settings);
     			$params['canvas'] = [$qn,'',$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
