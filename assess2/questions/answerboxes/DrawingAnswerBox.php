@@ -476,6 +476,8 @@ class DrawingAnswerBox implements AnswerBox
     				'value' => $la,
     				'autocomplete' => 'off'
     			];
+          
+          $settings = array_map('floatval', $settings);
     			$params['canvas'] = [$qn,'',$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
     			$out .= '<input ' .
