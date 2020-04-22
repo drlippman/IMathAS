@@ -1808,15 +1808,16 @@ class AssessRecord
    */
   public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true) {
     $qver = $this->getQuestionVer($qn);
-    $answeights = $qver['answeights'];
 
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
 
     $partattemptn = array();
-    for ($pn = 0; $pn < count($answeights); $pn++) {
-      // figure out try #
-      $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
+    if (isset($qver['answeights'])) { // should be set, but handle error case
+      for ($pn = 0; $pn < count($qver['answeights']); $pn++) {
+        // figure out try #
+        $partattemptn[$pn] = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) : 0;
+      }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
 
@@ -3064,7 +3065,10 @@ class AssessRecord
    */
   private function getPreviousTries($trydata, $qn, $qout) {
     $out = array();
-    for ($pn = 0; $pn < count($trydata); $pn++) {
+    if (!is_array($trydata)) { // shouldn't happen, but handle
+      return $out;
+    }
+    foreach ($trydata as $pn=>$parttrydata) {
       $out[$pn] = array();
       if ($pn == 0 && isset($qout['jsparams'][$qn])) {
         $partref = $qn;
@@ -3075,18 +3079,18 @@ class AssessRecord
       } else {
         $qtype = '';
       }
-      for ($tn = 0; $tn < count($trydata[$pn]); $tn++) {
+      for ($tn = 0; $tn < count($parttrydata); $tn++) {
         if ($qtype == 'choices') {
-          $out[$pn][] = $GLOBALS['choicesdata'][$partref][$trydata[$pn][$tn]['stuans']];
+          $out[$pn][] = $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']];
         } else if ($qtype == 'multans') {
-          $pts = explode('|',$trydata[$pn][$tn]['stuans']);
+          $pts = explode('|',$parttrydata[$tn]['stuans']);
           $outstr = '';
           foreach ($pts as $ptval) {
             $outstr .= $GLOBALS['choicesdata'][$partref][$ptval].'<br/>';
           }
           $out[$pn][] = $outstr;
         } else if ($qtype == 'matching') {
-          $pts = explode('|',$trydata[$pn][$tn]['stuans']);
+          $pts = explode('|',$parttrydata[$tn]['stuans']);
           $qrefarr = array_flip($GLOBALS['choicesdata'][$partref][0]);
           $outptarr = array();
           foreach ($pts as $k=>$ptval) {
@@ -3097,11 +3101,11 @@ class AssessRecord
         } else if ($qtype == 'draw') {
           $out[$pn][] = array(
             'draw',
-            $trydata[$pn][$tn]['stuans'],
+            $parttrydata[$tn]['stuans'],
             $GLOBALS['drawinitdata'][$partref]
           );
-        } else if ($qtype == 'file' && strpos($trydata[$pn][$tn]['stuans'], '@FILE')!==false) {
-          $file = preg_replace('/@FILE:(.+?)@/',"$1",$trydata[$pn][$tn]['stuans']);
+        } else if ($qtype == 'file' && strpos($parttrydata[$tn]['stuans'], '@FILE')!==false) {
+          $file = preg_replace('/@FILE:(.+?)@/',"$1",$parttrydata[$tn]['stuans']);
           $url = getasidfileurl($file);
           $extension = substr($url,strrpos($url,'.')+1,3);
           $filename = basename($file);
@@ -3112,7 +3116,7 @@ class AssessRecord
           }
           $out[$pn][] = $outstr;
         } else {
-          $out[$pn][] = Sanitize::encodeStringForDisplay($trydata[$pn][$tn]['stuans']);
+          $out[$pn][] = Sanitize::encodeStringForDisplay($parttrydata[$tn]['stuans']);
         }
       }
     }

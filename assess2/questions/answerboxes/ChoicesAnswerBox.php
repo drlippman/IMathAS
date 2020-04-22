@@ -98,6 +98,7 @@ class ChoicesAnswerBox implements AnswerBox
     		if ($displayformat == "select") {
     			$msg = '?';
     			foreach ($questions as $qv) {
+            if (is_array($qv)) { continue; }
     				if (mb_strlen(html_entity_decode($qv))>3) { //strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
     					$msg = _('Select an answer');
     					break;

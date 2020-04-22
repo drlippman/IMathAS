@@ -6,7 +6,7 @@
       :key = "index"
       class="med-below med-left"
     >
-      <div v-if="tries.length > 1">
+      <div v-if="processedTries.length > 1">
         <strong>{{ $t('gradebook.part_n', {n: index+1}) }}</strong>
       </div>
       <div v-for="(trystr, tryn) in part" :key="tryn">
