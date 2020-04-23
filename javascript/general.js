@@ -761,7 +761,7 @@ function setupvideoembeds(i,el) {
 
 var fileembedcounter = 0;
 function setuppreviewembeds(i,el) {
-	if (el.href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg)/)) {
+	if (el.href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg)/i)) {
 		jQuery('<span/>', {
 			text: " [+]",
 			role: "button",
@@ -795,7 +795,7 @@ function togglefileembed() {
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
-		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/)) {
+		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/i)) {
 			jQuery('<iframe/>', {
 				id: 'fileiframe'+id,
 				width: "80%",
@@ -805,11 +805,11 @@ function togglefileembed() {
 				allowfullscreen: 1
 			}).insertAfter(jQuery(this));
 		} else {
-			jQuery('<img/>', {
-				id: 'fileiframe'+id,
-				src: href
-			}).css('display','block').insertAfter(jQuery(this))
-			.on('click', rotateimg);
+			jQuery('<div>').append(jQuery('<img/>', {
+					id: 'fileiframe'+id,
+					src: href
+				}).css('display','block').on('click', rotateimg)
+		  ).insertAfter(jQuery(this));
 		}
 		jQuery('<br/>').insertAfter(jQuery(this));
 		jQuery(this).text(' [-]');
