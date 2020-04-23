@@ -1166,9 +1166,10 @@ class AssessRecord
    * @param  boolean|int $generate_html Whether to generate question HTML (def: false) 2 to also grab correct ans
    * @param int|string  $ver               Which version to grab data for, or 'last' for most recent
    * @param string   $try       Which try to show: 'last' (def) or 'scored'
+   * @param boolean $record_answeights  True to record answeights into record (needed in GB loads in case not scored) def: false
    * @return array  The question object
    */
-  public function getQuestionObject($qn, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last', $tryToShow = 'last') {
+  public function getQuestionObject($qn, $include_scores = false, $include_parts = false, $generate_html = false, $ver = 'last', $tryToShow = 'last', $record_answeights = false) {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $due_date = $this->assess_info->getSetting('original_enddate');
 
@@ -1337,7 +1338,9 @@ class AssessRecord
         $autosave = $this->getAutoSaves($qn);
         $out['autosave_timeactive'] = $autosave['timeactive'];
       }
-      $this->setAnsweights($qn, $out['answeights'], $ver);
+      if ($record_answeights) {
+        $this->setAnsweights($qn, $out['answeights'], $ver);
+      }
       if ($out['tries_max'] == 1) {
         $out['parts_entered'] = $this->getHasAutosaves($qn, $out['answeights']);
       }
@@ -2328,22 +2331,6 @@ class AssessRecord
     }
     $tries_max = $this->assess_info->getQuestionSetting($qid, 'tries_max');
     $out = array();
-    if (!is_array($answeights)) {
-      $errornote = 'Missing answeight. aid='.$this->curAid.',uid='.$this->curUid;
-      $errornote .= " on qn $qn. ";
-      $errornote .= $by_question ? 'by_question' : 'by_assess';
-      if ($by_question) {
-        $errornote .= ". qver " . (count($qvers) - 1);
-        $errornote .= '. record ' . json_encode($qvers[count($qvers) - 1]);
-      } else {
-        $errornote .= ". aver " . (count($this->data['assess_versions']) - 1);
-        $errornote .= '. record ' . json_encode($aver['questions'][$qn]['question_versions'][0]);
-      }
-      ob_start();
-      var_dump($answeights);
-      $errornote .= '.answeights:' . ob_get_clean();
-      error_log($errornote);
-    }
     foreach ($partssubmitted as $pn) {
       if (!isset($tries[$pn])) {
         $out[$pn] = true;
@@ -2692,7 +2679,7 @@ class AssessRecord
     $GLOBALS['drawinitdata'] = array();
     $GLOBALS['capturechoices'] = true;
     $GLOBALS['capturedrawinit'] = true;
-    $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver);
+    $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver, 'last', true);
     $out['showscores'] = $scoresInGb;
     $this->dispqn = null;
     if ($generate_html) { // only include this if we're displaying the question

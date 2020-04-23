@@ -602,6 +602,7 @@
 			}
 			$cnt++;
 		}
+		$assess_record->saveRecordIfNeeded();
 	}
 	if ($canedit) {
 		echo "<input type=\"submit\" value=\"Save Changes\"/> ";

@@ -232,27 +232,6 @@ if (count($qns) > 0) {
 }
 
 if ($end_attempt) {
-
-  // check some stuff and log if there's an issue
-  if ($assess_info->getSetting('deftries') == 1) { // only log if 1 try per q since that's where errors happened
-    $totnumq = $assess_info->getQuestionCount();
-    $missing = array();
-    for ($i=0;$i<$totnumq;$i++) {
-      if (isset($qnstoscore[$i])) {
-        continue; // it's in the to-score list
-      } else if (!empty($assess_record->getAutoSaves($i))) {
-        continue; // has autosave we'll score below
-      } else if (isset($_POST['qn'.$i]) || isset($_POST['qn' . (1000*($i+1))])) {
-        $missing[] = $i;
-      } else {
-        // just not answered
-      }
-    }
-    if (count($missing)>0) {
-      error_log("POST without toscoreqn in cid=$cid,aid=$aid,uid=$uid. Missing: ".implode(',',$missing).'. POST: '.json_encode($_POST) . '. Has Autosaves:'.implode(',', $assess_record->getQsWithAutosave()));
-    }
-  }
-
   $assess_record->scoreAutosaves();
   // sets assessment attempt as submitted and updates status
   $assess_record->setStatus(false, true);
