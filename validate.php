@@ -388,6 +388,11 @@
 			exit;
 		} // TODO: handle assess2 case
 	}
+  // update session time, if not handled by sessionLastAccess
+  // this is used by local and redis sessions; db sessions handle via sessionLastAccess
+  if (empty($GLOBALS['sessionLastAccess'])) {
+    $_SESSION['time'] = time();
+  }
 
 	if (isset($_SESSION['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
 		if ($myrights>18) {
