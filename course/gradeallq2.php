@@ -99,7 +99,7 @@
 						if ($v=='N/A') {
 							$allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
+							$allscores[$kp[1]][$kp[2]][$kp[3]] = floatval($v);
 						}
 					}
 				} else if ($kp[0]=='fb') {
