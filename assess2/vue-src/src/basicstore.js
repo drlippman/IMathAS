@@ -52,6 +52,10 @@ export const actions = {
     if (doreset === true) {
       qs += '&reset=1';
     }
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadAssessData(callback, doreset), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     store.inAssess = false;
@@ -87,6 +91,10 @@ export const actions = {
       });
   },
   startAssess (dopractice, password, newGroupMembers, callback) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.startAssess(dopractice, password, newGroupMembers, callback), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -167,6 +175,10 @@ export const actions = {
       });
   },
   loadQuestion (qn, regen, jumptoans) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadQuestion(qn, regen, jumptoans), 20);
+      return;
+    }
     store.inTransit = true;
     if (regen) {
       this.clearInitValue(qn);
@@ -259,6 +271,10 @@ export const actions = {
     }
   },
   submitWork () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitWork(), 20);
+      return;
+    }
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     store.inTransit = true;
     const data = {};
@@ -320,6 +336,11 @@ export const actions = {
   submitQuestion (qns, endattempt) {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitQuestion(qns, endattempt), 20);
+      return;
+    }
+    store.inTransit = true;
     if (typeof qns !== 'object') {
       qns = [qns];
     }
@@ -337,14 +358,14 @@ export const actions = {
 
     if (Object.keys(changedQuestions).length === 0 && !endattempt) {
       store.errorMsg = 'nochange';
+      store.inTransit = false;
       return;
     }
 
-    store.inTransit = true;
     window.MQeditor.resetEditor();
     window.imathasAssess.clearTips();
 
-    this.clearAutosave(qns);
+    window.setTimeout(() => this.clearAutosave(qns), 100);
 
     const data = new FormData();
 
@@ -524,6 +545,10 @@ export const actions = {
     if (Object.keys(store.autosaveQueue).length === 0) {
       return;
     }
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitAutosave(async), 20);
+      return;
+    }
     store.inTransit = true;
     store.autoSaving = true;
     const lastLoaded = {};
@@ -634,6 +659,10 @@ export const actions = {
     this.clearAutosaveTimer();
     window.MQeditor.resetEditor();
     window.imathasAssess.clearTips();
+    if (store.inTransit) {
+      window.setTimeout(() => this.endAssess(callback), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -663,6 +692,10 @@ export const actions = {
       });
   },
   getScores () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.getScores(), 20);
+      return;
+    }
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'getscores.php' + store.queryString,
@@ -689,6 +722,10 @@ export const actions = {
       });
   },
   getQuestions () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.getQuestions(), 20);
+      return;
+    }
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'getquestions.php' + store.queryString,
@@ -715,6 +752,10 @@ export const actions = {
       });
   },
   redeemLatePass (callback) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.redeemLatePass(callback), 20);
+      return;
+    }
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'uselatepass.php' + store.queryString,
@@ -749,6 +790,10 @@ export const actions = {
     Router.push('/');
   },
   setLivepollStatus (data) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.setLivepollStatus(data), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({

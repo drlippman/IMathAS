@@ -28,6 +28,10 @@ export const store = Vue.observable({
 
 export const actions = {
   loadGbAssessData (callback, keepversion) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadGbAssessData(callback, keepversion), 20);
+      return;
+    }
     if (store.assessInfo === null && window.gbAssessData) {
       store.assessInfo = window.gbAssessData;
       if (typeof callback !== 'undefined') {
@@ -78,6 +82,10 @@ export const actions = {
     }
   },
   loadGbAssessVersion (ver, practice) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadGbAssessVersion(ver, practice), 20);
+      return;
+    }
     const qs = store.queryString + '&ver=' + ver + '&practice=' + (practice ? 1 : 0);
     store.inTransit = true;
     store.errorMsg = null;
@@ -128,6 +136,10 @@ export const actions = {
       });
   },
   loadGbQuestionVersion (qn, ver, forceload, beforeSet) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadGbQuestionVersion(qn, ver, forceload, beforeSet), 20);
+      return;
+    }
     let qs = store.queryString + '&ver=' + ver + '&qn=' + qn;
     qs += '&practice=' + (store.ispractice ? 1 : 0);
     if (store.assessInfo.assess_versions[store.curAver].questions[qn][ver].html !== null &&
@@ -175,6 +187,10 @@ export const actions = {
       });
   },
   saveChanges (exit) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.saveChanges(exit), 20);
+      return;
+    }
     const qs = store.queryString;
     store.inTransit = true;
     store.saving = 'saving';
@@ -385,6 +401,10 @@ export const actions = {
       });
   },
   endAssess () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.endAssess(), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
