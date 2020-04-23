@@ -179,7 +179,12 @@
 	if (($line != null) && (
 	  ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password']))))
 	  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['password'],$line['password']))	)) {
-		 unset($_SESSION['challenge']); //challenge is used up - forget it.
+
+      if (empty($_POST['tzname']) && $_POST['tzoffset']=='' && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+        echo _('Uh oh, something went wrong.  Please go back and try again');
+        exit;
+      }
+     unset($_SESSION['challenge']); //challenge is used up - forget it.
 		 $userid = $line['id'];
 		 $groupid = $line['groupid'];
 		 //for upgrades times:
@@ -211,7 +216,7 @@
      $_SESSION['userid'] = $userid;
      $_SESSION['time'] = $now;
      $_SESSION['tzoffset'] = $_POST['tzoffset'];
-     if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+     if (!empty($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
        $_SESSION['tzname'] = $_POST['tzname'];
      }
 

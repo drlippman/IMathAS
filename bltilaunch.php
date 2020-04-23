@@ -131,7 +131,10 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
 	}
 	$userid = $_SESSION['userid'];
-
+	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+		echo _('Uh oh, something went wrong.  Please go back and try again');
+		exit;
+	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
 	}
@@ -1676,7 +1679,10 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
 	}
 	$userid = $_SESSION['userid'];
-
+	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+		echo _('Uh oh, something went wrong.  Please go back and try again');
+		exit;
+	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
 	}
