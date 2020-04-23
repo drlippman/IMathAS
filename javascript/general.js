@@ -761,7 +761,7 @@ function setupvideoembeds(i,el) {
 
 var fileembedcounter = 0;
 function setuppreviewembeds(i,el) {
-	if (el.href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/)) {
+	if (el.href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg)/)) {
 		jQuery('<span/>', {
 			text: " [+]",
 			role: "button",
@@ -795,14 +795,22 @@ function togglefileembed() {
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
-		jQuery('<iframe/>', {
-			id: 'fileiframe'+id,
-			width: "80%",
-			height: 600,
-			src: 'https://docs.google.com/viewerng/viewer?embedded=true&url=' + encodeURIComponent(href),
-			frameborder: 0,
-			allowfullscreen: 1
-		}).insertAfter(jQuery(this));
+		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/)) {
+			jQuery('<iframe/>', {
+				id: 'fileiframe'+id,
+				width: "80%",
+				height: 600,
+				src: 'https://docs.google.com/viewerng/viewer?embedded=true&url=' + encodeURIComponent(href),
+				frameborder: 0,
+				allowfullscreen: 1
+			}).insertAfter(jQuery(this));
+		} else {
+			jQuery('<img/>', {
+				id: 'fileiframe'+id,
+				src: href
+			}).css('display','block').insertAfter(jQuery(this))
+			.on('click', rotateimg);
+		}
 		jQuery('<br/>').insertAfter(jQuery(this));
 		jQuery(this).text(' [-]');
 		jQuery(this).attr('title',_("Hide preview"));
@@ -872,6 +880,9 @@ function removeSelfAsCoteacher(el,cid,selector,uid) {
 }
 
 function rotateimg(el) {
+	if (el.hasOwnProperty("target")) {
+		el = el.target;
+	}
 	if ($(el).data('rotation')) {
 		var r = ($(el).data('rotation') + 90)%360;
 	} else {

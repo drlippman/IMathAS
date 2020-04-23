@@ -97,10 +97,10 @@ class FileUploadAnswerBox implements AnswerBox
     					$filename = basename($file);
     					$out .= "<br/>" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a>";
     					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\" />";
-    					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
+    					/*if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
     						$out .= " <span aria-expanded=\"false\" aria-controls=\"img$qn\" class=\"pointer clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
     						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
-    					} 
+    					} */
               $hasPrevSubmittedFile = true;
     				}
     			} else {

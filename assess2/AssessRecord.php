@@ -3110,10 +3110,10 @@ class AssessRecord
           $extension = substr($url,strrpos($url,'.')+1,3);
           $filename = basename($file);
           $outstr = "<a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a>";
-          if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
+          /*if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
             $outstr .= " <span aria-expanded=\"false\" aria-controls=\"img$qn-$pn-$tn\" class=\"pointer clickable\" id=\"filetog$qn-$pn-$tn\" onclick=\"toggleinlinebtn('img$qn-$pn-$tn','filetog$qn-$pn-$tn');\">[+]</span>";
             $outstr .= " <br/><div><img id=\"img$qn-$pn-$tn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
-          }
+          }*/
           $out[$pn][] = $outstr;
         } else {
           $out[$pn][] = Sanitize::encodeStringForDisplay($parttrydata[$tn]['stuans']);
