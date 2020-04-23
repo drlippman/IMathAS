@@ -3753,6 +3753,12 @@ None - the file upload type is not computer graded.
 <dt>$scoremethod = "takeanything" or "takeanythingorblank"</dt>
 	<dd>Sets the problem to give full credit for any answer.  The latter also counts
 	blank answers as correct.</dd>
+<dt>$answerformat = "images", "canpreview", or a list of file extensions</dt>
+	<dd>Set a list of preferred file formats for the file selector.  "images" is
+	 a shorthand for .jpg,.gif,.png,.jpeg. "canpreview" is a shorthand for image
+   files, office files, and pdfs, which can be previewed inline.  If listing
+   file extensions, provide a comma separated list with leading periods, like
+    ".pdf,.docx,.doc"  </dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
 <dt>$showanswer </dt>

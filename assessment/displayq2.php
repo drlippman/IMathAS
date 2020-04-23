@@ -3462,11 +3462,18 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 	} else if ($anstype == "file") {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 
 		if ($colorbox!='') { $out .= '<span class="'.$colorbox.'">';}
-		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
+		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" ";
+		if (!empty($answerformat)) {
+			$answerformat = str_replace('images','.jpg,.jpeg,.gif,.png', $answerformat);
+			$answerformat = str_replace('canpreview','.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.jpg,.gif,.png,.jpeg', $answerformat);
+			$out .= 'accept="'.preg_replace('/[^\w\.,\/\*\-]/','',$answerformat).'"';
+		}
+		$out .= "/>\n";
 		$out .= getcolormark($colorbox);
 		if ($colorbox!='') { $out .= '</span>';}
 		if ($la!='') {
