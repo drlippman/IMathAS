@@ -1130,22 +1130,22 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					 $toggleParts = preg_split('/<p.*?###([^<>]+?)###.*\/p>/', $line['text'], 0, PREG_SPLIT_DELIM_CAPTURE);
 					 if (count($toggleParts) > 1) {
 						 $n = 0;
-						 for ($i=0;$i<(count($toggleParts)-1)/2;$i++) {
-							 if (strpos($toggleParts[2*$i+1], '(Active)') !== false) {
-								 $n = $i;
-								 $toggleParts[2*$i+1] = trim(str_replace('(Active)','', $toggleParts[2*$i+1]));
+						 for ($j=0;$j<(count($toggleParts)-1)/2;$j++) {
+							 if (strpos($toggleParts[2*$j+1], '(Active)') !== false) {
+								 $n = $j;
+								 $toggleParts[2*$j+1] = trim(str_replace('(Active)','', $toggleParts[2*$j+1]));
 								 break;
 							 }
 						 }
 						 $line['text'] = $toggleParts[0] . $toggleParts[2*($n+1)];
 						 if ($canedit) {
 							 $toggler = '<p><select onchange="chgInlineToggler(this, '.Sanitize::onlyInt($typeid).')">';
-							 for ($i=0;$i<(count($toggleParts)-1)/2;$i++) {
-								 $toggler .= '<option value="'.$i.'" ';
-								 if ($i==$n) {
+							 for ($j=0;$j<(count($toggleParts)-1)/2;$j++) {
+								 $toggler .= '<option value="'.$j.'" ';
+								 if ($j==$n) {
 									 $toggler .= 'selected=1';
 								 }
-								 $toggler .= '>'.Sanitize::encodeStringForDisplay($toggleParts[2*$i+1]).'</option>';
+								 $toggler .= '>'.Sanitize::encodeStringForDisplay($toggleParts[2*$j+1]).'</option>';
 							 }
 							 $toggler .= '</select></p>';
 							 $line['text'] = $toggler . $line['text'];
