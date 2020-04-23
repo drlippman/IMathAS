@@ -434,7 +434,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		var assessver = '$aver';
 		</script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=030818\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=042220\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=041120\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -1417,11 +1417,11 @@ if ($overwriteBody==1) {
 					echo '<br>'._('Showing ').($offset+1).'-'.($offset + 300).'. ';
 					if ($offset>0) {
 						$prevoffset = max($offset-300, 0);
-						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$prevoffset\">"._('Previous').'</a> ';
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$prevoffset\" onclick=\"return prePageChange()\">"._('Previous').'</a> ';
 					}
 					if ($searchlimited) {
 						$nextoffset = $offset+300;
-						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$nextoffset\">"._('Next').'</a> ';
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$nextoffset\" onclick=\"return prePageChange()\">"._('Next').'</a> ';
 					}
 					echo '</i></td></tr>';
 				}

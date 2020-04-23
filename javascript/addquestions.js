@@ -1,9 +1,9 @@
-function moveitem(from) { 
-	var to = document.getElementById(from).value; 
-	var grp = document.getElementById('group').value; 
+function moveitem(from) {
+	var to = document.getElementById(from).value;
+	var grp = document.getElementById('group').value;
 	if (to != from) {
   		var toopen = addqaddr+'&from=' + from + '&to=' + to + '&grp=' + grp;
-		window.location = toopen; 
+		window.location = toopen;
 		}
 }
 
@@ -21,13 +21,13 @@ function previewq(formn,loc,qn,docheck,onlychk) {
    if (onlychk) {
       addr += '&onlychk=1';
    }
-  
+
    previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
    previewpop.focus();
 }
 function sethighlightrow(loc) {
 	$("tr.highlight").removeClass("highlight");
-	$("#"+loc).closest("tr").addClass("highlight");	
+	$("#"+loc).closest("tr").addClass("highlight");
 }
 function previewsel(formn) {
 	var form = document.getElementById(formn);
@@ -106,4 +106,12 @@ function setlib(libs) {
 }
 function setlibnames(libn) {
 	document.getElementById("libnames").innerHTML = libn;
+}
+
+function prePageChange() {
+	if ($("#selq input[type=checkbox]:checked").length > 0) {
+		return confirm(_('You have questions selected which will get lost if you continue.  Continue anyway?'));
+	} else {
+		return true;
+	}
 }
