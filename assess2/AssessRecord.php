@@ -39,6 +39,7 @@ class AssessRecord
   private $need_to_record = false;
   private $penalties = array();
   private $dispqn = null;
+  private $inTransaction = false;
 
   /**
    * Construct object
@@ -56,11 +57,18 @@ class AssessRecord
   /**
    * Load an assessment record given the user id and assessment id.
    * @param  integer $userid  The user ID
+   * @param boolean $forupdate  True to use transaction with row locking
    * @return void
    */
-  public function loadRecord($userid) {
+  public function loadRecord($userid, $forupdate = true) {
     $this->curUid = $userid;
-    $stm = $this->DBH->prepare("SELECT * FROM imas_assessment_records WHERE userid=? AND assessmentid=?");
+    $selectQuery = "SELECT * FROM imas_assessment_records WHERE userid=? AND assessmentid=?";
+    if ($forupdate) {
+      $this->DBH->beginTransaction();
+      $selectQuery .= ' FOR UPDATE';
+      $this->inTransaction = true;
+    }
+    $stm = $this->DBH->prepare($selectQuery);
     $stm->execute(array($userid, $this->curAid));
     $this->assessRecord = $stm->fetch(PDO::FETCH_ASSOC);
     if ($this->assessRecord === false) {
@@ -123,6 +131,9 @@ class AssessRecord
   public function saveRecordIfNeeded() {
     if ($this->need_to_record) {
       $this->saveRecord();
+    } else if ($this->inTransaction) {
+      $this->DBH->commit();
+      $this->inTransaction = false;
     }
   }
 
@@ -180,6 +191,11 @@ class AssessRecord
       }
       $stm = $this->DBH->prepare($query);
       $stm->execute($qarr);
+
+      if ($this->inTransaction) {
+        $this->DBH->commit();
+        $this->inTransaction = false;
+      }
 
       $this->need_to_record = false;
     }
@@ -2314,23 +2330,24 @@ class AssessRecord
    */
   public function isSubmissionAllowed($qn, $qid, $partssubmitted) {
     $this->parseData();
-
+    $out = array();
     $by_question = ($this->assess_info->getSetting('submitby') === 'by_question');
     if ($by_question) {
       $qvers = $this->data['assess_versions'][0]['questions'][$qn]['question_versions'];
-      $answeights = $qvers[count($qvers) - 1]['answeights'];
       $tries = $qvers[count($qvers) - 1]['tries'];
       if (!empty($qvers[count($qvers)-1]['jumptoans'])) {
         // jump to answer has been clicked - submission not allowed
-        return array_fill(0, count($answeights), false);
+        foreach ($partssubmitted as $pn) {
+          $out[$pn] = false;
+        }
+        return $out;
       }
     } else {
       $aver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
-      $answeights = $aver['questions'][$qn]['question_versions'][0]['answeights'];
       $tries = $aver['questions'][$qn]['question_versions'][0]['tries'];
     }
     $tries_max = $this->assess_info->getQuestionSetting($qid, 'tries_max');
-    $out = array();
+
     foreach ($partssubmitted as $pn) {
       if (!isset($tries[$pn])) {
         $out[$pn] = true;

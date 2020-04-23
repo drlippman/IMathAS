@@ -26,11 +26,11 @@ if (isset($_POST['go'])) {
 	$trytouse = ($_POST['vertouse'] == 1) ? 'last' : 'first';
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
 	$assess_info->loadQuestionSettings('all', true);
-
+	$DBH->beginTransaction();
 	$query = "SELECT iar.* FROM imas_assessment_records AS iar
 							JOIN imas_students ON imas_students.userid = iar.userid
 						WHERE iar.assessmentid = :assessmentid
-							AND imas_students.courseid = :courseid";
+							AND imas_students.courseid = :courseid FOR UPDATE";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -43,6 +43,7 @@ if (isset($_POST['go'])) {
 		$assess_record->regradeQuestion($qid, $trytouse);
 		$assess_record->saveRecord();
 	}
+	$DBH->commit();
 
 	header('Location: ' . $GLOBALS['basesiteurl'] ."/course/addquestions.php?cid=$cid&aid=$aid");
 

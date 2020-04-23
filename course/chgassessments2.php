@@ -447,7 +447,8 @@ if (!(isset($teacherid))) {
 			// re-total existing assessment attempts to adjust scores
 			require("../assess2/AssessInfo.php");
 			require("../assess2/AssessRecord.php");
-			$stm = $DBH->query("SELECT * FROM imas_assessment_records WHERE assessmentid IN ($checkedlist) ORDER BY assessmentid");
+			$DBH->beginTransaction();
+			$stm = $DBH->query("SELECT * FROM imas_assessment_records WHERE assessmentid IN ($checkedlist) ORDER BY assessmentid FOR UPDATE");
 			$lastAid = 0;
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['assessmentid'] != $lastAid) {
@@ -464,6 +465,7 @@ if (!(isset($teacherid))) {
 				$assess_record->reTotalAssess();
 				$assess_record->saveRecord();
 			}
+			$DBH->commit();
 		}
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");

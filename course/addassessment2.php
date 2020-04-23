@@ -476,7 +476,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			require_once('../assess2/AssessRecord.php');
 			$assess_info = new AssessInfo($DBH, $assessmentId, $cid, false);
 			$assess_info->loadQuestionSettings();
-			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
 			$stm->execute(array($assessmentId));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$assess_record = new AssessRecord($DBH, $assess_info, false);

@@ -333,7 +333,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require_once('../assess2/AssessRecord.php');
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
 				$assess_info->loadQuestionSettings();
-				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+				$DBH->beginTransaction();
+				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
 		    $stm->execute(array($aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -352,6 +353,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
 					}
 				}
+				$DBH->commit();
 			} else {
 				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid,userid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));

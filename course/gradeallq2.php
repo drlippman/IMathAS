@@ -120,9 +120,10 @@
 		} else {
 			$onepergroup = false;
 		}
+		$DBH->beginTransaction();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_records.* FROM imas_users,imas_assessment_records ";
 		$query .= "WHERE imas_assessment_records.userid=imas_users.id AND imas_assessment_records.assessmentid=:assessmentid ";
-		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName FOR UPDATE";
 		if ($page != -1 && isset($_GET['userid'])) {
 			$query .= " AND userid=:userid";
 		}
@@ -202,6 +203,7 @@
 				}
 			}
 		}
+		$DBH->commit();
 
 		if (isset($_GET['quick'])) {
 			echo "saved";
