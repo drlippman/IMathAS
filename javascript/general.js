@@ -761,7 +761,10 @@ function setupvideoembeds(i,el) {
 
 var fileembedcounter = 0;
 function setuppreviewembeds(i,el) {
-	if (el.href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg)/i)) {
+	var filetypes = 'doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg';
+	if (window.fetch) { filetypes += '|heic'; }
+	var regex = new RegExp('\.(' + filetypes + ')', 'i');
+	if (el.href.match(regex)) {
 		jQuery('<span/>', {
 			text: " [+]",
 			role: "button",
@@ -804,6 +807,17 @@ function togglefileembed() {
 				frameborder: 0,
 				allowfullscreen: 1
 			}).insertAfter(jQuery(this));
+		} else if (href.match(/\.(heic)/i)) {
+			jQuery('<div>', {
+				id: 'fileiframe' + id,
+				text: 'Converting HEIC file (this may take a while)...'
+			}).insertAfter(jQuery(this));
+			if (!window.heic2any) {
+				jQuery.getScript(imasroot+'/javascript/heic2any.min.js')
+				 .done(function() { convertheic(href, 'fileiframe' + id); });
+			} else {
+				convertheic(href, 'fileiframe' + id);
+			}
 		} else {
 			jQuery('<div>').append(jQuery('<img/>', {
 					id: 'fileiframe'+id,
@@ -819,6 +833,21 @@ function togglefileembed() {
 			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
 		}
 	}
+}
+
+function convertheic(href, divid) {
+	fetch(href)
+  .then((res) => res.blob())
+  .then((blob) => heic2any({
+    blob
+  }))
+  .then((conversionResult) => {
+    var url = URL.createObjectURL(conversionResult);
+    document.getElementById(divid).innerHTML = '<img src="' + url + '" onclick="rotateimg(this)">';
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 }
 
 function addNoopener(i,el) {
