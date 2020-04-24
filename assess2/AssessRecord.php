@@ -122,6 +122,7 @@ class AssessRecord
    */
   public function setTeacherInGb($val) {
     $this->teacherInGb = $val;
+    $this->inGb = $val;
   }
 
   /**
@@ -1651,7 +1652,9 @@ class AssessRecord
     }
 
     $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
-
+    if (isset($autosave['stuans'])) {
+      $numParts = max($numParts, max(array_keys($autosave['stuans']))+1);
+    }
     $partattemptn = array();
     $qcolors = array();
     $lastans = array();
@@ -1679,13 +1682,13 @@ class AssessRecord
         if (is_string($autosave['stuans'][$pn]) && strpos($autosave['stuans'][$pn], '@FILE') !== false) {
           // it's  a file autosave.  As a bit of a hack we'll make an array
           // with both the last submitted answer and the autosave
-          if (is_array($stuanswers[$qn+1]) || $numParts > 1) {
+          if (is_array($stuanswers[$qn+1]) || $numParts > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
             $stuanswers[$qn+1][$pn] = array($stuanswers[$qn+1][$pn], $autosave['stuans'][$pn]);
           } else {
             $stuanswers[$qn+1] = array($stuanswers[$qn+1], $autosave['stuans'][$pn]);
           }
         } else {
-          if (is_array($stuanswers[$qn+1]) || $numParts > 1) {
+          if (is_array($stuanswers[$qn+1]) || $numParts > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
             $stuanswers[$qn+1][$pn] = $autosave['stuans'][$pn];
           } else {
             $stuanswers[$qn+1] = $autosave['stuans'][$pn];
@@ -1745,7 +1748,6 @@ class AssessRecord
       }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
-
     $questionParams = new QuestionParams();
     $questionParams
         ->setDbQuestionSetId($qsettings['questionsetid'])
