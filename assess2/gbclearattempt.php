@@ -78,6 +78,7 @@ if ($type == 'all' && $keepver == 0) {
     require_once("../includes/ltioutcomes.php");
     updateLTIgrade('delete',$lti_sourcedid,$aid,$uid);
   }
+  $assess_record->saveRecordIfNeeded(); //to commit
   echo '{"success": "saved"}';
   exit;
 } else if ($type == 'all' && $keepver == 1) {
