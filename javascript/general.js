@@ -781,6 +781,17 @@ function setuppreviewembeds(i,el) {
 	}
 }
 
+function supportsPdf() {
+	// based on PDFOject
+	var ua = window.navigator.userAgent;
+	if (ua.indexOf("irefox") !== -1 &&
+		parseInt(ua.split("rv:")[1].split(".")[0], 10) > 18) { return true; }
+ 	if (typeof navigator.mimeTypes['application/pdf'] !== "undefined") {
+		return true;
+	}
+	return false;
+}
+
 function togglefileembed() {
 	var id = this.id.substr(12);
 	var els = jQuery('#fileiframe'+id);
@@ -799,11 +810,17 @@ function togglefileembed() {
 	} else {
 		var href = jQuery(this).prev().attr('href');
 		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/i)) {
+			var src;
+			if (href.match(/\.pdf/) && supportsPdf()) {
+				src = href;
+			} else {
+				src = 'https://docs.google.com/viewerng/viewer?embedded=true&url=' + encodeURIComponent(href);
+			}
 			jQuery('<iframe/>', {
 				id: 'fileiframe'+id,
 				width: "80%",
 				height: 600,
-				src: 'https://docs.google.com/viewerng/viewer?embedded=true&url=' + encodeURIComponent(href),
+				src: src,
 				frameborder: 0,
 				allowfullscreen: 1
 			}).insertAfter(jQuery(this));
@@ -837,15 +854,15 @@ function togglefileembed() {
 
 function convertheic(href, divid) {
 	fetch(href)
-  .then((res) => res.blob())
-  .then((blob) => heic2any({
-    blob
-  }))
-  .then((conversionResult) => {
+  .then(function(res) { return res.blob();})
+  .then(function(blob) {
+		return heic2any({blob:blob});
+	})
+  .then(function(conversionResult) {
     var url = URL.createObjectURL(conversionResult);
     document.getElementById(divid).innerHTML = '<img src="' + url + '" onclick="rotateimg(this)">';
   })
-  .catch((e) => {
+  .catch(function(e) {
     console.log(e);
   });
 }
