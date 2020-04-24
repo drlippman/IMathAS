@@ -133,9 +133,12 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 			}
 			if (count($newAssesses) > 0) {
 				$ph2 = Sanitize::generateQueryPlaceholders($newAssesses);
-				$stm = $DBH->prepare("SELECT assessmentid,score,status FROM imas_assessment_records WHERE assessmentid IN ($ph2) AND userid=?");
+				$stm = $DBH->prepare("SELECT assessmentid,score,status,lastchange FROM imas_assessment_records WHERE assessmentid IN ($ph2) AND userid=?");
 				$stm->execute(array_merge($newAssesses, array($userid)));
 				while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+					if (($line['status']&3)==0 && $line['lastchange']==0) {
+						continue; // probably have only done practice
+					}
 					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsstatus'] = (($line['status']&3)>0)?1:2;
 					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['ptsearned'] = $line['score'];
 					$itemshowdata[$typelookups['Assessment'][$line['assessmentid']]]['outofattempts'] = (($line['status']&32)==32);
