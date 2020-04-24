@@ -813,12 +813,14 @@ function togglefileembed() {
 			var src;
 			if (href.match(/\.pdf/) && supportsPdf()) {
 				src = href;
+			} else if (href.match(/\.(doc|docx|xls|xlsx|ppt|pptx)/i)) {
+				src = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(href);
 			} else {
-				src = 'https://docs.google.com/viewerng/viewer?embedded=true&url=' + encodeURIComponent(href);
+				src = 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(href);
 			}
 			jQuery('<iframe/>', {
 				id: 'fileiframe'+id,
-				width: "80%",
+				width: "90%",
 				height: 600,
 				src: src,
 				frameborder: 0,
