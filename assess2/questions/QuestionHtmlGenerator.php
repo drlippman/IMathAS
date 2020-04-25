@@ -526,6 +526,46 @@ class QuestionHtmlGenerator
         $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . "\">\n"
             . filter($evaledqtext);
 
+
+        /*
+         *  Handle sequenial multipart, now that all answerboxes have been inserted
+         *
+         *  TODO: look earlier as well, and prevent answerbox generation in obvious
+         *  cases where $answerbox or [AB#] is already in the question text
+         */
+        if ($quesData['qtype'] == "multipart") {
+          $seqParts = preg_split('~(<p[^>]*>|<br/><br/>)\s*///+\s*(</p[^>]*>|<br/><br/>)~', $evaledqtext);
+
+          if (count($seqParts) > 1) {
+            $seqPartDone = $this->questionParams->getSeqPartDone();
+            $newqtext = '';
+            $lastGroupDone = true;
+            foreach ($seqParts as $k=>$seqPart) {
+              $thisGroupDone = true;
+              preg_match_all('/<input[^>]*name="qn(\d+)/', $seqPart, $m);
+              foreach ($m[1] as $qnrefnum) {
+                $pn = $qnrefnum % 1000;
+                if (!$lastGroupDone) { // not ready for it - unset stuff
+                  unset($jsParams[$qnrefnum]);
+                  unset($answerbox[$pn]);
+                  unset($showanswerloc[$pn]);
+                  $jsParams['hasseqnext'] = true;
+                }
+                if (empty($seqPartDone[$pn])) {
+                  $thisGroupDone = false;
+                }
+              }
+              if ($lastGroupDone) { // add html to output
+                $newqtext .= '<p class="seqsep">';
+                $newqtext .= sprintf(_('Part %d/%d'), $k+1, count($seqParts));
+                $newqtext .= '</p>' . $seqPart;
+              }
+              $lastGroupDone = $thisGroupDone;
+            }
+            $evaledqtext = $newqtext;
+          }
+        }
+
         /*
          * Disable answer box inputs
          */

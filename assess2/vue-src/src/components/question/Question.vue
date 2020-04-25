@@ -112,6 +112,10 @@ export default {
     questionContentLoaded () {
       return (this.questionData.html !== null);
     },
+    hasSeqNext () {
+      return (this.questionData.jsparams &&
+        this.questionData.jsparams.hasseqnext);
+    },
     showSubmit () {
       return (store.inProgress &&
         this.questionContentLoaded &&
@@ -119,7 +123,8 @@ export default {
         this.questionData.withdrawn === 0 &&
         this.questionData.canretry && (
         store.assessInfo.submitby === 'by_question' ||
-          this.questionData.tries_max > 1
+          this.questionData.tries_max > 1 ||
+          this.hasSeqNext
       ) && (
       // if livepoll, only show if state is 2
         store.assessInfo.displaymethod !== 'livepoll' ||
@@ -144,16 +149,21 @@ export default {
       );
     },
     submitLabel () {
+      let label = 'question.';
       if (store.assessInfo.submitby === 'by_question') {
         // by question submission
-        return this.$t('question.submit');
+        label += 'submit';
       } else if (this.questionData.tries_max === 1) {
         // by assessment, with one try
-        return this.$t('question.saveans');
+        label += 'saveans';
       } else {
         // by assessment, can retry
-        return this.$t('question.checkans');
+        label += 'checkans';
       }
+      if (this.hasSeqNext) {
+        label += 'seqnext';
+      }
+      return this.$t(label);
     },
     showHelps () {
       return ((store.assessInfo.hasOwnProperty('help_features') && (

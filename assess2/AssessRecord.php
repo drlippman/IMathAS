@@ -1670,6 +1670,7 @@ class AssessRecord
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
     list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
+    $seqPartDone = array();
 
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
@@ -1746,6 +1747,14 @@ class AssessRecord
       if ($showscores && $partattemptn[$pn] > 0) {
         $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
       }
+      if ($showscores) {
+        // move on if correct or out of tries
+        $seqPartDone[$pn] = ($partattemptn[$pn] === $trylimit ||
+          $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] > .98);
+      } else {
+        // move on if attempted
+        $seqPartDone[$pn] = ($partattemptn[$pn] > 0);
+      }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
     $questionParams = new QuestionParams();
@@ -1766,7 +1775,8 @@ class AssessRecord
         ->setAllQuestionAnswersAsNum($stuanswersval)
         ->setScoreNonZero($scorenonzero)
         ->setScoreIsCorrect($scoreiscorrect)
-        ->setLastRawScores($qcolors);
+        ->setLastRawScores($qcolors)
+        ->setSeqPartDone($seqPartDone);
     if ($this->dispqn !== null) {
       $questionParams->setDisplayQuestionNumber($this->dispqn);
     }

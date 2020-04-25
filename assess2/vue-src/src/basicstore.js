@@ -434,6 +434,8 @@ export const actions = {
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
     }
+    const hasSeqNext = (qns.length == 1 && store.assessInfo.questions[qns[0]].jsparams &&
+      store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
 
     window.$.ajax({
       url: store.APIbase + 'scorequestion.php' + store.queryString,
@@ -496,7 +498,7 @@ export const actions = {
           } else {
             Router.push('/summary');
           }
-        } else if (qns.length === 1) {
+        } else if (qns.length === 1 && !hasSeqNext) {
           // scroll to score result
           Vue.nextTick(() => {
             var el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
