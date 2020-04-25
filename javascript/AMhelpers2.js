@@ -340,7 +340,7 @@ function initShowAnswer2() {
         wrap.append(key);
         return;
       }
-      var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref);
+      var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref);
       if (inbox.length > 0) {
         $(el).prev(".sabtn").remove();
         key.append($(el).hide().removeClass("hidden"));
