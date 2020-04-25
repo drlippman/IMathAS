@@ -130,6 +130,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	if (strpos($settings[4],':')) {
 		$settings[4] = str_replace(array('(',')'),'',$settings[4]);
 		$lbl = explode(':',$settings[4]);
+		$lbl = array_map('evalbasic', $lbl);
+	} else {
+		$settings[4] = evalbasic($settings[4]);
 	}
 	if (is_numeric($settings[4]) && $settings[4]>0) {
 		$commands .= 'axes('.$settings[4].','.$settings[4].',1';
@@ -150,6 +153,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	if (strpos($settings[5],':')) {
 		$settings[5] = str_replace(array('(',')'),'',$settings[5]);
 		$grid = explode(':',$settings[5]);
+		$grid = array_map('evalbasic', $grid);
+	} else {
+		$settings[5] = evalbasic($settings[5]);
 	}
 	if (is_numeric($settings[5]) && $settings[5]>0) {
 		$commands .= ','.$settings[5].','.$settings[5];
