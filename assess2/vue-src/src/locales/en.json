@@ -104,6 +104,7 @@
     "submit": "Submit Question",
     "checkans": "Check Answer",
     "saveans": "Save Answer",
+    "next": "Next Question",
     "submit_seqnext": "Submit Part",
     "checkans_seqnext": "Check Part Answer",
     "saveans_seqnext": "Next Part",

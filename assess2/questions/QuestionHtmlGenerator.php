@@ -523,10 +523,6 @@ class QuestionHtmlGenerator
             }
         }
 
-        $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . "\">\n"
-            . filter($evaledqtext);
-
-
         /*
          *  Handle sequenial multipart, now that all answerboxes have been inserted
          *
@@ -534,7 +530,7 @@ class QuestionHtmlGenerator
          *  cases where $answerbox or [AB#] is already in the question text
          */
         if ($quesData['qtype'] == "multipart") {
-          $seqParts = preg_split('~(<p[^>]*>|<br/><br/>)\s*///+\s*(</p[^>]*>|<br/><br/>)~', $evaledqtext);
+          $seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
 
           if (count($seqParts) > 1) {
             $seqPartDone = $this->questionParams->getSeqPartDone();
@@ -565,6 +561,10 @@ class QuestionHtmlGenerator
             $evaledqtext = $newqtext;
           }
         }
+
+        $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . "\">\n"
+            . filter($evaledqtext);
+
 
         /*
          * Disable answer box inputs

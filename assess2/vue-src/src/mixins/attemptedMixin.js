@@ -20,7 +20,7 @@ export const attemptedMixin = {
               max = store.assessInfo.questions[i].parts_entered[k];
             }
           }
-          if (min > 0) {
+          if (min > 0 && store.assessInfo.questions[i].parts_entered.length === store.assessInfo.questions[i].answeights.length) {
             qAttempted[i] = 1;
           } else if (max > 0) {
             qAttempted[i] = 0.5;

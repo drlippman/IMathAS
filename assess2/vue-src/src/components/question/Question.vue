@@ -73,6 +73,17 @@
         {{ $t('question.jump_to_answer') }}
       </button>
     </div>
+    <div v-else-if="showNext"  class="submitbtnwrap">
+      <router-link
+        :to="'/skip/'+ (this.qn + 2)"
+        tag="button"
+        class="secondarybtn"
+        :disabled = "!canSubmit"
+      >
+        <icons name="right" />
+        {{ $t('question.next') }}
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -132,6 +143,10 @@ export default {
       )
       );
     },
+    showNext () {
+      return (!this.showSubmit && store.assessInfo.displaymethod === 'skip' &&
+        this.qn < store.assessInfo.questions.length - 1);
+    },
     submitClass () {
       return (store.assessInfo.submitby === 'by_assessment')
         ? 'secondary' : 'primary';
@@ -161,7 +176,7 @@ export default {
         label += 'checkans';
       }
       if (this.hasSeqNext) {
-        label += 'seqnext';
+        label += '_seqnext';
       }
       return this.$t(label);
     },
