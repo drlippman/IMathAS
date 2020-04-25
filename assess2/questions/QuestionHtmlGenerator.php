@@ -538,8 +538,8 @@ class QuestionHtmlGenerator
             $lastGroupDone = true;
             foreach ($seqParts as $k=>$seqPart) {
               $thisGroupDone = true;
-              preg_match_all('/<input[^>]*name="qn(\d+)/', $seqPart, $m);
-              foreach ($m[1] as $qnrefnum) {
+              preg_match_all('/<(input|select|textarea)[^>]*name="qn(\d+)/', $seqPart, $m);
+              foreach ($m[2] as $qnrefnum) {
                 $pn = $qnrefnum % 1000;
                 if (!$lastGroupDone) { // not ready for it - unset stuff
                   unset($jsParams[$qnrefnum]);
