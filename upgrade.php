@@ -8,9 +8,9 @@ require('migrator.php');
 //old approach: change counter; increase by 1 each time a change is made
 $latest_oldstyle = 119;
 
-ini_set("max_input_time", "6000");
+
 ini_set("max_execution_time", "6000");
-ini_set("memory_limit", "104857600");
+
 
 if (isset($dbsetup) && $dbsetup==true) {  //initial setup run from setupdb.php
 
@@ -50,7 +50,7 @@ unset($dbpassword);
 			<p>Run upgrade.php again after making those changes</p>';
 			exit;
 	}
-	$use_local_sessions = true;
+	//$use_local_sessions = true;
 	if (php_sapi_name() == 'cli') { //allow direct calling from command line
 		$init_skip_csrfp = true;
 		require("init_without_validate.php");
@@ -1806,7 +1806,7 @@ unset($dbpassword);
 			echo '<p>Added assessment sessions ver</p>';
 		}
 		if ($last<114) {
-		
+
 		}
 		if ($last<115) {
 			$query = "ALTER TABLE  `imas_users` ADD `FCMtoken` VARCHAR(512) NOT NULL DEFAULT '';";

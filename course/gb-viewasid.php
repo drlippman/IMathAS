@@ -4,6 +4,11 @@
 	require("../init.php");
 	require_once("../includes/filehandler.php");
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['course/gb-viewasid'])) {
+	require($CFG['hooks']['course/gb-viewasid']);
+}
+
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -542,6 +547,9 @@
 		}
 		$line=$stm->fetch(PDO::FETCH_ASSOC);
 		$GLOBALS['assessver'] = $line['ver'];
+		if (function_exists('onAssessVer')) {
+			onAssessVer($line);
+		}
 
 		if (!$isteacher && !$istutor) {
 			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
@@ -1195,6 +1203,9 @@
 		$stm->execute(array(':id'=>$asid));
 		$line=$stm->fetch(PDO::FETCH_ASSOC);
 		$GLOBALS['assessver'] = $line['ver'];
+		if (function_exists('onAssessVer')) {
+			onAssessVer($line);
+		}
 
 		if (!$isteacher && !$istutor) {
 			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";

@@ -27,7 +27,7 @@ export default {
     navOptions () {
       var out = [];
       for (let i = 0; i < this.versions.length; i++) {
-        let thisoption = {
+        const thisoption = {
           ver: i,
           ptsposs: this.versions[i].points_possible,
           onclick: () => this.$emit('setversion', this.qn, i)

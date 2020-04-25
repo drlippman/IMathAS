@@ -931,6 +931,11 @@ function chopZ(st) {
   if (i==k) i--;
   return st.slice(0,i+1);
 }
+function rounddec(v,dec) {
+  dec = 2 + Math.max(0,dec-2);
+  var m = Math.pow(10,dec);
+  return Math.round(v*m)/m;
+}
 
 
 function grid(dx,dy) { // for backward compatibility
@@ -1063,24 +1068,24 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     ly = (ymin>0 || ymax<0?ymin:0);
     lxp = (ly==0?"below":"above");
     lyp = (lx==0?"left":"right");
-    var ddx = Math.floor(1.1-Math.log(ldx)/Math.log(10))+1;
-    var ddy = Math.floor(1.1-Math.log(ldy)/Math.log(10))+1;
+    var ddx = Math.floor(1-Math.log(ldx)/Math.log(10))+1;
+    var ddy = Math.floor(1-Math.log(ldy)/Math.log(10))+1;
     if (ddy<0) { ddy = 0;}
     if (ddx<0) { ddx = 0;}
     if (dox && dx>0) {
 	    for (x = (doy?ldx:0); x<=xmax; x = x+ldx)
-	      if (x>=xmin) text([x,ly],chopZ(x.toFixed(ddx)),lxp);
+	      if (x>=xmin) text([x,ly], rounddec(x, ddx),lxp);
 	    if (!fqonlyx) {
 	      for (x = -ldx; xmin<=x; x = x-ldx)
-	        if (x<=xmax) text([x,ly],chopZ(x.toFixed(ddx)),lxp);
+	        if (x<=xmax) text([x,ly], rounddec(x, ddx),lxp);
 	    }
     }
     if (doy && dy>0) {
 	    for (y = (dox?ldy:0); y<=ymax; y = y+ldy)
-	      if (y>=ymin) text([lx,y],chopZ(y.toFixed(ddy)),lyp);
+	      if (y>=ymin) text([lx,y], rounddec(y, ddy), lyp);
       	    if (!fqonlyy) {
 	      for (y = -ldy; ymin<=y; y = y-ldy)
-	        if (y<=ymax) text([lx,y],chopZ(y.toFixed(ddy)),lyp);
+	        if (y<=ymax) text([lx,y], rounddec(y, ddy), lyp);
 	    }
     }
   }

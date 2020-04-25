@@ -118,11 +118,9 @@ class ScorePartFactory
                 // This will be caught by our custom exception handler to be
                 // displayed directly to question writers, who are not
                 // necessarily developers nor technical users.
-                throw new OutOfBoundsException(
-                    sprintf("Unknown answer type '%s'. (anstype)"
-                        . " See question writing help for a list of valid types.",
-                        $answerType)
-                );
+                throw new OutOfBoundsException('Unknown answer type (anstype) "'
+                    . $answerType . '".'
+                    . " See question writing help for a list of valid types.");
         }
     }
 }

@@ -132,6 +132,21 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 	}
+	if ((isset($teacherid) || isset($tutorid)) && isset($_GET['inlinetoggle'])) {
+		$inlineid = Sanitize::onlyInt($_GET['inlinetoggle']);
+		$val = Sanitize::onlyInt($_GET['val']);
+		$stm = $DBH->prepare("SELECT text FROM imas_inlinetext WHERE id=? AND courseid=?");
+		$stm->execute(array($inlineid, $cid));
+		$text = $stm->fetchColumn(0);
+		if ($text !== null) {
+			$text = str_replace(' (Active)','',$text);
+			$toggleParts = preg_split('/(<p.*?###[^<>]+?###.*\/p>)/', $text, 0, PREG_SPLIT_DELIM_CAPTURE);
+			$toggleParts[2*$val+1] = preg_replace('/###/', '### (Active)', $toggleParts[2*$val+1], 1);
+			$stm = $DBH->prepare("UPDATE imas_inlinetext SET text=? WHERE id=?");
+			$stm->execute(array(implode('',$toggleParts), $inlineid));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
+		}
+	}
 
 	//enable teacher guest access
 	if (isset($instrPreviewId)) {
@@ -244,8 +259,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			if (count($backtrack)>$depth) {
 				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".Sanitize::encodeUrlParam($backtrack[count($backtrack)-2][1])."\">" . _('Back') . "</a></span><br class=\"form\" />";
 			}
-			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
-
 		} else {
 			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			for ($i=0;$i<count($backtrack);$i++) {
@@ -272,7 +285,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 
 
 	if ($msgset<4) {
-	   $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
+	   $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0 AND deleted<2");
 	   $stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 	   $msgcnt = $stm->fetchColumn(0);
 	   if ($msgcnt>0) {
@@ -332,31 +345,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$newpostscnt = '';
 	}
 
-	//get items with content views, for enabling stats link
-	/*
-	//removed - always showing stats link now.
-	if (isset($teacherid) || isset($tutorid)) {
-		$hasstats = array();
-		$query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$cid' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
-		//not sure this is useful information, since this is in the list posts by name page, and we don't track forum views in content tracking
-		//$query .= "UNION SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),info)) FROM imas_content_track WHERE courseid='$cid' AND type in ('forumpost','forumreply')";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$hasstats[$row[0]] = true;
-		}
-	}
-	*/
-
-	//get read linked items
-	$readlinkeditems = array();
-	if ($coursetheme=='otbsreader.css' && isset($studentid)) {
-		$stm = $DBH->prepare("SELECT DISTINCT typeid FROM imas_content_track WHERE userid=:userid AND type='linkedlink' AND courseid=:courseid");
-		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$readlinkeditems[$row[0]] = true;
-		}
-	}
-
 	//get latepasses
 	if (!isset($teacherid) && !isset($tutorid) && !$inInstrStuView && isset($studentinfo)) {
 	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
@@ -407,6 +395,10 @@ if ($overwriteBody==1) {
 				var toopen = '<?php echo $jsAddress2 ?>add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $cid; ?>';
 				window.location = toopen;
 			}
+		}
+		function chgInlineToggler(el,id) {
+			var toopen = '<?php echo $jsAddress2 ?>course.php?inlinetoggle='+id+'&val='+el.value+'&cid=<?php echo $cid; ?>';
+			window.location = toopen;
 		}
 	</script>
 
@@ -522,7 +514,7 @@ if ($overwriteBody==1) {
 		<p><b><?php echo _('Course Items'); ?></b><br/>
 			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy'); ?></a><br/>
 			<a href="../admin/ccexport.php?cid=<?php echo $cid ?>"><?php echo _('Export'); ?></a>
-		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=75) { ?>
+		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=100) { ?>
 			<br/><a href="../admin/importitems2.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
 		<?php } ?>
 		</p>

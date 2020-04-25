@@ -46,7 +46,7 @@ export default {
       }
     },
     score () {
-      return this.option.score + '/' + store.assessInfo['points_possible'];
+      return this.option.score + '/' + store.assessInfo.points_possible;
     }
   }
 };

@@ -81,7 +81,11 @@ class DrawingAnswerBox implements AnswerBox
     		$answers = array_map('clean', $answers);
     		if (!isset($snaptogrid)) {
     			$snaptogrid = 0;
-    		}
+    		} else {
+          $snapparts = explode(':', $snaptogrid);
+          $snapparts = array_map('evalbasic', $snapparts);
+          $snaptogrid = implode(':', $snapparts);
+        }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
     		$imgborder = 5;
 
@@ -476,6 +480,8 @@ class DrawingAnswerBox implements AnswerBox
     				'value' => $la,
     				'autocomplete' => 'off'
     			];
+
+          $settings = array_map('floatval', $settings);
     			$params['canvas'] = [$qn,'',$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
     			$out .= '<input ' .
@@ -565,6 +571,10 @@ class DrawingAnswerBox implements AnswerBox
     							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
     						}
     					} else { //is function
+                			if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^(]|ln[^\(]|root[^\(]|root\(.*?\)[^\(])/', $function[0])) {
+    							echo "Invalid notation on ".Sanitize::encodeStringForDisplay($function[0]).": missing function parens";
+    							continue;
+    						}
     						$saarr[$k] = $function[0].',blue';
     						if (count($function)>2) {
     							if ($function[1] == '-oo') { $function[1] = $settings[0]-.1*($settings[1]-$settings[0]);}

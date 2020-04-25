@@ -1,9 +1,9 @@
 <?php
 	//IMathAS:  Basic Actions
 	//(c) 20006 David Lippman
-ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "10485760");
-ini_set("post_max_size", "10485760");
+
+
+
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['actions'])) {
@@ -120,9 +120,9 @@ require_once("includes/sanitize.php");
 			':SID'=>$_POST['SID'],
 			':password'=>$md5pw,
 			':rights'=>$initialrights,
-			':FirstName'=>$_POST['firstname'],
-			':LastName'=>$_POST['lastname'],
-			':email'=>$_POST['email'],
+			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+			':email'=>Sanitize::emailAddress($_POST['email']),
 			':msgnotify'=>$msgnot,
 			':homelayout'=>$homelayout));
 		$newuserid = $DBH->lastInsertId();
@@ -194,7 +194,7 @@ require_once("includes/sanitize.php");
 
 							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 							if ($msgOnEnroll) {
-								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
 								$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
 								$stm->execute(array(':cid'=>$_POST['courseid']));
 								while ($tuid = $stm->fetchColumn(0)) {
@@ -284,6 +284,9 @@ require_once("includes/sanitize.php");
 				echo _('If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.'),'<br/>';
 				echo sprintf(_('It may help to add %s to your contacts list.'),'<b>'.Sanitize::encodeStringForDisplay($sendfrom).'</b>'),'</p>';
 				echo '<p>',_('If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.'),'</p>';
+				if (function_exists('getInstructorSupport')) {
+					getInstructorSupport($rights);
+				}
 				require("footer.php");
 				exit;
 			} else {
@@ -527,7 +530,7 @@ require_once("includes/sanitize.php");
 
 					$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 					if ($msgOnEnroll) {
-						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
 						$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
 						$stm->execute(array(':cid'=>$_POST['cid']));
 						while ($tuid = $stm->fetchColumn(0)) {
@@ -774,7 +777,11 @@ require_once("includes/sanitize.php");
 		}
 
 	} else if ($_GET['action']=="forumwidgetsettings") {
-		$checked = $_POST['checked'];
+		if (empty($_POST['checked'])) {
+			$checked = array();
+		} else {
+			$checked = $_POST['checked'];
+		}
 		$all = explode(',',$_POST['allcourses']);
 		foreach ($all as $k=>$v) {
 			$all[$k] = intval($v);

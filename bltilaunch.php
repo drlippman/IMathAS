@@ -28,6 +28,7 @@
 
 header('P3P: CP="ALL CUR ADM OUR"');
 $init_skip_csrfp = true;
+$init_session_start = true;
 include("init_without_validate.php");
 unset($init_skip_csrfp);
 
@@ -130,7 +131,10 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
 	}
 	$userid = $_SESSION['userid'];
-
+	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+		echo _('Uh oh, something went wrong.  Please go back and try again');
+		exit;
+	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
 	}
@@ -322,7 +326,9 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify,:groupid)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$_POST['firstname'],':LastName'=>$_POST['lastname'],':email'=>$_POST['email'],
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
 						':msgnotify'=>$msgnot,':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
@@ -330,7 +336,9 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$_POST['firstname'],':LastName'=>$_POST['lastname'],':email'=>$_POST['email'],
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
 						':msgnotify'=>$msgnot));
 				}
 				$userid = $DBH->lastInsertId(); //DB mysql_insert_id();
@@ -688,7 +696,9 @@ if (isset($_GET['launch'])) {
 				$query .= '(:userid,:SID,:password,:rights,:FirstName,:LastName,:email,0)';
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':SID'=>'lti-'.$userrow['id'], ':password'=>'pass' ,':rights'=>10,
-					':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email));
+					':FirstName'=>Sanitize::stripHtmlTags($firstname),
+					':LastName'=>Sanitize::stripHtmlTags($lastname),
+					':email'=>Sanitize::emailAddress($email)));
 			} else if ($firstname != $userrow['FirstName'] || $lastname != $userrow['LastName'] || $email != $userrow['email']) {
 				//update imas_users record
 				$stm2 = $DBH->prepare("UPDATE imas_users SET FirstName=?,LastName=?,email=? WHERE id=?");
@@ -735,7 +745,10 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0,:groupid)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email,':groupid'=>$newgroupid));
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email),
+						':groupid'=>$newgroupid));
 
 				} else {
 					$rights = 10;
@@ -743,7 +756,9 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email));
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email)));
 				}
 				$userid = $DBH->lastInsertId(); //DB $userid = mysql_insert_id();
 				if ($rights>=20) {
@@ -1188,7 +1203,7 @@ if ($stm->rowCount()==0) {
 				}
 				if (!$foundaid && count($res)>0) { //multiple results - look for the identical name
 					foreach ($res as $k=>$row) {
-						$res[$k]['loc'] = strpos($row['ancestors'], $aidtolookfor);
+						$res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
 						if ($row['name']==$aidsourcename) {
 							$aid = $row['id'];
 							$foundaid = true;
@@ -1596,6 +1611,9 @@ $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];
 $_SESSION['lti_origkey'] = $SESS['ltiorigkey'];
+if (isset($SESS['lti_duedate'])) {
+	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
+}
 if (isset($SESS['selection_return'])) {
 	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
 	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'];
@@ -1661,7 +1679,10 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
 	}
 	$userid = $_SESSION['userid'];
-
+	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+		echo _('Uh oh, something went wrong.  Please go back and try again');
+		exit;
+	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
 	}
@@ -1863,13 +1884,21 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':groupid'=>$newgroupid));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
+						':msgnotify'=>$msgnot, ':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
+						':msgnotify'=>$msgnot));
 				}
 				$userid = $DBH->lastInsertId();
 			}
@@ -2239,13 +2268,21 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email, ':msgnotify'=>0, ':groupid'=>$newgroupid));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email),
+						':msgnotify'=>0, ':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email, ':msgnotify'=>0));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email),
+						':msgnotify'=>0));
 				}
 				$userid = $DBH->lastInsertId();
 			}
@@ -2700,6 +2737,9 @@ $_SESSION['lti_key'] = $SESS['lti_key'];
 $_SESSION['lti_keytype'] = $SESS['lti_keytype'];
 $_SESSION['lti_keylookup'] = $SESS['ltilookup'];
 $_SESSION['lti_origkey'] = $SESS['ltiorigkey'];
+if (isset($SESS['lti_duedate'])) {
+	$_SESSION['lti_duedate'] = $SESS['lti_duedate'];
+}
 if (isset($SESS['selection_return'])) {
 	$_SESSION['lti_selection_return'] = $SESS['selection_return'];
 	$_SESSION['lti_selection_targets'] = $SESS['selection_targets'];

@@ -169,6 +169,31 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$toset[$k] = $v;
 				}
 			}
+			if (isset($_POST['copysummary']) || isset($_POST['copyinstr']) ||
+				isset($_POST['copydates']) || isset($_POST['copyendmsg'])
+			) {
+				$stm = $DBH->prepare("SELECT summary,intro,startdate,enddate,reviewdate,avail,endmsg FROM imas_assessments WHERE id=:id AND courseid=:cid");
+				$stm->execute(array(':id'=>intval($_POST['copyfrom']), ':cid'=>$cid));
+				$row = $stm->fetch(PDO::FETCH_ASSOC);
+				if (isset($_POST['copysummary'])) {
+					$toset['summary'] = $row['summary'];
+				}
+				if (isset($_POST['copyinstr'])) {
+					if (($introjson=json_decode($row['intro']))!==null) { //is json intro
+							$toset['intro'] = $introjson[0];
+					} else {
+							$toset['intro'] = $row['intro'];
+					}
+				}
+				if (isset($_POST['copydates'])) {
+					$toset['startdate'] = $row['startdate'];
+					$toset['enddate'] = $row['enddate'];
+					$toset['reviewdate'] = $row['reviewdate'];
+				}
+				if (isset($_POST['copyendmsg'])) {
+					$toset['endmsg'] = $row['endmsg'];
+				}
+			}
 		} else { // set using values selected
 			$toset['displaymethod'] = Sanitize::stripHtmlTags($_POST['displaymethod']);
 
@@ -451,7 +476,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			require_once('../assess2/AssessRecord.php');
 			$assess_info = new AssessInfo($DBH, $assessmentId, $cid, false);
 			$assess_info->loadQuestionSettings();
-			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
 			$stm->execute(array($assessmentId));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$assess_record = new AssessRecord($DBH, $assess_info, false);

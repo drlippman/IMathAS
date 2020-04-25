@@ -35,7 +35,7 @@
 
 <script>
 import Icons from '@/components/widgets/Icons.vue';
-import './a11y-dialog';
+import A11yDialog from './a11y-dialog';
 
 export default {
   name: 'ErrorDialog',
@@ -73,7 +73,7 @@ export default {
         this.clearError();
       }
     });
-    this.dialog = new window.A11yDialog(this.$refs.wrap);
+    this.dialog = new A11yDialog(this.$refs.wrap);
     this.dialog.show();
   },
   beforeDestroy () {

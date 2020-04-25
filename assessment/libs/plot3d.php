@@ -194,7 +194,7 @@ function spacecurve($func,$tmin,$tmax) {
 			  for ($j=0;$j<$disc;$j++) {
 				  if ($count > 0) { $verts .= '~';}
 				  $u = 1.571*$i;
-				  $t = $vmin+$dt*$j;
+				  $t = $tmin+$dt*$j;
 
 				  $x = $usefunc[0](['u'=>$u, 't'=>$t]);
 				  $y = $usefunc[1](['u'=>$u, 't'=>$t]);
@@ -241,7 +241,7 @@ function spacecurve($func,$tmin,$tmax) {
 		$dt = ($tmax-$tmin)/($disc-1);
 		for ($j=0;$j<$disc;$j++) {
 			  if ($count > 0) { $verts .= '~';}
-			  $t = $vmin+$dt*$j;
+			  $t = $tmin+$dt*$j;
 
 			  $x = $usefunc[0](['t'=>$t]);
 			  $y = $usefunc[1](['t'=>$t]);

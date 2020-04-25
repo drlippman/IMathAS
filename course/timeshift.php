@@ -4,7 +4,7 @@
 
 //boost operation time
 
-ini_set("max_input_time", "120");
+
 ini_set("max_execution_time", "120");
 
 /*** master php includes *******/

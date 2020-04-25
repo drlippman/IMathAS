@@ -329,7 +329,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	</script>';
 	echo '<h2>'._('Link courses').'</h2>';
 	echo '<form method="post" action="ltihome.php">';
-	echo "<p>".sprintf_("This course on your LMS has not yet been linked to a course on %s. ",$installname);
+	echo "<p>".sprintf(_("This course on your LMS has not yet been linked to a course on %s. "),$installname);
 	echo _('Select a course to link with.  If it is a template course, a copy will be created for you:').'<br/> <select name="createcourse" onchange="updateCourseSelector(this)"> ';
 	$stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid=:userid AND ic.available<4 ORDER BY ic.name");
 	$stm->execute(array(':userid'=>$userid));
@@ -340,7 +340,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 		echo '</optgroup>';
 	}
-	$stm = $DBH->query("SELECT id,name,copyrights,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name");
+	$stm = $DBH->query("SELECT id,name,copyrights,termsurl FROM imas_courses WHERE istemplate > 0 AND (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name");
 	if ($stm->rowCount()>0) {
 		echo '<optgroup label="'._('Template Courses').'">';
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -354,7 +354,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	}
 
 	$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
-	$query .= "iu.groupid=:groupid AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+	$query .= "iu.groupid=:groupid AND ic.istemplate > 0 AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':groupid'=>$groupid));
 	if ($stm->rowCount()>0) {
@@ -457,7 +457,7 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		}
 		echo _('Be aware some LMSs will send unexpected dates on instructor launches, so don\'t worry if the date shown in the assessment preview is different than you expected or different than the default due date. ');
 		echo '</p><p>';
-		echo_('If the LMS reports a different due date for an individual student when they open this assignment, this system will handle that by setting a due date exception. ');
+		echo _('If the LMS reports a different due date for an individual student when they open this assignment, this system will handle that by setting a due date exception. ');
 	} else if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) { //regular show
 		echo _("Currently available to students.")."  ";
 		echo sprintf(_("Available until %s"), formatdate($line['enddate']));

@@ -1,4 +1,5 @@
 <?php
+  $init_session_start = true;
 	require("../init_without_validate.php");
 
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -17,6 +18,7 @@
 	if (!isset($_GET['id'])) {
 		//echo "<html><body><h1>Diagnostics</h1><ul>";
 		$nologo = true;
+        $loadinginfoheader = true;;
 		$infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
@@ -314,7 +316,11 @@ if (isset($_POST['SID'])) {
 	if (!isset($_POST['passwd'])) {
 		$_POST['passwd'] = "none";
 	}
-	$stm->execute(array(':SID'=>$diagSID, ':password'=>$_POST['passwd'], ':rights'=>10, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$eclass, ':lastaccess'=>$now));
+	$stm->execute(array(':SID'=>$diagSID, ':password'=>$_POST['passwd'], ':rights'=>10,
+    ':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+    ':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+    ':email'=>Sanitize::stripHtmlTags($eclass),
+    ':lastaccess'=>$now));
 	$userid = $DBH->lastInsertId();
 	if (!isset($_POST['timelimitmult'])) {
 		$_POST['timelimitmult'] = 1;
@@ -336,7 +342,7 @@ if (isset($_POST['SID'])) {
 	$_SESSION['time'] = $now;
 	$_SESSION['tzoffset'] = $_POST['tzoffset'];
 	$_SESSION['tzname'] = $tzname;
-	
+
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 	if ($aVer > 1) {

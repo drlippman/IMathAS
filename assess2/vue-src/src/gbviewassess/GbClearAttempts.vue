@@ -77,7 +77,7 @@
 
 <script>
 import { store, actions } from './gbstore';
-import '../components/a11y-dialog';
+import A11yDialog from '../components/a11y-dialog';
 
 export default {
   name: 'GbClearAttempts',
@@ -105,7 +105,7 @@ export default {
       return (store.curAver === avercnt);
     },
     isLastQAttempt () {
-      let qvercnt = store.assessInfo.assess_versions[store.curAver].questions[store.clearAttempts.qn].length - 1;
+      const qvercnt = store.assessInfo.assess_versions[store.curAver].questions[store.clearAttempts.qn].length - 1;
       return (store.curQver[store.clearAttempts.qn] === qvercnt);
     }
   },
@@ -126,7 +126,7 @@ export default {
           this.close();
         }
       });
-      this.dialog = new window.A11yDialog(this.$refs.wrap);
+      this.dialog = new A11yDialog(this.$refs.wrap);
       this.dialog.show();
     }
   }

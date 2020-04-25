@@ -423,13 +423,14 @@
 	echo '<p class="list"><input type="checkbox" name="eatlatepass"/> Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es) from each student. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
 	echo '<p class="list"><input type="checkbox" name="sendmsg"/> Send message to these students?</p>';
 	echo '<p>For assessments:</p>';
-	echo '<p class="list"><input type="checkbox" name="forceregen"/> <sup>*</sup> Force student to work on new versions of all questions?  Students ';
-	echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
-	echo '<p class="list"><input type="checkbox" name="forceclear"/> <sup>*</sup> Clear student\'s attempts?  Students ';
+	if ($courseUIver < 2) {
+		echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
+		echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
+	}
+	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
 	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
 	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
-	echo '<p class="small"><sup>*</sup> Note: These two options only work on older-format assessments for now</p>';
 	echo '</fieldset>';
 
 

@@ -50,7 +50,7 @@
  //check for bad sessionids.
  if (strlen($sessionid)<10) {
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
-	echo sprintf(_("Error.  Please %s try again%s","<a href=\"$imasroot/index.php\">","<a href=\"$imasroot/index.php\">","</a>"));
+	echo sprintf(_("Error.  Please %s try again%s"),"<a href=\"$imasroot/index.php\">","<a href=\"$imasroot/index.php\">","</a>");
 	exit;
  }
  if (!empty($_SESSION['userid'])) { // logged in
@@ -62,7 +62,9 @@
  	 		$tzname = $_SESSION['tzname'];
  	 	}
  	 }
-   if ((time()-$_SESSION['time'])>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
+
+   $lastSessionTime = isset($GLOBALS['sessionLastAccess']) ? $GLOBALS['sessionLastAccess'] : $_SESSION['time'];
+   if ((time()-$lastSessionTime)>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
     $wasLTI = isset($_SESSION['ltiitemtype']);
     unset($_SESSION['userid']);
     unset($userid);
@@ -79,7 +81,7 @@
     }
   }
  }
- 
+
  $hasusername = isset($userid);
  $haslogin = isset($_POST['password']);
  if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
@@ -135,7 +137,7 @@
 	 	$stm = $DBH->prepare($query);
 	 	$stm->execute(array(':guestcnt'=>"guestacct$guestcnt", ':homelayout'=>$homelayout));
 	 	$userid = $DBH->lastInsertId();
-	 	$query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
+	 	$query = "SELECT id FROM imas_courses WHERE istemplate > 0 AND (istemplate&8)=8 AND available<4";
 		if (isset($_GET['cid'])) { $query.= ' AND id=:id'; }
 		$stm = $DBH->prepare($query);
 		if (isset($_GET['cid'])) {
@@ -177,7 +179,12 @@
 	if (($line != null) && (
 	  ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password']))))
 	  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['password'],$line['password']))	)) {
-		 unset($_SESSION['challenge']); //challenge is used up - forget it.
+
+      if (empty($_POST['tzname']) && $_POST['tzoffset']=='' && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+        echo _('Uh oh, something went wrong.  Please go back and try again');
+        exit;
+      }
+     unset($_SESSION['challenge']); //challenge is used up - forget it.
 		 $userid = $line['id'];
 		 $groupid = $line['groupid'];
 		 //for upgrades times:
@@ -193,8 +200,8 @@
 			exit;
 		 }
 
-		 $_SESSION['useragent'] = $_SERVER['HTTP_USER_AGENT'];
-		 $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
+		 //$_SESSION['useragent'] = $_SERVER['HTTP_USER_AGENT'];
+		 //$_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
 		 $_SESSION['secsalt'] = generaterandstring();
 
 		 if (!isset($_POST['tzoffset'])) {
@@ -209,7 +216,7 @@
      $_SESSION['userid'] = $userid;
      $_SESSION['time'] = $now;
      $_SESSION['tzoffset'] = $_POST['tzoffset'];
-     if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+     if (!empty($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
        $_SESSION['tzname'] = $_POST['tzname'];
      }
 
@@ -281,11 +288,12 @@
  //has logged in already
  if ($hasusername) {
 	//check validity, if desired
-	if (($_SESSION['useragent'] != $_SERVER['HTTP_USER_AGENT']) || ($_SESSION['ip'] != $_SERVER['REMOTE_ADDR'])) {
+	//if (($_SESSION['useragent'] != $_SERVER['HTTP_USER_AGENT']) || ($_SESSION['ip'] != $_SERVER['REMOTE_ADDR'])) {
 		//suggests sidejacking.  Delete session and require relogin
 		//   caused issues so removed
-	}
+	//}
 	//$username = $_COOKIE['username'];
+
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken,forcepwreset,mfa';
@@ -324,7 +332,7 @@
 	}
 	*/
 	$FCMtoken = $line['FCMtoken'];
-	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
+	$userfullname = strip_tags($line['FirstName'] . ' ' . $line['LastName']);
 	$inInstrStuView = false;
 	if (!isset($_SESSION['userprefs']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		//userprefs are missing!  They should be defined from initial session setup
@@ -380,6 +388,11 @@
 			exit;
 		} // TODO: handle assess2 case
 	}
+  // update session time, if not handled by sessionLastAccess
+  // this is used by local and redis sessions; db sessions handle via sessionLastAccess
+  if (empty($GLOBALS['sessionLastAccess'])) {
+    $_SESSION['time'] = time();
+  }
 
 	if (isset($_SESSION['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
 		if ($myrights>18) {
@@ -414,7 +427,8 @@
 			$allowedinLTI = array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php',
         'redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php',
         'index.php','gbviewassess.php','autosave.php','endassess.php','getscores.php','livepollstatus.php','loadassess.php',
-        'loadquestion.php','scorequestion.php','startassess.php','uselatepass.php','gbloadassess.php','gbloadassessver.php','gbloadquestionver.php');
+        'loadquestion.php','scorequestion.php','startassess.php','uselatepass.php','gbloadassess.php','gbloadassessver.php',
+        'gbloadquestionver.php','getquestions.php','savework.php');
 			//call hook, if defined
 			if (function_exists('allowedInAssessment')) {
 				$allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());
@@ -631,20 +645,22 @@
 
   function checkeditorok() {
 	  $ua = $_SERVER['HTTP_USER_AGENT'];
-	  if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) {
-	  	  preg_match('/OS (\d+)_(\d+)/',$ua,$match);
-	  	  if ($match[1]>=5) {
-	  	  	  return 1;
-	  	  } else {
-	  	  	  return 0;
-	  	  }
-	  } else if (strpos($ua,'Android')!==false) {
-	  	  preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match);
-	  	  if ($match[1]>=4) {
-	  	  	  return 1;
-	  	  } else {
-	  	  	  return 0;
-	  	  }
+	  if ((strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) &&
+	  	  preg_match('/OS (\d+)_(\d+)/',$ua,$match)
+    ) {
+  	  if ($match[1]>=5) {
+  	  	  return 1;
+  	  } else {
+  	  	  return 0;
+  	  }
+	  } else if (strpos($ua,'Android')!==false &&
+	  	preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match)
+    ) {
+  	  if ($match[1]>=4) {
+  	  	  return 1;
+  	  } else {
+  	  	  return 0;
+  	  }
 	  } else {
 		  return 1;
 	  }
@@ -660,4 +676,3 @@
 	}
 	return $pass;
   }
-?>

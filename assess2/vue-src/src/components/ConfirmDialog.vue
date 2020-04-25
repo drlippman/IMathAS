@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import Icons from '@/components/widgets/Icons.vue';
-import './a11y-dialog';
+import A11yDialog from './a11y-dialog';
 
 export default {
   name: 'ConfirmDialog',
@@ -44,9 +43,6 @@ export default {
     return {
       dialog: null
     };
-  },
-  components: {
-    Icons
   },
   computed: {
     confirmBody () {
@@ -79,7 +75,7 @@ export default {
         this.doCancel();
       }
     });
-    this.dialog = new window.A11yDialog(this.$refs.wrap);
+    this.dialog = new A11yDialog(this.$refs.wrap);
     this.dialog.show();
   },
   beforeDestroy () {

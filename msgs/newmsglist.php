@@ -2,12 +2,13 @@
 	//Displays New Message list
 	//(c) 2009 David Lippman
 
-	//isread is bitwise:
-	//1      2         4                   8
-	//Read   Deleted   Deleted by Sender   Tagged
+/*	viewed: 0 unread, 1 read
+     deleted: 0 not deleted, 1 deleted by sender, 2 deleted by reader  (ordered this way so we can use < 2)
+     tagged: 0 no, 1 yes
+*/
 
 	require("../init.php");
-	
+
 
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -27,21 +28,21 @@
 
 	if (isset($_POST['read']) && count($_POST['checked'])>0) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
-		$query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
-		$DBH->query($query);
+		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=1 WHERE id IN ($checklist) AND viewed=0 AND msgto=?");
+		$stm->execute(array($userid));
 	}
 	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
-		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
-		$DBH->query($query);
-		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
-		$DBH->query($query);
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND deleted=1 AND msgto=?");
+		$stm->execute(array($userid));
+		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=2 WHERE id IN ($checklist) AND msgto=?");
+		$stm->execute(array($userid));
 	}
 	if (isset($_GET['removeid'])) {
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND (isread&4)=4");
-		$stm->execute(array(':id'=>$_GET['removeid']));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=(isread|2) WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['removeid']));
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND deleted=1 AND msgto=:msgto");
+		$stm->execute(array(':id'=>$_GET['removeid'], ':msgto'=>$userid));
+		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=2 WHERE id=:id AND msgto=:msgto");
+		$stm->execute(array(':id'=>$_GET['removeid'], ':msgto'=>$userid));
 	}
 
 	$pagetitle = "New Messages";
@@ -63,9 +64,9 @@
 	<input type=submit name="remove" value="Delete">
 
 <?php
-	$query = "SELECT imas_msgs.id,imas_msgs.msgfrom,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_courses.id AS cid ";
+	$query = "SELECT imas_msgs.id,imas_msgs.msgfrom,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.viewed,imas_courses.name,imas_courses.id AS cid ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread&3)=0 ";
+	$query .= "imas_msgs.msgto=:msgto AND viewed=0 AND deleted<2 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':msgto'=>$userid));
@@ -100,7 +101,7 @@
                 Sanitize::onlyInt($line['id']));
 			printf("<a href=\"viewmsg.php?cid=%s&type=new&msgid=%d\">", Sanitize::courseId($line['cid']),
                 Sanitize::onlyInt($line['id']));
-			if (($line['isread']&1)==0) {
+			if ($line['viewed']==0) {
 				echo "<b>{$line['title']}</b>";
 			} else {
 				echo $line['title'];

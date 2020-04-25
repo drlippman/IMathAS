@@ -64,6 +64,13 @@
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+
+	if (extension_loaded('newrelic')) { // Ensure PHP agent is available
+		// Record custom data about this web transaction
+		newrelic_add_custom_parameter ('printtest_aid', $line['assessmentid']);
+		newrelic_add_custom_parameter ('printtest_asid', $line['id']);
+	}
+
 	$GLOBALS['assessver'] = $line['ver'];
 	if (strpos($line['questions'],';')===false) {
 		$questions = explode(",",$line['questions']);

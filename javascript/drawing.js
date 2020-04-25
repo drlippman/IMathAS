@@ -1669,6 +1669,7 @@ function drawMouseDown(ev) {
 							lines[curTarget][curLine].reverse();
 							dragObj.subnum = lines[curTarget][curLine].length-1;
 						}
+						clickmightbenewcurve = true;
 					} else { //already in line
 						if (foundpt[1]==curLine && foundpt[2] == lines[curTarget][foundpt[1]].length-1) {
 							//clicked last point; end line
@@ -1697,21 +1698,27 @@ function drawMouseDown(ev) {
 					//targets[curTarget].el.style.cursor = 'move';
 					dragObj = {mode: 2, num: foundpt[1]};
 				} else if (foundpt[0]>=5 && foundpt[0]<10) { //if point is on twopoint
-					setCursor('move');
-					//targets[curTarget].el.style.cursor = 'move';
-					//start dragging
-					dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
-					oldpointpos = tplines[curTarget][foundpt[1]][foundpt[2]];
-					//curTPcurve = foundpt[1];
+					if (curTPcurve == null) {
+						setCursor('move');
+						//targets[curTarget].el.style.cursor = 'move';
+						//start dragging
+						dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
+						oldpointpos = tplines[curTarget][foundpt[1]][foundpt[2]];
+						clickmightbenewcurve = true;
+						//curTPcurve = foundpt[1];
+					}
 				} else if (foundpt[0]>=10 && foundpt[0]<11) { //if point is on ineqline
-					setCursor('move');
-					//targets[curTarget].el.style.cursor = 'move';
-					//start dragging
-					dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
-					oldpointpos = ineqlines[curTarget][foundpt[1]][foundpt[2]];
-					//curIneqcurve = foundpt[1];
+					if (curIneqcurve == null) {
+						setCursor('move');
+						//targets[curTarget].el.style.cursor = 'move';
+						//start dragging
+						dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
+						oldpointpos = ineqlines[curTarget][foundpt[1]][foundpt[2]];
+						//curIneqcurve = foundpt[1];
+						clickmightbenewcurve = true;
+					}
 				}
-				clickmightbenewcurve = true;
+
 			}
 			drawTarget();
 		} else {  //clicked outside currect target region
@@ -1762,8 +1769,8 @@ function findnearpoint(thetarget,mouseOff) {
 	}
 
 	if (targets[thetarget].mode==0 || targets[thetarget].mode==0.5 || targets[thetarget].mode==-1) { //if in line mode
-		for (var i=0;i<lines[thetarget].length;i++) { //check lines
-			for (var j=lines[thetarget][i].length-1; j>=0;j--) {
+		for (var i=lines[thetarget].length-1; i>=0; i--) { //check lines
+			for (var j=lines[thetarget][i].length-1; j>=0; j--) {
 				var dist = Math.pow(lines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(lines[thetarget][i][j][1]-mouseOff.y,2);
 				if (dist<chkdist) {
 					return [targets[thetarget].mode==-1?0:targets[thetarget].mode,i,j];
@@ -1772,22 +1779,22 @@ function findnearpoint(thetarget,mouseOff) {
 		}
 	}
 	if (targets[thetarget].mode==1 || targets[thetarget].mode==-1) {
-		for (var i=0; i<dots[thetarget].length;i++) { //check dots
+		for (var i=dots[thetarget].length-1; i>=0; i--) { //check dots
 			if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 				return [1,i];
 			}
 		}
 	}
 	if (targets[thetarget].mode==2 || targets[thetarget].mode==-1) {
-		for (var i=0; i<odots[thetarget].length;i++) { //check opendots
+		for (var i=odots[thetarget].length-1; i>=0; i--) { //check opendots
 			if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 				return [2,i];
 			}
 		}
 	}
 	if ((targets[thetarget].mode>=5 && targets[thetarget].mode<10) || targets[thetarget].mode==-1) { //if in tpline mode
-		for (var i=0;i<tplines[thetarget].length;i++) { //check lines
-			for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
+		for (var i=tplines[thetarget].length-1; i>=0; i--) { //check lines
+			for (var j=tplines[thetarget][i].length-1; j>=0; j--) {
 				if (tptypes[thetarget][i]!=targets[thetarget].mode && targets[thetarget].mode!=-1) {
 					continue;
 				}
@@ -1800,8 +1807,8 @@ function findnearpoint(thetarget,mouseOff) {
 		}
 	}
 	if ((targets[thetarget].mode>=10 && targets[thetarget].mode<11) || targets[thetarget].mode==-1) { //if in ineqline mode
-		for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
-			for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
+		for (var i=ineqlines[thetarget].length-1; i>=0; i--) { //check inqs
+			for (var j=ineqlines[thetarget][i].length-1; j>=0; j--) {
 				if (ineqtypes[thetarget][i]!=targets[thetarget].mode && targets[thetarget].mode!=-1) {
 					continue;
 				}

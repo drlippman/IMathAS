@@ -4,7 +4,7 @@
 //  The isset($teacherid) check blocks access if accessed directly
 //(c) 2013 David Lippman
 
-ini_set("max_input_time", "600");
+
 ini_set("max_execution_time", "600");
 
 	if (!(isset($teacherid))) {

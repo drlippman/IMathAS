@@ -61,8 +61,8 @@ export default {
   props: ['results', 'showans', 'itemid'],
   computed: {
     sortedKeys () {
-      let tots = this.results.datatots;
-      let keys = Object.keys(tots);
+      const tots = this.results.datatots;
+      const keys = Object.keys(tots);
       return keys.sort(function (a, b) { return tots[b] - tots[a]; });
     }
   },
@@ -76,7 +76,7 @@ export default {
             la[0] = '[' + la[0].replace(/;/g, '],[') + ']';
           }
           la = '[[' + la.join('],[') + ']]';
-          let uniqid = 'LP' + this.itemid + '-' + i;
+          const uniqid = 'LP' + this.itemid + '-' + i;
           window.canvases[uniqid] = this.results.initpts.slice();
           window.canvases[uniqid].unshift(uniqid);
           window.drawla[uniqid] = JSON.parse(la);

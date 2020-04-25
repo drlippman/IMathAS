@@ -22,7 +22,7 @@
 	} else {
 		$skipcid = array();
 	}
-	$stm = $DBH->query("SELECT id FROM imas_courses WHERE (istemplate&4)=4");
+	$stm = $DBH->query("SELECT id FROM imas_courses WHERE istemplate > 0 AND (istemplate&4)=4");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$skipcid[] = $row[0];
 	}

@@ -329,7 +329,15 @@ class QuestionHtmlGenerator
                     ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
                     ->setColorboxKeyword($questionColor);
 
-                $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                try {
+                  $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
+                } catch (\Throwable $t) {
+                  $this->addError(
+                       _('Caught error while generating this question: ')
+                       . $t->getMessage());
+                  continue;
+                }
+
                 $answerBoxGenerator->generate();
 
                 $answerbox[$atIdx] = $answerBoxGenerator->getAnswerBox();
@@ -359,8 +367,10 @@ class QuestionHtmlGenerator
                 $this->questionParams->getLastRawScores(), 0, 1);
 
             $lastAnswer = $stuanswers[$thisq];
+
             if (is_array($lastAnswer)) { // happens with autosaves
-              $lastAnswer = $lastAnswer[0];
+              //  appears to be resolved before getting here now
+              //  $lastAnswer = $lastAnswer[0];
             }
 
             if (isset($requestclearla)) {

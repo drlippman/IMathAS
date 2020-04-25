@@ -230,8 +230,8 @@ if ($isteacher) {
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
 				$stm->execute(array(':userid'=>$stu, ':gradetypeid'=>$id));
 			} else {
-				$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
-				$stm->execute(array(':score'=>$val, ':feedback'=>$_POST['feedback'][$id], ':userid'=>$stu, ':gradetypeid'=>$id));
+				$stm = $DBH->prepare("UPDATE imas_grades SET score=:score WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
+				$stm->execute(array(':score'=>$val, ':userid'=>$stu, ':gradetypeid'=>$id));
 			}
 
 		}
@@ -276,7 +276,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=011920"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=041120"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -1082,7 +1082,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]=='N/A')) { //no feedback
+				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2

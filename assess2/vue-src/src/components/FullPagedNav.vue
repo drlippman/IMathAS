@@ -75,11 +75,11 @@ export default {
           disppage: 0
         };
       }
-      for (let pn in this.pagesData) {
-        let disppage = parseInt(pn) + 1;
+      for (const pn in this.pagesData) {
+        const disppage = parseInt(pn) + 1;
         let numAttempted = 0;
         for (let i = 0; i < this.pagesData[pn][0].questions.length; i++) {
-          let qn = this.pagesData[pn][0].questions[i];
+          const qn = this.pagesData[pn][0].questions[i];
           if (store.assessInfo.questions[qn].status !== 'unattempted') {
             numAttempted++;
           } else if (this.qsAttempted[qn] === 1) {

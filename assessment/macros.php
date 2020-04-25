@@ -6,7 +6,7 @@ require_once(__DIR__ . '/../includes/Rand.php');
 $RND = new Rand();
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs","dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod");
-array_push($allowedmacros,"numtowords","randname","randnamewpronouns","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbackbasic","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand","mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates","prettysmallnumber","makeprettynegative");
+array_push($allowedmacros,"numtowords","randname","randnamewpronouns","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbackbasic","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand","mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates","prettysmallnumber","makeprettynegative","urlencode");
 function mergearrays() {
 	$args = func_get_args();
 	foreach ($args as $k=>$arg) {
@@ -1776,7 +1776,7 @@ function prettyint($n) {
 function prettyreal($n,$d=0,$comma=',') {
 	return number_format($n,$d,'.',$comma);
 }
-function prettysmallnumber($n) {
+function prettysmallnumber($n, $space=false) {
 	if (abs($n)<.01) {
 		$a = explode("E",$n);
 		if (count($a)==2) {
@@ -1785,7 +1785,11 @@ function prettysmallnumber($n) {
 			} else {
 				$sign = '';
 			}
-			$n = $sign."0.".str_repeat("0", -$a[1]-1).str_replace('.','',abs($a[0]));
+			$n = str_repeat("0", -$a[1]-1).str_replace('.','',abs($a[0]));
+			if ($space) {
+				$n = preg_replace('/(\d{3})/','$1&thinsp;', $n);
+			}
+			$n = $sign."0.".$n;
 		}
 	}
 	return $n;
@@ -3927,7 +3931,7 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			$gadploc = strpos($givenans,'.');
 			if ($gadploc===false) {$gadploc = strlen($givenans);}
 			if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
-			if ($anans != 0 && $reqsigfigoffset>0 && $v<0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
+			if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
 		} else {
 			$absgivenans = str_replace('-','',$givenans);
 			$gadploc = strpos($absgivenans,'.');
@@ -4050,5 +4054,16 @@ function checkMinMax($min, $max, $isint, $funcname) {
 	return array($min,$max);
 }
 
+function encryptval($val, $key) {
+	$cipher = "AES128";
+	$ivlen = openssl_cipher_iv_length($cipher);
+  $iv = openssl_random_pseudo_bytes($ivlen);
+	return base64_encode($iv). '.' . openssl_encrypt(json_encode($val), $cipher, $key, 0, $iv);
+}
+function decryptval($val, $key) {
+	$cipher = "AES128";
+	list($iv,$val) = explode('.', $val);
+	return json_decode(openssl_decrypt($val, $cipher, $key, 0, base64_decode($iv)), true);
+}
 
 ?>

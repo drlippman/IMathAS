@@ -98,13 +98,13 @@ export default {
           withdrawn: 0
         });
       }
-      for (let qn in store.assessInfo.questions) {
-        let dispqn = parseInt(qn) + 1;
-        let thisoption = {
+      for (const qn in store.assessInfo.questions) {
+        const dispqn = parseInt(qn) + 1;
+        const thisoption = {
           internallink: '/skip/' + dispqn,
           dispqn: dispqn
         };
-        for (let i in store.assessInfo.questions[qn]) {
+        for (const i in store.assessInfo.questions[qn]) {
           thisoption[i] = store.assessInfo.questions[qn][i];
         }
         if (thisoption.status === 'unattempted') {
@@ -126,7 +126,7 @@ export default {
       }
     },
     anyHaveRetry () {
-      for (let qn in store.assessInfo.questions) {
+      for (const qn in store.assessInfo.questions) {
         if (store.assessInfo.questions[qn].canretry) {
           return true;
         }
@@ -134,7 +134,7 @@ export default {
       return false;
     },
     anyHaveRetake () {
-      for (let qn in store.assessInfo.questions) {
+      for (const qn in store.assessInfo.questions) {
         if (store.assessInfo.questions[qn].regens_remaining) {
           return true;
         }

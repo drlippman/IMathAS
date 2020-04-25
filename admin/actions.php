@@ -6,7 +6,7 @@ require_once("../includes/password.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/actions'])) {
-	require(__DIR__.'/../'.$CFG['hooks']['admin/actions']);
+	require($CFG['hooks']['admin/actions']);
 }
 
 $from = 'admin';
@@ -46,8 +46,8 @@ switch($_POST['action']) {
 		$_SESSION['userid'] = $be;
 		break;
 	case "chgrights":
-		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) { 
-			echo _("You don't have the authority for this action"); 
+		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
+			echo _("You don't have the authority for this action");
 			break;
 		}
 		if ($_POST['newrights']>$myrights) {
@@ -278,13 +278,11 @@ switch($_POST['action']) {
 
 		//leave any forum posts and wiki revisions - don't want to break anything
 
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto AND isread>1");
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto");
 		$stm->execute(array(':msgto'=>$deluid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+2 WHERE msgto=:msgto AND isread<2");
-		$stm->execute(array(':msgto'=>$deluid));
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND isread>1");
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND deleted=2");
 		$stm->execute(array(':msgfrom'=>$deluid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom=:msgfrom AND isread<2");
+		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE msgfrom=:msgfrom");
 		$stm->execute(array(':msgfrom'=>$deluid));
 
 		require_once("../includes/filehandler.php");
@@ -377,7 +375,15 @@ switch($_POST['action']) {
 			$specialrights += 64;
 		}
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights);");
-		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
+		$stm->execute(array(':SID'=>$_POST['SID'],
+			':password'=>$md5pw,
+			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+			':rights'=>$_POST['newrights'],
+			':email'=>Sanitize::emailAddress($_POST['email']),
+			':groupid'=>$newgroup,
+			':homelayout'=>$homelayout,
+			':specialrights'=>$specialrights));
 		$newuserid = $DBH->lastInsertId();
 		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
 			$valbits = array();
@@ -1097,7 +1103,7 @@ switch($_POST['action']) {
 			$query = "INSERT INTO imas_users (email,FirstName,LastName,SID,password,rights,groupid) VALUES ";
 			$query .= "(:email, :FirstName, :LastName, :SID, :password, :rights, :groupid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':email'=>$_POST['ltidomain'], ':FirstName'=>$_POST['ltidomain'], ':LastName'=>'LTIcredential',
+			$stm->execute(array(':email'=>$_POST['ltidomain'], ':FirstName'=>Sanitize::stripHtmlTags($_POST['ltidomain']), ':LastName'=>'LTIcredential',
 				':SID'=>$_POST['ltikey'], ':password'=>$_POST['ltisecret'], ':rights'=>$_POST['createinstr'], ':groupid'=>$_POST['groupid']));
 		} else {
 			$query = "UPDATE imas_users SET email=:email,FirstName=:FirstName,LastName='LTIcredential',";

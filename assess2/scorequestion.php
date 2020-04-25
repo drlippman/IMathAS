@@ -67,6 +67,9 @@ if ($isstudent) {
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
   $end_attempt = false;
+} else if ($assess_info->getSetting('available') === 'yes' && !empty($_POST['practice'])) {
+  echo '{"error": "not_practice"}';
+  exit;
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
@@ -196,7 +199,7 @@ if (count($qns) > 0) {
     if (!isset($timeactive[$k])) {
       $timeactive[$k] = 0;
     }
-    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn]);
+    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $qnstoscore[$qn]);
     // only score the non-blank ones
     foreach ($parts_to_score as $pn=>$v) {
       if ($v === true && !in_array($pn, $qnstoscore[$qn])) {
@@ -244,7 +247,7 @@ if ($end_attempt) {
 if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
   $showscores = $assess_info->showScoresAtEnd();
-  $reshowQs = $assess_info->reshowQuestionsAtEnd();
+  $reshowQs = $assess_info->reshowQuestionsAtEnd() && $showscores;
   $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'last');
   $assessInfoOut['score'] = $assess_record->getAttemptScore();
   $totalScore = $assessInfoOut['score'];

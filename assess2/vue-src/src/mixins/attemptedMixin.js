@@ -3,8 +3,8 @@ import { store } from '../basicstore';
 export const attemptedMixin = {
   computed: {
     qsAttempted () {
-      let qAttempted = [];
-      for (let i in store.assessInfo.questions) {
+      const qAttempted = [];
+      for (const i in store.assessInfo.questions) {
         qAttempted[i] = 0;
         if (store.assessInfo.submitby === 'by_assessment' &&
           store.assessInfo.questions[i].tries_max === 1 &&
@@ -12,7 +12,7 @@ export const attemptedMixin = {
         ) {
           let min = 1;
           let max = 0;
-          for (let k in store.assessInfo.questions[i].parts_entered) {
+          for (const k in store.assessInfo.questions[i].parts_entered) {
             if (store.assessInfo.questions[i].parts_entered[k] < min) {
               min = store.assessInfo.questions[i].parts_entered[k];
             }

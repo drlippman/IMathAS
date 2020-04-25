@@ -158,7 +158,7 @@ export default {
     },
     hasActiveMsg () {
       if (this.settings.hasOwnProperty('timelimit_expiresin')) {
-        let expires = this.settings.timelimit_expiresin * 1000;
+        const expires = this.settings.timelimit_expiresin * 1000;
         if (expires < 0) {
           return this.$t('closed.unsubmitted_overtime');
         } else {

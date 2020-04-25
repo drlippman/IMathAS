@@ -29,7 +29,8 @@ class AssessHelpers
     // grab all questions settings
     $assess_info->loadQuestionSettings('all', false);
 
-    $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+    $DBH->beginTransaction();
+    $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
     $stm->execute(array($aid));
 
     $cnt = 0;
@@ -77,6 +78,7 @@ class AssessHelpers
         $cnt++;
       }
     }
+    $DBH->commit();
     return $cnt;
   }
 }

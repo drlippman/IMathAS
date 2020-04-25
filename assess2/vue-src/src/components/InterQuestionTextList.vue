@@ -41,7 +41,7 @@ export default {
       if (typeof this.page === 'undefined' || this.page < 0) {
         return store.assessInfo.questions.length - 1;
       } else {
-        let qlist = store.assessInfo.interquestion_pages[this.page][0].questions;
+        const qlist = store.assessInfo.interquestion_pages[this.page][0].questions;
         return qlist[qlist.length - 1];
       }
     },
@@ -55,9 +55,9 @@ export default {
       }
     },
     allText () {
-      let out = [];
-      for (let i in this.textList) {
-        let textObj = this.textList[i];
+      const out = [];
+      for (const i in this.textList) {
+        const textObj = this.textList[i];
         out.push({
           html: textObj.text,
           expanded: (textObj.forntype === true || this.qn === textObj.displayBefore)
@@ -66,9 +66,9 @@ export default {
       return out;
     },
     preText () {
-      let out = [];
-      for (let i in this.textList) {
-        let textObj = this.textList[i];
+      const out = [];
+      for (const i in this.textList) {
+        const textObj = this.textList[i];
         if ((this.pos === 'beforeexact' && this.qn === textObj.displayBefore) ||
           (this.pos !== 'beforeexact' && this.qn >= textObj.displayBefore && this.qn <= textObj.displayUntil)
         ) {
@@ -81,11 +81,11 @@ export default {
       return out;
     },
     postText () {
-      let out = [];
+      const out = [];
       if (this.qn === this.lastQuestion) {
         // only show post text if last question
-        for (let i in this.textList) {
-          let textObj = this.textList[i];
+        for (const i in this.textList) {
+          const textObj = this.textList[i];
           if (this.qn < textObj.displayBefore) {
             out.push({
               html: textObj.text,

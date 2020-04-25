@@ -707,8 +707,16 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 		$out .= '</table>';
 		return $out;
 	}
-	$uniqueid = uniqid('pie');
-	$out = '<div id="'.$uniqueid.'" style="display:inline-block;width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
+
+  $rows = array();
+	foreach ($labels as $k=>$label) {
+		$rows[] = array($label, $pcts[$k]);
+	}
+
+  $cw = $w - 20;
+  $ch = $h - 20;
+
+	$out = '<div class="piechart" data-pie="'.Sanitize::encodeStringForDisplay(json_encode($rows)).'" style="display:inline-block;width:'.Sanitize::onlyInt($w).'px;height:'.Sanitize::onlyInt($h).'px"></div>';
 	//load google charts loader if needed
 	$out .= '<script type="text/javascript">
 		if (typeof window.chartqueue == "undefined") {
@@ -720,33 +728,33 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 					google.charts.setOnLoadCallback(window.chartqueue[i]);
 				}
 			});
-		};';
-	$rows = array();
-	foreach ($labels as $k=>$label) {
-		$row = '["'.Sanitize::encodeStringForJavascript($label);
-		$row .= '",' . floatval($pcts[$k]) . ']';
-		$rows[] = $row;
-	}
+		};
+  initstack.push(function() {
+    if (typeof window.piechartcount == "undefined") {
+      window.piechartcount = 0;
+    }
+    $(".piechart").each(function(i,el) {
+      var uniqid = "pie" + window.piechartcount;
+      window.piechartcount++;
+      $(el).attr("id", uniqid).removeClass("piechart");
 
-  $cw = $w - 20;
-  $ch = $h - 20;
-	$out .= 'function '.$uniqueid.'() {
-		var data = new google.visualization.DataTable();
-		data.addColumn("string", "Data");
-		data.addColumn("number", "Percentage");
-		data.addRows(['.implode(',', $rows).']);
-		var chart = new google.visualization.PieChart(document.getElementById("'.$uniqueid.'"));
-		chart.draw(data, {sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}, chartArea:{left:10, top:10, width:'.$cw.', height:'.$ch.'}});
-	}';
+      var render = function () {
+        var data = new google.visualization.DataTable();
+        data.addColumn("string", "Data");
+        data.addColumn("number", "Percentage");
+        data.addRows(JSON.parse(el.getAttribute("data-pie")));
+        var chart = new google.visualization.PieChart(document.getElementById(uniqid));
+        chart.draw(data, {width:'.$w.', height:'.$h.', sliceVisibilityThreshold: 0, tooltip: {text: "percentage"}, legend:{position:"labeled"}, chartArea:{left:10, top:10, width:'.$cw.', height:'.$ch.'}});
+      }
+      if (typeof google == "undefined" || typeof google.charts == "undefined") {
+    			window.chartqueue.push(render);
+    		} else {
+    			google.charts.load("current", {packages: ["corechart"]});
+    			google.charts.setOnLoadCallback(render);
+    		}
+    });
+  })</script>';
 
-	//load it
-	$out .= 'if (typeof google == "undefined" || typeof google.charts == "undefined") {
-			window.chartqueue.push('.$uniqueid.');
-		} else {
-			google.charts.load("current", {packages: ["corechart"]});
-			google.charts.setOnLoadCallback('.$uniqueid.');
-		}
-		</script>';
 	/*
 	$out = "<img src=\"https://chart.apis.google.com/chart?cht=p&amp;chd=t:";
 	$out .= implode(',',$pcts);

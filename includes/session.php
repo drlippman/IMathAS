@@ -81,6 +81,7 @@ class SessionDBHandler implements SessionHandlerInterface
 		if ($stm->execute() && ($row = $stm->fetch())) {
 			$this->readLastAccess = $row['access'];
 			$this->readHash = md5($row['data']);
+			$GLOBALS['sessionLastAccess'] = $row['access'];
 			return $row['data'];
 		} else {
 			return '';
@@ -92,6 +93,9 @@ class SessionDBHandler implements SessionHandlerInterface
 	 */
 	public function write($sessionId, $sessionData)
 	{
+		if ($sessionData == '') {
+			return true; // skip write if no data
+		}
 		if (md5($sessionData) === $this->readHash &&
 			time() - $this->readLastAccess < 300
 		) {

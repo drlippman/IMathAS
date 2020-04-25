@@ -195,6 +195,15 @@ $vueData = array(
 				</span>
 			</span><br class=form />
 		</div>
+		<div v-show="copyfrom > 0">
+			<span class=form>Also copy:</span>
+			<span class=formright>
+				<input type=checkbox name="copysummary" value=1 /> <?php echo _('Summary');?><br/>
+				<input type=checkbox name="copyinstr" value=1 /> <?php echo _('Intro/Instructions');?><br/>
+				<input type=checkbox name="copydates" value=1 /> <?php echo _('Dates');?> <br/>
+				<input type=checkbox name="copyendmsg" value=1 /> <?php echo _('End of Assessment Messages');?>
+			</span><br class=form />
+		</div>
 		<div v-show="copyfrom == 0">
 			<hr v-if="reqscoreOptions.length > 0" />
 		<div>

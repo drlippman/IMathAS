@@ -93,10 +93,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$viddata = $row[1];
 			if ($viddata != '') {
-				if ($row[0]=='') {
-					$nextnum = 0;
-				} else {
-					$nextnum = substr_count($row[0],',')+1;
+				$nextnum = 0;
+				if ($row[0]!='') {
+					foreach (explode(',', $row[0]) as $iv) {
+						if (strpos($iv,'|')!==false) {
+							$choose = explode('|', $iv);
+							$nextnum += $choose[0];
+						} else {
+							$nextnum++;
+						}
+					}
 				}
 				$numnew= count($checked);
 				$viddata = unserialize($viddata);
@@ -327,7 +333,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require_once('../assess2/AssessRecord.php');
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
 				$assess_info->loadQuestionSettings();
-				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+				$DBH->beginTransaction();
+				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
 		    $stm->execute(array($aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -346,6 +353,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
 					}
 				}
+				$DBH->commit();
 			} else {
 				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid,userid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));
@@ -428,8 +436,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		var assessver = '$aver';
 		</script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=030818\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=032920\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=042220\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=041120\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -497,9 +505,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$questionjsarr = array();
 	$existingq = array();
-	$query = "SELECT imas_questions.id,imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts,imas_questionset.avgtime FROM imas_questions ";
-	$query .= "JOIN imas_questionset ON imas_questionset.id=imas_questions.questionsetid JOIN imas_users ON imas_questionset.ownerid=imas_users.id ";
-	$query .= "WHERE imas_questions.assessmentid=:aid";
+	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
+	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
+	$query .= "iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,iqs.meantimen FROM imas_questions AS iq ";
+	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
+	$query .= "WHERE iq.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':aid'=>$aid));
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -550,19 +560,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
 			$extrefval += 8;
 		}
-		$avgtimepts = array_map('Sanitize::onlyFloat', explode(',', $line['avgtime']));
-		if ($avgtimepts[0]>0) {
-			$timeout = array(round($avgtimepts[0]/60,1));
-		} else if (isset($avgtimepts[1]) && isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-			$timeout = array(round($avgtimepts[1]/60,1));
-		} else {
-			$timeout = array(0);
-		}
-		if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-			$timeout[1] = round($avgtimepts[2]); //score
-			$timeout[2] = round($avgtimepts[1]/60,1); //time first try
-			$timeout[3] = Sanitize::onlyInt($avgtimepts[3]); //# of data
-		}
+
+		$timeout = array();
+		$timeout[0] = round($line['meantime']/60, 1);
+		$timeout[1] = round($line['meanscore'], 1);
+		$timeout[2] = round($line['meantime']/60, 1);
+		$timeout[3] = intval($line['meantimen']);
+
 		$questionjsarr[$line['id']] = array((int)$line['id'],
 			(int)$line['questionsetid'],
 			Sanitize::encodeStringForDisplay($line['description']),
@@ -704,20 +708,34 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						unset($searchterms[$k]);
 					}
 				}
+				$wholewords = array();
+				foreach ($searchterms as $k=>$v) {
+					if (ctype_alnum($v) && strlen($v)>3) {
+						$wholewords[] = '+'.$v.'*';
+						unset($searchterms[$k]);
+					}
+				}
+				$searchlikes = '(';
+				if (count($wholewords)>0) {
+					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
+				}
 				if (count($searchterms)>0) {
-					$searchlikes .= "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+					if (count($wholewords)>0) {
+						$searchlikes .= 'AND ';
+					}
+					$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
 					foreach ($searchterms as $t) {
 						$searchlikevals[] = "%$t%";
 					}
-
-					if (ctype_digit($safesearch)) {
-						$searchlikes .= "OR imas_questionset.id=?) AND ";
-						$searchlikevals[] = $safesearch;
-						$isIDsearch = $safesearch;
-					} else {
-						$searchlikes .= ") AND";
-					}
 				}
+				if (ctype_digit($safesearch)) {
+					$searchlikes .= "OR imas_questionset.id=?) AND ";
+					$searchlikevals[] = $safesearch;
+					$isIDsearch = $safesearch;
+				} else {
+					$searchlikes .= ") AND";
+				}
+
 			}
 		}
 
@@ -783,7 +801,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			if (isset($search) && ($searchall==0 || $searchlikes!='' || $searchmine==1)) {
 				$qarr = $searchlikevals;
-				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
+				$query = "SELECT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.meantime,imas_questionset.meanscore,imas_questionset.meantimen,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_questionset.broken, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
 				$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
@@ -806,7 +824,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 				}
-				$query .= " ORDER BY FIELD(imas_library_items.libid,$llist),imas_questionset.broken,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
 					$query .= " LIMIT 300";
 					$offset = 0;
@@ -836,6 +853,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else {
 					$stm = $DBH->prepare($query);
 					$stm->execute($qarr);
+					//echo preg_replace(array_fill(0,count($qarr),'/[?]/'), $qarr, $query, 1);
 				}
 				if ($stm->rowCount()==0) {
 					$noSearchResults = true;
@@ -843,7 +861,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$searchlimited = ($stm->rowCount()==300);
 
 					$alt=0;
-					$lastlib = -1;
 					$i=0;
 					$page_questionTable = array();
 					$page_libstouse = array();
@@ -856,32 +873,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						if (isset($page_questionTable[$line['id']])) {
 							continue;
 						}
-						if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
-							/*$page_questionTable[$i]['checkbox'] = "";
-							$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
-							$page_questionTable[$i]['preview'] = "";
-							$page_questionTable[$i]['type'] = "";
-							if ($searchall==1)
-								$page_questionTable[$i]['lib'] = "";
-							$page_questionTable[$i]['times'] = "";
-							$page_questionTable[$i]['mine'] = "";
-							$page_questionTable[$i]['add'] = "";
-							$page_questionTable[$i]['src'] = "";
-							$page_questionTable[$i]['templ'] = "";
-							$lastlib = $line['libid'];
-							$i++;
-							*/
+						if (!isset($page_libqids[$line['libid']]) && isset($lnamesarr[$line['libid']])) {
 							$page_libstouse[] = $line['libid'];
-							$lastlib = $line['libid'];
 							$page_libqids[$line['libid']] = array();
-
 						}
 
-						if (isset($libsortorder[$line['libid']]) && $libsortorder[$line['libid']]==1) { //alpha
-							$page_libqids[$line['libid']][$line['id']] = $line['description'];
-						} else { //id
-							$page_libqids[$line['libid']][] = $line['id'];
-						}
+						$page_libqids[$line['libid']][] = $line['id'];
+
 						$i = $line['id'];
 						$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . Sanitize::onlyInt($line['id']) . "' id='qo$ln'>";
 						if ($line['broken'] > 0) {
@@ -898,35 +896,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$page_questionTable[$i]['type'] = $line['qtype'];
 						//avgtime, avgtimefirst, avgscorefirst, ndatapoints
 						//initial avgtime might be 0 if not populated
-						$avgtimepts = explode(',', $line['avgtime']);
-						if ($avgtimepts[0]>0) {
+						if ($line['meantimen'] > 100) {
 							$page_useavgtimes = true;
-							$page_questionTable[$i]['avgtime'] = round($avgtimepts[0]/60,1);
-						} else if (isset($avgtimepts[1]) && isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-							$page_useavgtimes = true;
-							$page_questionTable[$i]['avgtime'] = round($avgtimepts[1]/60,1);
-						} else {
-							$page_questionTable[$i]['avgtime'] = '';
+							$page_questionTable[$i]['meantime'] = round($line['meantime']/60,1);
+							$page_questionTable[$i]['qdata'] = array($line['meanscore'],$line['meantime'],$line['meantimen']);
 						}
-						if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-							$page_questionTable[$i]['qdata'] = array($avgtimepts[2],$avgtimepts[1],$avgtimepts[3]);
-						}
-						/*
-						//pull firstscores data
-						$query = "SELECT qsetid,count(id),AVG(score),AVG(timespent) FROM imas_firstscores WHERE qsetid IN ($allusedqids) AND timespent>1 AND timespent<600 GROUP BY qsetid";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						while ($row = mysql_fetch_row($result)) {
-							if ($row[1]>10) {
-								$page_questionTable[$row[0]]['qdata'] = array($row[2],$row[3]);
-							}
-						}
-						*/
+
+						$page_questionTable[$i]['broken'] = intval($line['broken']);
+
 						if ($searchall==1) {
 							$page_questionTable[$i]['lib'] = "<a href=\"addquestions.php?cid=$cid&aid=$aid&listlib=".Sanitize::encodeUrlParam($line['libid'])."\">"._("List lib")."</a>";
 						} else {
-							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
-							$page_questionTable[$i]['broken'] = intval($line['broken']);
 							$page_questionTable[$i]['libitemid'] = Sanitize::encodeStringForDisplay($line['libitemid']);
+							$page_questionTable[$i]['junkflag'] = Sanitize::encodeStringForDisplay($line['junkflag']);
 						}
 						$page_questionTable[$i]['extref'] = '';
 						$page_questionTable[$i]['cap'] = 0;
@@ -998,17 +980,33 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 
-
-					//sort alpha sorted libraries
-					foreach ($page_libstouse as $libid) {
-						if ($libsortorder[$libid]==1) {
-							natcasesort($page_libqids[$libid]);
-							$page_libqids[$libid] = array_keys($page_libqids[$libid]);
+					if ($searchall==1) { // consolidate all
+						uksort($page_questionTable, function($qA,$qB) use ($page_questionTable) {
+							if ($page_questionTable[$qA]['broken'] != $page_questionTable[$qB]['broken']) {
+								return $page_questionTable[$qA]['broken'] - $page_questionTable[$qB]['broken'];
+							} else {
+								return $qA - $qB;
+							}
+						});
+						$page_libstouse = array(0);
+						$page_libqids = array(0=>array_keys($page_questionTable));
+					} else {
+						//sort alpha sorted libraries
+						foreach ($page_libstouse as $libid) {
+							usort($page_libqids[$libid], function($qA,$qB) use ($libsortorder,$page_questionTable,$page_libqids,$libid) {
+								if ($page_questionTable[$qA]['broken'] != $page_questionTable[$qB]['broken']) {
+									return $page_questionTable[$qA]['broken'] - $page_questionTable[$qB]['broken'];
+								} else if ($page_questionTable[$qA]['junkflag'] != $page_questionTable[$qB]['junkflag']) {
+									return $page_questionTable[$qA]['junkflag'] - $page_questionTable[$qB]['junkflag'];
+								} else if ($libsortorder[$libid]==1) {
+									return strnatcasecmp($page_questionTable[$qA]['desc'], $page_questionTable[$qB]['desc']);
+								} else {
+									return $qA - $qB;
+								}
+							});
 						}
 					}
-					if ($searchall==1) {
-						$page_libstouse = array_keys($page_libqids);
-					}
+
 
 				}
 			}
@@ -1344,7 +1342,7 @@ if ($overwriteBody==1) {
 				<tr><th>&nbsp;</th><th><?php echo _('Description'); ?></th><th>&nbsp;</th><th>ID</th><th><?php echo _('Preview'); ?></th><th><?php echo _('Type'); ?></th>
 					<?php echo $page_libRowHeader ?>
 					<th><?php echo _('Times Used'); ?></th>
-					<?php if ($page_useavgtimes) {?><th><span onmouseenter=<?php echo "\"tipshow(this,". _('Average time, in minutes, this question has taken students').")\""; ?> onmouseleave="tipout()"><?php echo _('Avg Time'); ?></span></th><?php } ?>
+					<?php if ($page_useavgtimes) {?><th><span onmouseenter=<?php echo "\"tipshow(this,'". _('Average time, in minutes, this question has taken students')."')\""; ?> onmouseleave="tipout()"><?php echo _('Avg Time'); ?></span></th><?php } ?>
 					<th><?php echo _('Mine'); ?></th><th><?php echo _('Actions'); ?></th>
 					<?php if ($searchall==0) { echo '<th><span onmouseenter="tipshow(this,\''._('Flag a question if it is in the wrong library').'\')" onmouseleave="tipout()">'._('Wrong Lib').'</span></th>';} ?>
 				</tr>
@@ -1394,7 +1392,7 @@ if ($overwriteBody==1) {
 					} else {
 						echo '<span>';
 					}
-					echo $page_questionTable[$qid]['avgtime'].'</span>'; ?></td> <?php }?>
+					echo $page_questionTable[$qid]['meantime'].'</span>'; ?></td> <?php }?>
 					<td><?php echo $page_questionTable[$qid]['mine'] ?></td>
 					<td><div class="dropdown">
 					  <a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1421,11 +1419,11 @@ if ($overwriteBody==1) {
 					echo '<br>'._('Showing ').($offset+1).'-'.($offset + 300).'. ';
 					if ($offset>0) {
 						$prevoffset = max($offset-300, 0);
-						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$prevoffset\">"._('Previous').'</a> ';
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$prevoffset\" onclick=\"return prePageChange()\">"._('Previous').'</a> ';
 					}
 					if ($searchlimited) {
 						$nextoffset = $offset+300;
-						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$nextoffset\">"._('Next').'</a> ';
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$nextoffset\" onclick=\"return prePageChange()\">"._('Next').'</a> ';
 					}
 					echo '</i></td></tr>';
 				}

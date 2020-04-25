@@ -53,7 +53,7 @@
 
 <script>
 import Icons from '@/components/widgets/Icons.vue';
-import './a11y-dialog';
+import A11yDialog from './a11y-dialog';
 import { store, actions } from '../basicstore';
 
 export default {
@@ -122,7 +122,7 @@ export default {
         this.closeDialog();
       }
     });
-    this.dialog = new window.A11yDialog(this.$refs.wrap);
+    this.dialog = new A11yDialog(this.$refs.wrap);
     this.dialog.show();
   },
   beforeDestroy () {

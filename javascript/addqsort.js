@@ -1812,17 +1812,18 @@ function submitChanges() {
   if (!beentaken) {
     outdata["pts"] = JSON.stringify(data[2]);
     outdata["defpts"] = $("#defpts").val();
-  }
-  $.ajax({
-    type: "POST",
-    //url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid",
-    url: AHAHsaveurl,
-    data: outdata,
-  })
-    .done(function () {
-      if (!beentaken) {
-        defpoints = $("#defpts").val();
-      }
+	}
+	$.ajax({
+		type: "POST",
+		//url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid",
+		url: AHAHsaveurl,
+		async: false,
+		data: outdata
+	})
+	.done(function() {
+		if (!beentaken) {
+			defpoints = $("#defpts").val();
+		}
       document.getElementById(target).innerHTML = "";
       refreshTable();
       updateSaveButtonDimming();

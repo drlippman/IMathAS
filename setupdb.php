@@ -17,6 +17,7 @@ Because of this, this file does NOT contain the full up-to-date database schema.
 
 $dbsetup = true;
 $use_local_sessions = true;
+$init_session_start = true;
 include("init_without_validate.php");
 $stm = $DBH->query("SHOW TABLES LIKE 'imas_dbschema'");
 if ($stm->rowCount()>0) {

@@ -7,7 +7,7 @@
 	 if (!file_exists("$curdir/config.php")) {
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php?r=" . Sanitize::randomQueryStringParam());
 	 }
-	$init_skip_session_start = true;
+
  	require_once(__DIR__ . "/init_without_validate.php");
 	require_once(__DIR__ ."/includes/newusercommon.php");
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -71,7 +71,11 @@
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
 			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
+			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, 
+				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+				':email'=>Sanitize::emailAddress($_POST['email']),
+				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
 			$newuserid = $DBH->lastInsertId();
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
@@ -108,7 +112,7 @@
 	if ($_POST['ekey']!='') {
 		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
-	$init_skip_session_start = false;
+	$init_session_start = true;
 	require("init.php");
 	$flexwidth = true;
 	if ($verified) { //already have session
@@ -302,7 +306,3 @@ if (isset($_GET['getsid'])) {
 
 	require("footer.php");
 	}
-
-
-
-?>

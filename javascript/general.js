@@ -759,6 +759,116 @@ function setupvideoembeds(i,el) {
 	videoembedcounter++;
 }
 
+var fileembedcounter = 0;
+function setuppreviewembeds(i,el) {
+	var filetypes = 'doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg';
+	if (window.fetch) { filetypes += '|heic'; }
+	var regex = new RegExp('\.(' + filetypes + ')', 'i');
+	if (el.href.match(regex)) {
+		jQuery('<span/>', {
+			text: " [+]",
+			role: "button",
+			title: _("Preview file"),
+			"aria-label": _("Preview file"),
+			id: 'fileembedbtn'+fileembedcounter,
+			click: togglefileembed,
+			keydown: function (e) {if (e.which == 13) { $(this).click();}},
+			tabindex: 0,
+			"class": "videoembedbtn"
+		}).insertAfter(el);
+		jQuery(el).addClass("prepped");
+		fileembedcounter++;
+	}
+}
+
+function supportsPdf() {
+	// based on PDFOject
+	var ua = window.navigator.userAgent;
+	if (ua.indexOf("irefox") !== -1 &&
+		parseInt(ua.split("rv:")[1].split(".")[0], 10) > 18) { return true; }
+ 	if (typeof navigator.mimeTypes['application/pdf'] !== "undefined") {
+		return true;
+	}
+	return false;
+}
+
+function togglefileembed() {
+	var id = this.id.substr(12);
+	var els = jQuery('#fileiframe'+id);
+	if (els.length>0) {
+		if (els.css('display')=='none') {
+			els.show();
+			jQuery(this).text(' [-]');
+			jQuery(this).attr('title',_("Hide preview"));
+			jQuery(this).attr('aria-label',_("Hide file preview"));
+		} else {
+			els.hide();
+			jQuery(this).text(' [+]');
+			jQuery(this).attr('title',_("Preview file"));
+			jQuery(this).attr('aria-label',_("Preview file"));
+		}
+	} else {
+		var href = jQuery(this).prev().attr('href');
+		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/i)) {
+			var src;
+			if (href.match(/\.pdf/) && supportsPdf()) {
+				src = href;
+			} else if (href.match(/\.(doc|docx|xls|xlsx|ppt|pptx)/i)) {
+				src = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(href);
+			} else {
+				src = 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(href);
+			}
+			jQuery('<iframe/>', {
+				id: 'fileiframe'+id,
+				width: "90%",
+				height: 600,
+				src: src,
+				frameborder: 0,
+				allowfullscreen: 1
+			}).insertAfter(jQuery(this));
+		} else if (href.match(/\.(heic)/i)) {
+			jQuery('<div>', {
+				id: 'fileiframe' + id,
+				text: 'Converting HEIC file (this may take a while)...'
+			}).insertAfter(jQuery(this));
+			if (!window.heic2any) {
+				jQuery.getScript(imasroot+'/javascript/heic2any.min.js')
+				 .done(function() { convertheic(href, 'fileiframe' + id); });
+			} else {
+				convertheic(href, 'fileiframe' + id);
+			}
+		} else {
+			jQuery('<div>').append(jQuery('<img/>', {
+					id: 'fileiframe'+id,
+					src: href
+				}).css('display','block').on('click', rotateimg)
+		  ).insertAfter(jQuery(this));
+		}
+		jQuery('<br/>').insertAfter(jQuery(this));
+		jQuery(this).text(' [-]');
+		jQuery(this).attr('title',_("Hide preview"));
+		if (jQuery(this).prev().attr("data-base")) {
+			var inf = jQuery(this).prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
+		}
+	}
+}
+
+function convertheic(href, divid) {
+	fetch(href)
+  .then(function(res) { return res.blob();})
+  .then(function(blob) {
+		return heic2any({blob:blob});
+	})
+  .then(function(conversionResult) {
+    var url = URL.createObjectURL(conversionResult);
+    document.getElementById(divid).innerHTML = '<img src="' + url + '" onclick="rotateimg(this)">';
+  })
+  .catch(function(e) {
+    console.log(e);
+  });
+}
+
 function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
@@ -818,6 +928,9 @@ function removeSelfAsCoteacher(el,cid,selector,uid) {
 }
 
 function rotateimg(el) {
+	if (el.hasOwnProperty("target")) {
+		el = el.target;
+	}
 	if ($(el).data('rotation')) {
 		var r = ($(el).data('rotation') + 90)%360;
 	} else {
@@ -885,12 +998,12 @@ jQuery(document).ready(function($) {
 			if ("qn" in edata) {
 				var qn = edata['qn'].replace(/[^\d]/, "");
 				if (qn != "") {
-					$("#qn"+qn).val(edata['value']);
+					$("#qn"+qn).val(edata['value']).trigger('change');
 				}
 			} else {
 				var id = edata['id'].replace(/[^\w\-]/, "");
 				if ($("#"+id).hasClass("allowupdate")) {
-					$("#"+id).val(edata['value']);
+					$("#"+id).val(edata['value']).trigger('change');;
 				}
 			}
 		}
@@ -905,6 +1018,8 @@ function initlinkmarkup(base) {
 	$(base).find('a').each(setuptracklinks).each(addNoopener);
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
+	setupToggler(base);
 	$(base).fitVids();
 }
 
@@ -966,6 +1081,48 @@ function _(txt) {
 
 function randID() {
 	return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function setupToggler(base) {
+	$(base).find("*[data-toggler]:not(.togglerinit)").each(function() {
+		var id = $(this).attr("id") || randID();
+		if ($(this).prop('tagName') === 'IFRAME') {
+			$(this).css("display", "block");
+		}
+		var doslide = ($(this).css("display") == 'block');
+		var showtext = $(this).attr("data-toggler");
+		var hidetext = $(this).attr("data-toggler-hide") || showtext;
+		var button = $("<button>", {
+			id: "togbtn" + id,
+			type: "button",
+			text: showtext,
+			"aria-controls": id
+		});
+		$(this).hide().attr("id",id).addClass("togglerinit").before(button);
+		button.attr("aria-expanded", false)
+		.attr("tabindex", 0)
+		.css("cursor", "pointer")
+		.on("click keydown", function(e) {
+			if (e.type=="click" || e.which==13) {
+				var targ = $("#"+$(this).attr("aria-controls"));
+				if ($(this).attr("aria-expanded") == "true") {
+					$(this).attr("aria-expanded", false).text(showtext);
+					if (doslide) {
+						targ.slideUp(300);
+					} else {
+						targ.hide();
+					}
+				} else {
+					$(this).attr("aria-expanded", true).text(hidetext);
+					if (doslide) {
+						targ.slideDown(300);
+					} else {
+						targ.show();
+					}
+				}
+			}
+		});
+	});
 }
 
 //generic grouping block toggle

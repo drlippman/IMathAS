@@ -55,6 +55,7 @@ if (!$assess_record->hasRecord()) {
   echo '{"error": "active_attempt"}';
 } else {
   $res = $assess_record->saveWork($_POST['work']);
+  $assess_record->saveRecordIfNeeded();
   if ($res !== true) {
     echo '{"error": $res}';
   } else {

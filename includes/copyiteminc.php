@@ -4,9 +4,9 @@ require_once(__DIR__."/updateptsposs.php");
 require_once(__DIR__."/migratesettings.php");
 //boost operation time
 
-ini_set("max_input_time", "900");
+
 ini_set("max_execution_time", "900");
-ini_set("memory_limit", "104857600");
+
 
 //IMathAS:  Copy Items utility functions
 //(c) 2008 David Lippman

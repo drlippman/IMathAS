@@ -210,8 +210,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 		  <li><input type=checkbox name=includeduedates value=1 checked /> Include <?php echo $installname;?> due dates for assessments</li>
 		</ul>
 		</fieldset>
-		<p><button type="submit" name="carttype" value="imscc">Download Common Cartridge</button></p>
-		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button> (Recommended)</p>
+		<p><button type="submit" name="carttype" value="bb">Download BlackBoard Cartridge</button></p>
 		<p><a href="../help.php?section=ltibb" target="_blank">BlackBoard Setup Instructions</a></p>
 		<?php echo $groupLTInote; ?>
 		<ul>

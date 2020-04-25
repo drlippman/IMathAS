@@ -991,7 +991,7 @@
 
 	}
 	if (isset($_GET['qid'])) {
-		echo "<p>".sprintf(_("%sTemplate this question%s for use in this assessment.  ","<a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">","</a>"));
+		echo "<p>".sprintf(_("%sTemplate this question%s for use in this assessment.  "),"<a href=\"moddataset.php?id=" . Sanitize::onlyInt($_GET['id']) . "&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&template=true&makelocal=" . Sanitize::onlyInt($_GET['qid']) . "\">","</a>");
 		echo _("This will let you modify the question for this assessment only without affecting the library version being used in other assessments.")."</p>";
 	}
 	if (!$myq) {
@@ -1226,7 +1226,7 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  '._('Delete?').' <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
+	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  "._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap

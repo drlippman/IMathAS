@@ -1,7 +1,8 @@
 <?php
 //IMathAS:  Embed a Question via iFrame
 //(c) 2010 David Lippman
-
+$inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
+$init_skip_csrfp = true;
 require("./init_without_validate.php");
 
 require("includes/JWT.php");

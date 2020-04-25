@@ -54,12 +54,12 @@ export default {
     },
     noTries () {
       var out = {};
-      for (let i in this.questions) {
+      for (const i in this.questions) {
         if (!this.questions[i].hasOwnProperty('parts')) {
           out[i] = true;
         } else {
           let notries = true;
-          for (let p in this.questions[i].parts) {
+          for (const p in this.questions[i].parts) {
             if (this.questions[i].parts[p].try > 0) {
               notries = false;
               break;

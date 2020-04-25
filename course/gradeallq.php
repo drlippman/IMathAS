@@ -80,13 +80,13 @@
 						if ($v=='N/A') {
 							$allscores[$kp[1]][$kp[2]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]] = $v;
+							$allscores[$kp[1]][$kp[2]] = floatval($v);
 						}
 					} else {
 						if ($v=='N/A') {
 							$allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
+							$allscores[$kp[1]][$kp[2]][$kp[3]] = floatval($v);
 						}
 					}
 				} else if ($kp[0]=='fb') {
@@ -605,7 +605,7 @@
 						echo "  <b>$cntb:</b> " ;
 						if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
 							$url = getasidfileurl($match[1]);
-							echo "<a href=\"" . Sanitize::encodeUrlForHref($url) . "\" target=\"_new\">".Sanitize::encodeStringForDisplay(basename($match[1]))."</a>";
+							echo "<a class=\"attach\" href=\"" . Sanitize::encodeUrlForHref($url) . "\" target=\"_new\">".Sanitize::encodeStringForDisplay(basename($match[1]))."</a>";
 						} else {
 							if (strpos($laarr[$k],'$f$')) {
 								if (strpos($laarr[$k],'&')) { //is multipart q

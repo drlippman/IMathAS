@@ -11,7 +11,10 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'semi': ['warn', 'always'],
-    'no-labels': 'off'
+    'no-labels': 'off',
+    'vue/require-component-is': 'warn',
+    'quote-props': ['warn','as-needed'],
+    'no-prototype-builtins': 'off'
   },
   parserOptions: {
     parser: 'babel-eslint'

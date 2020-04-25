@@ -99,7 +99,7 @@
 						if ($v=='N/A') {
 							$allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
+							$allscores[$kp[1]][$kp[2]][$kp[3]] = floatval($v);
 						}
 					}
 				} else if ($kp[0]=='fb') {
@@ -120,9 +120,10 @@
 		} else {
 			$onepergroup = false;
 		}
+		$DBH->beginTransaction();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_records.* FROM imas_users,imas_assessment_records ";
 		$query .= "WHERE imas_assessment_records.userid=imas_users.id AND imas_assessment_records.assessmentid=:assessmentid ";
-		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName FOR UPDATE";
 		if ($page != -1 && isset($_GET['userid'])) {
 			$query .= " AND userid=:userid";
 		}
@@ -202,6 +203,7 @@
 				}
 			}
 		}
+		$DBH->commit();
 
 		if (isset($_GET['quick'])) {
 			echo "saved";
@@ -266,7 +268,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=071219"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=032320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042220"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -602,6 +604,7 @@
 			}
 			$cnt++;
 		}
+		$assess_record->saveRecordIfNeeded();
 	}
 	if ($canedit) {
 		echo "<input type=\"submit\" value=\"Save Changes\"/> ";

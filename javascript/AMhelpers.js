@@ -2220,7 +2220,7 @@ $(window).on("ImathasEmbedReload", initqsclickchange);
 initstack.push(initqsclickchange);
 
 function initShowAnswer() {
-	$("input.sabtn + span.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
+	$("input.sabtn + span.hidden").attr("aria-hidden",true);
 	$("input.sabtn").each(function() {
 		var idnext = $(this).siblings("span:first-of-type").attr("id");
 		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
@@ -2238,7 +2238,7 @@ function initShowAnswer() {
 				}
 		});
 	});
-	$("input.dsbtn + div.hidden").attr("aria-hidden",true).attr("aria-expanded",false);
+	$("input.dsbtn + div.hidden").attr("aria-hidden",true);
 	$("input.dsbtn").each(function() {
 		var idnext = $(this).siblings("div:first-of-type").attr("id");
 		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)

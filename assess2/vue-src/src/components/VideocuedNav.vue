@@ -48,7 +48,7 @@ export default {
          show link with followuptitle, jumps to main segment end time
       */
       for (let i = 0; i < store.assessInfo.videocues.length; i++) {
-        let cuedata = store.assessInfo.videocues[i];
+        const cuedata = store.assessInfo.videocues[i];
         out.push({
           // internallink: '/videocued/' + cuen + '/v',
           onclick: () => this.$emit('jumpto', i, 'v'),
@@ -81,7 +81,7 @@ export default {
       return out;
     },
     curOption () {
-      let curCue = parseInt(this.cue);
+      const curCue = parseInt(this.cue);
       if (curCue === -1 && this.hasIntro) {
         return 0;
       }

@@ -9,7 +9,7 @@ if (!isset($_GET['threadid'])) {
 }
 
 $ischanged = false;
-$stm = $DBH->prepare("UPDATE imas_msgs SET isread=(isread^8) WHERE msgto=:msgto AND id=:id");
+$stm = $DBH->prepare("UPDATE imas_msgs SET tagged=(1-tagged) WHERE msgto=:msgto AND id=:id");
 $stm->execute(array(':msgto'=>$userid, ':id'=>$_GET['threadid']));
 if ($stm->rowCount()>0) {
 	$ischanged = true;

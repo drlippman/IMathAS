@@ -708,7 +708,7 @@ var app = new Vue({
 				(this.defregens === '' ? 0 : 1) +
 				(this.defregens > 1 && this.defregenpenalty === '' ? 0 : 1) +
 				(this.defregens > 1 && this.defregenpenalty > 0 && this.defregenpenaltyaftern === '' ? 0 : 1) +
-				(this.subtype === 'by_assessment' && this.keepscore === 'DNC' ? 0 : 1) +
+				(this.subtype === 'by_assessment' && this.defregens > 1 && this.keepscore === 'DNC' ? 0 : 1) +
 				(this.defattempts === '' ? 0 : 1) +
 				(this.defattempts > 1 && this.defattemptpenalty === '' ? 0 : 1) +
 				(this.defattempts > 1 && this.defattemptpenalty > 0 && this.defattemptpenaltyaftern === '' ? 0 : 1) +
@@ -716,7 +716,7 @@ var app = new Vue({
 				(this.showansOptions.length > 0 && this.showans === 'DNC' ? 0 : 1) +
 				(this.viewingb === 'DNC' ? 0 : 1) +
 				(this.scoresingb === 'DNC' ? 0 : 1) +
-				(this.ansingb === 'DNC' ? 0 : 1);
+				(this.ansInGbOptions.length > 0 && this.ansingb === 'DNC' ? 0 : 1);
 			return tot;
 		},
 		changingCore: function () {

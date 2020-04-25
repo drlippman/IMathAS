@@ -284,6 +284,9 @@ ol.lalpha li { margin-top: .7em;}
 .drawcanvas {
 	margin-bottom: 5px;
 }
+.drawcanvas img {
+	max-width: 100% !important;
+}
 
 /* General layout styles used many places */
 input, .mq-editable-field, .mathquill-math-field {
@@ -347,6 +350,19 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   background-attachment: local, local, scroll, scroll;
   margin: 12px 0;
   padding: 1px;
+}
+
+div.question img, div.intro img {
+	max-width: 90%;
+	height: auto;
+}
+
+div.txtimgwrap > img {
+	max-width: none;
+}
+
+div.question td img, div.question th img {
+	max-width: 100%;
 }
 
 @media only screen and (max-width: 480px) {

@@ -541,6 +541,13 @@
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+
+	if (extension_loaded('newrelic')) { // Ensure PHP agent is available
+		// Record custom data about this web transaction
+		newrelic_add_custom_parameter ('showtest_aid', $line['assessmentid']);
+		newrelic_add_custom_parameter ('showtest_asid', $line['id']);
+	}
+
 	$GLOBALS['assessver'] = $line['ver'];
 	if (strpos($line['questions'],';')===false) {
 		$questions = explode(",",$line['questions']);
@@ -1220,7 +1227,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		}
 		$out = '';
 		if ($testsettings['msgtoinstr']==1 && $coursemsgset<4) {
-			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
+			$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0 AND deleted<2");
 			$stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 			$msgcnt = $stm->fetchColumn(0);
 			$out .= "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('". _('This will discard any unsaved work.'). "');\">". _('Messages'). " ";
@@ -1612,7 +1619,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		$introhaspages = ($testsettings['displaymethod'] == "Embed" && strpos($testsettings['intro'],'[PAGE')!==false);
 	}
 	if (!empty($_POST['backgroundsaveforlater'])) {
-		scorequestion(Sanitize::onlyInt($_POST['tosaveqn']),false);
+		scorequestion(Sanitize::onlyInt($_POST['tosaveqn']),false,false);
 		recordtestdata(true);
 		echo "Saved ".Sanitize::onlyInt($_POST['tosaveqn']);
 		exit;

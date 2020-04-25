@@ -74,6 +74,11 @@ specify them using
 
 `$CFG['GEN']['headerscriptinclude'] = 'javascript/myheaderscript.js';`
 
+Likewise, if you have any scripts that need to get loaded at the very end of the
+document (just before the closing `</body>`), specify them using
+
+`$CFG['GEN']['footerscriptinclude'] = 'javascript/myheaderscript.js';`
+
 
 
 

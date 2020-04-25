@@ -103,28 +103,6 @@
   		$newpostcnts[$row[0]] = $row[1];
   	}
 
-   //get items with content views, for enabling stats link
-	/*if (isset($teacherid) || isset($tutorid)) {
-		$hasstats = array();
-		$query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$cid' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
-		//$query .= "UNION SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),info)) FROM imas_content_track WHERE courseid='$cid' AND type in ('forumpost','forumreply')";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$hasstats[$row[0]] = true;
-		}
-	}
-	*/
-
-	//get read linked items
-	$readlinkeditems = array();
-	if ($coursetheme=='otbsreader.css' && isset($studentid)) {
-		$stm = $DBH->prepare("SELECT DISTINCT typeid FROM imas_content_track WHERE userid=:userid AND type='linkedlink' AND courseid=:courseid");
-		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$readlinkeditems[$row[0]] = true;
-		}
-	}
-
    if (isset($teacherid)) {
 	   //echo generateadditem($_GET['folder'],'t');
    }

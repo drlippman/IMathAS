@@ -33,11 +33,6 @@ if (isset($coursetheme)) {
 		$isfw = 1000;
 		$coursetheme = str_replace(array('_fw1000','_fw'),'',$coursetheme);
 	}
-	?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=042217";?>" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=051519" media="only screen and (max-width:480px)"/>
-
-<?php
 }
 if (isset($CFG['GEN']['favicon'])) {
 	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
@@ -71,7 +66,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=121819"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=042223"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //
@@ -173,7 +168,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$imasroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=031720\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=041020\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {
@@ -209,6 +204,10 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
 	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
 }
+if (isset($coursetheme)) {
+	echo '<link rel="stylesheet" href="'. $imasroot . "/themes/$coursetheme?v=042217\" type=\"text/css\" />";
+}
+echo '<link rel="stylesheet" href="'. $imasroot . '/handheld.css?v=051519" media="only screen and (max-width:480px)"/>';
 if (isset($CFG['GEN']['translatewidgetID'])) {
 	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
 }
@@ -238,7 +237,8 @@ if (!isset($flexwidth) && !isset($hideAllHeaderNav)) {
 	echo '<div class="headerwrapper">';
 }
 if (isset($CFG['GEN']['headerinclude']) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
-	require("$curdir/{$CFG['GEN']['headerinclude']}");
+    $prepend = '/' == substr($CFG['GEN']['headerinclude'], 0, 1) ? '' : $curdir;
+	require("$prepend/{$CFG['GEN']['headerinclude']}");
 }
 $didnavlist = false;  $essentialsnavcnt = 0;
 function getactivetab() {
@@ -257,7 +257,7 @@ function getactivetab() {
 	}
 	return $a;
 }
-if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav)) {
+if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !isset($nocoursenav)) {
 	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 	$a = array('course'=>'', 'msg'=>'', 'forum'=>'', 'cal'=>'', 'gb'=>'', 'roster'=>'');

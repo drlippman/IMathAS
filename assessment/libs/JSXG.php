@@ -30,7 +30,7 @@ $allowedmacros[] = "JSXG_addGlider";
 
 ####### BASIC FUNCTION THAT JUST LOADS THE JSXGRAPH SCRIPT
 function loadJSX() {
-    echo getJSXscript();
+    return getJSXscript();
 }
 function getJSXscript () {
   if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {

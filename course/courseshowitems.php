@@ -200,8 +200,8 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
-	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
-	   global $itemshowdata, $exceptionfuncs;
+	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset;
+	   global $itemshowdata, $exceptionfuncs,$coursejsondata;
 
 	   require_once("../includes/filehandler.php");
 
@@ -1126,6 +1126,32 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   $line['text'] = '';
 				   }
 			   }
+				 if (strpos($line['text'], '###') !== false) {
+					 $toggleParts = preg_split('/<p.*?###([^<>]+?)###.*\/p>/', $line['text'], 0, PREG_SPLIT_DELIM_CAPTURE);
+					 if (count($toggleParts) > 1) {
+						 $n = 0;
+						 for ($j=0;$j<(count($toggleParts)-1)/2;$j++) {
+							 if (strpos($toggleParts[2*$j+1], '(Active)') !== false) {
+								 $n = $j;
+								 $toggleParts[2*$j+1] = trim(str_replace('(Active)','', $toggleParts[2*$j+1]));
+								 break;
+							 }
+						 }
+						 $line['text'] = $toggleParts[0] . $toggleParts[2*($n+1)];
+						 if ($canedit) {
+							 $toggler = '<p><select onchange="chgInlineToggler(this, '.Sanitize::onlyInt($typeid).')">';
+							 for ($j=0;$j<(count($toggleParts)-1)/2;$j++) {
+								 $toggler .= '<option value="'.$j.'" ';
+								 if ($j==$n) {
+									 $toggler .= 'selected=1';
+								 }
+								 $toggler .= '>'.Sanitize::encodeStringForDisplay($toggleParts[2*$j+1]).'</option>';
+							 }
+							 $toggler .= '</select></p>';
+							 $line['text'] = $toggler . $line['text'];
+						 }
+					 }
+				 }
 			   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 			   	   $rec = "data-base=\"inlinetext-$typeid\" ";
 			   	   $line['text'] = str_replace('<a ','<a '.$rec, $line['text']);
@@ -1436,12 +1462,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon($icon, "link to $icon", false);
 
 				   echo "<div class=title>";
-				   if (isset($readlinkeditems[$typeid])) {
-				   	   echo '<b class="readitem">';
-				   } else {
-				   	   echo '<b>';
-				   }
-				   echo "<a href=\"$alink\" $rec $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b>\n";
+				   echo "<b><a href=\"$alink\" $rec $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1545,10 +1566,10 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> ';
 					   }
 					   echo '</span>';
-				   } else
+				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
 				   if ($line['allowlate']>0 && isset($_SESSION['stuview'])) {
-					echo _(' LatePass Allowed');
+						 echo _(' LatePass Allowed');
 				   } else if (!$canedit) {
 				   	if ($canuselatepassP || $canuselatepassR) {
 				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid\">", _('Use LatePass'), "</a>";

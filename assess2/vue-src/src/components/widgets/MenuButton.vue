@@ -105,10 +105,10 @@ export default {
   },
   computed: {
     hasButton () {
-      return !!this.$scopedSlots['button'];
+      return !!this.$scopedSlots.button;
     },
     hasSlot () {
-      return !!this.$scopedSlots['default'];
+      return !!this.$scopedSlots.default;
     }
   },
   methods: {
@@ -146,11 +146,11 @@ export default {
       }
     },
     setMenuHeight () {
-      let wrapper = document.getElementById(this.id + '_wrap');
-      let bndbox = wrapper.getBoundingClientRect();
-      let wrapperHeight = wrapper.clientHeight;
-      let wrapperTop = bndbox.top;
-      let windowHeight = window.innerHeight;
+      const wrapper = document.getElementById(this.id + '_wrap');
+      const bndbox = wrapper.getBoundingClientRect();
+      const wrapperHeight = wrapper.clientHeight;
+      const wrapperTop = bndbox.top;
+      const windowHeight = window.innerHeight;
       if (wrapperTop + wrapperHeight > windowHeight - 30) {
         wrapper.style.height = (windowHeight - wrapperTop - 30) + 'px';
       } else {
@@ -164,12 +164,12 @@ export default {
       }
     },
     scrollToCurrent () {
-      let selectedEl = document.getElementById(this.id + '_' + this.curSelected);
-      let selectedPos = selectedEl.offsetTop;
-      let selectedHeight = selectedEl.clientHeight;
-      let wrapper = document.getElementById(this.id + '_wrap');
-      let wrapperHeight = wrapper.clientHeight;
-      let offset = selectedPos - (wrapperHeight / 2 - selectedHeight / 2);
+      const selectedEl = document.getElementById(this.id + '_' + this.curSelected);
+      const selectedPos = selectedEl.offsetTop;
+      const selectedHeight = selectedEl.clientHeight;
+      const wrapper = document.getElementById(this.id + '_wrap');
+      const wrapperHeight = wrapper.clientHeight;
+      const offset = selectedPos - (wrapperHeight / 2 - selectedHeight / 2);
       wrapper.scrollTop = offset;
     },
     handleClick (index) {
@@ -192,9 +192,9 @@ export default {
     },
     processKeyBuffer (clear) {
       if (this.keybuffer !== '') {
-        let regex = new RegExp('^' + this.keybuffer, 'i');
-        for (let i in this.options) {
-          let val = this.options[i][this.searchby].toString();
+        const regex = new RegExp('^' + this.keybuffer, 'i');
+        for (const i in this.options) {
+          const val = this.options[i][this.searchby].toString();
           if (val.match(regex)) {
             this.curSelected = i;
             this.$nextTick(this.scrollToCurrent);
@@ -208,7 +208,7 @@ export default {
     },
     handleKeys (event) {
       if (this.open) {
-        let key = event.key.toLowerCase();
+        const key = event.key.toLowerCase();
         if (key === 'home') {
           this.curSelected = 0;
         } else if (key === 'end') {

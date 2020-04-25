@@ -5,7 +5,7 @@ require("../init.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/forms'])) {
-	require(__DIR__.'/../'.$CFG['hooks']['admin/forms']);
+	require($CFG['hooks']['admin/forms']);
 }
 
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
@@ -716,7 +716,7 @@ switch($_GET['action']) {
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
 			echo '</span><br class=form>';
 			echo '</div>';
-	
+
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
 			echo '<span class=form>'._('Use new assessment version').'</span>';
 			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';

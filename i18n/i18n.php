@@ -16,5 +16,3 @@ if (function_exists('gettext')) {
 		return $t;
 	}
 }
-
-?>

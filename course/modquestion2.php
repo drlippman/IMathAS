@@ -232,6 +232,10 @@ if (!(isset($teacherid))) {
       $defaults['showwork'] = _('No');
     } else if ($defaults['showwork'] == 1) {
       $defaults['showwork'] = _('During Assessment');
+    } else if ($defaults['showwork'] == 2) {
+      $defaults['showwork'] = _('After assessment');
+    } else if ($defaults['showwork'] == 3) {
+      $defaults['showwork'] = _('During or after assessment');
     }
 	}
 }
@@ -284,7 +288,9 @@ if (!isset($_GET['id'])) {
 </span><BR class=form>
 
 <span class=form><?php echo _("Penalty on Tries:"); ?></span>
-<span class=formright><input type=text size=2 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']);?>"><?php echo sprintf(_('% per try after %s full-credit tries'),'<input type=text size=1 name="penalty_aftern" value="'.Sanitize::encodeStringForDisplay($penalty_aftern).'">') ?>
+<span class=formright><input type=text size=2 name=penalty value="<?php echo Sanitize::encodeStringForDisplay($line['penalty']);?>">
+  <?php echo sprintf(_('%% per try after %s full-credit tries'),
+    '<input type=text size=1 name="penalty_aftern" value="'.Sanitize::encodeStringForDisplay($penalty_aftern).'">'); ?>
    <br/><i class="grey"><?php echo _('Default:'); ?> <?php echo Sanitize::encodeStringForDisplay($defaults['penalty']);?></i>
 </span><BR class=form>
 <?php

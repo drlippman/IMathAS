@@ -66,8 +66,8 @@ export default {
       var unanswered = true;
       if (store.assessInfo.hasOwnProperty('questions')) {
         let qAnswered = 0;
-        let nQuestions = store.assessInfo.questions.length;
-        for (let i in store.assessInfo.questions) {
+        const nQuestions = store.assessInfo.questions.length;
+        for (const i in store.assessInfo.questions) {
           if (store.assessInfo.questions[i].try > 0) {
             qAnswered++;
           }

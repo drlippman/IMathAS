@@ -44,8 +44,8 @@ export default {
       if (this.open) {
         this.$nextTick(() => {
           this.$refs.pane.style.right = '';
-          let bndbox = this.$refs.pane.getBoundingClientRect();
-          let pageWidth = document.documentElement.clientWidth;
+          const bndbox = this.$refs.pane.getBoundingClientRect();
+          const pageWidth = document.documentElement.clientWidth;
           if (bndbox.right >= pageWidth) {
             this.$refs.pane.style.right = '12px';
           }

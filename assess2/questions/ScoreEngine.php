@@ -275,7 +275,7 @@ class ScoreEngine
         $questionData = $stm->fetch(PDO::FETCH_ASSOC);
 
         if (!$questionData) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 sprintf('Failed to get question data for question ID %d. PDO error: %s',
                     $dbQuestionId, implode(':', $this->dbh->errorInfo()))
             );
@@ -505,7 +505,13 @@ class ScoreEngine
             // TODO: Do this a different/better way. (not accessing _POST)
 			      $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
 
-            $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+            try {
+              $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
+            } catch (\Throwable $t) {
+              $this->addError(
+                  _('Caught error while evaluating the code in this question: ')
+                  . $t->getMessage());
+            }
             $scorePartResult = $scorePart->getResult();
             $raw[$partnum] = $scorePartResult->getRawScore();
 
@@ -537,7 +543,8 @@ class ScoreEngine
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'scoreMethod' => 'singlescore'
+                'scoreMethod' => 'singlescore',
+                'answeights' => $answeights
             );
         } else if (isset($scoremethod) && $scoremethod == "allornothing") {
             if (array_sum($scores) < .98) {
@@ -546,7 +553,8 @@ class ScoreEngine
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'scoreMethod' => 'allornothing'
+                    'scoreMethod' => 'allornothing',
+                    'answeights' => $answeights
                 );
             } else {
                 return array(
@@ -554,7 +562,8 @@ class ScoreEngine
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                    'scoreMethod' => 'allornothing'
+                    'scoreMethod' => 'allornothing',
+                    'answeights' => $answeights
                 );
             }
         } else if (isset($scoremethod) && $scoremethod == "acct") {
@@ -564,14 +573,16 @@ class ScoreEngine
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
-                'scoreMethod' => 'singlescore'
+                'scoreMethod' => 'singlescore',
+                'answeights' => $answeights
             ));
         } else {
             return array(
                 'scores' => $scores,
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
-                'lastAnswerAsNumber' => $partLastAnswerAsNumber
+                'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                'answeights' => $answeights
             );
         }
     }
@@ -607,7 +618,8 @@ class ScoreEngine
             'scores' => array(round($score, 3)),
             'rawScores' => array(round($score, 2)),
             'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
-            'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber())
+            'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber()),
+            'answeights' => array(1)
         );
     }
 

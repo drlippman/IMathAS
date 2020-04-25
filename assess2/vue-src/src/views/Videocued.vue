@@ -126,8 +126,8 @@ export default {
       }
     },
     timeCues () {
-      let out = {};
-      for (let i in store.assessInfo.videocues) {
+      const out = {};
+      for (const i in store.assessInfo.videocues) {
         if (store.assessInfo.videocues[i].hasOwnProperty('qn')) {
           out[store.assessInfo.videocues[i].time] = parseInt(i);
         }
@@ -137,7 +137,7 @@ export default {
     nextVidTimes () {
       // we'll want to update the nav when a followup ends, or when a
       // video segment with a question ends
-      let out = {};
+      const out = {};
       for (let i = 0; i < store.assessInfo.videocues.length; i++) {
         if (store.assessInfo.videocues[i].hasOwnProperty('followuptime') &&
           store.assessInfo.videocues.hasOwnProperty(i + 1)
@@ -155,7 +155,7 @@ export default {
       return store.assessInfo.intro;
     },
     questionArray () {
-      let qnArray = {};
+      const qnArray = {};
       for (let i = 0; i < store.assessInfo.questions.length; i++) {
         qnArray[i] = i;
       }
@@ -164,10 +164,10 @@ export default {
   },
   methods: {
     createPlayer () {
-      let supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
-      let pVarsInternal = { 'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen ? 1 : 0, 'controls': 2, 'rel': 0, 'modestbranding': 1, 'showinfo': 0 };
-      let ar = store.assessInfo.videoar.split(':');
-      let videoHeight = window.innerHeight - 50;
+      const supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
+      const pVarsInternal = { 'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen ? 1 : 0, 'controls': 2, 'rel': 0, 'modestbranding': 1, 'showinfo': 0 };
+      const ar = store.assessInfo.videoar.split(':');
+      const videoHeight = window.innerHeight - 50;
       this.videoWidth = ar[0] / ar[1] * videoHeight;
       this.aspectRatioPercent = Math.round(1000 * videoHeight / this.videoWidth) / 10;
       this.ytplayer = new window.YT.Player('player', {
@@ -183,7 +183,7 @@ export default {
       });
     },
     exitFullscreen () {
-      let isInFullScreen = (
+      const isInFullScreen = (
         document.fullscreenElement ||
         document.webkitFullscreenElement ||
         document.mozFullScreenElement ||
@@ -201,7 +201,7 @@ export default {
       }
     },
     checkTime () {
-      let curTime = Math.floor(this.ytplayer.getCurrentTime());
+      const curTime = Math.floor(this.ytplayer.getCurrentTime());
       // If there's a queue for this time,
       // But not if we jumped to a video and the queue is for the previous
       // or if we jump to followup
@@ -250,11 +250,11 @@ export default {
           this.ytplayer.pauseVideo();
         }
       } else {
-        let newCue = store.assessInfo.videocues[newCueNum];
+        const newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
         if (newToshow === 'v') {
           if (newCueNum > 0) {
-            let prevCue = store.assessInfo.videocues[newCueNum - 1];
+            const prevCue = store.assessInfo.videocues[newCueNum - 1];
             if (prevCue.hasOwnProperty('followuptime')) {
               // if previous cue had followup, skip to end of that
               seektime = prevCue.followuptime;
@@ -286,7 +286,7 @@ export default {
       this.youtubeApiLoaded = true;
       this.createPlayer();
     };
-    let tag = document.createElement('script');
+    const tag = document.createElement('script');
     tag.src = '//www.youtube.com/player_api';
     document.head.appendChild(tag);
   },

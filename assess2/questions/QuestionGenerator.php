@@ -113,7 +113,7 @@ class QuestionGenerator
         $questionData = $stm->fetch(PDO::FETCH_ASSOC);
 
         if (!$questionData) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 sprintf('Failed to get question data for question ID %d. PDO error: %s',
                     $questionId, implode(':', $this->dbh->errorInfo()))
             );

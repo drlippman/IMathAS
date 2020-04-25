@@ -60,7 +60,7 @@ export default {
       if (this.option.type !== 'q') {
         return '';
       } else {
-        let qdata = store.assessInfo.questions[this.option.qn];
+        const qdata = store.assessInfo.questions[this.option.qn];
         if (qdata.hasOwnProperty('gbscore')) {
           let str = qdata.canretry ? '(' : '[';
           str += qdata.gbscore + '/' + qdata.points_possible;
@@ -73,14 +73,14 @@ export default {
     },
     canRetry () {
       if (this.option.type === 'q') {
-        let qdata = store.assessInfo.questions[this.option.qn];
+        const qdata = store.assessInfo.questions[this.option.qn];
         return qdata.canretry;
       }
       return false;
     },
     canRegen () {
       if (this.option.type === 'q') {
-        let qdata = store.assessInfo.questions[this.option.qn];
+        const qdata = store.assessInfo.questions[this.option.qn];
         return qdata.regens_remaining;
       }
       return false;

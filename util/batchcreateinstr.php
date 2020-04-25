@@ -3,17 +3,17 @@
 //(c) 2017 David Lippman for Lumen Learning
 
 
-ini_set("max_input_time", "1600");
+
 ini_set("max_execution_time", "1600");
-ini_set("memory_limit", "104857600");
-ini_set("upload_max_filesize", "10485760");
-ini_set("post_max_size", "10485760");
+
+
+
 
 require("../init.php");
 require_once("../includes/copyiteminc.php");
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['util/batchcreateinstr'])) {
-	require(__DIR__.'/../'.$CFG['hooks']['util/batchcreateinstr']);
+    require($CFG['hooks']['util/batchcreateinstr']);
 }
 
 if ($myrights < 100 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
@@ -307,7 +307,8 @@ function fopen_utf8 ($filename, $mode) {
     $file = @fopen($filename, $mode);
     $bom = fread($file, 3);
     if ($bom != b"\xEF\xBB\xBF") {
-        rewind($file);
+      fclose($file);
+      $file = @fopen($filename, $mode);
     }
     return $file;
 }

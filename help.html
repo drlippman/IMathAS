@@ -2367,7 +2367,8 @@ The following macros help with formatting values for display:
 <li><strong>prettyreal(number,decimals,[comma])</strong>:  Adds commas in thousands spaces of number, and displays the value to a fixed number of decimals places (rounding if needed).
    Example: prettyreal(1234.567,2) will return "1,234.57", and prettyreal(1.8,3) will return "1.800".  The result is a string, which
    can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li>
-<li><strong>prettysmallnumber(number)</strong>:  Prevents very small numbers from being displayed as scientific notation</li>
+<li><strong>prettysmallnumber(number, [space])</strong>:  Prevents very small numbers from being displayed as scientific notation.
+   Set space to true to add space in groups of 3, like 0.000 000 02</li>
 <li><strong>prettysigfig(number,sigfigs,[comma,choptrailingzeros])</strong>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" override.
    Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.</li>
 <li><strong>makescinot(number,[decimals,format])</strong>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
@@ -3358,6 +3359,8 @@ drawn line from the correct line.
 	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is
 	between 0 and 1).  Otherwise
 	the student will receive full credit.  Not set by default.</dd>
+<dt>$scoremethod = "takeanything" </dt>
+		<dd>When used, this will give full credit for any non-blank answer.  This might be of use with the freehand drawing option.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer </dt>
@@ -3750,6 +3753,12 @@ None - the file upload type is not computer graded.
 <dt>$scoremethod = "takeanything" or "takeanythingorblank"</dt>
 	<dd>Sets the problem to give full credit for any answer.  The latter also counts
 	blank answers as correct.</dd>
+<dt>$answerformat = "images", "canpreview", or a list of file extensions</dt>
+	<dd>Set a list of preferred file formats for the file selector.  "images" is
+	 a shorthand for .jpg,.gif,.png,.jpeg. "canpreview" is a shorthand for image
+   files, office files, and pdfs, which can be previewed inline.  If listing
+   file extensions, provide a comma separated list with leading periods, like
+    ".pdf,.docx,.doc"  </dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
 <dt>$showanswer </dt>

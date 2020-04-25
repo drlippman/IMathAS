@@ -38,6 +38,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$forumfulltoupdate = array();
 		$fullassess = false;
 		$fullforum = false;
+
+		$query = 'SELECT "Assessment" as type,id FROM imas_assessments WHERE courseid=?
+			UNION SELECT "Forum" as type,id FROM imas_forums WHERE courseid=?
+			UNION SELECT "Wiki" as type,id FROM imas_wikis WHERE courseid=?
+			UNION SELECT "InlineText" as type,id FROM imas_inlinetext WHERE courseid=?
+			UNION SELECT "Link",id as type FROM imas_linkedtext WHERE courseid=?';
+		$stm = $DBH->prepare($query);
+		$stm->execute(array($cid,$cid,$cid,$cid,$cid));
+		$existingIds = $stm->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("../includes/parsedatetime.php");
 
@@ -125,6 +135,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$type = $data[6]; // $_POST['type'.$i];
 			$id = $data[7]; // $_POST['id'.$i];
 			$avail = intval($data[8]);
+
+			// check it's ok
+			if ($type != 'Block') {
+				if (!in_array(intval($id), $existingIds[$type])) {
+					continue;
+				}
+			}
 			if ($type=='Assessment') {
 				if ($id>0) {
 					//$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate,avail=:avail WHERE id=:id");

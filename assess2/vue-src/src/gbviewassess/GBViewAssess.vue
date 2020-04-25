@@ -13,7 +13,8 @@
         {{ $t('gradebook.lastchange') }}: {{ lastchangeString }}
         <span v-if="aData.timeontask > 0">
           <br/>
-          {{ $t('gradebook.time_onscreen') }}: {{ totalTimeOnTask }}
+          {{ $tc('gradebook.time_onscreen', attemptCount) }}:
+          {{ totalTimeOnTask }}
         </span>
       </div>
 
@@ -318,7 +319,7 @@ export default {
       return store.assessInfo;
     },
     canEdit () {
-      return store.assessInfo['can_edit_scores'];
+      return store.assessInfo.can_edit_scores;
     },
     canSubmit () {
       return (!store.inTransit);
@@ -346,6 +347,15 @@ export default {
     totalTimeOnTask () {
       return Math.round(10 * this.aData.timeontask / 60) / 10 + ' ' + this.$t('gradebook.minutes');
     },
+    attemptCount () {
+      let cnt = 0;
+      for (let i = 0; i < this.aData.assess_versions.length; i++) {
+        if (this.aData.assess_versions[i].status < 3) {
+          cnt++;
+        }
+      }
+      return cnt;
+    },
     extensionString () {
       if (this.aData.extended_with.type === 'latepass') {
         return this.$tc('setlist.latepass_used', this.aData.extended_with.n);
@@ -363,7 +373,7 @@ export default {
       return store.curQver;
     },
     curQuestionVers () {
-      let out = [];
+      const out = [];
       for (let qn = 0; qn < this.curQuestions.length; qn++) {
         out[qn] = this.curQuestions[qn][this.curQver[qn]];
       }
@@ -371,7 +381,7 @@ export default {
     },
     showCategories () {
       let hascat = false;
-      for (let i in this.curQuestionVers) {
+      for (const i in this.curQuestionVers) {
         if (this.curQuestionVers[i].hasOwnProperty('category') &&
           this.curQuestionVers[i].category !== '' &&
           this.curQuestionVers[i].category !== null
@@ -380,7 +390,7 @@ export default {
           break;
         }
       }
-      let hasScores = this.curQuestionVers[0].hasOwnProperty('score') &&
+      const hasScores = this.curQuestionVers[0].hasOwnProperty('score') &&
         !isNaN(Number(this.curQuestionVers[0].score));
       return hascat && hasScores;
     },
@@ -406,9 +416,9 @@ export default {
     },
     showQuestion () {
       // 1 to hide perfect, 2 correct, 4 unanswered
-      let out = {};
+      const out = {};
       for (let i = 0; i < this.curQuestions.length; i++) {
-        let qdata = this.curQuestions[i][this.curQver[i]];
+        const qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
         if (this.hidePerfect && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
           showit = false;
@@ -498,13 +508,13 @@ export default {
         return; // same value - abort
       }
       let hasUnsaved = false;
-      let regex = new RegExp('^' + store.curAver + '-' + qn + '-');
-      for (let k in store.scoreOverrides) {
+      const regex = new RegExp('^' + store.curAver + '-' + qn + '-');
+      for (const k in store.scoreOverrides) {
         if (regex.test(k)) {
           hasUnsaved = true;
         }
       }
-      for (let k in store.feedbacks) {
+      for (const k in store.feedbacks) {
         if (regex.test(k)) {
           hasUnsaved = true;
         }
@@ -527,13 +537,13 @@ export default {
     },
     submitChanges (exit) {
       if (this.showOverride && this.assessOverride !== '') {
-        store.scoreOverrides['gen'] = this.assessOverride;
+        store.scoreOverrides.gen = this.assessOverride;
       } else if (this.aData.hasOwnProperty('scoreoverride') &&
         this.assessOverride !== this.aData.scoreoverride
       ) {
-        store.scoreOverrides['gen'] = this.assessOverride;
+        store.scoreOverrides.gen = this.assessOverride;
       } else {
-        delete store.scoreOverrides['gen'];
+        delete store.scoreOverrides.gen;
       }
       var doexit = (exit === true);
       actions.saveChanges(doexit);
@@ -589,10 +599,10 @@ export default {
       store.APIbase = process.env.BASE_URL;
     }
     // if no assessinfo, or if cid/aid has changed, load data
-    let querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
-    let queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
-    let queryuid = window.location.search.replace(/^.*uid=(\d+).*$/, '$1');
-    let querystu = window.location.search.replace(/^.*stu=(\d+).*$/, '$1');
+    const querycid = window.location.search.replace(/^.*cid=(\d+).*$/, '$1');
+    const queryaid = window.location.search.replace(/^.*aid=(\d+).*$/, '$1');
+    const queryuid = window.location.search.replace(/^.*uid=(\d+).*$/, '$1');
+    const querystu = window.location.search.replace(/^.*stu=(\d+).*$/, '$1');
     if (store.assessInfo === null ||
       store.cid !== querycid ||
       store.aid !== queryaid ||

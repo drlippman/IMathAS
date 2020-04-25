@@ -25,9 +25,9 @@ export default {
   props: ['data'],
   computed: {
     catScores () {
-      let questions = this.data;
-      let cats = [];
-      for (let i in questions) {
+      const questions = this.data;
+      const cats = [];
+      for (const i in questions) {
         if (!questions[i].hasOwnProperty('category') || questions[i].category === '') {
           // skip if no category
           continue;

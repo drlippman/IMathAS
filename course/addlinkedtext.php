@@ -8,11 +8,11 @@ require("../includes/htmlutil.php");
 require("../includes/parsedatetime.php");
 
 
-ini_set("max_input_time", "120");
+
 ini_set("max_execution_time", "120");
-ini_set("memory_limit", "31457280");
-ini_set("upload_max_filesize", "31457280");
-ini_set("post_max_size", "31457280");
+
+
+
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -545,7 +545,7 @@ if ($overwriteBody==1) {
 		</div>
 		<div id="fileinput" <?php if ($type != 'file') {echo 'style="display:none;"';}?>>
 			<span class="form">File</span>
-			<input type="hidden" name="MAX_FILE_SIZE" value="31457280" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="15000000" />
 			<span class="formright">
 			<?php if ($filename != '') {
 				require_once("../includes/filehandler.php");
@@ -556,7 +556,7 @@ if ($overwriteBody==1) {
 				echo _('Attach ');
 			}
 			?>
-			file (Max 30MB): <input name="userfile" type="file" />
+			file (Max 15MB): <input name="userfile" type="file" />
 			</span><br class="form">
 		</div>
 		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>

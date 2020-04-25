@@ -27,6 +27,7 @@
       v-html="questionData.html"
       class = "question"
       :id="'questionwrap' + qn"
+      ref = "thisqwrap"
     />
     <question-helps
       v-if = "showHelps"
@@ -46,6 +47,7 @@
           :id="'sw' + qn"
           :value = "questionData.work"
           rows = "3"
+          :active = "getwork === 2 || showWorkInput"
           @input = "updateWork"
           @blur = "workChanged"
           @focus = "workFocused"
@@ -92,8 +94,6 @@ export default {
   },
   data: function () {
     return {
-      timeActivated: null,
-      timeActive: 0,
       work: '',
       lastWorkVal: '',
       showWorkInput: false
@@ -188,8 +188,10 @@ export default {
       }
     },
     submitQuestion () {
-      this.updateTime(false);
-      actions.submitQuestion(this.qn, false, this.timeActive);
+      actions.submitQuestion(this.qn, false);
+      // reset timeactive counter
+      store.timeActive[this.qn] = 0;
+      store.timeActivated[this.qn] = new Date();
     },
     jumpToAnswer () {
       store.confirmObj = {
@@ -198,15 +200,15 @@ export default {
       };
     },
     updateTime (goingActive) {
-      if (this.timeActivated === null || goingActive) {
-        this.timeActivated = new Date();
-      } else if (this.timeActivated !== null) {
-        let now = new Date();
-        this.timeActive += (now - this.timeActivated);
+      if (!store.timeActivated.hasOwnProperty(this.qn) || goingActive) {
+        store.timeActivated[this.qn] = new Date();
+      } else if (store.timeActivated.hasOwnProperty(this.qn)) {
+        const now = new Date();
+        store.timeActive[this.qn] += (now - store.timeActivated[this.qn]);
+        delete store.timeActivated[this.qn]; // so it doesn't add more on submitall
       }
     },
     addDirtyTrackers () {
-      var self = this;
       window.$('#questionwrap' + this.qn).find('input[name],select[name],textarea[name]')
         .off('focus.dirtytrack').off('change.dirtytrack').off('input.dirtytrack')
         .on('focus.dirtytrack', function () {
@@ -221,7 +223,7 @@ export default {
           store.somethingDirty = true;
         })
         .on('change.dirtytrack', function () {
-          let val = window.$(this).val().trim();
+          const val = window.$(this).val().trim();
           let changed = false;
           if (this.type === 'radio' || this.type === 'checkbox') {
             changed = true;
@@ -230,8 +232,8 @@ export default {
           }
           if (changed) {
             store.somethingDirty = true;
-            let name = window.$(this).attr('name');
-            let m = name.match(/^(qs|qn|tc)(\d+)/);
+            const name = window.$(this).attr('name');
+            const m = name.match(/^(qs|qn|tc)(\d+)/);
             if (m !== null) {
               var qn = m[2] * 1;
               var pn = 0;
@@ -241,16 +243,16 @@ export default {
               }
 
               // autosave value
-              let now = new Date();
-              let timeactive = self.timeActive + (now - self.timeActivated);
+              const now = new Date();
+              const timeactive = store.timeActive[qn] + (now - store.timeActivated[qn]);
               actions.doAutosave(qn, pn, timeactive);
             }
           }
         });
     },
     disableOutOfTries () {
-      let trymax = this.questionData.tries_max;
-      for (let pn in this.questionData.parts) {
+      const trymax = this.questionData.tries_max;
+      for (const pn in this.questionData.parts) {
         var regex;
         if (this.questionData.parts[pn].try >= trymax) {
           // out of tries - disable inputs
@@ -276,12 +278,13 @@ export default {
         return;
       }
       setTimeout(window.drawPics, 100);
-      window.rendermathnode(document.getElementById('questionwrap' + this.qn));
-      window.initSageCell(document.getElementById('questionwrap' + this.qn));
+      window.rendermathnode(this.$refs.thisqwrap);
+      window.initSageCell(this.$refs.thisqwrap);
+      window.initlinkmarkup(this.$refs.thisqwrap);
       this.updateTime(true);
       this.setInitValues();
       // add in timeactive from autosave, if exists
-      this.timeActive += actions.getInitTimeactive(this.qn);
+      store.timeActive[this.qn] += actions.getInitTimeactive(this.qn);
       this.addDirtyTrackers();
       // set work
       this.work = this.questionData.work;
@@ -292,10 +295,10 @@ export default {
       svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
       let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
       svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
-      window.$('#questionwrap' + this.qn).find('.scoremarker').remove();
-      window.$('#questionwrap' + this.qn).find('div.ansgrn,table.ansgrn').append(svgchk);
-      window.$('#questionwrap' + this.qn).find('div.ansyel,table.ansyel').append(svgychk);
-      window.$('#questionwrap' + this.qn).find('div.ansred,table.ansred').append(svgx);
+      window.$(this.$refs.thisqwrap).find('.scoremarker').remove();
+      window.$(this.$refs.thisqwrap).find('div.ansgrn,table.ansgrn').append(svgchk);
+      window.$(this.$refs.thisqwrap).find('div.ansyel,table.ansyel').append(svgychk);
+      window.$(this.$refs.thisqwrap).find('div.ansred,table.ansred').append(svgx);
 
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
@@ -307,11 +310,11 @@ export default {
 
       window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
 
-      window.$('#questionwrap' + this.qn).find('select.ansgrn').after(svgchk);
-      window.$('#questionwrap' + this.qn).find('select.ansyel').after(svgychk);
-      window.$('#questionwrap' + this.qn).find('select.ansred').after(svgx);
+      window.$(this.$refs.thisqwrap).find('select.ansgrn').after(svgchk);
+      window.$(this.$refs.thisqwrap).find('select.ansyel').after(svgychk);
+      window.$(this.$refs.thisqwrap).find('select.ansred').after(svgx);
 
-      actions.setRendered(this.qn);
+      actions.setRendered(this.qn, true);
     },
     setInitValues () {
       var regex = new RegExp('^(qn|tc|qs)\\d');
@@ -342,8 +345,8 @@ export default {
         store.work[this.qn] = this.work;
         // autosave value
         if (this.getwork === 1) {
-          let now = new Date();
-          let timeactive = self.timeActive + (now - self.timeActivated);
+          const now = new Date();
+          const timeactive = store.timeActive[this.qn] + (now - store.timeActivated[this.qn]);
           actions.doAutosave(this.qn, 'sw', timeactive);
         } else if (this.getwork === 2) {
           this.$emit('workchanged', this.work);
@@ -365,12 +368,18 @@ export default {
   },
   created () {
     this.loadQuestionIfNeeded(true);
+    if (!store.timeActive.hasOwnProperty(this.qn)) {
+      store.timeActive[this.qn] = 0;
+    }
   },
   mounted () {
     if (this.questionContentLoaded) {
       this.disableOutOfTries();
       this.renderAndTrack();
     }
+  },
+  beforeDestroy () {
+    actions.setRendered(this.qn, false);
   },
   watch: {
     active: function (newVal, oldVal) {
