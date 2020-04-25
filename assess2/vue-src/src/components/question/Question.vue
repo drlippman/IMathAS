@@ -4,7 +4,7 @@
       {{ $t('loading') }}
     </div>
     <score-result
-      v-if = "showScore && !hasSeqNext"
+      v-if = "showScore"
       :qdata = "questionData"
       :qn = "qn"
     />
@@ -154,6 +154,7 @@ export default {
     showScore () {
       return (store.inProgress &&
         !store.inPrintView &&
+        this.questionData.hadSeqNext !== true &&
         (this.questionData.hasOwnProperty('score') ||
          this.questionData.status === 'attempted'
         ) &&

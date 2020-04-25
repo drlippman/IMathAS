@@ -499,6 +499,7 @@ export const actions = {
             Router.push('/summary');
           }
         } else if (qns.length === 1) {
+          store.assessInfo.questions[qns[0]].hadSeqNext = hasSeqNext;
           // scroll to score result
           Vue.nextTick(() => {
             var el;
