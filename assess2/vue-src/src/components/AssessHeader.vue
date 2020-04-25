@@ -152,6 +152,7 @@ export default {
           }
         }
       }
+      pointsEarned = Math.round(pointsEarned * 1000) / 1000;
       if (this.ainfo.in_practice) {
         return this.$t('header.practicescore', { pts: pointsEarned, poss: pointsPossible });
       } else if (this.ainfo.show_scores_during) {
