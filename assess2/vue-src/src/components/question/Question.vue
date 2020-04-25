@@ -4,7 +4,7 @@
       {{ $t('loading') }}
     </div>
     <score-result
-      v-if = "showScore"
+      v-if = "showScore && !hasSeqNext"
       :qdata = "questionData"
       :qn = "qn"
     />
