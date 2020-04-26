@@ -1659,7 +1659,11 @@ class AssessRecord
     $qcolors = array();
     $lastans = array();
     $showansparts = array();
-    $showans = ($numParts > 0); //true by default, unless no answeights or tries yet
+    // showans: true by default, unless no answeights or tries yet, or jumptoans
+    // gets overwritten below if individual parts are off
+    $showans = ($numParts > 0 ||
+      (!empty($qsettings['jump_to_answer']) && !empty($qver['jumptoans'])));
+
     $trylimit = $qsettings['tries_max'];
     $usedAutosave = array();
 
