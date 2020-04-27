@@ -123,7 +123,14 @@ class DrawingScorePart implements ScorePart
             $settings[2] = -0.5;
             $settings[3] = 0.5;
         }
-        if ($snaptogrid>0) {
+        if (!isset($snaptogrid)) {
+    			$snaptogrid = 0;
+        } else {
+          $snapparts = explode(':', $snaptogrid);
+          $snapparts = array_map('evalbasic', $snapparts);
+          $snaptogrid = implode(':', $snapparts);
+        }
+        if ($snaptogrid !== 0) {
             list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
             if (abs($newwidth - $settings[6])/$settings[6]<.1) {
                 $settings[6] = $newwidth;
