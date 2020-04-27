@@ -31,6 +31,7 @@ if ($myrights<20) {
 } else {
 	//data manipulation here
 	$useeditor = 1;
+
 	if (isset($_GET['seed'])) {
 		$seed = Sanitize::onlyInt($_GET['seed']);
 		$attempt = 0;
@@ -62,7 +63,11 @@ if ($myrights<20) {
 		}
 	}
 
-
+  $query = "SELECT imas_users.email,imas_questionset.* ";
+	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id=:id";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':id'=>$qsetid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 	$qn = 27;  //question number to use during testing
   $stuanswers = array();
@@ -75,6 +80,40 @@ if ($myrights<20) {
 
 	if (isset($_POST['seed'])) {
 		// Do scoring
+    $scoreEngine = new ScoreEngine($DBH, $GLOBALS['RND']);
+
+    $scoreQuestionParams = new ScoreQuestionParams();
+    $scoreQuestionParams
+        ->setUserRights($myrights)
+        ->setRandWrapper($GLOBALS['RND'])
+        ->setQuestionNumber($qn)
+        ->setQuestionData($line)
+        ->setAssessmentId(0)
+        ->setDbQuestionSetId($qsetid)
+        ->setQuestionSeed($seed)
+        ->setGivenAnswer($_POST['qn'.$qn])
+        ->setAttemptNumber($attemptn)
+        ->setAllQuestionAnswers($stuanswers)
+        ->setAllQuestionAnswersAsNum($stuanswersval)
+        ->setQnpointval(1);
+
+    $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
+
+    $scores = $scoreResult['scores'];
+    $rawparts = $scoreResult['rawScores'];
+    $partla = $scoreResult['lastAnswerAsGiven'];
+    $partlaNum = $scoreResult['lastAnswerAsNumber'];
+
+    $parts_to_score = true; // TODO: adjust based on submitted parts?
+
+    foreach ($partla as $k=>$v) {
+      if ($parts_to_score === true || !empty($parts_to_score[$k])) {
+        $stuanswers[$qn+1][$k] = $v;
+        $stuanswersval[$qn+1][$k] = $partlaNum[$k];
+        $lastraw[$k] = $rawparts[$k];
+      }
+    }
+		$score = implode('~', $scores);
 		$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
@@ -98,11 +137,6 @@ if ($myrights<20) {
 	if (isset($_GET['fixedseeds'])) {
 		$page_formAction .=  "&fixedseeds=1";
 	}
-	$query = "SELECT imas_users.email,imas_questionset.* ";
-	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id=:id";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':id'=>$qsetid));
-	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 	$lastmod = date("m/d/y g:i a",$line['lastmoddate']);
 
@@ -157,7 +191,8 @@ $placeinhead .= "<script>
     window.$(qwrap).find('select.ansgrn').after(svgchk);
     window.$(qwrap).find('select.ansyel').after(svgychk);
     window.$(qwrap).find('select.ansred').after(svgx);
-  }</script>";
+  }
+  </script>";
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -207,6 +242,32 @@ if ($overwriteBody==1) {
 				window.opener.sethighlightrow(-1);
 			}
 		});
+    function doonsubmit(form) {
+      for (let k in window.callbackstack) {
+        k = parseInt(k);
+        window.callbackstack[k](k);
+      }
+      if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+      window.MQeditor.resetEditor();
+      //window.imathasAssess.clearTips();
+      const qn = <?php echo $qn;?>;
+      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn + 1) + '\\d{3})');
+      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
+        if (el.name.match(regex)) {
+          valstr = window.imathasAssess.preSubmit(el.name.substr(2));
+          if (valstr !== false) {
+            $(form).append($('input', {
+              type: 'hidden',
+              name: el.name + '-val',
+              value: valstr
+            }));
+          }
+          if (el.type !== 'radio' && el.type !== 'checkbox' && el.type !== 'file') {
+            el.value = window.imathasAssess.preSubmitString(el.name, el.value);
+          }
+        }
+      });
+    }
 	</script>
 	<?php
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
@@ -298,9 +359,8 @@ if ($overwriteBody==1) {
 	echo $page_scoreMsg;
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
-	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this,true,true)\">\n";
+	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this)\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
-	echo "<input type=hidden name=attempt value=\"" . Sanitize::onlyInt($attempt) . "\">\n";
 
   // DO DISPLAY
   $questionParams = new QuestionParams();
@@ -337,7 +397,7 @@ if ($overwriteBody==1) {
     $jsparams['ans'] = $question->getCorrectAnswersForParts();
     $jsparams['stuans'] = $stuanswers[$qn+1];
   }
-  echo '<div class="questionwrap">';
+  echo '<div class="questionwrap" id="questionwrap'.$qn.'">';
   echo $question->getQuestionContent();
   echo '</div>';
   echo '<script>$(function() {
@@ -427,6 +487,11 @@ if ($overwriteBody==1) {
 		echo '<p>'._('UniqueID: ').Sanitize::encodeStringForDisplay($line['uniqueid']).'</p>';
 	}
 }
+$placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
+  <span id="ehddtext"></span>
+  <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
+</div>
+<div id="eh" class="eh"></div>';
 require("../footer.php");
 
 ?>
