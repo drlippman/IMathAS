@@ -98,7 +98,12 @@ class AssessStandalone {
   function displayQuestion($qn, $includeCorrect=false) {
     $qsid = $this->state['qsid'][$qn];
     $attemptn = empty($this->state['partattemptn'][$qn]) ? 0 : max($this->state['partattemptn'][$qn]);
-
+    $seqPartDone = array();
+    if (!empty($this->state['rawscores'][$qn])) {
+      foreach ($this->state['rawscores'][$qn] as $pn=>$sc) {
+        $seqPartDone[$pn] = ($sc>.98);
+      }
+    }
     $questionParams = new QuestionParams();
     $questionParams
         ->setDbQuestionSetId($qsid)
@@ -117,7 +122,8 @@ class AssessStandalone {
         ->setAllQuestionAnswersAsNum($this->state['stuanswersval'])
         ->setScoreNonZero($this->state['scorenonzero'])
         ->setScoreIsCorrect($this->state['scoreiscorrect'])
-        ->setLastRawScores($this->state['rawscores'][$qn]);
+        ->setLastRawScores($this->state['rawscores'][$qn])
+        ->setSeqPartDone($seqPartDone);;
 
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
