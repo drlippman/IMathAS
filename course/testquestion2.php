@@ -4,17 +4,8 @@
 
 /*** master php includes *******/
 require("../init.php");
-require_once('../assess2/questions/QuestionGenerator.php');
-require_once('../assess2/questions/models/QuestionParams.php');
-require_once('../assess2/questions/models/ShowAnswer.php');
-require_once('../assess2/questions/ScoreEngine.php');
-require_once('../assess2/questions/models/ScoreQuestionParams.php');
+require_once('../assess2/AssessStandalone.php');
 
-use IMathAS\assess2\questions\QuestionGenerator;
-use IMathAS\assess2\questions\models\QuestionParams;
-use IMathAS\assess2\questions\models\ShowAnswer;
-use IMathAS\assess2\questions\ScoreEngine;
-use IMathAS\assess2\questions\models\ScoreQuestionParams;
 $assessver = 2;
 $courseUIver = 2;
 
@@ -32,16 +23,6 @@ if ($myrights<20) {
 	//data manipulation here
 	$useeditor = 1;
 
-	if (isset($_GET['seed'])) {
-		$seed = Sanitize::onlyInt($_GET['seed']);
-		$attempt = 0;
-	} else if (!isset($_POST['seed']) || isset($_POST['regen'])) {
-		$seed = rand(0,10000);
-		$attempt = 0;
-	} else {
-		$seed = Sanitize::onlyInt($_POST['seed']);
-		$attempt = $_POST['attempt']+1;
-	}
 	if (isset($_GET['onlychk']) && $_GET['onlychk']==1) {
 		$onlychk = 1;
 	} else {
@@ -69,50 +50,39 @@ if ($myrights<20) {
 	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
-	$qn = 27;  //question number to use during testing
-  $stuanswers = array();
-  $stuanswersval = array();
-  $lastraw = array();
-  $scorenonzero = array($qn => false);
-  $scoreiscorrect = array($qn => false);
-  $partattemptn = array($qn => array());
-  $attemptn = 0;
+  $a2 = new AssessStandalone($DBH);
+  $a2->setQuestionData($line['id'], $line);
 
-	if (isset($_POST['seed'])) {
-		// Do scoring
-    $scoreEngine = new ScoreEngine($DBH, $GLOBALS['RND']);
+  $qn = 27;  //question number to use during testing
+  if (isset($_POST['state'])) {
+    $state = json_decode($_POST['state'], true);
+  } else {
+    if (isset($_GET['seed'])) {
+  		$seed = Sanitize::onlyInt($_GET['seed']);
+  	} else {
+  		$seed = rand(0,10000);
+  	}
+    $state = array(
+      'seeds' => array($qn => $seed),
+      'qsid' => array($qn => $qsetid),
+      'stuanswers' => array(),
+      'stuanswersval' => array(),
+      'scorenonzero' => array(($qn+1) => false),
+      'scoreiscorrect' => array(($qn+1) => false),
+      'partattemptn' => array($qn => array()),
+      'rawscores' => array($qn => array())
+    );
+  }
+  $a2->setState($state);
 
-    $scoreQuestionParams = new ScoreQuestionParams();
-    $scoreQuestionParams
-        ->setUserRights($myrights)
-        ->setRandWrapper($GLOBALS['RND'])
-        ->setQuestionNumber($qn)
-        ->setQuestionData($line)
-        ->setAssessmentId(0)
-        ->setDbQuestionSetId($qsetid)
-        ->setQuestionSeed($seed)
-        ->setGivenAnswer($_POST['qn'.$qn])
-        ->setAttemptNumber($attemptn)
-        ->setAllQuestionAnswers($stuanswers)
-        ->setAllQuestionAnswersAsNum($stuanswersval)
-        ->setQnpointval(1);
+	if (isset($_POST['toscoreqn'])) {
+    $toscoreqn = json_decode($_POST['toscoreqn'], true);
+    $parts_to_score = array();
+    foreach ($toscoreqn[$qn] as $pn) {
+      $parts_to_score[$pn] = true;
+    };
+    $scores = $a2->scoreQuestion($qn, $parts_to_score);
 
-    $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
-
-    $scores = $scoreResult['scores'];
-    $rawparts = $scoreResult['rawScores'];
-    $partla = $scoreResult['lastAnswerAsGiven'];
-    $partlaNum = $scoreResult['lastAnswerAsNumber'];
-
-    $parts_to_score = true; // TODO: adjust based on submitted parts?
-
-    foreach ($partla as $k=>$v) {
-      if ($parts_to_score === true || !empty($parts_to_score[$k])) {
-        $stuanswers[$qn+1][$k] = $v;
-        $stuanswersval[$qn+1][$k] = $partlaNum[$k];
-        $lastraw[$k] = $rawparts[$k];
-      }
-    }
 		$score = implode('~', $scores);
 		$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
@@ -165,34 +135,10 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=041920" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=041920" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
-$placeinhead .= "<script>
-  function initq(jsparams) {
-    var qwrap = document.getElementById('questionwrap');
-    setTimeout(window.drawPics, 100);
-    window.rendermathnode(qwrap);
-    window.initSageCell(qwrap);
-    window.initlinkmarkup(qwrap);
 
-    let svgchk = '<svg class=\"scoremarker\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" stroke=\"green\" stroke-width=\"3\" fill=\"none\" role=\"img\" aria-label=\"' + _('icons.correct') + '\">';
-    svgchk += '<polyline points=\"20 6 9 17 4 12\"></polyline></svg>';
-    let svgychk = '<svg class=\"scoremarker\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" stroke=\"rgb(255,187,0)\" stroke-width=\"3\" fill=\"none\" role=\"img\" aria-label=\"' + _('icons.partial') + '\">';
-    svgychk += '<path d=\"M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z\" /></svg>';
-    let svgx = '<svg class=\"scoremarker\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" stroke=\"rgb(153,0,0)\" stroke-width=\"3\" fill=\"none\" role=\"img\" aria-label=\"' + _('icons.incorrect') + '\">';
-    svgx += '<path d=\"M18 6 L6 18 M6 6 L18 18\" /></svg>';
-    window.$(qwrap).find('.scoremarker').remove();
-    window.$(qwrap).find('div.ansgrn,table.ansgrn').append(svgchk);
-    window.$(qwrap).find('div.ansyel,table.ansyel').append(svgychk);
-    window.$(qwrap).find('div.ansred,table.ansred').append(svgx);
-
-    window.imathasAssess.init(jsparams, true);
-
-    window.$(qwrap).find('select.ansgrn').after(svgchk);
-    window.$(qwrap).find('select.ansyel').after(svgychk);
-    window.$(qwrap).find('select.ansred').after(svgx);
-  }
-  </script>";
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -242,32 +188,6 @@ if ($overwriteBody==1) {
 				window.opener.sethighlightrow(-1);
 			}
 		});
-    function doonsubmit(form) {
-      for (let k in window.callbackstack) {
-        k = parseInt(k);
-        window.callbackstack[k](k);
-      }
-      if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
-      window.MQeditor.resetEditor();
-      //window.imathasAssess.clearTips();
-      const qn = <?php echo $qn;?>;
-      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn + 1) + '\\d{3})');
-      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
-        if (el.name.match(regex)) {
-          valstr = window.imathasAssess.preSubmit(el.name.substr(2));
-          if (valstr !== false) {
-            $(form).append($('input', {
-              type: 'hidden',
-              name: el.name + '-val',
-              value: valstr
-            }));
-          }
-          if (el.type !== 'radio' && el.type !== 'checkbox' && el.type !== 'file') {
-            el.value = window.imathasAssess.preSubmitString(el.name, el.value);
-          }
-        }
-      });
-    }
 	</script>
 	<?php
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
@@ -359,63 +279,23 @@ if ($overwriteBody==1) {
 	echo $page_scoreMsg;
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
-	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this)\">\n";
+	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"return dopresubmit($qn,false)\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 
   // DO DISPLAY
-  $questionParams = new QuestionParams();
-  $questionParams
-      ->setDbQuestionSetId($qsetid)
-      ->setQuestionData($line)
-      ->setQuestionNumber($qn)
-      ->setQuestionId(0)
-      ->setAssessmentId(0)
-      ->setQuestionSeed($seed)
-      ->setShowHints(true)
-      ->setShowAnswer(true)
-      ->setShowAnswerParts(array())
-      ->setShowAnswerButton(true)
-      ->setStudentAttemptNumber($attemptn)
-      ->setStudentPartAttemptCount($partattemptn)
-      ->setAllQuestionAnswers($stuanswers)
-      ->setAllQuestionAnswersAsNum($stuanswersval)
-      ->setScoreNonZero($scorenonzero)
-      ->setScoreIsCorrect($scoreiscorrect)
-      ->setLastRawScores($lastraw);
-
-  $questionGenerator = new QuestionGenerator($DBH,
-      $GLOBALS['RND'], $questionParams);
-  $question = $questionGenerator->getQuestion();
-
-  $jsparams = $question->getJsParams();
-  $jsparams['helps'] = $question->getExternalReferences();
-  $answeights = $question->getAnswerPartWeights();
-  /*if (count($scripts) > 0) {
-    $jsparams['scripts'] = $scripts;
-  }*/
-  if ($includeCorrect) {
-    $jsparams['ans'] = $question->getCorrectAnswersForParts();
-    $jsparams['stuans'] = $stuanswers[$qn+1];
-  }
-  echo '<div class="questionwrap" id="questionwrap'.$qn.'">';
-  echo $question->getQuestionContent();
-  echo '</div>';
+  $disp = $a2->displayQuestion($qn, true);
+  echo '<div class="questionwrap questionpane">';
+  echo '<div class="question" id="questionwrap'.$qn.'">';
+  echo $disp['html'];
+  echo '</div></div>';
   echo '<script>$(function() {
-    initq('.json_encode($jsparams).');
+    initq('.$qn.','.json_encode($disp['jsparams']).');
   });</script>';
-
-	echo "<input type=submit value=\""._("Submit")."\"><input type=submit name=\"regen\" value=\""._("Submit and Regen")."\">\n";
-	echo "<input type=button value=\""._("White Background")."\" onClick=\"whiteout()\"/>";
-	echo "<input type=button value=\""._("Show HTML")."\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
+  echo '<input type=hidden name=toscoreqn value=""/>';
+  echo '<input type=hidden name=state value="'. Sanitize::encodeStringForDisplay(json_encode($a2->getState())) .'" />';
+	echo "<input type=submit value=\""._("Submit")."\">";
+  echo '<button type=button onclick="location.href = location.href">'._('New Version').'</button>';
 	echo "</form>\n";
-
-	/*echo '<code id="qhtml" style="display:none">';
-	$message = displayq($qn,$qsetid,$seed,false,false,0,true);
-	$message = printfilter($message);
-	$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-	$message = str_replacE('`','\`',$message);
-	echo htmlentities($message);
-	echo '</code>';*/
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
 		$sendtype = 'msg';
