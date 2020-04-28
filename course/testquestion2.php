@@ -127,6 +127,7 @@ if ($myrights<20) {
 /******* begin html output ********/
 $_SESSION['coursetheme'] = $coursetheme;
 $flexwidth = true; //tells header to use non _fw stylesheet
+$nologo = true;
 
 $useeqnhelper = $eqnhelper;
 $lastupdate = '20200422';

@@ -175,7 +175,18 @@ class AssessStandalone {
 
     foreach ($partla as $k=>$v) {
       if ($parts_to_score === true || !empty($parts_to_score[$k])) {
-        if (count($rawparts)>1) {
+        if (!isset($this->state['partattemptn'][$qn])) {
+          $this->state['partattemptn'][$qn] = array($k=>1);
+        } else {
+          $this->state['partattemptn'][$qn][$k]++;
+        }
+        if (count($partla)>1) {
+          if (!is_array($this->state['stuanswers'][$qn+1])) {
+            $this->state['stuanswers'][$qn+1] = array();
+          }
+          if (!is_array($this->state['stuanswersval'][$qn+1])) {
+            $this->state['stuanswersval'][$qn+1] = array();
+          }
           $this->state['stuanswers'][$qn+1][$k] = $v;
           $this->state['stuanswersval'][$qn+1][$k] = $partlaNum[$k];
         } else {
