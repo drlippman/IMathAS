@@ -956,10 +956,12 @@ $address = $GLOBALS['basesiteurl'] . '/course';
 if ($overwriteBody==1) {
 	echo $body;
 } else {
+  $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+
 ?>
 <script type="text/javascript">
 function previewq(formn,loc,qn) {
-	var addr = '<?php echo $imasroot ?>/course/testquestion.php?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
+	var addr = '<?php echo $imasroot ?>/course/<?php echo $testqpage;?>?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
 	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
 	previewpop.focus();
 }

@@ -68,7 +68,7 @@
 	$placeinhead = '<script type="text/javascript">';
 	$placeinhead .= '$(function() {$("a[href*=\'gradeallq\']").attr("title","'._('Grade this question for all students').'");});';
 	$placeinhead .= 'function previewq(qn) {';
-	$placeinhead .= "var addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid='+qn;";
+	$placeinhead .= "var addr = '$imasroot/course/testquestion2.php?cid=$cid&qsetid='+qn;";
 	$placeinhead .= "window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
 	$placeinhead .= "}\n</script>";
 	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';

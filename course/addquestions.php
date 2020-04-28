@@ -430,9 +430,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	$address = $GLOBALS['basesiteurl'] . "/course/$addassess?cid=$cid&aid=$aid";
-
+	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 	$placeinhead = "<script type=\"text/javascript\">
-		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
+		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
 		var addqaddr = '$address';
 		var assessver = '$aver';
 		</script>";

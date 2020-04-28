@@ -164,7 +164,7 @@
 		$pagetitle = "Question Settings";
 		$placeinhead = '<script type="text/javascript">
 			function previewq(qn) {
-			  previewpop = window.open(imasroot+"/course/testquestion.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
+			  previewpop = window.open(imasroot+"/course/testquestion2.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
 			  previewpop.focus();
 			}
 			function chgisgrouped() {
