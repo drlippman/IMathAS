@@ -138,7 +138,7 @@ $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=041920" 
 $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=041920" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
-
+$placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -284,6 +284,7 @@ if ($overwriteBody==1) {
 
   // DO DISPLAY
   $disp = $a2->displayQuestion($qn, true);
+  echo '<hr/>';
   echo '<div class="questionwrap questionpane">';
   echo '<div class="question" id="questionwrap'.$qn.'">';
   echo $disp['html'];
@@ -293,7 +294,8 @@ if ($overwriteBody==1) {
   });</script>';
   echo '<input type=hidden name=toscoreqn value=""/>';
   echo '<input type=hidden name=state value="'. Sanitize::encodeStringForDisplay(json_encode($a2->getState())) .'" />';
-	echo "<input type=submit value=\""._("Submit")."\">";
+	echo '<hr/>';
+  echo "<input type=submit value=\""._("Submit")."\">";
   echo '<button type=button onclick="location.href = location.href">'._('New Version').'</button>';
 	echo "</form>\n";
 
