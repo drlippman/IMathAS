@@ -369,6 +369,9 @@ if ($overwriteBody==1) {
 	if ($myrights==100) {
 		echo '<p>'._('UniqueID: ').Sanitize::encodeStringForDisplay($line['uniqueid']).'</p>';
 	}
+  echo '<p>'._('Testing using the new interface.');
+  echo ' <a href="testquestion.php?cid='.$cid.'&qsetid='.$qsetid.'">';
+  echo _('Test in old interface').'</a></p>';
 }
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span id="ehddtext"></span>

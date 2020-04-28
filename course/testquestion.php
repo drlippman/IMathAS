@@ -21,6 +21,7 @@ if ($myrights<20) {
 } else {
 	//data manipulation here
 	$useeditor = 1;
+  $qsetid = Sanitize::onlyInt($_GET['qsetid']);
 	if (isset($_GET['seed'])) {
 		$seed = Sanitize::onlyInt($_GET['seed']);
 		$attempt = 0;
@@ -61,7 +62,7 @@ if ($myrights<20) {
 	$scores[$qn] = -1;
 
 	if (isset($_POST['seed'])) {
-		list($score,$rawscores[$qn]) = scoreq($qn,$_GET['qsetid'],$_POST['seed'],$_POST['qn'.$qn],$attempt-1);
+		list($score,$rawscores[$qn]) = scoreq($qn,$qsetid,$_POST['seed'],$_POST['qn'.$qn],$attempt-1);
 		$scores[$qn] = $score;
 		$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
@@ -69,7 +70,7 @@ if ($myrights<20) {
 		$_SESSION['choicemap'] = array();
 	}
   $cid = Sanitize::courseId($_GET['cid']);
-	$page_formAction = "testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['qsetid']);
+	$page_formAction = "testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($qsetid);
 
 	if (isset($_POST['usecheck'])) {
 		$page_formAction .=  "&checked=".Sanitize::encodeUrlParam($_GET['usecheck']);
@@ -89,7 +90,7 @@ if ($myrights<20) {
 	$query = "SELECT imas_users.email,imas_questionset.* ";
 	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id=:id";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':id'=>$_GET['qsetid']));
+	$stm->execute(array(':id'=>$qsetid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 	$lastmod = date("m/d/y g:i a",$line['lastmoddate']);
@@ -105,7 +106,7 @@ if ($myrights<20) {
 		$eqnhelper = 0;
 	}
 	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
-	$resultLibNames->execute(array(':qsetid'=>$_GET['qsetid']));
+	$resultLibNames->execute(array(':qsetid'=>$qsetid));
 }
 
 /******* begin html output ********/
@@ -121,7 +122,7 @@ if ($overwriteBody==1) {
 	echo $body;
 } else { //DISPLAY BLOCK HERE
 	$useeditor = 1;
-	$brokenurl = $GLOBALS['basesiteurl'] . "/course/savebrokenqflag.php?qsetid=".Sanitize::encodeUrlParam($_GET['qsetid']).'&flag=';
+	$brokenurl = $GLOBALS['basesiteurl'] . "/course/savebrokenqflag.php?qsetid=".Sanitize::encodeUrlParam($qsetid).'&flag=';
 	?>
 	<script type="text/javascript">
 		var BrokenFlagsaveurl = '<?php echo $brokenurl;?>';
@@ -271,14 +272,14 @@ if ($overwriteBody==1) {
 	if ($_GET['cid']=="admin") { //trigger debug messages
 		$teacherid = "admin";
 	}
-	displayq($qn,$_GET['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
+	displayq($qn,$qsetid,$seed,true,true,$attempt,false,false,false,$colors);
 	echo "<input type=submit value=\""._("Submit")."\"><input type=submit name=\"regen\" value=\""._("Submit and Regen")."\">\n";
 	echo "<input type=button value=\""._("White Background")."\" onClick=\"whiteout()\"/>";
 	echo "<input type=button value=\""._("Show HTML")."\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
 	echo "</form>\n";
 
 	echo '<code id="qhtml" style="display:none">';
-	$message = displayq($qn,$_GET['qsetid'],$seed,false,false,0,true);
+	$message = displayq($qn,$qsetid,$seed,false,false,0,true);
 	$message = printfilter($message);
 	$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 	$message = str_replacE('`','\`',$message);
@@ -306,8 +307,8 @@ if ($overwriteBody==1) {
 		}
 	}
 
-	printf("<p>"._("Question id:")." %s.  ", Sanitize::encodeStringForDisplay($_GET['qsetid']));
-	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$_GET['qsetid']}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems")."</p>";
+	printf("<p>"._("Question id:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
+	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$qsetid}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems")."</p>";
 
 	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." %s</p>", Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
@@ -354,6 +355,9 @@ if ($overwriteBody==1) {
 	if ($myrights==100) {
 		echo '<p>'._('UniqueID: ').Sanitize::encodeStringForDisplay($line['uniqueid']).'</p>';
 	}
+  echo '<p>'._('Testing using the old interface.');
+  echo ' <a href="testquestion2.php?cid='.$cid.'&qsetid='.$qsetid.'">';
+  echo _('Test in new interface').'</a></p>';
 }
 require("../footer.php");
 

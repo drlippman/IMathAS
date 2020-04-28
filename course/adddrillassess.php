@@ -277,8 +277,9 @@ if ($stm->rowCount()>0) {
 }
 
 $useeditor = "summary";
+$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 $placeinhead = "<script type=\"text/javascript\">
-		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
+		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
 		</script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js"></script>';
