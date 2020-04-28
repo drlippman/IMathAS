@@ -1359,12 +1359,12 @@ class AssessRecord
         $this->setAnsweights($qn, $out['answeights'], $ver);
       }
       if ($out['tries_max'] == 1) {
-        $out['parts_entered'] = $this->getHasAutosaves($qn, $out['answeights']);
+        $out['parts_entered'] = $this->getPartsEntered($qn, $curq['tries'], $out['answeights']);
       }
     } else {
       $out['html'] = null;
       if ($out['tries_max'] == 1) {
-        $out['parts_entered'] = $this->getHasAutosaves($qn, $answeights);
+        $out['parts_entered'] = $this->getPartsEntered($qn, $curq['tries'], $answeights);
       }
       if ($ver == 'last' && ($this->assess_info->getSetting('showwork') & 2) == 2) {
         $qver = $this->getQuestionVer($qn, $ver);
@@ -1674,6 +1674,7 @@ class AssessRecord
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
     list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
+    $seqPartDone = array();
 
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
@@ -1750,6 +1751,14 @@ class AssessRecord
       if ($showscores && $partattemptn[$pn] > 0 && !isset($autosave['stuans'][$pn])) {
         $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
       }
+      if ($showscores) {
+        // move on if correct or out of tries
+        $seqPartDone[$pn] = ($partattemptn[$pn] === $trylimit ||
+          $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] > .98);
+      } else {
+        // move on if attempted
+        $seqPartDone[$pn] = ($partattemptn[$pn] > 0);
+      }
     }
     $attemptn = (count($partattemptn) == 0) ? 0 : max($partattemptn);
     $questionParams = new QuestionParams();
@@ -1770,7 +1779,8 @@ class AssessRecord
         ->setAllQuestionAnswersAsNum($stuanswersval)
         ->setScoreNonZero($scorenonzero)
         ->setScoreIsCorrect($scoreiscorrect)
-        ->setLastRawScores($qcolors);
+        ->setLastRawScores($qcolors)
+        ->setSeqPartDone($seqPartDone);
     if ($this->dispqn !== null) {
       $questionParams->setDisplayQuestionNumber($this->dispqn);
     }
@@ -3275,6 +3285,30 @@ class AssessRecord
     $this->parseData();
     return array_keys($this->data['autosaves']);
   }
+
+  /**
+   * Get what parts of which quesitons have autosaves or submissions
+   * @return array  qn=>array of part numbers
+   */
+   public function getPartsEntered($qn, $tries, $answeights) {
+     if (!is_array($answeights)) {
+       return array();
+     }
+     $out = array_fill(0, count($answeights), 0);
+     $this->parseData();
+
+     if (isset($this->data['autosaves'][$qn])) {
+       foreach ($this->data['autosaves'][$qn]['stuans'] as $pn=>$ans) {
+         $out[$pn] = 1;
+       }
+     }
+     foreach ($tries as $pn=>$try) {
+       if (!empty($try)) {
+         $out[$pn] = 1;
+       }
+     }
+     return $out;
+   }
 
   /**
    * Get what parts of which questions have autosaves

@@ -365,6 +365,18 @@ div.question td img, div.question th img {
 	max-width: 100%;
 }
 
+p.seqsep {
+  font-size: 80%;
+  color: #757575;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 5px;
+  padding: 2px 0;
+  text-align: right;
+}
+p.seqsep:first-child {
+  margin-top: 0;
+}
+
 @media only screen and (max-width: 480px) {
   .questionpane {
     margin: 15px 4px;

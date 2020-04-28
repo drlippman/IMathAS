@@ -198,6 +198,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	$toevalsoln = str_replace('\\','\\\\',$toevalsoln);
 	$toevalsoln = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalsoln);
 
+	$toevalqtxt = preg_replace('~(<p[^>]*>|<br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?>)~', '', $toevalqtxt);
+
 	//$toevalqtxt = str_replace('"','\\"',$toevalqtxt);
 	//echo "toeval: $toevalqtxt";
 	if ($doshowans) {

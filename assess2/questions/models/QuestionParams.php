@@ -20,6 +20,7 @@ class QuestionParams
     private $allQuestionAnswersAsNum;   // Orig: $GLOBALS['stuanswersval']
     private $studentAttemptNumber;
     private $studentPartAttemptCount;
+    private $seqPartDone;
     private $lastRawScores;     // All of a student's scores on their last attempt.
 
     // Orig: $doshowans - int, from displayq2.php
@@ -291,6 +292,28 @@ class QuestionParams
     public function setStudentPartAttemptCount(?array $studentPartAttemptCount): QuestionParams
     {
         $this->studentPartAttemptCount = $studentPartAttemptCount;
+        return $this;
+    }
+
+    /**
+     * Whether the part is "done" for purposes of showing the next in sequence
+     *
+     * @return array
+     */
+    public function getSeqPartDone(): ?array
+    {
+        return $this->seqPartDone;
+    }
+
+    /**
+     * Whether the part is "done" for purposes of showing the next in sequence
+     *
+     * @param array $seqPartDone
+     * @return QuestionParams
+     */
+    public function setSeqPartDone(?array $seqPartDone): QuestionParams
+    {
+        $this->seqPartDone = $seqPartDone;
         return $this;
     }
 

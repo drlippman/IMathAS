@@ -434,6 +434,8 @@ export const actions = {
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
     }
+    const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
+      store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
 
     window.$.ajax({
       url: store.APIbase + 'scorequestion.php' + store.queryString,
@@ -497,9 +499,15 @@ export const actions = {
             Router.push('/summary');
           }
         } else if (qns.length === 1) {
+          store.assessInfo.questions[qns[0]].hadSeqNext = hasSeqNext;
           // scroll to score result
           Vue.nextTick(() => {
-            var el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
+            var el;
+            if (!hasSeqNext) {
+              el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
+            } else {
+              el = window.$('#questionwrap' + qns[0]).find('.seqsep').last().next()[0];
+            }
             var bounding = el.getBoundingClientRect();
             if (bounding.top < 0 || bounding.bottom > document.documentElement.clientHeight) {
               el.scrollIntoView();
