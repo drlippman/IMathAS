@@ -86,6 +86,7 @@
 	} else {
 		$frompot = 0;
 	}
+	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
 	$errmsg = '';
@@ -502,7 +503,7 @@
 			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
 		}
 		if ($_POST['test']=="Save and Test Question") {
-			$outputmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
+			$outputmsg .= "<script>addr = '$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
 			//echo "function previewit() {";
 			$outputmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
 			$outputmsg .= "previewpop.focus();";
@@ -1293,7 +1294,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				// Change form action url and testing address
 				if (formAction.indexOf("moddataset.php") > -1) {
 					quickSaveQuestion.url = formAction;
-					quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid="; ?>' + res.id
+					quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid="; ?>' + res.id
 				} else {
 					quickSaveQuestion.errorFunc();
 				}
@@ -1358,7 +1359,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		});
 	}
 	quickSaveQuestion.url = "<?php echo $formAction; // Sanitized near line 806 ?>&quick=1";
-	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id']); ?>';
+	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id']); ?>';
 	// Method to handle errors...
 	quickSaveQuestion.errorFunc = function(){
 		$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");

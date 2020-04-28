@@ -1329,7 +1329,7 @@ function gbtable() {
 		if (!$canviewall && (
 			($sa[$i]=="never") ||
 		 	($sa[$i]=='after_due' && $now < $thised) ||
-			($sa[$i]=='after_take' && !$hasSubmittedTake)
+			($sa[$i]=='after_take' && !$hasSubmittedTake && intval($l['status']) != 16)
 		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][3] = 0;  //no other info

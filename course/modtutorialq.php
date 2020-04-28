@@ -458,8 +458,8 @@ if (isset($_POST['text'])) {
 			$stm->execute(array(':libid'=>$libid, ':qsetid'=>$id, ':now'=>$now));
 		}
 	}
-
-	$editmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid=" . Sanitize::onlyInt($id) . "';";
+	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+	$editmsg .= "<script>addr = '$imasroot/course/$testqpage?cid=$cid&qsetid=" . Sanitize::onlyInt($id) . "';";
 			//echo "function previewit() {";
 	$editmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
 	$editmsg .=  "previewpop.focus();";
