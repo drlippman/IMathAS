@@ -1551,6 +1551,7 @@ function drawMouseDown(ev) {
 	//see if mouse click is inside a target; if so, select it (unless currently in a line from another target)
 	if (curTarget==null || (curLine==null && curTPcurve==null && curIneqcurve==null)) {
 		for (i in targets) {
+			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
 				curTarget = i;
@@ -1978,6 +1979,7 @@ function drawMouseMove(ev) {
 	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
 	//if (curTarget==null) {
 		for (i in targets) {
+			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
 				tempTarget = i;

@@ -193,8 +193,7 @@
             </div>
             <div class="scrollpane">
               <gb-question
-                class = "questionpane"
-                v-show = "showQuestion[qn]"
+                :class = "{'questionpane':true, 'inactive':!showQuestion[qn]}"
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
               />
