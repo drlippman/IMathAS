@@ -41,7 +41,6 @@ export default {
             const drawheight = this.tries[pn][tn][2][7];
             partout[tn] = '<canvas id="canvasGBR' + id + '" width=' + drawwidth + ' height=' + drawheight + '></canvas>';
             partout[tn] += '<input type="hidden" id="qnGBR' + id + '"/>';
-            // partout[tn] += '</div></div>';
           } else {
             partout[tn] = this.tries[pn][tn];
           }

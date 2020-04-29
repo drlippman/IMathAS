@@ -1259,9 +1259,10 @@ function parseShortScript(sscript,gw,gh) {
 
 
 
-function drawPics() {
+function drawPics(base) {
   var index, nd;
-  pictures = document.getElementsByTagName("embed");
+  base = base || document;
+  pictures = base.getElementsByTagName("embed");
  // might be needed if setTimeout on parseShortScript isn't working
 
  	if (!ASnoSVG && isOldIE) {

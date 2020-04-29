@@ -168,6 +168,16 @@ function addA11yTarget(canvdata, thisdrawla) {
 	var imgwidth = canvdata[7];
 	var imgheight = canvdata[8];
 	var tarel = document.getElementById("a11ydraw"+tarnum);
+	if (tarel == null) {
+		var canvel = document.getElementById("canvas"+tarnum);
+		if (canvel) { // non-interactive previous attempt display
+			var newdiv = $("<div>").append($("<p>", {text: _('Drawn Elements:')}));
+			var tarel = document.createElement("ul");
+			tarel.setAttribute("id", "allydraw" + tarnum);
+			newdiv.append(tarel);
+			$(canvel).replaceWith(newdiv);
+		}
+	}
 	targetOuts[tarnum] = document.getElementById('qn'+tarnum);
 	targets[tarnum] = {el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
@@ -410,8 +420,8 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		targets[tarnum].snaptogridx = 1*snaptogrid[0];
 		targets[tarnum].snaptogridy = 1*snaptogrid[1];
 	} else {
-		targets[tarnum].snaptogridx = snaptogrid;
-		targets[tarnum].snaptogridy = snaptogrid;
+		targets[tarnum].snaptogridx = 1*snaptogrid;
+		targets[tarnum].snaptogridy = 1*snaptogrid;
 	}
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
@@ -431,7 +441,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 	}
 	drawlocky[tarnum] = locky;
 	if (imgpath.match(/initPicture/)) {
-		if ($(tarel).closest('.canvasholder').length == 0) {
+		if ($(tarel).closest('.drawcanvasholder').length == 0) {
 			$(tarel).removeClass("drawcanvas").wrap($("<div>", {
 				class: "drawcanvas",
 				style: "position:relative;width:"+imgwidth+"px;height:"+imgheight+"px"

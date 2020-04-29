@@ -300,15 +300,11 @@
 	$placeinhead .= 'function togglealltries(n) {
 		$("#alltries"+n).toggle();
 		if (!$("#alltries"+n).hasClass("rendered")) {
-			$("#alltries"+n).find(".canvasholder canvas").each(function(i,el) {
+			$("#alltries"+n).find("canvas[id^=canvasGBR]").each(function(i,el) {
 				window.imathasDraw.initCanvases(el.id.substr(6));
-				var idpts = el.id.substr(9).split(/-/);
-				var svg = $("#canvas"+idpts[0]+",#canvas"+((idpts[0]+1)*1000 + idpts[1]))
-					.closest(".drawcanvas").find(".canvasbg svg").clone();
-				svg.attr("id", svg.attr("id") + el.id);
-				svg.appendTo($(el).closest(".drawcanvas").find(".canvasbg"));
 			});
 			$("#alltries"+n).addClass("rendered");
+			window.drawPics(document.getElementById("alltries"+n));
 		}
 	}';
 	$placeinhead .= '</script>';
@@ -607,12 +603,9 @@
 							if ($try[2][0]===null) {
 								$try[2][0] = "";
 							}
-							echo '<div class="drawcanvas" style="position:relative;width:'.$try[2][6].'px;height:'.$try[2][7].'px">';
-							echo '<div class="canvasbg" style="position:absolute;top:0px;left:0px;"></div>';
-							echo '<div class="canvasholder" style="position:relative;top:0;left:0;z-index:2">';
 							echo '<canvas id="canvasGBR'.$id.'" ';
-							echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas></div>';
-							echo '<input type=hidden id="qnGBR'.$id.'"/></div>';
+							echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas>';
+							echo '<input type=hidden id="qnGBR'.$id.'"/>';
 							$la = explode(';;', str_replace(array('(',')'), array('[',']'), $try[1]));
 							if ($la[0] !== '') {
 								$la[0] = '[' . str_replace(';', '],[', $la[0]) . ']';
