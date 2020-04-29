@@ -301,7 +301,6 @@
 		$("#alltries"+n).toggle();
 		if (!$("#alltries"+n).hasClass("rendered")) {
 			$("#alltries"+n).find(".canvasholder canvas").each(function(i,el) {
-				console.log(el);
 				window.imathasDraw.initCanvases(el.id.substr(6));
 				var idpts = el.id.substr(9).split(/-/);
 				var svg = $("#canvas"+idpts[0]+",#canvas"+((idpts[0]+1)*1000 + idpts[1]))
