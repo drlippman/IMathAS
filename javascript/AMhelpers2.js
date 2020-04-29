@@ -420,19 +420,22 @@ function setupDraw(qn) {
   window.drawla[qn] = todraw;
   window.canvases[qn] = allParams[qn].canvas;
   imathasDraw.initCanvases(qn);
-  document.getElementById('drawtools'+qn).addEventListener('click', function(event) {
-    var target = event.target;
-    if (target.hasAttribute('data-drawaction')) {
-      var action = target.getAttribute('data-drawaction');
-      var qn = target.getAttribute('data-qn');
-      if (action === 'clearcanvas') {
-        imathasDraw.clearcanvas(qn);
-      } else if (action === 'settool') {
-        var val = target.getAttribute('data-val');
-        imathasDraw.settool(target, qn, val);
+  var drawtools = document.getElementById('drawtools'+qn);
+  if (drawtools) {
+    drawtools.addEventListener('click', function(event) {
+      var target = event.target;
+      if (target.hasAttribute('data-drawaction')) {
+        var action = target.getAttribute('data-drawaction');
+        var qn = target.getAttribute('data-qn');
+        if (action === 'clearcanvas') {
+          imathasDraw.clearcanvas(qn);
+        } else if (action === 'settool') {
+          var val = target.getAttribute('data-val');
+          imathasDraw.settool(target, qn, val);
+        }
       }
-    }
-  });
+    });
+  }
   var a11ydrawbtn = document.getElementById("qn"+qn).parentNode.querySelector(".a11ydrawadd");
   if (a11ydrawbtn) {
     a11ydrawbtn.addEventListener('click', function(event) {
