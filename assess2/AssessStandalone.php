@@ -142,7 +142,7 @@ class AssessStandalone {
       $jsparams['stuans'] = $stuanswers[$qn+1];
     }
 
-    return array('html' => $qout, 'jsparams' => $jsparams);
+    return array('html' => $qout, 'jsparams' => $jsparams, 'errors'=>$question->getErrors());
   }
 
   /*
@@ -206,7 +206,7 @@ class AssessStandalone {
     $score = array_sum($scores);
     $this->state['scorenonzero'][$qn+1] = ($score > 0);
     $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
-    return $scores;
+    return array('scores'=>$scores, 'raw'=>$rawparts, 'errors'=>$scoreResult['errors']);
   }
 
   private function parseScripts($html) {

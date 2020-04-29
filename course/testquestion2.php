@@ -83,10 +83,17 @@ if ($myrights<20) {
         $parts_to_score[$pn] = true;
       };
     }
-    $scores = $a2->scoreQuestion($qn, $parts_to_score);
+    $res = $a2->scoreQuestion($qn, $parts_to_score);
 
-		$score = implode('~', $scores);
+		$score = implode('~', $res['scores']);
 		$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."/1</p>\n";
+    if (!empty($res['errors'])) {
+      $page_scoreMsg .= '<ul class="small">';
+      foreach ($res['errors'] as $err) {
+        $page_scoreMsg .= '<li>'.Sanitize::encodeStringForDisplay($err).'</li>';
+      }
+      $page_scoreMsg .= '</ul>';
+    }
 	} else {
 		$page_scoreMsg = "";
 		$_SESSION['choicemap'] = array();
@@ -286,8 +293,15 @@ if ($overwriteBody==1) {
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 
   // DO DISPLAY
-  $disp = $a2->displayQuestion($qn, true);
   echo '<hr/>';
+  $disp = $a2->displayQuestion($qn, true);
+  if (!empty($disp['errors'])) {
+    echo '<ul class="small">';
+    foreach ($disp['errors'] as $err) {
+      echo '<li>'.Sanitize::encodeStringForDisplay($err).'</li>';
+    }
+    echo '</ul>';
+  }
   echo '<div class="questionwrap questionpane">';
   echo '<div class="question" id="questionwrap'.$qn.'">';
   echo $disp['html'];
