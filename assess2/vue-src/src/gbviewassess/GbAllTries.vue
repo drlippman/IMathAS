@@ -39,12 +39,8 @@ export default {
             const id = this.qn + '-' + pn + '-' + tn;
             const drawwidth = this.tries[pn][tn][2][6];
             const drawheight = this.tries[pn][tn][2][7];
-            partout[tn] = '<div class="drawcanvas" style="position:relative;width:' + drawwidth + 'px;height:' + drawheight + 'px">';
-            partout[tn] += '<div class="canvasbg" style="position:absolute;top:0px;left:0px;"></div>';
-            partout[tn] += '<div class="canvasholder" style="position:relative;top:0;left:0;z-index:2">';
-            partout[tn] += '<canvas id="canvasGBR' + id + '" width=' + drawwidth + ' height=' + drawheight + '></canvas>';
+            partout[tn] = '<canvas id="canvasGBR' + id + '" width=' + drawwidth + ' height=' + drawheight + '></canvas>';
             partout[tn] += '<input type="hidden" id="qnGBR' + id + '"/>';
-            partout[tn] += '</div></div>';
           } else {
             partout[tn] = this.tries[pn][tn];
           }
@@ -81,10 +77,6 @@ export default {
             window.canvases['GBR' + id].unshift('GBR' + id);
             window.drawla['GBR' + id] = JSON.parse(la);
             window.imathasDraw.initCanvases('GBR' + id);
-            const svg = window.$('#canvas' + this.qn + ',#canvas' + ((this.qn + 1) * 1000 + pn))
-              .closest('.drawcanvas').find('.canvasbg svg').clone();
-            svg.attr('id', svg.attr('id') + 'prev' + tn);
-            svg.appendTo(window.$('#canvasGBR' + id).closest('.drawcanvas').find('.canvasbg'));
           }
         }
       }

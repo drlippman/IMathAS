@@ -168,6 +168,16 @@ function addA11yTarget(canvdata, thisdrawla) {
 	var imgwidth = canvdata[7];
 	var imgheight = canvdata[8];
 	var tarel = document.getElementById("a11ydraw"+tarnum);
+	if (tarel == null) {
+		var canvel = document.getElementById("canvas"+tarnum);
+		if (canvel) { // non-interactive previous attempt display
+			var newdiv = $("<div>").append($("<p>", {text: _('Drawn Elements:')}));
+			var tarel = document.createElement("ul");
+			tarel.setAttribute("id", "allydraw" + tarnum);
+			newdiv.append(tarel);
+			$(canvel).replaceWith(newdiv);
+		}
+	}
 	targetOuts[tarnum] = document.getElementById('qn'+tarnum);
 	targets[tarnum] = {el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
@@ -410,8 +420,8 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		targets[tarnum].snaptogridx = 1*snaptogrid[0];
 		targets[tarnum].snaptogridy = 1*snaptogrid[1];
 	} else {
-		targets[tarnum].snaptogridx = snaptogrid;
-		targets[tarnum].snaptogridy = snaptogrid;
+		targets[tarnum].snaptogridx = 1*snaptogrid;
+		targets[tarnum].snaptogridy = 1*snaptogrid;
 	}
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
@@ -430,7 +440,33 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		drawstyle[tarnum] = 0;
 	}
 	drawlocky[tarnum] = locky;
-	if (imgpath !== '') {
+	if (imgpath.match(/initPicture/)) {
+		if ($(tarel).closest('.drawcanvasholder').length == 0) {
+			$(tarel).removeClass("drawcanvas").wrap($("<div>", {
+				class: "drawcanvas",
+				style: "position:relative;width:"+imgwidth+"px;height:"+imgheight+"px"
+			})).wrap($("<div>", {
+				class: "drawcanvasholder",
+				style: "position:absolute;top:0;left:0;z-index:2"
+			}));
+			$(tarel).closest('.drawcanvas').prepend($('<div>', {
+				class: "canvasbg",
+				style: "position:absolute;top:0;left:0"
+			}).append($("<embed>", {
+				"data-nomag": 1,
+				type: "image/svg+xml",
+				align: "middle",
+				width: imgwidth,
+				height: imgheight,
+				script: imgpath
+			}).attr("width",imgwidth).attr("height",imgheight)));
+		}
+		imgs[tarnum] = null;
+		var oldcurTarget = curTarget;
+		curTarget = tarnum;
+		drawTarget();
+		curTarget = oldcurTarget;
+	} else if (imgpath !== '') {
 		imgs[tarnum] = new Image();
 		imgs[tarnum].onload = function() {
 			var oldcurTarget = curTarget;
@@ -2288,7 +2324,13 @@ function initCanvases(k) {
 			if (canvases[i][1].substr(0,8)=="a11ydraw") {
 				addA11yTarget(canvases[i], thisdrawla);
 			} else {
-				addTarget(canvases[i][0],'canvas'+canvases[i][0],(canvases[i][1]=='')?'':imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+				var bgpath = '';
+				if (canvases[i][1].match(/initPicture/)) {
+					bgpath = canvases[i][1];
+				} else if (canvases[i][1] !== '') {
+					bgpath = imasroot+'/filter/graph/imgs/'+canvases[i][1];
+				}
+				addTarget(canvases[i][0],'canvas'+canvases[i][0],bgpath,'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 			}
 		}
 	}
