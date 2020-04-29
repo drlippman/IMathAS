@@ -465,6 +465,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		var oldcurTarget = curTarget;
 		curTarget = tarnum;
 		drawTarget();
+		setTimeout(function() { window.drawPics($(tarel).closest('.drawcanvas')[0]);}, 30);
 		curTarget = oldcurTarget;
 	} else if (imgpath !== '') {
 		imgs[tarnum] = new Image();

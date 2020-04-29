@@ -3050,7 +3050,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 			} else {
 				//$bg = getgraphfilename($plot);
-
+				$bg = preg_replace('/.*script=\'(.*?[^\\\\])\'.*/', '$1', $plot);
 				$plot = str_replace('<embed','<embed data-nomag=1',$plot); //hide mag
 				//overlay canvas over SVG.
 				$out .= '<div class="drawcanvas" style="position:relative;width:'.$settings[6].'px;height:'.$settings[7].'px">';
@@ -3276,7 +3276,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				if (!isset($GLOBALS['drawinitdata'])) {
 					$GLOBALS['drawinitdata'] = array();
 				}
-				$GLOBALS['drawinitdata'][$qn] = "'',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
+				$GLOBALS['drawinitdata'][$qn] = [$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 			}
 			$la = str_replace(array('(',')'),array('[',']'),$la);
 			$la = explode(';;',$la);

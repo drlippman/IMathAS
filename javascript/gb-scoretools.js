@@ -141,8 +141,11 @@ function cleardeffeedback() {
 }
 
 function showgraphtip(el, la, init) {
-	var initpts = init.replace(/"|'/g,'').split(",");
-	for (var j=1;j<initpts.length;j++) {
+	var initpts = init;
+	if (typeof init == 'string') {
+		init = init.replace(/"|'/g,'').split(",");
+	}
+	for (var j=1;j<Math.max(initpts.length,11);j++) {
 		initpts[j] *= 1;  //convert to number
 	}
 	var drawwidth = initpts[6];
