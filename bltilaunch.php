@@ -870,7 +870,22 @@ if ($stm->rowCount()==0) {
 					$_SESSION['userid'] = $userid; //remember me
 					$nologo = true;
 					$flexwidth = true;
-					$placeinhead = '<style type="text/css"> ul.nomark {margin-left: 20px;} ul.nomark li {text-indent: -20px;}</style>';
+					$placeinhead = '<style type="text/css"> ul.nomark {margin-left: 20px;} ul.nomark li {text-indent: -20px;}
+                            /* LTI New Assessment Player */
+                            .assess-player-title {
+                                font-weight: bold;
+                            }
+                            .version-inputs-lti button {
+                                font-size: .75em;
+                                margin-left: 18px;
+                                text-decoration-line: underline;
+                            }
+                            
+                            .disable-input {
+                                opacity: 0.5;
+                                pointer-events: none;
+                            }</style>';
+                    $placeinhead .= "<script type="text/javascript" src="$imasroot/ohm/js/newPlayerDefault.js" ></script>";
 					require("header.php");
 
 					$query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
@@ -919,13 +934,20 @@ if ($stm->rowCount()==0) {
 							echo $advuseother;
 						}
 						echo "	</ul>";
-						if ($sourceUIver == 1) {
-							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
-						}
 						echo "<p>The first option is best if this is your first time using this $installname course.  The second option
 							may be preferrable if you have copied the course in your LMS and want your students records to
-							show in a separate $installname course.</p>
-							<p><input type=\"submit\" value=\"Continue\"/> (this may take a few moments - please be patient)</p>";
+							show in a separate $installname course.</p>";
+                        if ($sourceUIver == 1) {
+                            echo '<div id="usenew" style="display:none;">';
+                            echo '<p class="assess-player-title">'._('Assessment Player Version').'</p>';
+                            echo '<span class="js-version-inputs version-inputs version-inputs-lti">';
+                            echo '<label for="versionNew"><input type="radio" class="disable-input" name="assess-version" value="2" id="versionNew" checked/>'._('Newest Version (Recommended)').'</label>';
+                            echo '<button class="js-change-default-link u-button-reset" type="button">'._('Change default version').'</button>';
+                            echo '<span class="js-versionOld-input"><label for="versionOld"><input type="radio" name="assess-version" value="1" id="versionOld" />' . _("Old Version - <span class=\"version - warning\">Warning: this version will be deprecated on 12/30/2020</span>") . '</label></span>';
+                            echo '</span>';
+                            echo '</div>';
+                        }
+                        echo "<p><input type=\"submit\" value=\"Continue\"/> (this may take a few moments - please be patient)</p>";
 					} else {
 						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this
 							link is located in a $installname course you are not a teacher of (course ID $aidsourcecid).
@@ -945,9 +967,14 @@ if ($stm->rowCount()==0) {
 						} else {
 							echo "<input name=\"docoursecopy\" type=\"hidden\" value=\"makecopy\" />";
 						}
-						if ($sourceUIver == 1) {
-							echo '<p><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
-						}
+                        if ($sourceUIver == 1) {
+                            echo '<p class="assess-player-title">'._('Assessment Player Version').'</p>';
+                            echo '<span class="js-version-inputs version-inputs version-inputs-lti">';
+                            echo '<label for="versionNew"><input type="radio" class="disable-input" name="assess-version" value="2" id="versionNew" checked/>'._('Newest Version (Recommended)').'</label>';
+                            echo '<button class="js-change-default-link u-button-reset" type="button">'._('Change default version').'</button>';
+                            echo '<span class="js-versionOld-input"><label for="versionOld"><input type="radio" name="assess-version" value="1" id="versionOld" />' . _("Old Version - <span class=\"version-warning\">Warning: this version will be deprecated on 12/30/2020</span>") . '</label></span>';
+                            echo '</span>';
+                        }
 						echo "<p><input type=\"submit\" value=\"Create a copy on $installname\"/> (this may take a few moments - please be patient)</p>";
 					}
 					echo "</form>";
@@ -1039,7 +1066,7 @@ if ($stm->rowCount()==0) {
 				$deflatepass = $r[5];
 				$sourceUIver = $r[6];
 				$courselevel = $r[7];
-				if (isset($_POST['usenewassess'])) {
+                if ($_POST['assess-version'] == 2) {
 					$destUIver = 2;
 					$convertAssessVer = 2;
 				} else {
