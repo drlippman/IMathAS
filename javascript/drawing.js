@@ -306,7 +306,7 @@ function adda11ydraw(tarnum,initmode,defval) {
 	}
 	html += '</select><br/>';
 	html += '<span class="a11ydrawinstr"></span><br/>';
-	html += '<input type="text" aria-label="'+_("Point list")+'" value="'+val+'"/>';
+	html += '<input type="text" aria-label="'+_("Point list")+'" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
 	html += _("Remove")+'</button>';
 	var li = $("<li>", {class:"a11ydrawrow"}).html(html);
@@ -320,11 +320,16 @@ function adda11ydraw(tarnum,initmode,defval) {
 
 function removea11ydraw(el) {
 	$(el).parent().remove();
+	encodea11ydraw();
 }
 function changea11ydraw(tarel, tarnum) {
 	var curmode = $(tarel).val();
 	var modedata = targets[tarnum].moderef[curmode];
 	$(tarel).parent().find(".a11ydrawinstr").text(modedata.input);
+	encodea11ydraw();
+}
+function updatea11ydraw(el) {
+	encodea11ydraw();
 }
 function pixcoordstopointlist(vals,tarnum) {
 	var thistarg = targets[tarnum];
@@ -380,6 +385,7 @@ function encodea11ydraw() {
 			}
 		});
 		targetOuts[tarnum].value = lines.join(';')+';;'+dots.join(',')+';;'+odots.join(',')+';;'+tplines.join(',')+';;'+tpineq.join(',')+';;'+saveinput.join(',');
+		$(targetOuts[tarnum]).trigger("change");
 	}
 }
 
@@ -2665,6 +2671,7 @@ var drawexport = {
 	adda11ydraw:adda11ydraw,
 	changea11ydraw:changea11ydraw,
 	encodea11ydraw:encodea11ydraw,
+	updatea11ydraw:updatea11ydraw,
 	removea11ydraw:removea11ydraw
 };
 return drawexport;

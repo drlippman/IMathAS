@@ -259,7 +259,7 @@ class DrawingAnswerBox implements AnswerBox
     				}
     			} else {
     				//$bg = getgraphfilename($plot);
-
+            $bg = '';
     				$plot = str_replace('<embed','<embed data-nomag=1',$plot); //hide mag
     				//overlay canvas over SVG.
     				$out .= '<div class="drawcanvas" style="position:relative;width:'.$settings[6].'px;height:'.$settings[7].'px">';
@@ -482,7 +482,7 @@ class DrawingAnswerBox implements AnswerBox
     			];
 
           $settings = array_map('floatval', $settings);
-    			$params['canvas'] = [$qn,'',$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
+    			$params['canvas'] = [$qn,$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
     			$out .= '<input ' .
     							Sanitize::generateAttributeString($attributes) .
