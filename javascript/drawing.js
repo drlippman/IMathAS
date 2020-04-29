@@ -424,7 +424,33 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		drawstyle[tarnum] = 0;
 	}
 	drawlocky[tarnum] = locky;
-	if (imgpath !== '') {
+	if (imgpath.match(/initPicture/)) {
+		if ($(tarel).closest('.canvasholder').length == 0) {
+			$(tarel).removeClass("drawcanvas").wrap($("<div>", {
+				class: "drawcanvas",
+				style: "position:relative;width:"+imgwidth+"px;height:"+imgheight+"px"
+			})).wrap($("<div>", {
+				class: "drawcanvasholder",
+				style: "position:absolute;top:0;left:0;z-index:2"
+			}));
+			$(tarel).closest('.drawcanvas').prepend($('<div>', {
+				class: "canvasbg",
+				style: "position:absolute;top:0;left:0"
+			}).append($("<embed>", {
+				"data-nomag": 1,
+				type: "image/svg+xml",
+				align: "middle",
+				width: imgwidth,
+				height: imgheight,
+				script: imgpath
+			}).attr("width",imgwidth).attr("height",imgheight)));
+		}
+		imgs[tarnum] = null;
+		var oldcurTarget = curTarget;
+		curTarget = tarnum;
+		drawTarget();
+		curTarget = oldcurTarget;
+	} else if (imgpath !== '') {
 		imgs[tarnum] = new Image();
 		imgs[tarnum].onload = function() {
 			var oldcurTarget = curTarget;
@@ -2282,7 +2308,13 @@ function initCanvases(k) {
 			if (canvases[i][1].substr(0,8)=="a11ydraw") {
 				addA11yTarget(canvases[i], thisdrawla);
 			} else {
-				addTarget(canvases[i][0],'canvas'+canvases[i][0],(canvases[i][1]=='')?'':imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+				var bgpath = '';
+				if (canvases[i][1].match(/initPicture/)) {
+					bgpath = canvases[i][1];
+				} else if (canvases[i][1] !== '') {
+					bgpath = imasroot+'/filter/graph/imgs/'+canvases[i][1];
+				}
+				addTarget(canvases[i][0],'canvas'+canvases[i][0],bgpath,'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 			}
 		}
 	}
