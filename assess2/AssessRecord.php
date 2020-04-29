@@ -2725,7 +2725,7 @@ class AssessRecord
       }
       $out['timeactive'] = $this->calcTimeActive($qdata);
       $out['feedback'] = $qdata['feedback'];
-      $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $qn, $out);
+      $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $dispqn !== null ? $dispqn : $qn, $out);
     }
     return $out;
   }

@@ -297,6 +297,21 @@
 		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);
 		window.location = toopen;
 		}';
+	$placeinhead .= 'function togglealltries(n) {
+		$("#alltries"+n).toggle();
+		if (!$("#alltries"+n).hasClass("rendered")) {
+			$("#alltries"+n).find(".canvasholder canvas").each(function(i,el) {
+				console.log(el);
+				window.imathasDraw.initCanvases(el.id.substr(6));
+				var idpts = el.id.substr(9).split(/-/);
+				var svg = $("#canvas"+idpts[0]+",#canvas"+((idpts[0]+1)*1000 + idpts[1]))
+					.closest(".drawcanvas").find(".canvasbg svg").clone();
+				svg.attr("id", svg.attr("id") + el.id);
+				svg.appendTo($(el).closest(".drawcanvas").find(".canvasbg"));
+			});
+			$("#alltries"+n).addClass("rendered");
+		}
+	}';
 	$placeinhead .= '</script>';
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
@@ -456,6 +471,7 @@
 		$lockeys = array_keys($questions,$qid);
 		foreach ($lockeys as $loc) {
 			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
+
 			$answeightTot = array_sum($qdata['answeights']);
 			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
 			if ($groupdup) {
@@ -575,6 +591,46 @@
 				}
 			} else if ($canedit) {
 				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
+			}
+
+			if (!empty($qdata['other_tries'])) {
+
+				echo ' &nbsp; <button type=button onclick="togglealltries('.$cnt.')">'._('Show all tries').'</button>';
+				echo '<div id="alltries'.$cnt.'" style="display:none;">';
+				foreach ($qdata['other_tries'] as $pn=>$tries) {
+					if (count($qdata['other_tries']) > 1) {
+						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+					}
+					foreach ($tries as $tn=>$try) {
+						echo '<div>'._('Try').' '.($tn+1).': ';
+						if (is_array($try) && $try[0] === 'draw') {
+							$id = $cnt.'-'.$pn.'-'.$tn;
+							if ($try[2][0]===null) {
+								$try[2][0] = "";
+							}
+							echo '<div class="drawcanvas" style="position:relative;width:'.$try[2][6].'px;height:'.$try[2][7].'px">';
+							echo '<div class="canvasbg" style="position:absolute;top:0px;left:0px;"></div>';
+							echo '<div class="canvasholder" style="position:relative;top:0;left:0;z-index:2">';
+							echo '<canvas id="canvasGBR'.$id.'" ';
+							echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas></div>';
+							echo '<input type=hidden id="qnGBR'.$id.'"/></div>';
+							$la = explode(';;', str_replace(array('(',')'), array('[',']'), $try[1]));
+							if ($la[0] !== '') {
+								$la[0] = '[' . str_replace(';', '],[', $la[0]) . ']';
+							}
+							$la = '[[' . implode('],[', $la) . ']]';
+							echo '<script>';
+							array_unshift($try[2], 'GBR'.$id);
+							echo 'canvases["GBR'.$id.'"] = ' . json_encode($try[2]) . ';';
+							echo 'drawla["GBR'.$id.'"] = ' . json_encode(json_decode($la)) . ';';
+							echo '</script>';
+						} else {
+							echo $try;
+						}
+						echo '</div>';
+					}
+				}
+				echo '</div>';
 			}
 
 			// TODO: Add Previous Tries display here
