@@ -1661,7 +1661,7 @@ class AssessRecord
     $showansparts = array();
     // showans: true by default, unless no answeights or tries yet, or jumptoans
     // gets overwritten below if individual parts are off
-    $showans = ($numParts > 0 ||
+    $showans = ($numParts > 0 || $force_answers ||
       (!empty($qsettings['jump_to_answer']) && !empty($qver['jumptoans'])));
 
     $trylimit = $qsettings['tries_max'];
