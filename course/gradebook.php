@@ -872,6 +872,8 @@ function gbstudisp($stu) {
 				if ($gbt[0][1][$i][2]>0) {
 					echo round(100*$gbt[1][1][$i][0]/$gbt[0][1][$i][2],1).'%';
 				}
+			} else if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0] === 'N/A') {
+				echo 'N/A';
 			} else {
 				echo '0%';
 			}
