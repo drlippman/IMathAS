@@ -763,7 +763,7 @@ var fileembedcounter = 0;
 function setuppreviewembeds(i,el) {
 	var filetypes = 'doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg';
 	if (window.fetch) { filetypes += '|heic'; }
-	var regex = new RegExp('\.(' + filetypes + ')', 'i');
+	var regex = new RegExp('\.(' + filetypes + ')($|\\?)', 'i');
 	if (el.href.match(regex)) {
 		jQuery('<span/>', {
 			text: " [+]",
@@ -809,11 +809,11 @@ function togglefileembed() {
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
-		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/i)) {
+		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)($|\?)/i)) {
 			var src;
 			if (href.match(/\.pdf/) && supportsPdf()) {
 				src = href;
-			} else if (href.match(/\.(doc|docx|xls|xlsx|ppt|pptx)/i)) {
+			} else if (href.match(/\.(doc|docx|xls|xlsx|ppt|pptx)($|\?)/i)) {
 				src = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(href);
 			} else {
 				src = 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(href);
@@ -826,7 +826,7 @@ function togglefileembed() {
 				frameborder: 0,
 				allowfullscreen: 1
 			}).insertAfter(jQuery(this));
-		} else if (href.match(/\.(heic)/i)) {
+		} else if (href.match(/\.(heic)($|\?)/i)) {
 			jQuery('<div>', {
 				id: 'fileiframe' + id,
 				text: 'Converting HEIC file (this may take a while)...'
