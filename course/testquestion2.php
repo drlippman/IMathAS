@@ -201,32 +201,38 @@ if ($overwriteBody==1) {
 	</script>
 	<?php
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
-		echo '<p>';
+		echo '<p><span id="prev"></span> <span id="next"></span> <span id="chkspan"></span> <span id="remaining"></span></p>';
 		echo "<script type=\"text/javascript\">";
 		echo "var numchked = -1;";
+    echo "$(function() {";
 		echo "if (window.opener && !window.opener.closed && window.opener.sethighlightrow && window.opener.getnextprev) {";
 		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
+    echo 'console.log(prevnext);';
+    echo 'var next = document.getElementById("next");';
+    echo 'var prev = document.getElementById("prev");';
+    echo 'var remaining = document.getElementById("remaining");';
+    echo 'var chkspan = document.getElementById("chkspan");';
 		echo " if (prevnext[0][1]>0){
-				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">"._("Prev")."</a> ');
+				  prev.innerHTML = '<a href=\"testquestion2.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">"._("Prev")."</a>';
 			  } else {
-				  document.write('"._("Prev")." ');
+				  prev.innerHTML = '"._("Prev")."';
 			  }
 			  if (prevnext[1][1]>0){
-				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">"._("Next")."</a> ');
+				  next.innerHTML = '<a href=\"testquestion2.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">"._("Next")."</a> ';
 			  } else {
-				  document.write('"._("Next")." ');
+				  next.innerHTML = '"._("Next")." ';
 			  }
 			  if (prevnext[2]!=null) {
-			  	document.write(' <span id=\"numchked\">'+prevnext[2]+'</span> "._("checked")."');
-				numchked = prevnext[2];
+			  	chkspan.innerHTML = ' <span id=\"numchked\">'+prevnext[2]+'</span> "._("checked")."';
+				  numchked = prevnext[2];
 			  }
 			  if (prevnext[3]!=null) {
-			  	document.write(' '+prevnext[3]+' "._("remaining")."');
+			  	remaining.innerHTML = ' '+prevnext[3]+' "._("remaining")."';
 			  }
 			}
+    });
 			</script>";
-		echo '</p>';
 	}
 
 	if (isset($_GET['checked'])) {
