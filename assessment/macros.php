@@ -442,7 +442,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 
 			} else if ($y>$yymax || $y<$yymin) { //going or still out of bounds
 				if ($py <= $yymax && $py >= $yymin) { //going out
-					if ($yymax-$py < .5*($yymax-$yymin)) { //closer to top
+					if ($isparametric) {
+						$y = $evalyfunc(['t'=>$t]);
+						$tempy = $evalyfunc(['t'=>$t-$dx/10]);
+					} else {
+						$y = $evalfunc(['x'=>$x]);
+						$tempy = $evalfunc(['x'=>$x-$dx/10]);
+					}
+					if ($tempy<$y) { // going up
 						$iy = $yymax;
 						//if jumping from top of graph to bottom, change value
 						//for interpolation purposes
