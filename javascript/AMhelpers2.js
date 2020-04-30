@@ -1393,7 +1393,7 @@ function ineqtointerval(strw, intendedvar) {
       if (pat[2].charAt(0)=='<') {
         interval = (pat[2]=='<'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='<'?')':']');
       } else {
-        interval = (pat[2]=='>'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='>'?')':']');
+        interval = (pat[4]=='>'?'(':'[') + pat[5] + ',' + pat[1] + (pat[2]=='>'?')':']');
       }
       out.push(interval);
     } else if (pat = str.match(/^(.*?)(<=?|>=?)(.*?)$/)) {
