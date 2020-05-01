@@ -1069,14 +1069,14 @@ class AssessRecord
 
     $showscores = $this->assess_info->getSetting('showscores');
     if ($showscores === 'none') {
-      return array();
-    }
-
-    $out = array('score' => $this->assessRecord['score']*1);
-    if (isset($this->data['scoreoverride'])) {
-      $out['kept'] = 'override';
-    } else if (isset($this->data['scored_version'])) {
-      $out['kept'] = $this->data['scored_version'];
+      $out = array();
+    } else {
+      $out = array('score' => $this->assessRecord['score']*1);
+      if (isset($this->data['scoreoverride'])) {
+        $out['kept'] = 'override';
+      } else if (isset($this->data['scored_version'])) {
+        $out['kept'] = $this->data['scored_version'];
+      }
     }
 
     if ($currently_practice) {
