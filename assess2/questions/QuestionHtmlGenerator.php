@@ -292,26 +292,26 @@ class QuestionHtmlGenerator
             $skipAnswerboxGeneration = array();
             $seqGroupDone = array();
             if ($quesData['qtype'] == "multipart") {
-              $seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
+              $_seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
 
-              if (count($seqParts) > 1) {
-                $seqPartDone = $this->questionParams->getSeqPartDone();
-                $lastGroupDone = true;
-                foreach ($seqParts as $k=>$seqPart) {
-                  $thisGroupDone = true;
-                  preg_match_all('/(\$answerbox\[|\[AB)(\d+)\]/', $seqPart, $m);
+              if (count($_seqParts) > 1) {
+                $_seqPartDone = $this->questionParams->getSeqPartDone();
+                $_lastGroupDone = true;
+                foreach ($_seqParts as $kidx=>$_seqPart) {
+                  $_thisGroupDone = true;
+                  preg_match_all('/(\$answerbox\[|\[AB)(\d+)\]/', $_seqPart, $iidx);
 
-                  foreach ($m[2] as $pn) {
-                    if (!$lastGroupDone) { // not ready for it - unset stuff
-                      $skipAnswerboxGeneration[$pn] = true;
+                  foreach ($iidx[2] as $_pnidx) {
+                    if (!$_lastGroupDone) { // not ready for it - unset stuff
+                      $skipAnswerboxGeneration[$_pnidx] = true;
                       $jsParams['hasseqnext'] = true;
                     }
-                    if (empty($seqPartDone[$pn])) {
-                      $thisGroupDone = false;
+                    if (empty($_seqPartDone[$_pnidx])) {
+                      $_thisGroupDone = false;
                     }
                   }
-                  $seqGroupDone[$k] = $thisGroupDone;
-                  $lastGroupDone = $thisGroupDone;
+                  $seqGroupDone[$kidx] = $_thisGroupDone;
+                  $_lastGroupDone = $_thisGroupDone;
                 }
               }
             }
@@ -572,8 +572,8 @@ class QuestionHtmlGenerator
             $lastGroupDone = true;
             foreach ($seqParts as $k=>$seqPart) {
               $thisGroupDone = $seqGroupDone[$k];
-              preg_match_all('/<(input|select|textarea)[^>]*name="?qn(\d+)/', $seqPart, $m);
-              foreach ($m[2] as $qnrefnum) {
+              preg_match_all('/<(input|select|textarea)[^>]*name="?qn(\d+)/', $seqPart, $matches);
+              foreach ($matches[2] as $qnrefnum) {
                 $pn = $qnrefnum % 1000;
                 if (!$lastGroupDone) { // not ready for it - unset stuff
                   unset($jsParams[$qnrefnum]);
