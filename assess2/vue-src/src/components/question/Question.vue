@@ -127,12 +127,15 @@ export default {
       return (this.questionData.jsparams &&
         this.questionData.jsparams.hasseqnext);
     },
-    showSubmit () {
+    buttonsOk () {
       return (store.inProgress &&
         this.questionContentLoaded &&
         !store.inPrintView &&
         this.questionData.withdrawn === 0 &&
-        this.questionData.canretry && (
+        this.questionData.canretry);
+    },
+    showSubmit () {
+      return (this.buttonsOk && (
         store.assessInfo.submitby === 'by_question' ||
           this.questionData.tries_max > 1 ||
           this.hasSeqNext
@@ -144,7 +147,8 @@ export default {
       );
     },
     showNext () {
-      return (!this.showSubmit && store.assessInfo.displaymethod === 'skip' &&
+      return (this.buttonsOk && !this.showSubmit &&
+        store.assessInfo.displaymethod === 'skip' &&
         this.qn < store.assessInfo.questions.length - 1);
     },
     submitClass () {

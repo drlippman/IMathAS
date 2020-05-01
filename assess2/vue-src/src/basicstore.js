@@ -282,6 +282,7 @@ export const actions = {
       data[qn] = store.work[qn];
     }
     if (Object.keys(data).length === 0) { // nothing to submit
+      store.inTransit = false;
       if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
         Router.push('/summary');
       } else if (store.assessInfo.available === 'yes') {
