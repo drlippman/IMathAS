@@ -145,7 +145,7 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=041920" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';

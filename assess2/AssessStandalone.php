@@ -112,7 +112,7 @@ class AssessStandalone {
         ->setQuestionId(0)
         ->setAssessmentId(0)
         ->setQuestionSeed($this->state['seeds'][$qn])
-        ->setShowHints(true)
+        ->setShowHints(3)
         ->setShowAnswer(true)
         ->setShowAnswerParts(array())
         ->setShowAnswerButton(true)
@@ -135,6 +135,7 @@ class AssessStandalone {
       $jsparams['scripts'] = $scripts;
     }
     $jsparams['helps'] = $question->getExternalReferences();
+
     $answeights = $question->getAnswerPartWeights();
 
     if ($includeCorrect) {
