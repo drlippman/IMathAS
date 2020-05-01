@@ -87,97 +87,127 @@ $vueData = array(
 // skipmathrender class is needed to prevent katex parser from mangling
 // Vue template
 ?>
-<div id="app" class="skipmathrender" v-cloak>
-	<span class=form><?php echo _('Assessment Name');?>:</span>
-	<span class=formright>
-		<input type=text size=30 name=name v-model="name" required>
-	</span><br class=form />
+<div id="app" class="skipmathrender tabwrap" v-cloak>
+	<div style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+		<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
+			<li class="active">
+				<a href="#" role="tab" id="addassesstab_sel" aria-controls="addassess_gen" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('General');?></a>
+			</li>
+			<li>
+				<a href="#" role="tab" id="addassesstab_chg" aria-controls="addassess_avail" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('Availability');?></a>
+			</li>
+			<li>
+				<a href="#" role="tab" id="addassesstab_chg" aria-controls="addassess_sets" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('Settings');?></a>
+			</li>
+		</ul>
+		<div style="align-self:flex-end">
+			<input type=submit value="<?php echo $savetitle;?>">
+		</div>
+	</div>
+	<div class="tabpanel" id="addassess_gen" aria-labelledby="addassesstab_gen"
+		aria-hidden="false"
+	>
+		<span class=form><?php echo _('Assessment Name');?>:</span>
+		<span class=formright>
+			<input type=text size=30 name=name v-model="name" required>
+		</span><br class=form />
 
-	<?php echo _('Summary');?>:<br/>
-	<div class=editor>
-		<textarea cols=50 rows=15 id=summary name=summary v-model="summary" style="width: 100%"></textarea>
-	</div><br class=form />
+		<?php echo _('Summary');?>:<br/>
+		<div class=editor>
+			<textarea cols=50 rows=15 id=summary name=summary v-model="summary" style="width: 100%"></textarea>
+		</div><br class=form />
 
-	<?php echo _('Intro/Instructions');?>:<br/>
-	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;} ?>
-	<div class=editor>
-		<textarea cols=50 rows=20 id=intro name=intro v-model="intro" style="width: 100%"></textarea>
-	</div><br class=form />
-
-	<span class=form><?php echo _('Show');?>:</span>
-	<span class=formright>
-		<label>
-			<input type=radio name="avail" value="0" v-model="avail" />
-			<?php echo _('Hide');?>
-		</label><br/>
-		<label>
-			<input type=radio name="avail" value="1" v-model="avail"/>
-			<?php echo _('Show by Dates');?>
-		</label>
-	</span><br class="form"/>
-
-	<div v-show="avail==1 && datesbylti==0">
-		<span class=form><?php echo _('Available After');?>:</span>
+		<?php echo _('Intro/Instructions');?>:<br/>
+		<?php if (isset($introconvertmsg)) {echo $introconvertmsg;} ?>
+		<div class=editor>
+			<textarea cols=50 rows=20 id=intro name=intro v-model="intro" style="width: 100%"></textarea>
+		</div><br class=form />
+	</div>
+	<div class="tabpanel" id="addassess_avail" aria-labelledby="addassesstab_avail"
+		aria-hidden="true" style="display:none;"
+	>
+		<span class=form><?php echo _('Show');?>:</span>
 		<span class=formright>
 			<label>
-				<input type=radio name="sdatetype" value="0" v-model="sdatetype" />
-				<?php echo _('Available always until end date');?>
+				<input type=radio name="avail" value="0" v-model="avail" />
+				<?php echo _('Hide');?>
 			</label><br/>
 			<label>
-				<input type=radio name="sdatetype" value="sdate" v-model="sdatetype"/>
-				<?php echo _('Available after');?>
+				<input type=radio name="avail" value="1" v-model="avail"/>
+				<?php echo _('Show by Dates');?>
 			</label>
-			<input type=text size=10 name="sdate" v-model="sdate">
-			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a>
-			at <input type=text size=8 name=stime v-model="stime">
 		</span><br class="form"/>
 
-		<span class=form><?php echo _('Available Until');?>:</span>
-		<span class=formright>
-			<label>
-				<input type=radio name="edatetype" value="2000000000" v-model="edatetype" />
-				<?php echo _('Available always after start date');?>
-			</label><br/>
-			<label>
-				<input type=radio name="edatetype" value="edate" v-model="edatetype"/>
-				<?php echo _('Due');?>
-			</label>
-			<input type=text size=10 name="edate" v-model="edate">
-			<a href="#" onClick="displayDatePicker('edate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a>
-			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime">
-		</span><br class="form"/>
-	</div>
-	<div v-show="avail==1 && datesbylti>0">
-		<span class=form><?php echo _('Due date');?></span>
-		<span class=formright>
-			<?php echo _('The course setting is enabled for dates to be set via LTI');?>.<br/>
-			<span v-if="datesbylti==1">
-				<?php echo _('Waiting for the LMS to send a date');?>
-			</span>
-			<span v-else-if="enddate == 2000000000">
-				<?php echo _('Default due date set by LMS: No due date (individual student due dates may vary)');?>
-			</span>
-			<span v-else>
-				<?php echo _('Default due date set by LMS');?>: {{ edate + ' ' + etime}}
-				<?php echo _('(individual student due dates may vary)');?>
-			</span>
-		</span><br class=form />
+		<div v-show="avail==1 && datesbylti==0">
+			<span class=form><?php echo _('Available After');?>:</span>
+			<span class=formright>
+				<label>
+					<input type=radio name="sdatetype" value="0" v-model="sdatetype" />
+					<?php echo _('Available always until end date');?>
+				</label><br/>
+				<label>
+					<input type=radio name="sdatetype" value="sdate" v-model="sdatetype"/>
+					<?php echo _('Available after');?>
+				</label>
+				<input type=text size=10 name="sdate" v-model="sdate">
+				<a href="#" onClick="displayDatePicker('sdate', this); return false">
+				<img src="../img/cal.gif" alt="Calendar"/></a>
+				at <input type=text size=8 name=stime v-model="stime">
+			</span><br class="form"/>
+
+			<span class=form><?php echo _('Available Until');?>:</span>
+			<span class=formright>
+				<label>
+					<input type=radio name="edatetype" value="2000000000" v-model="edatetype" />
+					<?php echo _('Available always after start date');?>
+				</label><br/>
+				<label>
+					<input type=radio name="edatetype" value="edate" v-model="edatetype"/>
+					<?php echo _('Due');?>
+				</label>
+				<input type=text size=10 name="edate" v-model="edate">
+				<a href="#" onClick="displayDatePicker('edate', this); return false">
+				<img src="../img/cal.gif" alt="Calendar"/></a>
+				<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime">
+			</span><br class="form"/>
+		</div>
+		<div v-show="avail==1 && datesbylti>0">
+			<span class=form><?php echo _('Due date');?></span>
+			<span class=formright>
+				<?php echo _('The course setting is enabled for dates to be set via LTI');?>.<br/>
+				<span v-if="datesbylti==1">
+					<?php echo _('Waiting for the LMS to send a date');?>
+				</span>
+				<span v-else-if="enddate == 2000000000">
+					<?php echo _('Default due date set by LMS: No due date (individual student due dates may vary)');?>
+				</span>
+				<span v-else>
+					<?php echo _('Default due date set by LMS');?>: {{ edate + ' ' + etime}}
+					<?php echo _('(individual student due dates may vary)');?>
+				</span>
+			</span><br class=form />
+		</div>
+
+		<div v-if="avail==1 && edatetype=='edate'">
+			<span class=form><?php echo _('Practice mode');?>:</span>
+			<span class=formright>
+				<label>
+					<input type=checkbox name="allowpractice" value="true" v-model="allowpractice"/>
+					<?php echo _('Keep open for un-graded practice after the due date');?>
+				</label>
+			</span><br class=form />
+		</div>
 	</div>
 
-	<div v-if="avail==1 && edatetype=='edate'">
-		<span class=form><?php echo _('Practice mode');?>:</span>
-		<span class=formright>
-			<label>
-				<input type=checkbox name="allowpractice" value="true" v-model="allowpractice"/>
-				<?php echo _('Keep open for un-graded practice after the due date');?>
-			</label>
-		</span><br class=form />
-	</div>
-
-	<fieldset>
-		<legend><?php echo _('Assessment Options');?></legend>
+	<div class="tabpanel" id="addassess_sets" aria-labelledby="addassesstab_sets"
+		aria-hidden="true" style="display:none;"
+	>
 		<div v-if="reqscoreOptions.length > 0">
 			<label class=form for="copyfrom">
 				<?php echo _('Copy Options from');?>:
@@ -707,7 +737,7 @@ $vueData = array(
 			</div>
 		</div>
 		</div>
-	</fieldset>
+	</div>
 	<div v-if="showDisplayDialog" class="fullwrap">
 		<div class="dialog-overlay">
 			<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialoghdr">

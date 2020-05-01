@@ -849,7 +849,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
 $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
-
+$placeinhead .= '<style>
+	div.tabpanel {padding-top: 10px;}
+	.fixedonscroll[data-fixed=true] {
+		background: #fff;
+		z-index: 5;
+		margin-top: -5px;
+		padding-top: 5px; 
+	}
+</style>';
  require("../header.php");
 
 if ($overwriteBody==1) {
