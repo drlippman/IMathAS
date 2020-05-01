@@ -1341,7 +1341,7 @@ class AssessRecord
       $ansInGb = $this->assess_info->getSetting('ansingb');
 
       $force_answers = ($aver['status'] === 1 && (
-          $showans === 'after_attempt' || $ansInGb === 'after_take')
+          $showans === 'after_take' || $ansInGb === 'after_take')
         ) ||
         ($ansInGb == 'after_due'
           && time() > $this->assess_info->getSetting('enddate')

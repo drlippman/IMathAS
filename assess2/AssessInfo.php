@@ -535,14 +535,26 @@ class AssessInfo
   }
 
   /**
-   * Determine whether we are reshowing questions at end
+   * Determine whether we are reshowing questions in gb / addwork
    * @return boolean  true if showing question at end
    */
-  public function reshowQuestionsAtEnd() {
+  public function reshowQuestionsInGb() {
     //$showscores = $this->assessData['showscores'];
     //return ($showscores == 'at_end' || $showscores == 'during');
     $viewingb = $this->assessData['viewingb'];
     return ($viewingb == 'immediately' || $viewingb == 'after_take' ||
+      ($viewingb == 'after_due' && time() > $this->assessData['enddate']));
+  }
+
+  /**
+   * Determine whether we are reshowing questions at end
+   * @return boolean  true if showing question at end
+   */
+  public function reshowQuestionsAtEnd() {
+    $showscores = $this->assessData['showscores'];
+    $viewingb = $this->assessData['viewingb'];
+    return ($showscores == 'at_end' || $showscores == 'during' ||
+      $viewingb == 'immediately' || $viewingb == 'after_take' ||
       ($viewingb == 'after_due' && time() > $this->assessData['enddate']));
   }
 
