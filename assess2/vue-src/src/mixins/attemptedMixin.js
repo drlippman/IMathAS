@@ -8,7 +8,8 @@ export const attemptedMixin = {
         qAttempted[i] = 0;
         if (store.assessInfo.submitby === 'by_assessment' &&
           store.assessInfo.questions[i].tries_max === 1 &&
-          store.assessInfo.questions[i].hasOwnProperty('parts_entered')
+          store.assessInfo.questions[i].hasOwnProperty('parts_entered') &&
+          store.assessInfo.questions[i].hasOwnProperty('answeights')
         ) {
           let min = 1;
           let max = 0;
