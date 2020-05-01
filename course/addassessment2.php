@@ -855,7 +855,26 @@ $placeinhead .= '<style>
 		background: #fff;
 		z-index: 5;
 		margin-top: -5px;
-		padding-top: 5px; 
+		padding-top: 5px;
+		left: 0;
+		padding: 5px 10px 0;
+		width: 100%;
+		border-bottom: 1px solid #ccc;
+		box-sizing: border-box;
+	}
+	@media only screen and (min-width: 1060px) {
+		.fw1000 .fixedonscroll[data-fixed=true] {
+			left: auto;
+			max-width: 1000px;
+			padding: 5px 0 0;
+		}
+	}
+	@media only screen and (min-width: 1980px) {
+		.fw1920 .fixedonscroll[data-fixed=true] {
+			left: auto;
+			max-width: 1920px;
+			padding: 5px 0 0;
+		}
 	}
 </style>';
  require("../header.php");

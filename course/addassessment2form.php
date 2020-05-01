@@ -88,7 +88,7 @@ $vueData = array(
 // Vue template
 ?>
 <div id="app" class="skipmathrender tabwrap" v-cloak>
-	<div style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+	<div class="fixedonscroll" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
 		<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
 			<li class="active">
 				<a href="#" role="tab" id="addassesstab_sel" aria-controls="addassess_gen" aria-selected="true"
