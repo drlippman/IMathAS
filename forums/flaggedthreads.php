@@ -54,7 +54,7 @@ if (isset($_GET['unflagall'])) {
 
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
-$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/savetagged.php?cid=$cid';</script>";
+$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js?v=011517"></script>';
 $pagetitle = _('Flagged Forum Posts');
 require("../header.php");
