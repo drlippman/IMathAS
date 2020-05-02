@@ -718,9 +718,9 @@ switch($_GET['action']) {
 			echo '</div>';
 
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
-			echo '<span class=form>'._('Use new assessment version').'</span>';
-			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
-			echo _('Select this option to set your new course to use the new version of assessments.');
+			echo '<span class=form>'._('Assessment version').'</span>';
+			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
+			echo _('Use the new version of assessments.');
 			echo '</label></span><br class=form>';
 		}
 		//Start grouping: Availability and Access
