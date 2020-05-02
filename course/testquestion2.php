@@ -52,10 +52,12 @@ if ($myrights<20) {
 
   $a2 = new AssessStandalone($DBH);
   $a2->setQuestionData($line['id'], $line);
+  $hasSeqParts = preg_match('~(<p[^>]*>|\\n\s*\\n)\s*///+\s*(</p[^>]*>|\\n\s*\\n)~', $line['qtext']);
 
   $qn = 27;  //question number to use during testing
   if (isset($_POST['state'])) {
     $state = json_decode($_POST['state'], true);
+    $seed = $state['seeds'][$qn];
   } else {
     if (isset($_GET['seed'])) {
   		$seed = Sanitize::onlyInt($_GET['seed']);
@@ -149,6 +151,17 @@ $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" 
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
+$placeinhead .= '<script>
+  function loadNewVersion() {
+    location.href = location.href.replace(/&seed=\w+/g,"");
+  }
+  function showAllParts(seed) {
+    location.href = location.href.replace(/&seed=\w+/g,"") + "&seed=" + seed + "&showallparts=true";
+  }
+  function showPartSteps(seed) {
+    location.href = location.href.replace(/&seed=\w+/g,"").replace(/&showallparts=\w+/,"") + "&seed=" + seed;
+  }
+  </script>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -300,7 +313,11 @@ if ($overwriteBody==1) {
 
   // DO DISPLAY
   echo '<hr/>';
-  $disp = $a2->displayQuestion($qn, true);
+
+  $disp = $a2->displayQuestion($qn, [
+    'showans' => true,
+    'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
+  ]);
   if (!empty($disp['errors'])) {
     echo '<ul class="small">';
     foreach ($disp['errors'] as $err) {
@@ -319,7 +336,14 @@ if ($overwriteBody==1) {
   echo '<input type=hidden name=state value="'. Sanitize::encodeStringForDisplay(json_encode($a2->getState())) .'" />';
 	echo '<hr/>';
   echo "<input type=submit value=\""._("Submit")."\">";
-  echo '<button type=button onclick="location.href = location.href">'._('New Version').'</button>';
+  if ($hasSeqParts) {
+    if (!empty($_GET['showallparts'])) {
+      echo '<button type=button onclick="showPartSteps('.$seed.')">'._('Show steps').'</button>';
+    } else {
+      echo '<button type=button onclick="showAllParts('.$seed.')">'._('Show all parts').'</button>';
+    }
+  }
+  echo '<button type=button onclick="loadNewVersion()">'._('New Version').'</button>';
 	echo "</form>\n";
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {

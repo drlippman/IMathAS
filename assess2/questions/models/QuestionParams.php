@@ -300,7 +300,7 @@ class QuestionParams
      *
      * @return array
      */
-    public function getSeqPartDone(): ?array
+    public function getSeqPartDone()
     {
         return $this->seqPartDone;
     }
@@ -311,7 +311,7 @@ class QuestionParams
      * @param array $seqPartDone
      * @return QuestionParams
      */
-    public function setSeqPartDone(?array $seqPartDone): QuestionParams
+    public function setSeqPartDone($seqPartDone): QuestionParams
     {
         $this->seqPartDone = $seqPartDone;
         return $this;

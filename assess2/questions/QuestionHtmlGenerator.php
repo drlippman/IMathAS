@@ -306,7 +306,7 @@ class QuestionHtmlGenerator
                       $skipAnswerboxGeneration[$_pnidx] = true;
                       $jsParams['hasseqnext'] = true;
                     }
-                    if (empty($_seqPartDone[$_pnidx])) {
+                    if ($_seqPartDone !== true && empty($_seqPartDone[$_pnidx])) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -581,7 +581,7 @@ class QuestionHtmlGenerator
                   unset($showanswerloc[$pn]);
                   $jsParams['hasseqnext'] = true;
                 }
-                if (empty($seqPartDone[$pn])) {
+                if ($_seqPartDone !== true && empty($seqPartDone[$pn])) {
                   $thisGroupDone = false;
                 }
               }
