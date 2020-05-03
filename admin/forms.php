@@ -694,7 +694,7 @@ switch($_GET['action']) {
 		if ($_GET['action']=='addcourse' && $ctc>0) {
 			if ($sourceUIver < 2) {
 				echo '<span class=form>'._('Upgrade assessment version').'</span>';
-				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
+				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
 				echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
 				echo '</label></span><br class=form>';
 			}
