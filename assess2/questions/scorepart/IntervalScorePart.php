@@ -72,6 +72,8 @@ class IntervalScorePart implements ScorePart
         if ($hasNumVal) {
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
+        $formatErr = 0;
+        $formatCnt = 0;
         if ($anstype == 'calcinterval') {
             //test for correct format, if specified
             if (checkreqtimes($givenans,$requiretimes)==0) {
@@ -108,10 +110,11 @@ class IntervalScorePart implements ScorePart
                         $opts = preg_split('/(<=?|>=?)/',$opt);
                         foreach ($opts as $optp) {
                             $optp = trim($optp);
-                            if (strtolower($optp)=='var' || $optp=='oo' || $optp=='-oo') {continue;}
+                            if (strtolower($optp)=='var') {continue;}
+                            $formatCnt++;
+                            if ($optp=='oo' || $optp=='-oo') {continue;}
                             if (!checkanswerformat($optp,$ansformats)) {
-                                $scorePartResult->setRawScore(0);
-                                return $scorePartResult;
+                                $formatErr++;
                             }
                         }
                     }
@@ -130,13 +133,12 @@ class IntervalScorePart implements ScorePart
                     $opt = trim($opt);
                     if ($opt=='DNE') {continue;}
                     $opts = explode(',',substr($opt,1,strlen($opt)-2));
+                    $formatCnt += 2;
                     if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
+                        $formatErr++;
                     }
                     if (strpos($opts[1],'oo')===false &&  !checkanswerformat($opts[1],$ansformats)) {
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
+                        $formatErr++;
                     }
                 }
             }
@@ -185,9 +187,6 @@ class IntervalScorePart implements ScorePart
                 return $scorePartResult;
             }
 
-            if (count($aarr)!=count($gaarr)) {
-                //continue;
-            }
             $pairScored = array();
             foreach ($aarr as $j=>$ansint) {
                 $pairScored[$j] = array();
@@ -261,6 +260,9 @@ class IntervalScorePart implements ScorePart
         }
         if ($correct == 0) {
           $correct = max($orScores);
+        }
+        if ($formatErr > 0) {
+          $correct = (1 - $formatErr/$formatCnt)*$correct;
         }
         if ($scoremethod !== 'partialcredit') {
           if ($correct < .999) {
