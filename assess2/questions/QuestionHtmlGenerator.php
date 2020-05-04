@@ -291,11 +291,15 @@ class QuestionHtmlGenerator
              */
             $skipAnswerboxGeneration = array();
             $seqGroupDone = array();
-            if ($quesData['qtype'] == "multipart") {
+            if ($quesData['qtype'] == "multipart" ||
+              ($quesData['qtype'] == "conditional" && isset($seqPartDone))
+            ) {
               $_seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
 
               if (count($_seqParts) > 1) {
-                $_seqPartDone = $this->questionParams->getSeqPartDone();
+                if ($quesData['qtype'] != "conditional") {
+                  $seqPartDone = $this->questionParams->getSeqPartDone();
+                }
                 $_lastGroupDone = true;
                 foreach ($_seqParts as $kidx=>$_seqPart) {
                   $_thisGroupDone = true;
@@ -306,7 +310,7 @@ class QuestionHtmlGenerator
                       $skipAnswerboxGeneration[$_pnidx] = true;
                       $jsParams['hasseqnext'] = true;
                     }
-                    if ($_seqPartDone !== true && empty($_seqPartDone[$_pnidx])) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx])) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -314,6 +318,8 @@ class QuestionHtmlGenerator
                   $_lastGroupDone = $_thisGroupDone;
                 }
               }
+            } else {
+              unset($seqPartDone);
             }
             /*
 			 * Original displayq2.php notes:
@@ -441,29 +447,7 @@ class QuestionHtmlGenerator
             }
         }
 
-        /*
-         * For conditional question types, the entire question or answer box
-         * block needs to be surrounded with a colored border when scored.
-         *
-         * Answer box generation still needs to happen, but we don't change
-         * the color of those answer boxes. We do this instead.
-         */
 
-        if ($quesData['qtype'] == 'conditional') {
-            $questionColor = $this->getAnswerColorFromRawScore(
-                $this->questionParams->getLastRawScores(), 0, 1);
-            if ($questionColor != '') {
-
-                if (strpos($toevalqtxt, '<div') !== false || strpos($toevalqtxt, '<table') !== false) {
-                    $toevalqtxt = sprintf(
-                        '<div class=\\"%s\\" style=\\"display:block\\">%s</div>',
-                        $questionColor, $toevalqtxt);
-                } else {
-                    $toevalqtxt = sprintf('<div class=\\"%s\\">%s</div>',
-                        $questionColor, $toevalqtxt);
-                }
-            }
-        }
 
         /*
          * Get hint HTML.
@@ -563,11 +547,10 @@ class QuestionHtmlGenerator
          *  TODO: look earlier as well, and prevent answerbox generation in obvious
          *  cases where $answerbox or [AB#] is already in the question text
          */
-        if ($quesData['qtype'] == "multipart") {
+        if (isset($seqPartDone)) {
           $seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
 
           if (count($seqParts) > 1) {
-            $seqPartDone = $this->questionParams->getSeqPartDone();
             $newqtext = '';
             $lastGroupDone = true;
             foreach ($seqParts as $k=>$seqPart) {
@@ -594,6 +577,23 @@ class QuestionHtmlGenerator
             }
             $evaledqtext = $newqtext;
           }
+        }
+
+        /*
+         * For conditional question types, the entire question or answer box
+         * block needs to be surrounded with a colored border when scored.
+         *
+         * Answer box generation still needs to happen, but we don't change
+         * the color of those answer boxes. We do this instead.
+         */
+
+        if ($quesData['qtype'] == 'conditional') {
+            $questionColor = $this->getAnswerColorFromRawScore(
+                $this->questionParams->getLastRawScores(), 0, 1);
+            if ($questionColor != '') {
+                $evaledqtext = sprintf('<div class="%s">%s<br/></div>',
+                        $questionColor, $evaledqtext);
+            }
         }
 
         $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . "\">\n"
