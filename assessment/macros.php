@@ -2755,7 +2755,7 @@ function cleanbytoken($str,$funcs = array()) {
 			} else if ($token[1]==3 && $token[0]==='1') {
 				$dontuse = false;
 				if ($lastout>-1) { //if not first character
-					if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-') {
+					if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-' && $out[$lastout]!=' ') {
 						//( )1, x1,*1
 						if ($out[$lastout]=='*') { //elim *
 							array_pop($out);
@@ -2776,7 +2776,7 @@ function cleanbytoken($str,$funcs = array()) {
 					} else if ($tokens[$i+1][0]=='*') {
 						$i++;  //skip over *
 						$dontuse = true;
-					} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
+					} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
 						// 1x, 1(), 1sin
 						if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
 							$dontuse = true;
@@ -2785,6 +2785,8 @@ function cleanbytoken($str,$funcs = array()) {
 				}
 				if (!$dontuse) {
 					$out[] = 1;
+				} else {
+					continue;
 				}
 			} else {
 				$out[] = $token[0];
@@ -2792,7 +2794,6 @@ function cleanbytoken($str,$funcs = array()) {
 			if ($i<$lasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && $tokens[$i+1][1]==4))) {
 				$out[] = ' ';
 			}
-
 		}
 		if ($out[0]=='+') {
 			array_shift($out);
