@@ -568,6 +568,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $timelimit = round(abs($line['timelimit'])/60, 3);
           if ($line['isgroup']==0) {
               $line['groupsetid']=0;
+              $line['groupmax']=6;
           }
           if ($line['deffeedbacktext']=='') {
               $usedeffb = false;
