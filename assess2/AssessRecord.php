@@ -2516,7 +2516,8 @@ class AssessRecord
     } else {
       $out['scored_version'] = $this->data['scored_version'];
       if ($scoresInGb =='after_take' &&
-        $this->data['assess_versions'][$out['scored_version']]['status'] < 1
+        $this->data['assess_versions'][$out['scored_version']]['status'] < 1 &&
+        !isset($this->data['scoreoverride'])
       ) {
         $out['gbscore'] = 'N/A';
       } else {
@@ -2811,6 +2812,10 @@ class AssessRecord
       } else {
         $this->data['scoreoverride'] = floatval($scores['gen']);
         $this->assessRecord['score'] = floatval($scores['gen']);
+        // mark assessment as having a submitted take, so grade will show in GB
+        if (!$by_question) {
+          $this->assessRecord['status'] |= 64;
+        }
       }
       unset($scores['gen']);
     }
