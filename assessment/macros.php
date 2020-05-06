@@ -406,7 +406,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if (in_array($t,$avoid)) { continue;}
 				$x = $evalxfunc(['t'=>$t]);
 				$y = $evalyfunc(['t'=>$t]);
-				if (!is_numeric($x) || !is_numeric($y)) {
+				if (isNaN($x) || isNaN($y)) {
 					continue;
 				}
 				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
@@ -419,7 +419,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
 				$y = $evalfunc(['x'=>$x]);
-				if (!is_numeric($y)) {
+				if (isNaN($y)) {
 					continue;
 				}
 				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
@@ -443,10 +443,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			} else if ($y>$yymax || $y<$yymin) { //going or still out of bounds
 				if ($py <= $yymax && $py >= $yymin) { //going out
 					if ($isparametric) {
-						$y = $evalyfunc(['t'=>$t]);
+						$y = $evalyfunc(['t'=>$t-1E-10]);
 						$tempy = $evalyfunc(['t'=>$t-$dx/10]);
 					} else {
-						$y = $evalfunc(['x'=>$x]);
+						$y = $evalfunc(['x'=>$x-1E-10]);
 						$tempy = $evalfunc(['x'=>$x-$dx/10]);
 					}
 					if ($tempy<$y) { // going up
@@ -470,10 +470,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					//need to determine which direction.  Let's calculate an extra value
 					//and need un-rounded y-value for comparison
 					if ($isparametric) {
-						$y = $evalyfunc(['t'=>$t]);
+						$y = $evalyfunc(['t'=>$t-1E-10]);
 						$tempy = $evalyfunc(['t'=>$t-$dx/10]);
 					} else {
-						$y = $evalfunc(['x'=>$x]);
+						$y = $evalfunc(['x'=>$x-1E-10]);
 						$tempy = $evalfunc(['x'=>$x-$dx/10]);
 					}
 					if ($tempy>$y) { //seems to be coming down
