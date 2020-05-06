@@ -64,7 +64,7 @@ if ($assess_info->getSetting('submitby') == 'by_assessment' &&
 $showscores = $assess_info->showScoresAtEnd();
 $reshowQs = $assess_info->reshowQuestionsInGb();
 $assess_info->loadQuestionSettings('all', $reshowQs);
-$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
+$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs);
 
 //prep date display
 prepDateDisp($assessInfoOut);

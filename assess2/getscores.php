@@ -74,7 +74,7 @@ if ($assessInfoOut['has_active_attempt']) {
 $showscores = $assess_info->showScoresAtEnd();
 $reshowQs = $assess_info->reshowQuestionsInGb();
 $assess_info->loadQuestionSettings('all', $reshowQs);
-$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
+$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs);
 $assessInfoOut['score'] = $assess_record->getAttemptScore();
 $totalScore = $assessInfoOut['score'];
 $assessInfoOut['has_active_attempt'] = false;
