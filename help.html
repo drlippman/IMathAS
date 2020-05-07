@@ -2370,7 +2370,8 @@ The following macros help with formatting values for display:
 <li><strong>prettysmallnumber(number, [space])</strong>:  Prevents very small numbers from being displayed as scientific notation.
    Set space to true to add space in groups of 3, like 0.000 000 02</li>
 <li><strong>prettysigfig(number,sigfigs,[comma,choptrailingzeros])</strong>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" override.
-   Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.</li>
+   Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.
+   This is for display; to round a number for calculations, use roundsigfig.</li>
 <li><strong>makescinot(number,[decimals,format])</strong>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
 <li><strong>prettytime(value,informat,outformat)</strong>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
     value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
@@ -2591,6 +2592,8 @@ available in each library</p>
 <tr><td>log</td><td>Common Logarithm base 10</td></tr>
 <tr><td>abs</td><td>Absolute Value.  Note that while abs() is used for calculations, you may prefer to use | brackets for display</td></tr>
 <tr><td>round(n,d)</td><td>round number n to d decimal places</td></tr>
+<tr><td>roundsigfig(n,s)</td><td>round number n to s significant digits. This is for calculations;
+	if you need a value for display and want to ensure trailing 0's display, use prettysigfig</td></tr>
 <tr><td>floor,ceil</td><td>floor/ceiling: integer below/above given number</td></tr>
 <tr><td>min,max</td><td>min or max of the passed values. Can be used as min($a,$b,$c) or min($arrayvariable).</td></tr>
 </tbody>
@@ -3724,7 +3727,7 @@ invertal notation.
 <dt>$scoremethod = "partialcredit"</dt>
   <dd>By default, interval answers will be marked all right or all wrong.  Setting $scoremethod = "partialcredit"
 		will changing the scoring mode to give partial credit. Note that answers
-		not meeting $answerformat requirements will have deductions in addition to 
+		not meeting $answerformat requirements will have deductions in addition to
 		correctness checks. (new assessment system only).</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
