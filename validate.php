@@ -381,12 +381,19 @@
 	}
 	if (isset($_SESSION['isdiag'])) { // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		$urlparts = parse_url($_SERVER['PHP_SELF']);
-		if ($_SESSION['diag_aver'] == 1 &&
+		if ($_SESSION['diag_aver'][0] == 1 &&
       !in_array(basename($urlparts['path']),array('showtest.php','ltiuserprefs.php'))
     ) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?r=".Sanitize::randomQueryStringParam());
 			exit;
-		} // TODO: handle assess2 case
+		} else if ($_SESSION['diag_aver'][0] > 1 &&
+      strpos($_SERVER['PHP_SELF'],'assess2/')===false
+    ) {
+      $querystr = 'cid='.Sanitize::onlyInt($_SESSION['diag_aver'][1]);
+      $querystr .= '&aid='.Sanitize::onlyInt($_SESSION['diag_aver'][2]);
+      header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?" . $querystr);
+			exit;
+    }
 	}
   // update session time, if not handled by sessionLastAccess
   // this is used by local and redis sessions; db sessions handle via sessionLastAccess
