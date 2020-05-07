@@ -8,6 +8,7 @@ require_once('../assess2/AssessStandalone.php');
 
 $assessver = 2;
 $courseUIver = 2;
+$assessUIver = 2;
 
  //set some page specific variables and counters
 $overwriteBody = 0;
