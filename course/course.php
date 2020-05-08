@@ -483,17 +483,22 @@ if ($overwriteBody==1) {
 		</p>
 	<?php
 	} else if (!isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']!==false) {
-	?>
-		<p><b><?php echo _('Tools'); ?></b><br/>
-			<a href="listusers.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
-	                <a href="coursereports.php?cid=<?php echo $cid ?>">Reports</a><br/>
-			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
-			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a><br/>
-			<a href="coursemap.php?cid=<?php echo $cid ?>"><?php echo _('Course Map'); ?></a>
-		</p>
-	<?php
+
+		echo '<p><b>' . _('Tools') . '</b><br/>';
+		echo '<a href="listusers.php?cid=' . $cid . '" class="essen">' . _('Roster') . '</a><br/>';
+		echo '<a href="gradebook.php?cid=' . $cid . '" class="essen">' . _('Gradebook') . '</a>';
+		if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}
+		echo '<br/>';
+		echo '<a href="showcalendar.php?cid=' . $cid . '">' . _('Calendar') . '</a><br/>';
+		echo '<a href="coursemap.php?cid=' . $cid . '">' . _('Course Map') . '</a><br/>';
+		echo '<a href="#" class="togglecontrol" aria-controls="navtoolmore">' . _('More...') . '</a>';
+	  echo '<span id="navtoolmore" style="display:none">';
+		echo '<br/>&nbsp;<a href="coursereports.php?cid=' . $cid . '">' . _('Reports') . '</a><br/>';
+		echo '&nbsp;<a href="managestugrps.php?cid=' . $cid . '">' . _('Groups') . '</a><br/>';
+		echo '&nbsp;<a href="addoutcomes.php?cid=' . $cid . '">' . _('Outcomes') . '</a><br/>';
+		echo '&nbsp;<a href="addrubric.php?cid=' . $cid . '">' . _('Rubrics') . '</a>';
+		echo '</span>';
+		echo '</p>';
 	}
 	?>
 

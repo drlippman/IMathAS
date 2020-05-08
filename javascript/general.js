@@ -1020,6 +1020,7 @@ function initlinkmarkup(base) {
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
+	setupToggler2(base);
 	$(base).fitVids();
 }
 
@@ -1120,6 +1121,25 @@ function setupToggler(base) {
 						targ.show();
 					}
 				}
+			}
+		});
+	});
+}
+
+function setupToggler2(base) {
+	$(base).find(".togglecontrol:not(.togglerinit)").each(function() {
+		$(this).addClass("togglerinit").attr("aria-expanded", false)
+		.on("click keydown", function(e) {
+			if (e.type=="click" || e.which==13) {
+				var targ = $("#"+$(this).attr("aria-controls"));
+				if ($(this).attr("aria-expanded") == "true") {
+					$(this).attr("aria-expanded", false);
+					targ.hide();
+				} else {
+					$(this).attr("aria-expanded", true);
+					targ.show();
+				}
+				return false;
 			}
 		});
 	});
