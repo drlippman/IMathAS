@@ -73,13 +73,14 @@ class ChoicesScorePart implements ScorePart
             $randkeys = $RND->array_rand($questions,count($questions));
             $RND->shuffle($randkeys);
         }
+
         if ($givenans==='NA' || $givenans === null) {
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else {
             $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
         }
 
-        if ($givenans=='NA') {
+        if ($givenans=='NA' || $givenans === null) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
