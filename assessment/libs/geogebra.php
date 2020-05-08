@@ -31,19 +31,28 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
 	}
 	$out .= '<script type="text/javascript">';
-	if (strlen($url)>10) {
+	if ($url == 'graphing' || $url == 'geometry' || $url == 'classic' || $url == '3d') {
+		$out .= 'var applet'.$ggbid.' = new GGBApplet({"appName":"'.$url.'",';
+	} else if (strlen($url)>10) {
 		$out .= 'var applet'.$ggbid.' = new GGBApplet({"ggbBase64":"'.$url.'",';
 	} else {
 		$out .= 'var applet'.$ggbid.' = new GGBApplet({"material_id":"'.$url.'",';
 	}
 	$out .= '"ggbOnInitParam":"ggb'.$ggbid.'","id":"ggb'.$ggbid.'","useBrowserForJS":true';
 	foreach ($params as $k=>$v) {
-		$out .= ",\"$k\":\"$v\"";
+		$out .= ",\"$k\":";
+		if ($v === true || $v === 'true') {
+			$out .= 'true';
+		} else if ($v === false || $v === 'false') {
+			$out .= 'false';
+		} else {
+			$out .= '"' . $v . '"';
+		}
 	}
 	if ($width != "") {
 		$out .= ",height:\"$height\",width:\"$width\"";
 	}
-	$out .= '});';
+	$out .= '}, "5.0", "geogebra_container'.$ggbid.'");';
 	$out .= '$(function() { applet'.$ggbid.'.inject("geogebra_container'.$ggbid.'","preferHTML5");});';
 	$out .= '</script>';
 	$out .= '<div id="geogebra_container'.$ggbid.'"><span id="ggbloadimg'.$ggbid.'">Loading Geogebra...</span></div>';
