@@ -495,6 +495,11 @@ class AssessRecord
     if ($sourcedid != $this->assessRecord['lti_sourcedid']) {
       $this->assessRecord['lti_sourcedid'] = $sourcedid;
       $this->need_to_record = true;
+
+      // also update the sourcedid for any queued sends
+      $hash = $this->curAid . '-' . $this->curUid;
+      $stm = $this->DBH->prepare("UPDATE imas_ltiqueue SET sourcedid=? WHERE hash=?");
+      $stm->execute(array($sourcedid, $hash));
     }
   }
 
