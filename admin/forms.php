@@ -1525,7 +1525,7 @@ switch($_GET['action']) {
 			} else if (count($words)==1) {
 				$query .= "(iu.LastName LIKE ? OR iu.FirstName Like ? OR iu.SID LIKE ?)";
 				array_push($qarr, $words[0].'%', $words[0].'%', '%'.$words[0].'%');
-			} else if (count($words)==2) {
+			} else if (count($words)>1) {
 				$query .= "((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
 				array_push($qarr, $words[0].'%', $words[1].'%', $words[1].'%', $words[0].'%');
 			}
