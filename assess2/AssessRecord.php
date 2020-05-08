@@ -1203,7 +1203,7 @@ class AssessRecord
       $curq = $question_versions[$ver];
     }
 
-    $tryToGet = ($ver === 'scored') ? 'all' : 'last';
+    $tryToGet = ($tryToShow === 'scored') ? 'all' : 'last';
 
     // get basic settings
     $out = $this->assess_info->getQuestionSettings($curq['qid']);
@@ -1672,7 +1672,7 @@ class AssessRecord
       $usedAutosave[] = 'work';
     }
 
-    list($stuanswers, $stuanswersval) = $this->getStuanswers($ver);
+    list($stuanswers, $stuanswersval) = $this->getStuanswers($ver, $tryToShow);
     list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
     $seqPartDone = array();
 
@@ -1749,7 +1749,11 @@ class AssessRecord
         }
       }
       if ($showscores && $partattemptn[$pn] > 0 && !isset($autosave['stuans'][$pn])) {
-        $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
+        if ($tryToShow === 'scored') {
+          $qcolors[$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['raw'];
+        } else {
+          $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
+        }
       }
       if ($showscores) {
         // move on if correct or out of tries
@@ -1928,9 +1932,10 @@ class AssessRecord
   /**
    * Generate $stuanswers and $stuanswersval for the last tries
    * @param  string  $ver         Version to grab from, or 'last' for latest, or 'scored'
+   * @param  string  $try         Try to grab from, or 'last' for latest, or 'scored'
    * @return array  ($stuanswers, $stuanswersval)
    */
-  public function getStuanswers($ver = 'last') {
+  public function getStuanswers($ver = 'last', $try = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     // get data structure for this question
     $assessver = $this->getAssessVer($ver);
@@ -1961,7 +1966,14 @@ class AssessRecord
           $stuansparts[$pn] = null;
           $stuansvalparts[$pn] = null;
         } else {
-          $lasttry = $curq['tries'][$pn][count($curq['tries'][$pn]) - 1];
+          if (is_numeric($try)) {
+            $tryn = $try;
+          } else if ($try === 'scored' && isset($curq['scored_try'][$pn])) {
+            $tryn = $curq['scored_try'][$pn];
+          } else { // last
+            $tryn = count($curq['tries'][$pn]) - 1;
+          }
+          $lasttry = $curq['tries'][$pn][$tryn];
           $stuansparts[$pn] = ($lasttry['stuans'] === '') ? null : $lasttry['stuans'];
           $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
         }
@@ -2713,7 +2725,7 @@ class AssessRecord
     $GLOBALS['drawinitdata'] = array();
     $GLOBALS['capturechoices'] = true;
     $GLOBALS['capturedrawinit'] = true;
-    $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver, 'last', true);
+    $out = $this->getQuestionObject($qn, $showScores, true, $generate_html, $by_question ? $qver : $aver, $showScores ? 'scored' : 'last', true);
     $out['showscores'] = $scoresInGb;
     $this->dispqn = null;
     if ($generate_html) { // only include this if we're displaying the question
