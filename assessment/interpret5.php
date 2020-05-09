@@ -108,8 +108,8 @@ function interpretline($str,$anstype,$countcnt) {
 		}
 
 
-		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1]{0}!='=') {
-			//if equality equal (not comparison), and before if/where.
+		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1]{0}!='=' && $syms[$k+1]{0}!='>') {
+			//if equality equal (not comparison or array assn), and before if/where.
 			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
 			$hascomma = false;
