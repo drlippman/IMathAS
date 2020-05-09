@@ -1479,6 +1479,11 @@ class AssessRecord
     $due_date = $this->assess_info->getSetting('original_enddate');
     $starttime = $this->assessRecord['starttime'];
 
+    // adjust try setting if not showing scores to only count last try
+    if ($try == 'all' && $this->assess_info->getSetting('showscores') !== 'during') {
+      $try = 'last';
+    }
+
     $submissions = $this->data['submissions'];
     if ($this->is_practice) {
       $assessver = $this->data['assess_versions'][0];
