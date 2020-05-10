@@ -184,7 +184,7 @@
                 // Figure out if any part of the question is incomplete.
                 // Skip if a score override is set.  TODO: actually look per-part
                 $untried = array_keys($scoredQuestion['scored_try'], -1);
-								if (!empty($scoredQuestion['scoreoverride'])) {
+								if (!empty($scoredQuestion['scoreoverride']) && is_array($scoredQuestion['scoreoverride'])) {
 									$overridden = array_keys($scoredQuestion['scoreoverride']);
 									if (count(array_diff($untried, $overridden)) > 0) {
 										$qincomplete[$questionId] += 1;
