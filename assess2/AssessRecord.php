@@ -2389,6 +2389,7 @@ class AssessRecord
       if (!empty($qvers[count($qvers)-1]['jumptoans'])) {
         // jump to answer has been clicked - submission not allowed
         foreach ($partssubmitted as $pn) {
+          if ($pn === 'sw') { continue; }
           $out[$pn] = false;
         }
         return $out;
@@ -2400,6 +2401,7 @@ class AssessRecord
     $tries_max = $this->assess_info->getQuestionSetting($qid, 'tries_max');
 
     foreach ($partssubmitted as $pn) {
+      if ($pn === 'sw') { continue; }
       if (!isset($tries[$pn])) {
         $out[$pn] = true;
       } else {
