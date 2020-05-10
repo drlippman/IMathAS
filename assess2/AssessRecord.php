@@ -2791,7 +2791,7 @@ class AssessRecord
       } else {
         $ptsposs = $assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
       }
-      if (!isset($qdata['answeights'])) {
+      if (!isset($qdata['answeights']) || !empty($qdata['singlescore'])) {
         $adjscore = round($score/$ptsposs, 5);
       } else {
         $answeightTot = array_sum($qdata['answeights']);

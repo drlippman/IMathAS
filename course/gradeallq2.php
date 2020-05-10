@@ -529,11 +529,16 @@
 
 			}
 
+			if (!empty($qdata['singlescore'])) {
+				$qdata['answeights'] = [1];
+			}
 			// loop over parts
 			for ($pn = 0; $pn < count($qdata['answeights']); $pn++) {
 				// get points on this part
 
-				if (isset($qdata['scoreoverride']) && !is_array($qdata['scoreoverride'])) {
+				if (!empty($qdata['singlescore'])) {
+					$pts = round($qdata['score'],3);
+				} else if (isset($qdata['scoreoverride']) && !is_array($qdata['scoreoverride'])) {
 					$pts = round($qdata['scoreoverride'] * $qdata['points_possible'] * $qdata['answeights'][$pn], 3);
 				} else if (isset($qdata['scoreoverride']) && isset($qdata['scoreoverride'][$pn])) {
 					if (isset($qdata['parts'][$pn]['points_possible'])) {
@@ -551,7 +556,7 @@
 				$ptposs = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);
 
 				if ($canedit) {
-					$boxid = (count($qdata['answeights'])>1) ? "$cnt-$pn" : $cnt;
+					$boxid = ($multiEntry) ? "$cnt-$pn" : $cnt;
 					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					if ($rubric != 0) {
@@ -564,7 +569,7 @@
 				echo '/'.Sanitize::encodeStringForDisplay($ptposs).' ';
 			}
 
-			if (count($qdata['answeights'])>1 && $canedit) {
+			if ($multiEntry && $canedit) {
 				$togr = array();
 				if (isset($qdata['parts'])) {
 					foreach ($qdata['parts'] as $k=>$partinfo) {
