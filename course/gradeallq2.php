@@ -561,7 +561,7 @@
 					echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					if ($rubric != 0) {
 						$fbref = (count($qdata['answeights'])>1) ? ($loc+1).' part '.($pn+1) : ($loc+1);
-						echo printrubriclink($rubric,$qdata['points_possible'],"scorebox$boxid","fb-". $loc.'-'. Sanitize::onlyInt($line['userid']), $fbref);
+						echo printrubriclink($rubric, $ptposs,"scorebox$boxid","fb-". $loc.'-'. Sanitize::onlyInt($line['userid']), $fbref);
 					}
 				} else {
 					echo Sanitize::encodeStringForDisplay($pts);

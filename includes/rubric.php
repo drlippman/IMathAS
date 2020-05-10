@@ -34,7 +34,7 @@ function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$wi
 	global $imasroot;
 
 	$rubricid = Sanitize::onlyInt($rubricid);
-	$points = Sanitize::onlyInt($points);
+	$points = Sanitize::onlyFloat($points);
 	$scorebox = Sanitize::encodeStringForJavascript($scorebox);
 	$feedbackbox = Sanitize::encodeStringForJavascript($feedbackbox);
 	$qn = Sanitize::encodeStringForJavascript($qn);
