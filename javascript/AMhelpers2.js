@@ -227,6 +227,7 @@ function init(paramarr, enableMQ) {
 // setup tip focus/blur handlers
 function setupTips(id, tip, longtip) {
   var el = document.getElementById(id);
+  if (!el) { return; }
   el.setAttribute('data-tip', tip);
   var ref = id.substr(2).split(/-/)[0];
   if (!document.getElementById("tips"+ref)) {
