@@ -238,8 +238,19 @@ export const actions = {
           // Update part score
           const pts = key.split(/-/);
           const qdata = store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]];
+          if (qdata.scoreoverride && store.scoreOverrides[key] === '') {
+            if (typeof qdata.scoreoverride === 'number') {
+              Vue.delete(qdata, 'scoreoverride');
+            } else {
+              Vue.delete(qdata.scoreoverride, pts[3]);
+            }
+          }
           if (qdata.parts[pts[3]]) {
-            qdata.parts[pts[3]].score = Math.round(1000 * store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible) / 1000;
+            if (store.scoreOverrides[key] === '') {
+              Vue.delete(store.scoreOverrides, key);
+            } else {
+              qdata.parts[pts[3]].score = Math.round(1000 * store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible) / 1000;
+            }
           }
         }
         // update question scores
@@ -248,8 +259,16 @@ export const actions = {
           Vue.set(
             store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]],
             'score',
-            response.newscores[key]
+            response.newscores[key][0]
           );
+          // update part info
+          for (let i = 0; i < response.newscores[key][1].length; i++) {
+            Vue.set(
+              store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].parts,
+              i,
+              response.newscores[key][1][i]
+            );
+          }
         }
         // update feedbacks in store
         for (const key in store.feedbacks) {
@@ -453,20 +472,24 @@ export const actions = {
     // compare new score against existing value
     const qdata = store.assessInfo.assess_versions[av].questions[qn][qv];
     const key = av + '-' + qn + '-' + qv + '-' + pn;
-    let scoreChanged = true;
-    if (qdata.singlescore) {
-      scoreChanged = (Math.abs(score - qdata.rawscore) > 0.001);
-    } else if (qdata.parts[pn]) {
-      scoreChanged = (Math.abs(score - qdata.parts[pn].score / qdata.parts[pn].points_possible) > 0.001);
-    }
-    if (qdata.parts[pn] && qdata.parts[pn].try > 0 &&
-      (score === '' || !scoreChanged)
-    ) {
-      // same as existing - don't submit as an override
-      delete store.scoreOverrides[key];
+    if (score === '') {
+      store.scoreOverrides[key] = '';
     } else {
-      // different score - submit as override. Save raw score (0-1)?.
-      store.scoreOverrides[key] = Math.round(10000 * score) / 10000;
+      let scoreChanged = true;
+      if (qdata.singlescore) {
+        scoreChanged = (Math.abs(score - qdata.rawscore) > 0.001);
+      } else if (qdata.parts[pn]) {
+        scoreChanged = (Math.abs(score - qdata.parts[pn].score / qdata.parts[pn].points_possible) > 0.001);
+      }
+      if (qdata.parts[pn] && qdata.parts[pn].try > 0 &&
+        (score === '' || !scoreChanged)
+      ) {
+        // same as existing - don't submit as an override
+        delete store.scoreOverrides[key];
+      } else {
+        // different score - submit as override. Save raw score (0-1)?.
+        store.scoreOverrides[key] = Math.round(10000 * score) / 10000;
+      }
     }
     store.saving = '';
   },

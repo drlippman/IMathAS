@@ -299,8 +299,12 @@ export default {
   },
   methods: {
     updateScore (pn, evt) {
-      const partposs = this.qdata.points_possible * this.answeights[pn];
-      actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
+      if (this.curScores[pn].trim() === '') {
+        actions.setScoreOverride(this.qn, pn, '');
+      } else {
+        const partposs = this.qdata.points_possible * this.answeights[pn];
+        actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
+      }
     },
     revealFeedback () {
       this.showfeedback = true;
@@ -343,8 +347,11 @@ export default {
     this.initCurScores();
   },
   watch: {
-    qdata: function (newVal, oldVal) {
-      this.initCurScores();
+    qdata: {
+      handler: function (newVal, oldVal) {
+        this.initCurScores();
+      },
+      deep: true
     }
   }
 };

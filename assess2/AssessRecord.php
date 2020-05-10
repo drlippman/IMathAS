@@ -2163,6 +2163,10 @@ class AssessRecord
           // scoreoverride can be a single value override, or array per-part
           // should be RAW (0-1) override.
           if (isset($curQver['scoreoverride']) && !is_array($curQver['scoreoverride'])) {
+            // calc part scores to set $scoreTry
+            list($qScore, $qRawscore, $parts, $scoredTry) =
+              $this->getQuestionPartScores($qn, max($av,$qv), 'all');
+            // override score total
             $qScore = $curQver['scoreoverride'] * $points[$curQver['qid']];
             $qRawscore = $curQver['scoreoverride'];
           } else if (isset($curQver['scoreoverride']) && is_array($curQver['scoreoverride'])) {
@@ -2867,12 +2871,23 @@ class AssessRecord
       }
       $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
       if (!empty($qdata['singlescore'])) {
-        $qdata['scoreoverride'] = floatval($score);
+        if ($score === '') {
+          unset($qdata['scoreoverride']);
+        } else {
+          $qdata['scoreoverride'] = floatval($score);
+        }
       } else {
         if (!isset($qdata['scoreoverride'])) {
           $qdata['scoreoverride'] = array();
         }
-        $qdata['scoreoverride'][$pn] = floatval($score);
+        if ($score === '') {
+          unset($qdata['scoreoverride'][$pn]);
+        } else {
+          $qdata['scoreoverride'][$pn] = floatval($score);
+        }
+      }
+      if (is_array($qdata['scoreoverride']) && count($qdata['scoreoverride']) == 0) {
+        unset($qdata['scoreoverride']);
       }
     }
     if (!empty($scores) || $doRetotal) {
@@ -2908,14 +2923,21 @@ class AssessRecord
         continue;
       }
       $qdata = &$this->data['assess_versions'][$av]['questions'][$qn]['question_versions'][$qv];
-      if (isset($qdata['scoreoverride'])) {
+      if (isset($qdata['scoreoverride']) && !is_array($qdata['scoreoverride'])) {
+        // calc part scores to set $scoreTry
+        list($qScore, $qRawscore, $parts, $scoredTry) =
+          $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all');
+        // override score total
+        $qScore = $qdata['scoreoverride'] *
+          $this->assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
+      } else if (isset($qdata['scoreoverride'])) {
         list($qScore, $qRawscore, $parts, $scoredTry) =
           $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all', $qdata['scoreoverride']);
       } else {
         list($qScore, $qRawscore, $parts, $scoredTry) =
           $this->getQuestionPartScores($qn, $by_question ? $qv : $av, 'all');
       }
-      $scoreOut["$av-$qn-$qv"] = $qScore;
+      $scoreOut["$av-$qn-$qv"] = array($qScore, $parts);
     }
     return $scoreOut;
   }
