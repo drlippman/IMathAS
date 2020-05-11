@@ -49,8 +49,8 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=042920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/rubric_min.js?v=090619" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=051120" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/rubric_min.js?v=051120" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$imasroot.'/javascript/gb-scoretools.js?v=042920" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';

@@ -34,6 +34,15 @@
         >
           <icons name="clipboard" alt="icons.rubric" size="small" />
         </button>
+        <button
+          v-if="canedit && !isPractice && qdata.rubric > 0"
+          style="display:none"
+          class="plain nopad rubriclink"
+          @click="showRubric(i)"
+          :id="'rublink-scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
+        >
+          <icons name="clipboard" alt="icons.rubric" size="small" />
+        </button>
       </span>
       <button
         v-if="canedit && !isPractice"
@@ -338,7 +347,7 @@ export default {
         this.partPoss[pn],
         'scorebox' + this.qn + (this.partPoss.length > 1 ? '-' + pn : ''),
         'fb' + this.qn,
-        this.qn,
+        (this.qn + 1) + (this.partPoss.length > 1 ? ' part ' + (pn + 1) : ''),
         600
       );
     }

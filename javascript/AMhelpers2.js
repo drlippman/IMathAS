@@ -310,17 +310,18 @@ function handleMQenter(id) {
 
 function initDupRubrics() {
   $(".rubriclink").each(function(i,el) {
+    $(el).removeClass("rubriclink");
     var inref = el.id.substring(16);
-    var clone = $(el).clone(true, true);
+    //var clone = $(el).clone(true, true);
     if (inref.indexOf('-') !== -1) {
       var pts = inref.split('-');
       inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
     }
-    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref);
+    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref+",div.intro#qnwrap"+inref);
     if (inbox.length > 0) {
-      inbox.after(clone);
+      inbox.after(el);
+      $(el).show();
     }
-    $(el).removeClass("rubriclink");
   });
 }
 
