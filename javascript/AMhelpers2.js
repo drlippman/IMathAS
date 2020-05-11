@@ -189,6 +189,7 @@ function init(paramarr, enableMQ) {
     }
     initEnterHandler(qn);
   }
+  initDupRubrics();
   initShowAnswer2();
   initqsclickchange();
   initClearScoreMarkers();
@@ -305,6 +306,22 @@ function handleMQenter(id) {
   if (!btn.is(':disabled')) {
     btn.trigger('click');
   }
+}
+
+function initDupRubrics() {
+  $(".rubriclink").each(function(i,el) {
+    var inref = el.id.substring(16);
+    var clone = $(el).clone(true, true);
+    if (inref.indexOf('-') !== -1) {
+      var pts = inref.split('-');
+      inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
+    }
+    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref);
+    if (inbox.length > 0) {
+      inbox.after(clone);
+    }
+    $(el).removeClass("rubriclink");
+  });
 }
 
 function initShowAnswer2() {
