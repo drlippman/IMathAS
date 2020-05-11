@@ -267,7 +267,7 @@
 	$lastupdate = '032320';
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=071219"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051120"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042220"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
@@ -532,6 +532,7 @@
 			if (!empty($qdata['singlescore'])) {
 				$qdata['answeights'] = [1];
 			}
+			$multiEntry = (count($qdata['answeights'])>1);
 			// loop over parts
 			for ($pn = 0; $pn < count($qdata['answeights']); $pn++) {
 				// get points on this part

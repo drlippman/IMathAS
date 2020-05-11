@@ -141,7 +141,9 @@ function rubrictouchmove(evt) {
 
 function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexisting) {
 	var feedback = '';
-
+	if (qn !== null) {
+		feedback += '#'+qn+': ';
+	}
 	if (window.tinymce) {
 		var pastfb = tinymce.get(feedbackid).getContent();
 	} else {

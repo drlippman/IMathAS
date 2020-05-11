@@ -40,7 +40,7 @@ function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$wi
 	$qn = Sanitize::encodeStringForJavascript($qn);
 	$width = Sanitize::onlyInt($width);
 
-	$out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
+	$out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\" class=\"rubriclink\">";
 	$out .= "<img border=0 src=\"$imasroot/img/assess.png\" alt=\"rubric\"></a>";
 	return $out;
 }
