@@ -369,7 +369,13 @@ if ($overwriteBody==1) {
 	}
 
 	printf("<p>"._("Question id:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
-	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$qsetid}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems")."</p>";
+  if ($line['ownerid'] == $userid) {
+    echo '<a href="moddataset.php?cid='. Sanitize::courseId($sendcid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
+    echo _('Edit Question') . '</a>';
+  } else {
+	  echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$qsetid}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems");
+  }
+  echo '</p>';
 
 	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." %s</p>", Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
