@@ -177,7 +177,7 @@ function init(paramarr, enableMQ) {
         div.html(html);
         $("#qn"+qn).hide().after(div);
       } else {
-        initeditor("selector","#questionwrap" + qn + " textarea.mceEditor",null,false,function(ed) {
+        initeditor("selector","#qn" + qn + ".mceEditor",null,false,function(ed) {
           ed.on('blur', function (e) {
             tinymce.triggerSave();
             jQuery(e.target.targetElm).triggerHandler('change');
