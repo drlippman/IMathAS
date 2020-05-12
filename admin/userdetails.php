@@ -174,6 +174,10 @@ if ($overwriteBody==1) {
   echo '<div class="cpmid"><a href="forms.php?from=ud'.$uid.'&action=chgrights&id='.$uid.'">'._('Edit User').'</a>';
   echo ' | <a href="addcourse.php?for='.$uid.'">'. _('Add Course').'</a>';
   echo ' | <a href="../util/utils.php?emulateuser='.$uid.'">'. _('Emulate User').'</a>';
+  if (!empty($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+    echo " | <a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=$uid&sendtype=msg&cid=";
+    echo $CFG['GEN']['sendquestionproblemsthroughcourse'] . "',800,'auto')\" title=\"Send Message\">", _('Message'), "</a>";
+  }
   if ($myrights==100) {
     echo ' | <a href="userlti.php?id='.$uid.'">'. _('LTI Connections').'</a>';
   }
