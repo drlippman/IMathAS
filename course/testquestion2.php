@@ -308,7 +308,7 @@ if ($overwriteBody==1) {
 	echo $page_scoreMsg;
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
-	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"return dopresubmit($qn,false)\">\n";
+	echo "<form method=post class=\"questionwrap\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"return dopresubmit($qn,false)\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 
   // DO DISPLAY
@@ -325,7 +325,7 @@ if ($overwriteBody==1) {
     }
     echo '</ul>';
   }
-  echo '<div class="questionwrap questionpane">';
+  echo '<div questionpane">';
   echo '<div class="question" id="questionwrap'.$qn.'">';
   echo $disp['html'];
   echo '</div></div>';
@@ -335,7 +335,8 @@ if ($overwriteBody==1) {
   echo '<input type=hidden name=toscoreqn value=""/>';
   echo '<input type=hidden name=state value="'. Sanitize::encodeStringForDisplay(json_encode($a2->getState())) .'" />';
 	echo '<hr/>';
-  echo "<input type=submit value=\""._("Submit")."\">";
+  echo '<div class="submitbtnwrap">';
+  echo "<input type=submit class=\"primary\" value=\""._("Submit")."\">";
   if ($hasSeqParts) {
     if (!empty($_GET['showallparts'])) {
       echo '<button type=button onclick="showPartSteps('.$seed.')">'._('Show steps').'</button>';
@@ -344,6 +345,7 @@ if ($overwriteBody==1) {
     }
   }
   echo '<button type=button onclick="loadNewVersion()">'._('New Version').'</button>';
+  echo '</div>';
 	echo "</form>\n";
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
