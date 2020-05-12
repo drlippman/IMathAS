@@ -130,6 +130,10 @@ if (!(isset($teacherid))) {
     $stm = $DBH->prepare($query);
     $stm->execute(array($cid, $aid));
 
+    // retotal student assessment records with changes
+    require_once('../assess2/AssessHelpers.php');
+    AssessHelpers::retotalAll($cid, $aid);
+
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
@@ -185,9 +189,9 @@ if (!(isset($teacherid))) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 		if ($stm->rowCount() > 0) {
-			$page_beenTakenMsg = "<h2>"._("Warning")."</h2>\n";
-			$page_beenTakenMsg .= "<p>"._("This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ");
-			$page_beenTakenMsg .= _("If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts")."</p> ";
+			$page_beenTakenMsg = "<p><strong>"._("Warning")."</strong>: ";
+			$page_beenTakenMsg .= _("This assessment has already been taken.  Altering the points or penalty may cause some temporary weirdness for student currently working on the assessment. ");
+			$page_beenTakenMsg .= _("If you want to add additional copies of this question, you should clear all existing assessment attempts").".</p> ";
 			$page_beenTakenMsg .= "<p><input type=button value=\""._("Clear Assessment Attempts")."\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
 			$beentaken = true;
 		} else {
@@ -273,13 +277,14 @@ if (isset($_GET['id'])) {
 <form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
 <p><?php echo _("Leave items blank to use the assessment's default values."); ?>
 <input type="submit" value="<?php echo _('Save Settings');?>"></p>
-
 <?php
-if (!isset($_GET['id'])) {
+if (!isset($_GET['id']) || $beentaken) {
 ?>
 <span class=form><?php echo _("Points for this problem:"); ?></span>
 <span class=formright> <input type=text size=4 name=points value="<?php echo Sanitize::encodeStringForDisplay($line['points']);?>"><br/><i class="grey"><?php echo _("Default:"); ?> <?php echo Sanitize::encodeStringForDisplay($defaults['defpoints']);?></i></span><BR class=form>
 <?php
+} else {
+  echo '<input type="hidden" name="points" value="'.Sanitize::encodeStringForDisplay($line['points']).'"/>';
 }
 ?>
 <span class=form><?php echo _("Tries allowed on each version of this problem:"); ?></span>
@@ -366,15 +371,7 @@ if ($defaults['submitby'] == 'by_question' && $defaults['defregens'] > 1) {
 		echo '</span><span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
 		echo '</div>';
 	}
-	if ($beentaken) {
-		echo '<div class="advanced" style="display:none">';
-		echo '<span class=form>'._('Points for this problem:').' <br/>';
-		echo '<span class=noticetext>'._('WARNING: you generally should not change point values after students have started the assessment, as the points already earned by students will not be re-calculated.').'</span></span>';
-		echo '<span class=formright> <input type=text size=4 name=points value="'.Sanitize::encodeStringForDisplay($line['points']).'"> ('._('blank for default').')</span><BR class=form>';
-		echo '</div>';
-	} else if (isset($_GET['id'])) {
-		echo '<input type=hidden name=points value="'.Sanitize::encodeStringForDisplay($line['points']).'" />';
-	}
+
 	echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 	echo '</form>';
 }
