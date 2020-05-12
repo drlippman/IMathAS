@@ -222,7 +222,6 @@ if ($overwriteBody==1) {
 		echo "if (window.opener && !window.opener.closed && window.opener.sethighlightrow && window.opener.getnextprev) {";
 		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
-    echo 'console.log(prevnext);';
     echo 'var next = document.getElementById("next");';
     echo 'var prev = document.getElementById("prev");';
     echo 'var remaining = document.getElementById("remaining");';

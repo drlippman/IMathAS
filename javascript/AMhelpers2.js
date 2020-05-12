@@ -292,8 +292,10 @@ function initEnterHandler(qn) {
 	$("input[type=text][name=qn"+qn+"]").off("keydown.enterhandler")
 	  .on("keydown.enterhandler", function(e) {
 		if (e.which==13) {
-			e.preventDefault();
 			var btn = $(this).closest(".questionwrap").find(".submitbtnwrap .primary");
+      if (btn.length>0) {
+        e.preventDefault();
+      }
       if (!btn.is(':disabled')) {
         btn.trigger('click');
       }
