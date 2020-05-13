@@ -397,6 +397,7 @@ function AStextInternal($p,$st,$pos,$angle) {
 			$st = str_replace(array('"',"'"),'',$arg[2]);
 		}
 	}*/
+
 	if ($this->usettf) {
 		$bb = imagettfbbox($this->fontsize,$angle,$this->fontfile,$st);
 
@@ -1234,7 +1235,7 @@ function parseargs($str) {
 	}
 	$args[] = substr($str,$lp);
 	for ($i=0;$i<count($args);$i++) {
-		$args[$i] = str_replace(array('"','\''),'',$args[$i]);
+		$args[$i] = trim(str_replace(array('"','\''),'',$args[$i]));
 	}
 	return $args;
 }
