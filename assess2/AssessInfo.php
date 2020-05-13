@@ -466,7 +466,7 @@ class AssessInfo
     } else if ($now < $this->assessData['startdate']) {
       //before start date
       $available = 'notyet';
-    } else if ($now < $this->assessData['enddate']) {
+    } else if ($now < $this->assessData['enddate'] + 10) {
       //currently available
       $available = 'yes';
     } else if ($this->assessData['allow_practice']) {
