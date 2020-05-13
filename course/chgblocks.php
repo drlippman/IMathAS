@@ -121,7 +121,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$itemorder = serialize($items);
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+	$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
 
 	exit;
 
@@ -235,7 +236,7 @@ foreach ($existblocks as $pos=>$name) {
 			</select>
 		</td>
 	</tr>
-	
+
 	<tr>
 		<td><input type="checkbox" name="chggreyout" class="chgbox"/></td>
 		<td class="r">For assignments within this block,<br/>when they are not available:</td>
@@ -246,10 +247,10 @@ foreach ($existblocks as $pos=>$name) {
 				_('Show greyed out before start date, hide after end date'),
 				_('Hide before start date, show greyed out after end date'),
 				_('Show greyed out before and after'),
-			), 0); 
+			), 0);
 		?>
 		</td>
-	</tr>	
+	</tr>
 	<tr>
 		<td><input type="checkbox" name="chggrouplimit" class="chgbox"/></td>
 		<td class="r">Restrict access to students in section:</td>

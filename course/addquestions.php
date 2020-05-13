@@ -1270,7 +1270,7 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<p>
-		<button type="button" title=<?php echo '"'._("Exit back to course page"),'"'; ?> onClick="window.location='course.php?cid=<?php echo $cid ?>'"><?php echo _("Done"); ?></button>
+		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
 		<button type="button" title=<?php echo '"'._("Modify assessment settings").'"'; ?> onClick="window.location='<?php echo $address;?>?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"><?php echo _("Assessment Settings"); ?></button>
 		<button type="button" title=<?php echo '"'._("Categorize questions by outcome or other groupings").'"'; ?> onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"><?php echo _("Categorize Questions"); ?></button>
 		<button type="button" onClick="window.location='<?php

@@ -144,6 +144,7 @@ class AssessInfo
       } else {
         $LPneeded = 1;
       }
+
       $this->assessData['can_use_latepass'] = $LPneeded;
       $this->assessData['latepasses_avail'] = $latepasses;
 

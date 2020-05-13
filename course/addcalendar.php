@@ -74,7 +74,8 @@ if (!(isset($teacherid))) {
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 	$DBH->commit();
 }
-header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf");
 exit;
 
 ?>

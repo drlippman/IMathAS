@@ -450,7 +450,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($from=='lti') {
 				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
 			} else {
-				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
+				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp.$btf));
 			}
 			exit;
 		} else { //add new

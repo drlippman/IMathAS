@@ -854,6 +854,29 @@ function togglefileembed() {
 	}
 }
 
+jQuery(function() {
+	var m;
+	if (m = window.location.href.match(/course\.php.*cid=(\d+).*folder=([\d\-]+)/)) {
+		window.sessionStorage.setItem('btf'+m[1], m[2]);
+	}
+	jQuery('a[href*="course.php"]').each(function(i,el) {
+		if (!el.href.match(/folder=/) && (m=el.href.match(/cid=(\d+)/))) {
+			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
+			if (btf !== '') {
+				el.href += '&folder='+btf;
+			}
+		}
+	});
+	jQuery('form').each(function(i,el) {
+		if (m=el.action.match(/cid=(\d+)/)) {
+			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
+			if (btf !== '') {
+				el.action += '&btf='+btf;
+			}
+		}
+	});
+});
+
 function convertheic(href, divid) {
 	fetch(href)
   .then(function(res) { return res.blob();})

@@ -7,7 +7,7 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	$fid = Sanitize::onlyInt($_GET['fid']);
 	$from = $_GET['from'];
-	
+
 	require("../includes/exceptionfuncs.php");
 	if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
@@ -21,10 +21,10 @@
 	$allowlate = $fdata['allowlate'];
 	$postby = $fdata['postby'];
 	$replyby = $fdata['replyby'];
-	
+
 	$allowlaten = $allowlate%10; //allowlateon:  0: both together, 1: both separate (not used), 2: posts, 3: replies
 	$allowlateon = floor($allowlate/10)%10;
-		
+
 	$now = time();
 
 	if (isset($_GET['undo'])) {
@@ -44,7 +44,7 @@
 				echo '<p>Invalid</p>';
 			} else {
 				$now = time();
-				
+
 				//allowlateon:  0: both together, 1: both separate (not used), 2: posts, 3: replies
 				//if it's past original due date and latepass is for less than latepasshrs past now, too late
 				$postn = 0; $replyn = 0; $newpostend = 0; $newreplyend = 0;
@@ -124,7 +124,7 @@
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$fid));
 		$hasexception = false;
 		$usedlatepassespost = 0; $usedlatepassesreply = 0;
-		
+
 		if ($stm->rowCount()==0) { //no existing exception
 			$usedlatepasses = 0;
 			$thispostby = $postby;
@@ -144,8 +144,8 @@
 			$itemtype = $r[4];
 			$hasexception = true;
 		}
-		
-		$LPneededP = 0; $LPneededR = 0; 
+
+		$LPneededP = 0; $LPneededR = 0;
 		if ($canuselatepassP) {
 			if ($now>$thispostby) {
 				$LPneededP = $exceptionfuncs->calcLPneeded($thispostby);
@@ -173,7 +173,7 @@
 			if ($canuselatepassR) {
 				$newreplyby = min(strtotime("+".($latepasshrs*$LPneeded)." hours", $thisreplyby), $courseenddate);
 			}
-			
+
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass=latepass-:lps WHERE userid=:userid AND courseid=:courseid AND latepass>=:lps2");
 			$stm->execute(array(':lps'=>$LPneeded, ':lps2'=>$LPneeded, ':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
@@ -189,7 +189,7 @@
 			}
 		}
 		/* old code
-		
+
 		//start date is postby
 		//end date is replyby
 		if ($stm->rowCount()==0) {
@@ -216,11 +216,11 @@
 			$enddate = $thisreplyby;
 		}
 
-		$addtimepost = 0; $addtimereply = 0;												
+		$addtimepost = 0; $addtimereply = 0;
 		if (($itemtype=='F' || $itemtype=='P') && $postby<2000000000 && $postby>0 && ($allowlaten==1 || $allowlaten-1>$usedlatepassespost) && ($now<$thispostby || ($allowlate>100 && $now < strtotime("+".$latepasshrs." hours", $thispostby)))) {
 			$addtimepost = $latepasshrs;
-			$startdate = strtotime("+".$latepasshrs." hours",$thispostby); 
-		}																
+			$startdate = strtotime("+".$latepasshrs." hours",$thispostby);
+		}
 		if (($itemtype=='F' || $itemtype=='R') && $replyby<2000000000 && $replyby>0 && ($allowlaten==1 || $allowlaten-1>$usedlatepassesreply) && ($now<$thisreplyby || ($allowlate>100 && $now < strtotime("+".$latepasshrs." hours", $thisreplyby)))) {
 			$addtimereply = $latepasshrs;
 			$enddate = strtotime("+".$latepasshrs." hours",$thisreplyby);
@@ -238,7 +238,8 @@
 		if ($from=='forum') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid) . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($cid) . "&r=" . Sanitize::randomQueryStringParam());
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($cid) .$btf. "&r=" . Sanitize::randomQueryStringParam());
 		}
 
 	} else {
@@ -251,7 +252,7 @@
 		echo "Redeem LatePass</div>\n";
 
 		$numlatepass = $studentinfo['latepasses'];
-		
+
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND (itemtype='F' OR itemtype='R' OR itemtype='P')");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$fid));
 		$hasexception = false;
@@ -265,7 +266,7 @@
 				$itemtype = 'R';
 			}
 			list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepasspost, $canuselatepassreply, $thispostby, $thisreplyby, $ed) = $exceptionfuncs->getCanUseLatePassForums(null, $fdata);
-			
+
 		} else {
 			$hasexception = true;
 			$r = $stm->fetch(PDO::FETCH_NUM);
@@ -274,7 +275,7 @@
 			list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepasspost, $canuselatepassreply, $thispostby, $thisreplyby, $ed) = $exceptionfuncs->getCanUseLatePassForums($r, $fdata);
 			$itemtype = $r[4];
 		}
-		
+
 		if ($canuselatepasspost && $now>$thispostby) {
 			$LPneededP = $exceptionfuncs->calcLPneeded($thispostby);
 		} else {
@@ -303,7 +304,7 @@
 				echo '<p>You may use up to '.Sanitize::onlyInt($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>';
 			}
 			echo "<p>You have ".Sanitize::onlyInt($numlatepass)." LatePass(es) remaining.</p>";
-			
+
 			$extendwhat = '';
 			if ($canuselatepasspost) {
 				$extendwhat .= " the <b>New Threads</b> due date ";

@@ -99,7 +99,8 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 			if ($_POST['whattocopy']=='all') {
@@ -371,7 +372,8 @@ if (!(isset($teacherid))) {
 					$calitems[] = $row;
 				}
 			} else {
-			  header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
 
 				exit;
 			}

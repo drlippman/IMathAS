@@ -57,7 +57,8 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 			}
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid . "&r=" . Sanitize::randomQueryStringParam());
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid.$btf . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	} else {
@@ -84,7 +85,7 @@ if ($overwriteBody==1) {
 	Are you SURE you want to delete this Wiki and all associated revisions?
 	<form method="POST" action="deletewiki.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>&block=<?php echo Sanitize::encodeUrlParam($block) ?>&id=<?php echo Sanitize::onlyInt($_GET['id']) ?>">
 	<p>
-	<button type=submit name="remove" value="really">Yes, Delete</button>		
+	<button type=submit name="remove" value="really">Yes, Delete</button>
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo Sanitize::courseId($_GET['cid']); ?>'">
 	</p>
 	</form>

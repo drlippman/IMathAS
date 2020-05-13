@@ -260,7 +260,8 @@ if (isset($_GET['record'])) {
 	}
 	$DBH->commit();
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
-		header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, Sanitize::randomQueryStringParam()));
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, Sanitize::randomQueryStringParam()));
 	} else {
 		header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
 	}

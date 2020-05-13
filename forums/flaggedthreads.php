@@ -46,7 +46,8 @@ if (isset($_GET['unflagall'])) {
   if ($from=='home') {
     header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php?r=" . Sanitize::randomQueryStringParam());
   } else {
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+    $btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
   }
   exit;
 }
