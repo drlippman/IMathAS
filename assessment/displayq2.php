@@ -892,7 +892,9 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$stuanswers[$thisq] = implode('|',$tmp);
 		}
 	}
-
+	unset($ar); unset($arv); unset($arvp); unset($tmp); unset($postk);
+	unset($postv); unset($spc); unset($k); unset($v); unset($stuav);
+	
 	$preevalerror = error_get_last();
 	try {
 		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
