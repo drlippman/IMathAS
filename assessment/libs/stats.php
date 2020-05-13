@@ -2,7 +2,13 @@
 //A library of Stats functions.  Version 1.10, Nov 17, 2017
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Excelquartileexc","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","percentile",
+ "interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile",
+ "Excelquartileexc","Nplus1quartile","allquartile","median","freqdist","frequency",
+ "histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf",
+ "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
+ "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
+ "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
 
 //nCr(n,r)
 //The Choose function
