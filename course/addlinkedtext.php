@@ -611,7 +611,7 @@ if ($overwriteBody==1) {
 			</div>
 		</div>
 
-		<span class="form"><?php echo _("Open page in:"); ?>: </span>
+		<span class="form"><?php echo _("Open page in:"); ?></span>
 		<span class="formright">
 			<input type=radio name="target" value="0" <?php writeHtmlChecked($line['target'],0);?>/><?php echo _("Current window"); ?>/tab<br/>
 			<input type=radio name="target" value="1" <?php writeHtmlChecked($line['target'],1);?>/><?php echo _("New window"); ?>/tab<br/>
