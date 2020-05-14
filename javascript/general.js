@@ -868,10 +868,10 @@ jQuery(function() {
 		}
 	});
 	jQuery('form').each(function(i,el) {
-		if (m=el.action.match(/cid=(\d+)/)) {
+		if (m=el.getAttribute('action').match(/cid=(\d+)/)) {
 			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
 			if (btf !== '') {
-				el.action += '&btf='+btf;
+				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
 			}
 		}
 	});
