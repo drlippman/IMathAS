@@ -566,41 +566,44 @@ function scorejournal($stua, $answer, $j, $sn) {
 	}
 	//$newans = $answer;
 	foreach ($j as $ix=>$jd) {
-		$n = (count($jd['debits']) + count($jd['credits']))/2;
+		$offset = !empty($jd['haspostrefs'])?1:0;
+		$n = (count($jd['debits']) + count($jd['credits']))/(2+$offset);
 		$usedans = array();
-		for ($i=$sn;$i<$sn+3*$n;$i+=3) {
+		for ($i=$sn;$i<$sn+(3+$offset)*$n;$i+=3+$offset) {
 			$matchtype = -1;  $matchval = -1;
-			for ($k=$sn;$k<$sn+3*$n;$k+=3) {
+			for ($k=$sn;$k<$sn+(3+$offset)*$n;$k+=3+$offset) {
 				if (trim(strtolower($stua[$i]))==trim(strtolower($answer[$k]))) {
 					$matchtype = $k;
 					break;
-				} else if (($answer[$k+1]=='' && $stua[$i+1]=='' && abs(floatval($stua[$i+2]) - floatval($answer[$k+2]))<.01) ||
-					($answer[$k+2]=='' && $stua[$i+2]=='' && abs(floatval($stua[$i+1])-floatval($answer[$k+1]))<.01)
+				} else if (($answer[$k+1+$offset]=='' && $stua[$i+1+$offset]=='' &&
+					abs(floatval($stua[$i+2+$offset]) - floatval($answer[$k+2+$offset]))<.01) ||
+					($answer[$k+2+$offset]=='' && $stua[$i+2+$offset]=='' &&
+					abs(floatval($stua[$i+1+$offset])-floatval($answer[$k+1+$offset]))<.01)
 				) {
 					$matchval = $k;
 				}
 			}
 			if ($matchtype > -1 && !in_array($matchtype,$usedans)) {
 				$tmp = array();
-				for ($k=0;$k<3;$k++) {
+				for ($k=0;$k<3+$offset;$k++) {
 					$tmp[$k] = $answer[$i+$k];
 				}
-				for ($k=0;$k<3;$k++) {
+				for ($k=0;$k<3+$offset;$k++) {
 					$answer[$i+$k] = $answer[$matchtype+$k];
 				}
-				for ($k=0;$k<3;$k++) {
+				for ($k=0;$k<3+$offset;$k++) {
 					$answer[$matchtype+$k] = $tmp[$k];
 				}
 				$usedans[] = $i;
 			} else if ($matchval > -1 && !in_array($matchval,$usedans)) {
 				$tmp = array();
-				for ($k=0;$k<3;$k++) {
+				for ($k=0;$k<3+$offset;$k++) {
 					$tmp[$k] = $answer[$i+$k];
 				}
-				for ($k=0;$k<3;$k++) {
+				for ($k=0;$k<3+$offset;$k++) {
 					$answer[$i+$k] = $answer[$matchval+$k];
 				}
-				for ($k=0;$k<3;$k++) {
+				for ($k=0;$k<3+$offset;$k++) {
 					$answer[$matchval+$k] = $tmp[$k];
 				}
 			}
@@ -608,31 +611,31 @@ function scorejournal($stua, $answer, $j, $sn) {
 		//look at order:  look for debits after credits, and credits before debits
 		//mark wrong the less harmful ones
 		$debaftercred = array();  $firstcred = false;
-		for ($i=$sn;$i<$sn+3*$n;$i+=3) {
-			if ($stua[$i+1]!='' && $stua[$i+2]=='' && $firstcred) { $debaftercred[] = $i;}
-			if ($stua[$i+1]=='' && $stua[$i+2]!='') { $firstcred = true; }
+		for ($i=$sn;$i<$sn+(3+$offset)*$n;$i+=3+$offset) {
+			if ($stua[$i+1+$offset]!='' && $stua[$i+2+$offset]=='' && $firstcred) { $debaftercred[] = $i;}
+			if ($stua[$i+1+$offset]=='' && $stua[$i+2+$offset]!='') { $firstcred = true; }
 		}
 		$credbeforedeb = array();  $firstdeb = false;
-		for ($i=$sn+3*$n-3;$i>=$sn;$i-=3) {
-			if ($stua[$i+1]!='' && $stua[$i+2]=='') { $firstdeb = true;}
-			if ($stua[$i+1]=='' && $stua[$i+2]!='' && $firstdeb) { $credbeforedeb[] = $i; }
+		for ($i=$sn+(3+$offset)*$n-3-$offset;$i>=$sn;$i-=(3+$offset)) {
+			if ($stua[$i+1+$offset]!='' && $stua[$i+2+$offset]=='') { $firstdeb = true;}
+			if ($stua[$i+1+$offset]=='' && $stua[$i+2+$offset]!='' && $firstdeb) { $credbeforedeb[] = $i; }
 		}
 		if (count($debaftercred)+count($credbeforedeb) > 0) {
 			if (count($credbeforedeb) > count($debaftercred)) {
 				foreach ($debaftercred as $i) {
-					for ($k=0;$k<3;$k++) {
+					for ($k=0;$k<3+$offset;$k++) {
 						$answer[$i+$k] = $answer[$i+$k].'50000';
 					}
 				}
 			} else {
 				foreach ($credbeforedeb as $i) {
-					for ($k=0;$k<3;$k++) {
+					for ($k=0;$k<3+$offset;$k++) {
 						$answer[$i+$k] = $answer[$i+$k].'50000';
 					}
 				}
 			}
 		}
-		$sn += 3*(count($jd['debits']) + count($jd['credits']))/2 + 3*$jd['extrarows'];
+		$sn += (3+$offset)*(count($jd['debits']) + count($jd['credits']))/(2+$offset) + (3+$offset)*$jd['extrarows'];
 	}
 	return $answer;
 }
