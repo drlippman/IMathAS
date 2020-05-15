@@ -3,7 +3,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"addGeogebra","addGeogebraJava","ggb_axes","ggb_addobject","ggb_addslider");
+array_push($allowedmacros,"addGeogebra","addGeogebraJava","ggb_axes","ggb_addobject","ggb_addslider","ggb_getparams");
 
 //addGeogebra(url,[width,height,commands,params,callbacks,qn,part])
 //place a geogebra HTML5 applet.  Either include the base64ggb (grab by pressing
@@ -31,8 +31,22 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
 	}
 	$out .= '<script type="text/javascript">';
-	if ($url == 'graphing' || $url == 'geometry' || $url == 'classic' || $url == '3d') {
+	if ($url == 'graphing' || $url == 'geometry' || $url == '3d') {
 		$out .= 'var applet'.$ggbid.' = new GGBApplet({"appName":"'.$url.'",';
+	} else if ($url == 'spreadsheet' || $url == 'classic' || $url == 'probability') {
+		$out .= 'var applet'.$ggbid.' = new GGBApplet({';
+		if ($url == 'spreadsheet') {
+			$p = ggb_getparams('spreadsheet');
+		} else if ($url == 'probability') {
+			$p = ggb_getparams('probability');
+		} else {
+			$p = array("showAlgebraInput"=>true);
+		}
+		foreach ($p as $k=>$pv) {
+			if (!isset($params[$k])) {
+				$params[$k] = $pv;
+			}
+		}
 	} else if (strlen($url)>10) {
 		$out .= 'var applet'.$ggbid.' = new GGBApplet({"ggbBase64":"'.$url.'",';
 	} else {
@@ -55,6 +69,14 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	}
 	$out .= ',appletOnLoad:function(api) {';
 	$out .= '   $("#ggbloadimg'.$ggbid.'").remove(); ';
+	$out .= '  $("#geogebra_container'.$ggbid.'").on("keydown", function(e) {if (e.keyCode==13) { console.log("1");e.preventDefault(); return false;}});';
+	$out .= '  $(document).on("keydown", function(e) {if (e.keyCode==13) {window.lastEnterKeyPressed =  e.timeStamp;}});';
+	$out .= '  window.lastEnterKeyPressed = 0;
+	  $("input[type=submit]").on("click", function(e) { console.log(e);
+		if (e.detail==0 && (e.timeStamp - window.lastEnterKeyPressed)>20) {
+			e.preventDefault(); return false;
+		}
+	});';
 	foreach ($commands as $com) {
 		$out .= 'api.'.$com.';';
 	}
@@ -180,7 +202,12 @@ function ggb_addslider($commands,$label,$min=-5,$max=5,$step=0.1,$vis=false) {
 function ggb_getparams($type) {
 	if ($type == 'graphing_input') {
 		return ["showAlgebraInput" => true, "showMenuBar" => true];
+	} else if ($type == 'spreadsheet') {
+		return ["perspective"=>"S", "showAlgebraInput" => true, "showMenuBar" => true, "showToolBar"=>true, "showToolBarHelp"=>false];
+	} else if ($type == 'probability') {
+		return ["perspective"=>"B", "showAlgebraInput" => true, "showMenuBar" =>false, "showToolBar"=>false, "showToolBarHelp"=>false];
 	}
 }
+
 
 ?>
