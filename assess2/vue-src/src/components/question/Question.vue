@@ -319,17 +319,6 @@ export default {
       // set work
       this.work = this.questionData.work;
 
-      let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
-      svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
-      let svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.partial') + '">';
-      svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
-      let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
-      svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
-      window.$(this.$refs.thisqwrap).find('.scoremarker').remove();
-      window.$(this.$refs.thisqwrap).find('div.ansgrn,table.ansgrn').append(svgchk);
-      window.$(this.$refs.thisqwrap).find('div.ansyel,table.ansyel').append(svgychk);
-      window.$(this.$refs.thisqwrap).find('div.ansred,table.ansred').append(svgx);
-
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
           if (el.name.match(/^(qn|tc|qs)\d/)) {
@@ -338,11 +327,7 @@ export default {
         });
       };
 
-      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
-
-      window.$(this.$refs.thisqwrap).find('select.ansgrn').after(svgchk);
-      window.$(this.$refs.thisqwrap).find('select.ansyel').after(svgychk);
-      window.$(this.$refs.thisqwrap).find('select.ansred').after(svgx);
+      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ, this.$refs.thisqwrap);
 
       actions.setRendered(this.qn, true);
     },

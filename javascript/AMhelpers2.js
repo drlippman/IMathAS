@@ -79,7 +79,7 @@ function clearparams(paramarr) {
   }
 }
 
-function init(paramarr, enableMQ) {
+function init(paramarr, enableMQ, baseel) {
   var qn, params, i, el, str;
   for (qn in paramarr) {
     if (isNaN(parseInt(qn))) { continue; }
@@ -191,6 +191,9 @@ function init(paramarr, enableMQ) {
   }
   initDupRubrics();
   initShowAnswer2();
+  if (baseel) {
+    setScoreMarkers(baseel);
+  }
   initqsclickchange();
   initClearScoreMarkers();
   if (paramarr.scripts) {
@@ -265,6 +268,10 @@ function clearScoreMarkers(e) {
   var target = e.currentTarget
   if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
     $(target).removeClass(m[0]);
+    $(target).nextAll('.scoremarker.sr-only').first().remove();
+    if (target.tagName.toLowerCase() == 'select') {
+      $(target).nextAll('svg.scoremarker').first().remove();
+    }
     if (target.type == 'hidden') { // may be MQ box
       $("#mqinput-"+target.id).removeClass(m[0]);
     }
@@ -277,6 +284,28 @@ function clearScoreMarkers(e) {
       wrap.find(".scoremarker").remove();
     }
   }
+}
+
+function setScoreMarkers(base) {
+  var svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
+  svgchk += '<span class="sr-only scoremarker">' + _('Correct') + '</span>';
+  var svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
+  svgychk += '<span class="sr-only scoremarker">' + _('Partially correct') + '</span>';
+  var svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+  svgx += '<span class="sr-only scoremarker">' + _('Incorrect') + '</span>';
+  $(base).find('.scoremarker').remove();
+  $(base).find('div.ansgrn,table.ansgrn').append(svgchk);
+  $(base).find('div.ansyel,table.ansyel').append(svgychk);
+  $(base).find('div.ansred,table.ansred').append(svgx);
+  $(base).find('select.ansgrn').after(svgchk);
+  $(base).find('select.ansyel').after(svgychk);
+  $(base).find('select.ansred').after(svgx);
+  $(base).find('span[id^=mqinput-].ansgrn,input[type=text].ansgrn').after('<span class="scoremarker sr-only">' + _('Correct') + '</span>');
+  $(base).find('span[id^=mqinput-].ansyel,input[type=text].ansyel').after('<span class="scoremarker sr-only">' + _('Partially correct') + '</span>');
+  $(base).find('span[id^=mqinput-].ansred,input[type=text].ansred').after('<span class="scoremarker sr-only">' + _('Incorrect') + '</span>');
 }
 
 function initClearScoreMarkers() {
