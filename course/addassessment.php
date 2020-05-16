@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
+require_once("../includes/TeacherAuditLog.php");
 
 if ($courseUIver > 1) {
 	if (!isset($_GET['id'])) {
@@ -102,9 +103,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             	$DBH->beginTransaction();
                 require_once('../includes/filehandler.php');
                 deleteallaidfiles($assessmentId);
+								$grades = array();
+								$query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid";
+				        $stm->execute(array(':assessmentid'=>$assessmentId));
+				        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				          $sp = explode(';', $row['bestscores']);
+				          $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+				          $total = array_sum(explode(',', $as));
+				          $grades[$row['userid']] = $total;
+				        }
                 $stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));
-                $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+								if ($stm->rowCount()>0) {
+					        TeacherAuditLog::addTracking(
+					          $cid,
+					          "Clear Attempts",
+					          $assessmentId,
+					          array('grades'=>$grades)
+					        );
+					      }
+
+								$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));
                 $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));

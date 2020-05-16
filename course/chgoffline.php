@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
-
+require_once("../includes/TeacherAuditLog.php");
 
 if (!isset($teacherid)) {
 	echo "You need to log in as a teacher to access this page";
@@ -21,16 +21,38 @@ if (isset($_POST['checked'])) { //form submitted
 	$ph = Sanitize::generateQueryPlaceholders($checked);
 	if ($_POST['submit']=="Delete") {
 		if (isset($_POST['confirm'])) {
-			
+			$gbitems = array();
+			$stm = $DBH->prepare("SELECT id,name,points FROM imas_gbitems WHERE id IN ($ph)");
+			$stm->execute($checked);
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$gbitems[$row['id']] = array('name'=>$row['name'], 'points'=>$row['points']);
+			}
+			$grades = array();
+			$stm = $DBH->prepare("SELECT userid,gradetypeid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid IN ($ph)");
+			$stm->execute($checked);
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$grades[$row['gradetypeid']][$row['userid']] = $row['score'];
+			}
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Delete Item",
+				null,
+				array(
+					'type'=>'Delete Offline',
+					'items'=>$gbitems,
+					'grades'=>$grades
+				)
+			);
+
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid IN ($ph)");
 			$stm->execute($checked);
-			
+
 			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id IN ($ph)");
 			$stm->execute($checked);
-			
+
 		} else {
 			$checkedlist = implode(',', $checked);
-			
+
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";

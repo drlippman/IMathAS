@@ -11,6 +11,7 @@ require_once(__DIR__ . '/questions/models/QuestionParams.php');
 require_once(__DIR__ . '/questions/models/ShowAnswer.php');
 require_once(__DIR__ . '/questions/ScoreEngine.php');
 require_once(__DIR__ . '/questions/models/ScoreQuestionParams.php');
+require_once(__DIR__ . '/../includes/TeacherAuditLog.php');
 
 use IMathAS\assess2\questions\QuestionGenerator;
 use IMathAS\assess2\questions\models\QuestionParams;
@@ -2985,17 +2986,29 @@ class AssessRecord
   public function gbClearAttempts($type, $keepver, $av=0, $qn=0, $qv=0) {
     $this->parseData();
     $replacedDeleted = false;
+    $scoresToLog = array();
+    $origtype = $type;
+    $origScore = $this->assessRecord['score'];
+    $islogged = false;
     if ($type == 'all' && $keepver == 1) {
+
 
       // delete all old assessment attempts
       $cnt_aver = count($this->data['assess_versions']);
       if ($cnt_aver > 1) {
+        for ($i=0; $i < $cnt_aver; $i++) {
+          $scoresToLog[$i] = $this->data['assess_versions'][$i]['score'];
+        }
+        $islogged = true;
         array_splice($this->data['assess_versions'], 0, $cnt_aver - 1);
       }
 
       // clear out remaining version
-      $this->gbClearAttempts('attempt', $keepver, 0);
-    } else if ($type == 'attempt' && $keepver == 0) {
+      $type = 'attempt';
+      $av = 0;
+    }
+    if ($type == 'attempt' && $keepver == 0) {
+      $scoresToLog[$av] = $this->data['assess_versions'][$av]['score'];
       //delete this attempt
       array_splice($this->data['assess_versions'], $av, 1);
 
@@ -3007,6 +3020,9 @@ class AssessRecord
     } else if ($type == 'attempt' && $keepver == 1) {
       // want to clear work on this attempt but keep latest version
       $aver = &$this->data['assess_versions'][$av];
+      if (!$islogged) {
+        $scoresToLog[$av] = $aver['score'];
+      }
       $aver['score'] = 0;
       $aver['status'] = -1;
       $aver['starttime'] = 0;
@@ -3054,6 +3070,20 @@ class AssessRecord
         'tries' => array()
       );
       $replacedDeleted = true;
+    }
+    if (!empty($scoresToLog)) {
+      TeacherAuditLog::addTracking(
+        $this->assess_info->getCourseId(),
+        "Clear Attempts",
+        $this->curAid,
+        array(
+          'studentid'=>$this->curUid,
+          'grade'=>$origScore,
+          'type'=>$origtype,
+          'keepver'=>$keepver,
+          'attempt_scores'=>$scoresToLog
+        )
+      );
     }
     $this->updateStatus();
     return $replacedDeleted;

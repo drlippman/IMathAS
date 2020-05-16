@@ -5,7 +5,8 @@
 /*** master php includes *******/
 require("../init.php");
 include("../includes/htmlutil.php");
-
+require("delitembyid.php");
+require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -149,12 +150,34 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
+			$grades = array();
 			if ($aver > 1) {
+				$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+				$stm->execute(array(':assessmentid'=>$aid));
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			    $grades[$row['userid']]=$row["score"];
+				}
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 			} else {
+				$query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid";
+        $stm->execute(array(':assessmentid'=>$aid));
+        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+          $sp = explode(';', $row['bestscores']);
+          $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+          $total = array_sum(explode(',', $as));
+          $grades[$row['userid']] = $total;
+        }
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 			}
 			$stm->execute(array(':assessmentid'=>$aid));
+			if ($stm->rowCount()>0) {
+        TeacherAuditLog::addTracking(
+          $cid,
+          "Clear Attempts",
+          $aid,
+          array('grades'=>$grades)
+        );
+      }
 			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");

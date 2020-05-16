@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require("../init.php");
-
+require("delitembyid.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -31,30 +31,10 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		$stm->execute(array(':typeid'=>$wikiid, ':courseid'=>$cid));
 		if ($stm->rowCount()>0) {
 			$itemid = $stm->fetchColumn(0);
-			$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
-			$stm->execute(array(':id'=>$itemid));
-			$stm = $DBH->prepare("DELETE FROM imas_wikis WHERE id=:id");
-			$stm->execute(array(':id'=>$wikiid));
-			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
-			$stm->execute(array(':wikiid'=>$wikiid));
-			$stm = $DBH->prepare("DELETE FROM imas_wiki_views WHERE wikiid=:wikiid");
-			$stm->execute(array(':wikiid'=>$wikiid));
-			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$cid));
-			$items = unserialize($stm->fetchColumn(0));
 
-			$blocktree = explode('-',$block);
-			$sub =& $items;
-			for ($i=1;$i<count($blocktree);$i++) {
-				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-			}
-			$key = array_search($itemid,$sub);
-			if ($key!==false) {
-				array_splice($sub,$key,1);
-				$itemorder = serialize($items);
-				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-				$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
-			}
+			delitembyid($itemid);
+
+			removeItemFromItemorder($cid, $itemid, $block);
 		}
 		$DBH->commit();
 		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';

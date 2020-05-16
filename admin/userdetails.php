@@ -400,6 +400,7 @@ if ($overwriteBody==1) {
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
         thishtml += \' <li><a href="addremoveteachers.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
         thishtml += \' <li><a href="transfercourse.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
+        thishtml += \' <li><a href="teacherauditlog.php?userid='.$uid.'&cid=\'+cid+\'">'._('Teacher Audit Log').'</a></li>\';
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
         thishtml += \'</ul></span> \';
         $(el).find("img").replaceWith(thishtml);

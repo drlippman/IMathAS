@@ -1,6 +1,7 @@
 <?php
 
 require(__DIR__.'/migratesettings.php');
+require_once(__DIR__."/TeacherAuditLog.php");
 
 //util function for unenrolling students
 //$cid = courseid
@@ -83,7 +84,23 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		}
 		$gblist = implode(',',$gbitems);
 		//new
+		$grades = array();
 		if (count($assesses)>0) {
+			$query = "SELECT userid, assessmentid, bestscores FROM imas_assessment_sessions "
+				. " WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
+			$stm = $DBH->query($query);
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$sp = explode(';', $row['bestscores']);
+				$as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+				$total = array_sum(explode(',', $as));
+				$grades[$row['userid']]['assessment'][$row["assessmentid"]] = $total;
+			}
+			$query = "SELECT userid, assessmentid, score FROM imas_assessment_records "
+				. " WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
+			$stm = $DBH->query($query);
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$grades[$row['userid']]['assessment'][$row["assessmentid"]] =$row["score"];
+			}
 			deleteasidfilesbyquery2('userid',$tounenroll,$assesses);
 			deleteAssess2FilesOnUnenroll($tounenroll, $assesses, $groupassess);
 			//deleteasidfilesbyquery(array('assessmentid'=>$assesses, 'userid'=>$tounenroll));
@@ -93,6 +110,24 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$DBH->query($query); //values already sanitized
 			$query = "DELETE FROM imas_exceptions WHERE itemtype='A' AND assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
+		}
+		$where = array();
+		if (count($exttools)>0) {
+			$where[] = "(gradetype = 'exttool' AND gradetypeid IN($exttoolslist))";
+		}
+		if (count($gblist)>0) {
+			$where[] = "(gradetype = 'offline' AND gradetypeid IN($gblist))";
+		}
+		if (count($forums)>0) {
+			$where[] = "(gradetype = 'forum' AND gradetypeid IN($forumlist))";
+		}
+		if (!empty($where)) {
+			$query = "SELECT userid, gradetype, gradetypeid, score FROM imas_grades WHERE userid IN ($stulist) AND ("
+			. implode (" OR ", $where) . ")";
+			$stm = $DBH->query($query);
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$grades[$row['userid']][$row["gradetype"]][$row["gradetypeid"]] = $row["score"];
+			}
 		}
 		if (count($drills)>0) {
 			$query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid IN ($drilllist) AND userid IN ($stulist)";
@@ -232,13 +267,24 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 
 		$query = "DELETE FROM imas_content_track WHERE userid IN ($stulist) AND courseid=$cid";
 		$DBH->query($query); //values already sanitized
+
+		$result = TeacherAuditLog::addTracking(
+			$cid,
+			"Unenroll",
+			null,
+			array(
+				"unenrolled"=>$stulist,
+				"grades"=>$grades
+			)
+		);
 	}
 
+	/*
 	$lognote = "Unenroll in $cid run by $userid via script ".basename($_SERVER['PHP_SELF']);
 	$lognote .= ". Unenrolled: $stulist";
 	$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (?,?)");
 	$stm->execute(array(time(), $lognote));
-
+	*/
 }
 
 ?>

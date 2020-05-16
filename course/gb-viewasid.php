@@ -139,16 +139,29 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	//PROCESS ANY TODOS
 	if (isset($_REQUEST['clearattempt']) && $isteacher) {
 		if (isset($_POST['clearattempt']) && $_POST['clearattempt']=='confirmed') {
-			$query = "SELECT ias.assessmentid,ias.lti_sourcedid,ias.userid FROM imas_assessment_sessions AS ias ";
+			$query = "SELECT ias.assessmentid,ias.lti_sourcedid,ias.userid,ias.bestscores FROM imas_assessment_sessions AS ias ";
 			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id=:id AND ia.courseid=:courseid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$asid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
-				list($aid, $ltisourcedid, $uid) = $stm->fetch(PDO::FETCH_NUM);
+				list($aid, $ltisourcedid, $uid, $bestscores) = $stm->fetch(PDO::FETCH_NUM);
 				if (strlen($ltisourcedid)>1) {
 					require_once("../includes/ltioutcomes.php");
 					updateLTIgrade('delete',$ltisourcedid,$aid,$uid);
 				}
+
+				$sp = explode(';', $bestscores);
+        $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+        $total = array_sum(explode(',', $as));
+				TeacherAuditLog::addTracking(
+          $cid,
+          "Clear Attempts",
+          $aid,
+          array(
+						'studentid'=>$uid,
+						'grade'=>$total
+					)
+        );
 
 				$qp = getasidquery($asid);
 				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
