@@ -1,5 +1,6 @@
 <?php
 require_once("../includes/filehandler.php");
+require_once("../includes/TeacherAuditLog.php");
 
 function delitembyid($itemid) {
 	global $DBH, $cid;

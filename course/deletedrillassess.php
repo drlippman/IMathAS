@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require("../init.php");
-
+require("delitembyid.php");
 
 /*** pre-html data manipulation, including function code *******/
 

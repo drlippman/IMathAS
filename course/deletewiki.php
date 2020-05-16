@@ -4,7 +4,7 @@
 
 /*** master php includes *******/
 require("../init.php");
-
+require("delitembyid.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -31,7 +31,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 		$stm->execute(array(':typeid'=>$wikiid, ':courseid'=>$cid));
 		if ($stm->rowCount()>0) {
 			$itemid = $stm->fetchColumn(0);
-			
+
 			delitembyid($itemid);
 
 			removeItemFromItemorder($cid, $itemid, $block);
