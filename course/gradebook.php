@@ -797,7 +797,7 @@ function gbstudisp($stu) {
 					echo '<td></td>';
 				}
 			}
-			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'">';
+			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'" scope="row">';
 
 			$showlink = false;
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
