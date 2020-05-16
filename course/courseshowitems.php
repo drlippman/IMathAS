@@ -319,9 +319,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo "<div class=title>";
 
 					if ($ispublic) {
-						echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+						echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
 					} else {
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span class=noticetext>", _('New'), "</span>";
@@ -412,7 +412,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
+					echo "<b role=\"heading\"><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					echo "$astyle>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</a></b> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -429,7 +429,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id']);
 					} else {
 						echo '<div class="itemhdrright">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle ";
+						echo 'aria-label="'._('Isolate block').' '.Sanitize::encodeStringForDisplay($items[$i]['name']).'">';
+						echo _('Isolate'), "</a>";
 						echo '</div>';
 
 					}
@@ -506,7 +508,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
+					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo " <span class=noticetext>", _('New'), "</span>";
@@ -591,7 +593,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<b>";
+					echo "<b role=\"heading\">";
 					$control = "onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					$control .= 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					if ($items[$i]['SH'][0]=='S') {
@@ -614,7 +616,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id']);
 					} else {
 						echo '<div class="itemhdrright">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle ";
+						echo 'aria-label="'._('Isolate block').' '.Sanitize::encodeStringForDisplay($items[$i]['name']).'">';
+						echo _('Isolate'), "</a>";
 						echo '</div>';
 					}
 					echo '</div>'; //itemhdr
