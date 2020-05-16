@@ -238,7 +238,16 @@ tr {
 	margin: 0px;
 	padding: 0px;
 }
-
+th[aria-sort]:after {
+	color: #666;
+	padding-left: 2px;
+}
+th[aria-sort="ascending"]:after {
+	content: "\2191";
+}
+th[aria-sort="descending"]:after {
+	content: "\2193";
+}
 td.c, input.c {
 	text-align: center;
 }
