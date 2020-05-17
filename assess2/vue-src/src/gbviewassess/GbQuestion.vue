@@ -1,10 +1,12 @@
 <template>
-  <div
-    v-html="qdata.html"
-    class = "questionwrap"
-    :id="'questionwrap' + qn"
-    ref = "thisqwrap"
-  />
+  <div class="questionwrap questionpane">
+    <div
+      v-html="qdata.html"
+      class = "question"
+      :id="'questionwrap' + qn"
+      ref = "thisqwrap"
+    />
+  </div>
 </template>
 
 <script>

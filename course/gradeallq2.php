@@ -277,7 +277,7 @@
 	$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=051620" type="text/javascript"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
 	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
-	
+
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
@@ -500,14 +500,16 @@
 				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
 			}
 			*/
-			echo '<div class="questionwrap" id="qwrap'.$cnt.'">';
+			echo '<div class=scrollpane>';
+			echo '<div class="questionwrap questionpane">';
+			echo '<div class="question" id="questionwrap'.$cnt.'">';
 			echo $qdata['html'];
 			echo '<script type="text/javascript">
 				$(function() {
-					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false, document.getElementById("qwrap'.$cnt.'"));
+					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false, document.getElementById("questionwrap'.$cnt.'"));
 				});
 				</script>';
-			echo '</div>';
+			echo '</div></div></div>';
 
 			if (!empty($qdata['work'])) {
 				echo '<div class="questionpane">';

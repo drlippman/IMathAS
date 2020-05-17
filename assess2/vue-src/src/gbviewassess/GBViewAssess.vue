@@ -193,7 +193,7 @@
             </div>
             <div class="scrollpane">
               <gb-question
-                :class = "{'questionpane':true, 'inactive':!showQuestion[qn]}"
+                :class = "{'inactive':!showQuestion[qn]}"
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
               />

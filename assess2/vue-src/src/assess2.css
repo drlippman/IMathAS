@@ -334,6 +334,10 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   max-width: 700px;
   overflow: visible;
 }
+.questionpane > .question > .question {
+  margin: 0;
+  padding: 0;
+}
 .questionwrap .question {
   background-color: transparent;
   border: 0;
