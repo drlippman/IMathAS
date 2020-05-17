@@ -64,9 +64,9 @@ class EssayAnswerBox implements AnswerBox
     				$la = preg_replace('/\n/','<br/>',$la);
     			}
     			if ($colorbox=='') {
-    				$out .= '<div class="intro" id="qnwrap'.$qn.'">';
+    				$out .= '<div class="introtext" id="qnwrap'.$qn.'">';
     			} else {
-    				$out .= '<div class="intro '.$colorbox.'" id="qnwrap'.$qn.'">';
+    				$out .= '<div class="introtext '.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
     			if (isset($GLOBALS['questionscoreref'])) {
     				if ($multi==0) {
