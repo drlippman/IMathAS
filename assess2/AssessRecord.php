@@ -2765,6 +2765,21 @@ class AssessRecord
       $out['timeactive'] = $this->calcTimeActive($qdata);
       $out['feedback'] = $qdata['feedback'];
       $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $dispqn !== null ? $dispqn : $qn, $out);
+      // include autosaves if teacher and last asssess & question version
+      if ($this->teacherInGb &&
+        $aver == count($this->data['assess_versions'])-1 &&
+        $qver == count($this->data['assess_versions'][$aver]['questions'][$qn]['question_versions'])-1
+      ) {
+        $autosaves = $this->getAutoSaves($qn);
+        if (!empty($autosaves) && !empty($autosaves['stuans'])) {
+          // reformat like try data so we can reuse getPreviousTries / GbAllTries
+          $autosavereformatted = array(array());
+          foreach ($autosaves['stuans'] as $pn=>$val) {
+            $autosavereformatted[$pn] = array(array('stuans'=>$val));
+          }
+          $out['autosaves'] = $this->getPreviousTries($autosavereformatted, $dispqn !== null ? $dispqn : $qn, $out);
+        }
+      }
     }
     return $out;
   }

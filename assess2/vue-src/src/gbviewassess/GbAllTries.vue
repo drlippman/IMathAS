@@ -1,6 +1,21 @@
 <template>
   <div ref="trywrap">
-    <p><strong>{{ $t('gradebook.all_tries') }}</strong></p>
+    <p>
+      <strong v-if="type === 'tries'">
+        {{ $t('gradebook.all_tries') }}
+      </strong>
+      <strong v-else-if="type === 'autosave'">
+        {{ $t('gradebook.autosaves') }}
+      </strong>
+    </p>
+    <p v-if="type === 'autosave'" class="subdued">
+      {{ $t('gradebook.autosave_info') }}
+      <span v-if="submitby == 'by_assessment'">
+        {{ $t('gradebook.autosave_byassess') }}
+      </span>
+      <span v-else>
+      </span>
+    </p>
     <div
       v-for="(part,index) in processedTries"
       :key = "index"
@@ -10,7 +25,9 @@
         <strong>{{ $t('gradebook.part_n', {n: index+1}) }}</strong>
       </div>
       <div v-for="(trystr, tryn) in part" :key="tryn">
-        {{ $t('gradebook.try_n', {n: tryn+1}) }}:
+        <span v-if="type =='tries'">
+          {{ $t('gradebook.try_n', {n: tryn+1}) }}:
+        </span>
         <span v-html="trystr"></span>
       </div>
     </div>
@@ -20,7 +37,7 @@
 <script>
 export default {
   name: 'GbAllTries',
-  props: ['tries', 'qn'],
+  props: ['tries', 'qn', 'type', 'submitby'],
   data: function () {
     return {
       rendered: false,

@@ -92,16 +92,32 @@
       >
         {{ $t('gradebook.show_penalties') }}
       </button>
+      <button
+        v-if="hasAutoSaves"
+        type="button"
+        class="slim"
+        @click="showAutosaves = !showAutosaves"
+      >
+        {{ $t('gradebook.show_autosaves') }}
+      </button>
     </div>
     <gb-all-tries
       v-if="showAllTries"
       :tries="qdata.other_tries"
+      type="tries"
       :qn="qn"
     />
     <gb-penalties
       v-if="showPenalties"
       :parts="qdata.parts"
       :submitby="submitby"
+    />
+    <gb-all-tries
+      v-if="showAutosaves"
+      :tries="qdata.autosaves"
+      type="autosave"
+      :submitby="submitby"
+      :qn="qn"
     />
     <div v-if="canedit && showfull && qHelps.length > 0">
       {{ $t('gradebook.had_help') }}:
@@ -137,7 +153,8 @@ export default {
       curScores: false,
       showfeedback: false,
       showAllTries: false,
-      showPenalties: false
+      showPenalties: false,
+      showAutosaves: false
     };
   },
   computed: {
@@ -278,6 +295,9 @@ export default {
         }
       }
       return false;
+    },
+    hasAutoSaves () {
+      return this.qdata.hasOwnProperty('autosaves');
     },
     submitby () {
       return store.assessInfo.submitby;
