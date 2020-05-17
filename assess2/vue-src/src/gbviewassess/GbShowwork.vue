@@ -36,6 +36,7 @@ export default {
       setTimeout(window.drawPics, 100);
       window.rendermathnode(this.$refs.workbox);
       window.initlinkmarkup(this.$refs.workbox);
+      window.$(this.$refs.workbox).find('img').on('click', window.rotateimg);
       this.rendered = true;
     }
   },

@@ -301,7 +301,11 @@
 			$("#alltries"+n).addClass("rendered");
 			window.drawPics(document.getElementById("alltries"+n));
 		}
-	}';
+	}
+	$(function() {
+		$(".viewworkwrap img").on("click", rotateimg);
+	})
+	';
 	$placeinhead .= '</script>';
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';

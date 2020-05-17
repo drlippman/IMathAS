@@ -173,7 +173,7 @@ function init(paramarr, enableMQ, baseel) {
         !document.getElementById("tinyprev"+qn)
       ) {
         var html = $("#qn"+qn).val();
-        var div = $("<div>", {"id": "tinyprev"+qn, "class": "intro"});
+        var div = $("<div>", {"id": "tinyprev"+qn, "class": "introtext"});
         div.html(html);
         $("#qn"+qn).hide().after(div);
       } else {
@@ -186,6 +186,9 @@ function init(paramarr, enableMQ, baseel) {
           })
         });
       }
+    }
+    if (params.qtype == 'essay') {
+      $("#qnwrap"+qn+".introtext img").on('click', rotateimg);
     }
     initEnterHandler(qn);
   }
