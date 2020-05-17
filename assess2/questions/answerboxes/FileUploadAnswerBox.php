@@ -102,7 +102,7 @@ class FileUploadAnswerBox implements AnswerBox
     					$url = getasidfileurl($file);
     					$extension = substr($url,strrpos($url,'.')+1,3);
     					$filename = basename($file);
-    					$out .= "<br/>" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a>";
+    					$out .= "<br/><span class=\"lastfilesub\">" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a></span>";
     					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\" />";
     					/*if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
     						$out .= " <span aria-expanded=\"false\" aria-controls=\"img$qn\" class=\"pointer clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";

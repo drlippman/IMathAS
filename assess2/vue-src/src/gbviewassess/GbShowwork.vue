@@ -1,5 +1,5 @@
 <template>
-  <div class = "questionpane" v-if="!!work">
+  <div class = "questionpane viewworkwrap" v-if="!!work">
     <div>
       <button type="button" class="slim"
         @click = "show = !show"

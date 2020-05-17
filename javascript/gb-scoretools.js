@@ -221,3 +221,27 @@ function initAnswerboxHighlights() {
 		}
 	});
 };
+
+function sidebysidegrading() {
+	$("body").removeClass("fw1000").removeClass("fw1920");
+	$(".scrollpane").wrap('<div class="sidebyside">');
+	$(".sidebyside").append('<div class="sidepreview">');
+	$(".sidebyside").css('display','flex').css('flex-wrap','nowrap');
+	$(".sidepreview").css('border-left','1px solid #ccc').css('padding','10px');
+	$(".scrollpane,.sidepreview").css('width','50%');
+	// will have to adjust fileembedbtn to open in sidepreview
+	$(".question div.intro").each(function(i,el) {
+		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+		var t = $(el).replaceWith('<div class="subdued">('+(i+1)+')</div>');
+		tgt.append('<div class="subdued">('+(i+1)+')</div>').append(t);
+	});
+	$(".lastfilesub").each(function(i,el) {
+		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+		var t = $(el).replaceWith('<span class="subdued">('+(i+1)+')</span>');
+		tgt.append('<span class="subdued">('+(i+1)+') </span>').append(t);
+	});
+	$(".viewworkwrap").each(function(i,el) {
+		$(el).css('margin','0');
+		$(el).closest(".sidebyside").find('.sidepreview').append(el);
+	});
+}

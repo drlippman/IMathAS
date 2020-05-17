@@ -268,7 +268,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051120"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042220"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=051720"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -509,14 +509,14 @@
 					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false, document.getElementById("questionwrap'.$cnt.'"));
 				});
 				</script>';
-			echo '</div></div></div>';
+			echo '</div></div>';
 
 			if (!empty($qdata['work'])) {
-				echo '<div class="questionpane">';
+				echo '<div class="questionpane viewworkwrap">';
 				echo '<button type="button" onclick="toggleWork(this)">'._('View Work').'</button>';
 				echo '<div class="introtext" style="display:none;">' . $qdata['work'].'</div></div>';
 			}
-
+			echo '</div>';
 			echo "<div class=scoredetails>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
 			if (!$groupdup) {
