@@ -264,7 +264,31 @@
 		$points = $defpoints;
 	}
 
-	$lastupdate = '032320';
+	$lastupdate = '051620';
+	function formatTry($try,$cnt,$pn,$tn) {
+		if (is_array($try) && $try[0] === 'draw') {
+			$id = $cnt.'-'.$pn.'-'.$tn;
+			if ($try[2][0]===null) {
+				$try[2][0] = "";
+			}
+			echo '<canvas id="canvasGBR'.$id.'" ';
+			echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas>';
+			echo '<input type=hidden id="qnGBR'.$id.'"/>';
+			$la = explode(';;', str_replace(array('(',')'), array('[',']'), $try[1]));
+			if ($la[0] !== '') {
+				$la[0] = '[' . str_replace(';', '],[', $la[0]) . ']';
+			}
+			$la = '[[' . implode('],[', $la) . ']]';
+			echo '<script>';
+			array_unshift($try[2], 'GBR'.$id);
+			echo 'canvases["GBR'.$id.'"] = ' . json_encode($try[2]) . ';';
+			echo 'drawla["GBR'.$id.'"] = ' . json_encode(json_decode($la)) . ';';
+			echo '</script>';
+		} else {
+			echo $try;
+		}
+	}
+
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051120"></script>';
@@ -292,14 +316,14 @@
 		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);
 		window.location = toopen;
 		}';
-	$placeinhead .= 'function togglealltries(n) {
-		$("#alltries"+n).toggle();
-		if (!$("#alltries"+n).hasClass("rendered")) {
-			$("#alltries"+n).find("canvas[id^=canvasGBR]").each(function(i,el) {
+	$placeinhead .= 'function toggletryblock(type,n) {
+		$("#"+type+n).toggle();
+		if (!$("#"+type+n).hasClass("rendered")) {
+			$("#"+type+n).find("canvas[id^=canvasGBR]").each(function(i,el) {
 				window.imathasDraw.initCanvases(el.id.substr(6));
 			});
-			$("#alltries"+n).addClass("rendered");
-			window.drawPics(document.getElementById("alltries"+n));
+			$("#"+type+n).addClass("rendered");
+			window.drawPics(document.getElementById(type+n));
 		}
 	}
 	$(function() {
@@ -596,8 +620,7 @@
 			}
 
 			if (!empty($qdata['other_tries'])) {
-
-				echo ' &nbsp; <button type=button onclick="togglealltries('.$cnt.')">'._('Show all tries').'</button>';
+				echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
 				echo '<div id="alltries'.$cnt.'" style="display:none;">';
 				foreach ($qdata['other_tries'] as $pn=>$tries) {
 					if (count($qdata['other_tries']) > 1) {
@@ -605,34 +628,27 @@
 					}
 					foreach ($tries as $tn=>$try) {
 						echo '<div>'._('Try').' '.($tn+1).': ';
-						if (is_array($try) && $try[0] === 'draw') {
-							$id = $cnt.'-'.$pn.'-'.$tn;
-							if ($try[2][0]===null) {
-								$try[2][0] = "";
-							}
-							echo '<canvas id="canvasGBR'.$id.'" ';
-							echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas>';
-							echo '<input type=hidden id="qnGBR'.$id.'"/>';
-							$la = explode(';;', str_replace(array('(',')'), array('[',']'), $try[1]));
-							if ($la[0] !== '') {
-								$la[0] = '[' . str_replace(';', '],[', $la[0]) . ']';
-							}
-							$la = '[[' . implode('],[', $la) . ']]';
-							echo '<script>';
-							array_unshift($try[2], 'GBR'.$id);
-							echo 'canvases["GBR'.$id.'"] = ' . json_encode($try[2]) . ';';
-							echo 'drawla["GBR'.$id.'"] = ' . json_encode(json_decode($la)) . ';';
-							echo '</script>';
-						} else {
-							echo $try;
-						}
+						formatTry($try,$cnt,$pn,$tn);
 						echo '</div>';
 					}
 				}
 				echo '</div>';
 			}
 
-			// TODO: Add Previous Tries display here
+			if (!empty($qdata['autosaves'])) {
+				echo ' &nbsp; <button type=button onclick="toggletryblock(\'autosaves\','.$cnt.')">'._('Show autosaves').'</button>';
+				echo '<div id="autosaves'.$cnt.'" style="display:none;">';
+				echo '<p class="subdued">'._('Autosaves have been entered by the student but not submitted for grading, so are not included in the scoring.').'</p>';
+				foreach ($qdata['autosaves'] as $pn=>$tries) {
+					if (count($qdata['autosaves']) > 1) {
+						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+					}
+					foreach ($tries as $tn=>$try) {
+						formatTry($try,$cnt,$pn,$tn);
+					}
+				}
+				echo '</div>';
+			}
 
 			echo "<br/>"._("Question Feedback").": ";
 			if (!$canedit) {
