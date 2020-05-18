@@ -29,6 +29,7 @@ class CalculatedMatrixScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $isRescore = $this->scoreQuestionParams->getIsRescore();
 
         $defaultreltol = .0015;
 
@@ -65,11 +66,18 @@ class CalculatedMatrixScorePart implements ScorePart
             } else {
                 $givenanslistvals = array();
             }
-            for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
-                $givenanslist[$i] = $_POST["qn$qn-$i"];
-                if (!$hasNumVal) {
-                    $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
-                }
+            if ($isRescore) {
+              $givenanslist = explode('|', $givenans);
+              foreach ($givenanslist as $i=>$v) {
+                $givenanslistvals[$i] = evalMathParser($v);
+              }
+            } else {
+              for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
+                  $givenanslist[$i] = $_POST["qn$qn-$i"];
+                  if (!$hasNumVal) {
+                      $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
+                  }
+              }
             }
             $scorePartResult->setLastAnswerAsGiven(implode('|',$givenanslist));
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));

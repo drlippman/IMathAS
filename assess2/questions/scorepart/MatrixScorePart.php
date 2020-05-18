@@ -29,6 +29,7 @@ class MatrixScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $isRescore = $this->scoreQuestionParams->getIsRescore();
 
         $defaultreltol = .0015;
 
@@ -53,10 +54,14 @@ class MatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else if (isset($answersize)) {
             $sizeparts = explode(',',$answersize);
-            for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
-                $givenanslist[$i] = $_POST["qn$qn-$i"];
-            }
             $N = $sizeparts[0];
+            if ($isRescore) {
+              $givenanslist = explode('|', $givenans);
+            } else {
+              for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
+                  $givenanslist[$i] = $_POST["qn$qn-$i"];
+              }
+            }
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
             $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
