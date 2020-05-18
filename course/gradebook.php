@@ -302,7 +302,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$includeduedate = true;
 	}
 	$pagetitle = _('Gradebook');
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=051820\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type,uid) {
 			if (type=="all") {

@@ -135,7 +135,7 @@
 
 	function sortTable(e)
 	{
-		var el = e.target;
+		var el = e.currentTarget;
 		if(!tableWidget_okToSort)return;
 		tableWidget_okToSort = false;
 		/* Getting index of current column */
@@ -267,7 +267,7 @@
 		var cells = tHead.getElementsByTagName('TH');
 		for(var no=0;no<cells.length;no++){
 			if(sortArray[no]){
-				cells[no].onclick = sortTable;
+				cells[no].addEventListener("click", sortTable);
 				cells[no].setAttribute('tabindex', 0);
 				cells[no].addEventListener("keydown", function(e) {
 					if (e.key == 'Enter') {
