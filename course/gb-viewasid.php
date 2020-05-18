@@ -3,7 +3,8 @@
 //(c) 2007 David Lippman
 	require("../init.php");
 	require_once("../includes/filehandler.php");
-
+  require_once("../includes/TeacherAuditLog.php");
+	
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	require($CFG['hooks']['course/gb-viewasid']);
