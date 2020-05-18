@@ -5,7 +5,6 @@
 /*** master php includes *******/
 require("../init.php");
 include("../includes/htmlutil.php");
-require("delitembyid.php");
 require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
