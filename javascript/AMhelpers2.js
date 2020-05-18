@@ -1000,9 +1000,13 @@ function AMnumfuncPrepVar(qn,str) {
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
-		  } else if (!isgreek && vars[i]!="varE") {
+		  } else if (!isgreek && vars[i]!="varE" && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
+      if (vars[i].match(/[^\w_]/)) {
+        str = str.replace(new RegExp(vars[i],"g"), "repvars"+i);
+		  	vars[i] = "repvars"+i;
+      }
 	  }
   }
   if (varstoquote.length>0) {
@@ -1392,6 +1396,7 @@ function processNumfunc(qn, fullstr, format) {
 	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
   }
   totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+
   var i,j,totest,testval,res;
   var successfulEvals = 0;
   for (j=0; j < 20; j++) {

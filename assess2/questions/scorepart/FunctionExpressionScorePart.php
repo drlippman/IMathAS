@@ -218,7 +218,7 @@ class FunctionExpressionScorePart implements ScorePart
                 $thisreqtimes = $requiretimes;
             }
             $correct = true;
-            $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s]+/','',$answer);
+            $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\']+/','',$answer);
 
             if (in_array('equation',$ansformats)) {
                 if (substr_count($givenans, '=')!=1) {
@@ -227,7 +227,7 @@ class FunctionExpressionScorePart implements ScorePart
                 }
                 $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
             }
-            
+
             if ($answer == '') {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
