@@ -113,13 +113,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 		}
 		$where = array();
 		if (count($exttools)>0) {
-			$where[] = "(gradetype = 'exttool' AND gradetypeid IN($exttoolslist))";
+			$where[] = "(gradetype = 'exttool' AND gradetypeid IN ($exttoolslist))";
 		}
-		if (count($gblist)>0) {
-			$where[] = "(gradetype = 'offline' AND gradetypeid IN($gblist))";
+		if (count($gbitems)>0) {
+			$where[] = "(gradetype = 'offline' AND gradetypeid IN ($gblist))";
 		}
 		if (count($forums)>0) {
-			$where[] = "(gradetype = 'forum' AND gradetypeid IN($forumlist))";
+			$where[] = "(gradetype = 'forum' AND gradetypeid IN ($forumlist))";
 		}
 		if (!empty($where)) {
 			$query = "SELECT userid, gradetype, gradetypeid, score FROM imas_grades WHERE userid IN ($stulist) AND ("
