@@ -564,7 +564,7 @@ class QuestionHtmlGenerator
                   unset($showanswerloc[$pn]);
                   $jsParams['hasseqnext'] = true;
                 }
-                if ($_seqPartDone !== true && empty($seqPartDone[$pn])) {
+                if ($seqPartDone !== true && empty($seqPartDone[$pn])) {
                   $thisGroupDone = false;
                 }
               }
