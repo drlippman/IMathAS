@@ -209,10 +209,15 @@ class MathParser
   public function parse($str) {
     // Rewrite sin^(-1) as arcsin
     $str = str_replace(
-      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)","sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
-      array("arcsin","arccos","arctan","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
+      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)",
+        "sec^-1","csc^-1","cot^-1","sec^(-1)","csc^(-1)","cot^(-1)",
+        "sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
+      array("arcsin","arccos","arctan","arcsin","arccos","arctan",
+        "arcsec","arccsc","arccot","arcsec","arccsc","arccot",
+        "arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
       $str
     );
+
     $str = str_replace(array('\\','[',']'), array('','(',')'), $str);
     $this->tokenize($str);
     $this->handleImplicit();
@@ -725,9 +730,13 @@ class MathParser
           break;
         case 'arcsin':
         case 'arccos':
+          if ($insideval < -1 || $insideval > 1) {
+            throw new MathParserException("Invalid input to $funcname");
+          }
+          break;
         case 'arcsec':
         case 'arccsc':
-          if ($insideval < -1 || $insideval > 1) {
+          if ($insideval > -1 && $insideval < 1) {
             throw new MathParserException("Invalid input to $funcname");
           }
           break;

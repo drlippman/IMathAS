@@ -154,6 +154,9 @@ var AMQsymbols = [
 {input:"arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
 {input:"arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
 {input:"arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
+{input:"arcsec",  tag:"mo", output:"arcsec", tex:null, ttype:UNARY, func:true},
+{input:"arccsc",  tag:"mo", output:"arccsc", tex:null, ttype:UNARY, func:true},
+{input:"arccot",  tag:"mo", output:"arccot", tex:null, ttype:UNARY, func:true},
 {input:"sinh", tag:"mo", output:"sinh", tex:null, ttype:UNARY, func:true},
 {input:"cosh", tag:"mo", output:"cosh", tex:null, ttype:UNARY, func:true},
 {input:"tanh", tag:"mo", output:"tanh", tex:null, ttype:UNARY, func:true},
@@ -736,6 +739,7 @@ n\frac{num}{denom} to n num/denom
 function MQtoAM(tex,display) {
   var nested,lb,rb,isfuncleft,curpos,c,i;
 	tex = tex.replace(/\\:/g,' ');
+  tex = tex.replace(/\\operatorname{(\w+)}/g,'\\$1');
 	if (!display) {
     while ((i = tex.lastIndexOf('\\left|'))!=-1) { //found a left |)
       rb = tex.indexOf('\\right|',i+1);
