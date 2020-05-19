@@ -49,33 +49,52 @@ function nPr($n,$r){
 
 //mean(array)
 //Finds the mean of an array of numbers
-function mean($a) {
+function mean($a,$w=null) {
 	if (!is_array($a)) {
 		echo 'mean expects an array';
 		return false;
 	}
-	return (array_sum($a)/count($a));
+  if (is_array($w)) {
+    if (count($a) != count($w)) {
+      echo 'weights must have same count as array';
+      return false;
+    }
+    for ($i=0;$i<count($a);$i++) {
+      $a[$i] *= $w[$i];
+    }
+    return (array_sum($a)/array_sum($w));
+  } else {
+	  return (array_sum($a)/count($a));
+  }
 }
 
 //variance(array)
 //the (sample) variance of an array of numbers
-function variance($a) {
+function variance($a,$w=null) {
 	if (!is_array($a)) {
 		echo 'stdev/variance expects an array';
 		return false;
 	}
+  $useW = false;
+  if (is_array($w)) {
+    if (count($a) != count($w)) {
+      echo 'weights must have same count as array';
+      return false;
+    }
+    $useW = true;
+  }
 	$v = 0;
-	$mean = mean($a);
-	foreach ($a as $x) {
-		$v += pow($x-$mean,2);
+	$mean = mean($a,$w);
+	foreach ($a as $i=>$x) {
+		$v += pow($x-$mean,2) * ($useW ? $w[$i] : 1);
 	}
-	return ($v/(count($a)-1));
+	return ($v/(($useW ? array_sum($w) : count($a))-1));
 }
 
 //stdev(array)
 //the (sample) standard deviation of an array of numbers
-function stdev($a) {
-	return sqrt(variance($a));
+function stdev($a,$w=null) {
+	return sqrt(variance($a,$w));
 }
 
 //absmeandev(array)
