@@ -77,7 +77,6 @@ var AMQsymbols = [
 
 //binary operation symbols
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
-{input:"xx", tag:"mo", output:"\u00D7", tex:"times", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
 //{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
