@@ -213,7 +213,21 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	   .optionlist p.list { margin: 7px 0 7px 20px; padding: 0;}
 	   .optionlist input[type=checkbox] {margin-left:-20px;}
 	   </style>';
-
+	$placeinhead .= '<script>
+	$(function() {
+		$("input[name=forceclear]").on("change", function (e) {
+			$("#forceclearwarn").toggle($(this).prop("checked"));
+		});
+		$("form").on("submit", function(e) {
+			if ($("input[name=forceclear]").prop("checked")) {
+				if (!confirm("'._('WARNING! You are about to clear student attempts, deleting their grades. This cannot be undone. Are you SURE you want to do this?').'")) {
+					e.preventDefault();
+					return false;
+				}
+			}
+			return true;
+		});
+	})</script>';
 	require("../header.php");
 
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -451,8 +465,11 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
 		echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
 	}
-	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
-	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
+	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear students\' attempts?  Students ';
+	echo 'will <b>not</b> keep any scores earned, and must rework all problems.';
+	echo '<span style="display:none" class="noticetext" id="forceclearwarn">';
+	echo '<br/>Warning: this will delete the students\' attempts and grades for these assessments.</span>';
+	echo '</p>';
 	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
 	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
 	echo '</fieldset>';
