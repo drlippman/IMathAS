@@ -141,7 +141,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
 ) {
   $assessInfoOut['has_active_attempt'] = false;
   $assessInfoOut['can_retake'] = false;
-  if ($canViewAll) {
+  if ($canViewAll && $userid == $uid) {
     $assessInfoOut['show_reset'] = true;
   }
   $assessInfoOut['pasttime'] = 1;
