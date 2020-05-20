@@ -903,7 +903,7 @@ class QuestionHtmlGenerator
                 $showanswerloc .= filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span>\n");
             }
             $showanswerloc .= (isset($showanswerstyle) && $showanswerstyle == 'inline') ? '</span>' : '</div>';
-        } else {
+        } else if (isset($showanswer) && is_array($showanswer)) {
             $showanswerloc = array();
             foreach ($entryTips as $iidx => $entryTip) {
               $showanswerloc[$iidx] = '';
