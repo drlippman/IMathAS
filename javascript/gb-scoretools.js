@@ -73,8 +73,8 @@ function toggleWork(el) {
 	}
 }
 function preprint() {
-	$("span[id^='ans']").removeClass("hidden");
-	$(".sabtn").replaceWith("<span>Answer: </span>");
+	$("span[id^='ans']").show().removeClass("hidden");
+	$(".sabtn,.keybtn").replaceWith("<span>Answer: </span>");
 	$('input[value="Preview"]').trigger('click').remove();
 	document.getElementById("preprint").style.display = "none";
 }
