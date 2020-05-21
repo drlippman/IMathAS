@@ -799,6 +799,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/_{([\d\.]+)}\^/g,'_$1^');
 	tex = tex.replace(/_{([\d\.]+)}([^\^])/g,'_$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}$/g,'_$1');
+  tex = tex.replace(/_{(\w+)}$/g,'_($1)');
 	tex = tex.replace(/{/g,'(').replace(/}/g,')');
 	tex = tex.replace(/lbrace/g,'{').replace(/rbrace/g,'}');
 	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2');  //change (2)/(3) to 2/3
@@ -811,5 +812,6 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2');  //change /(x^n) to /x^n
 	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
   tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
+
 	return tex;
 }

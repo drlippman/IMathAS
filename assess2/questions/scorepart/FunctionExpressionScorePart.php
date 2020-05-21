@@ -82,9 +82,13 @@ class FunctionExpressionScorePart implements ScorePart
                 $givenans = str_replace('lamda', 'lambda', $givenans);
             }
             //find f() function variables
-            if (strpos($variables[$i],'(')!==false) {
+            if (strpos($variables[$i],'()')!==false) {
                 $ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
                 $variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+            }
+            // front end will submit p_(left) rather than p_left; strip parens
+            if (preg_match('/^(\w+)_(\w+)$/', $variables[$i], $m)) {
+              $givenans = preg_replace('/'.$m[1].'_\('.$m[2].'\)/', $m[0], $givenans);
             }
         }
 

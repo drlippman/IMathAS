@@ -78,7 +78,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
     		$ofunc = array();
     		for ($i = 0; $i < count($variables); $i++) {
     			$variables[$i] = trim($variables[$i]);
-    			if (strpos($variables[$i],'(')!==false) {
+    			if (strpos($variables[$i],'()')!==false) {
     				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
     				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
     			}
@@ -177,14 +177,19 @@ class FunctionExpressionAnswerBox implements AnswerBox
     							break;
     						}
     					}
-    					if (!$isgreek && preg_match('/^(\w+)_(\w+)$/',$variables[$i],$matches)) {
+    					if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/',$variables[$i],$matches)) {
+                $chg = false;
     						if (strlen($matches[1])>1) {
     							$matches[1] = '"'.$matches[1].'"';
+                  $chg = true;
     						}
-    						if (strlen($matches[2])>1) {
+    						if (strlen($matches[2])>1 && $matches[2]{0} != '(') {
     							$matches[2] = '"'.$matches[2].'"';
+                  $chg = true;
     						}
-    						$sa = str_replace($matches[0], $matches[1].'_'.$matches[2], $sa);
+                if ($chg) {
+                  $sa = str_replace($matches[0], $matches[1].'_'.$matches[2], $sa);
+                }
     					} else if (!$isgreek && $variables[$i]!='varE') {
     						$sa = str_replace($variables[$i], '"'.$variables[$i].'"', $sa);
     					}

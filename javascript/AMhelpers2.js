@@ -920,8 +920,8 @@ var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi
 
 function AMnumfuncPrepVar(qn,str) {
   var vars = allParams[qn].vars.slice();
-  var vl = vars.join('|');
-  var fvarslist = allParams[qn].fvars.join('|');
+  var vl = vars.map(escapeRegExp).join('|');
+  var fvarslist = allParams[qn].fvars.map(escapeRegExp).join('|');
   vars.push("DNE");
 
   if (vl.match(/lambda/)) {
@@ -934,7 +934,11 @@ function AMnumfuncPrepVar(qn,str) {
   dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
-  	  if (vars[i] == "varE") {
+    // handle double parens
+    if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
+      str = str.replace(/\(\((.*?)\)\)/g,'($1)');
+    }
+  	if (vars[i] == "varE") {
 		  str = str.replace("E","varE");
 		  dispstr = dispstr.replace("E","varE");
 	  } else {
@@ -989,7 +993,10 @@ function AMnumfuncPrepVar(qn,str) {
 		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
 		  	dispstr = dispstr.replace(remvarparen, vars[i]);
 		  	str = str.replace(remvarparen, vars[i]);
-        submitstr = submitstr.replace(remvarparen, vars[i]);
+        submitstr = submitstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
+        submitstr = submitstr.replace(
+          new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)',regmod),
+          varpts[1]+'_('+varpts[2]+')');
 		  	if (varpts[1].length>1 && greekletters.indexOf(varpts[1].toLowerCase())==-1) {
 		  		varpts[1] = '"'+varpts[1]+'"';
 		  	}
@@ -1004,11 +1011,12 @@ function AMnumfuncPrepVar(qn,str) {
 			  varstoquote.push(vars[i]);
 		  }
       if (vars[i].match(/[^\w_]/)) {
-        str = str.replace(new RegExp(vars[i],"g"), "repvars"+i);
+        str = str.replace(new RegExp(escapeRegExp(vars[i]),"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
       }
 	  }
   }
+
   if (varstoquote.length>0) {
 	  vltq = varstoquote.join("|");
 	  var reg = new RegExp("("+vltq+")","g");
@@ -1418,7 +1426,7 @@ function processNumfunc(qn, fullstr, format) {
   if (successfulEvals === 0) {
     err += _("syntax error") + '. ';
   }
-  err += syntaxcheckexpr(fullstr, '', vars.join('|'));
+  err += syntaxcheckexpr(strprocess[0], '', vars.map(escapeRegExp).join('|'));
   return {
     err: err
   };
@@ -1726,6 +1734,10 @@ function singlevaleval(evalstr, format) {
   } catch(e) {
     return [NaN, _("syntax incomplete")+". "];
   }
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 function scopedeval(c) {
