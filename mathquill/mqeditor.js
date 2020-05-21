@@ -281,6 +281,7 @@ var MQeditor = (function($) {
   function resetEditor() {
     clearTimeout(blurTimer);
     $("#mqeditor").hide();
+    curMQfield = null;
   }
 
 
