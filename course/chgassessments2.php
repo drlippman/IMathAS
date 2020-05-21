@@ -271,8 +271,8 @@ if (!(isset($teacherid))) {
 					$sets[] = "reqscoretype=(reqscoretype & ~2)";
 				}
 			}
-			if ($_POST['reqscoretype'] !== 'DNC') {
-				if ($_POST['reqscoretype']==0) {
+			if ($_POST['reqscoreshowtype'] !== 'DNC') {
+				if ($_POST['reqscoreshowtype']==0) {
 					$sets[] = 'reqscore=ABS(reqscore)';
 					$sets[] = 'reqscoretype=(reqscoretype & ~1)';
 				} else {
