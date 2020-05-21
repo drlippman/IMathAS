@@ -165,7 +165,11 @@ if (!(isset($teacherid))) {
 				$showans = Sanitize::simpleASCII($_POST['showans']);
 			}
 			$viewingb = Sanitize::simpleASCII($_POST['viewingb']);
-			$scoresingb = Sanitize::simpleASCII($_POST['scoresingb']);
+			if (!isset($_POST['scoresingb'])) {
+				$scoresingb = 'never';
+			} else {
+				$scoresingb = Sanitize::simpleASCII($_POST['scoresingb']);
+			}
 			if (!isset($_POST['ansingb'])) {
 				$ansingb = 'never';
 			} else {
