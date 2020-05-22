@@ -231,6 +231,7 @@ function sidebysidegrading() {
 	$(".scrollpane,.sidepreview").css('width','50%');
 	// will have to adjust fileembedbtn to open in sidepreview
 	$(".question div.introtext").each(function(i,el) {
+		$(el).find(".keywrap.inwrap").insertAfter($(el));
 		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
 		$(el).after('<div class="subdued">('+(i+1)+')</div>');
 		tgt.append('<div class="subdued">('+(i+1)+') </div>').append(el);
