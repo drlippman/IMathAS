@@ -99,10 +99,20 @@
        $cid = 0;
      }
 
+     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
  	 	 require("header.php");
- 	 	 echo '<p>You have requested guest access to a course.</p>';
- 	 	 echo '<p><a href="'.$imasroot.'/index.php">',_('Nevermind'),'</a> ';
- 	 	 echo '<a href="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">Continue</a></p>';
+     echo '<form method=post action="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">';
+     echo '<p>You have requested guest access to a course.</p>';
+ 	 	 echo '<p><button type=button onclick="location.href=\''.$imasroot.'/index.php\'">',_('Nevermind'),'</button> ';
+     echo '<button type=submit>Continue</button>';
+     echo '<input type=hidden id=tzname name=tzname />';
+     echo '<script type="text/javascript">
+     $(function() {
+       var tz = jstz.determine();
+       document.getElementById("tzname").value = tz.name();
+     });
+     </script>';
+     echo '</form>';
  	 	 require("footer.php");
  	 	 exit;
  	 }
