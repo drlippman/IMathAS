@@ -95,13 +95,17 @@ class AssessStandalone {
    * displays the question $qn, using details from state
    * $includeCorrect=true to include correct answer
    */
-  function displayQuestion($qn, $includeCorrect=false) {
+  function displayQuestion($qn, $options) {
     $qsid = $this->state['qsid'][$qn];
     $attemptn = empty($this->state['partattemptn'][$qn]) ? 0 : max($this->state['partattemptn'][$qn]);
-    $seqPartDone = array();
-    if (!empty($this->state['rawscores'][$qn])) {
-      foreach ($this->state['rawscores'][$qn] as $pn=>$sc) {
-        $seqPartDone[$pn] = ($sc>.98);
+    if (!empty($options['showallparts'])) {
+      $seqPartDone = true;
+    } else {
+      $seqPartDone = array();
+      if (!empty($this->state['rawscores'][$qn])) {
+        foreach ($this->state['rawscores'][$qn] as $pn=>$sc) {
+          $seqPartDone[$pn] = ($sc>.98);
+        }
       }
     }
     $questionParams = new QuestionParams();
@@ -112,7 +116,7 @@ class AssessStandalone {
         ->setQuestionId(0)
         ->setAssessmentId(0)
         ->setQuestionSeed($this->state['seeds'][$qn])
-        ->setShowHints(true)
+        ->setShowHints(3)
         ->setShowAnswer(true)
         ->setShowAnswerParts(array())
         ->setShowAnswerButton(true)
@@ -135,9 +139,10 @@ class AssessStandalone {
       $jsparams['scripts'] = $scripts;
     }
     $jsparams['helps'] = $question->getExternalReferences();
+
     $answeights = $question->getAnswerPartWeights();
 
-    if ($includeCorrect) {
+    if (!empty($options['showans'])) {
       $jsparams['ans'] = $question->getCorrectAnswersForParts();
       $jsparams['stuans'] = $stuanswers[$qn+1];
     }

@@ -52,14 +52,17 @@ nCr(n,r)
 nPr(n,r)
 <BR>The Permutations function
 <BR><h3><a name="mean">mean</a></h3>
-mean(array)
-<BR>Finds the mean of an array of numbers
+mean(array,[weights])
+<BR>Finds the mean of an array of numbers.  Optionally you can provide a
+  corresponding array of weights or frequencies to do a weighted mean.
 <BR><h3><a name="variance">variance</a></h3>
-variance(array)
-<BR>the (sample) variance of an array of numbers
+variance(array,[weights])
+<BR>the (sample) variance of an array of numbers. Optionally you can provide a
+  corresponding array of weights or frequencies to do a weighted variance.
 <BR><h3><a name="stdev">stdev</a></h3>
-stdev(array)
-<BR>the (sample) standard deviation of an array of numbers
+stdev(array, [weights])
+<BR>the (sample) standard deviation of an array of numbers.  Optionally you can provide a
+  corresponding array of weights or frequencies to do a weighted stdev.
 <BR><h3><a name="absmeandev">absmeandev</a></h3>
 absmeandev(array)
 <BR>the absolute mean deviation of an array of numbers

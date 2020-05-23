@@ -249,14 +249,16 @@ function deleteimport($key) {
 function downsizeimage($fileinfo) {
 	if (preg_match('/\.(jpg|jpeg)/', $fileinfo['name'])) {
 		$imgdata = getimagesize($fileinfo['tmp_name']);
+		if ($imgdata === false || $imgdata[2] !== IMAGETYPE_JPEG) {
+			return;
+		}
 		try {
 			$exif = exif_read_data($fileinfo['tmp_name']);
 		} catch (Exception $exp) {
 			$exif = false;
 		}
 		$changed = false;
-		if ($imgdata!==false && $imgdata['mime'] == 'image/jpeg' &&
-		   (min($imgdata[0],$imgdata[1])>1000 || (isset($exif['Orientation']) && $exif['Orientation']>1)) &&
+		if ((min($imgdata[0],$imgdata[1])>1000 || !empty($exif['Orientation'])) &&
 		   ($imgdata[0]*$imgdata[1]*3*2/1048576 < 80)) {  //make sure mem use will be under 80MB
 			if (min($imgdata[0],$imgdata[1])>1000) {
 				$r = $imgdata[0]/$imgdata[1]; // width/height

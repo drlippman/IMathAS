@@ -5,9 +5,15 @@
 require_once(__DIR__."/filehandler.php");
 
 function deleteCourse($cid) {
-	global $DBH;
+	global $DBH,$CFG;
 
 	$DBH->beginTransaction();
+
+	if (!empty($CFG['GEN']['doSafeCourseDelete'])) {
+		// hard delete, so also delete log entries
+		$stm = $DBH->prepare("DELETE FROM imas_teacher_audit_log WHERE courseid=:id");
+		$stm->execute(array(':id'=>$cid));
+	}
 
 	$stm = $DBH->prepare("DELETE FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));

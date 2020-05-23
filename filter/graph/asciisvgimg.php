@@ -397,6 +397,7 @@ function AStextInternal($p,$st,$pos,$angle) {
 			$st = str_replace(array('"',"'"),'',$arg[2]);
 		}
 	}*/
+
 	if ($this->usettf) {
 		$bb = imagettfbbox($this->fontsize,$angle,$this->fontfile,$st);
 
@@ -501,15 +502,27 @@ function ASinitPicture($arg=array()) {
 		}
 	}
 	$this->xunitlength = ($this->width - $this->border[0] - $this->border[2])/($this->xmax - $this->xmin);
-	$this->yunitlength = ($this->height - $this->border[1] - $this->border[3])/($this->ymax - $this->ymin);
 	if ($this->xunitlength<=0) {
 		$this->xunitlength = 1;
 	}
-	if ($this->yunitlength<=0) {
-		$this->yunitlength = 1;
+	$this->yunitlength = $this->xunitlength;
+	if (!isset($arg[2])) { // no ymin
+		$this->origin[0] = -$this->xmin*$this->xunitlength + $this->border[0];
+		$this->origin[1] = $this->height / 2;
+		$this->ymin = -($this->height - $this->border[1] - $this->border[3])/(2*$this->yunitlength);
+		$this->ymax = -$this->ymin;
+	} else {
+		if (isset($arg[3])) {  // do have ymax too
+			$this->yunitlength = ($this->height - $this->border[1] - $this->border[3])/($this->ymax - $this->ymin);
+			if ($this->yunitlength<=0) {
+				$this->yunitlength = 1;
+			}
+		} else {
+			$this->ymax = ($this->height - $this->border[1] - $this->border[3])/($this->yunitlength) + $this->ymin;
+		}
+		$this->origin[0] = -$this->xmin*$this->xunitlength + $this->border[0];
+		$this->origin[1] = -$this->ymin*$this->yunitlength + $this->border[1];
 	}
-	$this->origin[0] = -$this->xmin*$this->xunitlength + $this->border[0];
-	$this->origin[1] = -$this->ymin*$this->yunitlength + $this->border[1];
 
 	$this->winxmin = max($this->border[0] - 5,0);
 	$this->winxmax = min($this->width - $this->border[2] + 5, $this->width);
@@ -1234,7 +1247,7 @@ function parseargs($str) {
 	}
 	$args[] = substr($str,$lp);
 	for ($i=0;$i<count($args);$i++) {
-		$args[$i] = str_replace(array('"','\''),'',$args[$i]);
+		$args[$i] = trim(str_replace(array('"','\''),'',$args[$i]));
 	}
 	return $args;
 }

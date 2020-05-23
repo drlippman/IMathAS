@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
+require_once("../includes/TeacherAuditLog.php");
 
 if ($courseUIver == 1) {
 	if (isset($_GET['id'])) {
@@ -78,9 +79,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       	$DBH->beginTransaction();
           require_once('../includes/filehandler.php');
           deleteallaidfiles($assessmentId);
-          $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+          $grades = array();
+					$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+					$stm->execute(array(':assessmentid'=>$assessmentId));
+					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+						$grades[$row['userid']]=$row["score"];
+					}
+					$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
-          $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+					if ($stm->rowCount()>0) {
+		        TeacherAuditLog::addTracking(
+		          $cid,
+		          "Clear Attempts",
+		          $assessmentId,
+		          array('grades'=>$grades)
+		        );
+		      }
+
+					$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
           $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
@@ -500,7 +516,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($from=='lti') {
 				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
 			} else {
-				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
+				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, $rqp));
 			}
 			exit;
 		} else { //add new
@@ -568,6 +585,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $timelimit = round(abs($line['timelimit'])/60, 3);
           if ($line['isgroup']==0) {
               $line['groupsetid']=0;
+              $line['groupmax']=6;
           }
           if ($line['deffeedbacktext']=='') {
               $usedeffb = false;

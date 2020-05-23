@@ -272,7 +272,11 @@ if (isset($_POST['SID'])) {
 			//$_SESSION['graphdisp'] = 1;
 			$_SESSION['useed'] = 1;
 			$_SESSION['isdiag'] = $diagid;
-			$_SESSION['diag_aver'] = $aVer;
+      if ($aVer > 1) {
+			  $_SESSION['diag_aver'] = array($aVer, $pcid, $paid);
+      } else {
+        $_SESSION['diag_aver'] = array($aVer);
+      }
 
 			if (!empty($_POST['tzname'])) {
 				$tzname = $_POST['tzname'];

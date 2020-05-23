@@ -282,6 +282,7 @@ export const actions = {
       data[qn] = store.work[qn];
     }
     if (Object.keys(data).length === 0) { // nothing to submit
+      store.inTransit = false;
       if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
         Router.push('/summary');
       } else if (store.assessInfo.available === 'yes') {
@@ -1087,17 +1088,18 @@ export const actions = {
       store.enableMQ = data.enableMQ;
     }
     if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0 &&
+      store.timelimit_timer === null &&
       data.enddate_in < 20 * 24 * 60 * 60 // over 20 days causes int overlow
     ) {
-      clearTimeout(store.enddate_timer);
+      window.clearTimeout(store.enddate_timer);
       const now = new Date().getTime();
       const dueat = data.enddate_in * 1000;
       data.enddate_local = now + dueat;
       store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
     }
     if (data.hasOwnProperty('timelimit_expiresin')) {
-      clearTimeout(store.timelimit_timer);
-      clearTimeout(store.enddate_timer); // no need for it w timelimit timer
+      window.clearTimeout(store.timelimit_timer);
+      window.clearTimeout(store.enddate_timer); // no need for it w timelimit timer
       const now = new Date().getTime();
       if (data.hasOwnProperty('timelimit_expires')) {
         if (data.timelimit_expires === data.enddate) {

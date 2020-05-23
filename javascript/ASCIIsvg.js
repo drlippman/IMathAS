@@ -75,6 +75,9 @@ function chop(x,n) {
 }
 
 function prepWithMath(str) {
+  // avoid double-prep cased by script wrap of prepWithMath followed by
+  // secondary after prepWithMath
+  str = str.replace(/Ma(t|\(t\)\*)h\./,'');
 	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
 	str = str.replace(/\(E\)/g,'(Math.E)');
 	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');

@@ -395,7 +395,7 @@ function encodea11ydraw() {
 			}
 		});
 		targetOuts[tarnum].value = lines.join(';')+';;'+dots.join(',')+';;'+odots.join(',')+';;'+tplines.join(',')+';;'+tpineq.join(',')+';;'+saveinput.join(',');
-		$(targetOuts[tarnum]).trigger("change");
+		$(targetOuts[tarnum]).trigger("input").trigger("change");
 	}
 }
 
@@ -1561,7 +1561,7 @@ function encodeDraw() {
 		var dochange = (targetOuts[curTarget].value != '' || out != ';;;;;;;;');
 		targetOuts[curTarget].value = out;
 		if (dochange) {
-			$(targetOuts[curTarget]).trigger("change");
+			$(targetOuts[curTarget]).trigger("input").trigger("change");
 		}
 	}
 }

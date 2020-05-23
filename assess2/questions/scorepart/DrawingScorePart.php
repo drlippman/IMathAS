@@ -673,6 +673,7 @@ class DrawingScorePart implements ScorePart
             $sqrts = array();
             $coss = array();
             $exps = array();
+            $logs = array();
             $vecs = array();
             $rats = array();
             $ellipses = array();

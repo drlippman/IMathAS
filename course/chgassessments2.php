@@ -165,7 +165,11 @@ if (!(isset($teacherid))) {
 				$showans = Sanitize::simpleASCII($_POST['showans']);
 			}
 			$viewingb = Sanitize::simpleASCII($_POST['viewingb']);
-			$scoresingb = Sanitize::simpleASCII($_POST['scoresingb']);
+			if (!isset($_POST['scoresingb'])) {
+				$scoresingb = 'never';
+			} else {
+				$scoresingb = Sanitize::simpleASCII($_POST['scoresingb']);
+			}
 			if (!isset($_POST['ansingb'])) {
 				$ansingb = 'never';
 			} else {
@@ -271,8 +275,8 @@ if (!(isset($teacherid))) {
 					$sets[] = "reqscoretype=(reqscoretype & ~2)";
 				}
 			}
-			if ($_POST['reqscoretype'] !== 'DNC') {
-				if ($_POST['reqscoretype']==0) {
+			if ($_POST['reqscoreshowtype'] !== 'DNC') {
+				if ($_POST['reqscoreshowtype']==0) {
 					$sets[] = 'reqscore=ABS(reqscore)';
 					$sets[] = 'reqscoretype=(reqscoretype & ~1)';
 				} else {
@@ -470,7 +474,8 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
 		} else {
-		  header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']) .$btf. "&r=" . Sanitize::randomQueryStringParam());
 		}
 		exit;
 

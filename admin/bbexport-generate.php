@@ -19,7 +19,7 @@ if (!defined('ENT_XML1')) {
 }
 
 function leftpad($str) {
-	return str_pad($str, 5, '0', STR_PAD_LEFT);	
+	return str_pad($str, 5, '0', STR_PAD_LEFT);
 }
 function xmlstr($str) {
 	//remove newlines
@@ -31,7 +31,7 @@ function bbdate($time) {
 }
 function createbbitem($resid, $parentid, $template, $title, $rep, $handler, &$res) {
 	global $newdir, $bbhandlers, $bbtemplates;
-	
+
 	$item = $bbtemplates[$template];
 	if (!isset($rep['{{avail}}'])) {
 		$rep['{{avail}}'] = 'true';
@@ -45,13 +45,13 @@ function createbbitem($resid, $parentid, $template, $title, $rep, $handler, &$re
 		$item = str_replace('{{bodytype}}', isset($bbhandlers[$handler][3])?$bbhandlers[$handler][3]:'H', $item);
 	}
 	$item = str_replace('{{parentid}}', $parentid, $item);
-	
+
 	//empty-string out any remaining fields
 	$item = preg_replace('/{{\w+}}/', '', $item);
-	
+
 	file_put_contents($newdir.'/'.$resid.'.dat',$item);
 	$res[] = '<resource bb:file="'.$resid.'.dat" bb:title="'.xmlstr($title).'" identifier="'.$resid.'" type="'.$bbhandlers[$handler][2].'" xml:base="'.$resid.'"/>';
-}		
+}
 
 function replaceintemplate($template, $rep) {
 	foreach ($rep as $k=>$v) {
@@ -79,7 +79,7 @@ function addbbfile($courseid, $url, $fileaction, &$files, &$crs) {
 		}
 		copy($url, $newdir.'/csfiles/home_dir/'.$basename.'__xid-'.$fileid.'.'.$extension);
 		$filesize = filesize($newdir.'/csfiles/home_dir/'.$basename.'__xid-'.$fileid.'.'.$extension);
-		
+
 		//add to files array for inclusion in basicitem
 		$files[] = replaceintemplate($bbtemplates['file'], array(
 			'{{fileitemid}}' => $fileitemid,
@@ -89,13 +89,13 @@ function addbbfile($courseid, $url, $fileaction, &$files, &$crs) {
 			'{{filename}}' => xmlstr($filename),
 			'{{created}}' => $bbnow,
 			'{{updated}}' => $bbnow));
-		
+
 		//create file .xml
 		$thisfilexml = replaceintemplate($bbtemplates['filexml'], array(
 			'{{fileid}}' => $fileid,
 			'{{filename}}' => xmlstr($filename)));
 		file_put_contents($newdir.'/csfiles/home_dir/'.$basename.'__xid-'.$fileid.'.'.$extension.'.xml', $thisfilexml);
-		
+
 		//create crslink item
 		$crs[] = replaceintemplate($bbtemplates['crslink'], array(
 			'{{courseid}}' => $courseid,
@@ -103,6 +103,8 @@ function addbbfile($courseid, $url, $fileaction, &$files, &$crs) {
 			'{{fileid}}' => $fileid,
 			'{{filename}}' => xmlstr($filename),
 			'{{id}}' => '_3'.leftpad($filecnt).'_1' ));
+
+		$filecnt++;
 	}
 }
 
@@ -230,13 +232,13 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 					'{{avail}}' => $item['avail']==0?'false':'true',
 					'{{created}}' => $bbnow
 					), 'folder', $res);
-				
+
 				$out .= $ind.'<item identifier="BLOCK'.$item['id'].'" identifierref="'.$resid.'">'."\n";
 				$out .= $ind.'  <title>'.xmlstr($item['name']).'</title>'."\n";
 				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $blockid);
 				$out .= $ind.'</item>'."\n";
-				
-				
+
+
 			} else {
 				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ', $parentid);
 			}
@@ -260,7 +262,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						//do files as weblinks rather than including the file itself
 						if (substr($r[2],0,4)=='http') {
 							//do nothing
-						} else { 
+						} else {
 							$r[2] = getcoursefileurl($r[2], true);
 						}
 						addbbfile($courseexportid, $r[2], 'LINK', $filesout, $crslinks);
@@ -270,7 +272,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="'.$resid.'">'."\n";
 				$out .= $ind.'  <title>'.xmlstr($row[0]).'</title>'."\n";
 				$out .= $ind.'</item>'."\n";
-				
+
 				$text = $row[1];
 				/*if ($row[2]!='') {
 					$text .= '<ul>';
@@ -279,7 +281,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 					}
 					$text .= '</ul>';
 				}*/
-				
+
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
 					'{{id}}' => '_7'.$item.'_1',
 					'{{title}}' => xmlstr($row[0]),
@@ -298,7 +300,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="'.$resid.'">'."\n";
 				$out .= $ind.'  <title>'.xmlstr($row[0]).'</title>'."\n";
 				$out .= $ind.'</item>'."\n";
-				
+
 				//do files as weblinks rather than including the file itself
 				if (substr(strip_tags($row[1]),0,5)=="file:") {
 					if ($row[2]=='<p></p>') {
@@ -342,7 +344,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$stm = $DBH->prepare("SELECT name,description,avail FROM imas_forums WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
-				
+
 				$forumresid = $resid;
 				createbbitem($forumresid, $parentid, 'forum', $row[0], array(
 						'{{id}}' => '_8'.$item.'_1',
@@ -352,14 +354,14 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						'{{avail}}' => $row[2]==0?'false':'true',
 						'{{created}}' => $bbnow
 						), 'forum', $res);
-				
+
 				$resid = 'res'.leftpad($datcnt);
 				$datcnt++;
-				
+
 				$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="'.$resid.'">'."\n";
 				$out .= $ind.'  <title>'.xmlstr($row[0]).'</title>'."\n";
 				$out .= $ind.'</item>'."\n";
-									
+
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
 						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
@@ -368,34 +370,34 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						'{{avail}}' => $row[2]==0?'false':'true',
 						'{{newwindow}}' => "false"
 						), 'forumitem', $res);
-				
+
 				$forumlinkresid = 'res'.leftpad($datcnt);
 				$datcnt++;
-				
+
 				createbbitem($forumlinkresid, $parentid, 'forumlink', '', array(
 						'{{id}}' => '_9'.$item.'_1',
 						'{{itemdat}}' => $resid,
 						'{{avail}}' => $row[2]==0?'false':'true',
 						'{{forumdat}}' => $forumresid
 						), 'forumlink', $res);
-				
+
 			} else if ($iteminfo[$item][0]=='Assessment') {
 				$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder,enddate,gbcategory,avail,startdate,ptsposs FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row[8]==-1) {
 					require_once("../includes/updateptsposs.php");
-					$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);	
+					$row[8] = updatePointsPossible($iteminfo[$item][1], $row[3], $row[2]);
 				}
-				
+
 				$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="'.$resid.'">'."\n";
 				$out .= $ind.'  <title>'.xmlstr($row[0]).'</title>'."\n";
 				$out .= $ind.'</item>'."\n";
-				
+
 				$extended = '<ENTRY key="customParameters"/>';
 				$extended .= '<ENTRY key="alternateUrl">http://'.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1].'</ENTRY>';
 				$extended .= '<ENTRY key="vendorInfo">name='.$installname.'&amp;code=IMathAS</ENTRY>';
-				
+
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
 						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
@@ -406,7 +408,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						'{{launchurl}}' => $urlmode.Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']) . $imasroot . '/bltilaunch.php?custom_place_aid='.$iteminfo[$item][1],
 						'{{extendeddata}}' => $extended
 						), 'lti', $res);
-				
+
 				$gbitem = $bbtemplates['outcomedef'];
 				$gbitem = str_replace('{{defid}}', '_11'.$item.'_1', $gbitem);
 				$gbitem = str_replace('{{resid}}', $resid, $gbitem);
@@ -415,12 +417,12 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 				$gbitem = str_replace('{{title}}', xmlstr($row[0]), $gbitem);
 				$gbitem = str_replace('{{ptsposs}}', $row[8], $gbitem);
 				$gbitems[] = $gbitem;
-				
+
 			} else if ($iteminfo[$item][0]=='Wiki') {
 				$stm = $DBH->prepare("SELECT name,avail FROM imas_wikis WHERE id=:id");
 				$stm->execute(array(':id'=>$iteminfo[$item][1]));
 				$row = $stm->fetch(PDO::FETCH_NUM);
-				
+
 				$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="'.$resid.'">'."\n";
 				$out .= $ind.'  <title>'.xmlstr($row[0]).'</title>'."\n";
 				$out .= $ind.'</item>'."\n";
@@ -434,7 +436,7 @@ function getorg($it,$parent,&$res,$ind, $parentid) {
 						$text = substr($text,strpos($text,'**',6)+2);
 					}
 				}
-				
+
 				createbbitem($resid, $parentid, 'basicitem', $row[0], array(
 						'{{id}}' => '_7'.$item.'_1',
 						'{{title}}' => xmlstr($row[0]),
@@ -477,7 +479,7 @@ file_put_contents($newdir.'/imsmanifest.xml', $manifest);
 ini_set('max_execution_time', 300);
 
 if (file_exists($path.'/BBEXPORT'.$cid.'.zip')) {
-	unlink($path.'/BBEXPORT'.$cid.'.zip');	
+	unlink($path.'/BBEXPORT'.$cid.'.zip');
 }
 // create object
 $zip = new ZipArchive();
@@ -539,11 +541,10 @@ function rrmdir($path) {
 rrmdir($newdir);
 
 $archive_file_name = 'BBEXPORT'.$cid.'.zip';
-header("Content-type: application/zip"); 
+header("Content-type: application/zip");
 header("Content-Disposition: attachment; filename=$archive_file_name");
 header("Content-length: " . filesize($path.'/'.$archive_file_name));
-header("Pragma: no-cache"); 
-header("Expires: 0"); 
+header("Pragma: no-cache");
+header("Expires: 0");
 readfile($path.'/'.$archive_file_name);
 unlink($path.'/'.$archive_file_name);
-

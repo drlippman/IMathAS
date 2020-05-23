@@ -76,22 +76,7 @@ class FileUploadAnswerBox implements AnswerBox
     			if (!empty($assessmentId)) {
     				$s3asid = $assessmentId;
     			}
-    			if (isset($GLOBALS['questionscoreref'])) {
-    				if ($multi==0) {
-    					$el = $GLOBALS['questionscoreref'][0];
-    					$sc = $GLOBALS['questionscoreref'][1];
-    				} else {
-    					$el = $GLOBALS['questionscoreref'][0].'-'.($qn%1000);
-    					$sc = $GLOBALS['questionscoreref'][1][$qn%1000];
-    				}
-    				$out .= '<span style="float:right;">';
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" alt="Set score full credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',$sc)\" />";
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" alt="Set score half credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" alt="Set score no credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
-    			}
+    			
     			if (!empty($s3asid)) {
     				require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
 
@@ -102,7 +87,7 @@ class FileUploadAnswerBox implements AnswerBox
     					$url = getasidfileurl($file);
     					$extension = substr($url,strrpos($url,'.')+1,3);
     					$filename = basename($file);
-    					$out .= "<br/>" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a>";
+    					$out .= "<br/><span class=\"lastfilesub\">" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a></span>";
     					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\" />";
     					/*if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
     						$out .= " <span aria-expanded=\"false\" aria-controls=\"img$qn\" class=\"pointer clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";

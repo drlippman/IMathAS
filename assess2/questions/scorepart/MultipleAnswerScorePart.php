@@ -29,6 +29,7 @@ class MultipleAnswerScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $isRescore = $this->scoreQuestionParams->getIsRescore();
 
         $defaultreltol = .0015;
 
@@ -70,20 +71,37 @@ class MultipleAnswerScorePart implements ScorePart
         } else {
             $akeys = explode(",",$answers);
         }
+        $origla = array();
+        if ($isRescore) {
+          $origla = explode('|', $givenans);
+        } else {
+          for ($i=0;$i<count($questions);$i++) {
+              if (isset($_POST["qn$qn"][$i])) {
+                  $origla[] = $randqkeys[$i];
+              }
+          }
+        }
+        if ($qcnt > 1 && count($akeys) > 0 && count($origla) == 0) {
+          // if there's at least one correct answer, and no answers were submitted
+          // and the system still submitted it, then probably it's singlescore.
+          // To not give credit for an unanswered question, set scoremethod to answers
+          $scoremethod = 'answers';
+        }
         if (isset($scoremethod) && $scoremethod=='answers') {
             $deduct = 1.0/count($akeys);
         } else {
             $deduct = 1.0/$qcnt;
         }
-        $origla = array();
         for ($i=0;$i<count($questions);$i++) {
-            if (isset($_POST["qn$qn"][$i])) {
-                $origla[] = $randqkeys[$i];
+          if ($isRescore) {
+            if (in_array($i,$origla)!==in_array($i,$akeys)) {
+                $score -= $deduct;
             }
-
+          } else {
             if (isset($_POST["qn$qn"][$i])!==(in_array($randqkeys[$i],$akeys))) {
                 $score -= $deduct;
             }
+          }
         }
 
         // just store unrandomized last answers
@@ -98,6 +116,7 @@ class MultipleAnswerScorePart implements ScorePart
         if ($score < 0) {
             $score = 0;
         }
+
         $scorePartResult->setRawScore($score);
         return $scorePartResult;
     }

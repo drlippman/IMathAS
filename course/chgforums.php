@@ -140,7 +140,7 @@ if (isset($_POST['checked'])) { //form submitted
 		$autopostn = Sanitize::onlyInt($_POST['autopostn']);
 		$autoreplypts = Sanitize::onlyInt($_POST['autoreplypts']);
 		$autoreplyn = Sanitize::onlyInt($_POST['autoreplyn']);
-		if (($autopostpts>0 && $autopostn>0) || 
+		if (($autopostpts>0 && $autopostn>0) ||
 			($autoreplypts>0 && $autoreplyn>0)) {
 			$autoscore = "$autopostpts,$autopostn,$autoreplypts,$autoreplyn";
 		} else {
@@ -198,7 +198,8 @@ if (isset($_POST['checked'])) { //form submitted
 		}
 
 	}
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+	$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
 	exit;
 }
 

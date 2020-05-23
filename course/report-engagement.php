@@ -7,6 +7,14 @@ if (!isset($teacherid)) {
   exit;
 }
 
+if (isset($adminasteacher)) {
+  $stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=? ORDER BY id LIMIT 1");
+  $stm->execute(array($cid));
+  $uid = $stm->fetchColumn(0);
+} else {
+  $uid = $userid;
+}
+
 $stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE courseid=? AND locked=0");
 $stm->execute(array($cid));
 $numStu = $stm->fetchColumn(0);
@@ -18,13 +26,13 @@ $numInline = $stm->fetchColumn(0);
 $t0 = microtime(true);
 
 $stm = $DBH->prepare("SELECT count(id) FROM imas_msgs WHERE msgfrom=? AND courseid=? AND parent=0");
-$stm->execute(array($userid,$cid));
+$stm->execute(array($uid,$cid));
 $msgInstrInitiated = $stm->fetchColumn(0);
 
 $t1 = microtime(true);
 
 $stm = $DBH->prepare("SELECT count(id) FROM imas_msgs WHERE msgto=? AND courseid=? AND parent=0");
-$stm->execute(array($userid,$cid));
+$stm->execute(array($uid,$cid));
 $msgReceivedCnt = $stm->fetchColumn(0);
 
 $t2 = microtime(true);
@@ -34,7 +42,7 @@ $query .= 'FROM imas_msgs AS p JOIN imas_msgs AS c ';
 $query .= 'ON p.id=c.parent AND c.msgfrom=p.msgto AND c.courseid=? ';
 $query .= 'WHERE p.courseid=? AND p.msgto=? AND p.parent=0';
 $stm = $DBH->prepare($query);
-$stm->execute(array($cid,$cid,$userid));
+$stm->execute(array($cid,$cid,$uid));
 $diffs = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 sort($diffs);
 $msgRepliedCnt = count($diffs);
@@ -49,13 +57,13 @@ $forums = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 $forumsafe = implode(',',$forums);
 
 $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE userid=? AND forumid IN ($forumsafe) AND parent=0");
-$stm->execute(array($userid));
+$stm->execute(array($uid));
 $forumInstrInitiated = $stm->fetchColumn(0);
 
 $t4 = microtime(true);
 
 $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE userid<>? AND forumid IN ($forumsafe) AND parent=0");
-$stm->execute(array($userid));
+$stm->execute(array($uid));
 $forumStuCnt = $stm->fetchColumn(0);
 
 $t5 = microtime(true);
@@ -65,7 +73,7 @@ $query .= 'FROM imas_forum_posts AS p JOIN imas_forum_posts AS c ';
 $query .= "ON c.userid=? AND c.parent>0 AND p.threadid=c.threadid AND c.forumid IN ($forumsafe) ";
 $query .= "WHERE p.forumid IN ($forumsafe) AND p.parent=0 GROUP BY p.id";
 $stm = $DBH->prepare($query);
-$stm->execute(array($userid));
+$stm->execute(array($uid));
 $diffs = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 sort($diffs);
 $forumRepliedCnt = count($diffs);

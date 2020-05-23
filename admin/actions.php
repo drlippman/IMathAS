@@ -1202,7 +1202,8 @@ if ($myrights<75 || $from=='home') {
 } else if (empty($from)) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if (isset($_GET['cid'])) {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+	$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']).$btf);
 } else if ($from=='admin2') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if ($from=='userreports') {

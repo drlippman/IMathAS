@@ -54,7 +54,8 @@ if (isset($_POST['submit'])) {
 	}
 	if ($_POST['submit']=='Save') {
 		if ($from=='cp') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf" . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/showcalendar.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		}

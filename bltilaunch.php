@@ -920,7 +920,7 @@ if ($stm->rowCount()==0) {
 						}
 						echo "	</ul>";
 						if ($sourceUIver == 1) {
-							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
+							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
 						}
 						echo "<p>The first option is best if this is your first time using this $installname course.  The second option
 							may be preferrable if you have copied the course in your LMS and want your students records to
@@ -946,7 +946,7 @@ if ($stm->rowCount()==0) {
 							echo "<input name=\"docoursecopy\" type=\"hidden\" value=\"makecopy\" />";
 						}
 						if ($sourceUIver == 1) {
-							echo '<p><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
+							echo '<p><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
 						}
 						echo "<p><input type=\"submit\" value=\"Create a copy on $installname\"/> (this may take a few moments - please be patient)</p>";
 					}

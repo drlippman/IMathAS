@@ -33,14 +33,14 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
   $body = 'No id provided';
 } else {
   $now = time();
-  
+
   //pull basic user info
   $uid = Sanitize::onlyInt($_GET['id']);
   $query = "SELECT iu.SID,iu.FirstName,iu.LastName,iu.email,iu.rights,iu.lastaccess,iu.groupid,ig.name AS gname,iu.specialrights,ig.parent ";
   $query .= "FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.id=:id";
   $stm = $DBH->prepare($query);
   $stm->execute(array(':id'=>$uid));
- 
+
   $userinfo = $stm->fetch(PDO::FETCH_ASSOC);
   $userinfo['role'] = getRoleNameByRights($userinfo['rights']);
   $userinfo['lastaccess'] = ($userinfo['lastaccess']>0) ? date("n/j/y g:i a",$userinfo['lastaccess']) : "never";
@@ -64,13 +64,13 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 				$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			} else {
 				$newpw = md5($_POST['pw1']);
-			} 
+			}
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:pw,forcepwreset=1 WHERE id=:uid");
 			$stm->execute(array(':pw'=>$newpw, ':uid'=>$uid));
 			$errors = _('Password Reset');
 		  }
 	}
-	
+
 	//pull template courses
 	$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&1)=1 OR (istemplate&2)=2 ORDER BY name");
 	$templates = array();
@@ -78,7 +78,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 		$templates[$row[0]] = $row[1];
 	}
 	$templateids = array_keys($templates);
-	  
+
     //courses teaching list
     $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,";
     $query .= "imas_courses.lockaid,imas_courses.copyrights,imas_users.FirstName,imas_users.LastName,";
@@ -100,7 +100,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       $newrow['canedit'] = ($row['ownerid']==$userid || $myrights==100 || ($myrights>=75 && $row['groupid']==$groupid));
       $newrow['deleted'] = ($row['available']==4);
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
-      $newrow['showlink'] = ($row['copyrights']==2 || ($row['groupid']==$groupid && $row['copyrights']==1) || $myrights == 100); 
+      $newrow['showlink'] = ($row['copyrights']==2 || ($row['groupid']==$groupid && $row['copyrights']==1) || $myrights == 100);
       if ($row['available']==4) {
         $newrow['status'] = array(_('Deleted'));
       } else {
@@ -131,7 +131,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       }
       $courses_teaching[$row['id']] = $newrow;
     }
-    
+
     $totalactivestudirect = 0;
     $totalactivestuLTI = 0;
     if (count($courses_teaching)>0) {
@@ -143,7 +143,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     		$courses_teaching[$row['courseid']]['isLTI'] = 1;
     	}
-    	
+
     	//pull last student access and stucnt
     	$query = "SELECT ic.id,COUNT(istu.id) AS stucnt,MAX(istu.lastaccess) AS lastactivity ";
     	$query .= "FROM imas_courses AS ic JOIN imas_students AS istu ";
@@ -170,7 +170,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
     		$courses_teaching[$row['id']]['stucnt'] = $row['stucnt'];
     	}
     }
-    
+
     function sortteaching($a,$b) {
     	if ($a['active']==$b['active']) {
     		return ($a['id']-$b['id']);
@@ -279,7 +279,7 @@ if ($overwriteBody==1) {
   echo Sanitize::onlyInt($totalactivestudirect).' '. _('direct').', ';
   echo Sanitize::onlyInt($totalactivestuLTI).' '. _('via LTI');
   echo '</p>';
-  
+
   if ($errors != '') {
   	  echo '<p class=noticetext>'.$errors.'</p>';
   }
@@ -519,6 +519,7 @@ if ($overwriteBody==1) {
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=modify&id=\'+cid+\'">'._('Settings').'</a></li>\';
         thishtml += \' <li><a href="addremoveteachers.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Add/remove teachers').'</a></li>\';
         thishtml += \' <li><a href="transfercourse.php?from=ud'.$uid.'&id=\'+cid+\'">'._('Transfer ownership').'</a></li>\';
+        thishtml += \' <li><a href="teacherauditlog.php?userid='.$uid.'&cid=\'+cid+\'">'._('Teacher Audit Log').'</a></li>\';
         thishtml += \' <li><a href="forms.php?from=ud'.$uid.'&action=delete&id=\'+cid+\'">'._('Delete').'</a></li>\';
         thishtml += \'</ul></span> \';
         $(el).find("img").replaceWith(thishtml);

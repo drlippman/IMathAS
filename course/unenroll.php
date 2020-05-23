@@ -150,7 +150,7 @@ ini_set("max_execution_time", "600");
 				<input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
 			</p>
 			<?php if ($courseUIver == 1) { ?>
-			<p><input type=checkbox name="upgradeassessver" value="1" />
+			<p><input type=checkbox name="upgradeassessver" value="1" checked />
 				Upgrade course to use new assessment interface.
 			</p>
 			<?php } ?>

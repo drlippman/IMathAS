@@ -26,7 +26,7 @@ if ($caller=="posts") {
 	$returnname = "Forum Topics";
 }
 if (!empty($_GET['embed'])) {
-	$returnurl = "embeddone.php?embed=true";
+	$returnurl .= '&embed=true';
 }
 
 $now = time();
@@ -311,7 +311,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$files = implode('@@',$files);
 		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
 		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
-
+		if (!empty($_GET['embed'])) {
+			$returnurl = "embeddone.php?embed=true";
+		}
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //display mod

@@ -264,9 +264,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 
-	
+
 	if ($_POST['submitbtn']=='Submit') {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."&r=" .Sanitize::randomQueryStringParam());
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) .$btf."&r=" .Sanitize::randomQueryStringParam());
 		exit;
 	}
 
@@ -428,7 +429,7 @@ function chghidetitle() {
 		if (!!titleinput.data("hasrequired")) {
 			titleinput.prop("required", true);
 		}
-	}	
+	}
 }
 $(function() { chghidetitle(); });
 

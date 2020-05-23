@@ -19,7 +19,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script>window.jQuery || document.write(\'<script src="'.$imasroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=022720";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=051020";?>" type="text/css" />
 <?php
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
@@ -66,7 +66,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=042223"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=051420"></script>
 <?php
 //$_SESSION['mathdisp'] = 3;
 //
@@ -168,7 +168,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$imasroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=041020\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=051920\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {

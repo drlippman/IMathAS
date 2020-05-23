@@ -29,7 +29,31 @@ var allJsParams = {};
    window.$(qwrap).find('select.ansyel').after(svgychk);
    window.$(qwrap).find('select.ansred').after(svgx);
 
+   if (jsparams.helps && jsparams.helps.length > 0) {
+     addHelps(qwrap, jsparams.helps);
+   }
    allJsParams[qn] = jsparams;
+ }
+
+ function addHelps(qwrap, helps) {
+   if ($(qwrap).find(".qhelps").length == 0) {
+     var out = '<ul class="helplist">';
+     out += '<li>'+_('Question Help')+':</li>';
+     for (let help of helps) {
+       let title = help.label;
+       if (help.label == 'video') {
+         title = _('Video');
+       } else if (help.label == 'read') {
+         title = _('Read');
+       } else if (help.label == 'ex') {
+         title = _('Written Example');
+       }
+       out += '<li><a target="qhelp" href="'+ help['url'] +'">';
+       out += title + '</a></li>';
+     }
+     out += '</ul>';
+     $(qwrap).append($("<div>", {class: "qhelps"}).html(out));
+   }
  }
 
  function setInitValues(qwrap) {

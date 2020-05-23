@@ -79,7 +79,7 @@ function clearparams(paramarr) {
   }
 }
 
-function init(paramarr, enableMQ) {
+function init(paramarr, enableMQ, baseel) {
   var qn, params, i, el, str;
   for (qn in paramarr) {
     if (isNaN(parseInt(qn))) { continue; }
@@ -173,11 +173,11 @@ function init(paramarr, enableMQ) {
         !document.getElementById("tinyprev"+qn)
       ) {
         var html = $("#qn"+qn).val();
-        var div = $("<div>", {"id": "tinyprev"+qn, "class": "intro"});
+        var div = $("<div>", {"id": "tinyprev"+qn, "class": "introtext"});
         div.html(html);
         $("#qn"+qn).hide().after(div);
       } else {
-        initeditor("textareas","mceEditor",null,false,function(ed) {
+        initeditor("selector","#qn" + qn + ".mceEditor",null,false,function(ed) {
           ed.on('blur', function (e) {
             tinymce.triggerSave();
             jQuery(e.target.targetElm).triggerHandler('change');
@@ -187,9 +187,16 @@ function init(paramarr, enableMQ) {
         });
       }
     }
+    if (params.qtype == 'essay') {
+      $("#qnwrap"+qn+".introtext img").on('click', rotateimg);
+    }
     initEnterHandler(qn);
   }
+  initDupRubrics();
   initShowAnswer2();
+  if (baseel) {
+    setScoreMarkers(baseel);
+  }
   initqsclickchange();
   initClearScoreMarkers();
   if (paramarr.scripts) {
@@ -227,6 +234,7 @@ function init(paramarr, enableMQ) {
 // setup tip focus/blur handlers
 function setupTips(id, tip, longtip) {
   var el = document.getElementById(id);
+  if (!el) { return; }
   el.setAttribute('data-tip', tip);
   var ref = id.substr(2).split(/-/)[0];
   if (!document.getElementById("tips"+ref)) {
@@ -263,6 +271,10 @@ function clearScoreMarkers(e) {
   var target = e.currentTarget
   if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
     $(target).removeClass(m[0]);
+    $(target).nextAll('.scoremarker.sr-only').first().remove();
+    if (target.tagName.toLowerCase() == 'select') {
+      $(target).nextAll('svg.scoremarker').first().remove();
+    }
     if (target.type == 'hidden') { // may be MQ box
       $("#mqinput-"+target.id).removeClass(m[0]);
     }
@@ -275,6 +287,28 @@ function clearScoreMarkers(e) {
       wrap.find(".scoremarker").remove();
     }
   }
+}
+
+function setScoreMarkers(base) {
+  var svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
+  svgchk += '<span class="sr-only scoremarker">' + _('Correct') + '</span>';
+  var svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
+  svgychk += '<span class="sr-only scoremarker">' + _('Partially correct') + '</span>';
+  var svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+  svgx += '<span class="sr-only scoremarker">' + _('Incorrect') + '</span>';
+  $(base).find('.scoremarker').remove();
+  $(base).find('div.ansgrn,table.ansgrn').append(svgchk);
+  $(base).find('div.ansyel,table.ansyel').append(svgychk);
+  $(base).find('div.ansred,table.ansred').append(svgx);
+  $(base).find('select.ansgrn').after(svgchk);
+  $(base).find('select.ansyel').after(svgychk);
+  $(base).find('select.ansred').after(svgx);
+  $(base).find('span[id^=mqinput-].ansgrn,input[type=text].ansgrn').after('<span class="scoremarker sr-only">' + _('Correct') + '</span>');
+  $(base).find('span[id^=mqinput-].ansyel,input[type=text].ansyel').after('<span class="scoremarker sr-only">' + _('Partially correct') + '</span>');
+  $(base).find('span[id^=mqinput-].ansred,input[type=text].ansred').after('<span class="scoremarker sr-only">' + _('Incorrect') + '</span>');
 }
 
 function initClearScoreMarkers() {
@@ -290,8 +324,10 @@ function initEnterHandler(qn) {
 	$("input[type=text][name=qn"+qn+"]").off("keydown.enterhandler")
 	  .on("keydown.enterhandler", function(e) {
 		if (e.which==13) {
-			e.preventDefault();
 			var btn = $(this).closest(".questionwrap").find(".submitbtnwrap .primary");
+      if (btn.length>0) {
+        e.preventDefault();
+      }
       if (!btn.is(':disabled')) {
         btn.trigger('click');
       }
@@ -304,6 +340,23 @@ function handleMQenter(id) {
   if (!btn.is(':disabled')) {
     btn.trigger('click');
   }
+}
+
+function initDupRubrics() {
+  $(".rubriclink").each(function(i,el) {
+    $(el).removeClass("rubriclink");
+    var inref = el.id.substring(16);
+    //var clone = $(el).clone(true, true);
+    if (inref.indexOf('-') !== -1) {
+      var pts = inref.split('-');
+      inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
+    }
+    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref+",div.intro#qnwrap"+inref);
+    if (inbox.length > 0) {
+      inbox.after(el);
+      $(el).show();
+    }
+  });
 }
 
 function initShowAnswer2() {
@@ -867,8 +920,8 @@ var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi
 
 function AMnumfuncPrepVar(qn,str) {
   var vars = allParams[qn].vars.slice();
-  var vl = vars.join('|');
-  var fvarslist = allParams[qn].fvars.join('|');
+  var vl = vars.map(escapeRegExp).join('|');
+  var fvarslist = allParams[qn].fvars.map(escapeRegExp).join('|');
   vars.push("DNE");
 
   if (vl.match(/lambda/)) {
@@ -881,7 +934,11 @@ function AMnumfuncPrepVar(qn,str) {
   dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
-  	  if (vars[i] == "varE") {
+    // handle double parens
+    if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
+      str = str.replace(/\(\((.*?)\)\)/g,'($1)');
+    }
+  	if (vars[i] == "varE") {
 		  str = str.replace("E","varE");
 		  dispstr = dispstr.replace("E","varE");
 	  } else {
@@ -936,7 +993,10 @@ function AMnumfuncPrepVar(qn,str) {
 		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
 		  	dispstr = dispstr.replace(remvarparen, vars[i]);
 		  	str = str.replace(remvarparen, vars[i]);
-        submitstr = submitstr.replace(remvarparen, vars[i]);
+        submitstr = submitstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
+        submitstr = submitstr.replace(
+          new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)',regmod),
+          varpts[1]+'_('+varpts[2]+')');
 		  	if (varpts[1].length>1 && greekletters.indexOf(varpts[1].toLowerCase())==-1) {
 		  		varpts[1] = '"'+varpts[1]+'"';
 		  	}
@@ -947,11 +1007,16 @@ function AMnumfuncPrepVar(qn,str) {
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
-		  } else if (!isgreek && vars[i]!="varE") {
+		  } else if (!isgreek && vars[i]!="varE" && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
+      if (vars[i].match(/[^\w_]/)) {
+        str = str.replace(new RegExp(escapeRegExp(vars[i]),"g"), "repvars"+i);
+		  	vars[i] = "repvars"+i;
+      }
 	  }
   }
+
   if (varstoquote.length>0) {
 	  vltq = varstoquote.join("|");
 	  var reg = new RegExp("("+vltq+")","g");
@@ -1339,6 +1404,7 @@ function processNumfunc(qn, fullstr, format) {
 	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
   }
   totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+
   var i,j,totest,testval,res;
   var successfulEvals = 0;
   for (j=0; j < 20; j++) {
@@ -1360,7 +1426,7 @@ function processNumfunc(qn, fullstr, format) {
   if (successfulEvals === 0) {
     err += _("syntax error") + '. ';
   }
-  err += syntaxcheckexpr(fullstr, '', vars.join('|'));
+  err += syntaxcheckexpr(strprocess[0], '', vars.map(escapeRegExp).join('|'));
   return {
     err: err
   };
@@ -1668,6 +1734,10 @@ function singlevaleval(evalstr, format) {
   } catch(e) {
     return [NaN, _("syntax incomplete")+". "];
   }
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 function scopedeval(c) {

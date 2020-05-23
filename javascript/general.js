@@ -854,6 +854,29 @@ function togglefileembed() {
 	}
 }
 
+jQuery(function() {
+	var m;
+	if (m = window.location.href.match(/course\.php.*cid=(\d+).*folder=([\d\-]+)/)) {
+		window.sessionStorage.setItem('btf'+m[1], m[2]);
+	}
+	jQuery('a[href*="course.php"]').each(function(i,el) {
+		if (!el.href.match(/folder=/) && (m=el.href.match(/cid=(\d+)/))) {
+			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
+			if (btf !== '') {
+				el.href += '&folder='+btf;
+			}
+		}
+	});
+	jQuery('form').each(function(i,el) {
+		if (m=el.getAttribute('action').match(/cid=(\d+)/)) {
+			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
+			if (btf !== '') {
+				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
+			}
+		}
+	});
+});
+
 function convertheic(href, divid) {
 	fetch(href)
   .then(function(res) { return res.blob();})
@@ -1020,6 +1043,7 @@ function initlinkmarkup(base) {
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
+	setupToggler2(base);
 	$(base).fitVids();
 }
 
@@ -1120,6 +1144,25 @@ function setupToggler(base) {
 						targ.show();
 					}
 				}
+			}
+		});
+	});
+}
+
+function setupToggler2(base) {
+	$(base).find(".togglecontrol:not(.togglerinit)").each(function() {
+		$(this).addClass("togglerinit").attr("aria-expanded", false)
+		.on("click keydown", function(e) {
+			if (e.type=="click" || e.which==13) {
+				var targ = $("#"+$(this).attr("aria-controls"));
+				if ($(this).attr("aria-expanded") == "true") {
+					$(this).attr("aria-expanded", false);
+					targ.hide();
+				} else {
+					$(this).attr("aria-expanded", true);
+					targ.show();
+				}
+				return false;
 			}
 		});
 	});

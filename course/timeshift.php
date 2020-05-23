@@ -54,7 +54,7 @@ if (!(isset($teacherid))) {
 		} else {
 			$shiftstring = "-".abs($shiftdays)." days";
 		}
-		
+
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
@@ -72,7 +72,7 @@ if (!(isset($teacherid))) {
 			while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['startdate']>0) {
 					$row['startdate'] = strtotime($shiftstring, $row['startdate']);
-				} 
+				}
 				if ($row['enddate']<2000000000) {
 					$row['enddate'] = strtotime($shiftstring, $row['enddate']);
 				}
@@ -85,7 +85,7 @@ if (!(isset($teacherid))) {
 		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['startdate']>0) {
 				$row['startdate'] = strtotime($shiftstring, $row['startdate']);
-			} 
+			}
 			if ($row['enddate']<2000000000) {
 				$row['enddate'] = strtotime($shiftstring, $row['enddate']);
 			}
@@ -103,7 +103,7 @@ if (!(isset($teacherid))) {
 		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['startdate']>0) {
 				$row['startdate'] = strtotime($shiftstring, $row['startdate']);
-			} 
+			}
 			if ($row['enddate']<2000000000) {
 				$row['enddate'] = strtotime($shiftstring, $row['enddate']);
 			}
@@ -118,7 +118,7 @@ if (!(isset($teacherid))) {
 		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($row['startdate']>0) {
 				$row['startdate'] = strtotime($shiftstring, $row['startdate']);
-			} 
+			}
 			if ($row['enddate']<2000000000) {
 				$row['enddate'] = strtotime($shiftstring, $row['enddate']);
 			}
@@ -130,7 +130,7 @@ if (!(isset($teacherid))) {
 			}
 			$upd->execute(array($row['startdate'], $row['enddate'], $row['postby'], $row['replyby'], $row['id']));
 		}
-		
+
 
 		//update Calendar items
 		$upd = $DBH->prepare("UPDATE imas_calitems SET date=? WHERE id=?");
@@ -140,7 +140,7 @@ if (!(isset($teacherid))) {
 			$row['date'] = strtotime($shiftstring, $row['date']);
 			$upd->execute(array($row['date'], $row['id']));
 		}
-		
+
 		//update offline items
 		$upd = $DBH->prepare("UPDATE imas_gbitems SET showdate=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,showdate FROM imas_gbitems WHERE courseid=?");
@@ -150,7 +150,8 @@ if (!(isset($teacherid))) {
 			$upd->execute(array($row['showdate'], $row['id']));
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&" .Sanitize::randomQueryStringParam());
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&" .Sanitize::randomQueryStringParam());
 
 		exit;
 	} else { //DEFAULT DATA MANIPULATION

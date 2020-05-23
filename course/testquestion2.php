@@ -8,6 +8,7 @@ require_once('../assess2/AssessStandalone.php');
 
 $assessver = 2;
 $courseUIver = 2;
+$assessUIver = 2;
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -52,10 +53,12 @@ if ($myrights<20) {
 
   $a2 = new AssessStandalone($DBH);
   $a2->setQuestionData($line['id'], $line);
+  $hasSeqParts = preg_match('~(<p[^>]*>|\\n\s*\\n)\s*///+\s*(</p[^>]*>|\\n\s*\\n)~', $line['qtext']);
 
   $qn = 27;  //question number to use during testing
   if (isset($_POST['state'])) {
     $state = json_decode($_POST['state'], true);
+    $seed = $state['seeds'][$qn];
   } else {
     if (isset($_GET['seed'])) {
   		$seed = Sanitize::onlyInt($_GET['seed']);
@@ -144,11 +147,31 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=041920" type="text/javascript"></script>';
+//$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=051820" type="text/javascript"></script>';
+
+$placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
+
+$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
+$placeinhead .= '<script>
+  function loadNewVersion() {
+    location.href = location.href.replace(/&seed=\w+/g,"");
+  }
+  function showAllParts(seed) {
+    location.href = location.href.replace(/&seed=\w+/g,"") + "&seed=" + seed + "&showallparts=true";
+  }
+  function showPartSteps(seed) {
+    location.href = location.href.replace(/&seed=\w+/g,"").replace(/&showallparts=\w+/,"") + "&seed=" + seed;
+  }
+  </script>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -208,7 +231,6 @@ if ($overwriteBody==1) {
 		echo "if (window.opener && !window.opener.closed && window.opener.sethighlightrow && window.opener.getnextprev) {";
 		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
-    echo 'console.log(prevnext);';
     echo 'var next = document.getElementById("next");';
     echo 'var prev = document.getElementById("prev");';
     echo 'var remaining = document.getElementById("remaining");';
@@ -295,12 +317,16 @@ if ($overwriteBody==1) {
 	echo $page_scoreMsg;
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
-	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"return dopresubmit($qn,false)\">\n";
+	echo "<form method=post class=\"questionwrap\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"return dopresubmit($qn,false)\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 
   // DO DISPLAY
   echo '<hr/>';
-  $disp = $a2->displayQuestion($qn, true);
+
+  $disp = $a2->displayQuestion($qn, [
+    'showans' => true,
+    'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
+  ]);
   if (!empty($disp['errors'])) {
     echo '<ul class="small">';
     foreach ($disp['errors'] as $err) {
@@ -308,7 +334,7 @@ if ($overwriteBody==1) {
     }
     echo '</ul>';
   }
-  echo '<div class="questionwrap questionpane">';
+  echo '<div questionpane">';
   echo '<div class="question" id="questionwrap'.$qn.'">';
   echo $disp['html'];
   echo '</div></div>';
@@ -318,8 +344,17 @@ if ($overwriteBody==1) {
   echo '<input type=hidden name=toscoreqn value=""/>';
   echo '<input type=hidden name=state value="'. Sanitize::encodeStringForDisplay(json_encode($a2->getState())) .'" />';
 	echo '<hr/>';
-  echo "<input type=submit value=\""._("Submit")."\">";
-  echo '<button type=button onclick="location.href = location.href">'._('New Version').'</button>';
+  echo '<div class="submitbtnwrap">';
+  echo "<input type=submit class=\"primary\" value=\""._("Submit")."\">";
+  if ($hasSeqParts) {
+    if (!empty($_GET['showallparts'])) {
+      echo '<button type=button onclick="showPartSteps('.$seed.')">'._('Show steps').'</button>';
+    } else {
+      echo '<button type=button onclick="showAllParts('.$seed.')">'._('Show all parts').'</button>';
+    }
+  }
+  echo '<button type=button onclick="loadNewVersion()">'._('New Version').'</button>';
+  echo '</div>';
 	echo "</form>\n";
 
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
@@ -344,7 +379,13 @@ if ($overwriteBody==1) {
 	}
 
 	printf("<p>"._("Question id:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
-	echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$qsetid}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems")."</p>";
+  if ($line['ownerid'] == $userid) {
+    echo '<a href="moddataset.php?cid='. Sanitize::courseId($sendcid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
+    echo _('Edit Question') . '</a>';
+  } else {
+	  echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$qsetid}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems");
+  }
+  echo '</p>';
 
 	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." %s</p>", Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));

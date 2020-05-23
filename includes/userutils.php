@@ -44,7 +44,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
         if ($row['name']==null) {$row['name'] = _('Default');}
         $possible_users[] = $row;
       }
-    } else if (count($words)==2) {
+    } else if (count($words)>1) {
       $query = "SELECT iu.id,LastName,iu.FirstName,iu.email,iu.SID,iu.rights,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id ";
       $query .= "WHERE ((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
       if ($limitToTeacher) {
