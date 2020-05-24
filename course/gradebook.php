@@ -544,7 +544,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
 		setupGBpercents();';
 		if ($colorize != '0') {
+			echo '$("#myTable").hide();';
 			echo 'updateColors(document.getElementById("colorsel"));';
+			echo '$("#myTable").show();';
 		}
 		echo 'ts.init();
 	});
