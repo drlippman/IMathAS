@@ -88,20 +88,20 @@ $vueData = array(
 // Vue template
 ?>
 <div id="app" class="skipmathrender tabwrap" v-cloak>
-	<div class="fixedonscroll" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+	<div class="tabheaderfixed" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
 		<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
 			<li class="active">
-				<a href="#" role="tab" id="addassesstab_sel" aria-controls="addassess_gen" aria-selected="true"
+				<a href="#" role="tab" id="tab_gen" aria-controls="tabpanel_gen" aria-selected="true"
 					onclick="setActiveTab(this);return false;"
 				><?php echo _('General');?></a>
 			</li>
 			<li>
-				<a href="#" role="tab" id="addassesstab_chg" aria-controls="addassess_avail" aria-selected="true"
+				<a href="#" role="tab" id="tab_avail" aria-controls="tabpanel_avail" aria-selected="true"
 					onclick="setActiveTab(this);return false;"
 				><?php echo _('Availability');?></a>
 			</li>
 			<li>
-				<a href="#" role="tab" id="addassesstab_chg" aria-controls="addassess_sets" aria-selected="true"
+				<a href="#" role="tab" id="tab_settings" aria-controls="tabpanel_settings" aria-selected="true"
 					onclick="setActiveTab(this);return false;"
 				><?php echo _('Settings');?></a>
 			</li>
@@ -110,7 +110,7 @@ $vueData = array(
 			<input type=submit value="<?php echo $savetitle;?>">
 		</div>
 	</div>
-	<div class="tabpanel" id="addassess_gen" aria-labelledby="addassesstab_gen"
+	<div class="tabpanel" id="tabpanel_gen" aria-labelledby="tab_gen"
 		aria-hidden="false"
 	>
 		<span class=form><?php echo _('Assessment Name');?>:</span>
@@ -129,7 +129,7 @@ $vueData = array(
 			<textarea cols=50 rows=20 id=intro name=intro v-model="intro" style="width: 100%"></textarea>
 		</div><br class=form />
 	</div>
-	<div class="tabpanel" id="addassess_avail" aria-labelledby="addassesstab_avail"
+	<div class="tabpanel" id="tabpanel_avail" aria-labelledby="tab_avail"
 		aria-hidden="true" style="display:none;"
 	>
 		<span class=form><?php echo _('Show');?>:</span>
@@ -205,7 +205,7 @@ $vueData = array(
 		</div>
 	</div>
 
-	<div class="tabpanel" id="addassess_sets" aria-labelledby="addassesstab_sets"
+	<div class="tabpanel" id="tabpanel_settings" aria-labelledby="tab_settings"
 		aria-hidden="true" style="display:none;"
 	>
 		<div v-if="reqscoreOptions.length > 0">

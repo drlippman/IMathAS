@@ -437,10 +437,28 @@ $(function() { chghidetitle(); });
 </script>
 
 
-	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
-	<div id="headeraddinlinetext" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
+<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
+<div id="headeraddinlinetext" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
 
-	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>" class="tabwrap">
+<div class="tabheaderfixed" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+	<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
+		<li class="active">
+			<a href="#" role="tab" id="tab_gen" aria-controls="tabpanel_gen" aria-selected="true"
+				onclick="setActiveTab(this);return false;"
+			><?php echo _('General');?></a>
+		</li>
+		<li>
+			<a href="#" role="tab" id="tab_avail" aria-controls="tabpanel_avail" aria-selected="true"
+				onclick="setActiveTab(this);return false;"
+			><?php echo _('Availability');?></a>
+		</li>
+	</ul>
+	<div style="align-self:flex-end">
+		<input type=submit value="<?php echo $savetitle;?>">
+	</div>
+</div>
+<div class="tabpanel" id="tabpanel_gen" aria-labelledby="tab_gen"	aria-hidden="false">
 	<span class=form>Title: </span>
 	<span class=formright>
 		<span id="titlewrap" <?php if ($hidetitle==true) {echo 'style="display:none;"';} ?>>
@@ -484,7 +502,8 @@ $(function() { chghidetitle(); });
 		<input type="checkbox" name="isplaylist" value="1" <?php writeHtmlChecked($line['isplaylist'],1);?>/> Show as embedded playlist
 	</span>
 	<br class="form"/>
-
+</div>
+<div class="tabpanel" id="tabpanel_avail" aria-labelledby="tab_avail"	aria-hidden="true" style="display:none;">
 	<div>
 		<span class=form>Show:</span>
 		<span class=formright>
@@ -545,6 +564,7 @@ $(function() { chghidetitle(); });
 ?>
 
 	</div>
+</div>
 	<div class=submit><button type=submit name="submitbtn" value="Submit"><?php echo $savetitle; ?></button></div>
 	</form>
 	<p><sup>*</sup>Avoid quotes in the filename</p>

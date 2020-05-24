@@ -507,10 +507,28 @@ if ($overwriteBody==1) {
 } else {
 ?>
 
-	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
-	<div id="headeraddlinkedtext" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
+<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
+<div id="headeraddlinkedtext" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 
-	<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>" class="tabwrap">
+	<div class="tabheaderfixed" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+		<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
+			<li class="active">
+				<a href="#" role="tab" id="tab_gen" aria-controls="tabpanel_gen" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('General');?></a>
+			</li>
+			<li>
+				<a href="#" role="tab" id="tab_avail" aria-controls="tabpanel_avail" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('Availability');?></a>
+			</li>
+		</ul>
+		<div style="align-self:flex-end">
+			<input type=submit value="<?php echo $savetitle;?>">
+		</div>
+	</div>
+	<div class="tabpanel" id="tabpanel_gen" aria-labelledby="tab_gen"	aria-hidden="false">
 		<span class=form>Title: </span>
 		<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>" required />
 		</span><BR class=form>
@@ -616,7 +634,8 @@ if ($overwriteBody==1) {
 			<input type=radio name="target" value="0" <?php writeHtmlChecked($line['target'],0);?>/><?php echo _("Current window"); ?>/tab<br/>
 			<input type=radio name="target" value="1" <?php writeHtmlChecked($line['target'],1);?>/><?php echo _("New window"); ?>/tab<br/>
 		</span><br class="form"/>
-
+	</div>
+	<div class="tabpanel" id="tabpanel_avail" aria-labelledby="tab_avail"	aria-hidden="true" style="display:none;">
 		<span class=form><?php echo _("Show:"); ?></span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);$('#altcaldiv').slideUp(100);"/><?php echo _("Hide"); ?><br/>
@@ -674,6 +693,7 @@ if ($overwriteBody==1) {
 		echo '<input type="hidden" name="hadpoints" value="true"/>';
 	}
 ?>
+	</div>
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 	<p>&nbsp;</p>

@@ -371,57 +371,45 @@ if ($overwriteBody==1) {
 
 <?php echo $formTitle; ?>
 
-<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
+<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>" class="tabwrap">
+	<div class="tabheaderfixed" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+		<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
+			<li class="active">
+				<a href="#" role="tab" id="tab_gen" aria-controls="tabpanel_gen" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('General');?></a>
+			</li>
+			<li>
+				<a href="#" role="tab" id="tab_avail" aria-controls="tabpanel_avail" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('Availability');?></a>
+			</li>
+		</ul>
+		<div style="align-self:flex-end">
+			<input type=submit value="<?php echo $savetitle;?>">
+		</div>
+	</div>
+	<div class="tabpanel" id="tabpanel_gen" aria-labelledby="tab_gen"	aria-hidden="false">
 	<span class=form>Title: </span>
 	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>" required></span>
 	<BR class=form>
-	<span class=form>Show:</span>
-	<span class=formright>
-		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?>/>Hide <span class=small>(this will hide all items in the block from the gradebook)</span><br/>
-		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?>/>Show by Dates<br/>
-		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?>/>Show Always<br/>
-	</span><br class="form"/>
 
-	<div id="datediv">
-	<span class=form>Available After:</span>
-	<span class=formright>
-	<input type=radio name="sdatetype" value="0" <?php  writeHtmlChecked($startdate,0) ?>/>
-	 Always until end date<br/>
-	<input type=radio name="sdatetype" value="now"/> Now<br/>
-	<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,0,1) ?>/>
-	<input type=text size=10 name="sdate" value="<?php echo $sdate;?>">
-	<a href="#" onClick="displayDatePicker('sdate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a>
-	at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span>
-	<BR class=form>
-
-	<span class=form>Available Until:</span><span class=formright>
-	<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000') ?>/>
-	 Always after start date<br/>
-	<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-	<input type=text size=10 name=edate value="<?php echo $edate;?>">
-	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a>
-	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
-	<BR class=form>
-	</div>
 	<div class="availbh">
-	<span class=form>When available:</span>
-	<span class=formright>
-	<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
-	<input type=radio name=availbeh value="C" <?php writeHtmlChecked($availbeh,'C')?> />Show Collapsed<br/>
-	<input type=radio name=availbeh value="F" <?php writeHtmlChecked($availbeh,'F')?> />Show as Folder<br/>
-	<input type=radio name=availbeh value="T" <?php writeHtmlChecked($availbeh,'T')?> />Show as TreeReader
-	</span><br class=form />
+		<span class=form>When available:</span>
+		<span class=formright>
+		<input type=radio name=availbeh value="O" <?php writeHtmlChecked($availbeh,'O')?> />Show Expanded<br/>
+		<input type=radio name=availbeh value="C" <?php writeHtmlChecked($availbeh,'C')?> />Show Collapsed<br/>
+		<input type=radio name=availbeh value="F" <?php writeHtmlChecked($availbeh,'F')?> />Show as Folder<br/>
+		<input type=radio name=availbeh value="T" <?php writeHtmlChecked($availbeh,'T')?> />Show as TreeReader
+		</span><br class=form />
 	</div>
 	<div class="navail">
-	<span class=form>When not available:</span>
-	<span class=formright>
-	<input type=radio name=showhide value="H" <?php writeHtmlChecked($showhide,'H') ?> />Hide from Students<br/>
-	<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
-	</span><br class=form />
+		<span class=form>When not available:</span>
+		<span class=formright>
+		<input type=radio name=showhide value="H" <?php writeHtmlChecked($showhide,'H') ?> />Hide from Students<br/>
+		<input type=radio name=showhide value="S" <?php writeHtmlChecked($showhide,'S') ?> />Show Collapsed/as folder
+		</span><br class=form />
 	</div>
-	<div class="availbh">
 	<span class=form>For assignments within this block, when they are not available:</span>
 	<span class=formright>
 	<?php
@@ -434,10 +422,10 @@ if ($overwriteBody==1) {
 	?>
 	</span><br class=form />
 	<div class="expando">
-	<span class="form">If expanded, limit height to:</span>
-	<span class="formright">
-	<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo Sanitize::onlyInt($fixedheight);};?>" />pixels (blank for no limit)
-	</span><br class="form" />
+		<span class="form">If expanded, limit height to:</span>
+		<span class="formright">
+		<input type="text" name="fixedheight" size="4" value="<?php if ($fixedheight>0) {echo Sanitize::onlyInt($fixedheight);};?>" />pixels (blank for no limit)
+		</span><br class="form" />
 	</div>
 	<span class="form">Restrict access to students in section:</span>
 	<span class="formright">
@@ -497,7 +485,40 @@ if ($overwriteBody==1) {
 	</table>
 	</span>
 	<br class="form"/>
+</div>
+<div class="tabpanel" id="tabpanel_avail" aria-labelledby="tab_avail"	aria-hidden="true" style="display:none;">
+
+	<span class=form>Show:</span>
+	<span class=formright>
+		<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?>/>Hide <span class=small>(this will hide all items in the block from the gradebook)</span><br/>
+		<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?>/>Show by Dates<br/>
+		<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?>/>Show Always<br/>
+	</span><br class="form"/>
+
+	<div id="datediv">
+	<span class=form>Available After:</span>
+	<span class=formright>
+	<input type=radio name="sdatetype" value="0" <?php  writeHtmlChecked($startdate,0) ?>/>
+	 Always until end date<br/>
+	<input type=radio name="sdatetype" value="now"/> Now<br/>
+	<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,0,1) ?>/>
+	<input type=text size=10 name="sdate" value="<?php echo $sdate;?>">
+	<a href="#" onClick="displayDatePicker('sdate', this); return false">
+	<img src="../img/cal.gif" alt="Calendar"/></a>
+	at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span>
+	<BR class=form>
+
+	<span class=form>Available Until:</span><span class=formright>
+	<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000') ?>/>
+	 Always after start date<br/>
+	<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
+	<input type=text size=10 name=edate value="<?php echo $edate;?>">
+	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
+	<img src="../img/cal.gif" alt="Calendar"/></a>
+	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
+	<BR class=form>
 	</div>
+</div>
 	<div class=submit><input type=submit value="<?php echo $savetitle?>"></div>
 </form>
 <p class="small"><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>

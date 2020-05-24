@@ -258,7 +258,25 @@ if ($started) {
 
 ?>
 
-	<form method=post action="addwiki.php<?php echo $page_formActionTag; ?>">
+<form method=post action="addwiki.php<?php echo $page_formActionTag; ?>" class="tabwrap">
+	<div class="tabheaderfixed" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+		<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
+			<li class="active">
+				<a href="#" role="tab" id="tab_gen" aria-controls="tabpanel_gen" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('General');?></a>
+			</li>
+			<li>
+				<a href="#" role="tab" id="tab_avail" aria-controls="tabpanel_avail" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('Availability');?></a>
+			</li>
+		</ul>
+		<div style="align-self:flex-end">
+			<input type=submit value="<?php echo $savetitle;?>">
+		</div>
+	</div>
+	<div class="tabpanel" id="tabpanel_gen" aria-labelledby="tab_gen"	aria-hidden="false">
 		<span class=form>Wiki Name: </span>
 		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>" required /></span>
 		<BR class=form>
@@ -269,6 +287,19 @@ if ($started) {
 		<?php echo Sanitize::encodeStringForDisplay($line['description']);?></textarea>
 		</div>
 
+		<span class=form>Group wiki?</span><span class=formright>
+<?php
+if ($started) {
+	writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
+	echo '<input type="hidden" name="groupsetid" value="'.$line['groupsetid'].'" />';
+} else {
+	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0);
+}
+?>
+		</span><br class="form"/>
+
+	</div>
+	<div class="tabpanel" id="tabpanel_avail" aria-labelledby="tab_avail"	aria-hidden="true" style="display:none;">
 		<span class=form>Show:</span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Hide<br/>
@@ -299,16 +330,6 @@ if ($started) {
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		</div>
-		<span class=form>Group wiki?</span><span class=formright>
-<?php
-if ($started) {
-	writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
-	echo '<input type="hidden" name="groupsetid" value="'.$line['groupsetid'].'" />';
-} else {
-	writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0);
-}
-?>
-		</span><br class="form"/>
 
 		<span class=form>Students can edit:</span>
 		<span class=formright>

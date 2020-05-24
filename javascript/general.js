@@ -1066,7 +1066,7 @@ jQuery.fn.isolatedScroll = function() {
 
 
 jQuery(document).ready(function($) {
-	var fixedonscrollel = $('.fixedonscroll');
+	var fixedonscrollel = $('.fixedonscroll,.tabheaderfixed');
 	var initialtop = [];
 	for (var i=0;i<fixedonscrollel.length;i++) {
 		initialtop[i] = $(fixedonscrollel[i]).offset().top;

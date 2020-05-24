@@ -498,10 +498,35 @@ if ($overwriteBody==1) {
 
 ?>
 
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
+<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
+<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
 
-	<form method=post action="addforum.php<?php echo $page_formActionTag ?>">
+<form method=post action="addforum.php<?php echo $page_formActionTag ?>" class="tabwrap">
+	<div class="tabheaderfixed" style="display:flex;flex-wrap: wrap-reverse;justify-content: space-between">
+		<ul class="tablist" role="tablist" style="flex-grow:1; padding-top:10px">
+			<li class="active">
+				<a href="#" role="tab" id="tab_gen" aria-controls="tabpanel_gen" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('General');?></a>
+			</li>
+			<li>
+				<a href="#" role="tab" id="tab_avail" aria-controls="tabpanel_avail" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('Availability');?></a>
+			</li>
+			<li>
+				<a href="#" role="tab" id="tab_settings" aria-controls="tabpanel_settings" aria-selected="true"
+					onclick="setActiveTab(this);return false;"
+				><?php echo _('Settings');?></a>
+			</li>
+		</ul>
+		<div style="align-self:flex-end">
+			<input type=submit value="<?php echo $savetitle;?>">
+		</div>
+	</div>
+	<div class="tabpanel" id="tabpanel_gen" aria-labelledby="tab_gen"
+		aria-hidden="false"
+	>
 		<span class=form>Forum Name: </span>
 		<span class=formright><input type=text size=60 name=name value="<?php echo Sanitize::encodeStringForDisplay($line['name']);?>" required /></span>
 		<BR class=form>
@@ -513,6 +538,10 @@ if ($overwriteBody==1) {
 		</div><br/>
 
 		<br class="form"/>
+	</div>
+	<div class="tabpanel" id="tabpanel_avail" aria-labelledby="tab_avail"
+		aria-hidden="true" style="display:none;"
+	>
 		<span class=form>Show:</span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="$('#datediv').slideUp(100);"/>Hide<br/>
@@ -543,7 +572,11 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		</div>
+	</div>
 
+	<div class="tabpanel" id="tabpanel_settings" aria-labelledby="tab_settings"
+		aria-hidden="true" style="display:none;"
+	>
 		<div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
@@ -731,6 +764,7 @@ if ($overwriteBody==1) {
 ?>
 		</div>
 		</div>
+	</div>
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 	<p>&nbsp;</p>
