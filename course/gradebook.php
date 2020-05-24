@@ -292,7 +292,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=041120"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=052320"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -390,7 +390,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=103118\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=052320\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
@@ -542,7 +542,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
 		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
 		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
-		$(setupGBpercents);
+		setupGBpercents();';
+		if ($colorize != '0') {
+			echo 'updateColors(document.getElementById("colorsel"));';
+		}
+		echo 'ts.init();
 	});
 	</script>';
 
@@ -1528,6 +1532,7 @@ function gbinstrdisp() {
 	echo "<div id=\"tbl-container\">";
 	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
 
+	//echo '<div id="gbloading">'._('Loading...').'</div>';
 	echo '<table class="gb" id="myTable"><thead><tr>';
 
 	$sortarr = array();
@@ -1939,10 +1944,6 @@ function gbinstrdisp() {
 			echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 		}
 	}
-	if ($colorize != '0') {
-		echo '<script type="text/javascript">addLoadEvent( function() {updateColors(document.getElementById("colorsel"));} );</script>';
-	}
-
 
 }
 
