@@ -137,7 +137,7 @@ export default {
     showSubmit () {
       return (this.buttonsOk && (
         store.assessInfo.submitby === 'by_question' ||
-          this.questionData.tries_max > 1 ||
+          store.assessInfo.showscores === 'during' ||
           this.hasSeqNext
       ) && (
       // if livepoll, only show if state is 2
@@ -173,12 +173,12 @@ export default {
       if (store.assessInfo.submitby === 'by_question') {
         // by question submission
         label += 'submit';
-      } else if (this.questionData.tries_max === 1) {
+      } else if (store.assessInfo.showscores === 'during') {
+        // by assessment, show scores
+        label += 'checkans';
+      } else {
         // by assessment, with one try
         label += 'saveans';
-      } else {
-        // by assessment, can retry
-        label += 'checkans';
       }
       if (this.hasSeqNext) {
         label += '_seqnext';
