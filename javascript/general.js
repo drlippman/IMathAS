@@ -650,6 +650,7 @@ function recclick(type,typeid,info,txt) {
 	}
 }
 function setuptracklinks(i,el) {
+	jQuery(el).addClass("trackprepped");
 	if (jQuery(el).attr("data-base")) {
 		jQuery(el).click(function(e) {
 			var inf = jQuery(this).attr('data-base').split('-');
@@ -756,6 +757,7 @@ function setupvideoembeds(i,el) {
 		tabindex: 0,
 		"class": "videoembedbtn"
 	}).insertAfter(el);
+	jQuery(el).addClass("prepped");
 	videoembedcounter++;
 }
 
@@ -1038,9 +1040,9 @@ function initlinkmarkup(base) {
 	if (typeof isImathasAssessment != 'undefined') {
 		$(base).find('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
 	}
-	$(base).find('a').each(setuptracklinks).each(addNoopener);
-	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
-	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).find('a').not('.trackprepped').each(setuptracklinks).each(addNoopener);
+	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
+	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
 	setupToggler2(base);
