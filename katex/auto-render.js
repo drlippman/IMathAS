@@ -259,7 +259,10 @@ var renderMathInElement = function(elem, options) {
 };
 
 window.renderMathInElement = renderMathInElement;
-window.rendermathnode = function (node) {renderMathInElement(node);}
+window.rendermathnode = function (node, callback) {
+  renderMathInElement(node);
+  if(typeof callback=='function'){callback();}
+}
 $(function() {
 	renderMathInElement(document.body);
 });

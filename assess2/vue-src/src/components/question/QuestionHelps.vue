@@ -5,7 +5,7 @@
     </li>
     <li v-for="(qHelp,idx) in qHelps" :key="idx">
       <a href="#" @click.prevent="loadHelp(qHelp)">
-        <icons :name="qHelp.icon" />
+        <icons :name="qHelp.icon" alt=""/>
         {{ qHelp.title }}
       </a>
     </li>

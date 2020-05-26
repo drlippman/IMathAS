@@ -10,7 +10,16 @@
     <script type="text/javascript">
       var noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true;
       var MathJaxCompatible = true; var mathRenderer="MathJax";
-      function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }
+      function rendermathnode(node,callback) {
+  			if (window.MathJax) {
+  				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
+  				if (typeof callback == "function") {
+  					MathJax.Hub.Queue(callback);
+  				}
+  			} else {
+  				setTimeout(function() {rendermathnode(node, callback);}, 100);
+  			}
+      }
       var imasroot = 'http://localhost/imathas';
       var APIbase = 'http://localhost/imathas/assess2/';
       var coursetheme = "https://ohm.lumenlearning.com/themes/lumen.css?v=110918";

@@ -506,6 +506,7 @@ export const actions = {
             var el;
             if (!hasSeqNext) {
               el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
+              window.$(el).find('.scoreresult').focus();
             } else {
               el = window.$('#questionwrap' + qns[0]).find('.seqsep').last().next()[0];
             }
