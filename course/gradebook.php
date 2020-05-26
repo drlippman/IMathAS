@@ -543,7 +543,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
 		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
 		setupGBpercents();';
-		if ($colorize != '0') {
+		if ($isteacher && $colorize != '0' && $colorize != null) {
 			echo '$("#myTable").hide();';
 			echo 'updateColors(document.getElementById("colorsel"));';
 			echo '$("#myTable").show();';
