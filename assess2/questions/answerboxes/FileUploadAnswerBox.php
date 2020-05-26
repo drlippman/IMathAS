@@ -51,32 +51,33 @@ class FileUploadAnswerBox implements AnswerBox
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         if (isset($ansprompt)) {
-          $out .= "<label for=\"qn$qn\">$ansprompt</label>";
+          $out .= "$ansprompt ";
         }
-
-    		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" class=\"filealt\" ";
-        if (!empty($answerformat)) {
-          $answerformat = str_replace('images','.jpg,.jpeg,.gif,.png', $answerformat);
-    			$answerformat = str_replace('canpreview','.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.jpg,.gif,.png,.jpeg', $answerformat);
-          $out .= 'accept="'.preg_replace('/[^\w\.,\/\*\-]/','',$answerformat).'"';
+        if ($GLOBALS['useeditor'] !== 'review') {
+      		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" class=\"filealt\" ";
+          if (!empty($answerformat)) {
+            $answerformat = str_replace('images','.jpg,.jpeg,.gif,.png', $answerformat);
+      			$answerformat = str_replace('canpreview','.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.jpg,.gif,.png,.jpeg', $answerformat);
+            $out .= 'accept="'.preg_replace('/[^\w\.,\/\*\-]/','',$answerformat).'"';
+          }
+          $out .= "/>\n";
+          $out .= '<label for="qn'.$qn.'"><span role="button" class="filealt-btn '.$colorbox.'">';
+          $out .= _('Choose File').'</span>';
+          $out .= '<span class="filealt-label" data-def="'._('No file chosen').'">';
+          if ($autosave != '') {
+            $out .= Sanitize::encodeStringForDisplay(basename(preg_replace('/@FILE:(.+?)@/',"$1",$autosave)));
+            $out .= '<input type=hidden id="qn'.$qn.'-autosave" value="1"/>';
+          } else {
+            $out .= _('No file chosen');
+          }
+          $out .= '</span></label>';
         }
-        $out .= "/>\n";
-        $out .= '<label for="qn'.$qn.'"><span role="button" class="filealt-btn '.$colorbox.'">';
-        $out .= _('Choose File').'</span>';
-        $out .= '<span class="filealt-label" data-def="'._('No file chosen').'">';
-        if ($autosave != '') {
-          $out .= Sanitize::encodeStringForDisplay(basename(preg_replace('/@FILE:(.+?)@/',"$1",$autosave)));
-          $out .= '<input type=hidden id="qn'.$qn.'-autosave" value="1"/>';
-        } else {
-          $out .= _('No file chosen');
-        }
-        $out .= '</span></label>';
         $hasPrevSubmittedFile = false;
     		if ($la!='') {
     			if (!empty($assessmentId)) {
     				$s3asid = $assessmentId;
     			}
-    			
+
     			if (!empty($s3asid)) {
     				require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
 
@@ -98,7 +99,9 @@ class FileUploadAnswerBox implements AnswerBox
     			} else {
     				$out .= "<br/>$la";
     			}
-    		}
+    		} else if ($GLOBALS['useeditor'] === 'review') {
+          $out .= _('No file submitted');
+        }
     		$tip .= _('Select a file to upload');
     		$sa .= $answer;
 
