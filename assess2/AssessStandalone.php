@@ -204,8 +204,8 @@ class AssessStandalone {
           $this->state['stuanswers'][$qn+1] = $v;
           $this->state['stuanswersval'][$qn+1] = $partlaNum[$k];
         }
-        $this->state['rawscores'][$qn][$k] = $rawparts[$k];
       }
+      $this->state['rawscores'][$qn][$k] = $rawparts[$k];
     }
 
     $score = array_sum($scores);

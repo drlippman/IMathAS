@@ -1859,7 +1859,7 @@ class AssessRecord
    * @return string errors, if any
    */
   public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true) {
-    $qver = $this->getQuestionVer($qn);
+    $qver = &$this->getQuestionVer($qn);
 
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
@@ -1938,6 +1938,14 @@ class AssessRecord
           $data[$k]['raw'] = $rawparts[$k];
         }
         $this->clearAutoSave($qn, $k);
+      } else if (isset($rawparts[$k]) && !empty($qver['tries'][$k])) {
+        // check to see if score on an unsubmitted part has changed
+        // can happen in some pseudo-conditional questions
+        $lasttry = &$qver['tries'][$k][count($qver['tries'][$k])-1];
+        if (isset($lasttry['raw']) && abs($lasttry['raw'] - $rawparts[$k]) > .001) {
+          // score has changed
+          $lasttry['raw'] = $rawparts[$k];
+        }
       }
     }
 
@@ -3355,23 +3363,23 @@ class AssessRecord
    * Returns the specified version of question attempt data
    * @param  int  $qn          The question number
    * @param  string  $ver         The assessment attempt to grab, or 'last'
-   * @return object   question data for that version
+   * @return object   question data for that version.  Is reference
    */
-  private function getQuestionVer($qn, $ver = 'last') {
+  private function &getQuestionVer($qn, $ver = 'last') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $this->parseData();
     if ($this->is_practice) {
-      $assessver = $this->data['assess_versions'][0];
+      $assessver = &$this->data['assess_versions'][0];
     } else if ($by_question || !is_numeric($ver)) {
-      $assessver = $this->data['assess_versions'][count($this->data['assess_versions']) - 1];
+      $assessver = &$this->data['assess_versions'][count($this->data['assess_versions']) - 1];
     } else {
-      $assessver = $this->data['assess_versions'][$ver];
+      $assessver = &$this->data['assess_versions'][$ver];
     }
-    $question_versions = $assessver['questions'][$qn]['question_versions'];
+    $question_versions = &$assessver['questions'][$qn]['question_versions'];
     if (!$by_question || !is_numeric($ver)) {
-      $curq = $question_versions[count($question_versions) - 1];
+      $curq = &$question_versions[count($question_versions) - 1];
     } else {
-      $curq = $question_versions[$ver];
+      $curq = &$question_versions[$ver];
     }
     return $curq;
   }
