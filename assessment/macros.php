@@ -2360,6 +2360,9 @@ function definefunc($func,$varlist) {
 
 function getstuans($v,$q,$i=0) {
 	if (is_array($v[$q])) {
+    if (!isset($v[$q][$i])) {
+      return null;
+    }
 		return $v[$q][$i];
 	} else {
 		return $v[$q];
