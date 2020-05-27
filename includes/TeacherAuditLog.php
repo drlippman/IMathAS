@@ -16,7 +16,24 @@ class TeacherAuditLog
         "Clear Scores",
         "Delete Item",
         "Unenroll",
-        "Change Grades"
+        "Change Grades",
+        "Course Settings Change",
+        "Inlinetext Settings Change",
+        "Link Settings Change",
+        "Forum Settings Change",
+        "Mass Forum Settings Change",
+        "Block Settings Change",
+        "Mass Block Settings Change",
+        "Wiki Settings Change",
+        "Drill Settings Change",
+        "Gradebook Settings Change",
+        "Roster Action",
+        "Exception Change",
+        "Delete Post",
+        "Offline Grade Settings Change",
+        "Change Offline Grades",
+        "Change Forum Grades",
+        "Change External Tool Grades"
     ];
 
     public static function addTracking($courseid, $action, $itemid = null, $metadata = array(), ?PDO $dbhOverride = null)
@@ -106,10 +123,10 @@ class TeacherAuditLog
         $dbh = is_null($dbhOverride) ? $GLOBALS['DBH'] : $dbhOverride;
 
         $ph = \Sanitize::generateQueryPlaceholders($actions);
-        $query = "SELECT g.name, u.FirstName, u.LastName, l.userid, l.action, count(l.action) as itemcount 
+        $query = "SELECT g.name, u.FirstName, u.LastName, l.userid, l.action, count(l.action) as itemcount
             FROM imas_teacher_audit_log as l JOIN imas_users as u ON l.userid = u.id
             LEFT JOIN imas_groups AS g ON u.groupid=g.id
-            WHERE l.action in ($ph) AND l.created_at >= ? AND l.created_at <= ? 
+            WHERE l.action in ($ph) AND l.created_at >= ? AND l.created_at <= ?
             GROUP BY l.userid, l.action";
         $stm = $dbh->prepare($query);
         $params = array_merge($actions, [$startTimestamp->format("Y-m-d H:i:s"),$endTimestamp->format("Y-m-d H:i:s")]);
