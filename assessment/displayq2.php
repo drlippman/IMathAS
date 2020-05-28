@@ -3986,6 +3986,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -4059,26 +4061,30 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		}
-
+		$incorrect = 0;
 		for ($i=0; $i<count($answerlist); $i++) {
 			if (!is_numeric($givenanslist[$i])) {
-				$correct = false;
-				break;
+				$incorrect++;
+				continue;
 			} else if (isset($abstolerance)) {
 				if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance-1E-12) {
-					$correct = false;
-					break;
+					$incorrect++;
+					continue;
 				}
 			} else {
 				if (abs($answerlist[$i] - $givenanslist[$i])/(abs($answerlist[$i])+.0001) > $reltolerance-1E-12) {
-					$correct = false;
-					break;
+					$incorrect++;
+					continue;
 				}
 
 			}
 		}
 
-		if ($correct) {return 1;} else {return 0;}
+		if ($correct && $incorrect == 0) {
+			return 1;
+		} else if ($correct && $scoremethod == 'byelement') {
+			return (count($answerlist) - $incorrect)/count($answerlist);
+		} else {return 0;}
 	} else if ($anstype=="calcmatrix") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
@@ -4086,6 +4092,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$qn];} else {$answersize = $options['answersize'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+		if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
@@ -4121,6 +4129,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		$correct = true;
+		$incorrect = array();
 
 		$ansr = substr($answer,2,-2);
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
@@ -4133,7 +4142,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($answersize)) {
 			for ($i=0; $i<count($answerlist); $i++) {
 				if (!checkanswerformat($givenanslist[$i],$ansformats)) {
-					return 0; //perhaps should just elim bad answer rather than all?
+					if ($scoremethod == 'byelement') {
+						$incorrect[$i] = 1;
+					} else {
+						return 0; //perhaps should just elim bad answer rather than all?
+					}
 				}
 			}
 
@@ -4145,7 +4158,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$tocheck = explode(',',$tocheck);
 			foreach($tocheck as $chkme) {
 				if (!checkanswerformat($chkme,$ansformats)) {
-					return 0; //perhaps should just elim bad answer rather than all?
+					if ($scoremethod == 'byelement') {
+						$incorrect[$i] = 1;
+					} else {
+						return 0; //perhaps should just elim bad answer rather than all?
+					}
 				}
 			}
 		}
@@ -4183,17 +4200,21 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		for ($i=0; $i<count($answerlist); $i++) {
 			if (isset($abstolerance)) {
 				if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance-1E-12) {
-					$correct = false;
-					break;
+					$incorrect[$i] = 1;
+					continue;
 				}
 			} else {
 				if (abs($answerlist[$i] - $givenanslist[$i])/(abs($answerlist[$i])+.0001) > $reltolerance-1E-12) {
-					$correct = false;
-					break;
+					$incorrect[$i] = 1;
+					continue;
 				}
 			}
 		}
-		if ($correct) {return 1;} else {return 0;}
+		if ($correct && count($incorrect)==0) {
+			return 1;
+		} else if ($correct && $scoremethod == 'byelement') {
+			return (count($answerlist) - count($incorrect))/count($answerlist);
+		} else {return 0;}
 	} else if ($anstype == "ntuple" || $anstype== 'calcntuple') {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
