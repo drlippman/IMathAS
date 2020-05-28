@@ -848,6 +848,7 @@ if ($stm->rowCount()==0) {
 					if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useexisting") {
 						$destcid = $aidsourcecid;
 						$copycourse = "no";
+						$ltilog = ['copy'=>'useorig', 'cid'=>$destcid];
 					}
 				}
 				$stm = $DBH->prepare('SELECT jsondata,UIver FROM imas_courses WHERE id=:aidsourcecid');
@@ -859,12 +860,15 @@ if ($stm->rowCount()==0) {
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {
 					$destcid = $_POST['useothercoursecid'];
 					$copycourse = "no";
+					$ltilog = ['copy'=>'useother', 'cid'=>$destcid];
 				} else if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="makecopy") {
 					$copycourse = "yes";
 					$sourcecid = $aidsourcecid;
+					$ltilog = ['copy'=>'copyorig', 'cid'=>$sourcecid];
 				} else if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="copyother" && $_POST['othercoursecid']>0) {
 					$copycourse = "yes";
 					$sourcecid = Sanitize::onlyInt($_POST['othercoursecid']);
+					$ltilog = ['copy'=>'copyother', 'cid'=>$sourcecid];
 				}
 				if ($copycourse=="notify" || $copycourse=="ask") {
 					$_SESSION['userid'] = $userid; //remember me
@@ -1138,6 +1142,16 @@ if ($stm->rowCount()==0) {
 				':courseid'=>$destcid,
 				':copiedfrom'=>($copycourse == "yes")?$sourcecid:0,
 				':contextlabel'=>$_SESSION['lti_context_label']));
+
+			$ltilog['contextid'] = $_SESSION['lti_context_id'];
+			$ltilog['action'] = 'Establish LTI course connection';
+			require_once('includes/TeacherAuditLog.php');
+			TeacherAuditLog::addTracking(
+				$destcid,
+				"Course Settings Change",
+				$destcid,
+				$ltilog
+			);
 		} else {
 			list($destcid, $copiedfromcid) = $stm->fetch(PDO::FETCH_NUM);
 		}
@@ -1313,6 +1327,17 @@ if ($_SESSION['lti_keytype']=='cc-of') {
 					':contextid'=>$_SESSION['lti_context_id'],
 					':courseid'=>$linkcid,
 					':contextlabel'=>$_SESSION['lti_context_label']));
+				require_once('includes/TeacherAuditLog.php');
+				TeacherAuditLog::addTracking(
+					$linkcid,
+					"Course Settings Change",
+					$linkcid,
+					[
+						'action'=>'Establish LTI course connection',
+						'type'=>'cc-of',
+						'contextid'=>$_SESSION['lti_context_id']
+					]
+				);
 			} else {
 				reporterror(_("You are not an instructor on the course and folder this link is pointing to. Auto-copying is not currently supported for folder-level links."));
 			}
@@ -2399,6 +2424,19 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						':contextid'=>$_SESSION['lti_context_id'],
 						':courseid'=>$destcid,
 						':contextlabel'=>$_SESSION['lti_context_label']));
+					require_once('includes/TeacherAuditLog.php');
+					TeacherAuditLog::addTracking(
+						$destcid,
+						"Course Settings Change",
+						$destcid,
+						[
+							'action'=>'Establish LTI course connection',
+							'type'=>'2',
+							'contextid'=>$_SESSION['lti_context_id'],
+							'copycourse'=>$copycourse,
+							'orig'=>$_SESSION['place_aid'][0]
+						]
+					);
 
 				} else if ($_SESSION['lti_keytype']=='cc-c') {
 					$copyaid = true;
@@ -2410,7 +2448,17 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						':contextid'=>$_SESSION['lti_context_id'],
 						':courseid'=>$destcid,
 						':contextlabel'=>$_SESSION['lti_context_label']));
-
+					require_once('includes/TeacherAuditLog.php');
+					TeacherAuditLog::addTracking(
+						$destcid,
+						"Course Settings Change",
+						$destcid,
+						[
+							'action'=>'Establish LTI course connection',
+							'type'=>'3',
+							'contextid'=>$_SESSION['lti_context_id'],
+						]
+					);
 				}
 			} else {
 				$destcid = $stm->fetchColumn(0);

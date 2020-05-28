@@ -74,29 +74,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $assessmentId = Sanitize::onlyInt($_GET['id']);
         $cid = Sanitize::courseId($_GET['cid']);
         $block = $_GET['block'];
-        $assessName = Sanitize::stripHtmlTags($_POST['name']);
-        if ($assessName == '') {
-        	$assessName = _('Unnamed Assessment');
-        }
+
+				if (isset($_GET['id'])) {
+					$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+					$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
+					$taken = ($stm->fetchColumn(0)>0);
+				} else {
+					$taken = false;
+				}
+
         $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
         $stm->execute(array($cid));
         $dates_by_lti = $stm->fetchColumn(0);
-        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
-        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
-        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
-        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
-        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
-        $grpmax = Sanitize::onlyInt($_POST['groupmax']);
-        $shwqcat = Sanitize::onlyInt($_POST['showqcat']);
-        $eqnhelper = Sanitize::onlyInt($_POST['eqnhelper']);
-        $showtips = Sanitize::onlyInt($_POST['showtips']);
-        $grpsetid = Sanitize::onlyInt($_POST['groupsetid']);
-        $reqscore = Sanitize::onlyInt($_POST['reqscore']);
-        $allowlate = Sanitize::onlyInt($_POST['allowlate']);
-        $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
-        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
-        $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
-        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
         if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
             if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
@@ -149,6 +140,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $body .= '</form>';
             }
         } elseif (!empty($_POST['name'])) { //if the form has been submitted
+					$assessName = Sanitize::stripHtmlTags($_POST['name']);
+	        if ($assessName == '') {
+	        	$assessName = _('Unnamed Assessment');
+	        }
+	        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
+	        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
+	        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
+	        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
+	        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
+	        $grpmax = Sanitize::onlyInt($_POST['groupmax']);
+	        $shwqcat = Sanitize::onlyInt($_POST['showqcat']);
+	        $eqnhelper = Sanitize::onlyInt($_POST['eqnhelper']);
+	        $showtips = Sanitize::onlyInt($_POST['showtips']);
+	        $grpsetid = Sanitize::onlyInt($_POST['groupsetid']);
+	        $reqscore = Sanitize::onlyInt($_POST['reqscore']);
+	        $allowlate = Sanitize::onlyInt($_POST['allowlate']);
+	        $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
+	        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
+	        $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
+	        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
+
         	$DBH->beginTransaction();
             require_once("../includes/parsedatetime.php");
             if ($_POST['avail']==1) {
@@ -261,19 +273,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
             $extrefencoded = json_encode($extrefs);
 
-		if ($_POST['reqscoreshowtype']==-1 || $reqscore==0) {
-			$reqscore = 0;
-			$reqscoretype = 0;
-			$_POST['reqscoreaid'] = 0;
-		} else {
-			$reqscoretype = 0;
-			if ($_POST['reqscoreshowtype']==1) {
-				$reqscoretype |= 1;
-			}
-			if ($_POST['reqscorecalctype']==1) {
-				$reqscoretype |= 2;
-			}
-		}
+				if ($_POST['reqscoreshowtype']==-1 || $reqscore==0) {
+					$reqscore = 0;
+					$reqscoretype = 0;
+					$_POST['reqscoreaid'] = 0;
+				} else {
+					$reqscoretype = 0;
+					if ($_POST['reqscoreshowtype']==1) {
+						$reqscoretype |= 1;
+					}
+					if ($_POST['reqscorecalctype']==1) {
+						$reqscoretype |= 2;
+					}
+				}
 
         $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
         $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
@@ -347,21 +359,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
             $calrtag = 'R'; //not used anymore Sanitize::stripHtmlTags($_POST['caltagrev']);
 
-		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
-			$_POST['summary'] = '';
-		} else {
-			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
-		}
-		if ($_POST['intro']=='<p>Enter intro/instructions</p>' || $_POST['intro']=='<p></p>') {
-			$_POST['intro'] = '';
-		} else {
-			$_POST['intro'] = Sanitize::incomingHtml($_POST['intro']);
-		}
+						if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
+							$_POST['summary'] = '';
+						} else {
+							$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
+						}
+						if ($_POST['intro']=='<p>Enter intro/instructions</p>' || $_POST['intro']=='<p></p>') {
+							$_POST['intro'] = '';
+						} else {
+							$_POST['intro'] = Sanitize::incomingHtml($_POST['intro']);
+						}
 
-		if (isset($_GET['id'])) {  //already have id; update
-			$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
-			$curassess = $stm->fetch(PDO::FETCH_ASSOC);
+						if (isset($_GET['id'])) {  //already have id; update
+							$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
+							$stm->execute(array(':id'=>$_GET['id']));
+							$curassess = $stm->fetch(PDO::FETCH_ASSOC);
 
                 if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
                     if ($curassess['isgroup']>0) {
@@ -422,7 +434,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 
-			if ($stm->rowCount()>0) {
+			if ($taken && $stm->rowCount()>0) {
 				$metadata = array();
 				foreach ($curassess as $k=>$v) {
 					if (isset($qarr[':'.$k]) && $qarr[':'.$k] != $v) {
@@ -555,11 +567,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
         } else { //INITIAL LOAD
             if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
-                $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-                $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
-                $stm = $DBH->prepare($query);
-                $stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
-                $taken = ($stm->fetchColumn(0)>0);
+
                 $stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
                 $stm->execute(array(':id'=>$assessmentId));
                 $line = $stm->fetch(PDO::FETCH_ASSOC);

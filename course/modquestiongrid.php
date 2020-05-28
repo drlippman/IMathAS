@@ -10,6 +10,7 @@
 
 	if ($_GET['process']== true) {
 		require_once("../includes/updateptsposs.php");
+		require_once("../includes/TeacherAuditLog.php");
 		if (isset($_POST['add'])) { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
@@ -94,32 +95,32 @@
 			$stm->execute(array(':id'=>$aid));
 			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 
-			//what qsetids do we need for adding copies?
-			$lookupid = array();
-			foreach(explode(',',$_POST['qids']) as $qid) {
-				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
-					$lookupid[] = intval($qid);
-				}
+			// get old settings
+			$stm = $DBH->prepare("SELECT * FROM imas_questions WHERE assessmentid=?");
+			$stm->execute(array($aid));
+			$old_settings = array();
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$old_settings[$row['id']] = $row;
 			}
-			//lookup qsetids
-			$qidtoqsetid = array();
-			if (count($lookupid)>0) {
-				$stm = $DBH->query("SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")"); //sanitized above
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$qidtoqsetid[$row[0]] = $row[1];
-				}
-			}
+
+			$changes = array();
 
 			foreach(explode(',',$_POST['qids']) as $qid) {
 				$attempts = trim($_POST['attempts'.$qid]);
 				$showhints = intval($_POST['showhints'.$qid]);
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
+				$settings = array(':attempts'=>$attempts, ':showhints'=>$showhints, ':id'=>$qid);
 				$stm = $DBH->prepare("UPDATE imas_questions SET attempts=:attempts,showhints=:showhints WHERE id=:id");
-				$stm->execute(array(':attempts'=>$attempts, ':showhints'=>$showhints, ':id'=>$qid));
+				$stm->execute($settings);
+				foreach ($old_settings[$qid] as $k=>$v) {
+	        if (isset($settings[':'.$k]) && $settings[':'.$k] != $v) {
+	          $changes[$qid][$k] = ['old'=>$v, 'new'=>$settings[':'.$k]];
+	        }
+	      }
 				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
 					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
-						$qsetid = $qidtoqsetid[$qid];
+						$qsetid = $old_settings[$qid]['questionsetid'];
 						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
 						$query .= "VALUES (:assessmentid, :points, :attempts, :showhints, :penalty, :regen, :showans, :questionsetid)";
 						$stm = $DBH->prepare($query);
@@ -137,6 +138,16 @@
 					}
 				}
 			}
+			// we only get to modquestiongrid if assessment is untaken,
+			// and we're not logging course building changes for now
+			if (false && count($changes)>0) {
+        TeacherAuditLog::addTracking(
+          $cid,
+          "Question Settings Change",
+          $_GET['id'],
+          $changes
+        );
+      }
 			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
 			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
 
