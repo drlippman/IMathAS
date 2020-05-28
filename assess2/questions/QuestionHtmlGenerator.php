@@ -125,6 +125,7 @@ class QuestionHtmlGenerator
         // The following variables are expected by the question writer's code in interpret().
         $stuanswers = $this->questionParams->getAllQuestionAnswers();  // Contains ALL question answers.
         $stuanswersval = $this->questionParams->getAllQuestionAnswersAsNum();
+        $autosaves = $this->questionParams->getAllQuestionAutosaves();
         $scorenonzero = $this->questionParams->getScoreNonZero();
         $scoreiscorrect = $this->questionParams->getScoreIsCorrect();
         $attemptn = $this->questionParams->getStudentAttemptNumber();
@@ -278,11 +279,15 @@ class QuestionHtmlGenerator
 
             // Get the answers to all parts of this question.
             $lastAnswersAllParts = $stuanswers[$thisq];
+            if (isset($autosaves[$thisq])) {
+              $lastAnswersAllParts = $autosaves[$thisq];
+            }
             if (!is_array($lastAnswersAllParts)) {
               // multipart questions with one part get stored as single value;
               // turn back into an array
               $lastAnswersAllParts = array($lastAnswersAllParts);
             }
+
 
             /*
              *  For sequenial multipart, skip answerbox generation for parts
@@ -407,6 +412,9 @@ class QuestionHtmlGenerator
                 $this->questionParams->getLastRawScores(), 0, 1);
 
             $lastAnswer = $stuanswers[$thisq];
+            if (isset($autosaves[$thisq])) {
+              $lastAnswer = $autosaves[$thisq];
+            }
 
             if (is_array($lastAnswer)) { // happens with autosaves
               //  appears to be resolved before getting here now

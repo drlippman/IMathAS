@@ -18,6 +18,7 @@ class QuestionParams
 
     private $allQuestionAnswers;        // Orig: $GLOBALS['stuanswers']
     private $allQuestionAnswersAsNum;   // Orig: $GLOBALS['stuanswersval']
+    private $allQuestionAutosaves;      // related to stuanswers
     private $studentAttemptNumber;
     private $studentPartAttemptCount;
     private $seqPartDone;
@@ -252,6 +253,28 @@ class QuestionParams
     public function setAllQuestionAnswersAsNum(?array $allQuestionAnswersAsNum): QuestionParams
     {
         $this->allQuestionAnswersAsNum = $allQuestionAnswersAsNum;
+        return $this;
+    }
+
+    /**
+     * Get all of the student's autosaves to ALL questions. (as entered)
+     *
+     * @return array
+     */
+    public function getAllQuestionAutosaves(): ?array
+    {
+        return $this->allQuestionAutosaves;
+    }
+
+    /**
+     * Set all of the student's autosaves to ALL questions. (as entered)
+     *
+     * @param array $allQuestionAutosaves
+     * @return QuestionParams
+     */
+    public function setAllQuestionAutosaves(?array $allQuestionAutosaves): QuestionParams
+    {
+        $this->allQuestionAutosaves = $allQuestionAutosaves;
         return $this;
     }
 

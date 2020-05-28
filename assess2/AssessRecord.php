@@ -1687,6 +1687,7 @@ class AssessRecord
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers($ver, $tryToShow);
     list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
+    $autosaves = [];
     $seqPartDone = array();
 
     for ($pn = 0; $pn < $numParts; $pn++) {
@@ -1701,15 +1702,15 @@ class AssessRecord
           // it's  a file autosave.  As a bit of a hack we'll make an array
           // with both the last submitted answer and the autosave
           if (is_array($stuanswers[$qn+1]) || $numParts > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
-            $stuanswers[$qn+1][$pn] = array($stuanswers[$qn+1][$pn], $autosave['stuans'][$pn]);
+            $autosaves[$qn+1][$pn] = array($stuanswers[$qn+1][$pn], $autosave['stuans'][$pn]);
           } else {
-            $stuanswers[$qn+1] = array($stuanswers[$qn+1], $autosave['stuans'][$pn]);
+            $autosaves[$qn+1] = array($stuanswers[$qn+1], $autosave['stuans'][$pn]);
           }
         } else {
           if (is_array($stuanswers[$qn+1]) || $numParts > 1 || isset($autosave['post']['qn'.(($qn+1)*1000 + $pn)])) {
-            $stuanswers[$qn+1][$pn] = $autosave['stuans'][$pn];
+            $autosaves[$qn+1][$pn] = $autosave['stuans'][$pn];
           } else {
-            $stuanswers[$qn+1] = $autosave['stuans'][$pn];
+            $autosaves[$qn+1] = $autosave['stuans'][$pn];
           }
         }
         $usedAutosave[] = $pn;
@@ -1794,6 +1795,7 @@ class AssessRecord
         ->setStudentPartAttemptCount($partattemptn)
         ->setAllQuestionAnswers($stuanswers)
         ->setAllQuestionAnswersAsNum($stuanswersval)
+        ->setAllQuestionAutosaves($autosaves)
         ->setScoreNonZero($scorenonzero)
         ->setScoreIsCorrect($scoreiscorrect)
         ->setLastRawScores($qcolors)
