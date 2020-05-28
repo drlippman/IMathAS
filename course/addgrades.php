@@ -6,6 +6,7 @@
 	//single grade edit
 	require("../init.php");
 	require("../includes/htmlutil.php");
+	require_once("../includes/TeacherAuditLog.php");
 
 	$istutor = false;
 	$isteacher = false;
@@ -40,9 +41,25 @@
 	if (isset($_GET['del']) && $isteacher) {
 		$delItem = Sanitize::onlyInt($_GET['del']);
 		if (isset($_POST['confirm'])) {
+			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
+			$stm->execute(array(':id'=>$delItem));
+			$gbItemName = $stm->fetchColumn(0);
 			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':id'=>$delItem, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
+				$stm = $DBH->prepare("SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
+				$stm->execute(array(':gradetypeid'=>$delItem));
+				$grades = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
+				TeacherAuditLog::addTracking(
+            $cid,
+            "Delete Item",
+            $delItem,
+            [
+							'item_type'=>'Offline Grade Item',
+							'item_name'=>$gbItemName,
+							'grades' => $grades
+            ]
+        );
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
 				$stm->execute(array(':gradetypeid'=>$delItem));
 			}
