@@ -2358,13 +2358,18 @@ function definefunc($func,$varlist) {
 	return array($func,$varlist);
 }
 
-function getstuans($v,$q,$i=0) {
+function getstuans($v,$q,$i=0,$blankasnull=true) {
 	if (is_array($v[$q])) {
     if (!isset($v[$q][$i])) {
+      return null;
+    } else if ($blankasnull && ($v[$q][$i]==='' || $v[$q][$i]==='NA')) {
       return null;
     }
 		return $v[$q][$i];
 	} else {
+    if ($blankasnull && ($v[$q]==='' || $v[$q]==='NA')) {
+      return null;
+    }
 		return $v[$q];
 	}
 }
