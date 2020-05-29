@@ -138,12 +138,14 @@ class QuestionGenerator
     {
         $questionNumber = $this->questionParams->getQuestionNumber();
 
-        unset($_SESSION['choicemap'][$questionNumber]);
+        if (!empty($_SESSION['choicemap'])) {
+          unset($_SESSION['choicemap'][$questionNumber]);
 
-        $iidx = 0;
-        while (isset($_SESSION['choicemap'][1000 * ($questionNumber + 1) + $iidx])) {
-            unset($_SESSION['choicemap'][1000 * ($questionNumber + 1) + $iidx]);
-            $iidx++;
+          foreach ($_SESSION['choicemap'] as $k=>$v) {
+            if (floor($k/1000) == $questionNumber + 1) {
+              unset($_SESSION['choicemap'][$k]);
+            }
+          }
         }
     }
 
