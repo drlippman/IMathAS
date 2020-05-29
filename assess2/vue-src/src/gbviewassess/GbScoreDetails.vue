@@ -274,7 +274,8 @@ export default {
           link: this.questionEditUrl
         },
         {
-          label: this.$t('gradebook.msg_owner'),
+          label: (store.assessInfo.hasOwnProperty('qerrortitle')
+            ? store.assessInfo.qerrortitle : this.$t('gradebook.msg_owner')),
           link: this.questionErrorUrl
         }
       ];
