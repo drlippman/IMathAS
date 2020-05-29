@@ -2,6 +2,7 @@
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
 	require("../init.php");
+	require_once("../includes/TeacherAuditLog.php");
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -108,6 +109,7 @@
 		} else {
 			$onepergroup = false;
 		}
+		$scoresToLog = array();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -138,6 +140,7 @@
 				if ($onepergroup) {
 					if ($line['agroupid']==0) { continue;}
 					foreach ($grpscores[$line['agroupid']] as $loc=>$sv) {
+						$oldscore = $scores[$loc];
 						if (is_array($sv)) {
 							if (count($sv) < count(explode('~', $scores[$loc]))) {
 								echo "Oh-oh: score didn't seem to be submitted properly. Aborting";
@@ -146,6 +149,9 @@
 							$scores[$loc] = implode('~',$sv);
 						} else {
 							$scores[$loc] = $sv;
+						}
+						if ($oldscore != $scores[$loc]) {
+							$scoresToLog[$line['userid']] = ['loc'=>$loc, 'old'=>$oldscore, 'new'=>$scores[$loc]];
 						}
 					}
 					if (isset($grpfeedback[$line['agroupid']])) {
@@ -159,6 +165,7 @@
 					}
 				} else {
 					foreach ($allscores[$line['id']] as $loc=>$sv) {
+						$oldscore = $scores[$loc];
 						if (is_array($sv)) {
 							if (count($sv) < count(explode('~', $scores[$loc]))) {
 								echo "Oh-oh: score didn't seem to be submitted properly. Aborting";
@@ -167,6 +174,9 @@
 							$scores[$loc] = implode('~',$sv);
 						} else {
 							$scores[$loc] = $sv;
+						}
+						if ($oldscore != $scores[$loc]) {
+							$scoresToLog[$line['userid']] = ['loc'=>$loc, 'old'=>$oldscore, 'new'=>$scores[$loc]];
 						}
 					}
 					if (isset($allfeedbacks[$line['id']])) {
@@ -180,6 +190,7 @@
 					}
 					//$feedback = $_POST['feedback-'.$line['id']];
 				}
+
 				$scorelist = implode(",",$scores);
 				if (count($sp)>1) {
 					$scorelist .= ';'.$sp[1].';'.$sp[2];
@@ -206,6 +217,17 @@
 			$query .= "ON DUPLICATE KEY UPDATE bestscores=VALUES(bestscores),feedback=VALUES(feedback)";
 			$stm = $DBH->prepare($query);
 			$stm->execute($updatedata);
+		}
+		if (count($scoresToLog)>0) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Change Grades",
+				$aid,
+				array(
+					'qid'=>$qid,
+					'changes'=>$scoresToLog
+				)
+			);
 		}
 
 		if (isset($_GET['quick'])) {

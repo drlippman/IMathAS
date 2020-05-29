@@ -135,6 +135,7 @@
 		}
 		$cnt = 0;
 		$updatedata = array();
+		$changesToLog = array();
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 
 			$GLOBALS['assessver'] = $line['ver'];
@@ -185,11 +186,15 @@
 
 				$adjustedScores = $assess_record->convertGbScoreOverrides($scoresToSet, $ptsposs);
 				$adjustedFeedbacks = $assess_record->convertGbFeedbacks($feedbackToSet);
-				$assess_record->setGbScoreOverrides($adjustedScores);
+				$changes = $assess_record->setGbScoreOverrides($adjustedScores);
 				$assess_record->setGbFeedbacks($adjustedFeedbacks);
 
 				if (count($adjustedScores) > 0 || count($adjustedFeedbacks) > 0) {
 					$assess_record->saveRecord();
+				}
+
+				if (!empty($changes)) {
+					$changesToLog[$line['userid']] = $changes;
 				}
 
 				// Normally it'd only make sense to update LTI scores that changed. But
@@ -202,6 +207,17 @@
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true);
 				}
 			}
+		}
+		if (count($changesToLog)>0) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Change Grades",
+				$aid,
+				array(
+					'qid'=>$qid,
+					'changes'=>$changesToLog
+				)
+			);
 		}
 		$DBH->commit();
 
