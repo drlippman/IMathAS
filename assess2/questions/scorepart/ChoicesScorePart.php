@@ -50,7 +50,8 @@ class ChoicesScorePart implements ScorePart
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
-            return false;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
