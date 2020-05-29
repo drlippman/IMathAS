@@ -32,6 +32,7 @@ class MatchingAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $assessmentId = $this->answerBoxParams->getAssessmentId();
 
         // FIXME: The following code needs to be updated
         //        - $qn is always the question number (never $qn+1)
@@ -75,7 +76,7 @@ class MatchingAnswerBox implements AnswerBox
     			$randakeys = $RND->array_rand($answers,count($answers));
     			$RND->shuffle($randakeys);
     		}
-        $_SESSION['choicemap'][$qn] = array($randqkeys, $randakeys);
+        $_SESSION['choicemap'][$assessmentId][$qn] = array($randqkeys, $randakeys);
         if (isset($GLOBALS['capturechoices'])) {
           $GLOBALS['choicesdata'][$qn] = array($randqkeys, $answers);
         }

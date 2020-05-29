@@ -714,9 +714,9 @@ class AssessRecord
               $tmp[] = $_POST["qn$thisref-$spc"];
               $spc++;
           }
-          if (isset($_SESSION['choicemap'][$thisref])) { // matching
+          if (isset($_SESSION['choicemap'][$this->curAid][$thisref])) { // matching
             // matching - map back to unrandomized values
-            list($randqkeys, $randakeys) = $_SESSION['choicemap'][$thisref];
+            list($randqkeys, $randakeys) = $_SESSION['choicemap'][$this->curAid][$thisref];
             $mapped = array();
             foreach ($tmp as $k=>$v) {
               $mapped[$randqkeys[$k]] = $randakeys[$v];
@@ -726,14 +726,14 @@ class AssessRecord
           } else { //matrix
             $val = implode('|', $tmp);
           }
-        } else if (isset($_SESSION['choicemap'][$thisref])) {
+        } else if (isset($_SESSION['choicemap'][$this->curAid][$thisref])) {
           if (is_array($val)) {
             foreach ($val as $k => $v) {
-              $val[$k] = $_SESSION['choicemap'][$thisref][$v];
+              $val[$k] = $_SESSION['choicemap'][$this->curAid][$thisref][$v];
             }
             $val = implode('|', $val);
           } else {
-            $val = $_SESSION['choicemap'][$thisref][$val];
+            $val = $_SESSION['choicemap'][$this->curAid][$thisref][$val];
           }
         }
         $data[$qn]['stuans'][$pn] = $val;

@@ -137,13 +137,14 @@ class QuestionGenerator
     private function clearChoicemap(): void
     {
         $questionNumber = $this->questionParams->getQuestionNumber();
+        $assessmentId = $this->questionParams->getAssessmentId();
 
-        if (!empty($_SESSION['choicemap'])) {
-          unset($_SESSION['choicemap'][$questionNumber]);
+        if (!empty($_SESSION['choicemap'][$assessmentId])) {
+          unset($_SESSION['choicemap'][$assessmentId][$questionNumber]);
 
-          foreach ($_SESSION['choicemap'] as $k=>$v) {
+          foreach ($_SESSION['choicemap'][$assessmentId] as $k=>$v) {
             if (floor($k/1000) == $questionNumber + 1) {
-              unset($_SESSION['choicemap'][$k]);
+              unset($_SESSION['choicemap'][$assessmentId][$k]);
             }
           }
         }
