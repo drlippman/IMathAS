@@ -1596,7 +1596,10 @@ function drawMouseDown(ev) {
 		for (i in targets) {
 			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
-			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
+			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) &&
+				tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y) &&
+				ev.target == targets[i].el
+			) {
 				curTarget = i;
 				break;
 			}
@@ -2024,7 +2027,10 @@ function drawMouseMove(ev) {
 		for (i in targets) {
 			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
-			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
+			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) &&
+				tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y) &&
+				ev.target == targets[i].el
+			) {
 				tempTarget = i;
 				break;
 			}
