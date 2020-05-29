@@ -205,7 +205,12 @@ class AssessStandalone {
           $this->state['stuanswersval'][$qn+1] = $partlaNum[$k];
         }
       }
-      $this->state['rawscores'][$qn][$k] = $rawparts[$k];
+      if ($parts_to_score === true || !empty($parts_to_score[$k]) ||
+        (isset($this->state['rawscores'][$qn][$k]) &&
+        $this->state['rawscores'][$qn][$k] >= 0)
+      ) { // rec if scored, and update existing
+        $this->state['rawscores'][$qn][$k] = $rawparts[$k];
+      }
     }
 
     $score = array_sum($scores);
