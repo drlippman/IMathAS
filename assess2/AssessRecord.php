@@ -2822,15 +2822,17 @@ class AssessRecord
       } else {
         $ptsposs = $assess_info->getQuestionSetting($qdata['qid'], 'points_possible');
       }
-      if (!isset($qdata['answeights']) || !empty($qdata['singlescore'])) {
+      if ($ptsposs == 0) {
+        $adjscore = 0;
+      } else if (!isset($qdata['answeights']) || !empty($qdata['singlescore'])) {
         $adjscore = round($score/$ptsposs, 5);
       } else {
         $answeightTot = array_sum($qdata['answeights']);
         if ($qdata['answeights'][$pn] > 0) {
-        $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
+          $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot), 5);
         } else {
           $adjscore = 0;
-      }
+        }
       }
       $out[$av.'-'.$qn.'-'.$qv.'-'.$pn] = $adjscore;
     }
