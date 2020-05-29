@@ -214,8 +214,22 @@ class AssessStandalone {
     }
 
     $score = array_sum($scores);
-    $this->state['scorenonzero'][$qn+1] = ($score > 0);
-    $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
+    if (count($partla) > 1) {
+      $this->state['scorenonzero'][$qn+1] = array();
+      $this->state['scoreiscorrect'][$qn+1] = array();
+      foreach ($partla as $k=>$v) {
+        if (!isset($this->state['rawscores'][$qn][$k])) {
+          $this->state['scorenonzero'][$qn+1][$k] = -1;
+          $this->state['scoreiscorrect'][$qn+1][$k] = -1;
+        } else {
+          $this->state['scorenonzero'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>0);
+          $this->state['scoreiscorrect'][$qn+1][$k] = ($this->state['rawscores'][$qn][$k]>.98);
+        }
+      }
+    } else {
+      $this->state['scorenonzero'][$qn+1] = ($score > 0);
+      $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
+    }
     return array('scores'=>$scores, 'raw'=>$rawparts, 'errors'=>$scoreResult['errors']);
   }
 
