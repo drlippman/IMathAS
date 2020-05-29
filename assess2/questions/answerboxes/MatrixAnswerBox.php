@@ -45,6 +45,7 @@ class MatrixAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
+        if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat="matrix";}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -63,11 +64,16 @@ class MatrixAnswerBox implements AnswerBox
     			}
     			if (!isset($sz)) { $sz = 3;}
     			if ($colorbox=='') {
-    				$out .= '<table id="qnwrap'.$qn.'">';
+    				$out .= '<div id="qnwrap'.$qn.'">';
     			} else {
-    				$out .= '<table class="'.$colorbox.'" id="qnwrap'.$qn.'">';
+    				$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
-    			$out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
+          $out .= '<table>';
+          if ($displayformat == 'det') {
+             $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
+          } else {
+  			     $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
+          }
     			$answersize = explode(",",$answersize);
     			$out .= "<table>";
     			$count = 0;
@@ -94,8 +100,13 @@ class MatrixAnswerBox implements AnswerBox
     				}
     				$out .= "</tr>";
     			}
-    			$out .= "</table>\n";
-    			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
+          $out .= '</table>';
+          if ($displayformat == 'det') {
+            $out .= '</td><td class="matrixdetright">&nbsp;</td></tr></table>';
+          } else {
+            $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
+          }
+          $out .= "</div>\n";
           $params['matrixsize'] = $answersize;
           $params['tip'] = $shorttip;
           $params['longtip'] = $tip;
