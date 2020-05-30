@@ -1943,10 +1943,10 @@ class AssessRecord
       } else if (isset($rawparts[$k]) && !empty($qver['tries'][$k])) {
         // check to see if score on an unsubmitted part has changed
         // can happen in some pseudo-conditional questions
-        $lasttry = &$qver['tries'][$k][count($qver['tries'][$k])-1];
+        $lasttry = $qver['tries'][$k][count($qver['tries'][$k])-1];
         if (isset($lasttry['raw']) && abs($lasttry['raw'] - $rawparts[$k]) > .001) {
           // score has changed
-          $lasttry['raw'] = $rawparts[$k];
+          $qver['tries'][$k][count($qver['tries'][$k])-1]['raw'] = $rawparts[$k];
         }
       }
     }
