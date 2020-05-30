@@ -147,6 +147,18 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		$thisq = $qnidx+1;
 	}
+
+	if ($qdata['qtype'] == "multipart" || $qdata['qtype'] == 'conditional') {
+		// if multipart/condition only has one part, the stuanswers script will
+		// un-array it
+		if (isset($stuanswers[$thisq]) && !is_array($stuanswers[$thisq])) {
+			$stuanswers[$thisq] = array($stuanswers[$thisq]);
+			if (isset($stuanswersval[$thisq])) {
+				$stuanswersval[$thisq] = array($stuanswersval[$thisq]);
+			}
+		}
+	}
+
 	if (isset($GLOBALS['scores'])) {
 		$scorenonzero = getscorenonzero();
 	}

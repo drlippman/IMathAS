@@ -134,6 +134,16 @@ class QuestionHtmlGenerator
         $showHints = ($this->questionParams->getShowHints()&1)==1;
         $thisq = $this->questionParams->getQuestionNumber() + 1;
 
+        if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
+          // if multipart/condition only has one part, the stuanswers script will
+          // un-array it
+          if (isset($stuanswers[$thisq]) && !is_array($stuanswers[$thisq])) {
+            $stuanswers[$thisq] = array($stuanswers[$thisq]);
+            if (isset($stuanswersval[$thisq])) {
+              $stuanswersval[$thisq] = array($stuanswersval[$thisq]);
+            }
+          }
+        }
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {

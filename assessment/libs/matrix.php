@@ -1375,7 +1375,9 @@ function matrixNumberOfColumns($m){
 }
 
 function matrixParseStuans($stu) {
-	if (substr($stu,0,2)=='[(') {
+	if ($stu === null) {
+		return array(); 
+	} else if (substr($stu,0,2)=='[(') {
 		$ansr = substr($stu,2,-2);
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
 		return explode(',',$ansr);
