@@ -175,15 +175,14 @@ export default {
       return this.$t('header.answered', { n: this.qAttempted, tot: nQuestions });
     },
     saveInHeader () {
-      return (this.ainfo.submitby === 'by_assessment');
+      return true; // (this.ainfo.submitby === 'by_assessment');
     },
     assessSubmitLabel () {
+      console.log('"here"');
       if (this.ainfo.submitby === 'by_assessment') {
         return this.$t('header.assess_submit');
       } else {
-        // don't have
-        return '';
-        // return this.$t('header.done');
+        return this.$t('header.done');
       }
     },
     saveStatus () {
@@ -214,7 +213,11 @@ export default {
   },
   methods: {
     handleSubmit () {
-      actions.submitAssessment();
+      if (this.ainfo.submitby === 'by_assessment') {
+        actions.submitAssessment();
+      } else {
+        actions.gotoSummary();
+      }
     },
     handleSaveWork () {
       if (Object.keys(store.autosaveQueue).length === 0) {
