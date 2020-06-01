@@ -121,7 +121,6 @@ if (!isset($_SESSION['mathdisp'])) {
 			if (window.MathJax) {
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
 				if (typeof callback == "function") {
-					console.log("queing callback");
 					MathJax.Hub.Queue(callback);
 				}
 			} else {
