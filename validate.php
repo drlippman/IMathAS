@@ -120,6 +120,9 @@
  	 $_POST['username']='guest';
  	 $_POST['mathdisp'] = 0;
  	 $_POST['graphdisp'] = 2;
+   if (!isset($_POST['tzname'])) { // set an arbitrary default for guests
+     $_POST['tzname'] = 'America/Los_Angeles';
+   }
  }
  if (isset($_GET['checksess']) && !$hasusername) {
  	echo '<html><body>';
