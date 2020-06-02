@@ -315,7 +315,7 @@ class QuestionHtmlGenerator
             if ($quesData['qtype'] == "multipart" ||
               ($quesData['qtype'] == "conditional" && isset($seqPartDone))
             ) {
-              $_seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
+              $_seqParts = preg_split('~(<p[^>]*>(<[^>]*>)*|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
 
               if (count($_seqParts) > 1) {
                 if ($quesData['qtype'] != "conditional") {
@@ -574,7 +574,7 @@ class QuestionHtmlGenerator
          *  cases where $answerbox or [AB#] is already in the question text
          */
         if (isset($seqPartDone)) {
-          $seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
+          $seqParts = preg_split('~(<p[^>]*>(<[^>]*>)*|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
 
           if (count($seqParts) > 1) {
             $newqtext = '';
