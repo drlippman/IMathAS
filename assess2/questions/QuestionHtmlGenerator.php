@@ -290,7 +290,13 @@ class QuestionHtmlGenerator
             // Get the answers to all parts of this question.
             $lastAnswersAllParts = $stuanswers[$thisq];
             if (isset($autosaves[$thisq])) {
-              $lastAnswersAllParts = $autosaves[$thisq];
+              if (is_array($autosaves[$thisq])) {
+                foreach ($autosaves[$thisq] as $iidx=>$kidx) {
+                  $lastAnswersAllParts[$iidx] = $kidx;
+                }
+              } else {
+                $lastAnswersAllParts = $autosaves[$thisq];
+              }
             }
             if (!is_array($lastAnswersAllParts)) {
               // multipart questions with one part get stored as single value;
@@ -336,6 +342,7 @@ class QuestionHtmlGenerator
             } else {
               unset($seqPartDone);
             }
+
             /*
 			 * Original displayq2.php notes:
 			 *
