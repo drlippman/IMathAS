@@ -668,6 +668,7 @@ class AssessInfo
               $unused = array_diff($this->questionData[$qid]['fixedseeds'], $oldseeds[$qid]);
               $newseed = $unused[array_rand($unused, 1)];
             } else {
+              $n = count($this->questionData[$qid]['fixedseeds']);
               $newseed = $this->questionData[$qid]['fixedseeds'][rand(0, $n-1)];
             }
           } else {
