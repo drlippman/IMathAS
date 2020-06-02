@@ -147,16 +147,18 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=052920" type="text/javascript"></script>';
-/*
-$placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
-*/
+if (!empty($CFG['assess2-use-vue-dev'])) {
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
+} else {
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=052920" type="text/javascript"></script>';
+}
+
 $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
