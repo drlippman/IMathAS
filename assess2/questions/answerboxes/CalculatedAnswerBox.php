@@ -94,8 +94,9 @@ class CalculatedAnswerBox implements AnswerBox
     			unset($reqsigfigs);
     		}
     		if (isset($reqsigfigs)) {
-    			if ($reqsigfigs{0}=='=') {
-    				$reqsigfigs = substr($reqsigfigs,1);
+          list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
+
+    			if ($exactsigfig) {
     				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
     					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs,'',false,in_array("scinot",$ansformats)||in_array("scinotordec",$ansformats)));
     				} else {
@@ -103,10 +104,9 @@ class CalculatedAnswerBox implements AnswerBox
     				}
     				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
     				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
-    			} else if ($reqsigfigs{0}=='[') {
-    				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
-    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigparts[0], $reqsigfigparts[1]);
-    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigparts[0], $reqsigfigparts[1]);
+    			} else if ($reqsigfigoffset>0) {
+    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
+    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
     			} else {
     				if ($answer!=0) {
     					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;

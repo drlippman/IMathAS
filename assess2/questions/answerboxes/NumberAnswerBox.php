@@ -97,9 +97,11 @@ class NumberAnswerBox implements AnswerBox
     			$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
     		}
     		if (isset($reqdecimals)) {
-    			if (substr((string)$reqdecimals,0,1)=='=') {
+          if (isset($reqdecimals)) {
+              list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
+          }
+    			if ($exactreqdec) {
     				$exactdec = true;
-    				$reqdecimals = substr($reqdecimals,1);
     				$tip .= "<br/>" . sprintf(_('Your answer should include exactly %d decimal places.'), $reqdecimals);
     				$shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
     				$answer = prettyreal($answer, $reqdecimals);
@@ -109,8 +111,9 @@ class NumberAnswerBox implements AnswerBox
     			}
     		}
     		if (isset($reqsigfigs)) {
-    			if ($reqsigfigs{0}=='=') {
-    				$reqsigfigs = substr($reqsigfigs,1);
+          list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
+
+    			if ($exactsigfig) {
     				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
     					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs));
     				} else {
@@ -118,10 +121,9 @@ class NumberAnswerBox implements AnswerBox
     				}
     				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
     				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
-    			} else if ($reqsigfigs{0}=='[') {
-    				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
-    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigparts[0], $reqsigfigparts[1]);
-    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigparts[0], $reqsigfigparts[1]);
+    			} else if ($reqsigfigoffset>0) {
+    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
+    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
     			} else {
     				if ($answer!=0) {
     					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;

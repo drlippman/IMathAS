@@ -2594,7 +2594,7 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 
 		$d2 = 1/($d2-$L2);
 	}
-	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-9) {
+	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-10) {
 		return $d;
 	}
 	if ($format=="mixednumber") {
