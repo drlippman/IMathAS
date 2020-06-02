@@ -1769,7 +1769,9 @@ class AssessRecord
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
         }
       }
-      if ($showscores) {
+      if ($this->teacherInGb) {
+        $seqPartDone[$pn] = true;
+      } else if ($showscores) {
         // move on if correct or out of tries
         $seqPartDone[$pn] = ($partattemptn[$pn] === $trylimit ||
           $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] > .98);
@@ -1940,9 +1942,10 @@ class AssessRecord
           $data[$k]['raw'] = $rawparts[$k];
         }
         $this->clearAutoSave($qn, $k);
-      } else if (isset($rawparts[$k]) && !empty($qver['tries'][$k])) {
+      } else if (isset($rawparts[$k]) && $v!=='' && $v!==null && !empty($qver['tries'][$k])) {
         // check to see if score on an unsubmitted part has changed
         // can happen in some pseudo-conditional questions
+        // but skip if lastans is blank (might be sequential question)
         $lasttry = $qver['tries'][$k][count($qver['tries'][$k])-1];
         if (isset($lasttry['raw']) && abs($lasttry['raw'] - $rawparts[$k]) > .001) {
           // score has changed

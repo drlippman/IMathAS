@@ -330,6 +330,7 @@ class QuestionHtmlGenerator
                     if (!$_lastGroupDone) { // not ready for it - unset stuff
                       $skipAnswerboxGeneration[$_pnidx] = true;
                       $jsParams['hasseqnext'] = true;
+                      $_thisGroupDone = false;
                     }
                     if ($seqPartDone !== true && empty($seqPartDone[$_pnidx])) {
                       $_thisGroupDone = false;
@@ -588,6 +589,7 @@ class QuestionHtmlGenerator
                   unset($answerbox[$pn]);
                   unset($showanswerloc[$pn]);
                   $jsParams['hasseqnext'] = true;
+                  $thisGroupDone = false;
                 }
                 if ($seqPartDone !== true && empty($seqPartDone[$pn])) {
                   $thisGroupDone = false;
