@@ -169,6 +169,12 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 		$setfailed->execute(array($user_data['hash']));
 		if ($user_data['lasttry']===true) {
 			$cntgiveup++;
+			// Get the LTI request data for debugging.
+			$post_data = $request_info['post_data'];
+			// Don't log LTI secrets!
+			unset($post_data['key']);
+			unset($post_data['keytype']);
+			
 			error_log("LTI update giving up:\n"
 			. "POST data\n"
 			. "---------\n"
