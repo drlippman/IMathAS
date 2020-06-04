@@ -414,7 +414,7 @@ function printlist($items) {
 					 }
 					 if ($line['ver'] > 1) {
 						 if (!empty($CFG['assess2-use-vue-dev'])) {
-							 $out .= '<a tabindex="-1" href="http://localhost:8080/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
+							 $out .= '<a tabindex="-1" href="'.$CFG['assess2-use-vue-dev-address'].'/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
 						 } else {
 						 	$out .= '<a tabindex="-1" href="'.$imasroot.'/assess2/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
 						 }
