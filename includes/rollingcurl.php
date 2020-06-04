@@ -6,7 +6,7 @@
             Copyright (c) 2015-2017 Marcus Leath
                     License: MIT
         https://github.com/marcushat/RollingCurlX
-        
+
         Modified by David Lippman to add:
           setStopAddingTime(time): a time limit after which don't add additional requests
           setPostdataCallback: a function that will transform the request post data
@@ -51,7 +51,7 @@ Class RollingCurlX {
     public function setCallback(callable $callback) {
         $this->_callback = $callback;
     }
-    
+
     public function setPostdataCallback(callable $callback) {
         $this->_postdatacallback = $callback;
     }
@@ -61,7 +61,7 @@ Class RollingCurlX {
             $this->_timeout = $timeout;
         }
     }
-    
+
     public function setStopAddingTime($timeout) { //in seconds
         if($timeout >= 0) {
             $this->_stopAddingTime = $timeout;
@@ -162,9 +162,9 @@ Class RollingCurlX {
         $post_data = $request['post_data'];
         $individual_opts = $request['options'];
         $individual_headers = $request['headers'];
-        
+
         if ($post_data !== null && $request['post_callback'] !== null) {
-			$proc = call_user_func($request['post_callback'], $post_data);	
+			$proc = call_user_func($request['post_callback'], $post_data);
 			if ($proc !== false) {
 				if (isset($proc['body'])) {
 					$post_data = $proc['body'];
@@ -246,7 +246,8 @@ Class RollingCurlX {
         $request_info['time'] = $time = $this->stopTimer($request); //record request time
         $request_info['url_raw'] = $url = $request['url'];
         $request_info['user_data'] = $user_data = $request['user_data'];
-
+        $request_info['post_data'] = $request['post_data'];
+        
         if(curl_errno($ch) !== 0 || intval($request_info['http_code']) !== 200) { //if server responded with http error
             $response = false;
         } else { //sucessful response
