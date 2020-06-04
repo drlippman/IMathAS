@@ -102,7 +102,7 @@
 
 	if ($aver>1) {
 		if (!empty($CFG['assess2-use-vue-dev'])) {
-			$assessGbUrl = "http://localhost:8080/gbviewassess.html?";
+			$assessGbUrl = sprintf("%s/gbviewassess.html?", $CFG['assess2-use-vue-dev-address']);
 		} else {
 			$assessGbUrl = "../assess2/gbviewassess.php?";
 		}
