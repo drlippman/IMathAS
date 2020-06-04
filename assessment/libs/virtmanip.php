@@ -130,7 +130,7 @@ function vmchipmodelgetcount($state) {
 }
 
 //vmsetupnumbertiles(stuans,qn,[part])
-//Set up a number tiles manipulative
+//Set up a number tiles manipulative with 100, 10 and 1 blocks
 function vmsetupnumbertiles($state,$qn,$part=null) {
 	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
 	$initbase = "[]";
@@ -147,6 +147,28 @@ function vmsetupnumbertiles($state,$qn,$part=null) {
 		}
 	}
 	$out = '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/numbertiles/numbertiles.html?qn='.$qn.'&initbase='.$initbase.'&initobj='.$initobj.'" width="450" height="300" frameborder="0"></iframe>';
+	return $out;
+}
+
+//vmsetupnumbertiles_ten_one(stuans,qn,[part])
+//Set up a number tiles manipulative with 10 and 1 blocks
+//This VM uses vmnumbertilesgetcount to get the user input, with the 100's always at zero
+function vmsetupnumbertiles_ten_one($state,$qn,$part=null) {
+	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
+	$initbase = "[]";
+	$initobj = "[]";
+	if ($state!="") {
+		list($initbasestr,$initobjstr,$cont) = explode('|',$state);
+		if ($initbasestr != '') {
+			$initbase = '[['.str_replace(';','],[',$initbasestr).']]';
+			$initbase = preg_replace('/\[([^\[\]]+?),/','[&quot;$1&quot;,',$initbase);
+		}
+		if ($initobjstr != '') {
+			$initobj = '[['.str_replace(';','],[',$initobjstr).']]';
+			$initobj = preg_replace('/\[([^\[\]]+?),/','[&quot;$1&quot;,',$initobj);
+		}
+	}
+	$out = '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/numbertiles/numbertiles_ten_one.html?qn='.$qn.'&initbase='.$initbase.'&initobj='.$initobj.'" width="450" height="300" frameborder="0"></iframe>';
 	return $out;
 }
 
