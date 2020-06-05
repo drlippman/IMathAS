@@ -1746,9 +1746,9 @@ function syntaxcheckexpr(str,format,vl) {
 
 // returns [numval, errmsg]
 function singlevaleval(evalstr, format) {
-  evalstr = evalstr.replace(/,/, '');
+  evalstr = evalstr.replace(/,/g, '');
   if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
-    evalstr = evalstr.replace(/%/,'') + '/100';
+    evalstr = evalstr.replace(/%/g,'') + '/100';
   }
   if (format.indexOf('mixed')!=-1) {
     evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
