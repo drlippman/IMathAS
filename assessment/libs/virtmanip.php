@@ -28,7 +28,14 @@
 //Ver 1.0 by David Lippman and Bill Meacham, May 2014
 
 global $allowedmacros;
-array_push($allowedmacros,"vmsetup","vmgetlistener","vmgetparam","vmparamtoarray","vmsetupchipmodel","vmchipmodelgetcount","vmsetupnumbertiles","vmnumbertilesgetcount","vmsetupitemsort","vmitemsortgetcontainers","vmsetupnumberlineaddition","vmnumberlineadditiongetvals","vmsetupnumberline","vmnumberlinegetvals","vmsetupnumberlineinterval","vmnumberlineintervalgetvals","vmsetupfractionline","vmgetfractionlinevals","vmsetupfractionmult","vmgetfractionmultvals","vmsetupfractioncompare","vmgetfractioncompareval");
+array_push($allowedmacros,"vmsetup","vmgetlistener","vmgetparam","vmparamtoarray",
+	"vmsetupchipmodel","vmchipmodelgetcount","vmsetupnumbertiles","vmnumbertilesgetcount",
+	"vmsetupitemsort","vmitemsortgetcontainers","vmsetupnumberlineaddition",
+	"vmnumberlineadditiongetvals","vmsetupnumberline","vmnumberlinegetvals",
+	"vmsetupnumberlineinterval","vmnumberlineintervalgetvals","vmsetupfractionline",
+	"vmgetfractionlinevals","vmsetupfractionmult","vmgetfractionmultvals",
+	"vmsetupfractioncompare","vmgetfractioncompareval","vmdrawinchruler",
+	"vmdrawcmruler","vmdrawclock");
 
 function vmsetup($vmname, $vmparams, $width, $height, $qn, $part=null) {
 	if ($part !== null) {$qn = 1000*($qn)+$part;} else {$qn--;}
@@ -355,6 +362,93 @@ function vmsetupfractionmult($state="",$qn=null,$part=null) {
 //return array(horiz numerator, horiz denominator, vert num, vert denom)
 function vmgetfractionmultvals($state) {
 	return explode(',',$state);
+}
+
+function vmdrawinchruler($max=4,$val=0,$width=500,$height=80) {
+	$maxx = ceil(16*$max+2);
+	$svg = "initPicture(0,$maxx,0,10);rect([0,0],[$maxx,7]);";
+	for ($i=1;$i<=$maxx;$i++) {
+	  $h = 7 - sqrt(gcd($i,16));
+	  $svg .= "line([$i,7],[$i,$h]);";
+	  if ($i%16==0) {
+	    $v = $i/16;
+	    $svg .= "text([$i,$h],'$v','below');";
+	  }
+	}
+	$alt = 'Ruler with 16 divisions between each labeled number.';
+	if ($val > 0) {
+		$valx = 16*$val;
+		$svg .= "strokewidth=2;marker='arrow';stroke='blue';line([$valx,10],[$valx,7]);";
+		$offset = $valx%16;
+		$whole = floor($valx/16);
+		$alt .= " Arrow is pointing $offset divisions past $whole";
+	}
+	return showasciisvg($svg,$width,$height,$alt);
+}
+function vmdrawcmruler($max=4,$val=0,$width=500,$height=80) {
+	$maxx = ceil(10*$max+2);
+	$svg = "initPicture(0,$maxx,0,10);rect([0,0],[$maxx,7]);";
+	for ($i=1;$i<=$maxx;$i++) {
+	  $h = ($i%10==0)?4:5.5;
+	  $svg .= "line([$i,7],[$i,$h]);";
+	  if ($i%10==0) {
+	    $v = $i/10;
+	    $svg .= "text([$i,$h],'$v','below');";
+	  }
+	}
+	$alt = 'Ruler with 10 divisions between each labeled number.';
+	if ($val > 0) {
+		$valx = 10*$val;
+		$svg .= "strokewidth=2;marker='arrow';stroke='blue';line([$valx,10],[$valx,7]);";
+		$offset = $valx%10;
+		$whole = floor($valx/10);
+		$alt .= " Arrow is pointing $offset divisions past $whole";
+	}
+	return showasciisvg($svg,$width,$height,$alt);
+}
+function vmdrawclock($hr,$min,$size=200) {
+	$fontsize = floor($size/12);
+	$svg = "setBorder(5);initPicture(-5,5,-5,5);fontsize=$fontsize;";
+	for ($i=0;$i<60;$i++) {
+		if ($i%5==0) { continue; }
+		$x1 = round(3.7*cos($i*M_PI/30),3);
+		$x2 = round(3.9*cos($i*M_PI/30),3);
+		$y1 = round(3.7*sin($i*M_PI/30),3);
+		$y2 = round(3.9*sin($i*M_PI/30),3);
+		$svg .= "line([$x1,$y1],[$x2,$y2]);";
+	}
+	$svg .= 'strokewidth=2;circle([0,0],5);';
+	for ($i=1;$i<13;$i++) {
+		$x1 = round(3.5*cos($i*M_PI/6),3);
+		$x2 = round(3.9*cos($i*M_PI/6),3);
+		$x3 = round(4.5*cos($i*M_PI/6),3);
+		$y1 = round(3.5*sin($i*M_PI/6),3);
+		$y2 = round(3.9*sin($i*M_PI/6),3);
+		$y3 = round(4.5*sin($i*M_PI/6),3);
+		$svg .= "line([$x1,$y1],[$x2,$y2]);";
+		$val = (14-$i)%12 + 1;
+		$svg .= "text([$x3,$y3],'$val');";
+	}
+
+	$x1 = round(2.4*cos((3-$hr-$min/60)/12*2*M_PI),3);
+	$x2 = round(3.3*cos((15-$min)/60*2*M_PI),3);
+	$y1 = round(2.4*sin((3-$hr-$min/60)/12*2*M_PI),3);
+	$y2 = round(3.3*sin((15-$min)/60*2*M_PI),3);
+	$svg .= "line([0,0],[$x1,$y1]);line([0,0],[$x2,$y2]);dot([0,0]);";
+	$alt = 'Analog clock with the short hand pointing ';
+	if ($min==0) {
+		$alt .= "at $hr and the long hand pointing at 12";
+	} else {
+		$alt .= "between $hr and ".($hr%12+1);
+		$alt .= " and the long hand pointing ";
+		if ($min%5==0) {
+			$alt .= 'at '.($min/5);
+		} else {
+			$rem = $min%5;
+			$alt .= $rem . ' marks past '.floor($min/5);
+		}
+	}
+	return showasciisvg($svg,$size,$size,$alt);
 }
 
 ?>
