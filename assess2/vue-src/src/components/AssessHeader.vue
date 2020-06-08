@@ -178,7 +178,6 @@ export default {
       return true; // (this.ainfo.submitby === 'by_assessment');
     },
     assessSubmitLabel () {
-      console.log('"here"');
       if (this.ainfo.submitby === 'by_assessment') {
         return this.$t('header.assess_submit');
       } else {
