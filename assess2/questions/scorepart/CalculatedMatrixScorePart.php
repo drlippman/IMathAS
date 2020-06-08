@@ -76,7 +76,7 @@ class CalculatedMatrixScorePart implements ScorePart
             } else {
               for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
                   $givenanslist[$i] = $_POST["qn$qn-$i"];
-                  if (!$hasNumVal) {
+                  if (!$hasNumVal && $_POST["qn$qn-$i"] !== '') {
                       $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
                   }
               }
@@ -181,7 +181,10 @@ class CalculatedMatrixScorePart implements ScorePart
         }
 
         for ($i=0; $i<count($answerlist); $i++) {
-            if (isset($abstolerance)) {
+            if (!isset($givenanslistvals[$i]) || isNaN($givenanslistvals[$i])) {
+                $incorrect[$i] = 1;
+                continue;
+            } else if (isset($abstolerance)) {
                 if (abs($answerlist[$i] - $givenanslistvals[$i]) > $abstolerance-1E-12) {
                     $incorrect[$i] = 1;
                     continue;
