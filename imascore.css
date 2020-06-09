@@ -116,6 +116,14 @@ div.itemhdrdd, div.itemhdrright {
 	top:0px;
 }
 
+.inlinelist {
+	padding: 1em;
+	margin: 1em;
+}
+.inlinelist li {
+	display: inline-block;
+}
+
 @media only screen and (min-width: 1005px) {
 	/* put dropdown next to item when wide*/
 	.notfw .itemhdr .title {
