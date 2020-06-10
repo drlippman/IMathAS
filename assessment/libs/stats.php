@@ -832,7 +832,7 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 
 	$out = array();
 	for ($i=0; $i<$n; $i++) {
-		$out[] = -$mu*log($RND->rand(1,32768)/32768);
+		$out[] = round(-$mu*log($RND->rand(1,32768)/32768), $rnd);
 	}
 	return $out;
 }
