@@ -239,7 +239,10 @@ export const actions = {
       for (const i in store.assessInfo.questions) {
         if (store.assessInfo.questions[i].try > 0 ||
           (store.assessInfo.questions[i].hasOwnProperty('parts_entered') &&
-           store.assessInfo.questions[i].parts_entered.indexOf(0) === -1) ||
+          store.assessInfo.questions[i].hasOwnProperty('answeights') &&
+          store.assessInfo.questions[i].parts_entered.length >=
+          store.assessInfo.questions[i].answeights.length
+          ) ||
           changedQuestions.hasOwnProperty(i)
         ) {
           qAttempted++;
@@ -654,8 +657,9 @@ export const actions = {
         for (const qn in store.autosaveQueue) {
           for (const k in store.autosaveQueue[qn]) {
             if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
-              Vue.set(store.assessInfo.questions[parseInt(qn)].parts_entered,
-                store.autosaveQueue[qn][k], 1);
+              if (store.assessInfo.questions[parseInt(qn)].parts_entered.indexOf(store.autosaveQueue[qn][k]) === -1) {
+                store.assessInfo.questions[parseInt(qn)].parts_entered.push(store.autosaveQueue[qn][k]);
+              }
             }
           }
         }

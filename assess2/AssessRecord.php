@@ -3461,20 +3461,20 @@ class AssessRecord
      if (!is_array($answeights)) {
        return array();
      }
-     $out = array_fill(0, count($answeights), 0);
+     $out = array();
      $this->parseData();
 
      if (isset($this->data['autosaves'][$qn])) {
        foreach ($this->data['autosaves'][$qn]['stuans'] as $pn=>$ans) {
-         $out[$pn] = 1;
+         $out[] = $pn;
        }
      }
      foreach ($tries as $pn=>$try) {
        if (!empty($try)) {
-         $out[$pn] = 1;
+         $out[] = $pn;
        }
      }
-     return $out;
+     return array_unique($out);
    }
 
   /**
