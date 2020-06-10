@@ -284,7 +284,7 @@ export const actions = {
     }
     if (Object.keys(data).length === 0) { // nothing to submit
       store.inTransit = false;
-      if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+      if (store.inAssess) {
         Router.push('/summary');
       } else if (store.assessInfo.available === 'yes') {
         Router.push('/');
@@ -320,7 +320,7 @@ export const actions = {
           delete store.work[qn];
         }
 
-        if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+        if (store.inAssess) {
           Router.push('/summary');
         } else if (store.assessInfo.available === 'yes') {
           Router.push('/');
@@ -527,6 +527,24 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  gotoSummary () {
+    let hasShowWorkAfter = false;
+    for (let k = 0; k < store.assessInfo.questions.length; k++) {
+      if (store.assessInfo.questions[k].showwork & 2) {
+        hasShowWorkAfter = true;
+        store.assessInfo.showwork_after = true;
+        break;
+      }
+    }
+
+    if (store.assessInfo.submitby === 'by_question') {
+      if (hasShowWorkAfter && !store.assessInfo.in_practice) {
+        Router.push('/showwork');
+      } else {
+        Router.push('/summary');
+      }
+    }
   },
   doAutosave (qn, partnum, timeactive) {
     store.somethingDirty = false;

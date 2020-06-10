@@ -137,8 +137,10 @@ export default {
     },
     primarySubmit () {
       // primary if by_assessment and all questions loaded
-      return (this.ainfo.submitby === 'by_assessment' &&
-        Object.keys(store.initValues).length === this.ainfo.questions.length
+      return ((this.ainfo.submitby === 'by_assessment' &&
+        Object.keys(store.initValues).length === this.ainfo.questions.length) ||
+        (this.ainfo.submitby === 'by_question' &&
+        this.qAttempted === this.ainfo.questions.length)
       );
     },
     curScorePoints () {
@@ -175,15 +177,15 @@ export default {
       return this.$t('header.answered', { n: this.qAttempted, tot: nQuestions });
     },
     saveInHeader () {
-      return (this.ainfo.submitby === 'by_assessment');
+      return true; // (this.ainfo.submitby === 'by_assessment');
     },
     assessSubmitLabel () {
       if (this.ainfo.submitby === 'by_assessment') {
         return this.$t('header.assess_submit');
+      } else if (this.hasShowWorkAfter) {
+        return this.$t('work.add');
       } else {
-        // don't have
-        return '';
-        // return this.$t('header.done');
+        return this.$t('header.done');
       }
     },
     saveStatus () {
@@ -210,11 +212,25 @@ export default {
     },
     MQenabled () {
       return store.enableMQ;
+    },
+    hasShowWorkAfter () {
+      let hasShowWorkAfter = false;
+      for (let k = 0; k < store.assessInfo.questions.length; k++) {
+        if (store.assessInfo.questions[k].showwork & 2) {
+          hasShowWorkAfter = true;
+          break;
+        }
+      }
+      return hasShowWorkAfter;
     }
   },
   methods: {
     handleSubmit () {
-      actions.submitAssessment();
+      if (this.ainfo.submitby === 'by_assessment') {
+        actions.submitAssessment();
+      } else {
+        actions.gotoSummary();
+      }
     },
     handleSaveWork () {
       if (Object.keys(store.autosaveQueue).length === 0) {
