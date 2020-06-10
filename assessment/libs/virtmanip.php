@@ -68,7 +68,7 @@ function vmgetlistener($qn,$part=null) {
 	$out .= '$(function() { $(window).on("message", function(e) {
 		var data = e.originalEvent.data.split("::");
 		if (data[0] == '.$qn.') {
-			$("#qn'.$qn.'").val(data[1]);
+			$("#qn'.$qn.'").val(data[1]).trigger("change");
 		}});});';
 	$out .= '</script>';
 	return $out;
