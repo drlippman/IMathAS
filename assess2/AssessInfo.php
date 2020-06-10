@@ -448,12 +448,14 @@ class AssessInfo
   /*
     Override the "available" setting, and enddate and timelimit
    */
-  public function overrideAvailable($val) {
-    if ($this->assessData['available'] !== 'yes') {
+  public function overrideAvailable($val, $overrideTimelimit=true) {
+    if ($this->assessData['available'] !== 'yes' && $val == 'yes') {
       // necessary to override to prevent due date timer from causing problems
       $this->assessData['enddate'] = 2000000000;
     }
-    $this->assessData['timelimit'] = 0;
+    if ($overrideTimelimit) {
+      $this->assessData['timelimit'] = 0;
+    }
     $this->assessData['available'] = $val;
   }
 

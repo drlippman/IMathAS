@@ -10,12 +10,12 @@
   "previous": "Previous",
   "question_n": "Question {n}",
   "launch": {
-    "continue_assess": "Continue Assessment",
-    "retake_assess": "Retake Assessment",
-    "start_assess": "Start Assessment",
+    "continue_assess": "Resume",
+    "retake_assess": "Retake",
+    "start_assess": "Start",
     "timewarning": "This assessment has a time limit. Once you start the assessment, the timer will not pause for any reason.  Are you sure you are ready to start?",
     "resetmsg": "Teachers: you can reset your attempts on this assessment if desired.",
-    "doreset": "Reset Assessment",
+    "doreset": "Reset",
     "view_as_stu": "Acting as student: {name}"
   },
   "closed": {
@@ -41,7 +41,8 @@
     "submit_now": "Submit it now",
     "exit": "Exit",
     "teacher_preview": "This assessment is closed to students, but you can preview it.",
-    "teacher_preview_button": "Preview Assessment"
+    "teacher_preview_button": "Student Preview",
+    "teacher_previewall_button": "Teacher Preview"
   },
   "duedialog": {
     "due": "Due Date Reached",
@@ -134,7 +135,8 @@
     "work_saved": "Work saved",
     "work_saving": "Saving...",
     "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
-    "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?"
+    "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
+    "preview_all": "Instructor Preview of All Questions"
   },
   "text": {
     "hide": "Hide text",

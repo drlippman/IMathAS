@@ -90,7 +90,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  startAssess (dopractice, password, newGroupMembers, callback) {
+  startAssess (dopractice, password, newGroupMembers, callback, previewAll) {
     if (store.inTransit) {
       window.setTimeout(() => this.startAssess(dopractice, password, newGroupMembers, callback), 20);
       return;
@@ -103,6 +103,7 @@ export const actions = {
       dataType: 'json',
       data: {
         practice: dopractice,
+        preview_all: previewAll ? 1 : 0,
         password: password,
         in_print: store.inPrintView ? 1 : 0,
         new_group_members: newGroupMembers.join(','),
@@ -140,7 +141,7 @@ export const actions = {
           this.handleError(response.error);
         } else if (store.assessInfo.has_active_attempt) {
           store.inProgress = true;
-          if (typeof callback !== 'undefined') {
+          if (typeof callback !== 'undefined' && callback !== null) {
             callback();
             return;
           }
@@ -434,6 +435,9 @@ export const actions = {
     }
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
+    }
+    if (store.assessInfo.preview_all) {
+      data.append('preview_all', true);
     }
     const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
       store.assessInfo.questions[qns[0]].jsparams.hasseqnext);

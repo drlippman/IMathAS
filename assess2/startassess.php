@@ -47,6 +47,8 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -257,14 +259,23 @@ $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
   'extended_with', 'timelimit', 'timelimit_type', 'allowed_attempts',
   'showscores', 'intro', 'interquestion_text', 'resources', 'category_urls',
-  'help_features', 'points_possible', 'showcat', 'enddate_in'
+  'help_features', 'points_possible', 'showcat', 'enddate_in', 'displaymethod'
 );
 if ($in_practice) {
-  array_push($include_from_assess_info, 'displaymethod', 'showscores',
-    'allowed_attempts'
-  );
+  array_push($include_from_assess_info, 'showscores', 'allowed_attempts');
 }
+
 $assessInfoOut = array_merge($assessInfoOut, $assess_info->extractSettings($include_from_assess_info));
+
+// handle preview all
+if ($preview_all) {
+  $assessInfoOut['displaymethod'] = 'full'; // show all q
+  $assess_info->overrideSetting('displaymethod','full');
+  $assess_record->setTeacherInGb(true); // enables answers showing
+  $assessInfoOut['preview_all'] = true;
+} else {
+  $assessInfoOut['preview_all'] = false;
+}
 
 // filter interquestion text html
 foreach ($assessInfoOut['interquestion_text'] as $k=>$v) {

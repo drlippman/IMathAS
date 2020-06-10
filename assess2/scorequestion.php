@@ -63,6 +63,8 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -130,6 +132,9 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
 // If in practice, now we overwrite settings
 if ($in_practice) {
   $assess_info->overridePracticeSettings();
+}
+if ($preview_all) {
+  $assess_record->setTeacherInGb(true); // enables answers showing
 }
 
 // grab any assessment info fields that may have updated:
