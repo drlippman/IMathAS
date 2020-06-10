@@ -20,7 +20,7 @@
       :grace="ainfo.timelimit_local_grace">
     </timer>
 
-    <div class="flexgroup" v-if = "saveInHeader">
+    <div class="flexgroup">
       <button
         v-if = "saveStatus === 3"
         class = "secondary"
@@ -175,9 +175,6 @@ export default {
     curAnswered () {
       const nQuestions = this.ainfo.questions.length;
       return this.$t('header.answered', { n: this.qAttempted, tot: nQuestions });
-    },
-    saveInHeader () {
-      return true; // (this.ainfo.submitby === 'by_assessment');
     },
     assessSubmitLabel () {
       if (this.ainfo.submitby === 'by_assessment') {
