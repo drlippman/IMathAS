@@ -21,10 +21,11 @@ the following contents:
 
 ```
 VUE_APP_IMASROOT=http://localhost
+VUE_APP_PROXY=http://localhost
 ```
 
 If you have an `imasroot` set in your config.php other than the root directory,
-append it to the address (no trailing slash).
+append it to the address (no trailing slash) for VUE_APP_IMASROOT only.
 
 Note you will also have to disable `$CFG['use_csrfp']` when using the above
 option.
