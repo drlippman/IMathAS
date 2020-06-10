@@ -484,3 +484,8 @@ span.inlinebtn:hover {
 .feedbackwrap.incorrect {
 	background: #fee;
 }
+
+.inlineheader {
+  font-size: 1em;
+  display: inline;
+}

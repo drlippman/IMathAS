@@ -2,11 +2,11 @@
   <div class="full-question-header">
     <div style="flex-grow: 1">
       <icons :name="statusIcon" class="qstatusicon" />
-      <strong
-        :class="{greystrike: curQData.withdrawn !==0}"
+      <h2
+        :class="{inlineheader: true, greystrike: curQData.withdrawn !==0}"
       >
         {{ $t('question_n', { n: dispqn }) }}
-      </strong>
+      </h2>
     </div>
     <question-header-icons
       :showscore = "true"
