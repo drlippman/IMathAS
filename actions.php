@@ -29,8 +29,15 @@ require_once("includes/sanitize.php");
 	require_once("includes/password.php");
 
 	if ($_GET['action']=="newuser") {
+		$init_session_start = true;
 		require_once("init_without_validate.php");
 		require_once("includes/newusercommon.php");
+		if ($_POST['challenge'] !== $_SESSION['challenge'] || !empty($_POST['hval'])) {
+			echo "Invalid submission";
+			exit;
+		}
+		$_SESSION['challenge'] = '';
+
 		$error = '';
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
 			$error = "<p>"._("You must agree to the Terms and Conditions to set up an account")."</p>";
@@ -99,6 +106,8 @@ require_once("includes/sanitize.php");
 				echo '<input type="hidden" name="pw2" value="'.Sanitize::encodeStringForDisplay($_POST['pw2']).'" />';
 				echo '<input type="hidden" name="courseid" value="'.Sanitize::encodeStringForDisplay($_POST['courseid']).'" />';
 				echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_POST['ekey']).'" />';
+				$_SESSION['challenge'] = uniqid();
+				echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
 				if (isset($_POST['agree'])) {
 					echo '<input type="hidden" name="agree" value="1" />';
 				}
