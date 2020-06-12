@@ -1,27 +1,31 @@
 <template>
-  <ul class="helplist">
-    <li>
-      {{ $t('helps.help') }}:
-    </li>
-    <li v-for="(qHelp,idx) in qHelps" :key="idx">
-      <a href="#" @click.prevent="loadHelp(qHelp)">
-        <icons :name="qHelp.icon" alt=""/>
-        {{ qHelp.title }}
-      </a>
-    </li>
-    <li v-if="showMessage">
-      <a :href="messageHref" target="help">
-        <icons name="message" />
-        {{ $t('helps.message_instructor') }}
-      </a>
-    </li>
-    <li v-if="postToForum > 0">
-      <a :href="forumHref" target="help">
-        <icons name="forum" />
-        {{ $t('helps.post_to_forum') }}
-      </a>
-    </li>
-  </ul>
+  <div>
+    <span :id="'qhelp' + qn">
+      {{ $t('helps.help') }}<span class="sr-only">
+      {{ $t('question_n', {n: qn+1}) }}</span>:
+    </span>
+    <ul class="helplist" :aria-labelledby="'qhelp' + qn">
+      <li v-for="(qHelp,idx) in qHelps" :key="idx">
+        <a href="#" @click.prevent="loadHelp(qHelp)">
+          <icons :name="qHelp.icon" alt=""/>
+          {{ qHelp.title }}
+          <span class="sr-only">{{ qHelp.cnt }}</span>
+        </a>
+      </li>
+      <li v-if="showMessage">
+        <a :href="messageHref" target="help">
+          <icons name="message" />
+          {{ $t('helps.message_instructor') }}
+        </a>
+      </li>
+      <li v-if="postToForum > 0">
+        <a :href="forumHref" target="help">
+          <icons name="forum" />
+          {{ $t('helps.post_to_forum') }}
+        </a>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
@@ -46,9 +50,15 @@ export default {
       );
     },
     qHelps () {
+      const labelcnt = {};
       if (store.assessInfo.questions[this.qn].jsparams) {
         const helps = store.assessInfo.questions[this.qn].jsparams.helps;
         for (const i in helps) {
+          if (!labelcnt.hasOwnProperty(helps[i].label)) {
+            labelcnt[helps[i].label] = 1;
+          } else {
+            labelcnt[helps[i].label]++;
+          }
           if (helps[i].label === 'video') {
             helps[i].icon = 'video';
             helps[i].title = this.$t('helps.video');
@@ -62,6 +72,7 @@ export default {
             helps[i].icon = 'file';
             helps[i].title = helps[i].label;
           }
+          helps[i].cnt = labelcnt[helps[i].label];
         }
         return helps;
       } else {
@@ -116,15 +127,16 @@ export default {
 
 <style>
 ul.helplist {
-  margin-left: 0;
+  margin-left: 8px;
   padding-left: 0;
+  display: inline;
 }
 ul.helplist li {
   opacity: .8;
   list-style-type: none;
   margin-left: 0;
   display: inline;
-  margin-right: 12px;
+  margin-right: 10px;
 }
 
 </style>

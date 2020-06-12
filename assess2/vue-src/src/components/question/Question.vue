@@ -62,6 +62,9 @@
         :disabled = "!canSubmit"
       >
         {{ submitLabel }}
+        <span class="sr-only">
+          {{ $t('question_n', {n: qn+1}) }}
+        </span>
       </button>
       <button
         v-if = "canJumpToAnswer"
