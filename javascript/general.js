@@ -676,16 +676,16 @@ function togglevideoembed() {
 		if (els.css('display')=='none') {
 			els.show();
 			els.parent('.fluid-width-video-wrapper').show();
-			jQuery(this).text(' [-]');
-			jQuery(this).attr('title',_("Hide video"));
-			jQuery(this).attr('aria-label',_("Hide embedded video"));
+			jQuery(this).text(' [-]')
+				.attr('title',_("Hide video"))
+				.attr('aria-label',_("Hide embedded video"));
 		} else {
 			els.hide();
 			els.get(0).contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
 			els.parent('.fluid-width-video-wrapper').hide();
 			jQuery(this).text(' [+]');
 			jQuery(this).attr('title',_("Watch video here"));
-			jQuery(this).attr('aria-label',_("Embed video here"));
+			jQuery(this).attr('aria-label',_("Embed video") + ' ' + jQuery(this).prev().text());
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
@@ -736,8 +736,9 @@ function togglevideoembed() {
 		}).insertAfter(jQuery(this));
 		jQuery(this).parent().fitVids();
 		jQuery('<br/>').insertAfter(jQuery(this));
-		jQuery(this).text(' [-]');
-		jQuery(this).attr('title',_("Hide video"));
+		jQuery(this).text(' [-]')
+			.attr('title',_("Hide video"))
+			.attr('aria-label',_("Hide embedded video"));
 		if (jQuery(this).prev().attr("data-base")) {
 			var inf = jQuery(this).prev().attr('data-base').split('-');
 			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
@@ -750,7 +751,7 @@ function setupvideoembeds(i,el) {
 		text: " [+]",
 		role: "button",
 		title: _("Watch video here"),
-		"aria-label": _("Embed video here"),
+		"aria-label": _("Embed video") + ' ' + this.textContent,
 		id: 'videoembedbtn'+videoembedcounter,
 		click: togglevideoembed,
 		keydown: function (e) {if (e.which == 13) { $(this).click();}},
@@ -897,6 +898,9 @@ function convertheic(href, divid) {
 function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
+	}
+	if (el.target) {
+		jQuery(el).append('<span class="sr-only">Opens externally</span>');
 	}
 }
 function addBlankTarget(i,el) {
