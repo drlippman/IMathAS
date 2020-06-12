@@ -63,7 +63,9 @@ class StringAnswerBox implements AnswerBox
     			$shorttip = _('Enter text');
     		}
     		if ($displayformat=='select') {
-    			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\"><option value=\"\"> </option>";
+    			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
+          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+          $out .= '<option value=""> </option>';
     			foreach ($questions as $i=>$v) {
     				$out .= '<option value="'.htmlentities($v).'"';
     				//This is a hack.  Need to figure a better way to deal with & in answers
@@ -73,37 +75,6 @@ class StringAnswerBox implements AnswerBox
     				$out .= '>'.htmlentities($v).'</option>';
     			}
     			$out .= '</select>';
-    		} else if ($answerformat=='MQexperimental') {
-    			$out .= "<input type=\"text\" style=\"position:absolute;visibility:hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
-    			$out .= "<span class=\"$colorbox mathquill-embedded-latex MQE$qn\">";
-    			if ($displayformat != '') {
-    				$laprts = explode(';',$la);
-    				$laptcnt = 0;
-    				while (($p=strpos($displayformat, '[AB]'))!==false) {
-    					if (isset($laprts[$laptcnt])) {
-    						$lav = $laprts[$laptcnt];
-    						$laptcnt++;
-    					} else {
-    						$lav = '';
-    					}
-    					$displayformat = substr($displayformat,0,$p).'\editable{'.$lav.'}'.substr($displayformat,$p+4);
-    					//$out .= str_replace('[AB]', '\editable{'.$lav.'}', $displayformat, 1);
-    				}
-    				$out .= $displayformat;
-    			} else {
-    				$out .= '\editable{'.$la.'}';
-    			}
-    			$out .= "</span>";
-    			$out .= '<script type="text/javascript">$(function() {
-    				 $(".MQE'.$qn.'").on("keypress keyup", function() {
-    				     var latexvals = [];
-    				     var latex = $(".MQE'.$qn.'").find(".mathquill-editable").each(function(i,el) {
-    				            latexvals.push($(el).mathquill("latex"));
-    				         });
-    				     $("#qn'.$qn.'").val(MQtoAM(latexvals.join(";")));
-    				   });
-    				   setTimeout(function(){$(".MQE'.$qn.'").find("textarea").blur();}, 25);
-    				});</script>';
     		} else {
     			$classes = ['text'];
     			if ($colorbox != '') {
@@ -169,7 +140,8 @@ class StringAnswerBox implements AnswerBox
     			}
 
     			$out .= '<input ' .
-    							Sanitize::generateAttributeString($attributes) .
+    							'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
+                  Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';
 

@@ -148,6 +148,7 @@ class CalculatedAnswerBox implements AnswerBox
 
     		$out .= $leftb .
     						'<input ' .
+                'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     						Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />' .

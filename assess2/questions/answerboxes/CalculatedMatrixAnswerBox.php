@@ -73,13 +73,15 @@ class CalculatedMatrixAnswerBox implements AnswerBox
           } else {
   			     $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
           }
-    			$out .= "<table>";
+          $arialabel = $this->answerBoxParams->getQuestionIdentifierString();
+    			$out .= '<table role="group" aria-label="'.$arialabel.'">';
     			$count = 0;
     			$las = explode("|",$la);
+          $cellcnt = $answersize[0]*$answersize[1];
     			for ($row=0; $row<$answersize[0]; $row++) {
     				$out .= "<tr>";
     				for ($col=0; $col<$answersize[1]; $col++) {
-    					$out .= "<td>";
+    					$out .= '<td>';
 
     					$attributes = [
     						'type' => 'text',
@@ -93,6 +95,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     					$params['matrixsize'] = $answersize;
 
     					$out .= '<input ' .
+                      'aria-label="'.sprintf(_('Cell %d of %d'), $count+1, $cellcnt).'" ' .
     									Sanitize::generateAttributeString($attributes) .
     									'" />';
 
@@ -132,6 +135,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     			];
 
     			$out .= '<input ' .
+                  'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     							Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';

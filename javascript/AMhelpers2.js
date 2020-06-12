@@ -248,7 +248,6 @@ function setupTips(id, tip, longtip) {
   if (!document.getElementById("tips"+ref)) {
     $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
   }
-  el.setAttribute('aria-label', tip);
   el.setAttribute('aria-describedby', 'tips'+ref);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);

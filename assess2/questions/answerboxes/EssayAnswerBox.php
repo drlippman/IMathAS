@@ -76,7 +76,8 @@ class EssayAnswerBox implements AnswerBox
     				$la = str_replace('&quot;','"',$la);
     			}
     			if ($rows<2) {
-    				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" /> ";
+    				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" ";
+            $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" />';
     			} else {
     				if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
     				$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
@@ -85,6 +86,7 @@ class EssayAnswerBox implements AnswerBox
     				} else {
     					$out .= "cols=\"$cols\" ";
     				}
+            $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ';
     				$out .= sprintf(">%s</textarea>\n", Sanitize::encodeStringForDisplay($la, true));
     				if ($colorbox!='') { $out .= '</div>';}
     			}

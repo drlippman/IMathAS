@@ -388,6 +388,7 @@ class QuestionHtmlGenerator
                     ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                     ->setIsMultiPartQuestion($this->isMultipart())
                     ->setQuestionPartNumber($atIdx)
+                    ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
                     ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
                     ->setColorboxKeyword($questionColor);

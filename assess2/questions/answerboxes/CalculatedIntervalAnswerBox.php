@@ -100,6 +100,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
     		$params['calcformat'] = $answerformat;
 
     		$out .= '<input ' .
+                'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     						Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';

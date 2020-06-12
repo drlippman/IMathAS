@@ -145,7 +145,8 @@ class FunctionExpressionAnswerBox implements AnswerBox
     		$params['domain'] = $newdomain;
 
     		$out .= '<input ' .
-    						Sanitize::generateAttributeString($attributes) .
+    						'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
+                Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';
 

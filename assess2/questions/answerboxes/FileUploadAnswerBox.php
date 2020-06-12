@@ -62,6 +62,7 @@ class FileUploadAnswerBox implements AnswerBox
           }
           $out .= "/>\n";
           $out .= '<label for="qn'.$qn.'"><span role="button" class="filealt-btn '.$colorbox.'">';
+          $out .= '<span class="sr-only">'.$this->answerBoxParams->getQuestionIdentifierString().'</span>';
           $out .= _('Choose File').'</span>';
           $out .= '<span class="filealt-label" data-def="'._('No file chosen').'">';
           if ($autosave != '') {

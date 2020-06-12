@@ -68,7 +68,8 @@ class MatrixAnswerBox implements AnswerBox
     			} else {
     				$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
-          $out .= '<table>';
+          $arialabel = $this->answerBoxParams->getQuestionIdentifierString();
+          $out .= '<table role="group" aria-label="'.$arialabel.'">';
           if ($displayformat == 'det') {
              $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
           } else {
@@ -78,7 +79,8 @@ class MatrixAnswerBox implements AnswerBox
     			$out .= "<table>";
     			$count = 0;
     			$las = explode("|",$la);
-    			for ($row=0; $row<$answersize[0]; $row++) {
+          $cellcnt = $answersize[0]*$answersize[1];
+          for ($row=0; $row<$answersize[0]; $row++) {
     				$out .= "<tr>";
     				for ($col=0; $col<$answersize[1]; $col++) {
     					$out .= '<td>';
@@ -92,7 +94,8 @@ class MatrixAnswerBox implements AnswerBox
     					];
 
     					$out .= '<input ' .
-    									Sanitize::generateAttributeString($attributes) .
+                      'aria-label="'.sprintf(_('Cell %d of %d'), $count+1, $cellcnt).'" ' .
+                      Sanitize::generateAttributeString($attributes) .
     									'" />';
 
     					$out .= "</td>\n";
@@ -138,6 +141,7 @@ class MatrixAnswerBox implements AnswerBox
           $params['longtip'] = $tip;
 
     			$out .= '<input ' .
+                  'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     							Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';

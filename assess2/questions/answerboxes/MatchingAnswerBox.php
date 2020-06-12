@@ -104,7 +104,11 @@ class MatchingAnswerBox implements AnswerBox
     		} else {
     			$divstyle = '';
     		}
-    		if ($colorbox != '') {$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'" style="display:block">';}
+        $out = '<div id="qnwrap'.$qn.'" role="group" ';
+        if ($colorbox != '') {
+          $out .= 'class="'.$colorbox.'" ';
+        }
+        $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
     		$out .= "<div class=\"match\" $divstyle>\n";
         if (!empty($questiontitle)) {
     		  $out .= "<p class=\"centered\">$questiontitle</p>\n";
@@ -183,7 +187,7 @@ class MatchingAnswerBox implements AnswerBox
     			$out .= "</div>";
     		}
     		$out .= "<div class=spacer>&nbsp;</div>";
-    		if ($colorbox != '') {$out .= '</div>';}
+    		$out .= '</div>';
     		//$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
     		if ($displayformat=="select") {
     			$tip = _('In each pull-down, select the item that matches with the displayed item');

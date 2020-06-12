@@ -101,10 +101,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
 
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
+			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\"".$this->answerBoxParams->getQuestionIdentifierString().' '._('Select one or more answers')."\">";
 		} else  {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\"".$this->answerBoxParams->getQuestionIdentifierString().' '._('Select one or more answers')."\">";
 		}
 		if ($displayformat == "horiz") {
 

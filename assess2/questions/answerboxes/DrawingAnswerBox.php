@@ -485,7 +485,8 @@ class DrawingAnswerBox implements AnswerBox
     			$params['canvas'] = [$qn,$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
     			$out .= '<input ' .
-    							Sanitize::generateAttributeString($attributes) .
+    							'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
+                  Sanitize::generateAttributeString($attributes) .
     							'" />';
 
     			if (isset($GLOBALS['capturedrawinit'])) {
