@@ -53,7 +53,7 @@ class MatrixAnswerBox implements AnswerBox
 
 
         if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-    			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+    			$out .= $ansprompt;
     		}
     		if (isset($answersize)) {
     			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');

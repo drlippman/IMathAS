@@ -55,7 +55,7 @@ class NumberAnswerBox implements AnswerBox
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-            $out .= "<label for=\"qn$qn\">$ansprompt</label>";
+            $out .= $ansprompt;
         }
 
         if ($displayformat=="point") {

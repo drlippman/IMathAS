@@ -65,7 +65,7 @@ class CalculatedAnswerBox implements AnswerBox
     		$ansformats = array_map('trim',explode(',',$answerformat));
 
     		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-    			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+    			$out .= $ansprompt;
     		}
     		if ($displayformat=="point") {
     			$leftb = "(";

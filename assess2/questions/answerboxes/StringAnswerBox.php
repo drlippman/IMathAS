@@ -53,7 +53,7 @@ class StringAnswerBox implements AnswerBox
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (!isset($sz)) { $sz = 20;}
-    		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+    		if (isset($ansprompt)) {$out .= $ansprompt;}
 
     		if ($answerformat=='list') {
     			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";

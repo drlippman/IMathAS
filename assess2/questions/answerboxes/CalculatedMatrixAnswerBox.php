@@ -54,7 +54,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-    			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+    			$out .= $ansprompt;
     		}
     		if (isset($answersize)) {
     			list($tip,$shorttip) = formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix',false,true);

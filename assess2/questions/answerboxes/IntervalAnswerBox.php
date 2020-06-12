@@ -50,7 +50,7 @@ class IntervalAnswerBox implements AnswerBox
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (isset($ansprompt)) {
-          $out .= "<label for=\"qn$qn\">$ansprompt</label>";
+          $out .= $ansprompt;
         }
 
         $ansformats = array_map('trim',explode(',',$answerformat));
