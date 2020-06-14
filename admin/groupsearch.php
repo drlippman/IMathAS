@@ -21,7 +21,8 @@ if (isset($_POST['grpsearch'])) {
 		$row['priority'] = 0;
 		foreach ($words as $v) {
 			if (preg_match('/\b'.$v.'\b/i', $row['name'])) {
-				$hasp1 = true;
+				$row['priority']+=2;
+			} else if (preg_match('/\b'.$v.'/i', $row['name'])) {
 				$row['priority']++;
 			}
 		}
