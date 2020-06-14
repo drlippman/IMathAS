@@ -175,34 +175,6 @@ function getReqData() {
 	return $out;
 }
 
-function getGroups() {
-	global $DBH;
-	$query = "SELECT s.groupid, ig.name, MAX(s.domain)
-	  FROM (SELECT groupid, SUBSTRING_INDEX(email, '@', -1) AS domain, COUNT(*) AS domainCount
-		  FROM imas_users WHERE rights>10 AND groupid>0
-		  GROUP BY groupid, domain
-	       ) AS s
-	  JOIN (SELECT s.groupid, MAX(s.domainCount) AS MaxdomainCount
-		  FROM (SELECT groupid, SUBSTRING_INDEX(email, '@', -1) AS domain, COUNT(*) AS domainCount
-			FROM imas_users WHERE rights>10 AND groupid>0
-			GROUP BY groupid, domain
-		  ) AS s
-		 GROUP BY s.groupid
-	       ) AS m
-	    ON s.groupid = m.groupid AND s.domainCount = m.MaxdomainCount
-	  JOIN imas_groups AS ig ON s.groupid=ig.id GROUP BY s.groupid ORDER BY ig.name";
-	$stm = $DBH->query($query);
-	$out = array();
-	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		if (empty($row['domain']) || preg_match('/(gmail|yahoo|hotmail|me\.com)/', $row['domain'])) {
-			$row['domain'] = '';
-		}
-		$row['name'] = preg_replace('/\s+/', ' ', trim($row['name']));
-		$out[] = array('id'=>$row['groupid'], 'name'=>$row['name'], 'domain'=>strtolower($row['domain']));
-	}
-	return $out;
-}
-
 //add fields based on your new instructor request form
 //and then add the "search" entry
 if (empty($reqFields)) {
@@ -214,7 +186,6 @@ if (empty($reqFields)) {
 }
 
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/fuse.min.js\"></script>";
 //$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
@@ -287,10 +258,10 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	    	<button @click="chgStatus(status, userindex, 3)">Probably should be Denied</button>
       	    </span>
       	  </li>
-      	  <li>Group: <select v-model="group">
-      	  	<optgroup v-if="suggestedGroups.length>0" label="Suggested Groups">
-      	  		<option v-for="group in suggestedGroups" :value="group.id">{{group.name}}</option>
-      	  	</optgroup>
+					<li>Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
+						<button type=button @click="searchGroups">Search</button>
+					</li>
+      	  <li v-show="groups !== null">Group: <select v-model="group">
       	  	<optgroup label="groups">
       	  		<option value="-1">New group</option>
       	  		<option value=0>Default</option>
@@ -316,35 +287,12 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 </div>
 
 <script type="text/javascript">
-var groups = <?php echo json_encode(getGroups(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>;
-function normalizeGroupName(grpname) {
-	grpname = grpname.toLowerCase();
-	grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.|a|the)\b/g, "");
-	grpname = grpname.replace(/\bmt(\.|\b)/, "mount");
-	grpname = grpname.replace(/\bst(\.|\b)/, "saint");
-	return grpname;
-}
-var fuseoptions = {
-  shouldSort: true,
-  tokenize: false,
-  includeScore: true,
-  threshold: 0.3,
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 1,
-  keys: ["normname"]
-};
-var normgroups = [];
-for (i in groups) {
-	normgroups.push({"id": groups[i].id, "name": groups[i].name, "normname":normalizeGroupName(groups[i].name)});
-}
-var fuse = new Fuse(normgroups, fuseoptions);
 
 var app = new Vue({
 	el: '#app',
 	data: {
-		groups: groups,
+		groups: null,
+		grpsearch: '',
 		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>,
 		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);?>,
 		activeUser: -1,
@@ -362,40 +310,7 @@ var app = new Vue({
 		newgroup: ""
 	},
 	computed: {
-		suggestedGroups: function() {
-			if (this.activeUser==-1) {
-				return [];
-			}
-			var out = []; var matchedIDs = []; var i;
-			var user = this.toApprove[this.activeUserStatus][this.activeUserIndex];
-			if (user.email.indexOf("@")>-1) {
-				var userEmailDomain = user.email.substr(user.email.indexOf("@")+1).toLowerCase();
-				for (i in groups) {
-					if (userEmailDomain == groups[i].domain) {
-						out.push({"id": groups[i].id, "name": groups[i].name});
-						matchedIDs.push(groups[i].id);
-					}
-				}
-			}
-			if (user.school && user.school != "") {
-				var userGroup = normalizeGroupName(user.school);
-				var results = fuse.search(userGroup);
-				for (i in results) {
-					if (results[i].score>.8) {break;}
-					if (matchedIDs.indexOf(results[i].item.id)!=-1) { continue; }
-					out.push({"id":results[i].item.id, "name": results[i].item.name});
-					if (out.length>12) { break;}
-				}
-			}
-			return out;
-		},
-		suggestedGroupIds: function() {
-			var ids = [];
-			for (i in this.suggestedGroups) {
-				ids.push(this.suggestedGroups[i].id);
-			}
-			return ids;
-		}
+
 	},
 	methods: {
 		toggleActiveUser: function(userid, status, userindex) {
@@ -408,13 +323,25 @@ var app = new Vue({
 				this.activeUserStatus = status;
 				this.activeUserIndex = userindex;
 				this.$nextTick(function() {
-					if (this.suggestedGroups.length>0) {
-						this.group = this.suggestedGroups[0].id;
-					} else {
-						this.group = 0;
-					}
+					this.groups = null;
+					this.group = 0;
 				});
 			}
+		},
+		searchGroups: function () {
+			if (this.grpsearch.trim() == '') { return ;}
+			var self = this;
+			$.ajax({
+				type: "POST",
+				url: "groupsearch.php",
+				dataType: "json",
+				data: {
+					"grpsearch": this.grpsearch
+				}
+			}).done(function(msg) {
+				self.groups = msg;
+				self.group = msg[0].id;
+			});
 		},
 		chgStatus: function(status, userindex, newstatus) {
 			if (newstatus==11 && !this.checkgroupname()) {
