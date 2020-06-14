@@ -30,7 +30,29 @@ if (!empty($newStatus)) {
 	$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=?,reqdata=? WHERE userid=?");
 	$stm->execute(array($newStatus, json_encode($reqdata), $instId));
 
-	if ($newStatus==10) { //deny
+	if ($newStatus==4) { // request more info
+		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$instId));
+		$row = $stm->fetch(PDO::FETCH_ASSOC);
+
+		//call hook, if defined
+		if (function_exists('getMoreInfoMessage')) {
+			$message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+		} else {
+			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
+			$message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
+			$message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status. ';
+			$message .= 'If you believe you should have an instructor account, ';
+			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
+		}
+
+		require_once("../includes/email.php");
+		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
+			$installname._(' Account Status'), $message,
+			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
+			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
+
+	} else if ($newStatus==10) { //deny
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
@@ -143,7 +165,7 @@ function getReqData() {
 		$userdata['email'] = $row['email'];
 		$userdata['id'] = $row['id'];
 		if (isset($userdata['school'])) {
-			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search for Name/School</a>';
+			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search Google for Name/School</a>';
 		}
 		$out[$row['status']][] = $userdata;
 	}
@@ -280,8 +302,11 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	  <li>
       	    <button @click="chgStatus(status, userindex, 11)">Approve Request</button>
       	    <button @click="chgStatus(status, userindex, 10)">Deny Request</button>
+						<span v-if="status!=4">
+      	    	<button @click="chgStatus(status, userindex, 4)">Request More Info</button>
+      	    </span>
       	    <br/>
-      	    With an Approve or Deny, an email is automatically sent to the requester.
+      	    With an Approve, Deny, or Request More Info, an email is automatically sent to the requester.
       	  </li>
       	</ul>
       </li>
@@ -291,7 +316,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 </div>
 
 <script type="text/javascript">
-var groups = <?php echo json_encode(getGroups(), JSON_HEX_TAG); ?>;
+var groups = <?php echo json_encode(getGroups(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>;
 function normalizeGroupName(grpname) {
 	grpname = grpname.toLowerCase();
 	grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.|a|the)\b/g, "");
@@ -320,8 +345,8 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		groups: groups,
-		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG); ?>,
-		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG);?>,
+		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>,
+		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);?>,
 		activeUser: -1,
 		activeUserStatus: -1,
 		activeUserIndex: -1,
@@ -329,7 +354,8 @@ var app = new Vue({
 			0: 'New Account Request',
 			1: 'Needs Investigation',
 			2: 'Waiting for Confirmation',
-			3: 'Probably should be denied'
+			3: 'Probably should be denied',
+			4: 'Waiting for more info'
 		},
 		statusMsg: "",
 		group: 0,
