@@ -927,6 +927,12 @@ button.plain:hover, button.plain:active {
 	border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
 }
+@media (min-height: 2000px) {
+	.dialog {
+		position: absolute;
+		top: 5em;
+	}
+}
 .dialog button.slim {
   margin-right: -12px;
   margin-top: -3px;

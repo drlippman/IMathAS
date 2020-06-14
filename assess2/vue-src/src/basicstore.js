@@ -33,6 +33,7 @@ export const store = Vue.observable({
   show_enddate_dialog: false,
   inPrintView: false,
   enableMQ: true,
+  lastPos: null,
   livepollServer: '',
   livepollSettings: {
     showQuestionDefault: true,

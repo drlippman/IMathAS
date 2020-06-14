@@ -111,6 +111,12 @@ export default {
     }
   },
   created () {
+    window.$(document).on('click', function (e) {
+      store.lastPos = e.pageY;
+    });
+    window.$(document).on('focusin', function (e) {
+      store.lastPos = e.target.getBoundingClientRect().top;
+    });
     window.$(window).on('beforeunload', this.beforeUnload);
     // Give a warning if the assessment is quiz-style and not submitted
     // We're attaching this to breadcrumbs and nav buttons to avoid the default
