@@ -10,6 +10,7 @@ A collection of accounting macros
 <li><a href="#scorejournal">scorejournal</a></li>
 <li><a href="#makeaccttable">makeaccttable</a></li>
 <li><a href="#makeaccttable2">makeaccttable2</a></li>
+<li><a href="#makeaccttable3">makeaccttable3</a></li>
 <li><a href="#makeTchartsfromjournal">makeTchartsfromjournal</a></li>
 <li><a href="#scoreTchartsfromjournal">scoreTchartsfromjournal</a></li>
 <li><a href="#makeTchart">makeTchart</a></li>
@@ -87,6 +88,18 @@ makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $
 <br>&nbsp;&nbsp; $opts['class']: class to use for table
 <br>&nbsp;&nbsp; $opts['ops']: a list of typeahead options for string entries
 <br>$questions: you only need to pass this if you're using $opts['ops']
+<BR><h3><a name="makeaccttable3">makeaccttable3</a></h3>
+<br>makeaccttable3(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $questions, $answerformat, $answerboxsize, $opts)
+<br>headers:  array(title, colspan, title, colspan,...) or array(title,title,title) or array of these for multiple headers
+<br>coltypes: array(true if scores, false if fixed), one for each column  (use 2 to add dollar signs when not already in column values, -1 for non-numeric)
+<br>fixedrows: array(title, colspan, title, colspan,...), ignores coltypes
+<br>columsn: an array for each column of fixed values or answer values
+<br>opts: optional array of options:
+<br>&nbsp;&nbsp;$opts['totrow']: row to treat as totals row (decorates above and below with lines) - optional
+<br>&nbsp;&nbsp;$opts['class']: class to use for table
+<br>&nbsp;&nbsp;$opts['underline']: array of row=>underline style: 1 single, 2 double
+<br>&nbsp;&nbsp;&nbsp;&nbsp;can also do row=>[style, column] or row=>[style, [column, column]]
+<br>&nbsp;&nbsp;$opts['questions'][n] = array of pull-down options for column n
 <BR><h3><a name="makeTchartsfromjournal">makeTchartsfromjournal</a></h3>
 makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize)
 <BR><h3><a name="scoreTchartsfromjournal">scoreTchartsfromjournal</a></h3>
