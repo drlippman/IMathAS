@@ -344,7 +344,7 @@ var app = new Vue({
 			});
 		},
 		chgStatus: function(status, userindex, newstatus) {
-			if (newstatus==11 && !this.checkgroupname()) {
+			if (newstatus==11 && this.group===-1 && !this.checkgroupname()) {
 				return false;
 			}
 			this.statusMsg = _("Saving...");
@@ -384,14 +384,27 @@ var app = new Vue({
 			return JSON.parse(JSON.stringify(obj)); //crude
 		},
 		checkgroupname: function() {
-			var proposedgroup = this.newgroup.replace(/^\s+/,"").replace(/\s+$/,"").replace(/\s+/g," ").toLowerCase();
-			for (i in groups) {
-				if (groups[i].name.toLowerCase()==proposedgroup) {
+			var proposedgroup = this.newgroup.replace(/\s+/g," ").trim();
+			var self = this;
+			$.ajax({
+				type: "POST",
+				url: "groupsearch.php",
+				dataType: "json",
+				async: false,
+				data: {
+					"grpsearch": proposedgroup,
+					"exact": true
+				}
+			}).done(function(msg) {
+				if (msg.length === 0) {
+					return true;
+				} else {
 					alert("That group name already exists!");
-					this.group = groups[i].id;
+					self.groups = msg;
+					self.group = msg[0].id;
 					return false;
 				}
-			}
+			});
 			return true;
 		}
 	}

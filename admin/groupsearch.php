@@ -8,14 +8,20 @@ if ($myrights < 20) {
 
 if (isset($_POST['grpsearch'])) {
 	$findGroup = Sanitize::stripHtmlTags($_POST['grpsearch']);
-	$words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$findGroup)));
-	$likearr = array();
-	foreach ($words as $v) {
-		$likearr[] = '%'.$v.'%';
-	}
-	$likes = implode(' OR ', array_fill(0, count($words), 'ig.name LIKE ?'));
-	$stm = $DBH->prepare("SELECT ig.id,ig.name FROM imas_groups AS ig LEFT JOIN imas_users AS iu ON ig.id=iu.groupid WHERE $likes GROUP BY ig.id ORDER BY ig.name");
-	$stm->execute($likearr);
+  if (empty($_POST['exact'])) {
+  	$words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$findGroup)));
+  	$likearr = array();
+  	foreach ($words as $v) {
+  		$likearr[] = '%'.$v.'%';
+  	}
+  	$likes = implode(' OR ', array_fill(0, count($words), 'name LIKE ?'));
+  	$stm = $DBH->prepare("SELECT id,name FROM imas_groups WHERE $likes");
+  	$stm->execute($likearr);
+  } else {
+    $stm = $DBH->prepare("SELECT id,name FROM imas_groups WHERE name=?");
+    $stm->execute(array(trim($findGroup)));
+    $words = array();
+  }
 	$possible_groups = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$row['priority'] = 0;
