@@ -53,7 +53,6 @@ var dotradius = 4;
 var ticklength = 4;
 var axesstroke = "black";
 var gridstroke = "#757575";
-var pointerpos = null;
 var coordinates = null;
 var above = "above";
 var below = "below";
@@ -65,7 +64,6 @@ var belowleft = "belowleft";
 var belowright = "belowright";
 var xmin, xmax, ymin, ymax, xscl, yscl,
     xgrid, ygrid, xtick, ytick, initialized;
-var isOldIE = document.createElementNS==null;
 var picture, svgpicture, doc, width, height, a, b, c, d, i, n, p, t, x, y;
 var ASgraphidcnt = 0;
 
@@ -84,15 +82,8 @@ function prepWithMath(str) {
 	return str;
 }
 
-function ran(a,b,n) {
-  if (n==null) n=0;
-  return chop((b+Math.pow(10,-n)-a)*Math.random()+a,n);
-}
-
-
 function myCreateElementXHTML(t) {
-  if (isOldIE) return document.createElement(t);
-  else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
+  return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
 
@@ -119,18 +110,10 @@ function isSVGavailable() {
     	    //IE9+ can do SVG
 	    return null;
     } else {
-	    try	{
-	      var oSVG=eval("new ActiveXObject('Adobe.SVGCtl.3');");
-		return null;
-	    } catch (e) {
-
-		return 1;
-	    }
+	    return 1;
     }
   } else return 1;
 }
-
-
 
 
 function less(x,y) { return x < y }  // used for scripts in XML files
@@ -144,46 +127,13 @@ function setText(st,id) {
 
 
 function myCreateElementSVG(t) {
-  if (isOldIE) return doc.createElement(t);
-  else return doc.createElementNS("http://www.w3.org/2000/svg",t);
+  return doc.createElementNS("http://www.w3.org/2000/svg",t);
 }
 
-
-function getX() {
-  return (doc.getElementById("pointerpos").getAttribute("cx")-origin[0])/xunitlength;
-}
-
-
-function getY() {
-  return (height-origin[1]-doc.getElementById("pointerpos").getAttribute("cy"))/yunitlength;
-}
-
-
-function mousemove_listener(evt) {
-  if (svgpicture.getAttribute("xbase")!=null)
-    pointerpos.cx.baseVal.value = evt.clientX-svgpicture.getAttribute("xbase");
-  if (svgpicture.getAttribute("ybase")!=null)
-    pointerpos.cy.baseVal.value = evt.clientY-svgpicture.getAttribute("ybase");
-}
-
-
-function top_listener(evt) {
-  svgpicture.setAttribute("ybase",evt.clientY);
-}
-
-
-function bottom_listener(evt) {
-  svgpicture.setAttribute("ybase",evt.clientY-height+1);
-}
-
-
-function left_listener(evt) {
-  svgpicture.setAttribute("xbase",evt.clientX);
-}
-
-
-function right_listener(evt) {
-  svgpicture.setAttribute("xbase",evt.clientX-width+1);
+function setAttributes(el, attrs) {
+  for(var key in attrs) {
+    el.setAttribute(key, attrs[key]);
+  }
 }
 
 function asciisvgexpand(evt) {
@@ -222,13 +172,9 @@ function switchTo(id) {
   stroke = "black"; // default line color
   fill = "none";    // default fill color
   marker = "none";
-  if ((picture.nodeName == "EMBED" || picture.nodeName == "embed") && isOldIE) {
-    svgpicture = picture.getSVGDocument().getElementById("root");
-    doc = picture.getSVGDocument();
-  } else {
-    svgpicture = picture;
-    doc = document;
-  }
+  svgpicture = picture;
+  doc = document;
+
   xunitlength = svgpicture.getAttribute("xunitlength")-0;
   yunitlength = svgpicture.getAttribute("yunitlength")-0;
   xmin = svgpicture.getAttribute("xmin")-0;
@@ -237,53 +183,6 @@ function switchTo(id) {
   ymax = svgpicture.getAttribute("ymax")-0;
   origin = [svgpicture.getAttribute("ox")-0,svgpicture.getAttribute("oy")-0];
 }
-
-
-function updatePicture(obj) {
-//alert(typeof obj)
-  var src = document.getElementById((typeof obj=="string"?
-              obj:"picture"+(obj+1)+"input")).value;
-  xmin = null; xmax = null; ymin = null; ymax = null;
-  xscl = null; xgrid = null; yscl = null; ygrid = null;
-  initialized = false;
-  switchTo((typeof obj=="string"?obj.slice(0,8):"picture"+(obj+1)));
-  src = src.replace(/plot\(\x20*([^\"f\[][^\n\r]+?)\,/g,"plot\(\"$1\",");
-  src = src.replace(/plot\(\x20*([^\"f\[][^\n\r]+)\)/g,"plot(\"$1\")");
-  src = src.replace(/([0-9])([a-zA-Z])/g,"$1*$2");
-  src = src.replace(/\)([\(0-9a-zA-Z])/g,"\)*$1");
-//alert(src);
-  try {
-    eval(prepWithMath(src));
-  } catch(err) {alert(err+"\n"+src)}
-}
-
-
-function showHideCode(obj) {
-  var node = obj.nextSibling;
-  while (node != null && node.nodeName != "BUTTON" &&
-
-    node.nodeName != "button") node = node.nextSibling;
-  if (node.style.display == "none") node.style.display = "";
-  else node.style.display = "none";
-  while (node != null && node.nodeName != "TEXTAREA" &&
-    node.nodeName != "textarea") node = node.previousSibling;
-  if (node.style.display == "none") node.style.display = "";
-  else node.style.display = "none";
-//  updatePicture(node.getAttribute("id"));
-}
-
-
-function hideCode() { //do nothing
-}
-
-
-function showcode() { //do nothing
-}
-
-
-function nobutton() { //do nothing
-}
-
 
 function setBorder(l,b,r,t) {
 	if (t==null) {
@@ -345,105 +244,58 @@ function initPicture(x_min,x_max,y_min,y_max) {
   fontbackground = "none";
   marker = "none";
   initialized = true;
-//  if (true ||picture.nodeName == "EMBED" || picture.nodeName == "embed") {
-    if (isOldIE) {
-      svgpicture = picture.getSVGDocument().getElementById("root");
-      while (svgpicture.childNodes.length()>5)
-        svgpicture.removeChild(svgpicture.lastChild);
-      svgpicture.setAttribute("width",width);
-      svgpicture.setAttribute("height",height);
-      doc = picture.getSVGDocument();
-    } else {
-      var qnode = document.createElementNS("http://www.w3.org/2000/svg","svg");
+
+  var qnode = document.createElementNS("http://www.w3.org/2000/svg","svg");
 	var picid = picture.getAttribute("id");
 	picture.setAttribute("id",picid+'-embed');
-      qnode.setAttribute("id", picid);
+  qnode.setAttribute("id", picid);
 
-      if (picture.hasAttribute("data-enlarged")) {
-      	      qnode.setAttribute("viewBox","0 0 "+picture.getAttribute("width")+" "+picture.getAttribute("height"));
-      } else {
-      	      qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
-      	      qnode.setAttribute("width",picture.getAttribute("width"));
-      	      qnode.setAttribute("height",picture.getAttribute("height"));
-      }
-      if (picture.hasAttribute("data-nomag")) {
-        qnode.setAttribute("data-nomag",1);
-      }
-
-      qnode.setAttribute("alt", picture.getAttribute("alt") || '');
-      qnode.setAttribute("role", "img");
-
-      if (picture.parentNode!=null) {
-        //picture.parentNode.replaceChild(qnode,picture);
-				picture.parentNode.insertBefore(qnode,picture);
-				picture.style.display="none";
-				if (picture.hasAttribute("sscr")) {
-					qnode.setAttribute("data-sscr", picture.getAttribute("sscr"));
-					picture.removeAttribute("sscr");
-				}
-				if (picture.hasAttribute("script")) {
-					qnode.setAttribute("data-script", picture.getAttribute("script"));
-					picture.removeAttribute("script");
-				}
-      } else {
-        svgpicture.parentNode.replaceChild(qnode,svgpicture);
-      }
-
-      svgpicture = qnode;
-
-      if (picture.getAttribute("alt") != '' && picture.getAttribute("alt") != null) {
-        var title = document.createElement("title");
-        svgpicture.appendChild(title);
-        title.innerText = picture.getAttribute("alt");
-        title.id = picid+"-label";
-        svgpicture.setAttribute("aria-labelledby", picid+"-label");
-      }
-
-      doc = document;
-      pointerpos = doc.getElementById("pointerpos");
-      if (pointerpos==null) {
-        pointerpos = myCreateElementSVG("circle");
-        pointerpos.setAttribute("id","pointerpos");
-        pointerpos.setAttribute("cx",0);
-        pointerpos.setAttribute("cy",0);
-        pointerpos.setAttribute("r",0.5);
-        pointerpos.setAttribute("fill","red");
-        svgpicture.appendChild(pointerpos);
-      }
-      if (!picture.hasAttribute("data-enlarged")) {
-      	  //svgpicture.addEventListener("click", asciisvgexpand);
-      }
-    }
-//  } else {
-//    svgpicture = picture;
-//    doc = document;
-//  }
-
-  if (!isOldIE && picture.getAttribute("onmousemove")!=null) {
-    svgpicture.addEventListener("mousemove", mousemove_listener, true);
-    var st = picture.getAttribute("onmousemove");
-    svgpicture.addEventListener("mousemove", eval(st.slice(0,st.indexOf("("))), true);
-    node = myCreateElementSVG("polyline");
-    node.setAttribute("points","0,0 "+width+",0");
-    node.setAttribute("style","stroke:white; stroke-width:3");
-    node.addEventListener("mousemove", top_listener, true);
-    svgpicture.appendChild(node);
-    node = myCreateElementSVG("polyline");
-    node.setAttribute("points","0,"+height+" "+width+","+height);
-    node.setAttribute("style","stroke:white; stroke-width:3");
-    node.addEventListener("mousemove", bottom_listener, true);
-    svgpicture.appendChild(node);
-    node = myCreateElementSVG("polyline");
-    node.setAttribute("points","0,0 0,"+height);
-    node.setAttribute("style","stroke:white; stroke-width:3");
-    node.addEventListener("mousemove", left_listener, true);
-    svgpicture.appendChild(node);
-    node = myCreateElementSVG("polyline");
-    node.setAttribute("points",(width-1)+",0 "+(width-1)+","+height);
-    node.setAttribute("style","stroke:white; stroke-width:3");
-    node.addEventListener("mousemove", right_listener, true);
-    svgpicture.appendChild(node);
+  if (picture.hasAttribute("data-enlarged")) {
+  	      qnode.setAttribute("viewBox","0 0 "+picture.getAttribute("width")+" "+picture.getAttribute("height"));
+  } else {
+  	      qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
+  	      qnode.setAttribute("width",picture.getAttribute("width"));
+  	      qnode.setAttribute("height",picture.getAttribute("height"));
   }
+  if (picture.hasAttribute("data-nomag")) {
+    qnode.setAttribute("data-nomag",1);
+  }
+
+  qnode.setAttribute("alt", picture.getAttribute("alt") || '');
+  qnode.setAttribute("role", "img");
+
+  if (picture.parentNode!=null) {
+    //picture.parentNode.replaceChild(qnode,picture);
+		picture.parentNode.insertBefore(qnode,picture);
+		picture.style.display="none";
+		if (picture.hasAttribute("sscr")) {
+			qnode.setAttribute("data-sscr", picture.getAttribute("sscr"));
+			picture.removeAttribute("sscr");
+		}
+		if (picture.hasAttribute("script")) {
+			qnode.setAttribute("data-script", picture.getAttribute("script"));
+			picture.removeAttribute("script");
+		}
+  } else {
+    svgpicture.parentNode.replaceChild(qnode,svgpicture);
+  }
+
+  svgpicture = qnode;
+
+  if (picture.getAttribute("alt") != '' && picture.getAttribute("alt") != null) {
+    var title = document.createElement("title");
+    svgpicture.appendChild(title);
+    title.innerText = picture.getAttribute("alt");
+    title.id = picid+"-label";
+    svgpicture.setAttribute("aria-labelledby", picid+"-label");
+  }
+
+  doc = document;
+
+  if (!picture.hasAttribute("data-enlarged")) {
+  	  //svgpicture.addEventListener("click", asciisvgexpand);
+  }
+
   border = defaultborder;
  } else {
  	 //clear out svg
@@ -459,20 +311,24 @@ function initPicture(x_min,x_max,y_min,y_max) {
 	 svgpicture.setAttribute("width", width);
 	 svgpicture.style.width = width+"px";
  }
- svgpicture.setAttribute("xunitlength",xunitlength);
- svgpicture.setAttribute("yunitlength",yunitlength);
- svgpicture.setAttribute("xmin",xmin);
- svgpicture.setAttribute("xmax",xmax);
- svgpicture.setAttribute("ymin",ymin);
- svgpicture.setAttribute("ymax",ymax);
- svgpicture.setAttribute("ox",origin[0]);
- svgpicture.setAttribute("oy",origin[1]);
+ setAttributes(svgpicture, {
+   xunitlength: xunitlength,
+   yunitlength: yunitlength,
+   xmin: xmin,
+   xmax: xmax,
+   ymin: ymin,
+   ymax: ymax,
+   ox: origin[0],
+   oy: origin[1]
+ });
  var node = myCreateElementSVG("rect");
- node.setAttribute("x","0");
- node.setAttribute("y","0");
- node.setAttribute("width",width);
- node.setAttribute("height",height);
- node.setAttribute("style","stroke-width:1;fill:white");
+ setAttributes(node, {
+   x: 0,
+   y: 0,
+   width: width,
+   height: height,
+   style: "stroke-width:1;fill:white"
+ });
  svgpicture.appendChild(node);
 }
 
@@ -480,7 +336,7 @@ function setStrokeFill(node) {
   node.setAttribute("stroke-width", strokewidth);
   if (strokedasharray!=null)
     node.setAttribute("stroke-dasharray", strokedasharray);
-  node.setAttribute("stroke", stroke);
+    node.setAttribute("stroke", stroke);
   if (fill.substr(0,5)=='trans') {
   	  node.setAttribute("fill", fill.substring(5));
   	  node.setAttribute("fill-opacity",fillopacity);
@@ -645,10 +501,12 @@ function ellipse(center,rx,ry,id) { // coordinates in units
     node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
-  node.setAttribute("cx",center[0]*xunitlength+origin[0]);
-  node.setAttribute("cy",height-center[1]*yunitlength-origin[1]);
-  node.setAttribute("rx",rx*xunitlength);
-  node.setAttribute("ry",ry*yunitlength);
+  setAttributes(node, {
+    cx: center[0]*xunitlength+origin[0],
+    cy: height-center[1]*yunitlength-origin[1],
+    rx: rx*xunitlength,
+    ry: ry*yunitlength
+  });
   setStrokeFill(node);
 }
 
@@ -661,10 +519,12 @@ function rect(p,q,id,rx,ry) { // opposite corners in units, rounded by radii
     node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
-  node.setAttribute("x",Math.min(p[0],q[0])*xunitlength+origin[0]);
-  node.setAttribute("y",height-Math.max(q[1],p[1])*yunitlength-origin[1]);
-  node.setAttribute("width",Math.abs(q[0]-p[0])*xunitlength);
-  node.setAttribute("height",Math.abs(q[1]-p[1])*yunitlength);
+  setAttributes(node, {
+    x: Math.min(p[0],q[0])*xunitlength+origin[0],
+    y: height-Math.max(q[1],p[1])*yunitlength-origin[1],
+    width: Math.abs(q[0]-p[0])*xunitlength,
+    height: Math.abs(q[1]-p[1])*yunitlength
+  });
   if (rx!=null) node.setAttribute("rx",rx*xunitlength);
   if (ry!=null) node.setAttribute("ry",ry*yunitlength);
   setStrokeFill(node);
@@ -739,30 +599,36 @@ function textabs(p,st,pos,angle,id,fontsty) {
     node.appendChild(doc.createTextNode(st));
   }
   node.lastChild.nodeValue = st;
-  node.setAttribute("x",p[0]+dx);
-  node.setAttribute("y",height-p[1]+dy);
+  setAttributes(node, {
+    x: p[0]+dx,
+    y: height-p[1]+dy,
+    "font-style": (fontsty!=null?fontsty:fontstyle),
+    "font-family": fontfamily,
+    "font-size": fontsize,
+    "font-weight": fontweight,
+    "text-anchor": textanchor,
+    "stroke-width": "0px"
+  });
   if (angle != 0) {
 	  node.setAttribute("transform","rotate("+angle+" "+(p[0]+dx)+" "+(height-p[1]+dy)+")");
   }
-  node.setAttribute("font-style",(fontsty!=null?fontsty:fontstyle));
-  node.setAttribute("font-family",fontfamily);
-  node.setAttribute("font-size",fontsize);
-  node.setAttribute("font-weight",fontweight);
-  node.setAttribute("text-anchor",textanchor);
+
   //if (fontstroke!="none") node.setAttribute("stroke",fontstroke);
   if (fontfill!="none") node.setAttribute("fill",fontfill);
-  node.setAttribute("stroke-width","0px");
+
   if (fontbackground!="none") {
 	  try {
 		 var bb = node.getBBox();
 		  var bgnode = myCreateElementSVG("rect");
-
-		  bgnode.setAttribute("fill",fontbackground);
-		  bgnode.setAttribute("stroke-width","0px");
-		  bgnode.setAttribute("x",bb.x-2);
-		  bgnode.setAttribute("y",bb.y-1);
-		  bgnode.setAttribute("width",bb.width+4);
-		  bgnode.setAttribute("height",bb.height+2);
+      setAttributes(bgnode, {
+        fill: fontbackground,
+        x: bb.x-2,
+        y: bb.y-1,
+        width: bb.width+4,
+        height: bb.height+2,
+        "stroke-width": "0px"
+      });
+      console.log(node);
 		  if (angle != 0) {
 			   bgnode.setAttribute("transform","rotate("+angle+" "+(p[0]+dx)+" "+(height-p[1]+dy)+")");
 		  }
@@ -779,12 +645,14 @@ function textabs(p,st,pos,angle,id,fontsty) {
 function ASdot(center,radius,s,f) { // coordinates in units, radius in pixel
   if (s==null) s = stroke; if (f==null) f = fill;
   var node = myCreateElementSVG("circle");
-  node.setAttribute("cx",center[0]*xunitlength+origin[0]);
-  node.setAttribute("cy",height-center[1]*yunitlength-origin[1]);
-  node.setAttribute("r",radius);
-  node.setAttribute("stroke-width", strokewidth);
-  node.setAttribute("stroke", s);
-  node.setAttribute("fill", f);
+  setAttributes(node, {
+    cx: center[0]*xunitlength+origin[0],
+    cy: height-center[1]*yunitlength-origin[1],
+    r: radius,
+    "stroke-width": strokewidth,
+    stroke: s,
+    fill: f
+  });
   svgpicture.appendChild(node);
 }
 
@@ -820,12 +688,15 @@ function dot(center, typ, label, pos, id) {
       node.setAttribute("id", id);
       svgpicture.appendChild(node);
     }
-    node.setAttribute("cx",cx);
-    node.setAttribute("cy",cy);
-    node.setAttribute("r",dotradius);
-    node.setAttribute("stroke-width", strokewidth);
-    node.setAttribute("stroke", stroke);
-    node.setAttribute("fill", (typ=="open"?"white":stroke));
+
+    setAttributes(node, {
+      cx: cx,
+      cy: cy,
+      r: dotradius,
+      "stroke-width": strokewidth,
+      stroke: stroke,
+      fill: (typ=="open"?"white":stroke)
+    });
   }
   if (label!=null)
     text(center,label,(pos==null?"below":pos),(id==null?id:id+"label"))
@@ -854,35 +725,43 @@ function arrowhead(p,q) { // draw arrowhead at q (in units)
 
 function addMagGlass() {
   node = myCreateElementSVG("circle");
-  node.setAttribute("id", "magglass1");
-  node.setAttribute("cx",width-10);
-  node.setAttribute("cy",height-10);
-  node.setAttribute("r",5);
-  node.setAttribute("stroke-width", 2);
-  node.setAttribute("stroke", "grey");
-  node.setAttribute("stroke-opacity", 0.5);
-  node.setAttribute("fill", "none");
+  setAttributes(node, {
+    id: "magglass1",
+    cx:width-10,
+    cy:height-10,
+    r:5,
+    "stroke-width": 2,
+    stroke: "grey",
+    "stroke-opacity": 0.5,
+    fill: "none"
+  });
   svgpicture.appendChild(node);
+
   node = myCreateElementSVG("line");
-  node.setAttribute("id", "magglass2");
-  node.setAttribute("x1",width-1);
-  node.setAttribute("y1",height-1);
-  node.setAttribute("x2",width-6);
-  node.setAttribute("y2",height-6);
-  node.setAttribute("stroke-width", 2);
-  node.setAttribute("stroke", "grey");
-  node.setAttribute("stroke-opacity", 0.5);
-  node.setAttribute("fill", "none");
+  setAttributes(node, {
+    id: "magglass2",
+    x1: width-1,
+    y1: height-1,
+    x2: width-6,
+    y2: height-6,
+    "stroke-width": 2,
+    stroke: "grey",
+    "stroke-opacity": 0.5,
+    fill: "none"
+  });
   svgpicture.appendChild(node);
+
   node = myCreateElementSVG("rect");
-  node.setAttribute("id", "magglass3");
-  node.setAttribute("x",width-20);
-  node.setAttribute("y",height-20);
-  node.setAttribute("width",20);
-  node.setAttribute("height",20);
-  node.setAttribute("stroke", "none");
-  node.setAttribute("fill", "white");
-  node.setAttribute("fill-opacity", 0.01);
+  setAttributes(node, {
+    id: "magglass3",
+    x: width-20,
+    y: height-20,
+    width: 20,
+    height: 20,
+    stroke: "none",
+    fill: "white",
+    "fill-opacity": 0.01
+  });
   node.style.cursor = "pointer";
   svgpicture.appendChild(node);
   node.setAttribute("tabindex", 0);
@@ -995,10 +874,12 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	    for (y = height-origin[1]-gdy; y>=winymin; y = y-gdy)
 	        if (y<=winymax) st += " M"+(fqonlyx?origin[0]:gridxmin)+","+y+" "+gridxmax+","+y;
     }
-    pnode.setAttribute("d",st);
-    pnode.setAttribute("stroke-width", .5);
-    pnode.setAttribute("stroke", gridstroke);
-    pnode.setAttribute("fill", fill);
+    setAttributes(pnode, {
+      d: st,
+      "stroke-width": .5,
+      stroke: gridstroke,
+      fill: fill
+    });
     svgpicture.appendChild(pnode);
   }
   pnode = myCreateElementSVG("path");
@@ -1058,10 +939,14 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	    }
     }
   }
-  pnode.setAttribute("d",st);
-  pnode.setAttribute("stroke-width", .5);
-  pnode.setAttribute("stroke", axesstroke);
-  pnode.setAttribute("fill", fill);
+
+  setAttributes(pnode, {
+    d: st,
+    "stroke-width": .5,
+    stroke: axesstroke,
+    fill: fill
+  });
+
   svgpicture.appendChild(pnode);
 }
 
@@ -1217,16 +1102,9 @@ function parseShortScript(sscript,gw,gh) {
 			setTimeout(function() {switchTo(tofixid);parseShortScript(sscript,gw,gh)},100);
 		}
 
-
-		//picture.setAttribute("width", sa[9]);
-		//picture.setAttribute("height", sa[9]);
-
 		return commands;
 	}
 }
-
-
-
 
 function drawPics(base) {
   var index, nd;
@@ -1234,26 +1112,8 @@ function drawPics(base) {
   pictures = base.getElementsByTagName("embed");
  // might be needed if setTimeout on parseShortScript isn't working
 
- 	if (!ASnoSVG && isOldIE) {
-	   try {
-		  for (var i = 0; i < pictures.length; i++) {
-		  	  if (pictures[i].getAttribute("sscr")!='' || pictures[i].getAttribute("script")!='') {
-				  if (pictures[i].getSVGDocument().getElementById("root") == null) {
-					setTimeout(drawPics,100);
-					return;
-				  }
-			  }
-		  }
-	  } catch (e) {
-		  setTimeout(drawPics,100);
-		  return;
-	  }
- 	}
 	var len = pictures.length;
 
-
-  //for (index = 0; index < len; index++) {
-	  //picture = ((!ASnoSVG && isOldIE) ? pictures[index] : pictures[0]);
 	var sscr, src;
   for (index = len-1; index >=0; index--) {
 	  picture = pictures[index];
