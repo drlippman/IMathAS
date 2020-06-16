@@ -801,6 +801,11 @@ if ($askforuserinfo == true) {
 
 //if here, we know the local userid.
 
+//call hook, if defined
+if (function_exists('onHaveLocalUser')) {
+	onHaveLocalUser($userid);
+}
+
 //if it's a common catridge placement and we're here, then either we're using domain credentials, or
 //course credentials for a non-source course.
 
