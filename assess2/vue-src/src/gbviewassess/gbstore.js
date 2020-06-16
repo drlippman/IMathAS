@@ -66,7 +66,7 @@ export const actions = {
           Vue.nextTick(() => {
             window.initAnswerboxHighlights();
             if (window.location.hash) {
-              const el = document.getElementById(window.location.hash.substring(1));
+              const el = document.getElementById(window.location.hash.substring(1).replace(/\//, ''));
               if (el) {
                 el.scrollIntoView();
               }

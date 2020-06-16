@@ -9,12 +9,14 @@
     <error-dialog
       v-if="hasError"
       :errormsg="errorMsg"
+      :lastpos="lastPos"
       @clearerror="clearError"
     />
     <due-dialog v-if="showDueDialog"/>
     <confirm-dialog
       v-if="confirmObj !== null"
       :data="confirmObj"
+      :lastpos="lastPos"
       @close="closeConfirm"
     />
   </div>
@@ -56,6 +58,9 @@ export default {
     },
     showDueDialog () {
       return store.show_enddate_dialog;
+    },
+    lastPos () {
+      return store.lastPos;
     }
   },
   methods: {

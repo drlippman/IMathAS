@@ -34,13 +34,12 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
 import Icons from '@/components/widgets/Icons.vue';
 import A11yDialog from './a11y-dialog';
 
 export default {
   name: 'ErrorDialog',
-  props: ['errormsg'],
+  props: ['errormsg', 'lastpos'],
   data: function () {
     return {
       dialog: null
@@ -69,7 +68,7 @@ export default {
     }
   },
   mounted () {
-    const lastHeight = store.lastPos;
+    const lastHeight = this.lastpos || null;
     window.$(document).on('keyup.dialog', (event) => {
       if (event.key === 'Escape') {
         this.clearError();
