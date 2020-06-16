@@ -39,18 +39,18 @@ if ($isteacher || $istutor) {
 if ($canviewall) {
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-		setsecurecookie($cid.'gbmode', $gbmode);
+		$_SESSION[$cid.'gbmode'] = $gbmode;
 		if (isset($_GET['setgbmodeonly'])) {
 			echo "DONE";
 			exit;
 		}
-	} else if (isset($_COOKIE[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $_COOKIE[$cid.'gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
-		setsecurecookie($cid.'gbmode', $gbmode);
+		$_SESSION[$cid.'gbmode'] = $gbmode;
 	}
 	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
@@ -62,9 +62,9 @@ if ($canviewall) {
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
-		setsecurecookie($cid.'catfilter', $catfilter);
-	} else if (isset($_COOKIE[$cid.'catfilter'])) {
-		$catfilter = $_COOKIE[$cid.'catfilter'];
+		$_SESSION[$cid.'catfilter'] = $catfilter;
+	} else if (isset($_SESSION[$cid.'catfilter'])) {
+		$catfilter = $_SESSION[$cid.'catfilter'];
 	} else {
 		$catfilter = -1;
 	}
@@ -73,27 +73,24 @@ if ($canviewall) {
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			setsecurecookie($cid.'secfilter', $secfilter);
-		} else if (isset($_COOKIE[$cid.'secfilter'])) {
-			$secfilter = $_COOKIE[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
 	}
-	if (isset($_GET['refreshdef']) && isset($_COOKIE[$cid.'catcollapse'])) {
-		setsecurecookie($cid.'catcollapse', 0, time()-3600);
-		unset($_COOKIE[$cid.'catcollapse']);
+	if (isset($_GET['refreshdef']) && isset($_SESSION[$cid.'catcollapse'])) {
+		unset($_SESSION[$cid.'catcollapse']);
 	}
-	if (isset($_COOKIE[$cid.'catcollapse'])) {
-		$pts = explode('-',$_COOKIE[$cid.'catcollapse']);
-		$overridecollapse = array_combine(explode('.',$pts[0]), explode('.',$pts[1]));
+	if (isset($_SESSION[$cid.'catcollapse'])) {
+		$overridecollapse = $_SESSION[$cid.'catcollapse'];
 	} else {
 		$overridecollapse = array();
 	}
 	if (isset($_GET['catcollapse'])) {
 		$overridecollapse[$_GET['cat']] = $_GET['catcollapse'];
-		setsecurecookie($cid.'catcollapse', implode('.',array_keys($overridecollapse))
-			.'-'.implode('.',array_values($overridecollapse)));
+		$_SESSION[$cid.'catcollapse'] = $overridecollapse;
 	}
 
 	//Gbmode : Links NC Dates
@@ -134,8 +131,8 @@ if ($canviewall && !empty($_GET['stu'])) {
 }
 
 if (!empty($CFG['assess2-use-vue-dev'])) {
-	$assessGbUrl = "http://localhost:8080/gbviewassess.html";
-	$assessUrl = "http://localhost:8080/";
+	$assessGbUrl = sprintf("%s/gbviewassess.html", $CFG['assess2-use-vue-dev-address']);
+	$assessUrl = $CFG['assess2-use-vue-dev-address'] . '/';
 } else {
 	$assessGbUrl = "../assess2/gbviewassess.php";
 	$assessUrl = "../assess2/";
@@ -278,8 +275,24 @@ var gbmod = {
 	"pts": '.Sanitize::onlyInt($showpercents).',
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
+$placeinhead .= '<style>
+ dl.inlinedl dt,dl.inlinedl dd {
+	 display: inline; margin: 0;
+ }
+ dl.inlinedl dt {
+	font-weight: bold;
+ }
+ ul.inlineul {
+	 display: inline; list-style: none; padding: 0px;
+ }
+ ul.inlineul li {
+	 display: inline;
+ }
+ ul.inlineul li::after { content: ", "; }
+ ul.inlineul li:last-child::after { content: ""; }
+ </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=041120"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=052320"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -289,7 +302,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$includeduedate = true;
 	}
 	$pagetitle = _('Gradebook');
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=051820\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type,uid) {
 			if (type=="all") {
@@ -360,13 +373,24 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "</div>";
 	}
 	gbstudisp($stu);
-	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>x</sup> Excused score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
+	echo "<div>", _('Meanings:'), ' <ul class="inlineul">';
+	echo '<li>'._('IP-In Progress (some unattempted questions)').'</li>';
+	echo '<li>'._('UA-Unsubmitted attempt').'</li>';
+	echo '<li>'._('OT-overtime').'</li>';
+	echo '<li>'._('PT-practice test').'</li>';
+	echo '<li>'._('EC-extra credit').'</li>';
+	echo '<li>'._('NC-no credit').'</li>';
+	echo '<li>'._('<sub>d</sub> Dropped score').'</li>';
+	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
+	echo '<li>'._('<sup>e</sup> Has exception').'</li>';
+	echo '<li>'._('<sup>LP</sup> Used latepass').'</li>';
+	echo '</ul></div>';
 
 	require("../footer.php");
 
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=103118\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=052320\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
@@ -518,7 +542,13 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
 		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
 		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
-		$(setupGBpercents);
+		setupGBpercents();';
+		if ($isteacher && $colorize != '0' && $colorize != null) {
+			echo '$("#myTable").hide();';
+			echo 'updateColors(document.getElementById("colorsel"));';
+			echo '$("#myTable").show();';
+		}
+		echo 'ts.init();
 	});
 	</script>';
 
@@ -800,7 +830,7 @@ function gbstudisp($stu) {
 					echo '<td></td>';
 				}
 			}
-			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'">';
+			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'" scope="row">';
 
 			$showlink = false;
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
@@ -875,6 +905,8 @@ function gbstudisp($stu) {
 				if ($gbt[0][1][$i][2]>0) {
 					echo round(100*$gbt[1][1][$i][0]/$gbt[0][1][$i][2],1).'%';
 				}
+			} else if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0] === 'N/A') {
+				echo 'N/A';
 			} else {
 				echo '0%';
 			}
@@ -1085,7 +1117,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]=='N/A')) { //no feedback
+				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2
@@ -1269,22 +1301,22 @@ function gbstudisp($stu) {
 
 		}
 		echo '</tbody></table><br/>';
-		echo '<p>';
+		echo '<dl class="inlinedl">';
 		$outcometype = 0;
 		if (($show&1)==1) {
-			echo _('<b>Past Due</b> total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '<br/>';
+			echo _('<dt>Past Due:</dt> <dd>total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '</dd><br/>';
 		}
 		if (($show&2)==2) {
-			echo _('<b>Past Due and Attempted</b> total includes items whose due date has passed, as well as currently available items you have started working on.'), '<br/>';
+			echo _('<dt>Past Due and Attempted:</dt> <dd> total includes items whose due date has passed, as well as currently available items you have started working on.'), '</dd><br/>';
 			$outcometype = 1;
 		}
 		if (($show&4)==4) {
-			echo _('<b>Past Due and Available</b> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
+			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '</dd><br/>';
 		}
 		if (($show&8)==8) {
-			echo _('<b>All</b> total includes all items: past, current, and future to-be-done items.');
+			echo _('<dt>All:</dt> <dd> total includes all items: past, current, and future to-be-done items.'), '</dd><br/>';
 		}
-		echo '</p>';
+		echo '</dl>';
 		if ($hasoutcomes) {
 			echo '<p>';
 			echo '<a href="outcomereport.php?' . Sanitize::generateQueryStringFromMap(array('stu' => $stu,
@@ -1502,6 +1534,7 @@ function gbinstrdisp() {
 	echo "<div id=\"tbl-container\">";
 	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
 
+	//echo '<div id="gbloading">'._('Loading...').'</div>';
 	echo '<table class="gb" id="myTable"><thead><tr>';
 
 	$sortarr = array();
@@ -1913,10 +1946,6 @@ function gbinstrdisp() {
 			echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 		}
 	}
-	if ($colorize != '0') {
-		echo '<script type="text/javascript">addLoadEvent( function() {updateColors(document.getElementById("colorsel"));} );</script>';
-	}
-
 
 }
 

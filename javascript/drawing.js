@@ -168,6 +168,16 @@ function addA11yTarget(canvdata, thisdrawla) {
 	var imgwidth = canvdata[7];
 	var imgheight = canvdata[8];
 	var tarel = document.getElementById("a11ydraw"+tarnum);
+	if (tarel == null) {
+		var canvel = document.getElementById("canvas"+tarnum);
+		if (canvel) { // non-interactive previous attempt display
+			var newdiv = $("<div>").append($("<p>", {text: _('Drawn Elements:')}));
+			var tarel = document.createElement("ul");
+			tarel.setAttribute("id", "allydraw" + tarnum);
+			newdiv.append(tarel);
+			$(canvel).replaceWith(newdiv);
+		}
+	}
 	targetOuts[tarnum] = document.getElementById('qn'+tarnum);
 	targets[tarnum] = {el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
@@ -306,7 +316,7 @@ function adda11ydraw(tarnum,initmode,defval) {
 	}
 	html += '</select><br/>';
 	html += '<span class="a11ydrawinstr"></span><br/>';
-	html += '<input type="text" aria-label="'+_("Point list")+'" value="'+val+'"/>';
+	html += '<input type="text" aria-label="'+_("Point list")+'" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
 	html += _("Remove")+'</button>';
 	var li = $("<li>", {class:"a11ydrawrow"}).html(html);
@@ -320,11 +330,16 @@ function adda11ydraw(tarnum,initmode,defval) {
 
 function removea11ydraw(el) {
 	$(el).parent().remove();
+	encodea11ydraw();
 }
 function changea11ydraw(tarel, tarnum) {
 	var curmode = $(tarel).val();
 	var modedata = targets[tarnum].moderef[curmode];
 	$(tarel).parent().find(".a11ydrawinstr").text(modedata.input);
+	encodea11ydraw();
+}
+function updatea11ydraw(el) {
+	encodea11ydraw();
 }
 function pixcoordstopointlist(vals,tarnum) {
 	var thistarg = targets[tarnum];
@@ -380,6 +395,7 @@ function encodea11ydraw() {
 			}
 		});
 		targetOuts[tarnum].value = lines.join(';')+';;'+dots.join(',')+';;'+odots.join(',')+';;'+tplines.join(',')+';;'+tpineq.join(',')+';;'+saveinput.join(',');
+		$(targetOuts[tarnum]).trigger("input").trigger("change");
 	}
 }
 
@@ -404,8 +420,8 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		targets[tarnum].snaptogridx = 1*snaptogrid[0];
 		targets[tarnum].snaptogridy = 1*snaptogrid[1];
 	} else {
-		targets[tarnum].snaptogridx = snaptogrid;
-		targets[tarnum].snaptogridy = snaptogrid;
+		targets[tarnum].snaptogridx = 1*snaptogrid;
+		targets[tarnum].snaptogridy = 1*snaptogrid;
 	}
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
@@ -424,7 +440,34 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		drawstyle[tarnum] = 0;
 	}
 	drawlocky[tarnum] = locky;
-	if (imgpath !== '') {
+	if (imgpath.match(/initPicture/)) {
+		if ($(tarel).closest('.drawcanvasholder').length == 0) {
+			$(tarel).removeClass("drawcanvas").wrap($("<div>", {
+				class: "drawcanvas",
+				style: "position:relative;width:"+imgwidth+"px;height:"+imgheight+"px"
+			})).wrap($("<div>", {
+				class: "drawcanvasholder",
+				style: "position:absolute;top:0;left:0;z-index:2"
+			}));
+			$(tarel).closest('.drawcanvas').prepend($('<div>', {
+				class: "canvasbg",
+				style: "position:absolute;top:0;left:0"
+			}).append($("<embed>", {
+				"data-nomag": 1,
+				type: "image/svg+xml",
+				align: "middle",
+				width: imgwidth,
+				height: imgheight,
+				script: imgpath
+			}).attr("width",imgwidth).attr("height",imgheight)));
+		}
+		imgs[tarnum] = null;
+		var oldcurTarget = curTarget;
+		curTarget = tarnum;
+		drawTarget();
+		setTimeout(function() { window.drawPics($(tarel).closest('.drawcanvas')[0]);}, 30);
+		curTarget = oldcurTarget;
+	} else if (imgpath !== '') {
 		imgs[tarnum] = new Image();
 		imgs[tarnum].onload = function() {
 			var oldcurTarget = curTarget;
@@ -1518,7 +1561,7 @@ function encodeDraw() {
 		var dochange = (targetOuts[curTarget].value != '' || out != ';;;;;;;;');
 		targetOuts[curTarget].value = out;
 		if (dochange) {
-			$(targetOuts[curTarget]).trigger("change");
+			$(targetOuts[curTarget]).trigger("input").trigger("change");
 		}
 	}
 }
@@ -1551,8 +1594,12 @@ function drawMouseDown(ev) {
 	//see if mouse click is inside a target; if so, select it (unless currently in a line from another target)
 	if (curTarget==null || (curLine==null && curTPcurve==null && curIneqcurve==null)) {
 		for (i in targets) {
+			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
-			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
+			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) &&
+				tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y) &&
+				ev.target == targets[i].el
+			) {
 				curTarget = i;
 				break;
 			}
@@ -1669,6 +1716,7 @@ function drawMouseDown(ev) {
 							lines[curTarget][curLine].reverse();
 							dragObj.subnum = lines[curTarget][curLine].length-1;
 						}
+						clickmightbenewcurve = true;
 					} else { //already in line
 						if (foundpt[1]==curLine && foundpt[2] == lines[curTarget][foundpt[1]].length-1) {
 							//clicked last point; end line
@@ -1697,21 +1745,27 @@ function drawMouseDown(ev) {
 					//targets[curTarget].el.style.cursor = 'move';
 					dragObj = {mode: 2, num: foundpt[1]};
 				} else if (foundpt[0]>=5 && foundpt[0]<10) { //if point is on twopoint
-					setCursor('move');
-					//targets[curTarget].el.style.cursor = 'move';
-					//start dragging
-					dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
-					oldpointpos = tplines[curTarget][foundpt[1]][foundpt[2]];
-					//curTPcurve = foundpt[1];
+					if (curTPcurve == null) {
+						setCursor('move');
+						//targets[curTarget].el.style.cursor = 'move';
+						//start dragging
+						dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
+						oldpointpos = tplines[curTarget][foundpt[1]][foundpt[2]];
+						clickmightbenewcurve = true;
+						//curTPcurve = foundpt[1];
+					}
 				} else if (foundpt[0]>=10 && foundpt[0]<11) { //if point is on ineqline
-					setCursor('move');
-					//targets[curTarget].el.style.cursor = 'move';
-					//start dragging
-					dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
-					oldpointpos = ineqlines[curTarget][foundpt[1]][foundpt[2]];
-					//curIneqcurve = foundpt[1];
+					if (curIneqcurve == null) {
+						setCursor('move');
+						//targets[curTarget].el.style.cursor = 'move';
+						//start dragging
+						dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
+						oldpointpos = ineqlines[curTarget][foundpt[1]][foundpt[2]];
+						//curIneqcurve = foundpt[1];
+						clickmightbenewcurve = true;
+					}
 				}
-				clickmightbenewcurve = true;
+
 			}
 			drawTarget();
 		} else {  //clicked outside currect target region
@@ -1762,8 +1816,8 @@ function findnearpoint(thetarget,mouseOff) {
 	}
 
 	if (targets[thetarget].mode==0 || targets[thetarget].mode==0.5 || targets[thetarget].mode==-1) { //if in line mode
-		for (var i=0;i<lines[thetarget].length;i++) { //check lines
-			for (var j=lines[thetarget][i].length-1; j>=0;j--) {
+		for (var i=lines[thetarget].length-1; i>=0; i--) { //check lines
+			for (var j=lines[thetarget][i].length-1; j>=0; j--) {
 				var dist = Math.pow(lines[thetarget][i][j][0]-mouseOff.x,2) + Math.pow(lines[thetarget][i][j][1]-mouseOff.y,2);
 				if (dist<chkdist) {
 					return [targets[thetarget].mode==-1?0:targets[thetarget].mode,i,j];
@@ -1772,22 +1826,22 @@ function findnearpoint(thetarget,mouseOff) {
 		}
 	}
 	if (targets[thetarget].mode==1 || targets[thetarget].mode==-1) {
-		for (var i=0; i<dots[thetarget].length;i++) { //check dots
+		for (var i=dots[thetarget].length-1; i>=0; i--) { //check dots
 			if (Math.pow(dots[thetarget][i][0]-mouseOff.x,2) + Math.pow(dots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 				return [1,i];
 			}
 		}
 	}
 	if (targets[thetarget].mode==2 || targets[thetarget].mode==-1) {
-		for (var i=0; i<odots[thetarget].length;i++) { //check opendots
+		for (var i=odots[thetarget].length-1; i>=0; i--) { //check opendots
 			if (Math.pow(odots[thetarget][i][0]-mouseOff.x,2) + Math.pow(odots[thetarget][i][1]-mouseOff.y,2)<chkdist) {
 				return [2,i];
 			}
 		}
 	}
 	if ((targets[thetarget].mode>=5 && targets[thetarget].mode<10) || targets[thetarget].mode==-1) { //if in tpline mode
-		for (var i=0;i<tplines[thetarget].length;i++) { //check lines
-			for (var j=tplines[thetarget][i].length-1; j>=0;j--) {
+		for (var i=tplines[thetarget].length-1; i>=0; i--) { //check lines
+			for (var j=tplines[thetarget][i].length-1; j>=0; j--) {
 				if (tptypes[thetarget][i]!=targets[thetarget].mode && targets[thetarget].mode!=-1) {
 					continue;
 				}
@@ -1800,8 +1854,8 @@ function findnearpoint(thetarget,mouseOff) {
 		}
 	}
 	if ((targets[thetarget].mode>=10 && targets[thetarget].mode<11) || targets[thetarget].mode==-1) { //if in ineqline mode
-		for (var i=0;i<ineqlines[thetarget].length;i++) { //check inqs
-			for (var j=ineqlines[thetarget][i].length-1; j>=0;j--) {
+		for (var i=ineqlines[thetarget].length-1; i>=0; i--) { //check inqs
+			for (var j=ineqlines[thetarget][i].length-1; j>=0; j--) {
 				if (ineqtypes[thetarget][i]!=targets[thetarget].mode && targets[thetarget].mode!=-1) {
 					continue;
 				}
@@ -1971,8 +2025,12 @@ function drawMouseMove(ev) {
 	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
 	//if (curTarget==null) {
 		for (i in targets) {
+			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
-			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
+			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) &&
+				tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y) &&
+				ev.target == targets[i].el
+			) {
 				tempTarget = i;
 				break;
 			}
@@ -2273,7 +2331,13 @@ function initCanvases(k) {
 			if (canvases[i][1].substr(0,8)=="a11ydraw") {
 				addA11yTarget(canvases[i], thisdrawla);
 			} else {
-				addTarget(canvases[i][0],'canvas'+canvases[i][0],(canvases[i][1]=='')?'':imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+				var bgpath = '';
+				if (canvases[i][1].match(/initPicture/)) {
+					bgpath = canvases[i][1];
+				} else if (canvases[i][1] !== '') {
+					bgpath = imasroot+'/filter/graph/imgs/'+canvases[i][1];
+				}
+				addTarget(canvases[i][0],'canvas'+canvases[i][0],bgpath,'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 			}
 		}
 	}
@@ -2656,6 +2720,7 @@ var drawexport = {
 	adda11ydraw:adda11ydraw,
 	changea11ydraw:changea11ydraw,
 	encodea11ydraw:encodea11ydraw,
+	updatea11ydraw:updatea11ydraw,
 	removea11ydraw:removea11ydraw
 };
 return drawexport;

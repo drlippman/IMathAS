@@ -16,6 +16,7 @@ class AnswerBoxParams
     private $questionNumber;
     private $isMultiPartQuestion;
     private $questionPartNumber;
+    private $questionPartCount = 1;
     private $assessmentId = 0;
     private $studentLastAnswers;
     private $colorboxKeyword;
@@ -117,6 +118,18 @@ class AnswerBoxParams
     }
 
     /**
+     * Set the count of parts in this question
+     *
+     * @param int $questionPartCount
+     * @return AnswerBoxParams
+     */
+    public function setQuestionPartCount(?int $questionPartCount): AnswerBoxParams
+    {
+        $this->questionPartCount = $questionPartCount;
+        return $this;
+    }
+
+    /**
      * Get the assessment ID
      *
      * @return int The assessment ID.
@@ -159,6 +172,21 @@ class AnswerBoxParams
     {
         $this->isMultiPartQuestion = $isMultiPartQuestion;
         return $this;
+    }
+
+    /**
+     * Get the question identifier string
+     *
+     * @return string
+     */
+    public function getQuestionIdentifierString(): ?string
+    {
+        $str = sprintf(_('Question %d'), $this->questionNumber + 1);
+        if ($this->isMultiPartQuestion && $this->questionPartCount > 1) {
+          $str .= ' ' . sprintf(_('Part %d of %d'), $this->questionPartNumber + 1,
+            $this->questionPartCount);
+        }
+        return $str;
     }
 
     /**

@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 include("../includes/htmlutil.php");
-
+require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -47,14 +47,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$aver = $row['ver'];
 	$modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
 
-	if (isset($_GET['grp'])) {
-		setsecurecookie('groupopt'.$aid, Sanitize::onlyInt($_GET['grp']));
-	}
+	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
-		setsecurecookie('selfrom'.$aid, Sanitize::stripHtmlTags($_GET['selfrom']));
+		$_SESSION['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
 	} else {
-		if (!isset($_COOKIE['selfrom'.$aid])) {
-			setsecurecookie('selfrom'.$aid, 'lib');
+		if (!isset($_SESSION['selfrom'.$aid])) {
+			$_SESSION['selfrom'.$aid] = 'lib';
 		}
 	}
 
@@ -95,10 +93,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$viddata = $row[1];
 			if ($viddata != '') {
-				if ($row[0]=='') {
-					$nextnum = 0;
-				} else {
-					$nextnum = substr_count($row[0],',')+1;
+				$nextnum = 0;
+				if ($row[0]!='') {
+					foreach (explode(',', $row[0]) as $iv) {
+						if (strpos($iv,'|')!==false) {
+							$choose = explode('|', $iv);
+							$nextnum += $choose[0];
+						} else {
+							$nextnum++;
+						}
+					}
 				}
 				$numnew= count($checked);
 				$viddata = unserialize($viddata);
@@ -145,12 +149,34 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
+			$grades = array();
 			if ($aver > 1) {
+				$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+				$stm->execute(array(':assessmentid'=>$aid));
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			    $grades[$row['userid']]=$row["score"];
+				}
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 			} else {
+				$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid'=>$aid));
+        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+          $sp = explode(';', $row['bestscores']);
+          $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+          $total = array_sum(explode(',', $as));
+          $grades[$row['userid']] = $total;
+        }
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 			}
 			$stm->execute(array(':assessmentid'=>$aid));
+			if ($stm->rowCount()>0) {
+        TeacherAuditLog::addTracking(
+          $cid,
+          "Clear Attempts",
+          $aid,
+          array('grades'=>$grades)
+        );
+      }
 			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
@@ -329,7 +355,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require_once('../assess2/AssessRecord.php');
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
 				$assess_info->loadQuestionSettings();
-				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+				$DBH->beginTransaction();
+				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
 		    $stm->execute(array($aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -348,6 +375,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						calcandupdateLTIgrade($row['lti_sourcedid'], $aid, $row['userid'], $updatedScore, true);
 					}
 				}
+				$DBH->commit();
 			} else {
 				$stm = $DBH->prepare("SELECT id,questions,bestscores,lti_sourcedid,userid FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));
@@ -424,13 +452,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	$address = $GLOBALS['basesiteurl'] . "/course/$addassess?cid=$cid&aid=$aid";
-
+	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 	$placeinhead = "<script type=\"text/javascript\">
-		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
+		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
 		var addqaddr = '$address';
 		var assessver = '$aver';
 		</script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=030818\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=042220\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=041120\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -489,8 +517,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	$grp0Selected = "";
-	if (isset($_COOKIE['groupopt'.$aid])) {
-		$grp = $_COOKIE['groupopt'.$aid];
+	if (isset($_SESSION['groupopt'.$aid])) {
+		$grp = $_SESSION['groupopt'.$aid];
 		$grp1Selected = ($grp==1) ? " selected" : "";
 	} else {
 		$grp = 0;
@@ -638,7 +666,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	unset($questionjsarr);
 
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
-	if ($_COOKIE['selfrom'.$aid]=='lib') { //selecting from libraries
+	if ($_SESSION['selfrom'.$aid]=='lib') { //selecting from libraries
 
 		//remember search
 		if (isset($_POST['search'])) {
@@ -646,32 +674,32 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$safesearch = str_replace(' and ', ' ',$safesearch);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			setsecurecookie('lastsearch'.$cid, $safesearch);
+			$_SESSION['lastsearch'.$cid] = $safesearch; ///str_replace(" ","+",$safesearch);
 			if (isset($_POST['searchall'])) {
 				$searchall = 1;
 			} else {
 				$searchall = 0;
 			}
-			setsecurecookie('searchall'.$cid, $searchall);
+			$_SESSION['searchall'.$cid] = $searchall;
 			if (isset($_POST['searchmine'])) {
 				$searchmine = 1;
 			} else {
 				$searchmine = 0;
 			}
-			setsecurecookie('searchmine'.$cid, $searchmine);
+			$_SESSION['searchmine'.$cid] = $searchmine;
 			if (isset($_POST['newonly'])) {
 				$newonly = 1;
 			} else {
 				$newonly = 0;
 			}
-			setsecurecookie('searchnewonly'.$cid, $newonly);
-		} else if (isset($_COOKIE['lastsearch'.$cid])) {
-			$safesearch = trim($_COOKIE['lastsearch'.$cid]);
+			$_SESSION['searchnewonly'.$cid] = $newonly;
+		} else if (isset($_SESSION['lastsearch'.$cid])) {
+			$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$searchall = $_COOKIE['searchall'.$cid];
-			$searchmine = $_COOKIE['searchmine'.$cid];
-			$newonly = $_COOKIE['searchnewonly'.$cid];
+			$searchall = $_SESSION['searchall'.$cid];
+			$searchmine = $_SESSION['searchmine'.$cid];
+			$newonly = $_SESSION['searchnewonly'.$cid];
 		} else {
 			$search = '';
 			$searchall = 0;
@@ -702,12 +730,28 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						unset($searchterms[$k]);
 					}
 				}
-				if (count($searchterms)>0) {
-					$searchlikes .= "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-					foreach ($searchterms as $t) {
-						$searchlikevals[] = "%$t%";
+				$wholewords = array();
+				foreach ($searchterms as $k=>$v) {
+					if (ctype_alnum($v) && strlen($v)>3) {
+						$wholewords[] = '+'.$v.'*';
+						unset($searchterms[$k]);
 					}
-
+				}
+				if (count($wholewords)>0 || count($searchterms)>0) {
+					$searchlikes .= '(';
+					if (count($wholewords)>0) {
+						$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(? IN BOOLEAN MODE) ';
+						$searchlikevals[] = implode(' ', $wholewords);
+					}
+					if (count($searchterms)>0) {
+						if (count($wholewords)>0) {
+							$searchlikes .= 'AND ';
+						}
+						$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+						foreach ($searchterms as $t) {
+							$searchlikevals[] = "%$t%";
+						}
+					}
 					if (ctype_digit($safesearch)) {
 						$searchlikes .= "OR imas_questionset.id=?) AND ";
 						$searchlikevals[] = $safesearch;
@@ -724,19 +768,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$_POST['libs'] = $userdeflib;
 			}
 			$searchlibs = $_POST['libs'];
-			setsecurecookie('lastsearchlibs'.$aid, $searchlibs);
+			//$_SESSION['lastsearchlibs'] = implode(",",$searchlibs);
+			$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
 		} else if (isset($_GET['listlib'])) {
 			$searchlibs = $_GET['listlib'];
-			setsecurecookie('lastsearchlibs'.$aid, $searchlibs);
+			$_SESSION['lastsearchlibs'.$aid] = $searchlibs;
 			$searchall = 0;
-			setsecurecookie('searchall'.$aid, $searchall);
-			setsecurecookie('lastsearch'.$aid, '');
+			$_SESSION['searchall'.$aid] = $searchall;
+			$_SESSION['lastsearch'.$aid] = '';
 			$searchlikes = '';
 			$searchlikevals = array();
 			$search = '';
 			$safesearch = '';
-		}else if (isset($_COOKIE['lastsearchlibs'.$aid])) {
-			$searchlibs = $_COOKIE['lastsearchlibs'.$aid];
+		}else if (isset($_SESSION['lastsearchlibs'.$aid])) {
+			//$searchlibs = explode(",",$_SESSION['lastsearchlibs']);
+			$searchlibs = $_SESSION['lastsearchlibs'.$aid];
 		} else {
 			if (isset($CFG['AMS']['guesslib']) && count($existingq)>0) {
 				$maj = count($existingq)/2;
@@ -991,20 +1037,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		}
 
-	} else if ($_COOKIE['selfrom'.$aid]=='assm') { //select from assessments
+	} else if ($_SESSION['selfrom'.$aid]=='assm') { //select from assessments
 
 		if (isset($_GET['clearassmt'])) {
-			setsecurecookie('aidstolist'.$aid, '', time()-3600);
-			unset($_COOKIE['aidstolist'.$aid]);
+			unset($_SESSION['aidstolist'.$aid]);
 		}
 		if (isset($_POST['achecked'])) {
 			if (count($_POST['achecked'])!=0) {
 				$aidstolist = $_POST['achecked'];
-				setsecurecookie('aidstolist'.$aid, implode(',', $aidstolist));
+				$_SESSION['aidstolist'.$aid] = $aidstolist;
 			}
 		}
-		if (isset($_COOKIE['aidstolist'.$aid])) { //list questions
-			$aidlist = implode(',', array_map('intval', explode(',', $_COOKIE['aidstolist'.$aid])));
+		if (isset($_SESSION['aidstolist'.$aid])) { //list questions
+			$aidlist = implode(',', array_map('intval', $_SESSION['aidstolist'.$aid]));
 			$stm = $DBH->query("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$aidnames[$row[0]] = $row[1];
@@ -1017,7 +1062,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$x=0;
 			$page_assessmentQuestions = array();
-			foreach (explode(',', $_COOKIE['aidstolist'.$aid]) as $aidq) {
+			foreach ($_SESSION['aidstolist'.$aid] as $aidq) {
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid=:assessmentid";
 				$stm = $DBH->prepare($query);
@@ -1135,7 +1180,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 /******* begin html output ********/
 //hack to prevent the page breaking on accessible mode
-$origuseed = $_SESSION['useed'];
 $_SESSION['useed'] = 1;
  require("../header.php");
 
@@ -1181,7 +1225,7 @@ if ($overwriteBody==1) {
 		echo "<img src=\"$imasroot/img/help.gif\" alt=\"Help\"/> ";
 		echo _('How do I find questions to add?'),'</a>';
 		echo '<div id="helpwithadding" style="display:none">';
-		if ($_COOKIE['selfrom'.$aid]=='lib') {
+		if ($_SESSION['selfrom'.$aid]=='lib') {
 			echo "<p>",_("You are currently set to select questions from the question libraries.  If you would like to select questions from assessments you've already created, click the <b>Select From Assessments</b> button below"),"</p>";
 			echo "<p>",_("To find questions to add from the question libraries:");
 			echo "<ol><li>",_("Click the <b>Select Libraries</b> button below to pop open the library selector"),"</li>";
@@ -1189,7 +1233,7 @@ if ($overwriteBody==1) {
 			echo " <li>",_("Scroll down in the library selector, and click the <b>Use Libraries</b> button"),"</li> ";
 			echo " <li>",_("On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries"),"</li>";
 			echo "</ol>";
-		} else if ($_COOKIE['selfrom'.$aid]=='assm') {
+		} else if ($_SESSION['selfrom'.$aid]=='assm') {
 			echo "<p>",_("You are currently set to select questions existing assessments.  If you would like to select questions from the question libraries, click the <b>Select From Libraries</b> button below"),"</p>";
 			echo "<p>",_("To find questions to add from existing assessments:");
 			echo "<ol><li>",_("Use the checkboxes to select the assessments you want to pull questions from"),"</li>";
@@ -1249,7 +1293,7 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<p>
-		<button type="button" title=<?php echo '"'._("Exit back to course page"),'"'; ?> onClick="window.location='course.php?cid=<?php echo $cid ?>'"><?php echo _("Done"); ?></button>
+		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
 		<button type="button" title=<?php echo '"'._("Modify assessment settings").'"'; ?> onClick="window.location='<?php echo $address;?>?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"><?php echo _("Assessment Settings"); ?></button>
 		<button type="button" title=<?php echo '"'._("Categorize questions by outcome or other groupings").'"'; ?> onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"><?php echo _("Categorize Questions"); ?></button>
 		<button type="button" onClick="window.location='<?php
@@ -1274,7 +1318,7 @@ if ($overwriteBody==1) {
 //<input type=button value="Select Libraries" onClick="libselect()">
 
 	//POTENTIAL QUESTIONS
-	if ($_COOKIE['selfrom'.$aid]=='lib') { //selecting from libraries
+	if ($_SESSION['selfrom'.$aid]=='lib') { //selecting from libraries
 		if (!$beentaken) {
 ?>
 
@@ -1399,11 +1443,11 @@ if ($overwriteBody==1) {
 					echo '<br>'._('Showing ').($offset+1).'-'.($offset + 300).'. ';
 					if ($offset>0) {
 						$prevoffset = max($offset-300, 0);
-						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$prevoffset\">"._('Previous').'</a> ';
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$prevoffset\" onclick=\"return prePageChange()\">"._('Previous').'</a> ';
 					}
 					if ($searchlimited) {
 						$nextoffset = $offset+300;
-						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$nextoffset\">"._('Next').'</a> ';
+						echo "<a href=\"addquestions.php?cid=$cid&aid=$aid&offset=$nextoffset\" onclick=\"return prePageChange()\">"._('Next').'</a> ';
 					}
 					echo '</i></td></tr>';
 				}
@@ -1422,7 +1466,7 @@ if ($overwriteBody==1) {
 			}
 		}
 
-	} else if ($_COOKIE['selfrom'.$aid]=='assm') { //select from assessments
+	} else if ($_SESSION['selfrom'.$aid]=='assm') { //select from assessments
 ?>
 
 	<h2><?php echo _('Potential Questions'); ?></h2>
@@ -1430,7 +1474,7 @@ if ($overwriteBody==1) {
 <?php
 		if (isset($_POST['achecked']) && (count($_POST['achecked'])==0)) {
 			echo "<p>",_("No Assessments Selected.  Select at least one assessment."),"</p>";
-		} elseif (isset($_COOKIE['aidstolist'.$aid])) { //list questions
+		} elseif (isset($_SESSION['aidstolist'.$aid])) { //list questions
 ?>
 	<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
 
@@ -1541,4 +1585,4 @@ if ($overwriteBody==1) {
 }
 
 require("../footer.php");
-$_SESSION['useed'] = $origuseed;
+?>

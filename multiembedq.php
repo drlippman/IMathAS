@@ -20,7 +20,7 @@
     */
 
 $init_skip_csrfp = true;
-$init_session_start = true;
+$inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 require("./init_without_validate.php");
 unset($init_skip_csrfp);
 

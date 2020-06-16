@@ -147,9 +147,9 @@ class MathParser
     //build regex's for matching symbols
     $allwords = array_merge($this->functions, $this->variables);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
-    $this->regex = '/^('.implode('|',$allwords).')/';
-    $this->funcregex = '/^('.implode('|',$this->functions).')/i';
-    $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', $this->variables).')/';
+    $this->regex = '/^('.implode('|',array_map('preg_quote', $allwords)).')/';
+    $this->funcregex = '/^('.implode('|',array_map('preg_quote', $this->functions)).')/i';
+    $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', array_map('preg_quote', $this->variables)).')/';
 
     //define operators
     $this->operators = [
@@ -209,10 +209,15 @@ class MathParser
   public function parse($str) {
     // Rewrite sin^(-1) as arcsin
     $str = str_replace(
-      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)","sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
-      array("arcsin","arccos","arctan","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
+      array("sin^-1","cos^-1","tan^-1","sin^(-1)","cos^(-1)","tan^(-1)",
+        "sec^-1","csc^-1","cot^-1","sec^(-1)","csc^(-1)","cot^(-1)",
+        "sinh^-1","cosh^-1","tanh^-1","sinh^(-1)","cosh^(-1)","tanh^(-1)"),
+      array("arcsin","arccos","arctan","arcsin","arccos","arctan",
+        "arcsec","arccsc","arccot","arcsec","arccsc","arccot",
+        "arcsinh","arccosh","arctanh","arcsinh","arccosh","arctanh"),
       $str
     );
+
     $str = str_replace(array('\\','[',']'), array('','(',')'), $str);
     $this->tokenize($str);
     $this->handleImplicit();
@@ -704,7 +709,9 @@ class MathParser
     } else if ($node['type'] === 'function') {
       // find the value of the input to the function
       $insideval = $this->evalNode($node['input']);
-
+      if (isset($node['index'])) {
+        $indexval = $this->evalNode($node['index']);
+      }
       $funcname = $node['symbol'];
       // check for syntax errors or domain issues
       switch ($funcname) {
@@ -717,12 +724,19 @@ class MathParser
           if ($insideval <= 0) {
             throw new MathParserException("Invalid input to $funcname");
           }
+          if ($indexval <= 0) {
+            throw new MathParserException("Invalid base to $funcname");
+          }
           break;
         case 'arcsin':
         case 'arccos':
+          if ($insideval < -1 || $insideval > 1) {
+            throw new MathParserException("Invalid input to $funcname");
+          }
+          break;
         case 'arcsec':
         case 'arccsc':
-          if ($insideval < -1 || $insideval > 1) {
+          if ($insideval > -1 && $insideval < 1) {
             throw new MathParserException("Invalid input to $funcname");
           }
           break;
@@ -739,7 +753,7 @@ class MathParser
           }
           break;
         case 'nthroot':
-          if ($node['index']%2==0 && $insideval<0) {
+          if ($indexval%2==0 && $insideval<0) {
             throw new MathParserException("no even root of negative");
           }
           break;
@@ -754,7 +768,7 @@ class MathParser
       //rewrite arctan to atan to match php function name
       $funcname = str_replace('arc', 'a', $funcname);
       if (!empty($node['index'])) {
-        return call_user_func($funcname, $insideval, $this->evalNode($node['index']));
+        return call_user_func($funcname, $insideval, $indexval);
       }
       return call_user_func($funcname, $insideval);
     } else if ($node['symbol'] === '~') {
@@ -1268,4 +1282,7 @@ function sign($a,$str=false) {
 	} else {
 		return ($a<0)?-1:1;
 	}
+}
+function sgn($a) {
+	return ($a==0)?0:(($a<0)?-1:1);
 }

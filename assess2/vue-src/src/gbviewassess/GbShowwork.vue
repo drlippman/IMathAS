@@ -1,5 +1,5 @@
 <template>
-  <div class = "questionpane" v-if="!!work">
+  <div class = "questionpane viewworkwrap" v-if="!!work">
     <div>
       <button type="button" class="slim"
         @click = "show = !show"
@@ -36,6 +36,7 @@ export default {
       setTimeout(window.drawPics, 100);
       window.rendermathnode(this.$refs.workbox);
       window.initlinkmarkup(this.$refs.workbox);
+      window.$(this.$refs.workbox).find('img').on('click', window.rotateimg);
       this.rendered = true;
     }
   },

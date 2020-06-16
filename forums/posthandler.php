@@ -26,7 +26,7 @@ if ($caller=="posts") {
 	$returnname = "Forum Topics";
 }
 if (!empty($_GET['embed'])) {
-	$returnurl = "embeddone.php?embed=true";
+	$returnurl .= '&embed=true';
 }
 
 $now = time();
@@ -311,7 +311,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$files = implode('@@',$files);
 		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
 		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
-
+		if (!empty($_GET['embed'])) {
+			$returnurl = "embeddone.php?embed=true";
+		}
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //display mod
@@ -466,7 +468,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						if (!$isgroupedq) {
 							$query = "SELECT ift.id FROM imas_forum_posts AS ifp JOIN imas_forum_threads AS ift ON ifp.threadid=ift.id AND ifp.parent=0 ";
 							$query .= "WHERE ifp.subject=:subject AND ift.forumid=:forumid";
-							$array = array(':forumid'=>$forumid, ':subject'=>$line['subject']);
+							$array = array(':forumid'=>$forumid, ':subject'=>trim(strip_tags(htmlentities(html_entity_decode($line['subject'])))));
 							if ($groupsetid >0 && !$isteacher) {
 								$query .= " AND ift.stugroupid=:groupid";
 								$array[':groupid'] =$groupid;

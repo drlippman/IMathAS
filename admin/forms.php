@@ -167,7 +167,8 @@ switch($_GET['action']) {
 			$oldrights = $line['rights'];
 			$oldspecialrights = $line['specialrights'];
 		}
-		echo '<script type="text/javascript">
+		?>
+		<script type="text/javascript">
 			function onrightschg() {
 				var selrights = this.value;
 				if (selrights<75) {
@@ -191,11 +192,46 @@ switch($_GET['action']) {
 					if ($(this).text().toLowerCase()==proposedgroup) {
 						alert("That group name already exists!");
 						$("#group").val(this.value).trigger("change");
-						break;
+						return false;
 					}
 				});
 			}
-			</script>';
+			function searchgrps() {
+				var grpsearch = document.getElementById("grpsearch").value;
+				if (grpsearch.trim() !== '') {
+					$.ajax({
+						type: "POST",
+						url: "groupsearch.php",
+						dataType: "json",
+						data: {
+							"grpsearch": grpsearch
+						}
+					}).done(function(msg) {
+						var existing = [];
+						$("#group option").each(function(i,el) {
+							if (i>2) {
+								$(el).remove();
+							} else {
+								existing.push(el.value);
+							}
+						});
+						for (var i=0; i<msg.length; i++) {
+							if (existing.indexOf(msg[i].id) !== -1) { continue; }
+							$("#group").append($("<option>", {
+								value: msg[i].id,
+								text: msg[i].name
+							}));
+						}
+						if (document.getElementById("group").options.length > 3) {
+							document.getElementById("group").selectedIndex = 3;
+						} else {
+							document.getElementById("group").selectedIndex = document.getElementById("group").options.length-1;
+						}
+					});
+				}
+			}
+			</script>
+		<?php
 		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=SID ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
@@ -289,22 +325,27 @@ switch($_GET['action']) {
 		echo '</span><br class="form"/>';
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
-			echo "<span class=form>Assign to group: </span>";
-			echo "<span class=formright><select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
+			echo "<span class=form>Group: </span>";
+			echo "<span class=formright>";
+			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
+			echo "<label for=\"group\">Assign to:</label> <select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
 			echo '<option value="-1">New Group</option>';
 			echo "<option value=0 ";
 			if ($oldgroup==0) {
 				echo "selected=1";
 			}
 			echo ">Default</option>\n";
-			$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				printf('<option value="%d" ', Sanitize::onlyInt($row[0]));
-				if ($oldgroup==$row[0]) {
-					echo "selected=1";
+			if ($oldgroup > 0) {
+				$stm = $DBH->prepare("SELECT id,name FROM imas_groups WHERE id=?");
+				$stm->execute(array($oldgroup));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					printf('<option value="%d" ', Sanitize::onlyInt($row[0]));
+					if ($oldgroup==$row[0]) {
+						echo "selected=1";
+					}
+					$row[1] = preg_replace('/\s+/', ' ', trim($row[1]));
+					printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 				}
-				$row[1] = preg_replace('/\s+/', ' ', trim($row[1]));
-				printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 			}
 			echo "</select>";
 			echo '<span id="newgroup" style="display:none"><br/>New group name: ';
@@ -694,7 +735,7 @@ switch($_GET['action']) {
 		if ($_GET['action']=='addcourse' && $ctc>0) {
 			if ($sourceUIver < 2) {
 				echo '<span class=form>'._('Upgrade assessment version').'</span>';
-				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
+				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
 				echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
 				echo '</label></span><br class=form>';
 			}
@@ -718,9 +759,9 @@ switch($_GET['action']) {
 			echo '</div>';
 
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
-			echo '<span class=form>'._('Use new assessment version').'</span>';
-			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1"/>';
-			echo _('Select this option to set your new course to use the new version of assessments.');
+			echo '<span class=form>'._('Assessment version').'</span>';
+			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
+			echo _('Use the new version of assessments.');
 			echo '</label></span><br class=form>';
 		}
 		//Start grouping: Availability and Access
@@ -1525,7 +1566,7 @@ switch($_GET['action']) {
 			} else if (count($words)==1) {
 				$query .= "(iu.LastName LIKE ? OR iu.FirstName Like ? OR iu.SID LIKE ?)";
 				array_push($qarr, $words[0].'%', $words[0].'%', '%'.$words[0].'%');
-			} else if (count($words)==2) {
+			} else if (count($words)>1) {
 				$query .= "((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
 				array_push($qarr, $words[0].'%', $words[1].'%', $words[1].'%', $words[0].'%');
 			}

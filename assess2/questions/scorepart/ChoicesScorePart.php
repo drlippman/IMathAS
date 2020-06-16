@@ -29,6 +29,7 @@ class ChoicesScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $isRescore = $this->scoreQuestionParams->getIsRescore();
 
         $defaultreltol = .0015;
 
@@ -49,7 +50,8 @@ class ChoicesScorePart implements ScorePart
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
-            return false;
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
         }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
@@ -73,26 +75,30 @@ class ChoicesScorePart implements ScorePart
             $randkeys = $RND->array_rand($questions,count($questions));
             $RND->shuffle($randkeys);
         }
-        if ($givenans==='NA' || $givenans === null) {
+
+        if ($givenans==='NA' || $givenans === null || $isRescore) {
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else {
             $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
         }
 
-        if ($givenans=='NA') {
+        if ($givenans ==='NA' || $givenans === null) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
+
         $anss = explode(' or ',$answer);
         foreach ($anss as $k=>$v) {
             $anss[$k] = intval($v);
         }
         //if ($randkeys[$givenans] == $answer) {return 1;} else { return 0;}
-        if (in_array($randkeys[$givenans],$anss)) {
+        $adjGiven = $isRescore ? $givenans : $randkeys[$givenans];
+
+        if (in_array($adjGiven,$anss)) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
-        } else if (isset($partialcredit) && isset($creditweight[$randkeys[$givenans]])) {
-            $scorePartResult->setRawScore($creditweight[$randkeys[$givenans]]);
+        } else if (isset($partialcredit) && isset($creditweight[$adjGiven])) {
+            $scorePartResult->setRawScore($creditweight[$adjGiven]);
             return $scorePartResult;
         } else {
             $scorePartResult->setRawScore(0);

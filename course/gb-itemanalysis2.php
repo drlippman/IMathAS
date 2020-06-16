@@ -11,8 +11,8 @@
 		echo "This page not available to students";
 		exit;
 	}
-	if (isset($_COOKIE[$cid.'gbmode'])) {
-		$gbmode = $_COOKIE[$cid.'gbmode'];
+	if (isset($_SESSION[$cid.'gbmode'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -35,9 +35,9 @@
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			setsecurecookie($cid.'secfilter', $secfilter);
-		} else if (isset($_COOKIE[$cid.'secfilter'])) {
-			$secfilter = $_COOKIE[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
@@ -68,7 +68,7 @@
 	$placeinhead = '<script type="text/javascript">';
 	$placeinhead .= '$(function() {$("a[href*=\'gradeallq\']").attr("title","'._('Grade this question for all students').'");});';
 	$placeinhead .= 'function previewq(qn) {';
-	$placeinhead .= "var addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid='+qn;";
+	$placeinhead .= "var addr = '$imasroot/course/testquestion2.php?cid=$cid&qsetid='+qn;";
 	$placeinhead .= "window.open(addr,'Testing','width=400,height=300,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
 	$placeinhead .= "}\n</script>";
 	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';
@@ -184,7 +184,7 @@
                 // Figure out if any part of the question is incomplete.
                 // Skip if a score override is set.  TODO: actually look per-part
                 $untried = array_keys($scoredQuestion['scored_try'], -1);
-								if (!empty($scoredQuestion['scoreoverride'])) {
+								if (!empty($scoredQuestion['scoreoverride']) && is_array($scoredQuestion['scoreoverride'])) {
 									$overridden = array_keys($scoredQuestion['scoreoverride']);
 									if (count(array_diff($untried, $overridden)) > 0) {
 										$qincomplete[$questionId] += 1;
@@ -344,13 +344,13 @@
 				$pts = $defpoints;
 			}
 			if ($qcnt[$qid]>0) {
-				$avg = round($qtotal[$qid]/$qcnt[$qid],2);
+				$avg = $qtotal[$qid]/$qcnt[$qid];
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
-					$avg2 = round($qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2); //avg adjusted for not attempted
+					$avg2 = $qtotal[$qid]/($qcnt[$qid] - $qincomplete[$qid]); //avg adjusted for not attempted
 				} else {
 					$avg2 = 0;
 				}
-				$avgscore[$i-1] = $avg;
+				$avgscore[$i-1] = round($avg*$pts,2);
 				$qs[$i-1] = $qid;
 
 				if ($pts>0) {

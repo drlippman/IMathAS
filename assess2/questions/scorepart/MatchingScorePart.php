@@ -31,6 +31,7 @@ class MatchingScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $isRescore = $this->scoreQuestionParams->getIsRescore();
 
         $defaultreltol = .0015;
 
@@ -64,6 +65,22 @@ class MatchingScorePart implements ScorePart
 
         $origla = array();
         for ($i=0;$i<count($questions);$i++) {
+          if ($isRescore) {
+            $origla = explode('|', $givenans);
+            if ($origla[$i] != '') {
+              if (isset($matchlist)) {
+                if ($matchlist[$i] != $origla[$i]) {
+                  $score -= $deduct;
+                }
+              } else {
+                if ($i != $origla[$i]) {
+                  $score -= $deduct;
+                }
+              }
+            } else {
+              $score -= $deduct;
+            }
+          } else {
             if ($_POST["qn$qn-$i"]!="" && $_POST["qn$qn-$i"]!="-") {
                 $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
@@ -77,8 +94,10 @@ class MatchingScorePart implements ScorePart
                     }
                 }
             } else {$origla[$randqkeys[$i]] = '';$score -= $deduct;}
+          }
         }
         ksort($origla);
+
         // only store unrandomized
         $scorePartResult->setLastAnswerAsGiven(implode('|', $origla));
         $scorePartResult->setRawScore($score);

@@ -14,14 +14,13 @@ if (isset($teacherid) || isset($tutorid)) {
 } else {
 	$viewall = false;
 }
-
-if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($_COOKIE['folder'.$cid])) {
+if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($_SESSION['folder'.$cid])) {
 	$_GET['folder'] = '0';
-	setsecurecookie('folder'.$cid, '0');
-} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($_COOKIE['folder'.$cid]) || $_COOKIE['folder'.$cid]!=$_GET['folder'])) {
-	setsecurecookie('folder'.$cid, $_GET['folder']);
-} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($_COOKIE['folder'.$cid])) {
-	$_GET['folder'] = $_COOKIE['folder'.$cid];
+	$_SESSION['folder'.$cid] = '0';
+} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($_SESSION['folder'.$cid]) || $_SESSION['folder'.$cid]!=$_GET['folder'])) {
+	$_SESSION['folder'.$cid] = $_GET['folder'];
+} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($_SESSION['folder'.$cid])) {
+	$_GET['folder'] = $_SESSION['folder'.$cid];
 }
 
 if (isset($_GET['recordbookmark'])) {  //for recording bookmarks into the student's record
@@ -415,7 +414,7 @@ function printlist($items) {
 					 }
 					 if ($line['ver'] > 1) {
 						 if (!empty($CFG['assess2-use-vue-dev'])) {
-							 $out .= '<a tabindex="-1" href="http://localhost:8080/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
+							 $out .= '<a tabindex="-1" href="'.$CFG['assess2-use-vue-dev-address'].'/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
 						 } else {
 						 	$out .= '<a tabindex="-1" href="'.$imasroot.'/assess2/?cid='.$cid.'&amp;aid='.$typeid.'" '.$onclick.' target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
 						 }

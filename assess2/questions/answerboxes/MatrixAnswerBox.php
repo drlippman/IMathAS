@@ -45,6 +45,7 @@ class MatrixAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
+        if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat="matrix";}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -52,7 +53,7 @@ class MatrixAnswerBox implements AnswerBox
 
 
         if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-    			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+    			$out .= $ansprompt;
     		}
     		if (isset($answersize)) {
     			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
@@ -63,16 +64,23 @@ class MatrixAnswerBox implements AnswerBox
     			}
     			if (!isset($sz)) { $sz = 3;}
     			if ($colorbox=='') {
-    				$out .= '<table id="qnwrap'.$qn.'">';
+    				$out .= '<div id="qnwrap'.$qn.'">';
     			} else {
-    				$out .= '<table class="'.$colorbox.'" id="qnwrap'.$qn.'">';
+    				$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
-    			$out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
+          $arialabel = $this->answerBoxParams->getQuestionIdentifierString();
+          $out .= '<table role="group" aria-label="'.$arialabel.'">';
+          if ($displayformat == 'det') {
+             $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
+          } else {
+  			     $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
+          }
     			$answersize = explode(",",$answersize);
     			$out .= "<table>";
     			$count = 0;
     			$las = explode("|",$la);
-    			for ($row=0; $row<$answersize[0]; $row++) {
+          $cellcnt = $answersize[0]*$answersize[1];
+          for ($row=0; $row<$answersize[0]; $row++) {
     				$out .= "<tr>";
     				for ($col=0; $col<$answersize[1]; $col++) {
     					$out .= '<td>';
@@ -86,7 +94,8 @@ class MatrixAnswerBox implements AnswerBox
     					];
 
     					$out .= '<input ' .
-    									Sanitize::generateAttributeString($attributes) .
+                      'aria-label="'.sprintf(_('Cell %d of %d'), $count+1, $cellcnt).'" ' .
+                      Sanitize::generateAttributeString($attributes) .
     									'" />';
 
     					$out .= "</td>\n";
@@ -94,8 +103,13 @@ class MatrixAnswerBox implements AnswerBox
     				}
     				$out .= "</tr>";
     			}
-    			$out .= "</table>\n";
-    			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
+          $out .= '</table>';
+          if ($displayformat == 'det') {
+            $out .= '</td><td class="matrixdetright">&nbsp;</td></tr></table>';
+          } else {
+            $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
+          }
+          $out .= "</div>\n";
           $params['matrixsize'] = $answersize;
           $params['tip'] = $shorttip;
           $params['longtip'] = $tip;
@@ -127,6 +141,7 @@ class MatrixAnswerBox implements AnswerBox
           $params['longtip'] = $tip;
 
     			$out .= '<input ' .
+                  'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     							Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';

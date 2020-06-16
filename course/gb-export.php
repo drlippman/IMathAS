@@ -10,8 +10,8 @@
 		exit;
 	}
 	$canviewall = true;
-	if (isset($_COOKIE[$cid.'gbmode'])) {
-		$gbmode = $_COOKIE[$cid.'gbmode'];
+	if (isset($_SESSION[$cid.'gbmode'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -249,6 +249,8 @@ function gbInstrCatHdrs(&$gbt, &$pointsrow) {
 					} else {
 						echo '<br/>'.$gbt[0][2][$i][11].'%';
 					}
+				} else if ($pointsln==1) {
+					$pointsrow .= '<th></th>';
 				}
 			}
 

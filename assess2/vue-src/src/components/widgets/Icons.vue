@@ -157,7 +157,7 @@ export default {
   props: ['name', 'size', 'color', 'alt'],
   computed: {
     alttext () {
-      if (this.alt) {
+      if (this.alt || this.alt === '') {
         if (this.alt === '') {
           return '';
         } else {

@@ -10,12 +10,12 @@
   "previous": "Previous",
   "question_n": "Question {n}",
   "launch": {
-    "continue_assess": "Continue Assessment",
-    "retake_assess": "Retake Assessment",
-    "start_assess": "Start Assessment",
+    "continue_assess": "Resume",
+    "retake_assess": "Retake",
+    "start_assess": "Start",
     "timewarning": "This assessment has a time limit. Once you start the assessment, the timer will not pause for any reason.  Are you sure you are ready to start?",
     "resetmsg": "Teachers: you can reset your attempts on this assessment if desired.",
-    "doreset": "Reset Assessment",
+    "doreset": "Reset",
     "view_as_stu": "Acting as student: {name}"
   },
   "closed": {
@@ -41,7 +41,8 @@
     "submit_now": "Submit it now",
     "exit": "Exit",
     "teacher_preview": "This assessment is closed to students, but you can preview it.",
-    "teacher_preview_button": "Preview Assessment"
+    "teacher_preview_button": "Student Preview",
+    "teacher_previewall_button": "Teacher Preview"
   },
   "duedialog": {
     "due": "Due Date Reached",
@@ -104,6 +105,13 @@
     "submit": "Submit Question",
     "checkans": "Check Answer",
     "saveans": "Save Answer",
+    "next": "Next Question",
+    "submit_seqnext": "Submit Part",
+    "checkans_seqnext": "Check Part Answer",
+    "saveans_seqnext": "Next Part",
+    "submit_submitall": "Submit All Parts",
+    "checkans_submitall": "Check All Parts",
+    "saveans_submitall": "Save All Parts",
     "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question.",
     "jump_to_answer": "Jump to Answer",
     "jump_warn": "This will use up your remaining tries at this version of the question.",
@@ -127,7 +135,8 @@
     "work_saved": "Work saved",
     "work_saving": "Saving...",
     "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
-    "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?"
+    "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
+    "preview_all": "Instructor Preview of All Questions"
   },
   "text": {
     "hide": "Hide text",
@@ -142,7 +151,7 @@
     "missing_param": "Missing required parameter on API call",
     "not_avail": "The assessment is not currently available",
     "not_ready": "The assessment is not ready for this action",
-    "not_practice": "The assessment is not longer in practice mode. Go back and open the assessment again.", 
+    "not_practice": "The assessment is not longer in practice mode. Go back and open the assessment again.",
     "timelimit_expired": "Timelimit has expired",
     "timesup_submitting": "Timelimit has expired. Submitting now.",
     "out_of_regens": "No more Try a Similar Question remain",
@@ -395,9 +404,13 @@
     "unsubmitted": "This assessment attempt has not been submitted for grading.",
     "show_tries": "Show all tries",
     "show_penalties": "Show applied penalties",
+    "show_autosaves": "Show autosaves",
     "all_tries": "All Tries",
     "part_n": "Part {n}",
     "try_n": "Try {n}",
+    "autosaves": "Autosaves",
+    "autosave_info": "Autosaves have been entered by the student but not submitted for grading, so are not included in the scoring.",
+    "autosave_byassess": "Autosaves will be scored when the assessment attempt is submitted for scoring.",
     "view_edit": "View/Edit Question",
     "show_all_ans": "Show All Answers",
     "no_versions": "No assessment attempts available to view yet",

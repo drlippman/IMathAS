@@ -127,7 +127,7 @@ const router = new Router({
         // if active attempt or not avail, route to Launch
         if ((store.assessInfo.available === 'yes' ||
           (store.assessInfo.available === 'practice' && store.assessInfo.in_practice)) &&
-          (!store.assessInfo.has_active_attempt)
+          (!store.assessInfo.has_active_attempt || store.assessInfo.submitby === 'by_question')
         ) {
           next();
         } else {

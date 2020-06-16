@@ -53,10 +53,16 @@
 			}
 
 			if ($viddata != '') {
-				if ($itemorder=='') {
-					$nextnum = 0;
-				} else {
-					$nextnum = substr_count($itemorder,',')+1;
+				$nextnum = 0;
+				if ($itemorder!='') {
+					foreach (explode(',', $itemorder) as $iv) {
+						if (strpos($iv,'|')!==false) {
+							$choose = explode('|', $iv);
+							$nextnum += $choose[0];
+						} else {
+							$nextnum++;
+						}
+					}
 				}
 				$numnew= substr_count($newitemorder,',')+1;
 				$viddata = unserialize($viddata);
@@ -158,7 +164,7 @@
 		$pagetitle = "Question Settings";
 		$placeinhead = '<script type="text/javascript">
 			function previewq(qn) {
-			  previewpop = window.open(imasroot+"/course/testquestion.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
+			  previewpop = window.open(imasroot+"/course/testquestion2.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
 			  previewpop.focus();
 			}
 			function chgisgrouped() {

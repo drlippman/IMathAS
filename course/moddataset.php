@@ -86,6 +86,7 @@
 	} else {
 		$frompot = 0;
 	}
+	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
 	$errmsg = '';
@@ -180,12 +181,18 @@
 			$qsetid = intval($_GET['id']);
 			$isok = true;
 			if ($isgrpadmin) {
-				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+				$query = "SELECT iq.id,iq.ownerid,iq.userights,imas_users.groupid FROM imas_questionset AS iq,imas_users ";
 				$query .= "WHERE iq.id=:id AND iq.ownerid=imas_users.id AND (imas_users.groupid=:groupid OR iq.userights>2)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
 				if ($stm->rowCount()==0) {
 					$isok = false;
+				} else {
+					$row = $stm->fetch(PDO::FETCH_ASSOC);
+					if ($row['userights'] > 3 && $row['groupid'] != $groupid) {
+						// is a "allow mod by all" and not in group; cannot change userights
+						$_POST['userights'] = $row['userights'];
+					}
 				}
 				//$query = "UPDATE imas_questionset AS iq,imas_users SET iq.description='{$_POST['description']}',iq.author='{$_POST['author']}',iq.userights='{$_POST['userights']}',";
 				//$query .= "iq.qtype='{$_POST['qtype']}',iq.control='{$_POST['control']}',iq.qcontrol='{$_POST['qcontrol']}',";
@@ -193,12 +200,20 @@
 				//$query .= "WHERE iq.id='{$_GET['id']}' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>2)";
 			}
 			if (!$isadmin && !$isgrpadmin) {  //check is owner or is allowed to modify
-				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+				$query = "SELECT iq.id,iq.ownerid,iq.userights,imas_users.groupid FROM imas_questionset AS iq,imas_users ";
 				$query .= "WHERE iq.id=:id AND iq.ownerid=imas_users.id AND (iq.ownerid=:ownerid OR (iq.userights=3 AND imas_users.groupid=:groupid) OR iq.userights>3)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$_GET['id'], ':ownerid'=>$userid, ':groupid'=>$groupid));
 				if ($stm->rowCount()==0) {
 					$isok = false;
+				} else {
+					$row = $stm->fetch(PDO::FETCH_ASSOC);
+					if ($row['ownerid'] != $userid &&
+						($row['userights'] != 3 || $row['groupid'] != $groupid)
+					) {
+						// cannot change userights
+						$_POST['userights'] = $row['userights'];
+					}
 				}
 			}
 
@@ -502,7 +517,7 @@
 			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
 		}
 		if ($_POST['test']=="Save and Test Question") {
-			$outputmsg .= "<script>addr = '$imasroot/course/testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
+			$outputmsg .= "<script>addr = '$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
 			//echo "function previewit() {";
 			$outputmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
 			$outputmsg .= "previewpop.focus();";
@@ -1226,7 +1241,7 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  '._('Delete?').' <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
+	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  "._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
@@ -1293,7 +1308,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				// Change form action url and testing address
 				if (formAction.indexOf("moddataset.php") > -1) {
 					quickSaveQuestion.url = formAction;
-					quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid="; ?>' + res.id
+					quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid="; ?>' + res.id
 				} else {
 					quickSaveQuestion.errorFunc();
 				}
@@ -1358,7 +1373,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 		});
 	}
 	quickSaveQuestion.url = "<?php echo $formAction; // Sanitized near line 806 ?>&quick=1";
-	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/testquestion.php?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id']); ?>';
+	quickSaveQuestion.testAddr = '<?php echo "$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id']); ?>';
 	// Method to handle errors...
 	quickSaveQuestion.errorFunc = function(){
 		$(".quickSaveNotice").html("Error with Quick Save: try again, or use the \"Save\" option.");

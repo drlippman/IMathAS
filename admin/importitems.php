@@ -628,7 +628,7 @@ if (!(isset($teacherid))) {
 		$filename = getimportfilepath(Sanitize::simplestring($_POST['filekey']));
 		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
 		deleteimport(Sanitize::simplestring($_POST['filekey']));
-		
+
 		$userights = $_POST['userights'];
 		$newlibs = explode(",",array_map('intval',$_POST['libs']));
 
@@ -663,7 +663,8 @@ if (!(isset($teacherid))) {
 
 			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\" >"._("Done")."</a></p>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=$rqp");
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=$rqp$btf");
 		}
 		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION

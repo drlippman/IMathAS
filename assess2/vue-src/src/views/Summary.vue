@@ -22,7 +22,10 @@
                 :data = "ainfo.questions"
               />
             </vue-tab>
-            <vue-tab :name="$t('summary.reshowquestions')">
+            <vue-tab
+              :name="$t('summary.reshowquestions')"
+              v-if="showReviewQ"
+            >
               <template v-slot = "{ active }">
                 <summary-reshow-questions :active="active"/>
               </template>
@@ -83,6 +86,9 @@ export default {
     },
     showScores () {
       return (this.ainfo.showscores === 'during' || this.ainfo.showscores === 'at_end');
+    },
+    showReviewQ () {
+      return (this.ainfo.questions && this.ainfo.questions[0].html !== null);
     },
     hasCategories () {
       let hascat = false;

@@ -30,7 +30,29 @@ if (!empty($newStatus)) {
 	$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=?,reqdata=? WHERE userid=?");
 	$stm->execute(array($newStatus, json_encode($reqdata), $instId));
 
-	if ($newStatus==10) { //deny
+	if ($newStatus==4) { // request more info
+		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$instId));
+		$row = $stm->fetch(PDO::FETCH_ASSOC);
+
+		//call hook, if defined
+		if (function_exists('getMoreInfoMessage')) {
+			$message = getMoreInfoMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+		} else {
+			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
+			$message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
+			$message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status. ';
+			$message .= 'If you believe you should have an instructor account, ';
+			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
+		}
+
+		require_once("../includes/email.php");
+		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
+			$installname._(' Account Status'), $message,
+			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
+			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
+
+	} else if ($newStatus==10) { //deny
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
@@ -143,41 +165,13 @@ function getReqData() {
 		$userdata['email'] = $row['email'];
 		$userdata['id'] = $row['id'];
 		if (isset($userdata['school'])) {
-			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search for Name/School</a>';
+			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search Google for Name/School</a>';
 		}
 		$out[$row['status']][] = $userdata;
 	}
 	array_walk_recursive($out, function(&$item) {
 		$item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
 	});
-	return $out;
-}
-
-function getGroups() {
-	global $DBH;
-	$query = "SELECT s.groupid, ig.name, MAX(s.domain)
-	  FROM (SELECT groupid, SUBSTRING_INDEX(email, '@', -1) AS domain, COUNT(*) AS domainCount
-		  FROM imas_users WHERE rights>10 AND groupid>0
-		  GROUP BY groupid, domain
-	       ) AS s
-	  JOIN (SELECT s.groupid, MAX(s.domainCount) AS MaxdomainCount
-		  FROM (SELECT groupid, SUBSTRING_INDEX(email, '@', -1) AS domain, COUNT(*) AS domainCount
-			FROM imas_users WHERE rights>10 AND groupid>0
-			GROUP BY groupid, domain
-		  ) AS s
-		 GROUP BY s.groupid
-	       ) AS m
-	    ON s.groupid = m.groupid AND s.domainCount = m.MaxdomainCount
-	  JOIN imas_groups AS ig ON s.groupid=ig.id GROUP BY s.groupid ORDER BY ig.name";
-	$stm = $DBH->query($query);
-	$out = array();
-	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		if (empty($row['domain']) || preg_match('/(gmail|yahoo|hotmail|me\.com)/', $row['domain'])) {
-			$row['domain'] = '';
-		}
-		$row['name'] = preg_replace('/\s+/', ' ', trim($row['name']));
-		$out[] = array('id'=>$row['groupid'], 'name'=>$row['name'], 'domain'=>strtolower($row['domain']));
-	}
 	return $out;
 }
 
@@ -192,7 +186,6 @@ if (empty($reqFields)) {
 }
 
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/fuse.min.js\"></script>";
 //$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
@@ -265,10 +258,10 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	    	<button @click="chgStatus(status, userindex, 3)">Probably should be Denied</button>
       	    </span>
       	  </li>
-      	  <li>Group: <select v-model="group">
-      	  	<optgroup v-if="suggestedGroups.length>0" label="Suggested Groups">
-      	  		<option v-for="group in suggestedGroups" :value="group.id">{{group.name}}</option>
-      	  	</optgroup>
+					<li>Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
+						<button type=button @click="searchGroups">Search</button>
+					</li>
+      	  <li v-show="groups !== null">Group: <select v-model="group">
       	  	<optgroup label="groups">
       	  		<option value="-1">New group</option>
       	  		<option value=0>Default</option>
@@ -280,8 +273,11 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	  <li>
       	    <button @click="chgStatus(status, userindex, 11)">Approve Request</button>
       	    <button @click="chgStatus(status, userindex, 10)">Deny Request</button>
+						<span v-if="status!=4">
+      	    	<button @click="chgStatus(status, userindex, 4)">Request More Info</button>
+      	    </span>
       	    <br/>
-      	    With an Approve or Deny, an email is automatically sent to the requester.
+      	    With an Approve, Deny, or Request More Info, an email is automatically sent to the requester.
       	  </li>
       	</ul>
       </li>
@@ -291,37 +287,14 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 </div>
 
 <script type="text/javascript">
-var groups = <?php echo json_encode(getGroups(), JSON_HEX_TAG); ?>;
-function normalizeGroupName(grpname) {
-	grpname = grpname.toLowerCase();
-	grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.|a|the)\b/g, "");
-	grpname = grpname.replace(/\bmt(\.|\b)/, "mount");
-	grpname = grpname.replace(/\bst(\.|\b)/, "saint");
-	return grpname;
-}
-var fuseoptions = {
-  shouldSort: true,
-  tokenize: false,
-  includeScore: true,
-  threshold: 0.3,
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 1,
-  keys: ["normname"]
-};
-var normgroups = [];
-for (i in groups) {
-	normgroups.push({"id": groups[i].id, "name": groups[i].name, "normname":normalizeGroupName(groups[i].name)});
-}
-var fuse = new Fuse(normgroups, fuseoptions);
 
 var app = new Vue({
 	el: '#app',
 	data: {
-		groups: groups,
-		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG); ?>,
-		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG);?>,
+		groups: null,
+		grpsearch: '',
+		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>,
+		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);?>,
 		activeUser: -1,
 		activeUserStatus: -1,
 		activeUserIndex: -1,
@@ -329,47 +302,15 @@ var app = new Vue({
 			0: 'New Account Request',
 			1: 'Needs Investigation',
 			2: 'Waiting for Confirmation',
-			3: 'Probably should be denied'
+			3: 'Probably should be denied',
+			4: 'Waiting for more info'
 		},
 		statusMsg: "",
 		group: 0,
 		newgroup: ""
 	},
 	computed: {
-		suggestedGroups: function() {
-			if (this.activeUser==-1) {
-				return [];
-			}
-			var out = []; var matchedIDs = []; var i;
-			var user = this.toApprove[this.activeUserStatus][this.activeUserIndex];
-			if (user.email.indexOf("@")>-1) {
-				var userEmailDomain = user.email.substr(user.email.indexOf("@")+1).toLowerCase();
-				for (i in groups) {
-					if (userEmailDomain == groups[i].domain) {
-						out.push({"id": groups[i].id, "name": groups[i].name});
-						matchedIDs.push(groups[i].id);
-					}
-				}
-			}
-			if (user.school && user.school != "") {
-				var userGroup = normalizeGroupName(user.school);
-				var results = fuse.search(userGroup);
-				for (i in results) {
-					if (results[i].score>.8) {break;}
-					if (matchedIDs.indexOf(results[i].item.id)!=-1) { continue; }
-					out.push({"id":results[i].item.id, "name": results[i].item.name});
-					if (out.length>12) { break;}
-				}
-			}
-			return out;
-		},
-		suggestedGroupIds: function() {
-			var ids = [];
-			for (i in this.suggestedGroups) {
-				ids.push(this.suggestedGroups[i].id);
-			}
-			return ids;
-		}
+
 	},
 	methods: {
 		toggleActiveUser: function(userid, status, userindex) {
@@ -382,16 +323,28 @@ var app = new Vue({
 				this.activeUserStatus = status;
 				this.activeUserIndex = userindex;
 				this.$nextTick(function() {
-					if (this.suggestedGroups.length>0) {
-						this.group = this.suggestedGroups[0].id;
-					} else {
-						this.group = 0;
-					}
+					this.groups = null;
+					this.group = 0;
 				});
 			}
 		},
+		searchGroups: function () {
+			if (this.grpsearch.trim() == '') { return ;}
+			var self = this;
+			$.ajax({
+				type: "POST",
+				url: "groupsearch.php",
+				dataType: "json",
+				data: {
+					"grpsearch": this.grpsearch
+				}
+			}).done(function(msg) {
+				self.groups = msg;
+				self.group = msg[0].id;
+			});
+		},
 		chgStatus: function(status, userindex, newstatus) {
-			if (newstatus==11 && !this.checkgroupname()) {
+			if (newstatus==11 && this.group===-1 && !this.checkgroupname()) {
 				return false;
 			}
 			this.statusMsg = _("Saving...");
@@ -431,14 +384,27 @@ var app = new Vue({
 			return JSON.parse(JSON.stringify(obj)); //crude
 		},
 		checkgroupname: function() {
-			var proposedgroup = this.newgroup.replace(/^\s+/,"").replace(/\s+$/,"").replace(/\s+/g," ").toLowerCase();
-			for (i in groups) {
-				if (groups[i].name.toLowerCase()==proposedgroup) {
+			var proposedgroup = this.newgroup.replace(/\s+/g," ").trim();
+			var self = this;
+			$.ajax({
+				type: "POST",
+				url: "groupsearch.php",
+				dataType: "json",
+				async: false,
+				data: {
+					"grpsearch": proposedgroup,
+					"exact": true
+				}
+			}).done(function(msg) {
+				if (msg.length === 0) {
+					return true;
+				} else {
 					alert("That group name already exists!");
-					this.group = groups[i].id;
+					self.groups = msg;
+					self.group = msg[0].id;
 					return false;
 				}
-			}
+			});
 			return true;
 		}
 	}

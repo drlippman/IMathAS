@@ -58,6 +58,7 @@ private $now = 0;
 private $qmodcnt = 0;
 private $qsadded = 0;
 private $isadmin = false;
+private $dates_by_lti = 0;
 
 //do the data import
 //$data:  parsed JSON array
@@ -105,10 +106,11 @@ public function importdata($data, $cid, $checked, $options) {
 		$this->options['importlib'] = 0;
 	}
 
-	$stm = $DBH->prepare("SELECT itemorder,blockcnt,ownerid FROM imas_courses WHERE id=?");
+	$stm = $DBH->prepare("SELECT itemorder,blockcnt,ownerid,dates_by_lti FROM imas_courses WHERE id=?");
 	$stm->execute(array($this->cid));
-	list($itemorder, $this->blockcnt, $courseowner) = $stm->fetch(PDO::FETCH_NUM);
+	list($itemorder, $this->blockcnt, $courseowner,$dates_by_lti) = $stm->fetch(PDO::FETCH_NUM);
 	$courseitems = unserialize($itemorder);
+	$this->dates_by_lti = $dates_by_lti;
 
 	if (!empty($this->options['usecourseowner'])) {
 		$this->importowner = $courseowner;
@@ -745,6 +747,9 @@ private function insertAssessment() {
 	if (!in_array('ver', $db_fields['assessment'])) {
 		$db_fields['assessment'][] = 'ver';
 	}
+	if (!in_array('date_by_lti', $db_fields['assessment'])) {
+		$db_fields['assessment'][] = 'date_by_lti';
+	}
 	$contentlen = 0;
 	$tomap = array();
 	$defaults = array();
@@ -802,6 +807,7 @@ private function insertAssessment() {
 		if (!isset($thisitemdata['ver'])) {
 			$thisitemdata['ver'] = 1;
 		}
+		$thisitemdata['date_by_lti'] = empty($this->dates_by_lti) ? 0 : 1;
 		if ($thisitemdata['ver'] < $GLOBALS['courseUIver']) {
 			$thisitemdata = migrateAssessSettings($thisitemdata, $thisitemdata['ver'], $GLOBALS['courseUIver']);
 			$defaults[$toimport] = $thisitemdata;

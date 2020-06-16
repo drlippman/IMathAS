@@ -95,7 +95,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$itemlist = serialize($items);
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']).$btf . "&r=" . Sanitize::randomQueryStringParam());
 	}
 
 	$stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
@@ -132,19 +133,35 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 	}
+	if ((isset($teacherid) || isset($tutorid)) && isset($_GET['inlinetoggle'])) {
+		$inlineid = Sanitize::onlyInt($_GET['inlinetoggle']);
+		$val = Sanitize::onlyInt($_GET['val']);
+		$stm = $DBH->prepare("SELECT text FROM imas_inlinetext WHERE id=? AND courseid=?");
+		$stm->execute(array($inlineid, $cid));
+		$text = $stm->fetchColumn(0);
+		if ($text !== null) {
+			$text = str_replace(' (Active)','',$text);
+			$toggleParts = preg_split('/(<p.*?###[^<>]+?###.*\/p>)/', $text, 0, PREG_SPLIT_DELIM_CAPTURE);
+			$toggleParts[2*$val+1] = preg_replace('/###/', '### (Active)', $toggleParts[2*$val+1], 1);
+			$stm = $DBH->prepare("UPDATE imas_inlinetext SET text=? WHERE id=?");
+			$stm->execute(array(implode('',$toggleParts), $inlineid));
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']).$btf . "&r=" . Sanitize::randomQueryStringParam());
+		}
+	}
 
 	//enable teacher guest access
 	if (isset($instrPreviewId)) {
 		$tutorid = $instrPreviewId;
 	}
 
-	if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($_COOKIE['folder'.$cid])) {
+	if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($_SESSION['folder'.$cid])) {
 		$_GET['folder'] = '0';
-		setsecurecookie('folder'.$cid, '0');
-	} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($_COOKIE['folder'.$cid]) || $_COOKIE['folder'.$cid]!=$_GET['folder'])) {
-		setsecurecookie('folder'.$cid, $_GET['folder']);
-	} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($_COOKIE['folder'.$cid])) {
-		$_GET['folder'] = $_COOKIE['folder'.$cid];
+		$_SESSION['folder'.$cid] = '0';
+	} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($_SESSION['folder'.$cid]) || $_SESSION['folder'.$cid]!=$_GET['folder'])) {
+		$_SESSION['folder'.$cid] = $_GET['folder'];
+	} else if ((!isset($_GET['folder']) || $_GET['folder']=='') && isset($_SESSION['folder'.$cid])) {
+		$_GET['folder'] = $_SESSION['folder'.$cid];
 	}
 	if (!isset($_GET['quickview']) && !isset($_SESSION['quickview'.$cid])) {
 		$quickview = false;
@@ -270,7 +287,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 
 
 	if ($msgset<4) {
-	   $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
+	   $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0 AND deleted<2");
 	   $stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 	   $msgcnt = $stm->fetchColumn(0);
 	   if ($msgcnt>0) {
@@ -330,31 +347,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$newpostscnt = '';
 	}
 
-	//get items with content views, for enabling stats link
-	/*
-	//removed - always showing stats link now.
-	if (isset($teacherid) || isset($tutorid)) {
-		$hasstats = array();
-		$query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$cid' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
-		//not sure this is useful information, since this is in the list posts by name page, and we don't track forum views in content tracking
-		//$query .= "UNION SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),info)) FROM imas_content_track WHERE courseid='$cid' AND type in ('forumpost','forumreply')";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$hasstats[$row[0]] = true;
-		}
-	}
-	*/
-
-	//get read linked items
-	$readlinkeditems = array();
-	if ($coursetheme=='otbsreader.css' && isset($studentid)) {
-		$stm = $DBH->prepare("SELECT DISTINCT typeid FROM imas_content_track WHERE userid=:userid AND type='linkedlink' AND courseid=:courseid");
-		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$readlinkeditems[$row[0]] = true;
-		}
-	}
-
 	//get latepasses
 	if (!isset($teacherid) && !isset($tutorid) && !$inInstrStuView && isset($studentinfo)) {
 	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
@@ -405,6 +397,10 @@ if ($overwriteBody==1) {
 				var toopen = '<?php echo $jsAddress2 ?>add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $cid; ?>';
 				window.location = toopen;
 			}
+		}
+		function chgInlineToggler(el,id) {
+			var toopen = '<?php echo $jsAddress2 ?>course.php?inlinetoggle='+id+'&val='+el.value+'&cid=<?php echo $cid; ?>';
+			window.location = toopen;
 		}
 	</script>
 
@@ -489,17 +485,22 @@ if ($overwriteBody==1) {
 		</p>
 	<?php
 	} else if (!isset($CFG['CPS']['leftnavtools']) || $CFG['CPS']['leftnavtools']!==false) {
-	?>
-		<p><b><?php echo _('Tools'); ?></b><br/>
-			<a href="listusers.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
-	                <a href="coursereports.php?cid=<?php echo $cid ?>">Reports</a><br/>
-			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
-			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
-			<a href="showcalendar.php?cid=<?php echo $cid ?>"><?php echo _('Calendar'); ?></a><br/>
-			<a href="coursemap.php?cid=<?php echo $cid ?>"><?php echo _('Course Map'); ?></a>
-		</p>
-	<?php
+
+		echo '<p><b>' . _('Tools') . '</b><br/>';
+		echo '<a href="listusers.php?cid=' . $cid . '" class="essen">' . _('Roster') . '</a><br/>';
+		echo '<a href="gradebook.php?cid=' . $cid . '" class="essen">' . _('Gradebook') . '</a>';
+		if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}
+		echo '<br/>';
+		echo '<a href="showcalendar.php?cid=' . $cid . '">' . _('Calendar') . '</a><br/>';
+		echo '<a href="coursemap.php?cid=' . $cid . '">' . _('Course Map') . '</a><br/>';
+		echo '<a href="#" class="togglecontrol" aria-controls="navtoolmore">' . _('More...') . '</a>';
+	  echo '<span id="navtoolmore" style="display:none">';
+		echo '<br/>&nbsp;<a href="coursereports.php?cid=' . $cid . '">' . _('Reports') . '</a><br/>';
+		echo '&nbsp;<a href="managestugrps.php?cid=' . $cid . '">' . _('Groups') . '</a><br/>';
+		echo '&nbsp;<a href="addoutcomes.php?cid=' . $cid . '">' . _('Outcomes') . '</a><br/>';
+		echo '&nbsp;<a href="addrubric.php?cid=' . $cid . '">' . _('Rubrics') . '</a>';
+		echo '</span>';
+		echo '</p>';
 	}
 	?>
 
@@ -520,7 +521,7 @@ if ($overwriteBody==1) {
 		<p><b><?php echo _('Course Items'); ?></b><br/>
 			<a href="copyitems.php?cid=<?php echo $cid ?>"><?php echo _('Copy'); ?></a><br/>
 			<a href="../admin/ccexport.php?cid=<?php echo $cid ?>"><?php echo _('Export'); ?></a>
-		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=75) { ?>
+		<?php if (!isset($CFG['GEN']['noimathasimportfornonadmins']) || $myrights>=100) { ?>
 			<br/><a href="../admin/importitems2.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
 		<?php } ?>
 		</p>

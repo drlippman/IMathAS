@@ -42,11 +42,11 @@ if (isset($_POST['message'])) {
 		}
 		if ($sendinfo['sendtype']=='msg') {
 			$now = time();
-			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-			$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
+			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,courseid) VALUES ";
+			$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :courseid)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':title'=>$subject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
-				':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
+				':senddate'=>$now, ':courseid'=>$cid));
 			$msgid = $DBH->lastInsertId();
 
 			$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");

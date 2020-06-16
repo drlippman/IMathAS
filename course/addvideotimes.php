@@ -12,31 +12,35 @@ $aid = Sanitize::onlyInt($_GET['aid']);
 
 //form handling
 
-if (isset($_POST['vidid'])) {
+if (isset($_POST['clearall'])) {
+	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata='' WHERE id=? AND courseid=?");
+	$stm->execute(array($aid,$cid));
+} else if (isset($_POST['vidid'])) {
 	$vidid = $_POST['vidid'];
 	$vidar = $_POST['vidar'];
 	$data = array();
-	$i = 0;
-	while (isset($_POST['segtitle'.$i])) {
-		$n = array();
-		$n[0] = trim(htmlentities($_POST['segtitle'.$i]));
-		$thistime = timetosec($_POST['segend'.$i]);
-		$n[1] = $thistime;
-		if (isset($_POST['qn'.$i])) {
-			$n[2] = $_POST['qn'.$i];
-		}
-		if (isset($_POST['hasfollowup'.$i])) {
-			$n[3] = timetosec($_POST['followupend'.$i]);
-
-			if (isset($_POST['showlink'.$i])) {
-				$n[4] = true;
-			} else {
-				$n[4] = false;
+	foreach ($_POST AS $key=>$val) {
+		if (preg_match('/segtitle(\d+)/', $key, $m)) {
+			$i = $m[1];
+			$n = array();
+			$n[0] = trim(htmlentities($_POST['segtitle'.$i]));
+			$thistime = timetosec($_POST['segend'.$i]);
+			$n[1] = $thistime;
+			if (isset($_POST['qn'.$i])) {
+				$n[2] = $_POST['qn'.$i];
 			}
-			$n[5] = trim(htmlentities($_POST['followuptitle'.$i]));
+			if (isset($_POST['hasfollowup'.$i])) {
+				$n[3] = timetosec($_POST['followupend'.$i]);
+
+				if (isset($_POST['showlink'.$i])) {
+					$n[4] = true;
+				} else {
+					$n[4] = false;
+				}
+				$n[5] = trim(htmlentities($_POST['followuptitle'.$i]));
+			}
+			$data[$thistime] = $n;
 		}
-		$data[$thistime] = $n;
-		$i++;
 	}
 	ksort($data);
 	$data = array_values($data);
@@ -44,6 +48,7 @@ if (isset($_POST['vidid'])) {
 	if (trim($_POST['finalseg'])!='') {
 		array_push($data, array(htmlentities($_POST['finalseg'])));
 	}
+
 	$data = serialize($data);
 	$stm = $DBH->prepare("UPDATE imas_assessments SET viddata=:viddata WHERE id=:id");
 	$stm->execute(array(':viddata'=>$data, ':id'=>$aid));
@@ -64,16 +69,23 @@ $row = $stm->fetch(PDO::FETCH_NUM);
 $qorder = explode(',',$row[0]);
 $viddata = $row[1];
 $qidbynum = array();
+$k = 0;
 for ($i=0;$i<count($qorder);$i++) {
 	if (strpos($qorder[$i],'~')!==false) {
 		$qids = explode('~',$qorder[$i]);
 		if (strpos($qids[0],'|')!==false) { //pop off nCr
-			$qidbynum[$i] = $qids[1];
+			$choose = explode('|', $qids[0]);
+			for ($j=0;$j<$choose[0];$j++) { // add the number from pool we're using
+				$qidbynum[$k] = $qids[1+$j];
+				$k++;
+			}
 		} else {
-			$qidbynum[$i] = $qids[0];
+			$qidbynum[$k] = $qids[0];
+			$k++;
 		}
 	} else {
-		$qidbynum[$i] = $qorder[$i];
+		$qidbynum[$k] = $qorder[$i];
+		$k++;
 	}
 }
 
@@ -159,7 +171,7 @@ if ($viddata != '') {
 	}
 } else {
 	//new video stuff
-	$n = count($qorder);
+	$n = count($qidbynum);
 	$title = array_fill(0, $n, '');
 	$endtime = array_fill(0,$n, '');
 	$qn = range(0, $n-1);
@@ -437,7 +449,10 @@ echo '<a href="#" onclick="addsegat(' . $n . '); return false;">'._('Add video s
 echo '<div class="vidsegblock">';
 echo _('Remainder of video segment title (if any):').' <input type="text" size="20" name="finalseg" value="' . Sanitize::encodeStringForDisplay($finalsegtitle) . '"/></div>';
 echo '<p><button type="submit">'._('Submit').'</button></p>';
+echo '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+echo '<p><button type="submit" name="clearall" value=1 onclick="return confirm(\'Are you SURE? This will delete ALL defined cues.\')">Reset All Cues</button></p>';
 echo '</form>';
+
 require("../footer.php");
 
 ?>

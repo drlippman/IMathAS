@@ -436,6 +436,11 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 			if (($anstype=='matrix' || $anstype=='calcmatrix') && isset($answersize)) {
 				$options['answersize'] = $oldoptionsanswersize;
 			}
+      if ($anstype=='choices' || $anstype=='multans') {
+        $answerbox[$kidx] = str_replace(['<ul class=nomark>','</ul>'],
+          ['<ol style="list-style-type:upper-alpha">', '</ol>'],
+          $answerbox[$kidx]);
+      }
       if (!isset($showanswer)) {
         $showanswer = array();
       }
@@ -448,6 +453,11 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 			unset($options['answersize']); //pandoc doesn't like nested tables
 		}
 		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+    if ($qdata['qtype']=='choices' || $qdata['qtype']=='multans') {
+      $answerbox = str_replace(['<ul class=nomark>','</ul>'],
+        ['<ol style="list-style-type:upper-alpha">', '</ol>'],
+        $answerbox);
+    }
     if (!isset($showanswer)) {
       $showanswer = $shans[0];
     }

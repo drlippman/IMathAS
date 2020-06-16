@@ -79,7 +79,15 @@ function clearparams(paramarr) {
   }
 }
 
-function init(paramarr, enableMQ) {
+function init(paramarr, enableMQ, baseel) {
+  if ($("#arialive").length==0) {
+    $('body').append($('<p>', {
+      id: "arialive",
+      "aria-live": "assertive",
+      "aria-atomic": "true",
+      class: "sr-only"
+    }));
+  }
   var qn, params, i, el, str;
   for (qn in paramarr) {
     if (isNaN(parseInt(qn))) { continue; }
@@ -173,11 +181,11 @@ function init(paramarr, enableMQ) {
         !document.getElementById("tinyprev"+qn)
       ) {
         var html = $("#qn"+qn).val();
-        var div = $("<div>", {"id": "tinyprev"+qn, "class": "intro"});
+        var div = $("<div>", {"id": "tinyprev"+qn, "class": "introtext"});
         div.html(html);
         $("#qn"+qn).hide().after(div);
       } else {
-        initeditor("textareas","mceEditor",null,false,function(ed) {
+        initeditor("selector","#qn" + qn + ".mceEditor",null,false,function(ed) {
           ed.on('blur', function (e) {
             tinymce.triggerSave();
             jQuery(e.target.targetElm).triggerHandler('change');
@@ -187,9 +195,16 @@ function init(paramarr, enableMQ) {
         });
       }
     }
+    if (params.qtype == 'essay') {
+      $("#qnwrap"+qn+".introtext img").on('click', rotateimg);
+    }
     initEnterHandler(qn);
   }
+  initDupRubrics();
   initShowAnswer2();
+  if (baseel) {
+    setScoreMarkers(baseel);
+  }
   initqsclickchange();
   initClearScoreMarkers();
   if (paramarr.scripts) {
@@ -227,12 +242,12 @@ function init(paramarr, enableMQ) {
 // setup tip focus/blur handlers
 function setupTips(id, tip, longtip) {
   var el = document.getElementById(id);
+  if (!el) { return; }
   el.setAttribute('data-tip', tip);
   var ref = id.substr(2).split(/-/)[0];
   if (!document.getElementById("tips"+ref)) {
     $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
   }
-  el.setAttribute('aria-label', tip);
   el.setAttribute('aria-describedby', 'tips'+ref);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
@@ -263,6 +278,10 @@ function clearScoreMarkers(e) {
   var target = e.currentTarget
   if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
     $(target).removeClass(m[0]);
+    $(target).nextAll('.scoremarker.sr-only').first().remove();
+    if (target.tagName.toLowerCase() == 'select') {
+      $(target).nextAll('svg.scoremarker').first().remove();
+    }
     if (target.type == 'hidden') { // may be MQ box
       $("#mqinput-"+target.id).removeClass(m[0]);
     }
@@ -275,6 +294,28 @@ function clearScoreMarkers(e) {
       wrap.find(".scoremarker").remove();
     }
   }
+}
+
+function setScoreMarkers(base) {
+  var svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
+  svgchk += '<span class="sr-only scoremarker">' + _('Correct') + '</span>';
+  var svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
+  svgychk += '<span class="sr-only scoremarker">' + _('Partially correct') + '</span>';
+  var svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+  svgx += '<span class="sr-only scoremarker">' + _('Incorrect') + '</span>';
+  $(base).find('.scoremarker').remove();
+  $(base).find('div.ansgrn,table.ansgrn').append(svgchk);
+  $(base).find('div.ansyel,table.ansyel').append(svgychk);
+  $(base).find('div.ansred,table.ansred').append(svgx);
+  $(base).find('select.ansgrn').after(svgchk);
+  $(base).find('select.ansyel').after(svgychk);
+  $(base).find('select.ansred').after(svgx);
+  $(base).find('span[id^=mqinput-].ansgrn,input[type=text].ansgrn').after('<span class="scoremarker sr-only">' + _('Correct') + '</span>');
+  $(base).find('span[id^=mqinput-].ansyel,input[type=text].ansyel').after('<span class="scoremarker sr-only">' + _('Partially correct') + '</span>');
+  $(base).find('span[id^=mqinput-].ansred,input[type=text].ansred').after('<span class="scoremarker sr-only">' + _('Incorrect') + '</span>');
 }
 
 function initClearScoreMarkers() {
@@ -290,8 +331,10 @@ function initEnterHandler(qn) {
 	$("input[type=text][name=qn"+qn+"]").off("keydown.enterhandler")
 	  .on("keydown.enterhandler", function(e) {
 		if (e.which==13) {
-			e.preventDefault();
 			var btn = $(this).closest(".questionwrap").find(".submitbtnwrap .primary");
+      if (btn.length>0) {
+        e.preventDefault();
+      }
       if (!btn.is(':disabled')) {
         btn.trigger('click');
       }
@@ -306,15 +349,36 @@ function handleMQenter(id) {
   }
 }
 
+function initDupRubrics() {
+  $(".rubriclink").each(function(i,el) {
+    $(el).removeClass("rubriclink");
+    var inref = el.id.substring(16);
+    //var clone = $(el).clone(true, true);
+    if (inref.indexOf('-') !== -1) {
+      var pts = inref.split('-');
+      inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
+    }
+    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref+",div.intro#qnwrap"+inref);
+    if (inbox.length > 0) {
+      inbox.after(el);
+      $(el).show();
+    }
+  });
+}
+
 function initShowAnswer2() {
   var icon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>';
   $("input.sabtn + span.hidden, input.sabtn + div.hidden").each(function(i, el) {
 
     var qref = el.id.substring(3);
     var inref = qref;
+    var label;
     if (inref.indexOf('-') !== -1) {
       var pts = inref.split('-');
       inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
+      label = _('Question ') + (pts[0]*1+1) + _(' Part ') + (pts[1]*1 + 1);
+    } else {
+      label = _('Question ') + (inref*1+1);
     }
     var key = $('<span>', {'class': 'keywrap'}).append(
       $('<button>', {
@@ -322,7 +386,7 @@ function initShowAnswer2() {
         'aria-controls': 'ans'+qref,
         'aria-expanded': 'false',
         'class': 'keybtn',
-        'aria-label': _('View Key'),
+        'aria-label': _('View Key for ') + label,
         title: _('View Key')
       }).on('click', function(e) {
           var curstate = (e.currentTarget.getAttribute('aria-expanded') == 'true');
@@ -340,7 +404,7 @@ function initShowAnswer2() {
         wrap.append(key);
         return;
       }
-      var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref);
+      var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref);
       if (inbox.length > 0) {
         $(el).prev(".sabtn").remove();
         key.append($(el).hide().removeClass("hidden"));
@@ -420,19 +484,22 @@ function setupDraw(qn) {
   window.drawla[qn] = todraw;
   window.canvases[qn] = allParams[qn].canvas;
   imathasDraw.initCanvases(qn);
-  document.getElementById('drawtools'+qn).addEventListener('click', function(event) {
-    var target = event.target;
-    if (target.hasAttribute('data-drawaction')) {
-      var action = target.getAttribute('data-drawaction');
-      var qn = target.getAttribute('data-qn');
-      if (action === 'clearcanvas') {
-        imathasDraw.clearcanvas(qn);
-      } else if (action === 'settool') {
-        var val = target.getAttribute('data-val');
-        imathasDraw.settool(target, qn, val);
+  var drawtools = document.getElementById('drawtools'+qn);
+  if (drawtools) {
+    drawtools.addEventListener('click', function(event) {
+      var target = event.target;
+      if (target.hasAttribute('data-drawaction')) {
+        var action = target.getAttribute('data-drawaction');
+        var qn = target.getAttribute('data-qn');
+        if (action === 'clearcanvas') {
+          imathasDraw.clearcanvas(qn);
+        } else if (action === 'settool') {
+          var val = target.getAttribute('data-val');
+          imathasDraw.settool(target, qn, val);
+        }
       }
-    }
-  });
+    });
+  }
   var a11ydrawbtn = document.getElementById("qn"+qn).parentNode.querySelector(".a11ydrawadd");
   if (a11ydrawbtn) {
     a11ydrawbtn.addEventListener('click', function(event) {
@@ -654,6 +721,10 @@ function normalizemathunicode(str) {
 	return str;
 }
 
+function htmlEntities(str) {
+  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/&/g,'&amp;');
+}
+
 /**
  * Called on preview button click on livepreview timeout
  * Displays rendered preview, along with
@@ -663,10 +734,10 @@ function showPreview(qn) {
   var outstr = '';
   var res = processByType(qn);
   if (res.str) {
-    outstr = '`' + res.str + '`';
+    outstr = '`' + htmlEntities(res.str) + '`';
   }
   if (res.dispvalstr && res.dispvalstr != '' && params.calcformat.indexOf('showval')!=-1) {
-    outstr += (outstr==''?'':' = ') + '`' + res.dispvalstr + '`';
+    outstr += (outstr==''?'':' = ') + '`' + htmlEntities(res.dispvalstr) + '`';
   }
   if (res.err && res.err != '' && res.str != '') {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
@@ -679,6 +750,21 @@ function showPreview(qn) {
     previewel.innerHTML = outstr;
     rendermathnode(previewel);
   }
+  a11ypreview(outstr);
+}
+
+function a11ypreview(str) {
+  var el = $("<div>",{class:"inactive"}).html(str).appendTo("body")[0];
+  rendermathnode(el, function () {
+    var arialiveel = document.getElementById('arialive');
+    arialiveel.innerHTML = '';
+    el.className = '';
+    // replace mathjax spans with aria-label
+    $(el).find("[aria-label]").each(function(i,e) {
+      $(e).html($(e).attr("aria-label"));
+    })
+    arialiveel.appendChild(el);
+  });
 }
 
 var MQsyntaxtimer = null;
@@ -708,6 +794,7 @@ function showSyntaxCheckMQ(qn) {
     var previewel = document.getElementById('p'+qn);
     previewel.innerHTML = outstr;
   }
+  a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
 }
 
 /**
@@ -864,8 +951,8 @@ var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi
 
 function AMnumfuncPrepVar(qn,str) {
   var vars = allParams[qn].vars.slice();
-  var vl = vars.join('|');
-  var fvarslist = allParams[qn].fvars.join('|');
+  var vl = vars.map(escapeRegExp).join('|');
+  var fvarslist = allParams[qn].fvars.map(escapeRegExp).join('|');
   vars.push("DNE");
 
   if (vl.match(/lambda/)) {
@@ -878,7 +965,11 @@ function AMnumfuncPrepVar(qn,str) {
   dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   str = str.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|exp|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
-  	  if (vars[i] == "varE") {
+    // handle double parens
+    if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
+      str = str.replace(/\(\((.*?)\)\)/g,'($1)');
+    }
+  	if (vars[i] == "varE") {
 		  str = str.replace("E","varE");
 		  dispstr = dispstr.replace("E","varE");
 	  } else {
@@ -933,7 +1024,10 @@ function AMnumfuncPrepVar(qn,str) {
 		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
 		  	dispstr = dispstr.replace(remvarparen, vars[i]);
 		  	str = str.replace(remvarparen, vars[i]);
-        submitstr = submitstr.replace(remvarparen, vars[i]);
+        submitstr = submitstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
+        submitstr = submitstr.replace(
+          new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)',regmod),
+          varpts[1]+'_('+varpts[2]+')');
 		  	if (varpts[1].length>1 && greekletters.indexOf(varpts[1].toLowerCase())==-1) {
 		  		varpts[1] = '"'+varpts[1]+'"';
 		  	}
@@ -944,11 +1038,16 @@ function AMnumfuncPrepVar(qn,str) {
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
-		  } else if (!isgreek && vars[i]!="varE") {
+		  } else if (!isgreek && vars[i]!="varE" && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
+      if (vars[i].match(/[^\w_]/)) {
+        str = str.replace(new RegExp(escapeRegExp(vars[i]),"g"), "repvars"+i);
+		  	vars[i] = "repvars"+i;
+      }
 	  }
   }
+
   if (varstoquote.length>0) {
 	  vltq = varstoquote.join("|");
 	  var reg = new RegExp("("+vltq+")","g");
@@ -1072,6 +1171,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
         calcvals[j] = res[0];
       }
     }
+
     submitstrarr[i] = sm + calcvals[0] + ',' + calcvals[1] + em;
     if (format.indexOf('inequality')!=-1) {
       // reformat as inequality
@@ -1336,6 +1436,7 @@ function processNumfunc(qn, fullstr, format) {
 	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
   }
   totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+
   var i,j,totest,testval,res;
   var successfulEvals = 0;
   for (j=0; j < 20; j++) {
@@ -1357,7 +1458,7 @@ function processNumfunc(qn, fullstr, format) {
   if (successfulEvals === 0) {
     err += _("syntax error") + '. ';
   }
-  err += syntaxcheckexpr(fullstr, '', vars.join('|'));
+  err += syntaxcheckexpr(strprocess[0], '', vars.map(escapeRegExp).join('|'));
   return {
     err: err
   };
@@ -1386,11 +1487,13 @@ function ineqtointerval(strw, intendedvar) {
         return ['', 'wrongvar'];
       } else if (pat[2].charAt(0) != pat[4].charAt(0)) { // mixes > and <
         return ['', 'invalid'];
+      } else if (pat[1].trim()=='' || pat[5].trim()=='') {
+        return ['', 'invalid'];
       }
       if (pat[2].charAt(0)=='<') {
         interval = (pat[2]=='<'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='<'?')':']');
       } else {
-        interval = (pat[2]=='>'?'(':'[') + pat[1] + ',' + pat[5] + (pat[4]=='>'?')':']');
+        interval = (pat[4]=='>'?'(':'[') + pat[5] + ',' + pat[1] + (pat[2]=='>'?')':']');
       }
       out.push(interval);
     } else if (pat = str.match(/^(.*?)(<=?|>=?)(.*?)$/)) {
@@ -1646,9 +1749,9 @@ function syntaxcheckexpr(str,format,vl) {
 
 // returns [numval, errmsg]
 function singlevaleval(evalstr, format) {
-  evalstr = evalstr.replace(/,/, '');
+  evalstr = evalstr.replace(/,/g, '');
   if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
-    evalstr = evalstr.replace(/%/,'') + '/100';
+    evalstr = evalstr.replace(/%/g,'') + '/100';
   }
   if (format.indexOf('mixed')!=-1) {
     evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
@@ -1665,6 +1768,10 @@ function singlevaleval(evalstr, format) {
   } catch(e) {
     return [NaN, _("syntax incomplete")+". "];
   }
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 function scopedeval(c) {

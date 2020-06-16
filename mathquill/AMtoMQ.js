@@ -77,7 +77,6 @@ var AMQsymbols = [
 
 //binary operation symbols
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
-{input:"xx", tag:"mo", output:"\u00D7", tex:"times", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
 //{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
@@ -154,6 +153,9 @@ var AMQsymbols = [
 {input:"arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
 {input:"arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
 {input:"arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
+{input:"arcsec",  tag:"mo", output:"arcsec", tex:null, ttype:UNARY, func:true},
+{input:"arccsc",  tag:"mo", output:"arccsc", tex:null, ttype:UNARY, func:true},
+{input:"arccot",  tag:"mo", output:"arccot", tex:null, ttype:UNARY, func:true},
 {input:"sinh", tag:"mo", output:"sinh", tex:null, ttype:UNARY, func:true},
 {input:"cosh", tag:"mo", output:"cosh", tex:null, ttype:UNARY, func:true},
 {input:"tanh", tag:"mo", output:"tanh", tex:null, ttype:UNARY, func:true},
@@ -736,6 +738,7 @@ n\frac{num}{denom} to n num/denom
 function MQtoAM(tex,display) {
   var nested,lb,rb,isfuncleft,curpos,c,i;
 	tex = tex.replace(/\\:/g,' ');
+  tex = tex.replace(/\\operatorname{(\w+)}/g,'\\$1');
 	if (!display) {
     while ((i = tex.lastIndexOf('\\left|'))!=-1) { //found a left |)
       rb = tex.indexOf('\\right|',i+1);
@@ -760,6 +763,7 @@ function MQtoAM(tex,display) {
   });
 	tex = tex.replace(/\\le(?!f)/g,'<=');
 	tex = tex.replace(/\\ge/g,'>=');
+  tex = tex.replace(/\\ne/g,'!=');
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
@@ -772,6 +776,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\cdot/g,'*');
 	tex = tex.replace(/\\infty/g,'oo');
 	tex = tex.replace(/\\nthroot/g,'root');
+  tex = tex.replace(/\\mid/g,'|');
 	tex = tex.replace(/\\/g,'');
 	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
 	tex = tex.replace(/(\d)frac/g,'$1 frac');
@@ -796,6 +801,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/_{([\d\.]+)}\^/g,'_$1^');
 	tex = tex.replace(/_{([\d\.]+)}([^\^])/g,'_$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}$/g,'_$1');
+  tex = tex.replace(/_{(\w+)}$/g,'_($1)');
 	tex = tex.replace(/{/g,'(').replace(/}/g,')');
 	tex = tex.replace(/lbrace/g,'{').replace(/rbrace/g,'}');
 	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2');  //change (2)/(3) to 2/3
@@ -808,5 +814,6 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\/\(([\a-zA-Z])\^([\d\.]+)\)/g,'/$1^$2');  //change /(x^n) to /x^n
 	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
   tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
+
 	return tex;
 }

@@ -49,7 +49,10 @@ if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',432000);
 ini_set('auto_detect_line_endings',true);
 $hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
-if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
+if ((!function_exists('isDevEnvironment') || !isDevEnvironment())
+    && $_SERVER['HTTP_HOST'] != 'localhost'
+    && !is_numeric($hostparts[count($hostparts)-1])
+) {
 	$sess_cookie_domain = '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2));
 	if (disallowsSameSiteNone()) {
 		session_set_cookie_params(0, '/', $sess_cookie_domain);
@@ -92,7 +95,12 @@ if (!defined('JSON_INVALID_UTF8_IGNORE')) {
 
 // Store PHP sessions in the database.
 if (!isset($use_local_sessions)) {
-  if (!empty($CFG['dynamodb'])) {
+  if (!empty($CFG['redis'])) {
+		$redispath = $CFG['redis'] . ((strpos($CFG['redis'], '?')===false)?'?':'&')
+			. 'prefix='.preg_replace('/\W/','',$installname);
+  	ini_set('session.save_handler', 'redis');
+  	ini_set('session.save_path', $redispath);
+	} else if (!empty($CFG['dynamodb'])) {
   	require_once(__DIR__ . "/includes/dynamodb/DynamoDbSessionHandler.php");
   	(new Idealstack\DynamoDbSessionsDependencyFree\DynamoDbSessionHandler([
   		'region' => $CFG['dynamodb']['region'],

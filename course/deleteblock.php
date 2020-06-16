@@ -62,7 +62,8 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		$obloc = array_search($obid,$obarr);
 		array_splice($obarr,$obloc,1);
 		setcookie('openblocks-'.Sanitize::courseId($_GET['cid']),implode(',',array_map('Sanitize::onlyInt',$obarr)));
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=". $cid . "&r=" . Sanitize::randomQueryStringParam());
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=". $cid.$btf . "&r=" . Sanitize::randomQueryStringParam());
 
 	} else {
 		$blocktree = explode('-',$_GET['id']);
@@ -98,7 +99,7 @@ if ($overwriteBody==1) {
 	<p>Are you SURE you want to delete this Block?</p>
 	<p><input type=radio name="delcontents" value="0"/>Move all items out of block<br/>
 	<input type=radio name="delcontents" value="1" checked="checked"/>Also Delete all items in block</p>
-	<p><button type=submit name="remove" value="really">Yes, Delete</button>		
+	<p><button type=submit name="remove" value="really">Yes, Delete</button>
 	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $cid; ?>'"></p>
 	</form>
 <?php

@@ -90,6 +90,9 @@ div.match {
   padding: 5px;
   padding-right: 30px;
 }
+div.match li img, div.match li [role=img] {
+  vertical-align: middle;
+}
 div[role=radiogroup].clearfix .match {
 	padding-right: 5px;
 }
@@ -186,17 +189,22 @@ td.barslefttop {
   border-left: 1px solid #000;
   border-top: 1px solid #000;
 }
-td.matrixleft {
+td.matrixleft, td.matrixright, td.matrixdetleft, td.matrixdetright {
   border: 1px solid #000;
-  border-width: 1px 0px 1px 1px;
   margin: 0px;
   padding: 0px;
 }
+td.matrixleft {
+  border-width: 1px 0px 1px 1px;
+}
 td.matrixright {
-  border: 1px solid #000;
   border-width: 1px 1px 1px 0px;
-  margin: 0px;
-  padding: 0px;
+}
+td.matrixdetleft {
+  border-width: 0px 0px 0px 1px;
+}
+td.matrixdetright {
+  border-width: 0px 1px 0px 0px;
 }
 table.paddedtable tr.onepixel { line-height: 1px;}
 table.paddedtable td.matrixtopborder {border-top:1px solid black;padding:0;}
@@ -334,6 +342,10 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   max-width: 700px;
   overflow: visible;
 }
+.questionpane > .question > .question {
+  margin: 0;
+  padding: 0;
+}
 .questionwrap .question {
   background-color: transparent;
   border: 0;
@@ -352,7 +364,7 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   padding: 1px;
 }
 
-div.question img, div.intro img {
+div.question img, div.intro img, div.sidepreview img {
 	max-width: 90%;
 	height: auto;
 }
@@ -363,6 +375,18 @@ div.txtimgwrap > img {
 
 div.question td img, div.question th img {
 	max-width: 100%;
+}
+
+p.seqsep {
+  font-size: 80%;
+  color: #757575;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 5px;
+  padding: 2px 0;
+  text-align: right;
+}
+p.seqsep:first-child {
+  margin-top: 0;
 }
 
 @media only screen and (max-width: 480px) {
@@ -459,4 +483,9 @@ span.inlinebtn:hover {
 }
 .feedbackwrap.incorrect {
 	background: #fee;
+}
+
+.inlineheader {
+  font-size: 1em;
+  display: inline;
 }

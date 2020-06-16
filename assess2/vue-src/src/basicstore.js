@@ -17,6 +17,8 @@ export const store = Vue.observable({
   inProgress: false,
   autosaveQueue: {},
   autosaveTimeactive: {},
+  timeActive: {},
+  timeActivated: {},
   initValues: {},
   initTimes: {},
   work: {},
@@ -31,6 +33,7 @@ export const store = Vue.observable({
   show_enddate_dialog: false,
   inPrintView: false,
   enableMQ: true,
+  lastPos: null,
   livepollServer: '',
   livepollSettings: {
     showQuestionDefault: true,
@@ -49,6 +52,10 @@ export const actions = {
     let qs = store.queryString;
     if (doreset === true) {
       qs += '&reset=1';
+    }
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadAssessData(callback, doreset), 20);
+      return;
     }
     store.inTransit = true;
     store.errorMsg = null;
@@ -84,7 +91,11 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  startAssess (dopractice, password, newGroupMembers, callback) {
+  startAssess (dopractice, password, newGroupMembers, callback, previewAll) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.startAssess(dopractice, password, newGroupMembers, callback), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -93,6 +104,7 @@ export const actions = {
       dataType: 'json',
       data: {
         practice: dopractice,
+        preview_all: previewAll ? 1 : 0,
         password: password,
         in_print: store.inPrintView ? 1 : 0,
         new_group_members: newGroupMembers.join(','),
@@ -121,6 +133,8 @@ export const actions = {
         store.autosaveTimeactive = {};
         store.initValues = {};
         store.initTimes = {};
+        store.timeActive = {};
+        store.timeActivated = {};
         store.work = {};
         store.inAssess = true;
         // route to correct display
@@ -128,7 +142,7 @@ export const actions = {
           this.handleError(response.error);
         } else if (store.assessInfo.has_active_attempt) {
           store.inProgress = true;
-          if (typeof callback !== 'undefined') {
+          if (typeof callback !== 'undefined' && callback !== null) {
             callback();
             return;
           }
@@ -163,6 +177,10 @@ export const actions = {
       });
   },
   loadQuestion (qn, regen, jumptoans) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadQuestion(qn, regen, jumptoans), 20);
+      return;
+    }
     store.inTransit = true;
     if (regen) {
       this.clearInitValue(qn);
@@ -221,6 +239,11 @@ export const actions = {
       const changedQuestions = this.getChangedQuestions();
       for (const i in store.assessInfo.questions) {
         if (store.assessInfo.questions[i].try > 0 ||
+          (store.assessInfo.questions[i].hasOwnProperty('parts_entered') &&
+          store.assessInfo.questions[i].hasOwnProperty('answeights') &&
+          store.assessInfo.questions[i].parts_entered.length >=
+          store.assessInfo.questions[i].answeights.length
+          ) ||
           changedQuestions.hasOwnProperty(i)
         ) {
           qAttempted++;
@@ -233,23 +256,30 @@ export const actions = {
       store.confirmObj = {
         body: warnMsg,
         action: () => {
+          /*
           // TODO: Check if we should always submit all
+
           if (store.assessInfo.showscores === 'during') {
             // check for dirty questions and submit them
             this.submitQuestion(Object.keys(changedQuestions), true);
           } else {
-            // submit them all
-            var qns = [];
-            for (let k = 0; k < store.assessInfo.questions.length; k++) {
-              qns.push(k);
-            }
-            this.submitQuestion(qns, true);
+          */
+          // submit them all
+          var qns = [];
+          for (let k = 0; k < store.assessInfo.questions.length; k++) {
+            qns.push(k);
           }
+          this.submitQuestion(qns, true);
+          // }
         }
       };
     }
   },
   submitWork () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitWork(), 20);
+      return;
+    }
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     store.inTransit = true;
     const data = {};
@@ -257,7 +287,8 @@ export const actions = {
       data[qn] = store.work[qn];
     }
     if (Object.keys(data).length === 0) { // nothing to submit
-      if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+      store.inTransit = false;
+      if (store.inAssess) {
         Router.push('/summary');
       } else if (store.assessInfo.available === 'yes') {
         Router.push('/');
@@ -293,7 +324,7 @@ export const actions = {
           delete store.work[qn];
         }
 
-        if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+        if (store.inAssess) {
           Router.push('/summary');
         } else if (store.assessInfo.available === 'yes') {
           Router.push('/');
@@ -308,14 +339,19 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  submitQuestion (qns, endattempt, timeactive, partnum) {
+  submitQuestion (qns, endattempt) {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitQuestion(qns, endattempt), 20);
+      return;
+    }
+    store.inTransit = true;
     if (typeof qns !== 'object') {
       qns = [qns];
     }
-
-    for (const k in window.callbackstack) {
+    for (let k in window.callbackstack) {
+      k = parseInt(k);
       if (qns.indexOf(k < 1000 ? k : (Math.floor(k / 1000) - 1)) > -1) {
         window.callbackstack[k](k);
       }
@@ -328,27 +364,30 @@ export const actions = {
 
     if (Object.keys(changedQuestions).length === 0 && !endattempt) {
       store.errorMsg = 'nochange';
+      store.inTransit = false;
       return;
     }
 
-    store.inTransit = true;
     window.MQeditor.resetEditor();
     window.imathasAssess.clearTips();
 
-    this.clearAutosave(qns);
-    // don't store time active when full-test
-    if (store.assessInfo.displaymethod === 'full') {
-      timeactive = [];
-    } else if (typeof timeactive !== 'object') {
-      timeactive = [timeactive];
-    }
+    window.setTimeout(() => this.clearAutosave(qns), 100);
 
     const data = new FormData();
 
-    // run any pre-submit routines.  The question type wants to return a value,
-    // it will get returned here.
     let valstr;
+    const timeactive = [];
     for (const qn in changedQuestions) {
+      // get timeactive values
+      if (store.assessInfo.displaymethod !== 'full') { // don't store time active when full-test
+        if (store.timeActivated.hasOwnProperty(qn)) {
+          const now = new Date();
+          store.timeActive[qn] += (now - store.timeActivated[qn]);
+        }
+        timeactive.push(store.timeActive[qn]);
+      }
+      // run any pre-submit routines.  The question type wants to return a value,
+      // it will get returned here.
       if (changedQuestions[qn].length === 1 && changedQuestions[qn][0] === 0) {
         // one part, might be single part
         valstr = window.imathasAssess.preSubmit(qn);
@@ -401,6 +440,11 @@ export const actions = {
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
     }
+    if (store.assessInfo.preview_all) {
+      data.append('preview_all', true);
+    }
+    const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
+      store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
 
     window.$.ajax({
       url: store.APIbase + 'scorequestion.php' + store.queryString,
@@ -426,8 +470,7 @@ export const actions = {
           store.errorMsg = null;
         }
         // clear out initValues for this question so they get re-set
-        for (let k = 0; k < qns.length; k++) {
-          const qn = qns[k];
+        for (const qn in changedQuestions) {
           if (store.assessInfo.hasOwnProperty('scoreerrors') &&
             store.assessInfo.scoreerrors.hasOwnProperty(qn)
           ) {
@@ -465,9 +508,16 @@ export const actions = {
             Router.push('/summary');
           }
         } else if (qns.length === 1) {
+          store.assessInfo.questions[qns[0]].hadSeqNext = hasSeqNext;
           // scroll to score result
           Vue.nextTick(() => {
-            var el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
+            var el;
+            if (!hasSeqNext) {
+              el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
+              window.$(el).find('.scoreresult').focus();
+            } else {
+              el = window.$('#questionwrap' + qns[0]).find('.seqsep').last().next()[0];
+            }
             var bounding = el.getBoundingClientRect();
             if (bounding.top < 0 || bounding.bottom > document.documentElement.clientHeight) {
               el.scrollIntoView();
@@ -481,6 +531,24 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  gotoSummary () {
+    let hasShowWorkAfter = false;
+    for (let k = 0; k < store.assessInfo.questions.length; k++) {
+      if (store.assessInfo.questions[k].showwork & 2) {
+        hasShowWorkAfter = true;
+        store.assessInfo.showwork_after = true;
+        break;
+      }
+    }
+
+    if (store.assessInfo.submitby === 'by_question') {
+      if (hasShowWorkAfter && !store.assessInfo.in_practice) {
+        Router.push('/showwork');
+      } else {
+        Router.push('/summary');
+      }
+    }
   },
   doAutosave (qn, partnum, timeactive) {
     store.somethingDirty = false;
@@ -511,6 +579,10 @@ export const actions = {
     store.somethingDirty = false;
     this.clearAutosaveTimer();
     if (Object.keys(store.autosaveQueue).length === 0) {
+      return;
+    }
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitAutosave(async), 20);
       return;
     }
     store.inTransit = true;
@@ -586,8 +658,9 @@ export const actions = {
         for (const qn in store.autosaveQueue) {
           for (const k in store.autosaveQueue[qn]) {
             if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
-              Vue.set(store.assessInfo.questions[parseInt(qn)].parts_entered,
-                store.autosaveQueue[qn][k], 1);
+              if (store.assessInfo.questions[parseInt(qn)].parts_entered.indexOf(store.autosaveQueue[qn][k]) === -1) {
+                store.assessInfo.questions[parseInt(qn)].parts_entered.push(store.autosaveQueue[qn][k]);
+              }
             }
           }
         }
@@ -623,6 +696,10 @@ export const actions = {
     this.clearAutosaveTimer();
     window.MQeditor.resetEditor();
     window.imathasAssess.clearTips();
+    if (store.inTransit) {
+      window.setTimeout(() => this.endAssess(callback), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -652,6 +729,10 @@ export const actions = {
       });
   },
   getScores () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.getScores(), 20);
+      return;
+    }
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'getscores.php' + store.queryString,
@@ -678,6 +759,10 @@ export const actions = {
       });
   },
   getQuestions () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.getQuestions(), 20);
+      return;
+    }
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'getquestions.php' + store.queryString,
@@ -704,6 +789,10 @@ export const actions = {
       });
   },
   redeemLatePass (callback) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.redeemLatePass(callback), 20);
+      return;
+    }
     store.inTransit = true;
     window.$.ajax({
       url: store.APIbase + 'uselatepass.php' + store.queryString,
@@ -738,6 +827,10 @@ export const actions = {
     Router.push('/');
   },
   setLivepollStatus (data) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.setLivepollStatus(data), 20);
+      return;
+    }
     store.inTransit = true;
     store.errorMsg = null;
     window.$.ajax({
@@ -1023,17 +1116,18 @@ export const actions = {
       store.enableMQ = data.enableMQ;
     }
     if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0 &&
+      store.timelimit_timer === null &&
       data.enddate_in < 20 * 24 * 60 * 60 // over 20 days causes int overlow
     ) {
-      clearTimeout(store.enddate_timer);
+      window.clearTimeout(store.enddate_timer);
       const now = new Date().getTime();
       const dueat = data.enddate_in * 1000;
       data.enddate_local = now + dueat;
       store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
     }
     if (data.hasOwnProperty('timelimit_expiresin')) {
-      clearTimeout(store.timelimit_timer);
-      clearTimeout(store.enddate_timer); // no need for it w timelimit timer
+      window.clearTimeout(store.timelimit_timer);
+      window.clearTimeout(store.enddate_timer); // no need for it w timelimit timer
       const now = new Date().getTime();
       if (data.hasOwnProperty('timelimit_expires')) {
         if (data.timelimit_expires === data.enddate) {

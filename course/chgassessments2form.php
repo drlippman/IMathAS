@@ -304,7 +304,7 @@ $vueData = array(
 					</select>
 				</span><br class=form />
 
-				<div v-show="scoresInGbOptions.length > 0">
+				<div v-if="scoresInGbOptions.length > 0">
 					<label class="form" for="scoresingb">
 						<?php echo _('Students can view their scores in the gradebook'); ?>:
 					</label>
@@ -318,7 +318,7 @@ $vueData = array(
 					</span><br class=form />
 				</div>
 
-				<div v-show="ansInGbOptions.length > 0">
+				<div v-if="ansInGbOptions.length > 0">
 					<label class="form" for="ansingb">
 						<?php echo _('Students can view correct answers in the gradebook'); ?>:
 					</label>

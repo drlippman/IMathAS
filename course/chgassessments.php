@@ -7,6 +7,7 @@ require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/copyiteminc.php");
 require("../includes/loaditemshowdata.php");
+require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -337,10 +338,17 @@ if (!(isset($teacherid))) {
 			$qarr[':endmsg'] = $stm->fetchColumn(0);
 		}
 
+		$metadata = array('assessments'=>$checkedlist);
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
-			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)");
+			$qarr[':cid'] = $cid;
+			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist) AND courseid=:cid");
 			$stm->execute($qarr);
+			if ($stm->rowCount()>0) {
+				$updated_settings = true;
+				$metadata = $metadata + $qarr;
+				unset($metadata[':cid']);
+			}
 		}
 		if (isset($_POST['chgintro'])) {
 			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
@@ -351,6 +359,7 @@ if (!(isset($teacherid))) {
 			} else {
 				$newintro = $cpintro;
 			}
+			$metadata['intro'] = $newintro;
 			$stm = $DBH->query("SELECT id,intro FROM imas_assessments WHERE id IN ($checkedlist)");
 			$stmupd = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -361,11 +370,24 @@ if (!(isset($teacherid))) {
 					$outintro = $newintro;
 				}
 				$stmupd->execute(array(':id'=>$row['id'], ':intro'=>$outintro));
+				if ($stmupd->rowCount()>0) {
+					$updated_settings = true;
+				}
 			}
 		}
 
 		if (isset($_POST['removeperq'])) {
 			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0,fixedseeds=NULL WHERE assessmentid IN ($checkedlist)");
+			$metadata['perq'] = "Removed per-question settings";
+			$updated_settings = true;
+		}
+		if ($updated_settings === true) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Mass Assessment Settings Change",
+				null,
+				$metadata
+			);
 		}
 		if (isset($_POST['docopyopt']) || isset($_POST['chgdefpoints']) || isset($_POST['removeperq'])) {
 			//update points possible
@@ -377,7 +399,8 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
 		} else {
-		  header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']).$btf . "&r=" . Sanitize::randomQueryStringParam());
 		}
 		exit;
 

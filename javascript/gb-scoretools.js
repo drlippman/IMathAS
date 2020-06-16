@@ -54,6 +54,7 @@ function previewall() {
 }
 function previewallfiles() {
 	$("span.clickable").trigger("click");
+	$(".question span[id^=fileembedbtn]").trigger("click");
 }
 function allvisfullcred() {
 	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
@@ -72,8 +73,8 @@ function toggleWork(el) {
 	}
 }
 function preprint() {
-	$("span[id^='ans']").removeClass("hidden");
-	$(".sabtn").replaceWith("<span>Answer: </span>");
+	$("span[id^='ans']").show().removeClass("hidden");
+	$(".sabtn,.keybtn").replaceWith("<span>Answer: </span>");
 	$('input[value="Preview"]').trigger('click').remove();
 	document.getElementById("preprint").style.display = "none";
 }
@@ -140,8 +141,11 @@ function cleardeffeedback() {
 }
 
 function showgraphtip(el, la, init) {
-	var initpts = init.replace(/"|'/g,'').split(",");
-	for (var j=1;j<initpts.length;j++) {
+	var initpts = init;
+	if (typeof init == 'string') {
+		init = init.replace(/"|'/g,'').split(",");
+	}
+	for (var j=1;j<Math.max(initpts.length,11);j++) {
 		initpts[j] *= 1;  //convert to number
 	}
 	var drawwidth = initpts[6];
@@ -217,3 +221,28 @@ function initAnswerboxHighlights() {
 		}
 	});
 };
+
+function sidebysidegrading() {
+	$("body").removeClass("fw1000").removeClass("fw1920");
+	$(".scrollpane").wrap('<div class="sidebyside">');
+	$(".sidebyside").append('<div class="sidepreview">');
+	$(".sidebyside").css('display','flex').css('flex-wrap','nowrap');
+	$(".sidepreview").css('border-left','1px solid #ccc').css('padding','10px');
+	$(".scrollpane,.sidepreview").css('width','50%');
+	// will have to adjust fileembedbtn to open in sidepreview
+	$(".question div.introtext").each(function(i,el) {
+		$(el).find(".keywrap.inwrap").insertAfter($(el));
+		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+		$(el).after('<div class="subdued">('+(i+1)+')</div>');
+		tgt.append('<div class="subdued">('+(i+1)+') </div>').append(el);
+	});
+	$(".lastfilesub").each(function(i,el) {
+		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+		$(el).after('<span class="subdued">('+(i+1)+')</span>');
+		tgt.append('<span class="subdued">('+(i+1)+') </span>').append(el);
+	});
+	$(".viewworkwrap").each(function(i,el) {
+		$(el).css('margin','0');
+		$(el).closest(".sidebyside").find('.sidepreview').append(el);
+	});
+}

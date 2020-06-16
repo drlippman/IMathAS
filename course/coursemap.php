@@ -23,6 +23,7 @@ $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 $stm->execute(array(':id'=>$cid));
 $items = unserialize($stm->fetchColumn(0));
 
+$exceptions = array();
 if (!$viewall) {
 	$exceptions = loadExceptions($cid, $userid);
 	require_once("../includes/exceptionfuncs.php");

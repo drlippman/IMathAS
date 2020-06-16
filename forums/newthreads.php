@@ -53,7 +53,7 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && count($_POST['checke
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$toupdate[] = $row[0];
 	}
-	
+
 	if (count($toupdate)>0) {
 		$toupdatelistSanitize = array_map('Sanitize::onlyInt', $toupdate);
 		$toupdatelist_query_placeholders = Sanitize::generateQueryPlaceholders($toupdatelistSanitize);
@@ -62,7 +62,7 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && count($_POST['checke
   	}
   	$toinsert = array_diff($checked,$toupdate);
   	if (count($toinsert)>0) {
-  		$ph = 
+  		$ph =
   		$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
   		$qarray = array();
   		$first = true;
@@ -79,16 +79,17 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && count($_POST['checke
 	}
 	if (count($forumids)==count($checked)) { //marking all read
 		if ($from=='home') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
+      $btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+  		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf");
 		}
 	} else {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/newthreads.php?cid=$cid&from=".Sanitize::simpleString($from));
 	}
        	exit;
 }
-                                    
+
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
 $pagetitle = _('New Forum Posts');

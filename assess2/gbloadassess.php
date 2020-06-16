@@ -189,6 +189,11 @@ $assessInfoOut['lti_sourcedid'] = $assess_record->getLTIsourcedId();
 // generating answeights may have changed the record; save if needed
 $assess_record->saveRecordIfNeeded();
 
+// check to see if qerror
+if (isset($CFG['GEN']['qerrorsendto'][2])) {
+  $assessInfoOut['qerrortitle'] = $CFG['GEN']['qerrorsendto'][2] .' '._("to report problems");
+}
+
 //prep date display
 prepDateDisp($assessInfoOut);
 

@@ -48,43 +48,37 @@ class FileUploadAnswerBox implements AnswerBox
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         if (isset($ansprompt)) {
-          $out .= "<label for=\"qn$qn\">$ansprompt</label>";
+          $out .= "$ansprompt ";
         }
-
-    		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" class=\"filealt\" />\n";
-        $out .= '<label for="qn'.$qn.'"><span role="button" class="filealt-btn '.$colorbox.'">';
-        $out .= _('Choose File').'</span>';
-        $out .= '<span class="filealt-label" data-def="'._('No file chosen').'">';
-        if ($autosave != '') {
-          $out .= Sanitize::encodeStringForDisplay(basename(preg_replace('/@FILE:(.+?)@/',"$1",$autosave)));
-          $out .= '<input type=hidden id="qn'.$qn.'-autosave" value="1"/>';
-        } else {
-          $out .= _('No file chosen');
+        if ($GLOBALS['useeditor'] !== 'review') {
+      		$out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" class=\"filealt\" ";
+          if (!empty($answerformat)) {
+            $answerformat = str_replace('images','.jpg,.jpeg,.gif,.png', $answerformat);
+      			$answerformat = str_replace('canpreview','.doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx,.jpg,.gif,.png,.jpeg', $answerformat);
+            $out .= 'accept="'.preg_replace('/[^\w\.,\/\*\-]/','',$answerformat).'"';
+          }
+          $out .= "/>\n";
+          $out .= '<label for="qn'.$qn.'"><span role="button" class="filealt-btn '.$colorbox.'">';
+          $out .= '<span class="sr-only">'.$this->answerBoxParams->getQuestionIdentifierString().'</span>';
+          $out .= _('Choose File').'</span>';
+          $out .= '<span class="filealt-label" data-def="'._('No file chosen').'">';
+          if ($autosave != '') {
+            $out .= Sanitize::encodeStringForDisplay(basename(preg_replace('/@FILE:(.+?)@/',"$1",$autosave)));
+            $out .= '<input type=hidden id="qn'.$qn.'-autosave" value="1"/>';
+          } else {
+            $out .= _('No file chosen');
+          }
+          $out .= '</span></label>';
         }
-        $out .= '</span></label>';
         $hasPrevSubmittedFile = false;
     		if ($la!='') {
     			if (!empty($assessmentId)) {
     				$s3asid = $assessmentId;
     			}
-    			if (isset($GLOBALS['questionscoreref'])) {
-    				if ($multi==0) {
-    					$el = $GLOBALS['questionscoreref'][0];
-    					$sc = $GLOBALS['questionscoreref'][1];
-    				} else {
-    					$el = $GLOBALS['questionscoreref'][0].'-'.($qn%1000);
-    					$sc = $GLOBALS['questionscoreref'][1][$qn%1000];
-    				}
-    				$out .= '<span style="float:right;">';
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" alt="Set score full credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',$sc)\" />";
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" alt="Set score half credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" alt="Set score no credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
-    			}
+
     			if (!empty($s3asid)) {
     				require_once(dirname(__FILE__)."/../../../includes/filehandler.php");
 
@@ -95,21 +89,20 @@ class FileUploadAnswerBox implements AnswerBox
     					$url = getasidfileurl($file);
     					$extension = substr($url,strrpos($url,'.')+1,3);
     					$filename = basename($file);
-    					$out .= "<br/>" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\">$filename</a>";
+    					$out .= "<br/><span class=\"lastfilesub\">" . _('Last file submitted:') . " <a href=\"$url\" target=\"_blank\" class=\"attach\">$filename</a></span>";
     					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\" />";
-    					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
+    					/*if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
     						$out .= " <span aria-expanded=\"false\" aria-controls=\"img$qn\" class=\"pointer clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
     						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
-    					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
-    						$out .= " <span aria-expanded=\"false\" aria-controls=\"fileprev$qn\" class=\"pointer clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
-    						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".rawurlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
-    					}
+    					} */
               $hasPrevSubmittedFile = true;
     				}
     			} else {
     				$out .= "<br/>$la";
     			}
-    		}
+    		} else if ($GLOBALS['useeditor'] === 'review') {
+          $out .= _('No file submitted');
+        }
     		$tip .= _('Select a file to upload');
     		$sa .= $answer;
 

@@ -24,7 +24,7 @@ if (isset($_GET['public'])) {
 	header('P3P: CP="ALL CUR ADM OUR"');
 	session_start();
 	$_SESSION['publicquickdrill'] = true;
-	
+
 	if (!isset($_SESSION['data']) || isset($_GET['reset'])) {
 		$_SESSION = array();
 	} else {
@@ -73,6 +73,7 @@ if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
 		$out .= '</ul></p>';
 	}
 	echo $out;
+	/*  Disabled to prevent email spamming
 	if (isset($_GET['email']) && isset($_GET['public']) && !isset($_POST['stuname'])) {
 		$addy = 'quickdrill.php?public=true&showresults=true&email='.Sanitize::emailAddress($_GET['email']);
 		echo '<p><b>Send results to instructor</b><br/>';
@@ -97,6 +98,7 @@ if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
 
 		echo "<p>Email Sent</p>";
 	}
+	*/
 	exit;
 }
 if (isset($_SESSION['drill']) && empty($_GET['id'])) {

@@ -113,7 +113,7 @@ class QuestionGenerator
         $questionData = $stm->fetch(PDO::FETCH_ASSOC);
 
         if (!$questionData) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 sprintf('Failed to get question data for question ID %d. PDO error: %s',
                     $questionId, implode(':', $this->dbh->errorInfo()))
             );
@@ -137,13 +137,16 @@ class QuestionGenerator
     private function clearChoicemap(): void
     {
         $questionNumber = $this->questionParams->getQuestionNumber();
+        $assessmentId = $this->questionParams->getAssessmentId();
 
-        unset($_SESSION['choicemap'][$questionNumber]);
+        if (!empty($_SESSION['choicemap'][$assessmentId])) {
+          unset($_SESSION['choicemap'][$assessmentId][$questionNumber]);
 
-        $iidx = 0;
-        while (isset($_SESSION['choicemap'][1000 * ($questionNumber + 1) + $iidx])) {
-            unset($_SESSION['choicemap'][1000 * ($questionNumber + 1) + $iidx]);
-            $iidx++;
+          foreach ($_SESSION['choicemap'][$assessmentId] as $k=>$v) {
+            if (floor($k/1000) == $questionNumber + 1) {
+              unset($_SESSION['choicemap'][$assessmentId][$k]);
+            }
+          }
         }
     }
 

@@ -22,7 +22,7 @@ if ($myrights < 100) {
   exit;
 } else if (isset($_POST['removecourselti'])) {
   $id = Sanitize::onlyInt($_POST['removecourselti']);
-  $stm = $DBH->prepare("SELECT org,contextid FROM imas_lti_courses WHERE id=:id");
+  $stm = $DBH->prepare("SELECT org,contextid,courseid FROM imas_lti_courses WHERE id=:id");
   $stm->execute(array(':id'=>$id));
   $row = $stm->fetch(PDO::FETCH_ASSOC);
   if ($row===false) {
@@ -31,9 +31,21 @@ if ($myrights < 100) {
   }
   $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE org=:org AND contextid=:contextid");
   $stm->execute(array(':org'=>$row['org'], ':contextid'=>$row['contextid']));
-  
+
   $stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
   $stm->execute(array(':id'=>$id));
+
+  require_once('../includes/TeacherAuditLog.php');
+  TeacherAuditLog::addTracking(
+    $row['courseid'],
+    "Course Settings Change",
+    $row['courseid'],
+    [
+      'action'=>'LTI connection broken',
+      'contextid'=>$row['contextid']
+    ]
+  );
+
   echo "OK";
   exit;
 } else if (isset($_POST['removeplacementlti'])) {

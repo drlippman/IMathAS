@@ -29,8 +29,15 @@ require_once("includes/sanitize.php");
 	require_once("includes/password.php");
 
 	if ($_GET['action']=="newuser") {
+		$init_session_start = true;
 		require_once("init_without_validate.php");
 		require_once("includes/newusercommon.php");
+		if ($_POST['challenge'] !== $_SESSION['challenge'] || !empty($_POST['hval'])) {
+			echo "Invalid submission";
+			exit;
+		}
+		$_SESSION['challenge'] = '';
+
 		$error = '';
 		if (isset($studentTOS) && !isset($_POST['agree'])) {
 			$error = "<p>"._("You must agree to the Terms and Conditions to set up an account")."</p>";
@@ -99,6 +106,8 @@ require_once("includes/sanitize.php");
 				echo '<input type="hidden" name="pw2" value="'.Sanitize::encodeStringForDisplay($_POST['pw2']).'" />';
 				echo '<input type="hidden" name="courseid" value="'.Sanitize::encodeStringForDisplay($_POST['courseid']).'" />';
 				echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_POST['ekey']).'" />';
+				$_SESSION['challenge'] = uniqid();
+				echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
 				if (isset($_POST['agree'])) {
 					echo '<input type="hidden" name="agree" value="1" />';
 				}
@@ -120,9 +129,9 @@ require_once("includes/sanitize.php");
 			':SID'=>$_POST['SID'],
 			':password'=>$md5pw,
 			':rights'=>$initialrights,
-			':FirstName'=>$_POST['firstname'],
-			':LastName'=>$_POST['lastname'],
-			':email'=>$_POST['email'],
+			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+			':email'=>Sanitize::emailAddress($_POST['email']),
 			':msgnotify'=>$msgnot,
 			':homelayout'=>$homelayout));
 		$newuserid = $DBH->lastInsertId();
@@ -194,7 +203,7 @@ require_once("includes/sanitize.php");
 
 							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 							if ($msgOnEnroll) {
-								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
 								$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
 								$stm->execute(array(':cid'=>$_POST['courseid']));
 								while ($tuid = $stm->fetchColumn(0)) {
@@ -238,12 +247,15 @@ require_once("includes/sanitize.php");
 		require_once("init_without_validate.php");
 		if (isset($_POST['username'])) {
 
-			$query = "SELECT id,email,rights FROM imas_users WHERE SID=:sid";
+			$query = "SELECT id,email,rights,lastemail FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':sid'=>$_POST['username']));
 			if ($stm->rowCount()>0) {
-				list($id,$email,$rights) = $stm->fetch(PDO::FETCH_NUM);
-
+				list($id,$email,$rights,$lastemail) = $stm->fetch(PDO::FETCH_NUM);
+				if (time() - $lastemail < 60) {
+					echo 'Please wait and try again';
+					exit;
+				}
 				if (substr($email,0,7)==='BOUNCED') {
 					require("header.php");
 					echo '<p>';
@@ -266,9 +278,9 @@ require_once("includes/sanitize.php");
 					$code .= substr($chars,rand(0,61),1);
 				}
 
-				$query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
+				$query = "UPDATE imas_users SET remoteaccess=:code,lastemail=:now WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':code'=>$code, ':id'=>$id));
+				$stm->execute(array(':code'=>$code, ':now'=>time(), ':id'=>$id));
 
 				$message  = "<h3>".sprintf(_('This is an automated message from %s. Do not respond to this email'),$installname)."</h3>\r\n";
 				$message .= "<p>"._('Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ');
@@ -332,16 +344,21 @@ require_once("includes/sanitize.php");
 	} else if ($_GET['action']=="lookupusername") {
 		require_once("init_without_validate.php");
 
-		$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
+		$query = "SELECT id,SID,lastaccess,lastemail FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':email'=>$_POST['email']));
 		if ($stm->rowCount() > 0) {
-			echo $stm->rowCount();
-			echo _(" usernames match this email address and were emailed"),".  <a href=\"index.php\">",_("Return to login page"),"</a>";
+			$cnt = $stm->rowCount();
 			$message  = "<h3>".sprintf(_("This is an automated message from %s. Do not respond to this email"),$installname)."</h3>\r\n";
 			$message .= "<p>".sprintf(_("Your email was entered in the Username Lookup page on %s.  If you did not do this, you may ignore and delete this message."),$installname)."  ";
 			$message .= _("All usernames using this email address are listed below")."</p><p>";
+			$ids = array();
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (time() - $row['lastemail'] < 60) {
+					echo 'Please wait and try again';
+					exit;
+				}
+				$ids[] = $row['id'];
 				if ($row['lastaccess']==0) {
 					$lastlogin = _("Never");
 				} else {
@@ -353,7 +370,11 @@ require_once("includes/sanitize.php");
 
 			require_once("./includes/email.php");
 			send_email($_POST['email'], $sendfrom, $installname._(' Username Request'), $message, array(), array(), 10);
+			echo $cnt . _(" usernames match this email address and were emailed"),".  <a href=\"index.php\">",_("Return to login page"),"</a>";
 
+			$ids = implode(',', $ids); // database values, so safe
+			$stm = $DBH->prepare("UPDATE imas_users SET lastemail=? WHERE id IN ($ids)");
+			$stm->execute(array(time()));
 			exit;
 		} else {
 
@@ -391,7 +412,7 @@ require_once("includes/sanitize.php");
 		}
 		session_destroy();
 	} else if ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd") {
-		$stm = $DBH->prepare("SELECT password,email FROM imas_users WHERE id=:uid");
+		$stm = $DBH->prepare("SELECT password,email,lastemail FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
@@ -403,7 +424,7 @@ require_once("includes/sanitize.php");
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 
-			if ($_GET['action']=="chgpwd") {
+			if ($_GET['action']=="chgpwd" && time() - $line['lastemail'] > 60) {
 				require_once("./includes/email.php");
 				$message = '<p><b>'._('This is an automated message. Do not reply to this email.').'</b></p>';
 				$message .= '<p>'.sprintf(_('Hi, your account details on %s were recently changed.'), $installname).' ';
@@ -417,9 +438,9 @@ require_once("includes/sanitize.php");
 					$code .= substr($chars,rand(0,61),1);
 				}
 
-				$query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
+				$query = "UPDATE imas_users SET remoteaccess=:code,lastemail=:now WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':code'=>$code, ':id'=>$userid));
+				$stm->execute(array(':code'=>$code, ':now'=>time(), ':id'=>$userid));
 
 				$message .= _('If you are unable to log into your account, use the following link.'). ' ';
 				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$userid&code=$code\">";
@@ -429,6 +450,7 @@ require_once("includes/sanitize.php");
 					_('Alert:'). ' '.$installname.' '._('Account Activity'),
 					$message, array(), array(), 10
 				);
+
 			}
 		} else {
 			echo "<html><body>",_("Password change failed"),".  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">",_("Try Again"),"</a>\n";
@@ -530,7 +552,7 @@ require_once("includes/sanitize.php");
 
 					$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 					if ($msgOnEnroll) {
-						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
 						$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
 						$stm->execute(array(':cid'=>$_POST['cid']));
 						while ($tuid = $stm->fetchColumn(0)) {
@@ -683,9 +705,9 @@ require_once("includes/sanitize.php");
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 
-		$stm = $DBH->prepare("SELECT email FROM imas_users WHERE id=?");
+		$stm = $DBH->prepare("SELECT email,lastemail FROM imas_users WHERE id=?");
 		$stm->execute(array($userid));
-		$old_email = $stm->fetchColumn(0);
+		list($old_email,$lastemail) = $stm->fetch(PDO::FETCH_NUM);
 
 		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
@@ -740,7 +762,7 @@ require_once("includes/sanitize.php");
 		require("includes/userprefs.php");
 		storeUserPrefs();
 
-		if ($pwchanged || trim($old_email) != trim($_POST['email'])) {
+		if (($pwchanged || trim($old_email) != trim($_POST['email'])) && (time() - $lastemail > 60)) {
 			require_once("./includes/email.php");
 			$message = '<p><b>'._('This is an automated message. Do not reply to this email.').'</b></p>';
 			$message .= '<p>'.sprintf(_('Hi, your account details on %s were recently changed.'), $installname).' ';
@@ -760,9 +782,9 @@ require_once("includes/sanitize.php");
 					$code .= substr($chars,rand(0,61),1);
 				}
 
-				$query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
+				$query = "UPDATE imas_users SET remoteaccess=:code,lastemail=:now WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':code'=>$code, ':id'=>$userid));
+				$stm->execute(array(':code'=>$code, ':now'=>time(), ':id'=>$userid));
 
 				$message .= _('If you are unable to log into your account, use the following link.'). ' ';
 				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&id=$userid&code=$code\">";

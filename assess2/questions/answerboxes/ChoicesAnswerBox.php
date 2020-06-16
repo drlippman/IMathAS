@@ -32,6 +32,7 @@ class ChoicesAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $assessmentId = $this->answerBoxParams->getAssessmentId();
 
         $out = '';
         $tip = '';
@@ -70,7 +71,7 @@ class ChoicesAnswerBox implements AnswerBox
     			$randkeys = $RND->array_rand($questions,count($questions));
     			$RND->shuffle($randkeys);
     		}
-    		$_SESSION['choicemap'][$qn] = $randkeys;
+    		$_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
         if (isset($GLOBALS['capturechoices'])) {
           $GLOBALS['choicesdata'][$qn] = $questions;
         }
@@ -90,21 +91,26 @@ class ChoicesAnswerBox implements AnswerBox
 
     		if ($displayformat == 'inline') {
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-    			$out .= "<span $style id=\"qnwrap$qn\" role=radiogroup aria-label=\""._('Select an answer')."\">";
+    			$out .= "<span $style id=\"qnwrap$qn\" role=group ";
+          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
     		} else if ($displayformat != 'select') {
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-    			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=radiogroup aria-label=\""._('Select an answer')."\">";
+    			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group ";
+          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
     		}
     		if ($displayformat == "select") {
     			$msg = '?';
     			foreach ($questions as $qv) {
+            if (is_array($qv)) { continue; }
     				if (mb_strlen(html_entity_decode($qv))>3) { //strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
     					$msg = _('Select an answer');
     					break;
     				}
     			}
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-    			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style aria-label=\""._('Select an answer')."\"><option value=\"NA\">$msg</option>\n";
+    			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style ";
+          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+          $out .= "<option value=\"NA\">$msg</option>\n";
     		} else if ($displayformat == "horiz") {
 
     		} else if ($displayformat == "inline") {

@@ -131,7 +131,10 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
 	}
 	$userid = $_SESSION['userid'];
-
+	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+		echo _('Uh oh, something went wrong.  Please go back and try again');
+		exit;
+	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
 	}
@@ -323,7 +326,9 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify,:groupid)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$_POST['firstname'],':LastName'=>$_POST['lastname'],':email'=>$_POST['email'],
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
 						':msgnotify'=>$msgnot,':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
@@ -331,7 +336,9 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$_POST['firstname'],':LastName'=>$_POST['lastname'],':email'=>$_POST['email'],
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
 						':msgnotify'=>$msgnot));
 				}
 				$userid = $DBH->lastInsertId(); //DB mysql_insert_id();
@@ -689,7 +696,9 @@ if (isset($_GET['launch'])) {
 				$query .= '(:userid,:SID,:password,:rights,:FirstName,:LastName,:email,0)';
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':SID'=>'lti-'.$userrow['id'], ':password'=>'pass' ,':rights'=>10,
-					':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email));
+					':FirstName'=>Sanitize::stripHtmlTags($firstname),
+					':LastName'=>Sanitize::stripHtmlTags($lastname),
+					':email'=>Sanitize::emailAddress($email)));
 			} else if ($firstname != $userrow['FirstName'] || $lastname != $userrow['LastName'] || $email != $userrow['email']) {
 				//update imas_users record
 				$stm2 = $DBH->prepare("UPDATE imas_users SET FirstName=?,LastName=?,email=? WHERE id=?");
@@ -736,7 +745,10 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0,:groupid)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email,':groupid'=>$newgroupid));
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email),
+						':groupid'=>$newgroupid));
 
 				} else {
 					$rights = 10;
@@ -744,7 +756,9 @@ if (isset($_GET['launch'])) {
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,0)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
-						':FirstName'=>$firstname,':LastName'=>$lastname,':email'=>$email));
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email)));
 				}
 				$userid = $DBH->lastInsertId(); //DB $userid = mysql_insert_id();
 				if ($rights>=20) {
@@ -834,6 +848,7 @@ if ($stm->rowCount()==0) {
 					if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useexisting") {
 						$destcid = $aidsourcecid;
 						$copycourse = "no";
+						$ltilog = ['copy'=>'useorig', 'cid'=>$destcid];
 					}
 				}
 				$stm = $DBH->prepare('SELECT jsondata,UIver FROM imas_courses WHERE id=:aidsourcecid');
@@ -845,12 +860,15 @@ if ($stm->rowCount()==0) {
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {
 					$destcid = $_POST['useothercoursecid'];
 					$copycourse = "no";
+					$ltilog = ['copy'=>'useother', 'cid'=>$destcid];
 				} else if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="makecopy") {
 					$copycourse = "yes";
 					$sourcecid = $aidsourcecid;
+					$ltilog = ['copy'=>'copyorig', 'cid'=>$sourcecid];
 				} else if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="copyother" && $_POST['othercoursecid']>0) {
 					$copycourse = "yes";
 					$sourcecid = Sanitize::onlyInt($_POST['othercoursecid']);
+					$ltilog = ['copy'=>'copyother', 'cid'=>$sourcecid];
 				}
 				if ($copycourse=="notify" || $copycourse=="ask") {
 					$_SESSION['userid'] = $userid; //remember me
@@ -906,7 +924,7 @@ if ($stm->rowCount()==0) {
 						}
 						echo "	</ul>";
 						if ($sourceUIver == 1) {
-							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
+							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
 						}
 						echo "<p>The first option is best if this is your first time using this $installname course.  The second option
 							may be preferrable if you have copied the course in your LMS and want your students records to
@@ -932,7 +950,7 @@ if ($stm->rowCount()==0) {
 							echo "<input name=\"docoursecopy\" type=\"hidden\" value=\"makecopy\" />";
 						}
 						if ($sourceUIver == 1) {
-							echo '<p><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
+							echo '<p><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
 						}
 						echo "<p><input type=\"submit\" value=\"Create a copy on $installname\"/> (this may take a few moments - please be patient)</p>";
 					}
@@ -1124,6 +1142,16 @@ if ($stm->rowCount()==0) {
 				':courseid'=>$destcid,
 				':copiedfrom'=>($copycourse == "yes")?$sourcecid:0,
 				':contextlabel'=>$_SESSION['lti_context_label']));
+
+			$ltilog['contextid'] = $_SESSION['lti_context_id'];
+			$ltilog['action'] = 'Establish LTI course connection';
+			require_once('includes/TeacherAuditLog.php');
+			TeacherAuditLog::addTracking(
+				$destcid,
+				"Course Settings Change",
+				$destcid,
+				$ltilog
+			);
 		} else {
 			list($destcid, $copiedfromcid) = $stm->fetch(PDO::FETCH_NUM);
 		}
@@ -1299,6 +1327,17 @@ if ($_SESSION['lti_keytype']=='cc-of') {
 					':contextid'=>$_SESSION['lti_context_id'],
 					':courseid'=>$linkcid,
 					':contextlabel'=>$_SESSION['lti_context_label']));
+				require_once('includes/TeacherAuditLog.php');
+				TeacherAuditLog::addTracking(
+					$linkcid,
+					"Course Settings Change",
+					$linkcid,
+					[
+						'action'=>'Establish LTI course connection',
+						'type'=>'cc-of',
+						'contextid'=>$_SESSION['lti_context_id']
+					]
+				);
 			} else {
 				reporterror(_("You are not an instructor on the course and folder this link is pointing to. Auto-copying is not currently supported for folder-level links."));
 			}
@@ -1665,7 +1704,10 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
 	}
 	$userid = $_SESSION['userid'];
-
+	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+		echo _('Uh oh, something went wrong.  Please go back and try again');
+		exit;
+	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
 	}
@@ -1867,13 +1909,21 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':groupid'=>$newgroupid));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
+						':msgnotify'=>$msgnot, ':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+						':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+						':email'=>Sanitize::emailAddress($_POST['email']),
+						':msgnotify'=>$msgnot));
 				}
 				$userid = $DBH->lastInsertId();
 			}
@@ -2243,13 +2293,21 @@ if (isset($_GET['launch'])) {
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :groupid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email, ':msgnotify'=>0, ':groupid'=>$newgroupid));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email),
+						':msgnotify'=>0, ':groupid'=>$newgroupid));
 				} else {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights, ':FirstName'=>$firstname, ':LastName'=>$lastname, ':email'=>$email, ':msgnotify'=>0));
+					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$rights,
+						':FirstName'=>Sanitize::stripHtmlTags($firstname),
+						':LastName'=>Sanitize::stripHtmlTags($lastname),
+						':email'=>Sanitize::emailAddress($email),
+						':msgnotify'=>0));
 				}
 				$userid = $DBH->lastInsertId();
 			}
@@ -2366,6 +2424,19 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						':contextid'=>$_SESSION['lti_context_id'],
 						':courseid'=>$destcid,
 						':contextlabel'=>$_SESSION['lti_context_label']));
+					require_once('includes/TeacherAuditLog.php');
+					TeacherAuditLog::addTracking(
+						$destcid,
+						"Course Settings Change",
+						$destcid,
+						[
+							'action'=>'Establish LTI course connection',
+							'type'=>'2',
+							'contextid'=>$_SESSION['lti_context_id'],
+							'copycourse'=>$copycourse,
+							'orig'=>$_SESSION['place_aid'][0]
+						]
+					);
 
 				} else if ($_SESSION['lti_keytype']=='cc-c') {
 					$copyaid = true;
@@ -2377,7 +2448,17 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						':contextid'=>$_SESSION['lti_context_id'],
 						':courseid'=>$destcid,
 						':contextlabel'=>$_SESSION['lti_context_label']));
-
+					require_once('includes/TeacherAuditLog.php');
+					TeacherAuditLog::addTracking(
+						$destcid,
+						"Course Settings Change",
+						$destcid,
+						[
+							'action'=>'Establish LTI course connection',
+							'type'=>'3',
+							'contextid'=>$_SESSION['lti_context_id'],
+						]
+					);
 				}
 			} else {
 				$destcid = $stm->fetchColumn(0);

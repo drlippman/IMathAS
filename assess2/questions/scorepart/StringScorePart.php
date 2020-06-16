@@ -147,12 +147,12 @@ class StringScorePart implements ScorePart
                     if ($flags['remove_whitespace']===true) {
                         $anans = trim(preg_replace('/\s+/','',$anans));
                     }
-                    if ($flags['partial_credit']===true && $answerformat!='list') {
+                    if ($flags['partial_credit']===true && $answerformat!='list' && strlen($givenans)<250) {
                         $poss = strlen($anans);
                         $dist = levenshtein($anans,$givenans);
                         $score = ($poss - $dist)/$poss;
                         if ($score>$correct) { $correct = $score;}
-                    } else if (isset($flags['allow_diff'])) {
+                    } else if (isset($flags['allow_diff']) && strlen($givenans)<250) {
                         if (levenshtein($anans,$givenans) <= 1*$flags['allow_diff']) {
                             $correct += 1;
                             $foundloc = $j;

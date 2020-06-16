@@ -6,6 +6,7 @@
 	//single grade edit
 	require("../init.php");
 	require("../includes/htmlutil.php");
+	require_once("../includes/TeacherAuditLog.php");
 
 	$istutor = false;
 	$isteacher = false;
@@ -40,9 +41,25 @@
 	if (isset($_GET['del']) && $isteacher) {
 		$delItem = Sanitize::onlyInt($_GET['del']);
 		if (isset($_POST['confirm'])) {
+			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
+			$stm->execute(array(':id'=>$delItem));
+			$gbItemName = $stm->fetchColumn(0);
 			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':id'=>$delItem, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
+				$stm = $DBH->prepare("SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
+				$stm->execute(array(':gradetypeid'=>$delItem));
+				$grades = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
+				TeacherAuditLog::addTracking(
+            $cid,
+            "Delete Item",
+            $delItem,
+            [
+							'item_type'=>'Offline Grade Item',
+							'item_name'=>$gbItemName,
+							'grades' => $grades
+            ]
+        );
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
 				$stm->execute(array(':gradetypeid'=>$delItem));
 			}
@@ -301,8 +318,8 @@
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
-	} else if (isset($_COOKIE[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $_COOKIE[$cid.'gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -315,9 +332,9 @@
 	} else {
 		if (isset($_GET['secfilter'])) {
 			$secfilter = $_GET['secfilter'];
-			setsecurecookie($cid.'secfilter', $secfilter);
-		} else if (isset($_COOKIE[$cid.'secfilter'])) {
-			$secfilter = $_COOKIE[$cid.'secfilter'];
+			$_SESSION[$cid.'secfilter'] = $secfilter;
+		} else if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
@@ -373,7 +390,7 @@
 		 	padding-top: .5em;
 		 }
 		 </style>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051720"></script>';
 	$useeditor = "noinit";
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';

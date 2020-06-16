@@ -20,7 +20,7 @@ class DynamoDbSessionHandler implements \SessionHandlerInterface
 
     /** @var bool Keeps track of whether the session has been written. */
     private $sessionWritten = false;
-    
+
     /** @var int Keeps track of when the session was last written */
     private $lastWritten = 0;
 
@@ -132,7 +132,7 @@ class DynamoDbSessionHandler implements \SessionHandlerInterface
         }
         $changed = $id !== $this->openSessionId
             || $data !== $this->dataRead;
-            
+
         if (!$changed && time() - $this->lastWritten < 300) {
         	return true; // skip writing
         }
@@ -187,7 +187,8 @@ class DynamoDbSessionHandler implements \SessionHandlerInterface
      */
     private function formatId($id)
     {
-        return trim($this->sessionName . '_' . $id, '_');
+        global $installname;
+        return trim($this->sessionName . '_' . preg_replace('/\W/','',$installname) . '_' . $id, '_');
     }
 
 }

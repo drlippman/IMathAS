@@ -12,6 +12,44 @@ class AssessHelpers
 {
 
   /**
+   * Recalculute score for all assessments
+   * @param  int $cid   The course ID
+   * @param  int $aid   The assessment ID
+   * @param  bool $updateLTI   Whether to send updated LTI grades
+   */
+  public static function retotalAll($cid, $aid, $updateLTI=true) {
+    global $DBH;
+    // Re-total any student attempts on this assessment
+  	//need to re-score assessment attempts based on withdrawal
+  	$DBH->beginTransaction();
+  	$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
+  	$stm->execute(array($aid));
+  	if ($stm->rowCount() > 0) {
+  		require_once('../assess2/AssessInfo.php');
+  		require_once('../assess2/AssessRecord.php');
+  		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
+  		$assess_info->loadQuestionSettings();
+      $submitby = $assess_info->getSetting('submitby');
+  		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+  			$assess_record = new AssessRecord($DBH, $assess_info, false);
+  			$assess_record->setRecord($row);
+  			$assess_record->reTotalAssess();
+  			$assess_record->saveRecord();
+        // update LTI grade
+        $lti_sourcedid = $assess_record->getLTIsourcedId();
+        if (strlen($lti_sourcedid) > 1 && ($submitby == 'by_question' ||
+          ($assess_record->getStatus()&64)==64)
+        ) {
+          $gbscore = $assess_record->getGbScore();
+          $aidposs = $assess_info->getSetting('points_possible');
+          calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
+        }
+  		}
+  	}
+  	$DBH->commit();
+  }
+
+  /**
    * Submit all unsubmitted quiz-style attempts
    * @param  int $cid   The course ID
    * @param  int $aid   The assessment ID
@@ -29,7 +67,8 @@ class AssessHelpers
     // grab all questions settings
     $assess_info->loadQuestionSettings('all', false);
 
-    $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=?");
+    $DBH->beginTransaction();
+    $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
     $stm->execute(array($aid));
 
     $cnt = 0;
@@ -77,6 +116,7 @@ class AssessHelpers
         $cnt++;
       }
     }
+    $DBH->commit();
     return $cnt;
   }
 }

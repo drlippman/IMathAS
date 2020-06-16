@@ -3,7 +3,7 @@
     <div style="flex-grow: 1">
       <h1>{{ aInfo.name }}</h1>
 
-      <div class="med-below" v-html="aInfo.summary"></div>
+      <div class="med-below" v-html="aInfo.summary" ref="summary"></div>
 
       <settings-list />
 
@@ -84,6 +84,13 @@
           @click="startAssess"
           value="Submit"
         />
+        <button
+          v-if="showPreviewAll"
+          class = "secondary"
+          @click = "teacherPreviewAll"
+        >
+          {{ $t('closed.teacher_previewall_button') }}
+        </button>
         <button
           v-if="hasExit"
           type="button"
@@ -178,6 +185,9 @@ export default {
       }
       return true;
     },
+    showPreviewAll () {
+      return store.assessInfo.can_view_all && !this.aInfo.view_as_stu;
+    },
     showReset () {
       return this.aInfo.is_teacher &&
         !this.aInfo.view_as_stu &&
@@ -217,6 +227,9 @@ export default {
         };
       }
     },
+    teacherPreviewAll () {
+      actions.startAssess(false, '', [], null, true);
+    },
     reallyStartAssess () {
       const pwval = this.password;
       this.password = '';
@@ -242,6 +255,8 @@ export default {
       script.src = 'https://' + this.aInfo.livepoll_server + ':3000/socket.io/socket.io.js';
       document.getElementsByTagName('head')[0].appendChild(script);
     }
+    setTimeout(window.drawPics, 50);
+    window.rendermathnode(this.$refs.summary);
   }
 };
 </script>

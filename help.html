@@ -2188,17 +2188,17 @@ can be omitted.</p>
 
 <p>Array randomizers (return multiple results):</p>
 <ul>
-<li><strong>rands(min,max,n)</strong>:  Returns n integers between min and max</li>
-<li><strong>rrands(min,max,p,n)</strong>:  Returns n real numbers between min and max in steps of p</li>
-<li><strong>nonzerorands(min,max,n)</strong>:  Returns n nonzero integers between min and max</li>
-<li><strong>nonzerorrands(min,max,p,n)</strong>:  Returns n nonzero real numbers between min and max in steps of p</li>
-<li><strong>randsfrom(list/array,n)</strong>: Return n elements of the list/array.</li>
+<li><strong>rands(min,max,n,[order])</strong>:  Returns n integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>rrands(min,max,p,n,[order])</strong>:  Returns n real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>nonzerorands(min,max,n,[order])</strong>:  Returns n nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>randsfrom(list/array,n,[order])</strong>: Return n elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>jointrandfrom(list/array,list/array)</strong>:  Returns one element from each list, where the location used in each list is the same</li>
-<li><strong>diffrands(min,max,n)</strong>:  Returns n different integers between min and max</li>
-<li><strong>diffrrands(min,max,p,n)</strong>:  Returns n different real numbers between min and max in steps of p</li>
-<li><strong>diffrandsfrom(list/array,n)</strong>: Return n different elements of the list/array.</li>
-<li><strong>nonzerodiffrands(min,max,n)</strong>:  Returns n different nonzero integers between min and max</li>
-<li><strong>nonzerodiffrrands(min,max,p,n)</strong>:  Returns n different nonzero real numbers between min and max in steps of p</li>
+<li><strong>diffrands(min,max,n,[order])</strong>:  Returns n different integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>diffrrands(min,max,p,n,[order])</strong>:  Returns n different real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>diffrandsfrom(list/array,n,[order])</strong>: Return n different elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>nonzerodiffrands(min,max,n,[order])</strong>:  Returns n different nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>nonzerodiffrrands(min,max,p,n,[nonzero,order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>jointshuffle(list/array1,list/array2,[n1,n2])</strong>:  Shuffles two lists/arrays in a way that retains
     respective order.  In n1 is provided, n1 elements from each shuffled array will be returned (like
     a joint version of diffrandsfrom).  If n2 is also provided, n1 elements of list/array1 and n2
@@ -2367,9 +2367,11 @@ The following macros help with formatting values for display:
 <li><strong>prettyreal(number,decimals,[comma])</strong>:  Adds commas in thousands spaces of number, and displays the value to a fixed number of decimals places (rounding if needed).
    Example: prettyreal(1234.567,2) will return "1,234.57", and prettyreal(1.8,3) will return "1.800".  The result is a string, which
    can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li>
-<li><strong>prettysmallnumber(number)</strong>:  Prevents very small numbers from being displayed as scientific notation</li>
+<li><strong>prettysmallnumber(number, [space])</strong>:  Prevents very small numbers from being displayed as scientific notation.
+   Set space to true to add space in groups of 3, like 0.000 000 02</li>
 <li><strong>prettysigfig(number,sigfigs,[comma,choptrailingzeros])</strong>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" override.
-   Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.</li>
+   Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.
+   This is for display; to round a number for calculations, use roundsigfig.</li>
 <li><strong>makescinot(number,[decimals,format])</strong>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
 <li><strong>prettytime(value,informat,outformat)</strong>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
     value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
@@ -2484,6 +2486,7 @@ These macros are used for mathematical calculations:
 <li><strong>lcm(a,b)</strong>: Least common multiple of a and b</li>
 <li><strong>sign(a,[option])</strong>:  Returns the sign of a, as 1 or -1.  If option is set to true, returns a string "+" or "-" instead. If option
   is set to "onlyneg", it returns the string "-" if a is negative, or "" otherwise.</li>
+<li><strong>sgn(a)</strong>: Returns the sign of a, as -1, 0, or 1.</li>
 <li><strong>v!</strong>: Factorial, like $a = $b!</li>
 <li><strong>evalfunc(func,vars,val1,val2,..)</strong>: Evaluates a function given the variables and values for each variable.
   for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
@@ -2590,6 +2593,8 @@ available in each library</p>
 <tr><td>log</td><td>Common Logarithm base 10</td></tr>
 <tr><td>abs</td><td>Absolute Value.  Note that while abs() is used for calculations, you may prefer to use | brackets for display</td></tr>
 <tr><td>round(n,d)</td><td>round number n to d decimal places</td></tr>
+<tr><td>roundsigfig(n,s)</td><td>round number n to s significant digits. This is for calculations;
+	if you need a value for display and want to ensure trailing 0's display, use prettysigfig</td></tr>
 <tr><td>floor,ceil</td><td>floor/ceiling: integer below/above given number</td></tr>
 <tr><td>min,max</td><td>min or max of the passed values. Can be used as min($a,$b,$c) or min($arrayvariable).</td></tr>
 </tbody>
@@ -3198,9 +3203,10 @@ A student is asked to enter a string (a word or list of letters).
 		</ul>
 		By default, compress_whitespace and ignore_case are On.  Only one of
 		partial_credit, allow_diff, in_answer or regex may be used at a time.</dd>
-<dt>$scoremethod = "takeanything" or "takeanythingorblank"</dt>
-	<dd>Sets the problem to give full credit for any answer.  The latter also counts
-	blank answers as correct.</dd>
+<dt>$scoremethod = "takeanything" or "takeanythingorblank" or "submitblank"</dt>
+	<dd>"takeanything" or "takeanythingorblank" sets the problem to give full credit
+		for any answer.  "takeanythingorblank" also counts blank answers as correct.
+	  "submitblank" will cause blank answers to get submitted for scoring (new system only).</dd>
 <dt>$answerformat = "list" </dt>
 	<dd>Specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with
 	partial_credit flag.  Duplicates are not ignored.</dd>
@@ -3358,6 +3364,8 @@ drawn line from the correct line.
 	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is
 	between 0 and 1).  Otherwise
 	the student will receive full credit.  Not set by default.</dd>
+<dt>$scoremethod = "takeanything" </dt>
+		<dd>When used, this will give full credit for any non-blank answer.  This might be of use with the freehand drawing option.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer </dt>
@@ -3569,6 +3577,13 @@ The entries are compared to a given tolerance.
 	used by default.</dd>
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$scoremethod = "byelement" </dt>
+	<dd>By default, the whole matrix must be correct to receive any credit.
+	Set $scoremethod = "byelement" to give partial credit if only some elements of
+	the matrix are correct.</dd>
+<dt>$displayformat = "det" </dt>
+	<dd>When $answersize is used, by default square brackets are used around the
+		entry array. Set $displayformat = "det" to use vertical bars instead.</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$answerboxsize = number </dt>
@@ -3615,6 +3630,13 @@ The entries are compared to a given tolerance.
 	used by default.</dd>
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$scoremethod = "byelement" </dt>
+	<dd>By default, the whole matrix must be correct to receive any credit.
+	Set $scoremethod = "byelement" to give partial credit if only some elements of
+	the matrix are correct.</dd>
+<dt>$displayformat = "det" </dt>
+	<dd>When $answersize is used, by default square brackets are used around the
+		entry array. Set $displayformat = "det" to use vertical bars instead.</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
 <dt>$answerboxsize = number </dt>
@@ -3664,6 +3686,9 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 <dt>$answerformat = "normalcurve" </dt>
 	<dd>Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
 	shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.</dd>
+<dt>$scoremethod = "partialcredit"</dt>
+  <dd>By default, interval answers will be marked all right or all wrong.  Setting $scoremethod = "partialcredit"
+		will changing the scoring mode to give partial credit. (new assessment system only).</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
 <dt>$answerboxsize = number </dt>
@@ -3715,6 +3740,11 @@ invertal notation.
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$scoremethod = "partialcredit"</dt>
+  <dd>By default, interval answers will be marked all right or all wrong.  Setting $scoremethod = "partialcredit"
+		will changing the scoring mode to give partial credit. Note that answers
+		not meeting $answerformat requirements will have deductions in addition to
+		correctness checks. (new assessment system only).</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
 <dt>$answerboxsize = number </dt>
@@ -3750,6 +3780,12 @@ None - the file upload type is not computer graded.
 <dt>$scoremethod = "takeanything" or "takeanythingorblank"</dt>
 	<dd>Sets the problem to give full credit for any answer.  The latter also counts
 	blank answers as correct.</dd>
+<dt>$answerformat = "images", "canpreview", or a list of file extensions</dt>
+	<dd>Set a list of preferred file formats for the file selector.  "images" is
+	 a shorthand for .jpg,.gif,.png,.jpeg. "canpreview" is a shorthand for image
+   files, office files, and pdfs, which can be previewed inline.  If listing
+   file extensions, provide a comma separated list with leading periods, like
+    ".pdf,.docx,.doc"  </dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
 <dt>$showanswer </dt>

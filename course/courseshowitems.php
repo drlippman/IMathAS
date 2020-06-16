@@ -101,11 +101,11 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 	$out .= '</div>';
 	return $out;
 }
-function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
+function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name) {
 	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
 	if ($blocktype == 'T') {
@@ -122,11 +122,11 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	$out .= '</div>';
 	return $out;
 }
-function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver) {
+function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name) {
 	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
@@ -144,11 +144,11 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver) {
 	$out .= '</div>';
 	return $out;
 }
-function getDrillDD($i, $typeid, $parent, $itemid) {
+function getDrillDD($i, $typeid, $parent, $itemid, $name) {
 	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -161,11 +161,11 @@ function getDrillDD($i, $typeid, $parent, $itemid) {
 	$out .= '</div>';
 	return $out;
 }
-function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true) {
+function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true, $name) {
 	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"add$typename.php?id=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -183,25 +183,25 @@ function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $sho
 	$out .= '</div>';
 	return $out;
 }
-function getInlineDD($i, $typeid, $parent, $itemid, $showstats) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'inlinetext', 'I', $showstats);
+function getInlineDD($i, $typeid, $parent, $itemid, $showstats, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'inlinetext', 'I', $showstats, $name);
 }
-function getLinkedDD($i, $typeid, $parent, $itemid) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'linkedtext', 'L', true);
+function getLinkedDD($i, $typeid, $parent, $itemid, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'linkedtext', 'L', true, $name);
 }
-function getForumDD($i, $typeid, $parent, $itemid) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'forum', 'F', true);
+function getForumDD($i, $typeid, $parent, $itemid, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'forum', 'F', true, $name);
 }
-function getWikiDD($i, $typeid, $parent, $itemid) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'wiki', 'W', true);
+function getWikiDD($i, $typeid, $parent, $itemid, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'wiki', 'W', true, $name);
 }
 
 
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
-	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
-	   global $itemshowdata, $exceptionfuncs;
+	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset;
+	   global $itemshowdata, $exceptionfuncs,$coursejsondata;
 
 	   require_once("../includes/filehandler.php");
 
@@ -319,9 +319,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo "<div class=title>";
 
 					if ($ispublic) {
-						echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+						echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
 					} else {
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span class=noticetext>", _('New'), "</span>";
@@ -333,7 +333,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					}
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 					echo '</div>'; //itemhdr;
 
@@ -382,7 +382,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo "</div>"; //title
 
 					if ($canedit) {
-						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 
 					echo '</div>'; //itemhdr
@@ -412,7 +412,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
+					echo "<b role=\"heading\"><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					echo "$astyle>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</a></b> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -426,10 +426,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					} else {
 						echo '<div class="itemhdrright">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle ";
+						echo 'aria-label="'._('Isolate block').' '.Sanitize::encodeStringForDisplay($items[$i]['name']).'">';
+						echo _('Isolate'), "</a>";
 						echo '</div>';
 
 					}
@@ -506,7 +508,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
+					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo " <span class=noticetext>", _('New'), "</span>";
@@ -519,7 +521,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 					echo '</div>'; //itemhdr
 					//echo '<div class="clear"></div>';
@@ -561,7 +563,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 					//echo '<div class="clear"></div>';
 
@@ -591,7 +593,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<b>";
+					echo "<b role=\"heading\">";
 					$control = "onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					$control .= 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					if ($items[$i]['SH'][0]=='S') {
@@ -611,10 +613,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					} else {
 						echo '<div class="itemhdrright">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle ";
+						echo 'aria-label="'._('Isolate block').' '.Sanitize::encodeStringForDisplay($items[$i]['name']).'">';
+						echo _('Isolate'), "</a>";
 						echo '</div>';
 					}
 					echo '</div>'; //itemhdr
@@ -790,7 +794,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				 if ($line['ver'] > 1) {
 					 $thisaddassess = "addassessment2.php";
 					 	if ($assessUseVueDev) {
-					 		$assessUrl = "http://localhost:8080/?cid=$cid&aid=$typeid";
+							$assessUrl = sprintf("%s/?cid=%s&aid=%s",
+								$CFG['assess2-use-vue-dev-address'], $cid, $typeid);
 						} else {
 							$assessUrl = "../assess2/?cid=$cid&aid=$typeid";
 						}
@@ -912,7 +917,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</div>'; //title
 
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 
@@ -955,7 +960,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					 }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -973,7 +978,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				}
 				echo '</div>'; //title
 				if ($canedit) {
-					echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+					echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				}
 
 				echo '</div>'; //itemhdr
@@ -1001,7 +1006,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -1024,7 +1029,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -1067,7 +1072,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1126,6 +1131,32 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   	   $line['text'] = '';
 				   }
 			   }
+				 if (strpos($line['text'], '###') !== false) {
+					 $toggleParts = preg_split('/<p.*?###([^<>]+?)###.*\/p>/', $line['text'], 0, PREG_SPLIT_DELIM_CAPTURE);
+					 if (count($toggleParts) > 1) {
+						 $n = 0;
+						 for ($j=0;$j<(count($toggleParts)-1)/2;$j++) {
+							 if (strpos($toggleParts[2*$j+1], '(Active)') !== false) {
+								 $n = $j;
+								 $toggleParts[2*$j+1] = trim(str_replace('(Active)','', $toggleParts[2*$j+1]));
+								 break;
+							 }
+						 }
+						 $line['text'] = $toggleParts[0] . $toggleParts[2*($n+1)];
+						 if ($canedit) {
+							 $toggler = '<p><select onchange="chgInlineToggler(this, '.Sanitize::onlyInt($typeid).')">';
+							 for ($j=0;$j<(count($toggleParts)-1)/2;$j++) {
+								 $toggler .= '<option value="'.$j.'" ';
+								 if ($j==$n) {
+									 $toggler .= 'selected=1';
+								 }
+								 $toggler .= '>'.Sanitize::encodeStringForDisplay($toggleParts[2*$j+1]).'</option>';
+							 }
+							 $toggler .= '</select></p>';
+							 $line['text'] = $toggler . $line['text'];
+						 }
+					 }
+				 }
 			   if (isset($studentid) && !isset($_SESSION['stuview'])) {
 			   	   $rec = "data-base=\"inlinetext-$typeid\" ";
 			   	   $line['text'] = str_replace('<a ','<a '.$rec, $line['text']);
@@ -1167,7 +1198,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo "</div>"; //title
 				   if ($canedit) {
-				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false);
+				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false, $line['title']);
 				   }
 				   if ($line['title']!='##hidden##' || $viewall) {
 				   	   echo '</div>'; //itemhdr
@@ -1216,7 +1247,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false);
+				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false, $line['title']);
 				   }
 				   if ($line['title']!='##hidden##' || $viewall) {
 				   	   echo '</div>'; //itemhdr
@@ -1290,7 +1321,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getDrillDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getDrillDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1318,7 +1349,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getDrillDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getDrillDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   enditem($canedit); //echo "</div>\n";
@@ -1341,7 +1372,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getDrillDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getDrillDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 
@@ -1436,12 +1467,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo getItemIcon($icon, "link to $icon", false);
 
 				   echo "<div class=title>";
-				   if (isset($readlinkeditems[$typeid])) {
-				   	   echo '<b class="readitem">';
-				   } else {
-				   	   echo '<b>';
-				   }
-				   echo "<a href=\"$alink\" $rec $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b>\n";
+				   echo "<b><a href=\"$alink\" $rec $target>".Sanitize::encodeStringForDisplay($line['title'])."</a></b>\n";
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
@@ -1450,7 +1476,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i], $line['title']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1473,7 +1499,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i], $line['title']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1562,7 +1588,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getForumDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getForumDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
@@ -1609,7 +1635,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getForumDD($i, $typeid, $parent, $items[$i]);
+				   	echo getForumDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['description']}</div>\n");
@@ -1660,7 +1686,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getForumDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getForumDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
@@ -1762,7 +1788,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   if ($duedates!='') {echo "<br/>$duedates";}
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getWikiDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getWikiDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
@@ -1787,7 +1813,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getWikiDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getWikiDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");

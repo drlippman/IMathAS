@@ -110,7 +110,7 @@ if ($showmessagesgadget) {
 	$page_newmessagelist = array();
 	$query = "SELECT imas_msgs.id,imas_msgs.msgfrom,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.courseid ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
-	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ";
+	$query .= "imas_msgs.msgto=:msgto AND imas_msgs.viewed=0 AND deleted<2 ";
 	$query .= "ORDER BY senddate DESC ";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':msgto'=>$userid));
@@ -124,7 +124,7 @@ if ($showmessagesgadget) {
 	}
 } else {
 	//check for new messages
-	$stm = $DBH->prepare("SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND (isread=0 OR isread=4) GROUP BY courseid");
+	$stm = $DBH->prepare("SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND viewed=0 AND deleted<2 GROUP BY courseid");
 	$stm->execute(array(':msgto'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$newmsgcnt[$row[0]] = Sanitize::onlyInt($row[1]);

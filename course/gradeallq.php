@@ -2,6 +2,7 @@
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
 	require("../init.php");
+	require_once("../includes/TeacherAuditLog.php");
 
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
@@ -15,9 +16,9 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	$stu = $_GET['stu'];
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-		$gbmode = $_GET['gbmode'];
-	} else if (isset($_COOKIE[$cid.'gbmode'])) {
-		$gbmode = $_COOKIE[$cid.'gbmode'];
+	$gbmode = $_GET['gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -40,9 +41,9 @@
 		$secfilter = $tutorsection;
 	} else if (isset($_GET['secfilter'])) {
 		$secfilter = $_GET['secfilter'];
-		setsecurecookie($cid.'secfilter', $secfilter);
-	} else if (isset($_COOKIE[$cid.'secfilter'])) {
-		$secfilter = $_COOKIE[$cid.'secfilter'];
+		$_SESSION[$cid.'secfilter'] = $secfilter;
+	} else if (isset($_SESSION[$cid.'secfilter'])) {
+		$secfilter = $_SESSION[$cid.'secfilter'];
 	} else {
 		$secfilter = -1;
 	}
@@ -80,13 +81,13 @@
 						if ($v=='N/A') {
 							$allscores[$kp[1]][$kp[2]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]] = $v;
+							$allscores[$kp[1]][$kp[2]] = floatval($v);
 						}
 					} else {
 						if ($v=='N/A') {
 							$allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
+							$allscores[$kp[1]][$kp[2]][$kp[3]] = floatval($v);
 						}
 					}
 				} else if ($kp[0]=='fb') {
@@ -108,6 +109,7 @@
 		} else {
 			$onepergroup = false;
 		}
+		$scoresToLog = array();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -138,6 +140,7 @@
 				if ($onepergroup) {
 					if ($line['agroupid']==0) { continue;}
 					foreach ($grpscores[$line['agroupid']] as $loc=>$sv) {
+						$oldscore = $scores[$loc];
 						if (is_array($sv)) {
 							if (count($sv) < count(explode('~', $scores[$loc]))) {
 								echo "Oh-oh: score didn't seem to be submitted properly. Aborting";
@@ -146,6 +149,9 @@
 							$scores[$loc] = implode('~',$sv);
 						} else {
 							$scores[$loc] = $sv;
+						}
+						if ($oldscore != $scores[$loc]) {
+							$scoresToLog[$line['userid']] = ['loc'=>$loc, 'old'=>$oldscore, 'new'=>$scores[$loc]];
 						}
 					}
 					if (isset($grpfeedback[$line['agroupid']])) {
@@ -159,6 +165,7 @@
 					}
 				} else {
 					foreach ($allscores[$line['id']] as $loc=>$sv) {
+						$oldscore = $scores[$loc];
 						if (is_array($sv)) {
 							if (count($sv) < count(explode('~', $scores[$loc]))) {
 								echo "Oh-oh: score didn't seem to be submitted properly. Aborting";
@@ -167,6 +174,9 @@
 							$scores[$loc] = implode('~',$sv);
 						} else {
 							$scores[$loc] = $sv;
+						}
+						if ($oldscore != $scores[$loc]) {
+							$scoresToLog[$line['userid']] = ['loc'=>$loc, 'old'=>$oldscore, 'new'=>$scores[$loc]];
 						}
 					}
 					if (isset($allfeedbacks[$line['id']])) {
@@ -180,6 +190,7 @@
 					}
 					//$feedback = $_POST['feedback-'.$line['id']];
 				}
+
 				$scorelist = implode(",",$scores);
 				if (count($sp)>1) {
 					$scorelist .= ';'.$sp[1].';'.$sp[2];
@@ -206,6 +217,17 @@
 			$query .= "ON DUPLICATE KEY UPDATE bestscores=VALUES(bestscores),feedback=VALUES(feedback)";
 			$stm = $DBH->prepare($query);
 			$stm->execute($updatedata);
+		}
+		if (count($scoresToLog)>0) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Change Grades",
+				$aid,
+				array(
+					'qid'=>$qid,
+					'changes'=>$scoresToLog
+				)
+			);
 		}
 
 		if (isset($_GET['quick'])) {
@@ -271,7 +293,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=021519"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042920"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
@@ -605,7 +627,7 @@
 						echo "  <b>$cntb:</b> " ;
 						if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
 							$url = getasidfileurl($match[1]);
-							echo "<a href=\"" . Sanitize::encodeUrlForHref($url) . "\" target=\"_new\">".Sanitize::encodeStringForDisplay(basename($match[1]))."</a>";
+							echo "<a class=\"attach\" href=\"" . Sanitize::encodeUrlForHref($url) . "\" target=\"_new\">".Sanitize::encodeStringForDisplay(basename($match[1]))."</a>";
 						} else {
 							if (strpos($laarr[$k],'$f$')) {
 								if (strpos($laarr[$k],'&')) { //is multipart q

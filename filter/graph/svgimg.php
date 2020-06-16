@@ -2,7 +2,7 @@
 	$dbsetup = true; //to prevent database connection
 	require("../../init_without_validate.php");
 
-	$imgdir = 'imgs/'; //relative to current dir
+	$imgdir = __DIR__ . '/imgs/'; //relative to current dir
 
 	if (isset($_GET['script']) && trim($_GET['script']!='')) {
 		$fn = md5($_GET['script']);
@@ -21,5 +21,9 @@
 			$AS->outputimage($imgdir.$fn.'.png');
 		}
 	}
-	header("Location: " . $GLOBALS['basesiteurl'] . "/filter/graph/$imgdir$fn.png");
+	//header("Location: " . $GLOBALS['basesiteurl'] . "/filter/graph/$imgdir$fn.png");
+	header("Content-Type: image/png");
+	header("Content-Length: " . filesize($imgdir.$fn.'.png'));
+	$fp = fopen($imgdir.$fn.'.png', 'rb');
+	fpassthru($fp);
 ?>

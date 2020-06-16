@@ -7,7 +7,7 @@
 	 if (!file_exists("$curdir/config.php")) {
 		 header('Location: ' . $GLOBALS['basesiteurl'] . "/install.php?r=" . Sanitize::randomQueryStringParam());
 	 }
-
+	$init_session_start = true;
  	require_once(__DIR__ . "/init_without_validate.php");
 	require_once(__DIR__ ."/includes/newusercommon.php");
 	$cid = Sanitize::courseId($_GET['cid']);
@@ -28,8 +28,14 @@
 	 }
 	 $page_newaccounterror = '';
 	 if (isset($_POST['submit']) && $_POST['submit']=="Sign Up") {
+		if ($_POST['challenge'] !== $_SESSION['challenge']) {
+ 			echo "Invalid submission";
+ 			exit;
+ 		}
+ 		$_SESSION['challenge'] = '';
 		unset($_POST['username']);
 		unset($_POST['password']);
+
 		$page_newaccounterror = checkNewUserValidation();
 		$stm = $DBH->prepare("SELECT enrollkey,deflatepass FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['cid']));
@@ -71,7 +77,11 @@
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
 			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
+			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights,
+				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+				':email'=>Sanitize::emailAddress($_POST['email']),
+				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
 			$newuserid = $DBH->lastInsertId();
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
@@ -157,12 +167,8 @@
 		//$placeinhead = "<style type=\"text/css\">div#header {clear: both;height: 75px;background-color: #9C6;margin: 0px;padding: 0px;border-left: 10px solid #036;border-bottom: 5px solid #036;} \n.vcenter {font-family: sans-serif;font-size: 28px;margin: 0px;margin-left: 30px;padding-top: 25px;color: #fff;}</style>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
 		$pagetitle = $coursename;
-		 if (isset($_SESSION['challenge'])) {
-			 $challenge = $_SESSION['challenge'];
-		 } else {
-			 $challenge = base64_encode(microtime() . rand(0,9999));
-			 $_SESSION['challenge'] = $challenge;
-		 }
+		$challenge = uniqid();
+		$_SESSION['challenge'] = $challenge;
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		if (isset($CFG['locale'])) {
 			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';

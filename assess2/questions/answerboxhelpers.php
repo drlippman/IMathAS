@@ -580,6 +580,7 @@ function getcolormark($c,$wrongformat=false) {
 
 function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, $colorbox, $format="number") {
 	$answerbox = preg_replace('/<label.*?<\/label>/','',$answerbox);  //remove existing ansprompt
+
 	$answerbox = str_replace('<table ','<table style="display:inline-table;vertical-align:middle" ', $answerbox);
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
@@ -606,7 +607,13 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 			$infsoln = $anspromptp[2];
 		}
 	}
-	$out .= '<div id="qnwrap'.$qn.'" class="'.$colorbox.'">';
+	$out .= '<div id="qnwrap'.$qn.'" class="'.$colorbox.'" role="group" ';
+  if (preg_match('/aria-label=".*?"/', $answerbox, $arialabel)) {
+    $answerbox = preg_replace('/aria-label=".*?"/',
+      'aria-label="'.Sanitize::encodeStringForDisplay($specsoln).'"', $answerbox);
+    $out .= $arialabel[0];
+  }
+  $out .= '>';
 	$out .= '<ul class="likelines">';
 	$out .= '<li><input type="radio" id="qs'.$qn.'-s" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'><label for="qs'.$qn.'-s">'.$specsoln.'</label>';
 	if ($la=='DNE' || $la=='oo') {

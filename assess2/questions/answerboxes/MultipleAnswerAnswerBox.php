@@ -32,6 +32,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $assessmentId = $this->answerBoxParams->getAssessmentId();
 
 		$out = '';
 		$tip = '';
@@ -71,7 +72,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $answers = count($questions)-1;
       }
     }
-		$_SESSION['choicemap'][$qn] = $randkeys;
+		$_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
     if (isset($GLOBALS['capturechoices'])) {
       $GLOBALS['choicesdata'][$qn] = $questions;
     }
@@ -100,10 +101,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
 
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
+			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\"".$this->answerBoxParams->getQuestionIdentifierString().' '._('Select one or more answers')."\">";
 		} else  {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\"".$this->answerBoxParams->getQuestionIdentifierString().' '._('Select one or more answers')."\">";
 		}
 		if ($displayformat == "horiz") {
 

@@ -304,7 +304,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid ."&r=" .Sanitize::randomQueryStringParam());
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid.$btf ."&r=" .Sanitize::randomQueryStringParam());
 		}
 		exit;
 	} else {
@@ -610,7 +611,7 @@ if ($overwriteBody==1) {
 			</div>
 		</div>
 
-		<span class="form"><?php echo _("Open page in:"); ?>: </span>
+		<span class="form"><?php echo _("Open page in:"); ?></span>
 		<span class="formright">
 			<input type=radio name="target" value="0" <?php writeHtmlChecked($line['target'],0);?>/><?php echo _("Current window"); ?>/tab<br/>
 			<input type=radio name="target" value="1" <?php writeHtmlChecked($line['target'],1);?>/><?php echo _("New window"); ?>/tab<br/>

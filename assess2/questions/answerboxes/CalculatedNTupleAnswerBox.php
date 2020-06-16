@@ -101,7 +101,8 @@ class CalculatedNTupleAnswerBox implements AnswerBox
     		}
 
     		$out .= '<input ' .
-    						Sanitize::generateAttributeString($attributes) .
+                'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
+                Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';
 

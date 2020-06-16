@@ -8,9 +8,9 @@ require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
 if (isset($_GET['secfilter'])) {
 	$secfilter = $_GET['secfilter'];
-	setsecurecookie($cid.'secfilter', $secfilter);
-} else if (isset($_COOKIE[$cid.'secfilter'])) {
-	$secfilter = $_COOKIE[$cid.'secfilter'];
+	$_SESSION[$cid.'secfilter'] = $secfilter;
+} else if (isset($_SESSION[$cid.'secfilter'])) {
+	$secfilter = $_SESSION[$cid.'secfilter'];
 } else {
 	$secfilter = -1;
 }
@@ -75,6 +75,32 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 } //END DATA MANIPULATION
 
 /******* begin html output ********/
+if (isset($_GET['download'])) {
+	header('Content-type: text/csv');
+	header("Content-Disposition: attachment; filename=\"logingrid-$cid.csv\"");
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	header('Pragma: public');
+
+	echo _('Name');
+	foreach ($dates as $date) {
+		echo ','.$date;
+	}
+	echo "\n";
+	$n = count($dates);
+	foreach ($stus as $stu) {
+		echo '"'.str_replace('"', '""', strip_tags($stu[0])).'"';
+		for ($i=0;$i<$n;$i++) {
+			echo ',';
+			if (isset($logins[$stu[1]][$i])) {
+				echo $logins[$stu[1]][$i];
+			} else {
+				echo 0;
+			}
+		}
+		echo "\n";
+	}
+	exit;
+}
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css"> table.logingrid td {text-align: center; border-right:1px solid #ccc;} table.logingrid td.left {text-align: left;}</style>';
 require("../header.php");
@@ -84,6 +110,10 @@ if ($overwriteBody==1) {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerlogingrid" class="pagetitle"><h1>Login Grid View</h1></div>
+
+	<div class="cpmid">
+		<a href="logingrid.php?cid=<?php echo $cid;?>&download=true">Download as CSV</a>
+	</div>
 
 	<form method="post" action="logingrid.php?cid=<?php echo $cid;?>">
 	<p>Showing Number of Logins <?php echo "$starttime through $endtime";?></p>

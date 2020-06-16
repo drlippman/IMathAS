@@ -29,6 +29,7 @@ class MatrixScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $isRescore = $this->scoreQuestionParams->getIsRescore();
 
         $defaultreltol = .0015;
 
@@ -40,6 +41,9 @@ class MatrixScorePart implements ScorePart
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
+
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -53,10 +57,14 @@ class MatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else if (isset($answersize)) {
             $sizeparts = explode(',',$answersize);
-            for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
-                $givenanslist[$i] = $_POST["qn$qn-$i"];
-            }
             $N = $sizeparts[0];
+            if ($isRescore) {
+              $givenanslist = explode('|', $givenans);
+            } else {
+              for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
+                  $givenanslist[$i] = $_POST["qn$qn-$i"];
+              }
+            }
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
             $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
@@ -145,28 +153,31 @@ class MatrixScorePart implements ScorePart
             $givenanslist = $this->rref($givenanslist, $N);
           }
         }
-
+        $incorrect = 0;
         for ($i=0; $i<count($answerlist); $i++) {
             if (!is_numeric($givenanslist[$i])) {
-                $correct = false;
-                break;
+                $incorrect++;
+                continue;
             } else if (isset($abstolerance)) {
                 if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance-1E-12) {
-                    $correct = false;
-                    break;
+                  $incorrect++;
+                  continue;
                 }
             } else {
                 if (abs($answerlist[$i] - $givenanslist[$i])/(abs($answerlist[$i])+.0001) > $reltolerance-1E-12) {
-                    $correct = false;
-                    break;
+                  $incorrect++;
+                  continue;
                 }
-
             }
         }
 
-        if ($correct) {
+        if ($correct && $incorrect == 0) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
+        } else if ($correct && $scoremethod == 'byelement') {
+          $score = (count($answerlist) - $incorrect)/count($answerlist);
+          $scorePartResult->setRawScore($score);
+          return $scorePartResult;
         } else {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;

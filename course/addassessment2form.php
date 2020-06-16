@@ -70,7 +70,7 @@ $vueData = array(
 	'defoutcome' => $line['defoutcome'],
 	'outcomeOptions' => $outcomeOptions,
 	'isgroup' => $line['isgroup'],
-	'groupmax' => ($line['groupmax'] > 2) ? $line['groupmax'] : 6,
+	'groupmax' => ($line['groupmax'] > 1) ? $line['groupmax'] : 6,
 	'canchangegroup' => !($taken && $line['isgroup']>0),
 	'groupsetid' => $line['groupsetid'],
 	'groupOptions' => $groupOptions,
@@ -166,7 +166,7 @@ $vueData = array(
 		</span><br class=form />
 	</div>
 
-	<div v-if="avail==1 && edatetype=='edate'">
+	<div v-show="avail==1 && edatetype=='edate'">
 		<span class=form><?php echo _('Practice mode');?>:</span>
 		<span class=formright>
 			<label>
@@ -193,6 +193,15 @@ $vueData = array(
 					<br/>
 					<?php echo _('Warning: Changing settings after students have started may require converting their data, and lead to loss of data on earlier attempts. This will occur if converting between Homework-style and Quiz-style.');?>
 				</span>
+			</span><br class=form />
+		</div>
+		<div v-show="copyfrom > 0">
+			<span class=form>Also copy:</span>
+			<span class=formright>
+				<input type=checkbox name="copysummary" value=1 /> <?php echo _('Summary');?><br/>
+				<input type=checkbox name="copyinstr" value=1 /> <?php echo _('Intro/Instructions');?><br/>
+				<input type=checkbox name="copydates" value=1 /> <?php echo _('Dates');?> <br/>
+				<input type=checkbox name="copyendmsg" value=1 /> <?php echo _('End of Assessment Messages');?>
 			</span><br class=form />
 		</div>
 		<div v-show="copyfrom == 0">

@@ -30,7 +30,7 @@ function Viewer3D(paramObj, targetel) {
 	t._inrender = false;
 	t._paper = document.getElementById(targetel);
 	t._context = t._paper.getContext("2d");
-	
+
 	t._context.fillStyle = "#FFFFFF";
 	t._context.fillRect(0, 0, t.swidth, t.sheight);
 
@@ -39,13 +39,13 @@ function Viewer3D(paramObj, targetel) {
 	$(t._paper).on('mouseup touchend', function(e) {t.setMouseUp(e)});
 	$(t._paper).on('mousemove touchmove', function(e) {t.doMouseMove(e)});
 	$(t._paper).on('keydown', function(e) {t.doKeydown(e)});
-	
+
 	t._context.font = "10px sans-serif";
 	t._context.textAlign = "center";
 	t._context.textBaseline = "middle";
-	
+
 	//Parse the parameters
-		
+
 	t.vert = paramObj['verts'].split('~');
 	if (paramObj['faces'] != undefined) {
 		t.face = paramObj['faces'].split('~');
@@ -54,6 +54,10 @@ function Viewer3D(paramObj, targetel) {
 		}
 	} else if (paramObj['curves'] != undefined) {
 		t.iscurve = true;
+	}
+	console.log(paramObj);
+	if (paramObj['showaxes'] === 0) {
+		t.showaxes = false;
 	}
 	for (i=0; i<t.vert.length; i++) {
 		t.vert[i] = t.splitfloat(t.vert[i]);
@@ -89,19 +93,19 @@ function Viewer3D(paramObj, targetel) {
 		t.zmin -= 1;
 		t.zmax += 1;
 	}
-	
+
 	//initialize
 	var daxis = [];
-	
+
 	t.centr[0] = (t.xmax+t.xmin)/2;
 	t.centr[1] = (t.ymax+t.ymin)/2;
 	t.centr[2] = (t.zmax+t.zmin)/2;
-	
+
 	t.w2 = t.swidth/2;
 	t.h2 = t.sheight/2;
 
 	t.scale = 1.0*Math.min(t.w2,t.h2) / (1.8*Math.min(t.xmax-t.centr[0],t.ymax-t.centr[1],t.zmax-t.centr[2]));
-	
+
 	//set up bounding box.  Corners:
 	// 0:(t.xmin,t.ymin,t.zmin), 1:(t.xmax,t.ymin,t.zmin), 2:(t.xmin,t.ymax,t.zmin), 3:(t.xmax,t.ymax,t.zmin)
 	// 4:(t.xmin,t.ymin,t.zmax), 5:(t.xmax,t.ymin,t.zmax), 6:(t.xmin,t.ymax,t.zmax), 7:(t.xmax,t.ymax,t.zmax)
@@ -115,19 +119,19 @@ function Viewer3D(paramObj, targetel) {
 	daxis[0] = (t.xmax-t.xmin);
 	daxis[1] = (t.ymax-t.ymin);
 	daxis[2] = (t.zmax-t.zmin);
-	  
+
 	t.axlbl[0] = "x";
 	t.axlbl[1] = "y";
 	t.axlbl[2] = "z";
-	
-	
+
+
 	var basescale = Math.min(daxis[0],daxis[1],daxis[2]);
 	for (i=0; i<3;i++) {
 		t.axisscl[i] = basescale/daxis[i];
 	}
 	t.cam = 10*basescale;
-	  
-	  
+
+
 	  var start = [];
 	  var pow10;
 	  var scl;
@@ -165,7 +169,7 @@ function Viewer3D(paramObj, targetel) {
 		}
 		t.ticksize[i] = ticks[i]/10;
 	  }
-	  
+
 	  for (i=0;i<3;i++) {
 		t.axes[i] = [];
 		t.axes1[i] = [];
@@ -186,7 +190,7 @@ function Viewer3D(paramObj, targetel) {
 			t.axeslabels[i][j] = t.axes[i][j][0][i];
 		}
 	  }
-	
+
 	  if (t.iscurve) {
 	  	  for (i=0; i<t.vert.length; i++) {
 	  	  	  t.hue[i] = t.vert[i][2] - t.zmin;
@@ -217,7 +221,7 @@ function Viewer3D(paramObj, targetel) {
 			t.hue[i] /= (t.zmax-t.zmin);
 		  }
 	  }
-		  
+
 	  t.rotate();
 	  t.paint();
 } //end init
@@ -315,10 +319,10 @@ Viewer3D.prototype.rotate = function() {
 	var m20 = -1*t.scale*ct*cf;
 	var m21 = -1*t.scale*st*cf;
 	var m22 = t.scale*sf;
-	var x; 
+	var x;
 	var y;
 	var z;
-	
+
 	//rotate and project the geometry
 	for (var i=0; i<t.vert.length; i++) {
 		x = t.vert[i][0] - t.centr[0];
@@ -327,7 +331,7 @@ Viewer3D.prototype.rotate = function() {
 		x = x*t.axisscl[0];
 		y = y*t.axisscl[1];
 		z = z*t.axisscl[2];
-	            
+
 		t.vert1[i][2] = (m00*x + m01*y + m02*z)/t.scale;
 		t.vert1[i][0] = (m10*x + m11*y + m12*z)*(1/(1-t.vert1[i][2]/t.cam));
 		t.vert1[i][1] = (m20*x + m21*y + m22*z)*(1/(1-t.vert1[i][2]/t.cam));
@@ -344,7 +348,7 @@ Viewer3D.prototype.rotate = function() {
 		x = x*t.axisscl[0];
 		y = y*t.axisscl[1];
 		z = z*t.axisscl[2];
-		
+
 		t.bndbox1[i][2] = (m00*x + m01*y + m02*z)/t.scale;
 		t.bndbox1[i][0] = (m10*x + m11*y + m12*z)*(1/(1-t.bndbox1[i][2]/t.cam));
 		t.bndbox1[i][1] = (m20*x + m21*y + m22*z)*(1/(1-t.bndbox1[i][2]/t.cam));
@@ -355,7 +359,7 @@ Viewer3D.prototype.rotate = function() {
 	if ((t.phi>0 && t.phi%3.1415>1.55)||(t.phi<0 && t.phi%3.1415>-1.55)) {
 	        maxbby = maxbby^7;
 	}
-			
+
 	for (i=0; i<3;i++) {
 	    for (var j=0; j<t.numticks[i]; j++) {
 		for (var k =0; k<3; k++) {
@@ -414,19 +418,19 @@ Viewer3D.prototype.rotate = function() {
 			    t.Vsortface[0] = i;
 			}
 		}
-	}	
+	}
 } //end rotate()
-		
+
 Viewer3D.prototype.paint = function() {
 	var t = this;
-	
+
 	t._context.fillStyle = "#FFFFFF";
 	t._context.fillRect(0, 0, t.swidth, t.sheight);
-            
+
 	var bbmin = 0;
 	for (var i=0; i<8;i++) {
 		if (t.bndbox1[i][2]<t.bndbox1[bbmin][2]) { bbmin = i;}
-	}	
+	}
         t._context.strokeStyle = "#0000FF";
         t._context.lineWidth = 1;
 
@@ -441,10 +445,10 @@ Viewer3D.prototype.paint = function() {
 		}
 	}
 	t._context.stroke();
-	
+
         t._context.fillStyle = "#000000";
         for (i=0; i<3; i++) {
-        	t._context.fillText(t.axlbl[i], 
+        	t._context.fillText(t.axlbl[i],
         		t.w2+t.axes1[i][Math.floor(t.numticks[i]/2)][3][0],
             		t.h2-t.axes1[i][Math.floor(t.numticks[i]/2)][3][1]);
             	//need to add axis labels
@@ -456,15 +460,15 @@ Viewer3D.prototype.paint = function() {
             			t._context.stroke();
             			if (i==2) {
             				t._context.textAlign = "left";
-            			} 
+            			}
             			t._context.fillText(t.axeslabels[i][j],
             				t.w2+t.axes1[i][j][2][0],
             				t.h2-t.axes1[i][j][2][1]);
             		}
-            	} 
+            	}
          }
          t._context.textAlign = "center";
-         
+
          var sf;
          var bright;
          var rgb;
@@ -495,7 +499,7 @@ Viewer3D.prototype.paint = function() {
 			t._context.stroke();
 		    }
 	}
-            
+
 	//redraw front of t.bndbox
 	t._context.strokeStyle = "#0000FF";
 	bbmin = bbmin^7;
@@ -505,9 +509,9 @@ Viewer3D.prototype.paint = function() {
 		t._context.lineTo(t.w2+t.bndbox1[bbmin^(1<<i)][0],t.h2-t.bndbox1[bbmin^(1<<i)][1]);
 	}
 	t._context.stroke();
-            
+
 } //end paint()
-		
+
 //hsbtorgb from http://www.flashguru.co.uk/downloads/ColorConversion.as
 Viewer3D.prototype.hsbtorgb = function(hue,saturation,brightness) {
 	var red, green, blue;
@@ -548,4 +552,3 @@ Viewer3D.prototype.hsbtorgb = function(hue,saturation,brightness) {
 	blue=Math.round(blue*255)
 	return [red,green,blue];
 }
-

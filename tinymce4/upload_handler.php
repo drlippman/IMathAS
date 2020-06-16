@@ -59,12 +59,15 @@ ini_set("max_execution_time", "120");
 	$filename = implode('.',$filenamepts);
 	$ncnt++;
     }
-    storeuploadedfile($tempkey,"ufiles/$userid/".$filename,"public");
+    if (storeuploadedfile($tempkey,"ufiles/$userid/".$filename,"public")) {
 
-    // Respond to the successful upload with JSON.
-    // Use a location key to specify the path to the saved image resource.
-    // { location : '/your/uploaded/image/file'}
-    echo json_encode(array('location' => getuserfileurl("ufiles/$userid/".$filename)));
+      // Respond to the successful upload with JSON.
+      // Use a location key to specify the path to the saved image resource.
+      // { location : '/your/uploaded/image/file'}
+      echo json_encode(array('location' => getuserfileurl("ufiles/$userid/".$filename)));
+    } else {
+      header("HTTP/1.0 500 Unable to Save");
+    }
   } else {
     // Notify editor that the upload failed
     header("HTTP/1.0 500 Server Error");

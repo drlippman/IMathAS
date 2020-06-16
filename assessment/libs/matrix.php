@@ -45,9 +45,17 @@ function matrix($vals,$rows,$cols) {
 
 //matrixformat(matrix)
 //Formats a matrix item into an ASCIIMath string for display or $answer
-function matrixformat($m) {
+function matrixformat($m, $bracket='[') {
 	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
-	$out = '[';
+	if ($bracket == '(') {
+		$rb = ')';
+	} else if ($bracket == '|') {
+		$rb = '|';
+	} else {
+		$bracket = '[';
+		$rb = ']';
+	}
+	$out = $bracket;
 	for ($i=0; $i<count($m); $i++) {
 		if ($i!=0) {
 			$out .= ',';
@@ -61,7 +69,7 @@ function matrixformat($m) {
 		}
 		$out .= ')';
 	}
-	$out .= ']';
+	$out .= $rb;
 	return $out;
 }
 
@@ -1367,7 +1375,9 @@ function matrixNumberOfColumns($m){
 }
 
 function matrixParseStuans($stu) {
-	if (substr($stu,0,2)=='[(') {
+	if ($stu === null) {
+		return array(); 
+	} else if (substr($stu,0,2)=='[(') {
 		$ansr = substr($stu,2,-2);
 		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
 		return explode(',',$ansr);

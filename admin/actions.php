@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
 require("../init.php");
 require_once("../includes/password.php");
+require_once("../includes/TeacherAuditLog.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/actions'])) {
@@ -278,13 +279,11 @@ switch($_POST['action']) {
 
 		//leave any forum posts and wiki revisions - don't want to break anything
 
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto AND isread>1");
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto");
 		$stm->execute(array(':msgto'=>$deluid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+2 WHERE msgto=:msgto AND isread<2");
-		$stm->execute(array(':msgto'=>$deluid));
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND isread>1");
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND deleted=2");
 		$stm->execute(array(':msgfrom'=>$deluid));
-		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom=:msgfrom AND isread<2");
+		$stm = $DBH->prepare("UPDATE imas_msgs SET deleted=1 WHERE msgfrom=:msgfrom");
 		$stm->execute(array(':msgfrom'=>$deluid));
 
 		require_once("../includes/filehandler.php");
@@ -377,7 +376,15 @@ switch($_POST['action']) {
 			$specialrights += 64;
 		}
 		$stm = $DBH->prepare("INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, :specialrights);");
-		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':rights'=>$_POST['newrights'], ':email'=>$_POST['email'], ':groupid'=>$newgroup, ':homelayout'=>$homelayout, ':specialrights'=>$specialrights));
+		$stm->execute(array(':SID'=>$_POST['SID'],
+			':password'=>$md5pw,
+			':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+			':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+			':rights'=>$_POST['newrights'],
+			':email'=>Sanitize::emailAddress($_POST['email']),
+			':groupid'=>$newgroup,
+			':homelayout'=>$homelayout,
+			':specialrights'=>$specialrights));
 		$newuserid = $DBH->lastInsertId();
 		if (isset($CFG['GEN']['enrollonnewinstructor']) && $_POST['newrights']>=20) {
 			$valbits = array();
@@ -437,19 +444,19 @@ switch($_POST['action']) {
 			}
 		}
 		if (isset($_GET['id'])) {
-			$stm = $DBH->prepare("SELECT istemplate,jsondata,cleanupdate FROM imas_courses WHERE id=:id");
+			$stm = $DBH->prepare("SELECT * FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
-			list($old_istemplate, $old_jsondata, $cleanupdate) = $stm->fetch(PDO::FETCH_NUM);
+			$old_course_settings = $stm->fetch(PDO::FETCH_ASSOC);
 			if (isset($CFG['cleanup']['groups'][$groupid]['allowoptout'])) {
 				$allowoptout = $CFG['cleanup']['groups'][$groupid]['allowoptout'];
 			} else {
 				$allowoptout = (!isset($CFG['cleanup']['allowoptout']) || $CFG['cleanup']['allowoptout']==true);
 			}
 			if ($allowoptout && isset($_POST['cleanupoptout'])) {
-				$cleanupdate = 0;
+				$old_course_settings['cleanupdate'] = 0;
 			}
 		} else {
-			$old_istemplate = 0;
+			$old_course_settings['istemplate'] = 0;
 		}
 		if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
 			$theme = $CFG['CPS']['theme'][0];
@@ -530,21 +537,21 @@ switch($_POST['action']) {
 			if (isset($_POST['isgrptemplate'])) {
 				$istemplate |= 2;
 			}
-		} else if (($old_istemplate&2)==2) {
+		} else if (($old_course_settings['istemplate']&2)==2) {
 			$istemplate |= 2;
 		}
 		if (($myspecialrights&2)==2 || $myrights==100) {
 			if (isset($_POST['istemplate'])) {
 				$istemplate |= 1;
 			}
-		} else if (($old_istemplate&1)==1) {
+		} else if (($old_course_settings['istemplate']&1)==1) {
 			$istemplate |= 1;
 		}
 		if (($myspecialrights&2)==2 || $myrights==100) {
 			if (isset($_POST['issupergrptemplate'])) {
 				$istemplate |= 32;
 			}
-		} else if (($old_istemplate&32)==32) {
+		} else if (($old_course_settings['istemplate']&32)==32) {
 			$istemplate |= 32;
 		}
 		if ($myrights==100) {
@@ -559,11 +566,11 @@ switch($_POST['action']) {
 			$CFG['coursebrowserRightsToPromote'] = 40;
 		}
 		$updateJsonData = false;
-		$jsondata = json_decode($old_jsondata, true);
+		$jsondata = json_decode($old_course_settings['jsondata'], true);
 		if ($jsondata===null) {
 			$jsondata = array();
 		}
-		if ($CFG['coursebrowserRightsToPromote']>$myrights && ($old_istemplate&16)==16) {
+		if ($CFG['coursebrowserRightsToPromote']>$myrights && ($old_course_settings['istemplate']&16)==16) {
 			$istemplate |= 16;
 		} else if (isset($_POST['promote']) && isset($_GET['id']) && $CFG['coursebrowserRightsToPromote']<=$myrights) {
 			$browserprops = json_decode(file_get_contents(__DIR__.'/../javascript/'.$CFG['coursebrowser'], false, null, 25), true);
@@ -645,7 +652,7 @@ switch($_POST['action']) {
 				':picicons'=>$picicons, ':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset,
 				':toolset'=>$toolset, ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':istemplate'=>$istemplate,
 				':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':latepasshrs'=>$latepasshrs, ':cleanupdate'=>$cleanupdate, ':level'=> $_POST['courselevel'], ':id'=>$_GET['id']);
+				':latepasshrs'=>$latepasshrs, ':cleanupdate'=>$old_course_settings['cleanupdate'], ':level'=> $_POST['courselevel'], ':id'=>$_GET['id']);
 			if ($myrights<75) {
 				$query .= " AND ownerid=:ownerid";
 				$qarr[':ownerid']=$userid;
@@ -655,6 +662,21 @@ switch($_POST['action']) {
 			}
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
+
+			$changesToLog = array();
+			foreach($old_course_settings as $k=>$v) {
+				if (isset($qarr[':'.$k]) && $qarr[':'.$k] != $v) {
+					$changesToLog[$k] = ['old'=>$v, 'new'=>$qarr[':'.$k]];
+				}
+			}
+			if (!empty($changesToLog)) {
+				TeacherAuditLog::addTracking(
+						$cid,
+						"Course Settings Change",
+						null,
+						$changesToLog
+				);
+			} 
 
 			//call hook, if defined
 			if (function_exists('onModCourse')) {
@@ -1097,7 +1119,7 @@ switch($_POST['action']) {
 			$query = "INSERT INTO imas_users (email,FirstName,LastName,SID,password,rights,groupid) VALUES ";
 			$query .= "(:email, :FirstName, :LastName, :SID, :password, :rights, :groupid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':email'=>$_POST['ltidomain'], ':FirstName'=>$_POST['ltidomain'], ':LastName'=>'LTIcredential',
+			$stm->execute(array(':email'=>$_POST['ltidomain'], ':FirstName'=>Sanitize::stripHtmlTags($_POST['ltidomain']), ':LastName'=>'LTIcredential',
 				':SID'=>$_POST['ltikey'], ':password'=>$_POST['ltisecret'], ':rights'=>$_POST['createinstr'], ':groupid'=>$_POST['groupid']));
 		} else {
 			$query = "UPDATE imas_users SET email=:email,FirstName=:FirstName,LastName='LTIcredential',";
@@ -1196,7 +1218,8 @@ if ($myrights<75 || $from=='home') {
 } else if (empty($from)) {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if (isset($_GET['cid'])) {
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+	$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']).$btf);
 } else if ($from=='admin2') {
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php");
 } else if ($from=='userreports') {

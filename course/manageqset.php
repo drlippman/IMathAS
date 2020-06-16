@@ -651,7 +651,7 @@ if ($myrights<20) {
 			$safesearch = '';
 		}
     $searchlikevals = array();
-		$isIDsearch = false;
+		$isIDsearch = 0;
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
 		} else {
@@ -668,7 +668,7 @@ if ($myrights<20) {
 			} else if (substr($safesearch,0,3)=='id=') {
 				$searchlikes = "imas_questionset.id=? AND ";
 				$searchlikevals = array(substr($safesearch,3));
-				$isIDsearch = true;
+				$isIDsearch = substr($safesearch,3);
 			} else {
 				$searchterms = explode(" ",$safesearch);
 				$searchlikes = '';
@@ -679,20 +679,35 @@ if ($myrights<20) {
 						unset($searchterms[$k]);
 					}
 				}
-				if (count($searchterms)>0) {
-					$searchlikes .= "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-					foreach ($searchterms as $t) {
-						$searchlikevals[] = "%$t%";
-					}
-
-					if (ctype_digit($safesearch)) {
-						$searchlikes .= "OR imas_questionset.id=?) AND ";
-						$searchlikevals[] = $safesearch;
-						$isIDsearch = true;
-					} else {
-						$searchlikes .= ") AND";
+        $wholewords = array();
+				foreach ($searchterms as $k=>$v) {
+					if (ctype_alnum($v) && strlen($v)>3) {
+						$wholewords[] = '+'.$v.'*';
+						unset($searchterms[$k]);
 					}
 				}
+        if (count($wholewords)>0 || count($searchterms)>0) {
+  				$searchlikes .= '(';
+  				if (count($wholewords)>0) {
+  					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
+  				}
+  				if (count($searchterms)>0) {
+  					if (count($wholewords)>0) {
+  						$searchlikes .= 'AND ';
+  					}
+  					$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+  					foreach ($searchterms as $t) {
+  						$searchlikevals[] = "%$t%";
+  					}
+  				}
+  				if (ctype_digit($safesearch)) {
+  					$searchlikes .= "OR imas_questionset.id=?) AND ";
+  					$searchlikevals[] = $safesearch;
+  					$isIDsearch = $safesearch;
+  				} else {
+  					$searchlikes .= ") AND";
+  				}
+        }
 			}
 		}
 
@@ -754,10 +769,10 @@ if ($myrights<20) {
 		} else if ($isgrpadmin) {
 			$query .= "AND (imas_users.groupid=? OR imas_questionset.userights>0) ";
 			$qarr[] = $groupid;
-			if ($isIDsearch) {
+			if ($isIDsearch>0) {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=? OR imas_questionset.id=?)";
 				$qarr[] = $groupid;
-				$qarr[] = $safesearch;
+				$qarr[] = $isIDsearch;
 			} else {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=?)";
 				$qarr[] = $groupid;
@@ -765,10 +780,10 @@ if ($myrights<20) {
 		} else {
 			$query .= "AND (imas_questionset.ownerid=? OR imas_questionset.userights>0) ";
 			$qarr[] = $userid;
-			if ($isIDsearch) {
+			if ($isIDsearch>0) {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=? OR imas_questionset.id=?)";
 				$qarr[] = $userid;
-				$qarr[] = $safesearch;
+				$qarr[] = $isIDsearch;
 			} else {
 				$query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?)";
 				$qarr[] = $userid;
@@ -943,10 +958,12 @@ $address = $GLOBALS['basesiteurl'] . '/course';
 if ($overwriteBody==1) {
 	echo $body;
 } else {
+  $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+
 ?>
 <script type="text/javascript">
 function previewq(formn,loc,qn) {
-	var addr = '<?php echo $imasroot ?>/course/testquestion.php?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
+	var addr = '<?php echo $imasroot ?>/course/<?php echo $testqpage;?>?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
 	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
 	previewpop.focus();
 }

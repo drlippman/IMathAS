@@ -19,24 +19,24 @@ if ($isteacher || $istutor) {
 }
 
 if ($canviewall) {
-	if (isset($_COOKIE[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode = $_COOKIE[$cid.'gbmode'];
+	if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$gbmode = $stm->fetchColumn(0);
-		setsecurecookie($cid.'gbmode', $gbmode);
+		$_SESSION[$cid.'gbmode'] = $gbmode;
 	}
-	if (isset($_COOKIE[$cid.'catfilter'])) {
-		$catfilter = $_COOKIE[$cid.'catfilter'];
+	if (isset($_SESSION[$cid.'catfilter'])) {
+		$catfilter = $_SESSION[$cid.'catfilter'];
 	} else {
 		$catfilter = -1;
 	}
 	if (isset($tutorsection) && $tutorsection!='') {
 		$secfilter = $tutorsection;
 	} else {
-		if (isset($_COOKIE[$cid.'secfilter'])) {
-			$secfilter = $_COOKIE[$cid.'secfilter'];
+		if (isset($_SESSION[$cid.'secfilter'])) {
+			$secfilter = $_SESSION[$cid.'secfilter'];
 		} else {
 			$secfilter = -1;
 		}
@@ -80,10 +80,10 @@ require("../header.php");
 echo '<h1>'.sprintf(_('All Feedback For %s'), $gbt[1][0][0]).'</h1>';
 
 for ($i=0;$i<count($gbt[0][1]);$i++) {
-	if ($gbt[1][1][$i][1] == '' || $gbt[1][1][$i][1]=='<p></p>') {
+	if ($gbt[1][1][$i][1] === '' || $gbt[1][1][$i][1]==='<p></p>') {
 		continue;
 	}
-	if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]=='N/A') {
+	if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A') {
 		continue;
 	}
 	if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden

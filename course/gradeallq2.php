@@ -23,9 +23,9 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	$stu = $_GET['stu'];
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-		$gbmode = $_GET['gbmode'];
-	} else if (isset($_COOKIE[$cid.'gbmode'])) {
-		$gbmode = $_COOKIE[$cid.'gbmode'];
+	$gbmode = $_GET['gbmode'];
+	} else if (isset($_SESSION[$cid.'gbmode'])) {
+		$gbmode =  $_SESSION[$cid.'gbmode'];
 	} else {
 		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
@@ -48,9 +48,9 @@
 		$secfilter = $tutorsection;
 	} else if (isset($_GET['secfilter'])) {
 		$secfilter = $_GET['secfilter'];
-		setsecurecookie($cid.'secfilter', $secfilter);
-	} else if (isset($_COOKIE[$cid.'secfilter'])) {
-		$secfilter = $_COOKIE[$cid.'secfilter'];
+		$_SESSION[$cid.'secfilter'] = $secfilter;
+	} else if (isset($_SESSION[$cid.'secfilter'])) {
+		$secfilter = $_SESSION[$cid.'secfilter'];
 	} else {
 		$secfilter = -1;
 	}
@@ -99,7 +99,7 @@
 						if ($v=='N/A') {
 							$allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
 						} else {
-							$allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
+							$allscores[$kp[1]][$kp[2]][$kp[3]] = floatval($v);
 						}
 					}
 				} else if ($kp[0]=='fb') {
@@ -120,9 +120,10 @@
 		} else {
 			$onepergroup = false;
 		}
+		$DBH->beginTransaction();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_records.* FROM imas_users,imas_assessment_records ";
 		$query .= "WHERE imas_assessment_records.userid=imas_users.id AND imas_assessment_records.assessmentid=:assessmentid ";
-		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName FOR UPDATE";
 		if ($page != -1 && isset($_GET['userid'])) {
 			$query .= " AND userid=:userid";
 		}
@@ -134,6 +135,7 @@
 		}
 		$cnt = 0;
 		$updatedata = array();
+		$changesToLog = array();
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 
 			$GLOBALS['assessver'] = $line['ver'];
@@ -184,11 +186,15 @@
 
 				$adjustedScores = $assess_record->convertGbScoreOverrides($scoresToSet, $ptsposs);
 				$adjustedFeedbacks = $assess_record->convertGbFeedbacks($feedbackToSet);
-				$assess_record->setGbScoreOverrides($adjustedScores);
+				$changes = $assess_record->setGbScoreOverrides($adjustedScores);
 				$assess_record->setGbFeedbacks($adjustedFeedbacks);
 
 				if (count($adjustedScores) > 0 || count($adjustedFeedbacks) > 0) {
 					$assess_record->saveRecord();
+				}
+
+				if (!empty($changes)) {
+					$changesToLog[$line['userid']] = $changes;
 				}
 
 				// Normally it'd only make sense to update LTI scores that changed. But
@@ -202,6 +208,18 @@
 				}
 			}
 		}
+		if (count($changesToLog)>0) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Change Grades",
+				$aid,
+				array(
+					'qid'=>$qid,
+					'changes'=>$changesToLog
+				)
+			);
+		}
+		$DBH->commit();
 
 		if (isset($_GET['quick'])) {
 			echo "saved";
@@ -262,25 +280,44 @@
 		$points = $defpoints;
 	}
 
-	$lastupdate = '032320';
+	$lastupdate = '051620';
+	function formatTry($try,$cnt,$pn,$tn) {
+		if (is_array($try) && $try[0] === 'draw') {
+			$id = $cnt.'-'.$pn.'-'.$tn;
+			if ($try[2][0]===null) {
+				$try[2][0] = "";
+			}
+			echo '<canvas id="canvasGBR'.$id.'" ';
+			echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas>';
+			echo '<input type=hidden id="qnGBR'.$id.'"/>';
+			$la = explode(';;', str_replace(array('(',')'), array('[',']'), $try[1]));
+			if ($la[0] !== '') {
+				$la[0] = '[' . str_replace(';', '],[', $la[0]) . ']';
+			}
+			$la = '[[' . implode('],[', $la) . ']]';
+			echo '<script>';
+			array_unshift($try[2], 'GBR'.$id);
+			echo 'canvases["GBR'.$id.'"] = ' . json_encode($try[2]) . ';';
+			echo 'drawla["GBR'.$id.'"] = ' . json_encode(json_decode($la)) . ';';
+			echo '</script>';
+		} else {
+			echo $try;
+		}
+	}
+
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=071219"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=032320"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051120"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=051720"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2_min.js?v=070819" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips_min.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/drawing_min.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs_min.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ_min.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mqeditor_min.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mqedlayout_min.js" type="text/javascript"></script>
-	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
+	$placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
+	$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=051620" type="text/javascript"></script>';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
 	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
+
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
@@ -295,6 +332,20 @@
 		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);
 		window.location = toopen;
 		}';
+	$placeinhead .= 'function toggletryblock(type,n) {
+		$("#"+type+n).toggle();
+		if (!$("#"+type+n).hasClass("rendered")) {
+			$("#"+type+n).find("canvas[id^=canvasGBR]").each(function(i,el) {
+				window.imathasDraw.initCanvases(el.id.substr(6));
+			});
+			$("#"+type+n).addClass("rendered");
+			window.drawPics(document.getElementById(type+n));
+		}
+	}
+	$(function() {
+		$(".viewworkwrap img").on("click", rotateimg);
+	})
+	';
 	$placeinhead .= '</script>';
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
@@ -454,6 +505,7 @@
 		$lockeys = array_keys($questions,$qid);
 		foreach ($lockeys as $loc) {
 			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
+
 			$answeightTot = array_sum($qdata['answeights']);
 			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
 			if ($groupdup) {
@@ -492,21 +544,23 @@
 				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
 			}
 			*/
-			echo '<div class="questionwrap">';
+			echo '<div class=scrollpane>';
+			echo '<div class="questionwrap questionpane">';
+			echo '<div class="question" id="questionwrap'.$cnt.'">';
 			echo $qdata['html'];
 			echo '<script type="text/javascript">
 				$(function() {
-					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false);
+					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false, document.getElementById("questionwrap'.$cnt.'"));
 				});
 				</script>';
-			echo '</div>';
+			echo '</div></div>';
 
 			if (!empty($qdata['work'])) {
-				echo '<div class="questionpane">';
+				echo '<div class="questionpane viewworkwrap">';
 				echo '<button type="button" onclick="toggleWork(this)">'._('View Work').'</button>';
 				echo '<div class="introtext" style="display:none;">' . $qdata['work'].'</div></div>';
 			}
-
+			echo '</div>';
 			echo "<div class=scoredetails>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
 			if (!$groupdup) {
@@ -516,11 +570,17 @@
 
 			}
 
+			if (!empty($qdata['singlescore'])) {
+				$qdata['answeights'] = [1];
+			}
+			$multiEntry = (count($qdata['answeights'])>1);
 			// loop over parts
 			for ($pn = 0; $pn < count($qdata['answeights']); $pn++) {
 				// get points on this part
 
-				if (isset($qdata['scoreoverride']) && !is_array($qdata['scoreoverride'])) {
+				if (!empty($qdata['singlescore'])) {
+					$pts = round($qdata['score'],3);
+				} else if (isset($qdata['scoreoverride']) && !is_array($qdata['scoreoverride'])) {
 					$pts = round($qdata['scoreoverride'] * $qdata['points_possible'] * $qdata['answeights'][$pn], 3);
 				} else if (isset($qdata['scoreoverride']) && isset($qdata['scoreoverride'][$pn])) {
 					if (isset($qdata['parts'][$pn]['points_possible'])) {
@@ -538,12 +598,12 @@
 				$ptposs = round($qdata['points_possible'] * $qdata['answeights'][$pn], 3);
 
 				if ($canedit) {
-					$boxid = (count($qdata['answeights'])>1) ? "$cnt-$pn" : $cnt;
+					$boxid = ($multiEntry) ? "$cnt-$pn" : $cnt;
 					echo "<input type=text size=4 id=\"scorebox$boxid\" name=\"ud-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					echo "<input type=hidden name=\"os-" . Sanitize::onlyInt($line['userid']) . "-".Sanitize::onlyFloat($loc)."-$pn\" value=\"".Sanitize::encodeStringForDisplay($pts)."\">";
 					if ($rubric != 0) {
 						$fbref = (count($qdata['answeights'])>1) ? ($loc+1).' part '.($pn+1) : ($loc+1);
-						echo printrubriclink($rubric,$qdata['points_possible'],"scorebox$boxid","fb-". $loc.'-'. Sanitize::onlyInt($line['userid']), $fbref);
+						echo printrubriclink($rubric, $ptposs,"scorebox$boxid","fb-". $loc.'-'. Sanitize::onlyInt($line['userid']), $fbref);
 					}
 				} else {
 					echo Sanitize::encodeStringForDisplay($pts);
@@ -551,7 +611,7 @@
 				echo '/'.Sanitize::encodeStringForDisplay($ptposs).' ';
 			}
 
-			if (count($qdata['answeights'])>1 && $canedit) {
+			if ($multiEntry && $canedit) {
 				$togr = array();
 				if (isset($qdata['parts'])) {
 					foreach ($qdata['parts'] as $k=>$partinfo) {
@@ -575,7 +635,36 @@
 				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quicksetscore(\'scorebox' . $cnt .'\','.Sanitize::onlyInt($qdata['points_possible']).',this);return false;">Full credit</a> <span class=quickfb></span>';
 			}
 
-			// TODO: Add Previous Tries display here
+			if (!empty($qdata['other_tries'])) {
+				echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
+				echo '<div id="alltries'.$cnt.'" style="display:none;">';
+				foreach ($qdata['other_tries'] as $pn=>$tries) {
+					if (count($qdata['other_tries']) > 1) {
+						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+					}
+					foreach ($tries as $tn=>$try) {
+						echo '<div>'._('Try').' '.($tn+1).': ';
+						formatTry($try,$cnt,$pn,$tn);
+						echo '</div>';
+					}
+				}
+				echo '</div>';
+			}
+
+			if (!empty($qdata['autosaves'])) {
+				echo ' &nbsp; <button type=button onclick="toggletryblock(\'autosaves\','.$cnt.')">'._('Show autosaves').'</button>';
+				echo '<div id="autosaves'.$cnt.'" style="display:none;">';
+				echo '<p class="subdued">'._('Autosaves have been entered by the student but not submitted for grading, so are not included in the scoring.').'</p>';
+				foreach ($qdata['autosaves'] as $pn=>$tries) {
+					if (count($qdata['autosaves']) > 1) {
+						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+					}
+					foreach ($tries as $tn=>$try) {
+						formatTry($try,$cnt,$pn,$tn);
+					}
+				}
+				echo '</div>';
+			}
 
 			echo "<br/>"._("Question Feedback").": ";
 			if (!$canedit) {
@@ -602,6 +691,7 @@
 			}
 			$cnt++;
 		}
+		$assess_record->saveRecordIfNeeded();
 	}
 	if ($canedit) {
 		echo "<input type=\"submit\" value=\"Save Changes\"/> ";

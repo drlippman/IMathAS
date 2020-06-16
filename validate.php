@@ -99,10 +99,20 @@
        $cid = 0;
      }
 
+     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
  	 	 require("header.php");
- 	 	 echo '<p>You have requested guest access to a course.</p>';
- 	 	 echo '<p><a href="'.$imasroot.'/index.php">',_('Nevermind'),'</a> ';
- 	 	 echo '<a href="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">Continue</a></p>';
+     echo '<form method=post action="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">';
+     echo '<p>You have requested guest access to a course.</p>';
+ 	 	 echo '<p><button type=button onclick="location.href=\''.$imasroot.'/index.php\'">',_('Nevermind'),'</button> ';
+     echo '<button type=submit>Continue</button>';
+     echo '<input type=hidden id=tzname name=tzname />';
+     echo '<script type="text/javascript">
+     $(function() {
+       var tz = jstz.determine();
+       document.getElementById("tzname").value = tz.name();
+     });
+     </script>';
+     echo '</form>';
  	 	 require("footer.php");
  	 	 exit;
  	 }
@@ -110,6 +120,9 @@
  	 $_POST['username']='guest';
  	 $_POST['mathdisp'] = 0;
  	 $_POST['graphdisp'] = 2;
+   if (!isset($_POST['tzname'])) { // set an arbitrary default for guests
+     $_POST['tzname'] = 'America/Los_Angeles';
+   }
  }
  if (isset($_GET['checksess']) && !$hasusername) {
  	echo '<html><body>';
@@ -179,7 +192,12 @@
 	if (($line != null) && (
 	  ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password']))))
 	  || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['password'],$line['password']))	)) {
-		 unset($_SESSION['challenge']); //challenge is used up - forget it.
+
+      if (empty($_POST['tzname']) && $_POST['tzoffset']=='' && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+        echo _('Uh oh, something went wrong.  Please go back and try again');
+        exit;
+      }
+     unset($_SESSION['challenge']); //challenge is used up - forget it.
 		 $userid = $line['id'];
 		 $groupid = $line['groupid'];
 		 //for upgrades times:
@@ -211,7 +229,7 @@
      $_SESSION['userid'] = $userid;
      $_SESSION['time'] = $now;
      $_SESSION['tzoffset'] = $_POST['tzoffset'];
-     if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+     if (!empty($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
        $_SESSION['tzname'] = $_POST['tzname'];
      }
 
@@ -288,6 +306,7 @@
 		//   caused issues so removed
 	//}
 	//$username = $_COOKIE['username'];
+
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken,forcepwreset,mfa';
@@ -326,7 +345,7 @@
 	}
 	*/
 	$FCMtoken = $line['FCMtoken'];
-	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
+	$userfullname = strip_tags($line['FirstName'] . ' ' . $line['LastName']);
 	$inInstrStuView = false;
 	if (!isset($_SESSION['userprefs']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		//userprefs are missing!  They should be defined from initial session setup
@@ -380,13 +399,25 @@
 	}
 	if (isset($_SESSION['isdiag'])) { // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		$urlparts = parse_url($_SERVER['PHP_SELF']);
-		if ($_SESSION['diag_aver'] == 1 &&
+		if ($_SESSION['diag_aver'][0] == 1 &&
       !in_array(basename($urlparts['path']),array('showtest.php','ltiuserprefs.php'))
     ) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?r=".Sanitize::randomQueryStringParam());
 			exit;
-		} // TODO: handle assess2 case
+		} else if ($_SESSION['diag_aver'][0] > 1 &&
+      strpos($_SERVER['PHP_SELF'],'assess2/')===false
+    ) {
+      $querystr = 'cid='.Sanitize::onlyInt($_SESSION['diag_aver'][1]);
+      $querystr .= '&aid='.Sanitize::onlyInt($_SESSION['diag_aver'][2]);
+      header('Location: ' . $GLOBALS['basesiteurl'] . "/assess2/?" . $querystr);
+			exit;
+    }
 	}
+  // update session time, if not handled by sessionLastAccess
+  // this is used by local and redis sessions; db sessions handle via sessionLastAccess
+  if (empty($GLOBALS['sessionLastAccess'])) {
+    $_SESSION['time'] = time();
+  }
 
 	if (isset($_SESSION['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
 		if ($myrights>18) {
@@ -639,20 +670,22 @@
 
   function checkeditorok() {
 	  $ua = $_SERVER['HTTP_USER_AGENT'];
-	  if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) {
-	  	  preg_match('/OS (\d+)_(\d+)/',$ua,$match);
-	  	  if ($match[1]>=5) {
-	  	  	  return 1;
-	  	  } else {
-	  	  	  return 0;
-	  	  }
-	  } else if (strpos($ua,'Android')!==false) {
-	  	  preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match);
-	  	  if ($match[1]>=4) {
-	  	  	  return 1;
-	  	  } else {
-	  	  	  return 0;
-	  	  }
+	  if ((strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) &&
+	  	  preg_match('/OS (\d+)_(\d+)/',$ua,$match)
+    ) {
+  	  if ($match[1]>=5) {
+  	  	  return 1;
+  	  } else {
+  	  	  return 0;
+  	  }
+	  } else if (strpos($ua,'Android')!==false &&
+	  	preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match)
+    ) {
+  	  if ($match[1]>=4) {
+  	  	  return 1;
+  	  } else {
+  	  	  return 0;
+  	  }
 	  } else {
 		  return 1;
 	  }

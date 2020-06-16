@@ -133,47 +133,48 @@
 		}
 	}
 
-	function sortTable()
+	function sortTable(e)
 	{
+		var el = e.currentTarget;
 		if(!tableWidget_okToSort)return;
 		tableWidget_okToSort = false;
 		/* Getting index of current column */
-		var obj = this;
+		var obj = el;
 		var indexThis = 0;
 		while(obj.previousSibling){
 			obj = obj.previousSibling;
 			if(obj.tagName=='TH')indexThis++;
 		}
 
-		if(this.getAttribute('direction') || this.direction){
-			direction = this.getAttribute('direction');
-			if(navigator.userAgent.indexOf('Opera')>=0)direction = this.direction;
+		if(el.getAttribute('aria-sort') || el.direction){
+			direction = el.getAttribute('aria-sort');
+			if(navigator.userAgent.indexOf('Opera')>=0)direction = el.direction;
 			if(direction=='ascending'){
 				direction = 'descending';
-				this.setAttribute('direction','descending');
-				this.direction = 'descending';
+				el.setAttribute('aria-sort','descending');
+				el.direction = 'descending';
 			}else{
 				direction = 'ascending';
-				this.setAttribute('direction','ascending');
-				this.direction = 'ascending';
+				el.setAttribute('aria-sort','ascending');
+				el.direction = 'ascending';
 			}
 		}else{
 			direction = 'ascending';
-			this.setAttribute('direction','ascending');
-			this.direction = 'ascending';
+			el.setAttribute('aria-sort','ascending');
+			el.direction = 'ascending';
 		}
 
-		var tableObj = this.parentNode.parentNode.parentNode;
+		var tableObj = el.parentNode.parentNode.parentNode;
 		var tBody = tableObj.getElementsByTagName('TBODY')[0];
 		var widgetIndex = tableObj.getAttribute('tableIndex');
 		if(!widgetIndex)widgetIndex = tableObj.tableIndex;
 
 		var sortMethod = tableWidget_arraySort[widgetIndex][indexThis]; // N = numeric, S = String
-		if(activeColumn[widgetIndex] && activeColumn[widgetIndex]!=this){
-			if(activeColumn[widgetIndex])activeColumn[widgetIndex].removeAttribute('direction');
+		if(activeColumn[widgetIndex] && activeColumn[widgetIndex]!=el){
+			if(activeColumn[widgetIndex])activeColumn[widgetIndex].removeAttribute('aria-sort');
 		}
 
-		activeColumn[widgetIndex] = this;
+		activeColumn[widgetIndex] = el;
 
 		var cellArray = new Array();
 		var cellObjArray = new Array();
@@ -266,7 +267,15 @@
 		var cells = tHead.getElementsByTagName('TH');
 		for(var no=0;no<cells.length;no++){
 			if(sortArray[no]){
-				cells[no].onclick = sortTable;
+				cells[no].addEventListener("click", sortTable);
+				cells[no].setAttribute('tabindex', 0);
+				cells[no].addEventListener("keydown", function(e) {
+					if (e.key == 'Enter') {
+						sortTable(e);
+						e.preventDefault();
+						return false;
+					}
+				});
 			}else{
 				cells[no].style.cursor = 'default';
 			}

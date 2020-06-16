@@ -35,10 +35,13 @@ if ($from=='modq') {
 
 
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; <a href=\"addrubric.php?cid=$cid\">Manage Rubrics</a> ";
+	$curBreadcrumb .= "&gt; <a href=\"addrubric.php?cid=$cid$fromstr\">Manage Rubrics</a> ";
 	if ($_GET['id']=='new') {
 		$curBreadcrumb .= "&gt; Add Rubric\n";
 		$pagetitle = "Add Rubric";
+	} else if ($_GET['do'] === 'delete') {
+		$curBreadcrumb .= "&gt; Delete Rubric\n";
+		$pagetitle = "Delete Rubric";
 	} else {
 		$curBreadcrumb .= "&gt; Edit Rubric\n";
 		$pagetitle = "Edit Rubric";
@@ -55,7 +58,38 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	if (isset($_POST['rubname'])) { //FORM SUBMITTED, DATA PROCESSING
+	if (!empty($_POST['delete'])) { // delete form submitted
+		$rubid = intval($_GET['id']);
+		$stm = $DBH->prepare("DELETE FROM imas_rubrics WHERE id=? and ownerid=?");
+		$stm->execute(array($rubid, $userid));
+		if ($stm->rowCount() > 0) {
+			// this doesn't clear rubric usage outside of directly owned courses,
+			// but that's better than nothing
+			$query = "UPDATE imas_questions AS iq JOIN imas_assessments AS ia ";
+			$query .= "ON iq.assessmentid=ia.id JOIN imas_courses AS ic ";
+			$query .= "ON ia.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
+			$stm = $DBH->prepare($query);
+			$stm->execute($userid, $rubid);
+			$query = "UPDATE imas_gbitems AS ig JOIN imas_courses AS ic ";
+			$query .= "ON ig.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
+			$stm = $DBH->prepare($query);
+			$stm->execute($userid, $rubid);
+			$query = "UPDATE imas_forums AS if JOIN imas_courses AS ic ";
+			$query .= "ON if.courseid=ic.id AND ic.ownerid=? SET rubric=0 WHERE rubric=?";
+			$stm = $DBH->prepare($query);
+			$stm->execute($userid, $rubid);
+			// This is too inefficient to run
+			/*$stm = $DBH->prepare("UPDATE imas_questions SET rubric=0 WHERE rubric=?");
+			$stm->execute(array($rubid));
+			$stm = $DBH->prepare("UPDATE imas_gbitems SET rubric=0 WHERE rubric=?");
+			$stm->execute(array($rubid));
+			$stm = $DBH->prepare("UPDATE imas_forums SET rubric=0 WHERE rubric=?");
+			$stm->execute(array($rubid));
+			*/
+		}
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr&r=" .Sanitize::randomQueryStringParam());
+		exit;
+	} else if (isset($_POST['rubname'])) { //FORM SUBMITTED, DATA PROCESSING
 		if (isset($_POST['rubisgroup'])) {
 			$rubgrp = $groupid;
 		} else {
@@ -80,15 +114,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$fromstr = str_replace('&amp;','&',$fromstr);
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr&r=" .Sanitize::randomQueryStringParam());
 
-
-
 	} else { //INITIAL LOAD DATA PROCESS
 		if (isset($_GET['id'])) { //MODIFY
 			if ($_GET['id']=='new') {//NEW
-				$rubric = array();
-				$rubname = "New Rubric";
-				$rubgrp = -1;
-				$rubtype = 1;
+				if (isset($_GET['copy'])) {
+					$stm = $DBH->prepare("SELECT name,groupid,rubrictype,rubric FROM imas_rubrics WHERE id=:id");
+					$stm->execute(array(':id'=>intval($_GET['copy'])));
+					list($rubname,$rubgrp,$rubtype,$rubric) = $stm->fetch(PDO::FETCH_NUM);
+					$rubric = unserialize($rubric);
+					$rubname = 'Copy of: '.$rubname;
+				} else {
+					$rubname = "New Rubric";
+					$rubric = array();
+					$rubgrp = -1;
+					$rubtype = 1;
+				}
 				$savetitle = _('Create Rubric');
 			} else {
 				$rubid = Sanitize::onlyInt($_GET['id']);
@@ -106,6 +146,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 /******* begin html output ********/
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
+$placeinhead .= '<script type="text/javascript">$(function() {
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="../img/gears.png" alt="Options"/></a>\';
+  html += \'<ul role="menu" class="dropdown-menu">\';
+	var fromstr = "'.Sanitize::encodeStringForJavascript($fromstr).'";
+  $("img[data-rid]").each(function (i,el) {
+  	var rid = $(el).attr("data-rid");
+		var thishtml = html + \' <li><a href="addrubric.php?cid=\'+cid+\'&id=\'+rid+fromstr+\'">'._('Edit').'</a></li>\';
+		thishtml += \' <li><a href="addrubric.php?cid=\'+cid+\'&id=new&copy=\'+rid+fromstr+\'">'._('Copy').'</a></li>\';
+		if ($(el).attr("data-mine") == "true") {
+			thishtml += \' <li><a href="addrubric.php?cid=\'+cid+\'&do=delete&id=\'+rid+fromstr+\'">'._('Delete').'</a></li>\';
+		}
+		thishtml += \'</ul></span> \';
+		$(el).replaceWith(thishtml);
+	  });
+	  $(".dropdown-toggle").dropdown();
+	});
+  </script>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -113,17 +170,29 @@ if ($overwriteBody==1) {
 } else {  //ONLY INITIAL LOAD HAS DISPLAY
 
 ?>
-
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?></h1></div>
 <?php
 if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
+	echo '<p>'._('You can attach a rubric to an offline grade item on the Add Offline Grade page.').' ';
+	echo _('You can attach a rubric to an assessment questions from the Add/Remove Questions page by choosing Change Settings for the question.').'</p>';
 	echo '<p>Select a rubric to edit or <a href="addrubric.php?cid='.$cid.'&amp;id=new">Add a new rubric</a></p><p>';
-	$stm = $DBH->prepare("SELECT id, name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
+	$stm = $DBH->prepare("SELECT id, name, ownerid FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
 	$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$groupid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo Sanitize::encodeStringForDisplay($row[1]) . " <a href=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::onlyInt($row[0]) . $fromstr . "\">Edit</a><br/>";
+		echo '<img data-rid="' . Sanitize::onlyInt($row[0]) . '" ';
+		echo 'data-mine="' . ($row[2] == $userid ? "true" : "false") .'" ';
+		echo 'src="../img/gears.png"/>';
+		echo Sanitize::encodeStringForDisplay($row[1]) . '<br/>';
+
 	}
+	echo '</p>';
+} else if ($_GET['do'] === 'delete') { // deleting
+	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
+	echo '<p>Are you SURE you want to delete rubric <b>'.Sanitize::encodeStringForDisplay($rubname).'</b>?</p>';
+	echo '<input type="hidden" name="delete" value="1" />';
+	echo '<p><button type=submit>Yes, Delete</button> ';
+	echo '<button type=button onclick="location.href=\'addrubric.php?cid='.$cid.$fromstr.'\'">Nevermind</button>';
 	echo '</p>';
 } else {  //adding/editing a rubric
 	/*  Rubric Types

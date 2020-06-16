@@ -63,6 +63,8 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -130,6 +132,9 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
 // If in practice, now we overwrite settings
 if ($in_practice) {
   $assess_info->overridePracticeSettings();
+}
+if ($preview_all) {
+  $assess_record->setTeacherInGb(true); // enables answers showing
 }
 
 // grab any assessment info fields that may have updated:
@@ -199,7 +204,7 @@ if (count($qns) > 0) {
     if (!isset($timeactive[$k])) {
       $timeactive[$k] = 0;
     }
-    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn]);
+    $parts_to_score = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $qnstoscore[$qn]);
     // only score the non-blank ones
     foreach ($parts_to_score as $pn=>$v) {
       if ($v === true && !in_array($pn, $qnstoscore[$qn])) {
@@ -247,7 +252,7 @@ if ($end_attempt) {
 if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
   $showscores = $assess_info->showScoresAtEnd();
-  $reshowQs = $assess_info->reshowQuestionsAtEnd();
+  $reshowQs = $assess_info->reshowQuestionsAtEnd() && $showscores;
   $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'last');
   $assessInfoOut['score'] = $assess_record->getAttemptScore();
   $totalScore = $assessInfoOut['score'];

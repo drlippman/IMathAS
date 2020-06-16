@@ -64,51 +64,10 @@ class EssayAnswerBox implements AnswerBox
     				$la = preg_replace('/\n/','<br/>',$la);
     			}
     			if ($colorbox=='') {
-    				$out .= '<div class="intro" id="qnwrap'.$qn.'">';
+    				$out .= '<div class="introtext" id="qnwrap'.$qn.'">';
     			} else {
-    				$out .= '<div class="intro '.$colorbox.'" id="qnwrap'.$qn.'">';
+    				$out .= '<div class="introtext '.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
-    			if (isset($GLOBALS['questionscoreref'])) {
-    				if ($multi==0) {
-    					$el = $GLOBALS['questionscoreref'][0];
-    					$sc = $GLOBALS['questionscoreref'][1];
-    				} else {
-    					$el = $GLOBALS['questionscoreref'][0].'-'.($qn%1000);
-    					$sc = $GLOBALS['questionscoreref'][1][$qn%1000];
-    				}
-    				$out .= '<span style="float:right;">';
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" alt="Set score full credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',$sc)\" />";
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" alt="Set score half credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
-    				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" alt="Set score no credit" ';
-    				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
-
-    				$la = preg_replace_callback('/<a[^>]*href="(.*?)"[^>]*>(.*?)<\/a>/', function ($m) {
-    					global $gradededessayexpandocnt;
-    					if (!isset($gradededessayexpandocnt)) {
-    						$gradededessayexpandocnt = 0;
-    					}
-    					if (strpos($m[0],'target=')===false) {
-    						$ret = '<a target="_blank" '.substr($m[0], 2);
-    					} else {
-    						//force links to open in a new window to prevent manual scores and feedback from being lost
-    						$ret = preg_replace('/target=".*?"/','target="_blank"',$m[0]);
-    					}
-    					$url = $m[1];
-    					$extension = substr($url,strrpos($url,'.')+1,3);
-    					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
-    						$ret .= " <span aria-expanded=\"false\" aria-controls=\"essayimg$gradededessayexpandocnt\" class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayimg$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
-    						$ret .= " <br/><img id=\"essayimg$gradededessayexpandocnt\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" src=\"$url\" alt=\"Student uploaded image\" />";
-    					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
-    						$ret .= " <span aria-expanded=\"false\" aria-controls=\"essayfileprev$gradededessayexpandocnt\" class=\"clickable prepped\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayfileprev$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
-    						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" aria-hidden=\"true\" src=\"https://docs.google.com/viewer?url=".Sanitize::encodeUrlParam($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
-    					}
-    					$gradededessayexpandocnt++;
-    					return $ret;
-    				   }, $la);
-    			}
-
     			$out .= filter($la);
     			$out .= "</div>";
     		} else {
@@ -117,7 +76,8 @@ class EssayAnswerBox implements AnswerBox
     				$la = str_replace('&quot;','"',$la);
     			}
     			if ($rows<2) {
-    				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" /> ";
+    				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" ";
+            $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" />';
     			} else {
     				if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
     				$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
@@ -126,6 +86,7 @@ class EssayAnswerBox implements AnswerBox
     				} else {
     					$out .= "cols=\"$cols\" ";
     				}
+            $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ';
     				$out .= sprintf(">%s</textarea>\n", Sanitize::encodeStringForDisplay($la, true));
     				if ($colorbox!='') { $out .= '</div>';}
     			}

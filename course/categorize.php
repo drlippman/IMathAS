@@ -25,6 +25,7 @@
 	}
 
 	$pagetitle = "Categorize Questions";
+	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 	require("../header.php");
 	echo <<<END
 <script>
@@ -55,7 +56,7 @@ function resetcat() {
 	}
 }
 function previewq(formn,loc,qn) {
-	var addr = '$imasroot/course/testquestion.php?cid=$cid&checked=1&qsetid='+qn+'&loc=c'+loc+'&formn='+formn;
+	var addr = '$imasroot/course/$testqpage?cid=$cid&checked=1&qsetid='+qn+'&loc=c'+loc+'&formn='+formn;
 	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
 	previewpop.focus();
 }

@@ -53,7 +53,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         if (isset($ansprompt)) {
-          $out .= "<label for=\"qn$qn\">$ansprompt</label>";
+          $out .= $ansprompt;
         }
 
         if (in_array('inequality',$ansformats)) {
@@ -100,6 +100,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
     		$params['calcformat'] = $answerformat;
 
     		$out .= '<input ' .
+                'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     						Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';
