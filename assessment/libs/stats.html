@@ -44,6 +44,7 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#fcdf">fcdf</a></li>
 <li><a href="#invfcdf">invfcdf</a></li>
 <li><a href="#mosaicplot">mosaicplot</a></li>
+<li><a href="#csvdownloadlink">csvdownloadlink</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -286,3 +287,7 @@ mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
 <BR>&nbsp;&nbsp;rowlabel[1] and columnlabel[5]
 <BR>width and height are optional, default to 300 by 300.  Does not include labels
 <BR>
+<BR><h3><a name="csvdownloadlink">csvdownloadlink</a></h3>
+csvdownloadlink(string,array,[string,array]...)
+<p>Creates a link that downloads the specified data in CSV format. For each column
+  provide a string header and an array of values.</p>
