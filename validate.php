@@ -366,7 +366,7 @@
 
 	 //call hook function in validate hook, if defined
 	 if (function_exists('alreadyLoggededIn')) {
-		alreadyLoggededIn();
+		alreadyLoggededIn($userid);
 	 }
 
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
