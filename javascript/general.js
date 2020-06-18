@@ -654,7 +654,8 @@ function setuptracklinks(i,el) {
 	if (jQuery(el).attr("data-base")) {
 		jQuery(el).click(function(e) {
 			var inf = jQuery(this).attr('data-base').split('-');
-			recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
+			recclick(inf[0], inf[1], jQuery(this).attr("href"),
+				jQuery(this).clone().find(".sr-only").remove().end().text());
 			if (typeof(jQuery(el).attr("target"))=="undefined") {
 				e.preventDefault();
 				setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
@@ -663,7 +664,8 @@ function setuptracklinks(i,el) {
 		}).mousedown(function(e) {
 			if (e.which==3) { //right click
 				var inf = jQuery(this).attr('data-base').split('-');
-				recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
+				recclick(inf[0], inf[1], jQuery(this).attr("href"),
+					jQuery(this).clone().find(".sr-only").remove().end().text());
 			}
 		});
 	}
