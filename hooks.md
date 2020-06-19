@@ -70,6 +70,9 @@ Include via `$CFG['hooks']['bltilaunch']`
 On creation of a new course:
 `onAddCourse(course ID, user ID)`
 
+On identification of local user ID:
+`onHaveLocalUser(user ID)`
+
 ## ltihome
 
 Include via `$CFG['hooks']['ltihome']`
