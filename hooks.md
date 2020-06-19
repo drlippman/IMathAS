@@ -89,6 +89,9 @@ Include via `$CFG['hooks']['validate']`
 Called after login is successful, before redirect back to requested page
 `onLogin()`
 
+Called after determining user is already logged in
+`alreadyLoggededIn(user ID)`
+
 Called when checking if LTI user can access the requested page
 `allowedInAssessment()`
 return an array of base filenames that are allowed to be accessed by a user
