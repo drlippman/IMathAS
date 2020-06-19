@@ -49,6 +49,8 @@ class MatrixScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $correct = true;
 
+        $givenans = normalizemathunicode($givenans);
+
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
         }

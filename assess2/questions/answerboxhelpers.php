@@ -700,6 +700,9 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
   $str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
+  if (strtoupper(trim($str))==='DNE') {
+    $str = 'DNE';
+  }
 	return $str;
 }
 

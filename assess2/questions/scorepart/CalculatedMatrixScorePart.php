@@ -47,6 +47,7 @@ class CalculatedMatrixScorePart implements ScorePart
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
         }
+        $givenans = normalizemathunicode($givenans);
 
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
