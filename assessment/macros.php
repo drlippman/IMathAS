@@ -1404,11 +1404,11 @@ function diffrands($min,$max,$n=0,$ord='def') {
 	if (func_num_args()<3) { echo "diffrands expects 3 arguments"; return $min;}
 	list($min,$max) = checkMinMax($min, $max, true, 'diffrands');
 	if ($max == $min) {echo "diffrands: Need min&lt;max"; return array_fill(0,$n,$min);}
-	if ($n > $max-$min+1) {
+	/*if ($n > $max-$min+1) {
 		if ($GLOBALS['myrights']>10) {
 			echo "diffrands: min-max not far enough for n requested";
 		}
-	}
+	}*/
 
 	$n = floor($n);
 	if ($n<.1*($max-$min)) {
