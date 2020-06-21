@@ -40,6 +40,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$forumfulltoupdate = array();
 		$fullassess = false;
 		$fullforum = false;
+		$imas_assessments = [];
+		$imas_forums = [];
+		$imas_wikis = [];
+		$imas_inlinetext = [];
+		$imas_linkedtext = [];
 
 		$select = "SELECT id, startdate, enddate, avail ";
 		// imas_assessments
@@ -540,17 +545,17 @@ if ($overwriteBody==1) {
 	}
 
 
-	$names = Array();
-	$startdates = Array();
-	$enddates = Array();
-	$reviewdates = Array();
-	$LPcutoffs = Array();
-	$fpdates = Array();
-	$frdates = Array();
-	$ids = Array();
+	$names = array();
+	$startdates = array();
+	$enddates = array();
+	$reviewdates = array();
+	$LPcutoffs = array();
+	$fpdates = array();
+	$frdates = array();
+	$ids = array();
 	$avails = array();
-	$types = Array();
-	$courseorder = Array();
+	$types = array();
+	$courseorder = array();
 	$pres = array();
 	if ($filter=='all' || $filter=='assessments') {
 		$stm = $DBH->prepare("SELECT name,startdate,enddate,reviewdate,id,avail,LPcutoff FROM imas_assessments WHERE courseid=:courseid ");
