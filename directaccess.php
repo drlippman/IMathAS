@@ -119,7 +119,7 @@
 		$addtoquerystring = "ekey=".Sanitize::encodeUrlParam($_POST['ekey']);
 	}
 	$init_session_start = true;
-	require("init.php");
+	require_once(__DIR__ ."/validate.php");
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
