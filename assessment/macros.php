@@ -201,6 +201,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	} else {
 		$commands .= ');';
 	}
+
 	if (isset($lbl) && count($lbl)>3) {
 		$commands .= "text([{$winxmax},0],\"{$lbl[2]}\",\"aboveleft\");";
 		$commands .= "text([0,{$ymax}],\"{$lbl[3]}\",\"belowright\");";
@@ -2631,7 +2632,6 @@ function makenumberrequiretimes($arr) {
 
 function evalbasic($str) {
 	global $myrights;
-
 	$str = str_replace(',','',$str);
 	$str = str_replace('pi','3.141592653',$str);
 	$str = clean($str);
@@ -2639,7 +2639,9 @@ function evalbasic($str) {
 		return $str;
 	} else if (preg_match('/[^\d+\-\/\*\.]/',$str)) {
 		return $str;
-	} else {
+	} else if ($str === '') {
+    return 0;
+  } else {
 		try {
 			eval("\$ret = $str;");
 		} catch (Throwable $t) {
