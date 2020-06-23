@@ -693,7 +693,6 @@ final class SimpleEmailServiceRequest
 	private $__date;
 	private $__amz_date;
 	const SERVICE = 'email';
-	const DOMAIN = 'amazonaws.com';
 	const ALGORITHM = 'AWS4-HMAC-SHA256';
 
 	/**
