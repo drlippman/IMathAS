@@ -783,8 +783,8 @@ final class SimpleEmailServiceRequest
       // task3
       $signing_key = $this->_generateSignatureKey();
       $signature = hash_hmac('sha256', $string_to_sign, $signing_key);
-      $headers['Authorization'] = self::ALGORITHM . ' Credential=' . $this->ses->getAccessKey() . '/' . $credential_scope . ', SignedHeaders=' . $signed_headers . ', Signature=' . $signature;
-      $headers['x-amz-date'] = $this->__amz_date;
+      $headers[] = 'Authorization: ' . self::ALGORITHM . ' Credential=' . $this->ses->getAccessKey() . '/' . $credential_scope . ', SignedHeaders=' . $signed_headers . ', Signature=' . $signature;
+      $headers[] = 'x-amz-date: ' . $this->__amz_date;
 			return array($headers, $request_parameters);
   }
 	/**
