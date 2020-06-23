@@ -769,12 +769,19 @@ final class SimpleEmailServiceRequest
 
       $request_parameters = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
 
+			if ($this->verb == 'POST') {
+				$canonical_querystring = '';
+				$payload_hash = hash('sha256', $request_parameters);
+			} else {
+				$canonical_querystring = $request_parameters;
+				$payload_hash = hash('sha256', '');
+			}
+
       $canonical_headers = 'host:' . $this->ses->getHost() . "\n" . 'x-amz-date:' . $this->__amz_date . "\n";
       $signed_headers = 'host;x-amz-date';
-      $payload_hash = hash('sha256', '');
 
       // task1
-      $canonical_request = $this->verb . "\n" . $canonical_uri . "\n" . $request_parameters . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
+      $canonical_request = $this->verb . "\n" . $canonical_uri . "\n" . $canonical_querystring . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
 
       // task2
       $credential_scope = $this->__date . '/' . $this->ses->getRegion() . '/' . self::SERVICE . '/aws4_request';
