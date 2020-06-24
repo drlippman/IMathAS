@@ -382,7 +382,8 @@ $vueData = array(
 		<div class="blockitems hidden">
 			<label class="form" for="caltag"><?php echo _('Calendar icon');?>:</label>
 			<span class="formright">
-				<input name="caltag" id="caltag" v-model="caltag" type=text size=8 />
+				<input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>>Use Text: <input name="caltag" id="caltag" v-model="caltag" type=text size=8 <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /> <br />
+				<input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>>Use Assessment Name
 			</span><br class="form" />
 
 			<label class=form for="shuffle"><?php echo _('Shuffle item order');?>:</label>
@@ -957,6 +958,17 @@ var app = new Vue({
 		}
 	},
 	methods: {
+		initCalTagRadio: function() {
+			// bind to caltagradio controls
+			$('input[type=radio][name=caltagradio]').change(function() {
+				if (this.value == 'usename') {
+					$('input[type=text][name=caltag]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+				}
+				else if (this.value == 'usetext') {
+					$('input[type=text][name=caltag]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('?');
+				}
+			});
+		},
 		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
@@ -986,6 +998,10 @@ var app = new Vue({
 			this.showDisplayDialog = false;
 			$("#dispdetails").focus();
 		}
-	}
+	},
+    mounted: function() {
+    	// call init method
+        this.initCalTagRadio();
+    },
 });
 </script>

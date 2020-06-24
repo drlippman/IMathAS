@@ -356,7 +356,8 @@ $vueData = array(
 			<div :class="{highlight:caltag != ''}">
 				<label class="form" for="caltag"><?php echo _('Calendar icon'); ?>:</label>
 				<span class="formright">
-					<input name="caltag" id="caltag" type=text size=8 v-model="caltag"/>
+					<input name="caltagradio" type="radio" value="usetext" checked>Use Text: <input name="caltag" id="caltag" v-model="caltag" type=text size=8 /> <br />
+					<input name="caltagradio" type="radio" value="usename">Use Assessment Name
 				</span><br class=form />
 			</div>
 
@@ -964,6 +965,19 @@ var app = new Vue({
 		}
 	},
 	methods: {
+		initCalTagRadio: function() {
+			// bind to caltagradio controls
+			$('input[type=radio][name=caltagradio]').change(function() {
+				if (this.value == 'usename') {
+					$('input[type=text][name=caltag]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+					$('input[type=text][name=caltag]').closest('div').addClass('highlight');
+				}
+				else if (this.value == 'usetext') {
+					$('input[type=text][name=caltag]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('');
+					$('input[type=text][name=caltag]').closest('div').removeClass('highlight');
+				}
+			});
+		},
 		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
@@ -977,6 +991,10 @@ var app = new Vue({
 			this.extrefs.push({'label':'', 'link':''});
 			this.extrefs = this.extrefs.slice();
 		}
+	},
+    mounted: function() {
+    	// call init method
+        this.initCalTagRadio();
 	}
 });
 </script>

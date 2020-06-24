@@ -933,6 +933,15 @@ if ($overwriteBody==1) {
 				$("#reqscorewrap").toggle(rqshow);
 				$(this).attr("aria-expanded", rqshow);
 		});
+		// bind to caltagradio controls
+		$('input[type=radio][name=caltagradio]').change(function() {
+			if (this.value == 'usename') {
+				$('input[type=text][name=caltagact]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+			}
+			else if (this.value == 'usetext') {
+				$('input[type=text][name=caltagact]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('?');
+			}
+		});
 	})
 	</script>
 
@@ -1175,7 +1184,8 @@ if ($overwriteBody==1) {
 
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
-				<input name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
+				<input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>>Use Text: <input name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>" <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /><br />
+				<input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>>Use Assessment Name
 			</span><br class="form" />
 
 			<span class=form>Shuffle item order: </span>
