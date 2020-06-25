@@ -129,7 +129,9 @@ if (!$canViewAll &&
   // see if we are starting a new group or adding to existing one.
   // need to check that the user wasn't added to another group since initial launch
   // in which case we won't add the group members
-  if (count($current_members) == 0 || $stugroupid == $_POST['cur_group']) {
+  if ((count($current_members) == 0 || $stugroupid == $_POST['cur_group']) &&
+    count($available_new_members) > 0
+  ) {
     // Add new members to the group
     $qarr = array();
     $vals = array();
