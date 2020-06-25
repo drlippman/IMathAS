@@ -16,7 +16,7 @@ class Imathas_LTI_Database implements LTI\Database {
   }
 
   public function find_registration_by_issuer($iss) {
-    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_issuers WHERE issuer=?');
+    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=?');
     $stm->execute(array($iss));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     if ($row === false) {
@@ -27,7 +27,8 @@ class Imathas_LTI_Database implements LTI\Database {
       ->set_auth_token_url($row['auth_token_url'])
       ->set_client_id($row['client_id'])
       ->set_key_set_url($row['key_set_url'])
-      ->set_issuer($iss);
+      ->set_issuer($iss)
+      ->set_id($row['id']);
   }
   public function find_deployment($iss, $deployment_id) {
     $stm = $this->dbh->prepare('SELECT * FROM imas_lti_deployments WHERE issuer=? AND deployment=?');
@@ -72,24 +73,57 @@ class Imathas_LTI_Database implements LTI\Database {
     }
   }
 
-  public function get_token($iss, $scope) {
-    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_tokens WHERE issuer=? AND scopes=?');
-    $stm->execute(array($iss, $scope));
+  public function get_token($client_id, $scope) {
+    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_tokens WHERE client_id=? AND scopes=?');
+    $stm->execute(array($client_id, $scope));
     $row = $stm->fetch($PDO::FETCH_ASSOC);
     if ($row === false) {
       return false;
     } else if ($row['expires'] > time()) {
-      $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE issuer=? AND scopes=?');
-      $stm->execute(array($iss, $scope));
+      $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE client_id=? AND scopes=?');
+      $stm->execute(array($client_id, $scope));
       return false;
     } else {
       return $row['token'];
     }
   }
 
-  public function record_token($iss, $scope, $tokeninfo) {
-    $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (issuer, scopes, token, expires) VALUES (?,?,?,?)');
-    $stm->execute(array($iss, $scope, $tokeninfo['access_token'], time() + $tokeninfo['expires_in'] - 1));
+  public function record_token($client_id, $scope, $tokeninfo) {
+    $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (client_id, scopes, token, expires) VALUES (?,?,?,?)');
+    $stm->execute(array($client_id, $scope, $tokeninfo['access_token'], time() + $tokeninfo['expires_in'] - 1));
+  }
+
+  /**
+   * Get local user id
+   * @param  string $ltiuserid
+   * @param  string $platform_id
+   * @return false|int local userid
+   */
+  function get_local_userid($ltiuserid, $platform_id) {
+    $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org=?');
+    $stm->execute(array($ltiuserid, $platform_id));
+    return $stm->fetchColumn(0);
+  }
+  /**
+   * Get local user course id
+   * @param  string $ltiuserid
+   * @param  string $platform_id
+   * @return false|array local userid
+   */
+  function get_local_course($contextid, $platform_id) {
+    $stm = $this->dbh->prepare('SELECT courseid,copiedfrom FROM imas_lti_courses WHERE contextid=? AND org=?');
+    $stm->execute(array($contextid, $platform_id));
+    return $stm->fetch(PDO::FETCH_ASSOC);
+  }
+
+  function get_groups($iss, $deployment) {
+    $query = 'SELECT iga.groupid,ig.name FROM imas_groups AS ig
+      JOIN imas_groupassoc AS iga ON ig.id=iga.groupid
+      JOIN imas_lti_deployments AS ild ON ild.id=iga.deploymentid
+      WHERE ild.issuer=? AND ild.deployment=?';
+    $stm = $this->dbh->prepare($query);
+    $stm->execute(array($iss, $deployment));
+    return $stm->fetchAll(PDO::FETCH_ASSOC);
   }
 
 }

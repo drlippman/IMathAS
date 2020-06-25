@@ -18,12 +18,12 @@ if ($res===false) {
     $DBH->rollBack();
     return false;
 }
-$query = 'CREATE TABLE `imas_lti_issuers` (
+$query = 'CREATE TABLE `imas_lti_platforms` (
   `id` int(10) AUTO_INCREMENT PRIMARY KEY,
+  `client_id` varchar(254) NOT NULL,
   `issuer` varchar(254) NOT NULL,
   `auth_login_url` varchar(2000) NOT NULL,
   `auth_token_url` varchar(2000) NOT NULL,
-  `client_id` varchar(254) NOT NULL,
   `key_set_url` varchar(2000) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   INDEX `isscli` (`issuer`,`client_id`)
@@ -61,11 +61,11 @@ if ($res===false) {
     return false;
 }
 $query = 'CREATE TABLE `imas_lti_tokens` (
-  `issuer` varchar(254) NOT NULL,
+  `client_id` varchar(254) NOT NULL,
   `scopes` varchar(254) NOT NULL,
   `token` TEXT NOT NULL,
   `expires` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`issuer`,`scopes`)
+  PRIMARY KEY (`client_id`,`scopes`)
 ) ENGINE=InnoDB;';
 $res = $DBH->query($query);
 if ($res===false) {

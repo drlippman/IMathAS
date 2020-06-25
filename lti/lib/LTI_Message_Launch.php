@@ -205,12 +205,58 @@ class LTI_Message_Launch {
         return $this->launch_id;
     }
 
+    public function get_client_id() {
+      return is_array($this->jwt['body']['aud']) ? $this->jwt['body']['aud'][0] : $this->jwt['body']['aud'];
+    }
+    public function get_issuer() {
+      return $this->jwt['body']['iss'];
+    }
+    public function get_deployment_id() {
+      return $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id'];
+    }
+    public function get_platform_id() {
+      // return a unique identifier for the platform
+      return $this->registration->get_id();
+    }
+
     /**
      * Get the array of role claims
      * @return array
      */
     public function get_roles() {
       return $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/roles'];
+    }
+
+    /**
+     * Get user id provided by LMS (sub)
+     * @return string
+     */
+    public function get_platform_user_id() {
+      return $this->jwt['body']['sub'];
+    }
+
+    /**
+     * Get context id provided by LMS
+     * @return string
+     */
+    public function get_platform_context_id() {
+      return $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/context']['id'];
+    }
+    public function get_platform_context_label() {
+      $context = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/context'];
+      if (isset($context['label'])) {
+        return $context['label'];
+      } else {
+        return '';
+      }
+    }
+    public function get_platform_context_title() {
+      $context = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/context'];
+      if (isset($context['title'])) {
+        return $context['title'];
+      } else {
+        return '';
+      }
     }
 
     private function get_public_key() {

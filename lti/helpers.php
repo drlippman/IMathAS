@@ -26,3 +26,16 @@ function standardize_role($roles) {
   }
   return $currentRole;
 }
+
+function parse_name_from_launch($data) {
+  if (!empty($data['given_name']) || !empty($data['family_name'])) {
+    $first = $data['given_name'];
+    $last = $data['family_name'];
+    return array($first,$last);
+  } else if (!empty($data['name'])) {
+    $last = $data['name'];
+    return array('',$last);
+  } else {
+    return false;
+  }
+}

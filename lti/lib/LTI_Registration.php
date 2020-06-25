@@ -3,6 +3,7 @@ namespace IMSGlobal\LTI;
 
 class LTI_Registration {
 
+    private $id;
     private $issuer;
     private $client_id;
     private $key_set_url;
@@ -14,6 +15,14 @@ class LTI_Registration {
 
     public static function new() {
         return new LTI_Registration();
+    }
+
+    public function get_id() {
+      return $this->id;
+    }
+    public function set_id($id) {
+      $this->id = $id;
+      return $this;
     }
 
     public function get_issuer() {

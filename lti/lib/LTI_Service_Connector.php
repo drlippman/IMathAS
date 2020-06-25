@@ -21,7 +21,7 @@ class LTI_Service_Connector {
         // Don't fetch the same key more than once.
         sort($scopes);
         $scope_key = md5(implode('|', $scopes));
-        $cached_token = $this->db->get_token($this->registration->get_issuer(), $scope_key);
+        $cached_token = $this->db->get_token($this->registration->get_client_id(), $scope_key);
         if ($cached_token !== false) {
           return $cached_token;
         }
@@ -64,7 +64,7 @@ class LTI_Service_Connector {
 
         if (isset($token_data['access_token'])) {
 
-          $this->db->record_token($this->registration->get_issuer(), $scope_key, $token_data);
+          $this->db->record_token($this->registration->get_client_id(), $scope_key, $token_data);
 
           return $this->access_tokens[$scope_key] = $token_data['access_token'];
         } else {
