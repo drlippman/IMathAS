@@ -73,24 +73,24 @@ class Imathas_LTI_Database implements LTI\Database {
     }
   }
 
-  public function get_token($client_id, $scope) {
-    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_tokens WHERE client_id=? AND scopes=?');
-    $stm->execute(array($client_id, $scope));
+  public function get_token($id, $scope) {
+    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
+    $stm->execute(array($id, $scope));
     $row = $stm->fetch($PDO::FETCH_ASSOC);
     if ($row === false) {
       return false;
     } else if ($row['expires'] > time()) {
-      $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE client_id=? AND scopes=?');
-      $stm->execute(array($client_id, $scope));
+      $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
+      $stm->execute(array($id, $scope));
       return false;
     } else {
       return $row['token'];
     }
   }
 
-  public function record_token($client_id, $scope, $tokeninfo) {
-    $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (client_id, scopes, token, expires) VALUES (?,?,?,?)');
-    $stm->execute(array($client_id, $scope, $tokeninfo['access_token'], time() + $tokeninfo['expires_in'] - 1));
+  public function record_token($id, $scope, $tokeninfo) {
+    $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (platformid, scopes, token, expires) VALUES (?,?,?,?)');
+    $stm->execute(array($id, $scope, $tokeninfo['access_token'], time() + $tokeninfo['expires_in'] - 1));
   }
 
   /**

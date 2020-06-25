@@ -61,11 +61,11 @@ if ($res===false) {
     return false;
 }
 $query = 'CREATE TABLE `imas_lti_tokens` (
-  `client_id` varchar(254) NOT NULL,
+  `platformid` INT(10) UNSIGNED NOT NULL,
   `scopes` varchar(254) NOT NULL,
   `token` TEXT NOT NULL,
   `expires` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`client_id`,`scopes`)
+  PRIMARY KEY (`platformid`,`scopes`)
 ) ENGINE=InnoDB;';
 $res = $DBH->query($query);
 if ($res===false) {
