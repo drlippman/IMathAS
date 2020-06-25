@@ -104,6 +104,25 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm->execute(array($ltiuserid, $platform_id));
     return $stm->fetchColumn(0);
   }
+
+  function create_user_account($data) {
+    $query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
+    $query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify,:groupid)';
+    $stm = $this->dbh->prepare($query);
+    $stm->execute(array(':SID'=>$data['SID'], ':password'=>$data['pwhash'],':rights'=>$data['rights'],
+      ':FirstName'=>Sanitize::stripHtmlTags($data['firstname']),
+      ':LastName'=>Sanitize::stripHtmlTags($data['lastname']),
+      ':email'=>Sanitize::emailAddress($data['email']),
+      ':msgnotify'=>$data['msgnot'],':groupid'=>$data['groupid']));
+    return $this->dbh->lastInsertId();
+  }
+
+  function create_lti_user($userid, $ltiuserid, $platform_id) {
+    $stm = $this->dbh->prepare('INSERT INTO imas_ltiusers (userid,ltiuserid,org) VALUES (?,?,?)');
+    $stm->execute(array($userid, $ltiuserid, $platform_id));
+    return $this->dbh->lastInsertId();
+  }
+
   /**
    * Get local user course id
    * @param  string $ltiuserid
@@ -117,7 +136,7 @@ class Imathas_LTI_Database implements LTI\Database {
   }
 
   function get_groups($iss, $deployment) {
-    $query = 'SELECT iga.groupid,ig.name FROM imas_groups AS ig
+    $query = 'SELECT ig.id,ig.name FROM imas_groups AS ig
       JOIN imas_groupassoc AS iga ON ig.id=iga.groupid
       JOIN imas_lti_deployments AS ild ON ild.id=iga.deploymentid
       WHERE ild.issuer=? AND ild.deployment=?';

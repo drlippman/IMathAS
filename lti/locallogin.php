@@ -5,8 +5,8 @@
  * @param  LTI_Message_Launch $launch
  * @param  Imathas_LTI_Database $db
  */
-function show_postback_form($launch, $db) {
-  global $imasroot,$installname;
+function show_postback_form($launch, $db, $err='') {
+  global $imasroot,$installname,$coursetheme,$CFG;
   $promptForName = false;
   $promptForAcctCreation = false;
   $promptForLogin = false;
@@ -62,27 +62,19 @@ function show_postback_form($launch, $db) {
     }
   }
 
-  $GLOBALS['flexwidth'] = true;
-	$GLOBALS['nologo'] = true;
-	$GLOBALS['placeinhead'] = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
-  $GLOBALS['placeinhead'] .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+  $flexwidth = true;
+	$nologo = true;
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+  $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 	require("../header.php");
 	echo '<h1>'.sprintf(_('Connecting to %s'),$installname).'</h1>';
+  if ($err != '') {
+    echo '<p class=noticetext>'.$err.'</p>';
+  }
   echo '<form id=postbackform method=post action="finishlogin.php">';
   echo '<input type=hidden name=launchid value="'.$launch->get_launch_id().'"/>';
-  ?>
-  <input type="hidden" id="tzoffset" name="tzoffset" value="" />
-	<input type="hidden" id="tzname" name="tzname" value="">
-	<script type="text/javascript">
-		 $(function() {
-			var thedate = new Date();
-			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
-			var tz = jstz.determine();
-			document.getElementById("tzname").value = tz.name();
-		});
-	</script>
-  <?php
+
   if ($promptForLogin) {
     echo '<p>'.sprintf(_('If you already have an account on %s, please enter your username and password below to enable automated signin.'), $installname).'</p>';
     echo '<span class=form><label for="curSID">' .
@@ -100,6 +92,15 @@ function show_postback_form($launch, $db) {
       echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname><BR class=form>';
       echo '<span class=form><label for="email">'._('Enter E-mail address').':</label></span>  <input class=form type=email autocomplete="email" value="'.Sanitize::encodeStringForDisplay($defemail).'" size=60 id=email name=email><BR class=form>';
       echo '<span class=form><label for="msgnot">'._('Notify me by email when I receive a new message').':</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>';
+      if ($role == 'Instructor' && count($groups) > 1) {
+        echo '<span class=form><label for="groupid">'._('Group').':</label></span>';
+        echo '<select class=form id=groupid name=groupid>';
+        foreach ($groups as $group) {
+          echo '<option value="'.Sanitize::onlyInt($group['id']).'">'.$group['name'].'</option>';
+        }
+        echo '</select><br class=form>';
+      }
+
       echo '<div class=submit><button type=submit>'._('Create Account').'</button></div>';
       require_once(__DIR__.'/../includes/newusercommon.php');
       $requiredrules = array(
@@ -142,6 +143,23 @@ function show_postback_form($launch, $db) {
       });
     });</script>';
   }
+  ?>
+  <input type="hidden" id="tzoffset" name="tzoffset" value="" />
+	<input type="hidden" id="tzname" name="tzname" value="">
+	<script type="text/javascript">
+		 $(function() {
+			var thedate = new Date();
+			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
+			var tz = jstz.determine();
+			document.getElementById("tzname").value = tz.name();
+      <?php
+      if (!$promptForLogin && !$promptForName) {
+        echo 'document.getElementById("postbackform").submit();';
+      }
+      ?>
+		});
+	</script>
+  <?php
   echo '</form>';
   require('../footer.php');
 }
