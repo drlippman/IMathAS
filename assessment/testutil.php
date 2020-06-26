@@ -183,20 +183,20 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 	$penalty = $qi['penalty'];
 	$lastonly = false;
 	$skipsome = 0;
-	if ($penalty{0}==='L') {
+	if ($penalty[0]==='L') {
 		$lastonly = true;
 		$penalty = substr($penalty,1);
-	} else if ($penalty{0}==='S') {
-		$skipsome = $penalty{1};
+	} else if ($penalty[0]==='S') {
+		$skipsome = $penalty[1];
 		$penalty = substr($penalty,2);
 	}
 	if ($penalty == 9999) {
 		$penalty = $testsettings['defpenalty'];
-		if ($penalty{0}==='L') {
+		if ($penalty[0]==='L') {
 			$lastonly = true;
 			$penalty = substr($penalty,1);
-		} else if ($penalty{0}==='S') {
-			$skipsome = $penalty{1};
+		} else if ($penalty[0]==='S') {
+			$skipsome = $penalty[1];
 			$penalty = substr($penalty,2);
 		}
 	}

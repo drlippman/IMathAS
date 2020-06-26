@@ -107,8 +107,8 @@ if (isset($_POST['SID'])) {
 			exit;
 	}
 
-	$entrytype = substr($entryformat,0,1); //$entryformat{0};
-	$entrydig = substr($entryformat,1); //$entryformat{1};
+	$entrytype = substr($entryformat,0,1); //$entryformat[0];
+	$entrydig = substr($entryformat,1); //$entryformat[1];
 	$entrynotunique = false;
 	if ($entrytype=='A' || $entrytype=='B') {
 		$entrytype = chr(ord($entrytype)+2);

@@ -156,7 +156,7 @@ function parsecomplex($v) {
 			//look left
 			$nd = 0;
 			for ($L=$p-1;$L>0;$L--) {
-				$c = $v{$L};
+				$c = $v[$L];
 				if ($c==')') {
 					$nd++;
 				} else if ($c=='(') {
@@ -173,7 +173,7 @@ function parsecomplex($v) {
 			$nd = 0;
 
 			for ($R=$p+1;$R<$len;$R++) {
-				$c = $v{$R};
+				$c = $v[$R];
 				if ($c=='(') {
 					$nd++;
 				} else if ($c==')') {
@@ -191,11 +191,11 @@ function parsecomplex($v) {
 				if ($R==$len) {// real + AiB
 					$real = substr($v,0,$L);
 					$imag = substr($v,$L,$p-$L);
-					$imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+					$imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
 				} else if ($L==0) { //AiB + real
 					$real = substr($v,$R);
 					$imag = substr($v,0,$p);
-					$imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+					$imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
 				} else {
 					return _('error - invalid form');
 				}
@@ -206,34 +206,34 @@ function parsecomplex($v) {
 				$real = substr($v,0,$L) . substr($v,$p+1);
 			} else if ($R-$p>1) {
 				if ($p>0) {
-					if ($v{$p-1}!='+' && $v{$p-1}!='-') {
+					if ($v[$p-1]!='+' && $v[$p-1]!='-') {
 						return _('error - invalid form');
 					}
-					$imag = $v{$p-1}.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+					$imag = $v[$p-1].substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
 					$real = substr($v,0,$p-1) . substr($v,$R);
 				} else {
 					$imag = substr($v,$p+1,$R-$p-1);
 					$real = substr($v,0,$p) . substr($v,$R);
 				}
 			} else { //i or +i or -i or 3i  (one digit)
-				if ($v{$L}=='+') {
+				if ($v[$L]=='+') {
 					$imag = 1;
-				} else if ($v{$L}=='-') {
+				} else if ($v[$L]=='-') {
 					$imag = -1;
 				} else if ($p==0) {
 					$imag = 1;
 				} else {
-					$imag = $v{$L};
+					$imag = $v[$L];
 				}
 				$real = ($p>0?substr($v,0,$L):'') . substr($v,$p+1);
 			}
 			if ($real=='') {
 				$real = 0;
 			}
-			if ($imag{0}=='/') {
+			if ($imag[0]=='/') {
 				$imag = '1'.$imag;
-			} else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
-				$imag = $imag{0}.'1'.substr($imag,1);
+			} else if (($imag[0]=='+' || $imag[0]=='-') && $imag[1]=='/') {
+				$imag = $imag[0].'1'.substr($imag,1);
 			}
 			$imag = str_replace('*/','/',$imag);
 			if (substr($imag,-1)=='*') {

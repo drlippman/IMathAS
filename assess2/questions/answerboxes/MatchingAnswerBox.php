@@ -91,11 +91,11 @@ class MatchingAnswerBox implements AnswerBox
     		$ncol = 1;
 
     		if (substr($displayformat,1)=='columnselect') {
-    			$ncol = $displayformat{0};
+    			$ncol = $displayformat[0];
     			$itempercol = ceil(count($randqkeys)/$ncol);
     			$displayformat = 'select';
     		} else if (substr($displayformat,1)=='columnstacked') {
-    			$ncol = $displayformat{0};
+    			$ncol = $displayformat[0];
     			$itempercol = ceil(count($randqkeys)/$ncol);
           $itemperanscol = ceil(count($randakeys)/$ncol);
     		}

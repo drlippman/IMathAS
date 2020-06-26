@@ -94,7 +94,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		if ($displayformat == 'column') { $displayformat = '2column';}
 
 		if (substr($displayformat,1)=='column') {
-			$ncol = $displayformat{0};
+			$ncol = $displayformat[0];
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
 		}

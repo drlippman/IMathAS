@@ -800,7 +800,7 @@ if ($myrights<20) {
 			$query .= " AND imas_questionset.id NOT IN (SELECT iq.id FROM imas_questionset AS iq JOIN imas_library_items as ili on ili.qsetid=iq.id AND ili.deleted=0";
 			$query .= " JOIN imas_libraries AS il ON ili.libid=il.id AND il.deleted=0 WHERE il.federationlevel>0)";
 		}
-		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist{0}=='0')) {
+		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist[0]=='0')) {
 			$query .= " LIMIT 300";
 		}
 		$resultLibs = $DBH->prepare($query);

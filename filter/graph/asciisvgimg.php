@@ -276,7 +276,7 @@ function addcolor($origcolor) {
 	} else {
 		$alpha = 0;
 	}
-	if ($color{0}=='#') {
+	if ($color[0]=='#') {
 		$r = hexdec(substr($color,1,2));
 		$g = hexdec(substr($color,3,2));
 		$b = hexdec(substr($color,5,2));
@@ -1231,12 +1231,12 @@ function pt2arr($pt) {
 function parseargs($str) {
 	$lp = 0; $qd = 0; $bd=0; $args = array();
 	for($i=0; $i<strlen($str); $i++) {
-		if ($str{$i}=='[' && $qd==0) { $bd++;}
-		if ($str{$i}==']' && $qd==0) { $bd--;}
-		if ($str{$i}=='"' || $str{$i}=='\'') {
+		if ($str[$i]=='[' && $qd==0) { $bd++;}
+		if ($str[$i]==']' && $qd==0) { $bd--;}
+		if ($str[$i]=='"' || $str[$i]=='\'') {
 			$qd = 1-$qd;
 		}
-		if ($str{$i}==',' && $qd==0 && $bd==0) {
+		if ($str[$i]==',' && $qd==0 && $bd==0) {
 			if ($i>$lp) {
 				$args[] = substr($str,$lp,$i-$lp);
 			} else {
