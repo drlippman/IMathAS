@@ -461,7 +461,7 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 	$len = strlen($seq);
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
-		$vseq[$i] = $lblrev[$seq{$i}];
+		$vseq[$i] = $lblrev[$seq[$i]];
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
 		return -1; //doesn't return to start
@@ -509,7 +509,7 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 	$len = strlen($seq);
 	$vseq = array();
 	for ($i=0; $i<$len; $i++) {
-		$vseq[$i] = $lblrev[$seq{$i}];
+		$vseq[$i] = $lblrev[$seq[$i]];
 	}
 	if ($vseq[0] != $vseq[$len-1]) {
 		return false;
@@ -552,9 +552,9 @@ function graphgetpathlength($g,$op,$seq) {
 	$lblrev = array_flip($lbl);
 	$len = strlen($seq);
 	$pathlen = '';
-	$last = $lblrev[$seq{0}];
+	$last = $lblrev[$seq[0]];
 	for ($i=1; $i<$len; $i++) {
-		$cur = $lblrev[$seq{$i}];
+		$cur = $lblrev[$seq[$i]];
 		$pathlen += max($g[$last][$cur],$g[$cur][$last]);
 		$last = $cur;
 	}

@@ -1111,7 +1111,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		if (isset($reqsigfigs)) {
-			if ($reqsigfigs{0}=='=') {
+			if ($reqsigfigs[0]=='=') {
 				$reqsigfigs = substr($reqsigfigs,1);
 				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs));
@@ -1120,7 +1120,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
 				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
-			} else if ($reqsigfigs{0}=='[') {
+			} else if ($reqsigfigs[0]=='[') {
 				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
 				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigparts[0], $reqsigfigparts[1]);
 				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigparts[0], $reqsigfigparts[1]);
@@ -1269,7 +1269,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat == 'column') { $displayformat = '2column';}
 
 		if (substr($displayformat,1)=='column') {
-			$ncol = $displayformat{0};
+			$ncol = $displayformat[0];
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
 		}
@@ -1284,7 +1284,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat == "select") {
 			$msg = '?';
 			foreach ($questions as $qv) {
-				if (strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
+				if (strlen($qv)>2 && !($qv[0]=='&' && $qv[strlen($qv)-1]==';')) {
 					$msg = _('Select an answer');
 					break;
 				}
@@ -1402,7 +1402,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($displayformat == 'column') { $displayformat = '2column';}
 
 		if (substr($displayformat,1)=='column') {
-			$ncol = $displayformat{0};
+			$ncol = $displayformat[0];
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
 		}
@@ -1515,7 +1515,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		$ncol = 1;
 		if (substr($displayformat,1)=='columnselect') {
-			$ncol = $displayformat{0};
+			$ncol = $displayformat[0];
 			$itempercol = ceil(count($randqkeys)/$ncol);
 			$displayformat = 'select';
 		}
@@ -1664,7 +1664,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			unset($reqsigfigs);
 		}
 		if (isset($reqsigfigs)) {
-			if ($reqsigfigs{0}=='=') {
+			if ($reqsigfigs[0]=='=') {
 				$reqsigfigs = substr($reqsigfigs,1);
 				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs,'',false,in_array("scinot",$ansformats)||in_array("scinotordec",$ansformats)));
@@ -1673,7 +1673,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
 				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
-			} else if ($reqsigfigs{0}=='[') {
+			} else if ($reqsigfigs[0]=='[') {
 				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
 				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigparts[0], $reqsigfigparts[1]);
 				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigparts[0], $reqsigfigparts[1]);
@@ -2920,7 +2920,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					if (strpos($grid[$i],':')!==false) {
 						$pts = explode(':',$grid[$i]);
 						foreach ($pts as $k=>$v) {
-							if ($v{0}==="h") {
+							if ($v[0]==="h") {
 								$pts[$k] = "h".evalbasic(substr($v,1));
 							} else {
 								$pts[$k] = evalbasic($v);
@@ -3613,7 +3613,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($givenans == null) {return 0;}
 		if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
 			$givenans = trim($givenans);
-			if ($givenans{0}!='{' || substr($givenans,-1)!='}') { return 0; }
+			if ($givenans[0]!='{' || substr($givenans,-1)!='}') { return 0; }
 			$answer = str_replace(array('{','}'),'', $answer);
 			$givenans = str_replace(array('{','}'),'', $givenans);
 			$answerformat = str_replace('set','list',$answerformat);
@@ -3679,7 +3679,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if (in_array('parenneg',$ansformats)) {
 			foreach ($gaarr as $k=>$v) {
-				if ($v{0}=='(') {
+				if ($v[0]=='(') {
 					$gaarr[$k] = -1*substr($v,1,-1);
 				}
 			}
@@ -7759,7 +7759,7 @@ function parsecomplex($v) {
 			//look left
 			$nd = 0;
 			for ($L=$p-1;$L>0;$L--) {
-				$c = $v{$L};
+				$c = $v[$L];
 				if ($c==')') {
 					$nd++;
 				} else if ($c=='(') {
@@ -7776,7 +7776,7 @@ function parsecomplex($v) {
 			$nd = 0;
 
 			for ($R=$p+1;$R<$len;$R++) {
-				$c = $v{$R};
+				$c = $v[$R];
 				if ($c=='(') {
 					$nd++;
 				} else if ($c==')') {
@@ -7794,11 +7794,11 @@ function parsecomplex($v) {
 				if ($R==$len) {// real + AiB
 					$real = substr($v,0,$L);
 					$imag = substr($v,$L,$p-$L);
-					$imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+					$imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
 				} else if ($L==0) { //AiB + real
 					$real = substr($v,$R);
 					$imag = substr($v,0,$p);
-					$imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+					$imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
 				} else {
 					return _('error - invalid form');
 				}
@@ -7809,34 +7809,34 @@ function parsecomplex($v) {
 				$real = substr($v,0,$L) . substr($v,$p+1);
 			} else if ($R-$p>1) {
 				if ($p>0) {
-					if ($v{$p-1}!='+' && $v{$p-1}!='-') {
+					if ($v[$p-1]!='+' && $v[$p-1]!='-') {
 						return _('error - invalid form');
 					}
-					$imag = $v{$p-1}.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+					$imag = $v[$p-1].substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
 					$real = substr($v,0,$p-1) . substr($v,$R);
 				} else {
 					$imag = substr($v,$p+1,$R-$p-1);
 					$real = substr($v,0,$p) . substr($v,$R);
 				}
 			} else { //i or +i or -i or 3i  (one digit)
-				if ($v{$L}=='+') {
+				if ($v[$L]=='+') {
 					$imag = 1;
-				} else if ($v{$L}=='-') {
+				} else if ($v[$L]=='-') {
 					$imag = -1;
 				} else if ($p==0) {
 					$imag = 1;
 				} else {
-					$imag = $v{$L};
+					$imag = $v[$L];
 				}
 				$real = ($p>0?substr($v,0,$L):'') . substr($v,$p+1);
 			}
 			if ($real=='') {
 				$real = 0;
 			}
-			if ($imag{0}=='/') {
+			if ($imag[0]=='/') {
 				$imag = '1'.$imag;
-			} else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
-				$imag = $imag{0}.'1'.substr($imag,1);
+			} else if (($imag[0]=='+' || $imag[0]=='-') && $imag[1]=='/') {
+				$imag = $imag[0].'1'.substr($imag,1);
 			}
 			$imag = str_replace('*/','/',$imag);
 			if (substr($imag,-1)=='*') {

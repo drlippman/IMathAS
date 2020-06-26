@@ -23,7 +23,7 @@ $userid = intval($JWTsess->uid);
 $cid = intval($JWTsess->cid);
 $alarms = array('T'=>'', 'A'=>'', 'F'=>'', 'C'=>'');
 function toalarmformat($str) {
-	$type = $str{0};
+	$type = $str[0];
 	$time = intval(substr($str,1));
 	if (($type!=='D' && $type!=='H' && $type!=='M') || $time==0) {
 		return false;

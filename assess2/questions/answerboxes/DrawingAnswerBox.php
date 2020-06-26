@@ -119,7 +119,7 @@ class DrawingAnswerBox implements AnswerBox
     					if (strpos($grid[$i],':')!==false) {
     						$pts = explode(':',$grid[$i]);
     						foreach ($pts as $k=>$v) {
-    							if ($v{0}==="h") {
+    							if ($v[0]==="h") {
     								$pts[$k] = "h".evalbasic(substr($v,1));
     							} else {
     								$pts[$k] = evalbasic($v);
