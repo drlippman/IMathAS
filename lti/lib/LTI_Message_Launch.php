@@ -249,6 +249,8 @@ class LTI_Message_Launch {
       $context = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/context'];
       if (isset($context['label'])) {
         return $context['label'];
+      } else if (isset($context['title'])) {
+        return $context['title'];
       } else {
         return '';
       }
@@ -259,6 +261,14 @@ class LTI_Message_Launch {
         return $context['title'];
       } else {
         return '';
+      }
+    }
+    public function get_platform_context_history() {
+      $context = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/context'];
+      if (!empty($context['history'])) {
+        return explode(',', $context['history']);
+      } else {
+        return array();
       }
     }
 

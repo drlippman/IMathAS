@@ -24,5 +24,7 @@ if (isset($_SESSION['userid']) &&
   $_SESSION = array();
 }
 
+// TODO: Look for lti1p1 claim for remapping userid a/o contextid
+
 require(__DIR__ .'/locallogin.php');
 show_postback_form($launch, new Imathas_LTI_Database($DBH));

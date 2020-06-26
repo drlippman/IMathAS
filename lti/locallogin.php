@@ -72,7 +72,7 @@ function show_postback_form($launch, $db, $err='') {
   if ($err != '') {
     echo '<p class=noticetext>'.$err.'</p>';
   }
-  echo '<form id=postbackform method=post action="finishlogin.php">';
+  echo '<form id=postbackform method=post class="limitaftervalidate" action="finishlogin.php">';
   echo '<input type=hidden name=launchid value="'.$launch->get_launch_id().'"/>';
 
   if ($promptForLogin) {

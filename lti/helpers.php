@@ -41,7 +41,7 @@ function parse_name_from_launch($data) {
 }
 
 function parse_target_link($targetlink, $db) {
-  $param = parse_str(parse_url($targetlink, PHP_URL_QUERY));
+  parse_str(parse_url($targetlink, PHP_URL_QUERY), $param);
 
   if (!empty($param['refaid'])) {
     $out = ['type'=>'aid', 'refaid'=>$param['refaid'], 'refcid'=>$param['refcid']];

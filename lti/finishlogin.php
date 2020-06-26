@@ -126,14 +126,12 @@ $_SESSION['userid'] = $localuserid;
 require_once(__DIR__."/../includes/userprefs.php");
 generateuserprefs();
 
-// will want to set $_SESSION['ltiitemtype']
-
-echo 'Logged in!';
+// TODO: will want to set $_SESSION['ltiitemtype']
 
 if ($role == 'Instructor' && $localcourse === false) {
   // no course connection yet
   require(__DIR__.'/connectcourse.php');
-  connect_course($launch, $db);
+  connect_course($launch, $db, $localuserid);
 } else {
 
   // TODO: enroll student in course if needed
