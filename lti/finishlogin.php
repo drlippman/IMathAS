@@ -129,3 +129,26 @@ generateuserprefs();
 // will want to set $_SESSION['ltiitemtype']
 
 echo 'Logged in!';
+
+if ($role == 'Instructor' && $localcourse === false) {
+  // no course connection yet
+  require(__DIR__.'/connectcourse.php');
+  connect_course($launch, $db);
+} else {
+
+  // TODO: enroll student in course if needed
+  // TODO: add teacher to course if needed
+
+  // we have a course connection
+  if ($launch->is_deep_link_launch() && $role == 'Instructor') {
+    echo 'Is deep linking request - do something';
+  } else if ($launch->is_submission_review_launch()) {
+    echo 'Is submission review launch';
+  } else if ($launch->is_resource_launch()) {
+    require(__DIR__.'/resourcelink.php');
+    link_to_resource($launch, $db);
+  } else {
+    echo 'Error - invalid launch type';
+    exit;
+  }
+}

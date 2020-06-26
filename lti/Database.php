@@ -15,9 +15,9 @@ class Imathas_LTI_Database implements LTI\Database {
     $this->dbh = $DBH;
   }
 
-  public function find_registration_by_issuer($iss) {
-    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=?');
-    $stm->execute(array($iss));
+  public function find_registration_by_issuer($iss, $client_id) {
+    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=? AND client_id=?');
+    $stm->execute(array($iss, $client_id));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     if ($row === false) {
       return false;
@@ -143,6 +143,12 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($iss, $deployment));
     return $stm->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  function get_course_from_aid($aid) {
+    $stm = $this->dbh->prepare('SELECT courseid FROM imas_assessments WHERE id=?');
+    $stm->execute(array($aid));
+    return $stm->fetchColumn(0);
   }
 
 }

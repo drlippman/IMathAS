@@ -26,13 +26,3 @@ if (isset($_SESSION['userid']) &&
 
 require(__DIR__ .'/locallogin.php');
 show_postback_form($launch, new Imathas_LTI_Database($DBH));
-
-/*
-if ($launch->is_deep_link_launch()) {
-  echo 'Is deep linking request - do something';
-} else if ($launch->is_submission_review_launch()) {
-  echo 'Is submission review launch';
-} else if ($launch->is_resource_launch()) {
-
-}
-*/

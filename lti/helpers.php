@@ -39,3 +39,17 @@ function parse_name_from_launch($data) {
     return false;
   }
 }
+
+function parse_target_link($targetlink, $db) {
+  $param = parse_str(parse_url($targetlink, PHP_URL_QUERY));
+
+  if (!empty($param['refaid'])) {
+    $out = ['type'=>'aid', 'refaid'=>$param['refaid'], 'refcid'=>$param['refcid']];
+  } else if (!empty($param['refblock'])) {
+    $out = ['type'=>'block', 'refblock'=>$param['refblock'], 'refcid'=>$param['refcid']];
+  } else if (!empty($param['custom_place_aid'])) {
+    $refcid = $db->get_course_from_aid($param['custom_place_aid']);
+    $out = ['type'=>'aid', 'refaid'=>$param['custom_place_aid'], 'refcid'=>$refcid];
+  }
+  return $out;
+}
