@@ -29,15 +29,17 @@ class CopyItems {
 	private $newAssessVer = false;
 	private $copystickyposts = false;
 	private $userid = 0;
+	private $groupid = 0;
 	private $gbcats = null;
 	private $outcomes = null;
 	private $append = '';
 	private $removewithdrawn = true;
 
-	function __construct($DBH, $sourcecid, $userid, $options) {
+	function __construct($DBH, $sourcecid, $userid, $groupid, $options) {
 		$this->DBH = $DBH;
 		$this->sourcecid = $sourcecid;
 		$this->userid = $userid;
+		$this->groupid = $groupid;
 		foreach ($options as $k=>$v) {
 			if (property_exists('CopyItems', $k)) {
 				$this->$k = $v;
@@ -67,6 +69,62 @@ class CopyItems {
 		- Add a createCourse function that creates a new course copying settings
 		   and sets up the gbcats / outcome track
 		- Adjust copying to only remap outcomes/gbcats if diff course
+
+		Want to simplify code in copyitems.php, copyoneitem.php and admin/actions.php
+		and bltilaunch.php.  Ideally to get copying down to 2-3 lines.
+
+		copyoneitem.php:
+		  loads gbcats (not needed if we check for samecourse)
+			loads outcomes (not needed if we check for samecourse)
+			Calls a custom copysubone to copy an item or a block
+				Should be able to use a generic copier instead
+			Updates itemorder,blockcnt
+			Runs copyrubrics post-processor
+
+		copyitems.php:
+			Has a branch for copying selected calendar items
+			function for Copy course settings (doesn't include dates_by_lti or UIver)
+			function for copying gradebook settings and categories
+				loads gbcats with same name in both courses to establish map
+			function for copying outcomes
+				loads outcomes with same name in both courses to establish map
+			load replaceby map for source course assessments
+			Set options: copysticky, remove withdrawn, etc.
+			do copy
+			run doaftercopy to do remapping
+			update itemorder, blockcnt
+			copy offline items if requested
+			copy rubrics if requested
+
+		admin/actions.php, bltilaunch:
+			admin/action.php: create a course based on provided settings (since put in a form first)
+			bltilaunch.php: create a copy copying the existing settings
+			create gbscheme from defaults or coping
+			same stuff for copyitems if copying a template
+
+
+		functions to add:
+		 	buildGbcatMap(sourcecourse,destcourse) - for existing courses
+			buildOutcomeMap(sourcecourse,destcourse) - for existing courses
+			buildReplacebyMap(sourcecourse)
+
+			createCourse(settings) - create a new course using defaults or provided settings
+				one setting could be copyfrom to copy from another on creation
+				Should also create a default gbscheme or copy
+			copyCourseSettings(sourcecourse, destcourse)
+			copyGbcats(sourcecourse, destcourse)
+				check for any existing first and don't copy. Establish gbcatmap
+			copyCalendarItems(sourcecourse, destcourse, which)
+				which is array of checked items, or 'all' for all.
+
+			copyItems(sourcecourse, destcourse, which, recurse)
+				which is array of checked items, or 'all' for all.
+				recurse will copy all of contents of a block if set (for copyoneitem)
+					otherwise only checked items are copied
+				loads itemorder and updates itemorder
+
+			copyOffline(sourcecourse, destcourse)
+			copyRubrics(sourcecourse, destcourse)
 	 */
 
 
