@@ -509,11 +509,7 @@ if ($overwriteBody==1) {
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
 	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
 
-	if ($picicons) {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th class=mca>Review</th><th class=mca>LatePass Cutoff</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
-	} else {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th class=mca>Review</th><th class=mca>LatePass Cutoff</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
-	}
+	echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th class=mca>Review</th><th class=mca>LatePass Cutoff</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Changes</th></thead><tbody>';
 	$prefix = array();
 	if ($orderby==3) {  //course page order
 		$itemsassoc = array();
@@ -713,21 +709,20 @@ if ($overwriteBody==1) {
 		} else {
 			echo '<td class="togdishid'.($avails[$i]==0?' dis':'').'">';
 		}
-		if ($picicons>0) {
-			echo "<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
-			echo '<img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
-			switch ($types[$i]) {
-				case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
-				case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
-				case 'Link': echo $CFG['CPS']['miniicons']['linked']; break;
-				case 'Forum': echo $CFG['CPS']['miniicons']['forum']; break;
-				case 'Wiki': echo $CFG['CPS']['miniicons']['wiki']; break;
-				case 'Block': echo $CFG['CPS']['miniicons']['folder']; break;
-				case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
-				case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
-			}
-			echo '"/><div>';
+		echo "<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
+		echo '<img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
+		switch ($types[$i]) {
+			case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
+			case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
+			case 'Link': echo $CFG['CPS']['miniicons']['linked']; break;
+			case 'Forum': echo $CFG['CPS']['miniicons']['forum']; break;
+			case 'Wiki': echo $CFG['CPS']['miniicons']['wiki']; break;
+			case 'Block': echo $CFG['CPS']['miniicons']['folder']; break;
+			case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
+			case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
 		}
+		echo '"/><div>';
+
 		$sdatebase = ($startdates[$i]==0)?$defsnow:$startdates[$i];
 		$edatebase = ($enddates[$i]==2000000000)?(($startdates[$i]==0?$defnow:$sdatebase)+7*24*60*60):$enddates[$i];
 		$lpdatebase = ($LPcutoffs[$i]==0)?$edatebase+7*24*60*60:$LPcutoffs[$i];
@@ -743,11 +738,6 @@ if ($overwriteBody==1) {
 		echo "basefrdates[$cnt] = ". (($frdates[$i]==-1)?'"NA"':Sanitize::onlyInt($frdatebase)) . ";";
 		echo "</script>";
 		echo "</td>";
-		if ($picicons==0) {
-			echo "<td>";
-			echo "{$types[$i]}<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
-			echo "</td>";
-		}
 
 		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" alt="Swap" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.Sanitize::encodeStringForDisplay($cnt).'">'.Sanitize::encodeStringForDisplay($availnames[$avails[$i]]).'</span><input type="hidden" id="avail'.Sanitize::encodeStringForDisplay($cnt).'" value="'.Sanitize::encodeStringForDisplay($avails[$i]).'"/></span></td>';
 
