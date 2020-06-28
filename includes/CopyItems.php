@@ -45,11 +45,14 @@ class CopyItems {
 				$this->$k = $v;
 			}
 		}
+		$this->buildReplacebyMap();
 	}
 
 	public function setDestCourse($cid, $options = array()) {
 		$this->cid = $cid;
-		if (isset($options['dates_by_lti']) && isset($options['UIver'])) {
+		if ($this->cid === $this->sourcecid) {
+			// nothing to do
+		} else if (isset($options['dates_by_lti']) && isset($options['UIver'])) {
 			$this->dates_by_lti = $options['dates_by_lti'];
 			$this->newAssessVer = $options['UIver'];
 		} else {
@@ -57,10 +60,107 @@ class CopyItems {
 			$stm->execute(array($cid));
 			list($this->dates_by_lti, $this->newAssessVer) = $stm->fetch(PDO::FETCH_NUM);
 		}
+		$this->samecourse = ($this->cid == $this->sourcecid);
+
 		if (isset($options['gbcats'])) {
 			$this->gbcats = $options['gbcats'];
+		} else if (!$this->samecourse) {
+			$this->buildGbcatMap();
+			$this->buildOutcomeMap();
 		}
-		$this->samecourse = ($this->cid == $this->sourcecid);
+	}
+
+	/**
+	 * Create a new course
+	 * @param int|bool $copyfrom  false to not copy, or course ID to copy settings from
+	 * @param  array $settings array of override settings
+	 * @return int new course id
+	 */
+	public function createCourse($copyfrom = false, $settings = array()) {
+		/**
+		 * Notes:
+		 *   A create from copy will always copy gbscheme and gbcats
+		 *   A copy from Add New Course loads up the settings in the UI and allows
+		 *     altering, so no need to actually copy settings
+		 *   A copy from LTI copies most of the settings and overrides the name
+		 *
+		 *   Need an option for copying outcomes or not
+		 */
+		$sourcesettings = array();
+		$newsettings = array();
+		$fieldstocopy = 'name,enrollkey,'; // TODO: FIX THIS
+		if ($copyfrom !== false) {
+			$this->sourcecid = $copyfrom;
+			$stm = $this->DBH->prepare('SELECT * FROM imas_courses WHERE id=?');
+			$stm->execute(array($copyfrom));
+			$newsettings = $stm->fetch(PDO::FETCH_ASSOC);
+		} else {
+			// use CFG set defaults, if defined. Otherwise DB default will be used if
+			// not later overwritten
+			foreach ($GLOBALS['CFG']['CPS'] as $k=>$v) {
+				$newsettings[$k] = $v;
+			}
+		}
+		foreach ($settings as $k=>$v) {
+			$newsettings[$k] = $v;
+		}
+
+	}
+
+	/**
+	 * Build a map of gbcats from source to dest course, based on matching names
+	 */
+	private function buildGbcatMap() {
+		if ($this->sourcecid === 0 || $this->cid === 0) {
+			echo 'Error in buildGbcatMap - need to set source and dest course first';
+			return;
+		}
+		if (!is_array($this->gbcats)) {
+			$this->gbcats = array();
+		}
+		$query = 'SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc
+			ON tc.name=toc.name WHERE tc.courseid=:courseid AND toc.courseid=:courseid2';
+		$stm = $shis->DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$sourcecid, ':courseid2'=>$destcid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$this->gbcats[$row[0]] = $row[1];
+		}
+	}
+
+	/**
+	 * Builds outcome map from source to dest course, based on matching names
+	 */
+	private function buildOutcomeMap() {
+		if ($this->sourcecid === 0 || $this->cid === 0) {
+			echo 'Error in buildOutcomeMap - need to set source and dest course first';
+			return;
+		}
+		if (!is_array($this->outcomes)) {
+			$this->outcomes = array();
+		}
+		$query = 'SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc
+			ON tc.name=toc.name WHERE tc.courseid=:courseid AND toc.courseid=:courseid2';
+		$stm = $this->DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$this->sourcecid, ':courseid2'=>$this->cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$this->outcomes[$row[0]] = $row[1];
+		}
+	}
+
+	private function buildReplacebyMap() {
+		if ($this->sourcecid === 0) {
+			echo 'Error in buildReplacebyMap - need to set source course first';
+			return;
+		}
+		$query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset
+			JOIN imas_questions ON imas_questionset.id=imas_questions.questionsetid
+			JOIN imas_assessments ON imas_assessments.id=imas_questions.assessmentid
+			WHERE imas_assessments.courseid=:courseid AND imas_questionset.replaceby>0';
+		$stm = $this->DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$this->sourcecid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$this->replacebyarr[$row[0]] = $row[1];
+		}
 	}
 
 	/*
@@ -104,9 +204,9 @@ class CopyItems {
 
 
 		functions to add:
-		 	buildGbcatMap(sourcecourse,destcourse) - for existing courses
-			buildOutcomeMap(sourcecourse,destcourse) - for existing courses
-			buildReplacebyMap(sourcecourse)
+		 	x buildGbcatMap() - for existing courses
+			x buildOutcomeMap() - for existing courses
+			x buildReplacebyMap()
 
 			createCourse(settings) - create a new course using defaults or provided settings
 				one setting could be copyfrom to copy from another on creation
@@ -125,6 +225,10 @@ class CopyItems {
 
 			copyOffline(sourcecourse, destcourse)
 			copyRubrics(sourcecourse, destcourse)
+
+
+			checkCopyPermission($sourcecid): check to make sure we have permission to copy
+		}
 	 */
 
 
