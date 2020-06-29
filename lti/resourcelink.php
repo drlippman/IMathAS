@@ -87,6 +87,10 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       }
     }
 
+    $_SESSION['ltiitemtype'] = 0;
+    $_SESSION['ltiitemid'] = $link['typeid'];
+    $_SESSION['ltiitemver'] = $localcourse['UIver'];
+    $_SESSION['ltirole'] = strtolower($role);
 
     if (empty($localcourse['UIver'])) {
       $localcourse['UIver'] = $db->get_UIver($localcourse['courseid']);
