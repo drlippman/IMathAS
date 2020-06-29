@@ -160,7 +160,7 @@ export default {
       } else if (this.ainfo.show_scores_during) {
         return this.$t('header.score', { pts: pointsEarned, poss: pointsPossible });
       } else {
-        return this.$t('header.possible', { poss: pointsPossible });
+        return this.$tc('header.possible', pointsPossible);
       }
     },
     qAttempted () {
