@@ -362,6 +362,9 @@ class LTI_Message_Launch {
         $this->registration = $this->db->find_registration_by_issuer($this->jwt['body']['iss'], $client_id);
 
         if (empty($this->registration)) {
+          echo "Unable to find registration with issuer ".
+            Sanitize::encodeStringForDisplay($this->jwt['body']['iss']).
+            ' and client_id '.$client_id;
             throw new LTI_Exception("Registration not found.", 1);
         }
 

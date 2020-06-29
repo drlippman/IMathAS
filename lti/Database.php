@@ -238,13 +238,13 @@ class Imathas_LTI_Database implements LTI\Database {
   }
 
   public function get_link_assoc($linkid, $contextid, $platform_id) {
-    $stm = $this->dbh->prepare('SELECT typeid,placementype FROM imas_lti_placements WHERE linkid=?,contextid=?,org=?');
+    $stm = $this->dbh->prepare('SELECT typeid,placementtype FROM imas_lti_placements WHERE linkid=? AND contextid=? AND org=?');
     $stm->execute(array($linkid, $contextid, 'LTI13-'.$platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }
 
   public function make_link_assoc($typeid,$placementtype,$linkid,$contextid,$platform_id) {
-    $query = 'INSERT INTO imas_lti_placement (typeid,placementtype,linkid,contextid,org) VALUES (?,?,?,?,?)';
+    $query = 'INSERT INTO imas_lti_placements (typeid,placementtype,linkid,contextid,org) VALUES (?,?,?,?,?)';
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($typeid,$placementtype,$linkid,$contextid,'LTI13-'.$platform_id));
     return array('typeid'=>$typeid, 'placementtype'=>$placementtype);
@@ -268,7 +268,7 @@ class Imathas_LTI_Database implements LTI\Database {
       // history path matches.
       // This approach will work as long as there's a newer-format ancestry record
       $anregex = '[[:<:]]'.$aidsourcecid.':'.$sourceaid.'[[:>:]]';
-      $stm = $DBH->prepare("SELECT id,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
+      $stm = $this->dbh->prepare("SELECT id,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
       $stm->execute(array(':ancestors'=>$anregex, ':destcid'=>$destcid));
       while ($res = $stm->fetch(PDO::FETCH_ASSOC)) {
         $aidanc = explode(',',$res['ancestors']);
