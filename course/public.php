@@ -16,7 +16,7 @@
 	$ispublic = true;
 	$cid = Sanitize::courseId($_GET['cid']);
 
-	$stm = $DBH->prepare("SELECT name,theme,itemorder,hideicons,picicons,allowunenroll,msgset FROM imas_courses WHERE id=:id");
+	$stm = $DBH->prepare("SELECT name,theme,itemorder,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line == null) {

@@ -2000,7 +2000,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$exceptions,$latepasses,$CFG;
 	   global $itemtypes, $iteminfo, $addassess;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {

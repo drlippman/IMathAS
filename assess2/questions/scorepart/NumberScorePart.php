@@ -124,7 +124,7 @@ class NumberScorePart implements ScorePart
         }
         if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
             $givenans = trim($givenans);
-            if ($givenans{0}!='{' || substr($givenans,-1)!='}') {
+            if ($givenans[0]!='{' || substr($givenans,-1)!='}') {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
@@ -194,7 +194,7 @@ class NumberScorePart implements ScorePart
         }
         if (in_array('parenneg',$ansformats)) {
             foreach ($gaarr as $k=>$v) {
-                if ($v{0}=='(') {
+                if ($v[0]=='(') {
                     $gaarr[$k] = -1*substr($v,1,-1);
                 }
             }

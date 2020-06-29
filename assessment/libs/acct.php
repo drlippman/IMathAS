@@ -753,6 +753,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			}
 			if ($coltypes[$j]==false) {//fixed
 				if ($cols[$j][$i]{0}==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
+				if ($cols[$j][$i] == '') { $cols[$j][$i] = '&nbsp;'; }
 				$out .= "<td$dec>".$cols[$j][$i].'</td>';
 				$sa .= "<td$dec>".$cols[$j][$i].'</td>';
 
@@ -818,7 +819,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 //   $opts['totrow']: row to treat as totals row (decorates above and below with lines) - optional
 //   $opts['class']: class to use for table
 //   $opts['underline']: array of row=>underline style: 1 single, 2 double
-//      can also do row=>[style, column] or row=>[style, [column, column]]     
+//      can also do row=>[style, column] or row=>[style, [column, column]]
 //   $opts['questions'][n] = array of pull-down options for column n
 function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$questions, &$answerformat, &$answerboxsize, $opts=array()) {
 	if ($anstypes === null) { $anstypes = array();}
@@ -901,6 +902,7 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			}
 			if ($coltypes[$j]==false) {//fixed
 				if ($cols[$j][$i]{0}==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
+				if ($cols[$j][$i] == '') { $cols[$j][$i] = '&nbsp;'; }
 				$out .= "<td$dec>".$cols[$j][$i].'</td>';
 				$sa .= "<td$dec>".$cols[$j][$i].'</td>';
 
