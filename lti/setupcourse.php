@@ -46,5 +46,5 @@ if ($_POST['linktype'] == 'assoc') {
 
 if ($launch->is_resource_launch()) {
   require(__DIR__.'/resourcelink.php');
-  link_to_resource($launch, $localcourse, $db);
+  link_to_resource($launch, $userid, $localcourse, $db);
 }

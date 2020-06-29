@@ -145,7 +145,7 @@ if ($role == 'Instructor' && $localcourse === false) {
     echo 'Is submission review launch';
   } else if ($launch->is_resource_launch()) {
     require(__DIR__.'/resourcelink.php');
-    link_to_resource($launch, $localcourse, $db);
+    link_to_resource($launch, $localuserid, $localcourse, $db);
   } else {
     echo 'Error - invalid launch type';
     exit;

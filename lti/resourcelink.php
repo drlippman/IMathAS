@@ -1,6 +1,6 @@
 <?php
 
-function link_to_resource($launch, $localcourse, $db) {
+function link_to_resource($launch, $localuserid, $localcourse, $db) {
   $role = standardize_role($launch->get_roles());
   $contextid = $launch->get_platform_context_id();
   $platform_id = $launch->get_platform_id();
@@ -58,7 +58,35 @@ function link_to_resource($launch, $localcourse, $db) {
   // OK, we have a link at this point, so now we'll redirect to it
   if ($link['placementtype'] == 'assess') {
 
-    // TODO handle due date stuff
+    // handle due date setting stuff
+    if (empty($link['date_by_lti'])) {
+      $link = array_merge($link, $db->get_dates_by_aid($link['typeid']));
+    }
+    $lms_duedate = $launch->get_due_date();
+    // if date is available and no default due date yet, set it
+    if ($lms_duedate !== false && ($link['date_by_lti']==1 || $link['date_by_lti']==2)) {
+  		if ($role == 'Instructor') {
+  			$newdatebylti = 2; //set/keep as instructor-set
+  		} else {
+  			$newdatebylti = 3; //mark as student-set
+  		}
+      //no default due date set yet, or is the instructor:  set the default due date
+      $db->set_assessment_dates($link['typeid'], $lms_duedate, $newdatebylti);
+    }
+    if ($lms_duedate !== false && $role == 'Learner') {
+      $db->set_or_update_duedate_exception($localuserid, $link, $lms_duedate);
+    }
+    // if no due date provided, but we're expecting one, throw error
+    if ($link['date_by_lti']==1 && $lms_duedate === false) {
+      if ($role == 'Instructor') {
+  			echo sprintf(_('Your %s course is set to use dates sent by the LMS, but the LMS did not send a date.'), $GLOBALS['installname']);
+        exit;
+  		} else {
+  			echo _('Tell your teacher that the LMS is not sending due dates.');
+        exit;
+      }
+    }
+
 
     if (empty($localcourse['UIver'])) {
       $localcourse['UIver'] = $db->get_UIver($localcourse['courseid']);

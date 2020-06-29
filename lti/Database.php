@@ -151,7 +151,7 @@ class Imathas_LTI_Database implements LTI\Database {
    * @return false|array local userid
    */
   public function get_local_course($contextid, $platform_id) {
-    $query = 'SELECT ilc.courseid,ilc.copiedfrom,ic.UIver FROM
+    $query = 'SELECT ilc.courseid,ilc.copiedfrom,ic.UIver,ic.dates_by_lti FROM
       imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
       WHERE ilc.contextid=? AND ilc.org=?';
     $stm = $this->dbh->prepare($query);
@@ -238,7 +238,11 @@ class Imathas_LTI_Database implements LTI\Database {
   }
 
   public function get_link_assoc($linkid, $contextid, $platform_id) {
-    $stm = $this->dbh->prepare('SELECT typeid,placementtype FROM imas_lti_placements WHERE linkid=? AND contextid=? AND org=?');
+    $query = "SELECT ip.typeid,ip.placementtype,ia.date_by_lti,ia.enddate,ia.startdate
+      FROM imas_lti_placements AS ip LEFT JOIN imas_assessments AS ia
+      ON ip.typeid=ia.id AND ip.placementtype='assess'
+      WHERE linkid=? AND contextid=? AND org=?";
+    $stm = $this->dbh->prepare($query);
     $stm->execute(array($linkid, $contextid, 'LTI13-'.$platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }
@@ -248,6 +252,40 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($typeid,$placementtype,$linkid,$contextid,'LTI13-'.$platform_id));
     return array('typeid'=>$typeid, 'placementtype'=>$placementtype);
+  }
+
+  public function get_dates_by_aid($aid) {
+    $stm = $this->dbh->prepare('SELECT date_by_lti,startdate,enddate FROM imas_assessments WHERE id=?');
+    $stm->execute(array($aid));
+    return $stm->fetch(PDO::FETCH_ASSOC);
+  }
+  public function set_assessment_dates($aid, $enddate, $datebylti) {
+    $stm = $this->dbh->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,date_by_lti=:datebylti WHERE id=:id");
+    $stm->execute(array(':startdate'=>min(time(), $enddate),
+      ':enddate'=>$enddate, ':datebylti'=>$datebylti, ':id'=>$aid));
+  }
+  public function set_or_update_duedate_exception($userid, $link, $lms_duedate) {
+    $aid = $link['typeid'];
+    $stm = $this->dbh->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
+		$exceptionrow = $stm->fetch(PDO::FETCH_NUM);
+		$useexception = false;
+		if ($exceptionrow!=null) {
+			//have exception.  Update using lti_duedate if needed
+			if ($link['date_by_lti'] > 0 && $lms_duedate != $exceptionrow[1]) {
+				//if new due date is later, or no latepass used, then update
+				if ($exceptionrow[2]==0 || $lms_duedate > $exceptionrow[1]) {
+					$stm = $this->dbh->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+					$stm->execute(array(':startdate'=>min($now, $lms_duedate, $exceptionrow[0]),
+						':enddate'=>$lms_duedate, ':userid'=>$userid, ':assessmentid'=>$aid));
+				}
+			}
+		} else if ($link['date_by_lti']==3 && ($link['enddate'] != $lms_duedate || $now<$link['startdate'])) {
+			//default dates already set by LTI, and users's date doesn't match - create new exception
+			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
+			$stm = $this->dbh->prepare("INSERT INTO imas_exceptions (startdate,enddate,islatepass,is_lti,userid,assessmentid,itemtype) VALUES (?,?,?,?,?,?,'A')");
+			$stm->execute(array(min($now,$lms_duedate), $lms_duedate, 0, 1, $userid, $aid));
+		}
   }
 
   public function find_aid_by_immediate_ancestor($aidtolookfor, $destcid) {
