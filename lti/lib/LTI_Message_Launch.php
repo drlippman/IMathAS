@@ -3,6 +3,7 @@ namespace IMSGlobal\LTI;
 
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
+use Sanitize;
 
 JWT::$leeway = 5;
 

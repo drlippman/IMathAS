@@ -7,6 +7,7 @@
 define('TOOL_HOST', $GLOBALS['basesiteurl']);
 
 use \IMSGlobal\LTI;
+use Sanitize;
 
 class Imathas_LTI_Database implements LTI\Database {
   private $dbh;
