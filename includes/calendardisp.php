@@ -184,26 +184,26 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$showgrayedout = false;
 	if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0)) {
 		if ($bestscores_stm===null) { //only prepare once
-			$query = "SELECT ias.bestscores,ia.ptsposs,ia.ver FROM imas_assessment_sessions AS ias ";
-			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
-			$query .= "WHERE assessmentid=:assessmentid AND userid=:userid ";
-			$query .= "UNION ";
-			$query .= "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
-			$query .= "JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ";
-			$query .= "WHERE assessmentid=:assessmentid2 AND userid=:userid2 ";
-
+			if ($courseUIver > 1) {
+				$query = 'SELECT ia.ver,ia.name,ia.ptsposs,iar.score FROM
+					imas_assessments AS ia LEFT JOIN imas_assessment_records AS iar
+					ON iar.assessmentid=ia.id AND iar.userid=:userid WHERE ia.id=:assessmentid';
+			} else {
+				$query = 'SELECT ia.ver,ia.name,ia.ptsposs,ias.bestscores FROM
+					imas_assessments AS ia LEFT JOIN imas_assessment_sessions AS ias
+					ON ias.assessmentid=ia.id AND iar.userid=:userid WHERE id.id=:assessmentid';
+			}
 			$bestscores_stm = $DBH->prepare($query);
 		}
-		$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid,
-			':assessmentid2'=>$row['reqscoreaid'], ':userid2'=>$userid));
-	   if ($bestscores_stm->rowCount()==0) {
+		$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
+		list($reqaver,$reqaname,$reqscoreptsposs,$scores) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+	   if ($scores === null) {
 	   	   if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 	   	   	   $showgrayedout = true;
 	   	   } else {
 	   	   	   continue;
 	   	   }
 	   } else {
-			 list($scores,$reqscoreptsposs,$reqaver) = $bestscores_stm->fetch(PDO::FETCH_NUM);
 			 if ($reqaver > 1) {
 				 $reqascore = $scores;
 			 } else {
@@ -281,6 +281,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 		if ($showgrayedout) {
 			$colors = '#ccc';
+			$row['name'] .= ' <span class="small">'._('Prerequisite: ') .
+				abs($row['reqscore']).(($row['reqscoretype']&2)?'%':_(' points')) .
+				_(' on ').Sanitize::encodeStringForDisplay($reqaname).'</span> ';
 		} else {
 			$colors = makecolor2($row['startdate'],$row['enddate'],$now);
 		}
