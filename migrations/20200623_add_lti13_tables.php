@@ -36,10 +36,10 @@ if ($res===false) {
 }
 $query = 'CREATE TABLE `imas_lti_deployments` (
   `id` int(10) AUTO_INCREMENT PRIMARY KEY,
-  `issuer` varchar(254) NOT NULL,
+  `platform` int(10) UNSIGNED NOT NULL,
   `deployment` varchar(254) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  INDEX `issdep` (`issuer`,`deployment`)
+  INDEX `platdep` (`platform`,`deployment`)
 ) ENGINE=InnoDB;';
 $res = $DBH->query($query);
 if ($res===false) {

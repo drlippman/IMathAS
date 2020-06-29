@@ -407,7 +407,8 @@ class LTI_Message_Launch {
 
     private function validate_deployment() {
         // Find deployment.
-        $deployment = $this->db->find_deployment($this->jwt['body']['iss'], $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id']);
+        $deployment = $this->db->find_deployment($this->registration->get_id(),
+          $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id']);
 
         if (empty($deployment)) {
             // deployment not recognized.

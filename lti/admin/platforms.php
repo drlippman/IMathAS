@@ -14,7 +14,7 @@ if ($myrights < 100) {
 }
 
 if (isset($_POST['delete'])) {
-  $stm = $DBH->prepare("DELETE FROM imas_lti_issuers WHERE id=?");
+  $stm = $DBH->prepare("DELETE FROM imas_lti_platforms WHERE id=?");
   $stm->execute(array($_POST['delete']));
   header('Location: ' . $basesiteurl . "/lti/admin/platforms.php");
   exit;
@@ -25,7 +25,7 @@ if (!empty(trim($_POST['issuer'])) &&
   !empty(trim($_POST['tokenurl'])) &&
   !empty(trim($_POST['authurl']))
 ) {
-  $stm = $DBH->prepare("INSERT INTO imas_lti_issuers (issuer,client_id,auth_login_url,auth_token_url,key_set_url) VALUES (?,?,?,?,?)");
+  $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url) VALUES (?,?,?,?,?)");
   $stm->execute(array(
     trim($_POST['issuer']),
     trim($_POST['clientid']),
@@ -41,7 +41,7 @@ require("../../header.php");
 
 echo '<h1>'._('LTI 1.3 Platforms').'</h1>';
 echo '<h2>'._('Existing Platforms').'</h2>';
-$stm = $DBH->query('SELECT id,issuer,client_id,created_at FROM imas_lti_issuers WHERE 1');
+$stm = $DBH->query('SELECT id,issuer,client_id,created_at FROM imas_lti_platforms WHERE 1');
 echo '<form method="post" action="platforms.php">';
 echo '<ul class=nomark>';
 if ($stm->rowCount()===0) {

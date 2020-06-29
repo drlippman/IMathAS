@@ -31,15 +31,13 @@ class Imathas_LTI_Database implements LTI\Database {
       ->set_id($row['id']);
   }
 
-  // TODO: rewrite deployments table to use platform id (not issuer) and deployment id
-
-  public function find_deployment($iss, $deployment_id) {
-    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_deployments WHERE issuer=? AND deployment=?');
-    $stm->execute(array($iss, $deployment_id));
+  public function find_deployment($platform_id, $deployment_id) {
+    $stm = $this->dbh->prepare('SELECT * FROM imas_lti_deployments WHERE platform=? AND deployment=?');
+    $stm->execute(array($platform_id, $deployment_id));
     if ($stm->rowCount()===0) {
       // no existing deployment record, create one
-      $stm = $this->dbh->prepare('INSERT INTO imas_lti_deployments (issuer,deployment) VALUES (?,?)');
-      $stm->execute(array($iss, $deployment_id));
+      $stm = $this->dbh->prepare('INSERT INTO imas_lti_deployments (platform,deployment) VALUES (?,?)');
+      $stm->execute(array($platform_id, $deployment_id));
     }
     return LTI\LTI_Deployment::new()->set_deployment_id($deployment_id);
   }
