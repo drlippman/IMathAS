@@ -5,7 +5,7 @@ require_once(__DIR__."/copyiteminc.php");
 // TODO: Revamp this total hack job.
 // Rewrite the item and course copying as a class
 
-function copycourse($sourcecid, $name) {
+function copycourse($sourcecid, $name, $newUIver) {
   global $DBH, $CFG, $imasroot, $defaultcoursetheme, $userid, $myrights, $groupid;
   global $copystickyposts, $gbcats, $replacebyarr, $datesbylti, $convertAssessVer;
   global $removewithdrawn, $usereplaceby, $cid;
@@ -87,7 +87,7 @@ function copycourse($sourcecid, $name) {
   $deflatepass = $r[5];
   $sourceUIver = $r[6];
   $courselevel = $r[7];
-  if (isset($_POST['usenewassess'])) {
+  if ($newUIver) {
     $destUIver = 2;
     $convertAssessVer = 2;
   } else {
@@ -157,4 +157,33 @@ function copycourse($sourcecid, $name) {
   $DBH->commit();
 
   return $destcid;
+}
+
+function copyassess($aid, $destcid) {
+  global $cid,$datesbylti,$convertAssessVer;
+
+  $stm = $this->dbh->prepare("SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid=:typeid");
+  $stm->execute(array(':typeid'=>$aid));
+  if ($stm->rowCount()==0) {
+    echo sprintf("Error.  Assessment ID %s not found.", $aid);
+    exit;
+  }
+  $sourceitemid = $stm->fetchColumn(0);
+  $cid = $destcid;
+
+  $stm = $this->dbh->prepare("SELECT itemorder,dates_by_lti,UIver FROM imas_courses WHERE id=:id");
+  $stm->execute(array(':id'=>$destcid));
+  list($items,$datesbylti,$convertAssessVer) = $stm->fetch(PDO::FETCH_NUM);
+  $items = unserialize($items);
+  $newitem = copyitem($sourceitemid,array());
+  $stm = $this->dbh->prepare("SELECT typeid FROM imas_items WHERE id=:id");
+  $stm->execute(array(':id'=>$newitem));
+  $aid = $stm->fetchColumn(0);
+
+  $items[] = $newitem;
+  $items = serialize($items);
+  $stm = $this->dbh->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+  $stm->execute(array(':itemorder'=>$items, ':id'=>$destcid));
+
+  return $aid;
 }

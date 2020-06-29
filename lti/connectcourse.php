@@ -79,6 +79,8 @@ function connect_course($launch, $db, $userid) {
   if ($sourceUIver == 1) {
     echo '<p><label><input type="checkbox" name="usenewassess" checked />';
     echo _('Use new assessment interface (only applies if copying)') .'</label></p>';
+  } else {
+    echo '<input type=hidden name=usenewassess value=1 />';
   }
   echo '<button type=submit>'._('Continue').'</button>';
   echo '</form>';

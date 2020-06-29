@@ -221,6 +221,9 @@ class LTI_Message_Launch {
     public function get_target_link() {
       return $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'];
     }
+    public function get_resource_link() {
+      return $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/resource_link'];
+    }
 
     /**
      * Get the array of role claims

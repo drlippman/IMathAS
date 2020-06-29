@@ -120,6 +120,24 @@ class Imathas_LTI_Database implements LTI\Database {
     return $this->dbh->lastInsertId();
   }
 
+  public function enroll_if_needed($userid, $role, $courseid, $section='') {
+    if ($role == 'Instructor') {
+      $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=?');
+      $stm->execute(array($userid, $courseid));
+      if (!$stm->fetchColumn(0)) {
+        $stm = $this->dbh->prepare('INSERT INTO imas_teachers (userid,courseid) VALUES (?,?)');
+        $stm->execute(array($userid, $courseid));
+      }
+    } else {
+      $stm = $this->dbh->prepare('SELECT id FROM imas_students WHERE userid=? AND courseid=?');
+      $stm->execute(array($userid, $courseid));
+      if (!$stm->fetchColumn(0)) {
+        $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section) VALUES (?,?,?)');
+        $stm->execute(array($userid, $courseid, $section));
+      }
+    }
+  }
+
   public function create_lti_user($userid, $ltiuserid, $platform_id) {
     $stm = $this->dbh->prepare('INSERT INTO imas_ltiusers (userid,ltiuserid,org) VALUES (?,?,?)');
     $stm->execute(array($userid, $ltiuserid, 'LTI13-'.$platform_id));
@@ -133,7 +151,10 @@ class Imathas_LTI_Database implements LTI\Database {
    * @return false|array local userid
    */
   public function get_local_course($contextid, $platform_id) {
-    $stm = $this->dbh->prepare('SELECT courseid,copiedfrom FROM imas_lti_courses WHERE contextid=? AND org=?');
+    $query = 'SELECT ilc.courseid,ilc.copiedfrom,ic.UIver FROM
+      imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
+      WHERE ilc.contextid=? AND ilc.org=?';
+    $stm = $this->dbh->prepare($query);
     $stm->execute(array($contextid, 'LTI13-'.$platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }
@@ -141,6 +162,12 @@ class Imathas_LTI_Database implements LTI\Database {
   public function add_lti_course($contextid, $platform_id, $localcid, $label = '', $copiedfrom = 0) {
     $stm = $this->dbh->prepare('INSERT INTO imas_lti_courses (contextid,org,courseid,contextlabel,copiedfrom) VALUES (?,?,?,?,?)');
     $stm->execute(array($contextid, 'LTI13-'.$platform_id, $localcid, $label, $copiedfrom));
+  }
+
+  public function get_UIver($courseid) {
+    $stm = $this->dbh->prepare('SELECT UIver FROM imas_courses WHERE id=?');
+    $stm->execute(array($courseid));
+    return $stm->fetchColumn(0);
   }
 
   public function get_groups($iss, $deployment) {
@@ -208,6 +235,114 @@ class Imathas_LTI_Database implements LTI\Database {
       imas_teachers AS it ON it.courseid=ic.id WHERE ic.id=? AND it.userid=?');
     $stm->execute(array($destcid, $userid));
     return ($stm->fetchColumn(0) !== false);
+  }
+
+  public function get_link_assoc($linkid, $contextid, $platform_id) {
+    $stm = $this->dbh->prepare('SELECT typeid,placementype FROM imas_lti_placements WHERE linkid=?,contextid=?,org=?');
+    $stm->execute(array($linkid, $contextid, 'LTI13-'.$platform_id));
+    return $stm->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public function make_link_assoc($typeid,$placementtype,$linkid,$contextid,$platform_id) {
+    $query = 'INSERT INTO imas_lti_placement (typeid,placementtype,linkid,contextid,org) VALUES (?,?,?,?,?)';
+    $stm = $this->dbh->prepare($query);
+    $stm->execute(array($typeid,$placementtype,$linkid,$contextid,'LTI13-'.$platform_id));
+    return array('typeid'=>$typeid, 'placementtype'=>$placementtype);
+  }
+
+  public function find_aid_by_immediate_ancestor($aidtolookfor, $destcid) {
+    $anregex = '^([0-9]+:)?'.$aidtolookfor.'[[:>:]]';
+    $stm = $this->dbh->prepare("SELECT id FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
+    $stm->execute(array(':ancestors'=>$anregex, ':destcid'=>$destcid));
+    return $stm->fetchColumn(0);
+  }
+
+  public function find_aid_by_ancestor_walkback($sourceaid, $aidsourcecid, $copiedfrom, $destcid) {
+    $stm = $this->dbh->prepare("SELECT ancestors FROM imas_courses WHERE id=?");
+    $stm->execute(array($destcid));
+    $ancestors = explode(',', $stm->fetchColumn(0));
+    $ciddepth = array_search($aidsourcecid, $ancestors);  //so if we're looking for 23, "20,24,23,26" would give 2 here.
+    if ($ciddepth !== false) {
+      // first approach: look for aidsourcecid:sourcecid in ancestry of current course
+      // then we'll walk back through the ancestors and make sure the course
+      // history path matches.
+      // This approach will work as long as there's a newer-format ancestry record
+      $anregex = '[[:<:]]'.$aidsourcecid.':'.$sourceaid.'[[:>:]]';
+      $stm = $DBH->prepare("SELECT id,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
+      $stm->execute(array(':ancestors'=>$anregex, ':destcid'=>$destcid));
+      while ($res = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $aidanc = explode(',',$res['ancestors']);
+        $isok = true;
+        for($i=0;$i<=$ciddepth;$i++) {
+          if (!isset($aidanc[$i])) {
+            $isok = false;
+            break;
+          }
+          $ancparts = explode(':', $aidanc[$i]);
+          if ($ancparts[0] != $ancestors[$i]) {
+            $isok = false;
+            break; // not the same ancestry path
+          }
+        }
+        if ($isok) { // found it!
+          return $res['id'];
+        }
+      }
+
+      // last approach didn't work, so maybe it was an older-format ancestry.
+      // We'll try a heavier-duty walkback that calls the database for each walkback
+      array_unshift($ancestors, $destcid);  //add current course to front
+      $foundsubaid = true;
+      $aidtolookfor = $sourceaid;
+      for ($i=$ciddepth;$i>=0;$i--) {  //starts one course back from aidsourcecid because of the unshift
+        $stm = $this->dbh->prepare("SELECT id FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:cid");
+        $stm->execute(array(':ancestors'=>'^([0-9]+:)?'.$aidtolookfor.'[[:>:]]', ':cid'=>$ancestors[$i]));
+        if ($stm->rowCount()>0) {
+          $aidtolookfor = $stm->fetchColumn(0);
+        } else {
+          $foundsubaid = false;
+          break;
+        }
+      }
+      if ($foundsubaid) { // tracked it back all the way
+        return $aidtolookfor;
+      }
+
+      // ok, still didn't work, so assessment wasn't copied through the whole
+      // history.  So let's see if we have a copy in our course with the assessment
+      // anywhere in the ancestry.
+      $anregex = '[[:<:]]'.$sourceaid.'[[:>:]]';
+      $stm = $this->dbh->prepare("SELECT id,name,ancestors FROM imas_assessments WHERE ancestors REGEXP :ancestors AND courseid=:destcid");
+      $stm->execute(array(':ancestors'=>$anregex, ':destcid'=>$destcid));
+      $res = $stm->fetchAll(PDO::FETCH_ASSOC);
+      if (count($res)==1) {  //only one result - we found it
+        return $res[0]['id'];
+      }
+      $stm = $this->dbh->prepare("SELECT name FROM imas_assessments WHERE id=?");
+      $stm->execute(array($sourceaid));
+      $aidsourcename = $stm->fetchColumn(0);
+      if (count($res)>1) { //multiple results - look for the identical name
+        foreach ($res as $k=>$row) {
+          $res[$k]['loc'] = strpos($row['ancestors'], (string) $aidtolookfor);
+          if ($row['name']==$aidsourcename) {
+            return $row['id'];
+          }
+        }
+        //no name match. pick the one with the assessment closest to the start
+        usort($res, function($a,$b) { return $a['loc'] - $b['loc'];});
+        return $res[0]['id'];
+      }
+
+      // still haven't found it, so nothing in our current course has the
+      // desired assessment as an ancestor.  Try finding something just with
+      // the right name maybe?
+      $stm = $this->dbh->prepare("SELECT id FROM imas_assessments WHERE name=:name AND courseid=:courseid");
+      $stm->execute(array(':name'=>$aidsourcename, ':courseid'=>$destcid));
+      if ($stm->rowCount()>0) {
+        return $stm->fetchColumn(0);
+      }
+    }
+    return false;
   }
 
 }

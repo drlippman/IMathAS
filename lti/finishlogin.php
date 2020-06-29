@@ -134,8 +134,9 @@ if ($role == 'Instructor' && $localcourse === false) {
   connect_course($launch, $db, $localuserid);
 } else {
 
-  // TODO: enroll student in course if needed
-  // TODO: add teacher to course if needed
+  // enroll student in course if needed
+  $contextlabel = $launch->get_platform_context_label();
+  $db->enroll_if_needed($localuserid, $role, $localcourse['courseid'], $contextlabel);
 
   // we have a course connection
   if ($launch->is_deep_link_launch() && $role == 'Instructor') {
@@ -144,7 +145,7 @@ if ($role == 'Instructor' && $localcourse === false) {
     echo 'Is submission review launch';
   } else if ($launch->is_resource_launch()) {
     require(__DIR__.'/resourcelink.php');
-    link_to_resource($launch, $db);
+    link_to_resource($launch, $localcourse, $db);
   } else {
     echo 'Error - invalid launch type';
     exit;
