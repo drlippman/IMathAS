@@ -9,10 +9,9 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *   ext_handle_launch($targetlink, $localcourse, $localuserid, $db, $resource_link_id, $contextid, $platform_id)
    *    $localcourse the linked course info, an array with indices 'courseid' and 'copiedfrom'
    *    function should call $db->make_link_assoc($typeid, $type, $resource_link_id, $contextid, $platform_id)
-   *      to set the association, and return array('typeid'=>, 'placementtype'=>)
+   *      to set the association, and return array('typeid'=>, 'placementtype'=>, 'typenum'=>)
+   *      where placementtype is a short string, and typenum is a tinyint
    *   ext_can_handle_redirect($placementtype)
-   *   ext_get_type_num($placementtype)
-   *    get a numeric assocation for the $type to set as ltiitemtype
    *   ext_redirect_launch($typeid, $placementtype)
    *    redirect to the content
    */
@@ -40,6 +39,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       if ($target['refcid'] === $destcid) {
         // see if aid is in the current course, we just use it
         $link = $db->make_link_assoc($sourceaid,'assess',$resource_link['id'],$contextid,$platform_id);
+        $iteminfo = $db->get_assess_info($sourceaid);
+        $db->set_or_create_lineitem($launch, $link, $iteminfo, $destcid);
       } else {
         // need to find the assessment
         $destaid = false;
@@ -62,6 +63,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         }
         if ($destaid !== false) {
           $link = $db->make_link_assoc($destaid,'assess',$resource_link['id'],$contextid,$platform_id);
+          $iteminfo = $db->get_assess_info($destaid);
+          $db->set_or_create_lineitem($launch, $link, $iteminfo, $destcid);
         } else {
           echo 'Error - unable to establish link';
           exit;
@@ -79,7 +82,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
   if ($link['placementtype'] == 'assess') {
 
     // handle due date setting stuff
-    if (empty($link['date_by_lti'])) {
+    if (!isset($link['date_by_lti'])) {
       $link = array_merge($link, $db->get_dates_by_aid($link['typeid']));
     }
     $lms_duedate = $launch->get_due_date();
@@ -107,7 +110,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       }
     }
 
-    $_SESSION['ltiitemtype'] = 0;
+    $_SESSION['ltiitemtype'] = $link['typenum'];
     $_SESSION['ltiitemid'] = $link['typeid'];
     $_SESSION['ltiitemver'] = $localcourse['UIver'];
     $_SESSION['ltirole'] = strtolower($role);
@@ -129,7 +132,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       ));
     }
   } else if ($link['placementtype'] == 'course') {
-    $_SESSION['ltiitemtype'] = 1;
+    $_SESSION['ltiitemtype'] = $link['typenum'];
     $_SESSION['ltiitemid'] = $localcourse['courseid'];
     $_SESSION['ltiitemver'] = $localcourse['UIver'];
     $_SESSION['ltirole'] = strtolower($role);
@@ -139,7 +142,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       $localcourse['courseid']
     ));
   } else if (function_exists('ext_can_handle_redirect') && ext_can_handle_redirect($link['placementtype'])) {
-    $_SESSION['ltiitemtype'] = ext_get_type_num($link['placementtype']);
+    $_SESSION['ltiitemtype'] = $link['typenum'];
     $_SESSION['ltiitemid'] = $link['typeid'];
     $_SESSION['ltiitemver'] = $localcourse['UIver'];
     $_SESSION['ltirole'] = strtolower($role);

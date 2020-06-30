@@ -11,6 +11,11 @@ use \IMSGlobal\LTI;
 class Imathas_LTI_Database implements LTI\Database {
   private $dbh;
 
+  private $types_as_num = [
+    'assess'=>0,
+    'course'=>1
+  ];
+
   function __construct($DBH) {
     $this->dbh = $DBH;
   }
@@ -250,18 +255,27 @@ class Imathas_LTI_Database implements LTI\Database {
       WHERE linkid=? AND contextid=? AND org=?";
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($linkid, $contextid, 'LTI13-'.$platform_id));
-    return $stm->fetch(PDO::FETCH_ASSOC);
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+    $row['typenum'] = $this->types_as_num[$row['placementtype']];
+    return $row;
   }
 
   public function make_link_assoc($typeid,$placementtype,$linkid,$contextid,$platform_id) {
     $query = 'INSERT INTO imas_lti_placements (typeid,placementtype,linkid,contextid,org) VALUES (?,?,?,?,?)';
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($typeid,$placementtype,$linkid,$contextid,'LTI13-'.$platform_id));
-    return array('typeid'=>$typeid, 'placementtype'=>$placementtype);
+    $typenum = $this->types_as_num[$placementtype];
+    return array('typeid'=>$typeid, 'placementtype'=>$placementtype, 'typenum'=>$typenum);
   }
 
   public function get_dates_by_aid($aid) {
     $stm = $this->dbh->prepare('SELECT date_by_lti,startdate,enddate FROM imas_assessments WHERE id=?');
+    $stm->execute(array($aid));
+    return $stm->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public function get_assess_info($aid) {
+    $stm = $this->dbh->prepare('SELECT name,ptsposs,startdate,enddate,date_by_lti FROM imas_assessments WHERE id=?');
     $stm->execute(array($aid));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }
@@ -387,6 +401,37 @@ class Imathas_LTI_Database implements LTI\Database {
       }
     }
     return false;
+  }
+
+  public function set_or_create_lineitem($launch, $link, $info, $destcid) {
+    $platform_id = $launch->get_platform_id();
+    $itemtype = $link['typenum'];
+    $typeid = $line['typeid'];
+
+    if ($launch->has_ags()) {
+      // no need to proceed if we don't even support grade service
+      $lineitemstr = $launch->get_lineitem();
+      if ($lineitemstr === false && $launch->can_create_lineitem()) {
+        // there wasn't a lineitem in the launch, so find or create one
+        $ags = $launch->get_ags();
+        $lineitem = LTI\LTI_Lineitem::new()
+          ->set_resource_id($itemtype.'-'.$typeid)
+          ->set_score_maximum($info['ptsposs'])
+          ->set_label($info['name']);
+        if (empty($info['date_by_lti']) && !empty($info['startdate'])) {
+          $lineitem->set_start_date_time(date(DATE_ATOM, $info['startdate']));
+        }
+        if (empty($info['date_by_lti']) && !empty($info['enddate'])) {
+          $lineitem->set_end_date_time(date(DATE_ATOM, $info['enddate']));
+        }
+        $newlineitem = $ags->find_or_create_lineitem($lineitem);
+        $lineitemstr = $newlineitem->get_id();
+      }
+      if (!empty($lineitemstr)) {
+        $stm = $this->dbh->prepare('INSERT INTO imas_lti_lineitems (itemtype,typeid,platformid,courseid,lineitem) VALUES (?,?,?,?,?)');
+        $stm->execute(array($itemtype, $typeid, $platform_id, $destcid, $lineitemstr));
+      }
+    }
   }
 
 }

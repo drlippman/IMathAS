@@ -151,6 +151,32 @@ class LTI_Message_Launch {
     }
 
     /**
+     * If launch has a single lineitem, return it
+     * @return string|bool
+     */
+    public function get_lineitem() {
+      if ($this->has_ags()) {
+        $ags = $this->jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
+        if (!empty($ags['lineitem'])) {
+          return $ags['lineitem'];
+        }
+      }
+      return false;
+    }
+
+    public function can_create_lineitem() {
+      if ($this->has_ags()) {
+        $ags = $this->jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
+        if (!empty($ags['scope']) &&
+          !empty($ags['scope']['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'])
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
      * Fetches a deep link that can be used to construct a deep linking response.
      *
      * @return LTI_Deep_Link An instance of a deep link to construct a deep linking response for the current launch.
