@@ -22,6 +22,7 @@ if (isset($_SESSION['userid']) &&
   session_start();
   session_regenerate_id();
   $_SESSION = array();
+  // need to recache launch data since we've cleared the session
   $launch->cache_launch_data();
 }
 

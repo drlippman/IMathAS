@@ -89,6 +89,7 @@ class LTI_Message_Launch {
             ->cache_launch_data();
     }
 
+
     /**
      * Returns whether or not the current launch can use the names and roles service.
      *
@@ -330,7 +331,7 @@ class LTI_Message_Launch {
       }
     }
 
-    private function cache_launch_data() {
+    public function cache_launch_data() {
         $this->cache->cache_launch_data($this->launch_id, $this->jwt['body']);
         return $this;
     }
