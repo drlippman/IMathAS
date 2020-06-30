@@ -222,8 +222,8 @@ switch($_GET['action']) {
 								text: msg[i].name
 							}));
 						}
-						if (document.getElementById("group").options.length > 3) {
-							document.getElementById("group").selectedIndex = 3;
+						if (document.getElementById("group").options.length > 2) {
+							document.getElementById("group").selectedIndex = 2;
 						} else {
 							document.getElementById("group").selectedIndex = document.getElementById("group").options.length-1;
 						}
@@ -1477,6 +1477,49 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
+	case "mergegroups":
+		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		echo '<div id="headerforms" class="pagetitle"><h1>'._('Merge Group').'</h1></div>';
+		$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$grpname = $stm->fetchColumn(0);
+		?>
+		<script type="text/javascript">
+		function searchgrps() {
+			var grpsearch = document.getElementById("grpsearch").value;
+			if (grpsearch.trim() !== '') {
+				$.ajax({
+					type: "POST",
+					url: "groupsearch.php",
+					dataType: "json",
+					data: {
+						"grpsearch": grpsearch
+					}
+				}).done(function(msg) {
+					$("#group").empty();
+					for (var i=0; i<msg.length; i++) {
+						$("#group").append($("<option>", {
+							value: msg[i].id,
+							text: msg[i].name
+						}));
+					}
+				});
+			}
+		}
+		</script>
+		<?php
+		printf("<form method=post action=\"actions.php?from=%s&id=%s\">\n",
+			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']));
+		echo '<input type=hidden name=action value="mergegroups" />';
+		echo '<p>'.sprintf(_('This action will move teachers from group %s to another group and delete their original group'),
+			'<strong>'.Sanitize::encodeStringForDisplay($grpname).'</strong>').'</p>';
+		echo '<p><label for="grpsearch">'._('Search for Groups').'</label> <input id=grpsearch />';
+		echo ' <button type=button onclick="searchgrps()">'._('Search').'</button><br/>';
+		echo '<label for="group">'._('Move teachers to:').'</label> ';
+		echo '<select name="group" id="group" ></select>';
+		echo '<p><button type=submit>'._('Submit').'</button></p>';
+		echo '</form>';
+		break;
 	case "modgroup":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle"><h1>Rename Instructor Group</h1></div>';
@@ -1506,6 +1549,10 @@ switch($_GET['action']) {
 
 		echo "<input type=submit value=\"Update Group\">\n";
 		echo "</form>\n";
+		echo '<p></p><p>';
+		printf("<a href=\"forms.php?from=%s&action=mergegroups&id=%s\">%s</a></p>",
+			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']),
+			_('Merge group with another'));
 		break;
 	case "removediag":
 		if ($myrights<100 && ($myspecialrights&4)!=4) { echo "You don't have the authority for this action"; break;}

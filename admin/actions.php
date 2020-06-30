@@ -1100,6 +1100,21 @@ switch($_POST['action']) {
 		}
 
 		break;
+	case "mergegroups":
+		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		if (empty($_POST['group']) || empty($_GET['id'])) {
+			echo 'Invalid group';
+			exit;
+		}
+		$oldgroup = $_GET['id'];
+		$newgroup = $_POST['group'];
+		$stm = $DBH->prepare('UPDATE imas_libraries SET groupid=? WHERE groupid=?');
+		$stm->execute(array($newgroup, $oldgroup));
+		$stm = $DBH->prepare('UPDATE imas_users SET groupid=? WHERE groupid=?');
+		$stm->execute(array($newgroup, $oldgroup));
+		$stm = $DBH->prepare("DELETE FROM imas_groups WHERE id=:id");
+		$stm->execute(array(':id'=>$oldgroup));
+		break;
 	case "delgroup":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$stm = $DBH->prepare("DELETE FROM imas_groups WHERE id=:id");
