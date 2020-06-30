@@ -22,6 +22,7 @@ if (isset($_SESSION['userid']) &&
   session_start();
   session_regenerate_id();
   $_SESSION = array();
+  $launch->cache_launch_data();
 }
 
 // TODO: Look for lti1p1 claim for remapping userid a/o contextid
