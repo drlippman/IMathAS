@@ -178,6 +178,14 @@ class Imathas_LTI_Database implements LTI\Database {
     return $stm->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  public function set_group_assoc($platform_id, $deployment, $groupid) {
+    $stm = $this->dbh->prepare('SELECT id FROM imas_lti_deployments WHERE platform=? AND deployment=?');
+    $stm->execute(array($platform_id, $deployment));
+    $internal_deployment_id = $stm->fetchColumn(0);
+    $stm = $this->dbh->prepare('INSERT IGNORE INTO imas_lti_deployments (deploymentid,groupid) VALUES (?,?)');
+    $stm->execute(array($internal_deployment_id, $groupid));
+  }
+
   public function get_course_from_aid($aid) {
     $stm = $this->dbh->prepare('SELECT courseid FROM imas_assessments WHERE id=?');
     $stm->execute(array($aid));

@@ -33,14 +33,19 @@ if ($localuserid === false) {
     $role=='Instructor'
   )) {
     // check login
-    $stm = $DBH->prepare('SELECT password,id FROM imas_users WHERE SID=:sid');
+    $stm = $DBH->prepare('SELECT password,id,groupid FROM imas_users WHERE SID=:sid');
     $stm->execute(array(':sid'=>$_POST['curSID']));
     if ($stm->rowCount()==0) {
       $err = _('Existing username or password is not valid');
     } else {
-      list($realpw,$tmpuserid) = $stm->fetch(PDO::FETCH_NUM);
+      list($realpw,$tmpuserid,$tmpgroupid) = $stm->fetch(PDO::FETCH_NUM);
       if (password_verify($_POST['curPW'],$realpw)) {
+        // valid login
         $localuserid = $tmpuserid;
+        if ($role == 'Instructor') {
+          // if teacher, make sure the deployment is associated with the groupid
+          $db->set_group_assoc($platform_id, $launch->get_deployment_id(), $tmpgroupid);
+        }
       } else {
         $err = _('Existing username or password is not valid');
         unset($tmpuserid);
@@ -125,8 +130,6 @@ $_SESSION['lti_user_id'] = $ltiuserid;
 $_SESSION['userid'] = $localuserid;
 require_once(__DIR__."/../includes/userprefs.php");
 generateuserprefs();
-
-// TODO: will want to set $_SESSION['ltiitemtype']
 
 if ($role == 'Instructor' && $localcourse === false) {
   // no course connection yet
