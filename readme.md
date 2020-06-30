@@ -10,8 +10,17 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ## Installation
 
-IMathAS is designed for simple installation with minimal requirements.  The system requires PHP 7.1+ with GD and Freetype, and MySQL 5.6+.
+### Requirements
+IMathAS is designed for simple installation with minimal requirements.  The system
+requires PHP 7.1+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
+- mbstring (required)
+- pdo_mysql (required)
+- gettext (required)
+- gd with freetype (recommended) for image creation
+- curl (recommended) necessary for LTI grade passback
+- openssl (recommended) necessary for LTI 1.3 services
 
+### Installation Steps
 1.  Download IMathAS, extract it, and copy the files to your webserver.
 2.  Alternatively, if you have shell access to your server, enter the directory you want IMathAS in, and checkout the code from Github. Using Git greatly simplifies upgrading.
 3.  Create a database for IMathAS
