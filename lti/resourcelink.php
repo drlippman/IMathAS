@@ -1,5 +1,23 @@
 <?php
 
+if (isset($GLOBALS['CFG']['hooks']['lti'])) {
+  require_once($CFG['hooks']['bltilaunch']);
+  /**
+   * Hook should implement:
+   *   ext_can_ext_handle_launch($targetlink),
+   *    $targetlink is the raw target_link_uri
+   *   ext_handle_launch($targetlink, $localcourse, $localuserid, $db, $resource_link_id, $contextid, $platform_id)
+   *    $localcourse the linked course info, an array with indices 'courseid' and 'copiedfrom'
+   *    function should call $db->make_link_assoc($typeid, $type, $resource_link_id, $contextid, $platform_id)
+   *      to set the association, and return array('typeid'=>, 'placementtype'=>)
+   *   ext_can_handle_redirect($placementtype)
+   *   ext_get_type_num($placementtype)
+   *    get a numeric assocation for the $type to set as ltiitemtype
+   *   ext_redirect_launch($typeid, $placementtype)
+   *    redirect to the content
+   */
+}
+
 function link_to_resource($launch, $localuserid, $localcourse, $db) {
   $role = standardize_role($launch->get_roles());
   $contextid = $launch->get_platform_context_id();
@@ -49,6 +67,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
           exit;
         }
       }
+    } else if (function_exists('ext_can_ext_handle_launch') && ext_can_ext_handle_launch($launch->get_target_link())) {
+      $link = ext_handle_launch($launch->get_target_link(), $localcourse, $localuserid, $db, $resource_link_id, $contextid, $platform_id);
     } else {
       echo 'Unsupported link type';
       exit;
@@ -109,11 +129,22 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       ));
     }
   } else if ($link['placementtype'] == 'course') {
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+    $_SESSION['ltiitemtype'] = 1;
+    $_SESSION['ltiitemid'] = $localcourse['courseid'];
+    $_SESSION['ltiitemver'] = $localcourse['UIver'];
+    $_SESSION['ltirole'] = strtolower($role);
+
     header(sprintf('Location: %s/course/course.php?cid=%d',
       $GLOBALS['basesiteurl'],
       $localcourse['courseid']
     ));
+  } else if (function_exists('ext_can_handle_redirect') && ext_can_handle_redirect($link['placementtype'])) {
+    $_SESSION['ltiitemtype'] = ext_get_type_num($link['placementtype']);
+    $_SESSION['ltiitemid'] = $link['typeid'];
+    $_SESSION['ltiitemver'] = $localcourse['UIver'];
+    $_SESSION['ltirole'] = strtolower($role);
+
+    ext_redirect_launch($link['typeid'], $link['placementtype']);
   } else {
     echo 'Unsupported placementtype';
     exit;
