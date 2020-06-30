@@ -1664,7 +1664,7 @@ function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$a
 			if ((($t=='assets' || $t=='expenses') && $dt[$i+1]>=0) || (!($t=='assets' || $t=='expenses') && $dt[$i+1]<0)) {
 				$out .= '<td>[AB'.$sn.']</td>';
 				$sa .= '<td class="r">'.($hasdecimals?number_format(abs($dt[$i+1]),2,'.',','):number_format(abs($dt[$i+1]))).'</td>';
-				$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answer[$sn] = $dt[$i+1]; $answerboxsize[$sn] = 8;
+				$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answer[$sn] = abs($dt[$i+1]); $answerboxsize[$sn] = 8;
 				$sn++;
 				$out .= '<td class="r">[AB'.$sn.']</td>';
 				$sa .= '<td class="r"></td>';
@@ -1678,7 +1678,7 @@ function maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$a
 				$sn++;
 				$out .= '<td>[AB'.$sn.']</td>';
 				$sa .= '<td class="r">'.($hasdecimals?number_format(abs($dt[$i+1]),2,'.',','):number_format(abs($dt[$i+1]))).'</td>';
-				$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answer[$sn] = $dt[$i+1]; $answerboxsize[$sn] = 8;
+				$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answer[$sn] = abs($dt[$i+1]); $answerboxsize[$sn] = 8;
 				$sn++;
 				$totcred += abs($dt[$i+1]);
 			}
