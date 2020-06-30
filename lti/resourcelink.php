@@ -11,6 +11,9 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *    function should call $db->make_link_assoc($typeid, $type, $resource_link_id, $contextid, $platform_id)
    *      to set the association, and return array('typeid'=>, 'placementtype'=>, 'typenum'=>)
    *      where placementtype is a short string, and typenum is a tinyint
+   *    and call $db->set_or_create_lineitem($launch, $link, $info, $destcid)
+   *      if the item is going to passback a grade.  $info should be array with
+   *      indices 'name' and 'ptsposs', and optionally date_by_lti, startdate, enddate
    *   ext_can_handle_redirect($placementtype)
    *   ext_redirect_launch($typeid, $placementtype)
    *    redirect to the content
