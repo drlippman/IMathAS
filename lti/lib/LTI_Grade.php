@@ -71,6 +71,9 @@ class LTI_Grade {
         $this->timestamp = $value;
         return $this;
     }
+    public function set_timestamp_now() {
+        $this->timestamp = date('Y-m-d\TH:i:s.uP', time());
+    }
 
     public function get_user_id() {
         return $this->user_id;

@@ -139,7 +139,7 @@ if ($role == 'Instructor' && $localcourse === false) {
 
   // enroll student in course if needed
   $contextlabel = $launch->get_platform_context_label();
-  $db->enroll_if_needed($localuserid, $role, $localcourse['courseid'], $contextlabel);
+  $db->enroll_if_needed($localuserid, $role, $localcourse, $contextlabel);
 
   // we have a course connection
   if ($launch->is_deep_link_launch() && $role == 'Instructor') {

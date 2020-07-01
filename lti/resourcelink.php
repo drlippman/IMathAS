@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * TODO:
+ *  refactor $localcourse and $link into classes, maybe $target
+ *
+ */
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
   require_once($CFG['hooks']['bltilaunch']);
   /**
@@ -11,7 +16,7 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *    function should call $db->make_link_assoc($typeid, $type, $resource_link_id, $contextid, $platform_id)
    *      to set the association, and return array('typeid'=>, 'placementtype'=>, 'typenum'=>)
    *      where placementtype is a short string, and typenum is a tinyint
-   *    and call $db->set_or_create_lineitem($launch, $link, $info, $destcid)
+   *    and call $db->set_or_create_lineitem($launch, $link, $info, $localcourse)
    *      if the item is going to passback a grade.  $info should be array with
    *      indices 'name' and 'ptsposs', and optionally date_by_lti, startdate, enddate
    *   ext_can_handle_redirect($placementtype)
@@ -43,7 +48,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         // see if aid is in the current course, we just use it
         $link = $db->make_link_assoc($sourceaid,'assess',$resource_link['id'],$contextid,$platform_id);
         $iteminfo = $db->get_assess_info($sourceaid);
-        $db->set_or_create_lineitem($launch, $link, $iteminfo, $destcid);
+        $db->set_or_create_lineitem($launch, $link, $iteminfo, $localcourse);
       } else {
         // need to find the assessment
         $destaid = false;
@@ -67,7 +72,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         if ($destaid !== false) {
           $link = $db->make_link_assoc($destaid,'assess',$resource_link['id'],$contextid,$platform_id);
           $iteminfo = $db->get_assess_info($destaid);
-          $db->set_or_create_lineitem($launch, $link, $iteminfo, $destcid);
+          $db->set_or_create_lineitem($launch, $link, $iteminfo, $localcourse);
         } else {
           echo 'Error - unable to establish link';
           exit;

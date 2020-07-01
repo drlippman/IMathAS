@@ -123,20 +123,24 @@ class Imathas_LTI_Database implements LTI\Database {
     return $this->dbh->lastInsertId();
   }
 
-  public function enroll_if_needed($userid, $role, $courseid, $section='') {
+  public function enroll_if_needed($userid, $role, $localcourse, $section='') {
     if ($role == 'Instructor') {
       $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=?');
-      $stm->execute(array($userid, $courseid));
+      $stm->execute(array($userid, $localcourse['courseid']));
       if (!$stm->fetchColumn(0)) {
         $stm = $this->dbh->prepare('INSERT INTO imas_teachers (userid,courseid) VALUES (?,?)');
-        $stm->execute(array($userid, $courseid));
+        $stm->execute(array($userid, $localcourse['courseid']));
       }
     } else {
-      $stm = $this->dbh->prepare('SELECT id FROM imas_students WHERE userid=? AND courseid=?');
-      $stm->execute(array($userid, $courseid));
-      if (!$stm->fetchColumn(0)) {
-        $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section) VALUES (?,?,?)');
-        $stm->execute(array($userid, $courseid, $section));
+      $stm = $this->dbh->prepare('SELECT id,lticourseid FROM imas_students WHERE userid=? AND courseid=?');
+      $stm->execute(array($userid, $localcourse['courseid']));
+      $row = $stm->fetch(PDO::FETCH_ASSOC);
+      if ($row === false) {
+        $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,lticourseid) VALUES (?,?,?,?)');
+        $stm->execute(array($userid, $localcourse['courseid'], $section, $localcourse['id']));
+      } else if ($row['lticourseid'] !== $localcourse['id']) {
+        $stm = $this->dbh->prepare('UPDATE imas_students SET lticourseid=? WHERE id=?');
+        $stm->execute(array($localcourse['id'], $row['id']));
       }
     }
   }
@@ -149,12 +153,12 @@ class Imathas_LTI_Database implements LTI\Database {
 
   /**
    * Get local user course id
-   * @param  string $ltiuserid
+   * @param  string $contextid
    * @param  string $platform_id
-   * @return false|array local userid
+   * @return false|array local course info
    */
   public function get_local_course($contextid, $platform_id) {
-    $query = 'SELECT ilc.courseid,ilc.copiedfrom,ic.UIver,ic.dates_by_lti FROM
+    $query = 'SELECT ilc.id,ilc.courseid,ilc.copiedfrom,ic.UIver,ic.dates_by_lti FROM
       imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
       WHERE ilc.contextid=? AND ilc.org=?';
     $stm = $this->dbh->prepare($query);
@@ -165,6 +169,7 @@ class Imathas_LTI_Database implements LTI\Database {
   public function add_lti_course($contextid, $platform_id, $localcid, $label = '', $copiedfrom = 0) {
     $stm = $this->dbh->prepare('INSERT INTO imas_lti_courses (contextid,org,courseid,contextlabel,copiedfrom) VALUES (?,?,?,?,?)');
     $stm->execute(array($contextid, 'LTI13-'.$platform_id, $localcid, $label, $copiedfrom));
+    return $this->dbh->lastInsertId();
   }
 
   public function get_UIver($courseid) {
@@ -403,13 +408,13 @@ class Imathas_LTI_Database implements LTI\Database {
     return false;
   }
 
-  public function set_or_create_lineitem($launch, $link, $info, $destcid) {
+  public function set_or_create_lineitem($launch, $link, $info, $localcourse) {
     $platform_id = $launch->get_platform_id();
     $itemtype = $link['typenum'];
     $typeid = $line['typeid'];
 
-    if ($launch->has_ags()) {
-      // no need to proceed if we don't even support grade service
+    if ($launch->can_set_grades()) {
+      // no need to proceed if we can't send back grades
       $lineitemstr = $launch->get_lineitem();
       if ($lineitemstr === false && $launch->can_create_lineitem()) {
         // there wasn't a lineitem in the launch, so find or create one
@@ -428,8 +433,8 @@ class Imathas_LTI_Database implements LTI\Database {
         $lineitemstr = $newlineitem->get_id();
       }
       if (!empty($lineitemstr)) {
-        $stm = $this->dbh->prepare('INSERT INTO imas_lti_lineitems (itemtype,typeid,platformid,courseid,lineitem) VALUES (?,?,?,?,?)');
-        $stm->execute(array($itemtype, $typeid, $platform_id, $destcid, $lineitemstr));
+        $stm = $this->dbh->prepare('INSERT INTO imas_lti_lineitems (itemtype,typeid,lticourseid,lineitem) VALUES (?,?,?,?)');
+        $stm->execute(array($itemtype, $typeid, $localcourse['id'], $lineitemstr));
       }
     }
   }

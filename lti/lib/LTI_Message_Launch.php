@@ -176,6 +176,18 @@ class LTI_Message_Launch {
       return false;
     }
 
+    public function can_set_grades() {
+      if ($this->has_ags()) {
+        $ags = $this->jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
+        if (!empty($ags['scope']) &&
+          !empty($ags['scope']['https://purl.imsglobal.org/spec/lti-ags/scope/score'])
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     /**
      * Fetches a deep link that can be used to construct a deep linking response.
      *

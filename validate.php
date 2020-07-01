@@ -508,7 +508,7 @@
 		} else {
 			$cid = Sanitize::courseId($_SESSION['courseid']);
 		}
-		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess,lticourseid FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($line != null) {
@@ -516,6 +516,9 @@
 			$studentinfo['timelimitmult'] = $line['timelimitmult'];
 			$studentinfo['section'] = $line['section'];
 			$studentinfo['latepasses'] = $line['latepass'];
+      if ($line['lticourseid']>0) {
+        $studentinfo['lticourseid'] = $line['lticourseid'];
+      }
 			if ($line['locked']>0) {
 				require("header.php");
 				echo "<p>",_("You have been locked out of this course by your instructor.  Please see your instructor for more information."),"</p>";

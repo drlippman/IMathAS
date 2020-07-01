@@ -230,6 +230,26 @@ if (!empty($_SESSION['lti_lis_result_sourcedid'.$aid]) &&
 ) {
   $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
   $assess_record->updateLTIsourcedId($altltisourcedid);
+} else if (!empty($studentinfo['lticourseid'])) {
+  $stm = $DBH->prepare('SELECT contextid,org FROM imas_lti_courses WHERE id=?');
+  $stm->execute(array($studentinfo['lticourseid']));
+  $row = $stm->fetch(PDO::FETCH_ASSOC);
+  $platformid = substr($row['org'], 6); // strip off LTI13-
+  if (empty($_SESSION['lti_user_id'])) {
+    $stm = $DBH->prepare('SELECT ltiuserid FROM imas_ltiusers WHERE userid=? AND org=?');
+    $stm->execute(array($uid, $row['org']));
+    $ltiuserid = $stm->fetchColumn(0);
+  } else {
+    $ltiuserid = $_SESSION['lti_user_id'];
+  }
+  // TODO: look up lineitemurl
+  $stm = $DBH->prepare('SELECT lineitem FROM imas_lti_lineitems WHERE itemtype=0 AND typeid=? AND lticourseid=?');
+  $stm->execute(array($aid, $studentinfo['lticourseid']));
+  $lineitemurl = $stm->fetchColumn(0);
+  if ($lineitemurl !== false) {
+    $altltisourcedid = 'LTI1.3:|:'.$ltiuserid.':|:'.$lineitemurl.':|:'.$platformid;
+    $assess_record->updateLTIsourcedId($altltisourcedid);
+  }
 }
 /*
 else if (isset($_SESSION['lti_lis_result_sourcedid'])) {
