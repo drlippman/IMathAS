@@ -72,6 +72,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
 
 //use this if we know the grade, or want to delete
 function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
+	global $CFG;
 
 	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
 		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';

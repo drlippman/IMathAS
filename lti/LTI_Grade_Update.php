@@ -10,6 +10,8 @@ use Firebase\JWT\JWT;
  * A very simple LTI 1.3 grade update class.
  * This one assumes we've alredy checked scopes,
  * and that we already know the update lineitem.
+ *
+ * This has code duplication with the other libraries
  */
 define('TOOL_HOST', $GLOBALS['basesiteurl']);
 
@@ -17,10 +19,12 @@ class LTI_Grade_Update {
   private $dbh;
   private $access_tokens = [];
   private $private_key = '';
-  private $debug = true;
+  private $failures = [];
+  private $debug = false;
 
   public function __construct($DBH) {
     $this->dbh = $DBH;
+    $this->debug = !empty($CFG['LTI']['noisydebuglog']);
   }
 
   public function have_token($platform_id) {
@@ -41,13 +45,26 @@ class LTI_Grade_Update {
     if ($row === false) {
       return false;
     } else if ($row['expires'] < time() + 60) { // expired
+      if (substr($row['token'],0,6)==='failed') {
+        $this->failures[$platform_id] = intval(substr($row['token'],6));
+      }
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
       $stm->execute(array($platform_id, $scope));
       return false;
     } else {
+      $row['failed'] = (substr($row['token'],0,6)==='failed');
       $this->access_tokens[$platform_id] = $row;
       return true;
     }
+  }
+
+  public function token_valid($platform_id) {
+    if (isset($this->access_tokens[$platform_id]) &&
+      empty($this->access_tokens[$platform_id]['failed'])
+    ) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -105,7 +122,8 @@ class LTI_Grade_Update {
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
     $response = curl_exec($ch);
-    if (curl_errno($ch)){
+    $request_info = curl_getinfo($ch);
+    if (curl_errno($ch) || round(intval($request_info['http_code'])/100) != 2) {
         $this->debuglog('Grade update Error:' . curl_error($ch));
         return false;
     }
@@ -178,9 +196,13 @@ class LTI_Grade_Update {
     if ($row === false) {
 
     } else if ($row['expires'] < time() + 10) {
+      if (substr($row['token'],0,6)==='failed') {
+        $this->failures[$platform_id] = intval(substr($row['token'],6));
+      }
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
       $stm->execute(array($platform_id, $scope));
     } else {
+      $row['failed'] = (substr($row['token'],0,6)==='failed');
       $this->access_tokens[$platform_id] = $row;
       return $row['token'];
     }
@@ -215,8 +237,18 @@ class LTI_Grade_Update {
       $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];
     } else {
+      if (isset($this->failures[$platform_id])) {
+        $failures = $this->failures[$platform_id]++;
+      } else {
+        $failures = 1;
+      }
+      $token_data = [
+        'access_token' => 'failed'.$failures,
+        'expires' => time() + min(pow(3, $failures-1), 24*60*60)
+      ];
+      // store failure
+      $this->store_access_token($platform_id, $token_data);
       $this->debuglog('token request error '.$error);
-      echo "Error: no access token returned";
       return false;
     }
   }
@@ -268,6 +300,19 @@ class LTI_Grade_Update {
     $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
     $stm->execute(array($platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
+  }
+
+  /**
+   * We call this for ltiqueu if token failed, and we'll update the sendon
+   * to just after the token failure expires
+   * @param  [type] $hash        [description]
+   * @param  [type] $platform_id [description]
+   * @return void
+   */
+  public function update_sendon($hash, $platform_id) {
+    $newsendon = $this->access_tokens[$platform_id]['expires'] + 1;
+    $stm = $this->dbh->prepare('UPDATE imas_ltiqueue SET sendon=? WHERE hash=?');
+    $stm->execute(array($newsendon, $hash));
   }
 
 

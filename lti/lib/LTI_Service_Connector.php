@@ -24,7 +24,7 @@ class LTI_Service_Connector {
         if (isset($this->access_tokens[$scope_key])) {
           return $this->access_tokens[$scope_key];
         }
-        $cached_token = $this->db->get_token($this->registration->get_id(), $scope_key);
+        list($cached_token,$failures) = $this->db->get_token($this->registration->get_id(), $scope_key);
         if ($cached_token !== false) {
           return $cached_token;
         }
@@ -71,7 +71,12 @@ class LTI_Service_Connector {
 
           return $this->access_tokens[$scope_key] = $token_data['access_token'];
         } else {
-          echo "Error: no access token returned";
+          // record the failure in the token store
+          $token_data = [
+            'access_token' => 'failed'.$failures,
+            'expires' => time() + min(pow(3, $failures-1), 24*60*60)
+          ];
+          $this->db->record_token($this->registration->get_id(), $scope_key, $token_data);
           return false;
         }
     }

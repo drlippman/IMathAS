@@ -28,7 +28,15 @@
 require("../init_without_validate.php");
 require("../includes/rollingcurl.php");
 require_once('../includes/ltioutcomes.php');
-require('../lti/LTI_Grade_Update.php');
+
+function debuglog($str) {
+	if (!empty($GLOBALS['CFG']['LTI']['noisydebuglog'])) {
+		$fh = fopen(__DIR__.'/../lti/ltidebug.txt', 'a');
+		fwrite($fh, $str."\n");
+		fclose($fh);
+	}
+}
+
 
 if (php_sapi_name() == "cli") {
 	//running command line - no need for auth code
@@ -92,27 +100,33 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if (substr($row['sourcedid'],0,6)=='LTI1.3') {
 		// LTI 1.3 update
 		list($ltiver,$ltiuserid,$score_url,$platformid) = explode(':|:', $row['sourcedid']);
-		if ($updater1p3->have_token($ltiparts[3])) {
-			// we have a token, so add an update request
-			$pos = strpos($score_url, '?');
-			$score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
-			$RCX->addRequest(
-				$score_url,  //url to request
-				array( 		//post data; will get transformed before send
-					'ver' => 'LTI1.3',
-					'action' => 'update',
-					'ltiuserid' => $ltiuserid,
-					'platformid' => $platformid,
-					'grade' => max(0, $row['grade'])
-				),
-				null, //no special callback
-				array( 	  //user-data; will get passed to response
-					'hash' => $row['hash'],
-					'sendon' => $row['sendon'],
-					'lasttry' => ($row['failures']>=6)
-				)
-			);
+		if ($updater1p3->have_token($platformid)) {
+			if ($updater1p3->token_valid($platformid)) {
+				debuglog('queing request with token for '.$row['hash']);
+				// we have a token, so add an update request
+				$pos = strpos($score_url, '?');
+				$score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
+				$RCX->addRequest(
+					$score_url,  //url to request
+					array( 		//post data; will get transformed before send
+						'ver' => 'LTI1.3',
+						'action' => 'update',
+						'ltiuserid' => $ltiuserid,
+						'platformid' => $platformid,
+						'grade' => max(0, $row['grade'])
+					),
+					null, //no special callback
+					array( 	  //user-data; will get passed to response
+						'hash' => $row['hash'],
+						'sendon' => $row['sendon'],
+						'lasttry' => ($row['failures']>=6)
+					)
+				);
+			} else {
+				$updater1p3->update_sendon($row['hash'], $platformid);
+			}
 		} else {
+			debuglog('queing token request for '.$row['hash']. ' on platform '.$platformid);
 			// we need to get a token, so add a token request
 			$platforminfo = $updater1p3->get_platform_info($platformid);
 			$RCX->addRequest(
@@ -137,6 +151,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:', $row['sourcedid']);
 		$secret = '';
 		if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
+			debuglog('queing 1.1 request for '.$row['hash']);
 			$grade = min(1, max(0, $row['grade']));
 			$RCX->addRequest(
 				$ltiurl,  //url to request
@@ -163,32 +178,38 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 $RCX->execute();
 
 $timeused = time() - $updateStart;
+
 if (count($round2)>0 &&  $timeused < 40) {
 	// this is measured relative to start of exec
 	$RCX->setStopAddingTime(45 - $timeused);
 	// this would only be LTI1.3 updates that didn't have a token the first time
 	foreach ($round2 as $row) {
 		list($ltiver,$ltiuserid,$score_url,$platformid) = explode(':|:', $row['sourcedid']);
-		if ($updater1p3->have_token($ltiparts[3])) {
-			// we have a token, so add an update request
-			$pos = strpos($score_url, '?');
-			$score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
-			$RCX->addRequest(
-				$score_url,  //url to request
-				array( 		//post data; will get transformed before send
-					'ver' => 'LTI1.3',
-					'action' => 'update',
-					'ltiuserid' => $ltiuserid,
-					'platformid' => $platformid,
-					'grade' => max(0, $row['grade'])
-				),
-				null, //no special callback
-				array( 	  //user-data; will get passed to response
-					'hash' => $row['hash'],
-					'sendon' => $row['sendon'],
-					'lasttry' => ($row['failures']>=6)
-				)
-			);
+		if ($updater1p3->have_token($platformid)) {
+			if ($updater1p3->token_valid($platformid)) {
+				debuglog('queing round2 request for '.$row['hash']);
+				// we have a token, so add an update request
+				$pos = strpos($score_url, '?');
+				$score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
+				$RCX->addRequest(
+					$score_url,  //url to request
+					array( 		//post data; will get transformed before send
+						'ver' => 'LTI1.3',
+						'action' => 'update',
+						'ltiuserid' => $ltiuserid,
+						'platformid' => $platformid,
+						'grade' => max(0, $row['grade'])
+					),
+					null, //no special callback
+					array( 	  //user-data; will get passed to response
+						'hash' => $row['hash'],
+						'sendon' => $row['sendon'],
+						'lasttry' => ($row['failures']>=6)
+					)
+				);
+			} else {
+				$updater1p3->update_sendon($row['hash'], $platformid);
+			}
 		}
 	}
 
@@ -265,23 +286,29 @@ function LTIqueuePostdataCallback($data) {
 
 function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 	global $DBH,$cntsuccess,$cntfailure,$cntgiveup,$updater1p3;
-
+	$post_data = $request_info['post_data'];
 	$success = true;
+	debuglog('callback request_info:'.json_encode($post_data));
+	debuglog('callback user_data:'.json_encode($user_data));
 	if ($post_data['ver'] == 'LTI1.3') {
 		if ($post_data['action'] == 'gettoken') {
 			// was a token request
 			if ($response === false) {
 				// what do we do?
 				$updater1p3->token_request_failure($user_data['platformid']);
+				debuglog('token request failure t1 '.$user_data['platformid']);
 			}
-			$response = json_decode($response, true);
+			$token_data = json_decode($response, true);
 			if (isset($token_data['access_token'])) {
 				$updater1p3->store_access_token($user_data['platformid'], $token_data);
+				debuglog('got token for '.$user_data['platformid']);
 			} else {
 				$updater1p3->token_request_failure($user_data['platformid']);
+				debuglog('token request failure t2 '.$response);
 			}
 			return; // doesn't effect ltiqueue, so return now
 		} else if ($post_data['action'] == 'update') {
+			debuglog('got update response '.$response);
 			if ($response === false) {
 				$success = false;
 			}
@@ -294,12 +321,14 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 	}
 
 	if ($success) {
+		debuglog('update success for '.$user_data['hash']);
 		//we'll call this when send is successful
 		$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
 		$delfromqueue->execute(array($user_data['hash'], $user_data['sendon']));
 		$cntsuccess++;
 	} else {
 		//on call failure, we'll update failure count and push back sendon
+		debuglog('update failure for '.$user_data['hash']);
 		$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*(failures+1)*300,failures=failures+1 WHERE hash=?');
 		$setfailed->execute(array($user_data['hash']));
 		if ($user_data['lasttry']===true) {

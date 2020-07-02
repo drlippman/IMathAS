@@ -84,13 +84,17 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm->execute(array($id, $scope));
     $row = $stm->fetch($PDO::FETCH_ASSOC);
     if ($row === false) {
-      return false;
+      return array(false,0);
     } else if ($row['expires'] > time()) {
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
       $stm->execute(array($id, $scope));
-      return false;
+      if (substr($row['token'],0,6)==='failed') {
+        return array(false, intval(substr($row['token'],6)));
+      } else {
+        return array(false, 0);
+      }
     } else {
-      return $row['token'];
+      return array($row['token'], 0);
     }
   }
 

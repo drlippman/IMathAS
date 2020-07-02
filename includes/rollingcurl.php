@@ -254,8 +254,10 @@ Class RollingCurlX {
         $request_info['user_data'] = $user_data = $request['user_data'];
         $request_info['post_data'] = $request['post_data'];
 
-        if(curl_errno($ch) !== 0 || round(intval($request_info['http_code'])/100) !== 2) {
+        if(curl_errno($ch) !== 0 || round(intval($request_info['http_code'])/100) != 2) {
           //if server responded with http error or a non 2xx code
+            debuglog('request error: '. curl_error($ch));
+            debuglog('http_code: '. $request_info['http_code'].' rounded '.round(intval($request_info['http_code'])/100));
             $response = false;
         } else { //sucessful response
             $response = curl_multi_getcontent($ch);
