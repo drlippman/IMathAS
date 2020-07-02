@@ -191,7 +191,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			} else {
 				$query = 'SELECT ia.ver,ia.name,ia.ptsposs,ias.bestscores FROM
 					imas_assessments AS ia LEFT JOIN imas_assessment_sessions AS ias
-					ON ias.assessmentid=ia.id AND iar.userid=:userid WHERE id.id=:assessmentid';
+					ON ias.assessmentid=ia.id AND ias.userid=:userid WHERE id.id=:assessmentid';
 			}
 			$bestscores_stm = $DBH->prepare($query);
 		}
