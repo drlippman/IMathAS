@@ -128,7 +128,7 @@ if ($localuserid === false) {
 }
 if ($localuserid === false) {
   // wasn't able to create a new user; redisplay form and try again.
-  require(__DIR__ .'/locallogin.php');
+  require(__DIR__ .'/show_postback_form.php');
   show_postback_form($launch, new Imathas_LTI_Database($DBH), $err);
   exit;
 }
