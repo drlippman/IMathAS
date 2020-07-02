@@ -82,10 +82,10 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       $link = ext_handle_launch($launch->get_target_link(), $localcourse, $localuserid, $db, $resource_link_id, $contextid, $platform_id);
     } else {
       echo 'Unsupported link type';
+      print_r($link);
       exit;
     }
   }
-
   // OK, we have a link at this point, so now we'll redirect to it
   if ($link['placementtype'] == 'assess') {
 
@@ -158,6 +158,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
     ext_redirect_launch($link['typeid'], $link['placementtype']);
   } else {
     echo 'Unsupported placementtype';
+    print_r($link);
     exit;
   }
 }

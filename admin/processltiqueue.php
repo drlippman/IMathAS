@@ -219,7 +219,6 @@ function LTIqueuePostdataCallback($data) {
 			return [
 				'body' => $updater1p3->get_token_request_post($data['platformid'],
 										$platforminfo['client_id'],
-									  $platforminfo['auth_login_url'],
 										$platforminfo['auth_token_url']),
 				'header' => array()
 			];

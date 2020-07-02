@@ -88,12 +88,15 @@ if ($localuserid === false) {
     }
   } else if ($role=='Learner') {
     // create no-direct-login student account
-
+    $email = '';
     if (!empty($_POST['firstname'])) {
       $firstname = $_POST['firstname'];
       $lastname = $_POST['lastname'];
     } else if ($name = parse_name_from_launch($launch->get_launch_data())) {
       list($firstname,$lastname) = $name;
+      if (!empty($launch->get_launch_data()['email'])) {
+        $email = $launch->get_launch_data()['email'];
+      }
     } else {
       $err = _('No name provided');
     }
@@ -101,21 +104,26 @@ if ($localuserid === false) {
     if ($err == '') {
       $localuserid = $db->create_user_account([
         'SID' => uniqid(), // temporary
-        'pwhash' => password_hash($_POST['pw1'], PASSWORD_DEFAULT),
+        'pwhash' => 'pass',
         'rights' => 10,
-        'firstname' => $_POST['firstname'],
-        'lastname' => $_POST['lastname'],
-        'email' => $_POST['email'],
+        'firstname' => $firstname,
+        'lastname' => $lastname,
+        'email' => $email,
         'msgnot' => isset($_POST['msgnot']) ? 1 : 0,
-        'groupid' => $groupid
+        'groupid' => 0
       ]);
+      $updateSID = true;
     }
   }
 
   if ($localuserid !== false) {
     // we've logged into or created a local user account, so now create a
     // ltiuserid link
-    $db->create_lti_user($localuserid, $ltiuserid, $platform_id);
+    $num = $db->create_lti_user($localuserid, $ltiuserid, $platform_id);
+    // TODO: set SID on new non-direct login user to lti-(num)
+    if (!empty($updateSID)) {
+      $db->set_user_SID($localuserid, 'lti-'.$num);
+    }
   }
 }
 if ($localuserid === false) {

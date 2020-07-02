@@ -168,7 +168,7 @@ class LTI_Message_Launch {
       if ($this->has_ags()) {
         $ags = $this->jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
         if (!empty($ags['scope']) &&
-          !empty($ags['scope']['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'])
+          in_array('https://purl.imsglobal.org/spec/lti-ags/scope/lineitem', $ags['scope'])
         ) {
           return true;
         }
@@ -180,7 +180,7 @@ class LTI_Message_Launch {
       if ($this->has_ags()) {
         $ags = $this->jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
         if (!empty($ags['scope']) &&
-          !empty($ags['scope']['https://purl.imsglobal.org/spec/lti-ags/scope/score'])
+          in_array('https://purl.imsglobal.org/spec/lti-ags/scope/score', $ags['scope'])
         ) {
           return true;
         }

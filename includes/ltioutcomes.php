@@ -100,7 +100,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
       $action == 'delete' ? 0 : $grade, // score
       $ltiparts[1], // ltiuserid
       $action == 'delete' ? 'Initialized' : 'Submitted', // activityProgress
-      $action == 'delete' ? 'NotReady' : 'Pending' // gradingProgress
+      $action == 'delete' ? 'NotReady' : 'FullyGraded' // gradingProgress
     );
   } else {
     updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade,$sendnow);

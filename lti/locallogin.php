@@ -30,6 +30,7 @@ function show_postback_form($launch, $db, $err='') {
       // no local user yet - see if we have enough info
       $name = parse_name_from_launch($launch->get_launch_data());
       if ($name === false) {
+        print_r($launch->get_launch_data());
         $promptForName = true;
       }
       if (!empty($localcourse['allow_direct_login'])) {
@@ -53,10 +54,12 @@ function show_postback_form($launch, $db, $err='') {
     }
   }
 
+  $deffirst = '';
+  $deflast = '';
+  $defemail = '';
   if (!empty($name)) {
     $deffirst = $name['first'];
     $deflast = $name['last'];
-    $defemail = '';
     if (!empty($launch->get_launch_data()['email'])) {
       $defemail = $launch->get_launch_data()['email'];
     }
@@ -88,7 +91,7 @@ function show_postback_form($launch, $db, $err='') {
       echo '<span class=form><label for="SID">'.Sanitize::encodeStringForDisplay($GLOBALS['longloginprompt']).':</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>';
       echo '<span class=form><label for="pw1">'._('Choose a password').':</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>';
       echo '<span class=form><label for="pw2">'._('Confirm password').':</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>';
-      echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstnam name=firstname><BR class=form>';
+      echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstname name=firstname><BR class=form>';
       echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname><BR class=form>';
       echo '<span class=form><label for="email">'._('Enter E-mail address').':</label></span>  <input class=form type=email autocomplete="email" value="'.Sanitize::encodeStringForDisplay($defemail).'" size=60 id=email name=email><BR class=form>';
       echo '<span class=form><label for="msgnot">'._('Notify me by email when I receive a new message').':</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>';
@@ -130,8 +133,8 @@ function show_postback_form($launch, $db, $err='') {
     }
   } else if ($promptForName) {
     echo '<p>'._('Please provide a little information about yourself').'</p>';
-    echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete="given-name"><BR class=form>';
-    echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete="family-name"><BR class=form>';
+    echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstname name=firstname><BR class=form>';
+    echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname><BR class=form>';
     echo '<div class=submit><button type=submit>'._('Continue').'</button></div>';
     echo '<script type="text/javascript"> $(function() {
       $("#pageform").validate({

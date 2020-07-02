@@ -17,6 +17,7 @@ class LTI_Grade_Update {
   private $dbh;
   private $access_tokens = [];
   private $private_key = '';
+  private $debug = true;
 
   public function __construct($DBH) {
     $this->dbh = $DBH;
@@ -36,7 +37,7 @@ class LTI_Grade_Update {
 
     $stm = $this->dbh->prepare('SELECT token,expires FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
     $stm->execute(array($platform_id, $scopehash));
-    $row = $stm->fetch($PDO::FETCH_ASSOC);
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
     if ($row === false) {
       return false;
     } else if ($row['expires'] < time() + 60) { // expired
@@ -61,15 +62,16 @@ class LTI_Grade_Update {
    * @return bool|array
    */
   public function send_update($token, $score_url, $score, $ltiuserid,
-    $activityProgress='Submitted', $gradingProgress='Pending', $comment = ''
+    $activityProgress='Submitted', $gradingProgress='FullyGraded', $comment = ''
   ) {
     $pos = strpos($score_url, '?');
     $score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
 
-    $content = $this->get_update_body($token, $score_url, $score, $ltiuserid,
+    $content = $this->get_update_body($token, $score, $ltiuserid,
       $activityProgress, $gradingProgress, $comment);
-
+    $this->debuglog('Sending update: '.$content['body']);
     // try to spawn a curl and don't wait for response
+    /*
     $disabled = explode(', ', ini_get('disable_functions'));
     if (function_exists('exec') && !in_array('exec', $disabled)) {
   	  try {
@@ -87,6 +89,7 @@ class LTI_Grade_Update {
   		//continue below
   	  }
     }
+    */
     // do it the usual way, waiting for a response
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $score_url);
@@ -96,11 +99,17 @@ class LTI_Grade_Update {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, strval($content['body']));
     curl_setopt($ch, CURLOPT_HTTPHEADER, $content['header']);
+
+    // TODO: remove this
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
     $response = curl_exec($ch);
     if (curl_errno($ch)){
-        //echo 'Request Error:' . curl_error($ch);
+        $this->debuglog('Grade update Error:' . curl_error($ch));
         return false;
     }
+    $this->debuglog('Grade update success:' . $resp_body);
     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     curl_close ($ch);
 
@@ -123,7 +132,7 @@ class LTI_Grade_Update {
    * @return array [body=>, headers=>]
    */
   public function get_update_body($token, $score, $ltiuserid, $activityProgress='Submitted',
-    $gradingProgress='Pending', $comment = ''
+    $gradingProgress='FullyGraded', $comment = ''
   ) {
     $grade = [
       'scoreGiven' => max(0,$score),
@@ -148,11 +157,10 @@ class LTI_Grade_Update {
    * Get an access token
    * @param  int $platform_id  [description]
    * @param  string $client_id    [description]
-   * @param  string $auth_server  [description]
    * @param  string $token_server [description]
    * @return string access token
    */
-  public function get_access_token($platform_id, $client_id='', $auth_server='', $token_server='') {
+  public function get_access_token($platform_id, $client_id='', $token_server='') {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
       $this->access_tokens[$platform_id]['expires'] < time()
@@ -166,7 +174,7 @@ class LTI_Grade_Update {
 
     $stm = $this->dbh->prepare('SELECT token,expires FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
     $stm->execute(array($platform_id, $scopehash));
-    $row = $stm->fetch($PDO::FETCH_ASSOC);
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
     if ($row === false) {
 
     } else if ($row['expires'] < time() + 10) {
@@ -179,12 +187,12 @@ class LTI_Grade_Update {
 
     // Need to request a token
     if (empty($client_id)) {
-      $stm = $this->dbh->prepare('SELECT client_id,auth_login_url,auth_token_url FROM imas_lti_platforms WHERE id=?');
+      $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
       $stm->execute(array($platform_id));
-      list($client_id, $auth_server, $token_server) = $stm->fetch(PDO::FETCH_NUM);
+      list($client_id, $token_server) = $stm->fetch(PDO::FETCH_NUM);
     }
-
-    $request_post = $this->get_token_request_post($platform_id, $client_id, $auth_server, $token_server);
+    $this->debuglog('requesting a token from '.$platform_id);
+    $request_post = $this->get_token_request_post($platform_id, $client_id, $token_server);
     // Make request to get auth token
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $token_server);
@@ -192,34 +200,44 @@ class LTI_Grade_Update {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $request_post);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+    // TODO: remove this
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
     $resp = curl_exec($ch);
     $token_data = json_decode($resp, true);
+    $error = curl_error($ch);
     curl_close ($ch);
 
     if (isset($token_data['access_token'])) {
       $this->store_access_token($platform_id, $token_data);
+      $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];
     } else {
+      $this->debuglog('token request error '.$error);
       echo "Error: no access token returned";
       return false;
     }
   }
 
   public function store_access_token($platform_id, $token_data) {
+    $scopes = array('https://purl.imsglobal.org/spec/lti-ags/scope/score');
+    $scopehash = md5(implode('|',$scopes));
     $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (platformid, scopes, token, expires) VALUES (?,?,?,?)');
-    $stm->execute(array($id, $scope, $token_data['access_token'], time() + $token_data['expires_in'] - 1));
+    $stm->execute(array($platform_id, $scopehash, $token_data['access_token'], time() + $token_data['expires_in'] - 1));
     $this->access_tokens[$platform_id] = array(
       'token' => $token_data['access_token'],
       'expires' => time() + $token_data['expires_in'] - 1
     );
   }
 
-  public function get_token_request_post($platform_id, $client_id, $auth_server, $token_server) {
+  public function get_token_request_post($platform_id, $client_id, $token_server) {
     // Build up JWT to exchange for an auth token
     $jwt_claim = [
       "iss" => $client_id,
       "sub" => $client_id,
-      "aud" => $auth_server,
+      "aud" => $token_server,
       "iat" => time() - 5,
       "exp" => time() + 60,
       "jti" => 'lti-service-token' . hash('sha256', random_bytes(64))
@@ -247,7 +265,7 @@ class LTI_Grade_Update {
   }
 
   public function get_platform_info($platform_id) {
-    $stm = $this->dbh->prepare('SELECT client_id,auth_login_url,auth_token_url FROM imas_lti_platforms WHERE id=?');
+    $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
     $stm->execute(array($platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }
@@ -262,6 +280,14 @@ class LTI_Grade_Update {
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     $this->private_key = $row;
     return $row;
+  }
+
+  private function debuglog($info) {
+    if ($this->debug) {
+      $fh = fopen(__DIR__.'/ltidebug.txt','a');
+      fwrite($fh, $info."\n");
+      fclose($fh);
+    }
   }
 
 }

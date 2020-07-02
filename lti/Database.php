@@ -151,6 +151,11 @@ class Imathas_LTI_Database implements LTI\Database {
     return $this->dbh->lastInsertId();
   }
 
+  public function set_user_SID($userid, $SID) {
+    $stm = $this->dbh->prepare('UPDATE imas_users SET SID=? WHERE id=?');
+    $stm->execute(array($SID,$userid));
+  }
+
   /**
    * Get local user course id
    * @param  string $contextid
@@ -192,7 +197,7 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm = $this->dbh->prepare('SELECT id FROM imas_lti_deployments WHERE platform=? AND deployment=?');
     $stm->execute(array($platform_id, $deployment));
     $internal_deployment_id = $stm->fetchColumn(0);
-    $stm = $this->dbh->prepare('INSERT IGNORE INTO imas_lti_deployments (deploymentid,groupid) VALUES (?,?)');
+    $stm = $this->dbh->prepare('INSERT IGNORE INTO imas_lti_groupassoc (deploymentid,groupid) VALUES (?,?)');
     $stm->execute(array($internal_deployment_id, $groupid));
   }
 
@@ -261,7 +266,9 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($linkid, $contextid, 'LTI13-'.$platform_id));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
-    $row['typenum'] = $this->types_as_num[$row['placementtype']];
+    if ($row !== false) {
+      $row['typenum'] = $this->types_as_num[$row['placementtype']];
+    }
     return $row;
   }
 
@@ -411,12 +418,12 @@ class Imathas_LTI_Database implements LTI\Database {
   public function set_or_create_lineitem($launch, $link, $info, $localcourse) {
     $platform_id = $launch->get_platform_id();
     $itemtype = $link['typenum'];
-    $typeid = $line['typeid'];
-
+    $typeid = $link['typeid'];
     if ($launch->can_set_grades()) {
       // no need to proceed if we can't send back grades
       $lineitemstr = $launch->get_lineitem();
       if ($lineitemstr === false && $launch->can_create_lineitem()) {
+        print_r($launch->get_launch_data());
         // there wasn't a lineitem in the launch, so find or create one
         $ags = $launch->get_ags();
         $lineitem = LTI\LTI_Lineitem::new()
