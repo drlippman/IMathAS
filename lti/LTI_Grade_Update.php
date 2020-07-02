@@ -22,6 +22,33 @@ class LTI_Grade_Update {
     $this->dbh = $DBH;
   }
 
+  public function have_token($platform_id) {
+    // see if we already have the token in our private variable cache
+    if (isset($this->access_tokens[$platform_id]) &&
+      $this->access_tokens[$platform_id]['expires'] < time()
+    ) {
+      return true;
+    }
+
+    // see if we already have a token in the the database
+    $scopes = array('https://purl.imsglobal.org/spec/lti-ags/scope/score');
+    $scopehash = md5(implode('|',$scopes));
+
+    $stm = $this->dbh->prepare('SELECT token,expires FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
+    $stm->execute(array($platform_id, $scopehash));
+    $row = $stm->fetch($PDO::FETCH_ASSOC);
+    if ($row === false) {
+      return false;
+    } else if ($row['expires'] < time() + 60) { // expired
+      $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
+      $stm->execute(array($platform_id, $scope));
+      return false;
+    } else {
+      $this->access_tokens[$platform_id] = $row;
+      return true;
+    }
+  }
+
   /**
    * Immediately send grade update (no ltiqueue)
    * @param  string $token            [description]
@@ -47,7 +74,7 @@ class LTI_Grade_Update {
     if (function_exists('exec') && !in_array('exec', $disabled)) {
   	  try {
     		$cmd = "curl -X POST";
-    		foreach ($content['headers'] as $hdr) {
+    		foreach ($content['header'] as $hdr) {
     			if (strlen($hdr)<2) {continue;}
     			//$cmd .= " -H '".str_replace("'","\\'",$hdr)."'";
     			$cmd .= " -H " . escapeshellarg($hdr);
@@ -68,7 +95,7 @@ class LTI_Grade_Update {
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, strval($content['body']));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $content['headers']);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $content['header']);
     $response = curl_exec($ch);
     if (curl_errno($ch)){
         //echo 'Request Error:' . curl_error($ch);
@@ -114,7 +141,7 @@ class LTI_Grade_Update {
         'Accept: application/json',
         'Content-Type: application/vnd.ims.lis.v1.score+json'
     ];
-    return array('body'=>$body, 'headers'=>$headers);
+    return array('body'=>$body, 'header'=>$headers);
   }
 
   /**
@@ -142,7 +169,7 @@ class LTI_Grade_Update {
     $row = $stm->fetch($PDO::FETCH_ASSOC);
     if ($row === false) {
 
-    } else if ($row['expires'] > time()) {
+    } else if ($row['expires'] < time() + 10) {
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
       $stm->execute(array($platform_id, $scope));
     } else {
@@ -156,6 +183,38 @@ class LTI_Grade_Update {
       $stm->execute(array($platform_id));
       list($client_id, $auth_server, $token_server) = $stm->fetch(PDO::FETCH_NUM);
     }
+
+    $request_post = $this->get_token_request_post($platform_id, $client_id, $auth_server, $token_server);
+    // Make request to get auth token
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $token_server);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $request_post);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    $resp = curl_exec($ch);
+    $token_data = json_decode($resp, true);
+    curl_close ($ch);
+
+    if (isset($token_data['access_token'])) {
+      $this->store_access_token($platform_id, $token_data);
+      return $token_data['access_token'];
+    } else {
+      echo "Error: no access token returned";
+      return false;
+    }
+  }
+
+  public function store_access_token($platform_id, $token_data) {
+    $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (platformid, scopes, token, expires) VALUES (?,?,?,?)');
+    $stm->execute(array($id, $scope, $token_data['access_token'], time() + $token_data['expires_in'] - 1));
+    $this->access_tokens[$platform_id] = array(
+      'token' => $token_data['access_token'],
+      'expires' => time() + $token_data['expires_in'] - 1
+    );
+  }
+
+  public function get_token_request_post($platform_id, $client_id, $auth_server, $token_server) {
     // Build up JWT to exchange for an auth token
     $jwt_claim = [
       "iss" => $client_id,
@@ -180,29 +239,17 @@ class LTI_Grade_Update {
         'scope' => 'https://purl.imsglobal.org/spec/lti-ags/scope/score'
     ];
 
-    // Make request to get auth token
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $token_server);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($auth_request));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    $resp = curl_exec($ch);
-    $token_data = json_decode($resp, true);
-    curl_close ($ch);
+    return http_build_query($auth_request);
+  }
 
-    if (isset($token_data['access_token'])) {
-      $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (platformid, scopes, token, expires) VALUES (?,?,?,?)');
-      $stm->execute(array($id, $scope, $token_data['access_token'], time() + $token_data['expires_in'] - 1));
-      $this->access_tokens[$platform_id] = array(
-        'token' => $token_data['access_token'],
-        'expires' => time() + $token_data['expires_in'] - 1
-      );
-      return $token_data['access_token'];
-    } else {
-      echo "Error: no access token returned";
-      return false;
-    }
+  public function token_request_failure($platform_id) {
+    // TODO: do something
+  }
+
+  public function get_platform_info($platform_id) {
+    $stm = $this->dbh->prepare('SELECT client_id,auth_login_url,auth_token_url FROM imas_lti_platforms WHERE id=?');
+    $stm->execute(array($platform_id));
+    return $stm->fetch(PDO::FETCH_ASSOC);
   }
 
 
