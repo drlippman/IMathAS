@@ -61,6 +61,9 @@ class LTI_Service_Connector {
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($auth_request));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        // TODO: remove this
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         $resp = curl_exec($ch);
         $token_data = json_decode($resp, true);
         curl_close ($ch);
@@ -82,9 +85,13 @@ class LTI_Service_Connector {
     }
 
     public function make_service_request($scopes, $method, $url, $body = null, $content_type = 'application/json', $accept = 'application/json') {
+        $token = $this->get_access_token($scopes);
+        if ($token === false) {
+          return false;
+        }
         $ch = curl_init();
         $headers = [
-            'Authorization: Bearer ' . $this->get_access_token($scopes),
+            'Authorization: Bearer ' . $token,
             'Accept:' . $accept,
         ];
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -97,6 +104,9 @@ class LTI_Service_Connector {
             $headers[] = 'Content-Type: ' . $content_type;
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        // TODO: remove this
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         $response = curl_exec($ch);
         if (curl_errno($ch)){
             echo 'Request Error:' . curl_error($ch);

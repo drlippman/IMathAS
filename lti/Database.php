@@ -82,7 +82,7 @@ class Imathas_LTI_Database implements LTI\Database {
   public function get_token($id, $scope) {
     $stm = $this->dbh->prepare('SELECT * FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
     $stm->execute(array($id, $scope));
-    $row = $stm->fetch($PDO::FETCH_ASSOC);
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
     if ($row === false) {
       return array(false,0);
     } else if ($row['expires'] > time()) {
@@ -427,7 +427,6 @@ class Imathas_LTI_Database implements LTI\Database {
       // no need to proceed if we can't send back grades
       $lineitemstr = $launch->get_lineitem();
       if ($lineitemstr === false && $launch->can_create_lineitem()) {
-        print_r($launch->get_launch_data());
         // there wasn't a lineitem in the launch, so find or create one
         $ags = $launch->get_ags();
         $lineitem = LTI\LTI_Lineitem::new()
@@ -441,6 +440,11 @@ class Imathas_LTI_Database implements LTI\Database {
           $lineitem->set_end_date_time(date(DATE_ATOM, $info['enddate']));
         }
         $newlineitem = $ags->find_or_create_lineitem($lineitem);
+        if ($newlineitem === false) {
+          // TODO: handle lineitem creation failure somehow.
+          // What are we going to do in this case?
+          return false;
+        }
         $lineitemstr = $newlineitem->get_id();
       }
       if (!empty($lineitemstr)) {
