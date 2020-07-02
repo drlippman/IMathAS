@@ -108,8 +108,9 @@ class LTI_Service_Connector {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         $response = curl_exec($ch);
-        if (curl_errno($ch)){
-            echo 'Request Error:' . curl_error($ch);
+        $request_info = curl_getinfo($ch);
+        if (curl_errno($ch) || round(intval($request_info['http_code'])/100) != 2) {
+            return false;
         }
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         curl_close ($ch);

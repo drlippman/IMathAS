@@ -433,6 +433,12 @@ class Imathas_LTI_Database implements LTI\Database {
           ->set_resource_id($itemtype.'-'.$typeid)
           ->set_score_maximum($info['ptsposs'])
           ->set_label($info['name']);
+        if ($link['placementtype'] == 'assess') {
+          // TODO: figure this out.  Ideally we should link the lineitem to
+          // the resource_link.id, but Canvas doesn't seem to like this ? 
+          // Perhaps it doesn't recognize the link as owned by the tool.
+          // $lineitem->set_resource_link_id($launch->get_resource_link()['id']);
+        }
         if (empty($info['date_by_lti']) && !empty($info['startdate'])) {
           $lineitem->set_start_date_time(date(DATE_ATOM, $info['startdate']));
         }

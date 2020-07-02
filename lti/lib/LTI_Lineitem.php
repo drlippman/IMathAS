@@ -66,6 +66,15 @@ class LTI_Lineitem {
         return $this;
     }
 
+    public function get_resource_link_id() {
+        return $this->resource_link_id;
+    }
+
+    public function set_resource_link_id($value) {
+        $this->resource_link_id = $value;
+        return $this;
+    }
+
     public function get_tag() {
         return $this->tag;
     }
@@ -99,6 +108,7 @@ class LTI_Lineitem {
             "scoreMaximum" => $this->score_maximum,
             "label" => $this->label,
             "resourceId" => $this->resource_id,
+            "resourceLinkId" => $this->resource_link_id,
             "tag" => $this->tag,
             "startDateTime" => $this->start_date_time,
             "endDateTime" => $this->end_date_time,

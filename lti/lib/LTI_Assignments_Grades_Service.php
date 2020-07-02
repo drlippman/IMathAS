@@ -53,7 +53,7 @@ class LTI_Assignments_Grades_Service {
             null,
             'application/vnd.ims.lis.v2.lineitemcontainer+json'
         );
-        if ($created_line_item === false) {
+        if ($line_items === false) {
           return false;
         }
         foreach ($line_items['body'] as $line_item) {
