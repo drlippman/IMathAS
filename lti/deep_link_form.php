@@ -2,7 +2,7 @@
 
 function deep_link_form($launch, $localuserid, $localcourse, $db) {
   global $imasroot,$installname,$coursetheme,$CFG;
-  
+
   $role = standardize_role($launch->get_roles());
   if ($role !== 'Instructor') {
     echo 'You do not have access to this page';

@@ -17,6 +17,14 @@ class LTI_Deep_Link {
         $this->private_key = $private_key;
     }
 
+    public function get_accept_multiple() {
+      return boolval($this->deep_link_settings['accept_multiple']);
+    }
+
+    public function accepts_lti() {
+      return in_array('ltiResourceLink', $this->deep_link_settings['accept_types']);
+    }
+
     public function get_response_jwt($resources) {
         $message_jwt = [
             "iss" => $this->registration->get_client_id(),

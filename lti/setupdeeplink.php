@@ -56,4 +56,11 @@ $resource = LTI\LTI_Deep_Link_Resource::new()
     ->set_title($assessinfo['name'])
     ->set_lineitem($lineitem);
 
+if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
+  $resource->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
+}
+if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
+  $resource->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
+}
+
 $deeplink->output_response_form([$resource]);

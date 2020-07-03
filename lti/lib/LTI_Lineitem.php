@@ -102,17 +102,21 @@ class LTI_Lineitem {
         return $this;
     }
 
+    public function to_array() {
+      return array_filter([
+          "id" => $this->id,
+          "scoreMaximum" => $this->score_maximum,
+          "label" => $this->label,
+          "resourceId" => $this->resource_id,
+          "resourceLinkId" => $this->resource_link_id,
+          "tag" => $this->tag,
+          "startDateTime" => $this->start_date_time,
+          "endDateTime" => $this->end_date_time,
+      ]);
+    }
+
     public function __toString() {
-        return json_encode(array_filter([
-            "id" => $this->id,
-            "scoreMaximum" => $this->score_maximum,
-            "label" => $this->label,
-            "resourceId" => $this->resource_id,
-            "resourceLinkId" => $this->resource_link_id,
-            "tag" => $this->tag,
-            "startDateTime" => $this->start_date_time,
-            "endDateTime" => $this->end_date_time,
-        ]));
+        return json_encode($this->to_array());
     }
 }
 ?>

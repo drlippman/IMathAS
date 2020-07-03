@@ -7,6 +7,8 @@ class LTI_Deep_Link_Resource {
     private $title;
     private $url;
     private $lineitem;
+    private $startDateTime = null;
+    private $endDateTime = null;
     private $custom_params = [];
     private $target = 'iframe';
 
@@ -68,6 +70,13 @@ class LTI_Deep_Link_Resource {
         return $this;
     }
 
+    public function set_start_date_time($value) {
+      $this->startDateTime = $value;
+    }
+    public function set_end_date_time($value) {
+      $this->endDateTime = $value;
+    }
+
     public function to_array() {
         $resource = [
             "type" => $this->type,
@@ -79,10 +88,16 @@ class LTI_Deep_Link_Resource {
             "custom" => $this->custom_params,
         ];
         if ($this->lineitem !== null) {
-            $resource["lineItem"] = [
-                "scoreMaximum" => $this->lineitem->get_score_maximum(),
-                "label" => $this->lineitem->get_label(),
-            ];
+            $resource["lineItem"] = $this->lineitem->to_array();
+        }
+        if (!empty($this->startDateTime) || !empty($this->endDateTime)) {
+          $resource['submission'] = array();
+          if (!empty($this->startDateTime)) {
+            $resource['submission']['startDateTime'] = $this->startDateTime;
+          }
+          if (!empty($this->endDateTime)) {
+            $resource['submission']['endDateTime'] = $this->endDateTime;
+          }
         }
         return $resource;
     }
