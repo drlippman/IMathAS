@@ -209,8 +209,8 @@ class ComplexScorePart implements ScorePart
           return false;
         }
         $a = $func(['i'=>0]);
-        $apb = $func(['i'=>4])/4;
-        return array($a,$apb-$a);
+        $apb = $func(['i'=>4]);
+        return array($a,($apb-$a)/4);
     }
 
     /**
