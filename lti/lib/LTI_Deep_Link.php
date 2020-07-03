@@ -8,11 +8,13 @@ class LTI_Deep_Link {
     private $registration;
     private $deployment_id;
     private $deep_link_settings;
+    private $private_key;
 
-    public function __construct($registration, $deployment_id, $deep_link_settings) {
+    public function __construct($registration, $deployment_id, $deep_link_settings, $private_key) {
         $this->registration = $registration;
         $this->deployment_id = $deployment_id;
         $this->deep_link_settings = $deep_link_settings;
+        $this->private_key = $private_key;
     }
 
     public function get_response_jwt($resources) {
@@ -28,7 +30,7 @@ class LTI_Deep_Link {
             "https://purl.imsglobal.org/spec/lti-dl/claim/content_items" => array_map(function($resource) { return $resource->to_array(); }, $resources),
             "https://purl.imsglobal.org/spec/lti-dl/claim/data" => $this->deep_link_settings['data'],
         ];
-        return JWT::encode($message_jwt, $this->registration->get_tool_private_key(), 'RS256', $this->registration->get_kid());
+        return JWT::encode($message_jwt, $this->private_key['privatekey'], 'RS256', $this->private_key['kid']);
     }
 
     public function output_response_form($resources) {

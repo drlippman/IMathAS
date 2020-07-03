@@ -50,6 +50,9 @@ function parse_target_link($targetlink, $db) {
   } else if (!empty($param['custom_place_aid'])) {
     $refcid = $db->get_course_from_aid($param['custom_place_aid']);
     $out = ['type'=>'aid', 'refaid'=>$param['custom_place_aid'], 'refcid'=>$refcid];
+  } else if (!empty($param['place_aid'])) {
+    $refcid = $db->get_course_from_aid($param['place_aid']);
+    $out = ['type'=>'aid', 'refaid'=>$param['place_aid'], 'refcid'=>$refcid];
   }
   return $out;
 }

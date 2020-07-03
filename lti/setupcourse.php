@@ -48,4 +48,7 @@ if ($_POST['linktype'] == 'assoc') {
 if ($launch->is_resource_launch()) {
   require(__DIR__.'/resourcelink.php');
   link_to_resource($launch, $userid, $localcourse, $db);
+} else if ($launch->is_deep_link_launch() && $role == 'Instructor') {
+  require(__DIR__.'/deep_link_form.php');
+  deep_link_form($launch, $userid, $localcourse, $db);
 }

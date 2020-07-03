@@ -151,7 +151,8 @@ if ($role == 'Instructor' && $localcourse === false) {
 
   // we have a course connection
   if ($launch->is_deep_link_launch() && $role == 'Instructor') {
-    echo 'Is deep linking request - do something';
+    require(__DIR__.'/deep_link_form.php');
+    deep_link_form($launch, $localuserid, $localcourse, $db);
   } else if ($launch->is_submission_review_launch()) {
     echo 'Is submission review launch';
   } else if ($launch->is_resource_launch()) {

@@ -197,7 +197,8 @@ class LTI_Message_Launch {
         return new LTI_Deep_Link(
             $this->registration,
             $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id'],
-            $this->jwt['body']['https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings']);
+            $this->jwt['body']['https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings'],
+            $this->db->get_tool_private_key());
     }
 
     /**

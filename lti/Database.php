@@ -435,14 +435,14 @@ class Imathas_LTI_Database implements LTI\Database {
           ->set_label($info['name']);
         if ($link['placementtype'] == 'assess') {
           // TODO: figure this out.  Ideally we should link the lineitem to
-          // the resource_link.id, but Canvas doesn't seem to like this ? 
+          // the resource_link.id, but Canvas doesn't seem to like this ?
           // Perhaps it doesn't recognize the link as owned by the tool.
           // $lineitem->set_resource_link_id($launch->get_resource_link()['id']);
         }
         if (empty($info['date_by_lti']) && !empty($info['startdate'])) {
           $lineitem->set_start_date_time(date(DATE_ATOM, $info['startdate']));
         }
-        if (empty($info['date_by_lti']) && !empty($info['enddate'])) {
+        if (empty($info['date_by_lti']) && !empty($info['enddate']) && $info['enddate'] < 2000000000) {
           $lineitem->set_end_date_time(date(DATE_ATOM, $info['enddate']));
         }
         $newlineitem = $ags->find_or_create_lineitem($lineitem);
@@ -458,6 +458,12 @@ class Imathas_LTI_Database implements LTI\Database {
         $stm->execute(array($itemtype, $typeid, $localcourse['id'], $lineitemstr));
       }
     }
+  }
+
+  public function get_assessments($cid) {
+    $stm = $this->dbh->prepare('SELECT id,name FROM imas_assessments WHERE courseid=? ORDER BY name');
+    $stm->execute(array($cid));
+    return $stm->fetchAll(PDO::FETCH_ASSOC);
   }
 
 }
