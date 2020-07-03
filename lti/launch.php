@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Handle a launch request from the LMS, after OIDC login
+ */
+
 // need session to hold launch cache
 $init_session_start = true;
 $init_skip_csrfp = true;

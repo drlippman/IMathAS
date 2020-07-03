@@ -34,15 +34,21 @@ if ($_POST['linktype'] == 'assoc') {
   // TODO: this doesn't retain copiedfrom in imas_lti_courses.
   // It'd be nice to see if there was a way to do so.
   $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel);
-  $localcourse = array('courseid'=>$destcid, 'copiedfrom'=>0, 'id'=>$newlticourseid);
+  $localcourse = LTI_Localcourse::new()
+    ->set_courseid($destcid)
+    ->set_copiedfrom(0)
+    ->set_id($newlticourseid);
 } else if ($_POST['linktype'] == 'copy') {
   require_once(__DIR__.'/../includes/copycourse.php');
   // TODO: do we want to use the context.title instead of label here? Or both?
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
   $destcid = copycourse($_POST['copyselect'], $contextlabel, $newUIver);
   $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel);
-  $localcourse = array('courseid'=>$destcid, 'copiedfrom'=>$_POST['copyselect'],
-    'UIver'=>$newUIver?2:1, 'id'=>$newlticourseid);
+  $localcourse = LTI_Localcourse::new()
+    ->set_courseid($destcid)
+    ->set_copiedfrom(intval($_POST['copyselect']))
+    ->set_UIver($newUIver ? 2 : 1)
+    ->set_id($newlticourseid);
 }
 
 if ($launch->is_resource_launch()) {

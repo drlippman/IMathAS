@@ -1,6 +1,15 @@
 <?php
 
-function deep_link_form($launch, $localuserid, $localcourse, $db) {
+/**
+ * Displays the deep linking resource selection form
+ * @param LTI_Message_Launch $launch
+ * @param int                $localuserid
+ * @param LTI_Localcourse    $localcourse
+ * @param Database           $db
+ */
+function deep_link_form(LTI_Message_Launch $launch, int $localuserid,
+  LTI_Localcourse $localcourse, Database $db
+): void {
   global $imasroot,$installname,$coursetheme,$CFG;
 
   $role = standardize_role($launch->get_roles());
@@ -12,7 +21,7 @@ function deep_link_form($launch, $localuserid, $localcourse, $db) {
   $platform_id = $launch->get_platform_id();
   $resource_link = $launch->get_resource_link();
 
-  $assessments = $db->get_assessments($localcourse['courseid']);
+  $assessments = $db->get_assessments($localcourse->get_courseid());
 
   $flexwidth = true;
 	$nologo = true;

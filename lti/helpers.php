@@ -1,6 +1,13 @@
 <?php
 
-function standardize_role($roles) {
+/**
+ * Return a standardized role value based on an array of roles provided by the
+ * LMS
+ *
+ * @param  array  $roles  roles array provided by the LMS
+ * @return string  'Learner' or 'Instructor'
+ */
+function standardize_role(array $roles): string {
   $contextPriorities = [
     'membership'=>3,
     'institution'=>2,
@@ -27,7 +34,12 @@ function standardize_role($roles) {
   return $currentRole;
 }
 
-function parse_name_from_launch($data) {
+/**
+ * Parses the launch data to find the user's name, if provided
+ * @param  array  $data launch data
+ * @return false|array of (firstname,lastname)
+ */
+function parse_name_from_launch(array $data) {
   if (!empty($data['given_name']) || !empty($data['family_name'])) {
     $first = $data['given_name'];
     $last = $data['family_name'];
@@ -40,7 +52,13 @@ function parse_name_from_launch($data) {
   }
 }
 
-function parse_target_link($targetlink, $db) {
+/**
+ * Parse target link to determine what it's pointing to
+ * @param  string   $targetlink  the target_link_uri the LMS provided
+ * @param  Database $db
+ * @return array  ('type'=>, 'refcid'=> ) and possibly others
+ */
+function parse_target_link(string $targetlink, Database $db): array {
   parse_str(parse_url($targetlink, PHP_URL_QUERY), $param);
 
   if (!empty($param['refaid'])) {
@@ -53,6 +71,8 @@ function parse_target_link($targetlink, $db) {
   } else if (!empty($param['place_aid'])) {
     $refcid = $db->get_course_from_aid($param['place_aid']);
     $out = ['type'=>'aid', 'refaid'=>$param['place_aid'], 'refcid'=>$refcid];
+  } else {
+    $out = array();
   }
   return $out;
 }

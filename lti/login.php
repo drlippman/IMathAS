@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Handle the OIDC login request
+ */
+
 require('../init_without_validate.php');
 require_once(__DIR__ . '/lib/lti.php');
 require_once __DIR__ . '/Database.php';

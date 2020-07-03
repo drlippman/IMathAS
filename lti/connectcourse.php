@@ -1,9 +1,18 @@
 <?php
 
+if (isset($GLOBALS['CFG']['hooks']['lti'])) {
+  require_once($CFG['hooks']['lti']);
+}
+
 /**
  * Display course connection form
+ *
+ * @param  LTI_Message_Launch $launch
+ * @param  Database           $db
+ * @param  int                $userid  of current user
+ * @return void
  */
-function connect_course($launch, $db, $userid) {
+function connect_course(LTI_Message_Launch $launch, Database $db, int $userid): void {
   global $imasroot,$installname,$coursetheme,$CFG;
 
   $flexwidth = true;
@@ -13,6 +22,11 @@ function connect_course($launch, $db, $userid) {
 
   // Figure out what course the LTI link was originally imported from
   $target = parse_target_link($launch->get_target_link(), $db);
+  if (empty($target) && function_exists('ext_can_handle_launch')) {
+    if (ext_can_handle_launch($launch->get_target_link())) {
+      $target = ['type'=>'ext'];
+    }
+  }
   if (empty($target)) {
     echo "Error parsing requested resource";
     exit;
@@ -30,6 +44,7 @@ function connect_course($launch, $db, $userid) {
   }
 
   // See if there are any courses user owns that we could associate with
+  // TODO: handle targets that aren't assessments
   list($copycourses,$assoccourses,$sourceUIver) =
     $db->get_potential_courses($target,$last_copied_cid,$userid);
 

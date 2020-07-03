@@ -35,7 +35,7 @@ $aid = intval($_POST['aid']);
 $stm = $DBH->prepare('SELECT courseid,name,startdate,enddate,ptsposs,ver,date_by_lti FROM imas_assessments WHERE id=?');
 $stm->execute(array($aid));
 $assessinfo = $stm->fetch(PDO::FETCH_ASSOC);
-if ($assessinfo['courseid'] != $localcourse['courseid']) {
+if ($assessinfo['courseid'] != $localcourse->get_courseid()) {
   echo 'Invalid assessment';
   exit;
 }

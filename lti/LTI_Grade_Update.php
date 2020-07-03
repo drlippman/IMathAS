@@ -7,9 +7,12 @@ Firebase\JWT\JWT::$leeway = 5;
 use Firebase\JWT\JWT;
 
 /**
- * A very simple LTI 1.3 grade update class.
+ * LTI 1.3 grade update class.
  * This one assumes we've alredy checked scopes,
  * and that we already know the update lineitem.
+ *
+ * This class allows doing updates across multiple platforms and lineitems,
+ * making it handy for processing the lti queue
  *
  * This has code duplication with the other libraries
  */
@@ -22,12 +25,19 @@ class LTI_Grade_Update {
   private $failures = [];
   private $debug = false;
 
-  public function __construct($DBH) {
+  public function __construct(PDO $DBH) {
     $this->dbh = $DBH;
     $this->debug = !empty($CFG['LTI']['noisydebuglog']);
   }
 
-  public function have_token($platform_id) {
+  /**
+   * Determine if we have a token for particular platform already
+   * If this returns true, call token_valid to make sure the token is valid.
+   *
+   * @param  int  $platform_id imas_lti_platforms.id
+   * @return bool
+   */
+  public function have_token(int $platform_id): bool {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
       $this->access_tokens[$platform_id]['expires'] < time()
@@ -58,7 +68,14 @@ class LTI_Grade_Update {
     }
   }
 
-  public function token_valid($platform_id) {
+  /**
+   * Checks if an existing token is valid
+   * it might not be valid if it's a record of a failed previous attempt
+   *
+   * @param  int  $platform_id imas_lti_platforms.id
+   * @return bool
+   */
+  public function token_valid(int $platform_id): bool {
     if (isset($this->access_tokens[$platform_id]) &&
       empty($this->access_tokens[$platform_id]['failed'])
     ) {
@@ -69,17 +86,18 @@ class LTI_Grade_Update {
 
   /**
    * Immediately send grade update (no ltiqueue)
-   * @param  string $token            [description]
-   * @param  string $score_url        [description]
-   * @param  float $score            [description]
-   * @param  string $ltiuserid        [description]
-   * @param  string $activityProgress [description]
-   * @param  string $gradingProgress  [description]
-   * @param  string $comment          [description]
-   * @return bool|array
+   * @param  string $token            the token string
+   * @param  string $score_url        the lineitem url
+   * @param  float $score             normalized to 0-1
+   * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
+   * @param  string $activityProgress default 'Submitted'
+   * @param  string $gradingProgress  default 'FullyGraded'
+   * @param  string $comment          default ''
+   * @return false|array  false on failure, or array with body and headers
    */
-  public function send_update($token, $score_url, $score, $ltiuserid,
-    $activityProgress='Submitted', $gradingProgress='FullyGraded', $comment = ''
+  public function send_update(string $token, string $score_url, float $score,
+    string $ltiuserid, string $activityProgress='Submitted',
+    string $gradingProgress='FullyGraded', string $comment = ''
   ) {
     $pos = strpos($score_url, '?');
     $score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
@@ -117,9 +135,10 @@ class LTI_Grade_Update {
     curl_setopt($ch, CURLOPT_POSTFIELDS, strval($content['body']));
     curl_setopt($ch, CURLOPT_HTTPHEADER, $content['header']);
 
-    // TODO: remove this
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    if (!empty($GLOBALS['CFG']['LTI']['skipsslverify'])) {
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    }
 
     $response = curl_exec($ch);
     $request_info = curl_getinfo($ch);
@@ -141,16 +160,17 @@ class LTI_Grade_Update {
 
   /**
    * Get body and headers for grade update
-   * @param  string $token            [description]
-   * @param  float $score            [description]
-   * @param  string $ltiuserid        [description]
-   * @param  string $activityProgress [description]
-   * @param  string $gradingProgress  [description]
-   * @param  string $comment          [description]
-   * @return array [body=>, headers=>]
+   * @param  string $token            the token string
+   * @param  float $score             the score, normalized 0-1
+   * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
+   * @param  string $activityProgress default 'Submitted'
+   * @param  string $gradingProgress  default 'FullyGraded'
+   * @param  string $comment          default ''
+   * @return array [body=>, header=>]
    */
-  public function get_update_body($token, $score, $ltiuserid, $activityProgress='Submitted',
-    $gradingProgress='FullyGraded', $comment = ''
+  public function get_update_body(string $token, float $score, string $ltiuserid,
+    string $activityProgress='Submitted', string $gradingProgress='FullyGraded',
+    string $comment = ''
   ) {
     $grade = [
       'scoreGiven' => max(0,$score),
@@ -173,12 +193,12 @@ class LTI_Grade_Update {
 
   /**
    * Get an access token
-   * @param  int $platform_id  [description]
-   * @param  string $client_id    [description]
-   * @param  string $token_server [description]
-   * @return string access token
+   * @param  int $platform_id    imas_lti_platforms.id
+   * @param  string $client_id    optional if known - the client_id
+   * @param  string $token_server optional if known - the token_server_url
+   * @return false|string access token, or false on failure
    */
-  public function get_access_token($platform_id, $client_id='', $token_server='') {
+  public function get_access_token(int $platform_id, string $client_id='', string $token_server='') {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
       $this->access_tokens[$platform_id]['expires'] < time()
@@ -223,9 +243,10 @@ class LTI_Grade_Update {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
-    // TODO: remove this
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    if (!empty($GLOBALS['CFG']['LTI']['skipsslverify'])) {
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    }
 
     $resp = curl_exec($ch);
     $token_data = json_decode($resp, true);
@@ -253,8 +274,15 @@ class LTI_Grade_Update {
     }
   }
 
-  public function store_access_token($platform_id, $token_data) {
-    $scopes = array('https://purl.imsglobal.org/spec/lti-ags/scope/score');
+  /**
+   * Store an access token
+   * @param int   $platform_id imas_lti_platforms.id
+   * @param array $token_data  array with 'access_token', 'expires_in', and 'scope'
+   * @return void
+   */
+  public function store_access_token(int $platform_id, array $token_data): void {
+    $scopes = explode(' ', $token_data['scope']);
+    sort($scopes);
     $scopehash = md5(implode('|',$scopes));
     $stm = $this->dbh->prepare('REPLACE INTO imas_lti_tokens (platformid, scopes, token, expires) VALUES (?,?,?,?)');
     $stm->execute(array($platform_id, $scopehash, $token_data['access_token'], time() + $token_data['expires_in'] - 1));
@@ -264,7 +292,16 @@ class LTI_Grade_Update {
     );
   }
 
-  public function get_token_request_post($platform_id, $client_id, $token_server) {
+  /**
+   * Get the built query for a token request
+   * @param  int    $platform_id
+   * @param  string $client_id
+   * @param  string $token_server
+   * @return string output of http_build_query
+   */
+  public function get_token_request_post(int $platform_id, string $client_id,
+    string $token_server
+  ): string {
     // Build up JWT to exchange for an auth token
     $jwt_claim = [
       "iss" => $client_id,
@@ -292,31 +329,43 @@ class LTI_Grade_Update {
     return http_build_query($auth_request);
   }
 
-  public function token_request_failure($platform_id) {
+  /**
+   * Handle token request failure
+   * @param  int    $platform_id
+   */
+  public function token_request_failure(int $platform_id) {
     // TODO: do something
   }
 
-  public function get_platform_info($platform_id) {
+  /**
+   * Get client_id and auth_token_url for a platform
+   * @param  int   $platform_id
+   * @return array
+   */
+  public function get_platform_info(int $platform_id): array {
     $stm = $this->dbh->prepare('SELECT client_id,auth_token_url FROM imas_lti_platforms WHERE id=?');
     $stm->execute(array($platform_id));
     return $stm->fetch(PDO::FETCH_ASSOC);
   }
 
   /**
-   * We call this for ltiqueu if token failed, and we'll update the sendon
-   * to just after the token failure expires
-   * @param  [type] $hash        [description]
-   * @param  [type] $platform_id [description]
+   * We call this from ltiqueue if token failed, so we'll update the sendon
+   * for a grade update using that token to just after the token failure expires
+   * @param  string $hash       imas_ltiqueue.hash
+   * @param  int $platform_id   imas_lti_platforms.id
    * @return void
    */
-  public function update_sendon($hash, $platform_id) {
+  public function update_sendon(string $hash, int $platform_id): void {
     $newsendon = $this->access_tokens[$platform_id]['expires'] + 1;
     $stm = $this->dbh->prepare('UPDATE imas_ltiqueue SET sendon=? WHERE hash=?');
     $stm->execute(array($newsendon, $hash));
   }
 
-
-  private function get_tool_private_key() {
+  /**
+   * Get tool's private key
+   * @return array
+   */
+  private function get_tool_private_key(): array {
     if (!empty($this->private_key)) {
       return $this->private_key;
     }
@@ -327,7 +376,11 @@ class LTI_Grade_Update {
     return $row;
   }
 
-  private function debuglog($info) {
+  /**
+   * Write logging info to debug file, if enabled
+   * @param  string  $info  string to write
+   */
+  private function debuglog(string $info): void {
     if ($this->debug) {
       $fh = fopen(__DIR__.'/ltidebug.txt','a');
       fwrite($fh, $info."\n");

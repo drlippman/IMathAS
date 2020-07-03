@@ -61,9 +61,10 @@ class LTI_Service_Connector {
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($auth_request));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        // TODO: remove this
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        if (!empty($GLOBALS['CFG']['LTI']['skipsslverify'])) {
+          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
         $resp = curl_exec($ch);
         $token_data = json_decode($resp, true);
         curl_close ($ch);
@@ -104,9 +105,10 @@ class LTI_Service_Connector {
             $headers[] = 'Content-Type: ' . $content_type;
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        // TODO: remove this
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        if (!empty($GLOBALS['CFG']['LTI']['skipsslverify'])) {
+          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
         $response = curl_exec($ch);
         $request_info = curl_getinfo($ch);
         if (curl_errno($ch) || round(intval($request_info['http_code'])/100) != 2) {

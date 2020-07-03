@@ -21,7 +21,7 @@ function show_postback_form($launch, $db, $err='') {
 
   if ($role == 'Learner') {
     $localcourse = $db->get_local_course($contextid, $platform_id);
-    if ($localcourse === false) {
+    if ($localcourse === null) {
       // no course link established yet - abort
       echo _("Course link not established yet.  Notify your instructor they need to click this assignment to set it up.");
       exit;
@@ -33,7 +33,7 @@ function show_postback_form($launch, $db, $err='') {
         print_r($launch->get_launch_data());
         $promptForName = true;
       }
-      if (!empty($localcourse['allow_direct_login'])) {
+      if (!empty($localcourse->get_allow_direct_login())) {
         $promptForLogin = true;
         $promptForAcctCreation = true;
       }

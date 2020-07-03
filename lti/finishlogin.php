@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * After Launch, show_postback_form shows a form which posts back
+ * here to complete the login or account creation process 
+ *
+ */
+
 $init_session_start = true;
 $init_skip_csrfp = true;
 require('../init_without_validate.php');
@@ -29,7 +35,7 @@ $localcourse = $db->get_local_course($contextid, $platform_id);
 if ($localuserid === false) {
   // see if we're trying to login
   if (!empty($_POST['curSID']) && (
-    ($role=='Learner' && !empty($localcourse['allow_direct_login'])) ||
+    ($role=='Learner' && !empty($localcourse->get_allow_direct_login())) ||
     $role=='Instructor'
   )) {
     // check login
@@ -52,7 +58,7 @@ if ($localuserid === false) {
       }
     }
   } else if (!empty($_POST['SID']) && (
-    ($role=='Learner' && !empty($localcourse['allow_direct_login'])) ||
+    ($role=='Learner' && !empty($localcourse->get_allow_direct_login())) ||
     ($role=='Instructor' && !empty($GLOBALS['lti']['allow_instr_create']))
   )) {
     // create new account
@@ -139,7 +145,7 @@ $_SESSION['userid'] = $localuserid;
 require_once(__DIR__."/../includes/userprefs.php");
 generateuserprefs();
 
-if ($role == 'Instructor' && $localcourse === false) {
+if ($role == 'Instructor' && $localcourse === null) {
   // no course connection yet
   require(__DIR__.'/connectcourse.php');
   connect_course($launch, $db, $localuserid);
