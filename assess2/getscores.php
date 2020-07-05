@@ -59,25 +59,22 @@ $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 
-// adjust output if in by_question mode - to handle showwork after
-if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['submitby'] == 'by_question') {
-  $assessInfoOut['has_active_attempt'] = false;
-}
+
 
 // if have active scored record end it
-if ($assessInfoOut['has_active_attempt']) {
+if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['submitby'] == 'by_assessment') {
   echo '{"error": "active_attempt"}';
   exit;
 }
 
 // grab all questions settings and scores, based on end-of-assessment settings
 $showscores = $assess_info->showScoresAtEnd();
-$reshowQs = $assess_info->reshowQuestionsAtEnd();
+$reshowQs = $assess_info->reshowQuestionsInGb();
 $assess_info->loadQuestionSettings('all', $reshowQs);
-$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'scored');
+$assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs);
 $assessInfoOut['score'] = $assess_record->getAttemptScore();
 $totalScore = $assessInfoOut['score'];
-$assessInfoOut['has_active_attempt'] = false;
+
 
 //get prev attempt info
 if ($assessInfoOut['submitby'] == 'by_assessment') {

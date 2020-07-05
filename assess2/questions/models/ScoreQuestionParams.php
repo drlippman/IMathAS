@@ -8,7 +8,7 @@ class ScoreQuestionParams
 {
     private $userRights;        // Orig: $GLOBALS['myrights']
     private $questionNumber;    // Orig: $qnidx
-    private $assessmentId = 0;  
+    private $assessmentId = 0;
     private $dbQuestionSetId;   // Orig: $qidx
     private $questionData;      // Obtained from imas_questionset; optional
     private $questionSeed;      // Orig: $seed
@@ -24,6 +24,7 @@ class ScoreQuestionParams
     private $isMultiPartQuestion;   // Orig: $multi
     private $questionPartNumber;    // Orig: $partnum
     private $varsForScorePart;      // Orig: $options
+    private $isRescore = false;
 
     /**
      * The user's rights. (from imas_users table, "rights" column)
@@ -389,5 +390,16 @@ class ScoreQuestionParams
     {
         $this->allQuestionAnswersAsNum = $allQuestionAnswersAsNum;
         return $this;
+    }
+
+    public function setIsRescore(bool $isRescore): ScoreQuestionParams
+    {
+      $this->isRescore = $isRescore;
+      return $this;
+    }
+
+    public function getIsRescore(): bool
+    {
+      return $this->isRescore;
     }
 }

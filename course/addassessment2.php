@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
+require_once("../includes/TeacherAuditLog.php");
 
 if ($courseUIver == 1) {
 	if (isset($_GET['id'])) {
@@ -69,6 +70,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
   $cid = Sanitize::courseId($_GET['cid']);
   $block = $_GET['block'];
 
+	if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
+		$query = "SELECT COUNT(iar.userid) FROM imas_assessment_records AS iar,imas_students WHERE ";
+		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
+		$taken = ($stm->fetchColumn(0)>0);
+	} else {
+		$taken = false;
+	}
+
   $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
   $stm->execute(array($cid));
   $dates_by_lti = $stm->fetchColumn(0);
@@ -78,9 +89,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       	$DBH->beginTransaction();
           require_once('../includes/filehandler.php');
           deleteallaidfiles($assessmentId);
-          $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+          $grades = array();
+					$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+					$stm->execute(array(':assessmentid'=>$assessmentId));
+					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+						$grades[$row['userid']]=$row["score"];
+					}
+					$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
-          $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+					if ($stm->rowCount()>0) {
+		        TeacherAuditLog::addTracking(
+		          $cid,
+		          "Clear Attempts",
+		          $assessmentId,
+		          array('grades'=>$grades)
+		        );
+		      }
+
+					$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
           $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
           $stm->execute(array(':assessmentid'=>$assessmentId));
@@ -126,27 +152,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
     require_once("../includes/parsedatetime.php");
 		$toset['avail'] = Sanitize::onlyInt($_POST['avail']);
-    if ($_POST['avail']==1) {
-      if ($_POST['sdatetype']=='0') {
-        $toset['startdate'] = 0;
-      } else {
-        $toset['startdate'] = parsedatetime($_POST['sdate'],$_POST['stime'],0);
-      }
-      if ($_POST['edatetype']=='2000000000') {
-        $toset['enddate'] = 2000000000;
-      } else {
-        $toset['enddate'] = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
-      }
 
-      if (empty($_POST['allowpractice'])) {
-        $toset['reviewdate'] = 0;
-      } else {
-        $toset['reviewdate'] = 2000000000;
-      }
-    } else {
+    if ($_POST['sdatetype']=='0') {
       $toset['startdate'] = 0;
+    } else {
+      $toset['startdate'] = parsedatetime($_POST['sdate'],$_POST['stime'],0);
+    }
+    if ($_POST['edatetype']=='2000000000') {
       $toset['enddate'] = 2000000000;
+    } else {
+      $toset['enddate'] = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
+    }
+
+    if (empty($_POST['allowpractice']) || $toset['enddate'] == 2000000000) {
       $toset['reviewdate'] = 0;
+    } else {
+      $toset['reviewdate'] = 2000000000;
     }
 
 		// Core options
@@ -385,7 +406,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     }
 
 		if (isset($_GET['id'])) {  //already have id; update
-			$stm = $DBH->prepare("SELECT isgroup,intro,itemorder,deffeedbacktext FROM imas_assessments WHERE id=:id");
+			$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$curassess = $stm->fetch(PDO::FETCH_ASSOC);
 
@@ -423,6 +444,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       $qarr[':cid'] = $cid;
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
+
+			if ($taken && $stm->rowCount()>0) {
+				$metadata = array();
+				foreach ($curassess as $k=>$v) {
+					if (isset($toset[$k]) && $toset[$k] != $v) {
+						$metadata[$k] = ['old'=>$v, 'new'=>$toset[$k]];
+					}
+				}
+				$result = TeacherAuditLog::addTracking(
+				    $cid,
+				    "Assessment Settings Change",
+				    $assessmentId,
+				    $metadata
+				);
+			}
 
 			/*  TODO: make this work in new model
 			if ($toset['deffb']!=$curassess['deffeedbacktext']) {
@@ -500,7 +536,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($from=='lti') {
 				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
 			} else {
-				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
+				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, $rqp));
 			}
 			exit;
 		} else { //add new
@@ -555,11 +592,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
   } else { //INITIAL LOAD
       if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
-          $query = "SELECT COUNT(iar.userid) FROM imas_assessment_records AS iar,imas_students WHERE ";
-          $query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid";
-          $stm = $DBH->prepare($query);
-          $stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
-          $taken = ($stm->fetchColumn(0)>0);
           $stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
           $stm->execute(array(':id'=>$assessmentId));
           $line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -568,6 +600,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $timelimit = round(abs($line['timelimit'])/60, 3);
           if ($line['isgroup']==0) {
               $line['groupsetid']=0;
+              $line['groupmax']=6;
           }
           if ($line['deffeedbacktext']=='') {
               $usedeffb = false;

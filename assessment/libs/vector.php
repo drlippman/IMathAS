@@ -91,7 +91,7 @@ function veccompareset($a,$b) {
 	if ($b===null) { return 0;}
 	foreach ($b as $k=>$bv) {
 		if (is_array($bv)) {continue;}
-		if ($bv{0} == '[') { //in matrix notation
+		if ($bv[0] == '[') { //in matrix notation
 			$b[$k] = explode(',',str_replace(array('[',']','(',')'),'',$bv));
 		} else { //in compressed notation
 			$b[$k] = explode('|',$bv);
@@ -127,7 +127,7 @@ function veccomparesamespan($a,$b) {
 	if ($b===null) { return 0;}
 	foreach ($b as $k=>$bv) {
 		if (is_array($bv)) {continue;}
-		if ($bv{0} == '[') { //in matrix notation
+		if ($bv[0] == '[') { //in matrix notation
 			$b[$k] = explode(',',str_replace(array('[',']','(',')'),'',$bv));
 		} else { //in compressed notation
 			$b[$k] = explode('|',$bv);

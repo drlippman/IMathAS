@@ -144,6 +144,7 @@ class AssessInfo
       } else {
         $LPneeded = 1;
       }
+
       $this->assessData['can_use_latepass'] = $LPneeded;
       $this->assessData['latepasses_avail'] = $latepasses;
 
@@ -445,12 +446,15 @@ class AssessInfo
   }
 
   /*
-    Override the "available" setting
+    Override the "available" setting, and enddate and timelimit
    */
-  public function overrideAvailable($val) {
-    if ($this->assessData['available'] !== 'yes') {
+  public function overrideAvailable($val, $overrideTimelimit=true) {
+    if ($this->assessData['available'] !== 'yes' && $val == 'yes') {
       // necessary to override to prevent due date timer from causing problems
       $this->assessData['enddate'] = 2000000000;
+    }
+    if ($overrideTimelimit) {
+      $this->assessData['timelimit'] = 0;
     }
     $this->assessData['available'] = $val;
   }
@@ -466,7 +470,7 @@ class AssessInfo
     } else if ($now < $this->assessData['startdate']) {
       //before start date
       $available = 'notyet';
-    } else if ($now < $this->assessData['enddate']) {
+    } else if ($now < $this->assessData['enddate'] + 10) {
       //currently available
       $available = 'yes';
     } else if ($this->assessData['allow_practice']) {
@@ -535,14 +539,26 @@ class AssessInfo
   }
 
   /**
-   * Determine whether we are reshowing questions at end
+   * Determine whether we are reshowing questions in gb / addwork
    * @return boolean  true if showing question at end
    */
-  public function reshowQuestionsAtEnd() {
+  public function reshowQuestionsInGb() {
     //$showscores = $this->assessData['showscores'];
     //return ($showscores == 'at_end' || $showscores == 'during');
     $viewingb = $this->assessData['viewingb'];
     return ($viewingb == 'immediately' || $viewingb == 'after_take' ||
+      ($viewingb == 'after_due' && time() > $this->assessData['enddate']));
+  }
+
+  /**
+   * Determine whether we are reshowing questions at end
+   * @return boolean  true if showing question at end
+   */
+  public function reshowQuestionsAtEnd() {
+    $showscores = $this->assessData['showscores'];
+    $viewingb = $this->assessData['viewingb'];
+    return ($showscores == 'at_end' || $showscores == 'during' ||
+      $viewingb == 'immediately' || $viewingb == 'after_take' ||
       ($viewingb == 'after_due' && time() > $this->assessData['enddate']));
   }
 
@@ -654,6 +670,7 @@ class AssessInfo
               $unused = array_diff($this->questionData[$qid]['fixedseeds'], $oldseeds[$qid]);
               $newseed = $unused[array_rand($unused, 1)];
             } else {
+              $n = count($this->questionData[$qid]['fixedseeds']);
               $newseed = $this->questionData[$qid]['fixedseeds'][rand(0, $n-1)];
             }
           } else {

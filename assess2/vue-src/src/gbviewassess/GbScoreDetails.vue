@@ -34,6 +34,15 @@
         >
           <icons name="clipboard" alt="icons.rubric" size="small" />
         </button>
+        <button
+          v-if="canedit && !isPractice && qdata.rubric > 0"
+          style="display:none"
+          class="plain nopad rubriclink"
+          @click="showRubric(i)"
+          :id="'rublink-scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
+        >
+          <icons name="clipboard" alt="icons.rubric" size="small" />
+        </button>
       </span>
       <button
         v-if="canedit && !isPractice"
@@ -83,16 +92,32 @@
       >
         {{ $t('gradebook.show_penalties') }}
       </button>
+      <button
+        v-if="hasAutoSaves"
+        type="button"
+        class="slim"
+        @click="showAutosaves = !showAutosaves"
+      >
+        {{ $t('gradebook.show_autosaves') }}
+      </button>
     </div>
     <gb-all-tries
       v-if="showAllTries"
       :tries="qdata.other_tries"
+      type="tries"
       :qn="qn"
     />
     <gb-penalties
       v-if="showPenalties"
       :parts="qdata.parts"
       :submitby="submitby"
+    />
+    <gb-all-tries
+      v-if="showAutosaves"
+      :tries="qdata.autosaves"
+      type="autosave"
+      :submitby="submitby"
+      :qn="qn"
     />
     <div v-if="canedit && showfull && qHelps.length > 0">
       {{ $t('gradebook.had_help') }}:
@@ -128,7 +153,8 @@ export default {
       curScores: false,
       showfeedback: false,
       showAllTries: false,
-      showPenalties: false
+      showPenalties: false,
+      showAutosaves: false
     };
   },
   computed: {
@@ -248,7 +274,8 @@ export default {
           link: this.questionEditUrl
         },
         {
-          label: this.$t('gradebook.msg_owner'),
+          label: (store.assessInfo.hasOwnProperty('qerrortitle')
+            ? store.assessInfo.qerrortitle : this.$t('gradebook.msg_owner')),
           link: this.questionErrorUrl
         }
       ];
@@ -269,6 +296,9 @@ export default {
         }
       }
       return false;
+    },
+    hasAutoSaves () {
+      return this.qdata.hasOwnProperty('autosaves');
     },
     submitby () {
       return store.assessInfo.submitby;
@@ -299,8 +329,12 @@ export default {
   },
   methods: {
     updateScore (pn, evt) {
-      const partposs = this.qdata.points_possible * this.answeights[pn];
-      actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
+      if (this.curScores[pn].trim() === '') {
+        actions.setScoreOverride(this.qn, pn, '');
+      } else {
+        const partposs = this.qdata.points_possible * this.answeights[pn];
+        actions.setScoreOverride(this.qn, pn, this.curScores[pn] / partposs);
+      }
     },
     revealFeedback () {
       this.showfeedback = true;
@@ -334,7 +368,7 @@ export default {
         this.partPoss[pn],
         'scorebox' + this.qn + (this.partPoss.length > 1 ? '-' + pn : ''),
         'fb' + this.qn,
-        this.qn,
+        (this.qn + 1) + (this.partPoss.length > 1 ? ' part ' + (pn + 1) : ''),
         600
       );
     }
@@ -343,8 +377,11 @@ export default {
     this.initCurScores();
   },
   watch: {
-    qdata: function (newVal, oldVal) {
-      this.initCurScores();
+    qdata: {
+      handler: function (newVal, oldVal) {
+        this.initCurScores();
+      },
+      deep: true
     }
   }
 };

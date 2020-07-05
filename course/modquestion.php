@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
-
+require_once("../includes/TeacherAuditLog.php");
 
  //set some page specific variables and counters
 $overwriteBody = 0;
@@ -21,6 +21,13 @@ if (!(isset($teacherid))) {
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
+
+  $query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+  $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+  $beentaken = ($stm->rowCount() > 0);
+
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 	$curBreadcrumb .= _("Modify Question Settings");
@@ -54,19 +61,42 @@ if (!(isset($teacherid))) {
 			$showhints = intval($_POST['showhints']);
 		}
 		if (isset($_GET['id'])) { //already have id - updating
+      $stm = $DBH->prepare("SELECT * FROM imas_questions WHERE id=?");
+      $stm->execute(array($_GET['id']));
+      $old_settings = $stm->fetch(PDO::FETCH_ASSOC);
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':rubric'=>$rubric,
-					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
+        $settings = array(':points'=>$points, ':attempts'=>$attempts,
+          ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
+          ':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
+          ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']);
+				$stm->execute($settings);
 			} else {
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
-					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$_GET['id']));
+        $settings = array(':points'=>$points, ':attempts'=>$attempts,
+          ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
+          ':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
+          ':id'=>$_GET['id']);
+				$stm->execute($settings);
 			}
+      $changes = array();
+      foreach ($old_settings as $k=>$v) {
+        if (isset($settings[':'.$k]) && $settings[':'.$k] != $v) {
+          $changes[$k] = ['old'=>$v, 'new'=>$settings[':'.$k]];
+        }
+      }
+      if ($stm->rowCount()>0 && $beentaken && count($changes)>0) {
+        TeacherAuditLog::addTracking(
+          $cid,
+          "Question Settings Change",
+          $_GET['id'],
+          $changes
+        );
+      }
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$stm = $DBH->prepare("SELECT questionsetid FROM imas_questions WHERE id=:id");
 				$stm->execute(array(':id'=>$_GET['id']));
@@ -160,19 +190,12 @@ if (!(isset($teacherid))) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}
-		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
-		if ($stm->rowCount() > 0) {
+		if ($beentaken) {
 			$page_beenTakenMsg = "<h2>"._("Warning")."</h2>\n";
 			$page_beenTakenMsg .= "<p>"._("This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ");
 			$page_beenTakenMsg .= _("If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts")."</p> ";
 			$page_beenTakenMsg .= "<p><input type=button value=\""._("Clear Assessment Attempts")."\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
-			$beentaken = true;
-		} else {
-			$beentaken = false;
-		}
+		} 
 
 		//get defaults
 		$query = "SELECT defpoints,defattempts,defpenalty,deffeedback,showhints,shuffle FROM imas_assessments ";

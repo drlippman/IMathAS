@@ -25,7 +25,7 @@ while (($line = fgets($fp, 4096)) !== false) {
 	$cnt++;
 	if ($line=='') {
 		$injs = false; $msgid='""';
-	} else if ($line{0}=='#' && strpos($line,'.js')!==false) {
+	} else if ($line[0]=='#' && strpos($line,'.js')!==false) {
 		$injs = true;
 	} else if (substr($line,0,5)=='msgid') {
 		$msgid = substr($line,6);

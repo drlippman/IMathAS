@@ -801,6 +801,11 @@ if ($askforuserinfo == true) {
 
 //if here, we know the local userid.
 
+//call hook, if defined
+if (function_exists('onHaveLocalUser')) {
+	onHaveLocalUser($userid);
+}
+
 //if it's a common catridge placement and we're here, then either we're using domain credentials, or
 //course credentials for a non-source course.
 
@@ -848,6 +853,7 @@ if ($stm->rowCount()==0) {
 					if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useexisting") {
 						$destcid = $aidsourcecid;
 						$copycourse = "no";
+						$ltilog = ['copy'=>'useorig', 'cid'=>$destcid];
 					}
 				}
 				$stm = $DBH->prepare('SELECT jsondata,UIver FROM imas_courses WHERE id=:aidsourcecid');
@@ -859,12 +865,15 @@ if ($stm->rowCount()==0) {
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {
 					$destcid = $_POST['useothercoursecid'];
 					$copycourse = "no";
+					$ltilog = ['copy'=>'useother', 'cid'=>$destcid];
 				} else if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="makecopy") {
 					$copycourse = "yes";
 					$sourcecid = $aidsourcecid;
+					$ltilog = ['copy'=>'copyorig', 'cid'=>$sourcecid];
 				} else if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="copyother" && $_POST['othercoursecid']>0) {
 					$copycourse = "yes";
 					$sourcecid = Sanitize::onlyInt($_POST['othercoursecid']);
+					$ltilog = ['copy'=>'copyother', 'cid'=>$sourcecid];
 				}
 				if ($copycourse=="notify" || $copycourse=="ask") {
 					$_SESSION['userid'] = $userid; //remember me
@@ -920,7 +929,7 @@ if ($stm->rowCount()==0) {
 						}
 						echo "	</ul>";
 						if ($sourceUIver == 1) {
-							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
+							echo '<p id="usenew" style="display:none;"><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
 						}
 						echo "<p>The first option is best if this is your first time using this $installname course.  The second option
 							may be preferrable if you have copied the course in your LMS and want your students records to
@@ -946,7 +955,7 @@ if ($stm->rowCount()==0) {
 							echo "<input name=\"docoursecopy\" type=\"hidden\" value=\"makecopy\" />";
 						}
 						if ($sourceUIver == 1) {
-							echo '<p><input type="checkbox" name="usenewassess" /> Use new assessment interface (only applies if copying)</p>';
+							echo '<p><input type="checkbox" name="usenewassess" checked /> Use new assessment interface (only applies if copying)</p>';
 						}
 						echo "<p><input type=\"submit\" value=\"Create a copy on $installname\"/> (this may take a few moments - please be patient)</p>";
 					}
@@ -963,8 +972,6 @@ if ($stm->rowCount()==0) {
 				$blockcnt = 1;
 				$itemorder = serialize(array());
 				$randkey = uniqid();
-				$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
-				$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
 				$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
 				$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 				$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
@@ -978,10 +985,10 @@ if ($stm->rowCount()==0) {
 				$lockaid = 0;
 				$DBH->beginTransaction();
 
-				$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
-				$query .= "(:name,:ownerid,:enrollkey,:hideicons,:picicons,:allowunenroll,:copyrights,:msgset,:showlatepass,:itemorder,:available,:theme,:ltisecret,:blockcnt)";
+				$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
+				$query .= "(:name,:ownerid,:enrollkey,:allowunenroll,:copyrights,:msgset,:showlatepass,:itemorder,:available,:theme,:ltisecret,:blockcnt)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
+				$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey,
 					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 					':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 				$destcid = $DBH->lastInsertId();
@@ -1138,6 +1145,16 @@ if ($stm->rowCount()==0) {
 				':courseid'=>$destcid,
 				':copiedfrom'=>($copycourse == "yes")?$sourcecid:0,
 				':contextlabel'=>$_SESSION['lti_context_label']));
+
+			$ltilog['contextid'] = $_SESSION['lti_context_id'];
+			$ltilog['action'] = 'Establish LTI course connection';
+			require_once('includes/TeacherAuditLog.php');
+			TeacherAuditLog::addTracking(
+				$destcid,
+				"Course Settings Change",
+				$destcid,
+				$ltilog
+			);
 		} else {
 			list($destcid, $copiedfromcid) = $stm->fetch(PDO::FETCH_NUM);
 		}
@@ -1313,6 +1330,17 @@ if ($_SESSION['lti_keytype']=='cc-of') {
 					':contextid'=>$_SESSION['lti_context_id'],
 					':courseid'=>$linkcid,
 					':contextlabel'=>$_SESSION['lti_context_label']));
+				require_once('includes/TeacherAuditLog.php');
+				TeacherAuditLog::addTracking(
+					$linkcid,
+					"Course Settings Change",
+					$linkcid,
+					[
+						'action'=>'Establish LTI course connection',
+						'type'=>'cc-of',
+						'contextid'=>$_SESSION['lti_context_id']
+					]
+				);
 			} else {
 				reporterror(_("You are not an instructor on the course and folder this link is pointing to. Auto-copying is not currently supported for folder-level links."));
 			}
@@ -2364,8 +2392,6 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						$blockcnt = 1;
 						$itemorder = serialize(array());
 						$randkey = uniqid();
-						$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
-						$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
 						$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
 						$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 						$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
@@ -2376,10 +2402,10 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 
 						$avail = 0;
 						$lockaid = 0;
-						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
-						$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :showlatepass, :itemorder, :available, :theme, :ltisecret, :blockcnt);";
+						$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
+						$query .= "(:name, :ownerid, :enrollkey, :allowunenroll, :copyrights, :msgset, :showlatepass, :itemorder, :available, :theme, :ltisecret, :blockcnt);";
 						$stm = $DBH->prepare($query);
-						$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
+						$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, 
 							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 							':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 						$destcid  = $DBH->lastInsertId();
@@ -2399,6 +2425,19 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						':contextid'=>$_SESSION['lti_context_id'],
 						':courseid'=>$destcid,
 						':contextlabel'=>$_SESSION['lti_context_label']));
+					require_once('includes/TeacherAuditLog.php');
+					TeacherAuditLog::addTracking(
+						$destcid,
+						"Course Settings Change",
+						$destcid,
+						[
+							'action'=>'Establish LTI course connection',
+							'type'=>'2',
+							'contextid'=>$_SESSION['lti_context_id'],
+							'copycourse'=>$copycourse,
+							'orig'=>$_SESSION['place_aid'][0]
+						]
+					);
 
 				} else if ($_SESSION['lti_keytype']=='cc-c') {
 					$copyaid = true;
@@ -2410,7 +2449,17 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						':contextid'=>$_SESSION['lti_context_id'],
 						':courseid'=>$destcid,
 						':contextlabel'=>$_SESSION['lti_context_label']));
-
+					require_once('includes/TeacherAuditLog.php');
+					TeacherAuditLog::addTracking(
+						$destcid,
+						"Course Settings Change",
+						$destcid,
+						[
+							'action'=>'Establish LTI course connection',
+							'type'=>'3',
+							'contextid'=>$_SESSION['lti_context_id'],
+						]
+					);
 				}
 			} else {
 				$destcid = $stm->fetchColumn(0);

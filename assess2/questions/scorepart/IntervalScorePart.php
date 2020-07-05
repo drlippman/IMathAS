@@ -40,6 +40,7 @@ class IntervalScorePart implements ScorePart
         if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
         if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
         if (!isset($variables)) { $variables = 'x';}
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -55,7 +56,7 @@ class IntervalScorePart implements ScorePart
         if ($hasNumVal) {
           $givenansval = $_POST["qn$qn-val"];
         }
-        
+
         $givenans = normalizemathunicode($givenans);
 
         if (in_array('nosoln',$ansformats)) {
@@ -71,6 +72,8 @@ class IntervalScorePart implements ScorePart
         if ($hasNumVal) {
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
+        $formatErr = 0;
+        $formatCnt = 0;
         if ($anstype == 'calcinterval') {
             //test for correct format, if specified
             if (checkreqtimes($givenans,$requiretimes)==0) {
@@ -101,16 +104,17 @@ class IntervalScorePart implements ScorePart
                         }
                     }
                     $orarr = explode(' or ', $givenans);
-                    foreach ($orarr as $opt) {
+                    foreach ($orarr as $k=>$opt) {
                         $opt = trim($opt);
                         if ($opt=='DNE' || $givenans=='(-oo,oo)') {continue;} //DNE or all real numbers
                         $opts = preg_split('/(<=?|>=?)/',$opt);
                         foreach ($opts as $optp) {
                             $optp = trim($optp);
-                            if (strtolower($optp)=='var' || $optp=='oo' || $optp=='-oo') {continue;}
+                            if (strtolower($optp)=='var') {continue;}
+                            $formatCnt++;
+                            if ($optp=='oo' || $optp=='-oo') {continue;}
                             if (!checkanswerformat($optp,$ansformats)) {
-                                $scorePartResult->setRawScore(0);
-                                return $scorePartResult;
+                                $formatErr++;
                             }
                         }
                     }
@@ -129,13 +133,12 @@ class IntervalScorePart implements ScorePart
                     $opt = trim($opt);
                     if ($opt=='DNE') {continue;}
                     $opts = explode(',',substr($opt,1,strlen($opt)-2));
+                    $formatCnt += 2;
                     if (strpos($opts[0],'oo')===false &&  !checkanswerformat($opts[0],$ansformats)) {
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
+                        $formatErr++;
                     }
                     if (strpos($opts[1],'oo')===false &&  !checkanswerformat($opts[1],$ansformats)) {
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
+                        $formatErr++;
                     }
                 }
             }
@@ -163,6 +166,7 @@ class IntervalScorePart implements ScorePart
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
+        $orScores = array(0);
         foreach($ansar as $anans) {
             $answer = str_replace(' ','',$anans);
 
@@ -183,52 +187,87 @@ class IntervalScorePart implements ScorePart
                 return $scorePartResult;
             }
 
-            if (count($aarr)!=count($gaarr)) {
-                continue;
-            }
-
-            foreach ($aarr as $ansint) {
+            $pairScored = array();
+            foreach ($aarr as $j=>$ansint) {
+                $pairScored[$j] = array();
                 $foundloc = -1;
                 foreach ($gaarr as $k=>$gansint) {
+                    $pairScored[$j][$k] = 0;
                     // check brackets
-                    if ($ansint['lb']!=$gansint['lb'] || $ansint['rb']!=$gansint['rb']) {
-                        continue;
+                    if ($ansint['lb']==$gansint['lb']) {
+                      $pairScored[$j][$k] += .2;
+                    }
+                    if ($ansint['rb']==$gansint['rb']) {
+                        $pairScored[$j][$k] += .2;
                     }
                     list($anssn, $ansen) = $ansint['vals'];
                     list($ganssn, $gansen) = $gansint['vals'];
                     if (!is_numeric($anssn) || !is_numeric($ganssn)) {
-                        if ($anssn !== $ganssn) {
-                            continue;
+                        if ($anssn === $ganssn) {
+                            $pairScored[$j][$k] += .3;
                         }
                     } else if (isset($abstolerance)) {
-                        if (abs($anssn-$ganssn) < $abstolerance + 1E-12) {} else {continue;}
+                        if (abs($anssn-$ganssn) < $abstolerance + 1E-12) {
+                          $pairScored[$j][$k] += .3;
+                        }
                     } else {
-                        if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
+                        if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {
+                          $pairScored[$j][$k] += .3;
+                        }
                     }
                     if (!is_numeric($ansen) || !is_numeric($gansen)) {
-                        if ($ansen !== $gansen) {
-                            continue;
+                        if ($ansen === $gansen) {
+                            $pairScored[$j][$k] += .3;
                         }
                     } else if (isset($abstolerance)) {
-                        if (abs($ansen-$gansen) < $abstolerance + 1E-12) {} else {continue;}
+                        if (abs($ansen-$gansen) < $abstolerance + 1E-12) {
+                          $pairScored[$j][$k] += .3;
+                        }
                     } else {
-                        if (abs($ansen - $gansen)/(abs($ansen)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
+                        if (abs($ansen - $gansen)/(abs($ansen)+.0001) < $reltolerance+ 1E-12) {
+                          $pairScored[$j][$k] += .3;
+                        }
                     }
-
-                    $foundloc = $k;
-                    break;
-                }
-                if ($foundloc>-1) {
-                    array_splice($gaarr,$foundloc,1);
-                } else {
-                    continue 2;
                 }
             }
-            if (count($gaarr)>0) { //extraneous student intervals?
-                continue;
+            for ($i=0;$i<count($pairScored);$i++) {
+              arsort($pairScored[$i]);
             }
-            $correct = 1;
-            break;
+            uasort($pairScored, function($a,$b) {
+              return (reset($a) < reset($b));
+            });
+            $thisScore = 0;
+            $matchedGiven = array();
+            foreach ($pairScored as $j=>$arr) { // foreach ans
+              foreach ($arr as $k=>$v) { // look at pairwise score with given
+                if ($v == 0) { break; }  // sorted, so if we hit 0 abort
+                if (!in_array($k, $matchedGiven)) { // found a score, use it
+                  $matchedGiven[] = $k;
+                  $thisScore += $v;
+                  break;
+                }
+              }
+            }
+            $thisScore /= count($pairScored);
+            // take off points for extraneous student intervals
+            $thisScore -= (count($gaarr) - count($matchedGiven))/count($pairScored);
+            if ($thisScore == 1) {
+              $correct = 1;
+              break;
+            } else {
+              $orScores[] = $thisScore;
+            }
+        }
+        if ($correct == 0) {
+          $correct = max($orScores);
+        }
+        if ($formatErr > 0) {
+          $correct = (1 - $formatErr/$formatCnt)*$correct;
+        }
+        if ($scoremethod !== 'partialcredit') {
+          if ($correct < .999) {
+            $correct = 0;
+          }
         }
         $scorePartResult->setRawScore($correct);
         return $scorePartResult;

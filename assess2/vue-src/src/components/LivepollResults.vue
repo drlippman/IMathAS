@@ -129,9 +129,8 @@ export default {
           out[pn].choices = this.params[pn].livepoll_choices;
         }
         if (parttype === 'draw') {
-          let initpts = this.params[pn].livepoll_drawinit;
-          initpts = initpts.replace(/"|'/g, '').split(',');
-          for (let i = 1; i < initpts.length; i++) {
+          const initpts = this.params[pn].livepoll_drawinit;
+          for (let i = 1; i < Math.min(11, initpts.length); i++) {
             initpts[i] = Number(initpts[i]);
           }
           out[pn].initpts = initpts;

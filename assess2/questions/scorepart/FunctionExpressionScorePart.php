@@ -82,9 +82,13 @@ class FunctionExpressionScorePart implements ScorePart
                 $givenans = str_replace('lamda', 'lambda', $givenans);
             }
             //find f() function variables
-            if (strpos($variables[$i],'(')!==false) {
+            if (strpos($variables[$i],'()')!==false) {
                 $ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
                 $variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
+            }
+            // front end will submit p_(left) rather than p_left; strip parens
+            if (preg_match('/^(\w+)_(\w+)$/', $variables[$i], $m)) {
+              $givenans = preg_replace('/'.$m[1].'_\('.$m[2].'\)/', $m[0], $givenans);
             }
         }
 
@@ -218,7 +222,7 @@ class FunctionExpressionScorePart implements ScorePart
                 $thisreqtimes = $requiretimes;
             }
             $correct = true;
-            $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s]+/','',$answer);
+            $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\']+/','',$answer);
 
             if (in_array('equation',$ansformats)) {
                 if (substr_count($givenans, '=')!=1) {
@@ -227,7 +231,7 @@ class FunctionExpressionScorePart implements ScorePart
                 }
                 $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
             }
-            
+
             if ($answer == '') {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;

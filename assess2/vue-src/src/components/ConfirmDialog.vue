@@ -38,7 +38,7 @@ import A11yDialog from './a11y-dialog';
 
 export default {
   name: 'ConfirmDialog',
-  props: ['data'],
+  props: ['data', 'lastpos'],
   data: function () {
     return {
       dialog: null
@@ -70,6 +70,7 @@ export default {
     }
   },
   mounted () {
+    const lastHeight = this.lastpos || null;
     window.$(document).on('keyup.dialog', (event) => {
       if (event.key === 'Escape') {
         this.doCancel();
@@ -77,6 +78,9 @@ export default {
     });
     this.dialog = new A11yDialog(this.$refs.wrap);
     this.dialog.show();
+    if (window.innerHeight > 2000 && lastHeight !== null) {
+      this.$refs.dialog.style.top = Math.max(20, lastHeight - this.$refs.dialog.offsetHeight) + 'px';
+    }
   },
   beforeDestroy () {
     window.$(document).off('keyup.dialog');

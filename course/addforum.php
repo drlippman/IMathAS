@@ -100,7 +100,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (intval($_POST['points'])==0) {
 			$_POST['cntingb'] = 0;
 		}
-		
+
 		if ($_POST['cntingb']==0) {
 			$_POST['points'] = 0;
 			$tutoredit = 0;
@@ -167,7 +167,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$replyinstruction = Sanitize::incomingHtml($_POST['replyinstr']);
 		}
-		
+
 		$defaultdisplay = Sanitize::onlyInt($_POST['defdisplay']);
 		$groupsetid = Sanitize::onlyInt($_POST['groupsetid']);
 		$points = Sanitize::onlyInt($_POST['points']);
@@ -248,7 +248,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':forumid'=>$newforumid, ':userid'=>$userid));
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid."&r=" .Sanitize::randomQueryStringParam());
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid.$btf."&r=" .Sanitize::randomQueryStringParam());
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
@@ -542,7 +543,7 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		</div>
-		
+
 		<div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
@@ -581,13 +582,13 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
-		
+
 		<span class=form>New post notifcation:</span>
 		<span class=formright>
 			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
 			Get email notification of new posts
 		</span><br class="form" />
-		
+
 		</div>
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
 			Display Options
@@ -599,7 +600,7 @@ if ($overwriteBody==1) {
 			New Threads: <input name="caltagpost" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($posttag);?>"/>,
 			Replies: <input name="caltagreply" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($replytag);?>"/>
 		</span><br class="form" />
-		
+
 		<span class=form>Default display:</span>
 		<span class=formright>
 			<select name="defdisplay">
@@ -619,7 +620,7 @@ if ($overwriteBody==1) {
 			<input type=checkbox name=forumtype value=1 <?php if ($line['forumtype']==1) { echo 'checked=1';}?> />
 			Provide separate file upload option when posting
 		</span><br class="form"/>
-		
+
 		<span class="form">Categorize posts?</span>
 		<span class="formright">
 			<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
@@ -629,9 +630,9 @@ if ($overwriteBody==1) {
 			  <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
 			  </span>
 		</span><br class="form"/>
-		
+
 		</div>
-		
+
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
 			Posting and Reply Instructions
 		</div>
@@ -647,7 +648,7 @@ if ($overwriteBody==1) {
 		<?php echo Sanitize::encodeStringForDisplay($line['replyinstr']);?></textarea>
 		</div>
 		</div>
-		
+
 		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
 			Grading and Access Control
 		</div>

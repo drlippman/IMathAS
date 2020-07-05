@@ -519,6 +519,11 @@
 				if ($altltisourcedid != $line['lti_sourcedid']) {
 					$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET lti_sourcedid=:lti_sourcedid WHERE id=:id");
 					$stm->execute(array(':lti_sourcedid'=>$altltisourcedid, ':id'=>$line['id']));
+
+					// update any queued sends
+					$hash = $aid . '-' . $userid;
+					$stm = $DBH->prepare("UPDATE imas_ltiqueue SET sourcedid=? WHERE hash=?");
+		      $stm->execute(array($altltisourcedid, $hash));
 				}
 			}
 			session_write_close();
@@ -1638,7 +1643,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 						//question not redisplayed, or error - just skip with no warning
 					} else if ($_POST['verattempts'][$i]!=$attempts[$i]) {
 						echo sprintf(_('Question %d has been submitted since you viewed it.  Your answer just submitted was not scored or recorded.'), ($i+1)), "<br/>";
-					} else {
+					} else if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
 						scorequestion($i,false);
 					}
 				//}

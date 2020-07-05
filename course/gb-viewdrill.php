@@ -37,13 +37,13 @@ $dadata = $stm->fetch(PDO::FETCH_ASSOC);
 $n = $dadata['n'];
 $showtype = $dadata['showtype'];
 $scoretype = $dadata['scoretype'];
-if ($scoretype{0}=='t') {
+if ($scoretype[0]=='t') {
 	$mode = 'cntdown';
 	$torecord = 'cc';   //count  correct
 } else {
 	$mode = 'cntup';
-	$stopattype = $scoretype{1};  //a: attempted, c: correct, s: streak
-	$torecord = $scoretype{2}; //t: time, c: total count
+	$stopattype = $scoretype[1];  //a: attempted, c: correct, s: streak
+	$torecord = $scoretype[2]; //t: time, c: total count
 }
 $showtostu = $dadata['showtostu'];
 if ($dadata['itemids']=='') {

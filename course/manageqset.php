@@ -686,26 +686,28 @@ if ($myrights<20) {
 						unset($searchterms[$k]);
 					}
 				}
-				$searchlikes = '(';
-				if (count($wholewords)>0) {
-					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
-				}
-				if (count($searchterms)>0) {
-					if (count($wholewords)>0) {
-						$searchlikes .= 'AND ';
-					}
-					$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-					foreach ($searchterms as $t) {
-						$searchlikevals[] = "%$t%";
-					}
-				}
-				if (ctype_digit($safesearch)) {
-					$searchlikes .= "OR imas_questionset.id=?) AND ";
-					$searchlikevals[] = $safesearch;
-					$isIDsearch = $safesearch;
-				} else {
-					$searchlikes .= ") AND";
-				}
+        if (count($wholewords)>0 || count($searchterms)>0) {
+  				$searchlikes .= '(';
+  				if (count($wholewords)>0) {
+  					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
+  				}
+  				if (count($searchterms)>0) {
+  					if (count($wholewords)>0) {
+  						$searchlikes .= 'AND ';
+  					}
+  					$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+  					foreach ($searchterms as $t) {
+  						$searchlikevals[] = "%$t%";
+  					}
+  				}
+  				if (ctype_digit($safesearch)) {
+  					$searchlikes .= "OR imas_questionset.id=?) AND ";
+  					$searchlikevals[] = $safesearch;
+  					$isIDsearch = $safesearch;
+  				} else {
+  					$searchlikes .= ") AND";
+  				}
+        }
 			}
 		}
 
@@ -798,7 +800,7 @@ if ($myrights<20) {
 			$query .= " AND imas_questionset.id NOT IN (SELECT iq.id FROM imas_questionset AS iq JOIN imas_library_items as ili on ili.qsetid=iq.id AND ili.deleted=0";
 			$query .= " JOIN imas_libraries AS il ON ili.libid=il.id AND il.deleted=0 WHERE il.federationlevel>0)";
 		}
-		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist{0}=='0')) {
+		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist[0]=='0')) {
 			$query .= " LIMIT 300";
 		}
 		$resultLibs = $DBH->prepare($query);
@@ -956,10 +958,12 @@ $address = $GLOBALS['basesiteurl'] . '/course';
 if ($overwriteBody==1) {
 	echo $body;
 } else {
+  $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+
 ?>
 <script type="text/javascript">
 function previewq(formn,loc,qn) {
-	var addr = '<?php echo $imasroot ?>/course/testquestion.php?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
+	var addr = '<?php echo $imasroot ?>/course/<?php echo $testqpage;?>?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
 	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
 	previewpop.focus();
 }

@@ -85,6 +85,13 @@
           value="Submit"
         />
         <button
+          v-if="showPreviewAll"
+          class = "secondary"
+          @click = "teacherPreviewAll"
+        >
+          {{ $t('closed.teacher_previewall_button') }}
+        </button>
+        <button
           v-if="hasExit"
           type="button"
           class="secondary"
@@ -178,6 +185,9 @@ export default {
       }
       return true;
     },
+    showPreviewAll () {
+      return store.assessInfo.can_view_all && !this.aInfo.view_as_stu;
+    },
     showReset () {
       return this.aInfo.is_teacher &&
         !this.aInfo.view_as_stu &&
@@ -216,6 +226,9 @@ export default {
           action: () => this.reallyStartAssess()
         };
       }
+    },
+    teacherPreviewAll () {
+      actions.startAssess(false, '', [], null, true);
     },
     reallyStartAssess () {
       const pwval = this.password;

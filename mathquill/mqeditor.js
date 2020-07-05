@@ -20,6 +20,7 @@ var MQeditor = (function($) {
     layout: []
   };
   var MQconfig = {};
+  var initialized = false;
   var curMQfield = null;
   var blurTimer = null;
   var keyRepeatInterval = null;
@@ -181,11 +182,12 @@ var MQeditor = (function($) {
   function showEditor(event) {
     clearTimeout(blurTimer);
     var mqel = $(event.target).closest(".mathquill-math-field");
-    if (curMQfield === null) {
+    if (initialized === false) {
       // first time through: inject the mqeditor div
       $("body").append($("<div/>", {id:"mqeditor", class:"mqeditor"}));
       // prevent clicks in editor from triggering blur in MQ field
       $("#mqeditor").on("mousedown touchstart", function(evt) {evt.preventDefault();});
+      initialized = true;
     }
     // update layoutStyle if needed
     var lastlayoutstyle = config.curlayoutstyle;
@@ -270,6 +272,7 @@ var MQeditor = (function($) {
       $("#mqeditor").hide();
     }
     $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
+    curMQfield = null;
   }
 
   /*
@@ -278,6 +281,7 @@ var MQeditor = (function($) {
   function resetEditor() {
     clearTimeout(blurTimer);
     $("#mqeditor").hide();
+    curMQfield = null;
   }
 
 

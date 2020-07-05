@@ -253,8 +253,11 @@ var livepoll = new function() {
 		//pre-explode initpts for draw
 		var initpts,drawwidth,drawheight;
 		if (qdata[curquestion].anstypes=="draw") {
-			var initpts = qdata[curquestion].drawinit.replace(/"|'/g,'').split(",");
-			for (var j=1;j<initpts.length;j++) {
+			var initpts = qdata[curquestion].drawinit;
+			if (typeof initpts === 'string') {
+				initpts = initpts.replace(/"|'/g,'').split(",");
+			}
+			for (var j=1;j<Math.max(11,initpts.length);j++) {
 				initpts[j] *= 1;  //convert to number
 			}
 		}

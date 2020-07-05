@@ -6,6 +6,7 @@ require_once("includes/newusercommon.php");
 if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
 	require("init.php");
 } else {
+	$init_session_start = true;
 	require("init_without_validate.php");
 	if (isset($CFG['CPS']['theme'])) {
 		$defaultcoursetheme = $CFG['CPS']['theme'][0];
@@ -87,6 +88,9 @@ switch($_GET['action']) {
 				echo '</div>';
 			}
 		}
+		$_SESSION['challenge'] = uniqid();
+		echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
+		echo '<span style="display:none"><input name=hval></span>';
 		echo "<div class=submit><input type=submit value='",_('Sign Up'),"'></div>\n";
 		echo "</form>\n";
 		if (isset($studentTOS)) {

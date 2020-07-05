@@ -260,7 +260,8 @@ if (isset($_GET['record'])) {
 	}
 	$DBH->commit();
 	if (isset($_POST['save']) && $_POST['save']=='Save') {
-		header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, Sanitize::randomQueryStringParam()));
+		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+		header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid.$btf, Sanitize::randomQueryStringParam()));
 	} else {
 		header(sprintf('Location: %s/course/adddrillassess.php?cid=%s&daid=%d&r=%s', $GLOBALS['basesiteurl'], $cid, $daid, Sanitize::randomQueryStringParam()));
 	}
@@ -277,8 +278,9 @@ if ($stm->rowCount()>0) {
 }
 
 $useeditor = "summary";
+$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 $placeinhead = "<script type=\"text/javascript\">
-		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
+		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
 		</script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js"></script>';
@@ -354,7 +356,7 @@ if (!$beentaken) {
 
 	if (isset($search)) {
 		$qarr = $searchlikevals;
-		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
+		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.meantime,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 		$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id AND imas_library_items.deleted=0 ";
 		$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND $searchlikes ";
 		$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";

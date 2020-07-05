@@ -650,10 +650,12 @@ function recclick(type,typeid,info,txt) {
 	}
 }
 function setuptracklinks(i,el) {
+	jQuery(el).addClass("trackprepped");
 	if (jQuery(el).attr("data-base")) {
 		jQuery(el).click(function(e) {
 			var inf = jQuery(this).attr('data-base').split('-');
-			recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
+			recclick(inf[0], inf[1], jQuery(this).attr("href"),
+				jQuery(this).clone().find(".sr-only").remove().end().text());
 			if (typeof(jQuery(el).attr("target"))=="undefined") {
 				e.preventDefault();
 				setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
@@ -662,7 +664,8 @@ function setuptracklinks(i,el) {
 		}).mousedown(function(e) {
 			if (e.which==3) { //right click
 				var inf = jQuery(this).attr('data-base').split('-');
-				recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
+				recclick(inf[0], inf[1], jQuery(this).attr("href"),
+					jQuery(this).clone().find(".sr-only").remove().end().text());
 			}
 		});
 	}
@@ -675,16 +678,16 @@ function togglevideoembed() {
 		if (els.css('display')=='none') {
 			els.show();
 			els.parent('.fluid-width-video-wrapper').show();
-			jQuery(this).text(' [-]');
-			jQuery(this).attr('title',_("Hide video"));
-			jQuery(this).attr('aria-label',_("Hide embedded video"));
+			jQuery(this).text(' [-]')
+				.attr('title',_("Hide video"))
+				.attr('aria-label',_("Hide embedded video"));
 		} else {
 			els.hide();
 			els.get(0).contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
 			els.parent('.fluid-width-video-wrapper').hide();
 			jQuery(this).text(' [+]');
 			jQuery(this).attr('title',_("Watch video here"));
-			jQuery(this).attr('aria-label',_("Embed video here"));
+			jQuery(this).attr('aria-label',_("Embed video") + ' ' + jQuery(this).prev().text());
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
@@ -735,8 +738,9 @@ function togglevideoembed() {
 		}).insertAfter(jQuery(this));
 		jQuery(this).parent().fitVids();
 		jQuery('<br/>').insertAfter(jQuery(this));
-		jQuery(this).text(' [-]');
-		jQuery(this).attr('title',_("Hide video"));
+		jQuery(this).text(' [-]')
+			.attr('title',_("Hide video"))
+			.attr('aria-label',_("Hide embedded video"));
 		if (jQuery(this).prev().attr("data-base")) {
 			var inf = jQuery(this).prev().attr('data-base').split('-');
 			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
@@ -749,13 +753,14 @@ function setupvideoembeds(i,el) {
 		text: " [+]",
 		role: "button",
 		title: _("Watch video here"),
-		"aria-label": _("Embed video here"),
+		"aria-label": _("Embed video") + ' ' + this.textContent,
 		id: 'videoembedbtn'+videoembedcounter,
 		click: togglevideoembed,
 		keydown: function (e) {if (e.which == 13) { $(this).click();}},
 		tabindex: 0,
 		"class": "videoembedbtn"
 	}).insertAfter(el);
+	jQuery(el).addClass("prepped");
 	videoembedcounter++;
 }
 
@@ -763,7 +768,7 @@ var fileembedcounter = 0;
 function setuppreviewembeds(i,el) {
 	var filetypes = 'doc|docx|pdf|xls|xlsx|ppt|pptx|jpg|gif|png|jpeg';
 	if (window.fetch) { filetypes += '|heic'; }
-	var regex = new RegExp('\.(' + filetypes + ')', 'i');
+	var regex = new RegExp('\.(' + filetypes + ')($|\\?)', 'i');
 	if (el.href.match(regex)) {
 		jQuery('<span/>', {
 			text: " [+]",
@@ -809,11 +814,11 @@ function togglefileembed() {
 		}
 	} else {
 		var href = jQuery(this).prev().attr('href');
-		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)/i)) {
+		if (href.match(/\.(doc|docx|pdf|xls|xlsx|ppt|pptx)($|\?)/i)) {
 			var src;
 			if (href.match(/\.pdf/) && supportsPdf()) {
 				src = href;
-			} else if (href.match(/\.(doc|docx|xls|xlsx|ppt|pptx)/i)) {
+			} else if (href.match(/\.(doc|docx|xls|xlsx|ppt|pptx)($|\?)/i)) {
 				src = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(href);
 			} else {
 				src = 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(href);
@@ -826,7 +831,7 @@ function togglefileembed() {
 				frameborder: 0,
 				allowfullscreen: 1
 			}).insertAfter(jQuery(this));
-		} else if (href.match(/\.(heic)/i)) {
+		} else if (href.match(/\.(heic)($|\?)/i)) {
 			jQuery('<div>', {
 				id: 'fileiframe' + id,
 				text: 'Converting HEIC file (this may take a while)...'
@@ -854,6 +859,29 @@ function togglefileembed() {
 	}
 }
 
+jQuery(function() {
+	var m;
+	if (m = window.location.href.match(/course\.php.*cid=(\d+).*folder=([\d\-]+)/)) {
+		window.sessionStorage.setItem('btf'+m[1], m[2]);
+	}
+	jQuery('a[href*="course.php"]').each(function(i,el) {
+		if (!el.href.match(/folder=/) && (m=el.href.match(/cid=(\d+)/))) {
+			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
+			if (btf !== '') {
+				el.href += '&folder='+btf;
+			}
+		}
+	});
+	jQuery('form').each(function(i,el) {
+		if (m=el.getAttribute('action').match(/cid=(\d+)/)) {
+			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
+			if (btf !== '') {
+				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
+			}
+		}
+	});
+});
+
 function convertheic(href, divid) {
 	fetch(href)
   .then(function(res) { return res.blob();})
@@ -872,6 +900,9 @@ function convertheic(href, divid) {
 function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
+	}
+	if (el.target) {
+		jQuery(el).append('<span class="sr-only">Opens externally</span>');
 	}
 }
 function addBlankTarget(i,el) {
@@ -1015,11 +1046,12 @@ function initlinkmarkup(base) {
 	if (typeof isImathasAssessment != 'undefined') {
 		$(base).find('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
 	}
-	$(base).find('a').each(setuptracklinks).each(addNoopener);
-	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
-	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a').each(setupvideoembeds);
+	$(base).find('a').not('.trackprepped').each(setuptracklinks).each(addNoopener);
+	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
+	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
+	setupToggler2(base);
 	$(base).fitVids();
 }
 
@@ -1120,6 +1152,25 @@ function setupToggler(base) {
 						targ.show();
 					}
 				}
+			}
+		});
+	});
+}
+
+function setupToggler2(base) {
+	$(base).find(".togglecontrol:not(.togglerinit)").each(function() {
+		$(this).addClass("togglerinit").attr("aria-expanded", false)
+		.on("click keydown", function(e) {
+			if (e.type=="click" || e.which==13) {
+				var targ = $("#"+$(this).attr("aria-controls"));
+				if ($(this).attr("aria-expanded") == "true") {
+					$(this).attr("aria-expanded", false);
+					targ.hide();
+				} else {
+					$(this).attr("aria-expanded", true);
+					targ.show();
+				}
+				return false;
 			}
 		});
 	});

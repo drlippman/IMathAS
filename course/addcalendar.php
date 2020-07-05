@@ -23,27 +23,14 @@ if (!(isset($teacherid))) {
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
 } elseif (isset($_GET['remove'])) { // a valid delete request loaded the page
+	require("delitembyid.php");
 	$DBH->beginTransaction();
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
 	$itemid = Sanitize::onlyInt($_GET['id']);
-	$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
-	$stm->execute(array(':id'=>$itemid));
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-	$stm->execute(array(':id'=>$cid));
-	$items = unserialize($stm->fetchColumn(0));
-
-	$blocktree = explode('-',$block);
-	$sub =& $items;
-	for ($i=1;$i<count($blocktree);$i++) {
-		$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-	}
-	$key = array_search($itemid,$sub);
-	array_splice($sub,$key,1);
-	$itemorder = serialize($items);
-	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+	delitembyid($itemid);
+	removeItemFromItemorder($cid,$itemid,$block);
 	$DBH->commit();
 } else {
 	$DBH->beginTransaction();
@@ -74,7 +61,8 @@ if (!(isset($teacherid))) {
 	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 	$DBH->commit();
 }
-header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf");
 exit;
 
 ?>

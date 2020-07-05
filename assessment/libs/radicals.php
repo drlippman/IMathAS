@@ -18,7 +18,7 @@ function reduceradical($in,$root=2,$format="string") {
 		return;
 	}
 	$in = intval($in);
-	
+
 	if ($in > 10000000) {
 		if ($GLOBALS['myrights'] > 10) {
 			echo 'Input to reduceradical was too large';
@@ -39,9 +39,9 @@ function reduceradical($in,$root=2,$format="string") {
 		echo "can't handle negative roots";
 		return;
 	}
-	
+
 	$root = intval($root);
-	
+
 	if ($in<0) {
 		$sign = '-';
 	} else {
@@ -51,7 +51,7 @@ function reduceradical($in,$root=2,$format="string") {
 	$in = abs($in);
 	$max = 	pow($in,1/$root);
 	$out = 1;
-	
+
 	//look for biggest perfect power first
 	for ($i=floor($max+.01);$i>1 && $in>1;$i--) {
 		if ($in%(pow($i,$root))==0) {
@@ -67,6 +67,8 @@ function reduceradical($in,$root=2,$format="string") {
 		$outstr .= $sign;
 		if ($out>1 || $in==1) {
 			$outstr .= $out;
+		} else if ($in == 0) {
+			$outstr .= '0';
 		}
 		if ($in>1) {
 			if ($root==2) {
@@ -176,7 +178,7 @@ function reduceradicalfrac2($n,$d,$rootnum,$rat=false,$root=2,$format="string") 
 		if ($format=='disp') {
 			$outstr .= '`';
 		}
-		
+
 		$outstr .= $n;
 		if ($d>1 || $in>1) {
 			$outstr .= '/';
@@ -197,7 +199,7 @@ function reduceradicalfrac2($n,$d,$rootnum,$rat=false,$root=2,$format="string") 
 				$outstr .= ')';
 			}
 		}
-		
+
 		if ($format=='disp') {
 			$outstr .= '`';
 		}

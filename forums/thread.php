@@ -373,7 +373,7 @@ if (isset($_GET['markallread'])) {
 
 $pagetitle = "Threads";
 $placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js?v=050220\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
 $placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
@@ -688,11 +688,16 @@ echo "</p>";
 					$posts = 0;
 					$lastpost = '';
 				}
-				echo "<tr id=\"tr".Sanitize::onlyInt($line['id'])."\"";
+				$classes = array();
 				if ($line['posttype']>0) {
-					echo "class=sticky";
-				} else if (isset($flags[$line['id']])) {
-					echo "class=tagged";
+					$classes[] = "sticky";
+				}
+				if (isset($flags[$line['id']])) {
+					$classes[] = "tagged";
+				}
+				echo "<tr id=\"tr".Sanitize::onlyInt($line['id'])."\"";
+				if (count($classes)>0) {
+					 echo ' class="'.implode(' ',$classes).'"';
 				}
 				echo "><td>";
 				echo "<span class=\"right\">\n";
@@ -703,13 +708,12 @@ echo "</p>";
 					echo '<span class="forumcattag">'.Sanitize::encodeStringForDisplay($line['tag']).'</span> ';
 				}
 
-				if ($line['posttype']==0) {
-					if (isset($flags[$line['id']])) {
-						echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
-					} else {
-						echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
-					}
-				} else if ($isteacher) {
+				if (isset($flags[$line['id']])) {
+					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
+				} else {
+					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
+				}
+				if ($isteacher) {
 					if ($line['posttype']==2) {
 						echo "<img class=mida src=\"$imasroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
 					} else if ($line['posttype']==3) {

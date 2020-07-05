@@ -96,6 +96,12 @@
         >
           {{ $t('closed.teacher_preview_button') }}
         </button>
+        <button
+          class = "secondary"
+          @click = "teacherPreviewAll"
+        >
+          {{ $t('closed.teacher_previewall_button') }}
+        </button>
       </p>
 
     </div>
@@ -226,6 +232,7 @@ export default {
       return (this.settings.is_lti &&
         !this.canViewAll &&
         this.settings.viewingb !== 'never' &&
+        this.settings.prev_attempts.length > 0 &&
         (this.settings.available === 'practice' || this.settings.available === 'pastdue')
       );
     },
@@ -291,6 +298,9 @@ export default {
     },
     teacherPreview () {
       actions.startAssess(false, '', []);
+    },
+    teacherPreviewAll () {
+      actions.startAssess(false, '', [], null, true);
     },
     doReset () {
       actions.loadAssessData(null, true);

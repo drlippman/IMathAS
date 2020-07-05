@@ -62,6 +62,9 @@
         :disabled = "!canSubmit"
       >
         {{ submitLabel }}
+        <span class="sr-only">
+          {{ $t('question_n', {n: qn+1}) }}
+        </span>
       </button>
       <button
         v-if = "canJumpToAnswer"
@@ -72,6 +75,17 @@
       >
         {{ $t('question.jump_to_answer') }}
       </button>
+    </div>
+    <div v-else-if="showNext"  class="submitbtnwrap">
+      <router-link
+        :to="'/skip/'+ (this.qn + 2)"
+        tag="button"
+        class="secondarybtn"
+        :disabled = "!canSubmit"
+      >
+        <icons name="right" />
+        {{ $t('question.next') }}
+      </router-link>
     </div>
   </div>
 </template>
@@ -112,20 +126,38 @@ export default {
     questionContentLoaded () {
       return (this.questionData.html !== null);
     },
-    showSubmit () {
+    hasSeqNext () {
+      return (this.questionData.jsparams &&
+        this.questionData.jsparams.hasseqnext);
+    },
+    hasSubmitAll () {
+      return (this.questionData.jsparams &&
+        this.questionData.jsparams.submitall === 1);
+    },
+    buttonsOk () {
       return (store.inProgress &&
         this.questionContentLoaded &&
         !store.inPrintView &&
+        !this.disabled &&
         this.questionData.withdrawn === 0 &&
-        this.questionData.canretry && (
+        this.questionData.canretry);
+    },
+    showSubmit () {
+      return (this.buttonsOk && (
         store.assessInfo.submitby === 'by_question' ||
-          this.questionData.tries_max > 1
+          store.assessInfo.showscores === 'during' ||
+          this.hasSeqNext
       ) && (
       // if livepoll, only show if state is 2
         store.assessInfo.displaymethod !== 'livepoll' ||
           this.state === 2
       )
       );
+    },
+    showNext () {
+      return (this.buttonsOk && !this.showSubmit &&
+        store.assessInfo.displaymethod === 'skip' &&
+        this.qn < store.assessInfo.questions.length - 1);
     },
     submitClass () {
       return (store.assessInfo.submitby === 'by_assessment')
@@ -134,6 +166,8 @@ export default {
     showScore () {
       return (store.inProgress &&
         !store.inPrintView &&
+        !this.disabled &&
+        this.questionData.hadSeqNext !== true &&
         (this.questionData.hasOwnProperty('score') ||
          this.questionData.status === 'attempted'
         ) &&
@@ -144,16 +178,23 @@ export default {
       );
     },
     submitLabel () {
+      let label = 'question.';
       if (store.assessInfo.submitby === 'by_question') {
         // by question submission
-        return this.$t('question.submit');
-      } else if (this.questionData.tries_max === 1) {
-        // by assessment, with one try
-        return this.$t('question.saveans');
+        label += 'submit';
+      } else if (store.assessInfo.showscores === 'during') {
+        // by assessment, show scores
+        label += 'checkans';
       } else {
-        // by assessment, can retry
-        return this.$t('question.checkans');
+        // by assessment, with one try
+        label += 'saveans';
       }
+      if (this.hasSeqNext) {
+        label += '_seqnext';
+      } else if (this.hasSubmitAll) {
+        label += '_submitall';
+      }
+      return this.$t(label);
     },
     showHelps () {
       return ((store.assessInfo.hasOwnProperty('help_features') && (
@@ -289,17 +330,6 @@ export default {
       // set work
       this.work = this.questionData.work;
 
-      let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
-      svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
-      let svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.partial') + '">';
-      svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
-      let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
-      svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
-      window.$(this.$refs.thisqwrap).find('.scoremarker').remove();
-      window.$(this.$refs.thisqwrap).find('div.ansgrn,table.ansgrn').append(svgchk);
-      window.$(this.$refs.thisqwrap).find('div.ansyel,table.ansyel').append(svgychk);
-      window.$(this.$refs.thisqwrap).find('div.ansred,table.ansred').append(svgx);
-
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
           if (el.name.match(/^(qn|tc|qs)\d/)) {
@@ -308,11 +338,7 @@ export default {
         });
       };
 
-      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
-
-      window.$(this.$refs.thisqwrap).find('select.ansgrn').after(svgchk);
-      window.$(this.$refs.thisqwrap).find('select.ansyel').after(svgychk);
-      window.$(this.$refs.thisqwrap).find('select.ansred').after(svgx);
+      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ, this.$refs.thisqwrap);
 
       actions.setRendered(this.qn, true);
     },

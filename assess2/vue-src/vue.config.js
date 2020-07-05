@@ -23,7 +23,7 @@ module.exports = {
   },
   // in dev server mode, proxy all requests to localhost
   devServer: {
-    proxy: 'http://localhost'
+    proxy: process.env.VUE_APP_PROXY
   },
   pages: {
     index: 'src/main.js',

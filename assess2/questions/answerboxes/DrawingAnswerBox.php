@@ -119,7 +119,7 @@ class DrawingAnswerBox implements AnswerBox
     					if (strpos($grid[$i],':')!==false) {
     						$pts = explode(':',$grid[$i]);
     						foreach ($pts as $k=>$v) {
-    							if ($v{0}==="h") {
+    							if ($v[0]==="h") {
     								$pts[$k] = "h".evalbasic(substr($v,1));
     							} else {
     								$pts[$k] = evalbasic($v);
@@ -259,7 +259,7 @@ class DrawingAnswerBox implements AnswerBox
     				}
     			} else {
     				//$bg = getgraphfilename($plot);
-
+            $bg = preg_replace('/.*script=\'(.*?[^\\\\])\'.*/', '$1', $plot);
     				$plot = str_replace('<embed','<embed data-nomag=1',$plot); //hide mag
     				//overlay canvas over SVG.
     				$out .= '<div class="drawcanvas" style="position:relative;width:'.$settings[6].'px;height:'.$settings[7].'px">';
@@ -482,15 +482,17 @@ class DrawingAnswerBox implements AnswerBox
     			];
 
           $settings = array_map('floatval', $settings);
-    			$params['canvas'] = [$qn,'',$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
+    			$params['canvas'] = [$qn,$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
     			$out .= '<input ' .
-    							Sanitize::generateAttributeString($attributes) .
+    							'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
+                  Sanitize::generateAttributeString($attributes) .
     							'" />';
 
     			if (isset($GLOBALS['capturedrawinit'])) {
             $GLOBALS['drawinitdata'][$qn] = [$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
-    				$params['livepoll_drawinit'] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
+    				//$params['livepoll_drawinit'] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
+    			  $params['livepoll_drawinit'] = $GLOBALS['drawinitdata'][$qn];
     			}
     		}
         if ($colorbox!='') { $out .= '</div>';}

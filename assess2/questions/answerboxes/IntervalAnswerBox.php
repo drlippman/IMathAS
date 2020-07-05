@@ -50,7 +50,7 @@ class IntervalAnswerBox implements AnswerBox
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (isset($ansprompt)) {
-          $out .= "<label for=\"qn$qn\">$ansprompt</label>";
+          $out .= $ansprompt;
         }
 
         $ansformats = array_map('trim',explode(',',$answerformat));
@@ -120,10 +120,11 @@ class IntervalAnswerBox implements AnswerBox
     		}
 
     		$out .= '<input ' .
-    						Sanitize::generateAttributeString($attributes) .
+    						'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
+                Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';
-                
+
         $preview .= "<span id=p$qn></span> ";
 
     		if (in_array('nosoln',$ansformats))  {

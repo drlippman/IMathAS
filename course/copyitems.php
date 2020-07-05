@@ -99,7 +99,8 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+			$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 			if ($_POST['whattocopy']=='all') {
@@ -119,7 +120,7 @@ if (!(isset($teacherid))) {
 			}
 			$DBH->beginTransaction();
 			if (isset($_POST['copycourseopt'])) {
-				$tocopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,picicons,showlatepass,theme,latepasshrs,deflatepass';
+				$tocopy = 'ancestors,allowunenroll,copyrights,msgset,showlatepass,theme,latepasshrs,deflatepass';
 				$stm = $DBH->prepare("SELECT $tocopy FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$ctc));
 				$row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -371,7 +372,8 @@ if (!(isset($teacherid))) {
 					$calitems[] = $row;
 				}
 			} else {
-			  header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+				$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf&r=" . Sanitize::randomQueryStringParam());
 
 				exit;
 			}
@@ -379,12 +381,11 @@ if (!(isset($teacherid))) {
 		} elseif (isset($_GET['action']) && $_GET['action']=="select") { //DATA MANIPULATION FOR second option
 			$items = false;
 
-			$stm = $DBH->prepare("SELECT id,itemorder,picicons,name,UIver FROM imas_courses WHERE id IN (?,?)");
+			$stm = $DBH->prepare("SELECT id,itemorder,name,UIver FROM imas_courses WHERE id IN (?,?)");
 			$stm->execute(array($_POST['ctc'], $cid));
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['id']==$ctc) {
 					$items = unserialize($row['itemorder']);
-					$picicons = $row['picicons'];
 					$ctcname = $row['name'];
 					$sourceUIver = $row['UIver'];
 				}
@@ -481,12 +482,8 @@ if ($overwriteBody==1) {
 
 //DISPLAY BLOCK FOR SECOND STEP - selecting course item
 
-// if source is using assess2 and dest is not, bail
-if ($sourceUIver > $destUIver) {
-	echo '<p>'._('The course you selected is using a newer version of assessments than your course. It is not possible to convert assessment back to an older format, sorry.').'</p>';
-	require("../footer.php");
-	exit;
-}
+// if source is using assess2 and dest is not, exclude assessments
+$excludeAssess = ($sourceUIver > $destUIver);
 
 ?>
 	<script type="text/javascript">
@@ -503,6 +500,11 @@ if ($sourceUIver > $destUIver) {
 	</script>
 	<p>Copying course: <b><?php echo Sanitize::encodeStringForDisplay($ctcname);?></b></p>
 
+<?php
+	if ($excludeAssess) {
+		echo '<p class=noticetext>'._('The course you selected is using a newer version of assessments than your course. It is not possible to convert assessment back to an older format, sorry, so assessments will not be included in the list below.').'</p>';
+	}
+?>
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
 	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
@@ -511,14 +513,17 @@ if ($sourceUIver > $destUIver) {
 		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.Sanitize::onlyInt($ctc).'">'._('Preview source course').'</a>';}
 	?>
 	<br/>
-	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>
-	<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"> <label for=whattocopy2>Select items to copy</label></p>
-
+	<?php
+	if (!$excludeAssess) {
+		echo '<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>'._('Copy whole course').'</label><br/>';
+	}
+	echo '<input type=radio name=whattocopy value="select" id=whattocopy2 onchange="updatetocopy(this)"'.($excludeAssess?' checked':'').'> <label for=whattocopy2>'._('Select items to copy').'</label></p>';
+	?>
 	<div id="allitemsnote" style="display:none;">
 	<p class="noticetext"><?php echo _('You are about to copy ALL items in this course.'); ?></p>
 	<p><?php echo _("In most cases, you'll want to leave the options below set to their default	values"); ?> </p>
 	</div>
-	<div id="selectitemstocopy" style="display:none;">
+	<div id="selectitemstocopy" <?php echo $excludeAssess?'':'style="display:none"';?>>
 	<h3><?php _('Select Items to Copy'); ?></h3>
 
 	<?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a>
@@ -526,11 +531,7 @@ if ($sourceUIver > $destUIver) {
 	<table cellpadding=5 class=gb>
 		<thead>
 		<?php
-		if ($picicons) {
 			echo '<tr><th></th><th>'._('Title').'</th><th>'._('Summary').'</th></tr>';
-		} else {
-			echo '<tr><th></th><th>'._('Type').'</th><th>Title</th><th>'._('Summary').'</th></tr>';
-		}
 		?>
 
 		</thead>
@@ -539,6 +540,9 @@ if ($sourceUIver > $destUIver) {
 		$alt=0;
 
 		for ($i = 0 ; $i<(count($ids)); $i++) {
+			if ($excludeAssess && $types[$i]=='Assessment') {
+				continue;
+			}
 			if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
 			if (strpos($types[$i],'Block')!==false) {
@@ -555,24 +559,19 @@ if ($sourceUIver > $destUIver) {
 		<?php
 			$tdpad = 16*strlen($prespace[$i]);
 
-			if ($picicons) {
-				echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
-				switch ($types[$i]) {
-					case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
-					case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
-					case 'LinkedText': echo $CFG['CPS']['miniicons']['linked']; break;
-					case 'Forum': echo $CFG['CPS']['miniicons']['forum']; break;
-					case 'Wiki': echo $CFG['CPS']['miniicons']['wiki']; break;
-					case 'Block': echo $CFG['CPS']['miniicons']['folder']; break;
-					case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
-					case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
-				}
-				echo '" class="floatleft"/><div style="margin-left:21px">'.$names[$i].'</div></td>';
-			} else {
-
-				echo '<td>'.$prespace[$i].$names[$i].'</td>';
-				echo '<td>'.$types[$i].'</td>';
+			echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
+			switch ($types[$i]) {
+				case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
+				case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
+				case 'LinkedText': echo $CFG['CPS']['miniicons']['linked']; break;
+				case 'Forum': echo $CFG['CPS']['miniicons']['forum']; break;
+				case 'Wiki': echo $CFG['CPS']['miniicons']['wiki']; break;
+				case 'Block': echo $CFG['CPS']['miniicons']['folder']; break;
+				case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
+				case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
 			}
+			echo '" class="floatleft"/><div style="margin-left:21px">'.$names[$i].'</div></td>';
+
 		?>
 			<td><?php echo $sums[$i] ?></td>
 		</tr>

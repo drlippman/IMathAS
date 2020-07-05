@@ -101,5 +101,6 @@ if (isset($_GET['backref'])) {
 } else {
 	$backref = '';
 }
-header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$backref");
+$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
+header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid$btf$backref");
 ?>

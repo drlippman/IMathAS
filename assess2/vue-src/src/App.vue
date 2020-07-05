@@ -1,5 +1,5 @@
 <template>
-  <div id="app" role="main" aria-live="polite">
+  <div id="app" role="main">
     <div v-if="!assessInfoLoaded">
       {{ $t('loading') }}
     </div>
@@ -9,12 +9,14 @@
     <error-dialog
       v-if="hasError"
       :errormsg="errorMsg"
+      :lastpos="lastPos"
       @clearerror="clearError"
     />
     <due-dialog v-if="showDueDialog"/>
     <confirm-dialog
       v-if="confirmObj !== null"
       :data="confirmObj"
+      :lastpos="lastPos"
       @close="closeConfirm"
     />
   </div>
@@ -56,6 +58,9 @@ export default {
     },
     showDueDialog () {
       return store.show_enddate_dialog;
+    },
+    lastPos () {
+      return store.lastPos;
     }
   },
   methods: {
@@ -111,6 +116,12 @@ export default {
     }
   },
   created () {
+    window.$(document).on('click', function (e) {
+      store.lastPos = e.pageY;
+    });
+    window.$(document).on('focusin', function (e) {
+      store.lastPos = e.target.getBoundingClientRect().top;
+    });
     window.$(window).on('beforeunload', this.beforeUnload);
     // Give a warning if the assessment is quiz-style and not submitted
     // We're attaching this to breadcrumbs and nav buttons to avoid the default

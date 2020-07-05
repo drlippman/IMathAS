@@ -70,7 +70,7 @@ $vueData = array(
 	'defoutcome' => $line['defoutcome'],
 	'outcomeOptions' => $outcomeOptions,
 	'isgroup' => $line['isgroup'],
-	'groupmax' => ($line['groupmax'] > 2) ? $line['groupmax'] : 6,
+	'groupmax' => ($line['groupmax'] > 1) ? $line['groupmax'] : 6,
 	'canchangegroup' => !($taken && $line['isgroup']>0),
 	'groupsetid' => $line['groupsetid'],
 	'groupOptions' => $groupOptions,
@@ -166,7 +166,7 @@ $vueData = array(
 		</span><br class=form />
 	</div>
 
-	<div v-if="avail==1 && edatetype=='edate'">
+	<div v-show="avail==1 && edatetype=='edate'">
 		<span class=form><?php echo _('Practice mode');?>:</span>
 		<span class=formright>
 			<label>

@@ -64,23 +64,24 @@ Matrix functions.  Version 1.6, Jan 19
 </ul>
 <h3><a name="matrix">matrix</a></h3>
 matrix(vals,rows,cols)
-<BR>Creates a new matrix item.  
+<BR>Creates a new matrix item.
 <BR>Use matrixformat() to create display or $answer from a matrix item
 <BR>vals: list or array of numbers to form matrix values: R1C1,R1C2,...,R2C1,R2C2,...
 <BR>rows, cols: dimensions of matrix
 <BR>To define a matrix using calculations use:
 <BR>$m = matrix(array(3/2,2^3,5+1,3),2,2)
 <BR><h3><a name="matrixformat">matrixformat</a></h3>
-matrixformat(matrix)
+matrixformat(matrix, [bracket])
 <BR>Formats a matrix item into an ASCIIMath string for display or $answer
+<br>Defaults to square brackets, or set bracket to '(' or '|'.
 <BR><h3><a name="matrixdisplaytable">matrixdisplaytable</a></h3>
 matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
 <BR>&nbsp;Create a string that is a valid HTML table syntax for display.
 <BR>&nbsp;matrix: a matrix to be displayed in a HTML table
-<BR>&nbsp;matrixname: a string that holds the matrix name, like A or B.  This does not contain 
+<BR>&nbsp;matrixname: a string that holds the matrix name, like A or B.  This does not contain
 <BR>&nbsp;&nbsp;&nbsp;tick marks - if you want them you need to supply them.
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default empty string
-<BR>&nbsp;displayASCIIticks: put tick marks around each element of the table, either 0 or 1.  
+<BR>&nbsp;displayASCIIticks: put tick marks around each element of the table, either 0 or 1.
 <BR>&nbsp;&nbsp;&nbsp;Use 0 if you are building an answerbox matrix.
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 do not use math ticks (default)
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 use math ticks
@@ -120,7 +121,7 @@ matrixgetcol(matrix,col,[asArray])
 <BR><h3><a name="matrixgetsubmatrix">matrixgetsubmatrix</a></h3>
 matrixgetsubmatrix(matrix,rowselector,colselector)
 <BR>gets submatrix.  rowselector and colselector are strings
-<BR>with format:  "start:end".  ":" to select all 
+<BR>with format:  "start:end".  ":" to select all
 <BR><h3><a name="matrixsum">matrixsum</a></h3>
 matrixsum(matrix,matrix)
 <BR>Adds two matrices
@@ -185,16 +186,16 @@ matrixsolvefrac(A,b)
 <BR>A and b are both matrices
 <BR>A is nxn, b is nxm
 <BR>returns nxm matrix x so Ax = b
-<BR>entries may be fractions (as strings), so don't 
-<BR>try to use the result in calculations. 
+<BR>entries may be fractions (as strings), so don't
+<BR>try to use the result in calculations.
 <BR><h3><a name="matrixreduce">matrixreduce</a></h3>
 matrixreduce(A,[rref,frac])
 <BR>reduces the matrix A to echelon or reduced echelon form
 <BR>A is a matrix
 <BR>rref = true for rref, false for echelon (default)
 <BR>frac = true for fraction output, false for decimal output (default)
-<BR>&nbsp;&nbsp;if true, entries may be fractions (as strings), so don't 
-<BR>&nbsp;&nbsp;try to use the result in calculations. 
+<BR>&nbsp;&nbsp;if true, entries may be fractions (as strings), so don't
+<BR>&nbsp;&nbsp;try to use the result in calculations.
 <BR>NOTE:  In most cases, using matrixrandunreduce is a better option than using this!
 <BR><h3><a name="matrixnumsolutions">matrixnumsolutions</a></h3>
 matrixnumsolutions(A,n)
@@ -206,7 +207,7 @@ matrixround(matrix, decimal places)
 <BR>rounds each entry of the matrix the specified decimal places
 <BR><h3><a name="polyregression">polyregression</a></h3>
 polyregression(x,y,n)
-<BR>find a nth degree polynomial that best fits the data 
+<BR>find a nth degree polynomial that best fits the data
 <BR>x,y arrays of data
 <BR>returns an array (intercept, linear coeff, quad coeff, ...)
 <BR><br>
@@ -220,36 +221,36 @@ determines if a vector is the 0 vector<br>
 </p>
 <h3><a name="matrixFormMatrixFromEigValEigVec">matrixFormMatrixFromEigValEigVec</a></h3>
 <p>matrixFormMatrixFromEigValEigVec(eigenvalues,matrix of eigenvectors)<br>
-eigenvalues: The eigenvalues of the matrix include multiple times if 
+eigenvalues: The eigenvalues of the matrix include multiple times if
 multiplicity &gt; 0<br>
-matrix of eigenvectors: imput a matrix that consists of the eigenvectors of the 
+matrix of eigenvectors: imput a matrix that consists of the eigenvectors of the
 original matrix<br>
 returns the matrix PAP^-1<br>
 </p>
 <h3><a name="matrixIsRowsLinInd">matrixIsRowsLinInd</a></h3>
 <p>matrixIsRowsLinInd(matrix)<br>
-matrix: matrix's row vectors are the vectors we are looking at seeing if they 
+matrix: matrix's row vectors are the vectors we are looking at seeing if they
 are linearly independent<br>
 &nbsp;returns true if they are LI and false if they are LD<br>
 </p>
 <h3><a name="matrixIsColsLinInd">matrixIsColsLinInd</a></h3>
 <p>matrixIsColsLinInd(matrix)<br>
-matrix: matrix's column vectors are the vectors we are looking at seeing if they 
+matrix: matrix's column vectors are the vectors we are looking at seeing if they
 are linearly independent<br>
 &nbsp;returns true if they are LI and false if they are LD<br>
 </p>
 <h3><a name="matrixIsEigVec">matrixIsEigVec</a></h3>
 <p>matrixIsEigVec(matrix,eigenvector)<br>
 matrix: the matrix that we are testing<br>
-eigenvector: the possible eigenvector that we are checking.&nbsp; It is an 
+eigenvector: the possible eigenvector that we are checking.&nbsp; It is an
 array, not a matrix.<br>
-&nbsp;returns true is eigenvector is an eigenvector of matrix. Otherwise it 
+&nbsp;returns true is eigenvector is an eigenvector of matrix. Otherwise it
 returns false<br>
 </p>
 <h3><a name="matrixIsEigVal">matrixIsEigVal</a></h3>
 <p>matrixIsEigVal(matrix,eigenvalue)<br>
 matrix: the matrix that we are testing<br>
-eigenvalue a real number that we are testing to see if it is an eigenvalue of 
+eigenvalue a real number that we are testing to see if it is an eigenvalue of
 matrix.<br>
 </p>
 <h3><a name="matrixGetRowSpace">matrixGetRowSpace</a></h3>
@@ -278,7 +279,7 @@ tests if the rows of A are a basis for the row space of B<br>
 </p>
 <h3><a name="matrixGetMinor">matrixGetMinor</a></h3>
 <p>matrixGetMinor(matrix,rowNo,colNo)<br>
-returns the n-1 by n-1 matrix minor obtained by removing the rowNo row and colNo 
+returns the n-1 by n-1 matrix minor obtained by removing the rowNo row and colNo
 column. Only works for a square matrix.<br>
 </p>
 <h3><a name="matrixDet">matrixDet</a></h3>
@@ -290,8 +291,8 @@ returns the determinant of a matrix<br>
 returns matrix with random integer entries where the integers are between max and min values.<br>
 For cases where you'll want to solve Ax=b, use matrixrandinvertible instead</p>
 <h3><a name="matrixRandomSpan">matrixRandomSpan</a></h3>
-<p>matrixRandomSpan(matrix)<br>returns a matrix of rows that span the row space 
-of matrix<br>the number of rows of the spanning matrix will either be the same 
+<p>matrixRandomSpan(matrix)<br>returns a matrix of rows that span the row space
+of matrix<br>the number of rows of the spanning matrix will either be the same
 or one larger than the original matrix's number of rows.</p>
 <h3><a name="matrixNumberOfRows">matrixNumberOfRows</a></h3>
 <p>matrixNumberOfRows(matrix)<br>&nbsp;returns the number of rows of a matrix</p>
@@ -302,7 +303,7 @@ or one larger than the original matrix's number of rows.</p>
 <p>matrixParseStuans(student answer)</p>
 <p>Converts a students matrix answer into a single array of values</p>
 <p>student answer can come from <code>$stuanswers[$thisq]</code> for single-part
-questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for 
+questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for
 multi-part</p>
 
 <p>&nbsp;</p>

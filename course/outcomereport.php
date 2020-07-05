@@ -107,6 +107,7 @@ if ($report == 'overview') {
 			$usefullwidth = true;
 		}
 	}
+	$placeinhead .= '$(function() {ts.init();});';
 	$placeinhead .= "\nfunction lockcol() { \n";
 	$placeinhead .= "var tog = ts.toggle(); ";
 	$placeinhead .= "document.cookie = 'ocrhdr-$cid=1';\n document.getElementById(\"lockbtn\").value = \"" . _('Unlock headers') . "\"; ";

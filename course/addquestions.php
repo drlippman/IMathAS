@@ -5,7 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 include("../includes/htmlutil.php");
-
+require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -149,12 +149,34 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
+			$grades = array();
 			if ($aver > 1) {
+				$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+				$stm->execute(array(':assessmentid'=>$aid));
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			    $grades[$row['userid']]=$row["score"];
+				}
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 			} else {
+				$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid'=>$aid));
+        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+          $sp = explode(';', $row['bestscores']);
+          $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+          $total = array_sum(explode(',', $as));
+          $grades[$row['userid']] = $total;
+        }
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
 			}
 			$stm->execute(array(':assessmentid'=>$aid));
+			if ($stm->rowCount()>0) {
+        TeacherAuditLog::addTracking(
+          $cid,
+          "Clear Attempts",
+          $aid,
+          array('grades'=>$grades)
+        );
+      }
 			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
@@ -430,9 +452,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	$address = $GLOBALS['basesiteurl'] . "/course/$addassess?cid=$cid&aid=$aid";
-
+	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 	$placeinhead = "<script type=\"text/javascript\">
-		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
+		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
 		var addqaddr = '$address';
 		var assessver = '$aver';
 		</script>";
@@ -715,27 +737,29 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						unset($searchterms[$k]);
 					}
 				}
-				$searchlikes = '(';
-				if (count($wholewords)>0) {
-					$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
-				}
-				if (count($searchterms)>0) {
+				if (count($wholewords)>0 || count($searchterms)>0) {
+					$searchlikes .= '(';
 					if (count($wholewords)>0) {
-						$searchlikes .= 'AND ';
+						$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(? IN BOOLEAN MODE) ';
+						$searchlikevals[] = implode(' ', $wholewords);
 					}
-					$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
-					foreach ($searchterms as $t) {
-						$searchlikevals[] = "%$t%";
+					if (count($searchterms)>0) {
+						if (count($wholewords)>0) {
+							$searchlikes .= 'AND ';
+						}
+						$searchlikes .= "(imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+						foreach ($searchterms as $t) {
+							$searchlikevals[] = "%$t%";
+						}
+					}
+					if (ctype_digit($safesearch)) {
+						$searchlikes .= "OR imas_questionset.id=?) AND ";
+						$searchlikevals[] = $safesearch;
+						$isIDsearch = $safesearch;
+					} else {
+						$searchlikes .= ") AND";
 					}
 				}
-				if (ctype_digit($safesearch)) {
-					$searchlikes .= "OR imas_questionset.id=?) AND ";
-					$searchlikevals[] = $safesearch;
-					$isIDsearch = $safesearch;
-				} else {
-					$searchlikes .= ") AND";
-				}
-
 			}
 		}
 
@@ -1269,7 +1293,7 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<p>
-		<button type="button" title=<?php echo '"'._("Exit back to course page"),'"'; ?> onClick="window.location='course.php?cid=<?php echo $cid ?>'"><?php echo _("Done"); ?></button>
+		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
 		<button type="button" title=<?php echo '"'._("Modify assessment settings").'"'; ?> onClick="window.location='<?php echo $address;?>?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"><?php echo _("Assessment Settings"); ?></button>
 		<button type="button" title=<?php echo '"'._("Categorize questions by outcome or other groupings").'"'; ?> onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"><?php echo _("Categorize Questions"); ?></button>
 		<button type="button" onClick="window.location='<?php

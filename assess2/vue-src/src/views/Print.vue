@@ -34,8 +34,9 @@
     </p>
     <div class="scrollpane">
       <div
-        v-if = "intro != '' && showTexts"
+        v-if = "intro != ''"
         v-html = "intro"
+        v-show = "showTexts"
       />
       <div>
         <div

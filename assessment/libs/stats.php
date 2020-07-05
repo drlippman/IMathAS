@@ -2,7 +2,14 @@
 //A library of Stats functions.  Version 1.10, Nov 17, 2017
 
 global $allowedmacros;
-array_push($allowedmacros,"nCr","nPr","mean","stdev","absmeandev","percentile","interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile","Excelquartileexc","Nplus1quartile","allquartile","median","freqdist","frequency","histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf","tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf","binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart","mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","percentile",
+ "interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile",
+ "Excelquartileexc","Nplus1quartile","allquartile","median","freqdist","frequency",
+ "histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf",
+ "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
+ "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
+ "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
+ "csvdownloadlink");
 
 //nCr(n,r)
 //The Choose function
@@ -43,33 +50,52 @@ function nPr($n,$r){
 
 //mean(array)
 //Finds the mean of an array of numbers
-function mean($a) {
+function mean($a,$w=null) {
 	if (!is_array($a)) {
 		echo 'mean expects an array';
 		return false;
 	}
-	return (array_sum($a)/count($a));
+  if (is_array($w)) {
+    if (count($a) != count($w)) {
+      echo 'weights must have same count as array';
+      return false;
+    }
+    for ($i=0;$i<count($a);$i++) {
+      $a[$i] *= $w[$i];
+    }
+    return (array_sum($a)/array_sum($w));
+  } else {
+	  return (array_sum($a)/count($a));
+  }
 }
 
 //variance(array)
 //the (sample) variance of an array of numbers
-function variance($a) {
+function variance($a,$w=null) {
 	if (!is_array($a)) {
 		echo 'stdev/variance expects an array';
 		return false;
 	}
+  $useW = false;
+  if (is_array($w)) {
+    if (count($a) != count($w)) {
+      echo 'weights must have same count as array';
+      return false;
+    }
+    $useW = true;
+  }
 	$v = 0;
-	$mean = mean($a);
-	foreach ($a as $x) {
-		$v += pow($x-$mean,2);
+	$mean = mean($a,$w);
+	foreach ($a as $i=>$x) {
+		$v += pow($x-$mean,2) * ($useW ? $w[$i] : 1);
 	}
-	return ($v/(count($a)-1));
+	return ($v/(($useW ? array_sum($w) : count($a))-1));
 }
 
 //stdev(array)
 //the (sample) standard deviation of an array of numbers
-function stdev($a) {
-	return sqrt(variance($a));
+function stdev($a,$w=null) {
+	return sqrt(variance($a,$w));
 }
 
 //absmeandev(array)
@@ -807,7 +833,7 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 
 	$out = array();
 	for ($i=0; $i<$n; $i++) {
-		$out[] = -$mu*log($RND->rand(1,32768)/32768);
+		$out[] = round(-$mu*log($RND->rand(1,32768)/32768), $rnd);
 	}
 	return $out;
 }
@@ -948,7 +974,7 @@ function boxplot($arr,$label="",$options = array()) {
 //calculates the area under the standard normal distribution to the left of the
 //z-value z, to dec decimals (defaults to 4, max of 10)
 //based on someone else's code - can't remember whose!
-function normalcdf($ztest,$dec=4) {
+/*function normalcdf($ztest,$dec=4) {
 	if (!is_finite($ztest)) {
 		echo 'invalid value for z';
 		return 0;
@@ -1006,6 +1032,47 @@ function normalcdf($ztest,$dec=4) {
 		$pval = round(1-$eps,$dec);
 	}
 	return $pval;
+}
+*/
+// port from jStat, MIT License
+function erf($x) {
+  $cof = [-1.3026537197817094, 6.4196979235649026e-1, 1.9476473204185836e-2,
+             -9.561514786808631e-3, -9.46595344482036e-4, 3.66839497852761e-4,
+             4.2523324806907e-5, -2.0278578112534e-5, -1.624290004647e-6,
+             1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
+             6.529054439e-9, 5.059343495e-9, -9.91364156e-10,
+             -2.27365122e-10, 9.6467911e-11, 2.394038e-12,
+             -6.886027e-12, 8.94487e-13, 3.13092e-13,
+             -1.12708e-13, 3.81e-16, 7.106e-15,
+             -1.523e-15, -9.4e-17, 1.21e-16,
+             -2.8e-17];
+  $isneg = false;
+  $d = 0;
+  $dd = 0;
+
+  if ($x < 0) {
+    $x = -$x;
+    $isneg = true;
+  }
+
+  $t = 2 / (2 + $x);
+  $ty = 4 * $t - 2;
+
+  for($j = count($cof) - 1; $j > 0; $j--) {
+    $tmp = $d;
+    $d = $ty * $d - $dd + $cof[$j];
+    $dd = $tmp;
+  }
+
+  $res = $t * exp(-$x * $x + 0.5 * ($cof[0] + $ty * $d) - $dd);
+  return $isneg ? $res - 1 : 1 - $res;
+}
+function normalcdf($z,$dec=4) {
+  if (!is_finite($ztest)) {
+		echo 'invalid value for z';
+		return 0;
+	}
+  return round(0.5 * (1 + erf(($z) / sqrt(2))), $dec);
 }
 
 //tcdf(t,df,[dec])
@@ -1965,6 +2032,31 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 	}
 	$out .= '<div style="height: 1px; clear: left;">&nbsp;</div></div>';
 	return $out;
+}
+
+//argument should be header,column,header,column,...
+function csvdownloadlink() {
+  $alist = func_get_args();
+  if (count($alist)==0 || count($alist)%2==1) {
+    echo "invalid arguments to csvdownloadlink";
+    return '';
+  }
+  $rows = array();
+  for ($i=0;$i<count($alist);$i+=2) {
+    $rows[0] .= '"'.str_replace('"','',$alist[$i]).'",';
+    for ($j=0;$j<count($alist[$i+1]);$j++) {
+      $rows[$j+1] .= (is_numeric($alist[$i+1][$j]) ?
+        floatval($alist[$i+1][$j]) :
+        '"'.str_replace('"','',$alist[$i+1][$j]).'"')
+        . ',';
+    }
+  }
+  foreach ($rows as $i=>$row) {
+    $rows[$i] = rtrim($row,',');
+  }
+  $str = implode("\n",$rows);
+  return '<a download="data.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
+    . _('Download CSV').'</a>';
 }
 
 

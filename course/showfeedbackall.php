@@ -80,10 +80,10 @@ require("../header.php");
 echo '<h1>'.sprintf(_('All Feedback For %s'), $gbt[1][0][0]).'</h1>';
 
 for ($i=0;$i<count($gbt[0][1]);$i++) {
-	if ($gbt[1][1][$i][1] == '' || $gbt[1][1][$i][1]=='<p></p>') {
+	if ($gbt[1][1][$i][1] === '' || $gbt[1][1][$i][1]==='<p></p>') {
 		continue;
 	}
-	if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]=='N/A') {
+	if (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A') {
 		continue;
 	}
 	if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden

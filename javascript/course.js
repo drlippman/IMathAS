@@ -28,6 +28,7 @@ function ahahDone(url, target) {
       $('#'+target+' div.itemhdricon[data-tip]').on('click mouseover', icontipshow).on('mouseout', tipout);
       var x = document.getElementById(target).getElementsByTagName("script");
       for(var i=0;i<x.length;i++) {
+        if (x[i].type == "math/asciimath") { continue; }
 	      if (x[i].src) {
 		      var script = document.createElement("script");
 		      script.src = x[i].src;

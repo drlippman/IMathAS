@@ -2,6 +2,7 @@
   <transition name="fade">
     <div
       :class="['scoreresult', status]"
+      tabindex = "-1"
       v-if="expanded"
     >
       <p v-if="showScores">
@@ -24,9 +25,8 @@
           v-if = "showNext"
           :to="'/skip/' + (this.qn + 2)"
           tag="button"
-          :aria-label="$t('next')"
         >
-          <icons name="right" />
+          <icons name="right" alt=""/>
           {{ $t('scoreresult.next') }}
         </router-link>
         <button
@@ -42,7 +42,7 @@
           type = "button"
           @click = "trySimilar"
         >
-          <icons name="retake" />
+          <icons name="retake" alt="" />
           {{ $t('scoreresult.trysimilar') }}
         </button>
         <span v-if = "qdata.canretry">
