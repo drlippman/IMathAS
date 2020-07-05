@@ -3133,11 +3133,14 @@ A student is asked to enter a function
 	Include "ignore_case,false" to make the search case sensitive.
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "toconst" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
+<dt>$answerformat = "equation" or "inequality" or "toconst" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
 	answer should also be an equation.  Be sure to specify all variables in the equation in $variables.  This may fail
+	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
+	"inequality": Specifies that the answer is expected to be an inequality rather than an expression.
+	The given answers hould also be an inequality.  Be sure to specify all variables in the equation in $variables.  This may fail
 	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
