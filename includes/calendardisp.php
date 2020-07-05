@@ -683,6 +683,7 @@ foreach ($itemsimporder as $item) {
 				if ($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {  //hide link and grey if not current
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
+					$assess[$moday][$k]['inactive'] = true;
 				}
 				$k++;
 			}
