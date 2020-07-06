@@ -706,7 +706,8 @@ foreach ($itemsimporder as $item) {
 				$names[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][4];
 				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
 					$colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
+                    $assess[$moday][$k]['color'] = '#ccc';
+                    $assess[$moday][$k]['inactive'] = true;
 				}
 				$k++;
 			}
