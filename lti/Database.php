@@ -26,11 +26,11 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param  string           $client_id
    * @return LTI_Registration
    */
-  public function find_registration_by_issuer(string $iss, string $client_id): LTI_Registration {
+  public function find_registration_by_issuer(string $iss, string $client_id): LTI\LTI_Registration {
     $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=? AND client_id=?');
     $stm->execute(array($iss, $client_id));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
-    if ($row === false) {
+    if ($row === false || $row === null) {
       return false;
     }
     return LTI\LTI_Registration::new()
@@ -48,7 +48,7 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param  string         $deployment_id
    * @return LTI_Deployment
    */
-  public function find_deployment(int $platform_id, string $deployment_id): LTI_Deployment {
+  public function find_deployment(int $platform_id, string $deployment_id): LTI\LTI_Deployment {
     $stm = $this->dbh->prepare('SELECT * FROM imas_lti_deployments WHERE platform=? AND deployment=?');
     $stm->execute(array($platform_id, $deployment_id));
     if ($stm->rowCount()===0) {
@@ -100,7 +100,6 @@ class Imathas_LTI_Database implements LTI\Database {
   public function delete_key(string $keyseturl, string $kid): void {
     $stm = $this->dbh->prepare('DELETE FROM imas_lti_keys WHERE key_set_url=? AND kid=?');
     $stm->execute(array($keyseturl, $kid));
-    return $stm->fetch(PDO::FETCH_ASSOC);
   }
 
   /**
@@ -131,7 +130,7 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm = $this->dbh->prepare('SELECT * FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
     $stm->execute(array($platform_id, $scope));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
-    if ($row === false) {
+    if ($row === false || $row === null) {
       return array(false,0);
     } else if ($row['expires'] > time()) {
       $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
@@ -194,9 +193,10 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param string          $section     a section identifer
    */
   public function enroll_if_needed(int $userid, string $role,
-    LTI_Localcourse $localcourse, string $section=''
+    LTI\LTI_Localcourse $localcourse, string $section=''
   ): void {
     if ($role == 'Instructor') {
+        print_r($localcourse);
       $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=?');
       $stm->execute(array($userid, $localcourse->get_courseid()));
       if (!$stm->fetchColumn(0)) {
@@ -207,7 +207,7 @@ class Imathas_LTI_Database implements LTI\Database {
       $stm = $this->dbh->prepare('SELECT id,lticourseid FROM imas_students WHERE userid=? AND courseid=?');
       $stm->execute(array($userid, $localcourse->get_courseid()));
       $row = $stm->fetch(PDO::FETCH_ASSOC);
-      if ($row === false) {
+      if ($row === false || $row === null) {
         $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,lticourseid) VALUES (?,?,?,?)');
         $stm->execute(array($userid, $localcourse->get_courseid(), $section, $localcourse->get_id()));
       } else if ($row['lticourseid'] !== $localcourse->get_id()) {
@@ -246,17 +246,17 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param  int $platform_id
    * @return null|LTI_Localcourse local course info
    */
-  public function get_local_course(string $contextid, int $platform_id): ?LTI_Localcourse {
+  public function get_local_course(string $contextid, int $platform_id): ?LTI\LTI_Localcourse {
     $query = 'SELECT ilc.id,ilc.courseid,ilc.copiedfrom,ic.UIver,ic.dates_by_lti FROM
       imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
       WHERE ilc.contextid=? AND ilc.org=?';
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($contextid, 'LTI13-'.$platform_id));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
-    if ($row === false) {
+    if ($row === false || $row === null) {
       return null;
     } else {
-      return LTI_Localcourse::new($row);
+      return LTI\LTI_Localcourse::new($row);
     }
   }
 
@@ -404,7 +404,7 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param  int    $platform_id      imas_lti_platforms.id
    * @return null|LTI_Placement
    */
-  public function get_link_assoc(string $resource_link_id, string $contextid, int $platform_id): ?LTI_Placement {
+  public function get_link_assoc(string $resource_link_id, string $contextid, int $platform_id): ?LTI\LTI_Placement {
     $query = "SELECT ip.typeid,ip.placementtype,ia.date_by_lti,ia.enddate,ia.startdate
       FROM imas_lti_placements AS ip LEFT JOIN imas_assessments AS ia
       ON ip.typeid=ia.id AND ip.placementtype='assess'
@@ -413,7 +413,7 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm->execute(array($resource_link_id, $contextid, 'LTI13-'.$platform_id));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     if ($row !== false) {
-      return LTI_Placement::new()
+      return LTI\LTI_Placement::new()
         ->set_typeid($row['typeid'])
         ->set_placementtype($row['placementtype'])
         ->set_typenum($this->types_as_num[$row['placementtype']])
@@ -435,12 +435,12 @@ class Imathas_LTI_Database implements LTI\Database {
    */
   public function make_link_assoc(int $typeid, string $placementtype,
     string $resource_link_id, string $contextid, int $platform_id
-  ): LTI_Placement {
+  ): LTI\LTI_Placement {
     $query = 'INSERT INTO imas_lti_placements (typeid,placementtype,linkid,contextid,org) VALUES (?,?,?,?,?)';
     $stm = $this->dbh->prepare($query);
     $stm->execute(array($typeid,$placementtype,$resource_link_id,$contextid,'LTI13-'.$platform_id));
     $typenum = $this->types_as_num[$placementtype];
-    return LTI_Placement::new()
+    return LTI\LTI_Placement::new()
       ->set_typeid($typeid)
       ->set_placementtype($placementtype)
       ->set_typenum($typenum);
@@ -488,7 +488,7 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param int           $lms_duedate  the new duedate provided by the LMS
    * @return void
    */
-  public function set_or_update_duedate_exception(int $userid, LTI_Placement $link, int $lms_duedate): void {
+  public function set_or_update_duedate_exception(int $userid, LTI\LTI_Placement $link, int $lms_duedate): void {
     $aid = $link->get_typeid();
     $stm = $this->dbh->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
@@ -638,9 +638,9 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param array              $info    name, ptsposs, and optionally date_by_lti, enddate, startdate
    * @param LTI_Localcourse    $localcourse
    */
-  public function set_or_create_lineitem(LTI_Message_Launch $launch, LTI_Placement $link,
-      array $info, LTI_Localcourse $localcourse
-  ): void {
+  public function set_or_create_lineitem(LTI\LTI_Message_Launch $launch, LTI\LTI_Placement $link,
+      array $info, LTI\LTI_Localcourse $localcourse
+  ): bool {
     $platform_id = $launch->get_platform_id();
     $itemtype = $link->get_typenum();
     $typeid = $link->get_typeid();
@@ -654,7 +654,7 @@ class Imathas_LTI_Database implements LTI\Database {
           ->set_resource_id($itemtype.'-'.$typeid)
           ->set_score_maximum($info['ptsposs'])
           ->set_label($info['name']);
-        if ($link->get_placementtype()) == 'assess') {
+        if ($link->get_placementtype() == 'assess') {
           // TODO: figure this out.  Ideally we should link the lineitem to
           // the resource_link.id, but Canvas doesn't seem to like this ?
           // Perhaps it doesn't recognize the link as owned by the tool.
@@ -678,7 +678,24 @@ class Imathas_LTI_Database implements LTI\Database {
         $stm = $this->dbh->prepare('INSERT INTO imas_lti_lineitems (itemtype,typeid,lticourseid,lineitem) VALUES (?,?,?,?)');
         $stm->execute(array($itemtype, $typeid, $localcourse->get_id(), $lineitemstr));
       }
+      return true;
+    } else {
+        return false;
     }
+  }
+
+  /**
+   * Determine if there is a lineitem stored in the database already
+   * @param   LTI_Placement      $link
+   * @param   LTI_Localcourse    $localcourse
+   * @return bool
+   */ 
+  public function has_lineitem(LTI\LTI_Placement $link, LTI\LTI_Localcourse $localcourse): bool {
+    $itemtype = $link->get_typenum();
+    $typeid = $link->get_typeid();
+    $stm = $this->dbh->prepare('SELECT lineitem FROM imas_lti_lineitems WHERE itemtype=? AND typeid=? AND lticourseid=?');
+    $stm->execute(array($itemtype, $typeid,$localcourse->get_id()));
+    return ($stm->fetchColumn(0) !== false);
   }
 
   /**

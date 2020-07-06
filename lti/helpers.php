@@ -58,7 +58,7 @@ function parse_name_from_launch(array $data) {
  * @param  Database $db
  * @return array  ('type'=>, 'refcid'=> ) and possibly others
  */
-function parse_target_link(string $targetlink, Database $db): array {
+function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): array {
   parse_str(parse_url($targetlink, PHP_URL_QUERY), $param);
 
   if (!empty($param['refaid'])) {

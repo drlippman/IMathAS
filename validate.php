@@ -494,7 +494,11 @@
 				exit;
 			}
 		} else if ($_SESSION['ltirole']=='instructor') {
-			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+            if (!empty($_SESSION['ltiver'] && $_SESSION['ltiver']=='1.3')) {
+                $breadcrumbbase = "<a id=ltihomelink href=\"$imasroot/lti/ltihome.php\">LTI Home</a> &gt; ";
+            } else {
+                $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+            }
 		} else {
 			$breadcrumbbase = '';
 		}

@@ -142,6 +142,7 @@ if ($localuserid === false) {
 // We have a local userid, so log them in.
 $_SESSION['lti_user_id'] = $ltiuserid;
 $_SESSION['userid'] = $localuserid;
+$_SESSION['ltiver'] = '1.3';
 require_once(__DIR__."/../includes/userprefs.php");
 generateuserprefs();
 

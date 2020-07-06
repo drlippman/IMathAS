@@ -879,7 +879,11 @@ jQuery(function() {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
 			}
 		}
-	});
+    });
+    var ltihome;
+    if ((ltihome = document.getElementById('ltihomelink')) && window.sessionStorage.getItem('LTI1p3_launchid')) {
+        ltihome.href += '?launchid=' + encodeURIComponent(window.sessionStorage.getItem('LTI1p3_launchid'));
+    }
 });
 
 function convertheic(href, divid) {

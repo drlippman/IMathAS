@@ -76,7 +76,7 @@ function show_postback_form($launch, $db, $err='') {
     echo '<p class=noticetext>'.$err.'</p>';
   }
   echo '<form id=postbackform method=post class="limitaftervalidate" action="finishlogin.php">';
-  echo '<input type=hidden name=launchid value="'.$launch->get_launch_id().'"/>';
+  echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
 
   if ($promptForLogin) {
     echo '<p>'.sprintf(_('If you already have an account on %s, please enter your username and password below to enable automated signin.'), $installname).'</p>';
@@ -154,7 +154,8 @@ function show_postback_form($launch, $db, $err='') {
 			var thedate = new Date();
 			document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
 			var tz = jstz.determine();
-			document.getElementById("tzname").value = tz.name();
+            document.getElementById("tzname").value = tz.name();
+            window.sessionStorage.setItem('LTI1p3_launchid','<?php echo Sanitize::encodeStringForDisplay($launch->get_launch_id());?>');
       <?php
       if (!$promptForLogin && !$promptForName) {
         echo 'document.getElementById("postbackform").submit();';
