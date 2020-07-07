@@ -52,33 +52,56 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
   exit;
 }
 
+$bbclientid = false;
+$query = "SELECT ip.id,ip.issuer,ip.client_id,ip.created_at,
+  GROUP_CONCAT(ig.name SEPARATOR ';;') AS groups FROM
+  imas_lti_platforms AS ip
+  LEFT JOIN imas_lti_deployments AS id ON id.platform=ip.id
+  LEFT JOIN imas_lti_groupassoc AS iga ON iga.deploymentid=id.id
+  LEFT JOIN imas_groups AS ig ON iga.groupid=ig.id
+  GROUP BY ip.id ORDER BY ip.issuer,ip.created_at";
+$stm = $DBH->query($query);
+$platforms = $stm->fetchAll(PDO::FETCH_ASSOC);
+foreach ($platforms as $row) {
+  if ($row['issuer'] == 'https://blackboard.com') {
+    $bbclientid = $row['client_id'];
+  }
+}
+
+$pagetitle = _('LTI 1.3 Platforms');
 require("../../header.php");
+
+echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('LTI 1.3 Platforms').'</div>';
 
 $domainsite = $httpmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 
 echo '<h1>'._('LTI 1.3 Platforms').'</h1>';
 echo '<h2>'._('Existing Platforms').'</h2>';
-$stm = $DBH->query('SELECT id,issuer,client_id,created_at FROM imas_lti_platforms WHERE 1');
-echo '<form method="post" action="platforms.php">';
-echo '<ul class=nomark>';
-if ($stm->rowCount()===0) {
-  echo '<li>'._('No platforms').'</li>';
-}
-$bbclientid = false;
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-  if ($row['issuer'] == 'https://blackboard.com') {
-    $bbclientid = $row['client_id'];
-  }
-  echo '<li>'._('Issuer: ').Sanitize::encodeStringForDisplay($row['issuer']);
-  echo ', '._('ClientID: ').Sanitize::encodeStringForDisplay($row['client_id']);
-  echo ', '._('Created: ') . date("M j Y ", strtotime($row['created_at']));
-  echo ' <button type=submit name="delete" value="'.Sanitize::encodeStringForDisplay($row['id']).'" ';
-  echo 'onclick="return confirm(\''._('Are you SURE you want to delete this platform?').'\');">';
-  echo _('Delete').'</button>';
-  echo '</li>';
-}
-echo '</ul>';
 
+echo '<form method="post" action="platforms.php">';
+if ($platforms === false) {
+  echo '<p>'._('No platforms').'</p>';
+} else {
+  echo '<table class=gb><thead><tr>';
+  echo '<th>'._('Issuer').'</th>';
+  echo '<th>'._('ClientID').'</th>';
+  echo '<th>'._('Created').'</th>';
+  echo '<th>'._('Groups').'</th>';
+  echo '<th>'._('Delete').'</th>';
+  echo '</tr></thead><tbody>';
+  foreach ($platforms as $i=>$row) {
+    echo '<tr class="'.($i%2==0?'even':'odd').'">';
+    echo '<td>'.Sanitize::encodeStringForDisplay($row['issuer']).'</td>';
+    echo '<td>'.Sanitize::encodeStringForDisplay($row['client_id']).'</td>';
+    echo '<td>'. date("M j Y ", strtotime($row['created_at'])).'</td>';
+    echo '<td>'. str_replace(';;','<br>',Sanitize::encodeStringForDisplay($row['groups'])).'</td>';
+    echo '<td><button type=submit name="delete" value="'.Sanitize::encodeStringForDisplay($row['id']).'" ';
+    echo 'onclick="return confirm(\''._('Are you SURE you want to delete this platform?').'\');">';
+    echo _('Delete').'</button>';
+    echo '</td></tr>';
+  }
+  echo '</tbody></table>';
+}
 echo '<h2>'._('New Platform').'</h2>';
 echo '<p><label for=lms>'._('Select your LMS').'</label>: ';
 echo '<select id=lms name=lms>';
