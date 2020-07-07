@@ -30,7 +30,6 @@ function show_postback_form($launch, $db, $err='') {
       // no local user yet - see if we have enough info
       $name = parse_name_from_launch($launch->get_launch_data());
       if ($name === false) {
-        print_r($launch->get_launch_data());
         $promptForName = true;
       }
       if (!empty($localcourse->get_allow_direct_login())) {

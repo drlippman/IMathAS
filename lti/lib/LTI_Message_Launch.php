@@ -326,9 +326,9 @@ class LTI_Message_Launch {
       }
     }
     public function get_platform_context_history() {
-      $context = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/context'];
-      if (!empty($context['history'])) {
-        return explode(',', $context['history']);
+      $custom = $this->get_custom();
+      if (!empty($custom['context_history'])) {
+        return explode(',', $custom['context_history']);
       } else {
         return array();
       }

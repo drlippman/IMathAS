@@ -1,5 +1,7 @@
 <?php
 
+use \IMSGlobal\LTI;
+
 /**
  * Displays the deep linking resource selection form
  * @param LTI_Message_Launch $launch
@@ -7,8 +9,8 @@
  * @param LTI_Localcourse    $localcourse
  * @param Database           $db
  */
-function deep_link_form(LTI_Message_Launch $launch, int $localuserid,
-  LTI_Localcourse $localcourse, Database $db
+function deep_link_form(LTI\LTI_Message_Launch $launch, int $localuserid,
+  LTI\LTI_Localcourse $localcourse, LTI\Database $db
 ): void {
   global $imasroot,$installname,$coursetheme,$CFG;
 

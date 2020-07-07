@@ -44,7 +44,7 @@ if ($_POST['linktype'] == 'assoc') {
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
   $destcid = copycourse($_POST['copyselect'], $contextlabel, $newUIver);
   $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel);
-  $localcourse = LTI_Localcourse::new()
+  $localcourse = LTI\LTI_Localcourse::new()
     ->set_courseid($destcid)
     ->set_copiedfrom(intval($_POST['copyselect']))
     ->set_UIver($newUIver ? 2 : 1)

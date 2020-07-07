@@ -5,7 +5,21 @@
  * this out with ability for teachers or group admins to edit their
  * own registrations, and customize for each LMS.
  *
+ * TODO:  Add subsitution variables:
+ *   context_history = $Context.id.history
+ *
+ *
+ * TODO: LMS may not send client_id in OIDC launch, which will prevent us from
+ *   being able to look up their platform and return a client_id.
+ *   Need to test if the major LMSs send client_id in the OIDC launch.  If not,
+ *   we'll need to find a way to customize the OIDC launch URL to specify the
+ *   client_id, like on the query string.  But we don't know the client_id until
+ *   after the registration, so that'll be annoying.  We could also pre-assign
+ *   the platform ID and include that in the query string, but then we'd be
+ *   wasting an an autoincrement ID if we don't follow through with the registration.
  */
+
+
 
 require("../../init.php");
 

@@ -13,8 +13,6 @@ function copycourse($sourcecid, $name, $newUIver) {
   $blockcnt = 1;
   $itemorder = serialize(array());
   $randkey = uniqid();
-  $hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
-  $picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
   $allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
   $copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
   $msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
@@ -28,10 +26,10 @@ function copycourse($sourcecid, $name, $newUIver) {
   $lockaid = 0;
   $DBH->beginTransaction();
 
-  $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
-  $query .= "(:name,:ownerid,:enrollkey,:hideicons,:picicons,:allowunenroll,:copyrights,:msgset,:showlatepass,:itemorder,:available,:theme,:ltisecret,:blockcnt)";
+  $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,showlatepass,itemorder,available,theme,ltisecret,blockcnt) VALUES ";
+  $query .= "(:name,:ownerid,:enrollkey,:allowunenroll,:copyrights,:msgset,:showlatepass,:itemorder,:available,:theme,:ltisecret,:blockcnt)";
   $stm = $DBH->prepare($query);
-  $stm->execute(array(':name'=>$name, ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
+  $stm->execute(array(':name'=>$name, ':ownerid'=>$userid, ':enrollkey'=>$randkey,
     ':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
     ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
   $destcid = $DBH->lastInsertId();

@@ -196,7 +196,6 @@ class Imathas_LTI_Database implements LTI\Database {
     LTI\LTI_Localcourse $localcourse, string $section=''
   ): void {
     if ($role == 'Instructor') {
-        print_r($localcourse);
       $stm = $this->dbh->prepare('SELECT id FROM imas_teachers WHERE userid=? AND courseid=?');
       $stm->execute(array($userid, $localcourse->get_courseid()));
       if (!$stm->fetchColumn(0)) {
@@ -689,7 +688,7 @@ class Imathas_LTI_Database implements LTI\Database {
    * @param   LTI_Placement      $link
    * @param   LTI_Localcourse    $localcourse
    * @return bool
-   */ 
+   */
   public function has_lineitem(LTI\LTI_Placement $link, LTI\LTI_Localcourse $localcourse): bool {
     $itemtype = $link->get_typenum();
     $typeid = $link->get_typeid();
