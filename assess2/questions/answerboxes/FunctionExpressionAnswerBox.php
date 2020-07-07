@@ -67,10 +67,13 @@ class FunctionExpressionAnswerBox implements AnswerBox
     		}
     		if (in_array('equation',$ansformats)) {
     			$shorttip = _('Enter an algebraic equation');
-          $tip = _('Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
-    		} else {
+          		$tip = _('Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+    		} else if (in_array('inequality',$ansformats)) {
+    			$shorttip = _('Enter an algebraic inequality');
+          		$tip = _('Enter your answer as an inequality.  Example: y<3x^2+1, 2+x+y>=3') . "\n<br/>" . _('Be sure your variables match those in the question');
+			} else {
     			$shorttip = _('Enter an algebraic expression');
-          $tip = _('Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c') . "\n<br/>" . _('Be sure your variables match those in the question');
+          		$tip = _('Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c') . "\n<br/>" . _('Be sure your variables match those in the question');
     		}
 
     		if (!isset($variables)) { $variables = "x";}
