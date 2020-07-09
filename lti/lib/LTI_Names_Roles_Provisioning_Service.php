@@ -14,7 +14,7 @@ class LTI_Names_Roles_Provisioning_Service {
     public function get_members() {
 
         $members = [];
-
+        $context = [];
         $next_page = $this->service_data['context_memberships_url'];
 
         while ($next_page) {
@@ -26,6 +26,9 @@ class LTI_Names_Roles_Provisioning_Service {
                 null,
                 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'
             );
+            if (empty($context) && !empty($page['body']['context'])) {
+              $context = $page['body']['context'];
+            }
 
             $members = array_merge($members, $page['body']['members']);
 
@@ -37,7 +40,7 @@ class LTI_Names_Roles_Provisioning_Service {
                 }
             }
         }
-        return $members;
+        return array('members'=>$members, 'context'=>$context);
 
     }
 }

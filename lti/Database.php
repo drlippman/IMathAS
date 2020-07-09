@@ -807,4 +807,89 @@ class Imathas_LTI_Database implements LTI\Database {
     return $stm->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  /**
+   * Create and enroll users in a course based on roster data
+   * @param  array $data        array('members'=>, 'context'=>)
+   * @param  LTI_Localcourse $localcourse
+   * @param  int $platform_id
+   * @return array (count of added stu, array of unmatched stus)
+   */
+  public function update_roster(array $data, LTI\LTI_Localcourse $localcourse,
+    int $platform_id
+  ): array {
+    $section = '';
+    if (!empty($data['context']['label'])) {
+      $section = $data['context']['label'];
+    }
+
+    $query = 'SELECT iu.FirstName,iu.LastName,ilu.ltiuserid,istu.id FROM
+      imas_users AS iu JOIN imas_ltiusers AS ilu ON ilu.userid=iu.id AND ilu.org=?
+      JOIN imas_students AS istu ON istu.userid=iu.id WHERE istu.courseid=?';
+    $stm = $this->dbh->prepare($query);
+    $stm->execute(array('LTI13-'.$platform_id, $courseid));
+    $current = array();
+    $enrollcnt = 0;
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+      $current[$row['ltiuserid']] = $row;
+    }
+    foreach ($data['members'] AS $member) {
+      if (standardize_role($member['roles']) !== 'Learner') {
+        // only handling students
+        continue;
+      }
+      if (!isset($current[$member['user_id']])) {
+        // not enrolled in course
+        // See if user_id exists already
+        $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org=?');
+        $stm->execute(array($member['user_id'], 'LTI13-'.$platform_id));
+        $localuserid = $stm->fetchColumn(0);
+        if ($localuserid === false) {
+          // No existing user, create user if we have enough info
+          if (!empty($member['given_name']) && !empty($member['family_name']) {
+            // TODO create user
+            $localuserid = $this->create_user_account([
+              'SID' => uniqid(), // temporary
+              'pwhash' => 'pass',
+              'rights' => 10,
+              'firstname' => $member['given_name'],
+              'lastname' => $member['family_name'],
+              'email' => '',
+              'msgnot' => 0,
+              'groupid' => 0
+            ]);
+            $num = $this->create_lti_user($localuserid, $member['user_id'], $platform_id);
+            $this->set_user_SID($localuserid, 'lti-'.$num);
+          } else {
+            // skip this user
+            continue;
+          }
+        }
+        // enroll in course
+        $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,lticourseid) VALUES (?,?,?,?)');
+        $stm->execute(array($userid, $localcourse->get_courseid(), $section, $localcourse->get_id()));
+
+        $enrollcnt++;
+      } else {
+        // found them - remove from current list
+        unset($current[$member['user_id']]);
+      }
+    }
+    return array($enrollcnt, $current);
+  }
+
+  /**
+   * Mark the students indicated as locked from the course
+   * @param  array $stuids   array of imas_students.id
+   * @param  int  $courseid  the course id
+   * @return void
+   */
+  public function lock_stus(array $stuids, int $courseid): void {
+    if (count($stuids)>0) {
+      $ph = Sanitize::generateQueryPlaceholders($stuids);
+      $query = "UPDATE imas_students SET locked=? WHERE id IN ($ph) AND courseid=?";
+      $stm = $this->dbh->prepare($query);
+      $stm->execute(array_merge(array(time()), $stuids, array($courseid)));
+    }
+  }
+
 }

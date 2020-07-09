@@ -18,6 +18,7 @@ if (!isset($_GET['launchid'])) {
 
 require_once(__DIR__ . '/lib/lti.php');
 require_once __DIR__ . '/Database.php';
+require_once __DIR__ . '/helpers.php';
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
@@ -58,6 +59,7 @@ if (!empty($_POST['makelineitem'])) {
 	));
 	exit;
 }
+
 
 //HTML Output
 $pagetitle = "LTI Home";
@@ -132,10 +134,20 @@ if ($link->get_placementtype() == 'course') {
         echo _('LMS does not currently have a grade column for passing back grades, but the LMS supports us creating a grade column.');
 				echo '<br><button name="makelineitem" type="submit" value="1">';
 				echo _('Create Grade Column').'</button>';
+				echo '</form>';
     } else {
         echo _('Does not currently have a grade column for passing back grades, and the LMS does not support us adding one.');
     }
     echo '</p>';
+}
+if ($launch->has_nrps()) {
+	echo '<p>'.sprintf(_('The LMS offers a roster service, which allows you to update your %s roster to include all students in the LMS.'),
+		$installname).'</p>';
+	echo '<form method=post action="pullroster.php?launchid=' .
+		Sanitize::encodeStringForDisplay($launch->get_launch_id()).'">';
+	echo '<br><button name="pullroster" type="submit" value="1">';
+	echo _('Pull Roster from LMS').'</button>';
+	echo '</form>';
 }
 require("../footer.php");
 
