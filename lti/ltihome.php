@@ -11,7 +11,7 @@ if (!isset($_SESSION['ltirole']) || $_SESSION['ltirole']!='instructor') {
 }
 
 if (!isset($_GET['launchid'])) {
-    // this should have gotten inserted by general.js out of sessionstorage 
+    // this should have gotten inserted by general.js out of sessionstorage
     echo _('Missing launch id');
     exit;
 }
@@ -20,6 +20,9 @@ require_once(__DIR__ . '/lib/lti.php');
 require_once __DIR__ . '/Database.php';
 
 //Look to see if a hook file is defined, and include if it is
+if (isset($GLOBALS['CFG']['hooks']['lti'])) {
+  require_once($CFG['hooks']['lti']);
+}
 if (isset($CFG['hooks']['ltihome'])) {
 	require($CFG['hooks']['ltihome']);
 }
@@ -32,6 +35,30 @@ $resource_link = $launch->get_resource_link();
 $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
 $localcourse = $db->get_local_course($contextid, $platform_id);
 
+//Handle Postbacks
+if (!empty($_POST['makelineitem'])) {
+	// want to create a line item
+	$iteminfo = false;
+	if ($link->get_placementtype() == 'assess') {
+		$iteminfo = $db->get_assess_info($link->get_typeid());
+	} else if (function_exists('ext_get_item_info')) {
+		$iteminfo = ext_get_item_info($link);
+	}
+	if ($iteminfo !== false) {
+		$result = $db->set_or_create_lineitem($launch, $link, $iteminfo, $localcourse);
+		if ($result === false) {
+			$lineitemmsg = _('Failed to create the grade column.');
+		} else {
+			$lineitemmsg = _('Successfully created the grade column.');
+		}
+	}
+	header(sprintf('Location: %s/lti/ltihome.php?launchid=%s',
+		$GLOBALS['basesiteurl'],
+		$launch->get_launch_id()
+	));
+	exit;
+}
+
 //HTML Output
 $pagetitle = "LTI Home";
 require("../header.php");
@@ -40,7 +67,7 @@ if ($link->get_placementtype() == 'course') {
     $cid = $link->get_typeid();
 	echo '<h2>'._('LTI Placement of whole course').'</h2>';
     echo "<p><a href=\"../course/course.php?cid=" . Sanitize::courseId($cid) . "\">"._("Enter course")."</a></p>";
-    
+
 } else if ($link->get_placementtype() == 'assess') {
     $typeid = $link->get_typeid();
 	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti,ver,courseid FROM imas_assessments WHERE id=:id");
@@ -94,12 +121,19 @@ if ($link->get_placementtype() == 'course') {
 
     echo '<p>&nbsp;</p><p class=small>'.sprintf(_('This assessment is housed in course ID %s'),Sanitize::courseId($cid)).'</p>';
     echo '<p class=small>';
+		if (!empty($lineitemmsg)) {
+			echo '<p class="noticetext">'.Sanitize::encodeStringForDisplay($lineitemmsg).'</p>';
+		}
     if ($db->has_lineitem($link, $localcourse)) {
-        echo _('Has lineitem for passing back grades.');
+        echo _('Has info necessary for passing back grades.');
     } else if ($launch->can_create_lineitem()) {
-        echo _('Does not currently have a lineitem for passing back grades, but LMS supports creating lineitems.');
+				echo '<form method=post action="ltihome.php?launchid=' .
+					Sanitize::encodeStringForDisplay($launch->get_launch_id()).'">';
+        echo _('LMS does not currently have a grade column for passing back grades, but the LMS supports us creating a grade column.');
+				echo '<br><button name="makelineitem" type="submit" value="1">';
+				echo _('Create Grade Column').'</button>';
     } else {
-        echo _('Does not currently have a lineitem for passing back grades, and LMS does not support adding one.');
+        echo _('Does not currently have a grade column for passing back grades, and the LMS does not support us adding one.');
     }
     echo '</p>';
 }

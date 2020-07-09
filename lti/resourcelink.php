@@ -15,10 +15,12 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *    $localcourse the linked course info
    *    function should call $db->make_link_assoc($typeid, $type, $resource_link_id, $contextid, $platform_id)
    *      to set the association, and return LTI_Placement
-   *      where placementtype is a short string, and typenum is a tinyint
    *    and call $db->set_or_create_lineitem($launch, $link, $info, $localcourse)
-   *      if the item is going to passback a grade.  $info should be array with
-   *      indices 'name' and 'ptsposs', and optionally date_by_lti, startdate, enddate
+   *      if the item is going to passback a grade.
+   *      $info is result of ext_get_item_info($link)
+   *   ext_get_item_info(LTI_Placement)
+   *      returns array with indices 'name' and 'ptsposs',
+   *      and optionally date_by_lti, startdate, enddate
    *   ext_can_handle_redirect($placementtype)
    *   ext_redirect_launch($link)
    *    redirect to the content
