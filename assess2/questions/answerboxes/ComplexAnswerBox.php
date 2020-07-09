@@ -44,6 +44,7 @@ class ComplexAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
         if (!isset($sz)) { $sz = 20;}
@@ -71,12 +72,13 @@ class ComplexAnswerBox implements AnswerBox
     			'id' => "qn$qn",
     			'value' => $la,
     			'autocomplete' => 'off',
+                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     		];
     		$params['tip'] = $shorttip;
-        $params['longtip'] = $tip;
+            $params['longtip'] = $tip;
 
     		$out .= '<input ' .
-    						'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
                 Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';

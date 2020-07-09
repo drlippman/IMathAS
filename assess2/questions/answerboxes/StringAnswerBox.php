@@ -47,6 +47,7 @@ class StringAnswerBox implements AnswerBox
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
         if (!isset($answerformat)) { $answerformat = '';}
 
@@ -86,7 +87,9 @@ class StringAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
 
     			if ($displayformat=='alignright') {
@@ -140,7 +143,6 @@ class StringAnswerBox implements AnswerBox
     			}
 
     			$out .= '<input ' .
-    							'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
                   Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';

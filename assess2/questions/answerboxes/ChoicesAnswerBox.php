@@ -44,6 +44,7 @@ class ChoicesAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');
@@ -87,16 +88,19 @@ class ChoicesAnswerBox implements AnswerBox
     			$ncol = $displayformat[0];
     			$itempercol = ceil(count($randkeys)/$ncol);
     			$displayformat = 'column';
-    		}
+            }
+            
+            $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
+                 (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
 
     		if ($displayformat == 'inline') {
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
     			$out .= "<span $style id=\"qnwrap$qn\" role=group ";
-          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+          $out .= 'aria-label="'.$arialabel.'">';
     		} else if ($displayformat != 'select') {
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
     			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group ";
-          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+          $out .= 'aria-label="'.$arialabel.'">';
     		}
     		if ($displayformat == "select") {
     			$msg = '?';
@@ -109,7 +113,7 @@ class ChoicesAnswerBox implements AnswerBox
     			}
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
     			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style ";
-          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+          $out .= 'aria-label="'.$arialabel.'">';
           $out .= "<option value=\"NA\">$msg</option>\n";
     		} else if ($displayformat == "horiz") {
 

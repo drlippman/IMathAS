@@ -45,6 +45,7 @@ class IntervalAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -105,11 +106,13 @@ class IntervalAnswerBox implements AnswerBox
     			'name' => "qn$qn",
     			'id' => "qn$qn",
     			'value' => $la,
-    			'autocomplete' => 'off'
+    			'autocomplete' => 'off',
+                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     		];
     		$params['tip'] = $shorttip;
-        $params['longtip'] = $tip;
-        $params['calcformat'] = 'decimal';
+            $params['longtip'] = $tip;
+            $params['calcformat'] = 'decimal';
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}
@@ -120,7 +123,6 @@ class IntervalAnswerBox implements AnswerBox
     		}
 
     		$out .= '<input ' .
-    						'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
                 Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';

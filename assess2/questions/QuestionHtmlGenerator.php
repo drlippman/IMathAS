@@ -59,6 +59,7 @@ class QuestionHtmlGenerator
         'snaptogrid',
         'strflags',
         'variables',
+        'readerlabel'
     );
 
     // Variables that need to be packed up and passed to the answerbox generator.

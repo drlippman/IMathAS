@@ -52,6 +52,7 @@ class MatchingAnswerBox implements AnswerBox
         if (isset($options['matchlist'])) {if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$partnum];} else {$matchlist = $options['matchlist'];}}
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
@@ -108,7 +109,8 @@ class MatchingAnswerBox implements AnswerBox
         if ($colorbox != '') {
           $out .= 'class="'.$colorbox.'" ';
         }
-        $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+        $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().
+            (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '') . '">';
     		$out .= "<div class=\"match\" $divstyle>\n";
         if (!empty($questiontitle)) {
     		  $out .= "<p class=\"centered\">$questiontitle</p>\n";

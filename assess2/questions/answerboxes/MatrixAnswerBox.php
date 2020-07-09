@@ -46,6 +46,7 @@ class MatrixAnswerBox implements AnswerBox
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat="matrix";}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -68,7 +69,8 @@ class MatrixAnswerBox implements AnswerBox
     			} else {
     				$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
-          $arialabel = $this->answerBoxParams->getQuestionIdentifierString();
+          $arialabel = $this->answerBoxParams->getQuestionIdentifierString() . 
+            (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
           $out .= '<table role="group" aria-label="'.$arialabel.'">';
           if ($displayformat == 'det') {
              $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
@@ -135,13 +137,14 @@ class MatrixAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
     			$params['tip'] = $tip;
           $params['longtip'] = $tip;
 
     			$out .= '<input ' .
-                  'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     							Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';
