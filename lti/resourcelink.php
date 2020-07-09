@@ -90,6 +90,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       print_r($link);
       exit;
     }
+  } else {
+    $db->set_or_update_lineitem($launch, $link, $localcourse);
   }
   // OK, we have a link at this point, so now we'll redirect to it
   if ($link->get_placementtype() == 'assess') {

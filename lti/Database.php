@@ -4,6 +4,81 @@
  * Implements IMSGlobal\LTI\Database interface
  */
 
+/**
+ * Database tables and model:
+ * imas_lti_keys.  Stores tool and platform RSA keys
+ *  key_set_url     The keyset url the key came from
+ *  kid             The key ID
+ *  alg             The signature algorithm
+ *  publickey       The public key
+ *  privatekey      The private key. We only have this for our tool's keys
+ *
+ * imas_ltinonces.  Stores a cache of nonces to prevent reuse
+ *  id              An autoincrement local ID
+ *  nonce           The nonce string
+ *  time            The time the nonce was recorded. They are typically cleared after 90 min.
+ *
+ * imas_platforms.  Stores LMS registrations
+ *  id              An autoincrement local ID
+ *  issuer          The LMS's issuer name
+ *  client_id       Client ID
+ *  auth_login_url  The OpenID connect login URL
+ *  auth_token_url  The authorization token URL for services like grade passback
+ *  key_set_url     The LMS's keyset URL
+ *
+ * imas_lti_deployments.  Stores deployments of an LMS registration
+ *  id              An autoincrement local ID
+ *  platform        imas_lti_platforms.id
+ *  deployment      A deployment identifier provided by the LMS
+ *
+ * imas_lti_groupassoc.  An association between deployments and our groups
+ *  deploymentid    imas_lti_deployments.id
+ *  groupid         Our group ID, imas_groups.id
+ *
+ * imas_lti_courses.  Stores course associations
+ *  id              An autoincrement local ID
+ *  org             Stored as 'LTI13-' . imas_lti_platforms.id
+ *  contextid       A course identifier provided by the LMS
+ *  courseid        Our local course ID, imas_courses.id
+ *  copiedfrom      The imas_courses.id that was copied via the LTI interface
+ *  contextlabel    The LMS's label identifier for the course
+ *
+ * imas_ltiusers.  Stores user associations
+ *  id              An autoincrement local ID
+ *  org             Stored as 'LTI13-' . imas_lti_platforms.id
+ *  ltiuserid       A userid identifier provided by the LMS
+ *  userid          Our local user ID, imas_users.id
+ *
+ * imas_placements. Stores individual link item associations
+ *  id              An autoincrement local ID
+ *  org             Stored as 'LTI13-' . imas_lti_platforms.id
+ *  contextid       A course identifier provided by the LMS
+ *  linkid          A link identifier provided by the LMS
+ *  placementtype   A string identifier for the item type. 'assess' for assessments
+ *  typeid          The table ID for the placementtype.  imas_assessments.id for assessments
+ *
+ * imas_lti_tokens.  A store of OAuth2 service tokens
+ *  platformid      imas_lti_platforms.id
+ *  scopes          md5 hash of the scopes the token was issued for
+ *  token           The authorization token
+ *  expires         A timestamp for when the token expires
+ *
+ * imas_ltiqueue.  A store of queued lti grade updates
+ *  hash            A string of the form imas_assessments.id . '-' . imas_users.id
+ *  sourcedid       A string, formed by implode(':|:', $values), where the values are:
+ *    LTI 1.1:
+ *      lti_lis_result_sourcedid
+ *      lti_outcomeurl
+ *      LTI consumer key
+ *      LTI key lookup info: 'c' for course-level, 'u' for global
+ *    LTI 1.3:
+ *      'LTI1.3'                      the literal string as a version identifier
+ *      imas_ltiusers.ltiuserid       The LMS's user identifier
+ *      imas_lti_lineitems.lineitem   The lineitem URL
+ *      imas_lti_platforms.id         The platform ID
+ *
+ */
+
 define('TOOL_HOST', $GLOBALS['basesiteurl']);
 
 use \IMSGlobal\LTI;
@@ -680,6 +755,30 @@ class Imathas_LTI_Database implements LTI\Database {
       return true;
     } else {
         return false;
+    }
+  }
+
+  /**
+   * Sets or updates a lineitem, but only if a lineitem was included in the
+   * launch. Does not attempt to create a line item
+   * @param LTI_Message_Launch $launch
+   * @param LTI_Placement      $link
+   * @param LTI_Localcourse    $localcourse
+   */
+  public function set_or_update_lineitem(LTI\LTI_Message_Launch $launch, LTI\LTI_Placement $link,
+      LTI\LTI_Localcourse $localcourse
+  ): void {
+    $itemtype = $link->get_typenum();
+    $typeid = $link->get_typeid();
+    if ($launch->can_set_grades()) {
+      // no need to proceed if we can't send back grades
+      $lineitemstr = $launch->get_lineitem();
+      if ($lineitemstr !== false) {
+        $query = 'INSERT INTO imas_lti_lineitems (itemtype,typeid,lticourseid,lineitem)
+          VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE lineitem=VALUES(lineitem)';
+        $stm = $this->dbh->prepare($query);
+        $stm->execute(array($itemtype, $typeid, $localcourse->get_id(), $lineitemstr));
+      }
     }
   }
 
