@@ -12,7 +12,7 @@ $query = 'CREATE TABLE `imas_ipeds` (
   `country` char(2) DEFAULT "US",
   `state` char(2) DEFAULT "",
   `zip` int(5),
-  UNIQUE INDEX (`type`,`id`),
+  INDEX (`type`,`id`),
   FULLTEXT `school` (`school`)
   FULLTEXT `agency` (`agency`)
   INDEX `zip` (`zip`),
