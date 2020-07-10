@@ -29,7 +29,7 @@ $query = 'CREATE TABLE `imas_ipeds_group` (
   `type` char(1) NOT NULL,
   `ipedsid` CHAR(8) NOT NULL,
   `groupid` INT(10) NOT NULL,
-  INDEX `typeid` (`type`,`id`),
+  INDEX `typeid` (`type`,`ipedsid`),
   INDEX `groupid` (`groupid`)
 ) ENGINE=InnoDB;';
 $res = $DBH->query($query);
@@ -40,6 +40,6 @@ if ($res===false) {
 }
 
 $DBH->commit();
-echo '<p>table imas_ipeds created</p>';
+echo '<p>tables imas_ipeds, imas_ipeds_group created</p>';
 
 return true;
