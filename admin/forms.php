@@ -1542,6 +1542,30 @@ switch($_GET['action']) {
 		}
 		echo '</select><br/>';
 
+		if (!empty($CFG['use_ipeds'])) {
+			echo '<p>'._('IPEDS / NCES Associations').':</p>';
+			$query = 'SELECT DISTINCT ii.type,ii.ipedsid,IF(ii.type="A",ii.agency,ii.school) AS name
+			 	FROM imas_ipeds AS ii JOIN imas_ipeds_group AS iig
+				ON iig.type=ii.type AND iig.ipedsid=ii.ipedsid WHERE iig.groupid=?';
+			$stm = $DBH->prepare($query);
+			$stm->execute(array($_GET['id']));
+			$ipeds = $stm->fetchAll(PDO::FETCH_ASSOC);
+			if (!empty($ipeds)) {
+				echo '<ul class=nomark>';
+				foreach ($ipeds as $iped) {
+					$id = Sanitize::encodeStringForDisplay($iped['type'].'-'.$iped['ipedsid']);
+					echo '<li><label><input type=checkbox name="ipeddel[]" value="'.$id.'"> ';
+					echo Sanitize::encodeStringForDisplay($iped['name']).'</label></li>';
+				}
+				echo '</ul>';
+			}
+			echo '<p><label>'._('Add an association').': <input id=ipedsname size=40></label>';
+			echo '<button type=button onclick="ipedssearch()">'._('Search').'</button>';
+			echo '<label id=newipedswrap  style="display:none;"><br>';
+			echo _('New association').': <select name="newipeds" id="newipeds"></select></label></p>';
+			echo '<script src="../javascript/ipedssearch.js"></script>';
+		}
+
 		//call hook, if defined
 		if (function_exists('getModGroupForm')) {
 			getModGroupForm($_GET['id'], $grptype, $myrights);
