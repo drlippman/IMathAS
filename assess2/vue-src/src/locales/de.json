@@ -41,7 +41,8 @@
     "submit_now": "Jetzt einreichen",
     "exit": "Beenden",
     "teacher_preview": "Dieser Test ist für Studierende nicht geöffnet; Sie können ihn aber als Vorschau ansehen.",
-    "teacher_preview_button": "Test-Vorschau"
+    "teacher_preview_button": "Test-Vorschau",
+    "teacher_previewall_button": "Dozenten-Ansicht"
   },
   "duedialog": {
     "due": "Frist abgelaufen",
@@ -104,6 +105,13 @@
     "submit": "Frage einreichen",
     "checkans": "Antwort prüfen",
     "saveans": "Antwort speichern",
+    "next": "",
+    "submit_seqnext": "",
+    "checkans_seqnext": "",
+    "saveans_seqnext": "",
+    "submit_submitall": "",
+    "checkans_submitall": "",
+    "saveans_submitall": "",
     "withdrawn": "Diese Frage wurde vom Dozenten zurückgezogen. Sie brauchen sie nicht zu bearbeiten.",
     "jump_to_answer": "Gehe zur Antwort",
     "jump_warn": "Dies verbraucht alle übrigen Versuche für diese Version der Frage.",
@@ -112,7 +120,7 @@
   "header": {
     "score": "Punkte: {pts}/{poss}",
     "practicescore": "Punkte (Übung): {pts}/{poss}",
-    "possible": "{poss} mögliche Punkte",
+    "possible": "{poss} mögliche Punkte | undefined",
     "answered": "{n}/{tot} beantwortet",
     "assess_submit": "Test einreichen",
     "done": "Fertig",
@@ -127,7 +135,8 @@
     "work_saved": "Arbeit gespeichert",
     "work_saving": "Speichere...",
     "confirm_assess_submit": "Nach dem Einreichen können Sie Ihre Antworten in dieser Version des Tests nicht mehr ändern. Wollen Sie einreichen?",
-    "confirm_assess_unattempted_submit": "Es scheint, Sie haben noch nicht alle Fragen versucht. Nach Abgabe des Tests können Sie Ihre Antworten in dieser Version des Tests nicht mehr ändern. Wollen Sie jetzt wirklich einreichen?"
+    "confirm_assess_unattempted_submit": "Es scheint, Sie haben noch nicht alle Fragen versucht. Nach Abgabe des Tests können Sie Ihre Antworten in dieser Version des Tests nicht mehr ändern. Wollen Sie jetzt wirklich einreichen?",
+    "preview_all": "Vorschau aller Fragen für Dozenten"
   },
   "text": {
     "hide": "Text ausblenden",
@@ -142,6 +151,7 @@
     "missing_param": "Beim API-Zugriff fehlt ein notwendiger Parameter",
     "not_avail": "Dieser Test ist zurzeit nicht verfügbar",
     "not_ready": "Diese Aktion ist für diesen Test zurzeit nicht zulässig",
+    "not_practice": "",
     "timelimit_expired": "Zeitbegrenzung abgelaufen",
     "timesup_submitting": "Die Zeitbegrenzung ist abgelaufen. Es wird jetzt eingereicht.",
     "out_of_regens": "Keine weiteren Versuche für eine ähnliche Frage möglich",
@@ -332,7 +342,7 @@
     "detail_title": "Testversuche ansehen",
     "started": "Begonnen",
     "lastchange": "Zuletzt geändert",
-    "time_onscreen": "Gesamtzeit der Fragen auf dem Bildschirm",
+    "time_onscreen": "Gesamtzeit der Fragen auf dem Bildschirm | undefined",
     "time_on_version": "Verbrauchte Zeit für diese Version",
     "due": "Fällig",
     "originally_due": "Ursprünglich fällig",
@@ -394,9 +404,13 @@
     "unsubmitted": "Der Test-Versuch wurde nicht zur Bewertung eingereicht.",
     "show_tries": "Alle Versuche anzeigen",
     "show_penalties": "Angewandte Abzüge anzeigen",
+    "show_autosaves": "",
     "all_tries": "Alle Versuche",
     "part_n": "Teil {n}",
     "try_n": "Versuch {n}",
+    "autosaves": "",
+    "autosave_info": "",
+    "autosave_byassess": "",
     "view_edit": "Frage ansehen/bearbeiten",
     "show_all_ans": "Alle Antworten anzeigen",
     "no_versions": "Noch keine Test-Versuche anzuzeigen",
