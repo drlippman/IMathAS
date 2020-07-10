@@ -47,6 +47,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
         if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$partnum];} else {$hidepreview = $options['hidepreview'];}}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -78,10 +79,12 @@ class CalculatedComplexAnswerBox implements AnswerBox
     			'name' => "qn$qn",
     			'id' => "qn$qn",
     			'value' => $la,
-    			'autocomplete' => 'off'
+    			'autocomplete' => 'off',
+                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     		];
     		$params['tip'] = $shorttip;
-        $params['longtip'] = $tip;
+            $params['longtip'] = $tip;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}
@@ -91,10 +94,9 @@ class CalculatedComplexAnswerBox implements AnswerBox
     		$params['calcformat'] = $answerformat;
 
     		$out .= '<input ' .
-                'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
-    						Sanitize::generateAttributeString($attributes) .
-    						'class="'.implode(' ', $classes) .
-    						'" />';
+                Sanitize::generateAttributeString($attributes) .
+                'class="'.implode(' ', $classes) .
+                '" />';
 
     		if (!isset($hidepreview)) {
     			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";

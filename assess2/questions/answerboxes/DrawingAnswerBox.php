@@ -74,6 +74,7 @@ class DrawingAnswerBox implements AnswerBox
         }
 
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
         if (!is_array($answers)) {
     			settype($answers,"array");
@@ -245,7 +246,9 @@ class DrawingAnswerBox implements AnswerBox
     			$out .= $plot;
     		} else {
     			if ($_SESSION['userprefs']['drawentry']==0) { //accessible entry
-    				$bg = 'a11ydraw:'.implode(',', $answerformat);
+                    $bg = 'a11ydraw:'.implode(',', $answerformat);
+                    $out .= '<p class="sr-only">'.$this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '').'</p>';
     				$out .= '<p>'._('Graph to add drawings to:').'</p>';
     				$out .= '<p>'.$plot.'</p>';
     				$out .= '<p>'._('Elements to draw:').'</p>';
@@ -478,14 +481,15 @@ class DrawingAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
 
           $settings = array_map('floatval', $settings);
     			$params['canvas'] = [$qn,$bg,$settings[0],$settings[1],$settings[2],$settings[3],5,$settings[6],$settings[7],$def,$dotline,$locky,$snaptogrid];
 
     			$out .= '<input ' .
-    							'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
                   Sanitize::generateAttributeString($attributes) .
     							'" />';
 

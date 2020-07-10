@@ -43,6 +43,7 @@ class EssayAnswerBox implements AnswerBox
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (!isset($sz)) {
@@ -71,13 +72,14 @@ class EssayAnswerBox implements AnswerBox
     			$out .= filter($la);
     			$out .= "</div>";
     		} else {
-
+                $arialabel = $this->answerBoxParams->getQuestionIdentifierString() . 
+                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
     			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
     				$la = str_replace('&quot;','"',$la);
     			}
     			if ($rows<2) {
     				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" ";
-            $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" />';
+                    $out .= 'aria-label="'.$arialabel.'" />';
     			} else {
     				if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
     				$out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
@@ -86,7 +88,7 @@ class EssayAnswerBox implements AnswerBox
     				} else {
     					$out .= "cols=\"$cols\" ";
     				}
-            $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ';
+                    $out .= 'aria-label="'.$arialabel.'" ';
     				$out .= sprintf(">%s</textarea>\n", Sanitize::encodeStringForDisplay($la, true));
     				if ($colorbox!='') { $out .= '</div>';}
     			}

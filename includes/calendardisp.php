@@ -303,7 +303,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($now<$row['enddate'] || $row['reviewdate']>$now || isset($teacherid) || $lp==1) {
 			$json['id'] = $row['id'];
 		}
-		if ((($now>$row['enddate'] && $now>$row['reviewdate']) || $showgrayedout) && !isset($teacherid)) {
+		if ((($now>$row['enddate'] && $now>$row['reviewdate']) || $showgrayedout || $now<$row['startdate'])
+			&& !isset($teacherid)
+		) {
 			$json['inactive']=true;
 		}
 		if ($row['timelimit']!=0 && $row['ver']==1) {
@@ -592,6 +594,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($teacherid)) {
 			$json['editlink'] = true;
 		}
+		if ($status != 0) {
+			$json['inactive'] = true;
+		}
 		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json,$row['name'],$status);
 	}
 	if ($row['replyby']!=2000000000) { //($row['replyby']>$now || isset($teacherid))
@@ -613,7 +618,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($teacherid)) {
 			$json['editlink'] = true;
 		}
-
+		if ($status != 0) {
+			$json['inactive'] = true;
+		}
 		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name'],$status);
 	}
 	$tag = substr($row[1],0,8);
@@ -683,7 +690,6 @@ foreach ($itemsimporder as $item) {
 				if ($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {  //hide link and grey if not current
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
-					$assess[$moday][$k]['inactive'] = true;
 				}
 				$k++;
 			}
@@ -707,7 +713,6 @@ foreach ($itemsimporder as $item) {
 				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
 					$colors[$k] = '#ccc';
                     $assess[$moday][$k]['color'] = '#ccc';
-                    $assess[$moday][$k]['inactive'] = true;
 				}
 				$k++;
 			}

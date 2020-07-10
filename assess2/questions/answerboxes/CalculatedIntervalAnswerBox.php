@@ -46,6 +46,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         if (!isset($variables)) { $variables = 'x';}
         $ansformats = array_map('trim',explode(',',$answerformat));
@@ -86,10 +87,12 @@ class CalculatedIntervalAnswerBox implements AnswerBox
     			'name' => "qn$qn",
     			'id' => "qn$qn",
     			'value' => $la,
-    			'autocomplete' => 'off'
+    			'autocomplete' => 'off',
+                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     		];
     		$params['tip'] = $shorttip;
-        $params['longtip'] = $tip;
+            $params['longtip'] = $tip;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}
@@ -100,10 +103,9 @@ class CalculatedIntervalAnswerBox implements AnswerBox
     		$params['calcformat'] = $answerformat;
 
     		$out .= '<input ' .
-                'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
-    						Sanitize::generateAttributeString($attributes) .
-    						'class="'.implode(' ', $classes) .
-    						'" />';
+                Sanitize::generateAttributeString($attributes) .
+                'class="'.implode(' ', $classes) .
+                '" />';
 
     		if (!isset($hidepreview)) {
     			$params['preview'] = 1;

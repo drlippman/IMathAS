@@ -49,6 +49,7 @@ class FileUploadAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         if (isset($ansprompt)) {
           $out .= "$ansprompt ";
@@ -62,7 +63,8 @@ class FileUploadAnswerBox implements AnswerBox
           }
           $out .= "/>\n";
           $out .= '<label for="qn'.$qn.'"><span role="button" class="filealt-btn '.$colorbox.'">';
-          $out .= '<span class="sr-only">'.$this->answerBoxParams->getQuestionIdentifierString().'</span>';
+          $out .= '<span class="sr-only">'.$this->answerBoxParams->getQuestionIdentifierString().
+            (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '').'</span>';
           $out .= _('Choose File').'</span>';
           $out .= '<span class="filealt-label" data-def="'._('No file chosen').'">';
           if ($autosave != '') {
