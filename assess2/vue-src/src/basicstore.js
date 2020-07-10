@@ -33,6 +33,7 @@ export const store = Vue.observable({
   show_enddate_dialog: false,
   inPrintView: false,
   enableMQ: true,
+  lastPos: null,
   livepollServer: '',
   livepollSettings: {
     showQuestionDefault: true,
@@ -90,7 +91,7 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  startAssess (dopractice, password, newGroupMembers, callback) {
+  startAssess (dopractice, password, newGroupMembers, callback, previewAll) {
     if (store.inTransit) {
       window.setTimeout(() => this.startAssess(dopractice, password, newGroupMembers, callback), 20);
       return;
@@ -103,6 +104,7 @@ export const actions = {
       dataType: 'json',
       data: {
         practice: dopractice,
+        preview_all: previewAll ? 1 : 0,
         password: password,
         in_print: store.inPrintView ? 1 : 0,
         new_group_members: newGroupMembers.join(','),
@@ -140,7 +142,7 @@ export const actions = {
           this.handleError(response.error);
         } else if (store.assessInfo.has_active_attempt) {
           store.inProgress = true;
-          if (typeof callback !== 'undefined') {
+          if (typeof callback !== 'undefined' && callback !== null) {
             callback();
             return;
           }
@@ -238,7 +240,10 @@ export const actions = {
       for (const i in store.assessInfo.questions) {
         if (store.assessInfo.questions[i].try > 0 ||
           (store.assessInfo.questions[i].hasOwnProperty('parts_entered') &&
-           store.assessInfo.questions[i].parts_entered.indexOf(0) === -1) ||
+          store.assessInfo.questions[i].hasOwnProperty('answeights') &&
+          store.assessInfo.questions[i].parts_entered.length >=
+          store.assessInfo.questions[i].answeights.length
+          ) ||
           changedQuestions.hasOwnProperty(i)
         ) {
           qAttempted++;
@@ -283,7 +288,7 @@ export const actions = {
     }
     if (Object.keys(data).length === 0) { // nothing to submit
       store.inTransit = false;
-      if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+      if (store.inAssess) {
         Router.push('/summary');
       } else if (store.assessInfo.available === 'yes') {
         Router.push('/');
@@ -319,7 +324,7 @@ export const actions = {
           delete store.work[qn];
         }
 
-        if (store.inAssess && store.assessInfo.submitby === 'by_assessment') {
+        if (store.inAssess) {
           Router.push('/summary');
         } else if (store.assessInfo.available === 'yes') {
           Router.push('/');
@@ -356,8 +361,15 @@ export const actions = {
     // figure out non-blank questions to submit
     const lastLoaded = [];
     const changedQuestions = this.getChangedQuestions(qns);
-
-    if (Object.keys(changedQuestions).length === 0 && !endattempt) {
+    let changedWork = false;
+    for (let k = 0; k < qns.length; k++) {
+      const qn = parseInt(qns[k]);
+      if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+        changedWork = true;
+        break;
+      }
+    }
+    if (Object.keys(changedQuestions).length === 0 && !changedWork && !endattempt) {
       store.errorMsg = 'nochange';
       store.inTransit = false;
       return;
@@ -400,6 +412,7 @@ export const actions = {
         }
       }
     }
+
     for (let k = 0; k < qns.length; k++) {
       const qn = parseInt(qns[k]);
 
@@ -434,6 +447,9 @@ export const actions = {
     }
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
+    }
+    if (store.assessInfo.preview_all) {
+      data.append('preview_all', true);
     }
     const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
       store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
@@ -523,6 +539,24 @@ export const actions = {
       .always(response => {
         store.inTransit = false;
       });
+  },
+  gotoSummary () {
+    let hasShowWorkAfter = false;
+    for (let k = 0; k < store.assessInfo.questions.length; k++) {
+      if (store.assessInfo.questions[k].showwork & 2) {
+        hasShowWorkAfter = true;
+        store.assessInfo.showwork_after = true;
+        break;
+      }
+    }
+
+    if (store.assessInfo.submitby === 'by_question') {
+      if (hasShowWorkAfter && !store.assessInfo.in_practice) {
+        Router.push('/showwork');
+      } else {
+        Router.push('/summary');
+      }
+    }
   },
   doAutosave (qn, partnum, timeactive) {
     store.somethingDirty = false;
@@ -632,8 +666,9 @@ export const actions = {
         for (const qn in store.autosaveQueue) {
           for (const k in store.autosaveQueue[qn]) {
             if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
-              Vue.set(store.assessInfo.questions[parseInt(qn)].parts_entered,
-                store.autosaveQueue[qn][k], 1);
+              if (store.assessInfo.questions[parseInt(qn)].parts_entered.indexOf(store.autosaveQueue[qn][k]) === -1) {
+                store.assessInfo.questions[parseInt(qn)].parts_entered.push(store.autosaveQueue[qn][k]);
+              }
             }
           }
         }

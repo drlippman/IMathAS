@@ -794,7 +794,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				 if ($line['ver'] > 1) {
 					 $thisaddassess = "addassessment2.php";
 					 	if ($assessUseVueDev) {
-					 		$assessUrl = "http://localhost:8080/?cid=$cid&aid=$typeid";
+							$assessUrl = sprintf("%s/?cid=%s&aid=%s",
+								$CFG['assess2-use-vue-dev-address'], $cid, $typeid);
 						} else {
 							$assessUrl = "../assess2/?cid=$cid&aid=$typeid";
 						}
@@ -1999,7 +2000,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$exceptions,$latepasses,$CFG;
 	   global $itemtypes, $iteminfo, $addassess;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {

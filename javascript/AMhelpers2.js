@@ -248,7 +248,6 @@ function setupTips(id, tip, longtip) {
   if (!document.getElementById("tips"+ref)) {
     $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
   }
-  el.setAttribute('aria-label', tip);
   el.setAttribute('aria-describedby', 'tips'+ref);
   el.addEventListener('focus', function() {
     showehdd(id, tip, ref);
@@ -373,9 +372,13 @@ function initShowAnswer2() {
 
     var qref = el.id.substring(3);
     var inref = qref;
+    var label;
     if (inref.indexOf('-') !== -1) {
       var pts = inref.split('-');
       inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
+      label = _('Question ') + (pts[0]*1+1) + _(' Part ') + (pts[1]*1 + 1);
+    } else {
+      label = _('Question ') + (inref*1+1);
     }
     var key = $('<span>', {'class': 'keywrap'}).append(
       $('<button>', {
@@ -383,7 +386,7 @@ function initShowAnswer2() {
         'aria-controls': 'ans'+qref,
         'aria-expanded': 'false',
         'class': 'keybtn',
-        'aria-label': _('View Key'),
+        'aria-label': _('View Key for ') + label,
         title: _('View Key')
       }).on('click', function(e) {
           var curstate = (e.currentTarget.getAttribute('aria-expanded') == 'true');
@@ -1409,6 +1412,7 @@ function processNumfunc(qn, fullstr, format) {
   var fvars = params.fvars;
   var domain = params.domain;
   var iseqn = format.match(/equation/);
+  var isineq = format.match(/inequality/);
   var err = '';
 
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
@@ -1417,8 +1421,21 @@ function processNumfunc(qn, fullstr, format) {
   totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
   var remapVars = strprocess[2].split('|');
 
-  if (fullstr.match(/=/)) {
-    if (!iseqn) {
+  if (fullstr.match(/(<=|>=|<|>)/)) {
+    if (!isineq) {
+      if (iseqn) {
+        err += _("syntax error: you gave an inequality, not an equation");
+      } else {
+        err += _("syntax error: you gave an inequality, not an expression");
+      }
+    } else if (fullstr.match(/(<=|>=|<|>)/g).length>1) {
+      err += _("syntax error: your inequality should only contain one inequality symbol");
+    }
+    totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
+  } else if (fullstr.match(/=/)) {
+    if (isineq) {
+      err += _("syntax error: you gave an equation, not an inequality");
+    } else if (!iseqn) {
       err += _("syntax error: you gave an equation, not an expression");
     } else if (fullstr.match(/=/g).length>1) {
       err += _("syntax error: your equation should only contain one equal sign");
@@ -1426,6 +1443,8 @@ function processNumfunc(qn, fullstr, format) {
     totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
   } else if (iseqn) {
     err += _("syntax error: this is not an equation");
+  } else if (isineq) {
+    err += _("syntax error: this is not an inequality");
   }
 
   if (fvars.length > 0) {
@@ -1746,9 +1765,9 @@ function syntaxcheckexpr(str,format,vl) {
 
 // returns [numval, errmsg]
 function singlevaleval(evalstr, format) {
-  evalstr = evalstr.replace(/,/, '');
+  evalstr = evalstr.replace(/,/g, '');
   if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
-    evalstr = evalstr.replace(/%/,'') + '/100';
+    evalstr = evalstr.replace(/%/g,'') + '/100';
   }
   if (format.indexOf('mixed')!=-1) {
     evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");

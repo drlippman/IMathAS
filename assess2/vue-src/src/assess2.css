@@ -90,6 +90,9 @@ div.match {
   padding: 5px;
   padding-right: 30px;
 }
+div.match li img, div.match li [role=img] {
+  vertical-align: middle;
+}
 div[role=radiogroup].clearfix .match {
 	padding-right: 5px;
 }
@@ -480,4 +483,9 @@ span.inlinebtn:hover {
 }
 .feedbackwrap.incorrect {
 	background: #fee;
+}
+
+.inlineheader {
+  font-size: 1em;
+  display: inline;
 }

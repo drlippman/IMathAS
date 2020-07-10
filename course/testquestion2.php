@@ -29,7 +29,7 @@ if ($myrights<20) {
 	} else {
 		$onlychk = 0;
 	}
-  $qsetid = sanitize::onlyInt($_GET['qsetid']);
+  	$qsetid = Sanitize::onlyInt($_GET['qsetid']);
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
 		$formn = Sanitize::encodeStringForJavascript($_GET['formn']);
 		$loc = Sanitize::encodeStringForJavascript($_GET['loc']);
@@ -130,7 +130,7 @@ if ($myrights<20) {
 	if (isset($CFG['AMS']['eqnhelper'])) {
 		$eqnhelper = $CFG['AMS']['eqnhelper'];
 	} else {
-		$eqnhelper = 0;
+		$eqnhelper = 4;
 	}
 	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
 	$resultLibNames->execute(array(':qsetid'=>$qsetid));
@@ -147,16 +147,18 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/asse
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=052920" type="text/javascript"></script>';
-/*
-$placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
-*/
+if (!empty($CFG['assess2-use-vue-dev'])) {
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
+} else {
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=052920" type="text/javascript"></script>';
+}
+
 $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
@@ -378,7 +380,8 @@ if ($overwriteBody==1) {
 		}
 	}
 
-	printf("<p>"._("Question id:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
+	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
+	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';
   if ($line['ownerid'] == $userid) {
     echo '<a href="moddataset.php?cid='. Sanitize::courseId($sendcid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
     echo _('Edit Question') . '</a>';

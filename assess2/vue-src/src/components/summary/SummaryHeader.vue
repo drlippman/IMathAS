@@ -5,10 +5,10 @@
     </div>
     <div>
       <button
-        v-if="canRetake"
+        v-if="retakeLabel != ''"
         @click = "retake"
       >
-        {{ $t('launch.retake_assess') }}
+        {{ retakeLabel }}
       </button>
       <button
         v-if="hasExit"
@@ -29,9 +29,19 @@ export default {
     ainfo () {
       return store.assessInfo;
     },
-    canRetake () {
-      return (this.ainfo.submitby === 'by_assessment' &&
-        this.ainfo.prev_attempts.length < this.ainfo.allowed_attempts);
+    retakeLabel () {
+      if (this.ainfo.submitby === 'by_assessment' &&
+        this.ainfo.prev_attempts.length < this.ainfo.allowed_attempts
+      ) {
+        return this.$t('launch.retake_assess');
+      } else if (this.ainfo.submitby === 'by_question' &&
+        store.inAssess &&
+        this.ainfo.has_active_attempt
+      ) {
+        return this.$t('launch.continue_assess');
+      } else {
+        return '';
+      }
     },
     hasExit () {
       return (window.exiturl && window.exiturl !== '' && !this.ainfo.is_lti);

@@ -202,7 +202,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 		}
 		$intype = 0;
 		$out = '';
-		$c = $str{$i};
+		$c = $str[$i];
 		$eatenwhite = 0;
 		if ($c>="a" && $c<="z" || $c>="A" && $c<="Z") {
 			//is a string or function name
@@ -221,7 +221,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				$out .= $c;
 				$i++;
 				if ($i==$len) {break;}
-				$c = $str{$i};
+				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word
 			if ($out=='e' && !in_array($out,$vars)) {
@@ -234,7 +234,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				//eat whitespace
 				while ($c==' ') {
 					$i++;
-					$c = $str{$i};
+					$c = $str[$i];
 					$eatenwhite++;
 				}
 				//if possible function at end, strip off function
@@ -246,14 +246,14 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 						$outend = substr($out,$j);
 						if (in_array($outend,$allowedmacros)) {
 							$i = $i - $outlen + $j;
-							$c = $str{$i};
+							$c = $str[$i];
 							$out = substr($out,0,$j);
 							break;
 						}
 						//is end a variable?  like xy(1+x)
 						if (in_array($outend,$vars)) {
 							$i = $i - $outlen + $j;
-							$c = $str{$i};
+							$c = $str[$i];
 							$out = substr($out,0,$j);
 							break;
 						}
@@ -300,7 +300,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 							$outst = substr($out,0,$j);
 							if (in_array($outst,$lookfor)) {
 								$i = $i - $outlen + $j - $eatenwhite;
-								$c = $str{$i};
+								$c = $str[$i];
 								$out = $outst;
 								if ($out=='e') {
 									$out = "exp(1)";
@@ -337,7 +337,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 
 				}
 			}
-		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
+		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str[$i+1]>='0' && $str[$i+1]<='9')) ) { //is num
 			$intype = 3; //number
 			$cont = true;
 			//handle . 3 which needs to act as concat
@@ -349,22 +349,22 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				$lastc = $c;
 				$i++;
 				if ($i==$len) {break;}
-				$c= $str{$i};
-				if (($c>='0' && $c<='9') || ($c=='.' && $str{$i+1}!='.' && $lastc!='.')) {
+				$c= $str[$i];
+				if (($c>='0' && $c<='9') || ($c=='.' && $str[$i+1]!='.' && $lastc!='.')) {
 					//is still num
 				} else if ($c=='e' || $c=='E') {
 					//might be scientific notation:  5e6 or 3e-6
-					$d = $str{$i+1};
+					$d = $str[$i+1];
 					if ($d>='0' && $d<='9') {
 						$out .= $c;
 						$i++;
 						if ($i==$len) {break;}
-						$c= $str{$i};
-					} else if (($d=='-'||$d=='+') && ($str{$i+2}>='0' && $str{$i+2}<='9')) {
+						$c= $str[$i];
+					} else if (($d=='-'||$d=='+') && ($str[$i+2]>='0' && $str[$i+2]<='9')) {
 						$out .= $c.$d;
 						$i+= 2;
 						if ($i>=$len) {break;}
-						$c= $str{$i};
+						$c= $str[$i];
 					} else {
 						$cont = false;
 					}
@@ -393,9 +393,9 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			while ($j<$len) {
 				//read terms until we get to right bracket at same nesting level
 				//we have to avoid strings, as they might contain unmatched brackets
-				$d = $str{$j};
+				$d = $str[$j];
 				if ($inq) {  //if inquote, leave if same marker (not escaped)
-					if ($d==$qtype && $str{$j-1}!='\\') {
+					if ($d==$qtype && $str[$j-1]!='\\') {
 						$inq = false;
 					}
 				} else {
@@ -435,7 +435,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 					echo _('unmatched parens/brackets - likely will cause an error');
 				}
 			} else {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		} else if ($c=='"' || $c=="'") { //string
 			$intype = 6;
@@ -445,12 +445,12 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				$i++;
 				if ($i==$len) {break;}
 				$lastc = $c;
-				$c = $str{$i};
+				$c = $str[$i];
 			} while (!($c==$qtype && $lastc!='\\'));
 			$out .= $c;
 			if (!$ignorestrings) {
 				$inside = mathphpinterpretline(substr($out,1,strlen($out)-2),$vars,$ignorestrings);
-				if ($inside{0}=='\'' && $inside{strlen($inside)-1}=='\'') {
+				if ($inside[0]=='\'' && $inside[strlen($inside)-1]=='\'') {
 					$inside = substr($inside,1,strlen($inside)-2);
 				}
 				$out= $qtype . $inside . $qtype;
@@ -458,33 +458,33 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			}
 
 			$i++;
-			$c = $str{$i};
+			$c = $str[$i];
 		} else if ($c=="\n") {
 			//end of line
 			$intype = 7;
 			$i++;
 			if ($i<$len) {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		} else if ($c==';') {
 			//end of line
 			$intype = 7;
 			$i++;
 			if ($i<$len) {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		} else {
 			//no type - just append string.  Could be operators
 			$out .= $c;
 			$i++;
 			if ($i<$len) {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		}
 		while ($c==' ') { //eat up extra whitespace
 			$i++;
 			if ($i==$len) {break;}
-			$c = $str{$i};
+			$c = $str[$i];
 			if ($c=='.' && $intype==3) {//if 3 . needs space to act like concat
 				$out .= ' ';
 			}

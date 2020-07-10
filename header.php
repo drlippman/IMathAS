@@ -19,7 +19,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script>window.jQuery || document.write(\'<script src="'.$imasroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=051020";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=061320";?>" type="text/css" />
 <?php
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
@@ -121,7 +121,6 @@ if (!isset($_SESSION['mathdisp'])) {
 			if (window.MathJax) {
 				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
 				if (typeof callback == "function") {
-					console.log("queing callback");
 					MathJax.Hub.Queue(callback);
 				}
 			} else {
@@ -172,7 +171,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$imasroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=052520\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=070920\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {

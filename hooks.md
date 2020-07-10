@@ -70,6 +70,9 @@ Include via `$CFG['hooks']['bltilaunch']`
 On creation of a new course:
 `onAddCourse(course ID, user ID)`
 
+On identification of local user ID:
+`onHaveLocalUser(user ID)`
+
 ## ltihome
 
 Include via `$CFG['hooks']['ltihome']`
@@ -88,6 +91,9 @@ Include via `$CFG['hooks']['validate']`
 
 Called after login is successful, before redirect back to requested page
 `onLogin()`
+
+Called after determining user is already logged in
+`alreadyLoggededIn(user ID)`
 
 Called when checking if LTI user can access the requested page
 `allowedInAssessment()`

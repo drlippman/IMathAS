@@ -59,6 +59,7 @@ class QuestionHtmlGenerator
         'snaptogrid',
         'strflags',
         'variables',
+        'readerlabel'
     );
 
     // Variables that need to be packed up and passed to the answerbox generator.
@@ -262,9 +263,11 @@ class QuestionHtmlGenerator
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
-            if (!isset($anstypes) && $GLOBALS['myrights'] > 10) {
+            if (!isset($anstypes)) {
+              if ($GLOBALS['myrights'] > 10) {
                 $this->addError('Error in question: missing $anstypes for multipart or conditional question');
-                $anstypes = array("number");
+              }
+              $anstypes = array("number");
             }
 
             // Calculate answer weights.
@@ -290,7 +293,13 @@ class QuestionHtmlGenerator
             // Get the answers to all parts of this question.
             $lastAnswersAllParts = $stuanswers[$thisq];
             if (isset($autosaves[$thisq])) {
-              $lastAnswersAllParts = $autosaves[$thisq];
+              if (is_array($autosaves[$thisq])) {
+                foreach ($autosaves[$thisq] as $iidx=>$kidx) {
+                  $lastAnswersAllParts[$iidx] = $kidx;
+                }
+              } else {
+                $lastAnswersAllParts = $autosaves[$thisq];
+              }
             }
             if (!is_array($lastAnswersAllParts)) {
               // multipart questions with one part get stored as single value;
@@ -309,7 +318,7 @@ class QuestionHtmlGenerator
             if ($quesData['qtype'] == "multipart" ||
               ($quesData['qtype'] == "conditional" && isset($seqPartDone))
             ) {
-              $_seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
+              $_seqParts = preg_split('~(<p[^>]*>(<[^>]*>)*|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
 
               if (count($_seqParts) > 1) {
                 if ($quesData['qtype'] != "conditional") {
@@ -324,6 +333,7 @@ class QuestionHtmlGenerator
                     if (!$_lastGroupDone) { // not ready for it - unset stuff
                       $skipAnswerboxGeneration[$_pnidx] = true;
                       $jsParams['hasseqnext'] = true;
+                      $_thisGroupDone = false;
                     }
                     if ($seqPartDone !== true && empty($seqPartDone[$_pnidx])) {
                       $_thisGroupDone = false;
@@ -336,6 +346,7 @@ class QuestionHtmlGenerator
             } else {
               unset($seqPartDone);
             }
+
             /*
 			 * Original displayq2.php notes:
 			 *
@@ -380,6 +391,7 @@ class QuestionHtmlGenerator
                     ->setQuestionNumber($this->questionParams->getDisplayQuestionNumber())
                     ->setIsMultiPartQuestion($this->isMultipart())
                     ->setQuestionPartNumber($atIdx)
+                    ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
                     ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
                     ->setColorboxKeyword($questionColor);
@@ -566,7 +578,7 @@ class QuestionHtmlGenerator
          *  cases where $answerbox or [AB#] is already in the question text
          */
         if (isset($seqPartDone)) {
-          $seqParts = preg_split('~(<p[^>]*>|<br\s*/?><br\s*/?>)\s*///+\s*(</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
+          $seqParts = preg_split('~(<p[^>]*>(<[^>]*>)*|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
 
           if (count($seqParts) > 1) {
             $newqtext = '';
@@ -581,6 +593,7 @@ class QuestionHtmlGenerator
                   unset($answerbox[$pn]);
                   unset($showanswerloc[$pn]);
                   $jsParams['hasseqnext'] = true;
+                  $thisGroupDone = false;
                 }
                 if ($seqPartDone !== true && empty($seqPartDone[$pn])) {
                   $thisGroupDone = false;

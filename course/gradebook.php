@@ -131,8 +131,8 @@ if ($canviewall && !empty($_GET['stu'])) {
 }
 
 if (!empty($CFG['assess2-use-vue-dev'])) {
-	$assessGbUrl = "http://localhost:8080/gbviewassess.html";
-	$assessUrl = "http://localhost:8080/";
+	$assessGbUrl = sprintf("%s/gbviewassess.html", $CFG['assess2-use-vue-dev-address']);
+	$assessUrl = $CFG['assess2-use-vue-dev-address'] . '/';
 } else {
 	$assessGbUrl = "../assess2/gbviewassess.php";
 	$assessUrl = "../assess2/";

@@ -152,27 +152,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
     require_once("../includes/parsedatetime.php");
 		$toset['avail'] = Sanitize::onlyInt($_POST['avail']);
-    if ($_POST['avail']==1) {
-      if ($_POST['sdatetype']=='0') {
-        $toset['startdate'] = 0;
-      } else {
-        $toset['startdate'] = parsedatetime($_POST['sdate'],$_POST['stime'],0);
-      }
-      if ($_POST['edatetype']=='2000000000') {
-        $toset['enddate'] = 2000000000;
-      } else {
-        $toset['enddate'] = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
-      }
 
-      if (empty($_POST['allowpractice'])) {
-        $toset['reviewdate'] = 0;
-      } else {
-        $toset['reviewdate'] = 2000000000;
-      }
-    } else {
+    if ($_POST['sdatetype']=='0') {
       $toset['startdate'] = 0;
+    } else {
+      $toset['startdate'] = parsedatetime($_POST['sdate'],$_POST['stime'],0);
+    }
+    if ($_POST['edatetype']=='2000000000') {
       $toset['enddate'] = 2000000000;
+    } else {
+      $toset['enddate'] = parsedatetime($_POST['edate'],$_POST['etime'],2000000000);
+    }
+
+    if (empty($_POST['allowpractice']) || $toset['enddate'] == 2000000000) {
       $toset['reviewdate'] = 0;
+    } else {
+      $toset['reviewdate'] = 2000000000;
     }
 
 		// Core options

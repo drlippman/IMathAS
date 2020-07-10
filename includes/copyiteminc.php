@@ -128,10 +128,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 			$exttooltrack[$newtypeid] = intval($tool[0]);
 		}
 	} else if ($itemtype == "Forum") {
-		//$query = "INSERT INTO imas_forums (courseid,name,summary,startdate,enddate) ";
-		//$query .= "SELECT '$cid',name,summary,startdate,enddate FROM imas_forums WHERE id='$typeid'";
-		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$stm = $DBH->prepare("SELECT name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,allowlate,rubric FROM imas_forums WHERE id=:id");
+		$stm = $DBH->prepare("SELECT name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,allowlate,rubric,groupsetid,tutoredit,sortby,autoscore FROM imas_forums WHERE id=:id");
 		$stm->execute(array(':id'=>$typeid));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($sethidden) {$row['avail'] = 0;}
@@ -139,6 +136,9 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 			$row['gbcategory'] = $gbcats[$row['gbcategory']];
 		} else if ($_POST['ctc']!=$cid) {
 			$row['gbcategory'] = 0;
+		}
+		if ($_POST['ctc'] != $cid) {
+			$row['groupsetid'] = 0;
 		}
 		$rubric = $row['rubric']; //array_pop($row);
 		$row['name'] .= $_POST['append'];
@@ -152,14 +152,16 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 			}
 			$row['outcomes'] = implode(',',$newoutcomes);
 		}
-		$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,allowlate) ";
-		$query .= "VALUES (:courseid,:name,:description,:postinstr,:replyinstr,:startdate,:enddate,:settings,:defdisplay,:replyby,:postby,:avail,:points,:cntingb,:gbcategory,:forumtype,:taglist,:outcomes,:caltag,:allowlate)";
+		$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,allowlate,groupsetid,tutoredit,sortby,autoscore) ";
+		$query .= "VALUES (:courseid,:name,:description,:postinstr,:replyinstr,:startdate,:enddate,:settings,:defdisplay,:replyby,:postby,:avail,:points,:cntingb,:gbcategory,:forumtype,:taglist,:outcomes,:caltag,:allowlate,:groupsetid,:tutoredit,:sortby,:autoscore)";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid, ':name'=>$row['name'], ':description'=>$row['description'], ':postinstr'=>$row['postinstr'],
 		  ':replyinstr'=>$row['replyinstr'], ':startdate'=>$row['startdate'], ':enddate'=>$row['enddate'], ':settings'=>$row['settings'],
 			':defdisplay'=>$row['defdisplay'], ':replyby'=>$row['replyby'], ':postby'=>$row['postby'], ':avail'=>$row['avail'], ':points'=>$row['points'],
 			':cntingb'=>$row['cntingb'], ':gbcategory'=>$row['gbcategory'], ':forumtype'=>$row['forumtype'], ':taglist'=>$row['taglist'],
-			':outcomes'=>$row['outcomes'], ':caltag'=>$row['caltag'], ':allowlate'=>$row['allowlate']));
+			':outcomes'=>$row['outcomes'], ':caltag'=>$row['caltag'], ':allowlate'=>$row['allowlate'],
+			':groupsetid'=>$row['groupsetid'],':tutoredit'=>$row['tutoredit'],
+			':sortby'=>$row['sortby'],':autoscore'=>$row['autoscore']));
 		$newtypeid = $DBH->lastInsertId();
 		if ($_POST['ctc']!=$cid) {
 			$forumtrack[$typeid] = $newtypeid;

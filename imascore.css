@@ -116,6 +116,14 @@ div.itemhdrdd, div.itemhdrright {
 	top:0px;
 }
 
+.inlinelist {
+	padding: 1em;
+	margin: 1em;
+}
+.inlinelist li {
+	display: inline-block;
+}
+
 @media only screen and (min-width: 1005px) {
 	/* put dropdown next to item when wide*/
 	.notfw .itemhdr .title {
@@ -918,6 +926,12 @@ button.plain:hover, button.plain:active {
 	max-width: 700px;
 	border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+}
+@media (min-height: 2000px) {
+	.dialog {
+		position: absolute;
+		top: 5em;
+	}
 }
 .dialog button.slim {
   margin-right: -12px;

@@ -1769,7 +1769,9 @@ class AssessRecord
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
         }
       }
-      if ($showscores) {
+      if ($this->teacherInGb) {
+        $seqPartDone[$pn] = true;
+      } else if ($showscores) {
         // move on if correct or out of tries
         $seqPartDone[$pn] = ($partattemptn[$pn] === $trylimit ||
           $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] > .98);
@@ -1921,13 +1923,6 @@ class AssessRecord
     //foreach ($rawparts as $k=>$v) {
     foreach ($partla as $k=>$v) {
       if ($parts_to_score === true || !empty($parts_to_score[$k])) {
-        if (!empty($qver['tries'][$k])) {
-          $lasttry = $qver['tries'][$k][count($qver['tries'][$k])-1];
-          if (trim($lasttry['stuans']) == trim($v)) {
-            // same answer submitted.  Shouldn't happen, but skip it
-            continue;
-          }
-        }
         $data[$k] = array(
           'sub' => $submission,
           'time' => round($timeactive/1000),
@@ -1940,9 +1935,10 @@ class AssessRecord
           $data[$k]['raw'] = $rawparts[$k];
         }
         $this->clearAutoSave($qn, $k);
-      } else if (isset($rawparts[$k]) && !empty($qver['tries'][$k])) {
+      } else if (isset($rawparts[$k]) && $v!=='' && $v!==null && !empty($qver['tries'][$k])) {
         // check to see if score on an unsubmitted part has changed
         // can happen in some pseudo-conditional questions
+        // but skip if lastans is blank (might be sequential question)
         $lasttry = $qver['tries'][$k][count($qver['tries'][$k])-1];
         if (isset($lasttry['raw']) && abs($lasttry['raw'] - $rawparts[$k]) > .001) {
           // score has changed
@@ -3458,20 +3454,20 @@ class AssessRecord
      if (!is_array($answeights)) {
        return array();
      }
-     $out = array_fill(0, count($answeights), 0);
+     $out = array();
      $this->parseData();
 
      if (isset($this->data['autosaves'][$qn])) {
        foreach ($this->data['autosaves'][$qn]['stuans'] as $pn=>$ans) {
-         $out[$pn] = 1;
+         $out[] = $pn;
        }
      }
      foreach ($tries as $pn=>$try) {
        if (!empty($try)) {
-         $out[$pn] = 1;
+         $out[] = $pn;
        }
      }
-     return $out;
+     return array_unique($out);
    }
 
   /**

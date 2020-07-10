@@ -62,6 +62,9 @@
         :disabled = "!canSubmit"
       >
         {{ submitLabel }}
+        <span class="sr-only">
+          {{ $t('question_n', {n: qn+1}) }}
+        </span>
       </button>
       <button
         v-if = "canJumpToAnswer"
@@ -135,6 +138,7 @@ export default {
       return (store.inProgress &&
         this.questionContentLoaded &&
         !store.inPrintView &&
+        !this.disabled &&
         this.questionData.withdrawn === 0 &&
         this.questionData.canretry);
     },
@@ -162,6 +166,7 @@ export default {
     showScore () {
       return (store.inProgress &&
         !store.inPrintView &&
+        !this.disabled &&
         this.questionData.hadSeqNext !== true &&
         (this.questionData.hasOwnProperty('score') ||
          this.questionData.status === 'attempted'

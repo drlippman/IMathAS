@@ -1,10 +1,28 @@
 <template>
   <div class="home">
     <assess-header></assess-header>
+    <p v-if="isPreviewAll" class="headerpane noticetext">
+      {{ $t("header.preview_all") }}
+      <button
+        type="button"
+        class = "secondary"
+        @click="showAllAns"
+      >
+        {{ $t("gradebook.show_all_ans") }}
+      </button>
+      <button
+        type="button"
+        class = "secondary"
+        @click="showTexts = !showTexts"
+      >
+        {{ textToggleLabel }}
+      </button>
+    </p>
     <div class="scrollpane fulldisp" role="region" :aria-label="$t('regions.questions')">
       <div
         class = "questionpane introtext"
         v-if = "intro !== ''"
+        v-show = "showTexts"
         v-html = "intro"
         ref = "introtext"
       />
@@ -13,10 +31,11 @@
         v-for="curqn in questionArray" :key="curqn"
       >
         <inter-question-text-list
+          v-show="showTexts"
           pos="beforeexact"
           :qn="curqn"
           :key="'iqt'+curqn"
-          :active = "true"
+          :active = "showTexts"
         />
         <full-question-header :qn = "curqn" />
         <question
@@ -27,9 +46,10 @@
         />
       </div>
       <inter-question-text-list
+        v-show="showTexts"
         pos="after"
         :qn="lastQ"
-        :active = "true"
+        :active = "showTexts"
       />
     </div>
     <p v-if = "showSubmit">
@@ -53,6 +73,11 @@ import { store, actions } from '../basicstore';
 
 export default {
   name: 'Full',
+  data: function () {
+    return {
+      showTexts: true
+    };
+  },
   components: {
     Question,
     AssessHeader,
@@ -62,6 +87,9 @@ export default {
   computed: {
     intro () {
       return store.assessInfo.intro;
+    },
+    isPreviewAll () {
+      return !!store.assessInfo.preview_all;
     },
     questionArray () {
       const qnArray = {};
@@ -75,11 +103,18 @@ export default {
     },
     showSubmit () {
       return (store.assessInfo.submitby === 'by_assessment');
+    },
+    textToggleLabel () {
+      return this.showTexts ? this.$t('print.hide_text') : this.$t('print.show_text');
     }
   },
   methods: {
     submitAssess () {
       actions.submitAssessment();
+    },
+    showAllAns () {
+      window.$("span[id^='ans']").removeClass('hidden').toggle();
+      window.$('.keybtn').attr('aria-expanded', function (i, v) { return !JSON.parse(v); });
     }
   },
   mounted () {

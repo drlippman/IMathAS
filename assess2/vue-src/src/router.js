@@ -127,7 +127,7 @@ const router = new Router({
         // if active attempt or not avail, route to Launch
         if ((store.assessInfo.available === 'yes' ||
           (store.assessInfo.available === 'practice' && store.assessInfo.in_practice)) &&
-          (!store.assessInfo.has_active_attempt)
+          (!store.assessInfo.has_active_attempt || store.assessInfo.submitby === 'by_question')
         ) {
           next();
         } else {
@@ -158,9 +158,8 @@ const router = new Router({
       component: Print,
       beforeEnter: (to, from, next) => {
         // if no active attempt, route to launch
-        if (((store.assessInfo.available === 'yes' ||
-          (store.assessInfo.available === 'practice')) &&
-          (store.assessInfo.has_active_attempt)) ||
+        if (((store.assessInfo.available === 'yes' && store.assessInfo.has_active_attempt) ||
+          store.assessInfo.available === 'practice') ||
           store.assessInfo.can_view_all
         ) {
           store.inPrintView = true;

@@ -47,6 +47,7 @@ class CalculatedAnswerBox implements AnswerBox
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
         if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$partnum];} else {$reqsigfigs = $options['reqsigfigs'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -65,7 +66,7 @@ class CalculatedAnswerBox implements AnswerBox
     		$ansformats = array_map('trim',explode(',',$answerformat));
 
     		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-    			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+    			$out .= $ansprompt;
     		}
     		if ($displayformat=="point") {
     			$leftb = "(";
@@ -94,8 +95,9 @@ class CalculatedAnswerBox implements AnswerBox
     			unset($reqsigfigs);
     		}
     		if (isset($reqsigfigs)) {
-    			if ($reqsigfigs{0}=='=') {
-    				$reqsigfigs = substr($reqsigfigs,1);
+          list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
+
+    			if ($exactsigfig) {
     				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
     					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs,'',false,in_array("scinot",$ansformats)||in_array("scinotordec",$ansformats)));
     				} else {
@@ -103,10 +105,9 @@ class CalculatedAnswerBox implements AnswerBox
     				}
     				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
     				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
-    			} else if ($reqsigfigs{0}=='[') {
-    				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
-    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigparts[0], $reqsigfigparts[1]);
-    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigparts[0], $reqsigfigparts[1]);
+    			} else if ($reqsigfigoffset>0) {
+    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
+    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
     			} else {
     				if ($answer!=0) {
     					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;
@@ -133,11 +134,13 @@ class CalculatedAnswerBox implements AnswerBox
     			'name' => "qn$qn",
     			'id' => "qn$qn",
     			'value' => $la,
-    			'autocomplete' => 'off'
+                'autocomplete' => 'off',
+                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     		];
 
     		$params['tip'] = $shorttip;
-        $params['longtip'] = $tip;
+            $params['longtip'] = $tip;
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}

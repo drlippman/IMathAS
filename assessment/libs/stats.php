@@ -8,7 +8,8 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf",
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
- "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+ "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
+ "csvdownloadlink");
 
 //nCr(n,r)
 //The Choose function
@@ -832,7 +833,7 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 
 	$out = array();
 	for ($i=0; $i<$n; $i++) {
-		$out[] = -$mu*log($RND->rand(1,32768)/32768);
+		$out[] = round(-$mu*log($RND->rand(1,32768)/32768), $rnd);
 	}
 	return $out;
 }
@@ -2031,6 +2032,31 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 	}
 	$out .= '<div style="height: 1px; clear: left;">&nbsp;</div></div>';
 	return $out;
+}
+
+//argument should be header,column,header,column,...
+function csvdownloadlink() {
+  $alist = func_get_args();
+  if (count($alist)==0 || count($alist)%2==1) {
+    echo "invalid arguments to csvdownloadlink";
+    return '';
+  }
+  $rows = array();
+  for ($i=0;$i<count($alist);$i+=2) {
+    $rows[0] .= '"'.str_replace('"','',$alist[$i]).'",';
+    for ($j=0;$j<count($alist[$i+1]);$j++) {
+      $rows[$j+1] .= (is_numeric($alist[$i+1][$j]) ?
+        floatval($alist[$i+1][$j]) :
+        '"'.str_replace('"','',$alist[$i+1][$j]).'"')
+        . ',';
+    }
+  }
+  foreach ($rows as $i=>$row) {
+    $rows[$i] = rtrim($row,',');
+  }
+  $str = implode("\n",$rows);
+  return '<a download="data.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
+    . _('Download CSV').'</a>';
 }
 
 

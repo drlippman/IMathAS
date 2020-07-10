@@ -167,7 +167,8 @@ switch($_GET['action']) {
 			$oldrights = $line['rights'];
 			$oldspecialrights = $line['specialrights'];
 		}
-		echo '<script type="text/javascript">
+		?>
+		<script type="text/javascript">
 			function onrightschg() {
 				var selrights = this.value;
 				if (selrights<75) {
@@ -191,11 +192,46 @@ switch($_GET['action']) {
 					if ($(this).text().toLowerCase()==proposedgroup) {
 						alert("That group name already exists!");
 						$("#group").val(this.value).trigger("change");
-						break;
+						return false;
 					}
 				});
 			}
-			</script>';
+			function searchgrps() {
+				var grpsearch = document.getElementById("grpsearch").value;
+				if (grpsearch.trim() !== '') {
+					$.ajax({
+						type: "POST",
+						url: "groupsearch.php",
+						dataType: "json",
+						data: {
+							"grpsearch": grpsearch
+						}
+					}).done(function(msg) {
+						var existing = [];
+						$("#group option").each(function(i,el) {
+							if (i>2) {
+								$(el).remove();
+							} else {
+								existing.push(el.value);
+							}
+						});
+						for (var i=0; i<msg.length; i++) {
+							if (existing.indexOf(msg[i].id) !== -1) { continue; }
+							$("#group").append($("<option>", {
+								value: msg[i].id,
+								text: msg[i].name
+							}));
+						}
+						if (document.getElementById("group").options.length > 2) {
+							document.getElementById("group").selectedIndex = 2;
+						} else {
+							document.getElementById("group").selectedIndex = document.getElementById("group").options.length-1;
+						}
+					});
+				}
+			}
+			</script>
+		<?php
 		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=SID ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
@@ -289,22 +325,27 @@ switch($_GET['action']) {
 		echo '</span><br class="form"/>';
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
-			echo "<span class=form>Assign to group: </span>";
-			echo "<span class=formright><select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
+			echo "<span class=form>Group: </span>";
+			echo "<span class=formright>";
+			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
+			echo "<label for=\"group\">Assign to:</label> <select name=\"group\" id=\"group\" onchange=\"chknewgroup(this)\">";
 			echo '<option value="-1">New Group</option>';
 			echo "<option value=0 ";
 			if ($oldgroup==0) {
 				echo "selected=1";
 			}
 			echo ">Default</option>\n";
-			$stm = $DBH->query("SELECT id,name FROM imas_groups ORDER BY name");
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				printf('<option value="%d" ', Sanitize::onlyInt($row[0]));
-				if ($oldgroup==$row[0]) {
-					echo "selected=1";
+			if ($oldgroup > 0) {
+				$stm = $DBH->prepare("SELECT id,name FROM imas_groups WHERE id=?");
+				$stm->execute(array($oldgroup));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					printf('<option value="%d" ', Sanitize::onlyInt($row[0]));
+					if ($oldgroup==$row[0]) {
+						echo "selected=1";
+					}
+					$row[1] = preg_replace('/\s+/', ' ', trim($row[1]));
+					printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 				}
-				$row[1] = preg_replace('/\s+/', ' ', trim($row[1]));
-				printf(">%s</option>\n", Sanitize::encodeStringForDisplay($row[1]));
 			}
 			echo "</select>";
 			echo '<span id="newgroup" style="display:none"><br/>New group name: ';
@@ -1436,6 +1477,49 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
+	case "mergegroups":
+		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		echo '<div id="headerforms" class="pagetitle"><h1>'._('Merge Group').'</h1></div>';
+		$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$grpname = $stm->fetchColumn(0);
+		?>
+		<script type="text/javascript">
+		function searchgrps() {
+			var grpsearch = document.getElementById("grpsearch").value;
+			if (grpsearch.trim() !== '') {
+				$.ajax({
+					type: "POST",
+					url: "groupsearch.php",
+					dataType: "json",
+					data: {
+						"grpsearch": grpsearch
+					}
+				}).done(function(msg) {
+					$("#group").empty();
+					for (var i=0; i<msg.length; i++) {
+						$("#group").append($("<option>", {
+							value: msg[i].id,
+							text: msg[i].name
+						}));
+					}
+				});
+			}
+		}
+		</script>
+		<?php
+		printf("<form method=post action=\"actions.php?from=%s&id=%s\">\n",
+			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']));
+		echo '<input type=hidden name=action value="mergegroups" />';
+		echo '<p>'.sprintf(_('This action will move teachers from group %s to another group and delete their original group'),
+			'<strong>'.Sanitize::encodeStringForDisplay($grpname).'</strong>').'</p>';
+		echo '<p><label for="grpsearch">'._('Search for Groups').'</label> <input id=grpsearch />';
+		echo ' <button type=button onclick="searchgrps()">'._('Search').'</button><br/>';
+		echo '<label for="group">'._('Move teachers to:').'</label> ';
+		echo '<select name="group" id="group" ></select>';
+		echo '<p><button type=submit>'._('Submit').'</button></p>';
+		echo '</form>';
+		break;
 	case "modgroup":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle"><h1>Rename Instructor Group</h1></div>';
@@ -1465,6 +1549,10 @@ switch($_GET['action']) {
 
 		echo "<input type=submit value=\"Update Group\">\n";
 		echo "</form>\n";
+		echo '<p></p><p>';
+		printf("<a href=\"forms.php?from=%s&action=mergegroups&id=%s\">%s</a></p>",
+			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']),
+			_('Merge group with another'));
 		break;
 	case "removediag":
 		if ($myrights<100 && ($myspecialrights&4)!=4) { echo "You don't have the authority for this action"; break;}

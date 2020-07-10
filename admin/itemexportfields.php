@@ -10,7 +10,7 @@ $db_fields['calitems'] = 'date,title,tag';
 $db_fields['block'] = 'name,avail,startdate,enddate,SH,colors,public,fixedheight';
 
 //look for non-changable fields in $CFG and don't write those on import
-$db_fields['course'] = 'enrollkey,hideicons,allowunenroll,copyrights,msgset,available,theme,latepasshrs,picicons,ltisecret,showlatepass,toolset,deflatepass,deftime,UIver';
+$db_fields['course'] = 'enrollkey,allowunenroll,copyrights,msgset,available,theme,latepasshrs,ltisecret,showlatepass,toolset,deflatepass,deftime,UIver';
 
 $db_fields['inlinetext'] = 'title,text,startdate,enddate,fileorder,avail,oncal,caltag,isplaylist';
 $db_fields['linkedtext'] = 'title,summary,text,startdate,enddate,avail,oncal,caltag,target,points';

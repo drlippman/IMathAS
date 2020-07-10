@@ -96,6 +96,12 @@
         >
           {{ $t('closed.teacher_preview_button') }}
         </button>
+        <button
+          class = "secondary"
+          @click = "teacherPreviewAll"
+        >
+          {{ $t('closed.teacher_previewall_button') }}
+        </button>
       </p>
 
     </div>
@@ -292,6 +298,9 @@ export default {
     },
     teacherPreview () {
       actions.startAssess(false, '', []);
+    },
+    teacherPreviewAll () {
+      actions.startAssess(false, '', [], null, true);
     },
     doReset () {
       actions.loadAssessData(null, true);

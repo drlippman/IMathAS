@@ -740,7 +740,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if (count($wholewords)>0 || count($searchterms)>0) {
 					$searchlikes .= '(';
 					if (count($wholewords)>0) {
-						$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(\''.implode(' ', $wholewords).'\' IN BOOLEAN MODE) ';
+						$searchlikes .= 'MATCH(imas_questionset.description) AGAINST(? IN BOOLEAN MODE) ';
+						$searchlikevals[] = implode(' ', $wholewords);
 					}
 					if (count($searchterms)>0) {
 						if (count($wholewords)>0) {

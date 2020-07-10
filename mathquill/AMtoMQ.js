@@ -763,6 +763,7 @@ function MQtoAM(tex,display) {
   });
 	tex = tex.replace(/\\le(?!f)/g,'<=');
 	tex = tex.replace(/\\ge/g,'>=');
+  tex = tex.replace(/\\ne/g,'!=');
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
@@ -775,6 +776,7 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\\cdot/g,'*');
 	tex = tex.replace(/\\infty/g,'oo');
 	tex = tex.replace(/\\nthroot/g,'root');
+  tex = tex.replace(/\\mid/g,'|');
 	tex = tex.replace(/\\/g,'');
 	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
 	tex = tex.replace(/(\d)frac/g,'$1 frac');

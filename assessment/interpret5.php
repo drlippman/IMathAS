@@ -310,15 +310,15 @@ function tokenize($str,$anstype,$countcnt) {
 	while ($i<$len) {
 		$intype = 0;
 		$out = '';
-		$c = $str{$i};
+		$c = $str[$i];
 		$len = strlen($str);
-		if ($c=='/' && $str{$i+1}=='/') { //comment
+		if ($c=='/' && $str[$i+1]=='/') { //comment
 			while ($c!="\n" && $i<$len) {
 				$i++;
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 			$i++;
-			$c = $str{$i};
+			$c = $str[$i];
 			$intype = 7;
 		} else if ($c=='$') { //is var
 			$intype = 1;
@@ -327,7 +327,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$out .= $c;
 				$i++;
 				if ($i==$len) {break;}
-				$c = $str{$i};
+				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//if [ then array ref - read and connect as part of variable token
 			if ($c=='[' || $c=='{') {
@@ -349,7 +349,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$out .= $c;
 				$i++;
 				if ($i==$len) {break;}
-				$c = $str{$i};
+				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word, and set type appropriately if it is
 			if ($out=='if' || $out=='where' || $out=='for') {
@@ -377,24 +377,24 @@ function tokenize($str,$anstype,$countcnt) {
 				//eat whitespace
 				while ($c==' ') {
 					$i++;
-					$c = $str{$i};
+					$c = $str[$i];
 				}
 				//could be sin^-1 or sin^(-1) - check for them and rewrite if needed
 				if ($c=='^' && substr($str,$i+1,2)=='-1') {
 					$i += 3;
 					$out = 'arc'.$out;
-					$c = $str{$i};
+					$c = $str[$i];
 					while ($c==' ') {
 						$i++;
-						$c = $str{$i};
+						$c = $str[$i];
 					}
 				} else if ($c=='^' && substr($str,$i+1,4)=='(-1)') {
 					$i += 3;
 					$out = 'arc'.$out;
-					$c = $str{$i};
+					$c = $str[$i];
 					while ($c==' ') {
 						$i++;
-						$c = $str{$i};
+						$c = $str[$i];
 					}
 				}
 				//if there's a ( then it's a function
@@ -434,7 +434,7 @@ function tokenize($str,$anstype,$countcnt) {
 
 				}
 			}
-		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
+		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str[$i+1]>='0' && $str[$i+1]<='9')) ) { //is num
 			$intype = 3; //number
 			$cont = true;
 			//handle . 3 which needs to act as concat
@@ -446,22 +446,22 @@ function tokenize($str,$anstype,$countcnt) {
 				$lastc = $c;
 				$i++;
 				if ($i==$len) {break;}
-				$c= $str{$i};
-				if (($c>='0' && $c<='9') || ($c=='.' && $str{$i+1}!='.' && $lastc!='.')) {
+				$c= $str[$i];
+				if (($c>='0' && $c<='9') || ($c=='.' && $str[$i+1]!='.' && $lastc!='.')) {
 					//is still num
 				} else if ($c=='e' || $c=='E') {
 					//might be scientific notation:  5e6 or 3e-6
-					$d = $str{$i+1};
+					$d = $str[$i+1];
 					if ($d>='0' && $d<='9') {
 						$out .= $c;
 						$i++;
 						if ($i==$len) {break;}
-						$c= $str{$i};
-					} else if (($d=='-'||$d=='+') && ($str{$i+2}>='0' && $str{$i+2}<='9')) {
+						$c= $str[$i];
+					} else if (($d=='-'||$d=='+') && ($str[$i+2]>='0' && $str[$i+2]<='9')) {
 						$out .= $c.$d;
 						$i+= 2;
 						if ($i>=$len) {break;}
-						$c= $str{$i};
+						$c= $str[$i];
 					} else {
 						$cont = false;
 					}
@@ -490,9 +490,9 @@ function tokenize($str,$anstype,$countcnt) {
 			while ($j<$len) {
 				//read terms until we get to right bracket at same nesting level
 				//we have to avoid strings, as they might contain unmatched brackets
-				$d = $str{$j};
+				$d = $str[$j];
 				if ($inq) {  //if inquote, leave if same marker (not escaped)
-					if ($d==$qtype && $str{$j-1}!='\\') {
+					if ($d==$qtype && $str[$j-1]!='\\') {
 						$inq = false;
 					}
 				} else {
@@ -520,11 +520,11 @@ function tokenize($str,$anstype,$countcnt) {
 							$i= $j+1;
 							break;
 						}
-					} else if ($d=='/' && $str{$j+1}=='/') {
+					} else if ($d=='/' && $str[$j+1]=='/') {
 						//comment inside brackers
 						while ($d!="\n" && $j<$len) {
 							$j++;
-							$d = $str{$j};
+							$d = $str[$j];
 						}
 					} else if ($d=="\n") {
 						//echo "unmatched parens/brackets - likely will cause an error";
@@ -536,7 +536,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$i = $j;
 				echo _('unmatched parens/brackets - likely will cause an error');
 			} else {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		} else if ($c=='"' || $c=="'" || $c=='`') { //string, or unquoted math
 			$intype = 6;
@@ -547,7 +547,7 @@ function tokenize($str,$anstype,$countcnt) {
 				$i++;
 				if ($i==$len) {break;}
 				$lastc = $c;
-				$c = $str{$i};
+				$c = $str[$i];
 			} while (!($c==$qtype && $lastc!='\\'));
 			$strtext .= $c;
 			if ($c=='`') {
@@ -556,33 +556,33 @@ function tokenize($str,$anstype,$countcnt) {
 				$out .= removeDisallowedVarsString($strtext,$anstype,$countcnt);
 			}
 			$i++;
-			$c = $str{$i};
+			$c = $str[$i];
 		} else if ($c=="\n") {
 			//end of line
 			$intype = 7;
 			$i++;
 			if ($i<$len) {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		} else if ($c==';') {
 			//end of line
 			$intype = 7;
 			$i++;
 			if ($i<$len) {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		} else {
 			//no type - just append string.  Could be operators
 			$out .= $c;
 			$i++;
 			if ($i<$len) {
-				$c = $str{$i};
+				$c = $str[$i];
 			}
 		}
 		while ($c==' ') { //eat up extra whitespace
 			$i++;
 			if ($i==$len) {break;}
-			$c = $str{$i};
+			$c = $str[$i];
 			if ($c=='.' && $intype==3) {//if 3 . needs space to act like concat
 				$out .= ' ';
 			}
@@ -620,7 +620,7 @@ function tokenize($str,$anstype,$countcnt) {
 					$syms[] = array('',7); //end of line;
 					$lastsym = array('',7);
 				}
-			} else if ($out{0}=='{' && $lastsym[0]=='$') { //var var
+			} else if ($out[0]=='{' && $lastsym[0]=='$') { //var var
 				//conditional value based on if allowed
 				$syms[count($syms)-1][0] = '((checkvarvarisallowed('.substr($out,1,-1).'))?$'.$out.':0)';
 				$connecttolast = 0;
@@ -657,19 +657,19 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 	$outstr = '';
 	$depth = 0;
 	for ($c=0;$c<strlen($str);$c++) {
-		if ($str{$c}=='{') {
+		if ($str[$c]=='{') {
 			if ($invarvar || $inbraces) {
 				$depth++;
 			} else { //may be starting new brace or varvar item
-				if ($c>0 && $str{$c-1}=='$') { //might be varvar
-					if ($c>1 && $str{$c-2}=='\\' && ($c<3 || $str{$c-3}!='\\')) {
+				if ($c>0 && $str[$c-1]=='$') { //might be varvar
+					if ($c>1 && $str[$c-2]=='\\' && ($c<3 || $str[$c-3]!='\\')) {
 						//it's braces with escaped $ sign
 					} else {
 						$invarvar = true;
 					}
 				}
 				if (!$invarvar) {
-					if ($c<strlen($str)-1 && $str{$c+1}!=='$') {
+					if ($c<strlen($str)-1 && $str[$c+1]!=='$') {
 						continue; //skip {b and { $a since won't parse as brace
 					} else {
 						$inbraces = true;
@@ -683,7 +683,7 @@ function removeDisallowedVarsString($str,$anstype,$countcnt=1) {
 					$outstr .= substr($str,$lastend,$c-$lastend);
 				}
 			}
-		} else if ($str{$c}=='}' && ($invarvar || $inbraces)) {
+		} else if ($str[$c]=='}' && ($invarvar || $inbraces)) {
 			$depth--;
 			if ($depth==0) {
 				if ($inbraces) {

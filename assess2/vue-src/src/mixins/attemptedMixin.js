@@ -11,19 +11,9 @@ export const attemptedMixin = {
           store.assessInfo.questions[i].hasOwnProperty('parts_entered') &&
           store.assessInfo.questions[i].hasOwnProperty('answeights')
         ) {
-          let min = 1;
-          let max = 0;
-          for (const k in store.assessInfo.questions[i].parts_entered) {
-            if (store.assessInfo.questions[i].parts_entered[k] < min) {
-              min = store.assessInfo.questions[i].parts_entered[k];
-            }
-            if (store.assessInfo.questions[i].parts_entered[k] > max) {
-              max = store.assessInfo.questions[i].parts_entered[k];
-            }
-          }
-          if (min > 0 && store.assessInfo.questions[i].parts_entered.length === store.assessInfo.questions[i].answeights.length) {
+          if (store.assessInfo.questions[i].parts_entered.length >= store.assessInfo.questions[i].answeights.length) {
             qAttempted[i] = 1;
-          } else if (max > 0) {
+          } else if (store.assessInfo.questions[i].parts_entered.length > 0) {
             qAttempted[i] = 0.5;
           }
         } else if (store.assessInfo.questions[i].try > 0) {
