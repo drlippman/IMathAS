@@ -76,7 +76,7 @@ if ($link->get_placementtype() == 'course') {
 	$stm->execute(array(':id'=>$typeid));
     $line = $stm->fetch(PDO::FETCH_ASSOC);
     $cid = Sanitize::courseId($line['courseid']);
-	echo "<h2>".sprintf(_("Assignment Management: %s"), Sanitize::encodeStringForDisplay($line['name'])) . "</h2>";
+	echo "<h2>".sprintf(_("Assessment Management: %s"), Sanitize::encodeStringForDisplay($line['name'])) . "</h2>";
 	if ($line['ver'] > 1) {
 		echo "<p><a href=\"../assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a> | ";
 		echo "<a href=\"../course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Grade list")."</a> ";
@@ -155,8 +155,13 @@ if ($link->get_placementtype() == 'course') {
 		echo '<br><a href="../course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a>';
 		echo '</p>';
 
+} else if (function_exists('ext_can_handle_redirect') &&
+	ext_can_handle_redirect($link->get_placementtype()) &&
+	function_exists('ext_lti_home')
+) {
+	ext_lti_home($link, $launch, $localcourse, $db);
 }
-if ($launch->has_nrps()) {
+if ($launch->has_nrps() && empty($localcourse->get_allow_direct_login())) {
 	echo '<p>'.sprintf(_('The LMS offers a roster service, which allows you to update your %s roster to include all students in the LMS.'),
 		$installname).'</p>';
 	echo '<form method=post action="pullroster.php?launchid=' .

@@ -24,6 +24,7 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *   ext_can_handle_redirect($placementtype)
    *   ext_redirect_launch($link)
    *    redirect to the content
+   *   ext_lti_home($link, $launch, $localcourse, $db)
    */
 }
 
