@@ -49,7 +49,7 @@ if (!empty($_POST['pullroster'])) {
 	list($newcnt,$notfound) = $db->update_roster($data, $localcourse, $platform_id);
 
 	require('../header.php');
-	echo '<div class=breadcrumbs>'.$breadcrumbbase.' &gt; '._('Roster Pull Results').'</div>';
+	echo '<div class=breadcrumb>'.$breadcrumbbase._('Roster Pull Results').'</div>';
 	echo '<h1>'._('Roster Pull Results').'</h2>';
 	echo '<p>'.sprintf(_('Added %d new students to the roster.'), $newcnt).'</p>';
 

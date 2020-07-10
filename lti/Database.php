@@ -826,12 +826,13 @@ class Imathas_LTI_Database implements LTI\Database {
       imas_users AS iu JOIN imas_ltiusers AS ilu ON ilu.userid=iu.id AND ilu.org=?
       JOIN imas_students AS istu ON istu.userid=iu.id WHERE istu.courseid=?';
     $stm = $this->dbh->prepare($query);
-    $stm->execute(array('LTI13-'.$platform_id, $courseid));
+    $stm->execute(array('LTI13-'.$platform_id, $localcourse->get_courseid()));
     $current = array();
     $enrollcnt = 0;
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
       $current[$row['ltiuserid']] = $row;
     }
+
     foreach ($data['members'] AS $member) {
       if (standardize_role($member['roles']) !== 'Learner') {
         // only handling students
@@ -845,7 +846,7 @@ class Imathas_LTI_Database implements LTI\Database {
         $localuserid = $stm->fetchColumn(0);
         if ($localuserid === false) {
           // No existing user, create user if we have enough info
-          if (!empty($member['given_name']) && !empty($member['family_name']) {
+          if (!empty($member['given_name']) && !empty($member['family_name'])) {
             // TODO create user
             $localuserid = $this->create_user_account([
               'SID' => uniqid(), // temporary
@@ -866,7 +867,7 @@ class Imathas_LTI_Database implements LTI\Database {
         }
         // enroll in course
         $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,lticourseid) VALUES (?,?,?,?)');
-        $stm->execute(array($userid, $localcourse->get_courseid(), $section, $localcourse->get_id()));
+        $stm->execute(array($localuserid, $localcourse->get_courseid(), $section, $localcourse->get_id()));
 
         $enrollcnt++;
       } else {

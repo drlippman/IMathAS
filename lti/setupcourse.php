@@ -23,8 +23,11 @@ $contextid = $launch->get_platform_context_id();
 $contextlabel = $launch->get_platform_context_label();
 $platform_id = $launch->get_platform_id();
 
-// TODO: double check course connection not already established
-
+// double check course connection not already established
+if ($db->get_local_course($contextid, $platform_id) !== null) {
+  echo 'Error: course link already established';
+  exit;
+}
 if ($_POST['linktype'] == 'assoc') {
   $destcid = intval($_POST['assocselect']);
   if (!$db->ok_to_associate($destcid, $userid)) {

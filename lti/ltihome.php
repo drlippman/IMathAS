@@ -75,8 +75,8 @@ if ($link->get_placementtype() == 'course') {
 	$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti,ver,courseid FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$typeid));
     $line = $stm->fetch(PDO::FETCH_ASSOC);
-    $cid = $line['courseid'];
-	echo "<h2>".sprintf(_("LTI Placement of %s"), Sanitize::encodeStringForDisplay($line['name'])) . "</h2>";
+    $cid = Sanitize::courseId($line['courseid']);
+	echo "<h2>".sprintf(_("Assignment Management: %s"), Sanitize::encodeStringForDisplay($line['name'])) . "</h2>";
 	if ($line['ver'] > 1) {
 		echo "<p><a href=\"../assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a> | ";
 		echo "<a href=\"../course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Grade list")."</a> ";
@@ -115,8 +115,10 @@ if ($link->get_placementtype() == 'course') {
 
     if ($line['ver']>1) {
         $addassess = 'addassessment2.php';
+				$chgassess = 'chgassessment2.php';
     } else {
         $addassess = 'addassessment.php';
+				$chgassess = 'chgassessment.php';
     }
     echo "<p><a href=\"../course/$addassess?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a> | ";
     echo "<a href=\"../course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></p>";
@@ -139,6 +141,20 @@ if ($link->get_placementtype() == 'course') {
         echo _('Does not currently have a grade column for passing back grades, and the LMS does not support us adding one.');
     }
     echo '</p>';
+
+		echo '<h2>'._('Course Management').'</h2>';
+		echo '<p><a href="../course/listusers.php?cid='.$cid.'">'._('Roster').'</a>';
+		echo '<br><a href="../course/gradebook.php?cid='.$cid.'">'._('Gradebook').'</a>';
+		echo '<br><a href="../course/'.$chgassess.'?cid='.$cid.'">'._('Mass Change Assessments').'</a>';
+		if ($line['date_by_lti']===0) {
+			echo '<br><a href="../course/masschgdates?cid='.$cid.'">'._('Mass Change Dates').'</a>';
+		}
+		echo '<br><a href="../admin/forms.php?action=modify&cid='.$cid.'&id='.$cid.'">'._('Course Settings').'</a>';
+		echo '<br><a href="../course/copyitems.php?cid='.$cid.'">'._('Course Items: Copy').'</a>';
+		echo '<br><a href="../course/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a>';
+		echo '<br><a href="../course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a>';
+		echo '</p>';
+
 }
 if ($launch->has_nrps()) {
 	echo '<p>'.sprintf(_('The LMS offers a roster service, which allows you to update your %s roster to include all students in the LMS.'),
