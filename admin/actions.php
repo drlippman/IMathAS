@@ -1094,26 +1094,6 @@ switch($_POST['action']) {
 		$stm = $DBH->prepare("UPDATE imas_groups SET name=:name,parent=:parent WHERE id=:id");
 		$stm->execute(array(':name'=>$_POST['gpname'], ':parent'=>$_POST['parentid'], ':id'=>$_GET['id']));
 
-		if (!empty($_POST['ipeddel'])) {
-			$qstr = [];
-			$qarr = [];
-			foreach ($_POST['ipeddel'] as $v) {
-				list($type,$ipedsid) = explode('-',$v);
-				$qstr[] = '(type=? AND ipedsid=?)';
-				$qarr[] = $type;
-				$qarr[] = $ipedsid;
-			}
-			$query = 'DELETE FROM imas_ipeds_group WHERE ('.implode(' OR ', $qstr).') AND groupid=?';
-			$qarr[] = intval($_GET['id']);
-			$stm = $DBH->prepare($query);
-			$stm->execute($qarr);
-		}
-		if (!empty($_POST['newipeds'])) {
-			list($type,$ipedsid) = explode('-', $_POST['newipeds']);
-			$stm = $DBH->prepare('INSERT IGNORE imas_ipeds_group (type,ipedsid,groupid) VALUES (?,?,?)');
-			$stm->execute(array($type, $ipedsid, intval($_GET['id'])));
-		}
-
 		//call hook, if defined
 		if (function_exists('onModGroup')) {
 			onModGroup($_GET['id'], $userid, $myrights, $groupid);

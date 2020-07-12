@@ -12,6 +12,12 @@ if (empty($CFG['use_ipeds'])) {
     exit;
 }
 
+if ($myrights == 100 && isset($_REQUEST['groupid'])) {
+    $grp = intval($_REQUEST['groupid']);
+} else {
+    $grp = $groupid;
+}
+
 if (isset($_POST['postback'])) {
     if ($myrights == 100 && !empty($_POST['ipeddel'])) {
         $qstr = [];
@@ -23,7 +29,7 @@ if (isset($_POST['postback'])) {
             $qarr[] = $ipedsid;
         }
         $query = 'DELETE FROM imas_ipeds_group WHERE ('.implode(' OR ', $qstr).') AND groupid=?';
-        $qarr[] = intval($groupid);
+        $qarr[] = intval($grp);
         $stm = $DBH->prepare($query);
         $stm->execute($qarr);
     }
@@ -48,27 +54,30 @@ if (isset($_POST['postback'])) {
     }
     if (!empty($newipedsid) && $newipedsid != '0') {
         $stm = $DBH->prepare('INSERT IGNORE imas_ipeds_group (type,ipedsid,groupid) VALUES (?,?,?)');
-		$stm->execute(array($type, $newipedsid, intval($groupid)));
+		$stm->execute(array($type, $newipedsid, intval($grp)));
     }
     header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php');
     exit;
 }
 
 $stm = $DBH->prepare('SELECT name FROM imas_groups WHERE id=?');
-$stm->execute(array($groupid));
+$stm->execute(array($grp));
 $groupname = $stm->fetchColumn(0);
 
 $query = 'SELECT DISTINCT ii.type,ii.ipedsid,IF(ii.type="A",ii.agency,ii.school) AS name
     FROM imas_ipeds AS ii JOIN imas_ipeds_group AS iig
     ON iig.type=ii.type AND iig.ipedsid=ii.ipedsid WHERE iig.groupid=?';
 $stm = $DBH->prepare($query);
-$stm->execute(array($groupid));
+$stm->execute(array($grp));
 $ipeds = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/ipedssearch.js"></script>';
 require('../header.php');
 echo '<div class=breadcrumb>'.$breadcrumbbase.' IPEDS/NCES Association</div>';
 echo '<form method=post action="ipedslink.php">';
+if ($myrights == 100) {
+    echo '<input type=hidden name=groupid value="'.intval($grp).'"/>';
+}
 echo '<h1>Group IPEDS / NCES Associations</h1>';
 echo '<h2>Group: ' . Sanitize::encodeStringForDisplay($groupname) . '</h2>';
 if (!empty($ipeds)) {
@@ -89,7 +98,7 @@ if (!empty($ipeds)) {
         echo '<p>Select an assocation to delete it.</p>';
     }
 }
-if ($myrights === 100 || empty($ipds)) {
+if ($myrights == 100 || empty($ipeds)) {
     ?>
     <h3>Add Association</h3>
     <p><label>School type: <select name=schooltype id=schooltype>
