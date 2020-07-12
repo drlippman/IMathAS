@@ -257,15 +257,7 @@ $(function() {
             includeselect: true
         });
     });
-    $('#ipeds').on('change', function () {
-        var val = this.value;
-        if (val == '0') {
-            $('#otherschool').slideDown();
-        } else {
-            $('#otherschool').slideUp();
-        }
-        
-    });
+
     $('#country').on('change', function () {
         var country = this.value;
         if (country != '') {
@@ -276,15 +268,6 @@ $(function() {
                 wrapper: 'intlwrap',
                 includeselect: true
             });
-        }
-    });
-    // TODO: add intlipeds search
-    $('#intlipeds').on('change', function () {
-        var val = this.value;
-        if (val == '0') {
-            $('#otherschool').slideDown();
-        } else {
-            $('#otherschool').slideUp();
         }
     });
 

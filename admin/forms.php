@@ -1543,7 +1543,7 @@ switch($_GET['action']) {
 		echo '</select><br/>';
 
 		if (!empty($CFG['use_ipeds'])) {
-			echo '<p>'._('IPEDS / NCES Associations').':</p>';
+			echo '<p>'._('IPEDS / NCES Associations (select to delete)').':</p>';
 			$query = 'SELECT DISTINCT ii.type,ii.ipedsid,IF(ii.type="A",ii.agency,ii.school) AS name
 			 	FROM imas_ipeds AS ii JOIN imas_ipeds_group AS iig
 				ON iig.type=ii.type AND iig.ipedsid=ii.ipedsid WHERE iig.groupid=?';
