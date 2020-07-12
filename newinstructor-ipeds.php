@@ -4,6 +4,20 @@ $init_session_start = true;
 require("init_without_validate.php");
 require_once(__DIR__.'/includes/newusercommon.php');
 
+/**
+ * TODO: handle postback:
+ *  - Create user account
+ *  - Enroll in teacher courses
+ *  - Send email
+ *  - Store upload if provided
+ *  - Create request data
+ *  - Adjust approvepending2
+ *    - display new info
+ *    - If ipeds linked to group, preselect group, or provide selector of just the linked groups
+ *    - If not, establish link to selected group on approval
+ *    - Create custom ipeds records for Intl requests
+ */
+
 $pagetitle = "New instructor account request";
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
 $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
