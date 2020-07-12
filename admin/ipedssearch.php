@@ -2,6 +2,7 @@
 
 require('../init_without_validate.php');
 header('Content-Type: application/json; charset=utf-8');
+$out = array();
 if (isset($_POST['search'])) {
   $words = array_map('trim', explode(' ', Sanitize::stripHtmlTags($_POST['search'])));
   $qarr = array();
@@ -20,7 +21,7 @@ if (isset($_POST['search'])) {
     echo '[]';
     exit;
   }
-  $query = 'SELECT * FROM imas_ipeds WHERE ';
+  $query = 'SELECT * FROM imas_ipeds WHERE (';
   if (count($wholewords)>0) {
     $query .= 'MATCH(school) AGAINST(? IN BOOLEAN MODE) ';
     $qarr[] = implode(' ', $wholewords);
@@ -33,6 +34,16 @@ if (isset($_POST['search'])) {
     }
     $query .= 'zip=?';
     $qarr[] = $zip;
+  }
+  $query .= ')';
+  if (isset($_POST['type'])) {
+      if ($_POST['type'] == 'coll') {
+          $query .= " AND type='I'";
+      } else if ($_POST['type'] == 'pubk12') {
+        $query .= " AND type='A'";
+      } else if ($_POST['type'] == 'privk12') {
+        $query .= " AND type='S'";
+      }
   }
   $query .= ' ORDER BY school';
   $stm = $DBH->prepare($query);
@@ -53,6 +64,12 @@ if (isset($_POST['search'])) {
     $name .= $row['country'];
     $out[] = ['id'=>$row['type'].'-'.$row['ipedsid'], 'name'=>$name];
   }
-  echo json_encode($out, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);
-	exit;
+} else if (isset($_POST['country'])) {
+    $stm = $DBH->prepare('SELECT * FROM imas_ipeds WHERE country=? ORDER BY school');
+    $stm->execute(array(Sanitize::simpleString($_POST['country'])));
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $name = $row['school'];
+        $out[] = ['id'=>$row['type'].'-'.$row['ipedsid'], 'name'=>$name];
+    }
 }
+echo json_encode($out, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);
