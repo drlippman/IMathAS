@@ -50,6 +50,13 @@ var MQeditor = (function($) {
   function setMQconfig(newconfig) {
     MQconfig = newconfig;
   }
+  function inIframe () {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+  }
 
   /*
     Toggles the given input field to/from a MathQuill field
@@ -199,7 +206,11 @@ var MQeditor = (function($) {
       config.curlayoutstyle = config.layoutstyle;
     }
     if (config.curlayoutstyle === 'OSK') {
-      $("#mqeditor").addClass("fixedbottom");
+      if (!inIframe()) {
+        $("#mqeditor").addClass("fixedbottom").removeClass("iframeosk");
+      } else {
+        $("#mqeditor").addClass("iframeosk").removeClass("fixedbottom"); 
+      }
       if (!document.getElementById("mqe-fb-spacer")) {
         var div = document.createElement("div");
         div.style.height = "200px";
@@ -207,7 +218,7 @@ var MQeditor = (function($) {
         $("body").append(div);
       }
     } else {
-      $("#mqeditor").removeClass("fixedbottom");
+      $("#mqeditor").removeClass("fixedbottom iframeosk");
     }
     var rebuild = false;
     // see if the field has changed
@@ -243,7 +254,7 @@ var MQeditor = (function($) {
       }
     }
     // now show and position the editor
-    if (config.curlayoutstyle === 'OSK') {
+    if (config.curlayoutstyle === 'OSK' && !inIframe()) {
       $("#mqeditor").slideDown(50, function () {
         var mqedheight = $("#mqeditor").height() + 5;
         var mqedDistBottom = $(window).height() - (mqel.offset().top + mqel.outerHeight() - $(window).scrollTop());
@@ -266,7 +277,7 @@ var MQeditor = (function($) {
     Hide the editor
    */
   function hideEditor(event) {
-    if (config.curlayoutstyle === 'OSK') {
+    if (config.curlayoutstyle === 'OSK' && !inIframe()) {
       $("#mqeditor").slideUp(50);
     } else {
       $("#mqeditor").hide();
@@ -289,7 +300,7 @@ var MQeditor = (function($) {
     Positions the editor below the MQ field, if layoutstyle dictates
    */
   function positionEditor(ref) {
-    if (config.curlayoutstyle == 'under') {
+    if (config.curlayoutstyle == 'under' || inIframe()) {
     	var mqfield = $(ref).closest(".mathquill-math-field");
     	var offset = mqfield.offset();
     	var height = mqfield.outerHeight();
@@ -300,7 +311,11 @@ var MQeditor = (function($) {
           editorLeft = document.documentElement.clientWidth - editorWidth-5;
         }
       }
-    	$("#mqeditor").css("top", offset.top + height + 3).css("left", editorLeft);
+      if (inIframe()) {
+        $("#mqeditor").css("top", offset.top + height + 3).css("left", 0);
+      } else {
+        $("#mqeditor").css("top", offset.top + height + 3).css("left", editorLeft);
+      }
     } else {
       $("#mqeditor").css("top", "auto").css("left", 0);
     }
