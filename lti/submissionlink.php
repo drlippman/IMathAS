@@ -38,6 +38,12 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
   // look to see if we already know where this link should point
   $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
   if ($link === null) {
+    $lineitemstr = $launch->get_lineitem();
+    if ($lineitemstr !== false) {
+        $link = $db->get_link_assoc_by_lineitem($lineitemstr, $localcourse->get_id());
+    }
+  }
+  if ($link === null) {
     echo _('Cannot do a submission launch before an initial regular launch');
     exit;
   } 

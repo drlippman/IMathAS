@@ -22,6 +22,9 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *      returns array with indices 'name' and 'ptsposs',
    *      and optionally date_by_lti, startdate, enddate
    *   ext_can_handle_redirect($placementtype)
+   *   ext_get_types_as_num() 
+   *      return an array of placementtype=>number identifier, like 'assess'=>0
+   *      Use numbers >50 for custom added types to avoid conflicts
    *   ext_redirect_launch($link)
    *    redirect to the content
    *   ext_lti_home($link, $launch, $localcourse, $db)

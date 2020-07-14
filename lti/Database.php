@@ -1,5 +1,8 @@
 <?php
 
+if (isset($GLOBALS['CFG']['hooks']['lti'])) {
+    require_once($CFG['hooks']['lti']);
+}
 /**
  * Implements IMSGlobal\LTI\Database interface
  */
@@ -93,6 +96,9 @@ class Imathas_LTI_Database implements LTI\Database {
 
   function __construct(PDO $DBH) {
     $this->dbh = $DBH;
+    if (function_exists('ext_get_types_as_num')) {
+        $this->types_as_num = array_merge($this->types_as_num, ext_get_types_as_num());
+    }
   }
 
   /**
@@ -496,6 +502,28 @@ class Imathas_LTI_Database implements LTI\Database {
         ->set_enddate($row['enddate']);
     }
     return null;
+  }
+
+  /**
+   * Get placement from lineitem, if exists
+   * @param  string $lineitem     LMS provided lineitem string
+   * @param  int $lticourseid     imas_lticourses.id
+   * @return null|LTI_Placement
+   */
+  public function get_link_assoc_by_lineitem(string $lineitem, int $lticourseid): ?LTI\LTI_Placement {
+    $query = 'SELECT itemtype,typeid FROM imas_lti_lineitems WHERE
+        lticourseid=? AND lineitem=?';
+    $stm = $this->dbh->prepare($query);
+    $stm->execute(array($lticourseid, $lineitem));
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($row === false) {
+        return null;
+    }
+    $placementtype = array_search($row['itemtype'], $this->types_as_num);
+    return LTI\LTI_Placement::new()
+        ->set_typeid($row['typeid'])
+        ->set_placementtype($placementtype)
+        ->set_typenum($row['itemtype']);
   }
 
   /**
