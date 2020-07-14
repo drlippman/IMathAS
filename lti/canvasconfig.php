@@ -21,7 +21,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
        "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
        "https://purl.imsglobal.org/spec/lti-ags/scope/score",
-			 "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
+       "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
     ],
    "extensions":[
       {
