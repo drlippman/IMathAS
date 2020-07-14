@@ -161,7 +161,8 @@ if ($role == 'Instructor' && $localcourse === null) {
     require(__DIR__.'/deep_link_form.php');
     deep_link_form($launch, $localuserid, $localcourse, $db);
   } else if ($launch->is_submission_review_launch()) {
-    echo 'Is submission review launch';
+    require(__DIR__.'/submissionlink.php');
+    link_to_submission($launch, $localuserid, $localcourse, $db);
   } else if ($launch->is_resource_launch()) {
     require(__DIR__.'/resourcelink.php');
     link_to_resource($launch, $localuserid, $localcourse, $db);

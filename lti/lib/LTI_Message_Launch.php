@@ -301,6 +301,17 @@ class LTI_Message_Launch {
     }
 
     /**
+     * Get the LMS user id that is the target of a submission review request
+     */
+    public function get_submission_review_user_id() {
+        if (!empty($this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/for_user'])) {
+            $for_user = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/for_user'];
+            return $for_user['user_id'];
+        }
+        return false;
+    }
+
+    /**
      * Get context id provided by LMS
      * @return string
      */

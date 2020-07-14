@@ -25,6 +25,7 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *   ext_redirect_launch($link)
    *    redirect to the content
    *   ext_lti_home($link, $launch, $localcourse, $db)
+   *   ext_is_reviewable($link)
    */
 }
 

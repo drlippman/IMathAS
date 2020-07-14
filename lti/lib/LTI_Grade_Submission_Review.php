@@ -50,13 +50,17 @@ class LTI_Grade_Submission_Review {
         return $this;
     }
 
-    public function __toString() {
-        return json_encode(array_filter([
+    public function getObject() {
+        return array_filter([
             "reviewableStatus" => $this->reviewable_status,
             "label" => $this->label,
             "url" => $this->url,
             "custom" => $this->custom,
-        ]));
+        ]);
+    }
+
+    public function __toString() {
+        return json_encode($this->getObject());
     }
 }
 ?>

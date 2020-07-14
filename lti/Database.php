@@ -728,6 +728,14 @@ class Imathas_LTI_Database implements LTI\Database {
           ->set_resource_id($itemtype.'-'.$typeid)
           ->set_score_maximum($info['ptsposs'])
           ->set_label($info['name']);
+        if ($link->get_placementtype() == 'assess' ||
+            (function_exists('ext_is_reviewable') && ext_is_reviewable($link))
+        ) {
+            $submission_review = LTI\LTI\LTI_Grade_Submission_Review::new()
+                ->set_reviewable_status(["Submitted"]);
+            $lineitem->set_submission_review($submission_review);
+        }
+        
         if ($link->get_placementtype() == 'assess') {
           // TODO: figure this out.  Ideally we should link the lineitem to
           // the resource_link.id, but Canvas doesn't seem to like this ?
@@ -805,6 +813,18 @@ class Imathas_LTI_Database implements LTI\Database {
     $stm = $this->dbh->prepare('SELECT id,name FROM imas_assessments WHERE courseid=? ORDER BY name');
     $stm->execute(array($cid));
     return $stm->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  /**
+   * Get old assessment_sessions.id 
+   * @param int $uid  target userid 
+   * @param int $aid  assessment id
+   * @return int asid
+   */
+  public function get_old_asid($uid, $aid) {
+    $stm = $this->dbh->prepare('SELECT id FROM imas_assessment_sessions WHERE userid=? AND assessmentid=?');
+    $stm->execute(array($uid, $aid));
+    return $stm->fetchColumn(0);
   }
 
   /**
