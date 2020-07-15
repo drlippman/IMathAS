@@ -65,7 +65,8 @@ $query = 'CREATE TABLE `imas_lti_tokens` (
   `scopes` varchar(254) NOT NULL,
   `token` TEXT NOT NULL,
   `expires` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`platformid`,`scopes`)
+  PRIMARY KEY (`platformid`,`scopes`),
+  INDEX (`expires`)
 ) ENGINE=InnoDB;';
 $res = $DBH->query($query);
 if ($res===false) {

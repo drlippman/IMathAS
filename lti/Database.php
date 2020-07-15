@@ -222,7 +222,7 @@ class Imathas_LTI_Database implements LTI\Database
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row === false || $row === null) {
             return array(false, 0);
-        } else if ($row['expires'] > time()) {
+        } else if ($row['expires'] < time()) {
             $stm = $this->dbh->prepare('DELETE FROM imas_lti_tokens WHERE platformid=? AND scopes=?');
             $stm->execute(array($platform_id, $scope));
             if (substr($row['token'], 0, 6) === 'failed') {
