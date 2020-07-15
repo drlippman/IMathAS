@@ -584,13 +584,13 @@ class Imathas_LTI_Database implements LTI\Database
     }
 
     /**
-     * Get assessment info, including name, ptsposs, and dates
+     * Get assessment info, including name, ptsposs, submitby, and dates
      * @param  int   $aid imas_assessments.id
      * @return array
      */
     public function get_assess_info(int $aid): array
     {
-        $stm = $this->dbh->prepare('SELECT name,ptsposs,startdate,enddate,date_by_lti FROM imas_assessments WHERE id=?');
+        $stm = $this->dbh->prepare('SELECT name,ptsposs,startdate,enddate,date_by_lti,submitby FROM imas_assessments WHERE id=?');
         $stm->execute(array($aid));
         return $stm->fetch(PDO::FETCH_ASSOC);
     }
@@ -890,6 +890,32 @@ class Imathas_LTI_Database implements LTI\Database
         $stm = $this->dbh->prepare('SELECT id FROM imas_assessment_sessions WHERE userid=? AND assessmentid=?');
         $stm->execute(array($uid, $aid));
         return $stm->fetchColumn(0);
+    }
+
+    /**
+     * Get new assessment grades
+     */
+    public function get_assess_grades($courseid, $aid, $platform_id, $isquiz, $includeempty) 
+    {
+        $query = 'SELECT istu.userid,ilu.ltiuserid,iar.score,iar.status FROM 
+            imas_students AS istu 
+            JOIN imas_ltiusers AS ilu ON istu.userid=ilu.userid AND ilu.org=?
+            LEFT JOIN imas_assessment_records AS iar ON istu.userid=iar.userid
+            WHERE istu.courseid=?';
+        $stm = $this->dbh->prepare($query);
+        $out = array(array('LTI13-'.$platform_id, $courseid));
+        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            if (!$includeempty && 
+                ($row['score'] === null || ($isquiz && ($row['status']&64)==0))
+            ) {
+                continue; // no record or quiz with no submission
+            } 
+            if ($row['score'] === null) {
+                $row['score'] = 0;
+            }
+            $out[] = $row;
+        }
+        return $out;
     }
 
     /**

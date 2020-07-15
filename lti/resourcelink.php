@@ -29,6 +29,7 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
    *    redirect to the content
    *   ext_lti_home($link, $launch, $localcourse, $db)
    *   ext_is_reviewable($link)
+   *   ext_resend_grades($includeempty, $link, $launch, $localcourse, $db)
    */
 }
 

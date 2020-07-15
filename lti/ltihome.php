@@ -53,11 +53,34 @@ if (!empty($_POST['makelineitem'])) {
 			$lineitemmsg = _('Successfully created the grade column.');
 		}
 	}
-	header(sprintf('Location: %s/lti/ltihome.php?launchid=%s',
-		$GLOBALS['basesiteurl'],
-		$launch->get_launch_id()
-	));
-	exit;
+} else if (!empty($_POST['resync']) || !empty($_POST['resyncall'])) {
+    $includeempty = !empty($_POST['resyncall']);
+    $aid = $link->get_typeid();
+    $iteminfo = $db->get_assess_info($aid);
+    $scores = $db->get_assess_grades(
+        $localcourse->get_courseid(),
+        $aid, 
+        $platform_id,
+        $iteminfo['submitby']=='by_assessment',
+        $includeempty
+    );
+    $lineitem = $launch->get_lineitem();
+    require(__DIR__ . '/../includes/ltioutcomes.php');
+    $cnt = 0;
+    foreach ($scores as $scoredata) {
+        $sourcedid = 'LTI1.3:|:' . $scoredata['ltiuserid'] . 
+            ':|:' . $lineitem . ':|:' . $platform_id;
+        calcandupdateLTIgrade(
+            $sourcedid,
+            $aid,
+            $uid,
+            $score,
+            true,
+            $iteminfo['ptsposs']
+        );
+        $cnt++;
+    }
+    $scoreresendmsg = sprintf(_('Updates sent for %d students'), $cnt);
 }
 
 
@@ -115,45 +138,58 @@ if ($link->get_placementtype() == 'course') {
 
     if ($line['ver']>1) {
         $addassess = 'addassessment2.php';
-				$chgassess = 'chgassessment2.php';
+        $chgassess = 'chgassessment2.php';
     } else {
         $addassess = 'addassessment.php';
-				$chgassess = 'chgassessment.php';
+        $chgassess = 'chgassessment.php';
     }
     echo "<p><a href=\"../course/$addassess?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a> | ";
     echo "<a href=\"../course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></p>";
 
     echo '<p>&nbsp;</p><p class=small>'.sprintf(_('This assessment is housed in course ID %s'),Sanitize::courseId($cid)).'</p>';
-    echo '<p class=small>';
-		if (!empty($lineitemmsg)) {
-			echo '<p class="noticetext">'.Sanitize::encodeStringForDisplay($lineitemmsg).'</p>';
-		}
+    echo '<div class=small>';
+    if (!empty($lineitemmsg)) {
+        echo '<p class="noticetext">'.Sanitize::encodeStringForDisplay($lineitemmsg).'</p>';
+    }
+    if (!empty($scoreresendmsg)) {
+        echo '<p class="noticetext">'.Sanitize::encodeStringForDisplay($scoreresendmsg).'</p>';
+    }
+    
     if ($db->has_lineitem($link, $localcourse)) {
         echo _('Has info necessary for passing back grades.');
+        if ($line['ver']>1) {
+            echo '<form method=post action="ltihome.php?launchid=' .
+                Sanitize::encodeStringForDisplay($launch->get_launch_id()).'">';
+            echo '<br><button name="resync" type="submit" value="1">';
+            echo _('Resend scores to LMS').'</button> ';
+            echo '<button name="resyncall" type="submit" value="1">';
+            echo _('Resend scores to LMS, including zeros for unattempted').'</button>';
+            echo '</form>';
+        }
     } else if ($launch->can_create_lineitem()) {
-				echo '<form method=post action="ltihome.php?launchid=' .
-					Sanitize::encodeStringForDisplay($launch->get_launch_id()).'">';
+        echo '<form method=post action="ltihome.php?launchid=' .
+            Sanitize::encodeStringForDisplay($launch->get_launch_id()).'">';
         echo _('LMS does not currently have a grade column for passing back grades, but the LMS supports us creating a grade column.');
-				echo '<br><button name="makelineitem" type="submit" value="1">';
-				echo _('Create Grade Column').'</button>';
-				echo '</form>';
+        echo '<br><button name="makelineitem" type="submit" value="1">';
+        echo _('Create Grade Column').'</button>';
+        echo '</form>';
     } else {
         echo _('Does not currently have a grade column for passing back grades, and the LMS does not support us adding one.');
     }
-    echo '</p>';
+    echo '</div>';
 
-		echo '<h2>'._('Course Management').'</h2>';
-		echo '<p><a href="../course/listusers.php?cid='.$cid.'">'._('Roster').'</a>';
-		echo '<br><a href="../course/gradebook.php?cid='.$cid.'">'._('Gradebook').'</a>';
-		echo '<br><a href="../course/'.$chgassess.'?cid='.$cid.'">'._('Mass Change Assessments').'</a>';
-		if ($line['date_by_lti']===0) {
-			echo '<br><a href="../course/masschgdates?cid='.$cid.'">'._('Mass Change Dates').'</a>';
-		}
-		echo '<br><a href="../admin/forms.php?action=modify&cid='.$cid.'&id='.$cid.'">'._('Course Settings').'</a>';
-		echo '<br><a href="../course/copyitems.php?cid='.$cid.'">'._('Course Items: Copy').'</a>';
-		echo '<br><a href="../course/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a>';
-		echo '<br><a href="../course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a>';
-		echo '</p>';
+    echo '<h2>'._('Course Management').'</h2>';
+    echo '<p><a href="../course/listusers.php?cid='.$cid.'">'._('Roster').'</a>';
+    echo '<br><a href="../course/gradebook.php?cid='.$cid.'">'._('Gradebook').'</a>';
+    echo '<br><a href="../course/'.$chgassess.'?cid='.$cid.'">'._('Mass Change Assessments').'</a>';
+    if ($line['date_by_lti']===0) {
+        echo '<br><a href="../course/masschgdates?cid='.$cid.'">'._('Mass Change Dates').'</a>';
+    }
+    echo '<br><a href="../admin/forms.php?action=modify&cid='.$cid.'&id='.$cid.'">'._('Course Settings').'</a>';
+    echo '<br><a href="../course/copyitems.php?cid='.$cid.'">'._('Course Items: Copy').'</a>';
+    echo '<br><a href="../course/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a>';
+    echo '<br><a href="../course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a>';
+    echo '</p>';
 
 } else if (function_exists('ext_can_handle_redirect') &&
 	ext_can_handle_redirect($link->get_placementtype()) &&
