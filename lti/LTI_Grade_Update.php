@@ -40,7 +40,7 @@ class LTI_Grade_Update {
   public function have_token(int $platform_id): bool {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
-      $this->access_tokens[$platform_id]['expires'] >= time() + 60
+      $this->access_tokens[$platform_id]['expires'] >= time()
     ) {
       return true;
     }
