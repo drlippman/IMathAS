@@ -99,10 +99,14 @@ class LTI_Service_Connector {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        if ($method === 'POST') {
-            curl_setopt($ch, CURLOPT_POST, 1);
+        if ($method === 'POST' || $method === 'PUT') {
             curl_setopt($ch, CURLOPT_POSTFIELDS, strval($body));
             $headers[] = 'Content-Type: ' . $content_type;
+        }
+        if ($method === 'POST') {
+            curl_setopt($ch, CURLOPT_POST, 1);
+        } else if ($method === 'PUT') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if (!empty($GLOBALS['CFG']['LTI']['skipsslverify'])) {
@@ -112,6 +116,7 @@ class LTI_Service_Connector {
         $response = curl_exec($ch);
         $request_info = curl_getinfo($ch);
         if (curl_errno($ch) || round(intval($request_info['http_code'])/100) != 2) {
+            echo curl_error($ch);
             return false;
         }
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);

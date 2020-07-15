@@ -783,7 +783,7 @@ class Imathas_LTI_Database implements LTI\Database
             if ($link->get_placementtype() == 'assess' ||
                 (function_exists('ext_is_reviewable') && ext_is_reviewable($link))
             ) {
-                $submission_review = LTI\LTI\LTI_Grade_Submission_Review::new ()
+                $submission_review = LTI\LTI_Grade_Submission_Review::new ()
                     ->set_reviewable_status(["Submitted"]);
                 $lineitem->set_submission_review($submission_review);
             }
@@ -815,6 +815,7 @@ class Imathas_LTI_Database implements LTI\Database
             ) {
                 // lineitem already defined. Update it with submissionReview info
                 $ags = $launch->get_ags();
+                $lineitem->set_id($lineitemstr);
                 $ags->update_lineitem($lineitem);
             }
             if (!empty($lineitemstr)) {

@@ -11,6 +11,7 @@ require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/helpers.php';
 
 use \IMSGlobal\LTI;
+
 if (!isset($_POST['launchid'])) {
   echo 'Error - missing launch id';
   exit;
@@ -37,7 +38,7 @@ if ($_POST['linktype'] == 'assoc') {
   // TODO: this doesn't retain copiedfrom in imas_lti_courses.
   // It'd be nice to see if there was a way to do so.
   $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel);
-  $localcourse = LTI_Localcourse::new()
+  $localcourse = LTI\LTI_Localcourse::new()
     ->set_courseid($destcid)
     ->set_copiedfrom(0)
     ->set_id($newlticourseid);

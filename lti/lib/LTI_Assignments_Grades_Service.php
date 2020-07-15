@@ -81,14 +81,10 @@ class LTI_Assignments_Grades_Service {
         if (!in_array("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem", $this->service_data['scope'])) {
             throw new LTI_Exception('Missing required scope', 1);
         }
-        $pos = strpos($lineitem->get_id(), '?');
-        $update_url = $pos === false ? 
-            $this->service_data['lineitems'] . '/' . $line_item->get_id() : 
-            substr_replace($this->service_data['lineitems'], '/' . $line_item->get_id(), $pos, 0);
         $updated_line_item = $this->service_connector->make_service_request(
             $this->service_data['scope'],
             'PUT',
-            $update_url,
+            $line_item->get_id(),
             strval($line_item),
             'application/vnd.ims.lis.v2.lineitem+json',
             'application/vnd.ims.lis.v2.lineitem+json'
