@@ -40,7 +40,7 @@ class LTI_Grade_Update {
   public function have_token(int $platform_id): bool {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
-      $this->access_tokens[$platform_id]['expires'] < time()
+      $this->access_tokens[$platform_id]['expires'] >= time() + 60
     ) {
       return true;
     }
@@ -54,7 +54,7 @@ class LTI_Grade_Update {
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     if ($row === false) {
       return false;
-    } else if ($row['expires'] < time() + 60) { // expired
+    } else if ($row['expires'] < time() + 60) { // expired or expires in the next minute
       if (substr($row['token'],0,6)==='failed') {
         $this->failures[$platform_id] = intval(substr($row['token'],6));
       }
