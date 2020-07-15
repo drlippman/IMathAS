@@ -35,13 +35,16 @@ function reduceradical($in,$root=2,$format="string") {
 	} else if ($root < 0) {
 		echo "can't handle negative roots";
 		return;
-	}
+	} else if ($in < 0 && $root%2==0 && $root>3) {
+        echo "can't handle higher even roots of negative values";
+		return;
+    }
 
 	$root = intval($root);
 
     $iscomplex = false;
 	if ($in<0) {
-        if ($root%2==0) {
+        if ($root == 2) {
             $iscomplex = true;
         } else {
             $sign = '-';
@@ -108,8 +111,11 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 			echo 'Input to reduceradicalfrac was too large';
 		}
 		return;
+    } else if ($rootnum < 0 && $root%2==0 && $root>3) {
+        echo "can't handle higher even roots of negative values";
+		return;
     }
-    if ($rootnum < 0 && $root%2==0) {
+    if ($rootnum < 0 && $root == 2) {
         $iscomplex = true;
         $rootnum = abs($rootnum);
     } else {
