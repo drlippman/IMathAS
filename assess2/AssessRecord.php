@@ -2651,6 +2651,11 @@ class AssessRecord
       }
       $out['starttime'] = $aver['starttime'];
       $out['questions'] = $this->getGbQuestionsData($qVerToGet);
+      $out['endmsg'] = AssessUtils::getEndMsg(
+        $this->assess_info->getSetting('endmsg'),
+        $aver['score'],
+        $this->assess_info->getSetting('points_possible')
+      );
     }
     return $out;
   }

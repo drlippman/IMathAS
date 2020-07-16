@@ -163,7 +163,11 @@
           </button>
         </div>
 
-        <div>
+        <div
+          v-if = "!viewFull && endmsg != ''"
+          v-html = "endmsg"
+        />
+        <div v-if="viewFull">
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
@@ -317,8 +321,11 @@ export default {
     aData () {
       return store.assessInfo;
     },
+    viewFull () {
+      return this.aData.viewfull;
+    },
     canEdit () {
-      return store.assessInfo.can_edit_scores;
+      return store.assessInfo.can_edit_scores && this.viewFull;
     },
     canSubmit () {
       return (!store.inTransit);
@@ -454,6 +461,9 @@ export default {
     },
     assessFeedback () {
       return this.aData.assess_versions[store.curAver].feedback || '';
+    },
+    endmsg () {
+      return this.aData.assess_versions[store.curAver].endmsg || '';
     },
     savedMsg () {
       if (store.saving === '') {
