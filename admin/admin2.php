@@ -281,7 +281,7 @@ if ($overwriteBody==1) {
         if ($myrights == 100) {
           echo ' | <a href="forms.php?action=modgroup&id='.Sanitize::encodeUrlParam($showgroup).'">'._('Edit Group').'</a>';
         }
-        if (!empty($CFG['use_ipeds'])) {
+        if (!empty($CFG['use_ipeds']) && $myrights == 100) {
             echo ' | <a href="ipedslink.php?groupid='.Sanitize::encodeUrlParam($showgroup).'">'._('IPEDS/NCES Assoc').'</a>';
         }
         echo '</div>';
