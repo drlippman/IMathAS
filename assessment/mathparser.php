@@ -850,11 +850,16 @@ class MathParser
     }
   }
 
+  public function removeOneTimes() {
+    $this->walkRemoveOne($this->AST);
+  }
+
   /**
    * Normalize the tree and get the result as a string
    * @return string
    */
   public function normalizeTreeString() {
+    $this->removeOneTimes();
     return $this->normalizeNodeToString($this->AST);
     //return $this->toOutputString($this->normalizeNode($this->AST));
   }
@@ -1131,6 +1136,47 @@ class MathParser
         $node['right']['string'] = $this->toString($node['right']);
         $collection[] = $node['right'];
       }
+    }
+  }
+
+  private function walkRemoveOne(&$node) {
+    if ($node['symbol'] == '*') {
+      if ($node['right']['symbol'] == '1') {
+        $node = $node['left'];
+        $this->walkRemoveOne($node);
+        return;
+      } else if ($node['left']['symbol'] == '1') {
+        $node = $node['right'];
+        $this->walkRemoveOne($node);
+        return;
+      } else if ($node['left']['symbol'] == '~' &&
+        $node['left']['left']['symbol'] == '1'
+      ) {
+        if ($node['right']['symbol'] == '~') { // both neg; remove both negs
+          $node = $node['right']['left'];
+        } else { // make right neg and remove a level
+          $node['left']['left'] = $node['right'];
+          $node = $node['left'];
+        }
+      } else if ($node['right']['symbol'] == '~' &&
+        $node['right']['left']['symbol'] == '1'
+      ) {
+        if ($node['left']['symbol'] == '~') { // both neg; remove both negs
+          $node = $node['left']['left'];
+        } else { // make left neg and remove a level
+          $node['right']['left'] = $node['left'];
+          $node = $node['right'];
+        }
+      }
+    }
+    if (isset($node['left'])) {
+      $this->walkRemoveOne($node['left']);
+    }
+    if (isset($node['right'])) {
+      $this->walkRemoveOne($node['right']);
+    }
+    if (isset($node['input'])) {
+      $this->walkRemoveOne($node['input']);
     }
   }
 }

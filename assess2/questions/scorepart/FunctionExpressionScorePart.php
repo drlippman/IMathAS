@@ -172,7 +172,7 @@ class FunctionExpressionScorePart implements ScorePart
         if (!in_array('equation',$ansformats) && strpos($answer,'=')!==false) {
             echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
         }
-        if (!in_array('inequality',$ansformats) && 
+        if (!in_array('inequality',$ansformats) &&
             (strpos($answer,'<')!==false || strpos($answer,'>')!==false)
          ) {
             echo 'Your $answer contains an inequality sign, but you do not have $answerformat="inequality" set. This question probably will not work right.';
@@ -322,12 +322,12 @@ class FunctionExpressionScorePart implements ScorePart
                         if (in_array('inequality',$ansformats)) {
                             if ($meanratio > 0) {
                                 if ($answerInequality != $givenInequality) {
-                                    $correct = false; continue; 
+                                    $correct = false; continue;
                                 }
                             } else {
                                 $flippedIneq = strtr($givenInequality, ['<'=>'>', '>'=>'<']);
                                 if ($answerInequality != $flippedIneq) {
-                                    $correct = false; continue; 
+                                    $correct = false; continue;
                                 }
                             }
                         }
