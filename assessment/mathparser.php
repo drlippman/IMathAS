@@ -860,8 +860,8 @@ class MathParser
    */
   public function normalizeTreeString() {
     $this->removeOneTimes();
-    return $this->normalizeNodeToString($this->AST);
-    //return $this->toOutputString($this->normalizeNode($this->AST));
+    //return $this->normalizeNodeToString($this->AST);
+    return $this->toOutputString($this->normalizeNode($this->AST));
   }
 
   /**
