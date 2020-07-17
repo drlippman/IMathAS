@@ -1689,6 +1689,7 @@ class AssessRecord
     list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
     $autosaves = [];
     $seqPartDone = array();
+    $correctAnswerWrongFormat = array();
 
     for ($pn = 0; $pn < $numParts; $pn++) {
       // figure out try #
@@ -1769,6 +1770,13 @@ class AssessRecord
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
         }
       }
+      if ($tryToShow === 'scored') {
+        $correctAnswerWrongFormat[$pn] = 
+          !empty($qver['tries'][$pn][$qver['scored_try'][$pn]]['wrongfmt']);
+      } else {
+        $correctAnswerWrongFormat[$pn] = 
+          !empty($qver['tries'][$pn][$partattemptn[$pn] - 1]['wrongfmt']);
+      }
       if ($this->teacherInGb) {
         $seqPartDone[$pn] = true;
       } else if ($showscores) {
@@ -1801,7 +1809,8 @@ class AssessRecord
         ->setScoreNonZero($scorenonzero)
         ->setScoreIsCorrect($scoreiscorrect)
         ->setLastRawScores($qcolors)
-        ->setSeqPartDone($seqPartDone);
+        ->setSeqPartDone($seqPartDone)
+        ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat);
     if ($this->dispqn !== null) {
       $questionParams->setDisplayQuestionNumber($this->dispqn);
     }
@@ -1933,6 +1942,9 @@ class AssessRecord
         }
         if (isset($rawparts[$k])) {
           $data[$k]['raw'] = $rawparts[$k];
+        }
+        if (!empty($scoreResult['correctAnswerWrongFormat'][$k])) {
+          $data[$k]['wrongfmt'] = 1;
         }
         $this->clearAutoSave($qn, $k);
       } else if (isset($rawparts[$k]) && $v!=='' && $v!==null && !empty($qver['tries'][$k])) {

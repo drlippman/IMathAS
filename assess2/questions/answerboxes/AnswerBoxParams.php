@@ -19,6 +19,7 @@ class AnswerBoxParams
     private $questionPartCount = 1;
     private $assessmentId = 0;
     private $studentLastAnswers;
+    private $correctAnswerWrongFormat = false;
     private $colorboxKeyword;
 
     /**
@@ -230,6 +231,28 @@ class AnswerBoxParams
     public function setStudentLastAnswers($studentLastAnswers): AnswerBoxParams
     {
         $this->studentLastAnswers = $studentLastAnswers;
+        return $this;
+    }
+
+    /**
+     * Get whether it was the correct answer but wrong format.
+     *
+     * @return bool
+     */
+    public function getCorrectAnswerWrongFormat()
+    {
+        return $this->correctAnswerWrongFormat;
+    }
+
+    /**
+     * Set whether it was the correct answer but wrong format.
+     *
+     * @param bool $correctAnswerWrongFormat
+     * @return AnswerBoxParams
+     */
+    public function setCorrectAnswerWrongFormat($correctAnswerWrongFormat): AnswerBoxParams
+    {
+        $this->correctAnswerWrongFormat = $correctAnswerWrongFormat;
         return $this;
     }
 
