@@ -3,7 +3,7 @@ export function pauseVideos (el) {
   for (const frame of iframes) {
     if (frame.src.match(/enablejsapi/)) {
       frame.contentWindow.postMessage('{"event":"command","func":"pauseVideo"}', '*');
-    } else {
+    } else if (frame.src) {
       const origsrc = frame.src;
       frame.src = origsrc;
     }
