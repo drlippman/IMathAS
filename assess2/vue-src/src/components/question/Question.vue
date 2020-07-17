@@ -1,5 +1,5 @@
 <template>
-  <div class = "questionwrap questionpane">
+  <div class = "questionwrap questionpane" ref="main">
     <div v-if = "!questionContentLoaded">
       {{ $t('loading') }}
     </div>
@@ -96,6 +96,7 @@ import ScoreResult from '@/components/question/ScoreResult.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import QuestionHelps from '@/components/question/QuestionHelps.vue';
 import ShowworkInput from '@/components/ShowworkInput.vue';
+import { pauseVideos } from '@/components/pauseVideos';
 
 export default {
   name: 'Question',
@@ -411,6 +412,9 @@ export default {
     active: function (newVal, oldVal) {
       this.loadQuestionIfNeeded();
       this.updateTime(newVal);
+      if (newVal === false) {
+        pauseVideos(this.$refs.main);
+      }
     },
     state: function (newVal, oldVal) {
       if ((newVal > 1 && oldVal <= 1) ||

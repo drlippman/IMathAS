@@ -1889,8 +1889,27 @@ function unionarrays($a1,$a2) {
 function prettyint($n) {
 	return number_format($n);
 }
-function prettyreal($n,$d=0,$comma=',') {
-	return number_format($n,$d,'.',$comma);
+function prettyreal($aarr,$d=0,$comma=',') {
+    if (!is_array($aarr)) {
+		$arrayout = false;
+		$aarr = array($aarr);
+	} else {
+		$arrayout = true;
+	}
+	$out = array();
+	foreach ($aarr as $a) {
+        $a = str_replace(',','',$a);
+        if (is_numeric($a)) {
+            $out[] = number_format($a,$d,'.',$comma);
+        } else {
+            $out[] = $a;
+        }
+    }
+	if ($arrayout) {
+		return $out;
+	} else {
+		return $out[0];
+	}
 }
 function prettysmallnumber($n, $space=false) {
 	if (abs($n)<.01) {
@@ -1925,7 +1944,11 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 	}
 	$out = array();
 	foreach ($aarr as $a) {
-		$a = str_replace(',','',$a);
+        $a = str_replace(',','',$a);
+        if ($a === 'DNE') {
+            $out[] = $a;
+            continue;
+        }
 		if ($orscinot && is_numeric($a) && (abs($a)>1000 || abs($a)<.001)) {
 			$out[] = makescinot($a, $sigfig-1, '*');
 			continue;

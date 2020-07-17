@@ -98,21 +98,23 @@ class NumberAnswerBox implements AnswerBox
     			$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
     		}
     		if (isset($reqdecimals)) {
-          if (isset($reqdecimals)) {
-              list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
-          }
+                list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
     			if ($exactreqdec) {
     				$exactdec = true;
     				$tip .= "<br/>" . sprintf(_('Your answer should include exactly %d decimal places.'), $reqdecimals);
-    				$shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
-    				$answer = prettyreal($answer, $reqdecimals);
+                    $shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
+                    if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+    					$answer = implode(',', prettyreal(explode(',', $answer), $reqdecimals));
+    				} else {
+    					$answer = prettyreal($answer, $reqdecimals);
+    				}
     			} else {
     				$tip .= "<br/>" . sprintf(_('Your answer should be accurate to at least %d decimal places.'), $reqdecimals);
     				$shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);
     			}
     		}
     		if (isset($reqsigfigs)) {
-          list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
+                list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
 
     			if ($exactsigfig) {
     				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {

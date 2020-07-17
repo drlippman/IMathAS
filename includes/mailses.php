@@ -7,21 +7,21 @@ function send_SESemail($email, $from, $subject, $message, $replyto=array(), $bcc
 	}
 	if (!isset($CFG['email']['SES_SECRET_KEY'])) {
 		$CFG['email']['SES_SECRET_KEY'] = getenv('SES_SECRET_KEY');
-	} 
+	}
 	if (!isset($CFG['email']['SES_SERVER'])) {
 		$CFG['email']['SES_SERVER'] = 'email.us-west-2.amazonaws.com';
-	} 
+	}
 	$ses = new SimpleEmailService($CFG['email']['SES_KEY_ID'], $CFG['email']['SES_SECRET_KEY'], $CFG['email']['SES_SERVER']);
 	$m = new SimpleEmailServiceMessage();
-	
+
 	foreach ($email as $address) {
 		if ($address != '') {
 			$m->addTo($address);
 		}
 	}
-	
+
 	$m->setFrom($from);
-	
+
 	foreach ($replyto as $address) {
 		if ($address != '') {
 			$m->addReplyTo($address);
@@ -38,7 +38,9 @@ function send_SESemail($email, $from, $subject, $message, $replyto=array(), $bcc
 }
 
 /**
-*
+* Modified 7/16/20 to add Signature v4 support,
+*   Adapated from https://github.com/okamos/php-ses
+* 
 * Copyright (c) 2014, Daniel Zahariev.
 * Copyright (c) 2011, Dan Myers.
 * Parts copyright (c) 2008, Donovan Schonknecht.
@@ -91,10 +93,12 @@ class SimpleEmailService
 	protected $__accessKey; // AWS Access key
 	protected $__secretKey; // AWS Secret key
 	protected $__host;
+	private $__region;
 
 	public function getAccessKey() { return $this->__accessKey; }
 	public function getSecretKey() { return $this->__secretKey; }
 	public function getHost() { return $this->__host; }
+	public function getRegion() { return $this->__region; }
 
 	protected $__verifyHost = 1;
 	protected $__verifyPeer = 1;
@@ -120,6 +124,7 @@ class SimpleEmailService
 			$this->setAuth($accessKey, $secretKey);
 		}
 		$this->__host = $host;
+		$this->__region = explode('.',$host)[1];
 	}
 
 	/**
@@ -143,7 +148,7 @@ class SimpleEmailService
 		$rest = new SimpleEmailServiceRequest($this, 'GET');
 		$rest->setParameter('Action', 'ListVerifiedEmailAddresses');
 
-		$rest = $rest->getResponse();
+		$rest = $rest->getResponse4();
 		if($rest->error === false && $rest->code !== 200) {
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		}
@@ -183,7 +188,7 @@ class SimpleEmailService
 		$rest->setParameter('Action', 'VerifyEmailAddress');
 		$rest->setParameter('EmailAddress', $email);
 
-		$rest = $rest->getResponse();
+		$rest = $rest->getResponse4();
 		if($rest->error === false && $rest->code !== 200) {
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		}
@@ -207,7 +212,7 @@ class SimpleEmailService
 		$rest->setParameter('Action', 'DeleteVerifiedEmailAddress');
 		$rest->setParameter('EmailAddress', $email);
 
-		$rest = $rest->getResponse();
+		$rest = $rest->getResponse4();
 		if($rest->error === false && $rest->code !== 200) {
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		}
@@ -230,7 +235,7 @@ class SimpleEmailService
 		$rest = new SimpleEmailServiceRequest($this, 'GET');
 		$rest->setParameter('Action', 'GetSendQuota');
 
-		$rest = $rest->getResponse();
+		$rest = $rest->getResponse4();
 		if($rest->error === false && $rest->code !== 200) {
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		}
@@ -262,7 +267,7 @@ class SimpleEmailService
 		$rest = new SimpleEmailServiceRequest($this, 'GET');
 		$rest->setParameter('Action', 'GetSendStatistics');
 
-		$rest = $rest->getResponse();
+		$rest = $rest->getResponse4();
 		if($rest->error === false && $rest->code !== 200) {
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		}
@@ -373,7 +378,7 @@ class SimpleEmailService
 			}
 		}
 
-		$rest = $rest->getResponse();
+		$rest = $rest->getResponse4();
 		if($rest->error === false && $rest->code !== 200) {
 			$rest->error = array('code' => $rest->code, 'message' => 'Unexpected HTTP status');
 		}
@@ -687,6 +692,10 @@ final class SimpleEmailServiceRequest
 	private $ses, $verb, $parameters = array();
 	public $response;
 	public static $curlOptions = array();
+	private $__date;
+	private $__amz_date;
+	const SERVICE = 'email';
+	const ALGORITHM = 'AWS4-HMAC-SHA256';
 
 	/**
 	* Constructor
@@ -723,6 +732,151 @@ final class SimpleEmailServiceRequest
 		{
 			$this->parameters[$key] = $value;
 		}
+	}
+
+	private function _refreshDate() {
+    $this->__amz_date = gmdate('Ymd\THis\Z');
+    $this->__date = gmdate('Ymd');
+  }
+	/**
+     * Create and returns binary hmac sha256
+     *
+     * @return hmac sha256.
+     */
+  private function _generateSignatureKey()
+  {
+      $date_h = hash_hmac('sha256', $this->__date, 'AWS4' . $this->ses->getSecretKey(), true);
+      $region_h = hash_hmac('sha256', $this->ses->getRegion(), $date_h, true);
+      $service_h = hash_hmac('sha256', self::SERVICE, $region_h, true);
+      $signing_h = hash_hmac('sha256', 'aws4_request', $service_h, true);
+
+      return $signing_h;
+  }
+	/**
+     * Signing AWS Requests with Signature Version 4
+     *
+     * @param array $parameters It contains request parameters.
+     *
+     * @ref http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
+     *
+     * @return void
+     */
+  private function _generateSignature($parameters = array())
+  {
+      $headers = [];
+      $canonical_uri = '/';
+
+      ksort($parameters);
+
+      $request_parameters = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
+
+			if ($this->verb == 'POST') {
+				$canonical_querystring = '';
+				$payload_hash = hash('sha256', $request_parameters);
+			} else {
+				$canonical_querystring = $request_parameters;
+				$payload_hash = hash('sha256', '');
+			}
+
+      $canonical_headers = 'host:' . $this->ses->getHost() . "\n" . 'x-amz-date:' . $this->__amz_date . "\n";
+      $signed_headers = 'host;x-amz-date';
+
+      // task1
+      $canonical_request = $this->verb . "\n" . $canonical_uri . "\n" . $canonical_querystring . "\n" . $canonical_headers . "\n" . $signed_headers . "\n" . $payload_hash;
+
+      // task2
+      $credential_scope = $this->__date . '/' . $this->ses->getRegion() . '/' . self::SERVICE . '/aws4_request';
+      $string_to_sign =  self::ALGORITHM . "\n" . $this->__amz_date . "\n" . $credential_scope . "\n" . hash('sha256', $canonical_request);
+
+      // task3
+      $signing_key = $this->_generateSignatureKey();
+      $signature = hash_hmac('sha256', $string_to_sign, $signing_key);
+      $headers[] = 'Authorization: ' . self::ALGORITHM . ' Credential=' . $this->ses->getAccessKey() . '/' . $credential_scope . ', SignedHeaders=' . $signed_headers . ', Signature=' . $signature;
+      $headers[] = 'x-amz-date: ' . $this->__amz_date;
+			return array($headers, $request_parameters);
+  }
+	/**
+	 * Get the response, using v4 signature
+	 * Adapted from https://github.com/okamos/php-ses
+	 */
+	public function getResponse4() {
+		$this->_refreshDate();
+		list($headers, $query) = $this->_generateSignature($this->parameters);
+
+		$url = 'https://'.$this->ses->getHost().'/';
+
+		// Basic setup
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_USERAGENT, 'SimpleEmailService/php');
+
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, ($this->ses->verifyHost() ? 2 : 0));
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, ($this->ses->verifyPeer() ? 1 : 0));
+
+		// Request types
+		switch ($this->verb) {
+			case 'GET':
+				$url .= '?'.$query;
+				break;
+			case 'POST':
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->verb);
+				curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
+				$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+			break;
+			case 'DELETE':
+				$url .= '?'.$query;
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+			break;
+			default: break;
+		}
+
+
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($curl, CURLOPT_HEADER, false);
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, false);
+		curl_setopt($curl, CURLOPT_WRITEFUNCTION, array(&$this, '__responseWriteCallback'));
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+
+		foreach(self::$curlOptions as $option => $value) {
+			curl_setopt($curl, $option, $value);
+		}
+
+		// Execute, grab errors
+		if (curl_exec($curl)) {
+			$this->response->code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		} else {
+
+			$this->response->error = array(
+				'curl' => true,
+				'code' => curl_errno($curl),
+				'message' => curl_error($curl)
+			);
+		}
+		@curl_close($curl);
+
+		// Parse body into XML
+		if ($this->response->error === false && isset($this->response->body)) {
+			$this->response->body = simplexml_load_string($this->response->body);
+
+			// Grab SES errors
+			if (!in_array($this->response->code, array(200, 201, 202, 204))
+				&& isset($this->response->body->Error)) {
+				$error = $this->response->body->Error;
+				$output = array();
+				$output['curl'] = false;
+				$output['Error'] = array();
+				$output['Error']['Type'] = (string)$error->Type;
+				$output['Error']['Code'] = (string)$error->Code;
+				$output['Error']['Message'] = (string)$error->Message;
+				$output['RequestId'] = (string)$this->response->body->RequestId;
+
+				$this->response->error = $output;
+				unset($this->response->body);
+			}
+		}
+
+		return $this->response;
 	}
 
 	/**
@@ -788,7 +942,7 @@ final class SimpleEmailServiceRequest
 			break;
 			default: break;
 		}
-		
+
 
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($curl, CURLOPT_HEADER, false);
@@ -806,7 +960,7 @@ final class SimpleEmailServiceRequest
 		if (curl_exec($curl)) {
 			$this->response->code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		} else {
-			
+
 			$this->response->error = array(
 				'curl' => true,
 				'code' => curl_errno($curl),

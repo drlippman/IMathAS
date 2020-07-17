@@ -7,6 +7,10 @@
   border: 1px solid #ccc;
   z-index: 50;
 }
+.mqeditor.iframeosk {
+    width: 100%;
+    left: 0;
+}
 .mqeditor.fixedbottom {
   position: fixed;
   bottom: 0;

@@ -51600,7 +51600,13 @@ var modern = (function (domGlobals) {
         }
       }
     }
-
+    var inIframe = function() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    }
     var isFixed$1 = function (inlineToolbarContainer, editor) {
       return !!(inlineToolbarContainer && !editor.settings.ui_container);
     };
@@ -52123,7 +52129,14 @@ var modern = (function (domGlobals) {
         var layoutRect;
         for (i = 0; i < windows.length; i++) {
           layoutRect = windows[i].layoutRect();
-          windows[i].moveTo(windows[i].settings.x || Math.max(0, rect.w / 2 - layoutRect.w / 2), windows[i].settings.y || Math.max(0, rect.h / 2 - layoutRect.h / 2));
+          var newy;
+          if (inIframe()) {
+            var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
+            newy = contpos.y;
+          } else {
+            newy = Math.max(0, rect.h / 2 - layoutRect.h / 2);
+          }
+          windows[i].moveTo(windows[i].settings.x || Math.max(0, rect.w / 2 - layoutRect.w / 2), windows[i].settings.y || newy);
         }
       }
       global$9(domGlobals.window).on('resize', reposition);
@@ -52151,6 +52164,9 @@ var modern = (function (domGlobals) {
           self.classes.add('rtl');
         }
         self.classes.add('window');
+        if (inIframe()) {
+            self.classes.add('iniframe');
+        }
         self.bodyClasses.add('window-body');
         self.state.set('fixed', true);
         if (settings.buttons) {
@@ -52242,6 +52258,10 @@ var modern = (function (domGlobals) {
         var rect = funcs.getWindowSize();
         layoutRect.x = self.settings.x || Math.max(0, rect.w / 2 - layoutRect.w / 2);
         layoutRect.y = self.settings.y || Math.max(0, rect.h / 2 - layoutRect.h / 2);
+        if (inIframe()) {
+            var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
+            layoutRect.y = contpos.y;
+        }
         return layoutRect;
       },
       renderHtml: function () {
