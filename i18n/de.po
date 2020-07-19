@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-10 09:59+0200\n"
-"PO-Revision-Date: 2020-07-10 10:00+0200\n"
+"POT-Creation-Date: 2020-07-18 13:14+0200\n"
+"PO-Revision-Date: 2020-07-18 13:42+0200\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Last-Translator: Ingo Dahn <dahn@vcrp.de>\n"
+"Last-Translator: \n"
 "Language-Team: \n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Poedit 2.3\n"
 
 #: DEembedq.php:171 OEAembedq.php:315 admin/forms.php:1252 admin/forms.php:1520
 #: assessment/showtest.php:292 assessment/showtest.php:1929
@@ -26,6 +26,7 @@ msgstr ""
 #: course/testquestion2.php:350 directaccess.php:147 forms.php:118
 #: forms.php:397 forms.php:413 forms.php:434 javascript/livepoll.js:123
 #: multiembedq.php:189 multiembedq.php:285 admin/importitems2.php:177
+#: admin/forms.php:1250 admin/forms.php:1518 admin/importitems.php:752
 msgid "Submit"
 msgstr "Absenden"
 
@@ -55,7 +56,7 @@ msgstr "Richtig"
 #: course/quickdrill.php:476 embedq.php:290 javascript/AMhelpers2.js:308
 #: javascript/AMhelpers2.js:318 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 assess2/questions/QuestionHtmlGenerator.php:1122
-#: assess2/questions/answerboxhelpers.php:569
+#: assess2/questions/answerboxhelpers.php:569 assess2/displayq3.php:8168
 msgid "Incorrect"
 msgstr "Falsch"
 
@@ -66,7 +67,7 @@ msgstr "Falsch"
 #: course/quickdrill.php:480 embedq.php:294 javascript/AMhelpers2.js:305
 #: javascript/AMhelpers2.js:317 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 assess2/questions/QuestionHtmlGenerator.php:1134
-#: assess2/questions/answerboxhelpers.php:575
+#: assess2/questions/answerboxhelpers.php:575 assess2/displayq3.php:8174
 msgid "Partially correct"
 msgstr "Teilweise richtig"
 
@@ -306,7 +307,8 @@ msgid "Invalid Username"
 msgstr "Ungültiger Benutzername"
 
 #: actions.php:305 actions.php:312 admin/forms.php:1624
-#: assessment/showtest.php:393 course/addlinkedtext.php:120
+#: assessment/showtest.php:393 course/addlinkedtext.php:120 admin/forms.php:570
+#: admin/forms.php:1622
 msgid "Try again"
 msgstr "Veruchen Sie es erneut"
 
@@ -350,7 +352,8 @@ msgstr "Hier ist eine Liste aller Benutzernamen mit dieser Email-Adresse"
 #: course/addassessment2form.php:941 course/chgassessments2form.php:788
 #: course/chgassessments2form.php:850 course/chgassessments2form.php:892
 #: course/chgassessments2form.php:944 course/gbtable2.php:923
-#: course/gradebook.php:705 util/listnewteachers.php:261
+#: course/gradebook.php:705 util/listnewteachers.php:261 admin/forms.php:1375
+#: admin/forms.php:1376
 msgid "Never"
 msgstr "Niemals"
 
@@ -596,7 +599,10 @@ msgid "Group Details"
 msgstr "Gruppendetails"
 
 #: admin/actions.php:51 admin/actions.php:310 admin/actions.php:424
-#: admin/forms.php:1579
+#: admin/forms.php:1579 admin/forms.php:76 admin/forms.php:103
+#: admin/forms.php:391 admin/forms.php:450 admin/forms.php:459
+#: admin/forms.php:471 admin/forms.php:1256 admin/forms.php:1269
+#: admin/forms.php:1577
 msgid "You don't have the authority for this action"
 msgstr "Für diese Aktion haben Sie nicht die nötigen Rechte"
 
@@ -611,7 +617,7 @@ msgstr "Der Benutzername ist bereits vergeben."
 #: admin/actions.php:319 admin/forms.php:432 admin/forms.php:880
 #: assessment/showtest.php:3744 assessment/showtest.php:3751
 #: course/addquestions.php:1332 course/addquestions.php:1482
-#: course/addquestions.php:1550
+#: course/addquestions.php:1550 admin/forms.php:878
 msgid "or"
 msgstr "oder"
 
@@ -675,7 +681,7 @@ msgstr ""
 "(Secret) für die LTI-Verbindung bereits für alle eingerichtet hat - setzen "
 "Sie sich mit dem Administrator Ihres LMS in Verbindung. "
 
-#: admin/actions.php:936
+#: admin/actions.php:936 admin/forms.php:424 admin/forms.php:870
 msgid "If so, you will not need to set up a course-level configuration. "
 msgstr ""
 "Wenn das so ist, brauchen Sie es nicht mehr auf Kursebene zu konfigurieren. "
@@ -745,7 +751,7 @@ msgstr "Wählen Sie einen Kurs zum Kopieren"
 
 #: admin/addcourse.php:72 admin/forms.php:1385 assessment/showtest.php:1769
 #: assessment/showtest.php:2705 assessment/showtest.php:3562 ltihome.php:289
-#: assess2/AssessUtils.php:174
+#: assess2/AssessUtils.php:174 admin/forms.php:1383
 msgid "Continue"
 msgstr "Fortfahren"
 
@@ -781,31 +787,33 @@ msgstr "Gast"
 
 #: admin/admin2.php:11 admin/groupreportdetails.php:10 admin/userdetails.php:10
 #: admin/userreports.php:11 includes/getcourseopts.php:52
+#: admin/userreportdetails.php:11 course/course.php:690
 msgid "Student"
 msgstr "Student"
 
 #: admin/admin2.php:12 admin/groupreportdetails.php:11 admin/userdetails.php:11
 #: admin/userreports.php:12 util/listnewteachers.php:60
+#: admin/userreportdetails.php:12
 msgid "Pending"
 msgstr "Ausstehend"
 
 #: admin/admin2.php:13 admin/groupreportdetails.php:12 admin/userdetails.php:12
-#: admin/userreports.php:13
+#: admin/userreports.php:13 admin/userreportdetails.php:13
 msgid "Tutor/TA/Proctor"
 msgstr "Tutor/Assistent"
 
 #: admin/admin2.php:14 admin/groupreportdetails.php:13 admin/userdetails.php:13
-#: admin/userreports.php:14
+#: admin/userreports.php:14 admin/userreportdetails.php:14
 msgid "Teacher"
 msgstr "Lehrer"
 
 #: admin/admin2.php:15 admin/groupreportdetails.php:14 admin/userdetails.php:14
-#: admin/userreports.php:15
+#: admin/userreports.php:15 admin/userreportdetails.php:15
 msgid "LimCourseCreator"
 msgstr "Kurseigentümer"
 
 #: admin/admin2.php:16 admin/groupreportdetails.php:15 admin/userdetails.php:15
-#: admin/userreports.php:16
+#: admin/userreports.php:16 admin/userreportdetails.php:16
 msgid "GroupAdmin"
 msgstr "Gruppen-Administrator"
 
@@ -819,7 +827,7 @@ msgstr "Ausstehende Benutzer"
 
 #: admin/admin2.php:44 admin/forms.php:468 admin/forms.php:1436
 #: admin/groupreportdetails.php:34 admin/userreports.php:37
-#: includes/coursecopylist.php:36
+#: includes/coursecopylist.php:36 admin/forms.php:1434
 msgid "Default Group"
 msgstr "Standardgruppe"
 
@@ -874,7 +882,7 @@ msgstr "Neuen Benutzer hinzufügen"
 msgid "Batch Add Instructors"
 msgstr "Dozenten in Serie hinzufügen"
 
-#: admin/admin2.php:179 admin/forms.php:1580 index.php:538
+#: admin/admin2.php:179 admin/forms.php:1580 index.php:538 admin/forms.php:1578
 msgid "Find Student"
 msgstr "Finde Student"
 
@@ -895,7 +903,7 @@ msgstr "Name"
 #: admin/admin2.php:195 admin/admin2.php:287 admin/groupreportdetails.php:225
 #: admin/userdetails.php:197 admin/userreportdetails.php:275
 #: admin/userreports.php:157 admin/userreports.php:223 course/gradebook.php:712
-#: forms.php:425
+#: forms.php:425 course/gradebook.php:716 course/listusers.php:753
 msgid "Email"
 msgstr "E-Mail"
 
@@ -925,7 +933,7 @@ msgstr ""
 #: course/courseshowitems.php:2113 course/courseshowitems.php:2253
 #: course/courseshowitems.php:2300 course/courseshowitems.php:2347
 #: course/courseshowitems.php:2394 course/courseshowitems.php:2441
-#: course/moddataset.php:664
+#: course/moddataset.php:664 admin/forms.php:1387
 msgid "Modify"
 msgstr "Bearbeiten"
 
@@ -946,6 +954,8 @@ msgstr "Bearbeiten"
 #: course/courseshowitems.php:2348 course/courseshowitems.php:2395
 #: course/courseshowitems.php:2442 course/editsnippets.php:99
 #: course/editsnippets.php:244 index.php:74 msgs/viewmsg.php:239
+#: admin/forms.php:1324 admin/forms.php:1389 admin/forms.php:1474
+#: admin/forms.php:1559
 msgid "Delete"
 msgstr "Löschen"
 
@@ -1050,6 +1060,7 @@ msgstr "Diagnose-Einstellungen"
 #: admin/forms.php:72 admin/forms.php:99 admin/forms.php:142
 #: admin/forms.php:1327 admin/forms.php:1477 admin/forms.php:1562
 #: course/convertintro.php:114 course/deleteassessment.php:72 validate.php:106
+#: admin/forms.php:1325 admin/forms.php:1475 admin/forms.php:1560
 msgid "Nevermind"
 msgstr "Hat sich erledigt"
 
@@ -1078,16 +1089,16 @@ msgstr "Kurseinstellungen"
 msgid "Enrollment key"
 msgstr "Kurs-Passwort"
 
-#: admin/forms.php:432 admin/forms.php:880
+#: admin/forms.php:432 admin/forms.php:880 admin/forms.php:878
 msgid "to only allow access through the LMS"
 msgstr "Zugang nur über das LMS"
 
-#: admin/forms.php:433 admin/forms.php:881
+#: admin/forms.php:433 admin/forms.php:881 admin/forms.php:879
 #, php-format
 msgid "to allow students to login directly to %s"
 msgstr "Mit direkter Anmeldung in %s"
 
-#: admin/forms.php:440 admin/forms.php:891
+#: admin/forms.php:440 admin/forms.php:891 admin/forms.php:889
 msgid "LTI Launch URL (if needed):"
 msgstr "LTI-URL (wenn benötigt)"
 
@@ -1127,11 +1138,11 @@ msgstr "Kursname"
 msgid "Select a level"
 msgstr "Wählen Sie eine Stufe"
 
-#: admin/forms.php:737
+#: admin/forms.php:737 admin/forms.php:735
 msgid "Upgrade assessment version"
 msgstr "Test in neue Version konvertieren"
 
-#: admin/forms.php:739
+#: admin/forms.php:739 admin/forms.php:737
 msgid ""
 "The source course is using an older format of assessments. Select this "
 "option to set your new course to use the new version of assessments, and "
@@ -1143,61 +1154,62 @@ msgstr ""
 "kopierte Tests in das neue Format zu konvertieren. Überprüfen Sie die "
 "Einstellungen der Tests in dem kopierten Kurs."
 
-#: admin/forms.php:744
+#: admin/forms.php:744 admin/forms.php:742
 msgid "Course Copy Options"
 msgstr "Einstellungen für Kurskopie"
 
-#: admin/forms.php:747 course/copyitems.php:594
+#: admin/forms.php:747 course/copyitems.php:594 admin/forms.php:745
 msgid "Copy offline grade items?"
 msgstr "Kurselemente kopieren, die offline bewertet werden?"
 
-#: admin/forms.php:750 course/copyitems.php:597
+#: admin/forms.php:750 course/copyitems.php:597 admin/forms.php:748
 msgid "Copy rubrics?"
 msgstr "Lernziele kopieren?"
 
-#: admin/forms.php:753 course/copyitems.php:598
+#: admin/forms.php:753 course/copyitems.php:598 admin/forms.php:751
 msgid "Copy outcomes?"
 msgstr "Themen kopieren?"
 
-#: admin/forms.php:756 course/copyitems.php:601
+#: admin/forms.php:756 course/copyitems.php:601 admin/forms.php:754
 msgid "Copy \"display at top\" instructor forum posts?"
 msgstr "Kopiere \"oben anzeigen\" für Dozenten-Beiträge?"
 
-#: admin/forms.php:762
+#: admin/forms.php:762 admin/forms.php:760
 msgid "Assessment version"
 msgstr "Test-Version"
 
-#: admin/forms.php:764
+#: admin/forms.php:764 admin/forms.php:762
 msgid "Use the new version of assessments."
 msgstr "Neue Oberfläche für Tests verwenden."
 
-#: admin/forms.php:770
+#: admin/forms.php:770 admin/forms.php:768
 msgid "Availability and Access"
 msgstr "Verfügbarkeit und Zugang"
 
-#: admin/forms.php:774 admin/listdiag.php:121
+#: admin/forms.php:774 admin/listdiag.php:121 admin/forms.php:772
 msgid "Available"
 msgstr "Verfügbar"
 
 #: admin/forms.php:777 admin/userdetails.php:84 admin/userdetails.php:109
 #: admin/userdetails.php:135 admin/userreportdetails.php:107
 #: admin/userreportdetails.php:197 admin/userreportdetails.php:223
+#: admin/forms.php:775
 msgid "Available to students"
 msgstr "Für Studierende verfügbar"
 
-#: admin/forms.php:798
+#: admin/forms.php:798 admin/forms.php:796
 msgid "Course start/end dates"
 msgstr "Kursanfangs-/Enddaten"
 
-#: admin/forms.php:798
+#: admin/forms.php:798 admin/forms.php:796
 msgid "Blank for no limit"
 msgstr "Leer für keine Begrenzung"
 
-#: admin/forms.php:819
+#: admin/forms.php:819 admin/forms.php:817
 msgid "Default start/end time for new items"
 msgstr "Standardstart-/Endzeit für neue Teile"
 
-#: admin/forms.php:826
+#: admin/forms.php:826 admin/forms.php:824
 msgid "Allow students to self-<u>un</u>enroll"
 msgstr "Studierende können sich selbst <u>ab</u>melden"
 
@@ -1216,7 +1228,7 @@ msgstr "Studierende können sich selbst <u>ab</u>melden"
 #: course/modquestion2.php:333 course/modquestion2.php:347
 #: course/modquestion2.php:356 course/modquestiongrid.php:164
 #: course/modquestiongrid2.php:155 course/modquestiongrid2.php:250
-#: course/modquestiongrid2.php:336
+#: course/modquestiongrid2.php:336 admin/forms.php:827 admin/forms.php:834
 msgid "No"
 msgstr "Nein"
 
@@ -1227,163 +1239,165 @@ msgstr "Nein"
 #: course/chgassessments2form.php:554 course/modquestion.php:218
 #: course/modquestion.php:223 course/modquestion.php:234
 #: course/modquestion.php:330 course/modquestiongrid.php:164
+#: admin/forms.php:829 admin/forms.php:836
 msgid "Yes"
 msgstr "Ja"
 
-#: admin/forms.php:833
+#: admin/forms.php:833 admin/forms.php:831
 msgid "Allow students to self-enroll"
 msgstr "Studierende können sich selbst einschreiben"
 
-#: admin/forms.php:842
+#: admin/forms.php:842 admin/forms.php:840
 msgid "Allow other instructors to copy course items"
 msgstr "Andere Dozenten können Kursteile kopieren"
 
-#: admin/forms.php:845
+#: admin/forms.php:845 admin/forms.php:843
 msgid "Require enrollment key from everyone"
 msgstr "Kurs-Passwort von allen fordern"
 
-#: admin/forms.php:847
+#: admin/forms.php:847 admin/forms.php:845
 msgid "No key required for group members, require key from others"
 msgstr "Kein Kurs-Passwort von Gruppenmitgliedern aber von allen anderen"
 
-#: admin/forms.php:849
+#: admin/forms.php:849 admin/forms.php:847
 msgid "No key required from anyone"
 msgstr "Kein Kurs-Passwort erforderlich"
 
-#: admin/forms.php:862
+#: admin/forms.php:862 admin/forms.php:860
 #, php-format
 msgid "View %s integration setup instructions %s"
 msgstr "%s Anleitung zur LMS-Integration %s ansehen"
 
-#: admin/forms.php:896
+#: admin/forms.php:896 admin/forms.php:894
 msgid "Allow the LMS to set assessment due dates"
 msgstr "Freischaltung durch LMS erlauben"
 
-#: admin/forms.php:896
+#: admin/forms.php:896 admin/forms.php:894
 msgid "Only supported by Canvas"
 msgstr "Nur vom LMS Canvas unterstützt"
 
-#: admin/forms.php:901
+#: admin/forms.php:901 admin/forms.php:899
 msgid "LMS course copies always copy from this original course"
 msgstr "Kopien von Kursen im LMS kopieren immer von diesem Kurs"
 
-#: admin/forms.php:913
+#: admin/forms.php:913 admin/forms.php:911
 msgid "Additional Options"
 msgstr "Weitere Einstellungen"
 
-#: admin/forms.php:918
+#: admin/forms.php:918 admin/forms.php:916
 msgid "Auto-assign LatePasses on course enroll"
 msgstr "Kulanz-Guthaben beim Einschreiben automatisch zuordnen"
 
-#: admin/forms.php:919
+#: admin/forms.php:919 admin/forms.php:917
 msgid "LatePasses"
 msgstr "Kulanz-Guthaben"
 
-#: admin/forms.php:922
+#: admin/forms.php:922 admin/forms.php:920
 msgid "Late Passes extend the due date by"
 msgstr "Kulanz-Guthaben verlängert die Fälligkeit um"
 
 #: admin/forms.php:923 assessment/showtest.php:1487 course/exportcalfeed.php:36
+#: admin/forms.php:921
 msgid "hours"
 msgstr "Stunden"
 
-#: admin/forms.php:927
+#: admin/forms.php:927 admin/forms.php:925
 msgid "Send teachers a message when students enroll"
 msgstr "Nachricht an Dozent schicken, wenn sich ein Student einschreibt"
 
-#: admin/forms.php:930
+#: admin/forms.php:930 admin/forms.php:928
 msgid "Send"
 msgstr "Abschicken"
 
-#: admin/forms.php:934
+#: admin/forms.php:934 admin/forms.php:932
 msgid "Theme"
 msgstr "Design"
 
-#: admin/forms.php:969
+#: admin/forms.php:969 admin/forms.php:967
 msgid "Message System"
 msgstr "Kursnachrichten"
 
-#: admin/forms.php:973
+#: admin/forms.php:973 admin/forms.php:971
 msgid "On for send and receive"
 msgstr "Zum Senden und Empfangen"
 
-#: admin/forms.php:975
+#: admin/forms.php:975 admin/forms.php:973
 msgid "On for receive, students can only send to instructor"
 msgstr "Zum Empfangen, Studierende können nur an Dozenten senden"
 
-#: admin/forms.php:977
+#: admin/forms.php:977 admin/forms.php:975
 msgid "On for receive, students can only send to students"
 msgstr "Zum Empfangen, Studierende können nur an Studierende senden"
 
-#: admin/forms.php:979
+#: admin/forms.php:979 admin/forms.php:977
 msgid "On for receive, students cannot send"
 msgstr "Zum Empfangen, Studierende können nicht senden"
 
-#: admin/forms.php:981 course/gradebook.php:461
+#: admin/forms.php:981 course/gradebook.php:461 admin/forms.php:979
 msgid "Off"
 msgstr "Aus"
 
-#: admin/forms.php:983
+#: admin/forms.php:983 admin/forms.php:981
 msgid "Enable monitoring of student-to-student messages "
 msgstr "Überwachen der Nachrichten zwischen Studierenden ermöglichen "
 
-#: admin/forms.php:987
+#: admin/forms.php:987 admin/forms.php:985
 msgid "Navigation Links for Students"
 msgstr "Kurs-Menü für Studierende"
 
 #: admin/forms.php:990 course/course.php:494 course/course.php:574
 #: course/courseshowitems.php:1898 course/exportcalfeed.php:59
-#: course/moveitem.php:156 header.php:284
+#: course/moveitem.php:156 header.php:284 admin/forms.php:988 header.php:285
 msgid "Calendar"
 msgstr "Kalender"
 
-#: admin/forms.php:994
+#: admin/forms.php:994 admin/forms.php:992
 msgid "Forum List"
 msgstr "Foren"
 
-#: admin/forms.php:1000
+#: admin/forms.php:1000 admin/forms.php:998
 msgid "Show remaining LatePasses on student gradebook page"
 msgstr ""
 "Zeige das verbleibende Kulanz-Guthaben der Studierenden in der Punkte-"
 "Übersicht"
 
-#: admin/forms.php:1008
+#: admin/forms.php:1008 admin/forms.php:1006
 msgid "Mark course as template"
 msgstr "Dies ist eine Kurs-Vorlage"
 
-#: admin/forms.php:1013
+#: admin/forms.php:1013 admin/forms.php:1011
 msgid "Mark as group template course"
 msgstr "Dies ist eine Kurs-Vorlage für die Gruppe"
 
-#: admin/forms.php:1018
+#: admin/forms.php:1018 admin/forms.php:1016
 msgid "Mark as super-group template course"
 msgstr "Dies ist eine Kurs-Vorlage für die Obergruppe"
 
-#: admin/forms.php:1023
+#: admin/forms.php:1023 admin/forms.php:1021
 msgid "Mark as global template course"
 msgstr "Dies ist eine globale Kurs-Vorlage"
 
-#: admin/forms.php:1028
+#: admin/forms.php:1028 admin/forms.php:1026
 msgid "Mark as self-enroll course"
 msgstr "Kurs erlaubt Selbst-Registrierung"
 
-#: admin/forms.php:1032
+#: admin/forms.php:1032 admin/forms.php:1030
 msgid "Mark as guest-access course"
 msgstr "Kurs erlaubt Gast-Anmeldung ohne Passwort als 'guest'"
 
-#: admin/forms.php:1058
+#: admin/forms.php:1058 admin/forms.php:1056
 msgid "Promote Course"
 msgstr "Kurs ankündigen"
 
-#: admin/forms.php:1061
+#: admin/forms.php:1061 admin/forms.php:1059
 msgid "Promote in Course Browser"
 msgstr "In der Kursübersicht veröffentlichen"
 
-#: admin/forms.php:1063
+#: admin/forms.php:1063 admin/forms.php:1061
 msgid "Course Browser Settings"
 msgstr "Einstellungen für Kursübersicht"
 
-#: admin/forms.php:1064
+#: admin/forms.php:1064 admin/forms.php:1062
 msgid ""
 "Promoting your course will advertise it to all users of this system, making "
 "it easy for them to copy this course."
@@ -1391,13 +1405,13 @@ msgstr ""
 "Wenn Sie Ihren Kurs veröffentlichen, so kann er von allen Benutzern gefunden "
 "und von Dozenten kopiert werden."
 
-#: admin/forms.php:1065
+#: admin/forms.php:1065 admin/forms.php:1063
 msgid ""
 "You should only promote a course that is complete and ready to share with "
 "the world."
 msgstr "Sie sollten nur fertige Kurse veröffentlichen."
 
-#: admin/forms.php:1066
+#: admin/forms.php:1066 admin/forms.php:1064
 msgid ""
 "Before sharing your course, check to ensure that it only contains materials "
 "you created or have the rights to share."
@@ -1405,7 +1419,7 @@ msgstr ""
 "Bevor Sie einen Kurs veröffentlichen prüfen Sie bitte, dass er nur Material "
 "enthält, dass Sie mit anderen teilen dürfen."
 
-#: admin/forms.php:1067
+#: admin/forms.php:1067 admin/forms.php:1065
 msgid ""
 "Your course should contain no commercial, copyrighted content, including "
 "textbook pages, activites, test bank items, etc."
@@ -1413,7 +1427,7 @@ msgstr ""
 "Ihr Kurs sollte keine kommerziellen oder Copyright-geschützte Inhalte "
 "enthalten, wie Seiten aus Lehrbüchern, Aktivitäten, Testsätze, u.s.w."
 
-#: admin/forms.php:1068
+#: admin/forms.php:1068 admin/forms.php:1066
 msgid ""
 "Openly licensed material, clearly marked with an open license, is fine to "
 "include."
@@ -1421,7 +1435,7 @@ msgstr ""
 "Material, das deutlich mit einer freien Lizenz versehen ist, darf im Kurs "
 "vorkommen."
 
-#: admin/forms.php:1069
+#: admin/forms.php:1069 admin/forms.php:1067
 msgid ""
 "If sharing your own materials (textbook, activities, paper assessments), "
 "please mark the materials with an open license, or include a blanket license "
@@ -1431,23 +1445,23 @@ msgstr ""
 "so kennzeichnen Sie dieses bitte mit einer offenen Lizenz  oder fügen eine "
 "Lizenz an geeigneter Stelle in den Kurs ein."
 
-#: admin/forms.php:1254
+#: admin/forms.php:1254 admin/forms.php:1252
 msgid "Course Ancestors"
 msgstr "Kursvorgänger"
 
-#: admin/forms.php:1385
+#: admin/forms.php:1385 admin/forms.php:1383
 msgid "Incomplete"
 msgstr "Unvollständig"
 
-#: admin/forms.php:1392
+#: admin/forms.php:1392 admin/forms.php:1390
 msgid "Start New Pull"
 msgstr "Neue Anfrage starten"
 
-#: admin/forms.php:1482
+#: admin/forms.php:1482 admin/forms.php:1480
 msgid "Merge Group"
 msgstr "Gruppen zusammenführen"
 
-#: admin/forms.php:1514
+#: admin/forms.php:1514 admin/forms.php:1512
 #, php-format
 msgid ""
 "This action will move teachers from group %s to another group and delete "
@@ -1456,30 +1470,30 @@ msgstr ""
 "Diese Aktion verschiebt Dozenten aus der Gruppe %s in eine andere Gruppe und "
 "löscht ihre ursprüngliche Gruppe"
 
-#: admin/forms.php:1516
+#: admin/forms.php:1516 admin/forms.php:1514
 msgid "Search for Groups"
 msgstr "Gruppen suchen"
 
 #: admin/forms.php:1517 course/addquestions.php:1334
-#: course/addquestions.php:1345
+#: course/addquestions.php:1345 admin/forms.php:1515
 msgid "Search"
 msgstr "Suche"
 
-#: admin/forms.php:1518
+#: admin/forms.php:1518 admin/forms.php:1516
 msgid "Move teachers to:"
 msgstr "Dozenten verschieben nach:"
 
-#: admin/forms.php:1555
+#: admin/forms.php:1555 admin/forms.php:1553
 msgid "Merge group with another"
 msgstr "Mit einer anderen Gruppe zusammenführen"
 
-#: admin/forms.php:1582
+#: admin/forms.php:1582 admin/forms.php:1580
 msgid "Enter all or part of the name, email, or username:"
 msgstr ""
 "Geben Sie einen Teil des Namens, der E-Mail-Adresse oder des Benutzernamens "
 "ein:"
 
-#: admin/forms.php:1624
+#: admin/forms.php:1624 admin/forms.php:1622
 msgid "No matches"
 msgstr "Keine Treffer"
 
@@ -1686,7 +1700,7 @@ msgstr ""
 "Kursexport in einem älteren Format handeln."
 
 #: admin/importitems2.php:182 admin/listdiag.php:123 admin/userlti.php:207
-#: header.php:270 index.php:624 index.php:687 ltihome.php:408
+#: header.php:270 index.php:624 index.php:687 ltihome.php:408 header.php:271
 msgid "Course"
 msgstr "Kurs"
 
@@ -1844,6 +1858,7 @@ msgstr ""
 #: course/editsnippets.php:255 course/exception.php:188
 #: course/gbsettings.php:402 course/gradebook.php:763 course/gradebook.php:1331
 #: course/managecalitems.php:134 course/masschgdates.php:510 forms.php:485
+#: course/latepasses.php:175 course/managecalitems.php:162
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -1921,17 +1936,20 @@ msgstr "Gelöscht"
 
 #: admin/userdetails.php:84 admin/userdetails.php:109 admin/userdetails.php:135
 #: admin/userreportdetails.php:197 admin/userreportdetails.php:223
+#: admin/userreportdetails.php:107
 msgid "Hidden from students"
 msgstr "Für Studierende unsichtbar"
 
 #: admin/userdetails.php:86 admin/userdetails.php:113 admin/userdetails.php:139
 #: admin/userreportdetails.php:201 admin/userreportdetails.php:227
+#: admin/userreportdetails.php:109
 msgid "Locked for Assessment"
 msgstr "Gesperrter Test"
 
 #: admin/userdetails.php:89 admin/userdetails.php:116 admin/userdetails.php:142
 #: admin/userreportdetails.php:112 admin/userreportdetails.php:230
-#: admin/userreportdetails.php:502
+#: admin/userreportdetails.php:502 admin/userdetails.php:383
+#: admin/userreportdetails.php:204
 msgid "Hidden on User's Home Page"
 msgstr "Auf er Startseite des Benutzers ausgeblendet"
 
@@ -1983,6 +2001,7 @@ msgstr "Kurse, an denen Sie teilnehmen"
 #: admin/userdetails.php:304 admin/userlti.php:208
 #: admin/userreportdetails.php:314 admin/userreportdetails.php:382
 #: admin/userreportdetails.php:423 forms.php:82 forms.php:346
+#: admin/forms.php:405 admin/forms.php:679
 msgid "Course ID"
 msgstr "Kurs-ID"
 
@@ -2128,6 +2147,7 @@ msgid "Points Earned / Possible (Percent)"
 msgstr "Punkte erreicht / möglich (Prozent)"
 
 #: assessment/displayq2.php:355 assess2/questions/QuestionHtmlGenerator.php:226
+#: assess2/displayq3.php:310
 msgid "Answers may vary"
 msgstr "Antworten können variieren"
 
@@ -2142,7 +2162,7 @@ msgstr "Hinweis:"
 #: assessment/displayq2.php:483 assess2/displayq3.php:413
 #: assess2/displayq3.php:422 assess2/questions/QuestionHtmlGenerator.php:931
 #: assess2/questions/QuestionHtmlGenerator.php:952
-#: assess2/questions/QuestionHtmlGenerator.php:960
+#: assess2/questions/QuestionHtmlGenerator.php:960 assess2/displayq3.php:393
 msgid "Answer:"
 msgstr "Antwort:"
 
@@ -2150,7 +2170,7 @@ msgstr "Antwort:"
 #: assessment/displayq2.php:485 assess2/displayq3.php:415
 #: assess2/displayq3.php:424 assess2/questions/QuestionHtmlGenerator.php:933
 #: assess2/questions/QuestionHtmlGenerator.php:954
-#: assess2/questions/QuestionHtmlGenerator.php:962
+#: assess2/questions/QuestionHtmlGenerator.php:962 assess2/displayq3.php:395
 msgid "Show Answer"
 msgstr "Antwort anzeigen"
 
@@ -2158,7 +2178,7 @@ msgstr "Antwort anzeigen"
 #: assessment/displayq2.php:626 assessment/showsoln.php:26
 #: javascript/assess2supp.js:49 assess2/displayq3.php:451
 #: assess2/displayq3.php:610 assess2/questions/QuestionHtmlGenerator.php:1070
-#: assess2/questions/models/Question.php:168
+#: assess2/questions/models/Question.php:168 assess2/displayq3.php:449
 msgid "Written Example"
 msgstr "Musterlösung"
 
@@ -2174,7 +2194,7 @@ msgid "Question"
 msgstr "Frage"
 
 #: assessment/displayq2.php:515
-#: assess2/questions/QuestionHtmlGenerator.php:1072
+#: assess2/questions/QuestionHtmlGenerator.php:1072 assess2/displayq3.php:454
 msgid "This solution is for a similar problem, not your specific version"
 msgstr ""
 "Diese Lösung ist für ein ähnliches Problem, nicht für diese spezielle Version"
@@ -2184,10 +2204,11 @@ msgid "Inactive Question"
 msgstr "Inaktive Frage"
 
 #: assessment/displayq2.php:591 assess2/questions/models/Question.php:161
+#: assess2/displayq3.php:578
 msgid "Get help: "
 msgstr "Hilfe erhalten: "
 
-#: assessment/displayq2.php:636
+#: assessment/displayq2.php:636 assess2/displayq3.php:548
 msgid "Box"
 msgstr "Antwort"
 
@@ -2197,11 +2218,13 @@ msgid "Detailed Solution"
 msgstr "Detaillierte Lösung"
 
 #: assessment/displayq2.php:676 assess2/questions/QuestionHtmlGenerator.php:675
+#: assess2/displayq3.php:526
 msgid "Show Detailed Solution"
 msgstr "Zeige detaillierte Lösung an"
 
 #: assessment/displayq2.php:1149
 #: assess2/questions/answerboxes/NumberAnswerBox.php:74
+#: assess2/displayq3.php:1075
 msgid ""
 "Enter your answer as a list of integers separated with commas: Example: -4, "
 "3, 2"
@@ -2211,11 +2234,13 @@ msgstr ""
 
 #: assessment/displayq2.php:1150
 #: assess2/questions/answerboxes/NumberAnswerBox.php:75
+#: assess2/displayq3.php:1076
 msgid "Enter a list of integers"
 msgstr "Geben Sie eine Liste von ganzen Zahlen ein"
 
 #: assessment/displayq2.php:1152
 #: assess2/questions/answerboxes/NumberAnswerBox.php:77
+#: assess2/displayq3.php:1078
 msgid ""
 "Enter your answer as a list of integer or decimal numbers separated with "
 "commas: Examples: -4, 3, 2.5172"
@@ -2225,11 +2250,13 @@ msgstr ""
 
 #: assessment/displayq2.php:1153
 #: assess2/questions/answerboxes/NumberAnswerBox.php:78
+#: assess2/displayq3.php:1079
 msgid "Enter a list of integer or decimal numbers"
 msgstr "Geben Sie eine Liste von ganzen Zahlen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:1157
 #: assess2/questions/answerboxes/NumberAnswerBox.php:82
+#: assess2/displayq3.php:1083
 msgid ""
 "Enter your answer as a set of integers separated with commas: Example: {-4, "
 "3, 2}"
@@ -2239,11 +2266,13 @@ msgstr ""
 
 #: assessment/displayq2.php:1158
 #: assess2/questions/answerboxes/NumberAnswerBox.php:83
+#: assess2/displayq3.php:1084
 msgid "Enter a set of integers"
 msgstr "Geben Sie eine Menge von ganzen Zahlen ein"
 
 #: assessment/displayq2.php:1160
 #: assess2/questions/answerboxes/NumberAnswerBox.php:85
+#: assess2/displayq3.php:1086
 msgid ""
 "Enter your answer as a set of integer or decimal numbers separated with "
 "commas: Example: {-4, 3, 2.5172}"
@@ -2253,21 +2282,25 @@ msgstr ""
 
 #: assessment/displayq2.php:1161
 #: assess2/questions/answerboxes/NumberAnswerBox.php:86
+#: assess2/displayq3.php:1087
 msgid "Enter a set of integer or decimal numbers"
 msgstr "Geben Sie eine Menge von ganzen Zahlen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:1165
 #: assess2/questions/answerboxes/NumberAnswerBox.php:90
+#: assess2/displayq3.php:1091
 msgid "Enter your answer as an integer.  Examples: 3, -4, 0"
 msgstr "Geben Sie Ihre Antwort als ganze Zahl ein.  Beispiele: 3,-4,0"
 
 #: assessment/displayq2.php:1166
 #: assess2/questions/answerboxes/NumberAnswerBox.php:91
+#: assess2/displayq3.php:1092
 msgid "Enter an integer"
 msgstr "Geben Sie eine ganze Zahl ein"
 
 #: assessment/displayq2.php:1168
 #: assess2/questions/answerboxes/NumberAnswerBox.php:93
+#: assess2/displayq3.php:1094
 msgid ""
 "Enter your answer as an integer or decimal number.  Examples: 3, -4, 5.5172"
 msgstr ""
@@ -2292,18 +2325,24 @@ msgstr ""
 
 #: assessment/displayq2.php:1179
 #: assess2/questions/answerboxes/NumberAnswerBox.php:106
+#: assess2/displayq3.php:1105
+#: assess2/questions/answerboxes/NumberAnswerBox.php:104
 #, php-format
 msgid "Your answer should include exactly %d decimal places."
 msgstr "Ihre Antwort sollte auf %d Nachkommastellen genau sein."
 
 #: assessment/displayq2.php:1180
 #: assess2/questions/answerboxes/NumberAnswerBox.php:107
+#: assess2/displayq3.php:1106
+#: assess2/questions/answerboxes/NumberAnswerBox.php:105
 #, php-format
 msgid ", with %d decimal places"
 msgstr ", mit %d Nachkommastellen"
 
 #: assessment/displayq2.php:1183
 #: assess2/questions/answerboxes/NumberAnswerBox.php:110
+#: assess2/displayq3.php:1109
+#: assess2/questions/answerboxes/NumberAnswerBox.php:112
 #, php-format
 msgid "Your answer should be accurate to at least %d decimal places."
 msgstr "Ihre Antwort sollte auf wenigstens %d Nachkommastellen genau sein."
@@ -2312,6 +2351,7 @@ msgstr "Ihre Antwort sollte auf wenigstens %d Nachkommastellen genau sein."
 #: assess2/displayq3.php:1110 assess2/displayq3.php:1778
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:64
 #: assess2/questions/answerboxes/NumberAnswerBox.php:111
+#: assess2/questions/answerboxes/NumberAnswerBox.php:113
 #, php-format
 msgid ", accurate to at least %d decimal places"
 msgstr ", auf %d Nachkommastellen genau"
@@ -2320,6 +2360,7 @@ msgstr ", auf %d Nachkommastellen genau"
 #: assess2/displayq3.php:1121 assess2/displayq3.php:1674
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:106
 #: assess2/questions/answerboxes/NumberAnswerBox.php:123
+#: assess2/questions/answerboxes/NumberAnswerBox.php:125
 #, php-format
 msgid "Your answer should have exactly %d significant figures."
 msgstr "Ihre Antwort sollte genau %d signifikante Figuren haben."
@@ -2328,6 +2369,7 @@ msgstr "Ihre Antwort sollte genau %d signifikante Figuren haben."
 #: assess2/displayq3.php:1122 assess2/displayq3.php:1675
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:107
 #: assess2/questions/answerboxes/NumberAnswerBox.php:124
+#: assess2/questions/answerboxes/NumberAnswerBox.php:126
 #, php-format
 msgid ", with exactly %d significant figures"
 msgstr ", mit genau %d signifikanten Figuren"
@@ -2336,6 +2378,7 @@ msgstr ", mit genau %d signifikanten Figuren"
 #: assess2/displayq3.php:1125 assess2/displayq3.php:1678
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:109
 #: assess2/questions/answerboxes/NumberAnswerBox.php:126
+#: assess2/questions/answerboxes/NumberAnswerBox.php:128
 #, php-format
 msgid "Your answer should have between %d and %d significant figures."
 msgstr "Ihre Antwort sollte zwischen %d und %d signifikante Stellen haben."
@@ -2344,6 +2387,7 @@ msgstr "Ihre Antwort sollte zwischen %d und %d signifikante Stellen haben."
 #: assess2/displayq3.php:1126 assess2/displayq3.php:1679
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:110
 #: assess2/questions/answerboxes/NumberAnswerBox.php:127
+#: assess2/questions/answerboxes/NumberAnswerBox.php:129
 #, php-format
 msgid ", with %d - %d significant figures"
 msgstr ", mit %d - %d signifikanten Stellen"
@@ -2352,6 +2396,7 @@ msgstr ", mit %d - %d signifikanten Stellen"
 #: assess2/displayq3.php:1138 assess2/displayq3.php:1691
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:122
 #: assess2/questions/answerboxes/NumberAnswerBox.php:139
+#: assess2/questions/answerboxes/NumberAnswerBox.php:141
 #, php-format
 msgid "Your answer should have at least %d significant figures."
 msgstr "Ihre Antwort sollte mindestens %d signifikante Figuren haben."
@@ -2360,6 +2405,7 @@ msgstr "Ihre Antwort sollte mindestens %d signifikante Figuren haben."
 #: assess2/displayq3.php:1139 assess2/displayq3.php:1692
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:123
 #: assess2/questions/answerboxes/NumberAnswerBox.php:140
+#: assess2/questions/answerboxes/NumberAnswerBox.php:142
 #, php-format
 msgid ", with at least %d significant figures"
 msgstr ", mit mindestens %d signifikanten Figuren"
@@ -2371,6 +2417,7 @@ msgstr ", mit mindestens %d signifikanten Figuren"
 #: assess2/questions/answerboxes/MatchingAnswerBox.php:60
 #: assess2/questions/answerboxes/MultipleAnswerAnswerBox.php:51
 #: assess2/questions/answerboxes/StringAnswerBox.php:122
+#: assess2/displayq3.php:1207
 msgid "Eeek!  $questions is not defined or needs to be an array"
 msgstr "Eeek!  $questions ist nicht definiert oder muss ein Feld sein"
 
@@ -2384,6 +2431,7 @@ msgstr "Wählen Sie eine Antwort aus"
 
 #: assessment/displayq2.php:1422
 #: assess2/questions/answerboxes/ChoicesAnswerBox.php:175
+#: assess2/displayq3.php:1352
 msgid "Select the best answer"
 msgstr "Wählen Sie die beste Antwort aus"
 
@@ -2394,16 +2442,18 @@ msgstr "Wählen Sie die eine, keine oder mehrere Antworten aus"
 
 #: assessment/displayq2.php:1542
 #: assess2/questions/answerboxes/MultipleAnswerAnswerBox.php:163
+#: assess2/displayq3.php:1468
 msgid "Select all correct answers"
 msgstr "Wählen Sie alle korrekten Antworten aus"
 
-#: assessment/displayq2.php:1566
+#: assessment/displayq2.php:1566 assess2/displayq3.php:1492
 msgid "Eeek!  $questions or $answers is not defined or needs to be an array"
 msgstr ""
 "Eeek! $questions oder $answers ist nicht definiert oder muss ein Array sein"
 
 #: assessment/displayq2.php:1666
 #: assess2/questions/answerboxes/MatchingAnswerBox.php:195
+#: assess2/displayq3.php:1592
 msgid "In each pull-down, select the item that matches with the displayed item"
 msgstr ""
 "Wählen Sie den Eintrag aus dem Ausklappmenü aus, der zum angezeigten Eintrag "
@@ -2411,6 +2461,7 @@ msgstr ""
 
 #: assessment/displayq2.php:1668
 #: assess2/questions/answerboxes/MatchingAnswerBox.php:197
+#: assess2/displayq3.php:1594
 msgid ""
 "In each pull-down on the left, select the letter (a, b, c, etc.) of the "
 "matching answer in the right-hand column"
@@ -2420,6 +2471,7 @@ msgstr ""
 
 #: assessment/displayq2.php:1728
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:83
+#: assess2/displayq3.php:1652
 msgid ""
 "Enter your answer as a list of values separated by commas: Example: -4, 3, 2"
 msgstr ""
@@ -2432,11 +2484,13 @@ msgstr ""
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:84
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:87
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:78
+#: assess2/displayq3.php:1653
 msgid "each value"
 msgstr "jeder Wert"
 
 #: assessment/displayq2.php:1731
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:86
+#: assess2/displayq3.php:1655
 msgid ""
 "Enter your answer as a set of values separated with commas: Example: {-4, 3, "
 "2}"
@@ -2446,6 +2500,7 @@ msgstr ""
 
 #: assessment/displayq2.php:1735
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:90
+#: assess2/displayq3.php:1659
 msgid "your answer"
 msgstr "Ihre Antwort"
 
@@ -2478,6 +2533,7 @@ msgstr "Vorschau"
 
 #: assessment/displayq2.php:1844
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:60
+#: assess2/displayq3.php:1774
 msgid "Enter each element of the matrix as  number (like 5, -3, 2.2)"
 msgstr "Geben Sie jedes Element der Matrix als Zahl (z.B. 5, -2, 2.2) ein"
 
@@ -2487,6 +2543,7 @@ msgstr "Geben Sie jedes Element der Matrix als Zahl (z.B. 5, -2, 2.2) ein"
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:72
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:63
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:127
+#: assess2/displayq3.php:1777
 #, php-format
 msgid "Your numbers should be accurate to %d decimal places."
 msgstr "Ihre Zahlen sollten auf %d Nachkommastellen genau sein."
@@ -2507,21 +2564,25 @@ msgstr "jedes Element der Matrix"
 
 #: assessment/displayq2.php:1979
 #: assess2/questions/answerboxes/CalculatedMatrixAnswerBox.php:122
+#: assess2/displayq3.php:1933
 msgid "Enter your answer as a matrix, like ((2,3,4),(1,4,5))"
 msgstr "Geben Sie Ihre Antwort als Matrix wie ((2,3,4),(3,4,5)) ein."
 
 #: assessment/displayq2.php:2034
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:70
+#: assess2/displayq3.php:2002
 msgid "Enter an algebraic equation"
 msgstr "Geben Sie eine algebraische Gleichung ein"
 
 #: assessment/displayq2.php:2036
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:76
+#: assess2/displayq3.php:2004
 msgid "Enter an algebraic expression"
 msgstr "Geben Sie einen algebraischen Ausdruck ein"
 
 #: assessment/displayq2.php:2143
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:71
+#: assess2/displayq3.php:2095
 msgid "Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3"
 msgstr "Geben Sie Ihre Antwort als Gleichung ein.  Beispiel: y=3x^2+1, 2+x+y=3"
 
@@ -2536,6 +2597,7 @@ msgstr ""
 
 #: assessment/displayq2.php:2145
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:77
+#: assess2/displayq3.php:2097
 msgid "Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c"
 msgstr ""
 "Geben Sie Ihre Antwort als Ausdruck ein.  Beispiel: 3x^2+1, x/5, (a+b)/c"
@@ -2574,6 +2636,7 @@ msgstr "Geben Sie eine Liste von Punkten ein"
 
 #: assessment/displayq2.php:2202
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:63
+#: assess2/displayq3.php:2154
 msgid "Enter your answer as a vector.  Example: <2,5.5>"
 msgstr "Geben Sie Ihre Antwort als Vektor ein.  Beispiel: <2,5.5>"
 
@@ -2650,12 +2713,14 @@ msgstr "Geben Sie ein n-Tupel ein"
 
 #: assessment/displayq2.php:2218
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:79
+#: assess2/displayq3.php:2170
 #, php-format
 msgid "Each value should be accurate to %d decimal places."
 msgstr "Jeder Wert sollte auf %d Nachkommastellen genau sein."
 
 #: assessment/displayq2.php:2219
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:80
+#: assess2/displayq3.php:2171
 #, php-format
 msgid ", each value accurate to %d decimal places"
 msgstr ", jeder Wert auf %d Nachkommastellen genau"
@@ -2669,11 +2734,13 @@ msgstr "Geben Sie DNE (Does Not Exist) ein, wenn keine Antwort existiert"
 
 #: assessment/displayq2.php:2274
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:65
+#: assess2/displayq3.php:2232
 msgid "Enter your answer as a vector.  Example: <2,5.5172>"
 msgstr "Geben Sie Ihre Antwort als Vektor ein. Beispiel: <2, 5.5172>"
 
 #: assessment/displayq2.php:2343
 #: assess2/questions/answerboxes/ComplexAnswerBox.php:54
+#: assess2/displayq3.php:2304
 msgid ""
 "Enter your answer as a list of complex numbers in a+bi form separated with "
 "commas.  Example: 2+5.5172i,-3-4i"
@@ -2690,6 +2757,7 @@ msgstr "Geben Sie eine Liste von komplexen Zahlen ein"
 
 #: assessment/displayq2.php:2346
 #: assess2/questions/answerboxes/ComplexAnswerBox.php:57
+#: assess2/displayq3.php:2307
 msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i"
 msgstr ""
 "Geben Sie Ihre Antwort als komplexe Zahl in a+bi Form ein. Beispiel: "
@@ -2704,6 +2772,7 @@ msgstr "Geben Sie eine komplexe Zahl ein"
 
 #: assessment/displayq2.php:2391
 #: assess2/questions/answerboxes/CalculatedComplexAnswerBox.php:64
+#: assess2/displayq3.php:2367
 msgid ""
 "Enter your answer as a list of complex numbers in a+bi form separated with "
 "commas.  Example: 2+5i,-3-4i"
@@ -2713,12 +2782,14 @@ msgstr ""
 
 #: assessment/displayq2.php:2394
 #: assess2/questions/answerboxes/CalculatedComplexAnswerBox.php:67
+#: assess2/displayq3.php:2370
 msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5i"
 msgstr ""
 "Geben Sie Ihre Antwort als komplexe Zahl der Form a+bi ein. Beispiel: 2+5i"
 
 #: assessment/displayq2.php:2454
 #: assess2/questions/answerboxes/StringAnswerBox.php:60
+#: assess2/displayq3.php:2432
 msgid ""
 "Enter your answer as a list of text separated by commas.  Example:  dog, "
 "cat, rabbit."
@@ -2728,11 +2799,13 @@ msgstr ""
 
 #: assessment/displayq2.php:2455
 #: assess2/questions/answerboxes/StringAnswerBox.php:61
+#: assess2/displayq3.php:2433
 msgid "Enter a list of text"
 msgstr "Geben Sie eine Liste von Texten ein"
 
 #: assessment/displayq2.php:2457
 #: assess2/questions/answerboxes/StringAnswerBox.php:63
+#: assess2/displayq3.php:2435
 msgid "Enter your answer as letters.  Examples: A B C, linear, a cat"
 msgstr ""
 "Geben Sie Ihre Antwort als Wort oder Wortfolge ein.  Beispiele: A B C, "
@@ -2740,16 +2813,19 @@ msgstr ""
 
 #: assessment/displayq2.php:2458
 #: assess2/questions/answerboxes/StringAnswerBox.php:64
+#: assess2/displayq3.php:2436
 msgid "Enter text"
 msgstr "Geben Sie Text ein"
 
 #: assessment/displayq2.php:2563
 #: assess2/questions/answerboxes/StringAnswerBox.php:156
+#: assess2/displayq3.php:2555
 msgid "The answer must match a specified pattern"
 msgstr "Die Antwort muss zu einem vorgegebenen Muster passen"
 
 #: assessment/displayq2.php:2667
 #: assess2/questions/answerboxes/EssayAnswerBox.php:99
+#: assess2/displayq3.php:2658
 msgid "Enter your answer as text.  This question is not automatically graded."
 msgstr ""
 "Geben Sie Ihre Antwort als Text ein.  Diese Frage wird nicht automatisch "
@@ -2757,6 +2833,7 @@ msgstr ""
 
 #: assessment/displayq2.php:2683
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:60
+#: assess2/displayq3.php:2674
 msgid ""
 "Enter your answer by selecting the shade type, and by clicking and dragging "
 "the sliders on the normal curve"
@@ -2766,11 +2843,13 @@ msgstr ""
 
 #: assessment/displayq2.php:2684
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:61
+#: assess2/displayq3.php:2675
 msgid "Adjust the sliders"
 msgstr "Passen Sie die Schieberegler an"
 
 #: assessment/displayq2.php:2687
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:64
+#: assess2/displayq3.php:2678
 msgid "Enter your answer using interval notation.  Example: [2.1,5.6172)"
 msgstr ""
 "Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2.1, 5.6172)"
@@ -2807,37 +2886,44 @@ msgstr "Geben Sie ein Intervall in Intervallschreibweise ein"
 
 #: assessment/displayq2.php:2701
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:79
+#: assess2/displayq3.php:2692
 msgid "Left of a value"
 msgstr "Links von einem Wert"
 
 #: assessment/displayq2.php:2701
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:79
+#: assess2/displayq3.php:2692
 msgid "Right of a value"
 msgstr "Rechts von einem Wert"
 
 #: assessment/displayq2.php:2702
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:80
+#: assess2/displayq3.php:2693
 msgid "Between two values"
 msgstr "Zwischen zwei Werten"
 
 #: assessment/displayq2.php:2702
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:80
+#: assess2/displayq3.php:2693
 msgid "2 regions"
 msgstr "2 Bereiche"
 
 #: assessment/displayq2.php:2702
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:80
+#: assess2/displayq3.php:2693
 msgid "Click and drag the arrows to adjust the values."
 msgstr "Klicken und ziehen Sie die Pfeile, um die Werte anzupassen."
 
 #: assessment/displayq2.php:2719
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:96
+#: assess2/displayq3.php:2709
 msgid "Enter an interval corresponding to the region to be shaded"
 msgstr ""
 "Geben Sie ein Intervall für den Bereich ein, der schattiert werden soll"
 
 #: assessment/displayq2.php:2792
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:61
+#: assess2/displayq3.php:2783
 #, php-format
 msgid ""
 "Enter your answer using inequality notation.  Example: 3 &lt;= %s &lt; 4"
@@ -2846,6 +2932,7 @@ msgstr ""
 
 #: assessment/displayq2.php:2793
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:62
+#: assess2/displayq3.php:2784
 #, php-format
 msgid "Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3"
 msgstr ""
@@ -2853,51 +2940,61 @@ msgstr ""
 
 #: assessment/displayq2.php:2794
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:63
+#: assess2/displayq3.php:2785
 msgid "Enter <i>all real numbers</i> for solutions of that type"
 msgstr "Geben Sie <i>alle realen Zahlen</i> für Lösungen dieses Typs ein"
 
 #: assessment/displayq2.php:2795
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:64
+#: assess2/displayq3.php:2786
 msgid "Enter an interval using inequalities"
 msgstr "Geben Sie ein Intervall mit Ungleichungen an"
 
 #: assessment/displayq2.php:2797
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:66
+#: assess2/displayq3.php:2788
 msgid "Enter your answer using interval notation.  Example: [2,5)"
 msgstr "Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2, 5)"
 
 #: assessment/displayq2.php:2799
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:68
+#: assess2/displayq3.php:2790
 msgid "Separate intervals by a comma.  Example: (-oo,2],[4,oo)"
 msgstr "Trennen Sie Intervalle mit Kommata. Beispiel: (-oo,2],84,oo)"
 
 #: assessment/displayq2.php:2800
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:69
+#: assess2/displayq3.php:2791
 msgid "Enter a list of intervals using interval notation"
 msgstr "Geben Sie eine Liste von Intervallen in Intervallschreibweise ein"
 
 #: assessment/displayq2.php:3054
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:252
+#: assess2/displayq3.php:3050
 msgid "Graph to add drawings to:"
 msgstr "Graph, zu dem Zeichnungen hinzugefügt werden:"
 
 #: assessment/displayq2.php:3056
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:254
+#: assess2/displayq3.php:3052
 msgid "Elements to draw:"
 msgstr "Zu zeichnende Elemente:"
 
 #: assessment/displayq2.php:3058
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:256
+#: assess2/displayq3.php:3054
 msgid "Add new drawing element"
 msgstr "Neues Zeichenelement hinzufügen"
 
 #: assessment/displayq2.php:3080
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:275
+#: assess2/displayq3.php:3073
 msgid "Clear All"
 msgstr "Alles leeren"
 
 #: assessment/displayq2.php:3084
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:279
+#: assess2/displayq3.php:3077
 msgid "Draw:"
 msgstr "Zeichnen:"
 
@@ -2905,31 +3002,37 @@ msgstr "Zeichnen:"
 #: javascript/assessment_min.js:5 javascript/drawing.js:218
 #: javascript/drawing_min.js:1
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:438
+#: assess2/displayq3.php:3236
 msgid "Line"
 msgstr "Linie"
 
 #: assessment/displayq2.php:3245
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:440
+#: assess2/displayq3.php:3238
 msgid "Line Segment"
 msgstr "Liniensegment"
 
 #: assessment/displayq2.php:3247
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:442
+#: assess2/displayq3.php:3240
 msgid "Freehand Draw"
 msgstr "Freihandzeichnen"
 
 #: assessment/displayq2.php:3249
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:444
+#: assess2/displayq3.php:3242
 msgid "Eraser"
 msgstr "Radiergummi"
 
 #: assessment/displayq2.php:3252
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:447
+#: assess2/displayq3.php:3245
 msgid "Dot"
 msgstr "Punkt"
 
 #: assessment/displayq2.php:3254
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:449
+#: assess2/displayq3.php:3247
 msgid "Open Dot"
 msgstr "Offener Punkt"
 
@@ -2939,20 +3042,23 @@ msgstr "Offener Punkt"
 #: javascript/drawing_min.js:1 assess2/displayq3.php:3252
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:451
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:454
+#: assess2/displayq3.php:3249
 msgid "Polygon"
 msgstr "Vieleck"
 
 #: assessment/displayq2.php:3310
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:507
+#: assess2/displayq3.php:3304
 msgid "Enter your answer by drawing on the graph."
 msgstr "Geben Sie Ihre Antwort ein, indem Sie zeichnen."
 
-#: assessment/displayq2.php:3527
+#: assessment/displayq2.php:3527 assess2/displayq3.php:3510
 msgid "Last file uploaded:"
 msgstr "Zuletzt hochgeladene Datei:"
 
 #: assessment/displayq2.php:3538
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:108
+#: assess2/displayq3.php:3525
 msgid "Select a file to upload"
 msgstr "Wählen Sie eine Datei zum Hochladen aus"
 
@@ -2969,6 +3075,7 @@ msgstr ""
 
 #: assessment/displayq2.php:3944
 #: assess2/questions/scorepart/MatchingScorePart.php:45
+#: assess2/displayq3.php:3934
 msgid ""
 "Eeek!  $questions or $answers is not defined or needs to be an array.  Make "
 "sure both are defined in the Common Control section."
@@ -2979,16 +3086,21 @@ msgstr ""
 
 #: assessment/displayq2.php:4686
 #: assess2/questions/scorepart/CalculatedScorePart.php:113
+#: assess2/displayq3.php:4617
+#: assess2/questions/scorepart/CalculatedScorePart.php:117
 msgid "Debug info: empty, missing or invalid $answer"
 msgstr "Debuginfo: leeres, fehlendes oder ungültiges $answer"
 
 #: assessment/displayq2.php:4705
 #: assess2/questions/scorepart/CalculatedScorePart.php:133
+#: assess2/displayq3.php:4636
+#: assess2/questions/scorepart/CalculatedScorePart.php:141
 msgid "Debug info: empty, missing, or invalid $answer"
 msgstr "Debuginfo: leere, fehlende oder ungültiges $answer"
 
 #: assessment/displayq2.php:5107
 #: assess2/questions/scorepart/FunctionExpressionScorePart.php:309
+#: assess2/displayq3.php:5092
 msgid ""
 "Debug info: function evaled to Not-a-number at all test points.  Check "
 "$domain"
@@ -3003,7 +3115,7 @@ msgid " Unable to open Excel file"
 msgstr " Kann Excel Datei nicht öffnen"
 
 #: assessment/displayq2.php:7380
-#: assess2/questions/scorepart/FileScorePart.php:80
+#: assess2/questions/scorepart/FileScorePart.php:80 assess2/displayq3.php:7341
 #, php-format
 msgid "Upload of %s: "
 msgstr "Hochladen von %s: "
@@ -3030,7 +3142,7 @@ msgid "Error - File not uploaded in preview"
 msgstr "Fehler - Datei nicht in Vorschau hochgeladen"
 
 #: assessment/displayq2.php:7454
-#: assess2/questions/scorepart/FileScorePart.php:142
+#: assess2/questions/scorepart/FileScorePart.php:142 assess2/displayq3.php:7415
 msgid "Successful"
 msgstr "Erfolgreich"
 
@@ -3080,10 +3192,12 @@ msgstr "Fehler - mehr als ein i im Ausdruck"
 #: assess2/questions/scorepart/ComplexScorePart.php:266
 #: assess2/questions/scorepart/ComplexScorePart.php:280
 #: assess2/questions/scorepart/ComplexScorePart.php:290
+#: assess2/displayq3.php:7773
 msgid "error - invalid form"
 msgstr "Fehler - ungültige Form"
 
 #: assessment/displayq2.php:8012 assess2/questions/answerboxhelpers.php:485
+#: assess2/displayq3.php:8084
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4) or as an integer (like 4 or -2)"
@@ -3092,15 +3206,18 @@ msgstr ""
 "-2) ein"
 
 #: assessment/displayq2.php:8013 assess2/questions/answerboxhelpers.php:486
+#: assess2/displayq3.php:8085
 #, php-format
 msgid "Enter a %s of fractions or integers"
 msgstr "Geben Sie ein %s von Brüchen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:8013 assess2/questions/answerboxhelpers.php:486
+#: assess2/displayq3.php:8085
 msgid "Enter a fraction or integer"
 msgstr "Geben Sie einen Bruch oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8016 assess2/questions/answerboxhelpers.php:489
+#: assess2/displayq3.php:8088
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6), as an integer (like 4 "
@@ -3110,17 +3227,20 @@ msgstr ""
 "Zahl (wie 4 oder -2), oder als Dezimalzahl (wie 0.5 oder 1.25) ein"
 
 #: assessment/displayq2.php:8017 assess2/questions/answerboxhelpers.php:490
+#: assess2/displayq3.php:8089
 #, php-format
 msgid "Enter a %s of reduced fractions, integers, or exact decimals"
 msgstr ""
 "Geben Sie ein %s von gekürzten Brüchen, Ganzzahlen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:8017 assess2/questions/answerboxhelpers.php:490
+#: assess2/displayq3.php:8089
 msgid "Enter a reduced fraction, integer, or exact decimal"
 msgstr ""
 "Geben Sie einen gekürzten Bruch, eine ganze Zahl oder eine Dezimalzahl ein"
 
 #: assessment/displayq2.php:8019 assess2/questions/answerboxhelpers.php:492
+#: assess2/displayq3.php:8091
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6) or as an integer (like 4 "
@@ -3130,15 +3250,18 @@ msgstr ""
 "(z.B. 4 oder -2) ein"
 
 #: assessment/displayq2.php:8020 assess2/questions/answerboxhelpers.php:493
+#: assess2/displayq3.php:8092
 #, php-format
 msgid "Enter a %s of reduced fractions or integers"
 msgstr "Geben Sie ein %s von gekürzten Brüchen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:8020 assess2/questions/answerboxhelpers.php:493
+#: assess2/displayq3.php:8092
 msgid "Enter a reduced fraction or integer"
 msgstr "Geben Sie einen gekürzten Bruch oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8024 assess2/questions/answerboxhelpers.php:497
+#: assess2/displayq3.php:8096
 #, php-format
 msgid ""
 "Enter %s as a mixed number or as an integer.  Example: 2 1/2 = 2 &frac12;"
@@ -3147,6 +3270,7 @@ msgstr ""
 "&frac12;"
 
 #: assessment/displayq2.php:8026 assess2/questions/answerboxhelpers.php:499
+#: assess2/displayq3.php:8098
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number or as an integer.  Example: 2 1/2 = 2 "
@@ -3156,15 +3280,18 @@ msgstr ""
 "2 1/2 = 2 &frac12;"
 
 #: assessment/displayq2.php:8028 assess2/questions/answerboxhelpers.php:501
+#: assess2/displayq3.php:8100
 #, php-format
 msgid "Enter a %s of mixed numbers or integers"
 msgstr "Geben Sie ein %s von gemischten oder ganze Zahlen ein"
 
 #: assessment/displayq2.php:8028 assess2/questions/answerboxhelpers.php:501
+#: assess2/displayq3.php:8100
 msgid "Enter a mixed number or integer"
 msgstr "Geben Sie eine gemischte oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8031 assess2/questions/answerboxhelpers.php:504
+#: assess2/displayq3.php:8103
 #, php-format
 msgid ""
 "Enter %s as a mixed number, proper or improper fraction, or as an integer.  "
@@ -3182,12 +3309,14 @@ msgid "Enter a %s of mixed numbers, fractions, or integers"
 msgstr "Geben Sie ein %s von gemischten Zahlen, Brüchen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:8032 assess2/questions/answerboxhelpers.php:505
+#: assess2/displayq3.php:8104
 msgid "Enter a mixed number, proper or improper fraction, or integer"
 msgstr ""
 "Geben Sie eine gemischte Zahl, einen echten oder unechten Bruch oder eine "
 "ganze Zahl ein"
 
 #: assessment/displayq2.php:8034 assess2/questions/answerboxhelpers.php:507
+#: assess2/displayq3.php:8106
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number, reduced proper or improper fraction, or "
@@ -3197,12 +3326,14 @@ msgstr ""
 "Zahl ein. Kürzen Sie soweit wie möglich. Beispiel: 2 1/2 = 2 &frac12;"
 
 #: assessment/displayq2.php:8035 assess2/questions/answerboxhelpers.php:508
+#: assess2/displayq3.php:8107
 msgid "Enter a reduced mixed number, proper or improper fraction, or integer"
 msgstr ""
 "Geben Sie eine gekürzte gemischte Zahl, einen echten oder unechten Bruch "
 "oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8039 assess2/questions/answerboxhelpers.php:512
+#: assess2/displayq3.php:8111
 #, php-format
 msgid ""
 "Enter %s as a mixed number (like 2 1/2), fraction (like 3/5), an integer "
@@ -3212,15 +3343,18 @@ msgstr ""
 "ganze Zahl (z.B. 4 oder -2) oder Dezimalzahl (z.B. 0.5 oder 1.25) ein"
 
 #: assessment/displayq2.php:8040 assess2/questions/answerboxhelpers.php:513
+#: assess2/displayq3.php:8112
 #, php-format
 msgid "Enter a %s of mixed numbers, fractions, or exact decimals"
 msgstr "Geben Sie ein %s von gemischten Zahlen, Brüchen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:8040 assess2/questions/answerboxhelpers.php:513
+#: assess2/displayq3.php:8112
 msgid "Enter a mixed number, fraction, or exact decimal"
 msgstr "Geben Sie eine gemischte Zahl, einen Bruch oder eine Dezimalzahl ein"
 
 #: assessment/displayq2.php:8042 assess2/questions/answerboxhelpers.php:515
+#: assess2/displayq3.php:8114
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or "
@@ -3230,30 +3364,36 @@ msgstr ""
 "oder als Dezimalzahl (z.B. 0.5 oder 1.25) ein"
 
 #: assessment/displayq2.php:8043 assess2/questions/answerboxhelpers.php:516
+#: assess2/displayq3.php:8115
 #, php-format
 msgid "Enter a %s of fractions or exact decimals"
 msgstr "Geben Sie ein %s von Brüchen oder Ganzzahlen ein"
 
 #: assessment/displayq2.php:8043 assess2/questions/answerboxhelpers.php:516
+#: assess2/displayq3.php:8115
 msgid "Enter a fraction or exact decimal"
 msgstr "Geben Sie einen Bruch oder eine genaue Dezimalzahl ein"
 
 #: assessment/displayq2.php:8046 assess2/questions/answerboxhelpers.php:519
+#: assess2/displayq3.php:8118
 #, php-format
 msgid "Enter %s as an integer or decimal value (like 5 or 3.72)"
 msgstr ""
 "Geben Sie %s als ganze Zahl oder als Dezimalzahl (z.B. 5 oder 6.72) ein"
 
 #: assessment/displayq2.php:8047 assess2/questions/answerboxhelpers.php:520
+#: assess2/displayq3.php:8119
 #, php-format
 msgid "Enter a %s of integer or decimal values"
 msgstr "Geben Sie eine %s  von ganzen Zahlen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:8047 assess2/questions/answerboxhelpers.php:520
+#: assess2/displayq3.php:8119
 msgid "Enter an integer or decimal value"
 msgstr "Geben Sie eine ganze Zahl oder eine Dezimalzahl ein"
 
 #: assessment/displayq2.php:8049 assess2/questions/answerboxhelpers.php:522
+#: assess2/displayq3.php:8121
 #, php-format
 msgid ""
 "Enter %s as a decimal or in scientific notation.  Example: 3*10^2 = 3 "
@@ -3263,6 +3403,7 @@ msgstr ""
 "Beispiel: 3*10^2 = 3 &middot; 10<sup>2</sup>"
 
 #: assessment/displayq2.php:8050 assess2/questions/answerboxhelpers.php:523
+#: assess2/displayq3.php:8122
 #, php-format
 msgid "Enter a %s of numbers using decimals or scientific notation"
 msgstr ""
@@ -3270,12 +3411,14 @@ msgstr ""
 "Notation ein"
 
 #: assessment/displayq2.php:8050 assess2/questions/answerboxhelpers.php:523
+#: assess2/displayq3.php:8122
 msgid "Enter a number using decimals or scientific notation"
 msgstr ""
 "Geben Sie eine Zahl als Dezimalzahl oder in wissenschaftlicher Schreibweise "
 "ein"
 
 #: assessment/displayq2.php:8052 assess2/questions/answerboxhelpers.php:525
+#: assess2/displayq3.php:8124
 #, php-format
 msgid ""
 "Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</"
@@ -3285,15 +3428,18 @@ msgstr ""
 "&middot; 10<sup>2</sup>"
 
 #: assessment/displayq2.php:8053 assess2/questions/answerboxhelpers.php:526
+#: assess2/displayq3.php:8125
 #, php-format
 msgid "Enter a %s of numbers using scientific notation"
 msgstr "Geben Sie ein %s von Zahlen in wissenschaftlicher Notation ein"
 
 #: assessment/displayq2.php:8053 assess2/questions/answerboxhelpers.php:526
+#: assess2/displayq3.php:8125
 msgid "Enter a number using scientific notation"
 msgstr "Geben Sie eine Zahl in wissenschaftlicher Schreibweise ein"
 
 #: assessment/displayq2.php:8055 assess2/questions/answerboxhelpers.php:528
+#: assess2/displayq3.php:8127
 #, php-format
 msgid ""
 "Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, "
@@ -3303,43 +3449,51 @@ msgstr ""
 "5/3, 2^3, 5+4) ein."
 
 #: assessment/displayq2.php:8056 assess2/questions/answerboxhelpers.php:529
+#: assess2/displayq3.php:8128
 #, php-format
 msgid "Enter a %s of mathematical expressions"
 msgstr "Geben sie ein %s von mathematischen Ausdrücken ein"
 
 #: assessment/displayq2.php:8056 assess2/questions/answerboxhelpers.php:529
+#: assess2/displayq3.php:8128
 msgid "Enter a mathematical expression"
 msgstr "Geben Sie einen mathematischen Ausdruck ein"
 
 #: assessment/displayq2.php:8059 assess2/questions/answerboxhelpers.php:532
+#: assess2/displayq3.php:8131
 msgid "Do not enter mixed numbers"
 msgstr "Keine gemischten Zahlen eingeben"
 
 #: assessment/displayq2.php:8060 assess2/questions/answerboxhelpers.php:533
+#: assess2/displayq3.php:8132
 msgid " (no mixed numbers)"
 msgstr " (keine gemischten Zahlen)"
 
 #: assessment/displayq2.php:8072 assess2/questions/answerboxhelpers.php:545
+#: assess2/displayq3.php:8144
 msgid "Decimal values are not allowed"
 msgstr "Dezimalwerte sind nicht erlaubt"
 
 #: assessment/displayq2.php:8075 assess2/questions/answerboxhelpers.php:548
+#: assess2/displayq3.php:8147
 #, php-format
 msgid "Enter %s accurate to the nearest integer."
 msgstr "Geben Sie %s mit einer Genauigkeit bis zur nächsten ganzen Zahl ein."
 
 #: assessment/displayq2.php:8077 assess2/questions/answerboxhelpers.php:550
+#: assess2/displayq3.php:8149
 #, php-format
 msgid "Enter %s accurate to %d decimal places."
 msgstr "Geben Sie %s auf %d Nachkommastellen genau ein."
 
 #: assessment/displayq2.php:8081 assess2/questions/answerboxhelpers.php:554
+#: assess2/displayq3.php:8153
 msgid "Trig functions (sin,cos,etc.) are not allowed"
 msgstr "Trigonometrische Funktionen (sin, cos, etc.) sind nicht erlaubt"
 
 #: assessment/displayq2.php:8100
 #: assess2/questions/QuestionHtmlGenerator.php:1130
-#: assess2/questions/answerboxhelpers.php:573
+#: assess2/questions/answerboxhelpers.php:573 assess2/displayq3.php:8172
 msgid "Correct answer, but wrong format"
 msgstr "Richtige Antwort, aber falsches Format"
 
@@ -3358,22 +3512,26 @@ msgid "Infinite number of solutions"
 msgstr "Unendlich viele Lösungen"
 
 #: assessment/displayq2.php:8116 assess2/questions/answerboxhelpers.php:590
+#: assess2/displayq3.php:8188
 msgid "One or more solutions: "
 msgstr "Eine oder mehrere Lösungen: "
 
 #: assessment/displayq2.php:8118 assess2/questions/answerboxhelpers.php:592
+#: assess2/displayq3.php:8190
 msgid "Interval notation solution: "
 msgstr "Lösung in Intervallschreibweise: "
 
 #: assessment/displayq2.php:8120 assess2/questions/answerboxhelpers.php:594
+#: assess2/displayq3.php:8192
 msgid "Inequality notation solution: "
 msgstr "Lösung als Ungleichung: "
 
 #: assessment/displayq2.php:8122 assess2/questions/answerboxhelpers.php:596
+#: assess2/displayq3.php:8194
 msgid "One solution: "
 msgstr "Eine Lösung: "
 
-#: assessment/header.php:297 header.php:264
+#: assessment/header.php:297 header.php:264 header.php:265
 msgid "Course Navigation"
 msgstr "Kurs-Navigation"
 
@@ -3479,35 +3637,35 @@ msgstr "Punkt bei %s"
 msgid "Text label, color %s, at %s reading: %s"
 msgstr "Angezeigter Text, Farbe %s, bei %s gelesen: %s"
 
-#: assessment/macros.php:2272
+#: assessment/macros.php:2272 assessment/macros.php:2295
 msgid "he"
 msgstr "er"
 
-#: assessment/macros.php:2272
+#: assessment/macros.php:2272 assessment/macros.php:2295
 msgid "him"
 msgstr "ihm"
 
-#: assessment/macros.php:2272
+#: assessment/macros.php:2272 assessment/macros.php:2295
 msgid "his"
 msgstr "sein"
 
-#: assessment/macros.php:2274
+#: assessment/macros.php:2274 assessment/macros.php:2297
 msgid "she"
 msgstr "sie"
 
-#: assessment/macros.php:2274
+#: assessment/macros.php:2274 assessment/macros.php:2297
 msgid "her"
 msgstr "ihr(e)"
 
-#: assessment/macros.php:2274
+#: assessment/macros.php:2274 assessment/macros.php:2297
 msgid "hers"
 msgstr "ihre"
 
-#: assessment/macros.php:3392
+#: assessment/macros.php:3392 assessment/macros.php:3415
 msgid "No answer selected. Try again."
 msgstr "Keine Antwort ausgewählt. Bitte erneut versuchen."
 
-#: assessment/macros.php:3430
+#: assessment/macros.php:3430 assessment/macros.php:3453
 msgid "This answer does not appear to be a valid number."
 msgstr "Diese Antwort scheint keine gültige Zahl zu sein."
 
@@ -3746,7 +3904,7 @@ msgstr "Benutzerspezifische Einstellungen bearbeiten"
 
 #: assessment/showtest.php:1216 assessment/showtest.php:1220
 #: course/addquestions.php:1555 course/courseshowitems.php:1849
-#: course/masschgprereqs.php:113
+#: course/masschgprereqs.php:113 assess2/index.php:56 assess2/index.php:60
 msgid "Assessment"
 msgstr "Test"
 
@@ -3755,7 +3913,7 @@ msgid "This will discard any unsaved work."
 msgstr "Dies wird alle nicht gespeicherte Arbeit verwerfen."
 
 #: assessment/showtest.php:1238 course/course.php:475 course/course.php:567
-#: header.php:272 index.php:374 msgs/msglist.php:553
+#: header.php:272 index.php:374 msgs/msglist.php:553 header.php:273
 msgid "Messages"
 msgstr "Nachrichten"
 
@@ -3880,14 +4038,14 @@ msgstr "Stunde"
 #: assessment/showtest.php:1527 assessment/showtest.php:1534
 #: course/courseshowitems.php:864 course/courseshowitems.php:871
 #: course/drillassess.php:233 course/gradebook.php:853 course/gradebook.php:860
-#: course/treereader.php:400
+#: course/treereader.php:400 course/treereader.php:393
 msgid "minute"
 msgstr "Minute"
 
 #: assessment/showtest.php:1529 assessment/showtest.php:1536
 #: course/courseshowitems.php:866 course/courseshowitems.php:873
 #: course/drillassess.php:236 course/gradebook.php:855 course/gradebook.php:862
-#: course/treereader.php:402
+#: course/treereader.php:402 course/treereader.php:395
 msgid "second"
 msgstr "Sekunde"
 
@@ -4372,7 +4530,7 @@ msgstr "Punkt"
 
 #: assessment/showtest.php:3287 course/addassessment.php:1266
 #: course/addassessment2form.php:514 course/chgassessments.php:935
-#: course/masschgprereqs.php:141
+#: course/masschgprereqs.php:141 assess2/AssessInfo.php:519
 msgid "points"
 msgstr "Punkte"
 
@@ -5576,7 +5734,7 @@ msgid "No Access"
 msgstr "Kein Zugang"
 
 #: course/addassessment2form.php:639 course/addlinkedtext.php:444
-#: course/chgassessments2form.php:663
+#: course/chgassessments2form.php:663 assess2/gbviewassess.php:80
 msgid "View Scores"
 msgstr "Punkte ansehen"
 
@@ -7050,7 +7208,7 @@ msgid "Communication"
 msgstr "Kommunikation"
 
 #: course/course.php:477 course/course.php:537 course/course.php:571
-#: header.php:276
+#: header.php:276 header.php:277
 msgid "Forums"
 msgstr "Foren"
 
@@ -7062,7 +7220,7 @@ msgstr "Werkzeuge"
 msgid "Outcomes"
 msgstr "Themen"
 
-#: course/course.php:490 header.php:280
+#: course/course.php:490 header.php:280 header.php:281
 msgid "Roster"
 msgstr "Teilnehmerliste"
 
@@ -7071,6 +7229,7 @@ msgstr "Teilnehmerliste"
 #: course/outcomereport.php:138 course/redeemlatepass.php:37
 #: course/redeemlatepass.php:173 header.php:287 assess2/gbviewassess.php:79
 #: assess2/gbviewassess.php:82 assess2/gbviewassess.php:89
+#: assess2/gbviewassess.php:76 header.php:288
 msgid "Gradebook"
 msgstr "Punkteübersicht"
 
@@ -7143,6 +7302,7 @@ msgid "Help"
 msgstr "Hilfe"
 
 #: course/course.php:545 course/course.php:601 header.php:290 index.php:372
+#: header.php:291
 msgid "Log Out"
 msgstr "Abmelden"
 
@@ -8031,6 +8191,7 @@ msgstr "Gesamtpunktzahl"
 #: course/gb-export.php:202 course/gb-export.php:204 course/gb-export.php:235
 #: course/gb-export.php:486 course/gradebook.php:1077 course/gradebook.php:1079
 #: course/gradebook.php:1380 course/gradebook.php:1624
+#: course/gradebook.php:1349 course/gradebook.php:1622
 msgid "pts"
 msgstr "Pkt"
 
@@ -8182,7 +8343,7 @@ msgstr "Wirklich trennen"
 msgid "Really Clear and Regen"
 msgstr "Wirklich löschen und neu erzeugen"
 
-#: course/gb-viewasid.php:622
+#: course/gb-viewasid.php:622 assess2/gbviewassess.php:91
 msgid "Assessment Detail"
 msgstr "Test-Details"
 
@@ -12760,101 +12921,189 @@ msgstr "Änderung speichern"
 msgid ""
 "Enter your answer as a matrix filled with numbers, like [(2,3,4),(3,4,5)]"
 msgstr ""
+"Geben Sie Ihre Antwort als Matrix mit Zahlen ein, z.B. [(2,3,4),(3,4,5)]"
 
 #: assess2/gbviewassess.php:83
 msgid "View Group Scores"
-msgstr ""
+msgstr "Zeige die Punkte der Gruppen"
 
 #: assess2/gbviewassess.php:85
 msgid "Student Groups"
-msgstr ""
+msgstr "Studierenden-Gruppen"
 
 #: assess2/gbviewassess.php:87
 msgid "Diagnostic Gradebook"
-msgstr ""
+msgstr "Notenübersicht für Diagnostik"
 
 #: assess2/questions/QuestionGenerator.php:190
 #, php-format
 msgid "Caught warning in the question code: %s on line %d in file %s"
-msgstr ""
+msgstr "Warnung: Problem im Code einer Frage: %s in Zeile %d in Datei %s"
 
 #: assess2/questions/QuestionGenerator.php:210
 msgid "<p>Caught error while evaluating this question: "
-msgstr ""
+msgstr "<p>Fehler beim Auswerten dieser Frage: "
 
 #: assess2/questions/QuestionHtmlGenerator.php:184
 #: assess2/questions/ScoreEngine.php:136 assess2/questions/ScoreEngine.php:519
 msgid "Caught error while evaluating the code in this question: "
-msgstr ""
+msgstr "Fehler beim Auswerten des Codes in dieser Frage: "
 
 #: assess2/questions/QuestionHtmlGenerator.php:403
 msgid "Caught error while generating this question: "
-msgstr ""
+msgstr "Fehler beim Erzeugen dieser Frage: "
 
 #: assess2/questions/QuestionHtmlGenerator.php:531
 msgid "Caught error while evaluating the text in this question: "
-msgstr ""
+msgstr "Fehler im Text dieser Frage: "
 
 #: assess2/questions/QuestionHtmlGenerator.php:604
 #, php-format
 msgid "Part %d/%d"
-msgstr ""
+msgstr "Teil %d/%d"
 
 #: assess2/questions/answerboxes/AnswerBoxParams.php:184
 #, php-format
 msgid "Question %d"
-msgstr ""
+msgstr "Frage %d"
 
 #: assess2/questions/answerboxes/AnswerBoxParams.php:186
 #, php-format
 msgid "Part %d of %d"
-msgstr ""
+msgstr "Teil %d von %d"
 
 #: assess2/questions/answerboxes/CalculatedMatrixAnswerBox.php:100
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:99
 #, php-format
 msgid "Cell %d of %d"
-msgstr ""
+msgstr "Zelle %d von %d"
 
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:68
 msgid "Choose File"
-msgstr ""
+msgstr "Wähle eine Datei"
 
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:69
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:74
 msgid "No file chosen"
-msgstr ""
+msgstr "Keine Datei ausgewählt"
 
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:94
 msgid "Last file submitted:"
-msgstr ""
+msgstr "Zuletzt hochgeladene Datei:"
 
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:106
 msgid "No file submitted"
-msgstr ""
+msgstr "Keine Datei hochgeladen"
 
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:73
 msgid "Enter an algebraic inequality"
-msgstr ""
+msgstr "Geben Sie eine Ungleichung ein"
 
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:74
 msgid "Enter your answer as an inequality.  Example: y<3x^2+1, 2+x+y>=3"
 msgstr ""
+"Geben Sie Ihre Antwort als Ungleichung ein. Beispiel: y<3x^2+1, 2+x+y>=3"
 
 #: assess2/questions/answerboxes/MatchingAnswerBox.php:64
 msgid "Eeek!  $answers is not defined or needs to be an array"
-msgstr ""
+msgstr "Ups! $answers ist nicht definiert oder muss ein Array sein"
 
 #: assess2/questions/answerboxes/MultipleAnswerAnswerBox.php:71
 #: assess2/questions/scorepart/MultipleAnswerScorePart.php:64
 msgid "None of these"
-msgstr ""
+msgstr "Nichts davon"
 
 #: assess2/questions/answerboxes/MultipleAnswerAnswerBox.php:108
 #: assess2/questions/answerboxes/MultipleAnswerAnswerBox.php:111
 msgid "Select one or more answers"
-msgstr ""
+msgstr "Wählen Sie eine oder mehrere Antworten"
 
 #: assess2/questions/scorepart/NTupleScorePart.php:257
 msgid "Eeek: No valid $answer values provided"
+msgstr "Ups! Kein gültiger Wert für $answer"
+
+#: admin/forms.php:68
+msgid "Delete Course"
+msgstr "Kurs löschen"
+
+#: admin/forms.php:69
+msgid "Are you sure you want to delete the course"
+msgstr "Sind Sie sicher, dass Sie den Kurs löschen wollen"
+
+#: admin/forms.php:80
+msgid "Are you sure you want to anonymize this user"
+msgstr "Sind Sie sicher, dass Sie diesen Benutzer anonymisieren wollen"
+
+#: admin/forms.php:402
+#, php-format
+msgid ""
+"You are a teacher in this course, but <b>%s</b> is the course owner, and the "
+"only one who can modify the course settings"
 msgstr ""
+"Sie sind Dozent in diesem Kurs, aber <b>%s</b> ist der Kursbesitzer und "
+"damit die einzige Person, die die Kurseinstellungen ändern kann"
+
+#: admin/forms.php:415
+msgid ""
+"For integration setup instructions, visit the Course Items: Export page "
+"inside your course"
+msgstr ""
+"Für Anleitungen für die Integration wählen Sie: Seiten-Export in Ihrem Kurs"
+
+#: admin/forms.php:418
+msgid ""
+"Your school already has a school-wide LTI key and secret established, so no "
+"course level configuration is required."
+msgstr ""
+"Ihre Einrichtung hat LTI-Key und -Secret zentral eingerichtet. Deshalb ist "
+"keine Konfiguration für einzelne Kurse nötig."
+
+#: admin/forms.php:423 admin/forms.php:869
+msgid ""
+"Your school may already have a school-wide LTI key and secret established. "
+msgstr ""
+"Vielleicht hat Ihre Einrichtung LTI-Key und -Secret zentral eingerichtet. "
+
+#: admin/forms.php:425 admin/forms.php:871
+msgid "Show course level key/secret"
+msgstr "Zeige Key und Secret für den Kurs"
+
+#: admin/forms.php:715
+msgid "This class has been scheduled for data cleanup, on "
+msgstr "Dieser Kurs soll automatisch aufgeräumt werden am "
+
+#: admin/forms.php:718
+msgid "If you need a long-term copy of student grades, it is recommended you "
+msgstr "Wenn Sie die Noten der Studierenden dauerhaft benötigen sollten Sie "
+
+#: admin/forms.php:719
+msgid "export the gradebook"
+msgstr "die Notenübersicht exportieren"
+
+#: admin/forms.php:720
+msgid "You are also welcome to"
+msgstr "Gerne können Sie Ihren Kurs jetzt auch"
+
+#: admin/forms.php:721
+msgid "manually cleanup"
+msgstr "selbst"
+
+#: admin/forms.php:721
+msgid "your course now."
+msgstr "aufräumen."
+
+#: admin/forms.php:728
+msgid "If you have a strong reason, you can "
+msgstr "Aus wichtigen Gründen können Sie "
+
+#: admin/forms.php:729
+msgid "opt out of having the student data deleted."
+msgstr "das Löschen der Daten der Studierenden verhindern."
+
+#: admin/forms.php:717
+msgid ""
+"On that date, all student data in this course will be deleted as part of our "
+"data management policies, but the course itself will be untouched."
+msgstr ""
+"Zu diesem Zeipunkt werden aus Datenschutzgründen alle Daten der Studierenden "
+"in diesem Kurs gelöscht; der Kurs selbst wird nicht verändert."

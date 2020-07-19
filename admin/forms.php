@@ -714,11 +714,11 @@ switch($_GET['action']) {
 			$courseid = Sanitize::courseId($_GET['id']);
 			echo '<p>'._('This class has been scheduled for data cleanup, on ');
 			echo tzdate('F j, Y', $line['cleanupdate']).'. ';
-			echo _('On that date, all student data in this course will be deleted as part of our data management policies, but the course itself will be untouched.';
+			echo _('On that date, all student data in this course will be deleted as part of our data management policies, but the course itself will be untouched.');
 			echo _('If you need a long-term copy of student grades, it is recommended you ');
 			echo '<a href="../course/gb-export.php?cid='.$courseid.'&export=true">'._('export the gradebook').'</a>. ';
 			echo _('You are also welcome to').' <a href="../course/listusers.php?cid='.$courseid.'&action=unenroll&uid=all">';
-			echo _('manually cleanup').'</a> '_('your course now.').'</p>';
+			echo _('manually cleanup').'</a> '._('your course now.').'</p>';
 			if (isset($CFG['cleanup']['groups'][$groupid]['allowoptout'])) {
 				$allowoptout = $CFG['cleanup']['groups'][$groupid]['allowoptout'];
 			} else {
