@@ -447,8 +447,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $_SESSION['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-				$y = $evalfunc(['x'=>$x]);
+                $y = $evalfunc(['x'=>$x]);
 				if (isNaN($y)) {
+                    if ($lastl != 0) {
+                        if ($py !== null) {
+                            $pathstr .= ",[$px,$py]";
+                        }
+                        $pathstr .= ']);';
+                        $lastl = 0;
+                        $px = null;
+                        $py = null;
+                    }
 					continue;
 				}
 				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
@@ -491,7 +500,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
 					$pathstr .= "[$px,$py],[$ix,$iy]]);";
 					$lastl = 0;
-				} else { //still out
+                } else { //still out
 
 				}
 			} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
@@ -517,7 +526,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$pathstr .= "[$ix,$iy]";
 					$lastl++;
 				} else { //still out
-
+                    
 				}
 			} else {//all in
 				if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
