@@ -1312,7 +1312,7 @@ function acsc($x) {
   if ($inv < -1 || $inv > 1) {
     throw new MathParserException("Invalid input for arccsc");
   }
-  return acos($inv);
+  return asin($inv);
 }
 function acot($x) {
   if (abs($x)<1e-16) {
