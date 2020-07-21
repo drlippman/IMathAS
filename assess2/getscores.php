@@ -92,13 +92,12 @@ if ($assessInfoOut['submitby'] == 'by_question') {
 }
 
 // get endmsg
-if ($assessInfoOut['showscores'] != 'none') {
   $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
     $assess_info->getSetting('endmsg'),
     $totalScore,
     $assess_info->getSetting('points_possible')
   );
-}
+
 
 //prep date display
 prepDateDisp($assessInfoOut);
