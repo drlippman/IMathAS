@@ -1315,14 +1315,7 @@ function acsc($x) {
   return asin($inv);
 }
 function acot($x) {
-  if (abs($x)<1e-16) {
-    throw new MathParserException("Invalid input for arccot");
-  }
-  if ($x < 0) {
-    return M_PI + atan(1/$x);
-  } else {
-    return atan(1/$x);
-  }
+  return M_PI/2 - atan($x);
 }
 function sign($a,$str=false) {
 	if ($str==="onlyneg") {
