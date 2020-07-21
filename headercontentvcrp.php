@@ -49,12 +49,21 @@ echo '</div>'; //headercontent
 ?>
 <div class="headermobilemenu">
   <ul id="headermobilemenulist" role="navigation" aria-labelledby="topnavmenu" aria-hidden="true">
+<!--
 	<li>
 		<a href="<?php echo $imasroot;?>/index.php" class="trackprepped">Home</a>
-	</li>	
+	</li>
+-->
+	<?php
+	 	if ($myrights>0) {
+			echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
+		}
+	?>
+	<!--
   	<li>
 		<a href="<?php echo $imasroot;?>/actions.php?action=logout" class="trackprepped">Abmelden</a>
 	</li>
+	-->
   </ul>
 </div>
 <?php
