@@ -94,6 +94,8 @@ class CalculatedScorePart implements ScorePart
             $requiretimeslistpart = explode(';', $requiretimeslistpart);
         }
 
+        $checkSameform = (in_array('sameform',$ansformats));
+
         if (in_array("scinot",$ansformats) || in_array("scinotordec",$ansformats)) {
             $answer = str_replace('xx','*',$answer);
         }
@@ -102,6 +104,8 @@ class CalculatedScorePart implements ScorePart
             $givenans = str_replace(array('{','}'),'', $givenans);
             $ansformats = array_map('trim',explode(',', str_replace('set','list',$answerformat)));
         }
+
+        $ansnorm = array();
         //pre-evaluate all instructor expressions - preg match all intervals.  Return array of or options
         if (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats)) {
             $anarr = array_map('trim',explode(',',$answer));
@@ -119,7 +123,11 @@ class CalculatedScorePart implements ScorePart
                         if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
                             $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                         } else {
-                            $aarr[$j] = evalMathParser($anans);
+                            $anfunc = parseMathQuiet($anans);
+                            $aarr[$j] = $anfunc->evaluateQuiet();
+                            if ($checkSameform) {
+                              $ansnorm[$k][$j] = $anfunc->normalizeTreeString();
+                            }
                         }
                     }
                 }
@@ -149,7 +157,11 @@ class CalculatedScorePart implements ScorePart
                     if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
                         $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                     } else {
-                        $aarr[$j] = evalMathParser($anans);
+                        $anfunc = parseMathQuiet($anans);
+                        $aarr[$j] = $anfunc->evaluateQuiet();
+                        if ($checkSameform) {
+                          $ansnorm[0][$j] = $anfunc->normalizeTreeString();
+                        }
                     }
                 }
             }
@@ -233,6 +245,18 @@ class CalculatedScorePart implements ScorePart
             $anarr = array($answer);
         }
 
+        if ($checkSameform) {
+            $ganorm = array();
+            foreach ($gaarr as $toevalGivenans) {
+              $givenansfunc = parseMathQuiet($toevalGivenans);
+              if ($givenansfunc !== false) {
+                $ganorm[] = $givenansfunc->normalizeTreeString();
+              } else {
+                $ganorm[] = '';
+              }
+            }
+        }
+
         $extrapennum = count($gaarr)+count($anarr);
         $gaarrcnt = count($gaarr);
 
@@ -263,7 +287,7 @@ class CalculatedScorePart implements ScorePart
                 }
                 //removed - done above already
                 //$anss = explode(' or ',$answer);
-                foreach ($anss as $anans) {
+                foreach ($anss as $k=>$anans) {
                     if (!is_numeric($anans)) {
                         if (is_array($anans)) {
                             if (($anans[1]=="(" && $numericans>$anans[2]) || ($anans[1]=="[" && $numericans>=$anans[2])) {
@@ -279,10 +303,13 @@ class CalculatedScorePart implements ScorePart
                             if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
                         }
                     } else if (is_numeric($numericans)) {
+                        //echo "{$ganorm[$j]} vs {$ansnorm[$i][$k]}";
                         if (isset($reqsigfigs)) {
                             $tocheck = preg_replace('/\s*(\*|x|X|×|✕)\s*10\s*\^/','E',$givenans);
                             if (checksigfigs($tocheck, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
                                 if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
+                                    $formatok = "nopart";  $partformatok = false;
+                                } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                     $formatok = "nopart";  $partformatok = false;
                                 }
                                 if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
@@ -294,6 +321,8 @@ class CalculatedScorePart implements ScorePart
                             if (abs($anans-$numericans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {
                                 if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
                                     $formatok = "nopart";  $partformatok = false;
+                                } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
+                                    $formatok = "nopart";  $partformatok = false;
                                 }
                                 if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
                             }
@@ -302,12 +331,16 @@ class CalculatedScorePart implements ScorePart
                                 if (abs($anans - $numericans) < $reltolerance/1000 + 1E-12) {
                                     if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
                                         $formatok = "nopart";  $partformatok = false;
+                                    } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
+                                        $formatok = "nopart";  $partformatok = false;
                                     }
                                     if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
                                 }
                             } else {
                                 if (abs($anans - $numericans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {
                                     if (isset($requiretimeslistpart) && is_array($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart[$i])==0) {
+                                        $formatok = "nopart";  $partformatok = false;
+                                    } else if ($checkSameform && $ganorm[$j] != $ansnorm[$i][$k]) {
                                         $formatok = "nopart";  $partformatok = false;
                                     }
                                     if ($partformatok) {$correct += 1;}; $correctanyformat++; $foundloc = $j; break 2;
@@ -319,6 +352,9 @@ class CalculatedScorePart implements ScorePart
             }
             if ($foundloc>-1) {
                 array_splice($gaarr,$foundloc,1); //remove from list
+                if ($checkSameform) {
+                  array_splice($ganorm,$foundloc,1);
+                }
                 array_splice($numvalarr,$foundloc,1);
                 if (count($gaarr)==0 && !in_array('orderedlist',$ansformats)) {
                     break; //stop if no student answers left

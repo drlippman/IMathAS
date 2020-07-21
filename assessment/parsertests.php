@@ -7,6 +7,7 @@ if ($myrights < 100) {
   exit;
 }
 
+
 $tests = [
  ['log(100)', [], 2],
  ['ln(e^3)', [], 3],
@@ -80,4 +81,31 @@ foreach ($tests as $test) {
     echo $t->getMessage();
   }
 }
+
+$sameformtests = [
+    ['(x+3)(-x+5)','(5-x)(3+x)',['x']],
+    ['1x+3','3+x',['x']],
+    ['(x+2)/(x+3)','(x+2)/((x+3))',['x']],
+    ['2^(x)+1','2^x+1',['x']],
+    ['3x^2+5xy+4','5yx+4+3x^2',['x','y']],
+    ['2x-3','2*x-3',['x']]
+];
+$st = microtime(true);
+foreach ($sameformtests as $test) {
+    $p = new MathParser(implode(',', $test[2]));
+    $out = 0;
+    try {
+      $p->parse($test[0]);
+      $str1 = $p->normalizeTreeString();
+      $p->parse($test[1]);
+      $str2 = $p->normalizeTreeString();
+      if ($str1 != $str2) {
+        echo "Sameform Test failed on {$test[0]} vs {$test[1]}: $str1 vs $str2<br>";
+      }
+    } catch (Throwable $t) {
+      echo "Test crashed on {$test[0]}: $out vs {$test[2]}<br>";
+      echo $t->getMessage();
+    }
+}
+echo microtime(true) - $st;
 echo "Done";
