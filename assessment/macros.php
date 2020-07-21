@@ -2534,7 +2534,11 @@ function textonimage() {
 		$left = array_shift($args);
 		$top = array_shift($args);
 		$out .= "<div style=\"position: absolute; top: {$top}px; left: {$left}px;\">$text</div>";
-	}
+    }
+    if (count($args) > 0) {
+        $alttext = array_shift($args);
+        $out = '<div aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"' . substr($out, 4);
+    }
 	$out .= '</div>';
 	return $out;
 }
