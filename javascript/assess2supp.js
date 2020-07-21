@@ -3,6 +3,73 @@ Assess2 standalone support
  */
 var allJsParams = {};
 
+function showandinit(qn, data) {
+    $('#questionwrap'+qn).html(data.html);
+    showerrors(data.errors);
+    initq(qn, data.jsparams);
+}
+
+function showerrors(errors) {
+    var err = $('#errorslist');
+    err.empty();
+    if (errors.length > 0) {
+        for (var i=0; i<errors.length; i++) {
+            err.append($("<li>", {text: errors[i]}));
+        }
+        err.show();
+    } else {
+        err.hide();
+    }
+}
+
+function submitq(qn) {
+    $("#results"+qn).empty();
+    var data = dopresubmit(qn, true);
+    data.append('state', document.getElementById('state').value);
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        dataType: 'text',
+        data: data,
+        processData: false,
+        contentType: false
+      }).done(function(msg) {
+        var data = parseJwt(msg);
+        $("#state").val(data.state);
+        showerrors(data.errors);
+        if (data.disp) {
+            $("#results"+qn).html(_("Score: ")+data.score);
+            showandinit(qn, data.disp);
+        } else {
+            $("#results"+qn).html(_('Question Submitted'));
+            $("#questionwrap"+qn).empty();
+        }
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
+
+function regenq(qn) {
+    $("#results"+qn).empty();
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            state: document.getElementById('state').value,
+            regen: 1,
+            ajax: 1
+        }
+      }).done(function(data) {
+        $("#state").val(data.state);
+        console.log(data);
+        showerrors(data.disp.errors);
+        showandinit(qn, data.disp);
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
+
  function initq(qn, jsparams) {
    var qwrap = document.getElementById('questionwrap'+qn);
 
@@ -134,7 +201,7 @@ var allJsParams = {};
      qns = [qns];
    }
    if (forbackground) {
-     const data = new FormData();
+     var data = new FormData();
    }
    for (let k in window.callbackstack) {
      k = parseInt(k);
@@ -191,3 +258,13 @@ var allJsParams = {};
    }
    return true;
   }
+
+  function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+ };

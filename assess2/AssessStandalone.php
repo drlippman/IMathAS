@@ -108,6 +108,8 @@ class AssessStandalone {
         }
       }
     }
+    $showans = !empty($options['showans']);
+
     $questionParams = new QuestionParams();
     $questionParams
         ->setDbQuestionSetId($qsid)
@@ -117,9 +119,9 @@ class AssessStandalone {
         ->setAssessmentId(0)
         ->setQuestionSeed($this->state['seeds'][$qn])
         ->setShowHints(3)
-        ->setShowAnswer(true)
+        ->setShowAnswer($showans)
         ->setShowAnswerParts(array())
-        ->setShowAnswerButton(true)
+        ->setShowAnswerButton($showans)
         ->setStudentAttemptNumber($attemptn)
         ->setStudentPartAttemptCount($this->state['partattemptn'][$qn])
         ->setAllQuestionAnswers($this->state['stuanswers'])
