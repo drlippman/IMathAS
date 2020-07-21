@@ -80,9 +80,7 @@ div.inset {
 	margin-right: 0px;
 	padding-left: 0px;
 }
-div#headercontent {
-	display:none;
-}
+
 div#navlistcont {
 	height: auto !important;
 }

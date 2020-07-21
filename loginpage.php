@@ -6,8 +6,8 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 //any extra CSS, javascript, etc needed for login page
 	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\" />\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
-	$nologo = true;
-	$loadinginfoheader = true; // ID: Kein header über infoheader.php
+	//$nologo = true;
+	//$loadinginfoheader = true; // ID: Kein header über infoheader.php
 	require("header.php");
 	if (!empty($_SERVER['QUERY_STRING'])) {
 		 $querys = '?'.$_SERVER['QUERY_STRING'];
@@ -22,7 +22,7 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 		 $challenge = base64_encode(microtime() . rand(0,9999));
 		 $_SESSION['challenge'] = $challenge;
 	 }
-	 $pagetitle = "Die Mathe-Plattform des <a style='color: white' href='https://www.vcrp.de' target='_blank'>VCRP</a>";
+	 $pagetitle = "IMathAS";
 	 include("infoheader.php");
 
 ?>
@@ -76,6 +76,7 @@ $(function() {
 </form>
 </div>
 <div class="text">
+	<h1>Die Mathe-Plattform des <a style='color: '#66ff66' href='https://www.vcrp.de' target='_blank'>VCRP</a></h1>
 <p><?php printf('%s ist ein webbasiertes System für Mathematikaufgaben und Kursverwaltung das hier vom <a href="https://www.vcrp.de" target="_blank">Virtuellen Campus Rheinland-Pfalz (VCRP)</a> betrieben wird.', $installname); ?></p>
  <img style="float: left; margin-right: 20px;" src="<?php echo $imasroot; ?>/img/screens.jpg" alt="Computer screens"/>
 

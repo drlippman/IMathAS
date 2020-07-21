@@ -1,7 +1,8 @@
+<!--
 <div id="logo">
 <span style="font-size:50px; color:#00cc00; margin-bottom: 20px;"><i><?php echo $installname; echo '<a href="https://www.vcrp.de" target="_blank"><img src="'.$imasroot.'/vcrp/img/icon-vcrp_neu.png" alt="VCRP" height="50" style="float: right; margin-top: 5px"/></a>'?></i></span>
 </div>
-
+-->
 <ul id="navlist">
 <li><a href="<?php echo $imasroot; ?>/index.php">Zur Startseite</a></li>
 <li><a href="<?php echo $imasroot; ?>/info/enteringanswers.php/index.php">Formeln eingeben</a></li>

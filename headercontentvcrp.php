@@ -17,7 +17,7 @@ if (isset($userid)) {
 	}
 }
 echo '</div>';
-echo '<div id="headerbarlogo"><a href="'.$imasroot.'/index.php"><img src="'.$imasroot.'/vcrp/img/icon-vcrp_neu.png" alt="VCRP" height="40"/></a>';
+echo '<div id="headerbarlogo"><a href="'.$imasroot.'/index.php"><img src="'.$imasroot.'/vcrp/img/vcrp-logo-2016.png" alt="VCRP" height="40"/></a>';
 ?>
 <span id="headermidlinks">
 <?php
@@ -48,23 +48,13 @@ echo '</div>'; //headerbarlogo
 echo '</div>'; //headercontent
 ?>
 <div class="headermobilemenu">
-    <ul id="headermobilemenulist" role="navigation" aria-labelledby="topnavmenu" aria-hidden="true">
-      <?php
-    	if ($myrights > 5) {
-		echo "<li><a href=\"#\" onclick=\"GB_show('Account Settings','$imasroot/forms.php?action=chguserinfo&greybox=true',800,'auto')\">Mein Profil</a></li>";
-	}
-	/*
-	echo '<li><a href="'.$imasroot.'/index.php">Home</a></li>';
-	if (isset($teacherid)) {
-		echo "<li><a href=\"$imasroot/help.php?section=coursemanagement\">Help</a></li>";
-	} else {
-		echo "<li><a href=\"$imasroot/help.php?section=usingimas\">Help</a></li>";
-	}
-	*/
-	if ($myrights>0) {
-		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
-	}
-      ?>
+  <ul id="headermobilemenulist" role="navigation" aria-labelledby="topnavmenu" aria-hidden="true">
+	<li>
+		<a href="<?php echo $imasroot;?>/index.php" class="trackprepped">Home</a>
+	</li>	
+  	<li>
+		<a href="<?php echo $imasroot;?>/actions.php?action=logout" class="trackprepped">Abmelden</a>
+	</li>
   </ul>
 </div>
 <?php

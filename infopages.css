@@ -86,7 +86,7 @@ div#header {
 	margin-right: 0px;
 	margin-left: 20px;
 	margin-bottom: 10px;
-	width: 230px;
+	width: auto;
 	border: 1px solid #000000;
 }
 
