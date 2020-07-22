@@ -45,6 +45,12 @@ input, select {
     margin: auto;
 }
 
+.tablist a.disabled {
+    cursor: default;
+    text-decoration: none;
+    color: #666;
+}
+
 </style>';
 $nologo = true;
 
@@ -63,10 +69,34 @@ if (isset($_POST['SID'])) {$username=$_POST['SID'];} else {$username='';}
 $_SESSION['challenge'] = uniqid();
 
 ?>
-<form method=post id=newinstrform class=limitaftervalidate action="newinstructor.php">
+<form method=post id=newinstrform class="limitaftervalidate tabwrap" action="newinstructor.php">
 <h1>New Instructor Account Request</h1>
 
-<h2>Step 1/3: School Affiliation</h2>
+<ul class="tablist" role="tablist">
+    <li class="active">
+        <a href="#" role="tab" id="tab1" aria-controls="step1"
+            aria-selected="true" onclick="setActiveTab(this);return false;"
+        >
+            Step 1
+        </a>
+    </li>
+    <li>
+        <a href="#" role="tab" id="tab2" aria-controls="step2"
+            aria-selected="true" class="disabled" onclick="return false;"
+        >
+            Step 2
+        </a>
+    </li>
+    <li>
+        <a href="#" role="tab" id="tab3" aria-controls="step3"
+            aria-selected="true" class="disabled" onclick="return false;"
+        >
+            Step 3
+        </a>
+    </li>
+</ul>
+<div class="tabpanel" id="step1" aria-labelledby="tab1 tabhdr1">
+<h2 id="tabhdr1">School Affiliation</h2>
 <span class=form><label for="schooltype">What kind of institution do you work for?</label><br>
     <span class=small>Note: We do not provide instructor accounts to 
     parents, home-schools, or tutors</span></span>
@@ -139,8 +169,10 @@ $_SESSION['challenge'] = uniqid();
 
 <p><button type=button id=step1btn style="display:none">Continue</button></p>
 
-<div id=step2 style="display:none">
-    <h2>Step 2/3: Verification</h2>
+</div>
+
+<div class="tabpanel" id=step2 style="display:none" aria-labelledby="tab2 tabhdr2">
+    <h2 id="tabhdr2">Verification</h2>
 
     <p>To verify you are an instructor, you will need to provide one of the following:</p>
     <ol>
@@ -151,7 +183,7 @@ $_SESSION['challenge'] = uniqid();
             Have that person send the email to 
             <a href="mailto:support@myopenmath.com">support@myopenmath.com</a>.  
             The person sending the email must be listed on a school website.</li>
-        <li>Upload a picture of a school ID indicating you are a teacher</li>
+        <li>Upload a picture of a school ID indicating you are a teacher.</li>
     </ol>
 
     <span class=form><label for=vertype>What method would you like to use?</label></span>
@@ -178,8 +210,8 @@ $_SESSION['challenge'] = uniqid();
     <p><button type=button id=step2btn style="display:none">Continue</button></p>
 </div>
 
-<div id=step3 style="display:none">
-    <h2>Step 3/3: Account Details</h2>
+<div class="tabpanel" id=step3 style="display:none" aria-labelledby="tab3 tabhdr3">
+    <h2 id="tabhdr3">Account Details</h2>
 
     <span class=form><label for=firstname>Given Name:</label></span>
     <span class=formright>
@@ -278,16 +310,18 @@ $(function() {
             $('#step1btn').show();
         } else {
             $('#otherschool').slideUp();
-            if (val != '') {
-                $('#step2').show().get(0).scrollIntoView();
-            }
         }
-        
+        $('#step1btn').show();
     });
 
     $('#step1btn').on('click', function() {
-        $(this).parent().hide();
-        $('#step2').show().get(0).scrollIntoView();
+        var tab = $("#tab2");
+        tab.removeClass("disabled").on('click', function(e) {
+            e.preventDefault();
+            setActiveTab(this);
+        });
+        setActiveTab(tab[0]);
+        $('#step2').get(0).scrollIntoView();
     });
     $('#vertype').on('change', function() {
         $('.vertypes').hide();
@@ -298,8 +332,13 @@ $(function() {
         $('#step2btn').show();
     });
     $('#step2btn').on('click', function() {
-        $(this).parent().hide();
-        $('#step3').show().get(0).scrollIntoView();
+        var tab = $("#tab3");
+        tab.removeClass("disabled").on('click', function(e) {
+            e.preventDefault();
+            setActiveTab(this);
+        });
+        setActiveTab(tab[0]);
+        $('#step3').get(0).scrollIntoView();
     })
     $('#agree').on('click change', function () {
         $('#step3btn').prop('disabled', this.checked===false);
