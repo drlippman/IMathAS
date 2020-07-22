@@ -219,6 +219,11 @@ div.ddmenu {
   padding: 5px;
   background: CornflowerBlue;
   border: 1px solid #5970b2;
+  position: absolute;
+  right: auto;
+  text-align: left;
+  visibility: hidden;
+  z-index: 100;
 }
 
 /*colors and borders for assessments*/
