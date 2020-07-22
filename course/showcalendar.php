@@ -28,7 +28,7 @@
 	}
 
 	require("../includes/calendardisp.php");
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=070218\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=070620\"></script>";
 	if ($editingon) {
 		$placeinhead .= '<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 				<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>';
@@ -175,7 +175,7 @@
 		$latepasses = 0;
 	}
 
-	 $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
+	 $stm = $DBH->prepare("SELECT name,itemorder,allowunenroll,msgset,toolset,latepasshrs FROM imas_courses WHERE id=:id");
 	 $stm->execute(array(':id'=>$cid));
 	 $line = $stm->fetch(PDO::FETCH_ASSOC);
 	 $latepasshrs = $line['latepasshrs'];

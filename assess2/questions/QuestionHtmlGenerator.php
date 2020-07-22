@@ -59,6 +59,7 @@ class QuestionHtmlGenerator
         'snaptogrid',
         'strflags',
         'variables',
+        'readerlabel'
     );
 
     // Variables that need to be packed up and passed to the answerbox generator.
@@ -262,9 +263,11 @@ class QuestionHtmlGenerator
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
             // $anstypes is question writer defined.
-            if (!isset($anstypes) && $GLOBALS['myrights'] > 10) {
+            if (!isset($anstypes)) {
+              if ($GLOBALS['myrights'] > 10) {
                 $this->addError('Error in question: missing $anstypes for multipart or conditional question');
-                $anstypes = array("number");
+              }
+              $anstypes = array("number");
             }
 
             // Calculate answer weights.

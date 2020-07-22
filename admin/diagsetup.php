@@ -244,8 +244,8 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 	} else {
 		$sel = 'Select your '.$sel;
 	}
-	$entrytype = substr($entryformat,0,1); //$entryformat{0};
-	$entrydig = substr($entryformat,1); //$entryformat{1};
+	$entrytype = substr($entryformat,0,1); //$entryformat[0];
+	$entrydig = substr($entryformat,1); //$entryformat[1];
 	$entrynotunique = false;
 	if ($entrytype=='A' || $entrytype=='B') {
 		$entrytype = chr(ord($entrytype)+2);

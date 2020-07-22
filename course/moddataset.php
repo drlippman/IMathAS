@@ -1139,8 +1139,8 @@ if (isset($_GET['id']) && $myq) {
 </select>
 </p>
 <p>
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))"><?php echo _('Writing Questions Help'); ?></a> |
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))"><?php echo _('Macro Library Help'); ?></a>
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6));return false;"><?php echo _('Writing Questions Help'); ?></a> |
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6));return false;"><?php echo _('Macro Library Help'); ?></a>
 <?php if (!isset($_GET['id'])) {
 	echo ' | <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">'._('Tutorial Style editor').'</a>';
 }?>

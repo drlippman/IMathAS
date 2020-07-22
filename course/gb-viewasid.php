@@ -1002,7 +1002,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				if ($_SESSION['useed']==0) {
 					echo '<textarea id="fb-'.$i.'" name="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::encodeStringForDisplay($feedback["Q$i"], true).'</textarea>';
 				} else {
-					echo '<div id="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
+					echo '<div id="fb-'.$i.'" class="fbbox skipmathrender" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
 				}
 				echo '</span>';
 
@@ -1140,7 +1140,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				}
 				echo "</textarea></p>";
 			} else {
-				echo "<div cols=60 rows=4 id=\"feedback\" class=\"fbbox\">";
+				echo "<div cols=60 rows=4 id=\"feedback\" class=\"fbbox skipmathrender\">";
 				if (!empty($feedback["Z"])) {
 					echo Sanitize::outgoingHtml($feedback["Z"]);
 				}

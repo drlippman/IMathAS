@@ -96,6 +96,7 @@ class ComplexScorePart implements ScorePart
                 return $scorePartResult;
             }
             foreach ($gaarr as $i=>$tchk) {
+
                 if (in_array('sloppycomplex',$ansformats)) {
                     $tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
                     if (substr_count($tchk,'i')>1) {
@@ -108,8 +109,8 @@ class ComplexScorePart implements ScorePart
                     $cpts = $this->parsecomplex($tchk);
 
                     if (!is_array($cpts)) {
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
+                        unset($gaarr[$i]);
+                        continue;
                     }
                     $cpts[1] = ltrim($cpts[1], '+');
                     $cpts[1] = rtrim($cpts[1], '*');
@@ -125,14 +126,27 @@ class ComplexScorePart implements ScorePart
                     }
                 }
             }
+        } else { // if "complex"
+            foreach ($gaarr as $i=>$tchk) {
+                $cpts = $this->parsecomplex($tchk);
+                if (!is_array($cpts)) {
+                    unset($gaarr[$i]);
+                    continue;
+                }
+                if (!is_numeric($cpts[0]) || !is_numeric($cpts[1])) {
+                    unset($gaarr[$i]);
+                }
+            }
         }
 
         $ganumarr = array();
         foreach ($gaarr as $j=>$givenans) {
             $gaparts = $this->parsesloppycomplex($givenans);
+
             if ($gaparts === false) {  //invalid - skip it
               continue;
             }
+
             if (!in_array('exactlist',$ansformats)) {
                 // don't add if we already have it in the list
                 foreach ($ganumarr as $prevvals) {
@@ -209,8 +223,11 @@ class ComplexScorePart implements ScorePart
           return false;
         }
         $a = $func(['i'=>0]);
-        $apb = $func(['i'=>1]);
-        return array($a,$apb-$a);
+        $apb = $func(['i'=>4]);
+        if (isNaN($a) || isNaN($apb)) {
+            return false;
+        }
+        return array($a,($apb-$a)/4);
     }
 
     /**
@@ -236,7 +253,7 @@ class ComplexScorePart implements ScorePart
                 //look left
                 $nd = 0;
                 for ($L=$p-1;$L>0;$L--) {
-                    $c = $v{$L};
+                    $c = $v[$L];
                     if ($c==')') {
                         $nd++;
                     } else if ($c=='(') {
@@ -253,7 +270,7 @@ class ComplexScorePart implements ScorePart
                 $nd = 0;
 
                 for ($R=$p+1;$R<$len;$R++) {
-                    $c = $v{$R};
+                    $c = $v[$R];
                     if ($c=='(') {
                         $nd++;
                     } else if ($c==')') {
@@ -271,11 +288,11 @@ class ComplexScorePart implements ScorePart
                     if ($R==$len) {// real + AiB
                         $real = substr($v,0,$L);
                         $imag = substr($v,$L,$p-$L);
-                        $imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+                        $imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
                     } else if ($L==0) { //AiB + real
                         $real = substr($v,$R);
                         $imag = substr($v,0,$p);
-                        $imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+                        $imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
                     } else {
                         return _('error - invalid form');
                     }
@@ -286,34 +303,34 @@ class ComplexScorePart implements ScorePart
                     $real = substr($v,0,$L) . substr($v,$p+1);
                 } else if ($R-$p>1) {
                     if ($p>0) {
-                        if ($v{$p-1}!='+' && $v{$p-1}!='-') {
+                        if ($v[$p-1]!='+' && $v[$p-1]!='-') {
                             return _('error - invalid form');
                         }
-                        $imag = $v{$p-1}.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+                        $imag = $v[$p-1].substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
                         $real = substr($v,0,$p-1) . substr($v,$R);
                     } else {
                         $imag = substr($v,$p+1,$R-$p-1);
                         $real = substr($v,0,$p) . substr($v,$R);
                     }
                 } else { //i or +i or -i or 3i  (one digit)
-                    if ($v{$L}=='+') {
+                    if ($v[$L]=='+') {
                         $imag = 1;
-                    } else if ($v{$L}=='-') {
+                    } else if ($v[$L]=='-') {
                         $imag = -1;
                     } else if ($p==0) {
                         $imag = 1;
                     } else {
-                        $imag = $v{$L};
+                        $imag = $v[$L];
                     }
                     $real = ($p>0?substr($v,0,$L):'') . substr($v,$p+1);
                 }
                 if ($real=='') {
                     $real = 0;
                 }
-                if ($imag{0}=='/') {
+                if ($imag[0]=='/') {
                     $imag = '1'.$imag;
-                } else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
-                    $imag = $imag{0}.'1'.substr($imag,1);
+                } else if (($imag[0]=='+' || $imag[0]=='-') && $imag[1]=='/') {
+                    $imag = $imag[0].'1'.substr($imag,1);
                 }
                 $imag = str_replace('*/','/',$imag);
                 if (substr($imag,-1)=='*') {

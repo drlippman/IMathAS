@@ -1412,6 +1412,7 @@ function processNumfunc(qn, fullstr, format) {
   var fvars = params.fvars;
   var domain = params.domain;
   var iseqn = format.match(/equation/);
+  var isineq = format.match(/inequality/);
   var err = '';
 
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
@@ -1420,8 +1421,21 @@ function processNumfunc(qn, fullstr, format) {
   totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
   var remapVars = strprocess[2].split('|');
 
-  if (fullstr.match(/=/)) {
-    if (!iseqn) {
+  if (fullstr.match(/(<=|>=|<|>)/)) {
+    if (!isineq) {
+      if (iseqn) {
+        err += _("syntax error: you gave an inequality, not an equation");
+      } else {
+        err += _("syntax error: you gave an inequality, not an expression");
+      }
+    } else if (fullstr.match(/(<=|>=|<|>)/g).length>1) {
+      err += _("syntax error: your inequality should only contain one inequality symbol");
+    }
+    totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
+  } else if (fullstr.match(/=/)) {
+    if (isineq) {
+      err += _("syntax error: you gave an equation, not an inequality");
+    } else if (!iseqn) {
       err += _("syntax error: you gave an equation, not an expression");
     } else if (fullstr.match(/=/g).length>1) {
       err += _("syntax error: your equation should only contain one equal sign");
@@ -1429,6 +1443,8 @@ function processNumfunc(qn, fullstr, format) {
     totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
   } else if (iseqn) {
     err += _("syntax error: this is not an equation");
+  } else if (isineq) {
+    err += _("syntax error: this is not an inequality");
   }
 
   if (fvars.length > 0) {

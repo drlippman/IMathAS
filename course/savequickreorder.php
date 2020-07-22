@@ -34,7 +34,7 @@
 
   foreach ($_POST as $id=>$val) {
 	 if ($id=="order" || trim($val)=='') { continue;}
-	 $type = $id{0};
+	 $type = $id[0];
 	 $typeid = substr($id,1);
 	 if ($type=="I") {
 		 $stm = $DBH->prepare("UPDATE imas_inlinetext SET title=:title WHERE id=:id AND courseid=:cid");

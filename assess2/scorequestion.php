@@ -269,13 +269,12 @@ if ($end_attempt) {
   }
 
   // get endmsg
-  if ($assessInfoOut['showscores'] != 'none') {
     $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
       $assess_info->getSetting('endmsg'),
       $totalScore,
       $assess_info->getSetting('points_possible')
     );
-  }
+
 
 } else {
   if ($assess_info->getSetting('displaymethod') === 'livepoll') {

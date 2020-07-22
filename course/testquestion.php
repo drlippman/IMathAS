@@ -307,7 +307,8 @@ if ($overwriteBody==1) {
 		}
 	}
 
-	printf("<p>"._("Question id:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
+	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
+	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';
   if ($line['ownerid'] == $userid) {
     echo '<a href="moddataset.php?cid='. Sanitize::courseId($sendcid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
     echo _('Edit Question') . '</a>';

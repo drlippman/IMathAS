@@ -142,7 +142,7 @@ span.formright input[type="text"], span.formright input[type="password"] {
 }
 
 /* Adapted from https://stackoverflow.com/questions/19735352/how-to-make-tinymces-modal-dialogs-responsive */
-.mce-window {
+.mce-window:not(.mce-iniframe) {
 	width: auto !important;
 	top: 0 !important;
 	left: 0 !important;

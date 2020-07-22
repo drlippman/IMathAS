@@ -694,7 +694,7 @@
 				echo Sanitize::encodeStringForDisplay($feedback["Q$loc"], true);
 				echo '</textarea>';
 			} else {
-				echo '<div class="fbbox" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'">';
+				echo '<div class="fbbox skipmathrender" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['id']).'">';
 				echo Sanitize::outgoingHtml($feedback["Q$loc"]);
 				echo '</div>';
 			}

@@ -73,7 +73,7 @@ $query .= "(:title, :message, :msgto, :msgfrom, :senddate, :deleted, :courseid)"
 $msgins = $DBH->prepare($query);
 
 $updcrs = $DBH->prepare("UPDATE imas_courses SET cleanupdate=? WHERE id=?");
-$stuchk = $DBH->prepare("SELECT count(id) FROM imas_students WHERE courseid=?");
+$stuchk = $DBH->prepare("SELECT max(lastaccess) FROM imas_students WHERE courseid=?");
 
 $query = "SELECT ic.id,ic.name,ic.ownerid,iu.FirstName,iu.LastName,iu.email,iu.msgnotify,iu.groupid,ic.enddate,ic.available ";
 $query .= "FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id ";
@@ -90,14 +90,26 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 		continue;
 	}
-	if ($row['enddate']<2000000000) { //check to ensure course isn't alredy empty
-		$stuchk->execute(array($row['id']));
-		if ($stuchk->fetchColumn(0) == 0) {
-			//class is already empty; remove from cleaning plan
+	$thisold = $old;
+	if (isset($CFG['cleanup']['groups'][$row['groupid']])) {
+		$thisold = 24*60*60*$CFG['cleanup']['groups'][$row['groupid']]['old'];
+	}
+	if ($row['enddate']<2000000000) { //check to see if enddate reset
+		if ($row['enddate'] > $now - $thisold) {
+			// enddate has been updated - remove from cleaning plan
 			$updcrs->execute(array(0, $row['id']));
 			continue;
 		}
 	}
+	// check to see if students have become active or course already emptied
+	$stuchk->execute(array($row['id']));
+	$stulast = $stuchk->fetchColumn(0);
+	if ($stulast === null || $stulast > $now - $thisold) {
+		// course is already empty, or new student activity - remove from cleanup
+		$updcrs->execute(array(0, $row['id']));
+		continue;
+	}
+
 	if (isset($CFG['cleanup']['groups']) && isset($CFG['cleanup']['groups'][$row['groupid']])) {
 		$grpdet = $CFG['cleanup']['groups'][$row['groupid']];
 		$thisdelay = 24*60*60*$grpdet['delay'];
@@ -139,25 +151,45 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 }
 
 //run cleanup operation, 1 in a batch
-$stm = $DBH->prepare("SELECT id FROM imas_courses WHERE cleanupdate>1 AND cleanupdate<? ORDER BY cleanupdate LIMIT 1");
+$stm = $DBH->prepare("SELECT id,enddate FROM imas_courses WHERE cleanupdate>1 AND cleanupdate<? ORDER BY cleanupdate LIMIT 1");
 $stm->execute(array($now));
-$cidtoclean = $stm->fetchColumn(0);
-
-$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
-$stm->execute(array($cidtoclean));
-$stus = array();
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-	$stus[] = $row['userid'];
+list($cidtoclean,$enddate) = $stm->fetch(PDO::FETCH_NUM);
+$skip = false;
+if ($enddate<2000000000) { //check to see if enddate reset
+	if ($enddate > $now - $old) {
+		// enddate has been updated - remove from cleaning plan
+		$skip = true;
+	}
 }
-// not including in transaction to prevent cleanup from stalling on a
-// weird course
-$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
-$stm->execute(array($cidtoclean));
+// check to see if students have become active or course already emptied
+$stuchk->execute(array($cidtoclean));
+$stulast = $stuchk->fetchColumn(0);
+if ($stulast === null || $stulast > $now - $old) {
+	// course is already empty, or new student activity - remove from cleanup
+	$skip = true;
+}
 
-if (count($stus)>0) {
-	$DBH->beginTransaction();
-	unenrollstu($cidtoclean, $stus, true, false, true, 2);
-	$DBH->commit();
+if (!$skip) {
+	$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
+	$stm->execute(array($cidtoclean));
+	$stus = array();
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$stus[] = $row['userid'];
+	}
+	// not including in transaction to prevent cleanup from stalling on a
+	// weird course
+	$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
+	$stm->execute(array($cidtoclean));
+
+	if (count($stus)>0) {
+		$DBH->beginTransaction();
+		unenrollstu($cidtoclean, $stus, true, false, true, 2);
+		$DBH->commit();
+	}
+} else {
+	$updcrs->execute(array(0, $cidtoclean));
+	$stm = $DBH->prepare("UPDATE imas_courses SET cleanupdate=0 WHERE id=?");
+	$stm->execute(array($cidtoclean));
 }
 
 //delete old students

@@ -9,7 +9,7 @@
         <a href="#" @click.prevent="loadHelp(qHelp)">
           <icons :name="qHelp.icon" alt=""/>
           {{ qHelp.title }}
-          <span class="sr-only">{{ qHelp.cnt }}</span>
+          <span class="sr-only"> {{ qHelp.cnt }}</span>
         </a>
       </li>
       <li v-if="showMessage">

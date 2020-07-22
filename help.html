@@ -2308,8 +2308,11 @@ The following macros create graphs or tables:
 <li><strong>changeimagesize(image or graph, width, [height])</strong>: Changes the display width for an image.
     Note this doesn't resize the file itself, just changes the display size - it's always better to resize the original
     image file.</li>
-<li><strong>textonimage(img,text,left,top[text,left,top...])</strong>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
-    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.</li>
+<li><strong>textonimage(img,text,left,top[text,left,top,left,...,alttext])</strong>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
+    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.
+    textonimage is not screenreader-friendly, so it's recommended you provide an alttext as 
+    the final argument, which will be read to the screenreader instead of the image and any layered
+    text.  Do not use alttext if you have answerboxes in your layered text.</li>
 <li><strong>arraystodoteqns(xarray,yarray,[color])</strong>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
 <li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts an array of x-values and y-values into a form that
@@ -2851,7 +2854,9 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 <dt>$displayformat = "alignright" </dt>
 	<dd>Aligns the text in the answer box to the right side</dd>
 <dt>$answerboxsize = number </dt>
-	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+    <dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
 <dt>$showanswer </dt>
@@ -2965,7 +2970,9 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$hidepreview = true </dt>
 	<dd>Hides the Preview button.  Could be useful in multipart questions, or if you're only asking for a simple
-	response, like a fraction</dd>
+    response, like a fraction</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
 <dt>$showanswer </dt>
@@ -3007,6 +3014,8 @@ of choices is automatically randomized.
 	index is the index in $questions, and score is a proportion between 0 and 1 to award as partial credit.  For example, if $answer = 0
 	and $partialcredit = array(2,.3), then the student would get full credit for selecting the item corresponding with $questions[0], and 30% credit
 	for selecting the item corresponding with $questions[2].  All other answers would receive 0 credit.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
 <dt>$showanswer </dt>
@@ -3045,6 +3054,8 @@ of choices is automatically randomized.
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
 <dt>$noshuffle = "all" </dt>
 	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
 <dt>$showanswer </dt>
@@ -3087,6 +3098,8 @@ A student is asked to match answers with questions
 <dt>$displayformat = "select" or "2columnselect"</dt>
 	<dd>Only displays the $answers, with select boxes next to each containing the $questions.  This should only be used with
 	pure text $questions.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place matching questions and answers in that location</dd>
 <dt>$showanswer </dt>
@@ -3133,11 +3146,14 @@ A student is asked to enter a function
 	Include "ignore_case,false" to make the search case sensitive.
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "toconst" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
+<dt>$answerformat = "equation" or "inequality" or "toconst" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
 	answer should also be an equation.  Be sure to specify all variables in the equation in $variables.  This may fail
+	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
+	"inequality": Specifies that the answer is expected to be an inequality rather than an expression.
+	The given answers hould also be an inequality.  Be sure to specify all variables in the equation in $variables.  This may fail
 	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
@@ -3159,6 +3175,8 @@ A student is asked to enter a function
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
 <dt>$hidepreview = true </dt>
 	<dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
 <dt>$showanswer </dt>
@@ -3220,6 +3238,8 @@ A student is asked to enter a string (a word or list of letters).
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
 <dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the answer entry box in that location</dd>
 <dt>$showanswer </dt>
@@ -3251,6 +3271,8 @@ None - the essay type is not computer graded.
 <dt>$scoremethod = "takeanything" or "takeanythingorblank"</dt>
 	<dd>Sets the problem to give full credit for any answer.  The latter also counts
 	blank answers as correct.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the essay box in that location</dd>
 <dt>$showanswer </dt>
@@ -3367,6 +3389,8 @@ drawn line from the correct line.
 	the student will receive full credit.  Not set by default.</dd>
 <dt>$scoremethod = "takeanything" </dt>
 		<dd>When used, this will give full credit for any non-blank answer.  This might be of use with the freehand drawing option.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer </dt>
@@ -3409,6 +3433,8 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 	used by default.</dd>
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer </dt>
@@ -3461,6 +3487,8 @@ rather than just numbers, such as (5/3, 2/3).
 	used by default.</dd>
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer </dt>
@@ -3495,6 +3523,8 @@ Complex questions require the student to enter a complex number in a+bi form.
 	used by default.</dd>
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer </dt>
@@ -3539,6 +3569,8 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 	used by default.</dd>
 <dt>$abstolerance = a number </dt>
 	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
 <dt>$showanswer </dt>
@@ -3590,6 +3622,8 @@ The entries are compared to a given tolerance.
 <dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
 	used if $answersize is not supplied.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
 <dt>$showanswer </dt>
@@ -3645,6 +3679,8 @@ The entries are compared to a given tolerance.
 	used if $answersize is not supplied.</dd>
 <dt>$hidepreview = true </dt>
 	<dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
 <dt>$showanswer </dt>
@@ -3694,6 +3730,8 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
 <dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
 <dt>$showanswer </dt>
@@ -3750,6 +3788,8 @@ invertal notation.
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
 <dt>$answerboxsize = number </dt>
 	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
 <dt>$showanswer </dt>
@@ -3787,6 +3827,8 @@ None - the file upload type is not computer graded.
    files, office files, and pdfs, which can be previewed inline.  If listing
    file extensions, provide a comma separated list with leading periods, like
     ".pdf,.docx,.doc"  </dd>
+<dt>$readerlabel = string</dt>
+    <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
 <dt>$showanswer </dt>

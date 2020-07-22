@@ -735,6 +735,10 @@ function tabToSettings() {
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h1></div>
 
+	<div class="cpmid">
+	<a href="masschgprereqs.php?cid=<?php echo $cid;?>"><?php echo _('Mass Change Prereqs'); ?></a>
+	</div>
+
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
 	<p><b>Be aware</b> that changing some settings after an assessment has been
 	 taken will change the student's data.</p>

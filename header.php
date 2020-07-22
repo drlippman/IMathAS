@@ -171,7 +171,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$imasroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=052520\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=070920\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {
@@ -180,8 +180,9 @@ if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
 
 
 if (isset($useeditor) && $_SESSION['useed']==1) {
-	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.min.js?v=051919"></script>';
-	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082719"></script>';
+    echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.min.js?v=071320"></script>';
+    //echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.js?v=051919"></script>';
+
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var coursetheme = "'.$coursetheme.'";';
@@ -210,7 +211,7 @@ if (isset($CFG['GEN']['headerscriptinclude'])) {
 if (isset($coursetheme)) {
 	echo '<link rel="stylesheet" href="'. $imasroot . "/themes/$coursetheme?v=042217\" type=\"text/css\" />";
 }
-echo '<link rel="stylesheet" href="'. $imasroot . '/handheld.css?v=051519" media="only screen and (max-width:480px)"/>';
+echo '<link rel="stylesheet" href="'. $imasroot . '/handheld.css?v=071320" media="only screen and (max-width:480px)"/>';
 if (isset($CFG['GEN']['translatewidgetID'])) {
 	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
 }

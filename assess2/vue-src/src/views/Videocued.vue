@@ -14,12 +14,10 @@
       />
     </videocued-nav>
     <div class="scrollpane" role="region" :aria-label="$t('regions.q_and_vid')">
-      <div
-        class = "questionpane introtext"
-        v-show = "cue == -1"
+      <intro-text
+        :active = "cue == -1"
+        :html = "intro"
         key = "-1"
-        v-html = "intro"
-        ref = "introtext"
       />
       <div id = "playerwrapper" v-show = "cue > -1 && qn === -1">
         <div
@@ -87,6 +85,7 @@ import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
 import VideocuedResultNav from '@/components/VideocuedResultNav.vue';
 import Question from '@/components/question/Question.vue';
+import IntroText from '@/components/IntroText.vue';
 import { store } from '../basicstore';
 
 export default {
@@ -97,7 +96,8 @@ export default {
     Question,
     VideocuedResultNav,
     InterQuestionTextList,
-    AssessHeader
+    AssessHeader,
+    IntroText
   },
   data: function () {
     return {
@@ -289,10 +289,6 @@ export default {
     const tag = document.createElement('script');
     tag.src = '//www.youtube.com/player_api';
     document.head.appendChild(tag);
-  },
-  mounted () {
-    setTimeout(window.drawPics, 100);
-    window.rendermathnode(this.$refs.introtext);
   }
 };
 </script>

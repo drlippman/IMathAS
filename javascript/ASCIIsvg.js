@@ -369,6 +369,9 @@ function initPicture(x_min,x_max,y_min,y_max) {
       if (picture.hasAttribute("data-nomag")) {
         qnode.setAttribute("data-nomag",1);
       }
+      if (picture.getAttribute('align') === 'middle') {
+        qnode.style.verticalAlign = 'middle';
+      }
 
       qnode.setAttribute("alt", picture.getAttribute("alt") || '');
       qnode.setAttribute("role", "img");

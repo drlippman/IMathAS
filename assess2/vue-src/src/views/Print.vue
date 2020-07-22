@@ -33,10 +33,10 @@
       </button>
     </p>
     <div class="scrollpane">
-      <div
-        v-if = "intro != ''"
-        v-html = "intro"
-        v-show = "showTexts"
+      <intro-text
+        v-if = "intro !== ''"
+        :active = "showTexts"
+        :html = "intro"
       />
       <div>
         <div
@@ -79,6 +79,7 @@
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import IntroText from '@/components/IntroText.vue';
 import { store } from '../basicstore';
 
 export default {
@@ -86,7 +87,8 @@ export default {
   components: {
     Question,
     FullQuestionHeader,
-    InterQuestionTextList
+    InterQuestionTextList,
+    IntroText
   },
   data: function () {
     return {

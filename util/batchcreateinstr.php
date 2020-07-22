@@ -123,8 +123,8 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
       $blockcnt = 1;
       $itemorder = serialize(array());
       $DBH->beginTransaction();
-      $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,UIver,showlatepass,itemorder,available,istemplate,deftime,deflatepass,theme,ltisecret,blockcnt) ";
-      $query .= "SELECT name,:ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,UIver,showlatepass,:itemorder,available,0,deftime,deflatepass,theme,'',1 ";
+      $query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,toolset,UIver,showlatepass,itemorder,available,istemplate,deftime,deflatepass,theme,ltisecret,blockcnt) ";
+      $query .= "SELECT name,:ownerid,enrollkey,allowunenroll,copyrights,msgset,toolset,UIver,showlatepass,:itemorder,available,0,deftime,deflatepass,theme,'',1 ";
       $query .= "FROM imas_courses WHERE id=:sourceid";
       $stm = $DBH->prepare($query);
       $stm->execute(array(':ownerid'=>$uid, ':itemorder'=>$itemorder, ':sourceid'=>$sourcecid));

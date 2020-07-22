@@ -121,6 +121,7 @@ makeinventory($invs, $type, $rowper, $sn, &$anstypes, $questions, &$answer, &$sh
 <BR>invs has form array(array('type','date',quantity, value)), where type is 'init','purch',or 'sale'
 <BR>get can be set to 'journal' or 'totals', but defaults to 'rec', which generates a perpetual inventory record
 <BR>'journal' returns array(journal record, journal display)
+<BR>'totals' returns array(total cogs, total inventory, total inventory value, total sales)
 <BR>type is FIFO, LIFO, or WA, or SPEC
 <BR>if SPEC, then the form of $invs changes for sales, and should be 'sale','date',array(quantity, purchase#, quantity, purchase #, ...)) where
 <BR>init is purchase #0.
