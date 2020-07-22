@@ -3,20 +3,8 @@
 $init_session_start = true;
 require("init_without_validate.php");
 require_once(__DIR__.'/includes/newusercommon.php');
+require_once(__DIR__."/includes/email.php");
 
-/**
- * TODO: handle postback:
- *  - Create user account
- *  - Enroll in teacher courses
- *  - Send email
- *  - Store upload if provided
- *  - Create request data
- *  - Adjust approvepending2
- *    - display new info
- *    - If ipeds linked to group, preselect group, or provide selector of just the linked groups
- *    - If not, establish link to selected group on approval
- *    - Create custom ipeds records for Intl requests
- */
 
 $pagetitle = "New instructor account request";
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
@@ -58,6 +46,149 @@ require("header.php");
 $pagetitle = "Instructor Account Request";
 require("infoheader.php");
 
+/**
+ * Handle postback:
+ *  - Create user account
+ *  - Enroll in teacher courses
+ *  - Send email
+ *  - Store upload if provided
+ *  - Create request data
+ *  - Adjust approvepending2
+ *    - display new info
+ *    - If ipeds linked to group, preselect group, or provide selector of just the linked groups
+ *    - If not, establish link to selected group on approval
+ *    - Create custom ipeds records for Intl requests
+ */
+if (isset($_POST['firstname'])) {
+    $error = '';
+    if ($_POST['challenge'] !== $_SESSION['challenge'] || !empty($_POST['hval'])) {
+        $error .= "<p>Invalid submission</p>";
+    }
+    if (!isset($_POST['agree'])) {
+        $error .= "<p>You must agree to the Terms and Conditions to set up an account</p>";
+    }
+    $required = array('SID','firstname','lastname','email','pw1','pw2',
+        'schooltype','schoolloc','vertype');
+    $error .= checkNewUserValidation($required);
+    $otherschool = '';
+    if ($_POST['schoolloc'] == 'us') {
+        if (empty($_POST['ipeds'])) {
+            $error .= '<p>Institution is required</p>';
+        } else {
+            $ipeds = $_POST['ipeds'];
+        }
+    } else {
+        if (empty($_POST['country'])) {
+            $error .= '<p>Country is required</p>';
+        } else {
+            $_POST['schoolloc'] = $_POST['country'];
+        }
+        if (empty($_POST['ipedsintl'])) {
+            $error .= '<p>Institution is required</p>';
+        } else {
+            $ipeds = $_POST['ipedsintl'];
+        }
+        if ($ipeds == '0') {
+            if (empty($_POST['otherschool'])) {
+                $error .= '<p>School name is required</p>';
+            } else {
+                $otherschool = $_POST['otherschool'];
+            }
+        }
+    }
+    if ($error == '') {
+        if ($_POST['vertype'] == 'url') {
+            if (empty($_POST['verurl'])) {
+                $error .= '<p>Verification URL is required</p>';
+            }
+            $verdata = $_POST['verurl'];
+            
+        } else if ($_POST['vertype'] == 'email') {
+            if (empty($_POST['veremail'])) {
+                $error .= '<p>Verification email is required</p>';
+            }
+            $verdata = $_POST['veremail'];
+        } else if ($_POST['vertype'] == 'upload') {
+            // TODO: handle upload 
+            require_once('./includes/filehandler.php');
+            // check file extension for OK
+            // change filename
+            $key = uniqid();
+            if (storeuploadedfile('verupload', $key,'private')) {
+               $verdata = 'file:'.$key;
+            } else {
+               $error .= '<p>Error with file upload</p>';
+            }
+        }
+    }
+    if ($error != '') {
+        echo $error;
+    } else {
+        $now = time();
+        $reqdata = array(
+            'reqmade'=>$now, 
+            'schooltype' => $_POST['schooltype'],
+            'schoolloc' => $_POST['schoolloc'],  // country
+            'ipeds' => $ipeds,
+            'otherschool' => $otherschool,
+            'vertype' => $_POST['vertype'],
+            'verdata' => $verdata
+        );
+
+        if (isset($CFG['GEN']['homelayout'])) {
+            $homelayout = $CFG['GEN']['homelayout'];
+        } else {
+            $homelayout = '|0,1,2||0,1';
+        }
+
+        if (isset($CFG['GEN']['newpasswords'])) {
+            require_once("./includes/password.php");
+            $md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+        } else {
+            $md5pw = md5($_POST['pw1']);
+        }
+        $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
+        $query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :homelayout);";
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>12,
+            ':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+            ':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+            ':email'=>Sanitize::emailAddress($_POST['email']),
+            ':homelayout'=>$homelayout));
+        $newuserid = $DBH->lastInsertId();
+        if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+            $valbits = array();
+            foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+              $ncid = intval($ncid);
+                $valbits[] = "($newuserid,$ncid)";
+            }
+            $stm = $DBH->query("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits)); //known INTs - safe
+        }
+        $headers  = 'MIME-Version: 1.0' . "\r\n";
+        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        $headers .= "From: $installname <$sendfrom>\r\n";
+        $subject = "New Instructor Account Request";
+        $message = "Name: {$_POST['firstname']} {$_POST['lastname']} <br/>\n";
+        $message .= "Email: {$_POST['email']} <br/>\n";
+        $message .= "Username: {$_POST['SID']} <br/>\n";
+        foreach ($reqdata as $k=>$v) {
+            $message .= $k . ': ' . Sanitize::encodeStringForDisplay($v) . "<br>\n";
+        }
+        send_email($accountapproval, $sendfrom, $subject, $message, array(), array(), 10);
+
+        $stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,0,?,?)");
+        $stm->execute(array($newuserid, $now, json_encode($reqdata, JSON_INVALID_UTF8_IGNORE)));
+
+        $message = "<p>Your new account request has been sent.</p>  ";
+        $message .= "<p>This request is processed by hand, so please be patient.</p>";
+        send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $subject, $message, array(), array(), 10);
+
+        echo $message;
+        require("footer.php");
+        exit;
+    }
+}
+
 if (isset($_POST['firstname'])) {$firstname=$_POST['firstname'];} else {$firstname='';}
 if (isset($_POST['lastname'])) {$lastname=$_POST['lastname'];} else {$lastname='';}
 if (isset($_POST['email'])) {$email=$_POST['email'];} else {$email='';}
@@ -69,7 +200,7 @@ if (isset($_POST['SID'])) {$username=$_POST['SID'];} else {$username='';}
 $_SESSION['challenge'] = uniqid();
 
 ?>
-<form method=post id=newinstrform class="limitaftervalidate tabwrap" action="newinstructor.php">
+<form method=post id=newinstrform class="limitaftervalidate tabwrap" action="newinstructor-ipeds.php">
 <h1>New Instructor Account Request</h1>
 
 <ul class="tablist" role="tablist">
@@ -164,7 +295,7 @@ $_SESSION['challenge'] = uniqid();
 
 <div id=otherschool style="display:none">
     <span class=form><label for=otherschool>Please give the name of your school:</label></span>
-    <span class=formright><input name=otherschool size=40 /></span><br class=form>
+    <span class=formright><input id=otherschool name=otherschool size=40 /></span><br class=form>
 </div>
 
 <p><button type=button id=step1btn style="display:none">Continue</button></p>
@@ -187,7 +318,7 @@ $_SESSION['challenge'] = uniqid();
     </ol>
 
     <span class=form><label for=vertype>What method would you like to use?</label></span>
-    <span class=formright><select id=vertype>
+    <span class=formright><select id=vertype name=vertype>
         <option value="">Select...</option>
         <option value="url">Provide a website</option>
         <option value="email">Send an email</option>
@@ -215,13 +346,13 @@ $_SESSION['challenge'] = uniqid();
 
     <span class=form><label for=firstname>Given Name:</label></span>
     <span class=formright>
-        <input name=firstname autocomplete="given-name" size=40 
+        <input id=firstname name=firstname autocomplete="given-name" size=40 
         value="<?php echo Sanitize::encodeStringForDisplay($firstname);?>"/>
     </span><br class=form>
 
     <span class=form><label for=lstname>Family Name:</label></span>
     <span class=formright>
-        <input name=lastname autocomplete="family-name" size=40 
+        <input id=lastname name=lastname autocomplete="family-name" size=40 
             value="<?php echo Sanitize::encodeStringForDisplay($lastname);?>" />
     </span><br class=form>
 
@@ -231,20 +362,20 @@ $_SESSION['challenge'] = uniqid();
         <em>will</em> be denied.</span>
     </span>
     <span class=formright>
-        <input name=email autocomplete="email" size=40
+        <input id=email name=email autocomplete="email" size=40
         value="<?php echo Sanitize::encodeStringForDisplay($email);?>" />
     </span><br class=form>
 
     <span class=form><label for=SID>Username:</label></span>
     <span class=formright>
-        <input name=SID value="<?php echo Sanitize::encodeStringForDisplay($SID);?>" size=40 />
+        <input id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($SID);?>" size=40 />
     </span><br class=form>
 
     <span class=form><label for=pw1>Password:</label></span>
-    <span class=formright><input type=password name=pw1 size=40 /></span><br class=form>
+    <span class=formright><input type=password id=pw1 name=pw1 size=40 /></span><br class=form>
 
     <span class=form><label for=pw2>Reenter Password:</label></span>
-    <span class=formright><input type=password name=pw2 size=40 /></span><br class=form>
+    <span class=formright><input type=password id=pw2 name=pw2 size=40 /></span><br class=form>
 
     <span class=form><input type=checkbox name=agree id=agree>
         <label for="agree">I have read and agree to the 
@@ -353,6 +484,7 @@ $extrarequired = array('agree', 'schooltype', 'schooloc',
 $requiredrules = array(
     'ipeds' => 'function(){return document.getElementById("schoolloc").value == "us";}',
     'intlipeds' => 'function(){return document.getElementById("schoolloc").value == "intl";}',
+    'otherschool' => 'function(){return document.getElementById("intlipeds").value == "0";}',
     'verurl' => 'function(){return document.getElementById("vertype").value == "url";}',
     'veremail' => 'function(){return document.getElementById("vertype").value == "email";}',
     'verupload' => 'function(){return document.getElementById("vertype").value == "upload";}',
