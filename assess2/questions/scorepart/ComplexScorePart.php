@@ -96,6 +96,7 @@ class ComplexScorePart implements ScorePart
                 return $scorePartResult;
             }
             foreach ($gaarr as $i=>$tchk) {
+
                 if (in_array('sloppycomplex',$ansformats)) {
                     $tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
                     if (substr_count($tchk,'i')>1) {
@@ -108,8 +109,8 @@ class ComplexScorePart implements ScorePart
                     $cpts = $this->parsecomplex($tchk);
 
                     if (!is_array($cpts)) {
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
+                        unset($gaarr[$i]);
+                        continue;
                     }
                     $cpts[1] = ltrim($cpts[1], '+');
                     $cpts[1] = rtrim($cpts[1], '*');
@@ -125,14 +126,27 @@ class ComplexScorePart implements ScorePart
                     }
                 }
             }
+        } else { // if "complex"
+            foreach ($gaarr as $i=>$tchk) {
+                $cpts = $this->parsecomplex($tchk);
+                if (!is_array($cpts)) {
+                    unset($gaarr[$i]);
+                    continue;
+                }
+                if (!is_numeric($cpts[0]) || !is_numeric($cpts[1])) {
+                    unset($gaarr[$i]);
+                }
+            }
         }
 
         $ganumarr = array();
         foreach ($gaarr as $j=>$givenans) {
             $gaparts = $this->parsesloppycomplex($givenans);
+
             if ($gaparts === false) {  //invalid - skip it
               continue;
             }
+
             if (!in_array('exactlist',$ansformats)) {
                 // don't add if we already have it in the list
                 foreach ($ganumarr as $prevvals) {
@@ -210,6 +224,9 @@ class ComplexScorePart implements ScorePart
         }
         $a = $func(['i'=>0]);
         $apb = $func(['i'=>4]);
+        if (isNaN($a) || isNaN($apb)) {
+            return false;
+        }
         return array($a,($apb-$a)/4);
     }
 
