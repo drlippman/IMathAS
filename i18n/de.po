@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-18 13:14+0200\n"
-"PO-Revision-Date: 2020-07-18 13:42+0200\n"
+"POT-Creation-Date: 2020-07-23 19:10+0200\n"
+"PO-Revision-Date: 2020-07-23 19:20+0200\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -45,7 +45,7 @@ msgstr "%1$s von %2$s"
 #: javascript/AMhelpers2.js:302 javascript/AMhelpers2.js:316
 #: javascript/AMhelpers2_min.js:1 javascript/assess2_min.js:2
 #: assess2/displayq3.php:8170 assess2/questions/QuestionHtmlGenerator.php:1126
-#: assess2/questions/answerboxhelpers.php:571
+#: assess2/questions/answerboxhelpers.php:571 assessment/displayq2.php:8101
 msgid "Correct"
 msgstr "Richtig"
 
@@ -57,6 +57,7 @@ msgstr "Richtig"
 #: javascript/AMhelpers2.js:318 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 assess2/questions/QuestionHtmlGenerator.php:1122
 #: assess2/questions/answerboxhelpers.php:569 assess2/displayq3.php:8168
+#: assessment/displayq2.php:8099
 msgid "Incorrect"
 msgstr "Falsch"
 
@@ -68,6 +69,7 @@ msgstr "Falsch"
 #: javascript/AMhelpers2.js:317 javascript/AMhelpers2_min.js:1
 #: javascript/assess2_min.js:2 assess2/questions/QuestionHtmlGenerator.php:1134
 #: assess2/questions/answerboxhelpers.php:575 assess2/displayq3.php:8174
+#: assessment/displayq2.php:8105
 msgid "Partially correct"
 msgstr "Teilweise richtig"
 
@@ -2317,7 +2319,7 @@ msgstr "Geben Sie eine ganze Zahl oder eine Dezimalzahl ein"
 #: assessment/displayq2.php:1173 assessment/displayq2.php:8066
 #: assess2/displayq3.php:1099 assess2/displayq3.php:8138
 #: assess2/questions/answerboxes/NumberAnswerBox.php:98
-#: assess2/questions/answerboxhelpers.php:539
+#: assess2/questions/answerboxhelpers.php:539 assessment/displayq2.php:8069
 msgid "Enter DNE for Does Not Exist, oo for Infinity"
 msgstr ""
 "Geben Sie DNE (Does Not Exist) ein, wenn keine Antwort existiert, oder oo "
@@ -2417,7 +2419,7 @@ msgstr ", mit mindestens %d signifikanten Figuren"
 #: assess2/questions/answerboxes/MatchingAnswerBox.php:60
 #: assess2/questions/answerboxes/MultipleAnswerAnswerBox.php:51
 #: assess2/questions/answerboxes/StringAnswerBox.php:122
-#: assess2/displayq3.php:1207
+#: assess2/displayq3.php:1207 assessment/displayq2.php:2542
 msgid "Eeek!  $questions is not defined or needs to be an array"
 msgstr "Eeek!  $questions ist nicht definiert oder muss ein Feld sein"
 
@@ -2484,7 +2486,7 @@ msgstr ""
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:84
 #: assess2/questions/answerboxes/CalculatedAnswerBox.php:87
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:78
-#: assess2/displayq3.php:1653
+#: assess2/displayq3.php:1653 assessment/displayq2.php:2812
 msgid "each value"
 msgstr "jeder Wert"
 
@@ -2528,6 +2530,9 @@ msgstr "Ihre Antwort"
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:162
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:154
 #: assess2/questions/answerboxes/StringAnswerBox.php:151
+#: assessment/displayq2.php:2068 assessment/displayq2.php:2318
+#: assessment/displayq2.php:2426 assessment/displayq2.php:2538
+#: assessment/displayq2.php:2838
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -2543,7 +2548,7 @@ msgstr "Geben Sie jedes Element der Matrix als Zahl (z.B. 5, -2, 2.2) ein"
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:72
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:63
 #: assess2/questions/answerboxes/MatrixAnswerBox.php:127
-#: assess2/displayq3.php:1777
+#: assess2/displayq3.php:1777 assessment/displayq2.php:2698
 #, php-format
 msgid "Your numbers should be accurate to %d decimal places."
 msgstr "Ihre Zahlen sollten auf %d Nachkommastellen genau sein."
@@ -2570,19 +2575,19 @@ msgstr "Geben Sie Ihre Antwort als Matrix wie ((2,3,4),(3,4,5)) ein."
 
 #: assessment/displayq2.php:2034
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:70
-#: assess2/displayq3.php:2002
+#: assess2/displayq3.php:2002 assessment/displayq2.php:2037
 msgid "Enter an algebraic equation"
 msgstr "Geben Sie eine algebraische Gleichung ein"
 
 #: assessment/displayq2.php:2036
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:76
-#: assess2/displayq3.php:2004
+#: assess2/displayq3.php:2004 assessment/displayq2.php:2039
 msgid "Enter an algebraic expression"
 msgstr "Geben Sie einen algebraischen Ausdruck ein"
 
 #: assessment/displayq2.php:2143
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:71
-#: assess2/displayq3.php:2095
+#: assess2/displayq3.php:2095 assessment/displayq2.php:2146
 msgid "Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3"
 msgstr "Geben Sie Ihre Antwort als Gleichung ein.  Beispiel: y=3x^2+1, 2+x+y=3"
 
@@ -2591,13 +2596,14 @@ msgstr "Geben Sie Ihre Antwort als Gleichung ein.  Beispiel: y=3x^2+1, 2+x+y=3"
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:71
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:74
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:77
+#: assessment/displayq2.php:2146 assessment/displayq2.php:2148
 msgid "Be sure your variables match those in the question"
 msgstr ""
 "Stellen Sie sicher, dass Ihre Variablen mit denen in der Frage übereinstimmen"
 
 #: assessment/displayq2.php:2145
 #: assess2/questions/answerboxes/FunctionExpressionAnswerBox.php:77
-#: assess2/displayq3.php:2097
+#: assess2/displayq3.php:2097 assessment/displayq2.php:2148
 msgid "Enter your answer as an expression.  Example: 3x^2+1, x/5, (a+b)/c"
 msgstr ""
 "Geben Sie Ihre Antwort als Ausdruck ein.  Beispiel: 3x^2+1, x/5, (a+b)/c"
@@ -2606,6 +2612,7 @@ msgstr ""
 #: assess2/displayq3.php:2148 assess2/displayq3.php:2226
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:59
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:57
+#: assessment/displayq2.php:2199 assessment/displayq2.php:2271
 msgid "Enter your answer as a point.  Example: (2,5.5172)"
 msgstr "Geben Sie Ihre Antwort als Punkt ein. Beispiel: (2, 5.5172)"
 
@@ -2613,6 +2620,7 @@ msgstr "Geben Sie Ihre Antwort als Punkt ein. Beispiel: (2, 5.5172)"
 #: assess2/displayq3.php:2149 assess2/displayq3.php:2227
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:60
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:58
+#: assessment/displayq2.php:2200 assessment/displayq2.php:2272
 msgid "Enter a point"
 msgstr "Geben Sie einen Punkt ein"
 
@@ -2620,6 +2628,7 @@ msgstr "Geben Sie einen Punkt ein"
 #: assess2/displayq3.php:2151 assess2/displayq3.php:2229
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:62
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:60
+#: assessment/displayq2.php:2202 assessment/displayq2.php:2274
 msgid ""
 "Enter your answer a list of points separated with commas.  Example: (1,2), "
 "(3.5172,5)"
@@ -2631,12 +2640,13 @@ msgstr ""
 #: assess2/displayq3.php:2152 assess2/displayq3.php:2230
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:63
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:61
+#: assessment/displayq2.php:2203 assessment/displayq2.php:2275
 msgid "Enter a list of points"
 msgstr "Geben Sie eine Liste von Punkten ein"
 
 #: assessment/displayq2.php:2202
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:63
-#: assess2/displayq3.php:2154
+#: assess2/displayq3.php:2154 assessment/displayq2.php:2205
 msgid "Enter your answer as a vector.  Example: <2,5.5>"
 msgstr "Geben Sie Ihre Antwort als Vektor ein.  Beispiel: <2,5.5>"
 
@@ -2644,6 +2654,7 @@ msgstr "Geben Sie Ihre Antwort als Vektor ein.  Beispiel: <2,5.5>"
 #: assess2/displayq3.php:2155 assess2/displayq3.php:2233
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:66
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:64
+#: assessment/displayq2.php:2206 assessment/displayq2.php:2278
 msgid "Enter a vector"
 msgstr "Geben Sie einen Vektor ein"
 
@@ -2651,6 +2662,7 @@ msgstr "Geben Sie einen Vektor ein"
 #: assess2/displayq3.php:2157 assess2/displayq3.php:2235
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:68
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:66
+#: assessment/displayq2.php:2208 assessment/displayq2.php:2280
 msgid ""
 "Enter your answer a list of vectors separated with commas.  Example: <1,2>, "
 "<3.5172,5>"
@@ -2662,6 +2674,7 @@ msgstr ""
 #: assess2/displayq3.php:2158 assess2/displayq3.php:2236
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:69
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:67
+#: assessment/displayq2.php:2209 assessment/displayq2.php:2281
 msgid "Enter a list of vectors"
 msgstr "Geben Sie eine Liste von Vektoren ein"
 
@@ -2669,6 +2682,7 @@ msgstr "Geben Sie eine Liste von Vektoren ein"
 #: assess2/displayq3.php:2160 assess2/displayq3.php:2238
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:71
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:69
+#: assessment/displayq2.php:2211 assessment/displayq2.php:2283
 msgid "Enter your answer as a set of numbers.  Example: {1,2,3}"
 msgstr "Geben Sie Ihre ANtwort als Menge von Zahlen ein, Beispiel: {1,2,3}"
 
@@ -2676,6 +2690,7 @@ msgstr "Geben Sie Ihre ANtwort als Menge von Zahlen ein, Beispiel: {1,2,3}"
 #: assess2/displayq3.php:2161 assess2/displayq3.php:2239
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:72
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:70
+#: assessment/displayq2.php:2212 assessment/displayq2.php:2284
 msgid "Enter a set"
 msgstr "Geben Sie eine Menge ein"
 
@@ -2683,6 +2698,7 @@ msgstr "Geben Sie eine Menge ein"
 #: assess2/displayq3.php:2163 assess2/displayq3.php:2241
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:74
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:72
+#: assessment/displayq2.php:2214 assessment/displayq2.php:2286
 msgid ""
 "Enter your answer as a list of n-tuples of numbers separated with commas: "
 "Example: (1,2),(3.5172,4)"
@@ -2694,6 +2710,7 @@ msgstr ""
 #: assess2/displayq3.php:2164 assess2/displayq3.php:2242
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:75
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:73
+#: assessment/displayq2.php:2215 assessment/displayq2.php:2287
 msgid "Enter a list of n-tuples"
 msgstr "Geben Sie eine Liste von n-Tupeln ein"
 
@@ -2701,6 +2718,7 @@ msgstr "Geben Sie eine Liste von n-Tupeln ein"
 #: assess2/displayq3.php:2166 assess2/displayq3.php:2244
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:77
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:75
+#: assessment/displayq2.php:2217 assessment/displayq2.php:2289
 msgid "Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)"
 msgstr "Geben Sie Ihre Antwort als n-Tupel ein. Beispiel: (2, 5.5172)"
 
@@ -2708,19 +2726,20 @@ msgstr "Geben Sie Ihre Antwort als n-Tupel ein. Beispiel: (2, 5.5172)"
 #: assess2/displayq3.php:2167 assess2/displayq3.php:2245
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:78
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:76
+#: assessment/displayq2.php:2218 assessment/displayq2.php:2290
 msgid "Enter an n-tuple"
 msgstr "Geben Sie ein n-Tupel ein"
 
 #: assessment/displayq2.php:2218
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:79
-#: assess2/displayq3.php:2170
+#: assess2/displayq3.php:2170 assessment/displayq2.php:2221
 #, php-format
 msgid "Each value should be accurate to %d decimal places."
 msgstr "Jeder Wert sollte auf %d Nachkommastellen genau sein."
 
 #: assessment/displayq2.php:2219
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:80
-#: assess2/displayq3.php:2171
+#: assess2/displayq3.php:2171 assessment/displayq2.php:2222
 #, php-format
 msgid ", each value accurate to %d decimal places"
 msgstr ", jeder Wert auf %d Nachkommastellen genau"
@@ -2729,18 +2748,19 @@ msgstr ", jeder Wert auf %d Nachkommastellen genau"
 #: assess2/displayq3.php:2174 assess2/displayq3.php:2311
 #: assess2/questions/answerboxes/ComplexAnswerBox.php:61
 #: assess2/questions/answerboxes/NTupleAnswerBox.php:83
+#: assessment/displayq2.php:2225 assessment/displayq2.php:2353
 msgid "Enter DNE for Does Not Exist"
 msgstr "Geben Sie DNE (Does Not Exist) ein, wenn keine Antwort existiert"
 
 #: assessment/displayq2.php:2274
 #: assess2/questions/answerboxes/CalculatedNTupleAnswerBox.php:65
-#: assess2/displayq3.php:2232
+#: assess2/displayq3.php:2232 assessment/displayq2.php:2277
 msgid "Enter your answer as a vector.  Example: <2,5.5172>"
 msgstr "Geben Sie Ihre Antwort als Vektor ein. Beispiel: <2, 5.5172>"
 
 #: assessment/displayq2.php:2343
 #: assess2/questions/answerboxes/ComplexAnswerBox.php:54
-#: assess2/displayq3.php:2304
+#: assess2/displayq3.php:2304 assessment/displayq2.php:2346
 msgid ""
 "Enter your answer as a list of complex numbers in a+bi form separated with "
 "commas.  Example: 2+5.5172i,-3-4i"
@@ -2752,12 +2772,13 @@ msgstr ""
 #: assess2/displayq3.php:2305 assess2/displayq3.php:2368
 #: assess2/questions/answerboxes/CalculatedComplexAnswerBox.php:65
 #: assess2/questions/answerboxes/ComplexAnswerBox.php:55
+#: assessment/displayq2.php:2347 assessment/displayq2.php:2395
 msgid "Enter a list of complex numbers"
 msgstr "Geben Sie eine Liste von komplexen Zahlen ein"
 
 #: assessment/displayq2.php:2346
 #: assess2/questions/answerboxes/ComplexAnswerBox.php:57
-#: assess2/displayq3.php:2307
+#: assess2/displayq3.php:2307 assessment/displayq2.php:2349
 msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i"
 msgstr ""
 "Geben Sie Ihre Antwort als komplexe Zahl in a+bi Form ein. Beispiel: "
@@ -2767,12 +2788,13 @@ msgstr ""
 #: assess2/displayq3.php:2308 assess2/displayq3.php:2371
 #: assess2/questions/answerboxes/CalculatedComplexAnswerBox.php:68
 #: assess2/questions/answerboxes/ComplexAnswerBox.php:58
+#: assessment/displayq2.php:2350 assessment/displayq2.php:2398
 msgid "Enter a complex number"
 msgstr "Geben Sie eine komplexe Zahl ein"
 
 #: assessment/displayq2.php:2391
 #: assess2/questions/answerboxes/CalculatedComplexAnswerBox.php:64
-#: assess2/displayq3.php:2367
+#: assess2/displayq3.php:2367 assessment/displayq2.php:2394
 msgid ""
 "Enter your answer as a list of complex numbers in a+bi form separated with "
 "commas.  Example: 2+5i,-3-4i"
@@ -2782,14 +2804,14 @@ msgstr ""
 
 #: assessment/displayq2.php:2394
 #: assess2/questions/answerboxes/CalculatedComplexAnswerBox.php:67
-#: assess2/displayq3.php:2370
+#: assess2/displayq3.php:2370 assessment/displayq2.php:2397
 msgid "Enter your answer as a complex number in a+bi form.  Example: 2+5i"
 msgstr ""
 "Geben Sie Ihre Antwort als komplexe Zahl der Form a+bi ein. Beispiel: 2+5i"
 
 #: assessment/displayq2.php:2454
 #: assess2/questions/answerboxes/StringAnswerBox.php:60
-#: assess2/displayq3.php:2432
+#: assess2/displayq3.php:2432 assessment/displayq2.php:2457
 msgid ""
 "Enter your answer as a list of text separated by commas.  Example:  dog, "
 "cat, rabbit."
@@ -2799,13 +2821,13 @@ msgstr ""
 
 #: assessment/displayq2.php:2455
 #: assess2/questions/answerboxes/StringAnswerBox.php:61
-#: assess2/displayq3.php:2433
+#: assess2/displayq3.php:2433 assessment/displayq2.php:2458
 msgid "Enter a list of text"
 msgstr "Geben Sie eine Liste von Texten ein"
 
 #: assessment/displayq2.php:2457
 #: assess2/questions/answerboxes/StringAnswerBox.php:63
-#: assess2/displayq3.php:2435
+#: assess2/displayq3.php:2435 assessment/displayq2.php:2460
 msgid "Enter your answer as letters.  Examples: A B C, linear, a cat"
 msgstr ""
 "Geben Sie Ihre Antwort als Wort oder Wortfolge ein.  Beispiele: A B C, "
@@ -2813,19 +2835,19 @@ msgstr ""
 
 #: assessment/displayq2.php:2458
 #: assess2/questions/answerboxes/StringAnswerBox.php:64
-#: assess2/displayq3.php:2436
+#: assess2/displayq3.php:2436 assessment/displayq2.php:2461
 msgid "Enter text"
 msgstr "Geben Sie Text ein"
 
 #: assessment/displayq2.php:2563
 #: assess2/questions/answerboxes/StringAnswerBox.php:156
-#: assess2/displayq3.php:2555
+#: assess2/displayq3.php:2555 assessment/displayq2.php:2566
 msgid "The answer must match a specified pattern"
 msgstr "Die Antwort muss zu einem vorgegebenen Muster passen"
 
 #: assessment/displayq2.php:2667
 #: assess2/questions/answerboxes/EssayAnswerBox.php:99
-#: assess2/displayq3.php:2658
+#: assess2/displayq3.php:2658 assessment/displayq2.php:2670
 msgid "Enter your answer as text.  This question is not automatically graded."
 msgstr ""
 "Geben Sie Ihre Antwort als Text ein.  Diese Frage wird nicht automatisch "
@@ -2833,7 +2855,7 @@ msgstr ""
 
 #: assessment/displayq2.php:2683
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:60
-#: assess2/displayq3.php:2674
+#: assess2/displayq3.php:2674 assessment/displayq2.php:2686
 msgid ""
 "Enter your answer by selecting the shade type, and by clicking and dragging "
 "the sliders on the normal curve"
@@ -2843,13 +2865,13 @@ msgstr ""
 
 #: assessment/displayq2.php:2684
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:61
-#: assess2/displayq3.php:2675
+#: assess2/displayq3.php:2675 assessment/displayq2.php:2687
 msgid "Adjust the sliders"
 msgstr "Passen Sie die Schieberegler an"
 
 #: assessment/displayq2.php:2687
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:64
-#: assess2/displayq3.php:2678
+#: assess2/displayq3.php:2678 assessment/displayq2.php:2690
 msgid "Enter your answer using interval notation.  Example: [2.1,5.6172)"
 msgstr ""
 "Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2.1, 5.6172)"
@@ -2858,6 +2880,7 @@ msgstr ""
 #: assess2/displayq3.php:2679 assess2/displayq3.php:2793
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:71
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:65
+#: assessment/displayq2.php:2691 assessment/displayq2.php:2805
 msgid "Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)"
 msgstr ""
 "Benutzen Sie U (union) um Intervalle zu kombinieren.  Beispiel: (-oo,2] U [4,"
@@ -2866,14 +2889,16 @@ msgstr ""
 #: assessment/displayq2.php:2690 assessment/displayq2.php:8064
 #: assess2/displayq3.php:2681 assess2/displayq3.php:8136
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:67
-#: assess2/questions/answerboxhelpers.php:537
+#: assess2/questions/answerboxhelpers.php:537 assessment/displayq2.php:2693
+#: assessment/displayq2.php:8067
 msgid "Enter DNE for an empty set. Use oo to enter Infinity."
 msgstr "Geben Sie DNE für eine leere Menge oder oo für Unendlich ein."
 
 #: assessment/displayq2.php:2692 assessment/displayq2.php:8069
 #: assess2/displayq3.php:2683 assess2/displayq3.php:8141
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:69
-#: assess2/questions/answerboxhelpers.php:542
+#: assess2/questions/answerboxhelpers.php:542 assessment/displayq2.php:2695
+#: assessment/displayq2.php:8072
 msgid "Use oo to enter Infinity."
 msgstr "Benutze oo um Unendlich einzugeben."
 
@@ -2881,49 +2906,50 @@ msgstr "Benutze oo um Unendlich einzugeben."
 #: assess2/displayq3.php:2688 assess2/displayq3.php:2794
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:72
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:74
+#: assessment/displayq2.php:2700 assessment/displayq2.php:2806
 msgid "Enter an interval using interval notation"
 msgstr "Geben Sie ein Intervall in Intervallschreibweise ein"
 
 #: assessment/displayq2.php:2701
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:79
-#: assess2/displayq3.php:2692
+#: assess2/displayq3.php:2692 assessment/displayq2.php:2704
 msgid "Left of a value"
 msgstr "Links von einem Wert"
 
 #: assessment/displayq2.php:2701
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:79
-#: assess2/displayq3.php:2692
+#: assess2/displayq3.php:2692 assessment/displayq2.php:2704
 msgid "Right of a value"
 msgstr "Rechts von einem Wert"
 
 #: assessment/displayq2.php:2702
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:80
-#: assess2/displayq3.php:2693
+#: assess2/displayq3.php:2693 assessment/displayq2.php:2705
 msgid "Between two values"
 msgstr "Zwischen zwei Werten"
 
 #: assessment/displayq2.php:2702
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:80
-#: assess2/displayq3.php:2693
+#: assess2/displayq3.php:2693 assessment/displayq2.php:2705
 msgid "2 regions"
 msgstr "2 Bereiche"
 
 #: assessment/displayq2.php:2702
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:80
-#: assess2/displayq3.php:2693
+#: assess2/displayq3.php:2693 assessment/displayq2.php:2705
 msgid "Click and drag the arrows to adjust the values."
 msgstr "Klicken und ziehen Sie die Pfeile, um die Werte anzupassen."
 
 #: assessment/displayq2.php:2719
 #: assess2/questions/answerboxes/IntervalAnswerBox.php:96
-#: assess2/displayq3.php:2709
+#: assess2/displayq3.php:2709 assessment/displayq2.php:2722
 msgid "Enter an interval corresponding to the region to be shaded"
 msgstr ""
 "Geben Sie ein Intervall für den Bereich ein, der schattiert werden soll"
 
 #: assessment/displayq2.php:2792
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:61
-#: assess2/displayq3.php:2783
+#: assess2/displayq3.php:2783 assessment/displayq2.php:2795
 #, php-format
 msgid ""
 "Enter your answer using inequality notation.  Example: 3 &lt;= %s &lt; 4"
@@ -2932,7 +2958,7 @@ msgstr ""
 
 #: assessment/displayq2.php:2793
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:62
-#: assess2/displayq3.php:2784
+#: assess2/displayq3.php:2784 assessment/displayq2.php:2796
 #, php-format
 msgid "Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3"
 msgstr ""
@@ -2940,61 +2966,61 @@ msgstr ""
 
 #: assessment/displayq2.php:2794
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:63
-#: assess2/displayq3.php:2785
+#: assess2/displayq3.php:2785 assessment/displayq2.php:2797
 msgid "Enter <i>all real numbers</i> for solutions of that type"
 msgstr "Geben Sie <i>alle realen Zahlen</i> für Lösungen dieses Typs ein"
 
 #: assessment/displayq2.php:2795
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:64
-#: assess2/displayq3.php:2786
+#: assess2/displayq3.php:2786 assessment/displayq2.php:2798
 msgid "Enter an interval using inequalities"
 msgstr "Geben Sie ein Intervall mit Ungleichungen an"
 
 #: assessment/displayq2.php:2797
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:66
-#: assess2/displayq3.php:2788
+#: assess2/displayq3.php:2788 assessment/displayq2.php:2800
 msgid "Enter your answer using interval notation.  Example: [2,5)"
 msgstr "Geben Sie Ihre Antwort in Intervallschreibweise ein. Beispiel: [2, 5)"
 
 #: assessment/displayq2.php:2799
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:68
-#: assess2/displayq3.php:2790
+#: assess2/displayq3.php:2790 assessment/displayq2.php:2802
 msgid "Separate intervals by a comma.  Example: (-oo,2],[4,oo)"
 msgstr "Trennen Sie Intervalle mit Kommata. Beispiel: (-oo,2],84,oo)"
 
 #: assessment/displayq2.php:2800
 #: assess2/questions/answerboxes/CalculatedIntervalAnswerBox.php:69
-#: assess2/displayq3.php:2791
+#: assess2/displayq3.php:2791 assessment/displayq2.php:2803
 msgid "Enter a list of intervals using interval notation"
 msgstr "Geben Sie eine Liste von Intervallen in Intervallschreibweise ein"
 
 #: assessment/displayq2.php:3054
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:252
-#: assess2/displayq3.php:3050
+#: assess2/displayq3.php:3050 assessment/displayq2.php:3057
 msgid "Graph to add drawings to:"
 msgstr "Graph, zu dem Zeichnungen hinzugefügt werden:"
 
 #: assessment/displayq2.php:3056
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:254
-#: assess2/displayq3.php:3052
+#: assess2/displayq3.php:3052 assessment/displayq2.php:3059
 msgid "Elements to draw:"
 msgstr "Zu zeichnende Elemente:"
 
 #: assessment/displayq2.php:3058
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:256
-#: assess2/displayq3.php:3054
+#: assess2/displayq3.php:3054 assessment/displayq2.php:3061
 msgid "Add new drawing element"
 msgstr "Neues Zeichenelement hinzufügen"
 
 #: assessment/displayq2.php:3080
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:275
-#: assess2/displayq3.php:3073
+#: assess2/displayq3.php:3073 assessment/displayq2.php:3083
 msgid "Clear All"
 msgstr "Alles leeren"
 
 #: assessment/displayq2.php:3084
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:279
-#: assess2/displayq3.php:3077
+#: assess2/displayq3.php:3077 assessment/displayq2.php:3087
 msgid "Draw:"
 msgstr "Zeichnen:"
 
@@ -3002,37 +3028,37 @@ msgstr "Zeichnen:"
 #: javascript/assessment_min.js:5 javascript/drawing.js:218
 #: javascript/drawing_min.js:1
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:438
-#: assess2/displayq3.php:3236
+#: assess2/displayq3.php:3236 assessment/displayq2.php:3246
 msgid "Line"
 msgstr "Linie"
 
 #: assessment/displayq2.php:3245
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:440
-#: assess2/displayq3.php:3238
+#: assess2/displayq3.php:3238 assessment/displayq2.php:3248
 msgid "Line Segment"
 msgstr "Liniensegment"
 
 #: assessment/displayq2.php:3247
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:442
-#: assess2/displayq3.php:3240
+#: assess2/displayq3.php:3240 assessment/displayq2.php:3250
 msgid "Freehand Draw"
 msgstr "Freihandzeichnen"
 
 #: assessment/displayq2.php:3249
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:444
-#: assess2/displayq3.php:3242
+#: assess2/displayq3.php:3242 assessment/displayq2.php:3252
 msgid "Eraser"
 msgstr "Radiergummi"
 
 #: assessment/displayq2.php:3252
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:447
-#: assess2/displayq3.php:3245
+#: assess2/displayq3.php:3245 assessment/displayq2.php:3255
 msgid "Dot"
 msgstr "Punkt"
 
 #: assessment/displayq2.php:3254
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:449
-#: assess2/displayq3.php:3247
+#: assess2/displayq3.php:3247 assessment/displayq2.php:3257
 msgid "Open Dot"
 msgstr "Offener Punkt"
 
@@ -3042,23 +3068,24 @@ msgstr "Offener Punkt"
 #: javascript/drawing_min.js:1 assess2/displayq3.php:3252
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:451
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:454
-#: assess2/displayq3.php:3249
+#: assess2/displayq3.php:3249 assessment/displayq2.php:3262
 msgid "Polygon"
 msgstr "Vieleck"
 
 #: assessment/displayq2.php:3310
 #: assess2/questions/answerboxes/DrawingAnswerBox.php:507
-#: assess2/displayq3.php:3304
+#: assess2/displayq3.php:3304 assessment/displayq2.php:3313
 msgid "Enter your answer by drawing on the graph."
 msgstr "Geben Sie Ihre Antwort ein, indem Sie zeichnen."
 
 #: assessment/displayq2.php:3527 assess2/displayq3.php:3510
+#: assessment/displayq2.php:3530
 msgid "Last file uploaded:"
 msgstr "Zuletzt hochgeladene Datei:"
 
 #: assessment/displayq2.php:3538
 #: assess2/questions/answerboxes/FileUploadAnswerBox.php:108
-#: assess2/displayq3.php:3525
+#: assess2/displayq3.php:3525 assessment/displayq2.php:3541
 msgid "Select a file to upload"
 msgstr "Wählen Sie eine Datei zum Hochladen aus"
 
@@ -3066,6 +3093,7 @@ msgstr "Wählen Sie eine Datei zum Hochladen aus"
 #: assess2/displayq3.php:3823 assess2/displayq3.php:3877
 #: assess2/questions/scorepart/ChoicesScorePart.php:52
 #: assess2/questions/scorepart/MultipleAnswerScorePart.php:44
+#: assessment/displayq2.php:3836 assessment/displayq2.php:3890
 msgid ""
 "Eeek!  $questions is not defined or needs to be an array.  Make sure "
 "$questions is defined in the Common Control section."
@@ -3075,7 +3103,7 @@ msgstr ""
 
 #: assessment/displayq2.php:3944
 #: assess2/questions/scorepart/MatchingScorePart.php:45
-#: assess2/displayq3.php:3934
+#: assess2/displayq3.php:3934 assessment/displayq2.php:3947
 msgid ""
 "Eeek!  $questions or $answers is not defined or needs to be an array.  Make "
 "sure both are defined in the Common Control section."
@@ -3088,6 +3116,7 @@ msgstr ""
 #: assess2/questions/scorepart/CalculatedScorePart.php:113
 #: assess2/displayq3.php:4617
 #: assess2/questions/scorepart/CalculatedScorePart.php:117
+#: assessment/displayq2.php:4689
 msgid "Debug info: empty, missing or invalid $answer"
 msgstr "Debuginfo: leeres, fehlendes oder ungültiges $answer"
 
@@ -3095,12 +3124,13 @@ msgstr "Debuginfo: leeres, fehlendes oder ungültiges $answer"
 #: assess2/questions/scorepart/CalculatedScorePart.php:133
 #: assess2/displayq3.php:4636
 #: assess2/questions/scorepart/CalculatedScorePart.php:141
+#: assessment/displayq2.php:4708
 msgid "Debug info: empty, missing, or invalid $answer"
 msgstr "Debuginfo: leere, fehlende oder ungültiges $answer"
 
 #: assessment/displayq2.php:5107
 #: assess2/questions/scorepart/FunctionExpressionScorePart.php:309
-#: assess2/displayq3.php:5092
+#: assess2/displayq3.php:5092 assessment/displayq2.php:5110
 msgid ""
 "Debug info: function evaled to Not-a-number at all test points.  Check "
 "$domain"
@@ -3111,11 +3141,13 @@ msgstr ""
 #: assessment/displayq2.php:7360 assessment/displayq2.php:7446
 #: assess2/displayq3.php:7321 assess2/displayq3.php:7407
 #: assess2/questions/scorepart/FileScorePart.php:133
+#: assessment/displayq2.php:7363 assessment/displayq2.php:7449
 msgid " Unable to open Excel file"
 msgstr " Kann Excel Datei nicht öffnen"
 
 #: assessment/displayq2.php:7380
 #: assess2/questions/scorepart/FileScorePart.php:80 assess2/displayq3.php:7341
+#: assessment/displayq2.php:7383
 #, php-format
 msgid "Upload of %s: "
 msgstr "Hochladen von %s: "
@@ -3124,6 +3156,7 @@ msgstr "Hochladen von %s: "
 #: assess2/displayq3.php:7343 assess2/displayq3.php:7344
 #: assess2/questions/scorepart/FileScorePart.php:82
 #: assess2/questions/scorepart/FileScorePart.php:83
+#: assessment/displayq2.php:7385 assessment/displayq2.php:7386
 msgid "Error - Invalid file type"
 msgstr "Fehler - Ungültiger Dateityp"
 
@@ -3131,6 +3164,7 @@ msgstr "Fehler - Ungültiger Dateityp"
 #: assess2/displayq3.php:7385 assess2/displayq3.php:7386
 #: assess2/questions/scorepart/FileScorePart.php:109
 #: assess2/questions/scorepart/FileScorePart.php:110
+#: assessment/displayq2.php:7427 assessment/displayq2.php:7428
 msgid "Error - no asid"
 msgstr "Fehler - keine asid"
 
@@ -3138,11 +3172,13 @@ msgstr "Fehler - keine asid"
 #: assess2/displayq3.php:7390 assess2/displayq3.php:7391
 #: assess2/questions/scorepart/FileScorePart.php:115
 #: assess2/questions/scorepart/FileScorePart.php:116
+#: assessment/displayq2.php:7432 assessment/displayq2.php:7433
 msgid "Error - File not uploaded in preview"
 msgstr "Fehler - Datei nicht in Vorschau hochgeladen"
 
 #: assessment/displayq2.php:7454
 #: assess2/questions/scorepart/FileScorePart.php:142 assess2/displayq3.php:7415
+#: assessment/displayq2.php:7457
 msgid "Successful"
 msgstr "Erfolgreich"
 
@@ -3150,6 +3186,7 @@ msgstr "Erfolgreich"
 #: assess2/displayq3.php:7419 assess2/displayq3.php:7420
 #: assess2/questions/scorepart/FileScorePart.php:146
 #: assess2/questions/scorepart/FileScorePart.php:147
+#: assessment/displayq2.php:7461 assessment/displayq2.php:7462
 msgid "Error storing file"
 msgstr "Fehler beim Speichern der Datei"
 
@@ -3157,6 +3194,7 @@ msgstr "Fehler beim Speichern der Datei"
 #: assess2/displayq3.php:7427 assess2/displayq3.php:7428
 #: assess2/questions/scorepart/FileScorePart.php:155
 #: assess2/questions/scorepart/FileScorePart.php:156
+#: assessment/displayq2.php:7469 assessment/displayq2.php:7470
 msgid "Error uploading file - file too big"
 msgstr "Fehler beim Hochladen der Datei - Datei zu groß"
 
@@ -3164,6 +3202,7 @@ msgstr "Fehler beim Hochladen der Datei - Datei zu groß"
 #: assess2/displayq3.php:7430 assess2/displayq3.php:7431
 #: assess2/questions/scorepart/FileScorePart.php:158
 #: assess2/questions/scorepart/FileScorePart.php:159
+#: assessment/displayq2.php:7472 assessment/displayq2.php:7473
 msgid "Error uploading file"
 msgstr "Fehler beim Hochladen der Datei"
 
@@ -3172,6 +3211,8 @@ msgstr "Fehler beim Hochladen der Datei"
 #: javascript/assess2_min.js:2 javascript/assessment_min.js:3
 #: assess2/displayq3.php:7751 assess2/questions/answerboxhelpers.php:148
 #: assess2/questions/scorepart/ComplexScorePart.php:228
+#: assess2/questions/scorepart/ComplexScorePart.php:245
+#: assessment/displayq2.php:7800
 msgid "error - more than 1 i in expression"
 msgstr "Fehler - mehr als ein i im Ausdruck"
 
@@ -3193,11 +3234,17 @@ msgstr "Fehler - mehr als ein i im Ausdruck"
 #: assess2/questions/scorepart/ComplexScorePart.php:280
 #: assess2/questions/scorepart/ComplexScorePart.php:290
 #: assess2/displayq3.php:7773
+#: assess2/questions/scorepart/ComplexScorePart.php:267
+#: assess2/questions/scorepart/ComplexScorePart.php:283
+#: assess2/questions/scorepart/ComplexScorePart.php:297
+#: assess2/questions/scorepart/ComplexScorePart.php:307
+#: assessment/displayq2.php:7822 assessment/displayq2.php:7838
+#: assessment/displayq2.php:7852 assessment/displayq2.php:7862
 msgid "error - invalid form"
 msgstr "Fehler - ungültige Form"
 
 #: assessment/displayq2.php:8012 assess2/questions/answerboxhelpers.php:485
-#: assess2/displayq3.php:8084
+#: assess2/displayq3.php:8084 assessment/displayq2.php:8015
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4) or as an integer (like 4 or -2)"
@@ -3206,18 +3253,18 @@ msgstr ""
 "-2) ein"
 
 #: assessment/displayq2.php:8013 assess2/questions/answerboxhelpers.php:486
-#: assess2/displayq3.php:8085
+#: assess2/displayq3.php:8085 assessment/displayq2.php:8016
 #, php-format
 msgid "Enter a %s of fractions or integers"
 msgstr "Geben Sie ein %s von Brüchen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:8013 assess2/questions/answerboxhelpers.php:486
-#: assess2/displayq3.php:8085
+#: assess2/displayq3.php:8085 assessment/displayq2.php:8016
 msgid "Enter a fraction or integer"
 msgstr "Geben Sie einen Bruch oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8016 assess2/questions/answerboxhelpers.php:489
-#: assess2/displayq3.php:8088
+#: assess2/displayq3.php:8088 assessment/displayq2.php:8019
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6), as an integer (like 4 "
@@ -3227,20 +3274,20 @@ msgstr ""
 "Zahl (wie 4 oder -2), oder als Dezimalzahl (wie 0.5 oder 1.25) ein"
 
 #: assessment/displayq2.php:8017 assess2/questions/answerboxhelpers.php:490
-#: assess2/displayq3.php:8089
+#: assess2/displayq3.php:8089 assessment/displayq2.php:8020
 #, php-format
 msgid "Enter a %s of reduced fractions, integers, or exact decimals"
 msgstr ""
 "Geben Sie ein %s von gekürzten Brüchen, Ganzzahlen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:8017 assess2/questions/answerboxhelpers.php:490
-#: assess2/displayq3.php:8089
+#: assess2/displayq3.php:8089 assessment/displayq2.php:8020
 msgid "Enter a reduced fraction, integer, or exact decimal"
 msgstr ""
 "Geben Sie einen gekürzten Bruch, eine ganze Zahl oder eine Dezimalzahl ein"
 
 #: assessment/displayq2.php:8019 assess2/questions/answerboxhelpers.php:492
-#: assess2/displayq3.php:8091
+#: assess2/displayq3.php:8091 assessment/displayq2.php:8022
 #, php-format
 msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6) or as an integer (like 4 "
@@ -3250,18 +3297,18 @@ msgstr ""
 "(z.B. 4 oder -2) ein"
 
 #: assessment/displayq2.php:8020 assess2/questions/answerboxhelpers.php:493
-#: assess2/displayq3.php:8092
+#: assess2/displayq3.php:8092 assessment/displayq2.php:8023
 #, php-format
 msgid "Enter a %s of reduced fractions or integers"
 msgstr "Geben Sie ein %s von gekürzten Brüchen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:8020 assess2/questions/answerboxhelpers.php:493
-#: assess2/displayq3.php:8092
+#: assess2/displayq3.php:8092 assessment/displayq2.php:8023
 msgid "Enter a reduced fraction or integer"
 msgstr "Geben Sie einen gekürzten Bruch oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8024 assess2/questions/answerboxhelpers.php:497
-#: assess2/displayq3.php:8096
+#: assess2/displayq3.php:8096 assessment/displayq2.php:8027
 #, php-format
 msgid ""
 "Enter %s as a mixed number or as an integer.  Example: 2 1/2 = 2 &frac12;"
@@ -3270,7 +3317,7 @@ msgstr ""
 "&frac12;"
 
 #: assessment/displayq2.php:8026 assess2/questions/answerboxhelpers.php:499
-#: assess2/displayq3.php:8098
+#: assess2/displayq3.php:8098 assessment/displayq2.php:8029
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number or as an integer.  Example: 2 1/2 = 2 "
@@ -3280,18 +3327,18 @@ msgstr ""
 "2 1/2 = 2 &frac12;"
 
 #: assessment/displayq2.php:8028 assess2/questions/answerboxhelpers.php:501
-#: assess2/displayq3.php:8100
+#: assess2/displayq3.php:8100 assessment/displayq2.php:8031
 #, php-format
 msgid "Enter a %s of mixed numbers or integers"
 msgstr "Geben Sie ein %s von gemischten oder ganze Zahlen ein"
 
 #: assessment/displayq2.php:8028 assess2/questions/answerboxhelpers.php:501
-#: assess2/displayq3.php:8100
+#: assess2/displayq3.php:8100 assessment/displayq2.php:8031
 msgid "Enter a mixed number or integer"
 msgstr "Geben Sie eine gemischte oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8031 assess2/questions/answerboxhelpers.php:504
-#: assess2/displayq3.php:8103
+#: assess2/displayq3.php:8103 assessment/displayq2.php:8034
 #, php-format
 msgid ""
 "Enter %s as a mixed number, proper or improper fraction, or as an integer.  "
@@ -3303,20 +3350,20 @@ msgstr ""
 #: assessment/displayq2.php:8032 assessment/displayq2.php:8035
 #: assess2/displayq3.php:8104 assess2/displayq3.php:8107
 #: assess2/questions/answerboxhelpers.php:505
-#: assess2/questions/answerboxhelpers.php:508
+#: assess2/questions/answerboxhelpers.php:508 assessment/displayq2.php:8038
 #, php-format
 msgid "Enter a %s of mixed numbers, fractions, or integers"
 msgstr "Geben Sie ein %s von gemischten Zahlen, Brüchen oder ganzen Zahlen ein"
 
 #: assessment/displayq2.php:8032 assess2/questions/answerboxhelpers.php:505
-#: assess2/displayq3.php:8104
+#: assess2/displayq3.php:8104 assessment/displayq2.php:8035
 msgid "Enter a mixed number, proper or improper fraction, or integer"
 msgstr ""
 "Geben Sie eine gemischte Zahl, einen echten oder unechten Bruch oder eine "
 "ganze Zahl ein"
 
 #: assessment/displayq2.php:8034 assess2/questions/answerboxhelpers.php:507
-#: assess2/displayq3.php:8106
+#: assess2/displayq3.php:8106 assessment/displayq2.php:8037
 #, php-format
 msgid ""
 "Enter %s as a reduced mixed number, reduced proper or improper fraction, or "
@@ -3326,14 +3373,14 @@ msgstr ""
 "Zahl ein. Kürzen Sie soweit wie möglich. Beispiel: 2 1/2 = 2 &frac12;"
 
 #: assessment/displayq2.php:8035 assess2/questions/answerboxhelpers.php:508
-#: assess2/displayq3.php:8107
+#: assess2/displayq3.php:8107 assessment/displayq2.php:8038
 msgid "Enter a reduced mixed number, proper or improper fraction, or integer"
 msgstr ""
 "Geben Sie eine gekürzte gemischte Zahl, einen echten oder unechten Bruch "
 "oder eine ganze Zahl ein"
 
 #: assessment/displayq2.php:8039 assess2/questions/answerboxhelpers.php:512
-#: assess2/displayq3.php:8111
+#: assess2/displayq3.php:8111 assessment/displayq2.php:8042
 #, php-format
 msgid ""
 "Enter %s as a mixed number (like 2 1/2), fraction (like 3/5), an integer "
@@ -3343,18 +3390,18 @@ msgstr ""
 "ganze Zahl (z.B. 4 oder -2) oder Dezimalzahl (z.B. 0.5 oder 1.25) ein"
 
 #: assessment/displayq2.php:8040 assess2/questions/answerboxhelpers.php:513
-#: assess2/displayq3.php:8112
+#: assess2/displayq3.php:8112 assessment/displayq2.php:8043
 #, php-format
 msgid "Enter a %s of mixed numbers, fractions, or exact decimals"
 msgstr "Geben Sie ein %s von gemischten Zahlen, Brüchen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:8040 assess2/questions/answerboxhelpers.php:513
-#: assess2/displayq3.php:8112
+#: assess2/displayq3.php:8112 assessment/displayq2.php:8043
 msgid "Enter a mixed number, fraction, or exact decimal"
 msgstr "Geben Sie eine gemischte Zahl, einen Bruch oder eine Dezimalzahl ein"
 
 #: assessment/displayq2.php:8042 assess2/questions/answerboxhelpers.php:515
-#: assess2/displayq3.php:8114
+#: assess2/displayq3.php:8114 assessment/displayq2.php:8045
 #, php-format
 msgid ""
 "Enter %s as a fraction (like 3/5 or 10/4), an integer (like 4 or -2), or "
@@ -3364,36 +3411,36 @@ msgstr ""
 "oder als Dezimalzahl (z.B. 0.5 oder 1.25) ein"
 
 #: assessment/displayq2.php:8043 assess2/questions/answerboxhelpers.php:516
-#: assess2/displayq3.php:8115
+#: assess2/displayq3.php:8115 assessment/displayq2.php:8046
 #, php-format
 msgid "Enter a %s of fractions or exact decimals"
 msgstr "Geben Sie ein %s von Brüchen oder Ganzzahlen ein"
 
 #: assessment/displayq2.php:8043 assess2/questions/answerboxhelpers.php:516
-#: assess2/displayq3.php:8115
+#: assess2/displayq3.php:8115 assessment/displayq2.php:8046
 msgid "Enter a fraction or exact decimal"
 msgstr "Geben Sie einen Bruch oder eine genaue Dezimalzahl ein"
 
 #: assessment/displayq2.php:8046 assess2/questions/answerboxhelpers.php:519
-#: assess2/displayq3.php:8118
+#: assess2/displayq3.php:8118 assessment/displayq2.php:8049
 #, php-format
 msgid "Enter %s as an integer or decimal value (like 5 or 3.72)"
 msgstr ""
 "Geben Sie %s als ganze Zahl oder als Dezimalzahl (z.B. 5 oder 6.72) ein"
 
 #: assessment/displayq2.php:8047 assess2/questions/answerboxhelpers.php:520
-#: assess2/displayq3.php:8119
+#: assess2/displayq3.php:8119 assessment/displayq2.php:8050
 #, php-format
 msgid "Enter a %s of integer or decimal values"
 msgstr "Geben Sie eine %s  von ganzen Zahlen oder Dezimalzahlen ein"
 
 #: assessment/displayq2.php:8047 assess2/questions/answerboxhelpers.php:520
-#: assess2/displayq3.php:8119
+#: assess2/displayq3.php:8119 assessment/displayq2.php:8050
 msgid "Enter an integer or decimal value"
 msgstr "Geben Sie eine ganze Zahl oder eine Dezimalzahl ein"
 
 #: assessment/displayq2.php:8049 assess2/questions/answerboxhelpers.php:522
-#: assess2/displayq3.php:8121
+#: assess2/displayq3.php:8121 assessment/displayq2.php:8052
 #, php-format
 msgid ""
 "Enter %s as a decimal or in scientific notation.  Example: 3*10^2 = 3 "
@@ -3403,7 +3450,7 @@ msgstr ""
 "Beispiel: 3*10^2 = 3 &middot; 10<sup>2</sup>"
 
 #: assessment/displayq2.php:8050 assess2/questions/answerboxhelpers.php:523
-#: assess2/displayq3.php:8122
+#: assess2/displayq3.php:8122 assessment/displayq2.php:8053
 #, php-format
 msgid "Enter a %s of numbers using decimals or scientific notation"
 msgstr ""
@@ -3411,14 +3458,14 @@ msgstr ""
 "Notation ein"
 
 #: assessment/displayq2.php:8050 assess2/questions/answerboxhelpers.php:523
-#: assess2/displayq3.php:8122
+#: assess2/displayq3.php:8122 assessment/displayq2.php:8053
 msgid "Enter a number using decimals or scientific notation"
 msgstr ""
 "Geben Sie eine Zahl als Dezimalzahl oder in wissenschaftlicher Schreibweise "
 "ein"
 
 #: assessment/displayq2.php:8052 assess2/questions/answerboxhelpers.php:525
-#: assess2/displayq3.php:8124
+#: assess2/displayq3.php:8124 assessment/displayq2.php:8055
 #, php-format
 msgid ""
 "Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</"
@@ -3428,18 +3475,18 @@ msgstr ""
 "&middot; 10<sup>2</sup>"
 
 #: assessment/displayq2.php:8053 assess2/questions/answerboxhelpers.php:526
-#: assess2/displayq3.php:8125
+#: assess2/displayq3.php:8125 assessment/displayq2.php:8056
 #, php-format
 msgid "Enter a %s of numbers using scientific notation"
 msgstr "Geben Sie ein %s von Zahlen in wissenschaftlicher Notation ein"
 
 #: assessment/displayq2.php:8053 assess2/questions/answerboxhelpers.php:526
-#: assess2/displayq3.php:8125
+#: assess2/displayq3.php:8125 assessment/displayq2.php:8056
 msgid "Enter a number using scientific notation"
 msgstr "Geben Sie eine Zahl in wissenschaftlicher Schreibweise ein"
 
 #: assessment/displayq2.php:8055 assess2/questions/answerboxhelpers.php:528
-#: assess2/displayq3.php:8127
+#: assess2/displayq3.php:8127 assessment/displayq2.php:8058
 #, php-format
 msgid ""
 "Enter %s as a number (like 5, -3, 2.2172) or as a calculation (like 5/3, "
@@ -3449,85 +3496,88 @@ msgstr ""
 "5/3, 2^3, 5+4) ein."
 
 #: assessment/displayq2.php:8056 assess2/questions/answerboxhelpers.php:529
-#: assess2/displayq3.php:8128
+#: assess2/displayq3.php:8128 assessment/displayq2.php:8059
 #, php-format
 msgid "Enter a %s of mathematical expressions"
 msgstr "Geben sie ein %s von mathematischen Ausdrücken ein"
 
 #: assessment/displayq2.php:8056 assess2/questions/answerboxhelpers.php:529
-#: assess2/displayq3.php:8128
+#: assess2/displayq3.php:8128 assessment/displayq2.php:8059
 msgid "Enter a mathematical expression"
 msgstr "Geben Sie einen mathematischen Ausdruck ein"
 
 #: assessment/displayq2.php:8059 assess2/questions/answerboxhelpers.php:532
-#: assess2/displayq3.php:8131
+#: assess2/displayq3.php:8131 assessment/displayq2.php:8062
 msgid "Do not enter mixed numbers"
 msgstr "Keine gemischten Zahlen eingeben"
 
 #: assessment/displayq2.php:8060 assess2/questions/answerboxhelpers.php:533
-#: assess2/displayq3.php:8132
+#: assess2/displayq3.php:8132 assessment/displayq2.php:8063
 msgid " (no mixed numbers)"
 msgstr " (keine gemischten Zahlen)"
 
 #: assessment/displayq2.php:8072 assess2/questions/answerboxhelpers.php:545
-#: assess2/displayq3.php:8144
+#: assess2/displayq3.php:8144 assessment/displayq2.php:8075
 msgid "Decimal values are not allowed"
 msgstr "Dezimalwerte sind nicht erlaubt"
 
 #: assessment/displayq2.php:8075 assess2/questions/answerboxhelpers.php:548
-#: assess2/displayq3.php:8147
+#: assess2/displayq3.php:8147 assessment/displayq2.php:8078
 #, php-format
 msgid "Enter %s accurate to the nearest integer."
 msgstr "Geben Sie %s mit einer Genauigkeit bis zur nächsten ganzen Zahl ein."
 
 #: assessment/displayq2.php:8077 assess2/questions/answerboxhelpers.php:550
-#: assess2/displayq3.php:8149
+#: assess2/displayq3.php:8149 assessment/displayq2.php:8080
 #, php-format
 msgid "Enter %s accurate to %d decimal places."
 msgstr "Geben Sie %s auf %d Nachkommastellen genau ein."
 
 #: assessment/displayq2.php:8081 assess2/questions/answerboxhelpers.php:554
-#: assess2/displayq3.php:8153
+#: assess2/displayq3.php:8153 assessment/displayq2.php:8084
 msgid "Trig functions (sin,cos,etc.) are not allowed"
 msgstr "Trigonometrische Funktionen (sin, cos, etc.) sind nicht erlaubt"
 
 #: assessment/displayq2.php:8100
 #: assess2/questions/QuestionHtmlGenerator.php:1130
 #: assess2/questions/answerboxhelpers.php:573 assess2/displayq3.php:8172
+#: assessment/displayq2.php:8103
 msgid "Correct answer, but wrong format"
 msgstr "Richtige Antwort, aber falsches Format"
 
 #: assessment/displayq2.php:8111 assessment/displayq2.php:8170
 #: assess2/displayq3.php:8183 assess2/displayq3.php:8242
 #: assess2/questions/answerboxhelpers.php:585
-#: assess2/questions/answerboxhelpers.php:650
+#: assess2/questions/answerboxhelpers.php:650 assessment/displayq2.php:8114
+#: assessment/displayq2.php:8173
 msgid "No solution"
 msgstr "Keine Lösung"
 
 #: assessment/displayq2.php:8112 assessment/displayq2.php:8171
 #: assess2/displayq3.php:8184 assess2/displayq3.php:8243
 #: assess2/questions/answerboxhelpers.php:586
-#: assess2/questions/answerboxhelpers.php:651
+#: assess2/questions/answerboxhelpers.php:651 assessment/displayq2.php:8115
+#: assessment/displayq2.php:8174
 msgid "Infinite number of solutions"
 msgstr "Unendlich viele Lösungen"
 
 #: assessment/displayq2.php:8116 assess2/questions/answerboxhelpers.php:590
-#: assess2/displayq3.php:8188
+#: assess2/displayq3.php:8188 assessment/displayq2.php:8119
 msgid "One or more solutions: "
 msgstr "Eine oder mehrere Lösungen: "
 
 #: assessment/displayq2.php:8118 assess2/questions/answerboxhelpers.php:592
-#: assess2/displayq3.php:8190
+#: assess2/displayq3.php:8190 assessment/displayq2.php:8121
 msgid "Interval notation solution: "
 msgstr "Lösung in Intervallschreibweise: "
 
 #: assessment/displayq2.php:8120 assess2/questions/answerboxhelpers.php:594
-#: assess2/displayq3.php:8192
+#: assess2/displayq3.php:8192 assessment/displayq2.php:8123
 msgid "Inequality notation solution: "
 msgstr "Lösung als Ungleichung: "
 
 #: assessment/displayq2.php:8122 assess2/questions/answerboxhelpers.php:596
-#: assess2/displayq3.php:8194
+#: assess2/displayq3.php:8194 assessment/displayq2.php:8125
 msgid "One solution: "
 msgstr "Eine Lösung: "
 
@@ -3638,34 +3688,42 @@ msgid "Text label, color %s, at %s reading: %s"
 msgstr "Angezeigter Text, Farbe %s, bei %s gelesen: %s"
 
 #: assessment/macros.php:2272 assessment/macros.php:2295
+#: assessment/macros.php:2304
 msgid "he"
 msgstr "er"
 
 #: assessment/macros.php:2272 assessment/macros.php:2295
+#: assessment/macros.php:2304
 msgid "him"
 msgstr "ihm"
 
 #: assessment/macros.php:2272 assessment/macros.php:2295
+#: assessment/macros.php:2304
 msgid "his"
 msgstr "sein"
 
 #: assessment/macros.php:2274 assessment/macros.php:2297
+#: assessment/macros.php:2306
 msgid "she"
 msgstr "sie"
 
 #: assessment/macros.php:2274 assessment/macros.php:2297
+#: assessment/macros.php:2306
 msgid "her"
 msgstr "ihr(e)"
 
 #: assessment/macros.php:2274 assessment/macros.php:2297
+#: assessment/macros.php:2306
 msgid "hers"
 msgstr "ihre"
 
 #: assessment/macros.php:3392 assessment/macros.php:3415
+#: assessment/macros.php:3428
 msgid "No answer selected. Try again."
 msgstr "Keine Antwort ausgewählt. Bitte erneut versuchen."
 
 #: assessment/macros.php:3430 assessment/macros.php:3453
+#: assessment/macros.php:3466
 msgid "This answer does not appear to be a valid number."
 msgstr "Diese Antwort scheint keine gültige Zahl zu sein."
 
@@ -10306,7 +10364,7 @@ msgid "Edit Question"
 msgstr "Frage bearbeiten"
 
 #: course/testquestion.php:316 course/testquestion2.php:389
-#: assess2/gbloadassess.php:194
+#: assess2/gbloadassess.php:194 assess2/gbloadassess.php:198
 msgid "to report problems"
 msgstr "um Probleme zu melden"
 
@@ -13107,3 +13165,12 @@ msgid ""
 msgstr ""
 "Zu diesem Zeipunkt werden aus Datenschutzgründen alle Daten der Studierenden "
 "in diesem Kurs gelöscht; der Kurs selbst wird nicht verändert."
+
+#: assessment/displayq2.php:2034
+msgid ""
+"Warning: answerformat inequality is not supported in the old assessment "
+"system. This question will not function properly."
+msgstr ""
+"Warnung: Das Antwortformat Unleichung (answerformat inequality) wird im "
+"alten Testformat nicht unterstützt. Diese Frage wird dort nicht ordentlich "
+"funktionieren."
