@@ -2361,6 +2361,16 @@ The following macros help with formatting values for display:
    numtowords(1203,false,true) returns "1023rd"<br/>
    numtowords(1203,false,false,true) returns "one thousand, two hundred three"
   </li>
+<li><strong>fractowords(numerator,denominator,[options])</strong>: Creates a string containing fraction numerator/denominator written out in words. Options is a string that can include combinations
+	of 'mixed', 'over' and 'by'. Using 'over' or 'by' will connect numerator and denominator with those words.
+	Using 'mixed' will simplify fractions that reduce to integers and negative/negative = positive. Does not allow division by zero.<br/>
+	fractowords(5,2) returns "five halves"<br/>
+	fractowords(5,2,'by') returns "five by two"<br/>
+	fractowords(0,-3,'over') returns "zero over negative three"<br/>
+	fractowords(-7,3,'mixed') returns "negative two and one third"<br/>
+	fractowords(-7,-3,'mixed over') returns "two and one over three"<br/>
+	fractowords(0,-3,'mixed') returns "zero"
+</li>
 <li><strong>numtoroman(number,[uppercase])</strong>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
     produce lowercase</li>
 <li><strong>prettyint(number)</strong>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which

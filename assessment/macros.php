@@ -2224,29 +2224,13 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 	return trim($out);
 }
 
-//fractowords function takes numer and denom and returns the fraction in words.
-//Optional argument: $mixed (use 'mixed' to make a mixed number. Some simplification will be done to the fraction, including
-//simplifying whole numbers, recognizing zero, and neg/neg = pos.)
-//Optional argument: $overby (use 'over' or 'by' to make "five over 12" or "five by 12", respectively. No simplification
-//will be done to the fraction.)
-function fractowords($numer,$denom,$mixed=null,$overby=null) { //optional arguments:  $mixed,$overby
-  {
-      if (is_null($mixed) || $mixed=='')
-      {
-          $mixed = 'no';
-      }
-      if (is_null($overby))
-      {
-          $overby = 'no';
-      }
-  }
+function fractowords($numer,$denom,$options='no') { //optional arguments:  $mixed,$overby
 
-
-  if ($mixed=='no') {
+  if (strpos($options,'mixed')===false) {
     $int='';
   }
-  if ($mixed=='mixed') {
-    $hasint=0;
+  //creates integer and new numerator for mixed numbers
+  if (strpos($options,'mixed')!==false) {
     if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
       return '';
     }
@@ -2279,16 +2263,15 @@ function fractowords($numer,$denom,$mixed=null,$overby=null) { //optional argume
             $denom=$denom;
       }
     }
-  } //end mixed
-
-
+  }
+//handles non-mixed numbers or fractional part of mixed numbers
   if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
     return '';
   }
   if ($denom==0) {
     return '';
   } else {
-    if ($overby=='no') {
+    if (strpos($options,'over')===false && strpos($options,'by')===false) { //not over, not by
       $top=numtowords($numer);
       if ($denom==1) {
         $bot='whole';
@@ -2306,9 +2289,7 @@ function fractowords($numer,$denom,$mixed=null,$overby=null) { //optional argume
         } else {
           $bot='negative halve';
         }
-      }
-
-      else {
+      } else {
         $bot=numtowords($denom,$doth=true);
       }
 
@@ -2318,9 +2299,9 @@ function fractowords($numer,$denom,$mixed=null,$overby=null) { //optional argume
         return $int.$top.' '.$bot.'s';
       }
 
-    } elseif ($overby=='over') {
+    } elseif (strpos($options,'over')!==false) {//over or overby, prefers over
       return $int.numtowords($numer).' over '.numtowords($denom);
-    } elseif ($overby=='by') {
+    } elseif (strpos($options,'by')!==false) {//by or overby
       return $int.numtowords($numer).' by '.numtowords($denom);
     }
   }
