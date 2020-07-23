@@ -2024,7 +2024,7 @@ function JSXG_createBlankBoard($label, $ops){
   }
 
 
-	function JSXG_addTangent($board, $ops=array()) {
+	function JSXG_addTangent($board, $ops=array(), $ref=null) {
 	
 		// Get Label string -- so we know how to link elements
 		$labStart = strpos($board, "jxgboard_") + 9;
@@ -2035,22 +2035,12 @@ function JSXG_createBlankBoard($label, $ops){
 		$color = $ops['color'] !== null ? $ops['color'] : 'blue';
 		$dash = $ops['dash'] !== null ? $ops['dash'] : 0;
 		$width = $ops['width'] !== null ? $ops['width'] : 2;
-		
-		$visible = true;
-		if($ops['visible'] !== null) {
-			
-			if(gettype($ops['visible']) == 'string') {
-				$visible = $ops['visible'] !== null ? $ops['visible'] : "true";
-			} elseif (gettype($ops['visible']) == 'boolean') {
-				echo "Eek! Please provide boolean values as strings, i.e. use: 'false'";
-			} else {
-				echo "Eek! Unexpected value in parameter 'visible', use either 'true' or 'false'";
-			}
-			
-		}
 
+		$ops['visible'] = $ops['visible'] === null ?  'true' : $ops['visible'];
+		$visible = $ops['visible'] ? 'true' : 'false';
+		
 		// You must have a glider to attach a tangent to, if this isn't set then exit
-	    $obj = $ops['gliderName'] !== null ? $ops['gliderName'] : '';
+	    $obj = $ops['glider'] !== null ? $ops['glider'] : '';
 	
 		if($obj !== '') {
 				
@@ -2083,6 +2073,8 @@ function JSXG_createBlankBoard($label, $ops){
 			} else {
 				$out .= ";";
 			}
+	
+			echo $out;
 	
 			// Append new output string to the board string{
 			return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
