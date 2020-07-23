@@ -88,7 +88,9 @@ $(function() {
 <p>In öffentliche Kurse können Sie sich auch mit <em>guest</em> ohne Passwort einschreiben. Gast-Kennungen werden regelmäßig gelöscht.</p>
 
 <p><?php printf('Wenn Sie Dozent sind, so können Sie <a href="%s/newinstructor.php"><b>hier eine Dozentenkennung beantragen</b></a>. Mit einer Dozentenkennung erhalten Sie Zugang zur hochschulübergreifenden Aufgabenbibliothek und können eigene Aufgaben und Tests erstellen und in das Lernmanagementsystem Ihrer Hochschule einbinden.', $imasroot)?></p>
-<p align="center"><b>Dozenten: Bitte beachten Sie die <a href="https://olat.vcrp.de/url/RepositoryEntry/561807362/CourseNode/101286232227331" target="_blank">Informationen zur neuen Benutzeroberfläche!</a></b></p>
+<h2>Für Dozenten:</h2>
+<h3>Bitte stellen Sie Ihre IMathAS-Tests auf die neue Testoberfläche um!</h3>
+<h3>Unterstützung finden Sie in den <a href="https://netmath.vcrp.de/services/imathas-ui" target="_blank">Informationen und Anleitungen zur Umstellung</a>.</h3>
 
 <br class=clear>
 <p class="textright"><?php printf('%s wird entwickelt von %s', $installname, ' <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2020 David Lippman');  ?><br>
