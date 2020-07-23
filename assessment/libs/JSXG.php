@@ -2074,8 +2074,6 @@ function JSXG_createBlankBoard($label, $ops){
 				$out .= ";";
 			}
 	
-			echo $out;
-	
 			// Append new output string to the board string{
 			return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 			
