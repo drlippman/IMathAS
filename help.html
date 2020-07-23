@@ -2308,8 +2308,11 @@ The following macros create graphs or tables:
 <li><strong>changeimagesize(image or graph, width, [height])</strong>: Changes the display width for an image.
     Note this doesn't resize the file itself, just changes the display size - it's always better to resize the original
     image file.</li>
-<li><strong>textonimage(img,text,left,top[text,left,top...])</strong>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
-    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.</li>
+<li><strong>textonimage(img,text,left,top[text,left,top,left,...,alttext])</strong>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
+    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.
+    textonimage is not screenreader-friendly, so it's recommended you provide an alttext as 
+    the final argument, which will be read to the screenreader instead of the image and any layered
+    text.  Do not use alttext if you have answerboxes in your layered text.</li>
 <li><strong>arraystodoteqns(xarray,yarray,[color])</strong>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
 <li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts an array of x-values and y-values into a form that

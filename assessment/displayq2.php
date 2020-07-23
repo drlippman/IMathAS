@@ -2030,6 +2030,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
 			$out .= "<label for=\"tn$qn\">$ansprompt</label>";
 		}
+		if (in_array('inequality',$ansformats)) {
+			echo _("Warning: answerformat inequality is not supported in the old assessment system. This question will not function properly.");
+		}
 		if (in_array('equation',$ansformats)) {
 			$shorttip = _('Enter an algebraic equation');
 		} else {

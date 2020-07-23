@@ -1312,13 +1312,10 @@ function acsc($x) {
   if ($inv < -1 || $inv > 1) {
     throw new MathParserException("Invalid input for arccsc");
   }
-  return acos($inv);
+  return asin($inv);
 }
 function acot($x) {
-  if (abs($x)<1e-16) {
-    throw new MathParserException("Invalid input for arccot");
-  }
-  return atan(1/$x);
+  return M_PI/2 - atan($x);
 }
 function sign($a,$str=false) {
 	if ($str==="onlyneg") {
