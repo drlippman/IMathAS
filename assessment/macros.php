@@ -2224,46 +2224,51 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 	return trim($out);
 }
 
-function fractowords($numer,$denom,$options='no') { //optional arguments:  $mixed,$overby
+function fractowords($numer,$denom,$options='no') { //options can combine 'mixed','over','by' and 'literal'
 
   if (strpos($options,'mixed')===false) {
     $int='';
   }
+  $numersign=sign($numer);
+  $denomsign=sign($denom);
   //creates integer and new numerator for mixed numbers
-  if (strpos($options,'mixed')!==false) {
+  if (strpos($options,'mixed')!==false || strpos($options,'literal')===false) { //mixed or not literal
     if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
       return '';
     }
     if ($denom==0) {
+      echo 'Eek! Division by zero.';
       return '';
     }
     if ($numer==0) {
       return 'zero';
     }
-      $numersign=sign($numer);
-      $denomsign=sign($denom);
       $numernew=abs($numer)%(abs($denom));
-      $numer=abs($numer);
+      $numer=abs($numer); //numer and denom now positive
       $denom=abs($denom);
       $int=floor($numer/$denom);
 
-      if ($numernew==0) {
+      if ($numernew==0) {//did fraction reduce to a whole number?
         $int='';
         $numer=$numer*$numersign;
         $denom=$denom*$denomsign;
         return numtowords($numer/$denom);
-      } elseif ($numernew!=0) {
-        if ($int==0) {
+      } elseif ($numernew!=0) {//is there a remainder after dividing?
+        if ($int==0) {//was the fraction proper to begin with?
           $numer=$numernew*$numersign*$denomsign;
-          $denom=$denom;
           $int='';
-      } elseif ($int!=0) {
-            $int=numtowords($int*$numersign*$denomsign).' and ';
-            $numer=$numernew;
-            $denom=$denom;
+      } elseif ($int!=0) {//was the fraction improper to begin with?
+        if (strpos($options,'mixed')===false) {//not mixed and not literal
+          $int='';
+          $numer=$numer*$numersign*$denomsign;
+        } elseif (strpos($options,'mixed')!==false) {//mixed and not literal
+          $int=numtowords($int*$numersign*$denomsign).' and ';
+          $numer=$numernew;
+        }
       }
     }
-  }
+  } //end (mixed or not literal)
+
 //handles non-mixed numbers or fractional part of mixed numbers
   if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
     return '';
