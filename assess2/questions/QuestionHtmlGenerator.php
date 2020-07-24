@@ -797,16 +797,17 @@ class QuestionHtmlGenerator
         $lastkey = max(array_keys($hints));
         if ($qdata['qtype'] == "multipart" && is_array($hints[$lastkey])) { //individual part hints
             $hintloc = array();
+            $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
                 if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
                     continue;
                 }
                 $lastkey = max(array_keys($hintpart));
-                if ($attemptn > $lastkey) {
+                if ($partattemptn[$iidx] > $lastkey) {
                     $usenum = $lastkey;
                 } else {
-                    $usenum = $attemptn;
+                    $usenum = $partattemptn[$iidx];
                 }
                 if ($hintpart[$usenum] != '') {
                     if (strpos($hintpart[$usenum], '</div>') !== false) {
