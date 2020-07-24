@@ -89,6 +89,25 @@ function regenq(qn) {
       });
 }
 
+function loadquestionById(qn, qsid) {
+    $("#results"+qn).empty();
+    $("#questionwrap"+qn).empty();
+    console.log(window.location);
+    var url = window.location.href.replace(/id=\d+/,'id='+qsid);
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            ajax: true
+        }
+      }).done(function(msg) {
+        $("#state").val(msg.state);
+        showandinit(qn, msg.disp);
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
 function loadquestionByJwt(qn, jwt) {
     $("#results"+qn).empty();
     $("#questionwrap"+qn).empty();
@@ -116,7 +135,11 @@ $(function() {
         } else if (msg.match(/imathas\.show/)) {
             console.log(msg);
             var data = JSON.parse(msg);
-            loadquestionByJwt(thisqn, data.jwt);
+            if (data.jwt) {
+                loadquestionByJwt(thisqn, data.jwt);
+            } else if (data.id) {
+                loadquestionById(thisqn, data.id);
+            }
         }
     });
 });
