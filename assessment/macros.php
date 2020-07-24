@@ -34,7 +34,7 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata",
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
- "randstates","prettysmallnumber","makeprettynegative","rawurlencode");
+ "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords");
 function mergearrays() {
 	$args = func_get_args();
 	foreach ($args as $k=>$arg) {
@@ -2231,6 +2231,94 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 
 	}
 	return trim($out);
+}
+
+function fractowords($numer,$denom,$options='no') { //options can combine 'mixed','over','by' and 'literal'
+
+  if (strpos($options,'mixed')===false) {
+    $int='';
+  }
+  $numersign=sign($numer);
+  $denomsign=sign($denom);
+  //creates integer and new numerator for mixed numbers
+  if (strpos($options,'mixed')!==false || strpos($options,'literal')===false) { //mixed or not literal
+    if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
+      return '';
+    }
+    if ($denom==0) {
+      echo 'Eek! Division by zero.';
+      return '';
+    }
+    if ($numer==0) {
+      return 'zero';
+    }
+      $numernew=abs($numer)%(abs($denom));
+      $numer=abs($numer); //numer and denom now positive
+      $denom=abs($denom);
+      $int=floor($numer/$denom);
+
+      if ($numernew==0) {//did fraction reduce to a whole number?
+        $int='';
+        $numer=$numer*$numersign;
+        $denom=$denom*$denomsign;
+        return numtowords($numer/$denom);
+      } elseif ($numernew!=0) {//is there a remainder after dividing?
+        if ($int==0) {//was the fraction proper to begin with?
+          $numer=$numernew*$numersign*$denomsign;
+          $int='';
+      } elseif ($int!=0) {//was the fraction improper to begin with?
+        if (strpos($options,'mixed')===false) {//not mixed and not literal
+          $int='';
+          $numer=$numer*$numersign*$denomsign;
+        } elseif (strpos($options,'mixed')!==false) {//mixed and not literal
+          $int=numtowords($int*$numersign*$denomsign).' and ';
+          $numer=$numernew;
+        }
+      }
+    }
+  } //end (mixed or not literal)
+
+//handles non-mixed numbers or fractional part of mixed numbers
+  if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
+    return '';
+  }
+  if ($denom==0) {
+    return '';
+  } else {
+    if (strpos($options,'over')===false && strpos($options,'by')===false) { //not over, not by
+      $top=numtowords($numer);
+      if ($denom==1) {
+        $bot='whole';
+      } elseif ($denom==-1) {
+        $bot='negative whole';
+      } elseif ($denom==2) {
+        if (abs($numer)==1) {
+          $bot='half';
+        } elseif ($numer!=1) {
+          $bot='halve';
+        }
+      } elseif ($denom==-2) {
+        if ($numer==1) {
+          $bot='negative half';
+        } else {
+          $bot='negative halve';
+        }
+      } else {
+        $bot=numtowords($denom,$doth=true);
+      }
+
+      if (abs($numer)==1) {
+        return $int.$top.' '.$bot;
+      } else {
+        return $int.$top.' '.$bot.'s';
+      }
+
+    } elseif (strpos($options,'over')!==false) {//over or overby, prefers over
+      return $int.numtowords($numer).' over '.numtowords($denom);
+    } elseif (strpos($options,'by')!==false) {//by or overby
+      return $int.numtowords($numer).' by '.numtowords($denom);
+    }
+  }
 }
 
 $namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");
