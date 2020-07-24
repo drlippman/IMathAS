@@ -2641,19 +2641,21 @@ function evalfunc($farr) {
 
 function textonimage() {
 	$args = func_get_args();
-	$img = array_shift($args);
-	$img = preg_replace('/^.*src="(.*?)".*$/',"$1",$img);
+    $img = array_shift($args);
+    $alt = '';
+    if (preg_match('/alt="(.*?)"/', $img, $altmatch)) {
+        $alt = $altmatch[1];
+    }
+    $img = preg_replace('/^.*src="(.*?)".*$/',"$1",$img);
+
 	$out = '<div style="position: relative;" class="txtimgwrap">';
-	$out .= '<img src="'.$img.'" style="position: relative; top: 0px; left: 0px;" />';
+	$out .= '<img src="'.$img.'" alt="'.$alt.'" style="position: relative; top: 0px; left: 0px;" />';
 	while (count($args)>2) {
 		$text = array_shift($args);
 		$left = array_shift($args);
-		$top = array_shift($args);
-		$out .= "<div style=\"position: absolute; top: {$top}px; left: {$left}px;\">$text</div>";
-    }
-    if (count($args) > 0) {
-        $alttext = array_shift($args);
-        $out = '<div aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"' . substr($out, 4);
+        $top = array_shift($args);
+        $hidden = (strpos($text,'[AB')===false)?'aria-hidden=true':'';
+		$out .= "<div $hidden style=\"position: absolute; top: {$top}px; left: {$left}px;\">$text</div>";
     }
 	$out .= '</div>';
 	return $out;
