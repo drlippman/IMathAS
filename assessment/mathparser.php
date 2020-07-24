@@ -730,6 +730,7 @@ class MathParser
           break;
         case 'arcsin':
         case 'arccos':
+          $insideval = round($insideval, 12);
           if ($insideval < -1 || $insideval > 1) {
             throw new MathParserException("Invalid input to $funcname");
           }
@@ -1298,7 +1299,7 @@ function asec($x) {
   if (abs($x)<1e-16) {
     throw new MathParserException("Invalid input for arcsec");
   }
-  $inv = 1/$x;
+  $inv = round(1/$x, 12);
   if ($inv < -1 || $inv > 1) {
     throw new MathParserException("Invalid input for arcsec");
   }
@@ -1308,7 +1309,7 @@ function acsc($x) {
   if (abs($x)<1e-16) {
     throw new MathParserException("Invalid input for arccsc");
   }
-  $inv = 1/$x;
+  $inv = round(1/$x, 12);
   if ($inv < -1 || $inv > 1) {
     throw new MathParserException("Invalid input for arccsc");
   }
@@ -1316,6 +1317,12 @@ function acsc($x) {
 }
 function acot($x) {
   return M_PI/2 - atan($x);
+}
+function safeasin($x) {
+  return asin(round($x,12));  
+}
+function safeacos($x) {
+  return acos(round($x,12));  
 }
 function sign($a,$str=false) {
 	if ($str==="onlyneg") {
