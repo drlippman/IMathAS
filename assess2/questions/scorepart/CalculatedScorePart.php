@@ -124,9 +124,13 @@ class CalculatedScorePart implements ScorePart
                             $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                         } else {
                             $anfunc = parseMathQuiet($anans);
-                            $aarr[$j] = $anfunc->evaluateQuiet();
-                            if ($checkSameform) {
-                              $ansnorm[$k][$j] = $anfunc->normalizeTreeString();
+                            if ($anfunc !== false) {
+                                $aarr[$j] = $anfunc->evaluateQuiet();
+                                if ($checkSameform) {
+                                $ansnorm[$k][$j] = $anfunc->normalizeTreeString();
+                                }
+                            } else {
+                                $aarr[$j] = '';
                             }
                         }
                     }
@@ -158,9 +162,13 @@ class CalculatedScorePart implements ScorePart
                         $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                     } else {
                         $anfunc = parseMathQuiet($anans);
-                        $aarr[$j] = $anfunc->evaluateQuiet();
-                        if ($checkSameform) {
-                          $ansnorm[0][$j] = $anfunc->normalizeTreeString();
+                        if ($anfunc !== false) {
+                            $aarr[$j] = $anfunc->evaluateQuiet();
+                            if ($checkSameform) {
+                            $ansnorm[0][$j] = $anfunc->normalizeTreeString();
+                            }
+                        } else {
+                            $aarr[$j] = '';
                         }
                     }
                 }
