@@ -116,6 +116,12 @@ $placeinhead .= "} ";
 $placeinhead .= "</script>\n";
 $placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .endmsg {display:none;}</style>";
 
+if (!empty($CFG['assess2-use-vue-dev'])) {
+	$assessGbUrl = sprintf("%s/gbviewassess.html", $CFG['assess2-use-vue-dev-address']);
+} else {
+	$assessGbUrl = "../assess2/gbviewassess.php";
+}
+
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; Diagnostic Gradebook</div>";
@@ -161,7 +167,8 @@ require("../footer.php");
 
 
 function gbinstrdisp() {
-	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection,$includeendmsg;
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,
+		$tutorsection,$includeendmsg,$assessGbUrl;
 	$hidenc = 1;
 	$includeendmsg = true;
 	$hasendmsg = false;
@@ -286,6 +293,8 @@ function gbinstrdisp() {
 				if (isset($gbt[$i][1][$j][0])) {
 					if ($gbt[$i][1][$j][4]=='average') {
 						echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
+					} else if ($gbt[0][1][$j][15] > 1) { // assess2
+						echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}&from=gbtesting\">";
 					} else {
 						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}&from=gbtesting\">";
 					}
@@ -311,8 +320,10 @@ function gbinstrdisp() {
 				} else { //no score
 					if ($gbt[$i][0][0]=='Averages') {
 						echo '-';
+					} else if ($gbt[0][1][$j][15] > 1) { // assess2
+						echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}&from=gbtesting\">-</a>";
 					} else {
-						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$j][7]}&uid={$gbt[$i][4][0]}\">-</a>";
+						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$j][7]}&uid={$gbt[$i][4][0]}&from=gbtesting\">-</a>";
 					}
 				}
 			} else if ($gbt[0][1][$j][6]==1) { //offline

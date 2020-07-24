@@ -34,7 +34,9 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata",
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
- "randstates","prettysmallnumber","makeprettynegative","rawurlencode","randcountry","randcountries");
+ "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
+ "randcountry","randcountries");
+
 function mergearrays() {
 	$args = func_get_args();
 	foreach ($args as $k=>$arg) {
@@ -447,8 +449,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $_SESSION['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-				$y = $evalfunc(['x'=>$x]);
+                $y = $evalfunc(['x'=>$x]);
 				if (isNaN($y)) {
+                    if ($lastl != 0) {
+                        if ($py !== null) {
+                            $pathstr .= ",[$px,$py]";
+                        }
+                        $pathstr .= ']);';
+                        $lastl = 0;
+                        $px = null;
+                        $py = null;
+                    }
 					continue;
 				}
 				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
@@ -491,7 +502,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
 					$pathstr .= "[$px,$py],[$ix,$iy]]);";
 					$lastl = 0;
-				} else { //still out
+                } else { //still out
 
 				}
 			} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
@@ -517,7 +528,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$pathstr .= "[$ix,$iy]";
 					$lastl++;
 				} else { //still out
-
+                    
 				}
 			} else {//all in
 				if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
@@ -2224,6 +2235,94 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 	return trim($out);
 }
 
+function fractowords($numer,$denom,$options='no') { //options can combine 'mixed','over','by' and 'literal'
+
+  if (strpos($options,'mixed')===false) {
+    $int='';
+  }
+  $numersign=sign($numer);
+  $denomsign=sign($denom);
+  //creates integer and new numerator for mixed numbers
+  if (strpos($options,'mixed')!==false || strpos($options,'literal')===false) { //mixed or not literal
+    if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
+      return '';
+    }
+    if ($denom==0) {
+      echo 'Eek! Division by zero.';
+      return '';
+    }
+    if ($numer==0) {
+      return 'zero';
+    }
+      $numernew=abs($numer)%(abs($denom));
+      $numer=abs($numer); //numer and denom now positive
+      $denom=abs($denom);
+      $int=floor($numer/$denom);
+
+      if ($numernew==0) {//did fraction reduce to a whole number?
+        $int='';
+        $numer=$numer*$numersign;
+        $denom=$denom*$denomsign;
+        return numtowords($numer/$denom);
+      } elseif ($numernew!=0) {//is there a remainder after dividing?
+        if ($int==0) {//was the fraction proper to begin with?
+          $numer=$numernew*$numersign*$denomsign;
+          $int='';
+      } elseif ($int!=0) {//was the fraction improper to begin with?
+        if (strpos($options,'mixed')===false) {//not mixed and not literal
+          $int='';
+          $numer=$numer*$numersign*$denomsign;
+        } elseif (strpos($options,'mixed')!==false) {//mixed and not literal
+          $int=numtowords($int*$numersign*$denomsign).' and ';
+          $numer=$numernew;
+        }
+      }
+    }
+  } //end (mixed or not literal)
+
+//handles non-mixed numbers or fractional part of mixed numbers
+  if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
+    return '';
+  }
+  if ($denom==0) {
+    return '';
+  } else {
+    if (strpos($options,'over')===false && strpos($options,'by')===false) { //not over, not by
+      $top=numtowords($numer);
+      if ($denom==1) {
+        $bot='whole';
+      } elseif ($denom==-1) {
+        $bot='negative whole';
+      } elseif ($denom==2) {
+        if (abs($numer)==1) {
+          $bot='half';
+        } elseif ($numer!=1) {
+          $bot='halve';
+        }
+      } elseif ($denom==-2) {
+        if ($numer==1) {
+          $bot='negative half';
+        } else {
+          $bot='negative halve';
+        }
+      } else {
+        $bot=numtowords($denom,$doth=true);
+      }
+
+      if (abs($numer)==1) {
+        return $int.$top.' '.$bot;
+      } else {
+        return $int.$top.' '.$bot.'s';
+      }
+
+    } elseif (strpos($options,'over')!==false) {//over or overby, prefers over
+      return $int.numtowords($numer).' over '.numtowords($denom);
+    } elseif (strpos($options,'by')!==false) {//by or overby
+      return $int.numtowords($numer).' by '.numtowords($denom);
+    }
+  }
+}
+
 $namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");
 $namearray[1] = explode(',',"Adriana,Adrianna,Alejandra,Alexandra,Alexis,Alice,Alicia,Alma,Amanda,Amber,Amy,Andrea,Angela,Anna,April,Ariana,Ashley,Ashton,Autumn,Bianca,Bria,Brianna,Brittany,Brooke,Caitlyn,Carissa,Carolyn,Carrie,Cassandra,Catherine,Chasity,Chelsea,Chloe,Christy,Ciara,Claudia,Colleen,Courtney,Cristina,Crystal,Dana,Danielle,Delaney,Destiny,Diana,Elizabeth,Emily,Emma,Erica,Erin,Esmeralda,Gabrielle,Guadalupe,Haley,Hanna,Heather,Hillary,Holly,Jacqueline,Jamie,Jane,Jasmine,Jenna,Jennifer,Jessica,Julia,Karen,Karina,Karissa,Karla,Kathryn,Katie,Kayla,Kelly,Kelsey,Kendra,Kimberly,Kori,Kristen,Kristina,Krystal,Kylie,Laura,Lauren,Leah,Linda,Lindsey,Mackenzie,Madison,Maggie,Mariah,Marissa,Megan,Melissa,Meredith,Michelle,Mikayla,Miranda,Molly,Monique,Morgan,Naomi,Natalie,Natasha,Nicole,Nina,Noelle,Paige,Patricia,Rachael,Raquel,Rebecca,Renee,Riley,Rosa,Samantha,Sarah,Savannah,Shannon,Shantel,Sierra,Sonya,Sophia,Stacy,Stephanie,Summer,Sydney,Tatiana,Taylor,Tiana,Tiffany,Valerie,Vanessa,Victoria,Vivian,Wendy,Whitney,Zoe");
 
@@ -2305,14 +2404,23 @@ function randfemalenames($n=1) {
 function randname() {
 	return randnames(1,2);
 }
-function randnamewpronouns() {
-	$gender = $GLOBALS['RND']->rand(0,1);
-	$name = randnames(1,$gender);
-	if ($gender==0) { //male
-		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'));
-	} else {
-		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'));
-	}
+function randnamewpronouns($g=2) {
+  $gender = $GLOBALS['RND']->rand(0,1);
+  
+  if ($g==2) {
+  	if ($gender==0) { //male
+  		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'), _('himself'));
+  	} else {
+  		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'), _('herself'));
+  	}
+  } elseif ($g=='neutral') {
+    if ($gender==0) { //male
+  		return array(randnames(1,0), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  	} else {
+  		return array(randnames(1,1), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  	}
+  }
+
 }
 function randmalename() {
 	return randnames(1,0);
@@ -2542,7 +2650,11 @@ function textonimage() {
 		$left = array_shift($args);
 		$top = array_shift($args);
 		$out .= "<div style=\"position: absolute; top: {$top}px; left: {$left}px;\">$text</div>";
-	}
+    }
+    if (count($args) > 0) {
+        $alttext = array_shift($args);
+        $out = '<div aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"' . substr($out, 4);
+    }
 	$out .= '</div>';
 	return $out;
 }
