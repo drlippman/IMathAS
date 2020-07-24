@@ -25,17 +25,21 @@ if (isset($_POST['state'])) {
     $state = json_decode(json_encode(JWT::decode($_POST['state'], $statesecret)), true);
     $QS = $state;
     $QS['id'] = $state['qsid'][$qn];
-} else if (isset($_GET['jwt'])) {
+} else if (isset($_REQUEST['jwt'])) {
     try {
         // decode JWT.  Stupid hack to convert it into an assoc array
         // verification using 'auth' is built-into the JWT method
-        $QS = json_decode(json_encode(JWT::decode($_GET['jwt'])), true);
+        $QS = json_decode(json_encode(JWT::decode($_REQUEST['jwt'])), true);
     } catch (Exception $e) {
         echo "JWT Error: " . $e->getMessage();
         exit;
     }
     if (!empty($QS['auth'])) {
         $issigned = true;
+        if (isset($QS['showscored'])) {
+            // want to redisplay question; set as state
+            $_POST['state'] = $QS['showscored'];
+        }
     }
 } else {
     $QS = $_GET;
@@ -112,6 +116,11 @@ if (isset($QS['allowregen'])) {
 } else {
     $allowregen = !$issigned;
 }
+if (isset($QS['submitall'])) {
+    $submitall = $QS['submitall'];
+} else {
+    $submitall = $issigned;
+}
 
 // defaults
 $eqnhelper = 4;
@@ -177,24 +186,33 @@ if (isset($_POST['toscoreqn'])) {
       };
     }
     $res = $a2->scoreQuestion($qn, $parts_to_score);
-    $out = array(
-        'score' => array_sum($res['raw']),
+    $jwtcontents = array(
+        'id' => $qsid,
+        'score' => round(array_sum($res['scores']),2),
+        'raw' => $res['raw'],
+        'allans' => $res['allans'],
         'errors' => $res['errors'],
         'state' => JWT::encode($a2->getState(), $statesecret)
     );
+    $out = array('jwt'=>JWT::encode($jwtcontents, $QS['auth']));
     if ($showscoredonsubmit) {
         $disp = $a2->displayQuestion($qn, [
             'showans' => $showans,
+            'showhints' => $showhints
           ]);
         $out['disp'] = $disp;
     }
-    echo JWT::encode($out, $QS['auth']);
+    echo json_encode($out);
     exit;
 }
 
-$disp = $a2->displayQuestion($qn, []);
-// force submitall for now 
-$disp['jsparams']['submitall'] = 1;
+$disp = $a2->displayQuestion($qn, [
+    'showhints' => $showhints
+]);
+// force submitall
+if ($submitall) {
+    $disp['jsparams']['submitall'] = 1;
+}
 
 // if ajax load of question, return values now
 if (isset($_POST['ajax'])) {
@@ -239,12 +257,14 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $imasroot . '/
 
 // setup resize message sender
 $placeinhead .= '<script type="text/javascript">
+  var frame_id = "' . $frameid . '";
+  var qsid = '.$qsid.';
+  var thisqn = '.$qn.';
   function sendresizemsg() {
-   if(self != top){
+   if(inIframe()){
       var default_height = Math.max(
-        document.body.scrollHeight, document.body.offsetHeight,
-        document.documentElement.clientHeight, document.documentElement.scrollHeight,
-        document.documentElement.offsetHeight);
+        document.body.scrollHeight, document.body.offsetHeight)+20;
+        console.log(default_height);
       window.parent.postMessage( JSON.stringify({
         subject: "lti.frameResize",
         height: default_height,
@@ -256,7 +276,7 @@ $placeinhead .= '<script type="text/javascript">
   }
 
   if (mathRenderer == "Katex") {
-      window.katexDoneCallback = sendresizemsg;
+     window.katexDoneCallback = sendresizemsg;
   } else if (typeof MathJax != "undefined") {
       MathJax.Hub.Queue(function () {
           sendresizemsg();
@@ -266,7 +286,19 @@ $placeinhead .= '<script type="text/javascript">
           sendresizemsg();
       });
   }
-  </script>';
+  </script>
+  <style>
+  body { margin: 0;}
+  .question {
+      margin-top: 0 !important;
+  }
+  .questionpane {
+    margin-top: 0 !important;
+    }
+  #mqe-fb-spacer {
+      height: 0 !important;
+  }
+  </style>';
 if ($_SESSION['mathdisp'] == 1 || $_SESSION['mathdisp'] == 3) {
     //in case MathJax isn't loaded yet
     $placeinhead .= '<script type="text/x-mathjax-config">
@@ -281,7 +313,9 @@ require "./header.php";
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 echo '<div class="questionwrap">';
-echo '<div id="results'.$qn.'"></div>';
+if (!$jssubmit) {
+    echo '<div id="results'.$qn.'"></div>';
+}
 echo '<div class="questionpane">';
 echo '<div class="question" id="questionwrap'.$qn.'">';
 echo '</div></div>';
@@ -303,7 +337,12 @@ echo '<script>
     });
     </script>';
 
-echo '<div style="height:150px">&nbsp;</div>';
+if ($jssubmit) {
+    echo '<div style="height:200px">&nbsp;</div>';
+} else {
+    echo '<div style="height:150px">&nbsp;</div>';
+}
+
 
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span id="ehddtext"></span>

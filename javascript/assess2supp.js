@@ -9,6 +9,14 @@ function showandinit(qn, data) {
     initq(qn, data.jsparams);
 }
 
+function inIframe() {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+}
+
 function showerrors(errors) {
     var err = $('#errorslist');
     err.empty();
@@ -23,30 +31,42 @@ function showerrors(errors) {
 }
 
 function submitq(qn) {
-    $("#results"+qn).empty();
+    $("#results"+qn).html(_('Submitting...'));
     var data = dopresubmit(qn, true);
     data.append('state', document.getElementById('state').value);
     $.ajax({
         url: window.location.pathname,
         type: 'POST',
-        dataType: 'text',
+        dataType: 'json',
         data: data,
         processData: false,
         contentType: false
       }).done(function(msg) {
-        var data = parseJwt(msg);
+        var data = parseJwt(msg.jwt);
         $("#state").val(data.state);
         showerrors(data.errors);
-        if (data.disp) {
+        if (msg.disp) {
             $("#results"+qn).html(_("Score: ")+data.score);
-            showandinit(qn, data.disp);
+            showandinit(qn, msg.disp);
         } else {
             $("#results"+qn).html(_('Question Submitted'));
             $("#questionwrap"+qn).empty();
         }
+        sendupscores(msg.jwt);
       }).always(function(msg) {
         $("#toscoreqn").val('');
       });
+}
+
+function sendupscores(msg) {
+    if(inIframe()) {
+        var returnobj = {
+            subject: "lti.ext.mom.updateScore", 
+            jwt: msg,
+            frame_id: frame_id
+        };
+        window.parent.postMessage(JSON.stringify(returnobj), '*');
+    }
 }
 
 function regenq(qn) {
@@ -62,13 +82,45 @@ function regenq(qn) {
         }
       }).done(function(data) {
         $("#state").val(data.state);
-        console.log(data);
         showerrors(data.disp.errors);
         showandinit(qn, data.disp);
       }).always(function(msg) {
         $("#toscoreqn").val('');
       });
 }
+
+function loadquestionByJwt(qn, jwt) {
+    $("#results"+qn).empty();
+    $("#questionwrap"+qn).empty();
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            jwt: jwt,
+            ajax: true
+        }
+      }).done(function(msg) {
+        $("#state").val(msg.state);
+        showandinit(qn, msg.disp);
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
+
+$(function() {
+    $(window).on('message', function(e) {
+        var msg = e.originalEvent.data;
+        if (msg == 'submit') {
+            submitq(thisqn);
+        } else if (msg.match(/imathas\.show/)) {
+            console.log(msg);
+            var data = JSON.parse(msg);
+            loadquestionByJwt(thisqn, data.jwt);
+        }
+    });
+});
+
 
  function initq(qn, jsparams) {
    var qwrap = document.getElementById('questionwrap'+qn);

@@ -104,11 +104,20 @@ class AssessStandalone {
       $seqPartDone = array();
       if (!empty($this->state['rawscores'][$qn])) {
         foreach ($this->state['rawscores'][$qn] as $pn=>$sc) {
-          $seqPartDone[$pn] = ($sc>.98);
+            if (!empty($options['hidescoremarkers'])) {
+                $seqPartDone[$pn] = ($this->state['partattemptn'][$qn][$pn] > 0);
+            } else {
+                $seqPartDone[$pn] = ($sc>.98);
+            }
         }
       }
     }
     $showans = !empty($options['showans']);
+    $showhints = isset($options['showhints']) ? $options['showhints'] : 3;
+    $rawscores = $this->state['rawscores'][$qn];
+    if (!empty($options['hidescoremarkers'])) {
+        $rawscores = array();
+    }
 
     $questionParams = new QuestionParams();
     $questionParams
@@ -118,7 +127,7 @@ class AssessStandalone {
         ->setQuestionId(0)
         ->setAssessmentId(0)
         ->setQuestionSeed($this->state['seeds'][$qn])
-        ->setShowHints(3)
+        ->setShowHints($showhints)
         ->setShowAnswer($showans)
         ->setShowAnswerParts(array())
         ->setShowAnswerButton($showans)
@@ -128,7 +137,7 @@ class AssessStandalone {
         ->setAllQuestionAnswersAsNum($this->state['stuanswersval'])
         ->setScoreNonZero($this->state['scorenonzero'])
         ->setScoreIsCorrect($this->state['scoreiscorrect'])
-        ->setLastRawScores($this->state['rawscores'][$qn])
+        ->setLastRawScores($rawscores)
         ->setSeqPartDone($seqPartDone);;
 
     $questionGenerator = new QuestionGenerator($this->DBH,
@@ -214,7 +223,7 @@ class AssessStandalone {
         $this->state['rawscores'][$qn][$k] = $rawparts[$k];
       }
     }
-
+    $allPartsAns = (count($this->state['partattemptn'][$qn]) == count($scoreResult['answeights']));
     $score = array_sum($scores);
     if (count($partla) > 1) {
       $this->state['scorenonzero'][$qn+1] = array();
@@ -232,7 +241,13 @@ class AssessStandalone {
       $this->state['scorenonzero'][$qn+1] = ($score > 0);
       $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
     }
-    return array('scores'=>$scores, 'raw'=>$rawparts, 'errors'=>$scoreResult['errors']);
+
+    return array(
+        'scores'=>$scores, 
+        'raw'=>$rawparts, 
+        'errors'=>$scoreResult['errors'], 
+        'allans'=>$allPartsAns
+    );
   }
 
   private function parseScripts($html) {
