@@ -2385,14 +2385,23 @@ function randfemalenames($n=1) {
 function randname() {
 	return randnames(1,2);
 }
-function randnamewpronouns() {
-	$gender = $GLOBALS['RND']->rand(0,1);
-	$name = randnames(1,$gender);
-	if ($gender==0) { //male
-		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'));
-	} else {
-		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'));
-	}
+function randnamewpronouns($g=2) {
+  $gender = $GLOBALS['RND']->rand(0,1);
+  
+  if ($g==2) {
+  	if ($gender==0) { //male
+  		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'), _('himself'));
+  	} else {
+  		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'), _('herself'));
+  	}
+  } elseif ($g=='neutral') {
+    if ($gender==0) { //male
+  		return array(randnames(1,0), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  	} else {
+  		return array(randnames(1,1), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  	}
+  }
+
 }
 function randmalename() {
 	return randnames(1,0);
