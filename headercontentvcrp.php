@@ -2,7 +2,7 @@
 if ($coursetheme=='otbsreader.css') {
 	$nologo = true;
 }
-if (!isset($flexwidth) && ($coursetheme=='default_nm.css' || $coursetheme=='wamap_fw.css' || $coursetheme=='wamap.css' ) && !isset($loadinginfoheader)) {
+if (!isset($flexwidth) && ($coursetheme=='default_nm.css' || $coursetheme=='netmath.css' || $coursetheme=='wamap_fw.css' || $coursetheme=='wamap.css' ) && !isset($loadinginfoheader)) {
 	$smallheaderlogo = '<img src="'.$imasroot.'/img/collapse.gif"/>';
 ?>
 <div id="headercontent" role="navigation" aria-label="System Navigation">
@@ -56,7 +56,8 @@ echo '</div>'; //headercontent
 -->
 	<?php
 	 	if ($myrights>0) {
-			echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
+			echo "<li><a href='#' onclick=\"GB_show('Einstellungen','$imasroot/forms.php?action=chguserinfo&greybox=true',800,'auto')\" class='trackprepped'>Einstellungen</a></li>";
+			echo "<li><a href=\"$imasroot/actions.php?action=logout\" class=\"trackprepped\">Abmelden</a></li>";
 		}
 	?>
 	<!--
