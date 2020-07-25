@@ -114,12 +114,12 @@ if (isset($QS['showscoredonsubmit'])) {
 } else {
     $showscoredonsubmit = !$issigned;
 }
-$showscoremarkers = $showscoredonsubmit;
+$hidescoremarkers = !$showscoredonsubmit;
 if (isset($QS['showscored'])) {
-  $showscoremarkers = true;
+  $hidescoremarkers = false;
 }
-if (isset($QS['showscoremarkers'])) {
-    $showscoremarkers = $QS['showscoremarkers'];
+if (isset($QS['hidescoremarkers'])) {
+    $hidescoremarkers = $QS['hidescoremarkers'];
 }
 if (isset($QS['allowregen'])) {
     $allowregen = $QS['allowregen'];
@@ -169,6 +169,7 @@ if (isset($_POST['state'])) {
         'showans' => $showans,
         'showhints' => $showhints,
         'showscoredonsubmit' => $showscoredonsubmit,
+        'hidescoremarkers' => $hidescoremarkers,
         'allowregen' => $allowregen,
         'auth' => $QS['auth']
     );
@@ -205,11 +206,12 @@ if (isset($_POST['toscoreqn'])) {
         'state' => JWT::encode($a2->getState(), $statesecret)
     );
     $out = array('jwt'=>JWT::encode($jwtcontents, $QS['auth']));
-    if ($showscoredonsubmit) {
+
+    if ($showscoredonsubmit || !$res['allans']) {
         $disp = $a2->displayQuestion($qn, [
             'showans' => $showans,
             'showhints' => $showhints,
-            'hidescoremarkers'= > !$showscoremarkers
+            'hidescoremarkers' => $hidescoremarkers
           ]);
         $out['disp'] = $disp;
     }
@@ -219,7 +221,7 @@ if (isset($_POST['toscoreqn'])) {
 
 $disp = $a2->displayQuestion($qn, [
     'showhints' => $showhints,
-    'hidescoremarkers'= > !$showscoremarkers
+    'hidescoremarkers' => $hidescoremarkers
 ]);
 // force submitall
 if ($submitall) {
