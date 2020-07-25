@@ -111,7 +111,7 @@ if (isset($QS['showhints'])) {
 }
 
 if (isset($QS['maxtries'])) {
-    $maxtries = $QS['maxtries'];
+    $maxtries = intval($QS['maxtries']);
 } else {
     $maxtries = 0;
 }

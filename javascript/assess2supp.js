@@ -61,7 +61,7 @@ function submitq(qn) {
 function sendupscores(msg) {
     if(inIframe()) {
         var returnobj = {
-            subject: "lti.ext.mom.updateScore", 
+            subject: "lti.ext.mom.updateScore",
             jwt: msg,
             frame_id: frame_id
         };
@@ -144,6 +144,25 @@ $(function() {
     });
 });
 
+function disableInputs(qn, disabled) {
+  var regex, pn;
+  for (var i=0;i<disabled.length;i++) {
+    pn = disabled[i];
+    // out of tries - disable inputs
+    if (pn === 'all') {
+      regex = new RegExp('^(qn|tc|qs)(' + (qn) + '\\b|' + (qn + 1) + '\\d{3}\\b)');
+    } else if (pn === 0) {
+      regex = new RegExp('^(qn|tc|qs)(' + (qn) + '\\b|' + ((qn + 1) * 1000 + pn * 1) + '\\b)');
+    } else {
+      regex = new RegExp('^(qn|tc|qs)' + ((qn + 1) * 1000 + pn * 1) + '\\b');
+    }
+    $('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
+      if (el.name.match(regex)) {
+        el.disabled = true;
+      }
+    });
+  }
+}
 
  function initq(qn, jsparams) {
    var qwrap = document.getElementById('questionwrap'+qn);
@@ -173,6 +192,9 @@ $(function() {
 
    if (jsparams.helps && jsparams.helps.length > 0) {
      addHelps(qwrap, jsparams.helps);
+   }
+   if (jsparams.disabled) {
+     disableInputs(qn, jsparams.disabled);
    }
    allJsParams[qn] = jsparams;
  }

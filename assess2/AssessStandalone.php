@@ -150,6 +150,7 @@ class AssessStandalone {
 
     list($qout,$scripts) = $this->parseScripts($question->getQuestionContent());
     $jsparams = $question->getJsParams();
+
     if (count($scripts) > 0) {
       $jsparams['scripts'] = $scripts;
     }
@@ -160,6 +161,26 @@ class AssessStandalone {
     if (!empty($options['showans'])) {
       $jsparams['ans'] = $question->getCorrectAnswersForParts();
       $jsparams['stuans'] = $stuanswers[$qn+1];
+    }
+
+    if (!empty($options['maxtries'])) {
+      $disabled = array();
+      // TODO: is this correct?  Need it to work for conditional, but
+      // seems like it'd also hit singlescore
+      if (count($answeights)==1 && count($this->state['partattemptn'][$qn])>1
+        && $this->state['partattemptn'][$qn][0] >= $options['maxtries']
+      ) {
+        $disabled[] = 'all';
+      } else {
+        foreach($this->state['partattemptn'][$qn] as $pn=>$att) {
+          if ($att >= $options['maxtries']) {
+            $disabled[] = $pn;
+          }
+        }
+      }
+      $jsparams['maxtries'] = $options['maxtries'];
+      $jsparams['partatt'] = $this->state['partattemptn'][$qn];
+      $jsparams['disabled'] = $disabled;
     }
 
     return array('html' => $qout, 'jsparams' => $jsparams, 'errors'=>$question->getErrors());
