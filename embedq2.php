@@ -14,7 +14,7 @@ require("includes/JWT.php");
 $assessver = 2;
 $courseUIver = 2;
 $assessUIver = 2;
-$qn = 5; //question number to use 
+$qn = 5; //question number to use
 $_SESSION = array();
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $statesecret = !empty($CFG['GEN']['embedsecret']) ? $CFG['GEN']['embedsecret'] : 'test';
@@ -39,6 +39,9 @@ if (isset($_POST['state'])) {
         if (isset($QS['showscored'])) {
             // want to redisplay question; set as state
             $_POST['state'] = $QS['showscored'];
+        } if (isset($QS['redisplay'])) {
+            // want to redisplay question; set as state
+            $_POST['state'] = $QS['redisplay'];
         }
     }
 } else {
@@ -110,6 +113,13 @@ if (isset($QS['showscoredonsubmit'])) {
     $showscoredonsubmit = $QS['showscoredonsubmit'];
 } else {
     $showscoredonsubmit = !$issigned;
+}
+$showscoremarkers = $showscoredonsubmit;
+if (isset($QS['showscored'])) {
+  $showscoremarkers = true;
+}
+if (isset($QS['showscoremarkers'])) {
+    $showscoremarkers = $QS['showscoremarkers'];
 }
 if (isset($QS['allowregen'])) {
     $allowregen = $QS['allowregen'];
@@ -198,7 +208,8 @@ if (isset($_POST['toscoreqn'])) {
     if ($showscoredonsubmit) {
         $disp = $a2->displayQuestion($qn, [
             'showans' => $showans,
-            'showhints' => $showhints
+            'showhints' => $showhints,
+            'hidescoremarkers'= > !$showscoremarkers
           ]);
         $out['disp'] = $disp;
     }
@@ -207,7 +218,8 @@ if (isset($_POST['toscoreqn'])) {
 }
 
 $disp = $a2->displayQuestion($qn, [
-    'showhints' => $showhints
+    'showhints' => $showhints,
+    'hidescoremarkers'= > !$showscoremarkers
 ]);
 // force submitall
 if ($submitall) {
