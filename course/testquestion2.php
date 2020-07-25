@@ -337,7 +337,7 @@ if ($overwriteBody==1) {
     }
     echo '</ul>';
   }
-  echo '<div questionpane">';
+  echo '<div class="questionpane">';
   echo '<div class="question" id="questionwrap'.$qn.'">';
   echo $disp['html'];
   echo '</div></div>';
