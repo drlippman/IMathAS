@@ -106,6 +106,10 @@ class AssessStandalone {
         foreach ($this->state['rawscores'][$qn] as $pn=>$sc) {
             if (!empty($options['hidescoremarkers'])) {
                 $seqPartDone[$pn] = ($this->state['partattemptn'][$qn][$pn] > 0);
+            } else if (!empty($options['maxtries']) &&
+              $this->state['partattemptn'][$qn][$pn] >= $options['maxtries']
+            ) {
+                $seqPartDone[$pn] = true;
             } else {
                 $seqPartDone[$pn] = ($sc>.98);
             }
@@ -243,9 +247,9 @@ class AssessStandalone {
     }
 
     return array(
-        'scores'=>$scores, 
-        'raw'=>$rawparts, 
-        'errors'=>$scoreResult['errors'], 
+        'scores'=>$scores,
+        'raw'=>$rawparts,
+        'errors'=>$scoreResult['errors'],
         'allans'=>$allPartsAns
     );
   }

@@ -109,6 +109,12 @@ if (isset($QS['showhints'])) {
 } else {
     $showhints = 3;
 }
+
+if (isset($QS['maxtries'])) {
+    $maxtries = $QS['maxtries'];
+} else {
+    $maxtries = 0;
+}
 if (isset($QS['showscoredonsubmit'])) {
     $showscoredonsubmit = $QS['showscoredonsubmit'];
 } else {
@@ -171,6 +177,7 @@ if (isset($_POST['state'])) {
         'showscoredonsubmit' => $showscoredonsubmit,
         'hidescoremarkers' => $hidescoremarkers,
         'allowregen' => $allowregen,
+        'maxtries' => $maxtries,
         'auth' => $QS['auth']
     );
 }
@@ -211,7 +218,8 @@ if (isset($_POST['toscoreqn'])) {
         $disp = $a2->displayQuestion($qn, [
             'showans' => $showans,
             'showhints' => $showhints,
-            'hidescoremarkers' => $hidescoremarkers
+            'hidescoremarkers' => $hidescoremarkers,
+            'maxtries' => $maxtries
           ]);
         $out['disp'] = $disp;
     }
@@ -221,7 +229,8 @@ if (isset($_POST['toscoreqn'])) {
 
 $disp = $a2->displayQuestion($qn, [
     'showhints' => $showhints,
-    'hidescoremarkers' => $hidescoremarkers
+    'hidescoremarkers' => $hidescoremarkers,
+    'maxtries' => $maxtries
 ]);
 // force submitall
 if ($submitall) {
