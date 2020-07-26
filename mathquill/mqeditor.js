@@ -73,7 +73,7 @@ var MQeditor = (function($) {
     if (newstate === true) { // enable MQ
       var initval = $(el).attr("type","hidden").val();
       if (config.hasOwnProperty('toMQ')) { // convert format if needed
-        initval = config.toMQ(initval);
+        initval = config.toMQ(initval, textId);
       }
       var mqfield = $("#mqinput-"+textId);
       if (mqfield.length == 0) {  // no existing MQ input
@@ -330,7 +330,7 @@ var MQeditor = (function($) {
       var latex = mf.latex();
       if (config.hasOwnProperty('fromMQ')) {
         //convert to input format
-        latex = config.fromMQ(latex);
+        latex = config.fromMQ(latex, el.id);
       }
   		//document.getElementById(el.id.substring(8)).value = latex;
       $("#"+el.id.substring(8)).val(latex).trigger('input');
