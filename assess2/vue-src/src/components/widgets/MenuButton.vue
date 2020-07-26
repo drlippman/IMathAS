@@ -59,7 +59,7 @@
           <component
             v-else
             v-bind = "getLinkProps(option,index)"
-            @click = "toggleOpen"
+            @click = "linkClick($event,option)"
             @mouseover = "curSelected = index"
             :id = "id + '_' + index"
             :class="{'menubutton-focus': index==curSelected}"
@@ -129,6 +129,13 @@ export default {
           is: 'span'
         };
       }
+    },
+    linkClick (event, option) {
+      if (option.link && option.popup) {
+        event.preventDefault();
+        window.GB_show(option.label, option.link, 400, 400, false);
+      }
+      this.toggleOpen();
     },
     toggleOpen (val) {
       if (typeof val === 'boolean') {

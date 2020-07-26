@@ -313,7 +313,7 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
-function GB_show(caption,url,width,height) {
+function GB_show(caption,url,width,height,overlay) {
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
 		gb_overlay.id = "GB_overlay";
@@ -405,8 +405,12 @@ function GB_show(caption,url,width,height) {
 			var h = height;
 		}
 	}
-	document.getElementById("GB_window").style.display = "block";
-	document.getElementById("GB_overlay").style.display = "block";
+    document.getElementById("GB_window").style.display = "block";
+    if (overlay !== false) {
+        document.getElementById("GB_overlay").style.display = "block";
+    } else {
+        document.getElementById("GB_overlay").style.display = "none";
+    }
 	document.getElementById("GB_loading").style.display = "block";
 
 	//var de = document.documentElement;
