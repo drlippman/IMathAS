@@ -1022,7 +1022,8 @@ class QuestionHtmlGenerator
                           'url' => $extrefpt[1],
                           'w' => $vidextrefwidth,
                           'h' => $vidextrefheight,
-                          'ref' => $qref
+                          'ref' => $qref,
+                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
                         ];
                         //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
                     } else {
@@ -1032,7 +1033,8 @@ class QuestionHtmlGenerator
                           'url' => $extrefpt[1],
                           'w' => $extrefwidth,
                           'h' => $extrefheight,
-                          'ref' => $qref
+                          'ref' => $qref,
+                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
                         ];
                     }
                 }

@@ -150,8 +150,9 @@
 				));
 				$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
 				$captioned = (strpos($t, '<track')===false)?0:1;
-			}
-			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned;
+            }
+            $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
+			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned.'!!'.$helpdescr;
 		}
 		$extref = implode('~~',$newextref);
 		if (isset($_POST['doreplaceby'])) {
@@ -772,7 +773,10 @@
 			if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 				$type .= ' (cc)';
 			}
-			$extrefqs[$i] = array($type,$extrefpt[1]);
+            $extrefqs[$i] = array($type,$extrefpt[1]);
+            if (!empty($extrefpt[3])) {
+                $extrefqs[$i][2] = Sanitize::encodeStringForDisplay($extrefpt[3]);
+            }
 		}
 		$qsPacket['extref'] = $extrefqs;
 		$qsPacket['id'] = isset($_GET['id']) ? $_GET['id'] : 0;
@@ -1226,7 +1230,9 @@ if (isset($images['vars']) && count($images['vars'])>0) {
  <option value="video"><?php echo _('Video'); ?></option>
  <option value="read"><?php echo _('Read'); ?></option>
  </select>
- URL: <input type="text" name="helpurl" size="30" <?php if (!$myq) {echo 'disabled';};?>/><br/>
+ <?php echo _('URL')?>: <input type="text" name="helpurl" size="30" <?php if (!$myq) {echo 'disabled';};?>/>
+ <?php echo _('Description')?>: <input type="text" name="helpdescr" size="30" <?php if (!$myq) {echo 'disabled';};?>/>
+ <br/>
 <?php
 echo '<div id="helpbtnwrap" ';
 if (count($extref)==0) {
@@ -1241,7 +1247,11 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  "._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
+    echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>. ";
+    if (!empty($extrefpt[3])) {
+        echo _('Description') . ': ' . Sanitize::encodeStringForDisplay($extrefpt[3]) . '. ';
+    }
+    echo ' <label>'._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></label></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
@@ -1352,14 +1362,15 @@ if (FormData){ // Only allow quicksave if FormData object exists
 					$("#helpbtnlist").html('');
 					for (var i=0;i<res.extref.length;i++) {
 						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] +
-							", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
-							"Delete? <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
+                            ", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
+                            ((res.extref[i][2]) ? (_("Description")+": "+res.extref[i][2]+". "):"") +
+							_("Delete?")+" <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
 					}
 					$("#helpbtnwrap").removeClass("hidden");
 				} else {
 					$("#helpbtnwrap").addClass("hidden");
 				}
-				$("input[name=helpurl]").val('');
+				$("input[name=helpurl],input[name=helpdescr]").val('');
 
 				// Empty notices
 				$(".quickSaveNotice").empty();
