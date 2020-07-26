@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header></assess-header>
     <p v-if="isPreviewAll" class="headerpane noticetext">
       {{ $t("header.preview_all") }}
@@ -18,7 +21,13 @@
         {{ textToggleLabel }}
       </button>
     </p>
-    <div class="scrollpane fulldisp" role="region" :aria-label="$t('regions.questions')">
+    <div
+      class="scrollpane fulldisp"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.questions')"
+    >
       <intro-text
         v-if = "intro !== ''"
         :active = "showTexts"
