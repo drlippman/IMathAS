@@ -1294,16 +1294,22 @@ function randsfrom($lst,$n,$ord='def') {
 }
 
 
-function jointrandfrom($lst1,$lst2) {
-	if (func_num_args()!=2) { echo "jointrandfrom expects 2 arguments"; return array(1,1);}
-	if (!is_array($lst1)) {
-		$lst1 = listtoarray($lst1);
-	}
-	if (!is_array($lst2)) {
-		$lst2 = listtoarray($lst2);
-	}
-	$l = $GLOBALS['RND']->rand(0,min(count($lst1)-1,count($lst2)-1));
-	return array($lst1[$l],$lst2[$l]);
+function jointrandfrom() {
+    $args = func_get_args();
+	if (count($args)<2) { echo "jointrandfrom expects at least 2 arguments"; return array(1,1);}
+    $min = 1e12;
+    foreach ($args as $k=>$arg) {
+        if (!is_array($arg)) {
+            $args[$k] = listtoarray($arg);
+        }
+        $min = min($min, count($args[$k])-1);
+    }
+    $l = $GLOBALS['RND']->rand(0,$min);
+    $out = array();
+    foreach ($args as $k=>$arg) {
+        $out[] = $arg[$l];
+    }
+	return $out;
 }
 
 
