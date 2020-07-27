@@ -3903,7 +3903,9 @@ This type of question can contain multiple parts, where each part is one of the 
 <dt>$scoremethod = "singlescore" or "allornothing" </dt>
 	<dd>Instead of recording individual scores for each question part, these will cause a single score to be
 	recorded for the question.  "singlescore" totals the individual part scores, while "allornothing"
-	will only give full credit or no credit.</dd>
+    will only give full credit or no credit.  If you need to specify per-part indexed 
+    scoremethod values as well, you can define this as the array value 
+    $scoremethod['whole'] instead.</dd>
 <dt>Question part options</dt>
 	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
 <dt>$showanswer </dt>

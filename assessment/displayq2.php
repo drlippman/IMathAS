@@ -1044,7 +1044,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$answeights = array(1);
 			}
 		}
-		$scores = array();  $raw = array(); $accpts = 0;
+        $scores = array();  $raw = array(); $accpts = 0;
+        if (isset($scoremethod) && !empty($scoremethod['whole'])) {
+            $scoremethod = $scoremethod['whole'];
+        }
 		foreach ($anstypes as $kidx=>$anstype) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
 			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn".Sanitize::onlyInt($partnum)],$optionsPack,$qnidx+1);

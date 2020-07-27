@@ -421,9 +421,18 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
-            if ((isset($scoremethod) &&
-                ($scoremethod == 'acct' || $scoremethod == 'singlescore' ||
-                $scoremethod == 'allornothing')) ||
+            $scoremethodwhole = '';
+            if (isset($scoremethod)) {
+                if (!is_array($scoremethod)) {
+                    $scoremethodwhole = $scoremethod;
+                } else if (!empty($scoremethod['whole'])) {
+                    $scoremethodwhole = $scoremethod['whole'];
+                }
+            }
+            if (($scoremethodwhole == 'acct' || 
+                $scoremethodwhole == 'singlescore' ||
+                $scoremethodwhole == 'allornothing'
+              ) ||
               $quesData['qtype'] == 'conditional'
             ) {
               $jsParams['submitall'] = 1;
