@@ -218,7 +218,7 @@ class MathParser
       $str
     );
 
-    $str = str_replace(array('\\','[',']'), array('','(',')'), $str);
+    $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
