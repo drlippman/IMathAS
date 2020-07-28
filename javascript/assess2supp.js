@@ -77,7 +77,7 @@ function regenq(qn) {
         dataType: 'json',
         data: {
             state: document.getElementById('state').value,
-            regen: 1,
+            regen: qn,
             ajax: 1
         }
       }).done(function(data) {

@@ -190,7 +190,7 @@ if (isset($_POST['state'])) {
     );
 }
 
-if (!empty($_POST['regen']) && !$issigned) {
+if (isset($_POST['regen']) && !$issigned) {
     $seed = rand(0, 9999) + 10000;
     $state['seeds'][$qn] = $seed;
     unset($state['stuanswers'][$qn+1]);

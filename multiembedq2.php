@@ -210,6 +210,33 @@ if (isset($_POST['toscoreqn'])) {
     }
     echo json_encode($out);
     exit;
+} else if (isset($_POST['regen'])) {
+    $qn = intval($_POST['regen']);
+    $qsid = $QS['id'][$qn];
+
+    // clear values 
+    $seed = rand(0, 9999) + 10000;
+    $state['seeds'][$qn] = $seed;
+    unset($state['stuanswers'][$qn+1]);
+    unset($state['stuanswersval'][$qn+1]);
+    $state['scorenonzero'][$qn+1] = false;
+    $state['scoreiscorrect'][$qn+1] = false;
+    $state['partattemptn'][$qn] = array();
+    $state['rawscores'][$qn] = array();
+    $a2->setState($state);
+    
+    // load question data
+    $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
+    $stm->execute(array(':id' => $qsid));
+    $line = $stm->fetch(PDO::FETCH_ASSOC);
+    $a2->setQuestionData($qsid, $line);
+    $disp = $a2->displayQuestion($qn);
+    $out = array(
+        'state' => JWT::encode($a2->getState(), $statesecret),
+        'disp' => $disp
+    );
+    echo json_encode($out);
+    exit;
 }
 
 // load question data and load/set state
