@@ -102,7 +102,7 @@ if (isset($QS['jssubmit'])) {
 if (isset($QS['showans'])) {
     $showans = $QS['showans'];
 } else {
-    $showans = !$issigned;
+    $showans = 0;
 }
 if (isset($QS['showhints'])) {
     $showhints = $QS['showhints'];
@@ -114,6 +114,13 @@ if (isset($QS['maxtries'])) {
     $maxtries = intval($QS['maxtries']);
 } else {
     $maxtries = 0;
+}
+if (isset($QS['showansafter'])) {
+    $showansafter = $QS['showansafter'];
+} else if ($maxtries > 0) {
+    $showansafter = $maxtries;
+} else {
+    $showansafter = $issigned ? 0 : 1;
 }
 if (isset($QS['showscoredonsubmit'])) {
     $showscoredonsubmit = $QS['showscoredonsubmit'];
@@ -178,6 +185,7 @@ if (isset($_POST['state'])) {
         'hidescoremarkers' => $hidescoremarkers,
         'allowregen' => $allowregen,
         'maxtries' => $maxtries,
+        'showansafter' => $showansafter,
         'auth' => $QS['auth']
     );
 }
@@ -215,23 +223,15 @@ if (isset($_POST['toscoreqn'])) {
     $out = array('jwt'=>JWT::encode($jwtcontents, $QS['auth']));
 
     if ($showscoredonsubmit || !$res['allans']) {
-        $disp = $a2->displayQuestion($qn, [
-            'showans' => $showans,
-            'showhints' => $showhints,
-            'hidescoremarkers' => $hidescoremarkers,
-            'maxtries' => $maxtries
-          ]);
+        $disp = $a2->displayQuestion($qn);
         $out['disp'] = $disp;
     }
     echo json_encode($out);
     exit;
 }
 
-$disp = $a2->displayQuestion($qn, [
-    'showhints' => $showhints,
-    'hidescoremarkers' => $hidescoremarkers,
-    'maxtries' => $maxtries
-]);
+$disp = $a2->displayQuestion($qn);
+
 // force submitall
 if ($submitall) {
     $disp['jsparams']['submitall'] = 1;
@@ -274,7 +274,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $imasroot . '/javascript/assess2_min.js?v=052920" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="' . $imasroot . '/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
+$placeinhead .= '<script src="' . $imasroot . '/javascript/assess2supp.js" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $imasroot . '/mathquill/mathquill-basic.css">
   <link rel="stylesheet" type="text/css" href="' . $imasroot . '/mathquill/mqeditor.css">';
 

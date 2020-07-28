@@ -105,11 +105,16 @@ class AssessStandalone {
    * displays the question $qn, using details from state
    * Values in $options can override the state values
    */
-  function displayQuestion($qn, $options) {
+  function displayQuestion($qn, $options=[]) {
     $qsid = $this->state['qsid'][$qn];
     $attemptn = empty($this->state['partattemptn'][$qn]) ? 0 : max($this->state['partattemptn'][$qn]);
     $maxtries = $this->getOpVal($options, 'maxtries', 0);
+    $showansafter = $this->getOpVal($options, 'showansafter', 0); 
+
     $hidescoremarkers = !empty($this->getOpVal($options, 'hidescoremarkers', false));
+
+    $showansparts = array();
+    $showans = false;
 
     if (!empty($options['showallparts'])) {
       $seqPartDone = true;
@@ -126,9 +131,15 @@ class AssessStandalone {
             } else {
                 $seqPartDone[$pn] = ($sc>.98);
             }
+            if ($showansafter > 0 && 
+                $this->state['partattemptn'][$qn][$pn] >= $showansafter
+            ) {
+                $showansparts[$pn] = true;
+            }
         }
       }
     }
+
     $showans = !empty($this->getOpVal($options, 'showans', false));
     $showhints = $this->getOpVal($options, 'showhints', 3);
     $rawscores = $this->state['rawscores'][$qn];
@@ -150,8 +161,8 @@ class AssessStandalone {
         ->setQuestionSeed($this->state['seeds'][$qn])
         ->setShowHints($showhints)
         ->setShowAnswer($showans)
-        ->setShowAnswerParts(array())
-        ->setShowAnswerButton($showans)
+        ->setShowAnswerParts($showansparts)
+        ->setShowAnswerButton(true)
         ->setStudentAttemptNumber($attemptn)
         ->setStudentPartAttemptCount($this->state['partattemptn'][$qn])
         ->setAllQuestionAnswers($this->state['stuanswers'])

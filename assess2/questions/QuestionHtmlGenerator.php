@@ -144,6 +144,11 @@ class QuestionHtmlGenerator
               $stuanswersval[$thisq] = array($stuanswersval[$thisq]);
             }
           }
+        } else {
+            // if $doShowAnswerParts is set for part 0, use it for global
+            if (!empty($doShowAnswerParts[0])) {
+                $doShowAnswer = true;
+            }
         }
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
