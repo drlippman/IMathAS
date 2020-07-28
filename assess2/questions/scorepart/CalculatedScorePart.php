@@ -369,6 +369,10 @@ class CalculatedScorePart implements ScorePart
                 }
             }
         }
+        if (count($anarr) == 0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
         if (in_array('orderedlist',$ansformats)) {
             $score = $correct/count($anarr);
             $scorePartResult->setRawScore($score);
