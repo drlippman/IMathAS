@@ -1,6 +1,7 @@
 <?php
 
 require("../init.php");
+require('../includes/filehandler.php');
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
@@ -149,7 +150,44 @@ function getReqData() {
 		if (!isset($out[$row['status']])) {
 			$out[$row['status']] = array();
 		}
-		$userdata = json_decode($row['reqdata'],true);
+        $userdata = json_decode($row['reqdata'],true);
+        if (isset($userdata['ipeds'])) {
+            // handle requests with ipeds info 
+            if (strpos($userdata['ipeds'],'-') !== false) {
+                list($ipedstype,$ipedsval) = explode('-', $userdata['ipeds']);
+                $query = 'SELECT ip.school,ip.agency,ip.country,ig.id,ig.name 
+                    FROM imas_ipeds AS ip 
+                    LEFT JOIN imas_ipeds_group AS ip.type=ipg.type AND ip.ipedsid=ipg.ipedsid 
+                    JOIN imas_groups AS ig ON ipg.groupid=ig.id 
+                    WHERE ip.type=? and ip.ipedsid=?';
+                $stm2 = $DBH->prepare();
+                $stm2->execute(array($ipedstype, $ipedsval));
+                $ipedsgroups = array();
+                while ($r2 = $stm2->fetch(PDO::FETCH_ASSOC)) {
+                    $ipedname = ($ipedstype == 'A') ? $r2['agency'] : $r2['school'];
+                    if ($r2['id'] !== null) {
+                        $ipedsgroups[$r2['id']] = $r2['name'];
+                    }
+                }
+                if (count($ipedsgroups)>0) {
+                    $userdata['fixedgroups'] = $ipedsgroups;
+                } 
+                $userdata['school'] = $ipedname;
+            } else if ($userdata['ipeds'] == '0') {
+                $userdata['school'] = $userdata['otherschool'].', '.$userdata['schooloc'];
+            }
+        }
+        if (isset($userdata['vertype'])) {
+            // these values are further handled and sanitized below.
+            if ($userdata['vertype'] == 'url') {
+                $userdata['url'] = $userdata['verdata']; 
+            } else if ($userdata['vertype'] == 'email') {
+                $userdata['url'] = _('Expect an email from: ').$userdata['verdata'];
+            } else if ($userdata['vertype'] == 'file') {
+                $url = getprivatefileurl(substr($userdata['verdata'],5));
+                $userdata['url'] = "<a href=\"$url\" target=\"blank_\">"._('Verification Image').'</a>';
+            }
+        }
 		if (isset($userdata['url'])) {
 			if (substr($userdata['url'],0,4)=='http') {
 				$userdata['url'] = Sanitize::url($userdata['url']);
@@ -258,13 +296,13 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	    	<button @click="chgStatus(status, userindex, 3)">Probably should be Denied</button>
       	    </span>
       	  </li>
-					<li>Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
-						<button type=button @click="searchGroups">Search</button>
-					</li>
+          <li>Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
+            <button type=button @click="searchGroups">Search</button>
+          </li>
       	  <li v-show="groups !== null">Group: <select v-model="group">
       	  	<optgroup label="groups">
-      	  		<option value="-1">New group</option>
-      	  		<option value=0>Default</option>
+      	  		<option value="-1" v-if="fixedgroups.length===0">New group</option>
+      	  		<option value=0 v-if="fixedgroups.length===0">Default</option>
       	  		<option v-for="group in groups" :value="group.id">{{group.name}}</option>
       	  	</optgroup>
       	  	</select>
@@ -306,7 +344,8 @@ var app = new Vue({
 			4: 'Waiting for more info'
 		},
 		statusMsg: "",
-		group: 0,
+        group: 0,
+        fixedgroups: false,
 		newgroup: ""
 	},
 	computed: {
@@ -323,8 +362,15 @@ var app = new Vue({
 				this.activeUserStatus = status;
 				this.activeUserIndex = userindex;
 				this.$nextTick(function() {
-					this.groups = null;
-					this.group = 0;
+                    if (this.toApprove[status][userindex].hasOwnProperty('fixedgroups')) {
+                        this.groups = this.toApprove[status][userindex].fixedgroups;
+                        this.group = Object.keys(this.toApprove[status][userindex].fixedgroups)[0];
+                        this.fixedgroups = true;
+                    } else {
+                        this.groups = null;
+                        this.group = 0;
+                        this.fixedgroups = false;
+                    }
 				});
 			}
 		},

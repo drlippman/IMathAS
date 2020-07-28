@@ -109,15 +109,20 @@ if (isset($_POST['firstname'])) {
             }
             $verdata = $_POST['veremail'];
         } else if ($_POST['vertype'] == 'upload') {
-            // TODO: handle upload 
+            // handle upload 
             require_once('./includes/filehandler.php');
             // check file extension for OK
-            // change filename
-            $key = uniqid();
-            if (storeuploadedfile('verupload', $key,'private')) {
-               $verdata = 'file:'.$key;
+            $extension = strtolower(pathinfo($_FILES['verupload']['name'], PATHINFO_EXTENSION));
+            if (in_array($extension, array("gif", "jpg", "png", "jpeg", "pdf"))) {
+                // change filename
+                $key = 'instrreq/'.uniqid('img').'.'.$extension;
+                if (storeuploadedfile('verupload', $key, 'private')) {
+                    $verdata = 'file:'.$key;
+                } else {
+                    $error .= '<p>Error with file upload</p>';
+                }
             } else {
-               $error .= '<p>Error with file upload</p>';
+                $error .= '<p>Error invalid file type</p>';
             }
         }
     }
