@@ -1,8 +1,7 @@
 <?php
 
-// embedq2.php: Embed one question via an iframe
+// multiembedq2.php: Embed one or more questions via an iframe
 // Operates without requiring login
-// Can passback results to embedding page
 // (c) 2020 David Lippman
 
 $init_skip_csrfp = true;
@@ -14,7 +13,6 @@ require("includes/JWT.php");
 $assessver = 2;
 $courseUIver = 2;
 $assessUIver = 2;
-$qn = 5; //question number to use
 $_SESSION = array();
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $statesecret = !empty($CFG['GEN']['embedsecret']) ? $CFG['GEN']['embedsecret'] : 'test';
@@ -24,38 +22,18 @@ $issigned = false;
 if (isset($_POST['state'])) {
     $state = json_decode(json_encode(JWT::decode($_POST['state'], $statesecret)), true);
     $QS = $state;
-    $QS['id'] = $state['qsid'][$qn];
-} else if (isset($_REQUEST['jwt'])) {
-    try {
-        // decode JWT.  Stupid hack to convert it into an assoc array
-        // verification using 'auth' is built-into the JWT method
-        $QS = json_decode(json_encode(JWT::decode($_REQUEST['jwt'])), true);
-    } catch (Exception $e) {
-        echo "JWT Error: " . $e->getMessage();
-        exit;
-    }
-    if (!empty($QS['auth'])) {
-        $issigned = true;
-        if (isset($QS['showscored'])) {
-            // want to redisplay question; set as state
-            $_POST['state'] = $QS['showscored'];
-        } if (isset($QS['redisplay'])) {
-            // want to redisplay question; set as state
-            $_POST['state'] = $QS['redisplay'];
-        }
-    }
+    $QS['id'] = $state['qsid'];
 } else {
     $QS = $_GET;
-}
-if (empty($QS['auth'])) {
-    $QS['auth'] = '';
 }
 
 if (empty($QS['id'])) {
     echo 'Need to supply an id';
     exit;
 }
-
+if (!is_array($QS['id'])) {
+    $QS['id'] = explode('-', $QS['id']);
+}
 // set user preferences
 $prefdefaults = array(
     'mathdisp' => 6, //default is katex
@@ -91,8 +69,7 @@ foreach (array('graphdisp', 'mathdisp', 'useed') as $key) {
     $_SESSION[$key] = $_SESSION['userprefs'][$key];
 }
 
-// get parameter values based on query string / JWT values
-$qsid = intval($QS['id']);
+// get parameter values based on query string / state values
 
 if (isset($QS['jssubmit'])) {
     $jssubmit = $QS['jssubmit'];
@@ -150,34 +127,26 @@ $eqnhelper = 4;
 $useeqnhelper = 4;
 $showtips = 2;
 
-// load question data and load/set state
-$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
-$stm->execute(array(':id' => $qsid));
-$line = $stm->fetch(PDO::FETCH_ASSOC);
+$numq = count($QS['id']);
 
 $a2 = new AssessStandalone($DBH);
-$a2->setQuestionData($line['id'], $line);
 
 if (isset($_POST['state'])) {
     $state = json_decode(json_encode(JWT::decode($_POST['state'], $statesecret)), true);
-    $seed = $state['seeds'][$qn];
-    if (!$issigned) {
-        $seed = ($seed%10000) + 10000;
-    }
 } else {
-    $seed = rand(0, 9999);
-    if (!$issigned) {
-        $seed += 10000;
+    $seeds = array();
+    for($qn=0; $qn<$numq; $qn++) {
+        $seeds[$qn] = rand(0, 9999)+10000;
     }
     $state = array(
-        'seeds' => array($qn => $seed),
-        'qsid' => array($qn => $qsid),
+        'seeds' => $seeds,
+        'qsid' => $QS['id'],
         'stuanswers' => array(),
         'stuanswersval' => array(),
-        'scorenonzero' => array(($qn + 1) => false),
-        'scoreiscorrect' => array(($qn + 1) => false),
-        'partattemptn' => array($qn => array()),
-        'rawscores' => array($qn => array()),
+        'scorenonzero' => array_fill(1, $numq, false),
+        'scoreiscorrect' => array_fill(1, $numq, false),
+        'partattemptn' => array_fill(0, $numq, array()),
+        'rawscores' => array_fill(0, $numq, array()),
         'jssubmit' => $jssubmit,
         'showans' => $showans,
         'showhints' => $showhints,
@@ -185,32 +154,45 @@ if (isset($_POST['state'])) {
         'hidescoremarkers' => $hidescoremarkers,
         'allowregen' => $allowregen,
         'maxtries' => $maxtries,
-        'showansafter' => $showansafter,
-        'auth' => $QS['auth']
+        'showansafter' => $showansafter
     );
 }
 
-if (!empty($_POST['regen']) && !$issigned) {
+if (!empty($_POST['regen'])) {
+    $qntoregen = $_POST['regen'];
     $seed = rand(0, 9999) + 10000;
-    $state['seeds'][$qn] = $seed;
-    unset($state['stuanswers'][$qn+1]);
-    unset($state['stuanswersval'][$qn+1]);
-    $state['scorenonzero'][$qn+1] = false;
-    $state['scoreiscorrect'][$qn+1] = false;
-    $state['partattemptn'][$qn] = array();
-    $state['rawscores'][$qn] = array();
+    $state['seeds'][$qntoregen] = $seed;
+    unset($state['stuanswers'][$qntoregen+1]);
+    unset($state['stuanswersval'][$qntoregenn+1]);
+    $state['scorenonzero'][$qntoregen+1] = false;
+    $state['scoreiscorrect'][$qntoregen+1] = false;
+    $state['partattemptn'][$qntoregen] = array();
+    $state['rawscores'][$qntoregen] = array();
 }
 
 $a2->setState($state);
 
 if (isset($_POST['toscoreqn'])) {
     $toscoreqn = json_decode($_POST['toscoreqn'], true);
+    $qns = array_keys($toscoreqn);
+    if (count($qns)>1) {
+        echo "Error - can only handle submitting one question at a time";
+    }
+    $qn = $qns[0];
     $parts_to_score = array();
     if (isset($toscoreqn[$qn])) {
       foreach ($toscoreqn[$qn] as $pn) {
         $parts_to_score[$pn] = true;
       };
     }
+    $qsid = $QS['id'][$qn];
+
+    // load question data
+    $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
+    $stm->execute(array(':id' => $qsid));
+    $line = $stm->fetch(PDO::FETCH_ASSOC);
+    $a2->setQuestionData($qsid, $line);
+
     $res = $a2->scoreQuestion($qn, $parts_to_score);
     $jwtcontents = array(
         'id' => $qsid,
@@ -230,21 +212,25 @@ if (isset($_POST['toscoreqn'])) {
     exit;
 }
 
-$disp = $a2->displayQuestion($qn);
-
-// force submitall
-if ($submitall) {
-    $disp['jsparams']['submitall'] = 1;
+// load question data and load/set state
+$ph = Sanitize::generateQueryPlaceholders($QS['id']);
+$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
+$stm->execute($QS['id']);
+$line = $stm->fetch(PDO::FETCH_ASSOC);
+$qsdata = array();
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    $qsdata[$row['id']] = $row;
 }
 
-// if ajax load of question, return values now
-if (isset($_POST['ajax'])) {
-    $out = array(
-        'state' => JWT::encode($a2->getState(), $statesecret),
-        'disp' => $disp
-    );
-    echo json_encode($out);
-    exit;
+$disps = array();
+for ($qn=0; $qn < $numq; $qn++) {
+    $qsid = $QS['id'][$qn];
+    $a2->setQuestionData($qsid, $qsdata[$qn]);
+    $disps[$qn] = $a2->displayQuestion($qn);
+    // force submitall
+    if ($submitall) {
+        $disps[$qn]['jsparams']['submitall'] = 1;
+    }
 }
 
 if (isset($_GET['frame_id'])) {
@@ -281,8 +267,6 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $imasroot . '/
 // setup resize message sender
 $placeinhead .= '<script type="text/javascript">
   var frame_id = "' . $frameid . '";
-  var qsid = '.$qsid.';
-  var thisqn = '.$qn.';
   function sendresizemsg() {
    if(inIframe()){
       var default_height = Math.max(
@@ -335,30 +319,32 @@ $nologo = true;
 require "./header.php";
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
-echo '<div class="questionwrap">';
-if (!$jssubmit) {
-    echo '<div id="results'.$qn.'"></div>';
-}
-echo '<div class="questionpane">';
-echo '<div class="question" id="questionwrap'.$qn.'">';
-echo '</div></div>';
-if (!$jssubmit) {
-    echo '<p>';
-    echo '<button type=button onclick="submitq('.$qn.')" class="primary">'._("Submit").'</button>';
-    if ($allowregen) {
-        echo ' <button type=button onclick="regenq('.$qn.')" class="secondary">'._('Try a similar question').'</button>';
+for ($qn=0; $qn < $numq; $qn++) {
+    echo '<div class="questionwrap">';
+    if (!$jssubmit) {
+        echo '<div id="results'.$qn.'"></div>';
     }
-    echo '</p>';
+    echo '<div class="questionpane">';
+    echo '<div class="question" id="questionwrap'.$qn.'">';
+    echo '</div></div>';
+    if (!$jssubmit) {
+        echo '<p>';
+        echo '<button type=button onclick="submitq('.$qn.')" class="primary">'._("Submit").'</button>';
+        if ($allowregen) {
+            echo ' <button type=button onclick="regenq('.$qn.')" class="secondary">'._('Try a similar question').'</button>';
+        }
+        echo '</p>';
+    }
+    echo '</div>';
+
+    echo '<script>
+        $(function() {
+            showandinit('.$qn.','.json_encode($disps[$qn]).');
+        });
+        </script>';
 }
-echo '</div>';
 echo '<input type=hidden name=toscoreqn id=toscoreqn value=""/>';
 echo '<input type=hidden name=state id=state value="'.Sanitize::encodeStringForDisplay(JWT::encode($a2->getState(), $statesecret)).'" />';
-
-echo '<script>
-    $(function() {
-        showandinit('.$qn.','.json_encode($disp).');
-    });
-    </script>';
 
 if ($jssubmit) {
     echo '<div style="height:200px">&nbsp;</div>';

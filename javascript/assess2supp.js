@@ -133,7 +133,6 @@ $(function() {
         if (msg == 'submit') {
             submitq(thisqn);
         } else if (msg.match(/imathas\.show/)) {
-            console.log(msg);
             var data = JSON.parse(msg);
             if (data.jwt) {
                 loadquestionByJwt(thisqn, data.jwt);
