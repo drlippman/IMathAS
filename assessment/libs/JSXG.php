@@ -268,7 +268,7 @@ function JSXG_addSlider($board, $sname, $ops=array()){
       }
       // Add event listener
       $out .= ".on('up',function(){
-        $('#qn{$box}, #tc{$box}').val(this.Value());
+        $('#qn{$box}, #tc{$box}').val(this.Value()).trigger('change').trigger('input');
       });";
       // Change border color of JSXG board based off of answerbox color
       // (Green if correct, red if wrong, etc.)
@@ -1027,7 +1027,8 @@ function JSXG_createBlankBoard($label, $ops){
     // If answerbox option provided, link the point to the answerbox
     if($ops['answerbox']!==null ){
       $out .= ".on('up',function(){
-        $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')');
+        $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')')
+            .trigger('change').trigger('input');
       });";
       // Change border color of JSXG board based off of answerbox color
       // (Green if correct, red if wrong, etc.)
@@ -1984,7 +1985,8 @@ function JSXG_createBlankBoard($label, $ops){
       // // If answerbox option provided, link the point to the answerbox
       if($ops['answerbox']!==null ){
         $out .= ".on('up',function(){
-          $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')');
+          $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')')
+            .trigger('change').trigger('input');
         });";
         // Change border color of JSXG board based off of answerbox color
         // (Green if correct, red if wrong, etc.)
