@@ -104,7 +104,13 @@ if (!empty($newStatus)) {
 			}
 		} else {
 			$group = 0;
-		}
+        }
+        
+        if ($group > 0 && !empty($reqdata['ipeds']) && strpos($reqdata['ipeds'],'-')!==false) {
+            list($ipedtype, $ipedid) = explode('-', $reqdata['ipeds']);
+            $stm = $DBH->prepare("INSERT IGNORE INTO imas_ipeds_group (type,ipedsid,groupid) VALUES (?,?,?)");
+            $stm->execute(array($ipedtype, $ipedid, $group));
+        }
 
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
 		$stm->execute(array(':groupid'=>$group, ':id'=>$instId));

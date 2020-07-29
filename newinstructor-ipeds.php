@@ -299,7 +299,7 @@ $_SESSION['challenge'] = uniqid();
 </div>
 
 <div id=otherschool style="display:none">
-    <span class=form><label for=otherschool>Please give the name of your school:</label></span>
+    <span class=form><label for=otherschool>Please give the full name of your school (no initials like WSU please):</label></span>
     <span class=formright><input id=otherschool name=otherschool size=40 /></span><br class=form>
 </div>
 
