@@ -143,6 +143,12 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
 	$canuselatepass = false;
 
+	// if caltag == 'use_name', display the assessment name
+	if ($row['caltag'] == 'use_name') {
+		// truncate name, if needed
+		$row['caltag'] = strlen($row['name']) > 40 ? substr($row['name'], 0, 40) . '...' : $row['name'];
+	}
+
 	if (isset($exceptions[$row['id']])) {
 		list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row);
 		if ($useexception) {

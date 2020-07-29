@@ -414,7 +414,7 @@ function tokenize($str,$anstype,$countcnt) {
 						}
 					}
 					//rewrite arctrig into atrig for PHP
-					$out = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("asin","acos","atan","asinh","acosh","atanh"),$out);
+					$out = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("safeasin","safeacos","atan","asinh","acosh","atanh"),$out);
 
 					//connect upcoming parens to function
 					$connecttolast = 2;

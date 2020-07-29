@@ -102,67 +102,66 @@ if (!$in_practice &&
 }
 
 // add any new group members, if allowed
-if (!$canViewAll &&
-  $assess_info->getSetting('isgroup') == 2 &&
-  ($_POST['new_group_members'] != '' || !$assess_record->hasRecord())
-) {
+if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
   $groupsetid = $assess_info->getSetting('groupsetid');
   // get current group and members
   list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
-  $current_members = array_keys($current_members); // we just want the user IDs
-  if (trim($_POST['new_group_members']) == '') {
-    $potential_group_members = array();
-  } else {
-    $potential_group_members = explode(',', $_POST['new_group_members']);
-  }
-  $available_new_members = AssessUtils::checkPotentialGroupMembers($potential_group_members, $groupsetid);
-
-  if ($stugroupid == 0) {
-    // need to create a new stugroup for user and group
-    $stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',?)");
-		$stm->execute(array($groupsetid));
-    $stugroupid = $DBH->lastInsertId();
-
-    $available_new_members[] = $uid;
-  }
-
-  // see if we are starting a new group or adding to existing one.
-  // need to check that the user wasn't added to another group since initial launch
-  // in which case we won't add the group members
-  if ((count($current_members) == 0 || $stugroupid == $_POST['cur_group']) &&
-    count($available_new_members) > 0
-  ) {
-    // Add new members to the group
-    $qarr = array();
-    $vals = array();
-    foreach ($available_new_members as $gm_uid) {
-      $vals[] = '(?,?)';
-      array_push($qarr, $gm_uid, $stugroupid);
+  if ($_POST['new_group_members'] != '' || !$assess_record->hasRecord() || $stugroupid == 0) {
+    $current_members = array_keys($current_members); // we just want the user IDs
+    if (trim($_POST['new_group_members']) == '') {
+        $potential_group_members = array();
+    } else {
+        $potential_group_members = explode(',', $_POST['new_group_members']);
     }
-    $query = 'INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ';
-    $query .= implode(',', $vals);
-    $stm = $DBH->prepare($query);
+    $available_new_members = AssessUtils::checkPotentialGroupMembers($potential_group_members, $groupsetid);
 
-    $stm->execute($qarr);
-  }
-  $current_members = array_merge($current_members, $available_new_members);
+    if ($stugroupid == 0) {
+        // need to create a new stugroup for user and group
+        $stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES ('Unnamed group',?)");
+            $stm->execute(array($groupsetid));
+        $stugroupid = $DBH->lastInsertId();
 
-  // if we already have an assess record, need to copy it to new group members
-  if ($assess_record->hasRecord()) {
-    // get current record
-    $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
-    $query = "SELECT $fieldstocopy FROM ";
-    $query .= "imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid";
-    $stm = $DBH->prepare($query);
-    $stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
-    $rowgrpdata = $stm->fetch(PDO::FETCH_NUM);
-    // now copy it to others
-    $ph = Sanitize::generateQueryPlaceholders($rowgrpdata);
-    $query = "REPLACE INTO imas_assessment_records (userid,$fieldstocopy) ";
-    $query .= "VALUES (?,$ph)";
-    $stm = $DBH->prepare($query);
-    foreach ($available_new_members as $gm_uid) {
-      $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
+        $available_new_members[] = $uid;
+    }
+
+    // see if we are starting a new group or adding to existing one.
+    // need to check that the user wasn't added to another group since initial launch
+    // in which case we won't add the group members
+    if ((count($current_members) == 0 || $stugroupid == $_POST['cur_group']) &&
+        count($available_new_members) > 0
+    ) {
+        // Add new members to the group
+        $qarr = array();
+        $vals = array();
+        foreach ($available_new_members as $gm_uid) {
+        $vals[] = '(?,?)';
+        array_push($qarr, $gm_uid, $stugroupid);
+        }
+        $query = 'INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ';
+        $query .= implode(',', $vals);
+        $stm = $DBH->prepare($query);
+
+        $stm->execute($qarr);
+    }
+    $current_members = array_merge($current_members, $available_new_members);
+
+    // if we already have an assess record, need to copy it to new group members
+    if ($assess_record->hasRecord()) {
+        // get current record
+        $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
+        $query = "SELECT $fieldstocopy FROM ";
+        $query .= "imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid";
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
+        $rowgrpdata = $stm->fetch(PDO::FETCH_NUM);
+        // now copy it to others
+        $ph = Sanitize::generateQueryPlaceholders($rowgrpdata);
+        $query = "REPLACE INTO imas_assessment_records (userid,$fieldstocopy) ";
+        $query .= "VALUES (?,$ph)";
+        $stm = $DBH->prepare($query);
+        foreach ($available_new_members as $gm_uid) {
+        $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
+        }
     }
   }
 }

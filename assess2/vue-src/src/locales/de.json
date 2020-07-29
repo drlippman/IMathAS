@@ -41,7 +41,15 @@
     "submit_now": "Jetzt einreichen",
     "exit": "Beenden",
     "teacher_preview": "Dieser Test ist für Studierende nicht geöffnet; Sie können ihn aber als Vorschau ansehen.",
-    "teacher_preview_button": "Test-Vorschau"
+    "teacher_preview_button": "Test-Vorschau",
+    "teacher_previewall_button": "Dozenten-Ansicht"
+  },
+  "duedialog": {
+    "due": "Frist abgelaufen",
+    "nowdue": "Dieser Test ist jetzt fällig.",
+    "byq_unsubmitted": "Sie haben noch nicht alle Eingaben zur Bewertung eingereicht.",
+    "bya_unsubmitted": "Dieser Versuch des Tests wurde noch nicht zur Bewertung eingereicht.",
+    "submitnow": "Zur Bewertung einreichen"
   },
   "setlist": {
     "practice": "Dieser Test ist eine unbewertete Übung",
@@ -65,8 +73,10 @@
     "time_expired": "Die Zeit für den Test ist am {date} abgelaufen.",
     "time_grace_expires": "Die Zeit für den Test ist am {date} abgelaufen und die Kulanzzeit endet am {grace}.",
     "timelimit": "Zeitbegrenzung: {time}.",
-    "timelimit_wgrace": "Zeitbegrenzung: {time}, mit einer Kulanzzeit von of {grace} bei einem Punktabzug von {penalty}%.",
-    "timelimit_extend": "Erweitert gegenüber der ursprünglichen Zeit von {time}."
+    "timelimit_wgrace": "Zeitbegrenzung: {time}, mit einer Kulanzzeit von {grace} bei einem Punktabzug von {penalty}%.",
+    "timelimit_extend": "Erweitert gegenüber der ursprünglichen Zeit von {time}.",
+    "timelimit_restricted": "Abgabe bald fällig. Die Zeit läuft ab bei Fälligkeit, {due}.",
+    "timelimit_wgrace_restricted": "Zeitbegrenzung: {time}, mit einer Kulanzzeit bis {due}. Bei Nutzung der Kulanzzeit gibt es einen Punktabzug von {penalty}%."
   },
   "group": {
     "isgroup": "Dies ist ein Gruppentest.",
@@ -95,14 +105,22 @@
     "submit": "Frage einreichen",
     "checkans": "Antwort prüfen",
     "saveans": "Antwort speichern",
+    "next": "Nächste Frage",
+    "submit_seqnext": "Teil einreichen",
+    "checkans_seqnext": "Teilantwort prüfen",
+    "saveans_seqnext": "Nächster Teil",
+    "submit_submitall": "Alle Teile einreichen",
+    "checkans_submitall": "Alle Teile prüfen",
+    "saveans_submitall": "Alle Teile speichern",
     "withdrawn": "Diese Frage wurde vom Dozenten zurückgezogen. Sie brauchen sie nicht zu bearbeiten.",
     "jump_to_answer": "Gehe zur Antwort",
-    "jump_warn": "Dies verbraucht alle übrigen Versuche für diese Version der Frage."
+    "jump_warn": "Dies verbraucht alle übrigen Versuche für diese Version der Frage.",
+    "showwork": "Hier können Sie Ihre ausführliche Lösung einreichen. Sie können auch ein Foto Ihrer Notizen in diesen Bereich ziehen oder über das Büroklammer-Symbol hochladen."
   },
   "header": {
     "score": "Punkte: {pts}/{poss}",
     "practicescore": "Punkte (Übung): {pts}/{poss}",
-    "possible": "{poss} mögliche Punkte",
+    "possible": "{poss} mögliche Punkte | undefined",
     "answered": "{n}/{tot} beantwortet",
     "assess_submit": "Test einreichen",
     "done": "Fertig",
@@ -116,7 +134,9 @@
     "work_save": "Arbeit speichern",
     "work_saved": "Arbeit gespeichert",
     "work_saving": "Speichere...",
-    "confirm_assess_submit": "Nach dem Einreichen können Sie Ihre Antworten in dieser Version des Tests nicht mehr ändern. Wollen Sie einreichen?"
+    "confirm_assess_submit": "Nach dem Einreichen können Sie Ihre Antworten in dieser Version des Tests nicht mehr ändern. Wollen Sie einreichen?",
+    "confirm_assess_unattempted_submit": "Es scheint, Sie haben noch nicht alle Fragen versucht. Nach Abgabe des Tests können Sie Ihre Antworten in dieser Version des Tests nicht mehr ändern. Wollen Sie jetzt wirklich einreichen?",
+    "preview_all": "Vorschau aller Fragen für Dozenten"
   },
   "text": {
     "hide": "Text ausblenden",
@@ -131,6 +151,7 @@
     "missing_param": "Beim API-Zugriff fehlt ein notwendiger Parameter",
     "not_avail": "Dieser Test ist zurzeit nicht verfügbar",
     "not_ready": "Diese Aktion ist für diesen Test zurzeit nicht zulässig",
+    "not_practice": "Dieser Test ist nicht mehr im Übungsmodus. Gehen Sie zurück und öffnen Sie den Test noch einmal.",
     "timelimit_expired": "Zeitbegrenzung abgelaufen",
     "timesup_submitting": "Die Zeitbegrenzung ist abgelaufen. Es wird jetzt eingereicht.",
     "out_of_regens": "Keine weiteren Versuche für eine ähnliche Frage möglich",
@@ -147,6 +168,10 @@
     "livepoll_wrongquestion": "Die eingereichte Frage ist nicht die aktuelle Frage.",
     "livepoll_notopen": "Keine Einreichung zu dieser Frage möglich.",
     "need_relaunch": "Benötigte Informationen fehlen. Bitte gehen Sie zurück in Ihr Lernmanagementsystem und öffnen Sie den Test erneut."
+  },
+  "confirm": {
+    "ok": "OK",
+    "cancel": "Abbruch"
   },
   "scoreresult": {
     "correct": "Richtig",
@@ -235,7 +260,8 @@
     "alert": "Warnung",
     "unsubmitted_questions": "Sie haben Antworten eingegeben, aber nicht abgeschickt. Sin Si sicher, dass Sie beenden wollen?",
     "unsubmitted_assessment": "Sie haben Ihren Test noch nicht zur Bewertung eingereicht. Denken Sie daran, dafür zurückzukommen.",
-    "unsubmitted_done_assessment": "Sie haben alle Fragen versucht, aber haben den Test noch nicht abgeschickt. Denken Sie daran, dafür zurückzukommen."
+    "unsubmitted_done_assessment": "Sie haben alle Fragen versucht, aber haben den Test noch nicht abgeschickt. Denken Sie daran, dafür zurückzukommen.",
+    "unsubmitted_work": "Sie haben noch nicht alles eingereicht.Nicht eingereichte Informationen gehen verloren. Sind Sie sicher, dass Sie den Test verlassen wollen?"
   },
   "pages": {
     "next": "Nächste Seite"
@@ -249,6 +275,7 @@
     "show_qs": "Fragen einblenden"
   },
   "videocued": {
+    "start": "Starte Video",
     "continue": "Video fortsetzen bis {title}",
     "skipto": "Im Video zu {title} springen"
   },
@@ -293,6 +320,7 @@
     "partial": "Teilweise richtig",
     "dot": "Punkt",
     "attempted": "Versucht",
+    "partattempted": "Teilweise versucht",
     "unattempted": "Nicht versucht",
     "print": "Druck",
     "left": "Vorherige",
@@ -314,7 +342,7 @@
     "detail_title": "Testversuche ansehen",
     "started": "Begonnen",
     "lastchange": "Zuletzt geändert",
-    "time_onscreen": "Gesamtzeit der Fragen auf dem Bildschirm",
+    "time_onscreen": "Gesamtzeit der Fragen auf dem Bildschirm | undefined",
     "time_on_version": "Verbrauchte Zeit für diese Version",
     "due": "Fällig",
     "originally_due": "Ursprünglich fällig",
@@ -376,9 +404,13 @@
     "unsubmitted": "Der Test-Versuch wurde nicht zur Bewertung eingereicht.",
     "show_tries": "Alle Versuche anzeigen",
     "show_penalties": "Angewandte Abzüge anzeigen",
+    "show_autosaves": "Was wurde automatisch gespeichert?",
     "all_tries": "Alle Versuche",
     "part_n": "Teil {n}",
     "try_n": "Versuch {n}",
+    "autosaves": "Automatisch gespeichert",
+    "autosave_info": "Ergebnisse des Studierenden wurden automatisch gespeichert aber nicht vom Studierenden zur Bewertung eingereicht. Sie gehen deshalb nicht in die Bewertung ein.",
+    "autosave_byassess": "Automatisch gespeicherte Ergebnisse werden nach Einreichen des Tests bewertet.",
     "view_edit": "Frage ansehen/bearbeiten",
     "show_all_ans": "Alle Antworten anzeigen",
     "no_versions": "Noch keine Test-Versuche anzuzeigen",
@@ -387,7 +419,17 @@
     "avail_after_take": "Wird angezeigt, wenn Sie einen Test-Versuch einreichen.",
     "avail_after_due": "Wird nach Fälligkeit angezeigt.",
     "latepass_blocked_practice": "Verspätetes Einreichen ist blockiert, weil der Studierende den Test im Übungs-Modus angesehen hat.",
-    "clear_latepass_block": "Block leeren"
+    "clear_latepass_block": "Block leeren",
+    "showwork": "Lösung anzeigen",
+    "hidework": "Lösung ausblenden"
+  },
+  "work": {
+    "add": "Lösung hinzufügen",
+    "hide": "Lösungseingabe ausblenden",
+    "noquestions": "Alle Fragen bearbeitet",
+    "save": "Lösung speichern",
+    "save_continue": "Lösung speichern und weiter",
+    "add_prev": "Sie können noch Ihre Lösung für den aktuellsten Versuch einreichen"
   },
   "regions": {
     "questions": "Fragen und Text",

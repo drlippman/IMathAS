@@ -153,7 +153,7 @@ div.block.grouptoggle {
 div.block.grouptoggle + div.blockitems {
 	margin-top: 0px
 }
-.hidden {
+.hidden,.pseudohidden {
 	display:none;
 }
 .showinmobile {
