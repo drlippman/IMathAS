@@ -331,7 +331,9 @@ $_SESSION['challenge'] = uniqid();
         </select></span><br class=form>
     
     <div id=verurlwrap class=vertypes style="display:none">
-        <span class=form><label for=verurl>Website URL:</label></span>
+        <span class=form><label for=verurl>Website URL:</label><br>
+          <span class=small>This page should be accessible without login. No Facebook or LinkedIn pages.</span>
+        </span>
         <span class=formright><input name=verurl id=verurl size=40 /></span><br class=form>
     </div>
     <div id=veremailwrap class=vertypes style="display:none">
@@ -362,8 +364,8 @@ $_SESSION['challenge'] = uniqid();
     </span><br class=form>
 
     <span class=form><label for=email>Email:</label>
-        <span id=emailwarn style="display:none">This email <em>must</em> be the one listed 
-        on the website provided, or be an official college email address or your request 
+        <span id=emailwarn v-if="vertype=='url'" class=small><br>This email <em>must</em> be the one listed 
+        on the verification website provided, or be an official college email address, or your request 
         <em>will</em> be denied.</span>
     </span>
     <span class=formright>

@@ -38,7 +38,7 @@ if (isset($_POST['postback'])) {
     ) {
         // create new ipeds record 
         $type = 'C';
-        $newipedsid = substr(uniqid(),0,8);
+        $newipedsid = substr(md5($_POST['otherschool'].$_POST['country']),0,10);
         $query = 'INSERT INTO imas_ipeds (type,ipedsid,school,country) VALUES (?,?,?,?)';
         $stm = $DBH->prepare($query);
         $stm->execute(array(

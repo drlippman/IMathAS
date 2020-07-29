@@ -180,6 +180,16 @@ If you wish to enable users to request browser push notifications (does not work
 The student side of the system is pretty well set up for i18n, but the instructor side is  not yet.  Currently the only translation pack available is `de` (German).  See `/i18n/translating.md` for more information about generating translations.  To enable a translation:
 - `$CFG['locale']`: Set this to the desired language code, like `de`
 
+### IPEDS / NCES 
+
+The system can create associations with IPEDS/NCES records. For this, you will need to manually 
+[populate the `imas_ipeds` table](https://github.com/drlippman/IMathAS-Extras/blob/master/ipeds/ipeds.md). 
+- `$CFG['use_ipeds']`: set to true to enable UI features for editing associations.
+
+Look to `newinstructor-ipeds.php.dist` for an example of how to collect ipeds data during 
+account request.  The account approval process will auto-create group associations when 
+account requests are collected with this data.
+
 ### Development
 - `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.
 
