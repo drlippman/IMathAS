@@ -6,7 +6,7 @@ $DBH->beginTransaction();
 $query = 'CREATE TABLE `imas_ipeds` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `type` char(1) NOT NULL,
-  `id` CHAR(10) NOT NULL,
+  `id` VARCHAR(32) NOT NULL,
   `school` varchar(255) NOT NULL DEFAULT "",
   `agency` varchar(255) NOT NULL DEFAULT "",
   `country` char(2) NOT NULL DEFAULT "US",
@@ -27,7 +27,7 @@ if ($res===false) {
 
 $query = 'CREATE TABLE `imas_ipeds_group` (
   `type` char(1) NOT NULL,
-  `ipedsid` CHAR(10) NOT NULL,
+  `ipedsid` VARCHAR(32) NOT NULL,
   `groupid` INT(10) NOT NULL,
   PRIMARY KEY `link` (`type`,`ipedsid`,`groupid`),
   INDEX `groupid` (`groupid`)
