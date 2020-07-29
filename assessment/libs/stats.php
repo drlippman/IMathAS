@@ -4,7 +4,7 @@
 global $allowedmacros;
 array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","percentile",
  "interppercentile","Nplus1percentile","quartile","TIquartile","Excelquartile",
- "Excelquartileexc","Nplus1quartile","allquartile","median","freqdist","frequency",
+ "Excelquartileexc","Nplus1quartile","allquartile","median","mode","freqdist","frequency",
  "histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf",
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
@@ -392,6 +392,45 @@ function median($a) {
 	return percentile($a,50);
 }
 
+
+
+//mode(array)
+//returns a list of the mode(s) of an array of numbers
+//adapted from https://stackoverflow.com/a/23256527/23256708 and work by Anton Butenko.
+function mode($array) {
+    if (!is_array($array)) {
+      echo 'mean expects an array';
+      return false;
+    }
+    $maxCount = 0;
+    $n = count($array);
+    sort($array, SORT_NUMERIC);
+    for ($i = 0;$i < $n;$i++) {
+        $count = 0;
+        for ($j = 0;$j < count($array);$j++) {
+            if ($array[$j] == $array[$i]) $count++;
+        }
+        if ($count > $maxCount) {
+            $maxCount = $count;
+            $mode = array();
+            $mode[] = $array[$i];
+        }
+        else if ($count == $maxCount) {
+            $mode[] = $array[$i];
+        }
+    }
+    $mode = array_unique($mode);
+
+    if(count($mode)==$n){
+        $mode_list = "DNE";
+    } else {
+        $mode_list = implode(",", $mode);
+    }
+    return $mode_list;
+}
+
+
+
 //freqdist(array,label,start,classwidth)
 //display macro.  Returns an HTML table that is a frequency distribution of
 //the data
@@ -716,7 +755,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	return showasciisvg($outst,$width,$height);
 }
 
-//piechart(percents, labels, {width, height, data label})
+//piechart(percents, labels, {width, height})
 //create a piechart
 //percents: array of pie percents (should total 100%)
 //labels: array of labels for each pie piece
@@ -843,7 +882,7 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 //and optionally a datalabel (to topleft of boxplot)
 //array also be an array of dataarrays to do comparative boxplots
 //opts is an array of options:
-//   "datalabels" = array of data labels for comparative boxplots
+//   "datalabel" = a label for the boxplot, placed on the top left
 //   "showvals" = true to show 5 number summary above boxplot
 //   "showoutliers" = true to put whiskers at 1.5IQR and show outliers
 //   "qmethod" = quartile method: "N", "TI", "Excel" or "Nplus1"
@@ -856,8 +895,8 @@ function boxplot($arr,$label="",$options = array()) {
 	if (is_array($arr[0]) && count($options)==count($arr) && isset($options[0])) {
 		$dlbls = $options;
 		$options = array();
-	} else if (isset($options['datalabels'])) {
-		$dlbls = $options['datalabels'];
+	} else if (isset($options['datalabel'])) {
+		$dlbls = $options['datalabel'];
 	}
 	if (is_array($arr[0])) { $multi = count($arr);} else {$multi = 1;}
 	$qmethod = 'quartile';

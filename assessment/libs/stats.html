@@ -1,293 +1,312 @@
 <html><body>
 <h1>Macro Library stats</h1>
 A library of Stats functions.  Version 1.10, Nov 17, 2017
-<BR><ul>
-<li><a href="#nCr">nCr</a></li>
-<li><a href="#nPr">nPr</a></li>
-<li><a href="#mean">mean</a></li>
-<li><a href="#variance">variance</a></li>
-<li><a href="#stdev">stdev</a></li>
-<li><a href="#absmeandev">absmeandev</a></li>
-<li><a href="#percentile">percentile</a></li>
-<li><a href="#interppercentile">interppercentile</a></li>
-<li><a href="#Nplus1percentile">Nplus1percentile</a></li>
-<li><a href="#quartile">quartile</a></li>
-<li><a href="#TIquartile">TIquartile</a></li>
-<li><a href="#Excelquartile">Excelquartile</a></li>
-<li><a href="#Excelquartileexc">Excelquartileexc</a></li>
-<li><a href="#Nplus1quartile">Nplus1quartile</a></li>
-<li><a href="#allquartile">allquartile</a></li>
-<li><a href="#median">median</a></li>
-<li><a href="#freqdist">freqdist</a></li>
-<li><a href="#frequency">frequency</a></li>
-<li><a href="#countif">countif</a></li>
-<li><a href="#histogram">histogram</a></li>
-<li><a href="#fdhistogram">fdhistogram</a></li>
-<li><a href="#fdbargraph">fdbargraph</a></li>
-<li><a href="#piechart">piechart</a></li>
-<li><a href="#normrand">normrand</a></li>
-<li><a href="#expdistrand">expdistrand</a></li>
-<li><a href="#boxplot">boxplot</a></li>
-<li><a href="#normalcdf">normalcdf</a></li>
-<li><a href="#tcdf">tcdf</a></li>
-<li><a href="#invnormalcdf">invnormalcdf</a></li>
-<li><a href="#invtcdf">invtcdf</a></li>
-<li><a href="#linreg">linreg</a></li>
-<li><a href="#expreg">expreg</a></li>
-<li><a href="#checklineagainstdata">checklineagainstdata</a></li>
-<li><a href="#checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></li>
-<li><a href="#binomialpdf">binomialpdf</a></li>
-<li><a href="#binomialcdf">binomialcdf</a></li>
-<li><a href="#chi2teststat">chi2teststat</a></li>
-<li><a href="#chi2cdf">chi2cdf</a></li>
-<li><a href="#invchi2cdf">invchi2cdf</a></li>
-<li><a href="#fcdf">fcdf</a></li>
-<li><a href="#invfcdf">invfcdf</a></li>
-<li><a href="#mosaicplot">mosaicplot</a></li>
-<li><a href="#csvdownloadlink">csvdownloadlink</a></li>
+<ul>
+  <li><a href="#nCr">nCr</a></li>
+  <li><a href="#nPr">nPr</a></li>
+  <li><a href="#mean">mean</a></li>
+  <li><a href="#variance">variance</a></li>
+  <li><a href="#stdev">stdev</a></li>
+  <li><a href="#absmeandev">absmeandev</a></li>
+  <li><a href="#percentile">percentile</a></li>
+  <li><a href="#interppercentile">interppercentile</a></li>
+  <li><a href="#Nplus1percentile">Nplus1percentile</a></li>
+  <li><a href="#quartile">quartile</a></li>
+  <li><a href="#TIquartile">TIquartile</a></li>
+  <li><a href="#Excelquartile">Excelquartile</a></li>
+  <li><a href="#Excelquartileexc">Excelquartileexc</a></li>
+  <li><a href="#Nplus1quartile">Nplus1quartile</a></li>
+  <li><a href="#allquartile">allquartile</a></li>
+  <li><a href="#median">median</a></li>
+  <li><a href="#freqdist">freqdist</a></li>
+  <li><a href="#frequency">frequency</a></li>
+  <li><a href="#mode">mode</a></li>
+  <li><a href="#countif">countif</a></li>
+  <li><a href="#histogram">histogram</a></li>
+  <li><a href="#fdhistogram">fdhistogram</a></li>
+  <li><a href="#fdbargraph">fdbargraph</a></li>
+  <li><a href="#piechart">piechart</a></li>
+  <li><a href="#normrand">normrand</a></li>
+  <li><a href="#expdistrand">expdistrand</a></li>
+  <li><a href="#boxplot">boxplot</a></li>
+  <li><a href="#normalcdf">normalcdf</a></li>
+  <li><a href="#tcdf">tcdf</a></li>
+  <li><a href="#invnormalcdf">invnormalcdf</a></li>
+  <li><a href="#invtcdf">invtcdf</a></li>
+  <li><a href="#linreg">linreg</a></li>
+  <li><a href="#expreg">expreg</a></li>
+  <li><a href="#checklineagainstdata">checklineagainstdata</a></li>
+  <li><a href="#checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></li>
+  <li><a href="#binomialpdf">binomialpdf</a></li>
+  <li><a href="#binomialcdf">binomialcdf</a></li>
+  <li><a href="#chi2teststat">chi2teststat</a></li>
+  <li><a href="#chi2cdf">chi2cdf</a></li>
+  <li><a href="#invchi2cdf">invchi2cdf</a></li>
+  <li><a href="#fcdf">fcdf</a></li>
+  <li><a href="#invfcdf">invfcdf</a></li>
+  <li><a href="#mosaicplot">mosaicplot</a></li>
+  <li><a href="#csvdownloadlink">csvdownloadlink</a></li>
 </ul>
-<h3><a name="nCr">nCr</a></h3>
-nCr(n,r)
-<BR>The Choose function
-<BR><h3><a name="nPr">nPr</a></h3>
-nPr(n,r)
-<BR>The Permutations function
-<BR><h3><a name="mean">mean</a></h3>
-mean(array,[weights])
-<BR>Finds the mean of an array of numbers.  Optionally you can provide a
-  corresponding array of weights or frequencies to do a weighted mean.
-<BR><h3><a name="variance">variance</a></h3>
-variance(array,[weights])
-<BR>the (sample) variance of an array of numbers. Optionally you can provide a
-  corresponding array of weights or frequencies to do a weighted variance.
-<BR><h3><a name="stdev">stdev</a></h3>
-stdev(array, [weights])
-<BR>the (sample) standard deviation of an array of numbers.  Optionally you can provide a
-  corresponding array of weights or frequencies to do a weighted stdev.
-<BR><h3><a name="absmeandev">absmeandev</a></h3>
-absmeandev(array)
-<BR>the absolute mean deviation of an array of numbers
-<BR><h3><a name="percentile">percentile</a></h3>
-percentile(array,percentile)
-<BR>example: percentile($a,30) would find the 30th percentile of the data
-<BR>Calculates using the p/100*(N) method (e.g. Triola)
 
-<BR><h3><a name="interppercentile">interppercentile</a></h3>
-<BR>interppercentile(array, percentile, [mode])
-<BR>Interpolated percentile. Finds the percentile using an interpolated method.
-<BR>&nbsp; mode=1 (def): Matches Excel's PERCENTILE.EXC, JMP, and recommended by NIST
-<BR>&nbsp; &nbsp; except that this function will return the lowest/highest value if needed.
-<BR>&nbsp; mode=2: Matches Excel's PERCENTILE.INC (and older percentile)
-<BR>&nbsp; mode=3: Matches Mathlab's prctile function
+<h2><a name="nCr"><code>nCr(n,r)</code></a></h2>
+<p style="margin-left:0.75em;">The Choose function for combinations.</p>
 
-<BR><h3><a name="Nplus1percentile">Nplus1percentile</a></h3>
-Nplus1percentile(array,percentile)
-<BR>example: percentile($a,30) would find the 30th percentile of the data
-<BR>Calculates using the p/100*(N+1) method (e.g. OpenStax).
-<BR><h3><a name="quartile">quartile</a></h3>
-quartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using percentiles.
-<BR><h3><a name="TIquartile">TIquartile</a></h3>
-TIquartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the TI-84 method.
-<BR><h3><a name="Excelquartile">Excelquartile</a></h3>
-Excelquartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the Excel method, matching the older
-  QUARTILE function or the newer QUARTILE.INC function.
-<BR><h3><a name="Excelquartileexc">Excelquartileexc</a></h3>
-Excelquartileexc(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the Excel method, matching
-  QUARTILE.EXC function.
-<BR><h3><a name="Nplus1quartile">Nplus1quartile</a></h3>
-Nplus1quartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the N+1 method, which is like
-<BR>percentiles, but calculated using N+1 (OpenStax).
-<BR><h3><a name="allquartile">allquartile</a></h3>
-allquartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Uses all the quartile methods, and returns an "or" joined
-<BR>string of all unique answers.
-<BR><h3><a name="median">median</a></h3>
-median(array)
-<BR>returns the median of an array of numbers
-<BR><h3><a name="freqdist">freqdist</a></h3>
-freqdist(array,label,start,classwidth)
-<BR>display macro.  Returns an HTML table that is a frequency distribution of
-<BR>the data
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;label: name of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR><h3><a name="frequency">frequency</a></h3>
-frequency(array,start,classwidth)
-<BR>Returns an array of frequencies for the data grouped into classes
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR><h3><a name="countif">countif</a></h3>
-countif(array,condition)
-<BR>Returns count of items in array that meet condition
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;condition: a condition, using x for data values
-<BR>Example: countif($a,"x<3 && x>2")
-<BR><h3><a name="histogram">histogram</a></h3>
-histogram(array,label,start,classwidth,[labelstart,upper,width,height])
-<BR>display macro.  Creates a histogram from a data set
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;label: name of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
-<BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
-<BR>&nbsp;width,height (optional): width and height in pixels of graph
-<BR><h3><a name="fdhistogram">fdhistogram</a></h3>
-fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
-<BR>display macro.  Creates a histogram from frequency array
-<BR>&nbsp;freqarray: array of frequencies
-<BR>&nbsp;label: name of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
-<BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
-<BR>&nbsp;width,height (optional): width and height in pixels of graph
-<BR><h3><a name="fdbargraph">fdbargraph</a></h3>
-fdbargraph(barlabels,freqarray,label,[width,height,options])
-<BR>barlabels: array of labels for the bars
-<BR>freqarray: array of frequencies/heights for the bars
-<BR>label: general label for bars
-<BR>width,height (optional): width and height for graph
-<BR>options (optional): array of options:
-<BR>&nbsp;&nbsp;options['valuelabels'] = array of value labels, to be placed above bars
-<BR>&nbsp;&nbsp;options['showgrid'] = false to hide the horizontal grid lines
-<BR>&nbsp;&nbsp;options['vertlabel'] = label for vertical axis. Defaults to none
-<BR>&nbsp;&nbsp;options['gap'] = gap (0 &le; gap &lt; 1) between bars
-<BR>&nbsp;&nbsp;options['toplabel'] = label for top of chart
-<BR><h3><a name="piechart">piechart</a></h3>
-piechart(percents, labels, {width, height})
-<BR>create a piechart
-<BR>percents: array of pie percents (should total 100%)
-<BR>labels: array of labels for each pie piece
-<BR>uses Google Charts API
-<BR><h3><a name="normrand">normrand</a></h3>
-normrand(mu,sigma,n, [rnd])
-<BR>returns an array of n random numbers that are normally distributed with given
-<BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
-<BR>specify rnd to round to that many digits
-<BR><h3><a name="expdistrand">expdistrand</a></h3>
-expdistrand(mu, n, [rnd])
-<BR>returns an array of n random numbers that are exponentially distributed
-<BR>with given mean mu.
-<BR>specify rnd to round to that many digits (default 3)
-<BR><h3><a name="boxplot">boxplot</a></h3>
-boxplot(array,axislabel,[options])
-<BR>draws a boxplot based on the data in array, with given axislabel
-<BR>and optionally a datalabel (to topleft of boxplot)
-<BR>array also be an array of dataarrays to do comparative boxplots
-<BR>opts is an array of options:
-<BR>&nbsp;&nbsp;&nbsp;"datalabels" = array of data labels for comparative boxplots
-<BR>&nbsp;&nbsp;&nbsp;"showvals" = true to show 5 number summary above boxplot
-<BR>&nbsp;&nbsp;&nbsp;"showoutliers" = true to put whiskers at values inside 1.5IQR fence and show outliers
-<BR>&nbsp;&nbsp;&nbsp;"qmethod" = quartile method: "N", "TI", "Excel" or "Nplus1"
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N: percentile method, using .25*n
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nplus1: percentile method, using .25*(n+1)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TI: TI calculator method, a mix of n and nplus1 methods
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Excel: A method based on (n-1), with some linear interpolation
-<BR>For backwards compatability, options can also just be an array of datalabels
-<BR><h3><a name="normalcdf">normalcdf</a></h3>
-normalcdf(z,[dec])
-<BR>calculates the area under the standard normal distribution to the left of the
-<BR>z-value z, to dec decimals (defaults to 4)
-<BR>based on someone else's code - can't remember whose!
-<BR><h3><a name="tcdf">tcdf</a></h3>
-tcdf(t,df,[dec])
-<BR>calculates the area under the t-distribution with "df" degrees of freedom
-<BR>to the left of the t-value t
-<BR>based on code from www.math.ucla.edu/~tom/distributions/tDist.html
-<BR><h3><a name="invnormalcdf">invnormalcdf</a></h3>
-invnormalcdf(p,[dec])
-<BR>Inverse Normal CDF
-<BR>finds the z-value with a left-tail area of p, to dec decimals (default 5)
-<BR>&nbsp;from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
-<BR><h3><a name="invtcdf">invtcdf</a></h3>
-invtcdf(p,df,[dec])
-<BR>the inverse Student's t-distribution
-<BR>computes the t-value with a left-tail probability of p, with df degrees of freedom
-<BR>to dec decimal places (default 4)
-<BR>&nbsp;from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
-<BR><h3><a name="linreg">linreg</a></h3>
-linreg(xarray,yarray)
-<BR>Computes the linear correlation coefficient, and slope and intercept of
-<BR>regression line, based on array/list of x-values and array/list of y-values
-<BR>Returns as array:  r,slope,intercept
-<BR><h3><a name="expreg">expreg</a></h3>
-expreg(xarray,yarray)
-<BR>Computes the exponential correlation coefficient, and base and intercept of
-<BR>regression exponential, based on array/list of x-values and array/list of y-values
-<BR>Returns as array:  r,base,intercept
-<BR><h3><a name="checklineagainstdata">checklineagainstdata</a></h3>
-checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
-<BR>intended for checking a student answer for fitting a line to data.  Determines
-<BR>if the student answer is within the confidence bounds for the regression equation.
-<BR>xarray, yarray:  list/array of data values
-<BR>student answer:  the $stuanswers[$thisq] which is a line equation like "2x+3"
-<BR>variable:  defaults to "x"
-<BR>alpha: for confidence bound.  defaults to .05
-<BR>return array(answer, showanswer) to be used to set $answer and $showanswer
-<BR><h3><a name="checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></h3>
-checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid])
-<BR>intended for checking a student answer for drawing a line fit to data.  Determines
-<BR>if the student answer is within the confidence bounds for the regression equation.
-<BR>xarray, yarray:  list/array of data values
-<BR>student answer from draw:  the $stuanswers[$thisq]
-<BR>grade dots: default false.  If true, will grade that dots of xarray,yarray were plotted
-<BR>alpha: for confidence bound.  defaults to .05
-<BR>grid:  If you've modified the grid, include it here
-<BR>return array(answer, showanswer) to be used to set $answer and $showanswer
-<BR><h3><a name="binomialpdf">binomialpdf</a></h3>
-binomialpdf(N,p,x)
-<BR>Computes the probability of x successes out of N trials
-<BR>where each trial has probability p of success
-<BR><h3><a name="binomialcdf">binomialcdf</a></h3>
-binomialcdf(N,p,x)
-<BR>Computes the probably of &lt;=x successes out of N trials
-<BR>where each trial has probability p of success
-<BR><h3><a name="chi2teststat">chi2teststat</a></h3>
-chi2teststat(m)
-<BR>Computes the test stat sum((E-O)^2/E) given a matrix of values
-<BR><h3><a name="chi2cdf">chi2cdf</a></h3>
-chi2cdf(x,df)
-<BR>Computes the area to the left of x under the chi-squared disribution
-<BR>with df degrees of freedom
-<BR><h3><a name="invchi2cdf">invchi2cdf</a></h3>
-invchi2cdf(p,df)
-<BR>Compuates the x value with left-tail probability p under the
-<BR>chi-squared distribution with df degrees of freedom
-<BR><h3><a name="fcdf">fcdf</a></h3>
-fcdf(f,df1,df2)
-<BR>Returns the area to right of the F-value f for the f-distribution
-<BR>with df1 and df2 degrees of freedom (techinically it's 1-CDF)
-<BR>Algorithm is accurate to approximately 4-5 decimals
-<BR><h3><a name="invfcdf">invfcdf</a></h3>
-invfcdf(p,df1,df2)
-<BR>Computes the f-value with probability of p to the right
-<BR>with degrees of freedom df1 and df2
-<BR>Algorithm is accurate to approximately 2-4 decimal places
-<BR>Less accurate for smaller p-values
-<BR><h3><a name="mosaicplot">mosaicplot</a></h3>
-mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
-<BR>creates a mosaic plot (See http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972)
-<BR>rowlabels: an array of labels for the rows of the display
-<BR>columnlabels: an array of labels for the columns of the display
-<BR>count matrix: a 2-dimensional array.  $m[1][5] will give the count for
-<BR>&nbsp;&nbsp;rowlabel[1] and columnlabel[5]
-<BR>width and height are optional, default to 300 by 300.  Does not include labels
-<BR>
-<BR><h3><a name="csvdownloadlink">csvdownloadlink</a></h3>
-csvdownloadlink(string,array,[string,array]...)
-<p>Creates a link that downloads the specified data in CSV format. For each column
-  provide a string header and an array of values.</p>
+<h2><a name="nPr"><code>nPr(n,r)</code></a></h2>
+<p style="margin-left:0.75em;">The Permutations function.</p>
+
+<h2><a name="mean"><code>mean(array,[weights])</code></a></h2>
+<p style="margin-left:0.75em;">Finds the mean of an array of numbers.  Optionally you can provide a corresponding array of weights or frequencies to do a weighted mean.</p>
+
+<h2><a name="variance"><code>variance(array,[weights])</code></a></h2>
+<p style="margin-left:0.75em;">The (sample) variance of an array of numbers. Optionally you can provide a corresponding array of weights or frequencies to do a weighted variance.</p>
+
+<h2><a name="stdev"><code>stdev(array, [weights])</code></a></h2>
+<p style="margin-left:0.75em;">The (sample) standard deviation of an array of numbers.  Optionally you can provide a corresponding array of weights or frequencies to do a weighted stdev.<p style="margin-left:0.75em;">
+
+<h2><a name="absmeandev"><code>absmeandev(array)</code></a></h2>
+<p style="margin-left:0.75em;">The absolute mean deviation of an array of numbers.</p>
+
+<h2><a name="percentile"><code>percentile(array,percentile)</code></a></h2>
+<p style="margin-left:0.75em;">Calculates using the p/100*(N) method (e.g. Triola).<p style="margin-left:0.75em;">
+<p style="margin-left:0.75em;">Example: <code style="font-size:1.2em;font-weight:500;">percentile($a,30)</code> would find the 30th percentile of the data.</p>
+
+<h2><a name="interppercentile"><code>interppercentile(array, percentile, [mode])</code></a></h2>
+<p style="margin-left:0.75em;">Interpolated percentile. Finds the percentile using an interpolated method.</p>
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">mode=1</code>: Default mode. Matches Excel's PERCENTILE.EXC, JMP, and recommended by NIST except that this function will return the lowest/highest value if needed.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">mode=2</code>: Matches Excel's PERCENTILE.INC (and older percentile).</li>
+  <li><code style="font-size:1.2em;font-weight:500;">mode=3</code>: Matches Mathlab's prctile function.</li>
+</ul>
+
+<h2><a name="Nplus1percentile"><code>Nplus1percentile(array,percentile)</code></a></h2>
+<p style="margin-left:0.75em;">Calculates using the p/100*(N+1) method (e.g. OpenStax).<p style="margin-left:0.75em;">
+<p style="margin-left:0.75em;">Example: <code style="font-size:1.2em;font-weight:500;">percentile($a,30)</code> would find the 30th percentile of the data
+
+<h2><a name="quartile"><code>quartile(array,quartile)</code></a></h2>
+<p style="margin-left:0.75em;">Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an array of numbers.  Calculates using percentiles.</p>
+
+<h2><a name="TIquartile"><code>TIquartile(array,quartile)</code></a></h2>
+<p style="margin-left:0.75em;">Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an array of numbers.  Calculates using the TI-84 method.</p>
+
+<h2><a name="Excelquartile"><code>Excelquartile(array,quartile)</code></a></h2>
+<p style="margin-left:0.75em;">Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an array of numbers.  Calculates using the Excel method, matching the older QUARTILE function or the newer QUARTILE.INC function.</p>
+
+<h2><a name="Excelquartileexc"><code>Excelquartileexc(array,quartile)</code></a></h2>
+<p style="margin-left:0.75em;">Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an array of numbers.  Calculates using the Excel method, matching QUARTILE.EXC function.</p>
+
+<h2><a name="Nplus1quartile"><code>Nplus1quartile(array,quartile)</code></a></h2>
+<p style="margin-left:0.75em;">Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an array of numbers.  Calculates using the N+1 method, which is like percentiles, but calculated using N+1 (OpenStax).</p>
+
+<h2><a name="allquartile"><code>allquartile(array,quartile)</code></a></h2>
+<p style="margin-left:0.75em;">Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an array of numbers.  Uses all the quartile methods, and returns an "or" joined string of all unique answers.</p>
+
+<h2><a name="median"><code>median(array)</code></a></h2>
+<p style="margin-left:0.75em;">Returns the median of an array of numbers.</p>
+
+<h2><a name="freqdist"><code>freqdist(array,label,start,classwidth)</code></a></h2>
+<p style="margin-left:0.75em;">This is a display macro.  It returns an HTML table that is a frequency distribution of the data.</p>
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">array</code>: array of data values</li>
+  <li><code style="font-size:1.2em;font-weight:500;">label</code>: name of data values</li>
+  <li><code style="font-size:1.2em;font-weight:500;">start</code>: first lower class limit</li>
+  <li><code style="font-size:1.2em;font-weight:500;">classwidth</code>: width of the classes</li>
+</ul>
+
+<h2><a name="frequency"><code>frequency(array,start,classwidth)</code></a></h2>
+<p style="margin-left:0.75em;">Returns an array of frequencies for the data grouped into classes.<p style="margin-left:0.75em;">
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">array</code>: array of data values</li>
+  <li><code style="font-size:1.2em;font-weight:500;">start</code>: first lower class limit</li>
+  <li><code style="font-size:1.2em;font-weight:500;">classwidth</code>: width of the classes</li>
+</ul>
+
+<h2><a name="mode"><code>mode(array)</code></a></h2>
+<p style="margin-left:0.75em;">Returns a list of the mode(s) of an array that can be used for $answer and $showanswer.</p>
+<p style="margin-left:0.75em;">If the question type is set as "string", this will also return the mode of an array of strings that can be used for $answer and $showanswer.</p>
+<p style="margin-left:0.75em;">Example: <code style="font-size:1.2em;font-weight:500;">mode(array(3,2,1,1,2))</code> returns "1,2".</p>
+<p style="margin-left:0.75em;">Example: <code style="font-size:1.2em;font-weight:500;">mode(array(3,2,1,2,2))</code> returns "2".</p>
+<p style="margin-left:0.75em;">Example: <code style="font-size:1.2em;font-weight:500;">mode(array(3,2,1))</code> returns "DNE".</p>
+<p style="margin-left:0.75em;">Example: <code style="font-size:1.2em;font-weight:500;">mode(array("red","blue","red"))</code> returns "red".</p>
+
+<h2><a name="countif"><code>countif(array,condition)</code></a></h2>
+<p style="margin-left:0.75em;">Returns count of items in array that meet condition.<p style="margin-left:0.75em;">
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">array</code>: array of data values</li>
+  <li><code style="font-size:1.2em;font-weight:500;">condition</code>: a condition, using x for data values</li>
+</ul>
+<p style="margin-left:0.75em;">Example: <code style="font-size:1.2em;font-weight:500;">countif($a,"x<3 && x>2")</code></p>
+
+<h2><a name="histogram"><code>histogram(array,label,start,classwidth,[labelstart,upper,width,height])</code></a></h2>
+<p style="margin-left:0.75em;">This is a display macro.  It creates a histogram from an array of data.</p>
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">array</code>: array of data values</li>
+  <li><code style="font-size:1.2em;font-weight:500;">label</code>: name of data values</li>
+  <li><code style="font-size:1.2em;font-weight:500;">start</code>: first lower class limit</li>
+  <li><code style="font-size:1.2em;font-weight:500;">classwidth</code>: width of the classes</li>
+  <li><code style="font-size:1.2em;font-weight:500;">labelstart</code>: optional start value for axis labeling.  Defaults to start.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">upper</code>: optional first upper class limit.  Defaults to start+classwidth.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">width,height</code>: optional width and height of graph in pixels.</li>
+</ul>
+
+<h2><a name="fdhistogram"><code>fdhistogram(freqarray,label,start,classwidth,[labelstart,upper,width,height])</code></a></h2>
+<p style="margin-left:0.75em;">This is a display macro.  It creates a histogram from a frequency array.  Vertical axis is automatically labeled as "Frequency".
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">freqarray</code>: array of frequencies</li>
+  <li><code style="font-size:1.2em;font-weight:500;">label</code>: Horizontal label, displayed below the histogram.  Also used for creating accessability discription.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">start</code>: first lower class limit</li>
+  <li><code style="font-size:1.2em;font-weight:500;">classwidth</code>: width of the classes</li>
+  <li><code style="font-size:1.2em;font-weight:500;">labelstart</code>: optional start value for axis labeling.  Defaults to start.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">upper</code>: optional first upper class limit.  Defaults to start+classwidth.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">width,height</code>: optional width and height of graph in pixels.</li>
+</ul>
+
+<h2><a name="fdbargraph"><code>fdbargraph(barlabels,freqarray,label,[width,height,options])</code></a></h2>
+<p style="margin-left:0.75em;">This is a display macro.  Creates a bar graph.
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">barlabels</code>: array of labels for the bars</li>
+  <li><code style="font-size:1.2em;font-weight:500;">freqarray</code>: array of frequencies/heights for the bars</li>
+  <li><code style="font-size:1.2em;font-weight:500;">label</code>: general label for bars</li>
+  <li><code style="font-size:1.2em;font-weight:500;">width,height</code>: optional width and height of graph in pixels.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">$options</code>: array of additional options that could include:
+    <ul>
+      <li><code style="font-size:1.2em;font-weight:500;">$options['valuelabels']</code>: An array of value labels, to be placed above bars.</li>
+      <li><code style="font-size:1.2em;font-weight:500;">$options['showgrid']</code>: True by default. Set to false to hide the horizontal grid lines.</li>
+      <li><code style="font-size:1.2em;font-weight:500;">$options['vertlabel']</code>: Label for vertical axis. Defaults to none.</li>
+      <li><code style="font-size:1.2em;font-weight:500;">$options['gap']</code>: The gap (0 &le; gap &lt; 1) between bars.</li>
+      <li><code style="font-size:1.2em;font-weight:500;">$options['toplabel']</code>: Label for top of chart.</li>
+    </ul>
+  </li>
+</ul>
+<p style="margin-left:0.75em;">Example:</p>
+<div style="font-size:1.2em;font-weight:500;margin-left:2em;"><code>$barlabels = array("bar1","bar2","bar3")<br>
+$barlabels = array("bar1","bar2","bar3")<br>
+$freqarray = array(1,2,3)<br>
+$label = "Horizontal label"<br>
+$options['valuelabels'] = array("val1","val2","val3")<br>
+$options['vertlabel'] = "Vertical label"<br>
+$options['gap'] = 0.5<br>
+$options['toplabel'] = "My bar graph"<br><br>
+$graph = fdbargraph($barlabels,$freqarray,$label,300,200,$options)</code></div>
+
+<h2><a name="piechart"><code>piechart(percents, labels, {width, height})</code></a></h2>
+<p style="margin-left:0.75em;">Creates a piechart.  Uses Google Charts API.
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">percents</code>: array of pie percents (should total 100%)</li>
+  <li><code style="font-size:1.2em;font-weight:500;">labels</code>: array of labels for each pie piece</li>
+</ul>
+<p style="margin-left:0.75em;">Example:</p>
+<div style="font-size:1.2em;font-weight:500;margin-left:2em;"><code>$barlabels = array("bar1","bar2","bar3")<br>
+$percents = array(.3,.2,.5)<br>
+$labels = array("label 1","label 2","label 3"<br><br>
+$chart = piechart($percents,$labels,300,200,$options)</code></div>
+
+<h2><a name="normrand"><code>normrand(mu,sigma,n, [rnd])</code></a></h2>
+<p style="margin-left:0.75em;">Returns an array of <code style="font-size:1.2em;font-weight:500;">n</code> random numbers that are normally distributed with given mean <code style="font-size:1.2em;font-weight:500;">mu</code> and standard deviation <code style="font-size:1.2em;font-weight:500;">sigma</code>.  Uses the Box-Muller transform. Specify <code style="font-size:1.2em;font-weight:500;">rnd</code> to round to that many digits.
+
+<h2><a name="expdistrand"><code>expdistrand(mu, n, [rnd])</code></a></h2>
+<p style="margin-left:0.75em;">Returns an array of <code style="font-size:1.2em;font-weight:500;">n</code> random numbers that are exponentially distributed with given mean <code style="font-size:1.2em;font-weight:500;">mu</code>.  Specify <code style="font-size:1.2em;font-weight:500;">rnd</code> to round to that many digits (default 3).
+
+<h2><a name="boxplot"><code>boxplot(array,axislabel,[options])</code></a></h2>
+<p style="margin-left:0.75em;">Draws a boxplot based on the data in <code style="font-size:1.2em;font-weight:500;">array</code>, with given <code style="font-size:1.2em;font-weight:500;">axislabel</code> and optionally a <code style="font-size:1.2em;font-weight:500;">datalabel</code> (to topleft of boxplot).  The array also be an array of dataarrays to do comparative boxplots.<p style="margin-left:0.75em;">
+<p style="margin-left:0.75em;"><code style="font-size:1.2em;font-weight:500;">$options</code> is an array of options:
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">$options['datalabel']</code>: A data label for the boxplot placed on the top left.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">$options['showval']</code>: Set to "true" to show 5 number summary above boxplot.  Defaults to false.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">$options['showoutliers']</code>: Set to "true" to put whiskers at values inside 1.5 IQR fence and show outliers.  Defaults to false.</li>
+  <li><code style="font-size:1.2em;font-weight:500;">$options['qmethod']</code>: Quartile method chosen from "N", "TI", "Excel" or "Nplus1".
+    <ul>
+      <li><code style="font-size:1.2em;font-weight:500;">"N"</code>: percentile method, using .25*n</li>
+      <li><code style="font-size:1.2em;font-weight:500;">"Nplus1"</code>: percentile method, using .25*(n+1)</li>
+      <li><code style="font-size:1.2em;font-weight:500;">"TI"</code>: TI calculator method, a mix of n and nplus1 methods</li>
+      <li><code style="font-size:1.2em;font-weight:500;">"Excel"</code>: A method based on (n-1), with some linear interpolation</li>
+    </ul>
+  </li>
+</ul>
+<p style="margin-left:0.75em;">For backwards compatability, $options can also just be an array of datalabels.</p>
+<p style="margin-left:0.75em;">Example:</p>
+<div style="font-size:1.2em;font-weight:500;margin-left:2em;"><code>$barlabels = array("bar1","bar2","bar3")<br>
+$array = array(1,2,3,3,5)<br>
+$axislabel = "Axis label"<br>
+$options['datalabel'] = "My data"<br>
+$options['showval'] = "true"<br>
+$options['qmethod'] = "Nplus1"<br><br>
+$graph = boxplot($array,$axislabel,$options)</code></div>
+
+
+<h2><a name="normalcdf"><code>normalcdf(z,[dec])</code></a></h2>
+<p style="margin-left:0.75em;">Calculates the area under the standard normal distribution to the left of the z-value <code style="font-size:1.2em;font-weight:500;">z</code>, to <code style="font-size:1.2em;font-weight:500;">dec</code> decimals (defaults to 4).</p>
+<p style="margin-left:0.75em;">Based on someone else's code - can't remember whose!</p>
+
+<h2><a name="tcdf"><code>tcdf(t,df,[dec])</code></a></h2>
+<p style="margin-left:0.75em;">Calculates the area under the t-distribution with <code style="font-size:1.2em;font-weight:500;">df</code> degrees of freedom to the left of the t-value <code style="font-size:1.2em;font-weight:500;">t</code>.</p>
+<p style="margin-left:0.75em;">Based on code from www.math.ucla.edu/~tom/distributions/tDist.html</p>
+
+<h2><a name="invnormalcdf"><code>invnormalcdf(p,[dec])</code></a></h2>
+<p style="margin-left:0.75em;">Inverse Normal CDF.  Finds the z-value with a left-tail area of <code style="font-size:1.2em;font-weight:500;">p</code>, to <code style="font-size:1.2em;font-weight:500;">dec</code> decimals (default 5).</p>
+<p style="margin-left:0.75em;">From Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97</p>
+
+<h2><a name="invtcdf"><code>invtcdf(p,df,[dec])</code></a></h2>
+<p style="margin-left:0.75em;">The inverse Student's t-distribution. Computes the t-value with a left-tail probability of <code style="font-size:1.2em;font-weight:500;">p</code>, with <code style="font-size:1.2em;font-weight:500;">df</code> degrees of freedom to <code style="font-size:1.2em;font-weight:500;">dec</code> decimal places (default 4)</p>
+<p style="margin-left:0.75em;">From Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970.</p>
+
+<h2><a name="linreg"><code>linreg(xarray,yarray)</code></a></h2>
+<p style="margin-left:0.75em;">Computes the linear correlation coefficient, and slope and intercept of regression line, based on array/list of x-values and array/list of y-values.</p>
+<p style="margin-left:0.75em;">Returns an array:  [r,slope,intercept]</p>
+
+<h2><a name="expreg"><code>expreg(xarray,yarray)</code></a></h2>
+<p style="margin-left:0.75em;">Computes the exponential correlation coefficient, and base and intercept of exponential, based on array/list of x-values and array/list of y-values.</p>
+<p style="margin-left:0.75em;">Returns an array:  [r,base,intercept]</p>
+
+<h2><a name="checklineagainstdata"><code>checklineagainstdata(xarray, yarray, student answer, [variable, alpha])</code></a></h2>
+<p style="margin-left:0.75em;">Intended for checking a student answer for fitting a line to data.  Determines if the student answer is within the confidence bounds for the regression equation.</p>
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">xarray, yarray</code>:  list/array of data values </li>
+  <li><code style="font-size:1.2em;font-weight:500;">student answer</code>:  the $stuanswers[$thisq] which is a line equation like "2x+3" </li>
+  <li><code style="font-size:1.2em;font-weight:500;">variable</code>:  defaults to "x" </li>
+  <li><code style="font-size:1.2em;font-weight:500;">alpha</code>: for confidence bound.  Defaults to .05.</li>
+</ul>
+<p style="margin-left:0.75em;">Returns array(answer, showanswer) to be used to set $answer and $showanswer.<p style="margin-left:0.75em;">
+
+<h2><a name="checkdrawnlineagainstdata"><code>checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid])</code></a></h2>
+<p style="margin-left:0.75em;">Intended for checking a student answer for drawing a line fit to data.  Determines if the student answer is within the confidence bounds for the regression equation.
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">xarray, yarray</code>:  list/array of data values</li>
+  <li><code style="font-size:1.2em;font-weight:500;">student answer</code>:  the $stuanswers[$thisq] from drawing</li>
+  <li><code style="font-size:1.2em;font-weight:500;">grade dots</code>: default false.  If true, will grade that dots of xarray,yarray were plotted</li>
+  <li><code style="font-size:1.2em;font-weight:500;">alpha</code>: for confidence bound.  defaults to .05</li>
+  <li><code style="font-size:1.2em;font-weight:500;">grid</code>:  If you've modified the grid, include it here</li>
+</ul>
+<p style="margin-left:0.75em;">Returns array(answer, showanswer) to be used to set $answer and $showanswer.</p>
+
+<h2><a name="binomialpdf"><code>binomialpdf(N,p,x)</code></a></h2>
+<p style="margin-left:0.75em;">Computes the probability of x successes out of N trials where each trial has probability <code style="font-size:1.2em;font-weight:500;">p</code> of success.</p>
+
+<h2><a name="binomialcdf"><code>binomialcdf(N,p,x)</code></a></h2>
+<p style="margin-left:0.75em;">Computes the probably of &lt;=x successes out of <code style="font-size:1.2em;font-weight:500;">N</code> trials, where each trial has probability <code style="font-size:1.2em;font-weight:500;">p</code> of success.</p>
+
+<h2><a name="chi2teststat"><code>chi2teststat(m)</code></a></h2>
+<p style="margin-left:0.75em;">Computes the test stat sum((E-O)^2/E) given a matrix of values.</p>
+
+<h2><a name="chi2cdf"><code>chi2cdf(x,df)</code></a></h2>
+<p style="margin-left:0.75em;">Computes the area to the left of <code style="font-size:1.2em;font-weight:500;">x</code> under the chi-squared disribution with <code style="font-size:1.2em;font-weight:500;">df</code> degrees of freedom.</p>
+
+<h2><a name="invchi2cdf"><code>invchi2cdf(p,df)</code></a></h2>
+<p style="margin-left:0.75em;">Compuates the x value with left-tail probability <code style="font-size:1.2em;font-weight:500;">p</code> under the chi-squared distribution with <code style="font-size:1.2em;font-weight:500;">df</code> degrees of freedom.
+
+<h2><a name="fcdf"><code>fcdf(f,df1,df2)</code></a></h2>
+<p style="margin-left:0.75em;">Returns the area to right of the F-value <code style="font-size:1.2em;font-weight:500;">f</code> for the f-distribution with <code style="font-size:1.2em;font-weight:500;">df1</code> and <code style="font-size:1.2em;font-weight:500;">df2</code> degrees of freedom (techinically it's 1-CDF). Algorithm is accurate to approximately 4-5 decimals.</p>
+
+<h2><a name="invfcdf"><code>invfcdf(p,df1,df2)</code></a></h2>
+<p style="margin-left:0.75em;">Computes the f-value with probability of <code style="font-size:1.2em;font-weight:500;">p</code> to the right with degrees of freedom <code style="font-size:1.2em;font-weight:500;">df1</code> and <code style="font-size:1.2em;font-weight:500;">df2</code>.  Algorithm is accurate to approximately 2-4 decimal places. Less accurate for smaller p-values</p>
+
+<h2><a name="mosaicplot"><code>mosaicplot(rowlabels, columnlabels, count matrix, [width, height])</code></a></h2>
+<p style="margin-left:0.75em;">Creates a mosaic plot (see http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972).</p>
+<ul>
+  <li><code style="font-size:1.2em;font-weight:500;">rowlabels</code>: an array of labels for the rows of the display</li>
+  <li><code style="font-size:1.2em;font-weight:500;">columnlabels</code>: an array of labels for the columns of the display</li>
+  <li><code style="font-size:1.2em;font-weight:500;">count matrix</code>: a 2-dimensional array.  $m[1][5] will give the count for rowlabel[1] and columnlabel[5]</li>
+  <li><code style="font-size:1.2em;font-weight:500;">width, height</code>: are optional, default to 300 by 300.  Does not include labels.</li>
+</ul>
+
+<h2><a name="csvdownloadlink"><code>csvdownloadlink(string,array,[string,array]...)</code></a></h2>
+<p style="margin-left:0.75em;">Creates a link that downloads the specified data in CSV format. For each column provide a string header and an array of values.</p>
