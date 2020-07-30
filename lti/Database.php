@@ -170,13 +170,19 @@ class Imathas_LTI_Database implements LTI\Database
      * Get key from the database
      * @param  string $keyseturl [description]
      * @param  string $kid       [description]
-     * @return array with key_set_url,kid,alg,publickey,privatekey,created_at
+     * @return array|null with key_set_url,kid,alg,publickey,privatekey,created_at
+     *                  or null if no key exists
      */
-    public function get_key(string $keyseturl, string $kid): array
+    public function get_key(string $keyseturl, string $kid): ?array
     {
         $stm = $this->dbh->prepare('SELECT * FROM imas_lti_keys WHERE key_set_url=? AND kid=?');
         $stm->execute(array($keyseturl, $kid));
-        return $stm->fetch(PDO::FETCH_ASSOC);
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
+            return null;
+        } else {
+            return $row;
+        }
     }
 
     /**

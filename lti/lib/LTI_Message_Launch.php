@@ -349,7 +349,7 @@ class LTI_Message_Launch {
       $key_set_url = $this->registration->get_key_set_url();
       $kid = $this->jwt['header']['kid'];
       $key = $this->db->get_key($key_set_url, $kid);
-      if ($key !== false) {
+      if ($key !== null) {
         return $key['publickey'];
       }
 
