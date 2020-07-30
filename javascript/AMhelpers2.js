@@ -80,7 +80,7 @@ function clearparams(paramarr) {
 }
 
 function toMQwVars(str, elid) {
-    var qn = elid.substr(2);
+    var qn = elid.substr(2).split(/-/)[0];
     var qtype = allParams[qn].qtype;
     if (qtype === 'numfunc') {
         str = AMnumfuncPrepVar(qn, str)[1];
