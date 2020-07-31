@@ -94,57 +94,6 @@ foreach (array('graphdisp', 'mathdisp', 'useed') as $key) {
 // get parameter values based on query string / JWT values
 $qsid = intval($QS['id']);
 
-if (isset($QS['jssubmit'])) {
-    $jssubmit = $QS['jssubmit'];
-} else {
-    $jssubmit = $issigned;
-}
-if (isset($QS['showans'])) {
-    $showans = $QS['showans'];
-} else {
-    $showans = 0;
-}
-if (isset($QS['showhints'])) {
-    $showhints = $QS['showhints'];
-} else {
-    $showhints = 3;
-}
-
-if (isset($QS['maxtries'])) {
-    $maxtries = intval($QS['maxtries']);
-} else {
-    $maxtries = 0;
-}
-if (isset($QS['showansafter'])) {
-    $showansafter = $QS['showansafter'];
-} else if ($maxtries > 0) {
-    $showansafter = $maxtries;
-} else {
-    $showansafter = $issigned ? 0 : 1;
-}
-if (isset($QS['showscoredonsubmit'])) {
-    $showscoredonsubmit = $QS['showscoredonsubmit'];
-} else {
-    $showscoredonsubmit = !$issigned;
-}
-$hidescoremarkers = !$showscoredonsubmit;
-if (isset($QS['hidescoremarkers'])) {
-    $hidescoremarkers = $QS['hidescoremarkers'];
-}
-if (isset($QS['showscored'])) {
-    $hidescoremarkers = false;
-}
-if (isset($QS['allowregen'])) {
-    $allowregen = $QS['allowregen'];
-} else {
-    $allowregen = !$issigned;
-}
-if (isset($QS['submitall'])) {
-    $submitall = $QS['submitall'];
-} else {
-    $submitall = $issigned;
-}
-
 // defaults
 $eqnhelper = 4;
 $useeqnhelper = 4;
@@ -178,17 +127,69 @@ if (isset($_POST['state'])) {
         'scoreiscorrect' => array(($qn + 1) => false),
         'partattemptn' => array($qn => array()),
         'rawscores' => array($qn => array()),
-        'jssubmit' => $jssubmit,
-        'showans' => $showans,
-        'showhints' => $showhints,
-        'showscoredonsubmit' => $showscoredonsubmit,
-        'hidescoremarkers' => $hidescoremarkers,
-        'allowregen' => $allowregen,
-        'maxtries' => $maxtries,
-        'showansafter' => $showansafter,
         'auth' => $QS['auth']
     );
 }
+
+$overrides = array();
+if (isset($QS['jssubmit'])) {
+    $state['jssubmit'] = $QS['jssubmit'];
+} else {
+    $state['jssubmit'] = $issigned;
+}
+
+if (isset($QS['showhints'])) {
+    $state['showhints'] = $QS['showhints'];
+} else {
+    $state['showhints'] = 3;
+}
+
+if (isset($QS['maxtries'])) {
+    $state['maxtries'] = intval($QS['maxtries']);
+} else {
+    $state['maxtries'] = 0;
+}
+if (isset($QS['showansafter'])) {
+    $state['showansafter'] = $QS['showansafter'];
+} else if ($maxtries > 0) {
+    $state['showansafter'] = $maxtries;
+} else {
+    $state['showansafter'] = $issigned ? 0 : 1;
+}
+if (isset($QS['showscoredonsubmit'])) {
+    $state['showscoredonsubmit'] = $QS['showscoredonsubmit'];
+} else {
+    $state['showscoredonsubmit'] = !$issigned;
+}
+$state['hidescoremarkers'] = !$showscoredonsubmit;
+if (isset($QS['hidescoremarkers'])) {
+    $state['hidescoremarkers'] = $QS['hidescoremarkers'];
+}
+if (isset($QS['showscored'])) {
+    $overrides['hidescoremarkers'] = false;
+    if (isset($QS['showans'])) {
+        $overrides['showans'] = $QS['showans'];
+    } else {
+        $overrides['showans'] = 0;
+    }
+} else {
+    if (isset($QS['showans'])) {
+        $state['showans'] = $QS['showans'];
+    } else {
+        $state['showans'] = 0;
+    }
+}
+if (isset($QS['allowregen'])) {
+    $state['allowregen'] = $QS['allowregen'];
+} else {
+    $state['allowregen'] = !$issigned;
+}
+if (isset($QS['submitall'])) {
+    $state['submitall'] = $QS['submitall'];
+} else {
+    $state['submitall'] = $issigned;
+}
+
 
 if (isset($_POST['regen']) && !$issigned) {
     $seed = rand(0, 9999) + 10000;
@@ -229,18 +230,18 @@ if (isset($_POST['toscoreqn'])) {
     }
     $out = array('jwt'=>JWT::encode($jwtcontents, $authsecret));
 
-    if ($showscoredonsubmit || !$res['allans']) {
-        $disp = $a2->displayQuestion($qn);
+    if ($state['showscoredonsubmit'] || !$res['allans']) {
+        $disp = $a2->displayQuestion($qn, $overrides);
         $out['disp'] = $disp;
     }
     echo json_encode($out);
     exit;
 }
 
-$disp = $a2->displayQuestion($qn);
+$disp = $a2->displayQuestion($qn, $overrides);
 
 // force submitall
-if ($submitall) {
+if ($state['submitall']) {
     $disp['jsparams']['submitall'] = 1;
 }
 
@@ -353,16 +354,16 @@ require "./header.php";
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 echo '<div class="questionwrap">';
-if (!$jssubmit) {
+if (!$state['jssubmit']) {
     echo '<div id="results'.$qn.'"></div>';
 }
 echo '<div class="questionpane">';
 echo '<div class="question" id="questionwrap'.$qn.'">';
 echo '</div></div>';
-if (!$jssubmit) {
+if (!$state['jssubmit']) {
     echo '<p>';
     echo '<button type=button onclick="submitq('.$qn.')" class="primary">'._("Submit").'</button>';
-    if ($allowregen) {
+    if ($state['allowregen']) {
         echo ' <button type=button onclick="regenq('.$qn.')" class="secondary">'._('Try a similar question').'</button>';
     }
     echo '</p>';
@@ -377,7 +378,7 @@ echo '<script>
     });
     </script>';
 
-if ($jssubmit) {
+if ($state['jssubmit']) {
     echo '<div id="embedspacer" style="display:none;height:200px">&nbsp;</div>';
 } else {
     echo '<div id="embedspacer" style="display:none;height:150px">&nbsp;</div>';
