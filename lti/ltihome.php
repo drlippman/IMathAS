@@ -138,10 +138,10 @@ if ($link->get_placementtype() == 'course') {
 
     if ($line['ver']>1) {
         $addassess = 'addassessment2.php';
-        $chgassess = 'chgassessment2.php';
+        $chgassess = 'chgassessments2.php';
     } else {
         $addassess = 'addassessment.php';
-        $chgassess = 'chgassessment.php';
+        $chgassess = 'chgassessments.php';
     }
     echo "<p><a href=\"../course/$addassess?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a> | ";
     echo "<a href=\"../course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></p>";
@@ -187,7 +187,7 @@ if ($link->get_placementtype() == 'course') {
     }
     echo '<br><a href="../admin/forms.php?action=modify&cid='.$cid.'&id='.$cid.'">'._('Course Settings').'</a>';
     echo '<br><a href="../course/copyitems.php?cid='.$cid.'">'._('Course Items: Copy').'</a>';
-    echo '<br><a href="../course/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a>';
+    echo '<br><a href="../admin/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a>';
     echo '<br><a href="../course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a>';
     echo '</p>';
 
