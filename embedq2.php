@@ -128,11 +128,11 @@ if (isset($QS['showscoredonsubmit'])) {
     $showscoredonsubmit = !$issigned;
 }
 $hidescoremarkers = !$showscoredonsubmit;
-if (isset($QS['showscored'])) {
-  $hidescoremarkers = false;
-}
 if (isset($QS['hidescoremarkers'])) {
     $hidescoremarkers = $QS['hidescoremarkers'];
+}
+if (isset($QS['showscored'])) {
+    $hidescoremarkers = false;
 }
 if (isset($QS['allowregen'])) {
     $allowregen = $QS['allowregen'];
@@ -220,7 +220,14 @@ if (isset($_POST['toscoreqn'])) {
         'errors' => $res['errors'],
         'state' => JWT::encode($a2->getState(), $statesecret)
     );
-    $out = array('jwt'=>JWT::encode($jwtcontents, $QS['auth']));
+    if ($QS['auth'] != '') {
+        $stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=?");
+        $stm->execute(array($QS['auth']));
+        $authsecret = $stm->fetchColumn(0);
+    } else {
+        $authsecret = '';
+    }
+    $out = array('jwt'=>JWT::encode($jwtcontents, $authsecret));
 
     if ($showscoredonsubmit || !$res['allans']) {
         $disp = $a2->displayQuestion($qn);

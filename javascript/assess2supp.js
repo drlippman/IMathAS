@@ -61,7 +61,7 @@ function submitq(qn) {
 function sendupscores(msg) {
     if(inIframe()) {
         var returnobj = {
-            subject: "lti.ext.mom.updateScore",
+            subject: "lti.ext.imathas.result",
             jwt: msg,
             frame_id: frame_id
         };
