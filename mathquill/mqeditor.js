@@ -271,12 +271,14 @@ var MQeditor = (function($) {
     if (config.hasOwnProperty('onShow')) {
       config.onShow(mqel[0], config.curlayoutstyle, rebuild);
     }
+    $(document).trigger('mqeditor:show');
   }
 
   /*
     Hide the editor
    */
   function hideEditor(event) {
+    $(document).trigger('mqeditor:hide');
     if (config.curlayoutstyle === 'OSK' && !inIframe()) {
       $("#mqeditor").slideUp(50);
     } else {

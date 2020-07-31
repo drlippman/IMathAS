@@ -286,18 +286,28 @@ $placeinhead .= '<script type="text/javascript">
   function sendresizemsg() {
    if(inIframe()){
       var default_height = Math.max(
-        document.body.scrollHeight, document.body.offsetHeight)+20;
-        console.log(default_height);
+        document.body.scrollHeight, document.body.offsetHeight) + 20;
+      var wrap_height = default_height - document.getElementById("embedspacer").offsetHeight;
       window.parent.postMessage( JSON.stringify({
         subject: "lti.frameResize",
         height: default_height,
+        wrapheight: wrap_height,
         iframe_resize_id: "' . $frameid . '",
         element_id: "' . $frameid . '",
         frame_id: "' . $frameid . '"
       }), "*");
    }
   }
-
+  $(function() {
+      $(document).on("mqeditor:show", function() {
+        $("#embedspacer").show();
+        sendresizemsg();
+      });
+      $(document).on("mqeditor:hide", function() {
+        $("#embedspacer").hide();
+        sendresizemsg();
+      });
+    });
   if (mathRenderer == "Katex") {
      window.katexDoneCallback = sendresizemsg;
   } else if (typeof MathJax != "undefined") {
@@ -361,9 +371,9 @@ echo '<script>
     </script>';
 
 if ($jssubmit) {
-    echo '<div style="height:200px">&nbsp;</div>';
+    echo '<div id="embedspacer" style="display:none;height:200px">&nbsp;</div>';
 } else {
-    echo '<div style="height:150px">&nbsp;</div>';
+    echo '<div id="embedspacer" style="display:none;height:150px">&nbsp;</div>';
 }
 
 
