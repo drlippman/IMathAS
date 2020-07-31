@@ -348,12 +348,12 @@ function initEnterHandler(qn) {
 	  .on("keydown.enterhandler", function(e) {
 		if (e.which==13) {
 			var btn = $(this).closest(".questionwrap").find(".submitbtnwrap .primary");
-      if (btn.length>0) {
-        e.preventDefault();
-      }
-      if (!btn.is(':disabled')) {
-        btn.trigger('click');
-      }
+            if (btn.length>0) {
+                e.preventDefault();
+            }
+            if (!btn.is(':disabled')) {
+                btn.trigger('click');
+            }
 		}
 	});
 }
@@ -1962,6 +1962,9 @@ function AutoSuggest(elem, suggestions)
 			break;
 
 			case ENTER:
+            if (me.highlighted > -1) {
+                ev.stopImmediatePropagation();
+            }
 			me.useSuggestion("enter");
 			return false;
 			break;
@@ -2029,7 +2032,8 @@ function AutoSuggest(elem, suggestions)
 		}
 	};
 	elem.onblur = function(ev) {
-		setTimeout(me.hideDiv,100);
+        //setTimeout(me.hideDiv,100);
+        me.hideDiv();
 	}
 
 
@@ -2162,8 +2166,9 @@ function AutoSuggest(elem, suggestions)
 		/********************************************************
 		click handler for the dropdown ul
 		insert the clicked suggestion into the input
-		********************************************************/
-		ul.onclick = function(ev)
+        ********************************************************/
+        
+		ul.onmousedown = ul.ontouchstart = function(ev)
 		{
 			me.useSuggestion("click");
 			me.hideDiv();
