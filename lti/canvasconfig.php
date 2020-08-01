@@ -1,6 +1,6 @@
 <?php
 $init_skip_csrfp = true;
-require("init_without_validate.php");
+require("../init_without_validate.php");
 
 $host = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match to higher domains.
@@ -8,15 +8,14 @@ if (substr($host,0,4)=='www.') { //strip www if not required - Canvas can match 
 } else {
 	 $shorthost = $host;
 }
-header("Content-type: text/xml;");
-echo '<?xml version="1.0" encoding="UTF-8"?>';
+header("Content-type: application/json;");
 ?>
 {
    "title":"<?php echo Sanitize::encodeStringForDisplay($installname); ?>",
-   "description":<?php echo Sanitize::encodeStringForDisplay($installname); ?>",
+   "description":"<?php echo Sanitize::encodeStringForDisplay($installname); ?>",
    "privacy_level":"public",
-   "oidc_initiation_url":"<? echo $basesiteurl;?>/lti/login.php",
-   "target_link_uri":"<? echo $basesiteurl;?>/lti/launch.php",
+   "oidc_initiation_url":"<?php echo $basesiteurl;?>/lti/login.php",
+   "target_link_uri":"<?php echo $basesiteurl;?>/lti/launch.php",
    "scopes":[
        "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
        "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
@@ -36,7 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
                   "enabled":true,
                   "placement":"assignment_selection",
                   "message_type":"LtiDeepLinkingRequest",
-                  "target_link_uri":"<? echo $basesiteurl;?>/lti/launch.php",
+                  "target_link_uri":"<?php echo $basesiteurl;?>/lti/launch.php",
                   "selection_height": 600,
                   "selection_width": 600
                }
@@ -44,9 +43,10 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
          }
       }
    ],
-   "public_jwk_url": "<? echo $basesiteurl;?>/lti/jwks.php",
+   "public_jwk_url": "<?php echo $basesiteurl;?>/lti/jwks.php",
    "custom_fields":{
       "canvas_assignment_due_at":"$Canvas.assignment.dueAt.iso8601",
       "context_history":"$Context.id.history"
    }
 }
+<?php
