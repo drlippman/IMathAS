@@ -158,9 +158,13 @@ echo ' <li>'._('In the Assignment Selection options, set the Message Type to: Lt
 echo ' <li>'._('For Target Link URI, enter:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
 echo ' </ul></li>';
 echo '<li>'._('After submitting, turn the State ON').'</li>';
+echo '<li>'._('Copy the numeric value shown in the Details column.  This is the Client ID. (You do not need to click the Show Key button)').'</li>';
+echo '<li>'._('Go to Admin, then Settings, then Apps, and click View App Configurations').'</li>';
+echo '<li>'._('Click +App').'</li>';
+echo '<li>'._('For Configuration Type, select By Client ID. Paste in the Client ID you copied down above, and hit Submit.').'</li>';
 echo '</ul>';
 
-echo '<p>'._('Once that is complete, copy the numeric value shown in the Details column (you do not need to click the Show Key button)').'</p>';
+echo '<p>'._('Now enter the Client ID you copied down above from the Details column.').'</p>';
 echo '<ul class=nomark>';
 echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
 echo '</ul>';
@@ -201,6 +205,7 @@ if ($bbclientid === false) {
   echo ' <li>'._('Click Register LTI 1.3/Advantage Tool').'</li>';
   echo ' <li>'._('Enter the Client ID:').' <span class=tocopy>'.Sanitize::encodeStringForDisplay($bbclientid).'</span></li>';
   echo ' <li>'._('On the tool status page, make sure the tool is Approved. ').'</li>';
+  echo ' <li>'._('In the Tool Provider Custom Parameters box, enter:').' <code>context_history=$Context.id.history</code></li>';
   echo ' <li>'._('Also ensure User Fields to Send includes Name and Role in Course, and set Allow grade service access to Yes.').'</li>';
   echo '</ul>';
   echo '<p>'._('If you want to enable deep linking, to allow easy addition of new items in Blackboard:').'</p>';
