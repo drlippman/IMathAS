@@ -70,7 +70,7 @@ These are all added to the `config.php` by the install script.
 
 Many system defaults can be adjusted using config changes.
 
-- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options.
+- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options. Setting $CFG['AMS']['caltag'] = 'use_name' causes assessment names to appear in the calendar by default.
 - Gradebook settings.  Most defaults can be defined.  For example, `$CFG['GBS']['defgbmode']` allows you to define the default gradebook mode.  See `/course/gbsettings.php` for all options.
 - Forum settings.  A few defaults can be defined.  See `/course/addforum.php` for all options.
 - Course settings.  Most default can be defined, and most can be forced to a value.  For example, `$CFG['CPS']['theme'] = array("modern.css",1);` sets the default theme but allows the user to change it.  Using `0` instead of `1` in the second position would set the default and not allow the user to change it.  See `/admin/forms.php` for all options.

@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header></assess-header>
     <p v-if="isPreviewAll" class="headerpane noticetext">
       {{ $t("header.preview_all") }}
@@ -18,13 +21,17 @@
         {{ textToggleLabel }}
       </button>
     </p>
-    <div class="scrollpane fulldisp" role="region" :aria-label="$t('regions.questions')">
-      <div
-        class = "questionpane introtext"
+    <div
+      class="scrollpane fulldisp"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.questions')"
+    >
+      <intro-text
         v-if = "intro !== ''"
-        v-show = "showTexts"
-        v-html = "intro"
-        ref = "introtext"
+        :active = "showTexts"
+        :html = "intro"
       />
 
       <div
@@ -69,6 +76,7 @@ import AssessHeader from '@/components/AssessHeader.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import IntroText from '@/components/IntroText.vue';
 import { store, actions } from '../basicstore';
 
 export default {
@@ -82,7 +90,8 @@ export default {
     Question,
     AssessHeader,
     FullQuestionHeader,
-    InterQuestionTextList
+    InterQuestionTextList,
+    IntroText
   },
   computed: {
     intro () {
@@ -115,13 +124,6 @@ export default {
     showAllAns () {
       window.$("span[id^='ans']").removeClass('hidden').toggle();
       window.$('.keybtn').attr('aria-expanded', function (i, v) { return !JSON.parse(v); });
-    }
-  },
-  mounted () {
-    setTimeout(window.drawPics, 100);
-    if (this.intro !== '') {
-      window.rendermathnode(this.$refs.introtext);
-      window.initlinkmarkup(this.$refs.introtext);
     }
   }
 };

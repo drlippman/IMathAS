@@ -48,8 +48,13 @@ var allJsParams = {};
        } else if (help.label == 'ex') {
          title = _('Written Example');
        }
-       out += '<li><a target="qhelp" href="'+ help['url'] +'">';
-       out += title + '</a></li>';
+       out += '<li><a target="qhelp" href="'+ help['url'] +'"';
+       if (help['descr'] != '') {
+        help['descr'] = help['descr'].replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        out += ' title="'+help['descr']+'"';
+        out += ' aria-label="'+title+' '+help['descr']+'"';
+       }
+       out += '>' + title + '</a></li>';
      }
      out += '</ul>';
      $(qwrap).append($("<div>", {class: "qhelps"}).html(out));

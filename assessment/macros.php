@@ -34,7 +34,9 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata",
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
- "randstates","prettysmallnumber","makeprettynegative","rawurlencode");
+ "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
+ "randcountry","randcountries");
+
 function mergearrays() {
 	$args = func_get_args();
 	foreach ($args as $k=>$arg) {
@@ -210,7 +212,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$absymax = -1E10;
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
-
+        $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
 		//correct for parametric
 		$isparametric = false;
@@ -239,6 +241,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= ', color '.$function[4];
 
 			if (isset($function[5]) && $function[5]!='') {
+                $function[5] = str_replace('&x44;', ',', $function[5]);
 				if (!isset($function[6])) {
 					$function[6] = 'above';
 				}
@@ -251,7 +254,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$commands .= $path;
 			continue; //skip the stuff below
 		} else if ($function[0]=='text') {  //text,x,y,textstring,color,loc,angle
-			if (!isset($function[4]) || $function[4]=='') {
+            $function[3] = str_replace('&x44;', ',', $function[3]);
+            if (!isset($function[4]) || $function[4]=='') {
 				$function[4] = 'black';
 			}
 			if (!isset($function[5])) {
@@ -447,8 +451,17 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $_SESSION['graphdisp']==0)?0:5*abs($xmax-$xmin)/$plotwidth);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-				$y = $evalfunc(['x'=>$x]);
+                $y = $evalfunc(['x'=>$x]);
 				if (isNaN($y)) {
+                    if ($lastl != 0) {
+                        if ($py !== null) {
+                            $pathstr .= ",[$px,$py]";
+                        }
+                        $pathstr .= ']);';
+                        $lastl = 0;
+                        $px = null;
+                        $py = null;
+                    }
 					continue;
 				}
 				$y = round($y,$yrnd);//round(eval("return ($func);"),3);
@@ -491,7 +504,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
 					$pathstr .= "[$px,$py],[$ix,$iy]]);";
 					$lastl = 0;
-				} else { //still out
+                } else { //still out
 
 				}
 			} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
@@ -517,7 +530,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$pathstr .= "[$ix,$iy]";
 					$lastl++;
 				} else { //still out
-
+                    
 				}
 			} else {//all in
 				if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
@@ -1283,16 +1296,22 @@ function randsfrom($lst,$n,$ord='def') {
 }
 
 
-function jointrandfrom($lst1,$lst2) {
-	if (func_num_args()!=2) { echo "jointrandfrom expects 2 arguments"; return array(1,1);}
-	if (!is_array($lst1)) {
-		$lst1 = listtoarray($lst1);
-	}
-	if (!is_array($lst2)) {
-		$lst2 = listtoarray($lst2);
-	}
-	$l = $GLOBALS['RND']->rand(0,min(count($lst1)-1,count($lst2)-1));
-	return array($lst1[$l],$lst2[$l]);
+function jointrandfrom() {
+    $args = func_get_args();
+	if (count($args)<2) { echo "jointrandfrom expects at least 2 arguments"; return array(1,1);}
+    $min = 1e12;
+    foreach ($args as $k=>$arg) {
+        if (!is_array($arg)) {
+            $args[$k] = listtoarray($arg);
+        }
+        $min = min($min, count($args[$k])-1);
+    }
+    $l = $GLOBALS['RND']->rand(0,$min);
+    $out = array();
+    foreach ($args as $k=>$arg) {
+        $out[] = $arg[$l];
+    }
+	return $out;
 }
 
 
@@ -1889,8 +1908,27 @@ function unionarrays($a1,$a2) {
 function prettyint($n) {
 	return number_format($n);
 }
-function prettyreal($n,$d=0,$comma=',') {
-	return number_format($n,$d,'.',$comma);
+function prettyreal($aarr,$d=0,$comma=',') {
+    if (!is_array($aarr)) {
+		$arrayout = false;
+		$aarr = array($aarr);
+	} else {
+		$arrayout = true;
+	}
+	$out = array();
+	foreach ($aarr as $a) {
+        $a = str_replace(',','',$a);
+        if (is_numeric($a)) {
+            $out[] = number_format($a,$d,'.',$comma);
+        } else {
+            $out[] = $a;
+        }
+    }
+	if ($arrayout) {
+		return $out;
+	} else {
+		return $out[0];
+	}
 }
 function prettysmallnumber($n, $space=false) {
 	if (abs($n)<.01) {
@@ -1925,7 +1963,11 @@ function prettysigfig($aarr,$sigfig,$comma=',',$choptrailing=false,$orscinot=fal
 	}
 	$out = array();
 	foreach ($aarr as $a) {
-		$a = str_replace(',','',$a);
+        $a = str_replace(',','',$a);
+        if ($a === 'DNE') {
+            $out[] = $a;
+            continue;
+        }
 		if ($orscinot && is_numeric($a) && (abs($a)>1000 || abs($a)<.001)) {
 			$out[] = makescinot($a, $sigfig-1, '*');
 			continue;
@@ -2201,10 +2243,100 @@ function numtowords($num,$doth=false,$addcontractiontonum=false,$addcommas=false
 	return trim($out);
 }
 
+function fractowords($numer,$denom,$options='no') { //options can combine 'mixed','over','by' and 'literal'
+
+  if (strpos($options,'mixed')===false) {
+    $int='';
+  }
+  $numersign=sign($numer);
+  $denomsign=sign($denom);
+  //creates integer and new numerator for mixed numbers
+  if (strpos($options,'mixed')!==false || strpos($options,'literal')===false) { //mixed or not literal
+    if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
+      return '';
+    }
+    if ($denom==0) {
+      echo 'Eek! Division by zero.';
+      return '';
+    }
+    if ($numer==0) {
+      return 'zero';
+    }
+      $numernew=abs($numer)%(abs($denom));
+      $numer=abs($numer); //numer and denom now positive
+      $denom=abs($denom);
+      $int=floor($numer/$denom);
+
+      if ($numernew==0) {//did fraction reduce to a whole number?
+        $int='';
+        $numer=$numer*$numersign;
+        $denom=$denom*$denomsign;
+        return numtowords($numer/$denom);
+      } elseif ($numernew!=0) {//is there a remainder after dividing?
+        if ($int==0) {//was the fraction proper to begin with?
+          $numer=$numernew*$numersign*$denomsign;
+          $int='';
+      } elseif ($int!=0) {//was the fraction improper to begin with?
+        if (strpos($options,'mixed')===false) {//not mixed and not literal
+          $int='';
+          $numer=$numer*$numersign*$denomsign;
+        } elseif (strpos($options,'mixed')!==false) {//mixed and not literal
+          $int=numtowords($int*$numersign*$denomsign).' and ';
+          $numer=$numernew;
+        }
+      }
+    }
+  } //end (mixed or not literal)
+
+//handles non-mixed numbers or fractional part of mixed numbers
+  if (abs($numer-floor($numer))>1e-9 || abs($denom-floor($denom))>1e-9) { //integers only
+    return '';
+  }
+  if ($denom==0) {
+    return '';
+  } else {
+    if (strpos($options,'over')===false && strpos($options,'by')===false) { //not over, not by
+      $top=numtowords($numer);
+      if ($denom==1) {
+        $bot='whole';
+      } elseif ($denom==-1) {
+        $bot='negative whole';
+      } elseif ($denom==2) {
+        if (abs($numer)==1) {
+          $bot='half';
+        } elseif ($numer!=1) {
+          $bot='halve';
+        }
+      } elseif ($denom==-2) {
+        if ($numer==1) {
+          $bot='negative half';
+        } else {
+          $bot='negative halve';
+        }
+      } else {
+        $bot=numtowords($denom,$doth=true);
+      }
+
+      if (abs($numer)==1) {
+        return $int.$top.' '.$bot;
+      } else {
+        return $int.$top.' '.$bot.'s';
+      }
+
+    } elseif (strpos($options,'over')!==false) {//over or overby, prefers over
+      return $int.numtowords($numer).' over '.numtowords($denom);
+    } elseif (strpos($options,'by')!==false) {//by or overby
+      return $int.numtowords($numer).' by '.numtowords($denom);
+    }
+  }
+}
+
 $namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");
 $namearray[1] = explode(',',"Adriana,Adrianna,Alejandra,Alexandra,Alexis,Alice,Alicia,Alma,Amanda,Amber,Amy,Andrea,Angela,Anna,April,Ariana,Ashley,Ashton,Autumn,Bianca,Bria,Brianna,Brittany,Brooke,Caitlyn,Carissa,Carolyn,Carrie,Cassandra,Catherine,Chasity,Chelsea,Chloe,Christy,Ciara,Claudia,Colleen,Courtney,Cristina,Crystal,Dana,Danielle,Delaney,Destiny,Diana,Elizabeth,Emily,Emma,Erica,Erin,Esmeralda,Gabrielle,Guadalupe,Haley,Hanna,Heather,Hillary,Holly,Jacqueline,Jamie,Jane,Jasmine,Jenna,Jennifer,Jessica,Julia,Karen,Karina,Karissa,Karla,Kathryn,Katie,Kayla,Kelly,Kelsey,Kendra,Kimberly,Kori,Kristen,Kristina,Krystal,Kylie,Laura,Lauren,Leah,Linda,Lindsey,Mackenzie,Madison,Maggie,Mariah,Marissa,Megan,Melissa,Meredith,Michelle,Mikayla,Miranda,Molly,Monique,Morgan,Naomi,Natalie,Natasha,Nicole,Nina,Noelle,Paige,Patricia,Rachael,Raquel,Rebecca,Renee,Riley,Rosa,Samantha,Sarah,Savannah,Shannon,Shantel,Sierra,Sonya,Sophia,Stacy,Stephanie,Summer,Sydney,Tatiana,Taylor,Tiana,Tiffany,Valerie,Vanessa,Victoria,Vivian,Wendy,Whitney,Zoe");
 
 $cityarray = explode(',','Los Angeles,Dallas,Houston,Atlanta,Detroit,San Francisco,Minneapolis,St. Louis,Baltimore,Pittsburg,Cincinnati,Cleveland,San Antonio,Las Vegas,Milwaukee,Oklahoma City,New Orleans,Tucson,New York City,Chicago,Philadelphia,Miami,Boston,Phoenix,Seattle,San Diego,Tampa,Denver,Portland,Sacramento,Orlando,Kansas City,Nashville,Memphis,Hartford,Salt Lake City');
+
+$countryarray = explode(',','Afghanistan,Albania,Algeria,Andorra,Angola,Antigua & Deps,Argentina,Armenia,Australia,Austria,Azerbaijan,Bahamas,Bahrain,Bangladesh,Barbados,Belarus,Belgium,Belize,Benin,Bhutan,Bolivia,Bosnia Herzegovina,Botswana,Brazil,Brunei,Bulgaria,Burkina,Burundi,Cambodia,Cameroon,Canada,Cape Verde,Central African Rep,Chad,Chile,China,Colombia,Comoros,Congo,Congo,Costa Rica,Croatia,Cuba,Cyprus,Czech Republic,Denmark,Djibouti,Dominica,Dominican Republic,East Timor,Ecuador,Egypt,El Salvador,Equatorial Guinea,Eritrea,Estonia,Ethiopia,Fiji,Finland,France,Gabon,Gambia,Georgia,Germany,Ghana,Greece,Grenada,Guatemala,Guinea,Guinea-Bissau,Guyana,Haiti,Honduras,Hungary,Iceland,India,Indonesia,Iran,Iraq,Ireland,Israel,Italy,Ivory Coast,Jamaica,Japan,Jordan,Kazakhstan,Kenya,Kiribati,North Korea,South Korea,Kosovo,Kuwait,Kyrgyzstan,Laos,Latvia,Lebanon,Lesotho,Liberia,Libya,Liechtenstein,Lithuania,Luxembourg,Macedonia,Madagascar,Malawi,Malaysia,Maldives,Mali,Malta,Marshall Islands,Mauritania,Mauritius,Mexico,Micronesia,Moldova,Monaco,Mongolia,Montenegro,Morocco,Mozambique,Myanmar,Namibia,Nauru,Nepal,Netherlands,New Zealand,Nicaragua,Niger,Nigeria,Norway,Oman,Pakistan,Palau,Panama,Papua New Guinea,Paraguay,Peru,Philippines,Poland,Portugal,Qatar,Romania,Russia,Rwanda,St Kitts & Nevis,St Lucia,Saint Vincent & the Grenadines,Samoa,San Marino,Sao Tome & Principe,Saudi Arabia,Senegal,Serbia,Seychelles,Sierra Leone,Singapore,Slovakia,Slovenia,Solomon Islands,Somalia,South Africa,South Sudan,Spain,Sri Lanka,Sudan,Suriname,Swaziland,Sweden,Switzerland,Syria,Taiwan,Tajikistan,Tanzania,Thailand,Togo,Tonga,Trinidad & Tobago,Tunisia,Turkey,Turkmenistan,Tuvalu,Uganda,Ukraine,United Arab Emirates,United Kingdom,United States,Uruguay,Uzbekistan,Vanuatu,Vatican City,Venezuela,Vietnam,Yemen,Zambia,Zimbabwe');
 
 function randcities($n=1) {
 	global $cityarray;
@@ -2213,6 +2345,18 @@ function randcities($n=1) {
 		return $cityarray[$GLOBALS['RND']->rand(0,$c-1)];
 	} else {
 		$out = $cityarray;
+		$GLOBALS['RND']->shuffle($out);
+		return array_slice($out,0,$n);
+	}
+}
+
+function randcountries($n=1) {
+	global $countryarray;
+	$c = count($countryarray);
+	if ($n==1) {
+		return $countryarray[$GLOBALS['RND']->rand(0,$c-1)];
+	} else {
+		$out = $countryarray;
 		$GLOBALS['RND']->shuffle($out);
 		return array_slice($out,0,$n);
 	}
@@ -2234,6 +2378,9 @@ function randstate() {
 }
 function randcity() {
 	return randcities(1);
+}
+function randcountry() {
+  return randcountries(1);
 }
 
 function randnames($n=1,$gender=2) {
@@ -2265,14 +2412,23 @@ function randfemalenames($n=1) {
 function randname() {
 	return randnames(1,2);
 }
-function randnamewpronouns() {
-	$gender = $GLOBALS['RND']->rand(0,1);
-	$name = randnames(1,$gender);
-	if ($gender==0) { //male
-		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'));
-	} else {
-		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'));
-	}
+function randnamewpronouns($g=2) {
+  $gender = $GLOBALS['RND']->rand(0,1);
+  
+  if ($g==2) {
+  	if ($gender==0) { //male
+  		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'), _('himself'));
+  	} else {
+  		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'), _('herself'));
+  	}
+  } elseif ($g=='neutral') {
+    if ($gender==0) { //male
+  		return array(randnames(1,0), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  	} else {
+  		return array(randnames(1,1), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  	}
+  }
+
 }
 function randmalename() {
 	return randnames(1,0);
@@ -2493,16 +2649,22 @@ function evalfunc($farr) {
 
 function textonimage() {
 	$args = func_get_args();
-	$img = array_shift($args);
-	$img = preg_replace('/^.*src="(.*?)".*$/',"$1",$img);
+    $img = array_shift($args);
+    $alt = '';
+    if (preg_match('/alt="(.*?)"/', $img, $altmatch)) {
+        $alt = $altmatch[1];
+    }
+    $img = preg_replace('/^.*src="(.*?)".*$/',"$1",$img);
+
 	$out = '<div style="position: relative;" class="txtimgwrap">';
-	$out .= '<img src="'.$img.'" style="position: relative; top: 0px; left: 0px;" />';
+	$out .= '<img src="'.$img.'" alt="'.$alt.'" style="position: relative; top: 0px; left: 0px;" />';
 	while (count($args)>2) {
 		$text = array_shift($args);
 		$left = array_shift($args);
-		$top = array_shift($args);
-		$out .= "<div style=\"position: absolute; top: {$top}px; left: {$left}px;\">$text</div>";
-	}
+        $top = array_shift($args);
+        $hidden = (strpos($text,'[AB')===false)?'aria-hidden=true':'';
+		$out .= "<div $hidden style=\"position: absolute; top: {$top}px; left: {$left}px;\">$text</div>";
+    }
 	$out .= '</div>';
 	return $out;
 }

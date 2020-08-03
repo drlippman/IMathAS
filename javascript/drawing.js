@@ -2515,7 +2515,8 @@ function normupdatevalues(id) {
 	} else if (normslider.curslider.type=='1R') {
 		var outstr = "("+lbl1val+",oo)";
 	}
-	document.getElementById("qn"+id).value = outstr;
+    document.getElementById("qn"+id).value = outstr;
+    $("#qn"+id).trigger("input").trigger("change");
 }
 
 function chgnormtype(id) {

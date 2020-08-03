@@ -79,7 +79,23 @@ function clearparams(paramarr) {
   }
 }
 
+function toMQwVars(str, elid) {
+    var qn = elid.substr(2).split(/-/)[0];
+    var qtype = allParams[qn].qtype;
+    if (qtype === 'numfunc') {
+        str = AMnumfuncPrepVar(qn, str)[1];
+    }
+    return AMtoMQ(str);
+}
+function fromMQwText(str, elid) {
+    str = MQtoAM(str);
+    str = str.replace(/\(text\((.*?)\)\)/g,'($1)')
+            .replace(/text\((.*?)\)/g,' $1 ');
+    return str;
+}
+
 function init(paramarr, enableMQ, baseel) {
+  MQeditor.setConfig({toMQ: toMQwVars, fromMQ: fromMQwText});
   if ($("#arialive").length==0) {
     $('body').append($('<p>', {
       id: "arialive",
@@ -332,12 +348,12 @@ function initEnterHandler(qn) {
 	  .on("keydown.enterhandler", function(e) {
 		if (e.which==13) {
 			var btn = $(this).closest(".questionwrap").find(".submitbtnwrap .primary");
-      if (btn.length>0) {
-        e.preventDefault();
-      }
-      if (!btn.is(':disabled')) {
-        btn.trigger('click');
-      }
+            if (btn.length>0) {
+                e.preventDefault();
+            }
+            if (!btn.is(':disabled')) {
+                btn.trigger('click');
+            }
 		}
 	});
 }
@@ -1041,7 +1057,7 @@ function AMnumfuncPrepVar(qn,str) {
 		  } else if (!isgreek && vars[i]!="varE" && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
-      if (vars[i].match(/[^\w_]/)) {
+      if (vars[i].match(/[^\w_]/) || vars[i].match(/^(break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|and with)$/)) {
         str = str.replace(new RegExp(escapeRegExp(vars[i]),"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
       }
@@ -1451,6 +1467,7 @@ function processNumfunc(qn, fullstr, format) {
 	  reg = new RegExp("("+fvars.join('|')+")\\(","g");
 	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
   }
+
   totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
 
   var i,j,totest,testval,res;
@@ -1945,6 +1962,9 @@ function AutoSuggest(elem, suggestions)
 			break;
 
 			case ENTER:
+            if (me.highlighted > -1) {
+                ev.stopImmediatePropagation();
+            }
 			me.useSuggestion("enter");
 			return false;
 			break;
@@ -2012,7 +2032,8 @@ function AutoSuggest(elem, suggestions)
 		}
 	};
 	elem.onblur = function(ev) {
-		setTimeout(me.hideDiv,100);
+        //setTimeout(me.hideDiv,100);
+        me.hideDiv();
 	}
 
 
@@ -2145,8 +2166,9 @@ function AutoSuggest(elem, suggestions)
 		/********************************************************
 		click handler for the dropdown ul
 		insert the clicked suggestion into the input
-		********************************************************/
-		ul.onclick = function(ev)
+        ********************************************************/
+        
+		ul.onmousedown = ul.ontouchstart = function(ev)
 		{
 			me.useSuggestion("click");
 			me.hideDiv();

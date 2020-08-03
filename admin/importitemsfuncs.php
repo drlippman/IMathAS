@@ -304,7 +304,7 @@ private function importCourseOpt() {
 	$exarr = array();
 	if (!isset($CFG['CPS'])) { $CFG['CPS'] = array();}
 	foreach ($db_fields['course'] as $field) {
-		if ($field == 'ver') { continue; } // don't want to overwrite course ver in import
+		if ($field == 'UIver') { continue; } // don't want to overwrite course ver in import
 		//check if in export, and if CFG allows setting
 		if (isset($this->data['course'][$field]) && (!isset($CFG['CPS'][$field]) || $CFG['CPS'][$field][1]!=0)) {
 			$sets[] = $field.'=?';

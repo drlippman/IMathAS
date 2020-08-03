@@ -1,18 +1,21 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header />
     <full-paged-nav :page="page" />
-    <div class="scrollpane" role="region" :aria-label="$t('regions.questions')">
-      <div
-        class = "questionpane introtext"
-        v-show = "page === -1 && intro !== ''"
-      >
-        <h2>{{ $t('intro') }}</h2>
-        <div
-          v-html = "intro"
-          ref = "introtext"
-        />
-      </div>
+    <div
+      class="scrollpane"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.questions')"
+    >
+      <intro-text
+        :active = "page === -1 && intro !== ''"
+        :html = "intro"
+      />
       <div
         v-for = "(pageData,pagenum) in allPages"
         :key = "pagenum"
@@ -86,6 +89,7 @@ import FullPagedNav from '@/components/FullPagedNav.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import IntroText from '@/components/IntroText.vue';
 import { store, actions } from '../basicstore';
 
 export default {
@@ -95,7 +99,8 @@ export default {
     AssessHeader,
     FullPagedNav,
     FullQuestionHeader,
-    InterQuestionTextList
+    InterQuestionTextList,
+    IntroText
   },
   computed: {
     page () {
@@ -115,11 +120,6 @@ export default {
     submitAssess () {
       actions.submitAssessment();
     }
-  },
-  mounted () {
-    setTimeout(window.drawPics, 100);
-    window.rendermathnode(this.$refs.introtext);
-    window.initlinkmarkup(this.$refs.introtext);
   }
 };
 </script>

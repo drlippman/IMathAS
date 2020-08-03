@@ -1044,7 +1044,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$answeights = array(1);
 			}
 		}
-		$scores = array();  $raw = array(); $accpts = 0;
+        $scores = array();  $raw = array(); $accpts = 0;
+        if (isset($scoremethod) && !empty($scoremethod['whole'])) {
+            $scoremethod = $scoremethod['whole'];
+        }
 		foreach ($anstypes as $kidx=>$anstype) {
 			$partnum = ($qnidx+1)*1000 + $kidx;
 			$raw[$kidx] = scorepart($anstype,$kidx,$_POST["qn".Sanitize::onlyInt($partnum)],$optionsPack,$qnidx+1);
@@ -2029,6 +2032,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
 			$out .= "<label for=\"tn$qn\">$ansprompt</label>";
+		}
+		if (in_array('inequality',$ansformats)) {
+			echo _("Warning: answerformat inequality is not supported in the old assessment system. This question will not function properly.");
 		}
 		if (in_array('equation',$ansformats)) {
 			$shorttip = _('Enter an algebraic equation');

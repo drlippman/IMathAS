@@ -21,6 +21,7 @@
 </div>
 */
 // import Icons from '@/components/widgets/Icons.vue';
+import { pauseVideos } from '@/components/pauseVideos';
 
 export default {
   name: 'InterQuestionText',
@@ -57,6 +58,9 @@ export default {
     active: function (newVal, oldVal) {
       if (this.active && this.expanded && !this.rendered) {
         this.renderMath();
+      }
+      if (newVal === false) {
+        pauseVideos(this.$refs.main);
       }
     }
   }

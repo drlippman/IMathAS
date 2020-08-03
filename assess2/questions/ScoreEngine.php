@@ -522,7 +522,16 @@ class ScoreEngine
             $scorePartResult = $scorePart->getResult();
             $raw[$partnum] = $scorePartResult->getRawScore();
 
-            if (isset($scoremethod) && $scoremethod == 'acct') {
+            $scoremethodwhole = '';
+            if (isset($scoremethod)) {
+                if (!is_array($scoremethod)) {
+                    $scoremethodwhole = $scoremethod;
+                } else if (!empty($scoremethod['whole'])) {
+                    $scoremethodwhole = $scoremethod['whole'];
+                }
+            }
+
+            if ($scoremethodwhole == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
                     $scores[$partnum] = $raw[$partnum] - 1;  //0 if correct, -1 if wrong
                     // scores isn't actually used - only raw is
@@ -544,7 +553,7 @@ class ScoreEngine
             $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
         }
 
-        if (isset($scoremethod) && $scoremethod == "singlescore") {
+        if ($scoremethodwhole == "singlescore") {
             return array(
                 'scores' => array(round(array_sum($scores), 3)),
                 'rawScores' => $raw,
@@ -553,7 +562,7 @@ class ScoreEngine
                 'scoreMethod' => 'singlescore',
                 'answeights' => $answeights
             );
-        } else if (isset($scoremethod) && $scoremethod == "allornothing") {
+        } else if ($scoremethodwhole == "allornothing") {
             if (array_sum($scores) < .98) {
                 return array(
                     'scores' => array(0),
@@ -573,7 +582,7 @@ class ScoreEngine
                     'answeights' => $answeights
                 );
             }
-        } else if (isset($scoremethod) && $scoremethod == "acct") {
+        } else if ($scoremethodwhole == "acct") {
             $sc = round(array_sum($scores) / $accpts, 3);
             return (array(
                 'scores' => array($sc),
