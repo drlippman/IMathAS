@@ -975,6 +975,16 @@ function getuserfileurl($key) {
 		return "$imasroot/filestore/$key";
 	}
 }
+function getprivatefileurl($key,$exp=7200) {
+    global $imasroot;
+    $key = Sanitize::rawurlencodePath($key);
+	if (getfilehandlertype('filehandlertype') == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		return $s3->queryStringGet($GLOBALS['AWSbucket'],$key,$exp);
+	} else {
+		return $imasroot.'/filestore/'.$key;
+	}
+}
 function getfopenloc($key) {
 	global $urlmode,$imasroot;
 	$key = Sanitize::rawurlencodePath($key);

@@ -1,6 +1,7 @@
 <?php
 
 require("../init.php");
+require_once('../includes/filehandler.php');
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
@@ -103,7 +104,13 @@ if (!empty($newStatus)) {
 			}
 		} else {
 			$group = 0;
-		}
+        }
+        
+        if ($group > 0 && !empty($reqdata['ipeds']) && strpos($reqdata['ipeds'],'-')!==false) {
+            list($ipedtype, $ipedid) = explode('-', $reqdata['ipeds']);
+            $stm = $DBH->prepare("INSERT IGNORE INTO imas_ipeds_group (type,ipedsid,groupid) VALUES (?,?,?)");
+            $stm->execute(array($ipedtype, $ipedid, $group));
+        }
 
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
 		$stm->execute(array(':groupid'=>$group, ':id'=>$instId));
@@ -136,10 +143,12 @@ if (!empty($newStatus)) {
 	exit;
 }
 
-function getReqData() {
-	global $DBH;
+$countries = ['AF'=>'Afghanistan', 'AL'=>'Albania', 'DZ'=>'Algeria', 'AD'=>'Andorra', 'AO'=>'Angola', 'AI'=>'Anguilla', 'AQ'=>'Antarctica', 'AG'=>'Antigua and Barbuda', 'AR'=>'Argentina', 'AM'=>'Armenia', 'AW'=>'Aruba', 'AU'=>'Australia', 'AT'=>'Austria', 'AZ'=>'Azerbaijan', 'BS'=>'Bahamas (the)', 'BH'=>'Bahrain', 'BD'=>'Bangladesh', 'BB'=>'Barbados', 'BY'=>'Belarus', 'BE'=>'Belgium', 'BZ'=>'Belize', 'BJ'=>'Benin', 'BM'=>'Bermuda', 'BT'=>'Bhutan', 'BO'=>'Bolivia (Plurinational State of)', 'BQ'=>'Bonaire, Sint Eustatius and Saba', 'BA'=>'Bosnia and Herzegovina', 'BW'=>'Botswana', 'BV'=>'Bouvet Island', 'BR'=>'Brazil', 'IO'=>'British Indian Ocean Territory (the)', 'BN'=>'Brunei Darussalam', 'BG'=>'Bulgaria', 'BF'=>'Burkina Faso', 'BI'=>'Burundi', 'CV'=>'Cabo Verde', 'KH'=>'Cambodia', 'CM'=>'Cameroon', 'CA'=>'Canada', 'KY'=>'Cayman Islands (the)', 'CF'=>'Central African Republic (the)', 'TD'=>'Chad', 'CL'=>'Chile', 'CN'=>'China', 'CX'=>'Christmas Island', 'CC'=>'Cocos (Keeling) Islands (the)', 'CO'=>'Colombia', 'KM'=>'Comoros (the)', 'CD'=>'Congo (the Democratic Republic of the)', 'CG'=>'Congo (the)', 'CK'=>'Cook Islands (the)', 'CR'=>'Costa Rica', 'HR'=>'Croatia', 'CU'=>'Cuba', 'CW'=>'Curaçao', 'CY'=>'Cyprus', 'CZ'=>'Czechia', 'CI'=>'Côte d\'Ivoire', 'DK'=>'Denmark', 'DJ'=>'Djibouti', 'DM'=>'Dominica', 'DO'=>'Dominican Republic (the)', 'EC'=>'Ecuador', 'EG'=>'Egypt', 'SV'=>'El Salvador', 'GQ'=>'Equatorial Guinea', 'ER'=>'Eritrea', 'EE'=>'Estonia', 'SZ'=>'Eswatini', 'ET'=>'Ethiopia', 'FK'=>'Falkland Islands (the) [Malvinas]', 'FO'=>'Faroe Islands (the)', 'FJ'=>'Fiji', 'FI'=>'Finland', 'FR'=>'France', 'GF'=>'French Guiana', 'PF'=>'French Polynesia', 'TF'=>'French Southern Territories (the)', 'GA'=>'Gabon', 'GM'=>'Gambia (the)', 'GE'=>'Georgia', 'DE'=>'Germany', 'GH'=>'Ghana', 'GI'=>'Gibraltar', 'GR'=>'Greece', 'GL'=>'Greenland', 'GD'=>'Grenada', 'GP'=>'Guadeloupe', 'GT'=>'Guatemala', 'GG'=>'Guernsey', 'GN'=>'Guinea', 'GW'=>'Guinea-Bissau', 'GY'=>'Guyana', 'HT'=>'Haiti', 'HM'=>'Heard Island and McDonald Islands', 'VA'=>'Holy See (the)', 'HN'=>'Honduras', 'HK'=>'Hong Kong', 'HU'=>'Hungary', 'IS'=>'Iceland', 'IN'=>'India', 'ID'=>'Indonesia', 'IR'=>'Iran (Islamic Republic of)', 'IQ'=>'Iraq', 'IE'=>'Ireland', 'IM'=>'Isle of Man', 'IL'=>'Israel', 'IT'=>'Italy', 'JM'=>'Jamaica', 'JP'=>'Japan', 'JE'=>'Jersey', 'JO'=>'Jordan', 'KZ'=>'Kazakhstan', 'KE'=>'Kenya', 'KI'=>'Kiribati', 'KP'=>'Korea (the Democratic People\'s Republic of)', 'KR'=>'Korea (the Republic of)', 'KW'=>'Kuwait', 'KG'=>'Kyrgyzstan', 'LA'=>'Lao People\'s Democratic Republic (the)', 'LV'=>'Latvia', 'LB'=>'Lebanon', 'LS'=>'Lesotho', 'LR'=>'Liberia', 'LY'=>'Libya', 'LI'=>'Liechtenstein', 'LT'=>'Lithuania', 'LU'=>'Luxembourg', 'MO'=>'Macao', 'MG'=>'Madagascar', 'MW'=>'Malawi', 'MY'=>'Malaysia', 'MV'=>'Maldives', 'ML'=>'Mali', 'MT'=>'Malta', 'MQ'=>'Martinique', 'MR'=>'Mauritania', 'MU'=>'Mauritius', 'YT'=>'Mayotte', 'MX'=>'Mexico', 'MD'=>'Moldova (the Republic of)', 'MC'=>'Monaco', 'MN'=>'Mongolia', 'ME'=>'Montenegro', 'MS'=>'Montserrat', 'MA'=>'Morocco', 'MZ'=>'Mozambique', 'MM'=>'Myanmar', 'NA'=>'Namibia', 'NR'=>'Nauru', 'NP'=>'Nepal', 'NL'=>'Netherlands (the)', 'NC'=>'New Caledonia', 'NZ'=>'New Zealand', 'NI'=>'Nicaragua', 'NE'=>'Niger (the)', 'NG'=>'Nigeria', 'NU'=>'Niue', 'NF'=>'Norfolk Island', 'NO'=>'Norway', 'OM'=>'Oman', 'PK'=>'Pakistan', 'PS'=>'Palestine, State of', 'PA'=>'Panama', 'PG'=>'Papua New Guinea', 'PY'=>'Paraguay', 'PE'=>'Peru', 'PH'=>'Philippines (the)', 'PN'=>'Pitcairn', 'PL'=>'Poland', 'PT'=>'Portugal', 'QA'=>'Qatar', 'MK'=>'Republic of North Macedonia', 'RO'=>'Romania', 'RU'=>'Russian Federation (the)', 'RW'=>'Rwanda', 'RE'=>'Réunion', 'BL'=>'Saint Barthélemy', 'SH'=>'Saint Helena, Ascension and Tristan da Cunha', 'KN'=>'Saint Kitts and Nevis', 'LC'=>'Saint Lucia', 'MF'=>'Saint Martin (French part)', 'PM'=>'Saint Pierre and Miquelon', 'VC'=>'Saint Vincent and the Grenadines', 'WS'=>'Samoa', 'SM'=>'San Marino', 'ST'=>'Sao Tome and Principe', 'SA'=>'Saudi Arabia', 'SN'=>'Senegal', 'RS'=>'Serbia', 'SC'=>'Seychelles', 'SL'=>'Sierra Leone', 'SG'=>'Singapore', 'SX'=>'Sint Maarten (Dutch part)', 'SK'=>'Slovakia', 'SI'=>'Slovenia', 'SB'=>'Solomon Islands', 'SO'=>'Somalia', 'ZA'=>'South Africa', 'GS'=>'South Georgia and the South Sandwich Islands', 'SS'=>'South Sudan', 'ES'=>'Spain', 'LK'=>'Sri Lanka', 'SD'=>'Sudan (the)', 'SR'=>'Suriname', 'SJ'=>'Svalbard and Jan Mayen', 'SE'=>'Sweden', 'CH'=>'Switzerland', 'SY'=>'Syrian Arab Republic', 'TW'=>'Taiwan', 'TJ'=>'Tajikistan', 'TZ'=>'Tanzania, United Republic of', 'TH'=>'Thailand', 'TL'=>'Timor-Leste', 'TG'=>'Togo', 'TK'=>'Tokelau', 'TO'=>'Tonga', 'TT'=>'Trinidad and Tobago', 'TN'=>'Tunisia', 'TR'=>'Turkey', 'TM'=>'Turkmenistan', 'TC'=>'Turks and Caicos Islands (the)', 'TV'=>'Tuvalu', 'UG'=>'Uganda', 'UA'=>'Ukraine', 'AE'=>'United Arab Emirates (the)', 'GB'=>'United Kingdom of Great Britain and Northern Ireland (the)', 'UM'=>'United States Minor Outlying Islands (the)', 'UY'=>'Uruguay', 'UZ'=>'Uzbekistan', 'VU'=>'Vanuatu', 'VE'=>'Venezuela (Bolivarian Republic of)', 'VN'=>'Viet Nam', 'VG'=>'Virgin Islands (British)', 'WF'=>'Wallis and Futuna', 'EH'=>'Western Sahara', 'YE'=>'Yemen', 'ZM'=>'Zambia', 'ZW'=>'Zimbabwe', 'AX'=>'Åland Islands'];
 
-	$query = 'SELECT ir.status,ir.reqdata,ir.reqdate,iu.id,iu.email,iu.LastName,iu.FirstName ';
+function getReqData() {
+	global $DBH, $countries;
+
+	$query = 'SELECT ir.status,ir.reqdata,ir.reqdate,iu.id,iu.email,iu.LastName,iu.FirstName,iu.SID ';
 	$query .= 'FROM imas_instr_acct_reqs AS ir JOIN imas_users AS iu ';
 	$query .= 'ON ir.userid=iu.id WHERE ir.status<10 ORDER BY ir.status,ir.reqdate';
 	$stm = $DBH->query($query);
@@ -149,7 +158,44 @@ function getReqData() {
 		if (!isset($out[$row['status']])) {
 			$out[$row['status']] = array();
 		}
-		$userdata = json_decode($row['reqdata'],true);
+        $userdata = json_decode($row['reqdata'],true);
+        if (isset($userdata['ipeds'])) {
+            // handle requests with ipeds info 
+            if (strpos($userdata['ipeds'],'-') !== false) {
+                list($ipedstype,$ipedsval) = explode('-', $userdata['ipeds']);
+                $query = 'SELECT ip.school,ip.agency,ip.country,ig.id,ig.name 
+                    FROM imas_ipeds AS ip 
+                    LEFT JOIN imas_ipeds_group AS ipg ON ip.type=ipg.type AND ip.ipedsid=ipg.ipedsid 
+                    LEFT JOIN imas_groups AS ig ON ipg.groupid=ig.id 
+                    WHERE ip.type=? and ip.ipedsid=?';
+                $stm2 = $DBH->prepare($query);
+                $stm2->execute(array($ipedstype, $ipedsval));
+                $ipedsgroups = array();
+                while ($r2 = $stm2->fetch(PDO::FETCH_ASSOC)) {
+                    $ipedname = ($ipedstype == 'A') ? $r2['agency'] : $r2['school'];
+                    if ($r2['id'] !== null) {
+                        $ipedsgroups[] = ['id'=>$r2['id'], 'name'=>$r2['name']];
+                    }
+                }
+                if (count($ipedsgroups)>0) {
+                    $userdata['fixedgroups'] = $ipedsgroups;
+                } 
+                $userdata['school'] = $ipedname;
+            } else if ($userdata['ipeds'] == '0') {
+                $userdata['school'] = $userdata['otherschool'].' ('.$countries[$userdata['schoolloc']].')';
+            }
+        }
+        if (isset($userdata['vertype'])) {
+            // these values are further handled and sanitized below.
+            if ($userdata['vertype'] == 'url') {
+                $userdata['url'] = $userdata['verdata']; 
+            } else if ($userdata['vertype'] == 'email') {
+                $userdata['url'] = _('Expect an email from: ').$userdata['verdata'];
+            } else if ($userdata['vertype'] == 'file') {
+                $url = getprivatefileurl(substr($userdata['verdata'],5));
+                $userdata['url'] = "<a href=\"$url\" target=\"blank_\">"._('Verification Image').'</a>';
+            }
+        }
 		if (isset($userdata['url'])) {
 			if (substr($userdata['url'],0,4)=='http') {
 				$userdata['url'] = Sanitize::url($userdata['url']);
@@ -162,7 +208,8 @@ function getReqData() {
 		}
 		$userdata['reqdate'] = tzdate("D n/j/y, g:i a", $row['reqdate']);
 		$userdata['name'] = $row['LastName'].', '.$row['FirstName'];
-		$userdata['email'] = $row['email'];
+        $userdata['email'] = $row['email'];
+        $userdata['username'] = $row['SID'];
 		$userdata['id'] = $row['id'];
 		if (isset($userdata['school'])) {
 			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search Google for Name/School</a>';
@@ -178,11 +225,18 @@ function getReqData() {
 //add fields based on your new instructor request form
 //and then add the "search" entry
 if (empty($reqFields)) {
-    $reqFields = array(
-        'school' => 'School',
-        'phone' => 'Phone',
-        'search' => 'Search'
-    );
+    if (!empty($CFG['use_ipeds'])) {
+        $reqFields = array(
+            'school' => 'School',
+            'search' => 'Search'
+        );
+    } else {
+        $reqFields = array(
+            'school' => 'School',
+            'phone' => 'Phone',
+            'search' => 'Search'
+        );
+    }
 }
 
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
@@ -242,6 +296,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
         </span>
       	<ul class="userdata" v-if="activeUser==user.id">
       	  <li>Request Made: {{user.reqdate}}</li>
+          <li>Username: {{user.username}}</li>
       	  <li>Email: {{user.email}}</li>
       	  <li v-for="(title,fieldindex) in fieldTitles">
       	    <span v-if="fieldindex=='url' || fieldindex=='search'" v-html="user[fieldindex]"></span>
@@ -258,13 +313,13 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	    	<button @click="chgStatus(status, userindex, 3)">Probably should be Denied</button>
       	    </span>
       	  </li>
-					<li>Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
-						<button type=button @click="searchGroups">Search</button>
-					</li>
+          <li v-if="!fixedgroups">Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
+            <button type=button @click="searchGroups">Search</button>
+          </li>
       	  <li v-show="groups !== null">Group: <select v-model="group">
       	  	<optgroup label="groups">
-      	  		<option value="-1">New group</option>
-      	  		<option value=0>Default</option>
+      	  		<option value="-1" v-if="!fixedgroups">New group</option>
+      	  		<option value=0 v-if="!fixedgroups">Default</option>
       	  		<option v-for="group in groups" :value="group.id">{{group.name}}</option>
       	  	</optgroup>
       	  	</select>
@@ -306,7 +361,8 @@ var app = new Vue({
 			4: 'Waiting for more info'
 		},
 		statusMsg: "",
-		group: 0,
+        group: 0,
+        fixedgroups: false,
 		newgroup: ""
 	},
 	computed: {
@@ -323,8 +379,17 @@ var app = new Vue({
 				this.activeUserStatus = status;
 				this.activeUserIndex = userindex;
 				this.$nextTick(function() {
-					this.groups = null;
-					this.group = 0;
+                    if (this.toApprove[status][userindex].hasOwnProperty('fixedgroups')) {
+                        this.groups = this.toApprove[status][userindex].fixedgroups;
+                        this.group = this.toApprove[status][userindex].fixedgroups[0]['id'];
+                        this.fixedgroups = true;
+                    } else {
+                        this.groups = null;
+                        this.group = 0;
+                        this.fixedgroups = false;
+                        this.grpsearch = this.toApprove[status][userindex].school;
+                        this.newgroup = this.toApprove[status][userindex].school;
+                    }
 				});
 			}
 		},
