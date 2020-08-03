@@ -382,7 +382,11 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 		$stm->execute(array($groupid));
 		$hasGroupLTI = ($stm->fetchColumn() !== false);
-
+        // look for LTI 1.3 connection
+        $stm = $DBH->prepare("SELECT deploymentid FROM imas_lti_groupassoc WHERE groupid=?");
+        $stm->execute(array($groupid));
+        $hasLTI13 = ($stm->fetchColumn() !== false);
+        $hasGroupLTI = $hasGroupLTI || $hasLTI13;
 		if ($_GET['action']=='modify' && ($myrights < 40 || ($line['ownerid']!=$userid && $myrights<75))) {
 			//show limited info version
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=? AND userid=?");
@@ -415,12 +419,20 @@ switch($_GET['action']) {
 				echo '<p>For integration setup instructions, visit the Course Items: Export page inside your course</p>';
 
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
-					echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+                    if ($hasLTI13) {
+                        echo '<p>Your school already has a school-wide LTI 1.3 connection established, so no course level configuration is required.</p>';
+                    } else {
+                        echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+                    }
 				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
 					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
 				} else {
 					if ($hasGroupLTI) {
-						echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+                        if ($hasLTI13) {
+                            echo '<p>Your school may already have a school-wide LTI 1.3 connection established. ';
+                        } else {
+                            echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+                        }
 						echo 'If so, you will not need to set up a course-level configuration. ';
 						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">Show course level key/secret</a></p>';
 						echo '<div id="courselevelkey" style="display:none">';
@@ -493,7 +505,8 @@ switch($_GET['action']) {
 			$deftime = $line['deftime'];
 			$latepasshrs = $line['latepasshrs'];
 			$jsondata = json_decode($line['jsondata'], true);
-			$dates_by_lti = $line['dates_by_lti'];
+            $dates_by_lti = $line['dates_by_lti'];
+            $ltisendzeros = $line['ltisendzeros'];
 			$courselevel = $line['level'];
 			if ($jsondata===null || !isset($jsondata['browser'])) {
 				$browser = array();
@@ -529,7 +542,8 @@ switch($_GET['action']) {
 			$courselevel = '';
 			$browser = array();
 			$blockLTICopyOfCopies = false;
-			$dates_by_lti = 0;
+            $dates_by_lti = 0;
+            $ltisendzeros = 0;
 			$startdate = 0;
 			$enddate = 2000000000;
 			$for = 0;
@@ -863,12 +877,20 @@ switch($_GET['action']) {
 
 			if (isset($_GET['id'])) {
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
-					echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+                    if ($hasLTI13) {
+                        echo '<p>Your school already has a school-wide LTI 1.3 connection established, so no course level configuration is required.</p>';
+                    } else {
+                        echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+                    }
 				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
 					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
 				} else {
 					if ($hasGroupLTI) {
-						echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+                        if ($hasLTI13) {
+                            echo '<p>Your school may already have a school-wide LTI 1.3 connection established. ';
+                        } else {
+                            echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+                        }
 						echo 'If so, you will not need to set up a course-level configuration. ';
 						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">Show course level key/secret</a></p>';
 						echo '<div id="courselevelkey" style="display:none">';
@@ -893,15 +915,25 @@ switch($_GET['action']) {
 				}
 			}
 
-			echo '<span class="form">',_('Allow the LMS to set assessment due dates'),'?<br/><span class="small">(',_('Only supported by Canvas'),')</span></span>';
-			echo '<span class="formright"><input type="checkbox" name="setdatesbylti" value="1" ';
+			echo '<span class="form">',_('Due Dates'),'</span>';
+			echo '<span class="formright"><label><input type="checkbox" name="setdatesbylti" value="1" ';
 			if ($dates_by_lti>0) { echo 'checked="checked"';}
-			echo '/> </span><br class="form" />';
+            echo '/> '._('Allow the LMS to set assessment due dates');
+            echo ' <span class="small">(',_('Only supported by Canvas'),')</span></span><br class="form" />';
+            
+            if ($hasLTI13) {
+                echo '<span class="form">',_('Send zeros'),'?<br/></span>';
+                echo '<span class="formright"><label><input type="checkbox" name="ltisendzeros" value="1" ';
+                if ($ltisendzeros>0) { echo 'checked="checked"';}
+                echo '/> '._('Send zeros to LMS after due date for unattempted assignments');
+                echo ' <span class="small">(',_('LTI 1.3 only'),')</span></label>';
+                echo '</span><br class="form" />';
+            }
 			if ($myrights>=75) {
-				echo '<span class="form">',_('LMS course copies always copy from this original course'),'</span>';
-				echo '<span class="formright"><input type="checkbox" name="blocklticopies" value="1" ';
+				echo '<span class="form">',_('Copies of Copies'),'</span>';
+				echo '<span class="formright"><label><input type="checkbox" name="blocklticopies" value="1" ';
 				if ($blockLTICopyOfCopies) { echo 'checked="checked"';}
-				echo '/> </span><br class="form" />';
+				echo '/> '._('LMS course copies always copy from this original course').'</label></span><br class="form" />';
 			}
 
 			echo '</div>'; //end LTI grouping

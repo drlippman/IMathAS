@@ -55,7 +55,7 @@ $now = time();
 $query = "SELECT ia.id,ilu.ltiuserid,ilu.org,ili.lineitem,iar.status,iar.score,
     istu.userid
     FROM imas_assessments AS ia
-    JOIN imas_courses AS ic ON ia.courseid=ic.id AND ic.UIver=2
+    JOIN imas_courses AS ic ON ia.courseid=ic.id AND ic.UIver=2 AND ic.ltisendzeros=1
     JOIN imas_lti_courses AS ilc ON ilc.courseid=ic.id
     JOIN imas_lti_lineitems AS ili ON ili.itemtype=0 AND ili.typeid=ia.id AND ili.lticourseid=ilc.id
     JOIN imas_students AS istu ON ic.id=istu.courseid
@@ -90,7 +90,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 $query = "SELECT ia.id,ilu.ltiuserid,ilu.org,ili.lineitem,iar.status,iar.score,
     istu.userid
     FROM imas_assessments AS ia
-    JOIN imas_courses AS ic ON ia.courseid=ic.id AND ic.UIver=2
+    JOIN imas_courses AS ic ON ia.courseid=ic.id AND ic.UIver=2 AND ic.ltisendzeros=1
     JOIN imas_lti_courses AS ilc ON ilc.courseid=ic.id
     JOIN imas_lti_lineitems AS ili ON ili.itemtype=0 AND ili.typeid=ia.id AND ili.lticourseid=ilc.id
     JOIN imas_students AS istu ON ia.courseid=istu.courseid

@@ -44,7 +44,12 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 	$stm->execute(array($groupid));
-	$hasGroupLTI = ($stm->fetchColumn() !== false);
+    $hasGroupLTI = ($stm->fetchColumn() !== false);
+    // look for LTI 1.3 connection
+    $stm = $DBH->prepare("SELECT deploymentid FROM imas_lti_groupassoc WHERE groupid=?");
+    $stm->execute(array($groupid));
+    $hasLTI13 = ($stm->fetchColumn() !== false);
+    $hasGroupLTI = $hasGroupLTI || $hasLTI13;
 	if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel']) && $myrights<100) {
 		$groupLTInote = '<p>Your school already has a school-wide LTI key and secret established.  You do not need to set up a course-level configuration.</p>';
 	} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
