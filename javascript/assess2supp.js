@@ -183,6 +183,10 @@ function disableInputs(qn, disabled) {
    window.$(qwrap).find('div.ansyel,table.ansyel').append(svgychk);
    window.$(qwrap).find('div.ansred,table.ansred').append(svgx);
 
+   if (jsparams.disabled) {
+     disableInputs(qn, jsparams.disabled);
+   }
+   
    window.imathasAssess.init(jsparams, true);
 
    window.$(qwrap).find('select.ansgrn').after(svgchk);
@@ -192,9 +196,7 @@ function disableInputs(qn, disabled) {
    if (jsparams.helps && jsparams.helps.length > 0) {
      addHelps(qwrap, jsparams.helps);
    }
-   if (jsparams.disabled) {
-     disableInputs(qn, jsparams.disabled);
-   }
+   
    allJsParams[qn] = jsparams;
  }
 

@@ -151,8 +151,8 @@ if (isset($QS['maxtries'])) {
 }
 if (isset($QS['showansafter'])) {
     $state['showansafter'] = $QS['showansafter'];
-} else if ($maxtries > 0) {
-    $state['showansafter'] = $maxtries;
+} else if ($state['maxtries'] > 0) {
+    $state['showansafter'] = $state['maxtries'];
 } else {
     $state['showansafter'] = $issigned ? 0 : 1;
 }
@@ -161,7 +161,7 @@ if (isset($QS['showscoredonsubmit'])) {
 } else {
     $state['showscoredonsubmit'] = !$issigned;
 }
-$state['hidescoremarkers'] = !$showscoredonsubmit;
+$state['hidescoremarkers'] = !$state['showscoredonsubmit'];
 if (isset($QS['hidescoremarkers'])) {
     $state['hidescoremarkers'] = $QS['hidescoremarkers'];
 }
@@ -188,6 +188,11 @@ if (isset($QS['submitall'])) {
     $state['submitall'] = $QS['submitall'];
 } else {
     $state['submitall'] = $issigned;
+}
+if (isset($QS['autoseq'])) {
+    $state['autoseq'] = $QS['autoseq'];
+} else {
+    $state['autoseq'] = 1;
 }
 
 
@@ -230,7 +235,7 @@ if (isset($_POST['toscoreqn'])) {
     }
     $out = array('jwt'=>JWT::encode($jwtcontents, $authsecret));
 
-    if ($state['showscoredonsubmit'] || !$res['allans']) {
+    if ($state['showscoredonsubmit'] || (!$res['allans'] && $state['autoseq'])) {
         $disp = $a2->displayQuestion($qn, $overrides);
         $out['disp'] = $disp;
     }
@@ -336,6 +341,9 @@ $placeinhead .= '<script type="text/javascript">
   .questionpane {
     margin-top: 0 !important;
     }
+  .questionpane>.question { 
+  	background-image: none !important;
+  }
   #mqe-fb-spacer {
       height: 0 !important;
   }
