@@ -185,15 +185,17 @@ function getReqData() {
                 $userdata['school'] = $userdata['otherschool'].' ('.$countries[$userdata['schoolloc']].')';
             }
         }
+        $urlformatted = false;
         if (isset($userdata['vertype'])) {
             // these values are further handled and sanitized below.
             if ($userdata['vertype'] == 'url') {
                 $userdata['url'] = $userdata['verdata']; 
             } else if ($userdata['vertype'] == 'email') {
                 $userdata['url'] = _('Expect an email from: ').$userdata['verdata'];
-            } else if ($userdata['vertype'] == 'file') {
+            } else if ($userdata['vertype'] == 'upload') {
                 $url = getprivatefileurl(substr($userdata['verdata'],5));
-                $userdata['url'] = "<a href=\"$url\" target=\"blank_\">"._('Verification Image').'</a>';
+                $userdata['url'] = "<a href=\"$url\" target=\"_blank\">"._('Verification Image').'</a>';
+                $urlformatted = true;
             }
         }
 		if (isset($userdata['url'])) {
@@ -201,7 +203,9 @@ function getReqData() {
 				$userdata['url'] = Sanitize::url($userdata['url']);
 				$urldisplay = Sanitize::encodeStringForDisplay($userdata['url']);
 				$urlstring = "Verification URL: <a href='{$userdata['url']}' target='_blank'>{$urldisplay}</a>";
-			} else {
+			} else if ($urlformatted) {
+				$urlstring = 'Verification: '.$userdata['url'];
+            } else {
 				$urlstring = 'Verification: '.Sanitize::encodeStringForDisplay($userdata['url']);
 			}
 			$userdata['url'] = $urlstring;
@@ -228,6 +232,7 @@ if (empty($reqFields)) {
     if (!empty($CFG['use_ipeds'])) {
         $reqFields = array(
             'school' => 'School',
+            'url' => 'Verification',
             'search' => 'Search'
         );
     } else {
