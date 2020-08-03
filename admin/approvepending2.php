@@ -148,7 +148,7 @@ $countries = ['AF'=>'Afghanistan', 'AL'=>'Albania', 'DZ'=>'Algeria', 'AD'=>'Ando
 function getReqData() {
 	global $DBH, $countries;
 
-	$query = 'SELECT ir.status,ir.reqdata,ir.reqdate,iu.id,iu.email,iu.LastName,iu.FirstName ';
+	$query = 'SELECT ir.status,ir.reqdata,ir.reqdate,iu.id,iu.email,iu.LastName,iu.FirstName,iu.SID ';
 	$query .= 'FROM imas_instr_acct_reqs AS ir JOIN imas_users AS iu ';
 	$query .= 'ON ir.userid=iu.id WHERE ir.status<10 ORDER BY ir.status,ir.reqdate';
 	$stm = $DBH->query($query);
@@ -208,7 +208,8 @@ function getReqData() {
 		}
 		$userdata['reqdate'] = tzdate("D n/j/y, g:i a", $row['reqdate']);
 		$userdata['name'] = $row['LastName'].', '.$row['FirstName'];
-		$userdata['email'] = $row['email'];
+        $userdata['email'] = $row['email'];
+        $userdata['username'] = $row['SID'];
 		$userdata['id'] = $row['id'];
 		if (isset($userdata['school'])) {
 			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search Google for Name/School</a>';
@@ -295,6 +296,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
         </span>
       	<ul class="userdata" v-if="activeUser==user.id">
       	  <li>Request Made: {{user.reqdate}}</li>
+          <li>Username: {{user.username}}</li>
       	  <li>Email: {{user.email}}</li>
       	  <li v-for="(title,fieldindex) in fieldTitles">
       	    <span v-if="fieldindex=='url' || fieldindex=='search'" v-html="user[fieldindex]"></span>

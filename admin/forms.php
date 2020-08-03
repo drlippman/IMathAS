@@ -325,6 +325,38 @@ switch($_GET['action']) {
 		echo '</span><br class="form"/>';
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
+            if ($oldrights == 12) {
+                // account request pending
+                $stm = $DBH->prepare('SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?');
+                $stm->execute(array($_GET['id']));
+                $reqdata = json_decode($stm->fetchColumn(0), true);
+                $reqschool = '';
+                if (isset($reqdata['school'])) {
+                    $reqschool = $reqdata['school'];
+                } else if (isset($reqdata['ipeds']) && $reqdata['ipeds'] != '0') {
+                    list($ipedstype,$ipedsid) = explode('-', $reqdata['ipeds']);
+                    $query = 'SELECT ip.school,ip.agency,ip.country,ig.id,ig.name 
+                        FROM imas_ipeds AS ip 
+                        LEFT JOIN imas_ipeds_group AS ipg ON ip.type=ipg.type AND ip.ipedsid=ipg.ipedsid 
+                        LEFT JOIN imas_groups AS ig ON ipg.groupid=ig.id 
+                        WHERE ip.type=? and ip.ipedsid=? LIMIT 1';
+                    $stm2 = $DBH->prepare($query);
+                    $stm2->execute(array($ipedstype, $ipedsval));
+                    $ipedsgroups = array();
+                    while ($r2 = $stm2->fetch(PDO::FETCH_ASSOC)) {
+                        $reqschool = ($ipedstype == 'A') ? $r2['agency'] : $r2['school'];
+                        if ($r2['id'] !== null) {
+                            $oldgroup = $r2['id'];
+                        }
+                    }
+                } else if (isset($reqdata['ipeds']) && $reqdata['ipeds'] == '0') {
+                    $reqschool = $reqdata['otherschool'];
+                }
+                if ($reqschool != '') {
+                    echo '<span class=form>'._('Account request school:').'</span>';
+                    echo '<span class=formright>'.Sanitize::encodeStringForDisplay($reqschool).'</span><br class=form>';
+                }
+            }
 			echo "<span class=form>Group: </span>";
 			echo "<span class=formright>";
 			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
