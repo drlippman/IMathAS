@@ -407,6 +407,8 @@ $(function() {
             $('#locwrap').slideDown();
         }
         $('.locdesc').hide();
+        $('#country').val('');
+        $('#intlwrap,#searchresultwrapper').hide();
         $('.'+val+'src').slideDown();
     });
     $('#schoolloc').on('change', function () {
@@ -433,6 +435,7 @@ $(function() {
         if (country != '') {
             ipedssearch({
                 type: 'country',
+                ipedtypefield: 'schooltype',
                 searchfield: 'country',
                 resultfield: 'intlipeds',
                 wrapper: 'intlwrap',

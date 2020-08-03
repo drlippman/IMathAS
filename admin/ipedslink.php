@@ -36,13 +36,17 @@ if (isset($_POST['postback'])) {
     if ($myrights == 100 && !empty($_POST['otherschool']) && 
         ($_POST['schoolloc']=='intl' && $_POST['intlipeds']=='0')
     ) {
-        // create new ipeds record 
-        $type = 'C';
+        // create new ipeds record for an intl school 
+        if ($_POST['schooltype'] == 'coll') {
+            $type = 'W';
+        } else {
+            $type = 'U';
+        }
         $newipedsid = md5($_POST['otherschool'].$_POST['country']);
         $query = 'INSERT INTO imas_ipeds (type,ipedsid,school,country) VALUES (?,?,?,?)';
         $stm = $DBH->prepare($query);
         $stm->execute(array(
-            'C', 
+            $type, 
             $newipedsid,
             Sanitize::stripHtmlTags($_POST['otherschool']), 
             Sanitize::simpleString($_POST['country'])
