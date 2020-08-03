@@ -212,7 +212,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$absymax = -1E10;
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
-
+        $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
 		//correct for parametric
 		$isparametric = false;
@@ -241,6 +241,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= ', color '.$function[4];
 
 			if (isset($function[5]) && $function[5]!='') {
+                $function[5] = str_replace('&x44;', ',', $function[5]);
 				if (!isset($function[6])) {
 					$function[6] = 'above';
 				}
@@ -253,7 +254,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$commands .= $path;
 			continue; //skip the stuff below
 		} else if ($function[0]=='text') {  //text,x,y,textstring,color,loc,angle
-			if (!isset($function[4]) || $function[4]=='') {
+            $function[3] = str_replace('&x44;', ',', $function[3]);
+            if (!isset($function[4]) || $function[4]=='') {
 				$function[4] = 'black';
 			}
 			if (!isset($function[5])) {
