@@ -198,7 +198,7 @@ dd {
 		<li><a href="#calcinterval">Calculated Interval</a></li>
 		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
-		<li><a href="#conditional">Conditional</a></li>
+        <li><a href="#conditional">Conditional</a></li>
 		</ul></li>
 	</ul></li>
 
@@ -3919,6 +3919,32 @@ This type of question can contain multiple parts, where each part is one of the 
 	allow Show Answer to be placed inline with text rather than on its own line.</dd>
 </dl>
 
+<p><strong>Scaffolding</strong></p>
+<p>Scaffolded questions, also know as Sequential Multipart questions, allow you 
+    to break a question up into chunks, where the second chunk only shows after the 
+    first chunk is correctly answered or the student runs out of tries.  This 
+    allows you to use the answer to the first chunk in the second without 
+    "giving away" the answer, and allows a student who gets stuck on the first 
+    chunk to move on to the rest of the question.</p>
+<p><em>Note: scaffolding is only available in the new assessment interface. 
+    If you are using the old interface, the question will behave like a 
+    regular multipart question.</em></p>
+<p>Scaffolded questions are an extension of Multipart questions.  To turn a multipart 
+    question into a scaffolded question, just add an isolated line with three or more slashes
+    in the Question Text where you want the chunks broken apart.</p>
+<p>An example: (in the Question Text)</p>
+<pre>
+To simplify $a(x+$b) + $c, first we need to distribute:
+
+$a(x+$b) = $answerbox[0]
+
+///
+
+Next, combine like terms:
+
+$a x + $ab + $c = $answerbox[1]
+</pre>
+
 </div> <!-- h3 -->
 <div class=h3>
 <h3 id="conditional">Conditional</h3>
@@ -3971,7 +3997,18 @@ own question type.
 	<dd>By default the $showanswer for conditional types is "Answers may vary".  Set $showanswer to override this.</dd>
 </dl>
 
+<p><strong>Scaffolding</strong></p>
+<p>While not as simple as scaffolding multipart questions, 
+    you can add scaffolding to a Conditional question.  As with multipart,
+    put an isolated line with three slashes in the question text to indicate 
+    where the breaks occur. Then you will need to set <code>$seqPartDone[pn]</code>
+    to <code>true</code> for each part index once that part should be considered 
+    completed.  The scaffolding will move onto the next chunk when 
+    all parts in the previous chunk have <code>$seqPartDone</code>
+    set to <code>true</code>.
+</p>
 </div> <!-- h3 -->
+
 </div> <!-- h2 -->
 </div> <!-- h1 -->
 <div class=h1>
