@@ -90,24 +90,67 @@ class AssessStandalone {
     }
   }
 
+  function getOpVal($options, $key, $default=null) {
+      if (isset($options[$key])) {
+          return $options[$key];
+      } else if (isset($this->state[$key])) {
+          return $this->state[$key];
+      } else {
+          return $default;
+      }
+  }
+
   /*
-   * displayQuestion($qn, $includeCorrect)
+   * displayQuestion($qn, $options)
    * displays the question $qn, using details from state
-   * $includeCorrect=true to include correct answer
+   * Values in $options can override the state values
    */
-  function displayQuestion($qn, $options) {
+  function displayQuestion($qn, $options=[]) {
     $qsid = $this->state['qsid'][$qn];
     $attemptn = empty($this->state['partattemptn'][$qn]) ? 0 : max($this->state['partattemptn'][$qn]);
+    $maxtries = $this->getOpVal($options, 'maxtries', 0);
+    $showansafter = $this->getOpVal($options, 'showansafter', 0); 
+
+    $hidescoremarkers = !empty($this->getOpVal($options, 'hidescoremarkers', false));
+
+    $showansparts = array();
+    $showans = false;
+
     if (!empty($options['showallparts'])) {
       $seqPartDone = true;
     } else {
       $seqPartDone = array();
       if (!empty($this->state['rawscores'][$qn])) {
         foreach ($this->state['rawscores'][$qn] as $pn=>$sc) {
-          $seqPartDone[$pn] = ($sc>.98);
+            if ($hidescoremarkers) {
+                $seqPartDone[$pn] = ($this->state['partattemptn'][$qn][$pn] > 0);
+            } else if ($maxtries > 0 &&
+              $this->state['partattemptn'][$qn][$pn] >= $maxtries
+            ) {
+                $seqPartDone[$pn] = true;
+            } else {
+                $seqPartDone[$pn] = ($sc>.98);
+            }
+            if ($showansafter > 0 && 
+                $this->state['partattemptn'][$qn][$pn] >= $showansafter
+            ) {
+                $showansparts[$pn] = true;
+            }
         }
       }
     }
+
+    $showans = !empty($this->getOpVal($options, 'showans', false));
+    $showhints = $this->getOpVal($options, 'showhints', 3);
+    $rawscores = $this->state['rawscores'][$qn];
+    
+    if ($hidescoremarkers) {
+        $rawscores = array();
+    }
+
+    // showans is show-for-all override
+    // showansparts is per-part show ans
+
     $questionParams = new QuestionParams();
     $questionParams
         ->setDbQuestionSetId($qsid)
@@ -116,9 +159,9 @@ class AssessStandalone {
         ->setQuestionId(0)
         ->setAssessmentId(0)
         ->setQuestionSeed($this->state['seeds'][$qn])
-        ->setShowHints(3)
-        ->setShowAnswer(true)
-        ->setShowAnswerParts(array())
+        ->setShowHints($showhints)
+        ->setShowAnswer($showans)
+        ->setShowAnswerParts($showansparts)
         ->setShowAnswerButton(true)
         ->setStudentAttemptNumber($attemptn)
         ->setStudentPartAttemptCount($this->state['partattemptn'][$qn])
@@ -126,7 +169,7 @@ class AssessStandalone {
         ->setAllQuestionAnswersAsNum($this->state['stuanswersval'])
         ->setScoreNonZero($this->state['scorenonzero'])
         ->setScoreIsCorrect($this->state['scoreiscorrect'])
-        ->setLastRawScores($this->state['rawscores'][$qn])
+        ->setLastRawScores($rawscores)
         ->setSeqPartDone($seqPartDone);;
 
     $questionGenerator = new QuestionGenerator($this->DBH,
@@ -135,6 +178,7 @@ class AssessStandalone {
 
     list($qout,$scripts) = $this->parseScripts($question->getQuestionContent());
     $jsparams = $question->getJsParams();
+
     if (count($scripts) > 0) {
       $jsparams['scripts'] = $scripts;
     }
@@ -142,9 +186,31 @@ class AssessStandalone {
 
     $answeights = $question->getAnswerPartWeights();
 
-    if (!empty($options['showans'])) {
+    /*  Not needed
+    if ($showans) {
       $jsparams['ans'] = $question->getCorrectAnswersForParts();
       $jsparams['stuans'] = $stuanswers[$qn+1];
+    }
+    */
+
+    if ($maxtries > 0) {
+      $disabled = array();
+      // TODO: is this correct?  Need it to work for conditional, but
+      // seems like it'd also hit singlescore
+      if (count($answeights)==1 && count($this->state['partattemptn'][$qn])>1
+        && $this->state['partattemptn'][$qn][0] >= $maxtries
+      ) {
+        $disabled[] = 'all';
+      } else {
+        foreach($this->state['partattemptn'][$qn] as $pn=>$att) {
+          if ($att >= $maxtries) {
+            $disabled[] = $pn;
+          }
+        }
+      }
+      $jsparams['maxtries'] = $maxtries;
+      $jsparams['partatt'] = $this->state['partattemptn'][$qn];
+      $jsparams['disabled'] = $disabled;
     }
 
     return array('html' => $qout, 'jsparams' => $jsparams, 'errors'=>$question->getErrors());
@@ -212,7 +278,7 @@ class AssessStandalone {
         $this->state['rawscores'][$qn][$k] = $rawparts[$k];
       }
     }
-
+    $allPartsAns = (count($this->state['partattemptn'][$qn]) == count($scoreResult['answeights']));
     $score = array_sum($scores);
     if (count($partla) > 1) {
       $this->state['scorenonzero'][$qn+1] = array();
@@ -230,7 +296,13 @@ class AssessStandalone {
       $this->state['scorenonzero'][$qn+1] = ($score > 0);
       $this->state['scoreiscorrect'][$qn+1] = ($score > .98);
     }
-    return array('scores'=>$scores, 'raw'=>$rawparts, 'errors'=>$scoreResult['errors']);
+
+    return array(
+        'scores'=>$scores,
+        'raw'=>$rawparts,
+        'errors'=>$scoreResult['errors'],
+        'allans'=>$allPartsAns
+    );
   }
 
   private function parseScripts($html) {

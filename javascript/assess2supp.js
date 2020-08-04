@@ -3,6 +3,166 @@ Assess2 standalone support
  */
 var allJsParams = {};
 
+function showandinit(qn, data) {
+    $('#questionwrap'+qn).html(data.html);
+    showerrors(data.errors);
+    initq(qn, data.jsparams);
+}
+
+function inIframe() {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+}
+
+function showerrors(errors) {
+    var err = $('#errorslist');
+    err.empty();
+    if (errors.length > 0) {
+        for (var i=0; i<errors.length; i++) {
+            err.append($("<li>", {text: errors[i]}));
+        }
+        err.show();
+    } else {
+        err.hide();
+    }
+}
+
+function submitq(qn) {
+    $("#results"+qn).html(_('Submitting...'));
+    var data = dopresubmit(qn, true);
+    data.append('state', document.getElementById('state').value);
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        dataType: 'json',
+        data: data,
+        processData: false,
+        contentType: false
+      }).done(function(msg) {
+        var data = parseJwt(msg.jwt);
+        $("#state").val(data.state);
+        showerrors(data.errors);
+        if (msg.disp) {
+            $("#results"+qn).html(_("Score: ")+data.score);
+            showandinit(qn, msg.disp);
+        } else {
+            $("#results"+qn).html(_('Question Submitted'));
+            $("#questionwrap"+qn).empty();
+        }
+        sendupscores(msg.jwt);
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
+
+function sendupscores(msg) {
+    if(inIframe()) {
+        var returnobj = {
+            subject: "lti.ext.imathas.result",
+            jwt: msg,
+            frame_id: frame_id
+        };
+        window.parent.postMessage(JSON.stringify(returnobj), '*');
+    }
+}
+
+function regenq(qn) {
+    $("#results"+qn).empty();
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            state: document.getElementById('state').value,
+            regen: qn,
+            ajax: 1
+        }
+      }).done(function(data) {
+        $("#state").val(data.state);
+        showerrors(data.disp.errors);
+        showandinit(qn, data.disp);
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
+
+function loadquestionById(qn, qsid) {
+    $("#results"+qn).empty();
+    $("#questionwrap"+qn).empty();
+    console.log(window.location);
+    var url = window.location.href.replace(/id=\d+/,'id='+qsid);
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            ajax: true
+        }
+      }).done(function(msg) {
+        $("#state").val(msg.state);
+        showandinit(qn, msg.disp);
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
+function loadquestionByJwt(qn, jwt) {
+    $("#results"+qn).empty();
+    $("#questionwrap"+qn).empty();
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            jwt: jwt,
+            ajax: true
+        }
+      }).done(function(msg) {
+        $("#state").val(msg.state);
+        showandinit(qn, msg.disp);
+      }).always(function(msg) {
+        $("#toscoreqn").val('');
+      });
+}
+
+$(function() {
+    $(window).on('message', function(e) {
+        var msg = e.originalEvent.data;
+        if (msg == 'submit') {
+            submitq(thisqn);
+        } else if (msg.match(/imathas\.show/)) {
+            var data = JSON.parse(msg);
+            if (data.jwt) {
+                loadquestionByJwt(thisqn, data.jwt);
+            } else if (data.id) {
+                loadquestionById(thisqn, data.id);
+            }
+        }
+    });
+});
+
+function disableInputs(qn, disabled) {
+  var regex, pn;
+  for (var i=0;i<disabled.length;i++) {
+    pn = disabled[i];
+    // out of tries - disable inputs
+    if (pn === 'all') {
+      regex = new RegExp('^(qn|tc|qs)(' + (qn) + '\\b|' + (qn + 1) + '\\d{3}\\b)');
+    } else if (pn === 0) {
+      regex = new RegExp('^(qn|tc|qs)(' + (qn) + '\\b|' + ((qn + 1) * 1000 + pn * 1) + '\\b)');
+    } else {
+      regex = new RegExp('^(qn|tc|qs)' + ((qn + 1) * 1000 + pn * 1) + '\\b');
+    }
+    $('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
+      if (el.name.match(regex)) {
+        el.disabled = true;
+      }
+    });
+  }
+}
+
  function initq(qn, jsparams) {
    var qwrap = document.getElementById('questionwrap'+qn);
 
@@ -23,6 +183,10 @@ var allJsParams = {};
    window.$(qwrap).find('div.ansyel,table.ansyel').append(svgychk);
    window.$(qwrap).find('div.ansred,table.ansred').append(svgx);
 
+   if (jsparams.disabled) {
+     disableInputs(qn, jsparams.disabled);
+   }
+   
    window.imathasAssess.init(jsparams, true);
 
    window.$(qwrap).find('select.ansgrn').after(svgchk);
@@ -32,6 +196,7 @@ var allJsParams = {};
    if (jsparams.helps && jsparams.helps.length > 0) {
      addHelps(qwrap, jsparams.helps);
    }
+   
    allJsParams[qn] = jsparams;
  }
 
@@ -139,7 +304,7 @@ var allJsParams = {};
      qns = [qns];
    }
    if (forbackground) {
-     const data = new FormData();
+     var data = new FormData();
    }
    for (let k in window.callbackstack) {
      k = parseInt(k);
@@ -196,3 +361,13 @@ var allJsParams = {};
    }
    return true;
   }
+
+  function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+ };
