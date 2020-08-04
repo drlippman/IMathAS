@@ -137,7 +137,7 @@ var myMQeditor = (function($) {
               {l:'\\left(\\right]', c:'i', w:'(]'},
               {l:'\\left[\\right)', c:'i', w:'[)'},
               {l:'\\infty'},
-              {l:'-\\infty', c:'w'},
+              {l:'-\\infty', c:'w', w:'-\\infty'},
               {l:'\\cup'},
               {s:1}
             ]
