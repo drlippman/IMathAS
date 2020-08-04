@@ -69,59 +69,6 @@ foreach (array('graphdisp', 'mathdisp', 'useed') as $key) {
     $_SESSION[$key] = $_SESSION['userprefs'][$key];
 }
 
-// get parameter values based on query string / state values
-
-if (isset($QS['jssubmit'])) {
-    $jssubmit = $QS['jssubmit'];
-} else {
-    $jssubmit = $issigned;
-}
-if (isset($QS['showans'])) {
-    $showans = $QS['showans'];
-} else {
-    $showans = 0;
-}
-if (isset($QS['showhints'])) {
-    $showhints = $QS['showhints'];
-} else {
-    $showhints = 3;
-}
-
-if (isset($QS['maxtries'])) {
-    $maxtries = intval($QS['maxtries']);
-} else {
-    $maxtries = 0;
-}
-if (isset($QS['showansafter'])) {
-    $showansafter = $QS['showansafter'];
-} else if ($maxtries > 0) {
-    $showansafter = $maxtries;
-} else {
-    $showansafter = $issigned ? 0 : 1;
-}
-if (isset($QS['showscoredonsubmit'])) {
-    $showscoredonsubmit = $QS['showscoredonsubmit'];
-} else {
-    $showscoredonsubmit = !$issigned;
-}
-$hidescoremarkers = !$showscoredonsubmit;
-if (isset($QS['showscored'])) {
-  $hidescoremarkers = false;
-}
-if (isset($QS['hidescoremarkers'])) {
-    $hidescoremarkers = $QS['hidescoremarkers'];
-}
-if (isset($QS['allowregen'])) {
-    $allowregen = $QS['allowregen'];
-} else {
-    $allowregen = !$issigned;
-}
-if (isset($QS['submitall'])) {
-    $submitall = $QS['submitall'];
-} else {
-    $submitall = $issigned;
-}
-
 // defaults
 $eqnhelper = 4;
 $useeqnhelper = 4;
@@ -147,15 +94,61 @@ if (isset($_POST['state'])) {
         'scoreiscorrect' => array_fill(1, $numq, false),
         'partattemptn' => array_fill(0, $numq, array()),
         'rawscores' => array_fill(0, $numq, array()),
-        'jssubmit' => $jssubmit,
-        'showans' => $showans,
-        'showhints' => $showhints,
-        'showscoredonsubmit' => $showscoredonsubmit,
-        'hidescoremarkers' => $hidescoremarkers,
-        'allowregen' => $allowregen,
-        'maxtries' => $maxtries,
-        'showansafter' => $showansafter
     );
+}
+
+if (isset($QS['jssubmit'])) {
+    $state['jssubmit'] = $QS['jssubmit'];
+} else {
+    $state['jssubmit'] = 0;
+}
+
+if (isset($QS['showhints'])) {
+    $state['showhints'] = $QS['showhints'];
+} else {
+    $state['showhints'] = 3;
+}
+
+if (isset($QS['maxtries'])) {
+    $state['maxtries'] = intval($QS['maxtries']);
+} else {
+    $state['maxtries'] = 0;
+}
+if (isset($QS['showansafter'])) {
+    $state['showansafter'] = $QS['showansafter'];
+} else if ($state['maxtries'] > 0) {
+    $state['showansafter'] = $state['maxtries'];
+} else {
+    $state['showansafter'] = 1;
+}
+if (isset($QS['showscoredonsubmit'])) {
+    $state['showscoredonsubmit'] = $QS['showscoredonsubmit'];
+} else {
+    $state['showscoredonsubmit'] = 1;
+}
+$state['hidescoremarkers'] = !$state['showscoredonsubmit'];
+if (isset($QS['hidescoremarkers'])) {
+    $state['hidescoremarkers'] = $QS['hidescoremarkers'];
+}
+if (isset($QS['showans'])) {
+    $state['showans'] = $QS['showans'];
+} else {
+    $state['showans'] = 0;
+}
+if (isset($QS['allowregen'])) {
+    $state['allowregen'] = $QS['allowregen'];
+} else {
+    $state['allowregen'] = 1;
+}
+if (isset($QS['submitall'])) {
+    $state['submitall'] = $QS['submitall'];
+} else {
+    $state['submitall'] = 0;
+}
+if (isset($QS['autoseq'])) {
+    $state['autoseq'] = $QS['autoseq'];
+} else {
+    $state['autoseq'] = 1;
 }
 
 if (!empty($_POST['regen'])) {
@@ -204,7 +197,7 @@ if (isset($_POST['toscoreqn'])) {
     );
     $out = array('jwt'=>JWT::encode($jwtcontents, $QS['auth']));
 
-    if ($showscoredonsubmit || !$res['allans']) {
+    if ($state['showscoredonsubmit'] || !$res['allans']) {
         $disp = $a2->displayQuestion($qn);
         $out['disp'] = $disp;
     }
@@ -255,7 +248,7 @@ for ($qn=0; $qn < $numq; $qn++) {
     $a2->setQuestionData($qsid, $qsdata[$qn]);
     $disps[$qn] = $a2->displayQuestion($qn);
     // force submitall
-    if ($submitall) {
+    if ($state['submitall']) {
         $disps[$qn]['jsparams']['submitall'] = 1;
     }
 }
@@ -298,17 +291,27 @@ $placeinhead .= '<script type="text/javascript">
    if(inIframe()){
       var default_height = Math.max(
         document.body.scrollHeight, document.body.offsetHeight)+20;
-        console.log(default_height);
+      var wrap_height = default_height - document.getElementById("embedspacer").offsetHeight;
       window.parent.postMessage( JSON.stringify({
         subject: "lti.frameResize",
         height: default_height,
+        wrapheight: wrap_height,
         iframe_resize_id: "' . $frameid . '",
         element_id: "' . $frameid . '",
         frame_id: "' . $frameid . '"
       }), "*");
    }
   }
-
+  $(function() {
+    $(document).on("mqeditor:show", function() {
+      $("#embedspacer").show();
+      sendresizemsg();
+    });
+    $(document).on("mqeditor:hide", function() {
+      $("#embedspacer").hide();
+      sendresizemsg();
+    });
+  });
   if (mathRenderer == "Katex") {
      window.katexDoneCallback = sendresizemsg;
   } else if (typeof MathJax != "undefined") {
@@ -348,16 +351,16 @@ require "./header.php";
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 for ($qn=0; $qn < $numq; $qn++) {
     echo '<div class="questionwrap">';
-    if (!$jssubmit) {
+    if (!$state['jssubmit']) {
         echo '<div id="results'.$qn.'"></div>';
     }
     echo '<div class="questionpane">';
     echo '<div class="question" id="questionwrap'.$qn.'">';
     echo '</div></div>';
-    if (!$jssubmit) {
+    if (!$state['jssubmit']) {
         echo '<p>';
         echo '<button type=button onclick="submitq('.$qn.')" class="primary">'._("Submit").'</button>';
-        if ($allowregen) {
+        if ($state['allowregen']) {
             echo ' <button type=button onclick="regenq('.$qn.')" class="secondary">'._('Try a similar question').'</button>';
         }
         echo '</p>';
@@ -373,12 +376,11 @@ for ($qn=0; $qn < $numq; $qn++) {
 echo '<input type=hidden name=toscoreqn id=toscoreqn value=""/>';
 echo '<input type=hidden name=state id=state value="'.Sanitize::encodeStringForDisplay(JWT::encode($a2->getState(), $statesecret)).'" />';
 
-if ($jssubmit) {
-    echo '<div style="height:200px">&nbsp;</div>';
+if ($state['jssubmit']) {
+    echo '<div id="embedspacer" style="display:none;height:200px">&nbsp;</div>';
 } else {
-    echo '<div style="height:150px">&nbsp;</div>';
+    echo '<div id="embedspacer" style="display:none;height:150px">&nbsp;</div>';
 }
-
 
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
   <span id="ehddtext"></span>
