@@ -73,7 +73,7 @@ function copycourse($sourcecid, $name, $newUIver) {
     $gbcats[$frid] = $DBH->lastInsertId();
   }
   $copystickyposts = true;
-  $stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs,dates_by_lti,deflatepass,UIver,level FROM imas_courses WHERE id=:id");
+  $stm = $DBH->prepare("SELECT itemorder,ancestors,outcomes,latepasshrs,dates_by_lti,deflatepass,UIver,level,ltisendzeros FROM imas_courses WHERE id=:id");
   $stm->execute(array(':id'=>$sourcecid));
   $r = $stm->fetch(PDO::FETCH_NUM);
 
@@ -85,6 +85,15 @@ function copycourse($sourcecid, $name, $newUIver) {
   $deflatepass = $r[5];
   $sourceUIver = $r[6];
   $courselevel = $r[7];
+  $ltisendzeros = $r[8];
+  if ($ltisendzeros > 0) {
+      // verify have LTI1.3 connection
+      $stm = $DBH->prepare("SELECT deploymentid FROM imas_lti_groupassoc WHERE groupid=?");
+      $stm->execute(array($groupid));
+      if ($stm->fetchColumn() === false) {
+          $ltisendzeros = 0;
+      }
+  }
   if ($newUIver) {
     $destUIver = 2;
     $convertAssessVer = 2;
@@ -147,8 +156,12 @@ function copycourse($sourcecid, $name, $newUIver) {
   doaftercopy($sourcecid, $newitems);
 
   $itemorder = serialize($newitems);
-  $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,deflatepass=:deflatepass,dates_by_lti=:datesbylti,UIver=:UIver,level=:level WHERE id=:id");
-  $stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, ':latepasshrs'=>$latepasshrs, ':deflatepass'=>$deflatepass, ':datesbylti'=>$datesbylti, ':UIver'=>$destUIver, ':level'=>$courselevel, ':id'=>$destcid));
+  $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs,deflatepass=:deflatepass,dates_by_lti=:datesbylti,UIver=:UIver,level=:level,ltisendzeros=:ltisendzeros WHERE id=:id");
+  $stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, 
+    ':ancestors'=>$ancestors, ':outcomes'=>$newoutcomearr, 
+    ':latepasshrs'=>$latepasshrs, ':deflatepass'=>$deflatepass, 
+    ':datesbylti'=>$datesbylti, ':UIver'=>$destUIver, 
+    ':level'=>$courselevel, ':ltisendzeros'=>$ltisendzeros, ':id'=>$destcid));
 
   $offlinerubrics = array();
   copyrubrics();
