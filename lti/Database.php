@@ -65,7 +65,13 @@ if (isset($GLOBALS['CFG']['hooks']['lti'])) {
  *  scopes          md5 hash of the scopes the token was issued for
  *  token           The authorization token
  *  expires         A timestamp for when the token expires
- *
+ * 
+ * imas_lti_lineitems.  A record of LMS lineitems 
+ *  itemtype        The numeric identifier for the placementtype. 0 for assess
+ *  typeid          The table ID for the placementtype.  imas_assessments.id for assessments
+ *  lticourseid     imas_lti_courses.id the lineitem is associated with 
+ *  lineitem        The lineitem URL
+ * 
  * imas_ltiqueue.  A store of queued lti grade updates
  *  hash            A string of the form imas_assessments.id . '-' . imas_users.id
  *  sourcedid       A string, formed by implode(':|:', $values), where the values are:

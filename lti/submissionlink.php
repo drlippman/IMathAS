@@ -8,9 +8,7 @@
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
   require_once($CFG['hooks']['lti']);
   /**
-   * Hook should implement:
-   *   ext_is_reviewable($link)
-   *   ext_redirect_submissionreview($link)
+   * see ltihooks.php.dist for details
    */
 }
 
@@ -84,7 +82,7 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
     }
   } else if ($link->get_placementtype() == 'course') {
    
-  } else if (function_exists('ext_redirect_submissionreview') && ext_is_reviewable($link)) {
+  } else if (function_exists('ext_redirect_submissionreview') && ext_is_reviewable($link->get_placementtype())) {
     $_SESSION['ltiitemtype'] = $link->get_typenum();
     $_SESSION['ltiitemid'] = $link->get_typeid();
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();

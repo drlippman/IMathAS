@@ -8,27 +8,7 @@
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
   require_once($CFG['hooks']['lti']);
   /**
-   * Hook should implement:
-   *   ext_can_handle_launch($targetlink),
-   *    $targetlink is the raw target_link_uri
-   *   ext_handle_launch($targetlink, $localcourse, $localuserid, $db, $resource_link_id, $contextid, $platform_id)
-   *    $localcourse the linked course info
-   *    function should call $db->make_link_assoc($typeid, $type, $resource_link_id, $contextid, $platform_id)
-   *      to set the association, and return LTI_Placement
-   *    and call $db->set_or_create_lineitem($launch, $link, $info, $localcourse)
-   *      if the item is going to passback a grade.
-   *      $info is result of ext_get_item_info($link)
-   *   ext_get_item_info(LTI_Placement)
-   *      returns array with indices 'name' and 'ptsposs',
-   *      and optionally date_by_lti, startdate, enddate
-   *   ext_can_handle_redirect($placementtype)
-   *   ext_get_types_as_num() 
-   *      return an array of placementtype=>number identifier, like 'assess'=>0
-   *      Use numbers >50 for custom added types to avoid conflicts
-   *   ext_redirect_launch($link)
-   *    redirect to the content
-   *   ext_lti_home($link, $launch, $localcourse, $db)
-   *   ext_is_reviewable($link)
+   * see ltihooks.php.dist for details
    */
 }
 
@@ -91,7 +71,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
         }
       }
     } else if (function_exists('ext_can_ext_handle_launch') && ext_can_ext_handle_launch($launch->get_target_link())) {
-      $link = ext_handle_launch($launch->get_target_link(), $localcourse, $localuserid, $db, $resource_link_id, $contextid, $platform_id);
+      $link = ext_handle_launch($launch, $localcourse, $localuserid, $db);
     } else {
       echo 'Unsupported link type';
       print_r($link);
