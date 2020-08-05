@@ -1702,7 +1702,7 @@ function singlevalsyntaxcheck(str,format) {
 		  str = str.replace(/_/,' ');
 	} else if (format.indexOf('scinot')!=-1) {
 		  str = str.replace(/\s/g,'');
-		  str = str.replace(/(x|X|\u00D7)/,"xx");
+		  str = str.replace(/(xx|x|X|\u00D7)/,"xx");
 		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
 		  	if (format.indexOf('scinotordec')==-1) { //not scinotordec
 		  		return (_("not valid scientific notation")+". ");
@@ -1788,6 +1788,9 @@ function singlevaleval(evalstr, format) {
   }
   if (format.indexOf('mixed')!=-1) {
     evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
+  }
+  if (format.indexOf('allowxtimes')!=-1) {
+    evalstr = evalstr.replace(/(xx|x|X|\u00D7)/,"*");  
   }
   if (format.indexOf('scinot')!=-1) {
       evalstr = evalstr.replace("xx","*");
