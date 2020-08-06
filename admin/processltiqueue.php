@@ -244,7 +244,9 @@ function LTIqueuePostdataCallback($data) {
 				'header' => array()
 			];
 		} else if ($data['action'] == 'update') {
-			if ($updater1p3->have_token($data['platformid'])) { // double check we have the token
+            if ($updater1p3->have_token($data['platformid']) &&
+                $updater1p3->token_valid($data['platformid'])
+            ) { // double check we have a valid token
 				$token = $updater1p3->get_access_token($data['platformid']);
 				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid']);
 			} else {
@@ -294,7 +296,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 		if ($post_data['action'] == 'gettoken') {
 			// was a token request
 			if ($response === false) {
-				// what do we do?
+				// record failure. in round 2 token will be read as not valid
 				$updater1p3->token_request_failure($user_data['platformid']);
 				debuglog('token request failure t1 '.$user_data['platformid']);
 			}
@@ -303,6 +305,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 				$updater1p3->store_access_token($user_data['platformid'], $token_data);
 				debuglog('got token for '.$user_data['platformid']);
 			} else {
+                // record failure. in round 2 token will be read as not valid
 				$updater1p3->token_request_failure($user_data['platformid']);
 				debuglog('token request failure t2 '.$response);
 			}

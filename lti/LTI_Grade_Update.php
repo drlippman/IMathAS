@@ -330,11 +330,21 @@ class LTI_Grade_Update {
   }
 
   /**
-   * Handle token request failure
+   * Handle token request failure.  Store failure.
    * @param  int    $platform_id
    */
   public function token_request_failure(int $platform_id) {
-    // TODO: do something
+        if (isset($this->failures[$platform_id])) {
+            $failures = $this->failures[$platform_id]++;
+        } else {
+            $failures = 1;
+        }
+        $token_data = [
+            'access_token' => 'failed'.$failures,
+            'expires' => time() + min(pow(3, $failures-1), 24*60*60)
+        ];
+        // store failure
+        $this->store_access_token($platform_id, $token_data);
   }
 
   /**
