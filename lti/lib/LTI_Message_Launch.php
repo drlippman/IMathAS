@@ -332,6 +332,8 @@ class LTI_Message_Launch {
       $context = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/context'];
       if (isset($context['title'])) {
         return $context['title'];
+      } else if (isset($context['label'])) {
+        return $context['label'];
       } else {
         return '';
       }

@@ -21,7 +21,7 @@ $launch = LTI\LTI_Message_Launch::from_cache($_POST['launchid'], $db);
 
 $role = standardize_role($launch->get_roles());
 $contextid = $launch->get_platform_context_id();
-$contextlabel = $launch->get_platform_context_label();
+$contexttitle = $launch->get_platform_context_title();
 $platform_id = $launch->get_platform_id();
 
 // double check course connection not already established
@@ -36,7 +36,7 @@ if ($_POST['linktype'] == 'assoc') {
     exit;
   }
   $prev_copiedfrom = $db->get_previous_copiedfrom($destcid, $platform_id);
-  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel, $prev_copiedfrom);
+  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contexttitle, $prev_copiedfrom);
   $localcourse = LTI\LTI_Localcourse::new()
     ->set_courseid($destcid)
     ->set_copiedfrom($prev_copiedfrom)
@@ -45,8 +45,8 @@ if ($_POST['linktype'] == 'assoc') {
   require_once(__DIR__.'/../includes/copycourse.php');
   // TODO: do we want to use the context.title instead of label here? Or both?
   $newUIver = isset($_POST['usenewassess']) ? 2 : 1;
-  $destcid = copycourse($_POST['copyselect'], $contextlabel, $newUIver);
-  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel);
+  $destcid = copycourse($_POST['copyselect'], $contexttitle, $newUIver);
+  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contexttitle);
   $localcourse = LTI\LTI_Localcourse::new()
     ->set_courseid($destcid)
     ->set_copiedfrom(intval($_POST['copyselect']))
