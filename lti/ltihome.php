@@ -80,7 +80,10 @@ if (!empty($_POST['makelineitem'])) {
         );
         $cnt++;
     }
-    $scoreresendmsg = sprintf(_('Updates sent for %d students'), $cnt);
+    $scoreresendmsg = sprintf(_('Updates sent for %d students.'), $cnt);
+    if (!empty($GLOBALS['CFG']['LTI']['usequeue'])) {
+        $scoreresendmsg .= ' '._('It may take a couple minutes for the updates to show in the LMS.');
+    }
 }
 
 

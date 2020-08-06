@@ -501,6 +501,15 @@ class Imathas_LTI_Database implements LTI\Database
             $copycourses = array();
         } else {
             $copycourses = $othercourses;
+            if ($lastcopied > 0 && !isset($copycourses[$lastcopied])) {
+                // have a last copied courseid, but wasn't in the list above,
+                // possible if user isn't owner. We'll add as an option anyway.
+                $stm = $this->dbh->prepare('SELECT DISTINCT id,name FROM imas_courses WHERE id=?');
+                $stm->execute(array($lastcopied));
+                while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                    $copycourses[$row[0]] = $row[1];
+                }
+            }
         }
 
         // get origin course

@@ -37,7 +37,7 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
   if (count($context_history)>0) {
     $cidlookup = $db->get_local_course($context_history[0], $platform_id);
     if ($cidlookup !== null) {
-      $last_copied_cid = $cidlookup;
+      $last_copied_cid = $cidlookup->get_courseid();
     }
   }
 
