@@ -137,10 +137,10 @@ echo '<p>'._('To enable LTI 1.3 in a Canvas instance, the site administrator sho
 echo '<ul class=nomark>';
 echo '<li>'._('Go to Admin, then Developer Keys, click +Developer Key, then select +LTI Key').'</li>';
 echo '<li>'._('For Redirect URIs, enter:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
-/*
+
 echo '<li>'._('Set Configure Method: Enter URL').'</li>';
 echo '<li>'._('Enter JSON URL:').' <span class=tocopy>'.$basesiteurl.'/lti/canvasconfig.php</span></li>';
- */
+/* manual setup instructions:
 echo '<li>'._('Set Configure Method: Manual Entry, and enter the values:');
 echo '<ul>';
 echo ' <li>'._('Target Link URI:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
@@ -157,6 +157,7 @@ echo '<li>'._('In Placements, remove the default values, and add Assignment Sele
 echo ' <li>'._('In the Assignment Selection options, set the Message Type to: LtiDeepLinkingRequest').'</li>';
 echo ' <li>'._('For Target Link URI, enter:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
 echo ' </ul></li>';
+*/
 echo '<li>'._('After submitting, turn the State ON').'</li>';
 echo '<li>'._('Copy the numeric value shown in the Details column.  This is the Client ID. (You do not need to click the Show Key button)').'</li>';
 echo '<li>'._('Go to Admin, then Settings, then Apps, and click View App Configurations').'</li>';
