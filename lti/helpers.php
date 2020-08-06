@@ -1,5 +1,12 @@
 <?php
 
+if (isset($GLOBALS['CFG']['hooks']['lti'])) {
+    require_once($CFG['hooks']['lti']);
+    /**
+     * see ltihooks.php.dist for details
+     */
+}
+
 /**
  * Return a standardized role value based on an array of roles provided by the
  * LMS
@@ -71,6 +78,8 @@ function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): arr
   } else if (!empty($param['place_aid'])) {
     $refcid = $db->get_course_from_aid($param['place_aid']);
     $out = ['type'=>'aid', 'refaid'=>$param['place_aid'], 'refcid'=>$refcid];
+  } else if (function_exists('ext_parse_target_link')) {
+    $out = ext_parse_target_link($targetlink);
   } else {
     $out = array();
   }

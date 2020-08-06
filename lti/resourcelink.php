@@ -13,11 +13,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
   $platform_id = $launch->get_platform_id();
   $resource_link = $launch->get_resource_link();
   $target = parse_target_link($launch->get_target_link(), $db);
-  if (empty($target) && function_exists('ext_can_handle_launch')) {
-    if (ext_can_handle_launch($launch->get_target_link())) {
-      $target = ['type'=>'ext'];
-    }
-  }
+
   if (empty($target)) {
     echo "Error parsing requested resource";
     exit;

@@ -478,19 +478,23 @@ class Imathas_LTI_Database implements LTI\Database
         $sourcejsondata = json_decode($sourcejsondata, true);
         $blockLTICopyOfCopies = ($sourcejsondata !== null && !empty($sourcejsondata['blockLTICopyOfCopies']));
 
-        // look for other courses we could associate with
-        // TODO: adjust this to handle other target types
-        $query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
-        $query .= "AND imt.userid=:userid JOIN imas_assessments AS ia ON ic.id=ia.courseid ";
-        $query .= "WHERE ic.available<4 AND ic.ancestors REGEXP :cregex AND ia.ancestors REGEXP :aregex ORDER BY ic.name";
-        $stm = $this->dbh->prepare($query);
-        $stm->execute(array(
-            ':userid' => $userid,
-            ':cregex' => '[[:<:]]' . $target['refcid'] . '[[:>:]]',
-            ':aregex' => '[[:<:]]' . $target['refaid'] . '[[:>:]]'));
         $othercourses = array();
-        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-            $othercourses[$row[0]] = $row[1];
+
+        if ($target['type'] == 'aid') {
+            // look for other courses we could associate with
+            $query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
+            $query .= "AND imt.userid=:userid JOIN imas_assessments AS ia ON ic.id=ia.courseid ";
+            $query .= "WHERE ic.available<4 AND ic.ancestors REGEXP :cregex AND ia.ancestors REGEXP :aregex ORDER BY ic.name";
+            $stm = $this->dbh->prepare($query);
+            $stm->execute(array(
+                ':userid' => $userid,
+                ':cregex' => '[[:<:]]' . $target['refcid'] . '[[:>:]]',
+                ':aregex' => '[[:<:]]' . $target['refaid'] . '[[:>:]]'));
+            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                $othercourses[$row[0]] = $row[1];
+            }
+        } else if (function_exists('ext_get_othercourses')) {
+            $othercourses = ext_get_othercourses($target, $userid);
         }
 
         if ($blockLTICopyOfCopies) {
