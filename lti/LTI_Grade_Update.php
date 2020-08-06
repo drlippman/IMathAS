@@ -258,17 +258,8 @@ class LTI_Grade_Update {
       $this->debuglog('got token from '.$platform_id);
       return $token_data['access_token'];
     } else {
-      if (isset($this->failures[$platform_id])) {
-        $failures = $this->failures[$platform_id]++;
-      } else {
-        $failures = 1;
-      }
-      $token_data = [
-        'access_token' => 'failed'.$failures,
-        'expires' => time() + min(pow(3, $failures-1), 24*60*60)
-      ];
-      // store failure
-      $this->store_access_token($platform_id, $token_data);
+        // record failure
+        $this->token_request_failure($platform_id);
       $this->debuglog('token request error '.$error);
       return false;
     }
