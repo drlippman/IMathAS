@@ -27,6 +27,35 @@ function ext_can_handle_launch(string $targetlink): bool {
 }
 
 /**
+ * Parses a target_link_uri for the launch.  
+ * 
+ * @param string  $targetlink  The target_link_uri for the launch
+ * @return array  empty if not parsable.  Otherwise an array with keys:
+ *   'refcid'   (required) The courseid the target item is in
+ *   'type'     (required) A short string name for the item type
+ *   'refid'    The type id for the target item
+ * 
+ */
+function ext_parse_target_link(string $targetlink): array {
+
+}
+
+/**
+ * Get courses we could associate with.  These should be courses the user
+ * is a teacher of and contains a copy of the target item.
+ * 
+ * This function chould double-check the $targetinfo['type']
+ * 
+ * @param array $targetinfo    The output of ext_parse_target_link
+ * @return array of courseid=>name.  Return an empty array if target
+ *               isn't a supported type.
+ */
+function ext_get_othercourses(array $targetinfo, int $userid): array {
+    
+    return array();
+}
+
+/**
  * Handles a launch when an existing placement doesn't exist yet 
  * 
  * @param LTI_Message_launch $launch    The launch object
