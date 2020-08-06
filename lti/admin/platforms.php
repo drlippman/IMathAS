@@ -54,7 +54,7 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
 
 $bbclientid = false;
 $query = "SELECT ip.id,ip.issuer,ip.client_id,ip.created_at,
-  GROUP_CONCAT(ig.name SEPARATOR ';;') AS groups FROM
+  GROUP_CONCAT(CONCAT(ig.name,' (',DATE_FORMAT(iga.created_at,'%e %b %Y'),')') SEPARATOR ';;') AS groups FROM
   imas_lti_platforms AS ip
   LEFT JOIN imas_lti_deployments AS id ON id.platform=ip.id
   LEFT JOIN imas_lti_groupassoc AS iga ON iga.deploymentid=id.id
@@ -93,7 +93,7 @@ if ($platforms === false) {
     echo '<tr class="'.($i%2==0?'even':'odd').'">';
     echo '<td>'.Sanitize::encodeStringForDisplay($row['issuer']).'</td>';
     echo '<td>'.Sanitize::encodeStringForDisplay($row['client_id']).'</td>';
-    echo '<td>'. date("M j Y ", strtotime($row['created_at'])).'</td>';
+    echo '<td>'. date("j M Y ", strtotime($row['created_at'])).'</td>';
     echo '<td>'. str_replace(';;','<br>',Sanitize::encodeStringForDisplay($row['groups'])).'</td>';
     echo '<td><button type=submit name="delete" value="'.Sanitize::encodeStringForDisplay($row['id']).'" ';
     echo 'onclick="return confirm(\''._('Are you SURE you want to delete this platform?').'\');">';
