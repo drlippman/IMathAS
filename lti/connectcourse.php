@@ -46,7 +46,6 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
   }
 
   // See if there are any courses user owns that we could associate with
-  // TODO: handle targets that aren't assessments
   list($copycourses,$assoccourses,$sourceUIver) =
     $db->get_potential_courses($target,$last_copied_cid,$userid);
 

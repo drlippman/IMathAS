@@ -126,7 +126,6 @@ if ($localuserid === false) {
     // we've logged into or created a local user account, so now create a
     // ltiuserid link
     $num = $db->create_lti_user($localuserid, $ltiuserid, $platform_id);
-    // TODO: set SID on new non-direct login user to lti-(num)
     if (!empty($updateSID)) {
       $db->set_user_SID($localuserid, 'lti-'.$num);
     }

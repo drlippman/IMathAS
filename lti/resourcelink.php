@@ -1,10 +1,5 @@
 <?php
 
-/**
- * TODO:
- *  maybe refactor $target into a class
- *
- */
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
   require_once($CFG['hooks']['lti']);
   /**

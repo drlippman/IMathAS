@@ -355,8 +355,8 @@ class Imathas_LTI_Database implements LTI\Database
     public function get_local_course(string $contextid, int $platform_id): ?LTI\LTI_Localcourse
     {
         $query = 'SELECT ilc.id,ilc.courseid,ilc.copiedfrom,ic.UIver,ic.dates_by_lti FROM
-      imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
-      WHERE ilc.contextid=? AND ilc.org=?';
+            imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
+            WHERE ilc.contextid=? AND ilc.org=?';
         $stm = $this->dbh->prepare($query);
         $stm->execute(array($contextid, 'LTI13-' . $platform_id));
         $row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -365,6 +365,24 @@ class Imathas_LTI_Database implements LTI\Database
         } else {
             return LTI\LTI_Localcourse::new ($row);
         }
+    }
+
+    /**
+     * Get previous copiedfrom for a course when doing assoc with existing course
+     * @param int $courseid   course ID
+     * @param int $platform_id   platform id
+     * @return int  previous copiedfrom, or 0 if none
+     */
+    public function get_previous_copiedfrom(int $courseid, int $platform_id): int 
+    {
+        $query = 'SELECT copiedfrom FROM imas_lti_courses WHERE courseid=? AND org=? AND copiedfrom>0';
+        $stm = $this->dbh->prepare($query);
+        $stm->execute(array($courseid, 'LTI13-' . $platform_id));
+        $copiedfrom = $stm->fetchColumn(0);
+        if ($copiedfrom !== false) {
+            return $copiedfrom;
+        }
+        return 0;
     }
 
     /**
@@ -970,7 +988,7 @@ class Imathas_LTI_Database implements LTI\Database
                 if ($localuserid === false) {
                     // No existing user, create user if we have enough info
                     if (!empty($member['given_name']) && !empty($member['family_name'])) {
-                        // TODO create user
+                        // create user account
                         $localuserid = $this->create_user_account([
                             'SID' => uniqid(), // temporary
                             'pwhash' => 'pass',

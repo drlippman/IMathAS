@@ -35,12 +35,11 @@ if ($_POST['linktype'] == 'assoc') {
     echo 'Invalid course to associate';
     exit;
   }
-  // TODO: this doesn't retain copiedfrom in imas_lti_courses.
-  // It'd be nice to see if there was a way to do so.
-  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel);
+  $prev_copiedfrom = $db->get_previous_copiedfrom($destcid, $platform_id);
+  $newlticourseid = $db->add_lti_course($contextid, $platform_id, $destcid, $contextlabel, $prev_copiedfrom);
   $localcourse = LTI\LTI_Localcourse::new()
     ->set_courseid($destcid)
-    ->set_copiedfrom(0)
+    ->set_copiedfrom($prev_copiedfrom)
     ->set_id($newlticourseid);
 } else if ($_POST['linktype'] == 'copy') {
   require_once(__DIR__.'/../includes/copycourse.php');
