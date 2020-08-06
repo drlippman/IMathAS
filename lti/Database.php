@@ -968,8 +968,8 @@ class Imathas_LTI_Database implements LTI\Database
         }
 
         $query = 'SELECT iu.FirstName,iu.LastName,ilu.ltiuserid,istu.id FROM
-      imas_users AS iu JOIN imas_ltiusers AS ilu ON ilu.userid=iu.id AND ilu.org=?
-      JOIN imas_students AS istu ON istu.userid=iu.id WHERE istu.courseid=?';
+            imas_users AS iu JOIN imas_ltiusers AS ilu ON ilu.userid=iu.id AND ilu.org=?
+            JOIN imas_students AS istu ON istu.userid=iu.id WHERE istu.courseid=?';
         $stm = $this->dbh->prepare($query);
         $stm->execute(array('LTI13-' . $platform_id, $localcourse->get_courseid()));
         $current = array();
@@ -977,7 +977,9 @@ class Imathas_LTI_Database implements LTI\Database
         while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             $current[$row['ltiuserid']] = $row;
         }
-
+        if (!is_array($data['members'])) {
+            $data['members'] = array();
+        }
         foreach ($data['members'] as $member) {
             if (standardize_role($member['roles']) !== 'Learner') {
                 // only handling students

@@ -45,13 +45,21 @@ if (!empty($_POST['tolock'])) {
 
 if (!empty($_POST['pullroster'])) {
 	$nrps = $launch->get_nrps();
-	$data = $nrps->get_members();
-	list($newcnt,$notfound) = $db->update_roster($data, $localcourse, $platform_id);
+    $data = $nrps->get_members();
+    $notfound = array();
+    if ($data !== false) {
+        list($newcnt,$notfound) = $db->update_roster($data, $localcourse, $platform_id);
+    }
 
 	require('../header.php');
 	echo '<div class=breadcrumb>'.$breadcrumbbase._('Roster Pull Results').'</div>';
-	echo '<h1>'._('Roster Pull Results').'</h2>';
-	echo '<p>'.sprintf(_('Added %d new students to the roster.'), $newcnt).'</p>';
+    echo '<h1>'._('Roster Pull Results').'</h2>';
+    
+    if ($data === false) {
+        echo '<p>'._('Error pulling the roster.').'</p>';
+    } else {
+        echo '<p>'.sprintf(_('Added %d new students to the roster.'), $newcnt).'</p>';
+    }
 
 	if (count($notfound)>0) {
 		echo '<form method=post action="pullroster.php?launchid=' .

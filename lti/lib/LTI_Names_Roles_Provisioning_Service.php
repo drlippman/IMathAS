@@ -26,6 +26,9 @@ class LTI_Names_Roles_Provisioning_Service {
                 null,
                 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'
             );
+            if ($page === false) {
+                return false;
+            }
             if (empty($context) && !empty($page['body']['context'])) {
               $context = $page['body']['context'];
             }
