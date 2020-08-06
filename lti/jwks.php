@@ -27,4 +27,5 @@ foreach ($keys as $key) {
       'kid' => $key['kid']
   );
 }
+header('Content-Type: application/json');
 echo json_encode(array('keys'=>$jwks));
