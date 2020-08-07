@@ -15,12 +15,12 @@ function show_postback_form($launch, $db, $err='') {
   $contextid = $launch->get_platform_context_id();
   $ltiuserid = $launch->get_platform_user_id();
   $platform_id = $launch->get_platform_id();
-
+  $migration_claim = $launch->get_migration_claim();
   // see if we already know who this person is
-  $localuserid = $db->get_local_userid($ltiuserid, $platform_id);
+  $localuserid = $db->get_local_userid($ltiuserid, $platform_id, $migration_claim);
 
   if ($role == 'Learner') {
-    $localcourse = $db->get_local_course($contextid, $platform_id);
+    $localcourse = $db->get_local_course($contextid, $platform_id, $migration_claim);
     if ($localcourse === null) {
       // no course link established yet - abort
       echo _("Course link not established yet.  Notify your instructor they need to click this assignment to set it up.");

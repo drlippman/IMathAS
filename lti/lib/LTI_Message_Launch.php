@@ -388,6 +388,21 @@ class LTI_Message_Launch {
         return $this;
     }
 
+    public function get_migration_claim() {
+        if (!empty($this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/lti1p1'])) {
+            $claim = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/lti1p1'];
+            $claim['signing_string'] = $claim['oauth_consumer_key'] . '&' .
+                $this->jwt['body']["https://purl.imsglobal.org/spec/lti/claim/deployment_id"]. '&' . 
+                $this->jwt['body']['iss'] . '&' . 
+                $this->get_client_id() . '&' . 
+                $this->jwt['body']['exp'] . '&' . 
+                $this->jwt['body']['nonce'];
+            return $claim;
+        } else {
+            return false;
+        }
+    }
+
     private function validate_state() {
         // Check State for OIDC.
         if ($this->cookie->get_cookie('lti1p3_' . $this->request['state']) !== $this->request['state']) {

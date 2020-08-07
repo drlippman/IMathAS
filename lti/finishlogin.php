@@ -28,8 +28,9 @@ $ltiuserid = $launch->get_platform_user_id();
 $platform_id = $launch->get_platform_id();
 
 // see if we already know who this person is
-$localuserid = $db->get_local_userid($ltiuserid, $platform_id);
-$localcourse = $db->get_local_course($contextid, $platform_id);
+$migration_claim = $launch->get_migration_claim();
+$localuserid = $db->get_local_userid($ltiuserid, $platform_id, $migration_claim);
+$localcourse = $db->get_local_course($contextid, $platform_id, $migration_claim);
 
 // no local user yet.  Parse submitted info.
 if ($localuserid === false) {

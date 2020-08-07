@@ -46,6 +46,7 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
     $_SESSION['ltiitemid'] = $link->get_typeid();
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
+
     $targetuserid = $db->get_local_userid($targetltiuserid, $platform_id);
     if ($targetuserid == false) {
         echo 'Cannot find target student';

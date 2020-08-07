@@ -263,13 +263,33 @@ class Imathas_LTI_Database implements LTI\Database
      * Get local user id
      * @param  string $ltiuserid
      * @param  int $platform_id
+     * @param  false|array $migration_claim
      * @return false|int local userid
      */
-    public function get_local_userid(string $ltiuserid, int $platform_id)
+    public function get_local_userid(string $ltiuserid, int $platform_id, $migration_claim=false)
     {
         $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org=?');
         $stm->execute(array($ltiuserid, 'LTI13-' . $platform_id));
-        return $stm->fetchColumn(0);
+        $userid = $stm->fetchColumn(0);
+        if ($userid === false && 
+            !empty($migration_claim) && 
+            $this->verify_migration_claim($migration_claim)
+        ) {
+            if (isset($migration_claim['user_id'])) {
+                $oldltiuserid = $migration_claim['user_id'];
+            } else {
+                $oldltiuserid = $ltiuserid;
+            }
+            $oldkey = $migration_claim['oauth_consumer_key'];
+            $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org LIKE ?');
+            $stm->execute(array($oldltiuserid, $oldkey.':%'));
+            $userid = $stm->fetchColumn(0);
+            if ($userid !== false) {
+                // found one; create a new ltiusers record using new ltiuserd/platformid
+                $this->create_lti_user($userid, $ltiuserid, $platform_id);
+            }
+        }
+        return $userid;
     }
 
     /**
@@ -350,9 +370,10 @@ class Imathas_LTI_Database implements LTI\Database
      * Get local user course id
      * @param  string $contextid
      * @param  int $platform_id
+     * @param  false|array $migration_claim
      * @return null|LTI_Localcourse local course info
      */
-    public function get_local_course(string $contextid, int $platform_id): ?LTI\LTI_Localcourse
+    public function get_local_course(string $contextid, int $platform_id, $migration_claim=false): ?LTI\LTI_Localcourse
     {
         $query = 'SELECT ilc.id,ilc.courseid,ilc.copiedfrom,ic.UIver,ic.dates_by_lti FROM
             imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
@@ -361,6 +382,29 @@ class Imathas_LTI_Database implements LTI\Database
         $stm->execute(array($contextid, 'LTI13-' . $platform_id));
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row === false || $row === null) {
+            if (!empty($migration_claim) && $this->verify_migration_claim($migration_claim)) {
+                if (isset($migration_claim['context_id'])) {
+                    $oldcontextid = $migration_claim['context_id'];
+                } else {
+                    $oldcontextid = $contextid;
+                }
+                $oldkey = $migration_claim['oauth_consumer_key'];
+                $query = 'SELECT courseid,copiedfrom,contextlabel FROM imas_ltiusers 
+                    WHERE contextid=? AND org LIKE ?';
+                $stm = $this->dbh->prepare($query);
+                $stm->execute(array($oldcontextid, $oldkey.':%'));
+                $row = $stm->fetch(PDO::FETCH_ASSOC);
+                if ($row !== false) {
+                    // found one; create a new lti_course record using new contextid/platformid
+                    $newlticourseid = $this->add_lti_course($contextid, $platform_id, 
+                        $row['courseid'], $row['contextlabel'], $row['copiedfrom']);
+                    $localcourse = LTI\LTI_Localcourse::new()
+                        ->set_courseid($row['courseid'])
+                        ->set_copiedfrom($row['copiedfrom'])
+                        ->set_id($newlticourseid);
+                    return $localcourse;
+                }
+            }
             return null;
         } else {
             return LTI\LTI_Localcourse::new ($row);
@@ -1048,6 +1092,21 @@ class Imathas_LTI_Database implements LTI\Database
             $stm = $this->dbh->prepare($query);
             $stm->execute(array_merge(array(time()), $stuids, array($courseid)));
         }
+    }
+
+    private function verify_migration_claim($claim) {
+        $key = $claim['oauth_consumer_key'];
+        $query = "SELECT password FROM imas_users WHERE SID=:SID 
+            AND (rights=11 OR rights=76 OR rights=77)";
+        $stm = $this->dbh->prepare($query);
+        $stm->execute(array($key));
+        $secret = $stm->fetchColumn(0);
+        if ($secret === false) {
+            return false;
+        }
+        
+        $sig = base64_encode(hash_hmac('sha256', $claim['signing_string'], $secret));
+        return ($sig == $claim['oauth_consumer_key_sign']);
     }
 
 }
