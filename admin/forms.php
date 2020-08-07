@@ -921,7 +921,7 @@ switch($_GET['action']) {
             echo '/> '._('Allow the LMS to set assessment due dates');
             echo ' <span class="small">(',_('Only supported by Canvas'),')</span></span><br class="form" />';
             
-            if ($hasLTI13) {
+            if ($hasLTI13 && !empty($CFG['LTI']['usesendzeros'])) {
                 echo '<span class="form">',_('Send zeros'),'?<br/></span>';
                 echo '<span class="formright"><label><input type="checkbox" name="ltisendzeros" value="1" ';
                 if ($ltisendzeros>0) { echo 'checked="checked"';}
