@@ -14,13 +14,19 @@ if (empty($_GET['aid'])) {
 
 $aid = intval($_GET['aid']);
 
-$stm = $DBH->prepare('SELECT endmsg FROM imas_assessments WHERE id=? AND courseid=?');
+$stm = $DBH->prepare('SELECT submitby,ver,endmsg FROM imas_assessments WHERE id=? AND courseid=?');
 $stm->execute(array($aid, $cid));
-$endmsgstr = $stm->fetchColumn(0);
-if ($endmsgstr === false) {
+$row = $stm->fetch(PDO::FETCH_ASSOC);
+if ($row === false) {
     echo 'Invalid id';
     exit;
 }
+if ($row['submitby'] != 'by_assessment' || $row['ver'] < 2) {
+    echo 'This is only supported for quiz-style assessments';
+    exit;
+}
+$endmsgstr = $row['endmsg'];
+
 
 if (isset($_POST['cat']) || isset($_POST['newcat'])) {
     $excusals = array();
@@ -127,6 +133,7 @@ foreach ($excusals as $k=>$exc) {
     } 
 }
 
+$pagetitle = _('Auto Excuse');
 require('../header.php');
 ?>
 <script type="text/javascript">
