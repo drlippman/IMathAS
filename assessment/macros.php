@@ -1462,7 +1462,7 @@ function diffrands($min,$max,$n=0,$ord='def') {
 }
 
 
-function diffrrands($min,$max,$p=0,$n=0, $nonzero=false,$ord='def') {
+function diffrrands($min,$max,$p=0,$n=0,$ord='def',$nonzero=false) {
 	if (func_num_args()<4) { echo "diffrrands expects 4 arguments"; return $min;}
 	$n = floor($n);
 	list($min,$max) = checkMinMax($min, $max, false, 'diffrrands');
@@ -1564,7 +1564,7 @@ function nonzerodiffrands($min,$max,$n=0,$ord='def') {
 
 
 function nonzerodiffrrands($min,$max,$p=0,$n=0,$ord='def') {
-	return diffrrands($min,$max,$p,$n, true, $ord);
+	return diffrrands($min,$max,$p,$n, $ord, true);
 }
 
 
