@@ -4,6 +4,10 @@ require_once(__DIR__."/updateptsposs.php");
 require_once(__DIR__."/migratesettings.php");
 //boost operation time
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['includes/copyiteminc'])) {
+	require($CFG['hooks']['includes/copyiteminc']);
+}
 
 ini_set("max_execution_time", "900");
 
@@ -444,7 +448,11 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		}
 	} else if ($itemtype == "Calendar") {
 		$newtypeid = 0;
-	}
+    } else if (function_exists('copyitem_can_handle_type') && 
+        copyitem_can_handle_type($itemtype)
+    ) {
+        $newtypeid = copyitem_copy_item($itemtype, $typeid);
+    }
 	$itemtypemap[$itemtype.$typeid] = $newtypeid;
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES (:courseid, :itemtype, :typeid)";
