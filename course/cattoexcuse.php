@@ -28,26 +28,30 @@ if ($row['submitby'] != 'by_assessment' || $row['ver'] < 2) {
 
 if (isset($_POST['cat']) || isset($_POST['newcat'])) {
     $excusals = array();
-    foreach ($_POST['sc'] as $k=>$score) {
-        if ($score>=0 && $score<=100) {
-            $excusals[] = [
-                'sc'=>$score,
-                'cat'=>$_POST['cat'][$k],
-                'aid'=>$_POST['aid'][$k]
-            ];
+    if (isset($_POST['sc'])) {
+        foreach ($_POST['sc'] as $k=>$score) {
+            if ($score>=0 && $score<=100) {
+                $excusals[] = [
+                    'sc'=>$score,
+                    'cat'=>$_POST['cat'][$k],
+                    'aid'=>$_POST['aid'][$k]
+                ];
+            }
         }
     }
-    foreach ($_POST['newsc'] as $k=>$score) {
-        if ($score>=0 && $score<=100) {
-            $excusals[] = [
-                'sc'=>$score,
-                'cat'=>$_POST['newcat'][$k],
-                'aid'=>$_POST['newaid'][$k]
-            ];
+    if (isset($_POST['newsc'])) {
+        foreach ($_POST['newsc'] as $k=>$score) {
+            if ($score>=0 && $score<=100) {
+                $excusals[] = [
+                    'sc'=>$score,
+                    'cat'=>$_POST['newcat'][$k],
+                    'aid'=>$_POST['newaid'][$k]
+                ];
+            }
         }
     }
 
-    $query = 'UPDATE imas_assessments SET autoexecuse=? WHERE id=? AND courseid=?';
+    $query = 'UPDATE imas_assessments SET autoexcuse=? WHERE id=? AND courseid=?';
     $stm = $DBH->prepare($query);
     $stm->execute(array(json_encode($excusals), $aid, $cid));
 
@@ -56,7 +60,7 @@ if (isset($_POST['cat']) || isset($_POST['newcat'])) {
     exit;
 }
 
-if ($row['autoexecuse'] === '' || $row['autoexecuse'] === null) {
+if ($row['autoexcuse'] === '' || $row['autoexcuse'] === null) {
     $excusals = array();
 } else {
     $excusals = json_decode($row['autoexcuse'], true);

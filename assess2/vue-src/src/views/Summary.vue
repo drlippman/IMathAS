@@ -10,6 +10,7 @@
         <div
           v-if="ainfo.hasOwnProperty('endmsg') && ainfo.endmsg != ''"
           v-html = "ainfo.endmsg"
+          class = "introtext"
         />
 
         <div

@@ -2665,6 +2665,13 @@ class AssessRecord
       if (isset($this->data['scoreoverride'])) {
         $out['scoreoverride'] = $this->data['scoreoverride'];
       }
+      if (isset($this->data['excused']) && count($this->data['excused'])>0) {
+          $ph = Sanitize::generateQueryPlaceholders($this->data['excused']);
+          $query = "SELECT name FROM imas_assessments WHERE id IN ($ph) ORDER BY name";
+          $stm = $this->DBH->prepare($query);
+          $stm->execute(array_values($this->data['excused']));
+          $out['excused'] = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+      }
     }
     return $out;
   }
@@ -2743,6 +2750,11 @@ class AssessRecord
       }
       $out['starttime'] = $aver['starttime'];
       $out['questions'] = $this->getGbQuestionsData($qVerToGet);
+      $out['endmsg'] = AssessUtils::getEndMsg(
+        $this->assess_info->getSetting('endmsg'),
+        $aver['score'],
+        $this->assess_info->getSetting('points_possible')
+      );
     }
     return $out;
   }
