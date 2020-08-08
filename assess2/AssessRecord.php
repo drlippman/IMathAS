@@ -2253,16 +2253,15 @@ class AssessRecord
    * 
    */
   public function calcExcusals() {
-      $endmsg = $this->assess_info->getSetting('endmsg');
-      if ($endmsg == '') {
-          return;
-      }
-      $endmsg = unserialize($endmsg);
-      if (empty($endmsg['exc'])) {
+      $autoexecuse = $this->assess_info->getSetting('autoexcuse');
+      if ($autoexecuse === '' || $autoexecuse === null) {
           return;
       }
       // format: array of [cat=>, aid=>, sc=>]
-      $excusals = $endmsg['exc'];
+      $excusals = json_decode($autoexecuse, true);
+      if ($excusals === null || count($excusals) == 0) {
+          return;
+      }
       $toexcuse = [];
 
       $qinfo = $this->assess_info->getAllQuestionPointsAndCats();

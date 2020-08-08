@@ -98,6 +98,10 @@
         </a>
       </div>
 
+      <div>
+
+      </div>
+
       <div v-if="aData.assess_versions.length == 0">
         {{ $t('gradebook.no_versions') }}
       </div>

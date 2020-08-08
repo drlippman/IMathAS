@@ -14,7 +14,7 @@ if (empty($_GET['aid'])) {
 
 $aid = intval($_GET['aid']);
 
-$stm = $DBH->prepare('SELECT submitby,ver,endmsg FROM imas_assessments WHERE id=? AND courseid=?');
+$stm = $DBH->prepare('SELECT submitby,ver,autoexcuse FROM imas_assessments WHERE id=? AND courseid=?');
 $stm->execute(array($aid, $cid));
 $row = $stm->fetch(PDO::FETCH_ASSOC);
 if ($row === false) {
@@ -25,8 +25,6 @@ if ($row['submitby'] != 'by_assessment' || $row['ver'] < 2) {
     echo 'This is only supported for quiz-style assessments';
     exit;
 }
-$endmsgstr = $row['endmsg'];
-
 
 if (isset($_POST['cat']) || isset($_POST['newcat'])) {
     $excusals = array();
@@ -48,27 +46,22 @@ if (isset($_POST['cat']) || isset($_POST['newcat'])) {
             ];
         }
     }
-    if ($endmsgstr != '') {
-        $endmsgs = unserialize($endmsgstr);
-    } else {
-        $endmsgs = array();
-    }
-    $endmsgs['exc'] = $excusals;
 
-    $query = 'UPDATE imas_assessments SET endmsg=? WHERE id=? AND courseid=?';
+    $query = 'UPDATE imas_assessments SET autoexecuse=? WHERE id=? AND courseid=?';
     $stm = $DBH->prepare($query);
-    $stm->execute(array(serialize($endmsgs), $aid, $cid));
+    $stm->execute(array(json_encode($excusals), $aid, $cid));
 
     $btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
     header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" .$btf. "&r=" . Sanitize::randomQueryStringParam());
     exit;
 }
 
-$excusals = [];
-if ($endmsgstr != '') {
-    $endmsgs = unserialize($endmsgstr);
-    if (!empty($endmsgs['exc'])) {
-        $excusals = $endmsgs['exc'];
+if ($row['autoexecuse'] === '' || $row['autoexecuse'] === null) {
+    $excusals = array();
+} else {
+    $excusals = json_decode($row['autoexcuse'], true);
+    if ($excusals === null) {
+        $excusals = array();
     }
 }
 
