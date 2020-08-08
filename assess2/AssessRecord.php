@@ -41,6 +41,7 @@ class AssessRecord
   private $penalties = array();
   private $dispqn = null;
   private $inTransaction = false;
+  private $new_excusals = [];
 
   /**
    * Construct object
@@ -2240,7 +2241,81 @@ class AssessRecord
     }
     // update out of attempts, if needed
     $this->updateStatus();
+    // calc and do excusals for by_assess
+    if (!$by_question) {
+        $this->calcExcusals();
+    }
     return $maxAscore;
+  }
+
+  /**
+   * Calculate excusals based on scores 
+   * 
+   */
+  public function calcExcusals() {
+      $endmsg = $assess_info->getSetting('endmsg');
+      if ($endmsg == '') {
+          return;
+      }
+      $endmsg = unserialize($endmsg);
+      if (empty($endmsg['exc'])) {
+          return;
+      }
+      // format: array of [cat=>, aid=>, sc=>]
+      $excusals = $endmsg['exc'];
+      $toexcuse = [];
+
+      $qinfo = $assess_info->getAllQuestionPointsAndCats();
+
+      for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
+        $curAver = &$this->data['assess_versions'][$av];
+        // we're only doing this for quiz-style, so there'll only be one question version
+        $catposs = [];
+        $cattot = [];
+        foreach($excusals as $ex) {
+            $catposs[$ex['cat']] = 0;
+            $cattot[$ex['cat']] = 0;
+        }
+        if (isset($catposs['whole'])) {
+            $cattot['whole'] = $curAver['score'];
+            $catposs['whole'] = $assess_info->getSetting('points_possible');
+        }
+        for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
+            $qid = $curAver['questions'][$qn]['question_versions'][0]['qid'];
+            if (!empty($qinfo[$qid]['cat']) && isset($catposs[$qinfo[$qid]['cat']])) {
+                $catposs[$qinfo[$qid]['cat']] += $qinfo[$qid]['points'];
+                $cattot[$qinfo[$qid]['cat']] += $curAver['questions'][$qn]['score'];
+            }
+        }
+        foreach($excusals as $ex) {
+            if ($catposs[$ex['cat']] == 0) { continue; }
+            if (100*$cattot[$ex['cat']]/$catposs[$ex['cat']] >= $ex['sc']) {
+                // met requirement
+                $toexcuse[] = $ex['aid'];
+            }
+        }
+      }
+      // possibly duplicates from the loop over
+      $toexcuse = array_unique($toexecuse);
+      if (!isset($this->data['excusals'])) {
+        $this->data['excusals'] = [];
+      }
+      $newex = array_diff($toexecuse, $this->data['excusals']);
+      // record to record
+      $this->data['excusals'] = array_merge($this->data['excusals'], $newex);
+      // store new ones temporarily
+      $this->new_excusals = $newex;
+
+      // record excusals in database
+      $vals = [];
+      $cid = $this->assess_info->getCourseId();
+      foreach ($newex as $aid) {
+          array_push($vals, $this->curUid, $cid, 'A', $aid);
+      }
+      $ph = Sanitize::generateQueryPlaceholdersGrouped($vals, 4);
+      $query = "INSERT IGNORE INTO imas_excused (userid,courseid,type,typeid) VALUES $ph";
+      $stm = $this->DBH->prepare($query);
+      $stm->execute($vals); 
   }
 
   /**

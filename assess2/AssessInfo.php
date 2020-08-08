@@ -225,7 +225,9 @@ class AssessInfo
     while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
       $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
       $qsids[] = $qrow['questionsetid'];
+      $this->questionData[$qrow['id']]['origcategory'] = $this->questionData[$qrow['id']]['category'];
       $category = &$this->questionData[$qrow['id']]['category'];
+
       if ($category === '') {
         // do nothing
       } else if (is_numeric($category)) {
@@ -358,6 +360,14 @@ class AssessInfo
     $out = array();
     foreach ($this->questionData as $qid=>$v) {
       $out[$qid] = $v['points_possible'];
+    }
+    return $out;
+  }
+
+  public function getAllQuestionPointsAndCats() {
+    $out = array();
+    foreach ($this->questionData as $qid=>$v) {
+      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>$v['origcategory']];
     }
     return $out;
   }
