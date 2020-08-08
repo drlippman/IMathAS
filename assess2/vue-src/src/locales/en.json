@@ -201,7 +201,8 @@
     "retake_penalty": "{n}% retake penalty applied",
     "late_penalty": "{n}% late work penalty applied",
     "scorelist": "Score List",
-    "reshowquestions": "Review Questions"
+    "reshowquestions": "Review Questions",
+    "new_excused": "Based on your results in this assessment, the following assessments have been excused:"
   },
   "scorelist": {
     "question": "Question",

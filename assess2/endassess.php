@@ -105,13 +105,13 @@ if ($assessInfoOut['submitby'] == 'by_question') {
 }
 
 // get endmsg
-if ($assessInfoOut['showscores'] != 'none') {
-  $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
+$assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
     $assess_info->getSetting('endmsg'),
     $totalScore,
     $assess_info->getSetting('points_possible')
-  );
-}
+);
+
+$assessInfoOut['newexcused'] = $assess_record->get_new_excused();
 
 //prep date display
 prepDateDisp($assessInfoOut);

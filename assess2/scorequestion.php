@@ -269,12 +269,13 @@ if ($end_attempt) {
   }
 
   // get endmsg
-    $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
+  $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
       $assess_info->getSetting('endmsg'),
       $totalScore,
       $assess_info->getSetting('points_possible')
-    );
+  );
 
+  $assessInfoOut['newexcused'] = $assess_record->get_new_excused();
 
 } else {
   if ($assess_info->getSetting('displaymethod') === 'livepoll') {

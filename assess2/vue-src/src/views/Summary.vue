@@ -12,6 +12,17 @@
           v-html = "ainfo.endmsg"
         />
 
+        <div
+          v-if="ainfo.hasOwnProperty('newexcused') && Object.keys(ainfo.newexcused).length > 0"
+        >
+          <p>{{ $t('summary.new_excused') }}</p>
+          <ul id="excusedlist">
+            <li v-for="(name,index) in ainfo.newexcused" :key="index">
+              {{ name }}
+            </li>
+          </ul>
+        </div>
+
         <div v-if = "showScores">
           <vue-tabs id="scoretabs">
             <vue-tab :name="$t('summary.scorelist')">
@@ -124,4 +135,7 @@ export default {
 </script>
 
 <style>
+#excusedlist {
+  margin-bottom: 2em;
+}
 </style>

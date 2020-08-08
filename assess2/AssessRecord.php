@@ -2242,7 +2242,7 @@ class AssessRecord
     // update out of attempts, if needed
     $this->updateStatus();
     // calc and do excusals for by_assess
-    if (!$by_question) {
+    if (!$by_question && !$this->is_practice) {
         $this->calcExcusals();
     }
     return $maxAscore;
@@ -2253,7 +2253,7 @@ class AssessRecord
    * 
    */
   public function calcExcusals() {
-      $endmsg = $assess_info->getSetting('endmsg');
+      $endmsg = $this->assess_info->getSetting('endmsg');
       if ($endmsg == '') {
           return;
       }
@@ -2265,7 +2265,7 @@ class AssessRecord
       $excusals = $endmsg['exc'];
       $toexcuse = [];
 
-      $qinfo = $assess_info->getAllQuestionPointsAndCats();
+      $qinfo = $this->assess_info->getAllQuestionPointsAndCats();
 
       for ($av = 0; $av < count($this->data['assess_versions']); $av++) {
         $curAver = &$this->data['assess_versions'][$av];
@@ -2278,7 +2278,7 @@ class AssessRecord
         }
         if (isset($catposs['whole'])) {
             $cattot['whole'] = $curAver['score'];
-            $catposs['whole'] = $assess_info->getSetting('points_possible');
+            $catposs['whole'] = $this->assess_info->getSetting('points_possible');
         }
         for ($qn = 0; $qn < count($curAver['questions']); $qn++) {
             $qid = $curAver['questions'][$qn]['question_versions'][0]['qid'];
@@ -2296,15 +2296,16 @@ class AssessRecord
         }
       }
       // possibly duplicates from the loop over
-      $toexcuse = array_unique($toexecuse);
+      $toexcuse = array_unique($toexcuse);
       if (!isset($this->data['excusals'])) {
         $this->data['excusals'] = [];
       }
-      $newex = array_diff($toexecuse, $this->data['excusals']);
+      $newex = array_diff($toexcuse, $this->data['excusals']);
       // record to record
       $this->data['excusals'] = array_merge($this->data['excusals'], $newex);
       // store new ones temporarily
-      $this->new_excusals = $newex;
+      // sometimes retotal is called twice; keep values if already set
+      $this->new_excusals = array_unique(array_merge($newex, $this->new_excusals));
 
       // record excusals in database
       $vals = [];
@@ -2312,10 +2313,27 @@ class AssessRecord
       foreach ($newex as $aid) {
           array_push($vals, $this->curUid, $cid, 'A', $aid);
       }
-      $ph = Sanitize::generateQueryPlaceholdersGrouped($vals, 4);
-      $query = "INSERT IGNORE INTO imas_excused (userid,courseid,type,typeid) VALUES $ph";
+      if (count($vals)>0) {
+        $ph = Sanitize::generateQueryPlaceholdersGrouped($vals, 4);
+        $query = "INSERT IGNORE INTO imas_excused (userid,courseid,type,typeid) VALUES $ph";
+        $stm = $this->DBH->prepare($query);
+        $stm->execute($vals);
+      } 
+  }
+
+  public function get_new_excused() {
+      if (empty($this->new_excusals)) {
+          return [];
+      }
+      $ph = Sanitize::generateQueryPlaceholders($this->new_excusals);
+      $query = "SELECT id,name FROM imas_assessments WHERE id IN ($ph) ORDER BY name";
       $stm = $this->DBH->prepare($query);
-      $stm->execute($vals); 
+      $stm->execute(array_values($this->new_excusals));
+      $out = [];
+      while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+          $out[$row['id']] = $row['name'];
+      }
+      return $out;
   }
 
   /**
