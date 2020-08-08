@@ -16,6 +16,11 @@ if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!
 	$coursetheme = $defaultcoursetheme;
 }
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['forms'])) {
+	require($CFG['hooks']['forms']);
+}
+
 require("includes/htmlutil.php");
 
 if (isset($_GET['greybox'])) {
@@ -131,6 +136,12 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Modify User Profile'),"</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('User Profile'),'</h1></div>';
+
+		//call hook, if defined
+		if (function_exists('chguserinfoExtras')) {
+			chguserinfoExtras($userid, $myrights, $groupid);
+		}
+
 		echo "<form id=\"pageform\" class=limitaftervalidate enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>',_('Profile Settings'),'</legend>';
 		echo "<span class=form><label for=\"firstname\">",_('Enter First Name'),":</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
