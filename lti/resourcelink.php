@@ -61,8 +61,8 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
           exit;
         }
       }
-    } else if (function_exists('ext_can_ext_handle_launch') && ext_can_ext_handle_launch($launch->get_target_link())) {
-      $link = ext_handle_launch($launch, $localcourse, $localuserid, $db);
+    } else if (function_exists('lti_can_ext_handle_launch') && lti_can_ext_handle_launch($launch->get_target_link())) {
+      $link = lti_handle_launch($launch, $localcourse, $localuserid, $db);
     } else {
       echo 'Unsupported link type';
       print_r($link);
@@ -137,13 +137,13 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       $GLOBALS['basesiteurl'],
       $localcourse->get_courseid()
     ));
-  } else if (function_exists('ext_can_handle_redirect') && ext_can_handle_redirect($link->get_placementtype())) {
+  } else if (function_exists('lti_can_handle_redirect') && lti_can_handle_redirect($link->get_placementtype())) {
     $_SESSION['ltiitemtype'] = $link->get_typenum();
     $_SESSION['ltiitemid'] = $link->get_typeid();
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
 
-    ext_redirect_launch($link);
+    lti_redirect_launch($link);
   } else {
     echo 'Unsupported placementtype';
     print_r($link);

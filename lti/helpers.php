@@ -78,8 +78,8 @@ function parse_target_link(string $targetlink, \IMSGlobal\LTI\Database $db): arr
   } else if (!empty($param['place_aid'])) {
     $refcid = $db->get_course_from_aid($param['place_aid']);
     $out = ['type'=>'aid', 'refaid'=>$param['place_aid'], 'refcid'=>$refcid];
-  } else if (function_exists('ext_parse_target_link')) {
-    $out = ext_parse_target_link($targetlink);
+  } else if (function_exists('lti_parse_target_link')) {
+    $out = lti_parse_target_link($targetlink);
   } else {
     $out = array();
   }

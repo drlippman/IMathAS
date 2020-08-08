@@ -18,8 +18,8 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
       echo _('No target user id provided');
       exit;
   }
-  if (empty($target) && function_exists('ext_can_handle_launch')) {
-    if (ext_can_handle_launch($launch->get_target_link())) {
+  if (empty($target) && function_exists('lti_can_handle_launch')) {
+    if (lti_can_handle_launch($launch->get_target_link())) {
       $target = ['type'=>'ext'];
     }
   }
@@ -78,13 +78,13 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
     }
   } else if ($link->get_placementtype() == 'course') {
    
-  } else if (function_exists('ext_redirect_submissionreview') && ext_is_reviewable($link->get_placementtype())) {
+  } else if (function_exists('lti_redirect_submissionreview') && lti_is_reviewable($link->get_placementtype())) {
     $_SESSION['ltiitemtype'] = $link->get_typenum();
     $_SESSION['ltiitemid'] = $link->get_typeid();
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
 
-    ext_redirect_submissionreview($link);
+    lti_redirect_submissionreview($link);
   } else {
     echo 'Unsupported placementtype';
     print_r($link);

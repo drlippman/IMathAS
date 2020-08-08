@@ -24,9 +24,6 @@ require_once __DIR__ . '/helpers.php';
 if (isset($GLOBALS['CFG']['hooks']['lti'])) {
   require_once($CFG['hooks']['lti']);
 }
-if (isset($CFG['hooks']['ltihome'])) {
-	require($CFG['hooks']['ltihome']);
-}
 
 $db = new Imathas_LTI_Database($DBH);
 $launch = LTI\LTI_Message_Launch::from_cache($_GET['launchid'], $db);
@@ -42,8 +39,8 @@ if (!empty($_POST['makelineitem'])) {
 	$iteminfo = false;
 	if ($link->get_placementtype() == 'assess') {
 		$iteminfo = $db->get_assess_info($link->get_typeid());
-	} else if (function_exists('ext_get_item_info')) {
-		$iteminfo = ext_get_item_info($link);
+	} else if (function_exists('lti_get_item_info')) {
+		$iteminfo = lti_get_item_info($link);
 	}
 	if ($iteminfo !== false) {
 		$result = $db->set_or_create_lineitem($launch, $link, $iteminfo, $localcourse);
@@ -194,11 +191,11 @@ if ($link->get_placementtype() == 'course') {
     echo '<br><a href="../course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a>';
     echo '</p>';
 
-} else if (function_exists('ext_can_handle_redirect') &&
-	ext_can_handle_redirect($link->get_placementtype()) &&
-	function_exists('ext_lti_home')
+} else if (function_exists('lti_can_handle_redirect') &&
+	lti_can_handle_redirect($link->get_placementtype()) &&
+	function_exists('lti_ltihome')
 ) {
-	ext_lti_home($link, $launch, $localcourse, $db);
+	lti_ltihome($link, $launch, $localcourse, $db);
 }
 if ($launch->has_nrps() && empty($localcourse->get_allow_direct_login())) {
 	echo '<p>'.sprintf(_('The LMS offers a roster service, which allows you to update your %s roster to include all students in the LMS.'),

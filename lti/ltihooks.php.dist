@@ -8,9 +8,9 @@
  * > 50 to avoid conflicts with the core system types
  * 
  * The keys should be the same placementtype strings you 
- * use below in ext_handle_launch
+ * use below in lti_handle_launch
  */
-function ext_get_types_as_num(): array {
+function lti_get_types_as_num(): array {
     return [
         'mytype' => 50
     ];
@@ -22,7 +22,7 @@ function ext_get_types_as_num(): array {
  * @param string  $targetlink  The target_link_uri for the launch
  * @return bool true if hooks can handle this launch uri
  */
-function ext_can_handle_launch(string $targetlink): bool {
+function lti_can_handle_launch(string $targetlink): bool {
 
 }
 
@@ -36,7 +36,7 @@ function ext_can_handle_launch(string $targetlink): bool {
  *   'refid'    The type id for the target item
  * 
  */
-function ext_parse_target_link(string $targetlink): array {
+function lti_parse_target_link(string $targetlink): array {
 
 }
 
@@ -46,11 +46,11 @@ function ext_parse_target_link(string $targetlink): array {
  * 
  * This function chould double-check the $targetinfo['type']
  * 
- * @param array $targetinfo    The output of ext_parse_target_link
+ * @param array $targetinfo    The output of lti_parse_target_link
  * @return array of courseid=>name.  Return an empty array if target
  *               isn't a supported type.
  */
-function ext_get_othercourses(array $targetinfo, int $userid): array {
+function lti_get_othercourses(array $targetinfo, int $userid): array {
     
     return array();
 }
@@ -64,7 +64,7 @@ function ext_get_othercourses(array $targetinfo, int $userid): array {
  * @param Database $db                  An instance of Database 
  * @return LTI_Placement
  */
-function ext_handle_launch(
+function lti_handle_launch(
     LTI_Message_Launch $launch,  
     LTI_Localcourse $localcourse,
     int $localuserid,
@@ -97,7 +97,7 @@ function ext_handle_launch(
     If the item has a grade record associated, you'll need to 
     set the lineitem.  If you have no grades, skip this step.
     */
-    $iteminfo = ext_get_item_info($link);
+    $iteminfo = lti_get_item_info($link);
     $db->set_or_create_lineitem($launch, $link, $iteminfo, $localcourse);
 
     return $link;
@@ -113,7 +113,7 @@ function ext_handle_launch(
  *   'startdate' // optionally, start date to assoc with lineitem
  *   'enddate'   // optionally, end date to assoc with lineitem
  */
-function ext_get_item_info(LTI_Placement $link): array {
+function lti_get_item_info(LTI_Placement $link): array {
 
 }
 
@@ -124,7 +124,7 @@ function ext_get_item_info(LTI_Placement $link): array {
  * @param string $placementtype   placementtype, as set in make_link_assoc call
  * @return bool  true if this placementtype can handle a submissionReview launch
  */
-function ext_is_reviewable(string $placementtype): bool {
+function lti_is_reviewable(string $placementtype): bool {
 
 }
 
@@ -134,10 +134,27 @@ function ext_is_reviewable(string $placementtype): bool {
  * @param LTI_Placement $link    The placement info 
  * @return void
  */
-function ext_redirect_submissionreview(LTI_Placement $link): void {
+function lti_redirect_submissionreview(LTI_Placement $link): void {
 
 }
 
+/** 
+ * Display the LTI Home page for an item 
+ *
+ * @param LTI_Placement $link
+ * @param LTI_Message_launch $launch
+ * @param LTI_Localcourse $localcourse
+ * @param Database $db
+ * @return void
+ */
+function lti_ltihome(
+    LTI_Placement $link, 
+    LTI_Message_launch $launch, 
+    LTI_Localcourse $localcourse, 
+    Database $db
+):void {
+
+}
 
 
 

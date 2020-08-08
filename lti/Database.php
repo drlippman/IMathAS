@@ -104,8 +104,8 @@ class Imathas_LTI_Database implements LTI\Database
     public function __construct(PDO $DBH)
     {
         $this->dbh = $DBH;
-        if (function_exists('ext_get_types_as_num')) {
-            $this->types_as_num = array_merge($this->types_as_num, ext_get_types_as_num());
+        if (function_exists('lti_get_types_as_num')) {
+            $this->types_as_num = array_merge($this->types_as_num, lti_get_types_as_num());
         }
     }
 
@@ -537,8 +537,8 @@ class Imathas_LTI_Database implements LTI\Database
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
                 $othercourses[$row[0]] = $row[1];
             }
-        } else if (function_exists('ext_get_othercourses')) {
-            $othercourses = ext_get_othercourses($target, $userid);
+        } else if (function_exists('lti_get_othercourses')) {
+            $othercourses = lti_get_othercourses($target, $userid);
         }
 
         if ($blockLTICopyOfCopies) {
@@ -868,7 +868,7 @@ class Imathas_LTI_Database implements LTI\Database
                 ->set_score_maximum($info['ptsposs'])
                 ->set_label($info['name']);
             if ($link->get_placementtype() == 'assess' ||
-                (function_exists('ext_is_reviewable') && ext_is_reviewable($link))
+                (function_exists('lti_is_reviewable') && lti_is_reviewable($link))
             ) {
                 $submission_review = LTI\LTI_Grade_Submission_Review::new ()
                     ->set_reviewable_status(["Submitted"]);
