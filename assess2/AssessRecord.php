@@ -2297,12 +2297,12 @@ class AssessRecord
       }
       // possibly duplicates from the loop over
       $toexcuse = array_unique($toexcuse);
-      if (!isset($this->data['excusals'])) {
-        $this->data['excusals'] = [];
+      if (!isset($this->data['excused'])) {
+        $this->data['excused'] = [];
       }
-      $newex = array_diff($toexcuse, $this->data['excusals']);
+      $newex = array_diff($toexcuse, $this->data['excused']);
       // record to record
-      $this->data['excusals'] = array_merge($this->data['excusals'], $newex);
+      $this->data['excused'] = array_merge($this->data['excused'], $newex);
       // store new ones temporarily
       // sometimes retotal is called twice; keep values if already set
       $this->new_excusals = array_unique(array_merge($newex, $this->new_excusals));
