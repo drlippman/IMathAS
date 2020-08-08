@@ -133,5 +133,10 @@ Include via `$CFG['hooks']['util/batchcreateinstr']`
 On creation of a new course:
 `onAddCourse(course ID, owner ID)`
 
+## forms
 
+Include via `$CFG['hooks']['forms']`
 
+Called before the userinfoprofile fieldset
+`chguserinfoExtras($userid, $myrights, $groupid)`
+Returns HTML to be placed above editable fieldsets (e.g., to display extra data about user account).
