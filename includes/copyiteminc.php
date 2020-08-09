@@ -23,6 +23,7 @@ $frubrictrack = array();
 $assessnewid = array();
 $exttooltrack = array();
 $itemtypemap = array();
+$autoexcusetrack = array();
 if (!isset($replacebyarr)) {
 	$replacebyarr = array();
 }
@@ -37,7 +38,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	global $DBH;
 	global $cid, $sourcecid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
-	global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti, $convertAssessVer;
+	global $posttoforumtrack, $forumtrack, $itemtypemap, $datesbylti, $convertAssessVer, $autoexcusetrack;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
 		$gbcats = array();
@@ -236,7 +237,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 			istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,
 			posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,
 			ansingb,defregens,defregenpenalty,ver,keepscore,overtime_grace,overtime_penalty,
-			showwork
+			showwork,autoexcuse
 			FROM imas_assessments WHERE id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$typeid));
@@ -293,7 +294,11 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		$reqscoreaid = $row['reqscoreaid'];
 		if ($cid != $sourcecid) { // if same course, can keep this
 			unset($row['reqscoreaid']);
-		}
+        }
+        $autoexcuse = $row['autoexcuse'];
+        if ($cid != $sourcecid) { // if same course, can keep this
+			unset($row['autoexcuse']);
+        }
 		$row['name'] .= $_POST['append'];
 
 		$row['courseid'] = $cid;
@@ -328,7 +333,10 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 		}
 		if ($_POST['ctc']!=$cid && $forumtopostto>0) {
 			$posttoforumtrack[$newtypeid] = $forumtopostto;
-		}
+        }
+        if ($autoexcuse !== null && $autoexcuse !== '' && $cid != $sourcecid) {
+            $autoexcusetrack[$newtypeid] = $autoexcuse;
+        }
 		$assessnewid[$typeid] = $newtypeid;
 		$thiswithdrawn = array();
 		$needToUpdatePtsPoss = false;
@@ -502,7 +510,8 @@ function copysub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 
 function doaftercopy($sourcecid, &$newitems) {
 	global $DBH;
-	global $cid,$reqscoretrack,$categoryassessmenttrack,$assessnewid,$forumtrack,$posttoforumtrack;
+    global $cid,$reqscoretrack,$categoryassessmenttrack,$assessnewid,$forumtrack;
+    global $posttoforumtrack,$autoexcusetrack,$outcomes;
 	if (intval($cid)==intval($sourcecid)) {
 		$samecourse = true;
 	} else {
@@ -533,7 +542,44 @@ function doaftercopy($sourcecid, &$newitems) {
 				$stmB->execute(array(':id'=>$newqid));
 			}
 		}
-	}
+    }
+    // update autoexcuse on copy; only happens on copy into new course
+    if (count($autoexcusetrack) > 0) {
+        $stmA = $DBH->prepare("UPDATE imas_assessments SET autoexcuse=:autoexcuse WHERE id=:id");
+        foreach ($autoexcusetrack as $newaid=>$autoexc) {
+            $catcnt = 1;
+            $autoexcuse = json_decode($autoexc, true);
+            foreach ($autoexcuse as $k=>$v) {
+                if (isset($assessnewid[$v['aid']])) {
+                    $autoexcuse[$k]['aid'] = $assessnewid[$v['aid']];
+                } else {
+                    unset($autoexcuse[$k]);
+                    continue;
+                }
+                if (is_numeric($v['cat'])) {  // an outcome
+                    if (isset($outcomes[$v['cat']])) {
+                        $autoexcuse[$k]['cat'] = $outcomes[$v['cat']];
+                    } else {
+                        $autoexcuse[$k]['cat'] = _('Category').' '.$catcnt;
+                        $cntcnt++;
+                    }
+                } else if (substr($v['cat'],0,4)=='AID-') {
+                    if (isset($assessnewid[substr($v['cat'],4)])) {
+                        $autoexcuse[$k]['cat'] = 'AID-' . $assessnewid[substr($v['cat'],4)];
+                    } else {
+                        $autoexcuse[$k]['cat'] = _('Category').' '.$catcnt;
+                        $cntcnt++;
+                    }
+                }
+            }
+            $autoexcuse = array_values($autoexcuse);
+            if (count($autoexcuse) > 0) {
+                $stmA->execute(array(':autoexcuse'=>json_encode($autoexcuse), ':id'=>$newaid));
+            } else {
+                $stmA->execute(array(':autoexcuse'=>null, ':id'=>$newaid));
+            }
+        }
+    }
 
 	if (count($posttoforumtrack)>0) {
 		$stmA = $DBH->prepare("UPDATE imas_assessments SET posttoforum=:posttoforum WHERE id=:id");
