@@ -55,8 +55,7 @@ if (isset($_POST['cat']) || isset($_POST['newcat'])) {
     $stm = $DBH->prepare($query);
     $stm->execute(array(json_encode($excusals), $aid, $cid));
 
-    $btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" .$btf. "&r=" . Sanitize::randomQueryStringParam());
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
     exit;
 }
 
@@ -97,7 +96,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         $categories[] = [
             'type'=>'O', 
             'cat'=>$row['category'], 
-            'name'=>$outcomesnames[$row['category']]
+            'name'=>$outcomenames[$row['category']]
         ];
     } else if (strncmp($row['category'],"AID-",4) == 0) {
         $categories[] = [
@@ -124,7 +123,7 @@ usort($categories, function($a,$b) {
 // figure out existing excusal cat names
 foreach ($excusals as $k=>$exc) {
     if (is_numeric($exc['cat'])) {
-        $excusals[$k]['name'] = $outcomesnames[$exc['cat']];
+        $excusals[$k]['name'] = $outcomenames[$exc['cat']];
     } else if (strncmp($exc['cat'],"AID-",4) == 0) {
         $excusals[$k]['name'] = $allassess[substr($exc['cat'],4)];
     } 
@@ -196,7 +195,6 @@ $(function() {
 <?php
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid=$aid\">"._('Add/Remove Questions')."</a> ";
-echo "&gt; <a href=\"categorize.php?cid=$cid&amp;aid=$aid\">"._('Categorize')."</a> ";
 echo "&gt; "._('Auto Excuse')."</div>";
 
 echo '<div class="pagetitle"><h1>' . _('Auto Excuse') . '</h1></div>';

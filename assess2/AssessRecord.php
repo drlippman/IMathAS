@@ -36,6 +36,7 @@ class AssessRecord
   private $status = 'no_record';
   private $inGb = false;
   private $teacherInGb = false;
+  private $teacherPreview = false;
   private $now = 0;
   private $need_to_record = false;
   private $penalties = array();
@@ -125,6 +126,14 @@ class AssessRecord
   public function setTeacherInGb($val) {
     $this->teacherInGb = $val;
     $this->inGb = $val;
+  }
+
+   /**
+   * Set if teacher in preview
+   * @param bool $val true if teacher/tutor
+   */
+  public function setIsTeacherPreview($val) {
+    $this->teacherPreview = $val;
   }
 
   /**
@@ -2312,7 +2321,7 @@ class AssessRecord
       foreach ($newex as $aid) {
           array_push($vals, $this->curUid, $cid, 'A', $aid);
       }
-      if (count($vals)>0) {
+      if (count($vals)>0 && !$this->teacherPreview) {
         $ph = Sanitize::generateQueryPlaceholdersGrouped($vals, 4);
         $query = "INSERT IGNORE INTO imas_excused (userid,courseid,type,typeid) VALUES $ph";
         $stm = $this->DBH->prepare($query);

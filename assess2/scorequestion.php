@@ -39,6 +39,9 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 } else {
   $uid = $userid;
 }
+// is teacher/tutor and not acting as student
+$isTeacherPreview = ($canViewAll && $uid == $userid);
+
 // if toscoreqn is not an array, make it into one
 if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $qns = array();
@@ -135,6 +138,9 @@ if ($in_practice) {
 }
 if ($preview_all) {
   $assess_record->setTeacherInGb(true); // enables answers showing
+}
+if ($isTeacherPreview) {
+    $assess_record->setIsTeacherPreview(true); // disables saving student-only data
 }
 
 // grab any assessment info fields that may have updated:

@@ -33,6 +33,8 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 } else {
   $uid = $userid;
 }
+// is teacher/tutor and not acting as student
+$isTeacherPreview = ($canViewAll && $uid == $userid);
 
 $now = time();
 
@@ -46,6 +48,10 @@ if ($isstudent) {
 // load user's assessment record - always operating on scored attempt here
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
+
+if ($isTeacherPreview) {
+    $assess_record->setIsTeacherPreview(true); // disables saving student-only data
+}
 
 // grab all questions settings
 $assess_info->loadQuestionSettings('all', false);
