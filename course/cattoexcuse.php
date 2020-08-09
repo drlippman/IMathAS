@@ -26,6 +26,12 @@ if ($row['submitby'] != 'by_assessment' || $row['ver'] < 2) {
     exit;
 }
 
+$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
+$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+$beentaken = ($stm->rowCount() > 0);
+
 if (isset($_POST['cat']) || isset($_POST['newcat'])) {
     $excusals = array();
     if (isset($_POST['sc'])) {
@@ -54,6 +60,12 @@ if (isset($_POST['cat']) || isset($_POST['newcat'])) {
     $query = 'UPDATE imas_assessments SET autoexcuse=? WHERE id=? AND courseid=?';
     $stm = $DBH->prepare($query);
     $stm->execute(array(json_encode($excusals), $aid, $cid));
+
+    if ($beentaken) {
+        // retotal student assessment records with changes, which will set new excusals
+        require_once('../assess2/AssessHelpers.php');
+        AssessHelpers::retotalAll($cid, $aid, false);
+    }
 
     header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
     exit;
@@ -202,7 +214,14 @@ echo "<form method=\"post\" action=\"cattoexcuse.php?cid=$cid&amp;aid=$aid\" />"
 echo '<p>'._('This page allows you to automatically excuse students from other assessments based on their scores on this assessment.');
 echo ' '._('This can be based on their overall score, or on their score with question categories.').'</p>';
 
+if ($beentaken) {
+    echo '<p><strong>'._('Note').'</strong>:';
+    echo _('Students have already taken this assessment. Changes to rules will apply retroactively, but only to excuse new assessments; existing excused assignments will not be un-excused.');
+    echo '</p>';
+}
+
 echo '<h2>Rules:</h2>';
+
 echo '<ul id="rules">';
 
 foreach ($excusals as $k=>$exc) {
