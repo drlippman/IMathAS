@@ -1219,7 +1219,7 @@ if ($overwriteBody==1) {
     echo '</span><span class="column">';
     echo '<a href="assessendmsg.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define End Messages').'</a>';
     if ($aver > 1 && $submitby == 'by_assessment') {
-        echo '<br><a href="cattoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define Auto-Excuse').'</a>';
+        echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define Auto-Excuse').'</a>';
     }
     echo '</span><br class=clear /></div>';
 	if ($beentaken) {
