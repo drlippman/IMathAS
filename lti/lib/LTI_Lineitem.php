@@ -9,7 +9,7 @@ class LTI_Lineitem {
     private $tag;
     private $start_date_time;
     private $end_date_time;
-    private $submission_review;
+    private $submission_review = null;
 
     public function __construct(array $lineitem = null) {
         if (empty($lineitem)) {
@@ -107,7 +107,7 @@ class LTI_Lineitem {
         return $this->submission_review;
     }
 
-    public function set_submission_review(LTI_Grade_Submission_review $value) {
+    public function set_submission_review(LTI_Grade_Submission_Review $value) {
         $this->submission_review = $value;
         return $this;
     }
@@ -123,7 +123,9 @@ class LTI_Lineitem {
           "tag" => $this->tag,
           "startDateTime" => $this->start_date_time,
           "endDateTime" => $this->end_date_time,
-          "submissionReview" => $this->submission_review->getObject()
+          "submissionReview" => ($this->submission_review === null) ? 
+            null :
+            $this->submission_review->getObject()
       ]);
     }
 

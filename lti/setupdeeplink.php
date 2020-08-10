@@ -51,6 +51,10 @@ if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
 if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
   $lineitem->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
 }
+$submission_review = LTI\LTI_Grade_Submission_Review::new ()
+    ->set_reviewable_status(["Submitted"]);
+$lineitem->set_submission_review($submission_review);
+
 $resource = LTI\LTI_Deep_Link_Resource::new()
     ->set_url($basesiteurl . '/lti/launch.php?refaid='.$aid.'&refcid='.$assessinfo['courseid'])
     ->set_title($assessinfo['name'])
