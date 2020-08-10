@@ -349,6 +349,9 @@ class LTI_Message_Launch {
 
     private function get_public_key() {
       $key_set_url = $this->registration->get_key_set_url();
+      if (empty($this->jwt['header']['kid'])) {
+        throw new LTI_Exception("Missing key id", 1);
+      }
       $kid = $this->jwt['header']['kid'];
       $key = $this->db->get_key($key_set_url, $kid);
       if ($key !== null) {
