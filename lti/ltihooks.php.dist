@@ -138,6 +138,46 @@ function lti_redirect_submissionreview(LTI_Placement $link): void {
 
 }
 
+/**
+ * Gets item link options for the deeplinking dialog 
+ *
+ * This function should directly echo <option> strings for 
+ *  the deep linking select.  The value should have form "type-typeid"
+ *  to distinguish it from the assessment options.
+ * 
+ * @param LTI_Localcourse $localcourse  Course info object
+ * @return void
+ */
+function lti_deeplink_options(LTI_Localcourse $localcourse) {
+
+}
+
+/** 
+ * Checks if hooks can handle generating a deep link response for a type 
+ *
+ * @param string type  The "type" from the deeplink options generated above 
+ * @return bool
+ */
+ function lti_can_handle_deeplink(string $type) {
+
+ }
+
+/**
+ * Generates deep link response
+ *
+ * @param string type  The "type" from the deeplink options generated above
+ * @param string typeid  The "typeid" from the deeplink options generated above
+ * @return LTI_Deep_Link_Resource
+ */
+ function lti_get_deeplink_resource(string $type, string $typeid) {
+     /*
+      If this type generates grades, be sure to generate and set a lineitem 
+      on the LTI_Deep_Link_Resource, and if it supports submission review, 
+      attach a submission review to the lineitem
+     */
+ }
+ 
+
 /** 
  * Display the LTI Home page for an item 
  *

@@ -31,40 +31,51 @@ $localcourse = $db->get_local_course($contextid, $platform_id, $launch->get_migr
 
 $deeplink = $launch->get_deep_link();
 
-$aid = intval($_POST['aid']);
-$stm = $DBH->prepare('SELECT courseid,name,startdate,enddate,ptsposs,ver,date_by_lti FROM imas_assessments WHERE id=?');
-$stm->execute(array($aid));
-$assessinfo = $stm->fetch(PDO::FETCH_ASSOC);
-if ($assessinfo['courseid'] != $localcourse->get_courseid()) {
-  echo 'Invalid assessment';
-  exit;
+list($type,$typeid) = explode('-',$_POST['deeplinktarget']);
+if (empty($typeid)) {
+    echo 'Error: invalid selection';
+    exit;
 }
-$itemtype = 0; //assessment
+if ($type == 'assess') {
+    $aid = intval($typeid);
+    $stm = $DBH->prepare('SELECT courseid,name,startdate,enddate,ptsposs,ver,date_by_lti FROM imas_assessments WHERE id=?');
+    $stm->execute(array($aid));
+    $assessinfo = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($assessinfo['courseid'] != $localcourse->get_courseid()) {
+    echo 'Invalid assessment';
+    exit;
+    }
+    $itemtype = 0; //assessment
 
-$lineitem = LTI\LTI_Lineitem::new()
-    ->set_tag($itemtype.'-'.$aid)
-    ->set_score_maximum($assessinfo['ptsposs'])
-    ->set_label($assessinfo['name']);
-if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
-  $lineitem->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
-}
-if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
-  $lineitem->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
-}
-$submission_review = LTI\LTI_Grade_Submission_Review::new ()
-    ->set_reviewable_status(["Submitted"]);
-$lineitem->set_submission_review($submission_review);
+    $lineitem = LTI\LTI_Lineitem::new()
+        ->set_tag($itemtype.'-'.$aid)
+        ->set_score_maximum($assessinfo['ptsposs'])
+        ->set_label($assessinfo['name']);
+    if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
+    $lineitem->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
+    }
+    if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
+    $lineitem->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
+    }
+    $submission_review = LTI\LTI_Grade_Submission_Review::new ()
+        ->set_reviewable_status(["Submitted"]);
+    $lineitem->set_submission_review($submission_review);
 
-$resource = LTI\LTI_Deep_Link_Resource::new()
-    ->set_url($basesiteurl . '/lti/launch.php?refaid='.$aid.'&refcid='.$assessinfo['courseid'])
-    ->set_title($assessinfo['name'])
-    ->set_lineitem($lineitem);
+    $resource = LTI\LTI_Deep_Link_Resource::new()
+        ->set_url($basesiteurl . '/lti/launch.php?refaid='.$aid.'&refcid='.$assessinfo['courseid'])
+        ->set_title($assessinfo['name'])
+        ->set_lineitem($lineitem);
 
-if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
-  $resource->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
+    if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['startdate'])) {
+    $resource->set_start_date_time(date(DATE_ATOM, $assessinfo['startdate']));
+    }
+    if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
+    $resource->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
+    }
+} else if (function_exists('lti_can_handle_deeplink') && lti_can_handle_deeplink($type)) {
+    $resource = lti_get_deeplink_resource($type,$typeid);
+} else {
+    echo 'Error - cannot handle this target type';
+    exit;
 }
-if (empty($assessinfo['date_by_lti']) && !empty($assessinfo['enddate']) && $assessinfo['enddate'] < 2000000000) {
-  $resource->set_end_date_time(date(DATE_ATOM, $assessinfo['enddate']));
-}
-
 $deeplink->output_response_form([$resource]);
