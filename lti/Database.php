@@ -115,10 +115,18 @@ class Imathas_LTI_Database implements LTI\Database
      * @param  string           $client_id
      * @return LTI_Registration
      */
-    public function find_registration_by_issuer(string $iss, string $client_id): LTI\LTI_Registration
+    public function find_registration_by_issuer(string $iss, ?string $client_id): LTI\LTI_Registration
     {
-        $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=? AND client_id=?');
-        $stm->execute(array($iss, $client_id));
+        if (empty($client_id)) {
+            $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=?');
+            $stm->execute(array($iss));
+            if ($stm->rowCount() > 1) {
+                throw new OIDC_Exception("Multiple registrations found for this issuer. Platform must provide client_id on launch.", 1);
+            }
+        } else {
+            $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=? AND client_id=?');
+            $stm->execute(array($iss, $client_id));
+        }
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row === false || $row === null) {
             return false;
