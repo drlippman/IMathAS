@@ -478,6 +478,10 @@ class LTI_Message_Launch {
     }
 
     private function validate_deployment() {
+        if (empty($this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id'])) {
+            // deployment not provided.
+            throw new LTI_Exception("Missing deployment_id", 1);
+        }
         // Find deployment.
         $deployment = $this->db->find_deployment($this->registration->get_id(),
           $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/deployment_id']);
