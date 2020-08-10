@@ -8,3 +8,9 @@ foreach (glob(__DIR__ . "/*.php") as $filename) {
 }
 
 Firebase\JWT\JWT::$leeway = 5;
+
+function exception_handler($exception) {
+    echo "Error: " , $exception->getMessage(), "\n";
+}
+  
+set_exception_handler('exception_handler');
