@@ -29,21 +29,23 @@ class AssessHelpers
   		require_once('../assess2/AssessRecord.php');
   		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
   		$assess_info->loadQuestionSettings();
-      $submitby = $assess_info->getSetting('submitby');
+        $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
   			$assess_record = new AssessRecord($DBH, $assess_info, false);
   			$assess_record->setRecord($row);
   			$assess_record->reTotalAssess();
-  			$assess_record->saveRecord();
-        // update LTI grade
-        $lti_sourcedid = $assess_record->getLTIsourcedId();
-        if (strlen($lti_sourcedid) > 1 && ($submitby == 'by_question' ||
-          ($assess_record->getStatus()&64)==64)
-        ) {
-          $gbscore = $assess_record->getGbScore();
-          $aidposs = $assess_info->getSetting('points_possible');
-          calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
-        }
+            $assess_record->saveRecord();
+            if ($updateLTI) {
+                // update LTI grade
+                $lti_sourcedid = $assess_record->getLTIsourcedId();
+                if (strlen($lti_sourcedid) > 1 && ($submitby == 'by_question' ||
+                    ($assess_record->getStatus()&64)==64)
+                ) {
+                    $gbscore = $assess_record->getGbScore();
+                    $aidposs = $assess_info->getSetting('points_possible');
+                    calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
+                }
+            }
   		}
   	}
   	$DBH->commit();

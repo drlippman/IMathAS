@@ -87,6 +87,23 @@
         >
           {{ $t('gradebook.clear_all') }}
         </button>
+        <button
+          v-if="aData.hasOwnProperty('excused')"
+          type="button"
+          class="slim"
+          @click="showExcused = !showExcused"
+        >
+          {{ $t('gradebook.' + (showExcused ? 'hide' : 'show') + '_excused') }}
+        </button>
+      </div>
+
+      <div v-if="showExcused" class="introtext">
+        {{ $t('gradebook.excused_list') }}
+        <ul>
+          <li v-for="name in aData.excused" :key="name">
+            {{ name }}
+          </li>
+        </ul>
       </div>
 
       <div v-if="canEdit && aData.has_active_attempt">
@@ -127,6 +144,20 @@
               {{ $t('lti.use_latepass') }}
             </button>
           </div>
+        </div>
+
+        <div v-if="curEndmsg !== ''">
+          <button
+            type="button"
+            @click = "showEndmsg = !showEndmsg"
+          >
+            {{ $t('gradebook.' + (showEndmsg ? 'hide' : 'show') + '_endmsg') }}
+          </button>
+          <div
+            class="introtext"
+            v-if="showEndmsg"
+            v-html="curEndmsg"
+          />
         </div>
 
         <div v-if="canEdit">
@@ -307,7 +338,9 @@ export default {
       assessOverride: '',
       hidePerfect: false,
       hideCorrect: false,
-      hideUnanswered: false
+      hideUnanswered: false,
+      showEndmsg: false,
+      showExcused: false
     };
   },
   computed: {
@@ -377,6 +410,9 @@ export default {
         out[qn] = this.curQuestions[qn][this.curQver[qn]];
       }
       return out;
+    },
+    curEndmsg () {
+      return this.aData.assess_versions[store.curAver].endmsg;
     },
     showCategories () {
       let hascat = false;

@@ -252,6 +252,18 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	return $itemshowdata;
 }
 
+function loadExcusals($cid, $userid) {
+    global $DBH;
+    $excusals = array();
+    $query = 'SELECT type,typeid FROM imas_excused WHERE courseid=? AND userid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($cid, $userid));
+    while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $excusals[$line['type'].$line['typeid']] = 1;
+    }
+    return $excusals;
+}
+
 function loadExceptions($cid, $userid) {
 	global $DBH;
 

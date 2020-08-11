@@ -201,7 +201,8 @@
     "retake_penalty": "{n}% retake penalty applied",
     "late_penalty": "{n}% late work penalty applied",
     "scorelist": "Score List",
-    "reshowquestions": "Review Questions"
+    "reshowquestions": "Review Questions",
+    "new_excused": "Based on your results in this assessment, the following assessments have been excused:"
   },
   "scorelist": {
     "question": "Question",
@@ -422,7 +423,12 @@
     "latepass_blocked_practice": "Use of a LatePass is currently blocked because the student viewed the assessment in practice mode.",
     "clear_latepass_block": "Clear Block",
     "showwork": "View Work",
-    "hidework": "Hide Work"
+    "hidework": "Hide Work",
+    "show_excused": "Show Auto-Excused",
+    "hide_excused": "Hide Auto-Excused",
+    "excused_list": "Based on the results of this assessment, the following assessments have been excused:",
+    "show_endmsg": "Show End Message",
+    "hide_endmsg": "Hide End Message"
   },
   "work": {
     "add": "Add Work",
