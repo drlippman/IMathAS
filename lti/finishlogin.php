@@ -60,7 +60,7 @@ if ($localuserid === false) {
     }
   } else if (!empty($_POST['SID']) && (
     ($role=='Learner' && !empty($localcourse->get_allow_direct_login())) ||
-    ($role=='Instructor' && !empty($GLOBALS['lti']['allow_instr_create']))
+    ($role=='Instructor' && !empty($GLOBALS['CFG']['LTI']['allow_instr_create']))
   )) {
     // create new account
     require_once(__DIR__.'/../includes/newusercommon.php');
