@@ -15,8 +15,8 @@ if (!isset($_POST['launchid'])) {
   echo 'Error - missing launch id';
   exit;
 }
-if (empty($_POST['aid'])) {
-  echo 'No assessment selected';
+if (empty($_POST['deeplinktarget'])) {
+  echo 'No item selected';
   exit;
 }
 $db = new Imathas_LTI_Database($DBH);
