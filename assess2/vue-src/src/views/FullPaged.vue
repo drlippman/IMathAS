@@ -1,8 +1,17 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header />
     <full-paged-nav :page="page" />
-    <div class="scrollpane" role="region" :aria-label="$t('regions.questions')">
+    <div
+      class="scrollpane"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.questions')"
+    >
       <intro-text
         :active = "page === -1 && intro !== ''"
         :html = "intro"

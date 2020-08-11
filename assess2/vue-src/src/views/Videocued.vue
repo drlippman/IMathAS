@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header></assess-header>
     <videocued-nav
       :cue="cue"
@@ -13,7 +16,13 @@
         @jumpto="jumpTo"
       />
     </videocued-nav>
-    <div class="scrollpane" role="region" :aria-label="$t('regions.q_and_vid')">
+    <div
+      class="scrollpane"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.q_and_vid')"
+    >
       <intro-text
         :active = "cue == -1"
         :html = "intro"

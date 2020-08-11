@@ -251,7 +251,7 @@ function submitlimiter(e) {
 function setupFormLimiters() {
 	var el = document.getElementsByTagName("form");
 	for (var i=0;i<el.length;i++) {
-		if (typeof el[i].onsubmit != 'function' && el[i].className!="nolimit" && el[i].className!="limitaftervalidate") {
+		if (typeof el[i].onsubmit != 'function' && !el[i].className.match(/(nolimit|limitaftervalidate)/)) {
 			$(el[i]).on('submit',submitlimiter);
 		}
 	}

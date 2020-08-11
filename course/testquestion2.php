@@ -22,7 +22,31 @@ if ($myrights<20) {
 	$body = _("You need to log in as a teacher to access this page");
 } else {
 	//data manipulation here
-	$useeditor = 1;
+    $useeditor = 1;
+    
+    if (!empty($_POST['dellibitems']) && $myrights == 100) {
+        $libid = $_POST['libid'];
+        $uid = $_POST['uid'];
+        $query = 'UPDATE imas_library_items SET deleted=1,lastmoddate=? 
+            WHERE libid=? AND ownerid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(time(), $libid, $uid));
+        
+        //now, resolve any unassigned issues
+        //first, try to undelete the unassigned library item for any question with no undeleted library items
+        $query = "UPDATE imas_library_items AS ili JOIN (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ON ili.qsetid=tofix.qsetid ";
+        $query .= "JOIN imas_questionset AS iq ON ili.qsetid=iq.id ";
+        $query .= "SET ili.deleted=0 WHERE ili.libid=0 AND iq.deleted=0";
+        $stm = $DBH->query($query);
+        
+        //if any still have no undeleted library items, then they must not have an unassigned entry to undelete, so add it
+        $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid,junkflag,deleted,lastmoddate) ";
+        $query .= "(SELECT 0,ili.qsetid,iq.ownerid,0,0,iq.lastmoddate FROM imas_library_items AS ili JOIN imas_questionset AS iq ON iq.id=ili.qsetid WHERE iq.deleted=0 GROUP BY ili.qsetid HAVING min(ili.deleted)=1)";
+        $stm = $DBH->query($query);
+    
+        echo 'OK';
+        exit;
+    }
 
 	if (isset($_GET['onlychk']) && $_GET['onlychk']==1) {
 		$onlychk = 1;
@@ -53,7 +77,8 @@ if ($myrights<20) {
 
   $a2 = new AssessStandalone($DBH);
   $a2->setQuestionData($line['id'], $line);
-  $hasSeqParts = preg_match('~(<p[^>]*>|\\n\s*\\n)\s*///+\s*(</p[^>]*>|\\n\s*\\n)~', $line['qtext']);
+
+  $hasSeqParts = preg_match('~(<p[^>]*>(<[^>]*>)*|\\n\s*\\n|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|\\n\s*\\n|<br\s*/?><br\s*/?>)~', $line['qtext']);
 
   $qn = 27;  //question number to use during testing
   if (isset($_POST['state'])) {
@@ -132,7 +157,7 @@ if ($myrights<20) {
 	} else {
 		$eqnhelper = 4;
 	}
-	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
+	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName,imas_libraries.id,imas_users.id FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
 	$resultLibNames->execute(array(':qsetid'=>$qsetid));
 }
 
@@ -156,7 +181,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
-  $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=052920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=072520" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
@@ -172,6 +197,14 @@ $placeinhead .= '<script>
   }
   function showPartSteps(seed) {
     location.href = location.href.replace(/&seed=\w+/g,"").replace(/&showallparts=\w+/,"") + "&seed=" + seed;
+  }
+  function dellibitems(libid,uid,el) {
+      $.post({
+          url: window.location.href,
+          data: {dellibitems: 1, libid: libid, uid: uid}
+      }).done(function(msg) {
+          $(el).parent().slideUp();
+      });
   }
   </script>';
 require("../header.php");
@@ -336,7 +369,7 @@ if ($overwriteBody==1) {
     }
     echo '</ul>';
   }
-  echo '<div questionpane">';
+  echo '<div class="questionpane">';
   echo '<div class="question" id="questionwrap'.$qn.'">';
   echo $disp['html'];
   echo '</div></div>';
@@ -417,7 +450,11 @@ if ($overwriteBody==1) {
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
 		if ($myrights==100) {
-			printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+            printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+            echo ' <a class="small" href="#" onclick="dellibitems('.Sanitize::onlyInt($row[3]).',';
+            echo Sanitize::onlyInt($row[4]).',this);return false;">';
+            echo _('Remove all questions in this library added by this person');
+            echo '</a>';
 		}
 		echo '</li>';
 	}

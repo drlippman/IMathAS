@@ -18,6 +18,8 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#Nplus1quartile">Nplus1quartile</a></li>
 <li><a href="#allquartile">allquartile</a></li>
 <li><a href="#median">median</a></li>
+<li><a href="#modes">modes</a></li>
+<li><a href="#forceonemode">forceonemode</a></li>
 <li><a href="#freqdist">freqdist</a></li>
 <li><a href="#frequency">frequency</a></li>
 <li><a href="#countif">countif</a></li>
@@ -115,6 +117,16 @@ allquartile(array,quartile)
 <BR><h3><a name="median">median</a></h3>
 median(array)
 <BR>returns the median of an array of numbers
+<BR><h3><a name="modes">modes</a></h3>
+modes(array)
+<br>Returns the mode or modes of the data array as a comma-separated list.
+If all the values have the same frequency it returns DNE.
+<BR><h3><a name="forceonemode">forceonemode</a></h3>
+forceonemode(array)
+<br>Returns the mode of the data array.  If the data does not have one unique
+mode, the data array will be altered to only have one mode.  Because this
+function can alter the given array, be sure to call it before any functions that
+use the array.
 <BR><h3><a name="freqdist">freqdist</a></h3>
 freqdist(array,label,start,classwidth)
 <BR>display macro.  Returns an HTML table that is a frequency distribution of

@@ -9,6 +9,7 @@
   "next": "Next",
   "previous": "Previous",
   "question_n": "Question {n}",
+  "jumptocontent": "Skip Navigation",
   "launch": {
     "continue_assess": "Resume",
     "retake_assess": "Retake",

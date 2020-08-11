@@ -70,7 +70,7 @@ These are all added to the `config.php` by the install script.
 
 Many system defaults can be adjusted using config changes.
 
-- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options.
+- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options. Setting $CFG['AMS']['caltag'] = 'use_name' causes assessment names to appear in the calendar by default.
 - Gradebook settings.  Most defaults can be defined.  For example, `$CFG['GBS']['defgbmode']` allows you to define the default gradebook mode.  See `/course/gbsettings.php` for all options.
 - Forum settings.  A few defaults can be defined.  See `/course/addforum.php` for all options.
 - Course settings.  Most default can be defined, and most can be forced to a value.  For example, `$CFG['CPS']['theme'] = array("modern.css",1);` sets the default theme but allows the user to change it.  Using `0` instead of `1` in the second position would set the default and not allow the user to change it.  See `/admin/forms.php` for all options.
@@ -179,6 +179,16 @@ If you wish to enable users to request browser push notifications (does not work
 
 The student side of the system is pretty well set up for i18n, but the instructor side is  not yet.  Currently the only translation pack available is `de` (German).  See `/i18n/translating.md` for more information about generating translations.  To enable a translation:
 - `$CFG['locale']`: Set this to the desired language code, like `de`
+
+### IPEDS / NCES 
+
+The system can create associations with IPEDS/NCES records. For this, you will need to manually 
+[populate the `imas_ipeds` table](https://github.com/drlippman/IMathAS-Extras/blob/master/ipeds/ipeds.md). 
+- `$CFG['use_ipeds']`: set to true to enable UI features for editing associations.
+
+Look to `newinstructor-ipeds.php.dist` for an example of how to collect ipeds data during 
+account request.  The account approval process will auto-create group associations when 
+account requests are collected with this data.
 
 ### Development
 - `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.

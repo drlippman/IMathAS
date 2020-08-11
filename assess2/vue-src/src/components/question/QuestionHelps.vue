@@ -6,11 +6,16 @@
     </span>
     <ul class="helplist" :aria-labelledby="'qhelp' + qn">
       <li v-for="(qHelp,idx) in qHelps" :key="idx">
-        <a href="#" @click.prevent="loadHelp(qHelp)">
-          <icons :name="qHelp.icon" alt=""/>
-          {{ qHelp.title }}
-          <span class="sr-only"> {{ qHelp.cnt }}</span>
-        </a>
+        <tooltip-span :tip="qHelp.descr">
+          <a href="#" @click.prevent="loadHelp(qHelp)">
+            <icons :name="qHelp.icon" alt=""/>
+            {{ qHelp.title }}
+            <span class="sr-only"> {{ qHelp.cnt }}</span>
+            <span v-if="qHelp.descr" class="sr-only">
+              {{qHelp.descr}}
+            </span>
+          </a>
+        </tooltip-span>
       </li>
       <li v-if="showMessage">
         <a :href="messageHref" target="help">
@@ -30,13 +35,15 @@
 
 <script>
 import Icons from '@/components/widgets/Icons.vue';
+import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 import { store } from '../../basicstore';
 
 export default {
   name: 'QuestionHelps',
   props: ['qn'],
   components: {
-    Icons
+    Icons,
+    TooltipSpan
   },
   computed: {
     showMessage () {
