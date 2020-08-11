@@ -103,6 +103,9 @@ $query = "SELECT DISTINCT category FROM imas_questions WHERE assessmentid=:aid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':aid'=>$aid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['category'] == 0) {
+        continue;
+    }
     if (is_numeric($row['category'])) {
         //outcome
         $categories[] = [
@@ -189,7 +192,7 @@ $(function() {
             }).attr('size',2))
             .append('%');
         if (newcat=='whole') {
-            li.append(' <?php echo _('on the whole assessment');?> ');
+            li.append(' <strong><?php echo _('on the whole assessment');?></strong> ');
         } else {
             li.append(' <?php echo _('on category');?> <strong>'+newcatname+'</strong> ');
         }
@@ -210,6 +213,11 @@ echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid=$aid\">"._('Add/Remove Qu
 echo "&gt; "._('Auto Excuse')."</div>";
 
 echo '<div class="pagetitle"><h1>' . _('Auto Excuse') . '</h1></div>';
+
+echo '<div class="cpmid">';
+echo '<a href="categorize.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Categorize Questions').'</a>';
+echo '</div>';
+
 echo "<form method=\"post\" action=\"autoexcuse.php?cid=$cid&amp;aid=$aid\" />";
 echo '<p>'._('This page allows you to automatically excuse students from other assessments based on their scores on this assessment.');
 echo ' '._('This can be based on their overall score, or on their score with question categories.').'</p>';
