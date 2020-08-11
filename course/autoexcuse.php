@@ -220,10 +220,11 @@ echo '</div>';
 
 echo "<form method=\"post\" action=\"autoexcuse.php?cid=$cid&amp;aid=$aid\" />";
 echo '<p>'._('This page allows you to automatically excuse students from other assessments based on their scores on this assessment.');
-echo ' '._('This can be based on their overall score, or on their score with question categories.').'</p>';
+echo ' '._('This can be based on their overall score, or on their score with question categories.');
+echo ' '._('This feature will not work with LMS integration.').'</p>';
 
 if ($beentaken) {
-    echo '<p><strong>'._('Note').'</strong>:';
+    echo '<p><strong>'._('Note').'</strong>: ';
     echo _('Students have already taken this assessment. Changes to rules will apply retroactively, but only to excuse new assessments; existing excused assignments will not be un-excused.');
     echo '</p>';
 }
