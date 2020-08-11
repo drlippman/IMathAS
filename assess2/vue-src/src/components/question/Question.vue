@@ -4,10 +4,22 @@
       {{ $t('loading') }}
     </div>
     <score-result
-      v-if = "showScore"
+      v-if = "showScore && showResults"
       :qdata = "questionData"
       :qn = "qn"
     />
+    <div v-else-if = "showScore && questionData.canregen"
+      class="scoreresult neutral"
+      tabindex = "-1"
+    >
+      <button
+        type = "button"
+        @click = "trySimilar"
+      >
+        <icons name="retake" alt="" />
+        {{ $t('scoreresult.trysimilar') }}
+      </button>
+    </div>
     <p
       v-if="questionData.withdrawn !== 0"
       class="noticetext"
@@ -172,11 +184,13 @@ export default {
         (this.questionData.hasOwnProperty('score') ||
          this.questionData.status === 'attempted'
         ) &&
-        store.assessInfo.show_results &&
         (this.questionData.try > 0 ||
           this.questionData.hasOwnProperty('tries_remaining_range')) &&
         this.questionData.withdrawn === 0
       );
+    },
+    showResults () {
+      return store.assessInfo.show_results;
     },
     submitLabel () {
       let label = 'question.';
@@ -383,6 +397,9 @@ export default {
     workFocused () {
       actions.clearAutosaveTimer();
       this.lastWorkVal = this.work;
+    },
+    trySimilar () {
+      actions.loadQuestion(this.qn, true);
     }
   },
   updated () {

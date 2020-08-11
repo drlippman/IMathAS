@@ -1113,8 +1113,14 @@ switch($_POST['action']) {
 		$stm = $DBH->prepare('UPDATE imas_users SET groupid=? WHERE groupid=?');
 		$stm->execute(array($newgroup, $oldgroup));
 		$stm = $DBH->prepare("DELETE FROM imas_groups WHERE id=:id");
-		$stm->execute(array(':id'=>$oldgroup));
-		break;
+        $stm->execute(array(':id'=>$oldgroup));
+        // move over ipeds, skipping over duplicates
+        $stm = $DBH->prepare('UPDATE IGNORE imas_ipeds_group SET groupid=? WHERE groupid=?');
+        $stm->execute(array($newgroup, $oldgroup));
+        // if update failed, is a duplicate; delete them
+        $stm = $DBH->prepare('DELETE FROM imas_ipeds_group WHERE groupid=?');
+        $stm->execute(array($oldgroup));
+  		break;
 	case "delgroup":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$stm = $DBH->prepare("DELETE FROM imas_groups WHERE id=:id");
