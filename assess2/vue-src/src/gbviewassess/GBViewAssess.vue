@@ -105,6 +105,7 @@
         <div>
           {{ scoreCalc }}
           <gb-assess-select
+            v-if = "viewFull || aData.submitby === 'by_assessment'"
             :versions = "aData.assess_versions"
             :submitby = "aData.submitby"
             :haspractice = "aData.has_practice"
@@ -215,7 +216,7 @@
         </div>
         <gb-feedback
           qn="gen"
-          :show="true"
+          :show="viewFull"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
