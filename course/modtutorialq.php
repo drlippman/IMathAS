@@ -73,22 +73,25 @@ if (isset($_POST['text'])) {
 			$answer[$n] = $_POST['ans'.$n];
 		} else if ($qtypes[$n] == 'number') {
 			$partialans[$n] = array();
-			$qtol[$n] = (($_POST['qtol'.$n]=='abs')?'|':'') . $_POST['tol'.$n];
+			$qtoltype[$n] = $_POST['qtol'.$n];
+			$qtol[$n] = $_POST['tol'.$n];
 			$feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
 			$answer[$n] = $_POST['txt'.$n.'-'.$_POST['ans'.$n]];
 			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
 			$answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
 		} else if ($qtypes[$n] == 'calculated') {
 			$partialans[$n] = array();
-			$qtol[$n] = (($_POST['qtol'.$n]=='abs')?'|':'') . $_POST['tol'.$n];
+			$qtoltype[$n] = $_POST['calcqtol'.$n];
+			$qtol[$n] = $_POST['calctol'.$n];
 			$feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
 			$answer[$n] = '"'.$_POST['txt'.$n.'-'.$_POST['ans'.$n]].'"';
 			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
-			$answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
+			$answerboxsize[$n] = intval($_POST['calcboxsize'.$n]);
 			$answerformat[$n] = $_POST['answerformat'.$n].(trim($_POST['answerformat'.$n])!=''?",":"")."noval";
 		} else if ($qtypes[$n] == 'numfunc') {
 			$partialans[$n] = array();
-			$qtol[$n] = (($_POST['funcqtol'.$n]=='abs')?'|':'') . $_POST['functol'.$n];
+			$qtoltype[$n] = $_POST['funcqtol'.$n];
+			$qtol[$n] = $_POST['functol'.$n];
 			$feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
 			$answer[$n] = '"'.$_POST['txt'.$n.'-'.$_POST['ans'.$n]].'"';
 			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
@@ -170,7 +173,7 @@ if (isset($_POST['text'])) {
 		} else if ($qtypes[0]=='number' || $qtypes[0]=='calculated' || $qtypes[0] == 'numfunc') {
 			$code .= '$feedbacktxtdef = "'.escstring($feedbacktxtdef[0]).'"'."\n";
 			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
-			$code .= (($_POST['qtol0']=='abs')?'$abstolerance':'$reltolerance').' = '.$_POST['tol0']."\n";
+			$code .= (($qtoltype[0]=='abs')?'$abstolerance':'$reltolerance').' = '.$qtol[0]."\n";
 			if ($qtypes[0] == 'numfunc') {
 				$code .= '$variables = "'.$variables[0].'"'."\n";
 				$code .= '$requiretimes = ""'."\n";
@@ -223,7 +226,7 @@ if (isset($_POST['text'])) {
 			} else if ($qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
 				$code .= '$feedbacktxtdef['.$n.'] = "'.escstring($feedbacktxtdef[$n]).'"'."\n";
 				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
-				$code .= (($_POST['qtol'.$n]=='abs')?'$abstolerance[':'$reltolerance[').$n.'] = '.$_POST['tol'.$n]."\n";
+				$code .= (($qtoltype[$n]=='abs')?'$abstolerance[':'$reltolerance[').$n.'] = '.$qtol[$n]."\n";
 				if ($qtypes[$n] == 'numfunc') {
 					$code .= '$variables['.$n.'] = "'.$variables[$n].'"'."\n";
 					$code .= '$requiretimes['.$n.'] = ""'."\n";
@@ -1129,6 +1132,7 @@ function changeqtype(n,el) {
 		document.getElementById("qti"+n+"func").style.display="";
 		document.getElementById("qc"+n+"-def").style.display="";
 		document.getElementById("choicelbl"+n).innerHTML = "Answer";
+		document.getElementById("funcqtol"+n).selectedIndex = 1;
 	} else if (qt=='essay') {
 		$('#essay'+n+'wrap').show();
 		$('.hasparts'+n).hide();
@@ -1375,9 +1379,9 @@ for ($n=0;$n<10;$n++) {
 	echo '<span id="qti'.$n.'calc" ';
 	if ($qtype[$n]!='calculated') {echo ' style="display:none;"';};
 	echo '> numeric expressions that will receive feedback. Use a(n) ';
-	writeHtmlSelect("funcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
-	echo ' tolerance of <input autocomplete="off" name="functol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
-	echo ' Box size: <input autocomplete="off" name="funcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
+	writeHtmlSelect("calcqtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	echo ' tolerance of <input autocomplete="off" name="calctol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?Sanitize::encodeStringForDisplay($qtold[$n]):0.001).'"/>.';
+	echo ' Box size: <input autocomplete="off" name="calcboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?Sanitize::encodeStringForDisplay($answerboxsize[$n]):20).'"/>.';
 	echo ' Answer format: ';// <select name="answerformat'.$n.'" type="text" size="5" value="'.(isset($variables[$n])?$variables[$n]:'x').'"/>.';
 	writeHtmlSelect("answerformat$n",$ansfmtval,$ansfmtlbl, ($qtype[$n]=='calculated'?$answerformat[$n]:""));
 	echo '</span>';
