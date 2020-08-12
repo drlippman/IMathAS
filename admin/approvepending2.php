@@ -163,16 +163,16 @@ function getReqData() {
             // handle requests with ipeds info 
             if (strpos($userdata['ipeds'],'-') !== false) {
                 list($ipedstype,$ipedsval) = explode('-', $userdata['ipeds']);
-                $query = 'SELECT ip.school,ip.agency,ip.country,ig.id,ig.name 
+                $query = "SELECT DISTINCT IF(ip.type='A',ip.agency,ip.school) AS schoolname,ip.country,ig.id,ig.name 
                     FROM imas_ipeds AS ip 
                     LEFT JOIN imas_ipeds_group AS ipg ON ip.type=ipg.type AND ip.ipedsid=ipg.ipedsid 
                     LEFT JOIN imas_groups AS ig ON ipg.groupid=ig.id 
-                    WHERE ip.type=? and ip.ipedsid=?';
+                    WHERE ip.type=? and ip.ipedsid=?";
                 $stm2 = $DBH->prepare($query);
                 $stm2->execute(array($ipedstype, $ipedsval));
                 $ipedsgroups = array();
                 while ($r2 = $stm2->fetch(PDO::FETCH_ASSOC)) {
-                    $ipedname = ($ipedstype == 'A') ? $r2['agency'] : $r2['school'];
+                    $ipedname = $r2['schoolname'];
                     if ($r2['id'] !== null) {
                         $ipedsgroups[] = ['id'=>$r2['id'], 'name'=>$r2['name']];
                     }
