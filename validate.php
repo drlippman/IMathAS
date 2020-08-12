@@ -441,11 +441,7 @@
   if (empty($GLOBALS['sessionLastAccess'])) {
     $_SESSION['time'] = time();
   }
-/* Can be enabled for testing LTI menu behavior
-$_SESSION['ltiver']='1.3';
-$_SESSION['ltiitemtype'] = 0;
-$_SESSION['ltirole']='instructor';
-*/
+
 	if (isset($_SESSION['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
 		if ($myrights>18) {
 			foreach ($_SESSION as $k=>$v) {
