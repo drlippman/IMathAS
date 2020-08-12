@@ -441,7 +441,11 @@
   if (empty($GLOBALS['sessionLastAccess'])) {
     $_SESSION['time'] = time();
   }
-
+/* Can be enabled for testing LTI menu behavior
+$_SESSION['ltiver']='1.3';
+$_SESSION['ltiitemtype'] = 0;
+$_SESSION['ltirole']='instructor';
+*/
 	if (isset($_SESSION['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
 		if ($myrights>18) {
 			foreach ($_SESSION as $k=>$v) {
@@ -495,7 +499,10 @@
 			}
 		} else if ($_SESSION['ltirole']=='instructor') {
             if (!empty($_SESSION['ltiver'] && $_SESSION['ltiver']=='1.3')) {
-                $breadcrumbbase = "<a id=ltihomelink href=\"$imasroot/lti/ltihome.php\">LTI Home</a> &gt; ";
+                require(__DIR__.'/lti/ltimenu.php');
+                $breadcrumbbase = getLTIMenuButton();
+                //$breadcrumbbase = "<a id=ltihomelink href=\"$imasroot/lti/ltihome.php\">LTI Home</a> &gt; ";
+
             } else {
                 $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
             }
