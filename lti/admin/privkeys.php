@@ -36,7 +36,10 @@ if (!empty($_POST)) {
 $pagetitle = _('LTI Private Keys');
 require("../../header.php");
 
-echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('LTI Private Keys').'</div>';
+echo '<div class=breadcrumb>'.$breadcrumbbase;
+echo '<a href="../../admin/admin2.php">'._('Admin').'</a> ';
+echo '&gt; <a href="platforms.php">'._('LTI 1.3 Platforms').'</a> ';
+echo '&gt; '._('LTI Private Keys').'</div>';
 
 echo '<h1>'._('LTI Private Keys').'</h1>';
 echo '<p>'._('You MUST have at least one private key for LTI 1.3 to function. You normally would only create a new one as part of key rotation.').'</p>';

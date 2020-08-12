@@ -71,11 +71,19 @@ foreach ($platforms as $row) {
 $pagetitle = _('LTI 1.3 Platforms');
 require("../../header.php");
 
-echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('LTI 1.3 Platforms').'</div>';
+echo '<div class=breadcrumb>'.$breadcrumbbase;
+echo '<a href="../../admin/admin2.php">'._('Admin').'</a> ';
+echo '&gt; '._('LTI 1.3 Platforms').'</div>';
 
 $domainsite = $httpmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 
 echo '<h1>'._('LTI 1.3 Platforms').'</h1>';
+
+if ($myrights == 100) {
+    echo '<div class="cp">';
+    echo '<a href="privkeys.php">'._('Manage Private Keys').'</a>';
+    echo '</div>';
+}
 echo '<h2>'._('Existing Platforms').'</h2>';
 
 echo '<form method="post" action="platforms.php">';
