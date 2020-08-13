@@ -1063,6 +1063,23 @@ jQuery(document).ready(function($) {
 	initlinkmarkup('body');
 });
 
+jQuery(function($) {
+	$("#ltimenubutton").on('click', function() {
+		var btn = $("#ltimenubutton");
+		if (!btn.attr("data-loaded")) {
+			$.ajax({
+					type: "GET",
+					url: imasroot+'/lti/ltimenu.php?launchid=' +
+						encodeURIComponent(window.sessionStorage.getItem('LTI1p3_launchid'))
+			}).done(function(msg) {
+				$("#ltimenudiv").html(msg);
+				btn.attr("data-loaded",1);
+				sendLTIresizemsg();
+			});
+		}
+	});
+});
+
 jQuery.fn.isolatedScroll = function() {
     this.bind('mousewheel DOMMouseScroll', function (e) {
 	var delta = e.wheelDelta || (e.originalEvent && e.originalEvent.wheelDelta) || -e.detail,

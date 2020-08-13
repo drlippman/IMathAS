@@ -495,10 +495,17 @@
 			}
 		} else if ($_SESSION['ltirole']=='instructor') {
             if (!empty($_SESSION['ltiver'] && $_SESSION['ltiver']=='1.3')) {
-                require(__DIR__.'/lti/ltimenu.php');
-                $breadcrumbbase = getLTIMenuButton();
+                $breadcrumbbase = '<a href="#"
+                  role="button"
+                  id="ltimenubutton"
+                  class="dropdown-toggle arrow-down"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  >'._('LTI').'</a>
+                  <div id="ltimenudiv" role="menu" class="dropdown-menu ltimenu">'
+                  . _('Loading...').'</div>';
                 //$breadcrumbbase = "<a id=ltihomelink href=\"$imasroot/lti/ltihome.php\">LTI Home</a> &gt; ";
-
             } else {
                 $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
             }
