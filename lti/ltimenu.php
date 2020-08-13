@@ -34,7 +34,8 @@ if ($link->get_placementtype() == 'assess') {
     $line = $stm->fetch(PDO::FETCH_ASSOC);
     $cid = Sanitize::courseId($line['courseid']);
     echo '<div role=heading class="dropdown-header">';
-    echo _("Assessment Management"). "</div>";
+    echo _("Manage Assessment").'<br>';
+    echo Sanitize::encodeStringForDisplay($line['name']). "</div>";
     echo '<ul class="dropdown-ul">';
     if ($line['ver'] > 1) {
         echo "<li><a href=\"../assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a></li>";
