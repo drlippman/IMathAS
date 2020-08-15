@@ -10,8 +10,11 @@ if (isset($_POST['search'])) {
   $wholewords = array();
   $wordands = array();
   $zip = '';
+  $state = '';
   foreach ($words as $k=>$v) {
-    if (ctype_digit($v) && strlen($v)==5) { //zip
+    if (strlen($v)==1 && strtolower($v)!='hs') {
+      $state = $v;
+    } else if (ctype_digit($v) && strlen($v)==5) { //zip
       $zip = $v;
     } else if (ctype_alnum($v) && strlen($v)>3) {
       $wholewords[] = '+'.$v.'*';
@@ -35,6 +38,13 @@ if (isset($_POST['search'])) {
     $query .= 'zip=?';
     $qarr[] = $zip;
   }
+  if (!empty($state)) {
+    if (count($qarr)>0) {
+      $query .= 'OR ';
+    }
+    $query .= 'state=?';
+    $qarr[] = $state;
+  }
   $query .= ')';
   if (isset($_POST['type'])) {
       if ($_POST['type'] == 'coll') {
@@ -45,7 +55,7 @@ if (isset($_POST['search'])) {
         $query .= " AND type='S'";
       }
   }
-  $query .= ' ORDER BY school';
+  $query .= ' ORDER BY country,state,school';
   $stm = $DBH->prepare($query);
   $stm->execute($qarr);
   $out = array();
