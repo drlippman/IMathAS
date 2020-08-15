@@ -658,7 +658,7 @@ class AssessInfo
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
           } else {
             //pick seed based on assessment ID
-            $seeds[] = $i + $this->curAid + $attempt + $ispractice?100:0;
+            $seeds[] = $i + $this->curAid + $attempt + ($ispractice?100:0);
           }
         }
       } else { //regular selection
