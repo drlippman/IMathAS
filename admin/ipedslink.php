@@ -137,28 +137,39 @@ if ($myrights == 100 || empty($ipeds)) {
         </select></label>
     </p>
     <div id=ussel class=selopt style="display:none">
-        <p>
-            <span class="collsrc locdesc" style="display:none">
-                Please enter the name of your institution or it's 5-digit ZIP code and click Search,
-                then select your institution from the list.
-            </span>
-            <span class="pubk12src locdesc" style="display:none">
-                Please enter the name of your school or school district and click Search,
-                then select your school from the list.
-            </span>
-            <span class="privk12src locdesc" style="display:none">
-                Please enter the name of your school and click Search,
-                then select your school from the list.
-            </span>
+        <p><label>State: <select id=state name=state>
+            <option value="">Select...</option>
+        <?php
+        $states = ['Alabama'=>'AL', 'Alaska'=>'AK', 'American Samoa'=>'AS', 'Arizona'=>'AZ', 'Arkansas'=>'AR', 'Bureau of Indian Education'=>'BI', 'California'=>'CA', 'Colorado'=>'CO', 'Connecticut'=>'CT', 'Delaware'=>'DE', 'District of Columbia'=>'DC', 'Federated States of Micronesia'=>'FM', 'Florida'=>'FL', 'Georgia'=>'GA', 'Guam'=>'GU', 'Hawaii'=>'HI', 'Idaho'=>'ID', 'Illinois'=>'IL', 'Indiana'=>'IN', 'Iowa'=>'IA', 'Kansas'=>'KS', 'Kentucky'=>'KY', 'Louisiana'=>'LA', 'Maine'=>'ME', 'Marshall Islands'=>'MH', 'Maryland'=>'MD', 'Massachusetts'=>'MA', 'Michigan'=>'MI', 'Minnesota'=>'MN', 'Mississippi'=>'MS', 'Missouri'=>'MO', 'Montana'=>'MT', 'Nebraska'=>'NE', 'Nevada'=>'NV', 'New Hampshire'=>'NH', 'New Jersey'=>'NJ', 'New Mexico'=>'NM', 'New York'=>'NY', 'North Carolina'=>'NC', 'North Dakota'=>'ND', 'Northern Marianas'=>'MP', 'Ohio'=>'OH', 'Oklahoma'=>'OK', 'Oregon'=>'OR', 'Palau'=>'PW', 'Pennsylvania'=>'PA', 'Puerto Rico'=>'PR', 'Rhode Island'=>'RI', 'South Carolina'=>'SC', 'South Dakota'=>'SD', 'Tennessee'=>'TN', 'Texas'=>'TX', 'Utah'=>'UT', 'Vermont'=>'VT', 'Virgin Islands'=>'VI', 'Virginia'=>'VA', 'Washington'=>'WA', 'West Virginia'=>'WV', 'Wisconsin'=>'WI', 'Wyoming'=>'WY'];
+        foreach ($states as $name=>$code) {
+            echo '<option value='.$code.'>'.$name.'</option>';
+        }
+        ?>
+        </select></label>
+        <div id="uswrap">
+            <p>
+                <span class="collsrc locdesc" style="display:none">
+                    Please enter the name of your institution or it's 5-digit ZIP code and click Search,
+                    then select your institution from the list.
+                </span>
+                <span class="pubk12src locdesc" style="display:none">
+                    Please enter the name of your school or school district and click Search,
+                    then select your school from the list.
+                </span>
+                <span class="privk12src locdesc" style="display:none">
+                    Please enter the name of your school and click Search,
+                    then select your school from the list.
+                </span>
 
-            <br>
-            <input id=searchterms aria-label="school search terms">
-            <button type=button id=dosearch>Search</button>
-        </p>
-        <p id=searchresultwrapper style="display:none">
-            <label for=ipeds>Select your institution:</label>
-            <br/><select name=ipeds id=ipeds></select>
-        </p>
+                <br>
+                <input id=searchterms aria-label="school search terms">
+                <button type=button id=dosearch>Search</button>
+            </p>
+            <p id=searchresultwrapper style="display:none">
+                <label for=ipeds>Select your institution:</label>
+                <br/><select name=ipeds id=ipeds></select>
+            </p>
+        </div>
     </div>
     <div id=intlsel class=selopt style="display:none">
         <p><label for=country>Select your country:</label>
@@ -189,10 +200,21 @@ if ($myrights == 100 || empty($ipeds)) {
         $('#schooltype').on('change', function () {
             $('.locdesc').hide();
             $('.'+this.value+'src').slideDown();
+            $('#country').val('');
+            $('#searchresultwrapper').hide();
         });
         $('#schoolloc').on('change', function () {
             $('.selopt').hide();
             $('#'+this.value+'sel').slideDown();
+        });
+        $('#state').on('change', function () {
+            var state = this.value;
+            $('#searchresultwrapper').hide();
+            if (state != '') {
+                $("#uswrap").show();
+            } else {
+                $("#uswrap").hide();
+            }
         });
         $('#searchterms').on('input', function () {
             $('#searchresultwrapper').hide();
@@ -203,6 +225,7 @@ if ($myrights == 100 || empty($ipeds)) {
                 ipedtypefield: 'schooltype',
                 searchfield: 'searchterms',
                 resultfield: 'ipeds',
+                state: 'state',
                 wrapper: 'searchresultwrapper',
                 includeselect: true
             });

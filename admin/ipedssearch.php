@@ -46,6 +46,10 @@ if (isset($_POST['search'])) {
     $qarr[] = $state;
   }
   $query .= ')';
+  if (isset($_POST['state'])) {
+    $query .= " AND state=?";
+    $qarr[] = $_POST['state'];
+  }
   if (isset($_POST['type'])) {
       if ($_POST['type'] == 'coll') {
           $query .= " AND type='I'";
