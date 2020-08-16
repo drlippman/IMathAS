@@ -92,7 +92,6 @@ function regenq(qn) {
 function loadquestionById(qn, qsid) {
     $("#results"+qn).empty();
     $("#questionwrap"+qn).empty();
-    console.log(window.location);
     var url = window.location.href.replace(/id=\d+/,'id='+qsid);
     $.ajax({
         url: url,
@@ -130,6 +129,7 @@ function loadquestionByJwt(qn, jwt) {
 $(function() {
     $(window).on('message', function(e) {
         var msg = e.originalEvent.data;
+        if (typeof msg != 'string') { return; }
         if (msg == 'submit') {
             submitq(thisqn);
         } else if (msg.match(/imathas\.show/)) {
@@ -356,7 +356,6 @@ function disableInputs(qn, disabled) {
      data.append('toscoreqn', JSON.stringify(changed));
      return data;
    } else {
-     console.log(JSON.stringify(changed));
      $("input[name=toscoreqn]").val(JSON.stringify(changed));
    }
    return true;
