@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+    <a href="#" class="sr-only" id="skipnav" @click.prevent="$refs.scrollpane.focus()">
       {{ $t('jumptocontent') }}
     </a>
     <assess-header></assess-header>

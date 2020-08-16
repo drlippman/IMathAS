@@ -358,6 +358,13 @@ span.left {
 	overflow: hidden;
 	color: transparent;
 }
+#skipnav:focus, #skipnav:active {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    color: #000;
+}
 
 br.form {
 	clear: left;
