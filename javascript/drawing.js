@@ -310,7 +310,10 @@ function adda11ydraw(tarnum,initmode,defval) {
 	var mode = initmode || thistarg.defmode;
 	var val = defval || "";
     var afgroup = thistarg.afgroup;
-	html = '<label>'+_("Drawing element type")+': <select onchange="imathasDraw.changea11ydraw(this,\''+tarnum+'\')">';
+    var n = thistarg.el.getElementsByTagName("li").length+1;
+    var numname = '<span class="sr-only draweln">'+_('Drawing element ') + n + '</span>';
+    html = numname;
+	html += '<label>'+_("Element type")+': <select onchange="imathasDraw.changea11ydraw(this,\''+tarnum+'\')">';
 	for (j in thistarg.selects) {
 		html += thistarg.selects[j];
 	}
@@ -318,7 +321,7 @@ function adda11ydraw(tarnum,initmode,defval) {
 	html += '<label><span class="a11ydrawinstr"></span><br/>';
 	html += '<input type="text" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/></label>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
-	html += _("Remove")+'</button>';
+	html += _("Remove")+' '+numname+'</button>';
 	var li = $("<li>", {class:"a11ydrawrow"}).html(html);
 	$(thistarg.el).append(li);
 	li.find("select").val(mode);
@@ -329,7 +332,12 @@ function adda11ydraw(tarnum,initmode,defval) {
 }
 
 function removea11ydraw(el) {
-	$(el).parent().remove();
+    var ul = $(el).closest("ul");
+    $(el).parent().remove();
+    ul.find("li").each(function(i,el) {
+        var numname = _('Drawing element ') + (i+1);
+        $(el).find(".draweln").html(numname);
+    });
 	encodea11ydraw();
 }
 function changea11ydraw(tarel, tarnum) {
