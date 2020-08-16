@@ -142,8 +142,8 @@ class FunctionExpressionAnswerBox implements AnswerBox
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}
-    		if (!isset($hidepreview) && $_SESSION['userprefs']['livepreview']==1) {
-    			$params['preview'] = 1;
+    		if (!isset($hidepreview)) {
+    			$params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
     		}
     		$params['calcformat'] = Sanitize::encodeStringForDisplay($answerformat);
     		$params['vars'] = $variables;

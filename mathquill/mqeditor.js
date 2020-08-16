@@ -120,7 +120,7 @@ var MQeditor = (function($) {
           attachEditor(span);
           // if original input has input changed programmatically and change
           // event triggered, update mathquill.
-          $(el).on('change', function(e, fromblur) {
+          $(el).on('change.mqed', function(e, fromblur) {
             if (!fromblur) {
               var val = el.value;
               if (config.hasOwnProperty('toMQ')) {
@@ -139,7 +139,7 @@ var MQeditor = (function($) {
         mqfield.focus();
       }
     } else { // disable MQ
-      $(el).attr("type","text");
+      $(el).attr("type","text").off('change.mqed');
       if (nofocus !== true) {
         $(el).focus();
       }

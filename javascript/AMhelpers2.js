@@ -141,7 +141,7 @@ function init(paramarr, enableMQ, baseel) {
     if (params.preview) { //setup preview TODO: check for userpref
       var thisqn = qn;
       document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(thisqn)});
-      if (!params.qtype.match(/matrix/)) { //no live preview for matrix types
+      if (params.preview == 1 && !params.qtype.match(/matrix/)) { //no live preview for matrix types
         if (LivePreviews.hasOwnProperty(qn)) {
           delete LivePreviews[qn]; // want to reinit
         }
