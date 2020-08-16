@@ -443,6 +443,15 @@ class QuestionHtmlGenerator
               $jsParams['submitall'] = 1;
             }
         } else {
+
+
+            if ($GLOBALS['myrights'] > 10) {
+                if (isset($anstypes)) {
+                    $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
+                } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
+                    $this->addError('It looks like you have an $answerbox with part index; did you mean for this question to be Multipart?');
+                }
+            }
             // Generate answer boxes. (non-multipart question)
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
