@@ -2,6 +2,7 @@
 
 require('../init_without_validate.php');
 header('Content-Type: application/json; charset=utf-8');
+$skip = ['high','middle','junior','elementary','school'];
 $out = array();
 if (isset($_POST['search'])) {
   $words = array_map('trim', explode(' ', Sanitize::stripHtmlTags($_POST['search'])));
@@ -12,8 +13,9 @@ if (isset($_POST['search'])) {
   $zip = '';
   $state = '';
   foreach ($words as $k=>$v) {
-    if (strlen($v)==1 && strtolower($v)!='hs') {
-      $state = $v;
+      $lower = strtolower($v);
+    if (in_array($lower, $skip)) {
+        continue; // skip un-useful words
     } else if (ctype_digit($v) && strlen($v)==5) { //zip
       $zip = $v;
     } else if (ctype_alnum($v) && strlen($v)>3) {
