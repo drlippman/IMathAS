@@ -442,6 +442,9 @@ export default {
         actions.loadQuestion(this.qn, false, false);
       }
     },
+    qn: function (newVal, oldVal) {
+      actions.setRendered(oldVal, false);
+    },
     seed: function (newVal, oldVal) {
       actions.loadQuestion(this.qn, false, false);
     }
