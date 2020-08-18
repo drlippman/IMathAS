@@ -484,7 +484,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		menubar: false,//"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
-		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style],param[name|value],@[sscr]',
+		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
 		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
@@ -1052,11 +1052,24 @@ function initlinkmarkup(base) {
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
 	setupToggler2(base);
-	$(base).fitVids();
+    $(base).fitVids();
+    resizeResponsiveIframes(base, true);
 }
 
+function resizeResponsiveIframes(base, init) {
+    if (init) {
+        jQuery(base).find('iframe.scaleresponsive').wrap(jQuery('<div>', {css:{overflow:"hidden"}}));
+    }
+    jQuery(base).find('iframe.scaleresponsive').each(function(i,el) {
+        var p = el.parentNode; 
+        var sc = Math.min(1,p.offsetWidth/parseInt(el.width || el.style.width));
+        el.style.transform = "scale("+sc+")";
+        p.style.height = (sc*parseInt(el.height || el.style.height)+3)+"px";
+    });
+}
 jQuery(document).ready(function($) {
-	initlinkmarkup('body');
+    initlinkmarkup('body');
+    $(window).on('resize', function () {resizeResponsiveIframes('body');});
 });
 
 jQuery.fn.isolatedScroll = function() {

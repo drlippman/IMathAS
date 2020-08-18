@@ -1079,6 +1079,7 @@ pre {
 .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}
 .fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
 .video-wrapper-wrapper{width:100%;padding:0;}
+iframe.scaleresponsive { transform-origin: 0 0; }
 
 .vidmute { background: url(img/vidicons.png) no-repeat 0px 0px; width:24px; height:20px; display: inline-block;}
 .vidmute:hover { background: url(img/vidicons.png) no-repeat -24px 0px; width:24px; height:20px; display: inline-block;}
