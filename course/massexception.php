@@ -16,7 +16,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		require_once("../includes/parsedatetime.php");
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
-		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):'NULL';
+		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
 		$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
 
 		$forumitemtype = $_POST['forumitemtype'];
