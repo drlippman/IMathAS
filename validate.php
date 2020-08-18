@@ -495,7 +495,7 @@
 			}
 		} else if ($_SESSION['ltirole']=='instructor') {
             if (!empty($_SESSION['ltiver'] && $_SESSION['ltiver']=='1.3')) {
-                $breadcrumbbase = '<a href="#"
+                $breadcrumbbase = '<div class="dropdown inlinediv"><a href="#"
                   role="button"
                   id="ltimenubutton"
                   class="dropdown-toggle arrow-down"
@@ -504,7 +504,7 @@
                   aria-expanded="false"
                   >'._('LTI').'</a>
                   <div id="ltimenudiv" role="menu" class="dropdown-menu ltimenu">'
-                  . _('Loading...').'</div>';
+                  . _('Loading...').'</div></div>';
                 //$breadcrumbbase = "<a id=ltihomelink href=\"$imasroot/lti/ltihome.php\">LTI Home</a> &gt; ";
             } else {
                 $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";

@@ -1,5 +1,7 @@
 <?php
 
+require('../init.php');
+
 use \IMSGlobal\LTI;
 
 require_once(__DIR__ . '/lib/lti.php');
@@ -19,6 +21,7 @@ $db = new Imathas_LTI_Database($DBH);
 $launch = LTI\LTI_Message_Launch::from_cache($_GET['launchid'], $db);
 $contextid = $launch->get_platform_context_id();
 $platform_id = $launch->get_platform_id();
+$resource_link = $launch->get_resource_link();
 $role = standardize_role($launch->get_roles());
 $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
 
@@ -34,23 +37,23 @@ if ($link->get_placementtype() == 'assess') {
     $line = $stm->fetch(PDO::FETCH_ASSOC);
     $cid = Sanitize::courseId($line['courseid']);
     echo '<div role=heading class="dropdown-header">';
-    echo _("Manage Assessment").'<br>';
+    echo _("Manage Assessment").': ';
     echo Sanitize::encodeStringForDisplay($line['name']). "</div>";
     echo '<ul class="dropdown-ul">';
     if ($line['ver'] > 1) {
-        echo "<li><a href=\"../assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a></li>";
-        echo "<li><a href=\"../course/addassessment2.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a></li>";
-        echo "<li><a href=\"../course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></li>";
-        echo "<li><a href=\"../course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Grade list")."</a></li>";
-        echo "<li><a href=\"../course/gb-itemanalysis2.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Item Analysis")."</a></li>";
+        echo "<li><a href=\"$imasroot/assess2/?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a></li>";
+        echo "<li><a href=\"$imasroot/course/addassessment2.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a></li>";
+        echo "<li><a href=\"$imasroot/course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></li>";
+        echo "<li><a href=\"$imasroot/course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Grade list")."</a></li>";
+        echo "<li><a href=\"$imasroot/course/gb-itemanalysis2.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Item Analysis")."</a></li>";
     } else {
-        echo "<li><a href=\"../assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a></li>";
-        echo "<li><a href=\"../course/addassessment.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a></li>";
-        echo "<li><a href=\"../course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></li>";
-        echo "<li><a href=\"../course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Grade list")."</a></li>";
-        echo "<li><a href=\"../course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Item Analysis")."</a></li>";
+        echo "<li><a href=\"$imasroot/assessment/showtest.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Preview assessment")."</a></li>";
+        echo "<li><a href=\"$imasroot/course/addassessment.php?cid=" . Sanitize::courseId($cid) . "&id=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Settings")."</a></li>";
+        echo "<li><a href=\"$imasroot/course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></li>";
+        echo "<li><a href=\"$imasroot/course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Grade list")."</a></li>";
+        echo "<li><a href=\"$imasroot./course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Item Analysis")."</a></li>";
     }
-    echo '<li><a href="ltisync.php'. Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid).'">'._('Info and LMS Sync').'</li>';
+    echo '<li><a href="'.$imasroot.'/lti/ltiassessinfo.php?launchid='. Sanitize::encodeUrlParam($_GET['launchid']).'">'._('Info and LMS Sync').'</a></li>';
     echo "</ul>";
 
 } else if (function_exists('lti_can_handle_redirect') &&
@@ -63,17 +66,17 @@ if ($link->get_placementtype() == 'assess') {
 
 echo '<div role=heading class="dropdown-header">'._('Course Management').'</div>';
 echo '<ul class="dropdown-ul">';
-echo '<li><a href="../course/listusers.php?cid='.$cid.'">'._('Roster').'</a></ul>';
-echo '<li><a href="../course/gradebook.php?cid='.$cid.'">'._('Gradebook').'</a></ul>';
-echo '<li><a href="../course/'.$chgassess.'?cid='.$cid.'">'._('Mass Change Assessments').'</a></ul>';
+echo '<li><a href="'.$imasroot.'/course/listusers.php?cid='.$cid.'">'._('Roster').'</a></li>';
+echo '<li><a href="'.$imasroot.'/course/gradebook.php?cid='.$cid.'">'._('Gradebook').'</a></li>';
+echo '<li><a href="'.$imasroot.'/course/'.$chgassess.'?cid='.$cid.'">'._('Mass Change Assessments').'</a></li>';
 if (function_exists('lti_ltimenu_coursemenu')) {
   lti_ltimenu_coursemenu();
 }
 if (isset($line['date_by_lti']) && $line['date_by_lti']===0) {
-    echo '<li><a href="../course/masschgdates?cid='.$cid.'">'._('Mass Change Dates').'</a></ul>';
+    echo '<li><a href="'.$imasroot.'/course/masschgdates?cid='.$cid.'">'._('Mass Change Dates').'</a></li>';
 }
-echo '<li><a href="../admin/forms.php?action=modify&cid='.$cid.'&id='.$cid.'">'._('Course Settings').'</a></ul>';
-echo '<li><a href="../course/copyitems.php?cid='.$cid.'">'._('Course Items: Copy').'</a></ul>';
-echo '<li><a href="../admin/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a></ul>';
-echo '<li><a href="../course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a></ul>';
+echo '<li><a href="'.$imasroot.'/admin/forms.php?action=modify&cid='.$cid.'&id='.$cid.'">'._('Course Settings').'</a></li>';
+echo '<li><a href="'.$imasroot.'/course/copyitems.php?cid='.$cid.'">'._('Course Items: Copy').'</a></li>';
+echo '<li><a href="'.$imasroot.'/admin/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a></li>';
+echo '<li><a href="'.$imasroot.'/course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a></li>';
 echo '</ul>';
