@@ -873,7 +873,7 @@ jQuery(function() {
 		}
 	});
 	jQuery('form').each(function(i,el) {
-		if (el.action && (m=el.action.match(/cid=(\d+)/))) {
+		if (el.action && (m=el.getAttribute('action').match(/cid=(\d+)/))) {
 			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
 			if (btf !== '') {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
