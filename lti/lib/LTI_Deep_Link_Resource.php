@@ -84,9 +84,11 @@ class LTI_Deep_Link_Resource {
             "url" => $this->url,
             "presentation" => [
                 "documentTarget" => $this->target,
-            ],
-            "custom" => $this->custom_params,
+            ]
         ];
+        if (!empty($this->custom_params)) {
+            $resource["custom"] = $this->custom_params;
+        }
         if ($this->lineitem !== null) {
             $resource["lineItem"] = $this->lineitem->to_array();
         }
