@@ -75,6 +75,8 @@ echo '<div class=breadcrumb>'.$breadcrumbbase;
 echo '<a href="../../admin/admin2.php">'._('Admin').'</a> ';
 echo '&gt; '._('LTI 1.3 Platforms').'</div>';
 
+$domain = Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
+
 $domainsite = $httpmode . Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']);
 
 echo '<h1>'._('LTI 1.3 Platforms').'</h1>';
@@ -278,16 +280,17 @@ echo '<ul class=nomark>';
 echo '<li>'._('Go to Site Administration, Plugins, then External Tools: Manage Tools.').'</li>';
 echo '<li>'._('Click Configure a tool manually.').'</li>';
 echo '<li>'._('Enter these values:').'<ul>';
-echo ' <li>'._('Tool URL:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
+echo ' <li>'._('Tool URL:').' <span class=tocopy>'.$domain.'</span></li>';
 echo ' <li>'._('LTI version: LTI 1.3').'</li>';
 echo ' <li>'._('Public key type: Keyset Url.').'</li>';
 echo ' <li>'._('Public Keyset:').' <span class=tocopy>'.$basesiteurl.'/lti/jwks.php</span></li>';
 echo ' <li>'._('Initiate Login URL:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php</span></li>';
 echo ' <li>'._('Redirection URL(s):').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
-echo ' <li>'._('Enable Content-Item Message').'</li>';
+echo ' <li>'._('Click Show more, then Enable Content-Item Message').'</li>';
 echo ' <li>'._('Content Selection URL:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
 echo ' </ul></li>';
 echo '<li>'._('Under Services, for IMS LTI Assignment and Grade Services select Use this service for grade sync and column management.').'</li>';
+echo '<li>'._('Under Services, for IMS LTI Names and Role Provisining Services select Use this service.').'</li>';
 echo '<li>'._('Under Privacy, set Share launcher\'s name with tool to Always, and enable Force SSL.').'</li>';
 echo '</ul>';
 
