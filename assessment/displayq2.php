@@ -3057,12 +3057,21 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			if ($_SESSION['userprefs']['drawentry']==0) { //accessible entry
 				$bg = 'a11ydraw:'.implode(',', $answerformat);
-				$out .= '<p>'._('Graph to add drawings to:').'</p>';
-				$out .= '<p>'.$plot.'</p>';
+                $out .= '<p>'._('Graph to add drawings to:').'</p>';
+                $out .= '<p>'.$plot.'</p>';
+				/*
 				$out .= '<p>'._('Elements to draw:').'</p>';
 				$out .= '<ul id="a11ydraw'.$qn.'"></ul>';
 				$out .= '<p><button type="button" class="a11ydrawadd" onclick="imathasDraw.adda11ydraw('.$qn.')">'._('Add new drawing element').'</button></p>';
-				if ($answerformat[0]=="polygon") {
+                */
+                $out .= '<p tabindex="-1">'._('Elements to draw:').'</p>';
+                $out .= '<ul class="a11ydraw" id="a11ydraw'.$qn.'"></ul>';
+                $out .= '<p class="empty-state">'._('No elements have been added yet').'</p>';
+                $out .= '<p><label>'._('Add new drawing element');
+                $out .= ': <select id="a11ydrawnew'.$qn.'"></select></label> ';
+                $out .= '<button type="button" class="a11ydrawadd" onclick="imathasDraw.adda11ydraw('.$qn.')">'._('Add').'</button></p>';
+    				
+                if ($answerformat[0]=="polygon") {
 					$dotline = 1;
 				} else if ($answerformat[0]=="closedpolygon") {
 					$answerformat[0]="polygon";
@@ -3290,8 +3299,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
 			$out .= getcolormark($colorbox);
 			if ($colorbox!='') { $out .= '</div>';}
-			$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
-			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
+            $out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
+            if ($_SESSION['userprefs']['drawentry']==0) {
+                $bge = $bg;
+            } else {
+                $bge = '';
+            }
+			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bge',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
 			if (isset($GLOBALS['capturedrawinit'])) {
 				if (!isset($GLOBALS['drawinitdata'])) {
 					$GLOBALS['drawinitdata'] = array();

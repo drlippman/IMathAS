@@ -911,6 +911,10 @@ function addBlankTarget(i,el) {
 	}
 }
 
+function setariastatus(status) {
+    document.getElementById("ariastatus").innerHTML = status;
+}
+
 function addmultiselect(el,n) {
 	var p = jQuery(el).parent();
 	var val = jQuery('#'+n).val();

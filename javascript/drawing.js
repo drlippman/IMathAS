@@ -267,7 +267,8 @@ function addA11yTarget(canvdata, thisdrawla) {
 				selects.push(op);
 			}
 		}
-	}
+    }
+    document.getElementById("a11ydrawnew"+tarnum).innerHTML = selects;
 	targets[tarnum].defmode = defmode;
 	targets[tarnum].inputmodes = inputmodes;
 	targets[tarnum].selects = selects;
@@ -278,7 +279,7 @@ function addA11yTarget(canvdata, thisdrawla) {
 	// we have to store original typed answer.
 	//maybe new drawla[5] for that purpose?
 	//need to be able to get acccess to drawla from here
-	//TODO:  Check if thisdrawla was defined
+    //TODO:  Check if thisdrawla was defined
 	if (thisdrawla == null && lines.hasOwnProperty(tarnum)) {
 		for (var i=0;i<lines[tarnum].length;i++) {
 			adda11ydraw(tarnum, 0, pixcoordstopointlist(lines[tarnum][i], tarnum));
@@ -307,37 +308,34 @@ function addA11yTarget(canvdata, thisdrawla) {
 
 function adda11ydraw(tarnum,initmode,defval) {
 	var thistarg = targets[tarnum];
-	var mode = initmode || thistarg.defmode;
+	var mode = initmode || document.getElementById("a11ydrawnew"+tarnum).value;
 	var val = defval || "";
     var afgroup = thistarg.afgroup;
     var n = thistarg.el.getElementsByTagName("li").length+1;
     var numname = '<span class="sr-only draweln">'+_('Drawing element ') + n + '</span>';
     html = numname;
-	html += '<label>'+_("Element type")+': <select onchange="imathasDraw.changea11ydraw(this,\''+tarnum+'\')">';
-	for (j in thistarg.selects) {
-		html += thistarg.selects[j];
-	}
-	html += '</select></label><br/>';
+    html += thistarg.moderef[mode].descr + '.<br/>';
 	html += '<label><span class="a11ydrawinstr"></span><br/>';
 	html += '<input type="text" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/></label>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
 	html += _("Remove")+' '+numname+'</button>';
-	var li = $("<li>", {class:"a11ydrawrow"}).html(html);
+	var li = $("<li>", {class:"a11ydrawrow", "data-mode":mode}).html(html);
 	$(thistarg.el).append(li);
-	li.find("select").val(mode);
 	li.find(".a11ydrawinstr").text(thistarg.moderef[mode].input);
 	if (!defval) {
-		li.find("select").focus();
+		li.find("input").focus();
 	}
 }
 
 function removea11ydraw(el) {
+    setariastatus(_('Removed drawing element'));
     var ul = $(el).closest("ul");
     $(el).parent().remove();
     ul.find("li").each(function(i,el) {
         var numname = _('Drawing element ') + (i+1);
         $(el).find(".draweln").html(numname);
     });
+    ul.prev().focus();
 	encodea11ydraw();
 }
 function changea11ydraw(tarel, tarnum) {
@@ -347,6 +345,35 @@ function changea11ydraw(tarel, tarnum) {
 	encodea11ydraw();
 }
 function updatea11ydraw(el) {
+    var err = false;
+    var elval = el.value.trim();
+    if (elval.charAt(0) != '(' || elval.slice(-1) != ')') {
+        err = true;
+    }
+    var pts = elval.slice(1,-1).split(/\)\s*,\s*\(/);
+    for (var i=0; i<pts.length;i++) {
+        var subpts = pts[i].split(/,/);
+        if (subpts.length != 2) {
+            err = true;
+        }
+    }
+    if (el.nextSibling && el.nextSibling.className == 'noticetext') {
+        if (!err) {
+            el.parentNode.removeChild(el.nextSibling);
+        }
+    } else if (err) {
+        var errspan = document.createElement("span");
+        errspan.className = "noticetext"
+        errspan.innerHTML = '<br>'+_('Error: Invalid format for points. Give points as open parenthesis number comma number close parenthesis. Separate points with a comma.');
+        el.parentNode.appendChild(errspan);
+    }
+    if (err) {
+        el.setAttribute('aria-invalid', true);
+        setariastatus(_('Error: Invalid format for points'));
+    } else {
+        el.removeAttribute('aria-invalid');
+        setariastatus("");
+    }
 	encodea11ydraw();
 }
 function pixcoordstopointlist(vals,tarnum) {
@@ -370,8 +397,8 @@ function encodea11ydraw() {
 		var saveinput = [];
 		var afgroup = targets[tarnum].afgroup;
 		$("#a11ydraw"+tarnum).find(".a11ydrawrow").each(function(i,el) {
-			var mode = $(el).find("select").val();
-			var input = $(el).find("input").val();
+            var input = $(el).find("input").val();
+            var mode = el.getAttribute('data-mode');
 			saveinput.push("["+mode+',"'+input+'"]');
 			input = input.replace(/[\(\)]/g,'').split(/\s*,\s*/);
 			var outpts = [];
@@ -447,7 +474,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 	} else {
 		drawstyle[tarnum] = 0;
 	}
-	drawlocky[tarnum] = locky;
+    drawlocky[tarnum] = locky;
 	if (imgpath.match(/initPicture/)) {
 		if ($(tarel).closest('.drawcanvasholder').length == 0) {
 			$(tarel).removeClass("drawcanvas").wrap($("<div>", {
