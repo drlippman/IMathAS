@@ -88,8 +88,8 @@ if (!$assess_record->hasRecord()) {
     $stm = $DBH->prepare($query);
     $stm->execute(array($uid, $cid, $aid));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
-    if ($row !== false && substr($row['lineitem'],0,6)=='LTI13-') {
-        $lineitemdata = 'LTI1.3:|:' . $row['ltiuserid'] . ':|:' . $row['lineitem'] . ':|:' . substr($row['lineitem'],6);
+    if ($row !== false && substr($row['org'],0,6)=='LTI13-') {
+        $lineitemdata = 'LTI1.3:|:' . $row['ltiuserid'] . ':|:' . $row['lineitem'] . ':|:' . substr($row['org'],6);
         $ltiorg = $row['org'];
     }
 
