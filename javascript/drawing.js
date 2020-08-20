@@ -316,7 +316,8 @@ function adda11ydraw(tarnum,initmode,defval) {
     html = numname;
     html += thistarg.moderef[mode].descr + '.<br/>';
 	html += '<label><span class="a11ydrawinstr"></span><br/>';
-	html += '<input type="text" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/></label>';
+    html += '<input type="text" value="'+val+'" data-n="'+thistarg.moderef[mode].inN+'" ';
+    html += 'onblur="imathasDraw.updatea11ydraw(this)"/></label>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
 	html += _("Remove")+' '+numname+'</button>';
 	var li = $("<li>", {class:"a11ydrawrow", "data-mode":mode}).html(html);
@@ -345,31 +346,37 @@ function changea11ydraw(tarel, tarnum) {
 	encodea11ydraw();
 }
 function updatea11ydraw(el) {
-    var err = false;
+    var err = 0;
     var elval = el.value.trim();
     if (elval.charAt(0) != '(' || elval.slice(-1) != ')') {
-        err = true;
+        err |= 1;
     }
     var pts = elval.slice(1,-1).split(/\)\s*,\s*\(/);
+    var inN = el.getAttribute('data-n');
+    if (inN.match(/\d/) && pts.length != parseInt(inN)) {
+        err |= 2;
+    }
     for (var i=0; i<pts.length;i++) {
         var subpts = pts[i].split(/,/);
         if (subpts.length != 2) {
-            err = true;
+            err |= 1;
         }
     }
     if (el.nextSibling && el.nextSibling.className == 'noticetext') {
-        if (!err) {
-            el.parentNode.removeChild(el.nextSibling);
-        }
-    } else if (err) {
-        var errspan = document.createElement("span");
-        errspan.className = "noticetext"
-        errspan.innerHTML = '<br>'+_('Error: Invalid format for points. Give points as open parenthesis number comma number close parenthesis. Separate points with a comma.');
-        el.parentNode.appendChild(errspan);
+        el.parentNode.removeChild(el.nextSibling);
     }
     if (err) {
         el.setAttribute('aria-invalid', true);
-        setariastatus(_('Error: Invalid format for points'));
+        var errspan = document.createElement("span");
+        errspan.className = "noticetext"
+        if ((err&1)==1) {
+            errspan.innerHTML = '<br>'+_('Error: Invalid format for points. Give points as open parenthesis number comma number close parenthesis. Separate points with a comma.');
+            setariastatus(_('Error: Invalid format for points'));
+        } else {
+            errspan.innerHTML = '<br>'+_('Error: Incorrect number of points. Expecting ') + inN;
+            setariastatus(_('Error: Incorrect number of points'));
+        }
+        el.parentNode.appendChild(errspan);
     } else {
         el.removeAttribute('aria-invalid');
         setariastatus("");
