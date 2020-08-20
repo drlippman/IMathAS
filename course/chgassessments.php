@@ -601,6 +601,17 @@ $(function() {
 			$("#reqscorewrap").toggle(rqshow);
 			$(this).attr("aria-expanded", rqshow);
 	});
+
+	// bind to caltagradio controls
+	$('input[type=radio][name=caltagradio]').change(function() {
+		if (this.value == 'usename') {
+			$('input[type=text][name=caltagact]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+		}
+		else if (this.value == 'usetext') {
+			$('input[type=text][name=caltagact]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('?');
+		}
+	});
+
 });
 </script>
 
@@ -849,7 +860,9 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>
-				<input name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+                    <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>>Use Text:</label>
+                     <input aria-label="Calendar icon text" name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>" <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /><br />
+					<label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>>Use Assessment Name</label>
 				</td>
 			</tr>
 			<tr class="coptr">

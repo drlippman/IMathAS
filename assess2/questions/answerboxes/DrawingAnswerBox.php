@@ -647,7 +647,7 @@ class DrawingAnswerBox implements AnswerBox
     					if (!is_array($backg)) {
     						settype($backg,"array");
     					}
-    					$saarr = array_merge($saarr,$backg);
+                        $saarr = array_merge($backg,$saarr);
     					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     					if (isset($grid) && (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false)) {
     						$sa = addfractionaxislabels($sa,$xsclgridpts[0]);

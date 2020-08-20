@@ -186,7 +186,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$now = time();
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
-		$exceptions = loadExceptions($cid, $userid);
+        $exceptions = loadExceptions($cid, $userid);
+        $excused = loadExcusals($cid, $userid);
 	}
 	//update block start/end dates to show blocks containing items with exceptions
 	if (count($exceptions)>0) {

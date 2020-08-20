@@ -696,20 +696,11 @@ class S3 {
 			$file = $uri;
 			$ext = strToLower(pathInfo($file, PATHINFO_EXTENSION));
 		} else {
-			// Fileinfo documentation says fileinfo_open() will use the
-			// MAGIC env var for the magic file
-			if (extension_loaded('fileinfo') && isset($_ENV['MAGIC']) &&
-			($finfo = finfo_open(FILEINFO_MIME, $_ENV['MAGIC'])) !== false) {
-				if (($type = finfo_file($finfo, $file)) !== false) {
-					// Remove the charset and grab the last content-type
-					$type = explode(' ', str_replace('; charset=', ';charset=', $type));
-					$type = array_pop($type);
-					$type = explode(';', $type);
-					$type = trim(array_shift($type));
-				}
+			if (extension_loaded('fileinfo') &&
+                ($finfo = finfo_open(FILEINFO_MIME_TYPE)) !== false
+            ) {
+				$type = finfo_file($finfo, $file);
 				finfo_close($finfo);
-	
-			
 			} 
 		}
 		/*  
@@ -724,7 +715,8 @@ class S3 {
 		// Otherwise do it the old fashioned way
 		static $exts = array(
 			'jpg' => 'image/jpeg', 'gif' => 'image/gif', 'png' => 'image/png',
-			'tif' => 'image/tiff', 'tiff' => 'image/tiff', 'ico' => 'image/x-icon',
+            'tif' => 'image/tiff', 'tiff' => 'image/tiff', 'ico' => 'image/x-icon',
+            'svg' => 'image/svg+xml', 'jpeg' => 'image/jpeg',
 			'swf' => 'application/x-shockwave-flash', 'pdf' => 'application/pdf',
 			'zip' => 'application/zip', 'gz' => 'application/x-gzip',
 			'tar' => 'application/x-tar', 'bz' => 'application/x-bzip',
@@ -735,8 +727,8 @@ class S3 {
 			'avi' => 'video/x-msvideo', 'mpg' => 'video/mpeg', 'mpeg' => 'video/mpeg',
 			'mov' => 'video/quicktime', 'flv' => 'video/x-flv', 'php' => 'text/x-php',
 			'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-			'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation pptx',
-			'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx'
+			'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+			'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 		);
 		
 		return isset($exts[$ext]) ? $exts[$ext] : 'application/octet-stream';

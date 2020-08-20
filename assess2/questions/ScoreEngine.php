@@ -321,6 +321,10 @@ class ScoreEngine
         }
 
         foreach ($postpartstoprocess as $partnum => $kidx) {
+            if (!empty($GLOBALS['inline_choicemap']) && !empty($_POST["qn$partnum-choicemap"])) {
+                $_SESSION['choicemap'][$assessmentId][$partnum] = decryptval($_POST["qn$partnum-choicemap"],
+                    $GLOBALS['inline_choicemap']);
+            }
             if (isset($_POST["qs$partnum"]) && (
               $_POST["qs$partnum"] === 'DNE' || $_POST["qs$partnum"] === 'inf')
             ) {
@@ -397,6 +401,11 @@ class ScoreEngine
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
         $assessmentId = $scoreQuestionParams->getAssessmentId();
+
+        if (!empty($GLOBALS['inline_choicemap']) && !empty($_POST["qn$qnidx-choicemap"])) {
+            $_SESSION['choicemap'][$assessmentId][$qnidx] = decryptval($_POST["qn$qnidx-choicemap"],
+                $GLOBALS['inline_choicemap']);
+        }
 
         if (isset($_POST["qs$qnidx"]) && (
           $_POST["qs$qnidx"] === 'DNE' || $_POST["qs$qnidx"] === 'inf')
@@ -523,7 +532,16 @@ class ScoreEngine
             $scorePartResult = $scorePart->getResult();
             $raw[$partnum] = $scorePartResult->getRawScore();
 
-            if (isset($scoremethod) && $scoremethod == 'acct') {
+            $scoremethodwhole = '';
+            if (isset($scoremethod)) {
+                if (!is_array($scoremethod)) {
+                    $scoremethodwhole = $scoremethod;
+                } else if (!empty($scoremethod['whole'])) {
+                    $scoremethodwhole = $scoremethod['whole'];
+                }
+            }
+
+            if ($scoremethodwhole == 'acct') {
                 if (($anstype == 'string' || $anstype == 'number') && $answer[$partnum] === '') {
                     $scores[$partnum] = $raw[$partnum] - 1;  //0 if correct, -1 if wrong
                     // scores isn't actually used - only raw is
@@ -546,7 +564,7 @@ class ScoreEngine
             $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
         }
 
-        if (isset($scoremethod) && $scoremethod == "singlescore") {
+        if ($scoremethodwhole == "singlescore") {
             return array(
                 'scores' => array(round(array_sum($scores), 3)),
                 'rawScores' => $raw,
@@ -556,7 +574,7 @@ class ScoreEngine
                 'scoreMethod' => 'singlescore',
                 'answeights' => $answeights
             );
-        } else if (isset($scoremethod) && $scoremethod == "allornothing") {
+        } else if ($scoremethodwhole == "allornothing") {
             if (array_sum($scores) < .98) {
                 return array(
                     'scores' => array(0),
@@ -578,7 +596,7 @@ class ScoreEngine
                     'answeights' => $answeights
                 );
             }
-        } else if (isset($scoremethod) && $scoremethod == "acct") {
+        } else if ($scoremethodwhole == "acct") {
             $sc = round(array_sum($scores) / $accpts, 3);
             return (array(
                 'scores' => array($sc),

@@ -33,7 +33,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=?");
+	$stm = $DBH->prepare("SELECT courseid,ver,submitby FROM imas_assessments WHERE id=?");
 	$stm->execute(array($aid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($row === null || $row['courseid'] != $cid) {
@@ -44,7 +44,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$addassess = 'addassessment.php';
 	}
-	$aver = $row['ver'];
+    $aver = $row['ver'];
+    $submitby = $row['submitby'];
 	$modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
@@ -1202,9 +1203,25 @@ if ($overwriteBody==1) {
 
 	<div id="headeraddquestions" class="pagetitle"><h1><?php echo _('Add/Remove Questions'); ?>
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-	</h1></div>
+    </h1></div>
+    <div class="cp">
+        <span class="column">
 <?php
-	echo '<div class="cp"><a href="'.$addassess.'?id='.Sanitize::onlyInt($_GET['aid']).'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';
+    echo '<a href="'.$addassess.'?id='.$aid.'&amp;cid='.$cid.'">'._('Assessment Settings').'</a>';
+    echo '<br><a href="categorize.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Categorize Questions').'</a>';
+    echo '<br><a href="';
+    if (isset($CFG['GEN']['pandocserver'])) {
+        echo 'printlayoutword.php?cid='.$cid.'&aid='.$aid;
+    } else {
+        echo 'printtest.php?cid='.$cid.'&aid='.$aid;
+    }
+    echo '">'._('Create Print Version').'</a>';
+    echo '</span><span class="column">';
+    echo '<a href="assessendmsg.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define End Messages').'</a>';
+    if ($aver > 1 && $submitby == 'by_assessment') {
+        echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define Auto-Excuse').'</a>';
+    }
+    echo '</span><br class=clear /></div>';
 	if ($beentaken) {
 ?>
 	<h2><?php echo _("Warning") ?></h2>
@@ -1294,17 +1311,6 @@ if ($overwriteBody==1) {
 ?>
 	<p>
 		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
-		<button type="button" title=<?php echo '"'._("Modify assessment settings").'"'; ?> onClick="window.location='<?php echo $address;?>?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"><?php echo _("Assessment Settings"); ?></button>
-		<button type="button" title=<?php echo '"'._("Categorize questions by outcome or other groupings").'"'; ?> onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"><?php echo _("Categorize Questions"); ?></button>
-		<button type="button" onClick="window.location='<?php
-		if (isset($CFG['GEN']['pandocserver'])) {
-			echo 'printlayoutword.php?cid='.$cid.'&aid='.$aid;
-		} else {
-			echo 'printtest.php?cid='.$cid.'&aid='.$aid;
-		}
-		?>'"><?php echo _("Create Print Version"); ?></button>
-
-		<button type="button" title=<?php echo '"'._("Customize messages to display based on the assessment score").'"'; ?> onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"><?php echo _("Define End Messages"); ?></button>
 		<button type="button" title=<?php echo '"'._("Preview this assessment").'"'; ?> onClick="window.open('<?php
 			if ($aver > 1) {
 				echo $imasroot . '/assess2/?cid=' . $cid . '&aid=' . $aid;

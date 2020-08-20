@@ -77,14 +77,18 @@ if (!$assess_record->hasRecord()) {
   if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
     $isGroup = $assess_info->getSetting('isgroup');
     if ($isGroup > 0) {
-      if ($isGroup == 3) {
-        $groupsetid = $assess_info->getSetting('groupsetid');
-        list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
-        if ($stugroupid == 0) {
+      $groupsetid = $assess_info->getSetting('groupsetid');
+      list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
+      if ($stugroup == 0) {
+        if ($isGroup == 3) {
           // no group yet - can't do anything
           echo '{"error": "need_group"}';
           exit;
+        } else {
+          $current_members = false; // just create for user if no group yet
         }
+      } else {
+        $current_members = array_keys($current_members); // we just want the user IDs
       }
       // creating for group
       $assess_record->createRecord($current_members, $stugroupid, false, '');

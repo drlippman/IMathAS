@@ -16,7 +16,7 @@ require_once("filehandler.php");
 function showcalendar($refpage) {
 global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
-global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver;
+global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver, $excused;
 
 $now= time();
 
@@ -122,6 +122,15 @@ if (!isset($teacherid)) {
 		}
 	}
 }
+if (!isset($excused) && !isset($teacherid)) {
+    $excused = array();
+    $query = 'SELECT type,typeid FROM imas_excused WHERE courseid=? AND userid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($cid, $userid));
+    while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $excused[$line['type'].$line['typeid']] = 1;
+    }
+}
 
 $byid = array();
 $k = 0;
@@ -142,6 +151,12 @@ if ($latepasses > 0 && $courseUIver > 1) {
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
 	$canuselatepass = false;
+
+	// if caltag == 'use_name', display the assessment name
+	if ($row['caltag'] == 'use_name') {
+		// truncate name, if needed
+		$row['caltag'] = strlen($row['name']) > 40 ? substr($row['name'], 0, 40) . '...' : $row['name'];
+	}
 
 	if (isset($exceptions[$row['id']])) {
 		list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row);
@@ -298,7 +313,8 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"allowlate"=>$lp,
 			"undolate"=>$ulp,
 			"name"=> $row['name'],
-			'ver'=> $row['ver']
+            'ver'=> $row['ver'],
+            'excused' => !empty($excused['A'.$row['id']])? 1 : 0
 		);
 		if ($now<$row['enddate'] || $row['reviewdate']>$now || isset($teacherid) || $lp==1) {
 			$json['id'] = $row['id'];

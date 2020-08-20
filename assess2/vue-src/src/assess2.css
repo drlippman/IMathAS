@@ -363,6 +363,11 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   margin: 12px 0;
   padding: 1px;
 }
+.questionpane > .question > .question:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 
 div.question img, div.intro img, div.sidepreview img {
 	max-width: 90%;

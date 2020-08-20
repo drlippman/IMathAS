@@ -198,7 +198,7 @@ dd {
 		<li><a href="#calcinterval">Calculated Interval</a></li>
 		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
-		<li><a href="#conditional">Conditional</a></li>
+        <li><a href="#conditional">Conditional</a></li>
 		</ul></li>
 	</ul></li>
 
@@ -2183,8 +2183,8 @@ can be omitted.</p>
 <li><strong>nonzerorrand(min,max,p)</strong>:  Returns a nonzero real number between min and max in steps of p</li>
 <li><strong>randfrom(list or array)</strong>: Return an element of the list/array.  Examples of lists: &quot;2,4,6,8&quot;, or &quot;red,green,blue&quot;</li>
 <li><strong>randname(),randmalename(),randfemalename()</strong>:  Returns a random first name</li>
-<li><strong>randnamewpronouns()</strong>:  Returns a random first name with pronouns in the order: subjective, objective, possessive (singular), possessive (plural).
-	Use: $name,$heshe,$himher,$hisher,$hishers = randnamewpronouns()</li>
+<li><strong>randnamewpronouns([option])</strong>:  Returns a random first name with pronouns in the order: subjective, objective, possessive (singular), possessive (plural), reflexive. Can set option to 'neutral' for they/them/their/theirs/themself pronouns.
+	Use: $name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns()</li>
 </ul>
 
 <p>Array randomizers (return multiple results):</p>
@@ -2194,12 +2194,12 @@ can be omitted.</p>
 <li><strong>nonzerorands(min,max,n,[order])</strong>:  Returns n nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>randsfrom(list/array,n,[order])</strong>: Return n elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>jointrandfrom(list/array,list/array)</strong>:  Returns one element from each list, where the location used in each list is the same</li>
+<li><strong>jointrandfrom(list/array,list/array,[list/array,...])</strong>:  Returns one element from each list, where the location used in each list is the same</li>
 <li><strong>diffrands(min,max,n,[order])</strong>:  Returns n different integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>diffrrands(min,max,p,n,[order])</strong>:  Returns n different real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>diffrandsfrom(list/array,n,[order])</strong>: Return n different elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>nonzerodiffrands(min,max,n,[order])</strong>:  Returns n different nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>nonzerodiffrrands(min,max,p,n,[nonzero,order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>nonzerodiffrrands(min,max,p,n,[order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>jointshuffle(list/array1,list/array2,[n1,n2])</strong>:  Shuffles two lists/arrays in a way that retains
     respective order.  In n1 is provided, n1 elements from each shuffled array will be returned (like
     a joint version of diffrandsfrom).  If n2 is also provided, n1 elements of list/array1 and n2
@@ -2209,6 +2209,7 @@ can be omitted.</p>
 <li><strong>randnames(n),randmalenames(n),randfemalenames(n)</strong>:  Returns n random first names</li>
 <li><strong>randcity(),randcities(n)</strong>:  Returns one or n random city names</li>
 <li><strong>randstate(),randstates(n)</strong>:  Returns one or n random US state names</li>
+<li><strong>randcountry(),randcountries(n)</strong>:  Returns one or n random country names</li>
 <li><strong>randpythag([min,max])</strong>:  Return a Pythagorean triple.  min/max default to 1 to 100</li>
 </ul>
 
@@ -2308,8 +2309,10 @@ The following macros create graphs or tables:
 <li><strong>changeimagesize(image or graph, width, [height])</strong>: Changes the display width for an image.
     Note this doesn't resize the file itself, just changes the display size - it's always better to resize the original
     image file.</li>
-<li><strong>textonimage(img,text,left,top[text,left,top...])</strong>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
-    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.</li>
+<li><strong>textonimage(img,text,left,top[text,left,top,left,...])</strong>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
+    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.
+    textonimage is not screenreader-friendly, so it's recommended you provide an alt text on the image, 
+    which will be read to the screenreader instead of the image and any layered text.</li>
 <li><strong>arraystodoteqns(xarray,yarray,[color])</strong>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
 <li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts an array of x-values and y-values into a form that
@@ -2361,6 +2364,17 @@ The following macros help with formatting values for display:
    numtowords(1203,false,true) returns "1023rd"<br/>
    numtowords(1203,false,false,true) returns "one thousand, two hundred three"
   </li>
+<li><strong>fractowords(numerator,denominator,[options])</strong>: Creates a string containing fraction numerator/denominator written out in words. By default, fractions will be reduced to integers if possible,
+	and pos/neg signs will be reduced. Options is a string that can include combinations of 'mixed' or 'literal', and 'over' or 'by'. Using 'over' or 'by' will connect numerator and denominator with that word.
+	Using 'mixed' will output a mixed number, and 'literal' overrides the default simplifications. Does not allow division by zero. If 'over' and 'by' both used, defaults to 'over'. If 'mixed' and 'literal' both used,
+	defaults to 'mixed'.<br/>
+	fractowords(5,-2) returns "negative five halves"<br/>
+	fractowords(6,3) returns "two"<br/>
+	fractowords(-7,4,'mixed') returns "negative one and three fourths"<br/>
+	fractowords(-7,4,'mixed over') returns "negative one and three over four"<br/>
+	fractowords(6,3,'literal') returns "six thirds"<br/>
+	fractowords(6,3,'literal over') returns "six over three"<br/>
+</li>
 <li><strong>numtoroman(number,[uppercase])</strong>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
     produce lowercase</li>
 <li><strong>prettyint(number)</strong>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
@@ -3889,7 +3903,9 @@ This type of question can contain multiple parts, where each part is one of the 
 <dt>$scoremethod = "singlescore" or "allornothing" </dt>
 	<dd>Instead of recording individual scores for each question part, these will cause a single score to be
 	recorded for the question.  "singlescore" totals the individual part scores, while "allornothing"
-	will only give full credit or no credit.</dd>
+    will only give full credit or no credit.  If you need to specify per-part indexed 
+    scoremethod values as well, you can define this as the array value 
+    $scoremethod['whole'] instead.</dd>
 <dt>Question part options</dt>
 	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
 <dt>$showanswer </dt>
@@ -3902,6 +3918,32 @@ This type of question can contain multiple parts, where each part is one of the 
 	Show Answer button, you must place all of them, or else the remainder will not show.  Use $showanswerstyle = 'inline' to
 	allow Show Answer to be placed inline with text rather than on its own line.</dd>
 </dl>
+
+<p><strong>Scaffolding</strong></p>
+<p>Scaffolded questions, also know as Sequential Multipart questions, allow you 
+    to break a question up into chunks, where the second chunk only shows after the 
+    first chunk is correctly answered or the student runs out of tries.  This 
+    allows you to use the answer to the first chunk in the second without 
+    "giving away" the answer, and allows a student who gets stuck on the first 
+    chunk to move on to the rest of the question.</p>
+<p><em>Note: scaffolding is only available in the new assessment interface. 
+    If you are using the old interface, the question will behave like a 
+    regular multipart question.</em></p>
+<p>Scaffolded questions are an extension of Multipart questions.  To turn a multipart 
+    question into a scaffolded question, just add an isolated line with three or more slashes
+    in the Question Text where you want the chunks broken apart.</p>
+<p>An example: (in the Question Text)</p>
+<pre>
+To simplify $a(x+$b) + $c, first we need to distribute:
+
+$a(x+$b) = $answerbox[0]
+
+///
+
+Next, combine like terms:
+
+$a x + $ab + $c = $answerbox[1]
+</pre>
 
 </div> <!-- h3 -->
 <div class=h3>
@@ -3955,7 +3997,18 @@ own question type.
 	<dd>By default the $showanswer for conditional types is "Answers may vary".  Set $showanswer to override this.</dd>
 </dl>
 
+<p><strong>Scaffolding</strong></p>
+<p>While not as simple as scaffolding multipart questions, 
+    you can add scaffolding to a Conditional question.  As with multipart,
+    put an isolated line with three slashes in the question text to indicate 
+    where the breaks occur. Then you will need to set <code>$seqPartDone[pn]</code>
+    to <code>true</code> for each part index once that part should be considered 
+    completed.  The scaffolding will move onto the next chunk when 
+    all parts in the previous chunk have <code>$seqPartDone</code>
+    set to <code>true</code>.
+</p>
 </div> <!-- h3 -->
+
 </div> <!-- h2 -->
 </div> <!-- h1 -->
 <div class=h1>

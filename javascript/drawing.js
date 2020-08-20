@@ -243,13 +243,13 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
 		},
 		"basic": {
-			"line": [{"mode":0, "descr":_("Lines"), inN: "list", "input":_("Enter list of points to connect with lines")}],
+			"line": [{"mode":0, "descr":_("Lines"), inN: "list", "input":_("Enter a list of points to connect with lines")}],
 			"lineseg": [{"mode":0.5, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
-			"freehand": [{"mode":0.7, "descr":_("Freehand"), inN: "list", "input":_("Enter list of points to connect with lines")}],
+			"freehand": [{"mode":0.7, "descr":_("Freehand"), inN: "list", "input":_("Enter a list of points to connect with lines")}],
 			"dot": [{"mode":1, "descr":_("Solid dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
-			"polygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":1}],
-			"closedpolygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":2}],
+			"polygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter a list of points for dots to connect with lines"), "dotline":1}],
+			"closedpolygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter a list of points for dots to connect with lines"), "dotline":2}],
 		}
 	};
 
@@ -309,16 +309,19 @@ function adda11ydraw(tarnum,initmode,defval) {
 	var thistarg = targets[tarnum];
 	var mode = initmode || thistarg.defmode;
 	var val = defval || "";
-	var afgroup = thistarg.afgroup;
-	html = '<select aria-label="'+_("Drawing element type")+'" onchange="imathasDraw.changea11ydraw(this,\''+tarnum+'\')">';
+    var afgroup = thistarg.afgroup;
+    var n = thistarg.el.getElementsByTagName("li").length+1;
+    var numname = '<span class="sr-only draweln">'+_('Drawing element ') + n + '</span>';
+    html = numname;
+	html += '<label>'+_("Element type")+': <select onchange="imathasDraw.changea11ydraw(this,\''+tarnum+'\')">';
 	for (j in thistarg.selects) {
 		html += thistarg.selects[j];
 	}
-	html += '</select><br/>';
-	html += '<span class="a11ydrawinstr"></span><br/>';
-	html += '<input type="text" aria-label="'+_("Point list")+'" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/>';
+	html += '</select></label><br/>';
+	html += '<label><span class="a11ydrawinstr"></span><br/>';
+	html += '<input type="text" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/></label>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
-	html += _("Remove")+'</button>';
+	html += _("Remove")+' '+numname+'</button>';
 	var li = $("<li>", {class:"a11ydrawrow"}).html(html);
 	$(thistarg.el).append(li);
 	li.find("select").val(mode);
@@ -329,13 +332,18 @@ function adda11ydraw(tarnum,initmode,defval) {
 }
 
 function removea11ydraw(el) {
-	$(el).parent().remove();
+    var ul = $(el).closest("ul");
+    $(el).parent().remove();
+    ul.find("li").each(function(i,el) {
+        var numname = _('Drawing element ') + (i+1);
+        $(el).find(".draweln").html(numname);
+    });
 	encodea11ydraw();
 }
 function changea11ydraw(tarel, tarnum) {
 	var curmode = $(tarel).val();
 	var modedata = targets[tarnum].moderef[curmode];
-	$(tarel).parent().find(".a11ydrawinstr").text(modedata.input);
+	$(tarel).closest("li").find(".a11ydrawinstr").text(modedata.input);
 	encodea11ydraw();
 }
 function updatea11ydraw(el) {
@@ -2515,7 +2523,8 @@ function normupdatevalues(id) {
 	} else if (normslider.curslider.type=='1R') {
 		var outstr = "("+lbl1val+",oo)";
 	}
-	document.getElementById("qn"+id).value = outstr;
+    document.getElementById("qn"+id).value = outstr;
+    $("#qn"+id).trigger("input").trigger("change");
 }
 
 function chgnormtype(id) {

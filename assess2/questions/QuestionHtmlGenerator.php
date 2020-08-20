@@ -145,6 +145,11 @@ class QuestionHtmlGenerator
               $stuanswersval[$thisq] = array($stuanswersval[$thisq]);
             }
           }
+        } else {
+            // if $doShowAnswerParts is set for part 0, use it for global
+            if (!empty($doShowAnswerParts[0])) {
+                $doShowAnswer = true;
+            }
         }
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
@@ -423,14 +428,32 @@ class QuestionHtmlGenerator
                   unset($jsParams[$qnRef]['longtip']);
                 }
             }
-            if ((isset($scoremethod) &&
-                ($scoremethod == 'acct' || $scoremethod == 'singlescore' ||
-                $scoremethod == 'allornothing')) ||
+            $scoremethodwhole = '';
+            if (isset($scoremethod)) {
+                if (!is_array($scoremethod)) {
+                    $scoremethodwhole = $scoremethod;
+                } else if (!empty($scoremethod['whole'])) {
+                    $scoremethodwhole = $scoremethod['whole'];
+                }
+            }
+            if (($scoremethodwhole == 'acct' || 
+                $scoremethodwhole == 'singlescore' ||
+                $scoremethodwhole == 'allornothing'
+              ) ||
               $quesData['qtype'] == 'conditional'
             ) {
               $jsParams['submitall'] = 1;
             }
         } else {
+
+
+            if ($GLOBALS['myrights'] > 10) {
+                if (isset($anstypes)) {
+                    $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
+                } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
+                    $this->addError('It looks like you have an $answerbox with part index; did you mean for this question to be Multipart?');
+                }
+            }
             // Generate answer boxes. (non-multipart question)
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
@@ -800,16 +823,17 @@ class QuestionHtmlGenerator
         $lastkey = max(array_keys($hints));
         if ($qdata['qtype'] == "multipart" && is_array($hints[$lastkey])) { //individual part hints
             $hintloc = array();
+            $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
                 if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
                     continue;
                 }
                 $lastkey = max(array_keys($hintpart));
-                if ($attemptn > $lastkey) {
+                if ($partattemptn[$iidx] > $lastkey) {
                     $usenum = $lastkey;
                 } else {
-                    $usenum = $attemptn;
+                    $usenum = $partattemptn[$iidx];
                 }
                 if ($hintpart[$usenum] != '') {
                     if (strpos($hintpart[$usenum], '</div>') !== false) {
@@ -1024,7 +1048,8 @@ class QuestionHtmlGenerator
                           'url' => $extrefpt[1],
                           'w' => $vidextrefwidth,
                           'h' => $vidextrefheight,
-                          'ref' => $qref
+                          'ref' => $qref,
+                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
                         ];
                         //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
                     } else {
@@ -1034,7 +1059,8 @@ class QuestionHtmlGenerator
                           'url' => $extrefpt[1],
                           'w' => $extrefwidth,
                           'h' => $extrefheight,
-                          'ref' => $qref
+                          'ref' => $qref,
+                          'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
                         ];
                     }
                 }
