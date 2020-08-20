@@ -78,6 +78,9 @@ class MatchingAnswerBox implements AnswerBox
     			$RND->shuffle($randakeys);
     		}
         $_SESSION['choicemap'][$assessmentId][$qn] = array($randqkeys, $randakeys);
+        if (!empty($GLOBALS['inline_choicemap'])) {
+            $params['choicemap'] = encryptval(array($randqkeys, $randakeys), $GLOBALS['inline_choicemap']);
+        }
         if (isset($GLOBALS['capturechoices'])) {
           $GLOBALS['choicesdata'][$qn] = array($randqkeys, $answers);
         }

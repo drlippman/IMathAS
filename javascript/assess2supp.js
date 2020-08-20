@@ -349,6 +349,20 @@ function disableInputs(qn, disabled) {
          }
        }
      });
+     const curqparams = allJsParams[qn];
+     for (const qref in curqparams) {
+         if (typeof curqparams[qref] == 'object' && curqparams[qref].choicemap) {
+             if (forbackground) {
+                data.append("qn"+qref+'-choicemap', curqparams[qref].choicemap);
+             } else {
+                $('#questionwrap' + qn).append($('<input>', {
+                    type: 'hidden',
+                    name: "qn"+qref+'-choicemap',
+                    value: curqparams[qref].choicemap
+                }));
+             }
+        }
+     }
    }
    var changed = getChangedQuestions(qns);
 

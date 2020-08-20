@@ -321,6 +321,10 @@ class ScoreEngine
         }
 
         foreach ($postpartstoprocess as $partnum => $kidx) {
+            if (!empty($GLOBALS['inline_choicemap']) && !empty($_POST["qn$partnum-choicemap"])) {
+                $_SESSION['choicemap'][$assessmentId][$partnum] = decryptval($_POST["qn$partnum-choicemap"],
+                    $GLOBALS['inline_choicemap']);
+            }
             if (isset($_POST["qs$partnum"]) && (
               $_POST["qs$partnum"] === 'DNE' || $_POST["qs$partnum"] === 'inf')
             ) {
@@ -397,6 +401,11 @@ class ScoreEngine
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
         $assessmentId = $scoreQuestionParams->getAssessmentId();
+
+        if (!empty($GLOBALS['inline_choicemap']) && !empty($_POST["qn$qnidx-choicemap"])) {
+            $_SESSION['choicemap'][$assessmentId][$qnidx] = decryptval($_POST["qn$qnidx-choicemap"],
+                $GLOBALS['inline_choicemap']);
+        }
 
         if (isset($_POST["qs$qnidx"]) && (
           $_POST["qs$qnidx"] === 'DNE' || $_POST["qs$qnidx"] === 'inf')
