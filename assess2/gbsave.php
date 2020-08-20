@@ -86,7 +86,8 @@ if (!empty($changes)) {
 $lti_sourcedid = $assess_record->getLTIsourcedId();
 if (strlen($lti_sourcedid) > 1) {
   require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true);
+  $aidposs = $assess_info->getSetting('points_possible');
+  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true,$aidposs);
 }
 
 //prep date display
