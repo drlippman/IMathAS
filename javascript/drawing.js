@@ -361,13 +361,19 @@ function updatea11ydraw(el) {
         if (subpts.length != 2) {
             err |= 1;
         }
+        for (var j=0; j<subpts.length; j++) {
+            if (subpts[j].trim().length == 0) {
+                err |= 1;
+            }
+        }
     }
-    if (el.nextSibling && el.nextSibling.className == 'noticetext') {
-        el.parentNode.removeChild(el.nextSibling);
+    if (el.parentNode.parentNode.lastChild.className == 'noticetext') {
+        el.parentNode.parentNode.removeChild(el.parentNode.parentNode.lastChild);
     }
     if (err) {
         el.setAttribute('aria-invalid', true);
         var errspan = document.createElement("span");
+        errspan.id = uniqid('a11ydrawerr');
         errspan.className = "noticetext"
         if ((err&1)==1) {
             errspan.innerHTML = '<br>'+_('Error: Invalid format for points. Give points as open parenthesis number comma number close parenthesis. Separate points with a comma.');
@@ -376,9 +382,11 @@ function updatea11ydraw(el) {
             errspan.innerHTML = '<br>'+_('Error: Incorrect number of points. Expecting ') + inN;
             setariastatus(_('Error: Incorrect number of points'));
         }
-        el.parentNode.appendChild(errspan);
+        el.parentNode.parentNode.appendChild(errspan);
+        el.setAttribute('aria-describedby', errspan.id);
     } else {
         el.removeAttribute('aria-invalid');
+        el.removeAttribute('aria-describedby');
         setariastatus("");
     }
 	encodea11ydraw();

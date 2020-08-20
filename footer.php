@@ -41,8 +41,6 @@ if (isset($placeinfooter)) {
 	echo $placeinfooter;
 }
 
-echo '<div role="status" aria-live="polite" id="ariastatus" class="sr-only"></div>';
-
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['footerscriptinclude'])) {
 	require("$curdir/{$CFG['GEN']['footerscriptinclude']}");

@@ -911,8 +911,18 @@ function addBlankTarget(i,el) {
 	}
 }
 
+function uniqid(prefix) {
+    return (prefix || '') + '_' + Math.random().toString(36).substr(2, 9);
+}
+
 function setariastatus(status) {
-    document.getElementById("ariastatus").innerHTML = status;
+    var el = document.getElementById("ariastatus");
+    if (!el) {
+        el = $("<div>", {id:"ariastatus", role:"status", className:"sr-only", "aria-live":"polite"});
+        $("body").append(el);
+        el = el[0];
+    }
+    el.innerHTML = status;
 }
 
 function addmultiselect(el,n) {
