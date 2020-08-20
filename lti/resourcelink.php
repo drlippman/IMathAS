@@ -27,7 +27,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       $sourceaid = $target['refaid'];
       $destcid = $localcourse->get_courseid();
       // is an assessment launch
-      if ($target['refcid'] === $destcid) {
+      if ($target['refcid'] == $destcid) {
         // see if aid is in the current course, we just use it
         $link = $db->make_link_assoc($sourceaid,'assess',$resource_link['id'],$contextid,$platform_id);
         $iteminfo = $db->get_assess_info($sourceaid);
@@ -35,7 +35,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
       } else {
         // need to find the assessment
         $destaid = false;
-        if ($target['refcid'] === $localcourse->get_copiedfrom()) {
+        if ($target['refcid'] == $localcourse->get_copiedfrom()) {
           // aid is in the originally copied course - find our copy of it
           $destaid = $db->find_aid_by_immediate_ancestor($sourceaid, $destcid);
         }

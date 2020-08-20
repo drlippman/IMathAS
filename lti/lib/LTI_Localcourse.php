@@ -41,7 +41,7 @@ class LTI_Localcourse {
     }
 
     public function set_courseid($courseid) {
-        $this->courseid = $courseid;
+        $this->courseid = intval($courseid);
         return $this;
     }
 
@@ -50,7 +50,7 @@ class LTI_Localcourse {
     }
 
     public function set_copiedfrom($copiedfrom) {
-        $this->copiedfrom = $copiedfrom;
+        $this->copiedfrom = intval($copiedfrom);
         return $this;
     }
 
