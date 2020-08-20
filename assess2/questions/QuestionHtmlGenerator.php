@@ -134,6 +134,7 @@ class QuestionHtmlGenerator
         $quesData = $this->questionParams->getQuestionData();
         $showHints = ($this->questionParams->getShowHints()&1)==1;
         $thisq = $this->questionParams->getQuestionNumber() + 1;
+        $correctAnswerWrongFormat = $this->questionParams->getCorrectAnswerWrongFormat();
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
@@ -399,7 +400,8 @@ class QuestionHtmlGenerator
                     ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
                     ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
-                    ->setColorboxKeyword($questionColor);
+                    ->setColorboxKeyword($questionColor)
+                    ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[$atIdx]);
 
                 try {
                   $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
@@ -480,7 +482,8 @@ class QuestionHtmlGenerator
                 ->setAssessmentId($this->questionParams->getAssessmentId())
                 ->setIsMultiPartQuestion(false)
                 ->setStudentLastAnswers($lastAnswer)
-                ->setColorboxKeyword($questionColor);
+                ->setColorboxKeyword($questionColor)
+                ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0]);
 
             $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
             $answerBoxGenerator->generate();

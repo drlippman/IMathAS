@@ -491,6 +491,7 @@ class ScoreEngine
 
         $partLastAnswerAsGiven = array();
         $partLastAnswerAsNumber = array();
+        $partCorrectAnswerWrongFormat = array();
         if (isset($answeights)) {
   				if (!is_array($answeights)) {
   					$answeights = explode(",",$answeights);
@@ -560,6 +561,7 @@ class ScoreEngine
             $raw[$partnum] = round($raw[$partnum], 2);
             $partLastAnswerAsGiven[$partnum] = $scorePartResult->getLastAnswerAsGiven();
             $partLastAnswerAsNumber[$partnum] = $scorePartResult->getLastAnswerAsNumber();
+            $partCorrectAnswerWrongFormat[$partnum] = $scorePartResult->getCorrectAnswerWrongFormat();
         }
 
         if ($scoremethodwhole == "singlescore") {
@@ -568,6 +570,7 @@ class ScoreEngine
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                 'scoreMethod' => 'singlescore',
                 'answeights' => $answeights
             );
@@ -578,6 +581,7 @@ class ScoreEngine
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                    'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                     'scoreMethod' => 'allornothing',
                     'answeights' => $answeights
                 );
@@ -587,6 +591,7 @@ class ScoreEngine
                     'rawScores' => $raw,
                     'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                     'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                    'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                     'scoreMethod' => 'allornothing',
                     'answeights' => $answeights
                 );
@@ -598,6 +603,7 @@ class ScoreEngine
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                 'scoreMethod' => 'singlescore',
                 'answeights' => $answeights
             ));
@@ -607,6 +613,7 @@ class ScoreEngine
                 'rawScores' => $raw,
                 'lastAnswerAsGiven' => $partLastAnswerAsGiven,
                 'lastAnswerAsNumber' => $partLastAnswerAsNumber,
+                'correctAnswerWrongFormat' => $partCorrectAnswerWrongFormat,
                 'answeights' => $answeights
             );
         }
@@ -644,6 +651,7 @@ class ScoreEngine
             'rawScores' => array(round($score, 2)),
             'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
             'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber()),
+            'correctAnswerWrongFormat' => array($scorePartResult->getCorrectAnswerWrongFormat()),
             'answeights' => array(1)
         );
     }

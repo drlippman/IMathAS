@@ -32,6 +32,7 @@ class CalculatedAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $correctAnswerWrongFormat = $this->answerBoxParams->getCorrectAnswerWrongFormat();
 
         $out = '';
         $tip = '';
@@ -52,15 +53,12 @@ class CalculatedAnswerBox implements AnswerBox
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        // TODO: fix this
-        $lap = explode('$f$',$la);
-        if (isset($lap[1]) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
+        if (!empty($correctAnswerWrongFormat)) {
             $rightanswrongformat = true;
             if ($colorbox=='ansred') {
                 $colorbox = 'ansorg';
             }
         }
-        $la = $lap[0];
 
         if (!isset($answerformat)) { $answerformat = '';}
     		$ansformats = array_map('trim',explode(',',$answerformat));
@@ -155,14 +153,6 @@ class CalculatedAnswerBox implements AnswerBox
     						'class="'.implode(' ', $classes) .
     						'" />' .
     						$rightb;
-
-    		if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
-    			if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
-    				$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','One or more of your answers is equivalent to the correct answer, but is not simplified or is in the wrong format');
-    			} else {
-    				$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
-    			}
-    		}
 
     		if (!isset($hidepreview)) {
     			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";

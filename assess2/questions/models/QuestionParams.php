@@ -23,6 +23,7 @@ class QuestionParams
     private $studentPartAttemptCount;
     private $seqPartDone;
     private $lastRawScores;     // All of a student's scores on their last attempt.
+    private $correctAnswerWrongFormat;
 
     // Orig: $doshowans - int, from displayq2.php
     private $showAnswer;    // @see ShowAnswer.php
@@ -513,6 +514,28 @@ class QuestionParams
     public function setScoreIsCorrect(?array $scoreIsCorrect): QuestionParams
     {
         $this->scoreIsCorrect = $scoreIsCorrect;
+        return $this;
+    }
+
+    /**
+     * Get whether each part is right answer but wrong format.
+     *
+     * @return array
+     */
+    public function getCorrectAnswerWrongFormat(): ?array
+    {
+        return $this->correctAnswerWrongFormat;
+    }
+
+    /**
+     * Set whether each part is right answer but wrong format.
+     *
+     * @param array $correctAnswerWrongFormat
+     * @return QuestionParams
+     */
+    public function setCorrectAnswerWrongFormat(?array $correctAnswerWrongFormat): QuestionParams
+    {
+        $this->correctAnswerWrongFormat = $correctAnswerWrongFormat;
         return $this;
     }
 }

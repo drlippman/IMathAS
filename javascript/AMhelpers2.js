@@ -292,9 +292,12 @@ function initqsclickchange() {
 function clearScoreMarkers(e) {
   var m;
   var target = e.currentTarget
-  if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
+  if ((m = target.className.match(/(ansgrn|ansred|ansyel|ansorg)/)) !== null) {
     $(target).removeClass(m[0]);
     $(target).nextAll('.scoremarker.sr-only').first().remove();
+    if (m[0]=='ansorg') {
+        $(target).nextAll('.scoremarker').first().remove();
+    }
     if (target.tagName.toLowerCase() == 'select') {
       $(target).nextAll('svg.scoremarker').first().remove();
     }
@@ -304,7 +307,7 @@ function clearScoreMarkers(e) {
   } else {
     var wrap = $(target).closest("[id^=qnwrap]");
     if (wrap.length > 0 &&
-      ((m = wrap[0].className.match(/(ansgrn|ansred|ansyel)/)) !== null)
+      ((m = wrap[0].className.match(/(ansgrn|ansred|ansyel|ansorg)/)) !== null)
     ) {
       wrap.removeClass(m[0]);
       wrap.find(".scoremarker").remove();
@@ -322,16 +325,34 @@ function setScoreMarkers(base) {
   var svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
   svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
   svgx += '<span class="sr-only scoremarker">' + _('Incorrect') + '</span>';
+  var svgox = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,85,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgox += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+  svgox += '<span class="sr-only scoremarker">' + _('Incorrect, wrong format') + '</span>';
   $(base).find('.scoremarker').remove();
   $(base).find('div.ansgrn,table.ansgrn').append(svgchk);
   $(base).find('div.ansyel,table.ansyel').append(svgychk);
   $(base).find('div.ansred,table.ansred').append(svgx);
+  $(base).find('div.ansorg,table.ansorg').append(svgox);
   $(base).find('select.ansgrn').after(svgchk);
   $(base).find('select.ansyel').after(svgychk);
   $(base).find('select.ansred').after(svgx);
+  $(base).find('select.ansorg').after(svgox);
   $(base).find('span[id^=mqinput-].ansgrn,input[type=text].ansgrn').after('<span class="scoremarker sr-only">' + _('Correct') + '</span>');
   $(base).find('span[id^=mqinput-].ansyel,input[type=text].ansyel').after('<span class="scoremarker sr-only">' + _('Partially correct') + '</span>');
   $(base).find('span[id^=mqinput-].ansred,input[type=text].ansred').after('<span class="scoremarker sr-only">' + _('Incorrect') + '</span>');
+  $(base).find('span[id^=mqinput-].ansorg,input[type=text].ansorg').after('<span class="scoremarker sr-only">' + _('Incorrect, wrong format') + '</span>');
+  $(base).find('span[id^=mqinput-].ansorg,input[type=text].ansorg').after(
+      $('<span>', {
+          role: "button",
+          class: "scoremarker",
+          tabindex: 0,
+          "aria-label": _('Incorrect, wrong format'),
+          "data-tip": _('Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format'),
+          "data-tooltipclass": "dropdown-pane tooltip-pane"
+      }).on('mouseover focus', function () {tipshow(this)})
+      .on('mouseleave blur', tipout)
+      .html('<svg style="vertical-align:middle;margin-left:3px;" viewBox="0 0 24 24" width="18" height="18" stroke="rgb(255,85,0)" stroke-width="2" stroke-linecap="round" fill="none" role="img" aria-hidden=true><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>')
+  );
 }
 
 function initClearScoreMarkers() {

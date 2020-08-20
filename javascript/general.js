@@ -90,8 +90,12 @@ function tipshow(el,tip, e) {
 		return;
 	}
 	if (typeof tipobj!= 'object') {
-		tipobj = document.createElement("div");
-		tipobj.className = "tips";
+        tipobj = document.createElement("div");
+        if (imathasAssess) {
+            tipobj.className = "dropdown-pane tooltip-pane";
+        } else {
+            tipobj.className = "tips";
+        }
 		tipobj.setAttribute("role","tooltip");
 		tipobj.id = "hovertipsholder";
 		document.getElementsByTagName("body")[0].appendChild(tipobj);

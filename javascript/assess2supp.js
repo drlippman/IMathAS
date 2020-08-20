@@ -172,26 +172,11 @@ function disableInputs(qn, disabled) {
    window.initlinkmarkup(qwrap);
    window.setInitValues(qwrap);
 
-   let svgchk = '<svg class=\"scoremarker\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" stroke=\"green\" stroke-width=\"3\" fill=\"none\" role=\"img\" aria-label=\"' + _('icons.correct') + '\">';
-   svgchk += '<polyline points=\"20 6 9 17 4 12\"></polyline></svg>';
-   let svgychk = '<svg class=\"scoremarker\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" stroke=\"rgb(255,187,0)\" stroke-width=\"3\" fill=\"none\" role=\"img\" aria-label=\"' + _('icons.partial') + '\">';
-   svgychk += '<path d=\"M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z\" /></svg>';
-   let svgx = '<svg class=\"scoremarker\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" stroke=\"rgb(153,0,0)\" stroke-width=\"3\" fill=\"none\" role=\"img\" aria-label=\"' + _('icons.incorrect') + '\">';
-   svgx += '<path d=\"M18 6 L6 18 M6 6 L18 18\" /></svg>';
-   window.$(qwrap).find('.scoremarker').remove();
-   window.$(qwrap).find('div.ansgrn,table.ansgrn').append(svgchk);
-   window.$(qwrap).find('div.ansyel,table.ansyel').append(svgychk);
-   window.$(qwrap).find('div.ansred,table.ansred').append(svgx);
-
    if (jsparams.disabled) {
      disableInputs(qn, jsparams.disabled);
    }
-   
-   window.imathasAssess.init(jsparams, true);
 
-   window.$(qwrap).find('select.ansgrn').after(svgchk);
-   window.$(qwrap).find('select.ansyel').after(svgychk);
-   window.$(qwrap).find('select.ansred').after(svgx);
+   window.imathasAssess.init(jsparams, true, qwrap);
 
    if (jsparams.helps && jsparams.helps.length > 0) {
      addHelps(qwrap, jsparams.helps);
@@ -218,7 +203,7 @@ function disableInputs(qn, disabled) {
         help['descr'] = help['descr'].replace(/"/g,'&quot;').replace(/'/g,'&#039;');
         out += ' title="'+help['descr']+'"';
         out += ' aria-label="'+title+' '+help['descr']+'"';
-       }
+     }
        out += '>' + title + '</a></li>';
      }
      out += '</ul>';
@@ -360,7 +345,7 @@ function disableInputs(qn, disabled) {
                     name: "qn"+qref+'-choicemap',
                     value: curqparams[qref].choicemap
                 }));
-             }
+   }
         }
      }
    }
