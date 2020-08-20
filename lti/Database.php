@@ -914,7 +914,9 @@ class Imathas_LTI_Database implements LTI\Database
                 $ags->update_lineitem($lineitem);
             }
             if (!empty($lineitemstr)) {
-                $stm = $this->dbh->prepare('INSERT INTO imas_lti_lineitems (itemtype,typeid,lticourseid,lineitem) VALUES (?,?,?,?)');
+                $query = 'INSERT INTO imas_lti_lineitems (itemtype,typeid,lticourseid,lineitem) 
+                    VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE lineitem=VALUES(lineitem)';
+                $stm = $this->dbh->prepare($query);
                 $stm->execute(array($itemtype, $typeid, $localcourse->get_id(), $lineitemstr));
             }
             return true;
