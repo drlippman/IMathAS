@@ -727,23 +727,32 @@ function togglevideoembed() {
 			timeref += '&end='+m[1];
 		}
 		timeref += '&enablejsapi=1';
-		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
-		jQuery('<iframe/>', {
+        var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
+        var viframe = jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
 			height: 400,
 			src: loc_protocol+'//'+vidsrc+vidid+timeref,
 			frameborder: 0,
 			allowfullscreen: 1
-		}).insertAfter(jQuery(this));
-		jQuery(this).parent().fitVids();
-		jQuery('<br/>').insertAfter(jQuery(this));
-		jQuery(this).text(' [-]')
+        });
+        var $this = jQuery(this);
+        if ($this.closest('.itemhdr').length == 0) {
+            viframe.insertAfter($this);
+            $this.parent().fitVids();
+            jQuery('<br/>').insertAfter($this);
+        } else {
+            var par = $this.closest('.itemhdr').next();
+            par.prepend(viframe);
+            par.fitVids();
+        }
+		
+		$this.text(' [-]')
 			.attr('title',_("Hide video"))
 			.attr('aria-label',_("Hide embedded video"));
-		if (jQuery(this).prev().attr("data-base")) {
-			var inf = jQuery(this).prev().attr('data-base').split('-');
-			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
+		if ($this.prev().attr("data-base")) {
+			var inf = $this.prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, $this.prev().text());
 		}
 	}
 }
