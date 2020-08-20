@@ -251,9 +251,12 @@ class DrawingAnswerBox implements AnswerBox
                         (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '').'</p>';
     				$out .= '<p>'._('Graph to add drawings to:').'</p>';
     				$out .= '<p>'.$plot.'</p>';
-    				$out .= '<p>'._('Elements to draw:').'</p>';
-    				$out .= '<ul id="a11ydraw'.$qn.'"></ul>';
-    				$out .= '<p><button type="button" class="a11ydrawadd" data-qn="'.$qn.'">'._('Add new drawing element').'</button></p>';
+    				$out .= '<p tabindex="-1">'._('Elements to draw:').'</p>';
+                    $out .= '<ul class="a11ydraw" id="a11ydraw'.$qn.'"></ul>';
+                    $out .= '<p class="empty-state">'._('No elements have been added yet').'</p>';
+                    $out .= '<p><label>'._('Add new drawing element');
+                    $out .= ': <select id="a11ydrawnew'.$qn.'"></select></label> ';
+                    $out .= '<button type="button" class="a11ydrawadd" data-qn="'.$qn.'">'._('Add').'</button></p>';
     				if ($answerformat[0]=="polygon") {
     					$dotline = 1;
     				} else if ($answerformat[0]=="closedpolygon") {

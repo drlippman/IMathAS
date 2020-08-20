@@ -358,6 +358,12 @@ span.left {
 	overflow: hidden;
 	color: transparent;
 }
+.empty-state, ul:empty {
+    display: none;
+}
+ul:empty + .empty-state {
+    display: block;
+}
 #skipnav:focus, #skipnav:active {
     position: static;
     width: auto;
@@ -1363,3 +1369,5 @@ a.dropdown-toggle.arrow-down:hover {
 	max-width: 1920px;
 	margin: auto;
 }
+
+[tabindex="-1"] { outline: none }
