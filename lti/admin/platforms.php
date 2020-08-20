@@ -217,7 +217,7 @@ if ($bbclientid === false) {
   echo ' <li>'._('Click Register LTI 1.3/Advantage Tool').'</li>';
   echo ' <li>'._('Enter the Client ID:').' <span class=tocopy>'.Sanitize::encodeStringForDisplay($bbclientid).'</span></li>';
   echo ' <li>'._('On the tool status page, make sure the tool is Approved. ').'</li>';
-  echo ' <li>'._('Also ensure User Fields to Send includes Name and Role in Course, and set Allow grade service access to Yes.').'</li>';
+  echo ' <li>'._('Also ensure User Fields to Send includes Name and Role in Course, and set Allow grade service access and Allow Membership Service Access to Yes.').'</li>';
   echo '</ul>';
   echo '<p>'._('If you want to enable deep linking, to allow easy addition of new items in Blackboard:').'</p>';
   echo '<ul>';

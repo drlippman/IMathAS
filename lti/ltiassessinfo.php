@@ -65,8 +65,8 @@ if (!empty($_POST['makelineitem'])) {
         calcandupdateLTIgrade(
             $sourcedid,
             $aid,
-            $uid,
-            $score,
+            $scoredata['userid'],
+            $scoredata['score'],
             true,
             $iteminfo['ptsposs']
         );

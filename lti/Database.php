@@ -995,10 +995,12 @@ class Imathas_LTI_Database implements LTI\Database
         $query = 'SELECT istu.userid,ilu.ltiuserid,iar.score,iar.status FROM 
             imas_students AS istu 
             JOIN imas_ltiusers AS ilu ON istu.userid=ilu.userid AND ilu.org=?
-            LEFT JOIN imas_assessment_records AS iar ON istu.userid=iar.userid
+            LEFT JOIN imas_assessment_records AS iar 
+              ON istu.userid=iar.userid AND iar.assessmentid=?
             WHERE istu.courseid=?';
         $stm = $this->dbh->prepare($query);
-        $out = array(array('LTI13-'.$platform_id, $courseid));
+        $stm->execute(array('LTI13-'.$platform_id, $aid, $courseid));
+        $out = [];
         while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             if (!$includeempty && 
                 ($row['score'] === null || ($isquiz && ($row['status']&64)==0))

@@ -52,7 +52,7 @@ if (!empty($_POST['pullroster'])) {
     }
 
 	require('../header.php');
-	echo '<div class=breadcrumb>'.$breadcrumbbase._('Roster Pull Results').'</div>';
+	echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('Roster Pull Results').'</div>';
     echo '<h1>'._('Roster Pull Results').'</h2>';
     
     if ($data === false) {
