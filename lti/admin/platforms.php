@@ -23,11 +23,11 @@
 
 require("../../init.php");
 
-if ($myrights < 100) {
+if (($myrights < 100 && empty($CFG['LTI']['useradd13'])) || $myrights < 40) {
   exit;
 }
 
-if (isset($_POST['delete'])) {
+if (isset($_POST['delete']) && $myrights == 100) {
   $stm = $DBH->prepare("DELETE FROM imas_lti_platforms WHERE id=?");
   $stm->execute(array($_POST['delete']));
   header('Location: ' . $basesiteurl . "/lti/admin/platforms.php");
@@ -58,9 +58,17 @@ $query = "SELECT ip.id,ip.issuer,ip.client_id,ip.created_at,
   imas_lti_platforms AS ip
   LEFT JOIN imas_lti_deployments AS id ON id.platform=ip.id
   LEFT JOIN imas_lti_groupassoc AS iga ON iga.deploymentid=id.id
-  LEFT JOIN imas_groups AS ig ON iga.groupid=ig.id
-  GROUP BY ip.id ORDER BY ip.issuer,ip.created_at";
-$stm = $DBH->query($query);
+  LEFT JOIN imas_groups AS ig ON iga.groupid=ig.id ";
+if ($myrights < 100) {
+    $query .= 'WHERE iga.groupid=? ';
+}
+$query .= "GROUP BY ip.id ORDER BY ip.issuer,ip.created_at";
+if ($myrights < 100) {
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($groupid));
+} else {
+    $stm = $DBH->query($query);
+}
 $platforms = $stm->fetchAll(PDO::FETCH_ASSOC);
 foreach ($platforms as $row) {
   if ($row['issuer'] == 'https://blackboard.com') {
@@ -97,7 +105,9 @@ if ($platforms === false) {
   echo '<th>'._('ClientID').'</th>';
   echo '<th>'._('Created').'</th>';
   echo '<th>'._('Groups').'</th>';
-  echo '<th>'._('Delete').'</th>';
+  if ($myrights == 100) {
+    echo '<th>'._('Delete').'</th>';
+  }
   echo '</tr></thead><tbody>';
   foreach ($platforms as $i=>$row) {
     echo '<tr class="'.($i%2==0?'even':'odd').'">';
@@ -105,14 +115,22 @@ if ($platforms === false) {
     echo '<td>'.Sanitize::encodeStringForDisplay($row['client_id']).'</td>';
     echo '<td>'. date("j M Y ", strtotime($row['created_at'])).'</td>';
     echo '<td>'. str_replace(';;','<br>',Sanitize::encodeStringForDisplay($row['groups'])).'</td>';
-    echo '<td><button type=submit name="delete" value="'.Sanitize::encodeStringForDisplay($row['id']).'" ';
-    echo 'onclick="return confirm(\''._('Are you SURE you want to delete this platform?').'\');">';
-    echo _('Delete').'</button>';
-    echo '</td></tr>';
+    if ($myrights == 100) {
+        echo '<td><button type=submit name="delete" value="'.Sanitize::encodeStringForDisplay($row['id']).'" ';
+        echo 'onclick="return confirm(\''._('Are you SURE you want to delete this platform?').'\');">';
+        echo _('Delete').'</button></td>';
+    }
+    echo '</tr>';
   }
   echo '</tbody></table>';
+
 }
 echo '<h2>'._('New Platform').'</h2>';
+if (count($platforms)>0) {
+    if ($myrights < 100) {
+        echo '<p class="noticetext">'._('Since you already have an existing platform registration, you should not need to add a New Platform unless you have changed LMSs').'</p>';
+    }
+}
 echo '<p><label for=lms>'._('Select your LMS').'</label>: ';
 echo '<select id=lms name=lms>';
 echo  '<option value=other>'._('Other').'</option>';
@@ -189,7 +207,7 @@ echo '</div>';
 
 // Blackboard
 echo '<div id=bb class=lmsinstr style="display:none;">';
-if ($bbclientid === false) {
+if ($bbclientid === false && $myrights == 100) {
   echo '<p>'._('For Blackboard, the tool only has to be registered once by the tool provider (not the school), on developer.blackboard.com. ');
   echo _('After that, individidual schools only need the Client ID to enable the tool in their Blackboard instance. ');
   echo '</p>';
@@ -210,6 +228,8 @@ if ($bbclientid === false) {
   echo '<li><label>'._('OIDC auth request endpoint:').' <input name=bb_authurl size=50/></label></li>';
   echo '</ul>';
   echo '<button type=submit>'._('Add Blackboard').'</button></p>';
+} else if ($bbclientid === false) {
+  echo '<p>'._('This site is not yet set up for BlackBoard integration').'</p>';
 } else {
   echo '<p>'._('To enable LTI 1.3 in a BlackBoard instance, the site administrator should:').'</p>';
   echo '<ul>';
@@ -304,7 +324,9 @@ echo '<li><label>'._('Authentication request URL:').' <input name=moodle_authurl
 echo '</ul>';
 echo '<button type=submit>'._('Add Platform').'</button></p>';
 echo '</div>';
-
+if ($myrights < 100) {
+    echo '<p>'._('Note: Platforms are not associated with a group until the first launch from the LMS, so your added platform may not display here until that happens.').'</p>';
+}
 
 echo '</form>';
 ?>
