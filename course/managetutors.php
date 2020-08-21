@@ -165,8 +165,11 @@
 	$pagetitle = "Manage Tutors";
 	require("../header.php");
 	$cid = Sanitize::courseId($_GET['cid']);
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Users</a> &gt; Manage Tutors</div>";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Manage Tutors</div>";
 
 ?>
 

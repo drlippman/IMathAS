@@ -54,8 +54,11 @@ if (isset($_POST['checked'])) { //form submitted
 			$checkedlist = implode(',', $checked);
 
 			require("../header.php");
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+            echo "<div class=breadcrumb>$breadcrumbbase ";
+            if (empty($_COOKIE['fromltimenu'])) {
+                echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }
+            echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 			echo "&gt; <a href=\"chgoffline.php?cid=$cid\">Manage Offline Grades</a> &gt; Confirm Delete</div>";
 			echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 			echo '<input type="hidden" name="submit" value="Delete" />';
@@ -139,8 +142,11 @@ $placeinhead .= '<script type="text/javascript">
  </script>';
 require("../header.php");
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+echo "<div class=breadcrumb>$breadcrumbbase ";
+if (empty($_COOKIE['fromltimenu'])) {
+    echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Manage Offline Grades</div>";
 echo '<div id="headerchgoffline" class="pagetitle"><h1>Manage Offline Grades</h1></div>';
 

@@ -880,10 +880,6 @@ jQuery(function() {
 			}
 		}
     });
-    var ltihome;
-    if ((ltihome = document.getElementById('ltihomelink')) && window.sessionStorage.getItem('LTI1p3_launchid')) {
-        ltihome.href += '?launchid=' + encodeURIComponent(window.sessionStorage.getItem('LTI1p3_launchid'));
-    }
 });
 
 function convertheic(href, divid) {
@@ -1073,7 +1069,9 @@ jQuery(function($) {
 						encodeURIComponent(window.sessionStorage.getItem('LTI1p3_launchid'))
 			}).done(function(msg) {
 				$("#ltimenudiv").html(msg);
-				btn.attr("data-loaded",1);
+                btn.attr("data-loaded",1);
+                document.cookie = "fromltimenu=1;" 
+                    + ((window.location.protocol=='https:') ? "secure; samesite=none" : "");
 				sendLTIresizemsg();
 			});
 		}

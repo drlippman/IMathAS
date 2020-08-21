@@ -231,11 +231,14 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	require("../header.php");
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	if ($calledfrom=='lu') {
-		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Manage Exceptions</div>\n";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+    if ($calledfrom=='lu') {
+		echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Manage Exceptions</div>\n";
 	} else if ($calledfrom=='gb') {
-		echo "&gt; <a href=\"gradebook.php?cid=$cid";
+		echo "<a href=\"gradebook.php?cid=$cid";
 		if (isset($_GET['uid'])) {
 			echo "&stu=" . Sanitize::onlyInt($_GET['uid']);
 		}

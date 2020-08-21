@@ -24,11 +24,13 @@ $platform_id = $launch->get_platform_id();
 $resource_link = $launch->get_resource_link();
 $role = standardize_role($launch->get_roles());
 $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
+$chgassess = 'chgassessments2.php';
 
 if ($role != 'Instructor') {
   echo _('This menu requires instructor access');
   exit;
 }
+echo '<div id="ltimenu">';
 
 if ($link->get_placementtype() == 'assess') {
     $typeid = $link->get_typeid();
@@ -52,6 +54,7 @@ if ($link->get_placementtype() == 'assess') {
         echo "<li><a href=\"$imasroot/course/addquestions.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "&from=lti\">"._("Questions")."</a></li>";
         echo "<li><a href=\"$imasroot/course/isolateassessgrade.php?cid=" . Sanitize::courseId($cid) . "&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Grade list")."</a></li>";
         echo "<li><a href=\"$imasroot./course/gb-itemanalysis.php?cid=" . Sanitize::courseId($cid) . "&asid=average&aid=" . Sanitize::encodeUrlParam($typeid) . "\">"._("Item Analysis")."</a></li>";
+        $chgassess = 'chgassessments.php';
     }
     echo '<li><a href="'.$imasroot.'/lti/ltiassessinfo.php?launchid='. Sanitize::encodeUrlParam($_GET['launchid']).'">'._('Info and LMS Sync').'</a></li>';
     echo "</ul>";
@@ -80,3 +83,4 @@ echo '<li><a href="'.$imasroot.'/course/copyitems.php?cid='.$cid.'">'._('Course 
 echo '<li><a href="'.$imasroot.'/admin/ccexport.php?cid='.$cid.'">'._('Course Items: Export').'</a></li>';
 echo '<li><a href="'.$imasroot.'/course/course.php?cid='.$cid.'">'._('Full Course Contents').'</a></li>';
 echo '</ul>';
+echo '</div>';

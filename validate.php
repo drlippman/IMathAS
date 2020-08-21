@@ -504,7 +504,7 @@
                   aria-expanded="false"
                   >'._('LTI').'</a>
                   <div id="ltimenudiv" role="menu" class="dropdown-menu ltimenu">'
-                  . _('Loading...').'</div></div>';
+                  . _('Loading...').'</div></div> ';
                 //$breadcrumbbase = "<a id=ltihomelink href=\"$imasroot/lti/ltihome.php\">LTI Home</a> &gt; ";
             } else {
                 $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";

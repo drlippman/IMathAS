@@ -19,7 +19,11 @@ $body = "";
 $pagetitle = "Copy Course Items";
 $ctc = Sanitize::onlyInt($_POST['ctc']);
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Copy Course Items");
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= _("Copy Course Items");
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {

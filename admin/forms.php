@@ -397,7 +397,11 @@ switch($_GET['action']) {
 			}
 			if (isset($_GET['cid'])) {
 				$cid = Sanitize::courseId($_GET['cid']);
-				echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Course Settings</div>";
+                echo "<div class=breadcrumb>$breadcrumbbase ";
+                if (empty($_COOKIE['fromltimenu'])) {
+                    echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+                }
+                echo _('Course Settings') , '</div>';
 			}
 			echo '<div id="headerforms" class="pagetitle"><h1>';
 			echo _('Course Settings');
@@ -618,10 +622,14 @@ switch($_GET['action']) {
 			$defstimedisp = $deftimedisp;
 		}
 
-		if (isset($_GET['cid'])) {
-			$cid = Sanitize::courseId($_GET['cid']);
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Course Settings")."</div>";
-		}
+        if (isset($_GET['cid'])) {
+            $cid = Sanitize::courseId($_GET['cid']);
+            echo "<div class=breadcrumb>$breadcrumbbase ";
+            if (empty($_COOKIE['fromltimenu'])) {
+                echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }
+            echo _('Course Settings') , '</div>';
+        }
 		echo '<div id="headerforms" class="pagetitle"><h1>';
 		if ($_GET['action']=='modify') {
 			echo _('Course Settings');

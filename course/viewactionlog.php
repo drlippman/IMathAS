@@ -12,16 +12,19 @@ if (!isset($teacherid) && !isset($tutorid)) {
 	$uid = intval($_GET['uid']);
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if (isset($teacherid)) {
 	if (isset($_GET['from']) && $_GET['from']=='gb') {
-		$curBreadcrumb .= " &gt; <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> ";
-		$curBreadcrumb .= " &gt; <a href=\"gradebook.php?cid=$cid&stu=$uid\">Student Detail</a> ";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid&stu=0\">Gradebook</a> &gt; ";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid&stu=$uid\">Student Detail</a> &gt; ";
 	} else {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> ";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; ";
 	}
 }
-$curBreadcrumb .= "&gt; View Activity Log\n";
+$curBreadcrumb .= "View Activity Log\n";
 $pagetitle = "View Activity Log";
 require("../header.php");
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";

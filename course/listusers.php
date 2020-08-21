@@ -41,8 +41,10 @@ if (!isset($CFG['GEN']['allowinstraddstus'])) {
 if (!isset($CFG['GEN']['allowinstraddtutors'])) {
 	$CFG['GEN']['allowinstraddtutors'] = true;
 }
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
-
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
@@ -61,7 +63,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 	if (isset($_GET['assigncode'])) {
 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
 		$pagetitle = "Assign Section/Code Numbers";
 
 		if (isset($_POST['submit'])) {
@@ -90,7 +92,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 	} elseif (isset($_GET['enroll']) && ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true))) {
 
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
 
 		if (isset($_POST['username'])) {
@@ -140,7 +142,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		}
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
@@ -184,7 +186,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 		}
 	} elseif (isset($_POST['submit']) && $_POST['submit']=="Copy Emails") {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
 		$pagetitle = "Copy Student Emails";
 		if (count($_POST['checked'])>0) {
 			$ulist = implode(',', array_map('intval', $_POST['checked']));
@@ -202,7 +204,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 
 	} elseif (isset($_GET['chgstuinfo'])) {
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once("../includes/newusercommon.php");
@@ -347,16 +349,14 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "massexception.php";
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" && !isset($CFG['GEN']['noInstrUnenroll'])){
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "Unenroll Students";
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "unenroll.php";
 
 	} elseif (isset($_GET['action']) && $_GET['action']=="lock") {
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a>\n";
-		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
 		$pagetitle = "LockStudents";
 		$calledfrom='lu';
 		$overwriteBody = 1;
@@ -378,7 +378,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION HERE
 
-		$curBreadcrumb .= " &gt; Roster\n";
+		$curBreadcrumb .= " Roster\n";
 		$pagetitle = "Student Roster";
 		$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL ORDER BY section");
 		$stm->execute(array(':courseid'=>$cid));
@@ -689,19 +689,21 @@ if ($overwriteBody==1) {
 	if ($CFG['GEN']['allowinstraddtutors']) {
 		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
 	}
-	echo '</span>';
-	echo '<span class="column" style="width:auto;">';
-	if ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true)) {
-		echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
-	}
-	echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
-	if (isset($CFG['GEN']['allowinstraddstus']) && $CFG['GEN']['allowinstraddstus']==true) {
-		echo '</span><span class="column" style="width:auto;">';
-		echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
-		echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
-	}
-	echo '</span>';
-	echo '<br class="clear"/>';
+    echo '</span>';
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo '<span class="column" style="width:auto;">';
+        if ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true)) {
+            echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+        }
+        echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
+        if (isset($CFG['GEN']['allowinstraddstus']) && $CFG['GEN']['allowinstraddstus']==true) {
+            echo '</span><span class="column" style="width:auto;">';
+            echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
+            echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
+        }
+        echo '</span>';
+    }
+    echo '<br class="clear"/>';
 	echo '</div>';
 	echo '<p>Pictures: <select id="picsize" onchange="chgpicsize()">';
 	echo "<option value=0 selected>", _('None'), "</option>";
