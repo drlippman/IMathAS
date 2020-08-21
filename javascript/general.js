@@ -931,7 +931,7 @@ function uniqid(prefix) {
 function setariastatus(status) {
     var el = document.getElementById("ariastatus");
     if (!el) {
-        el = $("<div>", {id:"ariastatus", role:"status", className:"sr-only", "aria-live":"polite"});
+        el = $("<div>", {id:"ariastatus", role:"status", class:"sr-only", "aria-live":"polite"});
         $("body").append(el);
         el = el[0];
     }

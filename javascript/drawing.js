@@ -71,7 +71,6 @@ var mouseisdown = false;
 var targets = new Array();
 var imgs = new Array();
 var targetOuts = new Array();
-var a11ytargets = new Array();
 var lines = new Array();
 var dots = new Array();
 var odots = new Array();
@@ -110,7 +109,6 @@ function reset() {
 	targets.length = 0;
 	imgs.length = 0;
 	targetOuts.length = 0;
-	a11ytargets.length = 0;
 	lines.length = 0;
 	dots.length = 0;
 	odots.length = 0;
@@ -135,8 +133,10 @@ function clearcanvas(tarnum) {
 	tptypes[tarnum].length = 0;
 	ineqlines[tarnum].length = 0;
 	ineqtypes[tarnum].length = 0;
-	curTarget = tarnum;
-	drawTarget();
+    curTarget = tarnum;
+    if (targets[tarnum].type == 'canvas') {
+        drawTarget();
+    }
 	curTarget = null;
 	curLine = null;
 	dragObj = null;
@@ -155,7 +155,6 @@ function clearlastline(tarnum) {
 
 function addA11yTarget(canvdata, thisdrawla) {
 	var tarnum = canvdata[0];
-	a11ytargets.push(tarnum);
 	var ansformats = canvdata[1].substr(9).split(',');
 	var xmin = canvdata[2];
 	var xmax = canvdata[3];
@@ -179,7 +178,7 @@ function addA11yTarget(canvdata, thisdrawla) {
 		}
 	}
 	targetOuts[tarnum] = document.getElementById('qn'+tarnum);
-	targets[tarnum] = {el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
+	targets[tarnum] = {type:'a11y', el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
 	var afgroup;
@@ -337,7 +336,7 @@ function removea11ydraw(el) {
         $(el).find(".draweln").html(numname);
     });
     ul.prev().focus();
-	encodea11ydraw();
+	encodea11ydraw(ul.attr("id").substring(8));
 }
 function changea11ydraw(tarel, tarnum) {
 	var curmode = $(tarel).val();
@@ -389,7 +388,8 @@ function updatea11ydraw(el) {
         el.removeAttribute('aria-describedby');
         setariastatus("");
     }
-	encodea11ydraw();
+    var qn = parseInt($(el).closest('.a11ydraw').attr("id").substring(8));
+	encodea11ydraw(qn);
 }
 function pixcoordstopointlist(vals,tarnum) {
 	var thistarg = targets[tarnum];
@@ -400,10 +400,14 @@ function pixcoordstopointlist(vals,tarnum) {
 	y = Math.round(y*100)/100;
 	return "("+x+","+y+")";
 }
-function encodea11ydraw() {
-	for (var i=0;i<a11ytargets.length;i++) {
-		var tarnum = a11ytargets[i];
-		var thistarg = targets[tarnum];
+function encodea11ydraw(qn) {
+    if (typeof qn == 'undefined') {
+        qn = -1;
+    }
+	for (var tarnum in targets) {
+        if (qn > -1 && qn != tarnum) { continue; }
+        var thistarg = targets[tarnum];
+        if (thistarg.type != 'a11y') { continue; }
 		var lines = [];
 		var dots = [];
 		var odots = [];
@@ -464,7 +468,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 
 	var tarpos = getPosition(tarel);
 
-	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight, mode: defmode, dotline: dotline};
+	targets[tarnum] = {type:'canvas', el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight, mode: defmode, dotline: dotline};
 	if (typeof snaptogrid=="string" && snaptogrid.indexOf(":")!=-1) {
 		snaptogrid = snaptogrid.split(":");
 		targets[tarnum].snaptogridx = 1*snaptogrid[0];
