@@ -90,8 +90,12 @@ function tipshow(el,tip, e) {
 		return;
 	}
 	if (typeof tipobj!= 'object') {
-		tipobj = document.createElement("div");
-		tipobj.className = "tips";
+        tipobj = document.createElement("div");
+        if (imathasAssess) {
+            tipobj.className = "dropdown-pane tooltip-pane";
+        } else {
+            tipobj.className = "tips";
+        }
 		tipobj.setAttribute("role","tooltip");
 		tipobj.id = "hovertipsholder";
 		document.getElementsByTagName("body")[0].appendChild(tipobj);
@@ -484,7 +488,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		menubar: false,//"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
-		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
+		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
 		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
@@ -727,23 +731,32 @@ function togglevideoembed() {
 			timeref += '&end='+m[1];
 		}
 		timeref += '&enablejsapi=1';
-		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
-		jQuery('<iframe/>', {
+        var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
+        var viframe = jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
 			height: 400,
 			src: loc_protocol+'//'+vidsrc+vidid+timeref,
 			frameborder: 0,
 			allowfullscreen: 1
-		}).insertAfter(jQuery(this));
-		jQuery(this).parent().fitVids();
-		jQuery('<br/>').insertAfter(jQuery(this));
-		jQuery(this).text(' [-]')
+        });
+        var $this = jQuery(this);
+        if ($this.closest('.itemhdr').length == 0) {
+            viframe.insertAfter($this);
+            $this.parent().fitVids();
+            jQuery('<br/>').insertAfter($this);
+        } else {
+            var par = $this.closest('.itemhdr').next();
+            par.prepend(viframe);
+            par.fitVids();
+        }
+		
+		$this.text(' [-]')
 			.attr('title',_("Hide video"))
 			.attr('aria-label',_("Hide embedded video"));
-		if (jQuery(this).prev().attr("data-base")) {
-			var inf = jQuery(this).prev().attr('data-base').split('-');
-			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
+		if ($this.prev().attr("data-base")) {
+			var inf = $this.prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, $this.prev().text());
 		}
 	}
 }
@@ -873,7 +886,7 @@ jQuery(function() {
 		}
 	});
 	jQuery('form').each(function(i,el) {
-		if (m=el.getAttribute('action').match(/cid=(\d+)/)) {
+		if (el.action && (m=el.getAttribute('action').match(/cid=(\d+)/))) {
 			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
 			if (btf !== '') {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
@@ -909,6 +922,20 @@ function addBlankTarget(i,el) {
 	if (el.host !== window.location.host) {
 		el.setAttribute("target", "_blank");
 	}
+}
+
+function uniqid(prefix) {
+    return (prefix || '') + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function setariastatus(status) {
+    var el = document.getElementById("ariastatus");
+    if (!el) {
+        el = $("<div>", {id:"ariastatus", role:"status", class:"sr-only", "aria-live":"polite"});
+        $("body").append(el);
+        el = el[0];
+    }
+    el.innerHTML = status;
 }
 
 function addmultiselect(el,n) {
@@ -1052,11 +1079,24 @@ function initlinkmarkup(base) {
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
 	setupToggler2(base);
-	$(base).fitVids();
+    $(base).fitVids();
+    resizeResponsiveIframes(base, true);
 }
 
+function resizeResponsiveIframes(base, init) {
+    if (init) {
+        jQuery(base).find('iframe.scaleresponsive').wrap(jQuery('<div>', {css:{overflow:"hidden"}}));
+    }
+    jQuery(base).find('iframe.scaleresponsive').each(function(i,el) {
+        var p = el.parentNode; 
+        var sc = Math.min(1,p.offsetWidth/parseInt(el.width || el.style.width));
+        el.style.transform = "scale("+sc+")";
+        p.style.height = (sc*parseInt(el.height || el.style.height)+3)+"px";
+    });
+}
 jQuery(document).ready(function($) {
-	initlinkmarkup('body');
+    initlinkmarkup('body');
+    $(window).on('resize', function () {resizeResponsiveIframes('body');});
 });
 
 jQuery.fn.isolatedScroll = function() {

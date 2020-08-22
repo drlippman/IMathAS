@@ -57,6 +57,7 @@ class AssessStandalone {
    *  $arr['scoreiscorrect'] = scoreiscorrect for all questions, (qn+1)-indexed
    *  $arr['partattemptn'] = array of qn=>pn=>num of attempts made
    *  $arr['rawscores'] = array of qn=>pn=>rawscores
+   *  $arr['wrongfmt'] = array of qn=>pn=>wrongfmt
    */
   function setState($arr) {
     $this->state = $arr;
@@ -151,6 +152,12 @@ class AssessStandalone {
     // showans is show-for-all override
     // showansparts is per-part show ans
 
+    $correctAnswerWrongFormat = array();
+    if (!empty($this->state['wrongfmt'][$qn])) {
+        foreach ($this->state['wrongfmt'][$qn] as $pn=>$v) {
+            $correctAnswerWrongFormat[$pn] = ($v>0);
+        }
+    }
     $questionParams = new QuestionParams();
     $questionParams
         ->setDbQuestionSetId($qsid)
@@ -170,7 +177,8 @@ class AssessStandalone {
         ->setScoreNonZero($this->state['scorenonzero'])
         ->setScoreIsCorrect($this->state['scoreiscorrect'])
         ->setLastRawScores($rawscores)
-        ->setSeqPartDone($seqPartDone);;
+        ->setSeqPartDone($seqPartDone)
+        ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat);
 
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
@@ -269,6 +277,17 @@ class AssessStandalone {
         } else {
           $this->state['stuanswers'][$qn+1] = $v;
           $this->state['stuanswersval'][$qn+1] = $partlaNum[$k];
+        }
+        if (!empty($scoreResult['correctAnswerWrongFormat'][$k])) {
+            if (!isset($this->state['wrongfmt'])) {
+                $this->state['wrongfmt'] = array();
+            }
+            if (!isset($this->state['wrongfmt'][$qn])) {
+                $this->state['wrongfmt'][$qn] = array();
+            }
+            $this->state['wrongfmt'][$qn][$k] = 1;
+        } else if (!empty($this->state['wrongfmt'][$qn][$k])) {
+            unset($this->state['wrongfmt'][$qn][$k]);
         }
       }
       if ($parts_to_score === true || !empty($parts_to_score[$k]) ||

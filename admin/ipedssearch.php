@@ -2,6 +2,7 @@
 
 require('../init_without_validate.php');
 header('Content-Type: application/json; charset=utf-8');
+$skip = ['high','middle','junior','elementary','school'];
 $out = array();
 if (isset($_POST['search'])) {
   $words = array_map('trim', explode(' ', Sanitize::stripHtmlTags($_POST['search'])));
@@ -10,8 +11,12 @@ if (isset($_POST['search'])) {
   $wholewords = array();
   $wordands = array();
   $zip = '';
+  $state = '';
   foreach ($words as $k=>$v) {
-    if (ctype_digit($v) && strlen($v)==5) { //zip
+      $lower = strtolower($v);
+    if (in_array($lower, $skip)) {
+        continue; // skip un-useful words
+    } else if (ctype_digit($v) && strlen($v)==5) { //zip
       $zip = $v;
     } else if (ctype_alnum($v) && strlen($v)>3) {
       $wholewords[] = '+'.$v.'*';
@@ -35,7 +40,18 @@ if (isset($_POST['search'])) {
     $query .= 'zip=?';
     $qarr[] = $zip;
   }
+  if (!empty($state)) {
+    if (count($qarr)>0) {
+      $query .= 'OR ';
+    }
+    $query .= 'state=?';
+    $qarr[] = $state;
+  }
   $query .= ')';
+  if (isset($_POST['state'])) {
+    $query .= " AND state=?";
+    $qarr[] = $_POST['state'];
+  }
   if (isset($_POST['type'])) {
       if ($_POST['type'] == 'coll') {
           $query .= " AND type='I'";
@@ -45,7 +61,7 @@ if (isset($_POST['search'])) {
         $query .= " AND type='S'";
       }
   }
-  $query .= ' ORDER BY school';
+  $query .= ' ORDER BY country,state,school';
   $stm = $DBH->prepare($query);
   $stm->execute($qarr);
   $out = array();

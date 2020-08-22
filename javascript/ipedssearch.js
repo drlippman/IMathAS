@@ -7,6 +7,7 @@ function ipedssearch(options) {
     var wrapper = options.wrapper || 'newipedswrap';
     var incsel = options.includeselect || false;
     var skipnone = options.skipnone || false;
+    var statefield = options.state || false;
     var searchval = document.getElementById(searchfield).value;
     if (searchval.trim() !== '') {
         var data = {};
@@ -14,6 +15,9 @@ function ipedssearch(options) {
             data.search = searchval;
         } else if (searchtype == 'country') {
             data.country = searchval;
+        }
+        if (statefield) {
+            data.state = document.getElementById(statefield).value;
         }
         if (ipedtypefield != '') {
             data.type = document.getElementById(ipedtypefield).value;

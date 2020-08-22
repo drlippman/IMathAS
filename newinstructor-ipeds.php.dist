@@ -72,10 +72,17 @@ if (isset($_POST['firstname'])) {
     $error .= checkNewUserValidation($required);
     $otherschool = '';
     if ($_POST['schoolloc'] == 'us') {
-        if (empty($_POST['ipeds'])) {
+        if ($_POST['ipeds'] === '') {
             $error .= '<p>Institution is required</p>';
         } else {
             $ipeds = $_POST['ipeds'];
+        }
+        if ($ipeds == '0') {
+            if (empty($_POST['otherschool'])) {
+                $error .= '<p>School name is required</p>';
+            } else {
+                $otherschool = $_POST['otherschool'];
+            }
         }
     } else {
         if (empty($_POST['country'])) {

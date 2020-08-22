@@ -134,6 +134,7 @@ class QuestionHtmlGenerator
         $quesData = $this->questionParams->getQuestionData();
         $showHints = ($this->questionParams->getShowHints()&1)==1;
         $thisq = $this->questionParams->getQuestionNumber() + 1;
+        $correctAnswerWrongFormat = $this->questionParams->getCorrectAnswerWrongFormat();
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
@@ -399,7 +400,8 @@ class QuestionHtmlGenerator
                     ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
                     ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
-                    ->setColorboxKeyword($questionColor);
+                    ->setColorboxKeyword($questionColor)
+                    ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[$atIdx]);
 
                 try {
                   $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
@@ -443,6 +445,15 @@ class QuestionHtmlGenerator
               $jsParams['submitall'] = 1;
             }
         } else {
+
+
+            if ($GLOBALS['myrights'] > 10) {
+                if (isset($anstypes)) {
+                    $this->addError('It looks like you have defined $anstypes; did you mean for this question to be Multipart?');
+                } else if (strpos($toevalqtxt, '$answerbox[') !== false) {
+                    $this->addError('It looks like you have an $answerbox with part index; did you mean for this question to be Multipart?');
+                }
+            }
             // Generate answer boxes. (non-multipart question)
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
@@ -471,7 +482,8 @@ class QuestionHtmlGenerator
                 ->setAssessmentId($this->questionParams->getAssessmentId())
                 ->setIsMultiPartQuestion(false)
                 ->setStudentLastAnswers($lastAnswer)
-                ->setColorboxKeyword($questionColor);
+                ->setColorboxKeyword($questionColor)
+                ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0]);
 
             $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
             $answerBoxGenerator->generate();

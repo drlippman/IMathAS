@@ -83,7 +83,7 @@ var MQeditor = (function($) {
           text: initval
         });
         var m;
-        if ((m = el.className.match(/(ansred|ansyel|ansgrn)/)) !== null) {
+        if ((m = el.className.match(/(ansred|ansyel|ansgrn|ansorg)/)) !== null) {
           span.addClass(m[0]);
         }
         var size = (el.hasAttribute("size") ? (el.size > 3 ? el.size/1.8 : el.size) : 10);
@@ -120,7 +120,7 @@ var MQeditor = (function($) {
           attachEditor(span);
           // if original input has input changed programmatically and change
           // event triggered, update mathquill.
-          $(el).on('change', function(e, fromblur) {
+          $(el).on('change.mqed', function(e, fromblur) {
             if (!fromblur) {
               var val = el.value;
               if (config.hasOwnProperty('toMQ')) {
@@ -139,7 +139,7 @@ var MQeditor = (function($) {
         mqfield.focus();
       }
     } else { // disable MQ
-      $(el).attr("type","text");
+      $(el).attr("type","text").off('change.mqed');
       if (nofocus !== true) {
         $(el).focus();
       }

@@ -73,15 +73,19 @@
 				$homelayout = $CFG['GEN']['homelayout'];
 			} else {
 				$homelayout = '|0,1,2||0,1';
-			}
-			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
-			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
+            }
+            $jsondata = [];
+            if (isset($CFG['GEN']['COPPA']) && empty($_POST['over13'])) {
+                $jsondata['under13'] = 1;
+            }
+			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout, jsondata) ";
+			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout, :jsondata)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights,
 				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 				':email'=>Sanitize::emailAddress($_POST['email']),
-				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
+				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout, ':jsondata'=>json_encode($jsondata)));
 			$newuserid = $DBH->lastInsertId();
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
@@ -278,6 +282,9 @@ if (isset($_GET['getsid'])) {
 ?>
 <span class=form><label for="msgnot"><?php echo _("Notify me by email when I receive a new message:"); ?></label></span><span class=formright><input type=checkbox id=msgnot name=msgnot /></span><BR class=form>
 <?php
+    if (isset($CFG['GEN']['COPPA'])) {
+        echo "<span class=form><label for=\"over13\">",_('I am 13 years old or older'),"</label></span><span class=formright><input type=checkbox name=over13 id=over13 onchange=\"toggleOver13()\"></span><br class=form />\n";
+    }
 	if (strlen($enrollkey)>0) {
 ?>
 <span class=form><label for="ekey"><?php echo _("Course Enrollment Key:"); ?></label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['ekey2'])); } ?>/><BR class=form>

@@ -110,7 +110,6 @@ export default {
   },
   data: function () {
     return {
-      youtubeApiLoaded: false,
       videoWidth: 600,
       aspectRatioPercent: 56.2,
       ytplayer: null,
@@ -284,6 +283,15 @@ export default {
       this.toshow = newToshow;
     }
   },
+  mounted () {
+    if (window.YT) {
+      this.createPlayer();
+    } else {
+      window.onYouTubePlayerAPIReady = () => {
+        this.createPlayer();
+      };
+    }
+  },
   created () {
     // don't show intro if it's empty
     if (store.assessInfo.intro !== '') {
@@ -291,13 +299,11 @@ export default {
       this.toshow = 'i';
     }
     // async load YouTube API
-    window.onYouTubePlayerAPIReady = () => {
-      this.youtubeApiLoaded = true;
-      this.createPlayer();
-    };
-    const tag = document.createElement('script');
-    tag.src = '//www.youtube.com/player_api';
-    document.head.appendChild(tag);
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = '//www.youtube.com/player_api';
+      document.head.appendChild(tag);
+    }
   }
 };
 </script>

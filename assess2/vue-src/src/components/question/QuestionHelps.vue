@@ -10,7 +10,9 @@
           <a href="#" @click.prevent="loadHelp(qHelp)">
             <icons :name="qHelp.icon" alt=""/>
             {{ qHelp.title }}
-            <span class="sr-only"> {{ qHelp.cnt }}</span>
+            <span :class="{'sr-only': !showCnts}">
+              {{ qHelp.cnt }}
+            </span>
             <span v-if="qHelp.descr" class="sr-only">
               {{qHelp.descr}}
             </span>
@@ -85,6 +87,9 @@ export default {
       } else {
         return [];
       }
+    },
+    showCnts () {
+      return (this.qHelps.filter(a => a.cnt > 1).length > 0);
     },
     quoteQ () {
       const qsid = store.assessInfo.questions[this.qn].questionsetid;

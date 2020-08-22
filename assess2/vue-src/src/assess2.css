@@ -272,6 +272,9 @@ ol.lalpha li { margin-top: .7em;}
 .drawtools {
   margin-left: 8px;
 }
+.drawtools > span {
+    display:inline-block;
+}
 .drawtools img {
   vertical-align: middle;
 }

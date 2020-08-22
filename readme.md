@@ -12,7 +12,7 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ### Requirements
 IMathAS is designed for simple installation with minimal requirements.  The system
-requires PHP 7.1+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
+requires PHP 7.2+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
 - mbstring (required)
 - pdo_mysql (required)
 - gettext (required)
@@ -98,6 +98,7 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['vidextrefsize']`: Set to an array of (width,height) to set the popup size for Video question help buttons
 - `$CFG['GEN']['ratelimit']`: Set to a number of seconds (like 0.2) to limit the rate at
  which pages can be accessed/refreshed.
+- `$CFG['GEN']['COPPA']`: Set to enable an "I am 13 years old or older" checkbox on new student account creation. If not checked, requires a course ID and key to create an account.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
