@@ -149,6 +149,7 @@
 
         <div v-if="curEndmsg !== ''">
           <button
+            v-if = "viewFull"
             type="button"
             @click = "showEndmsg = !showEndmsg"
           >
@@ -156,7 +157,7 @@
           </button>
           <div
             class="introtext"
-            v-if="showEndmsg"
+            v-if="showEndmsg || !viewFull"
             v-html="curEndmsg"
           />
         </div>
@@ -195,10 +196,6 @@
           </button>
         </div>
 
-        <div
-          v-if = "!viewFull && endmsg != ''"
-          v-html = "endmsg"
-        />
         <div v-if="viewFull">
           <div
             v-for = "(qdata,qn) in curQuestions"
@@ -420,7 +417,7 @@ export default {
       return out;
     },
     curEndmsg () {
-      return this.aData.assess_versions[store.curAver].endmsg;
+      return this.aData.assess_versions[store.curAver].endmsg || '';
     },
     showCategories () {
       let hascat = false;
@@ -498,9 +495,6 @@ export default {
     },
     assessFeedback () {
       return this.aData.assess_versions[store.curAver].feedback || '';
-    },
-    endmsg () {
-      return this.aData.assess_versions[store.curAver].endmsg || '';
     },
     savedMsg () {
       if (store.saving === '') {
