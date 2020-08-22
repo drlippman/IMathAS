@@ -234,7 +234,7 @@ export default {
               760,
               'auto',
               false,
-              'leftnoreset',
+              'left',
               ['skip-question-header', 'resource-dropdown']
             );
           }
