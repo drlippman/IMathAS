@@ -287,8 +287,12 @@
 	<span class=form>Links show:</span>
 	<span class=formright>
 		<?php
-		$orderval = array(0,1);
-		$orderlabel = array('Full Test','Question Breakdown');
+        $orderval = array(0,1);
+        if ($courseUIver>1) {
+            $orderlabel = array('Full View/Edit','Summary');
+        } else {
+            $orderlabel = array('Full View/Edit','Question Breakdown');
+        }
 		writeHtmlSelect("gbmode100", $orderval, $orderlabel, $links);
 		?>
 	</span><br class=form />
