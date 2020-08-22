@@ -122,6 +122,7 @@
         <div>
           {{ scoreCalc }}
           <gb-assess-select
+            v-if = "viewFull || aData.submitby === 'by_assessment'"
             :versions = "aData.assess_versions"
             :submitby = "aData.submitby"
             :haspractice = "aData.has_practice"
@@ -148,6 +149,7 @@
 
         <div v-if="curEndmsg !== ''">
           <button
+            v-if = "viewFull"
             type="button"
             @click = "showEndmsg = !showEndmsg"
           >
@@ -155,7 +157,7 @@
           </button>
           <div
             class="introtext"
-            v-if="showEndmsg"
+            v-if="showEndmsg || !viewFull"
             v-html="curEndmsg"
           />
         </div>
@@ -194,7 +196,7 @@
           </button>
         </div>
 
-        <div>
+        <div v-if="viewFull">
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
@@ -242,7 +244,7 @@
         </div>
         <gb-feedback
           qn="gen"
-          :show="true"
+          :show="viewFull"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
@@ -350,8 +352,11 @@ export default {
     aData () {
       return store.assessInfo;
     },
+    viewFull () {
+      return this.aData.viewfull;
+    },
     canEdit () {
-      return store.assessInfo.can_edit_scores;
+      return store.assessInfo.can_edit_scores && this.viewFull;
     },
     canSubmit () {
       return (!store.inTransit);
@@ -412,7 +417,7 @@ export default {
       return out;
     },
     curEndmsg () {
-      return this.aData.assess_versions[store.curAver].endmsg;
+      return this.aData.assess_versions[store.curAver].endmsg || '';
     },
     showCategories () {
       let hascat = false;
