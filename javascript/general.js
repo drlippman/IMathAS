@@ -313,7 +313,8 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
-function GB_show(caption,url,width,height,overlay) {
+function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
+    posstyle = posstyle || '';
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
 		gb_overlay.id = "GB_overlay";
@@ -418,16 +419,38 @@ function GB_show(caption,url,width,height,overlay) {
 	var w = $(document).width();
 	if (width > w-20) {
 		width = w-20;
-	}
-	$("#GB_window").css("margin","").css("left","").css("top","");
-	document.getElementById("GB_window").style.width = width + "px";
-	document.getElementById("GB_window").style.height = (h-30) + "px";
-	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-	if (url.charAt(0)!='<') {
-		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
-	} else {
-		document.getElementById("GB_frameholder").style.height = "auto";
-	}
+    }
+    if (!posstyle.match(/noreset/) || 
+        !jQuery("#GB_window").data("original_mouse_x") || 
+        document.getElementById("GB_window").style.left==''
+    ) {
+        var inittop = '';
+        if (typeof showbelow == 'object') {
+            var belowel;
+            for (var i in showbelow) {
+                if (belowel = document.getElementById(showbelow[i])) {
+                    inittop = belowel.getBoundingClientRect().bottom + 10;
+                    if (height=='auto') {
+                        h = self.innerHeight - inittop - 20;
+                    }
+                    break;
+                }
+            }
+        }
+        $("#GB_window").css("margin","").css("left","").css("top",inittop);
+        if (posstyle.match(/left/) && document.getElementById("GB_window").style.left=='') {
+            $("#GB_window").css("left", width).css("margin","0");
+            width = w - width - 20;
+        }
+        document.getElementById("GB_window").style.width = width + "px";
+        document.getElementById("GB_window").style.height = (h-30) + "px";
+        //document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
+        if (url.charAt(0)!='<') {
+            document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
+        } else {
+            document.getElementById("GB_frameholder").style.height = "auto";
+        }
+    }
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {

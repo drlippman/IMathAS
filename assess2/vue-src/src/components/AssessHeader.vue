@@ -52,7 +52,7 @@
         :header = "$t('header.resources_header')"
         nobutton = "true"
         noarrow = "true"
-        :options = "ainfo.resources"
+        :options = "resources"
         searchby = "title"
       >
         <template v-slot:button>
@@ -219,6 +219,28 @@ export default {
         }
       }
       return hasShowWorkAfter;
+    },
+    resources () {
+      var out = [];
+      for (const i in this.ainfo.resources) {
+        out.push(this.ainfo.resources[i]);
+        out.push({
+          label: 'Popup ' + this.ainfo.resources[i].label,
+          nosmall: true,
+          onclick: () => {
+            window.GB_show(
+              this.ainfo.resources[i].label,
+              this.ainfo.resources[i].link,
+              760,
+              'auto',
+              false,
+              'leftnoreset',
+              ['skip-question-header', 'resource-dropdown']
+            );
+          }
+        })
+      }
+      return out;
     }
   },
   methods: {
