@@ -89,13 +89,20 @@
           <span class="switch-toggle__ui"></span>
         </button>
       </tooltip-span>
-      <tooltip-span
+      <badged-icon
         v-if="ainfo.is_lti && ainfo.lti_showmsg"
-        :tip="$tc('lti.msgs', ainfo.lti_msgcnt)"
-        style="display: inline-block"
-      >
-        <lti-msgs />
-      </tooltip-span>
+        :link="msglink"
+        icon = "message"
+        label = "lti.msgs"
+        :cnt = "ainfo.lti_msgcnt"
+      />
+      <badged-icon
+        v-if="ainfo.is_lti && ainfo.help_features.forum > 0"
+        :link="forumlink"
+        icon = "forum"
+        label = "lti.forum"
+        :cnt = "ainfo.lti_forumcnt"
+      />
       <lti-menu v-if="ainfo.is_lti" />
     </div>
 
@@ -107,8 +114,9 @@ import Timer from '@/components/Timer.vue';
 import MenuButton from '@/components/widgets/MenuButton.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
-import LtiMsgs from '@/components/LtiMsgs.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
+import BadgedIcon from '@/components/BadgedIcon.vue';
+
 import { attemptedMixin } from '@/mixins/attemptedMixin';
 import { store, actions } from '../basicstore';
 
@@ -117,10 +125,10 @@ export default {
   components: {
     Icons,
     LtiMenu,
-    LtiMsgs,
     MenuButton,
     Timer,
-    TooltipSpan
+    TooltipSpan,
+    BadgedIcon
   },
   data: function () {
     return {
@@ -219,6 +227,12 @@ export default {
         }
       }
       return hasShowWorkAfter;
+    },
+    msglink () {
+      return store.APIbase + '../msgs/msglist.php?cid=' + store.cid;
+    },
+    forumlink () {
+      return store.APIbase + '../forums/thread.php?cid=' + store.cid + '&forum= ' + this.ainfo.help_features.forum;
     }
   },
   methods: {

@@ -40,7 +40,7 @@ if (isset($CFG['hooks']['bltilaunch'])) {
 $curdir = rtrim(dirname(__FILE__), '/\\');
 
 
- if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+ /*if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 	 $urlmode = 'https://';
  } else {
  	 $urlmode = 'http://';
@@ -55,7 +55,7 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 	 	 }
 	 }
  	 reporterror($errormsg);
- }
+ }*/
 if ($enablebasiclti!=true) {
 	echo _("BasicLTI not enabled");
 	exit;

@@ -337,6 +337,22 @@ if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
 		$stm->execute(array(':msgto'=>$uid, ':courseid'=>$cid));
 		$assessInfoOut['lti_msgcnt'] = intval($stm->fetchColumn(0));
   }
+  if (!empty($assessInfoOut['help_features']['forum'])) {
+    // get new post count
+    $query = "SELECT COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
+    $query .= "WHERE imas_forum_threads.forumid=:forumid AND ";
+    $query .= "imas_forum_threads.lastposttime<:now AND ";
+    $query .= "(imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$qarr = array(':now'=>$now, ':forumid'=>$assessInfoOut['help_features']['forum'], ':userid'=>$userid);
+	if (!isset($teacherid)) {
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2 )) ";
+		$qarr[':userid2']=$userid;
+	}
+    $stm = $DBH->prepare($query);
+    $stm->execute($qarr);
+	$assessInfoOut['lti_forumcnt'] = intval($stm->fetchColumn(0));
+  }
 }
 
 // grab question settings data
