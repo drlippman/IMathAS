@@ -192,14 +192,14 @@ END;
 	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
+	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>Description</th><th class="sr-only">Preview</th><th>Category</th></tr></thead><tbody>';
 
 	foreach($itemarr as $qid) {
 		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
 		echo "<td>Q" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . '</td><td>';
-		echo Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td><td>";
-		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", Sanitize::onlyInt($qid), Sanitize::onlyInt($qsetids[$qid]));
-		echo "<select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
+		echo Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td>";
+		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/></td>", Sanitize::onlyInt($qid), Sanitize::onlyInt($qsetids[$qid]));
+		echo "<td><select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
 		echo ">Uncategorized or Default</option>\n";
