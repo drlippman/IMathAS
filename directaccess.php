@@ -215,7 +215,9 @@ if ($enrollkey!='closed') {
 <span class=form><?php echo $loginprompt;?>:</span><input class="form" type="text" size="15" id="username" name="username"><br class="form">
 <span class=form><?php echo _('Password'); ?>:</span><input class="form" type="password" size="15" id="password" name="password"><br class="form">
 <?php
-if (strlen($enrollkey)>0) {
+if (isset($_GET['ekey'])) {
+    echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_GET['ekey']).'">';
+} else if (strlen($enrollkey)>0) {
 	echo '<span class=form><label for="ekey">',_('Course Enrollment Key'),':</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="' . (isset($_REQUEST['ekey']) ? Sanitize::encodeStringForDisplay($_REQUEST['ekey']) : "") . '"/><BR class=form>';
 }
 ?>
@@ -285,9 +287,11 @@ if (isset($_GET['getsid'])) {
     if (isset($CFG['GEN']['COPPA'])) {
         echo "<span class=form><label for=\"over13\">",_('I am 13 years old or older'),"</label></span><span class=formright><input type=checkbox name=over13 id=over13 onchange=\"toggleOver13()\"></span><br class=form />\n";
     }
-	if (strlen($enrollkey)>0) {
+    if (isset($_GET['ekey'])) {
+        echo '<input type="hidden" name="ekey2" value="'.Sanitize::encodeStringForDisplay($_GET['ekey']).'">';
+    } else if (strlen($enrollkey)>0) {
 ?>
-<span class=form><label for="ekey"><?php echo _("Course Enrollment Key:"); ?></label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['ekey2'])); } ?>/><BR class=form>
+<span class=form><label for="ekey2"><?php echo _("Course Enrollment Key:"); ?></label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['ekey2'])); } ?>/><BR class=form>
 <?php
 	}
 ?>
