@@ -814,6 +814,10 @@ var app = new Vue({
 					{
 						'value': 'after_lastattempt',
 						'text': '<?php echo _('After the last try on a question'); ?>'
+                    },
+                    {
+						'value': 'jump_to_answer',
+						'text': '<?php echo _('After the last try or Jump to Answer button');?>'
 					},
 					never
 				];
