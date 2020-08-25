@@ -38,15 +38,17 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
   !empty(trim($_POST[$lms.'_clientid'])) &&
   !empty(trim($_POST[$lms.'_keyseturl'])) &&
   !empty(trim($_POST[$lms.'_tokenurl'])) &&
-  !empty(trim($_POST[$lms.'_authurl']))
+  !empty(trim($_POST[$lms.'_authurl'])) &&
+  !empty(trim($_POST['uniqid']))
 ) {
-  $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url) VALUES (?,?,?,?,?)");
+  $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url,uniqid) VALUES (?,?,?,?,?,?)");
   $stm->execute(array(
     trim($_POST[$lms.'_issuer']),
     trim($_POST[$lms.'_clientid']),
     trim($_POST[$lms.'_authurl']),
     trim($_POST[$lms.'_tokenurl']),
-    trim($_POST[$lms.'_keyseturl'])
+    trim($_POST[$lms.'_keyseturl']),
+    trim($_POST['uniqid'])
   ));
   header('Location: ' . $basesiteurl . "/lti/admin/platforms.php");
   exit;
@@ -76,6 +78,8 @@ foreach ($platforms as $row) {
   }
 }
 
+$uniqid = uniqid();
+
 $pagetitle = _('LTI 1.3 Platforms');
 require("../../header.php");
 
@@ -97,6 +101,7 @@ if ($myrights == 100) {
 echo '<h2>'._('Existing Platforms').'</h2>';
 
 echo '<form method="post" action="platforms.php">';
+echo '<input type=hidden name=uniqid value="'.Sanitize::encodeStringForDisplay($uniqid).'" />';
 if ($platforms === false) {
   echo '<p>'._('No platforms').'</p>';
 } else {
@@ -145,7 +150,7 @@ echo '<div id=other class=lmsinstr>';
 echo '<p>'._('Info to put in the LMS').'</p>';
 echo '<ul class=nomark>';
 echo '<li>'._('Target Link URI / Tool URL / Redirect URI:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
-echo '<li>'._('OpenID Connect / Initiate Login URL:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php</span></li>';
+echo '<li>'._('OpenID Connect / Initiate Login URL:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php?u='.$uniqid.'</span></li>';
 echo '<li>'._('Keyset URL:').' <span class=tocopy>'.$basesiteurl.'/lti/jwks.php</span></li>';
 echo '</ul>';
 echo '<p>'._('Info from LMS').'</p>';
@@ -172,7 +177,7 @@ echo '<li>'._('Enter JSON URL:').' <span class=tocopy>'.$basesiteurl.'/lti/canva
 echo '<li>'._('Set Configure Method: Manual Entry, and enter the values:');
 echo '<ul>';
 echo ' <li>'._('Target Link URI:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
-echo ' <li>'._('OpenID Connect Initiation Url:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php</span></li>';
+echo ' <li>'._('OpenID Connect Initiation Url:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php?u='.$uniqid.'</span></li>';
 echo ' <li>'._('JWK Method: Public JWK URL').'</li>';
 echo ' <li>'._('Public JWK URL:').' <span class=tocopy>'.$basesiteurl.'/lti/jwks.php</span></li>';
 echo ' </ul></li>';
@@ -259,7 +264,7 @@ echo '<li>'._('Go to the LTI Advantage tab, and click Register Tool.').'</li>';
 echo '<li>'._('Enter these values:').'<ul>';
 echo ' <li>'._('Domain:').' <span class=tocopy>'.$domainsite.'</span></li>';
 echo ' <li>'._('Redirect URLs:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
-echo ' <li>'._('OpenID Connect Login URL:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php</span></li>';
+echo ' <li>'._('OpenID Connect Login URL:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php?u='.$uniqid.'</span></li>';
 echo ' <li>'._('Keyset URL:').' <span class=tocopy>'.$basesiteurl.'/lti/jwks.php</span></li>';
 echo ' </ul></li>';
 echo '<li>'._('Enable the Extensions: Assignment and Grade Services and Deep Linking').'</li>';

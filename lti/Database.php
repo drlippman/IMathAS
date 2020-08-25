@@ -118,10 +118,15 @@ class Imathas_LTI_Database implements LTI\Database
     public function find_registration_by_issuer(string $iss, ?string $client_id): LTI\LTI_Registration
     {
         if (empty($client_id)) {
-            $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=?');
-            $stm->execute(array($iss));
-            if ($stm->rowCount() > 1) {
-                throw new OIDC_Exception("Multiple registrations found for this issuer. Platform must provide client_id on launch.", 1);
+            if (isset($_GET['u'])) {
+                $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=? AND uniqid=?');
+                $stm->execute(array($iss, $_GET['u']));
+            } else {
+                $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=?');
+                $stm->execute(array($iss));
+                if ($stm->rowCount() > 1) {
+                    throw new OIDC_Exception("Multiple registrations found for this issuer. Platform must provide client_id on launch.", 1);
+                }
             }
         } else {
             $stm = $this->dbh->prepare('SELECT * FROM imas_lti_platforms WHERE issuer=? AND client_id=?');
