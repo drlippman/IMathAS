@@ -654,9 +654,8 @@ function recclick(type,typeid,info,txt) {
 	}
 }
 function setuptracklinks(i,el) {
-	jQuery(el).addClass("trackprepped");
 	if (jQuery(el).attr("data-base")) {
-		jQuery(el).click(function(e) {
+		jQuery(el).off('click.recclick').on('click.recclick', function(e) {
 			var inf = jQuery(this).attr('data-base').split('-');
 			recclick(inf[0], inf[1], jQuery(this).attr("href"),
 				jQuery(this).clone().find(".sr-only").remove().end().text());
@@ -665,7 +664,7 @@ function setuptracklinks(i,el) {
 				setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
 				return false;
 			}
-		}).mousedown(function(e) {
+		}).off('mousedown.recclick').on('mousedown.recclick', function(e) {
 			if (e.which==3) { //right click
 				var inf = jQuery(this).attr('data-base').split('-');
 				recclick(inf[0], inf[1], jQuery(this).attr("href"),
@@ -914,8 +913,8 @@ function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
 	}
-	if (el.target) {
-		jQuery(el).append('<span class="sr-only">Opens externally</span>');
+	if (el.target && jQuery(el).find('.openext').length == 0) {
+		jQuery(el).append('<span class="sr-only openext">Opens externally</span>');
 	}
 }
 function addBlankTarget(i,el) {
@@ -1073,7 +1072,7 @@ function initlinkmarkup(base) {
 	if (typeof isImathasAssessment != 'undefined') {
 		$(base).find('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
 	}
-	$(base).find('a').not('.trackprepped').each(setuptracklinks).each(addNoopener);
+	$(base).find('a').each(setuptracklinks).each(addNoopener);
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
