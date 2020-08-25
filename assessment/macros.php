@@ -21,7 +21,7 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod",
  "numtowords","randname","randnamewpronouns","randmalename","randfemalename",
  "randnames","randmalenames","randfemalenames","randcity","randcities","prettytime",
- "definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper",
+ "definefunc","evalfunc","evalnumstr","safepow","arrayfindindices","stringtoarray","strtoupper",
  "strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend",
  "stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today",
  "numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction",
@@ -2557,6 +2557,10 @@ function getstuans($v,$q,$i=0,$blankasnull=true) {
     }
 		return $v[$q];
 	}
+}
+
+function evalnumstr($str) {
+    return evalMathParser($str);
 }
 
 function evalfunc($farr) {

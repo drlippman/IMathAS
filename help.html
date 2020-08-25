@@ -2505,6 +2505,9 @@ These macros are used for mathematical calculations:
 <li><strong>v!</strong>: Factorial, like $a = $b!</li>
 <li><strong>evalfunc(func,vars,val1,val2,..)</strong>: Evaluates a function given the variables and values for each variable.
   for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
+<li><strong>evalnumstr(expr)</strong>: Evaluates a string representation of a numerical expression, like "(2pi)/3", to a decimal.  
+  Avoid using this in place of direct calculation in most cases, but it can be handy if you already have generated the string 
+  for display but then need to do a calculation with it.</li>
 <li>See also: calconarray and multicalconarray in the <a href="#arraymacros">Array Macros</a> section</li>
 </ul>
 </div> <!-- h2 -->
