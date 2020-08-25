@@ -4,13 +4,21 @@
       Resources
     </div>
     <div class="pane-body">
-      <ul id="resource-list">
-        <li v-for="(curResource,index) in assessResources" :key="index">
-          <a :href="curResource.link" target="_blank">
-            {{ curResource.label }}
-          </a>
-        </li>
-      </ul>
+      <div v-for="(curResource,index) in assessResources"
+        :key="index"
+        class="flexrow"
+      >
+        <span style="flex-grow: 1">{{ curResource.label }}</span>
+        <button
+          class="plain"
+          @click="popout(curResource)"
+          v-if = "docEl.offsetWidth > 1000"
+        >
+          Pop
+        </button>
+        <a :href="curResource.link" target="_blank">
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -23,6 +31,22 @@ export default {
   computed: {
     assessResources () {
       return store.assessInfo.resources;
+    },
+    docEl () {
+      return window.document.documentElement;
+    }
+  },
+  methods: {
+    popout (res) {
+      window.GB_show(
+        res.label,
+        res.link,
+        760,
+        'auto',
+        false,
+        'left',
+        ['skip-question-header', 'resource-dropdown']
+      );
     }
   }
 };
