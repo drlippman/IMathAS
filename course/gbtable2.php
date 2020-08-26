@@ -964,7 +964,9 @@ function gbtable() {
 				if ($useexception) {
 					$gb[0][1][$assesscol[$r['typeid']]][11] = $r['exceptionenddate']; //override due date header if one stu display
 					//change $avail past/cur/future based on exception
-					if ($now<$r['exceptionenddate']) {
+                    if ($now<$r['exceptionstartdate']) {
+                        $avail[$assessidx[$r['typeid']]] = 2;
+                    } else if ($now<$r['exceptionenddate']) {
 						$avail[$assessidx[$r['typeid']]] = 1;
 					} else {
 						$avail[$assessidx[$r['typeid']]] = 0;
