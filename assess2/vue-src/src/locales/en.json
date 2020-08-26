@@ -139,6 +139,10 @@
     "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
     "preview_all": "Instructor Preview of All Questions"
   },
+  "resource": {
+      "sidebar": "Open in a sidebar",
+      "newtab": "Open in a new tab"
+  },
   "text": {
     "hide": "Hide text",
     "show": "Show question text"

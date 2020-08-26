@@ -8,16 +8,31 @@
         :key="index"
         class="flexrow"
       >
-        <span style="flex-grow: 1">{{ curResource.label }}</span>
+        <span style="flex-grow: 1; margin-right:12px;">{{ curResource.label }}</span>
+
         <button
-          class="plain"
           @click="popout(curResource)"
           v-if = "docEl.offsetWidth > 1000"
+          :title = "$t('resource.sidebar')"
+          :aria-label = "$t('resource.sidebar') + ' ' + curResource.label"
         >
-          Pop
+          <icons
+            name="sidebar"
+          />
         </button>
-        <a :href="curResource.link" target="_blank">
+
+        <a
+          class="abutton"
+          :href="curResource.link"
+          :target="'res' + index"
+          :title = "$t('resource.newtab')"
+          :aria-label = "$t('resource.newtab') + ' ' + curResource.label"
+        >
+          <icons
+            name="extlink"
+          />
         </a>
+
       </div>
     </div>
   </div>
@@ -25,9 +40,13 @@
 
 <script>
 import { store } from '../basicstore';
+import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'ResourcePane',
+  components: {
+    Icons
+  },
   computed: {
     assessResources () {
       return store.assessInfo.resources;
@@ -58,7 +77,13 @@ export default {
   margin: 0;
   min-width: 160px;
 }
-
+#resource-pane .flexrow {
+  margin-bottom: 5px;
+  align-items: center;
+}
+#resource-pane .pane-header, #resource-pane .pane-body {
+  padding: 8px 12px;
+}
 #resource-list {
   list-style-type: none;
   margin: 0;
