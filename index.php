@@ -170,16 +170,24 @@ if ($myrights>10) {
 	$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active ";
 	$query .= "FROM imas_teachers,imas_courses ";
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid=:userid ";
-	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY active DESC,imas_courses.name";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid));
+    $query .= "AND (imas_courses.available=0 OR imas_courses.available=1";
+    if ($myrights > 20) {
+        $query .= " OR (imas_courses.available=4 AND imas_courses.ownerid=:ownerid)";
+    }
+    $query .= ") ORDER BY active DESC,imas_courses.name";
+    $stm = $DBH->prepare($query);
+    if ($myrights > 20) {
+        $stm->execute(array(':userid'=>$userid, ':ownerid'=>$userid));
+    } else {
+        $stm->execute(array(':userid'=>$userid));
+    }
 	$teachhashiddencourses = false;
 	if ($stm->rowCount()==0) {
 		$noclass = true;
 	} else {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if ($line['hidefromcourselist']==1) {
-				$teachhashiddencourses = true;
+			if ($line['hidefromcourselist']==1 || $line['available'] == 4) {
+                $teachhashiddencourses = true;
 			} else {
 				$noclass = false;
 				if (!empty($courseListOrder) && isset($courseListOrder['teach'])) {

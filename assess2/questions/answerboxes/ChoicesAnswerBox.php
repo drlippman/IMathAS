@@ -72,15 +72,18 @@ class ChoicesAnswerBox implements AnswerBox
     			$randkeys = $RND->array_rand($questions,count($questions));
     			$RND->shuffle($randkeys);
     		}
-    		$_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
-        if (isset($GLOBALS['capturechoices'])) {
-          $GLOBALS['choicesdata'][$qn] = $questions;
-        }
-    		if (isset($GLOBALS['capturechoiceslivepoll'])) {
-          $params['livepoll_choices'] = $questions;
-          $params['livepoll_ans'] = $answer;
-          $params['livepoll_randkeys'] = $randkeys;
-    		}
+            $_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
+            if (!empty($GLOBALS['inline_choicemap'])) {
+                $params['choicemap'] = encryptval($randkeys, $GLOBALS['inline_choicemap']);
+            }
+            if (isset($GLOBALS['capturechoices'])) {
+                $GLOBALS['choicesdata'][$qn] = $questions;
+            }
+            if (isset($GLOBALS['capturechoiceslivepoll'])) {
+                $params['livepoll_choices'] = $questions;
+                $params['livepoll_ans'] = $answer;
+                $params['livepoll_randkeys'] = $randkeys;
+            }
 
     		if ($displayformat == 'column') { $displayformat = '2column';}
 

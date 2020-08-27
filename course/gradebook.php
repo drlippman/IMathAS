@@ -448,8 +448,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$togglehtml .= '<li><a data-pts="1">'._('Percents').'</a></li>';
 
 	$togglehtml .= '<li class="dropdown-header">'. _('Links'). '</li>';
-	$togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
-	$togglehtml .= '<li><a data-links="1">'. _('Scores'). '</a></li>';
+    $togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
+    if ($courseUIver>1) {
+        $togglehtml .= '<li><a data-links="1">'. _('Summary'). '</a></li>';
+    } else {
+        $togglehtml .= '<li><a data-links="1">'. _('Scores'). '</a></li>';
+    }
 
 	$togglehtml .= '<li class="dropdown-header">'. _('Pics'). '</li>';
 	$togglehtml .= '<li><a data-pics="0">'. _('None'). '</a></li>';

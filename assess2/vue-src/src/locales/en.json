@@ -9,6 +9,7 @@
   "next": "Next",
   "previous": "Previous",
   "question_n": "Question {n}",
+  "jumptocontent": "Skip Navigation",
   "launch": {
     "continue_assess": "Resume",
     "retake_assess": "Retake",
@@ -131,8 +132,8 @@
     "withdrawn": "Question withdrawn",
     "enable_mq": "Enable equation editor",
     "disable_mq": "Disable equation editor",
-    "work_save": "Save work",
-    "work_saved": "Work saved",
+    "work_save": "Save progress",
+    "work_saved": "Progress saved",
     "work_saving": "Saving...",
     "confirm_assess_submit": "After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
     "confirm_assess_unattempted_submit": "There appears to be unattempted questions. After submitting, you will not be able to change your answers on this version of the assessment. Are you ready to submit?",
@@ -200,7 +201,8 @@
     "retake_penalty": "{n}% retake penalty applied",
     "late_penalty": "{n}% late work penalty applied",
     "scorelist": "Score List",
-    "reshowquestions": "Review Questions"
+    "reshowquestions": "Review Questions",
+    "new_excused": "Based on your results in this assessment, the following assessments have been excused:"
   },
   "scorelist": {
     "question": "Question",
@@ -421,7 +423,12 @@
     "latepass_blocked_practice": "Use of a LatePass is currently blocked because the student viewed the assessment in practice mode.",
     "clear_latepass_block": "Clear Block",
     "showwork": "View Work",
-    "hidework": "Hide Work"
+    "hidework": "Hide Work",
+    "show_excused": "Show Auto-Excused",
+    "hide_excused": "Hide Auto-Excused",
+    "excused_list": "Based on the results of this assessment, the following assessments have been excused:",
+    "show_endmsg": "Show End Message",
+    "hide_endmsg": "Hide End Message"
   },
   "work": {
     "add": "Add Work",

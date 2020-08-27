@@ -8,8 +8,8 @@
   z-index: 50;
 }
 .mqeditor.iframeosk {
-    width: 100%;
-    left: 0;
+    width: calc(100% - 2px);
+    left: 0px;
 }
 .mqeditor.fixedbottom {
   position: fixed;

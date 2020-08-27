@@ -120,7 +120,9 @@ export default {
       store.lastPos = e.pageY;
     });
     window.$(document).on('focusin', function (e) {
-      store.lastPos = e.target.getBoundingClientRect().top;
+      if (e.target) {
+        store.lastPos = e.target.getBoundingClientRect().top;
+      }
     });
     window.$(window).on('beforeunload', this.beforeUnload);
     // Give a warning if the assessment is quiz-style and not submitted

@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header></assess-header>
     <videocued-nav
       :cue="cue"
@@ -13,7 +16,13 @@
         @jumpto="jumpTo"
       />
     </videocued-nav>
-    <div class="scrollpane" role="region" :aria-label="$t('regions.q_and_vid')">
+    <div
+      class="scrollpane"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.q_and_vid')"
+    >
       <intro-text
         :active = "cue == -1"
         :html = "intro"
@@ -101,7 +110,6 @@ export default {
   },
   data: function () {
     return {
-      youtubeApiLoaded: false,
       videoWidth: 600,
       aspectRatioPercent: 56.2,
       ytplayer: null,
@@ -275,6 +283,15 @@ export default {
       this.toshow = newToshow;
     }
   },
+  mounted () {
+    if (window.YT) {
+      this.createPlayer();
+    } else {
+      window.onYouTubePlayerAPIReady = () => {
+        this.createPlayer();
+      };
+    }
+  },
   created () {
     // don't show intro if it's empty
     if (store.assessInfo.intro !== '') {
@@ -282,13 +299,11 @@ export default {
       this.toshow = 'i';
     }
     // async load YouTube API
-    window.onYouTubePlayerAPIReady = () => {
-      this.youtubeApiLoaded = true;
-      this.createPlayer();
-    };
-    const tag = document.createElement('script');
-    tag.src = '//www.youtube.com/player_api';
-    document.head.appendChild(tag);
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = '//www.youtube.com/player_api';
+      document.head.appendChild(tag);
+    }
   }
 };
 </script>

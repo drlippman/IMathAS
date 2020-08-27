@@ -191,6 +191,15 @@ export const actions = {
       window.setTimeout(() => this.saveChanges(exit), 20);
       return;
     }
+    if (Object.keys(store.scoreOverrides).length === 0 &&
+      Object.keys(store.feedbacks).length === 0
+    ) {
+      store.saving = 'saved';
+      if (exit) {
+        window.location = window.exiturl;
+      }
+      return;
+    }
     const qs = store.queryString;
     store.inTransit = true;
     store.saving = 'saving';
@@ -477,7 +486,7 @@ export const actions = {
     } else {
       let scoreChanged = true;
       if (qdata.singlescore) {
-        scoreChanged = (Math.abs(score - qdata.rawscore) > 0.001);
+        scoreChanged = (Math.abs(score - qdata.score / qdata.points_possible) > 0.001);
       } else if (qdata.parts[pn]) {
         scoreChanged = (Math.abs(score - qdata.parts[pn].score / qdata.parts[pn].points_possible) > 0.001);
       }

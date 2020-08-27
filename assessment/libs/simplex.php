@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 29
+// File Version : 31
 //
 
 global $allowedmacros;
@@ -13,9 +13,13 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros, "simplex", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
+array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaycolortable", "simplexdisplaylatex", "simplexdisplaylatex2", "simplexdisplaytable2", "simplexdisplaytable2string", "simplexfindpivotpoint", "simplexfindpivotpointmixed", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolutiontolatex", "simplexsolve2", "simplexnumberofsolutions", "simplexdisplaytable", "simplexsolve");
 
 include_once("fractions.php");  // fraction routine
+
+function simplexver() {
+	return 31;
+}
 
 // function simplex(type, objective, constraints)
 // Creates and returns a new simplex matrix. elements are fractions
@@ -398,7 +402,6 @@ function simplexcreateanswerboxentrytable() {
 
 	return simplexdisplaytable($matrixans, $matrixname, 0, $mode, -1, null, $headers, $tablestyle);
 }
-
 
 // function simplexcreateinequalities(type, objectivevariable, objective, constraints, [headers, displayASCIIticks, showfractions, includeinequalities] )
 // Creates an array of string that correspond to each line of the simple inequalities
@@ -1190,24 +1193,18 @@ function simplexdisplaylatex() {
 			if(!is_null($pivots)) {
 				for ($pivotloop=0; $pivotloop<count($pivots); $pivotloop++) {
                     $currentpoint = $pivots[$pivotloop];
-                    // patched 2019-10-28
-                    // not tracked down was this wouldn't be an array...
-                    if(!is_array($currentpoint)) {
-                        $prow = -1;
-                        $pcol = -1;
-                        echo "currentpoint is not an array - ".htmlentities($currentpoint).".<br/>\r\n";
-                    } else {
-                        if((count($currentpoint)>0)&&(!is_null($currentpoint[0]))&&($currentpoint[0]>=0)) {
-                            $prow = $currentpoint[0];
-                        }
-                        else {
-                            $prow = -1;
-                        }
-                        if((count($currentpoint)>1)&&(!is_null($currentpoint[1]))&&($currentpoint[1]>=0)) {
-                            $pcol = $currentpoint[1];
-                        }
-                        else {
-                            $pcol = -1;
+                    // Updated 2019-11-24
+                    // set to not a pivot
+                    $prow = -1;
+                    $pcol = -1;
+                    if(is_array($currentpoint)) {
+                        if(count($currentpoint)>0){
+                            if((!is_null($currentpoint[0]))&&($currentpoint[0]>=0)) {
+                                $prow = $currentpoint[0];
+                            }
+                            if((!is_null($currentpoint[1]))&&($currentpoint[1]>=0)) {
+                                $pcol = $currentpoint[1];
+                            }
                         }
 
                         if(($prow==$rloop)&&($pcol==$cloop)) {
@@ -3170,9 +3167,9 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change Log
-// 2019-xx-xx
+// 2019-11-24 ver 30 - reworked the current point tpo not show debug information.
 //
-// 2019-10-28 ver 29 - Fixed bug in sinplexsolve2 that added an extra row to some tableaus
+// 2019-10-28 ver 29 - Fixed bug in simplexsolve2 that added an extra row to some tableaus
 //                     patched code in simplexdisplaylatex at 1193 $currentpoint was not an ordered pair - it was a single value.
 //
 //
@@ -3216,7 +3213,7 @@ function simplexsolve($sm,$type,$showfractions=1) {
 // 2015-04-03 Fixed bug in simplex - an error occurred sometimes when transposing the duality minimization
 //			to the maximization problem.
 //
-// 2015-03-18 Fixed bub in simplexfindpivotpoint - did not look at all non-basic rows for multiple solutions.
+// 2015-03-18 Fixed bug in simplexfindpivotpoint - did not look at all non-basic rows for multiple solutions.
 //			updated the slove to stop when no more multiple solutions are found.
 //
 // 2015-03-11 Fixed bug in simplex for the "min" option - was not transposing correctly.

@@ -437,7 +437,7 @@
 		echo "<script type=\"text/javascript\">\n";
 		echo "initSortTable('myTable',Array('N','S',false,'N','N','N','N','N',false),true);\n";
 		echo "</script>\n";
-		echo "<p>Average time taken on this assessment: ";
+		/*echo "<p>Average time taken on this assessment: ";
 		if (count($timetaken)>0) {
 			echo round(array_sum($timetaken)/count($timetaken)/60,1);
 		} else {
@@ -451,7 +451,7 @@
 			echo 0;
 		}
 		echo ' minutes</p>';
-
+        */
 	} else {
 		echo '</tbody></table>';
 	}

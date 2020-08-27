@@ -272,6 +272,9 @@ ol.lalpha li { margin-top: .7em;}
 .drawtools {
   margin-left: 8px;
 }
+.drawtools > span {
+    display:inline-block;
+}
 .drawtools img {
   vertical-align: middle;
 }
@@ -362,6 +365,11 @@ input[type=text]:disabled, .mathquill-math-field.disabled {
   background-attachment: local, local, scroll, scroll;
   margin: 12px 0;
   padding: 1px;
+}
+.questionpane > .question > .question:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 div.question img, div.intro img, div.sidepreview img {

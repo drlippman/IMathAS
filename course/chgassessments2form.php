@@ -28,7 +28,8 @@ $vueData = array(
 	'copyendmsg' => 'DNC',
 	'chgendmsg' => false,
 	'removeperq' => false,
-	'copyopts' => 'DNC',
+    'copyopts' => 'DNC',
+    'copyreqscore' => false,
 	'displaymethod' => 'DNC',
 	'defpoints' => '',
 	'gbcategory' => 'DNC',
@@ -169,6 +170,15 @@ $vueData = array(
 				</select>
 			</span><br class=form />
 		</div>
+        <div v-show="copyopts !== 'DNC'" :class="{highlight:copyreqscore != false}">
+            <span class="form"></span>
+            <span class=formright>
+                <label>
+                <input type="checkbox" name="copyreqscore" v-model="copyreqscore" />
+                <?php echo _('Also copy "show based on another assessment" setting');?>
+                </label>
+            </span><br class=form />
+        </div>
 		<div v-show="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
 		<div style="padding-top:4px;">
 			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All'); ?></a>
@@ -356,7 +366,9 @@ $vueData = array(
 			<div :class="{highlight:caltag != ''}">
 				<label class="form" for="caltag"><?php echo _('Calendar icon'); ?>:</label>
 				<span class="formright">
-					<input name="caltag" id="caltag" type=text size=8 v-model="caltag"/>
+                    <label><input name="caltagradio" type="radio" value="usetext" checked><?php echo _('Use Text');?>:</label>
+                        <input aria-label="<?php echo _('Calendar icon text');?>" name="caltag" id="caltag" v-model="caltag" type=text size=8 /> <br />
+					<label><input name="caltagradio" type="radio" value="usename"><?php echo _('Use Assessment Name');?></label>
 				</span><br class=form />
 			</div>
 
@@ -802,6 +814,10 @@ var app = new Vue({
 					{
 						'value': 'after_lastattempt',
 						'text': '<?php echo _('After the last try on a question'); ?>'
+                    },
+                    {
+						'value': 'jump_to_answer',
+						'text': '<?php echo _('After the last try or Jump to Answer button');?>'
 					},
 					never
 				];
@@ -964,6 +980,19 @@ var app = new Vue({
 		}
 	},
 	methods: {
+		initCalTagRadio: function() {
+			// bind to caltagradio controls
+			$('input[type=radio][name=caltagradio]').change(function() {
+				if (this.value == 'usename') {
+					$('input[type=text][name=caltag]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+					$('input[type=text][name=caltag]').closest('div').addClass('highlight');
+				}
+				else if (this.value == 'usetext') {
+					$('input[type=text][name=caltag]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('');
+					$('input[type=text][name=caltag]').closest('div').removeClass('highlight');
+				}
+			});
+		},
 		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
@@ -977,6 +1006,10 @@ var app = new Vue({
 			this.extrefs.push({'label':'', 'link':''});
 			this.extrefs = this.extrefs.slice();
 		}
+	},
+    mounted: function() {
+    	// call init method
+        this.initCalTagRadio();
 	}
 });
 </script>
