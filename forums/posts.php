@@ -422,9 +422,9 @@ if ($oktoshow) {
 	}
 }
 if (empty($_GET['embed'])) {
-    echo "<div class=breadcrumb>$breadcrumbbase ";
+    echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
-        echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        echo "$breadcrumbbase  <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
     if ($page==-4) {
 		echo "<a href=\"forums.php?cid=$cid\">Forum Search</a> ";

@@ -274,9 +274,9 @@ if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
 
 if (isset($_GET['search']) && trim($_GET['search'])!='') {
 	require("../header.php");
-    echo "<div class=breadcrumb>$breadcrumbbase ";
+    echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
-		echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+		echo "$breadcrumbbase  <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	}
 	echo "<a href=\"thread.php?page=".Sanitize::onlyInt($page)."&cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($forumid)."\">Forum Topics</a> &gt; Search Results</div>\n";
 
@@ -383,11 +383,11 @@ $placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thre
 require("../header.php");
 
 
-echo "<div class=breadcrumb>$breadcrumbbase ";
 if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+    echo "<div class=breadcrumb>$breadcrumbbase ";
     echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    echo _('Forum Topics').'</div>';
 }
-echo _('Forum Topics').'</div>';
 echo '<div id="headerthread" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 
 if ($duedates!='') {

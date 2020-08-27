@@ -64,9 +64,9 @@
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
 	require("../header.php");
-    echo "<div class=breadcrumb>$breadcrumbbase ";
+    echo "<div class=breadcrumb>";
     if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
-        echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }    
     echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."\">Forum Topics</a> &gt; Posts by Name</div>\n";
 
