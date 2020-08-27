@@ -110,11 +110,10 @@ class StringAnswerBox implements AnswerBox
     			if ($useeqnhelper && $displayformat == 'usepreview') {
     				$params['helper'] = 1;
     			}
-    			if (!isset($hidepreview) && $displayformat == 'usepreview' &&
-            $_SESSION['userprefs']['livepreview']==1
-          ) {
-    				$params['preview'] = 1;
-    			}
+                if (!isset($hidepreview) && $displayformat == 'usepreview') {
+                    $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+                }
+
     			$params['calcformat'] = $answerformat;
 
     			if ($displayformat == 'typeahead') {

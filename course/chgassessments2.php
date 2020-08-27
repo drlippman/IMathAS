@@ -49,15 +49,27 @@ if (!(isset($teacherid))) {
 		$sets = array();
 		$qarr = array();
 		if ($_POST['copyopts'] != 'DNC') {
-			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
+            $copyreqscore = !empty($_POST['copyreqscore']);
+			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
-				$sets[] = "$item=:$item";
-			}
-
+                if (($item == 'reqscoreaid' || $item == 'reqscore') && !$copyreqscore) {
+                    unset($qarr[$item]);
+                } else if ($item == 'reqscoretype' && !$copyreqscore) {
+                    if (($qarr[$item]&1)==0) {
+                        $sets[] = 'reqscore=ABS(reqscore)';
+                        $sets[] = 'reqscoretype=(reqscoretype & ~1)';
+                    } else {
+                        $sets[] = 'reqscoretype=(reqscoretype | 1)';
+                    }
+                    unset($qarr['reqscoretype']);
+                } else {
+                    $sets[] = "$item=:$item";
+                }
+            }
 		} else {
 			$turnonshuffle = 0;
 			$turnoffshuffle = 0;
@@ -417,7 +429,7 @@ if (!(isset($teacherid))) {
 			$setslist = implode(',',$sets);
 			$qarr[':cid'] = $cid;
 			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist) AND courseid=:cid");
-			$stm->execute($qarr);
+            $stm->execute($qarr);
 			if ($stm->rowCount()>0) {
 				$updated_settings = true;
 				$metadata = $metadata + $qarr;

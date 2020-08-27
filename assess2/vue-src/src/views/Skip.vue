@@ -1,12 +1,25 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" id="skipnav" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header></assess-header>
     <skip-question-header :qn="qn"/>
-    <div class="scrollpane" role="region" :aria-label="$t('regions.questions')">
+    <div
+      class="scrollpane"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.questions')"
+    >
       <intro-text
         :active = "qn == -1"
         :html = "intro"
         key = "-1"
+      />
+      <inter-question-text-skiplist
+        pos = "before"
+        :qn = "qn"
       />
       <div
         v-for="curqn in questionArray"
@@ -14,22 +27,16 @@
         :class="{inactive: curqn != qn}"
         :aria-hidden = "curqn != qn"
       >
-        <inter-question-text-list
-          pos = "before"
-          :qn = "curqn"
-          :active="curqn == qn"
-        />
         <question
           :qn="curqn"
           :active="curqn == qn"
           :getwork="1"
         />
-        <inter-question-text-list
-          pos = "after"
-          :qn = "curqn"
-          :active="curqn == qn"
-        />
       </div>
+      <inter-question-text-skiplist
+        pos = "after"
+        :qn = "qn"
+      />
     </div>
   </div>
 </template>
@@ -37,7 +44,7 @@
 <script>
 import AssessHeader from '@/components/AssessHeader.vue';
 import SkipQuestionHeader from '@/components/SkipQuestionHeader.vue';
-import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import InterQuestionTextSkiplist from '@/components/InterQuestionTextSkiplist.vue';
 import Question from '@/components/question/Question.vue';
 import IntroText from '@/components/IntroText.vue';
 
@@ -48,7 +55,7 @@ export default {
   components: {
     SkipQuestionHeader,
     Question,
-    InterQuestionTextList,
+    InterQuestionTextSkiplist,
     AssessHeader,
     IntroText
   },

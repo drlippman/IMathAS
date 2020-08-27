@@ -208,6 +208,10 @@ class ComplexScorePart implements ScorePart
                 }
             }
         }
+        if (count($annumarr) == 0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
         $score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
         if ($score<0) {
             $scorePartResult->setRawScore(0);

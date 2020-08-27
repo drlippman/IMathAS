@@ -419,13 +419,13 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("scinotordec",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!is_numeric($totest) && !preg_match('/^\-?[1-9](\.\d*)?(\*|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
+		if (!is_numeric($totest) && !preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
 			return false;
 		}
 	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
+		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
 			return false;
 		}
 	}

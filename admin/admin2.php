@@ -41,7 +41,7 @@ if ($myrights < 75) {
     if ($showgroup==-1) {
       $groupname = _('Pending Users');
     } else if ($showgroup==0) {
-      $groupname = _('Default Group');    
+      $groupname = _('Default Group');
     } else {
       $stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
       $stm->execute(array(':id'=>$showgroup));
@@ -56,7 +56,7 @@ if ($myrights < 75) {
 
   } else if (!empty($_GET['finduser']) || !empty($_GET['findteacher'])) {
     require("../includes/userutils.php");
-    
+
     //search for a user (teacher or regular)
     if (trim($_GET['findteacher'])!=='') {
       $limitToTeacher = true;
@@ -68,13 +68,13 @@ if ($myrights < 75) {
       $pagetitle = _("Select User");
     }
     $possible_users = searchForUser($searchterm, $limitToTeacher);
-    
+
     //only one match - redirect to user details page
     if (count($possible_users)==1) {
       header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/userdetails.php?id=".Sanitize::encodeUrlParam($possible_users[0]['id']). "&r=" .Sanitize::randomQueryStringParam());
     	exit;
     }
-    
+
     $page = 'pickuser';
     $curBreadcrumb = $curBreadcrumb . ' <a href="admin2.php">' . _('Admin') . '</a> &gt; ' . $pagetitle;
 
@@ -86,7 +86,7 @@ if ($myrights < 75) {
     foreach ($words as $v) {
       $likearr[] = '%'.$v.'%';
     }
-    $likes = implode(' OR ', array_fill(0, count($words), 'ig.name LIKE ?'));                                                                                              
+    $likes = implode(' OR ', array_fill(0, count($words), 'ig.name LIKE ?'));
     $stm = $DBH->prepare("SELECT ig.id,ig.name,COUNT(iu.id) as ucnt FROM imas_groups AS ig LEFT JOIN imas_users AS iu ON ig.id=iu.groupid WHERE $likes GROUP BY ig.id ORDER BY ig.name");
     $stm->execute($likearr);
     $possible_groups = array();
@@ -168,11 +168,11 @@ if ($overwriteBody==1) {
       echo '<a href="exportlib.php?cid=admin">',_('Export Libraries'),'</a><br/>';
       echo '<a href="listdiag.php">',_('Diagnostics'),'</a> ';
       echo '</span>';
-      
+
       echo '<span class="column">';
       echo '<a href="forms.php?from=admin2&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
       if (($myspecialrights&16)==16 || ($myspecialrights&32)==32) {
-      	      echo '<br/><a href="../util/batchcreateinstr.php?from=admin">'._('Batch Add Instructors').'</a>';    
+      	      echo '<br/><a href="../util/batchcreateinstr.php?from=admin">'._('Batch Add Instructors').'</a>';
       }
       echo '</span>';
       echo '<span class="column">';
@@ -260,7 +260,7 @@ if ($overwriteBody==1) {
           echo '<td><a href="forms.php?action=modgroup&id='.$grpid.'">'._('Modify').'</a></td>';
           echo '<td><a href="forms.php?action=delgroup&from=admin2&id='.$grpid.'">'._('Delete').'</a></td>';
           echo '</tr>';
-          
+
         }
         echo '</tbody>';
         echo '</table>';
@@ -278,6 +278,12 @@ if ($overwriteBody==1) {
         echo '<div class="cpmid">';
         echo '<a href="forms.php?from='.$from.'&action=newadmin&group='.Sanitize::encodeUrlParam($showgroup).'">'._('Add New User').'</a>';
         echo ' | <a href="listdiag.php?show=g'.Sanitize::encodeUrlParam($showgroup).'">'._('Diagnostics').'</a>';
+        if ($myrights == 100) {
+          echo ' | <a href="forms.php?action=modgroup&id='.Sanitize::encodeUrlParam($showgroup).'">'._('Edit Group').'</a>';
+        }
+        if (!empty($CFG['use_ipeds']) && $myrights == 100) {
+            echo ' | <a href="ipedslink.php?groupid='.Sanitize::encodeUrlParam($showgroup).'">'._('IPEDS/NCES Assoc').'</a>';
+        }
         echo '</div>';
       }
       echo '<table class=gb id="myTable">';

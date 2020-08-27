@@ -17,18 +17,13 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 if (isset($_GET['public'])) {
+    $init_session_start = true;
 	require("../init_without_validate.php");
-	if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
-	ini_set('session.gc_maxlifetime',432000);
-	ini_set('auto_detect_line_endings',true);
-	header('P3P: CP="ALL CUR ADM OUR"');
-	session_start();
+
 	$_SESSION['publicquickdrill'] = true;
 
-	if (!isset($_SESSION['data']) || isset($_GET['reset'])) {
+	if (!isset($_SESSION['drill']) || isset($_GET['reset'])) {
 		$_SESSION = array();
-	} else {
-		$_SESSION = unserialize(base64_decode($_SESSION['data']));
 	}
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		$urlmode = 'https://';
@@ -101,6 +96,7 @@ if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
 	*/
 	exit;
 }
+
 if (isset($_SESSION['drill']) && empty($_GET['id'])) {
 	//load from sessiondata
 	$qsetid = $_SESSION['drill']['id'];
@@ -371,7 +367,7 @@ initstack.push(focusfirst);
 <?php
 
 if ($page_scoreMsg != '' && $showscore) {
-	echo '<div class="review">Score on last question: '.Sanitize::encodeStringForDisplay($page_scoreMsg);
+	echo '<div class="review">Score on last question: '. $page_scoreMsg;
 	echo '</div>';
 }
 

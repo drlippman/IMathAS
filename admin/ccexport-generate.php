@@ -12,6 +12,14 @@ $loadmathfilter = 1;
 $loadgraphfilter = 1;
 require_once("../filter/filter.php");
 require_once("../includes/filehandler.php");
+if (substr($mathimgurl,0,4) !== 'http') {
+    // need to make an absolute url
+    if (strlen($imasroot) > 0) { 
+        $mathimgurl = substr($basesiteurl,0,-1*strlen($imasroot)) . $mathimgurl;
+    } else {
+        $mathimgurl = $basesiteurl . $mathimgurl;
+    }
+}
 
 if (!defined('ENT_XML1')) {
 	define('ENT_XML1',ENT_QUOTES);

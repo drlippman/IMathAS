@@ -382,7 +382,9 @@ $vueData = array(
 		<div class="blockitems hidden">
 			<label class="form" for="caltag"><?php echo _('Calendar icon');?>:</label>
 			<span class="formright">
-				<input name="caltag" id="caltag" v-model="caltag" type=text size=8 />
+                <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>><?php echo _('Use Text');?>:</label>
+                 <input aria-label="<?php echo _('Calendar icon text');?>" name="caltag" id="caltag" v-model="caltag" type=text size=8 <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /> <br />
+				<label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>><?php echo _('Use Assessment Name');?></label>
 			</span><br class="form" />
 
 			<label class=form for="shuffle"><?php echo _('Shuffle item order');?>:</label>
@@ -957,6 +959,27 @@ var app = new Vue({
 		}
 	},
 	methods: {
+		initCalTagRadio: function() {
+			// bind to caltagradio controls
+            // this is a hacky non-Vue approach, but sufficient
+            $('input[type=radio][name=caltagradio]').change(function() {
+                if (this.value == 'usename') {
+                    $('input[type=text][name=caltag]')
+                        .attr('data-prev', function() {return this.value;})
+                        .prop('readonly', true)
+                        .css({'color':'#FFFFFF', 'opacity':'0.6'})
+                        .val('use_name');
+                }
+                else if (this.value == 'usetext') {
+                    $('input[type=text][name=caltag]')
+                        .prop('readonly', false)
+                        .css({'color':'inherit', 'opacity':'1.0'})
+                        .val(function() {
+                            return this.getAttribute('data-prev') || '?';
+                        });
+                }
+            });
+		},
 		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
@@ -986,6 +1009,10 @@ var app = new Vue({
 			this.showDisplayDialog = false;
 			$("#dispdetails").focus();
 		}
-	}
+	},
+    mounted: function() {
+    	// call init method
+        this.initCalTagRadio();
+    },
 });
 </script>

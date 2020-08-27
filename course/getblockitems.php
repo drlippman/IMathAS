@@ -33,7 +33,8 @@
    $now = time();
    $exceptions = array();
    if (!isset($teacherid) && !isset($tutorid)) {
-	$exceptions = loadExceptions($cid, $userid);
+    $exceptions = loadExceptions($cid, $userid);
+    $excused = loadExcusals($cid, $userid);
    }
     if (count($exceptions)>0) {
 	   upsendexceptions($items);

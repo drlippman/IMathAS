@@ -1134,3 +1134,18 @@ button.hamburger {
 .katex {
 	font-size: 1.05em !important;
 }
+.screenreader, .sr-only {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	color: transparent;
+}
+.empty-state, ul:empty {
+    display: none;
+}
+ul:empty + .empty-state {
+    display: block;
+}
