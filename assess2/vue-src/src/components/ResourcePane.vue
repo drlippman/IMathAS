@@ -17,9 +17,7 @@
           :title = "$t('resource.sidebar')"
           :aria-label = "$t('resource.sidebar') + ' ' + curResource.label"
         >
-          <icons
-            name="sidebar"
-          />
+          <icons name="sidebar" alt="" />
         </button>
 
         <a
@@ -29,9 +27,7 @@
           :title = "$t('resource.newtab')"
           :aria-label = "$t('resource.newtab') + ' ' + curResource.label"
         >
-          <icons
-            name="extlink"
-          />
+          <icons name="extlink" alt="" />
         </a>
 
       </div>
@@ -66,7 +62,7 @@ export default {
         'auto',
         false,
         'left',
-        ['skip-question-header', 'resource-dropdown']
+        ['skip-question-header', 'assess-header', 'resource-dropdown']
       );
     }
   }

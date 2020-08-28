@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
+  <div id="assess-header" :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
     role="region" :aria-label="$t('regions.aheader')"
   >
     <div style="flex-grow: 1">
