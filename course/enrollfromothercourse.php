@@ -39,11 +39,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 			$vals = array();
 			$qarr = array();
-			$_POST['section'] = trim($_POST['section']);
+            $_POST['section'] = trim($_POST['section']);
+            require('../includes/setSectionGroups.php');
 			foreach ($todo as $stu) {
 				if (in_array($stu,$dontdo)) {continue;}
 				$vals[] = "(?,?,?,?)";
-				array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null, $deflatepass);
+                array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null, $deflatepass);
+                setSectionGroups($stu, $cid, $_POST['section']);
 			}
 			if (count($vals)>0) {
 				$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section,latepass) VALUES '.implode(',', $vals));

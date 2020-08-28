@@ -88,13 +88,16 @@
 				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 				':email'=>Sanitize::emailAddress($_POST['email']),
 				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout, ':jsondata'=>json_encode($jsondata)));
-			$newuserid = $DBH->lastInsertId();
+            $newuserid = $DBH->lastInsertId();
+            require('./includes/setSectionGroups.php');
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
-				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                $stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                setSectionGroups($newuserid, $cid, $_POST['ekey2']);
 			} else {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES (:userid, :courseid, :gbcomment, :latepass)");
-				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                $stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                setSectionGroups($newuserid, $cid, '');
 			}
 
 			if ($emailconfirmation) {
@@ -140,12 +143,15 @@
                 require("footer.php");
                 exit;
             } else if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
+                require('./includes/setSectionGroups.php');
 				if (count($keylist)>1) {
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
+                    setSectionGroups($userid, $cid, $_REQUEST['ekey']);
 				} else {
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,latepass) VALUES (:userid, :courseid, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':latepass'=>$deflatepass));
+                    setSectionGroups($userid, $cid, '');
 				}
 
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid. '&r=' . Sanitize::randomQueryStringParam());

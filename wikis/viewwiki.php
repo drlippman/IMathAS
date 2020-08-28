@@ -37,7 +37,9 @@ if ($cid==0) {
 	$overwriteBody=1;
 	$body = "You need to access this page with a wiki id";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
+    $query = "SELECT w.name,w.startdate,w.enddate,w.editbydate,w.avail,w.groupsetid,gs.name AS igsname 
+        FROM imas_wikis AS w LEFT JOIN imas_stugroupset AS gs ON w.groupsetid=gs.id WHERE w.id=:id";
+	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
 	$wikiname = $row['name'];
@@ -111,10 +113,11 @@ if ($cid==0) {
 			$canedit = false;
 		}
 
-		//if is group wiki, get groupid or fail
+        //if is group wiki, get groupid or fail
 		if ($row['groupsetid']>0 && !isset($teacherid)) {
 			$isgroup = true;
-			$groupsetid = $row['groupsetid'];
+            $groupsetid = $row['groupsetid'];
+            $isSectionGroup = ($row['igsname'] == '##autobysection##');
 			$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 			$stm = $DBH->prepare($query);
@@ -128,7 +131,8 @@ if ($cid==0) {
 			}
 		} else if ($row['groupsetid']>0 && isset($teacherid)) {
 			$isgroup = true;
-			$groupsetid = $row['groupsetid'];
+            $groupsetid = $row['groupsetid'];
+            $isSectionGroup = ($row['igsname'] == '##autobysection##');
 			$stugroup_ids = array();
 			$stugroup_names = array();
 			$hasnew = array();
@@ -170,7 +174,7 @@ if ($cid==0) {
 			$groupid = 0;
 		}
 
-		if ($groupid>0) {
+		if ($groupid>0 && !$isSectionGroup) {
 			$grpmem = '<p>Group Members: <ul class="nomark">';
 			$query = "SELECT i_u.LastName,i_u.FirstName FROM imas_stugroupmembers AS i_sg,imas_users AS i_u WHERE ";
 			$query .= "i_u.id=i_sg.userid AND i_sg.stugroupid=:stugroupid";
@@ -300,11 +304,18 @@ if ($overwriteBody==1) {
 		echo '</div>';
 	} else { //default page display
 		if ($isgroup && isset($teacherid)) {
-			echo '<p>Viewing page for group: ';
+            echo '<p>';
+            if ($isSectionGroup) {
+                echo _('Viewing page for section: ');
+            } else {
+                echo _('Viewing page for group: ');
+            }
 			writeHtmlSelect('gfilter',$stugroup_ids,$stugroup_names,$groupid,null,null,'onchange="chgfilter()"');
 			echo '</p>';
 		} else if ($isgroup) {
-			echo "<p>Group:". Sanitize::encodeStringForDisplay($curgroupname)."</p>";
+            echo "<p>";
+            echo $isSectionGroup ? _('Section') : _('Group');
+            echo ': '.Sanitize::encodeStringForDisplay($curgroupname)."</p>";
 		}
 ?>
 <?php

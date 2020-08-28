@@ -389,8 +389,15 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$line['message'] = "";
 				$line['posttype'] = 0;
 				$line['files'] = '';
-				$line['tag'] = '';
-				$curstugroupid = 0;
+                $line['tag'] = '';
+                if (isset($_SESSION['ffilter'.$forumid])) {
+                    $curstugroupid = $_SESSION['ffilter'.$forumid];
+                    if ($curstugroupid == -1) {
+                        $curstugroupid = 0;
+                    }
+                } else {
+                    $curstugroupid = 0;
+                }
 				$replyby = null;
 				echo "<h1>Add Thread - \n";
 				if (isset($_GET['quoteq'])) {
@@ -623,11 +630,31 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "at <input type=text size=10 name=releasetime value=\"$releasebytime\" aria-label=\"post release time\"></span><br class=\"form\" />";
 			}
 			if ($groupsetid >0 && $isteacher && ($_GET['modify']=='new' || ($_GET['modify']!='reply' && $line['parent']==0))) {
-				echo '<span class="form"><label for="stugroup">Set thread to group</label>:</span><span class="formright">';
-				echo '<select name="stugroup" id="stugroup">';
-				echo '<option value="0" ';
+                if ($isSectionGroups) {
+                    echo '<script>function onstugroupchg(el) {
+                        $("#nonsectionwarn").toggle(el.value==0);
+                    }</script>';
+                }
+                echo '<span class="form"><label for="stugroup">';
+                if ($isSectionGroups) {
+                    echo _('Set thread to section');
+                } else {
+                    echo _('Set thread to group');
+                }
+                echo '</label>:</span><span class="formright">';
+                echo '<select name="stugroup" id="stugroup"';
+                if ($isSectionGroups) {
+                    echo ' onchange="onstugroupchg(this)"';
+                }
+				echo '><option value="0" ';
 				if ($curstugroupid==0) { echo 'selected="selected"';}
-				echo '>Non group-specific</option>';
+                echo '>';
+                if ($isSectionGroups) {
+                    echo _('Non section-specific');
+                } else {
+                    echo _('Non group-specific');
+                }
+                echo '</option>';
 				$grpnums = 1;
 				$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY name,id");
 				$stm->execute(array(':groupsetid'=>$groupsetid));
@@ -640,7 +667,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
 					echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 				}
-				echo '</select></span><br class="form" />';
+                echo '</select>';
+                if ($isSectionGroups) {
+                    echo '<br><span id="nonsectionwarn" class="noticetext"'.($curstugroupid==0?'':' style="display:none;"').'>';
+                    echo _('Warning: students from any section can reply to this post, which may expose student names cross-section.');
+                    echo '</span>';
+                }
+                echo '</span><br class="form" />';
 			}
 			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';

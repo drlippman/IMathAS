@@ -25,9 +25,12 @@ if (!isset($_GET['page']) || $_GET['page']=='') {
 	$page = Sanitize::onlyInt($_GET['page']);
 }
 
-$stm = $DBH->prepare("SELECT name,postby,replyby,settings,groupsetid,sortby,taglist,enddate,avail,description,postinstr,replyinstr,allowlate,autoscore, courseid FROM imas_forums WHERE id=:id");
+$query = "SELECT f.name,f.postby,f.replyby,f.settings,f.groupsetid,igs.name AS igsname,f.sortby,
+    f.taglist,f.enddate,f.avail,f.description,f.postinstr,f.replyinstr,f.allowlate,f.autoscore,f.courseid 
+    FROM imas_forums AS f LEFT JOIN imas_stugroupset AS igs ON igs.id=f.groupsetid WHERE f.id=:id";
+$stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$forumid));
-list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $description, $postinstr,$replyinstr, $allowlate, $autoscore, $forumcourseid) = $stm->fetch(PDO::FETCH_NUM);
+list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $groupsetname, $sortby, $taglist, $enddate, $avail, $description, $postinstr,$replyinstr, $allowlate, $autoscore, $forumcourseid) = $stm->fetch(PDO::FETCH_NUM);
 
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";
@@ -194,6 +197,7 @@ $now = time();
 
 $grpqs = '';
 if ($groupsetid>0) {
+    $isSectionGroups = ($groupsetname == '##autobysection##');
 	if (isset($_GET['ffilter'])) {
 		$_SESSION['ffilter'.$forumid] = $_GET['ffilter'];
 	}
@@ -547,8 +551,7 @@ if ($isteacher && $groupsetid>0) {
 		$curfilter = -1;
 	}
 
-	$groupnames = array();
-	$groupnames[0] = "Non-group-specific";
+    $groupnames = array();
 	$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY id");
 	$stm->execute(array(':groupsetid'=>$groupsetid));
 	$grpnums = 1;
@@ -559,18 +562,25 @@ if ($isteacher && $groupsetid>0) {
 		}
 		$groupnames[$row[0]] = $row[1];
 	}
-	natsort($groupnames);
-	$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY id");
-	$stm->execute(array(':groupsetid'=>$groupsetid));
+    natsort($groupnames);
+    $groupnames = [0=>$isSectionGroups ?  _("Non-section-specific") : _("Non-group-specific")] + $groupnames;
 	/*echo "<script type=\"text/javascript\">";
 	echo 'function chgfilter() {';
 	echo '  var ffilter = document.getElementById("ffilter").value;';
 	echo "  window.location = \"thread.php?page=$pages&cid=$cid&forum=$forumid&ffilter=\"+ffilter;";
 	echo '}';
 	echo '</script>';*/
-	echo '<p><label for="ffilter">Show posts for group</label>: <select id="ffilter" onChange="chgfilter()"><option value="-1" ';
+    echo '<p><label for="ffilter">';
+    if ($isSectionGroups) {
+        echo _('Showing posts for section');
+    } else {
+        echo _('Showing posts for group');
+    }
+    echo '</label>: <select id="ffilter" onChange="chgfilter()"><option value="-1" ';
 	if ($curfilter==-1) { echo 'selected="1"';}
-	echo '>All groups</option>';
+    echo '>';
+    echo $isSectionGroups ? _('All Sections') : _('All Groups');
+    echo '</option>';
 	foreach ($groupnames as $gid=>$gname) {
 		echo "<option value=\"$gid\" ";
 		if ($curfilter==$gid) { echo 'selected="1"';}
@@ -578,8 +588,16 @@ if ($isteacher && $groupsetid>0) {
 	}
 	echo '</select></p>';
 } else if ($groupsetid>0 && $groupid>0) {
-	echo '<p><b>'._('Showing posts for group: ').Sanitize::encodeStringForDisplay($groupname).'</b> ';
-	echo '<a class="small" href="#" onclick="basicahah(\'../course/showstugroup.php?cid='.$cid.'&gid='.Sanitize::onlyInt($groupid).'\',\'grouplistout\');$(this).hide();return false;">['._('Show group members').']</a> <span id="grouplistout"></span>';
+    echo '<p><b>';
+    if ($isSectionGroups) {
+        echo _('Showing posts for section');
+    } else {
+        echo _('Showing posts for group');
+    }
+    echo ': '.Sanitize::encodeStringForDisplay($groupname).'</b> ';
+    if (!$isSectionGroups) {
+        echo '<a class="small" href="#" onclick="basicahah(\'../course/showstugroup.php?cid='.$cid.'&gid='.Sanitize::onlyInt($groupid).'\',\'grouplistout\');$(this).hide();return false;">['._('Show group members').']</a> <span id="grouplistout"></span>';
+    }
 	echo '</p>';
 }
 echo '<p>';
@@ -636,7 +654,11 @@ echo "</p>";
 		<tr><th>Topic</th><th>Started By</th>
 			<?php
 			if ($isteacher && $groupsetid>0 && !$dofilter) {
-				echo '<th>Group</th>';
+                if ($isSectionGroups) {
+                    echo '<th>Section</th>';
+                } else {
+                    echo '<th>Group</th>';
+                }
 			}
 			?>
 			<th>Replies</th><th>Views (Unique)</th><th>Last Post</th></tr>

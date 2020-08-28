@@ -855,6 +855,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				'text' => _('Create new set of groups')
 			));
       while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                if ($row[1] == '##autobysection##') { continue; }
 				$groupOptions[] = array(
 					'value' => $row[0],
 					'text' => $row[1]

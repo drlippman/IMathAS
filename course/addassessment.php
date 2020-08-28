@@ -815,6 +815,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $page_groupsets['label'][0] = 'Create new set of groups';
             $i=1;
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                if ($row[1] == '##autobysection##') { continue; }
                 $page_groupsets['val'][$i] = $row[0];
                 $page_groupsets['label'][$i] = $row[1];
                 $i++;
