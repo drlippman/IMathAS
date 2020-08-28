@@ -407,7 +407,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
-			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+            var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 		} else {
 			var h = height;
 		}
@@ -436,7 +436,8 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
                 if (belowel = document.getElementById(showbelow[i])) {
                     inittop = belowel.getBoundingClientRect().bottom + 10;
                     if (height=='auto') {
-                        h = self.innerHeight - inittop - 20;
+						h = (window.self !== window.top) ? Math.min(600,self.innerHeight) : self.innerHeight;
+						h = Math.max(200, h - inittop - 20);
                     }
                     break;
                 }
