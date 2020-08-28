@@ -147,14 +147,14 @@ export const actions = {
             return;
           }
           if (store.assessInfo.displaymethod === 'skip') {
-            if (store.assessInfo.intro !== '') {
+            if (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0) {
               Router.push('/skip/0');
             } else {
               Router.push('/skip/1');
             }
           } else if (store.assessInfo.displaymethod === 'full') {
             if (store.assessInfo.hasOwnProperty('interquestion_pages')) {
-              if (store.assessInfo.intro !== '') {
+              if (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0) {
                 Router.push('/full/page/0');
               } else {
                 Router.push('/full/page/1');

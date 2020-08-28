@@ -1,6 +1,7 @@
 <template>
-  <div id="resource-pane">
+  <div id="resource-pane" v-if="assessResources.length > 0">
     <div class="pane-header">
+      <icons v-if="showicon" name="file" />
       Resources
     </div>
     <div class="pane-body">
@@ -44,6 +45,7 @@ import Icons from '@/components/widgets/Icons.vue';
 
 export default {
   name: 'ResourcePane',
+  props: ['showicon'],
   components: {
     Icons
   },
