@@ -317,7 +317,8 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
-function GB_show(caption,url,width,height) {
+function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
+    posstyle = posstyle || '';
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
 		gb_overlay.id = "GB_overlay";
@@ -347,7 +348,7 @@ function GB_show(caption,url,width,height) {
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY)
 			  .css("left", gbwin.getBoundingClientRect().left)
 			  .css("top", gbwin.getBoundingClientRect().top)
-			  .css("margin", 0);
+			  .css("margin", 0).css("right","").css("width",$(gbwin).width());
 			jQuery("#GB_window").append($("<div/>", {id: "GB_frameoverlay"}));
 			jQuery("body").css("user-select","none");
 
@@ -367,7 +368,7 @@ function GB_show(caption,url,width,height) {
 
 			jQuery("#GB_window").css("left", gbwin.getBoundingClientRect().left)
 			  .css("top", gbwin.getBoundingClientRect().top)
-			  .css("margin", 0)
+			  .css("margin", 0).css("right","")
 			  .data("original_w", $(gbwin).width())
 			  .data("original_h", $(gbwin).height())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
@@ -384,16 +385,22 @@ function GB_show(caption,url,width,height) {
 				 .on('mouseup.GBresize', GB_endresize);
 			}
 		});
-	}
+    }
+    document.getElementById("GB_loading").style.display = "block";
 	if (url.charAt(0)=='<') {
 		document.getElementById("GB_frameholder").innerHTML = '<div>'+url+'</div>';
 		if (url.match(/data-enlarged/)) {
 			jQuery("#GB_window").attr("data-lockratio", 1);
 		}
 		setTimeout(GB_doneload, 50);
-	} else {
+    } else if (!document.getElementById("GB_frame") ||
+        document.getElementById("GB_frame").src.replace(/\/$/,'') !=
+            url.replace(/\/$/,'')
+    ) {
 		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
-	}
+	} else {
+        document.getElementById("GB_loading").style.display = 'none';
+    }
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
@@ -404,30 +411,58 @@ function GB_show(caption,url,width,height) {
 		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
-			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+            var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 		} else {
 			var h = height;
 		}
 	}
-	document.getElementById("GB_window").style.display = "block";
-	document.getElementById("GB_overlay").style.display = "block";
-	document.getElementById("GB_loading").style.display = "block";
+    document.getElementById("GB_window").style.display = "block";
+    if (overlay !== false) {
+        document.getElementById("GB_overlay").style.display = "block";
+    } else {
+        document.getElementById("GB_overlay").style.display = "none";
+    }
 
 	//var de = document.documentElement;
 	//var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
 	var w = $(document).width();
 	if (width > w-20) {
 		width = w-20;
-	}
-	$("#GB_window").css("margin","").css("left","").css("top","");
-	document.getElementById("GB_window").style.width = width + "px";
-	document.getElementById("GB_window").style.height = (h-30) + "px";
-	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-	if (url.charAt(0)!='<') {
-		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
-	} else {
-		document.getElementById("GB_frameholder").style.height = "auto";
-	}
+    }
+    if (!posstyle.match(/noreset/) || 
+        !jQuery("#GB_window").data("original_mouse_x") || 
+        document.getElementById("GB_window").style.left==''
+    ) {
+        var inittop = '';
+        if (typeof showbelow == 'object') {
+            var belowel;
+            for (var i in showbelow) {
+                if (belowel = document.getElementById(showbelow[i])) {
+                    inittop = belowel.getBoundingClientRect().bottom + 10;
+                    if (height=='auto') {
+						h = (window.self !== window.top) ? Math.min(600,self.innerHeight) : self.innerHeight;
+						h = Math.max(200, h - inittop - 20);
+                    }
+                    break;
+                }
+            }
+        }
+        $("#GB_window").css("margin","").css("left","").css("top",inittop);
+        if (posstyle.match(/left/) && document.getElementById("GB_window").style.left=='') {
+            $("#GB_window").css("left", width).css("width","auto").css("right",20).css("margin","0");
+            width = w - width - 20;
+        } else {
+            document.getElementById("GB_window").style.width = width + "px";
+        }
+        
+        document.getElementById("GB_window").style.height = (h-30) + "px";
+        //document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
+        if (url.charAt(0)!='<') {
+            document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
+        } else {
+            document.getElementById("GB_frameholder").style.height = "auto";
+        }
+    }
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {

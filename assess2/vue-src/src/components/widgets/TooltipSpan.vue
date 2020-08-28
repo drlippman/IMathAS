@@ -5,7 +5,8 @@
     @mouseover = "triggerOpen($event,true)"
     @mouseleave = "triggerOpen($event,false)"
     @touchstart = "triggerOpen"
-    @blur = "triggerOpen($event,false)"
+    @focusin = "triggerOpen($event,true)"
+    @focusout = "triggerOpen($event,false)"
     tabindex = "-1"
   >
     <slot></slot>

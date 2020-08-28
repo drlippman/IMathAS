@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
+  <div id="assess-header" :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
     role="region" :aria-label="$t('regions.aheader')"
   >
     <div style="flex-grow: 1">
@@ -46,19 +46,16 @@
     </div>
 
     <div class="assess-header">
-      <menu-button
+      <dropdown
         v-if="ainfo.resources.length > 0"
-        id="resource-dropdown" position="right"
-        :header = "$t('header.resources_header')"
-        nobutton = "true"
-        noarrow = "true"
-        :options = "ainfo.resources"
-        searchby = "title"
+        id="resource-dropdown"
+        :tip = "$t('header.resources_header')"
       >
         <template v-slot:button>
           <icons name="file" size="medium"/>
         </template>
-      </menu-button>
+        <resource-pane />
+      </dropdown>
 
       <tooltip-span v-if = "showPrint" :tip="$t('print.print_version')">
         <a
@@ -111,7 +108,9 @@
 
 <script>
 import Timer from '@/components/Timer.vue';
-import MenuButton from '@/components/widgets/MenuButton.vue';
+// import MenuButton from '@/components/widgets/MenuButton.vue';
+import Dropdown from '@/components/widgets/Dropdown.vue';
+import ResourcePane from '@/components/ResourcePane.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
@@ -125,7 +124,8 @@ export default {
   components: {
     Icons,
     LtiMenu,
-    MenuButton,
+    Dropdown,
+    ResourcePane,
     Timer,
     TooltipSpan,
     BadgedIcon

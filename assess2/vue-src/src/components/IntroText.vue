@@ -1,14 +1,19 @@
 <template>
   <div v-show="active" class="questionpane introtext">
-    <div v-html="html" ref="introtext"/>
+    <div v-if="html !== ''" v-html="html" ref="introtext"/>
+    <resource-pane :showicon="true" style="display:inline-block"/>
   </div>
 </template>
 
 <script>
 import { pauseVideos } from '@/components/pauseVideos';
+import ResourcePane from '@/components/ResourcePane.vue';
 
 export default {
   name: 'IntroText',
+  components: {
+    ResourcePane
+  },
   props: ['html', 'active'],
   mounted () {
     setTimeout(window.drawPics, 100);
