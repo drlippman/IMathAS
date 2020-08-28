@@ -9,6 +9,7 @@
   "next": "Nächste",
   "previous": "Vorherige",
   "question_n": "Frage {n}",
+  "jumptocontent": "Navigation überspringen",
   "launch": {
     "continue_assess": "Test fortsetzen",
     "retake_assess": "Test noch einmal machen",
@@ -200,7 +201,8 @@
     "retake_penalty": "{n}% Abzug wegen Wiederholung",
     "late_penalty": "{n}% Abzug wegen verspätetem Einreichen",
     "scorelist": "Liste der Punkte",
-    "reshowquestions": "Fragen überprüfen"
+    "reshowquestions": "Fragen überprüfen",
+    "new_excused": "Aufgrund Ihrer bisherigen Ergebnisse in diesem Test müssen Sie die folgenden Tests nicht bearbeiten:"
   },
   "scorelist": {
     "question": "Frage",
@@ -421,7 +423,12 @@
     "latepass_blocked_practice": "Verspätetes Einreichen ist blockiert, weil der Studierende den Test im Übungs-Modus angesehen hat.",
     "clear_latepass_block": "Block leeren",
     "showwork": "Lösung anzeigen",
-    "hidework": "Lösung ausblenden"
+    "hidework": "Lösung ausblenden",
+    "show_excused": "Tests, die Sie nicht bearbeiten müssen, anzeigen",
+    "hide_excused": "Tests, die Sie nicht bearbeiten müssen, ausblenden",
+    "excused_list": "Aufgrund der bisherigen Ergebnisse in diesem Test müssen Sie die folgenden Tests nicht bearbeiten:",
+    "show_endmsg": "Endnachricht anzeigen",
+    "hide_endmsg": "Endnachricht ausblenden"
   },
   "work": {
     "add": "Lösung hinzufügen",
@@ -435,8 +442,8 @@
     "questions": "Fragen und Text",
     "q_and_vid": "Video und Fragen",
     "pagenav": "Seiten-Navigation",
-    "qnav": "Question navigation",
-    "qvidnav": "Video und Fragen-Navigation",
+    "qnav": "Fragen-Navigation",
+    "qvidnav": "Video- und Fragen-Navigation",
     "aheader": "Test-Info"
   }
 }
