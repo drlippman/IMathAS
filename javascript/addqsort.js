@@ -1404,30 +1404,30 @@ function generateTable() {
                 html += '<td class="nowrap">';
                 if ((curitems[j][7] & 32) == 32) {
                     html += '<span title="' + _('Show Work') + '" aria-label="' + _('Show Work') + '">' + 
-                    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
+                    '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>'
                     + '</span>';
                 }
                 if ((curitems[j][7] & 64) == 64) {
                     html += '<span title="' + _('Has Rubric') + '" aria-label="' + _('Has Rubric') + '">' + 
-                    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
+                    '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
                     + '</span>';
                 }
-                if ((curitems[j][7] & 16) == 16) {
-                    html += '<div class="ccvid inlinediv"';
-                    var altbase = _("Captioned video");
-                } else {
-                    html += '<div class="inlinediv"';
-                    var altbase = _("Video");
-                }
-                html += ">";
-                if ((curitems[j][7] & 1) == 1) {
-                    var showicons = "";
-                    var altadd = "";
-                } else {
-                    var showicons = "_no";
-                    var altadd = _(" disabled");
-                }
                 if ((curitems[j][7] & 4) == 4) {
+                    if ((curitems[j][7] & 16) == 16) {
+                        html += '<div class="ccvid inlinediv"';
+                        var altbase = _("Captioned video");
+                    } else {
+                        html += '<div class="inlinediv"';
+                        var altbase = _("Video");
+                    }
+                    if ((curitems[j][7] & 1) == 1) {
+                        var showicons = "";
+                        var altadd = "";
+                    } else {
+                        var showicons = "_no";
+                        var altadd = _(" disabled");
+                    }
+                    html += 'title="'+altbase+altadd+'">';
                     html +=
                         '<img src="' +
                         imasroot +
@@ -1437,6 +1437,7 @@ function generateTable() {
                         altbase +
                         altadd +
                         '"/>';
+                    html += '</div>';
                 }
                 if ((curitems[j][7] & 2) == 2) {
                     html +=
@@ -1446,6 +1447,8 @@ function generateTable() {
                         showicons +
                         '.png" alt="Help Resource' +
                         altadd +
+                        '" title="Help Resource' +
+                        altadd +
                         '"/>';
                 }
                 if ((curitems[j][7] & 8) == 8) {
@@ -1454,11 +1457,13 @@ function generateTable() {
                         imasroot +
                         "/img/assess_tiny" +
                         showicons +
-                        '.png" alt="Detailed solution' +
+                        '.png" alt="Written solution' +
+                        altadd +
+                        '" title="Written solution' +
                         altadd +
                         '"/>';
                 }
-                html += "</div></td>";
+                html += "</td>";
                 html += "<td>" + curitems[j][1] + "</td>";
                 if (beentaken) {
                     html +=
@@ -1711,7 +1716,7 @@ function generateTable() {
         imasroot +
         '/img/help.gif" alt="Help" onClick="window.open(\'' +
         imasroot +
-        "/help.php?section=questionintrotext','help','top=0,width=400,height=500,scrollbars=1,left=" +
+        "/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left=" +
         (screen.width - 420) +
         "')\"/></div>";
     html += "</td><td></td><td></td></tr>";
