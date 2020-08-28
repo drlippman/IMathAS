@@ -1213,7 +1213,7 @@ if ($overwriteBody==1) {
     if (isset($CFG['GEN']['pandocserver'])) {
         echo 'printlayoutword.php?cid='.$cid.'&aid='.$aid;
     } else {
-        echo 'printtest.php?cid='.$cid.'&aid='.$aid;
+        echo 'printlayoutbare.php?cid='.$cid.'&aid='.$aid;
     }
     echo '">'._('Create Print Version').'</a>';
     echo '</span><span class="column">';

@@ -394,45 +394,25 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$replyby = null;
 				echo "<h1>Add Thread - \n";
 				if (isset($_GET['quoteq'])) {
-					require_once("../assessment/displayq2.php");
 					$showa = false;
 					$parts = explode('-',$_GET['quoteq']);
 					$GLOBALS['assessver'] = $parts[4];
-					/* This doesn't seem to be used anywhere...
-					if (count($parts)==6) {
-						//wants to show ans
-						$stm = $DBH->prepare("SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
-						$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$parts[3]));
-						list($seeds, $attempts, $questions) = $stm->fetch(PDO::FETCH_NUM);
-						$seeds = explode(',', $seeds);
-						$seeds = $seeds[$parts[0]];
-						$attempts = explode(',', $attempts);
-						$attempts = $attempts[$parts[0]];
-						$qs = explode(',', $questions);
-						$qid = intval($qs[$parts[0]]);
-						$stm = $DBH->prepare("SELECT questionsetid,attempts,showans FROM imas_questions WHERE id=:id");
-						$stm->execute(array(':id'=>$qid));
-						list($parts[1], $allowedattempts, $showans) = $stm->fetch(PDO::FETCH_NUM);
-						$stm = $DBH->prepare("SELECT defattempts,deffeedback,displaymethod FROM imas_assessments WHERE id=:id");
- 						$stm->execute(array(':id'=>$parts[3]));
-						list($defattempts,$deffeedback,$displaymethod) = $stm->fetch(PDO::FETCH_NUM);
-						list($displaymode,$defshowans) = explode('-', $deffeedback);
-
-						if ($allowedattempts==9999) {
-							$allowedattempts = $defattempts;
-						}
-						if ($showans==0) {
-							$showans = $defshowans;
-						}
-						if ($attempts >= $allowedattempts) {
-							if ($showans=='F' || $showans=='J') {
-								$showa = true;
-							}
-						}
-
-					}
-					*/
-					$message = displayq($parts[0],$parts[1],$parts[2],$showa,false,0,true);
+                    if ($courseUIver > 1) {
+                        include('../assess2/AssessStandalone.php');
+                        $a2 = new AssessStandalone($DBH);
+                        $state = array(
+                            'seeds' => array($parts[0] => $parts[2]),
+                            'qsid' => array($parts[0] => $parts[1])
+                        );
+                        $a2->setState($state);
+                        $a2->loadQuestionData();
+                        $res = $a2->displayQuestion($parts[0], ['showhints'=>false,]);
+                        $message = $res['html'];
+                        $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
+                    } else {
+                        require("../assessment/displayq2.php");
+                        $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+                    }
 					$message = printfilter(forcefiltergraph($message));
 					if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
 						require_once("../includes/filehandler.php");

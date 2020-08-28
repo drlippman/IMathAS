@@ -52,7 +52,7 @@ class AssessStandalone {
    *  $arr['seeds'] = array of qn=>seed
    *  $arr['qsid'] = array of qn=>qsetid
    *  $arr['stuanswers'] = stuanswers for all questions, (qn+1)-indexed
-   *  $arr['stuanswerval'] = stuanswersval for all questions, (qn+1)-indexed
+   *  $arr['stuanswersval'] = stuanswersval for all questions, (qn+1)-indexed
    *  $arr['scorenonzero'] = scorenonzero for all questions, (qn+1)-indexed
    *  $arr['scoreiscorrect'] = scoreiscorrect for all questions, (qn+1)-indexed
    *  $arr['partattemptn'] = array of qn=>pn=>num of attempts made
@@ -60,7 +60,24 @@ class AssessStandalone {
    *  $arr['wrongfmt'] = array of qn=>pn=>wrongfmt
    */
   function setState($arr) {
-    $this->state = $arr;
+      foreach (['stuanswers','stuanswersval','scorenonzero','scoreiscorrect','partattemptn','rawscore'] as $f) {
+          if (!isset($arr[$f])) {
+              $arr[$f] = [];
+          }
+      }
+      foreach ($arr['seeds'] as $qn=>$seed) {
+        foreach (['scorenonzero','scoreiscorrect'] as $f) {
+            if (!isset($arr[$f][$qn+1])) {
+                $arr[$f][$qn+1] = false;
+            }
+        }
+        foreach (['partattemptn','rawscore'] as $f) {
+            if (!isset($arr[$f][$qn])) {
+                $arr[$f][$qn] = [];
+            }
+        }
+      }
+      $this->state = $arr;
   }
 
   /*
@@ -180,6 +197,10 @@ class AssessStandalone {
         ->setSeqPartDone($seqPartDone)
         ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat);
 
+    if (!empty($options['printformat'])) {
+        $questionParams->setPrintFormat(true);
+    }
+
     $questionGenerator = new QuestionGenerator($this->DBH,
         $GLOBALS['RND'], $questionParams);
     $question = $questionGenerator->getQuestion();
@@ -194,12 +215,10 @@ class AssessStandalone {
 
     $answeights = $question->getAnswerPartWeights();
 
-    /*  Not needed
-    if ($showans) {
+    if (!empty($options['includeans'])) {
       $jsparams['ans'] = $question->getCorrectAnswersForParts();
       $jsparams['stuans'] = $stuanswers[$qn+1];
     }
-    */
 
     if ($maxtries > 0) {
       $disabled = array();
