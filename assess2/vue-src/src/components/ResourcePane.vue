@@ -13,7 +13,7 @@
 
         <button
           @click="popout(curResource)"
-          v-if = "docEl.offsetWidth > 1000"
+          class = "min1000"
           :title = "$t('resource.sidebar')"
           :aria-label = "$t('resource.sidebar') + ' ' + curResource.label"
         >
@@ -89,5 +89,10 @@ export default {
 }
 #resource-list li {
   padding: 8px 0;
+}
+@media only screen and (max-width: 1000px) {
+  .min1000 {
+    display: none;
+  }
 }
 </style>
