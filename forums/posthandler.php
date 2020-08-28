@@ -328,11 +328,14 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		require("../header.php");
 		if (empty($_GET['embed'])) {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			if ($caller != 'thread') {
-				echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";
+            echo "<div class=breadcrumb>";
+            if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+                echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }   
+            if ($caller != 'thread') {
+				echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 			}
-			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; ";
+			echo "<a href=\"$returnurl\">$returnname</a> &gt; ";
 			if ($_GET['modify']!="reply" && $_GET['modify']!='new') {
 				echo "Modify Posting";
 			} else if ($_GET['modify']=='reply') {
@@ -793,9 +796,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if (empty($_GET['embed'])) {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			if ($caller!='thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
-			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
+            echo "<div class=breadcrumb>";
+            if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+                echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }   
+            if ($caller!='thread') {echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";}
+			echo "<a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
 		}
 
 		echo "<h2>Remove Post</h2>\n";
@@ -895,9 +901,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		require("../header.php");
 		if (empty($_GET['embed'])) {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			if ($caller != 'thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
-			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
+            echo "<div class=breadcrumb>";
+            if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+                echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }   
+            if ($caller != 'thread') {echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";}
+			echo "<a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
 		}
 
 		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id");

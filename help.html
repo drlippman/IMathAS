@@ -198,7 +198,7 @@ dd {
 		<li><a href="#calcinterval">Calculated Interval</a></li>
 		<li><a href="#fileupload">File Upload</a></li>
 		<li><a href="#multipart">Multipart</a></li>
-		<li><a href="#conditional">Conditional</a></li>
+        <li><a href="#conditional">Conditional</a></li>
 		</ul></li>
 	</ul></li>
 
@@ -2194,12 +2194,12 @@ can be omitted.</p>
 <li><strong>nonzerorands(min,max,n,[order])</strong>:  Returns n nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>randsfrom(list/array,n,[order])</strong>: Return n elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>jointrandfrom(list/array,list/array)</strong>:  Returns one element from each list, where the location used in each list is the same</li>
+<li><strong>jointrandfrom(list/array,list/array,[list/array,...])</strong>:  Returns one element from each list, where the location used in each list is the same</li>
 <li><strong>diffrands(min,max,n,[order])</strong>:  Returns n different integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>diffrrands(min,max,p,n,[order])</strong>:  Returns n different real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>diffrandsfrom(list/array,n,[order])</strong>: Return n different elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>nonzerodiffrands(min,max,n,[order])</strong>:  Returns n different nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>nonzerodiffrrands(min,max,p,n,[nonzero,order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>nonzerodiffrrands(min,max,p,n,[order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
 <li><strong>jointshuffle(list/array1,list/array2,[n1,n2])</strong>:  Shuffles two lists/arrays in a way that retains
     respective order.  In n1 is provided, n1 elements from each shuffled array will be returned (like
     a joint version of diffrandsfrom).  If n2 is also provided, n1 elements of list/array1 and n2
@@ -2505,6 +2505,9 @@ These macros are used for mathematical calculations:
 <li><strong>v!</strong>: Factorial, like $a = $b!</li>
 <li><strong>evalfunc(func,vars,val1,val2,..)</strong>: Evaluates a function given the variables and values for each variable.
   for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
+<li><strong>evalnumstr(expr)</strong>: Evaluates a string representation of a numerical expression, like "(2pi)/3", to a decimal.  
+  Avoid using this in place of direct calculation in most cases, but it can be handy if you already have generated the string 
+  for display but then need to do a calculation with it.</li>
 <li>See also: calconarray and multicalconarray in the <a href="#arraymacros">Array Macros</a> section</li>
 </ul>
 </div> <!-- h2 -->
@@ -3903,7 +3906,9 @@ This type of question can contain multiple parts, where each part is one of the 
 <dt>$scoremethod = "singlescore" or "allornothing" </dt>
 	<dd>Instead of recording individual scores for each question part, these will cause a single score to be
 	recorded for the question.  "singlescore" totals the individual part scores, while "allornothing"
-	will only give full credit or no credit.</dd>
+    will only give full credit or no credit.  If you need to specify per-part indexed 
+    scoremethod values as well, you can define this as the array value 
+    $scoremethod['whole'] instead.</dd>
 <dt>Question part options</dt>
 	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
 <dt>$showanswer </dt>
@@ -3916,6 +3921,32 @@ This type of question can contain multiple parts, where each part is one of the 
 	Show Answer button, you must place all of them, or else the remainder will not show.  Use $showanswerstyle = 'inline' to
 	allow Show Answer to be placed inline with text rather than on its own line.</dd>
 </dl>
+
+<p><strong>Scaffolding</strong></p>
+<p>Scaffolded questions, also know as Sequential Multipart questions, allow you 
+    to break a question up into chunks, where the second chunk only shows after the 
+    first chunk is correctly answered or the student runs out of tries.  This 
+    allows you to use the answer to the first chunk in the second without 
+    "giving away" the answer, and allows a student who gets stuck on the first 
+    chunk to move on to the rest of the question.</p>
+<p><em>Note: scaffolding is only available in the new assessment interface. 
+    If you are using the old interface, the question will behave like a 
+    regular multipart question.</em></p>
+<p>Scaffolded questions are an extension of Multipart questions.  To turn a multipart 
+    question into a scaffolded question, just add an isolated line with three or more slashes
+    in the Question Text where you want the chunks broken apart.</p>
+<p>An example: (in the Question Text)</p>
+<pre>
+To simplify $a(x+$b) + $c, first we need to distribute:
+
+$a(x+$b) = $answerbox[0]
+
+///
+
+Next, combine like terms:
+
+$a x + $ab + $c = $answerbox[1]
+</pre>
 
 </div> <!-- h3 -->
 <div class=h3>
@@ -3969,7 +4000,18 @@ own question type.
 	<dd>By default the $showanswer for conditional types is "Answers may vary".  Set $showanswer to override this.</dd>
 </dl>
 
+<p><strong>Scaffolding</strong></p>
+<p>While not as simple as scaffolding multipart questions, 
+    you can add scaffolding to a Conditional question.  As with multipart,
+    put an isolated line with three slashes in the question text to indicate 
+    where the breaks occur. Then you will need to set <code>$seqPartDone[pn]</code>
+    to <code>true</code> for each part index once that part should be considered 
+    completed.  The scaffolding will move onto the next chunk when 
+    all parts in the previous chunk have <code>$seqPartDone</code>
+    set to <code>true</code>.
+</p>
 </div> <!-- h3 -->
+
 </div> <!-- h2 -->
 </div> <!-- h1 -->
 <div class=h1>

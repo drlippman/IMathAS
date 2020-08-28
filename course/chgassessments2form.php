@@ -28,7 +28,8 @@ $vueData = array(
 	'copyendmsg' => 'DNC',
 	'chgendmsg' => false,
 	'removeperq' => false,
-	'copyopts' => 'DNC',
+    'copyopts' => 'DNC',
+    'copyreqscore' => false,
 	'displaymethod' => 'DNC',
 	'defpoints' => '',
 	'gbcategory' => 'DNC',
@@ -169,6 +170,15 @@ $vueData = array(
 				</select>
 			</span><br class=form />
 		</div>
+        <div v-show="copyopts !== 'DNC'" :class="{highlight:copyreqscore != false}">
+            <span class="form"></span>
+            <span class=formright>
+                <label>
+                <input type="checkbox" name="copyreqscore" v-model="copyreqscore" />
+                <?php echo _('Also copy "show based on another assessment" setting');?>
+                </label>
+            </span><br class=form />
+        </div>
 		<div v-show="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
 		<div style="padding-top:4px;">
 			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All'); ?></a>
@@ -369,7 +379,9 @@ $vueData = array(
 						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option value="0"><?php echo _('No'); ?></option>
 						<option value="1"><?php echo _('All'); ?></option>
-						<option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="32"><?php echo _('All but last');?></option>
+                        <option value="48"><?php echo _('All but first and last');?></option>
 					</select>
 				</span><br class=form />
 			</div>
@@ -804,6 +816,10 @@ var app = new Vue({
 					{
 						'value': 'after_lastattempt',
 						'text': '<?php echo _('After the last try on a question'); ?>'
+                    },
+                    {
+						'value': 'jump_to_answer',
+						'text': '<?php echo _('After the last try or Jump to Answer button');?>'
 					},
 					never
 				];

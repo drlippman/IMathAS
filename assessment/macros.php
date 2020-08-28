@@ -21,7 +21,7 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "dechex","hexdec","print_r","replacealttext","randpythag","changeimagesize","mod",
  "numtowords","randname","randnamewpronouns","randmalename","randfemalename",
  "randnames","randmalenames","randfemalenames","randcity","randcities","prettytime",
- "definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper",
+ "definefunc","evalfunc","evalnumstr","safepow","arrayfindindices","stringtoarray","strtoupper",
  "strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend",
  "stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today",
  "numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction",
@@ -212,7 +212,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$absymax = -1E10;
 	foreach ($funcs as $function) {
 		if ($function=='') { continue;}
-
+        $function = str_replace('\\,','&x44;', $function);
 		$function = listtoarray($function);
 		//correct for parametric
 		$isparametric = false;
@@ -241,6 +241,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= ', color '.$function[4];
 
 			if (isset($function[5]) && $function[5]!='') {
+                $function[5] = str_replace('&x44;', ',', $function[5]);
 				if (!isset($function[6])) {
 					$function[6] = 'above';
 				}
@@ -253,7 +254,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$commands .= $path;
 			continue; //skip the stuff below
 		} else if ($function[0]=='text') {  //text,x,y,textstring,color,loc,angle
-			if (!isset($function[4]) || $function[4]=='') {
+            $function[3] = str_replace('&x44;', ',', $function[3]);
+            if (!isset($function[4]) || $function[4]=='') {
 				$function[4] = 'black';
 			}
 			if (!isset($function[5])) {
@@ -1294,16 +1296,22 @@ function randsfrom($lst,$n,$ord='def') {
 }
 
 
-function jointrandfrom($lst1,$lst2) {
-	if (func_num_args()!=2) { echo "jointrandfrom expects 2 arguments"; return array(1,1);}
-	if (!is_array($lst1)) {
-		$lst1 = listtoarray($lst1);
-	}
-	if (!is_array($lst2)) {
-		$lst2 = listtoarray($lst2);
-	}
-	$l = $GLOBALS['RND']->rand(0,min(count($lst1)-1,count($lst2)-1));
-	return array($lst1[$l],$lst2[$l]);
+function jointrandfrom() {
+    $args = func_get_args();
+	if (count($args)<2) { echo "jointrandfrom expects at least 2 arguments"; return array(1,1);}
+    $min = 1e12;
+    foreach ($args as $k=>$arg) {
+        if (!is_array($arg)) {
+            $args[$k] = listtoarray($arg);
+        }
+        $min = min($min, count($args[$k])-1);
+    }
+    $l = $GLOBALS['RND']->rand(0,$min);
+    $out = array();
+    foreach ($args as $k=>$arg) {
+        $out[] = $arg[$l];
+    }
+	return $out;
 }
 
 
@@ -1454,7 +1462,7 @@ function diffrands($min,$max,$n=0,$ord='def') {
 }
 
 
-function diffrrands($min,$max,$p=0,$n=0, $nonzero=false,$ord='def') {
+function diffrrands($min,$max,$p=0,$n=0,$ord='def',$nonzero=false) {
 	if (func_num_args()<4) { echo "diffrrands expects 4 arguments"; return $min;}
 	$n = floor($n);
 	list($min,$max) = checkMinMax($min, $max, false, 'diffrrands');
@@ -1556,7 +1564,7 @@ function nonzerodiffrands($min,$max,$n=0,$ord='def') {
 
 
 function nonzerodiffrrands($min,$max,$p=0,$n=0,$ord='def') {
-	return diffrrands($min,$max,$p,$n, true, $ord);
+	return diffrrands($min,$max,$p,$n, $ord, true);
 }
 
 
@@ -2549,6 +2557,10 @@ function getstuans($v,$q,$i=0,$blankasnull=true) {
     }
 		return $v[$q];
 	}
+}
+
+function evalnumstr($str) {
+    return evalMathParser($str);
 }
 
 function evalfunc($farr) {

@@ -284,7 +284,7 @@
 					$query = 'UPDATE imas_questions JOIN imas_assessments ON imas_assessments.id=imas_questions.assessmentid ';
 					$query .= 'LEFT JOIN imas_assessment_records ON imas_questions.assessmentid = imas_assessment_records.assessmentid ';
 					$query .= 'SET imas_questions.questionsetid=:replaceby WHERE imas_assessments.ver>1 AND ';
-					$query .= 'imas_assessment_records.id IS NULL AND imas_questions.questionsetid=:questionsetid';
+					$query .= 'imas_assessment_records.userid IS NULL AND imas_questions.questionsetid=:questionsetid';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':replaceby'=>$replaceby, ':questionsetid'=>$qsetid));
 

@@ -71,7 +71,6 @@ var mouseisdown = false;
 var targets = new Array();
 var imgs = new Array();
 var targetOuts = new Array();
-var a11ytargets = new Array();
 var lines = new Array();
 var dots = new Array();
 var odots = new Array();
@@ -110,7 +109,6 @@ function reset() {
 	targets.length = 0;
 	imgs.length = 0;
 	targetOuts.length = 0;
-	a11ytargets.length = 0;
 	lines.length = 0;
 	dots.length = 0;
 	odots.length = 0;
@@ -135,8 +133,10 @@ function clearcanvas(tarnum) {
 	tptypes[tarnum].length = 0;
 	ineqlines[tarnum].length = 0;
 	ineqtypes[tarnum].length = 0;
-	curTarget = tarnum;
-	drawTarget();
+    curTarget = tarnum;
+    if (targets[tarnum].type == 'canvas') {
+        drawTarget();
+    }
 	curTarget = null;
 	curLine = null;
 	dragObj = null;
@@ -155,7 +155,6 @@ function clearlastline(tarnum) {
 
 function addA11yTarget(canvdata, thisdrawla) {
 	var tarnum = canvdata[0];
-	a11ytargets.push(tarnum);
 	var ansformats = canvdata[1].substr(9).split(',');
 	var xmin = canvdata[2];
 	var xmax = canvdata[3];
@@ -179,7 +178,7 @@ function addA11yTarget(canvdata, thisdrawla) {
 		}
 	}
 	targetOuts[tarnum] = document.getElementById('qn'+tarnum);
-	targets[tarnum] = {el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
+	targets[tarnum] = {type:'a11y', el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
 	var afgroup;
@@ -243,13 +242,13 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
 		},
 		"basic": {
-			"line": [{"mode":0, "descr":_("Lines"), inN: "list", "input":_("Enter list of points to connect with lines")}],
+			"line": [{"mode":0, "descr":_("Lines"), inN: "list", "input":_("Enter a list of points to connect with lines")}],
 			"lineseg": [{"mode":0.5, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
-			"freehand": [{"mode":0.7, "descr":_("Freehand"), inN: "list", "input":_("Enter list of points to connect with lines")}],
+			"freehand": [{"mode":0.7, "descr":_("Freehand"), inN: "list", "input":_("Enter a list of points to connect with lines")}],
 			"dot": [{"mode":1, "descr":_("Solid dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
-			"polygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":1}],
-			"closedpolygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":2}],
+			"polygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter a list of points for dots to connect with lines"), "dotline":1}],
+			"closedpolygon": [{"mode":0, "descr":_("Polygon"), inN: "list", "input":_("Enter a list of points for dots to connect with lines"), "dotline":2}],
 		}
 	};
 
@@ -267,7 +266,8 @@ function addA11yTarget(canvdata, thisdrawla) {
 				selects.push(op);
 			}
 		}
-	}
+    }
+    document.getElementById("a11ydrawnew"+tarnum).innerHTML = selects;
 	targets[tarnum].defmode = defmode;
 	targets[tarnum].inputmodes = inputmodes;
 	targets[tarnum].selects = selects;
@@ -278,7 +278,7 @@ function addA11yTarget(canvdata, thisdrawla) {
 	// we have to store original typed answer.
 	//maybe new drawla[5] for that purpose?
 	//need to be able to get acccess to drawla from here
-	//TODO:  Check if thisdrawla was defined
+    //TODO:  Check if thisdrawla was defined
 	if (thisdrawla == null && lines.hasOwnProperty(tarnum)) {
 		for (var i=0;i<lines[tarnum].length;i++) {
 			adda11ydraw(tarnum, 0, pixcoordstopointlist(lines[tarnum][i], tarnum));
@@ -307,39 +307,89 @@ function addA11yTarget(canvdata, thisdrawla) {
 
 function adda11ydraw(tarnum,initmode,defval) {
 	var thistarg = targets[tarnum];
-	var mode = initmode || thistarg.defmode;
+	var mode = initmode || document.getElementById("a11ydrawnew"+tarnum).value;
 	var val = defval || "";
-	var afgroup = thistarg.afgroup;
-	html = '<select aria-label="'+_("Drawing element type")+'" onchange="imathasDraw.changea11ydraw(this,\''+tarnum+'\')">';
-	for (j in thistarg.selects) {
-		html += thistarg.selects[j];
-	}
-	html += '</select><br/>';
-	html += '<span class="a11ydrawinstr"></span><br/>';
-	html += '<input type="text" aria-label="'+_("Point list")+'" value="'+val+'" onblur="imathasDraw.updatea11ydraw(this)"/>';
+    var afgroup = thistarg.afgroup;
+    var n = thistarg.el.getElementsByTagName("li").length+1;
+    var numname = '<span class="sr-only draweln">'+_('Drawing element ') + n + '</span>';
+    html = numname;
+    html += thistarg.moderef[mode].descr + '.<br/>';
+	html += '<label><span class="a11ydrawinstr"></span><br/>';
+    html += '<input type="text" value="'+val+'" data-n="'+thistarg.moderef[mode].inN+'" ';
+    html += 'onblur="imathasDraw.updatea11ydraw(this)"/></label>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
-	html += _("Remove")+'</button>';
-	var li = $("<li>", {class:"a11ydrawrow"}).html(html);
+	html += _("Remove")+' '+numname+'</button>';
+	var li = $("<li>", {class:"a11ydrawrow", "data-mode":mode}).html(html);
 	$(thistarg.el).append(li);
-	li.find("select").val(mode);
 	li.find(".a11ydrawinstr").text(thistarg.moderef[mode].input);
 	if (!defval) {
-		li.find("select").focus();
+		li.find("input").focus();
 	}
 }
 
 function removea11ydraw(el) {
-	$(el).parent().remove();
-	encodea11ydraw();
+    setariastatus(_('Removed drawing element'));
+    var ul = $(el).closest("ul");
+    $(el).parent().remove();
+    ul.find("li").each(function(i,el) {
+        var numname = _('Drawing element ') + (i+1);
+        $(el).find(".draweln").html(numname);
+    });
+    ul.prev().focus();
+	encodea11ydraw(ul.attr("id").substring(8));
 }
 function changea11ydraw(tarel, tarnum) {
 	var curmode = $(tarel).val();
 	var modedata = targets[tarnum].moderef[curmode];
-	$(tarel).parent().find(".a11ydrawinstr").text(modedata.input);
+	$(tarel).closest("li").find(".a11ydrawinstr").text(modedata.input);
 	encodea11ydraw();
 }
 function updatea11ydraw(el) {
-	encodea11ydraw();
+    var err = 0;
+    var elval = el.value.trim();
+    if (elval.charAt(0) != '(' || elval.slice(-1) != ')') {
+        err |= 1;
+    }
+    var pts = elval.slice(1,-1).split(/\)\s*,\s*\(/);
+    var inN = el.getAttribute('data-n');
+    if (inN.match(/\d/) && pts.length != parseInt(inN)) {
+        err |= 2;
+    }
+    for (var i=0; i<pts.length;i++) {
+        var subpts = pts[i].split(/,/);
+        if (subpts.length != 2) {
+            err |= 1;
+        }
+        for (var j=0; j<subpts.length; j++) {
+            if (subpts[j].trim().length == 0) {
+                err |= 1;
+            }
+        }
+    }
+    if (el.parentNode.parentNode.lastChild.className == 'noticetext') {
+        el.parentNode.parentNode.removeChild(el.parentNode.parentNode.lastChild);
+    }
+    if (err) {
+        el.setAttribute('aria-invalid', true);
+        var errspan = document.createElement("span");
+        errspan.id = uniqid('a11ydrawerr');
+        errspan.className = "noticetext"
+        if ((err&1)==1) {
+            errspan.innerHTML = '<br>'+_('Error: Invalid format for points. Give points as open parenthesis number comma number close parenthesis. Separate points with a comma.');
+            setariastatus(_('Error: Invalid format for points'));
+        } else {
+            errspan.innerHTML = '<br>'+_('Error: Incorrect number of points. Expecting ') + inN;
+            setariastatus(_('Error: Incorrect number of points'));
+        }
+        el.parentNode.parentNode.appendChild(errspan);
+        el.setAttribute('aria-describedby', errspan.id);
+    } else {
+        el.removeAttribute('aria-invalid');
+        el.removeAttribute('aria-describedby');
+        setariastatus("");
+    }
+    var qn = parseInt($(el).closest('.a11ydraw').attr("id").substring(8));
+	encodea11ydraw(qn);
 }
 function pixcoordstopointlist(vals,tarnum) {
 	var thistarg = targets[tarnum];
@@ -350,10 +400,14 @@ function pixcoordstopointlist(vals,tarnum) {
 	y = Math.round(y*100)/100;
 	return "("+x+","+y+")";
 }
-function encodea11ydraw() {
-	for (var i=0;i<a11ytargets.length;i++) {
-		var tarnum = a11ytargets[i];
-		var thistarg = targets[tarnum];
+function encodea11ydraw(qn) {
+    if (typeof qn == 'undefined') {
+        qn = -1;
+    }
+	for (var tarnum in targets) {
+        if (qn > -1 && qn != tarnum) { continue; }
+        var thistarg = targets[tarnum];
+        if (thistarg.type != 'a11y') { continue; }
 		var lines = [];
 		var dots = [];
 		var odots = [];
@@ -362,8 +416,8 @@ function encodea11ydraw() {
 		var saveinput = [];
 		var afgroup = targets[tarnum].afgroup;
 		$("#a11ydraw"+tarnum).find(".a11ydrawrow").each(function(i,el) {
-			var mode = $(el).find("select").val();
-			var input = $(el).find("input").val();
+            var input = $(el).find("input").val();
+            var mode = el.getAttribute('data-mode');
 			saveinput.push("["+mode+',"'+input+'"]');
 			input = input.replace(/[\(\)]/g,'').split(/\s*,\s*/);
 			var outpts = [];
@@ -414,7 +468,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 
 	var tarpos = getPosition(tarel);
 
-	targets[tarnum] = {el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight, mode: defmode, dotline: dotline};
+	targets[tarnum] = {type:'canvas', el: tarel, left: tarpos.x, top: tarpos.y, width: tarel.offsetWidth, height: tarel.offsetHeight, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight, mode: defmode, dotline: dotline};
 	if (typeof snaptogrid=="string" && snaptogrid.indexOf(":")!=-1) {
 		snaptogrid = snaptogrid.split(":");
 		targets[tarnum].snaptogridx = 1*snaptogrid[0];
@@ -439,7 +493,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 	} else {
 		drawstyle[tarnum] = 0;
 	}
-	drawlocky[tarnum] = locky;
+    drawlocky[tarnum] = locky;
 	if (imgpath.match(/initPicture/)) {
 		if ($(tarel).closest('.drawcanvasholder').length == 0) {
 			$(tarel).removeClass("drawcanvas").wrap($("<div>", {
@@ -2515,7 +2569,8 @@ function normupdatevalues(id) {
 	} else if (normslider.curslider.type=='1R') {
 		var outstr = "("+lbl1val+",oo)";
 	}
-	document.getElementById("qn"+id).value = outstr;
+    document.getElementById("qn"+id).value = outstr;
+    $("#qn"+id).trigger("input").trigger("change");
 }
 
 function chgnormtype(id) {

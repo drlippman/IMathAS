@@ -86,13 +86,20 @@
           <span class="switch-toggle__ui"></span>
         </button>
       </tooltip-span>
-      <tooltip-span
+      <badged-icon
         v-if="ainfo.is_lti && ainfo.lti_showmsg"
-        :tip="$tc('lti.msgs', ainfo.lti_msgcnt)"
-        style="display: inline-block"
-      >
-        <lti-msgs />
-      </tooltip-span>
+        :link="msglink"
+        icon = "message"
+        label = "lti.msgs"
+        :cnt = "ainfo.lti_msgcnt"
+      />
+      <badged-icon
+        v-if="ainfo.is_lti && ainfo.help_features.forum > 0"
+        :link="forumlink"
+        icon = "forum"
+        label = "lti.forum"
+        :cnt = "ainfo.lti_forumcnt"
+      />
       <lti-menu v-if="ainfo.is_lti" />
     </div>
 
@@ -106,8 +113,9 @@ import Dropdown from '@/components/widgets/Dropdown.vue';
 import ResourcePane from '@/components/ResourcePane.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
-import LtiMsgs from '@/components/LtiMsgs.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
+import BadgedIcon from '@/components/BadgedIcon.vue';
+
 import { attemptedMixin } from '@/mixins/attemptedMixin';
 import { store, actions } from '../basicstore';
 
@@ -116,11 +124,11 @@ export default {
   components: {
     Icons,
     LtiMenu,
-    LtiMsgs,
     Dropdown,
     ResourcePane,
     Timer,
-    TooltipSpan
+    TooltipSpan,
+    BadgedIcon
   },
   data: function () {
     return {
@@ -220,27 +228,11 @@ export default {
       }
       return hasShowWorkAfter;
     },
-    resources () {
-      var out = [];
-      for (const i in this.ainfo.resources) {
-        out.push(this.ainfo.resources[i]);
-        out.push({
-          label: 'Popup ' + this.ainfo.resources[i].label,
-          nosmall: true,
-          onclick: () => {
-            window.GB_show(
-              this.ainfo.resources[i].label,
-              this.ainfo.resources[i].link,
-              760,
-              'auto',
-              false,
-              'left',
-              ['skip-question-header', 'resource-dropdown']
-            );
-          }
-        });
-      }
-      return out;
+    msglink () {
+      return store.APIbase + '../msgs/msglist.php?cid=' + store.cid;
+    },
+    forumlink () {
+      return store.APIbase + '../forums/thread.php?cid=' + store.cid + '&forum= ' + this.ainfo.help_features.forum;
     }
   },
   methods: {

@@ -13,7 +13,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
       $query = "SELECT iu.id,LastName,iu.FirstName,iu.email,iu.SID,iu.rights,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id ";
       $query .= "WHERE (iu.email=? OR iu.SID=?)";
       if ($limitToTeacher) {
-        $query .= " AND iu.rights>11";
+        $query .= " AND iu.rights>19";
       }
       $query .= " LIMIT 200";
       $stm = $DBH->prepare($query);

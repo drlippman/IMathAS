@@ -186,7 +186,10 @@ function showcalcontentsid(elid) {
 				}
 				if (caleventsarr[elid].data[i].undolate==1) {
 					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
-				}
+                }
+                if (caleventsarr[elid].data[i].excused) {
+                    html += '<br><span class="small">'+_('You have been excused from this assignment. It will not be counted in your grade.')+'</span>';
+                }
 				if (caleventsarr[elid].data[i].editlink!=null) {
           if (caleventsarr[elid].data[i].ver > 1) {
             html += ' <a href="addassessment2.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';

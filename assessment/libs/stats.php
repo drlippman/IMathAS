@@ -9,7 +9,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink");
+ "csvdownloadlink","modes","forceonemode");
 
 //nCr(n,r)
 //The Choose function
@@ -392,6 +392,43 @@ function median($a) {
 	return percentile($a,50);
 }
 
+function modes($arr) {
+  if (!is_array($arr)) {
+    echo "mode expects an array";
+    return 'DNE';
+  }
+  $arr = array_map('strval', $arr);
+  $freqs = array_count_values($arr);
+  $maxfreq = max($freqs);
+  $modes = array_keys($freqs, $maxfreq);
+  if (count($modes)==count($freqs)) {
+    return 'DNE';
+  } else {
+    return implode(',', $modes);
+  }
+}
+
+function forceonemode(&$arr) {
+  $modes = modes($arr);
+  if (is_numeric($modes)) {
+    return $modes;
+  }
+  if ($modes == 'DNE') {
+    $mode = $arr[0];
+  } else {
+    $mode = explode(',', $modes)[0];
+  }
+  // add a value after an existing one (in case sorted)
+  array_splice($arr, array_search($mode,$arr), 0, $mode);
+  foreach ($arr as $k=>$v) {
+    if ($v != $mode) {
+      array_splice($arr, $k, 1);
+      break;
+    }
+  }
+  return $mode;
+}
+
 //freqdist(array,label,start,classwidth)
 //display macro.  Returns an HTML table that is a frequency distribution of
 //the data
@@ -724,7 +761,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 function piechart($pcts,$labels,$w=250,$h=130) {
 	if ($_SESSION['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
-		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
+		$out .= '<tr><th>'._('Label').'</th>';
 		$out .= '<th>'._('Percent').'</th></tr>';
 		foreach ($labels as $k=>$label) {
 			$out .= '<tr><td>'.Sanitize::encodeStringForDisplay($label).'<td>';

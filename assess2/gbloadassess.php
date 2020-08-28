@@ -31,6 +31,19 @@ if ($isRealStudent || empty($_GET['uid'])) {
 } else {
   $uid = Sanitize::onlyInt($_GET['uid']);
 }
+$viewfull = true;
+if ($isteacher || $istutor) {
+  if (isset($_SESSION[$cid.'gbmode'])) {
+    $gbmode =  $_SESSION[$cid.'gbmode'];
+  } else {
+    $stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+    $stm->execute(array(':courseid'=>$cid));
+    $gbmode = $stm->fetchColumn(0);
+  }
+  if (((floor($gbmode/100)%10)&1) == 1) {
+    $viewfull = false;
+  }
+}
 
 $now = time();
 
@@ -200,6 +213,9 @@ if (isset($CFG['GEN']['qerrorsendto'][2])) {
 
 //prep date display
 prepDateDisp($assessInfoOut);
+
+// whether to show full gb detail or just summary
+$assessInfoOut['viewfull'] = $viewfull;
 
 //output JSON object
 echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

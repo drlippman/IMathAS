@@ -35,9 +35,14 @@ ini_set("max_execution_time", "120");
     }
 
     // Verify extension
+    $extension = strtolower(pathinfo($temp['name'], PATHINFO_EXTENSION));
+    if ($extension == 'dat' && $temp['type'] == 'image/svg+xml') {
+        $temp['name'] = str_replace('.dat','.svg', $temp['name']);
+        $extension = 'svg';
+    }
     if ($_POST['type'] == 'attach') {
       // already checked for blacklisted earlier
-    } else if (!in_array(strtolower(pathinfo($temp['name'], PATHINFO_EXTENSION)), array("gif", "jpg", "png"))) {
+    } else if (!in_array($extension, array("gif", "jpg", "png", "jpeg", "svg"))) {
         header("HTTP/1.0 500 Invalid extension.");
         return;
     }

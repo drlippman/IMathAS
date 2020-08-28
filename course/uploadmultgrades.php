@@ -94,7 +94,7 @@ if (!(isset($teacherid))) {
 						//echo "breaking 2";
 						//print_r($line);
 						if ($feedback != '') {
-							$score = 'NULL';
+							$score = null;
 						} else {
 							continue;
 						}

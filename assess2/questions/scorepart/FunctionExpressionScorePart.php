@@ -169,13 +169,15 @@ class FunctionExpressionScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        if (!in_array('equation',$ansformats) && strpos($answer,'=')!==false) {
-            echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
-        }
         if (!in_array('inequality',$ansformats) &&
             (strpos($answer,'<')!==false || strpos($answer,'>')!==false)
          ) {
             echo 'Your $answer contains an inequality sign, but you do not have $answerformat="inequality" set. This question probably will not work right.';
+        } else if (!in_array('equation',$ansformats) &&
+          !in_array('inequality',$ansformats) &&
+          strpos($answer,'=')!==false
+        ) {
+            echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
         }
 
         //build values for student answer

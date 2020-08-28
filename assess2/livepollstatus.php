@@ -96,15 +96,13 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   // load question settings and code
   $assess_info->loadQuestionSettings($qidstoload, true);
 
-  // get question object. Not showing scores in this state.
-  $assessInfoOut['questions'] = array(
-    $qn => $assess_record->getQuestionObject($qn, false, true, true)
-  );
+  // do not load question - question autoloader will handle that
 
   //TODO: ? pull any existing results (in case we refreshed)
 
   // extract seed
-  $seed = $assessInfoOut['questions'][$qn]['seed'];
+  $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
+  $seed = $question_obj['seed'];
 
   //set status
   $query = "UPDATE imas_livepoll_status SET ";

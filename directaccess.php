@@ -37,10 +37,12 @@
 		unset($_POST['password']);
 
 		$page_newaccounterror = checkNewUserValidation();
-		$stm = $DBH->prepare("SELECT enrollkey,deflatepass FROM imas_courses WHERE id=:id");
+		$stm = $DBH->prepare("SELECT enrollkey,deflatepass,allowunenroll FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['cid']));
-		list($enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
-		if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
+        list($enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
+        if (($line['allowunenroll']&2)==2) {
+            $page_newaccounterror .= _('Course is closed for self enrollment.  Contact your instructor for access.');
+        } else if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= _("Please provide the enrollment key");
 		} else if (strlen($enrollkey)>0) {
 			$keylist = array_map('trim',explode(';',$enrollkey));
@@ -73,15 +75,19 @@
 				$homelayout = $CFG['GEN']['homelayout'];
 			} else {
 				$homelayout = '|0,1,2||0,1';
-			}
-			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
-			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
+            }
+            $jsondata = [];
+            if (isset($CFG['GEN']['COPPA']) && empty($_POST['over13'])) {
+                $jsondata['under13'] = 1;
+            }
+			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout, jsondata) ";
+			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout, :jsondata)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights,
 				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
 				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 				':email'=>Sanitize::emailAddress($_POST['email']),
-				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
+				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout, ':jsondata'=>json_encode($jsondata)));
 			$newuserid = $DBH->lastInsertId();
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
@@ -123,11 +129,17 @@
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
-			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id=:id");
+			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass,allowunenroll FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
-			list($coursename,$enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
-			$keylist = array_map('trim',explode(';',$enrollkey));
-			if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
+			list($coursename,$enrollkey,$deflatepass,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM);
+            $keylist = array_map('trim',explode(';',$enrollkey));
+            if (($allowunenroll&2)==2) {
+                require("header.php");
+                echo "<h1>" . Sanitize::encodeStringForDisplay($coursename) . "</h1>";
+                echo '<p>'._('Course is closed for self enrollment.  Contact your instructor for access.').'</p>';
+                require("footer.php");
+                exit;
+            } else if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
 				if (count($keylist)>1) {
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
@@ -183,9 +195,16 @@
 		if (file_exists("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html")) {
 			require("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html");
 		}
-		$stm = $DBH->prepare("SELECT enrollkey FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$cid));
-		$enrollkey = $stm->fetchColumn(0);
+		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll FROM imas_courses WHERE id=:id");
+        $stm->execute(array(':id'=>$cid));
+        list($enrollkey,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM);
+        if (($allowunenroll&2)==2) {
+            echo '<p>', _('Course is closed for self enrollment.  Contact your instructor for access.'),'</p>';
+            echo '<p><a href="'.$GLOBALS['basesiteurl'].'/index.php">',_('Go to home page'),'</a>. ';
+            echo _('If you are already enrolled, you can log in there.'),'</p>';
+            require('footer.php');
+            exit;
+        }
 
 ?>
 <form id="pageform" class=limitaftervalidate method="post" action="directaccess.php<?php echo $querys; ?>">
@@ -211,7 +230,9 @@ if ($enrollkey!='closed') {
 <span class=form><?php echo $loginprompt;?>:</span><input class="form" type="text" size="15" id="username" name="username"><br class="form">
 <span class=form><?php echo _('Password'); ?>:</span><input class="form" type="password" size="15" id="password" name="password"><br class="form">
 <?php
-if (strlen($enrollkey)>0) {
+if (isset($_GET['ekey'])) {
+    echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_GET['ekey']).'">';
+} else if (strlen($enrollkey)>0) {
 	echo '<span class=form><label for="ekey">',_('Course Enrollment Key'),':</label></span><input class=form type=text size=12 name="ekey" id="ekey" value="' . (isset($_REQUEST['ekey']) ? Sanitize::encodeStringForDisplay($_REQUEST['ekey']) : "") . '"/><BR class=form>';
 }
 ?>
@@ -278,9 +299,14 @@ if (isset($_GET['getsid'])) {
 ?>
 <span class=form><label for="msgnot"><?php echo _("Notify me by email when I receive a new message:"); ?></label></span><span class=formright><input type=checkbox id=msgnot name=msgnot /></span><BR class=form>
 <?php
-	if (strlen($enrollkey)>0) {
+    if (isset($CFG['GEN']['COPPA'])) {
+        echo "<span class=form><label for=\"over13\">",_('I am 13 years old or older'),"</label></span><span class=formright><input type=checkbox name=over13 id=over13 onchange=\"toggleOver13()\"></span><br class=form />\n";
+    }
+    if (isset($_GET['ekey'])) {
+        echo '<input type="hidden" name="ekey2" value="'.Sanitize::encodeStringForDisplay($_GET['ekey']).'">';
+    } else if (strlen($enrollkey)>0) {
 ?>
-<span class=form><label for="ekey"><?php echo _("Course Enrollment Key:"); ?></label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['ekey2'])); } ?>/><BR class=form>
+<span class=form><label for="ekey2"><?php echo _("Course Enrollment Key:"); ?></label></span><input class=form type=text size=12 name="ekey2" id="ekey2" <?php if (isset($_POST['ekey2'])) { printf('value="%s"', Sanitize::encodeStringForDisplay($_POST['ekey2'])); } ?>/><BR class=form>
 <?php
 	}
 ?>

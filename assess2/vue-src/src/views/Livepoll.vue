@@ -62,7 +62,7 @@
 
       <livepoll-results
         v-if = "isTeacher"
-        :showresults = "showResults && curstate > 1"
+        :showresults = "showResults"
         :showans = "curstate === 4"
         :qn = "curqn"
       />

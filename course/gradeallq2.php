@@ -326,7 +326,7 @@
 	$placeinhead .= "       var toopen = '$address&page=' + stun;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
-	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForDisplay($deffbtext).'";';
+	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForJavascript($deffbtext).'";';
 	$placeinhead .= 'function chgsecfilter() {
 		var sec = document.getElementById("secfiltersel").value;
 		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);

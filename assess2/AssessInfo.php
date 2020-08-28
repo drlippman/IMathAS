@@ -225,7 +225,9 @@ class AssessInfo
     while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
       $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
       $qsids[] = $qrow['questionsetid'];
+      $this->questionData[$qrow['id']]['origcategory'] = $this->questionData[$qrow['id']]['category'];
       $category = &$this->questionData[$qrow['id']]['category'];
+
       if ($category === '') {
         // do nothing
       } else if (is_numeric($category)) {
@@ -358,6 +360,14 @@ class AssessInfo
     $out = array();
     foreach ($this->questionData as $qid=>$v) {
       $out[$qid] = $v['points_possible'];
+    }
+    return $out;
+  }
+
+  public function getAllQuestionPointsAndCats() {
+    $out = array();
+    foreach ($this->questionData as $qid=>$v) {
+      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>$v['origcategory']];
     }
     return $out;
   }
@@ -628,14 +638,23 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&1) {
-      //shuffle all
-      $RND->shuffle($qout);
-    } else if ($this->assessData['shuffle']&16) {
-      //shuffle all but first
-      $firstq = array_shift($qout);
-      $RND->shuffle($qout);
+    if ($this->assessData['shuffle']&16) {
+        //shuffle all but first
+        $firstq = array_shift($qout);
+    }
+    if ($this->assessData['shuffle']&32) {
+        //shuffle all but first
+        $lastq = array_pop($qout);
+    }
+    if ($this->assessData['shuffle']&(1+16+32)) {
+          // has any shuffle flag set
+          $RND->shuffle($qout);
+    }
+    if ($this->assessData['shuffle']&16) {
       array_unshift($qout, $firstq);
+    }
+    if ($this->assessData['shuffle']&32) {
+        array_push($qout, $lastq);
     }
 
     //pick seeds
@@ -658,7 +677,7 @@ class AssessInfo
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
           } else {
             //pick seed based on assessment ID
-            $seeds[] = $i + $this->curAid + $attempt + $ispractice?100:0;
+            $seeds[] = $i + $this->curAid + $attempt + ($ispractice?100:0);
           }
         }
       } else { //regular selection
