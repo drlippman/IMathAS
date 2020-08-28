@@ -638,14 +638,23 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&1) {
-      //shuffle all
-      $RND->shuffle($qout);
-    } else if ($this->assessData['shuffle']&16) {
-      //shuffle all but first
-      $firstq = array_shift($qout);
-      $RND->shuffle($qout);
+    if ($this->assessData['shuffle']&16) {
+        //shuffle all but first
+        $firstq = array_shift($qout);
+    }
+    if ($this->assessData['shuffle']&32) {
+        //shuffle all but first
+        $lastq = array_pop($qout);
+    }
+    if ($this->assessData['shuffle']&(1+16+32)) {
+          // has any shuffle flag set
+          $RND->shuffle($qout);
+    }
+    if ($this->assessData['shuffle']&16) {
       array_unshift($qout, $firstq);
+    }
+    if ($this->assessData['shuffle']&32) {
+        array_push($qout, $lastq);
     }
 
     //pick seeds
