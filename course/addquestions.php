@@ -460,7 +460,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=042220\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=041120\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=082820\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -485,9 +485,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$beentaken = false;
 	}
-	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,intro FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef, $assessintro) = $stm->fetch(PDO::FETCH_NUM);
+	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef,$showworkdef,$assessintro) = $stm->fetch(PDO::FETCH_NUM);
 	$ln = 1;
 
 	// Format of imas_assessments.intro is a JSON representation like
@@ -530,7 +530,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existingq = array();
 	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
 	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
-	$query .= "iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,iqs.meantimen FROM imas_questions AS iq ";
+    $query .= "iq.showwork,iq.rubric,iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,";
+    $query .= "iqs.meantimen FROM imas_questions AS iq ";
 	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
 	$query .= "WHERE iq.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
@@ -582,7 +583,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
 			$extrefval += 8;
-		}
+        }
+        if (($line['showwork'] == -1 && $showworkdef > 0) || $line['showwork'] > 0) {
+            $extrefval += 32;
+        }
+        if ($line['rubric'] > 0) {
+            $extrefval += 64;
+        }
 
 		$timeout = array();
 		$timeout[0] = round($line['meantime']/60, 1);
@@ -598,7 +605,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			(int)$canedit,
 			(int)Sanitize::onlyInt($line['withdrawn']),
 			(int)$extrefval,
-			$timeout);
+            $timeout
+        );
 
 	}
 
