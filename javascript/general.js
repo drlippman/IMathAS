@@ -449,6 +449,12 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
         }
         $("#GB_window").css("margin","").css("left","").css("top",inittop);
         if (posstyle.match(/left/) && document.getElementById("GB_window").style.left=='') {
+            if ($("body").hasClass("fw1000") && w > 1000) {
+                width += (w - 1000)/2;
+            }
+            if ($("body").hasClass("fw1920") && w > 1920) {
+                width += (w - 1920)/2;
+            }
             $("#GB_window").css("left", width).css("width","auto").css("right",20).css("margin","0");
             width = w - width - 20;
         } else {
