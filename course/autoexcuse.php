@@ -103,10 +103,10 @@ $query = "SELECT DISTINCT category FROM imas_questions WHERE assessmentid=:aid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':aid'=>$aid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    if ($row['category'] == 0) {
-        continue;
-    }
     if (is_numeric($row['category'])) {
+        if ($row['category'] == 0) {
+            continue;
+        }
         //outcome
         $categories[] = [
             'type'=>'O', 

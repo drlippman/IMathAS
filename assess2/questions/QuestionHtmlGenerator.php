@@ -135,6 +135,7 @@ class QuestionHtmlGenerator
         $showHints = ($this->questionParams->getShowHints()&1)==1;
         $thisq = $this->questionParams->getQuestionNumber() + 1;
         $correctAnswerWrongFormat = $this->questionParams->getCorrectAnswerWrongFormat();
+        $printFormat = $this->questionParams->getPrintFormat();
 
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
@@ -231,6 +232,21 @@ class QuestionHtmlGenerator
             if (!isset($showanswer)) {
                 $showanswer = _('Answers may vary');
             }
+        }
+
+        if ($printFormat) {
+            if (isset($displayformat)) {
+                if (is_array($displayformat)) {
+                    foreach ($displayformat as $kidx => $iidx) {
+                        if ($iidx == 'select') {
+                            unset($displayformat[$kidx]);
+                        }
+                    }
+                } else if ($displayformat == 'select') {
+                    unset($displayformat);
+                }
+            }
+            unset($answersize);
         }
 
         /*
@@ -422,6 +438,10 @@ class QuestionHtmlGenerator
                 $displayedAnswersForParts[$atIdx] = $answerBoxGenerator->getCorrectAnswerForPart();
                 $previewloc[$atIdx] = $answerBoxGenerator->getPreviewLocation();
 
+                if ($printFormat) {
+                    $answerbox[$atIdx] = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox[$atIdx]);
+                    $answerbox[$atIdx] = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox[$atIdx]);
+                }
                 // enact hidetips if set
                 if (!empty($hidetips) && (!is_array($hidetips) || !empty($hidetips[$atIdx]))) {
                   unset($jsParams[$qnRef]['tip']);
@@ -495,6 +515,11 @@ class QuestionHtmlGenerator
             $jsParams[$qnRef]['qtype'] = $quesData['qtype'];
             $displayedAnswersForParts[0] = $answerBoxGenerator->getCorrectAnswerForPart();
             $previewloc = $answerBoxGenerator->getPreviewLocation();
+
+            if ($printFormat) {
+                $answerbox = preg_replace('/<ul class="?nomark"?>(.*?)<\/ul>/s', '<ol style="list-style-type:upper-alpha">$1</ol>', $answerbox);
+                $answerbox = preg_replace('/<ol class="?lalpha"?/','<ol style="list-style-type:lower-alpha"', $answerbox);
+            }
 
             // enact hidetips if set
             if (!empty($hidetips)) {

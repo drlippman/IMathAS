@@ -5,22 +5,23 @@
     @focusin = "handleFocusin"
     @focusout = "handleFocusout"
   >
-    <span
-      :id = "id"
-      ref = "button"
-      role = "button"
-      tabindex = "0"
-      @click = "triggerOpen"
-      @keydown.enter.prevent = "triggerOpen"
-      @keydown.space.prevent = "triggerOpen"
-      class = "dropdown-button noselect"
-      :aria-controls = "id + '_pane'"
-      :aria-expanded = "open?'true':'false'"
-    >
-      <tooltip-span :show="!open && tip" :tip="tip">
+    <tooltip-span :show="!open && tip" :tip="tip">
+      <span
+        :id = "id"
+        ref = "button"
+        role = "button"
+        tabindex = "0"
+        @click = "triggerOpen"
+        @keydown.enter.prevent = "triggerOpen"
+        @keydown.space.prevent = "triggerOpen"
+        class = "dropdown-button noselect"
+        :aria-controls = "id + '_pane'"
+        :aria-expanded = "open?'true':'false'"
+      >
         <slot name=button></slot>
-      </tooltip-span>
-    </span>
+      </span>
+    </tooltip-span>
+
     <transition name="fade">
       <div
         class = "dropdown-pane"

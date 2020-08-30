@@ -37,10 +37,12 @@
 		unset($_POST['password']);
 
 		$page_newaccounterror = checkNewUserValidation();
-		$stm = $DBH->prepare("SELECT enrollkey,deflatepass FROM imas_courses WHERE id=:id");
+		$stm = $DBH->prepare("SELECT enrollkey,deflatepass,allowunenroll FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['cid']));
-		list($enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
-		if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
+        list($enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
+        if (($line['allowunenroll']&2)==2) {
+            $page_newaccounterror .= _('Course is closed for self enrollment.  Contact your instructor for access.');
+        } else if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= _("Please provide the enrollment key");
 		} else if (strlen($enrollkey)>0) {
 			$keylist = array_map('trim',explode(';',$enrollkey));
@@ -86,13 +88,16 @@
 				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
 				':email'=>Sanitize::emailAddress($_POST['email']),
 				':msgnotify'=>$msgnot, ':homelayout'=>$homelayout, ':jsondata'=>json_encode($jsondata)));
-			$newuserid = $DBH->lastInsertId();
+            $newuserid = $DBH->lastInsertId();
+            require('./includes/setSectionGroups.php');
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
-				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                $stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                setSectionGroups($newuserid, $cid, $_POST['ekey2']);
 			} else {
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES (:userid, :courseid, :gbcomment, :latepass)");
-				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                $stm->execute(array(':userid'=>$newuserid, ':courseid'=>$cid, ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+                setSectionGroups($newuserid, $cid, '');
 			}
 
 			if ($emailconfirmation) {
@@ -127,17 +132,26 @@
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
-			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id=:id");
+			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass,allowunenroll FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
-			list($coursename,$enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
-			$keylist = array_map('trim',explode(';',$enrollkey));
-			if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
+			list($coursename,$enrollkey,$deflatepass,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM);
+            $keylist = array_map('trim',explode(';',$enrollkey));
+            if (($allowunenroll&2)==2) {
+                require("header.php");
+                echo "<h1>" . Sanitize::encodeStringForDisplay($coursename) . "</h1>";
+                echo '<p>'._('Course is closed for self enrollment.  Contact your instructor for access.').'</p>';
+                require("footer.php");
+                exit;
+            } else if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
+                require('./includes/setSectionGroups.php');
 				if (count($keylist)>1) {
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
+                    setSectionGroups($userid, $cid, $_REQUEST['ekey']);
 				} else {
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,latepass) VALUES (:userid, :courseid, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':latepass'=>$deflatepass));
+                    setSectionGroups($userid, $cid, '');
 				}
 
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/course.php?cid='. $cid. '&r=' . Sanitize::randomQueryStringParam());
@@ -187,9 +201,16 @@
 		if (file_exists("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html")) {
 			require("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html");
 		}
-		$stm = $DBH->prepare("SELECT enrollkey FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$cid));
-		$enrollkey = $stm->fetchColumn(0);
+		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll FROM imas_courses WHERE id=:id");
+        $stm->execute(array(':id'=>$cid));
+        list($enrollkey,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM);
+        if (($allowunenroll&2)==2) {
+            echo '<p>', _('Course is closed for self enrollment.  Contact your instructor for access.'),'</p>';
+            echo '<p><a href="'.$GLOBALS['basesiteurl'].'/index.php">',_('Go to home page'),'</a>. ';
+            echo _('If you are already enrolled, you can log in there.'),'</p>';
+            require('footer.php');
+            exit;
+        }
 
 ?>
 <form id="pageform" class=limitaftervalidate method="post" action="directaccess.php<?php echo $querys; ?>">

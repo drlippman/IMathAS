@@ -82,6 +82,7 @@ row[1][1][0][13] = timelimit if requested through $includetimelimit
 row[0][1][0][14] = LP cutoff
 row[0][1][0][15] = assess UI version (online only)
 row[0][1][0][16] = accepts work after assess
+row[0][1][0][17] = section limit, if any 
 
 row[0][2] category totals
 row[0][2][0][0] = "Category Name"
@@ -167,20 +168,33 @@ row[1][4][4] = timelimitmult if requested through $includetimelimit
 cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidden, 7: calctype
 
 ****/
-function flattenitems($items,&$addto) {
-	global $canviewall;
+function flattenitems($items,&$addto,&$itemidsection,$sec='') {
+	global $canviewall,$secfilter,$studentinfo;
 
 	$now = time();
 	foreach ($items as $item) {
 		if (is_array($item)) {
 			if (!isset($item['avail'])) { //backwards compat
 				$item['avail'] = 1;
-			}
-			$ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+            }
+            $thissec = $sec;
+            $ishidden = ($item['avail']==0 || (!$canviewall && $item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+            if (!empty($item['grouplimit'])) {
+                $thissec = substr($item['grouplimit'][0],2); // trim off s-
+                if ((!$canviewall && $studentinfo['section'] != $thissec) ||
+                    ($canviewall && $secfilter != -1 && $secfilter != $thissec)
+                ) {
+                    // if a section limited block, and not in/showing that sec, hide
+                    $ishidden = true;
+                }
+            } 
 			if (!$ishidden) {
-				flattenitems($item['items'],$addto);
+				flattenitems($item['items'], $addto, $itemidsection, $thissec);
 			}
 		} else {
+            if ($sec != '') {
+                $itemidsection[$item] = $sec;
+            }
 			$addto[] = $item;
 		}
 	}
@@ -264,9 +278,11 @@ function gbtable() {
 	$stm->execute(array(':id'=>$cid));
 	$courseitemorder = unserialize($stm->fetchColumn(0));
 	$courseitemsimporder = array();
-	$courseitemsassoc = array();
+    $courseitemsassoc = array();
+    $itemidsection = array();
+    $itemsection = array();
 
-	flattenitems($courseitemorder,$courseitemsimporder);
+	flattenitems($courseitemorder,$courseitemsimporder,$itemidsection);
 	if (count($courseitemsimporder)>0) {
 		$ph = Sanitize::generateQueryPlaceholders($courseitemsimporder);
 		$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE id IN ($ph)");
@@ -275,8 +291,12 @@ function gbtable() {
 		$courseitemsimporder = array_flip($courseitemsimporder);
 
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
-		}
+            $courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
+            if (isset($itemidsection[$row[0]])) {
+                $itemsection[$row[1].$row[2]] = $itemidsection[$row[0]];
+            }
+        }
+        unset($itemidsection);
 	}
 
 	//Pull Assessment Info
@@ -329,7 +349,8 @@ function gbtable() {
 	$sa = array();
 	$category = array();
 	$name = array();
-	$possible = array();
+    $possible = array();
+    $sectionlimit = array();
 	$courseorder = array();
 	$allowlate = array();
 	$endmsgs = array();
@@ -377,7 +398,8 @@ function gbtable() {
 		$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit, 3: no count but show
 		if ($deffeedback[0]=='Practice') { //set practice as no count in gb
 			$cntingb[$kcnt] = 3;
-		}
+        }
+        
 		$allowlate[$kcnt] = $line['allowlate'];
 
 		if (isset($line['endmsg']) && $line['endmsg']!='') {
@@ -499,7 +521,8 @@ function gbtable() {
 			}
 		} else {
 			$avail[$kcnt] = 0;
-		}
+        }
+
 		$possible[$kcnt] = $line['points'];
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb'];
@@ -507,7 +530,7 @@ function gbtable() {
 			$courseorder[$kcnt] = $courseitemsassoc['Forum'.$line['id']];
 		}
 		$kcnt++;
-	}
+    }
 
 	//Pull External Tools info
 	$query = "SELECT id,title,text,startdate,enddate,points,avail FROM imas_linkedtext WHERE courseid=:courseid AND points>0 AND avail>0 ";
@@ -717,7 +740,11 @@ function gbtable() {
 					if (!empty($GLOBALS['includetimelimit'])) {
 						$gb[0][1][$pos][13] = $timelimits[$k];
 					}
-					$assesscol[$assessments[$k]] = $pos;
+                    $assesscol[$assessments[$k]] = $pos;
+                    if (!empty($itemsection['Assessment'.$assessments[$k]])) {
+                        $sectionlimit[$pos] = $itemsection['Assessment'.$assessments[$k]];
+                        $gb[0][1][$pos][17] = $sectionlimit[$pos];
+                    }
 				} else if (isset($grades[$k])) {
 					$gb[0][1][$pos][6] = 1; //0 online, 1 offline
 					$gb[0][1][$pos][8] = $tutoredit[$k]; //tutoredit
@@ -726,7 +753,11 @@ function gbtable() {
 				} else if (isset($discuss[$k])) {
 					$gb[0][1][$pos][6] = 2; //0 online, 1 offline, 2 discuss
 					$gb[0][1][$pos][7] = $discuss[$k];
-					$discusscol[$discuss[$k]] = $pos;
+                    $discusscol[$discuss[$k]] = $pos;
+                    if (!empty($itemsection['Forum'.$discuss[$k]])) {
+                        $sectionlimit[$pos] = $itemsection['Forum'.$discuss[$k]];
+                        $gb[0][1][$pos][17] = $sectionlimit[$pos];
+                    }
 				} else if (isset($exttools[$k])) {
 					$gb[0][1][$pos][6] = 3; //0 online, 1 offline, 2 discuss, 3 exttool
 					$gb[0][1][$pos][7] = $exttools[$k];
@@ -804,7 +835,11 @@ function gbtable() {
 				$gb[0][1][$pos][10] = $isgroup[$k];
 				if (!empty($GLOBALS['includetimelimit'])) {
 					$gb[0][1][$pos][13] = $timelimits[$k];
-				}
+                }
+                if (!empty($itemsection['Assessment'.$assessments[$k]])) {
+                    $sectionlimit[$pos] = $itemsection['Assessment'.$assessments[$k]];
+                    $gb[0][1][$pos][17] = $sectionlimit[$pos];
+                }
 				$assesscol[$assessments[$k]] = $pos;
 			} else if (isset($grades[$k])) {
 				$gb[0][1][$pos][6] = 1; //0 online, 1 offline
@@ -813,7 +848,11 @@ function gbtable() {
 				$gradecol[$grades[$k]] = $pos;
 			} else if (isset($discuss[$k])) {
 				$gb[0][1][$pos][6] = 2; //0 online, 1 offline, 2 discuss
-				$gb[0][1][$pos][7] = $discuss[$k];
+                $gb[0][1][$pos][7] = $discuss[$k];
+                if (!empty($itemsection['Forum'.$discuss[$k]])) {
+                    $sectionlimit[$pos] = $itemsection['Forum'.$discuss[$k]];
+                    $gb[0][1][$pos][17] = $sectionlimit[$pos];
+                }
 				$discusscol[$discuss[$k]] = $pos;
 			} else if (isset($exttools[$k])) {
 				$gb[0][1][$pos][6] = 3; //0 online, 1 offline, 2 discuss, 3 exttool
@@ -876,7 +915,8 @@ function gbtable() {
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 	$alt = 0;
-	$sturow = array();
+    $sturow = array();
+    $stusection = array();
 	$timelimitmult = array();
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($sturow[$line['id']])) {
@@ -915,7 +955,10 @@ function gbtable() {
 		}
 		if ($hassection && !$isdiag) {
 			$gb[$ln][0][] = ($line['section']==null)?'':$line['section'];
-		}
+        }
+        if ($line['section'] !== null) {
+            $stusection[$line['id']] = $line['section'];
+        }
 		if ($hascode) {
 			$gb[$ln][0][] = $line['code'];
 		}
@@ -1001,7 +1044,7 @@ function gbtable() {
 			$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			//$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		}
-	}
+    }
 
 	//Get assessment scores
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
@@ -1156,7 +1199,14 @@ function gbtable() {
 		}
 		if ($now < $thised) { //still active
 			$gb[$row][1][$col][3] += 10;
-		}
+        }
+        if (!empty($sectionlimit[$col]) && 
+            (empty($stusection[$l['userid']]) || $stusection[$l['userid']] != $sectionlimit[$col])
+        ) {
+            // assess is not in this stu's section, so we won't count it, 
+            $countthisone = false;
+            $gb[$row][1][$col][0] = ' ';
+        }
 		if ($countthisone) {
 			if ($cntingb[$i] == 1) {
 				if (isset($availstu[$row][$l['assessmentid']])) { //has per-stu avail override
@@ -1381,7 +1431,14 @@ function gbtable() {
 		}
 		if ($now < $thised) { //still active
 			$gb[$row][1][$col][3] += 10;
-		}
+        }
+        if (!empty($sectionlimit[$col]) && 
+            (empty($stusection[$l['userid']]) || $stusection[$l['userid']] != $sectionlimit[$col])
+        ) {
+            // assess is not in this stu's section, so we won't count it, 
+            $countthisone = false;
+            $gb[$row][1][$col][0] = ' ';
+        }
 		if ($countthisone) {
 			if ($cntingb[$i] == 1) {
 				if (isset($availstu[$row][$l['assessmentid']])) { //has per-stu avail override
@@ -1545,9 +1602,14 @@ function gbtable() {
 					}
 				}
 				$gb[$row][1][$col][2] = 1; //show link
-				$gb[$row][1][$col][3] = 0; //is counted
-
-				if ($cntingb[$i] == 1) {
+                $gb[$row][1][$col][3] = 0; //is counted
+                
+                if (!empty($sectionlimit[$col]) && 
+                    (empty($stusection[$l['userid']]) || $stusection[$l['userid']] != $sectionlimit[$col])
+                ) {
+                    // is not in this stu's section, so we won't count it, 
+                    $gb[$row][1][$col][0] = ' ';
+                } else if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
 					}
@@ -1924,7 +1986,13 @@ function gbtable() {
 
 		//remove excused and non-attempted
 		foreach($assessidx as $aid=>$i) {
-			$col = $assesscol[$aid];
+            $col = $assesscol[$aid];
+            if (!empty($sectionlimit[$col]) && 
+                (empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
+            ) {
+                // assess is for diff sec; remove as avail
+                $availstu[$ln][$aid] = 3;
+            }
 			if (isset($availstu[$ln][$aid]) && $availstu[$ln][$aid]!=$gb[0][1][$col][3]) {
 				//if we have a per-stu override of avail
 				//add to correct ones, when availstu < original
@@ -2000,7 +2068,16 @@ function gbtable() {
 			}
 		}
 		foreach($discussidx as $aid=>$i) {
-			$col = $discusscol[$aid];
+            $col = $discusscol[$aid];
+            if (!empty($sectionlimit[$col]) && 
+                (empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
+            ) {
+                // assess is for diff sec; remove from poss
+                for ($j=0;$j<4;$j++) {
+                    unset($catpossstu[$j][$category[$i]][$col]);
+                    unset($catpossstuec[$j][$category[$i]][$col]);
+				}
+            }
 			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) {
 				for ($j=0;$j<4;$j++) {
 					unset($catpossstu[$j][$category[$i]][$col]);

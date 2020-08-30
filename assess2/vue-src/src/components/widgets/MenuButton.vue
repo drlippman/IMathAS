@@ -37,8 +37,7 @@
         <li v-if="!!header" class="menubutton-header">
           {{ header }}
         </li>
-        <li v-for="(option,index) in options" :key="index"
-          @click = "handleClick(index)"
+        <li v-for="(option,index) in filteredOptions" :key="index"
           :class="{'listsubitem': option.subitem}"
         >
           <router-link
@@ -59,11 +58,12 @@
           <component
             v-else
             v-bind = "getLinkProps(option,index)"
-            @click = "toggleOpen"
+            @click = "linkClick($event,option)"
+            @keydown.enter = "linkClick($event,option)"
             @mouseover = "curSelected = index"
             :id = "id + '_' + index"
             :class="{'menubutton-focus': index==curSelected}"
-            role = "menuitem"
+            :role = "option.onclick ? 'menuitem button' : 'menuitem'"
             tabindex = "-1"
           >
             <slot v-if="hasSlot" :option="option" :selected="false"></slot>
@@ -100,7 +100,8 @@ export default {
       open: false,
       curSelected: 0,
       keybuffer: '',
-      closetimer: null
+      closetimer: null,
+      screenwidth: 1200
     };
   },
   computed: {
@@ -109,6 +110,12 @@ export default {
     },
     hasSlot () {
       return !!this.$scopedSlots.default;
+    },
+    filteredOptions () {
+      if (this.screenwidth > 1000) {
+        return this.options;
+      }
+      return this.options.filter(a => !a.nosmall);
     }
   },
   methods: {
@@ -130,18 +137,31 @@ export default {
         };
       }
     },
-    toggleOpen (val) {
+    linkClick (event, option) {
+      if (option.link && option.popup) {
+        event.preventDefault();
+        window.GB_show(option.label, option.link, 400, 400, false);
+        this.toggleOpen(false, true);
+      }
+      if (option.onclick) {
+        event.preventDefault();
+        option.onclick();
+        this.toggleOpen(false, true);
+      }
+    },
+    toggleOpen (val, nofocus) {
       if (typeof val === 'boolean') {
         this.open = val;
       } else {
         this.open = !this.open;
       }
       if (this.open) { // now open
+        this.screenwidth = document.documentElement.offsetWidth;
         this.curSelected = this.selected ? this.selected : 0;
         this.$nextTick(this.setMenuHeight);
         this.$nextTick(this.scrollToCurrent);
         this.$nextTick(() => { document.getElementById(this.id + '_' + this.curSelected).focus(); });
-      } else {
+      } else if (!nofocus) {
         this.$nextTick(() => { document.getElementById(this.id).focus(); });
       }
     },
@@ -171,11 +191,6 @@ export default {
       const wrapperHeight = wrapper.clientHeight;
       const offset = selectedPos - (wrapperHeight / 2 - selectedHeight / 2);
       wrapper.scrollTop = offset;
-    },
-    handleClick (index) {
-      if (this.options[index].onclick) {
-        this.options[index].onclick();
-      }
     },
     handleUpDown (val) {
       if (!this.open) {

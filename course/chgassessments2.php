@@ -79,9 +79,15 @@ if (!(isset($teacherid))) {
 					$turnoffshuffle += 16;
 				} else if ($_POST['shuffle']==16) {
 					$turnonshuffle += 16;
+					$turnoffshuffle += 33;
+				} else if ($_POST['shuffle']==32) {
+					$turnonshuffle += 32;
+					$turnoffshuffle += 17;
+				} else if ($_POST['shuffle']==48) {
+					$turnonshuffle += 16;
 					$turnoffshuffle += 1;
 				} else {
-					$turnoffshuffle += 17;
+					$turnoffshuffle += 49;
 				}
 			}
 			if ($_POST['samever'] !== 'DNC') {
