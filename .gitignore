@@ -6,3 +6,4 @@
 *.js~
 mathjax-b
 HTMLPurifier
+/config.php
