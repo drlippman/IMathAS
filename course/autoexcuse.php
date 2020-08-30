@@ -229,7 +229,7 @@ if ($beentaken) {
     echo '</p>';
 }
 
-echo '<h2>Rules:</h2>';
+echo '<h2>'._('Rules').':</h2>';
 
 echo '<ul id="rules">';
 
@@ -260,6 +260,7 @@ foreach ($excusals as $k=>$exc) {
 echo '</ul>';
 
 echo '<h2>'._('Add New Rule').'</h2>';
+echo count($categories);
 echo '<p>'._('A score of').' <input type=text id=newscore size=2 value=75 />%';
 echo '<br>'._('on').' <select id=newcat>';
 echo ' <option value="whole">'._('the whole assessment').'</option>';

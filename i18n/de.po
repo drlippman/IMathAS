@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 10:24+0200\n"
-"PO-Revision-Date: 2020-08-28 11:10+0200\n"
+"POT-Creation-Date: 2020-08-29 11:39+0200\n"
+"PO-Revision-Date: 2020-08-29 12:16+0200\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1744,7 +1744,8 @@ msgstr "Markieren:"
 #: course/addquestions.php:1555 course/chgassessments2form.php:381
 #: course/gradebook.php:509 course/gradebook.php:534 course/gradebook.php:560
 #: course/gradebook.php:1163 course/gradebook.php:1557 forms.php:509
-#: forms.php:521 forms.php:533
+#: forms.php:521 forms.php:533 course/categorize.php:194
+#: course/categorize.php:195
 msgid "All"
 msgstr "Alle"
 
@@ -1760,7 +1761,8 @@ msgstr "Alle"
 #: course/addquestions.php:1491 course/addquestions.php:1555
 #: course/chgassessments2form.php:452 course/gradebook.php:459
 #: course/gradebook.php:485 course/gradebook.php:560 course/gradebook.php:768
-#: forms.php:509 forms.php:521 forms.php:533
+#: forms.php:509 forms.php:521 forms.php:533 course/categorize.php:195
+#: course/categorize.php:196
 msgid "None"
 msgstr "Keine"
 
@@ -2252,6 +2254,7 @@ msgstr "Kategorisierte Punktzahlaufschlüsselung"
 
 #: assessment/catscores.php:65 course/gradebook.php:339
 #: includes/copyiteminc.php:563 includes/copyiteminc.php:570
+#: course/categorize.php:196 course/categorize.php:197
 msgid "Category"
 msgstr "Kategorie"
 
@@ -2710,6 +2713,9 @@ msgstr "Ihre Antwort"
 #: assessment/displayq2.php:2841 course/addquestions.php:920
 #: course/addquestions.php:1105 course/addquestions.php:1320
 #: course/addquestions.php:1372 course/addquestions.php:1499
+#: course/categorize.php:196 course/categorize.php:202
+#: course/categorize.php:197 course/categorize.php:203
+#, php-format
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -5593,7 +5599,7 @@ msgstr "Dies wird alle Änderungen auf dieser Seite verwerfen"
 #: course/modquestion.php:32 course/modquestion2.php:33
 #: course/modquestiongrid2.php:182 course/addassessment.php:963
 #: course/addquestions.php:1204 course/autoexcuse.php:212
-#: course/moddataset.php:969
+#: course/moddataset.php:969 course/categorize.php:92 course/categorize.php:93
 #, php-format
 msgid "Add/Remove Questions"
 msgstr "Fragen hinzufügen/entfernen"
@@ -6974,7 +6980,8 @@ msgid "Categorize questions by outcome or other groupings"
 msgstr "Fragen nach Lernziel oder anderen Kriterien kategorisieren"
 
 #: course/addquestions.php:1298 course/addquestions.php:1211
-#: course/autoexcuse.php:218
+#: course/autoexcuse.php:218 course/categorize.php:27 course/categorize.php:92
+#: course/categorize.php:192 course/categorize.php:93 course/categorize.php:193
 msgid "Categorize Questions"
 msgstr "Fragen kategorisieren"
 
@@ -7046,6 +7053,7 @@ msgstr "Vorschau für Ausgewählte"
 #: forums/posthandler.php:538 javascript/addqsort.js:1068
 #: course/addquestions.php:1372 course/addquestions.php:1499
 #: course/moddataset.php:1234 course/moddataset.php:1252
+#: course/categorize.php:196 course/categorize.php:197
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -7130,13 +7138,15 @@ msgid "Select Assessments"
 msgstr "Tests wählen"
 
 #: course/addquestions.php:1482 course/addquestions.php:1488
+#: course/addquestions.php:1557
 msgid "Select From Libraries"
 msgstr "Aus Bibliotheken auswählen"
 
 #: course/addquestions.php:1485 course/addquestions.php:1549
 #: course/copyitems.php:529 forms.php:451 forms.php:463 forms.php:475
 #: course/addquestions.php:1491 course/addquestions.php:1555 forms.php:509
-#: forms.php:521 forms.php:533
+#: forms.php:521 forms.php:533 course/categorize.php:194
+#: course/categorize.php:195
 msgid "Check"
 msgstr "Auswahl"
 
@@ -7819,7 +7829,7 @@ msgid "Tools"
 msgstr "Werkzeuge"
 
 #: course/course.php:484 course/course.php:500 course/course.php:485
-#: course/course.php:501
+#: course/course.php:501 course/categorize.php:208 course/categorize.php:209
 msgid "Outcomes"
 msgstr "Themen"
 
@@ -7867,7 +7877,9 @@ msgstr "Rubriken"
 msgid "Manage"
 msgstr "Verwalten"
 
-#: course/course.php:509 course/course.php:510
+#: course/course.php:509 course/course.php:510 course/categorize.php:225
+#: course/categorize.php:273 course/categorize.php:226
+#: course/categorize.php:274
 msgid "Libraries"
 msgstr "Bibliotheken"
 
@@ -7893,7 +7905,9 @@ msgid "Mass Change"
 msgstr "Serienänderung"
 
 #: course/course.php:532 course/course.php:534 ltihome.php:401
-#: course/course.php:533 course/course.php:535
+#: course/course.php:533 course/course.php:535 course/categorize.php:235
+#: course/categorize.php:274 course/categorize.php:236
+#: course/categorize.php:275
 msgid "Assessments"
 msgstr "Tests"
 
@@ -13996,12 +14010,12 @@ msgstr "Verwende Name des Tests"
 
 #: course/addquestions.php:1222
 msgid "Define Auto-Excuse"
-msgstr "Test überspringen wenn..."
+msgstr "Andere Tests überspringen"
 
 #: course/autoexcuse.php:147 course/autoexcuse.php:213
 #: course/autoexcuse.php:215
 msgid "Auto Excuse"
-msgstr "Test überspringen"
+msgstr "Tests überspringen"
 
 #: course/autoexcuse.php:172 course/autoexcuse.php:268
 msgid "category"
@@ -14198,3 +14212,61 @@ msgstr "Sende..."
 #: javascript/assess2supp.js:52
 msgid "Question Submitted"
 msgstr "Frage abgeschickt"
+
+#: course/autoexcuse.php:232
+msgid "Rules"
+msgstr "Regeln"
+
+#: course/categorize.php:206 course/categorize.php:207
+msgid "Uncategorized or Default"
+msgstr "Standard oder nicht kategorisiert"
+
+#: course/categorize.php:256 course/categorize.php:257
+msgid "Apply outcome to selected"
+msgstr "Ergebnis auf Auswahl anwenden"
+
+#: course/categorize.php:272 course/categorize.php:273
+msgid "Select first listed"
+msgstr "Ersten Eintrag wählen aus"
+
+#: course/categorize.php:276 course/categorize.php:277
+msgid "for all uncategorized questions"
+msgstr "für alle nicht kategorisierten Fragen"
+
+#: course/categorize.php:278 course/categorize.php:279
+msgid "Add new category to lists"
+msgstr "Neue Kategorie zu Listen hinzufügen"
+
+#: course/categorize.php:280 course/categorize.php:281
+msgid "and return to the Add/Remove Questions page"
+msgstr "und gehe zurück zum Hinzufügen/Entfernen von Fragen"
+
+#: course/categorize.php:276 course/categorize.php:277
+msgid "Quick Pick"
+msgstr "Schnellwahl"
+
+#: course/categorize.php:279 course/categorize.php:280
+msgid "Add Category"
+msgstr "Kategorie hinzufügen"
+
+#: course/categorize.php:280 course/categorize.php:281
+msgid "Record Categorizations"
+msgstr "Speichere Kategorisierung"
+
+#: course/categorize.php:280 course/categorize.php:281
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: course/categorize.php:30
+msgid "Are you SURE you want to reset all categories to Uncategorized/Default?"
+msgstr ""
+"Sind Sie SICHER, dass Sie alle Kategorien auf Unkategorisiert/Standard "
+"zurücksetzen wollen?"
+
+#: course/addquestions.php:1556
+msgid "Use these Assessments"
+msgstr "Diese Tests verwenden"
+
+#: course/categorize.php:31 course/categorize.php:246
+msgid "Custom"
+msgstr "Spezifisch"
