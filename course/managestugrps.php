@@ -785,8 +785,13 @@ if ($overwriteBody==1) {
 			echo '<p>No existing sets of groups</p>';
 		} else {
 			echo '<p>Select a set of groups to modify the groups in that set</p>';
-			echo '<table><tbody><tr>';
+			echo '<table><tbody>';
 			foreach ($page_groupsets as $gs) {
+                if ($gs[1] == '##autobysection##') {
+                    echo '<tr style="display:none;">';
+                } else {
+                    echo '<tr>';
+                }
 				echo "<td><a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($gs[0]) . "\">" . Sanitize::encodeStringForDisplay($gs[1]) . "</a></td><td class=small>";
 				echo "<a href=\"managestugrps.php?cid=$cid&rengrpset=" . Sanitize::encodeUrlParam($gs[0]) . "\">Rename</a> | ";
 				echo "<a href=\"managestugrps.php?cid=$cid&copygrpset=" . Sanitize::encodeUrlParam($gs[0]) . "\">Copy</a> | ";

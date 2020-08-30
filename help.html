@@ -102,7 +102,8 @@ dd {
 			<li><a href="#assessmentsettings">Assessment Settings</a></li>
 			<li><a href="#addingquestionstoanassessment">Adding Questions to an Assessment</a>
 				<ul>
-				<li><a href="#questionintrotext">Adding an Introduction to a Question</a></li>
+                    <li><a href="#questionicons">Icons used in question listing</a></li>
+				    <li><a href="#questionintrotext">Adding an Introduction to a Question</a></li>
 				</ul></li>
 			<li><a href="#addingnewquestions">Adding New Questions</a></li>
 			<li><a href="#categorizequestions">Categorizing Questions</a></li>
@@ -864,16 +865,16 @@ can be used to search in all libraries (not just the selected ones), list only q
 added to your assessment.</p>
 From this list you can:
 <ul>
-<li>Use the checkboxes to select questions, then click the &quot;Add Selected (using defaults)&quot;
+<li>Use the checkboxes to select questions, then click the &quot;Add (using defaults)&quot;
 button to add the questions.  Adding this way will use the assessment default settings for
 points, attempts allowed, and penalty per attempt.  You can change these later by
 clicking the &quot;Change Settings&quot; link.</li>
 <li>Use the checkboxes to select questions, then click the &quot;Add&quot;
 button to add the questions.  Adding this way will allow you to override the default settings for
 points, attempts allowed, and penalty per attempt if you wish, and add a question multiple times.</li>
-<li>Click the &quot;Add&quot; link.  This will allow you to change the default
+<li>Choose &quot;Add&quot; from the Action dropdown.  This will allow you to change the default
 question settings</li>
-<li>Click &quot;Use as template for New Question&quot; link.  This will create a new question based
+<li>Choose &quot;Use as template for New Question&quot; from the Action dropdown.  This will create a new question based
 upon the existing question.  This allows you to avoid rewriting a question from
 scratch if a similar question exists</li>
 <li>Click &quot;Preview&quot; to preview the question</li>
@@ -885,20 +886,40 @@ the questions you wish to use.</p>
 
 Once added to the assessment you can:
 <ul>
-<li><strong>Reorder Questions</strong>: When "Rearrange Questions" is selected, using the number selectors next
+<li><strong>Reorder Questions</strong>: Using the number selectors next
     to each question will allow you to rearrange the order of the questions.  This is only useful if you
     are not shuffling the question order</li>
-<li><strong>Group Questions</strong>:  When "Group Questions" is selected, using the number selectors next to each
-    question will allow you to group questions.  When questions are grouped, the testing engine will randomly
-    select one question from the group to display to the student</li>
+<li><strong>Group Questions</strong>:  Use the checkboxes to select questions, then press the "Group" 
+    button to group questions.  Then you can specify how many questions from the group you want 
+    the system to randomly assign to students, and whether to make that selection with or without 
+    replacement.</li>
 <li><strong>Change Settings</strong>:  Override the default settings for points, attempts allowed, and
-    penalty per attempt, if desired</li>
-<li><strong>Edit Source</strong>:  Change the question code or wording</li>
-<li><strong>Remove from assessment</strong>:  Remove the question from the assessment.  This does not
-    delete the question from the Question Set.  You can also use the checkboxes and the "With selected, Remove"
-    button to remove multiple questions at once.</li>
+    penalty per attempt, if desired.  When done for one question using the "Change Settings" option 
+    in the Action dropdown there 
+    are more settings you can edit than when using the checkboxes and the "Change Settings" button.</li>
+<li><strong>Edit Code</strong>:  In the Action Dropdown. Change the question code or wording, if it is your question</li>
+<li><strong>View Code</strong>:  In the Action Dropdown. View the question code, if it is not your question</li>
+<li><strong>Edit Personal Copy</strong>:  In the Action Dropdown, if it is not your question.
+    Creates a copy of the question, and will trade out the original question for your personal copy.</li>
+<li><strong>Template</strong>:  In the Action Dropdown. Create a new question based on this one. 
+    The original will not be removed from the assessment.</li>
+<li><strong>Remove from assessment</strong>:  From the Action dropdown, or use the checkboxes and 
+    press the "Remove" button.  Removes the question(s) from the assessment.  This does not
+    delete the question itself.  </li>
 </ul>
 
+<div class=h5>
+    <h5 id="questionicons">Icons used in question listing</h5>
+    <ul class="nomark">
+        <li><img src="img/video_tiny.png" alt="video"> Has a video help (if <img src="img/cc.png" alt="cc"> is shown, the video has captions)</li>
+        <li><img src="img/html_tiny.png" alt="help resource"> Has help resource</li>
+        <li><img src="img/assess_tiny.png" alt="detailed solution"> Has a written solution</li>
+        <li><svg aria-label="show work" viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            Has "show work" enabled</li>
+        <li><svg aria-label="rubric" viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            Has a rubric associated</li>
+    </ul>
+</div>
 <div class=h5>
 <h5 id="questionintrotext">Adding an Introduction to a Question</h5>
 <p>In addition to the assignment Introduction, each question can have an individual introduction.  A common example is to display a video and then a related question as part of a video assignment.</p>
@@ -909,6 +930,7 @@ Once added to the assessment you can:
 <p>Below the last questions is an <span class="icon-enlarge2" style="font-weight: bold">&nbsp;Expand All</span> button which will expand all the question intros.  Click on any one to edit it.<p>
 </div> <!-- h5 -->
 
+<h5>After the Assessment has been Taken</h5>
 <p>If students have taken the assessment, you will not be allowed to make as many changes to the assessment, as it
 will mess up existing student attempts.  If you need to change the assessment a lot, you can clear all student attempts.
 Otherwise you can change individual question settings (be careful!) or edit the question if it's yours.  If there is a problem with

@@ -464,11 +464,13 @@ switch($_POST['action']) {
 			$theme = $_POST['theme'];
 		}
 
+        $unenroll = 0;
 		if (isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==0) {
 			$unenroll = $CFG['CPS']['unenroll'][0];
-		} else {
-			$unenroll = $_POST['allowunenroll'] + $_POST['allowenroll'];
-		}
+		} else if (isset($CFG['CPS']['unenroll'])) {
+			$unenroll = $_POST['allowunenroll'];
+        }
+        $unenroll += empty($_POST['allowenroll']) ? 2 : 0;
 
 		if (isset($CFG['CPS']['copyrights']) && $CFG['CPS']['copyrights'][1]==0) {
 			$copyrights = $CFG['CPS']['copyrights'][0];

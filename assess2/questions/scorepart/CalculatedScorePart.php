@@ -40,6 +40,7 @@ class CalculatedScorePart implements ScorePart
         if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
         if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$partnum];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
 
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -388,7 +389,9 @@ class CalculatedScorePart implements ScorePart
         }
         if ($score<0) { $scorePartResult->setRawScore(0); }
         if ($formatok != "all" && $correctanyformat>0) {
-            $scorePartResult->setCorrectAnswerWrongFormat(true);
+            if (!empty($formatfeedbackon)) {
+                $scorePartResult->setCorrectAnswerWrongFormat(true);
+            }
             if ($formatok == 'nowhole') {
                 $scorePartResult->setRawScore(0);
             }

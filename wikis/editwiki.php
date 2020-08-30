@@ -35,9 +35,9 @@ if ($cid==0) {
 	$body = "You need to access this page with a wiki id";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
-
+    $grpback = !empty($_GET['grp']) ? '&grp='.intval($_GET['grp']) : '';
 	$curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
-	$curBreadcrumb .= "<a href=\"$imasroot/wikis/viewwiki.php?cid=$cid&id=$id\">View Wiki</a> &gt; Edit Wiki";
+	$curBreadcrumb .= "<a href=\"$imasroot/wikis/viewwiki.php?cid=$cid&id=$id$grpback\">View Wiki</a> &gt; Edit Wiki";
 	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
 	$stm->execute(array(':id'=>$id));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
@@ -50,16 +50,17 @@ if ($cid==0) {
 		if ($row['groupsetid']>0) {
 			if (isset($teacherid)) {
 				$groupid = intval($_GET['grp']);
-				$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
+				$stm = $DBH->prepare("SELECT ig.name,igs.name AS igsname FROM imas_stugroups AS ig JOIN imas_stugroupset AS igs ON ig.groupsetid=igs.id WHERE ig.id=:id");
 				$stm->execute(array(':id'=>$groupid));
-				$groupname = $stm->fetchColumn(0);
+                list($groupname, $groupsetname) = $stm->fetch(PDO::FETCH_NUM);
 			} else {
 				$groupsetid = $row['groupsetid'];
-				$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
-				$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
+				$query = 'SELECT i_sg.id,i_sg.name,igs.name AS igsname FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+                $query .= 'JOIN imas_stugroupset AS igs ON i_sg.groupsetid=igs.id ';
+                $query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':groupsetid'=>$groupsetid));
-				list($groupid, $groupname) = $stm->fetch(PDO::FETCH_NUM);
+				list($groupid, $groupname, $groupsetname) = $stm->fetch(PDO::FETCH_NUM);
 			}
 		} else {
 			$groupid = 0;
@@ -205,7 +206,9 @@ if ($overwriteBody==1) {
 
 <?php
 if ($groupid>0) {
-	echo "<p>Group: " . Sanitize::encodeStringForDisplay($groupname) . "</p>";
+    echo "<p>";
+    echo ($groupsetname == '##autobysection##') ? _('Section') : _('Group');
+    echo ': '.Sanitize::encodeStringForDisplay($groupname) . "</p>";
 }
 if ($inconflict) {
 ?>

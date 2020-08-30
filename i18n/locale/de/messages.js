@@ -241,4 +241,5 @@ var i18njs = {"Submit":"Absenden",
 "Error: Incorrect number of points. Expecting ":"Fehler: Falsche Anzahl von Punkten. Erwartet werden ",
 "Error: Incorrect number of points":"Fehler: Falsche Anzahl von Punkten",
 "Submitting...":"Sende...",
-"Question Submitted":"Frage abgeschickt"};
+"Question Submitted":"Frage abgeschickt",
+"Has Rubric":"Hat eine Rubrik"};

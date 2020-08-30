@@ -42,7 +42,11 @@ if ($overwriteBody==1) {
 	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 
-	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
+    echo '<div class="cpmid">';
+    if ($courseUIver == 1) {
+        echo '<a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing</a> | ';
+    }
+    echo '<a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
 
 	echo "<h1>"._('Generate Word Version')."</h1>";
 
@@ -144,8 +148,17 @@ if ($overwriteBody==1) {
 
 	$numq = count($questions);
 
-	include("../assessment/displayq2.php");
-
+	if ($courseUIver > 1) {
+		include('../assess2/AssessStandalone.php');
+		$a2 = new AssessStandalone($DBH);
+		$stm = $DBH->prepare("SELECT iqs.* FROM imas_questionset AS iqs JOIN imas_questions ON imas_questions.questionsetid=iqs.id WHERE imas_questions.assessmentid=:id");
+		$stm->execute(array(':id'=>$aid));
+		while ($qdata = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$a2->setQuestionData($qdata['id'], $qdata);
+		}
+	} else {
+		include("../assessment/displayq2.php");
+	}
 
 	if (is_numeric($_REQUEST['versions'])) {
 		$copies = $_REQUEST['versions'];
@@ -217,7 +230,11 @@ if ($overwriteBody==1) {
 
 			for ($i=0; $i<$numq; $i++) {
 				if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
-				list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				if ($courseUIver > 1) {
+					list($newout,$sa[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				} else {
+					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				}
 				$out .= $newout;
 			}
 
@@ -262,7 +279,11 @@ if ($overwriteBody==1) {
 			if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
 			for ($j=0; $j<$copies;$j++) {
 				if ($j>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
-				list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				if ($courseUIver > 1) {
+					list($newout,$sa[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				} else {
+					list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				}
 				$out .= $newout;
 			}
 		}
@@ -352,6 +373,32 @@ if ($overwriteBody==1) {
   $_SESSION['graphdisp'] = $origgraphdisp;
   require("../footer.php");
 	exit;
+}
+
+function printq2($qn,$qsetid,$seed,$pts,$showpts) {
+	global $a2,$isfinal,$imasroot,$urlmode;
+	$state = array(
+		'seeds' => array($qn => $seed),
+		'qsid' => array($qn => $qsetid)
+	);
+	$a2->setState($state);
+	// TODO: Some way to override or rewrite matrix answersize, and choices list numbering
+	$res = $a2->displayQuestion($qn, ['includeans'=>true, 'printformat'=>true]);
+
+	$retstrout = "<div class=q>";
+	if ($isfinal) {
+		$retstrout .= "<div class=\"trq$qn\">\n";
+	} else {
+		$retstrout .= "<div class=m id=\"trq$qn\">\n";
+	}
+	if ($showpts) {
+		$retstrout .= ($qn+1).'. ('.$pts.' pts) ';
+	}
+	$retstrout .= "<div>\n";
+	$retstrout .= printfilter($res['html']) . '</div>';
+	$retstrout .= '</div></div>';
+
+	return array($retstrout, $res['jsparams']['ans']);
 }
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {

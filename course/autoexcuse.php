@@ -103,10 +103,10 @@ $query = "SELECT DISTINCT category FROM imas_questions WHERE assessmentid=:aid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':aid'=>$aid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    if ($row['category'] == 0) {
-        continue;
-    }
     if (is_numeric($row['category'])) {
+        if ($row['category'] == 0) {
+            continue;
+        }
         //outcome
         $categories[] = [
             'type'=>'O', 
@@ -184,7 +184,7 @@ $(function() {
                 name: 'newaid['+newcnt+']',
                 value: newaid
             }))
-            .append('A score of ')
+            .append('<?php echo _('A score of').' '; ?>')
             .append($('<input>', {
                 type: 'text',
                 name: 'newsc['+newcnt+']',
@@ -260,7 +260,6 @@ foreach ($excusals as $k=>$exc) {
 echo '</ul>';
 
 echo '<h2>'._('Add New Rule').'</h2>';
-echo count($categories);
 echo '<p>'._('A score of').' <input type=text id=newscore size=2 value=75 />%';
 echo '<br>'._('on').' <select id=newcat>';
 echo ' <option value="whole">'._('the whole assessment').'</option>';

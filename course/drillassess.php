@@ -3,8 +3,13 @@
 //(c) 2011 David Lippman
 
 require("../init.php");
-require("../assessment/displayq2.php");
-
+$courseUIver = 1; // Doesn't quite work right yet
+if ($courseUIver > 1) {
+    include('../assess2/AssessStandalone.php');
+    $a2 = new AssessStandalone($DBH);
+} else {
+    require("../assessment/displayq2.php");
+}
 
 if (!isset($teacherid) && !isset($studentid) && !isset($tutorid)) {
 	echo _("You don't have authority to access this item");
@@ -86,9 +91,21 @@ if ($stm->rowCount()==0) {
 //score a submitted question
 $showans = false;
 if (isset($_GET['score'])) {
-	list($score,$rawscore) = scoreq(0,$curitemid,$seed,$_POST['qn0']);
-	$scores[0] = $score;
-	$rawscores[0] = $rawscore;
+    if ($courseUIver > 1) {
+        $state = array(
+            'seeds' => array(0 => $seed),
+            'qsid' => array(0 => $curitemid)
+        );
+        $a2->setState($state);
+        $a2->loadQuestionData();
+        $res = $a2->scoreQuestion(0);
+        $score = implode('~',$res['scores']);
+        $rawscore = implode('~',$res['raw']);
+    } else {
+        list($score,$rawscore) = scoreq(0,$curitemid,$seed,$_POST['qn0']);
+    }
+    $scores[0] = $score;
+    $rawscores[0] = $rawscore;
 	$page_scoreMsg =  printscore($score,$curitemid,$seed);
 	if (getpts($score)<.99 && $sa==0) {
 		$showans = true;
@@ -217,7 +234,21 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 $showtips = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
 $useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
-require("../assessment/header.php");
+if ($courseUIver > 1) {
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assessment/mathtest.css" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+    $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
+    $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=072520" type="text/javascript"></script>';
+    $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
+        <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
+    $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
+    require("../header.php");
+} else {
+    require("../assessment/header.php");
+}
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">" . Sanitize::encodeStringForDisplay($coursename) . "</a> ";
 echo "&gt; " . _("Drill Assessment") . "</div>";
 
@@ -352,8 +383,8 @@ if ($curitem == -1) {
 		?>
 		<script type="text/javascript">
 		function focusfirst() {
-		   var el = document.getElementById("qn0");
-		   if (el != null) {el.focus();}
+            var el = document.getElementById("qn0");
+            if (el != null) {el.focus();}
 		}
 		initstack.push(focusfirst);
 		</script>
@@ -363,27 +394,75 @@ if ($curitem == -1) {
 		if ($showans) {
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\"\">\n";
 			echo "<p>" . _("Displaying last question with solution") . "<button type=\"submit\" name=\"next\" value=\"New Question\"/>" . _("New Question") . "</button></p>\n";
-			echo "</form>\n";
-			displayq(0,$curitemid,$seed,2,true,0);
+            echo "</form>\n";
+            if ($courseUIver > 1) {
+                $state = array(
+                    'seeds' => array(0 => $seed),
+                    'qsid' => array(0 => $curitemid)
+                );
+                $a2->setState($state);
+                $a2->loadQuestionData();
+                $disp = $a2->displayQuestion(0, ['showans'=>true]);
+                echo $disp['html'];
+                echo '<script>$(function() {
+                    initq('.$qn.','.json_encode($disp['jsparams']).');
+                  });</script>';
+            } else {
+                displayq(0,$curitemid,$seed,2,true,0);
+            }
 		} else {
 			if ($sa==3) {
 				$doshowans = 1;
 			} else {
 				$doshowans = 0;
 			}
-			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction&score=true\" onsubmit=\"doonsubmit(this)\">\n";
-			displayq(0,$curitemid,$seed,$doshowans,true,0);
+            echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction&score=true\" ";
+            if ($courseUIver > 1) {
+                echo "onsubmit=\"return dopresubmit($qn,false)\" class=\"questionwrap\">";
+            } else {
+                echo "onsubmit=\"doonsubmit(this)\">\n";
+            }
+			if ($courseUIver > 1) {
+                $state = array(
+                    'seeds' => array(0 => $seed),
+                    'qsid' => array(0 => $curitemid)
+                );
+                $a2->setState($state);
+                $a2->loadQuestionData();
+                $disp = $a2->displayQuestion(0, ['showans'=>$doshowans]);
+                echo $disp['html'];
+                echo '<script>$(function() {
+                    initq('.$qn.','.json_encode($disp['jsparams']).');
+                  });</script>';
+            } else {
+                displayq(0,$curitemid,$seed,$doshowans,true,0);
+            }
+            echo '<div class="submitbtnwrap">';
 			if ($sa==3) {
-				echo "<button type=\"submit\" name=\"next\" value=\"Next Question\">" . _("New Question") . "</button>\n";
+				echo "<button type=\"submit\" name=\"next\" value=\"Next Question\" class=\"primary\">" . _("New Question") . "</button>\n";
 			} else {
-				echo "<button type=\"submit\" name=\"check\" value=\"Check Answer\">" . _("Check Answer") . "</button>\n";
+				echo "<button type=\"submit\" name=\"check\" value=\"Check Answer\" class=\"primary\">" . _("Check Answer") . "</button>\n";
 			}
-			echo "</form>\n";
+			echo "</div></form>\n";
 		}
 	}
 }
 
 echo '</div>';
+if ($courseUIver > 1) {
+    echo '<script>
+    $(function() {
+      for (var i=0; i<initstack.length; i++) {
+            var foo = initstack[i]();
+      }
+      initstack.length = 0;
+    });</script>';
+    $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">
+    <span id="ehddtext"></span>
+    <span onclick="showeh(curehdd);" style="cursor:pointer;">'._('[more..]').'</span>
+    </div>
+    <div id="eh" class="eh"></div>';
+}
 require("../footer.php");
 
 

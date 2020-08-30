@@ -1525,7 +1525,9 @@ if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || 
 					$stm->execute(array(':id'=>$cid));
 					$deflatepass = $stm->fetchColumn(0);
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    require_once('./includes/setSectionGroups.php');
+                    setSectionGroups($userid, $cid, $_SESSION['lti_context_label']);
 				}
 			} else {
 				$_SESSION['ltirole']='instructor';
@@ -2671,7 +2673,9 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 					$stm->execute(array(':id'=>$cid));
 					$deflatepass = $stm->fetchColumn(0);
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    require_once('./includes/setSectionGroups.php');
+                    setSectionGroups($userid, $cid, $_SESSION['lti_context_label']);
 				}
 			} else {
 				$_SESSION['ltirole']='instructor';

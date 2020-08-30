@@ -73,16 +73,18 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				if ($_POST['code'][$stuid]=='') {
 					$_POST['code'][$stuid] = null;
 				}
-			}
+            }
+            require('../includes/setSectionGroups.php');
 			foreach ($keys as $stuid) {
 				$stm = $DBH->prepare("UPDATE imas_students SET section=:section,code=:code WHERE id=:id AND courseid=:courseid ");
-				$stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
+                $stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
+                setSectionGroups($_POST['uid'][$stuid], $cid, $_POST['sec'][$stuid]);
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
-			$query = "SELECT imas_students.id,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
+			$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
 			$query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseid AND imas_students.userid=imas_users.id ";
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$resultStudentList = $DBH->prepare($query);
@@ -133,7 +135,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-
+                require('../includes/setSectionGroups.php');
+                setSectionGroups($id, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
@@ -178,7 +181,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-
+                require('../includes/setSectionGroups.php');
+                setSectionGroups($newuserid, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
@@ -297,7 +301,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm->execute(array(':code'=>$code, ':section'=>$section, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
 				$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE userid=:userid AND courseid=:courseid AND locked=0");
 				$stm->execute(array(':locked'=>$locked, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
-			}
+            }
+            require('../includes/setSectionGroups.php');
+            setSectionGroups($_GET['uid'], $cid, $section);
 
 			require('../includes/userpics.php');
 
@@ -531,7 +537,9 @@ if ($overwriteBody==1) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 ?>
 			<tr>
-				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?>
+                    <input type="hidden" name="uid[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" />
+                </td>
 				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
 				<td><input type=text name="code[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['code']); ?>"/></td>
 			</tr>

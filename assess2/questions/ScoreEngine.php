@@ -52,6 +52,7 @@ class ScoreEngine
         'strflags',
         'questions',
         'variables',
+        'formatfeedbackon'
     );
 
     const ADDITIONAL_VARS_FOR_SCORING = array(

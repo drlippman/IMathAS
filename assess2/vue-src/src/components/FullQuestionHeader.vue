@@ -80,6 +80,7 @@ export default {
   border-bottom: 1px solid #ccc;
   border-top: 1px solid #ccc;
   padding: 8px 0;
+  max-width: 726px;
 }
 .fulldisp > div > div:first-of-type {
   margin-top: 32px;
