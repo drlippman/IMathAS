@@ -3,6 +3,10 @@
 // embedq2.php: Embed one question via an iframe
 // Operates without requiring login
 // Can passback results to embedding page
+//
+// See https://github.com/drlippman/IMathAS-Extras/tree/master/embedq 
+// for documentation and examples
+//
 // (c) 2020 David Lippman
 
 $init_skip_csrfp = true;

@@ -41,6 +41,11 @@
         <br/>
         <icons name="alert" size="micro" />
         {{ $t('closed.will_block_latepass') }}
+        <span v-if="settings.hasOwnProperty('excused')">
+          <br />
+          <icons name="alert" size="micro" />
+          {{ $t('setlist.excused') }}
+        </span>
       </p>
 
       <p v-if="canViewScored">

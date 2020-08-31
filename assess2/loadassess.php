@@ -185,6 +185,15 @@ if ($assessInfoOut['is_diag']) {
 $assessInfoOut['useMQ'] = (!isset($_SESSION['userprefs']['useeqed']) ||
   $_SESSION['userprefs']['useeqed'] == 1);
 
+// get excused info
+if (!$canViewAll) {
+    $stm = $DBH->prepare("SELECT id FROM imas_excused WHERE type='A' AND typeid=? AND userid=?");
+    $stm->execute(array($aid,$uid));
+    if ($stm->fetchColumn(0) !== false) {
+        $assessInfoOut['excused'] = 1;
+    }
+}
+
 //prep date display
 prepDateDisp($assessInfoOut);
 
