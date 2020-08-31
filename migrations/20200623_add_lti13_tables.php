@@ -4,13 +4,14 @@
 $DBH->beginTransaction();
 
 $query = 'CREATE TABLE `imas_lti_keys` (
+  `id` int(10) AUTO_INCREMENT PRIMARY KEY,
   `key_set_url` varchar(2000) NOT NULL,
   `kid` varchar(254) NOT NULL,
   `alg` varchar(254) NOT NULL,
   `publickey` TEXT NOT NULL,
   `privatekey` TEXT NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  PRIMARY KEY (`key_set_url`,`kid`)
+  INDEX `keyinf` ( key_set_url(100), kid)
 ) ENGINE=InnoDB;';
 $res = $DBH->query($query);
 if ($res===false) {
