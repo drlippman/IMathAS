@@ -2903,33 +2903,41 @@ function ineqtointerval($str, $var) {
 		return $str;
 	}
 	$str = strtolower($str);
-	$var = strtolower($var);
+    $var = strtolower($var);
+    $str = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/',"$1", $str);
 	if (preg_match('/all\s*real/', $str)) {
 		return '(-oo,oo)';
-	}
-	$pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
-	$cnt = count($pieces);
-	$pieces = array_map('trim', $pieces);
-	if ($cnt != 3 && $cnt != 5) {
-		return false; //invalid
-	} else if ($cnt == 5 && ($pieces[1][0] != $pieces[3][0] || $pieces[2] != $var)) {
-		return false; // mixes > with <
-	}
-	if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='>') {
-		return ($pieces[1]=='>'?'(':'[') . $pieces[2] . ',oo)';
-	} else if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='<') {
-		return '(-oo,' . $pieces[2] . ($pieces[1]=='<'?')':']');
-	} else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='>') {
-		return '(-oo,' . $pieces[0] . ($pieces[1]=='>'?')':']');
-	} else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='<') {
-		return ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',oo)';
-	} else if ($cnt==5 && $pieces[1][0]=='<') {
-		return ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',' .
-			$pieces[4] . ($pieces[3]=='<'?')':']');
-	} else if ($cnt==5 && $pieces[1][0]=='>') {
-		return ($pieces[3]=='>'?'(':'[') . $pieces[4] . ',' .
-			$pieces[0] . ($pieces[1]=='>'?')':']');
-	}
+    }
+    $outpieces = [];
+    $orpts = preg_split('/\s*or\s*/', $str);
+    foreach ($orpts as $str) {
+        $pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $cnt = count($pieces);
+        $pieces = array_map('trim', $pieces);
+        if ($cnt != 3 && $cnt != 5) {
+            return false; //invalid
+        } else if ($cnt == 5 && ($pieces[1][0] != $pieces[3][0] || $pieces[2] != $var)) {
+            return false; // mixes > with <
+        }
+        if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='>') {
+            $outpieces[] = ($pieces[1]=='>'?'(':'[') . $pieces[2] . ',oo)';
+        } else if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='<') {
+            $outpieces[] = '(-oo,' . $pieces[2] . ($pieces[1]=='<'?')':']');
+        } else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='>') {
+            $outpieces[] = '(-oo,' . $pieces[0] . ($pieces[1]=='>'?')':']');
+        } else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='<') {
+            $outpieces[] = ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',oo)';
+        } else if ($cnt==5 && $pieces[1][0]=='<') {
+            $outpieces[] = ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',' .
+                $pieces[4] . ($pieces[3]=='<'?')':']');
+        } else if ($cnt==5 && $pieces[1][0]=='>') {
+            $outpieces[] = ($pieces[3]=='>'?'(':'[') . $pieces[4] . ',' .
+                $pieces[0] . ($pieces[1]=='>'?')':']');
+        }
+    }
+    if (count($outpieces) > 0) {
+        return implode('U', $outpieces);
+    }
 	return false;
 }
 
