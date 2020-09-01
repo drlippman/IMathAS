@@ -94,7 +94,10 @@ if ($link->get_placementtype() != 'assess') {
     exit;
 }
 $typeid = $link->get_typeid();
-$stm = $DBH->prepare("SELECT name,avail,startdate,enddate,date_by_lti,ver,courseid FROM imas_assessments WHERE id=:id");
+$query = "SELECT ia.name,ia.avail,ia.startdate,ia.enddate,ia.date_by_lti,
+    ia.ver,ia.courseid,ic.name AS coursename FROM imas_assessments AS ia 
+    JOIN imas_courses AS ic ON ic.id=ia.courseid WHERE ia.id=:id";
+$stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$typeid));
 $line = $stm->fetch(PDO::FETCH_ASSOC);
 $cid = Sanitize::courseId($line['courseid']);
@@ -127,7 +130,11 @@ if ($line['avail']==0) {
 }
 echo '</p>';
 
-echo '<p class=small>'.sprintf(_('This assessment is housed in %s course ID %s'), $installname, Sanitize::courseId($cid)).'</p>';
+echo '<p class=small>'.sprintf(_('This assessment is housed in %s course ID %s (%s)'), 
+        $installname, 
+        Sanitize::courseId($cid), 
+        Sanitize::encodeStringForDisplay($line['coursename'])
+    ).'</p>';
 
 
 echo '<h2>'._('LMS Syncing Tools').'</h2>';
