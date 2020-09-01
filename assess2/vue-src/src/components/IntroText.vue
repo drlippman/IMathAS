@@ -16,9 +16,11 @@ export default {
   },
   props: ['html', 'active'],
   mounted () {
-    setTimeout(window.drawPics, 100);
-    window.rendermathnode(this.$refs.introtext);
-    window.initlinkmarkup(this.$refs.introtext);
+    if (this.html !== '') {
+      setTimeout(window.drawPics, 100);
+      window.rendermathnode(this.$refs.introtext);
+      window.initlinkmarkup(this.$refs.introtext);
+    }
   },
   watch: {
     active: function (newVal, oldVal) {

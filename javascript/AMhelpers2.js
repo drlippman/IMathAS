@@ -139,8 +139,9 @@ function init(paramarr, enableMQ, baseel) {
       }
     }
     if (params.preview) { //setup preview TODO: check for userpref
-      var thisqn = qn;
-      document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(thisqn)});
+      document.getElementById("pbtn"+qn).addEventListener('click', (function(thisqn) {
+          return function() {showPreview(thisqn);}
+        })(qn));
       if (params.preview == 1 && !params.qtype.match(/matrix/)) { //no live preview for matrix types
         if (LivePreviews.hasOwnProperty(qn)) {
           delete LivePreviews[qn]; // want to reinit
@@ -779,7 +780,6 @@ function showPreview(qn) {
   if (res.err && res.err != '' && res.str != '') {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
   }
-
   if (LivePreviews.hasOwnProperty(qn)) {
     LivePreviews[qn].RenderNow(outstr);
   } else {
@@ -822,7 +822,7 @@ function showSyntaxCheckMQ(qn) {
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
-  if (LivePreviews.hasOwnProperty(qn)) {
+  if (LivePreviews.hasOwnProperty(qn) && (mathRenderer=="MathJax" || mathRenderer=="Katex")) {
     var previewel = document.getElementById('p'+qn).firstChild;
     previewel.innerHTML = outstr;
     previewel.style.visibility = '';
