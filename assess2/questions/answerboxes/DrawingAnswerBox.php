@@ -680,7 +680,7 @@ class DrawingAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = (string) $sa;
+        $this->correctAnswerForPart = '<div>'.$sa.'</div>';
         $this->previewLocation = $preview;
     }
 
