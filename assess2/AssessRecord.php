@@ -1675,7 +1675,7 @@ class AssessRecord
     }
 
     $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
-    if (isset($autosave['stuans'])) {
+    if (!empty($autosave['stuans'])) {
       $numParts = max($numParts, max(array_keys($autosave['stuans']))+1);
     }
     $partattemptn = array();
@@ -2629,6 +2629,9 @@ class AssessRecord
   public function withdrawQuestions($qpts) {
     $this->parseData();
     $madeChanges = false;
+    if (empty($this->data['assess_versions'])) {
+        return 0; // no attempts, so score is 0
+    }
     $avers = &$this->data['assess_versions'];
     for ($av = 0; $av < count($avers); $av++) {
       for ($q = 0; $q < count($avers[$av]['questions']); $q++) {
