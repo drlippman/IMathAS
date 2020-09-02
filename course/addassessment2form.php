@@ -554,8 +554,12 @@ $vueData = array(
 				</label>
 				<br/>
 				<label>
-					<input type="checkbox" name="doposttoforum" v-model="doposttoforum" />
-					<?php echo _('Show "Post this question to forum" links');?>
+                    <input type="checkbox" name="doposttoforum" v-model="doposttoforum" 
+                        :disabled="forumOptions.length == 0"/>
+                    <?php echo _('Show "Post this question to forum" links');?>
+                    <span v-if="forumOptions.length == 0" class="small">
+                        <?php echo _('(Create a forum first to enable this)'); ?>
+                    </span>
 				</label>
 			 	<span v-show="doposttoforum">
 					<?php echo _('to forum');?>
