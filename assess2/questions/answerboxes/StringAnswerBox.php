@@ -65,12 +65,11 @@ class StringAnswerBox implements AnswerBox
     		}
     		if ($displayformat=='select') {
     			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
-          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
-          $out .= '<option value=""> </option>';
+                $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+                $out .= '<option value=""> </option>';
     			foreach ($questions as $i=>$v) {
     				$out .= '<option value="'.htmlentities($v).'"';
-    				//This is a hack.  Need to figure a better way to deal with & in answers
-    				if (str_replace('&','',$v)==$la) {
+    				if ($v == $la) {
     					$out .= ' selected="selected"';
     				}
     				$out .= '>'.htmlentities($v).'</option>';
