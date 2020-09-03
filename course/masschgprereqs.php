@@ -107,6 +107,7 @@ echo '</div>';
 
 echo '<h1>' . _('Mass Change Prereqs') . '</h1>';
 
+echo '<p class="small">' . _('Note: To set the same prereq for multiple assessments at once, or to clear prereqs, it may be faster to use the Mass Change Assessments page.') . '</p>';
 echo '<form method=post action="masschgprereqs.php?cid='.$cid.'">';
 
 echo '<table id="myTable" class="gb"><thead><tr>';
