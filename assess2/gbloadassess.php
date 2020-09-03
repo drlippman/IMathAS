@@ -151,10 +151,13 @@ if ($isstudent) {
     ':type'=> $LPblockingView ? 'gbviewassess' : 'gbviewsafe', ':viewtime'=>$now));
 }
 
+// indicate whether teacher/tutor can see all the answers and such
+if ($isActualTeacher || $istutor) {
+    $assess_record->setTeacherInGb(true);
+}
 // indicate whether teacher/tutor can edit scores or not
 if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
-  $assess_record->setTeacherInGb(true);
   // get rubrics
   $assessInfoOut['rubrics'] = array();
   $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN
