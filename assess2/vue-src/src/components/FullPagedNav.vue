@@ -67,7 +67,7 @@ export default {
       return (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0);
     },
     navOptions () {
-      var out = {};
+      var out = [];
       if (this.hasIntro) {
         out[0] = {
           internallink: '/full/page/0',
