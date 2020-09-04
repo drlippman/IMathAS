@@ -507,25 +507,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array($cid, $assessmentId));
 
 			// Re-total any student attempts on this assessment
-			//need to re-score assessment attempts based on withdrawal
-			require_once('../assess2/AssessInfo.php');
-			require_once('../assess2/AssessRecord.php');
-			$assess_info = new AssessInfo($DBH, $assessmentId, $cid, false);
-			$assess_info->loadQuestionSettings();
-			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
-			$stm->execute(array($assessmentId));
-			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				$assess_record = new AssessRecord($DBH, $assess_info, false);
-				$assess_record->setRecord($row);
-				if ($toset['submitby']!=$curassess['submitby']) {
-					// convert data format
-					$assess_record->convertSubmitBy($toset['submitby']);
-				}
-				$assess_record->reTotalAssess();
-				// TODO: adjust deffb
-				// if ($toset['deffb']!=$curassess['deffeedbacktext']) {
-				$assess_record->saveRecord();
-			}
+            //need to re-score assessment attempts based on withdrawal
+            require_once('../assess2/AssessHelpers.php');
+            AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
+                ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 
 			$DBH->commit();
 			$rqp = Sanitize::randomQueryStringParam();
