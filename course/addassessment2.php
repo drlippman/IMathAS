@@ -251,7 +251,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$toset['viewingb'] = Sanitize::simpleString($_POST['viewingb']);
 			$toset['scoresingb'] = Sanitize::simpleString($_POST['scoresingb']);
-			if ($toset['viewingb'] == 'never' || $toset['scoresingb'] == 'never') {
+			if ($toset['viewingb'] == 'never') {
 				$toset['ansingb'] = 'never';
 			} else {
 				$toset['ansingb'] = Sanitize::simpleString($_POST['ansingb']);

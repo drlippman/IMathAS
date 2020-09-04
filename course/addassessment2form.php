@@ -935,7 +935,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never') {
 				this.ansingb = 'never';
  				return [];
  			} else {
@@ -949,9 +949,7 @@ var app = new Vue({
  						'text': '<?php echo _('Never');?>'
  					}
  				];
- 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
-				 	&& this.subtype == 'by_assessment'
-				) {
+ 				if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted');?>'
