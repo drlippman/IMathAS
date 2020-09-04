@@ -696,8 +696,9 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
 	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
 	//these are the slim vector unicodes: u2329 and u232a
-	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
-	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
+    $str = str_replace(array('⟨','⟩'), array('<','>'), $str);
+    $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
+	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
   $str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
   if (strtoupper(trim($str))==='DNE') {
