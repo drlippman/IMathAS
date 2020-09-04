@@ -144,9 +144,9 @@ $_SESSION['lti_user_id'] = $ltiuserid;
 $_SESSION['userid'] = $localuserid;
 $_SESSION['ltiver'] = '1.3';
 $_SESSION['tzoffset'] = $_POST['tzoffset'];
+$tzname = '';
 if (!empty($_POST['tzname'])) {
     $_SESSION['tzname'] = $_POST['tzname'];
-    $tzname = '';
  	if (date_default_timezone_set($_SESSION['tzname'])) {
         $tzname = $_SESSION['tzname'];
     }
