@@ -718,6 +718,7 @@ class Imathas_LTI_Database implements LTI\Database
      */
     public function set_or_update_duedate_exception(int $userid, LTI\LTI_Placement $link, int $lms_duedate): void
     {
+        $now = time();
         $aid = $link->get_typeid();
         $stm = $this->dbh->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
         $stm->execute(array(':userid' => $userid, ':assessmentid' => $aid));
@@ -734,7 +735,7 @@ class Imathas_LTI_Database implements LTI\Database
                 }
             }
         } else if ($link->get_date_by_lti() == 3 &&
-            ($link->get_date_by_lti() != $lms_duedate || $now < $link->get_startdate())
+            ($link->get_enddate() != $lms_duedate || $now < $link->get_startdate())
         ) {
             //default dates already set by LTI, and users's date doesn't match - create new exception
             //also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
