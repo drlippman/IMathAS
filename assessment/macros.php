@@ -4140,14 +4140,27 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 	return array($answer, $showanswer);
 }
 
-//scoremultiorder($stua, $answer, $swap, [$type='string'])
+//scoremultiorder($stua, $answer, $swap, [$type='string', $weights])
 //allows groups of questions to be scored in different orders
 //only works if $stua and $answer are directly comparable (i.e. basic string type or exact number)
 //$swap is an array of entries of the form "1,2,3;4,5,6"  says to treat 1,2,3 as a group of questions.
+//$weights is answeights, and use function like $answer,$answeights = scoremultiorder(...) if set
 //comparison is made on first entry in group
-function scoremultiorder($stua, $answer, $swap, $type='string') {
-	if ($stua == null) {return $answer;}
-	$newans = $answer;
+function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
+	if ($stua == null) {
+        if ($weights !== null) {
+            return [$answer,$weights];
+        } else {
+            return $answer;
+        }
+    }
+    $newans = $answer;
+    if ($weights !== null) {
+        if (!is_array($weights)) {
+            $weights = explode(',', $weights);
+        }
+        $newweights = $weights;
+    }
 	foreach ($swap as $k=>$sw) {
 		$swap[$k] = explode(';', $sw);
 		foreach ($swap[$k] as $i=>$s) {
@@ -4167,20 +4180,34 @@ function scoremultiorder($stua, $answer, $swap, $type='string') {
 			}
 			if ($loc>-1 && $i!=$loc) {
 				//want to swap entries from $sw[$loc] with sw[$i] and swap $answer values
-				$tmp = array();
+                $tmp = array();
+                $tmpw = array();
 				foreach ($sw[$i] as $k=>$v) {
-					$tmp[$k] = $newans[$v];
+                    $tmp[$k] = $newans[$v];
+                    if ($weights !== null) {
+                        $tmpw[$k] = $newweights[$v];
+                    }
 				}
 				foreach ($sw[$loc] as $k=>$v) {
-					$newans[$sw[$i][$k]] = $newans[$v];
+                    $newans[$sw[$i][$k]] = $newans[$v];
+                    if ($weights !== null) {
+                        $newweights[$sw[$i][$k]] = $newweights[$v];
+                    }
 				}
 				foreach ($tmp as $k=>$v) {
-					$newans[$sw[$loc][$k]] = $tmp[$k];
+                    $newans[$sw[$loc][$k]] = $tmp[$k];
+                    if ($weights !== null) {
+                        $newweights[$sw[$loc][$k]] = $tmpw[$k];
+                    }
 				}
 			}
 		}
-	}
-	return $newans;
+    }
+    if ($weights !== null) {
+        return array($newans, $newweights);
+    } else {
+        return $newans;
+    }
 }
 
 function lensort($a,$b) {
