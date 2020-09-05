@@ -9,7 +9,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink","modes","forceonemode");
+ "csvdownloadlink","modes","forceonemode","dotplot");
 
 //nCr(n,r)
 //The Choose function
@@ -2096,5 +2096,116 @@ function csvdownloadlink() {
     . _('Download CSV').'</a>';
 }
 
+//dotplot(array,label,relative,[width,height])
+//display macro.  Creates a dotplot from a data set
+// array: array of data values
+// label: title of the dotplot that will be placed below horizontal axis
+// relative (optional): 0 - default value, places dots relative to ticks marks
+// 		1 - places dots at exact tick marks. This will not work well if the range of the data array is too large or array contains float values.
+// width,height (optional): width and height in pixels of graph
+function dotplot($a,$label,$rel=1,$width=300,$height=150) {
+	if (!is_array($a)) {
+		echo 'dotplot expects an array';
+		return false;
+	}
+	
+	$ndecimal = array();
+	
+	// determine the maximum number of decimal places in the array
+	for($i = 0; $i <count($a);$i++){
+		$ndecimal[$i] = strlen(substr(strrchr($a[$i], "."), 1)); 
+	}
+
+	// determine the appropriate grouping/classwidth
+	$cw = 10**(-1*max($ndecimal));
+
+	sort($a, SORT_NUMERIC);
+
+	$start = 0;
+	if($rel == 0){
+		$start = floor($a[0]);
+		
+	}else{
+		$start = $a[0];
+	}
+
+	$x = min($a);
+	$curr = 0;
+	$alt = "Dotplot for $label <table class=stats><thead><tr><th>Value of Each Dot</th><th>Number of Dots</th></tr></thead>\n<tbody>\n";
+	$maxfreq = 0;
+	
+	// 
+	$dx = $cw;
+
+	// Create the stack of dots 
+	while ($x - $a[count($a)-1] < $cw) {
+		$alt .= "<tr><td>$x</td>";
+		$i = $curr;
+		$j = 0.1;
+  
+		while (($a[$i] <= $x) && ($i < count($a))) {
+			$i++;
+			$j = $j + 0.6;
+			$st .= "dot([$x,$j]);";
+		}
+		
+		$x += $dx;
+		
+		if (($i-$curr)>$maxfreq) { 
+			$maxfreq = $i-$curr;
+		}
+			
+		$alt .= "<td>" . ($i-$curr) . "</td></tr>\n";
+		$curr = $i;
+	}
+  	
+	$alt .= "</tbody></table>\n";
+
+	if ($_SESSION['graphdisp']==0) {
+		return $alt;
+	}
+	
+
+	// Start tick marks at the start value
+	$x = $start;
+	
+	// y-values for the size of the tick mark lines
+	$tm = -0.025*$maxfreq;
+	$tx = 0.025*$maxfreq;
+
+	// initialize 
+	$outst = "";
+	 
+	// Draw the horizontal axes
+	if($rel==0){
+		//Freedman–Diaconis rule for choosing bin-width
+		$cw = ceil((2*(Excelquartile($a,3)-Excelquartile($a,1)))/pow(count($a),1/3));	
+		
+		while ($x < $a[count($a)-1]+$cw) {
+			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+			$x+= $cw;
+		}
+	}else {
+		// draws the tick marks for the axes.
+		while ($x < $a[count($a)-1]+$cw) {
+			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+			$x+= $cw;
+		}  
+	} 
+	
+	//initializes SVG frame and canvas. ($start>0?(max($start-.9*$cw,0)):$start)
+	//(40+7*strlen($maxfreq))
+	$initst = "setBorder(20,40,10,10);initPicture($start,$x-0.9*$cw,0,$maxfreq);";
+  	
+	//xtick,ytick,{labels,xgrid,ygrid,dox,doy}
+	//,1,null,$step); fill=\"blue\";
+	//$initst .= "axes(null,null,null,null,null,0,0); fill=\"blue\"; textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$initst .="textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$x1 = $start - .25*$cw;
+	$x2 = $x + .25*$cw;
+	$initst .="line([$x1,0],[$x2,0]);";
+	$outst = $initst.$outst.$st;
+	return showasciisvg($outst,$width,$height);
+  }
 
 ?>

@@ -47,6 +47,7 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#invfcdf">invfcdf</a></li>
 <li><a href="#mosaicplot">mosaicplot</a></li>
 <li><a href="#csvdownloadlink">csvdownloadlink</a></li>
+<li><a href="#dotplot">dotplot</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -303,3 +304,12 @@ mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
 csvdownloadlink(string,array,[string,array]...)
 <p>Creates a link that downloads the specified data in CSV format. For each column
   provide a string header and an array of values.</p>
+<BR><h3><a name="dotplot">dotplot</a></h3>
+dotplot(array,label,relative,[width,height]) 
+<BR>display macro.  Creates a dotplot from a data set
+<BR> array: array of data values
+<BR> label: title of the dotplot that will be placed below the horizontal axis
+<BR>relative (optional): 0 - default value, places dots relative to ticks marks
+<BR>&nbsp;&nbsp; 1 - places dots at exact tick marks. This will not work well if the range of the data array is too large or array contains float values.
+<BR> width,height (optional): width and height in pixels of graph
+  
