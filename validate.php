@@ -100,8 +100,15 @@
      }
 
      $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
- 	 	 require("header.php");
-     echo '<form method=post action="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">';
+           require("header.php");
+    if (isset($_SERVER['QUERY_STRING'])) {
+        $querys = '?'.Sanitize::fullQueryString($_SERVER['QUERY_STRING']).'&guestaccess=true';
+    } else {
+        $querys = '?guestaccess=true';
+    }
+    $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
+        
+     echo '<form method=post action="'.$formAction.'">';
      echo '<p>You have requested guest access to a course.</p>';
  	 	 echo '<p><button type=button onclick="location.href=\''.$imasroot.'/index.php\'">',_('Nevermind'),'</button> ';
      echo '<button type=submit>Continue</button>';
