@@ -191,10 +191,16 @@ export default {
         this.showQuestion = store.livepollSettings.showQuestionDefault;
         this.showResults = store.livepollSettings.showResultsLiveDefault;
         this.showAnswers = store.livepollSettings.showAnswersAfter;
+        let nextState = 1;
+        if (store.livepollResults[qn] &&
+          Object.keys(store.livepollResults[qn]).length > 0
+        ) {
+          nextState = this.showAnswers ? 4 : 3;
+        }
         if (qn >= 0) {
           actions.setLivepollStatus({
             newquestion: dispqn,
-            newstate: 1
+            newstate: nextState
           });
         }
       }

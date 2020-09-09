@@ -79,8 +79,10 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   $livepollStatus['curstate'] === 0 ||
   !empty($_POST['forceregen'])
 ) {
-  // force the newstate to be 1; don't want to skip any steps
-  $newState = 1;
+  if ($newState == 2) {
+      // force the newstate to be 1; shouldn't jump right to open
+      $newState = 1;
+  }
 
   // look up question HTML. Also grab seed
   // get current question version
