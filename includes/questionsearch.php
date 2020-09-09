@@ -15,12 +15,12 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private):("[\w\s]+"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
             $out[$match[1]] = str_replace('"', '', $match[2]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private):("[\w\s]+"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
@@ -252,7 +252,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     LENGTH(iq.solution) AS hassolution,iq.solutionopts,
     ili.junkflag, iq.broken, ili.id AS libitemid ';
     if ($searchtype == 'assess') {
-        $query .= ',iqs.id AS qid ';
+        $query .= ',iaq.id AS qid ';
     }
     $query .= 'FROM imas_questionset AS iq JOIN imas_library_items AS ili ON
     ili.qsetid=iq.id AND ili.deleted=0 ';

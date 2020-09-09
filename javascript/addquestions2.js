@@ -97,6 +97,19 @@ function chkAll(frm, arr, mark) {
   }
 }
 
+function alllibs() {
+    cursearchtype = 'all';
+    curlibs = '';
+    $("#cursearchtype").text(_('All Libraries'));
+    $("#libnames").parent().hide();
+    var cursearch = document.getElementById("search").value;
+    if (cursearch.trim() != '') {
+        doQuestionSearch();
+    } else {
+        document.getElementById("search").focus();
+    }
+}
+
 function libselect() {
     var listlibs = '';
     if (cursearchtype == 'libs') {
@@ -109,9 +122,11 @@ function setlib(libs) {
     curlibs = libs;
     cursearchtype = 'libs';
     $("#cursearchtype").text(_('In Libraries'));
+    doQuestionSearch();
 }
 function setlibnames(libn) {
-	document.getElementById("libnames").innerHTML = libn.replace(/<span.*?<\/span.*?>/g,'');
+    document.getElementById("libnames").innerHTML = libn.replace(/<span.*?<\/span.*?>/g,'');
+    $("#libnames").parent().show();
 }
 function assessselect() {
     var lista = '';
@@ -124,9 +139,11 @@ function setassess(aids) {
     curlibs = aids;
     cursearchtype = 'assess';
     $("#cursearchtype").text(_('In Assessments'));
+    doQuestionSearch();
 }
 function setassessnames(aidn) {
-	document.getElementById("libnames").innerHTML = aidn.replace(/<span.*?<\/span.*?>/g,'');
+    document.getElementById("libnames").innerHTML = aidn.replace(/<span.*?<\/span.*?>/g,'');
+    $("#libnames").parent().show();
 }
 
 function prePageChange() {

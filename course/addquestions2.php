@@ -395,6 +395,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         }
         .advsearch {
             width: 80vw;
+            max-width: 800px;
           }
           .mform {
               padding: 15px;
@@ -416,7 +417,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             padding: 4px;
             line-height: 1.4em;
             font-size: 80%;
-            margin-bottom: 10px;
             position: relative;
             display: flex;
           }
@@ -459,6 +459,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             border-bottom-left-radius: 0;
             padding-left: 3px;
             padding-right: 5px;
+          }
+          #selq {
+              margin-top: 10px;
           }
         </style>
         <script>
@@ -889,7 +892,7 @@ if ($overwriteBody==1) {
             ?>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="#" role="button">
+            <li><a href="#" role="button" onclick="alllibs(); return false;">
                 <?php echo _('All Libraries'); ?>
             </a></li>
             <li><a href="#" role="button" onclick="libselect(); return false;">
@@ -902,12 +905,12 @@ if ($overwriteBody==1) {
     </div>
     <div style="flex-grow:1" class="flexrow">
         <input type=text style="flex-grow:1" name=search id=search 
-            value="<?php echo Sanitize::encodeStringForDisplay($search); ?>">
+            value="<?php echo Sanitize::encodeStringForDisplay($searchterms); ?>">
 
-        <div class="dropdown splitbtn">
-            <button type="button" class="primary">
+        <div class="dropdown splitbtn" id="searchbtngrp" >
+            <button type="button" class="primary" onclick="doQuestionSearch()">
                 <?php echo _('Search');?>
-            </button><button type="button" class="primary dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            </button><button type="button" id="advsearchbtn" class="primary dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="sr-only"><?php echo _('Advanced Search'); ?></span>
             </button>
 
@@ -946,15 +949,15 @@ if ($overwriteBody==1) {
                             <option value="conditional">Conditional</option>
                         </select></div>
                     <div><label><?php echo _('Avg Time');?>:</label> <div>
-                        <input size=2> to <input size=2>
+                        <input size=2 id="search-avgtime-min"> to <input size=2 id="search-avgtime-max">
                     </div></div>
-                    <p><input type=checkbox><?php echo _('Mine Only');?> 
-                        <input type=checkbox><?php echo _('Exclude Added');?>
+                    <p><input type=checkbox id="search-mine"><?php echo _('Mine Only');?> 
+                        <input type=checkbox id="search-unused"><?php echo _('Exclude Added');?>
                     </p>
                     <div>
                         <div style="flex-grow:1">
                         </div>
-                        <button class="primary">
+                        <button type="button" class="primary" onclick="doAdvSearch()">
                             <?php echo _('Search');?>
                         </button>
                     </div>
