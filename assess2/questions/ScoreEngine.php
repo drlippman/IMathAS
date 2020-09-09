@@ -117,6 +117,13 @@ class ScoreEngine
                     $stuanswers, $stuanswersval);
         }
 
+        if ($quesData['hasimg'] > 0) {
+            // We need to "unpack" this into locally scoped variables.
+            foreach ($this->getImages($scoreQuestionParams->getDbQuestionSetId()) as $kidx => $iidx) {
+                ${$kidx} = $iidx;
+            }
+        }
+
         /*
          * Evals
          */
@@ -667,6 +674,30 @@ class ScoreEngine
     {
         return ($questionData['qtype'] == "multipart"
             || $questionData['qtype'] == 'conditional');
+    }
+
+    /**
+     * Get all question images. For scoring we just need minimal info
+     *
+     * Note: Original variable names (value of $imageName in this method) must
+     *       be available during question code eval.
+     * @param int qsid  The question set id
+     * @return array A hashmap of strings containing image names.
+     */
+    private function getImages(int $qsid): array
+    {
+        $stm = $this->dbh->prepare("SELECT
+            var, filename FROM imas_qimages WHERE qsetid = :qsetid");
+        $stm->execute(array(':qsetid' => $qsid));
+
+        $imagesAsHtml = array();
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $imageName = $row[0];
+            $filename = $row[1]; // This can be a complete URL or a filename.
+            $imagesAsHtml[$imageName] = $filename;
+        }
+
+        return $imagesAsHtml;
     }
 
     /**
