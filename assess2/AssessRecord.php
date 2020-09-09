@@ -1921,7 +1921,8 @@ class AssessRecord
         ->setAttemptNumber($attemptn)
         ->setAllQuestionAnswers($stuanswers)
         ->setAllQuestionAnswersAsNum($stuanswersval)
-        ->setQnpointval($qsettings['points_possible']);
+        ->setQnpointval($qsettings['points_possible'])
+        ->setPartsToScore($parts_to_score);
 
     $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
 
