@@ -1104,14 +1104,16 @@ function makepretty($exp) {
 }
 
 function makexpretty($exp) {
-	if (is_array($exp)) {
+	/*if (is_array($exp)) {
 		for ($i=0;$i<count($exp);$i++) {
 			$exp[$i]=xclean($exp[$i]);
 		}
 	} else {
 		$exp = xclean($exp);
 	}
-	return $exp;
+    return $exp;
+    */
+    return makexxpretty($exp);
 }
 
 function makexxpretty($exp,$funcs=array()) {
@@ -1169,14 +1171,15 @@ function makeprettydisp($exp) {
 }
 
 function makexprettydisp($exp) {
-	if (is_array($exp)) {
+	/*if (is_array($exp)) {
 		for ($i=0;$i<count($exp);$i++) {
 			$exp[$i]="`".xclean($exp[$i])."`";
 		}
 	} else {
 		$exp = "`".xclean($exp)."`";
 	}
-	return $exp;
+    return $exp;*/
+    return makexxprettydisp($exp);
 }
 
 function makexxprettydisp($exp,$funcs=array()) {
