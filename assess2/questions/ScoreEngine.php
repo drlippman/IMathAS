@@ -322,14 +322,18 @@ class ScoreEngine
             $parts_to_score = true; // always score all parts for conditional
         }
 
-        if ($parts_to_score === true || !isset($stuanswers[$thisq])) {
+        if ($parts_to_score === true || !isset($stuanswers[$thisq]) || !is_array($stuanswers[$thisq])) {
             $stuanswers[$thisq] = array();
             $stuanswersval[$thisq] = array();
         } else {
             foreach ($parts_to_score as $pn=>$v) {
                 if ($v) {
                     unset($stuanswers[$thisq][$pn]);
-                    unset($stuanswersval[$thisq][$pn]);
+                    if (is_array($stuanswersval[$thisq])) {
+                        unset($stuanswersval[$thisq][$pn]);
+                    } else {
+                        $stuanswersval[$thisq] = array();
+                    }
                 }
             }
         }
