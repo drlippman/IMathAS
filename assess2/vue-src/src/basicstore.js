@@ -560,7 +560,7 @@ export const actions = {
   },
   doAutosave (qn, partnum, timeactive) {
     store.somethingDirty = false;
-    window.clearTimeout(store.autosaveTimer);
+    // this.clearAutosaveTimer()
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
       Vue.set(store.autosaveQueue, qn, []);
     }
@@ -568,7 +568,9 @@ export const actions = {
       store.autosaveQueue[qn].push(partnum);
     }
     Vue.set(store.autosaveTimeactive, qn, timeactive);
-    store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
+    if (store.autosaveTimer === null) {
+      store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 60 * 1000);
+    }
   },
   clearAutosave (qns) {
     for (const i in qns) {
@@ -582,6 +584,7 @@ export const actions = {
   },
   clearAutosaveTimer () {
     window.clearTimeout(store.autosaveTimer);
+    store.autosaveTimer = null;
   },
   submitAutosave (async) {
     store.somethingDirty = false;
@@ -640,6 +643,16 @@ export const actions = {
     }
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
+    }
+    if (async === false && navigator.sendBeacon) {
+      navigator.sendBeacon(
+        store.APIbase + 'autosave.php' + store.queryString,
+        data
+      );
+      store.inTransit = false;
+      store.autoSaving = false;
+      store.autosaveQueue = {};
+      return;
     }
     window.$.ajax({
       url: store.APIbase + 'autosave.php' + store.queryString,

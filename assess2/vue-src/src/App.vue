@@ -65,7 +65,7 @@ export default {
   },
   methods: {
     beforeUnload (evt) {
-      if (store.autosaveQueue.length > 0) {
+      if (Object.keys(store.autosaveQueue).length > 0) {
         actions.submitAutosave(false);
       }
       var unanswered = true;
