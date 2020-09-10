@@ -96,7 +96,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   }
 
   // load question settings and code
-  $assess_info->loadQuestionSettings($qidstoload, true);
+  $assess_info->loadQuestionSettings($qidstoload, true, false);
 
   // do not load question - question autoloader will handle that
 
@@ -131,7 +131,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   // load question seed
   list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
-  $assess_info->loadQuestionSettings($qidstoload, false);
+  $assess_info->loadQuestionSettings($qidstoload, false, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
 
@@ -174,7 +174,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   // lookup question seed
   list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
-  $assess_info->loadQuestionSettings($qidstoload, false);
+  $assess_info->loadQuestionSettings($qidstoload, false, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
 

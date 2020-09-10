@@ -848,7 +848,7 @@ class AssessRecord
     // Load the question code
     $qns = array_keys($autosaves);
     list($qids, $toloadqids) = $this->getQuestionIds($qns);
-    $this->assess_info->loadQuestionSettings($toloadqids, true);
+    $this->assess_info->loadQuestionSettings($toloadqids, true, false);
 
     // add a submission
     $submission = $this->addSubmission($submission_time);

@@ -1061,7 +1061,14 @@ export const actions = {
         store.assessInfo.questions = [];
       }
       for (const i in response.questions) {
-        Vue.set(store.assessInfo.questions, parseInt(i), response.questions[i]);
+        const iint = parseInt(i);
+        if (response.questions[i].category === null &&
+          store.assessInfo.questions.hasOwnProperty(iint) &&
+          store.assessInfo.questions[iint].hasOwnProperty('category')
+        ) {
+          response.questions[i].category = store.assessInfo.questions[iint].category;
+        }
+        Vue.set(store.assessInfo.questions, iint, response.questions[i]);
       }
       delete response.questions;
     }

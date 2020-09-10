@@ -112,7 +112,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
 list($qids,$toloadqids) = $assess_record->getQuestionIds(array_keys($qns));
 
 // load question settings and code
-$assess_info->loadQuestionSettings($toloadqids, false);
+$assess_info->loadQuestionSettings($toloadqids, false, false);
 
 // If in practice, now we overwrite settings
 if ($in_practice) {

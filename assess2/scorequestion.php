@@ -166,7 +166,7 @@ if (count($qns) > 0) {
   list($qids, $toloadqids) = $assess_record->getQuestionIds($qns);
 
   // load question settings and code
-  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $toloadqids, true);
+  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $toloadqids, true, false);
 
   // Verify confirmation values (to ensure it hasn't been submitted since)
   if (!$assess_record->checkVerification($verification)) {
@@ -239,7 +239,7 @@ if (count($qns) > 0) {
   $assess_record->reTotalAssess($qns);
 
 } else {
-  $assess_info->loadQuestionSettings('all', false);
+  $assess_info->loadQuestionSettings('all', false, false);
 }
 
 if ($end_attempt) {
