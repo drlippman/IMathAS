@@ -245,7 +245,7 @@ class ScoreEngine
         if ($quesData['qtype'] == "multipart") {
             $scoreResult = $this->scorePartMultiPart($scoreQuestionParams,
                 $additionalVarsForScoring,
-                $stuanswers);
+                $stuanswers, $quesData['qtype']);
         } else {
             $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $quesData);
             if ($quesData['qtype'] == "conditional") {
@@ -410,6 +410,10 @@ class ScoreEngine
                 }
             }
         }
+        $processed_stuans = $scoreQuestionParams->getProcessedStuans();
+        foreach ($processed_stuans as $pn=>$val) {
+            $stuanswers[$thisq][$pn] = $val;
+        }
         ksort($stuanswers[$thisq]);
         ksort($stuanswersval[$thisq]);
 
@@ -491,6 +495,10 @@ class ScoreEngine
                 }
             }
         }
+        $processed_stuans = $scoreQuestionParams->getProcessedStuans();
+        if (!empty($processed_stuans[0])) {
+            $stuanswers[$thisq] = $processed_stuans[0];
+        }
 
         return array($stuanswers, $stuanswersval);
     }
@@ -502,14 +510,22 @@ class ScoreEngine
      * @param array $additionalPackagedVars Additional packaged vars needed but
      *                                      not used by scorepart().
      * @param array $stuanswers
+     * @param string $qtype the question type
      * @return array An array of scores.
      */
     private function scorePartMultiPart(ScoreQuestionParams $scoreQuestionParams,
                                         array $additionalPackagedVars,
-                                        array $stuanswers): array
+                                        array $stuanswers,
+                                        string $qtype): array
     {
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $optionsPack = $scoreQuestionParams->getVarsForScorePart();
+        $parts_to_score = $scoreQuestionParams->getPartsToScore();
+
+        if ($qtype == 'conditional') {
+            $parts_to_score = true; // always score all parts for conditional
+        }
+        $baseIsRescore = $scoreQuestionParams->getIsRescore();
 
         // We need to "unpack" these into locally scoped variables.
         foreach ($optionsPack as $k => $v) {
@@ -553,7 +569,14 @@ class ScoreEngine
                 ->setIsMultiPartQuestion(true)
                 ->setQuestionPartNumber($partnum);
 
-			$scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum]);  
+            if (!$baseIsRescore && is_array($parts_to_score) && empty($parts_to_score[$partnum])) {
+                // not scoring it, so treat as rescore, using the stuanswer
+                $scoreQuestionParams->setIsRescore(true);
+                $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum]);  
+            } else {
+                $scoreQuestionParams->setIsRescore($baseIsRescore);
+                $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);
+            }
 
             try {
               $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);

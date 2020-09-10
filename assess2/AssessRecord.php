@@ -871,7 +871,8 @@ class AssessRecord
           $qn,    // question number
           $qdata['timeactive'],      // time active
           $submission,    // submission #
-          $parts_to_score
+          $parts_to_score,
+          $qdata['stuans']
       );
     }
 
@@ -1879,9 +1880,10 @@ class AssessRecord
    * @param  int  $timeactive     Time the question was active, in ms
    * @param  int  $submission     The submission number, from addSubmission
    * @param  array $parts_to_score  an array, true if part is to be scored/recorded
+   * @param  array $processed_stuans  an array of processed stuanswers (from autosave)
    * @return string errors, if any
    */
-  public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true) {
+  public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true, $processed_stuans=[]) {
     $qver = &$this->getQuestionVer($qn);
 
     // get the question settings
@@ -1918,6 +1920,7 @@ class AssessRecord
         ->setDbQuestionSetId($qsettings['questionsetid'])
         ->setQuestionSeed($qver['seed'])
         ->setGivenAnswer($_POST['qn'.$qn])
+        ->setProcessedStuans($processed_stuans)
         ->setAttemptNumber($attemptn)
         ->setAllQuestionAnswers($stuanswers)
         ->setAllQuestionAnswersAsNum($stuanswersval)
