@@ -1856,6 +1856,29 @@ function submitChanges() {
         });
 }
 
+function addusingdefaults() {
+    if (beentaken) { return; }
+    var checked = [];
+    $("#selq input[type=checkbox]:checked").each(function() {
+        checked.push(this.value);
+    });
+    if (checked.length == 0) { return; }
+    $.ajax({
+        type: "POST",
+        url: AHAHsaveurl,
+        async: false,
+        data: {addnewdef: checked},
+        dataType: 'json'
+    }).done(function (msg) {
+        itemarray = msg;
+        refreshTable();
+        $("#selq input[type=checkbox]:checked").prop("checked", false);
+        $("#addbar").hide();
+    }).fail(function () {
+        alert("Error adding questions");
+    });
+}
+
 /*
 function submitChanges() {
   url = AHAHsaveurl + '&order='+generateOutput();

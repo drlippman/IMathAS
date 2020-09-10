@@ -59,11 +59,11 @@ function parseSearchString($str)
  *    getowner: boolean true to include owners name (def: false)
  *    isadmin: boolean  user is search as admin (def false)
  *    isgroupadmin: int  user is searching as group admin (pass group id)
- * @param int  max   maximum number of rows to return
  * @param int  offset  offset when doing paginated results
+ * @param int  max   maximum number of rows to return
  * @return PDOStatement executed PDOStatement
  */
-function searchQuestions($search, $userid, $searchtype, $libs = array(), $options = array(), $max = 300, $offset = 0)
+function searchQuestions($search, $userid, $searchtype, $libs = array(), $options = array(), $offset = 0, $max = 200)
 {
     global $DBH;
 
@@ -247,7 +247,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $query = 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,
-    ili.libid, iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,
+    MIN(ili.libid) AS libid, iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,
     imas_users.LastName, imas_users.FirstName, imas_users.groupid,
     LENGTH(iq.solution) AS hassolution,iq.solutionopts,
     ili.junkflag, iq.broken, ili.id AS libitemid ';
@@ -287,6 +287,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($rightsquery !== '') {
         $query .= ' AND ' . $rightsquery;
     }
+    $query .= ' GROUP BY ili.qsetid ';
+
     if ($searchtype == 'assess') {
         $query .= ' ORDER BY ia.id ';
     }
@@ -356,7 +358,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 return ($a['id'] < $b['id']) ? -1 : 1;
             }
         });
-        return ['qs' => $res, 'names' => $aidnames, 'type'=>'assess'];
+        $out = ['qs' => $res, 'names' => $aidnames, 'type'=>'assess'];
     } else if ($searchtype == 'libs') {
         usort($res, function ($a, $b) use ($sortorder) {
             if ($a['libid'] != $b['libid']) {
@@ -371,8 +373,16 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 return ($a['id'] < $b['id']) ? -1 : 1;
             }
         });
-        return ['qs' => $res, 'names' => $libnames, 'type'=>'libs'];
+        $out = ['qs' => $res, 'names' => $libnames, 'type'=>'libs'];
     } else {
-        return ['qs' => $res, 'type'=>'all'];
+        $out = ['qs' => $res, 'type'=>'all'];
     }
+    $out['offset'] = $offset;
+    if (count($res) == $max) {
+        $out['next'] = $offset + $max;
+    }
+    if ($offset > 0) {
+        $out['prev'] = $offset - $max;
+    }
+    return $out;
 }

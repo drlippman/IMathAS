@@ -58,8 +58,10 @@ if (isset($_GET['getassess'])) {
 require('../includes/questionsearch.php');
 
 $search = parseSearchString($_POST['search']);
+$offset = intval($_POST['offset']);
 
-$res = searchQuestions($search, $userid, $_POST['searchtype'], $libs);
+// TODO: populate existing if unused is set
+$res = searchQuestions($search, $userid, $_POST['searchtype'], $libs, [], $offset);
 
 echo json_encode($res, JSON_INVALID_UTF8_IGNORE);
 

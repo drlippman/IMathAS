@@ -378,7 +378,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions2.js?v=042220\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=090320\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort2.js?v=090320\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/qsearch.js?v=082820\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -492,195 +492,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$beentaken = false;
 	}
-	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$aid));
-	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef,$showworkdef,$assessintro) = $stm->fetch(PDO::FETCH_NUM);
-	$ln = 1;
-
-	// Format of imas_assessments.intro is a JSON representation like
-	// [ "original (main) intro text",
-	//  { displayBefore:  question number to display before,
-	//    displayUntil:  last question number to display it for
-	//    text:  the actual text to show
-	//    ispage: is this is a page break (0 or 1)
-	//    pagetitle: page title text
-	//  },
-  	//  ...
-	// ]
-	$text_segments = array();
-	if (($introjson=json_decode($assessintro,true))!==null) { //is json intro
-		//$text_segments = array_slice($introjson,1); //remove initial Intro text
-		for ($i=0;$i<count($introjson);$i++) {
-			if (isset($introjson[$i]['displayBefore'])) {
-				if (!isset($text_segments[$introjson[$i]['displayBefore']])) {
-					$text_segments[$introjson[$i]['displayBefore']] = array();
-				}
-				$text_segments[$introjson[$i]['displayBefore']][] = $introjson[$i];
-			}
-		}
-	} else {
-		if (strpos($assessintro, '[Q ')!==false || strpos($assessintro, '[QUESTION ')!==false) {
-			$introconvertmsg = '<p>'.sprintf(_('It appears this assessment is using an older [Q #] or [QUESTION #] tag. You can %sconvert that into a new format%s if you would like.'), '<a href="convertintro.php?cid='.$cid.'&aid='.$aid.'">','</a>').'</p>';
-		}
-	}
-
-	$grp0Selected = "";
-	if (isset($_SESSION['groupopt'.$aid])) {
-		$grp = $_SESSION['groupopt'.$aid];
-		$grp1Selected = ($grp==1) ? " selected" : "";
-	} else {
-		$grp = 0;
-		$grp0Selected = " selected";
-	}
-
-	$questionjsarr = array();
-	$existingq = array();
-	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
-	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
-    $query .= "iq.showwork,iq.rubric,iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,";
-    $query .= "iqs.meantimen FROM imas_questions AS iq ";
-	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
-	$query .= "WHERE iq.assessmentid=:aid";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':aid'=>$aid));
-	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-		if ($line===false) { continue; } //this should never happen, but avoid issues if it does
-		$existingq[] = $line['questionsetid'];
-		//output item array
-		if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
-			$canedit = 1;
-		} else {
-			$canedit = 0;
-		}
-		$extrefval = 0;
-		if ($aver > 1) {
-			if (($line['showhints']==-1 && ($showhintsdef&2)==2) ||
-				($line['showhints'] > -1 && ($line['showhints']&2)==2)
-			) {
-				$extrefval += 1;
-			}
-		} else {
-			if (($line['showhints']==0 && $showhintsdef==1) || $line['showhints']==2) {
-				$extrefval += 1;
-			}
-		}
-		if ($line['extref']!='') {
-			$extref = explode('~~',$line['extref']);
-			$hasvid = false;  $hasother = false;  $hascap = false;
-			foreach ($extref as $v) {
-				if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
-					$hasvid = true;
-					if (strpos($v,'!!1')!==false) {
-						$hascap = true;
-					}
-				} else {
-					$hasother = true;
-				}
-			}
-			//$page_questionTable[$i]['extref'] = '';
-			if ($hasvid) {
-				$extrefval += 4;
-			}
-			if ($hasother) {
-				$extrefval += 2;
-			}
-			if ($hascap) {
-				$extrefval += 16;
-			}
-		}
-		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
-			$extrefval += 8;
-        }
-        if (($line['showwork'] == -1 && $showworkdef > 0) || $line['showwork'] > 0) {
-            $extrefval += 32;
-        }
-        if ($line['rubric'] > 0) {
-            $extrefval += 64;
-        }
-
-		$timeout = array();
-		$timeout[0] = round($line['meantime']/60, 1);
-		$timeout[1] = round($line['meanscore'], 1);
-		$timeout[2] = round($line['meantime']/60, 1);
-		$timeout[3] = intval($line['meantimen']);
-
-		$questionjsarr[$line['id']] = array((int)$line['id'],
-			(int)$line['questionsetid'],
-			Sanitize::encodeStringForDisplay($line['description']),
-			Sanitize::encodeStringForDisplay($line['qtype']),
-			(int)Sanitize::onlyInt($line['points']),
-			(int)$canedit,
-			(int)Sanitize::onlyInt($line['withdrawn']),
-			(int)$extrefval,
-            $timeout
-        );
-
-	}
-
-	$apointstot = 0;
-	$qncnt = 0;
-
-	$jsarr = array();
-	if ($itemorder != '') {
-		$items = explode(",",$itemorder);
-	} else {
-		$items = array();
-	}
-	for ($i = 0; $i < count($items); $i++) {
-		if (isset($text_segments[$qncnt])) {
-			foreach ($text_segments[$qncnt] as $text_seg) {
-				//stupid hack: putting a couple extra unused entries in array so length>=5
-				$jsarr[] = array("text", $text_seg['text'],
-					Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
-					Sanitize::onlyInt($text_seg['ispage']),
-					$text_seg['pagetitle'],
-					isset($text_seg['forntype'])?$text_seg['forntype']:0);
-			}
-		}
-		if (strpos($items[$i],'~')!==false) {
-			$subs = explode('~',$items[$i]);
-			if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid]))) {
-				$closegrp = 0;
-			} else {
-				$closegrp = 1;
-			}
-			$qsdata = array();
-			for ($j=(strpos($subs[0],'|')===false)?0:1;$j<count($subs);$j++) {
-				if (!isset($questionjsarr[$subs[$j]])) {continue;} //should never happen
-				$qsdata[] = $questionjsarr[$subs[$j]];
-			}
-			if (count($qsdata)==0) { continue; } //should never happen
-			if (strpos($subs[0],'|')===false) { //for backwards compat
-				$jsarr[] = array(1,0,$qsdata,$closegrp);
-				$qncnt++;
-			} else {
-				$grpparts = explode('|',$subs[0]);
-				$jsarr[] = array((int)Sanitize::onlyInt($grpparts[0]),
-					(int)Sanitize::onlyInt($grpparts[1]),
-					$qsdata,
-					(int)$closegrp);
-				$qncnt += $grpparts[0];
-			}
-		} else {
-			if (!isset($questionjsarr[$items[$i]])) {continue;} //should never happen
-			$jsarr[] = $questionjsarr[$items[$i]];
-			$qncnt++;
-		}
-
-		$alt = 1-$alt;
-	}
-	if (isset($text_segments[$qncnt])) {
-		foreach ($text_segments[$qncnt] as $j=>$text_seg) {
-			//stupid hack: putting a couple extra unused entries in array so length>=5
-			$jsarr[] = array("text", $text_seg['text'],
-				Sanitize::onlyInt($text_seg['displayUntil']-$text_seg['displayBefore']+1),
-				Sanitize::onlyInt($text_seg['ispage']),
-				$text_seg['pagetitle'], 1);
-		}
-	}
-
-    unset($questionjsarr);
     
+    require_once('../includes/addquestions2util.php');
+    $jsarr = getQuestionsAsJSON($cid, $aid);
+ 
     if (isset($_SESSION['searchtype'.$aid])) {
         $searchtype = $_SESSION['searchtype'.$aid];
     } else {
@@ -784,7 +599,7 @@ if ($overwriteBody==1) {
 	<h2><?php echo _('Questions in Assessment'),' - ',Sanitize::encodeStringForDisplay($page_assessmentName); ?></h2>
 
 <?php
-	if ($itemorder == '') {
+	if (count($jsarr)==0) {
 		echo "<p>"._("No Questions currently in assessment")."</p>\n";
 
 		echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
@@ -877,7 +692,7 @@ if ($overwriteBody==1) {
 
 <h2><?php echo _('Potential Questions') ?></h2>
 
-
+<div id="fullqsearchwrap">
 <div class="flexrow wrap dropdown searchbar">
     <div class="dropdown">
         <button id="cursearchtype" type="button" class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -915,7 +730,7 @@ if ($overwriteBody==1) {
             </button>
 
             <div class="dropdown-menu dropdown-menu-right advsearch">
-                <form class="mform">
+                <form class="mform" id="advsearchform">
                     <div><label><?php echo _('Has words');?>:</label> 
                         <input id="search-words"/></div>
                     <div><label><?php echo _('Doesn\'t have');?>:</label> 
@@ -977,13 +792,13 @@ if ($overwriteBody==1) {
 
 <div id="addbar" class="footerbar" style="display:none;">
     <div class="dropup inlinediv splitbtn">
-        <button type="button" class="primary">
+        <button type="button" class="primary" onclick="addusingdefaults()">
             <?php echo _('Add'); ?>
         </button><button type="button" class="primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="small" aria-label="<?php echo _('Options');?>">&#9650;</span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="#" role="button">
+            <li><a href="#" role="button" onclick="addusingdefaults(); return false;">
                 <?php echo _('Add using defaults'); ?>
             </a></li>
             <li><a href="#" role="button">
@@ -1003,14 +818,20 @@ if ($overwriteBody==1) {
 </div>
         
 <form id="selq">
-	<table cellpadding="5" id="myTable" class="gb zebra" style="clear:both; position:relative;">
+	<table cellpadding="5" id="myTable" class="gb zebra" style="clear:both; position:relative;" tabindex="-1">
     </table>
+    <p><span id="searchnums"><?php echo _('Showing');?> <span id="searchnumvals"></span></span>
+      <a href="#" id="searchprev" style="display:none"><?php echo _('Previous Results');?></a>
+      <a href="#" id="searchnext" style="display:none"><?php echo _('More Results');?></a>
+    </p>
 </form>
+<div style="height:200px"></div>
 <script type="text/javascript">
     $(function() {
         displayQuestionList(<?php echo json_encode($search_results, JSON_INVALID_UTF8_IGNORE); ?>);
     });
 </script>
+</div>
 <?php
     }
 }
