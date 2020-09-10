@@ -65,6 +65,7 @@
         :showresults = "showResults"
         :showans = "curstate === 4"
         :qn = "curqn"
+        :key = "curqn + '-' + curseed"
       />
 
     </div>
