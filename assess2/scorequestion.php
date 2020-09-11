@@ -253,7 +253,7 @@ if (!empty($_POST['autosave-tosaveqn'])) {
     } else {
         $autosave_timeactive = json_decode($_POST['autosave-timeactive'], true);
     }
-    if ($autosave_qns !== null && $autosave_lastloaded !== null && $autosave_timeactive !== null) {
+    if (!empty($autosave_qns) && $autosave_lastloaded !== null && $autosave_timeactive !== null) {
         list($autosave_qids,$autosave_toloadqids) = $assess_record->getQuestionIds(array_keys($autosave_qns));
 
         // load question settings and code
