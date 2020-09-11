@@ -848,7 +848,7 @@ class AssessRecord
     // Load the question code
     $qns = array_keys($autosaves);
     list($qids, $toloadqids) = $this->getQuestionIds($qns);
-    $this->assess_info->loadQuestionSettings($toloadqids, true);
+    $this->assess_info->loadQuestionSettings($toloadqids, true, false);
 
     // add a submission
     $submission = $this->addSubmission($submission_time);
@@ -871,7 +871,8 @@ class AssessRecord
           $qn,    // question number
           $qdata['timeactive'],      // time active
           $submission,    // submission #
-          $parts_to_score
+          $parts_to_score,
+          $qdata['stuans']
       );
     }
 
@@ -1675,7 +1676,7 @@ class AssessRecord
     }
 
     $numParts = isset($qver['answeights']) ? count($qver['answeights']) : count($qver['tries']);
-    if (isset($autosave['stuans'])) {
+    if (!empty($autosave['stuans'])) {
       $numParts = max($numParts, max(array_keys($autosave['stuans']))+1);
     }
     $partattemptn = array();
@@ -1879,9 +1880,10 @@ class AssessRecord
    * @param  int  $timeactive     Time the question was active, in ms
    * @param  int  $submission     The submission number, from addSubmission
    * @param  array $parts_to_score  an array, true if part is to be scored/recorded
+   * @param  array $processed_stuans  an array of processed stuanswers (from autosave)
    * @return string errors, if any
    */
-  public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true) {
+  public function scoreQuestion($qn, $timeactive, $submission, $parts_to_score=true, $processed_stuans=[]) {
     $qver = &$this->getQuestionVer($qn);
 
     // get the question settings
@@ -1918,10 +1920,12 @@ class AssessRecord
         ->setDbQuestionSetId($qsettings['questionsetid'])
         ->setQuestionSeed($qver['seed'])
         ->setGivenAnswer($_POST['qn'.$qn])
+        ->setProcessedStuans($processed_stuans)
         ->setAttemptNumber($attemptn)
         ->setAllQuestionAnswers($stuanswers)
         ->setAllQuestionAnswersAsNum($stuanswersval)
-        ->setQnpointval($qsettings['points_possible']);
+        ->setQnpointval($qsettings['points_possible'])
+        ->setPartsToScore($parts_to_score);
 
     $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
 
@@ -2629,6 +2633,9 @@ class AssessRecord
   public function withdrawQuestions($qpts) {
     $this->parseData();
     $madeChanges = false;
+    if (empty($this->data['assess_versions'])) {
+        return 0; // no attempts, so score is 0
+    }
     $avers = &$this->data['assess_versions'];
     for ($av = 0; $av < count($avers); $av++) {
       for ($q = 0; $q < count($avers[$av]['questions']); $q++) {

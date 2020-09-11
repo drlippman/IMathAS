@@ -1412,6 +1412,13 @@ function generateTable() {
                     '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>'
                     + '</span>';
                 }
+                if ((curitems[j][7] & 1) == 1) {
+                    var showicons = "";
+                    var altadd = "";
+                } else {
+                    var showicons = "_no";
+                    var altadd = _(" disabled");
+                }
                 if ((curitems[j][7] & 4) == 4) {
                     if ((curitems[j][7] & 16) == 16) {
                         html += '<div class="ccvid inlinediv"';
@@ -1419,14 +1426,7 @@ function generateTable() {
                     } else {
                         html += '<div class="inlinediv"';
                         var altbase = _("Video");
-                    }
-                    if ((curitems[j][7] & 1) == 1) {
-                        var showicons = "";
-                        var altadd = "";
-                    } else {
-                        var showicons = "_no";
-                        var altadd = _(" disabled");
-                    }
+                    } 
                     html += 'title="'+altbase+altadd+'">';
                     html +=
                         '<img src="' +

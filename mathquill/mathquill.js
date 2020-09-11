@@ -2940,13 +2940,18 @@ var MathCommand = P(MathElement, function(_, super_) {
       ) {
         // check to make sure additional letter doesn't make a longer op name
         var str = '', l = cursor[L];
-        while (l.isPartOfOperator && l[-1] !== 0 && !l.jQ.hasClass("mq-last")) {
+        while (l.isPartOfOperator && !l.jQ.hasClass("mq-last")) {
           str = l.letter + str;
+          if (l[-1] === 0) { break; }
           l = l[L];
         }
-        str += cmd.letter;
-        if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str)) {
-          cursor.parent.write(cursor, '(');
+        if (cursor.options.autoParenOperators === true ||
+            cursor.options.autoParenOperators.hasOwnProperty(str)
+        ) {
+            str += cmd.letter;
+            if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str)) {
+                cursor.parent.write(cursor, '(');
+            }
         }
       }
     }
@@ -4299,6 +4304,25 @@ optionProcessors.autoOperatorNames = function(cmds) {
   dict._maxLength = maxLength;
   return dict;
 };
+optionProcessors.autoParenOperators = function(cmds) {
+    if (cmds === true) {
+        return true;
+    }
+    if (!/^[a-z]+(?: [a-z]+)*$/i.test(cmds)) {
+        throw '"'+cmds+'" not a space-delimited list of only letters';
+    }
+    var list = cmds.split(' '), dict = {}, maxLength = 0;
+    for (var i = 0; i < list.length; i += 1) {
+        var cmd = list[i];
+        if (cmd.length < 2) {
+            throw '"'+cmd+'" not minimum length of 2';
+        }
+        dict[cmd] = 1;
+        maxLength = max(maxLength, cmd.length);
+    }
+    dict._maxLength = maxLength;
+    return dict;
+}
 var OperatorName = P(Symbol, function(_, super_) {
   _.init = function(fn) { this.ctrlSeq = fn; };
   _.createLeftOf = function(cursor) {

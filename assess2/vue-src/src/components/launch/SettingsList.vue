@@ -76,6 +76,9 @@ export default {
         icon: 'square-check',
         str: this.$t('setlist.points_possible', { pts: settings.points_possible })
       };
+      if (store.assessInfo.hasOwnProperty('excused')) {
+        pointsobj.alert = this.$t('setlist.excused');
+      }
       return pointsobj;
     },
     getDateObj () {

@@ -173,7 +173,16 @@ export default {
   methods: {
     createPlayer () {
       const supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
-      const pVarsInternal = { 'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen ? 1 : 0, 'controls': 2, 'rel': 0, 'modestbranding': 1, 'showinfo': 0 };
+      const pVarsInternal = {
+        'autoplay': 0,
+        'wmode': 'transparent',
+        'fs': supportsFullScreen ? 1 : 0,
+        'controls': 2,
+        'rel': 0,
+        'modestbranding': 1,
+        'showinfo': 0,
+        'origin': window.location.protocol + '//' + window.location.host
+      };
       const ar = store.assessInfo.videoar.split(':');
       const videoHeight = window.innerHeight - 50;
       this.videoWidth = ar[0] / ar[1] * videoHeight;
@@ -301,7 +310,7 @@ export default {
     // async load YouTube API
     if (!window.YT) {
       const tag = document.createElement('script');
-      tag.src = '//www.youtube.com/player_api';
+      tag.src = 'https://www.youtube.com/player_api';
       document.head.appendChild(tag);
     }
   }

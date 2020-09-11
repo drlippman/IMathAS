@@ -171,8 +171,8 @@ $lastupdate = '20200422';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
 if (!empty($CFG['assess2-use-vue-dev'])) {
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
@@ -181,6 +181,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
+  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=072520" type="text/javascript"></script>';
 }
 

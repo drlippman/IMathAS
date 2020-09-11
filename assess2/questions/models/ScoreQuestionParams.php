@@ -25,6 +25,8 @@ class ScoreQuestionParams
     private $questionPartNumber;    // Orig: $partnum
     private $varsForScorePart;      // Orig: $options
     private $isRescore = false;
+    private $parts_to_score = true;
+    private $processed_stuans = [];
 
     /**
      * The user's rights. (from imas_users table, "rights" column)
@@ -401,5 +403,27 @@ class ScoreQuestionParams
     public function getIsRescore(): bool
     {
       return $this->isRescore;
+    }
+
+    public function setPartsToScore($parts_to_score): ScoreQuestionParams
+    {
+      $this->parts_to_score = $parts_to_score;
+      return $this;
+    }
+
+    public function getPartsToScore()
+    {
+      return $this->parts_to_score;
+    }
+
+    public function setProcessedStuans($processed_stuans): ScoreQuestionParams
+    {
+      $this->processed_stuans = $processed_stuans;
+      return $this;
+    }
+
+    public function getProcessedStuans()
+    {
+      return $this->processed_stuans;
     }
 }

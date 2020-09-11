@@ -48,9 +48,10 @@ function disallowsSameSiteNone () {
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',432000);
 ini_set('auto_detect_line_endings',true);
-$hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
+$hostdomain = explode(':', Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
+$hostparts = explode('.', $hostdomain[0]);
 if ((!function_exists('isDevEnvironment') || !isDevEnvironment())
-    && $_SERVER['HTTP_HOST'] != 'localhost'
+    && $hostdomain[0] != 'localhost'
     && !is_numeric($hostparts[count($hostparts)-1])
 ) {
 	$sess_cookie_domain = '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2));

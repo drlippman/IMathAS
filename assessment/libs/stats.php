@@ -832,28 +832,35 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
-function normrand($mu,$sig,$n,$rnd=null) {
+function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
 	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
 	}
-	global $RND;
-	for ($i=0;$i<ceil($n/2);$i++) {
+    global $RND;
+    $icnt = 0;
+    $z = [];
+    while (count($z)<$n && $icnt < 2*$n) {
 		do {
 			$a = $RND->rand(-32768,32768)/32768;
 			$b = $RND->rand(-32768,32768)/32768;
 			$r = $a*$a+$b*$b;
 			$count++;
 		} while ($r==0||$r>1);
-		$r = sqrt(-2*log($r)/$r);
-		if ($rnd!==null) {
-			$z[] = round($sig*$a*$r + $mu, $rnd);
-			$z[] = round($sig*$b*$r + $mu, $rnd);
-		} else {
-			$z[] = $sig*$a*$r + $mu;
-			$z[] = $sig*$b*$r + $mu;
-		}
-	}
+        $r = sqrt(-2*log($r)/$r);
+        $v1 = $sig*$a*$r + $mu;
+        $v2 = $sig*$b*$r + $mu;
+        if (!$pos || $v1 > 0) {
+            $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
+        }
+        if (!$pos || $v2 > 0) {
+            $z[] = ($rnd===null) ? $v2 : round($v2, $rnd);
+        }
+        $icnt++;
+    }
+    if ($icnt == 2*$n && count($z) < $n) {
+        echo "Error: unable to generate enough positive values";
+    }
 	if ($n%2==0) {
 		return $z;
 	} else {

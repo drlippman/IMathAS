@@ -554,8 +554,12 @@ $vueData = array(
 				</label>
 				<br/>
 				<label>
-					<input type="checkbox" name="doposttoforum" v-model="doposttoforum" />
-					<?php echo _('Show "Post this question to forum" links');?>
+                    <input type="checkbox" name="doposttoforum" v-model="doposttoforum" 
+                        :disabled="forumOptions.length == 0"/>
+                    <?php echo _('Show "Post this question to forum" links');?>
+                    <span v-if="forumOptions.length == 0" class="small">
+                        <?php echo _('(Create a forum first to enable this)'); ?>
+                    </span>
 				</label>
 			 	<span v-show="doposttoforum">
 					<?php echo _('to forum');?>
@@ -931,7 +935,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never') {
 				this.ansingb = 'never';
  				return [];
  			} else {
@@ -945,9 +949,7 @@ var app = new Vue({
  						'text': '<?php echo _('Never');?>'
  					}
  				];
- 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
-				 	&& this.subtype == 'by_assessment'
-				) {
+ 				if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted');?>'

@@ -126,6 +126,7 @@ function reset() {
 }
 
 function clearcanvas(tarnum) {
+    if (targetOuts[tarnum].disabled) { return; }
 	lines[tarnum].length = 0;
 	dots[tarnum].length = 0;
 	odots[tarnum].length = 0;
@@ -177,7 +178,11 @@ function addA11yTarget(canvdata, thisdrawla) {
 			$(canvel).replaceWith(newdiv);
 		}
 	}
-	targetOuts[tarnum] = document.getElementById('qn'+tarnum);
+    targetOuts[tarnum] = document.getElementById('qn'+tarnum);
+    if (targetOuts[tarnum].disabled) {
+        document.getElementById("a11ydrawnew"+tarnum).disabled = true;
+        $(".a11ydrawadd[data-qn="+tarnum+"]").prop('disabled', true);
+    }
 	targets[tarnum] = {type:'a11y', el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
@@ -311,13 +316,14 @@ function adda11ydraw(tarnum,initmode,defval) {
 	var val = defval || "";
     var afgroup = thistarg.afgroup;
     var n = thistarg.el.getElementsByTagName("li").length+1;
+    var disabled = targetOuts[tarnum].disabled ? ' disabled ' : '';
     var numname = '<span class="sr-only draweln">'+_('Drawing element ') + n + '</span>';
     html = numname;
     html += thistarg.moderef[mode].descr + '.<br/>';
 	html += '<label><span class="a11ydrawinstr"></span><br/>';
-    html += '<input type="text" value="'+val+'" data-n="'+thistarg.moderef[mode].inN+'" ';
+    html += '<input type="text" value="'+val+'" data-n="'+thistarg.moderef[mode].inN+'" ' + disabled;
     html += 'onblur="imathasDraw.updatea11ydraw(this)"/></label>';
-	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
+	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)"' + disabled + '>';
 	html += _("Remove")+' '+numname+'</button>';
 	var li = $("<li>", {class:"a11ydrawrow", "data-mode":mode}).html(html);
 	$(thistarg.el).append(li);
@@ -480,7 +486,8 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
 
-	targetOuts[tarnum] = document.getElementById(formel);
+    targetOuts[tarnum] = document.getElementById(formel);
+
 	if (lines[tarnum]==null) {lines[tarnum] = new Array();}
 	if (dots[tarnum]==null) {dots[tarnum] = new Array();}
 	if (odots[tarnum]==null) {odots[tarnum] = new Array();}
@@ -1660,7 +1667,8 @@ function drawMouseDown(ev) {
 		}
 	}
 
-	if (curTarget!=null) { //is a target currectly in action?
+    if (curTarget!=null) { //is a target currectly in action?
+        if (targetOuts[curTarget].disabled) { return; }
 		ev.preventDefault();  //prevent scrolling
 		mouseisdown = true;
 		var tarelpos = getPosition(targets[curTarget].el);
@@ -1929,6 +1937,7 @@ function drawMouseUp(ev) {
 	var mousePos = mouseCoords(ev);
 	mouseisdown = false;
 	if (curTarget!=null) {
+        if (targetOuts[curTarget].disabled) { return; }
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
@@ -2091,6 +2100,7 @@ function drawMouseMove(ev) {
 		}
 	//}
 	if (tempTarget!=null) {
+        if (targetOuts[tempTarget].disabled) { return; }
 		mouseintarget = tempTarget;
 		var tarelpos = getPosition(targets[tempTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};

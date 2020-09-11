@@ -108,8 +108,11 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	}
 }
 
+$deletequeue = array();
 $RCX->execute();
-
+if (count($deletequeue) > 0) {
+    LTIDeleteQueue();
+}
 echo "Done in ".(time() - $scriptStartTime);
 
 if (!empty($CFG['LTI']['logltiqueue'])) {
@@ -158,7 +161,7 @@ function LTIqueuePostdataCallback($data) {
 }
 
 function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
-	global $DBH,$cntsuccess,$cntfailure,$cntgiveup;
+	global $DBH,$cntsuccess,$cntfailure,$cntgiveup,$deletequeue;
 
 	//echo 'got response with hash'.$user_data['hash'].'<br/>';
 	//echo htmlentities($response);
@@ -200,8 +203,22 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 		}
 	} else { //success
 		//we'll call this when send is successful
-		$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
-		$delfromqueue->execute(array($user_data['hash'], $user_data['sendon']));
+		//$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
+        //$delfromqueue->execute(array($user_data['hash'], $user_data['sendon']));
+        $deletequeue[] = $user_data['hash'];
+        $deletequeue[] = $user_data['sendon'];
+        if (count($deletequeue)>100) {
+            LTIDeleteQueue();
+        }
 		$cntsuccess++;
 	}
+}
+
+function LTIDeleteQueue() {
+    global $DBH,$deletequeue;
+
+    $ph = Sanitize::generateQueryPlaceholdersGrouped($deletequeue, 2);
+    $delfromqueue = $DBH->prepare("DELETE FROM imas_ltiqueue WHERE (hash,sendon) IN ($ph)");
+    $delfromqueue->execute($deletequeue);
+    $deletequeue = [];
 }

@@ -107,7 +107,7 @@ class EssayAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 
