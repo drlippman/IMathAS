@@ -204,6 +204,43 @@ $assessInfoOut['questions'] = array(
   $qn => $assess_record->getQuestionObject($qn, $showscores, true, true)
 );
 
+// save autosaves, if set 
+$assessInfoOut['saved_autosaves'] = false;
+if (!empty($_POST['autosave-tosaveqn'])) {
+    $qns = json_decode($_POST['autosave-tosaveqn'], true);
+    $lastloaded = json_decode($_POST['autosave-lastloaded'], true);
+    $verification = json_decode($_POST['autosave-verification'], true);
+    if ($_POST['autosave-timeactive'] == '') {
+        $timeactive = [];
+    } else {
+        $timeactive = json_decode($_POST['autosave-timeactive'], true);
+    }
+    if ($qns !== null && $lastloaded !== null && $timeactive !== null) {
+        list($qids,$toloadqids) = $assess_record->getQuestionIds(array_keys($qns));
+
+        // load question settings and code
+        $assess_info->loadQuestionSettings($toloadqids, false, false);
+        if ($assess_record->checkVerification($verification)) {
+            // autosave the requested parts
+            foreach ($qns as $qn=>$parts) {
+                if (!isset($timeactive[$qn])) {
+                    $timeactive[$qn] = 0;
+                }
+                $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
+                foreach ($parts as $part) {
+                    if ($ok_to_save === true || $ok_to_save[$part]) {
+                     $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
+                    }
+                }
+                if (isset($_POST['sw' . $qn])) {  //autosaving work
+                    $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
+                }
+            }
+            $assessInfoOut['saved_autosaves'] = true;
+        }
+    }
+}
+
 // save record if needed
 $assess_record->saveRecordIfNeeded();
 

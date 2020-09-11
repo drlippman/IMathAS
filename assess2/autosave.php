@@ -31,7 +31,6 @@ header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
-check_for_required('POST', array('tosaveqn', 'lastloaded'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($isActualTeacher && isset($_GET['uid'])) {
@@ -40,13 +39,26 @@ if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
-$qns = json_decode($_POST['tosaveqn'], true);
-$lastloaded = json_decode($_POST['lastloaded'], true);
-$verification = json_decode($_POST['verification'], true);
-if ($_POST['timeactive'] == '') {
-  $timeactive = [];
-} else {
-  $timeactive = json_decode($_POST['timeactive'], true);
+if (isset($_POST['autosave-tosaveqn'])) {
+    check_for_required('POST', array('autosave-tosaveqn', 'autosave-lastloaded'));
+    $qns = json_decode($_POST['autosave-tosaveqn'], true);
+    $lastloaded = json_decode($_POST['autosave-lastloaded'], true);
+    $verification = json_decode($_POST['autosave-verification'], true);
+    if ($_POST['autosave-timeactive'] == '') {
+        $timeactive = [];
+    } else {
+        $timeactive = json_decode($_POST['autosave-timeactive'], true);
+    }
+} else { // deprecated
+    check_for_required('POST', array('tosaveqn', 'lastloaded'));
+    $qns = json_decode($_POST['tosaveqn'], true);
+    $lastloaded = json_decode($_POST['lastloaded'], true);
+    $verification = json_decode($_POST['verification'], true);
+    if ($_POST['timeactive'] == '') {
+        $timeactive = [];
+    } else {
+        $timeactive = json_decode($_POST['timeactive'], true);
+    }
 }
 
 if ($qns === null || $lastloaded === null || $timeactive === null) {

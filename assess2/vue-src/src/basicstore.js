@@ -190,16 +190,22 @@ export const actions = {
         delete store.assessInfo.scoreerrors[qn];
       }
     }
+    const data = new FormData();
+    data.append('qn', qn);
+    data.append('practice', store.assessInfo.in_practice);
+    data.append('regen', regen ? 1 : 0);
+    data.append('jumptoans', jumptoans ? 1 : 0);
+    if (Object.keys(store.autosaveQueue).length > 0) {
+      actions.clearAutosaveTimer();
+      this.addAutosaveData(data);
+    }
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
       type: 'POST',
       dataType: 'json',
-      data: {
-        qn: qn,
-        practice: store.assessInfo.in_practice,
-        regen: regen ? 1 : 0,
-        jumptoans: jumptoans ? 1 : 0
-      },
+      data: data,
+      processData: false,
+      contentType: false,
       xhrFields: {
         withCredentials: true
       },
@@ -210,6 +216,10 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
+        if (response.saved_autosaves) {
+          this.markAutosavesDone();
+        }
+        delete response.saved_autosaves;
         if (regen && store.assessInfo.questions[qn].jsparams) {
           // clear out before overwriting
           window.imathasAssess.clearparams(store.assessInfo.questions[qn].jsparams);
@@ -451,6 +461,8 @@ export const actions = {
     if (store.assessInfo.preview_all) {
       data.append('preview_all', true);
     }
+    this.addAutosaveData(data, Object.keys(changedQuestions));
+
     const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
       store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
 
@@ -477,6 +489,10 @@ export const actions = {
         } else {
           store.errorMsg = null;
         }
+        if (response.saved_autosaves) {
+          this.markAutosavesDone();
+        }
+        delete response.saved_autosaves;
         // clear out initValues for this question so they get re-set
         for (const qn in changedQuestions) {
           if (store.assessInfo.hasOwnProperty('scoreerrors') &&
@@ -586,22 +602,16 @@ export const actions = {
     window.clearTimeout(store.autosaveTimer);
     store.autosaveTimer = null;
   },
-  submitAutosave (async) {
-    store.somethingDirty = false;
-    this.clearAutosaveTimer();
-    if (Object.keys(store.autosaveQueue).length === 0) {
-      return;
-    }
-    if (store.inTransit) {
-      window.setTimeout(() => this.submitAutosave(async), 20);
-      return;
-    }
-    store.inTransit = true;
-    store.autoSaving = true;
+  addAutosaveData (data, skip) {
+    skip = skip || [];
+    // adds autosave data to existing FormData
     const lastLoaded = {};
-    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
-    const data = new FormData();
+    const tosaveqn = {};
     for (const qn in store.autosaveQueue) {
+      if (skip.indexOf(qn) !== -1) {
+        continue; // skip it
+      }
+      tosaveqn[qn] = store.autosaveQueue[qn];
       // build up regex to match the inputs for all the parts we want to save
       const regexpts = [];
       for (const k in store.autosaveQueue[qn]) {
@@ -633,14 +643,46 @@ export const actions = {
       });
       lastLoaded[qn] = store.lastLoaded[qn].getTime();
     };
-    data.append('tosaveqn', JSON.stringify(store.autosaveQueue));
-    data.append('lastloaded', JSON.stringify(lastLoaded));
-    data.append('verification', JSON.stringify(this.getVerificationData(store.autosaveQueue)));
+    data.append('autosave-tosaveqn', JSON.stringify(tosaveqn));
+    data.append('autosave-lastloaded', JSON.stringify(lastLoaded));
+    data.append('autosave-verification', JSON.stringify(this.getVerificationData(tosaveqn)));
     if (store.assessInfo.displaymethod === 'full') {
-      data.append('timeactive', '');
+      data.append('autosave-timeactive', '');
     } else {
-      data.append('timeactive', JSON.stringify(store.autosaveTimeactive));
+      data.append('autosave-timeactive', JSON.stringify(store.autosaveTimeactive));
     }
+  },
+  markAutosavesDone () {
+    for (const qn in store.autosaveQueue) {
+      for (const k in store.autosaveQueue[qn]) {
+        if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
+          if (store.assessInfo.questions[parseInt(qn)].parts_entered.indexOf(store.autosaveQueue[qn][k]) === -1) {
+            store.assessInfo.questions[parseInt(qn)].parts_entered.push(store.autosaveQueue[qn][k]);
+          }
+        }
+      }
+    }
+
+    // clear autosave queue
+    store.autosaveQueue = {};
+  },
+  submitAutosave (async) {
+    store.somethingDirty = false;
+    this.clearAutosaveTimer();
+    if (Object.keys(store.autosaveQueue).length === 0) {
+      return;
+    }
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitAutosave(async), 20);
+      return;
+    }
+    store.inTransit = true;
+    store.autoSaving = true;
+
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    const data = new FormData();
+    this.addAutosaveData(data);
+
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
     }
@@ -676,18 +718,7 @@ export const actions = {
           }
           return;
         }
-        for (const qn in store.autosaveQueue) {
-          for (const k in store.autosaveQueue[qn]) {
-            if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
-              if (store.assessInfo.questions[parseInt(qn)].parts_entered.indexOf(store.autosaveQueue[qn][k]) === -1) {
-                store.assessInfo.questions[parseInt(qn)].parts_entered.push(store.autosaveQueue[qn][k]);
-              }
-            }
-          }
-        }
-
-        // clear autosave queue
-        store.autosaveQueue = {};
+        this.markAutosavesDone();
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
