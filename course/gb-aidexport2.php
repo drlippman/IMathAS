@@ -25,7 +25,7 @@ if (isset($_POST['options'])) {
 
 	//get assessment info
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings('all', $dobca); // only load code if we need answers
+	$assess_info->loadQuestionSettings('all', $dobca, false); // only load code if we need answers
 
 	$itemorder = $assess_info->getSetting('itemorder');
 	$itemarr = array();

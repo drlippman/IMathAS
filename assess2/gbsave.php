@@ -51,7 +51,7 @@ if ($istutor) {
 }
 
 // load question settings
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', false, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);

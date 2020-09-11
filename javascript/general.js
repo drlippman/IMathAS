@@ -91,7 +91,7 @@ function tipshow(el,tip, e) {
 	}
 	if (typeof tipobj!= 'object') {
         tipobj = document.createElement("div");
-        if (imathasAssess) {
+        if (window.imathasAssess) {
             tipobj.className = "dropdown-pane tooltip-pane";
         } else {
             tipobj.className = "tips";
@@ -926,7 +926,7 @@ jQuery(function() {
 		}
 	});
 	jQuery('form').each(function(i,el) {
-		if (el.action && (m=el.getAttribute('action').match(/cid=(\d+)/))) {
+		if (el.hasAttribute('action') && (m=el.getAttribute('action').match(/cid=(\d+)/))) {
 			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
 			if (btf !== '') {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
@@ -1430,12 +1430,14 @@ function initSageCell(base) {
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
-			code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'');
+            code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'')
+                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 		} else {
 			ta = $this.find("textarea");
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
 				if ($this.find("pre").length>0) {
-					code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n");
+                    code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
+                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 					if (ta.length==0) {
 						ta = $this.find("pre")[0];
 					} else {

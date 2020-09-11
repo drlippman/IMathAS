@@ -195,19 +195,19 @@ export default {
     },
     saveStatus () {
       // returns 0 if nothing to display, 1 if saving, 2 if saved, 3 if ready to save
-      if (this.ainfo.submitby === 'by_assessment') {
-        if (store.autoSaving) {
-          return 1;
-        } else if (Object.keys(store.autosaveQueue).length === 0 &&
-          !store.somethingDirty
-        ) {
-          return 2;
-        } else {
-          return 3;
-        }
+      // if (this.ainfo.submitby === 'by_assessment') {
+      if (store.autoSaving) {
+        return 1;
+      } else if (Object.keys(store.autosaveQueue).length === 0 &&
+        !store.somethingDirty
+      ) {
+        return 2;
       } else {
-        return 0;
+        return 3;
       }
+      // } else {
+      //  return 0;
+      // }
     },
     showPrint () {
       return (this.ainfo.noprint !== 1);

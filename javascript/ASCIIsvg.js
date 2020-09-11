@@ -317,12 +317,12 @@ function initPicture(x_min,x_max,y_min,y_max) {
   xunitlength = (width-border[0]-border[2])/(xmax-xmin);
   yunitlength = xunitlength;
   //alert(xmin+" "+xmax+" "+ymin+" "+ymax)
-  if (ymin==null) {
+  if (y_min==null) {
   	origin = [-xmin*xunitlength+border[0],height/2];
   	ymin = -(height-border[1]-border[3])/(2*yunitlength);
   	ymax = -ymin;
   } else {
-  	if (ymax!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
+  	if (y_max!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
   	else ymax = (height-border[1]-border[3])/yunitlength + ymin;
   	origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
   }

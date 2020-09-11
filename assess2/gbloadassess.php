@@ -113,6 +113,19 @@ if (!$assess_record->hasRecord()) {
     echo '{"error": "invalid_record"}';
     exit;
   }
+} else {
+    // retotal assess to make sure nothing's changed
+    $orig_gb_score = $assess_record->getGbScore()['gbscore'];
+    $assess_record->reTotalAssess();
+    $new_gb_score = $assess_record->getGbScore()['gbscore'];
+    if ($new_gb_score != $orig_gb_score) {
+        $assess_record->saveRecord();
+        $lti_sourcedid = $assess_record->getLTIsourcedId();
+        if (strlen($lti_sourcedid) > 1) {
+            require_once("../includes/ltioutcomes.php");
+            calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$new_gb_score,true);
+        }
+    }
 }
 
 //fields to extract from assess info for inclusion in output
@@ -151,10 +164,13 @@ if ($isstudent) {
     ':type'=> $LPblockingView ? 'gbviewassess' : 'gbviewsafe', ':viewtime'=>$now));
 }
 
+// indicate whether teacher/tutor can see all the answers and such
+if ($isActualTeacher || $istutor) {
+    $assess_record->setTeacherInGb(true);
+}
 // indicate whether teacher/tutor can edit scores or not
 if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
-  $assess_record->setTeacherInGb(true);
   // get rubrics
   $assessInfoOut['rubrics'] = array();
   $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN

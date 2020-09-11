@@ -64,7 +64,7 @@ if ($practicever) {
 }
 $assess_record->setInGb(true);
 // indicate whether teacher/tutor for viewing scores/answers
-if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+if ($isActualTeacher || $istutor) {
   $assess_record->setTeacherInGb(true);
 }
 $assess_record->parseData();

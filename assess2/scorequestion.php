@@ -166,7 +166,7 @@ if (count($qns) > 0) {
   list($qids, $toloadqids) = $assess_record->getQuestionIds($qns);
 
   // load question settings and code
-  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $toloadqids, true);
+  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $toloadqids, true, false);
 
   // Verify confirmation values (to ensure it hasn't been submitted since)
   if (!$assess_record->checkVerification($verification)) {
@@ -239,8 +239,46 @@ if (count($qns) > 0) {
   $assess_record->reTotalAssess($qns);
 
 } else {
-  $assess_info->loadQuestionSettings('all', false);
+  $assess_info->loadQuestionSettings('all', false, false);
 }
+
+// save autosaves, if set 
+$assessInfoOut['saved_autosaves'] = false;
+if (!empty($_POST['autosave-tosaveqn'])) {
+    $autosave_qns = json_decode($_POST['autosave-tosaveqn'], true);
+    $autosave_lastloaded = json_decode($_POST['autosave-lastloaded'], true);
+    $autosave_verification = json_decode($_POST['autosave-verification'], true);
+    if ($_POST['autosave-timeactive'] == '') {
+        $autosave_timeactive = [];
+    } else {
+        $autosave_timeactive = json_decode($_POST['autosave-timeactive'], true);
+    }
+    if (!empty($autosave_qns) && $autosave_lastloaded !== null && $autosave_timeactive !== null) {
+        list($autosave_qids,$autosave_toloadqids) = $assess_record->getQuestionIds(array_keys($autosave_qns));
+
+        // load question settings and code
+        $assess_info->loadQuestionSettings($autosave_toloadqids, false, false);
+        if ($assess_record->checkVerification($autosave_verification)) {
+            // autosave the requested parts
+            foreach ($autosave_qns as $qn=>$parts) {
+                if (!isset($timeactive[$qn])) {
+                    $timeactive[$qn] = 0;
+                }
+                $ok_to_save = $assess_record->isSubmissionAllowed($qn, $autosave_qids[$qn], $parts);
+                foreach ($parts as $part) {
+                    if ($ok_to_save === true || $ok_to_save[$part]) {
+                     $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, $part);
+                    }
+                }
+                if (isset($_POST['sw' . $qn])) {  //autosaving work
+                    $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, 'work');
+                }
+            }
+            $assessInfoOut['saved_autosaves'] = true;
+        }
+    }
+}
+
 
 if ($end_attempt) {
   $assess_record->scoreAutosaves();

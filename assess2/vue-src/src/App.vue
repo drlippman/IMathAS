@@ -65,7 +65,7 @@ export default {
   },
   methods: {
     beforeUnload (evt) {
-      if (store.autosaveQueue.length > 0) {
+      if (Object.keys(store.autosaveQueue).length > 0) {
         actions.submitAutosave(false);
       }
       var unanswered = true;
@@ -136,7 +136,7 @@ export default {
           body: 'unload.unsubmitted_assessment',
           action: () => {
             self.prewarned = true;
-            window.location = e.target.href;
+            window.location = e.currentTarget.href;
           }
         };
         return false;
@@ -146,7 +146,7 @@ export default {
           body: 'unload.unsubmitted_work',
           action: () => {
             self.prewarned = true;
-            window.location = e.target.href;
+            window.location = e.currentTarget.href;
           }
         };
         return false;

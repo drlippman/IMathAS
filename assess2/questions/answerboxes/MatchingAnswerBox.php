@@ -216,7 +216,7 @@ class MatchingAnswerBox implements AnswerBox
         // Done!
         $this->answerBox = $out;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

@@ -273,7 +273,7 @@ export default {
           } else {
             window.$(this).attr('data-lastval', window.$(this).val());
           }
-          actions.clearAutosaveTimer();
+          // actions.clearAutosaveTimer();
         })
         .on('input.dirtytrack', function () {
           store.somethingDirty = true;

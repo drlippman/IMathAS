@@ -355,10 +355,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require_once('../assess2/AssessInfo.php');
 				require_once('../assess2/AssessRecord.php');
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-				$assess_info->loadQuestionSettings();
+				$assess_info->loadQuestionSettings('all', false, false);
 				$DBH->beginTransaction();
 				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
-		    $stm->execute(array($aid));
+		        $stm->execute(array($aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					$assess_record = new AssessRecord($DBH, $assess_info, false);
 					$assess_record->setRecord($row);
@@ -460,7 +460,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=042220\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=082820\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=090220\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";

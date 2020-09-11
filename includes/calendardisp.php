@@ -905,7 +905,8 @@ if ($pageshift==0) {
 
 }
 function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$folder,$avail=true,$ishidden=false,$curblockgrey=0) {
-	$now = time();
+    global $studentinfo;
+    $now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (!isset($item['avail'])) { //backwards compat
@@ -920,7 +921,12 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 			}
 			//set as hidden if explicitly hidden or opens in future.  We won't count past folders that aren't showing as hidden
 			//  to allow students with latepasses to access old assignments even if the folder is gone.
-			$thisishidden = ($ishidden || $item['avail']==0 || ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+            $thisishidden = ($ishidden || 
+                $item['avail']==0 || 
+                ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now) ||
+                (!empty($item['grouplimit']) && isset($studentinfo['section']) &&
+                    substr($item['grouplimit'][0],2) != $studentinfo['section'])
+            );
 			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
 		} else {
 			$addto[] = $item;

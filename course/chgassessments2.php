@@ -496,7 +496,7 @@ if (!(isset($teacherid))) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['assessmentid'] != $lastAid) {
 					$assess_info = new AssessInfo($DBH, $row['assessmentid'], $cid, false);
-					$assess_info->loadQuestionSettings();
+					$assess_info->loadQuestionSettings('all', false, false);
 					$lastAid = $row['assessmentid'];
 				}
 				$assess_record = new AssessRecord($DBH, $assess_info, false);

@@ -2,7 +2,7 @@
   <div v-if="qinfo && qinfo.answeights">
     <p>{{ $tc('livepoll.numresults', numResults) }}</p>
     <div v-show="showresults && numResults > 0">
-      <div v-for="(resdata,pn) in results" :key="pn" class="med-below">
+      <div v-for="(resdata,pn) in results" :key="qn + '-' + pn" class="med-below">
         <livepoll-results-choices
           v-if="resdata.hasOwnProperty('choices')"
           :results = "resdata"
