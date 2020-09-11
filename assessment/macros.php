@@ -2420,15 +2420,15 @@ function randnamewpronouns($g=2) {
   
   if ($g==2) {
   	if ($gender==0) { //male
-  		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'), _('himself'));
+  		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'), _('himself'), _('He'), _('Him'), _('His'), _('His'), _('Himself'));
   	} else {
-  		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'), _('herself'));
+  		return array(randnames(1,1), _('she'), _('her'), _('her'), _('hers'), _('herself'), _('She'), _('Her'), _('Her'), _('Hers'), _('Herself'));
   	}
   } elseif ($g=='neutral') {
     if ($gender==0) { //male
-  		return array(randnames(1,0), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  		return array(randnames(1,0), _('they'), _('them'), _('their'), _('theirs'), _('themself'), _('They'), _('Them'), _('Their'), _('Theirs'), _('Themself'));
   	} else {
-  		return array(randnames(1,1), _('they'), _('them'), _('their'), _('theirs'), _('themself'));
+  		return array(randnames(1,1), _('they'), _('them'), _('their'), _('theirs'), _('themself'), _('They'), _('Them'), _('Their'), _('Theirs'), _('Themself'));
   	}
   }
 
