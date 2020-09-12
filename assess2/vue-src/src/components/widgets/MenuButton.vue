@@ -112,10 +112,7 @@ export default {
       return !!this.$scopedSlots.default;
     },
     filteredOptions () {
-      if (this.screenwidth > 1000 || !this.options.filter) {
-        return this.options.filter(a => (a !== null));
-      }
-      return this.options.filter(a => (a !== null && !a.nosmall));
+      return this.options.filter(a => (a !== null));
     }
   },
   methods: {
