@@ -525,3 +525,8 @@ button#timerbox:focus {
 	background-color: #e0ffff;
 }
 
+.subdued {
+	color: green;
+}
+
+

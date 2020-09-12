@@ -77,7 +77,8 @@
     "timelimit_wgrace": "Zeitbegrenzung: {time}, mit einer Kulanzzeit von {grace} bei einem Punktabzug von {penalty}%.",
     "timelimit_extend": "Erweitert gegenüber der ursprünglichen Zeit von {time}.",
     "timelimit_restricted": "Abgabe bald fällig. Die Zeit läuft ab bei Fälligkeit, {due}.",
-    "timelimit_wgrace_restricted": "Zeitbegrenzung: {time}, mit einer Kulanzzeit bis {due}. Bei Nutzung der Kulanzzeit gibt es einen Punktabzug von {penalty}%."
+    "timelimit_wgrace_restricted": "Zeitbegrenzung: {time}, mit einer Kulanzzeit bis {due}. Bei Nutzung der Kulanzzeit gibt es einen Punktabzug von {penalty}%.",
+    "excused": "Sie können diesen Test überspringen. Dies ändert nichts an Ihrer Note."
   },
   "group": {
     "isgroup": "Dies ist ein Gruppentest.",
