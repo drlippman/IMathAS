@@ -113,9 +113,9 @@ export default {
     },
     filteredOptions () {
       if (this.screenwidth > 1000 || !this.options.filter) {
-        return this.options;
+        return this.options.filter(a => (a !== null));
       }
-      return this.options.filter(a => !a.nosmall);
+      return this.options.filter(a => (a !== null && !a.nosmall));
     }
   },
   methods: {
