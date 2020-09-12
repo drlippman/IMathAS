@@ -173,7 +173,8 @@
     "parseerror": "Server sent an invalid response",
     "livepoll_wrongquestion": "Submitted question is not the current question.",
     "livepoll_notopen": "This question is not open for submissions.",
-    "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again."
+    "need_relaunch": "Necessary information is missing. Please go back to your LMS and open the assignment again.",
+    "ytnotready": "YouTube is not ready yet"
   },
   "confirm": {
     "ok": "OK",

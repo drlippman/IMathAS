@@ -294,7 +294,7 @@ export const actions = {
     store.inTransit = true;
     const data = {};
     // get values again, in case event trigger didn't happen
-    window.$('.swbox').each(function() {
+    window.$('.swbox').each(function () {
       const qn = parseInt(this.id.substr(2));
       if (!store.assessInfo.questions[qn].hasOwnProperty('work') ||
         this.value !== store.assessInfo.questions[qn].work
