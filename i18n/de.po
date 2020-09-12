@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-12 21:13+0200\n"
-"PO-Revision-Date: 2020-09-12 21:24+0200\n"
+"POT-Creation-Date: 2020-09-12 21:30+0200\n"
+"PO-Revision-Date: 2020-09-12 21:32+0200\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -826,7 +826,7 @@ msgstr "Wählen Sie einen Kurs zum Kopieren"
 #: admin/addcourse.php:72 admin/forms.php:1385 assessment/showtest.php:1769
 #: assessment/showtest.php:2705 assessment/showtest.php:3562 ltihome.php:289
 #: assess2/AssessUtils.php:174 admin/forms.php:1383 admin/forms.php:1415
-#: admin/forms.php:1416
+#: admin/forms.php:1416 validate.php:114
 msgid "Continue"
 msgstr "Fortfahren"
 
@@ -14967,3 +14967,7 @@ msgstr ""
 #: includes/setSectionGroups.php:7 includes/setSectionGroups.php:67
 msgid "(No section)"
 msgstr "(Kein Abschnitt)"
+
+#: validate.php:112
+msgid "You have requested guest access to a course."
+msgstr "Sie wollen einem Kurs als Gast beitreten."
