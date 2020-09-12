@@ -293,6 +293,15 @@ export const actions = {
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     store.inTransit = true;
     const data = {};
+    // get values again, in case event trigger didn't happen
+    window.$('.swbox').each(function() {
+      const qn = parseInt(this.id.substr(2));
+      if (!store.assessInfo.questions[qn].hasOwnProperty('work') ||
+        this.value !== store.assessInfo.questions[qn].work
+      ) {
+        store.work[qn] = this.value;
+      }
+    });
     for (const qn in store.work) {
       data[qn] = store.work[qn];
     }
@@ -374,6 +383,10 @@ export const actions = {
     let changedWork = false;
     for (let k = 0; k < qns.length; k++) {
       const qn = parseInt(qns[k]);
+      // get work again, in case triggers didn't work
+      if (document.getElementById('sw' + qn)) {
+        store.work[qn] = document.getElementById('sw' + qn).value;
+      }
       if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
         changedWork = true;
         break;
