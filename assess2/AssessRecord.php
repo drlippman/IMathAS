@@ -1746,11 +1746,11 @@ class AssessRecord
       } else if ($qsettings['showans'] === 'never') {
         $showansparts[$pn] = false;
         $showans = false;
-      } else if ($qsettings['showans'] === 'after_lastattempt' && $partattemptn[$pn] === $trylimit) {
+      } else if ($qsettings['showans'] === 'after_lastattempt' && $partattemptn[$pn] >= $trylimit) {
         $showansparts[$pn] = true;  // show after last attempt
       } else if (!empty($qsettings['jump_to_answer']) && !empty($qver['jumptoans'])) {
         $showansparts[$pn] = true;  // show after jump to answer pressed
-      } else if ($qsettings['showans'] === 'with_score' && $showscores && $partattemptn[$pn] > 0) {
+      } else if ($qsettings['showans'] === 'with_score' && $showscores && $partattemptn[$pn] >= $trylimit) {
         $showansparts[$pn] = true; // show with score
       } else if ($qsettings['showans'] === 'after_n' && $partattemptn[$pn] >= $qsettings['showans_aftern']) {
         $showansparts[$pn] = true; // show after n attempts
