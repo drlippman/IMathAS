@@ -108,8 +108,10 @@ class CalculatedIntervalAnswerBox implements AnswerBox
                 '" />';
 
     		if (!isset($hidepreview)) {
-    			$params['preview'] = 1;
-    			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
+                $params['preview'] = 1;
+                $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                $preview .= '</button> &nbsp;';
     		}
     		$preview .= "<span id=p$qn></span> ";
 
