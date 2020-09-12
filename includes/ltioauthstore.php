@@ -82,9 +82,10 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 	    $now = time();
 	    $stm = $DBH->prepare("INSERT INTO imas_ltinonces (nonce,time) VALUES (:nonce, :time)");
 	    $stm->execute(array(':nonce'=>$nonce, ':time'=>$now));
-
-	    $old = $now - 5400; //old stuff - 90 minutes
-	    $stm = $DBH->query("DELETE FROM imas_ltinonces WHERE time<$old"); //known INT - safe
+        if (rand(1,100) == 1) { // don't need to run every time; run with 1% probability
+	        $old = $now - 5400; //old stuff - 90 minutes
+            $stm = $DBH->query("DELETE FROM imas_ltinonces WHERE time<$old"); //known INT - safe
+        }
     }
 
     function mark_nonce_used($request) {

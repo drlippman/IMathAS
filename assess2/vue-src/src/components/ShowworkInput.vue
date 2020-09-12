@@ -3,7 +3,7 @@
     <textarea
       :id="computedId"
       ref="inbox"
-      class="fbbox"
+      class="fbbox swbox"
       :rows="rows"
     ></textarea>
   </div>
