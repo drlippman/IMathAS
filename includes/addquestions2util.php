@@ -193,5 +193,5 @@ function getQuestionsAsJSON($cid, $aid)
         }
     }
 
-    return $jsarr;
+    return array($jsarr, $existingq);
 }

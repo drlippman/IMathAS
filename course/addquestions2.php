@@ -33,7 +33,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$stm = $DBH->prepare("SELECT courseid,ver,submitby FROM imas_assessments WHERE id=?");
+	$stm = $DBH->prepare("SELECT courseid,ver,submitby,defpoints FROM imas_assessments WHERE id=?");
 	$stm->execute(array($aid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($row === null || $row['courseid'] != $cid) {
@@ -46,7 +46,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
     $aver = $row['ver'];
     $submitby = $row['submitby'];
-	$modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
+    $modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
+    $defpoints = $row['defpoints'];
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
@@ -374,6 +375,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
         var qsearchaddr = '$imasroot/course/qsearch.php?cid=$cid&aid=$aid';
         var aselectaddr = '$imasroot/course/assessselect.php?cid=$cid&aid=$aid';
+        var qsettingsaddr = '$imasroot/course/embedmodquestiongrid2.php?cid=$cid&aid=$aid';
 		var addqaddr = '$address';
 		var assessver = '$aver';
 		</script>";
@@ -494,7 +496,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
     
     require_once('../includes/addquestions2util.php');
-    $jsarr = getQuestionsAsJSON($cid, $aid);
+    list($jsarr,$existingq) = getQuestionsAsJSON($cid, $aid);
  
     if (isset($_SESSION['searchtype'.$aid])) {
         $searchtype = $_SESSION['searchtype'.$aid];
@@ -538,7 +540,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     require('../includes/questionsearch.php');
     $searchin = [7,376];
     $search_parsed = parseSearchString($searchterms);
-    $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin);
+    $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
+        'existing' => $existingq
+    ]);
 }
 
 
@@ -646,8 +650,8 @@ if ($overwriteBody==1) {
 		<?php echo _('Check:') ?> <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)"><?php echo _('None') ?></a>
 
 		<?php echo _('With Selected:') ?> <button type="button" onclick="removeSelected()"><?php echo _('Remove'); ?></button>
-				<button type="button" onclick="groupSelected()" ><?php echo _('Group'); ?></button>
-				<button type="submit" onclick="return confirm_textseg_dirty()"><?php echo _("Change Settings"); ?></button>
+			<button type="button" onclick="groupSelected()" ><?php echo _('Group'); ?></button>
+            <button type="button" onclick="if (confirm_textseg_dirty()) { modsettings();}"><?php echo _("Change Settings"); ?></button>
 
 <?php
 		}
@@ -801,7 +805,7 @@ if ($overwriteBody==1) {
             <li><a href="#" role="button" onclick="addusingdefaults(); return false;">
                 <?php echo _('Add using defaults'); ?>
             </a></li>
-            <li><a href="#" role="button">
+            <li><a href="#" role="button" onclick="addwithsettings(); return false;">
                 <?php echo _('Add and set options'); ?>
             </a></li>
         </ul>

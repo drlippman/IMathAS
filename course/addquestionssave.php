@@ -71,7 +71,7 @@
         $DBH->commit();
 
         require('../includes/addquestions2util.php');
-        $jsarr = getQuestionsAsJSON($cid, $aid);
+        list($jsarr,$existingqs) = getQuestionsAsJSON($cid, $aid);
         
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
