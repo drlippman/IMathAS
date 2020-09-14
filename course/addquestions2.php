@@ -395,6 +395,40 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         .searchbar .dropdown > button {
             margin:0;
         }
+        #searchwrap {
+            flex-grow: 1;
+            position: relative;
+        }
+        #searchwrap > #search {
+            width: calc(100% - 8px);
+            padding: 1px 2px;
+            margin: 0;
+            height: calc(100% - 6px);
+        }
+        #searchwrap.hastext > #search {
+            padding-right: 20px;
+            width: calc(100% - 26px);
+        }
+        #searchclear {
+            display:none;
+        }
+        #searchwrap.hastext #searchclear {
+            display: block;
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 1.4em;
+            line-height: 1em;
+            padding: 0 0.2em;
+            margin: 0.1em;
+            border: 0;
+            background-color: transparent;
+        }
+        #searchwrap.hastext #searchclear:hover,
+        #searchwrap.hastext #searchclear:focus {
+            background-color: #ccc;
+            outline: 0;
+        }
         .advsearch {
             width: 80vw;
             max-width: 800px;
@@ -723,9 +757,12 @@ if ($overwriteBody==1) {
         </ul>
     </div>
     <div style="flex-grow:1" class="flexrow">
-        <input type=text style="flex-grow:1" name=search id=search 
-            value="<?php echo Sanitize::encodeStringForDisplay($searchterms); ?>">
-
+        <div id="searchwrap" <?php if ($searchterms !== '') { echo 'class="hastext"';} ?>>
+            <input type=text name=search id=search  
+                value="<?php echo Sanitize::encodeStringForDisplay($searchterms); ?>">
+            <button type=button onclick="clearSearch()" 
+                id="searchclear" aria-label="Clear Search">&times;</button>
+        </div>
         <div class="dropdown splitbtn" id="searchbtngrp" >
             <button type="button" class="primary" onclick="doQuestionSearch()">
                 <?php echo _('Search');?>

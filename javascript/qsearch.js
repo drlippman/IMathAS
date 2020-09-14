@@ -3,6 +3,8 @@ $(function() {
         if (e.key == 'Enter') {
             doQuestionSearch();
         }
+    }).on('input', function (e) {
+        $("#searchwrap").toggleClass("hastext", e.currentTarget.value.trim() !== '');
     });
 });
 
@@ -56,6 +58,7 @@ function parseAdvSearch() {
     $("#search-words").val(haswords.join(' '));
     $("#search-exclude").val(excwords.join(' '));
 }
+
 
 function doAdvSearch() {
     var outstr = '';
@@ -117,6 +120,14 @@ function doQuestionSearch(offset) {
     }).fail(function() {
         $("#searcherror").show();
     });
+}
+
+function clearSearch() {
+    $("#search").val("");
+    $("#searchwrap").removeClass("hastext");
+    if (cursearchtype !== 'all') {
+        doQuestionSearch();
+    }
 }
 
 function displayQuestionList(results) {

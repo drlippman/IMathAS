@@ -60,8 +60,18 @@ require('../includes/questionsearch.php');
 $search = parseSearchString($_POST['search']);
 $offset = intval($_POST['offset']);
 
-// TODO: populate existing if unused is set
-$res = searchQuestions($search, $userid, $_POST['searchtype'], $libs, [], $offset);
+$options = [];
+if (!empty($search['unused'])) {
+    // populate existing if unused is set
+    $query = 'SELECT iqs.id FROM imas_questionset AS iqs
+        JOIN imas_questions AS iq ON iq.questionsetid=iqs.id
+        WHERE iq.assessmentid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($aid));
+    $options['existing'] = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+}
+
+$res = searchQuestions($search, $userid, $_POST['searchtype'], $libs, $options, $offset);
 
 echo json_encode($res, JSON_INVALID_UTF8_IGNORE);
 
