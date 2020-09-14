@@ -6,7 +6,14 @@
 
 
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$cid = Sanitize::courseId($_GET['cid']);
+    $cid = Sanitize::courseId($_GET['cid']);
+    if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+        $addq = 'addquestions2';
+        $from = 'addq2';
+    } else {
+        $addq = 'addquestions';
+        $from = 'from=addq';
+    }
 
 	if (isset($_GET['record'])) {
 
@@ -19,7 +26,7 @@
 				$upd_stm->execute(array(':category'=>$upd_category, ':id'=>$row[0]));
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addq.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	}
@@ -88,7 +95,7 @@ function getnextprev(formn,loc) {
 </script>
 END;
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Categorize Questions</div>\n";
+	echo "&gt; <a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Categorize Questions</div>\n";
 	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	$outcomenames = array();
@@ -189,7 +196,7 @@ END;
 	}
 
 	echo '<div id="headercategorize" class="pagetitle"><h1>Categorize Questions</h1></div>';
-	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
+	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&from=$from&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
 	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>Description</th><th class="sr-only">Preview</th><th>Category</th></tr></thead><tbody>';

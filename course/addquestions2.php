@@ -16,7 +16,7 @@ $pagetitle = _("Add/Remove Questions");
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid']) . "\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_GET['withdraw'])) {
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">"._("Add/Remove Questions")."</a> &gt; Confirm\n";
+	$curBreadcrumb .= "&gt; <a href=\"addquestions2.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">"._("Add/Remove Questions")."</a> &gt; Confirm\n";
 	//$pagetitle = "Modify Inline Text";
 } else {
 	$curBreadcrumb .= "&gt; "._("Add/Remove Questions")."\n";
@@ -61,7 +61,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($teacherid) && isset($_GET['addset'])) {
 		if (!isset($_POST['nchecked']) && !isset($_POST['qsetids'])) {
 			$overwriteBody = 1;
-			$body = _("No questions selected").".  <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
+			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else if (isset($_POST['add'])) {
 			if ($aver > 1) {
 				include("modquestiongrid2.php");
@@ -69,7 +69,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				include("modquestiongrid.php");
 			}
 			if (isset($_GET['process'])) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
 			}
 		} else {
@@ -127,14 +127,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			require_once("../includes/updateptsposs.php");
 			updatePointsPossible($aid, $itemorder, $row['defpoints']);
 
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		}
 	}
 	if (isset($_GET['modqs'])) {
 		if (!isset($_POST['checked']) && !isset($_POST['qids'])) {
 			$overwriteBody = 1;
-			$body = _("No questions selected").".  <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
+			$body = _("No questions selected").".  <a href=\"addquestions2.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
 		} else {
 			if ($aver > 1) {
 				include("modquestiongrid2.php");
@@ -142,7 +142,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				include("modquestiongrid.php");
 			}
 			if (isset($_GET['process'])) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
 			}
 		}
@@ -183,7 +183,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':assessmentid'=>$aid));
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -193,9 +193,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h2>".Sanitize::encodeStringForDisplay($assessmentname)."</h2>";
 			$body .= "<p>"._("Are you SURE you want to delete all attempts (grades) for this assessment?")."</p>";
-			$body .= '<form method="POST" action="'.sprintf('addquestions.php?cid=%s&aid=%d',$cid, $aid).'">';
+			$body .= '<form method="POST" action="'.sprintf('addquestions2.php?cid=%s&aid=%d',$cid, $aid).'">';
 			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions2.php?cid=$cid&aid=$aid';\"></p>\n";
 			$body .= '</form>';
 		}
 	}
@@ -338,7 +338,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
@@ -350,7 +350,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$overwriteBody = 1;
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h2>"._("Withdraw Question")."</h2>";
-			$body .= "<form method=post action=\"addquestions.php?cid=$cid&aid=$aid&withdraw=".Sanitize::encodeStringForDisplay($_GET['withdraw'])."\">";
+			$body .= "<form method=post action=\"addquestions2.php?cid=$cid&aid=$aid&withdraw=".Sanitize::encodeStringForDisplay($_GET['withdraw'])."\">";
 			if ($isingroup) {
 				$body .= '<p><b>'._('This question is part of a group of questions').'</b>.  </p>';
 				$body .= '<input type=radio name="withdrawtype" value="groupzero" > '._('Set points possible and all student scores to zero <b>for all questions in group</b>').'<br/>';
@@ -362,7 +362,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$body .= '<p>'._('This action can <b>not</b> be undone').'.</p>';
 			$body .= '<p><input type=submit value="Withdraw Question">';
-			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
+			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions2.php?cid=$cid&aid=$aid'\"></p>\n";
 
 			$body .= '</form>';
 		}
@@ -377,7 +377,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         var aselectaddr = '$imasroot/course/assessselect.php?cid=$cid&aid=$aid';
         var qsettingsaddr = '$imasroot/course/embedmodquestiongrid2.php?cid=$cid&aid=$aid';
 		var addqaddr = '$address';
-		var assessver = '$aver';
+        var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions2.js?v=042220\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort2.js?v=090320\"></script>";
@@ -610,18 +610,18 @@ if ($overwriteBody==1) {
         <span class="column">
 <?php
     echo '<a href="'.$addassess.'?id='.$aid.'&amp;cid='.$cid.'">'._('Assessment Settings').'</a>';
-    echo '<br><a href="categorize.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Categorize Questions').'</a>';
+    echo '<br><a href="categorize.php?aid='.$aid.'&amp;cid='.$cid.'&from=addq2">'._('Categorize Questions').'</a>';
     echo '<br><a href="';
     if (isset($CFG['GEN']['pandocserver'])) {
         echo 'printlayoutword.php?cid='.$cid.'&aid='.$aid;
     } else {
         echo 'printlayoutbare.php?cid='.$cid.'&aid='.$aid;
     }
-    echo '">'._('Create Print Version').'</a>';
+    echo '&from=addq2">'._('Create Print Version').'</a>';
     echo '</span><span class="column">';
-    echo '<a href="assessendmsg.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define End Messages').'</a>';
+    echo '<a href="assessendmsg.php?aid='.$aid.'&amp;cid='.$cid.'&from=addq2">'._('Define End Messages').'</a>';
     if ($aver > 1 && $submitby == 'by_assessment') {
-        echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Define Auto-Excuse').'</a>';
+        echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'&from=addq2">'._('Define Auto-Excuse').'</a>';
     }
     echo '</span><br class=clear /></div>';
 	if ($beentaken) {
@@ -629,7 +629,7 @@ if ($overwriteBody==1) {
 	<h2><?php echo _("Warning") ?></h2>
 	<p><?php echo _("This assessment has already been taken.  Adding or removing questions, or changing a	question's settings (point value, penalty, attempts) now would majorly mess things up. If you want to make these changes, you need to clear all existing assessment attempts") ?>
 	</p>
-	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
+	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions2.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
 	</p>
 <?php
 	}
@@ -668,7 +668,7 @@ if ($overwriteBody==1) {
 
 	} else {
 ?>
-	<form id="curqform" method="post" action="addquestions.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
+	<form id="curqform" method="post" action="addquestions2.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
 <?php
 		if (!$beentaken) {
 			/*

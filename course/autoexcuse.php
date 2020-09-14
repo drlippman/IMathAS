@@ -13,6 +13,13 @@ if (empty($_GET['aid'])) {
 }
 
 $aid = intval($_GET['aid']);
+if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+    $addq = 'addquestions2';
+    $from = 'addq2';
+} else {
+    $addq = 'addquestions';
+    $from = 'addq';
+}
 
 $stm = $DBH->prepare('SELECT submitby,ver,autoexcuse FROM imas_assessments WHERE id=? AND courseid=?');
 $stm->execute(array($aid, $cid));
@@ -67,7 +74,7 @@ if (isset($_POST['cat']) || isset($_POST['newcat'])) {
         AssessHelpers::retotalAll($cid, $aid, false);
     }
 
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addq.php?cid=$cid&aid=$aid");
     exit;
 }
 
@@ -209,16 +216,16 @@ $(function() {
 </script>
 <?php
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-echo "&gt; <a href=\"addquestions.php?cid=$cid&amp;aid=$aid\">"._('Add/Remove Questions')."</a> ";
+echo "&gt; <a href=\"$addq.php?cid=$cid&amp;aid=$aid\">"._('Add/Remove Questions')."</a> ";
 echo "&gt; "._('Auto Excuse')."</div>";
 
 echo '<div class="pagetitle"><h1>' . _('Auto Excuse') . '</h1></div>';
 
 echo '<div class="cpmid">';
-echo '<a href="categorize.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Categorize Questions').'</a>';
+echo '<a href="categorize.php?aid='.$aid.'&amp;cid='.$cid.'&from='.$from.'">'._('Categorize Questions').'</a>';
 echo '</div>';
 
-echo "<form method=\"post\" action=\"autoexcuse.php?cid=$cid&amp;aid=$aid\" />";
+echo "<form method=\"post\" action=\"autoexcuse.php?cid=$cid&amp;aid=$aid&from=$from\" />";
 echo '<p>'._('This page allows you to automatically excuse students from other assessments based on their scores on this assessment.');
 echo ' '._('This can be based on their overall score, or on their score with question categories.');
 echo ' '._('This feature will not work with LMS integration.').'</p>';

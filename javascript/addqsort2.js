@@ -1560,7 +1560,7 @@ function generateTable() {
                     curcid +
                     "&loc=" +
                     (curisgroup ? curqnum + 1 + "-" + (j + 1) : curqnum + 1) +
-                    '">' +
+                    '&from=addq2">' +
                     _("Change Settings") +
                     "</a></li>";
                 if (curitems[j][5] == 1) {
@@ -1573,7 +1573,7 @@ function generateTable() {
                         curaid +
                         "&cid=" +
                         curcid +
-                        '">' +
+                        '&from=addq2">' +
                         _("Edit Code") +
                         "</a></li>"; //edit
                 } else {
@@ -1584,7 +1584,7 @@ function generateTable() {
                         curaid +
                         "&cid=" +
                         curcid +
-                        '">' +
+                        '&from=addq2">' +
                         _("View Code") +
                         "</a></li>";
                     html +=
@@ -1596,13 +1596,13 @@ function generateTable() {
                         curaid +
                         "&cid=" +
                         curcid +
-                        '">' +
+                        '&from=addq2">' +
                         _("Edit Personal Copy") +
                         "</a></li>"; //edit makelocal
                 }
                 if (beentaken) {
                     html +=
-                        '<li><a href="addquestions.php?aid=' +
+                        '<li><a href="addquestions2.php?aid=' +
                         curaid +
                         "&cid=" +
                         curcid +
@@ -1613,7 +1613,7 @@ function generateTable() {
                         'onclick="return confirmclearattempts()">Clear Attempts</a></li>'; //add link
                     if (curitems[j][6] != 1) {
                         html +=
-                            '<li><a href="addquestions.php?aid=' +
+                            '<li><a href="addquestions2.php?aid=' +
                             curaid +
                             "&cid=" +
                             curcid +
@@ -1639,7 +1639,7 @@ function generateTable() {
                         curitems[j][0] +
                         "&qsid=" +
                         curitems[j][1] +
-                        '">' +
+                        '&from=addq2">' +
                         _("Re-score Question") +
                         "</a></li>";
                 } else {
@@ -1650,7 +1650,7 @@ function generateTable() {
                         curaid +
                         "&cid=" +
                         curcid +
-                        '">' +
+                        '&from=addq2">' +
                         _("Template") +
                         "</a></li>"; //add link
                     html +=
@@ -1664,25 +1664,6 @@ function generateTable() {
                     html += '<li><a href="#" onclick="addtextsegment(' + i + '); return false;">' + _('Add Text Before') + '</a></li>';
                 }
                 html += '</ul></div>';
-                /*
-                html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"&loc="+(curisgroup?(curqnum+1)+'-'+(j+1):curqnum+1)+"\">Change</a></td>"; //settings
-                if (curitems[j][5]==1) {
-                    html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
-                } else {
-                    html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit makelocal
-                }
-                if (beentaken) {
-                    html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link
-                    if (curitems[j][6]==1) {
-                        html += "<td><span class='red'>Withdrawn</span></td>";
-                    } else {
-                        html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?curqitemloc+'-'+j:curqitemloc)+"\">Withdraw</a></td>";
-                    }
-                } else {
-                    html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
-                    html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
-                }
-                */
             }
             html += "</tr>";
             ln++;
@@ -1824,7 +1805,6 @@ function submitChanges() {
     }
     $.ajax({
         type: "POST",
-        //url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid",
         url: AHAHsaveurl,
         async: false,
         data: outdata
