@@ -260,10 +260,6 @@ export default {
       store.errorMsg = event.data;
     },
     jumpTo (newCueNum, newToshow) {
-      if (this.ytplayer === null || typeof this.ytplayer.seekTo !== 'function') {
-        store.errorMsg = 'ytnotready';
-        return;
-      }
       if (newCueNum === -1 || newToshow === 'q') {
         // if showing a question, pause the video
         this.exitFullscreen();
@@ -271,6 +267,10 @@ export default {
           this.ytplayer.pauseVideo();
         }
       } else {
+        if (this.ytplayer === null || typeof this.ytplayer.seekTo !== 'function') {
+          store.errorMsg = 'ytnotready';
+          return;
+        }
         const newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
         if (newToshow === 'v') {
