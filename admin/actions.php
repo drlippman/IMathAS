@@ -66,7 +66,7 @@ switch($_POST['action']) {
 		}
 
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$_POST['adminname']));
+		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($_POST['SID'])));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$chgSID = true;
 		if ($row != null) {
