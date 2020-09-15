@@ -195,6 +195,9 @@ export const actions = {
     data.append('practice', store.assessInfo.in_practice);
     data.append('regen', regen ? 1 : 0);
     data.append('jumptoans', jumptoans ? 1 : 0);
+    if (store.assessInfo.preview_all) {
+      data.append('preview_all', true);
+    }
     if (Object.keys(store.autosaveQueue).length > 0) {
       actions.clearAutosaveTimer();
       this.addAutosaveData(data);
@@ -698,6 +701,9 @@ export const actions = {
 
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
+    }
+    if (store.assessInfo.preview_all) {
+      data.append('preview_all', true);
     }
     if (async === false && navigator.sendBeacon) {
       navigator.sendBeacon(

@@ -50,6 +50,8 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -59,7 +61,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes');
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
   }
 } else {
   echo '{"error": "not_avail"}';
