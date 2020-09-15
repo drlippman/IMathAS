@@ -25,7 +25,7 @@ export default {
   },
   watch: {
     active: function (newVal, oldVal) {
-      if (newVal === false) {
+      if (newVal === false && this.html !== '') {
         pauseVideos(this.$refs.introtext);
       }
     }

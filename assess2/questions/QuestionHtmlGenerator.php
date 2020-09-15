@@ -664,8 +664,8 @@ class QuestionHtmlGenerator
                 }
               }
               if ($lastGroupDone) { // add html to output
-                $newqtext .= '<p class="seqsep">';
-                $newqtext .= sprintf(_('Part %d/%d'), $k+1, count($seqParts));
+                $newqtext .= '<p class="seqsep" role="heading">';
+                $newqtext .= sprintf(_('Part %d of %d'), $k+1, count($seqParts));
                 $newqtext .= '</p>' . $seqPart;
               }
               $lastGroupDone = $thisGroupDone;
