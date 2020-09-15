@@ -9,7 +9,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink","modes","forceonemode");
+ "csvdownloadlink","modes","forceonemode","dotplot");
 
 //nCr(n,r)
 //The Choose function
@@ -2103,5 +2103,97 @@ function csvdownloadlink() {
     . _('Download CSV').'</a>';
 }
 
+//dotplot(array,label,[dot spacing, axis spacing,width,height])
+//display macro.  Creates a dotplot from a data set
+// array: array of data values
+// label: title of the dotplot that will be placed below horizontal axis
+// dot spacing: spacing of dots; data will be rounded to nearest (def 1)
+// axis spacing: spacing of axis labels (defaults to dot spacing) 
+// width,height (optional): width and height in pixels of graph
+function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) {
+	if (!is_array($a)) {
+		echo 'dotplot expects an array';
+		return false;
+    }
+    if ($dotspace <= 0) {
+        $dotspace = 1;
+    }
+    if ($labelspace === null || $labelspace <= 0) {
+        $labelspace = $dotspace;
+    }
+
+	sort($a, SORT_NUMERIC);
+
+    $start = round($a[0]/$dotspace)*$dotspace;
+	
+	$x = $start;
+	$curr = 0;
+	$alt = "Dotplot for $label <table class=stats><thead><tr><th>Value of Each Dot</th><th>Number of Dots</th></tr></thead>\n<tbody>\n";
+	$maxfreq = 0;
+	
+	// 
+	$dx = $dotspace;
+
+    // Create the stack of dots 
+	while ($i < count($a)) {
+		$alt .= "<tr><td>$x</td>";
+		$i = $curr;
+		$j = 0.1;
+  
+		while (($a[$i] < $x+.5*$dx) && ($i < count($a))) {
+			$i++;
+			$j = $j + 0.6;
+			$st .= "dot([$x,$j]);";
+		}
+		
+		$x += $dx;
+		
+		if (($i-$curr)>$maxfreq) { 
+			$maxfreq = $i-$curr;
+		}
+			
+		$alt .= "<td>" . ($i-$curr) . "</td></tr>\n";
+		$curr = $i;
+	}
+  	
+	$alt .= "</tbody></table>\n";
+
+	if ($_SESSION['graphdisp']==0) {
+		return $alt;
+	}
+	
+
+	// Start tick marks at the start value
+	$x = $start;
+	
+	// y-values for the size of the tick mark lines
+	$tm = -0.025*$maxfreq;
+	$tx = 0.025*$maxfreq;
+
+	// initialize 
+	$outst = "";
+	 
+	// Draw the horizontal axes
+    // draws the tick marks for the axes.
+    $startlabel = floor($start/$labelspace+1e-12)*$labelspace;
+    $maxx = round($a[count($a)-1]/$dotspace)*$dotspace;
+    $endlabel = ceil($maxx/$labelspace-1e-12)*$labelspace;
+    for ($x=$startlabel; $x <=$endlabel; $x+=$labelspace) {
+        $outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+    }  
+	
+	//initializes SVG frame and canvas.
+	$initst = "setBorder(20,40,20,10);initPicture($startlabel,$endlabel,0,$maxfreq);";
+  	
+	//xtick,ytick,{labels,xgrid,ygrid,dox,doy}
+	//,1,null,$step); fill=\"blue\";
+	//$initst .= "axes(null,null,null,null,null,0,0); fill=\"blue\"; textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$initst .="textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$x1 = $startlabel - .2*$labelspace;
+	$x2 = $endlabel + .2*$labelspace;
+	$initst .="line([$x1,0],[$x2,0]);";
+	$outst = $initst.$outst.$st;
+	return showasciisvg($outst,$width,$height);
+  }
 
 ?>
