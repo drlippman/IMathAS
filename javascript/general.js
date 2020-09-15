@@ -549,7 +549,8 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+        snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+        autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
 			items: [
