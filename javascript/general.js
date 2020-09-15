@@ -1071,6 +1071,7 @@ jQuery(function($) {
 				$("#ltimenudiv").html(msg);
                 btn.attr("data-loaded",1);
                 document.cookie = "fromltimenu=1;" 
+                    + 'path=' + ((imasroot=='') ? '/' : imasroot) + ';'
                     + ((window.location.protocol=='https:') ? "secure; samesite=none" : "");
 				sendLTIresizemsg();
 			});
