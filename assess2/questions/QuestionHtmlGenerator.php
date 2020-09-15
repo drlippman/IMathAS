@@ -550,6 +550,19 @@ class QuestionHtmlGenerator
         $answerbox = $this->adjustPreviewLocation($answerbox, $toevalqtxt, $previewloc);
 
         /*
+         * Possibly adjust the showanswer if it doesn't look right
+         */
+        if (isset($showanswer) && is_array($showanswer) && count($showanswer) < count($answerbox)) {
+            $showansboxloccnt = substr_count($toevalqtxt,'$showanswerloc') + substr_count($toevalqtxt,'[SAB');
+            if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
+                // not enough showanswerloc boxes for all the parts.  Question may be utilizing
+                // older question hackery which doesn't work in new player
+                // combine to a single showanswer
+                $questionWriterVars['showanswer'] = implode('<br>', $showanswer);
+                $toevalqtxt = preg_replace('/(\$showanswerloc\[.*?\]|\[SAB.*?\])(\s*<br\/><br\/>)?/','', $toevalqtxt);
+            }
+        }
+        /*
          * Get the "Show Answer" button location.
          */
 
