@@ -184,7 +184,7 @@ $(function() {
                 name: 'newaid['+newcnt+']',
                 value: newaid
             }))
-            .append('A score of ')
+            .append('<?php echo _('A score of').' '; ?>')
             .append($('<input>', {
                 type: 'text',
                 name: 'newsc['+newcnt+']',
@@ -229,7 +229,7 @@ if ($beentaken) {
     echo '</p>';
 }
 
-echo '<h2>Rules:</h2>';
+echo '<h2>'._('Rules').':</h2>';
 
 echo '<ul id="rules">';
 
@@ -282,6 +282,5 @@ echo '<p><button type="submit">'._('Save Changes').'</button></p>';
 echo '</form>';
 
 require('../footer.php');
-
 
 

@@ -24,14 +24,16 @@
 		exit;
 	}
 
-	$pagetitle = "Categorize Questions";
+	$pagetitle = _("Categorize Questions");
 	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 	require("../header.php");
+	$warn_cat=_("Are you SURE you want to reset all categories to Uncategorized/Default?");
+	$custom=_("Custom");
 	echo <<<END
 <script>
 function addcategory() {
 	var name = document.getElementById("newcat").value;
-	$('select optgroup[label=Custom]').append('<option value="'+name+'">'+name+'</option>');
+	$('select optgroup[label=$custom]').append('<option value="'+name+'">'+name+'</option>');
 	document.getElementById("newcat").value='';
 }
 function quickpick() {
@@ -51,7 +53,7 @@ function massassign() {
 }
 
 function resetcat() {
-	if (confirm("Are you SURE you want to reset all categories to Uncategorized/Default?")) {
+	if (confirm('$warn_cat')) {
 		$('select.qsel').val(0);
 	}
 }
@@ -88,7 +90,7 @@ function getnextprev(formn,loc) {
 </script>
 END;
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Categorize Questions</div>\n";
+	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Categorize Questions")."</div>\n";
 	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	$outcomenames = array();
@@ -188,23 +190,23 @@ END;
 		}
 	}
 
-	echo '<div id="headercategorize" class="pagetitle"><h1>Categorize Questions</h1></div>';
+	echo '<div id="headercategorize" class="pagetitle"><h1>'._('Categorize Questions').'</h1></div>';
 	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
-	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
-	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>Description</th><th class="sr-only">Preview</th><th>Category</th></tr></thead><tbody>';
+	echo _('Check').': <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">'._('All').'</a> ';
+	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">'._('None').'</a>';
+	echo '<table class="gb"><thead><tr><th></th><th>Q#</th><th>'._('Description').'</th><th class="sr-only">'._('Preview').'</th><th>'._('Category').'</th></tr></thead><tbody>';
 
 	foreach($itemarr as $qid) {
 		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
 		echo "<td>Q" . Sanitize::encodeStringForDisplay($itemnum[$qid]) . '</td><td>';
 		echo Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td>";
-		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/></td>", Sanitize::onlyInt($qid), Sanitize::onlyInt($qsetids[$qid]));
+		printf("<td><input type=button value=\""._("Preview")."\" onClick=\"previewq('selform', %d, %d);\"/></td>", Sanitize::onlyInt($qid), Sanitize::onlyInt($qsetids[$qid]));
 		echo "<td><select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
-		echo ">Uncategorized or Default</option>\n";
+		echo ">"._("Uncategorized or Default")."</option>\n";
 		if (count($outcomes)>0) {
-			echo '<optgroup label="Outcomes"></optgroup>';
+			echo '<optgroup label="'._('Outcomes').'"></optgroup>';
 		}
 		$ingrp = false;
 		$issel = false;
@@ -221,7 +223,7 @@ END;
 		}
 		if ($ingrp) { echo '</optgroup>';}
 		if (isset($questionlibs[$qid])) {
-			echo '<optgroup label="Libraries">';
+			echo '<optgroup label="'._('Libraries').'">';
 			foreach ($questionlibs[$qid] as $qlibid) {
 				echo "<option value=\"" . Sanitize::encodeStringForDisplay($libnames[$qlibid]) . "\" ";
 				if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
@@ -231,7 +233,7 @@ END;
 		}
 
 		if (isset($qsetidassessment[$qsetids[$qid]])) {
-			echo '<optgroup label="Assessments">';
+			echo '<optgroup label="'._('Assessments').'">';
 			//add assessment names as options
 			foreach ($qsetidassessment[$qsetids[$qid]] as $qaid) {
 				echo '<option value="AID-'.$qaid.'" ';
@@ -241,7 +243,7 @@ END;
 			echo '</optgroup>\n';
 		}
 
-		echo '<optgroup label="Custom">';
+		echo '<optgroup label="'._('Custom').'">';
 		foreach ($extracats as $cat) {
 			echo "<option value=\"" . Sanitize::encodeStringForDisplay($cat) . "\" ";
 			if ($category[$qid] == $cat && !$issel) { echo "selected=1";$issel = true;}
@@ -252,7 +254,7 @@ END;
 	}
 	echo "</tbody></table>\n";
 	if (count($outcomes)>0) {
-		echo '<p>Apply outcome to selected: <select id="masssel">';
+		echo '<p>'._('Apply outcome to selected').': <select id="masssel">';
 		$ingrp = false;
 		$issel = false;
 		foreach ($outcomes as $oc) {
@@ -268,15 +270,15 @@ END;
 		echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
 
 	}
-echo "<p>Select first listed <select id=\"label\">\n";
-echo "<option value=\"Libraries\">Libraries</option>";
-echo "<option value=\"Assessments\">Assessments</option>";
+echo "<p>"._("Select first listed")." <select id=\"label\">\n";
+echo "<option value=\""._("Libraries")."\">"._("Libraries")."</option>";
+echo "<option value=\""._("Assessments")."\">"._("Assessments")."</option>";
 echo "</select>\n";
-echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+echo _("for all uncategorized questions").": <input type=button value=\""._("Quick Pick")."\" label=\"XXX\" onclick=\"quickpick()\"></p>\n";
 
-	echo "<p>Add new category to lists: <input type=text id=\"newcat\" size=40> ";
-	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-	echo '<p><input type=submit value="Record Categorizations"> and return to the Add/Remove Questions page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
+	echo "<p>"._("Add new category to lists").": <input type=text id=\"newcat\" size=40> ";
+	echo "<input type=button value=\""._("Add Category")."\" onclick=\"addcategory()\"></p>\n";
+	echo '<p><input type=submit value="'._('Record Categorizations').'"> '._('and return to the Add/Remove Questions page').'.  <input type="button" class="secondarybtn" value="'._('Reset').'" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 
 	require("../footer.php");

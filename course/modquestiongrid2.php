@@ -175,7 +175,7 @@
         ];
         $defaults['showwork'] = $showworkoptions[$defaults['showwork']];
 
-		$pagetitle = "Question Settings";
+		$pagetitle = _("Question Settings");
 		$placeinhead = '<script type="text/javascript">
 			function previewq(qn) {
 			  previewpop = window.open(imasroot+"/course/testquestion2.php?cid="+cid+"&qsetid="+qn,"Testing","width="+(.4*screen.width)+",height="+(.8*screen.height)+",scrollbars=1,resizable=1,status=1,top=20,left="+(.6*screen.width-20));
@@ -193,13 +193,13 @@
 			</script>';
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
+		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 
-		echo "Question Settings</div>\n";
+		echo _("Question Settings")."</div>\n";
 
 ?>
-<div id="headermodquestiongrid" class="pagetitle"><h1>Modify Question Settings</h1></div>
-<p>For more advanced settings, modify the settings for individual questions after adding.</p>
+<div id="headermodquestiongrid" class="pagetitle"><h1><?php echo _("Modify Question Settings"); ?></h1></div>
+<p><?php echo _("For more advanced settings, modify the settings for individual questions after adding."); ?></p>
 <?php
 if (isset($_POST['checked'])) { //modifying existing
 	echo "<form method=post action=\"addquestions.php?modqs=true&process=true&cid=$cid&aid=$aid\">";
@@ -207,7 +207,7 @@ if (isset($_POST['checked'])) { //modifying existing
 	echo "<form method=post action=\"addquestions.php?addset=true&process=true&cid=$cid&aid=$aid\">";
 }
 ?>
-<p>Leave items blank to use the assessment's default values</p>
+<p><?php echo _("Leave items blank to use the assessment's default values"); ?></p>
 <table class=gb>
 <thead><tr>
 <?php
@@ -276,10 +276,10 @@ if (isset($_POST['checked'])) { //modifying existing
 				$qrows[$row['id']] .= '</tr>';
 			}
 			echo "<th>Q#<br/>&nbsp;</th><th>Description<br/>&nbsp;</th><th></th><th></th>";
-			echo '<th>Tries<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
-			echo '<th>Show Hints &amp; Videos?<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
-			echo '<th>Show Work?<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['showwork']).'</i></th>';
-			echo "<th>Copies to Add<br/>&nbsp;</th></tr></thead>";
+			echo '<th>'._('Tries').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
+			echo '<th>'._('Show Hints &amp; Videos?').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
+			echo '<th>'._('Show Work?').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['showwork']).'</i></th>';
+			echo "<th>"._("Copies to Add")."<br/>&nbsp;</th></tr></thead>";
 			echo "<tbody>";
 			$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
@@ -307,12 +307,12 @@ if (isset($_POST['checked'])) { //modifying existing
 			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 
 		} else { //adding new questions
-			echo "<th>Description</th><th></th><th></th>";
-			echo '<th>Points<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defpoints']).'</i></th>';
-			echo '<th>Tries<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
-            echo '<th>Show Hints &amp; Videos?<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
-			echo '<th>Show Work?<br/><i class="grey">Default: '.Sanitize::encodeStringForDisplay($defaults['showwork']).'</i></th>';
-			echo "<th>Copies to Add</th></tr></thead>";
+			echo "<th>"._("Description")."</th><th></th><th></th>";
+			echo '<th>'._('Points').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['defpoints']).'</i></th>';
+			echo '<th>'._('Tries').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
+            echo '<th>'._('Show Hints &amp; Videos?').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['showhints']).'</i></th>';
+			echo '<th>'._('Show Work?').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['showwork']).'</i></th>';
+			echo "<th>"._("Copies to Add")."</th></tr></thead>";
 			echo "<tbody>";
 			$checked = implode(',', array_map('intval', $_POST['nchecked']));
 			$stm = $DBH->query("SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ($checked)");
@@ -380,4 +380,3 @@ if (isset($_POST['checked'])) { //modifying existing
 		require("../footer.php");
 		exit;
 	}
-?>

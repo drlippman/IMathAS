@@ -109,9 +109,9 @@
     $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
         
      echo '<form method=post action="'.$formAction.'">';
-     echo '<p>You have requested guest access to a course.</p>';
+     echo '<p>'._('You have requested guest access to a course.').'</p>';
  	 	 echo '<p><button type=button onclick="location.href=\''.$imasroot.'/index.php\'">',_('Nevermind'),'</button> ';
-     echo '<button type=submit>Continue</button>';
+     echo '<button type=submit>'._('Continue').'</button>';
      echo '<input type=hidden id=tzname name=tzname />';
      echo '<script type="text/javascript">
      $(function() {
