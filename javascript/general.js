@@ -504,7 +504,7 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-var tinyMCEPreInit = {base: imasroot+"/tinymce4"};
+var tinyMCEPreInit = {base: staticroot+"/tinymce4"};
 function initeditor(edmode,edids,css,inline,setupfunction){
 	var cssmode = css || 0;
 	var inlinemode = inline || 0;
@@ -530,7 +530,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
-		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
+		content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
 		file_picker_callback: filePickerCallBackFunc,
