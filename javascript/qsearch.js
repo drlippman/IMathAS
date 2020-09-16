@@ -130,6 +130,16 @@ function clearSearch() {
     }
 }
 
+function getExistingQuestions(qlist,flattened) {
+    for (var i in qlist) {
+        if (qlist[i][0]=="text") { continue; }
+        if (typeof qlist[i][2] == 'object') {
+            getExistingQuestions(qlist[i][2], flattened);
+        } else {
+            flattened.push(qlist[i][1]);
+        }
+    }
+}
 function displayQuestionList(results) {
     var searchtype = 'libs';
     var colcnt = 8;
@@ -144,8 +154,12 @@ function displayQuestionList(results) {
         + '<th>'+_('Actions')+'</th>'
         + '</tr></thead>';
     var tbody = '<tbody>';
-    var i,q,row,features;
+    var i,q,row,features,descrclass,descricon;
     var lastlib = -1;
+    var existingq = [];
+    if (itemarray) {
+        getExistingQuestions(itemarray, existingq);
+    }
     for (var i in results['qs']) {
         // show lib/assess titles
         q = results['qs'][i];
@@ -191,8 +205,28 @@ function displayQuestionList(results) {
         }
         if (q['mine'] == 1) {
             features += '<span title="' + _('My Question') + '" aria-label="' + _('My Question') + '">' + 
-                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
                 '</span>';
+        }
+        if (q['userights'] == 0) {
+            features += '<span title="' + _('Private') + '" aria-label="' + _('Private') + '">' + 
+                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' +
+                '</span>';
+        }
+        descrclass = '';
+        descricon = '';
+        if (q['broken'] == 1) {
+            descrclass = ' class="qbroken"';
+            descricon = '<span title="' + _('Marked as broken') + '">' + 
+                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19.7 1.3 19.6 9 16.2 6.3 13.8 11.3 10.5 8.3 7 11.7 3.6 9.2l0-7.9z" class="a"></path><path d="m19.7 22.9 0-7.8-2-1.4-3.1 4-3.3-3-3.8 3.8-4-3.9v8.4z" class="a"></path></svg>' + 
+                '</span> ';
+        } else if (q['junkflag'] == 1) {
+            descrclass = ' class="qwronglib"';
+            descricon = '<span title="' + _('Marked as in wrong library') + '">' + 
+                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18.1 12.1C19.7 9.1 19 5.3 16.4 3.2 13.8 1 10 1 7.5 3.2 4.9 5.4 4.2 9.1 5.7 12.1l6.2 10.6z M9.5 11.5 14.5 6.5 M9.5 6.5 14.5 11.5"></path></svg>' +
+                '</span> ';
+        } else if (existingq.indexOf(parseInt(q['id'])) !== -1) {
+            descrclass = ' class="qinassess"';
         }
         // build action dropdown
         var actions = '<div class="dropdown">' +
@@ -206,7 +240,7 @@ function displayQuestionList(results) {
         // build row
         tbody += '<tr>'
             + '<td><input type=checkbox name="nchecked[]" id="qo'+i+'" value="'+q['id']+'"></td>'
-            + '<td>' + q['description'] + '</td>'
+            + '<td' + descrclass + '>' + descricon + q['description'] + '</td>'
             + '<td class="nowrap">' + features + '</td>'
             + '<td>' + q['id'] + '</td>'
             + '<td><button class="plain" type=button onclick="previewq(\'selq\',\'qo'+i+'\','+q['id']+',true,false)">'
@@ -250,4 +284,17 @@ function displayQuestionList(results) {
     } else {
         $("#searchprev").hide();
     }
+}
+
+function updateExistingMarkers() {
+    var existingq = [];
+    if (itemarray) {
+        getExistingQuestions(itemarray, existingq);
+
+    }
+    $("#selq tbody tr").each(function(i,el) {
+        if (el.childNodes.length == 1) { return; }
+        $(el.childNodes[1]).toggleClass('qinassess', 
+            existingq.indexOf(parseInt(el.childNodes[3].textContent)) !== -1);
+    });
 }

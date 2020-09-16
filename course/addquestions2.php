@@ -499,6 +499,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           #selq {
               margin-top: 10px;
           }
+          td.qbroken {
+              font-style: italic;
+              color: #f66;
+          }
+          td.qwronglib {
+              font-style: italic;
+              color: #333;
+          }
+          td.qinassess {
+              color: #999;
+          }
         </style>
         <script>
         $(function() {
