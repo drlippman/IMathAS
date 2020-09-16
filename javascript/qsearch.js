@@ -286,7 +286,7 @@ function displayQuestionList(results) {
     }
 }
 
-function updateExistingMarkers() {
+function updateInAssessMarkers() {
     var existingq = [];
     if (itemarray) {
         getExistingQuestions(itemarray, existingq);

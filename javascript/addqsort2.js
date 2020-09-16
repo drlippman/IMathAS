@@ -1814,7 +1814,7 @@ function submitChanges() {
             }
             document.getElementById(target).innerHTML = "";
             refreshTable();
-            updateExistingMarkers();
+            updateInAssessMarkers();
             updateSaveButtonDimming();
             //scroll to top if save action puts the curqtbl out of view
             if (
@@ -1860,7 +1860,7 @@ function addusingdefaults() {
 function doneadding(newq,addedqs) {
     itemarray = newq;
     refreshTable();
-    updateExistingMarkers();
+    updateInAssessMarkers();
     $("#selq input[type=checkbox]:checked").prop("checked", false);
     $("#addbar").hide();
 }
