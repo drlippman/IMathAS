@@ -180,7 +180,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$forumtype = Sanitize::onlyInt($_POST['forumtype']);
 		}
-		$forumid = Sanitize::onlyInt($_GET['id']);
+        $forumid = Sanitize::onlyInt($_GET['id']);
+        
+        // handle groupsetid
+        if ($_POST['groupsetid'] === 'bysec') {
+            // want to use by-section groups.  Create
+            require_once('../includes/setSectionGroups.php');
+            $groupsetid = createSectionGroupset($cid);
+        }
 
 		if (!empty($forumid)) {  //already have id; update
 			$stm = $DBH->prepare("SELECT groupsetid FROM imas_forums WHERE id=:id");
@@ -392,26 +399,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$postbytime = $deftime;
 		}
 
-		/*
-		$query = "SELECT id,name FROM imas_assessments WHERE isgroup>0 AND courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$i=0;
-		$page_groupSelect = array();
-		while ($row = mysql_fetch_row($result)) {
-			$page_groupSelect['val'][$i] = $row[0];
-			$page_groupSelect['label'][$i] = "Use groups of $row[1]";
-			$i++;
-		}
-		*/
+        $sectionGroup = 0;
 		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=0;
 		$page_groupSelect = array();
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            if ($row[1] == '##autobysection##') {
+                $sectionGroup = $row[0];
+                continue;
+            }
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 			$i++;
-		}
+        }
+        $page_groupSelect['val'][] = $sectionGroup > 0 ? $sectionGroup : 'bysec';
+        $page_groupSelect['label'][] = _('Use Course Sections');
+
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$page_gbcatSelect = array();

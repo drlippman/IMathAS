@@ -1104,14 +1104,16 @@ function makepretty($exp) {
 }
 
 function makexpretty($exp) {
-	if (is_array($exp)) {
+	/*if (is_array($exp)) {
 		for ($i=0;$i<count($exp);$i++) {
 			$exp[$i]=xclean($exp[$i]);
 		}
 	} else {
 		$exp = xclean($exp);
 	}
-	return $exp;
+    return $exp;
+    */
+    return makexxpretty($exp);
 }
 
 function makexxpretty($exp,$funcs=array()) {
@@ -1169,14 +1171,15 @@ function makeprettydisp($exp) {
 }
 
 function makexprettydisp($exp) {
-	if (is_array($exp)) {
+	/*if (is_array($exp)) {
 		for ($i=0;$i<count($exp);$i++) {
 			$exp[$i]="`".xclean($exp[$i])."`";
 		}
 	} else {
 		$exp = "`".xclean($exp)."`";
 	}
-	return $exp;
+    return $exp;*/
+    return makexxprettydisp($exp);
 }
 
 function makexxprettydisp($exp,$funcs=array()) {
@@ -2903,33 +2906,41 @@ function ineqtointerval($str, $var) {
 		return $str;
 	}
 	$str = strtolower($str);
-	$var = strtolower($var);
+    $var = strtolower($var);
+    $str = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/',"$1", $str);
 	if (preg_match('/all\s*real/', $str)) {
 		return '(-oo,oo)';
-	}
-	$pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
-	$cnt = count($pieces);
-	$pieces = array_map('trim', $pieces);
-	if ($cnt != 3 && $cnt != 5) {
-		return false; //invalid
-	} else if ($cnt == 5 && ($pieces[1][0] != $pieces[3][0] || $pieces[2] != $var)) {
-		return false; // mixes > with <
-	}
-	if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='>') {
-		return ($pieces[1]=='>'?'(':'[') . $pieces[2] . ',oo)';
-	} else if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='<') {
-		return '(-oo,' . $pieces[2] . ($pieces[1]=='<'?')':']');
-	} else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='>') {
-		return '(-oo,' . $pieces[0] . ($pieces[1]=='>'?')':']');
-	} else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='<') {
-		return ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',oo)';
-	} else if ($cnt==5 && $pieces[1][0]=='<') {
-		return ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',' .
-			$pieces[4] . ($pieces[3]=='<'?')':']');
-	} else if ($cnt==5 && $pieces[1][0]=='>') {
-		return ($pieces[3]=='>'?'(':'[') . $pieces[4] . ',' .
-			$pieces[0] . ($pieces[1]=='>'?')':']');
-	}
+    }
+    $outpieces = [];
+    $orpts = preg_split('/\s*or\s*/', $str);
+    foreach ($orpts as $str) {
+        $pieces = preg_split('/(<=?|>=?)/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $cnt = count($pieces);
+        $pieces = array_map('trim', $pieces);
+        if ($cnt != 3 && $cnt != 5) {
+            return false; //invalid
+        } else if ($cnt == 5 && ($pieces[1][0] != $pieces[3][0] || $pieces[2] != $var)) {
+            return false; // mixes > with <
+        }
+        if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='>') {
+            $outpieces[] = ($pieces[1]=='>'?'(':'[') . $pieces[2] . ',oo)';
+        } else if ($cnt==3 && $pieces[0]==$var && $pieces[1][0]=='<') {
+            $outpieces[] = '(-oo,' . $pieces[2] . ($pieces[1]=='<'?')':']');
+        } else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='>') {
+            $outpieces[] = '(-oo,' . $pieces[0] . ($pieces[1]=='>'?')':']');
+        } else if ($cnt==3 && $pieces[2]==$var && $pieces[1][0]=='<') {
+            $outpieces[] = ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',oo)';
+        } else if ($cnt==5 && $pieces[1][0]=='<') {
+            $outpieces[] = ($pieces[1]=='<'?'(':'[') . $pieces[0] . ',' .
+                $pieces[4] . ($pieces[3]=='<'?')':']');
+        } else if ($cnt==5 && $pieces[1][0]=='>') {
+            $outpieces[] = ($pieces[3]=='>'?'(':'[') . $pieces[4] . ',' .
+                $pieces[0] . ($pieces[1]=='>'?')':']');
+        }
+    }
+    if (count($outpieces) > 0) {
+        return implode('U', $outpieces);
+    }
 	return false;
 }
 
@@ -4132,14 +4143,27 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 	return array($answer, $showanswer);
 }
 
-//scoremultiorder($stua, $answer, $swap, [$type='string'])
+//scoremultiorder($stua, $answer, $swap, [$type='string', $weights])
 //allows groups of questions to be scored in different orders
 //only works if $stua and $answer are directly comparable (i.e. basic string type or exact number)
 //$swap is an array of entries of the form "1,2,3;4,5,6"  says to treat 1,2,3 as a group of questions.
+//$weights is answeights, and use function like $answer,$answeights = scoremultiorder(...) if set
 //comparison is made on first entry in group
-function scoremultiorder($stua, $answer, $swap, $type='string') {
-	if ($stua == null) {return $answer;}
-	$newans = $answer;
+function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
+	if ($stua == null) {
+        if ($weights !== null) {
+            return [$answer,$weights];
+        } else {
+            return $answer;
+        }
+    }
+    $newans = $answer;
+    if ($weights !== null) {
+        if (!is_array($weights)) {
+            $weights = explode(',', $weights);
+        }
+        $newweights = $weights;
+    }
 	foreach ($swap as $k=>$sw) {
 		$swap[$k] = explode(';', $sw);
 		foreach ($swap[$k] as $i=>$s) {
@@ -4159,20 +4183,34 @@ function scoremultiorder($stua, $answer, $swap, $type='string') {
 			}
 			if ($loc>-1 && $i!=$loc) {
 				//want to swap entries from $sw[$loc] with sw[$i] and swap $answer values
-				$tmp = array();
+                $tmp = array();
+                $tmpw = array();
 				foreach ($sw[$i] as $k=>$v) {
-					$tmp[$k] = $newans[$v];
+                    $tmp[$k] = $newans[$v];
+                    if ($weights !== null) {
+                        $tmpw[$k] = $newweights[$v];
+                    }
 				}
 				foreach ($sw[$loc] as $k=>$v) {
-					$newans[$sw[$i][$k]] = $newans[$v];
+                    $newans[$sw[$i][$k]] = $newans[$v];
+                    if ($weights !== null) {
+                        $newweights[$sw[$i][$k]] = $newweights[$v];
+                    }
 				}
 				foreach ($tmp as $k=>$v) {
-					$newans[$sw[$loc][$k]] = $tmp[$k];
+                    $newans[$sw[$loc][$k]] = $tmp[$k];
+                    if ($weights !== null) {
+                        $newweights[$sw[$loc][$k]] = $tmpw[$k];
+                    }
 				}
 			}
 		}
-	}
-	return $newans;
+    }
+    if ($weights !== null) {
+        return array($newans, $newweights);
+    } else {
+        return $newans;
+    }
 }
 
 function lensort($a,$b) {
@@ -4211,9 +4249,12 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 		$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
 	}
 	$epsilon = (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12));
-	if ($sigfigscoretype[0]=='abs' && $sigfigscoretype[1]==0) {
-		$sigfigscoretype[1] = pow(10,$v)/2;
-	}
+	if ($sigfigscoretype[0]=='abs') {
+		$sigfigscoretype[1] = max(pow(10,$v)/2, $sigfigscoretype[1]);
+	} else if ($sigfigscoretype[1]/100 * $anans < pow(10,$v)/2) {
+        // relative tolerance, but too small
+        $sigfigscoretype = ['abs', pow(10,$v)/2];
+    }
 	if (strpos($givenans,'E')!==false) {  //handle computer-style scientific notation
 		preg_match('/^-?[1-9]\.?(\d*)E/', $givenans, $matches);
 		$gasigfig = 1+strlen($matches[1]);
@@ -4243,7 +4284,7 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			}
 		}
 	}
-	//checked format, now check value
+    //checked format, now check value
 	if ($sigfigscoretype[0]=='abs') {
 		if (abs($anans-$givenans)< $sigfigscoretype[1]+$epsilon) {return true;}
 	} else if ($sigfigscoretype[0]=='rel') {

@@ -850,21 +850,22 @@ switch($_GET['action']) {
 			echo 'Start: <input name="defstime" type="text" size="8" value="'.Sanitize::encodeStringForDisplay($defstimedisp).'"/>, ';
 			echo 'end: <input name="deftime" type="text" size="8" value="'.Sanitize::encodeStringForDisplay($deftimedisp).'"/>';
 			echo '</span><br class="form"/>';
-		}
+        }
+        
+        echo "<span class=form>",_("Self-enrollment"),"</span><span class=formright>";
+        echo ' <label><input type=checkbox name="allowenroll" value="1" ';
+        if (($allowunenroll&2)==0) { echo "checked=1";}
+        echo '/> ',_('Allow students to self-enroll using Course ID and Key'),'</label>';
+        echo '</span><br class=form />';
 
-		if (!isset($CFG['CPS']['unenroll']) || $CFG['CPS']['unenroll'][1]==1) {
+        if ((isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==1) ||
+            ($myrights == 100 && ($istemplate&4)==4)
+        ) {
 			echo "<span class=form>",_("Allow students to self-<u>un</u>enroll"),"</span><span class=formright>";
 			echo '<input type=radio name="allowunenroll" value="0" ';
 			if (($allowunenroll&1)==0) { echo "checked=1";}
 			echo '/> ',_('No'),' <input type=radio name="allowunenroll" value="1" ';
 			if (($allowunenroll&1)==1) { echo "checked=1";}
-			echo '/> ',_('Yes'),' </span><br class=form />';
-
-			echo "<span class=form>",_("Allow students to self-enroll"),"</span><span class=formright>";
-			echo '<input type=radio name="allowenroll" value="2" ';
-			if (($allowunenroll&2)==2) { echo "checked=1";}
-			echo '/> ',_('No'),' <input type=radio name="allowenroll" value="0" ';
-			if (($allowunenroll&2)==0) { echo "checked=1";}
 			echo '/> ',_('Yes'),' </span><br class=form />';
 		}
 
@@ -1055,7 +1056,7 @@ switch($_GET['action']) {
 			if ($myrights==100) {
 				echo '<br/><input type=checkbox name="isselfenroll" value="4" ';
 				if (($istemplate&4)==4) {echo 'checked="checked"';};
-				echo ' /> ',_('Mark as self-enroll course');
+				echo ' /> ',_('Include in public self-enroll course list');
 				if (isset($CFG['GEN']['guesttempaccts'])) {
 					echo '<br/><input type=checkbox name="isguest" value="8" ';
 					if (($istemplate&8)==8) {echo 'checked="checked"';};

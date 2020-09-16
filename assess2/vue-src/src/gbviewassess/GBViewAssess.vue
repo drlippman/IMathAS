@@ -572,18 +572,19 @@ export default {
       actions.setFeedback(null, val);
     },
     setScoreOverride (evt) {
-      this.assessOverride = evt.target.value.trim();
+      const val = evt.target.value.trim();
+      if (val !== this.aData.scoreoverride) {
+        store.scoreOverrides.gen = val;
+        this.assessOverride = '';
+      }
       store.saving = '';
     },
     submitChanges (exit) {
-      if (this.showOverride && this.assessOverride !== '') {
-        store.scoreOverrides.gen = this.assessOverride;
-      } else if (this.aData.hasOwnProperty('scoreoverride') &&
-        this.assessOverride !== this.aData.scoreoverride
-      ) {
-        store.scoreOverrides.gen = this.assessOverride;
-      } else {
-        delete store.scoreOverrides.gen;
+      if (!this.aData.hasOwnProperty('scoreoverride') && this.showOverride) {
+        if (this.assessOverride !== '') {
+          store.scoreOverrides.gen = this.assessOverride;
+        }
+        this.showOverride = false;
       }
       var doexit = (exit === true);
       actions.saveChanges(doexit);

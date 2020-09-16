@@ -157,6 +157,14 @@ class ComplexScorePart implements ScorePart
             }
             $ganumarr[] = $gaparts;
         }
+        if ($anstype=='calccomplex' && !$hasNumVal) {
+            $givenansval = [];
+            foreach ($ganumarr as $ganumval) {
+                $givenansval[] = $ganumval[0] . ($ganumval[1]<0?'':'+') . $ganumval[1] . 'i';
+            }
+            $givenansval = implode(',', $givenansval);
+            $scorePartResult->setLastAnswerAsNumber($givenansval);
+        }
 
         $anarr = array_map('trim',explode(',',$answer));
         $annumarr = array();

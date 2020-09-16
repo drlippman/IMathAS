@@ -57,6 +57,7 @@ class FunctionExpressionScorePart implements ScorePart
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
 
         if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
 
@@ -381,7 +382,7 @@ class FunctionExpressionScorePart implements ScorePart
                 return $scorePartResult;
             }
         }
-        if ($rightanswrongformat!=-1) {
+        if ($rightanswrongformat!=-1 && !empty($formatfeedbackon)) {
             $scorePartResult->setCorrectAnswerWrongFormat(true);
         }
 

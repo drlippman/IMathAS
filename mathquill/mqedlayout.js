@@ -512,27 +512,6 @@ var myMQeditor = (function($) {
         }
       }
     }
-    // for both
-    if (vars.length > 0) {
-        var varbtns = getVarsButtons2(vars,layoutstyle);
-        if (varbtns.format == 'basic') {
-          baselayout.tabs[0].tabcontent.unshift({
-            flow: 'row',
-            s: 1,
-            contents: varbtns.btns
-          }, {s:.1});
-        } else {
-          baselayout.tabs.splice(1, 0, {
-            p: 'Vars',
-            enabled: true,
-            tabcontent: [{
-              flow: 'row',
-              s: varbtns.perrow,
-              contents: varbtns.btns
-            }]
-          });
-        }
-    }
     if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
@@ -565,6 +544,27 @@ var myMQeditor = (function($) {
         s: 1,
         contents: [{l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']}]
       }, {s:.1});
+    }
+    // for both
+    if (vars.length > 0) {
+        var varbtns = getVarsButtons2(vars,layoutstyle);
+        if (varbtns.format == 'basic') {
+          baselayout.tabs[0].tabcontent.unshift({
+            flow: 'row',
+            s: 1,
+            contents: varbtns.btns
+          }, {s:.1});
+        } else {
+          baselayout.tabs.splice(1, 0, {
+            p: 'Vars',
+            enabled: true,
+            tabcontent: [{
+              flow: 'row',
+              s: varbtns.perrow,
+              contents: varbtns.btns
+            }]
+          });
+        }
     }
     return baselayout;
   }

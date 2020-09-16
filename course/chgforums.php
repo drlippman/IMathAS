@@ -210,15 +210,7 @@ $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$forumitems[$row[0]] = $row[1];
 }
-$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
-$stm->execute(array(':courseid'=>$cid));
-$i=0;
-$page_groupSelect = array();
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$page_groupSelect['val'][$i] = $row[0];
-	$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
-	$i++;
-}
+
 $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 $page_gbcatSelect = array();

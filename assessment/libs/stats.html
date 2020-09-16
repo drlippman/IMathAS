@@ -187,10 +187,11 @@ piechart(percents, labels, {width, height})
 <BR>labels: array of labels for each pie piece
 <BR>uses Google Charts API
 <BR><h3><a name="normrand">normrand</a></h3>
-normrand(mu,sigma,n, [rnd])
+normrand(mu,sigma,n, [rnd, positive])
 <BR>returns an array of n random numbers that are normally distributed with given
 <BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
-<BR>specify rnd to round to that many digits
+<BR>specify rnd to round to that many digit
+<BR>set positive to true to not include negative values
 <BR><h3><a name="expdistrand">expdistrand</a></h3>
 expdistrand(mu, n, [rnd])
 <BR>returns an array of n random numbers that are exponentially distributed
@@ -305,11 +306,11 @@ csvdownloadlink(string,array,[string,array]...)
 <p>Creates a link that downloads the specified data in CSV format. For each column
   provide a string header and an array of values.</p>
 <BR><h3><a name="dotplot">dotplot</a></h3>
-dotplot(array,label,relative,[width,height]) 
-<BR>display macro.  Creates a dotplot from a data set
+dotplot(array,label,[dotspacing,labelspacing,width,height]) 
+<BR>Display macro.  Creates a dotplot from a data set
 <BR> array: array of data values
 <BR> label: title of the dotplot that will be placed below the horizontal axis
-<BR>relative (optional): 0 - default value, places dots relative to ticks marks
-<BR>&nbsp;&nbsp; 1 - places dots at exact tick marks. This will not work well if the range of the data array is too large or array contains float values.
-<BR> width,height (optional): width and height in pixels of graph
+<BR> dot spacing (default 1): horiz spacing of dots; data will be rounded to nearest value
+<br> axis spacing (defaults to dot spacing): spacing of axis labels 
+<BR> width,height (default 300x150): width and height in pixels of graph
   

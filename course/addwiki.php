@@ -85,7 +85,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['description'] = '';
 		} else {
 			$_POST['description'] = Sanitize::incomingHtml($_POST['description']);
-		}
+        }
+        if ($_POST['groupsetid'] === 'bysec') {
+            // want to use by-section groups.  Create
+            require_once('../includes/setSectionGroups.php');
+            $_POST['groupsetid'] = createSectionGroupset($cid);
+        }
 		if (isset($_GET['id'])) {  //already have id - update
 			$query = "UPDATE imas_wikis SET name=:name,description=:description,startdate=:startdate,enddate=:enddate,";
 			$query .= "editbydate=:editbydate,avail=:avail,groupsetid=:groupsetid,settings=:settings ";
@@ -214,13 +219,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
-		$i=0;
+        $i=0;
+        $sectionGroup = 0;
 		$page_groupSelect = array();
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            if ($row[1] == '##autobysection##') {
+                $sectionGroup = $row[0];
+                continue;
+            }
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 			$i++;
-		}
+        }
+        $page_groupSelect['val'][] = $sectionGroup > 0 ? $sectionGroup : 'bysec';
+        $page_groupSelect['label'][] = _('Use Course Sections');
 	}
 }
 

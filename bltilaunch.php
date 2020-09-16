@@ -42,7 +42,7 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 	 $urlmode = 'https://';
- } else {
+ } else if ($_SERVER['HTTP_HOST'] != 'localhost') {
  	 $urlmode = 'http://';
 	 $errormsg = _('This launch was made insecurely (using http instead of https). ');
  	 $errormsg .= sprintf(_('%s requires secure launches to protect student data. '),$installname);
@@ -128,7 +128,7 @@ if (
 //check to see if accessiblity page is posting back
 if (isset($_GET['launch'])) {
 	if (empty($_SESSION['userid'])) {
-		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
+		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
 	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
@@ -187,7 +187,7 @@ if (isset($_GET['launch'])) {
 	exit;
 } else if (isset($_GET['accessibility'])) {
 	if (empty($_SESSION['userid'])) {
-		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
+		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
 
@@ -517,7 +517,7 @@ if (isset($_GET['launch'])) {
 
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
 	if (empty($_REQUEST['lti_version'])) {
-		reporterror(_("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again"));
+		reporterror(_("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	if (empty($_REQUEST['user_id'])) {
 		if (isset($_REQUEST['relaunch_url'])) {
@@ -1525,7 +1525,9 @@ if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || 
 					$stm->execute(array(':id'=>$cid));
 					$deflatepass = $stm->fetchColumn(0);
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    require_once('./includes/setSectionGroups.php');
+                    setSectionGroups($userid, $cid, $_SESSION['lti_context_label']);
 				}
 			} else {
 				$_SESSION['ltirole']='instructor';
@@ -1704,7 +1706,7 @@ if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwr
 //check to see if accessiblity page is posting back
 if (isset($_GET['launch'])) {
 	if (empty($_SESSION['userid'])) {
-		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
+		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
 	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
@@ -1764,7 +1766,7 @@ if (isset($_GET['launch'])) {
 	exit;
 } else if (isset($_GET['accessibility'])) {
 	if (empty($_SESSION['userid'])) {
-		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again."));
+		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
 
@@ -2062,7 +2064,7 @@ if (isset($_GET['launch'])) {
 
 	//verify necessary POST values for LTI.  OAuth specific will be checked later
 	if (empty($_REQUEST['lti_version'])) {
-		reporterror(_("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again"));
+		reporterror(_("Insufficient launch information. This might indicate your browser is set to restrict third-party cookies. Check your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	if (empty($_REQUEST['user_id'])) {
 		if (isset($_REQUEST['relaunch_url'])) {
@@ -2671,7 +2673,9 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 					$stm->execute(array(':id'=>$cid));
 					$deflatepass = $stm->fetchColumn(0);
 					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
-					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label'], ':latepass'=>$deflatepass));
+                    require_once('./includes/setSectionGroups.php');
+                    setSectionGroups($userid, $cid, $_SESSION['lti_context_label']);
 				}
 			} else {
 				$_SESSION['ltirole']='instructor';

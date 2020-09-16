@@ -65,12 +65,11 @@ class StringAnswerBox implements AnswerBox
     		}
     		if ($displayformat=='select') {
     			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
-          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
-          $out .= '<option value=""> </option>';
+                $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+                $out .= '<option value=""> </option>';
     			foreach ($questions as $i=>$v) {
     				$out .= '<option value="'.htmlentities($v).'"';
-    				//This is a hack.  Need to figure a better way to deal with & in answers
-    				if (str_replace('&','',$v)==$la) {
+    				if ($v == $la) {
     					$out .= ' selected="selected"';
     				}
     				$out .= '>'.htmlentities($v).'</option>';
@@ -147,7 +146,9 @@ class StringAnswerBox implements AnswerBox
     							'" />';
 
     			if ($displayformat == 'usepreview') {
-    				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
+                    $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                    $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                    $preview .= '</button> &nbsp;';
     				$preview .= "<span id=p$qn></span> ";
     			}
     		}
@@ -168,7 +169,7 @@ class StringAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

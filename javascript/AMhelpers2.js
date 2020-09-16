@@ -139,8 +139,9 @@ function init(paramarr, enableMQ, baseel) {
       }
     }
     if (params.preview) { //setup preview TODO: check for userpref
-      var thisqn = qn;
-      document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(thisqn)});
+      document.getElementById("pbtn"+qn).addEventListener('click', (function(thisqn) {
+          return function() {showPreview(thisqn);}
+        })(qn));
       if (params.preview == 1 && !params.qtype.match(/matrix/)) { //no live preview for matrix types
         if (LivePreviews.hasOwnProperty(qn)) {
           delete LivePreviews[qn]; // want to reinit
@@ -747,7 +748,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/∞/g,"oo").replace(/≤/g,"<=").replace(/≥/g,">=").replace(/∪/g,"U");
 	str = str.replace(/±/g,"+-").replace(/÷/g,"/").replace(/·|✕|×|⋅/g,"*");
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
-	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
+	str = str.replace(/⁰/g,"^0").replace(/¹/g,"^1").replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9");
 	str = str.replace(/\u2329/g, "<").replace(/\u232a/g, ">");
 	str = str.replace(/₀/g,"_0").replace(/₁/g,"_1").replace(/₂/g,"_2").replace(/₃/g,"_3");
 	str = str.replace(/\bOO\b/i,"oo");
@@ -779,7 +780,6 @@ function showPreview(qn) {
   if (res.err && res.err != '' && res.str != '') {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
   }
-
   if (LivePreviews.hasOwnProperty(qn)) {
     LivePreviews[qn].RenderNow(outstr);
   } else {
@@ -822,7 +822,7 @@ function showSyntaxCheckMQ(qn) {
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
-  if (LivePreviews.hasOwnProperty(qn)) {
+  if (LivePreviews.hasOwnProperty(qn) && (mathRenderer=="MathJax" || mathRenderer=="Katex")) {
     var previewel = document.getElementById('p'+qn).firstChild;
     previewel.innerHTML = outstr;
     previewel.style.visibility = '';

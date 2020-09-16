@@ -50,6 +50,8 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -59,7 +61,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes');
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -138,7 +140,7 @@ if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
 list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
 
 // load question settings and code
-$assess_info->loadQuestionSettings($qidstoload, true);
+$assess_info->loadQuestionSettings($qidstoload, true, false);
 
 // For livepoll, verify seed and generate new question version if needed
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
@@ -203,6 +205,43 @@ if ($assess_info->getSetting('displaymethod') === 'livepoll') {
 $assessInfoOut['questions'] = array(
   $qn => $assess_record->getQuestionObject($qn, $showscores, true, true)
 );
+
+// save autosaves, if set 
+$assessInfoOut['saved_autosaves'] = false;
+if (!empty($_POST['autosave-tosaveqn'])) {
+    $qns = json_decode($_POST['autosave-tosaveqn'], true);
+    $lastloaded = json_decode($_POST['autosave-lastloaded'], true);
+    $verification = json_decode($_POST['autosave-verification'], true);
+    if ($_POST['autosave-timeactive'] == '') {
+        $timeactive = [];
+    } else {
+        $timeactive = json_decode($_POST['autosave-timeactive'], true);
+    }
+    if ($qns !== null && $lastloaded !== null && $timeactive !== null) {
+        list($qids,$toloadqids) = $assess_record->getQuestionIds(array_keys($qns));
+
+        // load question settings and code
+        $assess_info->loadQuestionSettings($toloadqids, false, false);
+        if ($assess_record->checkVerification($verification)) {
+            // autosave the requested parts
+            foreach ($qns as $qn=>$parts) {
+                if (!isset($timeactive[$qn])) {
+                    $timeactive[$qn] = 0;
+                }
+                $ok_to_save = $assess_record->isSubmissionAllowed($qn, $qids[$qn], $parts);
+                foreach ($parts as $part) {
+                    if ($ok_to_save === true || $ok_to_save[$part]) {
+                     $assess_record->setAutoSave($now, $timeactive[$qn], $qn, $part);
+                    }
+                }
+                if (isset($_POST['sw' . $qn])) {  //autosaving work
+                    $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
+                }
+            }
+            $assessInfoOut['saved_autosaves'] = true;
+        }
+    }
+}
 
 // save record if needed
 $assess_record->saveRecordIfNeeded();

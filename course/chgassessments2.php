@@ -79,9 +79,15 @@ if (!(isset($teacherid))) {
 					$turnoffshuffle += 16;
 				} else if ($_POST['shuffle']==16) {
 					$turnonshuffle += 16;
+					$turnoffshuffle += 33;
+				} else if ($_POST['shuffle']==32) {
+					$turnonshuffle += 32;
+					$turnoffshuffle += 17;
+				} else if ($_POST['shuffle']==48) {
+					$turnonshuffle += 16;
 					$turnoffshuffle += 1;
 				} else {
-					$turnoffshuffle += 17;
+					$turnoffshuffle += 49;
 				}
 			}
 			if ($_POST['samever'] !== 'DNC') {
@@ -490,7 +496,7 @@ if (!(isset($teacherid))) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['assessmentid'] != $lastAid) {
 					$assess_info = new AssessInfo($DBH, $row['assessmentid'], $cid, false);
-					$assess_info->loadQuestionSettings();
+					$assess_info->loadQuestionSettings('all', false, false);
 					$lastAid = $row['assessmentid'];
 				}
 				$assess_record = new AssessRecord($DBH, $assess_info, false);

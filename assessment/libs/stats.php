@@ -832,28 +832,35 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
-function normrand($mu,$sig,$n,$rnd=null) {
+function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
 	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
 	}
-	global $RND;
-	for ($i=0;$i<ceil($n/2);$i++) {
+    global $RND;
+    $icnt = 0;
+    $z = [];
+    while (count($z)<$n && $icnt < 2*$n) {
 		do {
 			$a = $RND->rand(-32768,32768)/32768;
 			$b = $RND->rand(-32768,32768)/32768;
 			$r = $a*$a+$b*$b;
 			$count++;
 		} while ($r==0||$r>1);
-		$r = sqrt(-2*log($r)/$r);
-		if ($rnd!==null) {
-			$z[] = round($sig*$a*$r + $mu, $rnd);
-			$z[] = round($sig*$b*$r + $mu, $rnd);
-		} else {
-			$z[] = $sig*$a*$r + $mu;
-			$z[] = $sig*$b*$r + $mu;
-		}
-	}
+        $r = sqrt(-2*log($r)/$r);
+        $v1 = $sig*$a*$r + $mu;
+        $v2 = $sig*$b*$r + $mu;
+        if (!$pos || $v1 > 0) {
+            $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
+        }
+        if (!$pos || $v2 > 0) {
+            $z[] = ($rnd===null) ? $v2 : round($v2, $rnd);
+        }
+        $icnt++;
+    }
+    if ($icnt == 2*$n && count($z) < $n) {
+        echo "Error: unable to generate enough positive values";
+    }
 	if ($n%2==0) {
 		return $z;
 	} else {
@@ -2096,54 +2103,44 @@ function csvdownloadlink() {
     . _('Download CSV').'</a>';
 }
 
-//dotplot(array,label,relative,[width,height])
+//dotplot(array,label,[dot spacing, axis spacing,width,height])
 //display macro.  Creates a dotplot from a data set
 // array: array of data values
 // label: title of the dotplot that will be placed below horizontal axis
-// relative (optional): 0 - default value, places dots relative to ticks marks
-// 		1 - places dots at exact tick marks. This will not work well if the range of the data array is too large or array contains float values.
+// dot spacing: spacing of dots; data will be rounded to nearest (def 1)
+// axis spacing: spacing of axis labels (defaults to dot spacing) 
 // width,height (optional): width and height in pixels of graph
-function dotplot($a,$label,$rel=1,$width=300,$height=150) {
+function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) {
 	if (!is_array($a)) {
 		echo 'dotplot expects an array';
 		return false;
-	}
-	
-	$ndecimal = array();
-	
-	// determine the maximum number of decimal places in the array
-	for($i = 0; $i <count($a);$i++){
-		$ndecimal[$i] = strlen(substr(strrchr($a[$i], "."), 1)); 
-	}
-
-	// determine the appropriate grouping/classwidth
-	$cw = 10**(-1*max($ndecimal));
+    }
+    if ($dotspace <= 0) {
+        $dotspace = 1;
+    }
+    if ($labelspace === null || $labelspace <= 0) {
+        $labelspace = $dotspace;
+    }
 
 	sort($a, SORT_NUMERIC);
 
-	$start = 0;
-	if($rel == 0){
-		$start = floor($a[0]);
-		
-	}else{
-		$start = $a[0];
-	}
-
-	$x = min($a);
+    $start = round($a[0]/$dotspace)*$dotspace;
+	
+	$x = $start;
 	$curr = 0;
 	$alt = "Dotplot for $label <table class=stats><thead><tr><th>Value of Each Dot</th><th>Number of Dots</th></tr></thead>\n<tbody>\n";
 	$maxfreq = 0;
 	
 	// 
-	$dx = $cw;
+	$dx = $dotspace;
 
-	// Create the stack of dots 
-	while ($x - $a[count($a)-1] < $cw) {
+    // Create the stack of dots 
+	while ($i < count($a)) {
 		$alt .= "<tr><td>$x</td>";
 		$i = $curr;
 		$j = 0.1;
   
-		while (($a[$i] <= $x) && ($i < count($a))) {
+		while (($a[$i] < $x+.5*$dx) && ($i < count($a))) {
 			$i++;
 			$j = $j + 0.6;
 			$st .= "dot([$x,$j]);";
@@ -2177,32 +2174,23 @@ function dotplot($a,$label,$rel=1,$width=300,$height=150) {
 	$outst = "";
 	 
 	// Draw the horizontal axes
-	if($rel==0){
-		//Freedman–Diaconis rule for choosing bin-width
-		$cw = ceil((2*(Excelquartile($a,3)-Excelquartile($a,1)))/pow(count($a),1/3));	
-		
-		while ($x < $a[count($a)-1]+$cw) {
-			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
-			$x+= $cw;
-		}
-	}else {
-		// draws the tick marks for the axes.
-		while ($x < $a[count($a)-1]+$cw) {
-			$outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
-			$x+= $cw;
-		}  
-	} 
+    // draws the tick marks for the axes.
+    $startlabel = floor($start/$labelspace+1e-12)*$labelspace;
+    $maxx = round($a[count($a)-1]/$dotspace)*$dotspace;
+    $endlabel = ceil($maxx/$labelspace-1e-12)*$labelspace;
+    for ($x=$startlabel; $x <=$endlabel; $x+=$labelspace) {
+        $outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+    }  
 	
-	//initializes SVG frame and canvas. ($start>0?(max($start-.9*$cw,0)):$start)
-	//(40+7*strlen($maxfreq))
-	$initst = "setBorder(20,40,10,10);initPicture($start,$x-0.9*$cw,0,$maxfreq);";
+	//initializes SVG frame and canvas.
+	$initst = "setBorder(20,40,20,10);initPicture($startlabel,$endlabel,0,$maxfreq);";
   	
 	//xtick,ytick,{labels,xgrid,ygrid,dox,doy}
 	//,1,null,$step); fill=\"blue\";
 	//$initst .= "axes(null,null,null,null,null,0,0); fill=\"blue\"; textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
 	$initst .="textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
-	$x1 = $start - .25*$cw;
-	$x2 = $x + .25*$cw;
+	$x1 = $startlabel - .2*$labelspace;
+	$x2 = $endlabel + .2*$labelspace;
 	$initst .="line([$x1,0],[$x2,0]);";
 	$outst = $initst.$outst.$st;
 	return showasciisvg($outst,$width,$height);

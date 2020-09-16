@@ -32,7 +32,7 @@ $vueData = array(
 	'gbcategory' => $line['gbcategory'],
 	'gbcatOptions' => $gbcats,
 	'caltag' => $line['caltag'],
-	'shuffle' => ($line['shuffle']&(1+16)),
+	'shuffle' => ($line['shuffle']&(1+16+32)),
 	'noprint' => $line['noprint'] > 0,
 	'sameseed' => ($line['shuffle']&2) > 0,
 	'samever' => ($line['shuffle']&4) > 0,
@@ -392,7 +392,9 @@ $vueData = array(
 				<select name="shuffle" id="shuffle" v-model="shuffle">
 					<option value="0"><?php echo _('No');?></option>
 					<option value="1"><?php echo _('All');?></option>
-					<option value="16"><?php echo _('All but first');?></option>
+                    <option value="16"><?php echo _('All but first');?></option>
+                    <option value="32"><?php echo _('All but last');?></option>
+                    <option value="48"><?php echo _('All but first and last');?></option>
 				</select>
 			</span><br class=form />
 
@@ -552,8 +554,12 @@ $vueData = array(
 				</label>
 				<br/>
 				<label>
-					<input type="checkbox" name="doposttoforum" v-model="doposttoforum" />
-					<?php echo _('Show "Post this question to forum" links');?>
+                    <input type="checkbox" name="doposttoforum" v-model="doposttoforum" 
+                        :disabled="forumOptions.length == 0"/>
+                    <?php echo _('Show "Post this question to forum" links');?>
+                    <span v-if="forumOptions.length == 0" class="small">
+                        <?php echo _('(Create a forum first to enable this)'); ?>
+                    </span>
 				</label>
 			 	<span v-show="doposttoforum">
 					<?php echo _('to forum');?>
@@ -791,7 +797,7 @@ var app = new Vue({
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': '<?php echo _('Show with the score');?>'
+				'text': '<?php echo _('After the last try on a question');?>'
 			};
 
 			var out = [];
@@ -929,7 +935,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never') {
 				this.ansingb = 'never';
  				return [];
  			} else {
@@ -943,9 +949,7 @@ var app = new Vue({
  						'text': '<?php echo _('Never');?>'
  					}
  				];
- 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
-				 	&& this.subtype == 'by_assessment'
-				) {
+ 				if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted');?>'

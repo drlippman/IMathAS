@@ -42,6 +42,18 @@ if (isset($_GET['tohide'])) {
 		}
 	}
 }
+if (!empty($_GET['toundel'])) {
+    $stm = $DBH->prepare('UPDATE imas_courses SET available=0 WHERE id=? AND ownerid=?');
+    $stm->execute([$_GET['toundel'], $actionuserid]);
+    if (isset($_GET['ajax'])) {
+        if ($stm->rowCount()>0) {
+            echo "OK";
+        } else {
+            echo "ERROR";
+        }
+        exit;
+    }
+}
 
 $pagetitle = "View Hidden Courses You're $typename from Course List";
 $curBreadcrumb = "$breadcrumbbase Unhide Courses\n";
@@ -50,21 +62,33 @@ require("../header.php");
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';
 echo '<h1>View Hidden Courses You\'re '.$typename.'</h1>';
 $query = 'SELECT ic.name,ic.id,ic.ownerid,ic.available,ic.cleanupdate FROM imas_courses AS ic JOIN '.$table.' AS istu ON ic.id=istu.courseid ';
-$query .= "WHERE istu.userid=:userid AND istu.hidefromcourselist=1 ";
+$query .= "WHERE istu.userid=:userid AND ((istu.hidefromcourselist=1 ";
 if ($type=='take') {
-	$query .= "AND ic.available=0 ";
+	$query .= "AND ic.available=0) ";
 } else {
-	$query .= "AND ic.available<4 ";
+    $query .= "AND ic.available<4) ";
+    if ($type == 'teach' && $myrights > 20) {
+        $query .= 'OR (ic.available=4 AND ic.ownerid=:ownerid)';
+    }
 }
-$query .= "ORDER BY ic.name";
+$query .= ") ORDER BY ic.name";
 $stm = $DBH->prepare($query);
-$stm->execute(array(':userid'=>$userid));
+if ($type == 'teach' && $myrights > 20) {
+    $stm->execute(array(':userid'=>$userid, ':ownerid'=>$userid));
+} else {
+    $stm->execute(array(':userid'=>$userid));
+}
 $hascleanup = false;
+$deleted = [];
 echo '<ul class="nomark courselist">';
 if ($stm->rowCount()==0) {
 	echo '<li>No hidden courses</li>';
 } else {
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        if ($row['available'] == 4) {
+            $deleted[] = $row;
+            continue;
+        }
 		echo '<li>';
 
 		if ($type=='teach') {
@@ -101,6 +125,20 @@ echo '</ul>';
 if ($hascleanup) {
 	echo '<p class="small info"><span style="color:orange;">**</span> ';
 	echo _('course is scheduled for cleanup').'</p>';
+}
+if (count($deleted) > 0) {
+    echo '<h1>',_('Courses Scheduled for Deletion'),'</h1>';
+    echo '<ul class="nomark courselist">';
+    foreach ($deleted as $row) {
+        echo '<li><span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+        echo '<img src="../img/gears.png" alt="Options" class="mida"/></a>';
+        echo '<ul role="menu" class="dropdown-menu">';
+        echo ' <li><a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&toundel='.$row['id'].'">'._('Un-Delete').'</a></li>';
+        echo '</ul></span> ';
+        echo '<a href="../course/course.php?cid='.$row['id'].'">'.Sanitize::encodeStringForDisplay($row['name']).'</a> ';
+		echo '</li>';
+    }
+    echo '</ul>';
 }
 echo '<p><a href="../index.php">Back to Home Page</a></p>';
 require("../footer.php");

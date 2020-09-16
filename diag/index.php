@@ -335,7 +335,12 @@ if (isset($_POST['SID'])) {
 	$_SESSION['mathdisp'] = $_POST['mathdisp'];//1;
 	$_SESSION['graphdisp'] = $_POST['graphdisp'];//1;
 	$_SESSION['useed'] = 1;
-	$_SESSION['isdiag'] = $diagid;
+    $_SESSION['isdiag'] = $diagid;
+    if ($aVer > 1) {
+        $_SESSION['diag_aver'] = array($aVer, $pcid, $paid);
+    } else {
+        $_SESSION['diag_aver'] = array($aVer);
+    }
 	$enc = base64_encode(serialize($_SESSION));
 	if (!empty($_POST['tzname'])) {
 		$tzname = $_POST['tzname'];

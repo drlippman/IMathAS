@@ -13,7 +13,7 @@
       :aria-label="$t('regions.questions')"
     >
       <intro-text
-        :active = "page === -1 && intro !== ''"
+        :active = "page === -1 && hasIntro"
         :html = "intro"
       />
       <div
@@ -111,6 +111,9 @@ export default {
     },
     intro () {
       return store.assessInfo.intro;
+    },
+    hasIntro () {
+      return (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0);
     },
     showSubmit () {
       return (store.assessInfo.submitby === 'by_assessment');

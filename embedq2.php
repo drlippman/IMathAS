@@ -3,6 +3,10 @@
 // embedq2.php: Embed one question via an iframe
 // Operates without requiring login
 // Can passback results to embedding page
+//
+// See https://github.com/drlippman/IMathAS-Extras/tree/master/embedq 
+// for documentation and examples
+//
 // (c) 2020 David Lippman
 
 $init_skip_csrfp = true;
@@ -114,7 +118,11 @@ if (isset($_POST['state'])) {
         $seed = ($seed%10000) + 10000;
     }
 } else {
-    $seed = rand(0, 9999);
+    if (isset($QS['seed'])) {
+        $seed = intval($QS['seed'])%10000;
+    } else {
+        $seed = rand(0, 9999);
+    }
     if (!$issigned) {
         $seed += 10000;
     }

@@ -26,12 +26,12 @@
 
 	$cid = Sanitize::courseId($_GET['cid']);
 
-	if (isset($_POST['read']) && count($_POST['checked'])>0) {
+	if (isset($_POST['read']) && !empty($_POST['checked'])) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=1 WHERE id IN ($checklist) AND viewed=0 AND msgto=?");
 		$stm->execute(array($userid));
 	}
-	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
+	if (isset($_POST['remove']) && !empty($_POST['checked'])) {
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id IN ($checklist) AND deleted=1 AND msgto=?");
 		$stm->execute(array($userid));

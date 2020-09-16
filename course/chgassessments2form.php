@@ -379,7 +379,9 @@ $vueData = array(
 						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option value="0"><?php echo _('No'); ?></option>
 						<option value="1"><?php echo _('All'); ?></option>
-						<option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="32"><?php echo _('All but last');?></option>
+                        <option value="48"><?php echo _('All but first and last');?></option>
 					</select>
 				</span><br class=form />
 			</div>
@@ -801,7 +803,7 @@ var app = new Vue({
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': '<?php echo _('Show with the score'); ?>'
+				'text': '<?php echo _('After the last try on a question');?>'
 			};
 
 			var out = [];
@@ -946,7 +948,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never') {
 				this.ansingb = 'never';
  				return [];
  			} else {
@@ -959,10 +961,8 @@ var app = new Vue({
  						'value': 'never',
  						'text': '<?php echo _('Never'); ?>'
  					}
- 				];
- 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
-				 	&& this.subtype == 'by_assessment'
-				) {
+                ];
+                if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted'); ?>'

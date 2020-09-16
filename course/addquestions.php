@@ -355,10 +355,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require_once('../assess2/AssessInfo.php');
 				require_once('../assess2/AssessRecord.php');
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-				$assess_info->loadQuestionSettings();
+				$assess_info->loadQuestionSettings('all', false, false);
 				$DBH->beginTransaction();
 				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
-		    $stm->execute(array($aid));
+		        $stm->execute(array($aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					$assess_record = new AssessRecord($DBH, $assess_info, false);
 					$assess_record->setRecord($row);
@@ -460,7 +460,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=042220\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=041120\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=090220\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -485,9 +485,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	} else {
 		$beentaken = false;
 	}
-	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,intro FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef, $assessintro) = $stm->fetch(PDO::FETCH_NUM);
+	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef,$showworkdef,$assessintro) = $stm->fetch(PDO::FETCH_NUM);
 	$ln = 1;
 
 	// Format of imas_assessments.intro is a JSON representation like
@@ -530,7 +530,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existingq = array();
 	$query = "SELECT iq.id,iq.questionsetid,iqs.description,iqs.userights,iqs.ownerid,";
 	$query .= "iqs.qtype,iq.points,iq.withdrawn,iqs.extref,imas_users.groupid,iq.showhints,";
-	$query .= "iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,iqs.meantimen FROM imas_questions AS iq ";
+    $query .= "iq.showwork,iq.rubric,iqs.solution,iqs.solutionopts,iqs.meantime,iqs.meanscore,";
+    $query .= "iqs.meantimen FROM imas_questions AS iq ";
 	$query .= "JOIN imas_questionset AS iqs ON iqs.id=iq.questionsetid JOIN imas_users ON iqs.ownerid=imas_users.id ";
 	$query .= "WHERE iq.assessmentid=:aid";
 	$stm = $DBH->prepare($query);
@@ -582,7 +583,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
 			$extrefval += 8;
-		}
+        }
+        if (($line['showwork'] == -1 && $showworkdef > 0) || $line['showwork'] > 0) {
+            $extrefval += 32;
+        }
+        if ($line['rubric'] > 0) {
+            $extrefval += 64;
+        }
 
 		$timeout = array();
 		$timeout[0] = round($line['meantime']/60, 1);
@@ -598,7 +605,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			(int)$canedit,
 			(int)Sanitize::onlyInt($line['withdrawn']),
 			(int)$extrefval,
-			$timeout);
+            $timeout
+        );
 
 	}
 
@@ -1213,7 +1221,7 @@ if ($overwriteBody==1) {
     if (isset($CFG['GEN']['pandocserver'])) {
         echo 'printlayoutword.php?cid='.$cid.'&aid='.$aid;
     } else {
-        echo 'printtest.php?cid='.$cid.'&aid='.$aid;
+        echo 'printlayoutbare.php?cid='.$cid.'&aid='.$aid;
     }
     echo '">'._('Create Print Version').'</a>';
     echo '</span><span class="column">';
@@ -1227,7 +1235,7 @@ if ($overwriteBody==1) {
 	<h2><?php echo _("Warning") ?></h2>
 	<p><?php echo _("This assessment has already been taken.  Adding or removing questions, or changing a	question's settings (point value, penalty, attempts) now would majorly mess things up. If you want to make these changes, you need to clear all existing assessment attempts") ?>
 	</p>
-	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
+	<p><input type=button value="<?php echo _("Clear Assessment Attempts"); ?>" onclick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
 	</p>
 <?php
 	}
@@ -1553,8 +1561,8 @@ if ($overwriteBody==1) {
 		<h3><?php echo _('Choose assessments to take questions from'); ?></h3>
 		<form id="sela" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
 		<?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)"><?php echo _('None'); ?></a>
-		<input type=submit value="Use these Assessments" /> <?php echo _('or'); ?>
-		<input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
+		<input type=submit value="<?php echo _("Use these Assessments") ?>" /> <?php echo _('or'); ?>
+		<input type=button value="<?php echo _("Select From Libraries") ?>" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
 
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
@@ -1578,7 +1586,7 @@ if ($overwriteBody==1) {
 
 			</tbody>
 		</table>
-		<script type=\"text/javascript\">
+		<script type="text/javascript">
 			initSortTable('myTable',Array(false,'S','S',false,false,false),true);
 		</script>
 	</form>
