@@ -140,6 +140,11 @@ function getExistingQuestions(qlist,flattened) {
         }
     }
 }
+var wronglibicon = '<span class="wronglibicon" title="' + _('Marked as in wrong library') + '" ' + 
+    'aria-label="' + _('Marked as in wrong library') + '">' + 
+    '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18.1 12.1C19.7 9.1 19 5.3 16.4 3.2 13.8 1 10 1 7.5 3.2 4.9 5.4 4.2 9.1 5.7 12.1l6.2 10.6z M9.5 11.5 14.5 6.5 M9.5 6.5 14.5 11.5"></path></svg>' +
+    '</span> ';
+var wrongLibState = {};
 function displayQuestionList(results) {
     var searchtype = 'libs';
     var colcnt = 8;
@@ -157,12 +162,14 @@ function displayQuestionList(results) {
     var i,q,row,features,descrclass,descricon;
     var lastlib = -1;
     var existingq = [];
+    wrongLibState = {};
     if (itemarray) {
         getExistingQuestions(itemarray, existingq);
     }
     for (var i in results['qs']) {
         // show lib/assess titles
         q = results['qs'][i];
+        wrongLibState[i] = [q['junkflag'], q['libitemid']];
         if (results.type=='libs' && q['libid'] != lastlib) {
             tbody += '<tr><td colspan="'+colcnt+'"><b>' + results.names[q['libid']] + '</b></td></tr>';
             lastlib = q['libid'];
@@ -222,19 +229,32 @@ function displayQuestionList(results) {
                 '</span> ';
         } else if (q['junkflag'] == 1) {
             descrclass = ' class="qwronglib"';
-            descricon = '<span title="' + _('Marked as in wrong library') + '">' + 
-                '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18.1 12.1C19.7 9.1 19 5.3 16.4 3.2 13.8 1 10 1 7.5 3.2 4.9 5.4 4.2 9.1 5.7 12.1l6.2 10.6z M9.5 11.5 14.5 6.5 M9.5 6.5 14.5 11.5"></path></svg>' +
-                '</span> ';
+            descricon = wronglibicon;
         } else if (existingq.indexOf(parseInt(q['id'])) !== -1) {
             descrclass = ' class="qinassess"';
         }
         // build action dropdown
+
+        var addqaddr = 'modquestion' +
+            (assessver > 1 ? "2" : "") +
+            ".php?qsetid=" + q['id'] +
+            "&aid=" + curaid +
+            "&cid=" + curcid +
+            '&from=addq2';
+        var editqaddr = 'moddataset.php?id=' + q['id'] +
+            "&aid=" + curaid +
+            "&cid=" + curcid +
+            '&from=addq2&frompot=1';
+
         var actions = '<div class="dropdown">' +
             '<button role="button" class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + 
             '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
-            '<li><a href="#">' + _('Add') + '</a></li>' +
-            '<li><a href="#">' + (q['mine']==1 ? _('Edit') : _('View Code')) + '</a></li>' + 
-            '<li><a href="#">' + _('Template') + '</a></li>' +
+            '<li><a href="' + addqaddr + '">' + _('Add') + '</a></li>' +
+            '<li><a href="' + editqaddr + '">' + (q['mine']==1 ? _('Edit') : _('View Code')) + '</a></li>' + 
+            '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>' +
+            '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
+                ((q['junkflag'] == 1) ? _('Un-mark as in wrong library') : _('Mark as in wrong library')) +
+                '</a></li>' +
             '</ul></div>';
 
         // build row
@@ -253,7 +273,7 @@ function displayQuestionList(results) {
     }
     tbody += '</tbody>';
     document.getElementById("myTable").innerHTML = thead + tbody;
-    // TODO init sorting
+
     initSortTable('myTable',[false,'S',false,'N',false,'S','N',false]);
     if (window.top == window.self && document.getElementById("addbar")) {
          $("#selq input[type=checkbox]").on("change", function () {
@@ -296,5 +316,58 @@ function updateInAssessMarkers() {
         if (el.childNodes.length == 1) { return; }
         $(el.childNodes[1]).toggleClass('qinassess', 
             existingq.indexOf(parseInt(el.childNodes[3].textContent)) !== -1);
+    });
+}
+
+function toggleWrongLibFlag(row) {
+    saveWrongLibFlag([row]);
+}
+function toggleWrongLibFlags(newstate) {
+    var checked = [];
+    $("#selq input[type=checkbox]:checked").each(function() {
+        var row = this.id.substring(2);
+        if (newstate != wrongLibState[row][0]) { 
+            // change it
+            checked.push(row);
+        }
+    });
+    if (checked.length == 0) { return; }
+    saveWrongLibFlag(checked);
+}
+
+function saveWrongLibFlag(rows) {
+    var rownums = rows;
+    var newstates = [];
+    var libitemids = [];
+    for (var i=0; i<rownums.length; i++) {
+        newstates.push(1 - wrongLibState[rownums[i]][0]);
+        libitemids.push(wrongLibState[rownums[i]][1]);
+    }
+    $.ajax({
+        url: JunkFlagsaveurl,
+        method: 'POST',
+        data: {
+            flags: newstates.join(','),
+            libitemids: libitemids.join(',')
+        },
+        dataType: 'text'
+    }).done(function(msg) {
+        var ischanged = msg.split(/,/);
+        for (var i=0; i<rownums.length; i++) {
+            if (ischanged[i] == 'OK') {
+                wrongLibState[rownums[i]][0] = newstates[i];
+                var row = $("#qo"+rownums[i]).parent().parent();
+                var descr = row.find("td:nth-child(2)");
+                var wronglibtoggle = row.find(".wronglibtoggle");
+                if (newstates[i] == 1) { // mark as wrong lib
+                    descr.prepend(wronglibicon).addClass("qwronglib");
+                    wronglibtoggle.text(_("Un-mark as in wrong library"));
+                } else {
+                    descr.find(".wronglibicon").remove();
+                    descr.removeClass("qwronglib");
+                    wronglibtoggle.text(_("Mark as in wrong library"));
+                }
+            }
+        }
     });
 }

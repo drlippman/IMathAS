@@ -1545,10 +1545,8 @@ function generateTable() {
                 }
 
                 html +=
-                    '<td class=c><div class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-                html +=
-                    _("Action") +
-                    '</a><ul role="menu" class="dropdown-menu dropdown-menu-right">';
+                    '<td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                html += '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
                 html +=
                     ' <li><a href="modquestion' +
                     (assessver > 1 ? "2" : "") +
@@ -1837,7 +1835,7 @@ function submitChanges() {
         });
 }
 
-function addusingdefaults() {
+function addusingdefaults(asgroup) {
     if (beentaken) { return; }
     var checked = [];
     $("#selq input[type=checkbox]:checked").each(function() {
@@ -1848,7 +1846,7 @@ function addusingdefaults() {
         type: "POST",
         url: AHAHsaveurl,
         async: false,
-        data: {addnewdef: checked},
+        data: {addnewdef: checked, asgroup: asgroup ? 1 : 0},
         dataType: 'json'
     }).done(function (msg) {
         doneadding(msg);

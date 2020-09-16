@@ -31,10 +31,15 @@
             $qids[] = $DBH->lastInsertId();
         }
         //add to itemorder
-        if ($rawitemorder=='') {
-            $itemorder = implode(",",$qids);
+        if ($_POST['asgroup'] == 1) {
+            $newitems = '1|0~'.implode('~', $qids);
         } else {
-            $itemorder  = $rawitemorder . "," . implode(",",$qids);
+            $newitems = implode(',', $qids);
+        }
+        if ($rawitemorder=='') {
+            $itemorder = $newitems;
+        } else {
+            $itemorder  = $rawitemorder . "," . $newitems;
         }
         if ($viddata != '') {
             $nextnum = 0;

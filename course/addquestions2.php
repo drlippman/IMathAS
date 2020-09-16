@@ -844,14 +844,17 @@ if ($overwriteBody==1) {
 
 <div id="addbar" class="footerbar" style="display:none;">
     <div class="dropup inlinediv splitbtn">
-        <button type="button" class="primary" onclick="addusingdefaults()">
+        <button type="button" class="primary" onclick="addusingdefaults(false)">
             <?php echo _('Add'); ?>
         </button><button type="button" class="primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="small" aria-label="<?php echo _('Options');?>">&#9650;</span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="#" role="button" onclick="addusingdefaults(); return false;">
+            <li><a href="#" role="button" onclick="addusingdefaults(false); return false;">
                 <?php echo _('Add using defaults'); ?>
+            </a></li>
+            <li><a href="#" role="button" onclick="addusingdefaults(true); return false;">
+                <?php echo _('Add as group using defaults'); ?>
             </a></li>
             <li><a href="#" role="button" onclick="addwithsettings(); return false;">
                 <?php echo _('Add and set options'); ?>
@@ -867,6 +870,19 @@ if ($overwriteBody==1) {
     <button type="button" class="plain" onclick="return chkAllNone('selq','nchecked[]',true)">
         <?php echo _('Select All'); ?>
     </button>
+    <div class="dropup inlinediv">
+        <button type="button" class="plain dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        ⋮
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" role="button" onclick="toggleWrongLibFlags(1); return false;">
+                <?php echo _('Mark selected as in wrong library'); ?>
+            </a></li>
+            <li><a href="#" role="button" onclick="toggleWrongLibFlags(0); return false;">
+                <?php echo _('Un-mark selected as in wrong library'); ?>
+            </a></li>
+        </ul>
+    </div>
 </div>
         
 <form id="selq">
