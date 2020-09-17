@@ -427,9 +427,9 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 
 if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/libtree.js\"></script>\n";
-$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
-$placeinhead .= '<script src="../javascript/copyitemslist.js" type="text/javascript"></script>';
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/libtree.js\"></script>\n";
+$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$staticroot/course/libtree.css\");\n-->\n</style>\n";
+$placeinhead .= '<script src="'.$staticroot.'/javascript/copyitemslist.js" type="text/javascript"></script>';
 require("../header.php");
 }
 if ($overwriteBody==1) {

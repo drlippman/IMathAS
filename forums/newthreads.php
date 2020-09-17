@@ -90,8 +90,8 @@ if (isset($_GET['markread']) && isset($_POST['checked']) && count($_POST['checke
        	exit;
 }
 
-$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
-$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/tablesorter.js?v=011517"></script>';
+$placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\");\n</style>\n";
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js?v=011517"></script>';
 $pagetitle = _('New Forum Posts');
 require("../header.php");
 

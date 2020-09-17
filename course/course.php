@@ -359,7 +359,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=070620\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=070620\"></script>";
 if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -440,7 +440,7 @@ if ($overwriteBody==1) {
 		if (isset($_SESSION['ltiitemtype'])) {
 			echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
 			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span>";
-			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
+			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"\"/></a>";
 		} else {
 			echo Sanitize::encodeStringForDisplay($userfullname);
 		}
@@ -454,7 +454,7 @@ if ($overwriteBody==1) {
 			} else {
 				$incclass = '';
 			}
-			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
+			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$staticroot.'/img/menu.png"></span> ';
 		}
 		echo $curBreadcrumb;
 		?>
@@ -624,7 +624,7 @@ if ($overwriteBody==1) {
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
 		   echo "</script>";
-		   echo "<script src=\"$imasroot/javascript/nestedjq.js?v=050719\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=050719\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
 

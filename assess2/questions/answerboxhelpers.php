@@ -561,18 +561,18 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 }
 
 function getcolormark($c,$wrongformat=false) {
-	global $imasroot;
+	global $imasroot,$staticroot;
 
 	if (isset($GLOBALS['nocolormark'])) { return '';}
 
 	if ($c=='ansred') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/redx.gif" width="8" height="8" alt="'._('Incorrect').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/redx.gif" width="8" height="8" alt="'._('Incorrect').'"/>';
 	} else if ($c=='ansgrn') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/gchk.gif" width="10" height="8" alt="'._('Correct').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/gchk.gif" width="10" height="8" alt="'._('Correct').'"/>';
 	} else if ($c=='ansorg') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/orgx.gif" width="8" height="8" alt="'._('Correct answer, but wrong format').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/orgx.gif" width="8" height="8" alt="'._('Correct answer, but wrong format').'"/>';
 	} else if ($c=='ansyel') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/ychk.gif" width="10" height="8" alt="'._('Partially correct').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/ychk.gif" width="10" height="8" alt="'._('Partially correct').'"/>';
 	} else {
 		return '';
 	}

@@ -148,7 +148,7 @@ if ($groupset>0) {
 }
 $placeinhead = '';
 if ($haspoints && $caneditscore && $rubric != 0) {
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051720"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051720"></script>';
 	require("../includes/rubric.php");
 }
 
@@ -163,8 +163,8 @@ $caller = "posts";
 include("posthandler.php");
 
 $pagetitle = "Posts";
-$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=010619" type="text/css" />';
-$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/posts.js?v=011517"></script>';
+$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=010619" type="text/css" />';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/posts.js?v=011517"></script>';
 //$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 if ($caneditscore && $_SESSION['useed']!=0) {
 	$useeditor = "noinit";
@@ -459,9 +459,9 @@ if (!$oktoshow) {
 
 	echo " | <a href=\"posts.php?cid=$cid&forum=$forumid&thread=$threadid&page=$page&markunread=true\">Mark Unread</a> ";
 	if ($tagged) {
-		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
+		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Flagged\" /> ";
 	} else {
-		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
+		echo "| <img class=\"pointer\" id=\"tag$threadid\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged($threadid);return false;\" alt=\"Not flagged\"/> ";
 	}
 
 	echo '| <button onclick="expandall()">'._('Expand All').'</button>';
@@ -481,7 +481,7 @@ function printchildren($base,$restricttoowner=false) {
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
 	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-	global $canviewall, $caneditscore, $canviewscore, $isstu;
+	global $canviewall, $caneditscore, $canviewscore, $isstu,$staticroot;
 	if (!isset($CFG['CPS']['itemicons'])) {
 		$itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -507,7 +507,7 @@ function printchildren($base,$restricttoowner=false) {
 				$lbl = '-';
 				$img = "collapse";
 			}
-			echo "<img class=\"pointer expcol\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow(this)\" alt=\"Expand/Collapse\"/> ";
+			echo "<img class=\"pointer expcol\" src=\"$staticroot/img/$img.gif\" onClick=\"toggleshow(this)\" alt=\"Expand/Collapse\"/> ";
 		}
 		if ($hasuserimg[$child]==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
@@ -531,7 +531,7 @@ function printchildren($base,$restricttoowner=false) {
 		if ($isteacher || ($ownerid[$child]==$userid && $allowmod && (($base==0 && time()<$postby) || ($base>0 && time()<$replyby))) || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 			echo '<span class="dropdown">';
 			echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$child.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-			echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
+			echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
 			echo '</a>';
 			echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$child.'">';
 
@@ -630,7 +630,7 @@ function printchildren($base,$restricttoowner=false) {
 			}
 
 			echo '<div class="likewrap">';
-			echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\" alt=\"Like\">";
+			echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$staticroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\" alt=\"Like\">";
 			echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
 			echo '</div>';
 		}
@@ -653,9 +653,9 @@ function printchildren($base,$restricttoowner=false) {
 				echo '<a href="'.getuserfileurl('ffiles/'.$child.'/'.$fl[2*$i+1]).'" target="_blank">';
 				$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
 				if (isset($itemicons[$extension])) {
-					echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+					echo "<img alt=\"$extension\" src=\"$staticroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
 				} else {
-					echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
+					echo "<img alt=\"doc\" src=\"$staticroot/img/doc.png\" class=\"mida\"/> ";
 				}
 				echo $fl[2*$i].'</a> ';
 				//if (count($fl)>2) {echo '</li>';}
@@ -726,8 +726,8 @@ if ($caneditscore && $haspoints) {
 	}
 	echo "</form>";
 }
-echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" alt=\"Expand\" />";
-echo "<img src=\"$imasroot/img/collapse.gif\" style=\"visibility:hidden\" alt=\"Collapse\" />";
+echo "<img src=\"$staticroot/img/expand.gif\" style=\"visibility:hidden\" alt=\"Expand\" />";
+echo "<img src=\"$staticroot/img/collapse.gif\" style=\"visibility:hidden\" alt=\"Collapse\" />";
 
 }
 if (empty($_GET['embed'])) {

@@ -239,7 +239,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+ $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -296,7 +296,7 @@ if ($started) {
 			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?>/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 
@@ -307,7 +307,7 @@ if ($started) {
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		</div>
@@ -329,7 +329,7 @@ if ($started) {
 			<input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>Before:
 			<input type=text size=10 name="rdate" value="<?php echo $rdate;?>">
 			<a href="#" onClick="displayDatePicker('rdate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=rtime value="<?php echo $rtime;?>">
 		</span><br class="form" />
 

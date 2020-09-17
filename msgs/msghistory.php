@@ -30,7 +30,7 @@
 	$type =  Sanitize::encodeStringForDisplay($_GET['type']);
 
 	$pagetitle = "Message Conversation";
-	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+	$placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showtrimmed(el,n) {
 			if (el.innerHTML.match(/Show/)) {
@@ -159,12 +159,12 @@
 	       node.className = 'hidden';
 	       //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
 	//       butn.value = 'Expand';
-		butn.src = imasroot+'/img/expand.gif';
+		butn.src = staticroot+'/img/expand.gif';
 	   } else {
 	       node.className = 'forumgrp';
 	       //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
 	//       butn.value = 'Collapse';
-		butn.src = imasroot+'/img/collapse.gif';
+		butn.src = staticroot+'/img/collapse.gif';
 	}
 	}
 	function toggleitem(inum) {
@@ -185,7 +185,7 @@
 	     node.className = 'forumgrp';
 	//     butn.value = 'Collapse';
 	       //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
-	       butn.src = imasroot+'/img/collapse.gif';
+	       butn.src = staticroot+'/img/collapse.gif';
 	   }
 	}
 	function collapseall() {
@@ -195,7 +195,7 @@
 	     node.className = 'hidden';
 	//     butn.value = 'Expand';
 	       //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
-	       butn.src = imasroot+'/img/expand.gif';
+	       butn.src = staticroot+'/img/expand.gif';
 	   }
 	}
 
@@ -222,7 +222,7 @@
 	$icnt = 0;
 	function printchildren($base) {
 		global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$view,$page,$allowmsg,$haspoints,$cansendmsgs;
-		global $filtercid,$page,$type,$imasroot;
+		global $filtercid,$page,$type,$imasroot,$staticroot;
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		foreach($children[$base] as $child) {
 			echo "<div class=block> ";
@@ -236,7 +236,7 @@
 					$img = "collapse";
 				}
 				//echo "<input type=button id=\"butb$bcnt\" value=\"$lbl\" onClick=\"toggleshow($bcnt)\"> ";
-				echo "<img class=\"pointer\" id=\"butb$bcnt\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow($bcnt)\" alt=\"Expand/Collapse\"/> ";
+				echo "<img class=\"pointer\" id=\"butb$bcnt\" src=\"$staticroot/img/$img.gif\" onClick=\"toggleshow($bcnt)\" alt=\"Expand/Collapse\"/> ";
 			}
 
 			echo '</span>';

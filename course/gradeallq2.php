@@ -307,16 +307,16 @@
 
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051120"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=051720"></script>';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-	$placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=051620" type="text/javascript"></script>';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
-	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051120"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=051720"></script>';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+	$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
+	$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=051620" type="text/javascript"></script>';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
+	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
 
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';

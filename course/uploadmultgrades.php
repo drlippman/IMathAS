@@ -202,7 +202,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 echo '<div id="headeruploadmultgrades" class="pagetitle"><h1>Upload Multiple Grades</h1></div>';
@@ -223,7 +223,7 @@ if ($overwriteBody==1) {
 		<span class=formright><input type=text name="sidcol" size=4 value="<?php echo $usernamecol+1; ?>"></span><br class=form />
 		<span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
 		<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo $sdate;?>">
-		<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
+		<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 		at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
 
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','addcol[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','addcol[]',false)">None</a></p>

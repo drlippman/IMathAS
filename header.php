@@ -13,10 +13,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <?php
 if (!empty($CFG['GEN']['uselocaljs'])) {
-	echo '<script src="'.$imasroot.'/javascript/jquery.min.js"></script>';
+	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
 } else {
 	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
-	echo '<script>window.jQuery || document.write(\'<script src="'.$imasroot.'/javascript/jquery.min.js"><\/script>\')</script>';
+	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
 ?>
 <link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=083120";?>" type="text/css" />
@@ -95,7 +95,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
 	//don't load MathJax async when using mathgraphcheck; it needs to check immediately
 	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
 		echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
@@ -113,7 +113,7 @@ if (!isset($_SESSION['mathdisp'])) {
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
 	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
@@ -146,8 +146,8 @@ if (!isset($_SESSION['mathdisp'])) {
 		}
 		</script>';*/
 	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
-		echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css" />';
+		echo '<script src="'.$staticroot.'/katex/katex.min.js"></script>';
+		echo '<link rel="stylesheet" href="'.$staticroot.'/katex/katex.min.css" />';
 		//echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
 		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">';

@@ -219,7 +219,7 @@ $stm->execute(array(':userid'=>$_GET['uid'], ':courseid'=>$cid));
 $latepasses = $stm->fetchColumn(0);
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -255,14 +255,14 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<input type=text size=10 name=sdate value="<?php echo $sdate ?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime ?>">
 		</span><BR class=form>
 		<span class=form>Available Until:</span>
 		<span class=formright>
 			<input type=text size=10 name=edate value="<?php echo $edate ?>">
 			<a href="#" onClick="displayDatePicker('edate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime ?>">
 		</span><BR class=form>
 <?php

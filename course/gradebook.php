@@ -292,7 +292,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=052320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=052320"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -302,7 +302,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$includeduedate = true;
 	}
 	$pagetitle = _('Gradebook');
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=051820\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=051820\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type,uid) {
 			if (type=="all") {
@@ -389,8 +389,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 	require("../footer.php");
 
 } else { //show instructor view
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=052320\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablescroller2.js?v=052320\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
@@ -611,7 +611,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 function gbstudisp($stu) {
 	global $DBH,$CFG,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	global $includeduedate, $includelastchange,$latepasshrs,$latepasses,$hidelocked,$exceptionfuncs;
-	global $assessGbUrl, $assessUrl;
+	global $assessGbUrl, $assessUrl,$staticroot;
 
 	if ($availshow==4) {
 		$availshow=1;
@@ -695,7 +695,7 @@ function gbstudisp($stu) {
 			}
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
-			echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif" alt="Updating..."/>';
+			echo '<img id="updatingicon" style="display:none" src="'.$staticroot.'/img/updating.gif" alt="Updating..."/>';
 			echo ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 		} else {
 			echo Sanitize::encodeStringForDisplay($gbt[1][0][0]) . ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';

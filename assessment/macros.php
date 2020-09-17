@@ -3516,7 +3516,7 @@ function stringtopolyterms($str) {
 }
 
 function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
-	global $rawscores,$imasroot;
+	global $rawscores,$imasroot,$staticroot;
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
@@ -3552,32 +3552,32 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 	if ($res==-1) {
 		return '';
 	} else if ($res==1) {
-		return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$correct.'</div>';
+		return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$correct.'</div>';
 	} else if ($res==0) {
-		return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$wrong.'</div>';
+		return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$wrong.'</div>';
 	}
 }
 
 function getfeedbacktxt($stu,$fbtxt,$ans) {
-	global $imasroot;
+	global $imasroot,$staticroot;
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
 	if ($stu===null) {
 		return " ";
 	} else if ($stu==='NA') {
-		return '<div class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> ' . _("No answer selected. Try again.") . '</div>';
+		return '<div class="feedbackwrap"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("No answer selected. Try again.") . '</div>';
 	} else if (isset($fbtxt[$stu])) {
 		if ($stu==$ans) {
-			return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$stu].'</div>';
+			return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$stu].'</div>';
 		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$stu].'</div>';
+			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$stu].'</div>';
 		}
 	} else {
 		if ($stu==$ans) {
-			return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/></div>';
+			return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/></div>';
 		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/></div>';
+			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/></div>';
 		}
 	}
 }
@@ -3594,7 +3594,7 @@ function getfeedbacktxtessay($stu,$fbtxt) {
 }
 
 function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.001) {
-	global $imasroot;
+	global $imasroot,$staticroot;
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
@@ -3604,7 +3604,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	if ($stu===null) {
 		return " ";
 	} else if (!is_numeric($stu)) {
-		return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
+		return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
 	} else {
 		if ($tol[0]=='|') {
 			$abstol = true;
@@ -3626,18 +3626,18 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 		}
 		if ($match>-1) {
 			if ($partial[$i+1]<1) {
-				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
+				return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
 			} else {
-				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
+				return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
 			}
 		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
 	}
 }
 
 function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incorrect', $answerformat = '', $requiretimes = '', $tol=.001) {
-	global $imasroot;
+	global $imasroot,$staticroot;
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
@@ -3691,19 +3691,19 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 		}
 		if ($match>-1) {
 			if ($partial[$i+1]<1) {
-				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
+				return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
 			} else {
-				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
+				return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
 			}
 		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
 	}
 }
 
 //$partial = array(answer,partialcreditval,answer,partialcreditval,...)
 function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars='x', $requiretimes = '', $tol='.001',$domain='-10,10') {
-	global $imasroot;
+	global $imasroot,$staticroot;
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
 	}
@@ -3732,7 +3732,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 		$origstu = $stu;
 		$stufunc = makeMathFunction(makepretty($stu), $vlist);
 		if ($stufunc===false) {
-			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
 
 		$numpts = 20;
@@ -3761,7 +3761,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 			if ($stupts[$i]===false) {$correct = false; break;}
 		}
 		if ($cntnana==$numpts || !$correct) { //evald to NAN at all points
-			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
 
 		$match = -1;
@@ -3861,12 +3861,12 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 		//WHAT to do with right answer, wrong format??
 		if ($match>-1) {
 			if ($partial[$match+1]<1) {
-				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
+				return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$match/2].'</div>';
 			} else {
-				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
+				return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$match/2].'</div>';
 			}
 		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
+			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$deffb.'</div>';
 		}
 	}
 }

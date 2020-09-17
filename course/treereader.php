@@ -209,8 +209,8 @@ ul[role="tree"] li[aria-expanded="true"] > ul {
 }
 
 </style>';
-$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
-$placeinhead .= '<script type="text/javascript" src="../javascript/a11ytree.js"></script>';
+$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$staticroot/course/libtree.css\");\n-->\n</style>\n";
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/a11ytree.js"></script>';
 $placeinhead .= '<script type="text/javascript">$(function() {
   $("#leftcontenttext").a11yTree({
 	toggleSelector: "span.hdr",
@@ -298,7 +298,7 @@ if (!$viewall) {
 }
 
 function printlist($items) {
-	global $DBH,$CFG,$cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions, $exceptionfuncs;
+	global $DBH,$CFG,$cid,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions, $exceptionfuncs,$staticroot;
 	$out = '';
 	$isopen = false;
 	foreach ($items as $item) {
@@ -311,11 +311,11 @@ function printlist($items) {
 					$isopen = true;
 				}
 				if ($bisopen) {
-					$out .=  "<li class=lihdr aria-expanded=true ><span class=hdr><span class=btn id=\"b".Sanitize::encodeStringForDisplay($item['id'])."\">-</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
+					$out .=  "<li class=lihdr aria-expanded=true ><span class=hdr><span class=btn id=\"b".Sanitize::encodeStringForDisplay($item['id'])."\">-</span> <img src=\"$staticroot/img/folder_tiny.png\" alt=\"Folder\"> ";
 					$out .=  "<span class=blocklbl>".Sanitize::encodeStringForDisplay($item['name'])."</span></span>\n";
 					$out .=  '<ul class="nomark" id="'.Sanitize::encodeStringForDisplay($item['id']).'">';
 				} else {
-					$out .=  "<li class=lihdr aria-expanded=false><span class=hdr><span class=btn id=\"b".Sanitize::encodeStringForDisplay($item['id'])."\">+</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
+					$out .=  "<li class=lihdr aria-expanded=false><span class=hdr><span class=btn id=\"b".Sanitize::encodeStringForDisplay($item['id'])."\">+</span> <img src=\"$staticroot/img/folder_tiny.png\" alt=\"Folder\"> ";
 					$out .=  "<span class=blocklbl>".Sanitize::encodeStringForDisplay($item['name'])."</span></span>\n";
 					$out .=  '<ul class="nomark" id="'.Sanitize::encodeStringForDisplay($item['id']).'">';
 				}
@@ -368,14 +368,14 @@ function printlist($items) {
 					 }
 					 $out .= '<li '.$opentxt.'>';
 					 if ($line['displaymethod']!='Embed' && $line['displaymethod']!='skip' && $line['displaymethod']!='full') {
-						 $out .=  '<img src="'.$imasroot.'/img/assess_tiny.png" alt="Assessment"> ';
+						 $out .=  '<img src="'.$staticroot.'/img/assess_tiny.png" alt="Assessment"> ';
 					 } else {
 						 if (!isset($astatus[$typeid]) || $astatus[$typeid]==0) {
-							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_fullbox.gif" alt="'._('Unattempted').'"/> ';
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$staticroot.'/img/q_fullbox.gif" alt="'._('Unattempted').'"/> ';
 						 } else if ($astatus[$typeid]==1) {
-							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_halfbox.gif" alt="'._('Started').'"/> ';
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$staticroot.'/img/q_halfbox.gif" alt="'._('Started').'"/> ';
 						 } else {
-							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_emptybox.gif" alt="'._('Attempted').'"/> ';
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$staticroot.'/img/q_emptybox.gif" alt="'._('Attempted').'"/> ';
 						 }
 					 }
 					 if (isset($studentinfo['timelimitmult'])) {
@@ -434,7 +434,7 @@ function printlist($items) {
 					 if ($itemtype.$typeid===$openitem) {
 						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a tabindex="-1" href="showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'"  onclick="recordlasttreeview(\''.Sanitize::encodeStringForJavascript($itemtype).Sanitize::encodeStringForJavascript($typeid).'\')"  target="readerframe">'.Sanitize::encodeStringForDisplay($line['title']).'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$staticroot.'/img/html_tiny.png" alt="Link"> <a tabindex="-1" href="showlinkedtext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'"  onclick="recordlasttreeview(\''.Sanitize::encodeStringForJavascript($itemtype).Sanitize::encodeStringForJavascript($typeid).'\')"  target="readerframe">'.Sanitize::encodeStringForDisplay($line['title']).'</a></li>';
 				 }
 			} else if ($line['itemtype']=='InlineText') {
 				//TODO check availability, etc.
@@ -448,7 +448,7 @@ function printlist($items) {
 					 if ($itemtype.$typeid===$openitem) {
 						 $foundopenitem = '/course/showinlinetext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid); $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/inline_tiny.png" alt="Text"> <a tabindex="-1" href="showinlinetext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'"  onclick="recordlasttreeview(\''.Sanitize::encodeStringForJavascript($itemtype).Sanitize::encodeStringForJavascript($typeid).'\')"  target="readerframe">'.Sanitize::encodeStringForDisplay($line['title']).'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$staticroot.'/img/inline_tiny.png" alt="Text"> <a tabindex="-1" href="showinlinetext.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'"  onclick="recordlasttreeview(\''.Sanitize::encodeStringForJavascript($itemtype).Sanitize::encodeStringForJavascript($typeid).'\')"  target="readerframe">'.Sanitize::encodeStringForDisplay($line['title']).'</a></li>';
 				 }
 			}/*else if ($line['itemtype']=='Forum') {
 				//TODO check availability, etc.
@@ -474,7 +474,7 @@ function printlist($items) {
 					 if ($itemtype.$typeid===$openitem) {
 						 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/wiki_tiny.png" alt="Wiki"> <a tabindex="-1" href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.Sanitize::encodeStringForJavascript($typeid).'\')" target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$staticroot.'/img/wiki_tiny.png" alt="Wiki"> <a tabindex="-1" href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.Sanitize::encodeUrlParam($typeid).'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.Sanitize::encodeStringForJavascript($typeid).'\')" target="readerframe">'.Sanitize::encodeStringForDisplay($line['name']).'</a></li>';
 				 }
 			}
 
@@ -527,7 +527,7 @@ function upsendexceptions(&$items) {
 </div>
 
 <div id="leftcontent" class="treeleftcontent" role="navigation" aria-label="<?php echo _('Content navigation');?>">
-<img id="navtoggle" src="<?php echo $imasroot;?>/img/collapse.gif"  onclick="toggletreereadernav()" alt="Expand/Collapse" aria-expanded="true" aria-controls="leftcontenttext"/>
+<img id="navtoggle" src="<?php echo $staticroot;?>/img/collapse.gif"  onclick="toggletreereadernav()" alt="Expand/Collapse" aria-expanded="true" aria-controls="leftcontenttext"/>
 <ul id="leftcontenttext" class="nomark" style="margin-left:5px; font-size: 90%;">
 <?php
 $ul = printlist($items);

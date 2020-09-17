@@ -891,7 +891,7 @@ function togglefileembed() {
 				text: 'Converting HEIC file (this may take a while)...'
 			}).insertAfter(jQuery(this));
 			if (!window.heic2any) {
-				jQuery.getScript(imasroot+'/javascript/heic2any.min.js')
+				jQuery.getScript(staticroot+'/javascript/heic2any.min.js')
 				 .done(function() { convertheic(href, 'fileiframe' + id); });
 			} else {
 				convertheic(href, 'fileiframe' + id);
@@ -1282,11 +1282,11 @@ jQuery(document).ready(function($) {
 				if (e.type=="click" || e.which==13) {
 					if ($(this).attr("aria-expanded") == "true") {
 						$(this).attr("aria-expanded", false);
-						$(this).children("img").attr("src", "../img/expand.gif");
+						$(this).children("img").attr("src", staticroot+"/img/expand.gif");
 						$(this).next(".blockitems").slideUp();
 					} else {
 						$(this).attr("aria-expanded", true);
-						$(this).children("img").attr("src", "../img/collapse.gif");
+						$(this).children("img").attr("src", staticroot+"/img/collapse.gif");
 						$(this).next(".blockitems").slideDown();
 					}
 				}

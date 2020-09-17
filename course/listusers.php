@@ -145,7 +145,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
 			require_once("../includes/newusercommon.php");
@@ -208,7 +208,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['chgstuinfo'])) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once("../includes/newusercommon.php");
 
 		if (isset($_POST['timelimitmult'])) {
@@ -475,7 +475,7 @@ $placeinhead .= '$(function() { $(".lal").attr("title","View login log");
 	});';
 $placeinhead .= "</script>";
 $placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="../img/gears.png" alt="Options"/></a>\';
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
   $("img[data-uid]").each(function (i,el) {
   	var uid = $(el).attr("data-uid");
@@ -682,7 +682,7 @@ if ($overwriteBody==1) {
 		window.location = "listusers.php?cid="+cid+"&rmode="+rmode;
 	}
 	</script>
-	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
+	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js"></script>
 	<div class="cpmid">
 	<?php
 	echo '<span class="column" style="width:auto;">';
@@ -775,12 +775,12 @@ if ($overwriteBody==1) {
 			$icons = '';
 			$numstu++;
 			if ($line['locked']>0) {
-				$icons .= '<img src="../img/lock.png" alt="Locked" title="Locked"/>';
+				$icons .= '<img src="'.$staticroot.'/img/lock.png" alt="Locked" title="Locked"/>';
 			} else {
 				$numunlocked++;
 			}
 			if ($line['timelimitmult']!=1) {
-				$icons .= '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
+				$icons .= '<img src="'.$staticroot.'/img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
 			}
 			if ($icons != '') {
 				$icons = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.Sanitize::onlyInt($line['userid']).'">'.$icons.'</a>';
@@ -810,7 +810,7 @@ if ($overwriteBody==1) {
 				echo $hasCodeData;
 				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid=' . Sanitize::onlyInt($line['userid']) . '" class="ui">';
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
-				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="../img/gears.png"/> ';
+				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
 				if ($line['locked']>0) {
 					echo '<span class="greystrike">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';

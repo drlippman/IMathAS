@@ -30,12 +30,12 @@ if (isset($_GET['greybox'])) {
 } else {
 	$gb = '';
 }
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 if (isset($CFG['locale'])) {
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
 }
 if ($_GET['action']=='chguserinfo') {
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 }
 require("header.php");
 switch($_GET['action']) {
