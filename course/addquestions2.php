@@ -866,7 +866,7 @@ if ($overwriteBody==1) {
             </a></li>
         </ul>
     </div>
-    <button type="button" class="secondary">
+    <button type="button" class="secondary" onclick="previewsel('selq')">
         <?php echo _('Preview Selected'); ?>
     </button>
     <button type="button" class="plain" onclick="chkAllNone('selq','nchecked[]',false);$('#addbar').hide();">

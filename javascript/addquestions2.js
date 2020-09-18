@@ -34,7 +34,7 @@ function previewsel(formn) {
 	for (var e = 0; e < form.elements.length; e++) {
 		var el = form.elements[e];
 		if (el.type == 'checkbox' && el.name=='nchecked[]' && el.checked) {
-			previewq(formn,el.id.substring(2),el.value,true,true);
+			previewq(formn,el.id,el.value,true,true);
 			return false;
 		}
 	}
