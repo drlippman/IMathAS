@@ -379,7 +379,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions2.js?v=042220\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort2.js?v=090320\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/qsearch.js?v=082820\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
