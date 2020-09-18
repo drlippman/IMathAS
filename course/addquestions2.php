@@ -636,6 +636,8 @@ if ($overwriteBody==1) {
     if ($aver > 1 && $submitby == 'by_assessment') {
         echo '<br><a href="autoexcuse.php?aid='.$aid.'&amp;cid='.$cid.'&from=addq2">'._('Define Auto-Excuse').'</a>';
     }
+    echo '<br><a href="addquestions.php?aid='.$aid.'&amp;cid='.$cid.'">'._('Use Classic Add/Remove').'</a>';
+
     echo '</span><br class=clear /></div>';
 	if ($beentaken) {
 ?>

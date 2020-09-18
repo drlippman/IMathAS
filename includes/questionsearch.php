@@ -339,7 +339,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $qsids[] = $row['id'];
     }
 
-    // TODO: pull timesused
+    // pull timesused
     $allusedqids = implode(',', array_unique($qsids));
     $stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
     $timesused = [];
