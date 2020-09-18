@@ -347,7 +347,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $timesused[$row[0]] = $row[1];
     }
     foreach ($res as $k=>$v) {
-        $res[$k]['times'] = $timesused[$v['id']];
+        $res[$k]['times'] = !empty($timesused[$v['id']]) ? $timesused[$v['id']] : 0;
     }
 
     // do sorting if needed
