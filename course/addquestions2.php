@@ -474,6 +474,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             padding: 0 8px;
             white-space: nowrap;
           }
+          #addbar {
+              margin-top: 10px;
+          }
           .footerbar {
             position: fixed;
             bottom: 0;
@@ -481,7 +484,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             padding: 10px 15px;
             box-shadow: 0px -3px 5px 0px rgba(0,0,0,0.75);
             width: 100%;
-            z-index: 10;
+            z-index: 30;
             background-color:#fff;
           }
           .splitbtn > button:first-child {
@@ -516,7 +519,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         <script>
         $(function() {
             if (window.top != window.self) {
-               $("#addbar").removeClass("footerbar").show(); 
+               $("#addbar").removeClass("footerbar").removeClass("sr-only"); 
             } 
         });
         </script>';
@@ -848,7 +851,7 @@ if ($overwriteBody==1) {
 </div>
 </div>
 
-<div id="addbar" class="footerbar" style="display:none;">
+<div id="addbar" class="footerbar sr-only">
     <div class="dropup inlinediv splitbtn">
         <button type="button" class="primary" onclick="addusingdefaults(false)">
             <?php echo _('Add'); ?>
@@ -870,7 +873,7 @@ if ($overwriteBody==1) {
     <button type="button" class="secondary" onclick="previewsel('selq')">
         <?php echo _('Preview Selected'); ?>
     </button>
-    <button type="button" class="plain" onclick="chkAllNone('selq','nchecked[]',false);$('#addbar').hide();">
+    <button type="button" class="plain" onclick="chkAllNone('selq','nchecked[]',false);$('#addbar.footerbar').addClass('sr-only');">
         <?php echo _('Clear Selection'); ?>
     </button>
     <button type="button" class="plain" onclick="return chkAllNone('selq','nchecked[]',true)">

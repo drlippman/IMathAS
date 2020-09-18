@@ -6,6 +6,11 @@ $(function() {
     }).on('input', function (e) {
         $("#searchwrap").toggleClass("hastext", e.currentTarget.value.trim() !== '');
     });
+    $("#addbar button").on('focus', function(e) {
+        if ($(this).closest("#addbar").hasClass("sr-only")) {
+            $(this).closest("#addbar").removeClass("sr-only").removeClass("footerbar");
+        }
+    });
 });
 
 $(function() {
@@ -283,7 +288,8 @@ function displayQuestionList(results) {
     initSortTable('myTable',[false,'S',false,'N',false,'S','N',false]);
     if (window.top == window.self && document.getElementById("addbar")) {
          $("#selq input[type=checkbox]").on("change", function () {
-             $("#addbar").toggle($("#selq input[type=checkbox]:checked").length > 0);
+             console.log($("#selq input[type=checkbox]:checked").length);
+             $("#addbar.footerbar").toggleClass("sr-only", $("#selq input[type=checkbox]:checked").length == 0);
          });
     }
     if (results.hasOwnProperty('next') || results.hasOwnProperty('prev')) {

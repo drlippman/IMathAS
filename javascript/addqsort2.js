@@ -1846,6 +1846,7 @@ function submitChanges() {
 
 function addusingdefaults(asgroup) {
     if (beentaken) { return; }
+    curqlastfocus = [];
     var checked = [];
     $("#selq input[type=checkbox]:checked").each(function() {
         checked.push(this.value);
