@@ -110,6 +110,7 @@ function handleClickTextSegmentButton(e) {
     }
 }
 
+var curqlastfocus = [];
 function refreshTable() {
     tinymce.remove();
     document.getElementById("curqtbl").innerHTML = generateTable();
@@ -132,12 +133,23 @@ function refreshTable() {
         .on("keydown.doblur", function (e) {
             if (e.which == 13) {
                 e.preventDefault();
-                $(this).blur();
+                $(this).trigger('change');;
             }
         });
     $("[id^=pts],[id^=grppts],#defpts")
-        .off("blur.pts")
-        .on("blur.pts", updatePts);
+        .off("change.pts")
+        .on("change.pts", updatePts);
+    $("#curqtbl *").off("focus.tracker")
+        .on("focus.tracker", function(e) {
+            var col = $(this).closest("td,th").index();
+            var row = $(this).closest("tr").index();
+            var rtype = $(this).closest("tbody,thead")[0].nodeName;
+            curqlastfocus = [rtype, row, col];
+        });
+    if (curqlastfocus.length > 0) {
+        $("#curqtbl "+curqlastfocus[0]+ " tr").eq(curqlastfocus[1])
+            .find("td,th").eq(curqlastfocus[2]).find("input,button,a").focus();
+    }
     if (usingASCIIMath) {
         rendermathnode(document.getElementById("curqtbl"));
     }
@@ -1225,7 +1237,7 @@ function generateTable() {
                             i +
                             "' value='" +
                             itemarray[i][0] +
-                            "' onblur='updateGrpN(" +
+                            "' onchange='updateGrpN(" +
                             i +
                             "," +
                             itemarray[i][0] +
@@ -1250,7 +1262,7 @@ function generateTable() {
                         html += ">" + _("With") + "</option></select>" + _(" replacement");
                         html += "</td>";
                         html +=
-                            '<td class="nowrap"><input size=2 id="grppts-' +
+                            '<td class="nowrap c"><input size=2 id="grppts-' +
                             i +
                             '" value="' +
                             curgrppoints +
@@ -1531,7 +1543,7 @@ function generateTable() {
                         html += "<td class=c>" + curpt + "</td>";
                     } else {
                         html +=
-                            '<td><input size=2 id="pts-' +
+                            '<td class=c><input size=2 id="pts-' +
                             i +
                             '" value="' +
                             curpt +
