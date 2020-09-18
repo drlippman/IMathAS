@@ -302,6 +302,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     $stm = $DBH->prepare($query);
     $stm->execute($searchvals);
     $res = [];
+    $qsids = [];
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         $row['description'] = Sanitize::encodeStringForDisplay($row['description']);
         if (!empty($options['getowner'])) {
@@ -331,17 +332,23 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         unset($row['extref']);
         unset($row['solutionopts']);
         unset($row['hassolution']);
-        if ($row['meantimen'] > 100) {
-            $row['meantime'] = round($row['meantime']/60,1);
-        } else {
-            $row['meantime'] = '';
-            $row['meanscore'] = '';
-        }
+        $row['meantime'] = round($row['meantime']/60,1);
+        $row['meanscore'] = round($row['meanscore']);
         $row['mine'] = ($row['ownerid'] == $userid) ? 1 : 0;
         $res[] = $row;
+        $qsids[] = $row['id'];
     }
 
     // TODO: pull timesused
+    $allusedqids = implode(',', array_unique($qsids));
+    $stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
+    $timesused = [];
+    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+        $timesused[$row[0]] = $row[1];
+    }
+    foreach ($res as $k=>$v) {
+        $res[$k]['times'] = $timesused[$v['id']];
+    }
 
     // do sorting if needed
     if ($searchtype == 'assess') {

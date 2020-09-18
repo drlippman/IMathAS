@@ -147,7 +147,7 @@ var wronglibicon = '<span class="wronglibicon" title="' + _('Marked as in wrong 
 var wrongLibState = {};
 function displayQuestionList(results) {
     var searchtype = 'libs';
-    var colcnt = 8;
+    var colcnt = 9;
     var thead = '<thead><tr>'
         + '<th><span class="sr-only">'+_('Select')+'</span></th>'
         + '<th>'+_('Description')+'</th>'
@@ -155,6 +155,7 @@ function displayQuestionList(results) {
         + '<th>'+_('ID')+'</th>'
         + '<th>'+_('Preview')+'</th>'
         + '<th>'+_('Type')+'</th>'
+        + '<th>'+_('Times Used')+'</th>'
         + '<th>'+_('Avg Time')+'</th>'
         + '<th>'+_('Actions')+'</th>'
         + '</tr></thead>';
@@ -267,7 +268,12 @@ function displayQuestionList(results) {
             + '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
             + '</td>'
             + '<td>' + q['qtype'] + '</td>'
-            + '<td class="c">' + (q['meantime'] > 0 ? q['meantime'] : '') + '</td>'
+            + '<td class="c">' + q['times'] + '</td>'
+            + '<td class="c">' + (q['meantimen'] > 3 ? 
+                ('<span onmouseenter="tipshow(this,\''+_('Avg score on first try: ')+q['meanscore']+'%'
+                + '<br/>'+_('Avg time on first try: ') + q['meantime'] + _(' min') + 
+                '<br/>N='+q['meantimen']+'\')" onmouseleave="tipout()">' + q['meantime'] + '</span>') :
+                '') + '</td>'
             + '<td class="c">' + actions + '</td>'
             + '</tr>';
     }

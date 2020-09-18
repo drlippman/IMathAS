@@ -1446,9 +1446,9 @@ function generateTable() {
                         imasroot +
                         "/img/html_tiny" +
                         showicons +
-                        '.png" alt="Help Resource' +
+                        '.png" alt="'+_('Help Resource') +
                         altadd +
-                        '" title="Help Resource' +
+                        '" title="'+_('Help Resource') +
                         altadd +
                         '"/>';
                 }
@@ -1458,9 +1458,9 @@ function generateTable() {
                         imasroot +
                         "/img/assess_tiny" +
                         showicons +
-                        '.png" alt="Written solution' +
+                        '.png" alt="'+('Written solution') +
                         altadd +
-                        '" title="Written solution' +
+                        '" title="'+('Written solution') +
                         altadd +
                         '"/>';
                 }
@@ -1487,23 +1487,20 @@ function generateTable() {
                 }
                 html += "<td>" + curitems[j][3] + "</td>"; //question type
                 html += "<td class=c>";
-                if (curitems[j][8][0] > 0) {
-                    if (curitems[j][8].length > 3) {
-                        html +=
-                            "<span onmouseover=\"tipshow(this,'Avg score on first try: " +
-                            curitems[j][8][1] +
-                            "%";
-                        html +=
-                            "<br/>Avg time on first try: " +
-                            curitems[j][8][2] +
-                            " min<br/>N=" +
-                            curitems[j][8][3] +
-                            '\')" onmouseout="tipout()">';
-                    }
+                if (curitems[j][8][3] > 4) {   
+                    html +=
+                        "<span onmouseover=\"tipshow(this,'"+('Avg score on first try: ') +
+                        curitems[j][8][1] +
+                        "%";
+                    html +=
+                        "<br/>"+_("Avg time on first try: ") +
+                        curitems[j][8][2] +
+                        _(" min")+"<br/>N=" +
+                        curitems[j][8][3] +
+                        '\')" onmouseout="tipout()">';
+                    
                     html += curitems[j][8][0];
-                    if (curitems[j][8].length > 3) {
-                        html += "</span>";
-                    }
+                    html += "</span>";
                 }
                 html += "</td>";
                 if (curitems[j][4] == 9999) {

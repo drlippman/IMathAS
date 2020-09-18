@@ -395,6 +395,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         .searchbar .dropdown > button {
             margin:0;
         }
+        #qsearchbarswrap {
+            max-width: 1000px;
+        }
         #searchwrap {
             flex-grow: 1;
             position: relative;
@@ -742,6 +745,7 @@ if ($overwriteBody==1) {
 <h2><?php echo _('Potential Questions') ?></h2>
 
 <div id="fullqsearchwrap">
+<div id="qsearchbarswrap">
 <div class="flexrow wrap dropdown searchbar">
     <div class="dropdown">
         <button id="cursearchtype" type="button" class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -840,6 +844,7 @@ if ($overwriteBody==1) {
     <button class="viewall" aria-hidden="true" onclick="this.style.display='none';this.parentNode.classList.remove('short');">
         <?php echo _('View all');?>
     </button>
+</div>
 </div>
 
 <div id="addbar" class="footerbar" style="display:none;">
