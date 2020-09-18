@@ -560,6 +560,24 @@ class QuestionHtmlGenerator
                 // combine to a single showanswer
                 $questionWriterVars['showanswer'] = implode('<br>', $showanswer);
                 $toevalqtxt = preg_replace('/(\$showanswerloc\[.*?\]|\[SAB.*?\])(\s*<br\/><br\/>)?/','', $toevalqtxt);
+                /*ksort($showanswer);
+                $_lastPartUsed = -1;
+                $_thisIsReady = true;
+                foreach ($showanswer as $kidx=>$atIdx) {
+                    $_thisIsReady = true;
+                    for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
+                        if (!$doShowAnswerParts[$iidx]) {
+                            $_thisIsReady = false;
+                            break;
+                        } else if ($iidx < $kidx) {
+                            $doShowAnswerParts[$iidx] = false;
+                        }
+                    }
+                    $doShowAnswerParts[$kidx] = $_thisIsReady;
+                    $_lastPartUsed = $kidx;
+                }
+                $doShowAnswer = false; // disable automatic display of answers
+                */
             }
         }
         /*
