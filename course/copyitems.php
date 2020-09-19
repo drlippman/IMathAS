@@ -559,7 +559,7 @@ $excludeAssess = ($sourceUIver > $destUIver);
 		<?php
 			$tdpad = 16*strlen($prespace[$i]);
 
-			echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
+			echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$staticroot.'/img/';
 			switch ($types[$i]) {
 				case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
 				case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
