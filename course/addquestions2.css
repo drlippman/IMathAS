@@ -1,0 +1,247 @@
+/*Styles for addquestions.php but initially for addqsort.js */
+
+input[id^=pts],input[id^=grppts],input[id^=grpn],#defpts {
+	width:2em;
+	text-align: center;
+}
+.textsegment {
+	border: 2px solid transparent;
+}
+.highlightbackground button {
+	background-color: #F8F810 !important;
+}
+.highlightborder .textsegment {
+	border: 2px solid #F8F810 !important;
+}
+.textsegment.mce-edit-focus {
+	outline: none !important;
+	border: 2px solid #DDDDFF;
+}
+.mce-dim{
+	opacity: 0.3;
+}
+.textsegment {
+	height: auto;
+	padding: 0px 5px;
+	margin: 0; /* h4 typically has a large margin which isn't needed */
+}
+.textsegment span.AMedit {
+	border: 1px solid #ff0000;
+}
+h4.textsegment {
+	padding: 3px 5px 5px;
+}
+.textsegment.collapsed * {
+	margin: 5px 0px;
+	padding: 0px;
+	font-size: 1em !important;
+}
+.description-cell {
+	max-width: 0; /* just need any max-width for text-overflow */
+}
+.collapsed {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-height: 1.7em;
+	max-width: 93%;
+	overflow: hidden;
+}
+.intro-like {
+	position: relative;
+	background-color: #fff; /* must match .intro */
+}
+.collapsed * {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.collapsedheader {
+	white-space: nowrap;
+	max-width: 93%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-height: 1.7em;
+}
+div.text-segment-icon {
+	font-size: 0.85em;
+	z-index: 10;
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	padding: 0;
+	text-align: right;
+	background: transparent;
+}
+div.text-segment-iconglobal {
+	margin: 3px;
+	/* remove some styles used in the general class */
+	display: inline;
+	position: static;
+	bottom: auto;
+	right: auto;
+}
+div.text-segment-iconglobal img {
+	vertical-align: middle;
+}
+button.text-segment-button-global, button.text-segment-button-global:hover, button.text-segment-button-global:active, button.text-segment-button-global:focus  {
+	background-color: #586EEA; /* or #6E9ADC; #7798f9;*/
+	border-color: #586EEA;
+	font-family: sans-serif;
+	font-color: #fff;
+	font-weight: bold;
+	color: #fff;
+}
+.text-segment-button {
+	cursor: pointer;
+	padding: 1px;
+	margin: 2px;
+	background-color: rgba(255,255,255,0.8);
+	box-shadow: 3px 3px 6px 0 rgba(0,0,0,0.2);
+}
+.text-segment-button:hover, .text-segment-button:focus {
+	background-color: white;
+	transition-duration: 0.4s;
+	box-shadow: 1px 1px 3px 0 rgba(0,0,0,0.24);
+}
+tr.textsegmentrow td {
+	vertical-align: top;
+	padding-top:5px;
+}
+.noticehighlight {
+	background-color: #ffaaaa;
+	padding: 0px 5px;
+}
+
+.zebra tbody tr:nth-of-type(even) {
+    background-color: #dfd;
+}
+.searchbar {
+    align-items: stretch;
+}
+.searchbar .dropdown > button {
+    margin:0;
+}
+#qsearchbarswrap {
+    max-width: 1000px;
+}
+#searchwrap {
+    flex-grow: 1;
+    position: relative;
+}
+#searchwrap > #search {
+    width: calc(100% - 8px);
+    padding: 1px 2px;
+    margin: 0;
+    height: calc(100% - 6px);
+}
+#searchwrap.hastext > #search {
+    padding-right: 20px;
+    width: calc(100% - 26px);
+}
+#searchclear {
+    display:none;
+}
+#searchwrap.hastext #searchclear {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 1.4em;
+    line-height: 1em;
+    padding: 0 0.2em;
+    margin: 0.1em;
+    border: 0;
+    background-color: transparent;
+}
+#searchwrap.hastext #searchclear:hover,
+#searchwrap.hastext #searchclear:focus {
+    background-color: #ccc;
+    outline: 0;
+}
+.advsearch {
+    width: 80vw;
+    max-width: 800px;
+  }
+  .mform {
+      padding: 15px;
+  }
+  .mform > div {
+      display: flex;
+    margin-bottom: 10px;
+  }
+  .mform > div > label {
+      min-width: 100px;
+    margin-right: 15px;
+  }
+  
+  .mform > div > label + * {
+      flex: 1 1 auto;
+  }
+  .selectedlibs {
+    background-color: #eee;
+    padding: 4px;
+    line-height: 1.4em;
+    font-size: 80%;
+    position: relative;
+    display: flex;
+  }
+  .selectedlibs.short #libnames {
+    height: 1.4em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+  }
+  .viewall {
+    border: 0;
+    border-left: 1px solid #ccc;
+    background-color: transparent;
+    height: 1.4em;
+    margin: 0;
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+  #addbar {
+      margin-top: 10px;
+  }
+  .footerbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 10px 15px;
+    box-shadow: 0px -3px 5px 0px rgba(0,0,0,0.75);
+    width: 100%;
+    z-index: 30;
+    background-color:#fff;
+  }
+  .footerbar.sr-only {
+      padding: 0;
+      width: 1px;
+  }
+  .splitbtn > button:first-child {
+      margin-right: 0;
+      border-right: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+  }
+  .splitbtn > button:first-child + button {
+    margin-left: 0;
+    border-left: 1px solid #ccc;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 3px;
+    padding-right: 5px;
+  }
+  #selq {
+      margin-top: 10px;
+  }
+  td.qbroken {
+      font-style: italic;
+      color: #f66;
+  }
+  td.qwronglib {
+      font-style: italic;
+      color: #333;
+  }
+  td.qinassess {
+      color: #999;
+  }
