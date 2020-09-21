@@ -196,7 +196,7 @@ function displayQuestionList(results) {
             features += 'title="'+altbase+'">';
             features +=
                 '<img src="' +
-                imasroot +
+                staticroot +
                 '/img/video_tiny.png" alt="' +
                 altbase +
                 '"/>' +
@@ -205,14 +205,14 @@ function displayQuestionList(results) {
         if ((q['extrefval'] & 4) == 4) {
             features +=
                 '<img src="' +
-                imasroot +
+                staticroot +
                 '/img/html_tiny.png" alt="'+_('Help Resource')+'" ' +
                 'title="'+_('Help Resource')+'" />';
         }
         if ((q['extrefval'] & 8) == 8) {
             features +=
                 '<img src="' +
-                imasroot +
+                staticroot +
                 '/img/assess_tiny.png" alt="'+_('Written example')+'" ' +  
                 'title="'+_('Written example')+'" />';
         }
