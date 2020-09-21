@@ -85,7 +85,14 @@
 		$frompot = 1;
 	} else {
 		$frompot = 0;
-	}
+    }
+    if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+        $addq = 'addquestions2';
+        $from = 'addq2';
+    } else {
+        $addq = 'addquestions';
+        $from = 'addq';
+    }
 	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
@@ -512,10 +519,10 @@
 		} else {
 			if ($frompot==1) {
 				$modquestion = (!empty($courseUIver) && $courseUIver > 1) ? 'modquestion2.php' : 'modquestion.php';
-				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">"._("Add Question to Assessment using Defaults")."</a> | \n";
-				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Add Question to Assessment")."</a> | \n";
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&from=$from&process=true&usedef=true\">"._("Add Question to Assessment using Defaults")."</a> | \n";
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&from=$from\">"._("Add Question to Assessment")."</a> | \n";
 			}
-			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
+			$outputmsg .=  "<a href=\"$addq.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
 		}
 		if ($_POST['test']=="Save and Test Question") {
 			$outputmsg .= "<script>addr = '$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
@@ -531,7 +538,7 @@
 			if ($errmsg == '' && !isset($_GET['aid'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/manageqset.php?cid='.$cid.'&r='.Sanitize::randomQueryStringParam());
 			} else if ($errmsg == '' && $frompot==0) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/addquestions.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/'.$addq.'.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
 			} else {
 				require("../header.php");
 				echo $errmsg;
@@ -752,11 +759,11 @@
 	// Build form action
 	$formAction = "moddataset.php?process=true"
 		. (isset($_GET['cid']) ? "&cid=$cid" : "")
-		. (isset($_GET['aid']) ? "&aid=".Sanitize::encodeUrlParam($_GET['aid']) : "")
+		. (isset($_GET['aid']) ? "&aid=".Sanitize::encodeUrlParam($_GET['aid'])."&from=$from" : "")
 		. ((isset($_GET['id']) && !isset($_GET['template'])) ? "&id=".Sanitize::encodeUrlParam($_GET['id']) : "")
 		. (isset($_GET['template']) ? "&templateid=".Sanitize::encodeUrlParam($_GET['id']) : "")
 		. (isset($_GET['makelocal']) ? "&makelocal=".Sanitize::encodeUrlParam($_GET['makelocal']) : "")
-		. ($frompot==1 ? "&frompot=1" : "");
+        . ($frompot==1 ? "&frompot=1" : "");
 
 	// If in quick-save mode, build return packet and exit here
 	if ($quicksave) {
@@ -966,7 +973,7 @@
 
 	if (isset($_GET['aid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; "._("Modify Questions")."</div>";
+		echo "&gt; <a href=\"$addq.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; "._("Modify Questions")."</div>";
 
 	} else if (isset($_GET['daid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
