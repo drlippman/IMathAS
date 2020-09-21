@@ -723,8 +723,8 @@ if ($overwriteBody==1) {
     <div class="dropup inlinediv splitbtn">
         <button type="button" class="primary" onclick="addusingdefaults(false)">
             <?php echo _('Add'); ?>
-        </button><button type="button" class="primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="small" aria-label="<?php echo _('Options');?>">&#9650;</span>
+        </button><button type="button" class="primary dropdown-toggle arrow-up" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="sr-only"><?php echo _('Options for adding'); ?></span>
         </button>
         <ul class="dropdown-menu">
             <li><a href="#" role="button" onclick="addusingdefaults(false); return false;">
