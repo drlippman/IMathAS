@@ -110,7 +110,7 @@ function init(paramarr, enableMQ, baseel) {
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
-    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval)/)) { //want mathquill
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
       str = params.qtype;
       if (params.calcformat) {
@@ -945,8 +945,7 @@ function processByType(qn) {
         res = processNumfunc(qn, str, params.calcformat);
         break;
       case 'matrix':
-        res = processCalcMatrix(str, '');
-        res.dispvalstr = ''; // don't need to show for standard matrix
+        res = processCalcMatrix(str, 'decimal');
         break;
     }
     res.str = preformat(qn, str, params.qtype, params.calcformat);
