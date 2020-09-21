@@ -846,8 +846,8 @@ class QuestionHtmlGenerator
                         $filename, htmlentities($altText, ENT_QUOTES));
             } else if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                 $imagesAsHtml[$imageName] =
-                    sprintf('<img src="%s%s.s3.amazonaws.com/qimages/%s" alt="%s" />',
-                        $GLOBALS['urlmode'], $GLOBALS['AWSbucket'], $filename,
+                    sprintf('<img src="https://%s.s3.amazonaws.com/qimages/%s" alt="%s" />',
+                        $GLOBALS['AWSbucket'], $filename,
                         htmlentities($altText, ENT_QUOTES));
             } else {
                 $imagesAsHtml[$imageName] =
