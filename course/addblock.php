@@ -42,9 +42,9 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::en
 $curBreadcrumb .= (isset($_GET['id'])) ? "&gt; Modify Block\n" : "&gt; Add Block\n";
 
 if (isset($_GET['id'])) {
-	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Modify Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Modify Block <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
 } else {
-	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Add Block <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+	$formTitle = "<div id=\"headeraddblock\" class=\"pagetitle\"><h1>Add Block <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
 }
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
@@ -346,11 +346,11 @@ $(function() {
 	$('input[name=avail]').on('click', updateSlides);
 	$('input[name=availbeh]').on('click', updateSlides);
 });
-var imgBase = '$imasroot/javascript/cpimages';
+var imgBase = '$staticroot/javascript/cpimages';
 </script>";
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");}</style>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/colorpicker.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 /******* begin html output ********/
 require("../header.php");
@@ -391,7 +391,7 @@ if ($overwriteBody==1) {
 	<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,0,1) ?>/>
 	<input type=text size=10 name="sdate" value="<?php echo $sdate;?>">
 	<a href="#" onClick="displayDatePicker('sdate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a>
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 	at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span>
 	<BR class=form>
 
@@ -401,7 +401,7 @@ if ($overwriteBody==1) {
 	<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 	<input type=text size=10 name=edate value="<?php echo $edate;?>">
 	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a>
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 	at <input type=text size=10 name=etime value="<?php echo $etime;?>"></span>
 	<BR class=form>
 	</div>

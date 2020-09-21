@@ -12,7 +12,7 @@ if (isset($_GET['greybox'])) {
 } else {
 	$greybox = false;
 }
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 require('../header.php');
 
 if (isset($_POST['mathdisp'])) {

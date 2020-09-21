@@ -36,8 +36,8 @@ h2,h3,h4,h5,h6 {
 	color: #00c;
 }
 </style>
-<link rel="stylesheet" href="<?php echo $imasroot;?>/iconfonts/style.css?v=081316" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot;?>/iconfonts/style.css?v=081316" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot;?>/tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />
 <?php
 	}
 //IMathAS:  Reads sections of the help.html file

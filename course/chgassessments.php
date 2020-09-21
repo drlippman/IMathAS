@@ -617,7 +617,7 @@ $(function() {
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerchgassessments" class="pagetitle"><h1>Mass Change Assessment Settings
-		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h1></div>
 
 	<div class="cpmid">

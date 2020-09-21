@@ -65,7 +65,7 @@ if (isset($_POST['submit'])) {
 
 
 //HTML output
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<script type="text/javascript">
 	$(document).on("submit","form",function() {
 		window.onbeforeunload = null;
@@ -74,7 +74,7 @@ $placeinhead .= '<script type="text/javascript">
 	var nextnewcnt = 1;
 	function addnewevent() {
 		var html = "<tr><td><input type=text size=10 id=\"datenew-"+nextnewcnt+"\" name=\"datenew-"+nextnewcnt+"\"> ";
-		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"'.$staticroot.'/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 		html += "<td><input name=\"tagnew-"+nextnewcnt+"\" id=\"tagnew-"+nextnewcnt+"\" type=text size=8 /></td>";
 		html += "<td><input name=\"txtnew-"+nextnewcnt+"\" id=\"txtnew-"+nextnewcnt+"\" type=text size=80 /></td></tr>";
 		$("#newEventsTable tbody").append(html);
@@ -124,7 +124,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$date = tzdate("m/d/Y",$row[1]);
 	echo "<td><input type=text size=10 id=\"date" . Sanitize::onlyInt($row[0]) . "\" name=\"date".Sanitize::onlyInt($row[0])."\" value=\"";
 	echo Sanitize::encodeStringForDisplay($date) . "\" oninput=\"txtchg()\" /> ";
-	echo "<a href=\"#\" onClick=\"displayDatePicker('date".Sanitize::onlyInt($row[0])."', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+	echo "<a href=\"#\" onClick=\"displayDatePicker('date".Sanitize::onlyInt($row[0])."', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 	$cnt++;
 	echo '<td><input name="tag['.Sanitize::onlyInt($row[0]).']" type=text size=8 value="'.Sanitize::encodeStringForDisplay($row[3]).'" oninput="txtchg()" /></td>';
 	echo '<td><input name="txt['.Sanitize::onlyInt($row[0]).']" type=text size=80 value="'.Sanitize::encodeStringForDisplay($row[2]).'" oninput="txtchg()" /></td>';
@@ -149,7 +149,7 @@ if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$now);
 }
 echo "<td><input type=text size=10 id=\"datenew-0\" name=\"datenew-0\" value=\"$date\" oninput=\"txtchg()\"/> ";
-echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
 echo '<td><input name="tagnew-0" id="tagnew-0" type=text size=8 value="!" oninput="txtchg()" /></td>';
 echo '<td><input name="txtnew-0" id="txtnew-0" type=text size=80 value="" oninput="txtchg()" /></td>';

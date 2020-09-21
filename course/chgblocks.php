@@ -161,7 +161,7 @@ function init() {
 	var inp3 = document.getElementById(\"bi\");
 	attachColorPicker(inp3);
 }
-var imgBase = '$imasroot/javascript/cpimages';
+var imgBase = '$staticroot/javascript/cpimages';
 $(document).ready(init);
 $(function() {
 	$('.chgbox').change(function() {
@@ -170,8 +170,8 @@ $(function() {
 })
 </script>";
 $placeinhead .= "<style type=\"text/css\">img {	behavior:	 url(\"$imasroot/javascript/pngbehavior.htc\");} table td {border-bottom: 1px solid #ccf;}</style>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/colorpicker.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/colorpicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 /******* begin html output ********/
 require("../header.php");

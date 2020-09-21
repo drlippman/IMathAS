@@ -108,7 +108,7 @@
 		}
 	}
 
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 
 	echo "<table id=myTable class=gb><thead><tr><th>Group</th>";
 	echo "<th>Grade</th><th>%</th><th>Feedback</th></tr></thead><tbody>";

@@ -248,7 +248,7 @@ If deleted on both ends, delete from DB
 					var newcid = $(el).val();
 					$("#to").hide();
 					if (newcid>0) {
-						$(el).after($("<img>", {src: imasroot+"/img/updating.gif", alt: "Loading recipients..."}));
+						$(el).after($("<img>", {src: staticroot+"/img/updating.gif", alt: "Loading recipients..."}));
 						$.ajax({
 							url: "msglist.php?cid=0&getstulist="+newcid,
 							dataType: "json",
@@ -544,7 +544,7 @@ If deleted on both ends, delete from DB
 	}
 
 	$pagetitle = "Messages";
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js?v=072217\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/msg.js?v=072217\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $GLOBALS['basesiteurl'] . "/msgs/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
 	if (isset($_SESSION['ltiitemtype'])) {
@@ -838,9 +838,9 @@ function chgfilter() {
 		echo "</td><td>";
 		echo '<a href="#" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');return false;">';
 		if ($line['tagged']==1) {
-			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" alt=\"Flagged\"/>";
+			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"Flagged\"/>";
 		} else {
-			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" alt=\"Not flagged\"/>";
+			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" alt=\"Not flagged\"/>";
 		}
 		echo '</a>';
 		echo '</td>';

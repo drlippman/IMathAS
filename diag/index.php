@@ -20,12 +20,12 @@
 		$nologo = true;
         $loadinginfoheader = true;;
 		$infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
-		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+		$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 		require("../header.php");
 		$pagetitle = "Diagnostics";
 		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
-		echo "<img class=\"floatleft\" src=\"$imasroot/img/ruler.jpg\" alt=\"Picture of a ruler\"/>
+		echo "<img class=\"floatleft\" src=\"$staticroot/img/ruler.jpg\" alt=\"Picture of a ruler\"/>
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h1>", _('Available Diagnostics'), "</h1></div>
 		<ul class=\"nomark\">";
@@ -371,8 +371,8 @@ if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludep
 } else {
 $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
-$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 $flexwidth = true;
 require("../header.php");
 $pagetitle =$line['name'];

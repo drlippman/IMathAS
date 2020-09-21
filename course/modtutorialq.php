@@ -980,9 +980,9 @@ $ansfmtlbl = array("none","any fraction","reduced fraction","fraction or decimal
 
 $useeditor = "text,popuptxt";
 
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
-$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js"></script>';
-$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js"></script>';
+$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css">';
 $placeinhead .= '<style type="text/css">
   .txted {
     padding-left: 1px;

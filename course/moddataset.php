@@ -810,9 +810,9 @@
 	}
 	*/
 	$useeditor = "noinit";
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js?v=072018"></script>';
-	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=072018"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
@@ -956,7 +956,7 @@
 	   	}
 	   }
 	   </script>';
-	$placeinhead .= "<script src=\"$imasroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
+	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
 		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
@@ -965,7 +965,7 @@
 		.CodeMirror-focused .CodeMirror-selected {background: #3366AA;}
 		.CodeMirror-selected {background: #666666;}
 		</style>';
-	$placeinhead .= "<link href=\"$imasroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
+	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
 	$placeinhead .= "<style>.quickSaveButton {display:none;}</style>";
 
 	require("../header.php");
@@ -1438,7 +1438,7 @@ $placeinfooter='
 	<div id="solverinsides">
 	<div id="operationselect">
 	Select and drag or copy an expression from your question code.
-	<img id="solverinputhelpicon" src="../img/help.gif" alt="Help"><br/>
+	<img id="solverinputhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
 	<div id="solverinputhelp" style="display: none;">
 	</div>
 	<input id="imathastosage" type="text" size="30">
@@ -1455,14 +1455,14 @@ $placeinfooter='
 	<div id="sagemathcode" style="display: none;"></div>
 	<div id="sagecellcontainer">
 		<div id="sagecell"></div>
-		<img id="solverhelpicon" src="../img/help.gif" alt="Help"><br/>
+		<img id="solverhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
 	</div>
 	<div id="solverhelpbody" style="display: none">
 	</div>
 	<div id="sagecelloutput"></div>
     <div id="sagetocontroldiv" style="display: none;" >
 		Drag this to the Common Control box or use the buttons below.
-	<img id="solveroutputhelpicon" src="../img/help.gif" alt="Help"><br/>
+	<img id="solveroutputhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
 	<div id="sagetocontrolresult">
 		<p><span id="sagetocontrol" draggable="true"></span></p>
 	</div>

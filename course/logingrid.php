@@ -101,7 +101,7 @@ if (isset($_GET['download'])) {
 	}
 	exit;
 }
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css"> table.logingrid td {text-align: center; border-right:1px solid #ccc;} table.logingrid td.left {text-align: left;}</style>';
 require("../header.php");
 if ($overwriteBody==1) {
@@ -126,10 +126,10 @@ if ($overwriteBody==1) {
 ?>
 	Show <input type="text" size="10" name="sdate" value="<?php echo $sdate;?>">
 	<a href="#" onClick="displayDatePicker('sdate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a> through
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a> through
 	<input type="text" size="10" name="edate" value="<?php echo $edate;?>">
 	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a>
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 	<input type="submit" name="daterange" value="Go"/></p>
 	</form>
 

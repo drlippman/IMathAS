@@ -93,7 +93,7 @@ if ($stm->rowCount()==0) {
 
 		if ($type=='teach') {
 			echo ' <span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-			echo '<img src="../img/gears.png" alt="Options" class="mida"/></a>';
+			echo '<img src="'.$staticroot.'/img/gears.png" alt="Options" class="mida"/></a>';
 			echo '<ul role="menu" class="dropdown-menu">';
 			echo ' <li><a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&tohide='.$row['id'].'">'._('Un-hide from course list').'</a></li>';
 			if ($row['ownerid']==$userid && $myrights>20) {
@@ -131,7 +131,7 @@ if (count($deleted) > 0) {
     echo '<ul class="nomark courselist">';
     foreach ($deleted as $row) {
         echo '<li><span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-        echo '<img src="../img/gears.png" alt="Options" class="mida"/></a>';
+        echo '<img src="'.$staticroot.'/img/gears.png" alt="Options" class="mida"/></a>';
         echo '<ul role="menu" class="dropdown-menu">';
         echo ' <li><a href="unhidefromcourselist.php?type='.Sanitize::encodeUrlParam($type).'&toundel='.$row['id'].'">'._('Un-Delete').'</a></li>';
         echo '</ul></span> ';

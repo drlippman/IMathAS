@@ -2263,7 +2263,7 @@ function setCursor(cursor, target) {
 		if (cursor=='move') {
 			targets[target].el.style.cursor = cursor;
 		} else {
-			targets[target].el.style.cursor = 'url('+imasroot+'/img/'+cursor+'.cur), auto';
+			targets[target].el.style.cursor = 'url('+staticroot+'/img/'+cursor+'.cur), auto';
 		}
 		targets[target].cursor = cursor;
 	}

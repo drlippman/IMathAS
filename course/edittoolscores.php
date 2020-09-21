@@ -128,7 +128,7 @@
 		exit;
 	}
 
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=121213\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=121213\"></script>";
 
 
 	require("../header.php");
@@ -172,7 +172,7 @@
 		echo '<div id="gradeboxes">';
 		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
 		if ($hassection) {
-			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+			echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 		}
 		if ($_GET['uid']=='all') {
 			echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>";

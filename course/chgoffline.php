@@ -129,7 +129,7 @@ $stime = tzdate("g:i a",time());
 $line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
 
 //HTML output
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<script type="text/javascript">
  $(function() {
    $("#options td:first-child input[type=checkbox").on("change", function() {
@@ -187,7 +187,7 @@ foreach($gbitems as $id=>$name) {
 <input type=radio name="sdatetype" value="0" /> Always<br/>
 <input type=radio name="sdatetype" value="sdate" checked="checked"/><input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 <a href="#" onClick="displayDatePicker('sdate', this); return false">
-<img src="../img/cal.gif" alt="Calendar"/></a>
+<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 	</td>
 </tr>

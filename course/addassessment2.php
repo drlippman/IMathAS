@@ -865,7 +865,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
 $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
 

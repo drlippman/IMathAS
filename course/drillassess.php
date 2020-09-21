@@ -235,15 +235,15 @@ $showtips = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
 $useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 if ($courseUIver > 1) {
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assessment/mathtest.css" />';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-    $placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
-    $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=072520" type="text/javascript"></script>';
-    $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
-    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
-        <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assessment/mathtest.css" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+    $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
+    $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=072520" type="text/javascript"></script>';
+    $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
+    $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
+        <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
     $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
     require("../header.php");
 } else {
@@ -557,7 +557,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $DBH,$imasroot;
+	global $DBH,$imasroot,$staticroot;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
@@ -597,7 +597,7 @@ function printscore($sc,$qsetid,$seed) {
 			} else {
 				$pm = 'ychk'; $alt=_('Partially correct');
 			}
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" alt=\"$alt\"/>";
+			$bar = "<img src=\"$staticroot/img/$pm.gif\" alt=\"$alt\"/>";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);

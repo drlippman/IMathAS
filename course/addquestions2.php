@@ -379,11 +379,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort2.js?v=090320\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/qsearch.js?v=082820\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090320\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=082820\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
-    $placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions2.css?v=092020\" type=\"text/css\" />";
+    $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=092020\" type=\"text/css\" />";
     $placeinhead .= '<script>
         $(function() {
             if (window.top != window.self) {
@@ -483,12 +483,12 @@ if ($overwriteBody==1) {
         var curlibs = '<?php echo Sanitize::encodeStringForJavascript(implode(',',$searchin)); ?>';
         var cursearchtype = '<?php echo Sanitize::simpleString($searchtype); ?>';
 	</script>
-	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
+	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js"></script>
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 
 	<div id="headeraddquestions" class="pagetitle"><h1><?php echo _('Add/Remove Questions'); ?>
-		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
     </h1></div>
     <div class="cp">
         <span class="column">
@@ -527,7 +527,7 @@ if ($overwriteBody==1) {
 		echo "<p>"._("No Questions currently in assessment")."</p>\n";
 
 		echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
-		echo "<img src=\"$imasroot/img/help.gif\" alt=\"Help\"/> ";
+		echo "<img src=\"$staticroot/img/help.gif\" alt=\"Help\"/> ";
 		echo _('How do I find questions to add?'),'</a>';
 		echo '<div id="helpwithadding" style="display:none">';
 		if ($_SESSION['selfrom'.$aid]=='lib') {
@@ -723,8 +723,8 @@ if ($overwriteBody==1) {
     <div class="dropup inlinediv splitbtn">
         <button type="button" class="primary" onclick="addusingdefaults(false)">
             <?php echo _('Add'); ?>
-        </button><button type="button" class="primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="small" aria-label="<?php echo _('Options');?>">&#9650;</span>
+        </button><button type="button" class="primary dropdown-toggle arrow-up" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="sr-only"><?php echo _('Options for adding'); ?></span>
         </button>
         <ul class="dropdown-menu">
             <li><a href="#" role="button" onclick="addusingdefaults(false); return false;">

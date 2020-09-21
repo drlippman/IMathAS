@@ -23,7 +23,7 @@ if (!(isset($teacherid))) {
 
 /******* begin html output ********/
 if (isset($_POST['versions'])) {
-	$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
+	$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/assessment/print.css?v=100213\"/>\n";
 }
 
 $nologo = true;

@@ -121,6 +121,12 @@ if (!isset($use_local_sessions)) {
   }
 }
 
+if (isset($CFG['static_server'])) {
+    $staticroot = $CFG['static_server'];
+} else {
+    $staticroot = $imasroot;
+}
+
 // Load validate.php?
 if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init_skip_validate)) {
 	require_once(__DIR__ . "/validate.php");

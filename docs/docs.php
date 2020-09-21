@@ -2,7 +2,7 @@
 $nologo = true;
 $dbsetup = true; //prevents connection to database
 include("../init_without_validate.php");
-$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
+$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/infopages.css\" type=\"text/css\">\n";
 require("../header.php");
 $pagetitle = "Documentation";
 require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");

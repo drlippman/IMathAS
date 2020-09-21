@@ -324,7 +324,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$useeditor = "message";
 		$loadgraphfilter = true;
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 		require("../header.php");
 		if (empty($_GET['embed'])) {
@@ -594,7 +594,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<input type=text size=10 name=replybydate value=\"".Sanitize::encodeStringForDisplay($replybydate)."\" aria-label=\"reply by date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
 				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
-				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
+				echo "<img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=replybytime value=\"".Sanitize::encodeStringForDisplay($replybytime)."\" aria-label=\"reply by time\"></span><br class=\"form\" />";
 
 				$thread_lastposttime = 0;
@@ -626,7 +626,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "/> <label for=releaseon3>Later:</label> ";
 				echo "<input type=text size=10 name=releasedate value=\"$releasebydate\" aria-label=\"post release date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'releasedate\', this); return false">';
-				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
+				echo "<img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=releasetime value=\"$releasebytime\" aria-label=\"post release time\"></span><br class=\"form\" />";
 			}
 			if ($groupsetid >0 && $isteacher && ($_GET['modify']=='new' || ($_GET['modify']!='reply' && $line['parent']==0))) {

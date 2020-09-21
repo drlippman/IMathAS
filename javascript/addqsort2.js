@@ -1205,7 +1205,7 @@ function generateTable() {
                         if (itemarray[i][3] == 1) {
                             html +=
                                 '<img src="' +
-                                imasroot +
+                                staticroot +
                                 '/img/collapse.gif" onclick="collapseqgrp(' +
                                 i +
                                 ')" alt="' +
@@ -1214,7 +1214,7 @@ function generateTable() {
                         } else {
                             html +=
                                 '<img src="' +
-                                imasroot +
+                                staticroot +
                                 '/img/expand.gif" onclick="expandqgrp(' +
                                 i +
                                 ')" alt="' +
@@ -1443,7 +1443,7 @@ function generateTable() {
                     html += 'title="'+altbase+altadd+'">';
                     html +=
                         '<img src="' +
-                        imasroot +
+                        staticroot +
                         "/img/video_tiny" +
                         showicons +
                         '.png" alt="' +
@@ -1455,7 +1455,7 @@ function generateTable() {
                 if ((curitems[j][7] & 2) == 2) {
                     html +=
                         '<img src="' +
-                        imasroot +
+                        staticroot +
                         "/img/html_tiny" +
                         showicons +
                         '.png" alt="'+_('Help Resource') +
@@ -1467,7 +1467,7 @@ function generateTable() {
                 if ((curitems[j][7] & 8) == 8) {
                     html +=
                         '<img src="' +
-                        imasroot +
+                        staticroot +
                         "/img/assess_tiny" +
                         showicons +
                         '.png" alt="'+('Written solution') +
@@ -1702,7 +1702,7 @@ function generateTable() {
     }
     html +=
         '<div class="text-segment-iconglobal"><img src="' +
-        imasroot +
+        staticroot +
         '/img/help.gif" alt="Help" onClick="window.open(\'' +
         imasroot +
         "/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left=" +

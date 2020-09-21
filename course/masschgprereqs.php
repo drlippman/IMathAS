@@ -90,7 +90,7 @@ $from = Sanitize::simpleString($_GET['from']);
 // HTML display
 
 $pagetitle = _('Mass Change Prereqs');
-$placeinhead = '<script type="text/javascript" src="'. $imasroot . '/javascript/tablesorter.js"></script>';
+$placeinhead = '<script type="text/javascript" src="'. $staticroot . '/javascript/tablesorter.js"></script>';
 require('../header.php');
 
 echo '<div class=breadcrumb>';

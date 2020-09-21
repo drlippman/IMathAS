@@ -94,7 +94,7 @@
        $cid = 0;
      }
 
-     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
            require("header.php");
     if (isset($_SERVER['QUERY_STRING'])) {
         $querys = '?'.Sanitize::fullQueryString($_SERVER['QUERY_STRING']).'&guestaccess=true';
