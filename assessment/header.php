@@ -53,6 +53,7 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
 	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
+echo "<script type=\"text/javascript\">imasroot = '$imasroot';staticroot='$staticroot';</script>";
 
 if (isset($CFG['locale'])) {
 	$lang = substr($CFG['locale'],0,2);
@@ -210,7 +211,6 @@ div { zoom: 1; }
 
 <?php
 
-echo "<script type=\"text/javascript\">imasroot = '$imasroot';staticroot='$staticroot';</script>";
 if (isset($useeditor) && $_SESSION['useed']==1) {
 	echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=051919"></script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
