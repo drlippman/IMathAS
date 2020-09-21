@@ -372,7 +372,7 @@ if ($end_attempt) {
 // Record record
 $assess_record->saveRecord();
 
-if ($assessInfoOut['submitby'] == 'by_question' || $end_attempt) {
+if (($assessInfoOut['submitby'] == 'by_question' && !$in_practice) || $end_attempt) {
   // update LTI grade
   $lti_sourcedid = $assess_record->getLTIsourcedId();
   if (strlen($lti_sourcedid) > 1) {

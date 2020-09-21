@@ -511,6 +511,10 @@ var myMQeditor = (function($) {
           );
         }
       }
+      if (qtype=='numfunc' && calcformat.match(/inequality/)) {
+        baselayout.tabs[3].enabled = true;
+        baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
+      }
     }
     if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
       baselayout.tabs[1].enabled = true;

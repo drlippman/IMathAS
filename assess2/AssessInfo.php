@@ -1126,7 +1126,7 @@ class AssessInfo
 
     //handle safe exam browser passwords
     if ($settings['password'] != '' && !empty($_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'])) {
-      $testhash = hash("sha256", 'https//'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($settings['password']));
+      $testhash = hash("sha256", $GLOBALS['urlmode'].$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($settings['password']));
       if ($testhash == $_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH']) {
         $settings['password'] = '';
       }

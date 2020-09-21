@@ -2,13 +2,15 @@
 
 require_once(__DIR__ . "/includes/sanitize.php");
 
+if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+    $urlmode = 'https://';
+} else {
+    $urlmode = 'http://';
+}
+
 // Load site config.
 if (!file_exists(__DIR__ . "/config.php")) {
-	// Can't use $basesiteurl here, as it's defined in config.php.
-	$httpMode = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
-	|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-		? 'https://' : 'http://';
-	header('Location: ' . Sanitize::url($httpMode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php?r=" . Sanitize::randomQueryStringParam()));
+	header('Location: ' . Sanitize::url($urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php?r=" . Sanitize::randomQueryStringParam()));
 }
 
 require_once(__DIR__ . "/config.php");

@@ -19,11 +19,6 @@
 
  session_start();
  $sessionid = session_id();
- if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
- 	 $urlmode = 'https://';
- } else {
- 	 $urlmode = 'http://';
- }
 
  $myrights = 0;
  $myspecialrights = 0;

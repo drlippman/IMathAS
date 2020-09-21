@@ -557,6 +557,7 @@ export const actions = {
               window.$(el).find('.scoreresult').focus();
             } else {
               el = window.$('#questionwrap' + qns[0]).find('.seqsep').last().next()[0];
+              window.$('#questionwrap' + qns[0]).find('.seqsep').last().focus();
             }
             var bounding = el.getBoundingClientRect();
             if (bounding.top < 0 || bounding.bottom > document.documentElement.clientHeight) {

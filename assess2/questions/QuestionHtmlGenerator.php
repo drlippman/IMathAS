@@ -555,11 +555,31 @@ class QuestionHtmlGenerator
         if (isset($showanswer) && is_array($showanswer) && count($showanswer) < count($answerbox)) {
             $showansboxloccnt = substr_count($toevalqtxt,'$showanswerloc') + substr_count($toevalqtxt,'[SAB');
             if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
-                // not enough showanswerloc boxes for all the parts.  Question may be utilizing
-                // older question hackery which doesn't work in new player
-                // combine to a single showanswer
+                // not enough showanswerloc boxes for all the parts.  
+                /*
+                  This approach combined to a single showanswer
                 $questionWriterVars['showanswer'] = implode('<br>', $showanswer);
                 $toevalqtxt = preg_replace('/(\$showanswerloc\[.*?\]|\[SAB.*?\])(\s*<br\/><br\/>)?/','', $toevalqtxt);
+                */
+                // this approach will only show the manually placed boxes, and only show them after all 
+                // preceedingly-indexed parts have been cleared for answer showing.
+                ksort($showanswer);
+                $_lastPartUsed = -1;
+                $_thisIsReady = true;
+                foreach ($showanswer as $kidx=>$atIdx) {
+                    $_thisIsReady = true;
+                    for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
+                        if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
+                            $_thisIsReady = false;
+                            break;
+                        } else if ($iidx < $kidx) {
+                            $doShowAnswerParts[$iidx] = false;
+                        }
+                    }
+                    $doShowAnswerParts[$kidx] = $_thisIsReady;
+                    $_lastPartUsed = $kidx;
+                }
+                $doShowAnswer = false; // disable automatic display of answers
             }
         }
         /*
@@ -664,7 +684,7 @@ class QuestionHtmlGenerator
                 }
               }
               if ($lastGroupDone) { // add html to output
-                $newqtext .= '<p class="seqsep" role="heading">';
+                $newqtext .= '<p class="seqsep" role="heading" tabindex="-1">';
                 $newqtext .= sprintf(_('Part %d of %d'), $k+1, count($seqParts));
                 $newqtext .= '</p>' . $seqPart;
               }
@@ -828,8 +848,8 @@ class QuestionHtmlGenerator
                         $filename, htmlentities($altText, ENT_QUOTES));
             } else if (isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                 $imagesAsHtml[$imageName] =
-                    sprintf('<img src="%s%s.s3.amazonaws.com/qimages/%s" alt="%s" />',
-                        $GLOBALS['urlmode'], $GLOBALS['AWSbucket'], $filename,
+                    sprintf('<img src="https://%s.s3.amazonaws.com/qimages/%s" alt="%s" />',
+                        $GLOBALS['AWSbucket'], $filename,
                         htmlentities($altText, ENT_QUOTES));
             } else {
                 $imagesAsHtml[$imageName] =
