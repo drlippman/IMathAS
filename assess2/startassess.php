@@ -58,7 +58,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes');
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
   }
 } else {
   echo '{"error": "not_avail"}';

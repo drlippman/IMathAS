@@ -31,7 +31,7 @@ class AssessHelpers
   	$stm->execute(array($aid));
   	if ($stm->rowCount() > 0) {
   		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-  		$assess_info->loadQuestionSettings();
+  		$assess_info->loadQuestionSettings('all', false, false);
         $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
   			$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -77,7 +77,7 @@ class AssessHelpers
   	$stm->execute(array($aid, $uid));
   	if ($stm->rowCount() > 0) {
   		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-  		$assess_info->loadQuestionSettings();
+  		$assess_info->loadQuestionSettings('all', false, false);
         $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
   			$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -117,7 +117,7 @@ class AssessHelpers
       return 0;
     }
     // grab all questions settings
-    $assess_info->loadQuestionSettings('all', false);
+    $assess_info->loadQuestionSettings('all', false, false);
 
     $DBH->beginTransaction();
     $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");

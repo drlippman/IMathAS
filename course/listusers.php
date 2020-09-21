@@ -449,9 +449,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$hasSectionRowHeader = ($hassection)? "<th>Section$sectionselect</th>" : "";
 		$hasCodeRowHeader = ($hascode) ? "<th>Code</th>" : "";
 		$hasLatePassHeader = ($haslatepasses) ? "<th>LatePasses</th>" : "";
-		$hasSectionSortTable = ($hassection) ? "'S'," : "";
-		$hasCodeSortTable = ($hascode) ? "'N'," : "";
-		$hasLatePassSortTable = ($haslatepasses) ? ",'N'" : "";
 
 	}
 } //END DATA MANIPULATION
@@ -857,8 +854,31 @@ if ($overwriteBody==1) {
 		}
 		echo '</p>';
 ?>
+
+        <?php
+            $sortstr = 'false,false';
+            if ($hassection) {
+                $sortstr .= ',"S"';
+            }
+            if ($hascode) {
+                $sortstr .= ',"S"';
+            }
+            $sortstr .= ',"S"';
+            $sortstr .= ',false';
+            if ($showSID) {
+                $sortstr .= ',"S"';
+            }
+            if ($showemail) {
+                $sortstr .= ',"S"';
+            }
+            $sortstr .= ',"D"';
+            $sortstr .= ',false';
+            if ($haslatepasses) {
+                $sortstr .= ',"N"';
+            }
+        ?>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S',false,'D',false<?php echo $hasLatePassSortTable ?>),true);
+			initSortTable('myTable',Array(<?php echo $sortstr;?>),true);
 		</script>
 	</form>
 

@@ -355,10 +355,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				require_once('../assess2/AssessInfo.php');
 				require_once('../assess2/AssessRecord.php');
 				$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-				$assess_info->loadQuestionSettings();
+				$assess_info->loadQuestionSettings('all', false, false);
 				$DBH->beginTransaction();
 				$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
-		    $stm->execute(array($aid));
+		        $stm->execute(array($aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					$assess_record = new AssessRecord($DBH, $assess_info, false);
 					$assess_record->setRecord($row);
@@ -1238,7 +1238,7 @@ if ($overwriteBody==1) {
 	<h2><?php echo _("Warning") ?></h2>
 	<p><?php echo _("This assessment has already been taken.  Adding or removing questions, or changing a	question's settings (point value, penalty, attempts) now would majorly mess things up. If you want to make these changes, you need to clear all existing assessment attempts") ?>
 	</p>
-	<p><input type=button value="Clear Assessment Attempts" onclick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
+	<p><input type=button value="<?php echo _("Clear Assessment Attempts"); ?>" onclick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearattempts=ask'">
 	</p>
 <?php
 	}
@@ -1564,8 +1564,8 @@ if ($overwriteBody==1) {
 		<h3><?php echo _('Choose assessments to take questions from'); ?></h3>
 		<form id="sela" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
 		<?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)"><?php echo _('None'); ?></a>
-		<input type=submit value="Use these Assessments" /> <?php echo _('or'); ?>
-		<input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
+		<input type=submit value="<?php echo _("Use these Assessments") ?>" /> <?php echo _('or'); ?>
+		<input type=button value="<?php echo _("Select From Libraries") ?>" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
 
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
@@ -1589,7 +1589,7 @@ if ($overwriteBody==1) {
 
 			</tbody>
 		</table>
-		<script type=\"text/javascript\">
+		<script type="text/javascript">
 			initSortTable('myTable',Array(false,'S','S',false,false,false),true);
 		</script>
 	</form>

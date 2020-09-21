@@ -42,7 +42,7 @@ $curdir = rtrim(dirname(__FILE__), '/\\');
 
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 	 $urlmode = 'https://';
- } else {
+ } else if ($_SERVER['HTTP_HOST'] != 'localhost') {
  	 $urlmode = 'http://';
 	 $errormsg = _('This launch was made insecurely (using http instead of https). ');
  	 $errormsg .= sprintf(_('%s requires secure launches to protect student data. '),$installname);

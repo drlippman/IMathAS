@@ -803,7 +803,7 @@ var app = new Vue({
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': '<?php echo _('Show with the score'); ?>'
+				'text': '<?php echo _('After the last try on a question');?>'
 			};
 
 			var out = [];

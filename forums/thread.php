@@ -216,7 +216,7 @@ if ($groupsetid>0) {
 		if (isset($_SESSION['ffilter'.$forumid]) && $_SESSION['ffilter'.$forumid]>-1) {
 			$groupid = $_SESSION['ffilter'.$forumid];
 			$dofilter = true;
-			$grpqs = "&grp=$groupid";
+			$grpqs = "&grp=" . intval($groupid);
 		} else {
 			$groupid = 0;
 		}
@@ -778,7 +778,7 @@ echo "</p>";
 				if ($line['lastposttime']>$now) {
 					echo '<i class="grey">';
 				}
-				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . Sanitize::encodeUrlParam($grpqs) .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
+				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . $grpqs .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
 				if ($line['lastposttime']>$now) {
 					echo '</i>';
 				}
