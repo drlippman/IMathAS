@@ -3081,11 +3081,12 @@ of choices is automatically randomized.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$scoremethod = "answers" or "allornothing" </dt>
+<dt>$scoremethod = "answers" or "allornothing" or "takeanything" </dt>
 	<dd>By default, the total points possible are divided by the number of questions, and partial credit is lost for each
 	correct answer missed and each wrong answer selected.  If $scoremethod="answers" is set, then the total points
 	possible are divided by the number of answers (tougher grading scheme).  If $scoremethod="allornothing", then the
-	student will only get credit if every piece is correct (no partial credit).</dd>
+    student will only get credit if every piece is correct (no partial credit).
+    if $scoremethod="takeanything", full credit will be given for any response.</dd>
 <dt>$displayformat = "horiz", "2column, "3column", or "inline" </dt>
 	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
 <dt>$noshuffle = "all" </dt>
