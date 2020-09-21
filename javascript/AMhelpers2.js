@@ -919,6 +919,8 @@ function processByType(qn) {
       return {str: 'DNE', displvalstr: '', submitstr: 'DNE'};
     } else if (str.match(/^\s*oo\s*$/i)) {
       return {str: 'oo', displvalstr: '', submitstr: 'oo'};
+    } else if (str.match(/^\s*\+oo\s*$/i)) {
+      return {str: '+oo', displvalstr: '', submitstr: '+oo'};
     } else if (str.match(/^\s*-oo\s*$/i)) {
       return {str: '-oo', displvalstr: '', submitstr: '-oo'};
     }
@@ -1200,7 +1202,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
       }
       err += singlevalsyntaxcheck(vals[j], format);
       err += syntaxcheckexpr(vals[j], format);
-      if (vals[j].match(/^\s*\-?oo\s*$/)) {
+      if (vals[j].match(/^\s*\-?\+?oo\s*$/)) {
         calcvals[j] = vals[j];
       } else {
         res = singlevaleval(vals[j], format);
@@ -1275,7 +1277,7 @@ function processCalcNtuple(fullstr, format) {
 
     if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
       sub = fullstr.substring(lastcut,i).replace(/^\s+/,'').replace(/\s+$/,'');
-      if (sub=='oo' || sub=='-oo') {
+      if (sub=='oo' || sub=='+oo' || sub=='-oo') {
         outcalced += sub;
       } else {
         err += singlevalsyntaxcheck(sub, format);
@@ -1697,7 +1699,7 @@ function singlevalsyntaxcheck(str,format) {
   str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	if (str.match(/DNE/i)) {
 		 return '';
-	} else if (str.match(/-?oo$/) || str.match(/-?oo\W/)) {
+	} else if (str.match(/-?\+?oo$/) || str.match(/-?\+?oo\W/)) {
 		 return '';
 	} else if (str.match(/,/)) {
     return _("Invalid use of a comma.");
