@@ -2379,7 +2379,8 @@ The following macros help with formatting values for display:
 <li><strong>makexpretty and makexprettydisp</strong>:  (deprecated - use makexxpretty instead) Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
    will often cause weird things to happen, so test well</li>
 <li><strong>makexxpretty and makexxprettydisp</strong>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, x^1, x^0, etc.  Can occasionally cause strange output, so
-   be sure to test.  Handles things better than the older makexpretty, but does not always produce 100% identical output.</li>
+   be sure to test.  Handles things better than the older makexpretty, but does not always produce 100% identical output.
+   This function cannot handle |x| notation; use abs(x) instead.</li>
 <li><strong>numtowords(number,[addth, numwithTh, addcommas)</strong>:  Creates a string containing number written out in words.<br/>
    numtowords(1203) returns "one thousand two hundred three"<br/>
    numtowords(1203,true) returns "one thousand two hundred third"<br/>
