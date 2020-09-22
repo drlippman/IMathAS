@@ -1249,8 +1249,7 @@ export const actions = {
         store.timelimit_restricted = 2;
       }
     }
-    if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')
-    ) {
+    if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')) {
       // map and override previous interquestion_text
       let lasttext = -1;
       const origtexts = data.interquestion_text;
@@ -1258,16 +1257,27 @@ export const actions = {
       for (const i in data.questions) {
         if (data.questions[i].hasOwnProperty('text')) {
           const thistext = data.questions[i].text;
-          if (thistext === lasttext) { // same one
-            newtexts[newtexts.length - 1].displayUntil = i;
+          if (JSON.stringify(thistext) === JSON.stringify(lasttext)) { // same one
+            for (let j = 0; j < thistext.length; j++) {
+              newtexts[newtexts.length - 1 - j].displayUntil = i;
+            }
           } else {
-            newtexts.push(Object.assign({}, origtexts[thistext]));
-            newtexts[newtexts.length - 1].displayBefore = i;
-            newtexts[newtexts.length - 1].displayUntil = i;
-            lasttext = thistext;
+            for (let j = 0; j < thistext.length; j++) {
+              newtexts.push(Object.assign({}, origtexts[thistext[j]]));
+              newtexts[newtexts.length - 1].displayBefore = i;
+              newtexts[newtexts.length - 1].displayUntil = i;
+            }
+            lasttext = thistext.slice();
           }
         } else {
           lasttext = -1;
+        }
+      }
+      for (const i in origtexts) {
+        if (origtexts[i].hasOwnProperty('atend')) {
+          newtexts.push(Object.assign({}, origtexts[i]));
+          newtexts[newtexts.length - 1].displayBefore = data.questions.length;
+          newtexts[newtexts.length - 1].displayUntil = data.questions.length;
         }
       }
       data.interquestion_text = newtexts;
