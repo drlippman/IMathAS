@@ -41,12 +41,34 @@ class NumberScorePart implements ScorePart
         if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
         if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$partnum];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-
+        
         if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
-
+        
+        //
+        if (in_array('units',$ansformats)) {
+          $givenansUnits = splitunits($givenans);
+          $answerUnits = splitunits($answer);
+          if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
+              $scorePartResult->setRawScore(0);
+              return $scorePartResult;
+          }
+          if ($answer == '' || $answerUnits[0] == '') {
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
+          }
+          if (($givenansUnits[0] == $answerUnits[0] && $givenansUnits[1] == $answerUnits[1])) {
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
+          } else {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+          }
+        }
+        //
+        
         $givenans = normalizemathunicode($givenans);
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {

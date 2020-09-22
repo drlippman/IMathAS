@@ -35,7 +35,7 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
- "randcountry","randcountries");
+ "randcountry","randcountries","splitunits");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -530,7 +530,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$pathstr .= "[$ix,$iy]";
 					$lastl++;
 				} else { //still out
-                    
+
 				}
 			} else {//all in
 				if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
@@ -2331,6 +2331,517 @@ function fractowords($numer,$denom,$options='no') { //options can combine 'mixed
   }
 }
 
+function splitunits($unitsExpression) {
+
+    $numerical=1; //Initiates numerical value of expression
+  
+    $unitsExpression = trim($unitsExpression);
+    $unitsExpression = preg_replace('/\s{2,}/',' ',$unitsExpression);
+    $unitsExpression = preg_replace('/\s*\/\s*/','/',$unitsExpression);    
+    $unitsExpression = preg_replace('/\s*\^\s*/','^',$unitsExpression);
+    $unitsExpression = preg_replace('/\*\*/','^',$unitsExpression);
+    $unitsExpression = preg_replace('/(\d)([a-zA-Z])/','$1*$2',$unitsExpression);
+    $unitsExpression = preg_replace('/([a-zA-Z])(\d)/','$1*$2',$unitsExpression);
+    $unitsExpression = preg_replace('/([0-9])(\.)([a-zA-Z])/','$1$2*$3',$unitsExpression);
+    $unitsExpression = preg_replace('/(\s*\-\s*)([a-zA-Z])/','*$2',$unitsExpression);
+    $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression);
+    
+    $unitsEmptyMessage='Eek! Empty String.';
+    $unitsFormatMessage='Eek! Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...';
+    $unitsDivisionMessage='Eek! Only one division symbol allowed in the expression.';
+    
+    $unitsBadSyntax='/[\(\)\+]|\^\^|\*\*|\^\*|\*\^|\*\*|\-\-|\-\*|\*\-|\-\^|\d\-\d|\s\.\s|\.\.|\d\.\d\.|\.[\d\.\*]\.|[a-zA-Z]\.|\*\.[a-zA-Z]|\*[\*\.]\*/';
+    $unitsStartLike='/^[a-zA-Z0-9\.]/';
+    $unitsEndLike='/[a-zA-Z0-9\.]$/';
+    
+    if ($unitsExpression==='0') {
+      echo $unitsExpression;
+      $numerical=0;
+      return 0;
+    }
+    if (empty($unitsExpression)) {
+      echo $unitsEmptyMessage;
+      return '';
+    }
+    if (preg_match($unitsBadSyntax,$unitsExpression)) {
+      echo $unitsFormatMessage;
+      return '';
+    }
+    if (preg_match($unitsStartLike,$unitsExpression)==0||preg_match($unitsEndLike,$unitsExpression)==0) {
+      echo $unitsFormatMessage;
+      return '';
+    }
+    if (preg_match('/\/{2,}/',$unitsExpression)) {
+      echo $unitsDivisionMessage;
+      return '';
+    }
+    
+    $parts=explode('/',$unitsExpression);
+    if (count($parts)>2) {
+      echo 'Eek! Only one division symbol allowed in units.';
+      return '';
+    } elseif (count($parts)==1) {
+      $numerator=$parts[0];
+      $denominator='1';
+    } elseif (count($parts)==2) {
+      $numerator=$parts[0];
+      $denominator=$parts[1];
+    }
+    
+    $numerParts=explode('*',$numerator);
+    $denomParts=explode('*',$denominator);
+
+    $numerPartsTmp=[];
+    foreach($numerParts as $k => $part) {
+      if (!isNaN(evalMathParser($part))) {
+        $numerical=$numerical*evalMathParser($part);
+      } elseif (isNaN(evalMathparser($part))) {
+        array_push($numerPartsTmp,$part);
+      }
+    }
+    $numerParts=$numerPartsTmp; //has only factors that cannot be computed (like units)
+
+    $denomPartsTmp=[];
+    foreach($denomParts as $k => $part) {
+      if (!isNaN(evalMathParser($part))) {
+        if (evalnumstr($part)==0) {
+          echo 'Eek! Division by zero.';
+          return '';
+        } else {
+          $numerical=$numerical/evalMathParser($part);
+        }
+      } elseif (isNaN(evalMathParser($part))) {
+        array_push($denomPartsTmp,$part);
+      }
+    }
+    $denomParts=$denomPartsTmp; //has only factors that cannot be computed (like units)
+    
+    $numerExpand=[];
+    $denomExpand=[];
+
+    if (empty($numerParts)) {
+      $numerUnitFactors=['m' => 0];
+    } else {
+      foreach ($numerParts as $k=>$part) { //expand all factors from numerator, put in numer or denom array
+        if (preg_match('/\^[^\d\.\-]/',$part)) {
+          echo 'Eek! Exponents can only be numbers.';
+          return '';
+        }
+        if (preg_match('/^[a-zA-Z]+$/',$part)) {
+          array_push($numerExpand,$part);
+      } elseif (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9\.\-]+$/',$part)) {
+          $pow=substr($part,strpos($part,'^')+1);
+          if (floor(evalMathParser($pow))!=evalMathParser($pow)||isNaN(evalMathParser($pow))) {
+            echo 'Eek! Exponents on units must be integers.';
+            return '';
+          }
+          $part=substr($part,0,strpos($part,'^'));
+          if ($pow>0) {
+            for ($i=-1; $i<($pow-1); $i++) {
+              array_push($numerExpand,$part);
+            }
+          } elseif ($pow<0) {
+            for ($i=$pow; $i<0; $i++) {
+              array_push($denomExpand,$part);
+            }
+          }
+        } else {
+          echo $part;
+          return '';
+        }
+      }
+    }
+    if (empty($denomParts)) {
+      $denomUnitFactors=['m' => 0];
+    } else {
+      foreach ($denomParts as $k=>$part) { //do same with denominator
+        if (preg_match('/\^[a-zA-Z]/',$part)) {
+          echo 'Eek! Exponents can only be numbers.';
+          return '';
+        }
+        if (preg_match('/^[a-zA-Z]+$/',$part)) {
+          array_push($denomExpand,$part);
+        } elseif (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9]+$/',$part)) {
+          $pow=substr($part,strpos($part,'^')+1);
+          $part=substr($part,0,strpos($part,'^'));
+          if ($pow>0) {
+            for ($i=-1; $i<($pow-1); $i++) {
+              array_push($denomExpand,$part);
+            }
+          } elseif ($pow<0) {
+            for ($i=$pow; $i<0; $i++) {
+              array_push($numerExpand,$part);
+            }
+          }
+        } else {
+          echo $unitsFormatMessage;
+          return '';
+        }
+      }
+    }
+    
+    $numerUnitFactors = array_count_values($numerExpand); //count same factors in numerator and denominator arrays
+    $denomUnitFactors = array_count_values($denomExpand);
+    
+  //fundamental units are: kilograms,meters,seconds,radians,degrees Celsius,degrees Fahrenheit,degrees Kelvin,moles,amperes,candelas)
+  $baseunits=['kg','m','sec','rad','degC','degF','degK','mol','amp','cd'];
+  $units=[
+  //Length
+    'm' => [1,array(0,1,0,0,0,0,0,0,0,0)],
+    'meter' => [1,array(0,1,0,0,0,0,0,0,0,0)],
+    'meters' => [1,array(0,1,0,0,0,0,0,0,0,0)],
+    'km' => [1000,array(0,1,0,0,0,0,0,0,0,0)],
+    'kilometer' => [1000,array(0,1,0,0,0,0,0,0,0,0)],
+    'kilometers' => [1000,array(0,1,0,0,0,0,0,0,0,0)],
+    'cm' => [0.01,array(0,1,0,0,0,0,0,0,0,0)],
+    'centimeter' => [0.01,array(0,1,0,0,0,0,0,0,0,0)],
+    'centimeters' => [0.01,array(0,1,0,0,0,0,0,0,0,0)],
+    'mm' => [0.001,array(0,1,0,0,0,0,0,0,0,0)],
+    'millimeter' => [0.001,array(0,1,0,0,0,0,0,0,0,0)],
+    'millimeters' => [0.001,array(0,1,0,0,0,0,0,0,0,0)],
+    'um' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)], //micrometer
+    'micrometer' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
+    'micrometers' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
+    'micron' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
+    'microns' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
+    'nm' => [1E-9,array(0,1,0,0,0,0,0,0,0,0)], //nanometer
+    'nanometer' => [1E-9,array(0,1,0,0,0,0,0,0,0,0)],
+    'nanometers' => [1E-9,array(0,1,0,0,0,0,0,0,0,0)],
+    'Angstrom' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
+    'Angstroms' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
+    'angstrom' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
+    'angstroms' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
+    'pm' => [1E-12,array(0,1,0,0,0,0,0,0,0,0)], //picometer
+    'picometer' => [1E-12,array(0,1,0,0,0,0,0,0,0,0)],
+    'picometers' => [1E-12,array(0,1,0,0,0,0,0,0,0,0)],
+    'in' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
+    'inch' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
+    'inches' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
+    'ft' => [0.3048,array(0,1,0,0,0,0,0,0,0,0)],
+    'foot' => [0.3048,array(0,1,0,0,0,0,0,0,0,0)],
+    'feet' => [0.3048,array(0,1,0,0,0,0,0,0,0,0)],
+    'mi' => [1609.344,array(0,1,0,0,0,0,0,0,0,0)],
+    'mile' => [1609.344,array(0,1,0,0,0,0,0,0,0,0)],
+    'miles' => [1609.344,array(0,1,0,0,0,0,0,0,0,0)],
+    'ly' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
+    'lightyear' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
+    'lightyears' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
+    'AU' => [149597870700,array(0,1,0,0,0,0,0,0,0,0)],
+    'AUs' => [149597870700,array(0,1,0,0,0,0,0,0,0,0)],
+    'parsec' => [3.08567758149137E16,array(0,1,0,0,0,0,0,0,0,0)],
+    'parsecs' => [3.08567758149137E16,array(0,1,0,0,0,0,0,0,0,0)],
+    'furlong' => [201.168,array(0,1,0,0,0,0,0,0,0,0)],
+    'furlongs' => [201.168,array(0,1,0,0,0,0,0,0,0,0)],
+    'yd' => [0.9144,array(0,1,0,0,0,0,0,0,0,0)],
+    'yard' => [0.9144,array(0,1,0,0,0,0,0,0,0,0)],
+    'yards' => [0.9144,array(0,1,0,0,0,0,0,0,0,0)],
+  //Time
+    's' => [1,array(0,0,1,0,0,0,0,0,0,0)],
+    'sec' => [1,array(0,0,1,0,0,0,0,0,0,0)],
+    'second' => [1,array(0,0,1,0,0,0,0,0,0,0)],
+    'seconds' => [1,array(0,0,1,0,0,0,0,0,0,0)],
+    'ms' => [0.001,array(0,0,1,0,0,0,0,0,0,0)], //milliseconds
+    'millisecond' => [0.001,array(0,0,1,0,0,0,0,0,0,0)],
+    'milliseconds' => [0.001,array(0,0,1,0,0,0,0,0,0,0)],
+    'us' => [1E-6,array(0,0,1,0,0,0,0,0,0,0)], //microseconds
+    'microsecond' => [1E-6,array(0,0,1,0,0,0,0,0,0,0)],
+    'microseconds' => [1E-6,array(0,0,1,0,0,0,0,0,0,0)],
+    'ns' => [1E-9,array(0,0,1,0,0,0,0,0,0,0)], //nanoseconds
+    'nanosecond' => [1E-9,array(0,0,1,0,0,0,0,0,0,0)],
+    'nanoseconds' => [1E-9,array(0,0,1,0,0,0,0,0,0,0)],
+    'min' => [60,array(0,0,1,0,0,0,0,0,0,0)],
+    'minute' => [60,array(0,0,1,0,0,0,0,0,0,0)],
+    'minutes' => [60,array(0,0,1,0,0,0,0,0,0,0)],
+    'hr' => [60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'hour' => [60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'hours' => [60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'day' => [24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'days' => [24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'week' => [7*24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'weeks' => [7*24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'mo' => [30*24*60*60,array(0,0,1,0,0,0,0,0,0,0)], //assumes 30 days
+    'month' => [30*24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'months' => [30*24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'yr' => [7*24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'year' => [7*24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'years' => [7*24*60*60,array(0,0,1,0,0,0,0,0,0,0)],
+    'fortnight' => [1209600,array(0,0,1,0,0,0,0,0,0,0)],
+    'fortnights' => [1209600,array(0,0,1,0,0,0,0,0,0,0)],
+  //Area
+    'acre' => [4046.86,array(0,2,0,0,0,0,0,0,0,0)],
+    'acres' => [4046.86,array(0,2,0,0,0,0,0,0,0,0)],
+  //Volume
+    'L' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
+    'liter' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
+    'litre' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
+    'liters' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
+    'litres' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
+    'dL' => [0.0001,array(0,3,0,0,0,0,0,0,0,0)],
+    'ml' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'milliliter' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'milliliters' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'millilitre' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'millilitres' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'cc' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'gal' => [0.00378541,array(0,3,0,0,0,0,0,0,0,0)],
+    'gallon' => [0.00378541,array(0,3,0,0,0,0,0,0,0,0)],
+    'gallons' => [0.00378541,array(0,3,0,0,0,0,0,0,0,0)],
+    'cup' => [0.000236588,array(0,3,0,0,0,0,0,0,0,0)],
+    'cups' => [0.000236588,array(0,3,0,0,0,0,0,0,0,0)],
+    'pint' => [0.000473176,array(0,3,0,0,0,0,0,0,0,0)],
+    'pints' => [0.000473176,array(0,3,0,0,0,0,0,0,0,0)],
+  //Angles
+    'rad' => [1,array(0,0,0,1,0,0,0,0,0,0)],
+    'radian' => [1,array(0,0,0,1,0,0,0,0,0,0)],
+    'radians' => [1,array(0,0,0,1,0,0,0,0,0,0)],
+    'deg' => [0.0174532925,array(0,0,0,1,0,0,0,0,0,0)],
+    'degree' => [0.0174532925,array(0,0,0,1,0,0,0,0,0,0)],
+    'degrees' => [0.0174532925,array(0,0,0,1,0,0,0,0,0,0)],
+    'gradian' => [0.015708,array(0,0,0,1,0,0,0,0,0,0)],
+    'gradians' => [0.015708,array(0,0,0,1,0,0,0,0,0,0)],
+  //Velocity
+    'knot' => [0.5144444444,array(0,1,-1,0,0,0,0,0,0,0)],
+    'knots' => [0.5144444444,array(0,1,-1,0,0,0,0,0,0,0)],
+    'kt' => [0.5144444444,array(0,1,-1,0,0,0,0,0,0,0)],
+    'c' => [299792458,array(0,1,-1,0,0,0,0,0,0,0)], // Speed of light
+    'mph' => [0.44704,array(0,1,-1,0,0,0,0,0,0,0)],
+  //Mass
+    'kg' => [1,array(1,0,0,0,0,0,0,0,0,0)],
+    'kilogram' => [1,array(1,0,0,0,0,0,0,0,0,0)],
+    'kilograms' => [1,array(1,0,0,0,0,0,0,0,0,0)],
+    'g' => [0.001,array(1,0,0,0,0,0,0,0,0,0)],
+    'gram' => [0.001,array(1,0,0,0,0,0,0,0,0,0)],
+    'grams' => [0.001,array(1,0,0,0,0,0,0,0,0,0)],
+    'mg' => [0.000001,array(1,0,0,0,0,0,0,0,0,0)],
+    'milligram' => [0.000001,array(1,0,0,0,0,0,0,0,0,0)],
+    'milligrams' => [0.000001,array(1,0,0,0,0,0,0,0,0,0)],
+    'tonne' => [1000,array(1,0,0,0,0,0,0,0,0,0)],
+    'tonnes' => [1000,array(1,0,0,0,0,0,0,0,0,0)],
+  //Frequency
+    'Hz' => [2*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    'hz' => [2*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    'Hertz' => [2*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    'hertz' => [2*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    'kHz' => [2000*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    'khz' => [2000*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    'kiloHertz' => [2000*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    'rev' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
+    'revs' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
+    'revolution' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
+    'revolutions' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
+    'cycle' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
+    'cycles' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
+  //Force
+    'N' => [1,array(1,1,-2,0,0,0,0,0,0,0)],
+    'Newton' => [1,array(1,1,-2,0,0,0,0,0,0,0)],
+    'Newtons' => [1,array(1,1,-2,0,0,0,0,0,0,0)],
+    'newton' => [1,array(1,1,-2,0,0,0,0,0,0,0)],
+    'newtons' => [1,array(1,1,-2,0,0,0,0,0,0,0)],
+    'kip' => [4448.22,array(1,1,-2,0,0,0,0,0,0,0)],
+    'kips' => [4448.22,array(1,1,-2,0,0,0,0,0,0,0)],
+    'dyne' => [1E-5,array(1,1,-2,0,0,0,0,0,0,0)],
+    'dynes' => [1E-5,array(1,1,-2,0,0,0,0,0,0,0)],
+    'lb' => [4.4482216152605,array(1,1,-2,0,0,0,0,0,0,0)],
+    'lbs' => [4.4482216152605,array(1,1,-2,0,0,0,0,0,0,0)],
+    'pound' => [4.4482216152605,array(1,1,-2,0,0,0,0,0,0,0)],
+    'pounds' => [4.4482216152605,array(1,1,-2,0,0,0,0,0,0,0)],
+    'ton' => [8896.443,array(1,1,-2,0,0,0,0,0,0,0)],
+    'tons' => [8896.443,array(1,1,-2,0,0,0,0,0,0,0)],
+  //Energy
+    'J' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
+    'Joule' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
+    'Joules' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
+    'joule' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
+    'joules' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
+    'KJ' => [1000,array(1,2,-2,0,0,0,0,0,0,0)],
+    'erg' => [1E-7,array(1,2,-2,0,0,0,0,0,0,0)],
+    'ergs' => [1E-7,array(1,2,-2,0,0,0,0,0,0,0)],
+    'lbf' => [1.35582,array(1,2,-2,0,0,0,0,0,0,0)],
+    'lbft' => [1.35582,array(1,2,-2,0,0,0,0,0,0,0)],
+    'ftlb' => [1.35582,array(1,2,-2,0,0,0,0,0,0,0)],
+    'cal' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
+    'calorie' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
+    'calories' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
+    'kcal' => [4184,array(1,2,-2,0,0,0,0,0,0,0)],
+    'kilocalorie' => [4184,array(1,2,-2,0,0,0,0,0,0,0)],
+    'eV' => [1.60218e-19,array(1,2,-2,0,0,0,0,0,0,0)],
+    'kwh' => [3.6E6,array(1,2,-2,0,0,0,0,0,0,0)],
+  //Power
+    'W' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
+    'Watt' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
+    'Watts' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
+    'watt' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
+    'watts' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
+    'kW' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
+    'kiloWatt' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
+    'kiloWatts' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
+    'kilowatt' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
+    'kilowatts' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
+    'hp' => [746,array(1,2,-3,0,0,0,0,0,0,0)],
+    'horsepower' => [746,array(1,2,-3,0,0,0,0,0,0,0)],
+  //Pressure
+    'Pa' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'Pascal' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'Pascals' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'pascal' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'pascals' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'kPa' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'kiloPascal' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'kiloPascals' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'kilopascal' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'kilopascals' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'MPa' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'megaPascal' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'megaPascals' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'megapascal' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'megapascals' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'GPa' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'gigapascal' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'gigapascals' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'gigaPascal' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'gigaPascals' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'atm' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'atms' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'atmosphere' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'atmospheres' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'bar' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'bars' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'barometer' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'barometers' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'mbar' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'mbars' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'millibar' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'millibars' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'Torr' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'torr' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'mmHg' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
+    //'cmH2O' => [98.0638,array(1,-1,-2,0,0,0,0,0,0,0)], This won't work because it would split into cmH*2*O
+    'psi' => [98.0638,array(1,-1,-2,0,0,0,0,0,0,0)],
+  //Electrical Units
+    'C' => [1,array(0,0,1,0,0,0,0,0,1,0)],
+    'Coulomb' => [1,array(0,0,1,0,0,0,0,0,1,0)],
+    'Coulombs' => [1,array(0,0,1,0,0,0,0,0,1,0)],
+    'coulomb' => [1,array(0,0,1,0,0,0,0,0,1,0)],
+    'coulombs' => [1,array(0,0,1,0,0,0,0,0,1,0)],
+    'V' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
+    'Volt' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
+    'Volts' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
+    'volt' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
+    'volts' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
+    'mv' => [0.001,array(1,2,-3,0,0,0,0,0,1,0)],
+    'millivolt' => [0.001,array(1,2,-3,0,0,0,0,0,1,0)],
+    'millivolts' => [0.001,array(1,2,-3,0,0,0,0,0,1,0)],
+    'MV' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)],
+    'megavolt' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)],
+    'megavolts' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)],
+    'Farad' => [1,array(-1,-2,4,0,0,0,0,0,2,0)],
+    'farad' => [1,array(-1,-2,4,0,0,0,0,0,2,0)],
+    'ohm' => [1,array(1,2,-3,0,0,0,0,0,2,0)],
+    'ohms' => [1,array(1,2,-3,0,0,0,0,0,2,0)],
+    'amp' => [1,array(0,0,0,0,0,0,0,0,1,0)],
+    'amps' => [1,array(0,0,0,0,0,0,0,0,1,0)],
+    'Ampere' => [1,array(0,0,0,0,0,0,0,0,1,0)],
+    'Amperes' => [1,array(0,0,0,0,0,0,0,0,1,0)],
+    'ampere' => [1,array(0,0,0,0,0,0,0,0,1,0)],
+    'amperes' => [1,array(0,0,0,0,0,0,0,0,1,0)],
+  //Magnetic Units
+    'T' => [1,array(1,0,-2,0,0,0,0,0,-1,0)],
+    'Tesla' => [1,array(1,0,-2,0,0,0,0,0,-1,0)],
+    'Teslas' => [1,array(1,0,-2,0,0,0,0,0,-1,0)],
+    'tesla' => [1,array(1,0,-2,0,0,0,0,0,-1,0)],
+    'teslas' => [1,array(1,0,-2,0,0,0,0,0,-1,0)],
+    'G' => [1,array(1,0,-2,0,0,0,0,0,-1,0)],
+    'Gauss' => [1,array(1,0,-2,0,0,0,0,0,-1,0)],
+    'Wb' => [1,array(1,2,-2,0,0,0,0,0,-1,0)],
+    'Weber' => [1,array(1,2,-2,0,0,0,0,0,-1,0)],
+    'H' => [1,array(1,2,-2,0,0,0,0,0,-2,0)],
+    'Henry' => [1,array(1,2,-2,0,0,0,0,0,-2,0)],
+  //Luminosity
+    'lm' => [1,array(0,0,0,-2,0,0,0,0,0,1)],
+    'lumen' => [1,array(0,0,0,-2,0,0,0,0,0,1)],
+    'lumens' => [1,array(0,0,0,-2,0,0,0,0,0,1)],
+    'lx' => [1,array(0,-2,0,-2,0,0,0,0,0,1)],
+    'lux' => [1,array(0,-2,0,-2,0,0,0,0,0,1)],
+  //Atomic Units
+    'amu' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)], //atomic mass unit
+    'Dalton' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
+    'Daltons' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
+    'dalton' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
+    'daltons' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
+    'me' => [1,array(9.1093826E-31,0,0,0,0,0,0,0,0,0)], //electron resting mass
+  //Biology/Chemistry Units
+    'millimol' => [0.001,array(0,0,0,0,0,0,0,1,0,0)],
+    'micromol' => [1E-6,array(0,0,0,0,0,0,0,1,0,0)],
+    'nanomol' => [1E-6,array(0,0,0,0,0,0,0,1,0,0)],
+  //Astronomy Units
+    'kpc' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)],
+    'kiloparsec' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)],
+    'solarmass' => [1.98892E30,array(1,0,0,0,0,0,0,0,0,0)],
+    'solarradius' => [6.955E8,array(0,1,0,0,0,0,0,0,0,0)],
+  //Temperature
+    'degF' => [1,array(0,0,0,0,0,1,0,0,0,0)],
+    'degC' => [1,array(0,0,0,0,1,0,0,0,0,0)],
+    'degK' => [1,array(0,0,0,0,0,0,1,0,0,0)],
+  ];
+
+  $unitArray=[0,0,0,0,0,0,0,0,0,0];
+
+  foreach ($numerUnitFactors as $k => $factor) {
+    if (!isset($units[$k])) {
+      echo 'Eek! Unknown units: '.$k;
+      return '';
+    } elseif (isset($units[$k])) {
+      for ($i=0;$i<$factor;$i++) {
+        $numerical=$numerical*$units[$k][0];
+      }
+      for ($i=0; $i<10; $i++) {
+        $unitArray[$i]=$unitArray[$i]+$factor*$units[$k][1][$i];
+      }
+    }
+  }
+  foreach ($denomUnitFactors as $k => $factor) {
+    if (!isset($units[$k])) {
+      echo 'Eek! Unknown units: '.$k;
+      return '';
+    } elseif (isset($units[$k])) {
+      for ($i=0;$i<$factor;$i++) {
+        $numerical=$numerical/$units[$k][0];
+      }
+      for ($i=0; $i<10; $i++) {
+        $unitArray[$i]=$unitArray[$i]-$factor*$units[$k][1][$i];
+      }
+    }
+  }
+  //At this point, $numerical is the number, and $unitArray is the array of factors of fundamental units: e.g. [0,1,-2,0,0,0,1,0,0,2]
+
+  $unitsExpressionSimple=$numerical; //Build the equivalent, simplifed answer in mks
+  if (max($unitArray)>0) {
+    foreach ($unitArray as $k => $factor) {
+      if ($factor>0) {
+        if ($factor==1) {
+          $unitsExpressionSimple = $unitsExpressionSimple." ".$baseunits[$k];
+        } elseif ($factor>1) {
+          $unitsExpressionSimple = $unitsExpressionSimple." ".$baseunits[$k]."^".$factor;
+        }
+      }
+    }
+  }
+  if (min($unitArray)<0) {
+    $unitsExpressionSimple = $unitsExpressionSimple."/";
+    foreach ($unitArray as $k => $factor) {
+      if ($factor<0) {
+        $factorNeg=$factor*-1;
+        if ($factor==-1) {
+          $unitsExpressionSimple = $unitsExpressionSimple.$baseunits[$k]." ";
+        } elseif ($factor<-1) {
+          $unitsExpressionSimple = $unitsExpressionSimple.$baseunits[$k]."^".$factorNeg." ";
+        }
+      }
+    }
+  }
+return array($numerical,$unitArray);
+}
+
 $namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");
 $namearray[1] = explode(',',"Adriana,Adrianna,Alejandra,Alexandra,Alexis,Alice,Alicia,Alma,Amanda,Amber,Amy,Andrea,Angela,Anna,April,Ariana,Ashley,Ashton,Autumn,Bianca,Bria,Brianna,Brittany,Brooke,Caitlyn,Carissa,Carolyn,Carrie,Cassandra,Catherine,Chasity,Chelsea,Chloe,Christy,Ciara,Claudia,Colleen,Courtney,Cristina,Crystal,Dana,Danielle,Delaney,Destiny,Diana,Elizabeth,Emily,Emma,Erica,Erin,Esmeralda,Gabrielle,Guadalupe,Haley,Hanna,Heather,Hillary,Holly,Jacqueline,Jamie,Jane,Jasmine,Jenna,Jennifer,Jessica,Julia,Karen,Karina,Karissa,Karla,Kathryn,Katie,Kayla,Kelly,Kelsey,Kendra,Kimberly,Kori,Kristen,Kristina,Krystal,Kylie,Laura,Lauren,Leah,Linda,Lindsey,Mackenzie,Madison,Maggie,Mariah,Marissa,Megan,Melissa,Meredith,Michelle,Mikayla,Miranda,Molly,Monique,Morgan,Naomi,Natalie,Natasha,Nicole,Nina,Noelle,Paige,Patricia,Rachael,Raquel,Rebecca,Renee,Riley,Rosa,Samantha,Sarah,Savannah,Shannon,Shantel,Sierra,Sonya,Sophia,Stacy,Stephanie,Summer,Sydney,Tatiana,Taylor,Tiana,Tiffany,Valerie,Vanessa,Victoria,Vivian,Wendy,Whitney,Zoe");
 
@@ -2414,7 +2925,7 @@ function randname() {
 }
 function randnamewpronouns($g=2) {
   $gender = $GLOBALS['RND']->rand(0,1);
-  
+
   if ($g==2) {
   	if ($gender==0) { //male
   		return array(randnames(1,0), _('he'), _('him'), _('his'), _('his'), _('himself'));
