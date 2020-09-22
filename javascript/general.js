@@ -529,8 +529,12 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		plugins: [
 			"lists advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor snippet",
-			"media table paste asciimath asciisvg rollups colorpicker"
-		],
+			"media table paste rollups colorpicker"
+        ],
+        external_plugins: {
+            "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
+            "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
+        },
 		menubar: false,//"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
