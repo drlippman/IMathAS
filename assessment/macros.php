@@ -2337,6 +2337,7 @@ function splitunits($unitsExpression) {
   
     $unitsExpression = trim($unitsExpression);
     $unitsExpression = preg_replace('/\s{2,}/',' ',$unitsExpression);
+    $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*(\-?\d+)/','$1*10^$2',$unitsExpression);
     $unitsExpression = preg_replace('/\s*\/\s*/','/',$unitsExpression);    
     $unitsExpression = preg_replace('/\s*\^\s*/','^',$unitsExpression);
     $unitsExpression = preg_replace('/\*\*/','^',$unitsExpression);
@@ -2736,8 +2737,8 @@ function splitunits($unitsExpression) {
     'megavolts' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)],
     'Farad' => [1,array(-1,-2,4,0,0,0,0,0,2,0)],
     'farad' => [1,array(-1,-2,4,0,0,0,0,0,2,0)],
-    'ohm' => [1,array(1,2,-3,0,0,0,0,0,2,0)],
-    'ohms' => [1,array(1,2,-3,0,0,0,0,0,2,0)],
+    'ohm' => [1,array(1,2,-3,0,0,0,0,0,-2,0)],
+    'ohms' => [1,array(1,2,-3,0,0,0,0,0,-2,0)],
     'amp' => [1,array(0,0,0,0,0,0,0,0,1,0)],
     'amps' => [1,array(0,0,0,0,0,0,0,0,1,0)],
     'Ampere' => [1,array(0,0,0,0,0,0,0,0,1,0)],
@@ -2763,12 +2764,12 @@ function splitunits($unitsExpression) {
     'lx' => [1,array(0,-2,0,-2,0,0,0,0,0,1)],
     'lux' => [1,array(0,-2,0,-2,0,0,0,0,0,1)],
   //Atomic Units
-    'amu' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)], //atomic mass unit
-    'Dalton' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
-    'Daltons' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
-    'dalton' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
-    'daltons' => [1,array(1.660538921E-27,0,0,0,0,0,0,0,0,0)],
-    'me' => [1,array(9.1093826E-31,0,0,0,0,0,0,0,0,0)], //electron resting mass
+    'amu' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)], //atomic mass unit
+    'Dalton' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)],
+    'Daltons' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)],
+    'dalton' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)],
+    'daltons' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)],
+    'me' => [9.1093826E-31,array(1,0,0,0,0,0,0,0,0,0)], //electron resting mass
   //Biology/Chemistry Units
     'millimol' => [0.001,array(0,0,0,0,0,0,0,1,0,0)],
     'micromol' => [1E-6,array(0,0,0,0,0,0,0,1,0,0)],
