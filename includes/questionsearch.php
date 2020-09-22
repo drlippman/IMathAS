@@ -340,14 +340,16 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     // pull timesused
-    $allusedqids = implode(',', array_unique($qsids));
-    $stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
-    $timesused = [];
-    while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-        $timesused[$row[0]] = $row[1];
-    }
-    foreach ($res as $k=>$v) {
-        $res[$k]['times'] = !empty($timesused[$v['id']]) ? $timesused[$v['id']] : 0;
+    if (count($qsids)>0) {
+        $allusedqids = implode(',', array_unique($qsids));
+        $stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
+        $timesused = [];
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $timesused[$row[0]] = $row[1];
+        }
+        foreach ($res as $k=>$v) {
+            $res[$k]['times'] = !empty($timesused[$v['id']]) ? $timesused[$v['id']] : 0;
+        }
     }
 
     // do sorting if needed

@@ -150,6 +150,8 @@ function refreshTable() {
         $("#curqtbl "+curqlastfocus[0]+ " tr").eq(curqlastfocus[1])
             .find("td,th").eq(curqlastfocus[2]).find("input,button,a").focus();
     }
+    $("#noqs").toggle(itemarray.length == 0);
+    $("#curqform").toggle(itemarray.length != 0);
     if (usingASCIIMath) {
         rendermathnode(document.getElementById("curqtbl"));
     }
@@ -1870,7 +1872,7 @@ function doneadding(newq,addedqs) {
     refreshTable();
     updateInAssessMarkers();
     $("#selq input[type=checkbox]:checked").prop("checked", false);
-    $("#addbar").hide();
+    $("#addbar.footerbar").addClass("sr-only");
 }
 
 function addwithsettings() {

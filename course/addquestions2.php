@@ -33,7 +33,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$stm = $DBH->prepare("SELECT courseid,ver,submitby,defpoints FROM imas_assessments WHERE id=?");
+	$stm = $DBH->prepare("SELECT courseid,ver,submitby,defpoints,name FROM imas_assessments WHERE id=?");
 	$stm->execute(array($aid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($row === null || $row['courseid'] != $cid) {
@@ -48,6 +48,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $submitby = $row['submitby'];
     $modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
     $defpoints = $row['defpoints'];
+    $assessmentname = $row['name'];
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
@@ -187,9 +188,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			exit;
 		} else {
 			$overwriteBody = 1;
-			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$aid));
-			$assessmentname = $stm->fetchColumn(0);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h2>".Sanitize::encodeStringForDisplay($assessmentname)."</h2>";
 			$body .= "<p>"._("Are you SURE you want to delete all attempts (grades) for this assessment?")."</p>";
@@ -520,41 +518,40 @@ if ($overwriteBody==1) {
 <?php
 	}
 ?>
-	<h2><?php echo _('Questions in Assessment'),' - ',Sanitize::encodeStringForDisplay($page_assessmentName); ?></h2>
+	<h2><?php echo _('Questions in Assessment'),' - ',Sanitize::encodeStringForDisplay($assessmentname); ?></h2>
 
 <?php
-	if (count($jsarr)==0) {
-		echo "<p>"._("No Questions currently in assessment")."</p>\n";
+    echo '<div id="noqs"'. (count($jsarr)==0?'':' style="display:none;"') . '>';
+    echo "<p>"._("No Questions currently in assessment")."</p>\n";
 
-		echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
-		echo "<img src=\"$staticroot/img/help.gif\" alt=\"Help\"/> ";
-		echo _('How do I find questions to add?'),'</a>';
-		echo '<div id="helpwithadding" style="display:none">';
-		if ($_SESSION['selfrom'.$aid]=='lib') {
-			echo "<p>",_("You are currently set to select questions from the question libraries.  If you would like to select questions from assessments you've already created, click the <b>Select From Assessments</b> button below"),"</p>";
-			echo "<p>",_("To find questions to add from the question libraries:");
-			echo "<ol><li>",_("Click the <b>Select Libraries</b> button below to pop open the library selector"),"</li>";
-			echo " <li>",_("In the library selector, open up the topics of interest, and click the checkbox to select libraries to use"),"</li>";
-			echo " <li>",_("Scroll down in the library selector, and click the <b>Use Libraries</b> button"),"</li> ";
-			echo " <li>",_("On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries"),"</li>";
-			echo "</ol>";
-		} else if ($_SESSION['selfrom'.$aid]=='assm') {
-			echo "<p>",_("You are currently set to select questions existing assessments.  If you would like to select questions from the question libraries, click the <b>Select From Libraries</b> button below"),"</p>";
-			echo "<p>",_("To find questions to add from existing assessments:");
-			echo "<ol><li>",_("Use the checkboxes to select the assessments you want to pull questions from"),"</li>";
-			echo " <li>",_("Click <b>Use these Assessments</b> button to list the questions in the assessments selected"),"</li>";
-			echo "</ol>";
-		}
-		echo "<p>",_("To select questions and add them:"),"</p><ul>";
-		echo " <li>",_("Click the <b>Preview</b> button after the question description to view an example of the question"),"</li>";
-		echo " <li>",_("Use the checkboxes to mark the questions you want to use"),"</li>";
-		echo " <li>",_("Click the <b>Add</b> button above the question list to add the questions to your assessment"),"</li> ";
-		echo "  </ul>";
-		echo '</div>';
+    echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
+    echo "<img src=\"$staticroot/img/help.gif\" alt=\"Help\"/> ";
+    echo _('How do I find questions to add?'),'</a>';
+    echo '<div id="helpwithadding" style="display:none">';
+    echo '<p>',_('Under Potential Questions below, use the selector on the left to decide whether you want to select specific libraries, search all libraries, or select assessments to choose from.'),'</p>';
+    
+    echo '<ul><li>',_('If you choose <b>Select Libraries</b>, in the library selector, open up the topics of interest, and click the checkboxes to select libraries to use. ');
+    echo _('Click the <b>Use Libraries</b> button to list the contents of those libraries. ');
+    echo _('You can also use the search bar to search within the selected libraries'),'</li>';
 
-	} else {
+    echo '<li>',_('If you choose <b>Select Assessments</b>, in the assessment selector, click the checkboxes to select the assessments to use. ');
+    echo _('Click the <b>Use Assessments</b> button to list the contents of those assessments. ');
+    echo _('You can also use the search bar to search within the selected assessments'),'</li>';
+
+    echo '<li>',_('If you choose <b>All Libraries</b>, you must provide a search term then click Search. '),'</li></ul>';
+
+    echo "<p>",_("To select questions and add them:"),"</p><ul>";
+    echo " <li>",_("Click the eye-shaped <b>Preview</b> icon to view an example of the question"),"</li>";
+    echo " <li>",_("Use the checkboxes to mark the questions you want to use"),"</li>";
+    echo " <li>",_("Click the <b>Add</b> button to add the questions to your assessment"),"</li> ";
+    echo "  </ul>";
+    echo '</div>';
+    echo '</div>';
+        
 ?>
-	<form id="curqform" method="post" action="addquestions2.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
+    <form id="curqform" method="post" action="addquestions2.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>"
+      <?php if (count($jsarr)==0) echo ' style="display:none;"'; ?>
+    >
 <?php
 		if (!$beentaken) {
 			/*
@@ -590,7 +587,7 @@ if ($overwriteBody==1) {
 		refreshTable();
 	</script>
 <?php
-	}
+    
 	if ($displaymethod=='VideoCue' || $displaymethod == 'video_cued') {
 		echo '<p><input type=button value="'._('Define Video Cues').'" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
 	} else if ($displaymethod == 'full') {

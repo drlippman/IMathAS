@@ -169,7 +169,7 @@ function displayQuestionList(results) {
     var lastlib = -1;
     var existingq = [];
     wrongLibState = {};
-    if (itemarray) {
+    if (typeof itemarray !== 'undefined') {
         getExistingQuestions(itemarray, existingq);
     }
     for (var i in results['qs']) {
@@ -288,7 +288,6 @@ function displayQuestionList(results) {
     initSortTable('myTable',[false,'S',false,'N',false,'S','N',false]);
     if (window.top == window.self && document.getElementById("addbar")) {
          $("#selq input[type=checkbox]").on("change", function () {
-             console.log($("#selq input[type=checkbox]:checked").length);
              $("#addbar.footerbar").toggleClass("sr-only", $("#selq input[type=checkbox]:checked").length == 0);
          });
     }
