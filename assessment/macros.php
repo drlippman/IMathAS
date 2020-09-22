@@ -2839,6 +2839,7 @@ function splitunits($unitsExpression) {
       }
     }
   }
+//echo "    ".$unitsExpressionSimple;
 return array($numerical,$unitArray);
 }
 

@@ -51,6 +51,8 @@ class NumberScorePart implements ScorePart
         if (in_array('units',$ansformats)) {
           $givenansUnits = splitunits($givenans);
           $answerUnits = splitunits($answer);
+          $givenansUnitsNumber = evalMathParser($givenansUnits[0]);
+          $answerUnitsNumber = evalMathParser($answerUnits[0]);
           if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
               $scorePartResult->setRawScore(0);
               return $scorePartResult;
@@ -59,7 +61,7 @@ class NumberScorePart implements ScorePart
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
           }
-          if (($givenansUnits[0] == $answerUnits[0] && $givenansUnits[1] == $answerUnits[1])) {
+          if (abs($givenansUnitsNumber-$answerUnitsNumber)<$defaultreltol && $givenansUnits[1] == $answerUnits[1]) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
           } else {
