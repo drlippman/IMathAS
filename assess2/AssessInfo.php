@@ -328,6 +328,9 @@ class AssessInfo
         $out[$field] = $this->questionData[$id][$field];
       }
     }
+    if (isset($this->assessData['textmap'][$id])) {
+        $out['text'] = $this->assessData['textmap'][$id];
+    }
     return $out;
   }
 
@@ -1166,6 +1169,65 @@ class AssessInfo
     } else {
       $settings['itemorder'] = $itemorder;
     }
+
+    
+    $textmap = [];
+    if (count($settings['interquestion_text']) > 0) {
+        $curtextnum = 0;
+        $curtext = $settings['interquestion_text'][$curtextnum];
+        $curqn = 0;
+        foreach ($settings['itemorder'] as $item) {
+            while ($curqn > $curtext['displayUntil']) {
+                if (!isset($settings['interquestion_text'][$curtextnum + 1])) {
+                    break;
+                } else {
+                    $curtextnum++;
+                    $curtext = $settings['interquestion_text'][$curtextnum];
+                }
+            }
+            if (is_array($item)) { // is a grouping
+                foreach ($item['qids'] as $qid) {
+                    if ($curqn >= $curtext['displayBefore'] && $curqn <= $curtext['displayUntil']) {
+                        $textmap[$qid] = $curtextnum;
+                    }
+                }
+                $curqn += $item['n'];
+            } else {
+                if ($curqn >= $curtext['displayBefore'] && $curqn <= $curtext['displayUntil']) {
+                    $textmap[$item] = $curtextnum;
+                }
+                $curqn++;
+            }
+        }
+        foreach ($settings['interquestion_text'] as $k=>$v) {
+            unset($settings['interquestion_text'][$k]['displayBefore']);
+            unset($settings['interquestion_text'][$k]['displayUntil']);
+        }
+    }
+    $settings['textmap'] = $textmap;
+    /*
+    $i = 0;
+    foreach ($settings['interquestion_text'] as $k=>$v) {
+        $n=$v['displayBefore'];
+        while ($n<=$v['displayUntil']) {
+            if (is_array($settings['itemorder'][$i])) {  // is a grouping
+                foreach ($settings['itemorder'][$i]['qids'] as $qid) { // set text for all questions in group
+                    $textmap[$qid] = $k;
+                }
+                $i++;
+                $n += $settings['itemorder'][$i]['n'];
+            } else {
+                $textmap[$settings['itemorder'][$i]] = $k;
+                $i++;
+                $n++;
+            }
+        }
+        //unset($settings['interquestion_text'][$k]['displayBefore']);
+       // unset($settings['interquestion_text'][$k]['displayUntil']);
+    }
+    $settings['textmap'] = $textmap;
+    */
+    
 
     foreach ($settings as $k=>$v) {
       //convert numeric strings to numbers

@@ -1249,6 +1249,29 @@ export const actions = {
         store.timelimit_restricted = 2;
       }
     }
+    if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')
+    ) {
+      // map and override previous interquestion_text
+      let lasttext = -1;
+      const origtexts = data.interquestion_text;
+      const newtexts = [];
+      for (const i in data.questions) {
+        if (data.questions[i].hasOwnProperty('text')) {
+          const thistext = data.questions[i].text;
+          if (thistext === lasttext) { // same one
+            newtexts[newtexts.length - 1].displayUntil = i;
+          } else {
+            newtexts.push(Object.assign({}, origtexts[thistext]));
+            newtexts[newtexts.length - 1].displayBefore = i;
+            newtexts[newtexts.length - 1].displayUntil = i;
+            lasttext = thistext;
+          }
+        } else {
+          lasttext = -1;
+        }
+      }
+      data.interquestion_text = newtexts;
+    }
     if (data.hasOwnProperty('interquestion_text')) {
       data.interquestion_pages = [];
       let lastDisplayBefore = 0;
