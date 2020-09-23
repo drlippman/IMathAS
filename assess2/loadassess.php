@@ -62,7 +62,7 @@ $assess_record->loadRecord($uid);
 $include_from_assess_info = array(
   'name', 'summary', 'available', 'startdate', 'enddate', 'enddate_in',
   'original_enddate', 'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
-  'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
+  'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb', 'scoresingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
   'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue'

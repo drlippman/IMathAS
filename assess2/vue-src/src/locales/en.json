@@ -196,9 +196,11 @@
   },
   "summary": {
     "no_total": "Your assessment has been submitted.",
+    "viewwork_work": "You can view your work in the gradebook.",
+    "viewwork_work_after": "You can view your work in the gradebook after the due date.",
     "viewwork_immediately": "You can view your work and scores in the gradebook.",
-    "viewwork_after_take": "You can view your work and scores in the gradebook.",
     "viewwork_after_due": "You can view your work and scores in the gradebook after the due date.",
+    "viewwork_work_scores_after": "You can view your work in the gradebook, and scores after the due date.",
     "viewwork_never": "",
     "score": "Score",
     "recordedscore": "Recorded Score",
