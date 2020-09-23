@@ -18,7 +18,7 @@ function checkreqtimes($tocheck,$rtimes) {
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
 	}
-	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=]+/','',$tocheck);
+	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|]+/','',$tocheck);
 
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);

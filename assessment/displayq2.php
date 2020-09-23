@@ -7687,7 +7687,7 @@ function checkreqtimes($tocheck,$rtimes) {
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
 	}
-	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=]+/','',$tocheck);
+	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|]+/','',$tocheck);
 
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);
@@ -7731,7 +7731,7 @@ function checkreqtimes($tocheck,$rtimes) {
 			} else {
 				$num = intval(substr($list[$i+1],1));
 			}
-			$grouptocheck = array_map('trim', explode('||',$list[$i]));
+            $grouptocheck = array_map('trim', explode('||',$list[$i]));
 			$okingroup = false;
 			foreach ($grouptocheck as $lookfor) {
 				if ($lookfor=='#') {
@@ -7749,10 +7749,10 @@ function checkreqtimes($tocheck,$rtimes) {
 					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
 				} else {
 					if ($ignore_case || in_array($lookfor, $mathfuncs)) {
-						$nummatch = substr_count(strtolower($cleanans),strtolower($lookfor));
+                        $nummatch = substr_count(strtolower($cleanans),strtolower($lookfor));
 					} else {
 						$nummatch = substr_count($cleanans,$lookfor);
-					}
+                    }
 				}
 
 				if ($comp == "=") {
