@@ -256,7 +256,7 @@ th[aria-sort="ascending"] > *:last-child:after {
 th[aria-sort="descending"] > *:last-child:after {
 	content: "\2193";
 }
-td.c, input.c {
+td.c, th.c, input.c {
 	text-align: center;
 }
 td.r {
