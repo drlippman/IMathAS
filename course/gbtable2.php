@@ -1269,7 +1269,7 @@ function gbtable() {
 	}
 
 	//Get assessment2 scores,
-	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.userid";
+	$query = "SELECT iar.assessmentid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.userid,iar.timelimitexp";
 	if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 		$query .= ',iar.scoreddata';
 	}
@@ -1353,12 +1353,17 @@ function gbtable() {
 		}
 		$gb[$row][1][$col][10] = $canuselatepass;
 
-		if (($l['status']&3)>0 && ($thised>$now || !empty($GLOBALS['alwaysshowIP']))) {
-			$IP=1;
-			$UA=0;
-		} else if (($l['status']&1)>0 && $thised<$now) {
+        if (($l['status']&1)>0 && ($thised<$now ||  //unsubmitted by-assess, and due date passed
+            ($l['timelimitexp']>0 && $l['timelimitexp']<$now)) // or time limit expired on last att
+        ) {
 			$IP=0;
 			$UA=1;
+		} else if (($l['status']&3)>0 && // unsubmitted attempt any mode
+            ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && // and before due date
+            ($l['timelimitexp']==0 || $l['timelimitexp']>$now) // and time limit not expired
+        ) {
+			$IP=1;
+			$UA=0;
 		} else {
 			$IP=0;
 			$UA=0;

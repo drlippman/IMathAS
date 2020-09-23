@@ -161,7 +161,7 @@ class AssessRecord
 
     $qarr = array();
     $fields = array('lti_sourcedid', 'timeontask', 'starttime', 'lastchange',
-                    'score', 'status');
+                    'score', 'status', 'timelimitexp');
     foreach ($fields as $field) {
       $qarr[':'.$field] = $this->assessRecord[$field];
     }
@@ -332,7 +332,7 @@ class AssessRecord
     if ($recordStart && $this->assess_info->getSetting('timelimit') > 0) {
       //recording start and has time limit, so record end time
       $out['timelimit_end'] = $this->now + $this->assess_info->getAdjustedTimelimit();
-      if (!$this->canMakeNewAttempt()) {
+      if (!$this->canMakeNewAttempt(1)) { // add 1 since to-be-created record isn't in there yet
         // set time after which latepass is useless
         $this->assessRecord['timelimitexp'] = $out['timelimit_end'] + $this->assess_info->getAdjustedTimelimitGrace();
       }
@@ -646,7 +646,7 @@ class AssessRecord
           $this->data['assess_versions'][$lastver]['timelimit_end'] =
             $this->now + $this->assess_info->getAdjustedTimelimit();
           if (!$this->canMakeNewAttempt()) {
-            $this->assessRecord['timelimitexp'] = $out['timelimit_end'];
+            $this->assessRecord['timelimitexp'] = $this->data['assess_versions'][$lastver]['timelimit_end'];
           }
         }
       }
@@ -983,7 +983,7 @@ class AssessRecord
    * Check whether user is allowed to create a new assessment version
    * @return boolean              True if OK to create a new assess version
    */
-  public function canMakeNewAttempt() {
+  public function canMakeNewAttempt($add=0) {
     if ($this->is_practice) {
       // if in practice, can make new if we don't have one
       return (empty($this->data));
@@ -994,7 +994,7 @@ class AssessRecord
       }
       $this->parseData();
       $submitby = $this->assess_info->getSetting('submitby');
-      $prev_attempt_cnt = count($this->data['assess_versions']);
+      $prev_attempt_cnt = count($this->data['assess_versions']) + $add;
       // if by-question, then we can if we have no versions yet
       if ($submitby == 'by_question' && $prev_attempt_cnt == 0) {
         return true;
