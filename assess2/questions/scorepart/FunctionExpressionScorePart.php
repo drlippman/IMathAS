@@ -158,7 +158,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
-            if ($answer==$givenans) {
+            if (strcmp($answer,$givenans) === 0) {
                 $scorePartResult->setRawScore(1);
                 return $scorePartResult;
             } else {

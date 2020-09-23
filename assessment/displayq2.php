@@ -5021,7 +5021,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		//handle nosolninf case
 		if ($_POST["tc$qn"]==='oo' || $_POST["tc$qn"]==='DNE') {
-			if ($answer==$_POST["tc$qn"]) {
+			if (strcmp($answer,$_POST["tc$qn"])===0) {
 				return 1;
 			} else {
 				return 0;
