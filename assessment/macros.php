@@ -295,6 +295,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$isxequals = true;
 			if ($function[0]{1}=='=') {
 				$val = substr($function[0],2);
+				if (!is_numeric($val)) {
+					// convert to parametric
+					$isxequals = false;
+					$isparametric = true;
+					$yfunc = "t";
+					$evalyfunc = makeMathFunction("t", "t");
+					$xfunc = makepretty(str_replace('y','t',$val));
+					$evalxfunc = makeMathFunction($xfunc, "t");
+					if ($evalxfunc===false || $evalyfunc===false) {continue;}
+				}
 			} else {
 				$isineq = true;
 				if ($function[0]{2}=='=') {
