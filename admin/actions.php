@@ -897,6 +897,9 @@ switch($_POST['action']) {
 				if (!empty($_POST['copyrubrics'])) {
 					copyrubrics();
 				}
+				if (!empty($_POST['copyallcalitems'])) {
+					copyallcalitems($_POST['usetemplate'], $cid);
+				}
 			}
 			if ($setdatesbylti==1) {
 				$stm = $DBH->prepare("UPDATE imas_assessments SET date_by_lti=1 WHERE date_by_lti=0 AND courseid=:cid");

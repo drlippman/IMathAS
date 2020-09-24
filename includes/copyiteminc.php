@@ -906,4 +906,22 @@ function handleextoolcopy($sourcecid) {
 	}
 }
 
+function copyallcalitems($sourcecid,$destcid) {
+	global $DBH;
+	$stm = $DBH->prepare("SELECT date,tag,title FROM imas_calitems WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$sourcecid));
+	$insarr = array();
+	$qarr = array();
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$insarr[] = "(?,?,?,?)";
+		array_push($qarr, $destcid, $row[0], $row[1], $row[2]);
+	}
+	if (count($qarr)>0) {
+		$query = "INSERT INTO imas_calitems (courseid,date,tag,title) VALUES ";
+		$query .= implode(',',$insarr);
+		$stm = $DBH->prepare($query);
+		$stm->execute($qarr);
+	}
+}
+
 ?>

@@ -786,6 +786,9 @@ switch($_GET['action']) {
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
 			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyallcalitems>'._('Copy all calendar items?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyallcalitems" id="copyallcalitems" value="1"/>';
+			echo '</span><br class=form>';
 			echo '</div>';
 
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
