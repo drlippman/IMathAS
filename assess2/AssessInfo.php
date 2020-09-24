@@ -299,6 +299,9 @@ class AssessInfo
   public function extractSettings($keys) {
     $out = array();
     foreach ($keys as $key) {
+      if ($key == 'interquestion_text' && !isset($this->assessData['textmap'])) {
+        $this->generateTextMap();
+      }
       if (isset($this->assessData[$key])) {
         $out[$key] = $this->assessData[$key];
       }
@@ -327,6 +330,12 @@ class AssessInfo
       foreach ($by_q as $field) {
         $out[$field] = $this->questionData[$id][$field];
       }
+    }
+    if (!isset($this->assessData['textmap'])) {
+        $this->generateTextMap();
+    }
+    if (isset($this->assessData['textmap'][$id])) {
+        $out['text'] = $this->assessData['textmap'][$id];
     }
     return $out;
   }
@@ -1175,6 +1184,55 @@ class AssessInfo
     }
 
     return $settings;
+  }
+
+  private function generateTextMap() {
+    if (($this->assessData['shuffle']&(1+16+32)) === 0) {
+        // no shuffling; skip textmap
+        return;
+    }
+    $textmap = [];
+    if (count($this->assessData['interquestion_text']) > 0) {
+        $curqn = 0;
+        $lastitemfirsttext = 0;
+        foreach ($this->assessData['itemorder'] as $item) {
+            $thistextmap = [];
+            $storedfirst = false;
+            for ($i=$lastitemfirsttext; $i < count($this->assessData['interquestion_text']); $i++) {
+                $curtext = $this->assessData['interquestion_text'][$i];
+                if ($curqn >= $curtext['displayBefore'] && $curqn <= $curtext['displayUntil']) {
+                    $thistextmap[] = $i;
+                    if (!$storedfirst) {
+                        $lastitemfirsttext = $i;
+                        $storedfirst = true;
+                    }
+                } else if ($curtext['displayBefore'] > $curqn) { // getting too big; stop
+                    break;
+                }
+            }
+            if (is_array($item)) { // is a grouping
+                if (count($thistextmap) > 0) {
+                    foreach ($item['qids'] as $qid) {
+                        $textmap[$qid] = $thistextmap;
+                    }
+                }
+                $curqn += $item['n'];
+            } else {
+                if (count($thistextmap) > 0) {
+                    $textmap[$item] = $thistextmap;
+                }
+                $curqn++;
+            }
+        }
+        foreach ($this->assessData['interquestion_text'] as $k=>$v) {
+            if ($v['displayBefore'] >= $curqn) {
+                $this->assessData['interquestion_text'][$k]['atend'] = 1;
+            }
+            unset($this->assessData['interquestion_text'][$k]['displayBefore']);
+            unset($this->assessData['interquestion_text'][$k]['displayUntil']);
+        }
+    }
+    $this->assessData['textmap'] = $textmap;
   }
 
   /**
