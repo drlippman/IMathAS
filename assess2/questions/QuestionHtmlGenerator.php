@@ -1008,6 +1008,21 @@ class QuestionHtmlGenerator
          * Business logic begins here.
          */
 
+        if (isset($showanswer) && !is_array($showanswer)) {
+            $showanswer = $this->fixDegrees($showanswer);
+        } else if (isset($showanswer)) {
+            foreach ($showanswer as $k=>$v) {
+                $showanswer[$k] = $this->fixDegrees($v);
+            }
+        }
+        if (!is_array($shanspt)) {
+            $shanspt = $this->fixDegrees($shanspt);
+        } else {
+            foreach ($shanspt as $k=>$v) {
+                $shanspt[$k] = $this->fixDegrees($v);
+            }
+        }
+        
         $showanswerloc = '';
 
         if (isset($showanswer) && !is_array($showanswer) && $doshowans) {  //single showanswer defined
@@ -1232,5 +1247,12 @@ class QuestionHtmlGenerator
     private function addError(string $errorMessage): void
     {
         $this->errors[] = $errorMessage;
+    }
+
+    private function fixDegrees(string $str): string 
+    {
+        return preg_replace_callback('/`(.*?)`/s', function($m) {
+            return '`' . str_replace(['degrees','degree'],'^@', $m[1]).'`';
+        }, $str);
     }
 }

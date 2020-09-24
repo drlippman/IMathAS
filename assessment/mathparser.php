@@ -145,7 +145,7 @@ class MathParser
     }
 
     //build regex's for matching symbols
-    $allwords = array_merge($this->functions, $this->variables);
+    $allwords = array_merge($this->functions, $this->variables, ['degree','degrees']);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
     $this->regex = '/^('.implode('|',array_map('preg_quote', $allwords)).')/';
     $this->funcregex = '/^('.implode('|',array_map('preg_quote', $this->functions)).')/i';
@@ -372,6 +372,11 @@ class MathParser
                 'input'=>null,
                 'index'=>['type'=>'number', 'symbol'=>M_E]
               ];
+            } else if ($matches[1] == 'degree' || $matches[1] == 'degrees') {
+                $tokens[] = [
+                    'type'=>'number',
+                    'symbol'=> M_PI/180
+                ];
             } else {
               $tokens[] = [
                 'type'=>'function',

@@ -47,6 +47,7 @@ class CalculatedScorePart implements ScorePart
         $hasNumVal = !empty($_POST["qn$qn-val"]);
 
         $givenans = normalizemathunicode($givenans);
+        $answer = normalizemathunicode($answer);
         $ansformats = array_map('trim',explode(',',$answerformat));
 
 

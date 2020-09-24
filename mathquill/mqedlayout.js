@@ -100,7 +100,10 @@ var myMQeditor = (function($) {
               {l:'\\tan^{-1}', c:'f'},
               {l:'\\sinh', c:'f'},
               {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'}
+              {l:'\\tanh', c:'f'},
+              {l:'\\pi', nb:1},
+              {s:1},
+              {s:4}
             ]
           }
         ]
@@ -295,7 +298,10 @@ var myMQeditor = (function($) {
               {l:'\\tan^{-1}', c:'f'},
               {l:'\\sinh', c:'f'},
               {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'}
+              {l:'\\tanh', c:'f'},
+              {l:'\\pi', nb:1},
+              {s:1},
+              {s:4}
             ]
           }
         ]
@@ -520,6 +526,9 @@ var myMQeditor = (function($) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
+        if (calcformat.match(/allowdegrees/)) {
+            baselayout.tabs[2].tabcontent[0].contents[13] = {l:'\\degree'};
+        }
       }
     }
     if (qtype.match(/interval/)) {
@@ -672,7 +681,7 @@ MQ.config({
   charsThatBreakOutOfSupSubVar: "+-(",
   charsThatBreakOutOfSupSubOp: "+-(",
   restrictMismatchedBrackets: true,
-  autoCommands: 'pi theta root sqrt ^oo',
+  autoCommands: 'pi theta root sqrt ^oo degree',
   autoParenOperators: true,
   addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;']},
 });

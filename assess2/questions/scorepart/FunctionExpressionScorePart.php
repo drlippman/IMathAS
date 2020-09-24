@@ -64,7 +64,8 @@ class FunctionExpressionScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         $givenans = normalizemathunicode(trim($givenans));
-
+        $answer = normalizemathunicode($answer);
+        
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
         }

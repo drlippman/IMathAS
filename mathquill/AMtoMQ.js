@@ -145,6 +145,8 @@ var AMQsymbols = [
 //{input:"''", tag:"mo", output:"''", tex:null, val:true},
 //{input:"'''", tag:"mo", output:"'''", tex:null, val:true},
 //{input:"''''", tag:"mo", output:"''''", tex:null, val:true},
+{input:"degree",  tag:"mo", tex:null, ttype:CONST},
+{input:"degrees", output:"degree", ttype:DEFINITION},
 
 
 //standard functions

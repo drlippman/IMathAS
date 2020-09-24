@@ -111,10 +111,10 @@ var MQeditor = (function($) {
           };
           thisMQconfig.keyboardPassthrough = true;
         }
+        thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
+            'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
         var vars = el.getAttribute("data-mq-vars") || '';
         if (vars != '') {
-            thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
-                'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
             vars = (vars=='') ? [] : vars.split(/,/);
             for (var i=0; i<vars.length; i++) {
                 if (vars[i].length > 1 && vars[i].match(/^[a-zA-Z]+$/)) {

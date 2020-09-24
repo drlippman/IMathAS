@@ -405,6 +405,11 @@ function checkanswerformat($tocheck,$ansformats) {
 		if (preg_match('/(sin|cos|tan|cot|csc|sec)/i',$tocheck)) {
 			return false;
 		}
+    }
+    if (!in_array("allowdegrees",$ansformats)) {
+        if (strpos($tocheck,'degree') !== false) {
+            return false;
+        }
 	}
 	if (in_array("nolongdec",$ansformats)) {
 		if (preg_match('/\.\d{6}/',$tocheck)) {
@@ -552,6 +557,9 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 	}
 	if (in_array('notrig',$ansformats)) {
 		$tip .= "<br/>" . _('Trig functions (sin,cos,etc.) are not allowed');
+    }
+    if (in_array('allowdegrees',$ansformats)) {
+		$tip .= "<br/>" . _('Degrees are allowed');
 	}
 	if ($doshort) {
 		return array($tip,$shorttip);
@@ -699,7 +707,7 @@ function normalizemathunicode($str) {
     $str = str_replace(array('⟨','⟩'), array('<','>'), $str);
     $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
 	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
-  $str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
+    $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
   if (strtoupper(trim($str))==='DNE') {
     $str = 'DNE';
