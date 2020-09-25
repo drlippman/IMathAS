@@ -156,13 +156,12 @@ function displayQuestionList(results) {
     var thead = '<thead><tr>'
         + '<th><span class="sr-only">'+_('Select')+'</span></th>'
         + '<th>'+_('Description')+'</th>'
+        + '<th>'+_('Actions')+'</th>'
         + '<th>'+_('Info')+'</th>'
         + '<th>'+_('ID')+'</th>'
-        + '<th>'+_('Preview')+'</th>'
         + '<th>'+_('Type')+'</th>'
         + '<th>'+_('Times Used')+'</th>'
         + '<th>'+_('Avg Time')+'</th>'
-        + '<th>'+_('Actions')+'</th>'
         + '</tr></thead>';
     var tbody = '<tbody>';
     var i,q,row,features,descrclass,descricon;
@@ -252,26 +251,26 @@ function displayQuestionList(results) {
             "&cid=" + curcid +
             '&from=addq2&frompot=1';
 
-        var actions = '<div class="dropdown">' +
-            '<button role="button" class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + 
-            '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
+        var actions2 = '<button role="button" class="dropdown-toggle arrow-down secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + 
+            '<span class="sr-only">More</span></button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
             '<li><a href="' + addqaddr + '">' + _('Add') + '</a></li>' +
             '<li><a href="' + editqaddr + '">' + (q['mine']==1 ? _('Edit') : _('View Code')) + '</a></li>' + 
             '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>' +
             '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
                 ((q['junkflag'] == 1) ? _('Un-mark as in wrong library') : _('Mark as in wrong library')) +
                 '</a></li>' +
-            '</ul></div>';
+            '</ul>';
 
         // build row
         tbody += '<tr>'
             + '<td><input type=checkbox name="nchecked[]" id="qo'+i+'" value="'+q['id']+'"></td>'
             + '<td' + descrclass + '>' + descricon + q['description'] + '</td>'
+            + '<td><div class="dropdown splitbtn nowrap"><button type="button" class="secondary" onclick="previewq(\'selq\',\'qo'+i+'\','+q['id']+',true,false)">'
+            + _('Preview') + '</button>'
+            + actions2
+            + '</div></td>'
             + '<td class="nowrap">' + features + '</td>'
             + '<td>' + q['id'] + '</td>'
-            + '<td><button class="plain" type=button onclick="previewq(\'selq\',\'qo'+i+'\','+q['id']+',true,false)">'
-            + '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
-            + '</td>'
             + '<td>' + q['qtype'] + '</td>'
             + '<td class="c">' + q['times'] + '</td>'
             + '<td class="c">' + (q['meantimen'] > 3 ? 
@@ -279,7 +278,6 @@ function displayQuestionList(results) {
                 + '<br/>'+_('Avg time on first try: ') + q['meantime'] + _(' min') + 
                 '<br/>N='+q['meantimen']+'\')" onmouseleave="tipout()">' + q['meantime'] + '</span>') :
                 '') + '</td>'
-            + '<td class="c">' + actions + '</td>'
             + '</tr>';
     }
     tbody += '</tbody>';
@@ -316,7 +314,6 @@ function displayQuestionList(results) {
         $("#searchprev").hide();
     }
 }
-
 function updateInAssessMarkers() {
     var existingq = [];
     if (itemarray) {

@@ -313,7 +313,10 @@ if ($overwriteBody==1) {
 					numchked--;
 				}
 				document.getElementById(\"numchked\").innerHTML = numchked;
-			  }
+              }
+              if (parentcbox) {
+                  opener.$(parentcbox).trigger('change');
+              }
 		  }
 		  </script>";
 	}
