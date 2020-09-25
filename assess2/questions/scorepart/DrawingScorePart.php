@@ -1478,8 +1478,16 @@ class DrawingScorePart implements ScorePart
                   }
                 }
               } else {
-                $xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
-                $xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
+                if (trim($function[1])==='-oo') {
+                    $xminpix = 1;
+                } else {
+                    $xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
+                }
+                if (trim($function[2])==='oo') {
+                    $xmaxpix = $settings[6]-1;
+                } else {
+                    $xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
+                }
                 if ($xminpix == $xmaxpix) { continue; } // skip if zero-length line
       					$overlap = false;
                 foreach ($anslines as $lk=>$line) {
