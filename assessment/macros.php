@@ -2332,189 +2332,34 @@ function fractowords($numer,$denom,$options='no') { //options can combine 'mixed
 }
 
 function splitunits($unitsExpression) {
-
-    $numerical=1; //Initiates numerical value of expression
+  //A unit expression should be of the form [decimal number]*[unit]^[power]*[unit]^[power]... / [unit]^[power]*[unit]^[power]...
+  //Factors can also be numerical, including scientific notation.
+  //All factors after division symbol are contained in denominator.
+  //Function changes unit expressions into a $numerical factor and a $unitArray of powers of fundamental units.
+  $numerical=1; //Initiates numerical value of expression
+  $unitArray=[0,0,0,0,0,0,0,0,0,0]; //Initiates array of exponents of the fundamental units
   
-    $unitsExpression = trim($unitsExpression);
-    $unitsExpression = preg_replace('/\s{2,}/',' ',$unitsExpression);
-    $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*(\-?\d+)/','$1*10^$2',$unitsExpression);
-    $unitsExpression = preg_replace('/\s*\/\s*/','/',$unitsExpression);    
-    $unitsExpression = preg_replace('/\s*\^\s*/','^',$unitsExpression);
-    $unitsExpression = preg_replace('/\*\*/','^',$unitsExpression);
-    $unitsExpression = preg_replace('/(\d)([a-zA-Z])/','$1*$2',$unitsExpression);
-    $unitsExpression = preg_replace('/([a-zA-Z])(\d)/','$1*$2',$unitsExpression);
-    $unitsExpression = preg_replace('/([0-9])(\.)([a-zA-Z])/','$1$2*$3',$unitsExpression);
-    $unitsExpression = preg_replace('/(\s*\-\s*)([a-zA-Z])/','*$2',$unitsExpression);
-    $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression);
-    
-    $unitsEmptyMessage='Eek! Empty String.';
-    $unitsFormatMessage='Eek! Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...';
-    $unitsDivisionMessage='Eek! Only one division symbol allowed in the expression.';
-    
-    $unitsBadSyntax='/[\(\)\+]|\^\^|\*\*|\^\*|\*\^|\*\*|\-\-|\-\*|\*\-|\-\^|\d\-\d|\s\.\s|\.\.|\d\.\d\.|\.[\d\.\*]\.|[a-zA-Z]\.|\*\.[a-zA-Z]|\*[\*\.]\*/';
-    $unitsStartLike='/^[a-zA-Z0-9\.]/';
-    $unitsEndLike='/[a-zA-Z0-9\.]$/';
-    
-    if ($unitsExpression==='0') {
-      echo $unitsExpression;
-      $numerical=0;
-      return 0;
-    }
-    if (empty($unitsExpression)) {
-      echo $unitsEmptyMessage;
-      return '';
-    }
-    if (preg_match($unitsBadSyntax,$unitsExpression)) {
-      echo $unitsFormatMessage;
-      return '';
-    }
-    if (preg_match($unitsStartLike,$unitsExpression)==0||preg_match($unitsEndLike,$unitsExpression)==0) {
-      echo $unitsFormatMessage;
-      return '';
-    }
-    if (preg_match('/\/{2,}/',$unitsExpression)) {
-      echo $unitsDivisionMessage;
-      return '';
-    }
-    
-    $parts=explode('/',$unitsExpression);
-    if (count($parts)>2) {
-      echo 'Eek! Only one division symbol allowed in units.';
-      return '';
-    } elseif (count($parts)==1) {
-      $numerator=$parts[0];
-      $denominator='1';
-    } elseif (count($parts)==2) {
-      $numerator=$parts[0];
-      $denominator=$parts[1];
-    }
-    
-    $numerParts=explode('*',$numerator);
-    $denomParts=explode('*',$denominator);
-
-    $numerPartsTmp=[];
-    foreach($numerParts as $k => $part) {
-      if (!isNaN(evalMathParser($part))) {
-        $numerical=$numerical*evalMathParser($part);
-      } elseif (isNaN(evalMathparser($part))) {
-        array_push($numerPartsTmp,$part);
-      }
-    }
-    $numerParts=$numerPartsTmp; //has only factors that cannot be computed (like units)
-
-    $denomPartsTmp=[];
-    foreach($denomParts as $k => $part) {
-      if (!isNaN(evalMathParser($part))) {
-        if (evalnumstr($part)==0) {
-          echo 'Eek! Division by zero.';
-          return '';
-        } else {
-          $numerical=$numerical/evalMathParser($part);
-        }
-      } elseif (isNaN(evalMathParser($part))) {
-        array_push($denomPartsTmp,$part);
-      }
-    }
-    $denomParts=$denomPartsTmp; //has only factors that cannot be computed (like units)
-    
-    $numerExpand=[];
-    $denomExpand=[];
-
-    if (empty($numerParts)) {
-      $numerUnitFactors=['m' => 0];
-    } else {
-      foreach ($numerParts as $k=>$part) { //expand all factors from numerator, put in numer or denom array
-        if (preg_match('/\^[^\d\.\-]/',$part)) {
-          echo 'Eek! Exponents can only be numbers.';
-          return '';
-        }
-        if (preg_match('/^[a-zA-Z]+$/',$part)) {
-          array_push($numerExpand,$part);
-      } elseif (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9\.\-]+$/',$part)) {
-          $pow=substr($part,strpos($part,'^')+1);
-          if (floor(evalMathParser($pow))!=evalMathParser($pow)||isNaN(evalMathParser($pow))) {
-            echo 'Eek! Exponents on units must be integers.';
-            return '';
-          }
-          $part=substr($part,0,strpos($part,'^'));
-          if ($pow>0) {
-            for ($i=-1; $i<($pow-1); $i++) {
-              array_push($numerExpand,$part);
-            }
-          } elseif ($pow<0) {
-            for ($i=$pow; $i<0; $i++) {
-              array_push($denomExpand,$part);
-            }
-          }
-        } else {
-          echo $part;
-          return '';
-        }
-      }
-    }
-    if (empty($denomParts)) {
-      $denomUnitFactors=['m' => 0];
-    } else {
-      foreach ($denomParts as $k=>$part) { //do same with denominator
-        if (preg_match('/\^[a-zA-Z]/',$part)) {
-          echo 'Eek! Exponents can only be numbers.';
-          return '';
-        }
-        if (preg_match('/^[a-zA-Z]+$/',$part)) {
-          array_push($denomExpand,$part);
-        } elseif (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9]+$/',$part)) {
-          $pow=substr($part,strpos($part,'^')+1);
-          $part=substr($part,0,strpos($part,'^'));
-          if ($pow>0) {
-            for ($i=-1; $i<($pow-1); $i++) {
-              array_push($denomExpand,$part);
-            }
-          } elseif ($pow<0) {
-            for ($i=$pow; $i<0; $i++) {
-              array_push($numerExpand,$part);
-            }
-          }
-        } else {
-          echo $unitsFormatMessage;
-          return '';
-        }
-      }
-    }
-    
-    $numerUnitFactors = array_count_values($numerExpand); //count same factors in numerator and denominator arrays
-    $denomUnitFactors = array_count_values($denomExpand);
-    
-  //fundamental units are: kilograms,meters,seconds,radians,degrees Celsius,degrees Fahrenheit,degrees Kelvin,moles,amperes,candelas)
+  //Fundamental units are: kilograms,meters,seconds,radians,degrees Celsius,degrees Fahrenheit,degrees Kelvin,moles,amperes,candelas)
   $baseunits=['kg','m','sec','rad','degC','degF','degK','mol','amp','cd'];
+  
+  //Units array: 'unit' => [numerical factor, [array of factors of fundamental units]]
   $units=[
   //Length
     'm' => [1,array(0,1,0,0,0,0,0,0,0,0)],
     'meter' => [1,array(0,1,0,0,0,0,0,0,0,0)],
     'meters' => [1,array(0,1,0,0,0,0,0,0,0,0)],
-    'km' => [1000,array(0,1,0,0,0,0,0,0,0,0)],
-    'kilometer' => [1000,array(0,1,0,0,0,0,0,0,0,0)],
-    'kilometers' => [1000,array(0,1,0,0,0,0,0,0,0,0)],
-    'cm' => [0.01,array(0,1,0,0,0,0,0,0,0,0)],
-    'centimeter' => [0.01,array(0,1,0,0,0,0,0,0,0,0)],
-    'centimeters' => [0.01,array(0,1,0,0,0,0,0,0,0,0)],
-    'mm' => [0.001,array(0,1,0,0,0,0,0,0,0,0)],
-    'millimeter' => [0.001,array(0,1,0,0,0,0,0,0,0,0)],
-    'millimeters' => [0.001,array(0,1,0,0,0,0,0,0,0,0)],
+    'km' => [1000,array(0,1,0,0,0,0,0,0,0,0)], //kilometer
+    'cm' => [0.01,array(0,1,0,0,0,0,0,0,0,0)], //centimeter
+    'mm' => [0.001,array(0,1,0,0,0,0,0,0,0,0)], //millimeter
     'um' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)], //micrometer
-    'micrometer' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
-    'micrometers' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
-    'micron' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
-    'microns' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],
+    'micron' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],///////////////////////////
+    'microns' => [1E-6,array(0,1,0,0,0,0,0,0,0,0)],/////////////////////////
     'nm' => [1E-9,array(0,1,0,0,0,0,0,0,0,0)], //nanometer
-    'nanometer' => [1E-9,array(0,1,0,0,0,0,0,0,0,0)],
-    'nanometers' => [1E-9,array(0,1,0,0,0,0,0,0,0,0)],
     'Angstrom' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
     'Angstroms' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
     'angstrom' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
     'angstroms' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
     'pm' => [1E-12,array(0,1,0,0,0,0,0,0,0,0)], //picometer
-    'picometer' => [1E-12,array(0,1,0,0,0,0,0,0,0,0)],
-    'picometers' => [1E-12,array(0,1,0,0,0,0,0,0,0,0)],
     'in' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
     'inch' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
     'inches' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
@@ -2542,14 +2387,8 @@ function splitunits($unitsExpression) {
     'second' => [1,array(0,0,1,0,0,0,0,0,0,0)],
     'seconds' => [1,array(0,0,1,0,0,0,0,0,0,0)],
     'ms' => [0.001,array(0,0,1,0,0,0,0,0,0,0)], //milliseconds
-    'millisecond' => [0.001,array(0,0,1,0,0,0,0,0,0,0)],
-    'milliseconds' => [0.001,array(0,0,1,0,0,0,0,0,0,0)],
     'us' => [1E-6,array(0,0,1,0,0,0,0,0,0,0)], //microseconds
-    'microsecond' => [1E-6,array(0,0,1,0,0,0,0,0,0,0)],
-    'microseconds' => [1E-6,array(0,0,1,0,0,0,0,0,0,0)],
     'ns' => [1E-9,array(0,0,1,0,0,0,0,0,0,0)], //nanoseconds
-    'nanosecond' => [1E-9,array(0,0,1,0,0,0,0,0,0,0)],
-    'nanoseconds' => [1E-9,array(0,0,1,0,0,0,0,0,0,0)],
     'min' => [60,array(0,0,1,0,0,0,0,0,0,0)],
     'minute' => [60,array(0,0,1,0,0,0,0,0,0,0)],
     'minutes' => [60,array(0,0,1,0,0,0,0,0,0,0)],
@@ -2578,11 +2417,7 @@ function splitunits($unitsExpression) {
     'liters' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
     'litres' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
     'dL' => [0.0001,array(0,3,0,0,0,0,0,0,0,0)],
-    'ml' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
-    'milliliter' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
-    'milliliters' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
-    'millilitre' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
-    'millilitres' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'ml' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)], //milliliter
     'cc' => [1E-6,array(0,3,0,0,0,0,0,0,0,0)],
     'gal' => [0.00378541,array(0,3,0,0,0,0,0,0,0,0)],
     'gallon' => [0.00378541,array(0,3,0,0,0,0,0,0,0,0)],
@@ -2607,15 +2442,11 @@ function splitunits($unitsExpression) {
     'c' => [299792458,array(0,1,-1,0,0,0,0,0,0,0)], // Speed of light
     'mph' => [0.44704,array(0,1,-1,0,0,0,0,0,0,0)],
   //Mass
-    'kg' => [1,array(1,0,0,0,0,0,0,0,0,0)],
-    'kilogram' => [1,array(1,0,0,0,0,0,0,0,0,0)],
-    'kilograms' => [1,array(1,0,0,0,0,0,0,0,0,0)],
+    'kg' => [1,array(1,0,0,0,0,0,0,0,0,0)], //kilogram
     'g' => [0.001,array(1,0,0,0,0,0,0,0,0,0)],
     'gram' => [0.001,array(1,0,0,0,0,0,0,0,0,0)],
     'grams' => [0.001,array(1,0,0,0,0,0,0,0,0,0)],
-    'mg' => [0.000001,array(1,0,0,0,0,0,0,0,0,0)],
-    'milligram' => [0.000001,array(1,0,0,0,0,0,0,0,0,0)],
-    'milligrams' => [0.000001,array(1,0,0,0,0,0,0,0,0,0)],
+    'mg' => [0.000001,array(1,0,0,0,0,0,0,0,0,0)], //milligram
     'tonne' => [1000,array(1,0,0,0,0,0,0,0,0,0)],
     'tonnes' => [1000,array(1,0,0,0,0,0,0,0,0,0)],
   //Frequency
@@ -2625,7 +2456,7 @@ function splitunits($unitsExpression) {
     'hertz' => [2*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
     'kHz' => [2000*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
     'khz' => [2000*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
-    'kiloHertz' => [2000*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
+    //'kiloHertz' => [2000*3.14159265358979,array(0,0,-1,1,0,0,0,0,0,0)],
     'rev' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
     'revs' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
     'revolution' => [2*3.14159265358979,array(0,0,0,1,0,0,0,0,0,0)],
@@ -2654,7 +2485,8 @@ function splitunits($unitsExpression) {
     'Joules' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
     'joule' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
     'joules' => [1,array(1,2,-2,0,0,0,0,0,0,0)],
-    'KJ' => [1000,array(1,2,-2,0,0,0,0,0,0,0)],
+    'KJ' => [1000,array(1,2,-2,0,0,0,0,0,0,0)], //kiloJoules
+    'kJ' => [1000,array(1,2,-2,0,0,0,0,0,0,0)],
     'erg' => [1E-7,array(1,2,-2,0,0,0,0,0,0,0)],
     'ergs' => [1E-7,array(1,2,-2,0,0,0,0,0,0,0)],
     'lbf' => [1.35582,array(1,2,-2,0,0,0,0,0,0,0)],
@@ -2663,21 +2495,17 @@ function splitunits($unitsExpression) {
     'cal' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
     'calorie' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
     'calories' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
-    'kcal' => [4184,array(1,2,-2,0,0,0,0,0,0,0)],
-    'kilocalorie' => [4184,array(1,2,-2,0,0,0,0,0,0,0)],
+    'kcal' => [4184,array(1,2,-2,0,0,0,0,0,0,0)], //kilocalorie
     'eV' => [1.60218e-19,array(1,2,-2,0,0,0,0,0,0,0)],
-    'kwh' => [3.6E6,array(1,2,-2,0,0,0,0,0,0,0)],
+    'kwh' => [3.6E6,array(1,2,-2,0,0,0,0,0,0,0)], //kiloWatthour
+    'kWh' => [3.6E6,array(1,2,-2,0,0,0,0,0,0,0)],
   //Power
     'W' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
     'Watt' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
     'Watts' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
     'watt' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
     'watts' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
-    'kW' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
-    'kiloWatt' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
-    'kiloWatts' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
-    'kilowatt' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
-    'kilowatts' => [1000,array(1,2,-3,0,0,0,0,0,0,0)],
+    'kW' => [1000,array(1,2,-3,0,0,0,0,0,0,0)], //kiloWatt
     'hp' => [746,array(1,2,-3,0,0,0,0,0,0,0)],
     'horsepower' => [746,array(1,2,-3,0,0,0,0,0,0,0)],
   //Pressure
@@ -2686,21 +2514,9 @@ function splitunits($unitsExpression) {
     'Pascals' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
     'pascal' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
     'pascals' => [1,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'kPa' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'kiloPascal' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'kiloPascals' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'kilopascal' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'kilopascals' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'MPa' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'megaPascal' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'megaPascals' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'megapascal' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'megapascals' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'GPa' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'gigapascal' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'gigapascals' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'gigaPascal' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'gigaPascals' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'kPa' => [1000,array(1,-1,-2,0,0,0,0,0,0,0)], //kilopascal
+    'MPa' => [1E6,array(1,-1,-2,0,0,0,0,0,0,0)], //megapascal
+    'GPa' => [1E9,array(1,-1,-2,0,0,0,0,0,0,0)], //gigapascal
     'atm' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
     'atms' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
     'atmosphere' => [1.01E5,array(1,-1,-2,0,0,0,0,0,0,0)],
@@ -2709,14 +2525,12 @@ function splitunits($unitsExpression) {
     'bars' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
     'barometer' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
     'barometers' => [100000,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'mbar' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
+    'mbar' => [100,array(1,-1,-2,0,0,0,0,0,0,0)], //millibar
     'mbars' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'millibar' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
-    'millibars' => [100,array(1,-1,-2,0,0,0,0,0,0,0)],
     'Torr' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
     'torr' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
     'mmHg' => [133.322,array(1,-1,-2,0,0,0,0,0,0,0)],
-    //'cmH2O' => [98.0638,array(1,-1,-2,0,0,0,0,0,0,0)], This won't work because it would split into cmH*2*O
+    'cmWater' => [98.0638,array(1,-1,-2,0,0,0,0,0,0,0)], //This comes from a cmH2O preg_replace
     'psi' => [98.0638,array(1,-1,-2,0,0,0,0,0,0,0)],
   //Electrical Units
     'C' => [1,array(0,0,1,0,0,0,0,0,1,0)],
@@ -2729,12 +2543,8 @@ function splitunits($unitsExpression) {
     'Volts' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
     'volt' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
     'volts' => [1,array(1,2,-3,0,0,0,0,0,1,0)],
-    'mv' => [0.001,array(1,2,-3,0,0,0,0,0,1,0)],
-    'millivolt' => [0.001,array(1,2,-3,0,0,0,0,0,1,0)],
-    'millivolts' => [0.001,array(1,2,-3,0,0,0,0,0,1,0)],
-    'MV' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)],
-    'megavolt' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)],
-    'megavolts' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)],
+    'mV' => [0.001,array(1,2,-3,0,0,0,0,0,1,0)], //millivolt
+    'MV' => [1E6,array(1,2,-3,0,0,0,0,0,1,0)], //megavolt
     'Farad' => [1,array(-1,-2,4,0,0,0,0,0,2,0)],
     'farad' => [1,array(-1,-2,4,0,0,0,0,0,2,0)],
     'ohm' => [1,array(1,2,-3,0,0,0,0,0,-2,0)],
@@ -2771,12 +2581,10 @@ function splitunits($unitsExpression) {
     'daltons' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)],
     'me' => [9.1093826E-31,array(1,0,0,0,0,0,0,0,0,0)], //electron resting mass
   //Biology/Chemistry Units
-    'millimol' => [0.001,array(0,0,0,0,0,0,0,1,0,0)],
-    'micromol' => [1E-6,array(0,0,0,0,0,0,0,1,0,0)],
-    'nanomol' => [1E-6,array(0,0,0,0,0,0,0,1,0,0)],
+    'mol' => [1,array(0,0,0,0,0,0,0,1,0,0)],
   //Astronomy Units
-    'kpc' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)],
-    'kiloparsec' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)],
+    'kpc' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)], //kiloparsec
+    //'kiloparsec' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)],
     'solarmass' => [1.98892E30,array(1,0,0,0,0,0,0,0,0,0)],
     'solarradius' => [6.955E8,array(0,1,0,0,0,0,0,0,0,0)],
   //Temperature
@@ -2784,9 +2592,259 @@ function splitunits($unitsExpression) {
     'degC' => [1,array(0,0,0,0,1,0,0,0,0,0)],
     'degK' => [1,array(0,0,0,0,0,0,1,0,0,0)],
   ];
+  
+  //Standard metric prefixes with associated numerical factors
+  $unitPrefix = [
+    'yotta' => ['yotta',1E24],
+    'zetta' => ['zetta',1E21],
+    'exa' => ['exa',1E18],
+    'peta' => ['peta',1E15],
+    'tera' => ['tera',1E12],
+    'giga' => ['giga',1E9],
+    'mega' => ['mega',1E6],
+    'kilo' => ['kilo',1E3],
+    'hecto' => ['hecto',100],
+    'deka' => ['deka',10],
+    'deci' => ['deci',0.1],
+    'centi' => ['centi',0.01],
+    'milli' => ['milli',1E-3],
+    'micro' => ['micro',1E-6],
+    'nano' => ['nano',1E-9],
+    'pico' => ['pico',1E-12],
+    'fempto' => ['fempto',1E-15],
+    'atto' => ['atto',1E-18],
+    'zepto' => ['zepto',1E-21],
+    'yocto' => ['yocto',1E-24]
+  ];
+  
+  //Search string for metric prefixes.
+  $unitPrefixPattern = '/yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto/';
+  
+  $unitsExpression = trim($unitsExpression);
+  
+  //Special case of unit 'micron'.
+  $unitsExpression = preg_replace('/(microns?)([^a-zA-Z]|$)/','micrometer$2',$unitsExpression);
+  
+  //Special case of unit "cmH2O".
+  $unitsExpression = preg_replace('/cmH2O/','cmWater',$unitsExpression);
+  
+  $unitsExpression = preg_replace('/\s{2,}/',' ',$unitsExpression); //no double spaces
+  $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*([\-]?\d+)/','$1*10^$2',$unitsExpression); //scientific notation
+  $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*[\+]?(\d+)/','$1*10^$2',$unitsExpression);
+  $unitsExpression = preg_replace('/\s*(\/|\^|\-)\s*/','$1',$unitsExpression); //trims space around division, exponent and dash symbols
+  $unitsExpression = preg_replace('/\*\*/','^',$unitsExpression); //interprets double multiplication as exponentiation
+  $unitsExpression = preg_replace('/(\d)([a-zA-Z])/','$1*$2',$unitsExpression); //interprets number next to letter as multiplication
+  $unitsExpression = preg_replace('/([a-zA-Z])(\d)/','$1*$2',$unitsExpression); //Not sure if this is standard notation.
+  $unitsExpression = preg_replace('/([0-9])(\.)([a-zA-Z])/','$1$2*$3',$unitsExpression); //allows numerical factor to end in a decimal point
+  $unitsExpression = preg_replace('/(\s*\-\s*)([a-zA-Z])/','*$2',$unitsExpression); //interprets dash as multiplication
+  $unitsExpression = preg_replace('/([a-zA-Z])(\s*\-\s*)/','$1*',$unitsExpression); //Not sure if this is standard notation.
+  $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol
+  
+  $unitsFormatMessage='Eek! Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...';
+  $unitsDivisionMessage='Eek! Only one division symbol allowed in the expression.';
+  $unitsSymbolMessage='Eek! Improper symbol or operation used. Expressions can only use decimal numbers, letters, multiplication, division and exponents. No parentheses allowed.';
+  
+  $unitsBadSyntax='/[\(\)]|\^\^|\*\*|\^\*|\*\^|\*\*|\-\-|\-\*|\*\-|\-\^|\d\-\d|\s\.\s|\.\.|\d\.\d\.|\.[\d\.\*]\.|[a-zA-Z]\.|\*\.[a-zA-Z]|\*[\*\.]\*|\d\-\d|\d\+\d/'; //bad combinations of symbols.
+  //We need to disallow the addition symbol, though it shows up in scientific notation.
+  $unitsBadSymbols='/[^a-zA-Z\d\*\/\^\.\-]/'; //expression can only contain letters, numbers, multiplication, division, exponents, decimals and negative symbol
+  $unitsStartLike='/^[a-zA-Z0-9\.\-]/'; //expression must start with one of these symbols
+  $unitsEndLike='/[a-zA-Z0-9\.]$/'; //expression must end with one of these symbols
+  
+  if ($unitsExpression==='0' || empty($unitsExpression)) {
+    $numerical=0;
+    return 0;
+  }
+  
+  if (preg_match($unitsBadSymbols,$unitsExpression)) {
+    echo $unitsSymbolMessage;
+    return '';
+  }
+  if (preg_match($unitsBadSyntax,$unitsExpression)) {
+    echo $unitsFormatMessage;
+    return '';
+  }
+  if (preg_match($unitsStartLike,$unitsExpression)==0 || preg_match($unitsEndLike,$unitsExpression)==0) {
+    echo $unitsFormatMessage;
+    return '';
+  }
+  
+  $parts=explode('/',$unitsExpression);
+  if (count($parts)>2) {
+    echo $unitsDivisionMessage;
+    return '';
+  } elseif (count($parts)==1) {
+    $numerator=$parts[0];
+    $denominator='1';
+  } elseif (count($parts)==2) {
+    $numerator=$parts[0];
+    $denominator=$parts[1];
+  }
+  
+  $numerParts=explode('*',$numerator);
+  $denomParts=explode('*',$denominator);
+  
+  $numerPartsTmp=[];
+  foreach($numerParts as $k => $part) {
+    if (!isNaN(evalMathParser($part))) {
+      $numerical=$numerical*evalMathParser($part);
+    } elseif (isNaN(evalMathparser($part))) { 
+      array_push($numerPartsTmp,$part);
+    }
+  }
+  $numerParts=$numerPartsTmp; //Has only factors that cannot be computed (like units).
 
-  $unitArray=[0,0,0,0,0,0,0,0,0,0];
+  $denomPartsTmp=[];
+  foreach($denomParts as $k => $part) {
+    if (!isNaN(evalMathParser($part))) {
+      if (evalnumstr($part)==0) {
+        echo 'Eek! Division by zero.';
+        return '';
+      } else {
+        $numerical=$numerical/evalMathParser($part);
+      }
+    } elseif (isNaN(evalMathParser($part))) {
+      array_push($denomPartsTmp,$part);
+    }
+  }
+  $denomParts=$denomPartsTmp; //Has only factors that cannot be computed (like units).
+  
+  $numerExpand=[]; //Initiates the expanded array of units.
+  $denomExpand=[];
+  
+  if (!empty($numerParts)) {
+    foreach ($numerParts as $k=>$part) { //Expand all factors from numerator, put in numer or denom array.
+      if (preg_match('/\^[^\d\.\-]/',$part)) {
+        echo 'Eek! Exponents can only be numbers.';
+        return '';
+      }
+      if (preg_match('/^[a-zA-Z]+$/',$part)) {
+        $part = preg_replace('/([a-zA-Z]+)/','$1^1',$part); //If unit has no exponent, make it unit^1.
+      }
 
+      if (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9\.\-]+$/',$part)) {
+        $pow=substr($part,strpos($part,'^')+1);
+        if (floor(evalMathParser($pow))!=evalMathParser($pow)||isNaN(evalMathParser($pow))) {
+          echo 'Eek! Exponents on units must be integers.';
+          return '';
+        }
+        $part = substr($part,0,strpos($part,'^')); //Now $part only has letters.
+        
+        $prefixCount=-1;
+        $partPrefix=[];
+        while (preg_match($unitPrefixPattern,$part)) { //Does it have a metric prefix?
+          $prefixCount = $prefixCount+1;
+          preg_match($unitPrefixPattern,$part,$matches[$prefixCount]); //$matches[0][0] catches the first prefix, $matches[1][0] is the 2nd prefix, etc.
+          $partPrefix[$prefixCount] = $matches[$prefixCount][0]; //Here is the prefix. [Could be empty!]
+          $prefixLength = strlen($matches[$prefixCount][0]);
+          $part = substr($part,$prefixLength); //Now $part is just the unit.
+          if ($part == '' || empty($part)) {
+            echo 'Eek! The prefix \''.$partPrefix[$prefixCount].'\' must be followed by a unit.';
+            return '';
+          }
+        }
+        if ($pow>0) {
+          for ($i=-1; $i<($pow-1); $i++) {
+            array_push($numerExpand,$part);
+            if (!empty($partPrefix)) { //Only look for the prefix factor if there is a prefix.
+              for ($j=-1; $j<$prefixCount; $j++) { //Deal with compounded prefixes, such as megamegafeet^2 = megamegafeet * megamegafeet
+                $numerical = $numerical*$unitPrefix[($partPrefix[($j+1)])][1];
+              }
+            }
+          }
+        } elseif ($pow<0) {
+          for ($i=$pow; $i<0; $i++) {
+            array_push($denomExpand,$part);
+            if (!empty($partPrefix)) { //Only look for the prefix factor if there is a prefix.
+              for ($j=-1; $j<$prefixCount; $j++) {
+                $numerical = $numerical/$unitPrefix[($partPrefix[($j+1)])][1];
+              }
+            }
+          }
+        }
+      } else {
+      echo 'Eek! Error in the numerator.';
+      return '';
+      }
+    }
+  }
+  
+  //Adapt the previous block for the denominator.
+  if (!empty($denomParts)) {
+    foreach ($denomParts as $k=>$part) { //Expand all factors from denominator, put in numer or denom array.
+      if (preg_match('/\^[^\d\.\-]/',$part)) {
+        echo 'Eek! Exponents can only be numbers.';
+        return '';
+      }
+      if (preg_match('/^[a-zA-Z]+$/',$part)) {
+        $part = preg_replace('/([a-zA-Z]+)/','$1^1',$part); //If unit has no exponent, make it unit^1.
+      }
+
+      if (preg_match('/^[a-zA-Z]+\^[\-]{0,1}[0-9\.\-]+$/',$part)) {
+        $pow=substr($part,strpos($part,'^')+1);
+        if (floor(evalMathParser($pow))!=evalMathParser($pow)||isNaN(evalMathParser($pow))) {
+          echo 'Eek! Exponents on units must be integers.';
+          return '';
+        }
+        $part = substr($part,0,strpos($part,'^')); //Now $part is the prefix-and-unit.
+        
+        $prefixCount=-1; //The denominator reuses these variable names, so must reset them to blank.
+        $partPrefix=[];
+        
+        while (preg_match($unitPrefixPattern,$part)) { //Does it have a metric prefix?
+          $prefixCount = $prefixCount+1;
+          preg_match($unitPrefixPattern,$part,$matches[$prefixCount]); //$matches[0][0] catches the first prefix, $matches[1][0] is the 2nd prefix, etc.
+          $partPrefix[$prefixCount] = $matches[$prefixCount][0];
+          $prefixLength = strlen($matches[$prefixCount][0]);
+          $part = substr($part,$prefixLength); //Now $part is just the unit.
+          if ($part == '' || empty($part)) {
+            echo 'Eek! The prefix \''.$partPrefix[$prefixCount].'\' must be followed by a unit.';
+            return '';
+          }
+        }
+        if ($partCount > -1) {
+          $partPrefix = []; //If factor didn't have a prefix, empty the prefix array.
+        }
+        if ($pow>0) {
+          for ($i=-1; $i<($pow-1); $i++) {
+            array_push($denomExpand,$part);
+            if (!empty($partPrefix)) { //Only look for the prefix factor if there is a prefix.
+              for ($j=-1; $j<$prefixCount; $j++) { //Deal with compounded prefixes, such as megamegafeet^2 = megamegafeet * megamegafeet
+                $numerical = $numerical / $unitPrefix[($partPrefix[($j+1)])][1];
+              }
+            }
+          }
+        } elseif ($pow<0) {
+          for ($i=$pow; $i<0; $i++) {
+            array_push($numerExpand,$part);
+            if (!empty($partPrefix)) { //Only look for the prefix factor if there is a prefix.
+              for ($j=-1; $j<$prefixCount; $j++) {
+                $numerical = $numerical * $unitPrefix[($partPrefix[($j+1)])][1];
+              }
+            }
+          }
+        }
+      } else {
+      echo 'Eek! Error in the denominator.';
+      return '';
+      }
+    }
+  }
+  
+  //These arrays count duplicated unit factors. Each looks like ['cm'=>3, 'feet'=>2]
+  if (!empty($numerExpand)) {
+    $numerUnitFactors = array_count_values($numerExpand);
+  }
+  if (empty($numerExpand)) {
+    $numerUnitFactors = ['m' => 0];
+  }
+  if (!empty($denomExpand)) {
+    $denomUnitFactors = array_count_values($denomExpand);
+  }
+  if (empty($denomExpand)) {
+    $denomUnitFactors = ['m' => 0];
+  }
+
+//This simplifies all matching fundamental units in numerator and denominator, and it builds the numerical factor
   foreach ($numerUnitFactors as $k => $factor) {
     if (!isset($units[$k])) {
       echo 'Eek! Unknown units: '.$k;
@@ -2813,8 +2871,9 @@ function splitunits($unitsExpression) {
       }
     }
   }
-  //At this point, $numerical is the number, and $unitArray is the array of factors of fundamental units: e.g. [0,1,-2,0,0,0,1,0,0,2]
-
+  
+  //At this point, $numerical is the number and $unitArray is the array of factors of fundamental units: e.g. [0,1,-2,0,0,0,0,0,1,0] would mean meter*amp/sec^2 
+  //Code block below converts expression in terms of fundamental metric units.
   $unitsExpressionSimple=$numerical; //Build the equivalent, simplifed answer in mks
   if (max($unitArray)>0) {
     foreach ($unitArray as $k => $factor) {
@@ -2840,7 +2899,8 @@ function splitunits($unitsExpression) {
       }
     }
   }
-//echo "    ".$unitsExpressionSimple;
+//Uncomment next line to show simplified answer written in terms of fundamental metric units. Not sure how/if this functionality will be used in problems.
+//echo $unitsExpressionSimple." ";
 return array($numerical,$unitArray);
 }
 
