@@ -800,8 +800,8 @@ function MQtoAM(tex,display) {
 		}
 	}
 	//separate un-braced subscripts using latex rules
-	tex = tex.replace(/_(\d)(\d)/g, '_$1 $2');
-	tex = tex.replace(/\^(\d)(\d)/g, '^$1 $2');
+	tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
+	tex = tex.replace(/\^(\w)(\w)/g, '^$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}\^/g,'_$1^');
 	tex = tex.replace(/_{([\d\.]+)}([^\^])/g,'_$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}$/g,'_$1');
