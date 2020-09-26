@@ -47,29 +47,9 @@ class NumberScorePart implements ScorePart
         $ansformats = array_map('trim',explode(',',$answerformat));
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         
-        //
         if (in_array('units',$ansformats)) {
-          $givenansUnits = splitunits($givenans);
-          $answerUnits = splitunits($answer);
-          $givenansUnitsNumber = evalMathParser($givenansUnits[0]);
-          $answerUnitsNumber = evalMathParser($answerUnits[0]);
-          if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
-              $scorePartResult->setRawScore(0);
-              return $scorePartResult;
-          }
-          if ($answer == '' || $answerUnits[0] == '') {
-            $scorePartResult->setRawScore(1);
-            return $scorePartResult;
-          }
-          if (abs($givenansUnitsNumber-$answerUnitsNumber)<$defaultreltol && $givenansUnits[1] == $answerUnits[1]) {
-            $scorePartResult->setRawScore(1);
-            return $scorePartResult;
-          } else {
-            $scorePartResult->setRawScore(0);
-            return $scorePartResult;
-          }
+            require_once(__DIR__.'/../../../assessment/libs/units.php');
         }
-        //
         
         $givenans = normalizemathunicode($givenans);
 
@@ -89,6 +69,7 @@ class NumberScorePart implements ScorePart
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
+
         if (in_array('integer',$ansformats) && preg_match('/\..*[1-9]/',$givenans)) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
@@ -163,8 +144,7 @@ class NumberScorePart implements ScorePart
             $anarr = explode(',',$answer);
             $islist = true;
         } else if (in_array('orderedlist',$ansformats)) {
-            $gamasterarr = array_map('trim', explode(',',$givenans));
-            $gaarr = $gamasterarr;
+            $gaarr = array_map('trim', explode(',',$givenans));
             $anarr = explode(',',$answer);
             $islist = true;
         } else if (in_array('list',$ansformats)) {
@@ -211,7 +191,7 @@ class NumberScorePart implements ScorePart
         }
 
         if (in_array('orderedlist',$ansformats)) {
-            if (count($gamasterarr)!=count($anarr)) {
+            if (count($gaarr)!=count($anarr)) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
@@ -223,7 +203,14 @@ class NumberScorePart implements ScorePart
                 }
             }
         }
+        $gaunitsarr = [];
         foreach ($gaarr as $k=>$v) {
+            if (in_array('units',$ansformats)) {
+                $givenansUnits = parseunits($v);
+                $v = evalMathParser($givenansUnits[0]);
+                $gaunitsarr[$k] = $givenansUnits[1]; 
+            }
+
             $gaarr[$k] = trim(str_replace(array('$',',',' ','/','^','*'),'',$v));
             if (strtoupper($gaarr[$k])=='DNE') {
                 $gaarr[$k] = 'DNE';
@@ -235,6 +222,13 @@ class NumberScorePart implements ScorePart
                 $gaarr[$k] = preg_replace('/^((-|\+)?(\d+\.?\d*|\.\d+)[Ee]?[+\-]?\d*)[^+\-]*$/','$1',$gaarr[$k]); //strip out units
             }
         }
+        if (in_array('orderedlist',$ansformats)) {
+            //define $gamasterarr with processed $gaarr
+            $gamasterarr = $gaarr;
+            if (in_array('units',$ansformats)) {
+                $gamasterunitsarr = $gaunitsarr;
+            }
+        }
 
         $extrapennum = count($gaarr)+count($anarr);
 
@@ -242,15 +236,26 @@ class NumberScorePart implements ScorePart
         foreach($anarr as $i=>$answer) {
             $foundloc = -1;
             if (in_array('orderedlist',$ansformats)) {
-                $gaarr = array($gamasterarr[$i]);
+                $gaarr = array($gamasterarr[$i]);  
+                if (in_array('units',$ansformats)) {
+                    $gaunitsarr = array($gamasterunitsarr[$i]);
+                }
             }
-
+            $anss = explode(' or ',$answer);
+            $anssunits = [];
+            foreach ($anss as $k=>$anans) {
+                if ($anans === 'DNE') { continue; }
+                if (in_array('units',$ansformats)) {
+                    $anssUnits = parseunits($anans);
+                    $anss[$k] = evalMathParser($anssUnits[0]);
+                    $anssunits[$k] = $anssUnits[1]; 
+                }
+            }
             foreach($gaarr as $j=>$givenans) {
                 if (isset($requiretimeslistpart) && checkreqtimes($givenans,$requiretimeslistpart)==0) {
                     continue;
                 }
-                $anss = explode(' or ',$answer);
-                foreach ($anss as $anans) {
+                foreach ($anss as $k=>$anans) {
                     if (!is_numeric($anans)) {
                         if (preg_match('/(\(|\[)(-?[\d\.]+|-oo)\,(-?[\d\.]+|oo)(\)|\])/',$anans,$matches) && is_numeric($givenans)) {
                             if ($matches[2]=='-oo') {$matches[2] = -1e99;}
@@ -274,6 +279,11 @@ class NumberScorePart implements ScorePart
                     } else {//{if (is_numeric($givenans)) {
                         //$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
                         if (is_numeric($givenans)) {
+                            if (in_array('units',$ansformats)) {
+                                if ($gaunitsarr[$j] != $anssunits[$k]) {
+                                    continue;
+                                }
+                            }
                             if ($exactreqdec) {
                                 //check number of decimal places in givenans
                                 if ($reqdecimals != (($p = strpos($givenans,'.'))===false?0:(strlen($givenans)-$p-1))) {
