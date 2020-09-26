@@ -283,7 +283,7 @@ function displayQuestionList(results) {
     tbody += '</tbody>';
     document.getElementById("myTable").innerHTML = thead + tbody;
 
-    initSortTable('myTable',[false,'S',false,'N',false,'S','N',false]);
+    initSortTable('myTable',[false,'S',false,'S','N','S','N','N']);
     if (window.top == window.self && document.getElementById("addbar")) {
          $("#selq input[type=checkbox]").on("change", function () {
              $("#addbar.footerbar").toggleClass("sr-only", $("#selq input[type=checkbox]:checked").length == 0);
