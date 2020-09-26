@@ -2360,6 +2360,8 @@ function splitunits($unitsExpression) {
     'angstrom' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
     'angstroms' => [1E-10,array(0,1,0,0,0,0,0,0,0,0)],
     'pm' => [1E-12,array(0,1,0,0,0,0,0,0,0,0)], //picometer
+    'fm' => [1E-15,array(0,1,0,0,0,0,0,0,0,0)], //femtometer
+    'fermi' => [1E-15,array(0,1,0,0,0,0,0,0,0,0)],
     'in' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
     'inch' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
     'inches' => [0.0254,array(0,1,0,0,0,0,0,0,0,0)],
@@ -2369,13 +2371,6 @@ function splitunits($unitsExpression) {
     'mi' => [1609.344,array(0,1,0,0,0,0,0,0,0,0)],
     'mile' => [1609.344,array(0,1,0,0,0,0,0,0,0,0)],
     'miles' => [1609.344,array(0,1,0,0,0,0,0,0,0,0)],
-    'ly' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
-    'lightyear' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
-    'lightyears' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
-    'AU' => [149597870700,array(0,1,0,0,0,0,0,0,0,0)],
-    'AUs' => [149597870700,array(0,1,0,0,0,0,0,0,0,0)],
-    'parsec' => [3.08567758149137E16,array(0,1,0,0,0,0,0,0,0,0)],
-    'parsecs' => [3.08567758149137E16,array(0,1,0,0,0,0,0,0,0,0)],
     'furlong' => [201.168,array(0,1,0,0,0,0,0,0,0,0)],
     'furlongs' => [201.168,array(0,1,0,0,0,0,0,0,0,0)],
     'yd' => [0.9144,array(0,1,0,0,0,0,0,0,0,0)],
@@ -2410,6 +2405,12 @@ function splitunits($unitsExpression) {
   //Area
     'acre' => [4046.86,array(0,2,0,0,0,0,0,0,0,0)],
     'acres' => [4046.86,array(0,2,0,0,0,0,0,0,0,0)],
+    'ha' => [1E4,array(0,2,0,0,0,0,0,0,0,0)],
+    'hectare' => [1E4,array(0,2,0,0,0,0,0,0,0,0)],
+    'hectares' => [1E4,array(0,2,0,0,0,0,0,0,0,0)],
+    'b' => [1E-28,array(0,2,0,0,0,0,0,0,0,0)], //barn
+    'barn' => [1E-28,array(0,2,0,0,0,0,0,0,0,0)],
+    'barns' => [1E-28,array(0,2,0,0,0,0,0,0,0,0)],
   //Volume
     'L' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
     'liter' => [0.001,array(0,3,0,0,0,0,0,0,0,0)],
@@ -2427,6 +2428,14 @@ function splitunits($unitsExpression) {
     'cups' => [0.000236588,array(0,3,0,0,0,0,0,0,0,0)],
     'pint' => [0.000473176,array(0,3,0,0,0,0,0,0,0,0)],
     'pints' => [0.000473176,array(0,3,0,0,0,0,0,0,0,0)],
+    'quart' => [0.000946353,array(0,3,0,0,0,0,0,0,0,0)],
+    'quarts' => [0.000946353,array(0,3,0,0,0,0,0,0,0,0)],
+    'tbsp' => [1.47868E-5,array(0,3,0,0,0,0,0,0,0,0)], //U.S. tablespoon
+    'tablespoon' => [1.47868E-5,array(0,3,0,0,0,0,0,0,0,0)],
+    'tablespoons' => [1.47868E-5,array(0,3,0,0,0,0,0,0,0,0)],
+    'tsp' => [4.92892E-6,array(0,3,0,0,0,0,0,0,0,0)], //U.S. teaspoon
+    'teaspoon' => [4.92892E-6,array(0,3,0,0,0,0,0,0,0,0)],
+    'teaspoons' => [4.92892E-6,array(0,3,0,0,0,0,0,0,0,0)],
   //Angles
     'rad' => [1,array(0,0,0,1,0,0,0,0,0,0)],
     'radian' => [1,array(0,0,0,1,0,0,0,0,0,0)],
@@ -2442,6 +2451,7 @@ function splitunits($unitsExpression) {
     'kt' => [0.5144444444,array(0,1,-1,0,0,0,0,0,0,0)],
     'c' => [299792458,array(0,1,-1,0,0,0,0,0,0,0)], // Speed of light
     'mph' => [0.44704,array(0,1,-1,0,0,0,0,0,0,0)],
+    'kph' => [0.277778,array(0,1,-1,0,0,0,0,0,0,0)],
   //Mass
     'kg' => [1,array(1,0,0,0,0,0,0,0,0,0)], //kilogram
     'g' => [0.001,array(1,0,0,0,0,0,0,0,0,0)],
@@ -2496,9 +2506,13 @@ function splitunits($unitsExpression) {
     'calorie' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
     'calories' => [4.184,array(1,2,-2,0,0,0,0,0,0,0)],
     'kcal' => [4184,array(1,2,-2,0,0,0,0,0,0,0)], //kilocalorie
-    'eV' => [1.60218e-19,array(1,2,-2,0,0,0,0,0,0,0)],
+    'eV' => [1.602176634E-19,array(1,2,-2,0,0,0,0,0,0,0)],
+    'electronvolt' => [1.602176634E-19,array(1,2,-2,0,0,0,0,0,0,0)],
+    'electronvolts' => [1.602176634E-19,array(1,2,-2,0,0,0,0,0,0,0)],
     'kwh' => [3.6E6,array(1,2,-2,0,0,0,0,0,0,0)], //kiloWatthour
     'kWh' => [3.6E6,array(1,2,-2,0,0,0,0,0,0,0)],
+    'btu' => [1055.06,array(1,2,-2,0,0,0,0,0,0,0)], //British thermal units
+    'BTU' => [1055.06,array(1,2,-2,0,0,0,0,0,0,0)],  
   //Power
     'W' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
     'Watt' => [1,array(1,2,-3,0,0,0,0,0,0,0)],
@@ -2580,11 +2594,31 @@ function splitunits($unitsExpression) {
     'dalton' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)],
     'daltons' => [1.660538921E-27,array(1,0,0,0,0,0,0,0,0,0)],
     'me' => [9.1093826E-31,array(1,0,0,0,0,0,0,0,0,0)], //electron resting mass
-  //Biology/Chemistry Units
+  //Other science units
     'mol' => [1,array(0,0,0,0,0,0,0,1,0,0)],
+    'mole' => [1,array(0,0,0,0,0,0,0,1,0,0)],
+    'Ci' => [3.7E10,array(0,0,-1,0,0,0,0,0,0,0)], //curie
+    'curie' => [3.7E10,array(0,0,-1,0,0,0,0,0,0,0)],
+    'curies' => [3.7E10,array(0,0,-1,0,0,0,0,0,0,0)],
+    'R' => [2.58E-4,array(-1,0,1,0,0,0,0,0,1,0)], //roentgen
+    'roentgen' => [2.58E-4,array(-1,0,1,0,0,0,0,0,1,0)],
+    'roentgens' => [2.58E-4,array(-1,0,1,0,0,0,0,0,1,0)],
+    'sr' => [1,array(0,0,0,2,0,0,0,0,0,0)], //steradian
+    'steradian' => [1,array(0,0,0,2,0,0,0,0,0,0)],
+    'steradians' => [1,array(0,0,0,2,0,0,0,0,0,0)],
+    'Bq' => [1,array(0,0,-1,0,0,0,0,0,0,0)], //becquerel
+    'bequerel' => [1,array(0,0,-1,0,0,0,0,0,0,0)],
   //Astronomy Units
-    'kpc' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)], //kiloparsec
-    //'kiloparsec' => [30.857E18,array(0,1,0,0,0,0,0,0,0,0)],
+    'ls' => [299792458,array(0,1,0,0,0,0,0,0,0,0)],
+    'lightsecond' => [299792458,array(0,1,0,0,0,0,0,0,0,0)],
+    'ly' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
+    'lightyear' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
+    'lightyears' => [9460730472580800,array(0,1,0,0,0,0,0,0,0,0)],
+    'AU' => [149597870700,array(0,1,0,0,0,0,0,0,0,0)], //astronomical unit
+    'au' => [149597870700,array(0,1,0,0,0,0,0,0,0,0)],
+    'parsec' => [3.08567758149137E16,array(0,1,0,0,0,0,0,0,0,0)],
+    'parsecs' => [3.08567758149137E16,array(0,1,0,0,0,0,0,0,0,0)],
+    'kpc' => [3.08567758149137E19,array(0,1,0,0,0,0,0,0,0,0)], //kiloparsec
     'solarmass' => [1.98892E30,array(1,0,0,0,0,0,0,0,0,0)],
     'solarradius' => [6.955E8,array(0,1,0,0,0,0,0,0,0,0)],
   //Temperature
@@ -2645,7 +2679,6 @@ function splitunits($unitsExpression) {
   $unitsSymbolMessage='Eek! Improper symbol or operation used. Expressions can only use decimal numbers, letters, multiplication, division and exponents. No parentheses allowed.';
   
   $unitsBadSyntax='/[\(\)]|\^\^|\*\*|\^\*|\*\^|\*\*|\-\-|\-\*|\*\-|\-\^|\d\-\d|\s\.\s|\.\.|\d\.\d\.|\.[\d\.\*]\.|[a-zA-Z]\.|\*\.[a-zA-Z]|\*[\*\.]\*|\d\-\d|\d\+\d/'; //bad combinations of symbols.
-  //We need to disallow the addition symbol, though it shows up in scientific notation.
   $unitsBadSymbols='/[^a-zA-Z\d\*\/\^\.\-]/'; //expression can only contain letters, numbers, multiplication, division, exponents, decimals and negative symbol
   $unitsStartLike='/^[a-zA-Z0-9\.\-]/'; //expression must start with one of these symbols
   $unitsEndLike='/[a-zA-Z0-9\.]$/'; //expression must end with one of these symbols
