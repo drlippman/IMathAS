@@ -347,7 +347,9 @@ function parseunits($unitsExpression) {
     $unitsExpression = preg_replace('/(\s*\-\s*)([a-zA-Z])/','*$2',$unitsExpression); //interprets dash as multiplication
     $unitsExpression = preg_replace('/([a-zA-Z])(\s*\-\s*)/','$1*',$unitsExpression); //Not sure if this is standard notation.
     $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol
-    
+    // unconvert E so is_numeric will recognize it
+    $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*\*\s*10\s*\^\s*([\-]?\d+)/','$1E$2',$unitsExpression);
+
     $unitsFormatMessage='Eek! Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...';
     $unitsDivisionMessage='Eek! Only one division symbol allowed in the expression.';
     $unitsSymbolMessage='Eek! Improper symbol or operation used. Expressions can only use decimal numbers, letters, multiplication, division and exponents. No parentheses allowed.';
@@ -391,10 +393,16 @@ function parseunits($unitsExpression) {
     $denomParts=explode('*',$denominator);
     
     $numerPartsTmp=[];
+    $baseNumber = '';
     foreach($numerParts as $k => $part) {
-      if (!isNaN(evalMathParser($part))) {
-        $numerical=$numerical*evalMathParser($part);
-      } elseif (isNaN(evalMathparser($part))) { 
+      if (is_numeric($part)) {
+          if ($baseNumber == '') {
+              $baseNumber = $part;
+          } else {
+              echo $unitsFormatMessage;
+              return '';
+          }
+      } else {
         array_push($numerPartsTmp,$part);
       }
     }
@@ -608,5 +616,72 @@ function parseunits($unitsExpression) {
     }
   //Uncomment next line to show simplified answer written in terms of fundamental metric units. Not sure how/if this functionality will be used in problems.
   //echo $unitsExpressionSimple." ";
-  return array($numerical,$unitArray);
+  //return array($numerical,$unitArray);
+  return array($baseNumber*$numerical, $unitArray, $baseNumber, $numerical);
+}
+
+function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) {
+    $givenans = $givenunits[0];
+    $anans = $ansunits[0];
+    if ($givenans*$anans < 0) { return false;} //move on if opposite signs
+    // base this stuff on the baseNumber
+	if ($ansunits[2]!=0) {
+		$v = -1*floor(-log10(abs($ansunits[2]))-1e-12) - $reqsigfigs;
+	}
+	if ($sigfigscoretype[0]=='abs') {
+		$sigfigscoretype[1] = max(pow(10,$v)/2, $sigfigscoretype[1]);
+	} else if ($sigfigscoretype[1]/100 * $ansunits[2] < pow(10,$v)/2) {
+        // relative tolerance, but too small
+        $sigfigscoretype = ['abs', pow(10,$v)/2];
+    }
+    $epsilon = (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12));
+    //base this on baseNumber
+	if (strpos($givenunits[2],'E')!==false) {  //handle computer-style scientific notation
+		preg_match('/^-?[1-9]\.?(\d*)E/', $givenunits[2], $matches);
+		$gasigfig = 1+strlen($matches[1]);
+		if ($exactsigfig) {
+			if ($gasigfig != $reqsigfigs) {return false;}
+		} else {
+			if ($gasigfig < $reqsigfigs) {return false;}
+			if ($reqsigfigoffset>0 && $gasigfig-$reqsigfigs>$reqsigfigoffset) {return false;}
+		}
+	} else {
+		if (!$exactsigfig) {
+			$gadploc = strpos($givenunits[2],'.');
+            if ($gadploc===false) {
+                $absgivenans = str_replace('-','',$givenunits[2]);
+                $gasigfigs = strlen(rtrim($absgivenans,'0'));
+                if ($anans != 0 && $v < 0 && $gasigfigs < 1-$v) { return false; } // not enough
+                if ($anans != 0 && $reqsigfigoffset>0 && $gasigfigs > 1-$v+$reqsigfigoffset) { return false;} // too many
+            } else {
+                if ($anans != 0 && $v < 0 && strlen($givenunits[2]) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
+                if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenunits[2]) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
+            }
+		} else {
+			$absgivenans = str_replace('-','',$givenunits[2]);
+			$gadploc = strpos($absgivenans,'.');
+            if ($gadploc===false) { //no decimal place
+                if (strlen(rtrim($absgivenans,'0')) != $reqsigfigs) { return false;}
+			} else {
+				if (abs($givenunits[2])<1) {
+					if (strlen(ltrim(substr($absgivenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
+				} else {
+					if (strlen(ltrim($absgivenans,'0'))-1 != $reqsigfigs) { return false;}
+				}
+			}
+		}
+    }
+    //checked format, now check values, using values in base units
+	if ($sigfigscoretype[0]=='abs') {
+        // adjust tolerance given unit conversions
+        $sigfigscoretype[1] = $sigfigscoretype[1]*$ansunits[3];
+		if (abs($anans-$givenans)< $sigfigscoretype[1]+$epsilon) {return true;}
+	} else if ($sigfigscoretype[0]=='rel') {
+		if ($anans==0) {
+			if (abs($anans - $givenans) < $sigfigscoretype[1]+$epsilon) {return true;}
+		} else {
+			if (abs($anans - $givenans)/(abs($anans)+$epsilon) < $sigfigscoretype[1]/100+$epsilon) {return true;}
+		}
+	}
+	return false;
 }

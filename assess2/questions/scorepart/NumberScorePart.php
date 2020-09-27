@@ -47,7 +47,8 @@ class NumberScorePart implements ScorePart
         $ansformats = array_map('trim',explode(',',$answerformat));
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         
-        if (in_array('units',$ansformats)) {
+        $hasUnits = in_array('units',$ansformats);
+        if ($hasUnits) {
             require_once(__DIR__.'/../../../assessment/libs/units.php');
         }
         
@@ -205,10 +206,10 @@ class NumberScorePart implements ScorePart
         }
         $gaunitsarr = [];
         foreach ($gaarr as $k=>$v) {
-            if (in_array('units',$ansformats)) {
+            if ($hasUnits) {
                 $givenansUnits = parseunits($v);
                 $v = evalMathParser($givenansUnits[0]);
-                $gaunitsarr[$k] = $givenansUnits[1]; 
+                $gaunitsarr[$k] = $givenansUnits; 
             }
 
             $gaarr[$k] = trim(str_replace(array('$',',',' ','/','^','*'),'',$v));
@@ -225,7 +226,7 @@ class NumberScorePart implements ScorePart
         if (in_array('orderedlist',$ansformats)) {
             //define $gamasterarr with processed $gaarr
             $gamasterarr = $gaarr;
-            if (in_array('units',$ansformats)) {
+            if ($hasUnits) {
                 $gamasterunitsarr = $gaunitsarr;
             }
         }
@@ -237,7 +238,7 @@ class NumberScorePart implements ScorePart
             $foundloc = -1;
             if (in_array('orderedlist',$ansformats)) {
                 $gaarr = array($gamasterarr[$i]);  
-                if (in_array('units',$ansformats)) {
+                if ($hasUnits) {
                     $gaunitsarr = array($gamasterunitsarr[$i]);
                 }
             }
@@ -245,10 +246,10 @@ class NumberScorePart implements ScorePart
             $anssunits = [];
             foreach ($anss as $k=>$anans) {
                 if ($anans === 'DNE') { continue; }
-                if (in_array('units',$ansformats)) {
+                if ($hasUnits) {
                     $anssUnits = parseunits($anans);
                     $anss[$k] = evalMathParser($anssUnits[0]);
-                    $anssunits[$k] = $anssUnits[1]; 
+                    $anssunits[$k] = $anssUnits; 
                 }
             }
             foreach($gaarr as $j=>$givenans) {
@@ -279,31 +280,55 @@ class NumberScorePart implements ScorePart
                     } else {//{if (is_numeric($givenans)) {
                         //$givenans = preg_replace('/[^\-\d\.eE]/','',$givenans); //strip out units, dollar signs, whatever
                         if (is_numeric($givenans)) {
-                            if (in_array('units',$ansformats)) {
-                                if ($gaunitsarr[$j] != $anssunits[$k]) {
+                            if ($hasUnits) {
+                                // check units type
+                                if ($gaunitsarr[$j][1] != $anssunits[$k][1]) {
                                     continue;
                                 }
-                            }
-                            if ($exactreqdec) {
-                                //check number of decimal places in givenans
-                                if ($reqdecimals != (($p = strpos($givenans,'.'))===false?0:(strlen($givenans)-$p-1))) {
-                                    continue;
-                                }
-                                $anans = round($anans, $reqdecimals);
-                            }
-                            if (isset($reqsigfigs)) {
-                                if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
-                                    $correct += 1; $foundloc = $j; break 2;
+                                if ($exactreqdec) {
+                                    //check number of decimal places in base givenans
+                                    if ($reqdecimals != (($p = strpos($gaunitsarr[$j][3],'.'))===false?0:(strlen($gaunitsarr[$j][3])-$p-1))) {
+                                        continue;
+                                    }
+                                } 
+                                if (isset($reqsigfigs)) {
+                                    if (checkunitssigfigs($gaunitsarr[$j], $anssunits[$k], $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
+                                        $correct += 1; $foundloc = $j; break 2;
+                                    } else {
+                                        continue;
+                                    }
+                                } else if (isset($abstolerance)) {
+                                    $adjabstolerance = $abstolerance*$anssunits[$k][3];
+                                    if (abs($anans-$givenans) < $adjabstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;}
                                 } else {
-                                    continue;
+                                    if ($anans==0) {
+                                        if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+                                    } else {
+                                        if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+                                    }
                                 }
-                            } else if (isset($abstolerance)) {
-                                if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;}
-                            } else {
-                                if ($anans==0) {
-                                    if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+                            } else { 
+                                if ($exactreqdec) {
+                                    //check number of decimal places in givenans
+                                    if ($reqdecimals != (($p = strpos($givenans,'.'))===false?0:(strlen($givenans)-$p-1))) {
+                                        continue;
+                                    }
+                                    $anans = round($anans, $reqdecimals);
+                                }
+                                if (isset($reqsigfigs)) {
+                                    if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
+                                        $correct += 1; $foundloc = $j; break 2;
+                                    } else {
+                                        continue;
+                                    }
+                                } else if (isset($abstolerance)) {
+                                    if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;}
                                 } else {
-                                    if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+                                    if ($anans==0) {
+                                        if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+                                    } else {
+                                        if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+                                    }
                                 }
                             }
                         }
