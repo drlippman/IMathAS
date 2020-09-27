@@ -346,7 +346,7 @@ function parseunits($unitsExpression) {
     $unitsExpression = preg_replace('/([0-9])(\.)([a-zA-Z])/','$1$2*$3',$unitsExpression); //allows numerical factor to end in a decimal point
     $unitsExpression = preg_replace('/(\s*\-\s*)([a-zA-Z])/','*$2',$unitsExpression); //interprets dash as multiplication
     $unitsExpression = preg_replace('/([a-zA-Z])(\s*\-\s*)/','$1*',$unitsExpression); //Not sure if this is standard notation.
-    $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol
+    $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol, spaces become *
     $unitsExpression = preg_replace('/\((.*?)\)\s*\//', '$1/', $unitsExpression); // strip paren around numerator
     $unitsExpression = preg_replace('/\/\s*\((.*?)\)/', '/$1', $unitsExpression); // strip paren around denom
     
@@ -413,14 +413,10 @@ function parseunits($unitsExpression) {
   
     $denomPartsTmp=[];
     foreach($denomParts as $k => $part) {
-      if (!isNaN(evalMathParser($part))) {
-        if (evalnumstr($part)==0) {
-          echo 'Eek! Division by zero.';
-          return '';
-        } else {
-          $numerical=$numerical/evalMathParser($part);
-        }
-      } elseif (isNaN(evalMathParser($part))) {
+      if (is_numeric($part)) {
+        echo $unitsFormatMessage;
+        return '';
+      } else {
         array_push($denomPartsTmp,$part);
       }
     }
