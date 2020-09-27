@@ -121,11 +121,7 @@ if (!isset($use_local_sessions)) {
   }
 }
 
-if (isset($CFG['static_server'])) {
-    $staticroot = $CFG['static_server'];
-} else {
-    $staticroot = $imasroot;
-}
+$staticroot = $imasroot;
 
 // Load validate.php?
 if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init_skip_validate)) {
@@ -137,6 +133,9 @@ if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init
 	}
 } else if (!empty($init_session_start)) {
 	session_start();
+}
+if (isset($CFG['static_server']) && !empty($_SESSION['static_ok'])) {
+    $staticroot = $CFG['static_server'];
 }
 /*
 if (isset($_SESSION['ratelimiter']) && isset($CFG['GEN']['ratelimit']) &&

@@ -229,7 +229,10 @@
 		 }
 		 if (isset($_POST['tzname'])) {
 		 	 $_SESSION['logintzname'] = $_POST['tzname'];
-		 }
+         }
+         if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
+            $_SESSION['static_ok'] = 1;
+         }
 		 require_once("$curdir/includes/userprefs.php");
 		 generateuserprefs();
 

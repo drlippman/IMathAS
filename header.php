@@ -18,6 +18,9 @@ if (!empty($CFG['GEN']['uselocaljs'])) {
 	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
 	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
+if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
+    echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
+}
 ?>
 <link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=092320";?>" type="text/css" />
 <?php
