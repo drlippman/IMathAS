@@ -169,7 +169,8 @@ class NumberAnswerBox implements AnswerBox
     			$params['format'] = 'credit';
     			$classes[] = 'textright';
     			$classes[] = 'creditbox';
-    		}
+            }
+            $params['calcformat'] = $answerformat;
 
     		$params['tip'] = $shorttip;
     		$params['longtip'] = $tip;
@@ -186,6 +187,7 @@ class NumberAnswerBox implements AnswerBox
     						'" />' .
     						$rightb;
 
+            $out .= "<span id=p$qn></span>";
     		if ($displayformat=='hidden') {
     			//TODO: What's this for? Maybe virtual manipulatives?
     			$out .= '<script type="text/javascript">imasprevans['.$qstr.'] = "'.$la.'";</script>';

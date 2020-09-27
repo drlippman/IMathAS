@@ -349,7 +349,7 @@ function parseunits($unitsExpression) {
     $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol, spaces become *
     $unitsExpression = preg_replace('/\((.*?)\)\s*\//', '$1/', $unitsExpression); // strip paren around numerator
     $unitsExpression = preg_replace('/\/\s*\((.*?)\)/', '/$1', $unitsExpression); // strip paren around denom
-    
+
     // unconvert E so is_numeric will recognize it
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*\*\s*10\s*\^\s*([\-]?\d+)/','$1E$2',$unitsExpression);
 
@@ -366,7 +366,6 @@ function parseunits($unitsExpression) {
       $numerical=0;
       return 0;
     }
-    
     if (preg_match($unitsBadSymbols,$unitsExpression)) {
       echo $unitsSymbolMessage;
       return '';
@@ -379,14 +378,14 @@ function parseunits($unitsExpression) {
       echo $unitsFormatMessage;
       return '';
     }
-    
+
     $parts=explode('/',$unitsExpression);
     if (count($parts)>2) {
       echo $unitsDivisionMessage;
       return '';
     } elseif (count($parts)==1) {
       $numerator=$parts[0];
-      $denominator='1';
+      $denominator='';
     } elseif (count($parts)==2) {
       $numerator=$parts[0];
       $denominator=$parts[1];
@@ -416,7 +415,7 @@ function parseunits($unitsExpression) {
       if (is_numeric($part)) {
         echo $unitsFormatMessage;
         return '';
-      } else {
+      } else if ($part !== ''){
         array_push($denomPartsTmp,$part);
       }
     }
