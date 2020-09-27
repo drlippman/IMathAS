@@ -1329,6 +1329,7 @@ function matrixDet($A){
 		return ($A[0][0]*$A[1][1] - $A[0][1]*$A[1][0]);
 	}
 	else{
+        $retVal = 0;
 		for($i=0;$i<count($A);$i++){
 			if ($A[0][$i]!=0) {
 				$retVal += pow(-1,$i)*$A[0][$i]*matrixDet(matrixGetMinor($A,0,$i));
