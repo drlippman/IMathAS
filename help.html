@@ -3759,9 +3759,11 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$answerformat = "normalcurve" </dt>
-	<dd>Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
-	shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.</dd>
+<dt>$answerformat = "normalcurve" or "list"</dt>
+	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
+    shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.
+    <br/>
+    "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)"</dd>
 <dt>$scoremethod = "partialcredit"</dt>
   <dd>By default, interval answers will be marked all right or all wrong.  Setting $scoremethod = "partialcredit"
 		will changing the scoring mode to give partial credit. (new assessment system only).</dd>
@@ -3802,12 +3804,14 @@ invertal notation.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "inequality" </dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", or "inequality" </dt>
 	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	$answerformat = "inequality" will require the student to enter an inequality rather than an interval.  The instructor answer must still be given in
-	interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
+    interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
+    <br/>
+    "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)".  Does not work with "inequality".
 	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
