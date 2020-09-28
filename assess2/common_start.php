@@ -49,10 +49,14 @@ function check_for_required($method, $required) {
 }
 
 function prepDateDisp(&$out) {
-  $tochg = ['starddate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto'];
+  $tochg = ['startdate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto'];
   foreach ($tochg as $key) {
     if (isset($out[$key])) {
-      $out[$key . '_disp'] = tzdate("D n/j/y, g:i a", $out[$key]);
+      if ($out[$key] == 2000000000) {
+        $out[$key . '_disp'] = _('None');
+      } else {
+        $out[$key . '_disp'] = tzdate("D n/j/y, g:i a", $out[$key]);
+      }
     }
   }
 }
