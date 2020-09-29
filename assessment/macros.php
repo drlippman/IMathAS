@@ -2667,6 +2667,10 @@ function evalfunc($farr) {
 function textonimage() {
 	$args = func_get_args();
     $img = array_shift($args);
+
+    if (substr($img,0,4)=='http') {
+        $img = '<img src="'.Sanitize::encodeStringForDisplay($img).'" alt="" />';
+    }
     
 	$out = '<div style="position: relative;" class="txtimgwrap">';
 	$out .= '<div class="txtimgwrap" style="position:relative;top:0px;left:0px;">'.$img.'</div>';
