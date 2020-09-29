@@ -2731,13 +2731,14 @@ function ifthen($c,$t,$f) {
 
 
 //adapted from http://www.mindspring.com/~alanh/fracs.html
-function decimaltofraction($d,$format="fraction",$maxden = 5000) {
-	if (floor($d)==$d) {
+function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
+	if (abs(floor($d)-$d)<1e-12) {
 		return floor($d);
 	}
 	if (abs($d)<1e-12) {
 		return '0';
-	}
+    }
+    $maxden = min($maxden, 1e16);
 	if ($d<0) {
 		$sign = '-';
 	} else {
@@ -2764,15 +2765,16 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 		//appendFractionsOutput(numerators[i], denominators[i]);
 
 		//if ($calcD == $d) { break;}
-		if (abs($calcD - $d)<1e-9) { break;}
+		if (abs($calcD - $d)<1e-14) { break;}
 
 		$prevCalcD = $calcD;
 
 		$d2 = 1/($d2-$L2);
-	}
+    }
+    echo "loops: $i";
 	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-10) {
 		return $d;
-	}
+    }
 	if ($format=="mixednumber") {
 		$w = floor($numerators[$i]/$denominators[$i]);
 		if ($w>0) {
