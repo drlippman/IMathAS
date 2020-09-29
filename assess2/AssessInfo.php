@@ -1113,7 +1113,9 @@ class AssessInfo
         if (isset($v['pagetitle'])) {
           $settings['interquestion_text'][$k]['pagetitle'] = html_entity_decode($v['pagetitle']);
         }
-        if (!empty($v['ispage'])) {
+        if ($settings['displaymethod'] !== 'full') {
+            unset($settings['interquestion_text'][$k]['ispage']);
+        } else if (!empty($v['ispage'])) {
             $pagebreaks[] = $v['displayBefore'];
         }
       }
