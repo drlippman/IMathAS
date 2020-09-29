@@ -8,9 +8,9 @@
         echo "error: validation";
         exit;
 	}
-	$stm = $DBH->prepare("SELECT itemorder,viddata,intro,defpoints,courseid,ver FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT itemorder,viddata,intro,defpoints,courseid,ver,showhints,showwork FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($rawitemorder, $viddata,$current_intro_json, $defpoints,$assesscourseid,$aver) = $stm->fetch(PDO::FETCH_NUM);
+	list($rawitemorder, $viddata,$current_intro_json, $defpoints,$assesscourseid,$aver,$showhints,$showwork) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "error: invalid ID";
 		exit;
@@ -76,7 +76,12 @@
         $DBH->commit();
 
         require('../includes/addquestions2util.php');
-        list($jsarr,$existingqs) = getQuestionsAsJSON($cid, $aid);
+        list($jsarr, $existingqs, $introconvertmsg) = getQuestionsAsJSON($cid, $aid, [
+            'intro' => $current_intro_json,
+            'itemorder' => $itemorder,
+            'showwork' => $showwork,
+            'showhints' => $showhints
+        ]);
         
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);

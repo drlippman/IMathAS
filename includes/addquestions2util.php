@@ -1,12 +1,15 @@
 <?php
 
 // Get existing questions in assessment as json
-function getQuestionsAsJSON($cid, $aid)
-{   global $DBH;
+// If called with data, include itemorder, showhints, showwork, intro
+function getQuestionsAsJSON($cid, $aid, $data=null)
+{   global $DBH, $userid, $groupid, $adminasteacher;
 
-    $stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
-    $stm->execute(array(':id' => $aid));
-    list($itemorder, $page_assessmentName, $defpoints, $displaymethod, $showhintsdef, $showworkdef, $assessintro) = $stm->fetch(PDO::FETCH_NUM);
+    if ($data === null) {
+        $stm = $DBH->prepare("SELECT itemorder,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
+        $stm->execute(array(':id' => $aid));
+        $data = $stm->fetch(PDO::FETCH_ASSOC);
+    }
     $ln = 1;
 
     // Format of imas_assessments.intro is a JSON representation like
@@ -20,7 +23,8 @@ function getQuestionsAsJSON($cid, $aid)
     //  ...
     // ]
     $text_segments = array();
-    if (($introjson = json_decode($assessintro, true)) !== null) { //is json intro
+    $introconvertmsg = '';
+    if (($introjson = json_decode($data['intro'], true)) !== null) { //is json intro
         //$text_segments = array_slice($introjson,1); //remove initial Intro text
         for ($i = 0; $i < count($introjson); $i++) {
             if (isset($introjson[$i]['displayBefore'])) {
@@ -31,7 +35,7 @@ function getQuestionsAsJSON($cid, $aid)
             }
         }
     } else {
-        if (strpos($assessintro, '[Q ') !== false || strpos($assessintro, '[QUESTION ') !== false) {
+        if (strpos($data['intro'], '[Q ') !== false || strpos($data['intro'], '[QUESTION ') !== false) {
             $introconvertmsg = '<p>' . sprintf(_('It appears this assessment is using an older [Q #] or [QUESTION #] tag. You can %sconvert that into a new format%s if you would like.'), '<a href="convertintro.php?cid=' . $cid . '&aid=' . $aid . '">', '</a>') . '</p>';
         }
     }
@@ -66,13 +70,13 @@ function getQuestionsAsJSON($cid, $aid)
         }
         $extrefval = 0;
         if ($aver > 1) {
-            if (($line['showhints'] == -1 && ($showhintsdef & 2) == 2) ||
+            if (($line['showhints'] == -1 && ($data['showhints'] & 2) == 2) ||
                 ($line['showhints'] > -1 && ($line['showhints'] & 2) == 2)
             ) {
                 $extrefval += 1;
             }
         } else {
-            if (($line['showhints'] == 0 && $showhintsdef == 1) || $line['showhints'] == 2) {
+            if (($line['showhints'] == 0 && $data['showhints'] == 1) || $line['showhints'] == 2) {
                 $extrefval += 1;
             }
         }
@@ -105,7 +109,7 @@ function getQuestionsAsJSON($cid, $aid)
         if ($line['solution'] != '' && ($line['solutionopts'] & 2) == 2) {
             $extrefval += 8;
         }
-        if (($line['showwork'] == -1 && $showworkdef > 0) || $line['showwork'] > 0) {
+        if (($line['showwork'] == -1 && $data['showwork'] > 0) || $line['showwork'] > 0) {
             $extrefval += 32;
         }
         if ($line['rubric'] > 0) {
@@ -135,8 +139,8 @@ function getQuestionsAsJSON($cid, $aid)
     $qncnt = 0;
 
     $jsarr = array();
-    if ($itemorder != '') {
-        $items = explode(",", $itemorder);
+    if ($data['itemorder'] != '') {
+        $items = explode(",", $data['itemorder']);
     } else {
         $items = array();
     }
@@ -193,5 +197,5 @@ function getQuestionsAsJSON($cid, $aid)
         }
     }
 
-    return array($jsarr, $existingq);
+    return array($jsarr, $existingq, $introconvertmsg);
 }

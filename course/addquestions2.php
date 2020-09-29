@@ -33,7 +33,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$stm = $DBH->prepare("SELECT courseid,ver,submitby,defpoints,name FROM imas_assessments WHERE id=?");
+	$stm = $DBH->prepare("SELECT courseid,ver,submitby,defpoints,name,intro,showhints,showwork,itemorder,displaymethod FROM imas_assessments WHERE id=?");
 	$stm->execute(array($aid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($row === null || $row['courseid'] != $cid) {
@@ -49,6 +49,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
     $defpoints = $row['defpoints'];
     $assessmentname = $row['name'];
+    $displaymethod = $row['displaymethod'];
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
@@ -378,7 +379,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         var assessver = '$aver';
 		</script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090320\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=082820\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=092820\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
     $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=092020\" type=\"text/css\" />";
@@ -412,8 +413,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
     
     require_once('../includes/addquestions2util.php');
-    list($jsarr,$existingq) = getQuestionsAsJSON($cid, $aid);
- 
+    list($jsarr, $existingq, $introconvertmsg) = getQuestionsAsJSON($cid, $aid, $row);
+
     if (isset($_SESSION['searchtype'.$aid])) {
         $searchtype = $_SESSION['searchtype'.$aid];
     } else {
@@ -454,7 +455,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
     // do initial search
     require('../includes/questionsearch.php');
-    $searchin = [7,376];
     $search_parsed = parseSearchString($searchterms);
     $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
         'existing' => $existingq
@@ -578,7 +578,7 @@ if ($overwriteBody==1) {
 
 	</form>
 	<p><?php echo _('Assessment points total:') ?> <span id="pttotal"></span></p>
-	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
+	<?php if (!empty($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;

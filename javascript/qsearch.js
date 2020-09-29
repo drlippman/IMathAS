@@ -282,6 +282,7 @@ function displayQuestionList(results) {
     }
     tbody += '</tbody>';
     document.getElementById("myTable").innerHTML = thead + tbody;
+    rendermathnode(document.getElementById("myTable"));
 
     initSortTable('myTable',[false,'S',false,'S','N','S','N','N']);
     if (window.top == window.self && document.getElementById("addbar")) {
