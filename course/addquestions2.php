@@ -614,6 +614,7 @@ if ($overwriteBody==1) {
 <h2><?php echo _('Potential Questions') ?></h2>
 
 <div id="fullqsearchwrap">
+    <div id="searcherror" class="noticetext"></div>
 <div id="qsearchbarswrap">
 <div class="flexrow wrap dropdown searchbar">
     <div class="dropdown">
@@ -693,6 +694,12 @@ if ($overwriteBody==1) {
                     </div></div>
                     <p><input type=checkbox id="search-mine"><?php echo _('Mine Only');?> 
                         <input type=checkbox id="search-unused"><?php echo _('Exclude Added');?>
+                    </p>
+                    <p><?php echo _('Helps');?>: 
+                        <label><input type=checkbox id="search-res-help" value="help"><?php echo _('Resource');?></label> 
+                        <label><input type=checkbox id="search-res-cap" value="cap"><?php echo _('Captioned Video');?></label> 
+                        <label><input type=checkbox id="search-res-WE" value="WE"><?php echo _('Written Example');?></label> 
+                        <label><input type=checkbox id="search-res-soln" value="soln"><?php echo _('Detailed Solution');?></label>
                     </p>
                     <div>
                         <div style="flex-grow:1">

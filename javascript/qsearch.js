@@ -27,7 +27,7 @@ $(function() {
 function parseAdvSearch() {
     var search = document.getElementById("search").value;
     var matches;
-    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/g)) {
+    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/g)) {
         var pts;
         for (var i=0;i<matches.length;i++) {
             pts = matches[i].split(/:/);
@@ -46,10 +46,15 @@ function parseAdvSearch() {
                 $("#search-mine").prop('checked', pts[1] == 1)
             } else if (pts[0] == 'unused') {
                 $("#search-unused").prop('checked', pts[1] == 1)
+            } else if (pts[0] == 'res') {
+                var helps = pts[1].split(/,/);
+                for (var j=0; j<helps.length;j++) {
+                    $("#search-res-"+helps[j]).prop('checked', true);
+                }
             }
         }
     }
-    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/g, '');
+    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/g, '');
     var words = search.split(/\s+/);
     var haswords = [];
     var excwords = [];
@@ -99,6 +104,16 @@ function doAdvSearch() {
     if ($("#search-unused").is(':checked')) {
         outstr += 'unused:1 ';
     }
+    var helps = [];
+    $("input[id^=search-res-]:checked").each(function(i,el) {
+        helps.push(el.value);
+    });
+    if (helps.length>1) {
+        outstr += 'res:"'+helps.join(',')+'" ';
+    } else if (helps.length==1) {
+        outstr += 'res:'+helps.join(',')+' ';
+    }
+
     $("#search").val(outstr.trim());
     $("#advsearchbtn").dropdown('toggle');
     doQuestionSearch();
@@ -108,6 +123,11 @@ function doQuestionSearch(offset) {
     offset = offset || 0;
     $("#searcherror").hide();
     var search = document.getElementById("search").value;
+    if (cursearchtype == 'all' && search.trim()=='') {
+        $("#searcherror").html(_('You must provide a search term when searching All Libraries')).show();
+        $("#search").focus();
+        return;
+    }
     $.ajax({
         url: qsearchaddr,
         method: 'POST',
@@ -232,7 +252,7 @@ function displayQuestionList(results) {
             descricon = '<span title="' + _('Marked as broken') + '">' + 
                 '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19.7 1.3 19.6 9 16.2 6.3 13.8 11.3 10.5 8.3 7 11.7 3.6 9.2l0-7.9z" class="a"></path><path d="m19.7 22.9 0-7.8-2-1.4-3.1 4-3.3-3-3.8 3.8-4-3.9v8.4z" class="a"></path></svg>' + 
                 '</span> ';
-        } else if (q['junkflag'] == 1) {
+        } else if (q['junkflag'] == 1 && results.type=='libs') {
             descrclass = ' class="qwronglib"';
             descricon = wronglibicon;
         } else if (existingq.indexOf(parseInt(q['id'])) !== -1) {
@@ -255,11 +275,13 @@ function displayQuestionList(results) {
             '<span class="sr-only">More</span></button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
             '<li><a href="' + addqaddr + '">' + _('Add') + '</a></li>' +
             '<li><a href="' + editqaddr + '">' + (q['mine']==1 ? _('Edit') : _('View Code')) + '</a></li>' + 
-            '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>' +
-            '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
+            '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>';
+        if (results.type=='libs') {
+            actions2 += '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
                 ((q['junkflag'] == 1) ? _('Un-mark as in wrong library') : _('Mark as in wrong library')) +
-                '</a></li>' +
-            '</ul>';
+                '</a></li>';
+        }
+        actions2 += '</ul>';
 
         // build row
         tbody += '<tr>'
