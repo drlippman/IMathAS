@@ -1279,7 +1279,7 @@ function matrixAbasisForB($A,$B){
 	if(matrixAspansB($A,$B)==false){
 		$retVal = false;
 	}
-	if(matrixIsLinInd($A)==false){
+	if(matrixIsRowsLinInd($A)==false){
 		$retVal = false;
 	}
 	return($retVal);
