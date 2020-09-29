@@ -662,12 +662,34 @@ class AssessInfo
         $firstq = array_shift($qout);
     }
     if ($this->assessData['shuffle']&32) {
-        //shuffle all but first
+        //shuffle all but last
         $lastq = array_pop($qout);
     }
     if ($this->assessData['shuffle']&(1+16+32)) {
           // has any shuffle flag set
-          $RND->shuffle($qout);
+          if (!empty($this->assessData['pagebreaks'])) {
+            $shift = ($this->assessData['shuffle']&16)?1:0;
+            $lastgroupq = 0;
+            $newqout = [];
+            foreach ($this->assessData['pagebreaks'] as $breakn=>$breakq) {
+                if ($breakq === 0) { continue; }
+                $thisgroup = [];
+                for ($i=$lastgroupq; $i < $breakq - $shift; $i++) {
+                    $thisgroup[] = $qout[$i];
+                }
+                $lastgroupq = $breakq - $shift;
+                $RND->shuffle($thisgroup);
+                $newqout = array_merge($newqout, $thisgroup);
+            }
+            $thisgroup = [];
+            for ($i=$lastgroupq;$i < count($qout); $i++) {
+                $thisgroup[] = $qout[$i];
+            }
+            $RND->shuffle($thisgroup);
+            $qout = array_merge($newqout, $thisgroup);
+          } else {
+            $RND->shuffle($qout);
+          }
     }
     if ($this->assessData['shuffle']&16) {
       array_unshift($qout, $firstq);
@@ -1081,6 +1103,7 @@ class AssessInfo
 
     //unpack intro
     $introjson = json_decode($settings['intro'], true);
+    $pagebreaks = [];
     if ($introjson === null) {
       $settings['interquestion_text'] = array();
     } else {
@@ -1090,8 +1113,12 @@ class AssessInfo
         if (isset($v['pagetitle'])) {
           $settings['interquestion_text'][$k]['pagetitle'] = html_entity_decode($v['pagetitle']);
         }
+        if (!empty($v['ispage'])) {
+            $pagebreaks[] = $v['displayBefore'];
+        }
       }
     }
+    $settings['pagebreaks'] = $pagebreaks;
 
     // decode entities in title
     $settings['name'] = html_entity_decode($settings['name']);
@@ -1201,6 +1228,14 @@ class AssessInfo
             for ($i=$lastitemfirsttext; $i < count($this->assessData['interquestion_text']); $i++) {
                 $curtext = $this->assessData['interquestion_text'][$i];
                 if ($curqn >= $curtext['displayBefore'] && $curqn <= $curtext['displayUntil']) {
+                    if (!empty($curtext['ispage'])) {
+                        foreach ($thistextmap as $v) {
+                            $this->assessData['interquestion_text'][$v]['beforebreak'] = true;
+                        }
+                        $thistextmap = [];
+                        $storedfirst = false;
+                        continue; 
+                    }
                     $thistextmap[] = $i;
                     if (!$storedfirst) {
                         $lastitemfirsttext = $i;
@@ -1228,8 +1263,12 @@ class AssessInfo
             if ($v['displayBefore'] >= $curqn) {
                 $this->assessData['interquestion_text'][$k]['atend'] = 1;
             }
-            unset($this->assessData['interquestion_text'][$k]['displayBefore']);
-            unset($this->assessData['interquestion_text'][$k]['displayUntil']);
+            if (empty($v['ispage']) && empty($v['beforebreak'])) { 
+                // keep original position for pages and text before the break
+                unset($this->assessData['interquestion_text'][$k]['displayBefore']);
+                unset($this->assessData['interquestion_text'][$k]['displayUntil']);
+            }
+            unset($this->assessData['interquestion_text'][$k]['beforebreak']);
         }
     }
     $this->assessData['textmap'] = $textmap;

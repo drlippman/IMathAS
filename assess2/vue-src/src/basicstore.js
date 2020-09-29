@@ -1263,7 +1263,7 @@ export const actions = {
             }
           } else {
             for (let j = 0; j < thistext.length; j++) {
-              newtexts.push(Object.assign({}, origtexts[thistext[j]]));
+              newtexts.push(Object.assign({ orig: 1e5 }, origtexts[thistext[j]]));
               newtexts[newtexts.length - 1].displayBefore = i;
               newtexts[newtexts.length - 1].displayUntil = i;
             }
@@ -1274,13 +1274,23 @@ export const actions = {
         }
       }
       for (const i in origtexts) {
+        if (origtexts[i].hasOwnProperty('displayBefore')) {
+          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
+        }
         if (origtexts[i].hasOwnProperty('atend')) {
-          newtexts.push(Object.assign({}, origtexts[i]));
+          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
           newtexts[newtexts.length - 1].displayBefore = data.questions.length;
           newtexts[newtexts.length - 1].displayUntil = data.questions.length;
         }
       }
       if (newtexts.length > 0) {
+        newtexts.sort(function (a, b) {
+          if (parseInt(a.displayBefore) === parseInt(b.displayBefore)) {
+            return (a.orig - b.orig);
+          } else {
+            return a.displayBefore - b.displayBefore;
+          }
+        });
         data.interquestion_text = newtexts;
       }
     }
