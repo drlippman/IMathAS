@@ -373,14 +373,7 @@ if ($end_attempt) {
 $assess_record->saveRecord();
 
 if (($assessInfoOut['submitby'] == 'by_question' && !$in_practice) || $end_attempt) {
-  // update LTI grade
-  $lti_sourcedid = $assess_record->getLTIsourcedId();
-  if (strlen($lti_sourcedid) > 1) {
-    $gbscore = $assess_record->getGbScore();
-    require_once("../includes/ltioutcomes.php");
-    $aidposs = $assess_info->getSetting('points_possible');
-    calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], false, $aidposs);
-  }
+    $assess_record->updateLTIscore();
 }
 
 //prep date display

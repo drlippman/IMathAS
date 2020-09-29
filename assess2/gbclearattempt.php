@@ -131,11 +131,7 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
 $assess_record->saveRecord();
 
 // update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$assessInfoOut['gbscore'],true);
-}
+$assess_record->updateLTIscore();
 
 //output JSON object
 echo json_encode($assessInfoOut);

@@ -188,7 +188,13 @@ class AssessRecord
       // updating existing record
       $sets = array();
       foreach ($fields as $field) {
-        $sets[] = $field.'=:'.$field;
+          if ($field == 'lti_sourcedid' && $this->assessRecord['agroupid'] > 0) {
+            $sets[] = 'lti_sourcedid=IF(userid=:userid,:lti_sourcedid,lti_sourcedid)';
+            $qarr[':userid'] = $this->curUid;
+          } else {
+            $sets[] = $field.'=:'.$field;
+          }
+        
       }
       $setlist = implode(',', $sets);
       $query = "UPDATE imas_assessment_records SET $setlist WHERE ";
@@ -210,6 +216,30 @@ class AssessRecord
       }
 
       $this->need_to_record = false;
+    }
+  }
+
+  /**
+   * Update the LTI score for the current assessment record. 
+   * Should be called after saveRecord.
+   */
+  public function updateLTIscore() {
+    $lti_sourcedid = $this->getLTIsourcedId();
+    if (strlen($lti_sourcedid) > 1) {
+        require_once(__DIR__ . '/../includes/ltioutcomes.php');
+        $gbscore = $this->getGbScore();
+        $aidposs = $this->assess_info->getSetting('points_possible');
+        calcandupdateLTIgrade($lti_sourcedid, $this->curAid, $this->curUid, $gbscore['gbscore'], true, $aidposs);
+        if ($this->assessRecord['agroupid'] > 0) {
+            // has group; update their scores too
+            $stm = $this->DBH->prepare('SELECT userid,lti_sourcedid FROM imas_assessment_records WHERE agroupid=? AND userid<>?');
+            $stm->execute(array($this->assessRecord['agroupid'], $this->curUid));
+            while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                if (strlen($row['lti_sourcedid']) > 1) {
+                    calcandupdateLTIgrade($row['lti_sourcedid'], $this->curAid, $row['userid'], $gbscore['gbscore'], true, $aidposs);
+                }
+            }
+        }
     }
   }
 
@@ -1130,6 +1160,19 @@ class AssessRecord
     $names = AssessUtils::getGroupMembersByGroupId($this->assessRecord['agroupid']);
 
     return $names;
+  }
+
+  /**
+   * Get stu group id.
+   * 
+   * @return int  stu group id, or 0 if none
+   */
+  public function getGroupId() {
+    if (empty($this->assessRecord)) {
+        return 0;
+    } else {
+        return $this->assessRecord['agroupid'];
+    }
   }
 
   /**
