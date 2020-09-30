@@ -1904,7 +1904,9 @@ var saneKeyboardEvents = (function() {
     		} else if (keyVal && keyVal !== 'Spacebar') {
     		  handleKey();
     		  usedkeydown = true;
-    		}
+    		} else if (which === 191) {
+              e.preventDefault(); // prevent FireFox quicksearch
+            }
       } else {
       	handleKey();
       }
