@@ -2775,7 +2775,6 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 
 		$d2 = 1/($d2-$L2);
     }
-    echo "loops: $i";
 	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-10) {
 		return $d;
     }
