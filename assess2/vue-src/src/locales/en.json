@@ -17,7 +17,10 @@
     "timewarning": "This assessment has a time limit. Once you start the assessment, the timer will not pause for any reason.  Are you sure you are ready to start?",
     "resetmsg": "Teachers: you can reset your attempts on this assessment if desired.",
     "doreset": "Reset",
-    "view_as_stu": "Acting as student: {name}"
+    "view_as_stu": "Acting as student: {name}",
+    "scorelist": "Score List",
+    "itemanalysis": "Item Analysis",
+    "gblinks": "Gradebook Links"
   },
   "closed": {
     "hidden": "This assessment is not currently available.",

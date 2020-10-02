@@ -77,6 +77,13 @@ if ($assessInfoOut['displaymethod'] === 'livepoll') {
 // indicate if teacher or tutor user
 $assessInfoOut['can_view_all'] = $canViewAll;
 $assessInfoOut['is_teacher'] = $isteacher;
+if ($istutor && $assess_info->getSetting('tutoredit') < 2) {
+    // tutor can edit
+    $assessInfoOut['tutor_gblinks'] = [
+        $basesiteurl . '/course/isolateassessgrade.php?cid=' . $cid . '&aid=' . $aid,
+        $basesiteurl . '/course/gb-itemanalysis2.php?cid=' . $cid . '&aid=' . $aid
+    ];
+}
 if ($canViewAll && $userid !== $uid) {
   $assessInfoOut['view_as_stu'] = 1;
   $query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
