@@ -600,6 +600,11 @@ function initcreditboxes() {
 
 var LivePreviews = [];
 function setupLivePreview(qn, skipinitial) {
+    if (mathRenderer=="MathJax" && !window.MathJax) {
+        var thisqn = qn; var thisskipinitial = skipinitial;
+        setTimeout(100, function() { setupLivePreview(thisqn, thisskipinitial)});
+        return;
+    }
 	if (!LivePreviews.hasOwnProperty(qn)) {
 		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
 			LivePreviews[qn] = {
