@@ -1,10 +1,10 @@
 <?php
 # Library name: finance2
-# Financial Functions.  Version 1.  September 2020
+# Financial Functions.  Version Pan2020.  September 2020
 # Author:  Amir Tavangar
 #          Humber College, Toronto, ON
 
-# Include loadlibrary("finance2") to import the library in questions.
+# Include loadlibrary("finance2") to import the library in your questions.
 
 # The functions in this library can be used to compute almost all compound and annuity problems as well as 
 # different business investment decisions methods such as
@@ -16,10 +16,12 @@
 # all types of annuities.
 
 global $allowedmacros;
-array_push($allowedmacros,"FV","PV","PMT","Nper","IY","IRR","NPV","iPMT","pPMT","TVMs");
+array_push($allowedmacros,"fin_FV","fin_PV","fin_PMT","fin_Nper","fin_IY","fin_IRR","fin_NPV",
+                            "fin_iPMT","fin_pPMT","fin_DBD","fin_TVM");
 
-//------------------------------------------FV-------------------------------------------
-// Function: FV(IY,Nper,PMT,PY,CY,[PV,type])
+
+//------------------------------------------fin_FV-------------------------------------------
+// Function: fin_FV(IY,Nper,PMT,PY,CY,[PV,type])
 // Returns the future value of a loan or investment based on a constant interest rate.
 // 
 // Parameters:
@@ -42,7 +44,7 @@ array_push($allowedmacros,"FV","PV","PMT","Nper","IY","IRR","NPV","iPMT","pPMT",
 // Returns:
 // Returns future value: a positive value for cash inflow and negative value for cash outflow.
 
-function FV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $PV=0,int $type=0) {
+function fin_FV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $PV=0,int $type=0) {
     if ($CY<=0 or $PY<=0) { echo 'error: CY and PY must be positive'; return '';}
     if ($type!=0 && $type!=1) { echo 'error: type gets either 1 for annuity due (beginning) or 0 for general annuity (end)'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
@@ -68,8 +70,8 @@ function FV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $PV=0,in
     return $FV;   
 }
 
-//-------------------------------------------PV-------------------------------------------
-// Function: PV(IY,Nper,PMT,PY,CY,[FV,type])
+//-------------------------------------------fin_PV-------------------------------------------
+// Function: fin_PV(IY,Nper,PMT,PY,CY,[FV,type])
 // Returns the presente value of a loan or investment based on a constant interest rate.
 // 
 // Parameters:
@@ -92,7 +94,7 @@ function FV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $PV=0,in
 // Returns:
 // Returns present value: a positive value for cash inflow and negative value for cash outflow.
 
-function PV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $FV=0,int $type=0) {
+function fin_PV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $FV=0,int $type=0) {
     if ($CY<=0 or $PY<=0) { echo 'error: CY and PY must be positive'; return '';}
     if ($type!=0 && $type!=1) { echo 'error: type gets either 1 for annuity due (beginning) or 0 for general annuity (end)'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
@@ -118,8 +120,8 @@ function PV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $FV=0,in
     return $PV;   
 }
 
-//-------------------------------------------PMT------------------------------------------
-// Function: PMT(IY,Nper,PV,PY,CY,[FV,type])
+//-------------------------------------------fin_PMT------------------------------------------
+// Function: fin_PMT(IY,Nper,PV,PY,CY,[FV,type])
 // Returns the periodic payment of a loan or investment based on a constant interest rate.
 // 
 // Parameters:
@@ -142,7 +144,7 @@ function PV(float $IY, float $Nper, float $PMT, int $PY, int $CY, float $FV=0,in
 // Returns:
 // Returns the periodic payment: a positive value for cash inflow and negative value for cash outflow.
 
-function PMT(float $IY, float $Nper, float $PV, int $PY, int $CY, float $FV=0, int $type=0) {
+function fin_PMT(float $IY, float $Nper, float $PV, int $PY, int $CY, float $FV=0, int $type=0) {
     if ($CY<=0 or $PY<=0) { echo 'error: CY and PY must be positive'; return '';}
     if ($type!=0 && $type!=1) { echo 'error: type gets either 1 for annuity due (beginning) or 0 for general annuity (end)'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
@@ -168,8 +170,8 @@ function PMT(float $IY, float $Nper, float $PV, int $PY, int $CY, float $FV=0, i
     return $PMT;   
 }
 
-//---------------------------------------------Nper----------------------------------------
-// Function: Nper(IY,PMT,PV,PY,CY,[FV,type])
+//---------------------------------------------fin_Nper----------------------------------------
+// Function: fin_Nper(IY,PMT,PV,PY,CY,[FV,type])
 // Returns the number of payments/compounding periods for an investment/loan based on periodic, 
 // constant payments and a constant interest rate.
 // 
@@ -193,7 +195,7 @@ function PMT(float $IY, float $Nper, float $PV, int $PY, int $CY, float $FV=0, i
 // Returns:
 // Returns the number of payments/compounding periods in the loan or investment term.
 
-function Nper(float $IY, float $PMT, float $PV, int $PY, int $CY, float $FV=0, int $type=0) {
+function fin_Nper(float $IY, float $PMT, float $PV, int $PY, int $CY, float $FV=0, int $type=0) {
     if ($CY<=0 or $PY<=0) { echo 'error: CY and PY must be positive'; return '';}
     if ($type!=0 && $type!=1) { echo 'error: type gets either 1 for annuity due (beginning) or 0 for general annuity (end)'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
@@ -231,7 +233,7 @@ function Nper(float $IY, float $PMT, float $PV, int $PY, int $CY, float $FV=0, i
     return $Nper;   
 }
 
-//-----------------------------function for Newton's iteration needed for IY Calculation---------------------
+//-------------------function for Newton's iteration needed for IY Calculation---------------
 // Adapted from python code of Numpy-financial on Github
 
 //  Using Newton's iteration until the change is less than tolerance (1e-6)
@@ -253,8 +255,8 @@ function gDiv($r, $n, $p, $x,$y, $w){
 
 }
 
-//-----------------------------------------------IY------------------------------------
-// Function: IY(Nper,PMT,PV,PY,CY,[FV,type])
+//-----------------------------------------------fin_IY-----------------------------------------
+// Function: fin_IY(Nper,PMT,PV,PY,CY,[FV,type])
 // Returns the nominal interest rate per year in percent 
 // 
 // Parameters:
@@ -277,7 +279,7 @@ function gDiv($r, $n, $p, $x,$y, $w){
 // Returns:
 // Returns the nominal interest rate per year in percent 
 
-function IY(float $Nper, float $PMT, float $PV, int $PY, int $CY, float $FV=0, int $type=0) {
+function fin_IY(float $Nper, float $PMT, float $PV, int $PY, int $CY, float $FV=0, int $type=0) {
     if ($CY<=0 or $PY<=0) { echo 'error: CY and PY must be positive'; return '';}
     if ($type!=0 && $type!=1) { echo 'error: type gets either 1 for annuity due (beginning) or 0 for general annuity (end)'; return '';}
     $tol=1e-6;  
@@ -300,7 +302,7 @@ function IY(float $Nper, float $PMT, float $PV, int $PY, int $CY, float $FV=0, i
     }
 }
 
-//-------------------------------------------iPMT----------------------------------------
+//-------------------------------------------fin_iPMT------------------------------------------
 // Function: iPMT(per,IY,Nper,PV,PY,CY,[FV,type])
 // Returns interest portion of a payment or a period (a range of payments). 
 // 
@@ -327,12 +329,12 @@ function IY(float $Nper, float $PMT, float $PV, int $PY, int $CY, float $FV=0, i
 // Returns:
 // Interest portion of a payment or a period (a range of payments) 
 
-function iPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, float $FV=0, int $type=0){
+function fin_iPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, float $FV=0, int $type=0){
     if (count($per)!=2) {echo 'array size must be 2: cannot compute'; return '';}
     if ($CY<=0 or $PY<=0) { echo 'error: CY and PY must be positive'; return '';}
     if ($type!=0 && $type!=1) { echo 'error: type gets either 1 for annuity due (beginning) or 0 for general annuity (end)'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
-    $pmt=round(PMT($IY,$Nper,$PV,$PY,$CY,$FV=0,$type=0),3);
+    $pmt=round(fin_PMT($IY,$Nper,$PV,$PY,$CY,$FV=0,$type=0),3);
     $i=$IY/($CY*100);
     $i2=((1+$i)**($CY/$PY))-1;
 
@@ -361,7 +363,7 @@ function iPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, flo
     return $intpaid;
 }
 
-//-------------------------------------------pPMT----------------------------------------
+//-------------------------------------------fin_pPMT------------------------------------------
 // Function: pPMT(per,IY,Nper,PV,PY,CY,[FV,type])
 // Returns principal portion of a payment or a period (a range of payments). 
 // 
@@ -388,12 +390,12 @@ function iPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, flo
 // Returns:
 // Principal portion of a payment or a period (a range of payments) 
 
-function pPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, float $FV=0, int $type=0){
+function fin_pPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, float $FV=0, int $type=0){
     if (count($per)!=2) {echo 'array size must be 2: cannot compute'; return '';}
     if ($CY<=0 or $PY<=0) { echo 'error: CY and PY must be positive'; return '';}
     if ($type!=0 && $type!=1) { echo 'error: type gets either 1 for annuity due (beginning) or 0 for general annuity (end)'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
-    $pmt=round(PMT($IY,$Nper,$PV,$PY,$CY,$FV=0,$type=0),3);
+    $pmt=round(fin_PMT($IY,$Nper,$PV,$PY,$CY,$FV=0,$type=0),3);
     $i=$IY/($CY*100);
     $i2=((1+$i)**($CY/$PY))-1;
 
@@ -422,8 +424,8 @@ function pPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, flo
     return $prnpaid;
 }
 
-//--------------------------------------------IRR------------------------------------------
-// Function: IRR(CF,FR)
+//--------------------------------------------fin_IRR--------------------------------------------
+// Function: fin_IRR(CF,FR)
 // Returns the Internal Rate of Return (IRR), in percent, of a series of cash flows, which is the 
 // average periodically compounded rate of return that gives a net present value (NPV) of 0.
 // IRR is the lowest rate of return from an investment that is acceptable to justify the investment.  
@@ -438,7 +440,7 @@ function pPMT(array $per,float $IY,float $Nper, float $PV, int $PY, int $CY, flo
 // Returns:
 // The Internal Rate of Return (IRR) in percent.
 
-function IRR(array $CF, array $FR){
+function fin_IRR(array $CF, array $FR){
     if (count($CF)!=count($FR)) {echo 'array sizes do not match: cannot compute'; return '';}
     include("solvers.php");
     
@@ -458,7 +460,7 @@ function IRR(array $CF, array $FR){
     return $n*100;
 }
 
-//----------------------------------------------NPV---------------------------------------
+//----------------------------------------------fin_NPV------------------------------------------
 // Function: NPV(CF,FR,IY)
 // Returns the Net Present Value (NPV) of a series of cash flows.
 // NPV is a method of evaluating the feasibility of an investment by finding the difference of present values 
@@ -475,7 +477,7 @@ function IRR(array $CF, array $FR){
 // Returns:
 // The Net Present Value (NPV) of a series of cash flows ($). 
 
-function NPV(array $CF, array $FR, float $IY){
+function fin_NPV(array $CF, array $FR, float $IY){
     if (count($CF)!=count($FR)) {echo 'array sizes do not match: cannot compute'; return '';}
     if ($IY<0) { echo 'error: IY cannot be negative'; return '';}
     //include("macros.php");
@@ -496,8 +498,32 @@ function NPV(array $CF, array $FR, float $IY){
     return $npv;
 }
 
-//------------------------------------------TVMs-------------------------------------------
-// Function: TVMs()
+//--------------------------------------------fin_DBD---------------------------------------------
+// Function: DBD(Date1,Date2)
+// Returns the number of days between the given dates (DBD). 
+// DBD function can be used for time-value-of-money problems (generally short terms) 
+// where the investment or loan term is not given explicitly but rather in a form of two dates. 
+//
+// Parameters:
+// Date1: Starting date in the form of 'YYYY-MM-DD', 'YYYY/MM/DD', or 'MM/DD/YYYY'.
+// Date2: End date in the form of 'YYYY-MM-DD', 'YYYY/MM/DD', or 'MM/DD/YYYY'. 
+// 
+// Returns:
+// Returns the number od days between the given dates (DBD). 
+
+function fin_DBD($D1,$D2) {
+
+    $date1=new DateTime($D1);
+    $date2=new DateTime($D2);
+    $delta=date_diff($date1,$date2,$absolute = FALSE);
+    $dbd=$delta->days;
+    
+    return $dbd;
+}
+
+
+//-------------------------------------------fin_TVM---------------------------------------------
+// Function: fin_TVM()
 // Returns an iframe for displaying a Time-Value-of-Money (TVM) solver.  
 // Provides students with a solver that can be used to compute various values of loans or investments. 
 // 
@@ -506,8 +532,8 @@ function NPV(array $CF, array $FR, float $IY){
 // Returns:
 // An embeded iframe code for inserting the solver into a question.
 
-function TVMs() {
-	return '<iframe src="https://tvm-solver-2020.ue.r.appspot.com" name="TVMsolver" width="420" height="680" frameborder="0" scrolling="no" ><p>Your browser does not support iframes.</p></iframe>';
+function fin_TVM() {
+	return '<iframe src="https://p2.amirtavangar.com" name="TVMsolver" width="420" height="680" frameborder="0" scrolling="no" ><p>Your browser does not support iframes.</p></iframe>';
 }
 
 
