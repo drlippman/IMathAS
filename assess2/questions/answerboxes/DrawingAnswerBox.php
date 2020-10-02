@@ -287,17 +287,29 @@ class DrawingAnswerBox implements AnswerBox
     						$out .= "<img src=\"$staticroot/img/tpineqparab.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.3\" alt=\"Quadratic inequality, solid line\"/>";
     						$out .= "<img src=\"$staticroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
     						$def = 10;
-    					}
-    					else if (in_array('parab',$answerformat)) {
-    						$out .= "<img src=\"$staticroot/img/tpineqparab.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.3\" class=\"sel\" alt=\"Quadratic inequality, solid line\"/>";
-    						$out .= "<img src=\"$staticroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
-    						$def = 10.3;
-    					}
-    					else {
+                        }
+                        if (in_array('line',$answerformat) || count($answerformat)==1) {
     						$out .= "<img src=\"$staticroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
     						$out .= "<img src=\"$staticroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
-    						$def = 10;
+                            if ($answerformat[1] == 'line' || count($answerformat)==1) {
+                                $def = 10;
+                            }
     					}
+    					if (in_array('parab',$answerformat)) {
+    						$out .= "<img src=\"$staticroot/img/tpineqparab.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.3\" class=\"sel\" alt=\"Quadratic inequality, solid line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
+    						if ($answerformat[1] == 'parab') {
+                                $def = 10.3;
+                            }
+                        } 
+                        if (in_array('abs',$answerformat)) {
+    						$out .= "<img src=\"$staticroot/img/tpineqabs.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.5\" class=\"sel\" alt=\"Absolute Value inequality, solid line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqabsdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.6\" alt=\"Absolute Value inequality, dashed line\"/>";
+    						if ($answerformat[1] == 'abs') {
+                                $def = 10.5;
+                            }
+    					}
+    					
     				} else if ($answerformat[0]=='twopoint') {
     					if (count($answerformat)==1 || in_array('line',$answerformat)) {
     						$out .= "<img src=\"$staticroot/img/tpline.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5\" ";
