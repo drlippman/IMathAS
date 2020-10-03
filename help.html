@@ -2875,13 +2875,29 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	the correct answer.  To override the tolerance use +- in the setting, like this:
 	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
 	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $relatolerance = .01)</dd>
-<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "nosoln", or "nosolninf"</dt>
-	<dd>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
-	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.
-	<br/>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)
-	<br/>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
-	$ansprompt = "One value, x=;No values;Many values"
-	<br/>Answerformats can be combined, like $answerformat = "nosoln,list"</dd>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "units", "nosoln", or "nosolninf"</dt>
+	<dd>
+        <ul>
+            <li>Answerformats can be combined, like $answerformat = "nosoln,list"</li>
+            <li>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.</li>
+            <li>If $answerformat="list", then duplicate values are ignored.</li>
+            <li>If $answerformat="exactlist", then duplicate values are not ignored.</li>
+            <li>If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</li>
+            <li>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)</li>
+            <li>$answerformat = "units" adds unit checking.  Supply the answer like <code>$answer = "3 kg/m^2"</code>.  
+                The student's answer can be in other equivalent units, so "300 cm" is considered equivalent to "3 m".
+                The answer must be in the format <code>[decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...</code>, 
+                though multiplication can be implied.  Note that the units do not require mathematically-proper parens around the denominator.
+                The decimal number can include basic scientific notation in 3E5 or 3*10^5 formats.
+                Note that tolerances are scaled to the unit, so $answer = "3m" with $abstolerance = .1 would mean 
+                .1 meters, so "310cm" would still be within tolerance.  If $reqsigfigs is set, the specified 
+                number of sigfigs will need to be present in the student's answer, regardless of units.
+                </li>
+            <li>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". 
+                $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
+            </li>
+        </ul>
+    </dd>
 <dt>$partialcredit = array(number,score,[number,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
 	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
