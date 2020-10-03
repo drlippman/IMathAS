@@ -3580,19 +3580,23 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 		return " ";
 	} else if ($stu==='NA') {
 		return '<div class="feedbackwrap"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("No answer selected. Try again.") . '</div>';
-	} else if (isset($fbtxt[$stu])) {
-		if ($stu==$ans) {
-			return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$stu].'</div>';
-		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$stu].'</div>';
-		}
-	} else {
-		if ($stu==$ans) {
-			return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/></div>';
-		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/></div>';
-		}
-	}
+    } else {
+        $anss = explode(' or ', $ans);
+        foreach ($anss as $ans) {
+            if ($stu==$ans) {
+                $out = '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> ';
+                if (isset($fbtxt[$stu])) {
+                    $out .= $fbtxt[$stu];
+                }
+                return $out .= '</div>';
+            } 
+        }
+        $out = '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ';
+        if (isset($fbtxt[$stu])) {
+            $out .= $fbtxt[$stu];
+        }
+        return $out .= '</div>';
+    } 
 }
 
 function getfeedbacktxtessay($stu,$fbtxt) {
