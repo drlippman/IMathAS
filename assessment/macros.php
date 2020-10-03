@@ -745,14 +745,16 @@ function mergeplots($plota) {
 	$n = func_num_args();
 	if ($n==1) {
 		return $plota;
-	}
+    }
+    $plota = preg_replace('/<span.*?<\/span>/','', $plota);
 	for ($i=1;$i<$n;$i++) {
-		$plotb = func_get_arg($i);
+        $plotb = func_get_arg($i);
 		if ($_SESSION['graphdisp']==0) {
 			$newtext = preg_replace('/^Graphs.*?y:.*?to.*?\.\s/', '', $plotb);
 			$plota .= $newtext;
 		} else {
-			$newcmds = preg_replace('/^.*?initPicture\(.*?\);\s*(axes\(.*?\);)?(.*?)\'\s*\/>.*$/', '$2', $plotb);
+            $plotb = preg_replace('/<span.*?<\/span>/','', $plotb);
+            $newcmds = preg_replace('/^.*?initPicture\(.*?\);\s*(axes\(.*?\);)?(.*?)\'\s*\/>.*$/', '$2', $plotb);
 			$plota = str_replace("' />", $newcmds."' />", $plota);
 		}
 	}
@@ -838,7 +840,7 @@ function showasciisvg($script, $width=200, $height=200, $alt="") {
         return $alt;
     }
     $script = str_replace("'",'"',$script);
-    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />\n";
+    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />";
     $out .= '<span class="sr-only">'.$alt.'</span>';
     return $out;
 }
