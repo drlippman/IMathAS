@@ -153,7 +153,7 @@ function init(paramarr, enableMQ, baseel) {
         }
         //document.getElementById("pbtn"+qn).style.display = 'none';
       } //TODO: when matrix, clear preview on further input
-    } else {
+    } else if (document.getElementById("qn"+qn)) {
         var thisqn = qn;
         document.getElementById("qn"+qn).addEventListener('keyup', function() { syntaxCheckMQ(thisqn) });
     } //TODO: for non-preview types, still check syntax
