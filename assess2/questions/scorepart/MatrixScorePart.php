@@ -162,12 +162,12 @@ class MatrixScorePart implements ScorePart
                 $incorrect++;
                 continue;
             } else if (isset($abstolerance)) {
-                if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance-1E-12) {
+                if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance+1E-12) {
                   $incorrect++;
                   continue;
                 }
             } else {
-                if (abs($answerlist[$i] - $givenanslist[$i])/(abs($answerlist[$i])+.0001) > $reltolerance-1E-12) {
+                if (abs($answerlist[$i] - $givenanslist[$i])/(abs($answerlist[$i])+.0001) > $reltolerance+1E-12) {
                   $incorrect++;
                   continue;
                 }
