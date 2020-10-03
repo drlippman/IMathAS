@@ -1136,8 +1136,8 @@ function processNumber(origstr, format) {
     }
     var str;
     for (var j=0;j<strs.length;j++) {
-         if (format.indexOf('units')!=-1) {
-            str = strs[j];
+        str = strs[j];
+        if (format.indexOf('units')!=-1) {
             var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
             if (!str.match(/^\s*(\d+\.?\d*|\.\d+|\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
                 err += _('Answer must start with a number. ');
