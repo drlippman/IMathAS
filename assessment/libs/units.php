@@ -346,9 +346,9 @@ function parseunits($unitsExpression) {
     $unitsExpression = preg_replace('/([0-9])(\.)([a-zA-Z])/','$1$2*$3',$unitsExpression); //allows numerical factor to end in a decimal point
     $unitsExpression = preg_replace('/(\s*\-\s*)([a-zA-Z])/','*$2',$unitsExpression); //interprets dash as multiplication
     $unitsExpression = preg_replace('/([a-zA-Z])(\s*\-\s*)/','$1*',$unitsExpression); //Not sure if this is standard notation.
+    $unitsExpression = preg_replace('/\(\s*(.*?)\s*\)\s*\//', '$1/', $unitsExpression); // strip paren around numerator
+    $unitsExpression = preg_replace('/\/\s*\(\s*(.*?)\s*\)/', '/$1', $unitsExpression); // strip paren around denom
     $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol, spaces become *
-    $unitsExpression = preg_replace('/\((.*?)\)\s*\//', '$1/', $unitsExpression); // strip paren around numerator
-    $unitsExpression = preg_replace('/\/\s*\((.*?)\)/', '/$1', $unitsExpression); // strip paren around denom
 
     // unconvert E so is_numeric will recognize it
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*\*\s*10\s*\^\s*([\-]?\d+)/','$1E$2',$unitsExpression);
