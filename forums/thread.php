@@ -379,8 +379,8 @@ if (isset($_GET['markallread'])) {
 
 
 $pagetitle = "Threads";
-$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js?v=050220\"></script>";
+$placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
 $placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
@@ -733,28 +733,28 @@ echo "</p>";
 				echo "><td>";
 				echo "<span class=\"right\">\n";
 				if ($line['lastposttime']>$now) {
-					echo "<img class=mida src=\"$imasroot/img/time.png\" alt=\"Scheduled\" title=\"Scheduled for later release\" /> ";
+					echo "<img class=mida src=\"$staticroot/img/time.png\" alt=\"Scheduled\" title=\"Scheduled for later release\" /> ";
 				}
 				if ($line['tag']!='') { //category tags
 					echo '<span class="forumcattag">'.Sanitize::encodeStringForDisplay($line['tag']).'</span> ';
 				}
 
 				if (isset($flags[$line['id']])) {
-					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
+					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
 				} else {
-					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
+					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
 				}
 				if ($isteacher) {
 					if ($line['posttype']==2) {
-						echo "<img class=mida src=\"$imasroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
+						echo "<img class=mida src=\"$staticroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
 					} else if ($line['posttype']==3) {
-						echo "<img class=mida src=\"$imasroot/img/noview.png\" alt=\"No View\" title=\"Students can only see their own replies\" /> ";
+						echo "<img class=mida src=\"$staticroot/img/noview.png\" alt=\"No View\" title=\"Students can only see their own replies\" /> ";
 					}
 				}
 				if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby) || ($allowdel && $line['userid']==$userid && $posts==0)) {
 					echo '<span class="dropdown">';
 					echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.Sanitize::onlyInt($line['id']).'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-					echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
+					echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
 					echo '</a>';
 					echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.Sanitize::onlyInt($line['id']).'">';
 

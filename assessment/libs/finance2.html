@@ -1,0 +1,215 @@
+<html><body style="margin:30px;padding:0;font-size: medium;">
+  <a name="top"></a>
+  <h1>Macro Library finance2</h1>
+
+<p><span style="font-size: medium;">Financial Functions. Version 1. October 2020</span></p>
+<p><span style="font-size: medium;">Author: Amir Tavangar</span></p>
+<p><span style="font-size: medium;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Humber College, Toronto, ON </span>
+<br /><br />
+<span style="font-size: medium;">To import the library, include <em>loadlibrary("finance2")</em> in the common control. </span>
+<br /><br />
+<span style="font-size: medium;">The functions in this library can be used to compute almost all compound and annuity problems as well as different business investment-decision methods such as</span></p>
+<ul>
+<li><span style="font-size: medium;">Simple, general, ordinary annuities, and annuity due&nbsp;</span></li>
+<li><span style="font-size: medium;">Net present value (NPV) method&nbsp;</span></li>
+<li><span style="font-size: medium;">Internal Rate of Return (IRR) method&nbsp;</span></li>
+<li><span style="font-size: medium;">Interest and principal portions of payments in an amortization schedule</span></li>
+<li><span style="font-size: medium;">TVM() function, which includes an iframe of a TVM solver in problems capable of computing all types of annuities</span></li>
+</ul>
+<div>
+<p>List of functions:</p>
+<div style="padding-left: 28px;">
+<li><a href="#FV">fin_FV: Future value</a></li>
+<li><a href="#PV">fin_PV: Present value</a></li>
+<li><a href="#PMT">fin_PMT: Payment</a></li>
+<li><a href="#Nper">fin_Nper: Number of payments</a></li>
+<li><a href="#IY">fin_IY: Interest rate per year</a></li>
+<li><a href="#iPMT">fin_iPMT: Interest portion of payment</a></li>
+<li><a href="#pPMT">fin_pPMT: Principal portion of payment</a></li>
+<li><a href="#IRR">fin_IRR: Internal rate of return</a></li>
+<li><a href="#NPV">fin_NPV: Net present value</a></li>
+<li><a href="#DBD">fin_DBD: Days between dates</a></li>
+<li><a href="#TVMs">fin_TVMs: Time-Value-of-Money solver</a></li>
+</div>
+
+<p>&nbsp;</p>
+<div><a name="FV"><strong>fin_FV</strong>(IY, Nper, PMT, PY, CY, [PV, type])</a></div>
+<div>&nbsp;</div>
+<div><span style="font-size: medium;">Function fin_FV computes the future value of a loan or investment based on a constant annual interest rate.</span></div>
+<p><strong><em>Parameters:</em></strong></p>
+<ul>
+  <li><span style="font-size: medium;">&nbsp;<strong>IY</strong>:&nbsp;&nbsp;Nominal interest rate per year as a percent; for example, 2.35 should be entered for a nominal rate of 2.35%.</span></li>
+  <li><span style="font-size: medium;">&nbsp;<strong>Nper</strong>: Total number of payments (for annuities) or compounding periods (for compound interest) in the loan/investment term.</span></li>
+  <li><span style="font-size: medium;">&nbsp;<strong>PMT</strong>: The size of periodic payment; should be entered as a negative value for cash outflow and positive value for cash inflow.</span></li>
+  <li><span style="font-size: medium;">&nbsp;<strong>PY</strong>:&nbsp;&nbsp;The number of payments per year. Should be the same value as CY for compound interest problems where PMT=0; should be entered 1 for annual payments,&nbsp;2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</span></li>
+  <li><span style="font-size: medium;">&nbsp;<strong>CY</strong>:&nbsp;&nbsp;The number of interest compounding periods per year; should be entered 1 for compounded annually, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</span></li>
+  <li><span style="font-size: medium;">&nbsp;<strong>PV</strong>:&nbsp;&nbsp;Optional - The present value (principal) of a loan or investment; should be entered&nbsp;as a negative value for cash outflow and positive value for cash inflow; default = 0.&nbsp;</span></li>
+  <li><span style="font-size: medium;">&nbsp;<strong>type</strong>: Optional - The type of annuity. Should be entered 1 for an annuity due and 0 (default) for a general annuity.&nbsp;</span></li>
+</ul>
+<p><strong><em>Returns</em></strong></p>
+<div><span style="font-size: medium;">&nbsp;The future value of a loan or investment: a positive value for cash inflow and a negative value for cash outflow.</span></div>
+
+<p>&nbsp;</p>
+  <div><a name="PV"><strong>fin_PV</strong>(IY, Nper, PMT, PY, CY, [FV, type])</a></div>
+  <div>&nbsp;</div>
+  <div><span style="font-size: medium;">Function fin_PV computes the present value (principal) of a loan or investment based on a constant annual interest rate.</span></div>
+  <p><strong><em>Parameters:</em></strong></p>    <ul>
+    <li><span style="font-size: medium;">&nbsp;<strong>IY</strong>:&nbsp;&nbsp;Nominal interest rate per year as a percent; for example, 2.35 should be entered for a nominal rate of 2.35%.</span></li>
+    <li><span style="font-size: medium;">&nbsp;<strong>Nper</strong>: Total number of payments (for annuities) or compounding periods (for compound interest) in the loan/investment term.</span></li>
+    <li><span style="font-size: medium;">&nbsp;<strong>PMT</strong>: The size of periodic payment; should be entered as a negative value for cash outflow and positive value for cash inflow.</span></li>
+    <li><span style="font-size: medium;">&nbsp;<strong>PY</strong>:&nbsp;&nbsp;The number of payments per year. Should be the same value as CY for compound interest problems where PMT=0; should be entered 1 for annual payments,&nbsp;2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</span></li>
+    <li><span style="font-size: medium;">&nbsp;<strong>CY</strong>:&nbsp;&nbsp;The number of interest compounding periods per year; should be entered 1 for compounded annually, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</span></li>
+    <li><span style="font-size: medium;">&nbsp;<strong>FV</strong>:&nbsp;&nbsp;Optional - The future value of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow; default = 0.&nbsp;</span></li>
+    <li><span style="font-size: medium;">&nbsp;<strong>type</strong>: Optional - The type of annuity. Should be entered 1 for an annuity due and 0 (default) for a general annuity.&nbsp;</span></li>
+  </ul>
+  <p><strong><em>Returns</em></strong></p>
+  <div><span style="font-size: medium;">The present value of a loan or investment: a positive value for cash inflow and a negative value for cash outflow.</span></div>
+  
+  <p>&nbsp;</p>
+    <div><a name="PMT"><strong>fin_PMT</strong>(IY, Nper, PV, PY, CY, [FV, type])</a></div>
+    <div>&nbsp;</div>
+    <div><span style="font-size: medium;">Function fin_PMT computes the periodic payment of a loan or investment based on a constant annual interest rate.</span></div>
+    
+    <p><strong><em>Parameters:</em></strong></p>      <ul>
+      <li><span style="font-size: medium;">&nbsp;<strong>IY</strong>:&nbsp;&nbsp;Nominal interest rate per year as a percent; for example, 2.35 should be entered for a nominal rate of 2.35%.</span></li>
+      <li><span style="font-size: medium;">&nbsp;<strong>Nper</strong>: Total number of payments (for annuities) or compounding periods (for compound interest) in the loan/investment term.</span></li>
+      <li><span style="font-size: medium;">&nbsp;<strong>PV</strong>: The present value (principal) of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow.&nbsp;</span></li>
+      <li><span style="font-size: medium;">&nbsp;<strong>PY</strong>:&nbsp;&nbsp;The number of payments per year. Should be the same value as CY for compound interest problems where PMT=0; should be entered 1 for annual payments,&nbsp;2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</span></li>
+      <li><span style="font-size: medium;">&nbsp;<strong>CY</strong>:&nbsp;&nbsp;The number of interest compounding periods per year; should be entered 1 for compounded annually, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</span></li>
+      <li><span style="font-size: medium;">&nbsp;<strong>FV</strong>:&nbsp;&nbsp;Optional - The future value of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow; default = 0.&nbsp;</span></li>
+      <li><span style="font-size: medium;">&nbsp;<strong>type</strong>: Optional - The type of annuity. Should be entered 1 for an annuity due and 0 (default) for a general annuity.&nbsp;</span></li>
+    </ul>
+    <p><strong><em>Returns</em></strong></p>
+    <div><span style="font-size: medium;">The periodic payment of a loan or investment: a positive value for cash inflow and a negative value for cash outflow.</span></div>
+
+    <p>&nbsp;</p>
+<div><a name="Nper"><strong>fin_Nper</strong>(IY, PMT, PV, PY, CY, [FV,type])</a></div>
+</div>
+<p>Function fin_Nper computes the total number of payments/compounding periods in the term of an investment or loan based on a constant annual interest rate.</p>
+<p><strong><em>Parameters:</em></strong></p>
+<ul>
+  <li><strong>IY</strong>:&nbsp;&nbsp;Nominal interest rate per year as a percent; for example, 2.35 should be entered for a nominal rate of 2.35%.</li>
+  <li><strong>PMT</strong>: The size of periodic payments; should be entered as a negative value for cash outflow and positive value for cash inflow.</li>
+  <li><strong>PV</strong>: The present value (principal) of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow.&nbsp;</li>
+  <li><strong>PY</strong>:&nbsp;&nbsp;The number of payments per year. Should be the same value as CY for compound interest problems where PMT=0; should be entered 1 for annual payments, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+  <li><strong>CY</strong>:&nbsp;&nbsp;The number of interest compounding periods per year; should be entered 1 for compounded annually, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+  <li><strong>FV</strong>:&nbsp;&nbsp;Optional - The future value of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow; default = 0.&nbsp;</li>
+  <li><strong>type</strong>: Optional - The type of annuity. Should be entered 1 for an annuity due and 0 (default) for a general annuity.&nbsp;</li>
+</ul>
+<p><strong><em>Returns</em></strong></p>
+<div>
+  <div>The number of payments/compounding periods in the loan or investment term.</div>
+</div>
+
+<p>&nbsp;</p>
+      <div><a name="IY"><strong>fin_IY</strong>(Nper, PMT, PV, PY, CY, [FV, type])</a></div>
+  </div>
+</div>
+<p>Function fin_IY computes the nominal interest rate per year in percent.&nbsp;</p>
+<p><strong><em>Parameters:</em></strong></p>
+<ul>
+  <li><strong>Nper</strong>: Total number of payments (for annuities) or compounding periods (for compound interest) in a loan or investment term.</li>
+  <li><strong>PMT</strong>: The size of periodic payments; should be entered as a negative value for cash outflow and positive value for cash inflow.</li>
+  <li><strong>PV</strong>: The present value (principal) of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow.&nbsp;</li>
+  <li><strong>PY</strong>:&nbsp;&nbsp;The number of payments per year. Should be the same value as CY for compound interest problems where PMT=0; should be entered 1 for annual payments, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+  <li><strong>CY</strong>:&nbsp;&nbsp;The number of interest compounding periods per year; should be entered 1 for compounded annually, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+  <li><strong>FV</strong>:&nbsp;&nbsp;Optional - The future value of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow; default = 0.&nbsp;</li>
+  <li><strong>type</strong>: Optional - The type of annuity. Should be entered 1 for an annuity due and 0 (default) for a general annuity.&nbsp;</li>
+</ul>
+<p><strong><em>Returns</em></strong></p>
+<div>
+  <div>
+    <div>
+      <div>The nominal interest rate per year in percent (%).&nbsp;</div>
+
+      <p>&nbsp;</p>
+
+    <div><a name="iPMT"><strong>fin_iPMT</strong>(per ,IY ,Nper ,PV ,PY ,CY , [FV, type])</a></div>
+  </div>
+</div>
+<p>Function fin_iPMT computes the interest portion of a payment or a period (a range of payments). Functions iPMT and pPMT can be used to generate an amortization schedule.&nbsp;</p>
+<p><strong><em>Parameters:</em></strong></p>
+<ul>
+  <li>
+    <div>
+      <div><strong>per</strong>:&nbsp;&nbsp;Array of size two for the range of payments for which the interest amount paid is calculated. To find the interest portion of a single payment, both values in the array should be the same. For example, $per=array(1,1) is used to compute the interest portion of the first payment, while $per=array(1,12) is used to calculate the interest portion paid in the period ranging from the 1st payment to 12th payment inclusive.</div>
+    </div>
+  </li>
+  <li><strong>IY</strong>:&nbsp;&nbsp;Nominal interest rate per year as a percent; for example, 2.35 should be entered for a nominal rate of 2.35%.</li>
+  <li><strong>Nper</strong>: Total number of payments (for annuities) or compounding periods (for compound interest) in a loan or investment term.</li>
+  <li><strong>PV</strong>: The present value (principal) of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow.&nbsp;</li>
+  <li><strong>PY</strong>:&nbsp;&nbsp;The number of payments per year. Should be the same value as CY for compound interest problems where PMT=0; should be entered 1 for annual payments, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+  <li><strong>CY</strong>:&nbsp;&nbsp;The number of interest compounding periods per year; should be entered 1 for compounded annually, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+  <li><strong>FV</strong>:&nbsp;&nbsp;Optional - The future value of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow; default = 0.&nbsp;</li>
+  <li><strong>type</strong>: Optional - The type of annuity. Should be entered 1 for an annuity due and 0 (default) for a general annuity.&nbsp;</li>
+</ul>
+<p><strong><em>Returns</em></strong></p>
+<div>
+  <div>
+    <div>
+      <div>The interest portion of a payment or a period (a range of payments).</div>
+    </div>
+  </div>
+</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<p><a name="pPMT"><strong>fin_pPMT</strong>(per ,IY ,Nper ,PV ,PY ,CY , [FV, type])</a></p>
+<p>Function fin_pPMT computes the principal portion of a payment or a period (a range of payments). Functions pPMT and iPMT can be used to generate an amortization schedule.&nbsp;</p>
+<p><strong><em>Parameters:</em></strong></p>
+<ul>
+<li><strong>per</strong>:&nbsp;&nbsp;Array of size two for the range of payments for which the principal portion is calculated. To find the principal portion of a single payment, both values in the array should be the same. For example, $per=array(1,1) is used to compute the principal portion of the first payment, while $per=array(1,12) is used to calculate the principal portion paid in the period ranging from the 1st payment to 12th payment inclusive.</li>
+<li><strong>IY</strong>:&nbsp;&nbsp;Nominal interest rate per year as a percent; for example, 2.35 should be entered for a nominal rate of 2.35%.</li>
+<li><strong>Nper</strong>: Total number of payments (for annuities) or compounding periods (for compound interest) in a loan or investment term.</li>
+<li><strong>PV</strong>: The present value (principal) of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow.&nbsp;</li>
+<li><strong>PY</strong>:&nbsp;&nbsp;The number of payments per year. Should be the same value as CY for compound interest problems where PMT=0; should be entered 1 for annual payments, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+<li><strong>CY</strong>:&nbsp;&nbsp;The number of interest compounding periods per year; should be entered 1 for compounded annually, 2 for semi-annually, 4 for quarterly, 12 for monthly, 365 for daily.</li>
+<li><strong>FV</strong>:&nbsp;&nbsp;Optional - The future value of a loan or investment; should be entered as a negative value for cash outflow and positive value for cash inflow; default = 0.&nbsp;</li>
+<li><strong>type</strong>: Optional - The type of annuity. Should be entered 1 for an annuity due and 0 (default) for a general annuity.&nbsp;</li>
+</ul>
+<p><strong><em>Returns</em></strong></p>
+<p>The principal portion of a payment or a period (a range of payments).</p>
+<div>&nbsp;</div>
+
+<p><a name="IRR"><strong>fin_IRR</strong>(CF, FR)</a></p>
+<p>Function fin_IRR computes the Internal Rate of Return (IRR), in percent, of a series of cash flows. IRR is the average periodically compounded rate of return that gives a net present value (NPV) of 0. In other words, IRR is the lowest rate of return from an investment that is acceptable to justify the investment.</p>
+<p><strong><em>Parameters:</em></strong></p>
+<ul>
+<li><strong>CF</strong>: Array of cash flows; cash outflows (investments) should be entered as negative values; cash inflows (expected returns on investment) should be entered as positive values.</li>
+<li><strong>FR</strong>: Array of the frequency of each cash flow; initial cash flow is negative (cash outflow) and has a frequency of 1.</li>
+</ul>
+<p style="padding-left: 40px;">Both CF and FR arrays must be the same size. For example, if the initial investment is $50,000 (cash ouflow), and the annual returns on investment (cash inflow) are expected to be $10,000 in the first year and $20,000 in the next three subsequent years, CF = array(-50,000, 10000, 20000) and FR = array(1, 1, 3).</p>
+<p><strong><em>Returns</em></strong></p>
+<p>The Internal Rate of Return (IRR) in percent (%).</p>
+<div>&nbsp;</div>
+
+<p><a name="NPV"><strong>fin_NPV</strong>(CF, FR, IY)</a></p>
+<p>Function fin_NPV computes the Net Present Value (NPV) of a series of cash flows. NPV is a method of evaluating the feasibility of investments by finding the difference of present values of all cash flows. Investment is accepted when NPV>=0 and rejected when NPV<0.</p>
+<p><strong><em>Parameters:</em></strong></p>
+<ul>
+<li>&nbsp;<strong>CF</strong>:&nbsp; Array of cash flows; cash outflows (investments) should be entered as negative values; cash inflows (expected returns on investment) should be entered as positive values. The period of cash flows must be the same. For example all annual cash flows or all monthly cash flows.</li>
+<li>&nbsp;<strong>FR</strong>:&nbsp; Array of the frequency of each cash flow; initial cash flow is negative (cash outflow) and has a frequency of 1.</li>
+<li>&nbsp;<strong>IY</strong>:&nbsp; The required rate of return in percent. The interest period must match the cash-flow period. For example, if the cash flows are annual, IY should be the annual interest rate, while for monthly cash flows, the interest rate per month should be entered.&nbsp;</li>
+</ul>
+<p style="padding-left: 40px;">Both CF and FR arrays must be the same size. For example, if the initial investment is $50,000 (cash ouflow), and the annual returns on investment (cash inflow) are expected to be $10,000 in the first year and $20,000 in the next three subsequent years, CF = array(-50,000, 10000, 20000) and FR = array(1, 1, 3).</p>
+<p>&nbsp;<strong><em>Returns:</em></strong></p>
+<p>&nbsp;The Net Present Value (NPV) of a series of cash flows ($).&nbsp;</p>
+<p>&nbsp;</p>
+
+<p><a name="DBD"></a><strong>fin_DBD</strong>(Date1,Date2)</p>
+<p>Function fin_DBD computes the number of days between the given dates (DBD). DBD function can be used for time-value-of-money problems (generally short-terms) where the term of the investment or loan is not given explicitly but rather in a form of two dates.</p>
+<p><em><strong>Parameters: </strong></em></p>
+<ul>
+<li><strong>Date1</strong>: Starting date in the form of 'YYYY-MM-DD', 'YYYY/MM/DD', or 'MM/DD/YYYY'.</li>
+<li><strong>Date2</strong>: End date in the form of 'YYYY-MM-DD', 'YYYY/MM/DD', or 'MM/DD/YYYY'.</li>
+</ul>
+<p><em><strong>Returns: </strong></em></p>
+<p>The number of days between the given dates (DBD).</p>
+<p>&nbsp;</p>
+
+<p><a name="TVMs"><strong>fin_TVM</strong>()</a></p>
+<p>Function fin_TVM returns an iframe for displaying a Time-Value-of-Money (TVM) solver. It provides students with a solver that can be used to compute different values of loans or investments (works similar to the functions in this library).</p>
+<p><em><strong>Parameters: </strong></em><span>None</span></p>
+
+<p><em><strong>Returns:</strong></em></p>
+<p>An embedded iframe code for inserting the solver into a question.</p>
+<a href="#top">Back to top of page</a>

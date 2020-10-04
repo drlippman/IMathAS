@@ -71,13 +71,7 @@ if ($assess_record->hasActiveAttempt()) {
 }
 
 // update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  $gbscore = $assess_record->getGbScore();
-  require_once("../includes/ltioutcomes.php");
-  $aidposs = $assess_info->getSetting('points_possible');
-  calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], true, $aidposs);
-}
+$assess_record->updateLTIscore();
 
 // grab any assessment info fields that may have updated:
 $include_from_assess_info = array(

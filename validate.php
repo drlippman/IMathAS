@@ -19,11 +19,6 @@
 
  session_start();
  $sessionid = session_id();
- if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
- 	 $urlmode = 'https://';
- } else {
- 	 $urlmode = 'http://';
- }
 
  $myrights = 0;
  $myspecialrights = 0;
@@ -99,7 +94,7 @@
        $cid = 0;
      }
 
-     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
            require("header.php");
     if (isset($_SERVER['QUERY_STRING'])) {
         $querys = '?'.Sanitize::fullQueryString($_SERVER['QUERY_STRING']).'&guestaccess=true';
@@ -234,7 +229,10 @@
 		 }
 		 if (isset($_POST['tzname'])) {
 		 	 $_SESSION['logintzname'] = $_POST['tzname'];
-		 }
+         }
+         if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
+            $_SESSION['static_ok'] = 1;
+         }
 		 require_once("$curdir/includes/userprefs.php");
 		 generateuserprefs();
 

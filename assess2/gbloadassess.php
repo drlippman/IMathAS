@@ -120,11 +120,7 @@ if (!$assess_record->hasRecord()) {
     $new_gb_score = $assess_record->getGbScore()['gbscore'];
     if ($new_gb_score != $orig_gb_score) {
         $assess_record->saveRecord();
-        $lti_sourcedid = $assess_record->getLTIsourcedId();
-        if (strlen($lti_sourcedid) > 1) {
-            require_once("../includes/ltioutcomes.php");
-            calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$new_gb_score,true);
-        }
+        $assess_record->updateLTIscore();
     }
 }
 

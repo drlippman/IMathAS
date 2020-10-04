@@ -126,7 +126,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
 $placeinhead = '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>';
 $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/admin/modcourseorder.php?type=$type';</script>";
-$placeinhead .= "<script src=\"$imasroot/javascript/nestedjq.js?v=050719\"></script>";
+$placeinhead .= "<script src=\"$staticroot/javascript/nestedjq.js?v=050719\"></script>";
 $placeinhead .= '<script type="text/javascript">
  	var noblockcookie=true;
 	var ocnt = 0;

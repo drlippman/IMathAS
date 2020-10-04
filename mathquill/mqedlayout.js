@@ -100,7 +100,10 @@ var myMQeditor = (function($) {
               {l:'\\tan^{-1}', c:'f'},
               {l:'\\sinh', c:'f'},
               {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'}
+              {l:'\\tanh', c:'f'},
+              {l:'\\pi', nb:1},
+              {s:1},
+              {s:4}
             ]
           }
         ]
@@ -295,7 +298,10 @@ var myMQeditor = (function($) {
               {l:'\\tan^{-1}', c:'f'},
               {l:'\\sinh', c:'f'},
               {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'}
+              {l:'\\tanh', c:'f'},
+              {l:'\\pi', nb:1},
+              {s:1},
+              {s:4}
             ]
           }
         ]
@@ -511,11 +517,18 @@ var myMQeditor = (function($) {
           );
         }
       }
+      if (qtype=='numfunc' && calcformat.match(/inequality/)) {
+        baselayout.tabs[3].enabled = true;
+        baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
+      }
     }
     if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
+        if (calcformat.match(/allowdegrees/)) {
+            baselayout.tabs[2].tabcontent[0].contents[13] = {l:'\\degree'};
+        }
       }
     }
     if (qtype.match(/interval/)) {
@@ -524,7 +537,7 @@ var myMQeditor = (function($) {
       } else {
         baselayout.tabs[4].enabled = true;
       }
-    } else if (qtype=='calcmatrix' && !calcformat.match(/matrixsized/)) {
+    } else if (qtype.match(/matrix/) && !calcformat.match(/matrixsized/)) {
       baselayout.tabs[5].enabled = true;
     } else if (calcformat.match(/set/)) {
       baselayout.tabs[0].tabcontent.unshift({
@@ -623,6 +636,23 @@ var myMQeditor = (function($) {
           class: "mqed-tipholder"
         }).append(tipdiv));
       }
+    } else if (rebuild && layoutstyle === 'OSK') {
+      var baseid = mqel.id.substring(8);
+      var textel = $('#'+baseid);
+      if (textel[0].hasAttribute("data-tip")) {
+        var ref = baseid.substr(2).split(/-/)[0];
+        reshrinkeh(mqel.id);
+        showehdd(mqel.id, textel[0].getAttribute("data-tip"), ref);
+      }
+    }
+  }
+
+  function onBlur() {
+    hideeh();
+  }
+  function onResize(el, layoutstyle) {
+    if (layoutstyle === 'OSK') {
+        updateehpos();
     }
   }
 
@@ -639,6 +669,8 @@ var myMQeditor = (function($) {
   return {
     getLayout: getLayout,
     onShow: onShow,
+    onBlur: onBlur,
+    onResize: onResize,
     onTab: onTab
   }
 })(jQuery);
@@ -651,6 +683,8 @@ var myMQeditor = (function($) {
 MQeditor.setConfig({
   getLayout: myMQeditor.getLayout,
   onShow: myMQeditor.onShow,
+  onBlur: myMQeditor.onBlur,
+  onResize: myMQeditor.onResize,
   onTab: myMQeditor.onTab,
   toMQ: AMtoMQ,
   fromMQ: MQtoAM,
@@ -668,7 +702,7 @@ MQ.config({
   charsThatBreakOutOfSupSubVar: "+-(",
   charsThatBreakOutOfSupSubOp: "+-(",
   restrictMismatchedBrackets: true,
-  autoCommands: 'pi theta root sqrt ^oo',
+  autoCommands: 'pi theta root sqrt ^oo degree',
   autoParenOperators: true,
   addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;']},
 });

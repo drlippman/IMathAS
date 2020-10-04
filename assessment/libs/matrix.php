@@ -1279,7 +1279,7 @@ function matrixAbasisForB($A,$B){
 	if(matrixAspansB($A,$B)==false){
 		$retVal = false;
 	}
-	if(matrixIsLinInd($A)==false){
+	if(matrixIsRowsLinInd($A)==false){
 		$retVal = false;
 	}
 	return($retVal);
@@ -1329,6 +1329,7 @@ function matrixDet($A){
 		return ($A[0][0]*$A[1][1] - $A[0][1]*$A[1][0]);
 	}
 	else{
+        $retVal = 0;
 		for($i=0;$i<count($A);$i++){
 			if ($A[0][$i]!=0) {
 				$retVal += pow(-1,$i)*$A[0][$i]*matrixDet(matrixGetMinor($A,0,$i));
@@ -1377,13 +1378,16 @@ function matrixNumberOfColumns($m){
 function matrixParseStuans($stu) {
 	if ($stu === null) {
 		return array(); 
-	} else if (substr($stu,0,2)=='[(') {
-		$ansr = substr($stu,2,-2);
-		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
-		return explode(',',$ansr);
 	} else {
-		return explode('|', $stu);
-	}
+        $start = substr($stu,0,2);
+        if ($start=='[(' || $start=='((' || $start=='|(') {
+            $ansr = substr($stu,2,-2);
+            $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
+            return explode(',',$ansr);
+        } else {
+            return explode('|', $stu);
+        }
+    }
 }
 
 function isMatrix($m) {

@@ -256,7 +256,7 @@ th[aria-sort="ascending"] > *:last-child:after {
 th[aria-sort="descending"] > *:last-child:after {
 	content: "\2193";
 }
-td.c, input.c {
+td.c, th.c, input.c {
 	text-align: center;
 }
 td.r {
@@ -1305,13 +1305,18 @@ a.dropdown-toggle.arrow-down:hover {
   }
 }
 
-.arrow-down::after {
-	content: "\25bc";
+.arrow-down::after, .arrow-up::after {
 	padding-left: 0.2em;
 	font-size:70%;
 	position:relative;
 	top:-.2em;
 	text-decoration: none;
+}
+.arrow-down::after {
+    content: "\25bc";
+}
+.arrow-up::after {
+    content: "\25b2";
 }
 
 .filealt {

@@ -119,8 +119,8 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     			} else {
     				$qnref = ($multi-1).'-'.($qn%1000);
     			}
-    			$shorttip = _('Enter your answer as a matrix, like ((2,3,4),(1,4,5))');
-    			$tip = $shorttip.'<br/>'.formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix');
+    			$shorttip = _('Enter your answer as a matrix');
+    			$tip = $shorttip._(', like [(2,3,4),(1,4,5)]').'<br/>'.formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix');
     			if (!isset($sz)) { $sz = 20;}
 
     			$classes = ['text'];

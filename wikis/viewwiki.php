@@ -224,7 +224,7 @@ if ($cid==0) {
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/viewwiki.js?v=051710"></script>';
+ $placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/viewwiki.js?v=051710"></script>';
  $addr = $GLOBALS['basesiteurl'] . '/wikis/wikirev.php?cid=' . $cid . '&id=' . $id . $framed;
  if ($isgroup) {
 	 $addr .= '&grp='.$groupid;

@@ -799,9 +799,6 @@ foreach ($itemsimporder as $item) {
 	}
 
 }
-if ($editingon) {
-	addBlockItems($itemorder,'0',$tags,$colors,$assess,$names,$itemidref);
-}
 
 $stm = $DBH->prepare("SELECT title,tag,date,id FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid=:courseid ORDER BY title");
 $stm->execute(array(':courseid'=>$cid));
@@ -822,6 +819,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$colors[$k]='';
 	$itemidref[$k] = 'CD'.$row[3];
 	$k++;
+}
+if ($editingon) {
+	addBlockItems($itemorder,'0',$tags,$colors,$assess,$names,$itemidref);
 }
 
 $jsarr = array();

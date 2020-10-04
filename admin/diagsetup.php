@@ -292,7 +292,7 @@ if ($myrights<100 && ($myspecialrights&4)!=4) {
 
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/diag.js\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/diag.js\"></script>\n";
 
  /******* begin html output ********/
 require("../header.php");

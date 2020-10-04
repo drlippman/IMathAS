@@ -344,7 +344,8 @@ export default {
       this.addDirtyTrackers();
       // set work
       this.work = this.questionData.work;
-
+      window.$('#questionwrap' + this.qn).find('.seqsep')
+        .attr('aria-level', store.assessInfo.displaymethod === 'full' ? 3 : 2);
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
           if (el.name.match(/^(qn|tc|qs)\d/)) {

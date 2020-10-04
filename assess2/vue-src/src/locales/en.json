@@ -17,7 +17,10 @@
     "timewarning": "This assessment has a time limit. Once you start the assessment, the timer will not pause for any reason.  Are you sure you are ready to start?",
     "resetmsg": "Teachers: you can reset your attempts on this assessment if desired.",
     "doreset": "Reset",
-    "view_as_stu": "Acting as student: {name}"
+    "view_as_stu": "Acting as student: {name}",
+    "scorelist": "Score List",
+    "itemanalysis": "Item Analysis",
+    "gblinks": "Gradebook Links"
   },
   "closed": {
     "hidden": "This assessment is not currently available.",
@@ -101,7 +104,7 @@
     "regenn": "Version {n} of {nmax}",
     "tries_remaining": "1 try on this question remaining | {n} tries on this question remaining",
     "tries_remaining_range": "{min} to {max} tries remaining depending on the part - see Details",
-    "regens_remaining": "You can Try a Similar Question 1 more time | You can Try a Similar Question {n} more times"
+    "regens_remaining": "You can Get a Similar Question 1 more time | You can Get a Similar Question {n} more times"
   },
   "question": {
     "submit": "Submit Question",
@@ -160,14 +163,14 @@
     "not_practice": "The assessment is not longer in practice mode. Go back and open the assessment again.",
     "timelimit_expired": "Timelimit has expired",
     "timesup_submitting": "Timelimit has expired. Submitting now.",
-    "out_of_regens": "No more Try a Similar Question remain",
+    "out_of_regens": "No more Get a Similar Question remain",
     "need_group": "Cannot start the assessment until you have been added to a group",
     "out_of_attempts": "You have used all your assessment attempts",
     "already_submitted": "Submission rejected. You have submitted this assessment elsewhere since it was displayed here, so the question(s) you were trying to submit may be out of date.",
     "no_active_attempt": "You do not have an active attempt",
     "no_session": "Your login session expired. To continue you will need to log in again.",
     "lti_no_session": "Your session expired. Please go back to your LMS and open the assignment again.",
-    "fast_regen": "Hey, how about slowing down and trying the problem before hitting Try a Similar Question?  Wait 5 seconds before trying again.",
+    "fast_regen": "Hey, how about slowing down and trying the problem before hitting Get a Similar Question?  Wait 5 seconds before trying again.",
     "nochange": "Your answers have not changed since your last submission.",
     "noserver": "The site is not responding",
     "parseerror": "Server sent an invalid response",
@@ -187,7 +190,7 @@
     "retry": "Retry this question",
     "next": "Next question",
     "retryq": "You can retry this question below",
-    "trysimilar": "Try a similar question",
+    "trysimilar": "Get a similar question",
     "scorepts": "{pts} of {poss} pts | {pts} of {poss} pts",
     "scorelast": "Score on last try:",
     "submitted": "Question submitted.",
@@ -196,9 +199,11 @@
   },
   "summary": {
     "no_total": "Your assessment has been submitted.",
+    "viewwork_work": "You can view your work in the gradebook.",
+    "viewwork_work_after": "You can view your work in the gradebook after the due date.",
     "viewwork_immediately": "You can view your work and scores in the gradebook.",
-    "viewwork_after_take": "You can view your work and scores in the gradebook.",
     "viewwork_after_due": "You can view your work and scores in the gradebook after the due date.",
+    "viewwork_work_scores_after": "You can view your work in the gradebook, and scores after the due date.",
     "viewwork_never": "",
     "score": "Score",
     "recordedscore": "Recorded Score",

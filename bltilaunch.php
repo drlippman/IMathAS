@@ -151,7 +151,10 @@ if (isset($_GET['launch'])) {
 		$tzname = '';
 	}
 	$_SESSION['tzoffset'] = $_POST['tzoffset'];
-	$_SESSION['tzname'] = $tzname;
+    $_SESSION['tzname'] = $tzname;
+    if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
+        $_SESSION['static_ok'] = 1;
+    }
 
 	$keyparts = explode('_',$_SESSION['ltikey']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid
@@ -195,7 +198,7 @@ if (isset($_GET['launch'])) {
 	$pref = 0;
 	$flexwidth = true;
 	$nologo = true;
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
 	echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
@@ -363,7 +366,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$flexwidth = true;
 		$nologo = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
@@ -1730,7 +1733,10 @@ if (isset($_GET['launch'])) {
 		$tzname = '';
 	}
 	$_SESSION['tzoffset'] = $_POST['tzoffset'];
-	$_SESSION['tzname'] = $tzname;
+    $_SESSION['tzname'] = $tzname;
+    if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
+        $_SESSION['static_ok'] = 1;
+    }
 
 	$keyparts = explode('_',$_SESSION['ltikey']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid
@@ -1784,7 +1790,7 @@ if (isset($_GET['launch'])) {
 	}*/
 	$flexwidth = true;
 	$nologo = true;
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
 	echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
@@ -1942,7 +1948,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$nologo = true;
 		$flexwidth = true;
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';

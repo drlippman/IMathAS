@@ -83,11 +83,7 @@ if (!empty($changes)) {
 }
 
 // update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true);
-}
+$assess_record->updateLTIscore();
 
 //prep date display
 prepDateDisp($assessInfoOut);

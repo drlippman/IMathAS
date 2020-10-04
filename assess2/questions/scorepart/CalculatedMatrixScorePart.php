@@ -207,18 +207,17 @@ class CalculatedMatrixScorePart implements ScorePart
               $givenanslistvals = matrix_scorer_rref($givenanslistvals, $N);
             }
         }
-
         for ($i=0; $i<count($answerlist); $i++) {
             if (!isset($givenanslistvals[$i]) || isNaN($givenanslistvals[$i])) {
                 $incorrect[$i] = 1;
                 continue;
             } else if (isset($abstolerance)) {
-                if (abs($answerlist[$i] - $givenanslistvals[$i]) > $abstolerance-1E-12) {
+                if (abs($answerlist[$i] - $givenanslistvals[$i]) > $abstolerance+1E-12) {
                     $incorrect[$i] = 1;
                     continue;
                 }
             } else {
-                if (abs($answerlist[$i] - $givenanslistvals[$i])/(abs($answerlist[$i])+.0001) > $reltolerance-1E-12) {
+                if (abs($answerlist[$i] - $givenanslistvals[$i])/(abs($answerlist[$i])+.0001) > $reltolerance+1E-12) {
                     $incorrect[$i] = 1;
                     continue;
                 }

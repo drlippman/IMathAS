@@ -238,10 +238,10 @@ if (isset($_POST['checked'])) { //modifying existing
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						$qrows[$row['id']] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
+						$qrows[$row['id']] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
 					if ($hasother) {
-						$qrows[$row['id']] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
+						$qrows[$row['id']] .= "<img src=\"$staticroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 					}
 				}
 				$qrows[$row['id']] .= '</td>';
@@ -314,10 +314,10 @@ if (isset($_POST['checked'])) { //modifying existing
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						echo "<td><img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/></td>";
+						echo "<td><img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/></td>";
 					}
 					if ($hasother) {
-						echo "<td><img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/></td>";
+						echo "<td><img src=\"$staticroot/img/html_tiny.png\" alt=\"Help Resource\"/></td>";
 					}
 				} else {
 					echo '<td></td>';

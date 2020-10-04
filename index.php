@@ -59,10 +59,10 @@ $placeinhead = '
    }
    #homefullwidth { clear: both;}
   </style>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 if ($myrights>15) {
 	$placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
+  var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
   $(".courselist-teach li[data-cid]:not(.coursegroup)").css("clear","both").each(function (i,el) {
   	var cid = $(el).attr("data-cid");
@@ -670,11 +670,11 @@ function printMessagesGadget() {
 
 }
 function printPostsGadget() {
-	global $DBH,$page_newpostlist, $page_coursenames, $postthreads,$imasroot;
+	global $DBH,$page_newpostlist, $page_coursenames, $postthreads,$imasroot,$staticroot;
 	echo '<div role="complementary" aria-label="'._('New forum posts').'">';
 	echo '<div class="block">';
 	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
-	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"Settings\"/></a></span>";
+	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"Settings\"/></a></span>";
 
 	echo '<h2>', _('New forum posts'), '</h2></div>';
 	echo '<div class="blockitems">';

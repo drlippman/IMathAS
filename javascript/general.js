@@ -407,6 +407,11 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+	} else if (url.match(/assessselect/)) {
+		var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
+		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
+		document.getElementById("GB_caption").innerHTML = btnhtml;
+		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
 		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 		document.getElementById("GB_caption").onclick = GB_hide;
@@ -504,7 +509,7 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-var tinyMCEPreInit = {base: imasroot+"/tinymce4"};
+var tinyMCEPreInit = {base: staticroot+"/tinymce4"};
 function initeditor(edmode,edids,css,inline,setupfunction){
 	var cssmode = css || 0;
 	var inlinemode = inline || 0;
@@ -524,13 +529,17 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		plugins: [
 			"lists advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor snippet",
-			"media table paste asciimath asciisvg rollups colorpicker"
-		],
+			"media table paste rollups colorpicker"
+        ],
+        external_plugins: {
+            "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
+            "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
+        },
 		menubar: false,//"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
-		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
+		content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
 		file_picker_callback: filePickerCallBackFunc,
@@ -549,7 +558,8 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+        snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+        autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
 			items: [
@@ -890,7 +900,7 @@ function togglefileembed() {
 				text: 'Converting HEIC file (this may take a while)...'
 			}).insertAfter(jQuery(this));
 			if (!window.heic2any) {
-				jQuery.getScript(imasroot+'/javascript/heic2any.min.js')
+				jQuery.getScript(staticroot+'/javascript/heic2any.min.js')
 				 .done(function() { convertheic(href, 'fileiframe' + id); });
 			} else {
 				convertheic(href, 'fileiframe' + id);
@@ -1281,11 +1291,11 @@ jQuery(document).ready(function($) {
 				if (e.type=="click" || e.which==13) {
 					if ($(this).attr("aria-expanded") == "true") {
 						$(this).attr("aria-expanded", false);
-						$(this).children("img").attr("src", "../img/expand.gif");
+						$(this).children("img").attr("src", staticroot+"/img/expand.gif");
 						$(this).next(".blockitems").slideUp();
 					} else {
 						$(this).attr("aria-expanded", true);
-						$(this).children("img").attr("src", "../img/collapse.gif");
+						$(this).children("img").attr("src", staticroot+"/img/collapse.gif");
 						$(this).next(".blockitems").slideDown();
 					}
 				}
@@ -1491,174 +1501,169 @@ function setActiveTab(el) {
 }
 
 /* ========================================================================
- * Bootstrap: dropdown.js v3.3.5
- * http://getbootstrap.com/javascript/#dropdowns
+ * Bootstrap: dropdown.js v3.4.1
+ * https://getbootstrap.com/docs/3.4/javascript/#dropdowns
  * ========================================================================
- * Copyright 2011-2015 Twitter, Inc.
+ * Copyright 2011-2019 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
 
 +function ($) {
-  'use strict';
-
-  // DROPDOWN CLASS DEFINITION
-  // =========================
-
-  var backdrop = '.dropdown-backdrop'
-  var toggle   = '[data-toggle="dropdown"]'
-  var Dropdown = function (element) {
-    $(element).on('click.bs.dropdown', this.toggle)
-		var $parent = getParent($(element));
-		$parent.find('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
-  }
-
-  Dropdown.VERSION = '3.3.5'
-
-  function getParent($this) {
-    var selector = $this.attr('data-target')
-
-    if (!selector) {
-      selector = $this.attr('href')
-      selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    'use strict';
+  
+    // DROPDOWN CLASS DEFINITION
+    // =========================
+  
+    var backdrop = '.dropdown-backdrop'
+    var toggle   = '[data-toggle="dropdown"]'
+    var Dropdown = function (element) {
+      $(element).on('click.bs.dropdown', this.toggle)
     }
-
-    var $parent = selector && $(selector)
-
-    return $parent && $parent.length ? $parent : $this.parent()
-  }
-
-  function clearMenus(e) {
-    if (e && e.which === 3) return
-    $(backdrop).remove()
-    $(toggle).each(function () {
-      var $this         = $(this)
-      var $parent       = getParent($this)
-      var relatedTarget = { relatedTarget: this }
-
-      if (!$parent.hasClass('open')) return
-
-      if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
-
-      $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
-
-      if (e.isDefaultPrevented()) return
-
-      $this.attr('aria-expanded', 'false')
-      $parent.removeClass('open').trigger('hidden.bs.dropdown', relatedTarget)
-    })
-  }
-
-  Dropdown.prototype.toggle = function (e) {
-    var $this = $(this)
-
-    if ($this.is('.disabled, :disabled')) return
-
-    var $parent  = getParent($this)
-    var isActive = $parent.hasClass('open')
-
-    clearMenus()
-
-    if (!isActive) {
-      if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
-        // if mobile we use a backdrop because click events don't delegate
-        $(document.createElement('div'))
-          .addClass('dropdown-backdrop')
-          .insertAfter($(this))
-          .on('click', clearMenus)
+  
+    Dropdown.VERSION = '3.4.1'
+  
+    function getParent($this) {
+      var selector = $this.attr('data-target')
+  
+      if (!selector) {
+        selector = $this.attr('href')
+        selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
       }
-
-      var relatedTarget = { relatedTarget: this }
-      $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
-
-      if (e.isDefaultPrevented()) return
-
-      $this
-        .trigger('focus')
-        .attr('aria-expanded', 'true')
-
-      $parent
-        .toggleClass('open')
-        .trigger('shown.bs.dropdown', relatedTarget)
-
+  
+      var $parent = selector !== '#' ? $(document).find(selector) : null
+  
+      return $parent && $parent.length ? $parent : $this.parent()
     }
-
-    return false
-  }
-
-  Dropdown.prototype.keydown = function (e) {
-    if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
-
-    var $this = $(this)
-
-    e.preventDefault()
-    e.stopPropagation()
-
-    if ($this.is('.disabled, :disabled')) return
-
-    var $parent  = getParent($this)
-    var isActive = $parent.hasClass('open')
-
-    if (!isActive && e.which != 27 || isActive && e.which == 27) {
-      if (e.which == 27) $parent.find(toggle).trigger('focus')
-      return $this.trigger('click')
+  
+    function clearMenus(e) {
+      if (e && e.which === 3) return
+      $(backdrop).remove()
+      $(toggle).each(function () {
+        var $this         = $(this)
+        var $parent       = getParent($this)
+        var relatedTarget = { relatedTarget: this }
+  
+        if (!$parent.hasClass('open')) return
+  
+        if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+  
+        $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+  
+        if (e.isDefaultPrevented()) return
+  
+        $this.attr('aria-expanded', 'false')
+        $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
+      })
     }
-
-    var desc = ' li:not(.disabled):visible a'
-    var $items = $parent.find('.dropdown-menu' + desc)
-
-    if (!$items.length) return
-
-    var index = $items.index(e.target)
-
-    if (e.which == 38 && index > 0)                 index--         // up
-    if (e.which == 40 && index < $items.length - 1) index++         // down
-    if (!~index)                                    index = 0
-
-    $items.eq(index).trigger('focus')
-  }
-
-
-  // DROPDOWN PLUGIN DEFINITION
-  // ==========================
-
-  function Plugin(option) {
-    return this.each(function () {
+  
+    Dropdown.prototype.toggle = function (e) {
       var $this = $(this)
-      var data  = $this.data('bs.dropdown')
-
-      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
-      if (typeof option == 'string') data[option].call($this)
-    })
-  }
-
-  var old = $.fn.dropdown
-
-  $.fn.dropdown             = Plugin
-  $.fn.dropdown.Constructor = Dropdown
-
-
-  // DROPDOWN NO CONFLICT
-  // ====================
-
-  $.fn.dropdown.noConflict = function () {
-    $.fn.dropdown = old
-    return this
-  }
-
-
-  // APPLY TO STANDARD DROPDOWN ELEMENTS
-  // ===================================
-
-  $(document)
-    .on('click.bs.dropdown.data-api', clearMenus)
-    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
-    .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
-    .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
-
-	$(function() {
-		$('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
-	});
-
-}(jQuery);
+      if ($this.is('.disabled, :disabled')) return
+  
+      var $parent  = getParent($this)
+      var isActive = $parent.hasClass('open')
+  
+      clearMenus()
+  
+      if (!isActive) {
+        if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+          // if mobile we use a backdrop because click events don't delegate
+          $(document.createElement('div'))
+            .addClass('dropdown-backdrop')
+            .insertAfter($(this))
+            .on('click', clearMenus)
+        }
+  
+        var relatedTarget = { relatedTarget: this }
+        $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+  
+        if (e.isDefaultPrevented()) return
+  
+        $this
+          .trigger('focus')
+          .attr('aria-expanded', 'true')
+  
+        $parent
+          .toggleClass('open')
+          .trigger($.Event('shown.bs.dropdown', relatedTarget))
+      }
+  
+      return false
+    }
+  
+    Dropdown.prototype.keydown = function (e) {
+      if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+  
+      var $this = $(this)
+  
+      e.preventDefault()
+      e.stopPropagation()
+  
+      if ($this.is('.disabled, :disabled')) return
+  
+      var $parent  = getParent($this)
+      var isActive = $parent.hasClass('open')
+  
+      if (!isActive && e.which != 27 || isActive && e.which == 27) {
+        if (e.which == 27) $parent.find(toggle).trigger('focus')
+        return $this.trigger('click')
+      }
+  
+      var desc = ' li:not(.disabled):visible a'
+      var $items = $this.next('.dropdown-menu' + desc);
+      if (!$items.length) {
+        $items = $parent.find('.dropdown-menu' + desc);
+      }
+  
+      if (!$items.length) return
+  
+      var index = $items.index(e.target)
+  
+      if (e.which == 38 && index > 0)                 index--         // up
+      if (e.which == 40 && index < $items.length - 1) index++         // down
+      if (!~index)                                    index = 0
+  
+      $items.eq(index).trigger('focus')
+    }
+  
+  
+    // DROPDOWN PLUGIN DEFINITION
+    // ==========================
+  
+    function Plugin(option) {
+      return this.each(function () {
+        var $this = $(this)
+        var data  = $this.data('bs.dropdown')
+  
+        if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+        if (typeof option == 'string') data[option].call($this)
+      })
+    }
+  
+    var old = $.fn.dropdown
+  
+    $.fn.dropdown             = Plugin
+    $.fn.dropdown.Constructor = Dropdown
+  
+  
+    // DROPDOWN NO CONFLICT
+    // ====================
+  
+    $.fn.dropdown.noConflict = function () {
+      $.fn.dropdown = old
+      return this
+    }
+  
+  
+    // APPLY TO STANDARD DROPDOWN ELEMENTS
+    // ===================================
+  
+    $(document)
+      .on('click.bs.dropdown.data-api', clearMenus)
+      .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+      .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+      .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
+      .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+  
+  }(jQuery);

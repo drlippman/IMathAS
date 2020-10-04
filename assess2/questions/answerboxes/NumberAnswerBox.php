@@ -68,8 +68,26 @@ class NumberAnswerBox implements AnswerBox
     		} else {
     			$leftb = '';
     			$rightb = '';
-    		}
-    		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
+            }
+            if (in_array('units', $ansformats)) {
+                if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
+                    if (in_array('integer',$ansformats)) {
+                        $tip = _('Enter your answer as a list of integers with units, separated with commas. Example: -4 cm, 3 m') . "<br/>";
+    				    $shorttip = _('Enter a list of integers with units');
+                    } else {
+                        $tip = _('Enter your answer as a list of integer or decimal numbers with units, separated with commas. Example: -4.2 cm, 3E6 m') . "<br/>";
+    				    $shorttip = _('Enter a list of integer or decimal numbers with units');
+                    } 
+                } else {
+                    if (in_array('integer',$ansformats)) {
+                        $tip = _('Enter your answer as an integer with units. Examples: -4 cm, 5 m/s^2') . "<br/>";
+    				    $shorttip = _('Enter an integer with units');
+                    } else {
+                        $tip = _('Enter your answer as an integer or decimal number with units. Examples: -4.2 cm, 3E6 m/s^2') . "<br/>";
+    				    $shorttip = _('Enter an integer or decimal number with units');
+                    } 
+                }
+            } else if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
     			if (in_array('integer',$ansformats)) {
     				$tip = _('Enter your answer as a list of integers separated with commas: Example: -4, 3, 2') . "<br/>";
     				$shorttip = _('Enter a list of integers');
@@ -169,7 +187,8 @@ class NumberAnswerBox implements AnswerBox
     			$params['format'] = 'credit';
     			$classes[] = 'textright';
     			$classes[] = 'creditbox';
-    		}
+            }
+            $params['calcformat'] = $answerformat;
 
     		$params['tip'] = $shorttip;
     		$params['longtip'] = $tip;
@@ -186,6 +205,7 @@ class NumberAnswerBox implements AnswerBox
     						'" />' .
     						$rightb;
 
+            $out .= "<span id=p$qn></span>";
     		if ($displayformat=='hidden') {
     			//TODO: What's this for? Maybe virtual manipulatives?
     			$out .= '<script type="text/javascript">imasprevans['.$qstr.'] = "'.$la.'";</script>';

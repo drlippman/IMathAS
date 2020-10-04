@@ -44,20 +44,21 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/assessment/mathtest.css?ver=040520";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $staticroot . "/assessment/mathtest.css?ver=040520";?>" type="text/css"/>
 <?php
 
 if (!empty($CFG['GEN']['uselocaljs'])) {
-	echo '<script src="'.$imasroot.'/javascript/jquery.min.js"></script>';
+	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
 } else {
 	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';
-	echo '<script>window.jQuery || document.write(\'<script src="'.$imasroot.'/javascript/jquery.min.js"><\/script>\')</script>';
+	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
 }
+echo "<script type=\"text/javascript\">imasroot = '$imasroot';staticroot='$staticroot';</script>";
 
 if (isset($CFG['locale'])) {
 	$lang = substr($CFG['locale'],0,2);
 	if (file_exists(rtrim(dirname(__FILE__), '/\\').'/../i18n/locale/'.$lang.'/messages.js')) {
-		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
+		echo '<script type="text/javascript" src="'.$staticroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
 	}
 }
 
@@ -78,13 +79,13 @@ if (isset($_SESSION['coursetheme'])) {
 			$coursetheme = str_replace(array('_fw1000','_fw'),'',$coursetheme);
 		}
 	}
-	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/$coursetheme?v=042217\"/>\n";
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/themes/$coursetheme?v=042217\"/>\n";
 }
-echo '<link rel="stylesheet" href="'.$imasroot.'/handheld.css?v=101817" media="handheld,only screen and (max-width:480px)"/>';
+echo '<link rel="stylesheet" href="'.$staticroot.'/handheld.css?v=101817" media="handheld,only screen and (max-width:480px)"/>';
 if ($isdiag) {
-	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/diag/print.css\" media=\"print\"/>\n";
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/diag/print.css\" media=\"print\"/>\n";
 } else {
-	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\" media=\"print\"/>\n";
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/assessment/print.css\" media=\"print\"/>\n";
 }
 if (isset($CFG['GEN']['favicon'])) {
 	echo '<link rel="shortcut icon" href="'.$CFG['GEN']['favicon'].'" />';
@@ -95,7 +96,7 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $imasroot . '/javascript/assessment_min.js?v=082920" type="text/javascript"></script>';
+echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=092020" type="text/javascript"></script>';
 
 
 //assessment_min.js bundles: general.js, mathjs.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
@@ -122,21 +123,21 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; var mathRenderer = "none"; function rendermathnode(el) {AMprocessNode(el);};</script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
-	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}});
-		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/javascript/mathjax";
+		MathJax.Ajax.config.path["Local"] = "'.$staticroot.'/javascript/mathjax";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
 	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
@@ -145,7 +146,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
 	// removed MathJax fallback since Katex covers pretty much everything now, and MathJax load was slowing display.
 	/*echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}, skipStartupTypeset: true});
@@ -159,15 +160,15 @@ if (!isset($_SESSION['mathdisp'])) {
 		}
 		</script>';*/
 	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
-		echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css" />';
+		echo '<script src="'.$staticroot.'/katex/katex.min.js"></script>';
+		echo '<link rel="stylesheet" href="'.$staticroot.'/katex/katex.min.css" />';
 		//echo '<script type="text/javascript" async src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
 		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">';
 		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>';
 		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
-	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=120118"></script>';
+	echo '<script type="text/javascript" src="'.$staticroot.'/katex/auto-render.js?v=120118"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
 	// re-route MathJax render requests to katex. Allows jsxgraph to work.
 	echo '<script type="text/javascript">
@@ -177,13 +178,13 @@ if (!isset($_SESSION['mathdisp'])) {
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($_SESSION['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=042318\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?v=042318\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;var MathJaxCompatible = false;var mathRenderer = \"img\";function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($_SESSION['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
 }
 if ($_SESSION['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=052520\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=052520\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
@@ -203,16 +204,15 @@ div { zoom: 1; }
 <![endif]-->
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script>
+<script type="text/javascript" src="<?php echo $staticroot;?>/javascript/excanvas_min.js?v=120811"></script>
 <![endif]-->
 
 
 
 <?php
 
-echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $_SESSION['useed']==1) {
-	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce_bundled.min.js?v=051919"></script>';
+	echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=051919"></script>';
 	//echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=082716"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
@@ -230,16 +230,16 @@ if (isset($useeditor) && $_SESSION['useed']==1) {
 	echo '<script type="text/javascript">var usingTinymceEditor = false;</script>';
 }
 if ((isset($useeditor) && $_SESSION['useed']==1) || isset($loadiconfont)) {
-	echo '<link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
-	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$imasroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
+	echo '<link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfont.css?v=013118" type="text/css" />';
+	echo '<!--[if lte IE 7]><link rel="stylesheet" href="'.$staticroot . '/iconfonts/imathasfontie7.css?v=013118" type="text/css" /><![endif]-->';
 }
 if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<script type="text/javascript">var eetype='.$useeqnhelper.'</script>';
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=062216\"></script>";
+	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/eqnhelper.js?v=062216\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
 } else if ($useeqnhelper==3 || $useeqnhelper==4) {
-	echo "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
+	echo "<link rel=\"stylesheet\" href=\"$staticroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
 	if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
 		echo '<!--[if lte IE 7]><style style="text/css">
 			.mathquill-editable.empty { width: 0.5em; }
@@ -250,7 +250,7 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 			</style><![endif]-->';
 	}
 	//This bundles mathquill.js, mathquilled.js, and AMtoMQ.js
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/MQbundle_min.js?v=021920\"></script>";
+	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/MQbundle_min.js?v=021920\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 }
 

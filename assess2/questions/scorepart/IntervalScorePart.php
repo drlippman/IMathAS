@@ -112,7 +112,7 @@ class IntervalScorePart implements ScorePart
                             $optp = trim($optp);
                             if (strtolower($optp)=='var') {continue;}
                             $formatCnt++;
-                            if ($optp=='oo' || $optp=='-oo') {continue;}
+                            if ($optp=='oo' || $optp=='+oo' || $optp=='-oo') {continue;}
                             if (!checkanswerformat($optp,$ansformats)) {
                                 $formatErr++;
                             }

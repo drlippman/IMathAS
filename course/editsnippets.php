@@ -65,7 +65,7 @@ if (isset($_POST['snippets'])) {
 	}
 
 	$useeditor = "noinit";
-	$placeinhead = '<script src="../javascript/jquery-sortable.js"></script>';
+	$placeinhead = '<script src="'.$staticroot.'/javascript/jquery-sortable.js"></script>';
 	$placeinhead .= '<script type="text/javascript">
 	var pageIsDirty = false;
 	$(function() {

@@ -1155,11 +1155,11 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
 		$placeinhead = "<script>var vidAspectRatio = '$vidar'</script>";
-		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js?v=101817"></script>';
+		$placeinhead .= '<script src="'.$staticroot.'/javascript/ytapi.js?v=101817"></script>';
 	}
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead = '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
-		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=102518"></script>';
+		$placeinhead .= '<script src="'.$staticroot.'/javascript/livepoll.js?v=102518"></script>';
 		$livepollroom = $testsettings['id'].'-'.($_SESSION['isteacher'] ? 'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
@@ -1205,7 +1205,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 				if ($userfullname != ' ') {
 					echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
 					echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
-					echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a>";
+					echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"\"/></a>";
 				} else {
 					echo "<a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
 					echo "<span id=\"myname\">".('User Preferences')."</span></a>";
@@ -1225,7 +1225,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		if ($userfullname != ' ') {
 			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
 			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
-			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a></p>";
+			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"\"/></a></p>";
 		} else {
 			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
 			echo "<span id=\"myname\">".('User Preferences')."</span></a></p>";
@@ -1264,7 +1264,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 		if ($userfullname != ' ') {
 			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\" title=\""._('User Preferences')."\" aria-label=\""._('Edit User Preferences')."\">";
 			echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
-			echo "<img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"\"/></a></p>";
+			echo "<img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"\"/></a></p>";
 		} else {
 			echo "<p><a href=\"#\" onclick=\"GB_show('"._('User Preferences')."','$imasroot/admin/ltiuserprefs.php?cid=$cid&greybox=true',800,'auto');return false;\">";
 			echo "<span id=\"myname\">".('User Preferences')."</span></a></p>";
@@ -3362,7 +3362,7 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 	}
 
 	function shownavbar($questions,$scores,$current,$showcat,$extrefs) {
-		global $imasroot,$isteacher,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;
+		global $imasroot,$isteacher,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG,$staticroot;
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
@@ -3421,35 +3421,35 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			}
 			if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
 				if (isset($CFG['TE']['navicons'])) {
-					echo "<img alt=\"" . _("untried") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+					echo "<img alt=\"" . _("untried") . "\" src=\"$staticroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
 				} else {
-				echo "<img alt=\"" - _("untried") . "\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
+				echo "<img alt=\"" - _("untried") . "\" src=\"$staticroot/img/q_fullbox.gif\"/> ";
 				}
 			} else if (canimprove($i) && !$noindivscores) {
 				if (isset($CFG['TE']['navicons'])) {
 					if ($thisscore==0 || $noindivscores) {
-						echo "<img alt=\"" . _("incorrect - can retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+						echo "<img alt=\"" . _("incorrect - can retry") . "\" src=\"$staticroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
 					} else {
-						echo "<img alt=\"" . _("partially correct - can retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+						echo "<img alt=\"" . _("partially correct - can retry") . "\" src=\"$staticroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 					}
 				} else {
-				echo "<img alt=\"" . _("can retry"). "\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
+				echo "<img alt=\"" . _("can retry"). "\" src=\"$staticroot/img/q_halfbox.gif\"/> ";
 				}
 			} else {
 				if (isset($CFG['TE']['navicons'])) {
 					if (!$showeachscore) {
-						echo "<img alt=\"" . _("cannot retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+						echo "<img alt=\"" . _("cannot retry") . "\" src=\"$staticroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 					} else {
 						if ($thisscore == $qi[$questions[$i]]['points']) {
-							echo "<img alt=\"" . _("correct") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+							echo "<img alt=\"" . _("correct") . "\" src=\"$staticroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
 						} else if ($thisscore==0) {
-							echo "<img alt=\"" . _("incorrect - cannot retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+							echo "<img alt=\"" . _("incorrect - cannot retry") . "\" src=\"$staticroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 						} else {
-							echo "<img alt=\"" . _("partially correct - cannot retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+							echo "<img alt=\"" . _("partially correct - cannot retry") . "\" src=\"$staticroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
 						}
 					}
 				} else {
-					echo "<img alt=\"" . _("cannot retry") . "\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
+					echo "<img alt=\"" . _("cannot retry") . "\" src=\"$staticroot/img/q_emptybox.gif\"/> ";
 				}
 			}
 

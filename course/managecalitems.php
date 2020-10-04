@@ -45,10 +45,24 @@ if (isset($_POST['submit'])) {
 		if (trim($_POST['tagnew-'.$newcnt])!='' && (trim($_POST['txtnew-'.$newcnt])!='' || $_POST['tagnew-'.$newcnt] != '!')) {
 			$date = $_POST['datenew-'.$newcnt];
 			preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-			$datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
-			$stm = $DBH->prepare("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES (:courseid, :date, :tag, :title)");
-			$stm->execute(array(':courseid'=>$cid, ':date'=>$datenew, ':tag'=>Sanitize::stripHtmlTags($_POST['tagnew-'.$newcnt]),
-				':title'=>Sanitize::stripHtmlTags($_POST['txtnew-'.$newcnt])));
+            $datenew = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+            $dayofweek = date('w', $datenew);
+            $tag = Sanitize::stripHtmlTags($_POST['tagnew-'.$newcnt]);
+            $title = Sanitize::stripHtmlTags($_POST['txtnew-'.$newcnt]);
+            $qarr = [$cid, $datenew, $tag, $title];
+            if (!empty($_POST['repeat'.$newcnt])) {
+                foreach ($_POST['repeat'.$newcnt] as $daytorepeat) {
+                    $dayoffset = ($daytorepeat - $dayofweek + 7)%7;
+                    for ($i=($dayoffset==0)?1:0;$i<$_POST['repeatN'.$newcnt];$i++) {
+                        $date = strtotime("+$dayoffset days +$i weeks", $datenew);
+                        array_push($qarr, $cid, $date, $tag, $title);
+                    }
+                }
+            }
+            $ph = Sanitize::generateQueryPlaceholdersGrouped($qarr, 4);
+            $stm = $DBH->prepare("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES $ph");
+            $stm->execute($qarr);
+
 		}
 		$newcnt++;
 	}
@@ -65,18 +79,28 @@ if (isset($_POST['submit'])) {
 
 
 //HTML output
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<script type="text/javascript">
 	$(document).on("submit","form",function() {
 		window.onbeforeunload = null;
 		return true;
 	});
-	var nextnewcnt = 1;
+	var nextnewcnt = 0;
 	function addnewevent() {
 		var html = "<tr><td><input type=text size=10 id=\"datenew-"+nextnewcnt+"\" name=\"datenew-"+nextnewcnt+"\"> ";
-		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+		html += "<a href=\"#\" onClick=\"displayDatePicker(\'datenew-"+nextnewcnt+"\', this); return false\"><img src=\"'.$staticroot.'/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 		html += "<td><input name=\"tagnew-"+nextnewcnt+"\" id=\"tagnew-"+nextnewcnt+"\" type=text size=8 /></td>";
-		html += "<td><input name=\"txtnew-"+nextnewcnt+"\" id=\"txtnew-"+nextnewcnt+"\" type=text size=80 /></td></tr>";
+        html += "<td><input name=\"txtnew-"+nextnewcnt+"\" id=\"txtnew-"+nextnewcnt+"\" type=text size=80 />";
+        html += "<button type=\"button\" onclick=\"$(\'#repeat"+nextnewcnt+"\').toggle()\">'._('Repeat').'</button>";
+        html += "<span id=\"repeat"+nextnewcnt+"\" style=\"display:none\"><br/>'._('Repeat every').'"
+          + "<label><input type=\"checkbox\" value=\"1\" name=\"repeat"+nextnewcnt+"[]\">'._('M').'</label> "
+          + "<label><input type=\"checkbox\" value=\"2\" name=\"repeat"+nextnewcnt+"[]\">'._('T').'</label> "
+          + "<label><input type=\"checkbox\" value=\"3\" name=\"repeat"+nextnewcnt+"[]\">'._('W').'</label> "
+          + "<label><input type=\"checkbox\" value=\"4\" name=\"repeat"+nextnewcnt+"[]\">'._('Th').'</label> "
+          + "<label><input type=\"checkbox\" value=\"5\" name=\"repeat"+nextnewcnt+"[]\">'._('F').'</label> "
+          + "<label><input type=\"checkbox\" value=\"6\" name=\"repeat"+nextnewcnt+"[]\">'._('Sa').'</label> "
+          + "<label><input type=\"checkbox\" value=\"0\" name=\"repeat"+nextnewcnt+"[]\">'._('Su').'</label> "
+          + "'._('for').' <input size=2 name=\"repeatN"+nextnewcnt+"\" value=1> '._('weeks').'</span></td></tr>";
 		$("#newEventsTable tbody").append(html);
 		$("#datenew-"+nextnewcnt).val($("#datenew-"+(nextnewcnt-1)).val());
 		$("#tagnew-"+nextnewcnt).val($("#tagnew-"+(nextnewcnt-1)).val());
@@ -95,7 +119,8 @@ $placeinhead .= '<script type="text/javascript">
 			window.onbeforeunload = function() {return unsavedmsg;}
 		}
 	}
-	</script>';
+    </script>
+    <style> td { white-space: nowrap;}</style>';
 require("../header.php");
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -124,7 +149,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$date = tzdate("m/d/Y",$row[1]);
 	echo "<td><input type=text size=10 id=\"date" . Sanitize::onlyInt($row[0]) . "\" name=\"date".Sanitize::onlyInt($row[0])."\" value=\"";
 	echo Sanitize::encodeStringForDisplay($date) . "\" oninput=\"txtchg()\" /> ";
-	echo "<a href=\"#\" onClick=\"displayDatePicker('date".Sanitize::onlyInt($row[0])."', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+	echo "<a href=\"#\" onClick=\"displayDatePicker('date".Sanitize::onlyInt($row[0])."', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 	$cnt++;
 	echo '<td><input name="tag['.Sanitize::onlyInt($row[0]).']" type=text size=8 value="'.Sanitize::encodeStringForDisplay($row[3]).'" oninput="txtchg()" /></td>';
 	echo '<td><input name="txt['.Sanitize::onlyInt($row[0]).']" type=text size=80 value="'.Sanitize::encodeStringForDisplay($row[2]).'" oninput="txtchg()" /></td>';
@@ -139,7 +164,7 @@ echo '<table class="gb" id="newEventsTable">
 </thead>
 <tbody>';
 $now = time();
-echo '<tr>';
+/*echo '<tr>';
 //echo '<td></td>';
 if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$_GET['addto']);
@@ -149,16 +174,16 @@ if (isset($_GET['addto'])) {
 	$date = tzdate("m/d/Y",$now);
 }
 echo "<td><input type=text size=10 id=\"datenew-0\" name=\"datenew-0\" value=\"$date\" oninput=\"txtchg()\"/> ";
-echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a></td>";
+echo "<a href=\"#\" onClick=\"displayDatePicker('datenew-0', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></a></td>";
 $cnt++;
 echo '<td><input name="tagnew-0" id="tagnew-0" type=text size=8 value="!" oninput="txtchg()" /></td>';
 echo '<td><input name="txtnew-0" id="txtnew-0" type=text size=80 value="" oninput="txtchg()" /></td>';
 echo '<tr/>';
-
+*/
 ?>
 </thead>
 </table>
-<button type="button" onclick="addnewevent()"><?php echo _('Add another') ?></button>
+<button type="button" onclick="addnewevent()"><?php echo _('Add Event') ?></button>
 <button type="submit" name="submit" value="Save"><?php echo _('Save Changes') ?></button>
 </form>
 

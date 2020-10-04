@@ -184,8 +184,8 @@ if (!(isset($teacherid))) {
 
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
-		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$gropuid));
+		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];

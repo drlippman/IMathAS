@@ -134,7 +134,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <p><button type=button @click="loadGroup()">List my group members</button>
 	or lookup a teacher: <input v-model="toLookup" size=30>
 	<button type=button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
-	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="../img/updating.gif"></span>
+	<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
 </p>
 <p>
 	<button type=submit :disabled="selectedTeacher == 0">Transfer</button>

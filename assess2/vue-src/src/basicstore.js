@@ -557,6 +557,7 @@ export const actions = {
               window.$(el).find('.scoreresult').focus();
             } else {
               el = window.$('#questionwrap' + qns[0]).find('.seqsep').last().next()[0];
+              window.$('#questionwrap' + qns[0]).find('.seqsep').last().focus();
             }
             var bounding = el.getBoundingClientRect();
             if (bounding.top < 0 || bounding.bottom > document.documentElement.clientHeight) {
@@ -1246,6 +1247,51 @@ export const actions = {
         store.timelimit_restricted = 1;
       } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
         store.timelimit_restricted = 2;
+      }
+    }
+    if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')) {
+      // map and override previous interquestion_text, if map defined
+      let lasttext = -1;
+      const origtexts = data.interquestion_text;
+      const newtexts = [];
+      for (const i in data.questions) {
+        if (data.questions[i].hasOwnProperty('text')) {
+          const thistext = data.questions[i].text;
+          if (JSON.stringify(thistext) === JSON.stringify(lasttext)) { // same one
+            for (let j = 0; j < thistext.length; j++) {
+              newtexts[newtexts.length - 1 - j].displayUntil = i;
+            }
+          } else {
+            for (let j = 0; j < thistext.length; j++) {
+              newtexts.push(Object.assign({ orig: 1e5 }, origtexts[thistext[j]]));
+              newtexts[newtexts.length - 1].displayBefore = i;
+              newtexts[newtexts.length - 1].displayUntil = i;
+            }
+            lasttext = thistext.slice();
+          }
+        } else {
+          lasttext = -1;
+        }
+      }
+      for (const i in origtexts) {
+        if (origtexts[i].hasOwnProperty('displayBefore')) {
+          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
+        }
+        if (origtexts[i].hasOwnProperty('atend')) {
+          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
+          newtexts[newtexts.length - 1].displayBefore = data.questions.length;
+          newtexts[newtexts.length - 1].displayUntil = data.questions.length;
+        }
+      }
+      if (newtexts.length > 0) {
+        newtexts.sort(function (a, b) {
+          if (parseInt(a.displayBefore) === parseInt(b.displayBefore)) {
+            return (a.orig - b.orig);
+          } else {
+            return a.displayBefore - b.displayBefore;
+          }
+        });
+        data.interquestion_text = newtexts;
       }
     }
     if (data.hasOwnProperty('interquestion_text')) {

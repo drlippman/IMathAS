@@ -340,8 +340,8 @@
 		}
 	}
 
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=112519\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=112519\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {
@@ -390,7 +390,7 @@
 		 	padding-top: .5em;
 		 }
 		 </style>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051720"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051720"></script>';
 	$useeditor = "noinit";
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
@@ -450,8 +450,8 @@
 		}
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
-		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$gropuid));
+		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -497,7 +497,7 @@
 
 <span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
 <input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo Sanitize::encodeStringForDisplay($sdate);?>">
-<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
+<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringForDisplay($stime);?>"></span><BR class=form>
 
 <?php
@@ -644,7 +644,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
 		}
 		if ($hassection) {
-			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+			echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 		}
 		if ($_GET['grades']=='all') {
 			echo '<button type="button" id="useqa" onclick="togglequickadd(this)">'._("Use Quicksearch Entry").'</button>';

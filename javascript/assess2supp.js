@@ -206,7 +206,7 @@ function disableInputs(qn, disabled) {
         help.descr = help.descr.replace(/"/g,'&quot;').replace(/'/g,'&#039;');
         out += ' title="'+help.descr+'"';
         out += ' aria-label="'+title+' '+help.descr+'"';
-       }
+     }
        out += '>' + icon + ' ' + title + '</a></li>';
      }
      out += '</ul>';

@@ -25,11 +25,11 @@ END;
 	}
 	if (isset($coursetheme)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
-		echo '<link rel="stylesheet" href="'."$imasroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
+		echo '<link rel="stylesheet" href="'."$staticroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
 	}
 	echo <<<END
-<link rel="stylesheet" href="$imasroot/course/libtree.css" type="text/css" />
-<script type="text/javascript" src="$imasroot/javascript/libtree.js"></script>
+<link rel="stylesheet" href="$staticroot/course/libtree.css" type="text/css" />
+<script type="text/javascript" src="$staticroot/javascript/libtree.js"></script>
 END;
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		echo <<<END

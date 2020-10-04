@@ -4,23 +4,35 @@
 
 require("../init.php");
 
-if (!isset($_GET['libitemid']) || $myrights<20) {
+if ((!isset($_REQUEST['libitemid']) && !isset($_REQUEST['libitemids'])) || $myrights<20) {
 	exit;
 }
 
-$ischanged = false;
+$ischanged = [];
 $now = time();
 
-$stm = $DBH->prepare("UPDATE imas_library_items SET junkflag=:junkflag,lastmoddate=:lastmoddate WHERE id=:id");
-$stm->execute(array(':junkflag'=>$_GET['flag'], ':lastmoddate'=>$now, ':id'=>$_GET['libitemid']));
-if ($stm->rowCount()>0) {
-	$ischanged = true;
+if (isset($_REQUEST['libitemid'])) {
+    $libitemids = [$_REQUEST['libitemid']];
+    $flags = [$_REQUEST['flag']];
+} else {
+    $libitemids = explode(',', $_REQUEST['libitemids']);
+    $flags = explode(',', $_REQUEST['flags']);
 }
 
-if ($ischanged) {
-	echo "OK";
+for ($i=0; $i<count($libitemids); $i++) {
+    $stm = $DBH->prepare("UPDATE imas_library_items SET junkflag=:junkflag,lastmoddate=:lastmoddate WHERE id=:id");
+    $stm->execute(array(':junkflag'=>$flags[$i], ':lastmoddate'=>$now, ':id'=>$libitemids[$i]));
+    if ($stm->rowCount()>0) {
+        $ischanged[$i] = 'OK';
+    } else {
+        $ischanged[$i] = 'Error';
+    }
+}
+
+if (isset($_REQUEST['libitemid'])) {
+	echo $ischanged[0];
 } else {
-	echo "Error";
+	echo implode(',', $ischanged);
 }
 
 

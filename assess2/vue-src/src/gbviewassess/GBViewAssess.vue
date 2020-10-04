@@ -232,6 +232,7 @@
               />
               <gb-showwork
                 :work = "qdata[curQver[qn]].work"
+                :worktime = "qdata[curQver[qn]].worktime"
               />
             </div>
             <gb-score-details

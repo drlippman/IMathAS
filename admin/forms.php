@@ -8,8 +8,8 @@ if (isset($CFG['hooks']['admin/forms'])) {
 	require($CFG['hooks']['admin/forms']);
 }
 
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 //call hook, if defined
 if (function_exists('getHeaderCode')) {
@@ -259,7 +259,7 @@ switch($_GET['action']) {
 			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
 		}
 
-		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
+		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
 		echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
 		echo "> Guest User <BR>\n";
@@ -439,7 +439,7 @@ switch($_GET['action']) {
 			if (isset($enablebasiclti) && $enablebasiclti==true) {
 				//Start grouping: LMS Integration
 				echo '<div class="block grouptoggle">';
-				echo '<img class="mida" src="../img/expand.gif" /> ';
+				echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 				echo 'LMS Integration (LTI)';
 				echo '</div>';
 				echo '<div class="blockitems hidden">';
@@ -770,7 +770,7 @@ switch($_GET['action']) {
 				echo '</label></span><br class=form>';
 			}
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 			echo _('Course Copy Options');
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -786,6 +786,9 @@ switch($_GET['action']) {
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
 			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyallcalitems>'._('Copy all calendar items?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyallcalitems" id="copyallcalitems" value="1"/>';
+			echo '</span><br class=form>';
 			echo '</div>';
 
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
@@ -796,7 +799,7 @@ switch($_GET['action']) {
 		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 		echo _('Availability and Access');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
@@ -839,10 +842,10 @@ switch($_GET['action']) {
 		}
 		echo 'Start: <input type=text size=10 name="sdate" value="'.$sdate.'">
 			<a href="#" onClick="displayDatePicker(\'sdate\', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
 		echo 'End: <input type=text size=10 name="edate" value="'.$edate.'">
 			<a href="#" onClick="displayDatePicker(\'edate\', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
 		echo '</span><br class=form />';
 
 		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
@@ -885,7 +888,7 @@ switch($_GET['action']) {
 		if (isset($enablebasiclti) && $enablebasiclti==true) {
 			//Start grouping: LMS Integration
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 			echo 'LMS Integration (LTI)';
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -940,7 +943,7 @@ switch($_GET['action']) {
 
 		//Start grouping: Additional Options
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 		echo _('Additional Options');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';

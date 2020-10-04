@@ -1904,7 +1904,11 @@ var saneKeyboardEvents = (function() {
     		} else if (keyVal && keyVal !== 'Spacebar') {
     		  handleKey();
     		  usedkeydown = true;
-    		}
+    		} else if (which === 191 && !e.shiftKey) {
+              e.preventDefault(); // prevent FireFox quicksearch
+              e.which = 47; // what keypress expects for /
+              onKeypress(e);
+            }
       } else {
       	handleKey();
       }
@@ -4860,7 +4864,8 @@ var SupSub = P(MathCommand, function(_, super_) {
       if (cursor[L] && !cursor[R] && !cursor.selection
           && this.parent[L] instanceof Variable
       ) {
-          if ((this.parent[L].isItalic !== false && this.parent[L].letter !== 'e'
+          if ((this.parent[L].isItalic !== false && this.parent[L].letter !== 'e' 
+            && !cursor[L].isPartOfOperator
             && cursor.options.charsThatBreakOutOfSupSubVar.indexOf(ch) > -1)
             || (this.parent[L].isPartOfOperator
             && cursor.options.charsThatBreakOutOfSupSubOp.indexOf(ch) > -1)

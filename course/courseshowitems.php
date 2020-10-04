@@ -76,7 +76,7 @@ if (! isset ( $CFG ['CPS'] ['itemicons'] )) {
  *
  */
 function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
-	global $imasroot, $itemicons;
+	global $imasroot, $itemicons, $staticroot;
 	$out = '<div class="itemhdricon"';
 	if ($scoremsg != '') {
 		$out .= ' data-tip="'. Sanitize::encodeStringForDisplay($scoremsg) . '"';
@@ -87,7 +87,7 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 	if ($faded) {
 		$class = 'class="faded"';
 	}
-	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $imasroot . '/img/' . $itemicons [$type] . '"/>';
+	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $staticroot . '/img/' . $itemicons[$type] . '"/>';
 	if ($status>-1) {
 		switch ($status) {
 			case 0: $icon = 'emptycircle'; break;
@@ -96,16 +96,16 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 		}
 		$class = $faded?' faded':'';
 		$out .= '<img alt="' . Sanitize::encodeStringForDisplay($scoremsg) . '" ';
-		$out .= 'src="' . $imasroot . '/img/' . $icon . '.png" class="circoverlay'. $class . '" />';
+		$out .= 'src="' . $staticroot . '/img/' . $icon . '.png" class="circoverlay'. $class . '" />';
 	}
 	$out .= '</div>';
 	return $out;
 }
 function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name) {
-	global $cid;
+	global $cid,$staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
 	if ($blocktype == 'T') {
@@ -123,10 +123,10 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name) {
 	return $out;
 }
 function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name) {
-	global $cid;
+	global $cid,$staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
@@ -145,10 +145,10 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name)
 	return $out;
 }
 function getDrillDD($i, $typeid, $parent, $itemid, $name) {
-	global $cid;
+	global $cid, $staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -162,10 +162,10 @@ function getDrillDD($i, $typeid, $parent, $itemid, $name) {
 	return $out;
 }
 function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true, $name) {
-	global $cid;
+	global $cid, $staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"add$typename.php?id=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -201,7 +201,7 @@ $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset;
-	   global $itemshowdata, $exceptionfuncs,$coursejsondata, $excused;
+	   global $itemshowdata, $exceptionfuncs,$coursejsondata, $excused,$staticroot;
 
 	   require_once("../includes/filehandler.php");
 
@@ -313,7 +313,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					} else {
 						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 					}
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['folder']}\"></a>";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
 					echo '</div>';
 
 					echo "<div class=title>";
@@ -358,7 +358,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					if (!$ispublic) {
 						echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 					}
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['foldertree']}\">";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\">";
 					if (!$ispublic) {
 						echo "</a>";
 					}
@@ -404,7 +404,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo '<div class="itemhdr">';
 
 					echo '<div class="itemhdricon">';
-					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$staticroot/img/";
 					if ($isopen) {echo 'collapse';} else {echo 'expand';}
 					echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"/>';
@@ -503,7 +503,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo '<div class="itemhdricon">';
 					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['folder']}\"></a>";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
 					echo '</div>';
 
 					echo "<div class=title>";
@@ -541,7 +541,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo '<div class="itemhdricon">';
 					echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['foldertree']}\"></a>";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\"></a>";
 					echo '</div>';
 
 					echo "<div class=title>";
@@ -585,7 +585,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo '<div class="itemhdr">';
 
 					echo '<div class="itemhdricon">';
-					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$staticroot/img/";
 					if ($isopen) {echo 'collapse';} else {echo 'expand';}
 					echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"/>';
@@ -677,7 +677,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   */
 				echo '<div class="floatright dropdown">';
 				echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-				echo ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+				echo ' <img src="'.$staticroot.'/img/gearsdd.png" alt="Options" class="mida"/>';
 				echo '</a>';
 				echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 				echo " <li><a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">", _('Delete'), "</a></li>";
@@ -1840,7 +1840,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
    }
 
    function generateadditem($blk,$tb) {
-   	global $cid, $CFG,$imasroot,$addassess;
+   	global $cid, $CFG,$imasroot,$addassess,$staticroot;
 
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
@@ -1857,7 +1857,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 		$html .= "<a href=\"$addassess?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
-			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
 		}
 		$html .= _('Assessment') ."</a> | ";
 
@@ -1870,43 +1870,43 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 		$html .= "<a href=\"addinlinetext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['inline'])) {
-			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
 		}
 		$html .= _('Text') . "</a> | ";
 
 		$html .= "<a href=\"addlinkedtext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['linked'])) {
-			$html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+			$html .= "<img alt=\"linked text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
 		}
 		$html .= _('Link') . "</a> | ";
 
 		$html .= "<a href=\"addforum.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['forum'])) {
-			$html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+			$html .= "<img alt=\"forum\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
 		}
 		$html .= _('Forum') . "</a> | ";
 
 		$html .= "<a href=\"addwiki.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['wiki'])) {
-			$html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
+			$html .= "<img alt=\"wiki\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
 		}
 		$html .= _('Wiki') . "</a> | ";
 
 		$html .= "<a href=\"adddrillassess.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['drill'])) {
-			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
+			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
 		}
 		$html .= _('Drill') . "</a> | ";
 
 		$html .= "<a href=\"addblock.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
-			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
 		}
 		$html .= _('Block') . "</a> | ";
 
 		$html .= "<a href=\"addcalendar.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['calendar'])) {
-			$html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+			$html .= "<img alt=\"calendar\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
 		}
 		$html .= _('Calendar') . "</a>";
 		$html .= '</span>';
@@ -2014,7 +2014,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
 	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$exceptions,$latepasses,$CFG;
-	   global $itemtypes, $iteminfo, $addassess;
+	   global $itemtypes, $iteminfo, $addassess, $staticroot;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {
 		   $itemtypes = array();  $iteminfo = array();
@@ -2108,7 +2108,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			if (!isset($CFG['CPS']['miniicons']['folder'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">B</span>';
 			} else {
-				$icon = '<img alt="folder" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
+				$icon = '<img alt="folder" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
 			}
 			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.Sanitize::encodeStringForDisplay($items[$i]['id']).'">'.$icon;
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
@@ -2138,7 +2138,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		        if (!isset($CFG['CPS']['miniicons']['calendar'])) {
 				$icon  = '<span class=icon style="background-color:#0f0;">C</span>';
 			} else {
-				$icon = '<img alt="calendar" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
+				$icon = '<img alt="calendar" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
 			}
 			echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon.'Calendar</li>';
 
@@ -2170,7 +2170,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			 if (!isset($CFG['CPS']['miniicons']['assess'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">?</span>';
 			} else {
-				$icon = '<img alt="assessment" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
+				$icon = '<img alt="assessment" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
 			}
 			echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2245,7 +2245,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   if (!isset($CFG['CPS']['miniicons']['inline'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
 			   } else {
-				$icon = '<img alt="text" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
+				$icon = '<img alt="text" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2292,7 +2292,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   if (!isset($CFG['CPS']['miniicons']['linked'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
 			   } else {
-				$icon = '<img alt="link" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
+				$icon = '<img alt="link" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2339,7 +2339,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		           if (!isset($CFG['CPS']['miniicons']['forum'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
 			   } else {
-				$icon = '<img alt="forum" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
+				$icon = '<img alt="forum" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2386,7 +2386,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		           if (!isset($CFG['CPS']['miniicons']['wiki'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">W</span>';
 			   } else {
-				$icon = '<img alt="wiki"  src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
+				$icon = '<img alt="wiki"  src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2433,7 +2433,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		           if (!isset($CFG['CPS']['miniicons']['drill'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">D</span>';
 			   } else {
-				$icon = '<img alt="wiki"  src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['drill'].'" class="mida icon" /> ';
+				$icon = '<img alt="wiki"  src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['drill'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {

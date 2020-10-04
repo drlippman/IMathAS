@@ -173,7 +173,7 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 require("../header.php");
 
@@ -202,7 +202,7 @@ if ($overwriteBody==1) {
 		<span class=formright>
 			<input type=text size=10 name="sdate" value="<?php echo $sdate ?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/>
 			</a>
 		</span><br class=form>
 		<div class=submit><input type=submit value="Change Dates"></div>

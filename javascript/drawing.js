@@ -60,7 +60,8 @@
    	10.2: linear < or >
 	10.3: quadratic <= or =>
 	10.4: quadratic < or >
-
+    10.5: abs < or >
+    10.6: abs <= or >=
 */
 
 var canvases = new Array();
@@ -214,8 +215,12 @@ function addA11yTarget(canvdata, thisdrawla) {
 				{"mode":10.2, "descr":_("Linear inequality with dashed line"), inN: 3, "input":_("Enter 2 points on the line, then a third point in the shaded region")}
 			],
 			"parab": [
-				{"mode":10.3, "descr":_("Parabolic inequality with solid line"), inN: 3, "input":_("Enter 2 points on the line, then a third point in the shaded region")},
-				{"mode":10.4, "descr":_("Parabolic inequality with dashed line"), inN: 3, "input":_("Enter 2 points on the line, then a third point in the shaded region")}
+				{"mode":10.3, "descr":_("Parabolic inequality with solid line"), inN: 3, "input":_("Enter the vertex, then another point on the parabola, then a third point in the shaded region")},
+				{"mode":10.4, "descr":_("Parabolic inequality with dashed line"), inN: 3, "input":_("Enter the vertex, then another point on the parabola, then a third point in the shaded region")}
+            ],
+            "abs": [
+				{"mode":10.5, "descr":_("Absolute value inequality with solid line"), inN: 3, "input":_("Enter the corner point of the absolute value, then another point on the graph, then a third point in the shaded region")},
+				{"mode":10.6, "descr":_("Absolute value inequality with dashed line"), inN: 3, "input":_("Enter the corner point of the absolute value, then another point on the graph, then a third point in the shaded region")}
 			]
 		},
 		"twopoint": {
@@ -649,9 +654,29 @@ function drawTarget(x,y) {
 						ctx.closePath();
 					}
 				}
-			} else {//quadratic inequality shading
+			} else if (ineqtypes[curTarget][i] <= 10.4) {//quadratic inequality shading
 				shadeParabola(ctx,ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],x2,y2,x3,y3,targets[curTarget].imgwidth,targets[curTarget].imgheight);
-			}
+			} else { //abs inequality shading
+                if (Math.abs(x2-ineqlines[curTarget][i][0][0])>1) { // only draw if not vertical
+                    var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
+                    if (x2<ineqlines[curTarget][i][0][0]) {  //want slope on right
+						slope *= -1;
+                    }
+                    var yb = slope*Math.abs(x3 - ineqlines[curTarget][i][0][0]) + ineqlines[curTarget][i][0][1];
+                    var yleft = ineqlines[curTarget][i][0][1] + slope*ineqlines[curTarget][i][0][0];
+					var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
+                    if (y3 > yb) { //shade above
+                        ctx.moveTo(targets[curTarget].imgwidth,targets[curTarget].imgheight);
+                        ctx.lineTo(0,targets[curTarget].imgheight);
+                    } else {
+                        ctx.moveTo(targets[curTarget].imgwidth,0);
+                        ctx.lineTo(0,0);
+                    }
+                    ctx.lineTo(0,yleft);
+					ctx.lineTo(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1]);
+					ctx.lineTo(targets[curTarget].imgwidth,yright);
+                }
+            }
 			ctx.fill();
 			ctx.restore();
 		}
@@ -696,8 +721,7 @@ function drawTarget(x,y) {
 						ctx.stroke();
 					}
 				}
-			}
-			else{//quadratic inequalities
+			} else if (ineqtypes[curTarget][i] <= 10.4) {//quadratic inequality shading
 				if (ineqtypes[curTarget][i]==10.3) {//solid parabola
 					if (x2 != ineqlines[curTarget][i][0][0]) {
 						if (y2==ineqlines[curTarget][i][0][1]) {
@@ -731,20 +755,46 @@ function drawTarget(x,y) {
 						dashedParabola(ctx,ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],x2,y2,targets[curTarget].imgwidth,targets[curTarget].imgheight);
 					}
 				}
-			}
+			} else { //abs ineq
+                if (x2!=ineqlines[curTarget][i][0][0]) {
+                    var slope = (y2 - ineqlines[curTarget][i][0][1])/(x2-ineqlines[curTarget][i][0][0]);
+                    if (x2<ineqlines[curTarget][i][0][0]) {  //want slope on right
+						slope *= -1;
+                    }
+                    var yleft = ineqlines[curTarget][i][0][1] + slope*ineqlines[curTarget][i][0][0];
+					var yright = ineqlines[curTarget][i][0][1] + slope*(targets[curTarget].imgwidth-ineqlines[curTarget][i][0][0]);
+
+					if (ineqtypes[curTarget][i]==10.6) {
+						if (dragObj != null && dragObj.mode>=10 && dragObj.mode<11 && dragObj.num==i && dragObj.subnum==0) {
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],targets[curTarget].imgwidth,yright);
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],0,yleft);
+						} else {
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],targets[curTarget].imgwidth,yright);
+							ctx.dashedLine(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],0,yleft);
+						}
+					} else {
+                        ctx.moveTo(0,yleft);
+                        ctx.lineTo(ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1]);
+						ctx.lineTo(targets[curTarget].imgwidth,yright);
+						ctx.stroke();
+					}
+                }
+            }
 		}
-		ctx.beginPath();
-		for (var j=0; j<ineqlines[curTarget][i].length; j++) {
-			if (j==2) {
-				ctx.arc(ineqlines[curTarget][i][j][0],ineqlines[curTarget][i][j][1],4,0,Math.PI*2,true);
-				ctx.fill();
-			} else {
-				ctx.fillRect(ineqlines[curTarget][i][j][0]-3,ineqlines[curTarget][i][j][1]-3,6,6);
-			}
-		}
-		if (ineqlines[curTarget][i].length==1 && x2!=null) {
-			ctx.fillRect(x2-3,y2-3,6,6);
-		}
+        if (ineqtypes[curTarget][i] == targets[curTarget].mode) {
+            ctx.beginPath();
+            for (var j=0; j<ineqlines[curTarget][i].length; j++) {
+                if (j==2) {
+                    ctx.arc(ineqlines[curTarget][i][j][0],ineqlines[curTarget][i][j][1],4,0,Math.PI*2,true);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(ineqlines[curTarget][i][j][0]-3,ineqlines[curTarget][i][j][1]-3,6,6);
+                }
+            }
+            if (ineqlines[curTarget][i].length==1 && x2!=null) {
+                ctx.fillRect(x2-3,y2-3,6,6);
+            }
+        }
 		ctx.beginPath();
 	}
 	ctx.fillStyle = "rgb(0,0,255)";
@@ -2263,7 +2313,7 @@ function setCursor(cursor, target) {
 		if (cursor=='move') {
 			targets[target].el.style.cursor = cursor;
 		} else {
-			targets[target].el.style.cursor = 'url('+imasroot+'/img/'+cursor+'.cur), auto';
+			targets[target].el.style.cursor = 'url('+staticroot+'/img/'+cursor+'.cur), auto';
 		}
 		targets[target].cursor = cursor;
 	}

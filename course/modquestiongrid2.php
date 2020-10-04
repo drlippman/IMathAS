@@ -250,10 +250,10 @@ if (isset($_POST['checked'])) { //modifying existing
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						$qrows[$row['id']] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
+						$qrows[$row['id']] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
 					if ($hasother) {
-						$qrows[$row['id']] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
+						$qrows[$row['id']] .= "<img src=\"$staticroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 					}
 				}
 				$qrows[$row['id']] .= '</td>';
@@ -306,7 +306,10 @@ if (isset($_POST['checked'])) { //modifying existing
 
 			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 
-		} else { //adding new questions
+        } else { //adding new questions
+			if (isset($_GET['toaddqs'])) {
+                $_POST['nchecked'] = explode('-', $_GET['toaddqs']);
+            }
 			echo "<th>"._("Description")."</th><th></th><th></th>";
 			echo '<th>'._('Points').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['defpoints']).'</i></th>';
 			echo '<th>'._('Tries').'<br/><i class="grey">'._('Default:').' '.Sanitize::encodeStringForDisplay($defaults['defattempts']).'</i></th>';
@@ -337,10 +340,10 @@ if (isset($_POST['checked'])) { //modifying existing
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						echo "<td><img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/></td>";
+						echo "<td><img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/></td>";
 					}
 					if ($hasother) {
-						echo "<td><img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/></td>";
+						echo "<td><img src=\"$staticroot/img/html_tiny.png\" alt=\"Help Resource\"/></td>";
 					}
 				} else {
 					echo '<td></td>';

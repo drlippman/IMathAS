@@ -493,7 +493,7 @@ if ($myrights<20) {
 
 	} else { //DEFAULT PROCESSING HERE
 		$pagetitle = "Library Management";
-		$helpicon = "&nbsp;&nbsp; <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=managelibraries','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>";
+		$helpicon = "&nbsp;&nbsp; <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=managelibraries','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>";
 		$curBreadcrumb .= " &gt; Manage Libraries ";
 		if ($isadmin) {
 			$page_AdminModeMsg = "You are in Admin mode, which means actions will apply to all libraries, regardless of owner";
@@ -543,8 +543,8 @@ if ($myrights<20) {
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/libtree.js\"></script>\n";
-$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/libtree.js\"></script>\n";
+$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$staticroot/course/libtree.css\");\n-->\n</style>\n";
 /******* begin html output ********/
 require("../header.php");
 

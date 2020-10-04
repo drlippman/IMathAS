@@ -6,6 +6,9 @@
       >
         {{ btnLabel }}
       </button>
+      <span class="small" v-if="show && worktime !== '0'">
+        {{ $t('gradebook.lastchange')}} {{ worktime }}
+      </span>
     </div>
     <transition name="fade">
       <div class="introtext" ref="workbox" v-show="show" v-html="work" />
@@ -16,7 +19,7 @@
 <script>
 export default {
   name: 'GbShowwork',
-  props: ['work'],
+  props: ['work', 'worktime'],
   data: function () {
     return {
       show: false,
