@@ -1012,6 +1012,7 @@ class QuestionHtmlGenerator
             $showanswer = $this->fixDegrees($showanswer);
         } else if (isset($showanswer)) {
             foreach ($showanswer as $k=>$v) {
+                if ($v === null) {continue;}
                 $showanswer[$k] = $this->fixDegrees($v);
             }
         }
@@ -1019,6 +1020,7 @@ class QuestionHtmlGenerator
             $shanspt = $this->fixDegrees($shanspt);
         } else {
             foreach ($shanspt as $k=>$v) {
+                if ($v === null) {continue;}
                 $shanspt[$k] = $this->fixDegrees($v);
             }
         }
@@ -1249,8 +1251,9 @@ class QuestionHtmlGenerator
         $this->errors[] = $errorMessage;
     }
 
-    private function fixDegrees(string $str): string 
+    private function fixDegrees($str): string 
     {
+        if ($str === null) { return ''; }
         return preg_replace_callback('/`(.*?)`/s', function($m) {
             return '`' . str_replace(['degrees','degree'],'^@', $m[1]).'`';
         }, $str);

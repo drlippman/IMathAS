@@ -27,7 +27,7 @@ $(function() {
 function parseAdvSearch() {
     var search = document.getElementById("search").value;
     var matches;
-    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/g)) {
+    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/g)) {
         var pts;
         for (var i=0;i<matches.length;i++) {
             pts = matches[i].split(/:/);
@@ -46,10 +46,15 @@ function parseAdvSearch() {
                 $("#search-mine").prop('checked', pts[1] == 1)
             } else if (pts[0] == 'unused') {
                 $("#search-unused").prop('checked', pts[1] == 1)
+            } else if (pts[0] == 'res') {
+                var helps = pts[1].split(/,/);
+                for (var j=0; j<helps.length;j++) {
+                    $("#search-res-"+helps[j]).prop('checked', true);
+                }
             }
         }
     }
-    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/g, '');
+    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/g, '');
     var words = search.split(/\s+/);
     var haswords = [];
     var excwords = [];
@@ -99,6 +104,16 @@ function doAdvSearch() {
     if ($("#search-unused").is(':checked')) {
         outstr += 'unused:1 ';
     }
+    var helps = [];
+    $("input[id^=search-res-]:checked").each(function(i,el) {
+        helps.push(el.value);
+    });
+    if (helps.length>1) {
+        outstr += 'res:"'+helps.join(',')+'" ';
+    } else if (helps.length==1) {
+        outstr += 'res:'+helps.join(',')+' ';
+    }
+
     $("#search").val(outstr.trim());
     $("#advsearchbtn").dropdown('toggle');
     doQuestionSearch();
@@ -108,6 +123,11 @@ function doQuestionSearch(offset) {
     offset = offset || 0;
     $("#searcherror").hide();
     var search = document.getElementById("search").value;
+    if (cursearchtype == 'all' && search.trim()=='') {
+        $("#searcherror").html(_('You must provide a search term when searching All Libraries')).show();
+        $("#search").focus();
+        return;
+    }
     $.ajax({
         url: qsearchaddr,
         method: 'POST',
@@ -156,13 +176,12 @@ function displayQuestionList(results) {
     var thead = '<thead><tr>'
         + '<th><span class="sr-only">'+_('Select')+'</span></th>'
         + '<th>'+_('Description')+'</th>'
+        + '<th>'+_('Actions')+'</th>'
         + '<th>'+_('Info')+'</th>'
         + '<th>'+_('ID')+'</th>'
-        + '<th>'+_('Preview')+'</th>'
         + '<th>'+_('Type')+'</th>'
         + '<th>'+_('Times Used')+'</th>'
         + '<th>'+_('Avg Time')+'</th>'
-        + '<th>'+_('Actions')+'</th>'
         + '</tr></thead>';
     var tbody = '<tbody>';
     var i,q,row,features,descrclass,descricon;
@@ -233,7 +252,7 @@ function displayQuestionList(results) {
             descricon = '<span title="' + _('Marked as broken') + '">' + 
                 '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#f66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19.7 1.3 19.6 9 16.2 6.3 13.8 11.3 10.5 8.3 7 11.7 3.6 9.2l0-7.9z" class="a"></path><path d="m19.7 22.9 0-7.8-2-1.4-3.1 4-3.3-3-3.8 3.8-4-3.9v8.4z" class="a"></path></svg>' + 
                 '</span> ';
-        } else if (q['junkflag'] == 1) {
+        } else if (q['junkflag'] == 1 && results.type=='libs') {
             descrclass = ' class="qwronglib"';
             descricon = wronglibicon;
         } else if (existingq.indexOf(parseInt(q['id'])) !== -1) {
@@ -252,26 +271,28 @@ function displayQuestionList(results) {
             "&cid=" + curcid +
             '&from=addq2&frompot=1';
 
-        var actions = '<div class="dropdown">' +
-            '<button role="button" class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + 
-            '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
+        var actions2 = '<button role="button" class="dropdown-toggle arrow-down secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' + 
+            '<span class="sr-only">More</span></button><ul role="menu" class="dropdown-menu dropdown-menu-right">' + 
             '<li><a href="' + addqaddr + '">' + _('Add') + '</a></li>' +
             '<li><a href="' + editqaddr + '">' + (q['mine']==1 ? _('Edit') : _('View Code')) + '</a></li>' + 
-            '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>' +
-            '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
+            '<li><a href="' + editqaddr + '&template=true">' + _('Template') + '</a></li>';
+        if (results.type=='libs') {
+            actions2 += '<li><a href="#" onclick="toggleWrongLibFlag('+i+'); return false;" class="wronglibtoggle">' + 
                 ((q['junkflag'] == 1) ? _('Un-mark as in wrong library') : _('Mark as in wrong library')) +
-                '</a></li>' +
-            '</ul></div>';
+                '</a></li>';
+        }
+        actions2 += '</ul>';
 
         // build row
         tbody += '<tr>'
             + '<td><input type=checkbox name="nchecked[]" id="qo'+i+'" value="'+q['id']+'"></td>'
             + '<td' + descrclass + '>' + descricon + q['description'] + '</td>'
+            + '<td><div class="dropdown splitbtn nowrap"><button type="button" class="secondary" onclick="previewq(\'selq\',\'qo'+i+'\','+q['id']+',true,false)">'
+            + _('Preview') + '</button>'
+            + actions2
+            + '</div></td>'
             + '<td class="nowrap">' + features + '</td>'
             + '<td>' + q['id'] + '</td>'
-            + '<td><button class="plain" type=button onclick="previewq(\'selq\',\'qo'+i+'\','+q['id']+',true,false)">'
-            + '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
-            + '</td>'
             + '<td>' + q['qtype'] + '</td>'
             + '<td class="c">' + q['times'] + '</td>'
             + '<td class="c">' + (q['meantimen'] > 3 ? 
@@ -279,13 +300,13 @@ function displayQuestionList(results) {
                 + '<br/>'+_('Avg time on first try: ') + q['meantime'] + _(' min') + 
                 '<br/>N='+q['meantimen']+'\')" onmouseleave="tipout()">' + q['meantime'] + '</span>') :
                 '') + '</td>'
-            + '<td class="c">' + actions + '</td>'
             + '</tr>';
     }
     tbody += '</tbody>';
     document.getElementById("myTable").innerHTML = thead + tbody;
+    rendermathnode(document.getElementById("myTable"));
 
-    initSortTable('myTable',[false,'S',false,'N',false,'S','N',false]);
+    initSortTable('myTable',[false,'S',false,'S','N','S','N','N']);
     if (window.top == window.self && document.getElementById("addbar")) {
          $("#selq input[type=checkbox]").on("change", function () {
              $("#addbar.footerbar").toggleClass("sr-only", $("#selq input[type=checkbox]:checked").length == 0);
@@ -316,7 +337,6 @@ function displayQuestionList(results) {
         $("#searchprev").hide();
     }
 }
-
 function updateInAssessMarkers() {
     var existingq = [];
     if (itemarray) {

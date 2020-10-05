@@ -5,6 +5,12 @@
 
       <p>{{ closedMessage }}</p>
 
+      <p v-if="showTutorLinks">
+        {{ $t('launch.gblinks') }}:
+        <a :href="settings.tutor_gblinks[0]" target="_blank">{{ $t('launch.scorelist') }}</a> &nbsp;
+        <a :href="settings.tutor_gblinks[1]" target="_blank">{{ $t('launch.itemanalysis') }}</a>
+      </p>
+
       <p v-if = "hasActive">
         {{ hasActiveMsg }}
         <br/>
@@ -257,6 +263,9 @@ export default {
     },
     canAddWork () {
       return (store.assessInfo.showwork_after);
+    },
+    showTutorLinks () {
+      return store.assessInfo.hasOwnProperty('tutor_gblinks');
     }
   },
   methods: {

@@ -180,6 +180,9 @@ var MQeditor = (function($) {
       .on('focus.mqeditor', showEditor)
       .on('blur.mqeditor', function() {
         blurTimer = setTimeout(hideEditor, 100);
+        if (config.hasOwnProperty('onBlur')) {
+            config.onBlur();
+        }
       });
     $(mqel).on('click.mqeditor', function(e) {
       // hack to handle MQ entries inside radio button labels
@@ -290,6 +293,7 @@ var MQeditor = (function($) {
    */
   function hideEditor(event) {
     $(document).trigger('mqeditor:hide');
+    
     if (config.curlayoutstyle === 'OSK' && !inIframe()) {
       $("#mqeditor").slideUp(50);
     } else {
@@ -338,7 +342,10 @@ var MQeditor = (function($) {
    */
   function onMQedit(mf) {
   	var el = mf.el();
-  	positionEditor(el);
+    positionEditor(el);
+    if (config.hasOwnProperty('onResize')) {
+        config.onResize(el, config.curlayoutstyle);
+    }
   	if (el.id.match(/mqinput/)) {
       var latex = mf.latex();
       if (config.hasOwnProperty('fromMQ')) {

@@ -534,6 +534,8 @@ function fin_DBD($D1,$D2) {
 
 function fin_TVM() {
 	return '<iframe src="https://p2.amirtavangar.com" name="TVMsolver" width="420" height="680" frameborder="0" scrolling="no" ><p>Your browser does not support iframes.</p></iframe>';
+    //return '<iframe src="https://p2.amirtavangar.com" name="TVMsolver" width="420" height="680" frameborder="0" scrolling="no" ><p>Your browser does not support iframes.</p></iframe>';
+    return '<iframe src="https://s3-us-west-2.amazonaws.com/oervm/tvm/index.html" name="TVMSolver" width="400" height="500" frameborder="0" scrolling="no" ><p>Your browser does not support iframes.</p></iframe>';
 }
 
 

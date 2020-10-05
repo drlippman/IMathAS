@@ -15,12 +15,12 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
             $out[$match[1]] = str_replace('"', '', $match[2]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private):("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
@@ -33,7 +33,6 @@ function parseSearchString($str)
             }
         }
     }
-
     return $out;
 }
 
@@ -146,7 +145,21 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchvals[] = $avgtimeparts[1];
         }
     }
-
+    if (!empty($search['res'])) {
+        $helps = explode(',', $search['res']);
+        if (in_array('help', $helps)) {
+            $searchand[] = 'LENGTH(iq.extref)>0';
+        }
+        if (in_array('cap', $helps)) {
+            $searchand[] = "iq.extref LIKE '%!!1%'";
+        }
+        if (in_array('soln', $helps)) {
+            $searchand[] = '(LENGTH(iq.solution) > 0 AND (iq.solutionopts&5)=5)';
+        }
+        if (in_array('WE', $helps)) {
+            $searchand[] = '(LENGTH(iq.solution) > 0 AND (iq.solutionopts&2)=2)';
+        }
+    }
     $searchquery = '';
     if (count($searchand) > 0) {
         $searchquery = '(' . implode(' AND ', $searchand) . ')';
@@ -195,7 +208,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     }
 
     $rightsand = [];
-    if (!empty($searc['mine'])) {
+    if (!empty($search['mine'])) {
         $rightsand[] = '(iq.ownerid=?)';
         $searchvals[] = $userid;
     } else {
@@ -287,10 +300,13 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($rightsquery !== '') {
         $query .= ' AND ' . $rightsquery;
     }
-    $query .= ' GROUP BY ili.qsetid ';
+    //$query .= ' GROUP BY ili.qsetid ';
 
     if ($searchtype == 'assess') {
+        $query .= ' GROUP BY iaq.id,ili.qsetid ';
         $query .= ' ORDER BY ia.id ';
+    } else {
+        $query .= ' GROUP BY ili.qsetid ';
     }
     if (!empty($max) && intval($max) > 0) {
         $query .= ' LIMIT ' . intval($max);
@@ -298,7 +314,6 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $query .= ' OFFSET ' . intval($offset);
         }
     }
-
     $stm = $DBH->prepare($query);
     $stm->execute($searchvals);
     $res = [];
@@ -316,17 +331,17 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $hasvid = false;  $hasother = false; $hascap = false;
             foreach ($extref as $v) {
                 if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
-                    $row['extrefval'] += 1; // has video
+                    $row['extrefval'] |= 1; // has video
                     if (strpos($v,'!!1')!==false) {
-                        $row['extrefval'] += 2; // video captioned
+                        $row['extrefval'] |= 2; // video captioned
                     } 
                 } else {
-                    $row['extrefval'] += 4; // has other extref
+                    $row['extrefval'] |= 4; // has other extref
                 }
             }
         }
         if ($row['hassolution']>0 && ($row['solutionopts']&2)==2) {
-            $row['extrefval'] += 8; // has written example
+            $row['extrefval'] |= 8; // has written example
         }
         // don't need to send these to frontend
         unset($row['extref']);

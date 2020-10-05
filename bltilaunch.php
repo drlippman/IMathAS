@@ -151,7 +151,10 @@ if (isset($_GET['launch'])) {
 		$tzname = '';
 	}
 	$_SESSION['tzoffset'] = $_POST['tzoffset'];
-	$_SESSION['tzname'] = $tzname;
+    $_SESSION['tzname'] = $tzname;
+    if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
+        $_SESSION['static_ok'] = 1;
+    }
 
 	$keyparts = explode('_',$_SESSION['ltikey']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid
@@ -1730,7 +1733,10 @@ if (isset($_GET['launch'])) {
 		$tzname = '';
 	}
 	$_SESSION['tzoffset'] = $_POST['tzoffset'];
-	$_SESSION['tzname'] = $tzname;
+    $_SESSION['tzname'] = $tzname;
+    if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
+        $_SESSION['static_ok'] = 1;
+    }
 
 	$keyparts = explode('_',$_SESSION['ltikey']);
 	if ($_SESSION['ltiitemtype']==0) { //is aid

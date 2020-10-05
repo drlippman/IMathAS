@@ -2875,13 +2875,29 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	the correct answer.  To override the tolerance use +- in the setting, like this:
 	<br/>$reqsigfigs = "=2+-.01" checks for exactly 2 sigfigs, but allows the answer to have an absolute error of .01
 	<br/>$reqsigfigs = "=2+-1%" checks for exactly 2 sigfigs, but allows the answer to have an relative error of 1% (equivalent to $relatolerance = .01)</dd>
-<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "nosoln", or "nosolninf"</dt>
-	<dd>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
-	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.
-	<br/>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)
-	<br/>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
-	$ansprompt = "One value, x=;No values;Many values"
-	<br/>Answerformats can be combined, like $answerformat = "nosoln,list"</dd>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "integer, "units", "nosoln", or "nosolninf"</dt>
+	<dd>
+        <ul>
+            <li>Answerformats can be combined, like $answerformat = "nosoln,list"</li>
+            <li>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.</li>
+            <li>If $answerformat="list", then duplicate values are ignored.</li>
+            <li>If $answerformat="exactlist", then duplicate values are not ignored.</li>
+            <li>If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</li>
+            <li>$answerformat = "integer" changes the entry hint to only indicate integers, and rejects answers that contain decimals (except it does allow 2.0 instead of 2)</li>
+            <li>$answerformat = "units" adds unit checking.  Supply the answer like <code>$answer = "3 kg/m^2"</code>.  
+                The student's answer can be in other equivalent units, so "300 cm" is considered equivalent to "3 m".
+                The answer must be in the format <code>[decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...</code>, 
+                though multiplication can be implied.  Note that the units do not require mathematically-proper parens around the denominator.
+                The decimal number can include basic scientific notation in 3E5 or 3*10^5 formats.
+                Note that tolerances are scaled to the unit, so $answer = "3m" with $abstolerance = .1 would mean 
+                .1 meters, so "310cm" would still be within tolerance.  If $reqsigfigs is set, the specified 
+                number of sigfigs will need to be present in the student's answer, regardless of units.
+                </li>
+            <li>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". 
+                $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
+            </li>
+        </ul>
+    </dd>
 <dt>$partialcredit = array(number,score,[number,score,...]) </dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
 	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
@@ -3390,7 +3406,9 @@ drawn line from the correct line.
 	    <p>$answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
 	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.</p>
 	    <p>$answerformat="inequality,parab" will use a set of drawing tools for graphing quadratic inequalities in two variables.  Give $answers in form
-	       like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.</p>
+           like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.</p>
+        <p>$answerformat="inequality,abs" will use a set of drawing tools for graphing absolute value inequalities in two variables.  Give $answers in form
+            like "&gt;=abs(x-3)+4", "&lt;3abs(x)".  Use $answerformat="inequality,line,abs,parab" or some combo to turn on multiple tools.</p>
 	    <p>$answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
 	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.</p>
 	    <p>$answerformat can also be used to limit the older tools: $answerformat = "line", or $answerformat = "line,dot"</p>
@@ -3759,9 +3777,11 @@ A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$answerformat = "normalcurve" </dt>
-	<dd>Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
-	shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.</dd>
+<dt>$answerformat = "normalcurve" or "list"</dt>
+	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
+    shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.
+    <br/>
+    "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)"</dd>
 <dt>$scoremethod = "partialcredit"</dt>
   <dd>By default, interval answers will be marked all right or all wrong.  Setting $scoremethod = "partialcredit"
 		will changing the scoring mode to give partial credit. (new assessment system only).</dd>
@@ -3802,12 +3822,14 @@ invertal notation.
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "inequality" </dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", or "inequality" </dt>
 	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	$answerformat = "inequality" will require the student to enter an inequality rather than an interval.  The instructor answer must still be given in
-	interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
+    interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
+    <br/>
+    "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)".  Does not work with "inequality".
 	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is

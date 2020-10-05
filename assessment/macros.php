@@ -745,14 +745,16 @@ function mergeplots($plota) {
 	$n = func_num_args();
 	if ($n==1) {
 		return $plota;
-	}
+    }
+    $plota = preg_replace('/<span.*?<\/span>/','', $plota);
 	for ($i=1;$i<$n;$i++) {
-		$plotb = func_get_arg($i);
+        $plotb = func_get_arg($i);
 		if ($_SESSION['graphdisp']==0) {
 			$newtext = preg_replace('/^Graphs.*?y:.*?to.*?\.\s/', '', $plotb);
 			$plota .= $newtext;
 		} else {
-			$newcmds = preg_replace('/^.*?initPicture\(.*?\);\s*(axes\(.*?\);)?(.*?)\'\s*\/>.*$/', '$2', $plotb);
+            $plotb = preg_replace('/<span.*?<\/span>/','', $plotb);
+            $newcmds = preg_replace('/^.*?initPicture\(.*?\);\s*(axes\(.*?\);)?(.*?)\'\s*\/>.*$/', '$2', $plotb);
 			$plota = str_replace("' />", $newcmds."' />", $plota);
 		}
 	}
@@ -838,7 +840,7 @@ function showasciisvg($script, $width=200, $height=200, $alt="") {
         return $alt;
     }
     $script = str_replace("'",'"',$script);
-    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />\n";
+    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />";
     $out .= '<span class="sr-only">'.$alt.'</span>';
     return $out;
 }
@@ -2667,6 +2669,10 @@ function evalfunc($farr) {
 function textonimage() {
 	$args = func_get_args();
     $img = array_shift($args);
+
+    if (substr($img,0,4)=='http') {
+        $img = '<img src="'.Sanitize::encodeStringForDisplay($img).'" alt="" />';
+    }
     
 	$out = '<div style="position: relative;" class="txtimgwrap">';
 	$out .= '<div class="txtimgwrap" style="position:relative;top:0px;left:0px;">'.$img.'</div>';
@@ -2731,13 +2737,14 @@ function ifthen($c,$t,$f) {
 
 
 //adapted from http://www.mindspring.com/~alanh/fracs.html
-function decimaltofraction($d,$format="fraction",$maxden = 5000) {
-	if (floor($d)==$d) {
+function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
+	if (abs(floor($d)-$d)<1e-12) {
 		return floor($d);
 	}
 	if (abs($d)<1e-12) {
 		return '0';
-	}
+    }
+    $maxden = min($maxden, 1e16);
 	if ($d<0) {
 		$sign = '-';
 	} else {
@@ -2764,15 +2771,15 @@ function decimaltofraction($d,$format="fraction",$maxden = 5000) {
 		//appendFractionsOutput(numerators[i], denominators[i]);
 
 		//if ($calcD == $d) { break;}
-		if (abs($calcD - $d)<1e-9) { break;}
+		if (abs($calcD - $d)<1e-14) { break;}
 
 		$prevCalcD = $calcD;
 
 		$d2 = 1/($d2-$L2);
-	}
+    }
 	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-10) {
 		return $d;
-	}
+    }
 	if ($format=="mixednumber") {
 		$w = floor($numerators[$i]/$denominators[$i]);
 		if ($w>0) {
@@ -3573,19 +3580,23 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 		return " ";
 	} else if ($stu==='NA') {
 		return '<div class="feedbackwrap"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("No answer selected. Try again.") . '</div>';
-	} else if (isset($fbtxt[$stu])) {
-		if ($stu==$ans) {
-			return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> '.$fbtxt[$stu].'</div>';
-		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> '.$fbtxt[$stu].'</div>';
-		}
-	} else {
-		if ($stu==$ans) {
-			return '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/></div>';
-		} else {
-			return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/></div>';
-		}
-	}
+    } else {
+        $anss = explode(' or ', $ans);
+        foreach ($anss as $ans) {
+            if ($stu==$ans) {
+                $out = '<div class="feedbackwrap correct"><img src="'.$staticroot.'/img/gchk.gif" alt="Correct"/> ';
+                if (isset($fbtxt[$stu])) {
+                    $out .= $fbtxt[$stu];
+                }
+                return $out .= '</div>';
+            } 
+        }
+        $out = '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ';
+        if (isset($fbtxt[$stu])) {
+            $out .= $fbtxt[$stu];
+        }
+        return $out .= '</div>';
+    } 
 }
 
 function getfeedbacktxtessay($stu,$fbtxt) {

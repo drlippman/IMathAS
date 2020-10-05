@@ -1279,7 +1279,7 @@ function matrixAbasisForB($A,$B){
 	if(matrixAspansB($A,$B)==false){
 		$retVal = false;
 	}
-	if(matrixIsLinInd($A)==false){
+	if(matrixIsRowsLinInd($A)==false){
 		$retVal = false;
 	}
 	return($retVal);
@@ -1329,6 +1329,7 @@ function matrixDet($A){
 		return ($A[0][0]*$A[1][1] - $A[0][1]*$A[1][0]);
 	}
 	else{
+        $retVal = 0;
 		for($i=0;$i<count($A);$i++){
 			if ($A[0][$i]!=0) {
 				$retVal += pow(-1,$i)*$A[0][$i]*matrixDet(matrixGetMinor($A,0,$i));

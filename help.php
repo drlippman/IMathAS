@@ -35,6 +35,18 @@ h1 {
 h2,h3,h4,h5,h6 {
 	color: #00c;
 }
+div.h2 {
+	margin-left: 5px;
+}
+div.h3 {
+	margin-left: 10px;
+}
+div.h4 {
+	margin-left: 15px;
+}
+dd {
+	margin-bottom: .4em;
+}
 </style>
 <link rel="stylesheet" href="<?php echo $staticroot;?>/iconfonts/style.css?v=081316" type="text/css" />
 <link rel="stylesheet" href="<?php echo $staticroot;?>/tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />

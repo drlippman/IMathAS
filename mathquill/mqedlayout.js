@@ -636,6 +636,23 @@ var myMQeditor = (function($) {
           class: "mqed-tipholder"
         }).append(tipdiv));
       }
+    } else if (rebuild && layoutstyle === 'OSK') {
+      var baseid = mqel.id.substring(8);
+      var textel = $('#'+baseid);
+      if (textel[0].hasAttribute("data-tip")) {
+        var ref = baseid.substr(2).split(/-/)[0];
+        reshrinkeh(mqel.id);
+        showehdd(mqel.id, textel[0].getAttribute("data-tip"), ref);
+      }
+    }
+  }
+
+  function onBlur() {
+    hideeh();
+  }
+  function onResize(el, layoutstyle) {
+    if (layoutstyle === 'OSK') {
+        updateehpos();
     }
   }
 
@@ -652,6 +669,8 @@ var myMQeditor = (function($) {
   return {
     getLayout: getLayout,
     onShow: onShow,
+    onBlur: onBlur,
+    onResize: onResize,
     onTab: onTab
   }
 })(jQuery);
@@ -664,6 +683,8 @@ var myMQeditor = (function($) {
 MQeditor.setConfig({
   getLayout: myMQeditor.getLayout,
   onShow: myMQeditor.onShow,
+  onBlur: myMQeditor.onBlur,
+  onResize: myMQeditor.onResize,
   onTab: myMQeditor.onTab,
   toMQ: AMtoMQ,
   fromMQ: MQtoAM,
