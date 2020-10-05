@@ -1,5 +1,8 @@
 <?php
 // Units checking
+// Contributed by Nick Chura
+// 
+// Based in part on https://github.com/openwebwork/pg/blob/master/lib/Units.pm, GPL licensed
 
 global $allowedmacros;
 
