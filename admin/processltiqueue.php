@@ -326,13 +326,7 @@ function LTIqueueCallback($response, $url, $request_info, $user_data, $time) {
 		}
 	}
 
-	if ($success) {
-		debuglog('update success for '.$user_data['hash']);
-		//we'll call this when send is successful
-		$delfromqueue = $DBH->prepare('DELETE FROM imas_ltiqueue WHERE hash=? AND sendon=?');
-		$delfromqueue->execute(array($user_data['hash'], $user_data['sendon']));
-		$cntsuccess++;
-	} else {
+	if (!$success) {
 		//on call failure, we'll update failure count and push back sendon
 		debuglog('update failure for '.$user_data['hash']);
 		$setfailed = $DBH->prepare('UPDATE imas_ltiqueue SET sendon=sendon+(failures+1)*(failures+1)*300,failures=failures+1 WHERE hash=?');
