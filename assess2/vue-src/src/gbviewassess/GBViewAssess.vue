@@ -87,6 +87,23 @@
         >
           {{ $t('gradebook.clear_all') }}
         </button>
+        <button
+          v-if="aData.hasOwnProperty('excused')"
+          type="button"
+          class="slim"
+          @click="showExcused = !showExcused"
+        >
+          {{ $t('gradebook.' + (showExcused ? 'hide' : 'show') + '_excused') }}
+        </button>
+      </div>
+
+      <div v-if="showExcused" class="introtext">
+        {{ $t('gradebook.excused_list') }}
+        <ul>
+          <li v-for="name in aData.excused" :key="name">
+            {{ name }}
+          </li>
+        </ul>
       </div>
 
       <div v-if="canEdit && aData.has_active_attempt">
@@ -105,6 +122,7 @@
         <div>
           {{ scoreCalc }}
           <gb-assess-select
+            v-if = "viewFull || aData.submitby === 'by_assessment'"
             :versions = "aData.assess_versions"
             :submitby = "aData.submitby"
             :haspractice = "aData.has_practice"
@@ -127,6 +145,21 @@
               {{ $t('lti.use_latepass') }}
             </button>
           </div>
+        </div>
+
+        <div v-if="curEndmsg !== ''">
+          <button
+            v-if = "viewFull"
+            type="button"
+            @click = "showEndmsg = !showEndmsg"
+          >
+            {{ $t('gradebook.' + (showEndmsg ? 'hide' : 'show') + '_endmsg') }}
+          </button>
+          <div
+            class="introtext"
+            v-if="showEndmsg || !viewFull"
+            v-html="curEndmsg"
+          />
         </div>
 
         <div v-if="canEdit">
@@ -163,7 +196,7 @@
           </button>
         </div>
 
-        <div>
+        <div v-if="viewFull">
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
@@ -199,6 +232,7 @@
               />
               <gb-showwork
                 :work = "qdata[curQver[qn]].work"
+                :worktime = "qdata[curQver[qn]].worktime"
               />
             </div>
             <gb-score-details
@@ -211,7 +245,7 @@
         </div>
         <gb-feedback
           qn="gen"
-          :show="true"
+          :show="viewFull"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
@@ -307,7 +341,9 @@ export default {
       assessOverride: '',
       hidePerfect: false,
       hideCorrect: false,
-      hideUnanswered: false
+      hideUnanswered: false,
+      showEndmsg: false,
+      showExcused: false
     };
   },
   computed: {
@@ -317,8 +353,11 @@ export default {
     aData () {
       return store.assessInfo;
     },
+    viewFull () {
+      return this.aData.viewfull;
+    },
     canEdit () {
-      return store.assessInfo.can_edit_scores;
+      return store.assessInfo.can_edit_scores && this.viewFull;
     },
     canSubmit () {
       return (!store.inTransit);
@@ -377,6 +416,9 @@ export default {
         out[qn] = this.curQuestions[qn][this.curQver[qn]];
       }
       return out;
+    },
+    curEndmsg () {
+      return this.aData.assess_versions[store.curAver].endmsg || '';
     },
     showCategories () {
       let hascat = false;
@@ -531,18 +573,19 @@ export default {
       actions.setFeedback(null, val);
     },
     setScoreOverride (evt) {
-      this.assessOverride = evt.target.value.trim();
+      const val = evt.target.value.trim();
+      if (val !== this.aData.scoreoverride) {
+        store.scoreOverrides.gen = val;
+        this.assessOverride = '';
+      }
       store.saving = '';
     },
     submitChanges (exit) {
-      if (this.showOverride && this.assessOverride !== '') {
-        store.scoreOverrides.gen = this.assessOverride;
-      } else if (this.aData.hasOwnProperty('scoreoverride') &&
-        this.assessOverride !== this.aData.scoreoverride
-      ) {
-        store.scoreOverrides.gen = this.assessOverride;
-      } else {
-        delete store.scoreOverrides.gen;
+      if (!this.aData.hasOwnProperty('scoreoverride') && this.showOverride) {
+        if (this.assessOverride !== '') {
+          store.scoreOverrides.gen = this.assessOverride;
+        }
+        this.showOverride = false;
       }
       var doexit = (exit === true);
       actions.saveChanges(doexit);

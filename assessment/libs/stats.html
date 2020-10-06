@@ -18,6 +18,8 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#Nplus1quartile">Nplus1quartile</a></li>
 <li><a href="#allquartile">allquartile</a></li>
 <li><a href="#median">median</a></li>
+<li><a href="#modes">modes</a></li>
+<li><a href="#forceonemode">forceonemode</a></li>
 <li><a href="#freqdist">freqdist</a></li>
 <li><a href="#frequency">frequency</a></li>
 <li><a href="#countif">countif</a></li>
@@ -45,6 +47,7 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#invfcdf">invfcdf</a></li>
 <li><a href="#mosaicplot">mosaicplot</a></li>
 <li><a href="#csvdownloadlink">csvdownloadlink</a></li>
+<li><a href="#dotplot">dotplot</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -115,6 +118,16 @@ allquartile(array,quartile)
 <BR><h3><a name="median">median</a></h3>
 median(array)
 <BR>returns the median of an array of numbers
+<BR><h3><a name="modes">modes</a></h3>
+modes(array)
+<br>Returns the mode or modes of the data array as a comma-separated list.
+If all the values have the same frequency it returns DNE.
+<BR><h3><a name="forceonemode">forceonemode</a></h3>
+forceonemode(array)
+<br>Returns the mode of the data array.  If the data does not have one unique
+mode, the data array will be altered to only have one mode.  Because this
+function can alter the given array, be sure to call it before any functions that
+use the array.
 <BR><h3><a name="freqdist">freqdist</a></h3>
 freqdist(array,label,start,classwidth)
 <BR>display macro.  Returns an HTML table that is a frequency distribution of
@@ -174,10 +187,11 @@ piechart(percents, labels, {width, height})
 <BR>labels: array of labels for each pie piece
 <BR>uses Google Charts API
 <BR><h3><a name="normrand">normrand</a></h3>
-normrand(mu,sigma,n, [rnd])
+normrand(mu,sigma,n, [rnd, positive])
 <BR>returns an array of n random numbers that are normally distributed with given
 <BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
-<BR>specify rnd to round to that many digits
+<BR>specify rnd to round to that many digit
+<BR>set positive to true to not include negative values
 <BR><h3><a name="expdistrand">expdistrand</a></h3>
 expdistrand(mu, n, [rnd])
 <BR>returns an array of n random numbers that are exponentially distributed
@@ -291,3 +305,12 @@ mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
 csvdownloadlink(string,array,[string,array]...)
 <p>Creates a link that downloads the specified data in CSV format. For each column
   provide a string header and an array of values.</p>
+<BR><h3><a name="dotplot">dotplot</a></h3>
+dotplot(array,label,[dotspacing,labelspacing,width,height]) 
+<BR>Display macro.  Creates a dotplot from a data set
+<BR> array: array of data values
+<BR> label: title of the dotplot that will be placed below the horizontal axis
+<BR> dot spacing (default 1): horiz spacing of dots; data will be rounded to nearest value
+<br> axis spacing (defaults to dot spacing): spacing of axis labels 
+<BR> width,height (default 300x150): width and height in pixels of graph
+  

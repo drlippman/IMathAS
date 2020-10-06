@@ -66,7 +66,7 @@ function toggleWork(el) {
 	var next = $(el).next();
 	if (next.is(':hidden')) {
 		el.innerText = _('Hide Work');
-		next.show();
+        next.show();
 	} else {
 		el.innerText = _('Show Work');
 		next.hide();
@@ -80,7 +80,7 @@ function preprint() {
 }
 function quicksave() {
 	var url = $("#mainform").attr("action")+"&quick=true";
-	$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
+	$("#quicksavenotice").html(_("Saving...") + ' <img src="'+staticroot+'/img/updating.gif"/>');
 	tinymce.triggerSave();
 	$.ajax({
 		url: url,

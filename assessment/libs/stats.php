@@ -9,7 +9,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink");
+ "csvdownloadlink","modes","forceonemode","dotplot");
 
 //nCr(n,r)
 //The Choose function
@@ -392,6 +392,43 @@ function median($a) {
 	return percentile($a,50);
 }
 
+function modes($arr) {
+  if (!is_array($arr)) {
+    echo "mode expects an array";
+    return 'DNE';
+  }
+  $arr = array_map('strval', $arr);
+  $freqs = array_count_values($arr);
+  $maxfreq = max($freqs);
+  $modes = array_keys($freqs, $maxfreq);
+  if (count($modes)==count($freqs)) {
+    return 'DNE';
+  } else {
+    return implode(',', $modes);
+  }
+}
+
+function forceonemode(&$arr) {
+  $modes = modes($arr);
+  if (is_numeric($modes)) {
+    return $modes;
+  }
+  if ($modes == 'DNE') {
+    $mode = $arr[0];
+  } else {
+    $mode = explode(',', $modes)[0];
+  }
+  // add a value after an existing one (in case sorted)
+  array_splice($arr, array_search($mode,$arr), 0, $mode);
+  foreach ($arr as $k=>$v) {
+    if ($v != $mode) {
+      array_splice($arr, $k, 1);
+      break;
+    }
+  }
+  return $mode;
+}
+
 //freqdist(array,label,start,classwidth)
 //display macro.  Returns an HTML table that is a frequency distribution of
 //the data
@@ -724,7 +761,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 function piechart($pcts,$labels,$w=250,$h=130) {
 	if ($_SESSION['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
-		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
+		$out .= '<tr><th>'._('Label').'</th>';
 		$out .= '<th>'._('Percent').'</th></tr>';
 		foreach ($labels as $k=>$label) {
 			$out .= '<tr><td>'.Sanitize::encodeStringForDisplay($label).'<td>';
@@ -795,28 +832,35 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
-function normrand($mu,$sig,$n,$rnd=null) {
+function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
 	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
 	}
-	global $RND;
-	for ($i=0;$i<ceil($n/2);$i++) {
+    global $RND;
+    $icnt = 0;
+    $z = [];
+    while (count($z)<$n && $icnt < 2*$n) {
 		do {
 			$a = $RND->rand(-32768,32768)/32768;
 			$b = $RND->rand(-32768,32768)/32768;
 			$r = $a*$a+$b*$b;
 			$count++;
 		} while ($r==0||$r>1);
-		$r = sqrt(-2*log($r)/$r);
-		if ($rnd!==null) {
-			$z[] = round($sig*$a*$r + $mu, $rnd);
-			$z[] = round($sig*$b*$r + $mu, $rnd);
-		} else {
-			$z[] = $sig*$a*$r + $mu;
-			$z[] = $sig*$b*$r + $mu;
-		}
-	}
+        $r = sqrt(-2*log($r)/$r);
+        $v1 = $sig*$a*$r + $mu;
+        $v2 = $sig*$b*$r + $mu;
+        if (!$pos || $v1 > 0) {
+            $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
+        }
+        if (!$pos || $v2 > 0) {
+            $z[] = ($rnd===null) ? $v2 : round($v2, $rnd);
+        }
+        $icnt++;
+    }
+    if ($icnt == 2*$n && count($z) < $n) {
+        echo "Error: unable to generate enough positive values";
+    }
 	if ($n%2==0) {
 		return $z;
 	} else {
@@ -2059,5 +2103,97 @@ function csvdownloadlink() {
     . _('Download CSV').'</a>';
 }
 
+//dotplot(array,label,[dot spacing, axis spacing,width,height])
+//display macro.  Creates a dotplot from a data set
+// array: array of data values
+// label: title of the dotplot that will be placed below horizontal axis
+// dot spacing: spacing of dots; data will be rounded to nearest (def 1)
+// axis spacing: spacing of axis labels (defaults to dot spacing) 
+// width,height (optional): width and height in pixels of graph
+function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) {
+	if (!is_array($a)) {
+		echo 'dotplot expects an array';
+		return false;
+    }
+    if ($dotspace <= 0) {
+        $dotspace = 1;
+    }
+    if ($labelspace === null || $labelspace <= 0) {
+        $labelspace = $dotspace;
+    }
+
+	sort($a, SORT_NUMERIC);
+
+    $start = round($a[0]/$dotspace)*$dotspace;
+	
+	$x = $start;
+	$curr = 0;
+	$alt = "Dotplot for $label <table class=stats><thead><tr><th>Value of Each Dot</th><th>Number of Dots</th></tr></thead>\n<tbody>\n";
+	$maxfreq = 0;
+	
+	// 
+	$dx = $dotspace;
+
+    // Create the stack of dots 
+	while ($i < count($a)) {
+		$alt .= "<tr><td>$x</td>";
+		$i = $curr;
+		$j = 0.1;
+  
+		while (($a[$i] < $x+.5*$dx) && ($i < count($a))) {
+			$i++;
+			$j = $j + 0.6;
+			$st .= "dot([$x,$j]);";
+		}
+		
+		$x += $dx;
+		
+		if (($i-$curr)>$maxfreq) { 
+			$maxfreq = $i-$curr;
+		}
+			
+		$alt .= "<td>" . ($i-$curr) . "</td></tr>\n";
+		$curr = $i;
+	}
+  	
+	$alt .= "</tbody></table>\n";
+
+	if ($_SESSION['graphdisp']==0) {
+		return $alt;
+	}
+	
+
+	// Start tick marks at the start value
+	$x = $start;
+	
+	// y-values for the size of the tick mark lines
+	$tm = -0.025*$maxfreq;
+	$tx = 0.025*$maxfreq;
+
+	// initialize 
+	$outst = "";
+	 
+	// Draw the horizontal axes
+    // draws the tick marks for the axes.
+    $startlabel = floor($start/$labelspace+1e-12)*$labelspace;
+    $maxx = round($a[count($a)-1]/$dotspace)*$dotspace;
+    $endlabel = ceil($maxx/$labelspace-1e-12)*$labelspace;
+    for ($x=$startlabel; $x <=$endlabel; $x+=$labelspace) {
+        $outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+    }  
+	
+	//initializes SVG frame and canvas.
+	$initst = "setBorder(20,40,20,10);initPicture($startlabel,$endlabel,0,$maxfreq);";
+  	
+	//xtick,ytick,{labels,xgrid,ygrid,dox,doy}
+	//,1,null,$step); fill=\"blue\";
+	//$initst .= "axes(null,null,null,null,null,0,0); fill=\"blue\"; textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$initst .="textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$x1 = $startlabel - .2*$labelspace;
+	$x2 = $endlabel + .2*$labelspace;
+	$initst .="line([$x1,0],[$x2,0]);";
+	$outst = $initst.$outst.$st;
+	return showasciisvg($outst,$width,$height);
+  }
 
 ?>

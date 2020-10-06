@@ -732,9 +732,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
 
             if (isset($_GET['id'])) {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
             } else {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
             }
 
             $page_formActionTag = sprintf("addassessment.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);
@@ -815,6 +815,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $page_groupsets['label'][0] = 'Create new set of groups';
             $i=1;
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                if ($row[1] == '##autobysection##') { continue; }
                 $page_groupsets['val'][$i] = $row[0];
                 $page_groupsets['label'][$i] = $row[1];
                 $i++;
@@ -851,7 +852,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
+ $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -933,6 +934,24 @@ if ($overwriteBody==1) {
 				$("#reqscorewrap").toggle(rqshow);
 				$(this).attr("aria-expanded", rqshow);
 		});
+		// bind to caltagradio controls
+		$('input[type=radio][name=caltagradio]').change(function() {
+			if (this.value == 'usename') {
+				$('input[type=text][name=caltagact]')
+                    .attr('data-prev', function() {return this.value;})
+                    .prop('readonly', true)
+                    .css({'color':'#FFFFFF', 'opacity':'0.6'})
+                    .val('use_name');
+			}
+			else if (this.value == 'usetext') {
+				$('input[type=text][name=caltagact]')
+                    .prop('readonly', false)
+                    .css({'color':'inherit', 'opacity':'1.0'})
+                    .val(function() {
+                        return this.getAttribute('data-prev') || '?';
+                    });
+			}
+		});
 	})
 	</script>
 
@@ -979,7 +998,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,"0",1); ?>/>
 			<input type=text size=10 name="sdate" value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=8 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 
@@ -993,7 +1012,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,"2000000000",1); ?>/>
 			<input type=text size=10 name="edate" value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=8 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 <?php
@@ -1168,14 +1187,16 @@ if ($overwriteBody==1) {
 		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Additional Display Options
 		 </div>
 		 <div class="blockitems hidden">
 
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
-				<input name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
+                <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>>Use Text:</label>
+                  <input aria-label="Calendar icon text" name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>" <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /><br />
+                <label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>>Use Assessment Name</label>
 			</span><br class="form" />
 
 			<span class=form>Shuffle item order: </span>
@@ -1217,7 +1238,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Time Limit and Access Control
 		 </div>
 		 <div class="blockitems hidden">
@@ -1238,7 +1259,7 @@ if ($overwriteBody==1) {
 				<label for=lpcutoff>No extensions past</label>
 				<input type=text size=10 name="lpdate" value="<?php echo $lpdate;?>">
 				<a href="#" onClick="displayDatePicker('lpdate', this, 'edate', 'due date'); return false">
-				<img src="../img/cal.gif" alt="Calendar"/></a>
+				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 				at <input type=text size=8 name=lptime value="<?php echo $lptime;?>">
 				</span>
 			</span><BR class=form>
@@ -1273,7 +1294,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Help and Hints
 		 </div>
 		 <div class="blockitems hidden">
@@ -1334,7 +1355,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Grading and Feedback
 		 </div>
 		 <div class="blockitems hidden">
@@ -1407,7 +1428,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Group Assessment
 		 </div>
 		 <div class="blockitems hidden">

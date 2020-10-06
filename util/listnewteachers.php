@@ -107,7 +107,7 @@ if (count($reqdates)==0) {
 function htmlHeader() {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
 
-	$placeinhead = '<script type="text/javascript" src="'.$GLOBALS['imasroot'].'/javascript/tablesorter.js"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$GLOBALS['staticroot'].'/javascript/tablesorter.js"></script>';
 	require("../header.php");
 	echo '<div class=breadcrumb>';
 	echo $GLOBALS['breadcrumbbase'] .' <a href="../admin/userreports.php">'._('User Reports').'</a> &gt; ';

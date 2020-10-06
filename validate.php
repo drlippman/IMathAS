@@ -19,11 +19,6 @@
 
  session_start();
  $sessionid = session_id();
- if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
- 	 $urlmode = 'https://';
- } else {
- 	 $urlmode = 'http://';
- }
 
  $myrights = 0;
  $myspecialrights = 0;
@@ -99,12 +94,19 @@
        $cid = 0;
      }
 
-     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
  	 	 require("header.php");
-     echo '<form method=post action="'.$imasroot.'/course/course.php?cid='.$cid.'&guestaccess=true">';
-     echo '<p>You have requested guest access to a course.</p>';
+    if (isset($_SERVER['QUERY_STRING'])) {
+        $querys = '?'.Sanitize::fullQueryString($_SERVER['QUERY_STRING']).'&guestaccess=true';
+    } else {
+        $querys = '?guestaccess=true';
+    }
+    $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
+        
+     echo '<form method=post action="'.$formAction.'">';
+     echo '<p>'._('You have requested guest access to a course.').'</p>';
  	 	 echo '<p><button type=button onclick="location.href=\''.$imasroot.'/index.php\'">',_('Nevermind'),'</button> ';
-     echo '<button type=submit>Continue</button>';
+     echo '<button type=submit>'._('Continue').'</button>';
      echo '<input type=hidden id=tzname name=tzname />';
      echo '<script type="text/javascript">
      $(function() {
@@ -228,6 +230,9 @@
 		 if (isset($_POST['tzname'])) {
 		 	 $_SESSION['logintzname'] = $_POST['tzname'];
 		 }
+         if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
+            $_SESSION['static_ok'] = 1;
+         }
 		 require_once("$curdir/includes/userprefs.php");
 		 generateuserprefs();
 
@@ -476,7 +481,8 @@
         'redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php','file_manager.php','upload_handler.php',
         'index.php','gbviewassess.php','autosave.php','endassess.php','getscores.php','livepollstatus.php','loadassess.php',
         'loadquestion.php','scorequestion.php','startassess.php','uselatepass.php','gbloadassess.php','gbloadassessver.php',
-        'gbloadquestionver.php','getquestions.php','savework.php');
+        'gbloadquestionver.php','getquestions.php','savework.php','posts.php','thread.php','postsbyname.php',
+        'savetagged.php','recordlikes.php','listlikes.php');
 			//call hook, if defined
 			if (function_exists('allowedInAssessment')) {
 				$allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());

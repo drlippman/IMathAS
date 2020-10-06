@@ -16,6 +16,11 @@ if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!
 	$coursetheme = $defaultcoursetheme;
 }
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['forms'])) {
+	require($CFG['hooks']['forms']);
+}
+
 require("includes/htmlutil.php");
 
 if (isset($_GET['greybox'])) {
@@ -25,12 +30,12 @@ if (isset($_GET['greybox'])) {
 } else {
 	$gb = '';
 }
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 if (isset($CFG['locale'])) {
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
 }
 if ($_GET['action']=='chguserinfo') {
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 }
 require("header.php");
 switch($_GET['action']) {
@@ -47,7 +52,10 @@ switch($_GET['action']) {
 		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form\" type=\"text\" size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form\" type=\"text\" size=60 id=email name=email autocomplete=\"email\"><BR class=\"form\">\n";
 		echo "<span class=form><label for=\"msgnot\">",_('Notify me by email when I receive a new message:'),"</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot checked=\"checked\" /></span><BR class=form>\n";
-		if (isset($studentTOS)) {
+        if (isset($CFG['GEN']['COPPA'])) {
+			echo "<span class=form><label for=\"over13\">",_('I am 13 years old or older'),"</label></span><span class=formright><input type=checkbox name=over13 id=over13 onchange=\"toggleOver13()\"></span><br class=form />\n";
+        }
+        if (isset($studentTOS)) {
 			echo "<span class=form><label for=\"agree\">",_('I have read and agree to the Terms of Use (below)'),"</label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
 		} else if (isset($CFG['GEN']['TOSpage'])) {
 			$t1=_('Terms of Use');
@@ -57,30 +65,67 @@ switch($_GET['action']) {
 			echo "<span class=form><label for=\"agree\">".$t2."</label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
 		}
 
-		showNewUserValidation('newuserform', (isset($studentTOS) || isset($CFG['GEN']['TOSpage']))?array('agree'):array());
+        $extrarequired = [];
+        $requiredrules = [];
+        if (isset($studentTOS) || isset($CFG['GEN']['TOSpage'])) {
+            $extrarequired[] = 'agree';
+        }
+        if (isset($CFG['GEN']['COPPA'])) {
+            $extrarequired[] = 'courseid';
+            $requiredrules['courseid'] = '{depends: function(element) {return !document.getElementById("over13").checked}}';
+        }
+		showNewUserValidation('newuserform', $extrarequired, $requiredrules);
 
 		if (!$emailconfirmation) {
-			$doselfenroll = false;
+            $doselfenroll = false;
+            if (isset($CFG['GEN']['COPPA'])) {
+                $fullopt = 'style="display:none;';
+            }
 			$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE istemplate > 0 AND (istemplate&4)=4 AND available<4 ORDER BY name");
 			if ($stm->rowCount()>0) {
-				$doselfenroll = true;
-				echo '<p><label for="courseselect">',_('Select the course you\'d like to enroll in'),'</label></p>';
-				echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
+                $doselfenroll = true;
+                if (isset($CFG['GEN']['COPPA'])) {
+                    echo '<p class="fullopt" style="display:none">';
+                } else {
+                    echo '<p>';
+                }
+				echo '<label for="courseselect">',_('Select the course you\'d like to enroll in'),'</label><br/>';
+				echo '<select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 				echo '<option value="0" selected="selected">',_('My teacher gave me a course ID (enter below)'),'</option>';
 				echo '<optgroup label="Self-study courses">';
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 				}
 				echo '</optgroup>';
-				echo '</select></p>';
+                echo '</select></p>';
+                if (isset($CFG['GEN']['COPPA'])) {
+                    echo '<p class="limitedopt">'._('Enter the course ID and Key provided by your teacher below').'</p>';
+                }
 				echo '<div id="courseinfo">';
 				echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); var c2 = document.getElementById("selfenrollwarn"); ';
 				echo 'if (el.value==0) {c.style.display="";c2.style.display="none";} else {c.style.display="none";c2.style.display="";}}</script>';
 			} else {
-				echo '<p>',_('If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.'),'</p>';
-			}
-			echo '<span class="form"><label for="courseid">',_('Course ID'),':</label></span><input class="form" type="text" size="20" name="courseid"/><br class="form"/>';
-			echo '<span class="form"><label for="ekey">',_('Enrollment Key'),':</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
+                if (isset($CFG['GEN']['COPPA'])) {
+                    echo '<p class="fullopt" style="display:none">';
+                } else {
+                    echo '<p>';
+                }
+                echo _('If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.'),'</p>';
+                if (isset($CFG['GEN']['COPPA'])) {
+                    echo '<p class="limitedopt">'._('Enter the course ID and Key provided by your teacher below').'</p>';
+                }
+            }
+            if (isset($CFG['GEN']['COPPA'])) {
+                echo '<script type="text/javascript">
+                function toggleOver13() {
+                    var chked = document.getElementById("over13").checked;
+                    $(".fullopt").toggle(chked);
+                    $(".limitedopt").toggle(!chked);
+                }</script>';
+            }
+
+			echo '<span class="form"><label for="courseid">',_('Course ID'),':</label></span><input class="form" type="text" size="20" name="courseid" id="courseid"/><br class="form"/>';
+			echo '<span class="form"><label for="ekey">',_('Enrollment Key'),':</label></span><input class="form" type="text" size="20" name="ekey" id="ekey"/><br class="form"/>';
 			if ($doselfenroll) {
 				echo '</div>';
 				echo '<div id="selfenrollwarn" class=noticetext style="display:none;">',_('Warning: You have selected a non-credit self-study course. ');
@@ -131,6 +176,12 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Modify User Profile'),"</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('User Profile'),'</h1></div>';
+
+		//call hook, if defined
+		if (function_exists('chguserinfoExtras')) {
+			chguserinfoExtras($userid, $myrights, $groupid);
+		}
+
 		echo "<form id=\"pageform\" class=limitaftervalidate enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>',_('Profile Settings'),'</legend>';
 		echo "<span class=form><label for=\"firstname\">",_('Enter First Name'),":</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
@@ -324,9 +375,16 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Enroll in a Course'),'</h1></div>';
 		echo "<form id=\"pageform\" method=post action=\"actions.php?action=enroll$gb\">";
 		$doselfenroll = false;
-		$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE istemplate > 0 AND (istemplate&4)=4 AND available<4 ORDER BY name");
-		if ($stm->rowCount()>0) {
-			$doselfenroll = true;
+        $stm = $DBH->query("SELECT id,name FROM imas_courses WHERE istemplate > 0 AND (istemplate&4)=4 AND available<4 ORDER BY name");
+        if ($stm->rowCount()>0) {
+            $stm2 = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=?");
+            $stm2->execute(array($userid));
+            $jsondata = json_decode($stm2->fetchColumn(0), true);
+            if (empty($jsondata['under13'])) {
+                $doselfenroll = true;
+            }
+        }
+		if ($doselfenroll) {
 			echo '<p>',_('Select the course you\'d like to enroll in'),'</p>';
 			echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 			echo '<option value="0" selected="selected">',_('My teacher gave me a course ID (enter below)').'</option>';

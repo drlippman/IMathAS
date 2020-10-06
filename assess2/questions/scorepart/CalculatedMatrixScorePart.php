@@ -4,6 +4,7 @@ namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
 require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once(__DIR__ . '/matrix_common.php');
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -63,6 +64,7 @@ class CalculatedMatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else if (isset($answersize)) {
             $sizeparts = explode(',',$answersize);
+            $N = $sizeparts[0];
             $givenanslist = array();
             if ($hasNumVal) {
                 $givenanslistvals = explode('|', $givenansval);
@@ -94,6 +96,7 @@ class CalculatedMatrixScorePart implements ScorePart
                     $givenanslistvals[$j] = evalMathParser($v);
                 }
             }
+            $N = substr_count($answer,'),(')+1;
             //this may not be backwards compatible
             $scorePartResult->setLastAnswerAsGiven($givenans);
             $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
@@ -181,17 +184,40 @@ class CalculatedMatrixScorePart implements ScorePart
             }
         }
 
+        if (in_array('ref',$ansformats)) {
+            // reduce correct answer to rref
+            $answerlist = matrix_scorer_rref($answerlist, $N);
+            $M = count($answerlist) / $N;
+            for ($r=0;$r<$N;$r++) {
+              $c = 0;
+              while (abs($answerlist[$r*$M+$c]) < 1e-10 && $c < $M) {
+                if (abs($givenanslistvals[$r*$M+$c]) > 1e-10) {
+                  $correct = false; // nonzero where 0 expected
+                }
+                $c++;
+              }
+              if ($c < $M) { // if there's a first non-zero entry, should be 1
+                if (abs($givenanslistvals[$r*$M+$c] - 1) > 1e-10) {
+                  $correct = false;
+                }
+              }
+            }
+            // now reduce given answer to rref
+            if ($correct) {
+              $givenanslistvals = matrix_scorer_rref($givenanslistvals, $N);
+            }
+        }
         for ($i=0; $i<count($answerlist); $i++) {
             if (!isset($givenanslistvals[$i]) || isNaN($givenanslistvals[$i])) {
                 $incorrect[$i] = 1;
                 continue;
             } else if (isset($abstolerance)) {
-                if (abs($answerlist[$i] - $givenanslistvals[$i]) > $abstolerance-1E-12) {
+                if (abs($answerlist[$i] - $givenanslistvals[$i]) > $abstolerance+1E-12) {
                     $incorrect[$i] = 1;
                     continue;
                 }
             } else {
-                if (abs($answerlist[$i] - $givenanslistvals[$i])/(abs($answerlist[$i])+.0001) > $reltolerance-1E-12) {
+                if (abs($answerlist[$i] - $givenanslistvals[$i])/(abs($answerlist[$i])+.0001) > $reltolerance+1E-12) {
                     $incorrect[$i] = 1;
                     continue;
                 }

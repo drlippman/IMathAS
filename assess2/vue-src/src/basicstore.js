@@ -147,14 +147,14 @@ export const actions = {
             return;
           }
           if (store.assessInfo.displaymethod === 'skip') {
-            if (store.assessInfo.intro !== '') {
+            if (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0) {
               Router.push('/skip/0');
             } else {
               Router.push('/skip/1');
             }
           } else if (store.assessInfo.displaymethod === 'full') {
             if (store.assessInfo.hasOwnProperty('interquestion_pages')) {
-              if (store.assessInfo.intro !== '') {
+              if (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0) {
                 Router.push('/full/page/0');
               } else {
                 Router.push('/full/page/1');
@@ -190,16 +190,25 @@ export const actions = {
         delete store.assessInfo.scoreerrors[qn];
       }
     }
+    const data = new FormData();
+    data.append('qn', qn);
+    data.append('practice', store.assessInfo.in_practice);
+    data.append('regen', regen ? 1 : 0);
+    data.append('jumptoans', jumptoans ? 1 : 0);
+    if (store.assessInfo.preview_all) {
+      data.append('preview_all', true);
+    }
+    if (Object.keys(store.autosaveQueue).length > 0) {
+      actions.clearAutosaveTimer();
+      this.addAutosaveData(data);
+    }
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
       type: 'POST',
       dataType: 'json',
-      data: {
-        qn: qn,
-        practice: store.assessInfo.in_practice,
-        regen: regen ? 1 : 0,
-        jumptoans: jumptoans ? 1 : 0
-      },
+      data: data,
+      processData: false,
+      contentType: false,
       xhrFields: {
         withCredentials: true
       },
@@ -210,6 +219,10 @@ export const actions = {
           this.handleError(response.error);
           return;
         }
+        if (response.saved_autosaves) {
+          this.markAutosavesDone();
+        }
+        delete response.saved_autosaves;
         if (regen && store.assessInfo.questions[qn].jsparams) {
           // clear out before overwriting
           window.imathasAssess.clearparams(store.assessInfo.questions[qn].jsparams);
@@ -283,6 +296,15 @@ export const actions = {
     if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
     store.inTransit = true;
     const data = {};
+    // get values again, in case event trigger didn't happen
+    window.$('.swbox').each(function () {
+      const qn = parseInt(this.id.substr(2));
+      if (!store.assessInfo.questions[qn].hasOwnProperty('work') ||
+        this.value !== store.assessInfo.questions[qn].work
+      ) {
+        store.work[qn] = this.value;
+      }
+    });
     for (const qn in store.work) {
       data[qn] = store.work[qn];
     }
@@ -361,8 +383,19 @@ export const actions = {
     // figure out non-blank questions to submit
     const lastLoaded = [];
     const changedQuestions = this.getChangedQuestions(qns);
-
-    if (Object.keys(changedQuestions).length === 0 && !endattempt) {
+    let changedWork = false;
+    for (let k = 0; k < qns.length; k++) {
+      const qn = parseInt(qns[k]);
+      // get work again, in case triggers didn't work
+      if (document.getElementById('sw' + qn)) {
+        store.work[qn] = document.getElementById('sw' + qn).value;
+      }
+      if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
+        changedWork = true;
+        break;
+      }
+    }
+    if (Object.keys(changedQuestions).length === 0 && !changedWork && !endattempt) {
       store.errorMsg = 'nochange';
       store.inTransit = false;
       return;
@@ -405,6 +438,7 @@ export const actions = {
         }
       }
     }
+
     for (let k = 0; k < qns.length; k++) {
       const qn = parseInt(qns[k]);
 
@@ -443,6 +477,8 @@ export const actions = {
     if (store.assessInfo.preview_all) {
       data.append('preview_all', true);
     }
+    this.addAutosaveData(data, Object.keys(changedQuestions));
+
     const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
       store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
 
@@ -469,6 +505,10 @@ export const actions = {
         } else {
           store.errorMsg = null;
         }
+        if (response.saved_autosaves) {
+          this.markAutosavesDone();
+        }
+        delete response.saved_autosaves;
         // clear out initValues for this question so they get re-set
         for (const qn in changedQuestions) {
           if (store.assessInfo.hasOwnProperty('scoreerrors') &&
@@ -517,6 +557,7 @@ export const actions = {
               window.$(el).find('.scoreresult').focus();
             } else {
               el = window.$('#questionwrap' + qns[0]).find('.seqsep').last().next()[0];
+              window.$('#questionwrap' + qns[0]).find('.seqsep').last().focus();
             }
             var bounding = el.getBoundingClientRect();
             if (bounding.top < 0 || bounding.bottom > document.documentElement.clientHeight) {
@@ -552,7 +593,7 @@ export const actions = {
   },
   doAutosave (qn, partnum, timeactive) {
     store.somethingDirty = false;
-    window.clearTimeout(store.autosaveTimer);
+    // this.clearAutosaveTimer()
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
       Vue.set(store.autosaveQueue, qn, []);
     }
@@ -560,7 +601,9 @@ export const actions = {
       store.autosaveQueue[qn].push(partnum);
     }
     Vue.set(store.autosaveTimeactive, qn, timeactive);
-    store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 2000);
+    if (store.autosaveTimer === null) {
+      store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 60 * 1000);
+    }
   },
   clearAutosave (qns) {
     for (const i in qns) {
@@ -574,23 +617,18 @@ export const actions = {
   },
   clearAutosaveTimer () {
     window.clearTimeout(store.autosaveTimer);
+    store.autosaveTimer = null;
   },
-  submitAutosave (async) {
-    store.somethingDirty = false;
-    this.clearAutosaveTimer();
-    if (Object.keys(store.autosaveQueue).length === 0) {
-      return;
-    }
-    if (store.inTransit) {
-      window.setTimeout(() => this.submitAutosave(async), 20);
-      return;
-    }
-    store.inTransit = true;
-    store.autoSaving = true;
+  addAutosaveData (data, skip) {
+    skip = skip || [];
+    // adds autosave data to existing FormData
     const lastLoaded = {};
-    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
-    const data = new FormData();
+    const tosaveqn = {};
     for (const qn in store.autosaveQueue) {
+      if (skip.indexOf(qn) !== -1) {
+        continue; // skip it
+      }
+      tosaveqn[qn] = store.autosaveQueue[qn];
       // build up regex to match the inputs for all the parts we want to save
       const regexpts = [];
       for (const k in store.autosaveQueue[qn]) {
@@ -622,16 +660,61 @@ export const actions = {
       });
       lastLoaded[qn] = store.lastLoaded[qn].getTime();
     };
-    data.append('tosaveqn', JSON.stringify(store.autosaveQueue));
-    data.append('lastloaded', JSON.stringify(lastLoaded));
-    data.append('verification', JSON.stringify(this.getVerificationData(store.autosaveQueue)));
+    data.append('autosave-tosaveqn', JSON.stringify(tosaveqn));
+    data.append('autosave-lastloaded', JSON.stringify(lastLoaded));
+    data.append('autosave-verification', JSON.stringify(this.getVerificationData(tosaveqn)));
     if (store.assessInfo.displaymethod === 'full') {
-      data.append('timeactive', '');
+      data.append('autosave-timeactive', '');
     } else {
-      data.append('timeactive', JSON.stringify(store.autosaveTimeactive));
+      data.append('autosave-timeactive', JSON.stringify(store.autosaveTimeactive));
     }
+  },
+  markAutosavesDone () {
+    for (const qn in store.autosaveQueue) {
+      for (const k in store.autosaveQueue[qn]) {
+        if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
+          if (store.assessInfo.questions[parseInt(qn)].parts_entered.indexOf(store.autosaveQueue[qn][k]) === -1) {
+            store.assessInfo.questions[parseInt(qn)].parts_entered.push(store.autosaveQueue[qn][k]);
+          }
+        }
+      }
+    }
+
+    // clear autosave queue
+    store.autosaveQueue = {};
+  },
+  submitAutosave (async) {
+    store.somethingDirty = false;
+    this.clearAutosaveTimer();
+    if (Object.keys(store.autosaveQueue).length === 0) {
+      return;
+    }
+    if (store.inTransit) {
+      window.setTimeout(() => this.submitAutosave(async), 20);
+      return;
+    }
+    store.inTransit = true;
+    store.autoSaving = true;
+
+    if (typeof window.tinyMCE !== 'undefined') { window.tinyMCE.triggerSave(); }
+    const data = new FormData();
+    this.addAutosaveData(data);
+
     if (store.assessInfo.in_practice) {
       data.append('practice', true);
+    }
+    if (store.assessInfo.preview_all) {
+      data.append('preview_all', true);
+    }
+    if (async === false && navigator.sendBeacon) {
+      navigator.sendBeacon(
+        store.APIbase + 'autosave.php' + store.queryString,
+        data
+      );
+      store.inTransit = false;
+      store.autoSaving = false;
+      store.autosaveQueue = {};
+      return;
     }
     window.$.ajax({
       url: store.APIbase + 'autosave.php' + store.queryString,
@@ -655,18 +738,7 @@ export const actions = {
           }
           return;
         }
-        for (const qn in store.autosaveQueue) {
-          for (const k in store.autosaveQueue[qn]) {
-            if (store.assessInfo.questions[parseInt(qn)].hasOwnProperty('parts_entered')) {
-              if (store.assessInfo.questions[parseInt(qn)].parts_entered.indexOf(store.autosaveQueue[qn][k]) === -1) {
-                store.assessInfo.questions[parseInt(qn)].parts_entered.push(store.autosaveQueue[qn][k]);
-              }
-            }
-          }
-        }
-
-        // clear autosave queue
-        store.autosaveQueue = {};
+        this.markAutosavesDone();
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -1053,7 +1125,14 @@ export const actions = {
         store.assessInfo.questions = [];
       }
       for (const i in response.questions) {
-        Vue.set(store.assessInfo.questions, parseInt(i), response.questions[i]);
+        const iint = parseInt(i);
+        if (response.questions[i].category === null &&
+          store.assessInfo.questions.hasOwnProperty(iint) &&
+          store.assessInfo.questions[iint].hasOwnProperty('category')
+        ) {
+          response.questions[i].category = store.assessInfo.questions[iint].category;
+        }
+        Vue.set(store.assessInfo.questions, iint, response.questions[i]);
       }
       delete response.questions;
     }
@@ -1168,6 +1247,51 @@ export const actions = {
         store.timelimit_restricted = 1;
       } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
         store.timelimit_restricted = 2;
+      }
+    }
+    if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')) {
+      // map and override previous interquestion_text, if map defined
+      let lasttext = -1;
+      const origtexts = data.interquestion_text;
+      const newtexts = [];
+      for (const i in data.questions) {
+        if (data.questions[i].hasOwnProperty('text')) {
+          const thistext = data.questions[i].text;
+          if (JSON.stringify(thistext) === JSON.stringify(lasttext)) { // same one
+            for (let j = 0; j < thistext.length; j++) {
+              newtexts[newtexts.length - 1 - j].displayUntil = i;
+            }
+          } else {
+            for (let j = 0; j < thistext.length; j++) {
+              newtexts.push(Object.assign({ orig: 1e5 }, origtexts[thistext[j]]));
+              newtexts[newtexts.length - 1].displayBefore = i;
+              newtexts[newtexts.length - 1].displayUntil = i;
+            }
+            lasttext = thistext.slice();
+          }
+        } else {
+          lasttext = -1;
+        }
+      }
+      for (const i in origtexts) {
+        if (origtexts[i].hasOwnProperty('displayBefore')) {
+          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
+        }
+        if (origtexts[i].hasOwnProperty('atend')) {
+          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
+          newtexts[newtexts.length - 1].displayBefore = data.questions.length;
+          newtexts[newtexts.length - 1].displayUntil = data.questions.length;
+        }
+      }
+      if (newtexts.length > 0) {
+        newtexts.sort(function (a, b) {
+          if (parseInt(a.displayBefore) === parseInt(b.displayBefore)) {
+            return (a.orig - b.orig);
+          } else {
+            return a.displayBefore - b.displayBefore;
+          }
+        });
+        data.interquestion_text = newtexts;
       }
     }
     if (data.hasOwnProperty('interquestion_text')) {

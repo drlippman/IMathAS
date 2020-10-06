@@ -1,5 +1,8 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header></assess-header>
     <videocued-nav
       :cue="cue"
@@ -13,13 +16,17 @@
         @jumpto="jumpTo"
       />
     </videocued-nav>
-    <div class="scrollpane" role="region" :aria-label="$t('regions.q_and_vid')">
-      <div
-        class = "questionpane introtext"
-        v-show = "cue == -1"
+    <div
+      class="scrollpane"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.q_and_vid')"
+    >
+      <intro-text
+        :active = "cue == -1"
+        :html = "intro"
         key = "-1"
-        v-html = "intro"
-        ref = "introtext"
       />
       <div id = "playerwrapper" v-show = "cue > -1 && qn === -1">
         <div
@@ -87,6 +94,7 @@ import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
 import VideocuedResultNav from '@/components/VideocuedResultNav.vue';
 import Question from '@/components/question/Question.vue';
+import IntroText from '@/components/IntroText.vue';
 import { store } from '../basicstore';
 
 export default {
@@ -97,11 +105,11 @@ export default {
     Question,
     VideocuedResultNav,
     InterQuestionTextList,
-    AssessHeader
+    AssessHeader,
+    IntroText
   },
   data: function () {
     return {
-      youtubeApiLoaded: false,
       videoWidth: 600,
       aspectRatioPercent: 56.2,
       ytplayer: null,
@@ -165,7 +173,16 @@ export default {
   methods: {
     createPlayer () {
       const supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
-      const pVarsInternal = { 'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen ? 1 : 0, 'controls': 2, 'rel': 0, 'modestbranding': 1, 'showinfo': 0 };
+      const pVarsInternal = {
+        'autoplay': 0,
+        'wmode': 'transparent',
+        'fs': supportsFullScreen ? 1 : 0,
+        'controls': 2,
+        'rel': 0,
+        'modestbranding': 1,
+        'showinfo': 0,
+        'origin': window.location.protocol + '//' + window.location.host
+      };
       const ar = store.assessInfo.videoar.split(':');
       const videoHeight = window.innerHeight - 50;
       this.videoWidth = ar[0] / ar[1] * videoHeight;
@@ -250,6 +267,10 @@ export default {
           this.ytplayer.pauseVideo();
         }
       } else {
+        if (this.ytplayer === null || typeof this.ytplayer.seekTo !== 'function') {
+          store.errorMsg = 'ytnotready';
+          return;
+        }
         const newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
         if (newToshow === 'v') {
@@ -275,24 +296,25 @@ export default {
       this.toshow = newToshow;
     }
   },
+  mounted () {
+    if (window.YT) {
+      this.createPlayer();
+    } else {
+      window.onYouTubePlayerAPIReady = () => {
+        this.createPlayer();
+      };
+      // async load YouTube API
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/player_api';
+      document.head.appendChild(tag);
+    }
+  },
   created () {
     // don't show intro if it's empty
     if (store.assessInfo.intro !== '') {
       this.cue = -1;
       this.toshow = 'i';
     }
-    // async load YouTube API
-    window.onYouTubePlayerAPIReady = () => {
-      this.youtubeApiLoaded = true;
-      this.createPlayer();
-    };
-    const tag = document.createElement('script');
-    tag.src = '//www.youtube.com/player_api';
-    document.head.appendChild(tag);
-  },
-  mounted () {
-    setTimeout(window.drawPics, 100);
-    window.rendermathnode(this.$refs.introtext);
   }
 };
 </script>

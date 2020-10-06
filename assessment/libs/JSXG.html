@@ -49,6 +49,8 @@
     <li><a href="#JSXG_addCircle">JSXG_addCircle</a></li>
     <li><a href="#JSXG_addPolygon">JSXG_addPolygon</a></li>
     <li><a href="#JSXG_addGlider">JSXG_addGlider</a></li>
+	<li><a href="#JSXG_addTangent">JSXG_addTangent</a></li>
+	<li><a href="#JSXG_setAttribute">JSXG_setAttribute</a></li>
 
   </ul>
 
@@ -105,7 +107,7 @@ $board = JSXG_addSlider($board, "a", $ops);
   </pre>
 
   <!-- addFunction -->
-  <h2><a name="JSXG_addFunction">JSXG_addFunction($board, $ops)</a></h2>
+  <h2><a name="JSXG_addFunction">JSXG_addFunction($board, $ops, [$ref])</a></h2>
   <p>Adds the graph of a function to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes().</p>
   <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
@@ -117,6 +119,9 @@ $board = JSXG_addSlider($board, "a", $ops);
     <li>$ops['strokeWidth']=(int) sets the width of the function graph. Should be a number between 1 and 9.</li>
     <li>$ops['dash']=(int) sets the dash of the function graph. Set to 2 through 9 to get different dashes. No dashing by default.</li>
   </ul>
+    <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via func_$label_$ref where $label is the label of the board that the function lives in.
+  </p>
   <h4>Example</h4>
   <pre>
 loadlibrary("JSXG");
@@ -535,6 +540,63 @@ $board = JSXG_addGlider($board, $ops, "1");
 $ops=array(); $ops['position'] = [[0,0], "glider_plot{$thisq}_1"];
 $board = JSXG_addLine($board, $ops);
   </pre>
+
+  <!-- addTangent -->
+  <h2><a name="JSXG_addTangent">JSXG_addTangent($board, $glidername, $ops, [$ref])</a></h2>
+  <p>Adds a tangent line to an object (circle, function, etc.). These can only be placed on a glider that exists on the object. $board should be a variable returned from JSXG_createAxes(), JSXG_createPolarAxes(), or JSXG_createBlankBoard().</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+	<li>$ops['glider'] = (string) - a reference to a glider on the object you wish to attach your tangent line to.</li>
+    <li>$ops['label'] = (string) - adds a label to the tangent line, this can be wrapped in `` for math notation.</li>
+    <li>$ops['color'] = (string) - sets the color of the tangent line. Can be expressed as a word describing the color such as 'blue' or as a RGB hexidecimal value such as '#00FF65'.</li>
+    <li>$ops['dash'] = (int) - if set, draws the line as a set of dashes. Use 1 - 6 as input for different patterns.</li>
+    <li>$ops['width'] = (int) - sets the width of the tangent line, the default is 2.</li>
+    <li>$ops['visible'] = (boolean) - can be used to show or hide the tangent by default, this can be changed later by using JSXG_setAttribute().</li>
+  </ul>
+    <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via tangent_$label_$ref where $label is the label of the board that the tangent lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG")
+
+loadJSX()
+$board = JSXG_createAxes("plot{$thisq}")
+
+$ops = array()
+$ops['rule'] = "sec(x)"
+$board = JSXG_addFunction($board, $ops, "1")
+
+$ops = array()
+$ops['position'] = [1, 0, "func_plot{$thisq}_1"]
+$board = JSXG_addGlider($board, $ops, "1")
+
+$ops = array()
+$ops['glider'] = "glider_plot{$thisq}_1"
+$board = JSXG_addTangent($board, $ops, "1")
+  </pre>
+
+ <!-- setAttribute -->
+  <h2><a name="JSXG_setAttribute">JSXG_setAttribute($board, $object, $parameters)</a></h2>
+  <p>Can be used to change an attribute of an object after it has been initialized.</p>
+  <p>$board - the name of the board for which the object resides.</p>
+  <p>$object - the reference name of the object you want to make a change to.</p>
+  <p>$parameters - a <i>json</i> object containing comma-separated key:value pairs of the attributes you wish to change. See the <a href="https://jsxgraph.uni-bayreuth.de/docs/index.html">JSX Graph API Reference</a> for a list of available attributes on each type of object. Note that this object must be delimited as a string.</p>
+  
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG")
+
+loadJSX()
+$board = JSXG_createAxes("plot{$thisq}")
+
+$ops = array()
+$ops['rule'] = "x^2-3"
+$board = JSXG_addFunction($board, $ops, "1")
+
+$board = JSXG_setAttribute($board, "func_plot{$thisq}_1", "{ strokeColor: 'red' }")
+ </pre>
+
 
 
 </body>

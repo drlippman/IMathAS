@@ -192,7 +192,7 @@ if ($myrights < 40) {
 
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 $placeinhead .= "<script>\nfunction showcourses() { \n";
 $placeinhead .= "  var uid=document.getElementById(\"seluid\").value; \n";
 $placeinhead .= "  if (uid>0) {window.location='admin.php?showcourses='+uid;} \n";

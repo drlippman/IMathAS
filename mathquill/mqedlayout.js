@@ -100,7 +100,10 @@ var myMQeditor = (function($) {
               {l:'\\tan^{-1}', c:'f'},
               {l:'\\sinh', c:'f'},
               {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'}
+              {l:'\\tanh', c:'f'},
+              {l:'\\pi', nb:1},
+              {s:1},
+              {s:4}
             ]
           }
         ]
@@ -137,7 +140,7 @@ var myMQeditor = (function($) {
               {l:'\\left(\\right]', c:'i', w:'(]'},
               {l:'\\left[\\right)', c:'i', w:'[)'},
               {l:'\\infty'},
-              {l:'-\\infty', c:'w'},
+              {l:'-\\infty', c:'w', w:'-\\infty'},
               {l:'\\cup'},
               {s:1}
             ]
@@ -295,7 +298,10 @@ var myMQeditor = (function($) {
               {l:'\\tan^{-1}', c:'f'},
               {l:'\\sinh', c:'f'},
               {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'}
+              {l:'\\tanh', c:'f'},
+              {l:'\\pi', nb:1},
+              {s:1},
+              {s:4}
             ]
           }
         ]
@@ -485,26 +491,6 @@ var myMQeditor = (function($) {
           baselayout.tabs[0].tabcontent[2].contents[13] = {s:1};
         }
       }
-      if (vars.length > 0) {
-        var varbtns = getVarsButtons2(vars);
-        if (varbtns.format == 'basic') {
-          baselayout.tabs[0].tabcontent.unshift({
-            flow: 'row',
-            s: 1,
-            contents: varbtns.btns
-          }, {s:.1});
-        } else {
-          baselayout.tabs.splice(1, 0, {
-            p: 'Vars',
-            enabled: true,
-            tabcontent: [{
-              flow: 'row',
-              s: varbtns.perrow,
-              contents: varbtns.btns
-            }]
-          });
-        }
-      }
     } else {
       baselayout = $.extend(true, [], underLayout3);
       if (calcformat.match(/\bdecimal/)) {
@@ -531,12 +517,18 @@ var myMQeditor = (function($) {
           );
         }
       }
+      if (qtype=='numfunc' && calcformat.match(/inequality/)) {
+        baselayout.tabs[3].enabled = true;
+        baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
+      }
     }
-    // for both
     if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
+        if (calcformat.match(/allowdegrees/)) {
+            baselayout.tabs[2].tabcontent[0].contents[13] = {l:'\\degree'};
+        }
       }
     }
     if (qtype.match(/interval/)) {
@@ -545,7 +537,7 @@ var myMQeditor = (function($) {
       } else {
         baselayout.tabs[4].enabled = true;
       }
-    } else if (qtype=='calcmatrix' && !calcformat.match(/matrixsized/)) {
+    } else if (qtype.match(/matrix/) && !calcformat.match(/matrixsized/)) {
       baselayout.tabs[5].enabled = true;
     } else if (calcformat.match(/set/)) {
       baselayout.tabs[0].tabcontent.unshift({
@@ -566,19 +558,41 @@ var myMQeditor = (function($) {
         contents: [{l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']}]
       }, {s:.1});
     }
+    // for both
+    if (vars.length > 0) {
+        var varbtns = getVarsButtons2(vars,layoutstyle);
+        if (varbtns.format == 'basic') {
+          baselayout.tabs[0].tabcontent.unshift({
+            flow: 'row',
+            s: 1,
+            contents: varbtns.btns
+          }, {s:.1});
+        } else {
+          baselayout.tabs.splice(1, 0, {
+            p: 'Vars',
+            enabled: true,
+            tabcontent: [{
+              flow: 'row',
+              s: varbtns.perrow,
+              contents: varbtns.btns
+            }]
+          });
+        }
+    }
     return baselayout;
   }
-  var greekletters = [''];
 
-  function getVarsButtons2(vars) {
+  function getVarsButtons2(vars,layoutstyle) {
     var maxlen = 1;
     var btns = [];
+    var maxbasic = (layoutstyle=='OSK' ? 4 : 2);
     for (var i=0; i<vars.length; i++) {
       vars[i] = vars[i].replace(/alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau/i,
         '\\$&');
       if (vars[i].charAt(0)!='\\' && vars[i].length > maxlen) {
         maxlen = vars[i].length;
       }
+      vars[i] = vars[i].replace(/_(\w{2,})/,"_{$1}");
       btns.push({'b':vars[i], c:'w'});
     }
     var perrow = Math.min(8,Math.max(4, Math.ceil(vars.length/4)));
@@ -586,47 +600,10 @@ var myMQeditor = (function($) {
       btns.push({'s': perrow - vars.length%perrow});
     }
     return {
-      format: (vars.length<5 && maxlen < 4) ? 'basic' : 'tab',
+      format: (vars.length <= maxbasic && maxlen < 4) ? 'basic' : 'tab',
       btns: btns,
       perrow: perrow
     };
-  }
-
-  function getVarsButtons(vars) {
-    for (var i=0; i<vars.length; i++) {
-      vars[i] = vars[i].replace(/alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau/i,
-        '\\$&');
-    }
-    if (vars.length<3 &&
-      vars[0].length<3 &&
-      vars[1].length<3
-    ) {
-      //put them as regular buttons.
-      if (vars.length==1) {
-        return {'b':vars[0]};
-      } else {
-        return {
-          flow: 'row',
-          contents: [{'b':vars[0]},{'b':vars[1]}]
-        };
-      }
-    } else {
-      var perrow = Math.min(8,Math.max(4, Math.ceil(vars.length/4)));
-      var subarr = [];
-      var cnt=0;
-      for (nr=0;nr<Math.ceil(vars.length/perrow);nr++) {
-        subarr[nr] = [];
-        for (nc=0;nc<perrow;nc++) {
-          if (cnt<vars.length) {
-            subarr[nr][nc] = {'b':vars[cnt], c:'w'};
-          } else {
-            subarr[nr][nc] = {'s':1};
-          }
-          cnt++;
-        }
-      }
-      return {'p':'Vars', 'panel':subarr.slice()};
-    }
   }
 
   function onShow(mqel, layoutstyle, rebuild) {
@@ -659,6 +636,23 @@ var myMQeditor = (function($) {
           class: "mqed-tipholder"
         }).append(tipdiv));
       }
+    } else if (rebuild && layoutstyle === 'OSK') {
+      var baseid = mqel.id.substring(8);
+      var textel = $('#'+baseid);
+      if (textel[0].hasAttribute("data-tip")) {
+        var ref = baseid.substr(2).split(/-/)[0];
+        reshrinkeh(mqel.id);
+        showehdd(mqel.id, textel[0].getAttribute("data-tip"), ref);
+      }
+    }
+  }
+
+  function onBlur() {
+    hideeh();
+  }
+  function onResize(el, layoutstyle) {
+    if (layoutstyle === 'OSK') {
+        updateehpos();
     }
   }
 
@@ -675,6 +669,8 @@ var myMQeditor = (function($) {
   return {
     getLayout: getLayout,
     onShow: onShow,
+    onBlur: onBlur,
+    onResize: onResize,
     onTab: onTab
   }
 })(jQuery);
@@ -687,6 +683,8 @@ var myMQeditor = (function($) {
 MQeditor.setConfig({
   getLayout: myMQeditor.getLayout,
   onShow: myMQeditor.onShow,
+  onBlur: myMQeditor.onBlur,
+  onResize: myMQeditor.onResize,
   onTab: myMQeditor.onTab,
   toMQ: AMtoMQ,
   fromMQ: MQtoAM,
@@ -704,7 +702,7 @@ MQ.config({
   charsThatBreakOutOfSupSubVar: "+-(",
   charsThatBreakOutOfSupSubOp: "+-(",
   restrictMismatchedBrackets: true,
-  autoCommands: 'pi theta root sqrt ^oo',
+  autoCommands: 'pi theta root sqrt ^oo degree',
   autoParenOperators: true,
   addCommands: {'oo': ['VanillaSymbol', '\\infty ', '&infin;']},
 });

@@ -542,9 +542,9 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$_SESSION['coursetheme'] = $coursetheme;
 		$_SESSION['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=031417"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=031417"></script>';
 			require("../includes/rubric.php");
-			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042519"></script>';
+			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=042519"></script>';
 			if ($_SESSION['useed']!=0) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}
@@ -1002,7 +1002,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				if ($_SESSION['useed']==0) {
 					echo '<textarea id="fb-'.$i.'" name="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::encodeStringForDisplay($feedback["Q$i"], true).'</textarea>';
 				} else {
-					echo '<div id="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
+					echo '<div id="fb-'.$i.'" class="fbbox skipmathrender" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
 				}
 				echo '</span>';
 
@@ -1140,7 +1140,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				}
 				echo "</textarea></p>";
 			} else {
-				echo "<div cols=60 rows=4 id=\"feedback\" class=\"fbbox\">";
+				echo "<div cols=60 rows=4 id=\"feedback\" class=\"fbbox skipmathrender\">";
 				if (!empty($feedback["Z"])) {
 					echo Sanitize::outgoingHtml($feedback["Z"]);
 				}

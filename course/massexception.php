@@ -16,7 +16,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		require_once("../includes/parsedatetime.php");
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
-		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):'NULL';
+		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
 		$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
 
 		$forumitemtype = $_POST['forumitemtype'];
@@ -203,7 +203,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 
 
 	$pagetitle = "Manage Exceptions";
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 	$placeinhead .= '<style type="text/css">
 	   fieldset { margin-bottom: 10px;}
 	   fieldset legend {font-weight: bold;}
@@ -493,11 +493,11 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		//$etime = tzdate("g:i a",$wk);
 		echo "<span class=form>Available After:</span><span class=formright>";
 		echo "<input type=text size=10 name=sdate value=\"$sdate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=stime value=\"$stime\"></span><BR class=form>\n";
 
 		echo "<span class=form>Available Until:</span><span class=formright><input type=text size=10 name=edate value=\"$edate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
 
 		echo "Set Exception for assessments: ";
@@ -535,11 +535,11 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		echo '<option value="R" checked">Override Reply By only</option></select></span><br class="form"/>';
 
 		echo "<span class=form>Post By:</span><span class=formright><input type=text size=10 name=pbdate value=\"$pbdate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=pbtime value=\"$pbtime\"></span><BR class=form>\n";
 
 		echo "<span class=form>Reply By:</span><span class=formright><input type=text size=10 name=rbdate value=\"$rbdate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=rbtime value=\"$rbtime\"></span><BR class=form>\n";
 
 

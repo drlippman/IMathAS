@@ -604,13 +604,28 @@ $(function() {
 			$("#reqscorewrap").toggle(rqshow);
 			$(this).attr("aria-expanded", rqshow);
 	});
+
+	// bind to caltagradio controls
+	$('input[type=radio][name=caltagradio]').change(function() {
+		if (this.value == 'usename') {
+			$('input[type=text][name=caltagact]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+		}
+		else if (this.value == 'usetext') {
+			$('input[type=text][name=caltagact]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('?');
+		}
+	});
+
 });
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerchgassessments" class="pagetitle"><h1>Mass Change Assessment Settings
-		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h1></div>
+
+	<div class="cpmid">
+	<a href="masschgprereqs.php?cid=<?php echo $cid;?>&from=chgassessments"><?php echo _('Mass Change Prereqs'); ?></a>
+	</div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
 	<p><b>Be aware</b> that changing default points or penalty after an assessment has been
@@ -848,7 +863,9 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>
-				<input name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+                    <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>>Use Text:</label>
+                     <input aria-label="Calendar icon text" name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>" <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /><br />
+					<label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>>Use Assessment Name</label>
 				</td>
 			</tr>
 			<tr class="coptr">

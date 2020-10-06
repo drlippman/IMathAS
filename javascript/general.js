@@ -91,7 +91,11 @@ function tipshow(el,tip, e) {
 	}
 	if (typeof tipobj!= 'object') {
 		tipobj = document.createElement("div");
+        if (window.imathasAssess) {
+            tipobj.className = "dropdown-pane tooltip-pane";
+        } else {
 		tipobj.className = "tips";
+        }
 		tipobj.setAttribute("role","tooltip");
 		tipobj.id = "hovertipsholder";
 		document.getElementsByTagName("body")[0].appendChild(tipobj);
@@ -251,7 +255,7 @@ function submitlimiter(e) {
 function setupFormLimiters() {
 	var el = document.getElementsByTagName("form");
 	for (var i=0;i<el.length;i++) {
-		if (typeof el[i].onsubmit != 'function' && el[i].className!="nolimit" && el[i].className!="limitaftervalidate") {
+		if (typeof el[i].onsubmit != 'function' && !el[i].className.match(/(nolimit|limitaftervalidate)/)) {
 			$(el[i]).on('submit',submitlimiter);
 		}
 	}
@@ -313,7 +317,8 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
-function GB_show(caption,url,width,height) {
+function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
+    posstyle = posstyle || '';
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
 		gb_overlay.id = "GB_overlay";
@@ -343,7 +348,7 @@ function GB_show(caption,url,width,height) {
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY)
 			  .css("left", gbwin.getBoundingClientRect().left)
 			  .css("top", gbwin.getBoundingClientRect().top)
-			  .css("margin", 0);
+			  .css("margin", 0).css("right","").css("width",$(gbwin).width());
 			jQuery("#GB_window").append($("<div/>", {id: "GB_frameoverlay"}));
 			jQuery("body").css("user-select","none");
 
@@ -363,7 +368,7 @@ function GB_show(caption,url,width,height) {
 
 			jQuery("#GB_window").css("left", gbwin.getBoundingClientRect().left)
 			  .css("top", gbwin.getBoundingClientRect().top)
-			  .css("margin", 0)
+			  .css("margin", 0).css("right","")
 			  .data("original_w", $(gbwin).width())
 			  .data("original_h", $(gbwin).height())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
@@ -381,19 +386,30 @@ function GB_show(caption,url,width,height) {
 			}
 		});
 	}
+    document.getElementById("GB_loading").style.display = "block";
 	if (url.charAt(0)=='<') {
 		document.getElementById("GB_frameholder").innerHTML = '<div>'+url+'</div>';
 		if (url.match(/data-enlarged/)) {
 			jQuery("#GB_window").attr("data-lockratio", 1);
 		}
 		setTimeout(GB_doneload, 50);
-	} else {
+    } else if (!document.getElementById("GB_frame") ||
+        document.getElementById("GB_frame").src.replace(/\/$/,'') !=
+            url.replace(/\/$/,'')
+    ) {
 		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+	} else {
+        document.getElementById("GB_loading").style.display = 'none';
 	}
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
 		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
+		document.getElementById("GB_caption").innerHTML = btnhtml;
+		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+	} else if (url.match(/assessselect/)) {
+		var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
+		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
 		document.getElementById("GB_caption").innerHTML = btnhtml;
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
@@ -406,8 +422,11 @@ function GB_show(caption,url,width,height) {
 		}
 	}
 	document.getElementById("GB_window").style.display = "block";
+    if (overlay !== false) {
 	document.getElementById("GB_overlay").style.display = "block";
-	document.getElementById("GB_loading").style.display = "block";
+    } else {
+        document.getElementById("GB_overlay").style.display = "none";
+    }
 
 	//var de = document.documentElement;
 	//var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
@@ -415,8 +434,38 @@ function GB_show(caption,url,width,height) {
 	if (width > w-20) {
 		width = w-20;
 	}
-	$("#GB_window").css("margin","").css("left","").css("top","");
+    if (!posstyle.match(/noreset/) || 
+        !jQuery("#GB_window").data("original_mouse_x") || 
+        document.getElementById("GB_window").style.left==''
+    ) {
+        var inittop = '';
+        if (typeof showbelow == 'object') {
+            var belowel;
+            for (var i in showbelow) {
+                if (belowel = document.getElementById(showbelow[i])) {
+                    inittop = belowel.getBoundingClientRect().bottom + 10;
+                    if (height=='auto') {
+						h = (window.self !== window.top) ? Math.min(600,self.innerHeight) : self.innerHeight;
+						h = Math.max(200, h - inittop - 20);
+                    }
+                    break;
+                }
+            }
+        }
+        $("#GB_window").css("margin","").css("left","").css("top",inittop);
+        if (posstyle.match(/left/) && document.getElementById("GB_window").style.left=='') {
+            if ($("body").hasClass("fw1000") && w > 1000) {
+                width += (w - 1000)/2;
+            }
+            if ($("body").hasClass("fw1920") && w > 1920) {
+                width += (w - 1920)/2;
+            }
+            $("#GB_window").css("left", width).css("width","auto").css("right",20).css("margin","0");
+            width = w - width - 20;
+        } else {
 	document.getElementById("GB_window").style.width = width + "px";
+        }
+        
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
@@ -424,6 +473,7 @@ function GB_show(caption,url,width,height) {
 	} else {
 		document.getElementById("GB_frameholder").style.height = "auto";
 	}
+    }
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {
@@ -459,7 +509,7 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-var tinyMCEPreInit = {base: imasroot+"/tinymce4"};
+var tinyMCEPreInit = {base: staticroot+"/tinymce4"};
 function initeditor(edmode,edids,css,inline,setupfunction){
 	var cssmode = css || 0;
 	var inlinemode = inline || 0;
@@ -479,13 +529,17 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 		plugins: [
 			"lists advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor snippet",
-			"media table paste asciimath asciisvg rollups colorpicker"
+			"media table paste rollups colorpicker"
 		],
+        external_plugins: {
+            "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
+            "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
+        },
 		menubar: false,//"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | snippet code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
-		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
-		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
+		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr]',
+		content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
 		file_picker_callback: filePickerCallBackFunc,
@@ -505,6 +559,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
 		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+        autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
 			items: [
@@ -650,9 +705,8 @@ function recclick(type,typeid,info,txt) {
 	}
 }
 function setuptracklinks(i,el) {
-	jQuery(el).addClass("trackprepped");
 	if (jQuery(el).attr("data-base")) {
-		jQuery(el).click(function(e) {
+		jQuery(el).off('click.recclick').on('click.recclick', function(e) {
 			var inf = jQuery(this).attr('data-base').split('-');
 			recclick(inf[0], inf[1], jQuery(this).attr("href"),
 				jQuery(this).clone().find(".sr-only").remove().end().text());
@@ -661,7 +715,7 @@ function setuptracklinks(i,el) {
 				setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
 				return false;
 			}
-		}).mousedown(function(e) {
+		}).off('mousedown.recclick').on('mousedown.recclick', function(e) {
 			if (e.which==3) { //right click
 				var inf = jQuery(this).attr('data-base').split('-');
 				recclick(inf[0], inf[1], jQuery(this).attr("href"),
@@ -728,22 +782,31 @@ function togglevideoembed() {
 		}
 		timeref += '&enablejsapi=1';
 		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
-		jQuery('<iframe/>', {
+        var viframe = jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
 			height: 400,
 			src: loc_protocol+'//'+vidsrc+vidid+timeref,
 			frameborder: 0,
 			allowfullscreen: 1
-		}).insertAfter(jQuery(this));
-		jQuery(this).parent().fitVids();
-		jQuery('<br/>').insertAfter(jQuery(this));
-		jQuery(this).text(' [-]')
+        });
+        var $this = jQuery(this);
+        if ($this.closest('.itemhdr').length == 0) {
+            viframe.insertAfter($this);
+            $this.parent().fitVids();
+            jQuery('<br/>').insertAfter($this);
+        } else {
+            var par = $this.closest('.itemhdr').next();
+            par.prepend(viframe);
+            par.fitVids();
+        }
+		
+		$this.text(' [-]')
 			.attr('title',_("Hide video"))
 			.attr('aria-label',_("Hide embedded video"));
-		if (jQuery(this).prev().attr("data-base")) {
-			var inf = jQuery(this).prev().attr('data-base').split('-');
-			recclick(inf[0], inf[1], href, jQuery(this).prev().text());
+		if ($this.prev().attr("data-base")) {
+			var inf = $this.prev().attr('data-base').split('-');
+			recclick(inf[0], inf[1], href, $this.prev().text());
 		}
 	}
 }
@@ -837,7 +900,7 @@ function togglefileembed() {
 				text: 'Converting HEIC file (this may take a while)...'
 			}).insertAfter(jQuery(this));
 			if (!window.heic2any) {
-				jQuery.getScript(imasroot+'/javascript/heic2any.min.js')
+				jQuery.getScript(staticroot+'/javascript/heic2any.min.js')
 				 .done(function() { convertheic(href, 'fileiframe' + id); });
 			} else {
 				convertheic(href, 'fileiframe' + id);
@@ -873,7 +936,7 @@ jQuery(function() {
 		}
 	});
 	jQuery('form').each(function(i,el) {
-		if (m=el.getAttribute('action').match(/cid=(\d+)/)) {
+		if (el.hasAttribute('action') && (m=el.getAttribute('action').match(/cid=(\d+)/))) {
 			var btf = window.sessionStorage.getItem('btf'+m[1]) || '';
 			if (btf !== '') {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
@@ -901,14 +964,28 @@ function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
 	}
-	if (el.target) {
-		jQuery(el).append('<span class="sr-only">Opens externally</span>');
+	if (el.target && jQuery(el).find('.openext').length == 0) {
+		jQuery(el).append('<span class="sr-only openext">Opens externally</span>');
 	}
 }
 function addBlankTarget(i,el) {
 	if (el.host !== window.location.host) {
 		el.setAttribute("target", "_blank");
 	}
+}
+
+function uniqid(prefix) {
+    return (prefix || '') + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function setariastatus(status) {
+    var el = document.getElementById("ariastatus");
+    if (!el) {
+        el = $("<div>", {id:"ariastatus", role:"status", class:"sr-only", "aria-live":"polite"});
+        $("body").append(el);
+        el = el[0];
+    }
+    el.innerHTML = status;
 }
 
 function addmultiselect(el,n) {
@@ -1046,17 +1123,30 @@ function initlinkmarkup(base) {
 	if (typeof isImathasAssessment != 'undefined') {
 		$(base).find('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
 	}
-	$(base).find('a').not('.trackprepped').each(setuptracklinks).each(addNoopener);
+	$(base).find('a').each(setuptracklinks).each(addNoopener);
 	$(base).find('a[href*="youtu"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find('a[href*="vimeo"]').not('.textsegment a,.mce-content-body a,.prepped').each(setupvideoembeds);
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
 	setupToggler2(base);
 	$(base).fitVids();
+    resizeResponsiveIframes(base, true);
 }
 
+function resizeResponsiveIframes(base, init) {
+    if (init) {
+        jQuery(base).find('iframe.scaleresponsive').wrap(jQuery('<div>', {css:{overflow:"hidden"}}));
+    }
+    jQuery(base).find('iframe.scaleresponsive').each(function(i,el) {
+        var p = el.parentNode; 
+        var sc = Math.min(1,p.offsetWidth/parseInt(el.width || el.style.width));
+        el.style.transform = "scale("+sc+")";
+        p.style.height = (sc*parseInt(el.height || el.style.height)+3)+"px";
+    });
+}
 jQuery(document).ready(function($) {
 	initlinkmarkup('body');
+    $(window).on('resize', function () {resizeResponsiveIframes('body');});
 });
 
 jQuery(function($) {
@@ -1221,11 +1311,11 @@ jQuery(document).ready(function($) {
 				if (e.type=="click" || e.which==13) {
 					if ($(this).attr("aria-expanded") == "true") {
 						$(this).attr("aria-expanded", false);
-						$(this).children("img").attr("src", "../img/expand.gif");
+						$(this).children("img").attr("src", staticroot+"/img/expand.gif");
 						$(this).next(".blockitems").slideUp();
 					} else {
 						$(this).attr("aria-expanded", true);
-						$(this).children("img").attr("src", "../img/collapse.gif");
+						$(this).children("img").attr("src", staticroot+"/img/collapse.gif");
 						$(this).next(".blockitems").slideDown();
 					}
 				}
@@ -1370,12 +1460,14 @@ function initSageCell(base) {
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
-			code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'');
+            code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'')
+                    .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 		} else {
 			ta = $this.find("textarea");
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
 				if ($this.find("pre").length>0) {
-					code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n");
+                    code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n")
+                            .replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 					if (ta.length==0) {
 						ta = $this.find("pre")[0];
 					} else {
@@ -1429,10 +1521,10 @@ function setActiveTab(el) {
 }
 
 /* ========================================================================
- * Bootstrap: dropdown.js v3.3.5
- * http://getbootstrap.com/javascript/#dropdowns
+ * Bootstrap: dropdown.js v3.4.1
+ * https://getbootstrap.com/docs/3.4/javascript/#dropdowns
  * ========================================================================
- * Copyright 2011-2015 Twitter, Inc.
+ * Copyright 2011-2019 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -1447,11 +1539,9 @@ function setActiveTab(el) {
   var toggle   = '[data-toggle="dropdown"]'
   var Dropdown = function (element) {
     $(element).on('click.bs.dropdown', this.toggle)
-		var $parent = getParent($(element));
-		$parent.find('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
   }
 
-  Dropdown.VERSION = '3.3.5'
+    Dropdown.VERSION = '3.4.1'
 
   function getParent($this) {
     var selector = $this.attr('data-target')
@@ -1461,7 +1551,7 @@ function setActiveTab(el) {
       selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
     }
 
-    var $parent = selector && $(selector)
+      var $parent = selector !== '#' ? $(document).find(selector) : null
 
     return $parent && $parent.length ? $parent : $this.parent()
   }
@@ -1483,13 +1573,12 @@ function setActiveTab(el) {
       if (e.isDefaultPrevented()) return
 
       $this.attr('aria-expanded', 'false')
-      $parent.removeClass('open').trigger('hidden.bs.dropdown', relatedTarget)
+        $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
     })
   }
 
   Dropdown.prototype.toggle = function (e) {
     var $this = $(this)
-
     if ($this.is('.disabled, :disabled')) return
 
     var $parent  = getParent($this)
@@ -1517,8 +1606,7 @@ function setActiveTab(el) {
 
       $parent
         .toggleClass('open')
-        .trigger('shown.bs.dropdown', relatedTarget)
-
+          .trigger($.Event('shown.bs.dropdown', relatedTarget))
     }
 
     return false
@@ -1543,7 +1631,10 @@ function setActiveTab(el) {
     }
 
     var desc = ' li:not(.disabled):visible a'
-    var $items = $parent.find('.dropdown-menu' + desc)
+      var $items = $this.next('.dropdown-menu' + desc);
+      if (!$items.length) {
+        $items = $parent.find('.dropdown-menu' + desc);
+      }
 
     if (!$items.length) return
 
@@ -1594,9 +1685,5 @@ function setActiveTab(el) {
     .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
     .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
     .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
-
-	$(function() {
-		$('[role=menu].dropdown-menu li:not(.disabled) a').attr('role','menuitem');
-	});
 
 }(jQuery);

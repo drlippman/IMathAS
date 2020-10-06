@@ -16,7 +16,7 @@ require_once("filehandler.php");
 function showcalendar($refpage) {
 global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$latepasses,$urlmode, $latepasshrs, $myrights;
-global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver;
+global $tzoffset, $tzname, $editingon, $exceptionfuncs, $courseUIver, $excused;
 
 $now= time();
 
@@ -122,6 +122,15 @@ if (!isset($teacherid)) {
 		}
 	}
 }
+if (!isset($excused) && !isset($teacherid)) {
+    $excused = array();
+    $query = 'SELECT type,typeid FROM imas_excused WHERE courseid=? AND userid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($cid, $userid));
+    while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $excused[$line['type'].$line['typeid']] = 1;
+    }
+}
 
 $byid = array();
 $k = 0;
@@ -142,6 +151,12 @@ if ($latepasses > 0 && $courseUIver > 1) {
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$canundolatepass = false;
 	$canuselatepass = false;
+
+	// if caltag == 'use_name', display the assessment name
+	if ($row['caltag'] == 'use_name') {
+		// truncate name, if needed
+		$row['caltag'] = strlen($row['name']) > 40 ? substr($row['name'], 0, 40) . '...' : $row['name'];
+	}
 
 	if (isset($exceptions[$row['id']])) {
 		list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$row['id']], $row);
@@ -184,26 +199,26 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$showgrayedout = false;
 	if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0)) {
 		if ($bestscores_stm===null) { //only prepare once
-			$query = "SELECT ias.bestscores,ia.ptsposs,ia.ver FROM imas_assessment_sessions AS ias ";
-			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
-			$query .= "WHERE assessmentid=:assessmentid AND userid=:userid ";
-			$query .= "UNION ";
-			$query .= "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
-			$query .= "JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ";
-			$query .= "WHERE assessmentid=:assessmentid2 AND userid=:userid2 ";
-
+			if ($courseUIver > 1) {
+				$query = 'SELECT ia.ver,ia.name,ia.ptsposs,iar.score FROM
+					imas_assessments AS ia LEFT JOIN imas_assessment_records AS iar
+					ON iar.assessmentid=ia.id AND iar.userid=:userid WHERE ia.id=:assessmentid';
+			} else {
+				$query = 'SELECT ia.ver,ia.name,ia.ptsposs,ias.bestscores FROM
+					imas_assessments AS ia LEFT JOIN imas_assessment_sessions AS ias
+					ON ias.assessmentid=ia.id AND ias.userid=:userid WHERE ia.id=:assessmentid';
+			}
 			$bestscores_stm = $DBH->prepare($query);
 		}
-		$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid,
-			':assessmentid2'=>$row['reqscoreaid'], ':userid2'=>$userid));
-	   if ($bestscores_stm->rowCount()==0) {
+		$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
+		list($reqaver,$reqaname,$reqscoreptsposs,$scores) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+	   if ($scores === null) {
 	   	   if ($row['reqscore']<0 || $row['reqscoretype']&1) {
 	   	   	   $showgrayedout = true;
 	   	   } else {
 	   	   	   continue;
 	   	   }
 	   } else {
-			 list($scores,$reqscoreptsposs,$reqaver) = $bestscores_stm->fetch(PDO::FETCH_NUM);
 			 if ($reqaver > 1) {
 				 $reqascore = $scores;
 			 } else {
@@ -281,6 +296,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 		if ($showgrayedout) {
 			$colors = '#ccc';
+			$row['name'] .= ' <span class="small">'._('Prerequisite: ') .
+				abs($row['reqscore']).(($row['reqscoretype']&2)?'%':_(' points')) .
+				_(' on ').Sanitize::encodeStringForDisplay($reqaname).'</span> ';
 		} else {
 			$colors = makecolor2($row['startdate'],$row['enddate'],$now);
 		}
@@ -295,12 +313,15 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			"allowlate"=>$lp,
 			"undolate"=>$ulp,
 			"name"=> $row['name'],
-			'ver'=> $row['ver']
+            'ver'=> $row['ver'],
+            'excused' => !empty($excused['A'.$row['id']])? 1 : 0
 		);
 		if ($now<$row['enddate'] || $row['reviewdate']>$now || isset($teacherid) || $lp==1) {
 			$json['id'] = $row['id'];
 		}
-		if ((($now>$row['enddate'] && $now>$row['reviewdate']) || $showgrayedout) && !isset($teacherid)) {
+		if ((($now>$row['enddate'] && $now>$row['reviewdate']) || $showgrayedout || $now<$row['startdate'])
+			&& !isset($teacherid)
+		) {
 			$json['inactive']=true;
 		}
 		if ($row['timelimit']!=0 && $row['ver']==1) {
@@ -589,6 +610,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($teacherid)) {
 			$json['editlink'] = true;
 		}
+		if ($status != 0) {
+			$json['inactive'] = true;
+		}
 		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json,$row['name'],$status);
 	}
 	if ($row['replyby']!=2000000000) { //($row['replyby']>$now || isset($teacherid))
@@ -610,7 +634,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (isset($teacherid)) {
 			$json['editlink'] = true;
 		}
-
+		if ($status != 0) {
+			$json['inactive'] = true;
+		}
 		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name'],$status);
 	}
 	$tag = substr($row[1],0,8);
@@ -702,7 +728,7 @@ foreach ($itemsimporder as $item) {
 				$names[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][4];
 				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) {
 					$colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
+                    $assess[$moday][$k]['color'] = '#ccc';
 				}
 				$k++;
 			}
@@ -773,9 +799,6 @@ foreach ($itemsimporder as $item) {
 	}
 
 }
-if ($editingon) {
-	addBlockItems($itemorder,'0',$tags,$colors,$assess,$names,$itemidref);
-}
 
 $stm = $DBH->prepare("SELECT title,tag,date,id FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid=:courseid ORDER BY title");
 $stm->execute(array(':courseid'=>$cid));
@@ -796,6 +819,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$colors[$k]='';
 	$itemidref[$k] = 'CD'.$row[3];
 	$k++;
+}
+if ($editingon) {
+	addBlockItems($itemorder,'0',$tags,$colors,$assess,$names,$itemidref);
 }
 
 $jsarr = array();
@@ -879,7 +905,8 @@ if ($pageshift==0) {
 
 }
 function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$folder,$avail=true,$ishidden=false,$curblockgrey=0) {
-	$now = time();
+    global $studentinfo;
+    $now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
 			if (!isset($item['avail'])) { //backwards compat
@@ -894,7 +921,12 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,&$greyitems,$
 			}
 			//set as hidden if explicitly hidden or opens in future.  We won't count past folders that aren't showing as hidden
 			//  to allow students with latepasses to access old assignments even if the folder is gone.
-			$thisishidden = ($ishidden || $item['avail']==0 || ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+            $thisishidden = ($ishidden || 
+                $item['avail']==0 || 
+                ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now) ||
+                (!empty($item['grouplimit']) && isset($studentinfo['section']) &&
+                    substr($item['grouplimit'][0],2) != $studentinfo['section'])
+            );
 			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$greyitems,$folder.'-'.($k+1),$thisavail,$thisishidden,$thisblockgrey);
 		} else {
 			$addto[] = $item;

@@ -130,6 +130,15 @@
         <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
         <path d="M 9 12 h 6 M 9 16 h6"></path>
       </template>
+      <template v-else-if="name=='extlink'">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </template>
+      <template v-else-if="name=='sidebar'">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="15" y1="3" x2="15" y2="21"></line>
+      </template>
     </svg>
     <span class="sronly" v-if="alttext.length > 0">
       {{ alttext }}

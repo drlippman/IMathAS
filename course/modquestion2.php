@@ -23,6 +23,13 @@ if (!(isset($teacherid))) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 
+    if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+        $addq = 'addquestions2';
+        $from = 'addq2';
+    } else {
+        $addq = 'addquestions';
+        $from = 'addq';
+    }
   $query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
   $query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid";
   $stm = $DBH->prepare($query);
@@ -30,7 +37,7 @@ if (!(isset($teacherid))) {
   $beentaken = ($stm->rowCount() > 0);
 
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
+	$curBreadcrumb .= "&gt; <a href=\"$addq.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 	$curBreadcrumb .= _("Modify Question Settings");
 
 	if ($_GET['process']== true) {
@@ -165,7 +172,7 @@ if (!(isset($teacherid))) {
     require_once('../assess2/AssessHelpers.php');
     AssessHelpers::retotalAll($cid, $aid);
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addq.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 
@@ -209,8 +216,8 @@ if (!(isset($teacherid))) {
 
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
-		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$groupid));
+		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$groupid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -219,7 +226,7 @@ if (!(isset($teacherid))) {
 			$page_beenTakenMsg = "<p><strong>"._("Warning")."</strong>: ";
 			$page_beenTakenMsg .= _("This assessment has already been taken.  Altering the points or penalty may cause some temporary weirdness for student currently working on the assessment. ");
 			$page_beenTakenMsg .= _("If you want to add additional copies of this question, you should clear all existing assessment attempts").".</p> ";
-			$page_beenTakenMsg .= "<p><input type=button value=\""._("Clear Assessment Attempts")."\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
+			$page_beenTakenMsg .= "<p><input type=button value=\""._("Clear Assessment Attempts")."\" onclick=\"window.location='$addq.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
 		}
 
 		//get defaults
@@ -298,7 +305,7 @@ if (isset($_GET['id'])) {
 	echo '<button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($qsetid).')">'._('Preview').'</button>';
 ?>
 </p>
-<form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
+<form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid) . "&from=$from"; if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
 <p><?php echo _("Leave items blank to use the assessment's default values."); ?>
 <input type="submit" value="<?php echo _('Save Settings');?>"></p>
 <?php

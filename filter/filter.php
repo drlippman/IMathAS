@@ -259,15 +259,15 @@
 		global $imasroot;
 		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1" alt="Graph"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
-		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
+        $str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
 		if (isset($_POST['hidetxtboxes'])) {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','',$str);
 			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','',$str);
-			$str = preg_replace('/<select.*?\/select>/','',$str);
+			$str = preg_replace('/<select.*?\/select>/s','',$str);
 		} else {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','__________________',$str);
 			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','__',$str);
-			$str = preg_replace('/<select.*?\/select>/','____',$str);
+			$str = preg_replace('/<select.*?\/select>/s','____',$str);
 		}
 		$str = preg_replace('/<table/','<table cellspacing="0"',$str);
 		$str = preg_replace('/`\s*(\w)\s*`/','<i>$1</i>',$str);

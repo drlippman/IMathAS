@@ -47,6 +47,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat="matrix";}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -73,7 +74,8 @@ class CalculatedMatrixAnswerBox implements AnswerBox
           } else {
   			     $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
           }
-          $arialabel = $this->answerBoxParams->getQuestionIdentifierString();
+          $arialabel = $this->answerBoxParams->getQuestionIdentifierString() . 
+            (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
     			$out .= '<table role="group" aria-label="'.$arialabel.'">';
     			$count = 0;
     			$las = explode("|",$la);
@@ -117,8 +119,8 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     			} else {
     				$qnref = ($multi-1).'-'.($qn%1000);
     			}
-    			$shorttip = _('Enter your answer as a matrix, like ((2,3,4),(1,4,5))');
-    			$tip = $shorttip.'<br/>'.formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix');
+    			$shorttip = _('Enter your answer as a matrix');
+    			$tip = $shorttip._(', like [(2,3,4),(1,4,5)]').'<br/>'.formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix');
     			if (!isset($sz)) { $sz = 20;}
 
     			$classes = ['text'];
@@ -131,18 +133,21 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
 
     			$out .= '<input ' .
-                  'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     							Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';
     		}
     		if (!isset($hidepreview)) {
-    			$params['preview'] = 1;
-    			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";
+                $params['preview'] = 1;
+                $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                $preview .= '</button> &nbsp;';
     		}
     		$preview .= "<span id=p$qn></span> ";
     		$params['tip'] = $shorttip;
@@ -164,7 +169,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

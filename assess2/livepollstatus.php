@@ -79,8 +79,10 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   $livepollStatus['curstate'] === 0 ||
   !empty($_POST['forceregen'])
 ) {
-  // force the newstate to be 1; don't want to skip any steps
-  $newState = 1;
+  if ($newState == 2) {
+      // force the newstate to be 1; shouldn't jump right to open
+      $newState = 1;
+  }
 
   // look up question HTML. Also grab seed
   // get current question version
@@ -94,17 +96,15 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
   }
 
   // load question settings and code
-  $assess_info->loadQuestionSettings($qidstoload, true);
+  $assess_info->loadQuestionSettings($qidstoload, true, false);
 
-  // get question object. Not showing scores in this state.
-  $assessInfoOut['questions'] = array(
-    $qn => $assess_record->getQuestionObject($qn, false, true, true)
-  );
+  // do not load question - question autoloader will handle that
 
   //TODO: ? pull any existing results (in case we refreshed)
 
   // extract seed
-  $seed = $assessInfoOut['questions'][$qn]['seed'];
+  $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
+  $seed = $question_obj['seed'];
 
   //set status
   $query = "UPDATE imas_livepoll_status SET ";
@@ -131,7 +131,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   // load question seed
   list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
-  $assess_info->loadQuestionSettings($qidstoload, false);
+  $assess_info->loadQuestionSettings($qidstoload, false, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
 
@@ -174,7 +174,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
 
   // lookup question seed
   list($qid, $qidstoload) = $assess_record->getQuestionId($qn);
-  $assess_info->loadQuestionSettings($qidstoload, false);
+  $assess_info->loadQuestionSettings($qidstoload, false, false);
   $question_obj = $assess_record->getQuestionObject($qn, false, false, false);
   $seed = $question_obj['seed'];
 

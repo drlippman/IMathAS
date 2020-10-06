@@ -1,8 +1,8 @@
 <template>
   <div class="headericons">
     <tooltip-span
-      v-if="showscore"
-      :tip="$t('qdetails.gbscore')"
+      v-if="scoreDisplay !== ''"
+      :tip="scoreTip"
     >
       <icons name="square-check" />
       {{ scoreDisplay }}
@@ -56,10 +56,17 @@ export default {
     scoreDisplay () {
       if (this.dispqn === 0) {
         return '';
-      } else if (this.curQData.hasOwnProperty('gbscore') && this.curQData.tries_max > 1) {
+      } else if (this.showscore && this.curQData.hasOwnProperty('gbscore') && this.curQData.tries_max > 1) {
         return this.curQData.gbscore + '/' + this.$tc('header.pts', this.curQData.points_possible);
       } else {
         return this.$tc('header.pts', this.curQData.points_possible);
+      }
+    },
+    scoreTip () {
+      if (this.showscore && this.curQData.hasOwnProperty('gbscore') && this.curQData.tries_max > 1) {
+        return this.$t('qdetails.gbscore');
+      } else {
+        return this.$tc('header.possible', this.curQData.points_possible);
       }
     },
     retryInfo () {

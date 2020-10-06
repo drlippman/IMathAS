@@ -281,7 +281,7 @@
 	}
 	echo '</p>';
 	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=060417\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=060417\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th>";
 	//echo "<th scope=\"col\">Average Score<br/>All</th>";
@@ -440,7 +440,7 @@
 		echo "<script type=\"text/javascript\">\n";
 		echo "initSortTable('myTable',Array('N','S',false,'N','N','N','N','N',false),true);\n";
 		echo "</script>\n";
-		echo "<p>Average time taken on this assessment: ";
+		/*echo "<p>Average time taken on this assessment: ";
 		if (count($timetaken)>0) {
 			echo round(array_sum($timetaken)/count($timetaken)/60,1);
 		} else {
@@ -454,7 +454,7 @@
 			echo 0;
 		}
 		echo ' minutes</p>';
-
+        */
 	} else {
 		echo '</tbody></table>';
 	}

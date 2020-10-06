@@ -8,8 +8,8 @@ if (isset($CFG['hooks']['admin/forms'])) {
 	require($CFG['hooks']['admin/forms']);
 }
 
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 //call hook, if defined
 if (function_exists('getHeaderCode')) {
@@ -65,19 +65,19 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$name = $stm->fetchColumn(0);
-		echo '<div id="headerforms" class="pagetitle"><h1>Delete Course</h1></div>';
-		echo "<p>Are you sure you want to delete the course <b>".Sanitize::encodeStringForDisplay($name)."</b>?</p>\n";
+		echo '<div id="headerforms" class="pagetitle"><h1>'._('Delete Course').'</h1></div>';
+		echo "<p>"._("Are you sure you want to delete the course")." <b>".Sanitize::encodeStringForDisplay($name)."</b>?</p>\n";
 		echo '<form method="POST" action="actions.php?from='.Sanitize::encodeUrlParam($from).'&id='.Sanitize::encodeUrlParam($_GET['id']).'">';
 		echo '<p><button type=submit name="action" value="delete">'._('Delete').'</button>';
 		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
 	case "anonuser":
-		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 100) { echo _("You don't have the authority for this action"); break;}
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
-		echo "<p>Are you sure you want to anonymize this user, <b>";
+		echo "<p>"._("Are you sure you want to anonymize this user").", <b>";
 		printf("%s, %s (%s)", Sanitize::encodeStringForDisplay($line['LastName']), Sanitize::encodeStringForDisplay($line['FirstName']), Sanitize::encodeStringForDisplay($line['SID']));
 		echo "</b>?</p>\n";
 
@@ -100,7 +100,7 @@ switch($_GET['action']) {
 		echo '</form>';
 		break;
 	case "deladmin":
-		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 75) { echo _("You don't have the authority for this action"); break;}
 		if ($myrights==100) {
 			$stm = $DBH->query("SELECT iu.id,iu.FirstName,iu.LastName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id WHERE iu.rights>12 AND iu.rights<>76 AND iu.rights<>77 ORDER BY iu.LastName,iu.FirstName");
 		} else {
@@ -222,8 +222,8 @@ switch($_GET['action']) {
 								text: msg[i].name
 							}));
 						}
-						if (document.getElementById("group").options.length > 3) {
-							document.getElementById("group").selectedIndex = 3;
+						if (document.getElementById("group").options.length > 2) {
+							document.getElementById("group").selectedIndex = 2;
 						} else {
 							document.getElementById("group").selectedIndex = document.getElementById("group").options.length-1;
 						}
@@ -259,7 +259,7 @@ switch($_GET['action']) {
 			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
 		}
 
-		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
+		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
 		echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
 		echo "> Guest User <BR>\n";
@@ -325,6 +325,38 @@ switch($_GET['action']) {
 		echo '</span><br class="form"/>';
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
+            if ($oldrights == 12) {
+                // account request pending
+                $stm = $DBH->prepare('SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?');
+                $stm->execute(array($_GET['id']));
+                $reqdata = json_decode($stm->fetchColumn(0), true);
+                $reqschool = '';
+                if (isset($reqdata['school'])) {
+                    $reqschool = $reqdata['school'];
+                } else if (isset($reqdata['ipeds']) && $reqdata['ipeds'] != '0') {
+                    list($ipedstype,$ipedsid) = explode('-', $reqdata['ipeds']);
+                    $query = 'SELECT ip.school,ip.agency,ip.country,ig.id,ig.name 
+                        FROM imas_ipeds AS ip 
+                        LEFT JOIN imas_ipeds_group AS ipg ON ip.type=ipg.type AND ip.ipedsid=ipg.ipedsid 
+                        LEFT JOIN imas_groups AS ig ON ipg.groupid=ig.id 
+                        WHERE ip.type=? and ip.ipedsid=? LIMIT 1';
+                    $stm2 = $DBH->prepare($query);
+                    $stm2->execute(array($ipedstype, $ipedsval));
+                    $ipedsgroups = array();
+                    while ($r2 = $stm2->fetch(PDO::FETCH_ASSOC)) {
+                        $reqschool = ($ipedstype == 'A') ? $r2['agency'] : $r2['school'];
+                        if ($r2['id'] !== null) {
+                            $oldgroup = $r2['id'];
+                        }
+                    }
+                } else if (isset($reqdata['ipeds']) && $reqdata['ipeds'] == '0') {
+                    $reqschool = $reqdata['otherschool'];
+                }
+                if ($reqschool != '') {
+                    echo '<span class=form>'._('Account request school:').'</span>';
+                    echo '<span class=formright>'.Sanitize::encodeStringForDisplay($reqschool).'</span><br class=form>';
+                }
+            }
 			echo "<span class=form>Group: </span>";
 			echo "<span class=formright>";
 			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
@@ -392,7 +424,7 @@ switch($_GET['action']) {
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=? AND userid=?");
 			$stm->execute(array($_GET['id'], $userid));
 			if ($stm->rowCount()==0) {
-				echo "You don't have the authority for this action";
+				echo _("You don't have the authority for this action");
 				break;
 			}
 			if (isset($_GET['cid'])) {
@@ -407,38 +439,38 @@ switch($_GET['action']) {
 			echo _('Course Settings');
 			echo '</h1></div>';
 			if ($line['ownerid']!=$userid) {
-				echo '<p>'.sprintf('You are a teacher in this course, but <b>%s</b> is the course owner, and the only one who can modify the course settings',
+				echo '<p>'.sprintf(_('You are a teacher in this course, but <b>%s</b> is the course owner, and the only one who can modify the course settings'),
 				  Sanitize::encodeStringForDisplay($line['FirstName'].' '.$line['LastName'])).'</p>';
 			}
-			echo "<div><span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($line['id'])."</span><br class=form>\n";
+			echo "<div><span class=form>"._("Course ID").":</span><span class=formright>".Sanitize::encodeStringForDisplay($line['id'])."</span><br class=form>\n";
 			echo "<span class=form>",_("Enrollment key"),":</span><span class=formright>".Sanitize::encodeStringForDisplay($line['enrollkey'])."</span><br class=form></div>\n";
 			if (isset($enablebasiclti) && $enablebasiclti==true) {
 				//Start grouping: LMS Integration
 				echo '<div class="block grouptoggle">';
-				echo '<img class="mida" src="../img/expand.gif" /> ';
+				echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 				echo 'LMS Integration (LTI)';
 				echo '</div>';
 				echo '<div class="blockitems hidden">';
 
-				echo '<p>For integration setup instructions, visit the Course Items: Export page inside your course</p>';
+				echo '<p>'._('For integration setup instructions, visit the Course Items: Export page inside your course').'</p>';
 
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
                     if ($hasLTI13) {
-                        echo '<p>Your school already has a school-wide LTI 1.3 connection established, so no course level configuration is required.</p>';
+                        echo '<p>'._('Your school already has a school-wide LTI 1.3 connection established, so no course level configuration is required.').'</p>';
                     } else {
-                        echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+                        echo '<p>'._('Your school already has a school-wide LTI key and secret established, so no course level configuration is required.').'</p>';
                     }
 				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
 					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
 				} else {
 					if ($hasGroupLTI) {
                         if ($hasLTI13) {
-                            echo '<p>Your school may already have a school-wide LTI 1.3 connection established. ';
+                            echo '<p>'._('Your school may already have a school-wide LTI 1.3 connection established. ');
                         } else {
-                            echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+                            echo '<p>'._('Your school may already have a school-wide LTI key and secret established. ');
                         }
-						echo 'If so, you will not need to set up a course-level configuration. ';
-						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">Show course level key/secret</a></p>';
+						echo _('If so, you will not need to set up a course-level configuration. ');
+						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">'._('Show course level key/secret').'</a></p>';
 						echo '<div id="courselevelkey" style="display:none">';
 					} else {
 						echo '<div>';
@@ -463,7 +495,7 @@ switch($_GET['action']) {
 			break;
 		}
 
-		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 40) { echo _("You don't have the authority for this action"); break;}
 
 		$isadminview = false;
 		if ($_GET['action']=='modify') {
@@ -472,7 +504,7 @@ switch($_GET['action']) {
 			if ($stm->rowCount()==0) {break;}
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($myrights<75 && $line['ownerid']!=$userid) {
-				echo "You don't have the authority for this action"; break;
+				echo _("You don't have the authority for this action"); break;
 			} else if ($myrights > 74) {
 				if ($line['ownerid']!=$userid) {
 					$isadminview = true;
@@ -484,7 +516,7 @@ switch($_GET['action']) {
 					$udat['name'] = _('Default Group');
 				}
 				if ($myrights===75 && $udat['groupid']!=$groupid) {
-					echo "You don't have the authority for this action"; break;
+					echo _("You don't have the authority for this action"); break;
 				}
 				if ($udat['parent']>0) {
 					$hassupergroup = true;
@@ -585,7 +617,7 @@ switch($_GET['action']) {
 						($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
 						if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {
 							//did not provide valid enrollment key
-							echo '<p>',_('Incorrect enrollment key provided'),'. <a href="addcourse.php">Try again</a></p>';
+							echo '<p>',_('Incorrect enrollment key provided'),'. <a href="addcourse.php">'._('Try again').'</a></p>';
 							require("../footer.php");
 							exit;
 						}
@@ -698,7 +730,7 @@ switch($_GET['action']) {
 			echo ' <a class=small href="addcourse.php?for='.Sanitize::onlyInt($for).'">'._('Change').'</a>';
 			echo '</span><br class=form>';
 		} else {
-			echo "<span class=form>Course ID:</span><span class=formright>".Sanitize::encodeStringForDisplay($courseid)."</span><br class=form>\n";
+			echo "<span class=form>"._("Course ID").":</span><span class=formright>".Sanitize::encodeStringForDisplay($courseid)."</span><br class=form>\n";
 		}
 		if ($isadminview) {
 			echo '<span class="form">Owner:</span><span class="formright">';
@@ -734,23 +766,21 @@ switch($_GET['action']) {
 
 		if ($_GET['action']=="modify" && $line['cleanupdate']>0) {
 			$courseid = Sanitize::courseId($_GET['id']);
-			echo '<p>This class has been scheduled for data cleanup, on ';
+			echo '<p>'._('This class has been scheduled for data cleanup, on ');
 			echo tzdate('F j, Y', $line['cleanupdate']).'. ';
-			echo 'On that date, all student data in this course will be deleted ';
-			echo 'as part of our data management policies, ';
-			echo 'but the course itself will be untouched. If you need a long-term ';
-			echo 'copy of student grades, it is recommended you ';
-			echo '<a href="../course/gb-export.php?cid='.$courseid.'&export=true">export the gradebook</a>. ';
-			echo 'You are also welcome to <a href="../course/listusers.php?cid='.$courseid.'&action=unenroll&uid=all">';
-			echo 'manually cleanup</a> your course now.</p>';
+			echo _('On that date, all student data in this course will be deleted as part of our data management policies, but the course itself will be untouched.');
+			echo _('If you need a long-term copy of student grades, it is recommended you ');
+			echo '<a href="../course/gb-export.php?cid='.$courseid.'&export=true">'._('export the gradebook').'</a>. ';
+			echo _('You are also welcome to').' <a href="../course/listusers.php?cid='.$courseid.'&action=unenroll&uid=all">';
+			echo _('manually cleanup').'</a> '._('your course now.').'</p>';
 			if (isset($CFG['cleanup']['groups'][$groupid]['allowoptout'])) {
 				$allowoptout = $CFG['cleanup']['groups'][$groupid]['allowoptout'];
 			} else {
 				$allowoptout = (!isset($CFG['cleanup']['allowoptout']) || $CFG['cleanup']['allowoptout']==true);
 			}
 			if ($allowoptout) {
-				echo '<p>If you have a strong reason, you can <input type=checkbox name=cleanupoptout value=1 /> ';
-				echo 'opt out of having the student data deleted. </p>';
+				echo '<p>'._('If you have a strong reason, you can ').'<input type=checkbox name=cleanupoptout value=1 /> ';
+				echo _('opt out of having the student data deleted.').' </p>';
 			}
 		}
 		//Start grouping: copy options
@@ -762,7 +792,7 @@ switch($_GET['action']) {
 				echo '</label></span><br class=form>';
 			}
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 			echo _('Course Copy Options');
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -778,6 +808,9 @@ switch($_GET['action']) {
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
 			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyallcalitems>'._('Copy all calendar items?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyallcalitems" id="copyallcalitems" value="1"/>';
+			echo '</span><br class=form>';
 			echo '</div>';
 
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
@@ -788,7 +821,7 @@ switch($_GET['action']) {
 		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 		echo _('Availability and Access');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
@@ -831,10 +864,10 @@ switch($_GET['action']) {
 		}
 		echo 'Start: <input type=text size=10 name="sdate" value="'.$sdate.'">
 			<a href="#" onClick="displayDatePicker(\'sdate\', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
 		echo 'End: <input type=text size=10 name="edate" value="'.$edate.'">
 			<a href="#" onClick="displayDatePicker(\'edate\', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
 		echo '</span><br class=form />';
 
 		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
@@ -844,19 +877,20 @@ switch($_GET['action']) {
 			echo '</span><br class="form"/>';
 		}
 
-		if (!isset($CFG['CPS']['unenroll']) || $CFG['CPS']['unenroll'][1]==1) {
+        echo "<span class=form>",_("Self-enrollment"),"</span><span class=formright>";
+        echo ' <label><input type=checkbox name="allowenroll" value="1" ';
+        if (($allowunenroll&2)==0) { echo "checked=1";}
+        echo '/> ',_('Allow students to self-enroll using Course ID and Key'),'</label>';
+        echo '</span><br class=form />';
+
+        if ((isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==1) ||
+            ($myrights == 100 && ($istemplate&4)==4)
+        ) {
 			echo "<span class=form>",_("Allow students to self-<u>un</u>enroll"),"</span><span class=formright>";
 			echo '<input type=radio name="allowunenroll" value="0" ';
 			if (($allowunenroll&1)==0) { echo "checked=1";}
 			echo '/> ',_('No'),' <input type=radio name="allowunenroll" value="1" ';
 			if (($allowunenroll&1)==1) { echo "checked=1";}
-			echo '/> ',_('Yes'),' </span><br class=form />';
-
-			echo "<span class=form>",_("Allow students to self-enroll"),"</span><span class=formright>";
-			echo '<input type=radio name="allowenroll" value="2" ';
-			if (($allowunenroll&2)==2) { echo "checked=1";}
-			echo '/> ',_('No'),' <input type=radio name="allowenroll" value="0" ';
-			if (($allowunenroll&2)==0) { echo "checked=1";}
 			echo '/> ',_('Yes'),' </span><br class=form />';
 		}
 
@@ -876,7 +910,7 @@ switch($_GET['action']) {
 		if (isset($enablebasiclti) && $enablebasiclti==true) {
 			//Start grouping: LMS Integration
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 			echo 'LMS Integration (LTI)';
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -895,12 +929,12 @@ switch($_GET['action']) {
 				} else {
 					if ($hasGroupLTI) {
                         if ($hasLTI13) {
-                            echo '<p>Your school may already have a school-wide LTI 1.3 connection established. ';
+                            echo '<p>'._('Your school may already have a school-wide LTI 1.3 connection established. ');
                         } else {
-                            echo '<p>Your school may already have a school-wide LTI key and secret established. ';
+                            echo '<p>'._('Your school may already have a school-wide LTI key and secret established. ');
                         }
-						echo 'If so, you will not need to set up a course-level configuration. ';
-						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">Show course level key/secret</a></p>';
+						echo _('If so, you will not need to set up a course-level configuration. ');
+						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">'._('Show course level key/secret').'</a></p>';
 						echo '<div id="courselevelkey" style="display:none">';
 					} else {
 						echo '<div>';
@@ -949,7 +983,7 @@ switch($_GET['action']) {
 
 		//Start grouping: Additional Options
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 		echo _('Additional Options');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
@@ -1065,7 +1099,7 @@ switch($_GET['action']) {
 			if ($myrights==100) {
 				echo '<br/><input type=checkbox name="isselfenroll" value="4" ';
 				if (($istemplate&4)==4) {echo 'checked="checked"';};
-				echo ' /> ',_('Mark as self-enroll course');
+				echo ' /> ',_('Include in public self-enroll course list');
 				if (isset($CFG['GEN']['guesttempaccts'])) {
 					echo '<br/><input type=checkbox name="isguest" value="8" ';
 					if (($istemplate&8)==8) {echo 'checked="checked"';};
@@ -1295,7 +1329,7 @@ switch($_GET['action']) {
 		}
 		break;
 	case "deloldusers":
-		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 100) { echo _("You don't have the authority for this action"); break;}
 		echo "<h2>Delete Old Users</h2>\n";
 		echo "<form method=post action=\"actions.php?from=".Sanitize::encodeUrlParam($from)."\">\n";
 		echo '<input type=hidden name=action value="deloldusers" />';
@@ -1308,7 +1342,7 @@ switch($_GET['action']) {
 		echo "</form>\n";
 		break;
 	case "listltidomaincred":
-		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		if ($myrights < 100) { echo _("You don't have the authority for this action"); break;}
 		echo '<div id="headerforms" class="pagetitle">';
 		echo "<h2>Modify LTI Domain Credentials</h2>\n";
 		echo '</div>';
@@ -1517,6 +1551,49 @@ switch($_GET['action']) {
 		echo "<input type=button value=\"",_("Nevermind"),"\" class=\"secondarybtn\" onclick=\"window.location='".Sanitize::encodeStringForJavascript($backloc)."'\"></p>\n";
 		echo '</form>';
 		break;
+	case "mergegroups":
+		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
+		echo '<div id="headerforms" class="pagetitle"><h1>'._('Merge Group').'</h1></div>';
+		$stm = $DBH->prepare("SELECT name FROM imas_groups WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$grpname = $stm->fetchColumn(0);
+		?>
+		<script type="text/javascript">
+		function searchgrps() {
+			var grpsearch = document.getElementById("grpsearch").value;
+			if (grpsearch.trim() !== '') {
+				$.ajax({
+					type: "POST",
+					url: "groupsearch.php",
+					dataType: "json",
+					data: {
+						"grpsearch": grpsearch
+					}
+				}).done(function(msg) {
+					$("#group").empty();
+					for (var i=0; i<msg.length; i++) {
+						$("#group").append($("<option>", {
+							value: msg[i].id,
+							text: msg[i].name
+						}));
+					}
+				});
+			}
+		}
+		</script>
+		<?php
+		printf("<form method=post action=\"actions.php?from=%s&id=%s\">\n",
+			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']));
+		echo '<input type=hidden name=action value="mergegroups" />';
+		echo '<p>'.sprintf(_('This action will move teachers from group %s to another group and delete their original group'),
+			'<strong>'.Sanitize::encodeStringForDisplay($grpname).'</strong>').'</p>';
+		echo '<p><label for="grpsearch">'._('Search for Groups').'</label> <input id=grpsearch />';
+		echo ' <button type=button onclick="searchgrps()">'._('Search').'</button><br/>';
+		echo '<label for="group">'._('Move teachers to:').'</label> ';
+		echo '<select name="group" id="group" ></select>';
+		echo '<p><button type=submit>'._('Submit').'</button></p>';
+		echo '</form>';
+		break;
 	case "modgroup":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
 		echo '<div id="headerforms" class="pagetitle"><h1>Rename Instructor Group</h1></div>';
@@ -1546,6 +1623,10 @@ switch($_GET['action']) {
 
 		echo "<input type=submit value=\"Update Group\">\n";
 		echo "</form>\n";
+		echo '<p></p><p>';
+		printf("<a href=\"forms.php?from=%s&action=mergegroups&id=%s\">%s</a></p>",
+			Sanitize::encodeUrlParam($from), Sanitize::encodeUrlParam($_GET['id']),
+			_('Merge group with another'));
 		break;
 	case "removediag":
 		if ($myrights<100 && ($myspecialrights&4)!=4) { echo "You don't have the authority for this action"; break;}

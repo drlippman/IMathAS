@@ -75,16 +75,18 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				if ($_POST['code'][$stuid]=='') {
 					$_POST['code'][$stuid] = null;
 				}
-			}
+            }
+            require('../includes/setSectionGroups.php');
 			foreach ($keys as $stuid) {
 				$stm = $DBH->prepare("UPDATE imas_students SET section=:section,code=:code WHERE id=:id AND courseid=:courseid ");
-				$stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
+                $stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
+                setSectionGroups($_POST['uid'][$stuid], $cid, $_POST['sec'][$stuid]);
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
-			$query = "SELECT imas_students.id,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
+			$query = "SELECT imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
 			$query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseid AND imas_students.userid=imas_users.id ";
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$resultStudentList = $DBH->prepare($query);
@@ -135,7 +137,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-
+                require('../includes/setSectionGroups.php');
+                setSectionGroups($id, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
@@ -144,7 +147,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
 			require_once("../includes/newusercommon.php");
@@ -180,7 +183,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					":section"=>trim($_POST['section'])!=''?trim($_POST['section']):null,
 					":code"=>trim($_POST['code'])!=''?trim($_POST['code']):null
 					));
-
+                require('../includes/setSectionGroups.php');
+                setSectionGroups($newuserid, $cid, $_POST['section']);
 				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
@@ -206,7 +210,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['chgstuinfo'])) {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
 		$pagetitle = "Change Student Info";
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once("../includes/newusercommon.php");
 
 		if (isset($_POST['timelimitmult'])) {
@@ -299,7 +303,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm->execute(array(':code'=>$code, ':section'=>$section, ':timelimitmult'=>$timelimitmult, ':hidefromcourselist'=>$hide, ':latepass'=>$latepasses, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
 				$stm = $DBH->prepare("UPDATE imas_students SET locked=:locked WHERE userid=:userid AND courseid=:courseid AND locked=0");
 				$stm->execute(array(':locked'=>$locked, ':userid'=>$_GET['uid'], ':courseid'=>$cid));
-			}
+            }
+            require('../includes/setSectionGroups.php');
+            setSectionGroups($_GET['uid'], $cid, $section);
 
 			require('../includes/userpics.php');
 
@@ -443,9 +449,6 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$hasSectionRowHeader = ($hassection)? "<th>Section$sectionselect</th>" : "";
 		$hasCodeRowHeader = ($hascode) ? "<th>Code</th>" : "";
 		$hasLatePassHeader = ($haslatepasses) ? "<th>LatePasses</th>" : "";
-		$hasSectionSortTable = ($hassection) ? "'S'," : "";
-		$hasCodeSortTable = ($hascode) ? "'N'," : "";
-		$hasLatePassSortTable = ($haslatepasses) ? ",'N'" : "";
 
 	}
 } //END DATA MANIPULATION
@@ -472,7 +475,7 @@ $placeinhead .= '$(function() { $(".lal").attr("title","View login log");
 	});';
 $placeinhead .= "</script>";
 $placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="../img/gears.png" alt="Options"/></a>\';
+  var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu">\';
   $("img[data-uid]").each(function (i,el) {
   	var uid = $(el).attr("data-uid");
@@ -531,7 +534,9 @@ if ($overwriteBody==1) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 ?>
 			<tr>
-				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></td>
+				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?>
+                    <input type="hidden" name="uid[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" />
+                </td>
 				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
 				<td><input type=text name="code[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['code']); ?>"/></td>
 			</tr>
@@ -677,7 +682,7 @@ if ($overwriteBody==1) {
 		window.location = "listusers.php?cid="+cid+"&rmode="+rmode;
 	}
 	</script>
-	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
+	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js"></script>
 	<div class="cpmid">
 	<?php
 	echo '<span class="column" style="width:auto;">';
@@ -772,12 +777,12 @@ if ($overwriteBody==1) {
 			$icons = '';
 			$numstu++;
 			if ($line['locked']>0) {
-				$icons .= '<img src="../img/lock.png" alt="Locked" title="Locked"/>';
+				$icons .= '<img src="'.$staticroot.'/img/lock.png" alt="Locked" title="Locked"/>';
 			} else {
 				$numunlocked++;
 			}
 			if ($line['timelimitmult']!=1) {
-				$icons .= '<img src="../img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
+				$icons .= '<img src="'.$staticroot.'/img/time.png" alt="'._('Has a time limit multiplier set').'" title="'._('Has a time limit multiplier set').'"/> ';
 			}
 			if ($icons != '') {
 				$icons = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid='.Sanitize::onlyInt($line['userid']).'">'.$icons.'</a>';
@@ -807,7 +812,7 @@ if ($overwriteBody==1) {
 				echo $hasCodeData;
 				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid=' . Sanitize::onlyInt($line['userid']) . '" class="ui">';
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
-				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="../img/gears.png"/> ';
+				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
 				if ($line['locked']>0) {
 					echo '<span class="greystrike">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
@@ -851,8 +856,31 @@ if ($overwriteBody==1) {
 		}
 		echo '</p>';
 ?>
+
+        <?php
+            $sortstr = 'false,false';
+            if ($hassection) {
+                $sortstr .= ',"S"';
+            }
+            if ($hascode) {
+                $sortstr .= ',"S"';
+            }
+            $sortstr .= ',"S"';
+            $sortstr .= ',false';
+            if ($showSID) {
+                $sortstr .= ',"S"';
+            }
+            if ($showemail) {
+                $sortstr .= ',"S"';
+            }
+            $sortstr .= ',"D"';
+            $sortstr .= ',false';
+            if ($haslatepasses) {
+                $sortstr .= ',"N"';
+            }
+        ?>
 		<script type="text/javascript">
-			initSortTable('myTable',Array(false,false,<?php echo $hasSectionSortTable ?><?php echo $hasCodeSortTable ?>'S',false,'D',false<?php echo $hasLatePassSortTable ?>),true);
+			initSortTable('myTable',Array(<?php echo $sortstr;?>),true);
 		</script>
 	</form>
 

@@ -119,7 +119,7 @@
       :submitby="submitby"
       :qn="qn"
     />
-    <div v-if="canedit && showfull && qHelps.length > 0">
+    <div v-if="showfull && qHelps.length > 0">
       {{ $t('gradebook.had_help') }}:
       <a v-for="(help,idx) in qHelps"
         :key="idx"

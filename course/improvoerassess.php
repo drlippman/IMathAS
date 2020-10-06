@@ -159,7 +159,7 @@ foreach ($gbt[0][1] as $col=>$data) {
 
 arsort($assessbadness);
 
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 require("../header.php");
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._('Assessment Metric');
 echo '<div class=breadcrumb>'.$curBreadcrumb.'</div>';

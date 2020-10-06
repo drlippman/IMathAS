@@ -6,7 +6,7 @@
 <html>
 <head>
 <title><?php echo $installname; ?></title>
-<link rel="stylesheet" href="<?php echo $imasroot;?>/infopages.css" type="text/css">
+<link rel="stylesheet" href="<?php echo $staticroot;?>/infopages.css" type="text/css">
 <style type="text/css">
 img {
 	vertical-align: middle;

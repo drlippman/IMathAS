@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= process.env.VUE_APP_I18N_LOCALE %>">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,6 +12,7 @@
       var MathJaxCompatible = true; var mathRenderer="MathJax";
       function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }
       var imasroot = '<%= process.env.VUE_APP_IMASROOT %>';
+      var staticroot = '<%= process.env.VUE_APP_IMASROOT %>';
       var APIbase = '<%= process.env.VUE_APP_IMASROOT %>/assess2/';
       var AMTcgiloc = 'https://www.myopenmath.com/cgi-bin/mimetex.cgi';
       var coursetheme = 'modern.css'; var tinymceUseSnippets = 0;

@@ -51,7 +51,7 @@ if ($istutor) {
 }
 
 // load question settings
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', false, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -83,12 +83,7 @@ if (!empty($changes)) {
 }
 
 // update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  require_once("../includes/ltioutcomes.php");
-  $aidposs = $assess_info->getSetting('points_possible');
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true,$aidposs);
-}
+$assess_record->updateLTIscore();
 
 //prep date display
 prepDateDisp($assessInfoOut);

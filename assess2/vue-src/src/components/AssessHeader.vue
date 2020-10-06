@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
+  <div id="assess-header" :class="{'assess-header': true, 'headerpane': true, 'practice': ainfo.in_practice}"
     role="region" :aria-label="$t('regions.aheader')"
   >
     <div style="flex-grow: 1">
@@ -46,19 +46,16 @@
     </div>
 
     <div class="assess-header">
-      <menu-button
+      <dropdown
         v-if="ainfo.resources.length > 0"
-        id="resource-dropdown" position="right"
-        :header = "$t('header.resources_header')"
-        nobutton = "true"
-        noarrow = "true"
-        :options = "ainfo.resources"
-        searchby = "title"
+        id="resource-dropdown"
+        :tip = "$t('header.resources_header')"
       >
         <template v-slot:button>
           <icons name="file" size="medium"/>
         </template>
-      </menu-button>
+        <resource-pane />
+      </dropdown>
 
       <tooltip-span v-if = "showPrint" :tip="$t('print.print_version')">
         <a
@@ -89,13 +86,20 @@
           <span class="switch-toggle__ui"></span>
         </button>
       </tooltip-span>
-      <tooltip-span
+      <badged-icon
         v-if="ainfo.is_lti && ainfo.lti_showmsg"
-        :tip="$tc('lti.msgs', ainfo.lti_msgcnt)"
-        style="display: inline-block"
-      >
-        <lti-msgs />
-      </tooltip-span>
+        :link="msglink"
+        icon = "message"
+        label = "lti.msgs"
+        :cnt = "ainfo.lti_msgcnt"
+      />
+      <badged-icon
+        v-if="ainfo.is_lti && ainfo.help_features.forum > 0"
+        :link="forumlink"
+        icon = "forum"
+        label = "lti.forum"
+        :cnt = "ainfo.lti_forumcnt"
+      />
       <lti-menu v-if="ainfo.is_lti" />
     </div>
 
@@ -104,11 +108,14 @@
 
 <script>
 import Timer from '@/components/Timer.vue';
-import MenuButton from '@/components/widgets/MenuButton.vue';
+// import MenuButton from '@/components/widgets/MenuButton.vue';
+import Dropdown from '@/components/widgets/Dropdown.vue';
+import ResourcePane from '@/components/ResourcePane.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import LtiMenu from '@/components/LtiMenu.vue';
-import LtiMsgs from '@/components/LtiMsgs.vue';
 import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
+import BadgedIcon from '@/components/BadgedIcon.vue';
+
 import { attemptedMixin } from '@/mixins/attemptedMixin';
 import { store, actions } from '../basicstore';
 
@@ -117,10 +124,11 @@ export default {
   components: {
     Icons,
     LtiMenu,
-    LtiMsgs,
-    MenuButton,
+    Dropdown,
+    ResourcePane,
     Timer,
-    TooltipSpan
+    TooltipSpan,
+    BadgedIcon
   },
   data: function () {
     return {
@@ -160,7 +168,7 @@ export default {
       } else if (this.ainfo.show_scores_during) {
         return this.$t('header.score', { pts: pointsEarned, poss: pointsPossible });
       } else {
-        return this.$t('header.possible', { poss: pointsPossible });
+        return this.$tc('header.possible', pointsPossible);
       }
     },
     qAttempted () {
@@ -187,19 +195,19 @@ export default {
     },
     saveStatus () {
       // returns 0 if nothing to display, 1 if saving, 2 if saved, 3 if ready to save
-      if (this.ainfo.submitby === 'by_assessment') {
-        if (store.autoSaving) {
-          return 1;
-        } else if (Object.keys(store.autosaveQueue).length === 0 &&
-          !store.somethingDirty
-        ) {
-          return 2;
-        } else {
-          return 3;
-        }
+      // if (this.ainfo.submitby === 'by_assessment') {
+      if (store.autoSaving) {
+        return 1;
+      } else if (Object.keys(store.autosaveQueue).length === 0 &&
+        !store.somethingDirty
+      ) {
+        return 2;
       } else {
-        return 0;
+        return 3;
       }
+      // } else {
+      //  return 0;
+      // }
     },
     showPrint () {
       return (this.ainfo.noprint !== 1);
@@ -219,6 +227,12 @@ export default {
         }
       }
       return hasShowWorkAfter;
+    },
+    msglink () {
+      return store.APIbase + '../msgs/msglist.php?cid=' + store.cid;
+    },
+    forumlink () {
+      return store.APIbase + '../forums/thread.php?cid=' + store.cid + '&forum= ' + this.ainfo.help_features.forum;
     }
   },
   methods: {

@@ -2,6 +2,11 @@
 require_once("../includes/filehandler.php");
 require_once("../includes/TeacherAuditLog.php");
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['delete'])) {
+	require($CFG['hooks']['delete']);
+}
+
 function delitembyid($itemid) {
 	global $DBH, $cid;
 	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
@@ -214,7 +219,9 @@ function delitembyid($itemid) {
 		$stm = $DBH->prepare("DELETE FROM imas_wiki_views WHERE wikiid=:wikiid");
 		$stm->execute(array(':wikiid'=>$typeid));
 
-	}
+	} else if (function_exists('delete_custom_item_by_id')) {
+        delete_custom_item_by_id($itemtype, $typeid);
+    }
 	$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
 	$stm->execute(array(':id'=>$itemid));
 

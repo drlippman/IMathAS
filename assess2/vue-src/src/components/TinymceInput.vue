@@ -2,7 +2,7 @@
   <div
     :id="computedId"
     ref="inbox"
-    class="fbbox"
+    class="fbbox skipmathrender"
     :rows="rows"
   ></div>
 </template>

@@ -257,7 +257,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$toset['viewingb'] = Sanitize::simpleString($_POST['viewingb']);
 			$toset['scoresingb'] = Sanitize::simpleString($_POST['scoresingb']);
-			if ($toset['viewingb'] == 'never' || $toset['scoresingb'] == 'never') {
+			if ($toset['viewingb'] == 'never') {
 				$toset['ansingb'] = 'never';
 			} else {
 				$toset['ansingb'] = Sanitize::simpleString($_POST['ansingb']);
@@ -513,25 +513,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array($cid, $assessmentId));
 
 			// Re-total any student attempts on this assessment
-			//need to re-score assessment attempts based on withdrawal
-			require_once('../assess2/AssessInfo.php');
-			require_once('../assess2/AssessRecord.php');
-			$assess_info = new AssessInfo($DBH, $assessmentId, $cid, false);
-			$assess_info->loadQuestionSettings();
-			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
-			$stm->execute(array($assessmentId));
-			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				$assess_record = new AssessRecord($DBH, $assess_info, false);
-				$assess_record->setRecord($row);
-				if ($toset['submitby']!=$curassess['submitby']) {
-					// convert data format
-					$assess_record->convertSubmitBy($toset['submitby']);
-				}
-				$assess_record->reTotalAssess();
-				// TODO: adjust deffb
-				// if ($toset['deffb']!=$curassess['deffeedbacktext']) {
-				$assess_record->saveRecord();
-			}
+            //need to re-score assessment attempts based on withdrawal
+            require_once('../assess2/AssessHelpers.php');
+            AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
+                ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 
 			$DBH->commit();
 			$rqp = Sanitize::randomQueryStringParam();
@@ -861,6 +846,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				'text' => _('Create new set of groups')
 			));
       while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                if ($row[1] == '##autobysection##') { continue; }
 				$groupOptions[] = array(
 					'value' => $row[0],
 					'text' => $row[1]
@@ -885,7 +871,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
 $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
 

@@ -87,7 +87,7 @@ export default {
       return parseInt(this.qn) + 1;
     },
     hasIntro () {
-      return (store.assessInfo.intro !== '');
+      return (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0);
     },
     navOptions () {
       var out = [];

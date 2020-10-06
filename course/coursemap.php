@@ -43,10 +43,10 @@ $itemshowdata = loadItemShowData($items, -1, $viewall, false, false);
 $now = time();
 
 function showicon($type,$alt='') {
-	global $CFG,$imasroot;
+	global $CFG,$imasroot,$staticroot;
 	if ($alt=='') {$alt = $type;}
 	if (isset($CFG['CPS']['miniicons'][$type])) {
-		echo '<img alt="'.$alt.'" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons'][$type].'" class="mida icon" /> ';
+		echo '<img alt="'.$alt.'" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons'][$type].'" class="mida icon" /> ';
 	}
 }
 

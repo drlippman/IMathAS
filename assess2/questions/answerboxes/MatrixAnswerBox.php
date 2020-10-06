@@ -46,6 +46,7 @@ class MatrixAnswerBox implements AnswerBox
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat="matrix";}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -68,7 +69,8 @@ class MatrixAnswerBox implements AnswerBox
     			} else {
     				$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
-          $arialabel = $this->answerBoxParams->getQuestionIdentifierString();
+          $arialabel = $this->answerBoxParams->getQuestionIdentifierString() . 
+            (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
           $out .= '<table role="group" aria-label="'.$arialabel.'">';
           if ($displayformat == 'det') {
              $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
@@ -119,8 +121,9 @@ class MatrixAnswerBox implements AnswerBox
     			} else {
     				$qnref = ($multi-1).'-'.($qn%1000);
     			}
-    			if (!isset($sz)) { $sz = 20;}
-    			$tip = _('Enter your answer as a matrix filled with numbers, like [(2,3,4),(3,4,5)]');
+                if (!isset($sz)) { $sz = 20;}
+                $shorttip = _('Enter a matrix of integer or decimal numbers');
+    			$tip = _('Enter your answer as a matrix filled with integer or decimal numbers, like [(2,3,4),(3,4,5)]');
     			if (isset($reqdecimals)) {
     				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
     			}
@@ -135,20 +138,27 @@ class MatrixAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
-    			$params['tip'] = $tip;
+    			$params['tip'] = $shorttip;
           $params['longtip'] = $tip;
 
     			$out .= '<input ' .
-                  'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
     							Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';
 
     			if (!isset($hidepreview)) {
-    				$params['preview'] = 1;
-    				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";
+                    if ($useeqnhelper) {
+                        $params['helper'] = 1;
+                        $params['calcformat'] = 'decimal';
+                    }
+                    $params['preview'] = 1;
+                    $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                    $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                    $preview .= '</button> &nbsp;';
     			}
     			$preview .= "<span id=p$qn></span> ";
     		}
@@ -165,7 +175,7 @@ class MatrixAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

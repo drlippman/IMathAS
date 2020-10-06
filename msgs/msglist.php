@@ -248,7 +248,7 @@ If deleted on both ends, delete from DB
 					var newcid = $(el).val();
 					$("#to").hide();
 					if (newcid>0) {
-						$(el).after($("<img>", {src: imasroot+"/img/updating.gif", alt: "Loading recipients..."}));
+						$(el).after($("<img>", {src: staticroot+"/img/updating.gif", alt: "Loading recipients..."}));
 						$.ajax({
 							url: "msglist.php?cid=0&getstulist="+newcid,
 							dataType: "json",
@@ -320,10 +320,24 @@ If deleted on both ends, delete from DB
 					$message = '';
 				}
 			} else if (isset($_GET['quoteq'])) {
-				require("../assessment/displayq2.php");
-				$parts = explode('-',$_GET['quoteq']);
+                $parts = explode('-',$_GET['quoteq']);
 				$GLOBALS['assessver'] = $parts[4];
-				$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+                if ($courseUIver > 1) {
+                    include('../assess2/AssessStandalone.php');
+                    $a2 = new AssessStandalone($DBH);
+                    $state = array(
+                        'seeds' => array($parts[0] => $parts[2]),
+                        'qsid' => array($parts[0] => $parts[1])
+                    );
+                    $a2->setState($state);
+                    $a2->loadQuestionData();
+                    $res = $a2->displayQuestion($parts[0], ['showhints'=>false]);
+                    $message = $res['html'];
+                    $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
+                } else {
+                    require("../assessment/displayq2.php");
+                    $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+                }
 				$message = printfilter(forcefiltergraph($message));
 				if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
 					require_once("../includes/filehandler.php");
@@ -530,7 +544,7 @@ If deleted on both ends, delete from DB
 	}
 
 	$pagetitle = "Messages";
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js?v=072217\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/msg.js?v=072217\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $GLOBALS['basesiteurl'] . "/msgs/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
 	if (isset($_SESSION['ltiitemtype'])) {
@@ -824,9 +838,9 @@ function chgfilter() {
 		echo "</td><td>";
 		echo '<a href="#" onclick="toggletagged('.Sanitize::onlyInt($line['id']).');return false;">';
 		if ($line['tagged']==1) {
-			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" alt=\"Flagged\"/>";
+			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" alt=\"Flagged\"/>";
 		} else {
-			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" alt=\"Not flagged\"/>";
+			echo "<img class=\"pointer\" id=\"tag".Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" alt=\"Not flagged\"/>";
 		}
 		echo '</a>';
 		echo '</td>';

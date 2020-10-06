@@ -164,7 +164,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <div id="currentteachers">
 	<h2>Current Teachers</h2>
 	<p>With selected: <button @click="removeTeachers()">Remove as teacher</button>
-	   <span v-if="processingRemove" class="noticetext">Saving Changes... <img src="../img/updating.gif"></span>
+	   <span v-if="processingRemove" class="noticetext">Saving Changes... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
 	</p>
 	<transition-group name="fade" tag="ul" class="nomark">
 		<li v-for="teacher in existingTeachers" :key="teacher.id">
@@ -177,8 +177,8 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	<p><button @click="loadGroup()">List my group members</button>
 		or lookup a teacher: <input v-model="toLookup" size=30>
 		<button @click="searchTeacher()" :disabled="toLookup.length==0">Search</button>
-		<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="../img/updating.gif"></span>
-		<span v-if="processingAdd" class="noticetext">Adding teachers... <img src="../img/updating.gif"></span>
+		<span v-if="processingSearch" class="noticetext">Looking up teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
+		<span v-if="processingAdd" class="noticetext">Adding teachers... <img src="<?php echo $staticroot;?>/img/updating.gif"></span>
 	</p>
 	<p v-if="searchResults !== null && searchResults.length==0">No teachers found</p>
 	<p v-if="searchResults !== null && searchResults.length>0">

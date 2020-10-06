@@ -54,9 +54,9 @@
 	$caller = "byname";
 	include("posthandler.php");
 
-	$placeinhead = '<link rel="stylesheet" href="'.$imasroot.'/forums/forums.css?ver=082911" type="text/css" />';
+	$placeinhead = '<link rel="stylesheet" href="'.$staticroot.'/forums/forums.css?ver=082911" type="text/css" />';
 	if ($haspoints && $caneditscore && $rubric != 0) {
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=113016"></script>';
 		require("../includes/rubric.php");
 	}
 	if ($caneditscore && $_SESSION['useed']!=0) {
@@ -64,7 +64,11 @@
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; <a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."\">Forum Topics</a> &gt; Posts by Name</div>\n";
+    echo "<div class=breadcrumb>";
+    if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+        echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }    
+    echo "<a href=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."\">Forum Topics</a> &gt; Posts by Name</div>\n";
 
 	echo '<div id="headerpostsbyname" class="pagetitle">';
 	echo "<h1>Posts by Name - ".Sanitize::encodeStringForDisplay($forumname)."</h1>\n";

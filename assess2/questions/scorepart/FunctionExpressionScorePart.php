@@ -57,13 +57,15 @@ class FunctionExpressionScorePart implements ScorePart
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
 
         if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         $givenans = normalizemathunicode(trim($givenans));
-
+        $answer = normalizemathunicode($answer);
+        
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
         }
@@ -157,7 +159,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
-            if ($answer==$givenans) {
+            if (strcmp($answer,$givenans) === 0) {
                 $scorePartResult->setRawScore(1);
                 return $scorePartResult;
             } else {
@@ -169,7 +171,14 @@ class FunctionExpressionScorePart implements ScorePart
             return $scorePartResult;
         }
 
-        if (!in_array('equation',$ansformats) && strpos($answer,'=')!==false) {
+        if (!in_array('inequality',$ansformats) &&
+            (strpos($answer,'<')!==false || strpos($answer,'>')!==false)
+         ) {
+            echo 'Your $answer contains an inequality sign, but you do not have $answerformat="inequality" set. This question probably will not work right.';
+        } else if (!in_array('equation',$ansformats) &&
+          !in_array('inequality',$ansformats) &&
+          strpos($answer,'=')!==false
+        ) {
             echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
         }
 
@@ -177,6 +186,14 @@ class FunctionExpressionScorePart implements ScorePart
         $givenansvals = array();
         if (in_array('equation',$ansformats)) {
             $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
+        } else if (in_array('inequality',$ansformats)) {
+            if (preg_match('/(.*)(<=|>=|<|>)(.*)/', $givenans, $matches)) {
+                $toevalGivenans = $matches[3] . '-(' . $matches[1] . ')';
+                $givenInequality = $matches[2];
+            } else {
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
         } else {
             $toevalGivenans = $givenans;
         }
@@ -222,7 +239,7 @@ class FunctionExpressionScorePart implements ScorePart
                 $thisreqtimes = $requiretimes;
             }
             $correct = true;
-            $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\']+/','',$answer);
+            $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\'<>]+/','',$answer);
 
             if (in_array('equation',$ansformats)) {
                 if (substr_count($givenans, '=')!=1) {
@@ -230,8 +247,11 @@ class FunctionExpressionScorePart implements ScorePart
                     return $scorePartResult;
                 }
                 $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
+            } else if (in_array('inequality',$ansformats)) {
+                preg_match('/(.*)(<=|>=|<|>)(.*)/', $answer, $matches);
+                $answer = $matches[3] . '-(' . $matches[1] . ')';
+                $answerInequality = $matches[2];
             }
-
             if ($answer == '') {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
@@ -260,7 +280,7 @@ class FunctionExpressionScorePart implements ScorePart
                 $realans = $answerfunc->evaluateQuiet($varvals);
                 //echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
                 if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
-                if (in_array('equation',$ansformats)) {  //if equation, store ratios
+                if (in_array('equation',$ansformats) || in_array('inequality',$ansformats)) {  //if equation, store ratios
                     if (isNaN($givenansvals[$i])) {
                         $stunan++;
                     } elseif (abs($realans)>.000001 && is_numeric($givenansvals[$i])) {
@@ -295,7 +315,7 @@ class FunctionExpressionScorePart implements ScorePart
             if ($stunan>1) { //if more than 1 student NaN response
                 $correct = false; continue;
             }
-            if (in_array('equation',$ansformats)) {
+            if (in_array('equation',$ansformats) || in_array('inequality',$ansformats)) {
                 if ($cntbothzero>18) {
                     $correct = true;
                 } else if (count($ratios)>1) {
@@ -303,6 +323,18 @@ class FunctionExpressionScorePart implements ScorePart
                         $correct = false; continue;
                     } else {
                         $meanratio = array_sum($ratios)/count($ratios);
+                        if (in_array('inequality',$ansformats)) {
+                            if ($meanratio > 0) {
+                                if ($answerInequality != $givenInequality) {
+                                    $correct = false; continue;
+                                }
+                            } else {
+                                $flippedIneq = strtr($givenInequality, ['<'=>'>', '>'=>'<']);
+                                if ($answerInequality != $flippedIneq) {
+                                    $correct = false; continue;
+                                }
+                            }
+                        }
                         for ($i=0; $i<count($ratios); $i++) {
                             if (isset($abstolerance)) {
                                 if (abs($ratios[$i]-$meanratio) > $abstolerance-1E-12) {$correct = false; break;}
@@ -351,7 +383,7 @@ class FunctionExpressionScorePart implements ScorePart
                 return $scorePartResult;
             }
         }
-        if ($rightanswrongformat!=-1) {
+        if ($rightanswrongformat!=-1 && !empty($formatfeedbackon)) {
             $scorePartResult->setCorrectAnswerWrongFormat(true);
         }
 

@@ -53,15 +53,27 @@ if (!(isset($teacherid))) {
 		$sets = array();
 		$qarr = array();
 		if ($_POST['copyopts'] != 'DNC') {
-			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
+            $copyreqscore = !empty($_POST['copyreqscore']);
+			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,defoutcome';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
-				$sets[] = "$item=:$item";
-			}
-
+                if (($item == 'reqscoreaid' || $item == 'reqscore') && !$copyreqscore) {
+                    unset($qarr[$item]);
+                } else if ($item == 'reqscoretype' && !$copyreqscore) {
+                    if (($qarr[$item]&1)==0) {
+                        $sets[] = 'reqscore=ABS(reqscore)';
+                        $sets[] = 'reqscoretype=(reqscoretype & ~1)';
+                    } else {
+                        $sets[] = 'reqscoretype=(reqscoretype | 1)';
+                    }
+                    unset($qarr['reqscoretype']);
+                } else {
+                    $sets[] = "$item=:$item";
+                }
+            }
 		} else {
 			$turnonshuffle = 0;
 			$turnoffshuffle = 0;
@@ -71,9 +83,15 @@ if (!(isset($teacherid))) {
 					$turnoffshuffle += 16;
 				} else if ($_POST['shuffle']==16) {
 					$turnonshuffle += 16;
+					$turnoffshuffle += 33;
+				} else if ($_POST['shuffle']==32) {
+					$turnonshuffle += 32;
+					$turnoffshuffle += 17;
+				} else if ($_POST['shuffle']==48) {
+					$turnonshuffle += 16;
 					$turnoffshuffle += 1;
 				} else {
-					$turnoffshuffle += 17;
+					$turnoffshuffle += 49;
 				}
 			}
 			if ($_POST['samever'] !== 'DNC') {
@@ -421,7 +439,7 @@ if (!(isset($teacherid))) {
 			$setslist = implode(',',$sets);
 			$qarr[':cid'] = $cid;
 			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist) AND courseid=:cid");
-			$stm->execute($qarr);
+            $stm->execute($qarr);
 			if ($stm->rowCount()>0) {
 				$updated_settings = true;
 				$metadata = $metadata + $qarr;
@@ -482,7 +500,7 @@ if (!(isset($teacherid))) {
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if ($row['assessmentid'] != $lastAid) {
 					$assess_info = new AssessInfo($DBH, $row['assessmentid'], $cid, false);
-					$assess_info->loadQuestionSettings();
+					$assess_info->loadQuestionSettings('all', false, false);
 					$lastAid = $row['assessmentid'];
 				}
 				$assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -590,7 +608,7 @@ if (!(isset($teacherid))) {
 		}
 
 		function getNestedList($items, $parent) {
-			global $itemshowdata, $agbcats;
+			global $itemshowdata, $agbcats, $staticroot;
 			$out = '';
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
@@ -598,7 +616,7 @@ if (!(isset($teacherid))) {
 						$sub = getNestedList($item['items'], $parent.'-'.($k+1));
 						if ($sub !== '') {
 							$out .= '<li>';
-							$out .= '<label> <img src="../img/folder_tiny.png"/> ';
+							$out .= '<label> <img src="'.$staticroot.'/img/folder_tiny.png"/> ';
 							$out .= '<input type=checkbox name="checked[]" value="0" id="'.$parent.'-'.($k+1).'" ';
 							$out .= 'onClick="chkgrp(this.form, \''.$parent.'-'.($k+1).'\', this.checked);" checked=checked /> ';
 
@@ -609,7 +627,7 @@ if (!(isset($teacherid))) {
 				} else if ($itemshowdata[$item]['itemtype'] == 'Assessment') {
 					$aid = $itemshowdata[$item]['id'];
 					$out .= '<li>';
-					$out .= '<label><img src="../img/assess_tiny.png"/> ';
+					$out .= '<label><img src="'.$staticroot.'/img/assess_tiny.png"/> ';
 					$out .= '<input type=checkbox name="checked[]" value="'.$aid.'" onclick="updgrp(\''.$parent.'\')" ';
 					$out .= 'id="' . $parent . "." . $item . ":" . $agbcats[$aid] . '" checked=checked /> ';
 
@@ -736,8 +754,12 @@ function tabToSettings() {
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerchgassessments" class="pagetitle"><h1>Mass Change Assessment Settings
-		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+		<img src="<?php echo $staticroot; ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h1></div>
+
+	<div class="cpmid">
+	<a href="masschgprereqs.php?cid=<?php echo $cid;?>"><?php echo _('Mass Change Prereqs'); ?></a>
+	</div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
 	<p><b>Be aware</b> that changing some settings after an assessment has been

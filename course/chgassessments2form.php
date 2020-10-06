@@ -28,7 +28,8 @@ $vueData = array(
 	'copyendmsg' => 'DNC',
 	'chgendmsg' => false,
 	'removeperq' => false,
-	'copyopts' => 'DNC',
+    'copyopts' => 'DNC',
+    'copyreqscore' => false,
 	'displaymethod' => 'DNC',
 	'defpoints' => '',
 	'gbcategory' => 'DNC',
@@ -169,13 +170,22 @@ $vueData = array(
 				</select>
 			</span><br class=form />
 		</div>
+        <div v-show="copyopts !== 'DNC'" :class="{highlight:copyreqscore != false}">
+            <span class="form"></span>
+            <span class=formright>
+                <label>
+                <input type="checkbox" name="copyreqscore" v-model="copyreqscore" />
+                <?php echo _('Also copy "show based on another assessment" setting');?>
+                </label>
+            </span><br class=form />
+        </div>
 		<div v-show="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
 		<div style="padding-top:4px;">
 			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All'); ?></a>
 	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All'); ?></a>
 		</div>
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/collapse.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/collapse.gif" />
 			<?php echo _('Core Options'); ?>
 		</div>
 		<div class="blockitems">
@@ -349,14 +359,16 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Additional Display Options'); ?>
 		</div>
 		<div class="blockitems hidden">
 			<div :class="{highlight:caltag != ''}">
 				<label class="form" for="caltag"><?php echo _('Calendar icon'); ?>:</label>
 				<span class="formright">
-					<input name="caltag" id="caltag" type=text size=8 v-model="caltag"/>
+                    <label><input name="caltagradio" type="radio" value="usetext" checked><?php echo _('Use Text');?>:</label>
+                        <input aria-label="<?php echo _('Calendar icon text');?>" name="caltag" id="caltag" v-model="caltag" type=text size=8 /> <br />
+					<label><input name="caltagradio" type="radio" value="usename"><?php echo _('Use Assessment Name');?></label>
 				</span><br class=form />
 			</div>
 
@@ -367,7 +379,9 @@ $vueData = array(
 						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option value="0"><?php echo _('No'); ?></option>
 						<option value="1"><?php echo _('All'); ?></option>
-						<option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="32"><?php echo _('All but last');?></option>
+                        <option value="48"><?php echo _('All but first and last');?></option>
 					</select>
 				</span><br class=form />
 			</div>
@@ -428,7 +442,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Time Limit and Access Control'); ?>
 		</div>
 		<div class="blockitems hidden">
@@ -528,7 +542,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Help and Hints'); ?>
 		</div>
 		<div class="blockitems hidden">
@@ -610,7 +624,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Grading and Feedback'); ?>
 		</div>
 		<div class="blockitems hidden">
@@ -789,7 +803,7 @@ var app = new Vue({
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': '<?php echo _('Show with the score'); ?>'
+				'text': '<?php echo _('After the last try on a question');?>'
 			};
 
 			var out = [];
@@ -802,6 +816,10 @@ var app = new Vue({
 					{
 						'value': 'after_lastattempt',
 						'text': '<?php echo _('After the last try on a question'); ?>'
+                    },
+                    {
+						'value': 'jump_to_answer',
+						'text': '<?php echo _('After the last try or Jump to Answer button');?>'
 					},
 					never
 				];
@@ -930,7 +948,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never') {
 				this.ansingb = 'never';
  				return [];
  			} else {
@@ -943,10 +961,8 @@ var app = new Vue({
  						'value': 'never',
  						'text': '<?php echo _('Never'); ?>'
  					}
- 				];
- 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
-				 	&& this.subtype == 'by_assessment'
-				) {
+                ];
+                if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted'); ?>'
@@ -964,6 +980,19 @@ var app = new Vue({
 		}
 	},
 	methods: {
+		initCalTagRadio: function() {
+			// bind to caltagradio controls
+			$('input[type=radio][name=caltagradio]').change(function() {
+				if (this.value == 'usename') {
+					$('input[type=text][name=caltag]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+					$('input[type=text][name=caltag]').closest('div').addClass('highlight');
+				}
+				else if (this.value == 'usetext') {
+					$('input[type=text][name=caltag]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('');
+					$('input[type=text][name=caltag]').closest('div').removeClass('highlight');
+				}
+			});
+		},
 		valueInOptions: function(optArr, value) {
 			var i;
 			for (i in optArr) {
@@ -977,6 +1006,10 @@ var app = new Vue({
 			this.extrefs.push({'label':'', 'link':''});
 			this.extrefs = this.extrefs.slice();
 		}
+	},
+    mounted: function() {
+    	// call init method
+        this.initCalTagRadio();
 	}
 });
 </script>

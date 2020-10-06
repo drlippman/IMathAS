@@ -47,6 +47,7 @@ class StringAnswerBox implements AnswerBox
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
         if (!isset($answerformat)) { $answerformat = '';}
 
@@ -64,12 +65,11 @@ class StringAnswerBox implements AnswerBox
     		}
     		if ($displayformat=='select') {
     			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
-          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
-          $out .= '<option value=""> </option>';
+                $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+                $out .= '<option value=""> </option>';
     			foreach ($questions as $i=>$v) {
     				$out .= '<option value="'.htmlentities($v).'"';
-    				//This is a hack.  Need to figure a better way to deal with & in answers
-    				if (str_replace('&','',$v)==$la) {
+    				if ($v == $la) {
     					$out .= ' selected="selected"';
     				}
     				$out .= '>'.htmlentities($v).'</option>';
@@ -86,7 +86,9 @@ class StringAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
 
     			if ($displayformat=='alignright') {
@@ -107,11 +109,10 @@ class StringAnswerBox implements AnswerBox
     			if ($useeqnhelper && $displayformat == 'usepreview') {
     				$params['helper'] = 1;
     			}
-    			if (!isset($hidepreview) && $displayformat == 'usepreview' &&
-            $_SESSION['userprefs']['livepreview']==1
-          ) {
-    				$params['preview'] = 1;
-    			}
+                if (!isset($hidepreview) && $displayformat == 'usepreview') {
+                    $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+                }
+
     			$params['calcformat'] = $answerformat;
 
     			if ($displayformat == 'typeahead') {
@@ -140,13 +141,14 @@ class StringAnswerBox implements AnswerBox
     			}
 
     			$out .= '<input ' .
-    							'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'" ' .
                   Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';
 
     			if ($displayformat == 'usepreview') {
-    				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
+                    $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                    $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                    $preview .= '</button> &nbsp;';
     				$preview .= "<span id=p$qn></span> ";
     			}
     		}
@@ -167,7 +169,7 @@ class StringAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

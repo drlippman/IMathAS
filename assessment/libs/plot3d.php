@@ -13,7 +13,7 @@ array_push($allowedmacros,"plot3d","spacecurve","replace3dalttext","CalcPlot3Dem
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
 //alttext: text for non-visual users. Can also be added later using replace3dalttext
 function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$height=300,$axes=1) {
-	global $imasroot;
+	global $imasroot, $staticroot;
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 
 	$alt = '3D Plot';
@@ -98,12 +98,12 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		  $html .= '  verts: "'.$verts.'",';
 		  $html .= '  faces: "'.$faces.'",';
 		  $html .= "  width: $width, height: $height };";
-		  $html .= "  swfobject.embedSWF(\"$imasroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
+		  $html .= "  swfobject.embedSWF(\"$staticroot/assessment/libs/viewer3d.swf\", \"plot3d$r\", \"$width\", \"$height\", \"9.0.0\", \"$imasroot/assessment/libs/expressInstall.swf\",FlashVars);";
 		  $html .= '</script>';
 	  } else {
 	  	$r = uniqid();
 			if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
-				$html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js?v=1"></script>';
+				$html .= '<script type="text/javascript" src="'.$staticroot.'/javascript/3dviewer.js?v=1"></script>';
 			}
 	  	  $GLOBALS['3dplotcnt'] = $r;
 	  	  $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
@@ -135,7 +135,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 //bounds: xmin,xmax,ymin,ymax,zmin,zmax
 //alttext: text for non-visual users. Can also be added later using replace3dalttext
 function spacecurve($func,$tmin,$tmax) {
-	global $imasroot;
+	global $imasroot, $staticroot;
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 	if (func_num_args()>3) {
 		$disc = func_get_arg(3);
@@ -253,7 +253,7 @@ function spacecurve($func,$tmin,$tmax) {
 
 	   $r = uniqid();
 		 if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
-			 $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
+			 $html .= '<script type="text/javascript" src="'.$staticroot.'/javascript/3dviewer.js"></script>';
 		 }
 	  	 $GLOBALS['3dplotcnt'] = $r;
 	  	 $html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
