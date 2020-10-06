@@ -552,6 +552,7 @@ class QuestionHtmlGenerator
         /*
          * Possibly adjust the showanswer if it doesn't look right
          */
+        $doShowDetailedSoln = false;
         if (isset($showanswer) && is_array($showanswer) && count($showanswer) < count($answerbox)) {
             $showansboxloccnt = substr_count($toevalqtxt,'$showanswerloc') + substr_count($toevalqtxt,'[SAB');
             if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
@@ -566,11 +567,13 @@ class QuestionHtmlGenerator
                 ksort($showanswer);
                 $_lastPartUsed = -1;
                 $_thisIsReady = true;
+                $doShowDetailedSoln = true;
                 foreach ($showanswer as $kidx=>$atIdx) {
                     $_thisIsReady = true;
                     for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
                         if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
                             $_thisIsReady = false;
+                            $doShowDetailedSoln = false;
                             break;
                         } else if ($iidx < $kidx) {
                             $doShowAnswerParts[$iidx] = false;
@@ -752,7 +755,7 @@ class QuestionHtmlGenerator
           }
         }
         // display detailed solution, if allowed and set
-        if ($doShowAnswer && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
+        if (($doShowAnswer || $doShowDetailedSoln) && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
           if ($nosabutton) {
             $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
           } else {
