@@ -185,12 +185,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $libquery = "ili.libid IN ($llist)";
-        $libnames = [];
         $sortorder = [];
         $stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $libnames[$row[1]] = Sanitize::encodeStringForDisplay($row[0]);
             $sortorder[$row[0]] = $row[2];
+        }
+        if (in_array(0, $libs)) {
+            $libnames[0] = _('Unassigned');
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
@@ -307,6 +309,12 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $query .= ' ORDER BY ia.id ';
     } else {
         $query .= ' GROUP BY ili.qsetid ';
+        if (!empty($search['bydate'])) {
+            $query .= ' ORDER BY ia.lastmoddate ';
+            if ($search['bydate'] != 'a') {
+                $query .= ' DESC ';
+            }
+        }
     }
     if (!empty($max) && intval($max) > 0) {
         $query .= ' LIMIT ' . intval($max);
