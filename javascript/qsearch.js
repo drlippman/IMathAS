@@ -27,7 +27,7 @@ $(function() {
 function parseAdvSearch() {
     var search = document.getElementById("search").value;
     var matches;
-    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/g)) {
+    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/g)) {
         var pts;
         for (var i=0;i<matches.length;i++) {
             pts = matches[i].split(/:/);
@@ -51,10 +51,12 @@ function parseAdvSearch() {
                 for (var j=0; j<helps.length;j++) {
                     $("#search-res-"+helps[j]).prop('checked', true);
                 }
+            } else if (pts[0] == 'order') {
+                $("#search-newest").prop('checked', pts[1] == 'newest');
             }
         }
     }
-    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/g, '');
+    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/g, '');
     var words = search.split(/\s+/);
     var haswords = [];
     var excwords = [];
@@ -103,6 +105,9 @@ function doAdvSearch() {
     }
     if ($("#search-unused").is(':checked')) {
         outstr += 'unused:1 ';
+    }
+    if ($("#search-newest").is(':checked')) {
+        outstr += 'order:newest ';
     }
     var helps = [];
     $("input[id^=search-res-]:checked").each(function(i,el) {

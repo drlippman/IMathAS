@@ -693,7 +693,8 @@ if ($overwriteBody==1) {
                         <input size=2 id="search-avgtime-min"> to <input size=2 id="search-avgtime-max">
                     </div></div>
                     <p><input type=checkbox id="search-mine"><?php echo _('Mine Only');?> 
-                        <input type=checkbox id="search-unused"><?php echo _('Exclude Added');?>
+                       <input type=checkbox id="search-unused"><?php echo _('Exclude Added');?>
+                       <input type=checkbox id="search-newest"><?php echo _('Newest First');?>
                     </p>
                     <p><?php echo _('Helps');?>: 
                         <label><input type=checkbox id="search-res-help" value="help"><?php echo _('Resource');?></label> 

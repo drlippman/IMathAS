@@ -15,12 +15,12 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
             $out[$match[1]] = str_replace('"', '', $match[2]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
@@ -269,6 +269,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($searchtype == 'assess') {
         $query .= ',iaq.id AS qid ';
     }
+    if (!empty($search['order']) && $search['order']=='newest') {
+        $query .= ',iq.lastmoddate ';
+    }
     $query .= 'FROM imas_questionset AS iq JOIN imas_library_items AS ili ON
     ili.qsetid=iq.id AND ili.deleted=0 ';
     if ($searchtype == 'assess') {
@@ -309,11 +312,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $query .= ' ORDER BY ia.id ';
     } else {
         $query .= ' GROUP BY ili.qsetid ';
-        if (!empty($search['bydate'])) {
-            $query .= ' ORDER BY ia.lastmoddate ';
-            if ($search['bydate'] != 'a') {
-                $query .= ' DESC ';
-            }
+        if (!empty($search['order']) && $search['order']=='newest') {
+            $query .= ' ORDER BY iq.lastmoddate DESC ';
         }
     }
     if (!empty($max) && intval($max) > 0) {
@@ -381,24 +381,28 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $res[$k]['grp'] = $qidmap[$v['qid']][0];
             $res[$k]['qn'] = $qidmap[$v['qid']][1];
         }
-        usort($res, function ($a, $b) {
+        usort($res, function ($a, $b) use ($search) {
             if ($a['grp'] != $b['grp']) {
                 return ($a['grp'] < $b['grp']) ? -1 : 1;
             } else if ($a['qn'] != $b['qn']) {
                 return ($a['qn'] < $b['qn']) ? -1 : 1;
+            } else if (!empty($search['order']) && $search['order']=='newest') {
+                return ($b['lastmoddate'] - $a['lastmoddate']);
             } else {
                 return ($a['id'] < $b['id']) ? -1 : 1;
             }
         });
         $out = ['qs' => $res, 'names' => $aidnames, 'type'=>'assess'];
     } else if ($searchtype == 'libs') {
-        usort($res, function ($a, $b) use ($sortorder) {
+        usort($res, function ($a, $b) use ($sortorder,$search) {
             if ($a['libid'] != $b['libid']) {
                 return ($a['libid'] < $b['libid']) ? -1 : 1;
             } else if ($a['broken'] != $b['broken']) {
                 return ($a['broken'] < $b['broken']) ? -1 : 1;
             } else if ($a['junkflag'] != $b['junkflag']) {
                 return ($a['junkflag'] < $b['junkflag']) ? -1 : 1;
+            } else if (!empty($search['order']) && $search['order']=='newest') {
+                return ($b['lastmoddate'] - $a['lastmoddate']);
             } else if ($sortorder[$a['libid']] == 1) { // alpha
                 return strnatcasecmp($a['descr'], $b['descr']);
             } else {
