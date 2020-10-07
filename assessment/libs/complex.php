@@ -107,25 +107,27 @@ function cx_conj(array $num) {
 }
 
 //------------------------------------------------Polar form --------------------------------------------
-// Function: cx_std2pol(num,[argin = "rad"])
+// Function: cx_std2pol(num,[argin = "rad", roundto = 12])
 // Converts the standard form to polar form and returns the modulus and the argument as a paired value.
 //
 // Parameters:
 // num: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).
 // argin: Optional - Unit for the argument; default is "rad" for radian. For argument in degree, argin = "deg".
-// 
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 3 decimal places.
+//
 // Returns:
 // The modulus and the argument of a complex number as a paired value in an array: array([mod, arg]).
 
-function cx_std2pol(array $num, string $argin="rad") {
+function cx_std2pol(array $num, string $argin="rad", int $roundto= 12) {
     if (count($num)!=1) { echo "cx_std2pol expects 1 complex number as an input"; return "";}
     
-    $r= cx_modul($num);
+    $r= round(cx_modul($num),$roundto);
     if ($argin=="deg"){
-        $th1=cx_arg($num,"deg");
+        $th1=round(cx_arg($num,"deg"),$roundto);
     }
         else{
-            $th1=cx_arg($num);
+            $th1=round(cx_arg($num),$roundto);
         }
     
     $polar=array([$r,$th1]);    
@@ -160,7 +162,7 @@ function cx_polEu(array $num,int $roundto=12) {
 }
 
 //---------------------------------------------Standard form-----------------------------------------------
-// Function: cx_pol2std(num, [argin = "rad"])
+// Function: cx_pol2std(num, [argin = "rad", roundto = 12])
 // Converts the polar form to standard form and returns the real and imaginary parts as a paired value 
 // in an array.
 //
@@ -168,11 +170,13 @@ function cx_polEu(array $num,int $roundto=12) {
 // num: An array of modulus and argument of a complex number in polar form given in square brackets: 
 //      $num = array([mod, arg]).
 // argin: Optional - Unit for the argument; default is "rad" for radian. For argument in degree, argin = "deg".
-// 
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
+//
 // Returns:
 // The real and imaginary parts as a paired value in an array: array([Re, Im]).
 
-function cx_pol2std(array $num, string $argin="rad") {
+function cx_pol2std(array $num, string $argin="rad", int $roundto= 12) {
     if (count($num)!=1) { echo "cx_pol2std expects 1 complex number as an input"; return "";}
 
     $mod=$num[0][0];
@@ -181,8 +185,8 @@ function cx_pol2std(array $num, string $argin="rad") {
         $arg=deg2rad($arg);
     }
             
-    $re=round($mod*cos($arg),3);
-    $im=round($mod*sin($arg),3);
+    $re=round($mod*cos($arg),$roundto);
+    $im=round($mod*sin($arg),$roundto);
     
     $st= array([$re , $im]);    
         
@@ -392,7 +396,7 @@ function cx_div(array $num) {
 }
 
 //-------------------------------------Quadratic real and complex roots--------------------------------------
-// Function: cx_quadRoot(a,b,c)
+// Function: cx_quadRoot(a,b,c, [roundto = 12])
 // Returns an array of roots of the quadratic equation f(x) = ax^2 + bx + c. Real roots are returned
 // as an array([r1],[r2]) ordered from the smallest to largest, and the complex roots are returned 
 // as an array([Re1,Im1], [Re2,Im2]). 
@@ -401,22 +405,24 @@ function cx_div(array $num) {
 // a: The numerical coefficient of x^2
 // b: The numerical coefficient of x    
 // c: The constant
+// roundto: Optional - number of decimal places to which modulus should be rounded off; 
+//          default is 12 decimal places. 
 //
 // Returns:
 // An array of roots (either real or complex) of the quadratic equation.
 
-function cx_quadRoot(float $a, float $b, float $c){
+function cx_quadRoot(float $a, float $b, float $c, int $roundto = 12){
     $d=$b**2 - 4*$a*$c;
     if ($d<0){
 
-        $re= -$b/(2*$a);
-        $im= sqrt(abs($d))/(2*$a);
+        $re= round(-$b/(2*$a),$roundto);
+        $im= round(sqrt(abs($d))/(2*$a),$roundto);
         $im2=-$im;
         $st=array([$re,$im],[$re,$im2]);
     }
         else {
-            $r1=round(((-$b-sqrt($d))/(2*$a)),3);
-            $r2=round(((-$b+sqrt($d))/(2*$a)),3);
+            $r1=round(((-$b-sqrt($d))/(2*$a)),$roundto);
+            $r2=round(((-$b+sqrt($d))/(2*$a)),$roundto);
             $st=array([$r1],[$r2]);
         }
 
@@ -506,7 +512,7 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
 }
 
 //------------------------------String Formatted Quadratic real and complex roots------------------------
-// Function: cx_prettyquadRoot(a,b,c)
+// Function: cx_prettyquadRoot(a,b,c, [roundto=3])
 // Returns an array of the string of roots of the quadratic equation f(x) = ax^2 + bx + c. Real roots are returned
 // as an array("r1","r2") ordered from the smallest to largest, and the complex roots are returned 
 // as an array("a+bi","a-bi"). This function is suitable for displaying answer (i.e., $showanswer).
@@ -515,11 +521,13 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
 // a: The numerical coefficient of x^2
 // b: The numerical coefficient of x    
 // c: The constant
+// roundto: Optional - number of decimal places to which modulus should be rounded off; 
+//          default is 3 decimal places. 
 //
 // Returns:
 // An array of formatted string of roots (either real or complex) of the quadratic equation.
 
-function cx_prettyquadRoot(float $a, float $b, float $c){
+function cx_prettyquadRoot(float $a, float $b, float $c, int $roundto=3){
     $d=$b**2 - 4*$a*$c;
     
     if ($d<0){
@@ -534,8 +542,8 @@ function cx_prettyquadRoot(float $a, float $b, float $c){
             $st=array("-$D + $N i","-$D - $N i");
     }
         else {
-            $r1=round(((-$b-sqrt($d))/(2*$a)),3);
-            $r2=round(((-$b+sqrt($d))/(2*$a)),3);
+            $r1=round(((-$b-sqrt($d))/(2*$a)),$roundto);
+            $r2=round(((-$b+sqrt($d))/(2*$a)),$roundto);
             $st=array("$r1","$r2");
         }
 
