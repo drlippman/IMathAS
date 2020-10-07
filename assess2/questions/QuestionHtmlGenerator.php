@@ -357,7 +357,7 @@ class QuestionHtmlGenerator
                       $jsParams['hasseqnext'] = true;
                       $_thisGroupDone = false;
                     }
-                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx])) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && $answeights[$_pnidx]!=0) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -682,7 +682,7 @@ class QuestionHtmlGenerator
                   $jsParams['hasseqnext'] = true;
                   $thisGroupDone = false;
                 }
-                if ($seqPartDone !== true && empty($seqPartDone[$pn])) {
+                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && $answeights[$pn]!=0) {
                   $thisGroupDone = false;
                 }
               }
