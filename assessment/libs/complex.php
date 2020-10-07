@@ -16,8 +16,8 @@
 
 global $allowedmacros;
 array_push($allowedmacros,"cx_add","cx_arg", "cx_conj", "cx_div", "cx_format2pol", "cx_format2std", "cx_modul",
-                  "cx_prettyquadRoot",  "cx_plot" ,"cx_mul", 
-         "cx_quadRoot", "cx_pow", "cx_polEu","cx_pol2std", "cx_root", "cx_std2pol", "cx_sub");
+                        "cx_mul", "cx_quadRoot", "cx_prettyquadRoot",  "cx_plot",
+                         "cx_pow", "cx_polEu","cx_pol2std", "cx_root", "cx_std2pol", "cx_sub");
                          
 
 
@@ -53,7 +53,7 @@ function cx_modul(array $num) {
 // Returns:
 // The agument of a complex number in radian (or degree) as a float. 
 
-function cx_arg(array $num,string $argin="rad") {
+function cx_arg(array $num, string $argin="rad") {
     if (count($num)!=1) { echo "cx_arg expects 1 complex number as an input"; return "";}
     
     $re=$num[0][0];
@@ -472,10 +472,9 @@ function cx_format2std(array $num,int $roundto=3) {
 // Parameters:
 // num: An array of real and imaginary parts of complex numbers given in square brackets: num = array([Re, Im]).
 //      num array can include more than one complex number. 
-// roundto: Optional - number of decimal places to which modulus should be rounded off; 
-//          default is 3 decimal places. 
 // argin: Optional - Unit for the argument; default is "deg" for degree. For argument in radian, argin = "rad".
-//
+//// roundto: Optional - number of decimal places to which modulus should be rounded off; 
+//          default is 3 decimal places. 
 // Returns:
 // A complex number in standard form as a string. If num has more than one complex number, the function returns
 // an array of the polar forms as strings: answer = array("r1 (cos(t1) + isin(t1))", "r2 (cos(t2) + isin(t2))", ...).
@@ -527,7 +526,7 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
 // Returns:
 // An array of formatted string of roots (either real or complex) of the quadratic equation.
 
-function cx_prettyquadRoot(float $a, float $b, float $c, int $roundto=3){
+function cx_prettyquadRoot(float $a, float $b, float $c, int $roundto = 3){
     $d=$b**2 - 4*$a*$c;
     
     if ($d<0){
@@ -551,25 +550,65 @@ function cx_prettyquadRoot(float $a, float $b, float $c, int $roundto=3){
 
 }
 
-//-------------------------------Plot a complex number-NOT TESTED---------------------------------
-# To display a complex number. Can be used to find z from plot as well as in solutions.
-function cx_plot(array $num){
+//-------------------------------------Plot a complex number------------------------------------
+// Function: cx_plot(num, [argin = "deg" , roundto = 3, showlabels = True] )
+// Returns the plot of a complex number. It can be used to find z from plot as well as in solutions.
+// 
+// Parameters:
+// num: An array of real and imaginary parts of complex numbers given in square brackets: num = array([Re, Im]).
+//       
+// argin: Optional - Unit for the argument; default is "deg" for degree. For argument in radian, argin = "rad".
+// roundto: Optional - number of decimal places to which modulus should be rounded off; 
+//          default is 3 decimal places. 
+// showlabels: If True (default), labels for the real and imaginary parts, modulus, argument,
+//             and z are shown on the plot. If False, no label is displayed. 
+//
+// Returns:
+// The plot of a complex number.
+
+function cx_plot(array $num, string $argin = "deg" ,int $roundto = 3, bool $showlabels = True){
     
-    $x=$num[0][0];
-    $y=$num[0][1];
+    $x=round($num[0][0],$roundto);
+    $y=round($num[0][1],$roundto);
 
     $r=cx_modul($num);
-    $m=$y/$x;
+    $r_d=round($r,$roundto);
+    
     $th=cx_arg($num);
-    $thd=$th;
+    $thd=round(cx_arg($num,$argin),$roundto);
+    $z=makexxpretty("$x + $y i");
 
     if (abs($x)>abs($y)){$g=abs($x)+2;} 
         else{$g=abs($y)+2;}
 
-    $z=makexxpretty("$x + $y i");
-    $plot=showplot(array("text,$x*(1-0.4),$y*(1-0.5),r","text,$x/2,$y*(1+0.1),Re",
-    "text,$x*(1+0.1),$y/2,Im","$m*x,blue,0,$x","[($r/3)*cos(t),($r/3)*sin(t)],red,0,$th",
-    "dot,$x,$y,,red,z = $z,above","dot,0,0,,black,t=$thd,aboveright", "x=$x,red,0,$y,,,,dash",
+        if ($showlabels==False){
+            $r_d="";
+            $th_d="";
+            $re_d="";
+            $im_d="";
+            $z_d="";
+        }
+            else {
+                $r_d="r";
+                $th_d="";
+                $re_d="Re";
+                $im_d="Im";
+                $z_d="z = $z";
+                $th_d= "th = $thd";
+    
+            }
+
+        if ($x==0){$line = "x=0";}
+            else{$m=$y/$x; $line = "$m*x";}
+
+        $th_x=$r*(1.2)*abs(cos($th))/3 +0.8;
+        $th_y=$r*(1)*abs(sin($th))/3;
+
+    
+    $plot=showplot(array("text,$th_x,$th_y,$th_d","text,$x*(1-0.4),$y*(1-0.5),$r_d",
+    "text,$x/2,$y*(1+0.1),$re_d","text,$x*(1+0.2),$y*(1+0.2),$z_d",
+    "text,$x*(1+0.1),$y/2,$im_d","$line,blue,0,$x","[($r/3)*cos(t),($r/3)*sin(t)],red,0,$th",
+    "dot,$x,$y,,red", "x=$x,red,0,$y,,,,dash",
     "y=$y,red,0,$x,,,,dash"),-$g,$g,-$g,$g,1,1,400,400);
 
     return $plot;

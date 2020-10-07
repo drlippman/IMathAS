@@ -21,8 +21,8 @@
     <li><a href="#arg">cx_arg: Argument (theta)</a></li>
     <li><a href="#modul">cx_modul: Modulus</a></li>
     <li><a href="#conj">cx_conj: Conjugate</a></li>
-    <li><a href="#std2pol">cx_std2pol: Standard to Polar form</a></li>
-    <li><a href="#pol2std">cx_pol2std: Polar to Standard form</a></li>
+    <li><a href="#std2pol">cx_std2pol: Standard to polar form</a></li>
+    <li><a href="#pol2std">cx_pol2std: Polar to standard form</a></li>
     <li><a href="#polEu">cx_polEu: Polar-Euler notation</a></li>
     <li><a href="#add">cx_add: Addition</a></li>
     <li><a href="#sub">cx_sub: Subtraction</a></li>
@@ -31,10 +31,10 @@
     <li><a href="#pow">cx_pow: Power</a></li>
     <li><a href="#root">cx_root: nth Roots</a></li>
     <li><a href="#quad">cx_quadRoot: Quadratic roots</a></li>
-    <li><a href="#prquad">cx_prettyquadRoot: String formatted Quadratic roots</a></li>
-    <li><a href="#format2std">cx_format2std: Display in Standard form</a></li>
-    <li><a href="#format2pol">cx_format2pol: Display in Polar form</a></li>
-    <li><a href="#plot">cx_plot: plot z</a></li>
+    <li><a href="#prquad">cx_prettyquadRoot: Formatted quadratic roots</a></li>
+    <li><a href="#format2std">cx_format2std: Display in standard form</a></li>
+    <li><a href="#format2pol">cx_format2pol: Display in polar form</a></li>
+    <li><a href="#plot">cx_plot: Plot z</a></li>
     
     </div>
 <p>&nbsp;</p>
@@ -223,7 +223,7 @@
 <p><em>Parameters:</em></p>
 <ul>
     <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]). num array can include more than one complex number.</li>
-    <li><strong>argin</strong>: Optional - Unit for the argument; default is "deg" for degree. For argument in radian, argin = "rad".</li>
+    <li><strong>argin</strong>: Optional - unit for the argument; default is "deg" for degree. For argument in radian, argin = "rad".</li>
     <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 3 decimal places. </li>
 
  </ul>
@@ -232,12 +232,15 @@
   an array of the polar forms as strings and output = array("r1 (cos(t1) + i sin(t1))", "r2 (cos(t2) + i sin(t2))", ...).</p>
 <p>&nbsp;</p>
 
-<p><a name="plot"></a><strong>cx_plot</strong>(num)</p>
+<p><a name="plot"></a><strong>cx_plot</strong>(num, [argin = "deg" , roundto = 3, showlabels = True])</p>
 <p>Function cx_plot returns the plot of a complex number.</p>
 <p><em>Parameters:</em></p>
 <ul>
-    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]). num array can include more than one complex number.</li>
-</ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).</li>
+    <li><strong>argin</strong>: Optional - unit for the argument; default is "deg" for degree. For argument in radian, argin = "rad".</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 3 decimal places. </li>
+    <li><strong>showlabels</strong>: Optional - if True (default), labels for the real and imaginary parts, modulus, argument, and z are shown on the plot. If False, no label is displayed. </li>
+ </ul>
 <p>&nbsp;<em>Returns:</em></p>
 <p>The plot of a complex number.</p>
 <p>&nbsp;</p>
