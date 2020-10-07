@@ -16,7 +16,8 @@
 
 global $allowedmacros;
 array_push($allowedmacros,"cx_add","cx_arg", "cx_conj", "cx_div", "cx_format2pol", "cx_format2std", "cx_modul",
-               "cx_plot" ,"cx_mul", "cx_quadRoot", "cx_pow", "cx_polEu","cx_pol2std", "cx_root", "cx_std2pol", "cx_sub");
+                  "cx_prettyquadRoot",  "cx_plot" ,"cx_mul", 
+         "cx_quadRoot", "cx_pow", "cx_polEu","cx_pol2std", "cx_root", "cx_std2pol", "cx_sub");
                          
 
 
@@ -146,10 +147,11 @@ function cx_std2pol(array $num, string $argin="rad") {
 
 function cx_polEu(array $num,int $roundto=12) {
     if (count($num)!=1) { echo "cx_polEu expects 1 complex number as an input"; return "";}
-    $r= cx_modul($num);
+    //$r= cx_modul($num);
     $th1= cx_arg($num);
     $th1= round($th1/pi(),$roundto);  
-    $r=round($r,$roundto); 
+    $sq=$num[0][0]**2+$num[0][1]**2;
+    $r= reduceradical($sq); 
     
     $th2=makexxpretty("$th1 pi"); 
     $polar=makexpretty("$r e^($th2 i)");    
@@ -477,7 +479,9 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
     $A=array();
     for ($i=0;$i<count($num);$i++){
         $num1=array($num[$i]);
-        $r= round(cx_modul($num1),$roundto);
+        $sq=$num[0][0]**2+$num[0][1]**2;
+        $r= reduceradical($sq);
+        //$r= round(cx_modul($num1),$roundto);
 
         if ($argin=="rad"){
                 $th0= cx_arg($num1);
@@ -500,6 +504,45 @@ function cx_format2pol(array $num, string $argin="rad", int $roundto=3) {
     return $ans;
       
 }
+
+//------------------------------String Formatted Quadratic real and complex roots------------------------
+// Function: cx_prettyquadRoot(a,b,c)
+// Returns an array of the string of roots of the quadratic equation f(x) = ax^2 + bx + c. Real roots are returned
+// as an array("r1","r2") ordered from the smallest to largest, and the complex roots are returned 
+// as an array("a+bi","a-bi"). This function is suitable for displaying answer (i.e., $showanswer).
+// 
+// Parameters:
+// a: The numerical coefficient of x^2
+// b: The numerical coefficient of x    
+// c: The constant
+//
+// Returns:
+// An array of formatted string of roots (either real or complex) of the quadratic equation.
+
+function cx_prettyquadRoot(float $a, float $b, float $c){
+    $d=$b**2 - 4*$a*$c;
+    
+    if ($d<0){
+        
+            $a2=$a*2;
+            $D=makereducedfraction($b,$a2);
+
+            $re= -$D;
+            $N=reduceradicalfrac(1,-$d,$a2);
+            $im= sqrt(abs($d))/(2*$a);
+            $im2=-$im;
+            $st=array("-$D + $N i","-$D - $N i");
+    }
+        else {
+            $r1=round(((-$b-sqrt($d))/(2*$a)),3);
+            $r2=round(((-$b+sqrt($d))/(2*$a)),3);
+            $st=array("$r1","$r2");
+        }
+
+    return $st;
+
+}
+
 //-------------------------------Plot a complex number-NOT TESTED---------------------------------
 # To display a complex number. Can be used to find z from plot as well as in solutions.
 function cx_plot(array $num){
@@ -523,4 +566,6 @@ function cx_plot(array $num){
 
     return $plot;
 }
+
+
 ?>
