@@ -2511,6 +2511,30 @@ These macros are fairly general purpose:
   start is the first value used, and num indicates the number of entries to create.
   ABarray(5,2) will output array("[AB5]","[AB6]").
   This macro is often used in conjunction with the showarrays macro.</li>
+<li><strong>scoremultiorder(stua, answer, swap, type, [weights])</strong>: In a multipart question, allows questions or groups 
+  of questions to be scored in any order.  Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 
+  'ntuple', and 'calcntuple'.  <em>Note:</em> Use of the "list" option for individual question types is <b>strongly</b> recommended over 
+  using this function if you're just asking for multiple answers.
+  <ul>
+    <li>Use like <code>$answer=scoremultiorder($stuanswers[$thisq],$answer,'0;1','number')</code></li>
+    <li>stua: For numeric types, <code>$stuanswers[$thisq]</code> should be the first argument.  For calculated types, 
+        <code>$stuanswersval[$thisq]</code> should be the first argument.</li>
+    <li>answer: The second argument is always <code>$answer</code>. This function must be used after $answer is already defined.</li>
+    <li>swap: The third argument shows what entries should be swappable. It can be a string or array of strings. Examples:
+        <ul>
+            <li><code>'0;1'</code> would say answers index 0 and 1 should be swappable</li>
+            <li><code>'0;1;2'</code> would say answers index 0,1,and 2 should be swappable</li>
+            <li><code>['0;1','2;3']</code> would say answers index 0 and 1 should be swappable, and 2 and 3 should be swappable</li>
+            <li><code>'0,1,2;3,4,5'</code> would say answers with indices 0,1,2 should be swappable as a group with 
+              the answers with indices 3,4,5.  Comparison is only made on the first entry to decide whether to swap the groups.</li>
+        </ul>
+    </li>
+    <li>type: should be the question part short name, like 'number' or 'calccomplex', for the entries that can be swapped.</li>
+    <li>weights: optionally, you can include your answeights to have them swapped to.  In that case, use the form 
+        <code>$answer,$answeights=scoremultiorder($stuanswers[$thisq],$answer,'0;1','number',$answeights)</code>
+    </li>
+  </ul>
+  </li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>

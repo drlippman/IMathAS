@@ -4160,6 +4160,19 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 	return array($answer, $showanswer);
 }
 
+function parsesloppycomplex($v) {
+    $func = makeMathFunction($v, 'i');
+    if ($func===false) {
+        return false;
+    }
+    $a = $func(['i'=>0]);
+    $apb = $func(['i'=>4]);
+    if (isNaN($a) || isNaN($apb)) {
+        return false;
+    }
+    return array($a,($apb-$a)/4);
+}
+
 //scoremultiorder($stua, $answer, $swap, [$type='string', $weights])
 //allows groups of questions to be scored in different orders
 //only works if $stua and $answer are directly comparable (i.e. basic string type or exact number)
@@ -4175,20 +4188,51 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
         }
     }
     $newans = $answer;
+    if ($type == 'calculated') {
+        $newansval = [];
+        foreach ($newans as $k=>$v) {
+            $newansval[$k] = evalMathParser($v);
+        }
+    } else if ($type == 'complex' || $type == 'calccomplex') {
+        $newansval = [];
+        foreach ($newans as $k=>$v) {
+            $newansval[$k] = parsesloppycomplex($v);
+        }
+        foreach ($stua as $k=>$v) {
+            $stua[$k] = parsesloppycomplex($v);
+        }
+    } else if ($type == 'ntuple' || $type == 'calcntuple') {
+        $newansval = [];
+        foreach ($newans as $k=>$v) {
+            $newansval[$k] = explode(',', substr($v,1,-1));
+            if ($type == 'calcntuple') {
+                foreach ($newansval[$k] as $j=>$vv) {
+                    $newansval[$k][$j] = evalMathParser($vv);
+                }
+            }
+        }
+        foreach ($stua as $k=>$v) {
+            $stua[$k] = explode(',', substr($v,1,-1));
+        }
+    }
     if ($weights !== null) {
         if (!is_array($weights)) {
             $weights = explode(',', $weights);
         }
         $newweights = $weights;
     }
+    if (!is_array($swap)) {
+        $swap = [$swap];
+    }
 	foreach ($swap as $k=>$sw) {
 		$swap[$k] = explode(';', $sw);
 		foreach ($swap[$k] as $i=>$s) {
 			$swap[$k][$i] = listtoarray($s);
 		}
-	}
+    }
 	foreach ($swap as $sw) {
 		for ($i=0;$i<count($sw);$i++) {
+            if (!isset($stua[$sw[$i][0]])) { continue; }
 			$tofind = $stua[$sw[$i][0]];
 			$loc = -1;
 			for ($k=0;$k<count($sw);$k++) {
@@ -4196,16 +4240,29 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
 					$loc = $k; break;
 				} else if ($type=='number' && abs($tofind - $newans[$sw[$k][0]])<0.01) {
 					$loc = $k; break;
-				}
+				} else if ($type=='calculated' && abs($tofind - $newansval[$sw[$k][0]])<0.01) {
+                    $loc = $k; break;
+                } else if ($type=='numfunc' && comparefunctions($tofind, $newansval[$sw[$k][0]])) {
+                    $loc = $k; break;
+                } else if (($type=='complex' || $type=='calccomplex' || $type=='ntuple' || $type == 'calcntuple') && 
+                    $tofind !== false &&
+                    abs($tofind[0] - $newansval[$sw[$k][0]][0])<0.01 && abs($tofind[1] - $newansval[$sw[$k][0]][1])<0.01
+                ) {
+                    $loc = $k; break;
+                }
 			}
 			if ($loc>-1 && $i!=$loc) {
 				//want to swap entries from $sw[$loc] with sw[$i] and swap $answer values
                 $tmp = array();
                 $tmpw = array();
+                $tmpv = array();
 				foreach ($sw[$i] as $k=>$v) {
                     $tmp[$k] = $newans[$v];
                     if ($weights !== null) {
                         $tmpw[$k] = $newweights[$v];
+                    }
+                    if (isset($newansval)) {
+                        $tmpv[$k] = $newansval[$v];
                     }
 				}
 				foreach ($sw[$loc] as $k=>$v) {
@@ -4213,11 +4270,17 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
                     if ($weights !== null) {
                         $newweights[$sw[$i][$k]] = $newweights[$v];
                     }
+                    if (isset($newansval)) {
+                        $newansval[$sw[$i][$k]] = $newansval[$v];
+                    }
 				}
 				foreach ($tmp as $k=>$v) {
                     $newans[$sw[$loc][$k]] = $tmp[$k];
                     if ($weights !== null) {
                         $newweights[$sw[$loc][$k]] = $tmpw[$k];
+                    }
+                    if (isset($newansval)) {
+                        $newansval[$sw[$loc][$k]] = $tmpv[$k];
                     }
 				}
 			}

@@ -7797,12 +7797,6 @@ function checkreqtimes($tocheck,$rtimes) {
 	return 1;
 }
 
-function parsesloppycomplex($v) {
-	$func = makeMathFunction($v, 'i');
-	$a = $func(['i'=>0]);
-	$apb = $func(['i'=>1]);
-	return array($a,$apb-$a);
-}
 
 //parses complex numbers.  Can handle anything, but only with
 //one i in it.
