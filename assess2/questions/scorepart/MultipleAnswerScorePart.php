@@ -105,6 +105,7 @@ class MultipleAnswerScorePart implements ScorePart
         }
 
         // just store unrandomized last answers
+        sort($origla);
         $scorePartResult->setLastAnswerAsGiven(implode('|',$origla));
         if (isset($scoremethod)) {
             if ($scoremethod=='allornothing' && $score<1) {
