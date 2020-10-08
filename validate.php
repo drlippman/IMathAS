@@ -629,15 +629,19 @@
 			$lockaid = $crow['lockaid']; //ysql_result($result,0,2);
 			if (isset($studentid) && $lockaid>0) {
 				if (($courseUIver == 1 && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) ||
-          ($courseUIver > 1 && strpos($_SERVER['PHP_SELF'],'assess2/')===false)
-        ) {
+                ($courseUIver > 1 && (strpos($_SERVER['PHP_SELF'],'assess2/')===false ||
+                strpos($_SERVER['QUERY_STRING'],'&aid='.$lockaid)===false))
+                ) {
 					require("header.php");
-					echo '<p>',_('This course is currently locked for an assessment'),'</p>';
-          if ($courseUIver > 1) {
-            echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=".Sanitize::encodeUrlParam($lockaid)."\">",_("Go to Assessment"),"</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
-          } else {
-            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
-          }
+                    echo '<p>',_('This course is currently locked for another assessment'),'</p>';
+
+                    if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
+                        echo "<p>"._('Go back to the LMS and open the correct assessment')."</p>";
+                    } else if ($courseUIver > 1) {
+                        echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=".Sanitize::encodeUrlParam($lockaid)."\">",_("Go to Assessment"),"</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
+                    } else {
+                        echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
+                    }
 					require("footer.php");
 					//header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
 					exit;
