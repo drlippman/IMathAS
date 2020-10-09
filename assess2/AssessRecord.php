@@ -1581,6 +1581,9 @@ class AssessRecord
 
     $answeights = isset($qver['answeights']) ? $qver['answeights'] : array(1);
     $answeightTot = array_sum($answeights);
+    if ($answeightTot == 0) {
+        $answeightTot = 1; //avoid errors
+    }
     $partscores = array_fill(0, count($answeights), 0);
     $partrawscores = array_fill(0, count($answeights), 0);
     $parts = array();
@@ -1713,6 +1716,17 @@ class AssessRecord
 
     // get the question settings
     $qsettings = $this->assess_info->getQuestionSettings($qver['qid']);
+    if ($qsettings === false) { // question doesn't exist
+        return [
+            'html' => _('Unable to load question data'),
+            'jsparams' => [],
+            'answeights' => [1],
+            'usedautosave' => false,
+            'work' => '',
+            'worktime' => '0',
+            'errors' => _('Unable to load question data')
+        ];
+    }
     $showscores = ($force_scores || ($this->assess_info->getSetting('showscores') === 'during'));
     // see if there is autosaved answers to redisplay
     if ($this->inGb) {
