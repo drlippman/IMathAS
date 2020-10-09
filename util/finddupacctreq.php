@@ -43,7 +43,7 @@ if (!empty($_POST['todel'])) {
     exit;
 }
 
-$query = 'SELECT a.id,a.SID,a.FirstName,a.LastName,a.email,imas_instr_acct_reqs.status,imas_instr_acct_reqs.reqdata,
+$query = 'SELECT a.id,a.SID,a.FirstName,a.LastName,a.email,a.rights,imas_instr_acct_reqs.status,imas_instr_acct_reqs.reqdata,
   b.SID as extSID, b.FirstName as extFirst,b.LastName as extLast,b.email as extemail,imas_groups.name 
   FROM imas_users AS a 
   JOIN imas_instr_acct_reqs ON a.id=imas_instr_acct_reqs.userid AND imas_instr_acct_reqs.status<10 
@@ -52,6 +52,9 @@ $query = 'SELECT a.id,a.SID,a.FirstName,a.LastName,a.email,imas_instr_acct_reqs.
   JOIN imas_groups ON imas_groups.id=b.groupid ORDER BY a.id';
 
 $stm = $DBH->query($query);
+
+// prepare query for requests that have already been upgraded to teacher to mark as approved
+$upd = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=11 WHERE userid=?");
 
 $status = [
     0 => _('New Request'),
@@ -81,7 +84,13 @@ echo '<th>'._('Email').'</th>';
 echo '<th>'._('Group').'</th></tr></thead>';
 echo '<tbody>';
 $listedusers = [];
+$fixedcnt = 0;
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['rights']>19) { // already upgraded to teacher
+        $upd->execute(array($row['id']));
+        $fixedcnt++;
+        continue;
+    }
     echo '<tr>';
     if (!isset($listedusers[$row['id']])) {
         echo '<td><input type=checkbox name="todel[]" value="'.$row['id'].'"></td>';
@@ -125,5 +134,7 @@ echo '<p><button type=submit>'._('Delete Selected Requests').'</button></p>';
 echo '<p>'._('This will mark the request as denied (without sending an email) and demote the account to a student account.').'</p>';
 
 echo '</form>';
+
+echo '<p>'.$fixedcnt.' '._('requests had already been upgraded, and have been updated').'</p>';
 
 require('../footer.php');
