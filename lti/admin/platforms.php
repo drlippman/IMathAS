@@ -1,22 +1,13 @@
 <?php
 
 /**
- * This is a HACKY start just to do testing.  Eventually flush
- * this out with ability for teachers or group admins to edit their
- * own registrations, and customize for each LMS.
+ * This is a basic version, more suitable for admins than general users. 
+ * Eventually flushthis out with ability for teachers or group admins to edit their
+ * own registrations.
  *
- * TODO:  Add subsitution variables:
+ * TODO:  Add subsitution variables for all platforms
  *   context_history = $Context.id.history
  *
- *
- * TODO: LMS may not send client_id in OIDC launch, which will prevent us from
- *   being able to look up their platform and return a client_id.
- *   Need to test if the major LMSs send client_id in the OIDC launch.  If not,
- *   we'll need to find a way to customize the OIDC launch URL to specify the
- *   client_id, like on the query string.  But we don't know the client_id until
- *   after the registration, so that'll be annoying.  We could also pre-assign
- *   the platform ID and include that in the query string, but then we'd be
- *   wasting an an autoincrement ID if we don't follow through with the registration.
  */
 
 
@@ -148,13 +139,13 @@ echo '</select></p>';
 // Other
 echo '<div id=other class=lmsinstr>';
 echo '<p>'._('Info to put in the LMS').'</p>';
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li>'._('Target Link URI / Tool URL / Redirect URI:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
 echo '<li>'._('OpenID Connect / Initiate Login URL:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php?u='.$uniqid.'</span></li>';
 echo '<li>'._('Keyset URL:').' <span class=tocopy>'.$basesiteurl.'/lti/jwks.php</span></li>';
 echo '</ul>';
 echo '<p>'._('Info from LMS').'</p>';
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li><label>'._('Issuer/Platform ID:').' <input name=other_issuer size=50/></label></li>';
 echo '<li><label>'._('Client ID:').' <input name=other_clientid size=50/></label></li>';
 echo '<li><label>'._('Keyset URL:').' <input name=other_keyseturl size=50/></label></li>';
@@ -167,7 +158,7 @@ echo '</div>';
 // Canvas
 echo '<div id=canvas class=lmsinstr style="display:none;">';
 echo '<p>'._('To enable LTI 1.3 in a Canvas instance, the site administrator should:').'</p>';
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li>'._('Go to Admin, then Developer Keys, click +Developer Key, then select +LTI Key').'</li>';
 echo '<li>'._('For Redirect URIs, enter:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
 
@@ -199,7 +190,7 @@ echo '<li>'._('For Configuration Type, select By Client ID. Paste in the Client 
 echo '</ul>';
 
 echo '<p>'._('Now enter the Client ID you copied down above from the Details column.').'</p>';
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
 echo '</ul>';
 echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.com"/>';
@@ -217,7 +208,7 @@ if ($bbclientid === false && $myrights == 100) {
   echo _('After that, individidual schools only need the Client ID to enable the tool in their Blackboard instance. ');
   echo '</p>';
   echo '<p>'._('Info to use when registering the tool:').'</p>';
-  echo '<ul class=nomark>';
+  echo '<ul>';
   echo '<li>'._('Login Initiation URL:').' <span class=tocopy>'.$basesiteurl.'/lti/login.php</span></li>';
   echo '<li>'._('Tool Redirect URLs:').' <span class=tocopy>'.$basesiteurl.'/lti/launch.php</span></li>';
   echo '<li>'._('Tool JWKS URL:').' <span class=tocopy>'.$basesiteurl.'/lti/jwks.php</span></li>';
@@ -225,7 +216,7 @@ if ($bbclientid === false && $myrights == 100) {
   echo ' <li>'._('In the Tool Provider Custom Parameters box, enter:').' <code>context_history=$Context.id.history</code></li>';
   echo '</ul>';
   echo '<p>'._('Info from LMS').'</p>';
-  echo '<ul class=nomark>';
+  echo '<ul>';
   echo '<li><label>'._('Application ID / Client ID:').' <input name=bb_clientid size=50/></label></li>';
   echo '<li><label>'._('Issuer:').' <input name=bb_issuer size=50 value="https://blackboard.com"/></label></li>';
   echo '<li><label>'._('Public Keyset URL:').' <input name=bb_keyseturl size=50/></label></li>';
@@ -258,7 +249,7 @@ echo '</div>';
 // D2l
 echo '<div id=d2l class=lmsinstr style="display:none;">';
 echo '<p>'._('To enable LTI 1.3 in a D2L Brightspace instance, the site administrator should:').'</p>';
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li>'._('Go to the Admin Tool: Manage Extensibility tool').'</li>';
 echo '<li>'._('Go to the LTI Advantage tab, and click Register Tool.').'</li>';
 echo '<li>'._('Enter these values:').'<ul>';
@@ -271,7 +262,7 @@ echo '<li>'._('Enable the Extensions: Assignment and Grade Services and Deep Lin
 echo '</ul>';
 
 echo '<p>'._('After clicking Register, copy the provided values here:').'</p>';
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li><label>'._('Client Id:').' <input name=d2l_clientid size=50/></label></li>';
 echo '<li><label>'._('Brightspace Keyset URL:').' <input name=d2l_keyseturl size=50/></label></li>';
 echo '<li><label>'._('Brightspace OAuth2 Access Token URL:').' <input name=d2l_tokenurl size=50/></label></li>';
@@ -301,7 +292,7 @@ echo '</div>';
 echo '<div id=moodle class=lmsinstr style="display:none;">';
 echo '<p>'._('To enable LTI 1.3 in a Moodle instance, the site administrator should:').'</p>';
 
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li>'._('Go to Site Administration, Plugins, then External Tools: Manage Tools.').'</li>';
 echo '<li>'._('Click Configure a tool manually.').'</li>';
 echo '<li>'._('Enter these values:').'<ul>';
@@ -320,7 +311,7 @@ echo '<li>'._('Under Privacy, set Share launcher\'s name with tool to Always, an
 echo '</ul>';
 
 echo '<p>'._('After hitting Save, find the tool and click the Details icon, and copy the values here:').'</p>';
-echo '<ul class=nomark>';
+echo '<ul>';
 echo '<li><label>'._('Platform ID:').' <input name=moodle_issuer size=50/></label></li>';
 echo '<li><label>'._('Client ID:').' <input name=moodle_clientid size=50/></label></li>';
 echo '<li><label>'._('Public keyset URL:').' <input name=moodle_keyseturl size=50/></label></li>';
