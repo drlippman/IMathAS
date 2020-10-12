@@ -22,6 +22,8 @@ $qn = 5; //question number to use
 $_SESSION = array();
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $statesecret = !empty($CFG['GEN']['embedsecret']) ? $CFG['GEN']['embedsecret'] : 'test';
+$cid = 'embedq';
+$_SESSION['secsalt'] = "12345";
 
 $issigned = false;
 // Get basic settings from JWT or query string
