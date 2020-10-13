@@ -57,7 +57,7 @@ function connect_course(LTI\LTI_Message_Launch $launch, LTI\Database $db, int $u
     echo '<p><input type=radio name=linktype value=copy id=linktypecopy checked> ';
     echo '<label for=linktypecopy>'._('Create a copy of a course').'</label>';
   } else {
-    echo '<p>'.sprintf(_('%s will make a copy of the course content for you to use.')).'</p>';
+    echo '<p>'.sprintf(_('%s will make a copy of the course content for you to use.'), $installname).'</p>';
     echo '<input type=hidden name=linktype value=copy>';
     echo '<p>';
   }
