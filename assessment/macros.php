@@ -2614,7 +2614,10 @@ function evalfunc($farr) {
 	$toparen = implode('|',$vars);
 
 	if ($isnum) {
-		$func = makeMathFunction($func, implode(',', $vars));
+        $func = makeMathFunction($func, implode(',', $vars));
+        if ($func === false) {
+            return '';
+        }
 		foreach ($vars as $i=>$var) {
 			$varvals[$var] = $args[$i];
 		}
