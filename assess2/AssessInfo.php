@@ -93,7 +93,7 @@ class AssessInfo
     } else if (!$isstu) {
       $this->exception = false;
     } else {
-      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
+      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
@@ -133,6 +133,7 @@ class AssessInfo
       $this->assessData['startdate'] = intval($this->exception[0]);
       $this->assessData['enddate'] = intval($this->exception[1]);
       $this->assessData['enddate_in'] = $this->assessData['enddate'] - time() - 5;
+      $this->assessData['timeext'] = intval($this->exception[6]);
       $this->setAvailable();
     }
 

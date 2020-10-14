@@ -114,6 +114,19 @@ $assessInfoOut['has_password'] = $assess_info->hasPassword();
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+
+// get time limit extension info 
+if ($assessInfoOut['timelimit'] > 0 && !empty($assess_info->getSetting('timeext'))) {
+    $assessInfoOut['timelimit_ext'] = $assess_info->getSetting('timeext');
+    if (!$assessInfoOut['has_active_attempt'] && ($assess_record->getStatus()&64)==64 &&
+      $assessInfoOut['timelimit_ext'] > 0
+    ) {
+        // has a previously submitted attempt; mark as active since we have a time 
+        // limit extension available
+        $assessInfoOut['has_active_attempt'] = true;
+    }
+}
+
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();

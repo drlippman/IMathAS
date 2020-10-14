@@ -194,7 +194,11 @@ export default {
             date: settings.timelimit_expires_disp,
             grace: settings.timelimit_grace_disp
           });
+        } else if (settings.timelimit_ext && settings.timelimit_ext > 0) {
+          timeobj.alert = this.$t('setlist.timelimit_ext', { n: settings.timelimit_ext });
         }
+      } else if (settings.timelimit_ext && settings.timelimit_ext > 0) {
+        timeobj.alert = this.$t('setlist.timelimit_ext', { n: settings.timelimit_ext });
       }
       return timeobj;
     },
