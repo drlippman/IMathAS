@@ -5,6 +5,8 @@
 /*
   To use the LTI queue, you'll need to either set up a cron job to call this
   script, or call it using a scheduled web call with the authcode option.
+  When called in cron job, the base address like https://www.mysite.com should 
+  be passed as an argument.
   It should be called every minute.
 
   Config options (in config.php):
@@ -24,6 +26,13 @@
   To log results in /admin/import/ltiqueue.log:
      $CFG['LTI']['logltiqueue'] = true;
 */
+if (php_sapi_name() == "cli") {
+    if (empty($argv[1])) {
+        echo 'You need to provide the domain name as an argument';
+        exit;
+    }
+    $_SERVER['HTTP_HOST'] = explode('//',$argv[1])[1];
+}
 
 require("../init_without_validate.php");
 require("../includes/rollingcurl.php");
@@ -39,7 +48,8 @@ function debuglog($str) {
 
 
 if (php_sapi_name() == "cli") {
-	//running command line - no need for auth code
+    //running command line - no need for auth code
+    $GLOBALS['basesiteurl'] = $argv[1] . $imasroot;
 } else if (!isset($CFG['LTI']['authcode'])) {
 	echo 'You need to set $CFG[\'LTI\'][\'authcode\'] in config.php';
 	exit;
