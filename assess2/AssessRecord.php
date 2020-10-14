@@ -1185,6 +1185,7 @@ class AssessRecord
     if (empty($this->assessRecord)) {
       return false;
     }
+    $this->parseData();
 
     $returnVal = null;
     // if in practice, we want to grab scored previous attempts, so switch out
@@ -1232,6 +1233,27 @@ class AssessRecord
     } else {
       return 0;
     }
+  }
+
+  public function applyTimeLimitExtension($min) {
+    $exp = $this->getTimeLimitExpires();
+    if ($exp === false || $this->is_practice) {
+      return false;
+    }
+    $lastvernum = count($this->data['assess_versions']) - 1;
+    $this->data['assess_versions'][$lastvernum]['timelimit_end'] = time() + $min*60;
+    // record extension in record for later reference
+    if (!isset($this->data['assess_versions'][$lastvernum]['timelimit_ext'])) {
+        $this->data['assess_versions'][$lastvernum]['timelimit_ext'] = [];
+    }
+    $this->data['assess_versions'][$lastvernum]['timelimit_ext'][] = $min;
+    // if timelimitexp was previously set, update it
+    if ($this->assessRecord['timelimitexp'] > 0) {
+        $this->assessRecord['timelimitexp'] = $this->data['assess_versions'][$lastvernum]['timelimit_end'];
+    }
+    // mark extension as used
+    $stm = $this->DBH->prepare("UPDATE imas_exceptions SET timeext=-1*timeext WHERE userid=? AND assessmentid=? AND itemtype='A'");
+    $stm->execute(array($this->curUid, $this->curAid));
   }
 
 
