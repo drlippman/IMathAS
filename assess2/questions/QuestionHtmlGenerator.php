@@ -756,6 +756,9 @@ class QuestionHtmlGenerator
         }
         // display detailed solution, if allowed and set
         if (($doShowAnswer || $doShowDetailedSoln) && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
+          if (($quesData['solutionopts']&1)==0) {
+            $evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
+          }
           if ($nosabutton) {
             $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
           } else {
