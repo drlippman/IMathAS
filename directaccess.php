@@ -45,11 +45,12 @@
         } else if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= _("Please provide the enrollment key");
 		} else if (strlen($enrollkey)>0) {
-			$keylist = array_map('trim',explode(';',$enrollkey));
-			if (!in_array($_POST['ekey2'], $keylist)) {
+            $keylist = array_map('trim',explode(';',$line['enrollkey']));
+            if (($p = array_search(strtolower(trim($_POST['ekey2'])), array_map('strtolower', $keylist))) === false) {
 				$page_newaccounterror .= _("Enrollment key is invalid.");
 			} else {
-				$_POST['ekey'] = $_POST['ekey2'];
+                $_POST['ekey'] = $keylist[$p];
+                $_POST['ekey2'] = $keylist[$p];
 			}
 		}
 

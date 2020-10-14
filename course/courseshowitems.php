@@ -243,7 +243,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 			   }
 			if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && !$viewall) {
-				if (!in_array('s-'.$studentinfo['section'],$items[$i]['grouplimit'])) {
+				if (!in_array(strtolower('s-'.$studentinfo['section']),array_map('strtolower',$items[$i]['grouplimit']))) {
 					continue;
 				}
 			}
