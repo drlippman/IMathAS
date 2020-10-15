@@ -3001,127 +3001,148 @@ function cleanbytoken($str,$funcs = array()) {
 		}
 		$primeoff = $p+1;
 	}
-	$parts = preg_split('/(<=|>=|=|,|<|>|&gt;|&lt;|&ge;|&le;|&ne;|\blt\b|\bgt\b|\ble\b|\bge\b|\bne\b|\bor\b)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
-	$finalout = array();
-	for ($k=0;$k<count($parts);$k+=2) {
-		$finalout = array();
-		$substr = $parts[$k];
-		if (trim($substr)=='') {$parts[$k] = ''; continue;}
-        $tokens = cleantokenize(trim($substr),$funcs);
-		//print_r($tokens);
-		$out = array();
-		$lasti = count($tokens)-1;
-		for ($i=0; $i<=$lasti; $i++) {
-			$token = $tokens[$i];
-			$lastout = count($out)-1;
-			if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
-				$isone = 0;
-				if ($lastout>-1) { //if not first character
-                    if ($out[$lastout] == '^') {
-						$isone = 2;
-						if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
-							//4x+x^0 -> 4x+1
-							array_splice($out,-2);
-							$out[] = 1;
-						} else if ($lastout>=2) {
-							$isone = 1;
-							//4x^0->4, 5(x+3)^0 -> 5
-							array_splice($out,-2);
-						} else if ($lastout==1) {
-							//x^0 -> 1
-							$out = array(1);
-						}
-					} else if ($out[$lastout] == '_') {
-                        $out[] = 0;
-                        continue;
-                    } else {
-						//( )0, + 0, x0
-						while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
-							array_pop($out);
-							$lastout--;
-						}
-						if ($lastout>-1) {
-							array_pop($out);
-						}
-
-					}
-				}
-				if ($i<$lasti) { //if not last character
-					if ($tokens[$i+1][0]=='^') {
-						//0^3
-						$i+=2; //skip over ^ and 3
-					} else if ($isone) {
-						if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
-							if ($isone==2) {
-								array_pop($out);  //pop the 1 we added since it apperears to be multiplying
-							}
-							if ($tokens[$i+1][0]=='*') {  //x^0*y
-								$i++;
-							}
-						}
-					} else {
-						while ($i<$lasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
-							$i++;
-						}
-					}
-				}
-			} else if ($token[1]==3 && $token[0]==='1') {
-				$dontuse = false;
-                if ($lastout>-1) { //if not first character
-                    if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-' && $out[$lastout]!=' ' && $out[$lastout]!='_') {
-						//( )1, x1,*1
-						if ($out[$lastout]=='*') { //elim *
-							array_pop($out);
-						}
-						$dontuse = true;
-					} else if ($out[$lastout] == '^' || $out[$lastout] == '/' ) {
-						if ($lastout>=1) {
-							//4+x^1 -> 4+x, 4x^1 -> 4x,   x/1 -> x
-							array_pop($out);
-							$dontuse = true;
-						}
-					} else if ($out[$lastout]=='_') {
+    $str = preg_replace('/&(gt|lt|ge|le|ne);/',' $1 ', $str);
+    $finalout = array();
+    if (trim($str)=='') {return '';}
+    $tokens = cleantokenize(trim($str),$funcs);
+    //print_r($tokens);
+    $out = array();
+    $lasti = count($tokens)-1;
+    $grplasti = $lasti;
+    for ($i=0; $i<=$lasti; $i++) {
+        $token = $tokens[$i];
+        $lastout = count($out)-1;
+        $grplasti = $lasti;
+        if ($i>0 && $tokens[$i-1][1]==12) {// following a separator
+            $lastout = -1;
+        }
+        if ($i < $lasti && $tokens[$i+1][1]==12) { // followed by a separator
+            $grplasti = $i;
+        }
+        if ($token[1]==12) { // separator
+            if ($out[0]=='+') {
+                array_shift($out);
+            }
+            if (count($out)==0 && $lastout>-1) {
+                $finalout[] = '0';
+            } else {
+                $finalout[] = implode('',$out);
+            }
+            $finalout[] = $token[0];
+            $out = []; //reset
+            if ($i==$grplasti) { // if nothing is following last separator, prevent 0 being added
+                $out[] = ' ';
+            }
+        } else if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
+            $isone = 0;
+            if ($lastout>-1) { //if not first character
+                if ($out[$lastout] == '^') {
+                    $isone = 2;
+                    if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
+                        //4x+x^0 -> 4x+1
+                        array_splice($out,-2);
                         $out[] = 1;
-                        continue;
+                    } else if ($lastout>=2) {
+                        $isone = 1;
+                        //4x^0->4, 5(x+3)^0 -> 5
+                        array_splice($out,-2);
+                    } else if ($lastout==1) {
+                        //x^0 -> 1
+                        $out = array(1);
                     }
-				}
-				if ($i<$lasti) { //if not last character
-					if ($tokens[$i+1][0]=='^') {
-						//1^3
-						$i+=2; //skip over ^ and 3
-					} else if ($tokens[$i+1][0]=='*') {
-						$i++;  //skip over *
-						$dontuse = true;
-					} else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
-						// 1x, 1(), 1sin
-						if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
-							$dontuse = true;
-						}
-					}
-				}
-				if (!$dontuse) {
-					$out[] = 1;
-				} else {
-					continue;
-				}
-			} else {
-				$out[] = $token[0];
-			}
-			if ($i<$lasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && $tokens[$i+1][1]==4))) {
-				$out[] = ' ';
-			}
-		}
-		if ($out[0]=='+') {
-			array_shift($out);
-		}
-		if (count($out)==0) {
-			$finalout[] = '0';
-		} else {
-			$finalout[] = implode('',$out);
-		}
-		$parts[$k] = implode('',$finalout);
-	}
-	return str_replace('`',"'", implode(' ',$parts));
+                } else if ($out[$lastout] == '_') {
+                    $out[] = 0;
+                    continue;
+                } else {
+                    //( )0, + 0, x0
+                    while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
+                        array_pop($out);
+                        $lastout--;
+                    }
+                    if ($lastout>-1) {
+                        array_pop($out);
+                    }
+
+                }
+            }
+            if ($i<$grplasti) { //if not last character
+                if ($tokens[$i+1][0]=='^') {
+                    //0^3
+                    $i+=2; //skip over ^ and 3
+                } else if ($isone) {
+                    if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
+                        if ($isone==2) {
+                            array_pop($out);  //pop the 1 we added since it apperears to be multiplying
+                        }
+                        if ($tokens[$i+1][0]=='*') {  //x^0*y
+                            $i++;
+                        }
+                    }
+                } else {
+                    while ($i<$grplasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
+                        $i++;
+                    }
+                }
+                if ($lastout==-1 && $i<$grplasti && $tokens[$i+1][0]== '+') {
+                    $i++; // skip leading + if we removed 0 from start
+                }
+            } 
+        } else if ($token[1]==3 && $token[0]==='1') {
+            $dontuse = false;
+            if ($lastout>-1) { //if not first character
+                if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-' && $out[$lastout]!=' ' && $out[$lastout]!='_') {
+                    //( )1, x1,*1
+                    if ($out[$lastout]=='*') { //elim *
+                        array_pop($out);
+                    }
+                    $dontuse = true;
+                } else if ($out[$lastout] == '^' || $out[$lastout] == '/' ) {
+                    if ($lastout>=1) {
+                        //4+x^1 -> 4+x, 4x^1 -> 4x,   x/1 -> x
+                        array_pop($out);
+                        $dontuse = true;
+                    }
+                } else if ($out[$lastout]=='_') {
+                    $out[] = 1;
+                    continue;
+                }
+            }
+            if ($i<$grplasti) { //if not last character
+                if ($tokens[$i+1][0]=='^') {
+                    //1^3
+                    $i+=2; //skip over ^ and 3
+                } else if ($tokens[$i+1][0]=='*') {
+                    $i++;  //skip over *
+                    $dontuse = true;
+                } else if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/' && !is_numeric($tokens[$i+1][0])) {
+                    // 1x, 1(), 1sin
+                    if ($lastout<2 || ($out[$lastout-1] != '^' || $out[$lastout] != '-')) { //exclude ^-1 case
+                        $dontuse = true;
+                    }
+                }
+            }
+            if (!$dontuse) {
+                $out[] = 1;
+            } else {
+                continue;
+            }
+        } else {
+            $out[] = $token[0];
+        }
+        if ($i<$grplasti && (($token[1]==3 && $tokens[$i+1][1]==3) || ($token[1]==4 && $tokens[$i+1][1]==4))) {
+            $out[] = ' ';
+        }
+    }
+    if ($out[0]=='+') {
+        array_shift($out);
+    }
+    if (count($out)==0) {
+        $finalout[] = '0';
+    } else {
+        $finalout[] = implode('',$out);
+    }
+	
+	return str_replace('`',"'", implode(' ',$finalout));
 }
 
 
@@ -3150,8 +3171,20 @@ function cleantokenize($str,$funcs) {
 		$intype = 0;
 		$out = '';
 		$c = $str[$i];
-		$eatenwhite = 0;
-		if ($c>="a" && $c<="z" || $c>="A" && $c<="Z") {
+        $eatenwhite = 0;
+        if ($c == ',') {
+            $intype = 12;
+            $out .= $c;
+            $i++;
+        } else if ($c == '<' || $c == '>' || $c=='=') {
+            $intype = 12;
+            $out .= $c;
+            $i++;
+            if ($i<$len && $str[$i]=='=') {
+                $out .= $str[$i];
+                $i++;
+            }
+        } else if ($c>="a" && $c<="z" || $c>="A" && $c<="Z") {
 			//is a string or function name
 
 			$intype = 2; //string like function name
@@ -3166,7 +3199,9 @@ function cleantokenize($str,$funcs) {
 				$intype = 3;
 			} else if ($out=='pi') {
 				$intype = 3;
-			} else {
+			} else if ($out=='gt' || $out=='lt' || $out=='ge' || $out=='le' || $out=='ne' || $out=='or') {
+                $intype = 12; // separator
+            } else {
 				//eat whitespace
 				while ($c==' ') {
 					$i++;
@@ -3259,7 +3294,7 @@ function cleantokenize($str,$funcs) {
 			while ($j<$len) {
 				//read terms until we get to right bracket at same nesting level
 				//we have to avoid strings, as they might contain unmatched brackets
-				$d = $str[$j];
+                $d = $str[$j];
 				if ($inq) {  //if inquote, leave if same marker (not escaped)
 					if ($d==$qtype && $str[$j-1]!='\\') {
 						$inq = false;
@@ -3274,16 +3309,19 @@ function cleantokenize($str,$funcs) {
 						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
-							$inside = cleanbytoken(substr($str,$i+1,$j-$i-1), $funcs);
+                            $inside = cleanbytoken(substr($str,$i+1,$j-$i-1), $funcs);
 							if ($inside=='error') {
 								//was an error, return error token
 								return array(array('',9));
 							}
 							//if curly, make sure we have a ;, unless preceeded by a $ which
-							//would be a variable variable
-							if ($rightb=='}' && $lastsym[0]!='$') {
-								$out .= $leftb.$inside.';'.$rightb;
-							} else {
+                            //would be a variable variable
+							//if ($rightb=='}' && $lastsym[0]!='$') {
+                            //	$out .= $leftb.$inside.';'.$rightb;
+                            // removed 10/15/20 ^^ why the semicolon??
+                            if ($rightb=='}') {
+                                $out .= $leftb.' '.$inside.$rightb;
+                            } else {
 								$out .= $leftb.$inside.$rightb;
 							}
 							$i= $j+1;
@@ -3330,7 +3368,16 @@ function cleantokenize($str,$funcs) {
 			if ($c=='.' && $intype==3) {//if 3 . needs space to act like concat
 				$out .= ' ';
 			}
-		}
+        }
+        if ($intype == 12) { // remove whitespace before and after separator
+            while ($i<$len && $str[$i]==' ') {
+                $i++;
+            }
+            while (count($syms)>0 && $syms[count($syms)-1][0]==' ') {
+                array_pop($syms);
+            }
+            $connecttolast = 0;
+        }
 		//if parens or array index needs to be connected to func/var, do it
 		if ($connecttolast>0 && $intype!=$connecttolast) {
 
