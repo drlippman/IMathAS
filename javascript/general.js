@@ -1435,7 +1435,7 @@ jQuery(document).ready(function($) {
 });
 var sagecellcounter = 0;
 function initSageCell(base) {
-	jQuery(base).find(".converttosagecell").each(function() {
+	jQuery(base).find(".converttosagecell:visible").each(function() {
 		var ta, code;
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
