@@ -3007,7 +3007,7 @@ function cleanbytoken($str,$funcs = array()) {
 		$finalout = array();
 		$substr = $parts[$k];
 		if (trim($substr)=='') {$parts[$k] = ''; continue;}
-		$tokens = cleantokenize(trim($substr),$funcs);
+        $tokens = cleantokenize(trim($substr),$funcs);
 		//print_r($tokens);
 		$out = array();
 		$lasti = count($tokens)-1;
@@ -3017,17 +3017,7 @@ function cleanbytoken($str,$funcs = array()) {
 			if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
 				$isone = 0;
 				if ($lastout>-1) { //if not first character
-					if ($out[$lastout] != '^') {
-						//( )0, + 0, x0
-						while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
-							array_pop($out);
-							$lastout--;
-						}
-						if ($lastout>-1) {
-							array_pop($out);
-						}
-
-					} else if ($out[$lastout] == '^') {
+                    if ($out[$lastout] == '^') {
 						$isone = 2;
 						if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
 							//4x+x^0 -> 4x+1
@@ -3041,6 +3031,19 @@ function cleanbytoken($str,$funcs = array()) {
 							//x^0 -> 1
 							$out = array(1);
 						}
+					} else if ($out[$lastout] == '_') {
+                        $out[] = 0;
+                        continue;
+                    } else {
+						//( )0, + 0, x0
+						while ($lastout>-1 && $out[$lastout]!= '+' && $out[$lastout]!= '-') {
+							array_pop($out);
+							$lastout--;
+						}
+						if ($lastout>-1) {
+							array_pop($out);
+						}
+
 					}
 				}
 				if ($i<$lasti) { //if not last character
@@ -3064,8 +3067,8 @@ function cleanbytoken($str,$funcs = array()) {
 				}
 			} else if ($token[1]==3 && $token[0]==='1') {
 				$dontuse = false;
-				if ($lastout>-1) { //if not first character
-					if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-' && $out[$lastout]!=' ') {
+                if ($lastout>-1) { //if not first character
+                    if ($out[$lastout] != '^' && $out[$lastout] != '/' && $out[$lastout]!='+' && $out[$lastout]!='-' && $out[$lastout]!=' ' && $out[$lastout]!='_') {
 						//( )1, x1,*1
 						if ($out[$lastout]=='*') { //elim *
 							array_pop($out);
@@ -3077,7 +3080,10 @@ function cleanbytoken($str,$funcs = array()) {
 							array_pop($out);
 							$dontuse = true;
 						}
-					}
+					} else if ($out[$lastout]=='_') {
+                        $out[] = 1;
+                        continue;
+                    }
 				}
 				if ($i<$lasti) { //if not last character
 					if ($tokens[$i+1][0]=='^') {
@@ -3154,7 +3160,7 @@ function cleantokenize($str,$funcs) {
 				$i++;
 				if ($i==$len) {break;}
 				$c = $str[$i];
-			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c=='_'); // took out : || $c>='0' && $c<='9'  don't need sin3 type function names for cleaning
+			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z"); // took out : || $c>='0' && $c<='9'  don't need sin3 type function names for cleaning
 			//check if it's a special word
 			if ($out=='e') {
 				$intype = 3;
