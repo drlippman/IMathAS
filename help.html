@@ -3118,7 +3118,8 @@ of choices is automatically randomized.
 	<dd>Defines the choices.  If you use $choices, don't define $questions</dd>
 <dt>$answers = a list of the <em>indexes</em> into $questions that contain the correct answer </dt>
 	<dd>Defines the answers.  Remember that arrays are zero-indexed, if $questions = array("correct","correct","wrong"),
-	then $answers="0,1"</dd>
+    then $answers="0,1". Or there are more than one correct combination, separate with or, like 
+    $answers = "0,1 or 0,3"</dd>
 </dl>
 
 <p><strong>Optional Variables</strong></p>
