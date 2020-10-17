@@ -217,7 +217,7 @@ class AssessUtils
             foreach ($ltiuserid as $uid=>$ltiuserid) {
                 $sourcedids[$uid] = 'LTI1.3:|:'.$ltiuserid.':|:'.$lineitemurl.':|:'.$platformid;
             }
-            if (count($uids)==1 || $asArray) {
+            if (count($uids)==1 && !$asArray) {
                 return $sourcedids[$uids[0]];
             } else {
                 return $sourcedids;
