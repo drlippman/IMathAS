@@ -2943,7 +2943,14 @@ var MathCommand = P(MathElement, function(_, super_) {
         )
       ) {
         // check to make sure additional letter doesn't make a longer op name
-        var str = '', l = cursor[L];
+        var str = '', l = cursor[L], issubsup = false;
+        // if sub/sup, grab base operator
+        if ((cursor[L].hasOwnProperty("sup") || cursor[L].hasOwnProperty("sub")) &&
+            cursor[L][-1].isPartOfOperator
+        ) {
+            l = cursor[L][-1];
+            issubsup = true;
+        }
         while (l.isPartOfOperator && !l.jQ.hasClass("mq-last")) {
           str = l.letter + str;
           if (l[-1] === 0) { break; }
@@ -2953,7 +2960,7 @@ var MathCommand = P(MathElement, function(_, super_) {
             cursor.options.autoParenOperators.hasOwnProperty(str)
         ) {
             str += cmd.letter;
-            if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str)) {
+            if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str) || issubsup) {
                 cursor.parent.write(cursor, '(');
             }
         }

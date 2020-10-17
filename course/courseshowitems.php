@@ -102,7 +102,8 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 	return $out;
 }
 function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name) {
-	global $cid,$staticroot;
+    global $cid,$staticroot;
+    $blockid = intval($blockid);
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
@@ -115,7 +116,7 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name) {
 	}
 	$out .= " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">" . _ ( 'Modify' ) . "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$blockid}');\">" . _ ( 'Move' ) . '</a></li>';
-	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">" . _ ( 'Delete' ) . "</a></li>";
+	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=$blockid&remove=ask\">" . _ ( 'Delete' ) . "</a></li>";
 	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum&backref=blockhead{$blockid}\">" . _('Copy') . "</a></li>";
 	$out .= " <li><a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">" . _('Toggle NewFlag') . "</a></li>";
 	$out .= '</ul>';
@@ -242,7 +243,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 			   }
 			if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && !$viewall) {
-				if (!in_array('s-'.$studentinfo['section'],$items[$i]['grouplimit'])) {
+				if (!in_array(strtolower('s-'.$studentinfo['section']),array_map('strtolower',$items[$i]['grouplimit']))) {
 					continue;
 				}
 			}
@@ -2123,7 +2124,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			}
 			if ($showlinks) {
 				echo '<span class="links">';
-				echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">", _('Delete'), "</a>";
+                echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a>";
+                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."remove=ask\">", _('Delete'), "</a>";
 				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
 				echo '</span>';

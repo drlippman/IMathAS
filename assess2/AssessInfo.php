@@ -319,6 +319,9 @@ class AssessInfo
       'showans','showans_aftern','points_possible','questionsetid',
       'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
+    if (!isset($this->questionData[$id])) {
+        return false;
+    }
     foreach ($base as $field) {
         if (isset($this->questionData[$id][$field])) {
             $out[$field] = $this->questionData[$id][$field];

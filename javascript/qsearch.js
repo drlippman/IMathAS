@@ -22,12 +22,18 @@ $(function() {
         if (rect.bottom > window.innerHeight) {
             advform.scrollIntoView(false);
         }
+    }).on('hide.bs.dropdown', function () {
+        console.log("here");
+        console.log(datePickerDivID);
+        if (datePickerDivID) {
+            $("#"+datePickerDivID).css('visibility','hidden').css('display','none');
+        }
     });
 });
 function parseAdvSearch() {
     var search = document.getElementById("search").value;
     var matches;
-    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/g)) {
+    if (matches = search.match(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/g)) {
         var pts;
         for (var i=0;i<matches.length;i++) {
             pts = matches[i].split(/:/);
@@ -42,6 +48,14 @@ function parseAdvSearch() {
                 var avgt = pts[1].split(/,/);
                 $("#search-avgtime-min").val(avgt[0]);
                 $("#search-avgtime-max").val(avgt[1]);
+            } else if (pts[0] == 'avgscore') {
+                var avgs = pts[1].split(/,/);
+                $("#search-avgscore-min").val(avgs[0]);
+                $("#search-avgscore-max").val(avgs[1]);
+            } else if (pts[0] == 'lastmod') {
+                var avgt = pts[1].split(/,/);
+                $("#search-lastmod-min").val(avgt[0]);
+                $("#search-lastmod-max").val(avgt[1]);
             } else if (pts[0] == 'mine') {
                 $("#search-mine").prop('checked', pts[1] == 1)
             } else if (pts[0] == 'unused') {
@@ -56,7 +70,7 @@ function parseAdvSearch() {
             }
         }
     }
-    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/g, '');
+    search = search.replace(/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/g, '');
     var words = search.split(/\s+/);
     var haswords = [];
     var excwords = [];
@@ -99,6 +113,16 @@ function doAdvSearch() {
     var avgtmax = $("#search-avgtime-max").val();
     if (avgtmin != '' || avgtmax != '') {
         outstr += 'avgtime:"' + avgtmin + ',' + avgtmax + '" ';
+    }
+    var avgsmin = $("#search-avgscore-min").val();
+    var avgsmax = $("#search-avgscore-max").val();
+    if (avgsmin != '' || avgsmax != '') {
+        outstr += 'avgscore:"' + avgsmin + ',' + avgsmax + '" ';
+    }
+    var lastmodmin = $("#search-lastmod-min").val();
+    var lastmodmax = $("#search-lastmod-max").val();
+    if (lastmodmin != '' || lastmodmax != '') {
+        outstr += 'lastmod:"' + lastmodmin + ',' + lastmodmax + '" ';
     }
     if ($("#search-mine").is(':checked')) {
         outstr += 'mine:1 ';

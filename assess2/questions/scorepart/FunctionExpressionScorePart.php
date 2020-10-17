@@ -145,6 +145,33 @@ class FunctionExpressionScorePart implements ScorePart
         $vlist = implode(",",$variables);
 
 
+        for($j=0; $j < count($variables); $j++) {
+            if ($fromto[2*$j+1]==$fromto[2*$j]) {
+                for ($i = 0; $i < 20; $i++) {
+                    $tps[$i][$j] = $fromto[2*$j];
+                } 
+            } else if ($restrictvartoint[$j]) {
+                if ($fromto[2*$j+1]-$fromto[2*$j] > 200) {
+                    for ($i = 0; $i < 20; $i++) {
+                        $tps[$i][$j] = rand($fromto[2*$j],$fromto[2*$j+1]);
+                    }
+                } else {
+                    $allbetween = range($fromto[2*$j],$fromto[2*$j+1]);
+                    shuffle($allbetween);
+                    $n = count($allbetween);
+                    for ($i = 0; $i < 20; $i++) {
+                        $tps[$i][$j] = $allbetween[$i%$n];
+                    }
+                }
+            } else {
+                $dx = ($fromto[2*$j+1]-$fromto[2*$j])/20;
+                for ($i = 0; $i < 20; $i++) {
+                    $tps[$i][$j] = $fromto[2*$j] + $dx*$i + $dx*rand(1,499)/500.0;
+                }
+            }
+        }
+/*
+    old code.  New code above distributes the points more evenly across the domain
         for ($i = 0; $i < 20; $i++) {
             for($j=0; $j < count($variables); $j++) {
                 if ($fromto[2*$j+1]==$fromto[2*$j]) {
@@ -156,7 +183,7 @@ class FunctionExpressionScorePart implements ScorePart
                 }
             }
         }
-
+*/
         //handle nosolninf case
         if ($givenans==='oo' || $givenans==='DNE') {
             if (strcmp($answer,$givenans) === 0) {

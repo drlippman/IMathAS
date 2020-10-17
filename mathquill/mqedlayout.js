@@ -14,12 +14,12 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 2,
             contents: [
-              {l:'\\left(\\right)', c:'i', w:'()'},
-              {l:'x^{}', c:'t', w:'^', nb:1},
-              {l:'\\pi', nb:1},
-              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1},
-              {l:'\\infty'},
-              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1},
+              {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
+              {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
+              {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
+              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
+              {l:'\\infty',pr:'<span>∞</span>'},
+              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
               {p:'DNE', 'sm':2},
               {l:'\\left|\\right|', c:'i', w:'||'},
             ]
@@ -32,7 +32,7 @@ var myMQeditor = (function($) {
               {b:'7'},
               {b:'8'},
               {b:'9'},
-              {l:'\\frac{}{}', c:'t', w:'/'},
+              {l:'\\frac{}{}', c:'t', w:'/', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator mq-empty"></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
               {b:'4'},
               {b:'5'},
               {b:'6'},
@@ -73,10 +73,10 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 4,
             contents: [
-              {l:'\\log', c:'f'},
-              {l:'\\ln', c:'f'},
-              {l:'\\log_{}', c:'f'},
-              {l:'e^{}', c:'t', w:'e^'},
+              {l:'\\log', c:'f', op:1},
+              {l:'\\ln', c:'f', op:1},
+              {l:'\\log_{}', c:'f', pr:'<var class="mq-operator-name">log</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
+              {l:'e^{}', c:'t', w:'e^', pr:'<var>e</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
             ]
           }
         ]
@@ -89,19 +89,19 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 6,
             contents: [
-              {l:'\\sin', c:'f'},
-              {l:'\\cos', c:'f'},
-              {l:'\\tan', c:'f'},
-              {l:'\\sec', c:'f'},
-              {l:'\\csc', c:'f'},
-              {l:'\\cot', c:'f'},
-              {l:'\\sin^{-1}', c:'f'},
-              {l:'\\cos^{-1}', c:'f'},
-              {l:'\\tan^{-1}', c:'f'},
-              {l:'\\sinh', c:'f'},
-              {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'},
-              {l:'\\pi', nb:1},
+              {l:'\\sin', c:'f', op:1},
+              {l:'\\cos', c:'f', op:1},
+              {l:'\\tan', c:'f', op:1},
+              {l:'\\sec', c:'f', op:1},
+              {l:'\\csc', c:'f', op:1},
+              {l:'\\cot', c:'f', op:1},
+              {l:'\\sin^{-1}', c:'f', pr:'<var class="mq-operator-name">sin</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup">−1</span></span>'},
+              {l:'\\cos^{-1}', c:'f', pr:'<var class="mq-operator-name">cos</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup">−1</span></span>'},
+              {l:'\\tan^{-1}', c:'f', pr:'<var class="mq-operator-name">tan</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup">−1</span></span>'},
+              {l:'\\sinh', c:'f', op:1},
+              {l:'\\cosh', c:'f', op:1},
+              {l:'\\tanh', c:'f', op:1},
+              {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
               {s:1},
               {s:4}
             ]
@@ -116,10 +116,10 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 4,
             contents: [
-              {l:'\\lt'},
-              {l:'\\gt'},
-              {l:'\\le'},
-              {l:'\\ge'},
+              {l:'\\lt', pr:'<span class="mq-binary-operator">&lt;</span>'},
+              {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
+              {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
+              {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
               {p:'or', c:'w', w:'\\text{ or }'},
               {p:'DNE', 'sm':2},
               {p:'all reals', c:'w', w:'\\text{all reals}', s:2}
@@ -139,9 +139,9 @@ var myMQeditor = (function($) {
               {l:'\\left[\\right]', c:'i', w:'[]'},
               {l:'\\left(\\right]', c:'i', w:'(]'},
               {l:'\\left[\\right)', c:'i', w:'[)'},
-              {l:'\\infty'},
-              {l:'-\\infty', c:'w', w:'-\\infty'},
-              {l:'\\cup'},
+              {l:'\\infty',pr:'<span>∞</span>'},
+              {l:'-\\infty', c:'w', w:'-\\infty',pr:'<span>−∞</span>'},
+              {l:'\\cup',pr:'<span class="mq-binary-operator">∪</span>'},
               {s:1}
             ]
           }
@@ -185,10 +185,10 @@ var myMQeditor = (function($) {
               {l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']},
               {l:'\\left|\\right|', c:'i', w:'||'},
               {p:'='},
-              {l:'\\lt'},
-              {l:'\\gt'},
-              {l:'\\le'},
-              {l:'\\ge'},
+              {l:'\\lt', pr:'<span class="mq-binary-operator">&lt;</span>'},
+              {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
+              {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
+              {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
               {p:'%'},
               {p:','},
               {p:'*'},
@@ -237,15 +237,15 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 5,
             contents: [
-              {l:'\\frac{}{}', c:'t', w:'/'},
-              {l:'x^{}', c:'t', w:'^', nb:1},
-              {l:'x_{}', c:'t', w:'_', nb:1},
-              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1},
-              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1},
+              {l:'\\frac{}{}', c:'t', w:'/', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator mq-empty"></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
+              {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
+              {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
+              {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
+              {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
               {l:'\\left(\\right)', c:'i', w:'()'},
               {l:'\\left|\\right|', c:'i', w:'||'},
-              {l:'\\pi', nb:1},
-              {l:'\\infty'},
+              {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
+              {l:'\\infty',pr:'<span>∞</span>'},
               {p:'DNE', 'sm':2}
             ]
           },
@@ -271,10 +271,10 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 4,
             contents: [
-              {l:'\\log', c:'f'},
-              {l:'\\ln', c:'f'},
-              {l:'\\log_{}', c:'f'},
-              {l:'e^{}', c:'t', w:'e^'},
+              {l:'\\log', c:'f', op:1},
+              {l:'\\ln', c:'f', op:1},
+              {l:'\\log_{}', c:'f', pr:'<var class="mq-operator-name">log</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
+              {l:'e^{}', c:'t', w:'e^', pr:'<var>e</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
             ]
           }
         ]
@@ -287,19 +287,19 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 6,
             contents: [
-              {l:'\\sin', c:'f'},
-              {l:'\\cos', c:'f'},
-              {l:'\\tan', c:'f'},
-              {l:'\\sec', c:'f'},
-              {l:'\\csc', c:'f'},
-              {l:'\\cot', c:'f'},
-              {l:'\\sin^{-1}', c:'f'},
-              {l:'\\cos^{-1}', c:'f'},
-              {l:'\\tan^{-1}', c:'f'},
-              {l:'\\sinh', c:'f'},
-              {l:'\\cosh', c:'f'},
-              {l:'\\tanh', c:'f'},
-              {l:'\\pi', nb:1},
+              {l:'\\sin', c:'f', op:1},
+              {l:'\\cos', c:'f', op:1},
+              {l:'\\tan', c:'f', op:1},
+              {l:'\\sec', c:'f', op:1},
+              {l:'\\csc', c:'f', op:1},
+              {l:'\\cot', c:'f', op:1},
+              {l:'\\sin^{-1}', c:'f', pr:'<var class="mq-operator-name">sin</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup">−1</span></span>'},
+              {l:'\\cos^{-1}', c:'f', pr:'<var class="mq-operator-name">cos</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup">−1</span></span>'},
+              {l:'\\tan^{-1}', c:'f', pr:'<var class="mq-operator-name">tan</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup">−1</span></span>'},
+              {l:'\\sinh', c:'f', op:1},
+              {l:'\\cosh', c:'f', op:1},
+              {l:'\\tanh', c:'f', op:1},
+              {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
               {s:1},
               {s:4}
             ]
@@ -314,10 +314,10 @@ var myMQeditor = (function($) {
             flow: 'row',
             s: 4,
             contents: [
-              {l:'\\lt'},
-              {l:'\\gt'},
-              {l:'\\le'},
-              {l:'\\ge'},
+              {l:'\\lt', pr:'<span class="mq-binary-operator">&lt;</span>'},
+              {l:'\\gt', pr:'<span class="mq-binary-operator">&gt;</span>'},
+              {l:'\\le', pr:'<span class="mq-binary-operator">&le;</span>'},
+              {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
               {p:'or', c:'w', w:'\\text{ or }'},
               {p:'DNE', 'sm':2},
               {p:'all reals', c:'w', w:'\\text{all reals}', s:2}
@@ -337,9 +337,9 @@ var myMQeditor = (function($) {
               {l:'\\left[\\right]', c:'i', w:'[]'},
               {l:'\\left(\\right]', c:'i', w:'(]'},
               {l:'\\left[\\right)', c:'i', w:'[)'},
-              {l:'\\infty'},
-              {l:'-\\infty', c:'w', w:'-\\infty'},
-              {l:'\\cup'},
+              {l:'\\infty',pr:'<span>∞</span>'},
+              {l:'-\\infty', c:'w', w:'-\\infty',pr:'<span>−∞</span>'},
+              {l:'\\cup',pr:'<span class="mq-binary-operator">∪</span>'},
               {s:1}
             ]
           }
@@ -382,15 +382,15 @@ var myMQeditor = (function($) {
         flow: 'row',
         s: 5,
         contents: [
-          {l:'\\frac{}{}', c:'t', w:'/'},
-          {l:'x^{}', c:'t', w:'^', nb:1},
-          {l:'x_{}', c:'t', w:'_', nb:1},
-          {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1},
-          {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1},
+          {l:'\\frac{}{}', c:'t', w:'/', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator mq-empty"></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
+          {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
+          {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
+          {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
+          {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
           {l:'\\left(\\right)', c:'t', w:'('},
           {l:'\\left|\\right|', c:'t', w:'|', nb:1},
-          {l:'\\pi', nb:1},
-          {l:'\\infty'},
+          {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
+          {l:'\\infty',pr:'<span>∞</span>'},
           {p:'DNE', 'sm':2}
         ]
       },
@@ -424,7 +424,7 @@ var myMQeditor = (function($) {
       if (calcformat.match(/\bdecimal/) && qtype != 'numfunc') {
         baselayout.tabs[0].tabcontent[0].s = 1;
         baselayout.tabs[0].tabcontent[0].contents = [
-          {l:'\\infty'},
+          {l:'\\infty',pr:'<span>∞</span>'},
           {p:'DNE', 'sm':2},
         ];
         baselayout.tabs[0].tabcontent[2] = {
@@ -453,9 +453,9 @@ var myMQeditor = (function($) {
       } else if (calcformat.match(/(fraction|mixednumber|fracordec)/) && qtype != 'numfunc') {
         baselayout.tabs[0].tabcontent[0].s = 1;
         baselayout.tabs[0].tabcontent[0].contents = [
-          {l:'\\frac{n}{}', c:'t', w:'/'},
-          {b:'\\frac{}{}', c:'c', w:'\\frac'},
-          {l:'\\infty'},
+          {l:'\\frac{n}{}', c:'t', w:'/', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator"><var>n</var></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
+          {l:'\\frac{}{}', c:'c', w:'\\frac', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator mq-empty"></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
+          {l:'\\infty',pr:'<span>∞</span>'},
           {p:'DNE', 'sm':2},
         ];
         baselayout.tabs[0].tabcontent[2] = {
@@ -496,7 +496,7 @@ var myMQeditor = (function($) {
       if (calcformat.match(/\bdecimal/)) {
         baselayout.tabs[0].tabcontent[0].s = 3;
         baselayout.tabs[0].tabcontent[0].contents = [
-          {l:'\\infty'},
+          {l:'\\infty',pr:'<span>∞</span>'},
           {p:'DNE', 'sm':2},
           ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
             calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
@@ -504,9 +504,9 @@ var myMQeditor = (function($) {
       } else if (calcformat.match(/(fraction|mixednumber|fracordec)/)) {
         baselayout.tabs[0].tabcontent[0].s = 4;
         baselayout.tabs[0].tabcontent[0].contents = [
-          {l:'\\frac{n}{}', c:'t', w:'/'},
-          {l:'\\frac{}{}', c:'c', w:'\\frac'},
-          {l:'\\infty'},
+          {l:'\\frac{n}{}', c:'t', w:'/', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator"><var>n</var></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
+          {l:'\\frac{}{}', c:'c', w:'\\frac', pr:'<span class="mq-fraction mq-non-leaf"><span class="mq-numerator mq-empty"></span><span class="mq-denominator mq-empty"></span><span style="display:inline-block;width:0">&#8203;</span></span>'},
+          {l:'\\infty',pr:'<span>∞</span>'},
           {p:'DNE', 'sm':2},
         ];
         if ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||

@@ -400,6 +400,7 @@ class ScoreEngine
                         foreach ($stuanswers[$thisq][$kidx] as $k => $v) {
                             $stuanswers[$thisq][$kidx][$k] = $_SESSION['choicemap'][$assessmentId][$partnum][$v];
                         }
+                        sort($stuanswers[$thisq][$kidx]);
                         $stuanswers[$thisq][$kidx] = implode('|', $stuanswers[$thisq][$kidx]);
                     } else { // choices
                         $stuanswers[$thisq][$kidx] = $_SESSION['choicemap'][$assessmentId][$partnum][$stuanswers[$thisq][$kidx]];
@@ -486,6 +487,7 @@ class ScoreEngine
                     foreach ($stuanswers[$thisq] as $k => $v) {
                         $stuanswers[$thisq][$k] = $_SESSION['choicemap'][$assessmentId][$qnidx][$v];
                     }
+                    sort($stuanswers[$thisq]);
                     $stuanswers[$thisq] = implode('|', $stuanswers[$thisq]);
                 } else { // choices
                     $stuanswers[$thisq] = $_SESSION['choicemap'][$assessmentId][$qnidx][$stuanswers[$thisq]];

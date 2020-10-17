@@ -15,12 +15,12 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
             $out[$match[1]] = str_replace('"', '', $match[2]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order):("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
@@ -143,6 +143,30 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         if (!empty($avgtimeparts[1])) {
             $searchand[] = 'iq.meantime < ?';
             $searchvals[] = $avgtimeparts[1];
+        }
+        $searchand[] = 'iq.meantimen > 3';
+    }
+    if (!empty($search['avgscore'])) {
+        $avgscoreparts = explode(',', $search['avgscore']);
+        if (!empty($avgscoreparts[0])) {
+            $searchand[] = 'iq.meanscore > ?';
+            $searchvals[] = $avgscoreparts[0];
+        }
+        if (!empty($avgscoreparts[1])) {
+            $searchand[] = 'iq.meanscore < ?';
+            $searchvals[] = $avgscoreparts[1];
+        }
+        $searchand[] = 'iq.meantimen > 3';
+    }
+    if (!empty($search['lastmod'])) {
+        $lastmodparts = explode(',', $search['lastmod']);
+        if (!empty($lastmodparts[0])) {
+            $searchand[] = 'iq.lastmoddate > ?';
+            $searchvals[] = strtotime($lastmodparts[0]);
+        }
+        if (!empty($lastmodparts[1])) {
+            $searchand[] = 'iq.lastmoddate < ?';
+            $searchvals[] = strtotime($lastmodparts[1]);
         }
     }
     if (!empty($search['res'])) {

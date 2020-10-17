@@ -357,7 +357,7 @@ class QuestionHtmlGenerator
                       $jsParams['hasseqnext'] = true;
                       $_thisGroupDone = false;
                     }
-                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx])) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && $answeights[$_pnidx]!=0) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -682,7 +682,7 @@ class QuestionHtmlGenerator
                   $jsParams['hasseqnext'] = true;
                   $thisGroupDone = false;
                 }
-                if ($seqPartDone !== true && empty($seqPartDone[$pn])) {
+                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && $answeights[$pn]!=0) {
                   $thisGroupDone = false;
                 }
               }
@@ -756,6 +756,9 @@ class QuestionHtmlGenerator
         }
         // display detailed solution, if allowed and set
         if (($doShowAnswer || $doShowDetailedSoln) && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
+          if (($quesData['solutionopts']&1)==0) {
+            $evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
+          }
           if ($nosabutton) {
             $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
           } else {

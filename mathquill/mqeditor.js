@@ -506,13 +506,25 @@ var MQeditor = (function($) {
     btnel = document.createElement("span");
     btnel.tabIndex = 0;
     if (btn.l) { // latex button
-      btnel.className = "mqed-btn rend";
-      btnel.innerText = btn.l;
+      if (btn.op) {
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-root-block"><var class="mq-operator-name">'+btn.l.substring(1)+'</var></span>';
+      } else if (btn.pr) {
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-root-block">'+btn.pr+'</span>';
+      } else if (btn.l.match(/\\left(.)\\right(.)/)) {
+        var m = btn.l.match(/\\left(.)\\right(.)/);
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">'+m[1]+'</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">'+m[2]+'</span></span>'
+      } else {
+        btnel.className = "mqed-btn rend";
+        btnel.innerText = btn.l;
+      }
       cmdtype = 'c';
       cmdval = btn.l.substring(1);
     } else if (btn.b) { // rendered text button
-      btnel.className = "mqed-btn rend";
-      btnel.innerHTML = btn.b;
+      btnel.className = "mqed-btn mq-math-mode";
+      btnel.innerHTML = '<span class="mq-root-block"><span>'+btn.b+'</span></span>';
       cmdtype = 't';
       cmdval = btn.b;
       if (cmdval.match(/^\d$/) || cmdval=='.') {
