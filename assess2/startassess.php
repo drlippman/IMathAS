@@ -147,6 +147,7 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
 
     // if we already have an assess record, need to copy it to new group members
     if ($assess_record->hasRecord()) {
+        $sourcedids = formLTIsourcedId($available_new_members, $aid);
         // get current record
         $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
         $query = "SELECT $fieldstocopy FROM ";
@@ -156,11 +157,16 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
         $rowgrpdata = $stm->fetch(PDO::FETCH_NUM);
         // now copy it to others
         $ph = Sanitize::generateQueryPlaceholders($rowgrpdata);
-        $query = "REPLACE INTO imas_assessment_records (userid,$fieldstocopy) ";
+        $query = "REPLACE INTO imas_assessment_records (userid,lti_sourcedid,$fieldstocopy) ";
         $query .= "VALUES (?,$ph)";
         $stm = $DBH->prepare($query);
         foreach ($available_new_members as $gm_uid) {
-            $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
+            if (is_array($sourcedids) && isset($sourcedids[$gm_uid])) {
+                $thissourcedid = $sourcedids[$gm_uid];
+            } else {
+                $thissourcedid = '';
+            }
+            $stm->execute(array_merge(array($gm_uid, $thissourcedid), $rowgrpdata));
         }
     }
   }
