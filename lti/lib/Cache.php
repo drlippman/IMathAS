@@ -32,9 +32,11 @@ class Cache {
       $stm->execute(array($nonce, time()));
 
       // delete old
-      $old = time() - 5400; //old stuff - 90 minutes
-	    $stm = $this->dbh->prepare("DELETE FROM imas_ltinonces WHERE time<?");
-      $stm->execute(array($old));
+      if (rand(1,100) == 1) { // don't need to run every time; run with 1% probability
+        $old = time() - 5400; //old stuff - 90 minutes
+        $stm = $this->dbh->prepare("DELETE FROM imas_ltinonces WHERE time<?");
+        $stm->execute(array($old));
+      }
       return $this;
     }
 
