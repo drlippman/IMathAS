@@ -1202,6 +1202,12 @@ a.dropdown-toggle.arrow-down:hover {
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
           box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
+.dropdown-ul {
+  padding: 5px 0;
+  margin: 2px 0 0;
+  list-style: none;
+  background-color: #fff;
+}
 .dropdown-menu.pull-right {
   right: 0;
   left: auto;
@@ -1212,7 +1218,7 @@ a.dropdown-toggle.arrow-down:hover {
   overflow: hidden;
   background-color: #e5e5e5;
 }
-.dropdown-menu > li > a, .dropdown-menu > li > span {
+.dropdown-menu  li > a, .dropdown-menu > li > span {
   display: block;
   padding: 3px 20px;
   clear: both;
@@ -1221,25 +1227,25 @@ a.dropdown-toggle.arrow-down:hover {
   color: #000;
   white-space: nowrap;
 }
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
+.dropdown-menu  li > a:hover,
+.dropdown-menu  li > a:focus {
   color: #000;
   text-decoration: none;
   background-color: #f5f5f5;
 }
-.dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
+.dropdown-menu  .active > a,
+.dropdown-menu  .active > a:hover,
+.dropdown-menu  .active > a:focus {
   text-decoration: none;
   background-color: #ddddff;
 }
-.dropdown-menu > .disabled > a,
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu  .disabled > a,
+.dropdown-menu  .disabled > a:hover,
+.dropdown-menu  .disabled > a:focus {
   color: #777;
 }
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu  .disabled > a:hover,
+.dropdown-menu  .disabled > a:focus {
   text-decoration: none;
   cursor: not-allowed;
   background-color: transparent;

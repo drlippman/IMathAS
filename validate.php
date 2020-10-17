@@ -95,7 +95,7 @@
      }
 
      $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
-           require("header.php");
+ 	 	 require("header.php");
     if (isset($_SERVER['QUERY_STRING'])) {
         $querys = '?'.Sanitize::fullQueryString($_SERVER['QUERY_STRING']).'&guestaccess=true';
     } else {
@@ -229,7 +229,7 @@
 		 }
 		 if (isset($_POST['tzname'])) {
 		 	 $_SESSION['logintzname'] = $_POST['tzname'];
-         }
+		 }
          if (isset($CFG['static_server']) && !empty($_POST['static_check'])) {
             $_SESSION['static_ok'] = 1;
          }
@@ -500,7 +500,21 @@
 				exit;
 			}
 		} else if ($_SESSION['ltirole']=='instructor') {
-			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+            if (!empty($_SESSION['ltiver'] && $_SESSION['ltiver']=='1.3')) {
+                $breadcrumbbase = '<div class="dropdown inlinediv"><a href="#"
+                  role="button"
+                  id="ltimenubutton"
+                  class="dropdown-toggle arrow-down"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  >'._('LTI').'</a>
+                  <div id="ltimenudiv" role="menu" class="dropdown-menu ltimenu">'
+                  . _('Loading...').'</div></div> ';
+                //$breadcrumbbase = "<a id=ltihomelink href=\"$imasroot/lti/ltihome.php\">LTI Home</a> &gt; ";
+            } else {
+                $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+            }
 		} else {
 			$breadcrumbbase = '';
 		}
@@ -514,7 +528,7 @@
 		} else {
 			$cid = Sanitize::courseId($_SESSION['courseid']);
 		}
-		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess,lticourseid FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($line != null) {
@@ -522,6 +536,9 @@
 			$studentinfo['timelimitmult'] = $line['timelimitmult'];
 			$studentinfo['section'] = $line['section'];
 			$studentinfo['latepasses'] = $line['latepass'];
+      if ($line['lticourseid']>0) {
+        $studentinfo['lticourseid'] = $line['lticourseid'];
+      }
 			if ($line['locked']>0) {
 				require("header.php");
 				echo "<p>",_("You have been locked out of this course by your instructor.  Please see your instructor for more information."),"</p>";
@@ -631,17 +648,17 @@
 				if (($courseUIver == 1 && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) ||
                 ($courseUIver > 1 && (strpos($_SERVER['PHP_SELF'],'assess2/')===false ||
                 strpos($_SERVER['QUERY_STRING'],'&aid='.$lockaid)===false))
-                ) {
+        ) {
 					require("header.php");
                     echo '<p>',_('This course is currently locked for another assessment'),'</p>';
 
                     if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
                         echo "<p>"._('Go back to the LMS and open the correct assessment')."</p>";
                     } else if ($courseUIver > 1) {
-                        echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=".Sanitize::encodeUrlParam($lockaid)."\">",_("Go to Assessment"),"</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
-                    } else {
-                        echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
-                    }
+            echo "<p><a href=\"$imasroot/assess2/?cid=$cid&aid=".Sanitize::encodeUrlParam($lockaid)."\">",_("Go to Assessment"),"</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
+          } else {
+            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=".Sanitize::encodeUrlParam($lockaid)."\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">",_("Go Back"),"</a></p>";
+          }
 					require("footer.php");
 					//header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id=$lockaid");
 					exit;

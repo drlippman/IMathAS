@@ -250,16 +250,24 @@ class AssessRecord
    *                                If false, current userid will be used. (def: false)
    * @param  int     $stugroupid    The stugroup ID, or 0 if not group (def: 0)
    * @param  boolean $recordStart   true to record the starttime now (def: true)
-   * @param  string  $lti_sourcedid The LTI sourcedid (def: '')
+   * @param  string  $lti_sourcedid The LTI sourcedid, or array of uid->sourcedid (def: '')
    * @return void
    */
   public function createRecord($users = false, $stugroupid = 0, $recordStart = true, $lti_sourcedid = '') {
     // if group, lookup group members. Otherwise just use current user
+    $lti_sourcedidarr = [];
     if ($users === false) {
       $users = array($this->curUid);
+    } else if (is_array($lti_sourcedid)) {
+        $lti_sourcedidarr = $lti_sourcedid;
+        if (isset($lti_sourcedidarr[$this->curUid])) {
+            $lti_sourcedid = $lti_sourcedidarr[$this->curUid];
+        } else {
+            $lti_sourcedid = '';
+        }
     }
 
-    //initiale a blank record
+    //initialize a blank record
     $this->assessRecord = array(
       'assessmentid' => $this->curAid,
       'userid' => $this->curUid,
@@ -301,11 +309,17 @@ class AssessRecord
     $vals = array();
     foreach ($users as $uid) {
       $vals[] = '(?,?,?,?,?,?,?,?,?)';
+      $this_lti_sourcedid = '';
+      if (isset($lti_sourcedidarr[$uid])) {
+        $this_lti_sourcedid = $lti_sourcedidarr[$uid];
+      } else if ($uid==$this->curUid) {
+        $this_lti_sourcedid = $lti_sourcedid;
+      }
       array_push($qarr,
         $uid,
         $this->curAid,
         $stugroupid,
-        ($uid==$this->curUid) ? $lti_sourcedid : '',
+        $this_lti_sourcedid,
         $recordStart ? $this->now : 0,
         2,
         $this->assessRecord['status'],

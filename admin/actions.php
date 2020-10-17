@@ -638,19 +638,28 @@ switch($_POST['action']) {
 			}
 		} else {
 			$_POST['courselevel'] = '';
-		}
+        }
+        $ltisendzeros = !empty($_POST['ltisendzeros']) ? 1 : 0;
 
 		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,available=:available,lockaid=:lockaid,showlatepass=:showlatepass,";
 			if ($updateJsonData) {
 				$query .= "jsondata=:jsondata,";
 			}
-			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass,latepasshrs=:latepasshrs,dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate,cleanupdate=:cleanupdate,level=:level WHERE id=:id";
-			$qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
-				':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset,
-				':toolset'=>$toolset, ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':istemplate'=>$istemplate,
-				':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':latepasshrs'=>$latepasshrs, ':cleanupdate'=>$old_course_settings['cleanupdate'], ':level'=> $_POST['courselevel'], ':id'=>$_GET['id']);
+            $query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,
+                toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,
+                deftime=:deftime,deflatepass=:deflatepass,latepasshrs=:latepasshrs,
+                dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate,
+                cleanupdate=:cleanupdate,level=:level,ltisendzeros=:ltisendzeros WHERE id=:id";
+            $qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], 
+                ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
+                ':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, 
+                ':copyrights'=>$copyrights, ':msgset'=>$msgset,	':toolset'=>$toolset, 
+                ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':istemplate'=>$istemplate,
+                ':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, 
+                ':startdate'=>$startdate, ':enddate'=>$enddate,	':latepasshrs'=>$latepasshrs, 
+                ':cleanupdate'=>$old_course_settings['cleanupdate'], ':level'=> $_POST['courselevel'], 
+                ':ltisendzeros'=>$ltisendzeros, ':id'=>$_GET['id']);
 			if ($myrights<75) {
 				$query .= " AND ownerid=:ownerid";
 				$qarr[':ownerid']=$userid;
@@ -749,13 +758,13 @@ switch($_POST['action']) {
 			}
 
 			$DBH->beginTransaction();
-			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,level,ltisecret,dates_by_lti,blockcnt,UIver) VALUES ";
-			$query .= "(:name, :ownerid, :enrollkey, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :level, :ltisecret, :ltidates, :blockcnt, :UIver);";
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,level,ltisecret,dates_by_lti,blockcnt,UIver,ltisendzeros) VALUES ";
+			$query .= "(:name, :ownerid, :enrollkey, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :level, :ltisecret, :ltidates, :blockcnt, :UIver, :ltisendzeros);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$courseownerid, ':enrollkey'=>$_POST['ekey'],
 				':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':toolset'=>$toolset, ':showlatepass'=>$showlatepass,
 				':itemorder'=>$itemorder, ':available'=>$avail, ':istemplate'=>$istemplate, ':deftime'=>$deftime, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':level'=>$_POST['courselevel'], ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt, ':UIver'=>$destUIver));
+				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':level'=>$_POST['courselevel'], ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt, ':UIver'=>$destUIver, ':ltisendzeros'=>$ltisendzeros));
 			$cid = $DBH->lastInsertId();
 
 			//call hook, if defined
