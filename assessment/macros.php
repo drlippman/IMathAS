@@ -3944,10 +3944,24 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 	}
 }
 
+function parsedrawgrid($str) {
+    $p = array_map('trim',explode(',', $str));
+    $xmin = isset($p[0]) ? $p[0] : -5;
+    $xmax = isset($p[1]) ? $p[1] : 5;
+    $ymin = isset($p[2]) ? $p[2] : -5;
+    $ymax = isset($p[3]) ? $p[3] : 5;
+    $w = isset($p[6]) ? $p[6] : 300;
+    $h = isset($p[7]) ? $p[7] : 300;
+    return [$xmin, $xmax, $ymin, $ymax, $w, $h];
+}
+
 function gettwopointlinedata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	return gettwopointdata($str,'line',$xmin,$xmax,$ymin,$ymax,$w,$h);
 }
 function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+    if (is_string($xmin) && strpos($xmin,',')!==false) {
+        list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin);
+    }
 	if ($type=='line') {
 		$code = 5;
 	} else if ($type=='lineseg') {
@@ -4004,6 +4018,9 @@ function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=
 }
 
 function getineqdata($str,$type='linear',$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+    if (is_string($xmin) && strpos($xmin,',')!==false) {
+        list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin);
+    }
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
@@ -4032,6 +4049,9 @@ function getineqdata($str,$type='linear',$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=30
 }
 
 function getdotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+    if (is_string($xmin) && strpos($xmin,',')!==false) {
+        list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin);
+    }
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
@@ -4047,6 +4067,9 @@ function getdotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	return $dots;
 }
 function getopendotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+    if (is_string($xmin) && strpos($xmin,',')!==false) {
+        list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin);
+    }
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
@@ -4062,6 +4085,9 @@ function getopendotsdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	return $dots;
 }
 function getlinesdata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+    if (is_string($xmin) && strpos($xmin,',')!==false) {
+        list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin);
+    }
 	$imgborder = 5;
 	$pixelsperx = ($w - 2*$imgborder)/($xmax-$xmin);
 	$pixelspery = ($h - 2*$imgborder)/($ymax -$ymin);
