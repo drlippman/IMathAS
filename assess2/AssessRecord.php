@@ -260,7 +260,11 @@ class AssessRecord
       $users = array($this->curUid);
     } else if (is_array($lti_sourcedid)) {
         $lti_sourcedidarr = $lti_sourcedid;
-        $lti_sourcedid = '';
+        if (isset($lti_sourcedidarr[$this->curUid])) {
+            $lti_sourcedid = $lti_sourcedidarr[$this->curUid];
+        } else {
+            $lti_sourcedid = '';
+        }
     }
 
     //initialize a blank record
