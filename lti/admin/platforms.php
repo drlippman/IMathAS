@@ -30,7 +30,7 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
   !empty(trim($_POST[$lms.'_keyseturl'])) &&
   !empty(trim($_POST[$lms.'_tokenurl'])) &&
   !empty(trim($_POST[$lms.'_authurl'])) &&
-  !empty(trim($_POST['uniqid']))
+  !empty(trim($_POST[$lms.'_uniqid']))
 ) {
   $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url,uniqid) VALUES (?,?,?,?,?,?)");
   $stm->execute(array(
@@ -39,7 +39,7 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
     trim($_POST[$lms.'_authurl']),
     trim($_POST[$lms.'_tokenurl']),
     trim($_POST[$lms.'_keyseturl']),
-    trim($_POST['uniqid'])
+    trim($_POST[$lms.'_uniqid'])
   ));
   header('Location: ' . $basesiteurl . "/lti/admin/platforms.php");
   exit;
@@ -92,7 +92,7 @@ if ($myrights == 100) {
 echo '<h2>'._('Existing Platforms').'</h2>';
 
 echo '<form method="post" action="platforms.php">';
-echo '<input type=hidden name=uniqid value="'.Sanitize::encodeStringForDisplay($uniqid).'" />';
+
 if ($platforms === false) {
   echo '<p>'._('No platforms').'</p>';
 } else {
@@ -122,6 +122,7 @@ if ($platforms === false) {
 
 }
 echo '<h2>'._('New Platform').'</h2>';
+
 if (count($platforms)>0) {
     if ($myrights < 100) {
         echo '<p class="noticetext">'._('Since you already have an existing platform registration, you should not need to add a New Platform unless you have changed LMSs').'</p>';
@@ -151,6 +152,7 @@ echo '<li><label>'._('Client ID:').' <input name=other_clientid size=50/></label
 echo '<li><label>'._('Keyset URL:').' <input name=other_keyseturl size=50/></label></li>';
 echo '<li><label>'._('Token URL:').' <input name=other_tokenurl size=50/></label></li>';
 echo '<li><label>'._('Authentication URL:').' <input name=other_authurl size=50/></label></li>';
+echo '<li><label>'._('The u= from the OpenID Connect URL:').' <input size=15 name=other_uniqid value="'.Sanitize::encodeStringForDisplay($uniqid).'" /></label></li>';
 echo '</ul>';
 echo '<button type=submit>'._('Add Platform').'</button></p>';
 echo '</div>';
@@ -197,6 +199,7 @@ echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.
 echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
 echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
 echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
+echo '<input type="hidden" name=canvas_uniqid value="" />';
 
 echo '<button type=submit>'._('Add Platform').'</button></p>';
 echo '</div>';
@@ -222,6 +225,7 @@ if ($bbclientid === false && $myrights == 100) {
   echo '<li><label>'._('Public Keyset URL:').' <input name=bb_keyseturl size=50/></label></li>';
   echo '<li><label>'._('Auth Token Endpoint:').' <input name=bb_tokenurl size=50/></label></li>';
   echo '<li><label>'._('OIDC auth request endpoint:').' <input name=bb_authurl size=50/></label></li>';
+  echo '<input type="hidden" name=bb_uniqid value="" />';
   echo '</ul>';
   echo '<button type=submit>'._('Add Blackboard').'</button></p>';
 } else if ($bbclientid === false) {
@@ -268,6 +272,7 @@ echo '<li><label>'._('Brightspace Keyset URL:').' <input name=d2l_keyseturl size
 echo '<li><label>'._('Brightspace OAuth2 Access Token URL:').' <input name=d2l_tokenurl size=50/></label></li>';
 echo '<li><label>'._('OpenID COnnect Authentication Endpoint:').' <input name=d2l_authurl size=50/></label></li>';
 echo '<li><label>'._('Issuer:').' <input name=d2l_issuer size=50/></label></li>';
+echo '<li><label>'._('The u= from the OpenID Connect URL:').'<input size=15 name=d2l_uniqid value="'.Sanitize::encodeStringForDisplay($uniqid).'" /></label></li>';
 echo '</ul>';
 
 echo '<p>'.('Once that is done, click View Deployments, then click New Deployment').'</p>';
@@ -318,6 +323,7 @@ echo '<li><label>'._('Public keyset URL:').' <input name=moodle_keyseturl size=5
 echo '<li><label>'._('Access token URL:').' <input name=moodle_tokenurl size=50/></label></li>';
 echo '<li><label>'._('Authentication request URL:').' <input name=moodle_authurl size=50/></label></li>';
 echo '</ul>';
+echo '<input type="hidden" name=moodle_uniqid value="" />';
 echo '<button type=submit>'._('Add Platform').'</button></p>';
 echo '</div>';
 if ($myrights < 100) {
