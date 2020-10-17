@@ -147,7 +147,7 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
 
     // if we already have an assess record, need to copy it to new group members
     if ($assess_record->hasRecord()) {
-        $sourcedids = formLTIsourcedId($available_new_members, $aid);
+        $sourcedids = AssessUtils::formLTIsourcedId($available_new_members, $aid);
         // get current record
         $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
         $query = "SELECT $fieldstocopy FROM ";
