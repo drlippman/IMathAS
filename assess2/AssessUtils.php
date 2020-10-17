@@ -180,4 +180,50 @@ class AssessUtils
     }
     return $outmsg;
   }
+
+  public static function formLTIsourcedId($uid, $aid) {
+    global $studentinfo, $DBH;  
+    if (is_array($uid)) {
+        $uid = array_map('intval', $uid);
+    } else {
+        $uid = [intval($uid)];
+    }
+    if (!empty($_SESSION['lti_lis_result_sourcedid'.$aid]) &&
+        !empty($_SESSION['lti_outcomeurl'])
+    ) {
+        return $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
+    } else if (!empty($studentinfo['lticourseid'])) {
+        $stm = $DBH->prepare('SELECT contextid,org FROM imas_lti_courses WHERE id=?');
+        $stm->execute(array($studentinfo['lticourseid']));
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+        $platformid = substr($row['org'], 6); // strip off LTI13-
+        $ltiuserid = [];
+        if (empty($_SESSION['lti_user_id']) || count($uid)>1) {
+            $uidlist = implode(',', $uid);
+            $stm = $DBH->prepare("SELECT userid,ltiuserid FROM imas_ltiusers WHERE userid in ($uidlist) AND org=?");
+            $stm->execute(array($row['org']));
+            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                $ltiuserid[$row[0]] = $row[1];
+            }
+        } else {
+            $ltiuserid = [$uid[0] => $_SESSION['lti_user_id']];
+        }
+        // look up lineitemurl
+        $stm = $DBH->prepare('SELECT lineitem FROM imas_lti_lineitems WHERE itemtype=0 AND typeid=? AND lticourseid=?');
+        $stm->execute(array($aid, $studentinfo['lticourseid']));
+        $lineitemurl = $stm->fetchColumn(0);
+        if ($lineitemurl !== false) {
+            $sourcedids = [];
+            foreach ($ltiuserid as $uid=>$ltiuserid) {
+                $sourcedids[$uid] = 'LTI1.3:|:'.$ltiuserid.':|:'.$lineitemurl.':|:'.$platformid;
+            }
+            if (count($uid)==1) {
+                return $sourcedids[$uid[0]];
+            } else {
+                return $sourcedids;
+            }
+        }
+    }
+    return '';
+  }
 }

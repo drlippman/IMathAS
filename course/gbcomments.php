@@ -30,8 +30,11 @@
 	if (isset($_GET['upload'])) {
 		require("../header.php");
 
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
+        echo "<div class=breadcrumb>$breadcrumbbase ";
+        if (empty($_COOKIE['fromltimenu'])) {
+            echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        }
+        echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
 		echo "&gt; <a href=\"gbcomments.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid&comtype=".Sanitize::encodeUrlParam($comtype)."\">Gradebook Comments</a> &gt; Upload Comments</div>";
 
 		if ($comtype=='stu') {
@@ -172,16 +175,18 @@
 	echo '   }'."\n";
 	echo ' } </script>'."\n";
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
 	if ($comtype=='stu') {
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=". Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
+		echo " <a href=\"gradebook.php?stu=0&gbmode=". Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
 		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=instr\">View/Edit Instructor notes</a></div>";
 		echo '<h1>Modify Gradebook Comments</h1>';
 		echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
 
 	} else if ($comtype=='instr') {
-		echo "&gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
+		echo " <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Instructor Notes</div>";
 		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=stu\">View/Edit Student comments</a></div>";
 		echo '<h1>Modify Instructor Notes</h1>';
 		echo "<p>These notes will only display on this page and gradebook exports.  They will not be visible to students.</p>";

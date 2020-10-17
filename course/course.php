@@ -33,7 +33,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-
+    if (!empty($_COOKIE['fromltimenu'])) {
+        setcookie('fromltimenu', '', time()-3600);
+    }
 	if (isset($teacherid) && isset($_SESSION['sessiontestid']) && !isset($_SESSION['actas']) && $_SESSION['courseid']==$cid) {
 		//clean up coming out of an assessment
 		require_once("../includes/filehandler.php");
@@ -186,7 +188,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	$now = time();
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
-        $exceptions = loadExceptions($cid, $userid);
+		$exceptions = loadExceptions($cid, $userid);
         $excused = loadExcusals($cid, $userid);
 	}
 	//update block start/end dates to show blocks containing items with exceptions

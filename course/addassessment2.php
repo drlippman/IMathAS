@@ -37,17 +37,20 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if ($from=='gb') {
-	$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> ";
+	$curBreadcrumb .= "<a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; ";
 } else if ($from=='mcd') {
-	$curBreadcrumb .= "&gt; <a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a> ";
+	$curBreadcrumb .= "&gt; <a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a> &gt; ";
 }
 
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Assessment\n";
+	$curBreadcrumb .= "Modify Assessment\n";
 } else {
-	$curBreadcrumb .= "&gt; Add Assessment\n";
+	$curBreadcrumb .= "Add Assessment\n";
 }
 
 if (isset($_GET['id'])) {
@@ -119,11 +122,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
           $stm->execute(array(':id'=>$assessmentId));
           $assessmentname = $stm->fetchColumn(0);
-          $body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
-              $cid, Sanitize::encodeStringForDisplay($coursename));
-          $body .= sprintf("&gt; <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
+          $body = '<div class=breadcrumb>'.$breadcrumbbase;
+          if (empty($_COOKIE['fromltimenu'])) {
+            $body = sprintf(" <a href=\"course.php?cid=%s\">%s</a> &gt; ", $breadcrumbbase,
+                $cid, Sanitize::encodeStringForDisplay($coursename));
+          }
+          $body .= sprintf(" <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
               $cid, $assessmentId);
-					$body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
+		  $body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
           $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
           $body .= '<form method="POST" action="'.sprintf('addassessment2.php?cid=%s&id=%d',$cid, $assessmentId).'">';
           $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';

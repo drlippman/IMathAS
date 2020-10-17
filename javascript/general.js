@@ -90,11 +90,11 @@ function tipshow(el,tip, e) {
 		return;
 	}
 	if (typeof tipobj!= 'object') {
-        tipobj = document.createElement("div");
+		tipobj = document.createElement("div");
         if (window.imathasAssess) {
             tipobj.className = "dropdown-pane tooltip-pane";
         } else {
-            tipobj.className = "tips";
+		tipobj.className = "tips";
         }
 		tipobj.setAttribute("role","tooltip");
 		tipobj.id = "hovertipsholder";
@@ -385,7 +385,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 				 .on('mouseup.GBresize', GB_endresize);
 			}
 		});
-    }
+	}
     document.getElementById("GB_loading").style.display = "block";
 	if (url.charAt(0)=='<') {
 		document.getElementById("GB_frameholder").innerHTML = '<div>'+url+'</div>';
@@ -400,7 +400,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
 	} else {
         document.getElementById("GB_loading").style.display = 'none';
-    }
+	}
 	jQuery("#GB_frameholder").isolatedScroll();
 	if (url.match(/libtree/)) {
 		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
@@ -416,14 +416,14 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
-            var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 		} else {
 			var h = height;
 		}
 	}
-    document.getElementById("GB_window").style.display = "block";
+	document.getElementById("GB_window").style.display = "block";
     if (overlay !== false) {
-        document.getElementById("GB_overlay").style.display = "block";
+	document.getElementById("GB_overlay").style.display = "block";
     } else {
         document.getElementById("GB_overlay").style.display = "none";
     }
@@ -433,7 +433,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 	var w = $(document).width();
 	if (width > w-20) {
 		width = w-20;
-    }
+	}
     if (!posstyle.match(/noreset/) || 
         !jQuery("#GB_window").data("original_mouse_x") || 
         document.getElementById("GB_window").style.left==''
@@ -463,16 +463,16 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
             $("#GB_window").css("left", width).css("width","auto").css("right",20).css("margin","0");
             width = w - width - 20;
         } else {
-            document.getElementById("GB_window").style.width = width + "px";
+	document.getElementById("GB_window").style.width = width + "px";
         }
         
-        document.getElementById("GB_window").style.height = (h-30) + "px";
-        //document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-        if (url.charAt(0)!='<') {
-            document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
-        } else {
-            document.getElementById("GB_frameholder").style.height = "auto";
-        }
+	document.getElementById("GB_window").style.height = (h-30) + "px";
+	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
+	if (url.charAt(0)!='<') {
+		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
+	} else {
+		document.getElementById("GB_frameholder").style.height = "auto";
+	}
     }
 	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
@@ -530,7 +530,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			"lists advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor snippet",
 			"media table paste rollups colorpicker"
-        ],
+		],
         external_plugins: {
             "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
             "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
@@ -558,7 +558,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-        snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
@@ -781,7 +781,7 @@ function togglevideoembed() {
 			timeref += '&end='+m[1];
 		}
 		timeref += '&enablejsapi=1';
-        var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
+		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
         var viframe = jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
@@ -942,7 +942,7 @@ jQuery(function() {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
 			}
 		}
-	});
+    });
 });
 
 function convertheic(href, divid) {
@@ -1129,7 +1129,7 @@ function initlinkmarkup(base) {
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
 	setupToggler2(base);
-    $(base).fitVids();
+	$(base).fitVids();
     resizeResponsiveIframes(base, true);
 }
 
@@ -1145,8 +1145,28 @@ function resizeResponsiveIframes(base, init) {
     });
 }
 jQuery(document).ready(function($) {
-    initlinkmarkup('body');
+	initlinkmarkup('body');
     $(window).on('resize', function () {resizeResponsiveIframes('body');});
+});
+
+jQuery(function($) {
+	$("#ltimenubutton").on('click', function() {
+		var btn = $("#ltimenubutton");
+		if (!btn.attr("data-loaded")) {
+			$.ajax({
+					type: "GET",
+					url: imasroot+'/lti/ltimenu.php?launchid=' +
+						encodeURIComponent(window.sessionStorage.getItem('LTI1p3_launchid'))
+			}).done(function(msg) {
+				$("#ltimenudiv").html(msg);
+                btn.attr("data-loaded",1);
+                document.cookie = "fromltimenu=1;" 
+                    + 'path=' + ((imasroot=='') ? '/' : imasroot) + ';'
+                    + ((window.location.protocol=='https:') ? "secure; samesite=none" : "");
+				sendLTIresizemsg();
+			});
+		}
+	});
 });
 
 jQuery.fn.isolatedScroll = function() {
@@ -1510,160 +1530,160 @@ function setActiveTab(el) {
 
 
 +function ($) {
-    'use strict';
-  
-    // DROPDOWN CLASS DEFINITION
-    // =========================
-  
-    var backdrop = '.dropdown-backdrop'
-    var toggle   = '[data-toggle="dropdown"]'
-    var Dropdown = function (element) {
-      $(element).on('click.bs.dropdown', this.toggle)
-    }
-  
+  'use strict';
+
+  // DROPDOWN CLASS DEFINITION
+  // =========================
+
+  var backdrop = '.dropdown-backdrop'
+  var toggle   = '[data-toggle="dropdown"]'
+  var Dropdown = function (element) {
+    $(element).on('click.bs.dropdown', this.toggle)
+  }
+
     Dropdown.VERSION = '3.4.1'
-  
-    function getParent($this) {
-      var selector = $this.attr('data-target')
-  
-      if (!selector) {
-        selector = $this.attr('href')
-        selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
-      }
-  
+
+  function getParent($this) {
+    var selector = $this.attr('data-target')
+
+    if (!selector) {
+      selector = $this.attr('href')
+      selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    }
+
       var $parent = selector !== '#' ? $(document).find(selector) : null
-  
-      return $parent && $parent.length ? $parent : $this.parent()
-    }
-  
-    function clearMenus(e) {
-      if (e && e.which === 3) return
-      $(backdrop).remove()
-      $(toggle).each(function () {
-        var $this         = $(this)
-        var $parent       = getParent($this)
-        var relatedTarget = { relatedTarget: this }
-  
-        if (!$parent.hasClass('open')) return
-  
-        if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
-  
-        $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
-  
-        if (e.isDefaultPrevented()) return
-  
-        $this.attr('aria-expanded', 'false')
+
+    return $parent && $parent.length ? $parent : $this.parent()
+  }
+
+  function clearMenus(e) {
+    if (e && e.which === 3) return
+    $(backdrop).remove()
+    $(toggle).each(function () {
+      var $this         = $(this)
+      var $parent       = getParent($this)
+      var relatedTarget = { relatedTarget: this }
+
+      if (!$parent.hasClass('open')) return
+
+      if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+
+      $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this.attr('aria-expanded', 'false')
         $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
-      })
-    }
-  
-    Dropdown.prototype.toggle = function (e) {
-      var $this = $(this)
-      if ($this.is('.disabled, :disabled')) return
-  
-      var $parent  = getParent($this)
-      var isActive = $parent.hasClass('open')
-  
-      clearMenus()
-  
-      if (!isActive) {
-        if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
-          // if mobile we use a backdrop because click events don't delegate
-          $(document.createElement('div'))
-            .addClass('dropdown-backdrop')
-            .insertAfter($(this))
-            .on('click', clearMenus)
-        }
-  
-        var relatedTarget = { relatedTarget: this }
-        $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
-  
-        if (e.isDefaultPrevented()) return
-  
-        $this
-          .trigger('focus')
-          .attr('aria-expanded', 'true')
-  
-        $parent
-          .toggleClass('open')
+    })
+  }
+
+  Dropdown.prototype.toggle = function (e) {
+    var $this = $(this)
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    clearMenus()
+
+    if (!isActive) {
+      if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+        // if mobile we use a backdrop because click events don't delegate
+        $(document.createElement('div'))
+          .addClass('dropdown-backdrop')
+          .insertAfter($(this))
+          .on('click', clearMenus)
+      }
+
+      var relatedTarget = { relatedTarget: this }
+      $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this
+        .trigger('focus')
+        .attr('aria-expanded', 'true')
+
+      $parent
+        .toggleClass('open')
           .trigger($.Event('shown.bs.dropdown', relatedTarget))
-      }
-  
-      return false
     }
-  
-    Dropdown.prototype.keydown = function (e) {
-      if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
-  
-      var $this = $(this)
-  
-      e.preventDefault()
-      e.stopPropagation()
-  
-      if ($this.is('.disabled, :disabled')) return
-  
-      var $parent  = getParent($this)
-      var isActive = $parent.hasClass('open')
-  
-      if (!isActive && e.which != 27 || isActive && e.which == 27) {
-        if (e.which == 27) $parent.find(toggle).trigger('focus')
-        return $this.trigger('click')
-      }
-  
-      var desc = ' li:not(.disabled):visible a'
+
+    return false
+  }
+
+  Dropdown.prototype.keydown = function (e) {
+    if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+
+    var $this = $(this)
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    if (!isActive && e.which != 27 || isActive && e.which == 27) {
+      if (e.which == 27) $parent.find(toggle).trigger('focus')
+      return $this.trigger('click')
+    }
+
+    var desc = ' li:not(.disabled):visible a'
       var $items = $this.next('.dropdown-menu' + desc);
       if (!$items.length) {
         $items = $parent.find('.dropdown-menu' + desc);
       }
-  
-      if (!$items.length) return
-  
-      var index = $items.index(e.target)
-  
-      if (e.which == 38 && index > 0)                 index--         // up
-      if (e.which == 40 && index < $items.length - 1) index++         // down
-      if (!~index)                                    index = 0
-  
-      $items.eq(index).trigger('focus')
-    }
-  
-  
-    // DROPDOWN PLUGIN DEFINITION
-    // ==========================
-  
-    function Plugin(option) {
-      return this.each(function () {
-        var $this = $(this)
-        var data  = $this.data('bs.dropdown')
-  
-        if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
-        if (typeof option == 'string') data[option].call($this)
-      })
-    }
-  
-    var old = $.fn.dropdown
-  
-    $.fn.dropdown             = Plugin
-    $.fn.dropdown.Constructor = Dropdown
-  
-  
-    // DROPDOWN NO CONFLICT
-    // ====================
-  
-    $.fn.dropdown.noConflict = function () {
-      $.fn.dropdown = old
-      return this
-    }
-  
-  
-    // APPLY TO STANDARD DROPDOWN ELEMENTS
-    // ===================================
-  
-    $(document)
-      .on('click.bs.dropdown.data-api', clearMenus)
-      .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-      .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
-      .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
-      .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
-  
-  }(jQuery);
+
+    if (!$items.length) return
+
+    var index = $items.index(e.target)
+
+    if (e.which == 38 && index > 0)                 index--         // up
+    if (e.which == 40 && index < $items.length - 1) index++         // down
+    if (!~index)                                    index = 0
+
+    $items.eq(index).trigger('focus')
+  }
+
+
+  // DROPDOWN PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this = $(this)
+      var data  = $this.data('bs.dropdown')
+
+      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+      if (typeof option == 'string') data[option].call($this)
+    })
+  }
+
+  var old = $.fn.dropdown
+
+  $.fn.dropdown             = Plugin
+  $.fn.dropdown.Constructor = Dropdown
+
+
+  // DROPDOWN NO CONFLICT
+  // ====================
+
+  $.fn.dropdown.noConflict = function () {
+    $.fn.dropdown = old
+    return this
+  }
+
+
+  // APPLY TO STANDARD DROPDOWN ELEMENTS
+  // ===================================
+
+  $(document)
+    .on('click.bs.dropdown.data-api', clearMenus)
+    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+    .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
+    .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+}(jQuery);

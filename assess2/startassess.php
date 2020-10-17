@@ -160,12 +160,13 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
         $query .= "VALUES (?,$ph)";
         $stm = $DBH->prepare($query);
         foreach ($available_new_members as $gm_uid) {
-        $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
+            $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
         }
     }
   }
 }
 
+$set_lti_sourcedid = false;
 // if there is no active assessment record, time to create one
 if (!$assess_record->hasRecord()) {
   // if it's a user-created group, we've already gotten group members above
@@ -182,14 +183,16 @@ if (!$assess_record->hasRecord()) {
   }
 
   // time to create a new record!
-  $lti_sourcedid = '';
   if ($assess_info->getSetting('isgroup') > 0 && !$canViewAll) {
     // creating for group
+    $lti_sourcedid = AssessUtils::formLTIsourcedId($current_members, $aid);
     $assess_record->createRecord($current_members, $stugroupid, true, $lti_sourcedid);
   } else {
     // creating for self
+    $lti_sourcedid = AssessUtils::formLTIsourcedId($uid, $aid);
     $assess_record->createRecord(false, 0, true, $lti_sourcedid);
   }
+  $set_lti_sourcedid = true;
 }
 
 // if there's no active assessment attempt, generate one
@@ -224,18 +227,12 @@ if ($isRealStudent) {
 }
 
 // update lti_sourcedid if needed
-if (!empty($_SESSION['lti_lis_result_sourcedid'.$aid]) &&
-  !empty($_SESSION['lti_outcomeurl'])
-) {
-  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
-  $assess_record->updateLTIsourcedId($altltisourcedid);
+if (!$set_lti_sourcedid) {
+    $altltisourcedid = AssessUtils::formLTIsourcedId($uid, $aid);
+    if ($altltisourcedid != '') {
+        $assess_record->updateLTIsourcedId($altltisourcedid);
+    }
 }
-/*
-else if (isset($_SESSION['lti_lis_result_sourcedid'])) {
-  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
-  $assess_record->updateLTIsourcedId($altltisourcedid);
-}
-*/
 
 $assessInfoOut = array();
 

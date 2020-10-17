@@ -1,8 +1,190 @@
 <?php
-// code is adapted from IMS-DEV sample code
-// on code.google.com/p/ims-dev
 require_once(__DIR__.'/OAuth.php');
 require_once(__DIR__.'/updateptsposs.php');
+require_once(__DIR__.'/../lti/LTI_Grade_Update.php');
+
+/**
+ * Add a grade update to the LTI queue. This only can send updates, not deletes
+ * @param string  $sourcedid  a :|: separated string that contains the lti_sourcedid
+ *  as supplied by the LMS, the return URL, the key, and keytype
+ * @param string  $key       a unique key for the user/item.
+ *                        Assessments use "assessmentid-userid", so other
+ *                        types should use something different. Max 32 char.
+ * @param float  $grade     The grade to send, between 0 and 1
+ * @param boolean $sendnow   true to send in the next update, false (default)
+ *                          to send after the $CFG-set queuedelay.
+ */
+function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false) {
+	global $DBH, $CFG;
+
+	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
+
+	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon) ';
+	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon) ON DUPLICATE KEY UPDATE ';
+	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),failures=0 ';
+
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(
+		':hash' => $key,
+		':sourcedid' => $sourcedid,
+		':grade' => $grade,
+		':sendon' => (time() + ($sendnow?0:$LTIdelay))
+	));
+
+	return ($stm->rowCount()>0);
+}
+
+$aidtotalpossible = array();
+//use this if we don't know the total possible
+function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1) {
+	global $DBH, $aidtotalpossible;
+  if ($aidposs == -1) {
+    if (isset($aidtotalpossible[$aid])) {
+      $aidposs = $aidtotalpossible[$aid];
+    } else {
+  		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
+  		$stm->execute(array(':id'=>$aid));
+  		$line = $stm->fetch(PDO::FETCH_ASSOC);
+  		if ($line['ptsposs']==-1) {
+  			$line['ptsposs'] = updatePointsPossible($aid, $line['itemorder'], $line['defpoints']);
+  		}
+  		$aidposs = $line['ptsposs'];
+  	}
+  }
+	$allans = true;
+  if (is_array($scores)) {
+    // old assesses
+    $total = 0;
+  	for ($i =0; $i < count($scores);$i++) {
+  		if ($allans && strpos($scores[$i],'-1')!==FALSE) {
+  			$allans = false;
+  		}
+  		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
+  	}
+  } else {
+    // new assesses
+    $total = $scores;
+  }
+	$grade = min(1, max(0,$total/$aidposs));
+	$grade = number_format($grade,8);
+	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow);
+}
+
+//use this if we know the grade, or want to delete
+function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
+	global $CFG;
+
+	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
+		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
+		if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k
+			$logFile = fopen($logfilename, "w+");
+		} else {
+			$logFile = fopen($logfilename, "a+");
+		}
+		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$userid,$grade,$sourcedid\n");
+		fclose($logFile);
+	}
+	//if we're using the LTI message queue, and it's an update, queue it
+	if (isset($CFG['LTI']['usequeue']) && $action=='update') {
+		return addToLTIQueue($sourcedid, $aid.'-'.$uid, $grade, $sendnow);
+	}
+
+  $sourcedidparts = explode(':|:',$sourcedid);
+  if (substr($sourcedid,0,6) == 'LTI1.3') {
+    // is an LTI 1.3 grade item
+    $updater = new LTI_Grade_Update($GLOBALS['DBH']);
+    $ltiparts = explode(':|:',$sourcedid);
+    $token = $updater->get_access_token($ltiparts[3]);
+    if ($token === false ) { return false; }
+    return $updater->send_update($token,
+      $ltiparts[2], // lineitemurl
+      $action == 'delete' ? 0 : $grade, // score
+      $ltiparts[1], // ltiuserid
+      $action == 'delete' ? 'Initialized' : 'Submitted', // activityProgress
+      $action == 'delete' ? 'NotReady' : 'FullyGraded' // gradingProgress
+    );
+  } else {
+    updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade,$sendnow);
+  }
+}
+
+function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
+  global $DBH,$testsettings,$cid,$CFG,$userid;
+
+	//otherwise, send now
+	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
+
+	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
+		if (isset($_SESSION[$ltikey.'-'.$aid.'-secret'])) {
+			$secret = $_SESSION[$ltikey.'-'.$aid.'-secret'];
+		} else {
+			if ($keytype=='a') {
+				if (isset($testsettings) && isset($testsettings['ltisecret'])) {
+					$secret = $testsettings['ltisecret'];
+				} else {
+					$stm = $DBH->prepare("SELECT ltisecret FROM imas_assessments WHERE id=:id");
+					$stm->execute(array(':id'=>$aid));
+					if ($stm->rowCount()>0) {
+						$secret = $stm->fetchColumn(0);
+						$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
+					} else {
+						$secret = '';
+					}
+				}
+			} else if ($keytype=='c') {
+				/*if (!isset($testsettings)) {
+					$qr = "SELECT ltisecret FROM imas_courses WHERE id='$cid'"; //if from gb-viewasid
+				} else {
+					$qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
+				}*/
+				//change to use launched key rather than key from course in case someone uses material
+				//from multiple imathas courses in one LMS course.
+				$keyparts = explode('_',$ltikey);
+				$stm = $DBH->prepare("SELECT ltisecret FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$keyparts[1]));
+				if ($stm->rowCount()>0) {
+					$secret = $stm->fetchColumn(0);
+					$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
+				} else {
+					$secret = '';
+				}
+			} else {
+				if (isset($_SESSION['lti_origkey'])) {
+					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
+					$stm->execute(array(':SID'=>$_SESSION['lti_origkey']));
+				} else {
+					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
+					$stm->execute(array(':SID'=>$ltikey));
+				}
+				if ($stm->rowCount()>0) {
+					$secret = $stm->fetchColumn(0);
+					$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
+				} else {
+					$secret = '';
+				}
+			}
+		}
+		if ($secret != '') {
+			if ($action=='update') {
+				$grade = min(1, max(0,$grade));
+				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
+			} else if ($action=='delete') {
+				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+}
+
+
+// code is adapted from IMS-DEV sample code
+// on code.google.com/p/ims-dev
+
 /*
 function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consumer_secret, $content_type, $body)
 {
@@ -302,130 +484,6 @@ if (!function_exists("getpts")) {
 	}
 }
 
-$aidtotalpossible = array();
-//use this if we don't know the total possible
-function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1) {
-	global $DBH, $aidtotalpossible;
-  if ($aidposs == -1) {
-    if (isset($aidtotalpossible[$aid])) {
-      $aidposs = $aidtotalpossible[$aid];
-    } else {
-  		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
-  		$stm->execute(array(':id'=>$aid));
-  		$line = $stm->fetch(PDO::FETCH_ASSOC);
-  		if ($line['ptsposs']==-1) {
-  			$line['ptsposs'] = updatePointsPossible($aid, $line['itemorder'], $line['defpoints']);
-  		}
-  		$aidposs = $line['ptsposs'];
-  	}
-  }
-	$allans = true;
-  if (is_array($scores)) {
-    // old assesses
-    $total = 0;
-  	for ($i =0; $i < count($scores);$i++) {
-  		if ($allans && strpos($scores[$i],'-1')!==FALSE) {
-  			$allans = false;
-  		}
-  		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
-  	}
-  } else {
-    // new assesses
-    $total = $scores;
-  }
-	$grade = min(1, max(0,$total/$aidposs));
-	$grade = number_format($grade,8);
-	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow);
-}
-
-//use this if we know the grade, or want to delete
-function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
-	global $DBH,$testsettings,$cid,$CFG,$userid;
-
-	if (isset($CFG['LTI']['logupdate']) && $action=='update') {
-		$logfilename = __DIR__ . '/../admin/import/ltiupdate.log';
-		if (file_exists($logfilename) && filesize($logfilename)>100000) { //restart log if over 100k
-			$logFile = fopen($logfilename, "w+");
-		} else {
-			$logFile = fopen($logfilename, "a+");
-		}
-		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$userid,$grade,$sourcedid\n");
-		fclose($logFile);
-	}
-	//if we're using the LTI message queue, and it's an update, queue it
-	if (isset($CFG['LTI']['usequeue']) && $action=='update') {
-		return addToLTIQueue($sourcedid, $aid.'-'.$uid, $grade, $sendnow);
-	}
-
-	//otherwise, send now
-	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
-
-	if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
-		if (isset($_SESSION[$ltikey.'-'.$aid.'-secret'])) {
-			$secret = $_SESSION[$ltikey.'-'.$aid.'-secret'];
-		} else {
-			if ($keytype=='a') {
-				if (isset($testsettings) && isset($testsettings['ltisecret'])) {
-					$secret = $testsettings['ltisecret'];
-				} else {
-					$stm = $DBH->prepare("SELECT ltisecret FROM imas_assessments WHERE id=:id");
-					$stm->execute(array(':id'=>$aid));
-					if ($stm->rowCount()>0) {
-						$secret = $stm->fetchColumn(0);
-						$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
-					} else {
-						$secret = '';
-					}
-				}
-			} else if ($keytype=='c') {
-				/*if (!isset($testsettings)) {
-					$qr = "SELECT ltisecret FROM imas_courses WHERE id='$cid'"; //if from gb-viewasid
-				} else {
-					$qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
-				}*/
-				//change to use launched key rather than key from course in case someone uses material
-				//from multiple imathas courses in one LMS course.
-				$keyparts = explode('_',$ltikey);
-				$stm = $DBH->prepare("SELECT ltisecret FROM imas_courses WHERE id=:id");
-				$stm->execute(array(':id'=>$keyparts[1]));
-				if ($stm->rowCount()>0) {
-					$secret = $stm->fetchColumn(0);
-					$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
-				} else {
-					$secret = '';
-				}
-			} else {
-				if (isset($_SESSION['lti_origkey'])) {
-					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
-					$stm->execute(array(':SID'=>$_SESSION['lti_origkey']));
-				} else {
-					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
-					$stm->execute(array(':SID'=>$ltikey));
-				}
-				if ($stm->rowCount()>0) {
-					$secret = $stm->fetchColumn(0);
-					$_SESSION[$ltikey.'-'.$aid.'-secret'] = $secret;
-				} else {
-					$secret = '';
-				}
-			}
-		}
-		if ($secret != '') {
-			if ($action=='update') {
-				$grade = min(1, max(0,$grade));
-				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
-			} else if ($action=='delete') {
-				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	} else {
-		return false;
-	}
-}
 
 function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResponse=false) {
 
@@ -593,34 +651,5 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 }
 
 
-/**
- * Add a grade update to the LTI queue. This only can send updates, not deletes
- * @param string  $sourcedid  a :|: separated string that contains the lti_sourcedid
- *  as supplied by the LMS, the return URL, the key, and keytype
- * @param string  $key       a unique key for the user/item.
- *                        Assessments use "assessmentid-userid", so other
- *                        types should use something different. Max 32 char.
- * @param float  $grade     The grade to send, between 0 and 1
- * @param boolean $sendnow   true to send in the next update, false (default)
- *                          to send after the $CFG-set queuedelay.
- */
-function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false) {
-	global $DBH, $CFG;
 
-	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
-
-	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon) ';
-	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon) ON DUPLICATE KEY UPDATE ';
-	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),failures=0 ';
-
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(
-		':hash' => $key,
-		':sourcedid' => $sourcedid,
-		':grade' => $grade,
-		':sendon' => (time() + ($sendnow?0:$LTIdelay))
-	));
-
-	return ($stm->rowCount()>0);
-}
 ?>

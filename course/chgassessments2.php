@@ -16,7 +16,11 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Assessment Settings";
 $cid = Sanitize::courseId($_GET['cid']);
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Assessment Settings";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= _('Mass Change Assessment Settings');
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
