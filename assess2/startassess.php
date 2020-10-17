@@ -158,7 +158,7 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
         // now copy it to others
         $ph = Sanitize::generateQueryPlaceholders($rowgrpdata);
         $query = "REPLACE INTO imas_assessment_records (userid,lti_sourcedid,$fieldstocopy) ";
-        $query .= "VALUES (?,$ph)";
+        $query .= "VALUES (?,?,$ph)";
         $stm = $DBH->prepare($query);
         foreach ($available_new_members as $gm_uid) {
             if (is_array($sourcedids) && isset($sourcedids[$gm_uid])) {
