@@ -198,7 +198,7 @@ class AssessUtils
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         $platformid = substr($row['org'], 6); // strip off LTI13-
         $ltiuserid = [];
-        if (empty($_SESSION['lti_user_id']) || count($uids)>1) {
+        if (empty($_SESSION['lti_user_id']) || count($uids)>1 || $asArray) {
             $uidlist = implode(',', $uids);
             $stm = $DBH->prepare("SELECT userid,ltiuserid FROM imas_ltiusers WHERE userid in ($uidlist) AND org=?");
             $stm->execute(array($row['org']));
