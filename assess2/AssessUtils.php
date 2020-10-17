@@ -181,7 +181,7 @@ class AssessUtils
     return $outmsg;
   }
 
-  public static function formLTIsourcedId($uids, $aid) {
+  public static function formLTIsourcedId($uids, $aid, $asArray = false) {
     global $studentinfo, $DBH;  
     if (is_array($uids)) {
         $uids = array_map('intval', $uids);
@@ -217,7 +217,7 @@ class AssessUtils
             foreach ($ltiuserid as $uid=>$ltiuserid) {
                 $sourcedids[$uid] = 'LTI1.3:|:'.$ltiuserid.':|:'.$lineitemurl.':|:'.$platformid;
             }
-            if (count($uids)==1) {
+            if (count($uids)==1 || $asArray) {
                 return $sourcedids[$uids[0]];
             } else {
                 return $sourcedids;
