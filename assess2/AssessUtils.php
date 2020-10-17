@@ -181,12 +181,12 @@ class AssessUtils
     return $outmsg;
   }
 
-  public static function formLTIsourcedId($uid, $aid) {
+  public static function formLTIsourcedId($uids, $aid) {
     global $studentinfo, $DBH;  
-    if (is_array($uid)) {
-        $uid = array_map('intval', $uid);
+    if (is_array($uids)) {
+        $uids = array_map('intval', $uids);
     } else {
-        $uid = [intval($uid)];
+        $uids = [intval($uids)];
     }
     if (!empty($_SESSION['lti_lis_result_sourcedid'.$aid]) &&
         !empty($_SESSION['lti_outcomeurl'])
@@ -198,15 +198,15 @@ class AssessUtils
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         $platformid = substr($row['org'], 6); // strip off LTI13-
         $ltiuserid = [];
-        if (empty($_SESSION['lti_user_id']) || count($uid)>1) {
-            $uidlist = implode(',', $uid);
+        if (empty($_SESSION['lti_user_id']) || count($uids)>1) {
+            $uidlist = implode(',', $uids);
             $stm = $DBH->prepare("SELECT userid,ltiuserid FROM imas_ltiusers WHERE userid in ($uidlist) AND org=?");
             $stm->execute(array($row['org']));
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
                 $ltiuserid[$row[0]] = $row[1];
             }
         } else {
-            $ltiuserid = [$uid[0] => $_SESSION['lti_user_id']];
+            $ltiuserid = [$uids[0] => $_SESSION['lti_user_id']];
         }
         // look up lineitemurl
         $stm = $DBH->prepare('SELECT lineitem FROM imas_lti_lineitems WHERE itemtype=0 AND typeid=? AND lticourseid=?');
@@ -217,8 +217,8 @@ class AssessUtils
             foreach ($ltiuserid as $uid=>$ltiuserid) {
                 $sourcedids[$uid] = 'LTI1.3:|:'.$ltiuserid.':|:'.$lineitemurl.':|:'.$platformid;
             }
-            if (count($uid)==1) {
-                return $sourcedids[$uid[0]];
+            if (count($uids)==1) {
+                return $sourcedids[$uids[0]];
             } else {
                 return $sourcedids;
             }
