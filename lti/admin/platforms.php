@@ -29,8 +29,7 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
   !empty(trim($_POST[$lms.'_clientid'])) &&
   !empty(trim($_POST[$lms.'_keyseturl'])) &&
   !empty(trim($_POST[$lms.'_tokenurl'])) &&
-  !empty(trim($_POST[$lms.'_authurl'])) &&
-  !empty(trim($_POST[$lms.'_uniqid']))
+  !empty(trim($_POST[$lms.'_authurl']))
 ) {
   $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url,uniqid) VALUES (?,?,?,?,?,?)");
   $stm->execute(array(
