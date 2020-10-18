@@ -191,7 +191,7 @@ if (!$assess_record->hasRecord()) {
   // time to create a new record!
   if ($assess_info->getSetting('isgroup') > 0 && !$canViewAll && !empty($current_members)) {
     // creating for group
-    $lti_sourcedid = AssessUtils::formLTIsourcedId($current_members, $aid);
+    $lti_sourcedid = AssessUtils::formLTIsourcedId($current_members, $aid, true);
     $assess_record->createRecord($current_members, $stugroupid, true, $lti_sourcedid);
   } else {
     // creating for self
