@@ -157,10 +157,14 @@ class AssessStandalone {
             } 
         }
         $showans = true;
-        foreach ($this->state['scoreiscorrect'][$qn+1] as $pn=>$sc) {
-            if (empty($showansparts[$pn])) {
-                $showans = false;
-                break;
+        if (!is_array($this->state['scoreiscorrect'][$qn+1])) {
+            $showans = $showansparts[0];
+        } else {
+            foreach ($this->state['scoreiscorrect'][$qn+1] as $pn=>$sc) {
+                if (empty($showansparts[$pn])) {
+                    $showans = false;
+                    break;
+                }
             }
         }
       }
