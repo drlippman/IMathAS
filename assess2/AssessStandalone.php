@@ -136,6 +136,7 @@ class AssessStandalone {
 
     if (!empty($options['showallparts'])) {
       $seqPartDone = true;
+      $showans = true;
     } else {
       $seqPartDone = array();
       if (!empty($this->state['rawscores'][$qn])) {
@@ -150,18 +151,25 @@ class AssessStandalone {
                 $seqPartDone[$pn] = ($sc>.98);
             }
             if ($showansafter > 0 && 
-                $this->state['partattemptn'][$qn][$pn] >= $showansafter
+                ($this->state['partattemptn'][$qn][$pn] >= $showansafter || $sc>.98)
             ) {
                 $showansparts[$pn] = true;
+            } 
+        }
+        $showans = true;
+        foreach ($this->state['scoreiscorrect'][$qn+1] as $pn=>$sc) {
+            if (empty($showansparts[$pn])) {
+                $showans = false;
+                break;
             }
         }
       }
     }
 
-    $showans = !empty($this->getOpVal($options, 'showans', false));
+    $showans = !empty($this->getOpVal($options, 'showans', false)) || $showans;
     $showhints = $this->getOpVal($options, 'showhints', 3);
     $rawscores = $this->state['rawscores'][$qn];
-    
+
     if ($hidescoremarkers) {
         $rawscores = array();
     }
