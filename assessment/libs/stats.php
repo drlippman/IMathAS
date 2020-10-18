@@ -9,7 +9,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink","modes","forceonemode","dotplot");
+ "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv");
 
 //nCr(n,r)
 //The Choose function
@@ -1593,7 +1593,7 @@ function chi2cdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function chicdf($x,$a) {
@@ -1601,7 +1601,7 @@ function chicdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function invchicdf($cdf,$a) {
@@ -1722,8 +1722,8 @@ function invchi2cdf($cdf,$a) {
   return $x;
 }
 
-function gamma_cdf($x,$a,$b,$c) {
-	return gamma_inc($c,($x-$a)/$b);
+function gamma_cdf($x, $shape, $scale=1, $offset=0) {
+    return gamma_inc($shape, ($x-$offset)/$scale);
 }
 function gamma_inc($p,$x,$dec=4) {
 	$exp_arg_min = -88.0;
@@ -1937,6 +1937,62 @@ function gamma_log($x) {
 	  $res = $res + $x*($corr - 1.0);
   }
   return $res;
+}
+
+function gamma_inv($p,$a,$scale=1) {
+	//adapted from https://github.com/jstat/jstat/blob/65ce096a99f753d6a22482e5e74accbfc1c33767/src/special.js#L254
+    $a1 = $a - 1;
+	$EPS = 1e-8;
+	$gln = gamma_log($a);
+
+	if ($p >= 1) {
+		return $scale*max(100, $a + 100 * sqrt($a));
+	}
+	if ($p <= 0) {
+		return 0;
+	}
+	if ($a > 1) {
+		$lna1 = log($a1);
+		$afac = exp($a1 * ($lna1 - 1) - $gln);
+		$pp = ($p < 0.5) ? $p : (1 - $p);
+		$t = sqrt(-2 * log($pp));
+		$x = (2.30753 + $t * 0.27061) / (1 + $t * (0.99229 + $t * 0.04481)) - $t;
+		if ($p < 0.5) {
+            $x = -$x;
+        }
+		$x = max(1e-3, $a * pow(1 - 1 / (9 * $a) - $x / (3 * sqrt($a)), 3));
+	} else {
+		$t = 1 - $a * (0.253 + $a * 0.12);
+        if ($p < $t) {
+            $x = pow($p / $t, 1 / $a);
+        } else {
+            $x = 1 - log(1 - ($p - $t) / (1 - $t));
+        }
+    }
+
+	for($j=0; $j < 12; $j++) {
+		if ($x <= 0) {
+			return 0;
+        }
+        $err = gamma_inc($a, $x) - $p;
+		if ($a > 1) {
+			$t = $afac * exp(-($x - $a1) + $a1 * (log($x) - $lna1));
+		} else {
+			$t = exp(-$x + $a1 * log($x) - $gln);
+        }
+        if ($t==0) { 
+            break; 
+        }
+		$u = $err / $t;
+		$x -= ($t = $u / (1 - 0.5 * min(1, $u * (($a - 1) / $x - 1))));
+		if ($x <= 0) {
+			$x = 0.5 * ($x + $t);
+		}
+		if (abs($t) < $EPS * $x) {
+			break;
+		}
+	}
+	return $scale*$x;
 }
 
 //fcdf(f,df1,df2)
