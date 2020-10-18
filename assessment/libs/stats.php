@@ -1803,6 +1803,22 @@ function gamma_inc($p,$x,$dec=4) {
 }
 
 function gamma_log($x) {
+    // from jStat
+    $cof = [
+        76.18009172947146, -86.50532032941677, 24.01409824083091,
+        -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
+    ];
+    $ser = 1.000000000190015;
+    $y = $xx = $x;
+    $tmp = $x + 5.5;
+    $tmp -= ($xx + 0.5) * log($tmp);
+    for ($j=0; $j < 6; $j++) {
+        $ser += $cof[$j] / (++$y);
+    }
+    return log(2.5066282746310005 * $ser / $xx) - $tmp;
+}
+/*
+function gamma_log($x) {
  $c = array(
     -1.910444077728E-03,
      8.4171387781295E-04,
@@ -1938,6 +1954,7 @@ function gamma_log($x) {
   }
   return $res;
 }
+*/
 
 function gamma_inv($p,$a,$scale=1) {
 	//adapted from https://github.com/jstat/jstat/blob/65ce096a99f753d6a22482e5e74accbfc1c33767/src/special.js#L254
@@ -2003,8 +2020,10 @@ function fcdf($x,$df1,$df2) {
 	if (!is_finite($x) || !is_finite($df1) || !is_finite($df2) || $df1 < 1 || $df2 < 1 || $x < 0) {
 		echo 'Invalid input to fcdf';
 		return 0;
-	}
-	$p1 = fcall(fspin($x,$df1,$df2));
+    }
+    //$p1 = fcall(fspin($x,$df1,$df2));
+    $p1 = 1-jstat_ibeta($df1*$x/($df1*$x + $df2), $df1/2, $df2/2);
+
 	return $p1;
 }
 
@@ -2061,6 +2080,70 @@ function LJspin($q,$i,$j,$b) {
 		$k += 2;
 	}
 	return $z;
+}
+
+function jstat_ibeta($x, $a, $b) {
+   $bt = ($x === 0 || $x === 1) ?  0 :
+     (exp(gamma_log($a + $b) - gamma_log($a) -
+     gamma_log($b) + $a * log($x) + $b * log(1 - $x)));
+  if ($x < 0 || $x > 1) {
+    return false;
+  }
+  if ($x < ($a + 1) / ($a + $b + 2)) {
+    // Use continued fraction directly.
+    return $bt * jstat_betacf($x, $a, $b) / $a;
+  }
+  // else use continued fraction after making the symmetry transformation.
+  return 1 - $bt * jstat_betacf(1 - $x, $b, $a) / $b;
+}
+
+function jstat_betacf($x,$a,$b) {
+    $fpmin = 1e-30;
+    $qab = $a + $b;
+    $qap = $a + 1;
+    $qam = $a - 1;
+    $c = 1;
+    $d = 1 - $qab * $x / $qap;
+  
+    // These q's will be used in factors that occur in the coefficients
+    if (abs($d) < $fpmin) {
+      $d = $fpmin;
+    }
+    $d = 1 / $d;
+    $h = $d;
+  
+    for ($m=1; $m <= 100; $m++) {
+      $m2 = 2 * $m;
+      $aa = $m * ($b - $m) * $x / (($qam + $m2) * ($a + $m2));
+      // One step (the even one) of the recurrence
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $h *= $d * $c;
+      $aa = -($a + $m) * ($qab + $m) * $x / (($a + $m2) * ($qap + $m2));
+      // Next step of the recurrence (the odd one)
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $del = $d * $c;
+      $h *= $del;
+      if (abs($del - 1.0) < 3e-7) {
+        break;
+      }
+    }
+    return $h;  
 }
 
 //invfcdf(p,df1,df2)
