@@ -117,6 +117,11 @@ class AssessInfo
       $canuselatepass = false;
     }
 
+    // use time limit extension even if rest of exception isn't used
+    if ($this->exception !== false && $this->exception[6] != 0) {
+        $this->assessData['timeext'] = intval($this->exception[6]);
+    }
+
     if ($useexception) {
       if (empty($this->exception[3]) || $this->exception[2] > 0) {
         //if not LTI-set, or if LP used, show orig due date
@@ -133,7 +138,6 @@ class AssessInfo
       $this->assessData['startdate'] = intval($this->exception[0]);
       $this->assessData['enddate'] = intval($this->exception[1]);
       $this->assessData['enddate_in'] = $this->assessData['enddate'] - time() - 5;
-      $this->assessData['timeext'] = intval($this->exception[6]);
       $this->setAvailable();
     }
 

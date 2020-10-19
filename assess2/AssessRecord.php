@@ -1254,6 +1254,8 @@ class AssessRecord
     // mark extension as used
     $stm = $this->DBH->prepare("UPDATE imas_exceptions SET timeext=-1*timeext WHERE userid=? AND assessmentid=? AND itemtype='A'");
     $stm->execute(array($this->curUid, $this->curAid));
+    
+    $this->need_to_record = true;
   }
 
 
