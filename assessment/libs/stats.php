@@ -9,7 +9,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv");
+ "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv");
 
 //nCr(n,r)
 //The Choose function
@@ -2022,7 +2022,7 @@ function fcdf($x,$df1,$df2) {
 		return 0;
     }
     //$p1 = fcall(fspin($x,$df1,$df2));
-    $p1 = 1-jstat_ibeta($df1*$x/($df1*$x + $df2), $df1/2, $df2/2);
+    $p1 = 1-beta_cdf($df1*$x/($df1*$x + $df2), $df1/2, $df2/2);
 
 	return $p1;
 }
@@ -2082,19 +2082,85 @@ function LJspin($q,$i,$j,$b) {
 	return $z;
 }
 
-function jstat_ibeta($x, $a, $b) {
-   $bt = ($x === 0 || $x === 1) ?  0 :
+function beta_cdf($x, $a, $b) {
+    // based on jStat.ibeta
+    if ($x > 1) { 
+        return 1;
+    } else if ($x < 0) { 
+        return 0;
+    }
+    $bt = ($x === 0 || $x === 1) ?  0 :
      (exp(gamma_log($a + $b) - gamma_log($a) -
      gamma_log($b) + $a * log($x) + $b * log(1 - $x)));
-  if ($x < 0 || $x > 1) {
-    return false;
-  }
-  if ($x < ($a + 1) / ($a + $b + 2)) {
-    // Use continued fraction directly.
-    return $bt * jstat_betacf($x, $a, $b) / $a;
-  }
-  // else use continued fraction after making the symmetry transformation.
-  return 1 - $bt * jstat_betacf(1 - $x, $b, $a) / $b;
+    if ($x < 0 || $x > 1) {
+        return false;
+    }
+    if ($x < ($a + 1) / ($a + $b + 2)) {
+        // Use continued fraction directly.
+        return $bt * jstat_betacf($x, $a, $b) / $a;
+    }
+    // else use continued fraction after making the symmetry transformation.
+    return 1 - $bt * jstat_betacf(1 - $x, $b, $a) / $b;
+}
+
+function beta_inv($p, $a, $b) {
+    // based on jStat.ibetainv
+    $st = microtime(true);
+    $EPS = 1e-8;
+    $a1 = $a - 1;
+    $b1 = $b - 1;
+
+    if ($p <= 0) {
+        return 0;
+    }
+    if ($p >= 1) {
+        return 1;
+    }
+    if ($a >= 1 && $b >= 1) {
+        $pp = ($p < 0.5) ? $p : (1 - $p);
+        $t = sqrt(-2 * log($pp));
+        $x = (2.30753 + $t * 0.27061) / (1 + $t* (0.99229 + $t * 0.04481)) - $t;
+        if ($p < 0.5) {
+            $x = -$x;
+        }
+        $al = ($x * $x - 3) / 6;
+        $h = 2 / (1 / (2 * $a - 1)  + 1 / (2 * $b - 1));
+        $w = ($x * sqrt($al + $h) / $h) - (1 / (2 * $b - 1) - 1 / (2 * $a - 1)) *
+            ($al + 5 / 6 - 2 / (3 * $h));
+        $x = $a / ($a + $b * exp(2 * $w));
+    } else {
+        $lna = log($a / ($a + $b));
+        $lnb = log($b / ($a + $b));
+        $t = exp($a * $lna) / $a;
+        $u = exp($b * $lnb) / $b;
+        $w = $t + $u;
+        if ($p < $t / $w) {
+            $x = pow($a * $w * $p, 1 / $a);
+        }
+        else {
+            $x = 1 - pow($b * $w * (1 - $p), 1 / $b);
+        }
+    }
+    $afac = -gamma_log($a) - gamma_log($b) + gamma_log($a + $b);
+    for ($j=0; $j < 10; $j++) {
+        if ($x < 1e-10 || $x === 1) {
+            return round($x,10);
+        }
+        $err = beta_cdf($x, $a, $b) - $p;
+        $t = exp($a1 * log($x) + $b1 * log(1 - $x) + $afac);
+        $u = $err / $t;
+        $x -= ($t = $u / (1 - 0.5 * min(1, $u * ($a1 / $x - $b1 / (1 - $x)))));
+        if ($x <= 0) {
+            $x = 0.5 * ($x + $t);
+        }
+        if ($x >= 1) {
+            $x = 0.5 * ($x + $t + 1);
+        }
+        if (abs($t) < ($EPS * $x) && $j > 0) {
+            break;
+        }
+    }
+    return round($x,10);
 }
 
 function jstat_betacf($x,$a,$b) {
