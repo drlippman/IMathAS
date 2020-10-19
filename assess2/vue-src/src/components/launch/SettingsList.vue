@@ -133,7 +133,7 @@ export default {
       }
 
       const nextAttempt = settings.prev_attempts.length + 1;
-      if (nextAttempt > settings.retake_penalty.n) {
+      if (nextAttempt > settings.retake_penalty.n && settings.retake_penalty.penalty > 0) {
         const penalty = settings.retake_penalty.penalty * (nextAttempt - settings.retake_penalty.n);
         alertstr = this.$t('setlist.retake_penalty', { p: penalty });
       }
@@ -150,31 +150,37 @@ export default {
       var timeobj = {
         icon: 'timer'
       };
-      var mytime = settings.timelimit * settings.timelimit_multiplier;
-      if (settings.overtime_grace > 0) {
-        timeobj.str = this.$t('setlist.timelimit_wgrace', {
-          time: this.formatTimeLimit(mytime),
-          grace: this.formatTimeLimit(settings.overtime_grace * settings.timelimit_multiplier),
-          penalty: settings.overtime_penalty
+      if (settings.has_active_attempt && settings.timelimit_ext && settings.timelimit_ext < 0) {
+        timeobj.str = this.$t('setlist.timelimit_ext_used', {
+          n: Math.abs(settings.timelimit_ext)
         });
       } else {
-        timeobj.str = this.$t('setlist.timelimit', { time: this.formatTimeLimit(mytime) });
-      }
-      if (store.timelimit_restricted === 1) { // time limit restricted
-        timeobj.altstr = this.$t('setlist.timelimit_restricted', {
-          due: settings.enddate_disp
-        });
-      } else if (store.timelimit_restricted === 2) { // grace restricted
-        timeobj.altstr = this.$t('setlist.timelimit_wgrace_restricted', {
-          time: this.formatTimeLimit(mytime),
-          due: settings.enddate_disp,
-          penalty: settings.overtime_penalty
-        });
-      }
-      if (settings.timelimit_multiplier > 1) {
-        timeobj.sub = this.$t('setlist.timelimit_extend', {
-          time: this.formatTimeLimit(settings.timelimit)
-        });
+        var mytime = settings.timelimit * settings.timelimit_multiplier;
+        if (settings.overtime_grace > 0) {
+          timeobj.str = this.$t('setlist.timelimit_wgrace', {
+            time: this.formatTimeLimit(mytime),
+            grace: this.formatTimeLimit(settings.overtime_grace * settings.timelimit_multiplier),
+            penalty: settings.overtime_penalty
+          });
+        } else {
+          timeobj.str = this.$t('setlist.timelimit', { time: this.formatTimeLimit(mytime) });
+        }
+        if (store.timelimit_restricted === 1) { // time limit restricted
+          timeobj.altstr = this.$t('setlist.timelimit_restricted', {
+            due: settings.enddate_disp
+          });
+        } else if (store.timelimit_restricted === 2) { // grace restricted
+          timeobj.altstr = this.$t('setlist.timelimit_wgrace_restricted', {
+            time: this.formatTimeLimit(mytime),
+            due: settings.enddate_disp,
+            penalty: settings.overtime_penalty
+          });
+        }
+        if (settings.timelimit_multiplier > 1) {
+          timeobj.sub = this.$t('setlist.timelimit_extend', {
+            time: this.formatTimeLimit(settings.timelimit)
+          });
+        }
       }
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
@@ -195,7 +201,7 @@ export default {
             grace: settings.timelimit_grace_disp
           });
         } else if (settings.timelimit_ext && settings.timelimit_ext > 0) {
-          timeobj.alert = this.$t('setlist.timelimit_ext', { n: settings.timelimit_ext });
+          timeobj.str = this.$t('setlist.timelimit_ext', { n: settings.timelimit_ext });
         }
       } else if (settings.timelimit_ext && settings.timelimit_ext > 0) {
         timeobj.alert = this.$t('setlist.timelimit_ext', { n: settings.timelimit_ext });

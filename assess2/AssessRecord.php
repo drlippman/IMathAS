@@ -1225,6 +1225,11 @@ class AssessRecord
     }
     $enddate = $this->assess_info->getSetting('enddate');
     if ($this->assess_info->getSetting('timelimit_type') == 'allow_overtime') {
+      // check if extension has been applied
+      $lastvernum = count($this->data['assess_versions']) - 1;
+      if (!empty($this->data['assess_versions'][$lastvernum]['timelimit_ext'])) {
+          return $exp; // use timelimit; no grace
+      }
       $returnVal = $exp + $this->assess_info->getAdjustedTimelimitGrace();
       if ($returnVal > $enddate) {
         $returnVal = $enddate;
@@ -1254,7 +1259,7 @@ class AssessRecord
     // mark extension as used
     $stm = $this->DBH->prepare("UPDATE imas_exceptions SET timeext=-1*timeext WHERE userid=? AND assessmentid=? AND itemtype='A'");
     $stm->execute(array($this->curUid, $this->curAid));
-    
+
     $this->need_to_record = true;
   }
 
