@@ -40,7 +40,8 @@ if (isset($_POST['go'])) {
 		$assess_record->setRecord($row);
 		$assess_record->setTeacherInGb(true);
 		// do the rescore
-		$assess_record->regradeQuestion($qid, $trytouse);
+        $assess_record->regradeQuestion($qid, $trytouse);
+        $assess_record->updateLTIscore();
 		$assess_record->saveRecord();
 	}
 	$DBH->commit();
