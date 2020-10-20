@@ -3008,22 +3008,28 @@ function cleanbytoken($str,$funcs = array()) {
     //print_r($tokens);
     $out = array();
     $lasti = count($tokens)-1;
-    $grplasti = $lasti;
+    $grplasti = -2;
     for ($i=0; $i<=$lasti; $i++) {
         $token = $tokens[$i];
         $lastout = count($out)-1;
-        $grplasti = $lasti;
         if ($i>0 && $tokens[$i-1][1]==12) {// following a separator
             $lastout = -1;
         }
-        if ($i < $lasti && $tokens[$i+1][1]==12) { // followed by a separator
-            $grplasti = $i;
+        if ($grplasti < $i-1) { // find next separator
+            $grplasti = $lasti;
+            for ($j=$i; $j<=$lasti;$j++) {
+                if ($tokens[$j][1]==12) {
+                    $grplasti = $j-1;
+                    break;
+                }
+            }
         }
+
         if ($token[1]==12) { // separator
             if ($out[0]=='+') {
                 array_shift($out);
             }
-            if (count($out)==0 && $lastout>-1) {
+            if (count($out)==0 && $i>0) {
                 $finalout[] = '0';
             } else {
                 $finalout[] = implode('',$out);
@@ -3136,7 +3142,7 @@ function cleanbytoken($str,$funcs = array()) {
     if ($out[0]=='+') {
         array_shift($out);
     }
-    if (count($out)==0) {
+    if (count($out)==0 && $lastout == -1) {
         $finalout[] = '0';
     } else {
         $finalout[] = implode('',$out);
