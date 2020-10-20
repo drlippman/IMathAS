@@ -43,34 +43,39 @@
     <br /><br />
   Both formatting functions format2pol and format2std can be used for displaying answers ($showanswer) as well as the answer itself. If they are to be used as the answer, calculated complex question-type accepts both formats with $answerformat = "sloppycomplex" for the polar form.</p>
 <p>&nbsp;</p>
-<p><a name="arg"></a><strong>cx_arg</strong>(num, [argin = "rad"])</p>
+<p><a name="arg"></a><strong>cx_arg</strong>(num, [argin = "rad", roundto = 12])</p>
 <p>Function: cx_arg returns the argument (angle theta) of a complex number.</p>
 <p><em>&nbsp;Parameters:</em></p>
 <ul>
   <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).</li>
   <li><strong>argin</strong>: Optional - Unit for the argument; default is "rad" for radian. For argument in degree, argin should be set to "deg".</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
 
 </ul>
 <p>&nbsp;<em>Returns:</em></p>
 <p>The agument of a complex number in radian (or degree) as a float.</p>
 <p>&nbsp;</p>
 
-<p><a name="modul"></a><strong>cx_modul</strong>(num)</p>
+<p><a name="modul"></a><strong>cx_modul</strong>(num, [roundto = 12])</p>
 <p>Function cx_modul returns the modulus (absolute value) of a complex number, which is sqrt(Re^2 + Im^2).</p>
 <p><em>Parameters:</em></p>
 <ul>
     <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).</li>
-</ul>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
 <p><em>Returns:</em></p>
 <p>The modulus of a complex number as a float.</p>
 <p>&nbsp;</p>
 
-<p><a name="conj"></a><strong>cx_conj</strong>(num)</p>
+<p><a name="conj"></a><strong>cx_conj</strong>(num, [roundto = 12])</p>
 <p>Function cx_conj returns the conjugate of a complex number; the conjugate of (a+bi) is (a-bi).</p>
 <p><em>Parameters:</em></p>
 <ul>
     <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).</li>
-</ul>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
 <p>&nbsp;<em>Returns:</em></p>
 <p>The conjugate of a complex number in an array (same format as the input).</p>
 <p>&nbsp;</p>
@@ -112,63 +117,75 @@
 <p>The polar form with the Euler's formula notation with angle in radian.</p>
 <p>&nbsp;</p>
 
-<p><a name="add"><strong>cx_add</strong>(num)</p>
+<p><a name="add"><strong>cx_add</strong>(num, [roundto = 12])</p>
 <p>Function cx_add returns the sum of input complex numbers in standard form as a paired value in an array.</p>
 <p>&nbsp;<em>Parameters:</em></p>
 <ul>
     <li><strong>num</strong>: An array of real and imaginary parts of complex numbers given as paired values in square brackets. For example, to add 2-3i, -5i, and sqrt(2)-i, num = array([2,-3], [0,-5], [sqrt(2),-1]).</li>
-</ul>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
 <p>&nbsp;<em>Returns:</em></p>
 <p>The real and imaginary parts of the sum as a paired value in an array: array([Re, Im]).</p>
 <p>&nbsp;</p>
 
-<p><a name="sub"><strong>cx_sub</strong>(num)</p>
+<p><a name="sub"><strong>cx_sub</strong>(num, [roundto = 12])</p>
 <p>Function cx_sub returns the difference of input complex numbers in standard form as a paired value in an array.</p>
 <p>&nbsp;<em>Parameters:</em></p>
 <ul>
     <li><strong>num</strong>: An array of real and imaginary parts of complex numbers given as paired values in square brackets. For example, to subtract -5i, and sqrt(2)-i from 2-3i, num = array([2,-3], [0,-5], [sqrt(2),-1]).</li>
-</ul>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
 <p>&nbsp;<em>Returns:</em></p>
 <p>The real and imaginary parts of the difference as a paired value in an array: array([Re, Im]).</p>
 <p>&nbsp;</p>
 
-<p><a name="div"><strong>cx_div</strong>(num)</p>
+<p><a name="div"><strong>cx_div</strong>(num, [roundto = 12])</p>
 <p>Function cx_div returns the quotient of two complex numbers in standard form as a paired values in an array.</p>
 <p><em>&nbsp;Parameters:</em></p>
 <ul>
   <li><strong>num</strong>: An array of real and imaginary parts of two complex numbers (dividend, divisor) given as paired values in square brackets. For example, to divide 2-3i by sqrt(2)-i, num = array([2,-3], [sqrt(2),-1]).</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
 </ul>
 <p>&nbsp;<em>Returns:</em></p>
 <p>The quotient of two complex numbers in standard form as a paired values in an array: array([Re, Im]).</p>
 <p>&nbsp;</p>
 
-<p><a name="mul"><strong>cx_mul</strong>(num)</p>
+<p><a name="mul"><strong>cx_mul</strong>(num, [roundto = 12])</p>
 <p>Function cx_mul returns the product of input complex numbers in standard form as a paired value in an array.</p>
 <p>&nbsp;<em>Parameters:</em></p>
 <ul>
   <li><strong>num</strong>: An array of real and imaginary parts of complex numbers given as paired values in square brackets. For example, to multiply 2-3i, -5i, and sqrt(2)-i, num = array([2,-3], [0,-5], [sqrt(2),-1]).</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
 </ul>
 <p>&nbsp;<em>Returns:</em></p>
 <p>The real and imaginary parts of the product as a paired value in an array: array([Re, Im]).</p>
 <p>&nbsp;</p>
 
-<p><a name="pow"></a><strong>cx_pow</strong>(num, exp)</p>
+<p><a name="pow"></a><strong>cx_pow</strong>(num, exp, [roundto = 12])</p>
 <p>Function cx_pow returns the power of a complex number in standard form as a paired value in an array.</p>
 <p><em>Parameters:</em></p>
 <ul>
   <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).</li>
   <li><strong>exp</strong>: exponent to which the complex number is raised.</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
 </ul>
 <p><em>&nbsp;Returns:</em></p>
 <p>The real and imaginary parts of the power as a paired value in an array: array([Re, Im]).</p>
 <p>&nbsp;</p>
 
-<p><a name="root"></a><strong>cx_root</strong>(num, n)</p>
+<p><a name="root"></a><strong>cx_root</strong>(num, n, [roundto = 12])</p>
 <p>Function cx_root returns an array of a paired value of real and imaginary parts of the nth roots.</p>
 <p><em>Parameters:</em></p>
 <ul>
   <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).</li>
   <li><strong>n</strong>: The nth roots. For example, for the cubic roots n=3.</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
 </ul>
 <p><em>&nbsp;Returns:</em></p>
 <p>An array of a paired value of real and imaginary parts of the nth roots: array([Re1, Im1], [Re2, Im2], ...)</p>

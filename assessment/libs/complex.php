@@ -23,37 +23,41 @@ array_push($allowedmacros,"cx_add","cx_arg", "cx_conj", "cx_div", "cx_format2pol
 
 
 //--------------------------------------------Modulus----------------------------------------------------
-// Function: cx_modul(num)
+// Function: cx_modul(num, [roundto = 12])
 // Returns the modulus (absolute value) of a complex number, which is sqrt(Re^2 + Im^2). 
 //
 // Parameters:
 // num: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).
-// 
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
+//
 // Returns:
 // The modulus of a complex number as a float. 
 
 
-function cx_modul(array $num) {
+function cx_modul(array $num, int $roundto=12) {
     if (count($num)!=1) { echo "cx_modul expects 1 complex number as an input"; return "";}
     
     $sq=$num[0][0]**2+$num[0][1]**2;
-    $r= sqrt($sq);
+    $r= round(sqrt($sq),$roundto);
    
     return $r;
 }
 
 //---------------------------------------------Argument (theta)---------------------------------------------
-// Function: cx_arg(num, [argin = "rad"])
+// Function: cx_arg(num, [argin = "rad", roundto = 12])
 // Returns the argument (angle theta) of a complex number in radian. 
 //
 // Parameters:
 // num: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).
 // argin: Optional - Unit for the argument; default is "rad" for radian. For argument in degree, argin = "deg".
-// 
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
+//
 // Returns:
 // The agument of a complex number in radian (or degree) as a float. 
 
-function cx_arg(array $num, string $argin="rad") {
+function cx_arg(array $num, string $argin="rad", int $roundto=12) {
     if (count($num)!=1) { echo "cx_arg expects 1 complex number as an input"; return "";}
     
     $re=$num[0][0];
@@ -80,28 +84,30 @@ function cx_arg(array $num, string $argin="rad") {
             $th2=$theta;
         }
    
-    return $th2;
+    return round($th2, $roundto);
 }
 
 
 
 //-------------------------------------------------Conjugate----------------------------------------------
-// Function: cx_conj(num)
+// Function: cx_conj(num, [roundto = 12])
 // Returns the conjugate of a complex number: conjugate of (a+bi)-->(a-bi)
 //
 // Parameters:
 // num: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
 //
 // Returns:
 // The conjugate of a complex number in an array (same format as the input).
 
-function cx_conj(array $num) {
+function cx_conj(array $num, int $roundto=12) {
     if (count($num)!=1) { echo "cx_conj expects 1 complex number as an input"; return "";}
     
     $re=$num[0][0];
     $im=$num[0][1];
     $im2=-$im;
-    $st= array([$re,$im2]); 
+    $st= array([round($re, $roundto),round($im2, $roundto)]); 
    
    return $st;
 }
@@ -114,7 +120,7 @@ function cx_conj(array $num) {
 // num: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).
 // argin: Optional - Unit for the argument; default is "rad" for radian. For argument in degree, argin = "deg".
 // roundto: Optional - number of decimal places to which values should be rounded off; 
-//          default is 3 decimal places.
+//          default is 12 decimal places.
 //
 // Returns:
 // The modulus and the argument of a complex number as a paired value in an array: array([mod, arg]).
@@ -194,17 +200,19 @@ function cx_pol2std(array $num, string $argin="rad", int $roundto= 12) {
 }
 
 //---------------------------------------------Complex Addition----------------------------------------
-// Function: cx_add(num)
+// Function: cx_add(num, [roundto=12])
 // Returns the sum of input complex numbers in standard form as a paired value in an array. 
 // 
 // Parameters:
 // num: An array of real and imaginary parts of complex numbers given as paired values in square brackets.
 //       For example, to add 2-3i, -5i, and sqrt(2)-i, num = array([2,-3], [0,-5], [sqrt(2),-1]).
-// 
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
+//
 // Returns:
 // The real and imaginary parts of the sum as a paired value in an array: array([Re, Im]).
 
-function cx_add(array $num) {
+function cx_add(array $num, int $roundto=12) {
     
     $ret=0;
     $imt=0;
@@ -218,23 +226,25 @@ function cx_add(array $num) {
         $imt+= $im;
     }
 
-    $st= array([$ret , $imt]);    
+    $st= array([round($ret,$roundto) , round($imt,$roundto)]);    
         
     return $st;
 }
 
 //---------------------------------------------Complex Subtraction----------------------------------------
-// Function: cx_sub(num)
+// Function: cx_sub(num, [roundto = 12])
 // Returns the difference of input complex numbers in standard form as a paired value in an array. 
 // 
 // Parameters:
 // num: An array of real and imaginary parts of complex numbers given as paired values in square brackets.
 //       For example, to subtract -5i, and sqrt(2)-i from 2-3i, num = array([2,-3], [0,-5], [sqrt(2),-1]).
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
 // 
 // Returns:
 // The real and imaginary parts of the difference as a paired value in an array: array([Re, Im]).
 
-function cx_sub(array $num) {
+function cx_sub(array $num, int $roundto=12) {
     
     $ret=0;
     $imt=0;
@@ -249,23 +259,25 @@ function cx_sub(array $num) {
     }
     $re=$num[0][0]-$ret;
     $im=$num[0][1]-$imt;
-    $st= array([$re , $im]);    
+    $st= array([round($re,$roundto) , round($im,$roundto)]);    
         
     return $st;
 }
 
 //---------------------------------------------Complex multiplication----------------------------------------
-// Function: cx_mul(num)
+// Function: cx_mul(num, [roundto = 12])
 // Returns the product of input complex numbers in standard form as a paired value in an array. 
 // 
 // Parameters:
 // num: An array of real and imaginary parts of complex numbers given as paired values in square brackets.
 //       For example, to multiply 2-3i, -5i, and sqrt(2)-i, num = array([2,-3], [0,-5], [sqrt(2),-1]).
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
 // 
 // Returns:
 // The real and imaginary parts of the product as a paired value in an array: array([Re, Im]).
 
-function cx_mul(array $num) {
+function cx_mul(array $num, int $roundto=12) {
     
     $rt=1;
     $tht=0;
@@ -299,23 +311,25 @@ function cx_mul(array $num) {
     $re_p=$rt*cos($tht);
     $im_p=$rt*sin($tht); 
     
-    $st= array([$re_p , $im_p]);    
+    $st= array([round($re_p, $roundto) , round($im_p,$roundto)]);    
         
     return $st;
 }
 
 //-------------------------------------------------Complex power--------------------------------------------
-// Function: cx_pow(num, exp)
+// Function: cx_pow(num, exp, [roundto=12])
 // Returns the power of a complex number in standard form as a paired value in an array. 
 //
 // Parameters:
 // num: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).
 // exp: exponent to which the complex number is raised.
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
 // 
 // Returns:
 // The real and imaginary parts of the power as a paired value in an array: array([Re, Im]).
 
-function cx_pow(array $num, $pow) {
+function cx_pow(array $num, $pow, int $roundto=12) {
     if (count($num)!=1) { echo "cx_pow expects 1 complex number as an input"; return "";}
     $r1= cx_modul($num);
     $th1=cx_arg($num);
@@ -325,23 +339,25 @@ function cx_pow(array $num, $pow) {
     $re=$r*cos($tht);
     $im=$r*sin($tht);  
         
-    $st= array([$re , $im]);   
+    $st= array([round($re,$roundto) , round($im,$roundto)]);   
         
     return $st;
 }
 
 //-----------------------------------------------Complex nth Roots--------------------------------------------
-// Function: cx_root(num, n)
+// Function: cx_root(num, n, [roundto=12])
 // Returns an array of the nth roots of a complex number in standard form.  
 //
 // Parameters:
 // num: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im]).
 // n: The nth root. For example, for the cubic roots n=3.
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
 // 
 // Returns:
 // An array of a paired value of real and imaginary parts of the nth roots. 
 
-function cx_root(array $num,int $root) {
+function cx_root(array $num, int $root, int $roundto=12) {
     if (count($num)!=1) { echo "cx_root expects 1 complex number as an input"; return "";}
     $r1= cx_modul($num);
     $th1= cx_arg($num);
@@ -353,24 +369,26 @@ function cx_root(array $num,int $root) {
         $tht=$th1+2*pi()*$k/$root;
         $re_f=$r*cos($tht);
         $im_f=$r*sin($tht);
-        $A[$k]=[$re_f , $im_f];
+        $A[$k]=[round($re_f,$roundto) , round($im_f,$roundto)];
     }
     return $A;
 }
     
 
 //-------------------------------------------------Complex division-----------------------------------------
-// Function: cx_div(num)
+// Function: cx_div(num, [roundto=12])
 // Returns the quotient of two complex numbers in standard form as a paired values in an array. 
 // 
 // Parameters:
 // num: An array of real and imaginary parts of two complex numbers (dividend, divisor) given as paired values
 //      in square brackets. For example, to divide 2-3i by sqrt(2)-i, num = array([2,-3], [sqrt(2),-1]). 
+// roundto: Optional - number of decimal places to which values should be rounded off; 
+//          default is 12 decimal places.
 // 
 // Returns:
 // The quotient of two complex numbers in standard form as a paired values in an array.
 
-function cx_div(array $num) {
+function cx_div(array $num, int $roundto=12) {
     if (count($num)!=2) { echo "cx_Div expects 2 complex numbers"; return "";}
     $rt=1;
     $tht=0;
@@ -390,7 +408,7 @@ function cx_div(array $num) {
     $re=$r*cos($tht);
     $im=$r*sin($tht);  
         
-    $st= array([$re , $im]);     
+    $st= array([round($re,$roundto) , round($im,$roundto)]);     
         
     return $st;
 }
@@ -473,7 +491,7 @@ function cx_format2std(array $num,int $roundto=3) {
 // num: An array of real and imaginary parts of complex numbers given in square brackets: num = array([Re, Im]).
 //      num array can include more than one complex number. 
 // argin: Optional - Unit for the argument; default is "deg" for degree. For argument in radian, argin = "rad".
-//// roundto: Optional - number of decimal places to which modulus should be rounded off; 
+// roundto: Optional - number of decimal places to which modulus should be rounded off; 
 //          default is 3 decimal places. 
 // Returns:
 // A complex number in standard form as a string. If num has more than one complex number, the function returns
