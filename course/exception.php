@@ -69,26 +69,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
-	$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
-	$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
 
 	if (isset($_POST['sdate'])) {
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
-		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+        $enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+        $waivereqscore = (isset($_POST['waivereqscore']))?1:0;
+        $epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
+        $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
 
 		//check if exception already exists
 		$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
-			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty WHERE id=:id");
-			$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':id'=>$row[0]));
+			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty,timeext=:timeext WHERE id=:id");
+			$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext, ':id'=>$row[0]));
 		} else {
-			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty) VALUES ";
-			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty)";
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext) VALUES ";
+			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :timeext)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty));
+				':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext));
 		}
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
@@ -179,7 +180,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$aVer = $row[3];
 
 		//check if exception already exists
-		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty,timeext FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>Sanitize::onlyInt($_GET['aid'])));
 		$erow = $stm->fetch(PDO::FETCH_NUM);
 		$page_isExceptionMsg = "";
@@ -192,7 +193,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stime = tzdate("g:i a",$erow[1]);
 			$etime = tzdate("g:i a",$erow[2]);
 			$curwaive = $erow[3];
-			$curepenalty = $erow[4];
+            $curepenalty = $erow[4];
+            $timeext = $erow[5];
 		}
 		if ($isDateByLTI) {
 			$page_isExceptionMsg .= '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
@@ -280,8 +282,19 @@ if ($aVer == 1) { // only allow this option for old assess UI for now. TODO
 		<span class="form"><input type="checkbox" name="waivereqscore" <?php if ($curwaive==1) echo 'checked="checked"';?>/></span>
 		<span class="formright">Waive "show based on an another assessment" requirements, if applicable.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="overridepenalty" <?php if ($curepenalty!==null) echo 'checked="checked"';?>/></span>
-		<span class="formright">Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="<?php echo ($curepenalty===null)?0:Sanitize::onlyFloat($curepenalty);?>"/>% for questions done while in exception.
-		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
+		<span class="formright">Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="<?php echo ($curepenalty===null)?0:Sanitize::onlyFloat($curepenalty);?>"/>% for questions done while in exception.</span><br class="form"/>
+<?php
+if ($aVer > 1) { // only for new assess
+?>
+        <span class="form"><input type="checkbox" name="timelimitext" <?php if ($timeext > 0) echo 'checked';?>/></span>
+        <span class=formright>If time limit is expired, allow an additional <input size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> additional minutes
+          <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span>
+        </span><br class=form>
+
+<?php
+}
+?>
+        <div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 
 <?php

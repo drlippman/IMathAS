@@ -442,7 +442,9 @@
     "hide_excused": "Hide Auto-Excused",
     "excused_list": "Based on the results of this assessment, the following assessments have been excused:",
     "show_endmsg": "Show End Message",
-    "hide_endmsg": "Hide End Message"
+    "hide_endmsg": "Hide End Message",
+    "has_timeext": "Has a {n} minute time limit extension available",
+    "used_timeext": "Used a {n} minute time limit extension"
   },
   "work": {
     "add": "Add Work",

@@ -134,9 +134,13 @@ $include_from_assess_info = array(
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
 if ($isstudent && $viewInGb == 'after_due' && $now < $assessInfoOut['enddate']) {
-  echo '{"error": "no_access"}';
+  echo '{"error": "not_ready"}';
   exit;
 }
+if ($isstudent && $now < $assessInfoOut['enddate'] && $assess_info->getSetting('timeext')>0) {
+    echo '{"error": "not_ready"}';
+    exit;
+  }
 
 if ($isstudent) {
   $LPblockingView = true;
@@ -195,6 +199,10 @@ $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
+}
+// get time limit extension info 
+if ($assessInfoOut['timelimit'] > 0 && !empty($assess_info->getSetting('timeext'))) {
+    $assessInfoOut['timelimit_ext'] = $assess_info->getSetting('timeext');
 }
 
 // if not available, see if there is an unsubmitted scored attempt
