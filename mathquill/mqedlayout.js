@@ -549,7 +549,7 @@ var myMQeditor = (function($) {
       baselayout.tabs[0].tabcontent.unshift({
         flow: 'row',
         s: 1,
-        contents: [{b:'i'}]
+        contents: [{b:'i', v:1}]
       }, {s:.1});
     } else if (calcformat.match(/vector/)) {
       baselayout.tabs[0].tabcontent.unshift({
@@ -593,7 +593,11 @@ var myMQeditor = (function($) {
         maxlen = vars[i].length;
       }
       vars[i] = vars[i].replace(/_(\w{2,})/,"_{$1}");
-      btns.push({'b':vars[i], c:'w'});
+      if (vars[i].length == 1) {
+        btns.push({'b':vars[i], c:'w', v:1});
+      } else {
+        btns.push({'b':vars[i], c:'w', r:1});
+      }
     }
     var perrow = Math.min(8,Math.max(4, Math.ceil(vars.length/4)));
     if (vars.length%perrow !== 0) {

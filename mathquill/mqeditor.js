@@ -523,8 +523,17 @@ var MQeditor = (function($) {
       cmdtype = 'c';
       cmdval = btn.l.substring(1);
     } else if (btn.b) { // rendered text button
-      btnel.className = "mqed-btn mq-math-mode";
-      btnel.innerHTML = '<span class="mq-root-block"><span>'+btn.b+'</span></span>';
+      if (btn.r) {
+          btnel.className = "mqed-btn rend";
+          btnel.innerHTML = btn.b;
+      } else {
+        btnel.className = "mqed-btn mq-math-mode";
+        if (btn.v) {
+            btnel.innerHTML = '<span class="mq-root-block"><var>'+btn.b+'</var></span>';
+        } else {
+            btnel.innerHTML = '<span class="mq-root-block"><span>'+btn.b+'</span></span>';
+        }
+      }
       cmdtype = 't';
       cmdval = btn.b;
       if (cmdval.match(/^\d$/) || cmdval=='.') {
