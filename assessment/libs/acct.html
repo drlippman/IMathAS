@@ -107,6 +107,8 @@ makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displa
 <BR><h3><a name="makeTchart">makeTchart</a></h3>
 makeTchart(title,numrows,leftentries,rightentries, start number, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize, [dofloat, showtotal])
 <BR>num rows, leftentries, and rightentries should not include the total - that will be automatically added
+<br>float (def false) set true to add display:float to table.
+<BR>showtotal (def true) to show total rows. Defaults to 0 total on left; set to 'zeroright' to show 0 total on right.
 <BR><h3><a name="scoreTchart">scoreTchart</a></h3>
 function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn)
 <BR>returns a new answer array
