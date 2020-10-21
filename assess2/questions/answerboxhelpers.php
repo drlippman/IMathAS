@@ -318,10 +318,11 @@ function ntupleToString($ntuples) {
 
 function parseInterval($str, $islist = false) {
 	if ($islist) {
-		$ints = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$str);
+		$ints = preg_split('/(?<=[\)\]])\s*,\s*(?=[\(\[])/',$str);
 	} else {
 		$ints = explode('U',$str);
-	}
+    }
+
 	$out = array();
 	foreach ($ints as $int) {
     $int = trim($int);

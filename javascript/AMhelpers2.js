@@ -1233,6 +1233,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
+    fullstr = fullstr.replace(/\s*,\s*/g,',');
     joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {
