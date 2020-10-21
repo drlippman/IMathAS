@@ -1224,7 +1224,7 @@ a.dropdown-toggle.arrow-down:hover {
   clear: both;
   font-weight: normal;
   line-height: 1.42857143;
-  color: #000;
+  color: #000 !important;
   white-space: nowrap;
 }
 .dropdown-menu  li > a:hover,
