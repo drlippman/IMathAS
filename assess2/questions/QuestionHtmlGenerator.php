@@ -1257,7 +1257,7 @@ class QuestionHtmlGenerator
         $this->errors[] = $errorMessage;
     }
 
-    private function fixDegrees($str): string 
+    private function fixDegrees($str) 
     {
         if ($str === null) { return ''; }
         return preg_replace_callback('/`(.*?)`/s', function($m) {
