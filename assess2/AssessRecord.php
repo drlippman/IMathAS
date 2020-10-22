@@ -1227,7 +1227,7 @@ class AssessRecord
     if ($this->assess_info->getSetting('timelimit_type') == 'allow_overtime') {
       // check if extension has been applied
       $lastvernum = count($this->data['assess_versions']) - 1;
-      if (!empty($this->data['assess_versions'][$lastvernum]['timelimit_ext'])) {
+      if (!empty($this->data['assess_versions'][$lastvernum]['nograce'])) {
           return $exp; // use timelimit; no grace
       }
       $returnVal = $exp + $this->assess_info->getAdjustedTimelimitGrace();
@@ -1245,13 +1245,27 @@ class AssessRecord
     if ($exp === false || $this->is_practice) {
       return false;
     }
+
+    $now = time();
+    $pasttime = (($this->assess_info->getSetting('timelimit_type') == 'kick_out' &&
+        $now > $exp + 10) ||
+        ($this->assess_info->getSetting('timelimit_type') == 'allow_overtime' &&
+        $now > $this->getTimeLimitGrace() + 10));
+
     $lastvernum = count($this->data['assess_versions']) - 1;
-    $this->data['assess_versions'][$lastvernum]['timelimit_end'] = time() + $min*60;
+    if ($pasttime) { // set for now plus extension
+        $this->data['assess_versions'][$lastvernum]['timelimit_end'] = time() + $min*60;
+    } else { // just extend
+        $this->data['assess_versions'][$lastvernum]['timelimit_end'] += $min*60;
+    }
     // record extension in record for later reference
     if (!isset($this->data['assess_versions'][$lastvernum]['timelimit_ext'])) {
         $this->data['assess_versions'][$lastvernum]['timelimit_ext'] = [];
     }
     $this->data['assess_versions'][$lastvernum]['timelimit_ext'][] = $min;
+    if ($pasttime) {
+        $this->data['assess_versions'][$lastvernum]['nograce'] = 1;
+    }
     // if timelimitexp was previously set, update it
     if ($this->assessRecord['timelimitexp'] > 0) {
         $this->assessRecord['timelimitexp'] = $this->data['assess_versions'][$lastvernum]['timelimit_end'];

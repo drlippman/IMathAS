@@ -29,7 +29,8 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$toarr = array_map('Sanitize::onlyInt', explode(',', $_POST['tolist']));
 		$addexcarr = array_map('Sanitize::onlyInt', $_POST['addexc']);
 		$addfexcarr = array_map('Sanitize::onlyInt', $_POST['addfexc']);
-		$existingExceptions = array();
+        $existingExceptions = array();
+        $eligibleForTimeExt = array();
 		if (count($addexcarr)>0 && count($toarr)>0) {
 			//prepull users with exceptions
 			$uidplaceholders = Sanitize::generateQueryPlaceholders($toarr);
@@ -38,7 +39,17 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			$stm->execute(array_merge($toarr, $addexcarr));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$existingExceptions[$row[0].'-'.$row[1]] = 1;
-			}
+            }
+            // pull cases eligible for timelimit extension
+            // This will also include cases where there's an active timelimit.
+            $query = "SELECT iar.userid,ia.id FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
+              "ON ia.id=iar.assessmentid WHERE ia.id IN ($aidplaceholders) AND iar.userid IN ($uidplaceholders) " .
+              "AND ia.timelimit>0 AND iar.starttime>0";
+            $stm = $DBH->prepare($query);
+            $stm->execute(array_merge($addexcarr, $toarr));
+            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                $eligibleForTimeExt[$row[0].'-'.$row[1]] = 1;
+            }
 		}
 		//set up inserts
 		$insertExceptionHolders = array();
@@ -46,15 +57,37 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		foreach ($toarr as $stu) {
 			foreach ($addexcarr as $aid) {
 				if (!isset($existingExceptions[$stu.'-'.$aid])) {
+                    if (isset($eligibleForTimeExt[$stu.'-'.$aid])) {
+                        $thistimelimitext = $timelimitext;
+                    } else {
+                        $thistimelimitext = 0;
+                    }
 					$insertExceptionHolders[] = "(?,?,?,?,?,?,?,?)";
-					array_push($insertExceptionVals, $stu, $aid, $startdate, $enddate, $waivereqscore, $epenalty, $timelimitext, 'A');
+					array_push($insertExceptionVals, $stu, $aid, $startdate, $enddate, $waivereqscore, $epenalty, $thistimelimitext, 'A');
 				}
 			}
 		}
 		//run update
 		if (count($addexcarr)>0 && count($toarr)>0) {
-			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=?,timeext=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
-			$stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty,$timelimitext), $toarr, $addexcarr));
+            if ($timelimitext == 0) {
+			    $stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=?,timeext=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
+                $stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty,$timelimitext), $toarr, $addexcarr));
+            } else {
+                // do one by one to handle timelimit diff 
+                $stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=?,timeext=? WHERE userid=? AND assessmentid=? and itemtype='A'");
+                foreach ($toarr as $stu) {
+                    foreach ($addexcarr as $aid) {
+                        if (isset($existingExceptions[$stu.'-'.$aid])) {
+                            if (isset($eligibleForTimeExt[$stu.'-'.$aid])) {
+                                $thistimelimitext = $timelimitext;
+                            } else {
+                                $thistimelimitext = 0;
+                            }
+                            $stm->execute([$startdate, $enddate, $waivereqscore, $epenalty,$thistimelimitext, $stu, $aid]);
+                        }
+                    }
+                }
+            }
 		}
 
 		//run inserts

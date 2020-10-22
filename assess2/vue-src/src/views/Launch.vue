@@ -50,6 +50,13 @@
           </button>
         </span>
       </p>
+      <p
+        v-else-if="timeLimitExt !== ''"
+        class = "noticetext"
+      >
+        <icons name="alert" />
+        {{ timeLimitExt }}
+      </p>
 
       <p v-if="canAddWork">
         {{ $t('work.add_prev') }}<br/>

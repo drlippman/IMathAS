@@ -88,13 +88,8 @@ if (!$in_practice && !$canViewAll &&
   exit;
 }
 
-if (!$in_practice &&
-  $assess_info->getSetting('timelimit') > 0 &&
-  (($assess_info->getSetting('timelimit_type') == 'kick_out' &&
-    $now > $assess_record->getTimeLimitExpires() + 10) ||
-    ($assess_info->getSetting('timelimit_type') == 'allow_overtime' &&
-    $now > $assess_record->getTimeLimitGrace() + 10)) &&
-  $assess_info->getSetting('timeext') > 0
+if (!$in_practice && $assess_info->getSetting('timelimit') > 0 && 
+    $assess_info->getSetting('timeext') > 0
 ) {
     // apply time limit extension
     if ($assess_record->hasActiveAttempt()) {

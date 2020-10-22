@@ -77,6 +77,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
         $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
 
+        if ($timelimitext > 0) {
+            // pull cases eligible for timelimit extension
+            // This will also include cases where there's an active timelimit. 
+            $query = "SELECT iar.userid,ia.id FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
+              "ON ia.id=iar.assessmentid WHERE ia.id=? AND iar.userid=? " .
+              "AND ia.timelimit>0 AND iar.starttime>0";
+            $stm = $DBH->prepare($query);
+            $stm->execute([$aid, $uid, time()]);
+            if ($stm->fetchColumn(0) === false) {
+                // if doesn't meet conditions, not eligible for time extension; zero out
+                $timelimitext = 0;
+            }
+        }
+
 		//check if exception already exists
 		$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid));
