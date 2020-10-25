@@ -695,13 +695,24 @@ function recclick(type,typeid,info,txt) {
 		var extradata = '',m;
 		if ((m = window.location.href.match(/showlinkedtext.*?&id=(\d+)/)) !== null && recordedunload==false) {
 			extradata = '&unloadinglinked='+m[1];
-			recordedunload = true;
-		}
-		jQuery.ajax({
-			type: "POST",
-			url: imasroot+'/course/rectrack.php?cid='+cid,
-			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
-		});
+            recordedunload = true;
+        }
+        if (navigator.sendBeacon) {
+            var fd = new FormData();
+            fd.append('type', type);
+            fd.append('typeid', typeid);
+            fd.append('info',info+'::'+txt);
+            if (extradata != '') {
+                fd.append('unloadinglinked', m[1]);
+            }
+            navigator.sendBeacon(imasroot+'/course/rectrack.php?cid='+cid, fd);
+        } else {
+            jQuery.ajax({
+                type: "POST",
+                url: imasroot+'/course/rectrack.php?cid='+cid,
+                data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
+            });
+        }
 	}
 }
 function setuptracklinks(i,el) {
