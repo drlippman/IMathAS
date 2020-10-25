@@ -698,7 +698,8 @@
 			echo '<br/>Question #'.($loc+1);
 			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
 					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
-					'to' => $line['userid'])) . "\">Use in Msg</a>";
+                    'to' => $line['userid'])) . "\">Use in Message</a>";
+            echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
 			if ($groupdup) {
