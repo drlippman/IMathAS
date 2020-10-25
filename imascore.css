@@ -1382,3 +1382,13 @@ a.dropdown-toggle.arrow-down:hover {
 }
 
 [tabindex="-1"] { outline: none }
+
+.embedwrap {
+    overflow: visible;
+    position: relative;
+}
+.embedwrap > iframe {
+    position: absolute;
+    border: none;
+    width: 100%;
+}

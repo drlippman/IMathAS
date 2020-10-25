@@ -1084,7 +1084,10 @@ jQuery(document).ready(function($) {
 		if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/lti\.frameResize/)) {
 			var edata = JSON.parse(e.originalEvent.data);
 			if ("frame_id" in edata) {
-				$("#"+edata["frame_id"]).height(edata.height);
+                $("#"+edata["frame_id"]).height(edata.height);
+                if (edata.wrapheight) {
+                    $("#"+edata["frame_id"]+"wrap").height(edata.wrapheight);
+                }
 			} else if ("iframe_resize_id" in edata) {
 				$("#"+edata["iframe_resize_id"]).height(edata.height);
 			} else {
