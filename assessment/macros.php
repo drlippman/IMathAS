@@ -493,7 +493,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			if ($py===null) { //starting line
 
 			} else if ($y>$yymax || $y<$yymin) { //going or still out of bounds
-				if ($py <= $yymax && $py >= $yymin) { //going out
+                if ($py <= $yymax && $py >= $yymin) { //going out
+                    $origy = $y;
 					if ($isparametric) {
 						$y = $evalyfunc(['t'=>$t-1E-10]);
 						$tempy = $evalyfunc(['t'=>$t-$dx/10]);
@@ -512,13 +513,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					}
 					$ix = round(($x-$px)*($iy - $py)/($y-$py) + $px,$xrnd);
 					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
-					$pathstr .= "[$px,$py],[$ix,$iy]]);";
+                    $pathstr .= "[$px,$py],[$ix,$iy]]);";
+                    if ($y < $yymax && $y > $yymin) { // lost out of boundness. restore orig
+                        $y = $origy;
+                    }
 					$lastl = 0;
                 } else { //still out
 
 				}
 			} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
-				if ($y <= $yymax && $y >= $yymin) { //coming in
+                if ($y <= $yymax && $y >= $yymin) { //coming in
 					//need to determine which direction.  Let's calculate an extra value
 					//and need un-rounded y-value for comparison
 					if ($isparametric) {
@@ -538,7 +542,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					$ix = round(($x-$px)*($iy - $py)/($y-$py) + $px,$xrnd);
 					if ($lastl == 0) {$pathstr .= "path([";} else { $pathstr .= ",";}
 					$pathstr .= "[$ix,$iy]";
-					$lastl++;
+                    $lastl++;
 				} else { //still out
                     
 				}
@@ -604,8 +608,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 
 		if ($isineq) {
-
-			$pathstr = substr($pathstr,0,-3);
+            // combine multiple paths together
+            $pathstr = str_replace(']);path([',',', $pathstr);
+            $pathstr = substr($pathstr, 0, -3);
 			preg_match('/^path\(\[\[(-?[\d\.]+),(-?[\d\.]+).*(-?[\d\.]+),(-?[\d\.]+)\]$/',$pathstr,$matches);
 			$sig = ($xxmax-$xxmin)/100;
 			$ymid = ($yymax + $yymin)/2;
@@ -626,7 +631,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if (abs($matches[1] - $xxmin)>$sig  && $matches[2]<$ymid) {
 					$pathstr .= ",[$xxmin,$yymin]"; //need to add lower left corner
 				}
-				$pathstr .= ']);';
+                $pathstr .= ']);';
 			}
 			if ($function[1]=='red' || $function[1]=='green') {
 				$path .= "fill=\"trans{$function[1]}\";";
