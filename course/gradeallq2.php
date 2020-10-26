@@ -384,7 +384,6 @@
 		writeHtmlSelect('secfiltersel', $sections, $sections, $secfilter, _('All'), '-1', 'onchange="chgsecfilter()"');
 	}
 	echo '</div>';
-	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id=:id";
 	$stm = $DBH->prepare($query);

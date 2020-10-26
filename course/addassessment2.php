@@ -124,7 +124,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $assessmentname = $stm->fetchColumn(0);
           $body = '<div class=breadcrumb>'.$breadcrumbbase;
           if (empty($_COOKIE['fromltimenu'])) {
-            $body = sprintf(" <a href=\"course.php?cid=%s\">%s</a> &gt; ", $breadcrumbbase,
+            $body .= sprintf(" <a href=\"course.php?cid=%s\">%s</a> &gt; ",
                 $cid, Sanitize::encodeStringForDisplay($coursename));
           }
           $body .= sprintf(" <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
