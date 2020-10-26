@@ -47,6 +47,11 @@ switch($_POST['action']) {
 		$_SESSION['userid'] = $be;
 		break;
 	case "chgrights":
+		if (isset($CFG['emailAsSID'])) {
+			// set SID, if using emailAsSID
+			$_POST['SID'] = Sanitize::emailAddress($_POST['email']);
+		}
+
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
 			echo _("You don't have the authority for this action");
 			break;
@@ -65,12 +70,19 @@ switch($_POST['action']) {
 			exit;
 		}
 
-		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($_POST['SID'])));
-		$row = $stm->fetch(PDO::FETCH_NUM);
-		$chgSID = true;
-		if ($row != null) {
-			$chgSID = false;
+		if (isset($CFG['emailAsSID'])) {
+			// make sure SID is not already in use
+			require_once("../includes/newusercommon.php");
+			$chgSID = sidIsAlreadyUsed($_POST['SID']) ? false : true;
+		} else {
+			// Perform the usual usage check
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+			$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($_POST['SID'])));
+			$row = $stm->fetch(PDO::FETCH_NUM);
+			$chgSID = true;
+			if ($row != null) {
+				$chgSID = false;
+			}
 		}
 
 		$specialrights = 0;
@@ -106,8 +118,15 @@ switch($_POST['action']) {
 
 		$arr = array(':rights'=>$_POST['newrights'], ':specialrights'=>$specialrights, ':id'=>$_GET['id'],
 				':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
-				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
-				':email'=>Sanitize::stripHtmlTags($_POST['email']));
+				':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']));
+		// when using emailAsSID, update email field only when $chgSID is true
+		if (isset($CFG['emailAsSID'])) {
+			if ($chgSID) {
+				$arr[':email'] = Sanitize::stripHtmlTags($_POST['email']);
+			}
+		} else {
+			$arr[':email'] = Sanitize::stripHtmlTags($_POST['email']);
+		}
 		if ($chgSID) {
 			$arr[':SID'] = Sanitize::stripHtmlTags($_POST['SID']);
 		}
@@ -136,7 +155,16 @@ switch($_POST['action']) {
 			}
 			$arr[':groupid'] = $newgroup;
 
-			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid,FirstName=:FirstName,LastName=:LastName,email=:email";
+			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,groupid=:groupid,FirstName=:FirstName,LastName=:LastName";
+
+			// when using emailAsSID, update email field only when $chgSID is true
+			if (isset($CFG['emailAsSID'])) {
+				if ($chgSID) {
+					$query .= ',email=:email';
+				}
+			} else {
+				$query .= ',email=:email';
+			}
 			if ($chgSID) {
 				$query .= ',SID=:SID';
 			}
@@ -152,7 +180,16 @@ switch($_POST['action']) {
 			$newgroup = $groupid;
 			$arr[':groupid'] = $groupid;
 
-			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,FirstName=:FirstName,LastName=:LastName,email=:email";
+			$query = "UPDATE imas_users SET rights=:rights,specialrights=:specialrights,FirstName=:FirstName,LastName=:LastName";
+
+			// when using emailAsSID, update email field only when $chgSID is true
+			if (isset($CFG['emailAsSID'])) {
+				if ($chgSID) {
+					$query .= ',email=:email';
+				}
+			} else {
+				$query .= ',email=:email';
+			}
 			if ($chgSID) {
 				$query .= ',SID=:SID';
 			}
@@ -207,7 +244,11 @@ switch($_POST['action']) {
 		}
 
 		if ($chgSID==false && $row[0]!=$_GET['id']) {
-			echo "Username in use - left unchanged";
+			if (isset($CFG['emailAsSID'])) {
+				echo "Email in use - left unchanged";
+			} else {
+				echo "Username in use - left unchanged";
+			}
 			exit;
 		}
 
@@ -311,15 +352,30 @@ switch($_POST['action']) {
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
-		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$_POST['SID']));
-		$row = $stm->fetch(PDO::FETCH_NUM);
-		if ($row != null) {
-			echo "<html><body>",_("Username is already used."),"\n";
-			echo "<a href=\"forms.php?action=newadmin\">",_("Try Again"),"</a> ",_("or")," ";
-			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">",_("Change rights for existing user"),"</a></body></html>\n";
-			exit;
+
+		if (isset($CFG['emailAsSID'])) {
+			// set SID, if using emailAsSID
+			$_POST['SID'] = Sanitize::emailAddress($_POST['email']);
+			// make sure SID is not already in use
+			require_once("../includes/newusercommon.php");
+			if (sidIsAlreadyUsed($_POST['SID'])) {
+				echo "<html><body>",_("The email you entered is already in use."),"\n";
+				echo "<a href=\"forms.php?action=newadmin\">",_("Try Again"),"</a>";
+				exit;
+			}
+		} else {
+			// SID is already in the post array. Perform the usual usage check
+        		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+        		$stm->execute(array(':SID'=>$_POST['SID']));
+        		$row = $stm->fetch(PDO::FETCH_NUM);
+        		if ($row != null) {
+        			echo "<html><body>",_("Username is already used."),"\n";
+        			echo "<a href=\"forms.php?action=newadmin\">",_("Try Again"),"</a> ",_("or")," ";
+        			echo "<a href=\"forms.php?action=chgrights&id={$row[0]}\">",_("Change rights for existing user"),"</a></body></html>\n";
+        			exit;
+        		}
 		}
+
 		if (isset($CFG['GEN']['newpasswords'])) {
 			$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 		} else {

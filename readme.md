@@ -194,6 +194,9 @@ Look to `newinstructor-ipeds.php.dist` for an example of how to collect ipeds da
 account request.  The account approval process will auto-create group associations when 
 account requests are collected with this data.
 
+### Using Email Addresses for Login
+- `$CFG['emailAsSID']`: Set to true if you want users to login using their email address (instead of username, aka "SID"). When true, this option modies appearance and behavior of related forms ("New Student Signup", "New Instructor Account Request", "Modify User Profile", "Admin -> New User", "Admin -> Edit User", "Change Student Info", "Username Lookup"). Be sure to increase the size of the SID field in the imas_users table to match the size of the email field (e.g.: "ALTER TABLE `imas_users` CHANGE `SID` `SID` VARCHAR(100)  CHARACTER SET latin1  COLLATE latin1_swedish_ci  NOT NULL  DEFAULT '';""). Be sure to set the $loginprompt and $longloginprompt vars in config.php to "Email"; also set $loginformat to something like "/^[0-9A-Za-z\\-\\.,\\\\?\/!#@$&():;_\"\']+$/"; Use with caution if you are using batchcreateinstr.php, newinstructor-ipeds.php, or other methods of creating user accounts.
+
 ### Development
 - `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.
 

@@ -114,35 +114,42 @@ require_once("includes/sanitize.php");
 			$_POST['courseid'] = Sanitize::courseId(trim($_POST['courseselect']));
 			$_POST['ekey'] = '';
 		}
-		if (!isset($_GET['confirmed'])) {
-			//look for existing account. ignore any LTI accounts
-			$stm = $DBH->prepare("SELECT SID FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'");
-			$stm->execute(array(':email'=>$_POST['email']));
-			if ($stm->rowCount()>0) {
-				$nologo = true;
-				require("header.php");
-				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true'.$gb.'">';
-				echo '<input type="hidden" name="SID" value="'.Sanitize::encodeStringForDisplay($_POST['SID']).'" />';
-				echo '<input type="hidden" name="firstname" value="'.Sanitize::encodeStringForDisplay($_POST['firstname']).'" />';
-				echo '<input type="hidden" name="lastname" value="'.Sanitize::encodeStringForDisplay($_POST['lastname']).'" />';
-				echo '<input type="hidden" name="email" value="'.Sanitize::encodeStringForDisplay($_POST['email']).'" />';
-				echo '<input type="hidden" name="pw1" value="'.Sanitize::encodeStringForDisplay($_POST['pw1']).'" />';
-				echo '<input type="hidden" name="pw2" value="'.Sanitize::encodeStringForDisplay($_POST['pw2']).'" />';
-				echo '<input type="hidden" name="courseid" value="'.Sanitize::encodeStringForDisplay($_POST['courseid']).'" />';
-				echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_POST['ekey']).'" />';
-				$_SESSION['challenge'] = uniqid();
-				echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
-				if (isset($_POST['agree'])) {
-					echo '<input type="hidden" name="agree" value="1" />';
-				}
-				echo '<p> </p>';
-				echo '<p>',_('It appears an account already exists with the same email address you just entered'),'. ';
-				echo sprintf(_('If you are creating an account because you forgot your username, you can %s look up your username %s instead.'),'<a href="forms.php?action=lookupusername">','</a>'),'</p>';
-				echo '<input type="submit" value="',_('Create new account anyways'),'"/>';
-				echo '</form>';
-				require("footer.php");
-				exit;
-			}
+
+		if (isset($CFG['emailAsSID'])) {
+			// set SID, if using emailAsSID
+			$_POST['SID'] = $_POST['email'];
+		} else {
+			// perform the usual email usage check
+    		if (!isset($_GET['confirmed'])) {
+    			//look for existing account. ignore any LTI accounts
+    			$stm = $DBH->prepare("SELECT SID FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'");
+    			$stm->execute(array(':email'=>$_POST['email']));
+    			if ($stm->rowCount()>0) {
+    				$nologo = true;
+    				require("header.php");
+    				echo '<form method="post" action="actions.php?action=newuser&amp;confirmed=true'.$gb.'">';
+    				echo '<input type="hidden" name="SID" value="'.Sanitize::encodeStringForDisplay($_POST['SID']).'" />';
+    				echo '<input type="hidden" name="firstname" value="'.Sanitize::encodeStringForDisplay($_POST['firstname']).'" />';
+    				echo '<input type="hidden" name="lastname" value="'.Sanitize::encodeStringForDisplay($_POST['lastname']).'" />';
+    				echo '<input type="hidden" name="email" value="'.Sanitize::encodeStringForDisplay($_POST['email']).'" />';
+    				echo '<input type="hidden" name="pw1" value="'.Sanitize::encodeStringForDisplay($_POST['pw1']).'" />';
+    				echo '<input type="hidden" name="pw2" value="'.Sanitize::encodeStringForDisplay($_POST['pw2']).'" />';
+    				echo '<input type="hidden" name="courseid" value="'.Sanitize::encodeStringForDisplay($_POST['courseid']).'" />';
+    				echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_POST['ekey']).'" />';
+    				$_SESSION['challenge'] = uniqid();
+    				echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
+    				if (isset($_POST['agree'])) {
+    					echo '<input type="hidden" name="agree" value="1" />';
+    				}
+    				echo '<p> </p>';
+    				echo '<p>',_('It appears an account already exists with the same email address you just entered'),'. ';
+    				echo sprintf(_('If you are creating an account because you forgot your username, you can %s look up your username %s instead.'),'<a href="forms.php?action=lookupusername">','</a>'),'</p>';
+    				echo '<input type="submit" value="',_('Create new account anyways'),'"/>';
+    				echo '</form>';
+    				require("footer.php");
+    				exit;
+    			}
+    		}
 		}
 
         $jsondata = [];
@@ -743,14 +750,34 @@ require_once("includes/sanitize.php");
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 
-		$stm = $DBH->prepare("SELECT email,lastemail FROM imas_users WHERE id=?");
+		$stm = $DBH->prepare("SELECT SID,email,lastemail FROM imas_users WHERE id=?");
 		$stm->execute(array($userid));
-		list($old_email,$lastemail) = $stm->fetch(PDO::FETCH_NUM);
+		list($old_SID, $old_email,$lastemail) = $stm->fetch(PDO::FETCH_NUM);
 
-		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
+		// process SID (needed to support emailAsSID)
+		if (isset($CFG['emailAsSID'])) {
+			if ($old_email != $_POST['email']) {
+				// email was changed; make sure SID can be updated as well
+				require_once("includes/newusercommon.php");
+				if (sidIsAlreadyUsed($_POST['email'])) {
+					require("header.php");
+					echo $pagetopper;
+					echo _("The email you entered is already in use. Please contact your instructor, or try again."),"  <a href=\"forms.php?action=chguserinfo$gb\">",_("Try Again"),"</a>\n";
+					require("footer.php");
+					exit;
+				}
+				// SID can be changed
+				$_POST['SID'] = $_POST['email'];
+			} else {
+				$_POST['SID'] = $old_SID;
+			}
+		} else {
+			$_POST['SID'] = $old_SID;
+		}
+		$query = "UPDATE imas_users SET SID=:SID, FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':FirstName'=>$_POST['firstname'],
+		$stm->execute(array(':SID'=>$_POST['SID'], ':FirstName'=>$_POST['firstname'],
 			':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$layoutstr, ':qrightsdef'=>$qrightsdef,
 			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>$_POST['theme'], ':listperpage'=>$perpage, ':uid'=>$userid));
 
