@@ -4280,6 +4280,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
             return $answer;
         }
     }
+
     $newans = $answer;
     if ($type == 'calculated') {
         $newansval = [];
@@ -4335,7 +4336,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
 					$loc = $k; break;
 				} else if ($type=='calculated' && abs($tofind - $newansval[$sw[$k][0]])<0.01) {
                     $loc = $k; break;
-                } else if ($type=='numfunc' && comparefunctions($tofind, $newansval[$sw[$k][0]])) {
+                } else if ($type=='numfunc' && comparefunctions($tofind, $newans[$sw[$k][0]])) {
                     $loc = $k; break;
                 } else if (($type=='complex' || $type=='calccomplex' || $type=='ntuple' || $type == 'calcntuple') && 
                     $tofind !== false &&
