@@ -453,7 +453,8 @@
 				if (substr($k,0,3)=='lti') {
 					unset($_SESSION[$k]);
 				}
-			}
+            }
+            setcookie('fromltimenu', '', time()-3600);
 		} else if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltirole']=='learner') {
 			require(__DIR__.'/includes/userutils.php');
 			logout();
