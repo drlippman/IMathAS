@@ -76,18 +76,36 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $waivereqscore = (isset($_POST['waivereqscore']))?1:0;
         $epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
         $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
-
+        $DBH->beginTransaction();
         if ($timelimitext > 0) {
             // pull cases eligible for timelimit extension
             // This will also include cases where there's an active timelimit. 
-            $query = "SELECT iar.userid,ia.id FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
+            $query = "SELECT iar.scoreddata FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
               "ON ia.id=iar.assessmentid WHERE ia.id=? AND iar.userid=? " .
               "AND ia.timelimit>0 AND iar.starttime>0";
             $stm = $DBH->prepare($query);
             $stm->execute([$aid, $uid, time()]);
-            if ($stm->fetchColumn(0) === false) {
+            $row = $stm->fetch(PDO::FETCH_NUM);
+            if ($row === false) {
                 // if doesn't meet conditions, not eligible for time extension; zero out
                 $timelimitext = 0;
+            } else {
+                // if time limit not expired, need to rewrite assess_versions[last]['timelimit_end']
+                //   and add timelimit_ext to note use of extension.
+                // if time limit is expired, then set eligibleForTimeExt
+                $adata = json_decode(gzdecode($row[0]), true);
+                $lastver = &$adata['assess_versions'][count($adata['assess_versions'])-1];
+                if ($lastver['status']==0 && $lastver['timelimit_end'] > $now) {
+                    // not submitted and time limit still active; extend now.
+                    $lastver['timelimit_end'] += 60*$timelimitext;
+                    if (!isset($lastver['timelimit_ext'])) {
+                        $lastver['timelimit_ext'] = [];
+                    }
+                    $lastver['timelimit_ext'][] = $timelimitext;
+                    $iarupdate = $DBH->prepare('UPDATE imas_assessment_records SET scoreddata=? WHERE userid=? AND assessmentid=?');
+                    $iarupdate->execute([gzencode(json_encode($adata)), $aid, $uid]);
+                    $timelimitext *= -1; // mark as used
+                }
             }
         }
 
@@ -170,7 +188,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					':reattempting'=>$reattemptinglist, ':id'=>$row[0]));
 			}
 
-		}
+        }
+        $DBH->commit();
 
 		header('Location: ' . $backurl);
 

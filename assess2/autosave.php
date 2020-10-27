@@ -167,4 +167,9 @@ foreach ($qns as $qn=>$parts) {
 $assess_record->saveRecordIfNeeded();
 
 //output JSON object
-echo '{"autosave": "done"}';
+$out['autosave'] = 'done';
+if ($assess_record->hasActiveAttempt() && $assess_info->getSetting('timelimit') > 0) {
+    $out['timelimit_expiresin'] = $assess_record->getTimeLimitExpires() - $now;
+    $out['timelimit_gracein'] = max($assess_record->getTimeLimitGrace() - $now, 0);
+}
+echo json_encode($out);

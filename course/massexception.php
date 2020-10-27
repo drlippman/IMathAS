@@ -13,6 +13,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$stm = $DBH->query("DELETE FROM imas_exceptions WHERE id IN ($clearlist)");
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
+        $DBH->beginTransaction();
 		require_once("../includes/parsedatetime.php");
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
@@ -40,15 +41,35 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$existingExceptions[$row[0].'-'.$row[1]] = 1;
             }
-            // pull cases eligible for timelimit extension
-            // This will also include cases where there's an active timelimit.
-            $query = "SELECT iar.userid,ia.id FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
-              "ON ia.id=iar.assessmentid WHERE ia.id IN ($aidplaceholders) AND iar.userid IN ($uidplaceholders) " .
-              "AND ia.timelimit>0 AND iar.starttime>0";
-            $stm = $DBH->prepare($query);
-            $stm->execute(array_merge($addexcarr, $toarr));
-            while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-                $eligibleForTimeExt[$row[0].'-'.$row[1]] = 1;
+            if ($timelimitext > 0) {
+                // pull cases eligible for timelimit extension
+                // This will also include cases where there's an active timelimit.
+                $query = "SELECT iar.userid,ia.id,iar.scoreddata FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
+                "ON ia.id=iar.assessmentid WHERE ia.id IN ($aidplaceholders) AND iar.userid IN ($uidplaceholders) " .
+                "AND ia.timelimit>0 AND iar.starttime>0";
+                $stm = $DBH->prepare($query);
+                $stm->execute(array_merge($addexcarr, $toarr));
+                $now = time();
+                $iarupdate = $DBH->prepare('UPDATE imas_assessment_records SET scoreddata=? WHERE userid=? AND assessmentid=?');
+                while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                    // if time limit not expired, need to rewrite assess_versions[last]['timelimit_end']
+                    //   and add timelimit_ext to note use of extension.
+                    // if time limit is expired, then set eligibleForTimeExt
+                    $adata = json_decode(gzdecode($row[2]), true);
+                    $lastver = &$adata['assess_versions'][count($adata['assess_versions'])-1];
+                    if ($lastver['status']==0 && $lastver['timelimit_end'] > $now) {
+                        // not submitted and time limit still active; extend now.
+                        $lastver['timelimit_end'] += 60*$timelimitext;
+                        if (!isset($lastver['timelimit_ext'])) {
+                            $lastver['timelimit_ext'] = [];
+                        }
+                        $lastver['timelimit_ext'][] = $timelimitext;
+                        $iarupdate->execute([gzencode(json_encode($adata)), $row[0], $row[1]]);
+                        $eligibleForTimeExt[$row[0].'-'.$row[1]] = -1;
+                    } else {
+                        $eligibleForTimeExt[$row[0].'-'.$row[1]] = 1;
+                    }
+                }
             }
 		}
 		//set up inserts
@@ -58,7 +79,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			foreach ($addexcarr as $aid) {
 				if (!isset($existingExceptions[$stu.'-'.$aid])) {
                     if (isset($eligibleForTimeExt[$stu.'-'.$aid])) {
-                        $thistimelimitext = $timelimitext;
+                        $thistimelimitext = $timelimitext*$eligibleForTimeExt[$stu.'-'.$aid];
                     } else {
                         $thistimelimitext = 0;
                     }
@@ -79,7 +100,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                     foreach ($addexcarr as $aid) {
                         if (isset($existingExceptions[$stu.'-'.$aid])) {
                             if (isset($eligibleForTimeExt[$stu.'-'.$aid])) {
-                                $thistimelimitext = $timelimitext;
+                                $thistimelimitext = $timelimitext*$eligibleForTimeExt[$stu.'-'.$aid];
                             } else {
                                 $thistimelimitext = 0;
                             }
@@ -223,7 +244,10 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			$tolist = implode(',', array_map('intval', explode(',',$_POST['tolist'])));
 			$stm = $DBH->prepare("UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid IN ($tolist) AND courseid=:courseid");
 			$stm->execute(array(':courseid'=>$cid));
-		}
+        }
+        
+        $DBH->commit();
+
 		if (isset($_POST['sendmsg'])) {
 			$_POST['submit'] = "Message";
 			$_POST['checked'] = explode(',',$_POST['tolist']);
