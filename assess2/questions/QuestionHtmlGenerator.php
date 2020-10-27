@@ -201,7 +201,7 @@ class QuestionHtmlGenerator
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalsoln);
-
+        $toevalsoln = preg_replace('/\$answerbox(\[.*?\])?/', '', $toevalsoln);
         // Reset the RNG to a known state after the question code has been eval'd.
         $this->randWrapper->srand($this->questionParams->getQuestionSeed() + 2);
 
