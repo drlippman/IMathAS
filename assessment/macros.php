@@ -3958,20 +3958,45 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 function parsedrawgrid($str) {
     $p = array_map('trim',explode(',', $str));
     $xmin = isset($p[0]) ? $p[0] : -5;
+    if (is_string($xmin)) {
+        $pts = explode(':', $xmin);
+        $xmin = $pts[count($pts)-1];
+    }
     $xmax = isset($p[1]) ? $p[1] : 5;
     $ymin = isset($p[2]) ? $p[2] : -5;
+    if (is_string($ymin)) {
+        $pts = explode(':', $ymin);
+        $ymin = $pts[count($pts)-1];
+    }
     $ymax = isset($p[3]) ? $p[3] : 5;
     $w = isset($p[6]) ? $p[6] : 300;
     $h = isset($p[7]) ? $p[7] : 300;
     return [$xmin, $xmax, $ymin, $ymax, $w, $h];
 }
 
-function gettwopointlinedata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+function gettwopointlinedata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
 	return gettwopointdata($str,'line',$xmin,$xmax,$ymin,$ymax,$w,$h);
 }
-function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
+function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
     if (is_string($xmin) && strpos($xmin,',')!==false) {
+        $origxmax = $xmax;
         list($xmin,$xmax,$ymin,$ymax,$w,$h) = parsedrawgrid($xmin);
+        if ($origxmax !== null) { // snaptogrid given
+            list($neww,$newh) = getsnapwidthheight($xmin,$xmax,$ymin,$ymax,$w,$h,$origxmax);
+            if (abs($neww - $w)/$w<.1) {
+                $w = $neww;
+            }
+            if (abs($newh- $h)/$h<.1) {
+                $h = $newh;
+            }
+        }
+    } else {
+        if ($xmin === null) { $xmin = -5;}
+        if ($xmax === null) { $xmax = 5;}
+        if ($ymin === null) { $ymin = -5;}
+        if ($ymax === null) { $ymax = 5;}
+        if ($w === null) { $w = 300;}
+        if ($h === null) { $h = 300;}
     }
 	if ($type=='line') {
 		$code = 5;
