@@ -88,7 +88,7 @@
 			if (isset($_POST['savesent'])) {
 				$deleted = 0;
 			} else {
-				$deleted = 4;
+				$deleted = 1; //deleted by sender
 			}
 			$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
