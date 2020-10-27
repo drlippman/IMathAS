@@ -6,7 +6,7 @@
 
 
 	$aid = Sanitize::onlyInt($_GET['aid']);
-    $cid = Sanitize::courseId($_GET['cid']);
+	$cid = Sanitize::courseId($_GET['cid']);
     if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
         $addq = 'addquestions2';
         $from = 'addq2';
@@ -96,8 +96,11 @@ function getnextprev(formn,loc) {
 }
 </script>
 END;
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"$addq.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Categorize Questions")."</div>\n";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Categorize Questions")."</div>\n";
 	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	$outcomenames = array();

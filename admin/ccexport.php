@@ -44,7 +44,12 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 	$stm->execute(array($groupid));
-	$hasGroupLTI = ($stm->fetchColumn() !== false);
+    $hasGroupLTI = ($stm->fetchColumn() !== false);
+    // look for LTI 1.3 connection
+    $stm = $DBH->prepare("SELECT deploymentid FROM imas_lti_groupassoc WHERE groupid=?");
+    $stm->execute(array($groupid));
+    $hasLTI13 = ($stm->fetchColumn() !== false);
+    $hasGroupLTI = $hasGroupLTI || $hasLTI13;
 	if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel']) && $myrights<100) {
 		$groupLTInote = '<p>Your school already has a school-wide LTI key and secret established.  You do not need to set up a course-level configuration.</p>';
 	} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
@@ -99,17 +104,21 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	 .nomark.canvasoptlist li { text-indent: -25px; margin-left: 25px;}
 	 </style>';
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">"
-		. Sanitize::encodeStringForDisplay($coursename) . "</a> &gt; Export For Another LMS</div>\n";
-
-	echo '<div class="cpmid">';
-	if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
-		echo '<a href="exportitems2.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a> ';
-	}
-	if ($myrights == 100) {
-		echo '| <a href="jsonexport.php?cid='. $cid.'" name="button">Export OEA JSON</a>';
-	}
-	echo '</div>';
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+    echo _('Export For Another LMS'), '</div>';
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo '<div class="cpmid">';
+        if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
+            echo '<a href="exportitems2.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a> ';
+        }
+        if ($myrights == 100) {
+            echo '| <a href="jsonexport.php?cid='. $cid.'" name="button">Export OEA JSON</a>';
+        }
+        echo '</div>';
+    }
 
 	echo '<h2>Export For Another LMS</h2>';
 	echo '<p>This feature will allow you to export package which can then be loaded into another Learning Management System. ';

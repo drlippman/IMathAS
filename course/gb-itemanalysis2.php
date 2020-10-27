@@ -49,9 +49,9 @@
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
 
-	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit,submitby FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit,submitby,showwork FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit, $submitby) = $stm->fetch(PDO::FETCH_NUM);
+	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit, $submitby, $showworkdef) = $stm->fetch(PDO::FETCH_NUM);
 	$showhints = (($showhints&2)==2);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
@@ -73,16 +73,19 @@
 	$placeinhead .= "}\n</script>";
 	$placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.pointer:hover {text-decoration: underline;}</style>';
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-	if ($stu==-1) {
-		echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> ";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+    }
+    if ($stu==-1) {
+		echo "<a href=\"gradebook.php?stu=$stu&cid=$cid\">Averages</a> &gt; ";
 	} else if ($from=='isolate') {
-		echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> ";
+		echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> &gt; ";
 	} else if ($from=='gisolate') {
-		echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> ";
+		echo "<a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> &gt; ";
 	}
-	echo "&gt; Item Analysis</div>";
+	echo "Item Analysis</div>";
 
 	echo '<div class="cpmid"><a href="isolateassessgrade.php?cid='.$cid.'&amp;aid='.$aid.'">View Score List</a></div>';
 
@@ -304,7 +307,7 @@
 		//$qs = array_keys($qtotal);
 		$qslist = array_map('Sanitize::onlyInt',$itemarr);
 		$query_placeholders = Sanitize::generateQueryPlaceholders($qslist);
-		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
+		$query = "SELECT imas_questionset.description,imas_questions.id AS qid,imas_questions.points,imas_questionset.id AS qsid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref,imas_questions.showwork ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($query_placeholders)";
 		$stm = $DBH->prepare($query);
@@ -314,24 +317,26 @@
 		$withdrawn = array();
 		$qsetids = array();
 		$needmanualgrade = array();
-		$showextref = array();
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$descrips[$row[1]] = $row[0];
-			$points[$row[1]] = $row[2];
-			$qsetids[$row[1]] = $row[3];
-			$withdrawn[$row[1]] = $row[4];
-			if ($row[5]=='essay' || $row[5]=='file') {
-				$needmanualgrade[$row[1]] = true;
-			} else if ($row[5]=='multipart') {
-				if (preg_match('/anstypes.*?(essay|file)/', $row[6])) {
-					$needmanualgrade[$row[1]] = true;
+        $showextref = array();
+        $showwork = array();
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$descrips[$row['qid']] = $row['description'];
+			$points[$row['qid']] = $row['points'];
+			$qsetids[$row['qid']] = $row['qsid'];
+			$withdrawn[$row['qid']] = $row['withdrawn'];
+			if ($row['qtype']=='essay' || $row['qtype']=='file') {
+				$needmanualgrade[$row['qid']] = true;
+			} else if ($row['qtype']=='multipart') {
+				if (preg_match('/anstypes.*?(essay|file)/', $row['control'])) {
+					$needmanualgrade[$row['qid']] = true;
 				}
 			}
-			if ($row[8]!='' && (($row[7]&2)==2 || ($row[7]==-1 && $showhints))) {
-				$showextref[$row[1]] = true;
+			if ($row['extref']!='' && (($row['showhints']&2)==2 || ($row['showhints']==-1 && $showhints))) {
+				$showextref[$row['qid']] = true;
 			} else {
-				$showextref[$row[1]] = false;
-			}
+				$showextref[$row['qid']] = false;
+            }
+            $showwork[$row['qid']] = (($row['showwork'] == -1 && $showworkdef > 0) || $row['showwork'] > 0);
 		}
 
 		$avgscore = array();
@@ -399,7 +404,12 @@
 			if (isset($needmanualgrade[$qid])) {
 				echo 'class="manualgrade" ';
 			}
-			echo ">Grade</a></td>";
+            echo ">Grade</a>";
+            if ($showwork[$qid]) {
+                echo ' <span title="' . _('Has Show Work enabled') . '" aria-label="' . _('Has Show Work enabled') . '">' .
+                  '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>';
+            }
+            echo "</td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
 			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
@@ -457,7 +467,10 @@
 	}
 	//echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
 
-	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
+    echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading. ';
+    echo 'Those marked with <span title="' . _('Show Work') . '" aria-label="' . _('Show Work') . '">' .
+        '<svg viewBox="0 0 24 24" width="14" height="14" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>' . 
+        ' have Show Work enabled.<br>';
 	echo "Note: Average Score, Tries, Regens, and Times only counts those who completed the problem.<br/>";
 	echo 'Average Score is based on raw score, before any penalties are applied.<br/>';
 	echo 'All averages only include those who have started the assessment.</p>';

@@ -11,7 +11,7 @@ if (!isset($imasroot)) {
 	}
 }
 
-    $cid = Sanitize::courseId($_GET['cid']);
+	$cid = Sanitize::courseId($_GET['cid']);
     if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
         $addq = 'addquestions2';
         $from = 'addq2';
@@ -56,11 +56,14 @@ if (!isset($imasroot)) {
 	$useeditor = "commonmsg";
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
 	if (!isset($_POST['checked'])) {
-		echo "&gt; <a href=\"$addq.php?cid=$cid&amp;aid=" . Sanitize::onlyInt($_GET['aid']) . "\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
+		echo "<a href=\"$addq.php?cid=$cid&amp;aid=" . Sanitize::onlyInt($_GET['aid']) . "\">Add/Remove Questions</a> &gt; End of Assessment Msg</div>\n";
 	} else {
-		echo "&gt; <a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a> &gt; End of Assessment Msg</div>\n";
+		echo "<a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a> &gt; End of Assessment Msg</div>\n";
 	}
 	if (!isset($_POST['checked'])) {
 		$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
@@ -75,7 +78,7 @@ if (!isset($imasroot)) {
 		}
 	}
 	if ($endmsg!='') {
-        $endmsg = unserialize($endmsg);
+		$endmsg = unserialize($endmsg);
         if (!isset($endmsg['msgs'])) {
             $endmsg['def'] = '';
 		    $endmsg['type'] = 0;

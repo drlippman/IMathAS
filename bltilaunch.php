@@ -121,6 +121,7 @@ if (
     ||
     (isset($_REQUEST['custom_place_aid']) && isset($_REQUEST['oauth_consumer_key']) && substr($_REQUEST['oauth_consumer_key'],0,7)!='placein')
     ) {
+
 //if (isset($_SESSION['place_aid']) || isset($_REQUEST['custom_place_aid'])) {
 /*use new behavior for place_aid requests */
 
@@ -652,7 +653,7 @@ if (isset($_GET['launch'])) {
 		if (isset($_REQUEST['custom_assignment_due_at'])) {
 			$_REQUEST['custom_canvas_assignment_due_at'] = $_REQUEST['custom_assignment_due_at'];
 		}
-        }
+    }
 	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
 		$duedate = strtotime($_REQUEST['custom_canvas_assignment_due_at']);
 		if ($duedate !== false) {
@@ -2205,8 +2206,8 @@ if (isset($_GET['launch'])) {
 			$sourcecid = $parts[0];
 			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
 		}
-	}
-
+    }
+   
 
 	//Store all LTI request data in session variable for reuse on submit
 	//if we got this far, secret has already been verified
@@ -2245,6 +2246,20 @@ if (isset($_GET['launch'])) {
 			$_SESSION['selection_type'] = 'all';
 		}
 		$_SESSION['selection_data'] = @$_REQUEST['data'];
+    }
+    unset($_SESSION['lti_duedate']);
+	if (!isset($_REQUEST['custom_canvas_assignment_due_at'])) {
+		if (isset($_REQUEST['custom_assignment_due_at'])) {
+			$_REQUEST['custom_canvas_assignment_due_at'] = $_REQUEST['custom_assignment_due_at'];
+		}
+    }
+	if (isset($_REQUEST['custom_canvas_assignment_due_at'])) {
+		$duedate = strtotime($_REQUEST['custom_canvas_assignment_due_at']);
+		if ($duedate !== false) {
+			$_SESSION['lti_duedate'] = $duedate;
+		} else {
+			$_SESSION['lti_duedate'] = 2000000000;
+		}
 	}
 
 	//look if we know this student
@@ -2370,9 +2385,10 @@ $now = time();
 //general placement or common catridge placement - look for placement, or create if know info
 $orgparts = explode(':',$_SESSION['ltiorg']);  //THIS was added to avoid issues when GUID change, while still storing it
 $shortorg = $orgparts[0];
-if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltirole']!='instructor' && $_SESSION['lti_keytype']!='cc-vf' && $_SESSION['lti_keytype']!='cc-of') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') {
+
+if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['lti_keytype']!='cc-vf' && $_SESSION['lti_keytype']!='cc-of') || $_SESSION['lti_keytype']=='cc-g' || $_SESSION['lti_keytype']=='cc-c') {
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
-	$query .= "contextid=:contextid AND linkid=:linkid AND typeid>0 AND org LIKE :org";
+    $query .= "contextid=:contextid AND linkid=:linkid AND typeid>0 AND org LIKE :org";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>"$shortorg:%"));
 	if ($stm->rowCount()==0) {
@@ -2524,11 +2540,11 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 			$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':placementtype'=>'assess', ':typeid'=>$aid));
 			$keyparts = array('aid',$aid);
 
-		} else {
+		} else if ($_SESSION['ltirole']!='instructor') {
 			reporterror(_("This placement is not yet set up"));
 		}
 	} else {
-		$row = $stm->fetch(PDO::FETCH_NUM);
+        $row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row[0]=='course') {
 			$keyparts = array('cid',$row[1]);
 		} else if ($row[0]=='assess') {
@@ -2539,6 +2555,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 
 	}
 }
+
 if ($_SESSION['lti_keytype']=='cc-vf' || $_SESSION['lti_keytype']=='cc-of') {
 	$keyparts = array('folder',$_SESSION['view_folder'][0],$_SESSION['view_folder'][1]);
 }
@@ -2555,14 +2572,41 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	}
 } else if ($keyparts[0]=='aid') {   //is assessment level placement
 	$aid = intval($keyparts[1]);
-	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,LPcutoff,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,LPcutoff,avail,ltisecret,allowlate,date_by_lti FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line===false) {
 		$diaginfo = "(Debug info: 7-$aid)";
 		reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
 	}
-	$cid = $line['courseid'];
+    $cid = $line['courseid'];
+    if (isset($_SESSION['lti_duedate']) && ($line['date_by_lti']==1 || $line['date_by_lti']==2)) {
+		if ($_SESSION['ltirole']=='instructor') {
+			$newdatebylti = 2; //set/keep as instructor-set
+		} else {
+			$newdatebylti = 3; //mark as student-set
+		}
+		//no default due date set yet, or is the instructor:  set the default due date
+		$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,date_by_lti=:datebylti WHERE id=:id");
+		$stm->execute(array(':startdate'=>min($now, $_SESSION['lti_duedate']),
+			':enddate'=>$_SESSION['lti_duedate'], ':datebylti'=>$newdatebylti, ':id'=>$aid));
+		$line['enddate'] = $_SESSION['lti_duedate'];
+    }
+    if (!isset($_SESSION['lti_duedate']) && $line['date_by_lti']==1) {
+		//assessment is set to use dates sent by LTI, but none was sent.  Give error for instructor.
+		if ($_SESSION['ltirole'] == 'instructor') {
+			$err = 'Your '.$installname.' course is set to use dates sent by the LMS, but the LMS did not send a date. ';
+			$err .= 'Your "App Config" may be old and not contain the necessary info. ';
+			$err .= 'In Canvas, go to Settings -> Apps -> View App Configurations ';
+			$err .= 'and edit the '.$installname.' app. (If you cannot edit it, you may have to ask your ';
+			$err .= 'Canvas admin to edit the app). In the "Custom Fields" box, ';
+			$err .= 'enter this: canvas_assignment_due_at=$Canvas.assignment.dueAt.iso8601';
+			reporterror($err);
+		} else {
+			$err = 'Tell your teacher that Canvas is not sending due dates.';
+			reporterror($err);
+		}
+	}
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
 		//	reporterror("This assessment is closed");
@@ -2570,14 +2614,29 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		if ($line['avail']==0) {
 			//reporterror("This assessment is closed");
 		}
-		$stm2 = $DBH->prepare("SELECT startdate,enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass,is_lti FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		$useexception = false;
 		if ($row!=null) {
+            if (isset($_SESSION['lti_duedate']) && $line['date_by_lti']>0 && $_SESSION['lti_duedate']!=$row[1]) {
+				//if new due date is later, or no latepass used, then update
+				if ($row[2]==0 || $_SESSION['lti_duedate']>$row[1]) {
+					$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,is_lti=1,islatepass=0 WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+					$stm->execute(array(':startdate'=>min($now, $line['startdate'], $row[0]),
+						':enddate'=>$_SESSION['lti_duedate'], ':userid'=>$userid, ':assessmentid'=>$aid));
+				}
+			}
 			require_once("./includes/exceptionfuncs.php");
 			$exceptionfuncs = new ExceptionFuncs($userid, $cid, true);
 			$useexception = $exceptionfuncs->getCanUseAssessException($row, $line, true);
+		} else if ($line['date_by_lti']==3 && ($line['enddate']!=$_SESSION['lti_duedate'] || $now<$line['startdate'])) {
+			//default dates already set by LTI, and users's date doesn't match - create new exception
+			//also create if it's before the default assessment startdate - since they could access via LMS, it should be available.
+			$exceptionrow = array(min($now,$_SESSION['lti_duedate']), $_SESSION['lti_duedate'], 0, 1);
+			$stm = $DBH->prepare("INSERT INTO imas_exceptions (startdate,enddate,islatepass,is_lti,userid,assessmentid,itemtype) VALUES (?,?,?,?,?,?,'A')");
+			$stm->execute(array_merge($exceptionrow, array($userid, $aid)));
+			$useexception = true;
 		}
 		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
