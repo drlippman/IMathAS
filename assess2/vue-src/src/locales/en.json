@@ -376,6 +376,7 @@
     "keep_avg": "Grade is calculated on the average of all assessment attempts",
     "keep_last": "Grade is calculated on the last assessment attempt",
     "full_credit_parts": "Full credit all parts",
+    "full_manual_parts": "Full credit all manually-graded parts",
     "full_credit": "Full credit",
     "add_feedback": "Add feedback",
     "feedback": "Feedback",

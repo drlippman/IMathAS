@@ -53,6 +53,14 @@
         {{ fullCreditLabel }}
       </button>
       <button
+        v-if="canedit && hasManual && !isPractice"
+        type="button"
+        @click="manualFull"
+        class="slim"
+      >
+        {{ $t('gradebook.full_manual_parts') }}
+      </button>
+      <button
         v-if="canedit && !isPractice && showfeedback === false"
         type="button"
         class="slim"
@@ -297,6 +305,19 @@ export default {
       }
       return false;
     },
+    hasManual () {
+      if (this.qdata.parts.length === 1) {
+        return false;
+      }
+      for (let pn = 0; pn < this.qdata.parts.length; pn++) {
+        if (this.qdata.parts[pn].hasOwnProperty('req_manual') &&
+          this.qdata.parts[pn].req_manual === true
+        ) {
+          return true;
+        }
+      }
+      return false;
+    },
     hasAutoSaves () {
       return this.qdata.hasOwnProperty('autosaves');
     },
@@ -347,6 +368,16 @@ export default {
       for (let i = 0; i < this.answeights.length; i++) {
         this.$set(this.curScores, i, this.partPoss[i]);
         actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+      }
+    },
+    manualFull () {
+      for (let i = 0; i < this.answeights.length; i++) {
+        if (this.qdata.parts[i] && this.qdata.parts[i].hasOwnProperty('req_manual') &&
+          this.qdata.parts[i].req_manual === true
+        ) {
+          this.$set(this.curScores, i, this.partPoss[i]);
+          actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+        }
       }
     },
     clearWork () {
