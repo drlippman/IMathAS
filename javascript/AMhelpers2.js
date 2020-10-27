@@ -154,8 +154,8 @@ function init(paramarr, enableMQ, baseel) {
         //document.getElementById("pbtn"+qn).style.display = 'none';
       } //TODO: when matrix, clear preview on further input
     } else if (document.getElementById("qn"+qn)) {
-        var thisqn = qn;
-        document.getElementById("qn"+qn).addEventListener('keyup', function() { syntaxCheckMQ(thisqn) });
+        document.getElementById("qn"+qn).addEventListener('keyup', (function(thisqn) { 
+            return function () {syntaxCheckMQ(thisqn) }; })(qn));
     } //TODO: for non-preview types, still check syntax
     if (params.format === 'debit') {
       document.getElementById("qn"+qn).addEventListener('keyup', editdebit);
