@@ -544,7 +544,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	echo '</p>';
 	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
 	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
-    echo '<p class="list"><input type="checkbox" name="timelimitext"/> If time limit is expired, allow an additional <input size=2 name="timelimitextmin" value="0"> additional minutes
+    echo '<p class="list"><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow an additional <input size=2 name="timelimitextmin" value="0"> additional minutes
         <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span></p>';
     echo '</fieldset>';
 

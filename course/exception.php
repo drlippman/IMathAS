@@ -320,7 +320,7 @@ if ($aVer == 1) { // only allow this option for old assess UI for now. TODO
 if ($aVer > 1) { // only for new assess
 ?>
         <span class="form"><input type="checkbox" name="timelimitext" <?php if ($timeext > 0) echo 'checked';?>/></span>
-        <span class=formright>If time limit is expired, allow an additional <input size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> additional minutes
+        <span class=formright>If time limit is active or expired, allow an additional <input size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> additional minutes
           <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span>
         </span><br class=form>
 
