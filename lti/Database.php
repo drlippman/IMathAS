@@ -309,7 +309,7 @@ class Imathas_LTI_Database implements LTI\Database
         } else if ($userid === false && $contextid != '') {
             // look to see if we already have a user record with the same context id
             // from an LTI 1.1 connection
-            $groups = $this->get_groups($launch->get_issuer(), $launch->get_deployment_id());
+            $groups = $this->get_groups($platform_id, $launch->get_deployment_id());
             if (count($groups)==0) {
                 return false;
             }
@@ -457,7 +457,7 @@ class Imathas_LTI_Database implements LTI\Database
             } else if ($contextid != '') {
                 // look to see if we already have a user record with the same context id
                 // from an LTI 1.1 connection
-                $groups = $this->get_groups($launch->get_issuer(), $launch->get_deployment_id());
+                $groups = $this->get_groups($platform_id, $launch->get_deployment_id());
                 if (count($groups)==0) {
                     return null;
                 }
@@ -543,18 +543,18 @@ class Imathas_LTI_Database implements LTI\Database
 
     /**
      * Get groups associated with deployment
-     * @param  string $iss        issuer
+     * @param  int $platform_id  platform id
      * @param  string $deployment LMS provided deployment string
      * @return array  of groups, with indices id and name
      */
-    public function get_groups(string $iss, string $deployment): array
+    public function get_groups(int $platform_id, string $deployment): array
     {
         $query = 'SELECT ig.id,ig.name FROM imas_groups AS ig
       JOIN imas_lti_groupassoc AS iga ON ig.id=iga.groupid
       JOIN imas_lti_deployments AS ild ON ild.id=iga.deploymentid
-      WHERE ild.issuer=? AND ild.deployment=?';
+      WHERE ild.platform=? AND ild.deployment=?';
         $stm = $this->dbh->prepare($query);
-        $stm->execute(array($iss, $deployment));
+        $stm->execute(array($platform_id, $deployment));
         return $stm->fetchAll(PDO::FETCH_ASSOC);
     }
 

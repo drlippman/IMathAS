@@ -45,7 +45,7 @@ function show_postback_form($launch, $db, $err='') {
       // associated with this deployment; we'll only trust LTI to create instructors
       // if we recognize the deployment and can assign them to a group
       if (!empty($GLOBALS['CFG']['LTI']['allow_instr_create'])) {
-        $groups = $this->db->get_groups($launch->get_issuer(), $launch->get_deployment_id());
+        $groups = $this->db->get_groups($platform_id, $launch->get_deployment_id());
         if (count($groups)>0) {
           $promptForAcctCreation = true;
         }
