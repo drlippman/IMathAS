@@ -17,10 +17,10 @@ function show_postback_form($launch, $db, $err='') {
   $platform_id = $launch->get_platform_id();
   $migration_claim = $launch->get_migration_claim();
   // see if we already know who this person is
-  $localuserid = $db->get_local_userid($ltiuserid, $platform_id, $migration_claim);
+  $localuserid = $db->get_local_userid($launch);
 
   if ($role == 'Learner') {
-    $localcourse = $db->get_local_course($contextid, $platform_id, $migration_claim);
+    $localcourse = $db->get_local_course($contextid, $launch);
     if ($localcourse === null) {
       // no course link established yet - abort
       echo _("Course link not established yet.  Notify your instructor they need to click this assignment to set it up.");
@@ -45,7 +45,7 @@ function show_postback_form($launch, $db, $err='') {
       // associated with this deployment; we'll only trust LTI to create instructors
       // if we recognize the deployment and can assign them to a group
       if (!empty($GLOBALS['CFG']['LTI']['allow_instr_create'])) {
-        $groups = $this->db->get_groups($launch->get_issuer(), $launch->get_deployment_id());
+        $groups = $this->db->get_groups($platform_id, $launch->get_deployment_id());
         if (count($groups)>0) {
           $promptForAcctCreation = true;
         }

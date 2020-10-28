@@ -26,7 +26,7 @@ $contextid = $launch->get_platform_context_id();
 $platform_id = $launch->get_platform_id();
 $resource_link = $launch->get_resource_link();
 $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
-$localcourse = $db->get_local_course($contextid, $platform_id);
+$localcourse = $db->get_local_course($contextid, $launch);
 
 //Handle Postbacks
 if (!empty($_POST['makelineitem'])) {

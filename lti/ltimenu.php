@@ -63,7 +63,7 @@ if ($link->get_placementtype() == 'assess') {
     lti_can_handle_redirect($link->get_placementtype()) &&
     function_exists('lti_ltimenu')
 ) {
-    $localcourse = $db->get_local_course($contextid, $platform_id);
+    $localcourse = $db->get_local_course($contextid, $launch);
     echo lti_ltimenu($link, $launch, $localcourse, $db);
 }
 

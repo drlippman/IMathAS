@@ -32,7 +32,7 @@ $db = new Imathas_LTI_Database($DBH);
 $launch = LTI\LTI_Message_Launch::from_cache($_GET['launchid'], $db);
 $contextid = $launch->get_platform_context_id();
 $platform_id = $launch->get_platform_id();
-$localcourse = $db->get_local_course($contextid, $platform_id);
+$localcourse = $db->get_local_course($contextid, $launch);
 
 if (!empty($_POST['tolock'])) {
 	$db->lock_stus($_POST['tolock'], $localcourse->get_courseid());
