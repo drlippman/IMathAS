@@ -550,7 +550,7 @@ class Imathas_LTI_Database implements LTI\Database
     public function get_groups(string $iss, string $deployment): array
     {
         $query = 'SELECT ig.id,ig.name FROM imas_groups AS ig
-      JOIN imas_groupassoc AS iga ON ig.id=iga.groupid
+      JOIN imas_lti_groupassoc AS iga ON ig.id=iga.groupid
       JOIN imas_lti_deployments AS ild ON ild.id=iga.deploymentid
       WHERE ild.issuer=? AND ild.deployment=?';
         $stm = $this->dbh->prepare($query);
