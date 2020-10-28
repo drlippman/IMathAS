@@ -7,12 +7,18 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 	global $DBH;
 	$ioquestions = explode(",",$itemorder);
-	$questions = array();
+    $questions = array();
+    $RND = new Rand();
+    if ($shuffle&4) { 
+        // if set for all students same random seed, it makes sense they'd get
+        // the same questions from pool and shuffle order as well
+        $RND->srand($aid);
+      }
 	foreach($ioquestions as $k=>$q) {
 		if (strpos($q,'~')!==false) {
 			$sub = explode('~',$q);
 			if (strpos($sub[0],'|')===false) { //backwards compat
-				$questions[] = $sub[array_rand($sub,1)];
+				$questions[] = $sub[$RND->array_rand($sub,1)];
 			} else {
 				$grpqs = array();
 				$grpparts = explode('|',$sub[0]);
@@ -22,14 +28,14 @@ function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 						$questions[] = $sub[array_rand($sub,1)];
 					}
 				} else if ($grpparts[1]==0) { //Without replacement
-					shuffle($sub);
+					$RND->shuffle($sub);
 					for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
 						$questions[] = $sub[$i];
 					}
 					//$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
 					if ($grpparts[0]>count($sub)) { //fix stupid inputs
 						for ($i=count($sub); $i<$grpparts[0]; $i++) {
-							$questions[] = $sub[array_rand($sub,1)];
+							$questions[] = $sub[$RND->array_rand($sub,1)];
 						}
 					}
 				}
@@ -50,10 +56,10 @@ function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 		}
 	}
 	
-	if ($shuffle&1) {shuffle($questions);}
+	if ($shuffle&1) {$RND->shuffle($questions);}
 	else if ($shuffle&16) {
 		$firstq = array_shift($questions);
-		shuffle($questions);
+		$RND->shuffle($questions);
 		array_unshift($questions, $firstq);
 	}
 	

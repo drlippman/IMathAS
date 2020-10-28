@@ -274,16 +274,21 @@ class Imathas_LTI_Database implements LTI\Database
 
     /**
      * Get local user id
-     * @param  string $ltiuserid
-     * @param  int $platform_id
-     * @param  false|array $migration_claim
+     * @param  LTI_Message_Launch $launch
      * @return false|int local userid
      */
-    public function get_local_userid(string $ltiuserid, int $platform_id, $migration_claim=false)
+    public function get_local_userid(LTI_Message_Launch $launch)
     {
+        $ltiuserid = $launch->get_platform_user_id();
+        $platform_id = $launch->get_platform_id();
+
         $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org=?');
         $stm->execute(array($ltiuserid, 'LTI13-' . $platform_id));
         $userid = $stm->fetchColumn(0);
+        if ($userid === false) {
+            $contextid = $launch->get_platform_context_id();
+            $migration_claim = $launch->get_migration_claim();
+        }
         if ($userid === false && 
             !empty($migration_claim) && 
             $this->verify_migration_claim($migration_claim)
@@ -301,6 +306,36 @@ class Imathas_LTI_Database implements LTI\Database
                 // found one; create a new ltiusers record using new ltiuserd/platformid
                 $this->create_lti_user($userid, $ltiuserid, $platform_id);
             }
+        } else if ($userid === false && $contextid != '') {
+            // look to see if we already have a user record with the same context id
+            // from an LTI 1.1 connection
+            $groups = $this->get_groups($launch->get_issuer(), $launch->get_deployment_id());
+            if (count($groups)==0) {
+                return false;
+            }
+            // find old course connections using same contextid
+            $query = 'SELECT ilc.org,iu.groupid FROM imas_lti_courses AS ilc 
+                JOIN imas_courses AS ic ON ic.id=ilc.courseid 
+                JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ilc.contextid=?';
+            $stm = $this->dbh->prepare($query);
+            $stm->execute(array($contextid));
+            $qarr = array($ltiuserid);
+            while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                if (in_array($row['groupid'], $groups)) { // check course is in right group
+                    $key = explode(':', $row['org'])[0];
+                    $qarr[] = $key.':%';
+                }
+            }
+            if (count($qarr)==2) { // only use if one matching association
+                $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org LIKE ?');
+                $stm->execute($qarr);
+                $userid = $stm->fetchColumn(0);
+                if ($userid !== false) {
+                    // found one; create a new ltiusers record using new ltiuserd/platformid
+                    $this->create_lti_user($userid, $ltiuserid, $platform_id);
+                }
+            }
+            
         }
         return $userid;
     }
@@ -382,12 +417,13 @@ class Imathas_LTI_Database implements LTI\Database
     /**
      * Get local user course id
      * @param  string $contextid
-     * @param  int $platform_id
-     * @param  false|array $migration_claim
+     * @param  LTI_Message_Launch $launch
      * @return null|LTI_Localcourse local course info
      */
-    public function get_local_course(string $contextid, int $platform_id, $migration_claim=false): ?LTI\LTI_Localcourse
+    public function get_local_course(string $contextid, LTI_Message_Launch $launch): ?LTI\LTI_Localcourse
     {
+        $platform_id = $launch->get_platform_id();
+
         $query = 'SELECT ilc.id,ilc.courseid,ilc.copiedfrom,ic.UIver,ic.dates_by_lti FROM
             imas_lti_courses AS ilc JOIN imas_courses AS ic ON ilc.courseid=ic.id
             WHERE ilc.contextid=? AND ilc.org=?';
@@ -395,6 +431,7 @@ class Imathas_LTI_Database implements LTI\Database
         $stm->execute(array($contextid, 'LTI13-' . $platform_id));
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row === false || $row === null) {
+            $migration_claim = $launch->get_migration_claim();
             if (!empty($migration_claim) && $this->verify_migration_claim($migration_claim)) {
                 if (isset($migration_claim['context_id'])) {
                     $oldcontextid = $migration_claim['context_id'];
@@ -402,7 +439,7 @@ class Imathas_LTI_Database implements LTI\Database
                     $oldcontextid = $contextid;
                 }
                 $oldkey = $migration_claim['oauth_consumer_key'];
-                $query = 'SELECT courseid,copiedfrom,contextlabel FROM imas_ltiusers 
+                $query = 'SELECT courseid,copiedfrom,contextlabel FROM imas_lti_courses 
                     WHERE contextid=? AND org LIKE ?';
                 $stm = $this->dbh->prepare($query);
                 $stm->execute(array($oldcontextid, $oldkey.':%'));
@@ -414,6 +451,39 @@ class Imathas_LTI_Database implements LTI\Database
                     $localcourse = LTI\LTI_Localcourse::new()
                         ->set_courseid($row['courseid'])
                         ->set_copiedfrom($row['copiedfrom'])
+                        ->set_id($newlticourseid);
+                    return $localcourse;
+                }
+            } else if ($contextid != '') {
+                // look to see if we already have a user record with the same context id
+                // from an LTI 1.1 connection
+                $groups = $this->get_groups($launch->get_issuer(), $launch->get_deployment_id());
+                if (count($groups)==0) {
+                    return null;
+                }
+                // find old course connections using same contextid
+                $query = 'SELECT ilc.courseid,ilc.copiedfrom,ilc.contextlabel,iu.groupid FROM imas_lti_courses AS ilc 
+                    JOIN imas_courses AS ic ON ic.id=ilc.courseid 
+                    JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ilc.contextid=?';
+                $stm = $this->dbh->prepare($query);
+                $stm->execute(array($contextid));
+                $foundrow = false;
+                while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                    if (in_array($row['groupid'], $groups)) { // check course is in right group
+                        if ($foundrow === false) {
+                            $foundrow = $row;
+                        } else { // more than one; bail
+                            return null;
+                        }
+                    }
+                }
+                if ($foundrow !== false) {
+                    // found one; create a new lti_course record using new contextid/platformid
+                    $newlticourseid = $this->add_lti_course($contextid, $platform_id, 
+                        $foundrow['courseid'], $foundrow['contextlabel'], $foundrow['copiedfrom']);
+                    $localcourse = LTI\LTI_Localcourse::new()
+                        ->set_courseid($foundrow['courseid'])
+                        ->set_copiedfrom($foundrow['copiedfrom'])
                         ->set_id($newlticourseid);
                     return $localcourse;
                 }

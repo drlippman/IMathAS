@@ -27,7 +27,7 @@ $contextid = $launch->get_platform_context_id();
 $ltiuserid = $launch->get_platform_user_id();
 $platform_id = $launch->get_platform_id();
 
-$localcourse = $db->get_local_course($contextid, $platform_id, $launch->get_migration_claim());
+$localcourse = $db->get_local_course($contextid, $launch);
 
 $deeplink = $launch->get_deep_link();
 

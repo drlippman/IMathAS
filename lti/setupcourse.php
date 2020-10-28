@@ -25,7 +25,7 @@ $contexttitle = $launch->get_platform_context_title();
 $platform_id = $launch->get_platform_id();
 
 // double check course connection not already established
-if ($db->get_local_course($contextid, $platform_id, $launch->get_migration_claim()) !== null) {
+if ($db->get_local_course($contextid, $launch)) {
   echo 'Error: course link already established';
   exit;
 }
