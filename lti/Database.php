@@ -277,7 +277,7 @@ class Imathas_LTI_Database implements LTI\Database
      * @param  LTI_Message_Launch $launch
      * @return false|int local userid
      */
-    public function get_local_userid(LTI_Message_Launch $launch)
+    public function get_local_userid(LTI\LTI_Message_Launch $launch)
     {
         $ltiuserid = $launch->get_platform_user_id();
         $platform_id = $launch->get_platform_id();
@@ -420,7 +420,7 @@ class Imathas_LTI_Database implements LTI\Database
      * @param  LTI_Message_Launch $launch
      * @return null|LTI_Localcourse local course info
      */
-    public function get_local_course(string $contextid, LTI_Message_Launch $launch): ?LTI\LTI_Localcourse
+    public function get_local_course(string $contextid, LTI\LTI_Message_Launch $launch): ?LTI\LTI_Localcourse
     {
         $platform_id = $launch->get_platform_id();
 
