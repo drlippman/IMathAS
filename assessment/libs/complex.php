@@ -604,19 +604,18 @@ function cx_prettyquadRoot(float $a, float $b, float $c){
     if ($d<0){
         
             $a2=$a*2;
-            $D=makereducedfraction($b,$a2);
+            $D=makereducedfraction(-$b,$a2);
 
             $re= -$D;
             $N=reduceradicalfrac(1,-$d,$a2);
             $im= sqrt(abs($d))/(2*$a);
             $im2=-$im;
-            $st=array("-$D + $N i","-$D - $N i");
+            $st=array("$D + $N i","$D - $N i");
     }
         else {
-            $r1=makereducedfraction((-$b-sqrt($d)),(2*$a));
-            $r2=makereducedfraction((-$b+sqrt($d)),(2*$a));
-           // $r1=round(((-$b-sqrt($d))/(2*$a)),$roundto);
-            //$r2=round(((-$b+sqrt($d))/(2*$a)),$roundto);
+            $r1 = reducequadraticform(-$b, -1, $d, 2*$a);
+            $r2 = reducequadraticform(-$b, 1, $d, 2*$a);
+
             $st=array("$r1","$r2");
         }
 
