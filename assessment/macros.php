@@ -35,7 +35,7 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
- "randcountry","randcountries");
+ "randcountry","randcountries","sorttwopointdata");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -3972,6 +3972,23 @@ function parsedrawgrid($str) {
     $w = isset($p[6]) ? $p[6] : 300;
     $h = isset($p[7]) ? $p[7] : 300;
     return [$xmin, $xmax, $ymin, $ymax, $w, $h];
+}
+
+function sorttwopointdata($data, $type='') {
+    if ($type=='line' || $type=='lineseg' || $type=='cos' || $type=='exp' || $type=='log') {
+        foreach ($data as $k=>$v) {
+            if ($v[2] < $v[0]) {
+                $data[$k] = [$v[2],$v[3],$v[0],$v[1]];
+            }
+        }
+    }
+    usort($data, function($a,$b) {
+        if ($a[0] == $a[1]) { 
+            return $a[0] - $b[1];
+        }
+        return ($a[0] - $b[1]);
+    });
+    return $data;
 }
 
 function gettwopointlinedata($str,$xmin=null,$xmax=null,$ymin=null,$ymax=null,$w=null,$h=null) {
