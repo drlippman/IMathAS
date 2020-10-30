@@ -2474,6 +2474,17 @@ Controller.open(function(_, super_) {
     var block = latexMathParser.skip(eof).or(all.result(false)).parse(latex);
 
     if (block && !block.isEmpty() && block.prepareInsertionAt(cursor)) {
+        // do autoparen if needed
+        var leftcmd = block.ends[L];
+        if (cursor.options.autoParenOperators && !(leftcmd instanceof Bracket) && !(leftcmd instanceof SupSub) &&   
+           ((cursor[L].isPartOfOperator && (cursor[L][1] === 0 || cursor[L].jQ.hasClass("mq-last"))) ||
+              ((cursor[L].hasOwnProperty("sup") || cursor[L].hasOwnProperty("sub")) &&
+                cursor[L][-1].isPartOfOperator
+              )
+           )
+        ) {
+            cursor.parent.write(cursor, '(');
+        }
       block.children().adopt(cursor.parent, cursor[L], cursor[R]);
       var jQ = block.jQize();
       jQ.insertBefore(cursor.jQ);
