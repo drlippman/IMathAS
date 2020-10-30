@@ -2759,8 +2759,16 @@ $hints[question part number][attempt number] = "hint text"
 Then in question text, place each hint using $hintloc[question part number]
 </p>
 <p>
+To have the hint to display based on a set of previous answers, you can use:
+</p>
+<pre>
+$hints[question part number][attempt number] = array("hint text", [part num1, part num 2])
+</pre>
+<p>This will display the hint after all the parts listed have had the required attempts or are correct.</p>
+<p>
 To override the default <em>Hint:</em> text, set $hintlabel.
 </p>
+
 
 <h3>Help references</h3>
 <p>To provide help of some sort for a question (typically, links to videos, book references, etc), define $helptext

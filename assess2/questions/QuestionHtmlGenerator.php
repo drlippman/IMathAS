@@ -890,16 +890,41 @@ class QuestionHtmlGenerator
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
-                if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
-                    continue;
-                }
                 $lastkey = max(array_keys($hintpart));
-                if ($partattemptn[$iidx] > $lastkey) {
-                    $usenum = $lastkey;
+
+                if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"
+                    $usenum = 10000;
+                    $allcorrect = true;
+                    $showfor = array_map('intval', $hintpart[$lastkey][1]);
+                    foreach ($showfor as $subpn) {
+                        if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$subpn] == 1) {
+                           continue; // don't consider correct
+                        } else {
+                           $allcorrect = false;
+                        }
+                        if ($partattemptn[$subpn] > $lastkey && $lastkey < $usenum) {
+                            $usenum = $lastkey;
+                        } else if ($partattemptn[$subpn] < $usenum) {
+                            $usenum = $partattemptn[$subpn];
+                        }
+                    }
+                    if ($allcorrect || $usenum == 10000) { 
+                        continue;
+                    }
+                    if (is_array($hintpart[$usenum])) {
+                        $hintpart[$usenum] = $hintpart[$usenum][0];
+                    }
                 } else {
-                    $usenum = $partattemptn[$iidx];
+                    if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
+                        continue;
+                    }
+                    if ($partattemptn[$iidx] > $lastkey) {
+                        $usenum = $lastkey;
+                    } else {
+                        $usenum = $partattemptn[$iidx];
+                    }
                 }
-                if ($hintpart[$usenum] != '') {
+                if (!empty($hintpart[$usenum])) {
                     if (strpos($hintpart[$usenum], '</div>') !== false) {
                         $hintloc[$iidx] = $hintpart[$usenum];
                     } else if (strpos($hintpart[$usenum], 'button"') !== false) {
