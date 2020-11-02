@@ -650,19 +650,28 @@
 			}
 
 			if (!empty($qdata['other_tries'])) {
-				echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
-				echo '<div id="alltries'.$cnt.'" style="display:none;">';
-				foreach ($qdata['other_tries'] as $pn=>$tries) {
-					if (count($qdata['other_tries']) > 1) {
-						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
-					}
-					foreach ($tries as $tn=>$try) {
-						echo '<div>'._('Try').' '.($tn+1).': ';
-						formatTry($try,$cnt,$pn,$tn);
-						echo '</div>';
-					}
-				}
-				echo '</div>';
+                $maxtries = 0;
+                foreach ($qdata['other_tries'] as $pn=>$tries) {
+                    if (count($tries)>1) {
+                        $maxtries = count($tries);
+                        break;
+                    }
+                }
+                if ($maxtries > 0) {
+                    echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
+                    echo '<div id="alltries'.$cnt.'" style="display:none;">';
+                    foreach ($qdata['other_tries'] as $pn=>$tries) {
+                        if (count($qdata['other_tries']) > 1) {
+                            echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+                        }
+                        foreach ($tries as $tn=>$try) {
+                            echo '<div>'._('Try').' '.($tn+1).': ';
+                            formatTry($try,$cnt,$pn,$tn);
+                            echo '</div>';
+                        }
+                    }
+                    echo '</div>';
+                }
 			}
 
 			if (!empty($qdata['autosaves'])) {
