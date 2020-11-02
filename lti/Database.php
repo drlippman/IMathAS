@@ -589,9 +589,26 @@ class Imathas_LTI_Database implements LTI\Database
     }
 
     /**
+     * Get all courses user is teacher for
+     * 
+     * @param int $userid 
+     * @return array of id=>name
+     */
+    public function get_all_courses(int $userid): array 
+    {
+        $query = "SELECT DISTINCT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS imt ON ic.id=imt.courseid ";
+        $query .= "AND imt.userid=? WHERE ic.available<4 ORDER BY ic.name";
+        $stm = $this->dbh->prepare($query);
+        $stm->execute([$userid]);
+        $courses = [];
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $courses[$row[0]] = $row[1];
+        }
+        return $courses;
+    }
+
+    /**
      * Get courses we might want to copy or associate with
-     *
-     * TODO: extend with hooks to handle initial launches to other item types
      *
      * @param  array $target    should have 'refcid' and 'refaid' defined
      * @param  int   $lastcopied last copied course id
