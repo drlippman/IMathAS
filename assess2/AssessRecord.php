@@ -1771,7 +1771,7 @@ class AssessRecord
     }
 
     list($stuanswers, $stuanswersval) = $this->getStuanswers($ver, $tryToShow);
-    list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect();
+    list($scorenonzero, $scoreiscorrect) = $this->getScoreIsCorrect($ver);
     $autosaves = [];
     $seqPartDone = array();
     $correctAnswerWrongFormat = array();

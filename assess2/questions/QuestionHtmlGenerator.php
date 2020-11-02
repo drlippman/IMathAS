@@ -156,14 +156,14 @@ class QuestionHtmlGenerator
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {
           if (count($partattemptn) == 1) {
-            $GLOBALS['assess2-curq-iscorrect'] = $scoreiscorrect[$thisq] ? 1 : 0;
+            $GLOBALS['assess2-curq-iscorrect'] = ($scoreiscorrect[$thisq] < 0 ? -1 : ($scoreiscorrect[$thisq]==1 ? 1 : 0));
           } else {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
               if ($iidx==0) {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = -1;
               } else {
-                $GLOBALS['assess2-curq-iscorrect'][$kidx] = $scoreiscorrect[$thisq][$kidx] ? 1 : 0;
+                $GLOBALS['assess2-curq-iscorrect'][$kidx] = ($scoreiscorrect[$thisq][$kidx] < 0 ? -1 : ($scoreiscorrect[$thisq][$kidx]==1 ? 1 : 0));
               }
             }
           }
