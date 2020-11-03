@@ -25,6 +25,9 @@ function parseSearchString($str)
 
     $out['terms'] = preg_split('/\s+/', trim($str));
     foreach ($out['terms'] as $k => $v) {
+        if ($v=='') { 
+            unset($out['terms'][$k]);
+        }
         if (ctype_digit($v) && !isset($out['id'])) {
             $out['id'] = $v;
             if (count($out['terms']) == 1) { // only id, remove as keyword
@@ -201,7 +204,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         if ($searchquery === '') {
             $searchquery = '(' . $idsearch . ')';
         } else {
-            $searchquery = '(' . $searchquery . ' OR ' . $idors . ')';
+            $searchquery = '(' . $searchquery . ' OR ' . $idsearch . ')';
         }
     }
 
@@ -346,6 +349,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $query .= ' OFFSET ' . intval($offset);
         }
     }
+    //echo $query;
+    //print_r($searchvals);
     $stm = $DBH->prepare($query);
     $stm->execute($searchvals);
     $res = [];
