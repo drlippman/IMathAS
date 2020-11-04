@@ -125,8 +125,8 @@ var AMQsymbols = [
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
 {input:"<<", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:">>", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
-//{input:"{:", tag:"mo", output:"{:", tex:null, ttype:LEFTBRACKET, invisible:true},
-//{input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
+{input:"{:", tag:"mo", output:"{:", tex:null, ttype:LEFTBRACKET, invisible:true},
+{input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
 
 //miscellaneous symbols
 {input:"int",  tag:"mo", output:"\u222B", tex:null, ttype:CONST},
