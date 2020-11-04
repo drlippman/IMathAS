@@ -39,6 +39,10 @@
             {{ aData.original_enddate_disp }}.
           {{ extensionString }}
         </span>
+        <span v-if="aData.hasOwnProperty('attemptext')">
+          <br/>
+          {{ $t('gradebook.attemptext', {n: aData.attemptext}) }}
+        </span>
       </div>
 
       <div v-if="canEdit && aData.latepass_blocked_by_practice">

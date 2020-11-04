@@ -76,6 +76,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $waivereqscore = (isset($_POST['waivereqscore']))?1:0;
         $epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
         $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
+        $attemptext = (isset($_POST['attemptext'])) ? intval($_POST['attemptextnum']) : 0;
+
         $DBH->beginTransaction();
         if ($timelimitext > 0) {
             // pull cases eligible for timelimit extension
@@ -114,14 +116,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
-			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty,timeext=:timeext WHERE id=:id");
-			$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext, ':id'=>$row[0]));
+			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty,timeext=:timeext,attemptext=:attemptext WHERE id=:id");
+			$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext, ':attemptext'=>$attemptext, ':id'=>$row[0]));
 		} else {
-			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext) VALUES ";
-			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :timeext)";
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext) VALUES ";
+			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty, :timeext, :attemptext)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$aid, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext));
+				':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':timeext'=>$timelimitext, ':attemptext'=>$attemptext));
 		}
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
@@ -213,7 +215,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$aVer = $row[3];
 
 		//check if exception already exists
-		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty,timeext FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
 		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>Sanitize::onlyInt($_GET['aid'])));
 		$erow = $stm->fetch(PDO::FETCH_NUM);
 		$page_isExceptionMsg = "";
@@ -228,7 +230,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$curwaive = $erow[3];
             $curepenalty = $erow[4];
             $timeext = $erow[5];
-		}
+            $attemptext = $erow[6];
+		} else {
+            $timeext = 0;
+            $attemptext = 0;
+        }
 		if ($isDateByLTI) {
 			$page_isExceptionMsg .= '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
 			$page_isExceptionMsg .=  'students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given ';
@@ -323,6 +329,9 @@ if ($aVer > 1) { // only for new assess
         <span class=formright>If time limit is active or expired, allow an additional <input size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> additional minutes
           <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span>
         </span><br class=form>
+        <span class="form"><input type="checkbox" name="attemptext" <?php if ($attemptext > 0) echo 'checked';?>/></span> 
+        <span class=formright>Allow student <input size=2 name="attemptextnum" value="<?php echo $attemptext; ?>"> additional versions.</span>
+        <br class=form>
 
 <?php
 }
