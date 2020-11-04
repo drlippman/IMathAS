@@ -20,6 +20,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
 		$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
         $timelimitext = (isset($_POST['timelimitext'])) ? intval($_POST['timelimitextmin']) : 0;
+        $attemptext = (isset($_POST['attemptext'])) ? intval($_POST['attemptextnum']) : 0;
 
 		$forumitemtype = $_POST['forumitemtype'];
 		$postbydate = ($forumitemtype=='R')?0:parsedatetime($_POST['pbdate'],$_POST['pbtime']);
@@ -83,19 +84,19 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                     } else {
                         $thistimelimitext = 0;
                     }
-					$insertExceptionHolders[] = "(?,?,?,?,?,?,?,?)";
-					array_push($insertExceptionVals, $stu, $aid, $startdate, $enddate, $waivereqscore, $epenalty, $thistimelimitext, 'A');
+					$insertExceptionHolders[] = "(?,?,?,?,?,?,?,?,?)";
+					array_push($insertExceptionVals, $stu, $aid, $startdate, $enddate, $waivereqscore, $epenalty, $thistimelimitext, $attemptext, 'A');
 				}
 			}
 		}
 		//run update
 		if (count($addexcarr)>0 && count($toarr)>0) {
             if ($timelimitext == 0) {
-			    $stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=?,timeext=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
-                $stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty,$timelimitext), $toarr, $addexcarr));
+			    $stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=?,timeext=?,attemptext=? WHERE userid IN ($uidplaceholders) AND assessmentid IN ($aidplaceholders) and itemtype='A'");
+                $stm->execute(array_merge(array($startdate, $enddate, $waivereqscore, $epenalty,$timelimitext,$attemptext), $toarr, $addexcarr));
             } else {
                 // do one by one to handle timelimit diff 
-                $stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=?,timeext=? WHERE userid=? AND assessmentid=? and itemtype='A'");
+                $stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=?,enddate=?,islatepass=0,waivereqscore=?,exceptionpenalty=?,timeext=?,attemptext=? WHERE userid=? AND assessmentid=? and itemtype='A'");
                 foreach ($toarr as $stu) {
                     foreach ($addexcarr as $aid) {
                         if (isset($existingExceptions[$stu.'-'.$aid])) {
@@ -104,7 +105,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                             } else {
                                 $thistimelimitext = 0;
                             }
-                            $stm->execute([$startdate, $enddate, $waivereqscore, $epenalty,$thistimelimitext, $stu, $aid]);
+                            $stm->execute([$startdate, $enddate, $waivereqscore, $epenalty,$thistimelimitext,$attemptext, $stu, $aid]);
                         }
                     }
                 }
@@ -113,7 +114,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 
 		//run inserts
 		if (count($insertExceptionVals)>0) {
-			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext,itemtype) VALUES ";
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty,timeext,attemptext,itemtype) VALUES ";
 			$query .= implode(',', $insertExceptionHolders);
 			$stm = $DBH->prepare($query);
 			$stm->execute($insertExceptionVals);
@@ -353,9 +354,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		}
 		echo "</h1>";
 	}
-	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
+	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.itemtype='A' AND ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid=:courseid AND iu.id IN ($tolist) ) ";
-	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
+	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
 	$query .= "WHERE (ie.itemtype='F' OR ie.itemtype='P' OR ie.itemtype='R') AND ie.assessmentid=i_f.id AND ie.userid=iu.id AND i_f.courseid=:courseid2 AND iu.id IN ($tolist) )";
 	if ($isall) {
 		$query .= "ORDER BY itemname,LastName,FirstName";
@@ -406,6 +407,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                         echo _(' - used');
                     }
                     echo '</i>';
+                }
+                if ($row['attemptext'] > 0) {
+                    $notesarr[$row['eid']] .= ' <i>('.sprintf(_('%d additional versions'), $row['attemptext']).')</i>';
                 }
 				if ($row['islatepass']>0) {
 					echo ' <i>('._('LatePass').')</i>';
@@ -460,6 +464,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                         $notesarr[$row['eid']] .= _(' - used');
                     }
                     $notesarr[$row['eid']] .= ')';
+                }
+                if ($row['attemptext'] > 0) {
+                    $notesarr[$row['eid']] .= ' ('.sprintf(_('%d additional versions'), $row['attemptext']).')';
                 }
 				if ($row['islatepass']>0) {
 					$notesarr[$row['eid']] .= ' ('._('LatePass').')';
@@ -546,9 +553,12 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	echo '<br/>Warning: this will delete the students\' attempts and grades for these assessments.</span>';
 	echo '</p>';
 	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
-	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
-    echo '<p class="list"><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow an additional <input size=2 name="timelimitextmin" value="0"> additional minutes
-        <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span></p>';
+    echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
+    if ($courseUIver > 1) {
+        echo '<p class="list"><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow an additional <input size=2 name="timelimitextmin" value="0"> additional minutes.
+            <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span></p>';
+        echo '<p class="list"><input type="checkbox" name="attemptext" /> Allow student <input size=2 name="attemptextnum" value="0"> additional versions.</p>';
+    }
     echo '</fieldset>';
 
 

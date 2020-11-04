@@ -107,6 +107,16 @@ export default {
       var mainstr, attemptsLeftStr, substr, alertstr;
 
       var attemptsLeft = settings.allowed_attempts - settings.prev_attempts.length;
+      let altstr = '';
+      if (settings.hasOwnProperty('attemptext')) {
+        if (settings.prev_attempts.length === 0) {
+          altstr = this.$tc('setlist.take', attemptsLeft);
+        } else {
+          altstr = this.$tc('setlist.take_more', attemptsLeft);
+        }
+        attemptsLeft = Math.max(0, attemptsLeft - settings.attemptext);
+      }
+
       if (settings.prev_attempts.length === 0) {
         attemptsLeftStr = this.$tc('setlist.take', attemptsLeft);
       } else {
@@ -141,6 +151,7 @@ export default {
       return {
         icon: 'retake',
         str: mainstr,
+        altstr: altstr,
         sub: substr,
         alert: alertstr
       };
