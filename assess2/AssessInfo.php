@@ -767,8 +767,11 @@ class AssessInfo
       //the question must be in a grouping.  Find the group.
       foreach ($this->assessData['itemorder'] as $qid) {
         if (is_array($qid) && in_array($oldquestion, $qid['qids'])) {
-          $group = $qid['qids'];
-          $grouptype = $qid['type'];
+          if ($qid['type'] == 'pool' && $qid['n'] < count($qid['qids'])) {
+            // only do redraw if not picking n from n
+            $group = $qid['qids'];
+            $grouptype = $qid['type'];
+          }
           break;
         }
       }
