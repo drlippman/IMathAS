@@ -84,7 +84,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
               "ON ia.id=iar.assessmentid WHERE ia.id=? AND iar.userid=? " .
               "AND ia.timelimit>0 AND iar.starttime>0";
             $stm = $DBH->prepare($query);
-            $stm->execute([$aid, $uid, time()]);
+            $stm->execute([$aid, $uid]);
             $row = $stm->fetch(PDO::FETCH_NUM);
             if ($row === false) {
                 // if doesn't meet conditions, not eligible for time extension; zero out
