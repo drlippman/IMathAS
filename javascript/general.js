@@ -975,9 +975,6 @@ function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
 	}
-	if (el.target && jQuery(el).find('.openext').length == 0) {
-		jQuery(el).append('<span class="sr-only openext">Opens externally</span>');
-	}
 }
 function addBlankTarget(i,el) {
 	if (el.host !== window.location.host) {

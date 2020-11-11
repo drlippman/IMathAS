@@ -1016,9 +1016,11 @@ a.attach {
     padding-left: 20px;
 }
 a[target=_blank]::after {
-	content: "";
+    content: "Opens Externally";
+    color: transparent;
 	width:16px;
-	height:1em;
+    height:1em;
+    overflow: hidden;
 	display: inline-block;
 	background: url(img/extlink.png) center right no-repeat;
 }
