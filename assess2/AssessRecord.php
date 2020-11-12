@@ -1865,9 +1865,11 @@ class AssessRecord
       if ($this->teacherInGb) {
         $seqPartDone[$pn] = true;
       } else if ($showscores) {
-        // move on if correct or out of tries
+        // move on if correct or out of tries or manually graded
         $seqPartDone[$pn] = ($partattemptn[$pn] === $trylimit ||
-          $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] > .98);
+          $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] > .98 ||
+          $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] == -2
+        );
       } else {
         // move on if attempted
         $seqPartDone[$pn] = ($partattemptn[$pn] > 0);
