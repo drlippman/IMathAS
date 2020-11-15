@@ -441,7 +441,8 @@ function AMQTparseSexpr(str) { //parses str and returns [node,tailstr]
 	    }
     } else {
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible)
-		    node = '{\\left.'+result[0]+'}';
+            //node = '{\\left.'+result[0]+'}';
+            node = '{'+result[0]+'}';
 	    else {
 		    node = '{\\left'+AMQTgetTeXbracket(symbol) + result[0]+'}';
 	    }
@@ -696,14 +697,14 @@ function AMQTparseExpr(str,rightbracket) {
       newFrag += node;
       addedright = true;
     } else {
-	    newFrag += '\\right.';
+	    //newFrag += '\\right.';
 	    addedright = true;
     }
 
   }
   if(AMQnestingDepth>0 && !addedright) {
-	  newFrag += '\\right.'; //adjust for non-matching left brackets
-	  //todo: adjust for non-matching right brackets
+      newFrag += '\\right)'; //adjust for non-matching left brackets.  should be \\right. but MQ can't handle that
+      //todo: adjust for non-matching right brackets
   }
   return [newFrag,str];
 }
@@ -723,6 +724,8 @@ return function(str) {
   if (str.match(/\S/)==null) {
 	  return "";
   }
+  console.log(str.replace(/^\s+/g,""));
+  console.log(AMQTparseExpr(str.replace(/^\s+/g,""),false)[0]);
   return AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
 }
 }();
