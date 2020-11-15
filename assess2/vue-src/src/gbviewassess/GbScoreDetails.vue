@@ -135,6 +135,16 @@
         target="_blank"
       >{{ help.title }}</a>
     </div>
+    <div>
+      <a :href="messageHref" target="help" v-if="showMessage">
+        <icons name="message" />
+        {{ $t('helps.message_instructor') }}
+      </a>
+      <a :href="forumHref" target="help" v-if="postToForum > 0">
+        <icons name="forum" />
+        {{ $t('helps.post_to_forum') }}
+      </a>
+    </div>
   </div>
 </template>
 
@@ -346,6 +356,43 @@ export default {
       } else {
         return [];
       }
+    },
+    showMessage () {
+      return (store.assessInfo.hasOwnProperty('help_features') &&
+        store.assessInfo.help_features.message === true &&
+        !store.assessInfo.can_edit_scores
+      );
+    },
+    postToForum () {
+      return (store.assessInfo.hasOwnProperty('help_features') &&
+        store.assessInfo.help_features.forum
+      );
+    },
+    quoteQ () {
+      const qsid = this.qdata.questionsetid;
+      const seed = this.qdata.seed;
+      const ver = 2; // TODO: send from backend
+      return this.qn + '-' + qsid + '-' + seed + '-' + store.aid + '-' + ver;
+    },
+    messageHref () {
+      let href = window.imasroot + '/msgs/msglist.php?';
+      href += window.$.param({
+        cid: store.cid,
+        add: 'new',
+        quoteq: this.quoteQ,
+        to: 'instr'
+      });
+      return href;
+    },
+    forumHref () {
+      let href = window.imasroot + '/forums/thread.php?';
+      href += window.$.param({
+        cid: store.cid,
+        forum: store.assessInfo.help_features.forum,
+        modify: 'new',
+        quoteq: this.quoteQ
+      });
+      return href;
     }
   },
   methods: {
