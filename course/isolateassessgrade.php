@@ -18,14 +18,21 @@
 	$now = time();
 
 	if ($isteacher) {
-		if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
+		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
 		}
-		if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
+		if (isset($_POST['posted']) && $_POST['posted']=="Un-excuse Grade") {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
-		}
+        }
+        if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
+            $calledfrom='isolateassess';
+            $_POST['checked'] = $_POST['stus'];
+            $_POST['assesschk'] = array($aid);
+			include("massexception.php");
+        }
+        
 		if (isset($_POST['submitua'])) {
 			require('../assess2/AssessHelpers.php');
 			AssessHelpers::submitAllUnsumitted($cid, $aid);
@@ -246,7 +253,9 @@
 	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 	echo '<p>',_('With selected:');
 	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
-	echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
+    echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
+    echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
+
 	echo '</p>';
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
 	if ($hassection && !$hidesection) {

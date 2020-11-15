@@ -237,12 +237,16 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
     }
     if ($calledfrom=='lu') {
 		echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Manage Exceptions</div>\n";
-	} else if ($calledfrom=='gb') {
+	} else if ($calledfrom=='gb' || $calledfrom == 'isolateassess') {
 		echo "<a href=\"gradebook.php?cid=$cid";
 		if (isset($_GET['uid'])) {
 			echo "&stu=" . Sanitize::onlyInt($_GET['uid']);
 		}
-		echo "\">Gradebook</a> &gt; Manage Exceptions</div>\n";
+        echo "\">Gradebook</a> &gt; ";
+        if ($calledfrom == 'isolateassess') {
+            echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('View Scores').'</a> &gt; ';
+        }
+        echo " Manage Exceptions</div>\n";
 	}
 
 	echo '<div id="headermassexception" class="pagetitle"><h1>Manage Exceptions</h1></div>';
@@ -254,7 +258,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			echo "&uid=" . Sanitize::onlyInt($_GET['uid']);
 		}
 		echo "\" id=\"qform\">\n";
-	}
+	} else if ($calledfrom == 'isolateassess') {
+        echo "<form method=post action=\"isolateassessgrade.php?cid=$cid&aid=$aid&massexception=1\" id=\"qform\">\n";
+    }
 
 	if (isset($_POST['tolist'])) {
 		$_POST['checked'] = explode(',',$_POST['tolist']);
@@ -269,7 +275,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 				echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";
 			} else if ($calledfrom=='gb') {
 				echo "<a href=\"gradebook.php?cid=$cid\">Try Again</a>\n";
-			}
+			} else if ($calledfrom == 'isolateassess') {
+                echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">Try Again</a>\n";
+            }
 			require("../footer.php");
 			exit;
 		}
