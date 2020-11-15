@@ -92,12 +92,26 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 	$maxsizedescr += 6;
 	$maxsizeentry += 3;
 	if (isset($s[0]['bigtitle'])) {
-		$out = '<table class="acctstatement"><thead><tr><th colspan="'.($maxind+2).'" class="c"><b>'.$s[0]['bigtitle'].'</b></th></tr><thead><tbody>';
-		$sa = '<table class="acctstatement"><thead><tr><th colspan="'.($maxind+2+$expspan).'" class="c"><b>'.$s[0]['bigtitle'].'</b></th></tr><thead><tbody>';
+		$out = '<table class="acctstatement"><caption><b>'.$s[0]['bigtitle'].'</b></caption>';
+		$sa = '<table class="acctstatement"><caption><b>'.$s[0]['bigtitle'].'</b></caption>';
 	} else {
-		$out = '<table class="acctstatement"><tbody>';
-		$sa = '<table class="acctstatement"><tbody>';
-	}
+		$out = '<table class="acctstatement">';
+		$sa = '<table class="acctstatement">';
+    }
+    $out .= '<thead><tr class="sr-only"><th scope=col>Description</th><th scope=col>Amount</th>';    
+    $sa .= '<thead><tr class="sr-only"><th scope=col>Description</th><th scope=col>Amount</th>';
+    if ($maxind > 0) {
+        $out .= '<th scope=col>Total</th>';
+        $sa .= '<th scope=col>Total</th>';
+    }
+    for ($i=1;$i<$maxind;$i++) {
+        $out .= '<th scope=col>Group Total</th>';
+        $sa .= '<th scope=col>Group Total</th>';
+    }
+    $sa .= '</tr></thead>';
+    $out .= '</tr></thead>';
+    $out .= '<tbody>';
+    $sa .= '<tbody>';
 	$grouptots = array();  $addspacer = false;
 	foreach ($s as $ix=>$sg) {
 		if (isset($sg['indent']) && $sg['indent']>0) {
@@ -112,14 +126,14 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 			$hdrindent = 0; $totindent = 0; $ind =0;
 		}
 		if ($addspacer && !isset($sg['nospacer'])) {
-			$out .= '<tr><td colspan="'.($maxind+2).'">&nbsp;</td></tr>';
-			$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'">&nbsp;</td></tr>';
+			$out .= '<tr aria-hidden=true><td colspan="'.($maxind+2).'">&nbsp;</td></tr>';
+			$sa .= '<tr aria-hidden=true><td colspan="'.($maxind+2+$expspan).'">&nbsp;</td></tr>';
 		}
 		if (isset($sg['header'])) {
 			$addspacer = false;
 			if (is_array($sg['header'])) {
-				$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'][0].'</b></td>'.$pre[$hdrindent].'<td class="r">'.$sg['header'][1].'</td>'.$post[$hdrindent].'</tr>';
-				$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'][0].'</b></td>'.$pre[$hdrindent].'<td class="r">'.$sg['header'][1].'</td>'.$post[$hdrindent].$blankexp.'</tr>';
+				$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><span class="sr-only">Subcategory,</span><b>'.$sg['header'][0].'</b></td>'.$pre[$hdrindent].'<td class="r">'.$sg['header'][1].'</td>'.$post[$hdrindent].'</tr>';
+				$sa .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><span class="sr-only">Subcategory,</span><b>'.$sg['header'][0].'</b></td>'.$pre[$hdrindent].'<td class="r">'.$sg['header'][1].'</td>'.$post[$hdrindent].$blankexp.'</tr>';
 			} else {
 				if (isset($sg['headerops'])) {
 					if ($sg['headerops'][0] == 'pulldowns') {
@@ -133,12 +147,12 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 						echo "Eek: ".$sg['header']." not in header options array<br/>";
 					}
 					$anstypes[$sn] = 'string'; $displayformat[$sn] = $tdisptype; $questions[$sn] = $sg['headerops'];  $answer[$sn] = $sg['header']; $answerboxsize[$sn] = 40;
-					$out .= '<tr><td colspan="'.($maxind+2).' style="padding-left:'.($hdrindent+.5).'em;"">[AB'.$sn.']</td></tr>';
-					$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
+					$out .= '<tr><td colspan="'.($maxind+2).' style="padding-left:'.($hdrindent+.5).'em;""><span class="sr-only">Subcategory,</span>[AB'.$sn.']</td></tr>';
+					$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'" style="padding-left:'.($hdrindent+.5).'em;"><span class="sr-only">Subcategory,</span><b>'.$sg['header'].'</b></td></tr>';
 					$sn++;
 				} else {
-					$out .= '<tr><td colspan="'.($maxind+2).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
-					$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'" style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['header'].'</b></td></tr>';
+					$out .= '<tr><td colspan="'.($maxind+2).'" style="padding-left:'.($hdrindent+.5).'em;"><span class="sr-only">Subcategory,</span><b>'.$sg['header'].'</b></td></tr>';
+					$sa .= '<tr><td colspan="'.($maxind+2+$expspan).'" style="padding-left:'.($hdrindent+.5).'em;"><span class="sr-only">Subcategory,</span><b>'.$sg['header'].'</b></td></tr>';
 				}
 			}
 		}
@@ -157,7 +171,7 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 					$out .= '<tr><td style="padding-left:'.($ind+.5).'em;">[AB'.$sn.']</td>';
 					$anstypes[$sn] = 'string'; $displayformat[$sn] = $disptype; $questions[$sn] = $ops;  $answer[$sn] = $sg['elements'][$i]; $answerboxsize[$sn] = $maxsizedescr;
 				}
-				$out .= $pre[$ind].'<td>[AB'.($sn+1).']</td>'.$post[$ind].'</tr>';
+				$out .= $pre[$ind].'<td class="r">[AB'.($sn+1).']</td>'.$post[$ind].'</tr>';
 				$sg['elements'][$i+1] = str_replace(array('$',',',' '),'',$sg['elements'][$i+1])*1;
 				$sa .= '<tr><td style="padding-left:'.($ind+.5).'em;">'.$sg['elements'][$i].'</td>'.$pre[$ind].'<td class="r">'.($hasdecimals?number_format($sg['elements'][$i+1],2,'.',','):number_format($sg['elements'][$i+1])).'</td>'.$post[$ind];
 				if (isset($sg['explanation'])) {
@@ -177,22 +191,35 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 			if (isset($sg['totrows'])) {
 				//echo "count: ".count($sg['elements'])/2." totr: ".$sg['totrows'].'<br/>';
 				for($i=count($sg['elements'])/2;$i<$sg['totrows'];$i++) {
-					$out .= '<tr><td style="padding-left:'.($ind+.5).'em;">[AB'.$sn.']</td>'.$pre[$ind].'<td>[AB'.($sn+1).']</td>'.$post[$ind].'</tr>';
+					$out .= '<tr><td style="padding-left:'.($ind+.5).'em;">[AB'.$sn.']</td>'.$pre[$ind].'<td class="r">[AB'.($sn+1).']</td>'.$post[$ind].'</tr>';
 					//$sa .= '<tr><td>&nbsp;</td><td class="r">&nbsp;</td></tr>';
 					$anstypes[$sn] = 'string'; $displayformat[$sn] = $disptype; $questions[$sn] = $ops;  $answer[$sn] = ""; $answerboxsize[$sn] = $maxsizedescr;
 					$anstypes[$sn+1] = 'string'; $displayformat[$sn+1] = 'alignright'; $answer[$sn+1] = ''; $answerboxsize[$sn+1] = $maxsizeentry;
 					$sn += 2;
 				}
-			}
+            }
+            $didextraline = false;
 			if (isset($sg['tottitle']) || isset($sg['tottitleline'])) {
-				$p = strrpos($out,'<td>[');
-				$out = substr($out,0,$p).'<td style="border-bottom:1px solid">'.substr($out,$p+4);
+				$p = strrpos($out,'<td class="r">');
+                $out = substr($out,0,$p).'<td style="border-bottom:1px solid" '.substr($out,$p+4);
+                $p = strpos($out,'</td>',$p);
+                $out = substr($out,0,$p).'<span class="sr-only">Single line</span>'.substr($out,$p+5);
 				$p = strrpos($sa,'<td class="r">');
-				$sa = substr($sa,0,$p).'<td style="border-bottom:1px solid" '.substr($sa,$p+4);
+                $sa = substr($sa,0,$p).'<td style="border-bottom:1px solid" '.substr($sa,$p+4);
+                $p = strpos($sa,'</td>',$p);
+                $sa = substr($sa,0,$p).'<span class="sr-only">Single line</span>'.substr($sa,$p+5);
+
+                if ($totindent < $ind) {
+                    $p = strrpos($out,'<td class="f"></td>');
+                    $out = substr($out,0,$p).'<td class="f" style="border-bottom:1px solid"><span class="sr-only">Single line</span></td>'.substr($out,$p+19);
+                    $p = strrpos($sa,'<td class="f"></td>');
+                    $sa = substr($sa,0,$p).'<td class="f" style="border-bottom:1px solid"><span class="sr-only">Single line</span></td>'.substr($sa,$p+19);
+                    $didextraline = true;
+                }
 
 				if (isset($sg['tottitleline']) && $sg['tottitleline']<0) {
 					$p = strrpos($out,' class="f"><');
-					$out = substr($out,0,$p).'>[AB'.$sn.']'.substr($out,$p+11);
+					$out = substr($out,0,$p).' class="r">[AB'.$sn.']'.substr($out,$p+11);
 					$p = strrpos($sa,' class="f"><');
 					$sa = substr($sa,0,$p).' class="r">'.($hasdecimals?number_format($tot,2,'.',','):number_format($tot)).substr($sa,$p+11);
 				} else {
@@ -215,8 +242,8 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 						$out .= '<tr><td style="padding-left:'.($totindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
 						$sa .= '<tr><td style="padding-left:'.($totindent+.5).'em;"><b>'.$sg['tottitle'].'</b></td>';
 					}
-					$out .= $pre[$totindent].'<td>[AB'.$sn.']</td>'.$post[$totindent].'</tr>';
-					$sa .= $pre[$totindent].'<td class="r">'.($hasdecimals?number_format($tot,2,'.',','):number_format($tot)).'</td>'.$post[$hdrindent].$blankexp.'</tr>';
+					$out .= $pre[$totindent].'<td class="r"><span class="sr-only">Single line</span>[AB'.$sn.']</td>'.$post[$totindent].'</tr>';
+					$sa .= $pre[$totindent].'<td class="r"><span class="sr-only">Single line</span>'.($hasdecimals?number_format($tot,2,'.',','):number_format($tot)).'</td>'.$post[$hdrindent].$blankexp.'</tr>';
 
 				}
 				$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answerformat[$sn] = 'parenneg'; $answer[$sn] = $tot; $answerboxsize[$sn] = $maxsizeentry;
@@ -225,17 +252,28 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 		}
 		if (isset($sg['totaltotal'])) {
 			$addspacer = true;
-			$p = strrpos($out,'<td>[');
-			$out = substr($out,0,$p).'<td style="border-bottom:1px solid">'.substr($out,$p+4);
+			$p = strrpos($out,'<td class="r">');
+            $out = substr($out,0,$p).'<td style="border-bottom:1px solid" '.substr($out,$p+4);
+            $p = strpos($out,'</td>',$p);
+            $out = substr($out,0,$p).'<span class="sr-only">Single line</span>'.substr($out,$p+5);
+
 			$p = strrpos($sa,'<td class="r">');
-			$sa = substr($sa,0,$p).'<td style="border-bottom:1px solid" '.substr($sa,$p+4);
+            $sa = substr($sa,0,$p).'<td style="border-bottom:1px solid" '.substr($sa,$p+4);
+            $p = strpos($sa,'</td>',$p);
+            $sa = substr($sa,0,$p).'<span class="sr-only">Single line</span>'.substr($sa,$p+5);
 
 			$tottot = 0;
 			if (isset($sg['totalindent'])) {
-				$totind = $sg['totalindent'];
+                $totind = $sg['totalindent'];
 			} else {
-				$totind = 0;
-			}
+                $totind = 0;
+            }
+            if ($totind < $ind && !$didextraline) {
+                $p = strrpos($out,'<td class="f"></td>');
+                $out = substr($out,0,$p).'<td class="f" style="border-bottom:1px solid"><span class="sr-only">Single line</span></td>'.substr($out,$p+19);
+                $p = strrpos($sa,'<td class="f"></td>');
+                $sa = substr($sa,0,$p).'<td class="f" style="border-bottom:1px solid"><span class="sr-only">Single line</span></td>'.substr($sa,$p+19);
+            }
 			for ($i=1;$i<count($sg['totaltotal']);$i++) {
 				if ($sg['totaltotal'][$i]<0) {
 					$tottot -= $grouptots[-1*round($sg['totaltotal'][$i])];
@@ -263,12 +301,14 @@ function makestatement($s, $sn, $ops=array(), &$anstypes, &$questions, &$answer,
 				$sa .= '<tr><td style="padding-left:'.($totind+.5).'em;"><b>'.$sg['totaltotal'][0].'</b></td>';
 			}
 			if (isset($sg['dblunder'])) {
-				$under = ' style="border-bottom: 3px double #000"';
+                $under = ' style="border-bottom: 3px double #000"';
+                $underlabel = '<span class="sr-only">Double line</span>';
 			} else {
-				$under = '';
+                $under = '';
+                $underlabel = '';
 			}
-			$out .= $pre[$totind].'<td'.$under.'>[AB'.$sn.']</td>'.$post[$totind].'</tr>';
-			$sa .= $pre[$totind].'<td class="r"'.$under.'>'.($hasdecimals?number_format($tottot,2,'.',','):number_format($tottot)).'</td>'.$post[$totind].$blankexp.'</tr>';
+			$out .= $pre[$totind].'<td class="r"'.$under.'><span class="sr-only">Single line</span>[AB'.$sn.']'.$underlabel.'</td>'.$post[$totind].'</tr>';
+			$sa .= $pre[$totind].'<td class="r"'.$under.'><span class="sr-only">Single line</span>'.($hasdecimals?number_format($tottot,2,'.',','):number_format($tottot)).$underlabel.'</td>'.$post[$totind].$blankexp.'</tr>';
 			$anstypes[$sn] = 'number'; $displayformat[$sn] = 'alignright'; $answerformat[$sn] = 'parenneg'; $answer[$sn] = $tottot; $answerboxsize[$sn] = $maxsizeentry;
 			$sn++;
 		}
