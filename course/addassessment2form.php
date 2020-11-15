@@ -144,7 +144,7 @@ $vueData = array(
 				<?php echo _('Due');?>
 			</label>
 			<input type=text size=10 name="edate" v-model="edate">
-			<a href="#" onClick="displayDatePicker('edate', this); return false">
+			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', '<?php echo _('Start date');?>'); return false">
 			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime">
 		</span><br class="form"/>
