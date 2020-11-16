@@ -46,7 +46,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                 // This will also include cases where there's an active timelimit.
                 $query = "SELECT iar.userid,ia.id,iar.scoreddata FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
                 "ON ia.id=iar.assessmentid WHERE ia.id IN ($aidplaceholders) AND iar.userid IN ($uidplaceholders) " .
-                "AND ia.timelimit>0 AND iar.starttime>0";
+                "AND ia.timelimit<>0 AND iar.starttime>0";
                 $stm = $DBH->prepare($query);
                 $stm->execute(array_merge($addexcarr, $toarr));
                 $now = time();
@@ -275,7 +275,10 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	$(function() {
 		$("input[name=forceclear]").on("change", function (e) {
 			$("#forceclearwarn").toggle($(this).prop("checked"));
-		});
+        });
+        $("input[name=timelimitextmin]").on("input", function (e) {
+            $("input[name=timelimitext]").prop("checked", this.value.match(/^\s*\d+\s*$/) && parseInt(this.value) != 0);
+        });
 		$("form").on("submit", function(e) {
 			if ($("input[name=forceclear]").prop("checked")) {
 				if (!confirm("'._('WARNING! You are about to clear student attempts, deleting their grades. This cannot be undone. Are you SURE you want to do this?').'")) {

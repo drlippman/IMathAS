@@ -82,7 +82,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             // This will also include cases where there's an active timelimit. 
             $query = "SELECT iar.scoreddata FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
               "ON ia.id=iar.assessmentid WHERE ia.id=? AND iar.userid=? " .
-              "AND ia.timelimit>0 AND iar.starttime>0";
+              "AND ia.timelimit<>0 AND iar.starttime>0";
             $stm = $DBH->prepare($query);
             $stm->execute([$aid, $uid]);
             $row = $stm->fetch(PDO::FETCH_NUM);
@@ -266,7 +266,12 @@ if ($overwriteBody==1) {
 	   var aid = document.getElementById('aidselect').value;
 	   var togo = '<?php echo Sanitize::url($address); ?>&aid=' + aid;
 	   window.location = togo;
-	}
+    }
+    $(function() {
+        $("input[name=timelimitextmin]").on("input", function (e) {
+            $("input[name=timelimitext]").prop("checked", this.value.match(/^\s*\d+\s*$/) && parseInt(this.value) != 0);
+        });
+    })
 	</script>
 
 
