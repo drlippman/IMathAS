@@ -1121,7 +1121,7 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 		$out .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;" class="r">[AB'.$sn.']</td>';
 		$answerboxsize[$sn] = $maxsize;
 		$displayformat[$sn] = 'alignright';
-		if ($tot>0 || ($tot==0 && $showtotal!=='zeroright')) {
+		if ($tot>0 || ($tot==0 && $showtotal==='zeroleft')) {
 			$anstypes[$sn] = 'number';
 			$answer[$sn] = $tot;
 			$sa .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;" class="r">';
@@ -1141,7 +1141,7 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 		$out .= '<td style="border-top: 3px double;">[AB'.$sn.']</td></tr>';
 		$answerboxsize[$sn] = $maxsize;
 		$displayformat[$sn] = 'alignright';
-		if ($tot<0 || ($tot==0 && $showtotal==='zeroright')) {
+		if ($tot<0 || ($tot==0 && $showtotal!=='zeroleft')) {
 			$anstypes[$sn] = 'number';
 			$answer[$sn] = -$tot;
 			$sa .= '<td style="border-top: 3px double;" class="r">';
@@ -1153,8 +1153,8 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 			$sa .= '</td></tr>';
 		} else {
 			$sa .= '<td style="border-top: 3px double;">&nbsp;</td></tr>';
-			$anstypes[$sn] = 'number';
-			$answer[$sn] = '0 or ';
+			$anstypes[$sn] = 'string';
+			$answer[$sn] = '';
 		}
 		$sn++;
 	}
