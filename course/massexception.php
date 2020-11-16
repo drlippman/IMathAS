@@ -280,6 +280,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
         $("input[name=timelimitextmin]").on("input", function (e) {
             $("input[name=timelimitext]").prop("checked", this.value.match(/^\s*\d+\s*$/) && parseInt(this.value) != 0);
         });
+        $("input[name=attemptextnum]").on("input", function (e) {
+            $("input[name=attemptext]").prop("checked", this.value.match(/^\s*\d+\s*$/) && parseInt(this.value) != 0);
+        });
 		$("form").on("submit", function(e) {
 			if ($("input[name=forceclear]").prop("checked")) {
 				if (!confirm("'._('WARNING! You are about to clear student attempts, deleting their grades. This cannot be undone. Are you SURE you want to do this?').'")) {

@@ -277,6 +277,9 @@ if ($overwriteBody==1) {
         $("input[name=timelimitextmin]").on("input", function (e) {
             $("input[name=timelimitext]").prop("checked", this.value.match(/^\s*\d+\s*$/) && parseInt(this.value) != 0);
         });
+        $("input[name=attemptextnum]").on("input", function (e) {
+            $("input[name=attemptext]").prop("checked", this.value.match(/^\s*\d+\s*$/) && parseInt(this.value) != 0);
+        });
     })
 	</script>
 
