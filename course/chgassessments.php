@@ -7,6 +7,7 @@ require("../init.php");
 require("../includes/htmlutil.php");
 require("../includes/copyiteminc.php");
 require("../includes/loaditemshowdata.php");
+require_once("../includes/TeacherAuditLog.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -15,8 +16,11 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Assessment Settings";
 $cid = Sanitize::courseId($_GET['cid']);
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Assessment Settings";
-
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= _('Mass Change Assessment Settings');
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
 	$overwriteBody = 1;
@@ -337,11 +341,17 @@ if (!(isset($teacherid))) {
 			$qarr[':endmsg'] = $stm->fetchColumn(0);
 		}
 
+		$metadata = array('assessments'=>$checkedlist);
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
 			$qarr[':cid'] = $cid;
 			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist) AND courseid=:cid");
 			$stm->execute($qarr);
+			if ($stm->rowCount()>0) {
+				$updated_settings = true;
+				$metadata = $metadata + $qarr;
+				unset($metadata[':cid']);
+			}
 		}
 		if (isset($_POST['chgintro'])) {
 			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
@@ -352,6 +362,7 @@ if (!(isset($teacherid))) {
 			} else {
 				$newintro = $cpintro;
 			}
+			$metadata['intro'] = $newintro;
 			$stm = $DBH->query("SELECT id,intro FROM imas_assessments WHERE id IN ($checkedlist)");
 			$stmupd = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -362,11 +373,24 @@ if (!(isset($teacherid))) {
 					$outintro = $newintro;
 				}
 				$stmupd->execute(array(':id'=>$row['id'], ':intro'=>$outintro));
+				if ($stmupd->rowCount()>0) {
+					$updated_settings = true;
+				}
 			}
 		}
 
 		if (isset($_POST['removeperq'])) {
 			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0,fixedseeds=NULL WHERE assessmentid IN ($checkedlist)");
+			$metadata['perq'] = "Removed per-question settings";
+			$updated_settings = true;
+		}
+		if ($updated_settings === true) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Mass Assessment Settings Change",
+				null,
+				$metadata
+			);
 		}
 		if (isset($_POST['docopyopt']) || isset($_POST['chgdefpoints']) || isset($_POST['removeperq'])) {
 			//update points possible
@@ -580,13 +604,28 @@ $(function() {
 			$("#reqscorewrap").toggle(rqshow);
 			$(this).attr("aria-expanded", rqshow);
 	});
+
+	// bind to caltagradio controls
+	$('input[type=radio][name=caltagradio]').change(function() {
+		if (this.value == 'usename') {
+			$('input[type=text][name=caltagact]').prop('readonly', true).css({'color':'#FFFFFF', 'opacity':'0.6'}).val('use_name');
+		}
+		else if (this.value == 'usetext') {
+			$('input[type=text][name=caltagact]').prop('readonly', false).css({'color':'inherit', 'opacity':'1.0'}).val('?');
+		}
+	});
+
 });
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerchgassessments" class="pagetitle"><h1>Mass Change Assessment Settings
-		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h1></div>
+
+	<div class="cpmid">
+	<a href="masschgprereqs.php?cid=<?php echo $cid;?>&from=chgassessments"><?php echo _('Mass Change Prereqs'); ?></a>
+	</div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
 	<p><b>Be aware</b> that changing default points or penalty after an assessment has been
@@ -824,7 +863,9 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>
-				<input name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>"/>
+                    <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>>Use Text:</label>
+                     <input aria-label="Calendar icon text" name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>" <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /><br />
+					<label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>>Use Assessment Name</label>
 				</td>
 			</tr>
 			<tr class="coptr">

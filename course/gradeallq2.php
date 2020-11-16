@@ -79,7 +79,7 @@
 
 	// Load new assess info class
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings('all');
+	$assess_info->loadQuestionSettings('all', false, false);
 	$ptsposs = $assess_info->getQuestionSetting($qid, 'points_possible');
 
 	if (isset($_GET['update']) && $canedit) {
@@ -135,6 +135,7 @@
 		}
 		$cnt = 0;
 		$updatedata = array();
+		$changesToLog = array();
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 
 			$GLOBALS['assessver'] = $line['ver'];
@@ -185,11 +186,15 @@
 
 				$adjustedScores = $assess_record->convertGbScoreOverrides($scoresToSet, $ptsposs);
 				$adjustedFeedbacks = $assess_record->convertGbFeedbacks($feedbackToSet);
-				$assess_record->setGbScoreOverrides($adjustedScores);
+				$changes = $assess_record->setGbScoreOverrides($adjustedScores);
 				$assess_record->setGbFeedbacks($adjustedFeedbacks);
 
 				if (count($adjustedScores) > 0 || count($adjustedFeedbacks) > 0) {
 					$assess_record->saveRecord();
+				}
+
+				if (!empty($changes)) {
+					$changesToLog[$line['userid']] = $changes;
 				}
 
 				// Normally it'd only make sense to update LTI scores that changed. But
@@ -202,6 +207,17 @@
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$line['userid'],$gbscore['gbscore'],true);
 				}
 			}
+		}
+		if (count($changesToLog)>0) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Change Grades",
+				$aid,
+				array(
+					'qid'=>$qid,
+					'changes'=>$changesToLog
+				)
+			);
 		}
 		$DBH->commit();
 
@@ -264,25 +280,55 @@
 		$points = $defpoints;
 	}
 
-	$lastupdate = '032320';
+	$lastupdate = '051620';
+	function formatTry($try,$cnt,$pn,$tn) {
+		if (is_array($try) && $try[0] === 'draw') {
+			$id = $cnt.'-'.$pn.'-'.$tn;
+			if ($try[2][0]===null) {
+				$try[2][0] = "";
+			}
+			echo '<canvas id="canvasGBR'.$id.'" ';
+			echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas>';
+			echo '<input type=hidden id="qnGBR'.$id.'"/>';
+			$la = explode(';;', str_replace(array('(',')'), array('[',']'), $try[1]));
+			if ($la[0] !== '') {
+				$la[0] = '[' . str_replace(';', '],[', $la[0]) . ']';
+			}
+			$la = '[[' . implode('],[', $la) . ']]';
+			echo '<script>';
+			array_unshift($try[2], 'GBR'.$id);
+			echo 'canvases["GBR'.$id.'"] = ' . json_encode($try[2]) . ';';
+			echo 'drawla["GBR'.$id.'"] = ' . json_encode(json_decode($la)) . ';';
+			echo '</script>';
+		} else {
+			echo $try;
+		}
+	}
+
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric_min.js?v=051120"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042220"></script>';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2_min.js?v=051120" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips_min.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/drawing_min.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs_min.js" type="text/javascript"></script>';
-	$placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ_min.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mqeditor_min.js" type="text/javascript"></script>
-	  <script src="'.$imasroot.'/mathquill/mqedlayout_min.js" type="text/javascript"></script>
-	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
-	  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051120"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=051720"></script>';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
+    if (!empty($CFG['assess2-use-vue-dev'])) {
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
+    } else {
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=100220b" type="text/javascript"></script>';
+    }
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
+	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
+
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';
@@ -291,22 +337,26 @@
 	$placeinhead .= "       var toopen = '$address&page=' + stun;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
-	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForDisplay($deffbtext).'";';
+	$placeinhead .= 'var GBdeffbtext ="'.Sanitize::encodeStringForJavascript($deffbtext).'";';
 	$placeinhead .= 'function chgsecfilter() {
 		var sec = document.getElementById("secfiltersel").value;
 		var toopen = "'.$address.'&secfilter=" + encodeURIComponent(sec);
 		window.location = toopen;
 		}';
-	$placeinhead .= 'function togglealltries(n) {
-		$("#alltries"+n).toggle();
-		if (!$("#alltries"+n).hasClass("rendered")) {
-			$("#alltries"+n).find("canvas[id^=canvasGBR]").each(function(i,el) {
+	$placeinhead .= 'function toggletryblock(type,n) {
+		$("#"+type+n).toggle();
+		if (!$("#"+type+n).hasClass("rendered")) {
+			$("#"+type+n).find("canvas[id^=canvasGBR]").each(function(i,el) {
 				window.imathasDraw.initCanvases(el.id.substr(6));
 			});
-			$("#alltries"+n).addClass("rendered");
-			window.drawPics(document.getElementById("alltries"+n));
+			$("#"+type+n).addClass("rendered");
+			window.drawPics(document.getElementById(type+n));
 		}
-	}';
+	}
+	$(function() {
+		$(".viewworkwrap img").on("click", rotateimg);
+	})
+	';
 	$placeinhead .= '</script>';
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
@@ -334,7 +384,6 @@
 		writeHtmlSelect('secfiltersel', $sections, $sections, $secfilter, _('All'), '-1', 'onchange="chgsecfilter()"');
 	}
 	echo '</div>';
-	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
@@ -505,21 +554,27 @@
 				$GLOBALS['questionscoreref'] = array("scorebox$cnt",$points);
 			}
 			*/
-			echo '<div class="questionwrap">';
+			echo '<div class=scrollpane>';
+			echo '<div class="questionwrap questionpane">';
+			echo '<div class="question" id="questionwrap'.$cnt.'">';
 			echo $qdata['html'];
 			echo '<script type="text/javascript">
 				$(function() {
-					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false);
+					imathasAssess.init('.json_encode($qdata['jsparams'], JSON_INVALID_UTF8_IGNORE).', false, document.getElementById("questionwrap'.$cnt.'"));
 				});
 				</script>';
-			echo '</div>';
+			echo '</div></div>';
 
 			if (!empty($qdata['work'])) {
-				echo '<div class="questionpane">';
-				echo '<button type="button" onclick="toggleWork(this)">'._('View Work').'</button>';
-				echo '<div class="introtext" style="display:none;">' . $qdata['work'].'</div></div>';
+				echo '<div class="questionpane viewworkwrap">';
+                echo '<button type="button" onclick="toggleWork(this)">'._('View Work').'</button>';
+                echo '<div class="introtext" style="display:none;">';
+                if ($qdata['worktime'] !== '0') {
+                    echo '<div class="small">' . _('Last Changed').': '.$qdata['worktime'].'</div>';
+                }
+                echo  $qdata['work'].'</div></div>';
 			}
-
+			echo '</div>';
 			echo "<div class=scoredetails>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
 			if (!$groupdup) {
@@ -595,43 +650,44 @@
 			}
 
 			if (!empty($qdata['other_tries'])) {
+                $maxtries = 0;
+                foreach ($qdata['other_tries'] as $pn=>$tries) {
+                    if (count($tries)>1) {
+                        $maxtries = count($tries);
+                        break;
+                    }
+                }
+                if ($maxtries > 0) {
+                    echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
+                    echo '<div id="alltries'.$cnt.'" style="display:none;">';
+                    foreach ($qdata['other_tries'] as $pn=>$tries) {
+                        if (count($qdata['other_tries']) > 1) {
+                            echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+                        }
+                        foreach ($tries as $tn=>$try) {
+                            echo '<div>'._('Try').' '.($tn+1).': ';
+                            formatTry($try,$cnt,$pn,$tn);
+                            echo '</div>';
+                        }
+                    }
+                    echo '</div>';
+                }
+			}
 
-				echo ' &nbsp; <button type=button onclick="togglealltries('.$cnt.')">'._('Show all tries').'</button>';
-				echo '<div id="alltries'.$cnt.'" style="display:none;">';
-				foreach ($qdata['other_tries'] as $pn=>$tries) {
-					if (count($qdata['other_tries']) > 1) {
+			if (!empty($qdata['autosaves'])) {
+				echo ' &nbsp; <button type=button onclick="toggletryblock(\'autosaves\','.$cnt.')">'._('Show autosaves').'</button>';
+				echo '<div id="autosaves'.$cnt.'" style="display:none;">';
+				echo '<p class="subdued">'._('Autosaves have been entered by the student but not submitted for grading, so are not included in the scoring.').'</p>';
+				foreach ($qdata['autosaves'] as $pn=>$tries) {
+					if (count($qdata['autosaves']) > 1) {
 						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
 					}
 					foreach ($tries as $tn=>$try) {
-						echo '<div>'._('Try').' '.($tn+1).': ';
-						if (is_array($try) && $try[0] === 'draw') {
-							$id = $cnt.'-'.$pn.'-'.$tn;
-							if ($try[2][0]===null) {
-								$try[2][0] = "";
-							}
-							echo '<canvas id="canvasGBR'.$id.'" ';
-							echo 'width='.$try[2][6].' height='.$try[2][7].'></canvas>';
-							echo '<input type=hidden id="qnGBR'.$id.'"/>';
-							$la = explode(';;', str_replace(array('(',')'), array('[',']'), $try[1]));
-							if ($la[0] !== '') {
-								$la[0] = '[' . str_replace(';', '],[', $la[0]) . ']';
-							}
-							$la = '[[' . implode('],[', $la) . ']]';
-							echo '<script>';
-							array_unshift($try[2], 'GBR'.$id);
-							echo 'canvases["GBR'.$id.'"] = ' . json_encode($try[2]) . ';';
-							echo 'drawla["GBR'.$id.'"] = ' . json_encode(json_decode($la)) . ';';
-							echo '</script>';
-						} else {
-							echo $try;
-						}
-						echo '</div>';
+						formatTry($try,$cnt,$pn,$tn);
 					}
 				}
 				echo '</div>';
 			}
-
-			// TODO: Add Previous Tries display here
 
 			echo "<br/>"._("Question Feedback").": ";
 			if (!$canedit) {
@@ -643,14 +699,15 @@
 				echo Sanitize::encodeStringForDisplay($qdata['feedback'], true);
 				echo '</textarea>';
 			} else {
-				echo '<div class="fbbox" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
+				echo '<div class="fbbox skipmathrender" id="fb-'.$loc.'-'.Sanitize::onlyInt($line['userid']).'">';
 				echo Sanitize::outgoingHtml($qdata['feedback']);
 				echo '</div>';
 			}
 			echo '<br/>Question #'.($loc+1);
 			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
 					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
-					'to' => $line['userid'])) . "\">Use in Msg</a>";
+                    'to' => $line['userid'])) . "\">Use in Message</a>";
+            echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
 			if ($groupdup) {

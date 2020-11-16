@@ -4,6 +4,7 @@ namespace IMathAS\assess2\questions\scorepart;
 
 require_once(__DIR__ . '/ScorePart.php');
 require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once(__DIR__ . '/matrix_common.php');
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -29,6 +30,7 @@ class MatrixScorePart implements ScorePart
         $givenans = $this->scoreQuestionParams->getGivenAnswer();
         $multi = $this->scoreQuestionParams->getIsMultiPartQuestion();
         $partnum = $this->scoreQuestionParams->getQuestionPartNumber();
+        $isRescore = $this->scoreQuestionParams->getIsRescore();
 
         $defaultreltol = .0015;
 
@@ -40,10 +42,15 @@ class MatrixScorePart implements ScorePart
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
+
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $correct = true;
+
+        $givenans = normalizemathunicode($givenans);
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
@@ -53,10 +60,14 @@ class MatrixScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else if (isset($answersize)) {
             $sizeparts = explode(',',$answersize);
-            for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
-                $givenanslist[$i] = $_POST["qn$qn-$i"];
-            }
             $N = $sizeparts[0];
+            if ($isRescore) {
+              $givenanslist = explode('|', $givenans);
+            } else {
+              for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
+                  $givenanslist[$i] = $_POST["qn$qn-$i"];
+              }
+            }
             $scorePartResult->setLastAnswerAsGiven(implode("|",$givenanslist));
         } else {
             $answer = preg_replace('/\)\s*,\s*\(/','),(',$answer);
@@ -124,7 +135,7 @@ class MatrixScorePart implements ScorePart
 
         if (in_array('ref',$ansformats)) {
           // reduce correct answer to rref
-          $answerlist = $this->rref($answerlist, $N);
+          $answerlist = matrix_scorer_rref($answerlist, $N);
           $M = count($answerlist) / $N;
           for ($r=0;$r<$N;$r++) {
             $c = 0;
@@ -142,81 +153,37 @@ class MatrixScorePart implements ScorePart
           }
           // now reduce given answer to rref
           if ($correct) {
-            $givenanslist = $this->rref($givenanslist, $N);
+            $givenanslist = matrix_scorer_rref($givenanslist, $N);
           }
         }
-
+        $incorrect = 0;
         for ($i=0; $i<count($answerlist); $i++) {
             if (!is_numeric($givenanslist[$i])) {
-                $correct = false;
-                break;
+                $incorrect++;
+                continue;
             } else if (isset($abstolerance)) {
-                if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance-1E-12) {
-                    $correct = false;
-                    break;
+                if (abs($answerlist[$i] - $givenanslist[$i]) > $abstolerance+1E-12) {
+                  $incorrect++;
+                  continue;
                 }
             } else {
-                if (abs($answerlist[$i] - $givenanslist[$i])/(abs($answerlist[$i])+.0001) > $reltolerance-1E-12) {
-                    $correct = false;
-                    break;
+                if (abs($answerlist[$i] - $givenanslist[$i])/(abs($answerlist[$i])+.0001) > $reltolerance+1E-12) {
+                  $incorrect++;
+                  continue;
                 }
-
             }
         }
 
-        if ($correct) {
+        if ($correct && $incorrect == 0) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
+        } else if ($correct && $scoremethod == 'byelement') {
+          $score = (count($answerlist) - $incorrect)/count($answerlist);
+          $scorePartResult->setRawScore($score);
+          return $scorePartResult;
         } else {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
     }
-
-    /*
-      Row reduce a matrix specified by the array of values $A with $N rows
-     */
-    private function rref($A, $N)
-    {
-      $M = count($A) / $N;
-      $r = 0;  $c = 0;
-      while ($r < $N && $c < $M) {
-        if ($A[$r*$M+$c] == 0) { //swap only if there's a 0 entry
-          $max = $r;
-          for ($i = $r+1; $i < $N; $i++) {
-            if (abs($A[$i*$M+$c]) > abs($A[$max*$M+$c])) {
-              $max = $i;
-            }
-          }
-          if ($max != $r) { // swap rows
-            for ($j=0; $j<$M; $j++) {
-              $temp = $A[$r*$M+$j];
-              $A[$r*$M+$j] = $A[$max*$M+$j];
-              $A[$max*$M+$j] = $temp;
-            }
-          }
-        }
-        if (abs($A[$r*$M+$c]) < 1e-10) {
-          $c++;
-          continue;
-        }
-        //scale pivot row
-        $div = $A[$r*$M+$c];
-        for ($j = $c; $j < $M; $j++) {
-          $A[$r*$M+$j] = $A[$r*$M+$j] / $div;
-        }
-
-        //get zeros above/below
-        for ($i = 0; $i < $N; $i++) {
-          if ($i == $r) { continue;}
-          $mult = $A[$i*$M+$c];
-          if ($mult == 0) { continue; }
-          for ($j = $c; $j < $M; $j++) {
-            $A[$i*$M+$j] = $A[$i*$M+$j] - $mult*$A[$r*$M+$j];
-          }
-        }
-        $r++; $c++;
-    }
-    return $A;
-  }
 }

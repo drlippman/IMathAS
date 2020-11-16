@@ -18,10 +18,13 @@ class QuestionParams
 
     private $allQuestionAnswers;        // Orig: $GLOBALS['stuanswers']
     private $allQuestionAnswersAsNum;   // Orig: $GLOBALS['stuanswersval']
+    private $allQuestionAutosaves;      // related to stuanswers
     private $studentAttemptNumber;
     private $studentPartAttemptCount;
     private $seqPartDone;
     private $lastRawScores;     // All of a student's scores on their last attempt.
+    private $correctAnswerWrongFormat;
+    private $printFormat = false;
 
     // Orig: $doshowans - int, from displayq2.php
     private $showAnswer;    // @see ShowAnswer.php
@@ -252,6 +255,28 @@ class QuestionParams
     public function setAllQuestionAnswersAsNum(?array $allQuestionAnswersAsNum): QuestionParams
     {
         $this->allQuestionAnswersAsNum = $allQuestionAnswersAsNum;
+        return $this;
+    }
+
+    /**
+     * Get all of the student's autosaves to ALL questions. (as entered)
+     *
+     * @return array
+     */
+    public function getAllQuestionAutosaves(): ?array
+    {
+        return $this->allQuestionAutosaves;
+    }
+
+    /**
+     * Set all of the student's autosaves to ALL questions. (as entered)
+     *
+     * @param array $allQuestionAutosaves
+     * @return QuestionParams
+     */
+    public function setAllQuestionAutosaves(?array $allQuestionAutosaves): QuestionParams
+    {
+        $this->allQuestionAutosaves = $allQuestionAutosaves;
         return $this;
     }
 
@@ -490,6 +515,50 @@ class QuestionParams
     public function setScoreIsCorrect(?array $scoreIsCorrect): QuestionParams
     {
         $this->scoreIsCorrect = $scoreIsCorrect;
+        return $this;
+    }
+
+    /**
+     * Get whether each part is right answer but wrong format.
+     *
+     * @return array
+     */
+    public function getCorrectAnswerWrongFormat(): ?array
+    {
+        return $this->correctAnswerWrongFormat;
+    }
+
+    /**
+     * Set whether each part is right answer but wrong format.
+     *
+     * @param array $correctAnswerWrongFormat
+     * @return QuestionParams
+     */
+    public function setCorrectAnswerWrongFormat(?array $correctAnswerWrongFormat): QuestionParams
+    {
+        $this->correctAnswerWrongFormat = $correctAnswerWrongFormat;
+        return $this;
+    }
+
+    /**
+     * Get whether should be formatted for print.
+     *
+     * @return array
+     */
+    public function getPrintFormat(): bool
+    {
+        return $this->printFormat;
+    }
+
+    /**
+     * Set whether should be formatted for print.
+     *
+     * @param bool $printFormat
+     * @return QuestionParams
+     */
+    public function setPrintFormat(bool $printFormat): QuestionParams
+    {
+        $this->printFormat = $printFormat;
         return $this;
     }
 }

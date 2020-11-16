@@ -47,13 +47,14 @@ class StringAnswerBox implements AnswerBox
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
         if (!isset($answerformat)) { $answerformat = '';}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (!isset($sz)) { $sz = 20;}
-    		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+    		if (isset($ansprompt)) {$out .= $ansprompt;}
 
     		if ($answerformat=='list') {
     			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
@@ -63,47 +64,17 @@ class StringAnswerBox implements AnswerBox
     			$shorttip = _('Enter text');
     		}
     		if ($displayformat=='select') {
-    			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\"><option value=\"\"> </option>";
+    			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
+                $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+                $out .= '<option value=""> </option>';
     			foreach ($questions as $i=>$v) {
     				$out .= '<option value="'.htmlentities($v).'"';
-    				//This is a hack.  Need to figure a better way to deal with & in answers
-    				if (str_replace('&','',$v)==$la) {
+    				if ($v == $la) {
     					$out .= ' selected="selected"';
     				}
     				$out .= '>'.htmlentities($v).'</option>';
     			}
     			$out .= '</select>';
-    		} else if ($answerformat=='MQexperimental') {
-    			$out .= "<input type=\"text\" style=\"position:absolute;visibility:hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"".Sanitize::encodeStringForDisplay($la)."\" />";
-    			$out .= "<span class=\"$colorbox mathquill-embedded-latex MQE$qn\">";
-    			if ($displayformat != '') {
-    				$laprts = explode(';',$la);
-    				$laptcnt = 0;
-    				while (($p=strpos($displayformat, '[AB]'))!==false) {
-    					if (isset($laprts[$laptcnt])) {
-    						$lav = $laprts[$laptcnt];
-    						$laptcnt++;
-    					} else {
-    						$lav = '';
-    					}
-    					$displayformat = substr($displayformat,0,$p).'\editable{'.$lav.'}'.substr($displayformat,$p+4);
-    					//$out .= str_replace('[AB]', '\editable{'.$lav.'}', $displayformat, 1);
-    				}
-    				$out .= $displayformat;
-    			} else {
-    				$out .= '\editable{'.$la.'}';
-    			}
-    			$out .= "</span>";
-    			$out .= '<script type="text/javascript">$(function() {
-    				 $(".MQE'.$qn.'").on("keypress keyup", function() {
-    				     var latexvals = [];
-    				     var latex = $(".MQE'.$qn.'").find(".mathquill-editable").each(function(i,el) {
-    				            latexvals.push($(el).mathquill("latex"));
-    				         });
-    				     $("#qn'.$qn.'").val(MQtoAM(latexvals.join(";")));
-    				   });
-    				   setTimeout(function(){$(".MQE'.$qn.'").find("textarea").blur();}, 25);
-    				});</script>';
     		} else {
     			$classes = ['text'];
     			if ($colorbox != '') {
@@ -115,7 +86,9 @@ class StringAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
 
     			if ($displayformat=='alignright') {
@@ -136,11 +109,10 @@ class StringAnswerBox implements AnswerBox
     			if ($useeqnhelper && $displayformat == 'usepreview') {
     				$params['helper'] = 1;
     			}
-    			if (!isset($hidepreview) && $displayformat == 'usepreview' &&
-            $_SESSION['userprefs']['livepreview']==1
-          ) {
-    				$params['preview'] = 1;
-    			}
+                if (!isset($hidepreview) && $displayformat == 'usepreview') {
+                    $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+                }
+
     			$params['calcformat'] = $answerformat;
 
     			if ($displayformat == 'typeahead') {
@@ -169,12 +141,14 @@ class StringAnswerBox implements AnswerBox
     			}
 
     			$out .= '<input ' .
-    							Sanitize::generateAttributeString($attributes) .
+                  Sanitize::generateAttributeString($attributes) .
     							'class="'.implode(' ', $classes) .
     							'" />';
 
     			if ($displayformat == 'usepreview') {
-    				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
+                    $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                    $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                    $preview .= '</button> &nbsp;';
     				$preview .= "<span id=p$qn></span> ";
     			}
     		}
@@ -195,7 +169,7 @@ class StringAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

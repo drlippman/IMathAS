@@ -66,21 +66,21 @@ function toggleWork(el) {
 	var next = $(el).next();
 	if (next.is(':hidden')) {
 		el.innerText = _('Hide Work');
-		next.show();
+        next.show();
 	} else {
 		el.innerText = _('Show Work');
 		next.hide();
 	}
 }
 function preprint() {
-	$("span[id^='ans']").removeClass("hidden");
-	$(".sabtn").replaceWith("<span>Answer: </span>");
+	$("span[id^='ans']").show().removeClass("hidden");
+	$(".sabtn,.keybtn").replaceWith("<span>Answer: </span>");
 	$('input[value="Preview"]').trigger('click').remove();
 	document.getElementById("preprint").style.display = "none";
 }
 function quicksave() {
 	var url = $("#mainform").attr("action")+"&quick=true";
-	$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
+	$("#quicksavenotice").html(_("Saving...") + ' <img src="'+staticroot+'/img/updating.gif"/>');
 	tinymce.triggerSave();
 	$.ajax({
 		url: url,
@@ -221,3 +221,28 @@ function initAnswerboxHighlights() {
 		}
 	});
 };
+
+function sidebysidegrading() {
+	$("body").removeClass("fw1000").removeClass("fw1920");
+	$(".scrollpane").wrap('<div class="sidebyside">');
+	$(".sidebyside").append('<div class="sidepreview">');
+	$(".sidebyside").css('display','flex').css('flex-wrap','nowrap');
+	$(".sidepreview").css('border-left','1px solid #ccc').css('padding','10px');
+	$(".scrollpane,.sidepreview").css('width','50%');
+	// will have to adjust fileembedbtn to open in sidepreview
+	$(".question div.introtext").each(function(i,el) {
+		$(el).find(".keywrap.inwrap").insertAfter($(el));
+		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+		$(el).after('<div class="subdued">('+(i+1)+')</div>');
+		tgt.append('<div class="subdued">('+(i+1)+') </div>').append(el);
+	});
+	$(".lastfilesub").each(function(i,el) {
+		var tgt = $(el).closest(".sidebyside").find('.sidepreview');
+		$(el).after('<span class="subdued">('+(i+1)+')</span>');
+		tgt.append('<span class="subdued">('+(i+1)+') </span>').append(el);
+	});
+	$(".viewworkwrap").each(function(i,el) {
+		$(el).css('margin','0');
+		$(el).closest(".sidebyside").find('.sidepreview').append(el);
+	});
+}

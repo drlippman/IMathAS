@@ -75,6 +75,9 @@ function chop(x,n) {
 }
 
 function prepWithMath(str) {
+  // avoid double-prep cased by script wrap of prepWithMath followed by
+  // secondary after prepWithMath
+  str = str.replace(/Ma(t|\(t\)\*)h\./,'');
 	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
 	str = str.replace(/\(E\)/g,'(Math.E)');
 	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
@@ -314,12 +317,12 @@ function initPicture(x_min,x_max,y_min,y_max) {
   xunitlength = (width-border[0]-border[2])/(xmax-xmin);
   yunitlength = xunitlength;
   //alert(xmin+" "+xmax+" "+ymin+" "+ymax)
-  if (ymin==null) {
+  if (y_min==null) {
   	origin = [-xmin*xunitlength+border[0],height/2];
   	ymin = -(height-border[1]-border[3])/(2*yunitlength);
   	ymax = -ymin;
   } else {
-  	if (ymax!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
+  	if (y_max!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
   	else ymax = (height-border[1]-border[3])/yunitlength + ymin;
   	origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
   }
@@ -365,6 +368,9 @@ function initPicture(x_min,x_max,y_min,y_max) {
       }
       if (picture.hasAttribute("data-nomag")) {
         qnode.setAttribute("data-nomag",1);
+      }
+      if (picture.getAttribute('align') === 'middle') {
+        qnode.style.verticalAlign = 'middle';
       }
 
       qnode.setAttribute("alt", picture.getAttribute("alt") || '');
@@ -473,6 +479,18 @@ function initPicture(x_min,x_max,y_min,y_max) {
  svgpicture.appendChild(node);
 }
 
+function setStrokeFill(node) {
+  node.setAttribute("stroke-width", strokewidth);
+  if (strokedasharray!=null)
+    node.setAttribute("stroke-dasharray", strokedasharray);
+  node.setAttribute("stroke", stroke);
+  if (fill.substr(0,5)=='trans') {
+  	  node.setAttribute("fill", fill.substring(5));
+  	  node.setAttribute("fill-opacity",fillopacity);
+  } else {
+  	  node.setAttribute("fill", fill);
+  }
+}
 
 function line(p,q,id) { // segment connecting points p,q (coordinates in units)
   var node;
@@ -485,16 +503,7 @@ function line(p,q,id) { // segment connecting points p,q (coordinates in units)
   node.setAttribute("d","M"+(p[0]*xunitlength+origin[0])+","+
     (height-p[1]*yunitlength-origin[1])+" "+
     (q[0]*xunitlength+origin[0])+","+(height-q[1]*yunitlength-origin[1]));
-  node.setAttribute("stroke-width", strokewidth);
-  if (strokedasharray!=null)
-    node.setAttribute("stroke-dasharray", strokedasharray);
-  node.setAttribute("stroke", stroke);
-  if (fill.substr(0,5)=='trans') {
-  	  node.setAttribute("fill", fill.substring(5));
-  	  node.setAttribute("fill-opacity",fillopacity);
-  } else {
-  	  node.setAttribute("fill", fill);
-  }
+  setStrokeFill(node);
   if (marker=="dot" || marker=="arrowdot") {
     ASdot(p,4,markerstroke,markerfill);
     if (marker=="arrowdot") arrowhead(p,q);
@@ -522,16 +531,7 @@ function path(plist,id,c) {
             (height-plist[i][1]*yunitlength-origin[1])+" ";
   }
   node.setAttribute("d", st);
-  node.setAttribute("stroke-width", strokewidth);
-  if (strokedasharray!=null)
-    node.setAttribute("stroke-dasharray", strokedasharray);
-  node.setAttribute("stroke", stroke);
-  if (fill.substr(0,5)=='trans') {
-  	  node.setAttribute("fill", fill.substring(5));
-  	  node.setAttribute("fill-opacity",fillopacity);
-  } else {
-  	  node.setAttribute("fill", fill);
-  }
+  setStrokeFill(node);
   if (marker=="dot" || marker=="arrowdot")
     for (i=0; i<plist.length; i++)
       if (c!="C" && c!="T" || i!=1 && i!=2)
@@ -556,14 +556,7 @@ function circle(center,radius,id) { // coordinates in units
   node.setAttribute("cx",center[0]*xunitlength+origin[0]);
   node.setAttribute("cy",height-center[1]*yunitlength-origin[1]);
   node.setAttribute("r",radius*xunitlength);
-  node.setAttribute("stroke-width", strokewidth);
-  node.setAttribute("stroke", stroke);
-  if (fill.substr(0,5)=='trans') {
-  	  node.setAttribute("fill", fill.substring(5));
-  	  node.setAttribute("fill-opacity",fillopacity);
-  } else {
-  	  node.setAttribute("fill", fill);
-  }
+  setStrokeFill(node);
 }
 
 
@@ -631,14 +624,7 @@ function arc(start,end,radius,id) { // coordinates in units
     (height-start[1]*yunitlength-origin[1])+" A"+radius*xunitlength+","+
      radius*yunitlength+" 0 0,0 "+(end[0]*xunitlength+origin[0])+","+
     (height-end[1]*yunitlength-origin[1]));
-  node.setAttribute("stroke-width", strokewidth);
-  node.setAttribute("stroke", stroke);
-  if (fill.substr(0,5)=='trans') {
-  	  node.setAttribute("fill", fill.substring(5));
-  	  node.setAttribute("fill-opacity",fillopacity);
-  } else {
-  	  node.setAttribute("fill", fill);
-  }
+  setStrokeFill(node);
   if (marker=="arrow" || marker=="arrowdot") {
     u = [(end[1]-start[1])/4,(start[0]-end[0])/4];
     v = [(end[0]-start[0])/2,(end[1]-start[1])/2];
@@ -666,14 +652,7 @@ function ellipse(center,rx,ry,id) { // coordinates in units
   node.setAttribute("cy",height-center[1]*yunitlength-origin[1]);
   node.setAttribute("rx",rx*xunitlength);
   node.setAttribute("ry",ry*yunitlength);
-  node.setAttribute("stroke-width", strokewidth);
-  node.setAttribute("stroke", stroke);
-  if (fill.substr(0,5)=='trans') {
-  	  node.setAttribute("fill", fill.substring(5));
-  	  node.setAttribute("fill-opacity",fillopacity);
-  } else {
-  	  node.setAttribute("fill", fill);
-  }
+  setStrokeFill(node);
 }
 
 
@@ -691,14 +670,7 @@ function rect(p,q,id,rx,ry) { // opposite corners in units, rounded by radii
   node.setAttribute("height",Math.abs(q[1]-p[1])*yunitlength);
   if (rx!=null) node.setAttribute("rx",rx*xunitlength);
   if (ry!=null) node.setAttribute("ry",ry*yunitlength);
-  node.setAttribute("stroke-width", strokewidth);
-  node.setAttribute("stroke", stroke);
-  if (fill.substr(0,5)=='trans') {
-  	  node.setAttribute("fill", fill.substring(5));
-  	  node.setAttribute("fill-opacity",fillopacity);
-  } else {
-  	  node.setAttribute("fill", fill);
-  }
+  setStrokeFill(node);
 }
 
 function text(p,st,pos,angle) {

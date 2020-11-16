@@ -31,6 +31,9 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 		$out .= '<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>';
 	}
 	$out .= '<script type="text/javascript">';
+	if ($url == '') {
+		$url = 'classic';
+	}
 	if ($url == 'graphing' || $url == 'geometry' || $url == '3d') {
 		$out .= 'var applet'.$ggbid.' = new GGBApplet({"appName":"'.$url.'",';
 	} else if ($url == 'spreadsheet' || $url == 'classic' || $url == 'probability') {

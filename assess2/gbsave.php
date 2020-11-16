@@ -23,6 +23,7 @@ require_once("./common_start.php");
 require_once("./AssessInfo.php");
 require_once("./AssessRecord.php");
 require_once('./AssessUtils.php');
+require_once('../includes/TeacherAuditLog.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -50,7 +51,7 @@ if ($istutor) {
 }
 
 // load question settings
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', false, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -61,7 +62,7 @@ if (!$assess_record->hasRecord()) {
   exit;
 }
 
-$assess_record->setGbScoreOverrides($scores);
+$changes = $assess_record->setGbScoreOverrides($scores);
 $assess_record->setGbFeedbacks($feedbacks);
 $assess_record->saveRecord();
 
@@ -69,12 +70,20 @@ $out = $assess_record->getGbScore();
 $out['assess_info'] = $assess_record->getGbAssessScoresAndQVersions();
 $out['newscores'] = $assess_record->getScoresAfterOverrides($scores);
 
-// update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true);
+if (!empty($changes)) {
+  TeacherAuditLog::addTracking(
+    $cid,
+    "Change Grades",
+    $aid,
+    array(
+      'stu'=>$uid,
+      'overrides'=>$changes
+    )
+  );
 }
+
+// update LTI grade
+$assess_record->updateLTIscore();
 
 //prep date display
 prepDateDisp($assessInfoOut);

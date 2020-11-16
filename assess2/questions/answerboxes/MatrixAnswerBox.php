@@ -45,6 +45,8 @@ class MatrixAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
+        if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat="matrix";}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -52,7 +54,7 @@ class MatrixAnswerBox implements AnswerBox
 
 
         if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-    			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+    			$out .= $ansprompt;
     		}
     		if (isset($answersize)) {
     			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
@@ -63,16 +65,24 @@ class MatrixAnswerBox implements AnswerBox
     			}
     			if (!isset($sz)) { $sz = 3;}
     			if ($colorbox=='') {
-    				$out .= '<table id="qnwrap'.$qn.'">';
+    				$out .= '<div id="qnwrap'.$qn.'">';
     			} else {
-    				$out .= '<table class="'.$colorbox.'" id="qnwrap'.$qn.'">';
+    				$out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';
     			}
-    			$out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
+          $arialabel = $this->answerBoxParams->getQuestionIdentifierString() . 
+            (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
+          $out .= '<table role="group" aria-label="'.$arialabel.'">';
+          if ($displayformat == 'det') {
+             $out .= '<tr><td class="matrixdetleft">&nbsp;</td><td>';
+          } else {
+  			     $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
+          }
     			$answersize = explode(",",$answersize);
     			$out .= "<table>";
     			$count = 0;
     			$las = explode("|",$la);
-    			for ($row=0; $row<$answersize[0]; $row++) {
+          $cellcnt = $answersize[0]*$answersize[1];
+          for ($row=0; $row<$answersize[0]; $row++) {
     				$out .= "<tr>";
     				for ($col=0; $col<$answersize[1]; $col++) {
     					$out .= '<td>';
@@ -86,7 +96,8 @@ class MatrixAnswerBox implements AnswerBox
     					];
 
     					$out .= '<input ' .
-    									Sanitize::generateAttributeString($attributes) .
+                      'aria-label="'.sprintf(_('Cell %d of %d'), $count+1, $cellcnt).'" ' .
+                      Sanitize::generateAttributeString($attributes) .
     									'" />';
 
     					$out .= "</td>\n";
@@ -94,8 +105,13 @@ class MatrixAnswerBox implements AnswerBox
     				}
     				$out .= "</tr>";
     			}
-    			$out .= "</table>\n";
-    			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
+          $out .= '</table>';
+          if ($displayformat == 'det') {
+            $out .= '</td><td class="matrixdetright">&nbsp;</td></tr></table>';
+          } else {
+            $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
+          }
+          $out .= "</div>\n";
           $params['matrixsize'] = $answersize;
           $params['tip'] = $shorttip;
           $params['longtip'] = $tip;
@@ -105,8 +121,9 @@ class MatrixAnswerBox implements AnswerBox
     			} else {
     				$qnref = ($multi-1).'-'.($qn%1000);
     			}
-    			if (!isset($sz)) { $sz = 20;}
-    			$tip = _('Enter your answer as a matrix filled with numbers, like [(2,3,4),(3,4,5)]');
+                if (!isset($sz)) { $sz = 20;}
+                $shorttip = _('Enter a matrix of integer or decimal numbers');
+    			$tip = _('Enter your answer as a matrix filled with integer or decimal numbers, like [(2,3,4),(3,4,5)]');
     			if (isset($reqdecimals)) {
     				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
     			}
@@ -121,9 +138,11 @@ class MatrixAnswerBox implements AnswerBox
     				'name' => "qn$qn",
     				'id' => "qn$qn",
     				'value' => $la,
-    				'autocomplete' => 'off'
+    				'autocomplete' => 'off',
+                    'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                        (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     			];
-    			$params['tip'] = $tip;
+    			$params['tip'] = $shorttip;
           $params['longtip'] = $tip;
 
     			$out .= '<input ' .
@@ -132,8 +151,14 @@ class MatrixAnswerBox implements AnswerBox
     							'" />';
 
     			if (!isset($hidepreview)) {
-    				$params['preview'] = 1;
-    				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";
+                    if ($useeqnhelper) {
+                        $params['helper'] = 1;
+                        $params['calcformat'] = 'decimal';
+                    }
+                    $params['preview'] = 1;
+                    $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                    $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                    $preview .= '</button> &nbsp;';
     			}
     			$preview .= "<span id=p$qn></span> ";
     		}
@@ -150,7 +175,7 @@ class MatrixAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

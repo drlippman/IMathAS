@@ -8,7 +8,7 @@ class ScoreQuestionParams
 {
     private $userRights;        // Orig: $GLOBALS['myrights']
     private $questionNumber;    // Orig: $qnidx
-    private $assessmentId = 0;  
+    private $assessmentId = 0;
     private $dbQuestionSetId;   // Orig: $qidx
     private $questionData;      // Obtained from imas_questionset; optional
     private $questionSeed;      // Orig: $seed
@@ -24,6 +24,9 @@ class ScoreQuestionParams
     private $isMultiPartQuestion;   // Orig: $multi
     private $questionPartNumber;    // Orig: $partnum
     private $varsForScorePart;      // Orig: $options
+    private $isRescore = false;
+    private $parts_to_score = true;
+    private $processed_stuans = [];
 
     /**
      * The user's rights. (from imas_users table, "rights" column)
@@ -389,5 +392,38 @@ class ScoreQuestionParams
     {
         $this->allQuestionAnswersAsNum = $allQuestionAnswersAsNum;
         return $this;
+    }
+
+    public function setIsRescore(bool $isRescore): ScoreQuestionParams
+    {
+      $this->isRescore = $isRescore;
+      return $this;
+    }
+
+    public function getIsRescore(): bool
+    {
+      return $this->isRescore;
+    }
+
+    public function setPartsToScore($parts_to_score): ScoreQuestionParams
+    {
+      $this->parts_to_score = $parts_to_score;
+      return $this;
+    }
+
+    public function getPartsToScore()
+    {
+      return $this->parts_to_score;
+    }
+
+    public function setProcessedStuans($processed_stuans): ScoreQuestionParams
+    {
+      $this->processed_stuans = $processed_stuans;
+      return $this;
+    }
+
+    public function getProcessedStuans()
+    {
+      return $this->processed_stuans;
     }
 }

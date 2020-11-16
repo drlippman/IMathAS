@@ -2,11 +2,11 @@
   <div class="full-question-header">
     <div style="flex-grow: 1">
       <icons :name="statusIcon" class="qstatusicon" />
-      <strong
-        :class="{greystrike: curQData.withdrawn !==0}"
+      <h2
+        :class="{inlineheader: true, greystrike: curQData.withdrawn !==0}"
       >
         {{ $t('question_n', { n: dispqn }) }}
-      </strong>
+      </h2>
     </div>
     <question-header-icons
       :showscore = "true"
@@ -80,6 +80,7 @@ export default {
   border-bottom: 1px solid #ccc;
   border-top: 1px solid #ccc;
   padding: 8px 0;
+  max-width: 726px;
 }
 .fulldisp > div > div:first-of-type {
   margin-top: 32px;

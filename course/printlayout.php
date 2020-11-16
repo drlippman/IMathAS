@@ -24,9 +24,9 @@ if (!(isset($teacherid))) {
 }
 
 /******* begin html output ********/
-$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/mathtest.css\"/>\n";
-$placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css\"/>\n";
-$placeinhead .= "<script src=\"$imasroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
+$placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/assessment/mathtest.css\"/>\n";
+$placeinhead .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$staticroot/assessment/print.css\"/>\n";
+$placeinhead .= "<script src=\"$staticroot/javascript/AMhelpers.js\" type=\"text/javascript\"></script>\n";
 
 $nologo = true;
 $loadgraphfilter = true;

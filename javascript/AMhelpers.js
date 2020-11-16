@@ -1525,11 +1525,19 @@ function toggleinlinebtn(n,p){ //n: target, p: click el
 
 }
 //triggered by blur, this saves the one question without scoring
+var backgsavetimer = null;
 function assessbackgsave() {
-	var m = $(this).attr("name").match(/^(qs|qn|tc)(\d+)/);
+	var el = this;
+	window.clearTimeout(backgsavetimer);
+	backgsavetimer = window.setTimeout(function() {
+			doassessbackgsave(el);
+	}, 500);
+}
+function doassessbackgsave(el) {
+	var m = $(el).attr("name").match(/^(qs|qn|tc)(\d+)/);
 	if (m !== null && !!window.FormData) {
 		var qn = m[2]*1;
-		if (qn>1000) {
+		if (qn>=1000) {
 			qn = Math.floor(qn/1000 + .001)-1;
 		}
 		if (typeof tinyMCE != "undefined") {tinyMCE.triggerSave();}

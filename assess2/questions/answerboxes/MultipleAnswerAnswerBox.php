@@ -32,6 +32,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $assessmentId = $this->answerBoxParams->getAssessmentId();
 
 		$out = '';
 		$tip = '';
@@ -44,6 +45,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
     if (!is_array($questions)) {
       echo _('Eeek!  $questions is not defined or needs to be an array');
@@ -71,7 +73,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
         $answers = count($questions)-1;
       }
     }
-		$_SESSION['choicemap'][$qn] = $randkeys;
+    $_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
+    if (!empty($GLOBALS['inline_choicemap'])) {
+        $params['choicemap'] = encryptval($randkeys, $GLOBALS['inline_choicemap']);
+    }
     if (isset($GLOBALS['capturechoices'])) {
       $GLOBALS['choicesdata'][$qn] = $questions;
     }
@@ -93,17 +98,20 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		if ($displayformat == 'column') { $displayformat = '2column';}
 
 		if (substr($displayformat,1)=='column') {
-			$ncol = $displayformat{0};
+			$ncol = $displayformat[0];
 			$itempercol = ceil(count($randkeys)/$ncol);
 			$displayformat = 'column';
-		}
+        }
+        
+        $arialabel = $this->answerBoxParams->getQuestionIdentifierString() . 
+            (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
 
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
+			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\"".$arialabel.' '._('Select one or more answers')."\">";
 		} else  {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\""._('Select one, none, or multiple answers')."\">";
+			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\"".$arialabel.' '._('Select one or more answers')."\">";
 		}
 		if ($displayformat == "horiz") {
 
@@ -157,17 +165,23 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		}
 		$tip = _('Select all correct answers');
 		if (isset($answers)) {
-			$akeys = array_map('trim',explode(',',$answers));
-			foreach($akeys as $akey) {
-				$sa .= '<br/>'.$questions[$akey];
-			}
+            $ansor = explode(' or ', $answers);
+            foreach ($ansor as $k=>$answers) {
+                $akeys = array_map('trim',explode(',',$answers));
+                if ($k>0) {
+                    $sa .= '<br/><em>'._('or').'</em>';
+                }
+                foreach($akeys as $akey) {
+                    $sa .= '<br/>'.$questions[$akey];
+                }
+            }
 		}
 
 		// Done!
 		$this->answerBox = $out;
     $this->jsParams = $params;
 		$this->entryTip = $tip;
-		$this->correctAnswerForPart = $sa;
+		$this->correctAnswerForPart = (string) $sa;
 		$this->previewLocation = $preview;
 	}
 

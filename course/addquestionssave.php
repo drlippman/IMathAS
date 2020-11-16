@@ -5,19 +5,119 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (!isset($teacherid)) {
-		echo "error: validation";
-	}
-	$stm = $DBH->prepare("SELECT itemorder,viddata,intro,defpoints,courseid FROM imas_assessments WHERE id=:id");
+        echo "error: validation";
+        exit;
+    }
+    
+	$stm = $DBH->prepare("SELECT itemorder,viddata,intro,defpoints,courseid,ver,showhints,showwork FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($rawitemorder, $viddata,$current_intro_json, $defpoints,$assesscourseid) = $stm->fetch(PDO::FETCH_NUM);
+	list($rawitemorder, $viddata,$current_intro_json, $defpoints,$assesscourseid,$aver,$showhints,$showwork) = $stm->fetch(PDO::FETCH_NUM);
 	if ($assesscourseid != $cid) {
 		echo "error: invalid ID";
 		exit;
+    }
+    if ($aver > 1) {
+		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
+		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	} else {
+		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
 	}
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+	if ($stm->rowCount() > 0) {
+		$beentaken = true;
+	} else {
+		$beentaken = false;
+	}
+
+    if (isset($_POST['addnewdef'])) {
+        header('Content-Type: application/json; charset=utf-8');
+        if ($beentaken) {
+            echo '{"error": "'._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page').'"}';
+            exit;
+        }
+        $DBH->beginTransaction();
+        $newqs = array_map('intval', $_POST['addnewdef']);
+        foreach ($newqs as $qsetid) {
+            if ($qsetid == 0) { continue; }
+            $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid,showhints) ";
+            $query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :questionsetid, :showhints);";
+            $stm = $DBH->prepare($query);
+            $stm->execute(array(':assessmentid'=>$aid, ':points'=>9999, ':attempts'=>9999,
+                ':penalty'=>9999, ':questionsetid'=>$qsetid,
+                ':showhints' => ($aver > 1) ? -1 : 0
+            ));
+            $qids[] = $DBH->lastInsertId();
+        }
+        //add to itemorder
+        if ($_POST['asgroup'] == 1) {
+            $newitems = '1|0~'.implode('~', $qids);
+        } else {
+            $newitems = implode(',', $qids);
+        }
+        if ($rawitemorder=='') {
+            $itemorder = $newitems;
+        } else {
+            $itemorder  = $rawitemorder . "," . $newitems;
+        }
+        if ($viddata != '') {
+            $nextnum = 0;
+            if ($rawitemorder!='') {
+                foreach (explode(',', $rawitemorder) as $iv) {
+                    if (strpos($iv,'|')!==false) {
+                        $choose = explode('|', $iv);
+                        $nextnum += $choose[0];
+                    } else {
+                        $nextnum++;
+                    }
+                }
+            }
+            $numnew= count($checked);
+            $viddata = unserialize($viddata);
+            if (!isset($viddata[count($viddata)-1][1])) {
+                $finalseg = array_pop($viddata);
+            } else {
+                $finalseg = '';
+            }
+            for ($i=$nextnum;$i<$nextnum+$numnew;$i++) {
+                $viddata[] = array('','',$i);
+            }
+            if ($finalseg != '') {
+                $viddata[] = $finalseg;
+            }
+            $viddata = serialize($viddata);
+        }
+        $stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
+        $stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
+
+        require_once("../includes/updateptsposs.php");
+        updatePointsPossible($aid, $itemorder, $defpoints);
+        $DBH->commit();
+
+        require('../includes/addquestions2util.php');
+        list($jsarr, $existingqs, $introconvertmsg) = getQuestionsAsJSON($cid, $aid, [
+            'intro' => $current_intro_json,
+            'itemorder' => $itemorder,
+            'showwork' => $showwork,
+            'showhints' => $showhints
+        ]);
+        
+        echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
+        exit;
+    } else if (isset($_POST['addnew'])) {
+
+    } 
+
 	if (!isset($_POST['order']) || !isset($_POST['text_order'])) {
 		echo "error: missing required values";
 		exit;
-	}
+    }
+    if ($beentaken && $rawitemorder != $_REQUEST['order']) {
+        echo 'error: '._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page');
+        exit;
+    }
+
 	$itemorder = str_replace('~',',',$rawitemorder);
 	$curitems = array();
 	foreach (explode(',',$itemorder) as $qid) {

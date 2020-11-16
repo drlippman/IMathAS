@@ -14,9 +14,24 @@ if (isset($_GET['secfilter'])) {
 } else {
 	$secfilter = -1;
 }
+if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
+    $gbmode = $_GET['gbmode'];
+    $_SESSION[$cid.'gbmode'] = $gbmode;
+} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+    $gbmode =  $_SESSION[$cid.'gbmode'];
+} else {
+    $stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+    $stm->execute(array(':courseid'=>$cid));
+    $gbmode = $stm->fetchColumn(0);
+    $_SESSION[$cid.'gbmode'] = $gbmode;
+}
+$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> ".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-$curBreadcrumb .= "&gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Login Grid";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Login Grid";
 
 $overwriteBody = 0;
 $body = "";
@@ -64,14 +79,18 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	}
 
 	$stus = array();
-	$query = "SELECT iu.LastName,iu.FirstName,iu.id FROM imas_users as iu JOIN imas_students ON iu.id=imas_students.userid ";
-	$query .= "WHERE imas_students.courseid=:courseid ORDER BY iu.LastName,iu.FirstName";
+	$query = "SELECT iu.LastName,iu.FirstName,iu.id,imas_students.locked FROM imas_users as iu JOIN imas_students ON iu.id=imas_students.userid ";
+    $query .= "WHERE imas_students.courseid=:courseid ";
+    $query .= "ORDER BY iu.LastName,iu.FirstName";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid));
+    $stm->execute(array(':courseid'=>$cid));
+    $haslocked = false;
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$stus[] = array($row[0].', '.$row[1], $row[2]);
+        $stus[] = array($row[0].', '.$row[1], $row[2], $row[3]);
+        if ($row[3]>0) { 
+            $haslocked = true;
+        }
 	}
-
 } //END DATA MANIPULATION
 
 /******* begin html output ********/
@@ -101,7 +120,7 @@ if (isset($_GET['download'])) {
 	}
 	exit;
 }
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css"> table.logingrid td {text-align: center; border-right:1px solid #ccc;} table.logingrid td.left {text-align: left;}</style>';
 require("../header.php");
 if ($overwriteBody==1) {
@@ -126,12 +145,25 @@ if ($overwriteBody==1) {
 ?>
 	Show <input type="text" size="10" name="sdate" value="<?php echo $sdate;?>">
 	<a href="#" onClick="displayDatePicker('sdate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a> through
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a> through
 	<input type="text" size="10" name="edate" value="<?php echo $edate;?>">
 	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a>
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 	<input type="submit" name="daterange" value="Go"/></p>
-	</form>
+    </form>
+<?php
+if ($haslocked) {
+    echo '<p>';
+    if ($hidelocked) {
+        $newgbmode = $gbmode - 100;
+        echo '<a href="logingrid.php?cid='.$cid.'&gbmode='.$newgbmode.'">'._('Show locked students').'</a>';
+    } else {
+        $newgbmode = $gbmode + 100;
+        echo '<a href="logingrid.php?cid='.$cid.'&gbmode='.$newgbmode.'">'._('Hide locked students').'</a>';
+    }
+    echo '</p>';
+}
+?>
 
 	<table class="gb logingrid" id="myTable">
 	<thead>
@@ -148,15 +180,22 @@ if ($overwriteBody==1) {
 	$alt = 0;
 	$n = count($dates);
 	foreach ($stus as $stu) {
+        if ($hidelocked && $stu[2] > 0) { continue;}
 		if ($alt==0) {echo '<tr class="even">'; $alt=1;} else {echo '<tr class="odd">'; $alt=0;}
-		echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($stu[1]).'">'.Sanitize::encodeStringForDisplay($stu[0]).'</a></td>';
+        echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($stu[1]).'">';
+        if ($stu[2] > 0) {
+            echo '<span class=greystrike>'.Sanitize::encodeStringForDisplay($stu[0]).'</span>';
+        } else {
+            echo Sanitize::encodeStringForDisplay($stu[0]);
+        }
+        echo '</a></td>';
 		for ($i=0;$i<$n;$i++) {
-			echo '<td>';
+            echo '<td>';
 			if (isset($logins[$stu[1]][$i])) {
 				echo $logins[$stu[1]][$i];
 			} else {
 				echo ' ';
-			}
+            }
 			echo '</td>';
 		}
 		echo '<tr/>';

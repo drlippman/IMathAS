@@ -5,6 +5,11 @@
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.4);
   background-color: #fafafa;
   border: 1px solid #ccc;
+  z-index: 50;
+}
+.mqeditor.iframeosk {
+    width: calc(100% - 2px);
+    left: 0px;
 }
 .mqeditor.fixedbottom {
   position: fixed;
@@ -84,7 +89,8 @@
   background-color: transparent;
   color: #339;
   border-radius: 0;
-  font-size: 100%;
+  font-size: 16px;
+  line-height: 16px;
   border-bottom: 2px solid #ccc;
 }
 .mqed-tabpanel {

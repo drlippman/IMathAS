@@ -17,18 +17,13 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 
 
 if (isset($_GET['public'])) {
+    $init_session_start = true;
 	require("../init_without_validate.php");
-	if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
-	ini_set('session.gc_maxlifetime',432000);
-	ini_set('auto_detect_line_endings',true);
-	header('P3P: CP="ALL CUR ADM OUR"');
-	session_start();
+
 	$_SESSION['publicquickdrill'] = true;
-	
-	if (!isset($_SESSION['data']) || isset($_GET['reset'])) {
+
+	if (!isset($_SESSION['drill']) || isset($_GET['reset'])) {
 		$_SESSION = array();
-	} else {
-		$_SESSION = unserialize(base64_decode($_SESSION['data']));
 	}
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		$urlmode = 'https://';
@@ -73,6 +68,7 @@ if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
 		$out .= '</ul></p>';
 	}
 	echo $out;
+	/*  Disabled to prevent email spamming
 	if (isset($_GET['email']) && isset($_GET['public']) && !isset($_POST['stuname'])) {
 		$addy = 'quickdrill.php?public=true&showresults=true&email='.Sanitize::emailAddress($_GET['email']);
 		echo '<p><b>Send results to instructor</b><br/>';
@@ -97,8 +93,10 @@ if (isset($_GET['showresults']) && is_array($_SESSION['drillresults'])) {
 
 		echo "<p>Email Sent</p>";
 	}
+	*/
 	exit;
 }
+
 if (isset($_SESSION['drill']) && empty($_GET['id'])) {
 	//load from sessiondata
 	$qsetid = $_SESSION['drill']['id'];
@@ -369,7 +367,7 @@ initstack.push(focusfirst);
 <?php
 
 if ($page_scoreMsg != '' && $showscore) {
-	echo '<div class="review">Score on last question: '.Sanitize::encodeStringForDisplay($page_scoreMsg);
+	echo '<div class="review">Score on last question: '. $page_scoreMsg;
 	echo '</div>';
 }
 
@@ -442,7 +440,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $DBH,$imasroot;
+	global $DBH,$imasroot,$staticroot;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
@@ -477,7 +475,7 @@ function printscore($sc,$qsetid,$seed) {
 			} else {
 				$pm = 'ychk'; $alt=_('Partially correct');
 			}
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" alt=\"$alt\"/>";
+			$bar = "<img src=\"$staticroot/img/$pm.gif\" alt=\"$alt\"/>";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);

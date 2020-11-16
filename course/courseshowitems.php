@@ -76,7 +76,7 @@ if (! isset ( $CFG ['CPS'] ['itemicons'] )) {
  *
  */
 function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
-	global $imasroot, $itemicons;
+	global $imasroot, $itemicons, $staticroot;
 	$out = '<div class="itemhdricon"';
 	if ($scoremsg != '') {
 		$out .= ' data-tip="'. Sanitize::encodeStringForDisplay($scoremsg) . '"';
@@ -87,7 +87,7 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 	if ($faded) {
 		$class = 'class="faded"';
 	}
-	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $imasroot . '/img/' . $itemicons [$type] . '"/>';
+	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $staticroot . '/img/' . $itemicons[$type] . '"/>';
 	if ($status>-1) {
 		switch ($status) {
 			case 0: $icon = 'emptycircle'; break;
@@ -96,16 +96,17 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 		}
 		$class = $faded?' faded':'';
 		$out .= '<img alt="' . Sanitize::encodeStringForDisplay($scoremsg) . '" ';
-		$out .= 'src="' . $imasroot . '/img/' . $icon . '.png" class="circoverlay'. $class . '" />';
+		$out .= 'src="' . $staticroot . '/img/' . $icon . '.png" class="circoverlay'. $class . '" />';
 	}
 	$out .= '</div>';
 	return $out;
 }
-function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
-	global $cid;
+function getBlockDD($blocktype, $i, $parent, $bnum, $blockid, $name) {
+    global $cid,$staticroot;
+    $blockid = intval($blockid);
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
 	if ($blocktype == 'T') {
@@ -115,18 +116,18 @@ function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	}
 	$out .= " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">" . _ ( 'Modify' ) . "</a></li>";
 	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$blockid}');\">" . _ ( 'Move' ) . '</a></li>';
-	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">" . _ ( 'Delete' ) . "</a></li>";
+	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=$blockid&remove=ask\">" . _ ( 'Delete' ) . "</a></li>";
 	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum&backref=blockhead{$blockid}\">" . _('Copy') . "</a></li>";
 	$out .= " <li><a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">" . _('Toggle NewFlag') . "</a></li>";
 	$out .= '</ul>';
 	$out .= '</div>';
 	return $out;
 }
-function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver) {
-	global $cid;
+function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name) {
+	global $cid,$staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"addquestions.php?aid=$typeid&cid=$cid\">" .  _('Questions') .  "</a></li>";
@@ -144,11 +145,11 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver) {
 	$out .= '</div>';
 	return $out;
 }
-function getDrillDD($i, $typeid, $parent, $itemid) {
-	global $cid;
+function getDrillDD($i, $typeid, $parent, $itemid, $name) {
+	global $cid, $staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -161,11 +162,11 @@ function getDrillDD($i, $typeid, $parent, $itemid) {
 	$out .= '</div>';
 	return $out;
 }
-function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true) {
-	global $cid;
+function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true, $name) {
+	global $cid, $staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+	$out .= ' <img src="'.$staticroot.'/img/gearsdd.png" alt="'. _('Options for').' '.Sanitize::encodeStringForDisplay($name). '" class="mida"/>';
 	$out .= '</a>';
 	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 	$out .= " <li><a href=\"add$typename.php?id=$typeid&block=$parent&cid=$cid\">" . _('Modify') . "</a></li>";
@@ -183,17 +184,17 @@ function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $sho
 	$out .= '</div>';
 	return $out;
 }
-function getInlineDD($i, $typeid, $parent, $itemid, $showstats) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'inlinetext', 'I', $showstats);
+function getInlineDD($i, $typeid, $parent, $itemid, $showstats, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'inlinetext', 'I', $showstats, $name);
 }
-function getLinkedDD($i, $typeid, $parent, $itemid) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'linkedtext', 'L', true);
+function getLinkedDD($i, $typeid, $parent, $itemid, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'linkedtext', 'L', true, $name);
 }
-function getForumDD($i, $typeid, $parent, $itemid) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'forum', 'F', true);
+function getForumDD($i, $typeid, $parent, $itemid, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'forum', 'F', true, $name);
 }
-function getWikiDD($i, $typeid, $parent, $itemid) {
-	return getBasicDD($i, $typeid, $parent, $itemid, 'wiki', 'W', true);
+function getWikiDD($i, $typeid, $parent, $itemid, $name) {
+	return getBasicDD($i, $typeid, $parent, $itemid, 'wiki', 'W', true, $name);
 }
 
 
@@ -201,7 +202,7 @@ $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset;
-	   global $itemshowdata, $exceptionfuncs,$coursejsondata;
+	   global $itemshowdata, $exceptionfuncs,$coursejsondata, $excused,$staticroot;
 
 	   require_once("../includes/filehandler.php");
 
@@ -242,7 +243,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 			   }
 			if (isset($items[$i]['grouplimit']) && count($items[$i]['grouplimit'])>0 && !$viewall) {
-				if (!in_array('s-'.$studentinfo['section'],$items[$i]['grouplimit'])) {
+				if (!in_array(strtolower('s-'.$studentinfo['section']),array_map('strtolower',$items[$i]['grouplimit']))) {
 					continue;
 				}
 			}
@@ -313,15 +314,15 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					} else {
 						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 					}
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['folder']}\"></a>";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
 					echo '</div>';
 
 					echo "<div class=title>";
 
 					if ($ispublic) {
-						echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+						echo "<a href=\"public.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
 					} else {
-						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
+						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">{$items[$i]['name']}</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span class=noticetext>", _('New'), "</span>";
@@ -333,7 +334,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					}
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 					echo '</div>'; //itemhdr;
 
@@ -358,7 +359,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					if (!$ispublic) {
 						echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
 					}
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['foldertree']}\">";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\">";
 					if (!$ispublic) {
 						echo "</a>";
 					}
@@ -382,7 +383,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo "</div>"; //title
 
 					if ($canedit) {
-						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 
 					echo '</div>'; //itemhdr
@@ -404,7 +405,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo '<div class="itemhdr">';
 
 					echo '<div class="itemhdricon">';
-					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$staticroot/img/";
 					if ($isopen) {echo 'collapse';} else {echo 'expand';}
 					echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"/>';
@@ -412,7 +413,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
+					echo "<b role=\"heading\"><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					echo "$astyle>".Sanitize::encodeStringForDisplay($items[$i]['name'])."</a></b> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -426,10 +427,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					} else {
 						echo '<div class="itemhdrright">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle ";
+						echo 'aria-label="'._('Isolate block').' '.Sanitize::encodeStringForDisplay($items[$i]['name']).'">';
+						echo _('Isolate'), "</a>";
 						echo '</div>';
 
 					}
@@ -501,12 +504,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo '<div class="itemhdricon">';
 					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['folder']}\"></a>";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['folder']}\"></a>";
 					echo '</div>';
 
 					echo "<div class=title>";
 
-					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
+					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b role=\"heading\">";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo " <span class=noticetext>", _('New'), "</span>";
@@ -519,7 +522,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('F', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 					echo '</div>'; //itemhdr
 					//echo '<div class="clear"></div>';
@@ -539,7 +542,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo '<div class="itemhdricon">';
 					echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" border=0>";
-					echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemicons['foldertree']}\"></a>";
+					echo "<img alt=\"folder\" src=\"$staticroot/img/{$itemicons['foldertree']}\"></a>";
 					echo '</div>';
 
 					echo "<div class=title>";
@@ -561,7 +564,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('T', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					}
 					//echo '<div class="clear"></div>';
 
@@ -583,7 +586,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					echo '<div class="itemhdr">';
 
 					echo '<div class="itemhdricon">';
-					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+					echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$staticroot/img/";
 					if ($isopen) {echo 'collapse';} else {echo 'expand';}
 					echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
 					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"/>';
@@ -591,7 +594,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "<div class=title>";
 
-					echo "<b>";
+					echo "<b role=\"heading\">";
 					$control = "onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
 					$control .= 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					if ($items[$i]['SH'][0]=='S') {
@@ -611,10 +614,12 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 					echo "</div>"; //title
 					if ($canedit) {
-						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id']);
+						echo getBlockDD('E', $i, $parent, $bnum, $items[$i]['id'], $items[$i]['name']);
 					} else {
 						echo '<div class="itemhdrright">';
-						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
+						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle ";
+						echo 'aria-label="'._('Isolate block').' '.Sanitize::encodeStringForDisplay($items[$i]['name']).'">';
+						echo _('Isolate'), "</a>";
 						echo '</div>';
 					}
 					echo '</div>'; //itemhdr
@@ -673,7 +678,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   */
 				echo '<div class="floatright dropdown">';
 				echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-				echo ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
+				echo ' <img src="'.$staticroot.'/img/gearsdd.png" alt="Options" class="mida"/>';
 				echo '</a>';
 				echo '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
 				echo " <li><a href=\"addcalendar.php?id={$items[$i]}&block=$parent&cid=$cid&remove=true\">", _('Delete'), "</a></li>";
@@ -787,10 +792,17 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
 			   }
 
+               $excusedNote = '';
+               if (!$canedit && !empty($excused['A'.$typeid])) {
+                   $excusedNote .= '<br/><span class="small">' . 
+                    _('You have been excused from this assignment. It will not be counted in your grade.') . 
+                    '</span>';
+               }
 				 if ($line['ver'] > 1) {
 					 $thisaddassess = "addassessment2.php";
 					 	if ($assessUseVueDev) {
-					 		$assessUrl = "http://localhost:8080/?cid=$cid&aid=$typeid";
+							$assessUrl = sprintf("%s/?cid=%s&aid=%s",
+								$CFG['assess2-use-vue-dev-address'], $cid, $typeid);
 						} else {
 							$assessUrl = "../assess2/?cid=$cid&aid=$typeid";
 						}
@@ -886,7 +898,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   if ($viewall) {
 				   	   echo $preReqNote;
-				   }
+                   }
+                   
+                   echo $excusedNote;
 
 				   if ($line['enddate']!=2000000000) {
 					   echo "<BR> $endname $enddate \n";
@@ -912,7 +926,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</div>'; //title
 
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 
@@ -936,7 +950,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
 				   if ($canuselatepass) {
-				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
+                          echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
+                          echo $excusedNote;
 				   }
 				   if ($canedit) {
 					echo '<span class="instronly">';
@@ -955,7 +970,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 					 }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -970,10 +985,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				echo ". <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 				if ($viewall) {
 				   echo $preReqNote;
-				}
+                }
+                echo $excusedNote;
 				echo '</div>'; //title
 				if ($canedit) {
-					echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+					echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				}
 
 				echo '</div>'; //itemhdr
@@ -994,14 +1010,16 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
 				   //echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
 
-				   echo $preReqNote;
+                   echo $preReqNote;
+                   
+                   echo $excusedNote;
 
 				   if ($line['enddate']!=2000000000) {
 					   echo "<br/> $endname $enddate \n";
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	   echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -1021,10 +1039,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo "<br/><i>$show</i>\n";
 				   if ($viewall) {
 				   	   echo $preReqNote;
-				   }
+                   }
+                   echo $excusedNote;
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
@@ -1067,7 +1086,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver']);
+				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1193,7 +1212,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo "</div>"; //title
 				   if ($canedit) {
-				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false);
+				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false, $line['title']);
 				   }
 				   if ($line['title']!='##hidden##' || $viewall) {
 				   	   echo '</div>'; //itemhdr
@@ -1242,7 +1261,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false);
+				   	   echo getInlineDD($i, $typeid, $parent, $items[$i], strpos($line['text'],'<a')!==false, $line['title']);
 				   }
 				   if ($line['title']!='##hidden##' || $viewall) {
 				   	   echo '</div>'; //itemhdr
@@ -1316,7 +1335,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getDrillDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getDrillDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1344,7 +1363,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getDrillDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getDrillDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   enditem($canedit); //echo "</div>\n";
@@ -1367,7 +1386,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getDrillDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getDrillDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 
@@ -1471,7 +1490,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i], $line['title']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1494,7 +1513,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getLinkedDD($i, $typeid, $parent, $items[$i], $line['title']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
@@ -1583,7 +1602,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getForumDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getForumDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
@@ -1630,7 +1649,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	echo getForumDD($i, $typeid, $parent, $items[$i]);
+				   	echo getForumDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=\"itemsum grey\">{$line['description']}</div>\n");
@@ -1681,7 +1700,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   }
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getForumDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getForumDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
@@ -1783,7 +1802,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   if ($duedates!='') {echo "<br/>$duedates";}
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getWikiDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getWikiDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
@@ -1808,7 +1827,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '</span>';
 				   echo '</div>'; //title
 				   if ($canedit) {
-				   	   echo getWikiDD($i, $typeid, $parent, $items[$i]);
+				   	   echo getWikiDD($i, $typeid, $parent, $items[$i], $line['name']);
 				   }
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['description']}</div>\n");
@@ -1822,7 +1841,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
    }
 
    function generateadditem($blk,$tb) {
-   	global $cid, $CFG,$imasroot,$addassess;
+   	global $cid, $CFG,$imasroot,$addassess,$staticroot;
 
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
@@ -1839,7 +1858,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 		$html .= "<a href=\"$addassess?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['assess'])) {
-			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+			$html .= "<img alt=\"assessment\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
 		}
 		$html .= _('Assessment') ."</a> | ";
 
@@ -1852,43 +1871,43 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
 		$html .= "<a href=\"addinlinetext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['inline'])) {
-			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+			$html .= "<img alt=\"inline text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
 		}
 		$html .= _('Text') . "</a> | ";
 
 		$html .= "<a href=\"addlinkedtext.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['linked'])) {
-			$html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+			$html .= "<img alt=\"linked text\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
 		}
 		$html .= _('Link') . "</a> | ";
 
 		$html .= "<a href=\"addforum.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['forum'])) {
-			$html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+			$html .= "<img alt=\"forum\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
 		}
 		$html .= _('Forum') . "</a> | ";
 
 		$html .= "<a href=\"addwiki.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['wiki'])) {
-			$html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
+			$html .= "<img alt=\"wiki\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
 		}
 		$html .= _('Wiki') . "</a> | ";
 
 		$html .= "<a href=\"adddrillassess.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['drill'])) {
-			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
+			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
 		}
 		$html .= _('Drill') . "</a> | ";
 
 		$html .= "<a href=\"addblock.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
-			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
 		}
 		$html .= _('Block') . "</a> | ";
 
 		$html .= "<a href=\"addcalendar.php?block=$blkUrlParam&tb=$tbUrlParam&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['calendar'])) {
-			$html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+			$html .= "<img alt=\"calendar\" class=\"mida\" src=\"$staticroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
 		}
 		$html .= _('Calendar') . "</a>";
 		$html .= '</span>';
@@ -1995,8 +2014,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$hideicons,$exceptions,$latepasses,$CFG;
-	   global $itemtypes, $iteminfo, $addassess;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$exceptions,$latepasses,$CFG;
+	   global $itemtypes, $iteminfo, $addassess, $staticroot;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   if ($parent=='0') {
 		   $itemtypes = array();  $iteminfo = array();
@@ -2090,7 +2109,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			if (!isset($CFG['CPS']['miniicons']['folder'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">B</span>';
 			} else {
-				$icon = '<img alt="folder" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
+				$icon = '<img alt="folder" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
 			}
 			echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.Sanitize::encodeStringForDisplay($items[$i]['id']).'">'.$icon;
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) {
@@ -2105,7 +2124,8 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			}
 			if ($showlinks) {
 				echo '<span class="links">';
-				echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">", _('Delete'), "</a>";
+                echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a>";
+                echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&bid=".intval($items[$i]['id'])."remove=ask\">", _('Delete'), "</a>";
 				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
 				echo '</span>';
@@ -2120,7 +2140,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		        if (!isset($CFG['CPS']['miniicons']['calendar'])) {
 				$icon  = '<span class=icon style="background-color:#0f0;">C</span>';
 			} else {
-				$icon = '<img alt="calendar" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
+				$icon = '<img alt="calendar" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
 			}
 			echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon.'Calendar</li>';
 
@@ -2152,7 +2172,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			 if (!isset($CFG['CPS']['miniicons']['assess'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">?</span>';
 			} else {
-				$icon = '<img alt="assessment" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
+				$icon = '<img alt="assessment" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
 			}
 			echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2227,7 +2247,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   if (!isset($CFG['CPS']['miniicons']['inline'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
 			   } else {
-				$icon = '<img alt="text" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
+				$icon = '<img alt="text" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2274,7 +2294,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   if (!isset($CFG['CPS']['miniicons']['linked'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
 			   } else {
-				$icon = '<img alt="link" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
+				$icon = '<img alt="link" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2321,7 +2341,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		           if (!isset($CFG['CPS']['miniicons']['forum'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
 			   } else {
-				$icon = '<img alt="forum" src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
+				$icon = '<img alt="forum" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2368,7 +2388,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		           if (!isset($CFG['CPS']['miniicons']['wiki'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">W</span>';
 			   } else {
-				$icon = '<img alt="wiki"  src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
+				$icon = '<img alt="wiki"  src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
@@ -2415,7 +2435,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 		           if (!isset($CFG['CPS']['miniicons']['drill'])) {
 				$icon  = '<span class=icon style="background-color:'.$color.'">D</span>';
 			   } else {
-				$icon = '<img alt="wiki"  src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['drill'].'" class="mida icon" /> ';
+				$icon = '<img alt="wiki"  src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['drill'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
 			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {

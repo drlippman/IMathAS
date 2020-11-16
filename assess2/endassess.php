@@ -33,6 +33,8 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 } else {
   $uid = $userid;
 }
+// is teacher/tutor and not acting as student
+$isTeacherPreview = ($canViewAll && $uid == $userid);
 
 $now = time();
 
@@ -46,6 +48,10 @@ if ($isstudent) {
 // load user's assessment record - always operating on scored attempt here
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
+
+if ($isTeacherPreview) {
+    $assess_record->setIsTeacherPreview(true); // disables saving student-only data
+}
 
 // grab all questions settings
 $assess_info->loadQuestionSettings('all', false);
@@ -65,13 +71,7 @@ if ($assess_record->hasActiveAttempt()) {
 }
 
 // update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  $gbscore = $assess_record->getGbScore();
-  require_once("../includes/ltioutcomes.php");
-  $aidposs = $assess_info->getSetting('points_possible');
-  calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], true, $aidposs);
-}
+$assess_record->updateLTIscore();
 
 // grab any assessment info fields that may have updated:
 $include_from_assess_info = array(
@@ -105,13 +105,13 @@ if ($assessInfoOut['submitby'] == 'by_question') {
 }
 
 // get endmsg
-if ($assessInfoOut['showscores'] != 'none') {
-  $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
+$assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
     $assess_info->getSetting('endmsg'),
     $totalScore,
     $assess_info->getSetting('points_possible')
-  );
-}
+);
+
+$assessInfoOut['newexcused'] = $assess_record->get_new_excused();
 
 //prep date display
 prepDateDisp($assessInfoOut);

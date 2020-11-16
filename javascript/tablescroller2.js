@@ -1,4 +1,4 @@
-/*** 
+/***
 Table row / column header locker
 (c) David Lippman, 2008.  http://www.pierce.ctc.edu/dlippman
 
@@ -17,12 +17,13 @@ the table to autolock the headers on page load.
 This version requires additional HTML markup to function correctly
 
 Public functions:
+ts.init()   Initializes the table. Call after DOMContentLoaded.
 ts.lock()		Locks the headers
 ts.unlock()		Unlocks the headers
 ts.toggle()		Toggles locked/unlocked. Returns corresponding 1 or 0.
 
-This library is free software; you can redistribute it and/or modify it 
-under the terms of the GNU Lesser General Public License as published by the 
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by the
 Free Software Foundation; either version 2.1 of the License, or (at your option)
 any later version.
 
@@ -32,20 +33,6 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 ***/
 
 //from http://www.webreference.com/programming/javascript/onloads/
-/*  moved to general.js 
-function addLoadEvent(func) { 
-	  var oldonload = window.onload; 
-	  if (typeof window.onload != 'function') { 
-	    window.onload = func; 
-	  } else { 
-	    window.onload = function() { 
-	      if (oldonload) { 
-	        oldonload(); 
-	      } 
-	      func(); 
-	    } 
-	  } 
-} */
 /*
 function findPos(obj) { //from quirksmode.org
 	var curleft = curtop = 0;
@@ -77,9 +64,9 @@ function tablescroller(id,lockonload,showpics) {
 	var locktds = new Array();
 	var ispreinited = false;
 	var haspics = (showpics>0);
-	
+
 //preinit is called onload
-//fixes column widths and heights by injecting div's 
+//fixes column widths and heights by injecting div's
 //into first and second rows and columns, locking in non-scrolling layout
 this.preinit = function(try2) {
 	thetable = document.getElementById(tblid);
@@ -109,12 +96,12 @@ this.preinit = function(try2) {
 		} else {
 			tblbrowser = 'ie';
 		}
-	} 
+	}
 	if (tblbrowser == 'ie') {
-		
+
 	} else {
 		//Approach:  Start with table layed out without scrolling
-		//fix column widths and heights by setting div heights into first and 
+		//fix column widths and heights by setting div heights into first and
 		//second rows and columns.  Then when we restrict the container to
 		//create scroll, we don't have to worry about different wrapping.
 		var trs = document.getElementsByTagName("tr");
@@ -124,21 +111,21 @@ this.preinit = function(try2) {
 			if (try2!=true) {
 				return;
 			} else if (lockcookie == 1) {
-				
+
 			} else {
 				if (!confirm("This might take a minute... header locking is really slow with a big gradebook.  Continue?")) {
-					cancellockcol();	
+					cancellockcol();
 					return;
 				} else {
 					document.cookie = "skiplhdrwarn_"+cid+"=1";
 				}
 			}
 		}
-		
+
 		leftth = theads[0];
 		var firstthcontent = theads[0].innerHTML;
 		var first = trs[1].getElementsByTagName("td");
-		//fix column widths by injecting fixed-width div in thead tr th's and 
+		//fix column widths by injecting fixed-width div in thead tr th's and
 		//first tbody tr td's
 		var offsets = [];
 		for (var i=0; i<theads.length; i++) {
@@ -152,15 +139,15 @@ this.preinit = function(try2) {
 			theads[i].firstChild.style.width = max + "px";
 			first[i].firstChild.style.width = max + "px";
 		}
-		
+
 		//fix row heights by setting fixed height divs in first and second columsn
-		
+
 		//var nnb = document.createElement("div");
 		//nnb.style.display = "table-cell";
 		//nnb.style.verticalAlign = "middle";
 		for (var i=0;i<trs.length;i++) {
 			var nodes = trs[i].getElementsByTagName((i==0?"th":"td"));
-			
+
 			if (i<2 || haspics) {
 				var max = nodes[0].offsetHeight;
 			}
@@ -173,7 +160,7 @@ this.preinit = function(try2) {
 			nodes[0].firstChild.style.width = theads[0].firstChild.style.width;
 			nodes[1].firstChild.style.height = max + "px";
 		}
-		
+
 		if (tblbrowser=='gecko' || tblbrowser=='safari') {
 			vertadj = 0;
 		} else {
@@ -202,7 +189,7 @@ this.preinit = function(try2) {
 			var cur = tableWidget_arraySort[thetable.getAttribute('tableIndex')];
 			tableWidget_arraySort[thetable.getAttribute('tableIndex')] = Array(cur[0],'S').concat(cur.splice(1));
 		}*/
-	
+
 	}
 	ispreinited = true;
 
@@ -210,7 +197,7 @@ this.preinit = function(try2) {
 //handles adjusing headers during scrolling
 scrollhandler = function(e) {
 	if (e.target.nodeName=="DIV") {
-		var el = e.target;	
+		var el = e.target;
 		if (tblbrowser=='gecko' || tblbrowser=='safari') {
 			thr.style.left = (-1*el.scrollLeft + margleft) + "px";
 			leftth.style.left = (el.scrollLeft -margleft)+ "px";
@@ -246,15 +233,15 @@ resettoplocs = function() {
 ierelock = function() {
 	 var trs = document.getElementsByTagName("tr");
 	  var theads = trs[0].getElementsByTagName("th");
-	  for (var i=0; i<theads.length; i++) {	  
+	  for (var i=0; i<theads.length; i++) {
 		  theads[i].style.setExpression("top",'document.getElementById("'+tblcont.id+'").scrollTop-2');
 	  }
 	  for (var i=1;i<trs.length;i++) {
 		  var nodes = trs[i].getElementsByTagName("td");
 		  nodes[0].style.position = "relative";
 		  nodes[0].style.setExpression("left",'parentNode.parentNode.parentNode.parentNode.scrollLeft');
-	  }	
-	
+	  }
+
 }
 //locks the header row and column
 //adjust the winw and winh calculations to adjust sizing - currently handles
@@ -288,7 +275,7 @@ this.lock = function() {
 		  //http://home.tampabay.rr.com/bmerkey/examples/locked-column-csv.html
 		  theads[0].style.setExpression("left",'parentNode.parentNode.parentNode.parentNode.scrollLeft');
 		  theads[0].style.zIndex = 40;
-		  for (var i=0; i<theads.length; i++) {	  
+		  for (var i=0; i<theads.length; i++) {
 			  theads[i].style.setExpression("top",'document.getElementById("'+tblcont.id+'").scrollTop-2');
 		  }
 		  for (var i=1;i<trs.length;i++) {
@@ -296,20 +283,20 @@ this.lock = function() {
 			  nodes[0].style.position = "relative";
 			  nodes[0].style.setExpression("left",'parentNode.parentNode.parentNode.parentNode.scrollLeft');
 		  }
-		  trs[0].attachEvent('onclick', ierelock); 
+		  trs[0].attachEvent('onclick', ierelock);
 	} else {
 		//use window height if remaining space is under 200px
 		if (window.innerHeight - findPos(locktds[0])[1] < 200) {
 		//if (window.innerHeight<600) {
-			winh = Math.min(Math.round(.9*window.innerHeight),thetable.offsetHeight+30);	
+			winh = Math.min(Math.round(.9*window.innerHeight),thetable.offsetHeight+30);
 		} else {
 			winh = Math.min(Math.round(window.innerHeight - findPos(thetable)[1]-10),thetable.offsetHeight+30);
 		}
 		//winw = Math.round(.95*window.innerWidth);
 		winw = tblcont.offsetWidth;
-		
+
 		//Approach:  Start with table layed out without scrolling
-		//fix column widths and heights by injecting div's into first and 
+		//fix column widths and heights by injecting div's into first and
 		//second rows and columns.  Then when we restrict the container to
 		//create scroll, we don't have to worry about different wrapping.
 		var trs = document.getElementsByTagName("tr");
@@ -328,7 +315,7 @@ this.lock = function() {
 		}
 		margleft = locktds[0].offsetWidth;
 		margtop = leftth.offsetHeight;
-		
+
 		//constrain size.  bigcont is the injected outsize div
 		//tblcont holds the table, and is shifted right to allow room
 		//for the out-of-flow row headers
@@ -343,11 +330,11 @@ this.lock = function() {
 		tblcont.style.height = (winh-margtop)+"px";
 		tblcont.style.overflow = "auto";
 		thetable.style.margin = "0px";
-		
+
 		thr = trs[0];
 		thr.style.position = "absolute";
 		thr.style.top = "0px";
-		
+
 		//gecko lets us take the top-left cell and remove it
 		//independently from the flow.  Safari doesn't, so we put
 		//a div over the top-left cell to cover it.
@@ -362,7 +349,7 @@ this.lock = function() {
 			upleftdiv.style.width= margleft +"px";
 			upleftdiv.style.visibility = "visible";
 		}
-		
+
 		//onclick is to reset heights after table sorting clicks
 		thr.addEventListener('click', resettoplocs , false); //
 		tblcont.addEventListener('scroll', scrollhandler, false);
@@ -384,7 +371,7 @@ this.unlock = function() {
 		  var theads = trs[0].getElementsByTagName("th");
 		  theads[0].style.removeExpression("left");
 		  theads[0].style.left = "0px";
-		  for (var i=0; i<theads.length; i++) {	
+		  for (var i=0; i<theads.length; i++) {
 			  theads[i].style.removeExpression("top");
 			  theads[i].style.top = "0px";
 		  }
@@ -393,15 +380,15 @@ this.unlock = function() {
 			  nodes[0].style.position = "";
 			  nodes[0].style.removeExpression("left");
 		  }
-		  trs[0].detachEvent('onclick',ierelock); 
-		 
+		  trs[0].detachEvent('onclick',ierelock);
+
 	} else {
-	
+
 	var trs = document.getElementsByTagName("tr");
 	var theads = trs[0].getElementsByTagName("th");
 	leftth = theads[0];
 	var firstthcontent = theads[0].innerHTML;
-	
+
 	bigcont.style.width = "auto";
 	bigcont.style.height = "auto";
 	bigcont.style.overflow = "";
@@ -415,7 +402,7 @@ this.unlock = function() {
 		locktds[i].style.position = "";
 		locktds[i].style.width= "";
 	}
-	thr = trs[0];   
+	thr = trs[0];
 	thr.style.position = "";
 	thr.removeEventListener('click', resettoplocs,false);
 	if (tblbrowser=='gecko') {
@@ -424,7 +411,7 @@ this.unlock = function() {
 		//upleftdiv.style.visibility = "hidden";
 		leftth.style.position = "static";
 		//Safari has an issue - this resets page layout
-		tblcont.innerHTML = tblcont.innerHTML + " ";	
+		tblcont.innerHTML = tblcont.innerHTML + " ";
 		locktds.length = 0;
 		for (var i=1;i<trs.length;i++) {
 			var nodes = trs[i].getElementsByTagName("td");
@@ -432,9 +419,9 @@ this.unlock = function() {
 		}
 		thetable = tblcont.getElementsByTagName("table")[0];
 	}
-	
+
 	tblcont.removeEventListener('scroll', scrollhandler, false);
-	
+
 	}
 }
 //toggles locked/unlocked
@@ -446,15 +433,16 @@ this.toggle = function() {
 		this.unlock();
 		return 0;
 	}
-	
+
 }
 this.status = function() {
 	return toggletracker;
 }
-	
+this.init = function () {
 	if(lockonload) {
-		addLoadEvent(this.lock);
+		this.lock();
 	} else {
-		addLoadEvent(this.preinit);
+		this.preinit();
 	}
+}
 }

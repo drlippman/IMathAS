@@ -26,6 +26,7 @@ require_once("./common_start.php");
 require_once("./AssessInfo.php");
 require_once("./AssessRecord.php");
 require_once('./AssessUtils.php');
+require_once("../includes/TeacherAuditLog.php");
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -59,7 +60,7 @@ if ($istutor) {
   }
 }
 // get question point values for retotal later
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', false, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -70,6 +71,18 @@ if (!$assess_record->hasRecord()) {
 }
 
 if ($type == 'all' && $keepver == 0) {
+  $stm = $DBH->prepare('SELECT score FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
+  $stm->execute(array($aid, $uid));
+  $score = $stm->fetchColumn(0);
+  TeacherAuditLog::addTracking(
+    $cid,
+    "Clear Attempts",
+    $aid,
+    array(
+      'studentid'=>$uid,
+      'grade'=>$score
+    )
+  );
   $stm = $DBH->prepare('DELETE FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
   // update LTI grade
@@ -118,11 +131,7 @@ if ($type == 'attempt' && ($replacedDeleted || $keepver == 1)) {
 $assess_record->saveRecord();
 
 // update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$assessInfoOut['gbscore'],true);
-}
+$assess_record->updateLTIscore();
 
 //output JSON object
 echo json_encode($assessInfoOut);

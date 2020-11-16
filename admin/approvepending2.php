@@ -1,6 +1,7 @@
 <?php
 
 require("../init.php");
+require_once('../includes/filehandler.php');
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
@@ -15,9 +16,10 @@ $defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0
 
 //handle ajax postback
 if (!empty($newStatus)) {
-	$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
-	$stm->execute(array($instId));
-	$reqdata = json_decode($stm->fetchColumn(0), true);
+	$stm = $DBH->prepare("SELECT status,reqdata FROM imas_instr_acct_reqs WHERE userid=?");
+    $stm->execute(array($instId));
+    list($oldstatus, $reqdata) = $stm->fetch(PDO::FETCH_NUM);
+	$reqdata = json_decode($reqdata, true);
 
 	if (!isset($reqdata['actions'])) {
 		$reqdata['actions'] = array();
@@ -30,34 +32,20 @@ if (!empty($newStatus)) {
 	$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=?,reqdata=? WHERE userid=?");
 	$stm->execute(array($newStatus, json_encode($reqdata), $instId));
 
-	if ($newStatus==10) { //deny
-		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
-		$stm->execute(array(':id'=>$instId));
-		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
-			require("../includes/unenroll.php");
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
-				unenrollstu($rcid, array(intval($instId)));
-			}
-		}
-
+	if ($newStatus==4) { // request more info
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 
 		//call hook, if defined
-		if (function_exists('getDenyMessage')) {
-			$message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+		if (function_exists('getMoreInfoMessage')) {
+			$message = getMoreInfoMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
 		} else {
 			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
 			$message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
-			$message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status, ';
-			$message .= 'so your account has been converted to a student account. If you believe you should have an instructor account, ';
+			$message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status. ';
+			$message .= 'If you believe you should have an instructor account, ';
 			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
-		}
-
-		//call hook, if defined
-		if (function_exists('getDenyBcc')) {
-			$CFG['email']['new_acct_bcclist'] = getDenyBcc();
 		}
 
 		require_once("../includes/email.php");
@@ -66,6 +54,42 @@ if (!empty($newStatus)) {
 			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
 			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
 
+	} else if ($newStatus==10) { //deny
+		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
+		$stm->execute(array(':id'=>$instId));
+		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+			require("../includes/unenroll.php");
+			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
+				unenrollstu($rcid, array(intval($instId)));
+			}
+		}
+        if ($oldstatus != 4) {
+            $stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
+            $stm->execute(array(':id'=>$instId));
+            $row = $stm->fetch(PDO::FETCH_ASSOC);
+
+            //call hook, if defined
+            if (function_exists('getDenyMessage')) {
+                $message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+            } else {
+                $message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
+                $message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
+                $message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status, ';
+                $message .= 'so your account has been converted to a student account. If you believe you should have an instructor account, ';
+                $message .= 'you are welcome to reply to this email with additional verification information.</p>';
+            }
+
+            //call hook, if defined
+            if (function_exists('getDenyBcc')) {
+                $CFG['email']['new_acct_bcclist'] = getDenyBcc();
+            }
+
+            require_once("../includes/email.php");
+            send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
+                $installname._(' Account Status'), $message,
+                !empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
+                !empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
+        }
 	} else if ($newStatus==11) { //approve
 		if ($_POST['group']>-1) {
 			$group = Sanitize::onlyInt($_POST['group']);
@@ -81,7 +105,13 @@ if (!empty($newStatus)) {
 			}
 		} else {
 			$group = 0;
-		}
+        }
+        
+        if ($group > 0 && !empty($reqdata['ipeds']) && strpos($reqdata['ipeds'],'-')!==false) {
+            list($ipedtype, $ipedid) = explode('-', $reqdata['ipeds']);
+            $stm = $DBH->prepare("INSERT IGNORE INTO imas_ipeds_group (type,ipedsid,groupid) VALUES (?,?,?)");
+            $stm->execute(array($ipedtype, $ipedid, $group));
+        }
 
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
 		$stm->execute(array(':groupid'=>$group, ':id'=>$instId));
@@ -114,10 +144,12 @@ if (!empty($newStatus)) {
 	exit;
 }
 
-function getReqData() {
-	global $DBH;
+$countries = ['AF'=>'Afghanistan', 'AL'=>'Albania', 'DZ'=>'Algeria', 'AD'=>'Andorra', 'AO'=>'Angola', 'AI'=>'Anguilla', 'AQ'=>'Antarctica', 'AG'=>'Antigua and Barbuda', 'AR'=>'Argentina', 'AM'=>'Armenia', 'AW'=>'Aruba', 'AU'=>'Australia', 'AT'=>'Austria', 'AZ'=>'Azerbaijan', 'BS'=>'Bahamas (the)', 'BH'=>'Bahrain', 'BD'=>'Bangladesh', 'BB'=>'Barbados', 'BY'=>'Belarus', 'BE'=>'Belgium', 'BZ'=>'Belize', 'BJ'=>'Benin', 'BM'=>'Bermuda', 'BT'=>'Bhutan', 'BO'=>'Bolivia (Plurinational State of)', 'BQ'=>'Bonaire, Sint Eustatius and Saba', 'BA'=>'Bosnia and Herzegovina', 'BW'=>'Botswana', 'BV'=>'Bouvet Island', 'BR'=>'Brazil', 'IO'=>'British Indian Ocean Territory (the)', 'BN'=>'Brunei Darussalam', 'BG'=>'Bulgaria', 'BF'=>'Burkina Faso', 'BI'=>'Burundi', 'CV'=>'Cabo Verde', 'KH'=>'Cambodia', 'CM'=>'Cameroon', 'CA'=>'Canada', 'KY'=>'Cayman Islands (the)', 'CF'=>'Central African Republic (the)', 'TD'=>'Chad', 'CL'=>'Chile', 'CN'=>'China', 'CX'=>'Christmas Island', 'CC'=>'Cocos (Keeling) Islands (the)', 'CO'=>'Colombia', 'KM'=>'Comoros (the)', 'CD'=>'Congo (the Democratic Republic of the)', 'CG'=>'Congo (the)', 'CK'=>'Cook Islands (the)', 'CR'=>'Costa Rica', 'HR'=>'Croatia', 'CU'=>'Cuba', 'CW'=>'Curaçao', 'CY'=>'Cyprus', 'CZ'=>'Czechia', 'CI'=>'Côte d\'Ivoire', 'DK'=>'Denmark', 'DJ'=>'Djibouti', 'DM'=>'Dominica', 'DO'=>'Dominican Republic (the)', 'EC'=>'Ecuador', 'EG'=>'Egypt', 'SV'=>'El Salvador', 'GQ'=>'Equatorial Guinea', 'ER'=>'Eritrea', 'EE'=>'Estonia', 'SZ'=>'Eswatini', 'ET'=>'Ethiopia', 'FK'=>'Falkland Islands (the) [Malvinas]', 'FO'=>'Faroe Islands (the)', 'FJ'=>'Fiji', 'FI'=>'Finland', 'FR'=>'France', 'GF'=>'French Guiana', 'PF'=>'French Polynesia', 'TF'=>'French Southern Territories (the)', 'GA'=>'Gabon', 'GM'=>'Gambia (the)', 'GE'=>'Georgia', 'DE'=>'Germany', 'GH'=>'Ghana', 'GI'=>'Gibraltar', 'GR'=>'Greece', 'GL'=>'Greenland', 'GD'=>'Grenada', 'GP'=>'Guadeloupe', 'GT'=>'Guatemala', 'GG'=>'Guernsey', 'GN'=>'Guinea', 'GW'=>'Guinea-Bissau', 'GY'=>'Guyana', 'HT'=>'Haiti', 'HM'=>'Heard Island and McDonald Islands', 'VA'=>'Holy See (the)', 'HN'=>'Honduras', 'HK'=>'Hong Kong', 'HU'=>'Hungary', 'IS'=>'Iceland', 'IN'=>'India', 'ID'=>'Indonesia', 'IR'=>'Iran (Islamic Republic of)', 'IQ'=>'Iraq', 'IE'=>'Ireland', 'IM'=>'Isle of Man', 'IL'=>'Israel', 'IT'=>'Italy', 'JM'=>'Jamaica', 'JP'=>'Japan', 'JE'=>'Jersey', 'JO'=>'Jordan', 'KZ'=>'Kazakhstan', 'KE'=>'Kenya', 'KI'=>'Kiribati', 'KP'=>'Korea (the Democratic People\'s Republic of)', 'KR'=>'Korea (the Republic of)', 'KW'=>'Kuwait', 'KG'=>'Kyrgyzstan', 'LA'=>'Lao People\'s Democratic Republic (the)', 'LV'=>'Latvia', 'LB'=>'Lebanon', 'LS'=>'Lesotho', 'LR'=>'Liberia', 'LY'=>'Libya', 'LI'=>'Liechtenstein', 'LT'=>'Lithuania', 'LU'=>'Luxembourg', 'MO'=>'Macao', 'MG'=>'Madagascar', 'MW'=>'Malawi', 'MY'=>'Malaysia', 'MV'=>'Maldives', 'ML'=>'Mali', 'MT'=>'Malta', 'MQ'=>'Martinique', 'MR'=>'Mauritania', 'MU'=>'Mauritius', 'YT'=>'Mayotte', 'MX'=>'Mexico', 'MD'=>'Moldova (the Republic of)', 'MC'=>'Monaco', 'MN'=>'Mongolia', 'ME'=>'Montenegro', 'MS'=>'Montserrat', 'MA'=>'Morocco', 'MZ'=>'Mozambique', 'MM'=>'Myanmar', 'NA'=>'Namibia', 'NR'=>'Nauru', 'NP'=>'Nepal', 'NL'=>'Netherlands (the)', 'NC'=>'New Caledonia', 'NZ'=>'New Zealand', 'NI'=>'Nicaragua', 'NE'=>'Niger (the)', 'NG'=>'Nigeria', 'NU'=>'Niue', 'NF'=>'Norfolk Island', 'NO'=>'Norway', 'OM'=>'Oman', 'PK'=>'Pakistan', 'PS'=>'Palestine, State of', 'PA'=>'Panama', 'PG'=>'Papua New Guinea', 'PY'=>'Paraguay', 'PE'=>'Peru', 'PH'=>'Philippines (the)', 'PN'=>'Pitcairn', 'PL'=>'Poland', 'PT'=>'Portugal', 'QA'=>'Qatar', 'MK'=>'Republic of North Macedonia', 'RO'=>'Romania', 'RU'=>'Russian Federation (the)', 'RW'=>'Rwanda', 'RE'=>'Réunion', 'BL'=>'Saint Barthélemy', 'SH'=>'Saint Helena, Ascension and Tristan da Cunha', 'KN'=>'Saint Kitts and Nevis', 'LC'=>'Saint Lucia', 'MF'=>'Saint Martin (French part)', 'PM'=>'Saint Pierre and Miquelon', 'VC'=>'Saint Vincent and the Grenadines', 'WS'=>'Samoa', 'SM'=>'San Marino', 'ST'=>'Sao Tome and Principe', 'SA'=>'Saudi Arabia', 'SN'=>'Senegal', 'RS'=>'Serbia', 'SC'=>'Seychelles', 'SL'=>'Sierra Leone', 'SG'=>'Singapore', 'SX'=>'Sint Maarten (Dutch part)', 'SK'=>'Slovakia', 'SI'=>'Slovenia', 'SB'=>'Solomon Islands', 'SO'=>'Somalia', 'ZA'=>'South Africa', 'GS'=>'South Georgia and the South Sandwich Islands', 'SS'=>'South Sudan', 'ES'=>'Spain', 'LK'=>'Sri Lanka', 'SD'=>'Sudan (the)', 'SR'=>'Suriname', 'SJ'=>'Svalbard and Jan Mayen', 'SE'=>'Sweden', 'CH'=>'Switzerland', 'SY'=>'Syrian Arab Republic', 'TW'=>'Taiwan', 'TJ'=>'Tajikistan', 'TZ'=>'Tanzania, United Republic of', 'TH'=>'Thailand', 'TL'=>'Timor-Leste', 'TG'=>'Togo', 'TK'=>'Tokelau', 'TO'=>'Tonga', 'TT'=>'Trinidad and Tobago', 'TN'=>'Tunisia', 'TR'=>'Turkey', 'TM'=>'Turkmenistan', 'TC'=>'Turks and Caicos Islands (the)', 'TV'=>'Tuvalu', 'UG'=>'Uganda', 'UA'=>'Ukraine', 'AE'=>'United Arab Emirates (the)', 'GB'=>'United Kingdom of Great Britain and Northern Ireland (the)', 'UM'=>'United States Minor Outlying Islands (the)', 'UY'=>'Uruguay', 'UZ'=>'Uzbekistan', 'VU'=>'Vanuatu', 'VE'=>'Venezuela (Bolivarian Republic of)', 'VN'=>'Viet Nam', 'VG'=>'Virgin Islands (British)', 'WF'=>'Wallis and Futuna', 'EH'=>'Western Sahara', 'YE'=>'Yemen', 'ZM'=>'Zambia', 'ZW'=>'Zimbabwe', 'AX'=>'Åland Islands'];
 
-	$query = 'SELECT ir.status,ir.reqdata,ir.reqdate,iu.id,iu.email,iu.LastName,iu.FirstName ';
+function getReqData() {
+	global $DBH, $countries;
+
+	$query = 'SELECT ir.status,ir.reqdata,ir.reqdate,iu.id,iu.email,iu.LastName,iu.FirstName,iu.SID ';
 	$query .= 'FROM imas_instr_acct_reqs AS ir JOIN imas_users AS iu ';
 	$query .= 'ON ir.userid=iu.id WHERE ir.status<10 ORDER BY ir.status,ir.reqdate';
 	$stm = $DBH->query($query);
@@ -127,23 +159,65 @@ function getReqData() {
 		if (!isset($out[$row['status']])) {
 			$out[$row['status']] = array();
 		}
-		$userdata = json_decode($row['reqdata'],true);
+        $userdata = json_decode($row['reqdata'],true);
+        if (isset($userdata['ipeds'])) {
+            // handle requests with ipeds info 
+            if (strpos($userdata['ipeds'],'-') !== false) {
+                list($ipedstype,$ipedsval) = explode('-', $userdata['ipeds']);
+                $query = "SELECT DISTINCT IF(ip.type='A',ip.agency,ip.school) AS schoolname,ip.country,ig.id,ig.name 
+                    FROM imas_ipeds AS ip 
+                    LEFT JOIN imas_ipeds_group AS ipg ON ip.type=ipg.type AND ip.ipedsid=ipg.ipedsid 
+                    LEFT JOIN imas_groups AS ig ON ipg.groupid=ig.id 
+                    WHERE ip.type=? and ip.ipedsid=?";
+                $stm2 = $DBH->prepare($query);
+                $stm2->execute(array($ipedstype, $ipedsval));
+                $ipedsgroups = array();
+                while ($r2 = $stm2->fetch(PDO::FETCH_ASSOC)) {
+                    $ipedname = $r2['schoolname'];
+                    if ($r2['id'] !== null) {
+                        $ipedsgroups[] = ['id'=>$r2['id'], 'name'=>$r2['name']];
+                    }
+                }
+                if (count($ipedsgroups)>0) {
+                    $userdata['fixedgroups'] = $ipedsgroups;
+                } 
+                $userdata['school'] = $ipedname;
+            } else if ($userdata['ipeds'] == '0') {
+                $userdata['school'] = $userdata['otherschool'].' ('.$countries[$userdata['schoolloc']].')';
+            }
+        }
+        $urlformatted = false;
+        if (isset($userdata['vertype'])) {
+            // these values are further handled and sanitized below.
+            if ($userdata['vertype'] == 'url') {
+                $userdata['url'] = $userdata['verdata']; 
+            } else if ($userdata['vertype'] == 'email') {
+                $userdata['url'] = _('Expect an email from: ').$userdata['verdata'];
+            } else if ($userdata['vertype'] == 'upload') {
+                $url = getprivatefileurl(substr($userdata['verdata'],5));
+                $userdata['url'] = "<a href=\"$url\" target=\"_blank\">"._('Verification Image').'</a>';
+                $urlformatted = true;
+            }
+        }
 		if (isset($userdata['url'])) {
 			if (substr($userdata['url'],0,4)=='http') {
 				$userdata['url'] = Sanitize::url($userdata['url']);
 				$urldisplay = Sanitize::encodeStringForDisplay($userdata['url']);
 				$urlstring = "Verification URL: <a href='{$userdata['url']}' target='_blank'>{$urldisplay}</a>";
-			} else {
+			} else if ($urlformatted) {
+				$urlstring = 'Verification: '.$userdata['url'];
+            } else {
 				$urlstring = 'Verification: '.Sanitize::encodeStringForDisplay($userdata['url']);
 			}
 			$userdata['url'] = $urlstring;
 		}
 		$userdata['reqdate'] = tzdate("D n/j/y, g:i a", $row['reqdate']);
 		$userdata['name'] = $row['LastName'].', '.$row['FirstName'];
-		$userdata['email'] = $row['email'];
+        $userdata['email'] = $row['email'];
+        $userdata['username'] = $row['SID'];
 		$userdata['id'] = $row['id'];
 		if (isset($userdata['school'])) {
-			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search for Name/School</a>';
+			$userdata['search'] = '<a target="checkver" href="https://www.google.com/search?q='.Sanitize::encodeUrlParam($row['FirstName'].' '.$row['LastName'].' '.$userdata['school']).'">Search Google for Name/School</a>';
 		}
 		$out[$row['status']][] = $userdata;
 	}
@@ -153,46 +227,25 @@ function getReqData() {
 	return $out;
 }
 
-function getGroups() {
-	global $DBH;
-	$query = "SELECT s.groupid, ig.name, MAX(s.domain)
-	  FROM (SELECT groupid, SUBSTRING_INDEX(email, '@', -1) AS domain, COUNT(*) AS domainCount
-		  FROM imas_users WHERE rights>10 AND groupid>0
-		  GROUP BY groupid, domain
-	       ) AS s
-	  JOIN (SELECT s.groupid, MAX(s.domainCount) AS MaxdomainCount
-		  FROM (SELECT groupid, SUBSTRING_INDEX(email, '@', -1) AS domain, COUNT(*) AS domainCount
-			FROM imas_users WHERE rights>10 AND groupid>0
-			GROUP BY groupid, domain
-		  ) AS s
-		 GROUP BY s.groupid
-	       ) AS m
-	    ON s.groupid = m.groupid AND s.domainCount = m.MaxdomainCount
-	  JOIN imas_groups AS ig ON s.groupid=ig.id GROUP BY s.groupid ORDER BY ig.name";
-	$stm = $DBH->query($query);
-	$out = array();
-	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		if (empty($row['domain']) || preg_match('/(gmail|yahoo|hotmail|me\.com)/', $row['domain'])) {
-			$row['domain'] = '';
-		}
-		$row['name'] = preg_replace('/\s+/', ' ', trim($row['name']));
-		$out[] = array('id'=>$row['groupid'], 'name'=>$row['name'], 'domain'=>strtolower($row['domain']));
-	}
-	return $out;
-}
-
 //add fields based on your new instructor request form
 //and then add the "search" entry
 if (empty($reqFields)) {
-    $reqFields = array(
-        'school' => 'School',
-        'phone' => 'Phone',
-        'search' => 'Search'
-    );
+    if (!empty($CFG['use_ipeds'])) {
+        $reqFields = array(
+            'school' => 'School',
+            'url' => 'Verification',
+            'search' => 'Search'
+        );
+    } else {
+        $reqFields = array(
+            'school' => 'School',
+            'phone' => 'Phone',
+            'search' => 'Search'
+        );
+    }
 }
 
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.6/dist/vue.min.js"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/fuse.min.js\"></script>";
 //$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/testgroups.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
@@ -249,6 +302,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
         </span>
       	<ul class="userdata" v-if="activeUser==user.id">
       	  <li>Request Made: {{user.reqdate}}</li>
+          <li>Username: {{user.username}}</li>
       	  <li>Email: {{user.email}}</li>
       	  <li v-for="(title,fieldindex) in fieldTitles">
       	    <span v-if="fieldindex=='url' || fieldindex=='search'" v-html="user[fieldindex]"></span>
@@ -265,13 +319,13 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	    	<button @click="chgStatus(status, userindex, 3)">Probably should be Denied</button>
       	    </span>
       	  </li>
-      	  <li>Group: <select v-model="group">
-      	  	<optgroup v-if="suggestedGroups.length>0" label="Suggested Groups">
-      	  		<option v-for="group in suggestedGroups" :value="group.id">{{group.name}}</option>
-      	  	</optgroup>
+          <li v-if="!fixedgroups">Search for group: <input v-model="grpsearch" size=30 @keyup.enter="searchGroups">
+            <button type=button @click="searchGroups">Search</button>
+          </li>
+      	  <li v-show="groups !== null">Group: <select v-model="group">
       	  	<optgroup label="groups">
-      	  		<option value="-1">New group</option>
-      	  		<option value=0>Default</option>
+      	  		<option value="-1" v-if="!fixedgroups">New group</option>
+      	  		<option value=0 v-if="!fixedgroups">Default</option>
       	  		<option v-for="group in groups" :value="group.id">{{group.name}}</option>
       	  	</optgroup>
       	  	</select>
@@ -280,8 +334,11 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
       	  <li>
       	    <button @click="chgStatus(status, userindex, 11)">Approve Request</button>
       	    <button @click="chgStatus(status, userindex, 10)">Deny Request</button>
+						<span v-if="status!=4">
+      	    	<button @click="chgStatus(status, userindex, 4)">Request More Info</button>
+      	    </span>
       	    <br/>
-      	    With an Approve or Deny, an email is automatically sent to the requester.
+      	    With an Approve, Deny, or Request More Info, an email is automatically sent to the requester.
       	  </li>
       	</ul>
       </li>
@@ -291,37 +348,14 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 </div>
 
 <script type="text/javascript">
-var groups = <?php echo json_encode(getGroups(), JSON_HEX_TAG); ?>;
-function normalizeGroupName(grpname) {
-	grpname = grpname.toLowerCase();
-	grpname = grpname.replace(/\b(sd|cc|su|of|hs|hsd|usd|isd|school|unified|public|county|district|college|community|university|univ|state|\.edu|www\.|a|the)\b/g, "");
-	grpname = grpname.replace(/\bmt(\.|\b)/, "mount");
-	grpname = grpname.replace(/\bst(\.|\b)/, "saint");
-	return grpname;
-}
-var fuseoptions = {
-  shouldSort: true,
-  tokenize: false,
-  includeScore: true,
-  threshold: 0.3,
-  location: 0,
-  distance: 100,
-  maxPatternLength: 32,
-  minMatchCharLength: 1,
-  keys: ["normname"]
-};
-var normgroups = [];
-for (i in groups) {
-	normgroups.push({"id": groups[i].id, "name": groups[i].name, "normname":normalizeGroupName(groups[i].name)});
-}
-var fuse = new Fuse(normgroups, fuseoptions);
 
 var app = new Vue({
 	el: '#app',
 	data: {
-		groups: groups,
-		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG); ?>,
-		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG);?>,
+		groups: null,
+		grpsearch: '',
+		toApprove: <?php echo json_encode(getReqData(), JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE); ?>,
+		fieldTitles: <?php echo json_encode($reqFields, JSON_HEX_TAG|JSON_INVALID_UTF8_IGNORE);?>,
 		activeUser: -1,
 		activeUserStatus: -1,
 		activeUserIndex: -1,
@@ -329,47 +363,16 @@ var app = new Vue({
 			0: 'New Account Request',
 			1: 'Needs Investigation',
 			2: 'Waiting for Confirmation',
-			3: 'Probably should be denied'
+			3: 'Probably should be denied',
+			4: 'Waiting for more info'
 		},
 		statusMsg: "",
-		group: 0,
+        group: 0,
+        fixedgroups: false,
 		newgroup: ""
 	},
 	computed: {
-		suggestedGroups: function() {
-			if (this.activeUser==-1) {
-				return [];
-			}
-			var out = []; var matchedIDs = []; var i;
-			var user = this.toApprove[this.activeUserStatus][this.activeUserIndex];
-			if (user.email.indexOf("@")>-1) {
-				var userEmailDomain = user.email.substr(user.email.indexOf("@")+1).toLowerCase();
-				for (i in groups) {
-					if (userEmailDomain == groups[i].domain) {
-						out.push({"id": groups[i].id, "name": groups[i].name});
-						matchedIDs.push(groups[i].id);
-					}
-				}
-			}
-			if (user.school && user.school != "") {
-				var userGroup = normalizeGroupName(user.school);
-				var results = fuse.search(userGroup);
-				for (i in results) {
-					if (results[i].score>.8) {break;}
-					if (matchedIDs.indexOf(results[i].item.id)!=-1) { continue; }
-					out.push({"id":results[i].item.id, "name": results[i].item.name});
-					if (out.length>12) { break;}
-				}
-			}
-			return out;
-		},
-		suggestedGroupIds: function() {
-			var ids = [];
-			for (i in this.suggestedGroups) {
-				ids.push(this.suggestedGroups[i].id);
-			}
-			return ids;
-		}
+
 	},
 	methods: {
 		toggleActiveUser: function(userid, status, userindex) {
@@ -382,16 +385,37 @@ var app = new Vue({
 				this.activeUserStatus = status;
 				this.activeUserIndex = userindex;
 				this.$nextTick(function() {
-					if (this.suggestedGroups.length>0) {
-						this.group = this.suggestedGroups[0].id;
-					} else {
-						this.group = 0;
-					}
+                    if (this.toApprove[status][userindex].hasOwnProperty('fixedgroups')) {
+                        this.groups = this.toApprove[status][userindex].fixedgroups;
+                        this.group = this.toApprove[status][userindex].fixedgroups[0]['id'];
+                        this.fixedgroups = true;
+                    } else {
+                        this.groups = null;
+                        this.group = 0;
+                        this.fixedgroups = false;
+                        this.grpsearch = this.toApprove[status][userindex].school;
+                        this.newgroup = this.toApprove[status][userindex].school;
+                    }
 				});
 			}
 		},
+		searchGroups: function () {
+			if (this.grpsearch.trim() == '') { return ;}
+			var self = this;
+			$.ajax({
+				type: "POST",
+				url: "groupsearch.php",
+				dataType: "json",
+				data: {
+					"grpsearch": this.grpsearch
+				}
+			}).done(function(msg) {
+				self.groups = msg;
+				self.group = msg[0].id;
+			});
+		},
 		chgStatus: function(status, userindex, newstatus) {
-			if (newstatus==11 && !this.checkgroupname()) {
+			if (newstatus==11 && this.group===-1 && !this.checkgroupname()) {
 				return false;
 			}
 			this.statusMsg = _("Saving...");
@@ -431,14 +455,27 @@ var app = new Vue({
 			return JSON.parse(JSON.stringify(obj)); //crude
 		},
 		checkgroupname: function() {
-			var proposedgroup = this.newgroup.replace(/^\s+/,"").replace(/\s+$/,"").replace(/\s+/g," ").toLowerCase();
-			for (i in groups) {
-				if (groups[i].name.toLowerCase()==proposedgroup) {
+			var proposedgroup = this.newgroup.replace(/\s+/g," ").trim();
+			var self = this;
+			$.ajax({
+				type: "POST",
+				url: "groupsearch.php",
+				dataType: "json",
+				async: false,
+				data: {
+					"grpsearch": proposedgroup,
+					"exact": true
+				}
+			}).done(function(msg) {
+				if (msg.length === 0) {
+					return true;
+				} else {
 					alert("That group name already exists!");
-					this.group = groups[i].id;
+					self.groups = msg;
+					self.group = msg[0].id;
 					return false;
 				}
-			}
+			});
 			return true;
 		}
 	}

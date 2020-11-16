@@ -159,7 +159,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	}
 }
 
-if ($itemtomove{0} != 'B') {
+if ($itemtomove[0] != 'B') {
 	$itemtomovename = $iteminfo[$itemtomove][1];
 } else {
 	$itemtomovename = $itemtomovename;
@@ -167,7 +167,7 @@ if ($itemtomove{0} != 'B') {
 
 $flexwidth = true;
 $nologo = true;
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/moveitem.js"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/moveitem.js"></script>';
 $placeinhead .= '<script type="text/javascript">
   var blockinfo = '.json_encode($briefitems, JSON_INVALID_UTF8_IGNORE).';
   var iteminfo = '.json_encode($iteminfo, JSON_INVALID_UTF8_IGNORE).';

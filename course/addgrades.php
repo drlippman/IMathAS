@@ -6,6 +6,7 @@
 	//single grade edit
 	require("../init.php");
 	require("../includes/htmlutil.php");
+	require_once("../includes/TeacherAuditLog.php");
 
 	$istutor = false;
 	$isteacher = false;
@@ -40,9 +41,25 @@
 	if (isset($_GET['del']) && $isteacher) {
 		$delItem = Sanitize::onlyInt($_GET['del']);
 		if (isset($_POST['confirm'])) {
+			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
+			$stm->execute(array(':id'=>$delItem));
+			$gbItemName = $stm->fetchColumn(0);
 			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':id'=>$delItem, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
+				$stm = $DBH->prepare("SELECT userid,score FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
+				$stm->execute(array(':gradetypeid'=>$delItem));
+				$grades = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
+				TeacherAuditLog::addTracking(
+            $cid,
+            "Delete Item",
+            $delItem,
+            [
+							'item_type'=>'Offline Grade Item',
+							'item_name'=>$gbItemName,
+							'grades' => $grades
+            ]
+        );
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
 				$stm->execute(array(':gradetypeid'=>$delItem));
 			}
@@ -323,8 +340,8 @@
 		}
 	}
 
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=112519\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addgrades.js?v=112519\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {
@@ -373,18 +390,21 @@
 		 	padding-top: .5em;
 		 }
 		 </style>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051720"></script>';
 	$useeditor = "noinit";
 	if ($_SESSION['useed']!=0) {
 		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
 	require("../includes/rubric.php");
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	if ($from == 'gbtesting') {
-		echo "&gt; <a href=\"gb-testing.php?stu=0&cid=$cid\">Gradebook</a> ";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+    if ($from == 'gbtesting') {
+		echo " <a href=\"gb-testing.php?stu=0&cid=$cid\">Gradebook</a> ";
 	} else {
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+		echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	}
 	if ($_GET['stu']>0) {
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Student Detail</a> ";
@@ -433,8 +453,8 @@
 		}
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
-		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$gropuid));
+		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -480,7 +500,7 @@
 
 <span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
 <input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo Sanitize::encodeStringForDisplay($sdate);?>">
-<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
+<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringForDisplay($stime);?>"></span><BR class=form>
 
 <?php
@@ -627,7 +647,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
 		}
 		if ($hassection) {
-			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+			echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 		}
 		if ($_GET['grades']=='all') {
 			echo '<button type="button" id="useqa" onclick="togglequickadd(this)">'._("Use Quicksearch Entry").'</button>';

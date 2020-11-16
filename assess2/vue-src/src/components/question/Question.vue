@@ -1,13 +1,25 @@
 <template>
-  <div class = "questionwrap questionpane">
+  <div class = "questionwrap questionpane" ref="main">
     <div v-if = "!questionContentLoaded">
       {{ $t('loading') }}
     </div>
     <score-result
-      v-if = "showScore"
+      v-if = "showScore && showResults"
       :qdata = "questionData"
       :qn = "qn"
     />
+    <div v-else-if = "showScore && questionData.canregen"
+      class="scoreresult neutral"
+      tabindex = "-1"
+    >
+      <button
+        type = "button"
+        @click = "trySimilar"
+      >
+        <icons name="retake" alt="" />
+        {{ $t('scoreresult.trysimilar') }}
+      </button>
+    </div>
     <p
       v-if="questionData.withdrawn !== 0"
       class="noticetext"
@@ -62,6 +74,9 @@
         :disabled = "!canSubmit"
       >
         {{ submitLabel }}
+        <span class="sr-only">
+          {{ $t('question_n', {n: qn+1}) }}
+        </span>
       </button>
       <button
         v-if = "canJumpToAnswer"
@@ -93,6 +108,7 @@ import ScoreResult from '@/components/question/ScoreResult.vue';
 import Icons from '@/components/widgets/Icons.vue';
 import QuestionHelps from '@/components/question/QuestionHelps.vue';
 import ShowworkInput from '@/components/ShowworkInput.vue';
+import { pauseVideos } from '@/components/pauseVideos';
 
 export default {
   name: 'Question',
@@ -127,17 +143,22 @@ export default {
       return (this.questionData.jsparams &&
         this.questionData.jsparams.hasseqnext);
     },
+    hasSubmitAll () {
+      return (this.questionData.jsparams &&
+        this.questionData.jsparams.submitall === 1);
+    },
     buttonsOk () {
       return (store.inProgress &&
         this.questionContentLoaded &&
         !store.inPrintView &&
+        !this.disabled &&
         this.questionData.withdrawn === 0 &&
         this.questionData.canretry);
     },
     showSubmit () {
       return (this.buttonsOk && (
         store.assessInfo.submitby === 'by_question' ||
-          this.questionData.tries_max > 1 ||
+          store.assessInfo.showscores === 'during' ||
           this.hasSeqNext
       ) && (
       // if livepoll, only show if state is 2
@@ -158,30 +179,35 @@ export default {
     showScore () {
       return (store.inProgress &&
         !store.inPrintView &&
+        !this.disabled &&
         this.questionData.hadSeqNext !== true &&
         (this.questionData.hasOwnProperty('score') ||
          this.questionData.status === 'attempted'
         ) &&
-        store.assessInfo.show_results &&
         (this.questionData.try > 0 ||
           this.questionData.hasOwnProperty('tries_remaining_range')) &&
         this.questionData.withdrawn === 0
       );
+    },
+    showResults () {
+      return store.assessInfo.show_results;
     },
     submitLabel () {
       let label = 'question.';
       if (store.assessInfo.submitby === 'by_question') {
         // by question submission
         label += 'submit';
-      } else if (this.questionData.tries_max === 1) {
+      } else if (store.assessInfo.showscores === 'during') {
+        // by assessment, show scores
+        label += 'checkans';
+      } else {
         // by assessment, with one try
         label += 'saveans';
-      } else {
-        // by assessment, can retry
-        label += 'checkans';
       }
       if (this.hasSeqNext) {
         label += '_seqnext';
+      } else if (this.hasSubmitAll) {
+        label += '_submitall';
       }
       return this.$t(label);
     },
@@ -247,7 +273,7 @@ export default {
           } else {
             window.$(this).attr('data-lastval', window.$(this).val());
           }
-          actions.clearAutosaveTimer();
+          // actions.clearAutosaveTimer();
         })
         .on('input.dirtytrack', function () {
           store.somethingDirty = true;
@@ -318,18 +344,8 @@ export default {
       this.addDirtyTrackers();
       // set work
       this.work = this.questionData.work;
-
-      let svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.correct') + '">';
-      svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
-      let svgychk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,187,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.partial') + '">';
-      svgychk += '<path d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z" /></svg>';
-      let svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-label="' + this.$t('icons.incorrect') + '">';
-      svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
-      window.$(this.$refs.thisqwrap).find('.scoremarker').remove();
-      window.$(this.$refs.thisqwrap).find('div.ansgrn,table.ansgrn').append(svgchk);
-      window.$(this.$refs.thisqwrap).find('div.ansyel,table.ansyel').append(svgychk);
-      window.$(this.$refs.thisqwrap).find('div.ansred,table.ansred').append(svgx);
-
+      window.$('#questionwrap' + this.qn).find('.seqsep')
+        .attr('aria-level', store.assessInfo.displaymethod === 'full' ? 3 : 2);
       if (this.disabled) {
         window.$('#questionwrap' + this.qn).find('input,select,textarea').each(function (i, el) {
           if (el.name.match(/^(qn|tc|qs)\d/)) {
@@ -338,11 +354,7 @@ export default {
         });
       };
 
-      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ);
-
-      window.$(this.$refs.thisqwrap).find('select.ansgrn').after(svgchk);
-      window.$(this.$refs.thisqwrap).find('select.ansyel').after(svgychk);
-      window.$(this.$refs.thisqwrap).find('select.ansred').after(svgx);
+      window.imathasAssess.init(this.questionData.jsparams, store.enableMQ, this.$refs.thisqwrap);
 
       actions.setRendered(this.qn, true);
     },
@@ -386,6 +398,9 @@ export default {
     workFocused () {
       actions.clearAutosaveTimer();
       this.lastWorkVal = this.work;
+    },
+    trySimilar () {
+      actions.loadQuestion(this.qn, true);
     }
   },
   updated () {
@@ -415,6 +430,9 @@ export default {
     active: function (newVal, oldVal) {
       this.loadQuestionIfNeeded();
       this.updateTime(newVal);
+      if (newVal === false) {
+        pauseVideos(this.$refs.main);
+      }
     },
     state: function (newVal, oldVal) {
       if ((newVal > 1 && oldVal <= 1) ||
@@ -424,6 +442,9 @@ export default {
         // force reload
         actions.loadQuestion(this.qn, false, false);
       }
+    },
+    qn: function (newVal, oldVal) {
+      actions.setRendered(oldVal, false);
     },
     seed: function (newVal, oldVal) {
       actions.loadQuestion(this.qn, false, false);
@@ -494,7 +515,10 @@ input.red {
 .ansyel {
   border: 1px solid #fb0 !important;
 }
-div.ansgrn, div.ansred, div.ansyel {
+.ansorg {
+  border: 1px solid #f50 !important;
+}
+div.ansgrn, div.ansred, div.ansyel, div.ansorg {
   margin: -1px;
 }
 input[type=text].ansgrn, .mathquill-math-field.ansgrn {
@@ -508,5 +532,9 @@ input[type=text].ansred, .mathquill-math-field.ansred {
 input[type=text].ansyel, .mathquill-math-field.ansyel {
   padding-right: 17px;
   background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsMTg3LDApIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0gNS4zLDEwLjYgOSwxNC4yIDE4LjUsNC42IDIxLjQsNy40IDksMTkuOCAyLjcsMTMuNSB6IiAvPjwvc3ZnPg==");
+}
+input[type=text].ansorg, .mathquill-math-field.ansorg {
+  padding-right: 17px;
+  background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsODUsMCkiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTE4IDYgTDYgMTggTTYgNiBMMTggMTgiIC8+PC9zdmc+");
 }
 </style>

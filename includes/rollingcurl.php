@@ -6,7 +6,7 @@
             Copyright (c) 2015-2017 Marcus Leath
                     License: MIT
         https://github.com/marcushat/RollingCurlX
-        
+
         Modified by David Lippman to add:
           setStopAddingTime(time): a time limit after which don't add additional requests
           setPostdataCallback: a function that will transform the request post data
@@ -51,7 +51,7 @@ Class RollingCurlX {
     public function setCallback(callable $callback) {
         $this->_callback = $callback;
     }
-    
+
     public function setPostdataCallback(callable $callback) {
         $this->_postdatacallback = $callback;
     }
@@ -61,7 +61,7 @@ Class RollingCurlX {
             $this->_timeout = $timeout;
         }
     }
-    
+
     public function setStopAddingTime($timeout) { //in seconds
         if($timeout >= 0) {
             $this->_stopAddingTime = $timeout;
@@ -162,19 +162,21 @@ Class RollingCurlX {
         $post_data = $request['post_data'];
         $individual_opts = $request['options'];
         $individual_headers = $request['headers'];
-        
+
         if ($post_data !== null && $request['post_callback'] !== null) {
-			$proc = call_user_func($request['post_callback'], $post_data);	
-			if ($proc !== false) {
-				if (isset($proc['body'])) {
-					$post_data = $proc['body'];
-				} else {
-					$post_data = $proc;
-				}
-				if (isset($proc['header'])) { //add in header to individual headers
-					$individual_headers = ($individual_headers) ? $individual_headers + $proc['header'] : $proc['header'];
-				}
-			}
+    			$proc = call_user_func($request['post_callback'], $post_data);
+    			if ($proc !== false) {
+    				if (isset($proc['body'])) {
+    					$post_data = $proc['body'];
+    				} else {
+    					$post_data = $proc;
+    				}
+    				if (isset($proc['header'])) { //add in header to individual headers
+    					$individual_headers = ($individual_headers) ? $individual_headers + $proc['header'] : $proc['header'];
+    				}
+    			} else {
+            return false;
+          }
         }
 
         $options = ($individual_opts) ? $individual_opts + $this->_options : $this->_options; //merge shared and individual request options
@@ -216,10 +218,14 @@ Class RollingCurlX {
 
     private function init_request($request_num, $multi_handle, &$requests_map) {
         $request =& $this->requests[$request_num];
+        $options = $this->buildOptions($request);
+        if ($options === false) {
+          // something went wrong; skip this one;
+          return;
+        }
         $this->addTimer($request);
 
         $ch = curl_init();
-        $options = $this->buildOptions($request);
         $request['options_set'] = $options; //merged options
         $opts_set = curl_setopt_array($ch, $options);
         if(!$opts_set) {
@@ -246,8 +252,12 @@ Class RollingCurlX {
         $request_info['time'] = $time = $this->stopTimer($request); //record request time
         $request_info['url_raw'] = $url = $request['url'];
         $request_info['user_data'] = $user_data = $request['user_data'];
+        $request_info['post_data'] = $request['post_data'];
 
-        if(curl_errno($ch) !== 0 || intval($request_info['http_code']) !== 200) { //if server responded with http error
+        if(curl_errno($ch) !== 0 || round(intval($request_info['http_code'])/100) != 2) {
+          //if server responded with http error or a non 2xx code
+            debuglog('request error: '. curl_error($ch));
+            debuglog('http_code: '. $request_info['http_code'].' rounded '.round(intval($request_info['http_code'])/100));
             $response = false;
         } else { //sucessful response
             $response = curl_multi_getcontent($ch);

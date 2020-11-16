@@ -49,8 +49,8 @@
 
 
 	$pagetitle = "Forums";
-	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
+	$placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\");\n</style>\n";
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/thread.js"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
 
 	require("../header.php");
@@ -281,9 +281,9 @@ if ($searchtype == 'thread') {
 			}
 
 			if ($line['tagged']==1) {
-				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
+				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
 			} else {
-				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Not flagged\"/>";
+				echo "<img class=\"pointer\" id=\"tag" . Sanitize::onlyInt($line['id']) . "\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(" . Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Not flagged\"/>";
 			}
 
 			if ($isteacher) {
@@ -399,9 +399,9 @@ if ($searchtype == 'thread') {
 				echo '<a href="'.getuserfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
 				$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
 				if (isset($itemicons[$extension])) {
-					echo "<img alt=\"".Sanitize::encodeStringForDisplay($extension)."\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+					echo "<img alt=\"".Sanitize::encodeStringForDisplay($extension)."\" src=\"$staticroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
 				} else {
-					echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
+					echo "<img alt=\"doc\" src=\"$staticroot/img/doc.png\" class=\"mida\"/> ";
 				}
 				echo Sanitize::encodeStringForDisplay($fl[2*$i]) . '</a> ';
 				//if (count($fl)>2) {echo '</li>';}

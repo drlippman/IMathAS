@@ -18,7 +18,7 @@
     </p>
     <p v-else>
       {{ $t("summary.no_total") }}
-      {{ $t("summary.viewwork_" + ainfo.viewingb) }}
+      {{ $t("summary.viewwork_" + viewWorkType) }}
     </p>
   </div>
 </template>
@@ -79,6 +79,25 @@ export default {
     },
     scoreTotalPercent () {
       return Math.round(1000 * this.scoreTotal / this.ainfo.points_possible) / 10;
+    },
+    viewWorkType () {
+      if (this.ainfo.viewingb === 'never') {
+        return 'never';
+      } else if (this.ainfo.viewingb === 'after_due') {
+        if (this.ainfo.scoresingb === 'never') {
+          return 'work_after';
+        } else {
+          return 'after_due';
+        }
+      } else { // after_take or immediately
+        if (this.ainfo.scoresingb === 'never') {
+          return 'work';
+        } else if (this.ainfo.scoresingb === 'after_due') {
+          return 'work_scores_after';
+        } else {
+          return 'immediately';
+        }
+      }
     }
   }
 };

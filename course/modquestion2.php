@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
+require_once("../includes/TeacherAuditLog.php");
 
 
  //set some page specific variables and counters
@@ -21,8 +22,22 @@ if (!(isset($teacherid))) {
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
+
+    if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+        $addq = 'addquestions2';
+        $from = 'addq2';
+    } else {
+        $addq = 'addquestions';
+        $from = 'addq';
+    }
+  $query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
+  $query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid";
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+  $beentaken = ($stm->rowCount() > 0);
+
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
+	$curBreadcrumb .= "&gt; <a href=\"$addq.php?aid=$aid&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ";
 	$curBreadcrumb .= _("Modify Question Settings");
 
 	if ($_GET['process']== true) {
@@ -64,19 +79,42 @@ if (!(isset($teacherid))) {
 			$showhints = intval($_POST['showhints']);
 		}
 		if (isset($_GET['id'])) { //already have id - updating
+      $stm = $DBH->prepare("SELECT * FROM imas_questions WHERE id=?");
+      $stm->execute(array($_GET['id']));
+      $old_settings = $stm->fetch(PDO::FETCH_ASSOC);
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,showwork=:showwork,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':showwork'=>$showwork, ':rubric'=>$rubric,
-					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
-			} else {
+        $settings = array(':points'=>$points, ':attempts'=>$attempts,
+          ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':showwork'=>$showwork,
+          ':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
+          ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']);
+        $stm->execute($settings);
+      } else {
 				$query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans, showwork=:showwork, rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':showwork'=>$showwork,
-					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$_GET['id']));
+        $settings = array(':points'=>$points, ':attempts'=>$attempts,
+          ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':showwork'=>$showwork,
+          ':rubric'=>$rubric,	':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds,
+          ':id'=>$_GET['id']);
+				$stm->execute($settings);
 			}
+      $changes = array();
+      foreach ($old_settings as $k=>$v) {
+        if (isset($settings[':'.$k]) && $settings[':'.$k] != $v) {
+          $changes[$k] = ['old'=>$v, 'new'=>$settings[':'.$k]];
+        }
+      }
+      if ($stm->rowCount()>0 && $beentaken && count($changes)>0) {
+        TeacherAuditLog::addTracking(
+          $cid,
+          "Question Settings Change",
+          $_GET['id'],
+          $changes
+        );
+      }
 			if (isset($_POST['copies']) && $_POST['copies']>0) {
 				$stm = $DBH->prepare("SELECT questionsetid FROM imas_questions WHERE id=:id");
 				$stm->execute(array(':id'=>$_GET['id']));
@@ -134,7 +172,7 @@ if (!(isset($teacherid))) {
     require_once('../assess2/AssessHelpers.php');
     AssessHelpers::retotalAll($cid, $aid);
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/$addq.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 
@@ -178,24 +216,17 @@ if (!(isset($teacherid))) {
 
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
-		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$gropuid));
+		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$groupid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
 		}
-		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
-		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
-		if ($stm->rowCount() > 0) {
+		if ($beentaken) {
 			$page_beenTakenMsg = "<p><strong>"._("Warning")."</strong>: ";
 			$page_beenTakenMsg .= _("This assessment has already been taken.  Altering the points or penalty may cause some temporary weirdness for student currently working on the assessment. ");
 			$page_beenTakenMsg .= _("If you want to add additional copies of this question, you should clear all existing assessment attempts").".</p> ";
-			$page_beenTakenMsg .= "<p><input type=button value=\""._("Clear Assessment Attempts")."\" onclick=\"window.location='addquestions.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
-			$beentaken = true;
-		} else {
-			$beentaken = false;
+			$page_beenTakenMsg .= "<p><input type=button value=\""._("Clear Assessment Attempts")."\" onclick=\"window.location='$addq.php?cid=$cid&aid=$aid&clearattempts=ask'\"></p>\n";
 		}
 
 		//get defaults
@@ -274,7 +305,7 @@ if (isset($_GET['id'])) {
 	echo '<button type="button" onclick="previewq('.Sanitize::encodeStringForJavascript($qsetid).')">'._('Preview').'</button>';
 ?>
 </p>
-<form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid); if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
+<form method=post action="modquestion2.php?process=true&<?php echo "cid=$cid&aid=" . Sanitize::encodeUrlParam($aid) . "&from=$from"; if (isset($_GET['id'])) {echo "&id=" . Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['qsetid'])) {echo "&qsetid=" . Sanitize::encodeUrlParam($_GET['qsetid']);}?>">
 <p><?php echo _("Leave items blank to use the assessment's default values."); ?>
 <input type="submit" value="<?php echo _('Save Settings');?>"></p>
 <?php

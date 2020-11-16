@@ -324,15 +324,18 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$useeditor = "message";
 		$loadgraphfilter = true;
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 		require("../header.php");
 		if (empty($_GET['embed'])) {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			if ($caller != 'thread') {
-				echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";
+            echo "<div class=breadcrumb>";
+            if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+                echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }   
+            if ($caller != 'thread') {
+				echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";
 			}
-			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; ";
+			echo "<a href=\"$returnurl\">$returnname</a> &gt; ";
 			if ($_GET['modify']!="reply" && $_GET['modify']!='new') {
 				echo "Modify Posting";
 			} else if ($_GET['modify']=='reply') {
@@ -386,50 +389,37 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$line['message'] = "";
 				$line['posttype'] = 0;
 				$line['files'] = '';
-				$line['tag'] = '';
-				$curstugroupid = 0;
+                $line['tag'] = '';
+                if (isset($_SESSION['ffilter'.$forumid])) {
+                    $curstugroupid = $_SESSION['ffilter'.$forumid];
+                    if ($curstugroupid == -1) {
+                        $curstugroupid = 0;
+                    }
+                } else {
+                    $curstugroupid = 0;
+                }
 				$replyby = null;
 				echo "<h1>Add Thread - \n";
 				if (isset($_GET['quoteq'])) {
-					require_once("../assessment/displayq2.php");
 					$showa = false;
 					$parts = explode('-',$_GET['quoteq']);
 					$GLOBALS['assessver'] = $parts[4];
-					/* This doesn't seem to be used anywhere...
-					if (count($parts)==6) {
-						//wants to show ans
-						$stm = $DBH->prepare("SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
-						$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$parts[3]));
-						list($seeds, $attempts, $questions) = $stm->fetch(PDO::FETCH_NUM);
-						$seeds = explode(',', $seeds);
-						$seeds = $seeds[$parts[0]];
-						$attempts = explode(',', $attempts);
-						$attempts = $attempts[$parts[0]];
-						$qs = explode(',', $questions);
-						$qid = intval($qs[$parts[0]]);
-						$stm = $DBH->prepare("SELECT questionsetid,attempts,showans FROM imas_questions WHERE id=:id");
-						$stm->execute(array(':id'=>$qid));
-						list($parts[1], $allowedattempts, $showans) = $stm->fetch(PDO::FETCH_NUM);
-						$stm = $DBH->prepare("SELECT defattempts,deffeedback,displaymethod FROM imas_assessments WHERE id=:id");
- 						$stm->execute(array(':id'=>$parts[3]));
-						list($defattempts,$deffeedback,$displaymethod) = $stm->fetch(PDO::FETCH_NUM);
-						list($displaymode,$defshowans) = explode('-', $deffeedback);
-
-						if ($allowedattempts==9999) {
-							$allowedattempts = $defattempts;
-						}
-						if ($showans==0) {
-							$showans = $defshowans;
-						}
-						if ($attempts >= $allowedattempts) {
-							if ($showans=='F' || $showans=='J') {
-								$showa = true;
-							}
-						}
-
-					}
-					*/
-					$message = displayq($parts[0],$parts[1],$parts[2],$showa,false,0,true);
+                    if ($courseUIver > 1) {
+                        include('../assess2/AssessStandalone.php');
+                        $a2 = new AssessStandalone($DBH);
+                        $state = array(
+                            'seeds' => array($parts[0] => $parts[2]),
+                            'qsid' => array($parts[0] => $parts[1])
+                        );
+                        $a2->setState($state);
+                        $a2->loadQuestionData();
+                        $res = $a2->displayQuestion($parts[0], ['showhints'=>false,]);
+                        $message = $res['html'];
+                        $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
+                    } else {
+                        require("../assessment/displayq2.php");
+                        $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+                    }
 					$message = printfilter(forcefiltergraph($message));
 					if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
 						require_once("../includes/filehandler.php");
@@ -604,7 +594,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "<input type=text size=10 name=replybydate value=\"".Sanitize::encodeStringForDisplay($replybydate)."\" aria-label=\"reply by date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
 				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
-				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
+				echo "<img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=replybytime value=\"".Sanitize::encodeStringForDisplay($replybytime)."\" aria-label=\"reply by time\"></span><br class=\"form\" />";
 
 				$thread_lastposttime = 0;
@@ -636,15 +626,35 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo "/> <label for=releaseon3>Later:</label> ";
 				echo "<input type=text size=10 name=releasedate value=\"$releasebydate\" aria-label=\"post release date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'releasedate\', this); return false">';
-				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
+				echo "<img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>";
 				echo "at <input type=text size=10 name=releasetime value=\"$releasebytime\" aria-label=\"post release time\"></span><br class=\"form\" />";
 			}
 			if ($groupsetid >0 && $isteacher && ($_GET['modify']=='new' || ($_GET['modify']!='reply' && $line['parent']==0))) {
-				echo '<span class="form"><label for="stugroup">Set thread to group</label>:</span><span class="formright">';
-				echo '<select name="stugroup" id="stugroup">';
-				echo '<option value="0" ';
+                if ($isSectionGroups) {
+                    echo '<script>function onstugroupchg(el) {
+                        $("#nonsectionwarn").toggle(el.value==0);
+                    }</script>';
+                }
+                echo '<span class="form"><label for="stugroup">';
+                if ($isSectionGroups) {
+                    echo _('Set thread to section');
+                } else {
+                    echo _('Set thread to group');
+                }
+                echo '</label>:</span><span class="formright">';
+                echo '<select name="stugroup" id="stugroup"';
+                if ($isSectionGroups) {
+                    echo ' onchange="onstugroupchg(this)"';
+                }
+				echo '><option value="0" ';
 				if ($curstugroupid==0) { echo 'selected="selected"';}
-				echo '>Non group-specific</option>';
+                echo '>';
+                if ($isSectionGroups) {
+                    echo _('Non section-specific');
+                } else {
+                    echo _('Non group-specific');
+                }
+                echo '</option>';
 				$grpnums = 1;
 				$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY name,id");
 				$stm->execute(array(':groupsetid'=>$groupsetid));
@@ -657,7 +667,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					if ($curstugroupid==$row[0]) { echo 'selected="selected"';}
 					echo '>'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 				}
-				echo '</select></span><br class="form" />';
+                echo '</select>';
+                if ($isSectionGroups) {
+                    echo '<br><span id="nonsectionwarn" class="noticetext"'.($curstugroupid==0?'':' style="display:none;"').'>';
+                    echo _('Warning: students from any section can reply to this post, which may expose student names cross-section.');
+                    echo '</span>';
+                }
+                echo '</span><br class="form" />';
 			}
 			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
 				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';
@@ -793,9 +809,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		if (empty($_GET['embed'])) {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			if ($caller!='thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
-			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
+            echo "<div class=breadcrumb>";
+            if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+                echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }   
+            if ($caller!='thread') {echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";}
+			echo "<a href=\"$returnurl\">$returnname</a> &gt; Remove Post</div>";
 		}
 
 		echo "<h2>Remove Post</h2>\n";
@@ -895,9 +914,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		require("../header.php");
 		if (empty($_GET['embed'])) {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			if ($caller != 'thread') {echo "&gt; <a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> ";}
-			echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
+            echo "<div class=breadcrumb>";
+            if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+                echo "$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }   
+            if ($caller != 'thread') {echo "<a href=\"thread.php?page=$page&cid=$cid&forum=$forumid\">Forum Topics</a> &gt; ";}
+			echo "<a href=\"$returnurl\">$returnname</a> &gt; Move Thread</div>";
 		}
 
 		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id");

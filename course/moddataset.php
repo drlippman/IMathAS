@@ -85,7 +85,14 @@
 		$frompot = 1;
 	} else {
 		$frompot = 0;
-	}
+    }
+    if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
+        $addq = 'addquestions2';
+        $from = 'addq2';
+    } else {
+        $addq = 'addquestions';
+        $from = 'addq';
+    }
 	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
@@ -150,8 +157,9 @@
 				));
 				$t = @file_get_contents('https://www.youtube.com/api/timedtext?type=list&v='.$vidid, false, $ctx);
 				$captioned = (strpos($t, '<track')===false)?0:1;
-			}
-			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned;
+            }
+            $helpdescr = str_replace(['!!','~~'],'',Sanitize::stripHtmlTags($_POST['helpdescr']));
+			$newextref[] = $_POST['helptype'].'!!'.$_POST['helpurl'].'!!'.$captioned.'!!'.$helpdescr;
 		}
 		$extref = implode('~~',$newextref);
 		if (isset($_POST['doreplaceby'])) {
@@ -181,12 +189,18 @@
 			$qsetid = intval($_GET['id']);
 			$isok = true;
 			if ($isgrpadmin) {
-				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+				$query = "SELECT iq.id,iq.ownerid,iq.userights,imas_users.groupid FROM imas_questionset AS iq,imas_users ";
 				$query .= "WHERE iq.id=:id AND iq.ownerid=imas_users.id AND (imas_users.groupid=:groupid OR iq.userights>2)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
 				if ($stm->rowCount()==0) {
 					$isok = false;
+				} else {
+					$row = $stm->fetch(PDO::FETCH_ASSOC);
+					if ($row['userights'] > 3 && $row['groupid'] != $groupid) {
+						// is a "allow mod by all" and not in group; cannot change userights
+						$_POST['userights'] = $row['userights'];
+					}
 				}
 				//$query = "UPDATE imas_questionset AS iq,imas_users SET iq.description='{$_POST['description']}',iq.author='{$_POST['author']}',iq.userights='{$_POST['userights']}',";
 				//$query .= "iq.qtype='{$_POST['qtype']}',iq.control='{$_POST['control']}',iq.qcontrol='{$_POST['qcontrol']}',";
@@ -194,12 +208,20 @@
 				//$query .= "WHERE iq.id='{$_GET['id']}' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>2)";
 			}
 			if (!$isadmin && !$isgrpadmin) {  //check is owner or is allowed to modify
-				$query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+				$query = "SELECT iq.id,iq.ownerid,iq.userights,imas_users.groupid FROM imas_questionset AS iq,imas_users ";
 				$query .= "WHERE iq.id=:id AND iq.ownerid=imas_users.id AND (iq.ownerid=:ownerid OR (iq.userights=3 AND imas_users.groupid=:groupid) OR iq.userights>3)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$_GET['id'], ':ownerid'=>$userid, ':groupid'=>$groupid));
 				if ($stm->rowCount()==0) {
 					$isok = false;
+				} else {
+					$row = $stm->fetch(PDO::FETCH_ASSOC);
+					if ($row['ownerid'] != $userid &&
+						($row['userights'] != 3 || $row['groupid'] != $groupid)
+					) {
+						// cannot change userights
+						$_POST['userights'] = $row['userights'];
+					}
 				}
 			}
 
@@ -269,7 +291,7 @@
 					$query = 'UPDATE imas_questions JOIN imas_assessments ON imas_assessments.id=imas_questions.assessmentid ';
 					$query .= 'LEFT JOIN imas_assessment_records ON imas_questions.assessmentid = imas_assessment_records.assessmentid ';
 					$query .= 'SET imas_questions.questionsetid=:replaceby WHERE imas_assessments.ver>1 AND ';
-					$query .= 'imas_assessment_records.id IS NULL AND imas_questions.questionsetid=:questionsetid';
+					$query .= 'imas_assessment_records.userid IS NULL AND imas_questions.questionsetid=:questionsetid';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':replaceby'=>$replaceby, ':questionsetid'=>$qsetid));
 
@@ -497,10 +519,10 @@
 		} else {
 			if ($frompot==1) {
 				$modquestion = (!empty($courseUIver) && $courseUIver > 1) ? 'modquestion2.php' : 'modquestion.php';
-				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&process=true&usedef=true\">"._("Add Question to Assessment using Defaults")."</a> | \n";
-				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Add Question to Assessment")."</a> | \n";
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&from=$from&process=true&usedef=true\">"._("Add Question to Assessment using Defaults")."</a> | \n";
+				$outputmsg .=  "<a href=\"$modquestion?qsetid=$qsetid&cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."&from=$from\">"._("Add Question to Assessment")."</a> | \n";
 			}
-			$outputmsg .=  "<a href=\"addquestions.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
+			$outputmsg .=  "<a href=\"$addq.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
 		}
 		if ($_POST['test']=="Save and Test Question") {
 			$outputmsg .= "<script>addr = '$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
@@ -516,7 +538,7 @@
 			if ($errmsg == '' && !isset($_GET['aid'])) {
 				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/manageqset.php?cid='.$cid.'&r='.Sanitize::randomQueryStringParam());
 			} else if ($errmsg == '' && $frompot==0) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/addquestions.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
+				header('Location: ' . $GLOBALS['basesiteurl'] . '/course/'.$addq.'.php?cid='.$cid.'&aid='.Sanitize::onlyInt($_GET['aid']).'&r='.Sanitize::randomQueryStringParam());
 			} else {
 				require("../header.php");
 				echo $errmsg;
@@ -737,11 +759,11 @@
 	// Build form action
 	$formAction = "moddataset.php?process=true"
 		. (isset($_GET['cid']) ? "&cid=$cid" : "")
-		. (isset($_GET['aid']) ? "&aid=".Sanitize::encodeUrlParam($_GET['aid']) : "")
+		. (isset($_GET['aid']) ? "&aid=".Sanitize::encodeUrlParam($_GET['aid'])."&from=$from" : "")
 		. ((isset($_GET['id']) && !isset($_GET['template'])) ? "&id=".Sanitize::encodeUrlParam($_GET['id']) : "")
 		. (isset($_GET['template']) ? "&templateid=".Sanitize::encodeUrlParam($_GET['id']) : "")
 		. (isset($_GET['makelocal']) ? "&makelocal=".Sanitize::encodeUrlParam($_GET['makelocal']) : "")
-		. ($frompot==1 ? "&frompot=1" : "");
+        . ($frompot==1 ? "&frompot=1" : "");
 
 	// If in quick-save mode, build return packet and exit here
 	if ($quicksave) {
@@ -758,7 +780,10 @@
 			if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 				$type .= ' (cc)';
 			}
-			$extrefqs[$i] = array($type,$extrefpt[1]);
+            $extrefqs[$i] = array($type,$extrefpt[1]);
+            if (!empty($extrefpt[3])) {
+                $extrefqs[$i][2] = Sanitize::encodeStringForDisplay($extrefpt[3]);
+            }
 		}
 		$qsPacket['extref'] = $extrefqs;
 		$qsPacket['id'] = isset($_GET['id']) ? $_GET['id'] : 0;
@@ -785,9 +810,9 @@
 	}
 	*/
 	$useeditor = "noinit";
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js?v=072018"></script>';
-	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=072018"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
@@ -931,7 +956,7 @@
 	   	}
 	   }
 	   </script>';
-	$placeinhead .= "<script src=\"$imasroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
+	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
 		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
@@ -940,7 +965,7 @@
 		.CodeMirror-focused .CodeMirror-selected {background: #3366AA;}
 		.CodeMirror-selected {background: #666666;}
 		</style>';
-	$placeinhead .= "<link href=\"$imasroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
+	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
 	$placeinhead .= "<style>.quickSaveButton {display:none;}</style>";
 
 	require("../header.php");
@@ -948,7 +973,7 @@
 
 	if (isset($_GET['aid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; "._("Modify Questions")."</div>";
+		echo "&gt; <a href=\"$addq.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; "._("Modify Questions")."</div>";
 
 	} else if (isset($_GET['daid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -1125,8 +1150,8 @@ if (isset($_GET['id']) && $myq) {
 </select>
 </p>
 <p>
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))"><?php echo _('Writing Questions Help'); ?></a> |
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))"><?php echo _('Macro Library Help'); ?></a>
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6));return false;"><?php echo _('Writing Questions Help'); ?></a> |
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6));return false;"><?php echo _('Macro Library Help'); ?></a>
 <?php if (!isset($_GET['id'])) {
 	echo ' | <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">'._('Tutorial Style editor').'</a>';
 }?>
@@ -1212,7 +1237,9 @@ if (isset($images['vars']) && count($images['vars'])>0) {
  <option value="video"><?php echo _('Video'); ?></option>
  <option value="read"><?php echo _('Read'); ?></option>
  </select>
- URL: <input type="text" name="helpurl" size="30" <?php if (!$myq) {echo 'disabled';};?>/><br/>
+ <?php echo _('URL')?>: <input type="text" name="helpurl" size="30" <?php if (!$myq) {echo 'disabled';};?>/>
+ <?php echo _('Description')?>: <input type="text" name="helpdescr" size="30" <?php if (!$myq) {echo 'disabled';};?>/>
+ <br/>
 <?php
 echo '<div id="helpbtnwrap" ';
 if (count($extref)==0) {
@@ -1227,7 +1254,11 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-	echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>.  "._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></li>";
+    echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>. ";
+    if (!empty($extrefpt[3])) {
+        echo _('Description') . ': ' . Sanitize::encodeStringForDisplay($extrefpt[3]) . '. ';
+    }
+    echo ' <label>'._('Delete?')." <input type=\"checkbox\" name=\"delhelp-$i\" ".($myq?'':'disabled')."/></label></li>";
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
@@ -1338,14 +1369,15 @@ if (FormData){ // Only allow quicksave if FormData object exists
 					$("#helpbtnlist").html('');
 					for (var i=0;i<res.extref.length;i++) {
 						$("#helpbtnlist").append("<li>Type: "+res.extref[i][0] +
-							", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
-							"Delete? <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
+                            ", URL: <a href='"+res.extref[i][1]+"'>"+res.extref[i][1]+"</a>. " +
+                            ((res.extref[i][2]) ? (_("Description")+": "+res.extref[i][2]+". "):"") +
+							_("Delete?")+" <input type=\"checkbox\" name=\"delhelp-"+i+"\"/></li>");
 					}
 					$("#helpbtnwrap").removeClass("hidden");
 				} else {
 					$("#helpbtnwrap").addClass("hidden");
 				}
-				$("input[name=helpurl]").val('');
+				$("input[name=helpurl],input[name=helpdescr]").val('');
 
 				// Empty notices
 				$(".quickSaveNotice").empty();
@@ -1406,7 +1438,7 @@ $placeinfooter='
 	<div id="solverinsides">
 	<div id="operationselect">
 	Select and drag or copy an expression from your question code.
-	<img id="solverinputhelpicon" src="../img/help.gif" alt="Help"><br/>
+	<img id="solverinputhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
 	<div id="solverinputhelp" style="display: none;">
 	</div>
 	<input id="imathastosage" type="text" size="30">
@@ -1423,14 +1455,14 @@ $placeinfooter='
 	<div id="sagemathcode" style="display: none;"></div>
 	<div id="sagecellcontainer">
 		<div id="sagecell"></div>
-		<img id="solverhelpicon" src="../img/help.gif" alt="Help"><br/>
+		<img id="solverhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
 	</div>
 	<div id="solverhelpbody" style="display: none">
 	</div>
 	<div id="sagecelloutput"></div>
     <div id="sagetocontroldiv" style="display: none;" >
 		Drag this to the Common Control box or use the buttons below.
-	<img id="solveroutputhelpicon" src="../img/help.gif" alt="Help"><br/>
+	<img id="solveroutputhelpicon" src="'.$staticroot.'/img/help.gif" alt="Help"><br/>
 	<div id="sagetocontrolresult">
 		<p><span id="sagetocontrol" draggable="true"></span></p>
 	</div>

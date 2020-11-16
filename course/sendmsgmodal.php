@@ -119,10 +119,24 @@ if (isset($_POST['message'])) {
 
 	if (isset($_GET['quoteq'])) {
 		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
-		require("../assessment/displayq2.php");
 		$parts = explode('-',$quoteq);
-		$GLOBALS['assessver'] = $parts[4];
-		$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+        $GLOBALS['assessver'] = $parts[4];
+        if ($courseUIver > 1) {
+            include('../assess2/AssessStandalone.php');
+            $a2 = new AssessStandalone($DBH);
+            $state = array(
+                'seeds' => array($parts[0] => $parts[2]),
+                'qsid' => array($parts[0] => $parts[1])
+            );
+            $a2->setState($state);
+            $a2->loadQuestionData();
+            $res = $a2->displayQuestion($parts[0], ['showhints'=>false]);
+            $message = $res['html'];
+            $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
+        } else {
+            require("../assessment/displayq2.php");
+            $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+        }
 		$message = printfilter(forcefiltergraph($message));
 		if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
 			require_once("../includes/filehandler.php");

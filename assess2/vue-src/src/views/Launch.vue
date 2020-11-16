@@ -66,6 +66,11 @@
           {{ $t('launch.doreset') }}
         </button>
       </p>
+      <p v-if="showTutorLinks">
+        {{ $t('launch.gblinks') }}:
+        <a :href="aInfo.tutor_gblinks[0]" target="_blank">{{ $t('launch.scorelist') }}</a> &nbsp;
+        <a :href="aInfo.tutor_gblinks[1]" target="_blank">{{ $t('launch.itemanalysis') }}</a>
+      </p>
       <p v-if="aInfo.view_as_stu" class="noticetext">
         {{ $t('launch.view_as_stu', {name: aInfo.stu_fullname}) }}
       </p>
@@ -84,6 +89,13 @@
           @click="startAssess"
           value="Submit"
         />
+        <button
+          v-if="showPreviewAll"
+          class = "secondary"
+          @click = "teacherPreviewAll"
+        >
+          {{ $t('closed.teacher_previewall_button') }}
+        </button>
         <button
           v-if="hasExit"
           type="button"
@@ -178,6 +190,9 @@ export default {
       }
       return true;
     },
+    showPreviewAll () {
+      return store.assessInfo.can_view_all && !this.aInfo.view_as_stu;
+    },
     showReset () {
       return this.aInfo.is_teacher &&
         !this.aInfo.view_as_stu &&
@@ -194,6 +209,9 @@ export default {
         this.aInfo.submitby === 'by_question') &&
         this.aInfo.showwork_after
       );
+    },
+    showTutorLinks () {
+      return this.aInfo.hasOwnProperty('tutor_gblinks');
     }
   },
   methods: {
@@ -216,6 +234,9 @@ export default {
           action: () => this.reallyStartAssess()
         };
       }
+    },
+    teacherPreviewAll () {
+      actions.startAssess(false, '', [], null, true);
     },
     reallyStartAssess () {
       const pwval = this.password;

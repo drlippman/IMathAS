@@ -553,7 +553,7 @@ if ($myrights < 100) {
 	}
 }
 
-$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/course/libtree.css\" type=\"text/css\" />";
+$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/course/libtree.css\" type=\"text/css\" />";
 
 /******* begin html output ********/
 require("../header.php");

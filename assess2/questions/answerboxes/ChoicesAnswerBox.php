@@ -32,6 +32,7 @@ class ChoicesAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $assessmentId = $this->answerBoxParams->getAssessmentId();
 
         $out = '';
         $tip = '';
@@ -43,6 +44,7 @@ class ChoicesAnswerBox implements AnswerBox
         if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
         if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');
@@ -70,42 +72,52 @@ class ChoicesAnswerBox implements AnswerBox
     			$randkeys = $RND->array_rand($questions,count($questions));
     			$RND->shuffle($randkeys);
     		}
-    		$_SESSION['choicemap'][$qn] = $randkeys;
-        if (isset($GLOBALS['capturechoices'])) {
-          $GLOBALS['choicesdata'][$qn] = $questions;
-        }
-    		if (isset($GLOBALS['capturechoiceslivepoll'])) {
-          $params['livepoll_choices'] = $questions;
-          $params['livepoll_ans'] = $answer;
-          $params['livepoll_randkeys'] = $randkeys;
-    		}
+            $_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
+            if (!empty($GLOBALS['inline_choicemap'])) {
+                $params['choicemap'] = encryptval($randkeys, $GLOBALS['inline_choicemap']);
+            }
+            if (isset($GLOBALS['capturechoices'])) {
+                $GLOBALS['choicesdata'][$qn] = $questions;
+            }
+            if (isset($GLOBALS['capturechoiceslivepoll'])) {
+                $params['livepoll_choices'] = $questions;
+                $params['livepoll_ans'] = $answer;
+                $params['livepoll_randkeys'] = $randkeys;
+            }
 
     		if ($displayformat == 'column') { $displayformat = '2column';}
 
     		if (substr($displayformat,1)=='column') {
-    			$ncol = $displayformat{0};
+    			$ncol = $displayformat[0];
     			$itempercol = ceil(count($randkeys)/$ncol);
     			$displayformat = 'column';
-    		}
+            }
+            
+            $arialabel = $this->answerBoxParams->getQuestionIdentifierString() .
+                 (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '');
 
     		if ($displayformat == 'inline') {
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-    			$out .= "<span $style id=\"qnwrap$qn\" role=radiogroup aria-label=\""._('Select an answer')."\">";
+    			$out .= "<span $style id=\"qnwrap$qn\" role=group ";
+          $out .= 'aria-label="'.$arialabel.'">';
     		} else if ($displayformat != 'select') {
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-    			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=radiogroup aria-label=\""._('Select an answer')."\">";
+    			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group ";
+          $out .= 'aria-label="'.$arialabel.'">';
     		}
     		if ($displayformat == "select") {
     			$msg = '?';
     			foreach ($questions as $qv) {
             if (is_array($qv)) { continue; }
-    				if (mb_strlen(html_entity_decode($qv))>3) { //strlen($qv)>2 && !($qv{0}=='&' && $qv{strlen($qv)-1}==';')) {
+    				if (mb_strlen(html_entity_decode($qv))>3) { //strlen($qv)>2 && !($qv[0]=='&' && $qv[strlen($qv)-1]==';')) {
     					$msg = _('Select an answer');
     					break;
     				}
     			}
     			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-    			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style aria-label=\""._('Select an answer')."\"><option value=\"NA\">$msg</option>\n";
+    			$out = "<select name=\"qn$qn\" id=\"qn$qn\" $style ";
+          $out .= 'aria-label="'.$arialabel.'">';
+          $out .= "<option value=\"NA\">$msg</option>\n";
     		} else if ($displayformat == "horiz") {
 
     		} else if ($displayformat == "inline") {
@@ -178,7 +190,7 @@ class ChoicesAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

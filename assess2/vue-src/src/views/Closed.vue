@@ -5,6 +5,12 @@
 
       <p>{{ closedMessage }}</p>
 
+      <p v-if="showTutorLinks">
+        {{ $t('launch.gblinks') }}:
+        <a :href="settings.tutor_gblinks[0]" target="_blank">{{ $t('launch.scorelist') }}</a> &nbsp;
+        <a :href="settings.tutor_gblinks[1]" target="_blank">{{ $t('launch.itemanalysis') }}</a>
+      </p>
+
       <p v-if = "hasActive">
         {{ hasActiveMsg }}
         <br/>
@@ -41,6 +47,11 @@
         <br/>
         <icons name="alert" size="micro" />
         {{ $t('closed.will_block_latepass') }}
+        <span v-if="settings.hasOwnProperty('excused')">
+          <br />
+          <icons name="alert" size="micro" />
+          {{ $t('setlist.excused') }}
+        </span>
       </p>
 
       <p v-if="canViewScored">
@@ -95,6 +106,12 @@
           @click = "teacherPreview"
         >
           {{ $t('closed.teacher_preview_button') }}
+        </button>
+        <button
+          class = "secondary"
+          @click = "teacherPreviewAll"
+        >
+          {{ $t('closed.teacher_previewall_button') }}
         </button>
       </p>
 
@@ -226,6 +243,7 @@ export default {
       return (this.settings.is_lti &&
         !this.canViewAll &&
         this.settings.viewingb !== 'never' &&
+        this.settings.prev_attempts.length > 0 &&
         (this.settings.available === 'practice' || this.settings.available === 'pastdue')
       );
     },
@@ -245,6 +263,9 @@ export default {
     },
     canAddWork () {
       return (store.assessInfo.showwork_after);
+    },
+    showTutorLinks () {
+      return store.assessInfo.hasOwnProperty('tutor_gblinks');
     }
   },
   methods: {
@@ -291,6 +312,9 @@ export default {
     },
     teacherPreview () {
       actions.startAssess(false, '', []);
+    },
+    teacherPreviewAll () {
+      actions.startAssess(false, '', [], null, true);
     },
     doReset () {
       actions.loadAssessData(null, true);

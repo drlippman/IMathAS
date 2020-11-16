@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Make deadline exceptions for a multiple students; included by listusers and gradebook
 //(c) 2007 David Lippman
-
+require_once(__DIR__."/../includes/TeacherAuditLog.php");
 
 	if (!isset($imasroot)) {
 		echo "This file cannot be called directly";
@@ -16,7 +16,7 @@
 		require_once("../includes/parsedatetime.php");
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
-		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):'NULL';
+		$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):null;
 		$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
 
 		$forumitemtype = $_POST['forumitemtype'];
@@ -63,6 +63,7 @@
 			$stm = $DBH->prepare($query);
 			$stm->execute($insertExceptionVals);
 		}
+		$gradesToLog = array();
 		foreach($toarr as $stu) {
 			foreach($addexcarr as $aid) {
 				if (isset($_POST['forceregen'])) {
@@ -123,6 +124,19 @@
 					}
 
 				} else if (isset($_POST['forceclear'])) {
+					$stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
+			    $stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
+			    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			      $sp = explode(';', $row['bestscores']);
+			      $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+			      $total = array_sum(explode(',', $as));
+			      $gradesToLog[$stu][$aid] = $total;
+			    }
+					$stm = $DBH->prepare("SELECT score FROM imas_assessment_records WHERE userid=:userid AND assessmentid=:assessmentid");
+			    $stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
+			    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			      $gradesToLog[$stu][$aid] = $row['score'];
+			    }
 					//this is not group-safe
 					$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 					$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
@@ -159,6 +173,16 @@
 				}
 			}
 		}
+		if (!empty($gradesToLog)) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Clear Attempts",
+				null,
+				array(
+					'grades'=>$gradesToLog
+				)
+			);
+		}
 
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
@@ -179,7 +203,7 @@
 
 
 	$pagetitle = "Manage Exceptions";
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 	$placeinhead .= '<style type="text/css">
 	   fieldset { margin-bottom: 10px;}
 	   fieldset legend {font-weight: bold;}
@@ -189,19 +213,40 @@
 	   .optionlist p.list { margin: 7px 0 7px 20px; padding: 0;}
 	   .optionlist input[type=checkbox] {margin-left:-20px;}
 	   </style>';
-
+	$placeinhead .= '<script>
+	$(function() {
+		$("input[name=forceclear]").on("change", function (e) {
+			$("#forceclearwarn").toggle($(this).prop("checked"));
+		});
+		$("form").on("submit", function(e) {
+			if ($("input[name=forceclear]").prop("checked")) {
+				if (!confirm("'._('WARNING! You are about to clear student attempts, deleting their grades. This cannot be undone. Are you SURE you want to do this?').'")) {
+					e.preventDefault();
+					return false;
+				}
+			}
+			return true;
+		});
+	})</script>';
 	require("../header.php");
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	if ($calledfrom=='lu') {
-		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Manage Exceptions</div>\n";
-	} else if ($calledfrom=='gb') {
-		echo "&gt; <a href=\"gradebook.php?cid=$cid";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+    if ($calledfrom=='lu') {
+		echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Manage Exceptions</div>\n";
+	} else if ($calledfrom=='gb' || $calledfrom == 'isolateassess') {
+		echo "<a href=\"gradebook.php?cid=$cid";
 		if (isset($_GET['uid'])) {
 			echo "&stu=" . Sanitize::onlyInt($_GET['uid']);
 		}
-		echo "\">Gradebook</a> &gt; Manage Exceptions</div>\n";
+        echo "\">Gradebook</a> &gt; ";
+        if ($calledfrom == 'isolateassess') {
+            echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('View Scores').'</a> &gt; ';
+        }
+        echo " Manage Exceptions</div>\n";
 	}
 
 	echo '<div id="headermassexception" class="pagetitle"><h1>Manage Exceptions</h1></div>';
@@ -213,7 +258,9 @@
 			echo "&uid=" . Sanitize::onlyInt($_GET['uid']);
 		}
 		echo "\" id=\"qform\">\n";
-	}
+	} else if ($calledfrom == 'isolateassess') {
+        echo "<form method=post action=\"isolateassessgrade.php?cid=$cid&aid=$aid&massexception=1\" id=\"qform\">\n";
+    }
 
 	if (isset($_POST['tolist'])) {
 		$_POST['checked'] = explode(',',$_POST['tolist']);
@@ -228,7 +275,9 @@
 				echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";
 			} else if ($calledfrom=='gb') {
 				echo "<a href=\"gradebook.php?cid=$cid\">Try Again</a>\n";
-			}
+			} else if ($calledfrom == 'isolateassess') {
+                echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">Try Again</a>\n";
+            }
 			require("../footer.php");
 			exit;
 		}
@@ -427,8 +476,11 @@
 		echo '<p class="list"><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
 		echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
 	}
-	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
-	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
+	echo '<p class="list"><input type="checkbox" name="forceclear"/> Clear students\' attempts?  Students ';
+	echo 'will <b>not</b> keep any scores earned, and must rework all problems.';
+	echo '<span style="display:none" class="noticetext" id="forceclearwarn">';
+	echo '<br/>Warning: this will delete the students\' attempts and grades for these assessments.</span>';
+	echo '</p>';
 	echo '<p class="list"><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</p>';
 	echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
 	echo '</fieldset>';
@@ -449,11 +501,11 @@
 		//$etime = tzdate("g:i a",$wk);
 		echo "<span class=form>Available After:</span><span class=formright>";
 		echo "<input type=text size=10 name=sdate value=\"$sdate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=stime value=\"$stime\"></span><BR class=form>\n";
 
 		echo "<span class=form>Available Until:</span><span class=formright><input type=text size=10 name=edate value=\"$edate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
 
 		echo "Set Exception for assessments: ";
@@ -491,11 +543,11 @@
 		echo '<option value="R" checked">Override Reply By only</option></select></span><br class="form"/>';
 
 		echo "<span class=form>Post By:</span><span class=formright><input type=text size=10 name=pbdate value=\"$pbdate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=pbtime value=\"$pbtime\"></span><BR class=form>\n";
 
 		echo "<span class=form>Reply By:</span><span class=formright><input type=text size=10 name=rbdate value=\"$rbdate\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"$staticroot/img/cal.gif\" alt=\"Calendar\"/></A>\n";
 		echo "at <input type=text size=10 name=rbtime value=\"$rbtime\"></span><BR class=form>\n";
 
 

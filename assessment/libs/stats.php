@@ -8,7 +8,8 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "histogram","fdhistogram","fdbargraph","normrand","expdistrand","boxplot","normalcdf",
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
- "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata");
+ "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
+ "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv");
 
 //nCr(n,r)
 //The Choose function
@@ -49,33 +50,52 @@ function nPr($n,$r){
 
 //mean(array)
 //Finds the mean of an array of numbers
-function mean($a) {
+function mean($a,$w=null) {
 	if (!is_array($a)) {
 		echo 'mean expects an array';
 		return false;
 	}
-	return (array_sum($a)/count($a));
+  if (is_array($w)) {
+    if (count($a) != count($w)) {
+      echo 'weights must have same count as array';
+      return false;
+    }
+    for ($i=0;$i<count($a);$i++) {
+      $a[$i] *= $w[$i];
+    }
+    return (array_sum($a)/array_sum($w));
+  } else {
+	  return (array_sum($a)/count($a));
+  }
 }
 
 //variance(array)
 //the (sample) variance of an array of numbers
-function variance($a) {
+function variance($a,$w=null) {
 	if (!is_array($a)) {
 		echo 'stdev/variance expects an array';
 		return false;
 	}
+  $useW = false;
+  if (is_array($w)) {
+    if (count($a) != count($w)) {
+      echo 'weights must have same count as array';
+      return false;
+    }
+    $useW = true;
+  }
 	$v = 0;
-	$mean = mean($a);
-	foreach ($a as $x) {
-		$v += pow($x-$mean,2);
+	$mean = mean($a,$w);
+	foreach ($a as $i=>$x) {
+		$v += pow($x-$mean,2) * ($useW ? $w[$i] : 1);
 	}
-	return ($v/(count($a)-1));
+	return ($v/(($useW ? array_sum($w) : count($a))-1));
 }
 
 //stdev(array)
 //the (sample) standard deviation of an array of numbers
-function stdev($a) {
-	return sqrt(variance($a));
+function stdev($a,$w=null) {
+	return sqrt(variance($a,$w));
 }
 
 //absmeandev(array)
@@ -370,6 +390,43 @@ function allquartile($a,$q) {
 //returns the median of an array of numbers
 function median($a) {
 	return percentile($a,50);
+}
+
+function modes($arr) {
+  if (!is_array($arr)) {
+    echo "mode expects an array";
+    return 'DNE';
+  }
+  $arr = array_map('strval', $arr);
+  $freqs = array_count_values($arr);
+  $maxfreq = max($freqs);
+  $modes = array_keys($freqs, $maxfreq);
+  if (count($modes)==count($freqs)) {
+    return 'DNE';
+  } else {
+    return implode(',', $modes);
+  }
+}
+
+function forceonemode(&$arr) {
+  $modes = modes($arr);
+  if (is_numeric($modes)) {
+    return $modes;
+  }
+  if ($modes == 'DNE') {
+    $mode = $arr[0];
+  } else {
+    $mode = explode(',', $modes)[0];
+  }
+  // add a value after an existing one (in case sorted)
+  array_splice($arr, array_search($mode,$arr), 0, $mode);
+  foreach ($arr as $k=>$v) {
+    if ($v != $mode) {
+      array_splice($arr, $k, 1);
+      break;
+    }
+  }
+  return $mode;
 }
 
 //freqdist(array,label,start,classwidth)
@@ -704,7 +761,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 function piechart($pcts,$labels,$w=250,$h=130) {
 	if ($_SESSION['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
-		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
+		$out .= '<tr><th>'._('Label').'</th>';
 		$out .= '<th>'._('Percent').'</th></tr>';
 		foreach ($labels as $k=>$label) {
 			$out .= '<tr><td>'.Sanitize::encodeStringForDisplay($label).'<td>';
@@ -775,28 +832,35 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
-function normrand($mu,$sig,$n,$rnd=null) {
+function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
 	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
 	}
-	global $RND;
-	for ($i=0;$i<ceil($n/2);$i++) {
+    global $RND;
+    $icnt = 0;
+    $z = [];
+    while (count($z)<$n && $icnt < 2*$n) {
 		do {
 			$a = $RND->rand(-32768,32768)/32768;
 			$b = $RND->rand(-32768,32768)/32768;
 			$r = $a*$a+$b*$b;
 			$count++;
 		} while ($r==0||$r>1);
-		$r = sqrt(-2*log($r)/$r);
-		if ($rnd!==null) {
-			$z[] = round($sig*$a*$r + $mu, $rnd);
-			$z[] = round($sig*$b*$r + $mu, $rnd);
-		} else {
-			$z[] = $sig*$a*$r + $mu;
-			$z[] = $sig*$b*$r + $mu;
-		}
-	}
+        $r = sqrt(-2*log($r)/$r);
+        $v1 = $sig*$a*$r + $mu;
+        $v2 = $sig*$b*$r + $mu;
+        if (!$pos || $v1 > 0) {
+            $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
+        }
+        if (!$pos || $v2 > 0) {
+            $z[] = ($rnd===null) ? $v2 : round($v2, $rnd);
+        }
+        $icnt++;
+    }
+    if ($icnt == 2*$n && count($z) < $n) {
+        echo "Error: unable to generate enough positive values";
+    }
 	if ($n%2==0) {
 		return $z;
 	} else {
@@ -813,7 +877,7 @@ function expdistrand($mu=1, $n=1, $rnd=3) {
 
 	$out = array();
 	for ($i=0; $i<$n; $i++) {
-		$out[] = -$mu*log($RND->rand(1,32768)/32768);
+		$out[] = round(-$mu*log($RND->rand(1,32768)/32768), $rnd);
 	}
 	return $out;
 }
@@ -954,7 +1018,7 @@ function boxplot($arr,$label="",$options = array()) {
 //calculates the area under the standard normal distribution to the left of the
 //z-value z, to dec decimals (defaults to 4, max of 10)
 //based on someone else's code - can't remember whose!
-function normalcdf($ztest,$dec=4) {
+/*function normalcdf($ztest,$dec=4) {
 	if (!is_finite($ztest)) {
 		echo 'invalid value for z';
 		return 0;
@@ -1012,6 +1076,47 @@ function normalcdf($ztest,$dec=4) {
 		$pval = round(1-$eps,$dec);
 	}
 	return $pval;
+}
+*/
+// port from jStat, MIT License
+function erf($x) {
+  $cof = [-1.3026537197817094, 6.4196979235649026e-1, 1.9476473204185836e-2,
+             -9.561514786808631e-3, -9.46595344482036e-4, 3.66839497852761e-4,
+             4.2523324806907e-5, -2.0278578112534e-5, -1.624290004647e-6,
+             1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
+             6.529054439e-9, 5.059343495e-9, -9.91364156e-10,
+             -2.27365122e-10, 9.6467911e-11, 2.394038e-12,
+             -6.886027e-12, 8.94487e-13, 3.13092e-13,
+             -1.12708e-13, 3.81e-16, 7.106e-15,
+             -1.523e-15, -9.4e-17, 1.21e-16,
+             -2.8e-17];
+  $isneg = false;
+  $d = 0;
+  $dd = 0;
+
+  if ($x < 0) {
+    $x = -$x;
+    $isneg = true;
+  }
+
+  $t = 2 / (2 + $x);
+  $ty = 4 * $t - 2;
+
+  for($j = count($cof) - 1; $j > 0; $j--) {
+    $tmp = $d;
+    $d = $ty * $d - $dd + $cof[$j];
+    $dd = $tmp;
+  }
+
+  $res = $t * exp(-$x * $x + 0.5 * ($cof[0] + $ty * $d) - $dd);
+  return $isneg ? $res - 1 : 1 - $res;
+}
+function normalcdf($z,$dec=4) {
+  if (!is_finite($ztest)) {
+		echo 'invalid value for z';
+		return 0;
+	}
+  return round(0.5 * (1 + erf(($z) / sqrt(2))), $dec);
 }
 
 //tcdf(t,df,[dec])
@@ -1488,7 +1593,7 @@ function chi2cdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function chicdf($x,$a) {
@@ -1496,7 +1601,7 @@ function chicdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function invchicdf($cdf,$a) {
@@ -1617,8 +1722,8 @@ function invchi2cdf($cdf,$a) {
   return $x;
 }
 
-function gamma_cdf($x,$a,$b,$c) {
-	return gamma_inc($c,($x-$a)/$b);
+function gamma_cdf($x, $shape, $scale=1, $offset=0) {
+    return gamma_inc($shape, ($x-$offset)/$scale);
 }
 function gamma_inc($p,$x,$dec=4) {
 	$exp_arg_min = -88.0;
@@ -1697,6 +1802,22 @@ function gamma_inc($p,$x,$dec=4) {
 	return $value;
 }
 
+function gamma_log($x) {
+    // from jStat
+    $cof = [
+        76.18009172947146, -86.50532032941677, 24.01409824083091,
+        -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
+    ];
+    $ser = 1.000000000190015;
+    $y = $xx = $x;
+    $tmp = $x + 5.5;
+    $tmp -= ($xx + 0.5) * log($tmp);
+    for ($j=0; $j < 6; $j++) {
+        $ser += $cof[$j] / (++$y);
+    }
+    return log(2.5066282746310005 * $ser / $xx) - $tmp;
+}
+/*
 function gamma_log($x) {
  $c = array(
     -1.910444077728E-03,
@@ -1833,6 +1954,63 @@ function gamma_log($x) {
   }
   return $res;
 }
+*/
+
+function gamma_inv($p,$a,$scale=1) {
+	//adapted from https://github.com/jstat/jstat/blob/65ce096a99f753d6a22482e5e74accbfc1c33767/src/special.js#L254
+    $a1 = $a - 1;
+	$EPS = 1e-8;
+	$gln = gamma_log($a);
+
+	if ($p >= 1) {
+		return $scale*max(100, $a + 100 * sqrt($a));
+	}
+	if ($p <= 0) {
+		return 0;
+	}
+	if ($a > 1) {
+		$lna1 = log($a1);
+		$afac = exp($a1 * ($lna1 - 1) - $gln);
+		$pp = ($p < 0.5) ? $p : (1 - $p);
+		$t = sqrt(-2 * log($pp));
+		$x = (2.30753 + $t * 0.27061) / (1 + $t * (0.99229 + $t * 0.04481)) - $t;
+		if ($p < 0.5) {
+            $x = -$x;
+        }
+		$x = max(1e-3, $a * pow(1 - 1 / (9 * $a) - $x / (3 * sqrt($a)), 3));
+	} else {
+		$t = 1 - $a * (0.253 + $a * 0.12);
+        if ($p < $t) {
+            $x = pow($p / $t, 1 / $a);
+        } else {
+            $x = 1 - log(1 - ($p - $t) / (1 - $t));
+        }
+    }
+
+	for($j=0; $j < 12; $j++) {
+		if ($x <= 0) {
+			return 0;
+        }
+        $err = gamma_inc($a, $x) - $p;
+		if ($a > 1) {
+			$t = $afac * exp(-($x - $a1) + $a1 * (log($x) - $lna1));
+		} else {
+			$t = exp(-$x + $a1 * log($x) - $gln);
+        }
+        if ($t==0) { 
+            break; 
+        }
+		$u = $err / $t;
+		$x -= ($t = $u / (1 - 0.5 * min(1, $u * (($a - 1) / $x - 1))));
+		if ($x <= 0) {
+			$x = 0.5 * ($x + $t);
+		}
+		if (abs($t) < $EPS * $x) {
+			break;
+		}
+	}
+	return $scale*$x;
+}
 
 //fcdf(f,df1,df2)
 //Returns the area to right of the F-value f for the f-distribution
@@ -1842,8 +2020,10 @@ function fcdf($x,$df1,$df2) {
 	if (!is_finite($x) || !is_finite($df1) || !is_finite($df2) || $df1 < 1 || $df2 < 1 || $x < 0) {
 		echo 'Invalid input to fcdf';
 		return 0;
-	}
-	$p1 = fcall(fspin($x,$df1,$df2));
+    }
+    //$p1 = fcall(fspin($x,$df1,$df2));
+    $p1 = 1-beta_cdf($df1*$x/($df1*$x + $df2), $df1/2, $df2/2);
+
 	return $p1;
 }
 
@@ -1900,6 +2080,136 @@ function LJspin($q,$i,$j,$b) {
 		$k += 2;
 	}
 	return $z;
+}
+
+function beta_cdf($x, $a, $b) {
+    // based on jStat.ibeta
+    if ($x > 1) { 
+        return 1;
+    } else if ($x < 0) { 
+        return 0;
+    }
+    $bt = ($x === 0 || $x === 1) ?  0 :
+     (exp(gamma_log($a + $b) - gamma_log($a) -
+     gamma_log($b) + $a * log($x) + $b * log(1 - $x)));
+    if ($x < 0 || $x > 1) {
+        return false;
+    }
+    if ($x < ($a + 1) / ($a + $b + 2)) {
+        // Use continued fraction directly.
+        return $bt * jstat_betacf($x, $a, $b) / $a;
+    }
+    // else use continued fraction after making the symmetry transformation.
+    return 1 - $bt * jstat_betacf(1 - $x, $b, $a) / $b;
+}
+
+function beta_inv($p, $a, $b) {
+    // based on jStat.ibetainv
+    $st = microtime(true);
+    $EPS = 1e-8;
+    $a1 = $a - 1;
+    $b1 = $b - 1;
+
+    if ($p <= 0) {
+        return 0;
+    }
+    if ($p >= 1) {
+        return 1;
+    }
+    if ($a >= 1 && $b >= 1) {
+        $pp = ($p < 0.5) ? $p : (1 - $p);
+        $t = sqrt(-2 * log($pp));
+        $x = (2.30753 + $t * 0.27061) / (1 + $t* (0.99229 + $t * 0.04481)) - $t;
+        if ($p < 0.5) {
+            $x = -$x;
+        }
+        $al = ($x * $x - 3) / 6;
+        $h = 2 / (1 / (2 * $a - 1)  + 1 / (2 * $b - 1));
+        $w = ($x * sqrt($al + $h) / $h) - (1 / (2 * $b - 1) - 1 / (2 * $a - 1)) *
+            ($al + 5 / 6 - 2 / (3 * $h));
+        $x = $a / ($a + $b * exp(2 * $w));
+    } else {
+        $lna = log($a / ($a + $b));
+        $lnb = log($b / ($a + $b));
+        $t = exp($a * $lna) / $a;
+        $u = exp($b * $lnb) / $b;
+        $w = $t + $u;
+        if ($p < $t / $w) {
+            $x = pow($a * $w * $p, 1 / $a);
+        }
+        else {
+            $x = 1 - pow($b * $w * (1 - $p), 1 / $b);
+        }
+    }
+    $afac = -gamma_log($a) - gamma_log($b) + gamma_log($a + $b);
+    for ($j=0; $j < 10; $j++) {
+        if ($x < 1e-10 || $x === 1) {
+            return round($x,10);
+        }
+        $err = beta_cdf($x, $a, $b) - $p;
+        $t = exp($a1 * log($x) + $b1 * log(1 - $x) + $afac);
+        $u = $err / $t;
+        $x -= ($t = $u / (1 - 0.5 * min(1, $u * ($a1 / $x - $b1 / (1 - $x)))));
+        if ($x <= 0) {
+            $x = 0.5 * ($x + $t);
+        }
+        if ($x >= 1) {
+            $x = 0.5 * ($x + $t + 1);
+        }
+        if (abs($t) < ($EPS * $x) && $j > 0) {
+            break;
+        }
+    }
+    return round($x,10);
+}
+
+function jstat_betacf($x,$a,$b) {
+    $fpmin = 1e-30;
+    $qab = $a + $b;
+    $qap = $a + 1;
+    $qam = $a - 1;
+    $c = 1;
+    $d = 1 - $qab * $x / $qap;
+  
+    // These q's will be used in factors that occur in the coefficients
+    if (abs($d) < $fpmin) {
+      $d = $fpmin;
+    }
+    $d = 1 / $d;
+    $h = $d;
+  
+    for ($m=1; $m <= 100; $m++) {
+      $m2 = 2 * $m;
+      $aa = $m * ($b - $m) * $x / (($qam + $m2) * ($a + $m2));
+      // One step (the even one) of the recurrence
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $h *= $d * $c;
+      $aa = -($a + $m) * ($qab + $m) * $x / (($a + $m2) * ($qap + $m2));
+      // Next step of the recurrence (the odd one)
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $del = $d * $c;
+      $h *= $del;
+      if (abs($del - 1.0) < 3e-7) {
+        break;
+      }
+    }
+    return $h;  
 }
 
 //invfcdf(p,df1,df2)
@@ -1973,5 +2283,122 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 	return $out;
 }
 
+//argument should be header,column,header,column,...
+function csvdownloadlink() {
+  $alist = func_get_args();
+  if (count($alist)==0 || count($alist)%2==1) {
+    echo "invalid arguments to csvdownloadlink";
+    return '';
+  }
+  $rows = array();
+  for ($i=0;$i<count($alist);$i+=2) {
+    $rows[0] .= '"'.str_replace('"','',$alist[$i]).'",';
+    for ($j=0;$j<count($alist[$i+1]);$j++) {
+      $rows[$j+1] .= (is_numeric($alist[$i+1][$j]) ?
+        floatval($alist[$i+1][$j]) :
+        '"'.str_replace('"','',$alist[$i+1][$j]).'"')
+        . ',';
+    }
+  }
+  foreach ($rows as $i=>$row) {
+    $rows[$i] = rtrim($row,',');
+  }
+  $str = implode("\n",$rows);
+  return '<a download="data.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
+    . _('Download CSV').'</a>';
+}
+
+//dotplot(array,label,[dot spacing, axis spacing,width,height])
+//display macro.  Creates a dotplot from a data set
+// array: array of data values
+// label: title of the dotplot that will be placed below horizontal axis
+// dot spacing: spacing of dots; data will be rounded to nearest (def 1)
+// axis spacing: spacing of axis labels (defaults to dot spacing) 
+// width,height (optional): width and height in pixels of graph
+function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) {
+	if (!is_array($a)) {
+		echo 'dotplot expects an array';
+		return false;
+    }
+    if ($dotspace <= 0) {
+        $dotspace = 1;
+    }
+    if ($labelspace === null || $labelspace <= 0) {
+        $labelspace = $dotspace;
+    }
+
+	sort($a, SORT_NUMERIC);
+
+    $start = round($a[0]/$dotspace)*$dotspace;
+	
+	$x = $start;
+	$curr = 0;
+	$alt = "Dotplot for $label <table class=stats><thead><tr><th>Value of Each Dot</th><th>Number of Dots</th></tr></thead>\n<tbody>\n";
+	$maxfreq = 0;
+	
+	// 
+	$dx = $dotspace;
+
+    // Create the stack of dots 
+	while ($i < count($a)) {
+		$alt .= "<tr><td>$x</td>";
+		$i = $curr;
+		$j = 0.1;
+  
+		while (($a[$i] < $x+.5*$dx) && ($i < count($a))) {
+			$i++;
+			$j = $j + 0.6;
+			$st .= "dot([$x,$j]);";
+		}
+		
+		$x += $dx;
+		
+		if (($i-$curr)>$maxfreq) { 
+			$maxfreq = $i-$curr;
+		}
+			
+		$alt .= "<td>" . ($i-$curr) . "</td></tr>\n";
+		$curr = $i;
+	}
+  	
+	$alt .= "</tbody></table>\n";
+
+	if ($_SESSION['graphdisp']==0) {
+		return $alt;
+	}
+	
+
+	// Start tick marks at the start value
+	$x = $start;
+	
+	// y-values for the size of the tick mark lines
+	$tm = -0.025*$maxfreq;
+	$tx = 0.025*$maxfreq;
+
+	// initialize 
+	$outst = "";
+	 
+	// Draw the horizontal axes
+    // draws the tick marks for the axes.
+    $startlabel = floor($start/$labelspace+1e-12)*$labelspace;
+    $maxx = round($a[count($a)-1]/$dotspace)*$dotspace;
+    $endlabel = ceil($maxx/$labelspace-1e-12)*$labelspace;
+    for ($x=$startlabel; $x <=$endlabel; $x+=$labelspace) {
+        $outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+    }  
+	
+	//initializes SVG frame and canvas.
+	$initst = "setBorder(20,40,20,10);initPicture($startlabel,$endlabel,0,$maxfreq);";
+  	
+	//xtick,ytick,{labels,xgrid,ygrid,dox,doy}
+	//,1,null,$step); fill=\"blue\";
+	//$initst .= "axes(null,null,null,null,null,0,0); fill=\"blue\"; textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$initst .="textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$x1 = $startlabel - .2*$labelspace;
+	$x2 = $endlabel + .2*$labelspace;
+	$initst .="line([$x1,0],[$x2,0]);";
+	$outst = $initst.$outst.$st;
+	return showasciisvg($outst,$width,$height);
+  }
 
 ?>

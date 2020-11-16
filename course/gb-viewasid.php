@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 	require("../init.php");
 	require_once("../includes/filehandler.php");
+  require_once("../includes/TeacherAuditLog.php");
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['course/gb-viewasid'])) {
@@ -139,16 +140,30 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	//PROCESS ANY TODOS
 	if (isset($_REQUEST['clearattempt']) && $isteacher) {
 		if (isset($_POST['clearattempt']) && $_POST['clearattempt']=='confirmed') {
-			$query = "SELECT ias.assessmentid,ias.lti_sourcedid,ias.userid FROM imas_assessment_sessions AS ias ";
+			$query = "SELECT ias.assessmentid,ias.lti_sourcedid,ias.userid,ias.bestscores FROM imas_assessment_sessions AS ias ";
 			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id=:id AND ia.courseid=:courseid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$asid, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
-				list($aid, $ltisourcedid, $uid) = $stm->fetch(PDO::FETCH_NUM);
+				list($aid, $ltisourcedid, $uid, $bestscores) = $stm->fetch(PDO::FETCH_NUM);
 				if (strlen($ltisourcedid)>1) {
 					require_once("../includes/ltioutcomes.php");
 					updateLTIgrade('delete',$ltisourcedid,$aid,$uid);
 				}
+
+				$sp = explode(';', $bestscores);
+        $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+        $total = array_sum(explode(',', $as));
+				TeacherAuditLog::addTracking(
+          $cid,
+          "Clear Attempts",
+          $aid,
+          array(
+						'studentid'=>$uid,
+						'grade'=>$total,
+						'bestscores'=>$bestscores  // TODO: log group assess delete data
+					)
+        );
 
 				$qp = getasidquery($asid);
 				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
@@ -227,11 +242,12 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			if ($stm->rowCount()>0) {
 				//$whereqry = getasidquery($_GET['asid']);
 				$qp = getasidquery($asid);
+				$aid = $qp[2];
 				//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
-				$stm = $DBH->prepare("SELECT seeds,lti_sourcedid,userid FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid");
+				$stm = $DBH->prepare("SELECT seeds,lti_sourcedid,userid,bestscores FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
-				list($seeds, $ltisourcedid, $uid) = $stm->fetch(PDO::FETCH_NUM);
+				list($seeds, $ltisourcedid, $uid, $bestscores) = $stm->fetch(PDO::FETCH_NUM);
 				$seeds = explode(',', $seeds);
 				if (strlen($ltisourcedid)>1) {
 					require_once("../includes/ltioutcomes.php");
@@ -255,6 +271,22 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':scores'=>"$scorelist;$scorelist",
 					':bestattempts'=>$bestattemptslist, ':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':bestscores'=>"$bestscorelist;$bestscorelist;$bestscorelist"));
+
+				if ($stm->rowCount() > 0) {
+					$sp = explode(';', $bestscores);
+	        $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+	        $total = array_sum(explode(',', $as));
+					TeacherAuditLog::addTracking(
+	          $cid,
+	          "Clear Scores",
+	          $aid,
+	          array(
+							'studentid'=>$uid,
+							'grade'=>$total,
+							'bestscores'=>$bestscores  // TODO: log group assess delete data
+						)
+	        );
+				}
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
 		} else {
@@ -510,9 +542,9 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$_SESSION['coursetheme'] = $coursetheme;
 		$_SESSION['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=031417"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric.js?v=031417"></script>';
 			require("../includes/rubric.php");
-			$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/gb-scoretools.js?v=042519"></script>';
+			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=042519"></script>';
 			if ($_SESSION['useed']!=0) {
 				$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 			}
@@ -970,7 +1002,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				if ($_SESSION['useed']==0) {
 					echo '<textarea id="fb-'.$i.'" name="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::encodeStringForDisplay($feedback["Q$i"], true).'</textarea>';
 				} else {
-					echo '<div id="fb-'.$i.'" class="fbbox" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
+					echo '<div id="fb-'.$i.'" class="fbbox skipmathrender" cols=60 rows=2>'.Sanitize::outgoingHtml($feedback["Q$i"]).'</div>';
 				}
 				echo '</span>';
 
@@ -1108,7 +1140,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				}
 				echo "</textarea></p>";
 			} else {
-				echo "<div cols=60 rows=4 id=\"feedback\" class=\"fbbox\">";
+				echo "<div cols=60 rows=4 id=\"feedback\" class=\"fbbox skipmathrender\">";
 				if (!empty($feedback["Z"])) {
 					echo Sanitize::outgoingHtml($feedback["Z"]);
 				}

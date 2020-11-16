@@ -37,13 +37,13 @@ $dadata = $stm->fetch(PDO::FETCH_ASSOC);
 $n = $dadata['n'];
 $showtype = $dadata['showtype'];
 $scoretype = $dadata['scoretype'];
-if ($scoretype{0}=='t') {
+if ($scoretype[0]=='t') {
 	$mode = 'cntdown';
 	$torecord = 'cc';   //count  correct
 } else {
 	$mode = 'cntup';
-	$stopattype = $scoretype{1};  //a: attempted, c: correct, s: streak
-	$torecord = $scoretype{2}; //t: time, c: total count
+	$stopattype = $scoretype[1];  //a: attempted, c: correct, s: streak
+	$torecord = $scoretype[2]; //t: time, c: total count
 }
 $showtostu = $dadata['showtostu'];
 if ($dadata['itemids']=='') {
@@ -98,7 +98,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 $placeinhead = '<script type="text/javascript">function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 $placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}</script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
 
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Drill Assessment Results</div>";

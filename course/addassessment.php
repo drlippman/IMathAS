@@ -5,6 +5,7 @@
 /*** master php includes *******/
 require("../init.php");
 require("../includes/htmlutil.php");
+require_once("../includes/TeacherAuditLog.php");
 
 if ($courseUIver > 1) {
 	if (!isset($_GET['id'])) {
@@ -73,38 +74,47 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $assessmentId = Sanitize::onlyInt($_GET['id']);
         $cid = Sanitize::courseId($_GET['cid']);
         $block = $_GET['block'];
-        $assessName = Sanitize::stripHtmlTags($_POST['name']);
-        if ($assessName == '') {
-        	$assessName = _('Unnamed Assessment');
-        }
+
+				if (isset($_GET['id'])) {
+					$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+					$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
+					$taken = ($stm->fetchColumn(0)>0);
+				} else {
+					$taken = false;
+				}
+
         $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
         $stm->execute(array($cid));
         $dates_by_lti = $stm->fetchColumn(0);
-        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
-        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
-        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
-        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
-        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
-        $grpmax = Sanitize::onlyInt($_POST['groupmax']);
-        $shwqcat = Sanitize::onlyInt($_POST['showqcat']);
-        $eqnhelper = Sanitize::onlyInt($_POST['eqnhelper']);
-        $showtips = Sanitize::onlyInt($_POST['showtips']);
-        $grpsetid = Sanitize::onlyInt($_POST['groupsetid']);
-        $reqscore = Sanitize::onlyInt($_POST['reqscore']);
-        $allowlate = Sanitize::onlyInt($_POST['allowlate']);
-        $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
-        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
-        $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
-        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
         if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
             if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
             	$DBH->beginTransaction();
                 require_once('../includes/filehandler.php');
                 deleteallaidfiles($assessmentId);
+								$grades = array();
+								$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+				        $stm->execute(array(':assessmentid'=>$assessmentId));
+				        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				          $sp = explode(';', $row['bestscores']);
+				          $as = str_replace(array('-1','-2','~'), array('0','0',','), $sp[0]);
+				          $total = array_sum(explode(',', $as));
+				          $grades[$row['userid']] = $total;
+				        }
                 $stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));
-                $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+								if ($stm->rowCount()>0) {
+					        TeacherAuditLog::addTracking(
+					          $cid,
+					          "Clear Attempts",
+					          $assessmentId,
+					          array('grades'=>$grades)
+					        );
+					      }
+
+								$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));
                 $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
                 $stm->execute(array(':assessmentid'=>$assessmentId));
@@ -130,6 +140,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $body .= '</form>';
             }
         } elseif (!empty($_POST['name'])) { //if the form has been submitted
+					$assessName = Sanitize::stripHtmlTags($_POST['name']);
+	        if ($assessName == '') {
+	        	$assessName = _('Unnamed Assessment');
+	        }
+	        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
+	        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
+	        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
+	        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
+	        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
+	        $grpmax = Sanitize::onlyInt($_POST['groupmax']);
+	        $shwqcat = Sanitize::onlyInt($_POST['showqcat']);
+	        $eqnhelper = Sanitize::onlyInt($_POST['eqnhelper']);
+	        $showtips = Sanitize::onlyInt($_POST['showtips']);
+	        $grpsetid = Sanitize::onlyInt($_POST['groupsetid']);
+	        $reqscore = Sanitize::onlyInt($_POST['reqscore']);
+	        $allowlate = Sanitize::onlyInt($_POST['allowlate']);
+	        $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
+	        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
+	        $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
+	        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
+
         	$DBH->beginTransaction();
             require_once("../includes/parsedatetime.php");
             if ($_POST['avail']==1) {
@@ -242,19 +273,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
             $extrefencoded = json_encode($extrefs);
 
-		if ($_POST['reqscoreshowtype']==-1 || $reqscore==0) {
-			$reqscore = 0;
-			$reqscoretype = 0;
-			$_POST['reqscoreaid'] = 0;
-		} else {
-			$reqscoretype = 0;
-			if ($_POST['reqscoreshowtype']==1) {
-				$reqscoretype |= 1;
-			}
-			if ($_POST['reqscorecalctype']==1) {
-				$reqscoretype |= 2;
-			}
-		}
+				if ($_POST['reqscoreshowtype']==-1 || $reqscore==0) {
+					$reqscore = 0;
+					$reqscoretype = 0;
+					$_POST['reqscoreaid'] = 0;
+				} else {
+					$reqscoretype = 0;
+					if ($_POST['reqscoreshowtype']==1) {
+						$reqscoretype |= 1;
+					}
+					if ($_POST['reqscorecalctype']==1) {
+						$reqscoretype |= 2;
+					}
+				}
 
         $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
         $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
@@ -328,21 +359,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
             $calrtag = 'R'; //not used anymore Sanitize::stripHtmlTags($_POST['caltagrev']);
 
-		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
-			$_POST['summary'] = '';
-		} else {
-			$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
-		}
-		if ($_POST['intro']=='<p>Enter intro/instructions</p>' || $_POST['intro']=='<p></p>') {
-			$_POST['intro'] = '';
-		} else {
-			$_POST['intro'] = Sanitize::incomingHtml($_POST['intro']);
-		}
+						if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
+							$_POST['summary'] = '';
+						} else {
+							$_POST['summary'] = Sanitize::incomingHtml($_POST['summary']);
+						}
+						if ($_POST['intro']=='<p>Enter intro/instructions</p>' || $_POST['intro']=='<p></p>') {
+							$_POST['intro'] = '';
+						} else {
+							$_POST['intro'] = Sanitize::incomingHtml($_POST['intro']);
+						}
 
-		if (isset($_GET['id'])) {  //already have id; update
-			$stm = $DBH->prepare("SELECT isgroup,intro,itemorder,deffeedbacktext FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
-			$curassess = $stm->fetch(PDO::FETCH_ASSOC);
+						if (isset($_GET['id'])) {  //already have id; update
+							$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
+							$stm->execute(array(':id'=>$_GET['id']));
+							$curassess = $stm->fetch(PDO::FETCH_ASSOC);
 
                 if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
                     if ($curassess['isgroup']>0) {
@@ -403,10 +434,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 
-			//update ptsposs field
-			if ($stm->rowCount()>0 && isset($_POST['defpoints'])) {
-				require_once("../includes/updateptsposs.php");
-				updatePointsPossible($_GET['id'], $curassess['itemorder'], $_POST['defpoints']);
+			if ($taken && $stm->rowCount()>0) {
+				$metadata = array();
+				foreach ($curassess as $k=>$v) {
+					if (isset($qarr[':'.$k]) && $qarr[':'.$k] != $v) {
+						$metadata[$k] = ['old'=>$v, 'new'=>$qarr[':'.$k]];
+					}
+				}
+				$result = TeacherAuditLog::addTracking(
+				    $cid,
+				    "Assessment Settings Change",
+				    $assessmentId,
+				    $metadata
+				);
+
+				//update ptsposs field
+				if (isset($_POST['defpoints'])) {
+					require_once("../includes/updateptsposs.php");
+					updatePointsPossible($_GET['id'], $curassess['itemorder'], $_POST['defpoints']);
+				}
 			}
 
 			if ($deffb!=$curassess['deffeedbacktext']) {
@@ -521,11 +567,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
         } else { //INITIAL LOAD
             if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
-                $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-                $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
-                $stm = $DBH->prepare($query);
-                $stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
-                $taken = ($stm->fetchColumn(0)>0);
+
                 $stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
                 $stm->execute(array(':id'=>$assessmentId));
                 $line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -690,9 +732,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             }
 
             if (isset($_GET['id'])) {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Modify Assessment <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
             } else {
-			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
+			$formTitle = "<div id=\"headeraddassessment\" class=\"pagetitle\"><h1>Add Assessment <img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/></h1></div>\n";
             }
 
             $page_formActionTag = sprintf("addassessment.php?block=%s&cid=%s", Sanitize::encodeUrlParam($block), $cid);
@@ -773,6 +815,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             $page_groupsets['label'][0] = 'Create new set of groups';
             $i=1;
             while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                if ($row[1] == '##autobysection##') { continue; }
                 $page_groupsets['val'][$i] = $row[0];
                 $page_groupsets['label'][$i] = $row[1];
                 $i++;
@@ -809,7 +852,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
+ $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
  require("../header.php");
 
 if ($overwriteBody==1) {
@@ -891,6 +934,24 @@ if ($overwriteBody==1) {
 				$("#reqscorewrap").toggle(rqshow);
 				$(this).attr("aria-expanded", rqshow);
 		});
+		// bind to caltagradio controls
+		$('input[type=radio][name=caltagradio]').change(function() {
+			if (this.value == 'usename') {
+				$('input[type=text][name=caltagact]')
+                    .attr('data-prev', function() {return this.value;})
+                    .prop('readonly', true)
+                    .css({'color':'#FFFFFF', 'opacity':'0.6'})
+                    .val('use_name');
+			}
+			else if (this.value == 'usetext') {
+				$('input[type=text][name=caltagact]')
+                    .prop('readonly', false)
+                    .css({'color':'inherit', 'opacity':'1.0'})
+                    .val(function() {
+                        return this.getAttribute('data-prev') || '?';
+                    });
+			}
+		});
 	})
 	</script>
 
@@ -937,7 +998,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,"0",1); ?>/>
 			<input type=text size=10 name="sdate" value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=8 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 
@@ -951,7 +1012,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,"2000000000",1); ?>/>
 			<input type=text size=10 name="edate" value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=8 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 <?php
@@ -1126,14 +1187,16 @@ if ($overwriteBody==1) {
 		 <div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Additional Display Options
 		 </div>
 		 <div class="blockitems hidden">
 
 			<span class="form">Calendar icon:</span>
 			<span class="formright">
-				<input name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>"/>
+                <label><input name="caltagradio" type="radio" value="usetext" <?php writeHtmlChecked($line['caltag'],"use_name",1); ?>>Use Text:</label>
+                  <input aria-label="Calendar icon text" name="caltagact" type=text size=8 value="<?php echo Sanitize::encodeStringForDisplay($line['caltag']); ?>" <?php echo ($line['caltag'] == 'use_name') ? 'style="color:#FFFFFF;opacity:0.6;" readonly' : null ?> /><br />
+                <label><input name="caltagradio" type="radio" value="usename" <?php writeHtmlChecked($line['caltag'],"use_name"); ?>>Use Assessment Name</label>
 			</span><br class="form" />
 
 			<span class=form>Shuffle item order: </span>
@@ -1175,7 +1238,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Time Limit and Access Control
 		 </div>
 		 <div class="blockitems hidden">
@@ -1196,7 +1259,7 @@ if ($overwriteBody==1) {
 				<label for=lpcutoff>No extensions past</label>
 				<input type=text size=10 name="lpdate" value="<?php echo $lpdate;?>">
 				<a href="#" onClick="displayDatePicker('lpdate', this, 'edate', 'due date'); return false">
-				<img src="../img/cal.gif" alt="Calendar"/></a>
+				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 				at <input type=text size=8 name=lptime value="<?php echo $lptime;?>">
 				</span>
 			</span><BR class=form>
@@ -1231,7 +1294,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Help and Hints
 		 </div>
 		 <div class="blockitems hidden">
@@ -1292,7 +1355,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Grading and Feedback
 		 </div>
 		 <div class="blockitems hidden">
@@ -1365,7 +1428,7 @@ if ($overwriteBody==1) {
 		 </div>
 
 		 <div class="block grouptoggle">
-		   <img class="mida" src="../img/expand.gif" />
+		   <img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 		   Group Assessment
 		 </div>
 		 <div class="blockitems hidden">

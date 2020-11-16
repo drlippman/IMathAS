@@ -365,7 +365,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $DBH,$imasroot;
+	global $DBH,$imasroot,$staticroot;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
@@ -399,7 +399,7 @@ function printscore($sc,$qsetid,$seed) {
 			} else {
 				$pm = 'ychk'; $alt=_('Partially correct');
 			}
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" alt=\"$alt\"/>";
+			$bar = "<img src=\"$staticroot/img/$pm.gif\" alt=\"$alt\"/>";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);

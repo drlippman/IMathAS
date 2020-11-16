@@ -11,9 +11,9 @@ if ($myrights < 40) {
 }
 
 
-$placeinhead = '<script src="../javascript/copyitemslist.js" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" href="../course/libtree.css" type="text/css" />';
-$placeinhead .= '<script type="text/javascript" src="../javascript/libtree.js"></script>';
+$placeinhead = '<script src="'.$staticroot.'/javascript/copyitemslist.js" type="text/javascript"></script>';
+$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree.js"></script>';
 require("../header.php");
 
 echo '<div class=breadcrumb>'.$breadcrumbbase.' '._('Add New Course').'</div>';

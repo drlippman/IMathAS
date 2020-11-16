@@ -20,6 +20,7 @@ var MQeditor = (function($) {
     layout: []
   };
   var MQconfig = {};
+  var initialized = false;
   var curMQfield = null;
   var blurTimer = null;
   var keyRepeatInterval = null;
@@ -49,6 +50,13 @@ var MQeditor = (function($) {
   function setMQconfig(newconfig) {
     MQconfig = newconfig;
   }
+  function inIframe () {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+  }
 
   /*
     Toggles the given input field to/from a MathQuill field
@@ -65,7 +73,7 @@ var MQeditor = (function($) {
     if (newstate === true) { // enable MQ
       var initval = $(el).attr("type","hidden").val();
       if (config.hasOwnProperty('toMQ')) { // convert format if needed
-        initval = config.toMQ(initval);
+        initval = config.toMQ(initval, textId);
       }
       var mqfield = $("#mqinput-"+textId);
       if (mqfield.length == 0) {  // no existing MQ input
@@ -75,7 +83,7 @@ var MQeditor = (function($) {
           text: initval
         });
         var m;
-        if ((m = el.className.match(/(ansred|ansyel|ansgrn)/)) !== null) {
+        if ((m = el.className.match(/(ansred|ansyel|ansgrn|ansorg)/)) !== null) {
           span.addClass(m[0]);
         }
         var size = (el.hasAttribute("size") ? (el.size > 3 ? el.size/1.8 : el.size) : 10);
@@ -103,6 +111,17 @@ var MQeditor = (function($) {
           };
           thisMQconfig.keyboardPassthrough = true;
         }
+        thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
+            'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
+        var vars = el.getAttribute("data-mq-vars") || '';
+        if (vars != '') {
+            vars = (vars=='') ? [] : vars.split(/,/);
+            for (var i=0; i<vars.length; i++) {
+                if (vars[i].length > 1 && vars[i].match(/^[a-zA-Z]+$/)) {
+                    thisMQconfig.autoOperatorNames += ' ' + vars[i];
+                }
+            }
+        }
 
         if (el.disabled) {
           mqfield = MQ.StaticMath(span[0]);
@@ -112,7 +131,7 @@ var MQeditor = (function($) {
           attachEditor(span);
           // if original input has input changed programmatically and change
           // event triggered, update mathquill.
-          $(el).on('change', function(e, fromblur) {
+          $(el).on('change.mqed', function(e, fromblur) {
             if (!fromblur) {
               var val = el.value;
               if (config.hasOwnProperty('toMQ')) {
@@ -131,7 +150,7 @@ var MQeditor = (function($) {
         mqfield.focus();
       }
     } else { // disable MQ
-      $(el).attr("type","text");
+      $(el).attr("type","text").off('change.mqed');
       if (nofocus !== true) {
         $(el).focus();
       }
@@ -161,6 +180,9 @@ var MQeditor = (function($) {
       .on('focus.mqeditor', showEditor)
       .on('blur.mqeditor', function() {
         blurTimer = setTimeout(hideEditor, 100);
+        if (config.hasOwnProperty('onBlur')) {
+            config.onBlur();
+        }
       });
     $(mqel).on('click.mqeditor', function(e) {
       // hack to handle MQ entries inside radio button labels
@@ -181,11 +203,12 @@ var MQeditor = (function($) {
   function showEditor(event) {
     clearTimeout(blurTimer);
     var mqel = $(event.target).closest(".mathquill-math-field");
-    if (curMQfield === null) {
+    if (initialized === false) {
       // first time through: inject the mqeditor div
       $("body").append($("<div/>", {id:"mqeditor", class:"mqeditor"}));
       // prevent clicks in editor from triggering blur in MQ field
       $("#mqeditor").on("mousedown touchstart", function(evt) {evt.preventDefault();});
+      initialized = true;
     }
     // update layoutStyle if needed
     var lastlayoutstyle = config.curlayoutstyle;
@@ -197,7 +220,11 @@ var MQeditor = (function($) {
       config.curlayoutstyle = config.layoutstyle;
     }
     if (config.curlayoutstyle === 'OSK') {
-      $("#mqeditor").addClass("fixedbottom");
+      if (!inIframe()) {
+        $("#mqeditor").addClass("fixedbottom").removeClass("iframeosk");
+      } else {
+        $("#mqeditor").addClass("iframeosk").removeClass("fixedbottom"); 
+      }
       if (!document.getElementById("mqe-fb-spacer")) {
         var div = document.createElement("div");
         div.style.height = "200px";
@@ -205,7 +232,7 @@ var MQeditor = (function($) {
         $("body").append(div);
       }
     } else {
-      $("#mqeditor").removeClass("fixedbottom");
+      $("#mqeditor").removeClass("fixedbottom iframeosk");
     }
     var rebuild = false;
     // see if the field has changed
@@ -241,7 +268,7 @@ var MQeditor = (function($) {
       }
     }
     // now show and position the editor
-    if (config.curlayoutstyle === 'OSK') {
+    if (config.curlayoutstyle === 'OSK' && !inIframe()) {
       $("#mqeditor").slideDown(50, function () {
         var mqedheight = $("#mqeditor").height() + 5;
         var mqedDistBottom = $(window).height() - (mqel.offset().top + mqel.outerHeight() - $(window).scrollTop());
@@ -258,18 +285,22 @@ var MQeditor = (function($) {
     if (config.hasOwnProperty('onShow')) {
       config.onShow(mqel[0], config.curlayoutstyle, rebuild);
     }
+    $(document).trigger('mqeditor:show');
   }
 
   /*
     Hide the editor
    */
   function hideEditor(event) {
-    if (config.curlayoutstyle === 'OSK') {
+    $(document).trigger('mqeditor:hide');
+    
+    if (config.curlayoutstyle === 'OSK' && !inIframe()) {
       $("#mqeditor").slideUp(50);
     } else {
       $("#mqeditor").hide();
     }
     $("#"+curMQfield.el().id.substring(8)).trigger('change', true);
+    curMQfield = null;
   }
 
   /*
@@ -278,6 +309,7 @@ var MQeditor = (function($) {
   function resetEditor() {
     clearTimeout(blurTimer);
     $("#mqeditor").hide();
+    curMQfield = null;
   }
 
 
@@ -285,7 +317,7 @@ var MQeditor = (function($) {
     Positions the editor below the MQ field, if layoutstyle dictates
    */
   function positionEditor(ref) {
-    if (config.curlayoutstyle == 'under') {
+    if (config.curlayoutstyle == 'under' || inIframe()) {
     	var mqfield = $(ref).closest(".mathquill-math-field");
     	var offset = mqfield.offset();
     	var height = mqfield.outerHeight();
@@ -296,7 +328,11 @@ var MQeditor = (function($) {
           editorLeft = document.documentElement.clientWidth - editorWidth-5;
         }
       }
-    	$("#mqeditor").css("top", offset.top + height + 3).css("left", editorLeft);
+      if (inIframe()) {
+        $("#mqeditor").css("top", offset.top + height + 3).css("left", 0);
+      } else {
+        $("#mqeditor").css("top", offset.top + height + 3).css("left", editorLeft);
+      }
     } else {
       $("#mqeditor").css("top", "auto").css("left", 0);
     }
@@ -306,12 +342,15 @@ var MQeditor = (function($) {
    */
   function onMQedit(mf) {
   	var el = mf.el();
-  	positionEditor(el);
+    positionEditor(el);
+    if (config.hasOwnProperty('onResize')) {
+        config.onResize(el, config.curlayoutstyle);
+    }
   	if (el.id.match(/mqinput/)) {
       var latex = mf.latex();
       if (config.hasOwnProperty('fromMQ')) {
         //convert to input format
-        latex = config.fromMQ(latex);
+        latex = config.fromMQ(latex, el.id);
       }
   		//document.getElementById(el.id.substring(8)).value = latex;
       $("#"+el.id.substring(8)).val(latex).trigger('input');
@@ -467,13 +506,34 @@ var MQeditor = (function($) {
     btnel = document.createElement("span");
     btnel.tabIndex = 0;
     if (btn.l) { // latex button
-      btnel.className = "mqed-btn rend";
-      btnel.innerText = btn.l;
+      if (btn.op) {
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-root-block"><var class="mq-operator-name">'+btn.l.substring(1)+'</var></span>';
+      } else if (btn.pr) {
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-root-block">'+btn.pr+'</span>';
+      } else if (btn.l.match(/\\left(.)\\right(.)/)) {
+        var m = btn.l.match(/\\left(.)\\right(.)/);
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">'+m[1]+'</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">'+m[2]+'</span></span>'
+      } else {
+        btnel.className = "mqed-btn rend";
+        btnel.innerText = btn.l;
+      }
       cmdtype = 'c';
       cmdval = btn.l.substring(1);
     } else if (btn.b) { // rendered text button
-      btnel.className = "mqed-btn rend";
-      btnel.innerHTML = btn.b;
+      if (btn.r) {
+          btnel.className = "mqed-btn rend";
+          btnel.innerHTML = btn.b;
+      } else {
+        btnel.className = "mqed-btn mq-math-mode";
+        if (btn.v) {
+            btnel.innerHTML = '<span class="mq-root-block"><var>'+btn.b+'</var></span>';
+        } else {
+            btnel.innerHTML = '<span class="mq-root-block"><span>'+btn.b+'</span></span>';
+        }
+      }
       cmdtype = 't';
       cmdval = btn.b;
       if (cmdval.match(/^\d$/) || cmdval=='.') {

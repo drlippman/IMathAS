@@ -53,6 +53,14 @@
         {{ fullCreditLabel }}
       </button>
       <button
+        v-if="canedit && hasManual && !isPractice"
+        type="button"
+        @click="manualFull"
+        class="slim"
+      >
+        {{ $t('gradebook.full_manual_parts') }}
+      </button>
+      <button
         v-if="canedit && !isPractice && showfeedback === false"
         type="button"
         class="slim"
@@ -92,10 +100,19 @@
       >
         {{ $t('gradebook.show_penalties') }}
       </button>
+      <button
+        v-if="hasAutoSaves"
+        type="button"
+        class="slim"
+        @click="showAutosaves = !showAutosaves"
+      >
+        {{ $t('gradebook.show_autosaves') }}
+      </button>
     </div>
     <gb-all-tries
       v-if="showAllTries"
       :tries="qdata.other_tries"
+      type="tries"
       :qn="qn"
     />
     <gb-penalties
@@ -103,13 +120,30 @@
       :parts="qdata.parts"
       :submitby="submitby"
     />
-    <div v-if="canedit && showfull && qHelps.length > 0">
+    <gb-all-tries
+      v-if="showAutosaves"
+      :tries="qdata.autosaves"
+      type="autosave"
+      :submitby="submitby"
+      :qn="qn"
+    />
+    <div v-if="showfull && qHelps.length > 0">
       {{ $t('gradebook.had_help') }}:
       <a v-for="(help,idx) in qHelps"
         :key="idx"
         :href="help.url"
         target="_blank"
       >{{ help.title }}</a>
+    </div>
+    <div>
+      <a :href="messageHref" target="help" v-if="showMessage">
+        <icons name="message" />
+        {{ $t('helps.message_instructor') }}
+      </a>
+      <a :href="forumHref" target="help" v-if="postToForum > 0">
+        <icons name="forum" />
+        {{ $t('helps.post_to_forum') }}
+      </a>
     </div>
   </div>
 </template>
@@ -137,7 +171,8 @@ export default {
       curScores: false,
       showfeedback: false,
       showAllTries: false,
-      showPenalties: false
+      showPenalties: false,
+      showAutosaves: false
     };
   },
   computed: {
@@ -257,7 +292,8 @@ export default {
           link: this.questionEditUrl
         },
         {
-          label: this.$t('gradebook.msg_owner'),
+          label: (store.assessInfo.hasOwnProperty('qerrortitle')
+            ? store.assessInfo.qerrortitle : this.$t('gradebook.msg_owner')),
           link: this.questionErrorUrl
         }
       ];
@@ -278,6 +314,22 @@ export default {
         }
       }
       return false;
+    },
+    hasManual () {
+      if (this.qdata.parts.length === 1) {
+        return false;
+      }
+      for (let pn = 0; pn < this.qdata.parts.length; pn++) {
+        if (this.qdata.parts[pn].hasOwnProperty('req_manual') &&
+          this.qdata.parts[pn].req_manual === true
+        ) {
+          return true;
+        }
+      }
+      return false;
+    },
+    hasAutoSaves () {
+      return this.qdata.hasOwnProperty('autosaves');
     },
     submitby () {
       return store.assessInfo.submitby;
@@ -304,6 +356,43 @@ export default {
       } else {
         return [];
       }
+    },
+    showMessage () {
+      return (store.assessInfo.hasOwnProperty('help_features') &&
+        store.assessInfo.help_features.message === true &&
+        !store.assessInfo.can_edit_scores
+      );
+    },
+    postToForum () {
+      return (store.assessInfo.hasOwnProperty('help_features') &&
+        store.assessInfo.help_features.forum
+      );
+    },
+    quoteQ () {
+      const qsid = this.qdata.questionsetid;
+      const seed = this.qdata.seed;
+      const ver = 2; // TODO: send from backend
+      return this.qn + '-' + qsid + '-' + seed + '-' + store.aid + '-' + ver;
+    },
+    messageHref () {
+      let href = window.imasroot + '/msgs/msglist.php?';
+      href += window.$.param({
+        cid: store.cid,
+        add: 'new',
+        quoteq: this.quoteQ,
+        to: 'instr'
+      });
+      return href;
+    },
+    forumHref () {
+      let href = window.imasroot + '/forums/thread.php?';
+      href += window.$.param({
+        cid: store.cid,
+        forum: store.assessInfo.help_features.forum,
+        modify: 'new',
+        quoteq: this.quoteQ
+      });
+      return href;
     }
   },
   methods: {
@@ -326,6 +415,16 @@ export default {
       for (let i = 0; i < this.answeights.length; i++) {
         this.$set(this.curScores, i, this.partPoss[i]);
         actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+      }
+    },
+    manualFull () {
+      for (let i = 0; i < this.answeights.length; i++) {
+        if (this.qdata.parts[i] && this.qdata.parts[i].hasOwnProperty('req_manual') &&
+          this.qdata.parts[i].req_manual === true
+        ) {
+          this.$set(this.curScores, i, this.partPoss[i]);
+          actions.setScoreOverride(this.qn, i, this.curScores[i] / this.partPoss[i]);
+        }
       }
     },
     clearWork () {

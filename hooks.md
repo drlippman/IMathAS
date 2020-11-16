@@ -70,6 +70,21 @@ Include via `$CFG['hooks']['bltilaunch']`
 On creation of a new course:
 `onAddCourse(course ID, user ID)`
 
+On identification of local user ID:
+`onHaveLocalUser(user ID)`
+
+## delete
+
+Include via `$CFG['hooks']['delete']`
+
+Called to delete all items from a course
+`delete_custom_items_by_course($courseid)`
+
+Called to delete one item. 
+$itemtype is imas_items.itemtype
+$typeid id imas_items.typeid
+`delete_custom_item_by_id($itemtype, $typeid)`
+
 ## ltihome
 
 Include via `$CFG['hooks']['ltihome']`
@@ -82,12 +97,29 @@ On creation of a new course:
 Include via `$CFG['hooks']['init']`
 Included immediately after config.php load
 
+## includes/copyiteminc  
+
+Include via `$CFG['hooks']['includes/copyiteminc']`
+
+Called to determine if an item type can be handled by the hook,
+called with $itemtype this is imas_items.itemtype
+`copyitem_can_handle_type($itemtype)`
+
+Called to trigger copying an item.  Called with
+$itemtype: imas_items.itemtype,
+$typeid: imas_items.typeid
+Should return $newtypeid, the value for the new imas_items.typeid
+`copyitem_copy_item($itemtype, $typeid)`
+
 ## validate
 
 Include via `$CFG['hooks']['validate']`
 
 Called after login is successful, before redirect back to requested page
 `onLogin()`
+
+Called after determining user is already logged in
+`alreadyLoggededIn(user ID)`
 
 Called when checking if LTI user can access the requested page
 `allowedInAssessment()`
@@ -101,5 +133,10 @@ Include via `$CFG['hooks']['util/batchcreateinstr']`
 On creation of a new course:
 `onAddCourse(course ID, owner ID)`
 
+## forms
 
+Include via `$CFG['hooks']['forms']`
 
+Called before the userinfoprofile fieldset
+`chguserinfoExtras($userid, $myrights, $groupid)`
+Returns HTML to be placed above editable fieldsets (e.g., to display extra data about user account).

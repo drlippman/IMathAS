@@ -47,6 +47,7 @@ class NumberAnswerBox implements AnswerBox
         if (isset($options['reqsigfigs'])) {if (is_array($options['reqsigfigs'])) {$reqsigfigs = $options['reqsigfigs'][$partnum];} else {$reqsigfigs = $options['reqsigfigs'];}}
         if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}} else {$displayformat='';}
         if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
+        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
@@ -55,7 +56,7 @@ class NumberAnswerBox implements AnswerBox
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
-            $out .= "<label for=\"qn$qn\">$ansprompt</label>";
+            $out .= $ansprompt;
         }
 
         if ($displayformat=="point") {
@@ -67,8 +68,26 @@ class NumberAnswerBox implements AnswerBox
     		} else {
     			$leftb = '';
     			$rightb = '';
-    		}
-    		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
+            }
+            if (in_array('units', $ansformats)) {
+                if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
+                    if (in_array('integer',$ansformats)) {
+                        $tip = _('Enter your answer as a list of integers with units, separated with commas. Example: -4 cm, 3 m') . "<br/>";
+    				    $shorttip = _('Enter a list of integers with units');
+                    } else {
+                        $tip = _('Enter your answer as a list of integer or decimal numbers with units, separated with commas. Example: -4.2 cm, 3E6 m') . "<br/>";
+    				    $shorttip = _('Enter a list of integer or decimal numbers with units');
+                    } 
+                } else {
+                    if (in_array('integer',$ansformats)) {
+                        $tip = _('Enter your answer as an integer with units. Examples: -4 cm, 5 m/s^2') . "<br/>";
+    				    $shorttip = _('Enter an integer with units');
+                    } else {
+                        $tip = _('Enter your answer as an integer or decimal number with units. Examples: -4.2 cm, 3E6 m/s^2') . "<br/>";
+    				    $shorttip = _('Enter an integer or decimal number with units');
+                    } 
+                }
+            } else if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
     			if (in_array('integer',$ansformats)) {
     				$tip = _('Enter your answer as a list of integers separated with commas: Example: -4, 3, 2') . "<br/>";
     				$shorttip = _('Enter a list of integers');
@@ -97,20 +116,25 @@ class NumberAnswerBox implements AnswerBox
     			$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
     		}
     		if (isset($reqdecimals)) {
-    			if (substr((string)$reqdecimals,0,1)=='=') {
+                list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
+    			if ($exactreqdec) {
     				$exactdec = true;
-    				$reqdecimals = substr($reqdecimals,1);
     				$tip .= "<br/>" . sprintf(_('Your answer should include exactly %d decimal places.'), $reqdecimals);
-    				$shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
-    				$answer = prettyreal($answer, $reqdecimals);
+                    $shorttip .= sprintf(_(", with %d decimal places"), $reqdecimals);
+                    if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+    					$answer = implode(',', prettyreal(explode(',', $answer), $reqdecimals));
+    				} else {
+    					$answer = prettyreal($answer, $reqdecimals);
+    				}
     			} else {
     				$tip .= "<br/>" . sprintf(_('Your answer should be accurate to at least %d decimal places.'), $reqdecimals);
     				$shorttip .= sprintf(_(", accurate to at least %d decimal places"), $reqdecimals);
     			}
     		}
     		if (isset($reqsigfigs)) {
-    			if ($reqsigfigs{0}=='=') {
-    				$reqsigfigs = substr($reqsigfigs,1);
+                list($reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype) = parsereqsigfigs($reqsigfigs);
+
+    			if ($exactsigfig) {
     				if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
     					$answer = implode(',', prettysigfig(explode(',', $answer), $reqsigfigs));
     				} else {
@@ -118,10 +142,9 @@ class NumberAnswerBox implements AnswerBox
     				}
     				$tip .= "<br/>" . sprintf(_('Your answer should have exactly %d significant figures.'), $reqsigfigs);
     				$shorttip .= sprintf(_(', with exactly %d significant figures'), $reqsigfigs);
-    			} else if ($reqsigfigs{0}=='[') {
-    				$reqsigfigparts = explode(',',substr($reqsigfigs,1,-1));
-    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigparts[0], $reqsigfigparts[1]);
-    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigparts[0], $reqsigfigparts[1]);
+    			} else if ($reqsigfigoffset>0) {
+    				$tip .= "<br/>" . sprintf(_('Your answer should have between %d and %d significant figures.'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
+    				$shorttip .= sprintf(_(', with %d - %d significant figures'), $reqsigfigs, $reqsigfigs+$reqsigfigoffset);
     			} else {
     				if ($answer!=0) {
     					$v = -1*floor(-log10(abs($answer))-1e-12) - $reqsigfigs;
@@ -148,7 +171,9 @@ class NumberAnswerBox implements AnswerBox
     			'name' => "qn$qn",
     			'id' => "qn$qn",
     			'value' => $la,
-    			'autocomplete' => 'off'
+    			'autocomplete' => 'off',
+                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
+                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
     		];
 
     		if ($displayformat=='alignright') {
@@ -162,7 +187,8 @@ class NumberAnswerBox implements AnswerBox
     			$params['format'] = 'credit';
     			$classes[] = 'textright';
     			$classes[] = 'creditbox';
-    		}
+            }
+            $params['calcformat'] = $answerformat;
 
     		$params['tip'] = $shorttip;
     		$params['longtip'] = $tip;
@@ -179,6 +205,7 @@ class NumberAnswerBox implements AnswerBox
     						'" />' .
     						$rightb;
 
+            $out .= "<span id=p$qn></span>";
     		if ($displayformat=='hidden') {
     			//TODO: What's this for? Maybe virtual manipulatives?
     			$out .= '<script type="text/javascript">imasprevans['.$qstr.'] = "'.$la.'";</script>';
@@ -202,7 +229,7 @@ class NumberAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

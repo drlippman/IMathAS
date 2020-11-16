@@ -41,7 +41,7 @@ function randmilphrase($removespaces=false,$pad=false) {
 		if ($n%$pad != 0) {
 			$phrase .= ' ';
 			for ($i=$n%$pad;$i<$pad;$i++) {
-				$phrase .= $charset{$RND->rand(0,20)};
+				$phrase .= $charset[$RND->rand(0,20)];
 			}
 		}
 	}
@@ -85,13 +85,13 @@ function shiftcipher($m, $s, $alpha='alpha', $rotate=false) {
 
 	$output = '';
 	for ($i=0; $i<strlen($m);$i++) {
-		$c = ord($m{$i});
+		$c = ord($m[$i]);
 		if ($c >= 65 && $c <=  90) { // Uppercase letter
-			$output .= $charset{($c-65+$s)%$L};
+			$output .= $charset[($c-65+$s)%$L];
 		} else if ($c >= 48 && $c <= 57 && $L>26 ) { // Number
-			$output .= $charset{($c-48+26+$s)%$L};
+			$output .= $charset[($c-48+26+$s)%$L];
 		} else {
-		        $output .= $m{$i};  // Copy
+		        $output .= $m[$i];  // Copy
 		}
 		$s += $rotate;
 	}
@@ -138,13 +138,13 @@ function subcipher($m, $map, $alpha='alpha', $rotate=false) {
 	$s = 0;
 	$output = '';
 	for ($i=0; $i<strlen($m);$i++) {
-		$c = ord($m{$i});
+		$c = ord($m[$i]);
 		if ($c >= 65 && $c <=  90) { // Uppercase letter
-			$output .= $map{($c-65+$s)%$L};
+			$output .= $map[($c-65+$s)%$L];
 		} else if ($c >= 48 && $c <= 57 && $L>26 ) { // Number
-			$output .= $map{($c-48+26+$s)%$L};
+			$output .= $map[($c-48+26+$s)%$L];
 		} else {
-		        $output .= $m{$i};  // Copy
+		        $output .= $m[$i];  // Copy
 		}
 		$s += $rotate;
 	}
@@ -190,7 +190,7 @@ function transcipher($m, $cols, $order=false) {
 	for ($i=0;$i<$n;$i++) {
 		if ($i%$rows==0) { $col++;} //current column we're reading
 		$r = $i%$rows;  //row we want to read in current column
-		$output .= $m{$cols*$r + $order[$col]};
+		$output .= $m[$cols*$r + $order[$col]];
 	}
 	return $output;
 }

@@ -1,14 +1,14 @@
 <html><body>
 <h1>Macro Library virtmanip</h1>
 Virtual Manipulatives
-<BR>Functions for displaying and scoring virtual manipulatives.  
+<BR>Functions for displaying and scoring virtual manipulatives.
 <BR>
 <BR>Some of these can be used an exploration/calculation aid in a question without
 <BR>being scored.  Most have the ability to score the interaction with the manipulative.
 <BR>
 <BR>When being scored, use the String question type.  For most of these, you must
 <BR>manually implement the scoring, usually by defining a wrong $answer, then changing
-<BR>it to match the value from $stuanswers if the values are correct.  
+<BR>it to match the value from $stuanswers if the values are correct.
 <BR>A typical pattern would look like:
 <BR>
 <BR>loadlibrary("virtmanip")
@@ -27,7 +27,7 @@ Virtual Manipulatives
 <BR>&lt;div style="position:absolute;left:0;right:0;visibility:hidden"&gt;$answerbox&lt;/div&gt;
 <BR>
 <BR>Ver 1.1 by David Lippman and Bill Meacham, May 2018
-<p>For VM writers, a variable called <code>$a11yqs</code> is defined and 
+<p>For VM writers, a variable called <code>$a11yqs</code> is defined and
    can be added to the query string passed to the VM.  It defines three
    parameters: a11y_graph, a11y_graph, and a11y_mouse. For each,
    zero means use an alternative, non-zero means use the default.
@@ -55,6 +55,10 @@ Virtual Manipulatives
 <li><a href="#vmgetfractioncompareval">vmgetfractioncompareval</a></li>
 <li><a href="#vmsetupfractionmult">vmsetupfractionmult</a></li>
 <li><a href="#vmgetfractionmultvals">vmgetfractionmultvals</a></li>
+<li><a href="#vmdrawinchruler">vmdrawinchruler</a></li>
+<li><a href="#vmdrawcmruler">vmdrawcmruler</a></li>
+<li><a href="#vmdrawclock">vmdrawclock</a></li>
+
 </ul>
 
 <h3><a name="vmsetup">vmsetup</a></h3>
@@ -91,8 +95,8 @@ is to be scored</p>
 send its postMessage in thise format:</p>
 <pre>
 message = {
-  subject: "imathas.update", 
-  "qn": qn, 
+  subject: "imathas.update",
+  "qn": qn,
   "value": datatostore
 };
 window.parent.postMessage(JSON.stringify(message), "*");
@@ -105,15 +109,15 @@ questions, or <code>1000*$thisq + (part index)</code> for multi-part.</p>
 vmsetupchipmodel(stuans,qn,[part])
 <BR>Set up a chip model manipulative
 <BR><h3><a name="vmchipmodelgetcount">vmchipmodelgetcount</a></h3>
-vmchipmodelgetcount(stuans) 
-<BR>return an array array(poscount,negcount) of the count of positive and 
-<BR>negative chips in the drop region.  
+vmchipmodelgetcount(stuans)
+<BR>return an array array(poscount,negcount) of the count of positive and
+<BR>negative chips in the drop region.
 <BR><h3><a name="vmsetupnumbertiles">vmsetupnumbertiles</a></h3>
 vmsetupnumbertiles(stuans,qn,[part])
 <BR>Set up a number tiles manipulative
 <BR><h3><a name="vmnumbertilesgetcount">vmnumbertilesgetcount</a></h3>
-vmnumbertilesgetcount(stuans) 
-<BR>return an array array(hundredcount,tencount,onecount) of the count of 
+vmnumbertilesgetcount(stuans)
+<BR>return an array array(hundredcount,tencount,onecount) of the count of
 <BR>hundred blocks, ten blocks, and ones blocks in the drop area
 <BR><h3><a name="vmsetupitemsort">vmsetupitemsort</a></h3>
 vmsetupitemsort(tosort,cats,stuans,qn,[part,width])
@@ -169,4 +173,14 @@ vmsetupfractionmult([stuans,qn,part])
 <BR><h3><a name="vmgetfractionmultvals">vmgetfractionmultvals</a></h3>
 vmgetfractionmultvals(stuans)
 <BR>return array(horiz numerator, horiz denominator, vert num, vert denom)
-<BR>
+<BR><h3><a name="vmdrawinchruler">vmdrawinchruler</a></h3>
+vmdrawinchruler([max,val,width,height])
+<BR>Draws an inch ruler, divided into sixteenths, up to the max value (default 4).
+  If specified, will draw an arrow at val (give as numeric/decimal value).
+<BR><h3><a name="vmdrawcmruler">vmdrawcmruler</a></h3>
+vmdrawcmruler([max,val,width,height])
+<BR>Draws an centimeter ruler, divided into mm, up to the max value (default 4).
+  If specified, will draw an arrow at val (give as numeric/decimal value).
+<BR><h3><a name="vmdrawclock">vmdrawclock</a></h3>
+  vmdrawclock(hr,min,[size])
+<br>Draws an analog clock with hands pointing to the specific hr and min.

@@ -4,6 +4,9 @@
 //(c) 2006 David Lippman
 function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 	global $DBH;
+	if (empty($quests)) {
+		return;
+	}
 	foreach ($quests as $i=>$q) {
 		$quests[$i] = intval($q);  //sanitize
 	}

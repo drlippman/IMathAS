@@ -10,8 +10,17 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ## Installation
 
-IMathAS is designed for simple installation with minimal requirements.  The system requires PHP 7.1+ with GD and Freetype, and MySQL 5.
+### Requirements
+IMathAS is designed for simple installation with minimal requirements.  The system
+requires PHP 7.2+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
+- mbstring (required)
+- pdo_mysql (required)
+- gettext (required)
+- gd with freetype (recommended) for image creation
+- curl (recommended) necessary for LTI grade passback
+- openssl (recommended) necessary for LTI 1.3 services
 
+### Installation Steps
 1.  Download IMathAS, extract it, and copy the files to your webserver.
 2.  Alternatively, if you have shell access to your server, enter the directory you want IMathAS in, and checkout the code from Github. Using Git greatly simplifies upgrading.
 3.  Create a database for IMathAS
@@ -61,7 +70,7 @@ These are all added to the `config.php` by the install script.
 
 Many system defaults can be adjusted using config changes.
 
-- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options.
+- Assessment settings.   Most assessment option defaults can be defined.  For example, `$CFG['AMS']['displaymethod']` allows you to set the default displaymethod for assessments.  Review the code in `/course/addassessment.php` for all options. Setting $CFG['AMS']['caltag'] = 'use_name' causes assessment names to appear in the calendar by default.
 - Gradebook settings.  Most defaults can be defined.  For example, `$CFG['GBS']['defgbmode']` allows you to define the default gradebook mode.  See `/course/gbsettings.php` for all options.
 - Forum settings.  A few defaults can be defined.  See `/course/addforum.php` for all options.
 - Course settings.  Most default can be defined, and most can be forced to a value.  For example, `$CFG['CPS']['theme'] = array("modern.css",1);` sets the default theme but allows the user to change it.  Using `0` instead of `1` in the second position would set the default and not allow the user to change it.  See `/admin/forms.php` for all options.
@@ -89,6 +98,7 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['vidextrefsize']`: Set to an array of (width,height) to set the popup size for Video question help buttons
 - `$CFG['GEN']['ratelimit']`: Set to a number of seconds (like 0.2) to limit the rate at
  which pages can be accessed/refreshed.
+- `$CFG['GEN']['COPPA']`: Set to enable an "I am 13 years old or older" checkbox on new student account creation. If not checked, requires a course ID and key to create an account.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
@@ -143,6 +153,9 @@ course list from the course browser options, so you must also have `$CFG['course
     - To operate properly, the `/admin/processltiqueue.php` script needs to be called regularly, ideally once a minute.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to  `/admin/processltiqueue.php?authcode=####` using the code you define.
     - `$CFG['LTI']['queuedelay']` defines the delay (in minutes) between the students' last submission and when the score is sent to the LMS.  Defaults to 5.
     - `$CFG['LTI']['logltiqueue']` set to true to log LTI queue results in /admin/import/ltiqueue.log
+- `$CFG['LTI']['usesendzeros']`: Set to true to enable the "send zeros after due date" course setting.  _This option requires additional setup._
+    - To operate, the `/lti/admin/sendzeros.php` script needs to be called on a schedule, typically once or a few times a day.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to `/lti/admin/sendzeros.php?authcode=####` using the code you define.
+- `$CFG['LTI']['useradd13']`: Set to true to allow teacher users to add LTI1.3 platforms.
 
 ### Email
 By default, emails are sent using the built-in PHP `mail()` function.  This can sometimes have reliability issue, so there are options to override the mail sender or reduce the use of email in the system.
@@ -170,6 +183,16 @@ If you wish to enable users to request browser push notifications (does not work
 
 The student side of the system is pretty well set up for i18n, but the instructor side is  not yet.  Currently the only translation pack available is `de` (German).  See `/i18n/translating.md` for more information about generating translations.  To enable a translation:
 - `$CFG['locale']`: Set this to the desired language code, like `de`
+
+### IPEDS / NCES 
+
+The system can create associations with IPEDS/NCES records. For this, you will need to manually 
+[populate the `imas_ipeds` table](https://github.com/drlippman/IMathAS-Extras/blob/master/ipeds/ipeds.md). 
+- `$CFG['use_ipeds']`: set to true to enable UI features for editing associations.
+
+Look to `newinstructor-ipeds.php.dist` for an example of how to collect ipeds data during 
+account request.  The account approval process will auto-create group associations when 
+account requests are collected with this data.
 
 ### Development
 - `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.

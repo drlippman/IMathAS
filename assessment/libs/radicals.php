@@ -18,16 +18,13 @@ function reduceradical($in,$root=2,$format="string") {
 		return;
 	}
 	$in = intval($in);
-	
+
 	if ($in > 10000000) {
 		if ($GLOBALS['myrights'] > 10) {
 			echo 'Input to reduceradical was too large';
 		}
 		return;
-	} else if ($in<0 && ($root%2==0)) {
-		echo "even roots of negatives can't be handled";
-		return;
-	}  else	if ($root==0) {
+	} else if ($root==0) {
 		if (is_string($root)) {
 			echo "can't provide a string as the root value - check your parameters";
 			return;
@@ -38,12 +35,20 @@ function reduceradical($in,$root=2,$format="string") {
 	} else if ($root < 0) {
 		echo "can't handle negative roots";
 		return;
-	}
-	
+	} else if ($in < 0 && $root%2==0 && $root>3) {
+        echo "can't handle higher even roots of negative values";
+		return;
+    }
+
 	$root = intval($root);
-	
+
+    $iscomplex = false;
 	if ($in<0) {
-		$sign = '-';
+        if ($root == 2) {
+            $iscomplex = true;
+        } else {
+            $sign = '-';
+        }
 	} else {
 		$sign = '';
 	}
@@ -51,7 +56,7 @@ function reduceradical($in,$root=2,$format="string") {
 	$in = abs($in);
 	$max = 	pow($in,1/$root);
 	$out = 1;
-	
+
 	//look for biggest perfect power first
 	for ($i=floor($max+.01);$i>1 && $in>1;$i--) {
 		if ($in%(pow($i,$root))==0) {
@@ -65,8 +70,10 @@ function reduceradical($in,$root=2,$format="string") {
 			$outstr .= '`';
 		}
 		$outstr .= $sign;
-		if ($out>1 || $in==1) {
+		if ($out>1 || ($in==1 && !$iscomplex)) {
 			$outstr .= $out;
+		} else if ($in == 0) {
+			$outstr .= '0';
 		}
 		if ($in>1) {
 			if ($root==2) {
@@ -74,14 +81,17 @@ function reduceradical($in,$root=2,$format="string") {
 			} else {
 				$outstr .= "root($root)($in)";
 			}
-		}
+        }
+        if ($iscomplex) {
+            $outstr .= 'i';
+        }
 		if ($format=='disp') {
 			$outstr .= '`';
 		}
 		return $outstr;
 	} else {
 		if ($sign=='-') {$out *= -1;}
-		return array($out,$in);
+		return array($out,$in*($iscomplex?-1:1));
 	}
 }
 
@@ -101,10 +111,19 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 			echo 'Input to reduceradicalfrac was too large';
 		}
 		return;
-	}
+    } else if ($rootnum < 0 && $root%2==0 && $root>3) {
+        echo "can't handle higher even roots of negative values";
+		return;
+    }
+    if ($rootnum < 0 && $root == 2) {
+        $iscomplex = true;
+        $rootnum = abs($rootnum);
+    } else {
+        $iscomplex = false;
+    }
 	$n = intval($n);
 	$rootnum = intval($rootnum);
-	$d = intval($d);
+    $d = intval($d);
 	$root = intval($root);
 	list($rootA,$in) = reduceradical($rootnum,$root,"parts");
 	$n *= $rootA;
@@ -116,6 +135,9 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 		$d = $d*-1;
 	}
 	if ($format=='string' || $format=='disp') {
+        if ($n==0 || $rootnum==0) {
+            return 0;
+        }
 		$outstr = '';
 		if ($format=='disp') {
 			$outstr .= '`';
@@ -127,7 +149,7 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 		if ($d>1) {
 			$outstr .= '(';
 		}
-		if (abs($n)!=1 || $in==1) {  //  3root(2) or 1root(1)
+		if (abs($n)!=1 || ($in==1 && !$iscomplex)) {  //  3root(2) or 1root(1)
 			$outstr .= $n;
 		} else if ($n==-1) {
 			$outstr .= '-';
@@ -138,7 +160,10 @@ function reduceradicalfrac($n,$rootnum,$d,$root=2,$format="string") {
 			} else {
 				$outstr .= "root($root)($in)";
 			}
-		}
+        }
+        if ($iscomplex && $n!=0) {
+            $outstr .= 'i';
+        }
 		if ($d>1) {
 			$outstr .= ")/$d";
 		}
@@ -176,7 +201,7 @@ function reduceradicalfrac2($n,$d,$rootnum,$rat=false,$root=2,$format="string") 
 		if ($format=='disp') {
 			$outstr .= '`';
 		}
-		
+
 		$outstr .= $n;
 		if ($d>1 || $in>1) {
 			$outstr .= '/';
@@ -197,7 +222,7 @@ function reduceradicalfrac2($n,$d,$rootnum,$rat=false,$root=2,$format="string") 
 				$outstr .= ')';
 			}
 		}
-		
+
 		if ($format=='disp') {
 			$outstr .= '`';
 		}

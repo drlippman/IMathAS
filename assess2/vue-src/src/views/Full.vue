@@ -1,22 +1,48 @@
 <template>
   <div class="home">
+    <a href="#" class="sr-only" id="skipnav" @click.prevent="$refs.scrollpane.focus()">
+      {{ $t('jumptocontent') }}
+    </a>
     <assess-header></assess-header>
-    <div class="scrollpane fulldisp" role="region" :aria-label="$t('regions.questions')">
-      <div
-        class = "questionpane introtext"
-        v-if = "intro !== ''"
-        v-html = "intro"
-        ref = "introtext"
+    <p v-if="isPreviewAll" class="headerpane noticetext">
+      {{ $t("header.preview_all") }}
+      <button
+        type="button"
+        class = "secondary"
+        @click="showAllAns"
+      >
+        {{ $t("gradebook.show_all_ans") }}
+      </button>
+      <button
+        type="button"
+        class = "secondary"
+        @click="showTexts = !showTexts"
+      >
+        {{ textToggleLabel }}
+      </button>
+    </p>
+    <div
+      class="scrollpane fulldisp"
+      role="region"
+      ref="scrollpane"
+      tabindex="-1"
+      :aria-label="$t('regions.questions')"
+    >
+      <intro-text
+        v-if = "hasIntro"
+        :active = "showTexts"
+        :html = "intro"
       />
 
       <div
         v-for="curqn in questionArray" :key="curqn"
       >
         <inter-question-text-list
+          v-show="showTexts"
           pos="beforeexact"
           :qn="curqn"
           :key="'iqt'+curqn"
-          :active = "true"
+          :active = "showTexts"
         />
         <full-question-header :qn = "curqn" />
         <question
@@ -27,9 +53,10 @@
         />
       </div>
       <inter-question-text-list
+        v-show="showTexts"
         pos="after"
         :qn="lastQ"
-        :active = "true"
+        :active = "showTexts"
       />
     </div>
     <p v-if = "showSubmit">
@@ -49,19 +76,32 @@ import AssessHeader from '@/components/AssessHeader.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
 import Question from '@/components/question/Question.vue';
 import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import IntroText from '@/components/IntroText.vue';
 import { store, actions } from '../basicstore';
 
 export default {
   name: 'Full',
+  data: function () {
+    return {
+      showTexts: true
+    };
+  },
   components: {
     Question,
     AssessHeader,
     FullQuestionHeader,
-    InterQuestionTextList
+    InterQuestionTextList,
+    IntroText
   },
   computed: {
     intro () {
       return store.assessInfo.intro;
+    },
+    hasIntro () {
+      return (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0);
+    },
+    isPreviewAll () {
+      return !!store.assessInfo.preview_all;
     },
     questionArray () {
       const qnArray = {};
@@ -75,18 +115,18 @@ export default {
     },
     showSubmit () {
       return (store.assessInfo.submitby === 'by_assessment');
+    },
+    textToggleLabel () {
+      return this.showTexts ? this.$t('print.hide_text') : this.$t('print.show_text');
     }
   },
   methods: {
     submitAssess () {
       actions.submitAssessment();
-    }
-  },
-  mounted () {
-    setTimeout(window.drawPics, 100);
-    if (this.intro !== '') {
-      window.rendermathnode(this.$refs.introtext);
-      window.initlinkmarkup(this.$refs.introtext);
+    },
+    showAllAns () {
+      window.$("span[id^='ans']").removeClass('hidden').toggle();
+      window.$('.keybtn').attr('aria-expanded', function (i, v) { return !JSON.parse(v); });
     }
   }
 };

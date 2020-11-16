@@ -31,6 +31,19 @@ if ($isRealStudent || empty($_GET['uid'])) {
 } else {
   $uid = Sanitize::onlyInt($_GET['uid']);
 }
+$viewfull = true;
+if ($isteacher || $istutor) {
+  if (isset($_SESSION[$cid.'gbmode'])) {
+    $gbmode =  $_SESSION[$cid.'gbmode'];
+  } else {
+    $stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+    $stm->execute(array(':courseid'=>$cid));
+    $gbmode = $stm->fetchColumn(0);
+  }
+  if (((floor($gbmode/100)%10)&1) == 1) {
+    $viewfull = false;
+  }
+}
 
 $now = time();
 
@@ -76,26 +89,67 @@ if (!$assess_record->hasRecord()) {
   // if there's no record yet, and we're a teacher, create a record
   if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
     $isGroup = $assess_info->getSetting('isgroup');
+
+    // Check for LTI 1.3 lineitem
+    $lineitemdata = '';
+    $ltiorg = '';
+    $query = 'SELECT istu.lticourseid,ilc.org,ili.lineitem,ilu.ltiuserid FROM imas_students AS istu
+        JOIN imas_lti_courses AS ilc ON ilc.id=istu.lticourseid
+        JOIN imas_lti_lineitems AS ili ON istu.lticourseid=ili.lticourseid
+        JOIN imas_ltiusers AS ilu ON istu.userid=ilu.userid AND ilu.org=ilc.org
+        WHERE istu.userid=? AND istu.courseid=? AND ili.itemtype=0 AND ili.typeid=?';
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($uid, $cid, $aid));
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($row !== false && substr($row['org'],0,6)=='LTI13-') {
+        $lineitemdata = 'LTI1.3:|:' . $row['ltiuserid'] . ':|:' . $row['lineitem'] . ':|:' . substr($row['org'],6);
+        $ltiorg = $row['org'];
+    }
+
     if ($isGroup > 0) {
-      if ($isGroup == 3) {
-        $groupsetid = $assess_info->getSetting('groupsetid');
-        list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
-        if ($stugroupid == 0) {
+      $groupsetid = $assess_info->getSetting('groupsetid');
+      list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);
+      if ($stugroup == 0) {
+        if ($isGroup == 3) {
           // no group yet - can't do anything
           echo '{"error": "need_group"}';
           exit;
+        } else {
+          $current_members = false; // just create for user if no group yet
         }
+      } else {
+        $current_members = array_keys($current_members); // we just want the user IDs
+      }
+      $sourcedidarr = [];
+      if ($lineitemdata != '') {
+          $lineitemparts = explode(':|:', $lineitemdata);
+          $ph = Sanitize::generateQueryPlaceholders($current_members);
+          $query = "SELECT userid,ltiuserid FROM imas_ltiusers WHERE org=? AND userid IN ($ph)";
+          $stm->execute(array_merge([$ltiorg], $current_members));
+          while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+              $lineitemparts[1] = $row['ltiuserid'];
+              $sourcedidarr[$row['userid']] = implode(':|:', $lineitemparts);
+          }
       }
       // creating for group
-      $assess_record->createRecord($current_members, $stugroupid, false, '');
+      $assess_record->createRecord($current_members, $stugroupid, false, $sourcedidarr);
     } else { // not group
       // creating for self
-      $assess_record->createRecord(false, 0, false, '');
+      $assess_record->createRecord(false, 0, false, $lineitemdata);
     }
   } else {
     echo '{"error": "invalid_record"}';
     exit;
   }
+} else {
+    // retotal assess to make sure nothing's changed
+    $orig_gb_score = $assess_record->getGbScore()['gbscore'];
+    $assess_record->reTotalAssess();
+    $new_gb_score = $assess_record->getGbScore()['gbscore'];
+    if ($new_gb_score != $orig_gb_score) {
+        $assess_record->saveRecord();
+        $assess_record->updateLTIscore();
+    }
 }
 
 //fields to extract from assess info for inclusion in output
@@ -103,7 +157,7 @@ $include_from_assess_info = array(
   'name', 'submitby', 'enddate', 'can_use_latepass', 'hasexception',
   'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
   'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
-  'scoresingb', 'viewingb', 'latepass_blocked_by_practice'
+  'scoresingb', 'viewingb', 'latepass_blocked_by_practice', 'help_features'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -134,10 +188,13 @@ if ($isstudent) {
     ':type'=> $LPblockingView ? 'gbviewassess' : 'gbviewsafe', ':viewtime'=>$now));
 }
 
+// indicate whether teacher/tutor can see all the answers and such
+if ($isActualTeacher || $istutor) {
+    $assess_record->setTeacherInGb(true);
+}
 // indicate whether teacher/tutor can edit scores or not
 if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
-  $assess_record->setTeacherInGb(true);
   // get rubrics
   $assessInfoOut['rubrics'] = array();
   $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN
@@ -189,8 +246,16 @@ $assessInfoOut['lti_sourcedid'] = $assess_record->getLTIsourcedId();
 // generating answeights may have changed the record; save if needed
 $assess_record->saveRecordIfNeeded();
 
+// check to see if qerror
+if (isset($CFG['GEN']['qerrorsendto'][2])) {
+  $assessInfoOut['qerrortitle'] = $CFG['GEN']['qerrorsendto'][2] .' '._("to report problems");
+}
+
 //prep date display
 prepDateDisp($assessInfoOut);
+
+// whether to show full gb detail or just summary
+$assessInfoOut['viewfull'] = $viewfull;
 
 //output JSON object
 echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);

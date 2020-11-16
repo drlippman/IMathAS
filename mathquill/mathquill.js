@@ -1904,7 +1904,11 @@ var saneKeyboardEvents = (function() {
     		} else if (keyVal && keyVal !== 'Spacebar') {
     		  handleKey();
     		  usedkeydown = true;
-    		}
+    		} else if (which === 191 && !e.shiftKey) {
+              e.preventDefault(); // prevent FireFox quicksearch
+              e.which = 47; // what keypress expects for /
+              onKeypress(e);
+            }
       } else {
       	handleKey();
       }
@@ -2470,6 +2474,17 @@ Controller.open(function(_, super_) {
     var block = latexMathParser.skip(eof).or(all.result(false)).parse(latex);
 
     if (block && !block.isEmpty() && block.prepareInsertionAt(cursor)) {
+        // do autoparen if needed
+        var leftcmd = block.ends[L];
+        if (cursor.options.autoParenOperators && !(leftcmd instanceof Bracket) && !(leftcmd instanceof SupSub) &&   
+           ((cursor[L].isPartOfOperator && (cursor[L][1] === 0 || cursor[L].jQ.hasClass("mq-last"))) ||
+              ((cursor[L].hasOwnProperty("sup") || cursor[L].hasOwnProperty("sub")) &&
+                cursor[L][-1].isPartOfOperator
+              )
+           )
+        ) {
+            cursor.parent.write(cursor, '(');
+        }
       block.children().adopt(cursor.parent, cursor[L], cursor[R]);
       var jQ = block.jQize();
       jQ.insertBefore(cursor.jQ);
@@ -2939,14 +2954,26 @@ var MathCommand = P(MathElement, function(_, super_) {
         )
       ) {
         // check to make sure additional letter doesn't make a longer op name
-        var str = '', l = cursor[L];
-        while (l.isPartOfOperator && l[-1] !== 0 && !l.jQ.hasClass("mq-last")) {
+        var str = '', l = cursor[L], issubsup = false;
+        // if sub/sup, grab base operator
+        if ((cursor[L].hasOwnProperty("sup") || cursor[L].hasOwnProperty("sub")) &&
+            cursor[L][-1].isPartOfOperator
+        ) {
+            l = cursor[L][-1];
+            issubsup = true;
+        }
+        while (l.isPartOfOperator && !l.jQ.hasClass("mq-last")) {
           str = l.letter + str;
+          if (l[-1] === 0) { break; }
           l = l[L];
         }
-        str += cmd.letter;
-        if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str)) {
-          cursor.parent.write(cursor, '(');
+        if (cursor.options.autoParenOperators === true ||
+            cursor.options.autoParenOperators.hasOwnProperty(str)
+        ) {
+            str += cmd.letter;
+            if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str) || issubsup) {
+                cursor.parent.write(cursor, '(');
+            }
         }
       }
     }
@@ -4299,6 +4326,25 @@ optionProcessors.autoOperatorNames = function(cmds) {
   dict._maxLength = maxLength;
   return dict;
 };
+optionProcessors.autoParenOperators = function(cmds) {
+    if (cmds === true) {
+        return true;
+    }
+    if (!/^[a-z]+(?: [a-z]+)*$/i.test(cmds)) {
+        throw '"'+cmds+'" not a space-delimited list of only letters';
+    }
+    var list = cmds.split(' '), dict = {}, maxLength = 0;
+    for (var i = 0; i < list.length; i += 1) {
+        var cmd = list[i];
+        if (cmd.length < 2) {
+            throw '"'+cmd+'" not minimum length of 2';
+        }
+        dict[cmd] = 1;
+        maxLength = max(maxLength, cmd.length);
+    }
+    dict._maxLength = maxLength;
+    return dict;
+}
 var OperatorName = P(Symbol, function(_, super_) {
   _.init = function(fn) { this.ctrlSeq = fn; };
   _.createLeftOf = function(cursor) {
@@ -4836,7 +4882,8 @@ var SupSub = P(MathCommand, function(_, super_) {
       if (cursor[L] && !cursor[R] && !cursor.selection
           && this.parent[L] instanceof Variable
       ) {
-          if ((this.parent[L].isItalic !== false && this.parent[L].letter !== 'e'
+          if ((this.parent[L].isItalic !== false && this.parent[L].letter !== 'e' 
+            && !cursor[L].isPartOfOperator
             && cursor.options.charsThatBreakOutOfSupSubVar.indexOf(ch) > -1)
             || (this.parent[L].isPartOfOperator
             && cursor.options.charsThatBreakOutOfSupSubOp.indexOf(ch) > -1)

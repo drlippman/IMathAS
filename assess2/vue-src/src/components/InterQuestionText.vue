@@ -1,5 +1,5 @@
 <template>
-  <div v-show="expanded" v-html="textobj.html" ref="main" />
+  <div v-if="rendered" v-show="expanded" v-html="textobj.html" ref="main" />
 
 </template>
 
@@ -21,6 +21,7 @@
 </div>
 */
 // import Icons from '@/components/widgets/Icons.vue';
+import { pauseVideos } from '@/components/pauseVideos';
 
 export default {
   name: 'InterQuestionText',
@@ -37,9 +38,12 @@ export default {
   methods: {
     renderMath () {
       this.rendered = true;
-      setTimeout(window.drawPics, 100);
-      window.initlinkmarkup(this.$refs.main);
-      window.rendermathnode(this.$refs.main);
+      this.$nextTick(() => {
+        setTimeout(window.drawPics, 100);
+        window.initlinkmarkup(this.$refs.main);
+        window.initSageCell(this.$refs.main);
+        window.rendermathnode(this.$refs.main);
+      });
     }
   },
   updated () {
@@ -57,6 +61,9 @@ export default {
     active: function (newVal, oldVal) {
       if (this.active && this.expanded && !this.rendered) {
         this.renderMath();
+      }
+      if (newVal === false) {
+        pauseVideos(this.$refs.main);
       }
     }
   }

@@ -25,9 +25,12 @@ if (!isset($_GET['page']) || $_GET['page']=='') {
 	$page = Sanitize::onlyInt($_GET['page']);
 }
 
-$stm = $DBH->prepare("SELECT name,postby,replyby,settings,groupsetid,sortby,taglist,enddate,avail,description,postinstr,replyinstr,allowlate,autoscore, courseid FROM imas_forums WHERE id=:id");
+$query = "SELECT f.name,f.postby,f.replyby,f.settings,f.groupsetid,igs.name AS igsname,f.sortby,
+    f.taglist,f.enddate,f.avail,f.description,f.postinstr,f.replyinstr,f.allowlate,f.autoscore,f.courseid 
+    FROM imas_forums AS f LEFT JOIN imas_stugroupset AS igs ON igs.id=f.groupsetid WHERE f.id=:id";
+$stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$forumid));
-list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $description, $postinstr,$replyinstr, $allowlate, $autoscore, $forumcourseid) = $stm->fetch(PDO::FETCH_NUM);
+list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $groupsetname, $sortby, $taglist, $enddate, $avail, $description, $postinstr,$replyinstr, $allowlate, $autoscore, $forumcourseid) = $stm->fetch(PDO::FETCH_NUM);
 
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";
@@ -194,6 +197,7 @@ $now = time();
 
 $grpqs = '';
 if ($groupsetid>0) {
+    $isSectionGroups = ($groupsetname == '##autobysection##');
 	if (isset($_GET['ffilter'])) {
 		$_SESSION['ffilter'.$forumid] = $_GET['ffilter'];
 	}
@@ -212,7 +216,7 @@ if ($groupsetid>0) {
 		if (isset($_SESSION['ffilter'.$forumid]) && $_SESSION['ffilter'.$forumid]>-1) {
 			$groupid = $_SESSION['ffilter'.$forumid];
 			$dofilter = true;
-			$grpqs = "&grp=$groupid";
+			$grpqs = "&grp=" . intval($groupid);
 		} else {
 			$groupid = 0;
 		}
@@ -274,7 +278,10 @@ if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
 
 if (isset($_GET['search']) && trim($_GET['search'])!='') {
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=".Sanitize::courseId($cid)."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    echo "<div class=breadcrumb>";
+    if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+		echo "$breadcrumbbase  <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+	}
 	echo "<a href=\"thread.php?page=".Sanitize::onlyInt($page)."&cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($forumid)."\">Forum Topics</a> &gt; Search Results</div>\n";
 
 	echo "<h1>Forum Search Results</h1>";
@@ -372,15 +379,19 @@ if (isset($_GET['markallread'])) {
 
 
 $pagetitle = "Threads";
-$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/thread.js?v=050220\"></script>";
+$placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/forums.css\"); td.pointer:hover {text-decoration: underline;}\n</style>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
 $placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
 require("../header.php");
 
 
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Forum Topics</div>\n";
+if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    echo _('Forum Topics').'</div>';
+}
 echo '<div id="headerthread" class="pagetitle"><h1>Forum: '.Sanitize::encodeStringForDisplay($forumname).'</h1></div>';
 
 if ($duedates!='') {
@@ -527,7 +538,9 @@ echo "<input type=hidden name=forum value=\"$forumid\"/>";
 
 ?>
 <label for="search">Search</label>: <input type=text name="search" id="search" />
+<?php if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) { ?>
 <input type=checkbox name="allforums" id="allforums" /> <label for="allforums">All forums in course?</label>
+<?php } ?>
 <input type="submit" value="Search"/>
 </form>
 <?php
@@ -538,8 +551,7 @@ if ($isteacher && $groupsetid>0) {
 		$curfilter = -1;
 	}
 
-	$groupnames = array();
-	$groupnames[0] = "Non-group-specific";
+    $groupnames = array();
 	$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY id");
 	$stm->execute(array(':groupsetid'=>$groupsetid));
 	$grpnums = 1;
@@ -550,18 +562,25 @@ if ($isteacher && $groupsetid>0) {
 		}
 		$groupnames[$row[0]] = $row[1];
 	}
-	natsort($groupnames);
-	$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid ORDER BY id");
-	$stm->execute(array(':groupsetid'=>$groupsetid));
+    natsort($groupnames);
+    $groupnames = [0=>$isSectionGroups ?  _("Non-section-specific") : _("Non-group-specific")] + $groupnames;
 	/*echo "<script type=\"text/javascript\">";
 	echo 'function chgfilter() {';
 	echo '  var ffilter = document.getElementById("ffilter").value;';
 	echo "  window.location = \"thread.php?page=$pages&cid=$cid&forum=$forumid&ffilter=\"+ffilter;";
 	echo '}';
 	echo '</script>';*/
-	echo '<p><label for="ffilter">Show posts for group</label>: <select id="ffilter" onChange="chgfilter()"><option value="-1" ';
+    echo '<p><label for="ffilter">';
+    if ($isSectionGroups) {
+        echo _('Showing posts for section');
+    } else {
+        echo _('Showing posts for group');
+    }
+    echo '</label>: <select id="ffilter" onChange="chgfilter()"><option value="-1" ';
 	if ($curfilter==-1) { echo 'selected="1"';}
-	echo '>All groups</option>';
+    echo '>';
+    echo $isSectionGroups ? _('All Sections') : _('All Groups');
+    echo '</option>';
 	foreach ($groupnames as $gid=>$gname) {
 		echo "<option value=\"$gid\" ";
 		if ($curfilter==$gid) { echo 'selected="1"';}
@@ -569,8 +588,16 @@ if ($isteacher && $groupsetid>0) {
 	}
 	echo '</select></p>';
 } else if ($groupsetid>0 && $groupid>0) {
-	echo '<p><b>'._('Showing posts for group: ').Sanitize::encodeStringForDisplay($groupname).'</b> ';
-	echo '<a class="small" href="#" onclick="basicahah(\'../course/showstugroup.php?cid='.$cid.'&gid='.Sanitize::onlyInt($groupid).'\',\'grouplistout\');$(this).hide();return false;">['._('Show group members').']</a> <span id="grouplistout"></span>';
+    echo '<p><b>';
+    if ($isSectionGroups) {
+        echo _('Showing posts for section');
+    } else {
+        echo _('Showing posts for group');
+    }
+    echo ': '.Sanitize::encodeStringForDisplay($groupname).'</b> ';
+    if (!$isSectionGroups) {
+        echo '<a class="small" href="#" onclick="basicahah(\'../course/showstugroup.php?cid='.$cid.'&gid='.Sanitize::onlyInt($groupid).'\',\'grouplistout\');$(this).hide();return false;">['._('Show group members').']</a> <span id="grouplistout"></span>';
+    }
 	echo '</p>';
 }
 echo '<p>';
@@ -627,7 +654,11 @@ echo "</p>";
 		<tr><th>Topic</th><th>Started By</th>
 			<?php
 			if ($isteacher && $groupsetid>0 && !$dofilter) {
-				echo '<th>Group</th>';
+                if ($isSectionGroups) {
+                    echo '<th>Section</th>';
+                } else {
+                    echo '<th>Group</th>';
+                }
 			}
 			?>
 			<th>Replies</th><th>Views (Unique)</th><th>Last Post</th></tr>
@@ -702,28 +733,28 @@ echo "</p>";
 				echo "><td>";
 				echo "<span class=\"right\">\n";
 				if ($line['lastposttime']>$now) {
-					echo "<img class=mida src=\"$imasroot/img/time.png\" alt=\"Scheduled\" title=\"Scheduled for later release\" /> ";
+					echo "<img class=mida src=\"$staticroot/img/time.png\" alt=\"Scheduled\" title=\"Scheduled for later release\" /> ";
 				}
 				if ($line['tag']!='') { //category tags
 					echo '<span class="forumcattag">'.Sanitize::encodeStringForDisplay($line['tag']).'</span> ';
 				}
 
 				if (isset($flags[$line['id']])) {
-					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
+					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id']) . ");return false;\" alt=\"Flagged\" />";
 				} else {
-					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
+					echo "<img class=\"pointer\" id=\"tag". Sanitize::onlyInt($line['id'])."\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggletagged(". Sanitize::onlyInt($line['id'])  . ");return false;\" alt=\"Not flagged\"/>";
 				}
 				if ($isteacher) {
 					if ($line['posttype']==2) {
-						echo "<img class=mida src=\"$imasroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
+						echo "<img class=mida src=\"$staticroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
 					} else if ($line['posttype']==3) {
-						echo "<img class=mida src=\"$imasroot/img/noview.png\" alt=\"No View\" title=\"Students can only see their own replies\" /> ";
+						echo "<img class=mida src=\"$staticroot/img/noview.png\" alt=\"No View\" title=\"Students can only see their own replies\" /> ";
 					}
 				}
 				if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby) || ($allowdel && $line['userid']==$userid && $posts==0)) {
 					echo '<span class="dropdown">';
 					echo '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.Sanitize::onlyInt($line['id']).'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-					echo ' <img src="../img/gears.png" class="mida" alt="Options"/>';
+					echo ' <img src="'.$staticroot.'/img/gears.png" class="mida" alt="Options"/>';
 					echo '</a>';
 					echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu'.Sanitize::onlyInt($line['id']).'">';
 
@@ -747,7 +778,7 @@ echo "</p>";
 				if ($line['lastposttime']>$now) {
 					echo '<i class="grey">';
 				}
-				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . Sanitize::encodeUrlParam($grpqs) .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
+				echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread=" .Sanitize::onlyInt($line['id']). "&page=". Sanitize::onlyInt($page) . $grpqs .'">'. Sanitize::encodeStringForDisplay($line['subject']) ."</a></td>";
 				if ($line['lastposttime']>$now) {
 					echo '</i>';
 				}

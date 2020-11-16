@@ -132,6 +132,8 @@ function mathjs(st,varlist) {
   //temp store of scientific notation
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
 
+  st = st.replace(/\*?\s*degrees?/g,"*((pi)/180)");
+
   //convert named constants
   st = st.replace(/e/g, "(E)");
 

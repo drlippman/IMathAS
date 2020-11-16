@@ -116,6 +116,14 @@ div.itemhdrdd, div.itemhdrright {
 	top:0px;
 }
 
+.inlinelist {
+	padding: 1em;
+	margin: 1em;
+}
+.inlinelist li {
+	display: inline-block;
+}
+
 @media only screen and (min-width: 1005px) {
 	/* put dropdown next to item when wide*/
 	.notfw .itemhdr .title {
@@ -145,7 +153,7 @@ div.block.grouptoggle {
 div.block.grouptoggle + div.blockitems {
 	margin-top: 0px
 }
-.hidden {
+.hidden,.pseudohidden {
 	display:none;
 }
 .showinmobile {
@@ -238,8 +246,17 @@ tr {
 	margin: 0px;
 	padding: 0px;
 }
-
-td.c, input.c {
+th[aria-sort] > *:last-child:after {
+	color: #666;
+    padding-left: 2px;
+}
+th[aria-sort="ascending"] > *:last-child:after {
+	content: "\2191";
+}
+th[aria-sort="descending"] > *:last-child:after {
+	content: "\2193";
+}
+td.c, th.c, input.c {
 	text-align: center;
 }
 td.r {
@@ -340,6 +357,19 @@ span.left {
 	height: 1px;
 	overflow: hidden;
 	color: transparent;
+}
+.empty-state, ul:empty {
+    display: none;
+}
+ul:empty + .empty-state {
+    display: block;
+}
+#skipnav:focus, #skipnav:active {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    color: #000;
 }
 
 br.form {
@@ -910,6 +940,12 @@ button.plain:hover, button.plain:active {
 	border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
 }
+@media (min-height: 2000px) {
+	.dialog {
+		position: absolute;
+		top: 5em;
+	}
+}
 .dialog button.slim {
   margin-right: -12px;
   margin-top: -3px;
@@ -980,9 +1016,11 @@ a.attach {
     padding-left: 20px;
 }
 a[target=_blank]::after {
-	content: "";
+    content: "Opens Externally";
+    color: transparent;
 	width:16px;
-	height:1em;
+    height:1em;
+    overflow: hidden;
 	display: inline-block;
 	background: url(img/extlink.png) center right no-repeat;
 }
@@ -1049,6 +1087,7 @@ pre {
 .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}
 .fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
 .video-wrapper-wrapper{width:100%;padding:0;}
+iframe.scaleresponsive { transform-origin: 0 0; }
 
 .vidmute { background: url(img/vidicons.png) no-repeat 0px 0px; width:24px; height:20px; display: inline-block;}
 .vidmute:hover { background: url(img/vidicons.png) no-repeat -24px 0px; width:24px; height:20px; display: inline-block;}
@@ -1165,6 +1204,12 @@ a.dropdown-toggle.arrow-down:hover {
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
           box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
+.dropdown-ul {
+  padding: 5px 0;
+  margin: 2px 0 0;
+  list-style: none;
+  background-color: #fff;
+}
 .dropdown-menu.pull-right {
   right: 0;
   left: auto;
@@ -1175,34 +1220,34 @@ a.dropdown-toggle.arrow-down:hover {
   overflow: hidden;
   background-color: #e5e5e5;
 }
-.dropdown-menu > li > a, .dropdown-menu > li > span {
+.dropdown-menu  li > a, .dropdown-menu > li > span {
   display: block;
   padding: 3px 20px;
   clear: both;
   font-weight: normal;
   line-height: 1.42857143;
-  color: #000;
+  color: #000 !important;
   white-space: nowrap;
 }
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
+.dropdown-menu  li > a:hover,
+.dropdown-menu  li > a:focus {
   color: #000;
   text-decoration: none;
   background-color: #f5f5f5;
 }
-.dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
+.dropdown-menu  .active > a,
+.dropdown-menu  .active > a:hover,
+.dropdown-menu  .active > a:focus {
   text-decoration: none;
   background-color: #ddddff;
 }
-.dropdown-menu > .disabled > a,
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu  .disabled > a,
+.dropdown-menu  .disabled > a:hover,
+.dropdown-menu  .disabled > a:focus {
   color: #777;
 }
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu  .disabled > a:hover,
+.dropdown-menu  .disabled > a:focus {
   text-decoration: none;
   cursor: not-allowed;
   background-color: transparent;
@@ -1268,13 +1313,18 @@ a.dropdown-toggle.arrow-down:hover {
   }
 }
 
-.arrow-down::after {
-	content: "\25bc";
+.arrow-down::after, .arrow-up::after {
 	padding-left: 0.2em;
 	font-size:70%;
 	position:relative;
 	top:-.2em;
 	text-decoration: none;
+}
+.arrow-down::after {
+    content: "\25bc";
+}
+.arrow-up::after {
+    content: "\25b2";
 }
 
 .filealt {
@@ -1331,4 +1381,16 @@ a.dropdown-toggle.arrow-down:hover {
 .fw1920 div#headercontent, .fw1920 div#navlistcont,.fw1920 .footerwrapper, .fw1920 .midwrapper {
 	max-width: 1920px;
 	margin: auto;
+}
+
+[tabindex="-1"] { outline: none }
+
+.embedwrap {
+    overflow: visible;
+    position: relative;
+}
+.embedwrap > iframe {
+    position: absolute;
+    border: none;
+    width: 100%;
 }

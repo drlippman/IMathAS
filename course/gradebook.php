@@ -131,11 +131,16 @@ if ($canviewall && !empty($_GET['stu'])) {
 }
 
 if (!empty($CFG['assess2-use-vue-dev'])) {
-	$assessGbUrl = "http://localhost:8080/gbviewassess.html";
-	$assessUrl = "http://localhost:8080/";
+	$assessGbUrl = sprintf("%s/gbviewassess.html", $CFG['assess2-use-vue-dev-address']);
+	$assessUrl = $CFG['assess2-use-vue-dev-address'] . '/';
 } else {
 	$assessGbUrl = "../assess2/gbviewassess.php";
 	$assessUrl = "../assess2/";
+}
+
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 }
 
 //HANDLE ANY POSTS
@@ -175,8 +180,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Unenroll Students');
 		include("unenroll.php");
 		include("../footer.php");
@@ -184,8 +188,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Lock Students');
 		include("lockstu.php");
 		include("../footer.php");
@@ -275,8 +278,24 @@ var gbmod = {
 	"pts": '.Sanitize::onlyInt($showpercents).',
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
+$placeinhead .= '<style>
+ dl.inlinedl dt,dl.inlinedl dd {
+	 display: inline; margin: 0;
+ }
+ dl.inlinedl dt {
+	font-weight: bold;
+ }
+ ul.inlineul {
+	 display: inline; list-style: none; padding: 0px;
+ }
+ ul.inlineul li {
+	 display: inline;
+ }
+ ul.inlineul li::after { content: ", "; }
+ ul.inlineul li:last-child::after { content: ""; }
+ </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=041120"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=052320"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -286,7 +305,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$includeduedate = true;
 	}
 	$pagetitle = _('Gradebook');
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=051820\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type,uid) {
 			if (type=="all") {
@@ -304,14 +323,17 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 	require("../header.php");
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt ", _('Student Grade Detail'), "</div>\n";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt ", _('Student Grade Detail'), "</div>\n";
 	} else if ($isteacher || $istutor) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
 	} else {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; ", _('Gradebook'), "</div>";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo _('Gradebook'), "</div>";
 	}
 	if ($stu==-1) {
 		echo '<div id="headergradebook" class="pagetitle"><h1>', _('Grade Book Averages'), ' </h1></div>';
@@ -357,13 +379,24 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo "</div>";
 	}
 	gbstudisp($stu);
-	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>x</sup> Excused score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
+	echo "<div>", _('Meanings:'), ' <ul class="inlineul">';
+	echo '<li>'._('IP-In Progress (some unattempted questions)').'</li>';
+	echo '<li>'._('UA-Unsubmitted attempt').'</li>';
+	echo '<li>'._('OT-overtime').'</li>';
+	echo '<li>'._('PT-practice test').'</li>';
+	echo '<li>'._('EC-extra credit').'</li>';
+	echo '<li>'._('NC-no credit').'</li>';
+	echo '<li>'._('<sub>d</sub> Dropped score').'</li>';
+	echo '<li>'._('<sup>x</sup> Excused score').'</li>';
+	echo '<li>'._('<sup>e</sup> Has exception').'</li>';
+	echo '<li>'._('<sup>LP</sup> Used latepass').'</li>';
+	echo '</ul></div>';
 
 	require("../footer.php");
 
 } else { //show instructor view
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=103118\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablescroller2.js?v=052320\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
@@ -389,8 +422,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; ", _('Gradebook'), "</div>";
+    echo "<div class=breadcrumb>";
+    echo $curBreadcrumb;
+    echo _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 
 	echo '<div id="headergradebook" class="pagetitle"><h1>', _('Gradebook'), ' <span class="noticetext" id="newflag" style="font-size: 70%" >';
@@ -421,8 +455,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$togglehtml .= '<li><a data-pts="1">'._('Percents').'</a></li>';
 
 	$togglehtml .= '<li class="dropdown-header">'. _('Links'). '</li>';
-	$togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
-	$togglehtml .= '<li><a data-links="1">'. _('Scores'). '</a></li>';
+    $togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
+    if ($courseUIver>1) {
+        $togglehtml .= '<li><a data-links="1">'. _('Summary'). '</a></li>';
+    } else {
+        $togglehtml .= '<li><a data-links="1">'. _('Scores'). '</a></li>';
+    }
 
 	$togglehtml .= '<li class="dropdown-header">'. _('Pics'). '</li>';
 	$togglehtml .= '<li><a data-pics="0">'. _('None'). '</a></li>';
@@ -515,7 +553,13 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$("a[data-pics='.Sanitize::onlyInt($showpics).']").parent().addClass("active");
 		$("a[data-newflag='.(($coursenewflag&1)==1?1:0).']").parent().addClass("active");
 		$("a[data-pgw='.(empty($_COOKIE["gbfullw-$cid"])?0:1).']").parent().addClass("active");
-		$(setupGBpercents);
+		setupGBpercents();';
+		if ($isteacher && $colorize != '0' && $colorize != null) {
+			echo '$("#myTable").hide();';
+			echo 'updateColors(document.getElementById("colorsel"));';
+			echo '$("#myTable").show();';
+		}
+		echo 'ts.init();
 	});
 	</script>';
 
@@ -574,7 +618,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 function gbstudisp($stu) {
 	global $DBH,$CFG,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	global $includeduedate, $includelastchange,$latepasshrs,$latepasses,$hidelocked,$exceptionfuncs;
-	global $assessGbUrl, $assessUrl;
+	global $assessGbUrl, $assessUrl,$staticroot;
 
 	if ($availshow==4) {
 		$availshow=1;
@@ -658,7 +702,7 @@ function gbstudisp($stu) {
 			}
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
-			echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif" alt="Updating..."/>';
+			echo '<img id="updatingicon" style="display:none" src="'.$staticroot.'/img/updating.gif" alt="Updating..."/>';
 			echo ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 		} else {
 			echo Sanitize::encodeStringForDisplay($gbt[1][0][0]) . ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
@@ -797,7 +841,7 @@ function gbstudisp($stu) {
 					echo '<td></td>';
 				}
 			}
-			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'">';
+			echo '<td class="cat'.Sanitize::onlyInt(($gbt[0][1][$i][1]%10)).'" scope="row">';
 
 			$showlink = false;
 			if ($gbt[0][1][$i][6]==0 && $gbt[0][1][$i][3]==1 && $gbt[1][1][$i][13]==1 && !$isteacher && !$istutor) {
@@ -1268,22 +1312,22 @@ function gbstudisp($stu) {
 
 		}
 		echo '</tbody></table><br/>';
-		echo '<p>';
+		echo '<dl class="inlinedl">';
 		$outcometype = 0;
 		if (($show&1)==1) {
-			echo _('<b>Past Due</b> total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '<br/>';
+			echo _('<dt>Past Due:</dt> <dd>total only includes items whose due date has passed.  Current assignments are not counted in this total.'), '</dd><br/>';
 		}
 		if (($show&2)==2) {
-			echo _('<b>Past Due and Attempted</b> total includes items whose due date has passed, as well as currently available items you have started working on.'), '<br/>';
+			echo _('<dt>Past Due and Attempted:</dt> <dd> total includes items whose due date has passed, as well as currently available items you have started working on.'), '</dd><br/>';
 			$outcometype = 1;
 		}
 		if (($show&4)==4) {
-			echo _('<b>Past Due and Available</b> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
+			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '</dd><br/>';
 		}
 		if (($show&8)==8) {
-			echo _('<b>All</b> total includes all items: past, current, and future to-be-done items.');
+			echo _('<dt>All:</dt> <dd> total includes all items: past, current, and future to-be-done items.'), '</dd><br/>';
 		}
-		echo '</p>';
+		echo '</dl>';
 		if ($hasoutcomes) {
 			echo '<p>';
 			echo '<a href="outcomereport.php?' . Sanitize::generateQueryStringFromMap(array('stu' => $stu,
@@ -1501,6 +1545,7 @@ function gbinstrdisp() {
 	echo "<div id=\"tbl-container\">";
 	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
 
+	//echo '<div id="gbloading">'._('Loading...').'</div>';
 	echo '<table class="gb" id="myTable"><thead><tr>';
 
 	$sortarr = array();
@@ -1912,10 +1957,6 @@ function gbinstrdisp() {
 			echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 		}
 	}
-	if ($colorize != '0') {
-		echo '<script type="text/javascript">addLoadEvent( function() {updateColors(document.getElementById("colorsel"));} );</script>';
-	}
-
 
 }
 

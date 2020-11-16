@@ -49,10 +49,14 @@ function check_for_required($method, $required) {
 }
 
 function prepDateDisp(&$out) {
-  $tochg = ['starddate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto'];
+  $tochg = ['startdate', 'enddate', 'original_enddate', 'timelimit_expires', 'timelimit_grace', 'latepass_extendto'];
   foreach ($tochg as $key) {
     if (isset($out[$key])) {
-      $out[$key . '_disp'] = tzdate("D n/j/y, g:i a", $out[$key]);
+      if ($out[$key] == 2000000000) {
+        $out[$key . '_disp'] = _('None');
+      } else {
+        $out[$key . '_disp'] = tzdate("D n/j/y, g:i a", $out[$key]);
+      }
     }
   }
 }
@@ -65,7 +69,9 @@ if (!empty($_POST['practice']) && $_POST['practice'] === 'false') {
 
 if ($_SERVER['HTTP_HOST'] == 'localhost') {
   //to help with development, while vue runs on 8080
-  header('Access-Control-Allow-Origin: http://localhost:8080');
+  if (!empty($CFG['assess2-use-vue-dev'])) {
+    header('Access-Control-Allow-Origin: '. $CFG['assess2-use-vue-dev-address']);
+  }
   header("Access-Control-Allow-Credentials: true");
   header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
   header("Access-Control-Allow-Headers: Origin");

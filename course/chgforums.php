@@ -210,15 +210,7 @@ $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$forumitems[$row[0]] = $row[1];
 }
-$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
-$stm->execute(array(':courseid'=>$cid));
-$i=0;
-$page_groupSelect = array();
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$page_groupSelect['val'][$i] = $row[0];
-	$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
-	$i++;
-}
+
 $stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 $stm->execute(array(':courseid'=>$cid));
 $page_gbcatSelect = array();
@@ -262,7 +254,7 @@ $page_allowlateonSelect['val'][2] = 3;
 $page_allowlateonSelect['label'][2] = "Replies only";
 
 //HTML output
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css">
 table td {
 	border-bottom: 1px solid #ccf;
@@ -343,7 +335,7 @@ foreach($forumitems as $id=>$name) {
 	<input type=radio name="postby" value="Date" />Before:
 	<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
 	<a href="#" onClick="displayDatePicker('postbydate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></A>
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 	at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
 
 	</td>
@@ -358,7 +350,7 @@ foreach($forumitems as $id=>$name) {
 	<input type=radio name="replyby" value="Date" />Before:
 	<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>">
 	<a href="#" onClick="displayDatePicker('replybydate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></A>
+	<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 	at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 
 	</td>

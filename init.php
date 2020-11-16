@@ -2,13 +2,15 @@
 
 require_once(__DIR__ . "/includes/sanitize.php");
 
+if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+    $urlmode = 'https://';
+} else {
+    $urlmode = 'http://';
+}
+
 // Load site config.
 if (!file_exists(__DIR__ . "/config.php")) {
-	// Can't use $basesiteurl here, as it's defined in config.php.
-	$httpMode = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
-	|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-		? 'https://' : 'http://';
-	header('Location: ' . Sanitize::url($httpMode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php?r=" . Sanitize::randomQueryStringParam()));
+	header('Location: ' . Sanitize::url($urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php?r=" . Sanitize::randomQueryStringParam()));
 }
 
 require_once(__DIR__ . "/config.php");
@@ -48,20 +50,25 @@ function disallowsSameSiteNone () {
 if (isset($sessionpath)) { session_save_path($sessionpath);}
 ini_set('session.gc_maxlifetime',432000);
 ini_set('auto_detect_line_endings',true);
-$hostparts = explode('.',Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
-if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
+$hostdomain = explode(':', Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']));
+$hostparts = explode('.', $hostdomain[0]);
+if ((!function_exists('isDevEnvironment') || !isDevEnvironment())
+    && $hostdomain[0] != 'localhost'
+    && !is_numeric($hostparts[count($hostparts)-1])
+) {
 	$sess_cookie_domain = '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2));
 	if (disallowsSameSiteNone()) {
-		session_set_cookie_params(0, '/', $sess_cookie_domain);
+		session_set_cookie_params(0, '/', $sess_cookie_domain, false, true);
 	} else if (PHP_VERSION_ID < 70300) {
 		// hack to add samesite
-		session_set_cookie_params(0, '/; samesite=none', $sess_cookie_domain, true);
+		session_set_cookie_params(0, '/; samesite=none', $sess_cookie_domain, true, true);
   } else {
 		session_set_cookie_params(array(
 			'lifetime' => 0,
 			'path' => '/',
 			'domain' => $sess_cookie_domain,
-			'secure' => true,
+            'secure' => true,
+            'httponly' => true,
 			'samesite'=>'None'
 		));
   }
@@ -114,6 +121,8 @@ if (!isset($use_local_sessions)) {
   }
 }
 
+$staticroot = $imasroot;
+
 // Load validate.php?
 if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init_skip_validate)) {
 	require_once(__DIR__ . "/validate.php");
@@ -124,6 +133,9 @@ if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init
 	}
 } else if (!empty($init_session_start)) {
 	session_start();
+}
+if (isset($CFG['static_server']) && !empty($_SESSION['static_ok'])) {
+    $staticroot = $CFG['static_server'];
 }
 /*
 if (isset($_SESSION['ratelimiter']) && isset($CFG['GEN']['ratelimit']) &&

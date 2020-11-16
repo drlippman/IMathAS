@@ -180,7 +180,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$forumtype = Sanitize::onlyInt($_POST['forumtype']);
 		}
-		$forumid = Sanitize::onlyInt($_GET['id']);
+        $forumid = Sanitize::onlyInt($_GET['id']);
+        
+        // handle groupsetid
+        if ($_POST['groupsetid'] === 'bysec') {
+            // want to use by-section groups.  Create
+            require_once('../includes/setSectionGroups.php');
+            $groupsetid = createSectionGroupset($cid);
+        }
 
 		if (!empty($forumid)) {  //already have id; update
 			$stm = $DBH->prepare("SELECT groupsetid FROM imas_forums WHERE id=:id");
@@ -392,26 +399,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$postbytime = $deftime;
 		}
 
-		/*
-		$query = "SELECT id,name FROM imas_assessments WHERE isgroup>0 AND courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$i=0;
-		$page_groupSelect = array();
-		while ($row = mysql_fetch_row($result)) {
-			$page_groupSelect['val'][$i] = $row[0];
-			$page_groupSelect['label'][$i] = "Use groups of $row[1]";
-			$i++;
-		}
-		*/
+        $sectionGroup = 0;
 		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
 		$stm->execute(array(':courseid'=>$cid));
 		$i=0;
 		$page_groupSelect = array();
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            if ($row[1] == '##autobysection##') {
+                $sectionGroup = $row[0];
+                continue;
+            }
 			$page_groupSelect['val'][$i] = $row[0];
 			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 			$i++;
-		}
+        }
+        $page_groupSelect['val'][] = $sectionGroup > 0 ? $sectionGroup : 'bysec';
+        $page_groupSelect['label'][] = _('Use Course Sections');
+
 		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$page_gbcatSelect = array();
@@ -423,8 +427,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
-		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid=:ownerid OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':ownerid'=>$userid, ':groupid'=>$gropuid));
+		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -488,7 +492,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
- $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+ $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
  $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { if (v) {$("#gbdetail").slideDown();} else {$("#gbdetail").slideUp();} }</script>';
  require("../header.php");
 
@@ -499,7 +503,7 @@ if ($overwriteBody==1) {
 ?>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
+	<div id="headeraddforum" class="pagetitle"><h1><?php echo $pagetitle ?><img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h1></div>
 
 	<form method=post action="addforum.php<?php echo $page_formActionTag ?>">
 		<span class=form>Forum Name: </span>
@@ -528,7 +532,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?>/>
 			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
 
@@ -539,14 +543,14 @@ if ($overwriteBody==1) {
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
 			<input type=text size=10 name=edate value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
 		</div>
 
 		<div><a href="#" onclick="groupToggleAll(1);return false;">Expand All</a>
 		<a href="#" onclick="groupToggleAll(0);return false;">Collapse All</a></div>
-		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
 			Basic Options
 		</div>
 		<div class="blockitems">
@@ -590,7 +594,7 @@ if ($overwriteBody==1) {
 		</span><br class="form" />
 
 		</div>
-		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
 			Display Options
 		</div>
 		<div class="blockitems">
@@ -633,7 +637,7 @@ if ($overwriteBody==1) {
 
 		</div>
 
-		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
 			Posting and Reply Instructions
 		</div>
 		<div class="blockitems">
@@ -649,7 +653,7 @@ if ($overwriteBody==1) {
 		</div>
 		</div>
 
-		<div class="block grouptoggle"><img class=mida src="../img/expand.gif" alt="expand-collapse">
+		<div class="block grouptoggle"><img class=mida src="<?php echo $staticroot;?>/img/expand.gif" alt="expand-collapse">
 			Grading and Access Control
 		</div>
 		<div class="blockitems">
@@ -659,7 +663,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before:
 			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
 			<a href="#" onClick="displayDatePicker('postbydate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
 		</span><br class="form"/>
 
@@ -670,7 +674,7 @@ if ($overwriteBody==1) {
 			<input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before:
 			<input type=text size=10 name="replybydate" value="<?php echo Sanitize::encodeStringForDisplay($replybydate);?>">
 			<a href="#" onClick="displayDatePicker('replybydate', this, 'sdate', 'start date'); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></A>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=replybytime value="<?php echo Sanitize::encodeStringForDisplay($replybytime);?>">
 		</span><br class="form" />
 		<span class=form>Allow use of LatePasses?: </span>

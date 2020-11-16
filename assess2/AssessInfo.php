@@ -208,9 +208,10 @@ class AssessInfo
   *                      Default 'all'.
   * @param boolean $get_code  set True to load the question code and other fields
   *                           from imas_questionset.  Gets stored in $questionSetData
+  * @param boolean $get_cats  whether to load question category info (def true)
   * @return void
   */
-  public function loadQuestionSettings($qids = 'all', $get_code = false) {
+  public function loadQuestionSettings($qids = 'all', $get_code = false, $get_cats = true) {
     if (is_array($qids)) {
       $ph = Sanitize::generateQueryPlaceholders($qids);
       $stm = $this->DBH->prepare("SELECT * FROM imas_questions WHERE id IN ($ph)");
@@ -223,21 +224,28 @@ class AssessInfo
     $tolookupAids = array();
     $tolookupOutcomes = array();
     while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
+      if (!$get_cats) {
+        unset($qrow['category']);
+      }
       $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
       $qsids[] = $qrow['questionsetid'];
-      $category = &$this->questionData[$qrow['id']]['category'];
-      if ($category === '') {
-        // do nothing
-      } else if (is_numeric($category)) {
-        if (intval($category) === 0) {
-          $category = $this->assessData['defoutcome'];
+      if ($get_cats) {
+        $this->questionData[$qrow['id']]['origcategory'] = $this->questionData[$qrow['id']]['category'];
+        $category = &$this->questionData[$qrow['id']]['category'];
+
+        if ($category === '') {
+            // do nothing
+        } else if (is_numeric($category)) {
+            if (intval($category) === 0) {
+            $category = $this->assessData['defoutcome'];
+            }
+            $tolookupOutcomes[$qrow['id']] = $category;
+        } else if (0==strncmp($category,"AID-",4)) {
+            $tolookupAids[$qrow['id']] = substr($category, 4);
         }
-        $tolookupOutcomes[$qrow['id']] = $category;
-      } else if (0==strncmp($category,"AID-",4)) {
-        $tolookupAids[$qrow['id']] = substr($category, 4);
       }
     }
-    if (count($tolookupAids) > 0) {
+    if (count($tolookupAids) > 0 && $get_cats) {
       $uniqAids = array_values(array_unique($tolookupAids));
       $ph = Sanitize::generateQueryPlaceholders($uniqAids);
       $stm = $this->DBH->prepare("SELECT id,name FROM imas_assessments WHERE id IN ($ph) AND courseid=?");
@@ -251,7 +259,7 @@ class AssessInfo
         $this->questionData[$qid]['category'] = $aidmap[$aid];
       }
     }
-    if (count($tolookupOutcomes) > 0) {
+    if (count($tolookupOutcomes) > 0 && $get_cats) {
       $uniqOutcomes = array_values(array_unique($tolookupOutcomes));
       $ph = Sanitize::generateQueryPlaceholders($uniqOutcomes);
       $stm = $this->DBH->prepare("SELECT id,name FROM imas_outcomes WHERE id IN ($ph) AND courseid=?");
@@ -291,6 +299,9 @@ class AssessInfo
   public function extractSettings($keys) {
     $out = array();
     foreach ($keys as $key) {
+      if ($key == 'interquestion_text' && !isset($this->assessData['textmap'])) {
+        $this->generateTextMap();
+      }
       if (isset($this->assessData[$key])) {
         $out[$key] = $this->assessData[$key];
       }
@@ -308,13 +319,26 @@ class AssessInfo
       'showans','showans_aftern','points_possible','questionsetid',
       'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
+    if (!isset($this->questionData[$id])) {
+        return false;
+    }
     foreach ($base as $field) {
-      $out[$field] = $this->questionData[$id][$field];
+        if (isset($this->questionData[$id][$field])) {
+            $out[$field] = $this->questionData[$id][$field];
+        } else {
+            $out[$field] = null;
+        }
     }
     if ($this->assessData['submitby'] == 'by_question') {
       foreach ($by_q as $field) {
         $out[$field] = $this->questionData[$id][$field];
       }
+    }
+    if (!isset($this->assessData['textmap'])) {
+        $this->generateTextMap();
+    }
+    if (isset($this->assessData['textmap'][$id])) {
+        $out['text'] = $this->assessData['textmap'][$id];
     }
     return $out;
   }
@@ -358,6 +382,14 @@ class AssessInfo
     $out = array();
     foreach ($this->questionData as $qid=>$v) {
       $out[$qid] = $v['points_possible'];
+    }
+    return $out;
+  }
+
+  public function getAllQuestionPointsAndCats() {
+    $out = array();
+    foreach ($this->questionData as $qid=>$v) {
+      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>$v['origcategory']];
     }
     return $out;
   }
@@ -446,12 +478,15 @@ class AssessInfo
   }
 
   /*
-    Override the "available" setting
+    Override the "available" setting, and enddate and timelimit
    */
-  public function overrideAvailable($val) {
-    if ($this->assessData['available'] !== 'yes') {
+  public function overrideAvailable($val, $overrideTimelimit=true) {
+    if ($this->assessData['available'] !== 'yes' && $val == 'yes') {
       // necessary to override to prevent due date timer from causing problems
       $this->assessData['enddate'] = 2000000000;
+    }
+    if ($overrideTimelimit) {
+      $this->assessData['timelimit'] = 0;
     }
     $this->assessData['available'] = $val;
   }
@@ -625,14 +660,45 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&1) {
-      //shuffle all
-      $RND->shuffle($qout);
-    } else if ($this->assessData['shuffle']&16) {
-      //shuffle all but first
-      $firstq = array_shift($qout);
-      $RND->shuffle($qout);
+    if ($this->assessData['shuffle']&16) {
+        //shuffle all but first
+        $firstq = array_shift($qout);
+    }
+    if ($this->assessData['shuffle']&32) {
+        //shuffle all but last
+        $lastq = array_pop($qout);
+    }
+    if ($this->assessData['shuffle']&(1+16+32)) {
+          // has any shuffle flag set
+          if (!empty($this->assessData['pagebreaks'])) {
+            $shift = ($this->assessData['shuffle']&16)?1:0;
+            $lastgroupq = 0;
+            $newqout = [];
+            foreach ($this->assessData['pagebreaks'] as $breakn=>$breakq) {
+                if ($breakq === 0) { continue; }
+                $thisgroup = [];
+                for ($i=$lastgroupq; $i < $breakq - $shift; $i++) {
+                    $thisgroup[] = $qout[$i];
+                }
+                $lastgroupq = $breakq - $shift;
+                $RND->shuffle($thisgroup);
+                $newqout = array_merge($newqout, $thisgroup);
+            }
+            $thisgroup = [];
+            for ($i=$lastgroupq;$i < count($qout); $i++) {
+                $thisgroup[] = $qout[$i];
+            }
+            $RND->shuffle($thisgroup);
+            $qout = array_merge($newqout, $thisgroup);
+          } else {
+            $RND->shuffle($qout);
+          }
+    }
+    if ($this->assessData['shuffle']&16) {
       array_unshift($qout, $firstq);
+    }
+    if ($this->assessData['shuffle']&32) {
+        array_push($qout, $lastq);
     }
 
     //pick seeds
@@ -655,7 +721,7 @@ class AssessInfo
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
           } else {
             //pick seed based on assessment ID
-            $seeds[] = $i + $this->curAid + $attempt + $ispractice?100:0;
+            $seeds[] = $i + $this->curAid + $attempt + ($ispractice?100:0);
           }
         }
       } else { //regular selection
@@ -667,6 +733,7 @@ class AssessInfo
               $unused = array_diff($this->questionData[$qid]['fixedseeds'], $oldseeds[$qid]);
               $newseed = $unused[array_rand($unused, 1)];
             } else {
+              $n = count($this->questionData[$qid]['fixedseeds']);
               $newseed = $this->questionData[$qid]['fixedseeds'][rand(0, $n-1)];
             }
           } else {
@@ -700,8 +767,11 @@ class AssessInfo
       //the question must be in a grouping.  Find the group.
       foreach ($this->assessData['itemorder'] as $qid) {
         if (is_array($qid) && in_array($oldquestion, $qid['qids'])) {
-          $group = $qid['qids'];
-          $grouptype = $qid['type'];
+          if ($qid['type'] == 'pool' && $qid['n'] < count($qid['qids'])) {
+            // only do redraw if not picking n from n
+            $group = $qid['qids'];
+            $grouptype = $qid['type'];
+          }
           break;
         }
       }
@@ -1039,6 +1109,7 @@ class AssessInfo
 
     //unpack intro
     $introjson = json_decode($settings['intro'], true);
+    $pagebreaks = [];
     if ($introjson === null) {
       $settings['interquestion_text'] = array();
     } else {
@@ -1048,8 +1119,14 @@ class AssessInfo
         if (isset($v['pagetitle'])) {
           $settings['interquestion_text'][$k]['pagetitle'] = html_entity_decode($v['pagetitle']);
         }
+        if ($settings['displaymethod'] !== 'full') {
+            unset($settings['interquestion_text'][$k]['ispage']);
+        } else if (!empty($v['ispage'])) {
+            $pagebreaks[] = $v['displayBefore'];
+        }
       }
     }
+    $settings['pagebreaks'] = $pagebreaks;
 
     // decode entities in title
     $settings['name'] = html_entity_decode($settings['name']);
@@ -1093,10 +1170,16 @@ class AssessInfo
 
     //handle safe exam browser passwords
     if ($settings['password'] != '' && !empty($_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'])) {
-      $testhash = hash("sha256", 'https//'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($settings['password']));
+      $testhash = hash("sha256", $GLOBALS['urlmode'].$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($settings['password']));
       if ($testhash == $_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH']) {
         $settings['password'] = '';
       }
+    }
+
+    // fix old-format reqscore "grey out"
+    if ($settings['reqscore'] < 0) {
+        $settings['reqscoretype'] |= 1;
+        $settings['reqscore'] = abs($settings['reqscore']);
     }
 
     //unpack itemorder
@@ -1142,6 +1225,67 @@ class AssessInfo
     }
 
     return $settings;
+  }
+
+  private function generateTextMap() {
+    if (($this->assessData['shuffle']&(1+16+32)) === 0) {
+        // no shuffling; skip textmap
+        return;
+    }
+    $textmap = [];
+    if (count($this->assessData['interquestion_text']) > 0) {
+        $curqn = 0;
+        $lastitemfirsttext = 0;
+        foreach ($this->assessData['itemorder'] as $item) {
+            $thistextmap = [];
+            $storedfirst = false;
+            for ($i=$lastitemfirsttext; $i < count($this->assessData['interquestion_text']); $i++) {
+                $curtext = $this->assessData['interquestion_text'][$i];
+                if ($curqn >= $curtext['displayBefore'] && $curqn <= $curtext['displayUntil']) {
+                    if (!empty($curtext['ispage'])) {
+                        foreach ($thistextmap as $v) {
+                            $this->assessData['interquestion_text'][$v]['beforebreak'] = true;
+                        }
+                        $thistextmap = [];
+                        $storedfirst = false;
+                        continue; 
+                    }
+                    $thistextmap[] = $i;
+                    if (!$storedfirst) {
+                        $lastitemfirsttext = $i;
+                        $storedfirst = true;
+                    }
+                } else if ($curtext['displayBefore'] > $curqn) { // getting too big; stop
+                    break;
+                }
+            }
+            if (is_array($item)) { // is a grouping
+                if (count($thistextmap) > 0) {
+                    foreach ($item['qids'] as $qid) {
+                        $textmap[$qid] = $thistextmap;
+                    }
+                }
+                $curqn += $item['n'];
+            } else {
+                if (count($thistextmap) > 0) {
+                    $textmap[$item] = $thistextmap;
+                }
+                $curqn++;
+            }
+        }
+        foreach ($this->assessData['interquestion_text'] as $k=>$v) {
+            if ($v['displayBefore'] >= $curqn) {
+                $this->assessData['interquestion_text'][$k]['atend'] = 1;
+            }
+            if (empty($v['ispage']) && empty($v['beforebreak'])) { 
+                // keep original position for pages and text before the break
+                unset($this->assessData['interquestion_text'][$k]['displayBefore']);
+                unset($this->assessData['interquestion_text'][$k]['displayUntil']);
+            }
+            unset($this->assessData['interquestion_text'][$k]['beforebreak']);
+        }
+    }
+    $this->assessData['textmap'] = $textmap;
   }
 
   /**

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" role="main" aria-live="polite">
+  <div id="app" role="main">
     <div v-if="!assessInfoLoaded">
       {{ $t('loading') }}
     </div>
@@ -9,12 +9,14 @@
     <error-dialog
       v-if="hasError"
       :errormsg="errorMsg"
+      :lastpos="lastPos"
       @clearerror="clearError"
     />
     <due-dialog v-if="showDueDialog"/>
     <confirm-dialog
       v-if="confirmObj !== null"
       :data="confirmObj"
+      :lastpos="lastPos"
       @close="closeConfirm"
     />
   </div>
@@ -56,11 +58,14 @@ export default {
     },
     showDueDialog () {
       return store.show_enddate_dialog;
+    },
+    lastPos () {
+      return store.lastPos;
     }
   },
   methods: {
     beforeUnload (evt) {
-      if (store.autosaveQueue.length > 0) {
+      if (Object.keys(store.autosaveQueue).length > 0) {
         actions.submitAutosave(false);
       }
       var unanswered = true;
@@ -111,6 +116,14 @@ export default {
     }
   },
   created () {
+    window.$(document).on('click', function (e) {
+      store.lastPos = e.pageY;
+    });
+    window.$(document).on('focusin', function (e) {
+      if (e.target) {
+        store.lastPos = e.target.getBoundingClientRect().top;
+      }
+    });
     window.$(window).on('beforeunload', this.beforeUnload);
     // Give a warning if the assessment is quiz-style and not submitted
     // We're attaching this to breadcrumbs and nav buttons to avoid the default
@@ -123,7 +136,7 @@ export default {
           body: 'unload.unsubmitted_assessment',
           action: () => {
             self.prewarned = true;
-            window.location = e.target.href;
+            window.location = e.currentTarget.href;
           }
         };
         return false;
@@ -133,7 +146,7 @@ export default {
           body: 'unload.unsubmitted_work',
           action: () => {
             self.prewarned = true;
-            window.location = e.target.href;
+            window.location = e.currentTarget.href;
           }
         };
         return false;

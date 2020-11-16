@@ -25,7 +25,7 @@ $qid = Sanitize::onlyInt($_GET['qid']);
 if (isset($_POST['go'])) {
 	$trytouse = ($_POST['vertouse'] == 1) ? 'last' : 'first';
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings('all', true);
+	$assess_info->loadQuestionSettings('all', true, false);
 	$DBH->beginTransaction();
 	$query = "SELECT iar.* FROM imas_assessment_records AS iar
 							JOIN imas_students ON imas_students.userid = iar.userid
@@ -40,7 +40,8 @@ if (isset($_POST['go'])) {
 		$assess_record->setRecord($row);
 		$assess_record->setTeacherInGb(true);
 		// do the rescore
-		$assess_record->regradeQuestion($qid, $trytouse);
+        $assess_record->regradeQuestion($qid, $trytouse);
+        $assess_record->updateLTIscore();
 		$assess_record->saveRecord();
 	}
 	$DBH->commit();
