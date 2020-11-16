@@ -82,7 +82,11 @@
     <div v-if="showfull">
       <span v-if="qdata.timeactive.total > 0">
         {{ $t('gradebook.time_on_version') }}:
-        {{ timeSpent }}
+        {{ timeSpent }}.
+      </span>
+      <span v-if="qdata.lastchange">
+        {{ $t('gradebook.lastchange') }}
+        {{ qdata.lastchange }}.
       </span>
       <button
         v-if="maxTry > 1"
