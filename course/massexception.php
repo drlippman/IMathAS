@@ -47,7 +47,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
                 // This will also include cases where there's an active timelimit.
                 $query = "SELECT iar.userid,ia.id,iar.scoreddata FROM imas_assessments AS ia JOIN imas_assessment_records AS iar " .
                 "ON ia.id=iar.assessmentid WHERE ia.id IN ($aidplaceholders) AND iar.userid IN ($uidplaceholders) " .
-                "AND ia.timelimit>0 AND iar.starttime>0";
+                "AND ia.timelimit<>0 AND iar.starttime>0";
                 $stm = $DBH->prepare($query);
                 $stm->execute(array_merge($addexcarr, $toarr));
                 $now = time();
@@ -277,6 +277,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$("input[name=forceclear]").on("change", function (e) {
 			$("#forceclearwarn").toggle($(this).prop("checked"));
 		});
+        $("input[name=timelimitextmin]").on("input", function (e) {
+            $("input[name=timelimitext]").prop("checked", this.value.match(/^\s*\d+\s*$/) && parseInt(this.value) != 0);
+        });
 		$("form").on("submit", function(e) {
 			if ($("input[name=forceclear]").prop("checked")) {
 				if (!confirm("'._('WARNING! You are about to clear student attempts, deleting their grades. This cannot be undone. Are you SURE you want to do this?').'")) {
@@ -556,7 +559,8 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
     echo '<p class="list"><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="0"/>% for questions done while in exception.</p>';
     if ($courseUIver > 1) {
         echo '<p class="list"><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow an additional <input size=2 name="timelimitextmin" value="0"> additional minutes.
-            <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span></p>';
+        <br><span class="small">Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.</span> 
+        <br><span class="small">To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student\'s name).</span></p>';
         echo '<p class="list"><input type="checkbox" name="attemptext" /> Allow student <input size=2 name="attemptextnum" value="0"> additional versions.</p>';
     }
     echo '</fieldset>';
