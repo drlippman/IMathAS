@@ -4485,9 +4485,13 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 	} else {
 		if (!$exactsigfig) {
 			$gadploc = strpos($givenans,'.');
-			if ($gadploc===false) {$gadploc = strlen($givenans);}
-			if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
-			if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
+			if ($gadploc===false) { // no decimal place
+                if ($anans != 0 && strlen($givenans) < $reqsigfigs) { return false; } //not enough digits
+                if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($givenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
+            } else {
+                if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
+                if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
+            }
 		} else {
 			$absgivenans = str_replace('-','',$givenans);
 			$gadploc = strpos($absgivenans,'.');
