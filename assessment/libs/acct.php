@@ -1143,8 +1143,8 @@ function scoreTchartsfromjournal($stua,$answer,$j,$order,$sn) {
 //makeTchart(title,numrows,leftentries,rightentries, start number, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize, [dofloat, showtotal])
 //num rows, leftentries, and rightentries should not include the total - that will be automatically added
 function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerboxsize, $dofloat = false, $showtotal=true) {
-	$out = '<table class="tchart" '.($dofloat?'style="float:left;margin:10px;"':'').'><thead><tr><td colspan="2" class="c" style="border-bottom:5px solid #000;">'.$title.'</td></tr></thead><tbody>';
-	$sa = '<table class="tchart" '.($dofloat?'style="float:left;margin:10px;"':'').'><thead><tr><td colspan="2" class="c" style="border-bottom:5px solid #000;">'.$title.'</td></tr></thead><tbody>';
+	$out = '<table class="tchart" '.($dofloat?'style="float:left;margin:10px;"':'').'><caption>'.$title.'</caption><thead><tr><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Debit</span></th><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Credit</span></th></tr></thead><tbody>';
+	$sa = '<table class="tchart" '.($dofloat?'style="float:left;margin:10px;"':'').'><caption>'.$title.'</caption><thead><tr><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Debit</span></th><th scope=col style="border-bottom:5px solid #000;"><span class="sr-only">Credit</span></th></tr></thead><tbody>';
 	$maxsize = 0;
 	for ($i=0;$i<count($leftentries);$i+=2) {
 		if (strlen($leftentries[$i])>$maxsize) {
@@ -1209,15 +1209,19 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 			$answer[$sn] = '';
 		}
 		$sn++;
-	}
+    }   
+    $out .= '</tbody>';
+    $sa .= '</tbody>';
 	if ($showtotal !== false) {
-		$out .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;" class="r">[AB'.$sn.']</td>';
+        $out .= '<tfoot>';
+        $sa .= '<tfoot>';
+		$out .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;" class="r"><span class="sr-only">Double line</span>[AB'.$sn.']</td>';
 		$answerboxsize[$sn] = $maxsize;
 		$displayformat[$sn] = 'alignright';
 		if ($tot>0 || ($tot==0 && $showtotal!=='zeroright')) {
 			$anstypes[$sn] = 'number';
 			$answer[$sn] = $tot;
-			$sa .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;" class="r">';
+			$sa .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;" class="r"><span class="sr-only">Double line</span>';
 			if ($hasdecimals) {
 				$sa .= number_format($tot,2,'.',',');
 			} else {
@@ -1225,19 +1229,19 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 			}
 			$sa .= '</td>';
 		} else {
-			$sa .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;">&nbsp;</td>';
+			$sa .= '<tr><td style="border-top: 3px double;border-right:5px solid #000;"><span class="sr-only">Double line</span>&nbsp;</td>';
 			$anstypes[$sn] = 'string';
 			$answer[$sn] = '';
 		}
 		$sn++;
 
-		$out .= '<td style="border-top: 3px double;">[AB'.$sn.']</td></tr>';
+		$out .= '<td style="border-top: 3px double;"><span class="sr-only">Double line</span>[AB'.$sn.']</td></tr>';
 		$answerboxsize[$sn] = $maxsize;
 		$displayformat[$sn] = 'alignright';
 		if ($tot<0 || ($tot==0 && $showtotal==='zeroright')) {
 			$anstypes[$sn] = 'number';
 			$answer[$sn] = -$tot;
-			$sa .= '<td style="border-top: 3px double;" class="r">';
+			$sa .= '<td style="border-top: 3px double;" class="r"><span class="sr-only">Double line</span>';
 			if ($hasdecimals) {
 				$sa .= number_format(-$tot,2,'.',',');
 			} else {
@@ -1245,15 +1249,17 @@ function makeTchart($title,$numrows,$leftentries,$rightentries, $sn, &$anstypes,
 			}
 			$sa .= '</td></tr>';
 		} else {
-			$sa .= '<td style="border-top: 3px double;">&nbsp;</td></tr>';
+			$sa .= '<td style="border-top: 3px double;"><span class="sr-only">Double line</span>&nbsp;</td></tr>';
 			$anstypes[$sn] = 'number';
 			$answer[$sn] = '0 or ';
-		}
+        }
+        $out .= '</tfoot>';
+        $sa .= '</tfoot>';
 		$sn++;
 	}
 
-	$out .= '</tbody></table>';
-	$sa .= '</tbody></table>';
+	$out .= '</table>';
+	$sa .= '</table>';
 	if ($dofloat) {
 		$showanswer .= $sa . '<br class="clear" />';
 	} else {
