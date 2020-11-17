@@ -1366,13 +1366,13 @@ function makeledgerfromjournal($j, $start, $order, $types, $sn, &$anstypes, &$an
 	}
 	$curbal = $start;
 	foreach ($order as $idx=>$o) {
-		$out .= '<table class="acctstatement"><thead><tr><th colspan="4">'.$o.'</th></tr><tr><th>Date</th><th>Debits</th><th>Credits</th><th>Balance</th></tr></thead><tbody>';
-		$sa .= '<table class="acctstatement"><thead><tr><th colspan="4">'.$o.'</th></tr><tr><th>Date</th><th>Debits</th><th>Credits</th><th>Balance</th></tr></thead><tbody>';
-		$out .= '<tr><td class="r">Beg. Bal.</td><td></td><td></td><td class="r">'.($hasdecimals?number_format($start[$idx],2,'.',','):number_format($start[$idx])).'</td></tr>';
-		$sa .= '<tr><td class="r">Beg. Bal.</td><td></td><td></td><td class="r">'.($hasdecimals?number_format($start[$idx],2,'.',','):number_format($start[$idx])).'</td></tr>';
+		$out .= '<table class="acctstatement"><caption>'.$o.'</caption><thead><tr><th scope=col>Date</th><th scope=col>Debits</th><th scope=col>Credits</th><th>Balance</th></tr></thead><tbody>';
+		$sa .= '<table class="acctstatement"><thead><caption>'.$o.'</caption><thead><tr><th scope=col>Date</th><th scope=col>Debits</th><th scope=col>Credits</th><th>Balance</th></tr></thead><tbody>';
+		$out .= '<tr><th scope=row class="r">Beg. Bal.</th><td></td><td></td><td class="r">'.($hasdecimals?number_format($start[$idx],2,'.',','):number_format($start[$idx])).'</td></tr>';
+		$sa .= '<tr><th scope=row class="r">Beg. Bal.</th><td></td><td></td><td class="r">'.($hasdecimals?number_format($start[$idx],2,'.',','):number_format($start[$idx])).'</td></tr>';
 		foreach ($acts[$o] as $a) {
-			$out .= '<tr><td>[AB'.$sn.']</td>';
-			$sa .= '<tr><td>'.$a[0].'</td>';
+			$out .= '<tr><th scope=row>[AB'.$sn.']</th>';
+			$sa .= '<tr><th scope=row>'.$a[0].'</th>';
 			$anstypes[$sn] = 'string'; $displayformat[$sn] = 'select'; $questions[$sn] = $dates;  $answer[$sn] = $a[0];
 			$sn++;
 			if ($a[1]=='d') {
@@ -1410,7 +1410,7 @@ function makeledgerfromjournal($j, $start, $order, $types, $sn, &$anstypes, &$an
 			$sn++;
 		}
 		for ($j=count($acts[$o]);$j<max(count($acts[$o])+1,3);$j++) {
-			$out .= '<tr><td>[AB'.$sn.']</td>';
+			$out .= '<tr><th scope=row>[AB'.$sn.']</th>';
 			$anstypes[$sn] = 'string'; $displayformat[$sn] = 'select'; $questions[$sn] = $dates;  $answer[$sn] = '';
 			$sn++;
 			$out .= '<td class="r">[AB'.$sn.']</td>';
