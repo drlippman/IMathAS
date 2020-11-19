@@ -730,9 +730,9 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 		}
 	}
 	if ($hashead) {
-		$out = '<table class="gridded"><thead><tr>'.$out.'</tr></thead>';
+		$out = '<table class="acctstatement"><thead><tr>'.$out.'</tr></thead>';
 	} else {
-		$out = '<table class="gridded">';
+		$out = '<table class="acctstatement">';
 	}
 	$out .= '<tbody>';
 	$sa = $out;
@@ -785,7 +785,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 	if ($showanswer === null) { $showanswer = '';}
 	if ($displayformat === null) { $displayformat = array();}
 	if (isset($opts['totrow'])) { $totrow = $opts['totrow'];} else {$totrow = -1;}
-	if (isset($opts['class'])) { $tblclass = $opts['class'];} else {$tblclass = 'gridded';}
+	if (isset($opts['class'])) { $tblclass = $opts['class'];} else {$tblclass = 'acctstatement';}
 	if (isset($opts['ops'])) {
 		if ($opts['ops'][0] == 'pulldowns') {
 			array_shift($opts['ops']);
@@ -949,7 +949,7 @@ function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 	if ($showanswer === null) { $showanswer = '';}
 	if ($displayformat === null) { $displayformat = array();}
 	if (isset($opts['totrow'])) { $totrow = $opts['totrow'];} else {$totrow = -1;}
-	if (isset($opts['class'])) { $tblclass = $opts['class'];} else {$tblclass = 'gridded';}
+	if (isset($opts['class'])) { $tblclass = $opts['class'];} else {$tblclass = 'acctstatement';}
 
 	$maxsize = array();  $hasdecimals = false;  $rowcnt = 0;
 	// handle sparse arrays
@@ -1710,9 +1710,9 @@ function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$questions, &$an
 		}
 	}
     $headers = array();
-    $headers[0] = array("Inventory", 10);
-	$headers[1] = array("",1,"Purchases",3,"Cost of Goods Sold",3,"Inventory on Hand",3);
-	$headers[2] = array("Dates","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost");
+    //$headers[0] = array("Inventory", 10);
+	$headers[0] = array("",1,"Purchases",3,"Cost of Goods Sold",3,"Inventory on Hand",3);
+	$headers[1] = array("Dates","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost");
 
 	if ($get=='totals') {
 		$cogs = 0;
