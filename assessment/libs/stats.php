@@ -861,10 +861,10 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
     if ($icnt == 2*$n && count($z) < $n) {
         echo "Error: unable to generate enough positive values";
     }
-	if ($n%2==0) {
+	if (count($z)==$n) {
 		return $z;
 	} else {
-		return (array_slice($z,0,count($z)-1));
+		return (array_slice($z,0,$n));
 	}
 }
 
