@@ -812,8 +812,8 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			$headers = array($headers);
 		}
         $out = '<table class="'.$tblclass.'">';
-        if ($headers[0][1] == count($cols)) {
-            $out .= '<caption>'.$headers[0][0].'</caption>';
+        if (abs($headers[0][1]) == count($cols)) {
+            $out .= '<caption '.($headers[0][1] < 0 ?'class="sr-only"':'').'>'.$headers[0][0].'</caption>';
             array_shift($headers);
         }
         $out .= '<thead>';
@@ -1710,9 +1710,9 @@ function makeinventory($invs, $type, $rowper, $sn, &$anstypes, &$questions, &$an
 		}
 	}
     $headers = array();
-    //$headers[0] = array("Inventory", 10);
-	$headers[0] = array("",1,"Purchases",3,"Cost of Goods Sold",3,"Inventory on Hand",3);
-	$headers[1] = array("Dates","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost");
+    $headers[0] = array("Inventory", -10);
+	$headers[1] = array("",1,"Purchases",3,"Cost of Goods Sold",3,"Inventory on Hand",3);
+	$headers[2] = array("Dates","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost","Quantity","Unit Cost","Total Cost");
 
 	if ($get=='totals') {
 		$cogs = 0;
