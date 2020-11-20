@@ -57,7 +57,7 @@ $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $late
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate',
   'extended_with', 'latepasses_avail', 'latepass_extendto',
-  'can_use_latepass', 'enddate_in'
+  'can_use_latepass', 'enddate_in', 'timelimit'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 

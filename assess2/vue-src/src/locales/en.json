@@ -30,7 +30,7 @@
     "needprereq": "You have not yet met the prerequisite requirements to work on this assessment.",
     "prereqreq": "A score of {score} on {name} is required.",
     "no_attempts": "You have used all your attempts at this assessment.",
-    "latepassn": "You have one LatePass available. | You have {n} LatePass available.",
+    "latepassn": "You have one LatePass available. | You have {n} LatePasses available.",
     "latepass_needed": "You can redeem one LatePass to reopen this assessment until {date} | You can redeem {n} LatePasses to reopen this assessment until {date}",
     "practice_no_latepass": "This assessment is now open for un-graded practice.",
     "practice_w_latepass": "You can also open the assessment for un-graded practice.",
@@ -83,7 +83,8 @@
     "timelimit_wgrace_restricted": "Time limit: {time}, with a grace period subject to a {penalty}% penalty which expires at the due date, {due}.",
     "timelimit_ext": "You have been given a {n} minute extension on the time limit",
     "timelimit_ext_used": "You have used a {n} minute timelimit extension",
-    "excused": "You have been excused from this assignment. It will not be counted in your grade."
+    "excused": "You have been excused from this assignment. It will not be counted in your grade.",
+    "latepass_needed": "You can redeem one LatePass to extend the due date to {date} | You can redeem {n} LatePasses to extend the due date to {date}"
   },
   "group": {
     "isgroup": "This is a group assessment.",

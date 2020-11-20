@@ -18,6 +18,12 @@
           <icons name="alert" size="micro" />
           {{ row.alert }}
         </div>
+        <div v-if="!!row.latepass" class="small subdued">
+          {{ row.latepass }}
+          <button @click="redeemLatePass" class="slim secondary">
+            {{ row.latepass_label }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -25,7 +31,7 @@
 
 <script>
 import Icons from '@/components/widgets/Icons.vue';
-import { store } from '../../basicstore';
+import { store, actions } from '../../basicstore';
 
 export default {
   name: 'SettingsList',
@@ -99,6 +105,13 @@ export default {
         if (settings.exceptionpenalty > 0) {
           dateobj.alert = this.$t('setlist.penalty', { p: settings.exceptionpenalty });
         }
+      }
+      if (settings.can_use_latepass > 0) {
+        dateobj.latepass = this.$tc('setlist.latepass_needed', settings.can_use_latepass, {
+          n: settings.can_use_latepass,
+          date: settings.latepass_extendto_disp
+        });
+        dateobj.latepass_label = this.$tc('closed.use_latepass', settings.can_use_latepass);
       }
       return dateobj;
     },
@@ -236,6 +249,18 @@ export default {
         out += this.$tc('seconds', sec);
       }
       return out;
+    },
+    redeemLatePass () {
+      var settings = store.assessInfo;
+      store.confirmObj = {
+        body: this.$tc('closed.latepassn', settings.latepasses_avail) + ' ' +
+          this.$tc('setlist.latepass_needed', settings.can_use_latepass, {
+            n: settings.can_use_latepass,
+            date: settings.latepass_extendto_disp
+          }),
+        ok: this.$tc('closed.use_latepass', settings.can_use_latepass),
+        action: () => actions.redeemLatePass()
+      };
     }
   }
 };

@@ -1248,6 +1248,8 @@ export const actions = {
         store.timelimit_restricted = 1;
       } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
         store.timelimit_restricted = 2;
+      } else {
+        store.timelimit_restricted = 0;
       }
     }
     if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')) {
