@@ -62,6 +62,9 @@ makejournal(journal array, start number, options, $anstypes, $questions, $answer
 <BR>options is an array of type-ahead values for the descriptions
 <BR>
 <BR>for $anstypes through $displayformat, just pass the variable through.
+<BR>
+<br>Set $journal[0]['haspostrefs'] to enable post ref. column, and add post ref
+<br>values to debits and credits arrays between description and value.
 <BR><h3><a name="scorejournal">scorejournal</a></h3>
 scorejournal($stuanswers[$thisq], $answer, $journal, start number)
 <BR>Call with $stuanswers, and $answer array

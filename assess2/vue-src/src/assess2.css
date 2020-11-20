@@ -444,16 +444,23 @@ table.tchart {
 table.tchart td {
 	min-width: 3em;
 }
+table.tchart caption {
+    font-weight: bold;
+}
 table.acctstatement {
 	border-collapse: collapse;
 }
-table.acctstatement th, table.acctstatement td {
+table.acctstatement th, table.acctstatement td, table.acctstatement caption {
 	border: 1px solid #eee;
 	background-color: #fff;
 	padding: 1px 5px;
 }
+table.acctstatement tbody th {
+    font-weight: normal;
+}
 
-table.acctstatement thead th {
+
+table.acctstatement thead th, table.acctstatement caption {
 	text-align: center;
 	z-index: 20;
 	background-color: #eef;
