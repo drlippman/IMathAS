@@ -724,8 +724,6 @@ return function(str) {
   if (str.match(/\S/)==null) {
 	  return "";
   }
-  console.log(str.replace(/^\s+/g,""));
-  console.log(AMQTparseExpr(str.replace(/^\s+/g,""),false)[0]);
   return AMQTparseExpr(str.replace(/^\s+/g,""),false)[0];
 }
 }();
