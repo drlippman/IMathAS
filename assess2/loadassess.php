@@ -65,7 +65,7 @@ $include_from_assess_info = array(
   'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb', 'scoresingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
-  'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue'
+  'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue', 'attemptext'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -114,6 +114,19 @@ $assessInfoOut['has_password'] = $assess_info->hasPassword();
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+
+// get time limit extension info 
+if ($assessInfoOut['timelimit'] > 0 && !empty($assess_info->getSetting('timeext'))) {
+    $assessInfoOut['timelimit_ext'] = $assess_info->getSetting('timeext');
+    if (!$assessInfoOut['has_active_attempt'] && ($assess_record->getStatus()&64)==64 &&
+      $assessInfoOut['timelimit_ext'] > 0
+    ) {
+        // has a previously submitted attempt; mark as active since we have a time 
+        // limit extension available
+        $assessInfoOut['has_active_attempt'] = true;
+    }
+}
+
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
@@ -144,7 +157,8 @@ $assessInfoOut['showwork_after'] = $assess_record->getShowWorkAfter();
 // adjust output if time limit is expired in by_question mode
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   $assessInfoOut['submitby'] == 'by_question' &&
-  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires'])
+  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires']) && 
+  intval($assess_info->getSetting('timeext')) <= 0
 ) {
   $assessInfoOut['has_active_attempt'] = false;
   $assessInfoOut['can_retake'] = false;

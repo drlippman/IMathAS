@@ -16,6 +16,11 @@
           {{ $tc('gradebook.time_onscreen', attemptCount) }}:
           {{ totalTimeOnTask }}
         </span>
+        <span v-if="aData.hasOwnProperty('timelimit_ext')">
+          <br/>
+          {{ $t('gradebook.'+ (aData.timelimit_ext > 0 ? 'has_timeext' : 'used_timeext'),
+            {n: Math.abs(aData.timelimit_ext)}) }}
+        </span>
       </div>
 
       <div>
@@ -33,6 +38,10 @@
           {{ $t('gradebook.originally_due') }}:
             {{ aData.original_enddate_disp }}.
           {{ extensionString }}
+        </span>
+        <span v-if="aData.hasOwnProperty('attemptext')">
+          <br/>
+          {{ $t('gradebook.attemptext', {n: aData.attemptext}) }}
         </span>
       </div>
 

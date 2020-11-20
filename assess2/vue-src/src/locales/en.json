@@ -81,6 +81,8 @@
     "timelimit_extend": "Extended from the original {time}.",
     "timelimit_restricted": "Because of the upcoming due date, your time limit will expire at the due date, {due}.",
     "timelimit_wgrace_restricted": "Time limit: {time}, with a grace period subject to a {penalty}% penalty which expires at the due date, {due}.",
+    "timelimit_ext": "You have been given a {n} minute extension on the time limit",
+    "timelimit_ext_used": "You have used a {n} minute timelimit extension",
     "excused": "You have been excused from this assignment. It will not be counted in your grade."
   },
   "group": {
@@ -441,7 +443,10 @@
     "hide_excused": "Hide Auto-Excused",
     "excused_list": "Based on the results of this assessment, the following assessments have been excused:",
     "show_endmsg": "Show End Message",
-    "hide_endmsg": "Hide End Message"
+    "hide_endmsg": "Hide End Message",
+    "has_timeext": "Has a {n} minute time limit extension available",
+    "used_timeext": "Used a {n} minute time limit extension",
+    "attemptext": "Exception given for {n} additional versions"
   },
   "work": {
     "add": "Add Work",

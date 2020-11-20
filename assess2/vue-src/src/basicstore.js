@@ -738,7 +738,8 @@ export const actions = {
           }
           return;
         }
-        this.markAutosavesDone();
+        response = this.processSettings(response);
+        this.copySettings(response);
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');

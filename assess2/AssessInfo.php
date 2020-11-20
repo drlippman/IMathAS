@@ -93,7 +93,7 @@ class AssessInfo
     } else if (!$isstu) {
       $this->exception = false;
     } else {
-      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
+      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
@@ -115,6 +115,25 @@ class AssessInfo
     } else {
       $useexception = $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, true);
       $canuselatepass = false;
+    }
+
+    // use time limit extension even if rest of exception isn't used
+    if ($this->exception !== false && $this->exception[6] != 0) {
+        $this->assessData['timeext'] = intval($this->exception[6]);
+    }
+    if ($this->exception !== false && $this->exception[7] != 0) {
+        $this->assessData['attemptext'] = intval($this->exception[7]);
+        // apply additional attempts
+        if ($this->assessData['submitby'] == 'by_assessment') {
+            $this->assessData['allowed_attempts'] += $this->assessData['attemptext'];
+        } else {
+            // if question settings already loaded, apply extension
+            foreach ($this->questionData as $i=>$set) {
+                if ($set['regen'] != 1) {
+                    $this->questionData[$i]['regens_max'] += $this->assessData['attemptext'];
+                }
+            }
+        }
     }
 
     if ($useexception) {
@@ -969,6 +988,10 @@ class AssessInfo
       $settings['regens_max'] = 1;
     } else {
       $settings['regens_max'] = $defaults['defregens'];
+      if (!empty($defaults['attemptext'])) {
+          // extend attempts if exception set
+          $settings['regens_max'] += $defaults['attemptext'];
+      }
     }
 
     $settings['jump_to_answer'] = false;

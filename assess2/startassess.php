@@ -88,6 +88,22 @@ if (!$in_practice && !$canViewAll &&
   exit;
 }
 
+if (!$in_practice && $assess_info->getSetting('timelimit') > 0 && 
+    $assess_info->getSetting('timeext') > 0
+) {
+    // apply time limit extension
+    if ($assess_record->hasActiveAttempt()) {
+        // has unsubmitted attempt
+        $assess_record->applyTimeLimitExtension($assess_info->getSetting('timeext'));
+    } else if (($assess_record->getStatus()&64)==64) {
+        // has submitted quiz-style attempt
+        // un-submit it
+        $assess_record->setStatus(true, true);
+        // apply time limit extension
+        $assess_record->applyTimeLimitExtension($assess_info->getSetting('timeext'));
+    }
+}
+
 // reject start if has current attempt, time limit expired, and is kick out
 if (!$in_practice &&
   $assess_record->hasActiveAttempt() &&

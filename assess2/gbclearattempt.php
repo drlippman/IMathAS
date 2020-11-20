@@ -85,6 +85,8 @@ if ($type == 'all' && $keepver == 0) {
   );
   $stm = $DBH->prepare('DELETE FROM imas_assessment_records WHERE assessmentid=? AND userid=?');
   $stm->execute(array($aid, $uid));
+  $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A' AND userid=?");
+  $stm->execute(array($aid, $uid));
   // update LTI grade
   $lti_sourcedid = $assess_record->getLTIsourcedId();
   if (strlen($lti_sourcedid) > 1) {

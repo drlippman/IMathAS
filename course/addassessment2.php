@@ -88,35 +88,40 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
   $dates_by_lti = $stm->fetchColumn(0);
 
   if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
-      if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
-      	$DBH->beginTransaction();
-          require_once('../includes/filehandler.php');
-          deleteallaidfiles($assessmentId);
-          $grades = array();
-					$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
-					$stm->execute(array(':assessmentid'=>$assessmentId));
-					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-						$grades[$row['userid']]=$row["score"];
-					}
-					$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-					if ($stm->rowCount()>0) {
-		        TeacherAuditLog::addTracking(
-		          $cid,
-		          "Clear Attempts",
-		          $assessmentId,
-		          array('grades'=>$grades)
-		        );
-		      }
+      if (isset($_POST['clearattempts']) && $_POST['clearattempts'] == "confirmed") {
+        $DBH->beginTransaction();
+        require_once '../includes/filehandler.php';
+        deleteallaidfiles($assessmentId);
+        $grades = array();
+        $stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            $grades[$row['userid']] = $row["score"];
+        }
 
-					$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-          $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-          $DBH->commit();
-          header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
-                  $cid, $assessmentId));
-          exit;
+        $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        if ($stm->rowCount() > 0) {
+            TeacherAuditLog::addTracking(
+                $cid,
+                "Clear Attempts",
+                $assessmentId,
+                array('grades' => $grades)
+            );
+        }
+
+        $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        // clear out time limit extensions
+        $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
+        $stm->execute(array($aid));
+        
+        $DBH->commit();
+        header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' . Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
+            $cid, $assessmentId));
+        exit;
       } else {
           $overwriteBody = 1;
           $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
