@@ -390,23 +390,35 @@
 	$stm->execute(array(':id'=>$qid));
 	if ($stm->rowCount()>0) {
 		echo printrubrics(array($stm->fetch(PDO::FETCH_NUM)));
-	}
+    }
+    echo '<button onclick="$(\'#filtersdiv\').slideToggle(100)">'._('Filters and Options').'</button>';
+    echo '<div id="filtersdiv" style="display:none; margin-bottom: 10px" class="tabpanel">';
+    echo '<p>';
 	if ($page==-1) {
-		echo '<button type=button id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
-		echo '<button type=button id="nztoggle" onclick="hidenonzero()">'._('Hide Nonzero Score Questions').'</button>';
-		echo ' <button type=button id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
-		echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
+        echo _('Hide').':</p><ul style="list-style-type: none; margin:0; padding-left: 15px;">';
+        echo '<li><label><input type=checkbox id="filter-unans" onchange="updatefilters()">'._('Unanswered Questions').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-zero" onchange="updatefilters()">'._('Score = 0').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-nonzero" onchange="updatefilters()">'._('0 &lt; score &lt 100%').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-perfect" onchange="updatefilters()">'._('Score = 100% (before penalties)').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-fb" onchange="updatefilters()">'._('Questions with Feedback').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-nowork" onchange="updatefilters()">'._('Questions without Work').'</label></li>';
+        echo '</ul>';
+        echo '<p>';
+		//echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
 		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
-		echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
+        echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
+        echo ' <button type="button" onclick="sidebysidegrading()">'._('Side-by-Side').'</button>';
 	}
-	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
+	echo ' <button type="button" id="clrfeedback" onclick="clearfeedback()">'._('Clear all feedback').'</button>';
 	if ($deffbtext != '') {
-		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
-	}
+		echo ' <button type="button" id="clrfeedback" onclick="cleardeffeedback()">'._('Clear default feedback').'</button>';
+    }
+    echo '</p>';
 	if ($canedit) {
 		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
 		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
-	}
+    }
+    echo '</div>'; // filtersdiv
 	if ($page==-1 && $canedit) {
 		echo '<div class="fixedbottomright">';
 		echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
@@ -520,19 +532,25 @@
 			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
 			if ($groupdup) {
 				echo '<div class="groupdup">';
-			}
-			echo "<div ";
-			if ($qdata['gbrawscore']==1) {
-				echo 'class="iscorrect bigquestionwrap"';
+            }
+            $classes = '';
+            if ($qdata['gbrawscore']==1) {
+				$classes = 'qfilter-perfect';
 			} else if ($qdata['gbscore']>0) {
-				echo 'class="isnonzero bigquestionwrap"';
+				$classes = 'qfilter-nonzero';
 			} else if ($qdata['status']=='unattempted') {
-				echo 'class="notanswered bigquestionwrap"';
+				$classes = 'qfilter-unans';
 			} else {
-				echo 'class="iswrong bigquestionwrap"';
-			}
-			echo '>';
-
+				$classes = 'qfilter-zero';
+            }
+            if (trim($qdata['feedback']) !== '') {
+                $classes .= ' qfilter-fb';
+            }
+            if (empty($qdata['work'])) {
+                $classes .= ' qfilter-nowork';
+            }
+			echo "<div class=\"$classes bigquestionwrap\">";
+			
 			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
 
 			if (!$groupdup) {

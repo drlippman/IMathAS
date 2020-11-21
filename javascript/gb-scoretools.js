@@ -62,6 +62,15 @@ function allvisfullcred() {
 function allvisnocred() {
 	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
 }
+function updatefilters() {
+    $(".bigquestionwrap").show();
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork'];
+    for (var i=0; i<6; i++) {
+        if (document.getElementById('filter-' + filters[i]).checked) {
+            $(".bigquestionwrap.qfilter-" + filters[i]).hide();
+        }
+    }
+}
 function toggleWork(el) {
 	var next = $(el).next();
 	if (next.is(':hidden')) {

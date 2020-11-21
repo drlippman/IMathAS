@@ -156,13 +156,20 @@
           </div>
         </div>
 
-        <div v-if="curEndmsg !== ''">
+        <div v-if = "(curEndmsg !== '' && viewFull) || !isByQuestion">
           <button
-            v-if = "viewFull"
+            v-if = "curEndmsg !== '' && viewFull"
             type="button"
             @click = "showEndmsg = !showEndmsg"
           >
             {{ $t('gradebook.' + (showEndmsg ? 'hide' : 'show') + '_endmsg') }}
+          </button>
+          <button
+            v-if = "!isByQuestion"
+            type="button"
+            @click="clearAttempts('attempt')"
+          >
+            {{ $t('gradebook.clear_attempt') }}
           </button>
           <div
             class="introtext"
@@ -172,37 +179,64 @@
         </div>
 
         <div v-if="canEdit">
-          <button
-            type="button"
-            @click = "hidePerfect = !hidePerfect"
-          >
-            {{ hidePerfectLabel }}
+          <button @click = "showFilters = !showFilters">
+            {{ $t('gradebook.filters') }}
           </button>
-          <button
-            type="button"
-            @click = "hideCorrect = !hideCorrect"
-          >
-            {{ hideCorrectLabel }}
-          </button>
-          <button
-            type="button"
-            @click = "hideUnanswered = !hideUnanswered"
-          >
-            {{ hideUnansweredLabel }}
-          </button>
-          <button
-            type="button"
-            @click = "showAllAns"
-          >
-            {{ $t('gradebook.show_all_ans') }}
-          </button>
-          <button
-            v-if = "!isByQuestion"
-            type="button"
-            @click="clearAttempts('attempt')"
-          >
-            {{ $t('gradebook.clear_attempt') }}
-          </button>
+          <div v-if = "showFilters" class="tabpanel">
+            <p>{{ $t('gradebook.hide') }}:</p>
+            <ul style="list-style-type: none; margin:0; padding-left: 15px;">
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideUnanswered">
+                  {{ $t('gradebook.hide_unans') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideZero">
+                  {{ $t('gradebook.hide_zero') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideNonzero">
+                  {{ $t('gradebook.hide_nonzero') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hidePerfect">
+                  {{ $t('gradebook.hide_perfect') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideFeedback">
+                  {{ $t('gradebook.hide_fb') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hideNowork">
+                  {{ $t('gradebook.hide_nowork') }}
+                </label>
+              </li>
+            </ul>
+            <p>
+              <button
+                type="button"
+                @click = "showAllAns"
+              >
+                {{ $t('gradebook.show_all_ans') }}
+              </button>
+              <button
+                type="button"
+                @click = "showAllWork = !showAllWork"
+              >
+                {{ $t('gradebook.show_all_work') }}
+              </button>
+            </p>
+          </div>
         </div>
 
         <div v-if="viewFull">
@@ -242,6 +276,7 @@
               <gb-showwork
                 :work = "qdata[curQver[qn]].work"
                 :worktime = "qdata[curQver[qn]].worktime"
+                :showall = "showAllWork"
               />
             </div>
             <gb-score-details
@@ -349,10 +384,15 @@ export default {
       showOverride: false,
       assessOverride: '',
       hidePerfect: false,
-      hideCorrect: false,
+      hideNonzero: false,
+      hideZero: false,
       hideUnanswered: false,
+      hideFeedback: false,
+      hideNowork: false,
+      showFilters: false,
       showEndmsg: false,
-      showExcused: false
+      showExcused: false,
+      showAllWork: false
     };
   },
   computed: {
@@ -465,16 +505,21 @@ export default {
       return 'index.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
     },
     showQuestion () {
-      // 1 to hide perfect, 2 correct, 4 unanswered
       const out = {};
       for (let i = 0; i < this.curQuestions.length; i++) {
         const qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
-        if (this.hidePerfect && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
-          showit = false;
-        } else if (this.hideCorrect && Math.abs(qdata.rawscore - 1) < 0.002) {
+        if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;
         } else if (this.hideUnanswered && qdata.try === 0) {
+          showit = false;
+        } else if (this.hideZero && Math.abs(qdata.rawscore) < 0.002) {
+          showit = false;
+        } else if (this.hideNonzero && Math.abs(qdata.rawscore) > 0.002 && Math.abs(qdata.rawscore) < 0.998) {
+          showit = false;
+        } else if (this.hideFeedback && qdata.feedback !== null && qdata.feedback !== '') {
+          showit = false;
+        } else if (this.hideNowork && (!qdata.hasOwnProperty('work') || qdata.work === null || qdata.work === '')) {
           showit = false;
         }
         out[i] = showit;
