@@ -100,7 +100,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script type="text/javascript" src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo "<script src=\"$staticroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
@@ -113,12 +113,12 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}});
 		MathJax.Ajax.config.path["Local"] = "'.$staticroot.'/javascript/mathjax";
-		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
+        MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
 	} else {
-		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
+		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
 		function rendermathnode(node,callback) {
@@ -155,7 +155,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	} else {
 		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">';
 		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>';
-		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
+		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo '<script type="text/javascript" src="'.$staticroot.'/katex/auto-render.js?v=073119"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
