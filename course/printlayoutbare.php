@@ -353,7 +353,10 @@ $_SESSION['graphdisp'] = $origgraphdisp;
 require("../footer.php");
 
 function printq2($qn,$qsetid,$seed,$pts,$showpts) {
-	global $a2,$isfinal,$imasroot,$urlmode;
+    global $a2,$isfinal,$imasroot,$urlmode;
+    
+    $GLOBALS['isbareprint'] = true;
+    
 	$state = array(
 		'seeds' => array($qn => $seed),
 		'qsid' => array($qn => $qsetid)

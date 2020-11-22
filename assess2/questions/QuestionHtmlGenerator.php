@@ -137,6 +137,8 @@ class QuestionHtmlGenerator
         $correctAnswerWrongFormat = $this->questionParams->getCorrectAnswerWrongFormat();
         $printFormat = $this->questionParams->getPrintFormat();
 
+        $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
+
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
           // un-array it
