@@ -91,7 +91,7 @@ function tipshow(el,tip, e) {
 	}
 	if (typeof tipobj!= 'object') {
 		tipobj = document.createElement("div");
-        if (window.imathasAssess) {
+        if (typeof window.imathasAssess != 'undefined') {
             tipobj.className = "dropdown-pane tooltip-pane";
         } else {
 		tipobj.className = "tips";
