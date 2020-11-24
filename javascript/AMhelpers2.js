@@ -551,7 +551,7 @@ function setupDraw(qn) {
 }
 
 function initMultAns(qn) {
-  var hasnone = $("#qnwrap"+qn).find('label:last').text().match(/none\s+of/i);
+  var hasnone = $("#qnwrap"+qn).attr('data-multans') == 'hasnone';
   if (hasnone) {
     var boxes = $('input[name^="qn'+qn+'["]');
     boxes.on('change', function () {
