@@ -14,11 +14,11 @@ $primes[6] = array(804847, 929459, 280811, 802027, 614527, 774313, 929623, 26804
 
 function isprime($n) {
     global $primes;
-    if ($n>999999 || $n<1) {
-        echo "isprime only works for numbers less than 1,000,000";
+    if ($n>9999 || $n<1) {
+        echo "isprime only works for numbers less than 10,000";
         return false;
     }
-    for ($i=1;$i<4;$i++) {
+    for ($i=1;$i<5;$i++) {
         $c = count($primes[$i]);
         for ($j=0;$j<$c;$j++) {
             if (abs($n-$primes[$i][$j]) < 0.1) {
