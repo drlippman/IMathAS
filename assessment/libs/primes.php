@@ -21,12 +21,12 @@ function isprime($n) {
     for ($i=1;$i<4;$i++) {
         $c = count($primes[$i]);
         for ($j=0;$j<$c;$j++) {
-            if ($n%$primes[$i][$j] == 0) {
-                return false;
+            if (abs($n-$primes[$i][$j]) < 0.1) {
+                return true;
             }
         }
     }
-    return true;
+    return false;
 }
 
 //getprime([digits])
