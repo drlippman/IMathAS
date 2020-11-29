@@ -14,19 +14,32 @@ $primes[6] = array(804847, 929459, 280811, 802027, 614527, 774313, 929623, 26804
 
 function isprime($n) {
     global $primes;
-    if ($n>9999 || $n<1) {
-        echo "isprime only works for numbers less than 10,000";
+    if ($n>999999 || $n<1) {
+        echo "isprime only works for positive integers less than 1,000,000";
         return false;
     }
-    for ($i=1;$i<5;$i++) {
-        $c = count($primes[$i]);
-        for ($j=0;$j<$c;$j++) {
-            if (abs($n-$primes[$i][$j]) < 0.1) {
-                return true;
-            }
-        }
+    if ($n<10000) {
+      for ($i=1;$i<5;$i++) {
+          $c = count($primes[$i]);
+          for ($j=0;$j<$c;$j++) {
+              if ($n==$primes[$i][$j]) {
+                  return true;
+              }
+          }
+      }
+      return false;
     }
-    return false;
+    if ($n>9999) {
+      for ($i=1;$i<5;$i++) {
+          $c = count($primes[$i]);
+          for ($j=0;$j<$c;$j++) {
+              if ($n%$primes[$i][$j] == 0) {
+                  return false;
+              }
+          }
+      }
+    }
+    return true;
 }
 
 //getprime([digits])
