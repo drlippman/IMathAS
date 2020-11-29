@@ -18,10 +18,14 @@ function isprime($n) {
         echo "isprime only works for numbers less than 1,000,000";
         return false;
     }
+    $sqrtn = ceil(sqrt($n));
     for ($i=1;$i<4;$i++) {
         $c = count($primes[$i]);
         for ($j=0;$j<$c;$j++) {
-            if ($n%$primes[$i][$j] == 0) {
+            if ($primes[$i][$j] > $sqrtn) {
+                return true; // abort; only need to test up to sqrt(n)
+            }
+            if ($n%($primes[$i][$j]) == 0) {
                 return false;
             }
         }
