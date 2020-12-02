@@ -270,15 +270,17 @@
 			 $querys = (!empty($addtoquerystring) ? '?' . Sanitize::fullQueryString($addtoquerystring) : '');
 		 }
 
-		 $needToForcePasswordReset = false;
-		 if (isset($CFG['acct']['passwordMinlength']) && strlen($_POST['password'])<$CFG['acct']['passwordMinlength']) {
-		 	 $needToForcePasswordReset = true;
-		 } else if (isset($CFG['acct']['passwordFormat'])) {
-		 	 require_once("includes/newusercommon.php");
-		 	 if (!checkFormatAgainstRegex($_POST['password'], $CFG['acct']['passwordFormat'])) {
-		 	 	 $needToForcePasswordReset = true;
-		 	 }
-		 }
+         $needToForcePasswordReset = false;
+         if ($_POST['username']!='guest') {
+            if (isset($CFG['acct']['passwordMinlength']) && strlen($_POST['password'])<$CFG['acct']['passwordMinlength']) {
+                $needToForcePasswordReset = true;
+            } else if (isset($CFG['acct']['passwordFormat'])) {
+                require_once("includes/newusercommon.php");
+                if (!checkFormatAgainstRegex($_POST['password'], $CFG['acct']['passwordFormat'])) {
+                    $needToForcePasswordReset = true;
+                }
+            }
+         }
 		 // checks if the array $querys is empty
 		 if (!empty($querys)){
 		     $rqp = "&r=" .Sanitize::randomQueryStringParam();
