@@ -3427,7 +3427,7 @@ class AssessRecord
     }
     // if deleting last attempt, clear out any timelimit extensions
     if ($type == 'all' || ($type == 'attempt' && $av == count($this->data['assess_versions'])-1)) {
-        $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A' AND userid=?");
+        $stm = $this->DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A' AND userid=?");
         $stm->execute(array($this->curAid, $this->curUid));
     }
     $this->updateStatus();
