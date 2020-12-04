@@ -141,6 +141,7 @@ export default {
   },
   methods: {
     condenseDraw (str) {
+      if (str === '') { return str; }
       var la = str.replace(/\(/g, '[').replace(/\)/g, ']');
       la = la.split(';;');
       if (la[0] !== '') {
