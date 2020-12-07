@@ -61,13 +61,8 @@
    $lastSessionTime = isset($GLOBALS['sessionLastAccess']) ? $GLOBALS['sessionLastAccess'] : $_SESSION['time'];
    if ((time()-$lastSessionTime)>24*60*60 && (!isset($_POST) || count($_POST)==0)) {
     $wasLTI = isset($_SESSION['ltiitemtype']);
-    unset($_SESSION['userid']);
     unset($userid);
     $_SESSION = array();
-		if (isset($_COOKIE[session_name()])) {
-			setcookie(session_name(), '', time()-42000, '/', null, false, true);
-		}
-		session_destroy();
     if ($wasLTI) {
       require('header.php');
       echo _('Your session has expired. Please go back to your LMS and open this assignment again.');
