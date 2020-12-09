@@ -106,7 +106,7 @@ if (isset($_GET['create']) && isset($_POST['whichitems'])) {
 	require("../header.php");
     echo "<div class=breadcrumb>$breadcrumbbase ";
     if (empty($_COOKIE['fromltimenu'])) {
-        echo " <a href=\"../course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
     echo _('Export For Another LMS'), '</div>';
     if (empty($_COOKIE['fromltimenu'])) {
