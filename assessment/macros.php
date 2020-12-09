@@ -4495,7 +4495,7 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			$absgivenans = str_replace('-','',$givenans);
 			$gadploc = strpos($absgivenans,'.');
 			if ($gadploc===false) { //no decimal place
-				if (strlen(rtrim($absgivenans,'0')) != $reqsigfigs) { return false;}
+				if (strlen(rtrim($absgivenans,'0')) > $reqsigfigs) { return false;}
 			} else {
 				if (abs($givenans)<1) {
 					if (strlen(ltrim(substr($absgivenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
