@@ -1174,7 +1174,7 @@ function processNumber(origstr, format) {
                 err += _("Missing units");
             }
         } else if (format.indexOf('integer')!=-1) {
-            if (!str.match(/^\s*\d+\s*$/)) {
+            if (!str.match(/^\s*\-?\d+\s*$/)) {
                 err += _('This is not an integer.');
             }
         } else {
