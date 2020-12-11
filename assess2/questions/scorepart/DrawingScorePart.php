@@ -57,8 +57,24 @@ class DrawingScorePart implements ScorePart
             else if (isset($options['answer'])) {$answers = $options['answer'];}
             if (isset($options['partweights'])) {$partweights = $options['partweights'];}
         }
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
+        if (isset($options['reltolerance'])) {
+            if (is_array($options['reltolerance'])) {
+                if (isset($options['reltolerance'][$partnum])) {
+                    $reltolerance = $options['reltolerance'][$partnum];
+                }
+            } else {
+                $reltolerance = $options['reltolerance'];
+            }
+        }
+        if (isset($options['abstolerance'])) {
+            if (is_array($options['abstolerance'])) {
+                if (isset($options['abstolerance'][$partnum])) {
+                    $abstolerance = $options['abstolerance'][$partnum];
+                }
+            } else {
+                $abstolerance = $options['abstolerance'];
+            }
+        }
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
 

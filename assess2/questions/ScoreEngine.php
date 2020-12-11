@@ -189,7 +189,7 @@ class ScoreEngine
                     $abstolerance = 0.5 / (pow(10, $reqdecimals));
                 } else if (isset($anstypes) && !isset($reltolerance)) {
                     foreach ($anstypes as $kidx => $vval) {
-                        if (!isset($abstolerance[$kidx]) && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
+                        if (!isset($abstolerance[$kidx]) && $vval != 'draw' && (!is_array($reltolerance) || !isset($reltolerance[$kidx]))) {
                             $abstolerance[$kidx] = 0.5 / (pow(10, $reqdecimals));
                         }
                     }
