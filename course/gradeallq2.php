@@ -405,10 +405,10 @@
         echo '</ul>';
         echo '<p>';
 		//echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
-		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
-        echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
-        echo ' <button type="button" onclick="sidebysidegrading()">'._('Side-by-Side').'</button>';
-	}
+    }
+    echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
+    echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
+    echo ' <button type="button" onclick="sidebysidegrading()">'._('Side-by-Side').'</button>';
 	echo ' <button type="button" id="clrfeedback" onclick="clearfeedback()">'._('Clear all feedback').'</button>';
 	if ($deffbtext != '') {
 		echo ' <button type="button" id="clrfeedback" onclick="cleardeffeedback()">'._('Clear default feedback').'</button>';
