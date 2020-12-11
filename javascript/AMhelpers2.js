@@ -827,8 +827,12 @@ function syntaxCheckMQ(id, str) {
 }
 
 function showSyntaxCheckMQ(qn) {
+  var params = allParams[qn];
   var res = processByType(qn);
   var outstr = '';
+  if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat.indexOf('showval')!=-1) {
+    outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+  }
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
