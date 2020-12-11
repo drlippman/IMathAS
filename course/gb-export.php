@@ -593,7 +593,7 @@ function gbinstrdisp() {
 				echo '</td>';
 				if ($commentloc==0) {
 					if (isset($gbt[$i][1][$j][1])) {
-						echo '<td>'.$gbt[$i][1][$j][1].'</td>';
+						echo '<td>'.strip_tags($gbt[$i][1][$j][1]).'</td>';
 					} else {
 						echo '<td></td>';
 					}
@@ -613,8 +613,8 @@ function gbinstrdisp() {
 			gbInstrCatCols($gbt, $i);
 		}
 		if (isset($gbcomments[$gbt[$i][4][0]])) {
-			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][0]) . '</td>';
-			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][1]) . '</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay(strip_tags($gbcomments[$gbt[$i][4][0]][0])) . '</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay(strip_tags($gbcomments[$gbt[$i][4][0]][1])) . '</td>';
 		} else {
 			echo '<td></td>';
 			echo '<td></td>';
@@ -635,7 +635,7 @@ function gbinstrdisp() {
 						continue;
 					}
 					if (isset($gbt[$i][1][$j][1])) {
-						echo '<td>'.$gbt[$i][1][$j][1].'</td>';
+						echo '<td>'.strip_tags($gbt[$i][1][$j][1]).'</td>';
 					} else {
 						echo '<td></td>';
 					}
