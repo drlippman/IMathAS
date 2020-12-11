@@ -1571,7 +1571,7 @@ function processNumfunc(qn, fullstr, format) {
   }
 
   totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-console.log(totesteqn);
+
   var i,j,totest,testval,res;
   var successfulEvals = 0;
   for (j=0; j < 20; j++) {
