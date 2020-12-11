@@ -592,6 +592,12 @@ export const actions = {
     }
   },
   doAutosave (qn, partnum, timeactive) {
+    if (store.inTransit) {
+      // wait until not in transit; don't want to add to autosavequeue then
+      // have queue cleared when intransit returns
+      window.setTimeout(() => this.doAutosave(qn, partnum, timeactive), 20);
+      return;
+    }
     store.somethingDirty = false;
     // this.clearAutosaveTimer()
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
@@ -737,6 +743,10 @@ export const actions = {
             this.copySettings(response);
           }
           return;
+        }
+        if (response.autosave === 'done') {
+          this.markAutosavesDone();
+          delete response.autosave;
         }
         response = this.processSettings(response);
         this.copySettings(response);
