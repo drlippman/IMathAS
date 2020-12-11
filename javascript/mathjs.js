@@ -112,20 +112,26 @@ function mathjs(st,varlist) {
   	  //search for alt capitalization to escape alt caps correctly
   	  var foundaltcap = [];
   	  for (var i=0; i<vararr.length; i++) {
-  	  	  foundaltcap[i] = false;
-  	  	  for (var j=0; j<vararr.length; j++) {
-  	  	  	  if (i!=j && vararr[j].toLowerCase()==vararr[i].toLowerCase() && vararr[j]!=vararr[i]) {
-	  			foundaltcap[i] = true;
-	  			break;
-	  		}
-	  	}
+        foundaltcap[i] = false;
+        if (vararr[i] == "E" || vararr[i] == "e") {
+            foundaltcap[i] = true;  // always want to treat e and E as different
+        } else {
+            for (var j=0; j<vararr.length; j++) {
+                if (i!=j && vararr[j].toLowerCase()==vararr[i].toLowerCase() && vararr[j]!=vararr[i]) {
+                    foundaltcap[i] = true;
+                    break;
+                }
+            } 
+        }
 	  }
 	  st = st.replace(new RegExp("("+varlist+")","gi"), function(match,p1) {
 		 for (var i=0; i<vararr.length;i++) {
 			if (vararr[i]==p1 || (!foundaltcap[i] && vararr[i].toLowerCase()==p1.toLowerCase())) {
 				return '(@v'+i+'@)';
 			}
-		 }});
+         }
+         return p1;
+        });
   } else {
   	  st = st.replace(/pi/g, "(pi)");
   }

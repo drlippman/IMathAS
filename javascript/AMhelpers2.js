@@ -1020,9 +1020,8 @@ function AMnumfuncPrepVar(qn,str) {
     if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
       str = str.replace(/\(\((.*?)\)\)/g,'($1)');
     }
-  	if (vars[i] == "varE") {
-		  str = str.replace("E","varE");
-		  dispstr = dispstr.replace("E","varE");
+  	if (vars[i] == "E" || vars[i] == "e") {
+          foundaltcap[i] = true;  // always want to treat e and E as different
 	  } else {
 	  	foundaltcap[i] = false;
 	  	for (var j=0; j<vars.length; j++) {
@@ -1039,7 +1038,9 @@ function AMnumfuncPrepVar(qn,str) {
 		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
-	 }});
+     }
+     return p1;
+    });
   str = str.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
@@ -1048,7 +1049,9 @@ function AMnumfuncPrepVar(qn,str) {
 		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
-	 }});
+     }
+     return p1;
+    });
   // fix display of /n!
   dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
@@ -1089,7 +1092,7 @@ function AMnumfuncPrepVar(qn,str) {
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
-		  } else if (!isgreek && vars[i]!="varE" && vars[i].replace(/[^\w_]/g,'').length>1) {
+		  } else if (!isgreek && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
       if (vars[i].match(/[^\w_]/) || vars[i].match(/^(break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|and with)$/)) {
@@ -1104,7 +1107,6 @@ function AMnumfuncPrepVar(qn,str) {
 	  var reg = new RegExp("("+vltq+")","g");
 	  dispstr = dispstr.replace(reg,"\"$1\"");
   }
-  dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
   str = str.replace(/@(\d+)@/g, indextofunc);
   submitstr = submitstr.replace(/@(\d+)@/g, indextofunc);
@@ -1565,7 +1567,7 @@ function processNumfunc(qn, fullstr, format) {
   }
 
   totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-
+console.log(totesteqn);
   var i,j,totest,testval,res;
   var successfulEvals = 0;
   for (j=0; j < 20; j++) {

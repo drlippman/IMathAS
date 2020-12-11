@@ -94,10 +94,6 @@ class FunctionExpressionScorePart implements ScorePart
             }
         }
 
-        if (($v = array_search('E', $variables))!==false) {
-            $variables[$v] = 'varE';
-            $answer = str_replace('E','varE',$answer);
-        }
         if (isset($domain)) {
             $fromto = array_map('trim',explode(",",$domain));
         } else {
