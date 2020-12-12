@@ -830,7 +830,7 @@ function showSyntaxCheckMQ(qn) {
   var params = allParams[qn];
   var res = processByType(qn);
   var outstr = '';
-  if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat.indexOf('showval')!=-1) {
+  if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
     outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
   }
   if (res.err && res.err != '' && res.str != '') {
@@ -949,9 +949,11 @@ function processByType(qn) {
       case 'calcinterval':
         res = processCalcInterval(str, params.calcformat, params.vars);
         break;
+      case 'ntuple':
       case 'calcntuple':
         res = processCalcNtuple(str, params.calcformat);
         break;
+      case 'complex':
       case 'calccomplex':
         res = processCalcComplex(str, params.calcformat);
         break;
