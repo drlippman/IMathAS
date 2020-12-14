@@ -123,7 +123,9 @@
     "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question.",
     "jump_to_answer": "Jump to Answer",
     "jump_warn": "This will use up your remaining tries at this version of the question.",
-    "showwork": "Show work here by typing it or attaching a file or picture"
+    "showwork": "Show work here by typing it or attaching a file or picture",
+    "uploadwork": "Show work here by attaching a file or picture",
+    "uploading": "Uploading..."
   },
   "header": {
     "score": "Score: {pts}/{poss}",
@@ -459,7 +461,8 @@
     "noquestions": "No questions require work",
     "save": "Save Work",
     "save_continue": "Save Work and Continue",
-    "add_prev": "You can still show or attach work for the previous attempt"
+    "add_prev": "You can still show or attach work for the previous attempt",
+    "remove": "Are you sure you want to remove this file?"
   },
   "regions": {
     "questions": "Questions and text",

@@ -104,7 +104,7 @@ if (!(isset($teacherid))) {
 
 			if ($_POST['showwork'] !== 'DNC') {
 				$sets[] = "showwork=:showwork";
-				$qarr[':showwork'] = Sanitize::onlyInt($_POST['showwork']);
+				$qarr[':showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
 			}
 
 			if ($_POST['displaymethod'] !== 'DNC') {

@@ -50,7 +50,8 @@ $vueData = array(
 	'assmpassword' => $line['password'],
 	'revealpw' => false,
 	'showhints' => ($line['showhints']&1) > 0,
-	'showwork' => $line['showwork'],
+    'showwork' => ($line['showwork']&3),
+    'showworktype' => ($line['showwork']&4),
 	'showextrefs' => ($line['showhints']&2) > 0,
 	'msgtoinstr' => $line['msgtoinstr'] > 0,
 	'doposttoforum' => $line['posttoforum'] > 0,
@@ -405,8 +406,14 @@ $vueData = array(
 					<option value="1"><?php echo _('During assessment');?></option>
 					<option value="2"><?php echo _('After assessment');?></option>
 					<option value="3"><?php echo _('During or after assessment');?></option>
-				</select>
-			</span><br class=form />
+                </select>
+                <br>
+                <label for="showworktype"><?php echo _('Work entry type');?>:</label>
+                <select name="showworktype" id="showworktype" v-model="showworktype">
+                    <option value="0"><?php echo _('Essay');?></option>
+                    <option value="4"><?php echo _('File upload');?></option>
+                </select>
+            </span><br class=form />
 
 			<span class=form><?php echo _('Options');?></span>
 			<span class=formright>

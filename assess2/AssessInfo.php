@@ -1247,6 +1247,9 @@ class AssessInfo
       }
     }
 
+    $settings['showworktype'] = ($settings['showwork'] & 4);
+    $settings['showwork'] = ($settings['showwork'] & 3);
+
     return $settings;
   }
 

@@ -50,6 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $defpoints = $row['defpoints'];
     $assessmentname = $row['name'];
     $displaymethod = $row['displaymethod'];
+    $row['showwork'] = ($row['showwork'] & 3);
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {

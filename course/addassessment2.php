@@ -277,7 +277,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['istutorial'] = empty($_POST['istutorial']) ? 0 : 1;
 			$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
 			$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
-			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']);
+			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
 
 			// time limit and access control
 			$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);

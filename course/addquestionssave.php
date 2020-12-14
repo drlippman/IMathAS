@@ -16,6 +16,7 @@
 		echo "error: invalid ID";
 		exit;
     }
+    $showwork = ($showwork & 3);
     if ($aver > 1) {
 		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
 		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";

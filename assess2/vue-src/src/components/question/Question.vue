@@ -54,7 +54,6 @@
         {{ showWorkInput ? $t('work.hide') : $t('work.add') }}
       </button>
       <div v-show="getwork === 2 || showWorkInput">
-        {{ $t("question.showwork") }}
         <showwork-input
           :id="'sw' + qn"
           :value = "questionData.work"
@@ -396,7 +395,6 @@ export default {
       }
     },
     workFocused () {
-      actions.clearAutosaveTimer();
       this.lastWorkVal = this.work;
     },
     trySimilar () {

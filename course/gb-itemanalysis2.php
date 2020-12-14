@@ -51,7 +51,8 @@
 
 	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints,courseid,tutoredit,submitby,showwork FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit, $submitby, $showworkdef) = $stm->fetch(PDO::FETCH_NUM);
+    list($defpoints, $aname, $itemorder, $defoutcome, $showhints, $assesscourseid, $tutoredit, $submitby, $showworkdef) = $stm->fetch(PDO::FETCH_NUM);
+    $showworkdef = ($showworkdef & 3);
 	$showhints = (($showhints&2)==2);
 	if ($assesscourseid != $cid) {
 		echo "Invalid assessment ID";
