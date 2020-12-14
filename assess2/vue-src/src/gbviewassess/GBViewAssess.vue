@@ -235,6 +235,11 @@
               >
                 {{ $t('gradebook.show_all_work') }}
               </button>
+              <button
+                @click = "previewFiles"
+              >
+                {{ $t('gradebook.preview_files') }}
+              </button>
             </p>
           </div>
         </div>
@@ -685,7 +690,11 @@ export default {
     },
     closeConfirm () {
       store.confirmObj = null;
+    },
+    previewFiles () {
+      window.previewallfiles();
     }
+
   },
   created () {
     window.$(window).on('beforeunload', this.beforeUnload);

@@ -450,7 +450,8 @@
     "hide_endmsg": "Hide End Message",
     "has_timeext": "Has a {n} minute time limit extension available",
     "used_timeext": "Used a {n} minute time limit extension",
-    "attemptext": "Exception given for {n} additional versions"
+    "attemptext": "Exception given for {n} additional versions",
+    "preview_files": "Preview All Files"
   },
   "work": {
     "add": "Add Work",

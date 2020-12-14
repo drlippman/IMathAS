@@ -54,7 +54,10 @@ function previewall() {
 }
 function previewallfiles() {
 	$("span.clickable").trigger("click");
-	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn]").trigger("click");
+	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").trigger("click");
+}
+function showallwork() {
+	$(".viewworkwrap > button").trigger("click");
 }
 function allvisfullcred() {
 	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
