@@ -668,7 +668,6 @@ class QuestionHtmlGenerator
          */
         if (isset($seqPartDone)) {
           $seqParts = preg_split('~(<p[^>]*>(<[^>]*>)*|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
-echo count($seqParts);
           if (count($seqParts) > 1) {
             $newqtext = '';
             $lastGroupDone = true;
