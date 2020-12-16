@@ -162,13 +162,22 @@ if (!empty($createcourse)) {
 		if (function_exists('onAddCourse')) {
 			onAddCourse($cid, $userid);
 		}
-	}
-	$stm = $DBH->prepare("UPDATE imas_lti_courses SET courseid=:courseid WHERE org=:org AND contextid=:contextid");
-	$stm->execute(array(':courseid'=>$cid, ':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id']));
-	if ($stm->rowCount()==0) {
+    }
+    
+    $shortorg = explode(':', $_SESSION['ltiorg'])[0];
+    $stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
+    $stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+    $oldcourseid = $stm->fetchColumn(0);
+    if ($oldcourseid === false) { // no existing course connection
 		$stm = $DBH->prepare("INSERT INTO imas_lti_courses (org,contextid,courseid) VALUES (:org, :contextid, :courseid)");
 		$stm->execute(array(':org'=>$_SESSION['ltiorg'], ':contextid'=>$_SESSION['lti_context_id'], ':courseid'=>$cid));
-	}
+    } else if (!empty($cid) && $oldcourseid != $cid) {
+        $stm = $DBH->prepare("UPDATE imas_lti_courses SET courseid=:courseid WHERE org LIKE :org AND contextid=:contextid");
+        $stm->execute(array(':courseid'=>$cid, ':org'=>"$shortorg:%", ':contextid'=>$_SESSION['lti_context_id']));
+        // if we're changing courses, we should delete any existing placements.
+        $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE contextid=:contextid AND org LIKE :org");
+        $stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+	} // otherwise, same course; do nothing
 	$hascourse = true;
 
 } else if (isset($_POST['setplacement'])) {
