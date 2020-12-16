@@ -30,8 +30,9 @@ if ($_SESSION['ltiitemtype']==0) {
 		$role = 'teacher';
 	}
 } else {
-	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org=:org");
-	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>$_SESSION['ltiorg']));
+    $shortorg = explode(':', $_SESSION['ltiorg'])[0];
+	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
+    $stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
 	if ($stm->rowCount()==0) {
 		$hascourse = false;
 		if (isset($_SESSION['lti_launch_get']) && isset($_SESSION['lti_launch_get']['cid'])) {
@@ -47,10 +48,11 @@ if ($_SESSION['ltiitemtype']==0) {
 		$cid = $stm->fetchColumn(0);
 	}
 	if ($hascourse) {
+        $shortorg = explode(':', $_SESSION['ltiorg'])[0];
 		$query = "SELECT id,placementtype,typeid FROM imas_lti_placements WHERE contextid=:contextid ";
-		$query .= "AND org=:org AND linkid=:linkid";
+		$query .= "AND org LIKE :org AND linkid=:linkid";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>$_SESSION['ltiorg'], ':linkid'=>$_SESSION['lti_resource_link_id']));
+		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%", ':linkid'=>$_SESSION['lti_resource_link_id']));
 		if ($stm->rowCount()==0) {
 			$hasplacement = false;
 			if (isset($_SESSION['lti_launch_get']) && isset($_SESSION['lti_launch_get']['aid'])) {
