@@ -908,6 +908,17 @@ button.plain:hover, button.plain:active {
   text-align: left;
   cursor: pointer;
 }
+#GB_footer {
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid #ccc;
+    width: 100%;
+    text-align: right;
+    margin-right: 20px;
+}
+#GB_footer button:last-child {
+    margin-right: 20px;
+}
 #GB_caption a, #GB_caption a:hover, #GB_caption a:focus {
 	color: #fff;
 	text-decoration: none;

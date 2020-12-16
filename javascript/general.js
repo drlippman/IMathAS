@@ -308,7 +308,7 @@ function GB_resize(e) {
 
 	gbwin.css("width", Math.max(0,gbwin.data("original_w") + dx))
 	 .css("height", Math.max(0,gbwin.data("original_h") + dy));
-	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - 36);
+	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - gbwin.data("footer_h"));
 }
 function GB_endresize(e) {
 	jQuery(window).off("touchmove.GBresize touchend.GBresize mousemove.GBresize mouseup.GBresize");
@@ -317,7 +317,14 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
+var GB_sourceel = null;
 function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
+    if (document.activeElement) {
+        GB_sourceel = document.activeElement;
+        if ($(GB_sourceel).closest(".dropdown-menu").length > 0) {
+            GB_sourceel = $(GB_sourceel).closest(".dropdown").find("a,button")[0];
+        }
+    }
     posstyle = posstyle || '';
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
@@ -329,7 +336,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		gb_window.setAttribute("aria-labelledby","GB_title");
 		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
-		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_resizehandle"></div>';
+		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_footer"></div><div id="GB_resizehandle"></div>';
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
 		GB_loaded  = true;
 		jQuery("#GB_caption").on('mousedown touchstart', function(e) {
@@ -370,7 +377,8 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 			  .css("top", gbwin.getBoundingClientRect().top)
 			  .css("margin", 0).css("right","")
 			  .data("original_w", $(gbwin).width())
-			  .data("original_h", $(gbwin).height())
+              .data("original_h", $(gbwin).height())
+              .data("footer_h", $("#GB_footer:visible").outerHeight() + $("#GB_caption").outerHeight())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY);
 
@@ -401,31 +409,37 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 	} else {
         document.getElementById("GB_loading").style.display = 'none';
 	}
-	jQuery("#GB_frameholder").isolatedScroll();
+    jQuery("#GB_frameholder").isolatedScroll();
+    document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 	if (url.match(/libtree/)) {
-		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
-		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
-		document.getElementById("GB_caption").innerHTML = btnhtml;
+		//var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
+		//btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
+       // document.getElementById("GB_caption").innerHTML = btnhtml;
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setlib()">Use Libraries</button> <button type=button onclick="GB_hide()">Close</button>';
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else if (url.match(/assessselect/)) {
-		var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
-		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
-		document.getElementById("GB_caption").innerHTML = btnhtml;
+		//var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
+		//btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
+       // document.getElementById("GB_caption").innerHTML = btnhtml;
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setassess()">Use Assessments</button> <button type=button onclick="GB_hide()">Close</button>';
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
+        document.getElementById("GB_footer").innerHTML = '<button type=button class="primary" onclick="GB_hide()">Close</button>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
 			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 		} else {
 			var h = height;
 		}
-	}
+    }
 	document.getElementById("GB_window").style.display = "block";
     if (overlay !== false) {
-	document.getElementById("GB_overlay").style.display = "block";
+        document.getElementById("GB_overlay").style.display = "block";
+        document.getElementById("GB_footer").style.display = "block";
+        document.getElementsByTagName("body")[0].style.overflow = "hidden";
     } else {
         document.getElementById("GB_overlay").style.display = "none";
+        document.getElementById("GB_footer").style.display = "none";
     }
 
 	//var de = document.documentElement;
@@ -463,33 +477,57 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
             $("#GB_window").css("left", width).css("width","auto").css("right",20).css("margin","0");
             width = w - width - 20;
         } else {
-	document.getElementById("GB_window").style.width = width + "px";
+            document.getElementById("GB_window").style.width = width + "px";
         }
         
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
 	if (url.charAt(0)!='<') {
-		document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
+        var capheight = $("#GB_caption").outerHeight();
+        var footheight = $("#GB_footer:visible").outerHeight();
+        document.getElementById("GB_frameholder").style.height = 
+            (h - 30 - capheight - footheight)+"px";
 	} else {
 		document.getElementById("GB_frameholder").style.height = "auto";
 	}
     }
-	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {
 			GB_hide();
-		}
-	});
+		} else if (evt.keyCode == 9 && overlay !== false) {
+            GB_retainfocus(evt);
+        }
+    });
+    document.getElementById("GB_window").focus();
 }
 function GB_doneload() {
 	document.getElementById("GB_loading").style.display = "none";
 }
 function GB_hide() {
-	document.getElementById("GB_window").style.display = "none";
+    document.getElementById("GB_window").style.display = "none";
 	if (document.getElementById("GB_overlay")) {
-		document.getElementById("GB_overlay").style.display = "none";
+        document.getElementById("GB_overlay").style.display = "none";
+        document.getElementsByTagName("body")[0].style.overflow = "";
 	}
-	$(document).off('keydown.GB');
+    $(document).off('keydown.GB');
+    if (GB_sourceel) {
+        GB_sourceel.focus();
+    }
+    GB_sourceel = null;
+}
+
+function GB_retainfocus(evt) {
+    if (!document.getElementById("GB_window").contains(document.activeElement)) {
+        $("#GB_window").find("a,button,input").first().focus();
+    } else {
+        if (evt.shiftKey && $("#GB_window").find("a,button,input").first()[0] == document.activeElement) {
+            $("#GB_window").find("a,button,input").last().focus();
+            evt.preventDefault();
+        } else if (!evt.shiftKey && $("#GB_window").find("a,button,input").last()[0] == document.activeElement) {
+            $("#GB_window").find("a,button,input").first().focus();
+            evt.preventDefault();
+        }
+    }
 }
 
 function chkAllNone(frmid, arr, mark, skip) {
