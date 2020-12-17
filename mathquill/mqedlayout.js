@@ -587,7 +587,7 @@ var myMQeditor = (function($) {
     var btns = [];
     var maxbasic = (layoutstyle=='OSK' ? 4 : 2);
     for (var i=0; i<vars.length; i++) {
-      vars[i] = vars[i].replace(/alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau/i,
+      vars[i] = vars[i].replace(/\b(alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau)\b/i,
         '\\$&');
       if (vars[i].charAt(0)!='\\' && vars[i].length > maxlen) {
         maxlen = vars[i].length;

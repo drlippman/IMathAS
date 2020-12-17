@@ -25,6 +25,7 @@ var MQeditor = (function($) {
   var blurTimer = null;
   var keyRepeatInterval = null;
   var MQ = MathQuill.getInterface(MathQuill.getInterface.MAX);
+  var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
 
   /*
     Config object for MQeditor
@@ -113,16 +114,20 @@ var MQeditor = (function($) {
         }
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
             'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
+        thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
         var vars = el.getAttribute("data-mq-vars") || '';
         if (vars != '') {
             vars = (vars=='') ? [] : vars.split(/,/);
             for (var i=0; i<vars.length; i++) {
                 if (vars[i].length > 1 && vars[i].match(/^[a-zA-Z]+$/)) {
-                    thisMQconfig.autoOperatorNames += ' ' + vars[i];
+                    if (greekletters.indexOf(vars[i].toLowerCase())!=-1) {
+                        thisMQconfig.autoCommands += ' ' + vars[i];
+                    } else {
+                        thisMQconfig.autoOperatorNames += ' ' + vars[i];
+                    }
                 }
             }
         }
-
         if (el.disabled) {
           mqfield = MQ.StaticMath(span[0]);
           span.addClass("disabled");
