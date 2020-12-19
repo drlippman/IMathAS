@@ -537,7 +537,7 @@ var myMQeditor = (function($) {
       } else {
         baselayout.tabs[4].enabled = true;
       }
-    } else if (qtype.match(/matrix/) && !calcformat.match(/matrixsized/)) {
+    } else if ((qtype.match(/matrix/) || calcformat.match(/matrix/)) && !calcformat.match(/matrixsized/)) {
       baselayout.tabs[5].enabled = true;
     } else if (calcformat.match(/set/)) {
       baselayout.tabs[0].tabcontent.unshift({
