@@ -5898,6 +5898,11 @@ Environments.matrix = P(Environment, function(_, super_) {
       }
     }
     if (myColumn.length > 1) {
+      row = rows.indexOf(myRow);
+      // Decrease all following row numbers
+      this.eachChild(function (cell) {
+        if (cell.row > row) cell.row-=1;
+      });
       remove(myRow);
       this.jQ.find('tr').eq(row).remove();
     }
