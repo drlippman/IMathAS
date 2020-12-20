@@ -115,7 +115,7 @@ class Imathas_LTI_Database implements LTI\Database
      * @param  string           $client_id
      * @return LTI_Registration
      */
-    public function find_registration_by_issuer(string $iss, ?string $client_id): LTI\LTI_Registration
+    public function find_registration_by_issuer(string $iss, ?string $client_id): ?LTI\LTI_Registration
     {
         if (empty($client_id)) {
             if (isset($_GET['u'])) {
@@ -134,7 +134,7 @@ class Imathas_LTI_Database implements LTI\Database
         }
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row === false || $row === null) {
-            return false;
+            return null;
         }
         return LTI\LTI_Registration::new ()
             ->set_auth_login_url($row['auth_login_url'])
