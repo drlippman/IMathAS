@@ -116,14 +116,18 @@ var MQeditor = (function($) {
             'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
         thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
         var vars = el.getAttribute("data-mq-vars") || '';
+        var varpts;
         if (vars != '') {
             vars = (vars=='') ? [] : vars.split(/,/);
             for (var i=0; i<vars.length; i++) {
-                if (vars[i].length > 1 && vars[i].match(/^[a-zA-Z]+$/)) {
-                    if (greekletters.indexOf(vars[i].toLowerCase())!=-1) {
-                        thisMQconfig.autoCommands += ' ' + vars[i];
-                    } else {
-                        thisMQconfig.autoOperatorNames += ' ' + vars[i];
+                varpts = vars[i].split(/_/);
+                for (var j=0; j<varpts.length; j++) {
+                    if (varpts[j].length > 1 && varpts[j].match(/^[a-zA-Z]+$/)) {
+                        if (greekletters.indexOf(varpts[j].toLowerCase())!=-1) {
+                            thisMQconfig.autoCommands += ' ' + varpts[j];
+                        } else {
+                            thisMQconfig.autoOperatorNames += ' ' + varpts[j];
+                        }
                     }
                 }
             }

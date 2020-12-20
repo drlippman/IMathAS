@@ -765,10 +765,10 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\\begin{.?matrix}(.*?)\\end{.?matrix}/g, function(m, p) {
     return '[(' + p.replace(/\\\\/g,'),(').replace(/&/g,',') + ')]';
   });
-	tex = tex.replace(/\\le(?!f)/g,'<=');
-	tex = tex.replace(/\\ge/g,'>=');
-  tex = tex.replace(/\\ne/g,'!=');
-  tex = tex.replace(/\\pm/g,'+-');
+	tex = tex.replace(/\\le(?!f)\b/g,'<=');
+	tex = tex.replace(/\\ge\b/g,'>=');
+  tex = tex.replace(/\\ne\b/g,'!=');
+  tex = tex.replace(/\\pm\b/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
     tex = tex.replace(/\\cup/g,'U');
