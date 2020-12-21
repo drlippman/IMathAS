@@ -313,7 +313,7 @@ function showcalcontentsid(elid) {
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='CD') {
 				html += '<li><span class="calitem">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				html += caleventsarr[elid].data[i].name;
+				html += caleventsarr[elid].data[i].name.replace(/https?:\/\/[^\s<]*/g, '<a href="$&" target="_blank">$&</a>');
 				html += '</li>';
 			}
 		}
