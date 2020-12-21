@@ -39,7 +39,8 @@ header("Content-type: application/json;");
                   "selection_height": 600,
                   "selection_width": 600
                }
-            ]
+            ],
+            "privacy_level": "public"
          }
       }
    ],
