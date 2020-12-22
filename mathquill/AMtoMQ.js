@@ -765,7 +765,7 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\\begin{.?matrix}(.*?)\\end{.?matrix}/g, function(m, p) {
     return '[(' + p.replace(/\\\\/g,'),(').replace(/&/g,',') + ')]';
   });
-	tex = tex.replace(/\\le/g,'<=');
+	tex = tex.replace(/\\le(?!f)/g,'<=');
 	tex = tex.replace(/\\ge/g,'>=');
   tex = tex.replace(/\\ne/g,'!=');
   tex = tex.replace(/\\pm/g,'+-');
@@ -821,5 +821,5 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
   tex = tex.replace(/text\(([^)]*)\)/g, '$1');
 
-	return tex;
+  return tex;
 }
