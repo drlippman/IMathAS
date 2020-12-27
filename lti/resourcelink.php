@@ -15,7 +15,7 @@ function link_to_resource($launch, $localuserid, $localcourse, $db) {
   $target = parse_target_link($launch->get_target_link(), $db);
 
   if (empty($target)) {
-    echo "Error parsing requested resource";
+    echo "Error parsing requested resource. Make sure that the launch URL contains a resource identifier. If it does not, you will either need to use the export/import process to bring in the link, or use the LMS's content selection / deep linking tools.";
     exit;
   }
 

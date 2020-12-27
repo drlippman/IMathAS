@@ -115,10 +115,11 @@
         </ul>
       </div>
 
-      <div v-if="canEdit && aData.has_active_attempt">
-        <a :href="viewAsStuUrl">
+      <div v-if="canEdit">
+        <a v-if="aData.has_active_attempt" :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
-        </a> |
+        </a>
+        <span v-if="aData.has_active_attempt">|</span>
         <a :href="viewAsStuUrl + '#/print'">
           {{ $t('gradebook.print') }}
         </a>

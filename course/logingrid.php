@@ -41,10 +41,10 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$now = time();
-	if (isset($_POST['daterange'])) {
+	if (isset($_REQUEST['daterange'])) {
 		require("../includes/parsedatetime.php");
-		$start = parsedatetime($_POST['sdate'],'12:00am');
-		$end = parsedatetime($_POST['edate'],'11:59pm');
+		$start = parsedatetime($_REQUEST['sdate'],'12:00am');
+		$end = parsedatetime($_REQUEST['edate'],'11:59pm');
 		if (($end-$start)/86400>365) {
 			$start = $end-365*24*60*60;
 		}
@@ -58,7 +58,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	$starttime = tzdate("M j, Y, g:i a", $start);
 	$endtime = tzdate("M j, Y, g:i a", $end);
 	$sdate = tzdate("m/d/Y",$start);
-	$edate = tzdate("m/d/Y",$end);
+    $edate = tzdate("m/d/Y",$end);
+    $downloadqs = "&download=true&daterange=go&sdate=".Sanitize::encodeUrlParam($sdate)."&edate=".Sanitize::encodeUrlParam($edate);
 
 	$logins = array();
 	$stm = $DBH->prepare("SELECT userid,logintime FROM imas_login_log WHERE courseid=:courseid AND logintime>=:start AND logintime<=:end");
@@ -131,7 +132,7 @@ if ($overwriteBody==1) {
 	<div id="headerlogingrid" class="pagetitle"><h1>Login Grid View</h1></div>
 
 	<div class="cpmid">
-		<a href="logingrid.php?cid=<?php echo $cid;?>&download=true">Download as CSV</a>
+		<a href="logingrid.php?cid=<?php echo $cid . $downloadqs;?>">Download as CSV</a>
 	</div>
 
 	<form method="post" action="logingrid.php?cid=<?php echo $cid;?>">

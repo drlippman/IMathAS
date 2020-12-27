@@ -139,6 +139,10 @@
         target="_blank"
       >{{ help.title }}</a>
     </div>
+    <div v-if="qdata.category">
+      {{ $t('qdetails.category') }}:
+      {{ qdata.category }}
+    </div>
     <div>
       <a :href="messageHref" target="help" v-if="showMessage">
         <icons name="message" />

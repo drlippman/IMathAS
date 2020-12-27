@@ -58,7 +58,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all || $_POST['in_print'] == 1);
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -223,7 +223,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
     // for practice, if we don't have unsubmitted attempt, then
     // we need to create a whole new data
     $assess_record->buildAssessData(true);
-  } else {
+  } else if (!($canViewAll && $_POST['in_print'] == 1)) { // only mark as started if student
     if ($assess_record->hasUnstartedAttempt()) {
       // has an assessment attempt they haven't started yet
       $assess_record->setStatus(true, true);
@@ -307,7 +307,9 @@ $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
 
 //get attempt info
-$assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+$assessInfoOut['has_active_attempt'] = ($assess_record->hasActiveAttempt() ||
+    ($canViewAll && $_POST['in_print'] == 1)  // for GB print view, fake an active attempt
+  );
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   // These values are adjusted for timelimit multiplier, but are not limited

@@ -537,7 +537,7 @@ var myMQeditor = (function($) {
       } else {
         baselayout.tabs[4].enabled = true;
       }
-    } else if (qtype.match(/matrix/) && !calcformat.match(/matrixsized/)) {
+    } else if ((qtype.match(/matrix/) || calcformat.match(/matrix/)) && !calcformat.match(/matrixsized/)) {
       baselayout.tabs[5].enabled = true;
     } else if (calcformat.match(/set/)) {
       baselayout.tabs[0].tabcontent.unshift({
@@ -586,10 +586,15 @@ var myMQeditor = (function($) {
     var maxlen = 1;
     var btns = [];
     var maxbasic = (layoutstyle=='OSK' ? 4 : 2);
+    var varpts
     for (var i=0; i<vars.length; i++) {
-      vars[i] = vars[i].replace(/alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau/i,
-        '\\$&');
-      if (vars[i].charAt(0)!='\\' && vars[i].length > maxlen) {
+        varpts = vars[i].split(/_/);
+        for (var j=0; j<varpts.length; j++) {
+            varpts[j] = varpts[j].replace(/\b(alpha|beta|chi|delta|epsilon|gamma|varphi|phi|psi|sigma|rho|theta|lambda|mu|nu|omega|tau)\b/i,
+                '\\$&');
+        }
+        vars[i] = varpts.join('_');
+      if ((vars[i].charAt(0)!='\\' || varpts.length>1) && vars[i].length > maxlen) {
         maxlen = vars[i].length;
       }
       vars[i] = vars[i].replace(/_(\w{2,})/,"_{$1}");
