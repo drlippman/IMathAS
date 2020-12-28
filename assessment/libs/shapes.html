@@ -20,6 +20,7 @@
     <li><a href="#rectangle">draw_rectangle</a></li>
     <li><a href="#square">draw_square</a></li>
     <li><a href="#polygon">draw_polygon</a></li>
+    <li><a href='#prismcubes'>draw_prismcubes</a></li>
 </div>
 <p>&nbsp;</p>
 <p>&nbsp;<strong>Function output:</strong></p>
@@ -43,7 +44,7 @@
   <li><strong>"median,[_,_,_,lab1,lab2,lab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle, and lab1,lab2,lab3 are labels for the midpoint of the opposite side.</li>
   <li><strong>"altitude,[_,_,_,lab1,lab2,lab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle, and lab1,lab2,lab3 are labels for where the altitude intersects the opposite (extended) side. Dashed lines are drawn to extend opposite side if necessary. Using "altitude" rotates the triangle so the side with the (last) altitude is horizontal.</li>
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
-  <li><strong>"horizontal"</strong> Using this draws the triangle so the side opposite to the largest angle will be drawn horizontally.</li>
+  <li><strong>"rotate"</strong> Rotates the triangle by a random angle.</li>
 </ul>
   <p>Notes</p>
 <ol>
@@ -55,15 +56,15 @@
   <li>Common Greek letters (pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using a Greek letter will suppress the degree symbol.</li>
   <li>If a label is a point, type it as (x;y).</li>
   <li>For "sides,a,b,c" and "angles,A,B,C", the number "a" is the side opposite angle "A", etc.</li>
-  <li>All triangles are drawn with random rotation, unless "horizontal" is used.</li>
+  <li>By default, triangles are drawn with vertex 0 at bottom left, vertex 1 at bottom right, and vertex 2 at top. Use "rotate" to rotate the triangle.</li>
 </ol>
 <br />
 <p>Examples:</p>
 <p><strong>$gr = draw_triangle("angles,30,60,90,pi/6,pi/3")</strong> -- A 30-60-90 right triangle with angle labels &pi;/6 and &pi;/3. The right angle box is displayed by default.</p>
 <p><strong>$gr = draw_triangle("sides,5,10,12,a,b,c", "angles,A,B,C")</strong> -- A triangle with side lengths 5, 10 and 12, labeled with letters a,b,c. Angles are labeled with A,B,C.</p>
-<p><strong>$gr = draw_triangle("horizontal","points")</strong> -- A random triangle with points on the vertices (unlabeled), drawn with one side horizontal.</p>
+<p><strong>$gr = draw_triangle("rotate","points")</strong> -- A random triangle with points on the vertices (unlabeled), drawn with random rotation.</p>
 <p><strong>$gr = draw_triangle("random","points,P,Q,R","angles,a,b,c,(,((,(((")</strong> -- A triangle with random angles, points are labeled P,Q,R, angles are labeled a,b,c and they have arcs (, (( and (((.</p>
-<p><strong>$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")</strong> -- A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and an altitude drawn down from point A, ending at labeled point P.</p>
+<p><strong>$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")</strong> -- A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and an altitude drawn down from point A, labeled with the letter "P".</p>
 
 
 <p><a name="circle"></a></p>
@@ -95,6 +96,7 @@
 <p>Draws and labels a scaled sector of a circle.</p>
 <p>Syntax: draw_circlesector("angle,measurement,[label]", ["option 1", "option 2", ...])</p>
 <p>draw_circlesector("angle,measurement,[label]") -- this draws a circle sector with angle measurement (given in degrees), and optional label.</p>
+<p>Note: Up to two "angle" arguments may be used. Test to make sure labels do not overlap (for close angles).</p>
 <p>Using "angle,measurement" is required for draw_circlesector.
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
@@ -150,19 +152,38 @@
 <p><a name="polygon"></a></p>
 <h2><strong>draw_polygon</strong></h2>
 <p>Draws and labels a polygon with n sides.</p>
+<p>Points drawn counterclockwise. By default, first side is horizontal on the bottom.</p>
 <p>Syntax: draw_polygon([n],["option 1", "option 2", ...])</p>
 <p>draw_polygon() -- this draws a random polygon with between 3 and 9 sides.</p>
 <p>draw_polygon(n) -- this draws an n-sided polygon.
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
-  <li><strong>"points,[lab1,lab2,...,labn]"</strong> Labels the vertices counterclockwise. If label is a point (a,b), type it as (a;b).</li>
+  <li><strong>"points,[lab1,lab2,...,labn]"</strong> Labels the vertices counterclockwise from bottom-left. If label is a point (a,b), type it as (a;b).</li>
+  <li><strong>"sides,lab1,lab2,...,labn"</strong> Labels the sides counterclockwise from bottom side.</li>
   <li><strong>"regular"</strong> Makes it a regular polygon</li>
-  <li><strong>"points,lab1,lab2,lab3,lab4"</strong> Plots the vertices with optional labels (counterclockwise from bottom left). If label is a point (a,b), type it as (a;b).</li>
-  <li><strong>"norotate"</strong> Rotates polygon so first vertex is on the positive x-axis.</li>
+  <li><strong>"rotate"</strong> Rotates polygon by random angle.</li>
   <li><strong>"axes"</strong> Shows x and y axes.</li>
 </ul>
 <br />
 <p>Examples:</p>
 <p><strong>$gr = draw_polygon(5,"axes","norotate","regular","points,P")</strong> -- A regular pentagon with points on vertices, and first vertex on positive x-axis labeled "P".</p>
+
+
+<p><a name="prismcubes"></a></p>
+<h2><strong>draw_prismcubes</strong></h2>
+<p>Draws and labels a polygon with n sides.</p>
+<p>Syntax: draw_prismcubes([option 1],[option 2],[option 3]</p>
+<p>draw_prismcubes() -- this draws a cube with no labels.</p>
+<p>Each option is a list inside quotes. Options include:</p>
+<ul>
+  <li><strong>"cubes,length,height,depth"</strong> Draws a rectangular prism made of cubes, that is length x height x depth.</li>
+  <li><strong>"labels,lab1,lab2,lab3"</strong> This labels the length, height and depth of the prism.</li>
+  <li><strong>"size,length"</strong> Sets the sqare image size to be length x length.</li>
+</ul>
+<br />
+<p>Examples:</p>
+<p><strong>$gr = draw_prismcubes("cubes,2,5,3","labels,a,b,c")</strong> -- A 2x5x3 rectangular prism of cubes, dimensions labeled a, b and c.</p>
+<p><strong>$gr = draw_prismcubes("labels,L,H,W")</strong> -- A 1x1x1 cube, dimensions labeled L, H and W.</p>
+
 
 <a href="#top">Back to top of page</a>

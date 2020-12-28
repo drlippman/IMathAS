@@ -1,18 +1,19 @@
 <?php
 
 global $allowedmacros;
-array_push($allowedmacros,"draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon");
+array_push($allowedmacros,"draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes");
 
 //--------------------------------------------draw_circle()----------------------------------------------------
-// circle("[center,[label]]","[radius,[label]]","[diameter]","angle,measurement,[label,point]")
+// circle("[center,[label]]","[radius,[label]]","[diameter,[label]]","[angle,measurement,[label]]")
 // Each "option" is a list in quotes. Here are the available options:
 // "center,[label]" This draws the center point with an optional label.
 // "radius,[label]" This draws a radius with an optional label.
 // "diameter,[label]" This draws a diameter with an optional label.
-// "angle,measurement,[label,point]" This draws an angle in standard position, with optional angle label and point on circle.
+// "angle,measurement,[label]" This draws an angle in standard position, with optional angle label.
 // Note: Angles are given in degrees, and degree symbol is displayed by default. To not display degree symbol, use e.g. "label rad".
 // "point,angle,[label]" This draws a point on the circle at "angle" degrees, counterclockwise from positive x-direction. Optional label on point.
-// Note: To get the "pi" symbol in an angle label, use e.g. "3 pi/4" for the label. This is for display only -- angle measurements must be given in degrees.
+// Note: If point label is (a,b), type it as (a;b).
+// Note: To get the "pi" symbol in an angle label, use e.g. "3 pi/4" for the label.
 // "axes" This draws x and y axes.
 
 // All arguments are optional and may be used in any order
@@ -29,20 +30,22 @@ function draw_circle() {
     $list = array_map('trim', $list);
     $argsArray[]=$list;
   }
-  foreach ($argsArray as $in) {
-    if (in_array("angle",$in) && $in[1]%360 > 315) {
+  foreach ($argsArray as $key => $in) {
+    if ($in[0]=="size" && isset($in[1])) {
+      $size = $in[1];
+    } else {
+      $size = 350;
+    }
+    if ($in[0]=="angle" && $in[1]%360 > 315) {
       $angleBlock = true;
       $ang = $in[1];
-    }
-    if (in_array("radian",$in)) {
-      $degSymbol = "";
     }
     if (in_array("axes",$in)) {
       $args = $args . "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
     }
   }
   foreach ($argsArray as $key => $in) {
-    if (in_array("center",$in)) {
+    if ($in[0]=="center") {
       $lab = "";
       if (isset($in[1]) && $ang !== 0) {
         if ($ang <= 180) {
@@ -61,7 +64,7 @@ function draw_circle() {
       $args = $args."dot([0,0]);".$lab;
     }
     
-    if (in_array("radius",$in)) {
+    if ($in[0]=="radius") {
       $lab = "";
       if (isset($in[1])) {
         if ($angleBlock === true) {
@@ -73,18 +76,18 @@ function draw_circle() {
       $args = $args."line([0,0],[1,0]);".$lab;
     }
     
-    if (in_array("diameter",$in)) {
+    if ($in[0]=="diameter") {
       if (!isset($in[1])) {
         $in[1] = '';
       }
       $args = $args."line([-1,0],[1,0]);text([0,0],'$in[1]',below);";
     }
     
-    if (in_array("angle",$in)) {
+    if ($in[0]=="angle") {
       $angleKey = $key;
       $lab = "";
       if (!isset($in[1])) {
-        echo 'Warning! "angle" must be followed by an angle in degrees.';
+        echo 'Eek! "angle" must be followed by an angle in degrees.';
         return '';
       }
       if (isset($in[1])) {
@@ -95,10 +98,10 @@ function draw_circle() {
           $ang = $ang%360;
         }
         if ($ang<=180) {
-          $arc = "arc([.25,0],[.25*$x,.25*$y],.25);";
+          $arc = "arc([.3,0],[.3*$x,.3*$y],.3);";
         }
         if ($ang>180) {
-          $arc = "arc([.25,0],[-.25,0],.25);arc([-.25,0],[.25*$x,.25*$y],.25);";
+          $arc = "arc([.3,0],[-.3,0],.3);arc([-.3,0],[.3*$x,.3*$y],.3);";
         }
         $args = $args.$arc;
         
@@ -118,17 +121,17 @@ function draw_circle() {
           // draw angle label
           $halfAngle = $ang/2;
           if ($ang <= 40) {
-            $xlab = .4*cos(M_PI*($ang+18)/180);
-            $ylab = .4*sin(M_PI*($ang+18)/180);
+            $xlab = .45*cos(M_PI*($ang+18)/180);
+            $ylab = .45*sin(M_PI*($ang+18)/180);
           } elseif ($ang > 40 && $ang < 90) {
-            $xlab = .4*cos(M_PI*($halfAngle)/180);
-            $ylab = .4*sin(M_PI*($halfAngle)/180);
+            $xlab = .45*cos(M_PI*($halfAngle)/180);
+            $ylab = .45*sin(M_PI*($halfAngle)/180);
           } elseif ($ang >= 90 && $ang <= 180) {
-            $xlab = .4*cos(M_PI*45/180);
-            $ylab = .4*sin(M_PI*45/180);
+            $xlab = .45*cos(M_PI*45/180);
+            $ylab = .45*sin(M_PI*45/180);
           } elseif ($ang > 180 || $ang <= 360) {
-            $xlab = .4*cos(M_PI*135/180);
-            $ylab = .4*sin(M_PI*135/180);
+            $xlab = .45*cos(M_PI*135/180);
+            $ylab = .45*sin(M_PI*135/180);
           }
           
           $lab = "text([$xlab,$ylab],'".$angLab."$degSymbol');";
@@ -137,7 +140,7 @@ function draw_circle() {
       }
       $args = $args."line([0,0],[1,0]);line([0,0],[$x,$y]);";
     }
-    if (in_array("dot",$in) || in_array("point",$in)) {
+    if ($in[0]=="point") {
       if (!isset($in[1])) {
         echo 'Warning! "point" must be followed by an angle in degrees.';
       }
@@ -183,20 +186,20 @@ function draw_circle() {
     }
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",300,300);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size);
   return $gr;
 }
 
 //--------------------------------------------draw_circlesector()----------------------------------------------------
 
-// draw_circlesector("angle,A,[label]", ["option 1"], ["option 2"])
-// You must include at least "angle, A", where "A" is the degree measurement of the internal angle, and "label" is optional label for the angle.
+// draw_circlesector("angle,measurement,[label]", ["option 1"], ["option 2"])
+// You must include at least "angle, measurement" to define the degree measurement of the internal angle, and "label" is optional label for the angle.
 // Note: Angle must be in degrees. In the label, the degree symbol is shown by default. To not show the degree symbol, use "rad" as in "angle, 57, 1 rad".
-// Labels involving "pi" or "theta" will display with those Greek letters.
+// Labels involving alpha, beta, gamma, theta, phi, pi or tau will display with those Greek letters.
 // Options include:
-// "center,[label]" Plots the center of the circle with optional label. If label is a point, use "center, (x;y)".
-// "radius,[label]" Labels the radius from the center to (1,0).
-// "point,angle,[label]" Plots a point on the circle at angle measured counterclockwise. If optional label is a point, use e.g. "point, 90, (0;1)".
+// "center,[label]" Plots the center of the circle with optional label. If label is a point (a,b), type it as (a;b).
+// "radius,[label]" Labels the radius from the center to the far-right point on the circle.
+// "point,angle,[label]" Plots a point on the circle at angle measured counterclockwise. If optional label is a point (a,b), type it as (a;b).
 
 function draw_circlesector() {
   $degSymbol = "&deg;";
@@ -209,23 +212,51 @@ function draw_circlesector() {
     $list = array_map('trim', $list);
     $argsArray[]=$list;
   }
+  
+  $angs = [];
+  $xs = [];
+  $ys = [];
+  $numAngles = 0;
+  $size = 300;
+  
   foreach ($argsArray as $key => $in) {
-    if (in_array("angle",$in)) {
+    if ($in[0]=="angle") {
       $angleKey = $key;
-      $ang = $in[1];
+      $angs[] = $in[1];
     }
   }
+  $xs = calconarray($angs,"cos(M_PI*x/180)");
+  $ys = calconarray($angs,"sin(M_PI*x/180)");
+  if (max($angs)<=90) {
+    $minXWindow = -0.35;
+    $minYWindow = -0.35;
+  } elseif (max($angs)>90 && max($angs)<180) {
+    $minXWindow = min($xs)-0.35;
+    $minYWindow = -0.35;
+  } elseif (max($angs)>=180 && max($angs)<=270) {
+    $minXWindow = -1.35;
+    $minYWindow = min($ys)-0.35;
+  } elseif (max($angs)>=270) {
+    $minYWindow = -1.35;
+    $minXWindow = -1.35;
+  }
+  $minxyDisp = min($minXWindow,$minYWindow);
+
   if (!isset($angleKey)) {
     echo 'Eek! "circlesector" must include "angle, no. of degrees".';
     return '';
   }
   
   foreach ($argsArray as $key => $in) {
+    if ($in[0]=="size" && isset($in[1])) {
+      $size = $in[1];
+    }
+    
     if (in_array("axes",$in)) {
       $args = $args . "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
     }
     
-    if (in_array("point",$in)) {
+    if ($in[0]=="point") {
       if (!isset($in[1]) || !is_numeric($in[1])) {
         echo 'Warning! "point" must be followed by an angle in degrees.';
         return '';
@@ -241,7 +272,7 @@ function draw_circlesector() {
       $args = $args . "text([".(1.2*$xAngPt).",".(1.2*$yAngPt)."],'$in[2]');";
     }
     
-    if (in_array("center",$in)) {
+    if ($in[0]=="center") {
       $centerKey = $key;
       $in = preg_replace('/;/',',',$in);
       if (!isset($in[1])) {
@@ -252,27 +283,11 @@ function draw_circlesector() {
       } elseif ($ang > 180) {
         $lab = "text([0,0],'".$in[1]."',above);";
       }
-      
       $args = $args."dot([0,0]);".$lab;
     }
     
-    if (in_array("radius",$in)) {
-      $lab = "";
-      if (!isset($in[1])) {
-        $in[1] = '';
-      }
-      if (preg_match('/(^\s*pi[^a-zA-Z]+)|([^a-zA-Z\s]+pi[^a-zA-Z])|([^a-zA-z]pi[^a-zA-Z\s]+)|(^\s*pi\s)|(\spi\s)|(\spi$)|([^a-zA-Z]pi$)|(^pi$)/',$in[1])) {
-        $in[1] = str_replace("pi","&pi;",$in[1]);
-      }
-      if ($ang > 330) {
-        $lab = "text([0.5,0],'".$in[1]."',above);";
-      } elseif ($ang <= 330) {
-        $lab = "text([0.5,0],'".$in[1]."',below);";
-      }
-      $args = $args."line([0,0],[1,0]);".$lab;
-    }
-    
-    if (in_array("angle",$in)) {
+    if ($in[0]=="angle") {
+      $ang = $in[1];
       $lab = "";
       if ($ang > 360 || $ang < 0) {
         echo 'Warning! Angle should be between 0 and 360.';
@@ -280,12 +295,21 @@ function draw_circlesector() {
       }
       $x = cos(M_PI*$ang/180);
       $y = sin(M_PI*$ang/180);
+      
+      $arcRad = 0.25+0.075*$numAngles;
+      if ($ang == min($angs)) {
+        $angLabRad = 0.5;
+      }
+      if ($ang == max($angs) && count($angs) > 1) {
+        $angLabRad = 0.8;
+      }
+      
       if ($ang <= 180) {
         $sectorArc = "arc([1,0],[$x,$y],1);";
-        $arc = "arc([.25,0],[.25*$x,.25*$y],.25);";
+        $arc = "arc([$arcRad,0],[$arcRad*$x,$arcRad*$y],$arcRad);";
       } elseif ($ang > 180) {
         $sectorArc = "arc([1,0],[-1,0],1);arc([-1,0],[$x,$y],1);";
-        $arc = "arc([0.25,0],[-0.25,0],0.25);arc([-0.25,0],[.25*$x,.25*$y],.25);";
+        $arc = "arc([$arcRad,0],[-$arcRad,0],$arcRad);arc([-$arcRad,0],[$arcRad*$x,$arcRad*$y],$arcRad);";
       }
       $args = $args.$sectorArc.$arc;
       if (isset($in[2])) {
@@ -305,22 +329,62 @@ function draw_circlesector() {
           }
         }
         $in[2] = str_replace($greekSpelled,$greekSymbol,$in[2]);
-        
-        $halfAngle = $ang/2;
-        $xlab = .45*cos(M_PI*$halfAngle/180);
-        $ylab = .4*sin(M_PI*$halfAngle/180);
-        if ($ang <= 40) {
-          $xlab = .45*cos(M_PI*($ang+15)/180);
-          $ylab = .4*sin(M_PI*($ang+15)/180);
+        // Rotate the label position away from the angle line
+        $angLabOffset = [-30+$angLabRad*22,30-$angLabRad*22];
+        if ($minxyDisp > -0.7) {
+          $angLabOffset = [-30+$angLabRad*27,30-$angLabRad*27];
         }
-        $lab = "text([$xlab,$ylab],'".$in[array_search('angle',$in)+2]."$degSymbol');";
+        $xlab = $angLabRad*cos(M_PI*($ang+$angLabOffset[0])/180);
+        $ylab = ($angLabRad-0.05)*sin(M_PI*($ang+$angLabOffset[0])/180);
+        if ($ang <= 35) {
+          $xlab = $angLabRad*cos(M_PI*($ang+$angLabOffset[1])/180);
+          $ylab = ($angLabRad-0.05)*sin(M_PI*($ang+$angLabOffset[1])/180);
+        }
+        if (count($angs)>1 && $ang == max($angs) && max($angs)-min($angs) < 25) {
+          $xlab = $angLabRad*cos(M_PI*($ang+$angLabOffset[1])/180);
+          $ylab = ($angLabRad-0.05)*sin(M_PI*($ang+$angLabOffset[1])/180);
+        }
+        $lab = "text([$xlab,$ylab],'".$in[2]."$degSymbol');";
       }
       $args = $args.$lab;
       $args = $args."line([0,0],[1,0]);line([0,0],[$x,$y]);";
+      $numAngles = $numAngles + 1;
+    }
+    
+    if ($in[0]=="radius") {
+      $lab = "";
+      if (!isset($in[1])) {
+        $in[1] = '';
+      }
+      if (preg_match('/(^\s*pi[^a-zA-Z]+)|([^a-zA-Z\s]+pi[^a-zA-Z])|([^a-zA-z]pi[^a-zA-Z\s]+)|(^\s*pi\s)|(\spi\s)|(\spi$)|([^a-zA-Z]pi$)|(^pi$)/',$in[1])) {
+        $in[1] = str_replace("pi","&pi;",$in[1]);
+      }
+      $above = "above";
+      foreach ($angs as $an) {
+        if ($an > 330 || (count($angs)>1 && (max($angs)-min($angs)<25) && max($angs)>300)) {
+          $angleBlock = true;
+        }
+      }
+      if ($angleBlock === true) {
+        foreach ($angs as $an) {
+          if ($an < 30) {
+            $angleDoubleBlock = true;
+          }
+        }
+        $radLabRad = 0.5;
+        if ($angleDoubleBlock === true) {
+          $radLabRad = 1;
+          $above = "right";
+        }
+        $lab = "text([$radLabRad,0],'".$in[1]."',$above);";
+      } elseif ($angleBlock !== true) {
+        $lab = "text([0.5,0],'".$in[1]."',below);";
+      }
+      $args = $args."line([0,0],[1,0]);".$lab;
     }
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.35,1.35,-1.35,1.35);$args",300,300);
+  $gr = showasciisvg("setBorder(5);initPicture($minxyDisp,1.35,$minxyDisp,1.35);$args",$size,$size);
   return $gr;
 }
 
@@ -344,14 +408,18 @@ function draw_square() {
     $argsArray[]=$list;
   }
   $hasPoints = false;
+  $size = 300;
   foreach ($argsArray as $key => $in) {
-    if (in_array("base",$in)) {
+    if ($in[0]=="size" && isset($in[1])) {
+      $size = $in[1];
+    }
+    if ($in[0]=="base") {
       $baseKey = $key;
     }
-    if (in_array("height",$in)) {
+    if ($in[0]=="height") {
       $heightKey = $key;
     }
-    if (in_array("points",$in)) {
+    if ($in[0]=="points") {
       $hasPoints = true;
       $pointKey = $key;
     }
@@ -385,7 +453,7 @@ function draw_square() {
     $args = $args . "text([-1,1],'$pointLab[3]',above);";
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);rect([-1,-1],[1,1]);$args",250,250);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);rect([-1,-1],[1,1]);$args",$size,$size);
   return $gr;
 }
 
@@ -411,14 +479,18 @@ function draw_rectangle() {
   $hasPoints = false;
   $hasBase = false;
   $hasHeight = false;
+  $size = 300;
   foreach ($argsArray as $key => $in) {
-    if (in_array("points",$in)) {
+    if ($in[0]=="size" && isset($in[1])) {
+      $size = $in[1];
+    }
+    if ($in[0]=="points") {
       $hasPoints = true;
     }
-    if (in_array("base",$in)) {
+    if ($in[0]=="base") {
       $hasBase = true;
     }
-    if (in_array("height",$in)) {
+    if ($in[0]=="height") {
       $hasHeight = true;
     }
   }
@@ -431,15 +503,15 @@ function draw_rectangle() {
   }
 
   foreach ($argsArray as $key => $in) {
-    if (in_array("points",$in)) {
+    if ($in[0]=="points") {
       $hasPoints = true;
       $pointKey = $key;
     }
-    if (in_array("base",$in)) {
+    if ($in[0]=="base") {
       $hasBase = true;
       $baseKey = $key;
     }
-    if (in_array("height",$in)) {
+    if ($in[0]=="height") {
       $hasHeight = true;
       $heightKey = $key;
     }
@@ -503,7 +575,7 @@ function draw_rectangle() {
 
   $args = $args."rect([".$xmin.",".$ymin."],[".$xmax.",".$ymax."]);";
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.7,1.7,-1.7,1.7);$args",250,250);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.7,1.7,-1.7,1.7);$args",$size,$size);
   
   return $gr;
 }
@@ -522,14 +594,14 @@ function draw_rectangle() {
 // Note: In "side,a,b,c", the number "a" is the side opposite angle "A", etc.
 // Note: If "sides" is used after "angles", the a,b,c are omitted (since the "angles,A,B,C" will define the triangle).
 // "points,[P,Q,R]" Here, P,Q,R are optional labels on the points.
-// "bisector,1,1,1" The entries following "bisector" correspond to the order of the angles. Putting a "1" will draw the angle bisector for that angle.
-// "median,1,1,1" Same as with "bisector. Putting a "1" will draw the median for that angle.
-// "random" Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, both having just labels.
-// Note: All triangles are drawn with random rotation, unless "horizontal" is used.
-// "horizontal" Using this draws the triangle so the side opposite to the largest angle will be drawn horizontally.
+// "bisectors,1,1,1,lab1,lab2,lab3,labpt1,labpt2,labpt3" The first three entries following "bisectors" correspond to the order of the angles. Putting a "1" will draw the angle bisector for that angle. The next three entries are labels for the bisectors, and the last three entries are labels for the terminal points.
+// "medians,1,1,1,lab1,lab2,lab3,labpt1,labpt2,labpt3" Same as with bisectors. Putting a "1" will draw the median for that angle. The next three entries are labels for the medians, and the last three entries are labels for the terminal points.
+// "altitudes,1,1,1,lab1,lab2,lab3,labpt1,labpt2,labpt3" Similar to bisectors and medians.
+// "random" Using this creates random angles for the triangle. This means "angles" should omit A,B,C and "sides" should omit a,b,c, both having just labels.
+// Note: By default, triangles are drawn with angle 0 at bottom left, angle 1 at bottom right, and angle 2 at the top.
+// "rotate" Use to randomly rotate the triangle.
 
 function draw_triangle() {
-  $rndNum = rand(0,360)*M_PI/180;
   $input = func_get_args();
   $argsArray = [];
   foreach ($input as $list) {
@@ -540,9 +612,7 @@ function draw_triangle() {
     $argsArray[]=$list;
   }
   foreach ($argsArray as &$row) {
-    $row = preg_replace('/(angle)$/','$1s',$row);
-    $row = preg_replace('/(side)$/','$1s',$row);
-    $row = preg_replace('/(point)$/','$1s',$row);
+    $row = preg_replace(['/(angle)$/','/(side)$/','/(point)$/','/(median)$/','/(bisector)$/','/(altitude)$/'],'$1s',$row);
   }
   
   $noAngles = true;
@@ -550,21 +620,23 @@ function draw_triangle() {
   $randomTriangle = false;
   $hasBisectors = false;
   $hasMedian = false;
-  $points = false;
-  $isHorizontal = false;
+  $hasPoints = false;
+  $rotateTriangle = false;
   $hasArcs = false;
   $hasMarks = false;
   $hasAltitude = false;
+  $hasSize = false;
+  $size = 350;
   
   foreach ($argsArray as $in) {
-    if (in_array("angles",$in)) {
+    if ($in[0]=="angles") {
       $noAngles = false;
     }
-    if (in_array("sides",$in)) {
+    if ($in[0]=="sides") {
       $noSides = false;
     }
-    if (in_array("horizontal",$in)) {
-      $isHorizontal = true;
+    if (in_array("rotate",$in)) {
+      $rotateTriangle = true;
     }
   }
   
@@ -573,13 +645,16 @@ function draw_triangle() {
   }
   
   foreach ($argsArray as $in) {
-    if (in_array("random",$in) || in_array("rand",$in) || ($noAngles === true && $noSides === true)) {
+    if (in_array("random",$in) || ($noAngles === true && $noSides === true)) {
       $randomTriangle = true;
     }
   }
   
   foreach ($argsArray as $key => $in) {
-    if (in_array("angles",$in)) {
+    if ($in[0]=="size" && isset($in[1])) {
+      $size = $in[1];
+    }
+    if ($in[0]=="angles") {
       $noAngles = false;
       $angleKey = $key;
       
@@ -588,7 +663,7 @@ function draw_triangle() {
         return '';
       }
     }
-    if (in_array("sides",$in)) {
+    if ($in[0]=="sides") {
       $noSides = false;
       $sideKey = $key;
       if (count($in) < 4) {
@@ -596,19 +671,19 @@ function draw_triangle() {
         return '';
       }
     }
-    if (in_array("bisector",$in)) {
+    if ($in[0]=="bisectors") {
       $hasBisectors = true;
       $bisectorKey = $key;
     }
-    if (in_array("points",$in)) {
-      $points = true;
+    if ($in[0]=="points") {
+      $hasPoints = true;
       $pointKey = $key;
     }
-    if (in_array("median",$in)) {
+    if ($in[0]=="medians") {
       $hasMedian = true;
       $medianKey = $key;
     }
-    if (in_array("altitude",$in)) {
+    if ($in[0]=="altitudes") {
       $hasAltitude = true;
       $altitudeKey = $key;
     }
@@ -658,14 +733,10 @@ function draw_triangle() {
       $altitudeKey = $altitudeKey + 1;
       $noAngles = false;
     }
-    if ($isHorizontal === true) {
-      if (max($ang) == $ang[2]) {
-        $rndNum = (90 - $ang[0] - $ang[1])*M_PI/180;
-      } elseif (max($ang) == $ang[1]) {
-        $rndNum = (2*$ang[2] - $ang[0] - $ang[2] + 90)*M_PI/180;
-      } elseif (max($ang) == $ang[0]) {
-        $rndNum = (180 + $ang[1] + $ang[2] - 90)*M_PI/180;
-      }
+    if ($rotateTriangle === true) {
+      $rndNum = rand(0,360)*M_PI/180;
+    } elseif ($rotateTriangle === false) {
+      $rndNum = $ang[2]*M_PI/180 - M_PI/2;
     }
   }
   // End random triangles
@@ -788,35 +859,11 @@ function draw_triangle() {
   
   ///Now, make the triangle
   $ang = array_slice($argsArray[$angleKey],1,3);
-  if ($isHorizontal === true) {
-    if (max($ang) == $ang[2]) {
-      $rndNum = (90 - $ang[0] - $ang[1])*M_PI/180;
-    } elseif (max($ang) == $ang[1]) {
-      $rndNum = (2*$ang[2] - $ang[0] - $ang[2] + 90)*M_PI/180;
-    } elseif (max($ang) == $ang[0]) {
-      $rndNum = (180 + $ang[1] + $ang[2] - 90)*M_PI/180;
-    }
-  }
-  
-  
-  // If altitudes are used, make triangle horizontal so altitude is drawn vertically
-  if ($hasAltitude === true) {
-    // This will be defined again when altitudes are drawn
-    $altitudes = array_slice($argsArray[$altitudeKey],1,3);
-    for ($i=0;$i<3;$i++) {
-      if (!isset($altitudes[$i])) {
-        $altitudes[$i] = '';
-      }
-      if ($altitudes[$i] == 1) {
-        if ($i == 2) {
-          $rndNum = (90 - $ang[0] - $ang[1])*M_PI/180;
-        } elseif ($i == 1) {
-          $rndNum = (2*$ang[2] - $ang[0] - $ang[2] + 90)*M_PI/180;
-        } elseif ($i == 0) {
-          $rndNum = (180 + $ang[1] + $ang[2] - 90)*M_PI/180;
-        }
-      }
-    }
+  $angRad = calconarray($ang,'x*M_PI/180');
+  if ($rotateTriangle === false) {
+    $rndNum = $angRad[2] - M_PI/2;
+  } elseif ($rotateTriangle === true) {
+    $rndNum = rand(0,360)*M_PI/180;
   }
   
   foreach ($ang as $key => $angle) {
@@ -858,15 +905,15 @@ function draw_triangle() {
   [$xMid[2],$yMid[2]] = [($x[0]+$x[2])/2,($y[0]+$y[2])/2];
   
   // length of side opposite angle 1 (Used for angle placement and angle bisectors)
-  $sL1 = sqrt(pow($x[1]-$x[0],2)+pow($y[1]-$y[0],2));
-  $sL2 = sqrt(pow($x[2]-$x[1],2)+pow($y[2]-$y[1],2));
-  $sL3 = sqrt(pow($x[2]-$x[0],2)+pow($y[2]-$y[0],2));
-  $xab[0] = $sL2/($sL2+$sL3)*$x[0] + $sL3/($sL2+$sL3)*$x[1]; //coords of where bisector of angle 1 intersects opposite side
-  $yab[1] = $sL2/($sL2+$sL3)*$y[0] + $sL3/($sL2+$sL3)*$y[1];
-  $xab[1] = $sL1/($sL1+$sL3)*$x[2] + $sL3/($sL1+$sL3)*$x[1]; //coords of where bisector of angle 2 intersects opposite side
-  $yab[2] = $sL1/($sL1+$sL3)*$y[2] + $sL3/($sL1+$sL3)*$y[1];
-  $xab[2] = $sL2/($sL2+$sL1)*$x[0] + $sL1/($sL2+$sL1)*$x[2]; //coords of where bisector of angle 3 intersects opposite side
-  $yab[3] = $sL2/($sL2+$sL1)*$y[0] + $sL1/($sL2+$sL1)*$y[2];
+  $sL0 = sqrt(pow($x[1]-$x[0],2)+pow($y[1]-$y[0],2));
+  $sL1 = sqrt(pow($x[2]-$x[1],2)+pow($y[2]-$y[1],2));
+  $sL2 = sqrt(pow($x[2]-$x[0],2)+pow($y[2]-$y[0],2));
+  $xab[0] = $sL1/($sL1+$sL2)*$x[0] + $sL2/($sL1+$sL2)*$x[1]; //coords of where bisector of angle 1 intersects opposite side
+  $yab[0] = $sL1/($sL1+$sL2)*$y[0] + $sL2/($sL1+$sL2)*$y[1];
+  $xab[1] = $sL0/($sL0+$sL2)*$x[2] + $sL2/($sL0+$sL2)*$x[1]; //coords of where bisector of angle 2 intersects opposite side
+  $yab[1] = $sL0/($sL0+$sL2)*$y[2] + $sL2/($sL0+$sL2)*$y[1];
+  $xab[2] = $sL1/($sL1+$sL0)*$x[0] + $sL0/($sL1+$sL0)*$x[2]; //coords of where bisector of angle 3 intersects opposite side
+  $yab[2] = $sL1/($sL1+$sL0)*$y[0] + $sL0/($sL1+$sL0)*$y[2];
   
   //points toward which to move small angle labels, and where the side labels go
   [$xDraw[0],$yDraw[0]] = [$xMid[0] - $xyDiff/2*($y[0]-$yMid[0])/sqrt(pow($y[0]-$yMid[0],2)+pow($x[0] - $xMid[0],2)), $yMid[0] + $xyDiff/2*($x[0] - $xMid[0])/sqrt(pow($y[0]-$yMid[0],2)+pow($x[0] - $xMid[0],2))];
@@ -917,7 +964,7 @@ function draw_triangle() {
   } else {
     // For angles labeled inside the triangle, labRat here is default fraction of distance between
     // vertex and where angle bisector intersects opposite side.
-    $angLabLoc[0] = [$x[2] + $labRat*($xab[0]-$x[2]),$y[2] + $labRat*($yab[1]-$y[2])];
+    $angLabLoc[0] = [$x[2] + $labRat*($xab[0]-$x[2]),$y[2] + $labRat*($yab[0]-$y[2])];
   }
   
   if ($ang[1] < $angMin || $ang[1] > $angMax || abs($ang[2]-$ang[0]) > 110 || min($ang) < 17) {
@@ -925,7 +972,7 @@ function draw_triangle() {
     elseif ($ang[0] > $ang[2]) {$rp[1] = 0;}
     $angLabLoc[1] = [$x[0]+$labRat*($xDraw[$rp[1]]-$x[0]), $y[0]+$labRat*($yDraw[$rp[1]]-$y[0])];
   } else {
-    $angLabLoc[1] = [$x[0] + $labRat*($xab[1]-$x[0]),$y[0] + $labRat*($yab[2]-$y[0])];
+    $angLabLoc[1] = [$x[0] + $labRat*($xab[1]-$x[0]),$y[0] + $labRat*($yab[1]-$y[0])];
   }
   
   if ($ang[2] < $angMin || $ang[2] > $angMax || abs($ang[1]-$ang[0]) > 110 || min($ang) < 17) {
@@ -933,13 +980,13 @@ function draw_triangle() {
     elseif ($ang[0] > $ang[1]) {$rp[2] = 0;}
     $angLabLoc[2] = [$x[1]+$labRat*($xDraw[$rp[2]]-$x[1]), $y[1]+$labRat*($yDraw[$rp[2]]-$y[1])];
   } else {
-    $angLabLoc[2] = [$x[1] + $labRat*($xab[2]-$x[1]),$y[1] + $labRat*($yab[3]-$y[1])];
+    $angLabLoc[2] = [$x[1] + $labRat*($xab[2]-$x[1]),$y[1] + $labRat*($yab[2]-$y[1])];
   }
   
   // SHOW/HIDE DEGREE SYMBOL
   for ($i=0;$i<3;$i++) {
     $degSymbol[$i] = "&deg;";
-    if (preg_match('/rad/',$angLab[$i]) || ($i == $perpKey && $hasPerp === true) || $angLab[$i] == '') {
+    if (preg_match('/rad/',$angLab[$i]) || ($i == $perpKey && $hasPerp === true && empty($arcTypeTmp[$i])) || $angLab[$i] == '') {
       $angLab[$i] = preg_replace('/rad/','',$angLab[$i]);
       $degSymbol[$i] = '';
     }
@@ -967,70 +1014,71 @@ function draw_triangle() {
   
   // DRAW ANGLE BISECTORS
   if ($hasBisectors === true) {
-    $bisectors = array_slice($argsArray[$bisectorKey],1,6);
-    for ($i=1;$i<7;$i++) {
+    $bisectors = array_slice($argsArray[$bisectorKey],1,9);
+    for ($i=1;$i<10;$i++) {
       if (!isset($bisectors[$i])) {
         $bisectors[$i] = '';
       }
     }
-    if ($bisectors[0]==1) {
-      $args = $args."line([$x[2],$y[2]],[$xab[0],$yab[1]]);dot([$xab[0],$yab[1]]);";
-    }
-    if ($bisectors[1]==1) {
-      $args = $args."line([$x[0],$y[0]],[$xab[1],$yab[2]]);dot([$xab[1],$yab[2]]);";
-    }
-    if ($bisectors[2]==1) {
-      $args = $args."line([$x[1],$y[1]],[$xab[2],$yab[3]]);dot([$xab[2],$yab[3]]);";
-    }
-    $bisRat = $xyDiff/7;
-    $medLabLoc[0] = [$xab[0] - $bisRat*($y[0]-$yMid[0])/sqrt(pow($xMid[0]-$x[0],2)+pow($yMid[0]-$y[0],2)),$yab[1] + $bisRat*($x[0]-$xMid[0])/sqrt(pow($xMid[0]-$x[0],2)+pow($yMid[0]-$y[0],2))];
-    $medLabLoc[1] = [$xab[1] - $bisRat*($y[1]-$yMid[1])/sqrt(pow($xMid[1]-$x[1],2)+pow($yMid[1]-$y[1],2)),$yab[2] + $bisRat*($x[1]-$xMid[1])/sqrt(pow($xMid[1]-$x[1],2)+pow($yMid[1]-$y[1],2))];
-    $medLabLoc[2] = [$xab[2] - $bisRat*($y[2]-$yMid[2])/sqrt(pow($xMid[2]-$x[2],2)+pow($yMid[2]-$y[2],2)),$yab[3] + $bisRat*($x[2]-$xMid[2])/sqrt(pow($xMid[2]-$x[2],2)+pow($yMid[2]-$y[2],2))];
+    $bisRat = $xyDiff/6;
     for ($i=0;$i<3;$i++) {
-      $args = $args."text([{$medLabLoc[$i][0]},{$medLabLoc[$i][1]}],'".$bisectors[($i+3)]."');";
+      // Where to label the endpoint of the bisector
+      $abPtLabLoc[$i] = [$xab[$i] - $bisRat*($y[$i]-$yMid[$i])/sqrt(pow($xMid[$i]-$x[$i],2)+pow($yMid[$i]-$y[$i],2)),$yab[$i] + $bisRat*($x[$i]-$xMid[$i])/sqrt(pow($xMid[$i]-$x[$i],2)+pow($yMid[$i]-$y[$i],2))];
+      // "Midpoints" of angle bisectors
+      $abMid[$i] = [($x[($i+2)%3]+2*$xab[$i])/3,($y[($i+2)%3]+2*$yab[$i])/3];
+      if ($bisectors[$i] == 1) {
+        // Draws the bisector
+        $args = $args."line([{$x[($i+2)%3]},{$y[($i+2)%3]}],[$xab[$i],$yab[$i]]);dot([$xab[$i],$yab[$i]]);";
+        // Labels the endpoint of the bisector
+        $bisectors[$i+6] = preg_replace('/;/',',',$bisectors[$i+6]);
+        $args = $args."text([{$abPtLabLoc[$i][0]},{$abPtLabLoc[$i][1]}],'".$bisectors[($i+6)]."');";
+        // Where to label the bisector
+        if ($ang[($i+1)%3] > $ang[($i+2)%3]) {
+          $abLabLoc[$i] = [$abMid[$i][0]+$xyDiff/8*($x[($i+1)%3]-$x[$i])/sqrt(pow($x[($i+1)%3]-$x[$i],2)+pow($y[($i+1)%3]-$y[$i],2)),$abMid[$i][1]+$xyDiff/8*($y[($i+1)%3]-$y[$i])/sqrt(pow($x[($i+1)%3]-$x[$i],2)+pow($y[($i+1)%3]-$y[$i],2))];
+        } elseif ($ang[($i+1)%3] <= $ang[($i+2)%3]) {
+          $abLabLoc[$i] = [$abMid[$i][0]+$xyDiff/8*($x[$i]-$x[($i+1)%3])/sqrt(pow($x[$i]-$x[($i+1)%3],2)+pow($y[$i]-$y[($i+1)%3],2)),$abMid[$i][1]+$xyDiff/8*($y[$i]-$y[($i+1)%3])/sqrt(pow($x[$i]-$x[($i+1)%3],2)+pow($y[$i]-$y[($i+1)%3],2))];
+        }
+        // Labels the bisector
+        $args = $args."text([{$abLabLoc[$i][0]},{$abLabLoc[$i][1]}],'".$bisectors[$i+3]."');";
+      }
     }
   }
   
   // DRAW MEDIANS
   if ($hasMedian === true) {
-    $medians = array_slice($argsArray[$medianKey],1,6);
-    for ($i=1;$i<7;$i++) {
+    $medians = array_slice($argsArray[$medianKey],1,9);
+    for ($i=1;$i<10;$i++) {
       if (!isset($medians[$i])) {
         $medians[$i] = '';
       }
     }
-    if ($medians[0]==1) {
-      $args = $args."line([$x[2],$y[2]],[$xMid[0],$yMid[0]]);dot([$xMid[0],$yMid[0]]);";
-    }
-    if ($medians[1]==1) {
-      $args = $args."line([$x[0],$y[0]],[$xMid[1],$yMid[1]]);dot([$xMid[1],$yMid[1]]);";
-    }
-    if ($medians[2]==1) {
-      $args = $args."line([$x[1],$y[1]],[$xMid[2],$yMid[2]]);dot([$xMid[2],$yMid[2]]);";
-    }
-    $medRat = $xyDiff/7;
-    $medLabLoc[0] = [$xMid[0] - $medRat*($y[0]-$yMid[0])/sqrt(pow($xMid[0]-$x[0],2)+pow($yMid[0]-$y[0],2)),$yMid[0] + $medRat*($x[0]-$xMid[0])/sqrt(pow($xMid[0]-$x[0],2)+pow($yMid[0]-$y[0],2))];
-    $medLabLoc[1] = [$xMid[1] - $medRat*($y[1]-$yMid[1])/sqrt(pow($xMid[1]-$x[1],2)+pow($yMid[1]-$y[1],2)),$yMid[1] + $medRat*($x[1]-$xMid[1])/sqrt(pow($xMid[1]-$x[1],2)+pow($yMid[1]-$y[1],2))];
-    $medLabLoc[2] = [$xMid[2] - $medRat*($y[2]-$yMid[2])/sqrt(pow($xMid[2]-$x[2],2)+pow($yMid[2]-$y[2],2)),$yMid[2] + $medRat*($x[2]-$xMid[2])/sqrt(pow($xMid[2]-$x[2],2)+pow($yMid[2]-$y[2],2))];
+    $medRat = $xyDiff/5;
     for ($i=0;$i<3;$i++) {
-      $args = $args."text([{$medLabLoc[$i][0]},{$medLabLoc[$i][1]}],'".$medians[($i+3)]."');";
+      if ($medians[$i]==1) {
+        $args = $args."line([{$x[($i+2)%3]},{$y[($i+2)%3]}],[$xMid[$i],$yMid[$i]]);dot([$xMid[$i],$yMid[$i]]);";
+        $medPtLabLoc[$i] = [$xMid[$i] - $medRat*($y[$i]-$yMid[$i])/sqrt(pow($xMid[$i]-$x[$i],2)+pow($yMid[$i]-$y[$i],2)),$yMid[$i] + $medRat*($x[$i]-$xMid[$i])/sqrt(pow($xMid[$i]-$x[$i],2)+pow($yMid[$i]-$y[$i],2))];
+        // "Midpoints" of the medians
+        $medianMid[$i] = [($x[($i+2)%3]+2*$xMid[$i])/3,($y[($i+2)%3]+2*$yMid[$i])/3];
+        // Where to label the median
+        if ($ang[($i+1)%3] > $ang[($i+2)%3]) {
+          $medianLabLoc[$i] = [$medianMid[$i][0]+$xyDiff/8*($y[$i]-$y[($i+2)%3])/sqrt(pow($xMid[$i]-$x[($i+2)%3],2)+pow($yMid[$i]-$y[($i+2)%3],2)),$medianMid[$i][1]-$xyDiff/8*($xMid[$i]-$x[($i+2)%3])/sqrt(pow($xMid[$i]-$x[($i+2)%3],2)+pow($yMid[$i]-$y[($i+2)%3],2))];
+        } elseif ($ang[($i+1)%3] <= $ang[($i+2)%3]) {
+          $medianLabLoc[$i] = [$medianMid[$i][0]-$xyDiff/8*($y[$i]-$y[($i+2)%3])/sqrt(pow($xMid[$i]-$x[($i+2)%3],2)+pow($yMid[$i]-$y[($i+2)%3],2)),$medianMid[$i][1]+$xyDiff/8*($xMid[$i]-$x[($i+2)%3])/sqrt(pow($xMid[$i]-$x[($i+2)%3],2)+pow($yMid[$i]-$y[($i+2)%3],2))];
+        }
+        $args = $args."text([{$medianLabLoc[$i][0]},{$medianLabLoc[$i][1]}],'".$medians[$i+3]."');";
+      }
+    }
+    // Labels endpoints of medians
+    for ($i=0;$i<3;$i++) {
+      $medians[$i+6] = preg_replace('/;/',',',$medians[$i+6]);
+      $args = $args."text([{$medPtLabLoc[$i][0]},{$medPtLabLoc[$i][1]}],'".$medians[($i+6)]."');";
     }
   }
   
   // DRAW ALTITUDES
   if ($hasAltitude === true) {
-    $altitudes = array_slice($argsArray[$altitudeKey],1,6);
-    // Need to move point labels to avoid altitude point
-    if ($points === true) {
-      $pointLabTmp = array_slice($argsArray[$pointKey],1,3);
-      for ($i=0;$i<3;$i++) {
-        if (!isset($pointLabTmp[$i])) {
-          $pointLabTmp[$i] = '';
-        }
-        $pointLabTmp[$i] = preg_replace('/;/',',',$pointLabTmp[$i]);
-      }
-    }
-    for ($i=1;$i<7;$i++) {
+    $altitudes = array_slice($argsArray[$altitudeKey],1,9);
+    for ($i=0;$i<9;$i++) {
       if (!isset($altitudes[$i])) {
         $altitudes[$i] = '';
       }
@@ -1048,6 +1096,9 @@ function draw_triangle() {
       $altStart[$i] = [$x[($i+2)%3],$y[($i+2)%3]];
       // End point of altitude
       $altEnd[$i] = [$x[($i+2)%3] + $altLen[$i]*$altVec[$i][0], $y[($i+2)%3] + $altLen[$i]*$altVec[$i][1]];
+      // "Midpoint" of altitude
+      $altMid[$i] = [($altStart[$i][0]+2*$altEnd[$i][0])/3,($altStart[$i][1]+2*$altEnd[$i][1])/3];
+      
       if ($altitudes[$i] == 1) {
         $args = $args . "line([{$altStart[$i][0]},{$altStart[$i][1]}],[{$altEnd[$i][0]},{$altEnd[$i][1]}]);";
         $args = $args . "dot([{$altEnd[$i][0]},{$altEnd[$i][1]}]);";
@@ -1064,35 +1115,40 @@ function draw_triangle() {
           $args = $args . "strokedasharray='4 3';line([$startAltDash[0],$startAltDash[1]],[$endAltDash[0],$endAltDash[1]]);strokedasharray='1 0';";
         }
         // Find in which direction to draw right-angle box symbol
-        // Index of maximum non-altitude angle
+        // Indices of points or minimum and maximum non-altitude angle
+        if ($ang[(($i+1)%3)] > $ang[(($i+2)%3)]) {
+          $maxNotAltInd = ($i)%3;
+          $minNotAltInd = ($i+1)%3;
+        } elseif ($ang[(($i+1)%3)] <= $ang[(($i+2)%3)]) {
+          $maxNotAltInd = ($i+1)%3;
+          $minNotAltInd = ($i)%3;
+        }
+        if ($ang[($i+1)%3] >= 90 || $ang[($i+2)%3] >= 90) {
+          // Move altitude label on far left or right if outside the triangle.
+          $altOtherSideLabel = -1;
+        } else {$altOtherSideLabel = 1;}
+        // Vector pointing away from maximum non-altitude angle (and parallel to side opposite angle $i)
+        // (to keep the right angle box out of the way of the larger)
+        $altSidVec[$i] = [($x[$minNotAltInd]-$x[$maxNotAltInd])/sqrt(pow($x[$minNotAltInd]-$x[$maxNotAltInd],2)+pow($y[$minNotAltInd]-$y[$maxNotAltInd],2)),($y[$minNotAltInd]-$y[$maxNotAltInd])/sqrt(pow($x[$minNotAltInd]-$x[$maxNotAltInd],2)+pow($y[$minNotAltInd]-$y[$maxNotAltInd],2))];
+        // Drawing the right-angle box
+        $altRat = $xyDiff/12;
         if ($ang[($i+1)%3] != 90 && $ang[($i+2)%3] != 90) {
-          if ($ang[(($i+1)%3)] > $ang[(($i+2)%3)]) {
-            $maxNotAltInd = ($i+3)%3;
-          } elseif ($ang[(($i+1)%3)] <= $ang[(($i+2)%3)]) {
-            $maxNotAltInd = ($i+4)%3;
-          }
-          // Vector pointing away from maximum non-altitude angle (and parallel to side opposite angle $i)
-          // (to keep the right angle box out of the way of the larger)
-          $altSidVec[$i] = [($altEnd[$i][0]-$x[$maxNotAltInd])/sqrt(pow($altEnd[$i][0]-$x[$maxNotAltInd],2)+pow($altEnd[$i][1]-$y[$maxNotAltInd],2)),($altEnd[$i][1]-$y[$maxNotAltInd])/sqrt(pow($altEnd[$i][0]-$x[$maxNotAltInd],2)+pow($altEnd[$i][1]-$y[$maxNotAltInd],2))];
-          // Drawing the right-angle box
-          $altRat = $xyDiff/12;
+          
           $altPerp[0] = [$altEnd[$i][0]-$altRat*$altVec[$i][0],$altEnd[$i][1]-$altRat*$altVec[$i][1]];
           $altPerp[1] = [$altPerp[0][0]+$altRat*$altSidVec[$i][0],$altPerp[0][1]+$altRat*$altSidVec[$i][1]];
           $altPerp[2] = [$altEnd[$i][0]+$altRat*$altSidVec[$i][0],$altEnd[$i][1]+$altRat*$altSidVec[$i][1]];
           $args = $args . "line([{$altPerp[0][0]},{$altPerp[0][1]}],[{$altPerp[1][0]},{$altPerp[1][1]}]);";
           $args = $args . "line([{$altPerp[1][0]},{$altPerp[1][1]}],[{$altPerp[2][0]},{$altPerp[2][1]}]);";
-          // Labels end point of altitude
-          $altEndLab[$i] = [$altEnd[$i][0] + $xyDiff/10*$altVec[$i][0],$altEnd[$i][1] + $xyDiff/10*$altVec[$i][1]];
-          $args = $args . "text([{$altEndLab[$i][0]},{$altEndLab[$i][1]}],'{$altitudes[$i+3]}');";  
         }
-        // This finds the last altitude set, which was used to determine which side is horizontal.
-        $lastAltTmp = $i;
+        // Labels end point of altitude
+        $altEndLab[$i] = [$altEnd[$i][0] + $xyDiff/6*$altVec[$i][0],$altEnd[$i][1] + $xyDiff/6*$altVec[$i][1]];
+        $altitudes[$i+6] = preg_replace('/;/',',',$altitudes[$i+6]);
+        $args = $args . "text([{$altEndLab[$i][0]},{$altEndLab[$i][1]}],'{$altitudes[$i+6]}');";
+        // Labels the altitude
+        $altLab[$i] = [$altMid[$i][0]+$xyDiff/7*$altOtherSideLabel*$altSidVec[$i][0],$altMid[$i][1]+$xyDiff/7*$altOtherSideLabel*$altSidVec[$i][1]];
+        $args = $args . "text([{$altLab[$i][0]},{$altLab[$i][1]}],'{$altitudes[$i+3]}');";
       }
     }
-    // Labels vertices of triangle below or above points
-    $args = $args . "text([{$x[($lastAltTmp+2)%3]},{$y[($lastAltTmp+2)%3]}],'{$pointLabTmp[$lastAltTmp]}',above);";
-    $args = $args . "text([{$x[($lastAltTmp+1)%3]},{$y[($lastAltTmp+1)%3]}],'{$pointLabTmp[($lastAltTmp+2)%3]}',below);";
-    $args = $args . "text([{$x[$lastAltTmp]},{$y[$lastAltTmp]}],'{$pointLabTmp[($lastAltTmp+1)%3]}',below);";
   }
     
   // PLACE SIDE TICK MARKS
@@ -1117,27 +1173,25 @@ function draw_triangle() {
   }
   
   // PLACE VERTEX POINTS AND LABELS
-  if ($points === true) {
-    $verRat = $xyDiff/5;
+  if ($hasPoints === true) {
+    $verRat = $xyDiff/6;
     $args = $args."dot([$x[0],$y[0]]);";
     $args = $args."dot([$x[1],$y[1]]);";
     $args = $args."dot([$x[2],$y[2]]);";
-    // Labels the points, unless altitudes are drawn
-    if ($hasAltitude !== true) {
-      $verLab = array_slice($argsArray[$pointKey],1,3);
-      for ($i=0;$i<3;$i++) {
-        if (!isset($verLab[$i])) {
-          $verLab[$i] = '';
-        }
-        $verLab[$i] = preg_replace('/;/',',',$verLab[$i]);
+    // Labels the points
+    $verLab = array_slice($argsArray[$pointKey],1,3);
+    for ($i=0;$i<3;$i++) {
+      if (!isset($verLab[$i])) {
+        $verLab[$i] = '';
       }
-      
-      $verLabLoc[0] = [$x[2] - $verRat*($xab[0]-$x[2])/sqrt(pow($xab[0]-$x[2],2)+pow($yab[1]-$y[2],2)),$y[2] - $verRat*($yab[1]-$y[2])/sqrt(pow($xab[0]-$x[2],2)+pow($yab[1]-$y[2],2))];
-      $verLabLoc[1] = [$x[0] - $verRat*($xab[1]-$x[0])/sqrt(pow($xab[1]-$x[0],2)+pow($yab[2]-$y[0],2)),$y[0] - $verRat*($yab[2]-$y[0])/sqrt(pow($xab[1]-$x[0],2)+pow($yab[2]-$y[0],2))];
-      $verLabLoc[2] = [$x[1] - $verRat*($xab[2]-$x[1])/sqrt(pow($xab[2]-$x[1],2)+pow($yab[3]-$y[1],2)),$y[1] - $verRat*($yab[3]-$y[1])/sqrt(pow($xab[2]-$x[1],2)+pow($yab[3]-$y[1],2))];
-      for ($i=0;$i<3;$i++) {
-        $args = $args."text([{$verLabLoc[$i][0]},{$verLabLoc[$i][1]}],'".$verLab[$i]."');";
-      }
+      $verLab[$i] = preg_replace('/;/',',',$verLab[$i]);
+    }
+    
+    $verLabLoc[0] = [$x[2] - $verRat*($xab[0]-$x[2])/sqrt(pow($xab[0]-$x[2],2)+pow($yab[0]-$y[2],2)),$y[2] - $verRat*($yab[0]-$y[2])/sqrt(pow($xab[0]-$x[2],2)+pow($yab[0]-$y[2],2))];
+    $verLabLoc[1] = [$x[0] - $verRat*($xab[1]-$x[0])/sqrt(pow($xab[1]-$x[0],2)+pow($yab[1]-$y[0],2)),$y[0] - $verRat*($yab[1]-$y[0])/sqrt(pow($xab[1]-$x[0],2)+pow($yab[1]-$y[0],2))];
+    $verLabLoc[2] = [$x[1] - $verRat*($xab[2]-$x[1])/sqrt(pow($xab[2]-$x[1],2)+pow($yab[2]-$y[1],2)),$y[1] - $verRat*($yab[2]-$y[1])/sqrt(pow($xab[2]-$x[1],2)+pow($yab[2]-$y[1],2))];
+    for ($i=0;$i<3;$i++) {
+      $args = $args."text([{$verLabLoc[$i][0]},{$verLabLoc[$i][1]}],'".$verLab[$i]."');";
     }
   }
   
@@ -1190,7 +1244,7 @@ function draw_triangle() {
       }
     }
   }
-  $gr = showasciisvg("setBorder(10);initPicture($xminDisp,$xmaxDisp,$yminDisp,$ymaxDisp);$args;",350,350);
+  $gr = showasciisvg("setBorder(10);initPicture($xminDisp,$xmaxDisp,$yminDisp,$ymaxDisp);$args;",$size,$size);
   
   return $gr;
 }
@@ -1207,11 +1261,14 @@ function draw_triangle() {
 
 function draw_polygon() {
   
-  $randAng = rand(0,360)*M_PI/180;
   $randSides = rand(3,9);
   $isRegular = false;
   $hasPoints = false;
+  $hasSides = false;
   $noRotate = false;
+  $size = 300;
+  $rotatePolygon = false;
+  
   $input = func_get_args();
   $argsArray = [];
   foreach ($input as $list) {
@@ -1230,17 +1287,22 @@ function draw_polygon() {
   }
   
   foreach ($argsArray as $key => $in) {
+    if ($in[0]=="sides") {
+      $hasSides = true;
+      $sideKey = $key;
+    }
+    if (in_array("rotate",$in)) {
+      $rotatePolygon = true;
+    }
+    if ($in[0]=="size" && isset($in[1])) {
+      $size = $in[1];
+    }
     if (in_array("regular",$in)) {
       $isRegular = true;
-      $regularKey = $key;
     }
-    if (in_array("points",$in)) {
+    if ($in[0]=="points") {
       $hasPoints = true;
       $pointKey = $key;
-    }
-    if (in_array("norotate",$in)) {
-      $noRotate = true;
-      $randAng = 0;
     }
     if (in_array("axes",$in)) {
       $args = "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
@@ -1249,13 +1311,12 @@ function draw_polygon() {
   
   //number of sides
   $n = $argsArray[0][0];
-  if (!is_numeric($n) || $n%round($n)!=0 || $n < 3) {
+  if (!is_numeric($n) || abs($n-round($n))>1E-9 || $n < 3) {
     echo 'Eek! First argument must be a whole number of sides greater than 2.';
     return '';
   }
   
   // Draw the polygon
-  $n1 = $n-1;
   $sumAngles = ($n-2)*180;
   $avgCenterAngle = 180 - $sumAngles/$n;
   $minAngle = ceil(0.9*$avgCenterAngle);
@@ -1270,7 +1331,11 @@ function draw_polygon() {
       $ang[] = rand($minAngle,$maxAngle)*M_PI/180;
     }
   }
-  
+  if ($rotatePolygon === true) {
+    $randAng = rand(0,360)*M_PI/180;
+  } else {
+    $randAng = -($ang[0]/2+M_PI/2);
+  }
   $x[0] = cos($randAng);
   $y[0] = sin($randAng);
   $args = $args . "path([[$x[0],$y[0]]";
@@ -1278,19 +1343,31 @@ function draw_polygon() {
     $partialSum[$i] = array_sum(array_slice($ang,0,$i));
     $x[$i] = cos($partialSum[$i] + $randAng);
     $y[$i] = sin($partialSum[$i] + $randAng);
+    
+    // Draw path through vertices
     $args = $args . ",[$x[$i],$y[$i]]";
     if ($hasPoints === true) {
       $xPointLab[$i] = 1.2*cos($partialSum[$i] + $randAng);
-      $xPointLabPlus[$i] = 1.2*cos($partialSum[$i] + $randAng + 0.1);
+      $xPointLabPlus[$i] = 1.25*cos($partialSum[$i] + $randAng);
       $yPointLab[$i] = 1.2*sin($partialSum[$i] + $randAng);
-      $yPointLabPlus[$i] = 1.2*sin($partialSum[$i] + $randAng + 0.1);
+      $yPointLabPlus[$i] = 1.25*sin($partialSum[$i] + $randAng);
       if (!isset($argsArray[$pointKey][1+$i])) {
         $argsArray[$pointKey][1+$i] = "";
       }
     }
   }
   $args = $args . ",[$x[0],$y[0]]]);";
-
+  
+  if ($hasSides === true) {
+    $sidLab = array_slice($argsArray[$sideKey],1,$n);
+    for ($i=0;$i<$n;$i++) {
+      // Midpoint of ith side
+      $midPt[$i] = [($x[$i]+$x[($i+1)%$n])/2,($y[$i]+$y[($i+1)%$n])/2];
+      $sidLabLoc[$i] = [$midPt[$i][0]-0.15*($y[$i]-$y[($i+1)%$n])/sqrt(pow($x[$i]-$x[($i+1)%$n],2)+pow($y[$i]-$y[($i+1)%$n],2)),$midPt[$i][1]+0.15*($x[$i]-$x[($i+1)%$n])/sqrt(pow($x[$i]-$x[($i+1)%$n],2)+pow($y[$i]-$y[($i+1)%$n],2))];
+      $args = $args . "text([{$sidLabLoc[$i][0]},{$sidLabLoc[$i][1]}],'".$sidLab[$i]."');";
+    }
+  }
+  
   if ($hasPoints === true) {
     $pointLab = array_slice($argsArray[$pointKey],1);
     for ($i=0;$i<$n;$i++) {
@@ -1299,8 +1376,90 @@ function draw_polygon() {
       $args = $args . "text([$xPointLabPlus[$i],$yPointLabPlus[$i]],'$pointLab[$i]');";
     }
   }
-  $gr = showasciisvg("setBorder(10);initPicture(-1.5,1.5,-1.5,1.5);$args;",300,300);
+  $gr = showasciisvg("setBorder(10);initPicture(-1.5,1.5,-1.5,1.5);$args;",$size,$size);
   return $gr;
+}
+
+//--------------------------------------------draw_prismcubes()----------------------------------------------------
+
+// draw_prismcubes("cubes,length,height,depth",["labels,lab1,lab2,lab3"],["size,length"])
+// draw_prismcubes() will draw a cube with no labels.
+// Options include:
+// "cubes,length,height,depth" Draws a rectangular prism made of cubes that is length x height x depth.
+// "labels,lab1,lab2,lab3" This labels the length, height and depth of the prism.
+// "size,length" Sets the sqare image size to be length x length.
+
+function draw_prismcubes() {
+  $size = 300;
+  $input = func_get_args();
+  $argsArray = [];
+  foreach ($input as $list) {
+    if (!is_array($list)) {
+      $list = listtoarray($list);
+    }
+    $list = array_map('trim', $list);
+    $argsArray[]=$list;
   }
+  foreach ($argsArray as $in) {
+    if ($in[0]=="cubes") {
+      $hasCubes = true;
+    }
+  }
+  if ($hasCubes !== true || empty($argsArray)) {
+    $argsArray[] = ["cubes",1,1,1];
+  }
+
+  foreach ($argsArray as $key => $in) {
+    if ($in[0]=="cubes") {
+      for ($i=1;$i<4;$i++) {
+        if ($in[$i]<1 || abs($in[$i]-round($in[$i]))>1E-9) {
+          echo "Eek! Sides must be whole numbers greater than zero.";
+          return '';
+        }
+      }
+      $length = $in[1];
+      $height = $in[2];
+      $depth = $in[3];
+    }
+    if ($in[0] == "size") {
+      $size = $in[1];
+    }
+    if ($in[0]=="labels") {
+      $labels = array_slice($in,1,3);
+      for ($i=0;$i<3;$i++) {
+        if (!isset($labels[$i])) {
+          $labels[$i] = '';
+        }
+      }
+    }
+  }
+  $xMax = $length+$depth/sqrt(2)+1;
+  $yMax = $height+$depth/sqrt(2)+1;
+  $xyMax = max($xMax,$yMax);
+  $xyLabDiff = $xyMax/12;
+  $xyMin = $xyMax/8;
+  
+  for ($i=0;$i<($height+1);$i++) {
+    $args = $args . "line([0,$i],[$length,$i]);";
+    $args = $args . "line([$length,$i],[$length+$depth/sqrt(2),$i+$depth/sqrt(2)]);";
+  }
+  for ($i=0;$i<($length+1);$i++) {
+    $args = $args . "line([$i,0],[$i,$height]);";
+    $args = $args . "line([$i,$height],[$i+$depth/sqrt(2),$height+$depth/sqrt(2)]);";
+  }
+  for ($i=0;$i<($depth+1);$i++) {
+    $args = $args . "line([$i/sqrt(2),$height+$i/sqrt(2)],[$length+$i/sqrt(2),$height+$i/sqrt(2)]);";
+    $args = $args . "line([$length+$i/sqrt(2),$i/sqrt(2)],[$length+$i/sqrt(2),$height+$i/sqrt(2)]);";
+  }
+  $args = $args . "line([$depth/sqrt(2),$height+$depth/sqrt(2)],[$length+$depth/sqrt(2),$height+$depth/sqrt(2)]);";
+  $args = $args . "line([$length+$depth/sqrt(2),$depth/sqrt(2)],[$length+$depth/sqrt(2),$height+$depth/sqrt(2)]);";
+  
+  $args = $args . "text([$length/2,-$xyLabDiff],'$labels[0]');";
+  $args = $args . "text([$length+$depth/sqrt(2)+$xyLabDiff,$depth/sqrt(2)+$height/2],'$labels[1]');";
+  $args = $args . "text([$length+$xyLabDiff+0.5*$depth/sqrt(2),0.5*$depth/sqrt(2)],'$labels[2]');";
+  
+  $gr = showasciisvg("setBorder(10);initPicture(-$xyMin,1.1*$xyMax,-$xyMin,1.1*$xyMax);$args;",$size,$size);
+  return $gr;
+}
   
 ?>
