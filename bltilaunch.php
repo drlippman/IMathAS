@@ -639,7 +639,8 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
-		$_SESSION['selection_return_format'] = "Canvas";
+        $_SESSION['selection_return_format'] = "Canvas";
+        unset($_SESSION['place_aid']);
 	}
 	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
 		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
@@ -652,7 +653,8 @@ if (isset($_GET['launch'])) {
 		} else {
 			$_SESSION['selection_type'] = 'all';
 		}
-		$_SESSION['selection_data'] = @$_REQUEST['data'];
+        $_SESSION['selection_data'] = @$_REQUEST['data'];
+        unset($_SESSION['place_aid']);
 	}
 	unset($_SESSION['lti_duedate']);
 	if (!isset($_REQUEST['custom_canvas_assignment_due_at'])) {
@@ -2244,7 +2246,8 @@ if (isset($_GET['launch'])) {
 	$_SESSION['lti_keygroupid'] = intval($requestinfo[0]->groupid);
 	if (isset($_REQUEST['selection_directive']) && $_REQUEST['selection_directive']=='select_link') {
 		$_SESSION['selection_return'] = $_REQUEST['launch_presentation_return_url'];
-		$_SESSION['selection_return_format'] = "Canvas";
+        $_SESSION['selection_return_format'] = "Canvas";
+        unset($_SESSION['place_aid']);
 	}
 	if (isset($_REQUEST['lti_message_type']) && $_REQUEST['lti_message_type']=='ContentItemSelectionRequest') {
 		$_SESSION['selection_return'] = $_REQUEST['content_item_return_url'];
@@ -2257,7 +2260,8 @@ if (isset($_GET['launch'])) {
 		} else {
 			$_SESSION['selection_type'] = 'all';
 		}
-		$_SESSION['selection_data'] = @$_REQUEST['data'];
+        $_SESSION['selection_data'] = @$_REQUEST['data'];
+        unset($_SESSION['place_aid']);
     }
     unset($_SESSION['lti_duedate']);
 	if (!isset($_REQUEST['custom_canvas_assignment_due_at'])) {
