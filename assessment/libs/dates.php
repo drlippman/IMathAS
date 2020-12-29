@@ -11,7 +11,7 @@ array_push($allowedmacros,"dates_adddays","dates_addweeks","dates_addmonths","da
 // adds a number of days to an existing date
 // uses $fmt as format of date inputs and outputs
 function dates_adddays($date, $days,$fmt = "F j, Y"){
-	$datetime = date_create_from_Format($fmt,$date);
+	$datetime = date_create_from_format($fmt,$date);
 	if ($datetime==false) {
 		echo "date_adddays::could not create date from string. The date is " . $date . " and the format is " . $fmt . ".";
 		return false;
@@ -24,7 +24,7 @@ function dates_adddays($date, $days,$fmt = "F j, Y"){
 // adds a number of weeks to an existing date
 // uses $fmt as format of date inputs and outputs
 function dates_addweeks($date, $weeks,$fmt = "F j, Y"){
-	$datetime = date_create_from_Format($fmt,$date);
+	$datetime = date_create_from_format($fmt,$date);
 	if ($datetime==false) {
 		echo "date_addweeks::could not create date from string. The date is " . $date . " and the format is " . $fmt . ".";
 		return false;
@@ -37,7 +37,7 @@ function dates_addweeks($date, $weeks,$fmt = "F j, Y"){
 // adds a number of months to an existing date
 // uses $fmt as format of date inputs and outputs
 function dates_addmonths($date,$months,$fmt= "F j, Y"){
-	$datetime = date_create_from_Format($fmt,$date);
+	$datetime = date_create_from_format($fmt,$date);
 	if ($datetime==false) {
 		echo "date_addmonths::could not create date from string. The date is " . $date . " and the format is " . $fmt . ".";
 		return false;
@@ -50,7 +50,7 @@ function dates_addmonths($date,$months,$fmt= "F j, Y"){
 // adds a number of weeks to an existing date
 // uses $fmt as format of date inputs and outputs
 function dates_addyears($date, $years,$fmt = "F j, Y"){
-	$datetime = date_create_from_Format($fmt,$date);
+	$datetime = date_create_from_format($fmt,$date);
 	if ($datetime==false) {
 		echo "date_addyears::could not create date from string. The date is " . $date . " and the format is " . $fmt . ".";
 		return false;
@@ -64,7 +64,7 @@ function dates_addyears($date, $years,$fmt = "F j, Y"){
 // from a given date. 
 // uses $fmt as format of date inputs and outputs
 function dates_eomonth($date,$fmt="F j, Y") {
-	$datetime = date_create_from_Format($fmt,$date);
+	$datetime = date_create_from_format($fmt,$date);
 	if ($datetime==false) {
 		echo "date_eomonth::could not create date from string. The date is " . $date . " and the format is " . $fmt . ".";
 		return false;
@@ -78,7 +78,7 @@ function dates_eomonth($date,$fmt="F j, Y") {
 // from a given date. 
 // uses $fmt as format of date inputs and outputs
 function dates_bomonth($date,$fmt="F j, Y") {
-	$datetime = date_create_from_Format($fmt,$date);
+	$datetime = date_create_from_format($fmt,$date);
 	if ($datetime==false) {
 		echo "date_bomonth::could not create date from string. The date is " . $date . " and the format is " . $fmt . ".";
 		return false;

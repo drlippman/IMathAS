@@ -22,6 +22,10 @@ function finderiv_payout($asset, $types, $possizes, $strikes){
 		return false;
 	}
 	$numTypes = count($types);
+	if ($numTypes>100) {
+		echo 'finderiv_payout: numTypes is too big. Capped at 100.';
+		return false;
+	}
 	if (!is_array($possizes)) {
 		echo 'finderiv_payout: position sizes must be an array';
 		return false;
@@ -86,14 +90,14 @@ function finderiv_fwdprice($spot, $rf, $yield, $today,$mat,$fmt="F j, Y") {
 		return false;
 	}
 
-	$todaydate = date_create_from_Format($fmt,$today);
+	$todaydate = date_create_from_format($fmt,$today);
 	if ($todaydate==false) {
 		echo "finderiv_fwdprice::could not create today's date from string.";
 		echo "The date is " . $today. " and the format is " . $fmt . ".";
 		return false;
 	}
 
-	$matdate = date_create_from_Format($fmt,$mat);
+	$matdate = date_create_from_format($fmt,$mat);
 	if ($matdate==false) {
 		echo "finderiv_fwdprice::could not create maturity date from string.";
 		echo "The date is " . $mat . " and the format is " . $fmt . ".";
@@ -126,14 +130,14 @@ function finderiv_fwdpricediv($spot, $rf, $div, $today, $divmat, $mat, $fmt="F j
 		echo "finderiv_fwdpricediv: invalid dividend";
 		return false;
 	}
-	$todaydate = date_create_from_Format($fmt,$today);
+	$todaydate = date_create_from_format($fmt,$today);
 	if ($todaydate==false) {
 		echo "finderiv_fwdpricediv::could not create today's date from string.";
 		echo "The date is " . $today. " and the format is " . $fmt . ".";
 		return false;
 	}
 
-	$divmatdate = date_create_from_Format($fmt,$divmat);
+	$divmatdate = date_create_from_format($fmt,$divmat);
 	if ($divmatdate==false) {
 		echo "finderiv_fwdpricediv::could not create dividend date from string.";
 		echo "The date is " . $divmat . " and the format is " . $fmt . ".";
@@ -145,7 +149,7 @@ function finderiv_fwdpricediv($spot, $rf, $div, $today, $divmat, $mat, $fmt="F j
 		return false;
 	}
 
-	$matdate = date_create_from_Format($fmt,$mat);
+	$matdate = date_create_from_format($fmt,$mat);
 	if ($matdate==false) {
 		echo "finderiv_fwdpricediv::could not create maturity date from string.";
 		echo "The date is " . $mat . " and the format is " . $fmt . ".";
@@ -187,14 +191,14 @@ function finderiv_fwdcontract ($count, $forward, $strike, $rf, $today,$mat, $fmt
 		echo "finderiv_fwdcontract: invalid risk-free interest rate";
 		return false;
 	}
-	$todaydate = date_create_from_Format($fmt,$today);
+	$todaydate = date_create_from_format($fmt,$today);
 	if ($todaydate==false) {
 		echo "finderiv_fwdcontract::could not create today's date from string.";
 		echo "The date is " . $today. " and the format is " . $fmt . ".";
 		return false;
 	}
 
-	$matdate = date_create_from_Format($fmt,$mat);
+	$matdate = date_create_from_format($fmt,$mat);
 	if ($matdate==false) {
 		echo "finderiv_fwdcontract::could not create maturity date from string.";
 		echo "The date is " . $mat . " and the format is " . $fmt . ".";
@@ -235,14 +239,14 @@ function finderiv_bsm($type, $strike, $mat, $today, $spot, $rf, $vol, $ans , $fm
 		echo 'finderiv_bsm: option type must be call or put.';
 		return false;
 	}
-	$todaydate = date_create_from_Format($fmt,$today);
+	$todaydate = date_create_from_format($fmt,$today);
 	if ($todaydate==false) {
 		echo "finderiv_bsm::could not create today's date from string.";
 		echo "The date is " . $today. " and the format is " . $fmt . ".";
 		return false;
 	}
 
-	$matdate = date_create_from_Format($fmt,$mat);
+	$matdate = date_create_from_format($fmt,$mat);
 	if ($matdate==false) {
 		echo "finderiv_bsm::could not create maturity date from string.";
 		echo "The date is " . $mat . " and the format is " . $fmt . ".";
@@ -293,7 +297,7 @@ function finderiv_bsm($type, $strike, $mat, $today, $spot, $rf, $vol, $ans , $fm
 // if today is an IMM date then it returns the next date
 // format is the date format
 function finderiv_immdate($start,$n,$fmt="F j, Y") {	
-	$startdate = date_create_from_Format($fmt,$start);
+	$startdate = date_create_from_format($fmt,$start);
 	if ($startdate==false) {
 		echo "finderiv_immdate::could not create date from string.";
 		echo "The date is " . $start . " and the format is " . $fmt . ".";
@@ -331,7 +335,7 @@ function finderiv_immdate($start,$n,$fmt="F j, Y") {
 // if today is an equity futures date then it returns the next date
 // format is the date format
 function finderiv_equityfutdate($start,$n,$fmt="F j, Y") {	
-	$startdate = date_create_from_Format($fmt,$start);
+	$startdate = date_create_from_format($fmt,$start);
 	if ($startdate==false) {
 		echo "finderiv_immdate::could not create date from string.";
 		echo "The date is " . $start . " and the format is " . $fmt . ".";
@@ -412,13 +416,13 @@ function finderiv_convertrate($days,$rate,$starttype,$endtype) {
 // This function returns the fair forward rate between two
 // dates given continuously compounded rates for each date.
 function finderiv_fairforwardrate($today,$date1,$rate1,$date2,$rate2,$basis, $fmt="F j, Y") {
-	$todaydate = date_create_from_Format($fmt,$today);
+	$todaydate = date_create_from_format($fmt,$today);
 	if ($todaydate==false) {
 		echo "finderiv_fairforwardrate::could not create today's date from string.";
 		echo "The date is " . $today. " and the format is " . $fmt . ".";
 		return false;
 	}
-	$startdate = date_create_from_Format($fmt,$date1);
+	$startdate = date_create_from_format($fmt,$date1);
 	if ($startdate==false) {
 		echo "finderiv_fairforwardrate::could not create first date from string.";
 		echo "The date is " . $date1. " and the format is " . $fmt . ".";
@@ -428,7 +432,7 @@ function finderiv_fairforwardrate($today,$date1,$rate1,$date2,$rate2,$basis, $fm
 		echo "finderiv_fairforwardrate:: Rate is in the past. Start date is less than today.";
 		return false;
 	}
-	$enddate = date_create_from_Format($fmt,$date2);
+	$enddate = date_create_from_format($fmt,$date2);
 	if ($enddate==false) {
 		echo "finderiv_fairforwardrate::could not create second date from string.";
 		echo "The date is " . $date2. " and the format is " . $fmt . ".";
@@ -473,13 +477,13 @@ function finderiv_fra($borrowlend, $principal, $date1, $date2,
 		echo "finderiv_fra::principal must be positive.";
 		return false;
 	}
-	$startdate = date_create_from_Format($fmt,$date1);
+	$startdate = date_create_from_format($fmt,$date1);
 	if ($startdate==false) {
 		echo "finderiv_fra::could not create first date from string.";
 		echo "The date is " . $date1. " and the format is " . $fmt . ".";
 		return false;
 	}
-	$enddate = date_create_from_Format($fmt,$date2);
+	$enddate = date_create_from_format($fmt,$date2);
 	if ($enddate==false) {
 		echo "finderiv_fra::could not create second date from string.";
 		echo "The date is " . $date2. " and the format is " . $fmt . ".";
@@ -498,7 +502,7 @@ function finderiv_fra($borrowlend, $principal, $date1, $date2,
 		return false;	
 	}
 
-	$todaydate = date_create_from_Format($fmt,$today);
+	$todaydate = date_create_from_format($fmt,$today);
 	if ($todaydate==false) {
 		echo "finderiv_fra::could not create today's date from string.";
 		echo "The date is " . $today. " and the format is " . $fmt . ".";
