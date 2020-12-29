@@ -1,5 +1,10 @@
 <?php
 
+# Library name: shapes
+# Functions for creating asciisvg for common shapes.  Version 1.  December 2020
+# Contributors:  Nick Chura
+
+
 global $allowedmacros;
 array_push($allowedmacros,"draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes");
 
@@ -1311,8 +1316,8 @@ function draw_polygon() {
   
   //number of sides
   $n = $argsArray[0][0];
-  if (!is_numeric($n) || abs($n-round($n))>1E-9 || $n < 3) {
-    echo 'Eek! First argument must be a whole number of sides greater than 2.';
+  if (!is_numeric($n) || abs($n-round($n))>1E-9 || $n < 3 || $n > 50) {
+    echo 'Eek! First argument must be a whole number of sides greater than 2 (maximum of 50).';
     return '';
   }
   
@@ -1420,6 +1425,10 @@ function draw_prismcubes() {
       $length = $in[1];
       $height = $in[2];
       $depth = $in[3];
+      if ($length > 20 || $height > 20 || $depth > 20) {
+        echo 'Eek! Exceeded maximum of 20 for length, height or width.';
+        return '';
+      }
     }
     if ($in[0] == "size") {
       $size = $in[1];
