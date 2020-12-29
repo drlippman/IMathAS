@@ -2910,9 +2910,9 @@ function forminlinebutton($label,$content,$style='button',$outstyle='block') {
 	if ($style=='classic') {
 		$out = '<input type="button" '.$common.'/>';
 	} else if ($style=='link') {
-		$out = '<span class="link" '.$common.'>'.$label.'</span>';
+		$out = '<span tabindex=0 class="link" '.$common.'>'.$label.'</span>';
 	} else {
-		$out = '<span class="spanbutton" '.$common.'>'.$label.'</span>';
+		$out = '<span tabindex=0 class="spanbutton" '.$common.'>'.$label.'</span>';
 	}
 	if ($outstyle=='inline') {
 		$out .= ' <span id="inlinebtnc'.$r.'" style="display:none;" aria-hidden="true">'.$content.'</span>';
