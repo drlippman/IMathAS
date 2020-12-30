@@ -1979,10 +1979,8 @@ class DrawingScorePart implements ScorePart
             }
         }
         $totscore = 0;
-        $pcnt = 0;
         foreach ($scores as $key=>$score) {
-            $totscore += $score*$partweights[$pcnt];
-            $pcnt++;
+            $totscore += $score*$partweights[$key];
         }
         if ($extrastuffpenalty>0) {
             $totscore = max($totscore*(1-$extrastuffpenalty),0);
