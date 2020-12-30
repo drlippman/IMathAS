@@ -1,0 +1,140 @@
+<html><body>
+<h1>Macro Library finderiv</h1>
+&nbsp;A library of Financial Derivative Functions. Version 1.0 Dec 27, 2020
+<BR>&nbsp;Author: Daniel Brown: CU Boulder - Leeds School of Business
+<BR><ul>
+<p> The following library implements useful functionality for wrinting questions for 
+financial derivatives. It includes forward prices, forward contracts and the Black-Scholes-Merton
+model for European call and put options. </p>
+<p>The question 606302 tests this macro library. If you make changes to the library please modify 
+the test question to incorporate your changes and run to make sure that nothing is broken.</p>
+<ul>
+<li><a href="#finderiv_payout">finderiv_payout</a></li>
+<li><a href="#finderiv_fwdprice">finderiv_fwdprice</a></li>
+<li><a href="#finderiv_fwdpricediv">finderiv_fwdpricediv</a></li>
+<li><a href="#finderiv_fwdcontract">finderiv_fwdcontract</a></li>
+<li><a href="#finderiv_bsm">finderiv_bsm</a></li>
+<li><a href="#finderiv_immdate">finderiv_immdate</a></li>
+<li><a href="#finderiv_equityfutdate">finderiv_equityfutdate</a></li>
+<li><a href="#finderiv_convertrate">finderiv_convertrate</a></li>
+<li><a href="#finderiv_fairforwardrate">finderiv_fairforwardrate</a></li>
+<li><a href="#finderiv_fra">finderiv_fra</a></li>
+</ul>
+<h4><a name="finderiv_payout">finderiv_payout(asset, types, possizes, strikes)</a></h4>
+<p>This function returns the payout of a portfolio. The portfolio can contain call options, put options,
+forward contracts and zero-coupon bonds. The parameters are: </p>
+<ul>
+<li><b>asset</b> is the terminal asset value for all positions.</li>
+<li><b>types</b> is an array where each element is 'call', 'put', 'forward' or 'bond'.</li>
+<li><b>possizes</b> is an array of position sizes. It can be positive or negative. If the type is a zero-coupon bond 
+then the position size is the amount paid at maturity.</li>
+<li><b>strikes</b> is an array of strikes. These are the strikes for calls, puts and forward contracts. It is 
+ignored if the type is a zero coupon bond.</li>
+</ul>
+<h4><a name="finderiv_fwdprice">finderiv_fwdprice(spot, rf, yield,  today, matdate, fmt)</a></h4>
+<p>This function calculates the fair forward price for an asset which has a yield. It is 
+appropriate for assets such as stock indices or FX rates. The parameters are:</p>
+<ul>
+<li><b>spot</b> is the spot price of the asset.</li>
+<li><b>rf</b> is the continuously compounded risk-free interest rate.</li>
+<li><b>yield</b> is the yield on the asset as a continuously compounded rate.</li>
+<li><b>today</b> is today's date.</li>
+<li><b>matdate</b> is the maturity date of the forward.</li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li>
+</ul>
+<h4><a name="finderiv_fwdpricediv">finderiv_fwdpricediv(spot, rf, div, divdays, today, divdate, matdate, fmt)</a></h4>
+<p>This function calculates the fair forward price for a stock which pays a single dividend. 
+The parameters are:</p>
+<ul>
+<li><b>spot</b> is the spot price of the stock.</li>
+<li><b>rf</b> is the continuously compounded risk-free interest rate.</li>
+<li><b>div</b> is the dividend amount.</li>
+<li><b>today</b> is today's date.</li>
+<li><b>divdate</b> is the dividend date for the dividend. If it is before the maturity of the forward then it 
+is included in the calculation. If it is after, then it is ignored.</li>
+<li><b>matdate</b> is the maturity date of the forward.</li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li></ul>
+<h4><a name="finderiv_fwdcontract">finderiv_fwdcontract(count, forward, strike, rf, today, matdate, fmt)</a></h4>
+<p>This function finds the present value of a forward contract. The parameters are:</p>
+<ul>
+<li><b>count</b> is the number of units of the asset to be delivered in the contract. 
+A positive number will return the present value of being long the contract (buying the asset) 
+and a negative number will return the present value of being short the contract (selling the asset). </li>
+<li><b>forward</b> is the fair forward price of the asset at the maturity of the contract.</li>
+<li><b>strike</b> is the strike of the forward contract. This is the price at which one is 
+buying or selling the asset.</li>
+<li><b>rf</b> is the continuously compounded risk-free interest rate.</li>
+<li><b>today</b> is today's date.</li>
+<li><b>matdate</b> is the maturity date of the forward contract.</li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li>
+</ul>
+<h4><a name="finderiv_bsm">finderiv_bsm(type, strike, mat, today, spot, rf, vol, ans , fmt)</a></h4>
+
+<p>This function calculates the value, delta, gamma or vega of a European call or put 
+option using the Black-Scholes-Merton formulas. The parameters are:</p>
+<ul>
+<li><b>type</b> must be 'call' or 'put'.</li>
+<li><b>strike</b> is the strike of the option.</li>
+<li><b>mat</b> is the maturity date of the option.</li>
+<li><b>today</b> is today's date.</li>
+<li><b>spot</b> is the spot price of the asset. </li>
+<li><b>rf</b> is the continuously compounded risk-free interest rate.</li>
+<li><b>vol</b> is the volatility of the asset.</li>
+<li><b>ans</b> is the answer type. It must be 'value', 'delta', 'gamma' or 'vega'.</li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li>
+</ul>
+<h4><a name="finderiv_immdate">finderiv_immdate(start, n, fmt)</a></h4>
+<p>This function finds the nth IMM date after the start date. IMM dates are the 
+third Wednesday of March, June, September and December. The parameters are:</p>
+<ul>
+<li><b>start</b> is the starting date. If it is an IMM date then n=1 will return the next one.</li>
+<li><b>n</b> is the number of IMM dates after start date to return. It must be positive. </li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li>
+</ul>
+<h4><a name="finderiv_equityfutdate">finderiv_equityfutdate(start, n, fmt)</a></h4>
+<p>This function finds the nth equity futures date after the start date. Equity 
+futures dates are the third Friday of March, June, September and December. The parameters are:</p>
+<ul>
+<li><b>start</b> is the starting date. If it is an equity futures date then n=1 will return the next one.</li>
+<li><b>n</b> is the number of equity futures dates after start date to return. It must be positive. </li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li>
+</ul>
+<h4><a name="finderiv_convertrate">finderiv_convertrate(days,rate,starttype,endtype)</a></h4>
+<p>This function converts a rate from one type to another.  The rate types must be '360', '365' or 'cc'. 
+The '360' and '365' refer to ACT/360 and ACT/365 basis.  'cc' refers to continuously compounded rates.</p>
+<ul>
+<li><b>days</b> is the number of days for the rate.</li>
+<li><b>rate</b> is the rate to be converted.</li>
+<li><b>starttype</b> is the type of the rate. It must be '360', '365' or 'cc'. </li>
+<li><b>endtype</b> is the type of rate to be converted to. It must be '360', '365' or 'cc'.</li>
+</ul>
+<h4><a name="finderiv_fairforwardrate">finderiv_fairforwardrate(today,date1,rate1,date2,rate2,basis, fmt)</a></h4>
+<p>This function computes the fair forward rate between date1 and date2 using the continuously compounded rates rate1 
+and rate2. It returns the rate in the basis which must be '360' or '365' for ACT/360 or ACT/365.</p>
+<ul>
+<li><b>today</b> is today's date.</li>
+<li><b>date1</b> the start date of the forward rate.</li>
+<li><b>rate1</b> is the continuously compounded rate from today to date1.</li>
+<li><b>date2</b> the end date of the forward rate.</li>
+<li><b>rate2</b> is the continuously compounded rate from today to date2.</li>
+<li><b>basis</b> is the basis of the rate to be calculated. It must be '360' or '365' for 
+ACT/360 or ACT/365.</li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li>
+</ul>
+<h4><a name="finderiv_fra">finderiv_fra(borrowlend, principal, date1, date2, 
+		strike, basis, today, rate1, rate2, fmt)</a></h4>
+<p>This function computes the present value of an forward rate agreement (FRA).</p>
+<ul>
+<li><b>borrowlend</b> is whether the present value is from the perspective of 
+the borrower 'borrow' or lender 'lend'.</li>
+<li><b>principal</b> is the amount being borrowed or lent. It must be positive.</li>
+<li><b>date1</b> the start date of the forward rate agreement.</li>
+<li><b>date2</b> the end date of the forward rate agreement.</li>
+<li><b>strike</b> is the agreed rate for the borrowing or lending.</li>
+<li><b>basis</b> is the basis of the agreed rate. It must be '360' or '365' for 
+ACT/360 or ACT/365.</li>
+<li><b>today</b> is today's date.</li>
+<li><b>rate1</b> is the continuously compounded rate from today to date1.</li>
+<li><b>rate2</b> is the continuously compounded rate from today to date2.</li>
+<li><b>fmt</b> is the format of the date. It defaults to 'F j, Y'</li>
+</ul>
