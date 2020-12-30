@@ -1483,7 +1483,7 @@ class AssessRecord
       }
       if ($this->teacherInGb && $lastsub > -1) {
           $out['lastchange'] = tzdate("n/j/y, g:i a", 
-            $this->submissions[$lastsub] + $this->assessRecord['starttime']);
+            $this->data['submissions'][$lastsub] + $this->assessRecord['starttime']);
       }
     } else {
       $out['html'] = null;
