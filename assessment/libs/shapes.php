@@ -96,6 +96,10 @@ function draw_circle() {
         return '';
       }
       if (isset($in[1])) {
+        if ($in[1] > 360 || $in[1] < 0) {
+          echo 'Eek! Angle must be between 0 and 360.';
+          return '';
+        }
         $ang = $in[1];
         $x = cos(M_PI*$ang/180);
         $y = sin(M_PI*$ang/180);
@@ -150,6 +154,10 @@ function draw_circle() {
         echo 'Warning! "point" must be followed by an angle in degrees.';
       }
       if (isset($in[1]) && is_numeric($in[1])) {
+        if ($in[1] > 360 || $in[1] < 0) {
+          echo 'Eek! Point angle must be between 0 and 360.';
+          return '';
+        }
         $angForPt = $in[1];
         $xPtLoc = cos(M_PI*$angForPt/180);
         $yPtLoc = sin(M_PI*$angForPt/180);
