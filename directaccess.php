@@ -39,13 +39,13 @@
 		$page_newaccounterror = checkNewUserValidation();
 		$stm = $DBH->prepare("SELECT enrollkey,deflatepass,allowunenroll FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['cid']));
-        list($enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
-        if (($line['allowunenroll']&2)==2) {
+        list($enrollkey,$deflatepass,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM);
+        if (($allowunenroll&2)==2) {
             $page_newaccounterror .= _('Course is closed for self enrollment.  Contact your instructor for access.');
         } else if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= _("Please provide the enrollment key");
 		} else if (strlen($enrollkey)>0) {
-            $keylist = array_map('trim',explode(';',$line['enrollkey']));
+            $keylist = array_map('trim',explode(';',$enrollkey));
             if (($p = array_search(strtolower(trim($_POST['ekey2'])), array_map('strtolower', $keylist))) === false) {
 				$page_newaccounterror .= _("Enrollment key is invalid.");
 			} else {
