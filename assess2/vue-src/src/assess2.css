@@ -305,6 +305,8 @@ input, .mq-editable-field, .mathquill-math-field {
   padding: 4px 6px;
   border-radius: 4px;
   margin: 1px 0;
+  background-color: #fff;
+  color: #000;
 }
 
 input[type=radio], input[type=checkbox] {
