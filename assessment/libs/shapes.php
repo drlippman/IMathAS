@@ -157,7 +157,6 @@ function draw_circle() {
       }
       $minDiff = 7;
       if (isset($in[2])) {
-        //matches pi in expressions, not in words
         $in[2] = str_replace(';',',',$in[2]);
         if (abs($angForPt%360) < $minDiff || abs($angForPt%360-360) < $minDiff) {
           if ($angForPt%360 < 2*$minDiff) {
@@ -295,8 +294,8 @@ function draw_circlesector() {
       $ang = $in[1];
       $lab = "";
       if ($ang > 360 || $ang < 0) {
-        echo 'Warning! Angle should be between 0 and 360.';
-        $ang = $ang%360;
+        echo 'Eek! Angles should be between 0 and 360.';
+        return '';
       }
       $x = cos(M_PI*$ang/180);
       $y = sin(M_PI*$ang/180);
@@ -872,6 +871,10 @@ function draw_triangle() {
   }
   
   foreach ($ang as $key => $angle) {
+    if ($angle <= 0) {
+      echo "Eek! Angles must be positive numbers.";
+      return '';
+    }
     if (abs($angle - 90) < 1E-9) {
       // Finds the right angle
       $perpKey = $key;
