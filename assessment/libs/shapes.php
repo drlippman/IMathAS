@@ -669,18 +669,19 @@ function draw_triangle() {
     if ($in[0]=="angles") {
       $noAngles = false;
       $angleKey = $key;
-      
-      if (count($in) < 4) {
-        echo "Eek! 'angles' must be followed by at least three numbers.";
-        return '';
+      for ($i=1;$i<4;$i++) {
+        if (!isset($in[$i])) {
+          $in[$i] = "";
+        }
       }
     }
     if ($in[0]=="sides") {
       $noSides = false;
       $sideKey = $key;
-      if (count($in) < 4) {
-        echo "Eek! 'sides' must be followed by at least three numbers.";
-        return '';
+      for ($i=1;$i<4;$i++) {
+        if (!isset($in[$i])) {
+          $in[$i] = "";
+        }
       }
     }
     if ($in[0]=="bisectors") {
@@ -763,6 +764,12 @@ function draw_triangle() {
       }
       
       if ($angleKey < $sideKey) {
+        for ($i=1;$i<4;$i++) {
+          if (empty($argsArray[$angleKey][$i])) {
+            echo 'Eek! "Angles" must be followed by three angles in degrees.';
+            return '';
+          }
+        }
         if (isset($argsArray[$angleKey][7])) {
           $hasArcs = true;
         }
@@ -783,6 +790,12 @@ function draw_triangle() {
       }
       
       if ($sideKey < $angleKey) {
+        for ($i=1;$i<4;$i++) {
+          if (empty($argsArray[$sideKey][$i])) {
+            echo 'Eek! "Sides" must be followed by three side lengths.';
+            return '';
+          }
+        }
         if (isset($argsArray[$sideKey][7])) {
           $hasMarks = true;
           for ($i=7;$i<10;$i++) {
@@ -855,6 +868,12 @@ function draw_triangle() {
     }
     // Has angles, but no sides
     if ($noSides === true && $noAngles === false) {
+      for ($i=1;$i<4;$i++) {
+        if (empty($argsArray[$angleKey][$i])) {
+          echo 'Eek! "Angles" must be followed by three angles in degrees.';
+          return '';
+        }
+      }
       if (isset($argsArray[$angleKey][7])) {
         $hasArcs = true;
       }
