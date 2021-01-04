@@ -45,6 +45,7 @@
   <li><strong>"altitude,[_,_,_,lab1,lab2,lab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle, and lab1,lab2,lab3 are labels for where the altitude intersects the opposite (extended) side. Dashed lines are drawn to extend opposite side if necessary. Using "altitude" rotates the triangle so the side with the (last) altitude is horizontal.</li>
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
   <li><strong>"rotate"</strong> Rotates the triangle by a random angle.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
 </ul>
   <p>Notes</p>
 <ol>
@@ -77,12 +78,13 @@
   <li><strong>"center,[label]"</strong> -- Draws the center point with an optional label.</li>
   <li><strong>"radius,[label]"</strong> -- Draws a horizontal radius with an optional label.</li>
   <li><strong>"diameter,[label]"</strong> -- Draws a diameter with an optional label.</li>
-  <li><strong>"angle,measurement,[label,point]"</strong> -- Draws an angle measured counterclockwise from positive x-direction, with optional angle label and point on circle. Here, "point" is the literal word point.</li>
+  <li><strong>"angle,measurement,[label]"</strong> -- Draws an angle measured counterclockwise from positive x-direction, with optional angle label.</li>
   <li>Note: Angle must be given in degrees, and degree symbol will be displayed by default. To not display degree symbol, use "rad" in the label. E.g. "angle,57,1 rad".</li>
   <li><strong>"point,angle,[label]"</strong> -- Draws a point on the circle where angle is measured counterclockwise from positive x-direction. Optional label on point.</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
   <li>Note: If a label is a point, type it as (x;y).</li>
   <li><strong>"axes"</strong> -- Draws the x and y axes.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -104,6 +106,7 @@
   <li><strong>"radius,[label]"</strong> Draws a horizontal radius from the center, with optional label.</li>
   <li><strong>"point,angle,[label]"</strong> Plots a point on the circle at angle measured counterclockwise. If optional label is a point (x,y), type is as (x;y).</li>
   <li><strong>"axes"</strong> -- Draws the x and y axes.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
   <li>Note: Angle must be given in degrees, and degree symbol will be displayed by default. To not display degree symbol, use "rad" in the label. E.g. "angle,57.3,1 rad".</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
 </ul>
@@ -123,6 +126,7 @@
   <li><strong>"base,b,[label]"</strong> Must be used with "height". Draws scaled rectangle with base "b" and height "h" with optional label on bottom horizontal side.</li>
   <li><strong>"height,h,[label]"</strong> Must be used with "base". Draws scaled rectangle with base "b" and height "h" with optional label on right-hand vertical side.</li>
   <li><strong>"points,lab1,lab2,lab3,lab4"</strong> Plots the vertices with optional labels (counterclockwise from bottom left). If label is a point (a,b), type it as (a;b).</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <p>Notes:</p>
 <ol>
@@ -143,6 +147,7 @@
   <li><strong>"base,[label]"</strong> Labels the bottom horizontal side.</li>
   <li><strong>"height,[label]"</strong> Labels the right-hand vertical side.</li>
   <li><strong>"points,lab1,lab2,lab3,lab4"</strong> Plots the vertices with optional labels (counterclockwise from bottom left). If label is a point (a,b), type it as (a;b).</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -155,7 +160,7 @@
 <p>Points drawn counterclockwise. By default, first side is horizontal on the bottom.</p>
 <p>Syntax: draw_polygon([n],["option 1", "option 2", ...])</p>
 <p>draw_polygon() -- this draws a random polygon with between 3 and 9 sides.</p>
-<p>draw_polygon(n) -- this draws an n-sided polygon.
+<p>draw_polygon(n) -- this draws an n-sided polygon. Maximum number of sides is 50.
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"points,[lab1,lab2,...,labn]"</strong> Labels the vertices counterclockwise from bottom-left. If label is a point (a,b), type it as (a;b).</li>
@@ -163,6 +168,7 @@
   <li><strong>"regular"</strong> Makes it a regular polygon</li>
   <li><strong>"rotate"</strong> Rotates polygon by random angle.</li>
   <li><strong>"axes"</strong> Shows x and y axes.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -171,14 +177,14 @@
 
 <p><a name="prismcubes"></a></p>
 <h2><strong>draw_prismcubes</strong></h2>
-<p>Draws and labels a polygon with n sides.</p>
+<p>Draws a rectangular prism sliced into cubes.</p>
 <p>Syntax: draw_prismcubes([option 1],[option 2],[option 3]</p>
 <p>draw_prismcubes() -- this draws a cube with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
-  <li><strong>"cubes,length,height,depth"</strong> Draws a rectangular prism made of cubes, that is length x height x depth.</li>
+  <li><strong>"cubes,length,height,depth"</strong> Draws a rectangular prism made of cubes, that is length x height x depth. Maximum of each dimension is 20.</li>
   <li><strong>"labels,lab1,lab2,lab3"</strong> This labels the length, height and depth of the prism.</li>
-  <li><strong>"size,length"</strong> Sets the sqare image size to be length x length.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <br />
 <p>Examples:</p>

@@ -96,6 +96,10 @@ function draw_circle() {
         return '';
       }
       if (isset($in[1])) {
+        if ($in[1] > 360 || $in[1] < 0) {
+          echo 'Eek! Angle must be between 0 and 360.';
+          return '';
+        }
         $ang = $in[1];
         $x = cos(M_PI*$ang/180);
         $y = sin(M_PI*$ang/180);
@@ -150,6 +154,10 @@ function draw_circle() {
         echo 'Warning! "point" must be followed by an angle in degrees.';
       }
       if (isset($in[1]) && is_numeric($in[1])) {
+        if ($in[1] > 360 || $in[1] < 0) {
+          echo 'Eek! Point angle must be between 0 and 360.';
+          return '';
+        }
         $angForPt = $in[1];
         $xPtLoc = cos(M_PI*$angForPt/180);
         $yPtLoc = sin(M_PI*$angForPt/180);
@@ -157,7 +165,6 @@ function draw_circle() {
       }
       $minDiff = 7;
       if (isset($in[2])) {
-        //matches pi in expressions, not in words
         $in[2] = str_replace(';',',',$in[2]);
         if (abs($angForPt%360) < $minDiff || abs($angForPt%360-360) < $minDiff) {
           if ($angForPt%360 < 2*$minDiff) {
@@ -295,8 +302,8 @@ function draw_circlesector() {
       $ang = $in[1];
       $lab = "";
       if ($ang > 360 || $ang < 0) {
-        echo 'Warning! Angle should be between 0 and 360.';
-        $ang = $ang%360;
+        echo 'Eek! Angles should be between 0 and 360.';
+        return '';
       }
       $x = cos(M_PI*$ang/180);
       $y = sin(M_PI*$ang/180);
@@ -662,18 +669,19 @@ function draw_triangle() {
     if ($in[0]=="angles") {
       $noAngles = false;
       $angleKey = $key;
-      
-      if (count($in) < 4) {
-        echo "Eek! 'angles' must be followed by at least three numbers.";
-        return '';
+      for ($i=1;$i<4;$i++) {
+        if (!isset($in[$i])) {
+          $in[$i] = "";
+        }
       }
     }
     if ($in[0]=="sides") {
       $noSides = false;
       $sideKey = $key;
-      if (count($in) < 4) {
-        echo "Eek! 'sides' must be followed by at least three numbers.";
-        return '';
+      for ($i=1;$i<4;$i++) {
+        if (!isset($in[$i])) {
+          $in[$i] = "";
+        }
       }
     }
     if ($in[0]=="bisectors") {
@@ -756,6 +764,12 @@ function draw_triangle() {
       }
       
       if ($angleKey < $sideKey) {
+        for ($i=1;$i<4;$i++) {
+          if (empty($argsArray[$angleKey][$i])) {
+            echo 'Eek! "Angles" must be followed by three angles in degrees.';
+            return '';
+          }
+        }
         if (isset($argsArray[$angleKey][7])) {
           $hasArcs = true;
         }
@@ -776,6 +790,12 @@ function draw_triangle() {
       }
       
       if ($sideKey < $angleKey) {
+        for ($i=1;$i<4;$i++) {
+          if (empty($argsArray[$sideKey][$i])) {
+            echo 'Eek! "Sides" must be followed by three side lengths.';
+            return '';
+          }
+        }
         if (isset($argsArray[$sideKey][7])) {
           $hasMarks = true;
           for ($i=7;$i<10;$i++) {
@@ -848,6 +868,12 @@ function draw_triangle() {
     }
     // Has angles, but no sides
     if ($noSides === true && $noAngles === false) {
+      for ($i=1;$i<4;$i++) {
+        if (empty($argsArray[$angleKey][$i])) {
+          echo 'Eek! "Angles" must be followed by three angles in degrees.';
+          return '';
+        }
+      }
       if (isset($argsArray[$angleKey][7])) {
         $hasArcs = true;
       }
@@ -872,6 +898,10 @@ function draw_triangle() {
   }
   
   foreach ($ang as $key => $angle) {
+    if ($angle <= 0) {
+      echo "Eek! Angles must be positive numbers.";
+      return '';
+    }
     if (abs($angle - 90) < 1E-9) {
       // Finds the right angle
       $perpKey = $key;
