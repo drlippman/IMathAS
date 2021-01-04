@@ -6,7 +6,122 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes");
+array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes");
+
+//--------------------------------------------draw_angle()----------------------------------------------------
+
+// draw_angle("measurement,[label]","rotate","axes")
+// You must include at least the angles measurement to define the angle, and "label" is optional for the angle.
+// Note: Angle must be in degrees. In the label, the degree symbol is shown by default. To not show the degree symbol, use "rad" as in "57, 1 rad".
+// Labels involving alpha, beta, gamma, theta, phi, pi or tau will display with those Greek letters.
+// Options include:
+// "rotate,[ang]" Rotates the image by ang degrees counterclockwise. Using just "rotate" will rotate by a random angle.
+// "axes" Draws xy axes.
+
+function draw_angle() {
+  $degSymbol = "&deg;";
+  $input = func_get_args();
+  $argsArray = [];
+  foreach ($input as $list) {
+    if (!is_array($list)) {
+      $list = listtoarray($list);
+    }
+    $list = array_map('trim', $list);
+    $argsArray[]=$list;
+  }
+  $size = 300;
+  foreach ($argsArray as $in) {
+    if ($in[0] == "rotate") {
+      if (isset($in[1])) {
+        $rot = $in[1];
+      } elseif (!isset($in[1])) {
+        $rot = rand(0,360);
+      }
+    }
+    if ($in[0] == "size") {
+      $size = $in[1];
+    }
+    if (in_array("axes",$in)) {
+      $args = $args . "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
+    }
+  }
+  
+  $rotRad = $rot*M_PI/180;
+  $ang = $argsArray[0][0];
+  if (abs($ang)>=2000) {
+    echo "Angle must be between less than 2000 degrees in magnitude.";
+    return '';
+  }
+  $angRad = $ang*M_PI/180;
+  $lab = $argsArray[0][1];
+  $xStart = cos($rotRad);
+  $yStart = sin($rotRad);
+  $xEnd = cos($angRad+$rotRad);
+  $yEnd = sin($angRad+$rotRad);
+  
+  // Draw the sides of the angle
+  $args = $args."strokewidth=2;line([0,0],[$xStart,$yStart]);line([0,0],[$xEnd,$yEnd]);dot([0,0]);strokewidth=1;";
+  
+  // Label the angle
+  $belowFactor = 1;
+  $labFact = 0.35+0.05*abs(ceil($ang/360));
+  if (abs($ang)<30) {
+    if ($ang<0) {
+      $belowFactor = -1;
+    }
+    [$xLabLoc,$yLabLoc] = [$labFact*cos(($rot+$ang+$belowFactor*20)*M_PI/180),$labFact*sin(($rot+$ang+$belowFactor*20)*M_PI/180)];
+  } elseif (abs($ang)>=30) {
+    $halfAngle = $ang/2;
+    if (($halfAngle%90<20 && $halfAngle%90>=0) || $halfAngle%90<-70) {
+      $moveAxis = 40;
+    } elseif (($halfAngle%90>-20 && $halfAngle%90<0) || $halfAngle%90>70) {
+      $moveAxis = -40;
+    } 
+    [$xLabLoc,$yLabLoc] = [$labFact*cos(($halfAngle+$rot+$moveAxis)*M_PI/180),$labFact*sin(($halfAngle+$rot+$moveAxis)*M_PI/180)];
+  }
+  
+  $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
+  $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
+  if (!empty($lab)) {
+    for ($j=0;$j<count($greekSpelled);$j++) {
+      if (preg_match($greekSpelled[$j],$lab)) {
+        $degSymbol = '';
+        $lab = preg_replace($greekSpelled[$j],$greekSymbol[$j],$lab);
+      }
+    }  
+  }
+  $args = $args."text([$xLabLoc,$yLabLoc],'$lab$degSymbol');";
+  
+  // Draw the angle arc
+  if ($ang < 0) {
+    [$xStartTmp,$yStartTmp] = [$xStart,$yStart];
+    [$xStart,$yStart] = [$xEnd,$yEnd];
+    [$xEnd,$yEnd] = [$xStartTmp,$yStartTmp]; 
+  }
+  // Starting position of the arc
+  $arcRad = 0.15;
+  if (abs($ang)>360) {
+    $minAng = $rotRad;
+    $maxAng = $rotRad+$angRad;
+    if ($ang<0) {
+      $minAng = $rotRad+$angRad;
+      $maxAng = $rotRad;
+    }
+    $args = $args."plot(['($arcRad+.06/(2*pi)*abs(t-$rotRad))*cos(t)','($arcRad+.06/(2*pi)*abs(t-$rotRad))*sin(t)'],$minAng,$maxAng);";
+    //$args = $args."plot(['0.4*cos(t)','0.4*sin(t)'],0,pi);";
+  } else {
+    if (abs($ang) <= 180) {
+      $arc = "arc([$arcRad*$xStart,$arcRad*$yStart],[$arcRad*$xEnd,$arcRad*$yEnd],$arcRad);";
+    } elseif (abs($ang) > 180 && abs($ang)<=360) {
+      $arc = "arc([$arcRad*$xStart,$arcRad*$yStart],[-$arcRad*$xStart,-$arcRad*$yStart],$arcRad);arc([-$arcRad*$xStart,-$arcRad*$yStart],[$arcRad*$xEnd,$arcRad*$yEnd],$arcRad);";
+    } 
+    $args = $args.$sectorArc.$arc;
+  }
+  
+  $gr = showasciisvg("setBorder(5);initPicture(-1.1,1.1,-1.1,1.1);$args",$size,$size);
+  
+  return $gr;
+}
 
 //--------------------------------------------draw_circle()----------------------------------------------------
 // circle("[center,[label]]","[radius,[label]]","[diameter,[label]]","[angle,measurement,[label]]")

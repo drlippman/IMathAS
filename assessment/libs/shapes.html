@@ -15,6 +15,7 @@
     <p><strong>List of functions:</strong></p>
     <div style="padding-left: 28px;">
     <li><a href="#triangle">draw_triangle</a></li>
+    <li><a href="#angle">draw_angle</a></li>
     <li><a href="#circle">draw_circle</a></li>
     <li><a href="#circlesector">draw_circlesector</a></li>
     <li><a href="#rectangle">draw_rectangle</a></li>
@@ -66,6 +67,33 @@
 <p><strong>$gr = draw_triangle("rotate","points")</strong> -- A random triangle with points on the vertices (unlabeled), drawn with random rotation.</p>
 <p><strong>$gr = draw_triangle("random","points,P,Q,R","angles,a,b,c,(,((,(((")</strong> -- A triangle with random angles, points are labeled P,Q,R, angles are labeled a,b,c and they have arcs (, (( and (((.</p>
 <p><strong>$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")</strong> -- A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and an altitude drawn down from point A, labeled with the letter "P".</p>
+
+// draw_angle("measurement,[label]","rotate","axes")
+// You must include at least the angles measurement to define the angle, and "label" is optional for the angle.
+// Note: Angle must be in degrees. In the label, the degree symbol is shown by default. To not show the degree symbol, use "rad" as in "57, 1 rad".
+// Labels involving alpha, beta, gamma, theta, phi, pi or tau will display with those Greek letters.
+// Options include:
+// "rotate,[ang]" Rotates the image by ang degrees counterclockwise. Using just "rotate" will rotate by a random angle.
+// "axes" Draws xy axes.
+
+<p><a name="angle"></a></p>
+<h2><strong>draw_angle</strong></h2>
+<p>Draws and labels an angle.</p>
+<p>Syntax: draw_angle("measurement,[label]",["rotate,[ang]"],["axes"])</p>
+<p>The first option must include the angle measurement.
+<p>Each option is a list inside quotes. Options include:</p>
+<ul>
+  <li><strong>"measurement,[label]"</strong> -- The label will include the degree symbol by default. To not use degree symbol, use "rad", e.g. "57,1rad".</li>
+  <li><strong>"rotate,[deg]"</strong> -- Rotates the image by deg degrees. If "deg" is omitted, rotates by a random anagle.</li>
+  <li><strong>"axes"</strong> -- Draws the xy axes.</li>
+  <li><strong>"size,length"</strong> -- Changes the size of the image to be lengthxlength. Default is 300x300.</li>
+  <li>Note: Angles can be any size (between -2000 and 2000 degrees), and arcs will be drawn by default.</li>
+  <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
+</ul>
+<br />
+<p>Examples:</p>
+<p><strong>$gr = draw_angle("120,2pi/3")</strong> -- This draws a 120 degree angle in standar position, labeled 2&pi;/3.</p>
+
 
 
 <p><a name="circle"></a></p>
