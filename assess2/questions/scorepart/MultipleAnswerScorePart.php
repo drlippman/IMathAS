@@ -46,7 +46,7 @@ class MultipleAnswerScorePart implements ScorePart
             return $scorePartResult;
         }
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
-        $score = 1.0;
+        
         if ($noshuffle == "last") {
             $randqkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
             $RND->shuffle($randqkeys);
@@ -66,11 +66,9 @@ class MultipleAnswerScorePart implements ScorePart
             $answers = $qcnt;
           }
         }
-        if (trim($answers)=='') {
-            $akeys = array();
-        } else {
-            $akeys = explode(",",$answers);
-        }
+        $ansor = explode(' or ', $answers);
+
+        
         $origla = array();
         if ($isRescore) {
           $origla = explode('|', $givenans);
@@ -81,43 +79,55 @@ class MultipleAnswerScorePart implements ScorePart
               }
           }
         }
-        if ($qcnt > 1 && count($akeys) > 0 && count($origla) == 0) {
-          // if there's at least one correct answer, and no answers were submitted
-          // and the system still submitted it, then probably it's singlescore.
-          // To not give credit for an unanswered question, set scoremethod to answers
-          $scoremethod = 'answers';
-        }
-        if (isset($scoremethod) && $scoremethod=='answers') {
-            $deduct = 1.0/count($akeys);
-        } else {
-            $deduct = 1.0/$qcnt;
-        }
-        for ($i=0;$i<count($questions);$i++) {
-          if ($isRescore) {
-            if (in_array($i,$origla)!==in_array($i,$akeys)) {
-                $score -= $deduct;
+        $bestscore = 0;
+        foreach ($ansor as $answers) {
+            $score = 1.0;
+            if (trim($answers)=='') {
+                $akeys = array();
+            } else {
+                $akeys = array_map('trim',explode(',',$answers));
             }
-          } else {
-            if (isset($_POST["qn$qn"][$i])!==(in_array($randqkeys[$i],$akeys))) {
-                $score -= $deduct;
+            if ($qcnt > 1 && count($akeys) > 0 && count($origla) == 0) {
+            // if there's at least one correct answer, and no answers were submitted
+            // and the system still submitted it, then probably it's singlescore.
+            // To not give credit for an unanswered question, set scoremethod to answers
+            $scoremethod = 'answers';
             }
-          }
+            if (isset($scoremethod) && $scoremethod=='answers') {
+                $deduct = 1.0/count($akeys);
+            } else {
+                $deduct = 1.0/$qcnt;
+            }
+            for ($i=0;$i<count($questions);$i++) {
+                if ($isRescore) {
+                    if (in_array($i,$origla)!==in_array($i,$akeys)) {
+                        $score -= $deduct;
+                    }
+                } else {
+                    if (isset($_POST["qn$qn"][$i])!==(in_array($randqkeys[$i],$akeys))) {
+                        $score -= $deduct;
+                    }
+                }
+            }
+            if ($score > $bestscore) {
+                $bestscore = $score;
+            }
         }
-
         // just store unrandomized last answers
+        sort($origla);
         $scorePartResult->setLastAnswerAsGiven(implode('|',$origla));
         if (isset($scoremethod)) {
-            if ($scoremethod=='allornothing' && $score<1) {
-                $score = 0;
+            if ($scoremethod=='allornothing' && $bestscore<1) {
+                $bestscore = 0;
             } else if ($scoremethod == 'takeanything') {
-                $score = 1;
+                $bestscore = 1;
             }
         }
-        if ($score < 0) {
-            $score = 0;
+        if ($bestscore < 0) {
+            $bestscore = 0;
         }
 
-        $scorePartResult->setRawScore($score);
+        $scorePartResult->setRawScore($bestscore);
         return $scorePartResult;
     }
 }

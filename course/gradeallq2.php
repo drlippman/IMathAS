@@ -308,7 +308,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051120"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=051720"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=121320"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -324,7 +324,7 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
     } else {
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100220" type="text/javascript"></script>';
-        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=100220b" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=111520" type="text/javascript"></script>';
     }
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
 	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
@@ -384,30 +384,42 @@
 		writeHtmlSelect('secfiltersel', $sections, $sections, $secfilter, _('All'), '-1', 'onchange="chgsecfilter()"');
 	}
 	echo '</div>';
-	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
 	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$qid));
 	if ($stm->rowCount()>0) {
 		echo printrubrics(array($stm->fetch(PDO::FETCH_NUM)));
-	}
+    }
+    echo '<button onclick="$(\'#filtersdiv\').slideToggle(100)">'._('Filters and Options').'</button>';
+    echo '<div id="filtersdiv" style="display:none; margin-bottom: 10px" class="tabpanel">';
+    echo '<p>';
 	if ($page==-1) {
-		echo '<button type=button id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
-		echo '<button type=button id="nztoggle" onclick="hidenonzero()">'._('Hide Nonzero Score Questions').'</button>';
-		echo ' <button type=button id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
-		echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
-		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
-		echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
-	}
-	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
+        echo _('Hide').':</p><ul style="list-style-type: none; margin:0; padding-left: 15px;">';
+        echo '<li><label><input type=checkbox id="filter-unans" onchange="updatefilters()">'._('Unanswered Questions').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-zero" onchange="updatefilters()">'._('Score = 0').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-nonzero" onchange="updatefilters()">'._('0 &lt; score &lt 100%').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-perfect" onchange="updatefilters()">'._('Score = 100% (before penalties)').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-fb" onchange="updatefilters()">'._('Questions with Feedback').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-nowork" onchange="updatefilters()">'._('Questions without Work').'</label></li>';
+        echo '</ul>';
+        echo '<p>';
+		//echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
+    }
+    echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
+    echo ' <button type="button" onclick="showallwork()">'._('Show All Work').'</button>';
+    echo ' <button type="button" onclick="previewallfiles()">'._('Preview All Files').'</button>';
+    echo ' <button type="button" onclick="sidebysidegrading()">'._('Side-by-Side').'</button>';
+	echo ' <button type="button" id="clrfeedback" onclick="clearfeedback()">'._('Clear all feedback').'</button>';
 	if ($deffbtext != '') {
-		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
-	}
+		echo ' <button type="button" id="clrfeedback" onclick="cleardeffeedback()">'._('Clear default feedback').'</button>';
+    }
+    echo '</p>';
 	if ($canedit) {
 		echo '<p>All visible questions: <button type=button onclick="allvisfullcred();">'._('Full Credit').'</button> ';
 		echo '<button type=button onclick="allvisnocred();">'._('No Credit').'</button></p>';
-	}
+    }
+    echo '</div>'; // filtersdiv
 	if ($page==-1 && $canedit) {
 		echo '<div class="fixedbottomright">';
 		echo '<button type="button" id="quicksavebtn" onclick="quicksave()">'._('Quick Save').'</button><br/>';
@@ -521,19 +533,25 @@
 			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
 			if ($groupdup) {
 				echo '<div class="groupdup">';
-			}
-			echo "<div ";
-			if ($qdata['gbrawscore']==1) {
-				echo 'class="iscorrect bigquestionwrap"';
+            }
+            $classes = '';
+            if ($qdata['gbrawscore']==1) {
+				$classes = 'qfilter-perfect';
 			} else if ($qdata['gbscore']>0) {
-				echo 'class="isnonzero bigquestionwrap"';
+				$classes = 'qfilter-nonzero';
 			} else if ($qdata['status']=='unattempted') {
-				echo 'class="notanswered bigquestionwrap"';
+				$classes = 'qfilter-unans';
 			} else {
-				echo 'class="iswrong bigquestionwrap"';
-			}
-			echo '>';
-
+				$classes = 'qfilter-zero';
+            }
+            if (trim($qdata['feedback']) !== '') {
+                $classes .= ' qfilter-fb';
+            }
+            if (empty($qdata['work'])) {
+                $classes .= ' qfilter-nowork';
+            }
+			echo "<div class=\"$classes bigquestionwrap\">";
+			
 			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
 
 			if (!$groupdup) {
@@ -651,19 +669,28 @@
 			}
 
 			if (!empty($qdata['other_tries'])) {
-				echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
-				echo '<div id="alltries'.$cnt.'" style="display:none;">';
-				foreach ($qdata['other_tries'] as $pn=>$tries) {
-					if (count($qdata['other_tries']) > 1) {
-						echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
-					}
-					foreach ($tries as $tn=>$try) {
-						echo '<div>'._('Try').' '.($tn+1).': ';
-						formatTry($try,$cnt,$pn,$tn);
-						echo '</div>';
-					}
-				}
-				echo '</div>';
+                $maxtries = 0;
+                foreach ($qdata['other_tries'] as $pn=>$tries) {
+                    if (count($tries)>1) {
+                        $maxtries = count($tries);
+                        break;
+                    }
+                }
+                if ($maxtries > 0) {
+                    echo ' &nbsp; <button type=button onclick="toggletryblock(\'alltries\','.$cnt.')">'._('Show all tries').'</button>';
+                    echo '<div id="alltries'.$cnt.'" style="display:none;">';
+                    foreach ($qdata['other_tries'] as $pn=>$tries) {
+                        if (count($qdata['other_tries']) > 1) {
+                            echo '<div><strong>'._('Part').' '.($pn+1).'</strong></div>';
+                        }
+                        foreach ($tries as $tn=>$try) {
+                            echo '<div>'._('Try').' '.($tn+1).': ';
+                            formatTry($try,$cnt,$pn,$tn);
+                            echo '</div>';
+                        }
+                    }
+                    echo '</div>';
+                }
 			}
 
 			if (!empty($qdata['autosaves'])) {
@@ -698,7 +725,8 @@
 			echo '<br/>Question #'.($loc+1);
 			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?" . Sanitize::generateQueryStringFromMap(array(
 					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
-					'to' => $line['userid'])) . "\">Use in Msg</a>";
+                    'to' => $line['userid'])) . "\">Use in Message</a>";
+            echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
 			if ($groupdup) {

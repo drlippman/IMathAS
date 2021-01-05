@@ -336,10 +336,10 @@ if ($overwriteBody==1) {
 
       echo '<span class="column">';
       if ($enablebasiclti) {
-    		echo '<a href="forms.php?from=admin2&action=listltidomaincred">',_('LTI Provider Creds'),'</a><br/>';
-    	}
-    	echo '<a href="forms.php?from=admin2&action=listfedpeers">',_('Federation Peers'),'</a><br/>';
-    	echo '<a href="externaltools.php?cid=admin">',_('External Tools'),'</a>';
+            echo '<a href="forms.php?from=admin2&action=listltidomaincred">',_('LTI 1.1 Provider Creds'),'</a><br/>';
+            echo '<a href="../lti/admin/platforms.php">',_('LTI 1.3 Platforms'),'</a><br/>';
+      }
+      echo '<a href="externaltools.php?cid=admin">',_('External Tools'),'</a>';
       echo '</span>';
 
       echo '<span class="column">';
@@ -350,6 +350,7 @@ if ($overwriteBody==1) {
       echo '<span class="column">';
       echo '<a href="exportlib.php?cid=admin">',_('Export Libraries'),'</a><br/>';
       echo '<a href="importlib.php?cid=admin">',_('Import Libraries'),'</a>';
+      //echo '<a href="forms.php?from=admin2&action=listfedpeers">',_('Federation Peers'),'</a><br/>';
       echo '</span>';
 
       echo '<div class=clear></div></div>';

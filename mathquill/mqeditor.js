@@ -25,6 +25,7 @@ var MQeditor = (function($) {
   var blurTimer = null;
   var keyRepeatInterval = null;
   var MQ = MathQuill.getInterface(MathQuill.getInterface.MAX);
+  var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
 
   /*
     Config object for MQeditor
@@ -113,16 +114,24 @@ var MQeditor = (function($) {
         }
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
             'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
+        thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
         var vars = el.getAttribute("data-mq-vars") || '';
+        var varpts;
         if (vars != '') {
             vars = (vars=='') ? [] : vars.split(/,/);
             for (var i=0; i<vars.length; i++) {
-                if (vars[i].length > 1 && vars[i].match(/^[a-zA-Z]+$/)) {
-                    thisMQconfig.autoOperatorNames += ' ' + vars[i];
+                varpts = vars[i].split(/_/);
+                for (var j=0; j<varpts.length; j++) {
+                    if (varpts[j].length > 1 && varpts[j].match(/^[a-zA-Z]+$/)) {
+                        if (greekletters.indexOf(varpts[j].toLowerCase())!=-1) {
+                            thisMQconfig.autoCommands += ' ' + varpts[j];
+                        } else {
+                            thisMQconfig.autoOperatorNames += ' ' + varpts[j];
+                        }
+                    }
                 }
             }
         }
-
         if (el.disabled) {
           mqfield = MQ.StaticMath(span[0]);
           span.addClass("disabled");
@@ -506,13 +515,34 @@ var MQeditor = (function($) {
     btnel = document.createElement("span");
     btnel.tabIndex = 0;
     if (btn.l) { // latex button
-      btnel.className = "mqed-btn rend";
-      btnel.innerText = btn.l;
+      if (btn.op) {
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-root-block"><var class="mq-operator-name">'+btn.l.substring(1)+'</var></span>';
+      } else if (btn.pr) {
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-root-block">'+btn.pr+'</span>';
+      } else if (btn.l.match(/\\left(.)\\right(.)/)) {
+        var m = btn.l.match(/\\left(.)\\right(.)/);
+        btnel.className = "mqed-btn mq-math-mode";
+        btnel.innerHTML = '<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">'+m[1]+'</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">'+m[2]+'</span></span>'
+      } else {
+        btnel.className = "mqed-btn rend";
+        btnel.innerText = btn.l;
+      }
       cmdtype = 'c';
       cmdval = btn.l.substring(1);
     } else if (btn.b) { // rendered text button
-      btnel.className = "mqed-btn rend";
-      btnel.innerHTML = btn.b;
+      if (btn.r) {
+          btnel.className = "mqed-btn rend";
+          btnel.innerHTML = btn.b;
+      } else {
+        btnel.className = "mqed-btn mq-math-mode";
+        if (btn.v) {
+            btnel.innerHTML = '<span class="mq-root-block"><var>'+btn.b+'</var></span>';
+        } else {
+            btnel.innerHTML = '<span class="mq-root-block"><span>'+btn.b+'</span></span>';
+        }
+      }
       cmdtype = 't';
       cmdval = btn.b;
       if (cmdval.match(/^\d$/) || cmdval=='.') {

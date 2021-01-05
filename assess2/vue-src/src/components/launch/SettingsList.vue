@@ -18,6 +18,12 @@
           <icons name="alert" size="micro" />
           {{ row.alert }}
         </div>
+        <div v-if="!!row.latepass" class="small subdued">
+          {{ row.latepass }}
+          <button @click="redeemLatePass" class="slim secondary">
+            {{ row.latepass_label }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -25,7 +31,7 @@
 
 <script>
 import Icons from '@/components/widgets/Icons.vue';
-import { store } from '../../basicstore';
+import { store, actions } from '../../basicstore';
 
 export default {
   name: 'SettingsList',
@@ -100,6 +106,13 @@ export default {
           dateobj.alert = this.$t('setlist.penalty', { p: settings.exceptionpenalty });
         }
       }
+      if (settings.can_use_latepass > 0) {
+        dateobj.latepass = this.$tc('setlist.latepass_needed', settings.can_use_latepass, {
+          n: settings.can_use_latepass,
+          date: settings.latepass_extendto_disp
+        });
+        dateobj.latepass_label = this.$tc('closed.use_latepass', settings.can_use_latepass);
+      }
       return dateobj;
     },
     getAttemptsObj () {
@@ -107,6 +120,16 @@ export default {
       var mainstr, attemptsLeftStr, substr, alertstr;
 
       var attemptsLeft = settings.allowed_attempts - settings.prev_attempts.length;
+      let altstr = '';
+      if (settings.hasOwnProperty('attemptext')) {
+        if (settings.prev_attempts.length === 0) {
+          altstr = this.$tc('setlist.take', attemptsLeft);
+        } else {
+          altstr = this.$tc('setlist.take_more', attemptsLeft);
+        }
+        attemptsLeft = Math.max(0, attemptsLeft - settings.attemptext);
+      }
+
       if (settings.prev_attempts.length === 0) {
         attemptsLeftStr = this.$tc('setlist.take', attemptsLeft);
       } else {
@@ -133,7 +156,7 @@ export default {
       }
 
       const nextAttempt = settings.prev_attempts.length + 1;
-      if (nextAttempt > settings.retake_penalty.n) {
+      if (nextAttempt > settings.retake_penalty.n && settings.retake_penalty.penalty > 0) {
         const penalty = settings.retake_penalty.penalty * (nextAttempt - settings.retake_penalty.n);
         alertstr = this.$t('setlist.retake_penalty', { p: penalty });
       }
@@ -141,6 +164,7 @@ export default {
       return {
         icon: 'retake',
         str: mainstr,
+        altstr: altstr,
         sub: substr,
         alert: alertstr
       };
@@ -150,31 +174,37 @@ export default {
       var timeobj = {
         icon: 'timer'
       };
-      var mytime = settings.timelimit * settings.timelimit_multiplier;
-      if (settings.overtime_grace > 0) {
-        timeobj.str = this.$t('setlist.timelimit_wgrace', {
-          time: this.formatTimeLimit(mytime),
-          grace: this.formatTimeLimit(settings.overtime_grace * settings.timelimit_multiplier),
-          penalty: settings.overtime_penalty
+      if (settings.has_active_attempt && settings.timelimit_ext && settings.timelimit_ext < 0) {
+        timeobj.str = this.$t('setlist.timelimit_ext_used', {
+          n: Math.abs(settings.timelimit_ext)
         });
       } else {
-        timeobj.str = this.$t('setlist.timelimit', { time: this.formatTimeLimit(mytime) });
-      }
-      if (store.timelimit_restricted === 1) { // time limit restricted
-        timeobj.altstr = this.$t('setlist.timelimit_restricted', {
-          due: settings.enddate_disp
-        });
-      } else if (store.timelimit_restricted === 2) { // grace restricted
-        timeobj.altstr = this.$t('setlist.timelimit_wgrace_restricted', {
-          time: this.formatTimeLimit(mytime),
-          due: settings.enddate_disp,
-          penalty: settings.overtime_penalty
-        });
-      }
-      if (settings.timelimit_multiplier > 1) {
-        timeobj.sub = this.$t('setlist.timelimit_extend', {
-          time: this.formatTimeLimit(settings.timelimit)
-        });
+        var mytime = settings.timelimit * settings.timelimit_multiplier;
+        if (settings.overtime_grace > 0) {
+          timeobj.str = this.$t('setlist.timelimit_wgrace', {
+            time: this.formatTimeLimit(mytime),
+            grace: this.formatTimeLimit(settings.overtime_grace * settings.timelimit_multiplier),
+            penalty: settings.overtime_penalty
+          });
+        } else {
+          timeobj.str = this.$t('setlist.timelimit', { time: this.formatTimeLimit(mytime) });
+        }
+        if (store.timelimit_restricted === 1) { // time limit restricted
+          timeobj.altstr = this.$t('setlist.timelimit_restricted', {
+            due: settings.enddate_disp
+          });
+        } else if (store.timelimit_restricted === 2) { // grace restricted
+          timeobj.altstr = this.$t('setlist.timelimit_wgrace_restricted', {
+            time: this.formatTimeLimit(mytime),
+            due: settings.enddate_disp,
+            penalty: settings.overtime_penalty
+          });
+        }
+        if (settings.timelimit_multiplier > 1) {
+          timeobj.sub = this.$t('setlist.timelimit_extend', {
+            time: this.formatTimeLimit(settings.timelimit)
+          });
+        }
       }
       if (settings.has_active_attempt) {
         if (!store.timelimit_expired) {
@@ -194,7 +224,11 @@ export default {
             date: settings.timelimit_expires_disp,
             grace: settings.timelimit_grace_disp
           });
+        } else if (settings.timelimit_ext && settings.timelimit_ext > 0) {
+          timeobj.str = this.$t('setlist.timelimit_ext', { n: settings.timelimit_ext });
         }
+      } else if (settings.timelimit_ext && settings.timelimit_ext > 0) {
+        timeobj.alert = this.$t('setlist.timelimit_ext', { n: settings.timelimit_ext });
       }
       return timeobj;
     },
@@ -215,6 +249,18 @@ export default {
         out += this.$tc('seconds', sec);
       }
       return out;
+    },
+    redeemLatePass () {
+      var settings = store.assessInfo;
+      store.confirmObj = {
+        body: this.$tc('closed.latepassn', settings.latepasses_avail) + ' ' +
+          this.$tc('setlist.latepass_needed', settings.can_use_latepass, {
+            n: settings.can_use_latepass,
+            date: settings.latepass_extendto_disp
+          }),
+        ok: this.$tc('closed.use_latepass', settings.can_use_latepass),
+        action: () => actions.redeemLatePass()
+      };
     }
   }
 };

@@ -141,6 +141,7 @@ export default {
   },
   methods: {
     condenseDraw (str) {
+      if (str === '') { return str; }
       var la = str.replace(/\(/g, '[').replace(/\)/g, ']');
       la = la.split(';;');
       if (la[0] !== '') {
@@ -254,6 +255,8 @@ export default {
   .LPshowcorrect td:first-child {background:#CCFFCC  no-repeat 8px center;}
   .LPshowwrong td {background-color:#FFCCCC;}
   .LPshowwrong td:first-child {background:#FFCCCC  no-repeat 8px center;}
+  .LPshowpartial td {background-color:#FFEEAA;}
+  .LPshowpartial td:first-child {background: #FFEEAA  no-repeat 8px center;}
   .LPresval {}
   .LPresbarwrap {display:inline-block; width:100%;}
   .LPresbar {display:inline-block; background-color: #CCCCCC; text-align:center; overflow:show; padding:5px 0px;}

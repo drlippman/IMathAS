@@ -30,7 +30,7 @@
     "needprereq": "You have not yet met the prerequisite requirements to work on this assessment.",
     "prereqreq": "A score of {score} on {name} is required.",
     "no_attempts": "You have used all your attempts at this assessment.",
-    "latepassn": "You have one LatePass available. | You have {n} LatePass available.",
+    "latepassn": "You have one LatePass available. | You have {n} LatePasses available.",
     "latepass_needed": "You can redeem one LatePass to reopen this assessment until {date} | You can redeem {n} LatePasses to reopen this assessment until {date}",
     "practice_no_latepass": "This assessment is now open for un-graded practice.",
     "practice_w_latepass": "You can also open the assessment for un-graded practice.",
@@ -81,7 +81,10 @@
     "timelimit_extend": "Extended from the original {time}.",
     "timelimit_restricted": "Because of the upcoming due date, your time limit will expire at the due date, {due}.",
     "timelimit_wgrace_restricted": "Time limit: {time}, with a grace period subject to a {penalty}% penalty which expires at the due date, {due}.",
-    "excused": "You have been excused from this assignment. It will not be counted in your grade."
+    "timelimit_ext": "You have been given a {n} minute extension on the time limit",
+    "timelimit_ext_used": "You have used a {n} minute timelimit extension",
+    "excused": "You have been excused from this assignment. It will not be counted in your grade.",
+    "latepass_needed": "You can redeem one LatePass to extend the due date to {date} | You can redeem {n} LatePasses to extend the due date to {date}"
   },
   "group": {
     "isgroup": "This is a group assessment.",
@@ -120,7 +123,9 @@
     "withdrawn": "This question was withdrawn by the instructor. You do not need to complete this question.",
     "jump_to_answer": "Jump to Answer",
     "jump_warn": "This will use up your remaining tries at this version of the question.",
-    "showwork": "Show work here by typing it or attaching a file or picture"
+    "showwork": "Show work here by typing it or attaching a file or picture",
+    "uploadwork": "Show work here by attaching a file or picture",
+    "uploading": "Uploading..."
   },
   "header": {
     "score": "Score: {pts}/{poss}",
@@ -376,6 +381,7 @@
     "keep_avg": "Grade is calculated on the average of all assessment attempts",
     "keep_last": "Grade is calculated on the last assessment attempt",
     "full_credit_parts": "Full credit all parts",
+    "full_manual_parts": "Full credit all manually-graded parts",
     "full_credit": "Full credit",
     "add_feedback": "Add feedback",
     "feedback": "Feedback",
@@ -396,12 +402,14 @@
     "overridden": "Overridden by teacher",
     "view_as_stu": "View as student",
     "print": "Print version",
-    "hide_perfect": "Hide full-credit questions",
-    "hide_correct": "Hide correct questions",
-    "hide_unans": "Hide unanswered questions",
-    "show_perfect": "Show full-credit questions",
-    "show_correct": "Show correct questions",
-    "show_unans": "Show unanswered questions",
+    "filters": "Filters and Options",
+    "hide": "Hide",
+    "hide_perfect": "Score = 100% (before penalties)",
+    "hide_nonzero": "0 < score < 100%",
+    "hide_zero": "Score = 0",
+    "hide_fb": "Questions with Feedback",
+    "hide_nowork": "Questions without Work",
+    "hide_unans": "Unanswered questions",
     "quick_grade": "Quick grade",
     "saving": "Saving...",
     "saved": "Saved",
@@ -427,6 +435,7 @@
     "autosave_byassess": "Autosaves will be scored when the assessment attempt is submitted for scoring.",
     "view_edit": "View/Edit Question",
     "show_all_ans": "Show All Answers",
+    "show_all_work": "Show All Work",
     "no_versions": "No assessment attempts available to view yet",
     "minutes": "minutes",
     "avail_never": "Grade is currently hidden by the teacher.",
@@ -440,7 +449,11 @@
     "hide_excused": "Hide Auto-Excused",
     "excused_list": "Based on the results of this assessment, the following assessments have been excused:",
     "show_endmsg": "Show End Message",
-    "hide_endmsg": "Hide End Message"
+    "hide_endmsg": "Hide End Message",
+    "has_timeext": "Has a {n} minute time limit extension available",
+    "used_timeext": "Used a {n} minute time limit extension",
+    "attemptext": "Exception given for {n} additional versions",
+    "preview_files": "Preview All Files"
   },
   "work": {
     "add": "Add Work",
@@ -448,7 +461,8 @@
     "noquestions": "No questions require work",
     "save": "Save Work",
     "save_continue": "Save Work and Continue",
-    "add_prev": "You can still show or attach work for the previous attempt"
+    "add_prev": "You can still show or attach work for the previous attempt",
+    "remove": "Are you sure you want to remove this file?"
   },
   "regions": {
     "questions": "Questions and text",

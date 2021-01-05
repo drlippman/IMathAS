@@ -189,8 +189,10 @@ export default {
         return this.$t('header.assess_submit');
       } else if (this.hasShowWorkAfter) {
         return this.$t('work.add');
-      } else {
+      } else if (this.ainfo.showscores === 'during') {
         return this.$t('header.done');
+      } else {
+        return '';
       }
     },
     saveStatus () {

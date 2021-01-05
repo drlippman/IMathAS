@@ -120,7 +120,7 @@ export default {
       store.lastPos = e.pageY;
     });
     window.$(document).on('focusin', function (e) {
-      if (e.target) {
+      if (e.target && e.target.getBoundingClientRect) {
         store.lastPos = e.target.getBoundingClientRect().top;
       }
     });

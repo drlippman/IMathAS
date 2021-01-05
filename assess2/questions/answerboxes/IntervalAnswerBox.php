@@ -50,12 +50,11 @@ class IntervalAnswerBox implements AnswerBox
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        if (isset($ansprompt)) {
-          $out .= $ansprompt;
-        }
-
         $ansformats = array_map('trim',explode(',',$answerformat));
 
+        if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
+          $out .= $ansprompt;
+        }
     		if (in_array('normalcurve',$ansformats) && $_SESSION['graphdisp']!=0) {
     			$top = _('Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve');
     			$shorttip = _('Adjust the sliders');
@@ -112,7 +111,7 @@ class IntervalAnswerBox implements AnswerBox
     		];
     		$params['tip'] = $shorttip;
             $params['longtip'] = $tip;
-            $params['calcformat'] = 'decimal';
+            $params['calcformat'] = $answerformat . ($answerformat==''?'':',') . 'decimal';
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}

@@ -1,0 +1,200 @@
+<?php 
+
+/**
+ * Define custom placement types
+ * 
+ * for each placementtype supported by the hooks, associate 
+ * it with a unique number.  The numbers should be
+ * > 50 to avoid conflicts with the core system types
+ * 
+ * The keys should be the same placementtype strings you 
+ * use below in lti_handle_launch
+ */
+function lti_get_types_as_num(): array {
+    return [
+        'mytype' => 50
+    ];
+}
+
+/**
+ * Determine if the hooks can handle a launch of this URI
+ * 
+ * @param string  $targetlink  The target_link_uri for the launch
+ * @return bool true if hooks can handle this launch uri
+ */
+function lti_can_handle_launch(string $targetlink): bool {
+
+}
+
+/**
+ * Parses a target_link_uri for the launch.  
+ * 
+ * @param string  $targetlink  The target_link_uri for the launch
+ * @return array  empty if not parsable.  Otherwise an array with keys:
+ *   'refcid'   (required) The courseid the target item is in
+ *   'type'     (required) A short string name for the item type
+ *   'refid'    The type id for the target item
+ * 
+ */
+function lti_parse_target_link(string $targetlink): array {
+
+}
+
+/**
+ * Get courses we could associate with.  These should be courses the user
+ * is a teacher of and contains a copy of the target item.
+ * 
+ * This function chould double-check the $targetinfo['type']
+ * 
+ * @param array $targetinfo    The output of lti_parse_target_link
+ * @return array of courseid=>name.  Return an empty array if target
+ *               isn't a supported type.
+ */
+function lti_get_othercourses(array $targetinfo, int $userid): array {
+    
+    return array();
+}
+
+/**
+ * Handles a launch when an existing placement doesn't exist yet 
+ * 
+ * @param LTI_Message_launch $launch    The launch object
+ * @param LTI_Localcourse $localcourse  Course info object
+ * @param int $localuserid              imas_users.id 
+ * @param Database $db                  An instance of Database 
+ * @return LTI_Placement
+ */
+function lti_handle_launch(
+    LTI_Message_Launch $launch,  
+    LTI_Localcourse $localcourse,
+    int $localuserid,
+    Database $db
+): LTI_Placement  {
+    // info from the launch you may need:
+    $targetlink = $launch->get_target_link(); // the launched URI
+
+    $role = standardize_role($launch->get_roles());
+    $contextid = $launch->get_platform_context_id();
+    $platform_id = $launch->get_platform_id();
+    $resource_link = $launch->get_resource_link();
+
+    // get the destination course ID
+    $destcid = $localcourse->get_courseid();
+
+    /*
+    after parsing the $targetlink, you'll want to check if the 
+    source course ID matches the $destcid, and if not handle
+    determing the right thing to associate or copy in.
+
+    Once you have the right item, you'll want to store the 
+    placement.  You will need to define
+    $placementtype: A short string (max 10 char) for the type of linked item
+    $typeid:  An id (INT) for the linked item
+    */
+    $link = $db->make_link_assoc($typeid, $placementtype, $resource_link_id, $contextid, $platform_id);
+
+    /*
+    If the item has a grade record associated, you'll need to 
+    set the lineitem.  If you have no grades, skip this step.
+    */
+    $iteminfo = lti_get_item_info($link);
+    $db->set_or_create_lineitem($launch, $link, $iteminfo, $localcourse);
+
+    return $link;
+}
+
+/**
+ * Returns info about the link 
+ * 
+ * @param LTI_Placement $link   The placed item
+ * @return array with indices:
+ *   'name'      // the item name 
+ *   'ptsposs'   // the points possible
+ *   'startdate' // optionally, start date to assoc with lineitem
+ *   'enddate'   // optionally, end date to assoc with lineitem
+ */
+function lti_get_item_info(LTI_Placement $link): array {
+
+}
+
+/**
+ * For an existing placement, determines whether these hooks 
+ * can handle a submissionReview launch to look over submissions
+ * 
+ * @param string $placementtype   placementtype, as set in make_link_assoc call
+ * @return bool  true if this placementtype can handle a submissionReview launch
+ */
+function lti_is_reviewable(string $placementtype): bool {
+
+}
+
+/**
+ * Do the actual redirect for a submissionReview launch an item. 
+ * 
+ * @param LTI_Placement $link    The placement info 
+ * @return void
+ */
+function lti_redirect_submissionreview(LTI_Placement $link): void {
+
+}
+
+/**
+ * Gets item link options for the deeplinking dialog 
+ *
+ * This function should directly echo <option> strings for 
+ *  the deep linking select.  The value should have form "type-typeid"
+ *  to distinguish it from the assessment options.
+ * 
+ * @param LTI_Localcourse $localcourse  Course info object
+ * @return void
+ */
+function lti_deeplink_options(LTI_Localcourse $localcourse) {
+
+}
+
+/** 
+ * Checks if hooks can handle generating a deep link response for a type 
+ *
+ * @param string type  The "type" from the deeplink options generated above 
+ * @return bool
+ */
+ function lti_can_handle_deeplink(string $type) {
+
+ }
+
+/**
+ * Generates deep link response
+ *
+ * @param string type  The "type" from the deeplink options generated above
+ * @param string typeid  The "typeid" from the deeplink options generated above
+ * @return LTI_Deep_Link_Resource
+ */
+ function lti_get_deeplink_resource(string $type, string $typeid) {
+     /*
+      If this type generates grades, be sure to generate and set a lineitem 
+      on the LTI_Deep_Link_Resource, and if it supports submission review, 
+      attach a submission review to the lineitem
+     */
+ }
+ 
+
+/** 
+ * Display the LTI Home page for an item 
+ *
+ * @param LTI_Placement $link
+ * @param LTI_Message_launch $launch
+ * @param LTI_Localcourse $localcourse
+ * @param Database $db
+ * @return void
+ */
+function lti_ltihome(
+    LTI_Placement $link, 
+    LTI_Message_launch $launch, 
+    LTI_Localcourse $localcourse, 
+    Database $db
+):void {
+
+}
+
+
+

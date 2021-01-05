@@ -16,9 +16,10 @@ $defGrouptype = isset($CFG['GEN']['defGroupType'])?$CFG['GEN']['defGroupType']:0
 
 //handle ajax postback
 if (!empty($newStatus)) {
-	$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
-	$stm->execute(array($instId));
-	$reqdata = json_decode($stm->fetchColumn(0), true);
+	$stm = $DBH->prepare("SELECT status,reqdata FROM imas_instr_acct_reqs WHERE userid=?");
+    $stm->execute(array($instId));
+    list($oldstatus, $reqdata) = $stm->fetch(PDO::FETCH_NUM);
+	$reqdata = json_decode($reqdata, true);
 
 	if (!isset($reqdata['actions'])) {
 		$reqdata['actions'] = array();
@@ -62,33 +63,33 @@ if (!empty($newStatus)) {
 				unenrollstu($rcid, array(intval($instId)));
 			}
 		}
+        if ($oldstatus != 4) {
+            $stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
+            $stm->execute(array(':id'=>$instId));
+            $row = $stm->fetch(PDO::FETCH_ASSOC);
 
-		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$instId));
-		$row = $stm->fetch(PDO::FETCH_ASSOC);
+            //call hook, if defined
+            if (function_exists('getDenyMessage')) {
+                $message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
+            } else {
+                $message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
+                $message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
+                $message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status, ';
+                $message .= 'so your account has been converted to a student account. If you believe you should have an instructor account, ';
+                $message .= 'you are welcome to reply to this email with additional verification information.</p>';
+            }
 
-		//call hook, if defined
-		if (function_exists('getDenyMessage')) {
-			$message = getDenyMessage($row['FirstName'], $row['LastName'], $row['SID'], $group);
-		} else {
-			$message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.Sanitize::encodeStringForDisplay($row['FirstName']).'</p>';
-			$message .= '<p>You recently requested an instructor account on '.$installname.' with the username <b>'.Sanitize::encodeStringForDisplay($row['SID']).'</b>. ';
-			$message .= 'Unfortunately, the information you provided was not sufficient for us to verify your instructor status, ';
-			$message .= 'so your account has been converted to a student account. If you believe you should have an instructor account, ';
-			$message .= 'you are welcome to reply to this email with additional verification information.</p>';
-		}
+            //call hook, if defined
+            if (function_exists('getDenyBcc')) {
+                $CFG['email']['new_acct_bcclist'] = getDenyBcc();
+            }
 
-		//call hook, if defined
-		if (function_exists('getDenyBcc')) {
-			$CFG['email']['new_acct_bcclist'] = getDenyBcc();
-		}
-
-		require_once("../includes/email.php");
-		send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
-			$installname._(' Account Status'), $message,
-			!empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
-			!empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
-
+            require_once("../includes/email.php");
+            send_email(Sanitize::emailAddress($row['email']), !empty($accountapproval)?$accountapproval:$sendfrom,
+                $installname._(' Account Status'), $message,
+                !empty($CFG['email']['new_acct_replyto'])?$CFG['email']['new_acct_replyto']:array(),
+                !empty($CFG['email']['new_acct_bcclist'])?$CFG['email']['new_acct_bcclist']:array(), 10);
+        }
 	} else if ($newStatus==11) { //approve
 		if ($_POST['group']>-1) {
 			$group = Sanitize::onlyInt($_POST['group']);

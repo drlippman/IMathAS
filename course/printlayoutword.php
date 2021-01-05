@@ -44,8 +44,11 @@ if ($overwriteBody==1) {
 } if (!isset($_REQUEST['versions'])) {
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 
     echo '<div class="cpmid">';
@@ -163,7 +166,7 @@ if ($overwriteBody==1) {
 			$a2->setQuestionData($qdata['id'], $qdata);
 		}
 	} else {
-		include("../assessment/displayq2.php");
+	include("../assessment/displayq2.php");
 	}
 
 	if (is_numeric($_REQUEST['versions'])) {
@@ -239,7 +242,7 @@ if ($overwriteBody==1) {
 				if ($courseUIver > 1) {
 					list($newout,$sa[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				} else {
-					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				}
 				$out .= $newout;
 			}
@@ -288,7 +291,7 @@ if ($overwriteBody==1) {
 				if ($courseUIver > 1) {
 					list($newout,$sa[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				} else {
-					list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				}
 				$out .= $newout;
 			}

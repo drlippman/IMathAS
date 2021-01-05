@@ -65,13 +65,19 @@ class MultipleAnswerAnswerBox implements AnswerBox
 			$randkeys = $RND->array_rand($questions,count($questions));
 			$RND->shuffle($randkeys);
 		}
+	$hasNoneOfThese = '';
     if (count($questions) > 1 && trim($answers) == "") {
-      $qstr = strtolower(implode(' ', $questions));
+      $qstr = strtolower($questions[count($questions)-1]);
       if (strpos($qstr, 'none of') === false) {
         $questions[] = _('None of these');
         array_push($randkeys,count($questions)-1);
         $answers = count($questions)-1;
       }
+      $hasNoneOfThese = 'data-multans="hasnone"';
+    } else if (count($questions) > 1 && ($noshuffle == 'all' || $noshuffle == 'last')) {
+    	if (preg_match('/^none\s*of/i', $questions[count($questions)-1])) {
+    		$hasNoneOfThese = 'data-multans="hasnone"';
+    	}
     }
     $_SESSION['choicemap'][$assessmentId][$qn] = $randkeys;
     if (!empty($GLOBALS['inline_choicemap'])) {
@@ -108,10 +114,10 @@ class MultipleAnswerAnswerBox implements AnswerBox
 
 		if ($displayformat == 'inline') {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.'" ';} else {$style='';}
-			$out .= "<span $style id=\"qnwrap$qn\" role=group aria-label=\"".$arialabel.' '._('Select one or more answers')."\">";
+			$out .= "<span $style $hasNoneOfThese id=\"qnwrap$qn\" role=group aria-label=\"".$arialabel.' '._('Select one or more answers')."\">";
 		} else  {
 			if ($colorbox != '') {$style .= ' class="'.$colorbox.' clearfix" ';} else {$style=' class="clearfix" ';}
-			$out .= "<div $style id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\"".$arialabel.' '._('Select one or more answers')."\">";
+			$out .= "<div $style $hasNoneOfThese id=\"qnwrap$qn\" style=\"display:block\" role=group aria-label=\"".$arialabel.' '._('Select one or more answers')."\">";
 		}
 		if ($displayformat == "horiz") {
 
@@ -165,10 +171,16 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		}
 		$tip = _('Select all correct answers');
 		if (isset($answers)) {
-			$akeys = array_map('trim',explode(',',$answers));
-			foreach($akeys as $akey) {
-				$sa .= '<br/>'.$questions[$akey];
-			}
+            $ansor = explode(' or ', $answers);
+            foreach ($ansor as $k=>$answers) {
+                $akeys = array_map('trim',explode(',',$answers));
+                if ($k>0) {
+                    $sa .= '<br/><em>'._('or').'</em>';
+                }
+                foreach($akeys as $akey) {
+                    $sa .= '<br/>'.$questions[$akey];
+                }
+            }
 		}
 
 		// Done!

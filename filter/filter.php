@@ -144,10 +144,26 @@
 
 		if (strpos($str,'[EMBED')!==false) {
 			$search = '/\[EMBED:\s*([^\]]+)\]/';
-
+            $zindex = 50;
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
-					$respt = explode(',',$resval[1]);
+                    $respt = explode(',',$resval[1]);
+                    
+                    if (substr($respt[0],0,3)=='QID') {
+                        $url = implode('&',$respt);
+                        $w = '100%';
+                        $h = '200';
+                        $qs = preg_replace('/[^\w=&]/','', trim(substr($url,3)));
+                        $uniqid = uniqid('eq2');
+                        $url = $GLOBALS['basesiteurl'] . '/embedq2.php?frame_id='.$uniqid.'&id='.$qs;
+                        $tag = '<div id="'.$uniqid.'wrap" class="embedwrap">';
+                        $tag .= "<iframe id=\"$uniqid\" width=\"$w\" height=\"$h\" src=\"$url\" style=\"z-index:$zindex\" frameborder=\"0\">";
+                        $tag .= '</iframe></div>';
+                        $str = str_replace($resval[0], $tag, $str);
+                        $zindex--;
+                        continue;
+                    }
+
 					if (isset($respt[3])) {
 						$nobord = true;
 						array_pop($respt);
@@ -165,8 +181,8 @@
 							list ($url,$w,$h) = $respt;
 						}
 					}
-					$url = trim(str_replace(array('"','&nbsp;'),'',$url));
-					if (substr($url,0,18)=='https://tegr.it/y/') {
+                    $url = trim(str_replace(array('"','&nbsp;'),'',$url));
+                    if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
 						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".Sanitize::encodeUrlParam($url);

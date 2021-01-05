@@ -53,7 +53,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
 
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
-        if (isset($ansprompt)) {
+        if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
           $out .= $ansprompt;
         }
 

@@ -22,6 +22,8 @@ $qn = 5; //question number to use
 $_SESSION = array();
 $inline_choicemap = !empty($CFG['GEN']['choicesalt']) ? $CFG['GEN']['choicesalt'] : 'test';
 $statesecret = !empty($CFG['GEN']['embedsecret']) ? $CFG['GEN']['embedsecret'] : 'test';
+$cid = 'embedq';
+$_SESSION['secsalt'] = "12345";
 
 $issigned = false;
 // Get basic settings from JWT or query string
@@ -292,7 +294,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
-    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=082020" type="text/javascript"></script>';
+    $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v=111520" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=082020" type="text/javascript"></script>';
