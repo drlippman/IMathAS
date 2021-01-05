@@ -6,7 +6,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes");
+array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes","draw_cylinder");
 
 //--------------------------------------------draw_angle()----------------------------------------------------
 
@@ -1615,5 +1615,105 @@ function draw_prismcubes() {
   $gr = showasciisvg("setBorder(10);initPicture(-$xyMin,1.1*$xyMax,-$xyMin,1.1*$xyMax);$args;",$size,$size);
   return $gr;
 }
+
+
+//--------------------------------------------draw_cylinder----------------------------------------------------
+
+// draw_cylinder(diameter,height,[option1],[option2],...)
+// draw_cylinder() draws a random cylinder with no labels.
+// draw_cylinder(a,b) scale drawing of a cylinder with diameter "a" and height "b".
+// Options are lists in quotes, including:
+// "radius,[label]" Draws a radius on the top circle with optional label.
+// "diameter,[label]" Draws a diameter on the top circle with optional label.
+// "height,[label]" Labels the height of the cylinder.
+// "fill,[percent]" Fills a specified percent of the cylinder. If 'percent' is omitted, fills a random percent.
+// "size,length" Sets the size of the image to length x length.
+
+function draw_cylinder() {
+  $size = 300;
+  $input = func_get_args();
+  $argsArray = [];
+  foreach ($input as $list) {
+    if (!is_array($list)) {
+      $list = listtoarray($list);
+    }
+    $list = array_map('trim', $list);
+    $argsArray[]=$list;
+  }
   
+  foreach ($argsArray as $in) {
+    if ($in[0] == "size") {
+      if (is_numeric($in[1])) {
+        $size = $in[1];
+      }
+    }
+    if ($in[0] == "fill") {
+      $hasFill = true;
+      if (!is_numeric($in[1])) {
+        $fillPercent = rand(20,80);
+      } elseif (is_numeric($in[1])) {
+        if ($in[1]<0 || $in[1]>100) {
+          echo 'Eek! Fill percent must be between 0 and 100.';
+          return '';
+        }
+        $fillPercent = $in[1];
+      }
+    }
+  }
+  
+  if ((is_numeric($argsArray[0][0]) && !is_numeric($argsArray[1][0])) || (!is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0]))) {
+    echo 'Warning! Gave diameter without height.';
+  }
+  if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0) {
+    $diameter = $argsArray[0][0];
+    $height = $argsArray[1][0];
+  } else {
+    [$diameter,$height] = diffrands(3,8,2);
+  }
+  
+  // Set the window dimensions
+  $af = 4;
+  $dim = max(1.5*$diameter/2,1.5*($height/2+$diameter/$af));
+  
+  // Fill cylinder
+  $fillColor = 'black';
+  if ($hasFill === true) {
+    $fillHeight = $fillPercent/100*$height;
+    $fillColor = 'slategray';
+    $args = $args . "strokewidth=0; fill='lightblue'; fillopacity=0.5; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],0,2*pi); plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); rect([-$diameter/2,-$height/2],[$diameter/2,-$height/2+$fillHeight]); strokewidth=1; fill='none'; stroke='steelblue'; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); stroke='black';";
+  }
+  
+  // Draw the cylinder
+  $args = $args . "strokewidth=2.5; strokedasharray='4 4'; stroke='$fillColor'; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],0,pi); stroke='black'; strokedasharray='1 0'; fill='none'; ellipse([0,$height/2],$diameter/2,$diameter/$af); fill='none'; line([-$diameter/2,-$height/2],[-$diameter/2,$height/2]); line([$diameter/2,-$height/2],[$diameter/2,$height/2]); plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],pi,2*pi);";
+  
+  // Draw and label the radius
+  foreach ($argsArray as $in) {
+    if ($in[0] == "radius") {
+      $args = $args . "strokewidth=1; line([0,$height/2],[$diameter/2,$height/2]);";
+      if (isset($in[1])) {
+        $args = $args . "strokewidth=1; arc([$diameter/2,$height/2+1.5*$diameter/$af+$diameter/(10*$af)],[$diameter/4,$height/2+$diameter/(10*$af)],$diameter); text([$diameter/2,$height/2+1.5*$diameter/$af],'$in[1]',above);strokewidth=2;";
+      }
+    }
+  }
+  
+  // Draw and label the diameter
+  foreach ($argsArray as $in) {
+    if ($in[0] == "diameter") {
+      $args = $args . "strokewidth=1; line([-$diameter/2,$height/2],[$diameter/2,$height/2]);";
+      if (isset($in[1])) {
+        $args = $args . "strokewidth=1; arc([$diameter/2,$height/2+1.5*$diameter/$af+$diameter/(10*$af)],[$diameter/4,$height/2+$diameter/(10*$af)],$diameter); text([$diameter/2,$height/2+1.5*$diameter/$af],'$in[1]',above);strokewidth=2;";
+      }
+    }
+  }
+  
+  // Label the height
+  foreach ($argsArray as $in) {
+    if ($in[0] == "height") {
+      $args = $args . "text([$diameter/2,0],'$in[1]',right);";
+    }
+  }
+
+  $gr = showasciisvg("setBorder(20);initPicture(-0.75*$dim,1.25*$dim,-$dim,$dim);$args",$size,$size);
+  return $gr;
+}
 ?>

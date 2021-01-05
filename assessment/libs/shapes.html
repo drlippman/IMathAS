@@ -22,6 +22,8 @@
     <li><a href="#square">draw_square</a></li>
     <li><a href="#polygon">draw_polygon</a></li>
     <li><a href='#prismcubes'>draw_prismcubes</a></li>
+    <li><a href='#cylinder'>draw_cylinder</a></li>
+    
 </div>
 <p>&nbsp;</p>
 <p>&nbsp;<strong>Function output:</strong></p>
@@ -41,9 +43,9 @@
   <li><strong>"angles,A,B,C,[lab1,lab2,lab3,arc1,arc2,arc3]"</strong> Here, A,B,C are angles (in degrees) that define the triangle; lab1,lab2,lab3 are the angle labels; and arc1,arc2,arc3 can be (,(( or ((( to make arc symbols.</li>
   <li><strong>"sides,a,b,c,[lab1,lab2,lab3,tick1,tick2,tick3]"</strong> Here, a,b,c are sides that define the triangle; lab1,lab2,lab3 are the side labels; and tick1,tick2,tick3 can be |,|| or ||| to make side tickmarks.</li>
   <li><strong>"points,[P,Q,R]"</strong> Draws points on the vertices, and P,Q,R are optional labels on those points. If a label is a point (a,b), type it as (a;b).</li>
-  <li><strong>"bisector,[_,_,_,lab1,lab2,lab3]"</strong> The three entries following "bisector" correspond to the order of the angles. Put a "1" to draw the angle bisector for that angle; leave blank (or put a zero) to not draw the bisector. Lab1,lab2,lab3 are labels for where the bisector intersects the opposite side.</li>
-  <li><strong>"median,[_,_,_,lab1,lab2,lab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle, and lab1,lab2,lab3 are labels for the midpoint of the opposite side.</li>
-  <li><strong>"altitude,[_,_,_,lab1,lab2,lab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle, and lab1,lab2,lab3 are labels for where the altitude intersects the opposite (extended) side. Dashed lines are drawn to extend opposite side if necessary. Using "altitude" rotates the triangle so the side with the (last) altitude is horizontal.</li>
+  <li><strong>"bisector,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> The three entries following "bisector" correspond to the order of the angles. Put a "1" to draw the angle bisector for that angle; leave blank (or put a zero) to not draw the bisector. lab1,lab2,lab3 are labels for the bisector, and ptab1,ptlab2,ptlab3 are labels for where the bisectors intersect their opposite sides.</li>
+  <li><strong>"median,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle. lab1,lab2,lab3 are labels for the medians, and ptab1,ptlab2,ptlab3 are labels for where the medians intersect their opposite sides</li>
+  <li><strong>"altitude,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle. lab1,lab2,lab3 are labels for the altitudes, and ptab1,ptlab2,ptlab3 are labels for where the altitudes intersect their opposite (extended) sides. Dashed lines are drawn to extend opposite side if necessary.</li>
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
   <li><strong>"rotate"</strong> Rotates the triangle by a random angle.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
@@ -218,6 +220,26 @@
 <p>Examples:</p>
 <p><strong>$gr = draw_prismcubes("cubes,2,5,3","labels,a,b,c")</strong> -- A 2x5x3 rectangular prism of cubes, dimensions labeled a, b and c.</p>
 <p><strong>$gr = draw_prismcubes("labels,L,H,W")</strong> -- A 1x1x1 cube, dimensions labeled L, H and W.</p>
+
+
+<p><a name="cylinder"></a></p>
+<h2><strong>draw_cylinder</strong></h2>
+<p>Draws and labels a circular cylinder.</p>
+<p>Syntax: draw_cylinder([diameter,height],[option 1],[option 2],[option 3]</p>
+<p>draw_cylinder() -- draws a random cylinder with no labels.</p>
+<p>draw_cylinder(a,b) -- makes a scaled drawing of a cylinder with diameter 'a' and height 'b'.
+<p>Each option is a list inside quotes. Options include:</p>
+<ul>
+  <li><strong>"radius,[label]"</strong> Draws a radius on the top of the cylinder with optional label.</li>
+  <li><strong>"diameter,[label]"</strong> Draws a diameter on the top of the cylinder with optional label.</li>
+  <li><strong>"height,[label]"</strong> Labels the height of the cylinder.</li>
+  <li><strong>"fill,[percent]"</strong> Fills a specified percent of the cylinder. If 'percent' omitted, fills a random percent.</li>
+  <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+</ul>
+<br />
+<p>Examples:</p>
+<p><strong>$gr = draw_cylinder(1,1,"radius,r=12")</strong> -- A cylinder with equal diameter and height, with radius drawn and labeled 'r=12'.</p>
+<p><strong>$gr = draw_cylinder("height,x","fill,30")</strong> -- A random cylinder with height labeled 'x' and filled 30 percent.</p>
 
 
 <a href="#top">Back to top of page</a>
