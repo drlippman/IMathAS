@@ -9,7 +9,8 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv");
+ "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
+ "anova1way_f","anova1way","anova2way","anova_table","anova2way_f");
 
 //nCr(n,r)
 //The Choose function
@@ -2401,4 +2402,393 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
 	return showasciisvg($outst,$width,$height);
   }
 
+  //---------------------------------------------ANOVA-Oneway F ratio-----------------------------------------
+// Function: anova1way_f(arr1,arr2, [arr3,...])
+// Returns F ratio and the corresponding P value as an array. 
+//
+// Parameters:
+// arr1, arr2, ...: Arrays in the form [2,3,4,5,...] 
+//  
+// Returns:
+// F ratio and the corresponding P value as an array in the form [F ratio, P value].
+
+function anova1way_f(... $arr){
+	$n=array();  
+	foreach($arr as $a){
+		if (!is_array($a)) { $a = explode(',',$a);};
+		$n[]=count($a);
+		if (count(array_unique($n))!=1) {
+			echo "Error: ANOVA requires the same length for all arrays";
+			return false;
+		}
+	}
+	if (count($n)<2) {
+		echo "Error: ANOVA requires at least two arrays";
+		return false;
+	}
+		
+	$numargs = func_num_args();
+	//$args=func_get_args();
+	$mean=array();
+	$ss=array();
+	for($i=0;$i<$numargs;$i++){
+		$mean[$i]=mean($arr[$i]);
+		$ss[$i]=variance($arr[$i])*(count($arr[$i])-1);
+		//$n[$i]=count($args[$i]);
+	}
+	$gmean=array_sum($mean)/count($mean); //grand mean
+	$ssA=variance($mean)*$n[0]*($numargs-1); //Sum of the square for Factor A
+	$ssE=array_sum($ss); //Sum of the square for Residual (Error)
+	$ssT=$ssA+$ssE;
+	$dfA=count($arr)-1;
+	$dfE=($n[0]-1)*$numargs;
+	$dfT=$dfA+$dfE;
+	
+	
+	$msA=$ssA/$dfA; //mean square of Factor A
+	$msE=$ssE/$dfE;    //pooled variance (residual or error)
+	$msT=$msA+$msE;  //total sum of the squares
+	$F_a=$msA/$msE;    //F Ratio
+	
+	$p_a=fcdf($F_a,$dfA,$dfE); //P value
+	
+	return ([$F_a,$p_a]); 
+	}
+
+
+//---------------------------------------------ANOVA-Oneway array-------------------------------------------
+// Function: anova1way(arr1,arr2, [arr3,...])
+// Returns ANOVA table as an array with each row corresponding to Factor A, error (residual), and totals. 
+//
+// Parameters:
+// arr1, arr2, ...: Arrays in the form [2,3,4,5,...] 
+//  
+// Returns:
+// ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
+// [[SS_A, df_A, MS_A, F_A, P_A],[SS_E,df_E,MS_E],[SS_T,df_T]] 
+// where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
+// And A, E, and T correspond to Factor A, error (residual), and total, respectively. 
+
+function anova1way(... $arr){
+	$n=array();  
+	foreach($arr as $a){
+		if (!is_array($a)) { $a = explode(',',$a);};
+		$n[]=count($a);
+		
+		if (count(array_unique($n))!=1) {
+			echo "Error: ANOVA requires the same length for all arrays";
+			return false;
+		}
+	}
+	if (count($n)<2) {
+		echo "Error: ANOVA requires at least two arrays";
+		return false;
+	}
+		
+	$numargs = func_num_args();
+	//$args=func_get_args();
+	$mean=array();
+	$ss=array();
+	for($i=0;$i<$numargs;$i++){
+		$mean[$i]=mean($arr[$i]);
+		$ss[$i]=variance($arr[$i])*(count($arr[$i])-1);
+		//$n[$i]=count($args[$i]);
+	}
+	$gmean=array_sum($mean)/count($mean); //grand mean
+	$ssA=variance($mean)*$n[0]*($numargs-1); //Sum of the square for Factor A
+	$ssE=array_sum($ss); //Sum of the square for Residual (Error)
+	$ssT=$ssA+$ssE;
+	$dfA=count($arr)-1;
+	$dfE=($n[0]-1)*$numargs;
+	$dfT=$dfA+$dfE;
+	
+	
+	$msA=$ssA/$dfA; //mean square of Factor A
+	$msE=$ssE/$dfE;    //pooled variance (residual or error)
+	$msT=$msA+$msE;  //total sum of the squares
+	$F_a=$msA/$msE;    //F Ratio
+	
+	$p_a=fcdf($F_a,$dfA,$dfE); //P value
+	
+	return (array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssE,$dfE,$msE],[$ssT,$dfT])); 
+}
+
+
+//---------------------------------------------ANOVA-Twoway array--------------------------------------------
+// Function: anova2way(arr,[replication = False])
+// Returns ANOVA table as an array with each row corresponding to Factor A, Factor B, 
+// their interaction (only with replication), error (residual), and totals. 
+//
+// Parameters:
+// arr: An array in the follwing form: 
+//  for twoway WITH replication - example: $arr=[[[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]]
+//  for twoway WITHOUT replication - example: $arr=[[53,61,51],[47,55,51],[46,52,49],[50,58,54],[49,54,50]]
+// replication: Optional - boolean (true or false) it specifies whether the ANOVA with replication
+//             (multiple observations for each group) or without replication (one observation per group)
+//             is to be performed. The default is False - without replication.
+// Returns:
+// ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
+// [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T]] 
+// where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
+// And A, B, I, E, and T correspond to Factor A, Factor B, their interaction (only with replication), 
+// error (residual), and total, respectively.
+
+function anova2way($arr, $replication=False){
+	
+	//with replication:
+	if($replication==True){
+		$n_b=count($arr); //number of rows: Factor B	
+		$n_r=array();
+		$n_col=array();
+
+		foreach($arr as $a){
+			$n_col[]=count($a);
+			if (count(array_unique($n_col))!=1) {
+				echo "Error: ANOVA requires the same length for all arrays";
+				return false;
+			}
+		}
+		
+		for($i=0;$i<count($arr);++$i){
+			foreach($arr[$i] as $a){
+				$n_r[]=count($a);
+				if (count(array_unique($n_r))!=1) {
+					echo "Error: ANOVA requires the same number of replicates for all factors";
+					return false;
+				}
+			}
+		}
+				
+		$n_a=count($arr[0]); //number of columns: Factor A
+		$n_b=count($arr); //number of rows: Factor B
+		$n_r=count($arr[0][0]); //number of replicates
+
+		$m_r=array();
+		
+		//mean of the replicates
+		for($i=0;$i<count($arr);$i++){
+			for($j=0;$j<count($arr[0]);++$j){
+				$m_r[$i][$j]=mean($arr[$i][$j]);
+				//$g=mean($arr[$i][$j]);
+			}
+		}
+
+		$m_a=array(); //mean of the columns
+		$m_b=array(); //mean of the rows
+
+		for($i=0;$i<count($m_r);$i++){
+			$m_b[]=mean($m_r[$i]);
+		}
+		$m_r_t=array_map(null, ...$m_r);
+		
+		for($j=0;$j<count($m_r_t);$j++){
+			$m_a[]=mean($m_r_t[$j]);
+		}
+		$gmean=mean($m_a); //grand average
+
+		$ssA=variance($m_a)*($n_a-1)*$n_b*$n_r; //Sum of the square for Factor A
+		$ssB=variance($m_b)*($n_b-1)*$n_a*$n_r; //Sum of the square for Factor A
+		$dfA=($n_a-1);
+		$dfB=($n_b-1);
+		$msA=$ssA/$dfA; //mean square of Factor A
+		$msB=$ssB/$dfB; //mean square of Factor B
+
+		$ss=array(); //Residual
+		for($i=0;$i<$n_b;$i++){
+			for($j=0;$j<$n_a;$j++){
+				for($k=0;$k<$n_r;$k++){
+					$ss[]=($m_r[$i][$j]-$arr[$i][$j][$k])**2;
+				}
+				
+			}
+		}
+		$ssE=array_sum($ss);
+		$dfE=($n_r-1)*$n_b*$n_a;
+		$msE=$ssE/$dfE;    //pooled variance-within (residual or error)
+
+		$ss_i=array(); //SS of Interaction between two factors
+		for($i=0;$i<count($m_r);$i++){
+			for($j=0;$j<count($m_r[0]);$j++){
+				$ss_i[]=$n_r*($m_r[$i][$j]-$m_a[$j]-$m_b[$i]+$gmean)**2;
+			}
+		}
+
+		$ssI=array_sum($ss_i);	
+		$dfI=($n_a-1)*($n_b-1);
+		$msI=$ssI/$dfI;
+
+		$ssT=$ssA+$ssB+$ssI+$ssE;  //total sum of the squares
+		$dfT=($n_a*$n_b*$n_r)-1;
+
+		$F_a=$msA/$msE;    //F Ratio of Factor A
+		$F_b=$msB/$msE;    //F Ratio of Factor A
+		$F_i=$msI/$msE;    //F Ratio of the interaction of Factors A and B
+		
+		$p_a=fcdf($F_a,$dfA,$dfE); //P value of factor A
+		$p_b=fcdf($F_b,$dfB,$dfE); //P value of factor B
+		$p_i=fcdf($F_i,$dfI,$dfE); //P value of factor B
+		$ans=array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssB,$dfB,$msB,$F_b,$p_b],[$ssI,$dfI,$msI,$F_i,$p_i],[$ssE,$dfE,$msE],[$ssT,$dfT]);
+	
+	}
+
+	//without replication:
+	else{
+		$n_col=array();  
+		foreach($arr as $a){
+			$n_col[]=count($a);
+			if (count(array_unique($n_col))!=1) {
+				echo "Error: ANOVA requires the same length for all arrays";
+				return false;
+			}
+		}
+		$arr_t=array_map(null, ...$arr);
+
+		$n_a=count($arr[0]); //number of columns: Factor A
+		$n_b=count($arr); //number of rows: Factor B
+		$m_a=array();
+		$m_b=array();
+		for($i=0;$i<count($arr);$i++){
+			$m_b[]=mean($arr[$i]);
+		}
+
+		for($j=0;$j<count($arr_t);$j++){
+			$m_a[]=mean($arr_t[$j]);
+		}
+
+		$gmean=mean($m_a); //grand average
+		$ssA=variance($m_a)*$n_b*($n_a-1); //Sum of the square for Factor A
+		$ssB=variance($m_b)*$n_a*($n_b-1); //Sum of the square for Factor A
+		$dfA=($n_a-1);
+		$dfB=($n_b-1);
+		
+		$ss=array(); //Residual
+		for($i=0;$i<count($arr);$i++){
+			for($j=0;$j<count($arr[0]);$j++){
+				$ss[]=($arr[$i][$j]-$m_a[$j]-$m_b[$i]+$gmean)**2;
+			}
+		}
+		$ssE=array_sum($ss);
+		$dfE=($n_a-1)*($n_b-1);
+		$dfT=($n_a*$n_b)-1;
+		
+		$msA=$ssA/$dfA; //mean square of Factor A
+		$msB=$ssB/$dfB; //mean square of Factor B
+		$msE=$ssE/$dfE;    //pooled variance (residual or error)
+		$ssT=$ssA+$ssB+$ssE;  //total sum of the squares
+		$F_a=$msA/$msE;    //F Ratio of Factor A
+		$F_b=$msB/$msE;    //F Ratio of Factor A
+		
+		$p_a=fcdf($F_a,$dfA,$dfE); //P value of factor A
+		$p_b=fcdf($F_b,$dfB,$dfE); //P value of factor B
+		$ans=array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssB,$dfB,$msB,$F_b,$p_b],[$ssE,$dfE,$msE],[$ssT,$dfT]);
+			
+	}
+	return ($ans);	
+}
+
+//---------------------------------------------ANOVA-Twoway F ratio-----------------------------------------
+// Function: anova2way_f(arr, [replication=False])
+// Returns F ratio and the corresponding P value for Factor A, Factor B and their interaction (if replication is true). 
+//
+// Parameters:
+// arr: An array in the follwing form: 
+//  for twoway WITH replication - example: $arr=[[[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]]
+//  for twoway WITHOUT replication - example: $arr=[[53,61,51],[47,55,51],[46,52,49],[50,58,54],[49,54,50]] 
+// replication: Optional - boolean (true or false) it specifies whether the ANOVA with replication
+//             (multiple observations for each group) or without replication (one observation per group)
+//             is to be performed. The default is False - without replication.
+//  
+// Returns:
+// F ratio and the corresponding P value for Factor A, Factor B and their Interaction (if replication is true)
+// as an array in the form  array([F_A,P_A],[F_B,P_B],[F_I,P_I]). 	
+
+function anova2way_f($arr, $replication=False){
+	$k=anova2way($arr,$replication);
+	if($replication==True){
+		$ans=[[$k[0][3],$k[0][4]],[$k[1][3],$k[1][4]],[$k[2][3],$k[2][4]]];
+	}
+		else{
+			$ans=[[$k[0][3],$k[0][4]],[$k[1][3],$k[1][4]]];
+	}
+	
+	return($ans);
+}
+
+
+
+//-----------------------------------------------ANOVA Table---------------------------------------------
+// Function: anova_table(arr,[factor=1, replication=False, roundto=12, nameA="factorA", nameB="factorB "])
+// Returns ANOVA table for both oneway and twoway ANOVA - display only. The output of anova1way_arr() and 
+// anova2way_arr() can be used as the input array for this function.
+//
+// Parameters:
+// arr: An array in the follwing form: 
+//   for oneway: [[SS_A, df_A, MS_A, F_A, P_A],[SS_E,df_E,MS_E],[SS_T,df_T]]
+//   for twoway WITHOUT replication: [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_E,df_E,MS_E],[SS_T,df_T]]
+//   for twoway WITH replication: [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T]]
+// factor: number of factors considered in ANOVA - 1 for one-way and 2 for two-way. The default is 1, one-way ANOVA.
+// replication: Optional - boolean (true or false) it specifies whether the ANOVA tewoway with replication
+//             (multiple observations for each group) or without replication (one observation per group)
+//             is performed. The default is False - without replication.
+// roundto: Optional - number of decimal places to which data should be rounded off; 
+//          default is 12 decimal places. 
+// NameA: Optional - the name of factor A as string to be displayed in the table. Default is "Factor A".
+// NameB: Optional - the name of factor B as string to be displayed in the table. Default is "Factor B".
+// Returns:
+// ANOVA table for displaying data. 
+
+
+function anova_table(array $array, int $factor = 1, $rep=False, int $roundto=12, string $f1="Factor A", string $f2="Factor B"){
+	if ($factor!=1 && $factor!=2) { echo 'error: the factor variable only expects 1 for one-way and 2 for two-way ANOVA'; return '';}
+	/*if (!function_exists('calconarray')) {
+       // require_once(__DIR__.'/assessment/macros.php');
+	}*/
+	array_walk_recursive($array, function(&$x) use ($roundto) { $x = round($x,$roundto);});
+	
+	if ($factor==1){
+		$r0=$array[0];
+		$r1=$array[1];
+		$r2=$array[2];
+		
+		$out = "<table class=stats><CAPTION><EM>Analysis of Variance: One-Way</EM></CAPTION><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F Ratio</th><th>P value</th></tr></thead>\n<tbody>\n";
+		$out .="<tr><td>$f1</td><td>$r0[0]</td><td>$r0[1]</td><td>$r0[2]</td><td>$r0[3]</td><td>$r0[4]</td></tr>";
+		$out .="<tr><td>Residual</td><td>$r1[0]</td><td>$r1[1]</td><td>$r1[2]</td></tr>"; //<td></td><td></td>
+		$out .="<tr><td>TOTAL</td><td>$r2[0]</td><td>$r2[1]</td></tr>"; //<td></td><td></td><td></td>
+		$out .= "</tbody></table>\n";
+
+	}
+		elseif($factor==2 && $rep==False){
+			$r0=$array[0];
+			$r1=$array[1];
+			$r2=$array[2];
+			$r3=$array[3];
+			$out = "<table class=stats><CAPTION><EM>Analysis of Variance: Two-way without Replication</EM></CAPTION><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F Ratio</th><th>P value</th></tr></thead>\n<tbody>\n";
+			$out .="<tr><td>$f1</td><td>$r0[0]</td><td>$r0[1]</td><td>$r0[2]</td><td>$r0[3]</td><td>$r0[4]</td></tr>";
+			$out .="<tr><td>$f2</td><td>$r1[0]</td><td>$r1[1]</td><td>$r1[2]</td><td>$r1[3]</td><td>$r1[4]</td></tr>";
+			$out .="<tr><td>Residual</td><td>$r2[0]</td><td>$r2[1]</td><td>$r2[2]</td></tr>"; //<td></td><td></td>
+			$out .="<tr><td>TOTAL</td><td>$r3[0]</td><td>$r3[1]</td></tr>"; //<td></td><td></td><td></td>
+			$out .= "</tbody></table>\n";
+
+		}
+
+		elseif($factor==2 && $rep==True){
+			$r0=$array[0];
+			$r1=$array[1];
+			$r2=$array[2];
+			$r3=$array[3];
+			$r4=$array[4];
+			$out = "<table class=stats><CAPTION><EM>Analysis of Variance: Two-way with Replication</EM></CAPTION><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F Ratio</th><th>P value</th></tr></thead>\n<tbody>\n";
+			$out .="<tr><td>$f1</td><td>$r0[0]</td><td>$r0[1]</td><td>$r0[2]</td><td>$r0[3]</td><td>$r0[4]</td></tr>";
+			$out .="<tr><td>$f2</td><td>$r1[0]</td><td>$r1[1]</td><td>$r1[2]</td><td>$r1[3]</td><td>$r1[4]</td></tr>";
+			$out .="<tr><td>Interaction</td><td>$r2[0]</td><td>$r2[1]</td><td>$r2[2]</td><td>$r2[3]</td><td>$r2[4]</td></tr>";
+			$out .="<tr><td>Residual</td><td>$r3[0]</td><td>$r3[1]</td><td>$r3[2]</td></tr>"; //<td></td><td></td>
+			$out .="<tr><td>TOTAL</td><td>$r4[0]</td><td>$r4[1]</td></tr>"; //<td></td><td></td><td></td>
+			$out .= "</tbody></table>\n";
+
+		}
+		
+	return $out;
+
+
+}
 ?>
