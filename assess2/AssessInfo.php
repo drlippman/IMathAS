@@ -93,7 +93,7 @@ class AssessInfo
     } else if (!$isstu) {
       $this->exception = false;
     } else {
-      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
+      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
@@ -115,6 +115,25 @@ class AssessInfo
     } else {
       $useexception = $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, true);
       $canuselatepass = false;
+    }
+
+    // use time limit extension even if rest of exception isn't used
+    if ($this->exception !== false && $this->exception[6] != 0) {
+        $this->assessData['timeext'] = intval($this->exception[6]);
+    }
+    if ($this->exception !== false && $this->exception[7] != 0) {
+        $this->assessData['attemptext'] = intval($this->exception[7]);
+        // apply additional attempts
+        if ($this->assessData['submitby'] == 'by_assessment') {
+            $this->assessData['allowed_attempts'] += $this->assessData['attemptext'];
+        } else {
+            // if question settings already loaded, apply extension
+            foreach ($this->questionData as $i=>$set) {
+                if ($set['regen'] != 1) {
+                    $this->questionData[$i]['regens_max'] += $this->assessData['attemptext'];
+                }
+            }
+        }
     }
 
     if ($useexception) {
@@ -319,6 +338,9 @@ class AssessInfo
       'showans','showans_aftern','points_possible','questionsetid',
       'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
+    if (!isset($this->questionData[$id])) {
+        return false;
+    }
     foreach ($base as $field) {
         if (isset($this->questionData[$id][$field])) {
             $out[$field] = $this->questionData[$id][$field];
@@ -764,8 +786,11 @@ class AssessInfo
       //the question must be in a grouping.  Find the group.
       foreach ($this->assessData['itemorder'] as $qid) {
         if (is_array($qid) && in_array($oldquestion, $qid['qids'])) {
-          $group = $qid['qids'];
-          $grouptype = $qid['type'];
+          if ($qid['type'] == 'pool' && $qid['n'] < count($qid['qids'])) {
+            // only do redraw if not picking n from n
+            $group = $qid['qids'];
+            $grouptype = $qid['type'];
+          }
           break;
         }
       }
@@ -963,6 +988,10 @@ class AssessInfo
       $settings['regens_max'] = 1;
     } else {
       $settings['regens_max'] = $defaults['defregens'];
+      if (!empty($defaults['attemptext'])) {
+          // extend attempts if exception set
+          $settings['regens_max'] += $defaults['attemptext'];
+      }
     }
 
     $settings['jump_to_answer'] = false;
@@ -1170,6 +1199,12 @@ class AssessInfo
       }
     }
 
+    // fix old-format reqscore "grey out"
+    if ($settings['reqscore'] < 0) {
+        $settings['reqscoretype'] |= 1;
+        $settings['reqscore'] = abs($settings['reqscore']);
+    }
+
     //unpack itemorder
     $itemorder = json_decode($settings['itemorder'], true);
     //temp handling of old format
@@ -1211,6 +1246,9 @@ class AssessInfo
         $settings[$k] = $v + 0;
       }
     }
+
+    $settings['showworktype'] = ($settings['showwork'] & 4);
+    $settings['showwork'] = ($settings['showwork'] & 3);
 
     return $settings;
   }

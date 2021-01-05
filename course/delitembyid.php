@@ -177,7 +177,10 @@ function delitembyid($itemid) {
 		$stm->execute(array(':assessmentid'=>$typeid));
 
 		$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=0 WHERE reqscoreaid=:assessmentid AND courseid=:courseid");
-		$stm->execute(array(':assessmentid'=>$typeid, ':courseid'=>$cid));
+        $stm->execute(array(':assessmentid'=>$typeid, ':courseid'=>$cid));
+        
+        $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE typeid=:assessmentid AND placementtype='assess'");
+		$stm->execute(array(':assessmentid'=>$typeid));
 
 	} else if ($itemtype == "Drill") {
 		$stm = $DBH->prepare("SELECT name FROM imas_drillassess WHERE id=:id");

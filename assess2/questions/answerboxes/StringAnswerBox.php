@@ -59,7 +59,10 @@ class StringAnswerBox implements AnswerBox
     		if ($answerformat=='list') {
     			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
     			$shorttip = _('Enter a list of text');
-    		} else {
+    		} else if ($answerformat=='matrix') {
+                $shorttip = _('Enter your answer as a matrix');  
+                $tip = $shorttip._(', like [(2,3,4),(1,4,5)]');
+            } else {
     			$tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
     			$shorttip = _('Enter text');
     		}

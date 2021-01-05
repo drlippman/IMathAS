@@ -9,6 +9,7 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
         $stm = $DBH->prepare("SELECT itemorder,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
         $stm->execute(array(':id' => $aid));
         $data = $stm->fetch(PDO::FETCH_ASSOC);
+        $data['showwork'] = ($data['showwork'] & 3);
     }
     $ln = 1;
 

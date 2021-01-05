@@ -12,7 +12,7 @@
         :key = "i"
         :class = "[showans ? (results.scoredata[i] > 0 ? 'LPshowcorrect' : 'LPshowwrong') : '']"
       >
-        <td>{{ choice }}</td>
+        <td v-html="choice"></td>
         <td>
           <span class="LPresbarwrap">
             <span class="LPresbar" :style="{width: Math.round(100*results.datatots[i]/results.maxfreq) +'%'}">

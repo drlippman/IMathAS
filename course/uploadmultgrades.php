@@ -195,8 +195,11 @@ if (!(isset($teacherid))) {
 		}
 	}
 
-	$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
+    $curBreadcrumb = $breadcrumbbase;
+    if (empty($_COOKIE['fromltimenu'])) {
+        $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+    $curBreadcrumb .=" <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
 	$curBreadcrumb .=" &gt; <a href=\"chgoffline.php?stu=0&cid=$cid\">Manage Offline Grades</a> &gt; Upload Multiple Grades";
 
 }
@@ -275,7 +278,7 @@ if ($overwriteBody==1) {
 		<p>
 		<span class=form>Import File: </span>
 		<span class=formright>
-			<input type="hidden" name="MAX_FILE_SIZE" value="300000" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
 			<input name="userfile" type="file" />
 		</span><br class=form />
 		<span class=form>File contains a header row:</span>

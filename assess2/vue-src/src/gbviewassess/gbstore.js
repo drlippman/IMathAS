@@ -254,12 +254,14 @@ export const actions = {
               Vue.delete(qdata.scoreoverride, pts[3]);
             }
           }
-          if (qdata.parts[pts[3]]) {
-            if (store.scoreOverrides[key] === '') {
-              Vue.delete(store.scoreOverrides, key);
-            } else {
-              qdata.parts[pts[3]].score = Math.round(1000 * store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible) / 1000;
+          if (store.scoreOverrides[key]) { // set or re-set scoreoverride on question part
+            if (!qdata.scoreoverride) {
+              store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride = {};
             }
+            Vue.set(store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride,
+              pts[3],
+              store.scoreOverrides[key]
+            );
           }
         }
         // update question scores

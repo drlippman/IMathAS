@@ -4,6 +4,7 @@ Prime numbers, Version 1.0 Feb 11, 2009
 <BR><ul>
 <li><a href="#getprime">getprime</a></li>
 <li><a href="#getprimes">getprimes</a></li>
+<li><a href="#isprime">isprime</a></li>
 </ul>
 <h3><a name="getprime">getprime</a></h3>
 getprime([digits])
@@ -14,3 +15,8 @@ getprimes(n,[digits])
 <BR>returns n different prime numbers. 
 <BR>if digits is specified, returns primes with that many digits.  1 to 6 is supported
 <BR>
+ <h3><a name="isprime">isprime</a></h3>
+isprime(n)
+<BR>returns true or false, indicating if n is prime. 
+<BR>Only works for whole numbers less than 1,000,000.
+<br>If you need a prime number, use getprime instead.

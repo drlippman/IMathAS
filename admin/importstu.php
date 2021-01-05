@@ -315,7 +315,7 @@ if ($overwriteBody==1) {
 
 		<span class=form>Import File: </span>
 		<span class=formright>
-			<input type="hidden" name="MAX_FILE_SIZE" value="300000" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
 			<input name="userfile" type="file" />
 		</span><br class=form>
 		<span class=form>File contains a header row:</span>

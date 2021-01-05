@@ -1064,7 +1064,7 @@ function updateqgrpcookie() {
 }
 
 function generateTable() {
-    olditemarray = itemarray;
+    olditemarray = itemarray.slice();
     itemcount = itemarray.length;
     var alt = 0;
     var ln = 0;
@@ -1817,7 +1817,13 @@ function submitChanges() {
         url: AHAHsaveurl,
         data: outdata
     })
-        .done(function () {
+        .done(function (msg) {
+            if (msg.match(/^error:/)) {
+                document.getElementById(target).innerHTML = msg;
+                itemarray = olditemarray.slice();
+                refreshTable();
+                return;
+            }
             if (!beentaken) {
                 defpoints = $("#defpts").val();
             }
@@ -1841,7 +1847,7 @@ function submitChanges() {
                 req.statusText +
                 "\nError: " +
                 errorThrown;
-            itemarray = olditemarray;
+            itemarray = olditemarray.slice();
             refreshTable();
         });
 }
@@ -1861,7 +1867,12 @@ function addusingdefaults(asgroup) {
         data: {addnewdef: checked, asgroup: asgroup ? 1 : 0},
         dataType: 'json'
     }).done(function (msg) {
-        doneadding(msg);
+        console.log(msg);
+        if (msg.hasOwnProperty('error')) {
+            document.getElementById("submitnotice").innerHTML = msg.error;
+        } else {
+            doneadding(msg);
+        }
     }).fail(function () {
         alert("Error adding questions");
     });

@@ -58,8 +58,11 @@ if ($overwriteBody==1) {
 	echo $body;
 } if (!isset($_POST['versions'])) {
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
 	echo "&gt; Print Test</div>\n";
 
     if ($courseUIver == 1 || isset($CFG['GEN']['pandocserver'])) {
@@ -67,13 +70,13 @@ if ($overwriteBody==1) {
         if ($courseUIver == 1) {
             echo '<a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for in-browser printing</a>';
         }
-        if (isset($CFG['GEN']['pandocserver'])) {
+	if (isset($CFG['GEN']['pandocserver'])) {
             if ($courseUIver == 1) {
                 echo ' | ';
-            }
+	}
             echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for Word</a>';
         }
-        echo '</div>';
+	echo '</div>';
     }
 	echo "<h1>Copy-and-Paste Print Version</h1>";
 
@@ -186,7 +189,7 @@ if ($overwriteBody==1) {
             $a2->setQuestionData($qdata['id'], $qdata);
         }
     } else {
-        include("../assessment/displayq2.php");
+	include("../assessment/displayq2.php");
     }
 
 
@@ -265,13 +268,13 @@ if ($overwriteBody==1) {
 
 
 				for ($i=0; $i<$numq; $i++) {
-                    if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
+					if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
                     if ($courseUIver > 1) {
                         $sa[$j][$i] = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
                     } else {
-                        $sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
-                    }
-                }
+					$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
+				}
+			}
 			}
 
 			if ($_POST['keys']>0) { //print answer keys
@@ -313,13 +316,13 @@ if ($overwriteBody==1) {
 			for ($i=0; $i<$numq; $i++) {
 				if ($i>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
 				for ($j=0; $j<$copies;$j++) {
-                    if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
+					if ($j>0) { echo Sanitize::encodeStringForDisplay($_POST['qsep']);}
                     if ($courseUIver > 1) {
                         $sa[] = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
                     } else {
-                        $sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
-                    }
+					$sa[] = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_POST['showqn']));
 				}
+			}
 			}
 			if ($_POST['keys']>0) { //print answer keys
 				echo Sanitize::encodeStringForDisplay($_POST['vsep']).'<br/>';
@@ -350,7 +353,10 @@ $_SESSION['graphdisp'] = $origgraphdisp;
 require("../footer.php");
 
 function printq2($qn,$qsetid,$seed,$pts,$showpts) {
-	global $a2,$isfinal,$imasroot,$urlmode;
+    global $a2,$isfinal,$imasroot,$urlmode;
+    
+    $GLOBALS['isbareprint'] = true;
+    
 	$state = array(
 		'seeds' => array($qn => $seed),
 		'qsid' => array($qn => $qsetid)

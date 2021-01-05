@@ -58,7 +58,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all || $_POST['in_print'] == 1);
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -86,6 +86,22 @@ if (!$in_practice && !$canViewAll &&
 ) {
   echo '{"error": "invalid_password"}';
   exit;
+}
+
+if (!$in_practice && $assess_info->getSetting('timelimit') > 0 && 
+    $assess_info->getSetting('timeext') > 0
+) {
+    // apply time limit extension
+    if ($assess_record->hasActiveAttempt()) {
+        // has unsubmitted attempt
+        $assess_record->applyTimeLimitExtension($assess_info->getSetting('timeext'));
+    } else if (($assess_record->getStatus()&64)==64) {
+        // has submitted quiz-style attempt
+        // un-submit it
+        $assess_record->setStatus(true, true);
+        // apply time limit extension
+        $assess_record->applyTimeLimitExtension($assess_info->getSetting('timeext'));
+    }
 }
 
 // reject start if has current attempt, time limit expired, and is kick out
@@ -147,6 +163,7 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
 
     // if we already have an assess record, need to copy it to new group members
     if ($assess_record->hasRecord()) {
+        $sourcedids = AssessUtils::formLTIsourcedId($available_new_members, $aid, true);
         // get current record
         $fieldstocopy = 'assessmentid,agroupid,timeontask,starttime,lastchange,score,status,scoreddata,practicedata,ver';
         $query = "SELECT $fieldstocopy FROM ";
@@ -156,16 +173,22 @@ if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
         $rowgrpdata = $stm->fetch(PDO::FETCH_NUM);
         // now copy it to others
         $ph = Sanitize::generateQueryPlaceholders($rowgrpdata);
-        $query = "REPLACE INTO imas_assessment_records (userid,$fieldstocopy) ";
-        $query .= "VALUES (?,$ph)";
+        $query = "REPLACE INTO imas_assessment_records (userid,lti_sourcedid,$fieldstocopy) ";
+        $query .= "VALUES (?,?,$ph)";
         $stm = $DBH->prepare($query);
         foreach ($available_new_members as $gm_uid) {
-        $stm->execute(array_merge(array($gm_uid), $rowgrpdata));
+            if (is_array($sourcedids) && isset($sourcedids[$gm_uid])) {
+                $thissourcedid = $sourcedids[$gm_uid];
+            } else {
+                $thissourcedid = '';
+            }
+            $stm->execute(array_merge(array($gm_uid, $thissourcedid), $rowgrpdata));
         }
     }
   }
 }
 
+$set_lti_sourcedid = false;
 // if there is no active assessment record, time to create one
 if (!$assess_record->hasRecord()) {
   // if it's a user-created group, we've already gotten group members above
@@ -182,14 +205,16 @@ if (!$assess_record->hasRecord()) {
   }
 
   // time to create a new record!
-  $lti_sourcedid = '';
-  if ($assess_info->getSetting('isgroup') > 0 && !$canViewAll) {
+  if ($assess_info->getSetting('isgroup') > 0 && !$canViewAll && !empty($current_members)) {
     // creating for group
+    $lti_sourcedid = AssessUtils::formLTIsourcedId($current_members, $aid, true);
     $assess_record->createRecord($current_members, $stugroupid, true, $lti_sourcedid);
   } else {
     // creating for self
+    $lti_sourcedid = AssessUtils::formLTIsourcedId($uid, $aid);
     $assess_record->createRecord(false, 0, true, $lti_sourcedid);
   }
+  $set_lti_sourcedid = true;
 }
 
 // if there's no active assessment attempt, generate one
@@ -198,7 +223,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
     // for practice, if we don't have unsubmitted attempt, then
     // we need to create a whole new data
     $assess_record->buildAssessData(true);
-  } else {
+  } else if (!($canViewAll && $_POST['in_print'] == 1)) { // only mark as started if student
     if ($assess_record->hasUnstartedAttempt()) {
       // has an assessment attempt they haven't started yet
       $assess_record->setStatus(true, true);
@@ -224,18 +249,12 @@ if ($isRealStudent) {
 }
 
 // update lti_sourcedid if needed
-if (!empty($_SESSION['lti_lis_result_sourcedid'.$aid]) &&
-  !empty($_SESSION['lti_outcomeurl'])
-) {
-  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'.$aid].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
-  $assess_record->updateLTIsourcedId($altltisourcedid);
+if (!$set_lti_sourcedid) {
+    $altltisourcedid = AssessUtils::formLTIsourcedId($uid, $aid);
+    if ($altltisourcedid != '') {
+        $assess_record->updateLTIsourcedId($altltisourcedid);
+    }
 }
-/*
-else if (isset($_SESSION['lti_lis_result_sourcedid'])) {
-  $altltisourcedid = $_SESSION['lti_lis_result_sourcedid'].':|:'.$_SESSION['lti_outcomeurl'].':|:'.$_SESSION['lti_origkey'].':|:'.$_SESSION['lti_keylookup'];
-  $assess_record->updateLTIsourcedId($altltisourcedid);
-}
-*/
 
 $assessInfoOut = array();
 
@@ -288,7 +307,9 @@ $assessInfoOut['show_results'] = !$assess_info->getSetting('istutorial');
 
 
 //get attempt info
-$assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+$assessInfoOut['has_active_attempt'] = ($assess_record->hasActiveAttempt() ||
+    ($canViewAll && $_POST['in_print'] == 1)  // for GB print view, fake an active attempt
+  );
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   // These values are adjusted for timelimit multiplier, but are not limited

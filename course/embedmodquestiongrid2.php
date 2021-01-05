@@ -161,11 +161,27 @@
 
 	} else {
 		//get defaults
-		$query = "SELECT defpoints,defattempts,showhints,showwork FROM imas_assessments ";
+		$query = "SELECT defpoints,defattempts,showhints,showwork,ver FROM imas_assessments ";
 		$query .= "WHERE id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$aid));
-		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+        $defaults = $stm->fetch(PDO::FETCH_ASSOC);
+        
+        if ($defaults['ver'] > 1) {
+            $query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
+            $query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+        } else {
+            $query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+            $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+        }
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+        if ($stm->rowCount() > 0) {
+            $beentaken = true;
+        } else {
+            $beentaken = false;
+        }
+
 		if ($defaults['showhints'] == 0) {
       $defaults['showhints'] = _('No');
     } else if ($defaults['showhints'] == 1) {
@@ -215,7 +231,13 @@
             </script>';
     $flexwidth = true;
     $nologo = true;        
-	require("../header.php");
+    require("../header.php");
+    
+    if ($beentaken) {
+        echo '<p>'._('Students have started the assessment, and you cannot change questions or order after students have started; reload the page').'</p>';
+        require('../footer.php');
+        exit;
+    }
 
 ?>
 <div id="headermodquestiongrid" class="pagetitle"><h1>Modify Question Settings</h1></div>

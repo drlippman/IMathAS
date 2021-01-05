@@ -40,7 +40,11 @@ if (!(isset($_GET['cid']))) { //if the cid is missing go back to the index page
 		}
 		if (is_array($sub[$blockid])) { //make sure it's really a block
 			$blockitems = $sub[$blockid]['items'];
-			$obid = $sub[$blockid]['id'];
+            $obid = $sub[$blockid]['id'];
+            if ($obid != $_POST['bid']) {
+                echo _('Uh oh, something changed.  Please go back and try again');
+                exit;
+            }
 			if (count($blockitems)>0) {
 				if (isset($_POST['delcontents']) && $_POST['delcontents']==1) { //clear out contents of block
 					require("delitembyid.php");
@@ -94,13 +98,15 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<h2><?php echo $itemname; ?></h2>
+	<h2><?php echo _('Block').': ' . Sanitize::encodeStringForDisplay($itemname); ?></h2>
 	<form method=post action="deleteblock.php?cid=<?php echo $cid; ?>&id=<?php echo Sanitize::encodeStringForDisplay($_GET['id']) ?>">
-	<p>Are you SURE you want to delete this Block?</p>
-	<p><input type=radio name="delcontents" value="0"/>Move all items out of block<br/>
-	<input type=radio name="delcontents" value="1" checked="checked"/>Also Delete all items in block</p>
-	<p><button type=submit name="remove" value="really">Yes, Delete</button>
-	<input type=button value="Nevermind" class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $cid; ?>'"></p>
+    <p><?php echo _('Are you SURE you want to delete this Block?');?>
+    <input type=hidden name="bid" value="<?php echo intval($_GET['bid']);?>"/>
+    </p>
+	<p><label><input type=radio name="delcontents" value="0"/><?php echo _('Move all items out of block');?></label><br/>
+	<label><input type=radio name="delcontents" value="1" checked="checked"/><?php echo _('Also Delete all items in block');?></label></p>
+	<p><button type=submit name="remove" value="really"><?php echo _('Yes, Delete');?></button>
+    <button type=button class="secondarybtn" onClick="window.location='course.php?cid=<?php echo $cid; ?>'"><?php echo _('Nevermind');?></button></p>
 	</form>
 <?php
 }

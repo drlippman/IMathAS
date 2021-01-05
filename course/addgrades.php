@@ -397,11 +397,14 @@
 	}
 	require("../includes/rubric.php");
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	if ($from == 'gbtesting') {
-		echo "&gt; <a href=\"gb-testing.php?stu=0&cid=$cid\">Gradebook</a> ";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+    if ($from == 'gbtesting') {
+		echo " <a href=\"gb-testing.php?stu=0&cid=$cid\">Gradebook</a> ";
 	} else {
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+		echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	}
 	if ($_GET['stu']>0) {
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Student Detail</a> ";

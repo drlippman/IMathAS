@@ -50,6 +50,20 @@ if ($istutor) {
   }
 }
 
+// get user info
+$query = 'SELECT iu.FirstName, iu.LastName, istu.latepass, istu.timelimitmult ';
+$query .= 'FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id ';
+$query .= 'WHERE iu.id=? AND istu.courseid=?';
+$stm = $DBH->prepare($query);
+$stm->execute(array($uid, $cid));
+$studata = $stm->fetch(PDO::FETCH_ASSOC);
+if ($studata === false) {
+  echo '{"error": "invalid_uid"}';
+  exit;
+}
+$assess_info->loadException($uid, true, $studata['latepass'], $latepasshrs, $courseenddate);
+$assess_info->applyTimelimitMultiplier($studata['timelimitmult']);
+
 // load question settings
 $assess_info->loadQuestionSettings('all', false, false);
 

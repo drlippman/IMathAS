@@ -77,12 +77,12 @@ class ComplexAnswerBox implements AnswerBox
     		];
     		$params['tip'] = $shorttip;
             $params['longtip'] = $tip;
-
+            $params['calcformat'] = $answerformat . ($answerformat==''?'':',') . 'decimal';
     		$out .= '<input ' .
                 Sanitize::generateAttributeString($attributes) .
     						'class="'.implode(' ', $classes) .
     						'" />';
-
+            $out .= "<span id=p$qn></span>";
     		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
     			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
     			$answer = str_replace('"','',$answer);

@@ -137,6 +137,8 @@ class QuestionHtmlGenerator
         $correctAnswerWrongFormat = $this->questionParams->getCorrectAnswerWrongFormat();
         $printFormat = $this->questionParams->getPrintFormat();
 
+        $isbareprint = !empty($GLOBALS['isbareprint']); // lazy hack
+
         if ($quesData['qtype'] == "multipart" || $quesData['qtype'] == 'conditional') {
           // if multipart/condition only has one part, the stuanswers script will
           // un-array it
@@ -155,15 +157,15 @@ class QuestionHtmlGenerator
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {
-          if (count($partattemptn) == 1) {
-            $GLOBALS['assess2-curq-iscorrect'] = $scoreiscorrect[$thisq] ? 1 : 0;
+          if (count($partattemptn) == 1 && isset($partattemptn[0])) {
+            $GLOBALS['assess2-curq-iscorrect'] = ($scoreiscorrect[$thisq] < 0 ? -1 : ($scoreiscorrect[$thisq]==1 ? 1 : 0));
           } else {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
               if ($iidx==0) {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = -1;
               } else {
-                $GLOBALS['assess2-curq-iscorrect'][$kidx] = $scoreiscorrect[$thisq][$kidx] ? 1 : 0;
+                $GLOBALS['assess2-curq-iscorrect'][$kidx] = ($scoreiscorrect[$thisq][$kidx] < 0 ? -1 : ($scoreiscorrect[$thisq][$kidx]==1 ? 1 : 0));
               }
             }
           }
@@ -201,7 +203,7 @@ class QuestionHtmlGenerator
         $toevalsoln = str_replace('\\', '\\\\', $toevalsoln);
         $toevalsoln = str_replace(array('\\\\n', '\\\\"', '\\\\$', '\\\\{'),
             array('\\n', '\\"', '\\$', '\\{'), $toevalsoln);
-
+        $toevalsoln = preg_replace('/\$answerbox(\[.*?\])?/', '', $toevalsoln);
         // Reset the RNG to a known state after the question code has been eval'd.
         $this->randWrapper->srand($this->questionParams->getQuestionSeed() + 2);
 
@@ -340,7 +342,7 @@ class QuestionHtmlGenerator
             if ($quesData['qtype'] == "multipart" ||
               ($quesData['qtype'] == "conditional" && isset($seqPartDone))
             ) {
-              $_seqParts = preg_split('~(<p[^>]*>(<[^>]*>)*|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>)~', $toevalqtxt);
+              $_seqParts = preg_split('~(<p[^>]*>(<(span|em|strong)[^>]*>)*\s*///+\s*(<\/[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>\s*(<(span|em|strong)[^>]*>)*\s*///+\s*(<\/[^>]*>)*\s*<br\s*/?><br\s*/?>)~', $toevalqtxt);
 
               if (count($_seqParts) > 1) {
                 if ($quesData['qtype'] != "conditional") {
@@ -357,7 +359,7 @@ class QuestionHtmlGenerator
                       $jsParams['hasseqnext'] = true;
                       $_thisGroupDone = false;
                     }
-                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx])) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && $answeights[$_pnidx]!=0) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -552,6 +554,7 @@ class QuestionHtmlGenerator
         /*
          * Possibly adjust the showanswer if it doesn't look right
          */
+        $doShowDetailedSoln = false;
         if (isset($showanswer) && is_array($showanswer) && count($showanswer) < count($answerbox)) {
             $showansboxloccnt = substr_count($toevalqtxt,'$showanswerloc') + substr_count($toevalqtxt,'[SAB');
             if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
@@ -566,11 +569,13 @@ class QuestionHtmlGenerator
                 ksort($showanswer);
                 $_lastPartUsed = -1;
                 $_thisIsReady = true;
+                $doShowDetailedSoln = true;
                 foreach ($showanswer as $kidx=>$atIdx) {
                     $_thisIsReady = true;
                     for ($iidx=$_lastPartUsed+1; $iidx <= $kidx; $iidx++) {
                         if (!$doShowAnswerParts[$iidx] && !$doShowAnswer) {
                             $_thisIsReady = false;
+                            $doShowDetailedSoln = false;
                             break;
                         } else if ($iidx < $kidx) {
                             $doShowAnswerParts[$iidx] = false;
@@ -662,8 +667,7 @@ class QuestionHtmlGenerator
          *  cases where $answerbox or [AB#] is already in the question text
          */
         if (isset($seqPartDone)) {
-          $seqParts = preg_split('~(<p[^>]*>(<[^>]*>)*|<br\s*/?><br\s*/?>)\s*///+\s*((<[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>)~', $evaledqtext);
-
+          $seqParts = preg_split('~(<p[^>]*>(<(span|em|strong)[^>]*>)*\s*///+\s*(<\/[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>\s*(<(span|em|strong)[^>]*>)*\s*///+\s*(<\/[^>]*>)*\s*<br\s*/?><br\s*/?>)~', $evaledqtext);
           if (count($seqParts) > 1) {
             $newqtext = '';
             $lastGroupDone = true;
@@ -679,7 +683,7 @@ class QuestionHtmlGenerator
                   $jsParams['hasseqnext'] = true;
                   $thisGroupDone = false;
                 }
-                if ($seqPartDone !== true && empty($seqPartDone[$pn])) {
+                if ($seqPartDone !== true && empty($seqPartDone[$pn]) && $answeights[$pn]!=0) {
                   $thisGroupDone = false;
                 }
               }
@@ -752,7 +756,10 @@ class QuestionHtmlGenerator
           }
         }
         // display detailed solution, if allowed and set
-        if ($doShowAnswer && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
+        if (($doShowAnswer || $doShowDetailedSoln) && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
+          if (($quesData['solutionopts']&1)==0) {
+            $evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
+          }
           if ($nosabutton) {
             $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
           } else {
@@ -884,16 +891,41 @@ class QuestionHtmlGenerator
             $partattemptn = $this->questionParams->getStudentPartAttemptCount();
 
             foreach ($hints as $iidx => $hintpart) {
-                if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
-                    continue;
-                }
                 $lastkey = max(array_keys($hintpart));
-                if ($partattemptn[$iidx] > $lastkey) {
-                    $usenum = $lastkey;
+
+                if (is_array($hintpart[$lastkey])) {  // has "show for group of questions"
+                    $usenum = 10000;
+                    $allcorrect = true;
+                    $showfor = array_map('intval', $hintpart[$lastkey][1]);
+                    foreach ($showfor as $subpn) {
+                        if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$subpn] == 1) {
+                           continue; // don't consider correct
+                        } else {
+                           $allcorrect = false;
+                        }
+                        if ($partattemptn[$subpn] > $lastkey && $lastkey < $usenum) {
+                            $usenum = $lastkey;
+                        } else if ($partattemptn[$subpn] < $usenum) {
+                            $usenum = $partattemptn[$subpn];
+                        }
+                    }
+                    if ($allcorrect || $usenum == 10000) { 
+                        continue;
+                    }
+                    if (is_array($hintpart[$usenum])) {
+                        $hintpart[$usenum] = $hintpart[$usenum][0];
+                    }
                 } else {
-                    $usenum = $partattemptn[$iidx];
+                    if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx] == 1) {
+                        continue;
+                    }
+                    if ($partattemptn[$iidx] > $lastkey) {
+                        $usenum = $lastkey;
+                    } else {
+                        $usenum = $partattemptn[$iidx];
+                    }
                 }
-                if ($hintpart[$usenum] != '') {
+                if (!empty($hintpart[$usenum])) {
                     if (strpos($hintpart[$usenum], '</div>') !== false) {
                         $hintloc[$iidx] = $hintpart[$usenum];
                     } else if (strpos($hintpart[$usenum], 'button"') !== false) {
@@ -1251,7 +1283,7 @@ class QuestionHtmlGenerator
         $this->errors[] = $errorMessage;
     }
 
-    private function fixDegrees($str): string 
+    private function fixDegrees($str) 
     {
         if ($str === null) { return ''; }
         return preg_replace_callback('/`(.*?)`/s', function($m) {

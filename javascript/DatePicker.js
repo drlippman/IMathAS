@@ -84,6 +84,7 @@ function drawDatePicker(targetDateField, x, y, jumpFieldName, jumpTitle)
     newNode.setAttribute("class", "dpDiv");
     newNode.setAttribute("style", "visibility: hidden;");
     document.body.appendChild(newNode);
+    $(newNode).on('click', function (e) { e.stopPropagation();});
   }
 
   // move the datepicker div to the proper x,y coordinate and toggle the visiblity

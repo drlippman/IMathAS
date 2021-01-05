@@ -1050,7 +1050,7 @@ function updateqgrpcookie() {
 }
 
 function generateTable() {
-    olditemarray = itemarray;
+    olditemarray = itemarray.slice();
     itemcount = itemarray.length;
     var alt = 0;
     var ln = 0;
@@ -1828,7 +1828,13 @@ function submitChanges() {
         async: false,
         data: outdata
     })
-        .done(function () {
+        .done(function (msg) {
+            if (msg.match(/^error:/)) {
+                document.getElementById(target).innerHTML = msg;
+                itemarray = olditemarray.slice();
+                refreshTable();
+                return;
+            }
             if (!beentaken) {
                 defpoints = $("#defpts").val();
             }
@@ -1851,7 +1857,7 @@ function submitChanges() {
                 req.statusText +
                 "\nError: " +
                 errorThrown;
-            itemarray = olditemarray;
+            itemarray = olditemarray.slice();;
             refreshTable();
         });
 }

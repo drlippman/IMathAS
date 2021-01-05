@@ -154,8 +154,8 @@ function init(paramarr, enableMQ, baseel) {
         //document.getElementById("pbtn"+qn).style.display = 'none';
       } //TODO: when matrix, clear preview on further input
     } else if (document.getElementById("qn"+qn)) {
-        var thisqn = qn;
-        document.getElementById("qn"+qn).addEventListener('keyup', function() { syntaxCheckMQ(thisqn) });
+        document.getElementById("qn"+qn).addEventListener('keyup', (function(thisqn) { 
+            return function () {syntaxCheckMQ(thisqn) }; })(qn));
     } //TODO: for non-preview types, still check syntax
     if (params.format === 'debit') {
       document.getElementById("qn"+qn).addEventListener('keyup', editdebit);
@@ -399,7 +399,7 @@ function initDupRubrics() {
       var pts = inref.split('-');
       inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
     }
-    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref+",div.intro#qnwrap"+inref);
+    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref+",div.introtext#qnwrap"+inref);
     if (inbox.length > 0) {
       inbox.after(el);
       $(el).show();
@@ -551,7 +551,7 @@ function setupDraw(qn) {
 }
 
 function initMultAns(qn) {
-  var hasnone = $("#qnwrap"+qn).find('label:last').text().match(/none\s+of/i);
+  var hasnone = $("#qnwrap"+qn).attr('data-multans') == 'hasnone';
   if (hasnone) {
     var boxes = $('input[name^="qn'+qn+'["]');
     boxes.on('change', function () {
@@ -569,7 +569,8 @@ function isBlank(str) {
 }
 function editdebit(e) {
   var el = e.target;
-	var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && descr.hasClass("iscredit")) {
     var leftpad = descr.css('padding-left');
 		if (descr.is('select')) {
@@ -583,7 +584,8 @@ function editdebit(e) {
 }
 function editcredit(e) {
   var el = e.target;
-	var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && !descr.hasClass("iscredit")) {
     var leftpad = parseInt(descr.css('padding-left'));
 		if (descr.is('select')) {
@@ -825,8 +827,12 @@ function syntaxCheckMQ(id, str) {
 }
 
 function showSyntaxCheckMQ(qn) {
+  var params = allParams[qn];
   var res = processByType(qn);
   var outstr = '';
+  if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
+    outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+  }
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
@@ -943,9 +949,11 @@ function processByType(qn) {
       case 'calcinterval':
         res = processCalcInterval(str, params.calcformat, params.vars);
         break;
+      case 'ntuple':
       case 'calcntuple':
         res = processCalcNtuple(str, params.calcformat);
         break;
+      case 'complex':
       case 'calccomplex':
         res = processCalcComplex(str, params.calcformat);
         break;
@@ -1018,9 +1026,8 @@ function AMnumfuncPrepVar(qn,str) {
     if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
       str = str.replace(/\(\((.*?)\)\)/g,'($1)');
     }
-  	if (vars[i] == "varE") {
-		  str = str.replace("E","varE");
-		  dispstr = dispstr.replace("E","varE");
+  	if (vars[i] == "E" || vars[i] == "e") {
+          foundaltcap[i] = true;  // always want to treat e and E as different
 	  } else {
 	  	foundaltcap[i] = false;
 	  	for (var j=0; j<vars.length; j++) {
@@ -1037,7 +1044,9 @@ function AMnumfuncPrepVar(qn,str) {
 		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
-	 }});
+     }
+     return p1;
+    });
   str = str.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
@@ -1046,7 +1055,9 @@ function AMnumfuncPrepVar(qn,str) {
 		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
-	 }});
+     }
+     return p1;
+    });
   // fix display of /n!
   dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
@@ -1087,7 +1098,7 @@ function AMnumfuncPrepVar(qn,str) {
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
-		  } else if (!isgreek && vars[i]!="varE" && vars[i].replace(/[^\w_]/g,'').length>1) {
+		  } else if (!isgreek && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
       if (vars[i].match(/[^\w_]/) || vars[i].match(/^(break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|and with)$/)) {
@@ -1102,7 +1113,6 @@ function AMnumfuncPrepVar(qn,str) {
 	  var reg = new RegExp("("+vltq+")","g");
 	  dispstr = dispstr.replace(reg,"\"$1\"");
   }
-  dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
   str = str.replace(/@(\d+)@/g, indextofunc);
   submitstr = submitstr.replace(/@(\d+)@/g, indextofunc);
@@ -1162,7 +1172,7 @@ function processNumber(origstr, format) {
 
             if (str.length > 0) {
                 var pts = str.split(/\s*\*\s*/);
-                var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arad|ohms?|ohms|amps?|[aA]mperes?|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|microns?|cmH2O)$/;
+                var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)$/;
                 for (var i=0; i<pts.length; i++) {
                     if (!unitsregex.test(pts[i])) {
                         err += _('Unknown unit ')+'"'+pts[i]+'". ';
@@ -1172,7 +1182,7 @@ function processNumber(origstr, format) {
                 err += _("Missing units");
             }
         } else if (format.indexOf('integer')!=-1) {
-            if (!str.match(/^\s*\d+\s*$/)) {
+            if (!str.match(/^\s*\-?\d+\s*$/)) {
                 err += _('This is not an integer.');
             }
         } else {
@@ -1233,6 +1243,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
+    fullstr = fullstr.replace(/\s*,\s*/g,',');
     joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {

@@ -986,9 +986,9 @@ function gbtable() {
 	$exceptions = array();
 	$canuseexception = array();
 	$forumexceptions = array();
-	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate,imas_assessments.LPcutoff FROM imas_exceptions AS ie,imas_assessments WHERE ";
+	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_assessments.enddate,imas_assessments.startdate,imas_assessments.LPcutoff,ie.timeext FROM imas_exceptions AS ie,imas_assessments WHERE ";
 	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
-	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_forums.enddate,imas_forums.startdate,0 AS LPcutoff FROM imas_exceptions AS ie,imas_forums WHERE ";
+	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate AS exceptionstartdate,ie.enddate AS exceptionenddate,ie.islatepass,ie.itemtype,imas_forums.enddate,imas_forums.startdate,0 AS LPcutoff,ie.timeext FROM imas_exceptions AS ie,imas_forums WHERE ";
 	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
@@ -1001,7 +1001,7 @@ function gbtable() {
 			if ($r['exceptionenddate'] > $courseenddate && $now > $courseenddate) { //for grading purposes, cutoff exceptions at courseenddate
 				$r['exceptionenddate'] = $courseenddate;
 			}
-			$exceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass']);
+			$exceptions[$r['typeid']][$r['userid']] = array($r['exceptionstartdate'],$r['exceptionenddate'],$r['islatepass'],$r['timeext']);
 			if ($limuser>0) {
 				$useexception = $exceptionfuncs->getCanUseAssessException($exceptions[$r['typeid']][$r['userid']], $r, true);
 				if ($useexception) {
@@ -1316,9 +1316,10 @@ function gbtable() {
 			$gb[$row][1][$col][9] =	$l['lastchange'];
 		}
 
-		$useexception = false; $canuselatepass = false;
+		$useexception = false; $canuselatepass = false; $hastimeext = false;
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
-			list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
+            list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
+            $hastimeext = ($exceptions[$l['assessmentid']][$l['userid']][3] > 0);
 		} else {
 			$canuselatepass = $exceptionfuncs->getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid'], 'LPcutoff'=>$LPcutoff[$i]));
 		}
@@ -1354,17 +1355,20 @@ function gbtable() {
 		$gb[$row][1][$col][10] = $canuselatepass;
 
         if (($l['status']&1)>0 && ($thised<$now ||  //unsubmitted by-assess, and due date passed
-            ($l['timelimitexp']>0 && $l['timelimitexp']<$now)) // or time limit expired on last att
+            ($l['timelimitexp']>0 && $l['timelimitexp']<$now && !$hastimext)) // or time limit expired on last att
         ) {
 			$IP=0;
 			$UA=1;
 		} else if (($l['status']&3)>0 && // unsubmitted attempt any mode
             ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && // and before due date
-            ($l['timelimitexp']==0 || $l['timelimitexp']>$now) // and time limit not expired
+            ($l['timelimitexp']==0 || $l['timelimitexp']>$now || $hastimext) // and time limit not expired
         ) {
 			$IP=1;
 			$UA=0;
-		} else {
+		} else if ($hastimeext && $thised>$now) { // has time extension and before due date
+            $IP=1;
+			$UA=0;
+        } else {
 			$IP=0;
 			$UA=0;
 		}
@@ -1373,7 +1377,7 @@ function gbtable() {
 
 		if ($canviewall ||
 			$assessmenttype[$i] == 'immediately' || //viewingb
-			($assessmenttype[$i] == 'after_take' && $hasSubmittedTake) ||
+			($assessmenttype[$i] == 'after_take' && $hasSubmittedTake && !$hastimeext) ||
 			($assessmenttype[$i] == 'after_due' && $now > $thised)
 		) {
 			$gb[$row][1][$col][2] = 1; //show link
