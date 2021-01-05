@@ -188,6 +188,7 @@ class ComplexScorePart implements ScorePart
             return $scorePartResult;
         }
         $extrapennum = count($ganumarr)+count($annumarr);
+        $gaarrcnt = count($ganumarr);
         $correct = 0;
         foreach ($annumarr as $i=>$ansparts) {
             $foundloc = -1;
@@ -220,7 +221,13 @@ class ComplexScorePart implements ScorePart
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
-        $score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
+        //$score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
+
+        if ($gaarrcnt<=count($annumarr)) {
+            $score = $correct/count($annumarr);
+        } else {
+            $score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;  //take off points for extranous stu answers
+        }
         if ($score<0) {
             $scorePartResult->setRawScore(0);
         } else {

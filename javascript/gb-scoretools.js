@@ -54,13 +54,25 @@ function previewall() {
 }
 function previewallfiles() {
 	$("span.clickable").trigger("click");
-	$(".question span[id^=fileembedbtn]").trigger("click");
+	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").trigger("click");
+}
+function showallwork() {
+	$(".viewworkwrap > button").trigger("click");
 }
 function allvisfullcred() {
 	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
 }
 function allvisnocred() {
 	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
+}
+function updatefilters() {
+    $(".bigquestionwrap").show();
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork'];
+    for (var i=0; i<6; i++) {
+        if (document.getElementById('filter-' + filters[i]).checked) {
+            $(".bigquestionwrap.qfilter-" + filters[i]).hide();
+        }
+    }
 }
 function toggleWork(el) {
 	var next = $(el).next();

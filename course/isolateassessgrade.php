@@ -18,14 +18,21 @@
 	$now = time();
 
 	if ($isteacher) {
-		if (isset($_POST['posted']) && $_POST['posted']==_("Excuse Grade")) {
+		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
 		}
-		if (isset($_POST['posted']) && $_POST['posted']==_("Un-excuse Grade")) {
+		if (isset($_POST['posted']) && $_POST['posted']=="Un-excuse Grade") {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
-		}
+        }
+        if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
+            $calledfrom='isolateassess';
+            $_POST['checked'] = $_POST['stus'];
+            $_POST['assesschk'] = array($aid);
+			include("massexception.php");
+        }
+        
 		if (isset($_POST['submitua'])) {
 			require('../assess2/AssessHelpers.php');
 			AssessHelpers::submitAllUnsumitted($cid, $aid);
@@ -82,8 +89,12 @@
 		}
 		</script>';
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; <a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; View Scores</div>";
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        echo "<a href=\"gradebook.php?gbmode=" . Sanitize::encodeUrlParam($gbmode) . "&cid=$cid\">Gradebook</a> &gt; ";
+    }
+    echo _('View Scores').'</div>';
 
 	if ($aver > 1 ) {
 		echo '<div class="cpmid"><a href="gb-itemanalysis2.php?cid='.$cid.'&amp;aid='.$aid.'">View Item Analysis</a></div>';
@@ -181,7 +192,7 @@
 	if ($aver>1) {
 		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
 		$query .= "IF((iar.status&1)=1,iar.scoreddata,'') AS scoreddata,";
-		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
+		$query .= "istu.userid,iar.score,iar.starttime,iar.lastchange,iar.timeontask,iar.status,iar.timelimitexp,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
 		$query .= "LEFT JOIN imas_assessment_records AS iar ON iu.id=iar.userid AND iar.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
 	} else {
 		$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
@@ -242,7 +253,9 @@
 	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 	echo '<p>',_('With selected:');
 	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
-	echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
+    echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
+    echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
+
 	echo '</p>';
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
 	if ($hassection && !$hidesection) {
@@ -300,9 +313,20 @@
 			$total = $line['score'];
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$timeontask = round($line['timeontask']/60,1);
-			$isOvertime = ($line['status']&4) == 4;
-			$IP = ($line['status']&3)>0;
-			$UA = ($line['status']&1)>0;
+            $isOvertime = ($line['status']&4) == 4;
+            $IP = 0;
+            $UA = 0;
+            if (($line['status']&1)>0 && ($line['thisenddate']<$now ||  //unsubmitted by-assess, and due date passed
+                ($line['timelimitexp']>0 && $line['timelimitexp']<$now)) // or time limit expired on last att
+            ) {
+                $UA=1;
+            } else if (($line['status']&3)>0 && $line['thisenddate']>$now && // unsubmitted attempt any mode and before due date
+                ($line['timelimitexp']==0 || $line['timelimitexp']>$now) // and time limit not expired
+            ) {
+                $IP=1;
+            }
+			//$IP = ($line['status']&3)>0;
+			//$UA = ($line['status']&1)>0;
 		} else {
 			$total = 0;
 			$sp = explode(';',$line['bestscores']);
@@ -386,9 +410,9 @@
 			//if ($total<$minscore) {
 			if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
 				echo "&nbsp;(NC)";
-			} else 	if ($IP==1 && $line['thisenddate'] > $now) {
+			} else 	if ($IP==1) {
 				echo "&nbsp;(IP)";
-			} else 	if ($UA==1 && $line['thisenddate'] < $now) {
+			} else 	if ($UA==1) {
 				echo "&nbsp;(UA)";
 			} else	if ($isOvertime) {
 				echo "&nbsp;(OT)";

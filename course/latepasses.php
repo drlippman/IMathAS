@@ -26,10 +26,12 @@
 		exit;
 	}
 
-	require("../header.php");
-    printf('<div class=breadcrumb>%s <a href="course.php?cid=%s">%s</a> ', $breadcrumbbase,
-        Sanitize::courseId($_GET['cid']), Sanitize::encodeStringForDisplay($coursename));
-	echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> ";
+    require("../header.php");
+    echo "<div class=breadcrumb>$breadcrumbbase ";
+    if (empty($_COOKIE['fromltimenu'])) {
+        echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+	echo "<a href=\"listusers.php?cid=$cid\">Roster</a> ";
 	echo "&gt; Manage LatePasses</div>";
 
 	echo "<form id=\"mainform\" method=post action=\"latepasses.php?&cid=$cid\">";

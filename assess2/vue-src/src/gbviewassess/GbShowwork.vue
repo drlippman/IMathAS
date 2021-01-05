@@ -19,7 +19,7 @@
 <script>
 export default {
   name: 'GbShowwork',
-  props: ['work', 'worktime'],
+  props: ['work', 'worktime', 'showall'],
   data: function () {
     return {
       show: false,
@@ -52,6 +52,9 @@ export default {
         this.rendered = false;
         this.$nextTick(this.renderInit);
       }
+    },
+    showall: function (newVal, oldVal) {
+      this.show = newVal;
     }
   }
 };

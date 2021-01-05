@@ -125,10 +125,11 @@ class IntervalScorePart implements ScorePart
                 }
             } else {
                 if ($ansformatsHasList) {
-                    $orarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/', $givenans);
+                    $orarr = preg_split('/(?<=[\)\]])\s*,\s*(?=[\(\[])/', $givenans);
                 } else {
                     $orarr = explode('U', $givenans);
                 }
+
                 foreach ($orarr as $opt) {
                     $opt = trim($opt);
                     if ($opt=='DNE') {continue;}
@@ -181,6 +182,7 @@ class IntervalScorePart implements ScorePart
             }
 
             $aarr = parseInterval($anans, in_array('list',$ansformats));
+
             if ($aarr === false) {
                 // uh oh
                 $scorePartResult->setRawScore(0);

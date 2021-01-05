@@ -57,8 +57,24 @@ class DrawingScorePart implements ScorePart
             else if (isset($options['answer'])) {$answers = $options['answer'];}
             if (isset($options['partweights'])) {$partweights = $options['partweights'];}
         }
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
+        if (isset($options['reltolerance'])) {
+            if (is_array($options['reltolerance'])) {
+                if (isset($options['reltolerance'][$partnum])) {
+                    $reltolerance = $options['reltolerance'][$partnum];
+                }
+            } else {
+                $reltolerance = $options['reltolerance'];
+            }
+        }
+        if (isset($options['abstolerance'])) {
+            if (is_array($options['abstolerance'])) {
+                if (isset($options['abstolerance'][$partnum])) {
+                    $abstolerance = $options['abstolerance'][$partnum];
+                }
+            } else {
+                $abstolerance = $options['abstolerance'];
+            }
+        }
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
 
@@ -980,9 +996,51 @@ class DrawingScorePart implements ScorePart
                 }
             }
 
+            if ($scoremethod == 'direction' || $scoremethod == 'relativelength') {
+                $veclen = [];
+                foreach ($vecs as $i=>$vec) {
+                    $vecs[$i][5] = atan2($vec[3]-$vec[1], $vec[2]-$vec[0]); // angle
+                    $vecs[$i][6] = sqrt(($vec[3]-$vec[1])**2 + ($vec[2]-$vec[0])**2); // length
+                }
+                $rellengths = [];
+            }
+
             foreach ($ansvecs as $key=>$ansvec) {
                 $scores[$key] = 0;
-                if ($ansvec[0]=='p') {  //point
+                if (($scoremethod == 'direction' || $scoremethod == 'relativelength') &&
+                    ($ansvec[0]=='p' || $ansvec[0] == 'd')
+                ) {
+                    if ($ansvec[0]=='p') {
+                        $ansvec[5] = atan2($ansvec[4]-$ansvec[2], $ansvec[3]-$ansvec[1]);
+                        $ansvec[6] = sqrt(($ansvec[4]-$ansvec[2])**2 + ($ansvec[3]-$ansvec[1])**2); // length
+                    } else if ($ansvec[0]=='d') {
+                        $ansvec[5] = atan2($ansvec[2], $ansvec[1]);
+                        $ansvec[6] = sqrt(($ansvec[2])**2 + ($ansvec[1])**2); // length
+                    }
+                    for ($i=0; $i<count($vecs); $i++) {
+                        if ($vecs[$i][4]!='v') {continue;}
+                        if ($ansvec[0]=='p') { 
+                            // check starting point
+                            if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance) {
+                                continue;
+                            }
+                            if (abs($ansvec[2]-$vecs[$i][1])>$defpttol*$reltolerance) {
+                                continue;
+                            }
+                        }
+                        // check direction; allow about 4 degree error
+                        if (abs($ansvec[5] - $vecs[$i][5]) > 0.07*$reltolerance) {
+                            continue;
+                        }
+                        if ($ansvec[6] == 0) {
+                            $rellengths[$key] = 0;
+                        } else {
+                            $rellengths[$key] = $vecs[$i][6]/$ansvec[6];
+                        }
+                        $scores[$key] = 1;
+                        break;
+                    }
+                } else if ($ansvec[0]=='p') {  //point
                     for ($i=0; $i<count($vecs); $i++) {
                         if ($vecs[$i][4]!='v') {continue;}
                         if (abs($ansvec[1]-$vecs[$i][0])>$defpttol*$reltolerance) {
@@ -1064,7 +1122,7 @@ class DrawingScorePart implements ScorePart
                         $scores[$key] = 1;
                         break;
                     }
-                } else {  //direction vector
+                } else if ($ansvec[0]=='d') {  //direction vector
                     for ($i=0; $i<count($vecs); $i++) {
                         if ($vecs[$i][4]!='v') {continue;}
                         if (abs($ansvec[1]-($vecs[$i][2] - $vecs[$i][0]))>$defpttol*$reltolerance) {
@@ -1075,6 +1133,30 @@ class DrawingScorePart implements ScorePart
                         }
                         $scores[$key] = 1;
                         break;
+                    }
+                }
+            }
+            // check rellengths
+            if ($scoremethod == 'relativelength' && count($rellengths) > 1) {
+                // want to make sure all rellengths values are the same (within reasonable tolerance)
+                asort($rellengths);
+                $lastval = -1;
+                $freqs = [];
+                foreach ($rellengths as $k=>$v) {
+                    if (($v==0 && $lastval==0) || ($lastval>0 && abs($v-$lastval)/$lastval<.001)) {
+                        $freqs[$lastval]++;
+                    } else {
+                        $freqs[$v] = 1;
+                        $lastval = $v;
+                    }
+                }
+                if (count($freqs)>1) { // one different than others
+                    arsort($freqs);
+                    $bestlen = array_key_first($freqs);
+                    foreach ($rellengths as $k=>$v) {
+                        if ($v != $bestlen) {
+                            $scores[$k] = 0;
+                        }
                     }
                 }
             }
@@ -1897,10 +1979,8 @@ class DrawingScorePart implements ScorePart
             }
         }
         $totscore = 0;
-        $pcnt = 0;
         foreach ($scores as $key=>$score) {
-            $totscore += $score*$partweights[$pcnt];
-            $pcnt++;
+            $totscore += $score*$partweights[$key];
         }
         if ($extrastuffpenalty>0) {
             $totscore = max($totscore*(1-$extrastuffpenalty),0);

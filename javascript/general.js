@@ -90,11 +90,11 @@ function tipshow(el,tip, e) {
 		return;
 	}
 	if (typeof tipobj!= 'object') {
-        tipobj = document.createElement("div");
-        if (window.imathasAssess) {
+		tipobj = document.createElement("div");
+        if (typeof window.imathasAssess != 'undefined') {
             tipobj.className = "dropdown-pane tooltip-pane";
         } else {
-            tipobj.className = "tips";
+		tipobj.className = "tips";
         }
 		tipobj.setAttribute("role","tooltip");
 		tipobj.id = "hovertipsholder";
@@ -308,7 +308,7 @@ function GB_resize(e) {
 
 	gbwin.css("width", Math.max(0,gbwin.data("original_w") + dx))
 	 .css("height", Math.max(0,gbwin.data("original_h") + dy));
-	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - 36);
+	$("#GB_frameholder").css("height", Math.max(0,gbwin.data("original_h") + dy) - gbwin.data("footer_h"));
 }
 function GB_endresize(e) {
 	jQuery(window).off("touchmove.GBresize touchend.GBresize mousemove.GBresize mouseup.GBresize");
@@ -317,7 +317,14 @@ function GB_endresize(e) {
 }
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
+var GB_sourceel = null;
 function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
+    if (document.activeElement) {
+        GB_sourceel = document.activeElement;
+        if ($(GB_sourceel).closest(".dropdown-menu").length > 0) {
+            GB_sourceel = $(GB_sourceel).closest(".dropdown").find("a,button")[0];
+        }
+    }
     posstyle = posstyle || '';
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
@@ -329,7 +336,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		gb_window.setAttribute("aria-labelledby","GB_title");
 		gb_window.setAttribute("tabindex",-1);
 		gb_window.id = "GB_window";
-		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_resizehandle"></div>';
+		gb_window.innerHTML = '<div id="GB_caption"></div><div id="GB_loading">Loading...</div><div id="GB_frameholder" ></div><div id="GB_footer"></div><div id="GB_resizehandle"></div>';
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
 		GB_loaded  = true;
 		jQuery("#GB_caption").on('mousedown touchstart', function(e) {
@@ -370,7 +377,8 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 			  .css("top", gbwin.getBoundingClientRect().top)
 			  .css("margin", 0).css("right","")
 			  .data("original_w", $(gbwin).width())
-			  .data("original_h", $(gbwin).height())
+              .data("original_h", $(gbwin).height())
+              .data("footer_h", $("#GB_footer:visible").outerHeight() + $("#GB_caption").outerHeight())
 			  .data("original_mouse_x", (e.type=='touchstart')?touch.pageX:e.pageX)
 			  .data("original_mouse_y", (e.type=='touchstart')?touch.pageY:e.pageY);
 
@@ -385,7 +393,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 				 .on('mouseup.GBresize', GB_endresize);
 			}
 		});
-    }
+	}
     document.getElementById("GB_loading").style.display = "block";
 	if (url.charAt(0)=='<') {
 		document.getElementById("GB_frameholder").innerHTML = '<div>'+url+'</div>';
@@ -400,32 +408,38 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
 	} else {
         document.getElementById("GB_loading").style.display = 'none';
-    }
-	jQuery("#GB_frameholder").isolatedScroll();
+	}
+    jQuery("#GB_frameholder").isolatedScroll();
+    document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 	if (url.match(/libtree/)) {
-		var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
-		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
-		document.getElementById("GB_caption").innerHTML = btnhtml;
+		//var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
+		//btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
+       // document.getElementById("GB_caption").innerHTML = btnhtml;
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setlib()">Use Libraries</button> <button type=button onclick="GB_hide()">Close</button>';
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else if (url.match(/assessselect/)) {
-		var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
-		btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
-		document.getElementById("GB_caption").innerHTML = btnhtml;
+		//var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
+		//btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
+       // document.getElementById("GB_caption").innerHTML = btnhtml;
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setassess()">Use Assessments</button> <button type=button onclick="GB_hide()">Close</button>';
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else {
-		document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
+        document.getElementById("GB_footer").innerHTML = '<button type=button class="primary" onclick="GB_hide()">Close</button>';
 		document.getElementById("GB_caption").onclick = GB_hide;
 		if (height=='auto') {
-            var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+			var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 		} else {
 			var h = height;
 		}
-	}
-    document.getElementById("GB_window").style.display = "block";
+    }
+	document.getElementById("GB_window").style.display = "block";
     if (overlay !== false) {
         document.getElementById("GB_overlay").style.display = "block";
+        document.getElementById("GB_footer").style.display = "block";
+        document.getElementsByTagName("body")[0].style.overflow = "hidden";
     } else {
         document.getElementById("GB_overlay").style.display = "none";
+        document.getElementById("GB_footer").style.display = "none";
     }
 
 	//var de = document.documentElement;
@@ -433,7 +447,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
 	var w = $(document).width();
 	if (width > w-20) {
 		width = w-20;
-    }
+	}
     if (!posstyle.match(/noreset/) || 
         !jQuery("#GB_window").data("original_mouse_x") || 
         document.getElementById("GB_window").style.left==''
@@ -466,30 +480,54 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
             document.getElementById("GB_window").style.width = width + "px";
         }
         
-        document.getElementById("GB_window").style.height = (h-30) + "px";
-        //document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
-        if (url.charAt(0)!='<') {
-            document.getElementById("GB_frameholder").style.height = (h - 30 -36)+"px";
-        } else {
-            document.getElementById("GB_frameholder").style.height = "auto";
-        }
+	document.getElementById("GB_window").style.height = (h-30) + "px";
+	//document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
+	if (url.charAt(0)!='<') {
+        var capheight = $("#GB_caption").outerHeight();
+        var footheight = $("#GB_footer:visible").outerHeight();
+        document.getElementById("GB_frameholder").style.height = 
+            (h - 30 - capheight - footheight)+"px";
+	} else {
+		document.getElementById("GB_frameholder").style.height = "auto";
+	}
     }
-	document.getElementById("GB_window").focus();
 	$(document).on('keydown.GB', function(evt) {
 		if (evt.keyCode == 27) {
 			GB_hide();
-		}
-	});
+		} else if (evt.keyCode == 9 && overlay !== false) {
+            GB_retainfocus(evt);
+        }
+    });
+    document.getElementById("GB_window").focus();
 }
 function GB_doneload() {
 	document.getElementById("GB_loading").style.display = "none";
 }
 function GB_hide() {
-	document.getElementById("GB_window").style.display = "none";
+    document.getElementById("GB_window").style.display = "none";
 	if (document.getElementById("GB_overlay")) {
-		document.getElementById("GB_overlay").style.display = "none";
+        document.getElementById("GB_overlay").style.display = "none";
+        document.getElementsByTagName("body")[0].style.overflow = "";
 	}
-	$(document).off('keydown.GB');
+    $(document).off('keydown.GB');
+    if (GB_sourceel) {
+        GB_sourceel.focus();
+    }
+    GB_sourceel = null;
+}
+
+function GB_retainfocus(evt) {
+    if (!document.getElementById("GB_window").contains(document.activeElement)) {
+        $("#GB_window").find("a,button,input").first().focus();
+    } else {
+        if (evt.shiftKey && $("#GB_window").find("a,button,input").first()[0] == document.activeElement) {
+            $("#GB_window").find("a,button,input").last().focus();
+            evt.preventDefault();
+        } else if (!evt.shiftKey && $("#GB_window").find("a,button,input").last()[0] == document.activeElement) {
+            $("#GB_window").find("a,button,input").first().focus();
+            evt.preventDefault();
+        }
+    }
 }
 
 function chkAllNone(frmid, arr, mark, skip) {
@@ -530,7 +568,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			"lists advlist autolink attach image charmap anchor",
 			"searchreplace code link textcolor snippet",
 			"media table paste rollups colorpicker"
-        ],
+		],
         external_plugins: {
             "asciimath": imasroot+'/tinymce4/plugins/asciimath/plugin.min.js',
             "asciisvg": imasroot+'/tinymce4/plugins/asciisvg/plugin.min.js'
@@ -558,7 +596,7 @@ function initeditor(edmode,edids,css,inline,setupfunction){
 			{title:"Gridded", value:"gridded"},
 			{title:"Gridded Centered", value:"gridded centered"}],
 		style_formats_merge: true,
-        snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
+		snippets: (tinymceUseSnippets==1)?imasroot+'/tinymce4/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
 		style_formats: [{
 			title: "Font Family",
@@ -695,13 +733,24 @@ function recclick(type,typeid,info,txt) {
 		var extradata = '',m;
 		if ((m = window.location.href.match(/showlinkedtext.*?&id=(\d+)/)) !== null && recordedunload==false) {
 			extradata = '&unloadinglinked='+m[1];
-			recordedunload = true;
-		}
-		jQuery.ajax({
-			type: "POST",
-			url: imasroot+'/course/rectrack.php?cid='+cid,
-			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
-		});
+            recordedunload = true;
+        }
+        if (navigator.sendBeacon) {
+            var fd = new FormData();
+            fd.append('type', type);
+            fd.append('typeid', typeid);
+            fd.append('info',info+'::'+txt);
+            if (extradata != '') {
+                fd.append('unloadinglinked', m[1]);
+            }
+            navigator.sendBeacon(imasroot+'/course/rectrack.php?cid='+cid, fd);
+        } else {
+            jQuery.ajax({
+                type: "POST",
+                url: imasroot+'/course/rectrack.php?cid='+cid,
+                data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
+            });
+        }
 	}
 }
 function setuptracklinks(i,el) {
@@ -781,7 +830,7 @@ function togglevideoembed() {
 			timeref += '&end='+m[1];
 		}
 		timeref += '&enablejsapi=1';
-        var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
+		var loc_protocol = location.protocol == 'https:' ? 'https:' : 'http:';
         var viframe = jQuery('<iframe/>', {
 			id: 'videoiframe'+id,
 			width: 640,
@@ -942,7 +991,7 @@ jQuery(function() {
 				el.setAttribute('action', el.getAttribute('action') + '&btf='+btf);
 			}
 		}
-	});
+    });
 });
 
 function convertheic(href, divid) {
@@ -963,9 +1012,6 @@ function convertheic(href, divid) {
 function addNoopener(i,el) {
 	if (!el.rel && el.target && el.host !== window.location.host) {
 		el.setAttribute("rel", "noopener noreferrer");
-	}
-	if (el.target && jQuery(el).find('.openext').length == 0) {
-		jQuery(el).append('<span class="sr-only openext">Opens externally</span>');
 	}
 }
 function addBlankTarget(i,el) {
@@ -1084,7 +1130,10 @@ jQuery(document).ready(function($) {
 		if (typeof e.originalEvent.data=='string' && e.originalEvent.data.match(/lti\.frameResize/)) {
 			var edata = JSON.parse(e.originalEvent.data);
 			if ("frame_id" in edata) {
-				$("#"+edata["frame_id"]).height(edata.height);
+                $("#"+edata["frame_id"]).height(edata.height);
+                if (edata.wrapheight) {
+                    $("#"+edata["frame_id"]+"wrap").height(edata.wrapheight);
+                }
 			} else if ("iframe_resize_id" in edata) {
 				$("#"+edata["iframe_resize_id"]).height(edata.height);
 			} else {
@@ -1129,7 +1178,7 @@ function initlinkmarkup(base) {
 	$(base).find("a.attach").not('.textsegment a,.mce-content-body a').not(".prepped").each(setuppreviewembeds);
 	setupToggler(base);
 	setupToggler2(base);
-    $(base).fitVids();
+	$(base).fitVids();
     resizeResponsiveIframes(base, true);
 }
 
@@ -1145,8 +1194,28 @@ function resizeResponsiveIframes(base, init) {
     });
 }
 jQuery(document).ready(function($) {
-    initlinkmarkup('body');
+	initlinkmarkup('body');
     $(window).on('resize', function () {resizeResponsiveIframes('body');});
+});
+
+jQuery(function($) {
+	$("#ltimenubutton").on('click', function() {
+		var btn = $("#ltimenubutton");
+		if (!btn.attr("data-loaded")) {
+			$.ajax({
+					type: "GET",
+					url: imasroot+'/lti/ltimenu.php?launchid=' +
+						encodeURIComponent(window.sessionStorage.getItem('LTI1p3_launchid'))
+			}).done(function(msg) {
+				$("#ltimenudiv").html(msg);
+                btn.attr("data-loaded",1);
+                document.cookie = "fromltimenu=1;" 
+                    + 'path=' + ((imasroot=='') ? '/' : imasroot) + ';'
+                    + ((window.location.protocol=='https:') ? "secure; samesite=none" : "");
+				sendLTIresizemsg();
+			});
+		}
+	});
 });
 
 jQuery.fn.isolatedScroll = function() {
@@ -1435,7 +1504,7 @@ jQuery(document).ready(function($) {
 });
 var sagecellcounter = 0;
 function initSageCell(base) {
-	jQuery(base).find(".converttosagecell").each(function() {
+	jQuery(base).find(".converttosagecell:visible").each(function() {
 		var ta, code;
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
@@ -1510,160 +1579,160 @@ function setActiveTab(el) {
 
 
 +function ($) {
-    'use strict';
-  
-    // DROPDOWN CLASS DEFINITION
-    // =========================
-  
-    var backdrop = '.dropdown-backdrop'
-    var toggle   = '[data-toggle="dropdown"]'
-    var Dropdown = function (element) {
-      $(element).on('click.bs.dropdown', this.toggle)
-    }
-  
+  'use strict';
+
+  // DROPDOWN CLASS DEFINITION
+  // =========================
+
+  var backdrop = '.dropdown-backdrop'
+  var toggle   = '[data-toggle="dropdown"]'
+  var Dropdown = function (element) {
+    $(element).on('click.bs.dropdown', this.toggle)
+  }
+
     Dropdown.VERSION = '3.4.1'
-  
-    function getParent($this) {
-      var selector = $this.attr('data-target')
-  
-      if (!selector) {
-        selector = $this.attr('href')
-        selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
-      }
-  
+
+  function getParent($this) {
+    var selector = $this.attr('data-target')
+
+    if (!selector) {
+      selector = $this.attr('href')
+      selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    }
+
       var $parent = selector !== '#' ? $(document).find(selector) : null
-  
-      return $parent && $parent.length ? $parent : $this.parent()
-    }
-  
-    function clearMenus(e) {
-      if (e && e.which === 3) return
-      $(backdrop).remove()
-      $(toggle).each(function () {
-        var $this         = $(this)
-        var $parent       = getParent($this)
-        var relatedTarget = { relatedTarget: this }
-  
-        if (!$parent.hasClass('open')) return
-  
-        if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
-  
-        $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
-  
-        if (e.isDefaultPrevented()) return
-  
-        $this.attr('aria-expanded', 'false')
+
+    return $parent && $parent.length ? $parent : $this.parent()
+  }
+
+  function clearMenus(e) {
+    if (e && e.which === 3) return
+    $(backdrop).remove()
+    $(toggle).each(function () {
+      var $this         = $(this)
+      var $parent       = getParent($this)
+      var relatedTarget = { relatedTarget: this }
+
+      if (!$parent.hasClass('open')) return
+
+      if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+
+      $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this.attr('aria-expanded', 'false')
         $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
-      })
-    }
-  
-    Dropdown.prototype.toggle = function (e) {
-      var $this = $(this)
-      if ($this.is('.disabled, :disabled')) return
-  
-      var $parent  = getParent($this)
-      var isActive = $parent.hasClass('open')
-  
-      clearMenus()
-  
-      if (!isActive) {
-        if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
-          // if mobile we use a backdrop because click events don't delegate
-          $(document.createElement('div'))
-            .addClass('dropdown-backdrop')
-            .insertAfter($(this))
-            .on('click', clearMenus)
-        }
-  
-        var relatedTarget = { relatedTarget: this }
-        $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
-  
-        if (e.isDefaultPrevented()) return
-  
-        $this
-          .trigger('focus')
-          .attr('aria-expanded', 'true')
-  
-        $parent
-          .toggleClass('open')
+    })
+  }
+
+  Dropdown.prototype.toggle = function (e) {
+    var $this = $(this)
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    clearMenus()
+
+    if (!isActive) {
+      if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+        // if mobile we use a backdrop because click events don't delegate
+        $(document.createElement('div'))
+          .addClass('dropdown-backdrop')
+          .insertAfter($(this))
+          .on('click', clearMenus)
+      }
+
+      var relatedTarget = { relatedTarget: this }
+      $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this
+        .trigger('focus')
+        .attr('aria-expanded', 'true')
+
+      $parent
+        .toggleClass('open')
           .trigger($.Event('shown.bs.dropdown', relatedTarget))
-      }
-  
-      return false
     }
-  
-    Dropdown.prototype.keydown = function (e) {
-      if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
-  
-      var $this = $(this)
-  
-      e.preventDefault()
-      e.stopPropagation()
-  
-      if ($this.is('.disabled, :disabled')) return
-  
-      var $parent  = getParent($this)
-      var isActive = $parent.hasClass('open')
-  
-      if (!isActive && e.which != 27 || isActive && e.which == 27) {
-        if (e.which == 27) $parent.find(toggle).trigger('focus')
-        return $this.trigger('click')
-      }
-  
-      var desc = ' li:not(.disabled):visible a'
+
+    return false
+  }
+
+  Dropdown.prototype.keydown = function (e) {
+    if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+
+    var $this = $(this)
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    if (!isActive && e.which != 27 || isActive && e.which == 27) {
+      if (e.which == 27) $parent.find(toggle).trigger('focus')
+      return $this.trigger('click')
+    }
+
+    var desc = ' li:not(.disabled):visible a'
       var $items = $this.next('.dropdown-menu' + desc);
       if (!$items.length) {
         $items = $parent.find('.dropdown-menu' + desc);
       }
-  
-      if (!$items.length) return
-  
-      var index = $items.index(e.target)
-  
-      if (e.which == 38 && index > 0)                 index--         // up
-      if (e.which == 40 && index < $items.length - 1) index++         // down
-      if (!~index)                                    index = 0
-  
-      $items.eq(index).trigger('focus')
-    }
-  
-  
-    // DROPDOWN PLUGIN DEFINITION
-    // ==========================
-  
-    function Plugin(option) {
-      return this.each(function () {
-        var $this = $(this)
-        var data  = $this.data('bs.dropdown')
-  
-        if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
-        if (typeof option == 'string') data[option].call($this)
-      })
-    }
-  
-    var old = $.fn.dropdown
-  
-    $.fn.dropdown             = Plugin
-    $.fn.dropdown.Constructor = Dropdown
-  
-  
-    // DROPDOWN NO CONFLICT
-    // ====================
-  
-    $.fn.dropdown.noConflict = function () {
-      $.fn.dropdown = old
-      return this
-    }
-  
-  
-    // APPLY TO STANDARD DROPDOWN ELEMENTS
-    // ===================================
-  
-    $(document)
-      .on('click.bs.dropdown.data-api', clearMenus)
-      .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-      .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
-      .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
-      .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
-  
-  }(jQuery);
+
+    if (!$items.length) return
+
+    var index = $items.index(e.target)
+
+    if (e.which == 38 && index > 0)                 index--         // up
+    if (e.which == 40 && index < $items.length - 1) index++         // down
+    if (!~index)                                    index = 0
+
+    $items.eq(index).trigger('focus')
+  }
+
+
+  // DROPDOWN PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this = $(this)
+      var data  = $this.data('bs.dropdown')
+
+      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+      if (typeof option == 'string') data[option].call($this)
+    })
+  }
+
+  var old = $.fn.dropdown
+
+  $.fn.dropdown             = Plugin
+  $.fn.dropdown.Constructor = Dropdown
+
+
+  // DROPDOWN NO CONFLICT
+  // ====================
+
+  $.fn.dropdown.noConflict = function () {
+    $.fn.dropdown = old
+    return this
+  }
+
+
+  // APPLY TO STANDARD DROPDOWN ELEMENTS
+  // ===================================
+
+  $(document)
+    .on('click.bs.dropdown.data-api', clearMenus)
+    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+    .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
+    .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+}(jQuery);

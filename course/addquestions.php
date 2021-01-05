@@ -14,12 +14,15 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = _("Add/Remove Questions");
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" . Sanitize::courseId($_GET['cid']) . "\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_GET['withdraw'])) {
-	$curBreadcrumb .= "&gt; <a href=\"addquestions.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">"._("Add/Remove Questions")."</a> &gt; Confirm\n";
+	$curBreadcrumb .= " <a href=\"addquestions.php?cid=" . Sanitize::courseId($_GET['cid']) . "&aid=" . Sanitize::onlyInt($_GET['aid']) . "\">"._("Add/Remove Questions")."</a> &gt; Confirm\n";
 	//$pagetitle = "Modify Inline Text";
 } else {
-	$curBreadcrumb .= "&gt; "._("Add/Remove Questions")."\n";
+	$curBreadcrumb .= _("Add/Remove Questions")."\n";
 	//$pagetitle = "Add Inline Text";
 }
 
@@ -46,7 +49,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
     $aver = $row['ver'];
     $submitby = $row['submitby'];
-	$modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
+    $modquestion = ($aver > 1) ? 'modquestion2' : 'modquestion';
+    
+    if ($aver > 1) {
+		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
+		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	} else {
+		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	}
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+	if ($stm->rowCount() > 0) {
+		$beentaken = true;
+	} else {
+		$beentaken = false;
+	}
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
@@ -57,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 
-	if (isset($teacherid) && isset($_GET['addset'])) {
+	if (isset($teacherid) && isset($_GET['addset']) && !$beentaken) {
 		if (!isset($_POST['nchecked']) && !isset($_POST['qsetids'])) {
 			$overwriteBody = 1;
 			$body = _("No questions selected").".  <a href=\"addquestions.php?cid=$cid&aid=$aid\">"._("Go back")."</a>\n";
@@ -155,9 +173,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 				$stm->execute(array(':assessmentid'=>$aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			    $grades[$row['userid']]=$row["score"];
-				}
-				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+			        $grades[$row['userid']]=$row["score"];
+                }
+                // clear out time limit extensions
+                $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
+                $stm->execute(array($aid));
+                
+                $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+
 			} else {
 				$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
         $stm->execute(array(':assessmentid'=>$aid));
@@ -460,7 +483,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var assessver = '$aver';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addquestions.js?v=042220\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=090220\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort.js?v=100820\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -471,20 +494,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//load filter.  Need earlier than usual header.php load
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/../filter/filter.php");
-	if ($aver > 1) {
-		$query = "SELECT iar.userid FROM imas_assessment_records AS iar,imas_students WHERE ";
-		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
-	} else {
-		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
-	}
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
-	if ($stm->rowCount() > 0) {
-		$beentaken = true;
-	} else {
-		$beentaken = false;
-	}
+	
 	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef,$showworkdef,$assessintro) = $stm->fetch(PDO::FETCH_NUM);
@@ -1321,7 +1331,7 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<p>
-		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
+		<a class="abutton" href="course.php?cid=<?php echo $cid ?>" onclick="return prePageChange()"><?php echo _("Done"); ?></a>
 		<button type="button" title=<?php echo '"'._("Preview this assessment").'"'; ?> onClick="window.open('<?php
 			if ($aver > 1) {
 				echo $imasroot . '/assess2/?cid=' . $cid . '&aid=' . $aid;

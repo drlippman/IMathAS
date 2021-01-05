@@ -310,17 +310,20 @@ function disableInputs(qn, disabled) {
      var regex = new RegExp('^(qn|tc|qs)(' + qn + '\\b|' + (qn + 1) + '\\d{3})');
      window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
        if (el.name.match(regex)) {
-         valstr = window.imathasAssess.preSubmit(el.name.substr(2));
-         if (valstr !== false) {
-           if (forbackground) {
-             data.append(el.name + '-val', valstr);
-           } else {
-             $('#questionwrap' + qn).append($('<input>', {
-               type: 'hidden',
-               name: el.name + '-val',
-               value: valstr
-             }));
-           }
+         var namepts = el.name.split(/-/);
+         if (namepts.length == 1 || namepts[1] == '0') {
+            valstr = window.imathasAssess.preSubmit(namepts[0].substr(2));
+            if (valstr !== false) {
+                if (forbackground) {
+                    data.append(namepts[0] + '-val', valstr);
+                } else {
+                    $('#questionwrap' + qn).append($('<input>', {
+                    type: 'hidden',
+                    name: namepts[0] + '-val',
+                    value: valstr
+                    }));
+                }
+            }
          }
          if ((el.type !== 'radio' && el.type !== 'checkbox') || el.checked) {
            if (el.type === 'file' && el.files.length > 0) {

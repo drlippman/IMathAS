@@ -319,7 +319,7 @@ class MathParser
         continue;
       } else if (ctype_digit($c) || $c=='.') {
         // if it's a number/decimal value
-        preg_match('/^(\d*\.?\d*(E-?\d+)?)/', substr($str,$n), $matches);
+        preg_match('/^(\d*\.?\d*(E\+?-?\d+)?)/', substr($str,$n), $matches);
         $tokens[] = [
           'type'=>'number',
           'symbol'=> $matches[1]

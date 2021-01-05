@@ -86,9 +86,6 @@ class FunctionExpressionAnswerBox implements AnswerBox
     				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
     			}
     		}
-    		if (($v = array_search('E', $variables))!==false) {
-    			$variables[$v] = 'varE';
-    		}
 
     		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
     		if (count($fromto)==1) {$fromto[0]=-10; $fromto[1]=10;}
@@ -172,7 +169,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
     			$greekletters = array('alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega');
 
     			for ($i = 0; $i < count($variables); $i++) {
-    				if (strlen($variables[$i])>1 && $variables[$i]!='varE') {
+    				if (strlen($variables[$i])>1) {
     					$isgreek = false;
     					$varlower = strtolower($variables[$i]);
     					for ($j = 0; $j< count($greekletters);$j++) {
@@ -194,7 +191,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
                 if ($chg) {
                   $sa = str_replace($matches[0], $matches[1].'_'.$matches[2], $sa);
                 }
-    					} else if (!$isgreek && $variables[$i]!='varE') {
+    					} else if (!$isgreek) {
     						$sa = str_replace($variables[$i], '"'.$variables[$i].'"', $sa);
     					}
     				}

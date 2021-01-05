@@ -2174,7 +2174,8 @@ function isBlank(str) {
 }
 
 function editdebit(el) {
-	var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && descr.hasClass("iscredit")) {
 		if (descr.is('select')) {
 			descr.css('margin-right',20);
@@ -2186,7 +2187,8 @@ function editdebit(el) {
 	}
 }
 function editcredit(el) {
-	var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && !descr.hasClass("iscredit")) {
 		if (descr.is('select')) {
 			descr.css('margin-right',0);
@@ -2200,7 +2202,8 @@ function editcredit(el) {
 function initcreditboxes() {
 	$('.creditbox').each(function(i, el) {
 		if (!isBlank(el.value) && $(el).css('padding-left')!=20) {
-			var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+			//var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+			var descr = $(el).closest('tr').find("input").first();
 			if (descr.is('select')) {
 				descr.css('margin-right',0);
 			} else {

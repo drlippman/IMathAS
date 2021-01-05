@@ -50,7 +50,6 @@ class CalculatedScorePart implements ScorePart
         $answer = normalizemathunicode($answer);
         $ansformats = array_map('trim',explode(',',$answerformat));
 
-
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
             if ($givenans === 'DNE' || $givenans === 'oo') {
@@ -190,6 +189,13 @@ class CalculatedScorePart implements ScorePart
                     if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
                         $numvalarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                     } else {
+                        if ($v[strlen($v)-1]=='%') {//single percent
+                            $val = substr($v,0,-1);
+                            if (is_numeric($val)) { // if is number%, eval
+                                $numvalarr[$j] = $val/100;
+                                continue;
+                            }
+                        }
                         $numvalarr[$j] = evalMathParser($v);
                         if (!is_finite($numvalarr[$j])) {
                           $numvalarr[$j] = '';

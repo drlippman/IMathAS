@@ -29,7 +29,7 @@
       </div>
       <timer
         v-if = "timelimit > 0 && starttime > 0"
-        :end = "starttime + timelimit"
+        :end = "1000*(starttime + timelimit)"
         :total = "timelimit"
       />
     </div>

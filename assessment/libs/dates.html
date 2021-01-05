@@ -1,0 +1,56 @@
+<html><body>
+<h1>Macro Library dates</h1>
+&nbsp;A library of Date Functions. Version 1. Dec 17, 2020
+<BR>&nbsp;Author: Daniel Brown: CU Boulder - Leeds School of Business
+<BR><ul>
+<p> The following library allows you to manipulate dates in your question. It is often desireable to have questions that 
+use the current date and then some days or months into the future.</p>
+<p>It takes advantage of PHP date formatting. A reference to the available formatting codes can be found  
+<a href="https://www.php.net/manual/en/datetime.formats.date.php">here</a>. A few useful formats include 'd-M-Y' for dates 
+like 4-Mar-2020 or 'F j, Y' for dates like March 4, 2020. The date format is optional and if left out will default to 'F j, Y'.
+The intention is that you will select a preferred date format and then pass that consistently to all functions. Finally, the 
+function formatDate can be used to get useful information from the date. For example, $today=today('d-M-Y') can be used to 
+retreive today's date. $weekday = formatDate($today,"l") will retrieve the day of the week. $month = formatDate($today,"F") will 
+retrive the name of the month. </p>
+<p>The question 601187 tests this macro library. If you make changes to the library please modify the test question to incorporate
+your changes and run to make sure that nothing is broken.</p>
+<ul>
+<li><a href="#dates_adddays">dates_adddays</a></li>
+<li><a href="#dates_addweeks">dates_addweeks</a></li>
+<li><a href="#dates_addmonths">dates_addmonths</a></li>
+<li><a href="#dates_addyears">dates_addyears</a></li>
+<li><a href="#dates_bomonth">dates_bomonth</a></li>
+<li><a href="#dates_eomonth">dates_eomonth</a></li>
+<li><a href="#dates_diffdays">dates_diffdays</a></li>
+<li><a href="#dates_randdate">dates_randdate</a></li>
+<li><a href="#dates_formatdate">dates_formatdate</a></li>
+</ul>
+<h4><a name="dates_adddays">dates_adddays</a></h4>
+<p>function dates_adddays(date,days,format)</p>
+<p>Adds days to the given date. Input and output dates are formatted with the given format.</p>
+<h4><a name="dates_addweeks">dates_addweeks</a></h4>
+<p>function dates_addmonths(date,weeks,format)</p>
+<p>Adds weeks to the given date. Input and output dates are formatted with the given format.</p>
+<h4><a name="dates_addmonths">dates_addmonths</a></h4>
+<p>function dates_addmonths(date,months,format)</p>
+<p>Adds months to the given date. Input and output dates are formatted with the given format.</p>
+<h4><a name="dates_addyears">dates_addyears</a></h4>
+<p>function dates_addyears(date,years,format)</p>
+<p>Adds years to the given date. Input and output dates are formatted with the given format.</p>
+<h4><a name="dates_bomonth">dates_bomonth</a></h4>
+<p>function dates_bomonth(date,format)</p>
+<p>Returns the first day of the month for the given date. Input and output dates are formatted with the given format.</p>
+<h4><a name="dates_eomonth">dates_eomonth</a></h4>
+<p>function dates_eomonth(date,format)</p>
+<p>Returns the last day of the month for the given date. Input and output dates are formatted with the given format.</p>
+<h4><a name="dates_diffdays">dates_diffdays</a></h4>
+<p>function dates_diffdays(date1,date2,format)</p>
+<p>Returns the number of days between date1 and date2. If date1 is after date2 then this will return a negative number.
+ Input dates are formatted with the given format. This function will truncate the time from the dates when taking the difference. For example,
+  today at 23:30 is one day from tomorrow at 01:30.</p>
+<h4><a name="dates_randdate">dates_randdate</a></h4>
+<p>function dates_randdate(date1,date2,format)</p>
+<p>Returns a random date between date1 and date2. Input dates are formatted with the given format.</p>
+<h4><a name="dates_formatDate">dates_formatDate</a></h4>
+<p>function dates_formatDate(date1,origFormat,newFormat)</p>
+<p>Returns a date formatted with a new format.</p>

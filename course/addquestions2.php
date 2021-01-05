@@ -50,6 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $defpoints = $row['defpoints'];
     $assessmentname = $row['name'];
     $displaymethod = $row['displaymethod'];
+    $row['showwork'] = ($row['showwork'] & 3);
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
 	if (isset($_GET['selfrom'])) {
@@ -159,7 +160,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm->execute(array(':assessmentid'=>$aid));
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			    $grades[$row['userid']]=$row["score"];
-				}
+                }
+                // clear out time limit extensions
+                $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
+                $stm->execute(array($aid));
+                
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 			} else {
 				$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -378,9 +383,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=090320\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=100820\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=092820\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
     $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=092020\" type=\"text/css\" />";
     $placeinhead .= '<script>
@@ -595,7 +601,7 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<p>
-		<a class="abutton" href="course.php?cid=<?php echo $cid ?>"><?php echo _("Done"); ?></a>
+		<a class="abutton" href="course.php?cid=<?php echo $cid ?>" onclick="return prePageChange()"><?php echo _("Done"); ?></a>
 		<button type="button" title=<?php echo '"'._("Preview this assessment").'"'; ?> onClick="window.open('<?php
 			if ($aver > 1) {
 				echo $imasroot . '/assess2/?cid=' . $cid . '&aid=' . $aid;
@@ -657,15 +663,15 @@ if ($overwriteBody==1) {
 
             <div class="dropdown-menu dropdown-menu-right advsearch">
                 <form class="mform" id="advsearchform">
-                    <div><label><?php echo _('Has words');?>:</label> 
+                    <div><label for="search-words"><?php echo _('Has words');?>:</label>
                         <input id="search-words"/></div>
-                    <div><label><?php echo _('Doesn\'t have');?>:</label> 
+                    <div><label for="search-exclude"><?php echo _('Doesn\'t have');?>:</label> 
                         <input id="search-exclude"/></div>
-                    <div><label><?php echo _('Author');?>:</label> 
+                    <div><label for="search-author"><?php echo _('Author');?>:</label> 
                         <input id="search-author"/></div>
-                    <div><label><?php echo _('ID');?>:</label> 
+                    <div><label for="search-id"><?php echo _('ID');?>:</label> 
                         <input id="search-id"></div>
-                    <div><label><?php echo _('Type');?>:</label> 
+                    <div><label for="search-type"><?php echo _('Type');?>:</label> 
                         <select id="search-type">
                             <option value=""><?php echo _('All');?></option>
                             <option value="number">Number</option>
@@ -689,11 +695,24 @@ if ($overwriteBody==1) {
                             <option value="multipart">Multipart</option>
                             <option value="conditional">Conditional</option>
                         </select></div>
-                    <div><label><?php echo _('Avg Time');?>:</label> <div>
+                    <div><label for="search-avgtime-min"><?php echo _('Avg Time');?>:</label> <div>
                         <input size=2 id="search-avgtime-min"> to <input size=2 id="search-avgtime-max">
                     </div></div>
-                    <p><input type=checkbox id="search-mine"><?php echo _('Mine Only');?> 
-                        <input type=checkbox id="search-unused"><?php echo _('Exclude Added');?>
+                    <div><label for="search-avgscore-min"><?php echo _('Avg Score');?>:</label> <div>
+                        <input size=2 id="search-avgscore-min">% to <input size=2 id="search-avgscore-max">%
+                    </div></div>
+                    <div><label for="search-lastmod-min"><?php echo _('Last Modified');?>:</label> <div>
+                        <input size=8 id="search-lastmod-min" name="search-lastmod-min">
+                        <a href="#" onClick="displayDatePicker('search-lastmod-min', this); return false">
+			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+                        to 
+                        <input size=8 id="search-lastmod-max" name="search-lastmod-max">
+                        <a href="#" onClick="displayDatePicker('search-lastmod-max', this); return false">
+			            <img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
+                    </div></div>
+                    <p><label><input type=checkbox id="search-mine"><?php echo _('Mine Only');?></label> 
+                        <label><input type=checkbox id="search-unused"><?php echo _('Exclude Added');?></label> 
+                        <label><input type=checkbox id="search-newest"><?php echo _('Newest First');?></label> 
                     </p>
                     <p><?php echo _('Helps');?>: 
                         <label><input type=checkbox id="search-res-help" value="help"><?php echo _('Resource');?></label> 

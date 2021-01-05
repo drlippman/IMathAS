@@ -29,7 +29,6 @@
           @workchanged = "workChanged(curqn, ...arguments)"
         />
         <div v-else>
-          {{ $t("question.showwork") }}
           <showwork-input
             :id="'sw' + curqn"
             :value = "question.work"

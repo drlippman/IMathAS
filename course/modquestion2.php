@@ -235,7 +235,8 @@ if (!(isset($teacherid))) {
 		$query .= "WHERE id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$aid));
-		$defaults = $stm->fetch(PDO::FETCH_ASSOC);
+        $defaults = $stm->fetch(PDO::FETCH_ASSOC);
+        $defaults['showwork'] = ($defaults['showwork'] & 3);
 
 		if ($defaults['defpenalty']{0}==='S') {
 			$defaults['penalty'] = sprintf(_('%d%% after %d full-credit tries'),

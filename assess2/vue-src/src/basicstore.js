@@ -592,6 +592,12 @@ export const actions = {
     }
   },
   doAutosave (qn, partnum, timeactive) {
+    if (store.inTransit) {
+      // wait until not in transit; don't want to add to autosavequeue then
+      // have queue cleared when intransit returns
+      window.setTimeout(() => this.doAutosave(qn, partnum, timeactive), 20);
+      return;
+    }
     store.somethingDirty = false;
     // this.clearAutosaveTimer()
     if (!store.autosaveQueue.hasOwnProperty(qn)) {
@@ -738,7 +744,12 @@ export const actions = {
           }
           return;
         }
-        this.markAutosavesDone();
+        if (response.autosave === 'done') {
+          this.markAutosavesDone();
+          delete response.autosave;
+        }
+        response = this.processSettings(response);
+        this.copySettings(response);
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -1247,6 +1258,8 @@ export const actions = {
         store.timelimit_restricted = 1;
       } else if (data.enddate_in < data.timelimit + data.overtime_grace) {
         store.timelimit_restricted = 2;
+      } else {
+        store.timelimit_restricted = 0;
       }
     }
     if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')) {

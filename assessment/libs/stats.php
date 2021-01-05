@@ -9,7 +9,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink","modes","forceonemode","dotplot");
+ "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv");
 
 //nCr(n,r)
 //The Choose function
@@ -861,10 +861,10 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
     if ($icnt == 2*$n && count($z) < $n) {
         echo "Error: unable to generate enough positive values";
     }
-	if ($n%2==0) {
+	if (count($z)==$n) {
 		return $z;
 	} else {
-		return (array_slice($z,0,count($z)-1));
+		return (array_slice($z,0,$n));
 	}
 }
 
@@ -1593,7 +1593,7 @@ function chi2cdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function chicdf($x,$a) {
@@ -1601,7 +1601,7 @@ function chicdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function invchicdf($cdf,$a) {
@@ -1722,8 +1722,8 @@ function invchi2cdf($cdf,$a) {
   return $x;
 }
 
-function gamma_cdf($x,$a,$b,$c) {
-	return gamma_inc($c,($x-$a)/$b);
+function gamma_cdf($x, $shape, $scale=1, $offset=0) {
+    return gamma_inc($shape, ($x-$offset)/$scale);
 }
 function gamma_inc($p,$x,$dec=4) {
 	$exp_arg_min = -88.0;
@@ -1802,6 +1802,22 @@ function gamma_inc($p,$x,$dec=4) {
 	return $value;
 }
 
+function gamma_log($x) {
+    // from jStat
+    $cof = [
+        76.18009172947146, -86.50532032941677, 24.01409824083091,
+        -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
+    ];
+    $ser = 1.000000000190015;
+    $y = $xx = $x;
+    $tmp = $x + 5.5;
+    $tmp -= ($xx + 0.5) * log($tmp);
+    for ($j=0; $j < 6; $j++) {
+        $ser += $cof[$j] / (++$y);
+    }
+    return log(2.5066282746310005 * $ser / $xx) - $tmp;
+}
+/*
 function gamma_log($x) {
  $c = array(
     -1.910444077728E-03,
@@ -1938,6 +1954,63 @@ function gamma_log($x) {
   }
   return $res;
 }
+*/
+
+function gamma_inv($p,$a,$scale=1) {
+	//adapted from https://github.com/jstat/jstat/blob/65ce096a99f753d6a22482e5e74accbfc1c33767/src/special.js#L254
+    $a1 = $a - 1;
+	$EPS = 1e-8;
+	$gln = gamma_log($a);
+
+	if ($p >= 1) {
+		return $scale*max(100, $a + 100 * sqrt($a));
+	}
+	if ($p <= 0) {
+		return 0;
+	}
+	if ($a > 1) {
+		$lna1 = log($a1);
+		$afac = exp($a1 * ($lna1 - 1) - $gln);
+		$pp = ($p < 0.5) ? $p : (1 - $p);
+		$t = sqrt(-2 * log($pp));
+		$x = (2.30753 + $t * 0.27061) / (1 + $t * (0.99229 + $t * 0.04481)) - $t;
+		if ($p < 0.5) {
+            $x = -$x;
+        }
+		$x = max(1e-3, $a * pow(1 - 1 / (9 * $a) - $x / (3 * sqrt($a)), 3));
+	} else {
+		$t = 1 - $a * (0.253 + $a * 0.12);
+        if ($p < $t) {
+            $x = pow($p / $t, 1 / $a);
+        } else {
+            $x = 1 - log(1 - ($p - $t) / (1 - $t));
+        }
+    }
+
+	for($j=0; $j < 12; $j++) {
+		if ($x <= 0) {
+			return 0;
+        }
+        $err = gamma_inc($a, $x) - $p;
+		if ($a > 1) {
+			$t = $afac * exp(-($x - $a1) + $a1 * (log($x) - $lna1));
+		} else {
+			$t = exp(-$x + $a1 * log($x) - $gln);
+        }
+        if ($t==0) { 
+            break; 
+        }
+		$u = $err / $t;
+		$x -= ($t = $u / (1 - 0.5 * min(1, $u * (($a - 1) / $x - 1))));
+		if ($x <= 0) {
+			$x = 0.5 * ($x + $t);
+		}
+		if (abs($t) < $EPS * $x) {
+			break;
+		}
+	}
+	return $scale*$x;
+}
 
 //fcdf(f,df1,df2)
 //Returns the area to right of the F-value f for the f-distribution
@@ -1947,8 +2020,10 @@ function fcdf($x,$df1,$df2) {
 	if (!is_finite($x) || !is_finite($df1) || !is_finite($df2) || $df1 < 1 || $df2 < 1 || $x < 0) {
 		echo 'Invalid input to fcdf';
 		return 0;
-	}
-	$p1 = fcall(fspin($x,$df1,$df2));
+    }
+    //$p1 = fcall(fspin($x,$df1,$df2));
+    $p1 = 1-beta_cdf($df1*$x/($df1*$x + $df2), $df1/2, $df2/2);
+
 	return $p1;
 }
 
@@ -2005,6 +2080,136 @@ function LJspin($q,$i,$j,$b) {
 		$k += 2;
 	}
 	return $z;
+}
+
+function beta_cdf($x, $a, $b) {
+    // based on jStat.ibeta
+    if ($x > 1) { 
+        return 1;
+    } else if ($x < 0) { 
+        return 0;
+    }
+    $bt = ($x === 0 || $x === 1) ?  0 :
+     (exp(gamma_log($a + $b) - gamma_log($a) -
+     gamma_log($b) + $a * log($x) + $b * log(1 - $x)));
+    if ($x < 0 || $x > 1) {
+        return false;
+    }
+    if ($x < ($a + 1) / ($a + $b + 2)) {
+        // Use continued fraction directly.
+        return $bt * jstat_betacf($x, $a, $b) / $a;
+    }
+    // else use continued fraction after making the symmetry transformation.
+    return 1 - $bt * jstat_betacf(1 - $x, $b, $a) / $b;
+}
+
+function beta_inv($p, $a, $b) {
+    // based on jStat.ibetainv
+    $st = microtime(true);
+    $EPS = 1e-8;
+    $a1 = $a - 1;
+    $b1 = $b - 1;
+
+    if ($p <= 0) {
+        return 0;
+    }
+    if ($p >= 1) {
+        return 1;
+    }
+    if ($a >= 1 && $b >= 1) {
+        $pp = ($p < 0.5) ? $p : (1 - $p);
+        $t = sqrt(-2 * log($pp));
+        $x = (2.30753 + $t * 0.27061) / (1 + $t* (0.99229 + $t * 0.04481)) - $t;
+        if ($p < 0.5) {
+            $x = -$x;
+        }
+        $al = ($x * $x - 3) / 6;
+        $h = 2 / (1 / (2 * $a - 1)  + 1 / (2 * $b - 1));
+        $w = ($x * sqrt($al + $h) / $h) - (1 / (2 * $b - 1) - 1 / (2 * $a - 1)) *
+            ($al + 5 / 6 - 2 / (3 * $h));
+        $x = $a / ($a + $b * exp(2 * $w));
+    } else {
+        $lna = log($a / ($a + $b));
+        $lnb = log($b / ($a + $b));
+        $t = exp($a * $lna) / $a;
+        $u = exp($b * $lnb) / $b;
+        $w = $t + $u;
+        if ($p < $t / $w) {
+            $x = pow($a * $w * $p, 1 / $a);
+        }
+        else {
+            $x = 1 - pow($b * $w * (1 - $p), 1 / $b);
+        }
+    }
+    $afac = -gamma_log($a) - gamma_log($b) + gamma_log($a + $b);
+    for ($j=0; $j < 10; $j++) {
+        if ($x < 1e-10 || $x === 1) {
+            return round($x,10);
+        }
+        $err = beta_cdf($x, $a, $b) - $p;
+        $t = exp($a1 * log($x) + $b1 * log(1 - $x) + $afac);
+        $u = $err / $t;
+        $x -= ($t = $u / (1 - 0.5 * min(1, $u * ($a1 / $x - $b1 / (1 - $x)))));
+        if ($x <= 0) {
+            $x = 0.5 * ($x + $t);
+        }
+        if ($x >= 1) {
+            $x = 0.5 * ($x + $t + 1);
+        }
+        if (abs($t) < ($EPS * $x) && $j > 0) {
+            break;
+        }
+    }
+    return round($x,10);
+}
+
+function jstat_betacf($x,$a,$b) {
+    $fpmin = 1e-30;
+    $qab = $a + $b;
+    $qap = $a + 1;
+    $qam = $a - 1;
+    $c = 1;
+    $d = 1 - $qab * $x / $qap;
+  
+    // These q's will be used in factors that occur in the coefficients
+    if (abs($d) < $fpmin) {
+      $d = $fpmin;
+    }
+    $d = 1 / $d;
+    $h = $d;
+  
+    for ($m=1; $m <= 100; $m++) {
+      $m2 = 2 * $m;
+      $aa = $m * ($b - $m) * $x / (($qam + $m2) * ($a + $m2));
+      // One step (the even one) of the recurrence
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $h *= $d * $c;
+      $aa = -($a + $m) * ($qab + $m) * $x / (($a + $m2) * ($qap + $m2));
+      // Next step of the recurrence (the odd one)
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $del = $d * $c;
+      $h *= $del;
+      if (abs($del - 1.0) < 3e-7) {
+        break;
+      }
+    }
+    return $h;  
 }
 
 //invfcdf(p,df1,df2)

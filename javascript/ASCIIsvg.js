@@ -77,7 +77,7 @@ function chop(x,n) {
 function prepWithMath(str) {
   // avoid double-prep cased by script wrap of prepWithMath followed by
   // secondary after prepWithMath
-  str = str.replace(/Ma(t|\(t\)\*)h\./,'');
+  str = str.replace(/Ma(t|\(t\)\*)h\./g,'');
 	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
 	str = str.replace(/\(E\)/g,'(Math.E)');
 	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
@@ -1095,6 +1095,11 @@ function drawPictures() {
 	drawPics()
 }
 
+function prepmath(str) {
+    if (str === 'null') { return 'null';}
+    return prepWithMath(mathjs(str));
+}
+
 //ShortScript format:
 //xmin,xmax,ymin,ymax,xscl,yscl,labels,xgscl,ygscl,width,height plotcommands(see blow)
 //plotcommands: type,eq1,eq2,startmaker,endmarker,xmin,xmax,color,strokewidth,strokedash
@@ -1124,8 +1129,8 @@ function parseShortScript(sscript,gw,gh) {
 	if (sa.length > 10) {
 		commands = 'setBorder(5);';
 		commands += 'width=' +sa[9] + '; height=' +sa[10] + ';';
-		commands += 'initPicture(' + sa[0] +','+ sa[1] +','+ sa[2] +','+ sa[3] + ');';
-		commands += 'axes(' + sa[4] +','+ sa[5] +','+ sa[6] +','+ sa[7] +','+ sa[8]+ ');';
+		commands += 'initPicture(' + prepmath(sa[0]) +','+ prepmath(sa[1]) +','+ prepmath(sa[2]) +','+ prepmath(sa[3]) + ');';
+		commands += 'axes(' + prepmath(sa[4]) +','+ prepmath(sa[5]) +','+ prepmath(sa[6]) +','+ prepmath(sa[7]) +','+ prepmath(sa[8]) + ');';
 
 		var inx = 11;
 		var varlet = '';
@@ -1173,7 +1178,7 @@ function parseShortScript(sscript,gw,gh) {
 			if (typeof eval(sa[inx+5]) == "number") {
 		//	if ((sa[inx+5]!='null')&&(sa[inx+5].length>0)) {
 				//commands += 'myplot(' + eqn +',"' + sa[inx+3] +  '","' + sa[inx+4]+'",' + sa[inx+5] + ',' + sa[inx+6]  +');';
-				commands += 'plot(' + eqn +',' + sa[inx+5] + ',' + sa[inx+6] +',null,null,' + sa[inx+3] +  ',' + sa[inx+4] +');';
+				commands += 'plot(' + eqn +',' + prepmath(sa[inx+5]) + ',' + prepmath(sa[inx+6]) +',null,null,' + prepmath(sa[inx+3]) +  ',' + prepmath(sa[inx+4]) +');';
 				eqnlist += " from " + varlet + '='+sa[inx+5]+ ' ';
 				if (sa[inx+3]==1) {
 					eqnlist += 'with an arrow ';
@@ -1191,7 +1196,7 @@ function parseShortScript(sscript,gw,gh) {
 					eqnlist += 'with a closed dot ';
 				}
 			} else {
-				commands += 'plot(' + eqn +',null,null,null,null,' + sa[inx+3] +  ',' + sa[inx+4]+');';
+				commands += 'plot(' + eqn +',null,null,null,null,' + prepmath(sa[inx+3]) +  ',' + prepmath(sa[inx+4])+');';
 			}
 			eqnlist += '. ';
 		   }
@@ -1207,16 +1212,16 @@ function parseShortScript(sscript,gw,gh) {
 			}
 		} catch (e) {
 			if (picture.hasAttribute("data-failedrenders")) {
-				var fails = picture.getAttribute("data-failedrenders");
+				var fails = 1*picture.getAttribute("data-failedrenders");
 				if (fails>3) {
 					return commands;
 				} else {
-					picture.setAttribute("data-failedrenders",fails+1);
+					picture.setAttribute("data-failedrenders",fails + 1);
 				}
 			} else {
 				picture.setAttribute("data-failedrenders",1);
 			}
-			var tofixid = picture.getAttribute("id");
+			var tofixid = svgpicture.getAttribute("id");
 			setTimeout(function() {switchTo(tofixid);parseShortScript(sscript,gw,gh)},100);
 		}
 

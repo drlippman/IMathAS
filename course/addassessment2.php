@@ -37,17 +37,20 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if ($from=='gb') {
-	$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> ";
+	$curBreadcrumb .= "<a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; ";
 } else if ($from=='mcd') {
-	$curBreadcrumb .= "&gt; <a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a> ";
+	$curBreadcrumb .= "&gt; <a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a> &gt; ";
 }
 
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Assessment\n";
+	$curBreadcrumb .= "Modify Assessment\n";
 } else {
-	$curBreadcrumb .= "&gt; Add Assessment\n";
+	$curBreadcrumb .= "Add Assessment\n";
 }
 
 if (isset($_GET['id'])) {
@@ -85,45 +88,53 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
   $dates_by_lti = $stm->fetchColumn(0);
 
   if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
-      if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
-      	$DBH->beginTransaction();
-          require_once('../includes/filehandler.php');
-          deleteallaidfiles($assessmentId);
-          $grades = array();
-					$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
-					$stm->execute(array(':assessmentid'=>$assessmentId));
-					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-						$grades[$row['userid']]=$row["score"];
-					}
-					$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-					if ($stm->rowCount()>0) {
-		        TeacherAuditLog::addTracking(
-		          $cid,
-		          "Clear Attempts",
-		          $assessmentId,
-		          array('grades'=>$grades)
-		        );
-		      }
+      if (isset($_POST['clearattempts']) && $_POST['clearattempts'] == "confirmed") {
+        $DBH->beginTransaction();
+        require_once '../includes/filehandler.php';
+        deleteallaidfiles($assessmentId);
+        $grades = array();
+        $stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            $grades[$row['userid']] = $row["score"];
+        }
 
-					$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-          $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-          $DBH->commit();
-          header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
-                  $cid, $assessmentId));
-          exit;
+        $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        if ($stm->rowCount() > 0) {
+            TeacherAuditLog::addTracking(
+                $cid,
+                "Clear Attempts",
+                $assessmentId,
+                array('grades' => $grades)
+            );
+        }
+
+        $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        // clear out time limit extensions
+        $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
+        $stm->execute(array($aid));
+        
+        $DBH->commit();
+        header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' . Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
+            $cid, $assessmentId));
+        exit;
       } else {
           $overwriteBody = 1;
           $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
           $stm->execute(array(':id'=>$assessmentId));
           $assessmentname = $stm->fetchColumn(0);
-          $body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
-              $cid, Sanitize::encodeStringForDisplay($coursename));
-          $body .= sprintf("&gt; <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
+          $body = '<div class=breadcrumb>'.$breadcrumbbase;
+          if (empty($_COOKIE['fromltimenu'])) {
+            $body .= sprintf(" <a href=\"course.php?cid=%s\">%s</a> &gt; ",
+                $cid, Sanitize::encodeStringForDisplay($coursename));
+          }
+          $body .= sprintf(" <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
               $cid, $assessmentId);
-					$body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
+		  $body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
           $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
           $body .= '<form method="POST" action="'.sprintf('addassessment2.php?cid=%s&id=%d',$cid, $assessmentId).'">';
           $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
@@ -266,7 +277,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['istutorial'] = empty($_POST['istutorial']) ? 0 : 1;
 			$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
 			$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
-			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']);
+			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
 
 			// time limit and access control
 			$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);

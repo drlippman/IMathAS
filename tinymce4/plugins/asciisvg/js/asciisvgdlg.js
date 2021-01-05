@@ -39,7 +39,7 @@ var AsciisvgDialog = {
 		} else {
 			el = window.parent.tinymce.activeEditor.selection.getNode();
 			ed.dom.setAttrib(el,"sscr",this.sscr);
-			ed.dom.setAttrib(el,"data-sscr",this.sscr);
+            ed.dom.setAttrib(el,"data-sscr",this.sscr);
 			ed.dom.setAttrib(el,"src",this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr));
 			ed.dom.setAttrib(el,"width",this.width);
 			ed.dom.setAttrib(el,"height",this.height);
@@ -171,13 +171,14 @@ var AsciisvgDialog = {
 		this.width = document.getElementById("gwidth").value;
 		this.height = document.getElementById("gheight").value;
 		this.sscr = commands;
-		this.alignm = document.getElementById("alignment").value;
+        this.alignm = document.getElementById("alignment").value;
 		if (ASnoSVG) {
 			var pvimg = document.getElementById("previewimg");
 			pvimg.src = this.AScgiloc + '?sscr='+encodeURIComponent(commands);
 			ed.dom.setStyle(pvimg,"width",this.width + 'px');
 			ed.dom.setStyle(pvimg,"height",this.height + 'px');
 		} else {
+            document.getElementById("previewsvg-embed").removeAttribute("data-failedrenders");
 			var pvsvg = document.getElementById("previewsvg");
 			parseShortScript(commands,this.width,this.height);
 		}

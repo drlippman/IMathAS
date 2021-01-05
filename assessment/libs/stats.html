@@ -45,6 +45,10 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#invchi2cdf">invchi2cdf</a></li>
 <li><a href="#fcdf">fcdf</a></li>
 <li><a href="#invfcdf">invfcdf</a></li>
+<li><a href="#gamma_cdf">gamma_cdf</a></li>
+<li><a href="#gamma_inv">gamma_inv</a></li>
+<li><a href="#beta_cdf">beta_cdf</a></li>
+<li><a href="#beta_inv">beta_inv</a></li>
 <li><a href="#mosaicplot">mosaicplot</a></li>
 <li><a href="#csvdownloadlink">csvdownloadlink</a></li>
 <li><a href="#dotplot">dotplot</a></li>
@@ -292,6 +296,18 @@ invfcdf(p,df1,df2)
 <BR>with degrees of freedom df1 and df2
 <BR>Algorithm is accurate to approximately 2-4 decimal places
 <BR>Less accurate for smaller p-values
+<h3><a name="gamma_cdf">gamma_cdf</a></h3>
+gamma_cdf(x,shape,[scale,offset])
+<BR>Calculated the gamma cdf
+<BR><h3><a name="gamma_inv">gamma_inv</a></h3>
+gamma_inv(p,shape,[scale])
+<BR>Calculates the inverse gamma cdf
+<h3><a name="beta_cdf">beta_cdf</a></h3>
+beta_cdf(x,alpha,beta)
+<BR>Calculated the gamma cdf
+<BR><h3><a name="beta_inv">beta_inv</a></h3>
+beta_inv(p,alpha,beta)
+<BR>Calculates the inverse gamma cdf
 <BR><h3><a name="mosaicplot">mosaicplot</a></h3>
 mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
 <BR>creates a mosaic plot (See http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972)

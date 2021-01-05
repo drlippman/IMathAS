@@ -15,16 +15,19 @@
 function parseSearchString($str)
 {
     $out = array();
-    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
+    preg_match_all('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/', $str, $matches, PREG_SET_ORDER);
     if (count($matches) > 0) {
         foreach ($matches as $match) {
             $out[$match[1]] = str_replace('"', '', $match[2]);
         }
-        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res):("[^"]+?"|\w+)/', '', $str);
+        $str = preg_replace('/(author|type|id|regex|used|avgtime|mine|unused|private|res|order|lastmod|avgscore):("[^"]+?"|\w+)/', '', $str);
     }
 
     $out['terms'] = preg_split('/\s+/', trim($str));
     foreach ($out['terms'] as $k => $v) {
+        if ($v=='') { 
+            unset($out['terms'][$k]);
+        }
         if (ctype_digit($v) && !isset($out['id'])) {
             $out['id'] = $v;
             if (count($out['terms']) == 1) { // only id, remove as keyword
@@ -144,6 +147,30 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $searchand[] = 'iq.meantime < ?';
             $searchvals[] = $avgtimeparts[1];
         }
+        $searchand[] = 'iq.meantimen > 3';
+    }
+    if (!empty($search['avgscore'])) {
+        $avgscoreparts = explode(',', $search['avgscore']);
+        if (!empty($avgscoreparts[0])) {
+            $searchand[] = 'iq.meanscore > ?';
+            $searchvals[] = $avgscoreparts[0];
+        }
+        if (!empty($avgscoreparts[1])) {
+            $searchand[] = 'iq.meanscore < ?';
+            $searchvals[] = $avgscoreparts[1];
+        }
+        $searchand[] = 'iq.meantimen > 3';
+    }
+    if (!empty($search['lastmod'])) {
+        $lastmodparts = explode(',', $search['lastmod']);
+        if (!empty($lastmodparts[0])) {
+            $searchand[] = 'iq.lastmoddate > ?';
+            $searchvals[] = strtotime($lastmodparts[0]);
+        }
+        if (!empty($lastmodparts[1])) {
+            $searchand[] = 'iq.lastmoddate < ?';
+            $searchvals[] = strtotime($lastmodparts[1]);
+        }
     }
     if (!empty($search['res'])) {
         $helps = explode(',', $search['res']);
@@ -177,7 +204,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         if ($searchquery === '') {
             $searchquery = '(' . $idsearch . ')';
         } else {
-            $searchquery = '(' . $searchquery . ' OR ' . $idors . ')';
+            $searchquery = '(' . $searchquery . ' OR ' . $idsearch . ')';
         }
     }
 
@@ -185,12 +212,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($searchtype == 'libs' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $libquery = "ili.libid IN ($llist)";
-        $libnames = [];
         $sortorder = [];
         $stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $libnames[$row[1]] = Sanitize::encodeStringForDisplay($row[0]);
             $sortorder[$row[0]] = $row[2];
+        }
+        if (in_array(0, $libs)) {
+            $libnames[0] = _('Unassigned');
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
@@ -267,6 +296,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($searchtype == 'assess') {
         $query .= ',iaq.id AS qid ';
     }
+    if (!empty($search['order']) && $search['order']=='newest') {
+        $query .= ',iq.lastmoddate ';
+    }
     $query .= 'FROM imas_questionset AS iq JOIN imas_library_items AS ili ON
     ili.qsetid=iq.id AND ili.deleted=0 ';
     if ($searchtype == 'assess') {
@@ -307,6 +339,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $query .= ' ORDER BY ia.id ';
     } else {
         $query .= ' GROUP BY ili.qsetid ';
+        if (!empty($search['order']) && $search['order']=='newest') {
+            $query .= ' ORDER BY iq.lastmoddate DESC ';
+        }
     }
     if (!empty($max) && intval($max) > 0) {
         $query .= ' LIMIT ' . intval($max);
@@ -314,6 +349,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $query .= ' OFFSET ' . intval($offset);
         }
     }
+    //echo $query;
+    //print_r($searchvals);
     $stm = $DBH->prepare($query);
     $stm->execute($searchvals);
     $res = [];
@@ -373,24 +410,28 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $res[$k]['grp'] = $qidmap[$v['qid']][0];
             $res[$k]['qn'] = $qidmap[$v['qid']][1];
         }
-        usort($res, function ($a, $b) {
+        usort($res, function ($a, $b) use ($search) {
             if ($a['grp'] != $b['grp']) {
                 return ($a['grp'] < $b['grp']) ? -1 : 1;
             } else if ($a['qn'] != $b['qn']) {
                 return ($a['qn'] < $b['qn']) ? -1 : 1;
+            } else if (!empty($search['order']) && $search['order']=='newest') {
+                return ($b['lastmoddate'] - $a['lastmoddate']);
             } else {
                 return ($a['id'] < $b['id']) ? -1 : 1;
             }
         });
         $out = ['qs' => $res, 'names' => $aidnames, 'type'=>'assess'];
     } else if ($searchtype == 'libs') {
-        usort($res, function ($a, $b) use ($sortorder) {
+        usort($res, function ($a, $b) use ($sortorder,$search) {
             if ($a['libid'] != $b['libid']) {
                 return ($a['libid'] < $b['libid']) ? -1 : 1;
             } else if ($a['broken'] != $b['broken']) {
                 return ($a['broken'] < $b['broken']) ? -1 : 1;
             } else if ($a['junkflag'] != $b['junkflag']) {
                 return ($a['junkflag'] < $b['junkflag']) ? -1 : 1;
+            } else if (!empty($search['order']) && $search['order']=='newest') {
+                return ($b['lastmoddate'] - $a['lastmoddate']);
             } else if ($sortorder[$a['libid']] == 1) { // alpha
                 return strnatcasecmp($a['descr'], $b['descr']);
             } else {

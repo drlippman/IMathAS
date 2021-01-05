@@ -88,7 +88,7 @@
 			if (isset($_POST['savesent'])) {
 				$deleted = 0;
 			} else {
-				$deleted = 4;
+				$deleted = 1; //deleted by sender
 			}
 			$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userid));
@@ -253,13 +253,16 @@
 		if ($calledfrom=='embed') {
 			$_POST['checked'] = explode('-', $_GET['to']);
 		} else {
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-			if ($calledfrom=='lu') {
-				echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+            echo "<div class=breadcrumb>$breadcrumbbase ";
+            if (empty($_COOKIE['fromltimenu'])) {
+                echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }
+            if ($calledfrom=='lu') {
+				echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 			} else if ($calledfrom=='gb') {
-				echo "&gt; <a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+				echo "<a href=\"gradebook.php?cid=$cid&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."\">Gradebook</a> &gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 			} else if ($calledfrom=='itemsearch') {
-				echo "&gt; Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
+				echo "Send Mass ".Sanitize::encodeStringForDisplay($sendtype)."</div>\n";
 			}
 		}
 		if (count($_POST['checked'])==0) {

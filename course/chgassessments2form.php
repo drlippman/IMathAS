@@ -39,7 +39,8 @@ $vueData = array(
 	'showcat' => 'DNC',
 	'samever' => 'DNC',
 	'noprint' => 'DNC',
-	'showwork' => 'DNC',
+    'showwork' => 'DNC',
+    'showworktype' => 0,
 	'allowlate' => 'DNC',
 	'timelimit' => '',
 	'allowovertime' => false,
@@ -395,7 +396,15 @@ $vueData = array(
 						<option value="1"><?php echo _('During assessment');?></option>
 						<option value="2"><?php echo _('After assessment');?></option>
 						<option value="3"><?php echo _('During or after assessment');?></option>
-					</select>
+                    </select>
+                    <span v-show="showwork != 'DNC'">
+                        <br>
+                        <label for="showworktype"><?php echo _('Work entry type');?>:</label>
+                        <select name="showworktype" id="showworktype" v-model="showworktype">
+                            <option value="0"><?php echo _('Essay');?></option>
+                            <option value="4"><?php echo _('File upload');?></option>
+                        </select>
+                    </span>
 				</span><br class=form />
 			</div>
 
