@@ -52,6 +52,11 @@ A library of Stats functions.  Version 1.10, Nov 17, 2017
 <li><a href="#mosaicplot">mosaicplot</a></li>
 <li><a href="#csvdownloadlink">csvdownloadlink</a></li>
 <li><a href="#dotplot">dotplot</a></li>
+<li><a href="#anova1way">One-way ANOVA: Data</a></li>
+<li><a href="#anova1way_f">One-way ANOVA: F ratio/P value</a></li>
+<li><a href="#anova2way">Two-way ANOVA: Data</a></li>
+<li><a href="#anova2way_f">Two-way ANOVA: F ratios/P values </a></li>
+<li><a href="#anova_table">ANOVA Table</a></li>
 </ul>
 <h3><a name="nCr">nCr</a></h3>
 nCr(n,r)
@@ -329,4 +334,80 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
 <BR> dot spacing (default 1): horiz spacing of dots; data will be rounded to nearest value
 <br> axis spacing (defaults to dot spacing): spacing of axis labels 
 <BR> width,height (default 300x150): width and height in pixels of graph
+  <p>&nbsp;</p>
+  <p><h3><a name="anova1way"></a><strong>anova1way</strong>(arr1, arr2, [arr3, ...])</h3></p>
+  <p>Function anova1way() performs one-way analysis of variance (ANOVA) on two or more groups and returns the ANOVA table as an array with each row corresponding to Factor A, error (residual), and totals.</p>
+  <p><em>Parameters:</em></p>
+  <ul>
+      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]</li>
+  </ul>
+  <p>&nbsp;<em>Returns:</em></p>
+  <p>ANOVA table as an array in the following format. 
+    array([SS_A, df_A, MS_A, F_A, P_A], [SS_E, df_E, MS_E], [SS_T, df_T]) 
+    where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
+    And A, E, and T correspond to Factor A, error (residual), and total, respectively. This array can be used in anova_table() function to tabulate data for display.</p>
+  <p>&nbsp;</p>
+  <p><h3><a name="anova1way_f"></a><strong>anova1way_f</strong>(arr1, arr2, [arr3,...])</h3></p>
+  <p>Function anova1way_f() performs one-way analysis of variance (ANOVA) on two or more groups and returns F ratio and the corresponding P value as an array.</p>
+  <p><em>Parameters:</em></p>
+  <ul>
+      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]</li>
+  </ul>
+  <p>&nbsp;<em>Returns:</em></p>
+  <p>F ratio and the corresponding P value as an array in the form [F ratio, P value].</p>
+  <p>&nbsp;</p>
   
+  <p><h3><a name="anova2way"></a><strong>anova2way</strong>(arr, [replication = False])</h3></p>
+  <p>Function anova2way() performs two-way analysis of variance (ANOVA) and returns ANOVA table as an array with each row corresponding to Factor A, Factor B, 
+     their interaction (only with replication), error (residual), and totals. </p>
+  <p><em>Parameters:</em></p>
+  <ul>
+      <li><strong>arr</strong>: An array in the follwing form: 
+         for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factora A with three and Factor B with two levels, and there are four replicates in each group.
+         and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
+      <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
+                       (multiple observations for each group) or without replication (one observation per group)
+                       is to be performed. The default is False - without replication.</li>
+  </ul>
+  <p>&nbsp;<em>Returns:</em></p>
+  <p>ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
+    [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T]] 
+    where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
+    And A, B, I, E, and T correspond to Factor A, Factor B, their interaction (only with replication), 
+    error (residual), and total, respectively.</p>
+  <p>&nbsp;</p>
+  <p><h3><a name="anova2way_f"></a><strong>anova2way_f</strong>(arr, [replication = False])</h3></p>
+  <p>Function anova2way_f() performs two-way analysis of variance (ANOVA) and returns F ratio and the corresponding P value for Factor A, Factor B and their interaction (if replication is true). </p>
+  <p><em>Parameters:</em></p>
+  <ul>
+    <li><strong>arr</strong>: An array in the follwing form: 
+      for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factora A with three and Factor B with two levels, and there are four replicates in each group.
+      and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
+   <li><strong>replication</strong>: Optional - boolean (true or false) it specifies whether the ANOVA with replication
+                    (multiple observations for each group) or without replication (one observation per group)
+                    is to be performed. The default is False - without replication.</li>
+  </ul>
+  <p>&nbsp;<em>Returns:</em></p>
+  <p>F ratio and the corresponding P value for Factor A, Factor B and their Interaction (if replication is true)
+    as an array in the form  array([F_A,P_A],[F_B,P_B],[F_I,P_I]). </p>
+  <p>&nbsp;</p>
+  
+  <p><h3><a name="anova_table"></a><strong>anova_table</strong>(arr, [factor = 1, replication = False, roundto = 12, nameA = "Factor A", nameB = "Factor B"])</h3></p>
+  <p>Function anova_table() returns ANOVA table for both oneway and twoway ANOVA - display only. The output of anova1way() and 
+   anova2way() can be used as the input array for this function. </p>
+  <p><em>Parameters:</em></p>
+  <ul>
+      <li><strong>arr</strong>: for oneway: arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_E,df_E,MS_E],[SS_T,df_T])
+        for twoway WITHOUT replication: arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_E,df_E,MS_E],[SS_T,df_T])
+        and for twoway WITH replication: arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T])</li>
+      <li><strong>factor</strong>: number of factors considered in ANOVA - 1 for one-way and 2 for two-way. The default is 1, one-way ANOVA.</li>
+      <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
+                       (multiple observations for each group) or without replication (one observation per group)
+                       is to be performed. The default is False - without replication.</li>
+        <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; 
+          the default is 12 decimal places. </li>
+        <li><strong>NameA</strong>: Optional - the name of factor A as string to be displayed in the table. Default is "Factor A". </li>
+          <li><strong>NameB</strong>: Optional - the name of factor B as string to be displayed in the table. Default is "Factor B". </li>
+  </ul>
+  <p>&nbsp;<em>Returns:</em></p>
+  <p>ANOVA table for displaying data.</p>  
