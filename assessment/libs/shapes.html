@@ -15,12 +15,15 @@
     <p><strong>List of functions:</strong></p>
     <div style="padding-left: 28px;">
     <li><a href="#triangle">draw_triangle</a></li>
+    <li><a href="#angle">draw_angle</a></li>
     <li><a href="#circle">draw_circle</a></li>
     <li><a href="#circlesector">draw_circlesector</a></li>
     <li><a href="#rectangle">draw_rectangle</a></li>
     <li><a href="#square">draw_square</a></li>
     <li><a href="#polygon">draw_polygon</a></li>
     <li><a href='#prismcubes'>draw_prismcubes</a></li>
+    <li><a href='#cylinder'>draw_cylinder</a></li>
+    
 </div>
 <p>&nbsp;</p>
 <p>&nbsp;<strong>Function output:</strong></p>
@@ -40,11 +43,12 @@
   <li><strong>"angles,A,B,C,[lab1,lab2,lab3,arc1,arc2,arc3]"</strong> Here, A,B,C are angles (in degrees) that define the triangle; lab1,lab2,lab3 are the angle labels; and arc1,arc2,arc3 can be (,(( or ((( to make arc symbols.</li>
   <li><strong>"sides,a,b,c,[lab1,lab2,lab3,tick1,tick2,tick3]"</strong> Here, a,b,c are sides that define the triangle; lab1,lab2,lab3 are the side labels; and tick1,tick2,tick3 can be |,|| or ||| to make side tickmarks.</li>
   <li><strong>"points,[P,Q,R]"</strong> Draws points on the vertices, and P,Q,R are optional labels on those points. If a label is a point (a,b), type it as (a;b).</li>
-  <li><strong>"bisector,[_,_,_,lab1,lab2,lab3]"</strong> The three entries following "bisector" correspond to the order of the angles. Put a "1" to draw the angle bisector for that angle; leave blank (or put a zero) to not draw the bisector. Lab1,lab2,lab3 are labels for where the bisector intersects the opposite side.</li>
-  <li><strong>"median,[_,_,_,lab1,lab2,lab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle, and lab1,lab2,lab3 are labels for the midpoint of the opposite side.</li>
-  <li><strong>"altitude,[_,_,_,lab1,lab2,lab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle, and lab1,lab2,lab3 are labels for where the altitude intersects the opposite (extended) side. Dashed lines are drawn to extend opposite side if necessary. Using "altitude" rotates the triangle so the side with the (last) altitude is horizontal.</li>
+  <li><strong>"bisector,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> The three entries following "bisector" correspond to the order of the angles. Put a "1" to draw the angle bisector for that angle; leave blank (or put a zero) to not draw the bisector. lab1,lab2,lab3 are labels for the bisector, and ptab1,ptlab2,ptlab3 are labels for where the bisectors intersect their opposite sides.</li>
+  <li><strong>"median,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle. lab1,lab2,lab3 are labels for the medians, and ptab1,ptlab2,ptlab3 are labels for where the medians intersect their opposite sides</li>
+  <li><strong>"altitude,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle. lab1,lab2,lab3 are labels for the altitudes, and ptab1,ptlab2,ptlab3 are labels for where the altitudes intersect their opposite (extended) sides. Dashed lines are drawn to extend opposite side if necessary.</li>
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
   <li><strong>"rotate"</strong> Rotates the triangle by a random angle.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
 </ul>
   <p>Notes</p>
 <ol>
@@ -66,6 +70,33 @@
 <p><strong>$gr = draw_triangle("random","points,P,Q,R","angles,a,b,c,(,((,(((")</strong> -- A triangle with random angles, points are labeled P,Q,R, angles are labeled a,b,c and they have arcs (, (( and (((.</p>
 <p><strong>$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")</strong> -- A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and an altitude drawn down from point A, labeled with the letter "P".</p>
 
+// draw_angle("measurement,[label]","rotate","axes")
+// You must include at least the angles measurement to define the angle, and "label" is optional for the angle.
+// Note: Angle must be in degrees. In the label, the degree symbol is shown by default. To not show the degree symbol, use "rad" as in "57, 1 rad".
+// Labels involving alpha, beta, gamma, theta, phi, pi or tau will display with those Greek letters.
+// Options include:
+// "rotate,[ang]" Rotates the image by ang degrees counterclockwise. Using just "rotate" will rotate by a random angle.
+// "axes" Draws xy axes.
+
+<p><a name="angle"></a></p>
+<h2><strong>draw_angle</strong></h2>
+<p>Draws and labels an angle.</p>
+<p>Syntax: draw_angle("measurement,[label]",["rotate,[ang]"],["axes"])</p>
+<p>The first option must include the angle measurement.
+<p>Each option is a list inside quotes. Options include:</p>
+<ul>
+  <li><strong>"measurement,[label]"</strong> -- The label will include the degree symbol by default. To not use degree symbol, use "rad", e.g. "57,1rad".</li>
+  <li><strong>"rotate,[deg]"</strong> -- Rotates the image by deg degrees. If "deg" is omitted, rotates by a random anagle.</li>
+  <li><strong>"axes"</strong> -- Draws the xy axes.</li>
+  <li><strong>"size,length"</strong> -- Changes the size of the image to be lengthxlength. Default is 300x300.</li>
+  <li>Note: Angles can be any size (between -2000 and 2000 degrees), and arcs will be drawn by default.</li>
+  <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
+</ul>
+<br />
+<p>Examples:</p>
+<p><strong>$gr = draw_angle("120,2pi/3")</strong> -- This draws a 120 degree angle in standar position, labeled 2&pi;/3.</p>
+
+
 
 <p><a name="circle"></a></p>
 <h2><strong>draw_circle</strong></h2>
@@ -77,12 +108,13 @@
   <li><strong>"center,[label]"</strong> -- Draws the center point with an optional label.</li>
   <li><strong>"radius,[label]"</strong> -- Draws a horizontal radius with an optional label.</li>
   <li><strong>"diameter,[label]"</strong> -- Draws a diameter with an optional label.</li>
-  <li><strong>"angle,measurement,[label,point]"</strong> -- Draws an angle measured counterclockwise from positive x-direction, with optional angle label and point on circle. Here, "point" is the literal word point.</li>
+  <li><strong>"angle,measurement,[label]"</strong> -- Draws an angle measured counterclockwise from positive x-direction, with optional angle label.</li>
   <li>Note: Angle must be given in degrees, and degree symbol will be displayed by default. To not display degree symbol, use "rad" in the label. E.g. "angle,57,1 rad".</li>
   <li><strong>"point,angle,[label]"</strong> -- Draws a point on the circle where angle is measured counterclockwise from positive x-direction. Optional label on point.</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
   <li>Note: If a label is a point, type it as (x;y).</li>
   <li><strong>"axes"</strong> -- Draws the x and y axes.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -104,6 +136,7 @@
   <li><strong>"radius,[label]"</strong> Draws a horizontal radius from the center, with optional label.</li>
   <li><strong>"point,angle,[label]"</strong> Plots a point on the circle at angle measured counterclockwise. If optional label is a point (x,y), type is as (x;y).</li>
   <li><strong>"axes"</strong> -- Draws the x and y axes.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
   <li>Note: Angle must be given in degrees, and degree symbol will be displayed by default. To not display degree symbol, use "rad" in the label. E.g. "angle,57.3,1 rad".</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
 </ul>
@@ -123,6 +156,7 @@
   <li><strong>"base,b,[label]"</strong> Must be used with "height". Draws scaled rectangle with base "b" and height "h" with optional label on bottom horizontal side.</li>
   <li><strong>"height,h,[label]"</strong> Must be used with "base". Draws scaled rectangle with base "b" and height "h" with optional label on right-hand vertical side.</li>
   <li><strong>"points,lab1,lab2,lab3,lab4"</strong> Plots the vertices with optional labels (counterclockwise from bottom left). If label is a point (a,b), type it as (a;b).</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <p>Notes:</p>
 <ol>
@@ -143,6 +177,7 @@
   <li><strong>"base,[label]"</strong> Labels the bottom horizontal side.</li>
   <li><strong>"height,[label]"</strong> Labels the right-hand vertical side.</li>
   <li><strong>"points,lab1,lab2,lab3,lab4"</strong> Plots the vertices with optional labels (counterclockwise from bottom left). If label is a point (a,b), type it as (a;b).</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -155,7 +190,7 @@
 <p>Points drawn counterclockwise. By default, first side is horizontal on the bottom.</p>
 <p>Syntax: draw_polygon([n],["option 1", "option 2", ...])</p>
 <p>draw_polygon() -- this draws a random polygon with between 3 and 9 sides.</p>
-<p>draw_polygon(n) -- this draws an n-sided polygon.
+<p>draw_polygon(n) -- this draws an n-sided polygon. Maximum number of sides is 50.
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"points,[lab1,lab2,...,labn]"</strong> Labels the vertices counterclockwise from bottom-left. If label is a point (a,b), type it as (a;b).</li>
@@ -163,6 +198,7 @@
   <li><strong>"regular"</strong> Makes it a regular polygon</li>
   <li><strong>"rotate"</strong> Rotates polygon by random angle.</li>
   <li><strong>"axes"</strong> Shows x and y axes.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <br />
 <p>Examples:</p>
@@ -171,19 +207,39 @@
 
 <p><a name="prismcubes"></a></p>
 <h2><strong>draw_prismcubes</strong></h2>
-<p>Draws and labels a polygon with n sides.</p>
+<p>Draws a rectangular prism sliced into cubes.</p>
 <p>Syntax: draw_prismcubes([option 1],[option 2],[option 3]</p>
 <p>draw_prismcubes() -- this draws a cube with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
-  <li><strong>"cubes,length,height,depth"</strong> Draws a rectangular prism made of cubes, that is length x height x depth.</li>
+  <li><strong>"cubes,length,height,depth"</strong> Draws a rectangular prism made of cubes, that is length x height x depth. Maximum of each dimension is 20.</li>
   <li><strong>"labels,lab1,lab2,lab3"</strong> This labels the length, height and depth of the prism.</li>
-  <li><strong>"size,length"</strong> Sets the sqare image size to be length x length.</li>
+  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
 </ul>
 <br />
 <p>Examples:</p>
 <p><strong>$gr = draw_prismcubes("cubes,2,5,3","labels,a,b,c")</strong> -- A 2x5x3 rectangular prism of cubes, dimensions labeled a, b and c.</p>
 <p><strong>$gr = draw_prismcubes("labels,L,H,W")</strong> -- A 1x1x1 cube, dimensions labeled L, H and W.</p>
+
+
+<p><a name="cylinder"></a></p>
+<h2><strong>draw_cylinder</strong></h2>
+<p>Draws and labels a circular cylinder.</p>
+<p>Syntax: draw_cylinder([diameter,height],[option 1],[option 2],[option 3]</p>
+<p>draw_cylinder() -- draws a random cylinder with no labels.</p>
+<p>draw_cylinder(a,b) -- makes a scaled drawing of a cylinder with diameter 'a' and height 'b'.
+<p>Each option is a list inside quotes. Options include:</p>
+<ul>
+  <li><strong>"radius,[label]"</strong> Draws a radius on the top of the cylinder with optional label.</li>
+  <li><strong>"diameter,[label]"</strong> Draws a diameter on the top of the cylinder with optional label.</li>
+  <li><strong>"height,[label]"</strong> Labels the height of the cylinder.</li>
+  <li><strong>"fill,[percent]"</strong> Fills a specified percent of the cylinder. If 'percent' omitted, fills a random percent.</li>
+  <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
+</ul>
+<br />
+<p>Examples:</p>
+<p><strong>$gr = draw_cylinder(1,1,"radius,r=12")</strong> -- A cylinder with equal diameter and height, with radius drawn and labeled 'r=12'.</p>
+<p><strong>$gr = draw_cylinder("height,x","fill,30")</strong> -- A random cylinder with height labeled 'x' and filled 30 percent.</p>
 
 
 <a href="#top">Back to top of page</a>

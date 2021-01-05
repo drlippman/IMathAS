@@ -6,7 +6,122 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros,"draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes");
+array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_square","draw_rectangle","draw_triangle","draw_polygon","draw_prismcubes","draw_cylinder");
+
+//--------------------------------------------draw_angle()----------------------------------------------------
+
+// draw_angle("measurement,[label]","rotate","axes")
+// You must include at least the angles measurement to define the angle, and "label" is optional for the angle.
+// Note: Angle must be in degrees. In the label, the degree symbol is shown by default. To not show the degree symbol, use "rad" as in "57, 1 rad".
+// Labels involving alpha, beta, gamma, theta, phi, pi or tau will display with those Greek letters.
+// Options include:
+// "rotate,[ang]" Rotates the image by ang degrees counterclockwise. Using just "rotate" will rotate by a random angle.
+// "axes" Draws xy axes.
+
+function draw_angle() {
+  $degSymbol = "&deg;";
+  $input = func_get_args();
+  $argsArray = [];
+  foreach ($input as $list) {
+    if (!is_array($list)) {
+      $list = listtoarray($list);
+    }
+    $list = array_map('trim', $list);
+    $argsArray[]=$list;
+  }
+  $size = 300;
+  foreach ($argsArray as $in) {
+    if ($in[0] == "rotate") {
+      if (isset($in[1])) {
+        $rot = $in[1];
+      } elseif (!isset($in[1])) {
+        $rot = rand(0,360);
+      }
+    }
+    if ($in[0] == "size") {
+      $size = $in[1];
+    }
+    if (in_array("axes",$in)) {
+      $args = $args . "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
+    }
+  }
+  
+  $rotRad = $rot*M_PI/180;
+  $ang = $argsArray[0][0];
+  if (abs($ang)>=2000) {
+    echo "Angle must be between less than 2000 degrees in magnitude.";
+    return '';
+  }
+  $angRad = $ang*M_PI/180;
+  $lab = $argsArray[0][1];
+  $xStart = cos($rotRad);
+  $yStart = sin($rotRad);
+  $xEnd = cos($angRad+$rotRad);
+  $yEnd = sin($angRad+$rotRad);
+  
+  // Draw the sides of the angle
+  $args = $args."strokewidth=2;line([0,0],[$xStart,$yStart]);line([0,0],[$xEnd,$yEnd]);dot([0,0]);strokewidth=1;";
+  
+  // Label the angle
+  $belowFactor = 1;
+  $labFact = 0.35+0.05*abs(ceil($ang/360));
+  if (abs($ang)<30) {
+    if ($ang<0) {
+      $belowFactor = -1;
+    }
+    [$xLabLoc,$yLabLoc] = [$labFact*cos(($rot+$ang+$belowFactor*20)*M_PI/180),$labFact*sin(($rot+$ang+$belowFactor*20)*M_PI/180)];
+  } elseif (abs($ang)>=30) {
+    $halfAngle = $ang/2;
+    if (($halfAngle%90<20 && $halfAngle%90>=0) || $halfAngle%90<-70) {
+      $moveAxis = 40;
+    } elseif (($halfAngle%90>-20 && $halfAngle%90<0) || $halfAngle%90>70) {
+      $moveAxis = -40;
+    } 
+    [$xLabLoc,$yLabLoc] = [$labFact*cos(($halfAngle+$rot+$moveAxis)*M_PI/180),$labFact*sin(($halfAngle+$rot+$moveAxis)*M_PI/180)];
+  }
+  
+  $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
+  $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
+  if (!empty($lab)) {
+    for ($j=0;$j<count($greekSpelled);$j++) {
+      if (preg_match($greekSpelled[$j],$lab)) {
+        $degSymbol = '';
+        $lab = preg_replace($greekSpelled[$j],$greekSymbol[$j],$lab);
+      }
+    }  
+  }
+  $args = $args."text([$xLabLoc,$yLabLoc],'$lab$degSymbol');";
+  
+  // Draw the angle arc
+  if ($ang < 0) {
+    [$xStartTmp,$yStartTmp] = [$xStart,$yStart];
+    [$xStart,$yStart] = [$xEnd,$yEnd];
+    [$xEnd,$yEnd] = [$xStartTmp,$yStartTmp]; 
+  }
+  // Starting position of the arc
+  $arcRad = 0.15;
+  if (abs($ang)>360) {
+    $minAng = $rotRad;
+    $maxAng = $rotRad+$angRad;
+    if ($ang<0) {
+      $minAng = $rotRad+$angRad;
+      $maxAng = $rotRad;
+    }
+    $args = $args."plot(['($arcRad+.06/(2*pi)*abs(t-$rotRad))*cos(t)','($arcRad+.06/(2*pi)*abs(t-$rotRad))*sin(t)'],$minAng,$maxAng);";
+    //$args = $args."plot(['0.4*cos(t)','0.4*sin(t)'],0,pi);";
+  } else {
+    if (abs($ang) <= 180) {
+      $arc = "arc([$arcRad*$xStart,$arcRad*$yStart],[$arcRad*$xEnd,$arcRad*$yEnd],$arcRad);";
+    } elseif (abs($ang) > 180 && abs($ang)<=360) {
+      $arc = "arc([$arcRad*$xStart,$arcRad*$yStart],[-$arcRad*$xStart,-$arcRad*$yStart],$arcRad);arc([-$arcRad*$xStart,-$arcRad*$yStart],[$arcRad*$xEnd,$arcRad*$yEnd],$arcRad);";
+    } 
+    $args = $args.$sectorArc.$arc;
+  }
+  
+  $gr = showasciisvg("setBorder(5);initPicture(-1.1,1.1,-1.1,1.1);$args",$size,$size);
+  
+  return $gr;
+}
 
 //--------------------------------------------draw_circle()----------------------------------------------------
 // circle("[center,[label]]","[radius,[label]]","[diameter,[label]]","[angle,measurement,[label]]")
@@ -96,6 +211,10 @@ function draw_circle() {
         return '';
       }
       if (isset($in[1])) {
+        if ($in[1] > 360 || $in[1] < 0) {
+          echo 'Eek! Angle must be between 0 and 360.';
+          return '';
+        }
         $ang = $in[1];
         $x = cos(M_PI*$ang/180);
         $y = sin(M_PI*$ang/180);
@@ -150,6 +269,10 @@ function draw_circle() {
         echo 'Warning! "point" must be followed by an angle in degrees.';
       }
       if (isset($in[1]) && is_numeric($in[1])) {
+        if ($in[1] > 360 || $in[1] < 0) {
+          echo 'Eek! Point angle must be between 0 and 360.';
+          return '';
+        }
         $angForPt = $in[1];
         $xPtLoc = cos(M_PI*$angForPt/180);
         $yPtLoc = sin(M_PI*$angForPt/180);
@@ -157,7 +280,6 @@ function draw_circle() {
       }
       $minDiff = 7;
       if (isset($in[2])) {
-        //matches pi in expressions, not in words
         $in[2] = str_replace(';',',',$in[2]);
         if (abs($angForPt%360) < $minDiff || abs($angForPt%360-360) < $minDiff) {
           if ($angForPt%360 < 2*$minDiff) {
@@ -295,8 +417,8 @@ function draw_circlesector() {
       $ang = $in[1];
       $lab = "";
       if ($ang > 360 || $ang < 0) {
-        echo 'Warning! Angle should be between 0 and 360.';
-        $ang = $ang%360;
+        echo 'Eek! Angles should be between 0 and 360.';
+        return '';
       }
       $x = cos(M_PI*$ang/180);
       $y = sin(M_PI*$ang/180);
@@ -662,18 +784,19 @@ function draw_triangle() {
     if ($in[0]=="angles") {
       $noAngles = false;
       $angleKey = $key;
-      
-      if (count($in) < 4) {
-        echo "Eek! 'angles' must be followed by at least three numbers.";
-        return '';
+      for ($i=1;$i<4;$i++) {
+        if (!isset($in[$i])) {
+          $in[$i] = "";
+        }
       }
     }
     if ($in[0]=="sides") {
       $noSides = false;
       $sideKey = $key;
-      if (count($in) < 4) {
-        echo "Eek! 'sides' must be followed by at least three numbers.";
-        return '';
+      for ($i=1;$i<4;$i++) {
+        if (!isset($in[$i])) {
+          $in[$i] = "";
+        }
       }
     }
     if ($in[0]=="bisectors") {
@@ -756,6 +879,12 @@ function draw_triangle() {
       }
       
       if ($angleKey < $sideKey) {
+        for ($i=1;$i<4;$i++) {
+          if (empty($argsArray[$angleKey][$i])) {
+            echo 'Eek! "Angles" must be followed by three angles in degrees.';
+            return '';
+          }
+        }
         if (isset($argsArray[$angleKey][7])) {
           $hasArcs = true;
         }
@@ -776,6 +905,12 @@ function draw_triangle() {
       }
       
       if ($sideKey < $angleKey) {
+        for ($i=1;$i<4;$i++) {
+          if (empty($argsArray[$sideKey][$i])) {
+            echo 'Eek! "Sides" must be followed by three side lengths.';
+            return '';
+          }
+        }
         if (isset($argsArray[$sideKey][7])) {
           $hasMarks = true;
           for ($i=7;$i<10;$i++) {
@@ -848,6 +983,12 @@ function draw_triangle() {
     }
     // Has angles, but no sides
     if ($noSides === true && $noAngles === false) {
+      for ($i=1;$i<4;$i++) {
+        if (empty($argsArray[$angleKey][$i])) {
+          echo 'Eek! "Angles" must be followed by three angles in degrees.';
+          return '';
+        }
+      }
       if (isset($argsArray[$angleKey][7])) {
         $hasArcs = true;
       }
@@ -872,6 +1013,10 @@ function draw_triangle() {
   }
   
   foreach ($ang as $key => $angle) {
+    if ($angle <= 0) {
+      echo "Eek! Angles must be positive numbers.";
+      return '';
+    }
     if (abs($angle - 90) < 1E-9) {
       // Finds the right angle
       $perpKey = $key;
@@ -1470,5 +1615,105 @@ function draw_prismcubes() {
   $gr = showasciisvg("setBorder(10);initPicture(-$xyMin,1.1*$xyMax,-$xyMin,1.1*$xyMax);$args;",$size,$size);
   return $gr;
 }
+
+
+//--------------------------------------------draw_cylinder----------------------------------------------------
+
+// draw_cylinder(diameter,height,[option1],[option2],...)
+// draw_cylinder() draws a random cylinder with no labels.
+// draw_cylinder(a,b) scale drawing of a cylinder with diameter "a" and height "b".
+// Options are lists in quotes, including:
+// "radius,[label]" Draws a radius on the top circle with optional label.
+// "diameter,[label]" Draws a diameter on the top circle with optional label.
+// "height,[label]" Labels the height of the cylinder.
+// "fill,[percent]" Fills a specified percent of the cylinder. If 'percent' is omitted, fills a random percent.
+// "size,length" Sets the size of the image to length x length.
+
+function draw_cylinder() {
+  $size = 300;
+  $input = func_get_args();
+  $argsArray = [];
+  foreach ($input as $list) {
+    if (!is_array($list)) {
+      $list = listtoarray($list);
+    }
+    $list = array_map('trim', $list);
+    $argsArray[]=$list;
+  }
   
+  foreach ($argsArray as $in) {
+    if ($in[0] == "size") {
+      if (is_numeric($in[1])) {
+        $size = $in[1];
+      }
+    }
+    if ($in[0] == "fill") {
+      $hasFill = true;
+      if (!is_numeric($in[1])) {
+        $fillPercent = rand(20,80);
+      } elseif (is_numeric($in[1])) {
+        if ($in[1]<0 || $in[1]>100) {
+          echo 'Eek! Fill percent must be between 0 and 100.';
+          return '';
+        }
+        $fillPercent = $in[1];
+      }
+    }
+  }
+  
+  if ((is_numeric($argsArray[0][0]) && !is_numeric($argsArray[1][0])) || (!is_numeric($argsArray[0][0]) && is_numeric($argsArray[1][0]))) {
+    echo 'Warning! Gave diameter without height.';
+  }
+  if (is_numeric($argsArray[0][0]) && $argsArray[0][0]>0 && is_numeric($argsArray[1][0]) && $argsArray[1][0]>0) {
+    $diameter = $argsArray[0][0];
+    $height = $argsArray[1][0];
+  } else {
+    [$diameter,$height] = diffrands(3,8,2);
+  }
+  
+  // Set the window dimensions
+  $af = 4;
+  $dim = max(1.5*$diameter/2,1.5*($height/2+$diameter/$af));
+  
+  // Fill cylinder
+  $fillColor = 'black';
+  if ($hasFill === true) {
+    $fillHeight = $fillPercent/100*$height;
+    $fillColor = 'slategray';
+    $args = $args . "strokewidth=0; fill='lightblue'; fillopacity=0.5; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],0,2*pi); plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); rect([-$diameter/2,-$height/2],[$diameter/2,-$height/2+$fillHeight]); strokewidth=1; fill='none'; stroke='steelblue'; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2+$fillHeight'],0,2*pi); stroke='black';";
+  }
+  
+  // Draw the cylinder
+  $args = $args . "strokewidth=2.5; strokedasharray='4 4'; stroke='$fillColor'; plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],0,pi); stroke='black'; strokedasharray='1 0'; fill='none'; ellipse([0,$height/2],$diameter/2,$diameter/$af); fill='none'; line([-$diameter/2,-$height/2],[-$diameter/2,$height/2]); line([$diameter/2,-$height/2],[$diameter/2,$height/2]); plot(['$diameter/2*cos(t)','$diameter/$af*sin(t)-$height/2'],pi,2*pi);";
+  
+  // Draw and label the radius
+  foreach ($argsArray as $in) {
+    if ($in[0] == "radius") {
+      $args = $args . "strokewidth=1; line([0,$height/2],[$diameter/2,$height/2]);";
+      if (isset($in[1])) {
+        $args = $args . "strokewidth=1; arc([$diameter/2,$height/2+1.5*$diameter/$af+$diameter/(10*$af)],[$diameter/4,$height/2+$diameter/(10*$af)],$diameter); text([$diameter/2,$height/2+1.5*$diameter/$af],'$in[1]',above);strokewidth=2;";
+      }
+    }
+  }
+  
+  // Draw and label the diameter
+  foreach ($argsArray as $in) {
+    if ($in[0] == "diameter") {
+      $args = $args . "strokewidth=1; line([-$diameter/2,$height/2],[$diameter/2,$height/2]);";
+      if (isset($in[1])) {
+        $args = $args . "strokewidth=1; arc([$diameter/2,$height/2+1.5*$diameter/$af+$diameter/(10*$af)],[$diameter/4,$height/2+$diameter/(10*$af)],$diameter); text([$diameter/2,$height/2+1.5*$diameter/$af],'$in[1]',above);strokewidth=2;";
+      }
+    }
+  }
+  
+  // Label the height
+  foreach ($argsArray as $in) {
+    if ($in[0] == "height") {
+      $args = $args . "text([$diameter/2,0],'$in[1]',right);";
+    }
+  }
+
+  $gr = showasciisvg("setBorder(20);initPicture(-0.75*$dim,1.25*$dim,-$dim,$dim);$args",$size,$size);
+  return $gr;
+}
 ?>
