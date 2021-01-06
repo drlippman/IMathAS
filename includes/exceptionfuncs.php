@@ -148,7 +148,7 @@ class ExceptionFuncs {
 		if ($exception!==null && $exception!==false && !empty($exception[3])) {
 			//is LTI-set - use the exception
 
-		} else if ($exception!==null && $exception[2]>0 && ($adata['enddate']>$exception[1] || $exception[1]>$this->courseenddate)) {
+		} else if ($exception!==null && $exception[2]>0 && $exception[0]>=$adata['startdate'] && ($adata['enddate']>$exception[1] || $exception[1]>$this->courseenddate)) {
 			//if latepass and assessment enddate is later than exception enddate, skip exception
 			//or, if latepass and exception would put it past the course end date, skip exception
 			$useexception = false;
