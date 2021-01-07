@@ -527,7 +527,12 @@ class DrawingAnswerBox implements AnswerBox
     			foreach($answers as $ans) {
     				if (is_array($ans)) { continue;} //shouldn't happen, unless user forgot to set question to multipart
     				if ($ans=='') { continue;}
-    				$function = array_map('trim',explode(',',$ans));
+                    $function = array_map('trim',explode(',',$ans));
+                    $defcolor = 'blue';
+                    if ($function[0] == 'optional') {
+                        array_shift($function);
+                        $defcolor = 'grey';
+                    }
     				if ($answerformat[0]=='inequality') {
     					if ($function[0]{2}=='=') {
     						$type = 10;
@@ -540,7 +545,7 @@ class DrawingAnswerBox implements AnswerBox
     					$saarr[$k]  = makepretty($function[0]).','.$ineqcolors[$k%3];
     				} else {
     					if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-    						$saarr[$k] = $function[1].',blue,'.$function[0].','.$function[0];
+    						$saarr[$k] = $function[1].','.$defcolor.','.$function[0].','.$function[0];
     						if (count($function)==2 || $function[2]=='closed') {
     							$saarr[$k] .= ',closed';
     						} else {
@@ -560,11 +565,11 @@ class DrawingAnswerBox implements AnswerBox
     							$dy = $function[2];
     							$xs = 0; $ys = 0;
     						}
-    						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],blue,0,1,,arrow";
+    						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],$defcolor,0,1,,arrow";
     					} else if ($function[0]=='circle') { //is circle
-    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
+    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],$defcolor,0,6.31";
     					} else if ($function[0]=='ellipse') {
-    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[4]}*sin(t)+{$function[2]}],blue,0,6.31";
+    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[4]}*sin(t)+{$function[2]}],$defcolor,0,6.31";
     					} else if ($function[0]=='verthyperbola') {
     						//(y-yc)^2/a^2 -  (x-xc)^2/b^2 = 1
     						$saarr[$k] = "sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2]";
@@ -576,9 +581,9 @@ class DrawingAnswerBox implements AnswerBox
     						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]-$function[3]*t],green,,,,,,dash";
     					} else if ($function[0]=='horizhyperbola') {
     						//(x-xc)^2/a^2 - (y-yc)^2/b^2 = 1
-    						$saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
+    						$saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],$defcolor,$settings[2],$settings[3]";
     						$k++;
-    						$saarr[$k] = "[-sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
+    						$saarr[$k] = "[-sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],$defcolor,$settings[2],$settings[3]";
     						$k++;
     						$saarr[$k] = "[$function[1]+$function[3]*t,$function[2]+$function[4]*t],green,,,,,,dash";
     						$k++;
@@ -587,16 +592,16 @@ class DrawingAnswerBox implements AnswerBox
     						if (count($function)==3) {
     							if ($function[1] == '-oo') { $function[1] = $settings[2]-.1*($settings[3]-$settings[2]);}
     							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}
-    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.$function[1].','.$function[2];
+    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],'.$defcolor.','.$function[1].','.$function[2];
     						} else {
-    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],'.$defcolor.','.($settings[2]-1).','.($settings[3]+1);
     						}
     					} else { //is function
                 			if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^(]|ln[^\(]|root[^\(]|root\([^\)]*?\)[^\(])/', $function[0], $m)) {
     							echo "Invalid notation on ".Sanitize::encodeStringForDisplay($function[0]).": missing function parens";
     							continue;
     						}
-    						$saarr[$k] = $function[0].',blue';
+    						$saarr[$k] = $function[0].','.$defcolor;
     						if (count($function)>2) {
     							if ($function[1] == '-oo') { $function[1] = $settings[0]-.1*($settings[1]-$settings[0]);}
     							if ($function[2] == 'oo') { $function[2] = $settings[1]+.1*($settings[1]-$settings[0]);}
