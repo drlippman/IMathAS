@@ -2996,7 +2996,11 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
         <li>allowmixed: will enable support for mixed numbers (like 2 1/2) in answers</li>
         <li>allowdegrees: will enable the use of the degree symbol to designate degrees, so sin(30degree)=1/2.</li>
 		<li>noval: tells the answer preview to not compute a decimal equivalent (deprecated - this option is now enabled by default)</li>
-		<li>showval: tells the answer preview to display a decimal equivalent</li>
+        <li>showval: tells the answer preview to display a decimal equivalent</li>
+        <li>sameform: requires the student's answer be in the "same form" as the correct answer. This means 
+            exactly the same, except for commutation of addition and multiplication, multiplication by 1,
+            implicit multiplication, and extra parentheses. Use with caution.</li>
+        </li>
 		</ul></li>
 	<li>List options: only use at most one of these at a time
 		<ul>
@@ -3235,7 +3239,7 @@ A student is asked to enter a function
 	Include "ignore_case,false" to make the search case sensitive.
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
+<dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -3251,7 +3255,11 @@ A student is asked to enter a function
     scalar multiple.<br/>
 	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions".
 	$ansprompt can override the default statements like this:
-	$ansprompt = "One function, f(x)=;No such function exists"
+    $ansprompt = "One function, f(x)=;No such function exists" <br/>
+    "sameform": requires the student's answer be in the "same form" as the correct answer. This means 
+        exactly the same, except for commutation of addition and multiplication, multiplication by 1,
+        implicit multiplication, and extra parentheses. (2x-3)(5-x) would be "safeform" as (-1x+5)(2*x-3), 
+        but 2/4x and 1/2x and 0.5x would not be "sameform". Use with caution.
 	</dd>
 <dt>$formatfeedbackon = true</dt>
 	<dd>Turns on "right answer, wrong format" feedback on the question</dd>
