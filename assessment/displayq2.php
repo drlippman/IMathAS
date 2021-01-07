@@ -2454,7 +2454,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 
 		$la = preg_replace('/%(\w+;)/',"&$1",$la);
-		$la = str_replace('&tilde;', '~', $la);
+        $la = str_replace('&tilde;', '~', $la);
 
 		if ($answerformat=='list') {
 			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
@@ -2468,7 +2468,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			foreach ($questions as $i=>$v) {
 				$out .= '<option value="'.htmlentities($v).'"';
 				//This is a hack.  Need to figure a better way to deal with & in answers
-				if (str_replace('&','',$v)==$la) {
+				if (str_replace(['&amp;','&'],'',$v)==str_replace(['&amp;','&'],'',$la)) {
 					$out .= ' selected="selected"';
 				}
 				$out .= '>'.htmlentities($v).'</option>';
