@@ -308,7 +308,7 @@ function finderiv_immdate($start,$n,$fmt="F j, Y") {
 		return false;
 	}
 	$month = $startdate->format('n');
-	$offset = $month%3;
+	$offset = (12-$month)%3;
 	$IMMdate = clone($startdate);
 	if ($offset==0) {
 		// need to check whether the start date is 
@@ -321,7 +321,7 @@ function finderiv_immdate($start,$n,$fmt="F j, Y") {
 			$IMMdate->modify ('+ ' . 3*$n . ' months');
 		}
 	} else {
-		$IMMdate->modify ('+ ' . 3*($n-1)+ $offset . ' months');
+		$IMMdate->modify ('+ ' . (3*($n-1)+$offset) . ' months');
 	}
 	$IMMdate->modify('third Wednesday of this month');
 	
@@ -346,7 +346,7 @@ function finderiv_equityfutdate($start,$n,$fmt="F j, Y") {
 		return false;
 	}
 	$month = $startdate->format('n');
-	$offset = $month%3;
+	$offset = (12-$month)%3;
 	$futdate = clone($startdate);
 	if ($offset==0) {
 		// need to check whether the start date is 
@@ -359,7 +359,7 @@ function finderiv_equityfutdate($start,$n,$fmt="F j, Y") {
 			$futdate->modify ('+ ' . 3*$n . ' months');
 		}
 	} else {
-		$futdate->modify ('+ ' . 3*($n-1)+ $offset . ' months');
+		$futdate->modify ('+ ' . (3*($n-1)+ $offset) . ' months');
 	}
 	$futdate->modify('third Friday of this month');
 	
