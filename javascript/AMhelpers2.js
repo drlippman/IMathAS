@@ -432,7 +432,7 @@ function initShowAnswer2() {
       }).on('click', function(e) {
           var curstate = (e.currentTarget.getAttribute('aria-expanded') == 'true');
           e.currentTarget.setAttribute('aria-expanded', curstate ? 'false' : 'true');
-          $("#ans"+qref).toggle(!curstate);
+          $("#ans"+qref).toggleClass("hidden", curstate);
         })
         .html(icon)
     );
@@ -440,7 +440,7 @@ function initShowAnswer2() {
       var wrap = $("#qnwrap"+inref);
       if (wrap.length > 0) {
         $(el).prev(".sabtn").remove();
-        key.append($(el).hide().removeClass("hidden"))
+        key.append($(el))
           .addClass("inwrap");
         wrap.append(key);
         return;
@@ -448,14 +448,14 @@ function initShowAnswer2() {
       var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref);
       if (inbox.length > 0) {
         $(el).prev(".sabtn").remove();
-        key.append($(el).hide().removeClass("hidden"));
+        key.append($(el));
         inbox.after(key);
         return;
       }
     }
     // not in autoshowans or no match, so don't want to relocate, just refresh
     var parel = $(el).parent();
-    key.append($(el).hide().removeClass("hidden"));
+    key.append($(el));
     parel.empty().append(key);
   });
 

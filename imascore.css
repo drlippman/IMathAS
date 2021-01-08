@@ -154,7 +154,9 @@ div.block.grouptoggle + div.blockitems {
 	margin-top: 0px
 }
 .hidden,.pseudohidden {
-	display:none;
+    visibility: hidden;
+    position: absolute;
+    height: 0;
 }
 .showinmobile {
 	display:none;
