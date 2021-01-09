@@ -1142,7 +1142,7 @@ function processNumber(origstr, format) {
     if (format.indexOf('list')!== -1) {
         var strs = origstr.split(/\s*,\s*/);
     } else {
-        var strs = [origstr.replace(/,/,'')];
+        var strs = [origstr.replace(/,/g,'')];
     }
     var str;
     for (var j=0;j<strs.length;j++) {
