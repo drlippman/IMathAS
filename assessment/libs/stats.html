@@ -1,6 +1,6 @@
 <html><body>
 <h1>Macro Library stats</h1>
-A library of Stats functions.  Version 1.10, Nov 17, 2017
+A library of Stats functions.  Version 1.20, Jan 8, 2021
 <BR><ul>
 <li><a href="#nCr">nCr</a></li>
 <li><a href="#nPr">nPr</a></li>
@@ -339,7 +339,7 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   <p>Function anova1way() performs one-way analysis of variance (ANOVA) on two or more groups and returns the ANOVA table as an array with each row corresponding to Factor A, error (residual), and totals.</p>
   <p><em>Parameters:</em></p>
   <ul>
-      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]</li>
+      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes.</li>
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>ANOVA table as an array in the following format. 
@@ -351,7 +351,7 @@ dotplot(array,label,[dotspacing,labelspacing,width,height])
   <p>Function anova1way_f() performs one-way analysis of variance (ANOVA) on two or more groups and returns F ratio and the corresponding P value as an array.</p>
   <p><em>Parameters:</em></p>
   <ul>
-      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]</li>
+      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes.</li>
   </ul>
   <p>&nbsp;<em>Returns:</em></p>
   <p>F ratio and the corresponding P value as an array in the form [F ratio, P value].</p>
