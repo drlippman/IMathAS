@@ -2437,9 +2437,7 @@ function anova1way_f(... $arr){
 		$ss[$i]=variance($arr[$i])*(count($arr[$i])-1);
 		//$n[$i]=count($args[$i]);
 	}
-	for ($i=0;$i<$numargs;$i++){
-		$gmean=array_sum($mean)/count($mean); //grand mean 
-	}
+	
 	$total = array_map(function($x, $y) { return $x * $y; },
                    $mean, $n);
 
@@ -2507,9 +2505,7 @@ function anova1way(... $arr){
 		$ss[$i]=variance($arr[$i])*(count($arr[$i])-1);
 		//$n[$i]=count($args[$i]);
 	}
-	for ($i=0;$i<$numargs;$i++){
-		$gmean=array_sum($mean)/count($mean); //grand mean 
-	}
+	
 	$total = array_map(function($x, $y) { return $x * $y; },
                    $mean, $n);
 
