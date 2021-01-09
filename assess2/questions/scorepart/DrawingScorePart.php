@@ -1013,7 +1013,7 @@ class DrawingScorePart implements ScorePart
             }
 
             foreach ($ansvecs as $key=>$ansvec) {
-                $scores[$key] = 0;
+                $scores[$scoretype[$key]][$key] = 0;
                 if (($scoremethod == 'direction' || $scoremethod == 'relativelength') &&
                     ($ansvec[0]=='p' || $ansvec[0] == 'd')
                 ) {
