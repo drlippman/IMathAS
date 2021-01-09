@@ -587,7 +587,7 @@ if ($overwriteBody==1) {
 			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
 
-		<span class=form>New post notifcation:</span>
+		<span class=form>New post notification:</span>
 		<span class=formright>
 			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
 			Get email notification of new posts
