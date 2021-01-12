@@ -95,3 +95,18 @@ function createSectionGroupset($courseid) {
 
     return $groupsetid;
 }
+
+function sendMsgOnEnroll($msgset,$cid,$userid) {
+    global $DBH;
+    $msgOnEnroll = ((floor($msgset/5)&2) > 0);
+    if ($msgOnEnroll) {
+        $stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
+        $stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
+        $stm->execute(array(':cid'=>$cid));
+        while ($tuid = $stm->fetchColumn(0)) {
+            $stm_nmsg->execute(array(':cid'=>$cid,':title'=>_('Automated new enrollment notice'),
+                ':message'=>_('This is an automated system message letting you know this student just enrolled in your course'),
+                ':msgto'=>$tuid, ':msgfrom'=>$userid, ':senddate'=>time()));
+        }
+    }
+}
