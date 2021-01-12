@@ -1083,9 +1083,13 @@ class AssessRecord
     foreach ($this->data['assess_versions'] as $k=>$ver) {
       // if it's a submitted version or an active one no longer available
       if ($ver['status'] === 1 || (!$is_available && $ver['status'] === 0)) {
-        $out[$k] = array(
-          'date' => tzdate("n/j/y, g:i a", $ver['lastchange'])
-        );
+        if ($ver['lastchange'] == 0) {
+            $out[$k] = array('date' => _('Never submitted'));
+        } else {
+            $out[$k] = array(
+                'date' => tzdate("n/j/y, g:i a", $ver['lastchange'])
+            );
+        }
         // show score if forced, or
         // if by_question and not available and showscores is allowed, or
         // if by_assessment and submitted and showscores is allowed
