@@ -2753,6 +2753,7 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 		return '0';
     }
     $maxden = min($maxden, 1e16);
+
 	if ($d<0) {
 		$sign = '-';
 	} else {
@@ -2766,13 +2767,16 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 	$calcD = -1;
 	$prevCalcD = -1;
 	for ($i = 2; $i < 1000; $i++)  {
-		$L2 = floor($d2);
+        $L2 = floor($d2);
+        $newdenom = $L2 * $denominators[$i-1] + $denominators[$i-2];
+        if (abs($newdenom)>$maxden) {
+            $i--;
+            break;
+        }
 		$numerators[$i] = $L2 * $numerators[$i-1] + $numerators[$i-2];
 		//if (Math.abs(numerators[i]) > maxNumerator) return;
-		$denominators[$i] = $L2 * $denominators[$i-1] + $denominators[$i-2];
-		if (abs($denominators[$i])>$maxden) {
-			break;
-		}
+		$denominators[$i] = $newdenom;
+		
 		$calcD = $numerators[$i] / $denominators[$i];
 		if ($calcD == $prevCalcD) { break; }
 
@@ -2785,7 +2789,7 @@ function decimaltofraction($d,$format="fraction",$maxden = 10000000) {
 
 		$d2 = 1/($d2-$L2);
     }
-	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-10) {
+	if (abs($numerators[$i]/$denominators[$i] - $d)>1e-12) {
 		return $d;
     }
 	if ($format=="mixednumber") {
