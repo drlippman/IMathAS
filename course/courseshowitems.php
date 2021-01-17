@@ -1025,7 +1025,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 
-			   } else if (!$viewall && $line['avail']>0 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
+			   } else if (!$viewall && $line['avail']>0 && ($nothidden || $showgreyedout) && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
 
 			   	   if ($now<$line['startdate']) {
 			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
@@ -1036,11 +1036,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '<div class="itemhdr">';
 				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 				   echo "<div class=\"title grey\"><i>".Sanitize::encodeStringForDisplay($line['name'])."</i>";
-				   echo "<br/><i>$show</i>\n";
-				   if ($viewall) {
-				   	   echo $preReqNote;
-                   }
+                   echo "<br/><i>$show</i>\n";
+                   
+				   echo $preReqNote;
                    echo $excusedNote;
+                   
 				   echo '</div>'; //title
 				   if ($canedit) {
 				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
