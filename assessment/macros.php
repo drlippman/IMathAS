@@ -35,7 +35,7 @@ array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog",
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
- "randcountry","randcountries","sorttwopointdata");
+ "randcountry","randcountries","sorttwopointdata","addimageborder");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -2705,6 +2705,19 @@ function changeimagesize($img,$w,$h='') {
 	}
 	$img = str_replace('<img', '<img '.$sizestr, $img);
 	return $img;
+}
+
+function addimageborder($img, $w=1, $m=0) {
+    $style = 'border:'.intval($w).'px solid black;';
+    if ($m>0) {
+        $style .= 'margin:'.intval($m).'px;';
+    }
+    if (strpos($img,'style=')!==false) {
+        $img = str_replace('style="','style="'.$style, $img);
+    } else {
+        $img = str_replace('<img ','<img style="'.$style.'" ', $img);
+    }
+    return $img;
 }
 
 function today($str = "F j, Y") {

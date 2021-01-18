@@ -2336,6 +2336,8 @@ The following macros create graphs or tables:
     image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.
     textonimage is not screenreader-friendly, so it's recommended you provide an alt text on the image, 
     which will be read to the screenreader instead of the image and any layered text.</li>
+<li><strong>addimageborder(image, [border width, margin])</strong>: Adds a border to an image uploaded in 
+    the question editor. Border width (default 1) and whitespace margin (default 0) can be specified.</li>
 <li><strong>arraystodoteqns(xarray,yarray,[color])</strong>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
 <li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts an array of x-values and y-values into a form that
