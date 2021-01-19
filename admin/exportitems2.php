@@ -301,10 +301,8 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
             }
             // skip if license type is excluded
             if (!empty($_POST['excludecopyright']) && $line['license'] == 0) {
-                echo "c: skipping question $qid.";
                 continue;
             } else if (!empty($_POST['excludenc']) && $line['license'] == 3) {
-                echo "nc: skipping question $qid.";
                 continue;
             } else {
                 unset($line['license']);
