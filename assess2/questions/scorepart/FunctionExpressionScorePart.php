@@ -74,7 +74,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         $correct = true;
 
-        $givenans = str_replace(',','', $givenans);
+        $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$givenans);
 
         if (!isset($variables)) { $variables = "x";}
         $variables = array_map('trim',explode(",",$variables));
