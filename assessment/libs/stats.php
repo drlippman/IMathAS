@@ -2287,6 +2287,10 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 //argument should be header,column,header,column,...
 function csvdownloadlink() {
   $alist = func_get_args();
+  $filename = "data";
+  if (count($alist)>1 && is_string($alist[1])) {
+      $filename = array_shift($alist);
+  }
   if (count($alist)==0 || count($alist)%2==1) {
     echo "invalid arguments to csvdownloadlink";
     return '';
@@ -2305,7 +2309,7 @@ function csvdownloadlink() {
     $rows[$i] = rtrim($row,',');
   }
   $str = implode("\n",$rows);
-  return '<a download="data.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
+  return '<a download="'.Sanitize::encodeStringForDisplay($filename).'.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
     . _('Download CSV').'</a>';
 }
 

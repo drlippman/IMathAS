@@ -323,9 +323,10 @@ mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
 <BR>width and height are optional, default to 300 by 300.  Does not include labels
 <BR>
 <BR><h3><a name="csvdownloadlink">csvdownloadlink</a></h3>
-csvdownloadlink(string,array,[string,array]...)
+csvdownloadlink([filename],string,array,[string,array]...)
 <p>Creates a link that downloads the specified data in CSV format. For each column
-  provide a string header and an array of values.</p>
+  provide a string header and an array of values.  A filename (without the .csv) can 
+  optionally be provided as a first argument.</p>
 <BR><h3><a name="dotplot">dotplot</a></h3>
 dotplot(array,label,[dotspacing,labelspacing,width,height]) 
 <BR>Display macro.  Creates a dotplot from a data set
