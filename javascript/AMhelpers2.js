@@ -770,7 +770,7 @@ function normalizemathunicode(str) {
 }
 
 function htmlEntities(str) {
-  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/&/g,'&amp;');
+  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&/g,'&amp;');
 }
 
 /**
