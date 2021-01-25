@@ -247,7 +247,7 @@ class ScoreEngine
                 $additionalVarsForScoring,
                 $stuanswers, $quesData['qtype']);
         } else {
-            $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $quesData);
+            $scoreResult = $this->scorePartNonMultiPart($scoreQuestionParams, $quesData, $stuanswers);
             if ($quesData['qtype'] == "conditional") {
               // Store just-build $stuanswers as lastanswer for conditional
               // in case there was no POST (like multans checkbox), null out
@@ -411,6 +411,21 @@ class ScoreEngine
                 }
             }
         }
+
+        foreach ($_FILES as $postk => $postv) {
+            $prefix = substr($postk, 0, 2);
+            if ($prefix == 'qn') { // TODO: handle "qs" from nosolninf
+                $partnum = intval(substr($postk, 2));
+                if (floor($partnum / 1000) == $thisq) {
+                    $kidx = round($partnum - 1000 * floor($partnum / 1000));
+                    if (is_array($parts_to_score) && empty($parts_to_score[$kidx])) {
+                        continue; // don't process if not in to-score list
+                    }
+                    $stuanswers[$thisq][$kidx] = $this->storeFileUpload($partnum, $assessmentId);
+                }
+            }
+        }
+
         $processed_stuans = $scoreQuestionParams->getProcessedStuans();
         foreach ($processed_stuans as $pn=>$val) {
             $stuanswers[$thisq][$pn] = $val;
@@ -496,6 +511,8 @@ class ScoreEngine
                     }
                 }
             }
+        } else if (isset($_FILES["qn$qnidx"])) {
+            $stuanswers[$thisq] = $this->storeFileUpload($qnidx, $assessmentId);
         }
         $processed_stuans = $scoreQuestionParams->getProcessedStuans();
         if (!empty($processed_stuans[0])) {
@@ -574,6 +591,9 @@ class ScoreEngine
             if (!$baseIsRescore && is_array($parts_to_score) && empty($parts_to_score[$partnum])) {
                 // not scoring it, so treat as rescore, using the stuanswer
                 $scoreQuestionParams->setIsRescore(true);
+                $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum]);  
+            } else if ($anstype === 'file') {
+                $scoreQuestionParams->setIsRescore($baseIsRescore);
                 $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum]);  
             } else {
                 $scoreQuestionParams->setIsRescore($baseIsRescore);
@@ -686,13 +706,17 @@ class ScoreEngine
      * @return array An array of scores.
      */
     private function scorePartNonMultiPart(ScoreQuestionParams $scoreQuestionParams,
-                                           array $qdata): array
+                                           array $qdata, array $stuanswers): array
     {
         $qnidx = $scoreQuestionParams->getQuestionNumber();
 
         $scoreQuestionParams
             ->setAnswerType($qdata['qtype'])
             ->setIsMultiPartQuestion(false);
+
+        if ($qdata['qtype'] === 'file') {
+            $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1]); 
+        }
 
         $scorePart = ScorePartFactory::getScorePart($scoreQuestionParams);
         $scorePartResult = $scorePart->getResult();
@@ -724,6 +748,57 @@ class ScoreEngine
     {
         return ($questionData['qtype'] == "multipart"
             || $questionData['qtype'] == 'conditional');
+    }
+
+    /**
+     * Store a file upload 
+     * @param int $qn  question/part number, adjusted for multipart as needed
+     * @param int $assessmentId  the assessment ID
+     */
+    private function storeFileUpload($qn, $assessmentId) {
+        require_once(__DIR__ . "/../../includes/filehandler.php");
+
+        if (empty($_FILES["qn$qn"])) {
+            return '';
+        }
+        $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
+        $filename = preg_replace('/[^\w\.]/','',$filename);
+        $extension = strtolower(strrchr($filename,"."));
+        $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
+        if (in_array($extension,$badextensions)) {
+            return _('Error - Invalid file type');
+        } else if (empty($assessmentId)) {
+            return _('Error - no asid');
+        } else if (!is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+            if ($_FILES["qn$qn"]['error']==2 || $_FILES["qn$qn"]['error']==1) {
+                return _('Error uploading file - file too big');
+            } else {
+                return _('Error uploading file');
+            }
+        }
+        $randstr = '';
+        $chars = 'abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789';
+        $m = microtime(true);
+        $res = '';
+        $in = floor($m)%1000000000;
+        while ($in>0) {
+            $i = $in % 62;
+            $in = floor($in/62);
+            $randstr .= $chars[$i];
+        }
+        $in = floor(10000*($m-floor($m)));
+        while ($in>0) {
+            $i = $in % 62;
+            $in = floor($in/62);
+            $randstr .= $chars[$i];
+        }
+        $s3asid = $assessmentId."/$randstr";
+        $s3object = "adata/$s3asid/$filename";
+        if (storeuploadedfile("qn$qn",$s3object)) {
+            return "@FILE:$s3asid/$filename@";
+        } else {
+            return _('Error storing file');
+        }
     }
 
     /**

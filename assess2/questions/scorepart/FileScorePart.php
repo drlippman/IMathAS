@@ -42,6 +42,23 @@ class FileScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
+        if ($givenans === null || substr($givenans,0,5) !== '@FILE') { // handle error or empty case
+            $scorePartResult->setLastAnswerAsGiven($givenans);
+            if (!empty($givenans)) {
+                $scorePartResult->addScoreMessage($givenans);
+            }
+            if (isset($scoremethod) && $scoremethod=='takeanythingorblank') {
+                $scorePartResult->setRawScore(1);
+                return $scorePartResult;
+            } else {
+                $scorePartResult->setRawScore(0);
+                return $scorePartResult;
+            }
+        } else {
+            $scorePartResult->setLastAnswerAsGiven($givenans);
+            $scorePartResult->addScoreMessage(_("Successful"));
+        }
+/*
         $filename = basename(str_replace('\\','/',$_FILES["qn$qn"]['name']));
         $filename = preg_replace('/[^\w\.]/','',$filename);
         $hasfile = false;
@@ -49,19 +66,6 @@ class FileScorePart implements ScorePart
         if (trim($filename)=='') {
             if (is_string($givenans) && substr($givenans,0,5) === '@FILE') { // has an autosaved file
                 $scorePartResult->setLastAnswerAsGiven($givenans);
-                if ($answerformat=='excel') {
-                  // TODO if we want to resurrect this
-                    /*$zip = new ZipArchive;
-                    if ($zip->open(getasidfilepath($_POST["lf$qn"]))) {
-                        $doc = new DOMDocument();
-                        $doc->loadXML($zip->getFromName('xl/worksheets/sheet1.xml'));
-                        $zip->close();
-                    } else {
-                        $scorePartResult->addScoreMessage(_(' Unable to open Excel file'));
-                        $scorePartResult->setRawScore(0);
-                        return $scorePartResult;
-                    }*/
-                }
                 $hasfile = true;
             } else {
                 $scorePartResult->setLastAnswerAsGiven('');
@@ -162,6 +166,8 @@ class FileScorePart implements ScorePart
                 return $scorePartResult;
             }
         }
+    */
+
         if (isset($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
