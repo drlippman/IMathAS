@@ -23,7 +23,7 @@ your changes and run to make sure that nothing is broken.</p>
 <li><a href="#dates_eomonth">dates_eomonth</a></li>
 <li><a href="#dates_diffdays">dates_diffdays</a></li>
 <li><a href="#dates_randdate">dates_randdate</a></li>
-<li><a href="#dates_formatdate">dates_formatdate</a></li>
+<li><a href="#dates_dateformat">dates_dateformat</a></li>
 </ul>
 <h4><a name="dates_adddays">dates_adddays</a></h4>
 <p>function dates_adddays(date,days,format)</p>
@@ -51,6 +51,9 @@ your changes and run to make sure that nothing is broken.</p>
 <h4><a name="dates_randdate">dates_randdate</a></h4>
 <p>function dates_randdate(date1,date2,format)</p>
 <p>Returns a random date between date1 and date2. Input dates are formatted with the given format.</p>
-<h4><a name="dates_formatDate">dates_formatDate</a></h4>
-<p>function dates_formatDate(date1,origFormat,newFormat)</p>
-<p>Returns a date formatted with a new format.</p>
+<h4><a name="dates_dateformat">dates_dateformat</a></h4>
+<p>function dates_dateformat(date1,origFormat,newFormat)</p>
+<p>
+    Returns a date formatted with a new format. A reference to the available formatting codes can be found
+    <a href="https://www.php.net/manual/en/datetime.formats.date.php">here</a>.
+</p>
