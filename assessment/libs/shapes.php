@@ -1299,6 +1299,18 @@ function draw_triangle() {
         $args = $args . "text([{$altLab[$i][0]},{$altLab[$i][1]}],'{$altitudes[$i+3]}');";
       }
     }
+    // Redefine window settings in case extended base and altitude intersect outside the standard window
+    $toCheckx = [$x[0],$x[1],$x[2],$altEnd[0][0],$altEnd[1][0],$altEnd[2][0]];
+    $toChecky = [$y[0],$y[1],$y[2],$altEnd[0][1],$altEnd[1][1],$altEnd[2][1]];
+    $xmin = min($toCheckx);
+    $xmax = max($toCheckx);
+    $ymin = min($toChecky);
+    $ymax = max($toChecky);
+    $xyDiff = max(($xmax-$xmin),($ymax-$ymin))/2;
+    $xminDisp = (($xmax + $xmin)/2-1.35*$xyDiff); //window settings
+    $xmaxDisp = (($xmax + $xmin)/2+1.35*$xyDiff);
+    $yminDisp = (($ymax + $ymin)/2-1.35*$xyDiff);
+    $ymaxDisp = (($ymax + $ymin)/2+1.35*$xyDiff);
   }
     
   // PLACE SIDE TICK MARKS
