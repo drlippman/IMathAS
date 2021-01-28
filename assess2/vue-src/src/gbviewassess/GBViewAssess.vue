@@ -166,7 +166,7 @@
             {{ $t('gradebook.' + (showEndmsg ? 'hide' : 'show') + '_endmsg') }}
           </button>
           <button
-            v-if = "!isByQuestion"
+            v-if = "!isByQuestion && canEdit"
             type="button"
             @click="clearAttempts('attempt')"
           >
