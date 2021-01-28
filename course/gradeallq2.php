@@ -161,8 +161,8 @@
 							}
 						}
 					}
-					if (isset($grpfeedback[$line['agroupid']])) {
-						foreach ($grpfeedback[$line['agroupid']] as $loc=>$sv) {
+					if (isset($grpfeedbacks[$line['agroupid']])) {
+						foreach ($grpfeedbacks[$line['agroupid']] as $loc=>$sv) {
 							$allQns[] = $loc;
 							$feedbackToSet[$loc] = $sv;
 						}
