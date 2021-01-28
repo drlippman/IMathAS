@@ -43,9 +43,9 @@
   <li><strong>"angles,A,B,C,[lab1,lab2,lab3,arc1,arc2,arc3]"</strong> Here, A,B,C are angles (in degrees) that define the triangle; lab1,lab2,lab3 are the angle labels; and arc1,arc2,arc3 can be (,(( or ((( to make arc symbols.</li>
   <li><strong>"sides,a,b,c,[lab1,lab2,lab3,tick1,tick2,tick3]"</strong> Here, a,b,c are sides that define the triangle; lab1,lab2,lab3 are the side labels; and tick1,tick2,tick3 can be |,|| or ||| to make side tickmarks.</li>
   <li><strong>"points,[P,Q,R]"</strong> Draws points on the vertices, and P,Q,R are optional labels on those points. If a label is a point (a,b), type it as (a;b).</li>
-  <li><strong>"bisector,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> The three entries following "bisector" correspond to the order of the angles. Put a "1" to draw the angle bisector for that angle; leave blank (or put a zero) to not draw the bisector. lab1,lab2,lab3 are labels for the bisector, and ptab1,ptlab2,ptlab3 are labels for where the bisectors intersect their opposite sides.</li>
-  <li><strong>"median,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle. lab1,lab2,lab3 are labels for the medians, and ptab1,ptlab2,ptlab3 are labels for where the medians intersect their opposite sides</li>
-  <li><strong>"altitude,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle. lab1,lab2,lab3 are labels for the altitudes, and ptab1,ptlab2,ptlab3 are labels for where the altitudes intersect their opposite (extended) sides. Dashed lines are drawn to extend opposite side if necessary.</li>
+  <li><strong>"bisector,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> The three entries following "bisector" correspond to the order of the angles. Put a "1" to draw the angle bisector for that angle; leave blank (or put a zero) to not draw the bisector. lab1,lab2,lab3 are labels for the bisector, and ptlab1,ptlab2,ptlab3 are labels for where the bisectors intersect their opposite sides.</li>
+  <li><strong>"median,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the median for that angle. lab1,lab2,lab3 are labels for the medians, and ptlab1,ptlab2,ptlab3 are labels for where the medians intersect their opposite sides</li>
+  <li><strong>"altitude,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle. lab1,lab2,lab3 are labels for the altitudes, and ptlab1,ptlab2,ptlab3 are labels for where the altitudes intersect their opposite (extended) sides. Dashed lines are drawn to extend opposite side if necessary.</li>
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
   <li><strong>"rotate"</strong> Rotates the triangle by a random angle.</li>
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
@@ -70,14 +70,6 @@
 <p><strong>$gr = draw_triangle("random","points,P,Q,R","angles,a,b,c,(,((,(((")</strong> -- A triangle with random angles, points are labeled P,Q,R, angles are labeled a,b,c and they have arcs (, (( and (((.</p>
 <p><strong>$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")</strong> -- A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and an altitude drawn down from point A, labeled with the letter "P".</p>
 
-// draw_angle("measurement,[label]","rotate","axes")
-// You must include at least the angles measurement to define the angle, and "label" is optional for the angle.
-// Note: Angle must be in degrees. In the label, the degree symbol is shown by default. To not show the degree symbol, use "rad" as in "57, 1 rad".
-// Labels involving alpha, beta, gamma, theta, phi, pi or tau will display with those Greek letters.
-// Options include:
-// "rotate,[ang]" Rotates the image by ang degrees counterclockwise. Using just "rotate" will rotate by a random angle.
-// "axes" Draws xy axes.
-
 <p><a name="angle"></a></p>
 <h2><strong>draw_angle</strong></h2>
 <p>Draws and labels an angle.</p>
@@ -86,7 +78,7 @@
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"measurement,[label]"</strong> -- The label will include the degree symbol by default. To not use degree symbol, use "rad", e.g. "57,1rad".</li>
-  <li><strong>"rotate,[deg]"</strong> -- Rotates the image by deg degrees. If "deg" is omitted, rotates by a random anagle.</li>
+  <li><strong>"rotate,[deg]"</strong> -- Rotates the image by deg degrees. If "deg" is omitted, rotates by a random angle.</li>
   <li><strong>"axes"</strong> -- Draws the xy axes.</li>
   <li><strong>"size,length"</strong> -- Changes the size of the image to be lengthxlength. Default is 300x300.</li>
   <li>Note: Angles can be any size (between -2000 and 2000 degrees), and arcs will be drawn by default.</li>
@@ -164,7 +156,7 @@
 </ol>
 <br />
 <p>Examples:</p>
-<p><strong>$gr = draw_rectangle("base,1,x","height,2,y","points,(0;0),(5;0)")</strong> -- A square with 1:2 ratio of base-to-height, bottom horizontal side labeled "x", right-hand vertical side labeled "y", and bottom two vertices labeled (0,0) and (5,0).</p>
+<p><strong>$gr = draw_rectangle("base,1,x","height,2,y","points,(0;0),(5;0)")</strong> -- A rectangle with 1:2 ratio of base-to-height, bottom horizontal side labeled "x", right-hand vertical side labeled "y", and bottom two vertices labeled (0,0) and (5,0).</p>
 
 
 <p><a name="square"></a></p>
