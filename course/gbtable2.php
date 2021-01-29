@@ -203,7 +203,7 @@ function flattenitems($items,&$addto,&$itemidsection,$sec='') {
 function gbtable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
 	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs,$includeendmsg;
-	global $hidesection,$hidecode,$exceptionfuncs,$courseenddate;
+	global $hidesection,$hidecode,$exceptionfuncs,$courseenddate, $includeemail;
 
 	if (!isset($hidesection)) {$hidesection = false;}
 	if (!isset($hidecode)) {$hidecode= false;}
@@ -267,13 +267,14 @@ function gbtable() {
 	}
 	if ($lastlogin) {
 		$gb[0][0][] = "Last Login";
-	}
+    }
+    if ($includeemail) {
+        $gb[0][0][] = "Email";
+    }
 	if ($logincnt) {
 		$gb[0][0][] = "Login Count";
-	}
-
-
-
+    }
+    
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$courseitemorder = unserialize($stm->fetchColumn(0));
@@ -964,7 +965,10 @@ function gbtable() {
 		}
 		if ($lastlogin) {
 			$gb[$ln][0][] = ($line['lastaccess']>0)?date("n/j/y",$line['lastaccess']):_('Never');
-		}
+        }
+        if ($includeemail) {
+            $gb[$ln][0][] = $line['email'];
+        }
 
 		$sturow[$line['id']] = $ln;
 		$timelimitmult[$line['id']] = $line['timelimitmult'];
