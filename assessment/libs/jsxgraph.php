@@ -52,7 +52,8 @@ $allowedmacros[] = "jsxUnsuspendUpdate";
 
 
 function jsx_getlibrarylink() {
-	return "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraphcore.js";
+	return "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore.js";
+	//return "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraphcore.js";
 }
 
 function jsx_idlen() {
@@ -1285,7 +1286,8 @@ function jsxFunction(&$board, $f, $ops=array()) {
   
 	$objects = jsx_getobjectreferences($f);
   
-	// Here we preserve the text of the function in case it is needed elswhere
+	// Here we preserve the text of the function so it can be used in other objects
+	// like Riemannsum
 	$out = "var {$id}_text = ".jsx_functionToJS($f, $inpVar).";";
   
 	// Start the output string
@@ -2181,7 +2183,7 @@ function jsx_functionToJS($rule, $var) {
 		}
 	}
 	$js .= "with (Math) var result = eval(mathjs(ts, '{$var}'));
-            return result; }";
+            return result; }"; 
 		
 	return $js;
 }
