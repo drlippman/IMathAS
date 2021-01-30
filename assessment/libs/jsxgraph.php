@@ -52,7 +52,7 @@ $allowedmacros[] = "jsxUnsuspendUpdate";
 
 
 function jsx_getlibrarylink() {
-	return "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraphcore.js";
+	return "//cdn.jsdelivr.net/npm/jsxgraph@1.2.1/distrib/jsxgraphcore.js";
 }
 
 function jsx_idlen() {
@@ -2169,7 +2169,7 @@ function jsx_functionToJS($rule, $var) {
 
 	$objs = jsx_getobjectreferences($rule);
 
-	$js = "function({$var}) {";
+    $js = "function({$var}) {";
 	$js .= "var ts = '{$rule}';";
 	foreach($objs as $obj) {
 		// check to see if user just sent the reference to a slider, this
