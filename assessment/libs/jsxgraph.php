@@ -1542,29 +1542,23 @@ function jsx_getscript () {
 				exp = exp.replaceAll(/\-\s*\-/g, "+");
 				exp = exp.replaceAll(/\+\s*\+/g, "+");
 				exp = exp.replaceAll(/\*\s*1(\D|$)/g, "$1"); // x*1 = x
-				console.log("1: " + exp);
 				exp = exp.replaceAll(/(\D|^)(1\s*\*|1\s*\**([a-zA-Z\(]))/g, "$1$3"); // 1*x = x
-				console.log("2: " + exp);
 				exp = exp.replaceAll(/(^|[\=\(\+\-])\s*(0\s*\*?)([a-zA-Z](\^[\-\d\.]+)*)/g, "$1"); //3+0x-4 -> 3-4
 				exp = exp.replaceAll(/\+\s*\-/g, "-");
 				exp = exp.replaceAll(/\-\s*\+/g, "-");
 				exp = exp.replaceAll(/\-\s*\-/g, "+");
 				exp = exp.replaceAll(/\+\s*\+/g, "+");
-				console.log("3: " + exp);
 				exp = exp.replaceAll(/(^|[\(])\s*0(\s*[\+\-\)])/g, "$1");  //0+x, 0-x
 				exp = exp.replaceAll(/\+\s*\-/g, "-");
 				exp = exp.replaceAll(/\-\s*\+/g, "-");
 				exp = exp.replaceAll(/\-\s*\-/g, "+");
 				exp = exp.replaceAll(/\+\s*\+/g, "+");
-				console.log("4: " + exp);
 				exp = exp.replaceAll(/[\+\-]\s*0(\)|\D|$)/g, "$1");  // x+0, x-0
 				exp = exp.replaceAll(/\+\s*\-/g, "-");
 				exp = exp.replaceAll(/\-\s*\+/g, "-");
 				exp = exp.replaceAll(/\-\s*\-/g, "+");
 				exp = exp.replaceAll(/\+\s*\+/g, "+");
-				console.log("5: " + exp);
 				exp = exp.replaceAll(/=\s*\+/g, "="); // =+2x -> =2x
-				console.log("6: " + exp);
 				exp = exp.replaceAll(/\+\s*\-/g, "-");
 				exp = exp.replaceAll(/\-\s*\+/g, "-");
 				exp = exp.replaceAll(/\-\s*\-/g, "+");	
