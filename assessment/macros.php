@@ -4453,7 +4453,7 @@ function parsereqsigfigs($reqsigfigs) {
 	$reqsigfigoffset = 0;
 	$reqsigfigparts = explode('+-',$reqsigfigs);
 	$reqsigfigs = $reqsigfigparts[0];
-	$sigfigscoretype = array('abs',0);
+	$sigfigscoretype = array('abs',0,'def');
 	if (count($reqsigfigparts)>1) {
 		if (substr($reqsigfigparts[1], -1)=='%') {
 			$sigfigscoretype = array('rel', substr($reqsigfigparts[1], 0, -1));

@@ -90,7 +90,7 @@ class NumberScorePart implements ScorePart
         $exactreqdec = false;
         if (isset($reqdecimals)) {
             list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
-            if ($exactreqdec) {
+            if ($exactreqdec || count($reqdecscoretype)==2) { // exact or not default
                 if ($reqdecscoretype[0] == 'rel') {
                     $reltolerance = $reqdecscoretype[1];
                 } else if ($reqdecscoretype[0] == 'abs') {
