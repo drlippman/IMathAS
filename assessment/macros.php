@@ -462,6 +462,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
                 $y = $evalfunc(['x'=>$x]);
+
 				if (isNaN($y)) {
                     if ($lastl != 0) {
                         if ($py !== null) {
@@ -494,14 +495,15 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 
 			} else if ($y>$yymax || $y<$yymin) { //going or still out of bounds
                 if ($py <= $yymax && $py >= $yymin) { //going out
+                    
                     $origy = $y;
 					if ($isparametric) {
 						$y = $evalyfunc(['t'=>$t-1E-10]);
-						$tempy = $evalyfunc(['t'=>$t-$dx/10]);
+						$tempy = $evalyfunc(['t'=>$t-$dx/100-1E-10]);
 					} else {
 						$y = $evalfunc(['x'=>$x-1E-10]);
-						$tempy = $evalfunc(['x'=>$x-$dx/10]);
-					}
+						$tempy = $evalfunc(['x'=>$x-$dx/100-1E-10]);
+                    }
 					if ($tempy<$y) { // going up
 						$iy = $yymax;
 						//if jumping from top of graph to bottom, change value
@@ -527,10 +529,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 					//and need un-rounded y-value for comparison
 					if ($isparametric) {
 						$y = $evalyfunc(['t'=>$t-1E-10]);
-						$tempy = $evalyfunc(['t'=>$t-$dx/10]);
+						$tempy = $evalyfunc(['t'=>$t-$dx/100-1E-10]);
 					} else {
 						$y = $evalfunc(['x'=>$x-1E-10]);
-						$tempy = $evalfunc(['x'=>$x-$dx/10]);
+						$tempy = $evalfunc(['x'=>$x-$dx/100-1E-10]);
 					}
 					if ($tempy>$y) { //seems to be coming down
 						$iy = $yymax;
