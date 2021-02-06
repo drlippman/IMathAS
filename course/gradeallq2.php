@@ -534,15 +534,28 @@
 			if ($groupdup) {
 				echo '<div class="groupdup">';
             }
+            
             $classes = '';
             if ($qdata['gbrawscore']==1) {
 				$classes = 'qfilter-perfect';
 			} else if ($qdata['gbscore']>0) {
 				$classes = 'qfilter-nonzero';
-			} else if ($qdata['status']=='unattempted') {
-				$classes = 'qfilter-unans';
-			} else {
-				$classes = 'qfilter-zero';
+			} else if ($qdata['status'] != 'unattempted') {
+                $classes = 'qfilter-zero';
+            } else {
+                // it's possible only one part is unattempted
+                $unattempted = true;
+                foreach ($qdata['parts'] as $partdata) {
+                    if ($partdata['try'] > 0) {
+                        $unattempted = false;
+                        break;
+                    }
+                }
+                if ($unattempted) {
+                    $classes = 'qfilter-unans';
+                } else {
+                    $classes = 'qfilter-zero';
+                }
             }
             if (trim($qdata['feedback']) !== '') {
                 $classes .= ' qfilter-fb';
