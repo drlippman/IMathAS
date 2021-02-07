@@ -526,7 +526,7 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			}
 		}
 		if ($hasCleanup) {
-			echo '<p class="small info"><span style="color:orange;">**</span> ';
+			echo '<p class="small info"><span class="warn">**</span> ';
 			echo _('course is scheduled for cleanup').'</p>';
 		}
 	}

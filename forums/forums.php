@@ -549,8 +549,18 @@ if ($searchtype == 'thread') {
 			echo '<span class="right">';
 			echo "<a href=\"../course/addforum.php?cid=$cid&id={$line['id']}\">Modify</a> ";
 			echo '</span>';
-		}
-		echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> ";
+        }
+        if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+            echo '<b>';
+        } else {
+            echo '<i>';
+        }
+        echo "<a href=\"thread.php?cid=$cid&forum={$line['id']}\">".Sanitize::encodeStringForDisplay($line['name'])."</a></b> ";
+        if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
+            echo '</b>';
+        } else {
+            echo '</i> <i class="small info">'._('Hidden').'</i> ';
+        }
 		if ($newcnt[$line['id']]>0) {
 			 echo "<a href=\"thread.php?cid=$cid&forum=" . Sanitize::onlyInt($line['id']) . "&page=-1\" class=noticetext >New Posts (" . Sanitize::encodeStringForDisplay($newcnt[$line['id']]) . ")</a>";
 		}

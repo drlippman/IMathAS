@@ -70,7 +70,10 @@ span.iteminfo {
 	margin-left: 30px;
 }
 .info {
-	color: #4bb6e8;
+	color: #007585;
+}
+.warn {
+    color: #C40;
 }
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
@@ -498,7 +501,7 @@ img.faded {
 	opacity: .3;
 }
 .grey {
-	color: #999;
+	color: #757575;
 }
 .itemgrey {
 	opacity: .5;
