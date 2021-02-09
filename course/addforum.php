@@ -151,17 +151,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$outcomes = implode(',',$outcomes);
 
 		$forumname = Sanitize::stripHtmlTags($_POST['name']);
-
+        $_POST['description'] = Sanitize::trimEmptyPara($_POST['description']);
 		if ($_POST['description']=='<p>Enter forum description here</p>' || $_POST['description']=='<p></p>') {
 			$forumdesc = '';
 		} else {
 			$forumdesc = Sanitize::incomingHtml($_POST['description']);
-		}
+        }
+        $_POST['postinstr'] = Sanitize::trimEmptyPara($_POST['postinstr']);
 		if (!isset($_POST['postinstr']) || trim($_POST['postinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['postinstr'])) {
 			$postinstruction = '';
 		} else {
 			$postinstruction = Sanitize::incomingHtml($_POST['postinstr']);
-		}
+        }
+        $_POST['replyinstr'] = Sanitize::trimEmptyPara($_POST['replyinstr']);
 		if (!isset($_POST['replyinstr']) || trim($_POST['replyinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['replyinstr'])) {
 			$replyinstruction = '';
 		} else {

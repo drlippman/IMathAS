@@ -87,7 +87,7 @@ if (isset($_GET['record'])) {
 		$enddate =  2000000000;
 	}
 	$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
-
+    $_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
 	if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>' || $_POST['summary']=='<p></p>') {
 		$_POST['summary'] = '';
 	} else {

@@ -67,8 +67,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$_POST['subject'] = htmlentities($_POST['subject']);
 
-		require_once("../includes/htmLawed.php");
-        $_POST['message'] = myhtmLawed($_POST['message']);
+        $_POST['message'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['message']));
 		$_POST['subject'] = trim(strip_tags($_POST['subject']));
 		if (trim($_POST['subject'])=='') {
 			$_POST['subject']= '(none)';

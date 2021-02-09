@@ -97,7 +97,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$processingerror = false;
 		$newfileid = 0;
 		if ($_POST['linktype']=='text') {
-			$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
+			$_POST['text'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['text']));
 		} else if ($_POST['linktype']=='file') {
 			require_once("../includes/filehandler.php");
 			if ($_FILES['userfile']['name']!='') {
@@ -194,7 +194,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':gradetypeid'=>$linkid));
 		}
 		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
-
+        $_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
 		if ($_POST['summary']=='<p>'._('Enter summary here (displays on course page)').'</p>' || $_POST['summary']=='<p></p>') {
 			$_POST['summary'] = '';
 		} else {

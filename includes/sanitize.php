@@ -584,6 +584,10 @@ class Sanitize
 	 */
 	public static function forRawExport($str) {
 		return $str;
-	}
+    }
+    
+    public static function trimEmptyPara($str) {
+        return preg_replace('/(<p>(&nbsp;)?<\/p>\s*)+$/','', $str);
+    }
 
 }
