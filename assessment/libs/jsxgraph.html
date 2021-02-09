@@ -19,8 +19,8 @@
 </head>
 <body>
   <h1>jsxgraph Macro Library</h1>
-  <p>JSXGraph Integration functions - Version 1.0</br>by David Flenner</p><p>October 14th, 2020</p>
-  <p><i>Adapted from JSXG library written by Grant Sander</i></p>
+  <p>JSXGraph Integration functions - Version 1.1</br>by David Flenner</p><p>Written: October 14th, 2020</p><p>Last Updated: January 30th, 2021</p>
+  <p style="font-size:12px"><i>Adapted from JSXG library written by Grant Sander</i></p>
   <hr>
   <h2>Introduction</h2>
   <p>This library provides an interface to the mathematics graphics library <a href="http://jsxgraph.uni-bayreuth.de/wp/index.html">JSXGraph</a> 
@@ -48,6 +48,12 @@
 	customize the label, you can change the 'fontcolor' and the 'fontsize' through $options. All labels	support ASCII math, and that can 
 	be enabled by surrounding your text with ``:</p>
 	<pre>$p = jsxPoint($board, [1, 2], ['label' => '`pi`'])</pre>
+	<p>Alternatively, you can use rendering hints to make your labels display in ASCII math, just pass your label as an array with the first
+	element containing your label, and the next element containing the word: 'display'. This will wrap your label in back-ticks for you. 
+	Another rendering hint you can use is 'makepretty', this will attemp to clean up things like 1*x^2 = x^2 or 0*x+2 = 2 in your functions
+	for nicer display. Test this extensively with your function as the regular expressions cleaning these can be buggy with different kinds
+	of functions, but should work fine with polynomials, exponentials, and basic elementary functions.</p>
+	<pre>$a = jsxFunction($board, "x+$a", ['label' => ["'y = x+' + $a.Value()", 'makepretty', 'display']])</pre>
 	<p>If you need to express the deriviative of a function, it is best to write f prime (x) in your ASCII Math because writing f'(x) can 
 	confuse the system since ' is used to start and end a string</p>
 	<p>You can also	create dynamic labels by using references to jsx objects in conjunction with javascript. To reference an object 
@@ -63,11 +69,10 @@
 	question using it, please tag the question with #jsx in the name of the question so its easy for everyone to be able to find these great
 	interactive questions!
 </p>
-   <h3>Known Bugs:</h3>
+   <h3>Notes:</h3>
    <ul>
 	 <li>When the question type is set to <i>conditional</i> using the old interface, the board can revert to a smaller size after the submit button is pressed. This can 
 		be avoided if the question text is longer than the board display. That prevents the board from being re-drawn in a smaller size.</li>
-	 <li>ticksdistance does not appear to be working with rectangular boards</li>
    </ul>
 
 <h3>Functions in this Library:</h3>
@@ -123,6 +128,10 @@
     <li><i>axislabel</i> [(string) xLabel, (string) yLabel] - adds labels to the axes, ASCIIMath can be used</li>
     <li><i>ticksdistance</i> [(float) ticksDistanceX, (float) ticksDistanceY] sets the distance between each major tick on the axes</li>
     <li><i>minorticks</i> [(int) minorTicksX, (int) minorTicksY] sets the number of minor ticks between each major tick on the axes</li>
+	<li><i>showlabels</i> [(boolean) showLabelsX, (boolean) showLabelsY] - turns on or off the axis grid labels</li>
+	<li><i>gridheight</i> [(int) gridHeightX, (int) gridHeightY] - set the length of the major grid lines in the x and y direction. By default
+		these are set to -1, which draws grid lines that span the entire board.</li>
+	<li><i>minortickheight</i> [(int) minorTickHeightX, (int) minorTickHeightY] - set the length of the minor ticks</li>
   </ul>
   <p>The following options are used with polar boards:</p>
   <ul>
@@ -193,6 +202,13 @@ loadlibrary("jsxgraph")
 $board = jsxBoard("rectangular")
 $ops = ['answerbox' => [$thisq], 'position' => [[-4, -4], [1, -4]], 'color' => '#935218', 'decimals' => 1, 'name' => "a", 'fontsize' => 20, 'attributes' => '{ face: "cross" }']
 $a = jsxSlider($board, [-15, 10, 0.1, 8], $ops)
+  </pre>
+   <h4>Example 3</h4>
+  <pre>
+loadlibrary("jsxgraph")
+$board = jsxBoard("rectangular")
+$a = jsxSlider($board, [-10, 10, 0.1], ['label' => "'a =' + this.Value().toFixed(1)",  'decimals' => 1])
+$f = jsxFunction($board, "($a) * (x-3)*(x+1)")
   </pre>
 
   <!-- jsxPoint -->
