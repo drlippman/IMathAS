@@ -34,7 +34,7 @@ function printlist($parent) {
 
 function parseqs($file,$touse,$rights) {
 	function writeq($qd,$rights,$qn) {
-		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin;
+		global $DBH,$userid,$isadmin,$updateq,$newq,$isgrpadmin, $importuserid, $importgroupid;
 		$now = time();
 		$toundel = array();
 		$stm = $DBH->prepare("SELECT id,adddate,lastmoddate,deleted FROM imas_questionset WHERE uniqueid=:uniqueid");
@@ -121,12 +121,12 @@ function parseqs($file,$touse,$rights) {
 			if (isset($GLOBALS['mapusers']) && isset($GLOBALS['mapusers'][$sourceinstall][$qd['ownerid']])) {
 				$thisownerid = $GLOBALS['mapusers'][$sourceinstall][$qd['ownerid']]['id'];
 			} else {
-				$thisownerid = $userid;
+				$thisownerid = $importuserid;
 			}
 			$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,ownerid,userights,description,author,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) VALUES ";
 			$query .= "(:uniqueid, :adddate, :lastmoddate, :ownerid, :userights, :description, :author, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':uniqueid'=>$qd['uqid'], ':adddate'=>$now, ':lastmoddate'=>$now, ':ownerid'=>$userid, ':userights'=>$thisqrights,
+			$stm->execute(array(':uniqueid'=>$qd['uqid'], ':adddate'=>$now, ':lastmoddate'=>$now, ':ownerid'=>$thisownerid, ':userights'=>$thisqrights,
 				':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'], ':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'],
 				':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'], ':extref'=>$qd['extref'],
 				':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'], ':otherattribution'=>$qd['otherattribution'], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
@@ -344,7 +344,22 @@ if ($myrights < 100) {
 		$filekey = Sanitize::simplestring($_POST['filekey']);
 		$uploadfile = getimportfilepath($filekey);
 
-		$libstoadd = array_map('intval',$_POST['libs']);
+        $libstoadd = array_map('intval',$_POST['libs']);
+        
+        $importuserid = $userid;
+        $importgroupid = $groupid;
+        if ($_POST['owner'] == 'other' && !empty($_POST['ownertouse'])) {
+            $stm = $DBH->prepare('SELECT id,groupid FROM imas_users WHERE SID=?');
+            $stm->execute(array($_POST['ownertouse']));
+            $row = $stm->fetch(PDO::FETCH_ASSOC);
+            if ($row === false) {
+                echo 'Invalid owner username';
+                exit;
+            } else {
+                $importuserid = $row['id'];
+                $importgroupid = $row['groupid'];
+            }
+        } 
 
 		list($packname,$names,$parents,$libitems,$unique,$lastmoddate,$ownerid,$userights,$sourceinstall) = parselibs($uploadfile);
 
@@ -421,8 +436,8 @@ if ($myrights < 100) {
 					$thisownerid = $GLOBALS['mapusers'][$sourceinstall][$ownerid[$libid]]['id'];
 					$thisgroupid = $GLOBALS['mapusers'][$sourceinstall][$ownerid[$libid]]['groupid'];
 				} else {
-					$thisownerid = $userid;
-					$thisgroupid = $groupid;
+					$thisownerid = $importuserid;
+					$thisgroupid = $importgroupid;
 				}
 				$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :parent, :groupid)";
@@ -659,6 +674,11 @@ if ($overwriteBody==1) {
 				Note that updating existing libraries will not place those imported libraries
 				in the parent selected above.
 			</p>
+
+            <p>For new libraries and questions, set owner to:<br>
+                <input type=radio name=owner value="self" CHECKED>Self<br/>
+                <input type=radio name=owner value="other">Username: <input size=15 name=ownertouse />
+            </p>
 
 			Base
 			<ul class=base>
