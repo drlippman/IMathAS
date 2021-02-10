@@ -762,8 +762,9 @@ class QuestionHtmlGenerator
           if ($nosabutton) {
             $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
           } else {
+            $qnidx = $this->questionParams->getDisplayQuestionNumber();
             $sadiv .= "<div><input class=\"dsbtn\" type=button value=\""._('Show Detailed Solution')."\" />";
-            $sadiv .= filter(" <div class=\"hidden dsbox\">$evaledsoln </div></div>\n");
+            $sadiv .= filter(" <div class=\"hidden dsbox\" id=\"dsbox$qnidx\">$evaledsoln </div></div>\n");
           }
         }
         if ($sadiv !== '') {

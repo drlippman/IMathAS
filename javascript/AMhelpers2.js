@@ -465,10 +465,11 @@ function initShowAnswer2() {
 		var idnext = $(this).siblings("div:first-of-type").attr("id");
 		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
 		  .off("click.sashow").on("click.sashow", function() {
-			$(this).attr("aria-expanded",true)
+            var curstate = ($(this).attr("aria-expanded") == 'true');
+			$(this).attr("aria-expanded",!curstate)
 		  	  .siblings("div:first-of-type")
-				.attr("aria-expanded",true).attr("aria-hidden",false)
-				.removeClass("hidden");
+				.attr("aria-expanded",!curstate).attr("aria-hidden",curstate)
+				.toggleClass("hidden",curstate);
 		});
 	});
 }
