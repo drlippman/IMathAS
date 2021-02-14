@@ -3089,6 +3089,7 @@ function cleanbytoken($str,$funcs = array()) {
                     }
                     if ($lastout>-1) {
                         array_pop($out);
+                        $lastout--;
                     }
 
                 }
@@ -3164,6 +3165,7 @@ function cleanbytoken($str,$funcs = array()) {
     if ($out[0]=='+') {
         array_shift($out);
     }
+
     if (count($out)==0 && $lastout == -1) {
         $finalout[] = '0';
     } else {
