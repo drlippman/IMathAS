@@ -1160,6 +1160,7 @@ export const actions = {
         if (thisq.hasOwnProperty('parts')) {
           let trymin = 1e10;
           let trymax = 0;
+          let canretrydet = false;
           for (const pn in thisq.parts) {
             const remaining = thisq.tries_max - thisq.parts[pn].try;
             if (remaining < trymin) {
@@ -1168,7 +1169,16 @@ export const actions = {
             if (remaining > trymax) {
               trymax = remaining;
             }
+            if (remaining > 0 &&
+              (!thisq.parts[pn].hasOwnProperty('rawscore') ||
+                thisq.parts[pn].rawscore < 1 ||
+                thisq.parts[pn].req_manual
+              )
+            ) {
+              canretrydet = true;
+            }
           }
+          data.questions[i].canretry = canretrydet;
           if (trymin !== trymax) {
             data.questions[i].tries_remaining_range = [trymin, trymax];
           }
