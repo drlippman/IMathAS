@@ -16,7 +16,8 @@ array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum"
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
-	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
+	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans","matrixformatfrac",
+	"matrixscalarfrac","matrixrowscalefrac");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.
@@ -1413,4 +1414,65 @@ function isMatrix($m) {
 		return false;
 	}
 }
+
+//-----------------------------------------matrixformatfrac(matrix)-----------------------------------------------
+//Formats a matrix item into an ASCIIMath string for display or $answer - the output displays fraction
+function matrixformatfrac($m, $bracket='[') {
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	if ($bracket == '(') {
+		$rb = ')';
+	} else if ($bracket == '|') {
+		$rb = '|';
+	} else {
+		$bracket = '[';
+		$rb = ']';
+	}
+	$out = $bracket;
+	include_once("fractions.php");
+	for ($i=0; $i<count($m); $i++) {
+		if ($i!=0) {
+			$out .= ',';
+		}
+		$out .= '(';
+		for ($j=0;$j<count($m[0]); $j++) {
+			if ($j!=0) {
+				$out .= ',';
+			}
+			$out.= decimaltofraction($m[$i][$j]);
+		}
+		$out .= ')';
+	}
+	$out .= $rb;
+	return $out;
+}
+
+#------------------------------------------matricrowscalefraction----------------------------------------------------
+//matrixrowscalefrac(matrix,row,n)
+//Multiplies row of matrix by n; n can be a fraction and the output displays fractions
+//matrix rows are 0-indexed; first row is row 0
+function matrixrowscalefrac($m,$r,$n) {
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	include_once("fractions.php");
+	for ($j=0; $j<count($m[$r]); $j++) {
+		$m[$r][$j] *= $n;
+		$m[$r][$j] = decimaltofraction($m[$r][$j]);
+	}
+	return $m;
+}
+
+#------------------------------------------matrixscalarfrac(matrix,n)------------------------------------------------
+//Multiplies the matrix times the number n; n can be a fraction and the output displays fraction
+function matrixscalarfrac($m,$n) {
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	include_once("fractions.php");
+	for ($i=0; $i<count($m); $i++) {
+		for ($j=0; $j<count($m[0]); $j++) {
+			$m[$i][$j] *= $n;
+			$m[$i][$j] = decimaltofraction($m[$i][$j]);
+		}
+	}
+	return $m;
+}
+
+
 ?>

@@ -1,5 +1,5 @@
 <html>
-
+	<a name="top"></a>
 <head>
 <style type="text/css">
 .auto-style1 {
@@ -10,11 +10,12 @@
 
 <body>
 <h1>Macro Library matrix</h1>
-Matrix functions.  Version 1.6, Jan 19
+Matrix functions.  Version 1.6, Feb 15, 2021
 <br>Contributors: David Lippman, Mike Jenck, Larry Green
 <BR><ul>
 <li><a href="#matrix">matrix</a></li>
 <li><a href="#matrixformat">matrixformat</a></li>
+<li><a href="#matrixformatfrac">matrixformatfrac</a></li>
 <li><a href="#matrixdisplaytable">matrixdisplaytable</a></li>
 <li><a href="#matrixsystemdisp">matrixsystemdisp</a></li>
 <li><a href="#matrixgetentry">matrixgetentry</a></li>
@@ -24,9 +25,11 @@ Matrix functions.  Version 1.6, Jan 19
 <li><a href="#matrixsum">matrixsum</a></li>
 <li><a href="#matrixdiff">matrixdiff</a></li>
 <li><a href="#matrixscalar">matrixscalar</a></li>
+<li><a href="#matrixscalarfrac">matrixscalarfrac</a></li>
 <li><a href="#matrixprod">matrixprod</a></li>
 <li><a href="#matrixaugment">matrixaugment</a></li>
 <li><a href="#matrixrowscale">matrixrowscale</a></li>
+<li><a href="#matrixrowscalefrac">matrixrowscalefrac</a></li>
 <li><a href="#matrixrowswap">matrixrowswap</a></li>
 <li><a href="#matrixrowcombine">matrixrowcombine</a></li>
 <li><a href="#matrixrowcombine3">matrixrowcombine3</a></li>
@@ -74,6 +77,10 @@ matrix(vals,rows,cols)
 matrixformat(matrix, [bracket])
 <BR>Formats a matrix item into an ASCIIMath string for display or $answer
 <br>Defaults to square brackets, or set bracket to '(' or '|'.
+<BR><h3><a name="matrixformatfrac">matrixformatfrac</a></h3>
+	matrixformatfrac(matrix, [bracket])
+	<BR>Formats a matrix item into an ASCIIMath string for display or $answer; the entries can be displayed in fraction.
+	<br>Defaults to square brackets, or set bracket to '(' or '|'.
 <BR><h3><a name="matrixdisplaytable">matrixdisplaytable</a></h3>
 matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
 <BR>&nbsp;Create a string that is a valid HTML table syntax for display.
@@ -131,6 +138,9 @@ matrixdiff(matrix1,matrix2)
 <BR><h3><a name="matrixscalar">matrixscalar</a></h3>
 matrixscalar(matrix,n)
 <BR>Multiplies the matrix times the number n
+<BR><h3><a name="matrixscalarfrac">matrixscalarfrac</a></h3>
+matrixscalarfrac(matrix,n)
+<BR>Multiplies the matrix times the number n; n can be decimal or fraction. The output can display fractions when formatted by matrixformat().
 <BR><h3><a name="matrixprod">matrixprod</a></h3>
 matrixprod(matrix1,matrix2)
 <BR>Calculates the matrix product matrix1*matrix2
@@ -141,6 +151,10 @@ matrixaugment(matrix1,matrix2)
 matrixrowscale(matrix,row,n)
 <BR>Multiplies row of matrix by n
 <BR>matrix rows are 0-indexed; first row is row 0
+<BR><h3><a name="matrixrowscalefrac">matrixrowscalefrac</a></h3>
+matrixrowscalefrac(matrix,row,n)
+<BR>Multiplies row of matrix by n; n can be be decimal or fraction. The output can display fractions when formatted by matrixformat().
+<BR>matrix rows are 0-indexed; first row is row 0	
 <BR><h3><a name="matrixrowswap">matrixrowswap</a></h3>
 matrixrowswap(matrix,row1,row2)
 <BR>swaps rows in matrix
@@ -307,5 +321,7 @@ questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for
 multi-part</p>
 
 <p>&nbsp;</p>
+<a href="#top">Back to top of page</a>
 <p><br>
 </p>
+
