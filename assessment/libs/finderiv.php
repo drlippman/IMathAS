@@ -6,21 +6,23 @@
 global $allowedmacros;
 array_push($allowedmacros,"finderiv_payout","finderiv_fwdprice","finderiv_fwdpricediv",
 	"finderiv_fwdcontract",	"finderiv_bsm","finderiv_immdate","finderiv_equityfutdate", 
-	"finderiv_convertrate","finderiv_fairforwardrate","finderiv_fra");
+	"finderiv_convertrate","finderiv_fairforwardrate","finderiv_fra",
+	"finderiv_checkpayout");
 
 // function finderiv_payout
 // calculates the payout of a portfolio given a terminal value for the 
 // underlying asset. The portfolio can contain
 // European calls, European puts, zero coupon bonds and forward contracts
 function finderiv_payout($asset, $types, $possizes, $strikes){
-	if (!is_numeric($asset) ) {
-		echo "finderiv_payout: invalid asset level";
+	if (!is_numeric($asset) && !is_array($asset)) {
+		echo "finderiv_payout: Asset level must be a single number or an array";
 		return false;
 	}
 	if (!is_array($types)) {
 		echo 'finderiv_payout: types must be an array';
 		return false;
-	}
+    }
+    array_walk($types, 'strtolower');
 	$numTypes = count($types);
 	if ($numTypes>100) {
 		echo 'finderiv_payout: numTypes is too big. Capped at 100.';
@@ -44,31 +46,55 @@ function finderiv_payout($asset, $types, $possizes, $strikes){
 		echo 'finderiv_payout: type and strike arrays must be of the same size.';
 		return false;
 	}
-	$total = 0;
-    for ($i=0;$i<$numTypes;$i++) {
-		if (!is_numeric($possizes[$i])) {
-			echo "finderiv_payout: position size is invalid. Cannot be " . $possizes[$i] . ".\r\n";
-			return false;
-		}
-		if (!is_numeric($strikes[$i])) {
-			echo "finderiv_payout: strike is invalid. Cannot be " . $strikes[$i] . ".";
-			return false;
-		}
-
-		if (strcasecmp($types[$i],"call")==0) {
-			$total += $possizes[$i]* max($asset-$strikes[$i],0);
-		} elseif (strcasecmp($types[$i],"put")==0) {
-			$total += $possizes[$i]* max($strikes[$i]-$asset,0);
-		} elseif (strcasecmp($types[$i],"bond")==0) {
-			$total += $possizes[$i];
-		} elseif (strcasecmp($types[$i],"forward")==0) {
-			$total += $possizes[$i]*($asset-$strikes[$i]);
-		} else {
-			echo 'finderiv_payout: type ' . $types[$i] . ' is not recognized. It must be call, put, forward, bond';
-			return false;
+	if (is_numeric($asset)) {
+		$numLevels = 1;
+	} else {
+		$numLevels = count($asset);
+	}
+	for ($j=0;$j<$numLevels;$j++) {
+		$total[$j] = 0;
+		for ($i=0;$i<$numTypes;$i++) {
+            // if not valid type then ignore
+            if ($types[$i]=='call' || 
+                $types[$i]=='put' ||
+                $types[$i]=='forward' ||
+                $types[$i]=='bond') {
+				if (!is_numeric($possizes[$i])) {
+					echo "finderiv_payout: position size is invalid. Cannot be " . $possizes[$i] . ".\r\n";
+					return false;
+				}
+				if ($types[$i]!='bond') {
+					if (!is_numeric($strikes[$i])) {
+						echo "finderiv_payout: strike is invalid. Cannot be " . $strikes[$i] . ".";
+						return false;
+					}
+				}
+				if ($numLevels==1) {
+					$price = $asset;
+				} else {
+					$price = $asset[$j];
+				}
+			
+				if ($types[$i]=='call') {
+					$total[$j] += $possizes[$i]* max($price-$strikes[$i],0);
+				} elseif ($types[$i]=='put') {
+					$total[$j] += $possizes[$i]* max($strikes[$i]-$price,0);
+				} elseif ($types[$i]=='bond') {
+					$total[$j] += $possizes[$i];
+				} elseif ($types[$i]=='forward') {
+					$total[$j] += $possizes[$i]*($price-$strikes[$i]);
+				} else {
+					echo 'finderiv_payout: type ' . $types[$i] . ' is not recognized. It must contain call, put, forward or bond';
+					return false;
+				}
+			}		
 		}
 	}
-	return $total;
+	if ($numLevels == 1 ) {
+		return $total[0];
+	} else {
+		return $total;
+	}
 }
 
 // function finderiv_fwdprice
@@ -308,7 +334,7 @@ function finderiv_immdate($start,$n,$fmt="F j, Y") {
 		return false;
 	}
 	$month = $startdate->format('n');
-	$offset = $month%3;
+	$offset = (12-$month)%3;
 	$IMMdate = clone($startdate);
 	if ($offset==0) {
 		// need to check whether the start date is 
@@ -321,7 +347,7 @@ function finderiv_immdate($start,$n,$fmt="F j, Y") {
 			$IMMdate->modify ('+ ' . 3*$n . ' months');
 		}
 	} else {
-		$IMMdate->modify ('+ ' . 3*($n-1)+ $offset . ' months');
+		$IMMdate->modify ('+ ' . (3*($n-1)+$offset) . ' months');
 	}
 	$IMMdate->modify('third Wednesday of this month');
 	
@@ -346,7 +372,7 @@ function finderiv_equityfutdate($start,$n,$fmt="F j, Y") {
 		return false;
 	}
 	$month = $startdate->format('n');
-	$offset = $month%3;
+	$offset = (12-$month)%3;
 	$futdate = clone($startdate);
 	if ($offset==0) {
 		// need to check whether the start date is 
@@ -359,7 +385,7 @@ function finderiv_equityfutdate($start,$n,$fmt="F j, Y") {
 			$futdate->modify ('+ ' . 3*$n . ' months');
 		}
 	} else {
-		$futdate->modify ('+ ' . 3*($n-1)+ $offset . ' months');
+		$futdate->modify ('+ ' . (3*($n-1)+ $offset) . ' months');
 	}
 	$futdate->modify('third Friday of this month');
 	
@@ -538,4 +564,128 @@ function finderiv_fra($borrowlend, $principal, $date1, $date2,
 	}
 	
 	return $PV;
+}
+
+// finderiv_checkpayout
+// this function checks that a student has graphed
+// the correct payout by checking the y-values vs
+// the student lines returned by the graph.
+// This function will return a number between 0 and 1
+// if there are n possible y-values then each is worth 1/n
+function finderiv_checkpayout($xValues,$yValues,$lines, $xTol=0.0001, $yTol=0.0001) {
+	if (!is_array($xValues)) {
+		echo 'finderiv_checkpayout: xValues must be an array';
+		return false;
+	}
+	$numX = count($xValues);
+	if (!is_array($yValues)) {
+		echo 'finderiv_checkpayout: yValues must be an array';
+		return false;
+	}
+	if ($numX!=count($yValues)){
+		echo 'finderiv_checkpayout: xValues and yValues must be the same size';
+		return false;
+	}
+	for($i=0;$i<$numX;$i++) {
+		if (!is_numeric($xValues[$i])) {
+			echo 'finderiv_checkpayout: xValues[' . $i . '] is not a number.';
+			return false;
+		}
+		if (!is_numeric($yValues[$i])) {
+			echo 'finderiv_checkpayout: yValues[' . $i . '] is not a number.';
+			return false;
+		}
+	}
+	if (!is_array($lines)) {
+		echo 'finderiv_checkpayout: lines must be an array';
+		return false;
+	}
+	$numLines = count($lines);
+	if (!is_numeric($xTol)) {
+		echo 'finderiv_checkpayout: xTol is not a number.';
+		return false;
+	}
+	if ($xTol<0) {
+		echo 'finderiv_checkpayout: xTol must be positive.';
+		return false;
+	}
+	if (!is_numeric($yTol)) {
+		echo 'finderiv_checkpayout: yTol is not a number.';
+		return false;
+	}
+	if ($yTol<0) {
+		echo 'finderiv_checkpayout: yTol must be positive.';
+		return false;
+	}
+
+	// unpack the lines
+	for ($i=0;$i<$numLines;$i++) {
+		if (!is_array($lines[$i])) {
+			echo 'finderiv_checkpayout: line ' . $i . ' is not an array.';
+			return false;	
+		}
+		if (count($lines[$i])!=4) {
+			echo 'finderiv_checkpayout: line ' . $i . ' should have 4 elements.';
+			return false;
+		}
+		if (!is_numeric($lines[$i][0]) || !is_numeric($lines[$i][1]) ||
+			!is_numeric($lines[$i][2]) || !is_numeric($lines[$i][3]) ) {
+			echo 'finderiv_checkpayout: line ' . $i . ' does not consist of 4 numeric values';
+			return false;
+		}
+		$x1[$i] = ($lines[$i])[0];
+		$y1[$i] = ($lines[$i])[1];
+		$x2[$i] = ($lines[$i])[2];
+		$y2[$i] = ($lines[$i])[3];
+//		echo "Line "  . $i . " has points (" . $x1[$i] . ", " . $y1[$i] . ")"
+//			. " and (" . $x2[$i] . ", " . $y2[$i] . ")";
+		if ($x1[$i]==$x2[$i]) {
+			if ($y1[$i]==$y2[$i]) {
+				$slope[$i] = 0;
+			} else {
+				echo 'finderiv_checkpayout: line ' . $i . ' is a vertical line. There cannot be a vertical line segment in a payout.';
+				return 0;
+			}
+		} else {
+			$slope[$i] = ($y2[$i]-$y1[$i])/($x2[$i]-$x1[$i]);
+		}
+	}
+
+	// check each y-value 
+	// if it appears on multiple lines then it must
+	// have the same value for each line
+	// if the y-value is zero then it does not need to appear 
+	// on any line.
+	$answer = 0;
+	for ($i=0;$i<$numX;$i++) {
+		$isBad = false;
+		$isFound = false;
+		$val = 0;
+		$x = $xValues[$i];
+		for ($j=0;$j<$numLines;$j++) {
+			if ( ($x+$xTol>=$x1[$j] && $x-$xTol<=$x2[$j]) ||
+				($x+$xTol>=$x2[$j] && $x-$xTol<=$x1[$j])) {
+//				echo " x value " . $x . " is on line " . $j;
+				if ($isFound==false) {
+//					echo " isFound is false " . $x . ": line " . $j;
+					$val = $slope[$j]*($x-$x1[$j])+$y1[$j];
+					$isFound = true;
+				} else {
+					if (abs($val-($slope[$j]*($x-$x1[$j])+$y1[$j]))>$yTol) {
+//						echo " isBad is true " . $x . ": line " . $j;
+						$isBad = true;
+					} else {
+//						echo " isBad is false " . $x . ": line " . $j;
+					}
+				}
+			} else {
+//				echo " x value " . $x . " is not on line " . $j;
+			}
+		}
+		if ($isBad==false && abs($val-$yValues[$i])<$yTol) {
+			$answer = $answer + 1/$numX;	
+		}
+	}
+
+	return round($answer,2);
 }

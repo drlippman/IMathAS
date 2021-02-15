@@ -288,6 +288,7 @@ export default {
     }
     setTimeout(window.drawPics, 50);
     window.rendermathnode(this.$refs.summary);
+    window.initlinkmarkup(this.$refs.summary);
   }
 };
 </script>

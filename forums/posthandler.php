@@ -67,8 +67,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		$_POST['subject'] = htmlentities($_POST['subject']);
 
-		require_once("../includes/htmLawed.php");
-		$_POST['message'] = myhtmLawed($_POST['message']);
+        $_POST['message'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['message']));
 		$_POST['subject'] = trim(strip_tags($_POST['subject']));
 		if (trim($_POST['subject'])=='') {
 			$_POST['subject']= '(none)';
@@ -115,7 +114,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'forumpost', ':typeid'=>$threadid, ':viewtime'=>$now, ':info'=>$forumid));
 			}
-			if (isset($studentid) && $autoscore != '' && strlen(strip_tags($_POST['message']))>1) {
+			if (isset($studentid) && $autoscore != '' && strlen(Sanitize::stripBlankLines($_POST['message']))>1) {
 				$autoscore = explode(',',$autoscore);
 				if ($autoscore[0]>0) { //assigning points
 					$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent=0");
@@ -167,7 +166,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>'forumreply', ':typeid'=>$_GET['modify'], ':viewtime'=>$now, ':info'=>"$forumid;$threadid"));
 				}
-				if (isset($studentid) && $autoscore != '' && strlen(strip_tags($_POST['message']))>1) {
+				if (isset($studentid) && $autoscore != '' && strlen(Sanitize::stripBlankLines($_POST['message']))>1) {
 					$autoscore = explode(',',$autoscore);
 					if ($autoscore[2]>0) { //assigning points
 						$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE forumid=? AND userid=? AND parent>0");

@@ -81,6 +81,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$settings = intval($_POST['settings']);
 		$_POST['name'] = Sanitize::stripHtmlTags($_POST['name']);
 
+        $_POST['description'] = Sanitize::trimEmptyPara($_POST['description']);
 		if ($_POST['description']=='<p>Enter Wiki description here</p>') {
 			$_POST['description'] = '';
 		} else {

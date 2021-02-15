@@ -235,17 +235,8 @@ require_once("includes/sanitize.php");
 							$stm->execute($array);
 							echo '<p>',sprintf(_("You have been enrolled in course ID %s"),Sanitize::encodeStringForDisplay($_POST['courseid'])),'</p>';
 
-							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
-							if ($msgOnEnroll) {
-								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
-								$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
-								$stm->execute(array(':cid'=>$_POST['courseid']));
-								while ($tuid = $stm->fetchColumn(0)) {
-									$stm_nmsg->execute(array(':cid'=>$_POST['courseid'],':title'=>_('Automated new enrollment notice'),
-										':message'=>_('This is an automated system message letting you know this student just enrolled in your course'),
-										':msgto'=>$tuid, ':msgfrom'=>$newuserid, ':senddate'=>time()));
-								}
-							}
+                            sendMsgOnEnroll($line['msgset'], $_POST['courseid'], $newuserid);
+
 						}
 					}
 				}
@@ -588,17 +579,7 @@ require_once("includes/sanitize.php");
 					$stm = $DBH->prepare($query);
                     $stm->execute($array);
 
-					$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
-					if ($msgOnEnroll) {
-						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,deleted) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,1)");
-						$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
-						$stm->execute(array(':cid'=>$_POST['cid']));
-						while ($tuid = $stm->fetchColumn(0)) {
-							$stm_nmsg->execute(array(':cid'=>$_POST['cid'],':title'=>_('Automated new enrollment notice'),
-								':message'=>_('This is an automated system message letting you know this student just enrolled in your course'),
-								':msgto'=>$tuid, ':msgfrom'=>$userid, ':senddate'=>time()));
-						}
-					}
+                    sendMsgOnEnroll($line['msgset'], $_POST['cid'], $userid);
 
 					//call hook, if defined
 					if (function_exists('onEnroll')) {

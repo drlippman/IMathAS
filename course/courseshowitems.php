@@ -1025,7 +1025,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 
-			   } else if (!$viewall && $line['avail']>0 && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
+			   } else if (!$viewall && $line['avail']>0 && ($nothidden || $showgreyedout) && (($greyitems&1 && $now<$line['startdate']) || ($greyitems&2 && $now>$line['enddate']))) { //show greyed
 
 			   	   if ($now<$line['startdate']) {
 			   	   	   $show = sprintf(_('Will be available starting %1$s'), $startdate);
@@ -1036,11 +1036,11 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				   echo '<div class="itemhdr">';
 				   echo getItemIcon('assess', 'assessment', true, $iconstatus, $scoremsg);
 				   echo "<div class=\"title grey\"><i>".Sanitize::encodeStringForDisplay($line['name'])."</i>";
-				   echo "<br/><i>$show</i>\n";
-				   if ($viewall) {
-				   	   echo $preReqNote;
-                   }
+                   echo "<br/><i>$show</i>\n";
+                   
+				   echo $preReqNote;
                    echo $excusedNote;
+                   
 				   echo '</div>'; //title
 				   if ($canedit) {
 				   	echo getAssessDD($i, $typeid, $parent, $items[$i], $thisaddassess, $line['ver'], $line['name']);
@@ -2250,7 +2250,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$icon = '<img alt="text" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
-			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+			   if ($line['avail'] == 2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   echo '<b><span id="I' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				  // echo '<b>'.$line['name']. "</b>";
 				   if ($showdates) {
@@ -2297,7 +2297,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$icon = '<img alt="link" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
-			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+			   if ($line['avail'] == 2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="L' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {
@@ -2344,7 +2344,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$icon = '<img alt="forum" src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
-			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+			  if ($line['avail'] == 2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="F' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {
@@ -2391,7 +2391,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$icon = '<img alt="wiki"  src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
-			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+			  if ($line['avail'] == 2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="W' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {
@@ -2438,7 +2438,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$icon = '<img alt="wiki"  src="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['drill'].'" class="mida icon" /> ';
 			   }
 			   echo '<li id="' . Sanitize::encodeStringForDisplay($items[$i]) . '">'.$icon;
-			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+			  if ($line['avail'] == 2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
 				   //echo '<b>'.$line['name']. "</b>";
 				   echo '<b><span id="D' . Sanitize::encodeStringForDisplay($typeid) . '" onclick="editinplace(this)">'.Sanitize::encodeStringForDisplay($line['name']). "</span></b>";
 				   if ($showdates) {

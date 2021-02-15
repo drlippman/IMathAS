@@ -141,7 +141,7 @@ class MathParser
     if (count($allowedfuncs) > 0) {
       $this->functions = $allowedfuncs;
     } else {
-      $this->functions = explode(',', 'arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
+      $this->functions = explode(',', 'funcvar,arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
     }
 
     //build regex's for matching symbols
@@ -432,6 +432,26 @@ class MathParser
               } else {
                 throw new MathParserException("Invalid root index");
               }
+            } else if ($nextSymbol == 'funcvar') {
+                // handle variables acting as functions
+                if (preg_match('/^[\(\[](.+?)[\)\]]/', substr($str,$n+1), $sub)) {
+                    if (in_array($sub[1], $this->variables)) {
+                        $tokens[count($tokens)-1] = [
+                            'type' => 'function',
+                            'symbol' => 'funcvar',
+                            'input' => null,
+                            'index' => [
+                                'type'=>'variable',
+                                'symbol'=>$sub[1]
+                            ]
+                        ];
+                        $n += strlen($sub[0]);
+                    } else {
+                        throw new MathParserException("Invalid funcvar variable");
+                    }
+                  } else {
+                    throw new MathParserException("Invalid funcvar format");
+                  }
             }
           }
           continue ;
@@ -1224,6 +1244,10 @@ function nthroot($x,$n) {
 	} else { //root of positive base
 		return exp(1/$n*log(abs($x)));
 	}
+}
+
+function funcvar ($input, $v) {
+    return $v*sin($v + $input);
 }
 
 // a safer power function that can handle (-8)^(1/3)

@@ -10,6 +10,7 @@ model for European call and put options. </p>
 the test question to incorporate your changes and run to make sure that nothing is broken.</p>
 <ul>
 <li><a href="#finderiv_payout">finderiv_payout</a></li>
+<li><a href="#finderiv_checkpayout">finderiv_checkpayout</a></li>
 <li><a href="#finderiv_fwdprice">finderiv_fwdprice</a></li>
 <li><a href="#finderiv_fwdpricediv">finderiv_fwdpricediv</a></li>
 <li><a href="#finderiv_fwdcontract">finderiv_fwdcontract</a></li>
@@ -24,12 +25,29 @@ the test question to incorporate your changes and run to make sure that nothing 
 <p>This function returns the payout of a portfolio. The portfolio can contain call options, put options,
 forward contracts and zero-coupon bonds. The parameters are: </p>
 <ul>
-<li><b>asset</b> is the terminal asset value for all positions.</li>
-<li><b>types</b> is an array where each element is 'call', 'put', 'forward' or 'bond'.</li>
+<li><b>asset</b> is the terminal asset value for all positions. It may be a single number or an array of numbers. 
+if it is an array of numbers then the function returns an array of payouts.</li>
+<li><b>types</b> is an array where each element must contain 'call', 'put', 'forward' or 'bond'. 
+Capitalization does not matter. If an entry does not contain one of these then that position is 
+ignored.</li>
 <li><b>possizes</b> is an array of position sizes. It can be positive or negative. If the type is a zero-coupon bond 
 then the position size is the amount paid at maturity.</li>
 <li><b>strikes</b> is an array of strikes. These are the strikes for calls, puts and forward contracts. It is 
 ignored if the type is a zero coupon bond.</li>
+</ul>
+<h4><a name="finderiv_checkpayout">finderiv_checkpayout(xValues, yValues, lines, xTol, yTol)</a></h4>
+<p>This function checks that the array of points represented by xValues and yValues are matched by the given 
+lines. The function returns a number between 0 and 1 determined by how many points are matched. It is 
+meant to be used in a conditional style question where the student enters a chart to match a payout diagram. If a y-value 
+is equal to zero, it does not have to be on any line. The parameters are: </p>
+<ul>
+<li><b>xValues</b> is an array of x-values for the payout to be checked.</li>
+<li><b>yValues</b> is an array of payout values, one for each x-value.</li>
+<li><b>lines</b> is an array of lines. A line is represented by four values x1, y1, x2 and y2 representing the 
+end points of the line. This can be returned using gettwopointdata from the student chart. Most likely, you 
+will want to call $w, $h = getsnapwidthheight() to pass into the gettwopointdata call. </li>
+<li><b>xTol</b> is a tolerance on the x-values to match to the line. It defaults to 1e-4 which should generally work.</li>
+<li><b>yTol</b> is a tolerance on the y-values to match to the line. It defaults to 1e-4 which should generally work.</li>
 </ul>
 <h4><a name="finderiv_fwdprice">finderiv_fwdprice(spot, rf, yield,  today, matdate, fmt)</a></h4>
 <p>This function calculates the fair forward price for an asset which has a yield. It is 

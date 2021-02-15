@@ -1274,7 +1274,7 @@ if ($myrights==100) {
 	}
 	echo '"/>.  <i>'._('Do not use this unless you know what you\'re doing').'</i></p>';
 }
-if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
+if ($line['deleted']==1 && ($myrights==100 || $line['ownerid']==$userid)) {
 	echo '<p>'._('This question is currently marked as deleted.').' <label><input type="checkbox" name="undelete"> '._('Un-delete question').'</p>';
 }
 ?>

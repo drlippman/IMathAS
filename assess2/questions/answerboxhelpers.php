@@ -14,11 +14,11 @@ function ltrimzero($v,$k) {
 }
 function checkreqtimes($tocheck,$rtimes) {
 	global $mathfuncs, $myrights;
-	if ($rtimes=='') {return 1;}
+    if ($rtimes=='') {return 1;}
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
 	}
-	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|<>_]+/','',$tocheck);
+	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|<>_!]+/','',$tocheck);
 
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);

@@ -50,6 +50,7 @@
 
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
 		echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
+		echo '<span class="form">Include email address?</span><span class="formright"><input type="radio" name="emailcol" value="0" checked="checked"> No <input type="radio" name="emailcol" value="1" > Yes </span><br class="form" />';
 
 
 		if (isset($_GET['export'])) {
@@ -76,7 +77,8 @@
 	$commentloc = $_POST['commentloc'];  //0: interleve, 1: at end
 	$pointsln = $_POST['pointsln']; //0: on main, 1: separate line
 	$lastlogin = $_POST['lastlogin']; //0: no, 1 yes
-	$logincnt = $_POST['logincnt']; //0: no, 1 yes
+    $logincnt = $_POST['logincnt']; //0: no, 1 yes
+    $includeemail = !empty($_POST['emailcol']);
 	$hidelocked = ($_POST['locked']=='hide')?true:false;
 	$includetimes = intval($_POST['timestype']); //1 total time, 2 time on task
 

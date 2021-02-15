@@ -151,11 +151,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     if ($toset['name'] == '') {
     	$toset['name'] = _('Unnamed Assessment');
     }
+        $_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
 		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
 			$toset['summary'] = '';
 		} else {
 			$toset['summary'] = Sanitize::incomingHtml($_POST['summary']);
-		}
+        }
+        $_POST['intro'] = Sanitize::trimEmptyPara($_POST['intro']);
 		if ($_POST['intro']=='<p>Enter intro/instructions</p>' || $_POST['intro']=='<p></p>') {
 			$toset['intro']= '';
 		} else {

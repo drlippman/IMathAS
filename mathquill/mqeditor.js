@@ -144,7 +144,7 @@ var MQeditor = (function($) {
             if (!fromblur) {
               var val = el.value;
               if (config.hasOwnProperty('toMQ')) {
-                val = config.toMQ(val);
+                val = config.toMQ(val, el.id);
               }
               mqfield.latex(val);
             }

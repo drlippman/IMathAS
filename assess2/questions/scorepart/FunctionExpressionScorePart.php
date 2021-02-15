@@ -74,7 +74,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         $correct = true;
 
-        $givenans = str_replace(',','', $givenans);
+        $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$givenans);
 
         if (!isset($variables)) { $variables = "x";}
         $variables = array_map('trim',explode(",",$variables));
@@ -135,8 +135,8 @@ class FunctionExpressionScorePart implements ScorePart
         if (count($ofunc)>0) {
             usort($ofunc,'lensort');
             $flist = implode("|",$ofunc);
-            $answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
-            $givenans = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$givenans);
+            $answer = preg_replace('/('.$flist.')\(/',"funcvar[$1](",$answer);
+            $givenans = preg_replace('/('.$flist.')\(/',"funcvar[$1](",$givenans);
         }
         $vlist = implode(",",$variables);
 

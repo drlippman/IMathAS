@@ -131,16 +131,26 @@
       <div v-else class="gbmainview">
         <div>
           {{ scoreCalc }}
-          <gb-assess-select
-            v-if = "viewFull || aData.submitby === 'by_assessment'"
-            :versions = "aData.assess_versions"
-            :submitby = "aData.submitby"
-            :haspractice = "aData.has_practice"
-            :selected = "curAver"
-            @setversion = "changeAssessVersion"
-          />
+          <div>
+            <gb-assess-select
+              style = "display: inline-block"
+              v-if = "viewFull || aData.submitby === 'by_assessment'"
+              :versions = "aData.assess_versions"
+              :submitby = "aData.submitby"
+              :haspractice = "aData.has_practice"
+              :selected = "curAver"
+              @setversion = "changeAssessVersion"
+            />
+            <button
+              v-if = "!isByQuestion && canEdit && aData.assess_versions[curAver].status != -1"
+              type="button"
+              @click="clearAttempts('attempt')"
+            >
+              {{ $t('gradebook.clear_attempt') }}
+            </button>
+          </div>
           <div v-if="isUnsubmitted">
-            {{ $t('gradebook.unsubmitted') }}.
+            {{ $t('gradebook.unsubmitted') }}
             <button
               type="button"
               @click="submitVersion"
@@ -157,20 +167,13 @@
           </div>
         </div>
 
-        <div v-if = "(curEndmsg !== '' && viewFull) || !isByQuestion">
+        <div v-if = "curEndmsg !== ''">
           <button
-            v-if = "curEndmsg !== '' && viewFull"
+            v-if = "viewFull"
             type="button"
             @click = "showEndmsg = !showEndmsg"
           >
             {{ $t('gradebook.' + (showEndmsg ? 'hide' : 'show') + '_endmsg') }}
-          </button>
-          <button
-            v-if = "!isByQuestion"
-            type="button"
-            @click="clearAttempts('attempt')"
-          >
-            {{ $t('gradebook.clear_attempt') }}
           </button>
           <div
             class="introtext"
@@ -517,7 +520,7 @@ export default {
         let showit = true;
         if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;
-        } else if (this.hideUnanswered && qdata.try === 0) {
+        } else if (this.hideUnanswered && qdata.parts.reduce((a, c) => Math.max(a, c.try), 0) === 0) {
           showit = false;
         } else if (this.hideZero && Math.abs(qdata.rawscore) < 0.002) {
           showit = false;

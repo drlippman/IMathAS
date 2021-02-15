@@ -121,7 +121,8 @@ if (isset($_POST['snippets'])) {
 		  	}).text("'._('Add Snippet').'")
 		  	.on("click", addsnip),
 		  $("<button>", {
-		  	type: "button"
+              type: "button",
+              class: "grptogglebtn"
 		  	}).text("-")
 		  	.on("click", togglegrp),
 		  $("<ul>", {
@@ -138,12 +139,20 @@ if (isset($_POST['snippets'])) {
 		} else {
 			$t.text("-");
 		}
-		$t.siblings(".snipgroup").slideToggle();
+		$t.siblings(".snipgroup").slideToggle("fast");
 		return false;
-	}
+    }
+    function collapseallgrps() {
+        $(".snipgroup").hide();
+        $(".grptogglebtn").text("+");
+    }
+    function expandallgrps() {
+        $(".snipgroup").show();
+        $(".grptogglebtn").text("-");
+    }
 	function deletesnip(event) {
 		if (confirm("'._('Are you SURE you want to delete this snippet?').'")) {
-			$(event.target).closest(".snipwrap").slideUp("normal", function() { $(this).remove(); });
+			$(event.target).closest(".snipwrap").slideUp("fast", function() { $(this).remove(); });
 			markDirty();
 		}
 	}
@@ -156,8 +165,12 @@ if (isset($_POST['snippets'])) {
 				var edid = $(subel).find(".snipcont").attr("id");
 				groupitems.push({"text": $(subel).find(".sniptitle").val(),
 					"content": tinyMCE.get(edid).getContent()})
-			});
-			snippetdata.push({"text": $(el).find(".grptitle").val(), "items":groupitems});
+            });
+            if (groupitems.length == 0) {
+                $(el).remove();
+            } else {
+                snippetdata.push({"text": $(el).find(".grptitle").val(), "items":groupitems});
+            }
 		});
 		$.ajax({
 			type: "POST",
@@ -224,7 +237,10 @@ if (isset($_POST['snippets'])) {
 
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>"._("Prewritten Snippets")."</h1></div>\n";
 
-	echo '<p><button type="button" class="savebtn" onclick="savesnippets()">'._('Save Changes').'</button> ';
+    echo '<p>';
+    echo '<button type="button" onclick="collapseallgrps()">'._('Collapse All').'</button> ';
+    echo '<button type="button" onclick="expandallgrps()">'._('Expand All').'</button> ';
+    echo '<button type="button" class="savebtn" onclick="savesnippets()">'._('Save Changes').'</button> ';
 	echo '<span class="submitnotice noticetext"></span></p>';
 	echo '<ul class="grouplist">';
 	$snipcnt = 0;
@@ -234,7 +250,7 @@ if (isset($_POST['snippets'])) {
 		echo '<input type="text" class="grptitle" oninput="markDirty()" ';
 		echo 'value="'.Sanitize::encodeStringForDisplay($snipgroup['text']).'" size=50 /> ';
 		echo '<button type="button" onclick="addsnip(event)">'._('Add Snippet').'</button>';
-		echo '<button type="button" onclick="togglegrp(event)">-</button>';
+		echo '<button type="button" class="grptogglebtn" onclick="togglegrp(event)">-</button>';
 		echo '<ul class="snipgroup">';
 		foreach ($snipgroup['items'] as $snip) {
 			echo '<li class="snipwrap"><span class=icon style="background-color:#0f0">S</span> ';

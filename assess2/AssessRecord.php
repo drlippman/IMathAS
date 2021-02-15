@@ -1083,9 +1083,13 @@ class AssessRecord
     foreach ($this->data['assess_versions'] as $k=>$ver) {
       // if it's a submitted version or an active one no longer available
       if ($ver['status'] === 1 || (!$is_available && $ver['status'] === 0)) {
-        $out[$k] = array(
-          'date' => tzdate("n/j/y, g:i a", $ver['lastchange'])
-        );
+        if ($ver['lastchange'] == 0) {
+            $out[$k] = array('date' => _('Never submitted'));
+        } else {
+            $out[$k] = array(
+                'date' => tzdate("n/j/y, g:i a", $ver['lastchange'])
+            );
+        }
         // show score if forced, or
         // if by_question and not available and showscores is allowed, or
         // if by_assessment and submitted and showscores is allowed
@@ -1490,7 +1494,7 @@ class AssessRecord
       if ($out['tries_max'] == 1) {
         $out['parts_entered'] = $this->getPartsEntered($qn, $curq['tries'], $answeights);
       }
-      if ($ver == 'last' && ($this->assess_info->getSetting('showwork') & 2) == 2) {
+      if ($ver == 'last' && ($this->assess_info->getQuestionSetting($curq['qid'],'showwork') & 2) == 2) {
         $qver = $this->getQuestionVer($qn, $ver);
         $out['work'] = isset($qver['work']) ? $qver['work'] : '';
       }
@@ -2202,7 +2206,7 @@ class AssessRecord
       } else {
         $curq = $question_versions[$ver];
       }
-      if (count($curq['tries']) == 0) {
+      if (empty($curq['tries'])) {
         $scorenonzero[$qn+1] = -1;
         $scoreiscorrect[$qn+1] = -1;
         continue;
@@ -2210,7 +2214,7 @@ class AssessRecord
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
       foreach ($curq['tries'] as $pn => $v) {
-        if (count($curq['tries'][$pn]) == 0) {
+        if (empty($curq['tries'][$pn])) {
           $scorenonzeroparts[$pn] = -1;
           $scoreiscorrectparts[$pn] = -1;
         } else {

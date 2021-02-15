@@ -343,11 +343,11 @@ class QuestionHtmlGenerator
               ($quesData['qtype'] == "conditional" && isset($seqPartDone))
             ) {
               $_seqParts = preg_split('~(<p[^>]*>(<(span|em|strong)[^>]*>)*\s*///+\s*(<\/[^>]*>)*</p[^>]*>|<br\s*/?><br\s*/?>\s*(<(span|em|strong)[^>]*>)*\s*///+\s*(<\/[^>]*>)*\s*<br\s*/?><br\s*/?>)~', $toevalqtxt);
-
               if (count($_seqParts) > 1) {
                 if ($quesData['qtype'] != "conditional") {
                   $seqPartDone = $this->questionParams->getSeqPartDone();
                 }
+ 
                 $_lastGroupDone = true;
                 foreach ($_seqParts as $kidx=>$_seqPart) {
                   $_thisGroupDone = true;
@@ -359,7 +359,7 @@ class QuestionHtmlGenerator
                       $jsParams['hasseqnext'] = true;
                       $_thisGroupDone = false;
                     }
-                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && $answeights[$_pnidx]!=0) {
+                    if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($answeights[$_pnidx]!=0 || $quesData['qtype'] == "conditional")) {
                       $_thisGroupDone = false;
                     }
                   }
@@ -370,7 +370,6 @@ class QuestionHtmlGenerator
             } else {
               unset($seqPartDone);
             }
-
             /*
 			 * Original displayq2.php notes:
 			 *
@@ -763,8 +762,9 @@ class QuestionHtmlGenerator
           if ($nosabutton) {
             $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
           } else {
+            $qnidx = $this->questionParams->getDisplayQuestionNumber();
             $sadiv .= "<div><input class=\"dsbtn\" type=button value=\""._('Show Detailed Solution')."\" />";
-            $sadiv .= filter(" <div class=\"hidden dsbox\">$evaledsoln </div></div>\n");
+            $sadiv .= filter(" <div class=\"hidden dsbox\" id=\"dsbox$qnidx\">$evaledsoln </div></div>\n");
           }
         }
         if ($sadiv !== '') {

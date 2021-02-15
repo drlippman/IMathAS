@@ -167,7 +167,10 @@ By default, emails are sent using the built-in PHP `mail()` function.  This can 
       - `$CFG['email']['SES_KEY_ID']` or an environment variable `SES_KEY_ID`
       -  `$CFG['email']['SES_SECRET_KEY']` or an environment variable `SES_SECRET_KEY`
       - `$CFG['email']['SES_SERVER']` or the default of `email.us-west-2.amazonaws.com` will be used.
+      - Optionally, but recommended: set `$CFG['email']['authcode']`, and set up SES to call
+         `/admin/handleSESbounce.php?authcode=####` on bounces or complaints.
     - `$CFG['email']['handlerpriority']` can be set to define a breakpoint between using the default `mail()` delivery and the custom handler.   See `/includes/email.php` for values.
+
 
 
 ### Push Notifications

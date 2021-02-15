@@ -2261,7 +2261,7 @@ The following macros create graphs or tables:
 		<li><strong>color</strong>: a color designator: black,red,orange,yellow,green,blue,purple</li>
 		<li><strong>min,max</strong>: the min and max values for the input variable for which you wish to see this graph.  You can also exclude
 		    point discontinuities; for example -5,5!0!2 for min,max would include all values from -5 to 5, excluding 0 and 2.</li>
-		<li><strong>startmarker,endmarker</strong>: can be "open" or "closed" (dots), or anything else for none</li>
+		<li><strong>startmarker,endmarker</strong>: can be "open" or "closed" (dots), "arrow", or anything else for none</li>
 		<li><strong>width</strong>: a pixel width for the line</li>
 		<li><strong>dash</strong>: enter "dash" if you want a dashed line, otherwise the line is solid</li>
 		<li><strong>Examples</strong>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0" or "x=1,red,,,,,,dash"</li>
@@ -2336,6 +2336,8 @@ The following macros create graphs or tables:
     image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.
     textonimage is not screenreader-friendly, so it's recommended you provide an alt text on the image, 
     which will be read to the screenreader instead of the image and any layered text.</li>
+<li><strong>addimageborder(image, [border width, margin])</strong>: Adds a border to an image uploaded in 
+    the question editor. Border width (default 1) and whitespace margin (default 0) can be specified.</li>
 <li><strong>arraystodoteqns(xarray,yarray,[color])</strong>:  Converts an array of x-values and y-values into a form that can be used in
   showplot.</li>
 <li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts an array of x-values and y-values into a form that
@@ -2996,7 +2998,11 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
         <li>allowmixed: will enable support for mixed numbers (like 2 1/2) in answers</li>
         <li>allowdegrees: will enable the use of the degree symbol to designate degrees, so sin(30degree)=1/2.</li>
 		<li>noval: tells the answer preview to not compute a decimal equivalent (deprecated - this option is now enabled by default)</li>
-		<li>showval: tells the answer preview to display a decimal equivalent</li>
+        <li>showval: tells the answer preview to display a decimal equivalent</li>
+        <li>sameform: requires the student's answer be in the "same form" as the correct answer. This means 
+            exactly the same, except for commutation of addition and multiplication, multiplication by 1,
+            implicit multiplication, and extra parentheses. Use with caution.</li>
+        </li>
 		</ul></li>
 	<li>List options: only use at most one of these at a time
 		<ul>
@@ -3235,7 +3241,7 @@ A student is asked to enter a function
 	Include "ignore_case,false" to make the search case sensitive.
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" (can combine, like "equation,nosoln")</dt>
+<dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -3251,7 +3257,11 @@ A student is asked to enter a function
     scalar multiple.<br/>
 	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions".
 	$ansprompt can override the default statements like this:
-	$ansprompt = "One function, f(x)=;No such function exists"
+    $ansprompt = "One function, f(x)=;No such function exists" <br/>
+    "sameform": requires the student's answer be in the "same form" as the correct answer. This means 
+        exactly the same, except for commutation of addition and multiplication, multiplication by 1,
+        implicit multiplication, and extra parentheses. (2x-3)(5-x) would be "safeform" as (-1x+5)(2*x-3), 
+        but 2/4x and 1/2x and 0.5x would not be "sameform". Use with caution.
 	</dd>
 <dt>$formatfeedbackon = true</dt>
 	<dd>Turns on "right answer, wrong format" feedback on the question</dd>
@@ -3391,7 +3401,11 @@ drawn line from the correct line.
 <dt>$answers = a string or array of strings describing the points or curves to be drawn </dt>
 	<dd>Curves:  "f(x)" like "x^2+3".<br/>
 	    Line segments or rays: "f(x),xmin,xmax", like "x+1,-3,2" or "x+1,-oo,3"<br/>
-	    Dots:  "x,y" for closed dots, "x,y,open" for open dots, like "2,3"</dd>
+        Dots:  "x,y" for closed dots, "x,y,open" for open dots, like "2,3"<br/>
+        See below for additional entry formats for other curves when using "twopoint" drawing.<br/>
+        When using twopoint drawing, you can preface an answer with "optional", like "optional,2,3", to 
+        indicate that drawing element is not required, but shouldn't mark down the score if present.
+    </dd>
 </dl>
 
 <p><strong>Recommended Variables</strong></p>

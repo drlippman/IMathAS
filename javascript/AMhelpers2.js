@@ -432,7 +432,7 @@ function initShowAnswer2() {
       }).on('click', function(e) {
           var curstate = (e.currentTarget.getAttribute('aria-expanded') == 'true');
           e.currentTarget.setAttribute('aria-expanded', curstate ? 'false' : 'true');
-          $("#ans"+qref).toggle(!curstate);
+          $("#ans"+qref).toggleClass("hidden", curstate);
         })
         .html(icon)
     );
@@ -440,7 +440,7 @@ function initShowAnswer2() {
       var wrap = $("#qnwrap"+inref);
       if (wrap.length > 0) {
         $(el).prev(".sabtn").remove();
-        key.append($(el).hide().removeClass("hidden"))
+        key.append($(el))
           .addClass("inwrap");
         wrap.append(key);
         return;
@@ -448,14 +448,14 @@ function initShowAnswer2() {
       var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref);
       if (inbox.length > 0) {
         $(el).prev(".sabtn").remove();
-        key.append($(el).hide().removeClass("hidden"));
+        key.append($(el));
         inbox.after(key);
         return;
       }
     }
     // not in autoshowans or no match, so don't want to relocate, just refresh
     var parel = $(el).parent();
-    key.append($(el).hide().removeClass("hidden"));
+    key.append($(el));
     parel.empty().append(key);
   });
 
@@ -465,10 +465,11 @@ function initShowAnswer2() {
 		var idnext = $(this).siblings("div:first-of-type").attr("id");
 		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
 		  .off("click.sashow").on("click.sashow", function() {
-			$(this).attr("aria-expanded",true)
+            var curstate = ($(this).attr("aria-expanded") == 'true');
+			$(this).attr("aria-expanded",!curstate)
 		  	  .siblings("div:first-of-type")
-				.attr("aria-expanded",true).attr("aria-hidden",false)
-				.removeClass("hidden");
+				.attr("aria-expanded",!curstate).attr("aria-hidden",curstate)
+				.toggleClass("hidden",curstate);
 		});
 	});
 }
@@ -770,7 +771,7 @@ function normalizemathunicode(str) {
 }
 
 function htmlEntities(str) {
-  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/&/g,'&amp;');
+  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&/g,'&amp;');
 }
 
 /**
@@ -1142,7 +1143,7 @@ function processNumber(origstr, format) {
     if (format.indexOf('list')!== -1) {
         var strs = origstr.split(/\s*,\s*/);
     } else {
-        var strs = [origstr.replace(/,/,'')];
+        var strs = [origstr.replace(/,/g,'')];
     }
     var str;
     for (var j=0;j<strs.length;j++) {

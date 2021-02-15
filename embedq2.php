@@ -277,7 +277,7 @@ if (isset($_GET['frame_id'])) {
 }
 if (isset($_GET['theme'])) {
     $theme = preg_replace('/\W/', '', $_GET['theme']);
-    $_SESSION['coursetheme'] = $theme . '.css';
+    $coursetheme = $theme . '.css';
 }
 
 $lastupdate = '20200422';

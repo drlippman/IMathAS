@@ -47,12 +47,8 @@ $allowedmacros[] = "jsxSuspendUpdate";
 $allowedmacros[] = "jsxUnsuspendUpdate";
 
 
-// next in line:
-// -- integral
-
-
 function jsx_getlibrarylink() {
-	return "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraphcore.js";
+	return "//cdn.jsdelivr.net/npm/jsxgraph@1.2.1/distrib/jsxgraphcore.js";
 }
 
 function jsx_idlen() {
@@ -1123,7 +1119,7 @@ function jsxText (&$board, $param, $ops=array()) {
 	$inputerror = false;
 
 	// Validate input values
-	if (is_jsxpoint($param[0]) && is_jsxvalue($param[1])) {
+	if (is_jsxpoint($param[0]) && (is_jsxvalue($param[1]) || is_array($param[1]))) {
 			
 		// Set default values
 		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
@@ -1133,8 +1129,6 @@ function jsxText (&$board, $param, $ops=array()) {
 		$anchor = $ops['anchor'] !== null ? $ops['anchor'] : false;
 		$anchorX = $ops['anchorX'] !== null ? $ops['anchorX'] : false;
 		$anchorY = $ops['anchorY'] !== null ? $ops['anchorY'] : false;
-		
-		$useMathJax = strpos($param[1], "`") > -1 ? 'true' : 'false';
 		
 		// Begin object creation
 
@@ -1146,16 +1140,60 @@ function jsxText (&$board, $param, $ops=array()) {
 			$out .= jsx_valueToJS("$param[0].X()").", ".jsx_valueToJS("$param[0].Y()").", ";
 		}
 		
-		if (count(jsx_getobjectreferences($param[1])) > 0) {
-			$out .= "function() { return {$param[1]}; }],";
-		} else {
-			$out .= "'{$param[1]}'],";
-		}
+		if (is_jsxvalue($param[1])) {
+			if (count(jsx_getobjectreferences($param[1])) > 0) {
+				$out .= "function() { return {$param[1]}; }],";
+			} else {
+				$out .= "'{$param[1]}'],";
+			}
+		} else if (is_array($param[1])) {
+			
+			$makepretty = false;
+			$display = false;
+			
+			for ($i = 1; $i < count($param[1]); $i++) {
+				
+				switch ($param[1][$i]) {
+					case 'makepretty' :	$makepretty = true;	break;
+					case 'display' : $display = true; break;
+					default:
+						echo "Warning: Unknown label rendering hint encountered: {$param[1][$i]}";
+				}
+				
+			}
+			
+			$label = $param[1][0];
+			
+			if ($label !== '') {
+
+				if ($makepretty && !$display) {
+					$out .= "function() { return jsx_clean({$label}); }],";
+				} 
+				
+				if (!$makepretty && $display) {
+					$out .= "function() { return '`' + {$label} + '`';  }],";
+				}
+				
+				if ($makepretty && $display) {
+					$out .= "function() { return '`' + jsx_clean({$label}) + '`';  }],";
+				}
+				
+				if (!$makepretty && !$display) {
+					if (count(jsx_getobjectreferences($label)) > 0) {
+						$out .= "function() { return {$label}; }],";
+					} else {
+						$out .= "'{$label}'],";
+					}
+				}
+
+			}
+		
+		} 
 
 		// Set attributes 
 		
 		$out .= "{";
-		$out .= "useMathJax: {$useMathJax},";
+		$out .= "useMathJax: 'true',";
 		$out .= "fontSize: {$fontsize},";
 		$out .= "highlight: {$highlight},";
 		$out .= "fixed: {$fixed},";
@@ -1285,7 +1323,8 @@ function jsxFunction(&$board, $f, $ops=array()) {
   
 	$objects = jsx_getobjectreferences($f);
   
-	// Here we preserve the text of the function in case it is needed elswhere
+	// Here we preserve the text of the function so it can be used in other objects
+	// like Riemannsum
 	$out = "var {$id}_text = ".jsx_functionToJS($f, $inpVar).";";
   
 	// Start the output string
@@ -1496,7 +1535,43 @@ function jsx_getscript () {
 			jsxgloadscript.src = "'.jsx_getlibrarylink().'";
 			document.getElementsByTagName("head")[0].appendChild(jsxgloadscript);
 			JXGscriptloaded = true;
-			} </script>';
+			}
+			function jsx_clean(exp) {
+				exp = exp.replaceAll(/\+\s*\-/g, "-");
+				exp = exp.replaceAll(/\-\s*\+/g, "-");
+				exp = exp.replaceAll(/\-\s*\-/g, "+");
+				exp = exp.replaceAll(/\+\s*\+/g, "+");
+				exp = exp.replaceAll(/\*\s*1(\D|$)/g, "$1"); // x*1 = x
+				exp = exp.replaceAll(/(\D|^)(1\s*\*|1\s*\**([a-zA-Z\(]))/g, "$1$3"); // 1*x = x
+				exp = exp.replaceAll(/(^|[\=\(\+\-])\s*(0\s*\*?)([a-zA-Z](\^[\-\d\.]+)*)/g, "$1"); //3+0x-4 -> 3-4
+				exp = exp.replaceAll(/\+\s*\-/g, "-");
+				exp = exp.replaceAll(/\-\s*\+/g, "-");
+				exp = exp.replaceAll(/\-\s*\-/g, "+");
+				exp = exp.replaceAll(/\+\s*\+/g, "+");
+				exp = exp.replaceAll(/(^|[\(])\s*0(\s*[\+\-\)])/g, "$1");  //0+x, 0-x
+				exp = exp.replaceAll(/\+\s*\-/g, "-");
+				exp = exp.replaceAll(/\-\s*\+/g, "-");
+				exp = exp.replaceAll(/\-\s*\-/g, "+");
+				exp = exp.replaceAll(/\+\s*\+/g, "+");
+				exp = exp.replaceAll(/[\+\-]\s*0(\)|\D|$)/g, "$1");  // x+0, x-0
+				exp = exp.replaceAll(/\+\s*\-/g, "-");
+				exp = exp.replaceAll(/\-\s*\+/g, "-");
+				exp = exp.replaceAll(/\-\s*\-/g, "+");
+				exp = exp.replaceAll(/\+\s*\+/g, "+");
+				exp = exp.replaceAll(/=\s*\+/g, "="); // =+2x -> =2x
+				exp = exp.replaceAll(/\+\s*\-/g, "-");
+				exp = exp.replaceAll(/\-\s*\+/g, "-");
+				exp = exp.replaceAll(/\-\s*\-/g, "+");	
+				exp = exp.replaceAll(/\+\s*\+/g, "+");
+				if (exp[0] == "+") {
+					exp = exp.substring(1);
+					return exp == "" ? "0" : exp;
+				}
+				exp = exp.replaceAll(/^([a-zA-Z])\s*=\s*$/g,"$1=0");
+				return exp;
+
+			}
+			</script>';
 	}
 }
 
@@ -1596,10 +1671,19 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	$ymin = $ops['bounds'][2] !== null ? $ops['bounds'][2] : -5;
 	$ymax = $ops['bounds'][3] !== null ? $ops['bounds'][3] : 5;
 
-	$minorTicksX = $ops['minorticks'][0] !== null ? $ops['minorticks'][0] : 1;
-	$minorTicksY = $ops['minorticks'][1] !== null ? $ops['minorticks'][1] : 1;
+	$minorTicksX = $ops['minorticks'][0] !== null ? $ops['minorticks'][0] : 0;
+	$minorTicksY = $ops['minorticks'][1] !== null ? $ops['minorticks'][1] : 0;
 	$ticksDistanceX = $ops['ticksdistance'][0] !== null ? $ops['ticksdistance'][0] : floor((($xmax)-($xmin))/8);
 	$ticksDistanceY = $ops['ticksdistance'][1] !== null ? $ops['ticksdistance'][1] : floor((($ymax)-($ymin))/8);
+	
+	$showXLabels = $ops['showlabels'][0] !== null ? jsx_getbool($ops['showlabels'][0]) : 'true';
+	$showYLabels = $ops['showlabels'][1] !== null ? jsx_getbool($ops['showlabels'][1]) : 'true';
+	
+	$gridHeightX = $ops['gridheight'][0] !== null ? $ops['gridheight'][0] : -1;
+	$gridHeightY = $ops['gridheight'][1] !== null ? $ops['gridheight'][1] : -1;
+	
+	$minorTickHeightX = $ops['minortickheight'][0] !== null ? $ops['minortickheight'][0] : 10;
+	$minorTickHeightY = $ops['minortickheight'][1] !== null ? $ops['minortickheight'][1] : 10;
 
 	$useMathJax = ($ops['axislabel'] !== null && (strpos($ops['axislabel'][0], "`") > -1 || strpos($ops['axislabel'][1], "`") > -1)) ? "true" : "false";
 
@@ -1608,7 +1692,6 @@ function jsx_createrectangularboard ($label, $ops = array()) {
             curve: 5, turtle: 5, polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2, grid: 1, image: 0, trace: 0};";
    
 	// Create the board
-	$defaultAxis = $ops['ticksdistance'] ? "false" : "true";
 	$out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
              boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
              axis: false,
@@ -1628,29 +1711,36 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 			 }
            });";
 
-	$out .= "var xTicks{$label}, yTicks{$label}, bb{$label};";
+	$out .= "var xTicks{$label}, yTicks{$label};";
    
 	// x-axis
 	$out .= "var xaxis{$label} = board_{$label}.create('axis', [[0,0], [1,0]], {
-               strokeColor:'black',
-               strokeWidth: 2,
-               highlight:false,
-               name:'" . ($ops['axislabel'][0] != null ? $ops['axislabel'][0] : "") . "',
-               withLabel:true,
-               label: {position:'rt', offset:[-15,15], highlight:false, useMathJax:{$useMathJax}}
-             });";
-	// Remove standard ticks and create new ones based off of tickDistance
-	$out .= "xaxis{$label}.removeAllTicks();";
-	$out .= "var xticks{$label} = board_{$label}.create('ticks',[xaxis{$label}], {
-             ticksDistance: {$ticksDistanceX},
-             strokeColor: 'rgba(150,150,150,0.85)',
-             majorHeight:-1,
-             minorHeight: -1,
-             highlight:false,
-             drawLabels:true,
-             label:{offset:[0,-5], anchorY:'top', anchorX:'middle', highlight:false},
-             minorTicks: {$minorTicksX}
-           });";
+				strokeColor:'black',
+				strokeWidth: 2,
+				highlight:false,
+				name:'" . ($ops['axislabel'][0] != null ? $ops['axislabel'][0] : "") . "',
+				label: { 
+					position: 'rt', 
+					offset: [-15,15], 
+					highlight: false, 
+					useMathJax: {$useMathJax}
+				},
+				ticks: {
+					insertTicks: false,
+					ticksDistance: $ticksDistanceX,
+					minorTicks: $minorTicksX,
+					majorHeight: $gridHeightX,
+					minorHeight: $minorTickHeightX,
+					color: 'black',
+					label: { 
+						offset: [0,-5], 
+						anchorY: 'top', 
+						anchorX: 'middle', 
+						highlight: false, 
+						visible: $showXLabels
+					}
+				} 
+            });";
 
 	// y-axis
 	$out .= "var yaxis{$label} = board_{$label}.create('axis', [[0,0],[0,1]], {
@@ -1659,49 +1749,23 @@ function jsx_createrectangularboard ($label, $ops = array()) {
                highlight:false,
                name:'" . ($ops['axislabel'][1] != null ? $ops['axislabel'][1] : "") . "',
                withLabel:true,
-               label: {position:'rt', offset:[10,-15], highlight:false, useMathJax:{$useMathJax}}
+               label: {position:'rt', offset:[10,-15], highlight:false, useMathJax:{$useMathJax}},
+			   ticks: {
+					insertTicks: false,
+					ticksDistance: $ticksDistanceY,
+					minorTicks: $minorTicksY,
+					majorHeight: $gridHeightY,
+					minorHeight: $minorTickHeightY,
+					label: {
+						offset: [-5,0],
+						anchorY: 'middle', 
+						anchorX: 'right', 
+						highlight: false,
+						visible: $showYLabels
+					}
+				} 
              });";
-	
-	// Remove standard ticks and create new ones based off of tickDistance
-    $out .= "yaxis{$label}.removeAllTicks();";
-    $out .= "var yticks{$label} = board_{$label}.create('ticks',[yaxis{$label}], {
-              ticksDistance: {$ticksDistanceY},
-              strokeColor: 'rgba(150,150,150,0.85)',
-              majorHeight:-1,
-              minorHeight: -1,
-              highlight:false,
-              drawLabels:true,
-              label:{offset:[-5, 0], anchorY:'middle', anchorX:'right', highlight:false},
-              minorTicks: {$minorTicksY}
-            });";
-
-    // If zoom is allowed, we need to make sure ticks behave nicely
-    if ($zoom == "true") {
-		$out .= "xticks{$label}.ticksFunction = function(){return xTicks{$label};};";
-		$out .= "yticks{$label}.ticksFunction = function(){return yTicks{$label};};";
-      
-		// Tick handling functions
-		$out .= "var setTicks{$label} = function(){
-          bb = board_{$label}.getBoundingBox();
-          xTicksVal = Math.pow(10, Math.floor((Math.log(0.6*(bb[2]-bb[0])))/Math.LN10));
-          if( (bb[2]-bb[0])/xTicksVal > 6) {
-        	  xTicks{$label} = xTicksVal;
-        	} else {
-        	  xTicks{$label} = 0.5* xTicksVal;
-        	}
-        	yTicksVal = Math.pow(10, Math.floor((Math.log(0.6*(bb[1]-bb[3])))/Math.LN10));
-        	if( (bb[1]-bb[3])/yTicksVal > 6) {
-        	  yTicks{$label} = yTicksVal;
-        	} else {
-        	  yTicks{$label} = 0.5* yTicksVal;
-        	}
-        	board_{$label}.fullUpdate(); // full update is required
-        };
-        setTicks{$label}();
-        board_{$label}.on('boundingbox', function(){setTicks{$label}();});
-        board_{$label}.fullUpdate();";
-    }
-    
+	  
 	$boardinit = jsx_setupboard($label, $width, $height, $centered);
     return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
 
@@ -2181,7 +2245,7 @@ function jsx_functionToJS($rule, $var) {
 		}
 	}
 	$js .= "with (Math) var result = eval(mathjs(ts, '{$var}'));
-            return result; }";
+            return result; }"; 
 		
 	return $js;
 }
@@ -2199,21 +2263,77 @@ function jsx_getbool($bool) {
 
 
 // Affixes a label to a jsx object, sets it up so that it can be dynamic 
-// static
+// or static. A string for the label can be passed, or an array that
+// contains the label string along with some rendering hints. The possible
+// rendering hints are: makepretty, display, function.
+// makepretty will attempt to clean up things like 1 * x, x + 0, x + - 1
+// disp will make the label show up as a rendered math function
+// function will allow the user to provide a javascript function to
+//   allow for high levels of customization
 function jsx_setlabel($id, $label) {
 	
-	if($label !== '') {
-		if(strpos($label, 'this.') !== false) {
-			$label = str_replace('this', $id, $label);
-		}
+	$js = "{$id}.label.setText('');";
+	
+	if (is_string($label)) {
+		if ($label !== '') {
+			if (strpos($label, 'this.') !== false) {
+				$label = str_replace('this', $id, $label);
+			}
 
-		if (count(jsx_getobjectreferences($label)) > 0) {
-			$js = "{$id}.label.setText(function() { return {$label}; });";
-		} else {
-			$js = "{$id}.label.setText('{$label}');";
+			if (count(jsx_getobjectreferences($label)) > 0) {
+				$js = "{$id}.label.setText(function() { return {$label}; });";
+			} else {
+				$js = "{$id}.label.setText('{$label}');";
+			}
+		
+			return $js;
+		}
+	} else if (is_array($label)) {
+
+		$makepretty = false;
+		$display = false;
+		
+		for ($i = 1; $i < count($label); $i++) {
+			
+			switch ($label[$i]) {
+				case 'makepretty' :	$makepretty = true;	break;
+				case 'display' : $display = true; break;
+				default:
+					echo "Warning: Unknown label rendering hint encountered: {$label[$i]}";
+			}
+			
 		}
 		
-		return $js;
+		$label = $label[0];
+		
+		if ($label !== '') {
+			if (strpos($label, 'this.') !== false) {
+				$label = str_replace('this', $id, $label);
+			}
+
+			if ($makepretty && !$display) {
+				$js = "{$id}.label.setText(function() { return jsx_clean({$label}); });";
+			} 
+			
+			if (!$makepretty && $display) {
+				$js = "{$id}.label.setText(function() { return '`' + {$label} + '`';  });";
+			}
+			
+			if ($makepretty && $display) {
+				$js = "{$id}.label.setText(function() { return '`' + jsx_clean({$label}) + '`';  });";
+			}
+		
+			if (!$makepretty && !$display) {
+				if (count(jsx_getobjectreferences($label)) > 0) {
+					$js = "{$id}.label.setText(function() { return {$label}; });";
+				} else {
+					$js = "{$id}.label.setText('{$label}');";
+				}
+			}
+		
+			return $js;
+		}
+		
 	}
 }
 

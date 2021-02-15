@@ -111,7 +111,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$_POST['title'] = Sanitize::stripHtmlTags($_POST['title']);
-		$_POST['text'] = Sanitize::incomingHtml($_POST['text']);
+		$_POST['text'] = Sanitize::trimEmptyPara(Sanitize::incomingHtml($_POST['text']));
 
 		$outcomes = array();
 		if (isset($_POST['outcomes'])) {

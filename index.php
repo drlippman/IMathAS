@@ -526,11 +526,11 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			}
 		}
 		if ($hasCleanup) {
-			echo '<p class="small info"><span style="color:orange;">**</span> ';
+			echo '<p class="small info"><span class="warn">**</span> ';
 			echo _('course is scheduled for cleanup').'</p>';
 		}
 	}
-    if ($type=='take') {
+    if ($type=='take' && substr($username, 0, 4) != 'lti-') {
         echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
     } else if ($type=='teach' && $myrights>39) {
         echo '<div class="center"><a class="abutton" href="admin/addcourse.php">', _('Add New Course'), '</a></div>';

@@ -2287,6 +2287,10 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 //argument should be header,column,header,column,...
 function csvdownloadlink() {
   $alist = func_get_args();
+  $filename = "data";
+  if (count($alist)>1 && is_string($alist[1])) {
+      $filename = array_shift($alist);
+  }
   if (count($alist)==0 || count($alist)%2==1) {
     echo "invalid arguments to csvdownloadlink";
     return '';
@@ -2305,7 +2309,7 @@ function csvdownloadlink() {
     $rows[$i] = rtrim($row,',');
   }
   $str = implode("\n",$rows);
-  return '<a download="data.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
+  return '<a download="'.Sanitize::encodeStringForDisplay($filename).'.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
     . _('Download CSV').'</a>';
 }
 
@@ -2402,58 +2406,20 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
 	return showasciisvg($outst,$width,$height);
   }
 
-  //---------------------------------------------ANOVA-Oneway F ratio-----------------------------------------
+//---------------------------------------------ANOVA-Oneway F ratio-----------------------------------------
 // Function: anova1way_f(arr1,arr2, [arr3,...])
 // Returns F ratio and the corresponding P value as an array. 
 //
 // Parameters:
-// arr1, arr2, ...: Arrays in the form [2,3,4,5,...] 
+// arr1, arr2, ...: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes. 
 //  
 // Returns:
 // F ratio and the corresponding P value as an array in the form [F ratio, P value].
 
 function anova1way_f(... $arr){
-	$n=array();  
-	foreach($arr as $a){
-		if (!is_array($a)) { $a = explode(',',$a);};
-		$n[]=count($a);
-		if (count(array_unique($n))!=1) {
-			echo "Error: ANOVA requires the same length for all arrays";
-			return false;
-		}
-	}
-	if (count($n)<2) {
-		echo "Error: ANOVA requires at least two arrays";
-		return false;
-	}
-		
-	$numargs = func_num_args();
-	//$args=func_get_args();
-	$mean=array();
-	$ss=array();
-	for($i=0;$i<$numargs;$i++){
-		$mean[$i]=mean($arr[$i]);
-		$ss[$i]=variance($arr[$i])*(count($arr[$i])-1);
-		//$n[$i]=count($args[$i]);
-	}
-	$gmean=array_sum($mean)/count($mean); //grand mean
-	$ssA=variance($mean)*$n[0]*($numargs-1); //Sum of the square for Factor A
-	$ssE=array_sum($ss); //Sum of the square for Residual (Error)
-	$ssT=$ssA+$ssE;
-	$dfA=count($arr)-1;
-	$dfE=($n[0]-1)*$numargs;
-	$dfT=$dfA+$dfE;
-	
-	
-	$msA=$ssA/$dfA; //mean square of Factor A
-	$msE=$ssE/$dfE;    //pooled variance (residual or error)
-	$msT=$msA+$msE;  //total sum of the squares
-	$F_a=$msA/$msE;    //F Ratio
-	
-	$p_a=fcdf($F_a,$dfA,$dfE); //P value
-	
-	return ([$F_a,$p_a]); 
-	}
+    $out = anova1way(... $arr);
+    return [$out[0][3], $out[0][4]];
+}
 
 
 //---------------------------------------------ANOVA-Oneway array-------------------------------------------
@@ -2461,7 +2427,7 @@ function anova1way_f(... $arr){
 // Returns ANOVA table as an array with each row corresponding to Factor A, error (residual), and totals. 
 //
 // Parameters:
-// arr1, arr2, ...: Arrays in the form [2,3,4,5,...] 
+// arr1, arr2, ...: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes. 
 //  
 // Returns:
 // ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
@@ -2474,19 +2440,15 @@ function anova1way(... $arr){
 	foreach($arr as $a){
 		if (!is_array($a)) { $a = explode(',',$a);};
 		$n[]=count($a);
-		
-		if (count(array_unique($n))!=1) {
-			echo "Error: ANOVA requires the same length for all arrays";
-			return false;
-		}
 	}
-	if (count($n)<2) {
-		echo "Error: ANOVA requires at least two arrays";
+	if (count($n)<3) {
+		echo "Error: ANOVA requires three or more arrays";
 		return false;
 	}
-		
+	$N=array_sum($n);	
 	$numargs = func_num_args();
-	//$args=func_get_args();
+    //$args=func_get_args();
+
 	$mean=array();
 	$ss=array();
 	for($i=0;$i<$numargs;$i++){
@@ -2494,12 +2456,22 @@ function anova1way(... $arr){
 		$ss[$i]=variance($arr[$i])*(count($arr[$i])-1);
 		//$n[$i]=count($args[$i]);
 	}
-	$gmean=array_sum($mean)/count($mean); //grand mean
-	$ssA=variance($mean)*$n[0]*($numargs-1); //Sum of the square for Factor A
+	
+	$total = array_map(function($x, $y) { return $x * $y; },
+                   $mean, $n);
+
+	$gmean=array_sum($total)/$N; //grand mean
+
+	//Sum of the square for Factor A uneequal sample sizes
+	$ssa=array();
+	for ($i=0;$i<$numargs;$i++){
+		$ssa[$i]=$n[$i]*($mean[$i]-$gmean)**2; 
+	}
+	$ssA=array_sum($ssa); //Sum of the square for Factor A uneequal sample sizes
 	$ssE=array_sum($ss); //Sum of the square for Residual (Error)
 	$ssT=$ssA+$ssE;
-	$dfA=count($arr)-1;
-	$dfE=($n[0]-1)*$numargs;
+	$dfA=$numargs-1;
+	$dfE=$N-$numargs;
 	$dfT=$dfA+$dfE;
 	
 	
@@ -2507,10 +2479,12 @@ function anova1way(... $arr){
 	$msE=$ssE/$dfE;    //pooled variance (residual or error)
 	$msT=$msA+$msE;  //total sum of the squares
 	$F_a=$msA/$msE;    //F Ratio
-	
+    
 	$p_a=fcdf($F_a,$dfA,$dfE); //P value
+
+	return (array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssE,$dfE,$msE],[$ssT,$dfT]));//[$F_a,$p_a]
 	
-	return (array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssE,$dfE,$msE],[$ssT,$dfT])); 
+
 }
 
 
