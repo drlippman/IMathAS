@@ -37,8 +37,8 @@ $stm = $DBH->prepare($query);
 $stm->execute(array(':courseid'=>$cid));
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 
-	if (!is_numeric($row['category'])) {continue;}
-	if ($row['category']==0) {
+	if (!is_numeric($row['category']) && $row['defoutcome']==0) {continue;}
+	if (!is_numeric($row['category']) || $row['category']==0) {
 		$outc = $row['defoutcome'];
 	} else {
 		$outc = $row['category'];
