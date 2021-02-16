@@ -4,9 +4,9 @@
 // licensed under GPL version 2 or later
 //
 
-function ConversionVer() {
+function conversionVer() {
 	// File version
-	return 8;
+	return 9;
 }
 
 global $allowedmacros;
@@ -17,7 +17,7 @@ if(!is_array($allowedmacros)) {
 }
 
 array_push($allowedmacros, "conversionVer", "conversionDisplay", "conversionDisplay2HTML", "conversionDisplay2HTMLwithBorder",
-    "conversionPrefix", "conversionAbbreviations", "conversionLength",
+    "conversionPrefix", "conversionAbbreviations", "conversionLength", "conversionLiquid", "conversionUnits2ScreenReader",
     "conversionCapacity", "conversionWeight",  "conversionArea", "conversionVolume",
     "conversionTime", "conversionFormulaAbbreviations", "conversionFormulaTemperature" );
 
@@ -85,6 +85,7 @@ function conversionFormulaAbbreviations() {
 
 	return $retval;
 }
+
 
 // function conversionDisplay(Title1,Factors1,[Title2,Factors2,...])
 //
@@ -263,6 +264,9 @@ function conversionPrefix() {
 	return $retval;
 }
 
+// conversionTime(Fullname)
+// conversionTime() use Abbreviations
+// conversionTime("y") use full name
 function conversionTime() {
 	$args = func_get_args();
     if (count($args)==0) {
@@ -284,12 +288,86 @@ function conversionTime() {
 	return $retval;
 }
 
+//function conversionUnits2ScreenReader(units,dimensions,tick)
+// Returns the Abbreviations to words
+//
+// INPUTS:
+//           units: ft - feet
+//                  in - inch
+//                  m = meter
+//                  ect.
+//
+//       dimensions: 2,3 (except dam it allows 1,2, or 3)
+//             tick: add tick marks
+//
+function conversionUnits2ScreenReader($units,$dimensions=2,$tick="y"){
+    $units = strtolower($units);
+    $tick = verifyTickMarks($tick);
+    $exponentWord = _('exponent');
+
+    if($dimensions==1) {
+        if($tick=="`") {
+            if($units=="in") {
+                return "<span aria-hidden=true>`i n`</span><span class=\"sr-only\">in</span>";
+            } elseif($units=="dam") {
+                return "<span aria-hidden=true>`dam`</span><span class=\"sr-only\">d a m</span>";
+            } elseif($units=="dal") {
+                return "<span aria-hidden=true>`daL`</span><span class=\"sr-only\">d a L</span>";
+            } elseif($units=="dag") {
+                return "<span aria-hidden=true>`dag`</span><span class=\"sr-only\">d a g</span>";
+            } else {
+                return "`$units`";
+            }
+        } else {
+            if($units=="in") {
+                return "<span aria-hidden=true>in</span><span class=\"sr-only\">in</span>";
+            } elseif($units=="dam") {
+                return "<span aria-hidden=true>dam</span><span class=\"sr-only\">d a m</span>";
+            } elseif($units=="dal") {
+                return "<span aria-hidden=true>daL</span><span class=\"sr-only\">d a L</span>";
+            } elseif($units=="dag") {
+                return "<span aria-hidden=true>dag</span><span class=\"sr-only\">d a g</span>";
+            } else {
+                return "$units";
+            }
+        }
+    } else {
+        if($tick=="`") {
+            if($units=="in") {
+                return "<span aria-hidden=true>`i n^$dimensions`</span><span class=\"sr-only\">in $exponentWord $dimensions</span>";
+            } elseif($units=="dam") {
+                return "<span aria-hidden=true>`dam^$dimensions`</span><span class=\"sr-only\">d a m $exponentWord $dimensions</span>";
+            } elseif($units=="dal") {
+                return "<span aria-hidden=true>`daL^$dimensions`</span><span class=\"sr-only\">d a L $exponentWord $dimensions</span>";
+            } elseif($units=="dag") {
+                return "<span aria-hidden=true>`dag^$dimensions`</span><span class=\"sr-only\">d a g $exponentWord $dimensions</span>";
+            } else {
+                return "<span aria-hidden=true>`$units^$dimensions`</span><span class=\"sr-only\">$units $exponentWord $dimensions</span>";
+            }
+        } else {
+            if($units=="in") {
+                return "<span aria-hidden=true>in^$dimensions</span><span class=\"sr-only\">in $exponentWord $dimensions</span>";
+            } elseif($units=="dam") {
+                return "<span aria-hidden=true>dam^$dimensions</span><span class=\"sr-only\">d a m $exponentWord $dimensions</span>";
+            } elseif($units=="dal") {
+                return "<span aria-hidden=true>daL^$dimensions</span><span class=\"sr-only\">d a L $exponentWord $dimensions</span>";
+            } elseif($units=="dag") {
+                return "<span aria-hidden=true>dag^$dimensions</span><span class=\"sr-only\">d a g $exponentWord $dimensions</span>";
+            } else {
+                return "<span aria-hidden=true>$units^$dimensions</span><span class=\"sr-only\">$units $exponentWord $dimensions</span>";
+            }
+        }
+    }
+
+}
+
 // function conversionAbbreviations(system,type[,tick,Fullname])
 // Returns the Abbreviations to words
 //
 // INPUTS:
 //   system: "A" - American
 //           "M" - Metric
+//           "T" - Time
 //
 //     type: Length
 //           Capacity
@@ -357,26 +435,26 @@ function conversionAbbreviations() {
 			$retval[2] = "Ton = T";
         } elseif($type=="Area"){
 			if($fullname==0) {
-                $retval[0] = "Inches squared = <span aria-hidden=true>$tick"."in^2$tick</span><span class=\"sr-only\">in exponent 2</span>"; //$tick"."in^2$tick";
-                $retval[1] = "Feet squared = <span aria-hidden=true>$tick"."fy^2$tick</span><span class=\"sr-only\">ft exponent 2</span>"; //$tick"."ft^2$tick";
-                $retval[2] = "Yard squared = <span aria-hidden=true>$tick"."yd^2$tick</span><span class=\"sr-only\">yd exponent 2</span>"; //$tick"."yd^2$tick";
-                $retval[3] = "Mile squared = <span aria-hidden=true>$tick"."Mi^2$tick</span><span class=\"sr-only\">Mi exponent 2</span>"; //$tick"."Mi^2$tick";
+                $retval[0] = "Inches squared = ".conversionUnits2ScreenReader("in",2,$tick);
+                $retval[1] = "Feet squared = ".conversionUnits2ScreenReader("ft",2,$tick);
+                $retval[2] = "Yard squared = ".conversionUnits2ScreenReader("yd",2,$tick);
+                $retval[3] = "Mile squared = ".conversionUnits2ScreenReader("mi",2,$tick);
             } else {
-                $retval[0] = "Square inches = <span aria-hidden=true>$tick"."in^2$tick</span><span class=\"sr-only\">in exponent 2</span>"; //$tick"."in^2$tick";
-                $retval[1] = "Square feet = <span aria-hidden=true>$tick"."fy^2$tick</span><span class=\"sr-only\">ft exponent 2</span>"; //$tick"."ft^2$tick";
-                $retval[2] = "Square yard = <span aria-hidden=true>$tick"."yd^2$tick</span><span class=\"sr-only\">yd exponent 2</span>"; //$tick"."yd^2$tick";
-                $retval[3] = "Square mile =<span aria-hidden=true>$tick"."Mi^2$tick</span><span class=\"sr-only\">Mi exponent 2</span>"; //$tick"."Mi^2$tick";
+                $retval[0] = "Square inches = ".conversionUnits2ScreenReader("in",2,$tick);
+                $retval[1] = "Square feet = ".conversionUnits2ScreenReader("ft",2,$tick);
+                $retval[2] = "Square yard = ".conversionUnits2ScreenReader("yd",2,$tick);
+                $retval[3] = "Square mile = ".conversionUnits2ScreenReader("mi",2,$tick);
             }
 
         } elseif($type=="Volume"){
 			if($fullname==0) {
-                $retval[0] = "Inches cubed = <span aria-hidden=true>$tick"."in^3$tick</span><span class=\"sr-only\">in exponent 3</span>"; //$tick"."in^3$tick";
-                $retval[1] = "Feet cubed = <span aria-hidden=true>$tick"."fy^3$tick</span><span class=\"sr-only\">ft exponent 3</span>"; //$tick"."ft^3$tick";
-                $retval[2] = "Yard cubed = <span aria-hidden=true>$tick"."yd^3$tick</span><span class=\"sr-only\">yd exponent 3</span>"; //$tick"."yd^3$tick";
+                $retval[0] = "Inches cubed = ".conversionUnits2ScreenReader("in",3,$tick);
+                $retval[1] = "Feet cubed = ".conversionUnits2ScreenReader("ft",3,$tick);
+                $retval[2] = "Yard cubed = ".conversionUnits2ScreenReader("yd",3,$tick);
             } else {
-                $retval[0] = "Cubic inches = <span aria-hidden=true>$tick"."in^3$tick</span><span class=\"sr-only\">in exponent 3</span>"; //$tick"."in^3$tick";
-                $retval[1] = "Cubic feet = <span aria-hidden=true>$tick"."fy^3$tick</span><span class=\"sr-only\">ft exponent 3</span>"; //$tick"."ft^3$tick";
-                $retval[2] = "Cubic yard = <span aria-hidden=true>$tick"."fy^3$tick</span><span class=\"sr-only\">ft exponent 3</span>"; //$tick"."ft^3$tick";
+                $retval[0] = "Cubic inches = ".conversionUnits2ScreenReader("in",3,$tick);
+                $retval[1] = "Cubic feet = ".conversionUnits2ScreenReader("ft",3,$tick);
+                $retval[2] = "Cubic yard = ".conversionUnits2ScreenReader("yd",3,$tick);
             }
         }
 
@@ -391,7 +469,7 @@ function conversionAbbreviations() {
 			$retval[1] = "Centi"._('meter')." = cm";
 			$retval[2] = "Deci"._('meter')." = dm";
 			$retval[3] = _('Meter')." = m";
-			$retval[4] = _('Deca'). _('meter')." = <span aria-hidden=true>dam</span><span class=\"sr-only\">d a m</span>";
+			$retval[4] = _('Deca'). _('meter')." = ".conversionUnits2ScreenReader("dam",1,"n");
 			$retval[5] = "Hecto"._('meter')." = hm";
 			$retval[6] = "Kilo"._('meter')." = km";
         } elseif($type=="Capacity"){
@@ -399,7 +477,7 @@ function conversionAbbreviations() {
 			$retval[1] = "Centi" . _('liter') . " = cL";
 			$retval[2] = "Deci" . _('liter') . " = dL";
 			$retval[3] = _('Liter') . " = L";
-			$retval[4] = _('Deca')._('liter') . " = = <span aria-hidden=true>daL</span><span class=\"sr-only\">d a L</span>";
+			$retval[4] = _('Deca')._('liter') . " = ".conversionUnits2ScreenReader("daL",1,"n");
 			$retval[5] = "Hecto" . _('liter') . " = hL";
 			$retval[6] = "Kilo" . _('liter') . " = kL";
         } elseif(($type=="Weight")||($type=="Mass")){
@@ -407,50 +485,63 @@ function conversionAbbreviations() {
 			$retval[1] = "Centi"._('gram')." = cg";
 			$retval[2] = "Deci"._('gram')." = dg";
 			$retval[3] = _('Gram') ." = g";
-			$retval[4] = _('Deca')._('gram')." = = <span aria-hidden=true>dag</span><span class=\"sr-only\">d a g</span>";
+			$retval[4] = _('Deca')._('gram')." = ".conversionUnits2ScreenReader("dag",1,"n");
 			$retval[5] = "Hecto"._('gram')." = hg";
 			$retval[6] = "Kilo"._('gram')." = kg";
 			$retval[7] = "Metric Ton = Tonne";
         } elseif($type=="Area"){
 			if($fullname==0) {
-                $retval[0] = "Milli"._('meter')." squared= <span aria-hidden=true>".$tick."mm^2$tick</span><span class=\"sr-only\">mm exponent 2</span>"; //$tick"."mm^2$tick";  // TO DO
-                $retval[1] = "Centi"._('meter')." squared= <span aria-hidden=true>".$tick."cm^2$tick</span><span class=\"sr-only\">cm exponent 2</span>"; //$tick"."cm^2$tick";
-                $retval[2] = "Deci"._('meter')." squared= <span aria-hidden=true>".$tick."dm^2$tick</span><span class=\"sr-only\">dm exponent 2</span>"; //$tick"."dm^2$tick";
-                $retval[3] = _('Meter')." squared= <span aria-hidden=true>".$tick."m^2$tick</span><span class=\"sr-only\">m exponent 2</span>"; //$tick"."m^2$tick";
-                $retval[4] = _('Deca')._('meter')." squared= = <span aria-hidden=true>".$tick."dam^2$tick</span><span class=\"sr-only\">d a m exponent 2</span>";
-                $retval[5] = "Hecto"._('meter')." squared = <span aria-hidden=true>".$tick."hm^2$tick</span><span class=\"sr-only\">hm exponent 2</span>"; //$tick"."hm^2$tick";
-                $retval[6] = "Kilo"._('meter')." squared = <span aria-hidden=true>".$tick."km^2$tick</span><span class=\"sr-only\">km exponent 2</span>"; //$tick"."km^2$tick";
+                $retval[0] = "Milli"._('meter')." squared = ".conversionUnits2ScreenReader("mm",2,$tick);
+                $retval[1] = "Centi"._('meter')." squared = ".conversionUnits2ScreenReader("cm",2,$tick);
+                $retval[2] = "Deci"._('meter')." squared = ".conversionUnits2ScreenReader("dm",2,$tick);
+                $retval[3] = _('Meter')." squared = ".conversionUnits2ScreenReader("m",2,$tick);
+                $retval[4] = _('Deca')._('meter')." squared = ".conversionUnits2ScreenReader("dam",2,$tick);
+                $retval[5] = "Hecto"._('meter')." squared = ".conversionUnits2ScreenReader("hm",2,$tick);
+                $retval[6] = "Kilo"._('meter')." squared = ".conversionUnits2ScreenReader("km",2,$tick);
             } else {
-                $retval[0] = "Square milli"._('meter')." = <span aria-hidden=true>".$tick."mm^2$tick</span><span class=\"sr-only\">mm exponent 2</span>"; //$tick"."mm^2$tick";  // TO DO
-                $retval[1] = "Square centi"._('meter')." = <span aria-hidden=true>".$tick."cm^2$tick</span><span class=\"sr-only\">cm exponent 2</span>"; //$tick"."cm^2$tick";
-                $retval[2] = "Square deci"._('meter')." = <span aria-hidden=true>".$tick."dm^2$tick</span><span class=\"sr-only\">dm exponent 2</span>"; //$tick"."dm^2$tick";
-                $retval[3] = "Square "._('meter')." = <span aria-hidden=true>".$tick."m^2$tick</span><span class=\"sr-only\">m exponent 2</span>"; //$tick"."m^2$tick";
-                $retval[4] = "Square "._('deca')._('meter')." = <span aria-hidden=true>".$tick."dam^2$tick</span><span class=\"sr-only\">d a m exponent 2</span>";
-                $retval[5] = "Square hecto"._('meter')." = <span aria-hidden=true>".$tick."hm^2$tick</span><span class=\"sr-only\">hm exponent 2</span>"; //$tick"."hm^2$tick";
-                $retval[6] = "Square kilo"._('meter')." = <span aria-hidden=true>".$tick."km^2$tick</span><span class=\"sr-only\">km exponent 2</span>"; //$tick"."km^2$tick";
+                $retval[0] = "Square milli"._('meter')." = ".conversionUnits2ScreenReader("mm",2,$tick);
+                $retval[1] = "Square centi"._('meter')." = ".conversionUnits2ScreenReader("cm",2,$tick);
+                $retval[2] = "Square deci"._('meter')." = ".conversionUnits2ScreenReader("dm",2,$tick);
+                $retval[3] = "Square "._('meter')." = ".conversionUnits2ScreenReader("m",2,$tick);
+                $retval[4] = "Square "._('deca')._('meter')." = ".conversionUnits2ScreenReader("dam",2,$tick);
+                $retval[5] = "Square hecto"._('meter')." = ".conversionUnits2ScreenReader("hm",2,$tick);
+                $retval[6] = "Square kilo"._('meter')." = <".conversionUnits2ScreenReader("km",2,$tick);
             }
 			$retval[7] = "Ares = a";
 			$retval[8] = "Hectares = ha";
-        } elseif($type=="Volume"){
+        } elseif($type=="Volume") {
 			if($fullname==0) {
-                $retval[0] = "Milli"._('meter')." cubed = <span aria-hidden=true>".$tick."mm^3$tick</span><span class=\"sr-only\">mm exponent 3</span>"; //$tick"."mm^3$tick";  // TO DO
-                $retval[1] = "Centi"._('meter')." cubed = <span aria-hidden=true>".$tick."cm^3$tick</span><span class=\"sr-only\">cm exponent 3</span>"; //$tick"."cm^3$tick";
-                $retval[2] = "Deci"._('meter')." cubed = <span aria-hidden=true>".$tick."dm^3$tick</span><span class=\"sr-only\">dm exponent 3</span>"; //$tick"."dm^3$tick";
-                $retval[3] = _('Meter')." cubed = <span aria-hidden=true>".$tick."m^3$tick</span><span class=\"sr-only\">m exponent 3</span>"; //$tick"."m^3$tick";
-                $retval[4] = _('Deca')._('meter')." cubed = <span aria-hidden=true>".$tick."dam^3$tick</span><span class=\"sr-only\">d a m exponent 3</span>";
-                $retval[5] = "Hecto"._('meter')." cubed = <span aria-hidden=true>".$tick."hm^3$tick</span><span class=\"sr-only\">hm exponent 3</span>"; //$tick"."hm^3$tick";
-                $retval[6] = "Kilo"._('meter')." cubed = <span aria-hidden=true>".$tick."km^3$tick</span><span class=\"sr-only\">km exponent 3</span>"; //$tick"."km^3$tick";
+                $retval[0] = "Milli"._('meter')." cubed = ".conversionUnits2ScreenReader("mm",3,$tick);
+                $retval[1] = "Centi"._('meter')." cubed = ".conversionUnits2ScreenReader("cm",3,$tick);
+                $retval[2] = "Deci"._('meter')." cubed = ".conversionUnits2ScreenReader("dm",3,$tick);
+                $retval[3] = _('Meter')." cubed = ".conversionUnits2ScreenReader("m",3,$tick);
+                $retval[4] = _('Deca')._('meter')." cubed = ".conversionUnits2ScreenReader("dam",3,$tick);
+                $retval[5] = "Hecto"._('meter')." cubed = ".conversionUnits2ScreenReader("hm",3,$tick);
+                $retval[6] = "Kilo"._('meter')." cubed = ".conversionUnits2ScreenReader("km",3,$tick);
             } else {
-                $retval[0] = "Cubic milli"._('meter')." = <span aria-hidden=true>".$tick."mm^3$tick</span><span class=\"sr-only\">mm exponent 3</span>"; //$tick"."mm^3$tick";  // TO DO
-                $retval[1] = "Cubic centi"._('meter')." = <span aria-hidden=true>".$tick."cm^3$tick</span><span class=\"sr-only\">cm exponent 3</span>"; //$tick"."cm^3$tick";
-                $retval[2] = "Cubic deci"._('meter')." = <span aria-hidden=true>".$tick."dm^3$tick</span><span class=\"sr-only\">dm exponent 3</span>"; //$tick"."dm^3$tick";
-                $retval[3] = "Cubic "._('meter')." = <span aria-hidden=true>".$tick."m^3$tick</span><span class=\"sr-only\">m exponent 3</span>"; //$tick"."m^3$tick";
-                $retval[4] = "Cubic "._('deca')._('meter')." = <span aria-hidden=true>".$tick."dam^3$tick</span><span class=\"sr-only\">d a m exponent 3</span>";
-                $retval[5] = "Cubic hecto"._('meter')." = <span aria-hidden=true>".$tick."hm^3$tick</span><span class=\"sr-only\">hm exponent 3</span>"; //$tick"."hm^3$tick";
-                $retval[6] = "Cubic kilo"._('meter')." = <span aria-hidden=true>".$tick."km^3$tick</span><span class=\"sr-only\">km exponent 3</span>"; //$tick"."km^3$tick";
+                $retval[0] = "Cubic milli"._('meter')." = ".conversionUnits2ScreenReader("mm",3,$tick);
+                $retval[1] = "Cubic centi"._('meter')." = ".conversionUnits2ScreenReader("cm",3,$tick);
+                $retval[2] = "Cubic deci"._('meter')." = ".conversionUnits2ScreenReader("dm",3,$tick);
+                $retval[3] = "Cubic "._('meter')." = ".conversionUnits2ScreenReader("m",3,$tick);
+                $retval[4] = "Cubic "._('deca')._('meter')." = ".conversionUnits2ScreenReader("dam",3,$tick);
+                $retval[5] = "Cubic hecto"._('meter')." = ".conversionUnits2ScreenReader("hm",3,$tick);
+                $retval[6] = "Cubic kilo"._('meter')." = ".conversionUnits2ScreenReader("km",3,$tick);
             }
         }
 	}
+
+
+	// -------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------------------
+	if($system=="T"){
+        $retval[0] = "Seconds = sec";
+		$retval[1] = "Minutes = min";
+		$retval[2] = "Hour = hr";
+		$retval[3] = "Day = d";
+		$retval[4] = "Year = yr.";
+		$retval[5] = "Century = c";
+    }
 
 	return $retval;
 }
@@ -502,7 +593,7 @@ function conversionLength() {
 		if($fullname==0) {
             $retval[0] = "1 km = 1000 m";
             $retval[1] = "1 hm = 100 m";
-            $retval[2] = "1 <span aria-hidden=true>dam</span><span class=\"sr-only\">d a m</span> = 10 m";
+            $retval[2] = "1 ".conversionUnits2ScreenReader("dam",1,"n")." = 10 m";
             $retval[3] = "1 m = 10 dm";
             $retval[4] = "1 m = 100 cm";
             $retval[5] = "1 m = 1000 mm";
@@ -578,8 +669,8 @@ function conversionCapacity() {
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "1 C = 8 fl oz";
-            $retval[1] = "1 pt = 2 C";
+            $retval[0] = "1 c = 8 fl oz";
+            $retval[1] = "1 pt = 2 c";
             $retval[2] = "1 qt = 2 pt";
             $retval[3] = "1 gal = 4 qt";
         } else {
@@ -592,7 +683,7 @@ function conversionCapacity() {
 		if($fullname==0) {
             $retval[0] = "1 kL = 1000 L";
             $retval[1] = "1 hL = 100 L";
-            $retval[2] = "1 <span aria-hidden=true>daL</span><span class=\"sr-only\">d a L</span> = 10 L";
+            $retval[2] = "1 ".conversionUnits2ScreenReader("daL",1,"n")." = 10 L";
             $retval[3] = "1 L = 10 dL";
             $retval[4] = "1 L = 100 cL";
 			$retval[5] = "1 L = 1000 mL";
@@ -648,6 +739,8 @@ function conversionCapacity() {
 //           "AM - Americian to Metric
 //           "MA - Metric to Americian
 //
+//      NOTE: This ignores the fact that the metric system uses mass and the Americam system uses a force for weight.
+//
 // FullWords: 0 = use Abbreviations
 //            1 = use Full name
 //
@@ -682,7 +775,7 @@ function conversionWeight() {
 		if($fullname==0) {
             $retval[0] = "1 kg = 1000 g";
             $retval[1] = "1 hg = 100 g";
-            $retval[2] = "1 <span aria-hidden=true>dag</span><span class=\"sr-only\">d a g</span> = 10 g";
+            $retval[2] = "1 ".conversionUnits2ScreenReader("dag",1,"n")." = 10 g";
             $retval[3] = "1 g = 10 dg";
             $retval[4] = "1 g = 100 cg";
 			$retval[5] = "1 g = 1000 mg";
@@ -748,16 +841,16 @@ function conversionArea() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-	$tick = verifyTickMarks($args[3]);
+	$tick = $args[3];
 
     $retval = array();
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "1 <span aria-hidden=true>$tick"."fy^2$tick</span><span class=\"sr-only\">ft exponent 2</span> = 144 <span aria-hidden=true>$tick"."in^2$tick</span><span class=\"sr-only\">in exponent 2</span>";
-            $retval[1] = "1 <span aria-hidden=true>$tick"."yd^2$tick</span><span class=\"sr-only\">yd exponent 2</span> = 9 <span aria-hidden=true>$tick"."fy^2$tick</span><span class=\"sr-only\">ft exponent 2</span>";
-			$retval[2] = "1 acre = 43,560 <span aria-hidden=true>$tick"."fy^2$tick</span><span class=\"sr-only\">ft exponent 2</span>";
-            $retval[3] = "1 <span aria-hidden=true>$tick"."mi^2$tick</span><span class=\"sr-only\">mi exponent 2</span>k = 640 acre";
+            $retval[0] = "1 ".conversionUnits2ScreenReader("ft",2,$tick)." = 144 ".conversionUnits2ScreenReader("in",2,$tick);
+            $retval[1] = "1 ".conversionUnits2ScreenReader("yd",2,$tick)." = 9 ".conversionUnits2ScreenReader("ft",2,$tick);
+            $retval[2] = "1 acre = 43,560 ".conversionUnits2ScreenReader("ft",2,$tick);
+            $retval[3] = "1 ".conversionUnits2ScreenReader("mi",2,$tick)." = 640 acre";
         } else {
             $retval[0] = "1 feet squared = 144 inches squared";
             $retval[1] = "1 yard squared = 9 feet squared";
@@ -766,13 +859,13 @@ function conversionArea() {
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
-            $retval[0] = "1 <span aria-hidden=true>$tick"."km^2$tick</span><span class=\"sr-only\">km exponent 2</span> = 100 <span aria-hidden=true>$tick"."hm^2$tick</span><span class=\"sr-only\">hm exponent 2</span>";
-            $retval[1] = "1 <span aria-hidden=true>$tick"."hm^2$tick</span><span class=\"sr-only\">hm exponent 2</span> = 100 <span aria-hidden=true>$tick"."dam^2$tick</span><span class=\"sr-only\">d a m exponent 2</span>";
-            $retval[2] = "1 <span aria-hidden=true>$tick"."dam^2$tick</span><span class=\"sr-only\">d a m exponent 2</span> = 100 <span aria-hidden=true>$tick"."m^2$tick</span><span class=\"sr-only\">m exponent 2</span>";
-            $retval[3] = "1 <span aria-hidden=true>$tick"."m^2$tick</span><span class=\"sr-only\">m exponent 2</span> = 100 <span aria-hidden=true>$tick"."dm^2$tick</span><span class=\"sr-only\">dm exponent 2</span>";
-            $retval[4] = "1 <span aria-hidden=true>$tick"."dm^2$tick</span><span class=\"sr-only\">dm exponent 2</span> = 100 <span aria-hidden=true>$tick"."cm^2$tick</span><span class=\"sr-only\">cm exponent 2</span>";
-			$retval[5] = "1 <span aria-hidden=true>$tick"."cm^2$tick</span><span class=\"sr-only\">cm exponent 2</span> = 100 <span aria-hidden=true>$tick"."mm^2$tick</span><span class=\"sr-only\">mm exponent 2</span>";
-			$retval[6] = "1 a = 100 <span aria-hidden=true>$tick"."m^2$tick</span><span class=\"sr-only\">m exponent 2</span>";
+            $retval[0] = "1 ".conversionUnits2ScreenReader("km",2,$tick)." = 100 ".conversionUnits2ScreenReader("hm",2,$tick);
+            $retval[1] = "1 ".conversionUnits2ScreenReader("hm",2,$tick)." = 100 ".conversionUnits2ScreenReader("dam",2,$tick);
+            $retval[2] = "1 ".conversionUnits2ScreenReader("dam",2,$tick)." = 100 ".conversionUnits2ScreenReader("m",2,$tick);
+            $retval[3] = "1 ".conversionUnits2ScreenReader("m",2,$tick)." = 100 ".conversionUnits2ScreenReader("dm",2,$tick);
+            $retval[4] = "1 ".conversionUnits2ScreenReader("dm",2,$tick)." = 100 ".conversionUnits2ScreenReader("cm",2,$tick);
+			$retval[5] = "1 ".conversionUnits2ScreenReader("cm",2,$tick)." = 100 ".conversionUnits2ScreenReader("mm",2,$tick);
+			$retval[6] = "1 a = 100 ".conversionUnits2ScreenReader("m",2,$tick);
 			$retval[7] = "1 ha = 100 a";
         } elseif($fullname==1) {
 			$retval[0] = "1 Kilo"._('meter')." squared = 100 Hecto"._('meter')." squared";
@@ -794,25 +887,29 @@ function conversionArea() {
 			$retval[7] = "1 Hectares = 100 Ares";
         }
 	} elseif($system=="AM"){
+        //6.45160000 cm^2 https://www.wolframalpha.com/input/?i=convert+1+square+inch+to+mm+squared
+        $CF = round(6.4516, $rounding);
 		if($fullname==0) {
-            //6.45160000 cm^2 https://www.wolframalpha.com/input/?i=convert+1+square+inch+to+mm+squared
-			$retval[0] = "1 <span aria-hidden=true>$tick"."in^2$tick</span><span class=\"sr-only\">in exponent 2</span> = ".round(6.4516, $rounding)." <span aria-hidden=true>$tick"."cm^2$tick</span><span class=\"sr-only\">cm exponent 2</span>";
+			$retval[0] = "1 ".conversionUnits2ScreenReader("in",2,$tick)." = $CF ".conversionUnits2ScreenReader("cm",2,$tick);
         } elseif($fullname==1) {
-			$retval[0] = "1 Inch squared = ".round(6.4516, $rounding)." Centi"._('meter')." squared";
+			$retval[0] = "1 Inch squared = $CF Centi"._('meter')." squared";
         } else {
-			$retval[0] = "1 Square inch = ".round(6.4516, $rounding)."Square centi"._('meter');
+			$retval[0] = "1 Square inch = $CF Square centi"._('meter');
         }
 	} elseif($system=="MA"){
+        // 1.19599005 yd^2 https://www.wolframalpha.com/input/?i=convert+1+square+meter+to+square+feet
+        // https://www.wolframalpha.com/input/?i=convert+1+hectares+to+square+feet
+        $CF0 = round(1.19599005, $rounding);
+        $CF1 = round(2.471, $rounding);
 		if($fullname==0) {
-            // 1.19599005 yd^2 https://www.wolframalpha.com/input/?i=convert+1+square+meter+to+square+feet
-			$retval[0] = "1 <span aria-hidden=true>$tick"."m^2$tick</span><span class=\"sr-only\">m exponent 2</span> = ".round(1.19599005, $rounding)." <span aria-hidden=true>$tick"."yd^2$tick</span><span class=\"sr-only\">ud exponent 2</span>";
-            $retval[1] = "1 ha = ".round(2.471, $rounding)." acres";  // https://www.wolframalpha.com/input/?i=convert+1+hectares+to+square+feet
+			$retval[0] = "1 ".conversionUnits2ScreenReader("m",2,$tick)." = $CF0 ".conversionUnits2ScreenReader("yd",2,$tick);
+            $retval[1] = "1 ha = $CF1 acres";
         } elseif($fullname==1) {
-			$retval[0] = "1 "._('Meter')." squared = ".round(1.19599005, $rounding)." Yard squared";
-            $retval[1] = "1 hectares = ".round(2.471, $rounding)." acres";
+			$retval[0] = "1 "._('Meter')." squared = $CF0 Yard squared";
+            $retval[1] = "1 hectares = $CF1 acres";
         } else {
-			$retval[0] = "1 Square"._('Meter')." = ".round(1.19599005, $rounding)." Square yard";
-            $retval[1] = "1 hectares = ".round(2.471, $rounding)." acres";
+			$retval[0] = "1 Square"._('Meter')." = $CF0 Square yard";
+            $retval[1] = "1 hectares = $CF1 acres";
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -850,26 +947,29 @@ function conversionVolume() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-	$tick = verifyTickMarks($args[3]);
+	$tick = $args[3];
 
     $retval = array();
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "1 <span aria-hidden=true>$tick"."ft^3$tick</span><span class=\"sr-only\">ft exponent 3</span> = 1,728 <span aria-hidden=true>$tick"."in^3$tick</span><span class=\"sr-only\">in exponent 3</span>";
-            $retval[1] = "1 <span aria-hidden=true>$tick"."yd^3$tick</span><span class=\"sr-only\">yd exponent 3</span> = 27 <span aria-hidden=true>$tick"."ft^3$tick</span><span class=\"sr-only\">ft exponent 3</span>";
-        } else {
+            $retval[0] = "1 ".conversionUnits2ScreenReader("ft",3,$tick)." = 1,728 ".conversionUnits2ScreenReader("in",3,$tick);
+            $retval[1] = "1 ".conversionUnits2ScreenReader("yd",3,$tick)." = 27 ".conversionUnits2ScreenReader("ft",3,$tick);
+        } elseif($fullname==1) {
             $retval[0] = "1 feet cubed = 1,728 inches cubed";
             $retval[1] = "1 yard cubed = 27 feet cubed";
+        } elseif($fullname==2) {
+            $retval[0] = "1 cubic feet = 1,728 cubic inches";
+            $retval[1] = "1 cubic yard = 27 cubic feet";
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
-            $retval[0] = "1 <span aria-hidden=true>$tick"."km^3$tick</span><span class=\"sr-only\">km exponent 3</span> = 1000 <span aria-hidden=true>$tick"."hm^3$tick</span><span class=\"sr-only\">hm exponent 3</span>";
-            $retval[1] = "1 <span aria-hidden=true>$tick"."hm^3$tick</span><span class=\"sr-only\">hm exponent 3</span> = 1000 <span aria-hidden=true>$tick"."dam^3$tick</span><span class=\"sr-only\">d a m exponent 3</span>k";
-            $retval[2] = "1 <span aria-hidden=true>$tick"."dam^3$tick</span><span class=\"sr-only\">d a m exponent 3</span> = 1000 <span aria-hidden=true>$tick"."m^3$tick</span><span class=\"sr-only\">m exponent 3</span>";
-            $retval[3] = "1 <span aria-hidden=true>$tick"."m^3$tick</span><span class=\"sr-only\">m exponent 3</span> = 1000 <span aria-hidden=true>$tick"."dm^3$tick</span><span class=\"sr-only\">dm exponent 3</span>";
-            $retval[4] = "1 <span aria-hidden=true>$tick"."dm^3$tick</span><span class=\"sr-only\">dm exponent 3</span> = 1000 <span aria-hidden=true>$tick"."cm^3$tick</span><span class=\"sr-only\">cm exponent 3</span>";
-			$retval[5] = "1 <span aria-hidden=true>$tick"."cm^3$tick</span><span class=\"sr-only\">cm exponent 3</span> = 1000 <span aria-hidden=true>$tick"."mm^3$tick</span><span class=\"sr-only\">mm exponent 3</span>";
+            $retval[0] = "1 ".conversionUnits2ScreenReader("km",3,$tick)." = 1000 ".conversionUnits2ScreenReader("hm",3,$tick);
+            $retval[1] = "1 ".conversionUnits2ScreenReader("hm",3,$tick)." = 1000 ".conversionUnits2ScreenReader("dam",3,$tick);
+            $retval[2] = "1 ".conversionUnits2ScreenReader("dam",3,$tick)." = 1000 ".conversionUnits2ScreenReader("m",3,$tick);
+            $retval[3] = "1 ".conversionUnits2ScreenReader("m",3,$tick)." = 1000 ".conversionUnits2ScreenReader("dm",3,$tick);
+            $retval[4] = "1 ".conversionUnits2ScreenReader("dm",3,$tick)." = 1000 ".conversionUnits2ScreenReader("cm",3,$tick);
+			$retval[5] = "1 ".conversionUnits2ScreenReader("cm",3,$tick)." = 1000 ".conversionUnits2ScreenReader("mm",3,$tick);
         } elseif($fullname==1) {
 			$retval[0] = "1 Kilo"._('meter')." cubed = 1000 Hecto"._('meter')."  cubed";
             $retval[1] = "1 Hecto"._('meter')." cubed = 1000 "._('Deca')._('meter')." cubed";
@@ -886,20 +986,24 @@ function conversionVolume() {
 			$retval[5] = "1 Cubic centi"._('meter')." cubed = 1000 Cubic milli"._('meter');
         }
 	} elseif($system=="AM"){
+        // 0.0163870640 L https://www.wolframalpha.com/input/?i=convert+1+cubic+inch+to+ml
+        $CF = round(16.3870640, $rounding);
 		if($fullname==0) {
-			$retval[0] = "1 <span aria-hidden=true>$tick"."in^3$tick</span><span class=\"sr-only\">in exponent 3</span> = ".round(16.3870640, $rounding)." mL";
+			$retval[0] = "1 ".conversionUnits2ScreenReader("in",3,$tick)." = $CF mL";
         } elseif($fullname==1) {
-			$retval[0] = "1 Inch cubed = ".round(16.3870640, $rounding)." Milli"._('liter');  // 0.0163870640 L https://www.wolframalpha.com/input/?i=convert+1+cubic+inch+to+ml
+			$retval[0] = "1 Inch cubed = $CF Milli"._('liter');
         } else {
-			$retval[0] = "1 Cubic inch = ".round(16.3870640, $rounding)." Milli"._('Liter');
+			$retval[0] = "1 Cubic inch = $CF Milli"._('Liter');
         }
 	} elseif($system=="MA"){
+        // 61.0237441 in^3  https://www.wolframalpha.com/input/?i=convert+1+liter+to+cubic+feet
+        $CF = round(61.0237441, $rounding);
 		if($fullname==0) {
-			$retval[0] = "1 L = ".round(61.0237441, $rounding)." <span aria-hidden=true>$tick"."in^3$tick</span><span class=\"sr-only\">in exponent 3</span>";
+			$retval[0] = "1 L = $CF ".conversionUnits2ScreenReader("in",3,$tick);
         } elseif($fullname==1) {
-			$retval[0] = "1 "._('Liter')." = ".round(61.0237441, $rounding)." Inches cubed"; // 61.0237441 in^3  https://www.wolframalpha.com/input/?i=convert+1+liter+to+cubic+feet
+			$retval[0] = "1 "._('Liter')." = $CF Inches cubed";
         } else {
-			$retval[0] = "1 "._('Liter')." = ".round(61.0237441, $rounding)." Cubic inches";
+			$retval[0] = "1 "._('Liter')." = $CF Cubic inches";
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -908,6 +1012,64 @@ function conversionVolume() {
 	return $retval;
 }
 
+// function conversionLiquid(type[,FullWords,Rounding,tick])
+// returns an array of strings with the conversion factors
+//
+// INPUTS:
+//   system: "C" - Casks  (rounding is ignored)
+//
+// FullWords: 0 = use Abbreviations
+//            1 = use Full name
+//
+// Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+//     tick: add a tick mark around items with exponents
+//
+// Examples
+//
+// use conversionLiquid("A") returns an array of strings that have Abbreviations for the units that can be used for display
+function conversionLiquid() {
+
+	$args = func_get_args();
+	if (count($args)==0) {
+		echo "Nothing to display - no system type supplied.<br/>\r\n";
+		return "";
+	}
+
+	$system = $args[0];
+	$fullname = verifyFullName($args[1]);
+	//$rounding = verifyRounding($args[2]);
+	//$tick = verifyTickMarks($args[3]);
+
+    $retval = array();
+
+	if($system=="C"){
+        if($fullname==0) {
+            $retval[0] = "1 US Barrel = 42 gal";
+            $retval[1] = "1 British Barrel = 43 gal";
+            $retval[2] = "1 Hogshead = 63 gal";
+            $retval[3] = "1 Barrique = 63 gal";
+            $retval[4] = "1 Puncheon = 79 gal";
+            $retval[5] = "1 Butt = 126 gal";
+            $retval[6] = "1 Pipe = 145 gal";
+            $retval[7] = "1 Tun = 252 gal";
+        } else {
+            $retval[0] = "1 US Barrel = 42 gallons";
+            $retval[1] = "1 British Barrel = 43 gallons";
+            $retval[2] = "1 Hogshead = 63 gallons";
+            $retval[3] = "1 Barrique = 63 gallons";
+            $retval[4] = "1 Puncheon = 79 gallons";
+            $retval[5] = "1 Butt = 126 gallons";
+            $retval[6] = "1 Pipe = 145 gallons";
+            $retval[7] = "1 Tun = 252 gallons";
+        }
+	} else {
+        $retval[0] = "'".(string)$system."' is not a valid type.";
+    }
+
+	return $retval;
+}
+
+// 2021-02-04 ver 9 - added conversionLiquid, find typo in conversionArea
 // 2021-02-04 ver 8 - Added cellpadding to conversionDisplay2HTML, updated conversion factors from www.wolframalpha.com
 //                    fixed missing screen reader on missed ^ conversion factors.
 // 2021-02-02 ver 7 - working on the screen reader added
