@@ -4,7 +4,7 @@
 //Contributors:  David Lippman, Larry Green
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum",
+array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsystemdisp","matrixsum",
 	"matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale",
 	"matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity",
 	"matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse",
@@ -45,7 +45,7 @@ function matrix($vals,$rows,$cols) {
 
 //matrixformat(matrix)
 //Formats a matrix item into an ASCIIMath string for display or $answer
-function matrixformat($m, $bracket='[') {
+function matrixformat($m, $bracket='[', $asfraction=false) {
 	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
 	if ($bracket == '(') {
 		$rb = ')';
@@ -64,13 +64,21 @@ function matrixformat($m, $bracket='[') {
 		for ($j=0;$j<count($m[0]); $j++) {
 			if ($j!=0) {
 				$out .= ',';
-			}
-			$out.= $m[$i][$j];
+            }
+            if ($asfraction) {
+                $out .= decimaltofraction($m[$i][$j]);
+            } else {
+                $out.= $m[$i][$j];
+            }
 		}
 		$out .= ')';
 	}
 	$out .= $rb;
 	return $out;
+}
+
+function matrixformatfrac($m, $bracket='[') {
+    return matrixformat($m, $bracket, true);
 }
 
 //matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])

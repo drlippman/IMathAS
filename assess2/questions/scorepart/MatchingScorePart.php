@@ -67,7 +67,7 @@ class MatchingScorePart implements ScorePart
         for ($i=0;$i<count($questions);$i++) {
           if ($isRescore) {
             $origla = explode('|', $givenans);
-            if ($origla[$i] != '') {
+            if ($origla[$i] !== '') {
               if (isset($matchlist)) {
                 if ($matchlist[$i] != $origla[$i]) {
                   $score -= $deduct;
@@ -81,7 +81,7 @@ class MatchingScorePart implements ScorePart
               $score -= $deduct;
             }
           } else {
-            if ($_POST["qn$qn-$i"]!="" && $_POST["qn$qn-$i"]!="-") {
+            if ($_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
                 $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
                 if (isset($matchlist)) {

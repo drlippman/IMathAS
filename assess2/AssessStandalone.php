@@ -291,7 +291,7 @@ class AssessStandalone {
 
     foreach ($partla as $k=>$v) {
       if ($parts_to_score === true || !empty($parts_to_score[$k])) {
-        if (!isset($this->state['partattemptn'][$qn])) {
+        if (empty($this->state['partattemptn'][$qn])) {
           $this->state['partattemptn'][$qn] = array($k=>1);
         } else {
           $this->state['partattemptn'][$qn][$k]++;
