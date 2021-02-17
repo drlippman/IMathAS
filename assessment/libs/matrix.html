@@ -15,6 +15,7 @@ Matrix functions.  Version 1.6, Jan 19
 <BR><ul>
 <li><a href="#matrix">matrix</a></li>
 <li><a href="#matrixformat">matrixformat</a></li>
+<li><a href="#matrixformatfrac">matrixformatfrac</a></li>
 <li><a href="#matrixdisplaytable">matrixdisplaytable</a></li>
 <li><a href="#matrixsystemdisp">matrixsystemdisp</a></li>
 <li><a href="#matrixgetentry">matrixgetentry</a></li>
@@ -73,6 +74,11 @@ matrix(vals,rows,cols)
 <BR><h3><a name="matrixformat">matrixformat</a></h3>
 matrixformat(matrix, [bracket])
 <BR>Formats a matrix item into an ASCIIMath string for display or $answer
+<br>Defaults to square brackets, or set bracket to '(' or '|'.
+<BR><h3><a name="matrixformatfrac">matrixformatfrac</a></h3>
+matrixformatfrac(matrix, [bracket])
+<BR>Formats a matrix item into an ASCIIMath string for display or $answer,
+    with entries converted to fractions where possible.
 <br>Defaults to square brackets, or set bracket to '(' or '|'.
 <BR><h3><a name="matrixdisplaytable">matrixdisplaytable</a></h3>
 matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
