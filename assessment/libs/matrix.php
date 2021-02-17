@@ -16,7 +16,8 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
-	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
+	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans", "matrixrowscalefrac", 
+	"matrixscalarfrac", "matrixrowcombinefrac","matrixrowcombine3frac","matrixrowcombine3frac1");
 
 //matrix(vals,rows,cols)
 //Creates a new matrix item.
@@ -55,6 +56,7 @@ function matrixformat($m, $bracket='[', $asfraction=false) {
 		$bracket = '[';
 		$rb = ']';
 	}
+	include_once("fractions.php");
 	$out = $bracket;
 	for ($i=0; $i<count($m); $i++) {
 		if ($i!=0) {
@@ -66,7 +68,9 @@ function matrixformat($m, $bracket='[', $asfraction=false) {
 				$out .= ',';
             }
             if ($asfraction) {
-                $out .= decimaltofraction($m[$i][$j]);
+                $m[$i][$j] = fractionparse($m[$i][$j]);
+				$out .= fractionreduce($m[$i][$j]);
+				//$out .= decimaltofraction($m[$i][$j]);
             } else {
                 $out.= $m[$i][$j];
             }
@@ -77,9 +81,9 @@ function matrixformat($m, $bracket='[', $asfraction=false) {
 	return $out;
 }
 
-function matrixformatfrac($m, $bracket='[') {
+/*function matrixformatfrac($m, $bracket='[') {
     return matrixformat($m, $bracket, true);
-}
+}*/
 
 //matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
 // Create a string that is a valid HTML table syntax for display.
@@ -1420,5 +1424,137 @@ function isMatrix($m) {
 	} else {
 		return false;
 	}
+}
+
+#-----------------------------------------------------matrixformatfrac-------------------------------------------------
+
+//Formats a matrix item into an ASCIIMath string for display or $answer. It displays reduced fraction 
+// if rational enties are entered as strings.
+function matrixformatfrac($m, $bracket='[') {
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	if ($bracket == '(') {
+		$rb = ')';
+	} else if ($bracket == '|') {
+		$rb = '|';
+	} else {
+		$bracket = '[';
+		$rb = ']';
+	}
+	$out = $bracket;
+	include_once("fractions.php");
+	for ($i=0; $i<count($m); $i++) {
+		if ($i!=0) {
+			$out .= ',';
+		}
+		$out .= '(';
+		for ($j=0;$j<count($m[0]); $j++) {
+			if ($j!=0) {
+				$out .= ',';
+            }
+            
+			$m[$i][$j] = fractionparse($m[$i][$j]);
+			$out .= fractionreduce($m[$i][$j]);
+		}
+		$out .= ')';
+	}
+	$out .= $rb;
+	return $out;
+}
+    
+#--------------------------------------------------matrixrowscalefrac-------------------------------------------------
+
+
+//matrixrowscalefrac(matrix,row,n)
+//Multiplies row of matrix by n; row entries and n may be fractions entered as a string. 
+//matrix rows are 0-indexed; first row is row 0
+function matrixrowscalefrac($m,$r,$n) {
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	include_once("fractions.php");
+	$n = fractionparse($n);
+	for ($j=0; $j<count($m[$r]); $j++) {
+		$m[$r][$j] = fractionparse($m[$r][$j]);
+		$m[$r][$j] = fractionmultiply($n, $m[$r][$j]);
+		$m[$r][$j] = fractionreduce($m[$r][$j]);
+		
+	}
+	return $m;
+}
+
+#-----------------------------------------------------matrixscalartfrac-------------------------------------------------
+
+
+//matrixscalarfrac(matrix,n)
+//Multiplies matrix by n; matrix entries and n may be fractions entered as a string. 
+//It returns the entries as reduced fraction, so the output should not be used in calculations.
+//matrix rows are 0-indexed; first row is row 0
+function matrixscalarfrac($m,$n) {
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	include_once("fractions.php");
+	$n = fractionparse($n);
+	for ($i=0; $i<count($m); $i++) {
+		for ($j=0; $j<count($m[0]); $j++) {
+			$m[$i][$j] = fractionparse($m[$i][$j]);
+			$m[$i][$j] = fractionmultiply($n, $m[$i][$j]);
+			$m[$i][$j] = fractionreduce($m[$i][$j]);
+		}
+	}
+	return $m;
+}
+
+#---------------------------------------------------matrixrowcombinefrac------------------------------------------------
+
+//matrixrowcombinefrac(matrix,row1,a,row2,b,endrow)
+//replaces endrow in matrix with a*row1 + b*row2; 
+// matrix entries, a and b may be fractions entered as strings.
+//matrix rows are 0-indexed; first row is row 0
+function matrixrowcombinefrac($m,$r1,$a,$r2,$b,$s) {
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	include_once("fractions.php");
+	
+	$a = fractionparse($a);
+	$b = fractionparse($b);
+	
+	for ($j=0; $j<count($m[$s]); $j++) {
+		$m[$r1][$j] = fractionparse($m[$r1][$j]);
+		$m[$r2][$j] = fractionparse($m[$r2][$j]);
+		$m[$s][$j] = fractionadd(fractionmultiply($a,$m[$r1][$j]), fractionmultiply($b,$m[$r2][$j]));
+		$m[$r1][$j] = fractionreduce($m[$r1][$j]);
+		$m[$r2][$j] = fractionreduce($m[$r2][$j]);
+		$m[$s][$j] = fractionreduce($m[$s][$j]);
+	}
+	
+	return $m;
+}
+
+#---------------------------------------------------matrixrowcombine3frac------------------------------------------------
+
+//matrixrowcombine3frac(matrix,row1,a,row2,b,row3,c,endrow)
+//replaces endrow in matrix with a*row1 + b*row2 + c*row3; 
+//matrix entries, a, b, and c may be fractions entered as strings.
+//matrix rows are 0-indexed; first row is row 0
+
+function matrixrowcombine3frac($m,$r1,$a,$r2,$b,$r3,$c,$s) {
+	#$start = microtime(true);
+	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
+	include_once("fractions.php");
+	$a = fractionparse($a);
+	$b = fractionparse($b);
+	$c = fractionparse($c);
+	
+	for ($j=0; $j<count($m[$s]); $j++) {
+		$m[$r1][$j] = fractionparse($m[$r1][$j]);
+		$m[$r2][$j] = fractionparse($m[$r2][$j]);
+		$m[$r3][$j] = fractionparse($m[$r3][$j]);
+		$m[$s][$j] = fractionadd(fractionmultiply($a,$m[$r1][$j]), fractionmultiply($b,$m[$r2][$j]),fractionmultiply($c,$m[$r3][$j]));
+		$m[$r1][$j] = fractionreduce($m[$r1][$j]);
+		$m[$r2][$j] = fractionreduce($m[$r2][$j]);
+		$m[$r3][$j] = fractionreduce($m[$r3][$j]);
+		$m[$s][$j] = fractionreduce($m[$s][$j]);
+	}
+		
+	/*$time = microtime(true) - $start;
+	echo "Did stuff in loop2 in $time seconds\n";*/
+	
+	return $m;
 }
 ?>

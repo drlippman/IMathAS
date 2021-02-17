@@ -1,6 +1,7 @@
 <html>
 
 <head>
+<a name="top"></a>
 <style type="text/css">
 .auto-style1 {
 	font-weight: normal;
@@ -25,12 +26,16 @@ Matrix functions.  Version 1.6, Jan 19
 <li><a href="#matrixsum">matrixsum</a></li>
 <li><a href="#matrixdiff">matrixdiff</a></li>
 <li><a href="#matrixscalar">matrixscalar</a></li>
+<li><a href="#matrixscalarfrac">matrixscalarfrac</a></li>
 <li><a href="#matrixprod">matrixprod</a></li>
 <li><a href="#matrixaugment">matrixaugment</a></li>
 <li><a href="#matrixrowscale">matrixrowscale</a></li>
+<li><a href="#matrixrowscalefrac">matrixrowscalefrac</a></li>
 <li><a href="#matrixrowswap">matrixrowswap</a></li>
 <li><a href="#matrixrowcombine">matrixrowcombine</a></li>
+<li><a href="#matrixrowcombinefrac">matrixrowcombinefrac</a></li>
 <li><a href="#matrixrowcombine3">matrixrowcombine3</a></li>
+<li><a href="#matrixrowcombine3frac">matrixrowcombine3frac</a></li>
 <li><a href="#matrixidentity">matrixidentity</a></li>
 <li><a href="#matrixtranspose">matrixtranspose</a></li>
 <li><a href="#matrixrandinvertible">matrixrandinvertible</a></li>
@@ -137,6 +142,10 @@ matrixdiff(matrix1,matrix2)
 <BR><h3><a name="matrixscalar">matrixscalar</a></h3>
 matrixscalar(matrix,n)
 <BR>Multiplies the matrix times the number n
+<BR><h3><a name="matrixscalarfrac">matrixscalarfrac</a></h3>
+matrixscalarfrac(matrix,n)
+<BR>Multiplies the matrix times the number n; matrix entries and n may be fractions entered as strings. 
+ It returns the entries as reduced fractions as strings, so the output should not be used in calculations.
 <BR><h3><a name="matrixprod">matrixprod</a></h3>
 matrixprod(matrix1,matrix2)
 <BR>Calculates the matrix product matrix1*matrix2
@@ -147,6 +156,11 @@ matrixaugment(matrix1,matrix2)
 matrixrowscale(matrix,row,n)
 <BR>Multiplies row of matrix by n
 <BR>matrix rows are 0-indexed; first row is row 0
+<BR><h3><a name="matrixrowscalefrac">matrixrowscalefrac</a></h3>
+matrixrowscalefrac(matrix,row,n)
+<BR>Multiplies row of matrix by the number n; the row entries and n may be fractions entered as strings. 
+It returns the entries as reduced fractions as strings, so the output should not be used in calculations.
+<BR>matrix rows are 0-indexed; first row is row 0
 <BR><h3><a name="matrixrowswap">matrixrowswap</a></h3>
 matrixrowswap(matrix,row1,row2)
 <BR>swaps rows in matrix
@@ -155,9 +169,19 @@ matrixrowswap(matrix,row1,row2)
 matrixrowcombine(matrix,row1,a,row2,b,endrow)
 <BR>replaces endrow in matrix with a*row1 + b*row2
 <BR>matrix rows are 0-indexed; first row is row 0
+<BR><h3><a name="matrixrowcombinefrac">matrixrowcombinefrac</a></h3>
+matrixrowcombinefrac(matrix,row1,a,row2,b,endrow)
+<BR>replaces endrow in matrix with a*row1 + b*row2; the matrix entries, a, and b may be fractions entered as strings.
+    It returns the entries as reduced fractions as strings, so the output should not be used in calculations.
+<BR>matrix rows are 0-indexed; first row is row 0
 <BR><h3><a name="matrixrowcombine3">matrixrowcombine3</a></h3>
 matrixrowcombine3(matrix,row1,a,row2,b,row3,c,endrow)
 <BR>replaces endrow in matrix with a*row1 + b*row2 + c*row3
+<BR>matrix rows are 0-indexed; first row is row 0
+<BR><h3><a name="matrixrowcombine3frac">matrixrowcombine3frac</a></h3>
+matrixrowcombine3frac(matrix,row1,a,row2,b,row3,c,endrow)
+<BR>replaces endrow in matrix with a*row1 + b*row2 + c*row3; the matrix entries, a, b, and c may be fractions entered as strings.
+It returns the entries as reduced fractions as strings, so the output should not be used in calculations.
 <BR>matrix rows are 0-indexed; first row is row 0
 <BR><h3><a name="matrixidentity">matrixidentity</a></h3>
 matrixidentity(n)
@@ -313,5 +337,6 @@ questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for
 multi-part</p>
 
 <p>&nbsp;</p>
+<a href="#top">Back to top of page</a>
 <p><br>
 </p>
