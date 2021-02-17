@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 10a;
+	return 10;
 }
 
 global $allowedmacros;
