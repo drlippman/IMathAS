@@ -9,6 +9,7 @@ function conversionVer() {
 	return 10;
 }
 
+
 global $allowedmacros;
 
 // COMMENT OUT BEFORE UPLOADING
