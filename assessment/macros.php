@@ -384,14 +384,14 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		$avoid = array();
 		$domainlimited = false;
-		if (isset($function[2]) && $function[2]!='' && is_numeric($function[2])) {
-			$xmin = $function[2];
+		if (isset($function[2]) && $function[2]!='') {
+			$xmin = evalbasic($function[2]);
 			$domainlimited = true;
 		} else {$xmin = $winxmin;}
 		if (isset($function[3]) && $function[3]!='') {
 			$xmaxarr = explode('!',$function[3]);
-			if (is_numeric($xmaxarr[0])) {
-				$xmax = $xmaxarr[0];
+			if ($xmaxarr[0] != '') {
+				$xmax = evalbasic($xmaxarr[0]);
 			} else {
 				$xmax = $winxmax;
 			}
@@ -2841,7 +2841,8 @@ function makenumberrequiretimes($arr) {
 
 function evalbasic($str) {
 	global $myrights;
-	$str = str_replace(',','',$str);
+    $str = str_replace(',','',$str);
+    $str = preg_replace('/(\d)pi/', '$1*pi', $str);
 	$str = str_replace('pi','3.141592653',$str);
 	$str = clean($str);
 	if (is_numeric($str)) {
