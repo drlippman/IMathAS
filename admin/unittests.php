@@ -43,7 +43,8 @@ $xxtests = [
     ['x^0y+x^0*y','y+y'],
     ['3x^1+x/1+x/12','3x+x+x/12'],
     ['(x+3)/1+x^1','(x+3)+x'],
-    ['3+0<1x<0x+5','3 < x <  5']
+    ['3+0<1x<0x+5','3 < x <  5'],
+    ['x+1 leq 3', 'x+1 leq 3']
 ];
 
 require("../assessment/interpret5.php");

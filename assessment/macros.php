@@ -3230,7 +3230,7 @@ function cleantokenize($str,$funcs) {
 				$intype = 3;
 			} else if ($out=='pi') {
 				$intype = 3;
-			} else if ($out=='gt' || $out=='lt' || $out=='ge' || $out=='le' || $out=='ne' || $out=='or') {
+			} else if ($out=='gt' || $out=='lt' || $out=='ge' || $out=='le' || $out=='geq' || $out=='leq' || $out=='ne' || $out=='or') {
                 $intype = 12; // separator
             } else {
 				//eat whitespace
