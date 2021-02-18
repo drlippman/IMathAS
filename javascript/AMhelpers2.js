@@ -844,7 +844,9 @@ function showSyntaxCheckMQ(qn) {
     previewel.style.position = '';
   } else {
     var previewel = document.getElementById('p'+qn);
-    previewel.innerHTML = outstr;
+    if (previewel) {
+        previewel.innerHTML = outstr;
+    }
   }
   a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
 }
