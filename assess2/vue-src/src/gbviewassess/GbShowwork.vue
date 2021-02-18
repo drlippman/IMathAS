@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     renderInit () {
-      if (this.rendered) {
+      if (this.rendered || !this.work) {
         return;
       }
       setTimeout(window.drawPics, 100);
