@@ -2248,8 +2248,8 @@ function AutoSuggest(elem, suggestions)
 		/********************************************************
 		mouseover handler for the dropdown ul
 		move the highlighted suggestion with the mouse
-		********************************************************/
-		ul.onmouseover = function(ev)
+        ********************************************************/
+        this.setHighlight = function(ev)
 		{
 			//Walk up from target until you find the LI.
 			var target = me.getEventSource(ev);
@@ -2271,7 +2271,8 @@ function AutoSuggest(elem, suggestions)
 				}
 			}
 			me.changeHighlight();
-		};
+        };
+        ul.onmouseover = me.setHighlight;
 
 		/********************************************************
 		click handler for the dropdown ul
@@ -2280,6 +2281,7 @@ function AutoSuggest(elem, suggestions)
         
 		ul.onmousedown = ul.ontouchstart = function(ev)
 		{
+            me.setHighlight(ev);
 			me.useSuggestion("click");
 			me.hideDiv();
 			me.cancelEvent(ev);
