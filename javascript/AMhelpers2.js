@@ -844,7 +844,9 @@ function showSyntaxCheckMQ(qn) {
     previewel.style.position = '';
   } else {
     var previewel = document.getElementById('p'+qn);
-    previewel.innerHTML = outstr;
+    if (previewel) {
+        previewel.innerHTML = outstr;
+    }
   }
   a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
 }
@@ -1187,7 +1189,7 @@ function processNumber(origstr, format) {
                 err += _('This is not an integer.');
             }
         } else {
-            if (!str.match(/^\s*\-?(\d+\.?\d*|\.\d+|\d\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
+            if (!str.match(/^\s*\-?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
                 err += _('This is not a decimal or integer value.');
             }
         }
@@ -2248,8 +2250,8 @@ function AutoSuggest(elem, suggestions)
 		/********************************************************
 		mouseover handler for the dropdown ul
 		move the highlighted suggestion with the mouse
-		********************************************************/
-		ul.onmouseover = function(ev)
+        ********************************************************/
+        this.setHighlight = function(ev)
 		{
 			//Walk up from target until you find the LI.
 			var target = me.getEventSource(ev);
@@ -2271,7 +2273,8 @@ function AutoSuggest(elem, suggestions)
 				}
 			}
 			me.changeHighlight();
-		};
+        };
+        ul.onmouseover = me.setHighlight;
 
 		/********************************************************
 		click handler for the dropdown ul
@@ -2280,6 +2283,7 @@ function AutoSuggest(elem, suggestions)
         
 		ul.onmousedown = ul.ontouchstart = function(ev)
 		{
+            me.setHighlight(ev);
 			me.useSuggestion("click");
 			me.hideDiv();
 			me.cancelEvent(ev);
