@@ -1189,7 +1189,7 @@ function processNumber(origstr, format) {
                 err += _('This is not an integer.');
             }
         } else {
-            if (!str.match(/^\s*\-?(\d+\.?\d*|\.\d+|\d\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
+            if (!str.match(/^\s*\-?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
                 err += _('This is not a decimal or integer value.');
             }
         }
