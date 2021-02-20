@@ -165,7 +165,7 @@
     "missing_param": "Missing required parameter on API call",
     "not_avail": "The assessment is not currently available",
     "not_ready": "The assessment is not ready for this action",
-    "not_practice": "The assessment is not longer in practice mode. Go back and open the assessment again.",
+    "not_practice": "The assessment is no longer in practice mode. Go back and open the assessment again.",
     "timelimit_expired": "Timelimit has expired",
     "timesup_submitting": "Timelimit has expired. Submitting now.",
     "out_of_regens": "No more Get a Similar Question remain",
