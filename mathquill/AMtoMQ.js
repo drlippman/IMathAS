@@ -800,8 +800,9 @@ function MQtoAM(tex,display) {
 			tex = tex.substring(0,i) + tex.substring(i+4);
 		}
 	}
-	//separate un-braced subscripts using latex rules
-	tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
+    //separate un-braced subscripts using latex rules
+    tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
+    tex = tex.replace(/(\^|_)([+\-])/g, '$1($2) ');
 	tex = tex.replace(/\^(\w)(\w)/g, '^$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}\^/g,'_$1^');
 	tex = tex.replace(/_{([\d\.]+)}([^\^])/g,'_$1 $2');

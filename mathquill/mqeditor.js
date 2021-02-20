@@ -112,6 +112,12 @@ var MQeditor = (function($) {
           };
           thisMQconfig.keyboardPassthrough = true;
         }
+        var calcformat = el.getAttribute("data-mq") || '';
+        if (calcformat.match(/chem/)) {
+            thisMQconfig.charsThatBreakOutOfSupSubVar = '';
+            thisMQconfig.charsThatBreakOutOfSupSubOp = '';
+        }
+
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
             'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
         thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
