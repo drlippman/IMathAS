@@ -3483,7 +3483,11 @@ drawn line from the correct line.
 	    To create first quadrant graphs, use "0:-n" (for some value of n) for xmin and/or ymin to only have gridlines and labels
 	    after 0, while still using -n to adjust spacing. </dd>
 <dt>$background = equation or array of equations, using the showplot macro format </dt>
-	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
+	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red". 
+    <br>You can also set $background a string of asciisvg commands prefaced with "draw:", like "draw:line([1,1],[3,3]);".  
+        Note that initPicture and axes will already have been called, so do not include them. 
+    <br>You can also set $background to "none" to remove axes and the grid.
+    </dd>
 <dt>$partweights = array or list of weights </dt>
 	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
 	    to equal weights on each line or dot.</dd>

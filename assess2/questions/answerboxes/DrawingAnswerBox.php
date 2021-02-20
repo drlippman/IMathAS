@@ -214,7 +214,7 @@ class DrawingAnswerBox implements AnswerBox
     			$_SESSION['graphdisp']=2;
     		} else {
     			$revertgraphdisp = false;
-    		}
+            }
     		if (!is_array($backg) && substr($backg,0,5)=="draw:") {
     			$plot = showplot("",$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
@@ -663,7 +663,9 @@ class DrawingAnswerBox implements AnswerBox
     					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     					$insat = strpos($sa,');',strpos($sa,'axes'))+2;
     					$sa = substr($sa,0,$insat).str_replace("'",'"',substr($backg,5)).substr($sa,$insat);
-    				} else {
+    				} else if (!is_array($backg) && $backg=='none') {
+                        $sa = showasciisvg("initPicture(0,10,0,10);",$settings[6],$settings[7]);
+                    } else {
     					if (!is_array($backg)) {
     						settype($backg,"array");
     					}
