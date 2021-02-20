@@ -307,7 +307,7 @@ function AMQgetSymbol(str) {
     st = str.slice(0,1); //take 1 character
     tagst = (("A">st || st>"Z") && ("a">st || st>"z")?"mo":"mi");
   }
-  if (st=="-" && AMQpreviousSymbol==INFIX) {
+  if (st=="-" && str.charAt(1)!==' ' && AMQpreviousSymbol==INFIX) {
     AMQcurrentSymbol = INFIX;
     return {input:st, tag:tagst, output:st, ttype:UNARY, func:true, val:true};
   }
@@ -802,7 +802,7 @@ function MQtoAM(tex,display) {
 	}
     //separate un-braced subscripts using latex rules
     tex = tex.replace(/_(\w)(\w)/g, '_$1 $2');
-    tex = tex.replace(/(\^|_)([+\-])/g, '$1($2) ');
+    tex = tex.replace(/(\^|_)([+\-])([^\^])/g, '$1$2 $3');  
 	tex = tex.replace(/\^(\w)(\w)/g, '^$1 $2');
 	tex = tex.replace(/_{([\d\.]+)}\^/g,'_$1^');
 	tex = tex.replace(/_{([\d\.]+)}([^\^])/g,'_$1 $2');
