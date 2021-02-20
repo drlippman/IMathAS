@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 12;
+	return 14;
 }
 
 global $allowedmacros;
@@ -16,14 +16,14 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros, "conversionVer", "conversionDisplay", "conversionDisplay2HTML", "conversionDisplay2HTMLwithBorder",
-    "conversionPrefix", "conversionAbbreviations", "conversionLength", "conversionLiquid",
-    "conversionUnits2ScreenReader1", "conversionUnits2ScreenReader2",
-    "conversionCapacity", "conversionWeight",  "conversionArea", "conversionVolume",
-    "conversionTime", "conversionFormulaAbbreviations", "conversionFormulaTemperature" );
+array_push($allowedmacros, "conversionVer", "conversionAbbreviations",  "conversionArea",
+    "conversionCapacity", "conversionDisplay", "conversionDisplay2HTML", "conversionDisplay2HTMLwithBorder",
+     "conversionFormulaAbbreviations", "conversionFormulaGeometry", "conversionFormulaTemperature",
+     "conversionLength", "conversionLiquid", "conversionPrefix", "conversionTime",
+    "conversionUnits2ScreenReader1", "conversionUnits2ScreenReader2", "conversionVolume", "conversionWeight" );
 
-// -------------------------------------------------------------------------------------------------
 // internal only  ----------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 function verifyCancel($input) {
@@ -93,7 +93,6 @@ function verifySign($input) {
 	return $retval;
 }
 
-
 function verifyString($input) {
 	if(!is_null($input)) {
 		$retval =  $input;
@@ -102,7 +101,6 @@ function verifyString($input) {
 
 	return $retval;
 }
-
 
 // function conversionAbbreviations(system,type[,tick,Fullname])
 // Returns the Abbreviations to words
@@ -585,15 +583,116 @@ function conversionDisplay2HTMLwithBorder($CellValueArray,$cellPadding=7) {
 	return $HTML;
 }
 
+// function conversionFormulaAbbreviations(type)
+// Returns the Abbreviations to words
+//
+// INPUTS:
+//   system: "C" = Circle (default)
+//           "T" = Triangle
+//           "A" = Area
+//           "V" = Volume
+//           "F" = Temperature
+//
 function conversionFormulaAbbreviations() {
+    $args = func_get_args();
+	if (count($args)==0) {
+		$firstPart = "C";  // Circle
+	} else {
+        $type = $args[0];
+        $firstPart = strtoupper(substr($type, 0, 1));
+    }
     $retval = array();
 
-    $retval[0] = "A = Area";
-    $retval[1] = "SA = Surface Area";
-    $retval[2] = "r = Radius";
-	$retval[3] = "V = Volume";
+    if($firstPart=="C") {$type="Circle";}
+    if($firstPart=="T") {$type="Triangle";}
+    if($firstPart=="A") {$type="Area";}
+    if($firstPart=="V") {$type="Volume";}
+    if($firstPart=="F") {$type="Temperature";}
+
+    if($type=="Circle") {
+        $retval[0] = "C = Circumference"; // of a circle
+        $retval[1] = "A = Area";
+        $retval[2] = "r = Radius";
+        $retval[3] = "d = Diameter";
+    } elseif($type=="Area") {
+        $retval[0] = "SA = Surface Area";
+        $retval[1] = "L = Length";
+        $retval[2] = "W = Width";
+        $retval[3] = "H or h = Height";
+        $retval[4] = "s = Side";
+        $retval[5] = "r = Radius";
+    } elseif($type=="Volume") {
+        $retval[0] = "V = Volume";
+        $retval[1] = "L = Length";
+        $retval[2] = "W = Width";
+        $retval[3] = "H or h = Height";
+        $retval[4] = "s = Side";
+        $retval[5] = "r = Radius";
+    } elseif($type=="Triangle") {
+        $retval[0] = "A = Area";
+        $retval[1] = "b = base";
+        $retval[2] = "h = Height";
+    } elseif($type=="Temperature") {
+        $retval[0] = "C = Celsius";
+        $retval[1] = "F = Fahrenheit";
+        $retval[2] = "K = Kelvin";
+    } else {
+        $retval[0] = "'".(string)$type."' is not a valid type.";
+    }
+
 
 	return $retval;
+}
+
+// function conversionFormulaGeometry(type,[tick=y])
+// Returns the Abbreviations to words
+//
+// INPUTS:
+//   system: "C" = Circle (default)
+//           "T" = Triangle
+//           "A" = Surface Area
+//           "V" = Volume
+function conversionFormulaGeometry() {
+    $PI = "&#8508;";
+    $args = func_get_args();
+	if (count($args)==0) {
+		$firstPart = "C";  // Circle
+	} else {
+        $type = $args[0];
+        $firstPart = strtoupper(substr($type, 0, 1));
+    }
+    $tick = $args[1];
+
+    $retval = array();
+
+
+    if($firstPart=="C") {$type="Circle";}
+    if($firstPart=="T") {$type="Triangle";}
+    if($firstPart=="A") {$type="SurfaceArea";}
+    if($firstPart=="V") {$type="Volume";}
+
+    if($type=="Circle") {
+        $retval[0] = "C = {$PI}d";
+        $retval[1] = "C = 2{$PI}r";
+        $retval[2] = conversionUnits2ScreenReader2("","A",1,"$PI","r",2,"=",$tick);
+    } elseif($type=="Triangle") {
+        $retval[0] = "Perimeter = add all sides";
+        $retval[1] = "{$tick}A = 1/2bh{$tick}";
+    } elseif($type=="SurfaceArea") {
+        $retval[0] = "SA=2LW+2LH+2WH (Surface Area of a Rectangular Solid)";
+        $retval[1] = conversionUnits2ScreenReader2("","SA",1,"6","s",2,"=",$tick)." (Surface Area of a Cube)";
+        $retval[2] = conversionUnits2ScreenReader2("","SA",1,"4{$PI}","r",2,"=",$tick)." (Surface Area of a Sphere)";
+        $retval[3] = conversionUnits2ScreenReader2("","SA",1,"2{$PI}rh+4{$PI}","r",2,"=",$tick)." (Surface Area of a Right Circular Cylindar)";
+    } elseif($type=="Volume") {
+        $retval[0] = "V = LWH (Volume of a Rectangular Solid)";
+        $retval[1] = conversionUnits2ScreenReader2("","V",1,"","s",3,"=",$tick)." (Volume of a Cube)";
+        $retval[2] = conversionUnits2ScreenReader2("","V",1,"4/3{$PI}","r",3,"=",$tick)." (Volume of a Sphere)";
+        $retval[3] = conversionUnits2ScreenReader2("","V",1,"{$PI}h","r",2,"=",$tick)." (Volume of a Right Circular Cylindar)";
+    } else {
+        $retval[0] = "'".(string)$type."' is not a valid type.";
+    }
+
+    return $retval;
 }
 
 // function conversionFormulaTemperature(type)
@@ -603,7 +702,7 @@ function conversionFormulaAbbreviations() {
 //   system: "C" = to Celsius (default)
 //           "F" = to Fahrenheit
 //           "K" = to Kelvin
-///
+//
 // Examples
 //
 // use ConversionFormulaTemperature("F") returns the formula for F = 9/5C+32
@@ -671,15 +770,15 @@ function conversionLength() {
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "12 in = 1 ft";
-            $retval[1] = "3 ft = 1 yd";
-            $retval[2] = "36 in = 1 yd";
-            $retval[3] = "5,280 ft = 1 mi";
+            $retval[0] = "1 ft = 12 in";
+            $retval[1] = "1 yd = 3 ft";
+            $retval[2] = "1 yd = 36 in";
+            $retval[3] = "1 mi = 5,280 ft";
         } else {
-            $retval[0] = "12 inches = 1 foot";
-            $retval[1] = "3 feet = 1 yard";
-            $retval[2] = "36 inches = 1 yard";
-            $retval[3] = "5,280 feet = 1 mile";
+            $retval[0] = "1 foot = 12 inches";
+            $retval[1] = "1 yard = 3 feet";
+            $retval[2] = "1 yard = 36 inches";
+            $retval[3] = "1 mile = 5,280 feet";
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
@@ -875,7 +974,7 @@ function conversionTime() {
 //  Returns a 2 element array where the 0 element is the word that can have tick marksof the tick mark form of the word and the screen read form of the work
 //
 function conversionUnit2ScreenReaderModification($units,$tick){
-    $units = strtolower($units);
+    $testunit = strtolower($units);
     $retval = array();
     if($units=="in") {
         if($tick=="`") {
@@ -884,16 +983,16 @@ function conversionUnit2ScreenReaderModification($units,$tick){
             $retval[0] = "in";
         }
         $retval[1] = "in";
-    } elseif($units=="dam") {
+    } elseif($testunit=="dam") {
         $retval[0] = "dam";
         $retval[1] = "d a m";
-    } elseif($units=="dal") {
+    } elseif($testunit=="dal") {
         $retval[0] = "daL";
         $retval[1] = "d a L";
-    } elseif($units=="dag") {
+    } elseif($testunit=="dag") {
         $retval[0] = "dag";
         $retval[1] = "d a g";
-    } elseif($units=="l") {
+    } elseif($testunit=="l") {
         $retval[0] = "L";
         $retval[1] = "L";
     } else {
@@ -992,7 +1091,6 @@ function conversionUnits2ScreenReader2($number1,$units1,$dimensions1,$number2,$u
     }
 
 }
-
 
 // function conversionVolume(type [,FullWords,Rounding,tick,Sign])
 // returns an array of strings with the conversion factors
@@ -1127,11 +1225,11 @@ function conversionWeight() {
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "16 oz = 1 lbs";
-            $retval[1] = "2000 lbs = 1 T";
+            $retval[0] = "1 lbs = 16 oz";
+            $retval[1] = "1 T =2000 lbs";
         } else {
-            $retval[0] = "16 ounces = 1 pound";
-            $retval[1] = "2000 pounds = 1 Ton";
+            $retval[0] = "1 pound = 16 ounces";
+            $retval[1] = "1 Ton= 2000 pounds";
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
@@ -1174,7 +1272,9 @@ function conversionWeight() {
 	return $retval;
 }
 
-// 2021-02-19 ver 12 - updated conversionUnits2ScreenReader to include a cancel option - not completed
+// 2021-02-20 ver 14 - updated conversionFormulaAbbreviations, conversionFormulaGeometry, length conversion
+// 2021-02-19 ver 13 - updated american weight conversion
+// 2021-02-19 ver 12 - updated conversionUnits2ScreenReader to conversionUnits2ScreenReader1 and conversionUnits2ScreenReader2
 // 2021-02-16 ver 11 - updated conversionFormulaTemperature and reordered the file for alphabetical order
 // 2021-02-16 ver 10 - updated conversionUnits2ScreenReader to take 4 arguments
 // 2021-02-04 ver 9  - added conversionLiquid, find typo in conversionArea
