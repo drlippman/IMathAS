@@ -613,9 +613,7 @@ class AssessRecord
     if ($this->is_practice) {
       if ($active) {
         $this->assessRecord['status'] |= 16;
-      } else {
-        $this->assessRecord['status'] = $this->assessRecord['status'] & ~16;
-      }
+      } 
       if ($setattempt) {
         $this->parseData();
         $lastver = count($this->data['assess_versions']) - 1;

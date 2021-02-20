@@ -4393,7 +4393,7 @@ function scoremultiorder($stua, $answer, $swap, $type='string', $weights=null) {
 			$loc = -1;
 			//for ($k=0;$k<count($sw);$k++) {
             for ($k=count($sw)-1;$k>=0;$k--) {
-				if ($type=='string' && trim(strtolower($tofind))==trim(strtolower($newans[$sw[$k][0]]))) {
+				if ($type=='string' && preg_replace('/\s+/','',strtolower($tofind))==preg_replace('/\s+/','',strtolower($newans[$sw[$k][0]]))) {
 					$loc = $k; break;
 				} else if ($type=='number' && abs($tofind - $newans[$sw[$k][0]])<0.01) {
 					$loc = $k; break;
