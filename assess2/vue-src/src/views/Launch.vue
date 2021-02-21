@@ -27,7 +27,7 @@
         v-if = "errorMsg !== null"
       >
         {{ errorMsg }}
-      <p>
+      </p>
 
       <p
         v-if = "timeLimitExpired !== ''"

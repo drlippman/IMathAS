@@ -43,8 +43,8 @@
           <router-link
             v-if = "option.internallink"
             :to = "option.internallink"
-            @click.native = "toggleOpen"
-            @mouseover.native = "curSelected = index"
+            @click = "toggleOpen"
+            @mouseover = "curSelected = index"
             :id = "id + '_' + index"
             :class="{'menubutton-focus': index==curSelected}"
             role = "menuitem"
@@ -106,10 +106,10 @@ export default {
   },
   computed: {
     hasButton () {
-      return !!this.$scopedSlots.button;
+      return !!this.$slots.button;
     },
     hasSlot () {
-      return !!this.$scopedSlots.default;
+      return !!this.$slots.default;
     },
     filteredOptions () {
       return this.options.filter(a => (a !== null));

@@ -421,7 +421,7 @@ export default {
       this.renderAndTrack();
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     actions.setRendered(this.qn, false);
   },
   watch: {
