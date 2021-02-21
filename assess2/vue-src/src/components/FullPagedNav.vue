@@ -12,25 +12,41 @@
 
     <router-link
       :to="'/full/page/'+ (disppage-1)"
-      tag="button"
-      :disabled="page < (this.hasIntro ? 0 : 1)"
-      class="secondarybtn"
-      id="qprev"
-      :aria-label="$t('previous')"
+      custom
+      v-slot="{ navigate }"
       v-if = "showNextPrev"
     >
-      <icons name="left"/>
+      <button
+        type="button"
+        @click="navigate"
+        @keypress.enter="navigate"
+        role="link"
+        :disabled="page < (this.hasIntro ? 0 : 1)"
+        class="secondarybtn"
+        id="qprev"
+        :aria-label="$t('previous')"
+      >
+        <icons name="left"/>
+      </button>
     </router-link>
     <router-link
       :to="'/full/page/'+ (disppage+1)"
-      tag="button"
-      :disabled="page>=pagesData.length-1"
-      class="secondarybtn"
-      id="qnext"
-      :aria-label="$t('next')"
+      custom
+      v-slot="{ navigate }"
       v-if = "showNextPrev"
     >
-      <icons name="right" />
+      <button
+        type="button"
+        @click="navigate"
+        @keypress.enter="navigate"
+        role="link"
+        :disabled="page>=pagesData.length-1"
+        class="secondarybtn"
+        id="qnext"
+        :aria-label="$t('next')"
+      >
+        <icons name="right" />
+      </button>
     </router-link>
   </div>
 </template>

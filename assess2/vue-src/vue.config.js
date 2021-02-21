@@ -1,4 +1,6 @@
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+    .BundleAnalyzerPlugin;
 
 module.exports = {
   outputDir: path.resolve(__dirname, '../vue'),
@@ -20,6 +22,7 @@ module.exports = {
       config.plugins.delete('prefetch');
       config.plugins.delete('copy');
     }
+    config.plugin("webpack-bundle-analyzer").use(BundleAnalyzerPlugin);
   },
   // in dev server mode, proxy all requests to localhost
   devServer: {

@@ -90,12 +90,20 @@
     <div v-else-if="showNext"  class="submitbtnwrap">
       <router-link
         :to="'/skip/'+ (this.qn + 2)"
-        tag="button"
-        class="secondarybtn"
-        :disabled = "!canSubmit"
+        custom
+        v-slot="{ navigate }"
       >
-        <icons name="right" />
-        {{ $t('question.next') }}
+        <button
+          type="button"
+          @click="navigate"
+          @keypress.enter="navigate"
+          role="link"
+          class="secondarybtn"
+          :disabled = "!canSubmit"
+        >
+          <icons name="right" />
+          {{ $t('question.next') }}
+        </button>
       </router-link>
     </div>
   </div>

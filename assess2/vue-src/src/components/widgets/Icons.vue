@@ -59,22 +59,22 @@
         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
       </template>
       <template v-else-if="name=='incorrect'">
-        <path :stroke="wrong" d="M18 6 L6 18 M6 6 L18 18" />
+        <path :stroke="colors.wrong" d="M18 6 L6 18 M6 6 L18 18" />
       </template>
       <template v-else-if="name=='correct'">
-        <polyline :stroke="correct" points="20 6 9 17 4 12"></polyline>
+        <polyline :stroke="colors.correct" points="20 6 9 17 4 12"></polyline>
       </template>
       <template v-else-if="name=='partial'">
-        <path :stroke="partial" d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z"/>
+        <path :stroke="colors.partial" d="M 5.3,10.6 9,14.2 18.5,4.6 21.4,7.4 9,19.8 2.7,13.5 z"/>
       </template>
       <template v-else-if="name=='dot'">
-        <circle cx="12" cy="12" r="8" :fill="neutral"></circle>
+        <circle cx="12" cy="12" r="8" :fill="colors.neutral"></circle>
       </template>
       <template v-else-if="name=='unattempted'">
-        <circle cx="12" cy="12" r="8" :fill="neutral"></circle>
+        <circle cx="12" cy="12" r="8" :fill="colors.neutral"></circle>
       </template>
       <template v-else-if="name=='partattempted'">
-        <circle cx="12" cy="12" r="8" :stroke="neutral"></circle>
+        <circle cx="12" cy="12" r="8" :stroke="colors.neutral"></circle>
       </template>
       <template v-else-if="name=='print'">
         <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -88,7 +88,7 @@
         <polyline points="9 18 15 12 9 6"></polyline>
       </template>
       <template v-else-if="name=='downarrow'" >
-        <polygon :fill="dark" stroke-linecap="square" points="6 6 18 6 12 14"/>
+        <polygon :fill="colors.dark" stroke-linecap="square" points="6 6 18 6 12 14"/>
       </template>
       <template v-else-if="name=='file'">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -154,13 +154,15 @@ export default {
   data: function () {
     return {
       id: null,
-      dark: '#000',
-      neutral: '#00a',
-      wrong: '#900',
-      correct: '#090',
-      partial: '#fb0',
-      warn: '#900',
-      subdued: '#757575'
+      colors: {
+        dark: '#000',
+        neutral: '#00a',
+        wrong: '#900',
+        correct: '#090',
+        partial: '#fb0',
+        warn: '#900',
+        subdued: '#757575'
+      }
     };
   },
   props: ['name', 'size', 'color', 'alt'],
@@ -178,13 +180,13 @@ export default {
     },
     stroke () {
       if (this.color) {
-        if (this.hasOwnProperty(this.color)) {
-          return this[this.color];
+        if (this.colors.hasOwnProperty(this.color)) {
+          return this.colors[this.color];
         } else {
           return this.color;
         }
       } else {
-        return this.dark;
+        return this.colors.dark;
       }
     },
     iconwidth () {

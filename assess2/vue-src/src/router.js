@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import { nextTick } from 'vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { store, actions } from './basicstore';
 import Launch from './views/Launch.vue';
@@ -217,6 +217,6 @@ router.beforeEach((to, from, next) => {
   }
 });
 router.afterEach((to, from) => {
-  Vue.nextTick(window.sendLTIresizemsg);
+  nextTick(window.sendLTIresizemsg);
 });
 export default router;

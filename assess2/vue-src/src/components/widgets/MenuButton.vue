@@ -57,6 +57,7 @@
           </router-link>
           <component
             v-else
+            :is = "getLinkProps(option,index).is"
             v-bind = "getLinkProps(option,index)"
             @click = "linkClick($event,option)"
             @keydown.enter = "linkClick($event,option)"

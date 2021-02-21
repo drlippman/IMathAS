@@ -111,31 +111,6 @@ export default {
     }
   }
 };
-/* Next/Prev buttons, removed since they don't make much sense in this view
-
-<router-link
-  :to="prevLink"
-  tag="button"
-  :disabled="curOption <= 0"
-  class="secondarybtn"
-  id="qprev"
-  :aria-label="$t('previous')"
-  v-if = "showNextPrev"
->
-  <icons name="left"/>
-</router-link>
-<router-link
-  :to="nextLink"
-  tag="button"
-  :disabled="curOption>=navOptions.length-1"
-  class="secondarybtn"
-  id="qnext"
-  :aria-label="$t('next')"
-  v-if = "showNextPrev"
->
-  <icons name="right" />
-</router-link>
- */
 </script>
 
 <style>
