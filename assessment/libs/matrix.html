@@ -45,6 +45,7 @@ Matrix functions.  Version 1.6, Jan 19
 <li><a href="#polyregression">polyregression</a></li>
 <li><a href="#matrixGetRank">matrixGetRank</a></li>
 <li><a href="#arrayIsZeroVector">arrayIsZeroVector</a></li>
+<li><a href="#matrixFormFromEigen">matrixFormFromEigen</a></li>
 <li><a href="#matrixFormMatrixFromEigValEigVec">matrixFormMatrixFromEigValEigVec</a></li>
 <li><a href="#matrixIsRowsLinInd">matrixIsRowsLinInd</a></li>
 <li><a href="#matrixIsColsLinInd">matrixIsColsLinInd</a></li>
@@ -225,6 +226,35 @@ polyregression(x,y,n)
 <p>arrayIsZeroVector(vector)<br>vector is an array, not a matrix.<br>
 determines if a vector is the 0 vector<br>
 </p>
+<h3><a name="matrixFormFromEigen">matrixFormFromEigen</a></h3>
+
+<p>matrixFormFromEigen(eigenvalues, eigenvectors, [size = 2, iscomplex = false])</p>
+Constructs the original matrix (with real entires), where possible, for which eigenvalues and eigenvectors are given; it accepts both real and complex eigenvalues and eigenvectors.
+<p>Parameters:</p>
+<ul>
+
+<li><strong>eigenvalues:</strong> The eigenvalues are entered in the following form: 
+    <ul>
+        <li>real eigenvalues: array(r1, r2, $r3, ...) INCLUDING repeating eigenvalues </li>
+        <li>complex eigenvalues: array([Re1,Im1], [Re2,Im2], $r1, $r2, ...) EXCLUDING conjugate eigenvalues</li>
+    </ul></li> 
+    
+<li><strong>eigenvectors:</strong> The eigenvectors are entered in the same order as corresponding eigenvalues and in the following form: 
+    <ul>
+        <li>real eigvectors: array([a, b, c, ...], [d, e, f, ...], ...) </li>
+        <li>complex eigenvectors: array([[Re1,Im1], [Re2,Im2], [Re3,Im3], ...], [a, b, c, ...]) EXCLUDING conjugate eigenvectors</li>
+    </ul></li>    
+<li><strong>size:</strong> The size of the original square matrix; the default is size = 2. </li>
+<li><strong>iscomplex:</strong> indicates whether the eigenvalues and eigenvectors include complex values; the default is real (i.e., iscomplex = false); enter true for complex eigenvalues and eigenvectors.</li>
+</ul>
+
+<p>Returns:</p>
+<p>A square matrix in the matrix format, e.g., array([a, b, c], [d, e, f], [g, h, i]) for a 3 by 3 matrix, with real entries using A = CBC^-1;
+    use matrixformat() or matrixformatfrac() to display the output.
+</p>
+
+
+
 <h3><a name="matrixFormMatrixFromEigValEigVec">matrixFormMatrixFromEigValEigVec</a></h3>
 <p>matrixFormMatrixFromEigValEigVec(eigenvalues,matrix of eigenvectors)<br>
 eigenvalues: The eigenvalues of the matrix include multiple times if
