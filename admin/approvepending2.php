@@ -118,7 +118,25 @@ if (!empty($newStatus)) {
 
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
-		$row = $stm->fetch(PDO::FETCH_ASSOC);
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
+        
+        // enroll in courses, if not already
+        if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+            $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
+            $stm->execute([$instId]);
+            $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+            $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+            if (count($toEnroll) > 0) {
+                $valbits = array();
+                $valvals = array();
+                foreach ($toEnroll as $ncid) {
+                    $valbits[] = "(?,?)";
+                    array_push($valvals, $instId, $ncid);
+                }
+                $stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
+                $stm->execute($valvals);
+            }
+        }
 
 		//call hook, if defined
 		if (function_exists('getApproveMessage')) {

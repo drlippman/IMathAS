@@ -165,15 +165,23 @@ switch($_POST['action']) {
 		}
 
 		//if student being promoted, enroll in teacher enroll courses
-		if ($oldrights<=10 && $_POST['newrights']>=20 && isset($CFG['GEN']['enrollonnewinstructor'])) {
-			$valbits = array();
-			$valvals = array();
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
-				$valbits[] = "(?,?)";
-				array_push($valvals, $_GET['id'], $ncid);
-			}
-			$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
-			$stm->execute($valvals);
+		if ($oldrights<=10 && $_POST['newrights']>=20) {
+            if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+                $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
+                $stm->execute([$_GET['id']]);
+                $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+                $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+                if (count($toEnroll) > 0) {
+                    $valbits = array();
+                    $valvals = array();
+                    foreach ($toEnroll as $ncid) {
+                        $valbits[] = "(?,?)";
+                        array_push($valvals, $_GET['id'], $ncid);
+                    }
+                    $stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
+                    $stm->execute($valvals);
+                }
+            }
 
 
 			//log new account

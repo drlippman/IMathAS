@@ -191,7 +191,7 @@ class AssessInfo
    * Also sets assessData['latepass_blocked_by_practice']
    * @return boolean
    */
-  public function getLatePassBlockedByView() {
+  public function getLatePassStatus() {
     if ($this->assessData['hasexception']) {
       list($useexception,$LPblocked) =
         $this->exceptionfunc->getCanUseAssessException(
@@ -201,10 +201,11 @@ class AssessInfo
           true
         );
     } else {
-      $LPblocked = $this->exceptionfunc->getLatePassBlockedByView($this->assessData,0);
+      $LPblocked = $this->exceptionfunc->getCanUseAssessLatePass($this->assessData, 0, true);
+      //$this->exceptionfunc->getLatePassBlockedByView($this->assessData,0);
     }
-    $this->assessData['latepass_blocked_by_practice'] = $LPblocked;
-    return $this->assessData['latepass_blocked_by_practice'];
+    $this->assessData['latepass_status'] = $LPblocked;
+    return $this->assessData['latepass_status'];
   }
 
   /**

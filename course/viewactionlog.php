@@ -182,7 +182,8 @@ foreach ($actions as $r) {
 	case 'assess':
 		$actionmsg =  'Opened assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]);
 		break;
-	case 'assessreview':
+    case 'assessreview':
+    case 'assessreviewub':
 		$actionmsg =  'Opened in review mode assessment '.Sanitize::encodeStringForDisplay($asnames[$r[1]]);
 		break;
 	case 'gbviewassess':

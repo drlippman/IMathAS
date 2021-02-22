@@ -45,9 +45,10 @@
         </span>
       </div>
 
-      <div v-if="canEdit && aData.latepass_blocked_by_practice">
-        {{ $t('gradebook.latepass_blocked_practice') }}
+      <div v-if="canEdit && aData.latepass_status > 1">
+        {{ latepassBlockMsg }}
         <button
+          v-if="aData.latepass_status > 6"
           type="button"
           @click="clearLPblock"
         >
@@ -116,10 +117,10 @@
       </div>
 
       <div v-if="canEdit">
-        <a v-if="aData.has_active_attempt" :href="viewAsStuUrl">
+        <a v-if="showViewAsStu" :href="viewAsStuUrl">
           {{ $t('gradebook.view_as_stu') }}
         </a>
-        <span v-if="aData.has_active_attempt">|</span>
+        <span v-if="showViewAsStu">|</span>
         <a :href="viewAsStuUrl + '#/print'">
           {{ $t('gradebook.print') }}
         </a>
@@ -510,6 +511,13 @@ export default {
         return '';
       }
     },
+    showViewAsStu () {
+      // show if there's an active attempt, or if there's only an instructor-generated
+      // non-started assessment version
+      return (this.aData.has_active_attempt ||
+        (this.aData.scored_version === 0 && this.aData.assess_versions[0].status === -1)
+      );
+    },
     viewAsStuUrl () {
       return 'index.php?cid=' + store.cid + '&aid=' + store.aid + '&uid=' + store.uid;
     },
@@ -566,6 +574,19 @@ export default {
       } else {
         return this.$t('gradebook.' + store.saving);
       }
+    },
+    latepassBlockMsg () {
+      var m;
+      switch (this.aData.latepass_status) {
+        case 7: m = 'practice'; break;
+        case 8: m = 'gb'; break;
+        case 2: m = 'lpcutoff'; break;
+        case 3: m = 'courseend'; break;
+        case 4: m = 'pastdue'; break;
+        case 5: m = 'toolate'; break;
+        case 6: m = 'toofew'; break;
+      }
+      return this.$t('gradebook.latepass_blocked_' + m);
     },
     isUnsubmitted () {
       return (this.aData.submitby === 'by_assessment' &&

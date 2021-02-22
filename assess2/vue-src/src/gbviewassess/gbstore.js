@@ -370,7 +370,7 @@ export const actions = {
           // reload whole mess
           actions.loadGbAssessData();
         } else if (store.clearAttempts.type === 'practiceview') {
-          store.assessInfo.latepass_blocked_by_practice = data.latepass_blocked_by_practice;
+          store.assessInfo.latepass_status = data.latepass_status;
         } else {
           store.assessInfo.gbscore = response.gbscore;
           store.assessInfo.scored_version = response.scored_version;

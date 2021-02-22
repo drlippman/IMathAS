@@ -3767,6 +3767,16 @@ class AssessRecord
   }
 
   /**
+   * Clears any Latepass blocks (review or gb) for current student
+   */
+  public function clearLPblocks() {
+    $query = "UPDATE imas_content_track SET type=IF(type = 'assessreview', 'assessreviewub', 'gbviewsafe')
+        WHERE typeid=:typeid AND userid=:userid AND (type='gbviewasid' OR type='gbviewassess' OR type='assessreview')";
+    $stm = $this->DBH->prepare($query);
+    $stm->execute([':typeid' => $this->curAid, ':userid' => $this->curUid]);
+  }
+
+  /**
    * Save after-assessment showwork
    * @param  array $work array of $qn => $work
    * @param  boolean $during   true if being called during assess

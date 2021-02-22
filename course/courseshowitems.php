@@ -724,7 +724,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   	   }
 			   } else {
 			   	   $canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($line);
-			   }
+               }
 				 if (!empty($line['outofattempts'])) {
 					 $canuselatepass = 0;
 				 }
