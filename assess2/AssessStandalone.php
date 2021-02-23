@@ -229,7 +229,6 @@ class AssessStandalone {
 
     if (!empty($options['includeans'])) {
       $jsparams['ans'] = $question->getCorrectAnswersForParts();
-      $jsparams['stuans'] = $stuanswers[$qn+1];
     }
 
     if ($maxtries > 0) {
