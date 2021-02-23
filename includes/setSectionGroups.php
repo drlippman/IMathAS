@@ -18,7 +18,7 @@ function setSectionGroups($userid, $courseid, $section) {
     $groupsetid = 0;
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         $groupsetid = $row['igsid'];
-        if ($row['userid'] == $userid && $row['name'] != $section) {
+        if ($row['userid'] == $userid && $row['name'] !== $section) {
             // delete
             $stm2 = $DBH->prepare("DELETE FROM imas_stugroupmembers WHERE stugroupid=? AND userid=?");
             $stm2->execute(array($row['id'], $userid));
