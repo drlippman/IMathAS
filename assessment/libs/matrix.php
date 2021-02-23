@@ -1423,7 +1423,7 @@ function isMatrix($m) {
 }
 
 //-------------------------------------matrixFormFromEigen (real and complex)---------------------------------
-// Function: matrixFormFromEigen(eigenvalues, eigenvectors, [size = 2, iscomplex = false])
+// Function: matrixFormFromEigen(eigenvalues, eigenvectors)
 // Constructs the original matrix (with real entires) where possible for which eigenvalues and eigenvectors are given; 
 // it accepts both real and complex eigenvalues and eigenvectors.
 // 
@@ -1437,89 +1437,82 @@ function isMatrix($m) {
 //				 real eigvectors: array([a, b, c, ...], [d, e, f, ...], ...); 
 //               complex eigenvectors: array([[Re1,Im1], [Re2,Im2], [Re3,Im3], ...], [a, b, c, ...]) EXCLUDING conjugate eigenvectors.  
 //
-// size: The size of the original square matrix; the default is size = 2. 
-//
-// iscomplex: indicates whether the eigenvalues and eigenvectors include complex or real values; the default is real (i.e., iscomplex = false); 
-// 			  enter true for complex.
-//
 // Returns:
 // A square matrix in the matrix format, e.g., array([a, b, c], [d, e, f], [g, h, i]) for a 3 by 3 matrix, with real entries using A = CBC^-1;
 // use matrixformat() or matrixformatfrac() to display the output.
 
 
-function matrixFormFromEigen($value, $vector, $size=2, $iscomplex=False){
+function matrixFormFromEigen($value, $vector){ 
 		
-	if (count($vector[0])!=$size) { echo "Each eigenvector must have $size entries"; return "";}
+	if (count($value)!= count($vector)) { echo "matrixFormFromEigen expects equal number of eigenvalues and eigenvectors"; return "";}
 	
-	//complex eigenvalues and eigenvectors:
-	if($iscomplex==True){
-
-		//working on D (block-diagonal matrix):
-		$s = 0;
-		$d = array();
-		for($i=0; $i<count($value); $i++){
-			
-			if (!is_array($value[$i])) {
+	$size = count($vector[0]);
+	for ($i=1; $i<count($vector); $i++){
+		if (count($vector[$i])!=$size) { echo "All eigenvectors must be the same length"; return "";}
+	}
+	
+	//working on D (block-diagonal matrix):
+	$s = 0;
+	$d = array();
+	
+	for($i=0; $i<count($value); $i++){
+		
+		//real eigenvalues
+		if (!is_array($value[$i])) {
+			$d[$s] = array_fill(0,$size,0);
+			$d[$s][$s] = $value[$i];
+			$d[$s][$s] = $value[$i];
+			$s = $s+1;
+					
+		//complex eigenvalues
+		}	else{
 				$d[$s] = array_fill(0,$size,0);
-				$d[$s][$s] = $value[$i];
-				$d[$s][$s] = $value[$i];
-				$s=$s+1;
-						
-			}	else{
-					$d[$s] = array_fill(0,$size,0);
-					$d[$s+1] = array_fill(0,$size,0);
-					$d[$s][$s] = $value[$i][0];
-					$d[$s][$s+1] = $value[$i][1];
-					$d[$s+1][$s] = -$value[$i][1];
-					$d[$s+1][$s+1] = $value[$i][0];
-					$s=$s+2;
-				}
-		}	
-		
-		//working on P (matrix of eigenvectors):
-		$t = 0;
-		$pt = array();
-		$k=array();
-		$l=array();
-		
-		for($i=0; $i<count($vector); $i++){
-			
-			if (!is_array($vector[$i][0])) {
-				$pt[$t] = $vector[$i];
-				$t=$t+1;
+				$d[$s+1] = array_fill(0,$size,0);
+				$d[$s][$s] = $value[$i][0];
+				$d[$s][$s+1] = $value[$i][1];
+				$d[$s+1][$s] = -$value[$i][1];
+				$d[$s+1][$s+1] = $value[$i][0];
+				$s=$s+2;
 				
-			}	else{
-					for ($j=0; $j<$size; $j++){
-						$k[$j] = $vector[$i][$j][0];
-						$l[$j] = $vector[$i][$j][1];
-					}
-					$pt[$t] = $k;
-					$pt[$t+1] = $l;
-					$t=$t+2;
-				}
-		}		
-
-	//real eigenvalues and eigenvectors:
-	}	else{
-			if (count($value)!=$size) { echo "matrixFormFromEigen expects $size eigenvalues"; return "";}
-			if (count($vector)!=$size) { echo "matrixFormFromEigen expects $size eigenvectors"; return "";}
-			$d = array();
-			for($i=0; $i<$size; $i++){
-				$d[$i] = array_fill(0,$size,0);
-				$d[$i][$i] = $value[$i];
 			}
-			$pt = $vector; 
-		}
-	
+	}	
+		
+	//working on P (matrix of eigenvectors):
+	$t = 0;
+	$pt = array();
+	$k = array();
+	$l = array();
+	for($i=0; $i<count($vector); $i++){
+		
+		//real eigenvectors
+		if (!is_array($vector[$i][0])) {
+			$pt[$t] = $vector[$i];
+			$t=$t+1;
+			
+		//complex eigenvectors
+		}	else{
+				for ($j=0; $j<$size; $j++){
+					$k[$j] = $vector[$i][$j][0];
+					$l[$j] = $vector[$i][$j][1];
+				}
+				$pt[$t] = $k;
+				$pt[$t+1] = $l;
+				$t=$t+2;
+			}
+	}		
+
 	$p = matrixtranspose($pt); //matrix of eigenvectors
-	$det_p = matrixdet($p);
-	if ($det_p==0) { echo "matrixFormFromEigen expects $size linearly independent eigenvectors"; return "";}
-	$pinv = matrixinverse($p); //P^-1
+	$i = matrixidentity($size);
+	$pinv = matrixsolve($p,$i,true); //P^-1
+	
+	if ($pinv==false) { echo "matrixFormFromEigen expects $size linearly independent eigenvectors"; return "";}
+	
 	$p_d = matrixprod($p,$d); //PD
 	$A = matrixprod($p_d,$pinv); //PDP^-1
 		
 		
 	return $A;
 	
-	}
+}
+
 ?>
