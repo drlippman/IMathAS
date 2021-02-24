@@ -85,14 +85,6 @@ if (isset($ispublic) && $ispublic && !isset($_SESSION['mathdisp'])) {
 	$_SESSION['mathdisp'] = 1;
 	$_SESSION['graphdisp'] = 1;
 }
-if (isset($_SESSION['ltiitemtype']) && ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3)) {
-	echo '<script type="text/x-mathjax-config">
-		MathJax.Hub.Queue(function () {
-			sendLTIresizemsg();
-		});
-		MathJax.Hub.Register.MessageHook("End Process", sendLTIresizemsg);
-	     </script>';
-}
 
 if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
@@ -108,46 +100,52 @@ if (!isset($_SESSION['mathdisp'])) {
 	if (isset($useeditor) && $_SESSION['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=090120\" type=\"text/javascript\"></script>\n";
-	}
-	//Contrib not hosted in CDN yet
-	echo '<script type="text/x-mathjax-config">
-		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}});
-		MathJax.Ajax.config.path["Local"] = "'.$staticroot.'/javascript/mathjax";
-		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
-		</script>';
-	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
-	} else {
-		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
-	}
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
+    }
+    echo '<script>
+    window.MathJax = {
+      options: {
+        ignoreHtmlClass: "skipmathrender",
+      },
+      loader: {
+        load: ["input/asciimath", "output/chtml", "ui/menu"]
+      },
+      options: {
+        renderActions: {
+            addattr: [150,
+                function (doc) {for (math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
+                function (math, doc) {MathJax.config.addDataAttr(math, doc)}
+            ]
+        }
+      },
+      addDataAttr: function (math, doc) {
+        math.typesetRoot.setAttribute("data-asciimath", math.math);
+      }
+    };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script"></script>';
+    echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
 		function rendermathnode(node,callback) {
-			if (window.MathJax) {
-				MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
-				if (typeof callback == "function") {
-					MathJax.Hub.Queue(callback);
+			if (window.MathJax && window.MathJax.typesetPromise) {
+                if (typeof callback != "function") {
+					callback = function () {};
 				}
+                MathJax.typesetClear([node]);
+                MathJax.typesetPromise([node]).then(callback);
 			} else {
 				setTimeout(function() {rendermathnode(node, callback);}, 100);
 			}
-		}</script>';
+        }</script>';
+    if (isset($_SESSION['ltiitemtype'])) {
+        echo '<script type="text/javascript">
+            MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+            </script>';
+    }
 	echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
 } else if ($_SESSION['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=090120\" type=\"text/javascript\"></script>\n";
 
-	/*echo '<script type="text/x-mathjax-config">
-		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}, skipStartupTypeset: true});
-		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/javascript/mathjax";
-		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
-		MathJax.Hub.Register.StartupHook("Begin Config", setupKatexAutoRenderWhenReady);
-		</script>
-		<script type="text/javascript">
-		function setupKatexAutoRenderWhenReady() {
-			if (typeof setupKatexAutoRender == "function") {setupKatexAutoRender();} else { setTimeout(setupKatexAutoRenderWhenReady,50);}
-		}
-		</script>';*/
 	if (!empty($CFG['GEN']['uselocaljs'])) {
 		echo '<script src="'.$staticroot.'/katex/katex.min.js"></script>';
 		echo '<link rel="stylesheet" href="'.$staticroot.'/katex/katex.min.css" />';
@@ -155,7 +153,6 @@ if (!isset($_SESSION['mathdisp'])) {
 	} else {
 		echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">';
 		echo '<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>';
-		//echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo '<script type="text/javascript" src="'.$staticroot.'/katex/auto-render.js?v=073119"></script>';
 	echo '<script type="text/javascript">setupKatexAutoRender();</script>';
