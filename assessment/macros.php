@@ -35,7 +35,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
- "randcountry","randcountries","sorttwopointdata","addimageborder");
+ "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -4644,6 +4644,22 @@ function decryptval($val, $key) {
 	$cipher = "AES128";
 	list($iv,$val) = explode('.', $val);
 	return json_decode(openssl_decrypt($val, $cipher, $key, 0, base64_decode($iv)), true);
+}
+
+function formatcomplex($real,$imag) {
+    if ($imag == 0) {
+        return $real;
+    } else {
+        if ($imag == 1) {
+            return ($real==0) ? 'i' : "$real+i";
+        } else if ($imag == -1) {
+            return ($real==0) ? '-i' : "$real-i";
+        } else if ($imag < 0) {
+            return "$real{$imag}i";
+        } else {
+            return "$real+{$imag}i";
+        }
+    }
 }
 
 ?>

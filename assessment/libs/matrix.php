@@ -14,7 +14,7 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixnumsolutions","matrixround",
 	"matrixGetRank","arrayIsZeroVector","matrixFormMatrixFromEigValEigVec",
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
-	"matrixGetRowSpace","matrixGetColumnSpace",
+	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
 	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
 
@@ -1421,4 +1421,99 @@ function isMatrix($m) {
 		return false;
 	}
 }
+
+function matrixFromEigenvals($values) {
+    $size = 0;
+    foreach ($values as $v) {
+        $size += is_array($v) ? 2 : 1;
+    }
+    $m = matrixidentity($size);
+    $mi = matrixidentity($size);
+    $d = [];
+    $ops = array();
+	$mult = nonzerodiffrands(-3,3,6);
+	for ($i=0; $i<6; $i++) {
+        list($sr,$er) = diffrands(0,$size-2,2); // leave last row alone for now
+        $ops[] = array($sr, $er, $mult[$i]);
+		$m = matrixrowcombine($m,$sr,$mult[$i],$er,1,$er);
+    }
+    $mult = nonzerodiffrands(-3,3,2);
+    for ($i=0; $i<2; $i++) {
+        $sr = $GLOBALS['RND']->rand(0,$size-2);
+        $ops[] = array($sr, $size-1, $mult[$i]);
+        $m = matrixrowcombine($m,$sr,$mult[$i],$size-1,1,$size-1);
+    }
+    $mult = rands(1,3,$size);
+    $n = 0;
+    // real evals will get one row as evec
+    // complex evals will get one row for imag, and next for real part
+    foreach ($values as $i=>$v) {
+        $d[$n] = array_fill(0,$size,0);
+        if (is_array($v)) {
+            // add multiple of last row to real rows
+            if ($n+1 != $size-1) {
+                $ops[] = array($size-1, $n+1, $mult[$i]);
+                $m = matrixrowcombine($m,$size-1,$mult[$i],$n+1,1,$n+1);
+            }
+            $d[$n+1] = array_fill(0,$size,0);
+            $d[$n][$n] = $values[$i][0];
+            $d[$n][$n+1] = -$values[$i][1];
+            $d[$n+1][$n] = $values[$i][1];
+            $d[$n+1][$n+1] = $values[$i][0];
+            $n += 2;
+        } else {
+            $d[$n][$n] = $values[$i];
+            $n++;
+        }
+    }
+
+    for ($i=count($ops)-1; $i>-1; $i--) {
+        $mi = matrixrowcombine($mi,$ops[$i][0],-1*$ops[$i][2],$ops[$i][1],1,$ops[$i][1]);
+    }
+    
+    $evecs = [];
+    $r = 0;
+    foreach ($values as $v) {
+        if (!is_array($v)) { // real: use row as e-vec
+            $evecs[] = $m[$r];
+            $r++;
+        } else { // complex: use two rows as real and complex
+            $vec = [];
+            for ($i=0; $i<$size; $i++) {
+                $vec[] = [$m[$r+1][$i], $m[$r][$i]];
+            }
+            $evecs[] = $vec;
+            $r += 2;
+        }
+    }
+
+    $p = matrixtranspose($m);
+    $pinv = matrixtranspose($mi);
+    $A = matrixprod(matrixprod($p, $d), $pinv);
+    return [$A,$evecs];
+}
+
+function matrixFormatEigenvecs($evecs) {
+    $out = [];
+    foreach ($evecs as $evec) {
+        $elpts = []; $elpts2 = [];
+        $iscomplex = false;
+        foreach ($evec as $v) {
+            if (is_array($v)) {
+                $elpts[] = formatcomplex($v[0], $v[1]);
+                $elpts2[] = formatcomplex($v[0], -1*$v[1]);
+                $iscomplex = true;
+            } else {
+                $elpts[] = $v;
+                $elpts2[] = $v;
+            }
+        }
+        $out[] = '[('.implode('),(', $elpts).')]';
+        if ($iscomplex) {
+            $out[] = '[('.implode('),(', $elpts2).')]';
+        }
+    }
+    return $out;
+}
+
 ?>
