@@ -485,34 +485,22 @@ if (!(isset($teacherid))) {
 				$metadata
 			);
 		}
-		if ($_POST['copyopts'] != 'DNC' || $_POST['defpoints'] !== '' || isset($_POST['removeperq'])) {
-			//update points possible
-			require_once("../includes/updateptsposs.php");
+        if ($_POST['copyopts'] != 'DNC' || $_POST['defpoints'] !== '' || 
+            isset($_POST['removeperq']) || $_POST['exceptionpenalty'] !== ''
+        ) {
+            require_once("../includes/updateptsposs.php");
+            require("../assess2/AssessHelpers.php");
 			foreach ($checked as $aid) {
-				updatePointsPossible($aid);
-			}
-			// re-total existing assessment attempts to adjust scores
-			require("../assess2/AssessInfo.php");
-			require("../assess2/AssessRecord.php");
-			$DBH->beginTransaction();
-			$stm = $DBH->query("SELECT * FROM imas_assessment_records WHERE assessmentid IN ($checkedlist) ORDER BY assessmentid FOR UPDATE");
-			$lastAid = 0;
-			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				if ($row['assessmentid'] != $lastAid) {
-					$assess_info = new AssessInfo($DBH, $row['assessmentid'], $cid, false);
-					$assess_info->loadQuestionSettings('all', false, false);
-					$lastAid = $row['assessmentid'];
-				}
-				$assess_record = new AssessRecord($DBH, $assess_info, false);
-				$assess_record->setRecord($row);
-				if ($coreOK && $submitby!==$cursumitby[$row['assessmentid']]) {
+                //update points possible
+                updatePointsPossible($aid);
+                // re-total existing assessment attempts to adjust scores
+                if ($coreOK && $submitby!==$cursumitby[$aid]) {
 					// convert data format
-					$assess_record->convertSubmitBy($submitby);
-				}
-				$assess_record->reTotalAssess();
-				$assess_record->saveRecord();
+                    AssessHelpers::retotalAll($cid, $aid, true, false, $submitby);
+				} else {
+                    AssessHelpers::retotalAll($cid, $aid);
+                }
 			}
-			$DBH->commit();
 		}
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");

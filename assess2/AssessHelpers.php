@@ -27,6 +27,22 @@ class AssessHelpers
     if ($transaction) {
           $DBH->beginTransaction();
     }
+    $stm = $DBH->prepare("SELECT userid,timelimitmult FROM imas_students WHERE courseid=?");
+    $stm->execute(array($cid));
+    $timelimitmults = [];
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $timelimitmults[$row['userid']] = $row['timelimitmult'];
+    }
+    $stm = $DBH->prepare("SELECT imas_exceptions.* FROM imas_exceptions JOIN imas_assessment_records AS iar 
+        ON imas_exceptions.userid=iar.userid AND imas_exceptions.assessmentid=iar.assessmentid WHERE
+        iar.assessmentid=?");
+    $stm->execute(array($aid));
+    $exceptions = [];
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $exceptions[$row['userid']] = array($row['startdate'],$row['enddate'],
+            $row['islatepass'],$row['is_lti'],$row['exceptionpenalty'],
+            $row['waivereqscore'],$row['timeext'],$row['attemptext']);
+    }
   	$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
   	$stm->execute(array($aid));
   	if ($stm->rowCount() > 0) {
@@ -34,6 +50,11 @@ class AssessHelpers
   		$assess_info->loadQuestionSettings('all', false, false);
         $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            $assess_info->setException(
+                isset($exceptions[$row['userid']]) ? $exceptions[$row['userid']] : false,
+                true
+            );
+            $assess_info->applyTimelimitMultiplier($timelimitmults[$row['userid']]);
   			$assess_record = new AssessRecord($DBH, $assess_info, false);
             $assess_record->setRecord($row);
             $orig_gb_score = $assess_record->getGbScore();
@@ -73,11 +94,17 @@ class AssessHelpers
     // Re-total any student attempts on this assessment
       //need to re-score assessment attempts based on withdrawal
     $DBH->beginTransaction();
+    $stm = $DBH->prepare("SELECT timelimitmult FROM imas_students WHERE courseid=? AND userid=?");
+    $stm->execute(array($cid, $uid));
+    $timelimitmult = $stm->fetchColumn(0);
+
   	$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? AND userid=? FOR UPDATE");
   	$stm->execute(array($aid, $uid));
   	if ($stm->rowCount() > 0) {
   		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-  		$assess_info->loadQuestionSettings('all', false, false);
+        $assess_info->loadException($uid, true);
+        $assess_info->applyTimelimitMultiplier($timelimitmult);
+        $assess_info->loadQuestionSettings('all', false, false);
         $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
   			$assess_record = new AssessRecord($DBH, $assess_info, false);
