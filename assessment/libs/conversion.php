@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 11;
+	return 14;
 }
 
 global $allowedmacros;
@@ -16,14 +16,36 @@ if(!is_array($allowedmacros)) {
 	$allowedmacros = array();
 }
 
-array_push($allowedmacros, "conversionVer", "conversionDisplay", "conversionDisplay2HTML", "conversionDisplay2HTMLwithBorder",
-    "conversionPrefix", "conversionAbbreviations", "conversionLength", "conversionLiquid", "conversionUnits2ScreenReader",
-    "conversionCapacity", "conversionWeight",  "conversionArea", "conversionVolume",
-    "conversionTime", "conversionFormulaAbbreviations", "conversionFormulaTemperature" );
+array_push($allowedmacros, "conversionVer", "conversionAbbreviations",  "conversionArea",
+    "conversionCapacity", "conversionDisplay", "conversionDisplay2HTML", "conversionDisplay2HTMLwithBorder",
+     "conversionFormulaAbbreviations", "conversionFormulaGeometry", "conversionFormulaTemperature",
+     "conversionLength", "conversionLiquid", "conversionPrefix", "conversionTime",
+    "conversionUnits2ScreenReader1", "conversionUnits2ScreenReader2", "conversionVolume", "conversionWeight" );
 
-// -------------------------------------------------------------------------------------------------
 // internal only  ----------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+function verifyCancel($input) {
+//    s - skip (default)
+//    n - around the number
+//    u - around the units
+//    b - around
+    $Retval = "s";
+
+	if(!is_null($input)) {
+        if(strtolower($input)=="n"){
+            $Retval = "n";
+        } elseif (strtolower($input)=="u"){
+            $Retval = "u";
+        }elseif (strtolower($input)=="b"){
+            $Retval = "b";
+        }
+	}
+
+	return $Retval;
+}
+
 function verifyRounding($input) {
 	if(!is_null($input)) {
 		$rounding = $input;
@@ -56,10 +78,19 @@ function verifyTickMarks($input) {
     $TickMarks = "";
 
 	if(!is_null($input)) {
-        if(($input=="y")||($input=="`")) { $TickMarks = "`"; }
+        if((strtolower($input)=="y")||($input=="`")) { $TickMarks = "`"; }
 	}
 
 	return $TickMarks;
+}
+
+function verifySign($input) {
+	if(!is_null($input)) {
+        if($input=="=") { $retval = "="; } else {$retval =  "&#8776;";}  //&#8776; &#x2248; &thickapprox;
+	}
+	else { $retval = "="; }
+
+	return $retval;
 }
 
 function verifyString($input) {
@@ -70,7 +101,6 @@ function verifyString($input) {
 
 	return $retval;
 }
-
 
 // function conversionAbbreviations(system,type[,tick,Fullname])
 // Returns the Abbreviations to words
@@ -146,26 +176,26 @@ function conversionAbbreviations() {
 			$retval[2] = "Ton = T";
         } elseif($type=="Area"){
 			if($fullname==0) {
-                $retval[0] = "Inches squared = ".conversionUnits2ScreenReader("","in",2,$tick);
-                $retval[1] = "Feet squared = ".conversionUnits2ScreenReader("","ft",2,$tick);
-                $retval[2] = "Yard squared = ".conversionUnits2ScreenReader("","yd",2,$tick);
-                $retval[3] = "Mile squared = ".conversionUnits2ScreenReader("","mi",2,$tick);
+                $retval[0] = "Inches squared = ".conversionUnits2ScreenReader1("","in",2,$tick);
+                $retval[1] = "Feet squared = ".conversionUnits2ScreenReader1("","ft",2,$tick);
+                $retval[2] = "Yard squared = ".conversionUnits2ScreenReader1("","yd",2,$tick);
+                $retval[3] = "Mile squared = ".conversionUnits2ScreenReader1("","mi",2,$tick);
             } else {
-                $retval[0] = "Square inches = ".conversionUnits2ScreenReader("","in",2,$tick);
-                $retval[1] = "Square feet = ".conversionUnits2ScreenReader("","ft",2,$tick);
-                $retval[2] = "Square yard = ".conversionUnits2ScreenReader("","yd",2,$tick);
-                $retval[3] = "Square mile = ".conversionUnits2ScreenReader("","mi",2,$tick);
+                $retval[0] = "Square inches = ".conversionUnits2ScreenReader1("","in",2,$tick);
+                $retval[1] = "Square feet = ".conversionUnits2ScreenReader1("","ft",2,$tick);
+                $retval[2] = "Square yard = ".conversionUnits2ScreenReader1("","yd",2,$tick);
+                $retval[3] = "Square mile = ".conversionUnits2ScreenReader1("","mi",2,$tick);
             }
 
         } elseif($type=="Volume"){
 			if($fullname==0) {
-                $retval[0] = "Inches cubed = ".conversionUnits2ScreenReader("","in",3,$tick);
-                $retval[1] = "Feet cubed = ".conversionUnits2ScreenReader("","ft",3,$tick);
-                $retval[2] = "Yard cubed = ".conversionUnits2ScreenReader("","yd",3,$tick);
+                $retval[0] = "Inches cubed = ".conversionUnits2ScreenReader1("","in",3,$tick);
+                $retval[1] = "Feet cubed = ".conversionUnits2ScreenReader1("","ft",3,$tick);
+                $retval[2] = "Yard cubed = ".conversionUnits2ScreenReader1("","yd",3,$tick);
             } else {
-                $retval[0] = "Cubic inches = ".conversionUnits2ScreenReader("","in",3,$tick);
-                $retval[1] = "Cubic feet = ".conversionUnits2ScreenReader("","ft",3,$tick);
-                $retval[2] = "Cubic yard = ".conversionUnits2ScreenReader("","yd",3,$tick);
+                $retval[0] = "Cubic inches = ".conversionUnits2ScreenReader1("","in",3,$tick);
+                $retval[1] = "Cubic feet = ".conversionUnits2ScreenReader1("","ft",3,$tick);
+                $retval[2] = "Cubic yard = ".conversionUnits2ScreenReader1("","yd",3,$tick);
             }
         }
 
@@ -180,7 +210,7 @@ function conversionAbbreviations() {
 			$retval[1] = "Centi"._('meter')." = cm";
 			$retval[2] = "Deci"._('meter')." = dm";
 			$retval[3] = _('Meter')." = m";
-			$retval[4] = _('Deca'). _('meter')." = ".conversionUnits2ScreenReader("","dam",1,"n");
+			$retval[4] = _('Deca'). _('meter')." = ".conversionUnits2ScreenReader1("","dam",1,"n");
 			$retval[5] = "Hecto"._('meter')." = hm";
 			$retval[6] = "Kilo"._('meter')." = km";
         } elseif($type=="Capacity"){
@@ -188,7 +218,7 @@ function conversionAbbreviations() {
 			$retval[1] = "Centi" . _('liter') . " = cL";
 			$retval[2] = "Deci" . _('liter') . " = dL";
 			$retval[3] = _('Liter') . " = L";
-			$retval[4] = _('Deca')._('liter') . " = ".conversionUnits2ScreenReader("","daL",1,"n");
+			$retval[4] = _('Deca')._('liter') . " = ".conversionUnits2ScreenReader1("","daL",1,"n");
 			$retval[5] = "Hecto" . _('liter') . " = hL";
 			$retval[6] = "Kilo" . _('liter') . " = kL";
         } elseif(($type=="Weight")||($type=="Mass")){
@@ -196,47 +226,47 @@ function conversionAbbreviations() {
 			$retval[1] = "Centi"._('gram')." = cg";
 			$retval[2] = "Deci"._('gram')." = dg";
 			$retval[3] = _('Gram') ." = g";
-			$retval[4] = _('Deca')._('gram')." = ".conversionUnits2ScreenReader("","dag",1,"n");
+			$retval[4] = _('Deca')._('gram')." = ".conversionUnits2ScreenReader1("","dag",1,"n");
 			$retval[5] = "Hecto"._('gram')." = hg";
 			$retval[6] = "Kilo"._('gram')." = kg";
 			$retval[7] = "Metric Ton = Tonne";
         } elseif($type=="Area"){
 			if($fullname==0) {
-                $retval[0] = "Milli"._('meter')." squared = ".conversionUnits2ScreenReader("","mm",2,$tick);
-                $retval[1] = "Centi"._('meter')." squared = ".conversionUnits2ScreenReader("","cm",2,$tick);
-                $retval[2] = "Deci"._('meter')." squared = ".conversionUnits2ScreenReader("","dm",2,$tick);
-                $retval[3] = _('Meter')." squared = ".conversionUnits2ScreenReader("","m",2,$tick);
-                $retval[4] = _('Deca')._('meter')." squared = ".conversionUnits2ScreenReader("","dam",2,$tick);
-                $retval[5] = "Hecto"._('meter')." squared = ".conversionUnits2ScreenReader("","hm",2,$tick);
-                $retval[6] = "Kilo"._('meter')." squared = ".conversionUnits2ScreenReader("","km",2,$tick);
+                $retval[0] = "Milli"._('meter')." squared = ".conversionUnits2ScreenReader1("","mm",2,$tick);
+                $retval[1] = "Centi"._('meter')." squared = ".conversionUnits2ScreenReader1("","cm",2,$tick);
+                $retval[2] = "Deci"._('meter')." squared = ".conversionUnits2ScreenReader1("","dm",2,$tick);
+                $retval[3] = _('Meter')." squared = ".conversionUnits2ScreenReader1("","m",2,$tick);
+                $retval[4] = _('Deca')._('meter')." squared = ".conversionUnits2ScreenReader1("","dam",2,$tick);
+                $retval[5] = "Hecto"._('meter')." squared = ".conversionUnits2ScreenReader1("","hm",2,$tick);
+                $retval[6] = "Kilo"._('meter')." squared = ".conversionUnits2ScreenReader1("","km",2,$tick);
             } else {
-                $retval[0] = "Square milli"._('meter')." = ".conversionUnits2ScreenReader("","mm",2,$tick);
-                $retval[1] = "Square centi"._('meter')." = ".conversionUnits2ScreenReader("","cm",2,$tick);
-                $retval[2] = "Square deci"._('meter')." = ".conversionUnits2ScreenReader("","dm",2,$tick);
-                $retval[3] = "Square "._('meter')." = ".conversionUnits2ScreenReader("","m",2,$tick);
-                $retval[4] = "Square "._('deca')._('meter')." = ".conversionUnits2ScreenReader("","dam",2,$tick);
-                $retval[5] = "Square hecto"._('meter')." = ".conversionUnits2ScreenReader("","hm",2,$tick);
-                $retval[6] = "Square kilo"._('meter')." = <".conversionUnits2ScreenReader("","km",2,$tick);
+                $retval[0] = "Square milli"._('meter')." = ".conversionUnits2ScreenReader1("","mm",2,$tick);
+                $retval[1] = "Square centi"._('meter')." = ".conversionUnits2ScreenReader1("","cm",2,$tick);
+                $retval[2] = "Square deci"._('meter')." = ".conversionUnits2ScreenReader1("","dm",2,$tick);
+                $retval[3] = "Square "._('meter')." = ".conversionUnits2ScreenReader1("","m",2,$tick);
+                $retval[4] = "Square "._('deca')._('meter')." = ".conversionUnits2ScreenReader1("","dam",2,$tick);
+                $retval[5] = "Square hecto"._('meter')." = ".conversionUnits2ScreenReader1("","hm",2,$tick);
+                $retval[6] = "Square kilo"._('meter')." = <".conversionUnits2ScreenReader1("","km",2,$tick);
             }
 			$retval[7] = "Ares = a";
 			$retval[8] = "Hectares = ha";
         } elseif($type=="Volume") {
 			if($fullname==0) {
-                $retval[0] = "Milli"._('meter')." cubed = ".conversionUnits2ScreenReader("","mm",3,$tick);
-                $retval[1] = "Centi"._('meter')." cubed = ".conversionUnits2ScreenReader("","cm",3,$tick);
-                $retval[2] = "Deci"._('meter')." cubed = ".conversionUnits2ScreenReader("","dm",3,$tick);
-                $retval[3] = _('Meter')." cubed = ".conversionUnits2ScreenReader("","m",3,$tick);
-                $retval[4] = _('Deca')._('meter')." cubed = ".conversionUnits2ScreenReader("","dam",3,$tick);
-                $retval[5] = "Hecto"._('meter')." cubed = ".conversionUnits2ScreenReader("","hm",3,$tick);
-                $retval[6] = "Kilo"._('meter')." cubed = ".conversionUnits2ScreenReader("","km",3,$tick);
+                $retval[0] = "Milli"._('meter')." cubed = ".conversionUnits2ScreenReader1("","mm",3,$tick);
+                $retval[1] = "Centi"._('meter')." cubed = ".conversionUnits2ScreenReader1("","cm",3,$tick);
+                $retval[2] = "Deci"._('meter')." cubed = ".conversionUnits2ScreenReader1("","dm",3,$tick);
+                $retval[3] = _('Meter')." cubed = ".conversionUnits2ScreenReader1("","m",3,$tick);
+                $retval[4] = _('Deca')._('meter')." cubed = ".conversionUnits2ScreenReader1("","dam",3,$tick);
+                $retval[5] = "Hecto"._('meter')." cubed = ".conversionUnits2ScreenReader1("","hm",3,$tick);
+                $retval[6] = "Kilo"._('meter')." cubed = ".conversionUnits2ScreenReader1("","km",3,$tick);
             } else {
-                $retval[0] = "Cubic milli"._('meter')." = ".conversionUnits2ScreenReader("","mm",3,$tick);
-                $retval[1] = "Cubic centi"._('meter')." = ".conversionUnits2ScreenReader("","cm",3,$tick);
-                $retval[2] = "Cubic deci"._('meter')." = ".conversionUnits2ScreenReader("","dm",3,$tick);
-                $retval[3] = "Cubic "._('meter')." = ".conversionUnits2ScreenReader("","m",3,$tick);
-                $retval[4] = "Cubic "._('deca')._('meter')." = ".conversionUnits2ScreenReader("","dam",3,$tick);
-                $retval[5] = "Cubic hecto"._('meter')." = ".conversionUnits2ScreenReader("","hm",3,$tick);
-                $retval[6] = "Cubic kilo"._('meter')." = ".conversionUnits2ScreenReader("","km",3,$tick);
+                $retval[0] = "Cubic milli"._('meter')." = ".conversionUnits2ScreenReader1("","mm",3,$tick);
+                $retval[1] = "Cubic centi"._('meter')." = ".conversionUnits2ScreenReader1("","cm",3,$tick);
+                $retval[2] = "Cubic deci"._('meter')." = ".conversionUnits2ScreenReader1("","dm",3,$tick);
+                $retval[3] = "Cubic "._('meter')." = ".conversionUnits2ScreenReader1("","m",3,$tick);
+                $retval[4] = "Cubic "._('deca')._('meter')." = ".conversionUnits2ScreenReader1("","dam",3,$tick);
+                $retval[5] = "Cubic hecto"._('meter')." = ".conversionUnits2ScreenReader1("","hm",3,$tick);
+                $retval[6] = "Cubic kilo"._('meter')." = ".conversionUnits2ScreenReader1("","km",3,$tick);
             }
         }
 	}
@@ -257,7 +287,7 @@ function conversionAbbreviations() {
 	return $retval;
 }
 
-// function conversionArea(type [,FullWords,Rounding,tick])
+// function conversionArea(type [,FullWords,Rounding,tick,Sign])
 // returns an array of strings with the conversion factors
 //
 // INPUTS:
@@ -271,6 +301,7 @@ function conversionAbbreviations() {
 //            2 = use Full name (square feet)
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
 //     tick: add a tick mark around items with exponents
+//     Sign: use an = or html approximately equal symbol
 //
 // Examples
 //
@@ -287,32 +318,31 @@ function conversionArea() {
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
 	$tick = $args[3];
-    $tickL = verifyTickMarks($tick);
+    $sign = verifySign($args[4]);
 
     $retval = array();
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = conversionUnits2ScreenReader("1 ","ft",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("144 ","in",2,$tick);
-            $retval[1] = conversionUnits2ScreenReader("1 ","yd",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("9 ","ft",2,$tick);
-            $retval[2] = "{$tickL}1 acre = $tickL".conversionUnits2ScreenReader("43,560 ","ft",2,$tick);
-            $retval[3] = conversionUnits2ScreenReader("1 ","mi",2,$tick)."$tickL = 640 acre$tickL";
+            $retval[0] = conversionUnits2ScreenReader2("1 ","ft",2,"144 ","in",2,"=",$tick);
+            $retval[1] = conversionUnits2ScreenReader2("1 ","yd",2,"9 ","ft",2,"=",$tick);
+            $retval[2] = conversionUnits2ScreenReader2("1 ","\"acre\"",1,"43,560 ","ft",2,"=",$tick);
+            $retval[3] = conversionUnits2ScreenReader2("1 ","mi",2,"640 ","\"acre\"",1,"=",$tick);
         } else {
             $retval[0] = "1 feet squared = 144 inches squared";
             $retval[1] = "1 yard squared = 9 feet squared";
-			$retval[2] = "1 acre = 43,560 feet squared ";
             $retval[3] = "1 mile squared  = 640 acre";
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
-            $retval[0] = conversionUnits2ScreenReader("1 ","km",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("100 ","hm",2,$tick);
-            $retval[1] = conversionUnits2ScreenReader("1 ","hm",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("100 ","dam",2,$tick);
-            $retval[2] = conversionUnits2ScreenReader("1 ","dam",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("100 ","m",2,$tick);
-            $retval[3] = conversionUnits2ScreenReader("1 ","m",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("100 ","dm",2,$tick);
-            $retval[4] = conversionUnits2ScreenReader("1 ","dm",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("100 ","cm",2,$tick);
-			$retval[5] = conversionUnits2ScreenReader("1 ","cm",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("100 ","mm",2,$tick);
-			$retval[6] = "{$tickL}1 a = $tickL".conversionUnits2ScreenReader("100 ","m",2,$tick);
-			$retval[7] = "{$tickL}1 ha = 100 a$tickL";
+            $retval[0] = conversionUnits2ScreenReader2("1 ","km",2,"100 ","hm",2,"=",$tick);
+            $retval[1] = conversionUnits2ScreenReader2("1 ","hm",2,"100 ","dam",2,"=",$tick);
+            $retval[2] = conversionUnits2ScreenReader2("1 ","dam",2,"100 ","m",2,"=",$tick);
+            $retval[3] = conversionUnits2ScreenReader2("1 ","m",2,"100 ","dm",2,"=",$tick);
+            $retval[4] = conversionUnits2ScreenReader2("1 ","dm",2,"100 ","cm",2,"=",$tick);
+			$retval[5] = conversionUnits2ScreenReader2("1 ","cm",2,"100 ","mm",2,"=",$tick);
+			$retval[6] = conversionUnits2ScreenReader2("1 ","\"a\"",1,"100 ","m",2,"=",$tick);
+			$retval[7] = conversionUnits2ScreenReader2("1 ","\"ha\"",1,"100 ","\"a\"",1,"=",$tick);
         } elseif($fullname==1) {
 			$retval[0] = "1 Kilo"._('meter')." squared = 100 Hecto"._('meter')." squared";
             $retval[1] = "1 Hecto"._('meter')."  squared = 100 "._('Deca')._('meter')." squared";
@@ -336,11 +366,11 @@ function conversionArea() {
         //6.45160000 cm^2 https://www.wolframalpha.com/input/?i=convert+1+square+inch+to+mm+squared
         $CF = round(6.4516, $rounding);
 		if($fullname==0) {
-			$retval[0] = conversionUnits2ScreenReader("1 ","in",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("$CF ","cm",2,$tick);
+			$retval[0] = conversionUnits2ScreenReader2("1 ","in",2,"$CF ","cm",2,$sign,$tick);
         } elseif($fullname==1) {
-			$retval[0] = "1 Inch squared = $CF Centi"._('meter')." squared";
+			$retval[0] = "1 Inch squared $sign $CF Centi"._('meter')." squared";
         } else {
-			$retval[0] = "1 Square inch = $CF Square centi"._('meter');
+			$retval[0] = "1 Square inch $sign $CF Square centi"._('meter');
         }
 	} elseif($system=="MA"){
         // 1.19599005 yd^2 https://www.wolframalpha.com/input/?i=convert+1+square+meter+to+square+feet
@@ -348,14 +378,14 @@ function conversionArea() {
         $CF0 = round(1.19599005, $rounding);
         $CF1 = round(2.471, $rounding);
 		if($fullname==0) {
-			$retval[0] = conversionUnits2ScreenReader("1 ","m",2,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("$CF0 ","yd",2,$tick);
-            $retval[1] = "1 ha = $CF1 acres";
+			$retval[0] = conversionUnits2ScreenReader2("1 ","m",2,"$CF0 ","yd",2,$sign,$tick);
+            $retval[1] = "1 ha $sign $CF1 acres";
         } elseif($fullname==1) {
-			$retval[0] = "1 "._('Meter')." squared = $CF0 Yard squared";
-            $retval[1] = "1 hectares = $CF1 acres";
+			$retval[0] = "1 "._('Meter')." squared $sign $CF0 Yard squared";
+            $retval[1] = "1 hectares $sign $CF1 acres";
         } else {
-			$retval[0] = "1 Square"._('Meter')." = $CF0 Square yard";
-            $retval[1] = "1 hectares = $CF1 acres";
+			$retval[0] = "1 Square"._('Meter')." $sign $CF0 Square yard";
+            $retval[1] = "1 hectares $sign $CF1 acres";
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -364,7 +394,7 @@ function conversionArea() {
 	return $retval;
 }
 
-// function conversionCapacity(type [,FullWords,Rounding])
+// function conversionCapacity(type [,FullWords,Rounding,Sign])
 // returns an array of strings with the conversion factors
 //
 // INPUTS:
@@ -377,6 +407,7 @@ function conversionArea() {
 //            1 = use Full name
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+//     Sign: use an = or html approximately equal symbol
 //
 // Examples
 //
@@ -392,6 +423,7 @@ function conversionCapacity() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
+    $sign = verifySign($args[3]);
 
     $retval = array();
 
@@ -411,7 +443,7 @@ function conversionCapacity() {
 		if($fullname==0) {
             $retval[0] = "1 kL = 1000 L";
             $retval[1] = "1 hL = 100 L";
-            $retval[2] = conversionUnits2ScreenReader("1 ","daL",1,"n")." = 10 L";
+            $retval[2] = conversionUnits2ScreenReader1("1 ","daL",1,"n")." = 10 L";
             $retval[3] = "1 L = 10 dL";
             $retval[4] = "1 L = 100 cL";
 			$retval[5] = "1 L = 1000 mL";
@@ -425,31 +457,31 @@ function conversionCapacity() {
         }
 	} elseif($system=="AM"){
 		if($fullname==0) {
-			$retval[0] = "1 fl oz = ".round(0.0295735296, $rounding)." L";
-            $retval[1] = "1 C = ".round(0.236588236, $rounding)." L";
-            $retval[2] = "1 pt = ".round(0.473176473, $rounding)." L";
-            $retval[3] = "1 qt = ".round(0.946352946, $rounding)." L";
-			$retval[4] = "1 gal = ".round(3.78541178, $rounding)." L";
+			$retval[0] = "1 fl oz $sign ".round(0.0295735296, $rounding)." L";
+            $retval[1] = "1 C $sign ".round(0.236588236, $rounding)." L";
+            $retval[2] = "1 pt $sign ".round(0.473176473, $rounding)." L";
+            $retval[3] = "1 qt $sign ".round(0.946352946, $rounding)." L";
+			$retval[4] = "1 gal $sign ".round(3.78541178, $rounding)." L";
         } else {
-			$retval[0] = "1 fluid ounces = ".round(0.0295735296, $rounding)._('Liter');  // 29.5735296 mL  https://www.wolframalpha.com/input/?i=convert+1+fluid+ounce+to+liters
-            $retval[1] = "1 cup = ".round(0.236588236, $rounding)._('Liter');  // 236.588236 mL  https://www.wolframalpha.com/input/?i=convert+1+cup+to+liters
-            $retval[2] = "1 pint = ".round(0.473176473, $rounding)._('Liter');  // 473.176473 mL  https://www.wolframalpha.com/input/?i=convert+1+pint+to+liters
-            $retval[3] = "1 quart = ".round(0.946352946, $rounding)._('Liter');   // 946.352946 mL https://www.wolframalpha.com/input/?i=convert+1+quart+to+liters
-			$retval[4] = "1 gallon = ".round(3.78541178, $rounding)._('Liter');  // 3.78541178 L https://www.wolframalpha.com/input/?i=convert+1+gallon+to+milliliters
+			$retval[0] = "1 fluid ounces $sign ".round(0.0295735296, $rounding)._('Liter');  // 29.5735296 mL  https://www.wolframalpha.com/input/?i=convert+1+fluid+ounce+to+liters
+            $retval[1] = "1 cup $sign ".round(0.236588236, $rounding)._('Liter');  // 236.588236 mL  https://www.wolframalpha.com/input/?i=convert+1+cup+to+liters
+            $retval[2] = "1 pint $sign ".round(0.473176473, $rounding)._('Liter');  // 473.176473 mL  https://www.wolframalpha.com/input/?i=convert+1+pint+to+liters
+            $retval[3] = "1 quart $sign ".round(0.946352946, $rounding)._('Liter');   // 946.352946 mL https://www.wolframalpha.com/input/?i=convert+1+quart+to+liters
+			$retval[4] = "1 gallon $sign ".round(3.78541178, $rounding)._('Liter');  // 3.78541178 L https://www.wolframalpha.com/input/?i=convert+1+gallon+to+milliliters
         }
 	} elseif($system=="MA"){
 		if($fullname==0) {
-			$retval[0] = "1 L = ".round(33.8140227, $rounding)." fl oz";  // 33.8140227 fl oz (fluid ounces)  https://www.wolframalpha.com/input/?i=convert+1+liter+to+pints
-            $retval[1] = "1 L = ".round(4.22675284, $rounding)." C"; //  2.11337642 pints *2
-            $retval[2] = "1 L = ".round(2.11337642, $rounding)." pt";    // 2.11337642 pints   https://www.wolframalpha.com/input/?i=convert+1+liter+to+fluid+ounces
-            $retval[3] = "1 L = ".round(1.05668821, $rounding)." qt";    // 1.05668821 quarts
-			$retval[4] = "1 L = ".round(0.264172052, $rounding)." gal";  // 0.264172052 gallons
+			$retval[0] = "1 L $sign ".round(33.8140227, $rounding)." fl oz";  // 33.8140227 fl oz (fluid ounces)  https://www.wolframalpha.com/input/?i=convert+1+liter+to+pints
+            $retval[1] = "1 L $sign ".round(4.22675284, $rounding)." C"; //  2.11337642 pints *2
+            $retval[2] = "1 L $sign ".round(2.11337642, $rounding)." pt";    // 2.11337642 pints   https://www.wolframalpha.com/input/?i=convert+1+liter+to+fluid+ounces
+            $retval[3] = "1 L $sign ".round(1.05668821, $rounding)." qt";    // 1.05668821 quarts
+			$retval[4] = "1 L $sign ".round(0.264172052, $rounding)." gal";  // 0.264172052 gallons
         } else {
-			$retval[0] = "1 "._('Liter')." = ".round(33.8140227, $rounding)." fluid ounces";
-            $retval[1] = "1 "._('Liter')." = ".round(4.22675284, $rounding)." Cup";
-            $retval[2] = "1 "._('Liter')." = ".round(2.11337642, $rounding)." pint";
-            $retval[3] = "1 "._('Liter')." = ".round(1.05668821, $rounding)." quart";
-			$retval[4] = "1 "._('Liter')." = ".round(0.264172052, $rounding)." gallon";
+			$retval[0] = "1 "._('Liter')." $sign ".round(33.8140227, $rounding)." fluid ounces";
+            $retval[1] = "1 "._('Liter')." $sign ".round(4.22675284, $rounding)." Cup";
+            $retval[2] = "1 "._('Liter')." $sign ".round(2.11337642, $rounding)." pint";
+            $retval[3] = "1 "._('Liter')." $sign ".round(1.05668821, $rounding)." quart";
+			$retval[4] = "1 "._('Liter')." $sign ".round(0.264172052, $rounding)." gallon";
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -506,7 +538,6 @@ function conversionDisplay() {
 	return $retval;
 }
 
-
 // function conversionDisplay2HTML(CellValueArray,$cellPadding=4)
 //
 // INPUTS:
@@ -552,15 +583,116 @@ function conversionDisplay2HTMLwithBorder($CellValueArray,$cellPadding=7) {
 	return $HTML;
 }
 
+// function conversionFormulaAbbreviations(type)
+// Returns the Abbreviations to words
+//
+// INPUTS:
+//   system: "C" = Circle (default)
+//           "T" = Triangle
+//           "A" = Area
+//           "V" = Volume
+//           "F" = Temperature
+//
 function conversionFormulaAbbreviations() {
+    $args = func_get_args();
+	if (count($args)==0) {
+		$firstPart = "C";  // Circle
+	} else {
+        $type = $args[0];
+        $firstPart = strtoupper(substr($type, 0, 1));
+    }
     $retval = array();
 
-    $retval[0] = "A = Area";
-    $retval[1] = "SA = Surface Area";
-    $retval[2] = "r = Radius";
-	$retval[3] = "V = Volume";
+    if($firstPart=="C") {$type="Circle";}
+    if($firstPart=="T") {$type="Triangle";}
+    if($firstPart=="A") {$type="Area";}
+    if($firstPart=="V") {$type="Volume";}
+    if($firstPart=="F") {$type="Temperature";}
+
+    if($type=="Circle") {
+        $retval[0] = "C = Circumference"; // of a circle
+        $retval[1] = "A = Area";
+        $retval[2] = "r = Radius";
+        $retval[3] = "d = Diameter";
+    } elseif($type=="Area") {
+        $retval[0] = "SA = Surface Area";
+        $retval[1] = "L = Length";
+        $retval[2] = "W = Width";
+        $retval[3] = "H or h = Height";
+        $retval[4] = "s = Side";
+        $retval[5] = "r = Radius";
+    } elseif($type=="Volume") {
+        $retval[0] = "V = Volume";
+        $retval[1] = "L = Length";
+        $retval[2] = "W = Width";
+        $retval[3] = "H or h = Height";
+        $retval[4] = "s = Side";
+        $retval[5] = "r = Radius";
+    } elseif($type=="Triangle") {
+        $retval[0] = "A = Area";
+        $retval[1] = "b = base";
+        $retval[2] = "h = Height";
+    } elseif($type=="Temperature") {
+        $retval[0] = "C = Celsius";
+        $retval[1] = "F = Fahrenheit";
+        $retval[2] = "K = Kelvin";
+    } else {
+        $retval[0] = "'".(string)$type."' is not a valid type.";
+    }
+
 
 	return $retval;
+}
+
+// function conversionFormulaGeometry(type,[tick=y])
+// Returns the Abbreviations to words
+//
+// INPUTS:
+//   system: "C" = Circle (default)
+//           "T" = Triangle
+//           "A" = Surface Area
+//           "V" = Volume
+function conversionFormulaGeometry() {
+    $PI = "&#8508;";
+    $args = func_get_args();
+	if (count($args)==0) {
+		$firstPart = "C";  // Circle
+	} else {
+        $type = $args[0];
+        $firstPart = strtoupper(substr($type, 0, 1));
+    }
+    $tick = $args[1];
+
+    $retval = array();
+
+
+    if($firstPart=="C") {$type="Circle";}
+    if($firstPart=="T") {$type="Triangle";}
+    if($firstPart=="A") {$type="SurfaceArea";}
+    if($firstPart=="V") {$type="Volume";}
+
+    if($type=="Circle") {
+        $retval[0] = "C = {$PI}d";
+        $retval[1] = "C = 2{$PI}r";
+        $retval[2] = conversionUnits2ScreenReader2("","A",1,"$PI","r",2,"=",$tick);
+    } elseif($type=="Triangle") {
+        $retval[0] = "Perimeter = add all sides";
+        $retval[1] = "{$tick}A = 1/2bh{$tick}";
+    } elseif($type=="SurfaceArea") {
+        $retval[0] = "SA=2LW+2LH+2WH (Surface Area of a Rectangular Solid)";
+        $retval[1] = conversionUnits2ScreenReader2("","SA",1,"6","s",2,"=",$tick)." (Surface Area of a Cube)";
+        $retval[2] = conversionUnits2ScreenReader2("","SA",1,"4{$PI}","r",2,"=",$tick)." (Surface Area of a Sphere)";
+        $retval[3] = conversionUnits2ScreenReader2("","SA",1,"2{$PI}rh+4{$PI}","r",2,"=",$tick)." (Surface Area of a Right Circular Cylindar)";
+    } elseif($type=="Volume") {
+        $retval[0] = "V = LWH (Volume of a Rectangular Solid)";
+        $retval[1] = conversionUnits2ScreenReader2("","V",1,"","s",3,"=",$tick)." (Volume of a Cube)";
+        $retval[2] = conversionUnits2ScreenReader2("","V",1,"4/3{$PI}","r",3,"=",$tick)." (Volume of a Sphere)";
+        $retval[3] = conversionUnits2ScreenReader2("","V",1,"{$PI}h","r",2,"=",$tick)." (Volume of a Right Circular Cylindar)";
+    } else {
+        $retval[0] = "'".(string)$type."' is not a valid type.";
+    }
+
+    return $retval;
 }
 
 // function conversionFormulaTemperature(type)
@@ -570,7 +702,7 @@ function conversionFormulaAbbreviations() {
 //   system: "C" = to Celsius (default)
 //           "F" = to Fahrenheit
 //           "K" = to Kelvin
-///
+//
 // Examples
 //
 // use ConversionFormulaTemperature("F") returns the formula for F = 9/5C+32
@@ -603,7 +735,7 @@ function conversionFormulaTemperature() {
     return $retval;
 }
 
-// function conversionLength(type [,FullWords,Rounding])
+// function conversionLength(type [,FullWords,Rounding,sign])
 // returns an array of strings with the conversion factors
 //
 // INPUTS:
@@ -616,6 +748,7 @@ function conversionFormulaTemperature() {
 //            1 = use Full name
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+//     Sign: use an = or html approximately equal symbol
 //
 // Examples
 //
@@ -631,26 +764,27 @@ function conversionLength() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
+    $sign = verifySign($args[3]);
 
     $retval = array();
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "12 in = 1 ft";
-            $retval[1] = "3 ft = 1 yd";
-            $retval[2] = "36 in = 1 yd";
-            $retval[3] = "5,280 ft = 1 mi";
+            $retval[0] = "1 ft = 12 in";
+            $retval[1] = "1 yd = 3 ft";
+            $retval[2] = "1 yd = 36 in";
+            $retval[3] = "1 mi = 5,280 ft";
         } else {
-            $retval[0] = "12 inches = 1 foot";
-            $retval[1] = "3 feet = 1 yard";
-            $retval[2] = "36 inches = 1 yard";
-            $retval[3] = "5,280 feet = 1 mile";
+            $retval[0] = "1 foot = 12 inches";
+            $retval[1] = "1 yard = 3 feet";
+            $retval[2] = "1 yard = 36 inches";
+            $retval[3] = "1 mile = 5,280 feet";
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
             $retval[0] = "1 km = 1000 m";
             $retval[1] = "1 hm = 100 m";
-            $retval[2] = conversionUnits2ScreenReader("1 ","dam",1,"n")." = 10 m";
+            $retval[2] = conversionUnits2ScreenReader1("1 ","dam",1,"n")." = 10 m";
             $retval[3] = "1 m = 10 dm";
             $retval[4] = "1 m = 100 cm";
             $retval[5] = "1 m = 1000 mm";
@@ -664,27 +798,27 @@ function conversionLength() {
         }
 	} elseif($system=="AM"){
 		if($fullname==0) {
-			$retval[0] = "1 in = ".round(2.54, $rounding)." cm";     // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
-            $retval[1] = "1 ft = ".round(0.3048, $rounding)." m";    // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
-            $retval[2] = "1 yd = ".round(0.9144, $rounding)." m";  // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
-            $retval[3] = "1 mi = ".round(1.60934400, $rounding)." km";// 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
+			$retval[0] = "1 in $sign ".round(2.54, $rounding)." cm";     // https://www.wolframalpha.com/input/?i=convert+1+inch+to+mm
+            $retval[1] = "1 ft $sign ".round(0.3048, $rounding)." m";    // https://www.wolframalpha.com/input/?i=convert+1+foot+to+dm
+            $retval[2] = "1 yd $sign ".round(0.9144, $rounding)." m";  // https://www.wolframalpha.com/input/?i=convert+1+yard+to+dm
+            $retval[3] = "1 mi $sign ".round(1.60934400, $rounding)." km";// 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
         } else {
-			$retval[0] = "1 inch = ".round(2.54, $rounding)." centi"._('meter');
-            $retval[1] = "1 foot = ".round(0.3048, $rounding)._('meter');
-            $retval[2] = "1 yard = ".round(0.9144, $rounding)._('meter');
-            $retval[3] = "1 mile = ".round(1.60934400, $rounding)." kilo"._('meter');
+			$retval[0] = "1 inch $sign ".round(2.54, $rounding)." centi"._('meter');
+            $retval[1] = "1 foot $sign ".round(0.3048, $rounding)._('meter');
+            $retval[2] = "1 yard $sign ".round(0.9144, $rounding)._('meter');
+            $retval[3] = "1 mile $sign ".round(1.60934400, $rounding)." kilo"._('meter');
         }
 	} elseif($system=="MA"){
 		if($fullname==0) {
-			$retval[0] = "1 cm = ".round(0.393700787, $rounding)." in";    // 393.700787 mils https://www.wolframalpha.com/input/?i=convert+1+centimeter+to+inch
-            $retval[1] = "1 m = ".round(3.28083990, $rounding)." ft"; // 3.28083990 feet https://www.wolframalpha.com/input/?i=convert+1+meter+to+inch
-            $retval[2] = "1 m = ".round(1.0936133, $rounding)." yd";  // 3.28083990 feet divided by 3
-            $retval[3] = "1 km = ".round(0.621371, $rounding)." mi";   // 621371 miles https://www.wolframalpha.com/input/?i=convert+1000000+kilometer+to+miles
+			$retval[0] = "1 cm $sign ".round(0.393700787, $rounding)." in";    // 393.700787 mils https://www.wolframalpha.com/input/?i=convert+1+centimeter+to+inch
+            $retval[1] = "1 m $sign ".round(3.28083990, $rounding)." ft"; // 3.28083990 feet https://www.wolframalpha.com/input/?i=convert+1+meter+to+inch
+            $retval[2] = "1 m $sign ".round(1.0936133, $rounding)." yd";  // 3.28083990 feet divided by 3
+            $retval[3] = "1 km $sign ".round(0.621371, $rounding)." mi";   // 621371 miles https://www.wolframalpha.com/input/?i=convert+1000000+kilometer+to+miles
         } else {
-			$retval[0] = "1 centi"._('meter')." = ".round(0.393700787, $rounding)." inch";
-            $retval[1] = "1 "._('meter')." = ".round(3.28083990, $rounding)." feet";
-            $retval[2] = "1 "._('meter')." = ".round(1.0936133, $rounding)." yard";
-            $retval[3] = "1 kilo"._('meter')." = ".round(0.621371, $rounding)." mile";
+			$retval[0] = "1 centi"._('meter')." $sign ".round(0.393700787, $rounding)." inch";
+            $retval[1] = "1 "._('meter')." $sign ".round(3.28083990, $rounding)." feet";
+            $retval[2] = "1 "._('meter')." $sign ".round(1.0936133, $rounding)." yard";
+            $retval[3] = "1 kilo"._('meter')." $sign ".round(0.621371, $rounding)." mile";
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -833,80 +967,132 @@ function conversionTime() {
 	return $retval;
 }
 
-//function conversionUnits2ScreenReader(number,units,dimensions=2,tick="y")
+//
+// INTERNAL ONLY
+//
+//function conversionUnit2ScreenReaderModification($units){
+//  Returns a 2 element array where the 0 element is the word that can have tick marksof the tick mark form of the word and the screen read form of the work
+//
+function conversionUnit2ScreenReaderModification($units,$tick){
+    $testunit = strtolower($units);
+    $retval = array();
+    if($units=="in") {
+        if($tick=="`") {
+            $retval[0] = "i n";
+        } else {
+            $retval[0] = "in";
+        }
+        $retval[1] = "in";
+    } elseif($testunit=="dam") {
+        $retval[0] = "dam";
+        $retval[1] = "d a m";
+    } elseif($testunit=="dal") {
+        $retval[0] = "daL";
+        $retval[1] = "d a L";
+    } elseif($testunit=="dag") {
+        $retval[0] = "dag";
+        $retval[1] = "d a g";
+    } elseif($testunit=="l") {
+        $retval[0] = "L";
+        $retval[1] = "L";
+    } else {
+        $retval[0] = $units;
+        $retval[1] = $units;
+    }
+
+    return $retval;
+}
+
+//function conversionUnits2ScreenReader1(number,units,dimensions=2,tick="y",sign="")
 // Returns the Abbreviations to words
 //
-// INPUTS:
+// INPUTS:  number: the amount of units
 //           units: ft - feet
 //                  in - inch
 //                  m = meter
-//                  ect.
+//                  etc.
+//      dimensions: 1   - does not show an exponent
+//                  2,3 - add ^dimensions1 to units1
+//             tick: y - add tick marks
+//                   n - do not add tick marks//
+//             sign: add this to the end (default of '')
 //
-//       dimensions: 2,3 (except dam it allows 1,2, or 3)
-//             tick: add tick marks
-//
-function conversionUnits2ScreenReader($number,$units,$dimensions=2,$tick="y"){
-    $units = strtolower($units);
+function conversionUnits2ScreenReader1($number,$units,$dimensions=2,$tick="y",$sign=""){
+
     $tick = verifyTickMarks($tick);
     $exponentWord = _('exponent');
+    $retval = conversionUnit2ScreenReaderModification($units,$tick);
+
+    $unitTick = $retval[0];
+    $unitSR = $retval[1];
 
     if($dimensions==1) {
-        if($tick=="`") {
-            if($units=="in") {
-                return "<span aria-hidden=true>`{$number}i n`</span><span class=\"sr-only\">$number in</span>";
-            } elseif($units=="dam") {
-                return "<span aria-hidden=true>`{$number}dam`</span><span class=\"sr-only\">$number d a m</span>";
-            } elseif($units=="dal") {
-                return "<span aria-hidden=true>`{$number}daL`</span><span class=\"sr-only\">$number d a L</span>";
-            } elseif($units=="dag") {
-                return "<span aria-hidden=true>`{$number}dag`</span><span class=\"sr-only\">$number d a g</span>";
-            } else {
-                return "`{$number}$units`";
-            }
+        return "<span aria-hidden=true>$tick$number$unitTick$sign$tick</span><span class=\"sr-only\">$number $unitSR $sign</span>";
+    } else {
+        return "<span aria-hidden=true>$tick$number$unitTick^$dimensions$sign$tick</span><span class=\"sr-only\">$number $unitSR $exponentWord $dimensions $sign</span>";
+    }
+
+}
+
+//function conversionUnits2ScreenReader2(number1,units1,dimensions1,number2,units2,dimensions2,sign="=",tick="y")
+// Returns the Abbreviations to words
+//
+// INPUTS:  number1: the amount of units1
+//           units1: ft - feet
+//                   in - inch
+//                   m = meter
+//                   etc.
+//      dimensions1: 1   - does not show an exponent
+//                   2,3 - add ^dimensions1 to units1
+//
+//          number2: the amount of units2
+//           units2: ft - feet
+//                   in - inch
+//                   m = meter
+//                   etc.
+//
+//       dimensions2: 1   - does not show an exponent
+//                    2,3 - add ^dimensions2 to units2
+//             sign: add this between the two factors (default of '=')
+//             tick: y - add tick marks
+//                   n - do not add tick marks
+//
+//
+function conversionUnits2ScreenReader2($number1,$units1,$dimensions1,$number2,$units2,$dimensions2,$sign="=",$tick="y"){
+
+    $tick = verifyTickMarks($tick);
+    $exponentWord = _('exponent');
+    $retval1 = conversionUnit2ScreenReaderModification($units1,$tick);
+    $retval2 = conversionUnit2ScreenReaderModification($units2,$tick);
+
+    $unitTick1 = $retval1[0];
+    $unitSR1 = $retval1[1];
+
+    $unitTick2 = $retval2[0];
+    $unitSR2 = $retval2[1];
+
+    if($dimensions1==1) {
+        if($dimensions2==1) {
+            return "<span aria-hidden=true>$tick$number1$unitTick1$sign$number2$unitTick2$tick</span>
+                    <span class=\"sr-only\">$number1 $unitSR1 $sign $number2 $unitSR2 </span>";
         } else {
-            if($units=="in") {
-                return "<span aria-hidden=true>{$number}in</span><span class=\"sr-only\">$number in</span>";
-            } elseif($units=="dam") {
-                return "<span aria-hidden=true>{$number}dam</span><span class=\"sr-only\">$number d a m</span>";
-            } elseif($units=="dal") {
-                return "<span aria-hidden=true>{$number}daL</span><span class=\"sr-only\">$number d a L</span>";
-            } elseif($units=="dag") {
-                return "<span aria-hidden=true>{$number}dag</span><span class=\"sr-only\">$number d a g</span>";
-            } else {
-                return "{$number}$units";
-            }
+            return "<span aria-hidden=true>$tick$number1$unitTick1$sign$number2$unitTick2^$dimensions2$tick</span>
+                    <span class=\"sr-only\">$number1 $unitSR1 $sign $number2 $unitSR2 $exponentWord $dimensions2</span>";
         }
     } else {
-        if($tick=="`") {
-            if($units=="in") {
-                return "<span aria-hidden=true>`{$number}i n^$dimensions`</span><span class=\"sr-only\">$number in $exponentWord $dimensions</span>";
-            } elseif($units=="dam") {
-                return "<span aria-hidden=true>`{$number}dam^$dimensions`</span><span class=\"sr-only\">$number d a m $exponentWord $dimensions</span>";
-            } elseif($units=="dal") {
-                return "<span aria-hidden=true>`{$number}daL^$dimensions`</span><span class=\"sr-only\">$number d a L $exponentWord $dimensions</span>";
-            } elseif($units=="dag") {
-                return "<span aria-hidden=true>`{$number}dag^$dimensions`</span><span class=\"sr-only\">$number d a g $exponentWord $dimensions</span>";
-            } else {
-                return "<span aria-hidden=true>`{$number}$units^$dimensions`</span><span class=\"sr-only\">$number $units $exponentWord $dimensions</span>";
-            }
-        } else {
-            if($units=="in") {
-                return "<span aria-hidden=true>$number in^$dimensions</span><span class=\"sr-only\">$number in $exponentWord $dimensions</span>";
-            } elseif($units=="dam") {
-                return "<span aria-hidden=true>$number dam^$dimensions</span><span class=\"sr-only\">$number d a m $exponentWord $dimensions</span>";
-            } elseif($units=="dal") {
-                return "<span aria-hidden=true>$number daL^$dimensions</span><span class=\"sr-only\">$number d a L $exponentWord $dimensions</span>";
-            } elseif($units=="dag") {
-                return "<span aria-hidden=true>$number dag^$dimensions</span><span class=\"sr-only\">$number d a g $exponentWord $dimensions</span>";
-            } else {
-                return "<span aria-hidden=true>$number $units^$dimensions</span><span class=\"sr-only\">$number $units $exponentWord $dimensions</span>";
-            }
+        if($dimensions2==1) {
+            return "<span aria-hidden=true>$tick$number1$unitTick1^$dimensions1$sign$number2$unitTick2$tick</span>
+                    <span class=\"sr-only\">$number1 $unitSR1  $exponentWord $dimensions1 $sign $number2 $unitSR2</span>";
+        }
+        else {
+            return "<span aria-hidden=true>$tick$number1$unitTick1^$dimensions1$sign$number2$unitTick2^$dimensions2$tick</span>
+                    <span class=\"sr-only\">$number1 $unitSR1  $exponentWord $dimensions1 $sign $number2 $unitSR2 $exponentWord $dimensions2</span>";
         }
     }
 
 }
 
-// function conversionVolume(type [,FullWords,Rounding,tick])
+// function conversionVolume(type [,FullWords,Rounding,tick,Sign])
 // returns an array of strings with the conversion factors
 //
 // INPUTS:
@@ -920,6 +1106,7 @@ function conversionUnits2ScreenReader($number,$units,$dimensions=2,$tick="y"){
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
 //     tick: add a tick mark around items with exponents
+//     Sign: use an = or html approximately equal symbol
 //
 // Examples
 //
@@ -936,14 +1123,14 @@ function conversionVolume() {
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
 	$tick = $args[3];
-    $tickL = verifyTickMarks($tick);
+    $sign = verifySign($args[4]);
 
     $retval = array();
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = conversionUnits2ScreenReader("1 ","ft",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("1,728 ","in",3,$tick);
-            $retval[1] = conversionUnits2ScreenReader("1 ","yd",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("27 ","ft",3,$tick);
+            $retval[0] = conversionUnits2ScreenReader2("1 ","ft",3,"1,728 ","in",3,"=",$tick);
+            $retval[1] = conversionUnits2ScreenReader2("1 ","yd",3,"27 ","ft",3,"=",$tick);
         } elseif($fullname==1) {
             $retval[0] = "1 feet cubed = 1,728 inches cubed";
             $retval[1] = "1 yard cubed = 27 feet cubed";
@@ -953,12 +1140,12 @@ function conversionVolume() {
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
-            $retval[0] = conversionUnits2ScreenReader("1 ","km",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("1000 ","hm",3,$tick);
-            $retval[1] = conversionUnits2ScreenReader("1 ","hm",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("1000 ","dam",3,$tick);
-            $retval[2] = conversionUnits2ScreenReader("1 ","dam",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("1000 ","m",3,$tick);
-            $retval[3] = conversionUnits2ScreenReader("1 ","m",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("1000 ","dm",3,$tick);
-            $retval[4] = conversionUnits2ScreenReader("1 ","dm",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("1000 ","cm",3,$tick);
-			$retval[5] = conversionUnits2ScreenReader("1 ","cm",3,$tick)."$tickL = $tickL".conversionUnits2ScreenReader("1000 ","mm",3,$tick);
+            $retval[0] = conversionUnits2ScreenReader1("1 ","km",3,"1000 ","hm",3,"=",$tick);
+            $retval[1] = conversionUnits2ScreenReader1("1 ","hm",3,"1000 ","dam",3,"=",$tick);
+            $retval[2] = conversionUnits2ScreenReader1("1 ","dam",3,"1000 ","m",3,"=",$tick);
+            $retval[3] = conversionUnits2ScreenReader1("1 ","m",3,"1000 ","dm",3,"=",$tick);
+            $retval[4] = conversionUnits2ScreenReader1("1 ","dm",3,"1000 ","cm",3,"=",$tick);
+			$retval[5] = conversionUnits2ScreenReader1("1 ","cm",3,"1000 ","mm",3,"=",$tick);
         } elseif($fullname==1) {
 			$retval[0] = "1 Kilo"._('meter')." cubed = 1000 Hecto"._('meter')."  cubed";
             $retval[1] = "1 Hecto"._('meter')." cubed = 1000 "._('Deca')._('meter')." cubed";
@@ -978,21 +1165,21 @@ function conversionVolume() {
         // 0.0163870640 L https://www.wolframalpha.com/input/?i=convert+1+cubic+inch+to+ml
         $CF = round(16.3870640, $rounding);
 		if($fullname==0) {
-			$retval[0] = conversionUnits2ScreenReader("1 ","in",3,$tick)." = $CF mL";
+			$retval[0] = conversionUnits2ScreenReader2("1 ","in",3,"$CF ","mL",1,$sign,$tick);
         } elseif($fullname==1) {
-			$retval[0] = "1 Inch cubed = $CF Milli"._('liter');
+			$retval[0] = "1 Inch cubed $sign $CF Milli"._('liter');
         } else {
-			$retval[0] = "1 Cubic inch = $CF Milli"._('Liter');
+			$retval[0] = "1 Cubic inch $sign $CF Milli"._('Liter');
         }
 	} elseif($system=="MA"){
         // 61.0237441 in^3  https://www.wolframalpha.com/input/?i=convert+1+liter+to+cubic+feet
         $CF = round(61.0237441, $rounding);
 		if($fullname==0) {
-			$retval[0] = "1 L = ".conversionUnits2ScreenReader("$CF ","in",3,$tick);
+			$retval[0] = conversionUnits2ScreenReader2("1 ","L",1,"$CF ","in",3,$sign,$tick);
         } elseif($fullname==1) {
-			$retval[0] = "1 "._('Liter')." = $CF Inches cubed";
+			$retval[0] = "1 "._('Liter')." $sign $CF Inches cubed";
         } else {
-			$retval[0] = "1 "._('Liter')." = $CF Cubic inches";
+			$retval[0] = "1 "._('Liter')." $sign $CF Cubic inches";
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -1001,7 +1188,7 @@ function conversionVolume() {
 	return $retval;
 }
 
-// function conversionWeight(type [,FullWords,Rounding])
+// function conversionWeight(type [,FullWords,Rounding,Sign])
 // returns an array of strings with the conversion factors
 //
 // INPUTS:
@@ -1016,6 +1203,7 @@ function conversionVolume() {
 //            1 = use Full name
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
+//     Sign: use an = or html approximately equal symbol
 //
 // Examples
 //
@@ -1031,22 +1219,23 @@ function conversionWeight() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
+    $sign = verifySign($args[3]);
 
     $retval = array();
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "16 oz = 1 lbs";
-            $retval[1] = "2000 lbs = 1 T";
+            $retval[0] = "1 lbs = 16 oz";
+            $retval[1] = "1 T =2000 lbs";
         } else {
-            $retval[0] = "16 ounces = 1 pound";
-            $retval[1] = "2000 pounds = 1 Ton";
+            $retval[0] = "1 pound = 16 ounces";
+            $retval[1] = "1 Ton= 2000 pounds";
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
             $retval[0] = "1 kg = 1000 g";
             $retval[1] = "1 hg = 100 g";
-            $retval[2] = conversionUnits2ScreenReader("1 ","dag",1,"n")." = 10 g";
+            $retval[2] = conversionUnits2ScreenReader1("1 ","dag",1,"n")." = 10 g";
             $retval[3] = "1 g = 10 dg";
             $retval[4] = "1 g = 100 cg";
 			$retval[5] = "1 g = 1000 mg";
@@ -1062,19 +1251,19 @@ function conversionWeight() {
         }
 	} elseif($system=="AM"){
 		if($fullname==0) {
-			$retval[0] = "1 oz = ".round(28.3495231, $rounding)." g";    // 0.0283495231 kg https://www.wolframalpha.com/input/?i=convert+1+ounce+to+gram
-            $retval[1] = "1 lbs = ".round(0.453592370, $rounding)." kg"; // 0.453592370 kg https://www.wolframalpha.com/input/?i=convert+1+pound+to+gram
+			$retval[0] = "1 oz $sign ".round(28.3495231, $rounding)." g";    // 0.0283495231 kg https://www.wolframalpha.com/input/?i=convert+1+ounce+to+gram
+            $retval[1] = "1 lbs $sign ".round(0.453592370, $rounding)." kg"; // 0.453592370 kg https://www.wolframalpha.com/input/?i=convert+1+pound+to+gram
         } else {
-			$retval[0] = "1 ounces = ".round(28.3495231, $rounding)._('gram');
-            $retval[1] = "1 pound = ".round(0.453592370, $rounding)." kilo"._('gram');;
+			$retval[0] = "1 ounces $sign ".round(28.3495231, $rounding)._('gram');
+            $retval[1] = "1 pound $sign ".round(0.453592370, $rounding)." kilo"._('gram');;
         }
 	} elseif($system=="MA"){
 		if($fullname==0) {
-			$retval[0] = "1 g = ".round(0.035274, $rounding)." oz";
-            $retval[1] = "1 kg = ".round(2.20462, $rounding)." lbs";
+			$retval[0] = "1 g $sign ".round(0.035274, $rounding)." oz";
+            $retval[1] = "1 kg $sign ".round(2.20462, $rounding)." lbs";
         } else {
-			$retval[0] = "1 "._('gram')." = ".round(0.035274, $rounding)." ounces";
-            $retval[1] = "1 kilo"._('gram')." = ".round(2.20462, $rounding)." pound";
+			$retval[0] = "1 "._('gram')." $sign ".round(0.035274, $rounding)." ounces";
+            $retval[1] = "1 kilo"._('gram')." $sign ".round(2.20462, $rounding)." pound";
         }
 	} else {
         $retval[0] = "'".(string)$system."' is not a valid type.";
@@ -1083,6 +1272,9 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2021-02-20 ver 14 - updated conversionFormulaAbbreviations, conversionFormulaGeometry, length conversion
+// 2021-02-19 ver 13 - updated american weight conversion
+// 2021-02-19 ver 12 - updated conversionUnits2ScreenReader to conversionUnits2ScreenReader1 and conversionUnits2ScreenReader2
 // 2021-02-16 ver 11 - updated conversionFormulaTemperature and reordered the file for alphabetical order
 // 2021-02-16 ver 10 - updated conversionUnits2ScreenReader to take 4 arguments
 // 2021-02-04 ver 9  - added conversionLiquid, find typo in conversionArea
