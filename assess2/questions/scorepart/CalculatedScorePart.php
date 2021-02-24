@@ -158,7 +158,7 @@ class CalculatedScorePart implements ScorePart
                         $matches[3] = evalMathParser($matches[3]);
                     }
                     $aarr[$j] = $matches;
-                } else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
+                } else if ((!is_numeric($anans) || $checkSameform) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
                     if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
                         $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                     } else {
@@ -166,7 +166,7 @@ class CalculatedScorePart implements ScorePart
                         if ($anfunc !== false) {
                             $aarr[$j] = $anfunc->evaluateQuiet();
                             if ($checkSameform) {
-                            $ansnorm[0][$j] = $anfunc->normalizeTreeString();
+                                $ansnorm[0][$j] = $anfunc->normalizeTreeString();
                             }
                         } else {
                             $aarr[$j] = '';
@@ -264,12 +264,16 @@ class CalculatedScorePart implements ScorePart
         if ($checkSameform) {
             $ganorm = array();
             foreach ($gaarr as $toevalGivenans) {
-              $givenansfunc = parseMathQuiet($toevalGivenans);
-              if ($givenansfunc !== false) {
-                $ganorm[] = $givenansfunc->normalizeTreeString();
-              } else {
-                $ganorm[] = '';
-              }
+                if ($toevalGivenans=='DNE' || $toevalGivenans=='oo' || $toevalGivenans=='+oo' || $toevalGivenans=='-oo') {
+                    $ganorm[] =  $toevalGivenans;
+                } else {
+                    $givenansfunc = parseMathQuiet($toevalGivenans);
+                    if ($givenansfunc !== false) {
+                        $ganorm[] = $givenansfunc->normalizeTreeString();
+                    } else {
+                        $ganorm[] = '';
+                    }
+                }
             }
         }
 
