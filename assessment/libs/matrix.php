@@ -1431,30 +1431,33 @@ function matrixFromEigenvals($values) {
     $mi = matrixidentity($size);
     $d = [];
     $ops = array();
-	$mult = nonzerodiffrands(-3,3,6);
-	for ($i=0; $i<min(6, $size-2); $i++) {
-        list($sr,$er) = diffrands(0,$size-2,2); // leave last row alone for now
-        $ops[] = array($sr, $er, $mult[$i]);
-		$m = matrixrowcombine($m,$sr,$mult[$i],$er,1,$er);
+    if ($size > 2) {
+        $ord = diffrands(0,$size-2,$size-1);
+    } else {
+        $ord = [0];
     }
-    $mult = nonzerodiffrands(-3,3,2);
-    for ($i=0; $i<2; $i++) {
-        $sr = $GLOBALS['RND']->rand(0,$size-2);
-        $ops[] = array($sr, $size-1, $mult[$i]);
-        $m = matrixrowcombine($m,$sr,$mult[$i],$size-1,1,$size-1);
+    $ord[] = $size-1;
+    $mults = nonzerodiffrands(-3,3,$size*2,'def',true);
+	for ($i=1; $i<$size; $i++) {
+        $er = $ord[$i];
+        $sr = $ord[$i-1];
+        $ops[] = array($sr, $er, $mults[$i-1]);
+		$m = matrixrowcombine($m,$sr,$mults[$i-1],$er,1,$er);
     }
-    $mult = rands(1,3,$size);
+    
     $n = 0;
     // real evals will get one row as evec
     // complex evals will get one row for imag, and next for real part
+    $realrows = [];
     foreach ($values as $i=>$v) {
         $d[$n] = array_fill(0,$size,0);
         if (is_array($v)) {
             // add multiple of last row to real rows
             if ($n+1 != $size-1) {
-                $mult = $GLOBALS['RND']->rand(1,3);
+                $mult = abs($mults[$size+$i]);
                 $ops[] = array($size-1, $n+1, $mult);
                 $m = matrixrowcombine($m,$size-1,$mult,$n+1,1,$n+1);
+                $realrows[] = $n+1;
             }
             $d[$n+1] = array_fill(0,$size,0);
             $d[$n][$n] = $values[$i][0];
@@ -1465,14 +1468,23 @@ function matrixFromEigenvals($values) {
         } else {
             // add multiple of last row to real rows
             if ($n != $size-1) {
-                $mult = nonzerorand(-3,3);
+                $mult = $mults[$size+$i];
                 $ops[] = array($size-1, $n, $mult);
                 $m = matrixrowcombine($m,$size-1,$mult,$n,1,$n);
+                $realrows[] = $n;
             }
             $d[$n][$n] = $values[$i];
             $n++;
         }
     }
+
+    $sr = randfrom($realrows);
+    $mult = $GLOBALS['RND']->rand(-1,1);
+    if (is_array($values[count($values)-1]) && $m[$sr][$size-1]*$mult < 0) {
+        $mult *= -1;
+    }
+    $ops[] = array($sr,$size-1, $mult);
+    $m = matrixrowcombine($m,$sr,$mult,$size-1,1,$size-1);
 
     for ($i=count($ops)-1; $i>-1; $i--) {
         $mi = matrixrowcombine($mi,$ops[$i][0],-1*$ops[$i][2],$ops[$i][1],1,$ops[$i][1]);
