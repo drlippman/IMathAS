@@ -3262,7 +3262,12 @@ A student is asked to enter a function
         exactly the same, except for commutation of addition and multiplication, multiplication by 1,
         implicit multiplication, and extra parentheses. (2x-3)(5-x) would be "sameform" as (-1x+5)(2*x-3), 
         but 2/4x and 1/2x and 0.5x would not be "sameform". Use with caution.
-	</dd>
+    </dd>
+<dt>$partialcredit = array(string,score,[string,score,...]) </dt>
+	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form 
+        array(string,score,string,score,...), where	string is the expression to compare to the student answer, 
+        and score is a proportion between 0 and 1 to award as partial credit.  Note this
+        currently only works for single expression answers; "or" answers are not supported.</dd>
 <dt>$formatfeedbackon = true</dt>
 	<dd>Turns on "right answer, wrong format" feedback on the question</dd>
 <dt>$reltolerance = a decimal value </dt>

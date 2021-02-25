@@ -19,6 +19,7 @@ class AssessInfo
   private $questionSetData = array();
   private $exception = null;
   private $exceptionfunc = null;
+  private $resetdata = array();
 
 
  /**
@@ -89,23 +90,55 @@ class AssessInfo
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
     if (!$isstu && $this->assessData['date_by_lti'] > 0 && isset($_SESSION['lti_duedate'])) {
       // fake exception for teachers from LTI
-      $this->exception = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+      $this->setException(array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else if (!$isstu) {
-      $this->exception = false;
+      $this->setException(false, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else {
       $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
-      $this->exception = $stm->fetch(PDO::FETCH_NUM);
+      $this->setException($stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
     }
+  }
+
+  /**
+   * Sets an exception
+   * @param  array|false   $exception   array of exception data, or false for none.
+   * @param  boolean  $isstu      Whether the user is a student
+   * @param  integer $latepasses  The number of latepasses the user has
+   * @param  integer $latepasshrs How many hours latepasses extend due dates
+   * @param  integer $courseenddate The course end date
+   * @return void
+   */
+  public function setException($exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
+
+    // resets, in case we're using setException multiple times
+    $resetkeys = ['exceptionpenalty','original_enddate','extended_with',
+        'timeext','attemptext', 'startdate', 'enddate', 'enddate_in',
+        'latepasses_avail', 'latepass_extendto'];
+    if (empty($this->resetdata)) { // set reset data on first run
+        foreach ($resetkeys as $key) {
+            $this->resetdata[$key] = isset($this->assessData[$key]) ? $this->assessData[$key] : null;
+        }
+    } else {
+        foreach ($resetkeys as $key) {
+            if ($this->resetdata[$key] === null) {
+                unset($this->assessData[$key]);
+            } else {
+                $this->assessData[$key] = $this->resetdata[$key];
+            }
+        }
+    }
+
+    $this->exception = $exception;
 
     $this->assessData['hasexception'] = ($this->exception !== false);
 
     if ($this->exception !== false && $this->exception[4] !== null) {
       //override default exception penalty
       $this->assessData['exceptionpenalty'] = $this->exception[4];
-    }
+    } 
 
     $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
