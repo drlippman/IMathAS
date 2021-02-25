@@ -159,13 +159,27 @@ if (isset($_GET['frame_id'])) {
 		if (mathRenderer == "Katex") {
 			window.katexDoneCallback = sendresizemsg;
 		} else if (typeof MathJax != "undefined") {
-			MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+            if (MathJax.startup) {
+                MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+            } elseif (MathJax.Hub) {
+                MathJax.Hub.Queue(function () {
+                    sendresizemsg();
+                });
+            } 
 		} else {
 			$(function() {
 				sendresizemsg();
 			});
 		}
-		</script>';
+        </script>';
+    if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
+        //in case MathJax isn't loaded yet
+        $placeinhead .= '<script type="text/x-mathjax-config">
+            MathJax.Hub.Queue(function () {
+                sendresizemsg();
+            });
+            </script>';
+    }
 }
 
 

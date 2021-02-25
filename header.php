@@ -101,15 +101,54 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=090120\" type=\"text/javascript\"></script>\n";
     }
+
+    echo '<script type="text/x-mathjax-config">
+		MathJax.Hub.Queue(function () {
+			sendLTIresizemsg();
+		});
+		MathJax.Hub.Register.MessageHook("End Process", sendLTIresizemsg);
+         </script>';
+    //Contrib not hosted in CDN yet
+	echo '<script type="text/x-mathjax-config">
+        MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}});
+        MathJax.Ajax.config.path["Local"] = "'.$staticroot.'/javascript/mathjax";
+        MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
+        </script>';
+    if (!empty($CFG['GEN']['uselocaljs'])) {
+        echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
+    } else {
+        echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=AM_CHTML-full"></script>';
+    }
+    echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true;var mathRenderer="MathJax";
+        function rendermathnode(node,callback) {
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
+                if (typeof callback == "function") {
+                    MathJax.Hub.Queue(callback);
+                }
+            } else {
+                setTimeout(function() {rendermathnode(node, callback);}, 100);
+            }
+        }</script>';
+
+    echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
+} else if ($_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8) { // mathjax 3
+    if (isset($useeditor) && $_SESSION['useed']==1) {
+		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
+		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=090120\" type=\"text/javascript\"></script>\n";
+    }
     // for autoload of a11y extension, add "a11y/semantic-enrich" to load, and put in options enrichSpeech: "shallow",
     echo '<script>
     window.MathJax = {
       loader: {
-        load: ["input/asciimath", "output/chtml", "ui/menu"]
+        load: ["input/asciimath", "output/chtml", "ui/menu"'.
+            (($_SESSION['mathdisp']==8) ? ',"a11y/semantic-enrich"' : '')
+        .']
       },
       options: {
-        ignoreHtmlClass: "skipmathrender",
-        renderActions: {
+        ignoreHtmlClass: "skipmathrender",'.
+        (($_SESSION['mathdisp']==8) ? 'enrichSpeech: "shallow",' : '')
+        .'renderActions: {
             addattr: [150,
                 function (doc) {for (math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
                 function (math, doc) {MathJax.config.addDataAttr(math, doc)}
