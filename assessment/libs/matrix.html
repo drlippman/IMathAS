@@ -249,9 +249,16 @@ complex elements, only one of the conjugate pair is returned.
 
 <h3><a name="matrixFormatEigenvecs">matrixFormatEigenvecs</a></h3>
 <p>matrixFormatEigenvecs(eigenvectors)<br>
-Takes the eigenvectors returned by the matrixFromEgienvals function and formats them for 
-display.  It returns an array of strings, each being the asciimath representation of that 
-eigenvector.
+Takes a set of eigenvectors and formats them for display.  
+It returns an array of strings, each being the asciimath representation of that 
+eigenvector.<br>
+eigenvectors: in the same format matrixFromEigenvals returns. An array of eigenvectors, 
+where each is an array of the elements of that 
+eigenvector.  If an element is complex, it should be entered as [real,imag]. If an 
+eigenvector has complex elements, only one of the conjugate pair should be listed.<br>
+Ex: <code>[[1,2,3], [[1,3],[4,5],2]]</code> would describe the eigenvectors 
+<code>(1,2,3), (1+3i,4+5i,2), and (1-3i,4-5i,2)</code>.
+
 </p>
 
 <h3><a name="matrixIsRowsLinInd">matrixIsRowsLinInd</a></h3>
