@@ -1432,7 +1432,7 @@ function matrixFromEigenvals($values) {
     $d = [];
     $ops = array();
 	$mult = nonzerodiffrands(-3,3,6);
-	for ($i=0; $i<6; $i++) {
+	for ($i=0; $i<min(6, $size-2); $i++) {
         list($sr,$er) = diffrands(0,$size-2,2); // leave last row alone for now
         $ops[] = array($sr, $er, $mult[$i]);
 		$m = matrixrowcombine($m,$sr,$mult[$i],$er,1,$er);
@@ -1452,8 +1452,9 @@ function matrixFromEigenvals($values) {
         if (is_array($v)) {
             // add multiple of last row to real rows
             if ($n+1 != $size-1) {
-                $ops[] = array($size-1, $n+1, $mult[$i]);
-                $m = matrixrowcombine($m,$size-1,$mult[$i],$n+1,1,$n+1);
+                $mult = $GLOBALS['RND']->rand(1,3);
+                $ops[] = array($size-1, $n+1, $mult);
+                $m = matrixrowcombine($m,$size-1,$mult,$n+1,1,$n+1);
             }
             $d[$n+1] = array_fill(0,$size,0);
             $d[$n][$n] = $values[$i][0];
@@ -1462,6 +1463,12 @@ function matrixFromEigenvals($values) {
             $d[$n+1][$n+1] = $values[$i][0];
             $n += 2;
         } else {
+            // add multiple of last row to real rows
+            if ($n != $size-1) {
+                $mult = nonzerorand(-3,3);
+                $ops[] = array($size-1, $n, $mult);
+                $m = matrixrowcombine($m,$size-1,$mult,$n,1,$n);
+            }
             $d[$n][$n] = $values[$i];
             $n++;
         }
