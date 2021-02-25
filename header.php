@@ -101,15 +101,14 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=090120\" type=\"text/javascript\"></script>\n";
     }
+    // for autoload of a11y extension, add "a11y/semantic-enrich" to load, and put in options enrichSpeech: "shallow",
     echo '<script>
     window.MathJax = {
-      options: {
-        ignoreHtmlClass: "skipmathrender",
-      },
       loader: {
         load: ["input/asciimath", "output/chtml", "ui/menu"]
       },
       options: {
+        ignoreHtmlClass: "skipmathrender",
         renderActions: {
             addattr: [150,
                 function (doc) {for (math of doc.math) {MathJax.config.addDataAttr(math, doc)}},
