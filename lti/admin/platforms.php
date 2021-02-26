@@ -31,6 +31,11 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
   !empty(trim($_POST[$lms.'_tokenurl'])) &&
   !empty(trim($_POST[$lms.'_authurl']))
 ) {
+    if ($lms == 'canvas' && $_POST['canvasenv'] != '') {
+        foreach (['issuer', 'keyseturl', 'tokenurl', 'authurl'] as $key) {
+            $_POST['canvas_'.$key] = str_replace('canvas.', 'canvas.'.$_POST['canvasenv'].'.', $_POST['canvas_'.$key]);
+        }
+    }
   $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url,uniqid) VALUES (?,?,?,?,?,?)");
   $stm->execute(array(
     trim($_POST[$lms.'_issuer']),
@@ -158,6 +163,12 @@ echo '</div>';
 
 // Canvas
 echo '<div id=canvas class=lmsinstr style="display:none;">';
+echo '<p><label for="canvasenv">'._('Environment type').'</label>: ';
+echo '<select id=canvasenv name=canvasenv>';
+echo ' <option value="" selected>'._('Production').'</option>';
+echo ' <option value="beta">'._('Beta').'</option>';
+echo ' <option value="test">'._('Test').'</option>';
+echo '</select></p>';
 echo '<p>'._('To enable LTI 1.3 in a Canvas instance, the site administrator should:').'</p>';
 echo '<ul>';
 echo '<li>'._('Go to Admin, then Developer Keys, click +Developer Key, then select +LTI Key').'</li>';
@@ -198,6 +209,7 @@ echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.
 echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
 echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
 echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
+
 echo '<input type="hidden" name=canvas_uniqid value="" />';
 
 echo '<button type=submit>'._('Add Platform').'</button></p>';
