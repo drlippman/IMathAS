@@ -279,6 +279,7 @@ class AssessStandalone {
         ->setAttemptNumber($attemptn)
         ->setAllQuestionAnswers($this->state['stuanswers'])
         ->setAllQuestionAnswersAsNum($this->state['stuanswersval'])
+        ->setPartsToScore($parts_to_score)
         ->setQnpointval(1);
 
     $scoreResult = $scoreEngine->scoreQuestion($scoreQuestionParams);
