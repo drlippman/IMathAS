@@ -1193,12 +1193,12 @@ function conversionVolume() {
         }
 	} elseif($system=="M"){
 		if($fullname==0) {
-            $retval[0] = conversionUnits2ScreenReader1("1 ","km",3,"1000 ","hm",3,"=",$tick);
-            $retval[1] = conversionUnits2ScreenReader1("1 ","hm",3,"1000 ","dam",3,"=",$tick);
-            $retval[2] = conversionUnits2ScreenReader1("1 ","dam",3,"1000 ","m",3,"=",$tick);
-            $retval[3] = conversionUnits2ScreenReader1("1 ","m",3,"1000 ","dm",3,"=",$tick);
-            $retval[4] = conversionUnits2ScreenReader1("1 ","dm",3,"1000 ","cm",3,"=",$tick);
-			$retval[5] = conversionUnits2ScreenReader1("1 ","cm",3,"1000 ","mm",3,"=",$tick);
+            $retval[0] = conversionUnits2ScreenReader2("1 ","km",3,"1000 ","hm",3,"=",$tick);
+            $retval[1] = conversionUnits2ScreenReader2("1 ","hm",3,"1000 ","dam",3,"=",$tick);
+            $retval[2] = conversionUnits2ScreenReader2("1 ","dam",3,"1000 ","m",3,"=",$tick);
+            $retval[3] = conversionUnits2ScreenReader2("1 ","m",3,"1000 ","dm",3,"=",$tick);
+            $retval[4] = conversionUnits2ScreenReader2("1 ","dm",3,"1000 ","cm",3,"=",$tick);
+			$retval[5] = conversionUnits2ScreenReader2("1 ","cm",3,"1000 ","mm",3,"=",$tick);
         } elseif($fullname==1) {
 			$retval[0] = "1 Kilo"._('meter')." cubed = 1000 Hecto"._('meter')."  cubed";
             $retval[1] = "1 Hecto"._('meter')." cubed = 1000 "._('Deca')._('meter')." cubed";
@@ -1327,7 +1327,7 @@ function conversionWeight() {
 	return $retval;
 }
 
-// 2021-02-26 ver 16 - added rectangle and square to conversionFormulaGeometry and conversionFormulaAbbreviations
+// 2021-02-26 ver 16 - added rectangle and square to conversionFormulaGeometry and conversionFormulaAbbreviations, typo in conversionVolume
 // 2021-02-23 ver 15 - updated american length language, update pi symbol to pi, update verify equal sign to =, ~~, or HTML entity, verifypi added
 // 2021-02-20 ver 14 - updated conversionFormulaAbbreviations, conversionFormulaGeometry, length conversion
 // 2021-02-19 ver 13 - updated american weight conversion
