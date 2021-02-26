@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 15;
+	return 16;
 }
 
 global $allowedmacros;
@@ -85,7 +85,6 @@ function verifyPI($input){
     }
     return $retval;
 }
-
 
 function verifyTickMarks($input) {
     $TickMarks = "";
@@ -610,6 +609,8 @@ function conversionDisplay2HTMLwithBorder($CellValueArray,$cellPadding=7) {
 // INPUTS:
 //   system: "C" = Circle (default)
 //           "T" = Triangle
+//           "R" = Rectangle
+//           "S" = Square
 //           "A" = Area
 //           "V" = Volume
 //           "F" = Temperature
@@ -626,6 +627,8 @@ function conversionFormulaAbbreviations() {
 
     if($firstPart=="C") {$type="Circle";}
     if($firstPart=="T") {$type="Triangle";}
+    if($firstPart=="R") {$type="Rectangle";}
+    if($firstPart=="S") {$type="Square";}
     if($firstPart=="A") {$type="Area";}
     if($firstPart=="V") {$type="Volume";}
     if($firstPart=="F") {$type="Temperature";}
@@ -635,6 +638,15 @@ function conversionFormulaAbbreviations() {
         $retval[1] = "A = Area";
         $retval[2] = "r = Radius";
         $retval[3] = "d = Diameter";
+    } elseif($type=="Rectangle") {
+        $retval[0] = "P = Perimeter";
+        $retval[1] = "A = Area";
+        $retval[2] = "L = Length";
+        $retval[3] = "W = Width";
+    } elseif($type=="Square") {
+        $retval[0] = "P = Perimeter";
+        $retval[1] = "A = Area";
+        $retval[2] = "s = side";
     } elseif($type=="Area") {
         $retval[0] = "SA = Surface Area";
         $retval[1] = "L = Length";
@@ -650,9 +662,10 @@ function conversionFormulaAbbreviations() {
         $retval[4] = "s = Side";
         $retval[5] = "r = Radius";
     } elseif($type=="Triangle") {
-        $retval[0] = "A = Area";
-        $retval[1] = "b = base";
-        $retval[2] = "h = Height";
+        $retval[0] = "P = Perimeter";
+        $retval[1] = "A = Area";
+        $retval[2] = "b = base";
+        $retval[3] = "h = Height";
     } elseif($type=="Temperature") {
         $retval[0] = "C = Celsius";
         $retval[1] = "F = Fahrenheit";
@@ -671,6 +684,8 @@ function conversionFormulaAbbreviations() {
 // INPUTS:
 //   system: "C" = Circle (default)
 //           "T" = Triangle
+//           "R" = Rectangle
+//           "S" = Square
 //           "A" = Surface Area
 //           "V" = Volume
 //
@@ -694,23 +709,31 @@ function conversionFormulaGeometry() {
 
     if($firstPart=="C") {$type="Circle";}
     if($firstPart=="T") {$type="Triangle";}
+    if($firstPart=="R") {$type="Rectangle";}
+    if($firstPart=="S") {$type="Square";}
     if($firstPart=="A") {$type="SurfaceArea";}
     if($firstPart=="V") {$type="Volume";}
 
     if($type=="Circle") {
-        $retval[0] = "C = {$PI}d";
-        $retval[1] = "C = 2{$PI}r";
+        $retval[0] = "{$tick}C = {$PI}d{$tick}";
+        $retval[1] = "{$tick}C = 2{$PI}r{$tick}";
         $retval[2] = conversionUnits2ScreenReader2("","A",1,"$PI","r",2,"=",$tick);
     } elseif($type=="Triangle") {
-        $retval[0] = "Perimeter = add all sides";
+        $retval[0] = "P = add all sides";
         $retval[1] = "{$tick}A = 1/2bh{$tick}";
+    } elseif($type=="Rectangle") {
+        $retval[0] = "{$tick}P = 2W+2L{$tick}";
+        $retval[1] = "{$tick}A = LW{$tick}";
+    } elseif($type=="Square") {
+        $retval[0] = "{$tick}P = 4s{$tick}";
+        $retval[1] = "{$tick}A = s^2{$tick}";
     } elseif($type=="SurfaceArea") {
-        $retval[0] = "SA=2LW+2LH+2WH (Surface Area of a Rectangular Solid)";
+        $retval[0] = "{$tick}SA=2LW+2LH+2WH{$tick} (Surface Area of a Rectangular Solid)";
         $retval[1] = conversionUnits2ScreenReader2("","SA",1,"6","s",2,"=",$tick)." (Surface Area of a Cube)";
         $retval[2] = conversionUnits2ScreenReader2("","SA",1,"4{$PI}","r",2,"=",$tick)." (Surface Area of a Sphere)";
         $retval[3] = conversionUnits2ScreenReader2("","SA",1,"2{$PI}rh+4{$PI}","r",2,"=",$tick)." (Surface Area of a Right Circular Cylindar)";
     } elseif($type=="Volume") {
-        $retval[0] = "V = LWH (Volume of a Rectangular Solid)";
+        $retval[0] = "{$tick}V = LWH{$tick} (Volume of a Rectangular Solid)";
         $retval[1] = conversionUnits2ScreenReader2("","V",1,"","s",3,"=",$tick)." (Volume of a Cube)";
         $retval[2] = conversionUnits2ScreenReader2("","V",1,"4/3{$PI}","r",3,"=",$tick)." (Volume of a Sphere)";
         $retval[3] = conversionUnits2ScreenReader2("","V",1,"{$PI}h","r",2,"=",$tick)." (Volume of a Right Circular Cylindar)";
@@ -1304,6 +1327,7 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2021-02-26 ver 16 - added rectangle and square to conversionFormulaGeometry and conversionFormulaAbbreviations
 // 2021-02-23 ver 15 - updated american length language, update pi symbol to pi, update verify equal sign to =, ~~, or HTML entity, verifypi added
 // 2021-02-20 ver 14 - updated conversionFormulaAbbreviations, conversionFormulaGeometry, length conversion
 // 2021-02-19 ver 13 - updated american weight conversion
