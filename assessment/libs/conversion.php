@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 14;
+	return 15;
 }
 
 global $allowedmacros;
@@ -74,6 +74,19 @@ function verifyFullName($input) {
 	return $fullname;
 }
 
+function verifyPI($input){
+    $retval = " pi ";
+
+    if(!is_null($input)) {
+        $input = strtolower($input);
+        if($input=="h") {
+            $retval = "&#8508;"; // HTML pi symbol
+        }
+    }
+    return $retval;
+}
+
+
 function verifyTickMarks($input) {
     $TickMarks = "";
 
@@ -84,9 +97,15 @@ function verifyTickMarks($input) {
 	return $TickMarks;
 }
 
-function verifySign($input) {
+function verifyEqualSign($input) {
 	if(!is_null($input)) {
-        if($input=="=") { $retval = "="; } else {$retval =  "&#8776;";}  //&#8776; &#x2248; &thickapprox;
+        if($input=="=") {
+            $retval = "=";
+        } elseif($input=="~") {
+            $retval = "~~";
+        } else {
+            $retval =  "&#8776;"; //&#8776; &#x2248; &thickapprox;
+        }
 	}
 	else { $retval = "="; }
 
@@ -161,19 +180,19 @@ function conversionAbbreviations() {
 	if($system=="A"){
 		if($type=="Length"){
 			$retval[0] = "Inches = in";
-			$retval[1] = "Feet (foot) = ft";
-			$retval[2] = "Yard = yd";
-			$retval[3] = "Mile = mi";
+			$retval[1] = "Feet = ft";
+			$retval[2] = "Yards = yd";
+			$retval[3] = "Miles = mi";
         } elseif($type=="Capacity"){
 			$retval[0] = "Fluid ounces = fl oz";
-			$retval[1] = "Cup = c";
-			$retval[2] = "Pint = pt";
-			$retval[3] = "Quart = qt";
-			$retval[4] = "Gallon = gal";
+			$retval[1] = "Cups = c";
+			$retval[2] = "Pints = pt";
+			$retval[3] = "Quarts = qt";
+			$retval[4] = "Gallons = gal";
         } elseif(($type=="Weight")||($type=="Mass")){
 			$retval[0] = "Ounces = oz";
 			$retval[1] = "Pounds = lbs";
-			$retval[2] = "Ton = T";
+			$retval[2] = "Tons = T";
         } elseif($type=="Area"){
 			if($fullname==0) {
                 $retval[0] = "Inches squared = ".conversionUnits2ScreenReader1("","in",2,$tick);
@@ -271,18 +290,18 @@ function conversionAbbreviations() {
         }
 	}
 
-
-	// -------------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------
 	if($system=="T"){
         $retval[0] = "Seconds = sec";
 		$retval[1] = "Minutes = min";
-		$retval[2] = "Hour = hr";
-		$retval[3] = "Day = d";
-		$retval[4] = "Year = yr.";
-		$retval[5] = "Century = c";
+		$retval[2] = "Hours = hr";
+		$retval[3] = "Days = d";
+		$retval[4] = "Years = yr.";
+		$retval[5] = "Centuries = c";
     }
+
 
 	return $retval;
 }
@@ -318,7 +337,7 @@ function conversionArea() {
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
 	$tick = $args[3];
-    $sign = verifySign($args[4]);
+    $sign = verifyEqualSign($args[4]);
 
     $retval = array();
 
@@ -407,7 +426,9 @@ function conversionArea() {
 //            1 = use Full name
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
-//     Sign: use an = or html approximately equal symbol
+//     Sign: = gives you =
+//           ~ gives you ~~
+//          "" gives you html approximately equal symbol
 //
 // Examples
 //
@@ -423,7 +444,7 @@ function conversionCapacity() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-    $sign = verifySign($args[3]);
+    $sign = verifyEqualSign($args[3]);
 
     $retval = array();
 
@@ -644,7 +665,7 @@ function conversionFormulaAbbreviations() {
 	return $retval;
 }
 
-// function conversionFormulaGeometry(type,[tick=y])
+// function conversionFormulaGeometry(type,[tick=y,pi])
 // Returns the Abbreviations to words
 //
 // INPUTS:
@@ -652,8 +673,12 @@ function conversionFormulaAbbreviations() {
 //           "T" = Triangle
 //           "A" = Surface Area
 //           "V" = Volume
+//
+//        pi - blank = the letters pi
+//           - h = the html entity for pi
+//
 function conversionFormulaGeometry() {
-    $PI = "&#8508;";
+
     $args = func_get_args();
 	if (count($args)==0) {
 		$firstPart = "C";  // Circle
@@ -662,6 +687,7 @@ function conversionFormulaGeometry() {
         $firstPart = strtoupper(substr($type, 0, 1));
     }
     $tick = $args[1];
+    $PI = verifyPI($args[2]);
 
     $retval = array();
 
@@ -748,7 +774,9 @@ function conversionFormulaTemperature() {
 //            1 = use Full name
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
-//     Sign: use an = or html approximately equal symbol
+//     Sign: = gives you =
+//           ~ gives you ~~
+//          "" gives you html approximately equal symbol
 //
 // Examples
 //
@@ -764,7 +792,7 @@ function conversionLength() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-    $sign = verifySign($args[3]);
+    $sign = verifyEqualSign($args[3]);
 
     $retval = array();
 
@@ -1106,7 +1134,9 @@ function conversionUnits2ScreenReader2($number1,$units1,$dimensions1,$number2,$u
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
 //     tick: add a tick mark around items with exponents
-//     Sign: use an = or html approximately equal symbol
+//     Sign: = gives you =
+//           ~ gives you ~~
+//          "" gives you html approximately equal symbol
 //
 // Examples
 //
@@ -1123,7 +1153,7 @@ function conversionVolume() {
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
 	$tick = $args[3];
-    $sign = verifySign($args[4]);
+    $sign = verifyEqualSign($args[4]);
 
     $retval = array();
 
@@ -1203,7 +1233,9 @@ function conversionVolume() {
 //            1 = use Full name
 //
 // Rounding: a integer number of digits to round to that is between 2 and 8 and defaults to 2
-//     Sign: use an = or html approximately equal symbol
+//     Sign: = gives you =
+//           ~ gives you ~~
+//          "" gives you html approximately equal symbolsymbol
 //
 // Examples
 //
@@ -1219,13 +1251,13 @@ function conversionWeight() {
 	$system = $args[0];
 	$fullname = verifyFullName($args[1]);
 	$rounding = verifyRounding($args[2]);
-    $sign = verifySign($args[3]);
+    $sign = verifyEqualSign($args[3]);
 
     $retval = array();
 
 	if($system=="A"){
 		if($fullname==0) {
-            $retval[0] = "1 lbs = 16 oz";
+            $retval[0] = "1 lb = 16 oz";
             $retval[1] = "1 T =2000 lbs";
         } else {
             $retval[0] = "1 pound = 16 ounces";
@@ -1272,6 +1304,7 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2021-02-23 ver 15 - updated american length language, update pi symbol to pi, update verify equal sign to =, ~~, or HTML entity, verifypi added
 // 2021-02-20 ver 14 - updated conversionFormulaAbbreviations, conversionFormulaGeometry, length conversion
 // 2021-02-19 ver 13 - updated american weight conversion
 // 2021-02-19 ver 12 - updated conversionUnits2ScreenReader to conversionUnits2ScreenReader1 and conversionUnits2ScreenReader2
