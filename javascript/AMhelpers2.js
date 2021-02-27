@@ -1152,11 +1152,11 @@ function processNumber(origstr, format) {
         str = strs[j];
         if (format.indexOf('units')!=-1) {
             var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
-            if (!str.match(/^\s*(\d+\.?\d*|\.\d+|\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
+            if (!str.match(/^\s*(-?\s*\d+\.?\d*|-?\s*\.\d+|-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
                 err += _('Answer must start with a number. ');
             }
             // strip number
-            str = str.replace(/^\s*(\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+|\d+\.?\d*|\.\d+)\s*[\-\*]?\s*/,'');
+            str = str.replace(/^\s*(-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+|-?\s*\d+\.?\d*|-?\s*\.\d+)\s*[\-\*]?\s*/,'');
             str = str.replace(/\s*\-\s*([a-zA-Z])/g,'*$1');
             str = str.replace(/\*\*/g,'^');
             str = str.replace(/\s*(\/|\^|\-)\s*/g,'$1');
