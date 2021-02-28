@@ -66,26 +66,26 @@ function formpolyfromroots($a,$roots,$mult=1) {
 //showzeros:  optional, defaults to false.  If true, shows zero coefficients
 function writepoly($poly,$var="x",$sz=false) {
 	$po = '';
-	$first = true;
-	for ($i=0;$i<count($poly);$i++) {
-		if (!$sz && $poly[$i][0]==0) {continue;}
+    $first = true;
+    foreach ($poly as $p) {
+		if (!$sz && $p[0]==0) {continue;}
 		if (!$first) {
-			if ($poly[$i][0]<0) {
+			if ($p[0]<0) {
 				$po .= ' - ';
 			} else {
 				$po .= ' + ';
 			}
 		} else {
-			if ($poly[$i][0]<0) {
+			if ($p[0]<0) {
 				$po .= ' - ';
 			}
 		}
-		if (abs($poly[$i][0])!=1 || $poly[$i][1]==0) {
-			$po .= abs($poly[$i][0]);
+		if (abs($p[0])!=1 || $p[1]==0) {
+			$po .= abs($p[0]);
 		}
-		if ($poly[$i][1]>1) {
-			$po .= " $var^". $poly[$i][1];
-		} else if ($poly[$i][1]>0) {
+		if ($p[1]>1) {
+			$po .= " $var^". $p[1];
+		} else if ($p[1]>0) {
 			$po .= " $var";
 		}
 		$first = false;
@@ -274,7 +274,7 @@ function derivepoly($p) {
 		$out[$i] = array();
 		$out[$i][0] = $p[$i][0]*$p[$i][1];
 		$out[$i][1] = $p[$i][1]-1;
-	}
+    }
 	return $out;
 }
 
