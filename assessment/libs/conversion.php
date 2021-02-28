@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 16;
+	return 17;
 }
 
 global $allowedmacros;
@@ -483,11 +483,11 @@ function conversionCapacity() {
             $retval[3] = "1 qt $sign ".round(0.946352946, $rounding)." L";
 			$retval[4] = "1 gal $sign ".round(3.78541178, $rounding)." L";
         } else {
-			$retval[0] = "1 fluid ounces $sign ".round(0.0295735296, $rounding)._('Liter');  // 29.5735296 mL  https://www.wolframalpha.com/input/?i=convert+1+fluid+ounce+to+liters
-            $retval[1] = "1 cup $sign ".round(0.236588236, $rounding)._('Liter');  // 236.588236 mL  https://www.wolframalpha.com/input/?i=convert+1+cup+to+liters
-            $retval[2] = "1 pint $sign ".round(0.473176473, $rounding)._('Liter');  // 473.176473 mL  https://www.wolframalpha.com/input/?i=convert+1+pint+to+liters
-            $retval[3] = "1 quart $sign ".round(0.946352946, $rounding)._('Liter');   // 946.352946 mL https://www.wolframalpha.com/input/?i=convert+1+quart+to+liters
-			$retval[4] = "1 gallon $sign ".round(3.78541178, $rounding)._('Liter');  // 3.78541178 L https://www.wolframalpha.com/input/?i=convert+1+gallon+to+milliliters
+			$retval[0] = "1 fluid ounces $sign ".round(0.0295735296, $rounding)." "._('Liter');  // 29.5735296 mL  https://www.wolframalpha.com/input/?i=convert+1+fluid+ounce+to+liters
+            $retval[1] = "1 cup $sign ".round(0.236588236, $rounding)." "._('Liter');  // 236.588236 mL  https://www.wolframalpha.com/input/?i=convert+1+cup+to+liters
+            $retval[2] = "1 pint $sign ".round(0.473176473, $rounding)." "._('Liter');  // 473.176473 mL  https://www.wolframalpha.com/input/?i=convert+1+pint+to+liters
+            $retval[3] = "1 quart $sign ".round(0.946352946, $rounding)." "._('Liter');   // 946.352946 mL https://www.wolframalpha.com/input/?i=convert+1+quart+to+liters
+			$retval[4] = "1 gallon $sign ".round(3.78541178, $rounding)." "._('Liter');  // 3.78541178 L https://www.wolframalpha.com/input/?i=convert+1+gallon+to+milliliters
         }
 	} elseif($system=="MA"){
 		if($fullname==0) {
@@ -744,7 +744,7 @@ function conversionFormulaGeometry() {
     return $retval;
 }
 
-// function conversionFormulaTemperature(type)
+// function conversionFormulaTemperature(type[,tick])
 // Returns the Abbreviations to words
 //
 // INPUTS:
@@ -764,6 +764,8 @@ function conversionFormulaTemperature() {
         $FirstLetter = strtoupper(substr($type, 0, 1));
     }
 
+    $tick = verifyTickMarks($args[1]);
+
 	if($FirstLetter=="C") {$type="Celsius";}
     if($FirstLetter=="F") {$type="Fahrenheit";}
 	if($FirstLetter=="K") {$type="Kelvin";}
@@ -771,14 +773,14 @@ function conversionFormulaTemperature() {
     $retval = array();
 
 	if ($type == "Kelvin") {
-        $retval[0] = "K=C+273.15";
-        $retval[1] = "K=5/9(F-32)+273.15";
+        $retval[0] = "{$tick}K=C+273.15{$tick}";
+        $retval[1] = "{$tick}K=5/9(F-32)+273.15{$tick}";
     } elseif($type == "Fahrenheit") {
-        $retval[0] =  "F=9/5C+32";
-        $retval[1] =  "F=9/5(K-273.15)+32";
+        $retval[0] =  "{$tick}F=9/5C+32{$tick}";
+        $retval[1] =  "{$tick}F=9/5(K-273.15)+32{$tick}";
     } else {
-        $retval[0] =  "C=(5/9)(F-32)";
-        $retval[1] =  "C=K-273.15";
+        $retval[0] =  "{$tick}C=(5/9)(F-32){$tick}";
+        $retval[1] =  "{$tick}C=K-273.15{$tick}";
     }
 
     return $retval;
@@ -855,8 +857,8 @@ function conversionLength() {
             $retval[3] = "1 mi $sign ".round(1.60934400, $rounding)." km";// 1.60934400 km https://www.wolframalpha.com/input/?i=convert+1+mile+to+m
         } else {
 			$retval[0] = "1 inch $sign ".round(2.54, $rounding)." centi"._('meter');
-            $retval[1] = "1 foot $sign ".round(0.3048, $rounding)._('meter');
-            $retval[2] = "1 yard $sign ".round(0.9144, $rounding)._('meter');
+            $retval[1] = "1 foot $sign ".round(0.3048, $rounding)." "._('meter');
+            $retval[2] = "1 yard $sign ".round(0.9144, $rounding)." "._('meter');
             $retval[3] = "1 mile $sign ".round(1.60934400, $rounding)." kilo"._('meter');
         }
 	} elseif($system=="MA"){
@@ -1309,7 +1311,7 @@ function conversionWeight() {
 			$retval[0] = "1 oz $sign ".round(28.3495231, $rounding)." g";    // 0.0283495231 kg https://www.wolframalpha.com/input/?i=convert+1+ounce+to+gram
             $retval[1] = "1 lbs $sign ".round(0.453592370, $rounding)." kg"; // 0.453592370 kg https://www.wolframalpha.com/input/?i=convert+1+pound+to+gram
         } else {
-			$retval[0] = "1 ounces $sign ".round(28.3495231, $rounding)._('gram');
+			$retval[0] = "1 ounces $sign ".round(28.3495231, $rounding)." "._('gram');
             $retval[1] = "1 pound $sign ".round(0.453592370, $rounding)." kilo"._('gram');;
         }
 	} elseif($system=="MA"){
@@ -1327,6 +1329,7 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2021-02-26 ver 17 - fixed conversionLength, conversionCapacity, and conversionWeight missing spaces
 // 2021-02-26 ver 16 - added rectangle and square to conversionFormulaGeometry and conversionFormulaAbbreviations, typo in conversionVolume
 // 2021-02-23 ver 15 - updated american length language, update pi symbol to pi, update verify equal sign to =, ~~, or HTML entity, verifypi added
 // 2021-02-20 ver 14 - updated conversionFormulaAbbreviations, conversionFormulaGeometry, length conversion
