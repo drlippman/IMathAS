@@ -702,7 +702,7 @@ function normalizemathunicode($str) {
     $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
 	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
     $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
-	$str = preg_replace('/\bOO\b/i','oo', $str);
+	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
   if (strtoupper(trim($str))==='DNE') {
     $str = 'DNE';
   }

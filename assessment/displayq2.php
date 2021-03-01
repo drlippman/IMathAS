@@ -4655,7 +4655,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$givenans = normalizemathunicode($givenans);
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
-
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
 		}
@@ -8237,7 +8236,7 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
 	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
 	$str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
-	$str = preg_replace('/\bOO\b/i','oo', $str);
+	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
 	return $str;
 }
 
