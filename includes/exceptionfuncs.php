@@ -267,6 +267,8 @@ class ExceptionFuncs {
         */
         if ($now>$adata['enddate'] && $adata['allowlate']>10) { //after due date and allows use after due date
             $latepassesNeededToExtend = $this->calcLPneeded($adata['enddate']);
+        } else {
+            $latepassesNeededToExtend = 1;
         }
         // determine reason for blocking
         if ($adata['allowlate'] == 0) {
