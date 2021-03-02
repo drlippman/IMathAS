@@ -1790,7 +1790,7 @@ function gbinstrdisp() {
 						} else if ($gbt[$i][1][$j][3]==5) {
 							echo ' (UA)';
 						} else if ($gbt[$i][1][$j][3]==3) {
-							echo ' (OT)';
+							// echo ' (OT)';
 						} else if ($gbt[$i][1][$j][3]==4) {
 							echo ' (PT)';
 						}
