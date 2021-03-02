@@ -3336,8 +3336,9 @@ A student is asked to enter a string (a word or list of letters).
 <dt>$answerformat = "list" </dt>
 	<dd>Specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with
 	partial_credit flag.  Duplicates are not ignored.</dd>
-<dt>$displayformat = "usepreview" or "typeahead"</dt>
-	<dd>"usepreview" adds a preview button for previewing mathematical answers.<br/>
+<dt>$displayformat = "usepreview" or "typeahead" or "usepreviewnomq"</dt>
+    <dd>"usepreview" enables mathquill entry for mathematical answers.<br/>
+        "usepreviewnomq" adds a preview button for previewing mathematical answers in asciimath.<br/>
 	"typeahead" will enable an auto-suggest list of options once the student has typed at least
 	two letters of the word.  Provide the auto-suggest list in the variable $questions.
 	</dd>

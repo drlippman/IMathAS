@@ -112,7 +112,7 @@ class StringAnswerBox implements AnswerBox
     			if ($useeqnhelper && $displayformat == 'usepreview') {
     				$params['helper'] = 1;
     			}
-                if (!isset($hidepreview) && $displayformat == 'usepreview') {
+                if (!isset($hidepreview) && ($displayformat == 'usepreview' || $displayformat == 'usepreviewnomq')) {
                     $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
                 }
 
@@ -148,7 +148,7 @@ class StringAnswerBox implements AnswerBox
     							'class="'.implode(' ', $classes) .
     							'" />';
 
-    			if ($displayformat == 'usepreview') {
+    			if ($displayformat == 'usepreview' || $displayformat == 'usepreviewnomq') {
                     $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
                     $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
                     $preview .= '</button> &nbsp;';
