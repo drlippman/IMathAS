@@ -179,6 +179,7 @@ class QuestionHtmlGenerator
         }
 
         // Use this question's RNG seed.
+        $currentseed = $this->questionParams->getQuestionSeed();
         $this->randWrapper->srand($this->questionParams->getQuestionSeed());
 
         // Eval the question writer's question code.

@@ -135,6 +135,7 @@ class ScoreEngine
         $qnidx = $scoreQuestionParams->getQuestionNumber();
         $attemptn = $scoreQuestionParams->getAttemptNumber();
         $thisq = $scoreQuestionParams->getQuestionNumber() + 1;
+        $currentseed = $scoreQuestionParams->getQuestionSeed();
         try {
           eval(interpret('control', $quesData['qtype'], $quesData['control']));
           $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
