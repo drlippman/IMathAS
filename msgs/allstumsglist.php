@@ -128,7 +128,7 @@ function chgfilter() {
 	}
 	echo ">All students</option>";
 	$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName FROM imas_users,imas_students WHERE ";
-	$query .= "imas_students.userid=imas_users.id AND imas_students.courseid=:courseid";
+	$query .= "imas_students.userid=imas_users.id AND imas_students.courseid=:courseid ORDER BY imas_users.LastName,imas_users.FirstName";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
 	$stulist = array();
@@ -164,7 +164,7 @@ function chgfilter() {
 	$query .= "FROM imas_msgs,imas_courses WHERE imas_courses.id=imas_msgs.courseid AND ";
 	$query .= "imas_msgs.deleted<2 AND imas_msgs.courseid=:courseid ";
 	if ($filterstu>0) {
-		$query .= "AND imas_msgs.msgto=:msgto";
+		$query .= "AND imas_msgs.msgto=:msgto ";
 	}
 	$query .= "ORDER BY senddate DESC LIMIT $offset,$threadsperpage";// these are INT vals
 	$stm = $DBH->prepare($query);
@@ -186,13 +186,13 @@ function chgfilter() {
 			$n++;
 		}
 		if ($n==1) {
-			$line['title'] = 'Re: '.$line['title'];
+			$line['title'] = 'Re: '.Sanitize::encodeStringForDisplay($line['title']);
 		} else if ($n>1) {
-			$line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+			$line['title'] = "Re<sup>$n</sup>: ".Sanitize::encodeStringForDisplay($line['title']);
 		}
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"" . Sanitize::onlyInt($line['id']) . "\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page" . Sanitize::onlyInt($page) . "&cid=$cid&filterstu=" . Sanitize::encodeStringForDisplay($filterstu) . "&type=msg&msgid=" . Sanitize::onlyInt($line['id']) . "&type=allstu\">";
-		echo Sanitize::encodeStringForDisplay($line['title']);
+		echo $line['title']; // sanitized above
 		echo "</a></td><td>";
 		echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
 		echo "</td><td>" . Sanitize::encodeStringForDisplay($stulist[$line['msgto']]) . "</td>";
