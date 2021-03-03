@@ -423,7 +423,8 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '</select>';
 	echo '<input type="Submit" value="'._('Make Placement').'"/>';
 	echo "<p>".sprintf(_('If you want to create new assessments, log directly into %s'),$installname)."</p>";
-	echo "<p>".sprintf(_("If your LMS course is linked with the wrong course on %s, "),$installname);
+    echo "<p>".sprintf(_('Your LMS course is currently linked with %s course ID %d. '),$installname, $cid);
+    echo sprintf(_("If your LMS course is linked with the wrong course on %s, "),$installname);
 	echo '<a href="ltihome.php?chgcourselink=true" onclick="return confirm(\''._('Are you SURE you want to do this? This may break existing placements.').'\');">'._('Change course link').'</a></p>';
 	echo '</form>';
 } else if ($placementtype=='course') {
