@@ -36,14 +36,15 @@ if (!empty(trim($_POST[$lms.'_issuer'])) &&
             $_POST['canvas_'.$key] = str_replace('canvas.', 'canvas.'.$_POST['canvasenv'].'.', $_POST['canvas_'.$key]);
         }
     }
-  $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url,uniqid) VALUES (?,?,?,?,?,?)");
+  $stm = $DBH->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url,uniqid,created_by) VALUES (?,?,?,?,?,?,?)");
   $stm->execute(array(
     trim($_POST[$lms.'_issuer']),
     trim($_POST[$lms.'_clientid']),
     trim($_POST[$lms.'_authurl']),
     trim($_POST[$lms.'_tokenurl']),
     trim($_POST[$lms.'_keyseturl']),
-    trim($_POST[$lms.'_uniqid'])
+    trim($_POST[$lms.'_uniqid']),
+    $userid
   ));
   header('Location: ' . $basesiteurl . "/lti/admin/platforms.php");
   exit;
@@ -57,12 +58,13 @@ $query = "SELECT ip.id,ip.issuer,ip.client_id,ip.created_at,
   LEFT JOIN imas_lti_groupassoc AS iga ON iga.deploymentid=id.id
   LEFT JOIN imas_groups AS ig ON iga.groupid=ig.id ";
 if ($myrights < 100) {
-    $query .= 'WHERE iga.groupid=? ';
+    $query .= 'LEFT JOIN imas_users AS iu ON iu.id=ip.created_by ';
+    $query .= 'WHERE iga.groupid=? OR iu.groupid=?';
 }
 $query .= "GROUP BY ip.id ORDER BY ip.issuer,ip.created_at";
 if ($myrights < 100) {
     $stm = $DBH->prepare($query);
-    $stm->execute(array($groupid));
+    $stm->execute(array($groupid,$groupid));
 } else {
     $stm = $DBH->query($query);
 }
@@ -338,7 +340,7 @@ echo '<input type="hidden" name=moodle_uniqid value="" />';
 echo '<button type=submit>'._('Add Platform').'</button></p>';
 echo '</div>';
 if ($myrights < 100) {
-    echo '<p>'._('Note: Platforms are not associated with a group until the first launch from the LMS, so your added platform may not display here until that happens.').'</p>';
+    echo '<p>'._('Note: Platforms are not associated with a group until the first launch from the LMS, so your added platform may not show your group name here until that happens.').'</p>';
 }
 
 echo '</form>';
