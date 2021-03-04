@@ -708,7 +708,10 @@ function addlabel($plot,$x,$y,$lbl) {
 	}
 	if ($_SESSION['graphdisp']==0) {
 		return $plot .= "Label &quot;$lbl&quot; at ($x,$y). ";
-	}
+    }
+    $lbl = str_replace("'",'&apos;',$lbl);
+    $lbl = str_replace('"','\\"',$lbl);
+
 	if (func_num_args()>6) {
 		$loc = func_get_arg(5);
 		$angle = func_get_arg(6);
@@ -729,7 +732,9 @@ function addlabelabs($plot,$x,$y,$lbl) {
 	}
 	if ($_SESSION['graphdisp']==0) {
 		return $plot .= "Label &quot;$lbl&quot; at pixel coordinates ($x,$y).";
-	}
+    }
+    $lbl = str_replace("'",'&apos;',$lbl);
+    $lbl = str_replace('"','\\"',$lbl);
 	if (func_num_args()>6) {
 		$loc = func_get_arg(5);
 		$angle = func_get_arg(6);
