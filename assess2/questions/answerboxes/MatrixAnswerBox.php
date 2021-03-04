@@ -111,8 +111,10 @@ class MatrixAnswerBox implements AnswerBox
           } else {
             $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
           }
+          $out .= "<span id=p$qn></span>";
           $out .= "</div>\n";
           $params['matrixsize'] = $answersize;
+          $params['calcformat'] = 'decimal';
           $params['tip'] = $shorttip;
           $params['longtip'] = $tip;
     		} else {

@@ -152,7 +152,10 @@ function init(paramarr, enableMQ, baseel) {
           showSyntaxCheckMQ(qn);
         }
         //document.getElementById("pbtn"+qn).style.display = 'none';
-      } //TODO: when matrix, clear preview on further input
+      }  //TODO: when matrix, clear preview on further input
+    } else if (params.matrixsize) {
+        $("input[id^=qn"+qn+"-]").on('input', (function(thisqn) { 
+          return function () {syntaxCheckMQ(thisqn) }; })(qn));
     } else if (document.getElementById("qn"+qn)) {
         document.getElementById("qn"+qn).addEventListener('keyup', (function(thisqn) { 
             return function () {syntaxCheckMQ(thisqn) }; })(qn));
@@ -823,7 +826,7 @@ var MQsyntaxtimer = null;
  */
 function syntaxCheckMQ(id, str) {
   clearTimeout(MQsyntaxtimer);
-  var qn = parseInt(id.replace(/\D/g,''));
+  var qn = parseInt(id.replace(/.*qn(\d+)\b.*/g,'$1'));
   MQsyntaxtimer = setTimeout(function() { showSyntaxCheckMQ(qn);}, 1000);
 }
 
@@ -848,7 +851,11 @@ function showSyntaxCheckMQ(qn) {
         previewel.innerHTML = outstr;
     }
   }
-  a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
+  if (document.getElementById("qn"+qn)) {
+    a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
+  } else {
+    a11ypreview(outstr);
+  }
 }
 
 /**
@@ -1447,8 +1454,10 @@ function processSizedMatrix(qn) {
     for (var col=0; col<size[1]; col++) {
       str = document.getElementById('qn' + qn + '-' + count).value;
       str = normalizemathunicode(str);
-      err += syntaxcheckexpr(str,format);
-      err += singlevalsyntaxcheck(str,format);
+      if (str !== '') {
+        err += syntaxcheckexpr(str,format);
+        err += singlevalsyntaxcheck(str,format);
+      }
       out[row][col] = str;
       res = singlevaleval(str, format);
       err += res[1];
