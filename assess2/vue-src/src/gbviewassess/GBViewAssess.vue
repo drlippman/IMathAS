@@ -697,9 +697,12 @@ export default {
       window.location = url;
     },
     showAllAns () {
-      window.$("span[id^='ans']").removeClass('hidden').show();
+      window.$('span[id^=ans]').toggleClass('hidden', false).show();
       window.$('.sabtn').replaceWith('<span>Answer: </span>');
       window.$('.keybtn').attr('aria-expanded', 'true');
+      window.$('div[id^=dsbox]').toggleClass('hidden', false).attr('aria-hidden', false)
+        .attr('aria-expanded', true);
+      window.$('input[aria-controls^=dsbox]').attr('aria-expanded', true);
     },
     beforeUnload (evt) {
       if (Object.keys(store.scoreOverrides).length > 0 ||
