@@ -880,9 +880,17 @@ class AssessInfo
     if ($this->assessData['displaymethod'] != 'video_cued') {
       $this->assessData['displaymethod'] = 'skip';
     }
+    if ($this->assessData['ansingb'] == 'never') {
+        $newshowans = 'never';
+    } else {
+        $newshowans = 'after_n';
+    }
     $this->assessData['submitby'] = 'by_question';
     $this->assessData['showscores'] = 'during';
-    $this->assessData['showans'] = 'with_score';
+    $this->assessData['showans'] = $newshowans;
+    if ($newshowans == 'after_n') {
+        $this->assessData['showans_aftern'] = 1;
+    }
     $this->assessData['deftries'] = 999; // unlimited
     $this->assessData['defregens'] = 999; // unlimited
     $this->assessData['shuffle'] &= ~4;  // disable "all stu same version"
@@ -893,7 +901,10 @@ class AssessInfo
       $this->questionData[$i]['tries_max'] = 999; // unlimited
       $this->questionData[$i]['regens_max'] = 999; // unlimited
       $this->questionData[$i]['retry_penalty'] = 0;
-      $this->questionData[$i]['showans'] = 'with_score';
+      $this->questionData[$i]['showans'] = $newshowans;
+      if ($newshowans == 'after_n') {
+        $this->questionData[$i]['showans_aftern'] = 1;
+      }
     }
   }
 
