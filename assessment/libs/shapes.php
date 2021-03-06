@@ -19,7 +19,7 @@ array_push($allowedmacros,"draw_angle","draw_circle","draw_circlesector","draw_s
 // "axes" Draws xy axes.
 
 function draw_angle() {
-  $degSymbol = "&deg;";
+  
   $input = func_get_args();
   $argsArray = [];
   foreach ($input as $list) {
@@ -28,6 +28,9 @@ function draw_angle() {
     }
     $list = array_map('trim', $list);
     $argsArray[]=$list;
+  }
+  if (isset($argsArray[0][1])) {
+    $degSymbol = "&deg;";
   }
   $size = 300;
   foreach ($argsArray as $in) {
@@ -79,14 +82,16 @@ function draw_angle() {
     } 
     [$xLabLoc,$yLabLoc] = [$labFact*cos(($halfAngle+$rot+$moveAxis)*M_PI/180),$labFact*sin(($halfAngle+$rot+$moveAxis)*M_PI/180)];
   }
-  
+  $altAngleLab = $lab;
   $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
   $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
+  $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi",""];
   if (!empty($lab)) {
     for ($j=0;$j<count($greekSpelled);$j++) {
       if (preg_match($greekSpelled[$j],$lab)) {
         $degSymbol = '';
         $lab = preg_replace($greekSpelled[$j],$greekSymbol[$j],$lab);
+        $altAngleLab = preg_replace($greekSpelled[$j],$altGreekSymbol[$j],$altAngleLab);
       }
     }  
   }
@@ -118,8 +123,66 @@ function draw_angle() {
     $args = $args.$sectorArc.$arc;
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.1,1.1,-1.1,1.1);$args",$size,$size);
+  // Build alt text
+  $angRef = abs($ang)%360;
+  $angTurns = floor(abs($ang)/360);
+  if ($angTurns > 0) {
+    $altAnother = " an additional";
+    if ($angRef > 270 && $angRef < 360) {
+      $altAnother = " additional";
+    }
+  }
+  if ($angRef == 0 && $angTurns == 0) {
+    $altRefLabel = " with zero rotation";
+  }
+  elseif ($angRef > 0 && $angRef < 90) {
+    $altRefLabel = " less than one quarter of".$altAnother." rotation";
+  }
+  elseif ($angRef == 90) {
+    $altRefLabel = " one quarter of".$altAnother." rotation";
+  }
+  elseif ($angRef > 90 && $angRef < 180) {
+    $altRefLabel = " between one quarter and one half of".$altAnother." rotation";
+  }
+  elseif ($angRef == 180) {
+    $altRefLabel = " one half of".$altAnother." rotation";
+  }
+  elseif ($angRef > 180 && $angRef < 270) {
+    $altRefLabel = " between one half and three quarters of".$altAnother." rotation";
+  }
+  elseif ($angRef == 270) {
+    $altRefLabel = " three quarters of".$altAnother." rotation";
+  }
+  elseif ($angRef > 270 && $angRef < 360) {
+    $altRefLabel = " between three quarters and one".$altAnother." full rotation";
+  }
   
+  if (abs($angTurns) > 0) {
+    if ($angRef > 0) {
+      $altTurnsAnd = " and also ";
+    }
+    $howManyTurns = "rotation" . $altTurnsAnd;
+    if (abs($angTurns) > 1) {
+      $howManyTurns = "rotations" . $altTurnsAnd;
+    }
+    $altTurnsLabel = " ".numtowords($angTurns)." complete ".$howManyTurns;
+  }
+  if ($degSymbol == "&deg;") {
+    $altDegSymbol = "degrees";
+  }
+  
+  if ($ang > 0) {
+    $direction = " turned counterclockwise";
+  } elseif ($ang < 0) {
+    $direction = " turned clockwise";
+  }
+  if (isset($argsArray[0][1])) {
+    $altLabel = ", and labeled $altAngleLab $altDegSymbol";
+  }
+
+  $alt = "An angle".$direction.$altTurnsLabel.$altRefLabel.$altLabel.".";
+  $gr = showasciisvg("setBorder(5);initPicture(-1.1,1.1,-1.1,1.1);$args",$size,$size,"$alt");
+  echo $alt;
   return $gr;
 }
 
@@ -143,6 +206,10 @@ function draw_circle() {
   $degSymbol = "&deg;";
   $input = func_get_args();
   $argsArray = [];
+  $hasPoint = [];
+  $altAngForPt = [];
+  $hasPointLabel = [];
+  $altPointLab = [];
   foreach ($input as $list) {
     if (!is_array($list)) {
       $list = listtoarray($list);
@@ -161,13 +228,16 @@ function draw_circle() {
       $ang = $in[1];
     }
     if (in_array("axes",$in)) {
+      $hasAxes = true;
       $args = $args . "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
     }
   }
   foreach ($argsArray as $key => $in) {
     if ($in[0]=="center") {
+      $hasCenter = true;
       $lab = "";
       if (isset($in[1]) && $ang !== 0) {
+        $hasCenterLabel = true;
         if ($ang <= 180) {
           $xCentLab = 0.2*cos(M_PI*225/180);
           $yCentLab = 0.2*sin(M_PI*225/180);
@@ -179,31 +249,40 @@ function draw_circle() {
           $yCentLab = 0.15*sin(M_PI*225/180);
         }
         $in[1] = str_replace(';',',',$in[1]);
-        $lab = "text([$xCentLab,$yCentLab],'".$in[1]."');";
+        $centerLab = $in[1];
+        $lab = "text([$xCentLab,$yCentLab],'".$centerLab."');";
       }
       $args = $args."dot([0,0]);".$lab;
     }
     
     if ($in[0]=="radius") {
+      $hasRadius = true;
       $lab = "";
       if (isset($in[1])) {
+        $hasRadiusLabel = true;
+        $radiusLab = $in[1];
         if ($angleBlock === true) {
-          $lab = "text([0.5,0],'".$in[1]."',above);";
+          $lab = "text([0.5,0],'".$radiusLab."',above);";
         } elseif ($angleBlock !== true) {
-          $lab = "text([0.5,0],'".$in[1]."',below);";
+          $lab = "text([0.5,0],'".$radiusLab."',below);";
         }
       }
       $args = $args."line([0,0],[1,0]);".$lab;
     }
     
     if ($in[0]=="diameter") {
+      $hasDiameter = true;
       if (!isset($in[1])) {
         $in[1] = '';
+      } elseif (isset($in[1])) {
+        $hasDiameterLabel = true;
+        $diameterLab = $in[1];
       }
-      $args = $args."line([-1,0],[1,0]);text([0,0],'$in[1]',below);";
+      $args = $args."line([-1,0],[1,0]);text([0,0],'$diameterLab',below);";
     }
     
     if ($in[0]=="angle") {
+      $hasAngle = true;
       $angleKey = $key;
       $lab = "";
       if (!isset($in[1])) {
@@ -216,6 +295,7 @@ function draw_circle() {
           return '';
         }
         $ang = $in[1];
+        $angArray[] = $ang;
         $x = cos(M_PI*$ang/180);
         $y = sin(M_PI*$ang/180);
         if ($ang>360) {
@@ -230,16 +310,20 @@ function draw_circle() {
         $args = $args.$arc;
         
         if (isset($in[2])) {
+          $hasAngleLabel = true;
           $angLab = $in[2];
-          $greekSpelled = ["/alpha/","/beta/","/gamma/","/theta/","/phi/","/tau/","/pi/","/rad/"];
+          $altAngleLab = $in[2];
+          $greekSpelled = ["/\s?alpha/","/\sbeta/","/\s?gamma/","/\s?theta/","/\s?phi/","/\s?tau/","/\s?pi/","/\s?rad/"];
           $greekSymbol = ["&alpha;","&beta;","&gamma;","&theta;","&phi;","&tau;","&pi;",""];
+          $altGreekSymbol = [" alpha"," beta"," gamma"," theta"," phi"," tau"," pi",""];
           if (!empty($angLab)) {
             for ($j=0;$j<count($greekSpelled);$j++) {
               if (preg_match($greekSpelled[$j],$angLab)) {
                 $degSymbol = '';
                 $angLab = preg_replace($greekSpelled[$j],$greekSymbol[$j],$angLab);
+                $altAngleLab = preg_replace($greekSpelled[$j],$altGreekSymbol[$j],$altAngleLab);
               }
-            }  
+            }
           }
           
           // draw angle label
@@ -265,6 +349,8 @@ function draw_circle() {
       $args = $args."line([0,0],[1,0]);line([0,0],[$x,$y]);";
     }
     if ($in[0]=="point") {
+      $numPts += 1;
+      $hasPoint[] = true;
       if (!isset($in[1])) {
         echo 'Warning! "point" must be followed by an angle in degrees.';
       }
@@ -274,13 +360,16 @@ function draw_circle() {
           return '';
         }
         $angForPt = $in[1];
+        $altAngForPt[] = $in[1];
         $xPtLoc = cos(M_PI*$angForPt/180);
         $yPtLoc = sin(M_PI*$angForPt/180);
         $args = $args."dot([$xPtLoc,$yPtLoc]);";
       }
       $minDiff = 7;
       if (isset($in[2])) {
+        $hasPointLabel[] = true;
         $in[2] = str_replace(';',',',$in[2]);
+        $altPointLab[] = $in[2];
         if (abs($angForPt%360) < $minDiff || abs($angForPt%360-360) < $minDiff) {
           if ($angForPt%360 < 2*$minDiff) {
             $rotAng = 5;
@@ -309,11 +398,108 @@ function draw_circle() {
         $xLabLoc = 1.25*cos(M_PI*($angForPt+$rotAng)/180);
         $yLabLoc = 1.25*sin(M_PI*($angForPt+$rotAng)/180);
         $args = $args . "text([$xLabLoc,$yLabLoc],'$in[2]');";
+      } elseif (!isset($in[2])) {
+        $altPointLab[] = '';
+        $hasPointLabel[] = false;
       }
     }
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size);
+  // Build alt text
+  $altAnd = ", and";
+  $unlabeled = " unlabeled";
+  if ($degSymbol == "&deg;") {
+    $altDegSymbol = " degrees";
+  }
+  if ($hasAxes === true) {
+    $altAxes = " centered at the origin of the coordinate axes";
+    $hasAnd = true;
+  }
+  if ($hasCenter === true) {
+    if ($hasCenterLabel === true) {
+      $unlabeled = "";
+    }
+    $altCenter = " with$unlabeled center point";
+    if ($hasAnd === true) {
+      $altCenter = $altAnd.$altCenter;
+    }
+    $hasAnd = true;
+  }
+  if ($hasCenterLabel === true) {
+    $altCenterLabel = " labeled $centerLab";
+  }
+  if ($hasRadius === true) {
+    $unlabeled = " unlabeled";
+    if ($hasRadiusLabel === true) {
+      $unlabeled = "";
+    }
+    $altRadius = $andCenter." with$unlabeled radius drawn from the center to the right";
+    if ($hasAnd === true) {
+      $altRadius = $altAnd.$altRadius;
+    }
+    $hasAnd = true;
+  }
+  if ($hasRadiusLabel === true) {
+    $altRadiusLabel = " labeled $radiusLab";
+  }
+  if ($hasDiameter === true) {
+    $unlabeled = " unlabeled";
+    if ($hasDiameterLabel === true) {
+      $unlabeled = "";
+    }
+    $altDiameter = $andRadius." with$unlabeled diameter drawn horizontally";
+    if ($hasAnd === true) {
+      $altDiameter = $altAnd.$altDiameter;
+    }
+    $hasAnd = true;
+  }
+  if ($hasDiameterLabel === true) {
+    $altDiameterLabel = " labeled $diameterLab";
+  }
+  if ($hasAngle === true) {
+    $unlabeled = " unlabeled";
+    $quadrant = ["pointed directly to the right with zero rotation","less than one quarter of a rotation counterclockwise from the right","equal to one quarter of a rotation counterclockwise from the right","between one quarter and one half of a rotation counterclockwise from the right","equal to one half of a rotation counterclockwise from the right","between one half and three quarters of a rotation counterclockwise from the right","equal to three quarters of a rotation counterclockwise from the right","between three quarters and one full rotation counterclockwise from the right","of one full rotation counterclockwise from the right"];
+    $altAngleIndex = 2*ceil(($ang%360)/90) - ceil(($ang%90-(1E-9))/90);
+    $altAngleQuadrant = $quadrant[$altAngleIndex];
+    
+    if ($hasAngleLabel === true) {
+      $unlabeled = "";
+    }
+    
+    $altAngle = " with$unlabeled angle $altAngleQuadrant";
+    if ($hasAnd === true) {
+      $altAngle = $altAnd.$altAngle;
+    }
+    $hasAnd = true;
+  }
+  if ($hasAngleLabel === true) {
+    $altAngleLabel = " labeled $altAngleLab$altDegSymbol";
+  }
+
+  for ($i=0;$i<$numPts;$i++) {
+    
+    $unlabeled = " unlabeled";
+    $quadrant = [" on the circle at far right"," on the circle in the top-right quarter"," on the circle at the top"," on the circle in the top-left quarter"," on the circle at far left"," on the circle in bottom-left quarter"," on the circle at bottom"," on the circle in bottom-right quarter"];
+    $altPointAngleIndex = 2*ceil(($altAngForPt[$i]%360)/90) - ceil(($altAngForPt[$i]%90-(1E-9))/90);
+    $altPointAngleQuadrant = $quadrant[$altPointAngleIndex];
+    if ($hasPointLabel[$i] === true) {
+      $unlabeled = "";
+    }
+    $altPoint = " with$unlabeled point$altPointAngleQuadrant";
+    if ($hasAnd === true) {
+      $altPoint = $altAnd.$altPoint;
+    }
+    $hasAnd = true;
+    $altPointLabel = '';
+    if ($hasPointLabel[$i] === true) {
+      $altPointLabel = " labeled $altPointLab[$i]";
+    }
+    $altPointAndLabel = $altPointAndLabel.$altPoint.$altPointLabel;
+  }
+
+  $alt = "A circle".$altAxes.$altCenter.$altCenterLabel.$altRadius.$altRadiusLabel.$altDiameter.$altDiameterLabel.$altAngle.$altAngleLabel.$altPointAndLabel.".";
+  echo $alt;
+  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,"$alt");
   return $gr;
 }
 
@@ -380,6 +566,7 @@ function draw_circlesector() {
     }
     
     if (in_array("axes",$in)) {
+      $hasAxes = true;
       $args = $args . "stroke='grey';line([-1.3,0],[1.3,0]);line([0,-1.3],[0,1.3]);stroke='black';";
     }
     
@@ -397,9 +584,13 @@ function draw_circlesector() {
       }
       $in[2] = preg_replace('/;/',',',$in[2]);
       $args = $args . "text([".(1.2*$xAngPt).",".(1.2*$yAngPt)."],'$in[2]');";
+      $hasPoint = true;
+      $altNumPts = $altNumPts + 1;
+      $altPtsArray[] = [$angPt,$in[2]];
     }
     
     if ($in[0]=="center") {
+      $hasCenter = true;
       $centerKey = $key;
       $in = preg_replace('/;/',',',$in);
       if (!isset($in[1])) {
@@ -511,7 +702,56 @@ function draw_circlesector() {
     }
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture($minxyDisp,1.35,$minxyDisp,1.35);$args",$size,$size);
+  // Build alt text
+  
+  $altNumPts = $altNumPts + 1;
+  
+  if ($ang < 90) {
+    $alt = "A sector less than one quarter of a full circle";
+  } elseif ($ang == 90) {
+    $alt = "A sector equal to one quarter of a circle";
+  } elseif ($ang > 90 && $ang < 180) {
+    $alt = "A sector between one quarter and one half of a circle";
+  } elseif ($ang == 180) {
+    $alt = "A sector equal to one half of a circle";
+  } elseif ($ang > 180 && $ang < 270) {
+    $alt = "A sector between one half and three quarters of a circle";
+  } elseif ($ang == 270) {
+    $alt = "A sector equal to three quarters of a circle";
+  } elseif ($ang > 270 && $ang < 360) {
+    $alt = "A sector between three quarters and a full circle";
+  } elseif ($ang == 360) {
+    $alt = "A complete circle";
+  }
+  if ($hasAxes === true) {
+    $altAxes = ", with angle centered on the coordinate axes";
+  }
+  $alt = $alt.$altAxes;
+  
+  if ($hasPoint === true) {
+    foreach ($altPtsArray as $altPt) {
+      if ($altPt[0] < 90) {
+        $altPointLoc = " in the top right quarter of the circle";
+      } elseif ($altPt[0] == 90) {
+        $altPointLoc = " at the top point on the circle";
+      } elseif ($altPt[0] > 90 && $altPt[0] < 180) {
+        $altPointLoc = " in the top left quarter of the circle";
+      } elseif ($altPt[0] == 180) {
+        $altPointLoc = " at the far left point on the circle";
+      } elseif ($altPt[0] > 180 && $altPt[0] < 270) {
+        $altPointLoc = " in the bottom left quarter of the circle";
+      } elseif ($altPt[0] == 270) {
+        $altPointLoc = " at the bottom point on the circle";
+      } elseif ($altPt[0] > 270 && $altPt[0] < 360) {
+        $altPointLoc = " on the bottom right quarter of the circle";
+      } elseif ($altPt[0] == 360) {
+        $altPointLoc = " at the far right point on the circle";
+      }
+      $alt = $alt.", and a point".$altPointLab.$altPointLoc;
+    }
+  }
+  echo $alt;
+  $gr = showasciisvg("setBorder(5);initPicture($minxyDisp,1.35,$minxyDisp,1.35);$args",$size,$size,"$alt");
   return $gr;
 }
 
