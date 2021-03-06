@@ -3483,6 +3483,7 @@ class AssessRecord
         $outOfAttempts = true;
       }
       $hasSubmitted = false;
+      $hasUnSubmitted = false;
       for ($av=0; $av < count($this->data['assess_versions']); $av++) {
         if (!empty($this->data['assess_versions'][$av]['timelimit_end'])) {
           if ($this->data['assess_versions'][$av]['lastchange'] >
@@ -3493,12 +3494,19 @@ class AssessRecord
         }
         if ($this->data['assess_versions'][$av]['status'] == 1) {
           $hasSubmitted = true;
+        } else if ($this->data['assess_versions'][$av]['status'] == 0) {
+          $hasUnSubmitted = true;
         }
       }
       if ($hasSubmitted) {
         $this->assessRecord['status'] |= 64;
       } else {
         $this->assessRecord['status'] = $this->assessRecord['status'] & ~64;
+      }
+      if ($hasUnSubmitted) {
+        $this->assessRecord['status'] |= 1;
+      } else {
+        $this->assessRecord['status'] = $this->assessRecord['status'] & ~1;
       }
     }
     if ($outOfAttempts) {
