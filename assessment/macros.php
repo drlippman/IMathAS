@@ -35,7 +35,8 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "getopendotsdata","gettwopointdata","getlinesdata","getineqdata","adddrawcommand",
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
- "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex");
+ "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
+ "array_values");
 
 function mergearrays() {
 	$args = func_get_args();
