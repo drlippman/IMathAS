@@ -676,7 +676,7 @@ function gbstudisp($stu) {
 			}
 			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid=:courseid ";
 			if ($hidelocked) {
-				$query .= "AND istu.locked=0 ";
+				$query .= "AND (istu.locked=0 OR iu.id=:uid) ";
 			}
 			if ($usersort==0) {
 				$query .= "ORDER BY istu.section,iu.LastName,iu.FirstName";
@@ -684,7 +684,11 @@ function gbstudisp($stu) {
 				$query .= "ORDER BY iu.LastName,iu.FirstName";
 			}
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid));
+			if ($hidelocked) {
+				$stm->execute(array(':courseid'=>$cid, ':uid'=>$stu));
+			} else {
+				$stm->execute(array(':courseid'=>$cid));
+			}
 
 			echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
 			$lastsec = '';
