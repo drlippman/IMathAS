@@ -63,7 +63,7 @@ class StringScorePart implements ScorePart
         $strflags = explode(",",$strflags);
         $torem = array();
         foreach($strflags as $flag) {
-            $pc = array_map('trim',explode('=',$flag));
+            $pc = array_map('trim',explode('=',$flag,2));
             if ($pc[0]=='ignore_symbol') {
                 $torem[] = $pc[1];
                 continue;
