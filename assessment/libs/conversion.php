@@ -6,7 +6,7 @@
 
 function conversionVer() {
 	// File version
-	return 17;
+	return 18;
 }
 
 global $allowedmacros;
@@ -731,7 +731,7 @@ function conversionFormulaGeometry() {
         $retval[0] = "{$tick}SA=2LW+2LH+2WH{$tick} (Surface Area of a Rectangular Solid)";
         $retval[1] = conversionUnits2ScreenReader2("","SA",1,"6","s",2,"=",$tick)." (Surface Area of a Cube)";
         $retval[2] = conversionUnits2ScreenReader2("","SA",1,"4{$PI}","r",2,"=",$tick)." (Surface Area of a Sphere)";
-        $retval[3] = conversionUnits2ScreenReader2("","SA",1,"2{$PI}rh+4{$PI}","r",2,"=",$tick)." (Surface Area of a Right Circular Cylindar)";
+        $retval[3] = conversionUnits2ScreenReader2("","SA",1,"2{$PI}rh+2{$PI}","r",2,"=",$tick)." (Surface Area of a Right Circular Cylinder)";
     } elseif($type=="Volume") {
         $retval[0] = "{$tick}V = LWH{$tick} (Volume of a Rectangular Solid)";
         $retval[1] = conversionUnits2ScreenReader2("","V",1,"","s",3,"=",$tick)." (Volume of a Cube)";
@@ -1329,6 +1329,7 @@ function conversionWeight() {
 	return $retval;
 }
 
+// 2021-03-08 ver 18 - fixed typo in surface area of a right circular cylinder
 // 2021-02-26 ver 17 - fixed conversionLength, conversionCapacity, and conversionWeight missing spaces
 // 2021-02-26 ver 16 - added rectangle and square to conversionFormulaGeometry and conversionFormulaAbbreviations, typo in conversionVolume
 // 2021-02-23 ver 15 - updated american length language, update pi symbol to pi, update verify equal sign to =, ~~, or HTML entity, verifypi added
