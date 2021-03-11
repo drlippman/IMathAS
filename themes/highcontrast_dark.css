@@ -291,3 +291,15 @@ button.plain {
 .dialog {
     color: #000;
 }
+.bigquestionwrap .headerpane {
+    background-color: #222;
+}
+.fbbox {
+    background-color: #000;
+}
+.menubutton * {
+    color: #000;
+}
+.filealt-btn {
+    color: #000;
+}
