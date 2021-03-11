@@ -22,7 +22,7 @@ function finderiv_payout($asset, $types, $possizes, $strikes){
 		echo 'finderiv_payout: types must be an array';
 		return false;
     }
-    array_walk($types, 'strtolower');
+    $types = array_map('strtolower',$types);
 	$numTypes = count($types);
 	if ($numTypes>100) {
 		echo 'finderiv_payout: numTypes is too big. Capped at 100.';
