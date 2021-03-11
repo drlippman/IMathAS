@@ -37,7 +37,9 @@ array_push($allowedmacros,"cx_add","cx_arg", "cx_conj", "cx_div", "cx_format2pol
 
 
 function cx_modul(array $num, int $roundto=12) {
-    if (count($num)!=2) { echo "cx_modul expects 1 complex number as an input"; return "";}
+
+    if (count($num)==1) { $num = [$num[0],0];}
+    if (count($num)!=2) { echo "cx_modul expects 1 complex number as an input in the form [Re, Im]"; return "";}
     
     $sq=$num[0]**2+$num[1]**2;
     $r= round(sqrt($sq),$roundto);
@@ -60,25 +62,32 @@ function cx_modul(array $num, int $roundto=12) {
 // The agument of a complex number in radian (or degree) as a float. 
 
 function cx_arg(array $num, string $argin="rad", int $roundto=12) {
+
+    if (count($num)==1) { $num = [$num[0],0];}
     if (count($num)!=2) { echo "cx_arg expects 1 complex number as an input"; return "";}
     
     $re=$num[0];
     $im=$num[1];
     $r= cx_modul($num);
-    $th1=asin(abs($im/$r));
-
-    if ($re>=0 && $im>=0){
+    
+    if ($r==0){
+        $theta=0;
+    } else {
+        $th1 = asin(abs($im/$r));
+        if ($re>=0 && $im>=0){
             $theta=$th1;
     }    
-        else if($re<0 && $im<0){
-            $theta=pi() +$th1;
+        else if($re<=0 && $im<=0){
+            $theta = pi() + $th1;
         }
-        else if($re<0 && $im>=0){
-            $theta=pi() -$th1;
+        else if($re<=0 && $im>=0){
+            $theta = pi() - $th1;
         }
         else {
-            $theta=2*pi() -$th1;
+            $theta = 2*pi() - $th1;
         }
+    }
+    
     if ($argin=="deg"){
         $th2=rad2deg($theta);
     }
@@ -105,6 +114,8 @@ function cx_arg(array $num, string $argin="rad", int $roundto=12) {
 // The conjugate of a complex number in an array (same format as the input).
 
 function cx_conj(array $num, int $roundto=12) {
+
+    if (count($num)==1) { $num = [$num[0],0];}
     if (count($num)!=2) { echo "cx_conj expects 1 complex number as an input"; return "";}
     
     $re=$num[0];
@@ -130,6 +141,8 @@ function cx_conj(array $num, int $roundto=12) {
 // The modulus and the argument of a complex number as a paired value in an array: [mod, arg].
 
 function cx_std2pol(array $num, string $argin="rad", int $roundto= 12) {
+    
+    if (count($num)==1) { $num = [$num[0],0];}
     if (count($num)!=2) { echo "cx_std2pol expects 1 complex number as an input"; return "";}
     
     $r= round(cx_modul($num),$roundto);
@@ -252,10 +265,14 @@ function cx_pol2std(array $num, string $argin="rad", int $roundto= 12) {
 
 function cx_add(array $num, int $roundto=12) {
     
+    
     $ret=0;
     $imt=0;
     $counter=count($num);
     for ($i=0; $i < $counter; $i++){
+
+        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
+        if (count($num[$i])!=2) { echo "cx_add expects complex numbers in the form [Re,Im]"; return "";}
         
         $re=$num[$i][0];
         $im=$num[$i][1];
@@ -284,10 +301,16 @@ function cx_add(array $num, int $roundto=12) {
 
 function cx_sub(array $num, int $roundto=12) {
     
+    if (count($num[0])==1) { $num[0] = [$num[0][0],0];}
+    if (count($num[0])!=2) { echo "cx_sub expects complex numbers in the form [Re,Im]"; return "";}
+    
     $ret=0;
     $imt=0;
     $counter=count($num);
     for ($i=1; $i < $counter; $i++){
+
+        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
+        if (count($num[$i])!=2) { echo "cx_sub expects complex numbers in the form [Re,Im]"; return "";}
         
         $re=$num[$i][0];
         $im=$num[$i][1];
@@ -321,29 +344,12 @@ function cx_mul(array $num, int $roundto=12) {
     $tht=0;
     $counter=count($num);
     for ($i=0; $i < $counter; $i++){
-        
-        $re=$num[$i][0];
-        $im=$num[$i][1];
-        $sq=$re**2+$im**2;
-        $r1= sqrt($sq);
-     
-        $th1=asin(abs($im/$r1));
 
-        if ($re>=0 && $im>=0){
-                $theta=$th1;
-        }    
-            else if($re<0 && $im<0){
-                $theta=pi() +$th1;
-            }
-            else if($re<0 && $im>=0){
-                $theta=pi() -$th1;
-            }
-            else {
-                $theta=2*pi() -$th1;
-            }
-    
-        $rt=$rt*$r1;
-        $tht+=$theta;
+        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
+        if (count($num[$i])!=2) { echo "cx_mul expects complex numbers in the form [Re,Im]"; return "";}
+        
+        $rt = $rt*cx_modul($num[$i]);
+        $tht += cx_arg($num[$i]);
     }
 
     $re_p=$rt*cos($tht);
@@ -369,7 +375,10 @@ function cx_mul(array $num, int $roundto=12) {
 // The real and imaginary parts of the power as a paired value in an array: [Re, Im].
 
 function cx_pow(array $num, $pow, int $roundto=12) {
-    if (count($num)!=2) { echo "cx_pow expects 1 complex number as an input"; return "";}
+    
+    if (count($num)==1) { $num = [$num[0],0];}
+    if (count($num)!=2) { echo "cx_pow expects 1 complex number as an input in the form [Re,Im]"; return "";}
+    
     $r1= cx_modul($num);
     $th1=cx_arg($num);
     $r=$r1**$pow;
@@ -398,7 +407,10 @@ function cx_pow(array $num, $pow, int $roundto=12) {
 // An array of paired values of real and imaginary parts of the nth roots: array([Re1,Im1], [Re2,Im2],...). 
 
 function cx_root(array $num, int $root, int $roundto=12) {
-    if (count($num)!=2) { echo "cx_root expects 1 complex number as an input"; return "";}
+    
+    if (count($num)==1) { $num = [$num[0],0];}
+    if (count($num)!=2) { echo "cx_root expects 1 complex number as an input in the form [Re,Im]"; return "";}
+    
     $r1= cx_modul($num);
     $th1= cx_arg($num);
     $r=$r1**(1/$root);
@@ -406,10 +418,10 @@ function cx_root(array $num, int $root, int $roundto=12) {
     
     for ($k=0; $k<$root; $k++){
         
-        $tht=$th1+2*pi()*$k/$root;
-        $re_f=$r*cos($tht);
-        $im_f=$r*sin($tht);
-        $A[$k]=[round($re_f,$roundto) , round($im_f,$roundto)];
+        $tht = ($th1+2*pi()*$k)/$root;
+        $re_f = $r*cos($tht);
+        $im_f = $r*sin($tht);
+        $A[$k] = [round($re_f,$roundto) , round($im_f,$roundto)];
     }
     return $A;
 }
@@ -429,7 +441,13 @@ function cx_root(array $num, int $root, int $roundto=12) {
 // The quotient of two complex numbers in standard form an array: [Re, Im]
 
 function cx_div(array $num, int $roundto=12) {
-    if (count($num)!=2) { echo "cx_Div expects 2 complex numbers"; return "";}
+    
+    for ($i=0; $i<count($num); $i++){
+        if (count($num[$i])==1) { $num[$i] = [$num[$i][0],0];}
+        if (count($num[$i])!=2) { echo "cx_Div expects complex numbers in the form [Re,Im]"; return "";}
+        if (count($num)!=2) { echo "cx_Div expects 2 complex numbers in the form [Re,Im]"; return "";}
+    }
+        
     $rt=1;
     $tht=0;
     $N=$num[0];
@@ -442,6 +460,7 @@ function cx_div(array $num, int $roundto=12) {
     $thconj= cx_arg($D_conj);
     
     $den=($D[0])**2 +($D[1])**2;
+    if ($den==0) { echo "Division by zero! cx_Div expects the second complex number to have nonzero modulus"; return "";}
     
     $r=$rn*$rconj/$den;
     $tht=$thn+$thconj;
@@ -454,7 +473,7 @@ function cx_div(array $num, int $roundto=12) {
 }
 
 //-------------------------------------Quadratic real and complex roots--------------------------------------
-// Function: cx_quadRoot(a,b,c, [roundto = 12])
+// Function: cx_quadRoot(a,b,c, [roundto = 12, $disp = False])
 // Returns an array of roots of the quadratic equation f(x) = ax^2 + bx + c. Real roots are returned
 // as an array([r1],[r2]) ordered from the smallest to largest, and the complex roots are returned 
 // as an array([Re1,Im1], [Re2,Im2]). 
@@ -465,11 +484,12 @@ function cx_div(array $num, int $roundto=12) {
 // c: The constant
 // roundto: Optional - number of decimal places to which modulus should be rounded off; 
 //          default is 12 decimal places. 
-//
+// disp: If set to true, the function returns the string version of the roots for display, which should not be used for calculation.   
+
 // Returns:
 // An array of roots (either real or complex) of the quadratic equation.
 
-function cx_quadRoot(float $a, float $b, float $c, int $roundto = 12){
+function cx_quadRoot(float $a, float $b, float $c, int $roundto = 12, $disp = False){
     $d=$b**2 - 4*$a*$c;
     if ($d<0){
 
@@ -483,6 +503,10 @@ function cx_quadRoot(float $a, float $b, float $c, int $roundto = 12){
             $r2=round(((-$b+sqrt($d))/(2*$a)),$roundto);
             $st=array([$r1],[$r2]);
         }
+
+    if ($disp == True){
+        $st=cx_format2std($st,$roundto);
+    }
 
     return $st;
 
