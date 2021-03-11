@@ -15,7 +15,7 @@
     
 
 global $allowedmacros;
-array_push($allowedmacros,"cx_add","cx_arg", "cx_conj", "cx_div", "cx_format2pol", "cx_format2std", "cx_modul",
+array_push($allowedmacros,"cx_add","cx_arg", "cx_conj","cx_cubicRoot", "cx_div", "cx_format2pol", "cx_format2std", "cx_modul",
                         "cx_mul", "cx_quadRoot", "cx_prettyquadRoot",  "cx_plot",
                         "cx_pow", "cx_polEu","cx_pol2std", "cx_root", "cx_std2pol", "cx_sub");
                          
@@ -511,6 +511,105 @@ function cx_quadRoot(float $a, float $b, float $c, int $roundto = 12, $disp = Fa
     return $st;
 
 }
+
+//---------------------------------------------------Cubic real and complex roots------------------------------------------
+// Function: cx_cubicRoot(poly, [disp = False, roundto = 12])
+// Returns an array of roots of the cubic equation f(x) = ax^3 + bx^2 + cx + d. Real roots are returned
+// as an array([r1],[r2],[r3]) and complex roots are return as an array([r1],[Re1,Im1], [Re1,Im1]).
+// 
+// Parameters:
+// poly: The array of coefficients: [a,b,c,d]
+// disp: If set to true, the function returns the string version of the roots for display, which should not be used for calculation.   
+// roundto: Optional - number of decimal places to which the roots should be rounded off; default is 12 decimal places. 
+//
+// Returns:
+// An array of roots (either real or complex) of the cubic equation.
+
+#internal function: long devision of a cubic function by x-a; used for cx_cubicRoot()
+function cubicdivide($divident, $divisor){
+
+	$q = [$divident[0],$divident[1]+$divisor[1]*$divident[0],$divident[2]+($divisor[1]*($divident[1]+$divisor[1]*$divident[0]))];
+	$r = $divident[3]+($divisor[1]*($divident[2]+$divisor[1]*($divident[1]+$divisor[1]*$divident[0])));
+	if (abs($r)<1e-9) {$r=0;}
+	return ([$q,$r]);
+}
+
+#internal function: cubic root of real numbers (negative and positive)
+function amirCube($num){
+	if ($num<0){
+		$num=-$num;
+		$cube=-$num**(1/3);
+	} else{
+		$cube=$num**(1/3);
+	}
+	return($cube);
+}
+
+# Finding roots of cubic polynomial
+function cx_cubicRoot( array $poly, $disp = False, int $roundto = 12){
+    
+    $ct = count($poly);
+        
+    if ($ct<3 || $ct>4) { echo 'error: The function must be either quadratic or cubic'; return '';}
+
+    //Cubic
+    if ($ct == 4) {
+
+        if ($poly[0]==0) { echo 'error: The leading coefficient must be nonzero'; return '';}
+        elseif ($poly[0]!=1){
+            $a0=1;
+            $a1=$poly[1]/$poly[0];
+            $a2=$poly[2]/$poly[0];
+            $a3=$poly[3]/$poly[0];
+        } else {
+            $a0=$poly[0];
+            $a1=$poly[1];
+            $a2=$poly[2];
+            $a3=$poly[3];
+        }
+
+        $Q = (3*($a2)-$a1**2)/9;
+        $R = (9*$a1*$a2-27*$a3-2*$a1**3)/54;
+        $delta = ($Q)**3 + ($R)**2;
+        
+        if ($delta<0) {
+
+            $dsq = sqrt(-$delta);
+            $Scube = [$R, $dsq];
+            $Tcube = [$R,-$dsq];
+            $S = cx_root($Scube,3);
+            $T = cx_root($Tcube,3);
+            $x1 = cx_add([$S[1],$T[1],[-$a1/3,0]])[0];
+            
+        } else{
+
+            $S = amirCube($R + sqrt($delta));       
+            $T = amirCube($R - sqrt($delta));   
+            $x1 = $S+$T-$a1/3;
+            }
+
+        $q1 = cubicdivide($poly,[1,$x1]);	
+        $xq = cx_quadRoot($q1[0][0],$q1[0][1],$q1[0][2],$roundto);
+        $x2 = $xq[0];
+        $x3 = $xq[1];
+        $x = [[round($x1,$roundto)],$x2,$x3];
+        
+
+        //Quadratic
+    } 	else {
+            if ($poly[0]==0) { echo 'error: The leading coefficient must be nonzero'; return '';}
+            $x = cx_quadRoot($poly[0],$poly[1],$poly[2],$roundto);
+    }
+
+    if ($disp==True){
+        $x = cx_format2std($x,$roundto);
+    }
+
+    return($x);
+    
+    }
+
+
 
 //------------------------------------------Formating to standard form-------------------------------------
 // Function: cx_format2std(num, [roundto=3])
