@@ -2575,7 +2575,9 @@ These macros are used to test various conditions.  They typically return true or
 <li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
   to see if the words in the list/array "words" appear in the student's answer. If they all appear, it redefines
-  $answer and $showanswer so the student's answer is marked correct.
+  $answer so the student's answer is marked correct.  $showanswer is also redefined to show the original $answer 
+  with all the required words highlighted. You can turn off the highlighting by setting the optional highlight 
+  parameters to false.<br>
   For multipart questions, include the part number as an
   additional parameter.  Usage for single part questions (where $words is predefined earlier in the code):<br/>
   $answer,$showanswer = scorestring($answer,"",$words,$stuanswers,$thisq)<Br/>
