@@ -385,6 +385,7 @@
     "full_credit": "Full credit",
     "add_feedback": "Add feedback",
     "feedback": "Feedback",
+    "feedback_for": "Feedback for {name}",
     "general_feedback": "General feedback",
     "use_in_msg": "Use in Message",
     "clear_hdr": "Delete confirmation",

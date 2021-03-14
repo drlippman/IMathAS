@@ -299,6 +299,7 @@
         </div>
         <gb-feedback
           qn="gen"
+          :username="aData.userfullname"
           :show="viewFull"
           :canedit = "canEdit"
           :useeditor = "useEditor"
