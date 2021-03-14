@@ -46679,6 +46679,7 @@ var paste = (function (domGlobals) {
 			//ed.on('PreProcess', function (o) {   //tiny 4 doesn't seem to use this anymore
 			//luckily, there is a special paste callback
 			ed.on('PastePostProcess', function(o) {
+                var AMtags, MJtags;
 				//if (o.get) {
 					AMtags = ed.dom.select('span.AM', o.node);
 					for (var i=0; i<AMtags.length; i++) {
@@ -46687,7 +46688,13 @@ var paste = (function (domGlobals) {
 					MJtags = ed.dom.select('span[data-asciimath]', o.node);
 					for (var i=0; i<MJtags.length; i++) {
 						t.mathjax2ascii(MJtags[i]);
-					}
+                    }
+                    MJtags = ed.dom.select('mjx-container[data-asciimath]', o.node);
+                    for (var i=0; i<MJtags.length; i++) {
+                        var newspan = ed.dom.create('span', {'data-asciimath': MJtags[i].getAttribute("data-asciimath")});
+                        MJtags[i].parentNode.replaceChild(newspan, MJtags[i]);
+						t.mathjax2ascii(newspan);
+                    }
 					/*AMtags = ed.dom.select('span.AMedit', o.node);
 					for (var i=0; i<AMtags.length; i++) {
 						var myAM = AMtags[i].innerHTML;
