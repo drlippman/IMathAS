@@ -786,10 +786,16 @@ switch($_GET['action']) {
 		//Start grouping: copy options
 		if ($_GET['action']=='addcourse' && $ctc>0) {
 			if ($sourceUIver < 2) {
-				echo '<span class=form>'._('Upgrade assessment version').'</span>';
-				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
-				echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
-				echo '</label></span><br class=form>';
+                if (!empty($CFG['assess_upgrade_optout'])) {
+                    echo '<span class=form>'._('Upgrade assessment version').'</span>';
+                    echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
+                    echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
+                    echo '</label></span><br class=form>';
+                } else {
+                    echo '<p><input type=hidden name="newassessver" id="newassessver" value="1" />';
+                    echo _('The source course is using an older format of assessments, so they will be converted to the new format during the copy. You will want to review the settings after the copy.');
+                    echo '</p>';
+                }
 			}
 			echo '<div class="block grouptoggle">';
 			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
@@ -814,10 +820,14 @@ switch($_GET['action']) {
 			echo '</div>';
 
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
-			echo '<span class=form>'._('Assessment version').'</span>';
-			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
-			echo _('Use the new version of assessments.');
-			echo '</label></span><br class=form>';
+            if (!empty($CFG['assess_upgrade_optout'])) {
+                echo '<span class=form>'._('Assessment version').'</span>';
+                echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
+                echo _('Use the new version of assessments.');
+                echo '</label></span><br class=form>';
+            } else {
+                echo '<input type=hidden name="newassessver" id="newassessver" value="1" />';
+            }
 		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';

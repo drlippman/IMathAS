@@ -99,6 +99,8 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['ratelimit']`: Set to a number of seconds (like 0.2) to limit the rate at
  which pages can be accessed/refreshed.
 - `$CFG['GEN']['COPPA']`: Set to enable an "I am 13 years old or older" checkbox on new student account creation. If not checked, requires a course ID and key to create an account.
+- `$CFG['assess_upgrade_optout']`: Set to true to allow users to opt out of an upgrade
+to the new assessment interface.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
