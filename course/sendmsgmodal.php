@@ -165,9 +165,15 @@ if (isset($_POST['message'])) {
 				}
 			}
 			if ($_GET['to'] == 0) {
-				$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
+                $query = 'SELECT iqs.ownerid,iu.lastaccess FROM imas_questionset AS iqs
+                    JOIN imas_users AS iu ON iqs.ownerid=iu.id WHERE iqs.id=:id';
+				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$parts[1]));
-				$_GET['to'] = $stm->fetchColumn(0);
+                $r = $stm->fetch(PDO::FETCH_ASSOC);
+                $_GET['to'] = $r['ownerid'];
+                if (!empty($CFG['GEN']['qerroronold']) && $r['lastaccess'] < time() - 60*60*24*$CFG['GEN']['qerroronold'][0]) {
+                    $_GET['to'] = $CFG['GEN']['qerroronold'][1];
+                }
 			}
 		} else if (isset($parts[3])) {  //sending to instructor
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
