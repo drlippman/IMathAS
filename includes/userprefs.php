@@ -11,7 +11,9 @@ function showUserPrefsForm() {
 
 	$prefs = array();
 	$prefs['mathdisp'] = array(
-		'1'=>_('MathJax - best display and best for screenreaders'),
+        '1'=>_('MathJax 2'),
+        '7'=>_('MathJax 3'),
+        '8'=>_('MathJax 3, with screenreader support pre-enabled'),
 		'6'=>_('Katex - faster display'),
 		'2'=>_('Image-based display'),
 		'0'=>_('Calculator-style linear display, like x^2/3'));

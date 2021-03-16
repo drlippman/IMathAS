@@ -609,7 +609,7 @@ function initcreditboxes() {
 
 var LivePreviews = [];
 function setupLivePreview(qn, skipinitial) {
-    if (mathRenderer=="MathJax" && !window.MathJax) {
+    if (mathRenderer=="MathJax" && (!window.MathJax || (!window.MathJax.Hub && !window.MathJax.typesetPromise))) {
         var thisqn = qn; var thisskipinitial = skipinitial;
         setTimeout(100, function() { setupLivePreview(thisqn, thisskipinitial)});
         return;
@@ -626,7 +626,8 @@ function setupLivePreview(qn, skipinitial) {
 			  finaltimeout: null,  // setTimeout id for clicking preview
 			  mjRunning: false,  // true when MathJax is processing
 			  mjPending: false,  // true when a typeset has been queued
-			  oldText: null,     // used to check if an update is needed
+              oldText: null,     // used to check if an update is needed
+              mjPromise: null,
 
 			  //
 			  //  Get the preview and buffer DIV's
@@ -637,9 +638,12 @@ function setupLivePreview(qn, skipinitial) {
   					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');
   				this.preview = document.getElementById("lpbuf1"+qn);
   				this.buffer = document.getElementById("lpbuf2"+qn);
-          if (!skipinitial) {
-            showPreview(qn);  //TODO: review this
-          }
+                if (mathRenderer=="MathJax" && MathJax.typesetPromise) {
+                    this.mjPromise = Promise.resolve();
+                }
+                if (!skipinitial) {
+                    showPreview(qn);  //TODO: review this
+                }
 			  },
 
 			  SwapBuffers: function () {
@@ -664,13 +668,20 @@ function setupLivePreview(qn, skipinitial) {
 			  },
 			  RenderBuffer: function() {
 			      if (mathRenderer=="MathJax") {
-				      MathJax.Hub.Queue(
-					      ["Typeset",MathJax.Hub,this.buffer],
-					      ["PreviewDone",this]
-				      );
+                      if (MathJax.typesetPromise) {
+                        this.mjPromise = this.mjPromise.then(function () {
+                            //MathJax.typesetClear([this.buffer]);
+                            MathJax.typesetPromise([this.buffer]).then(this.PreviewDone.bind(this));
+                        }.bind(this));
+                      } else {
+                        MathJax.Hub.Queue(
+                            ["Typeset",MathJax.Hub,this.buffer],
+                            ["PreviewDone",this]
+                        );
+                      }
 			      } else if (mathRenderer=="Katex") {
-			      	      renderMathInElement(this.buffer);
-				      if (typeof MathJax != "undefined" && MathJax.version && $(this.buffer).children(".mj").length>0) {//has MathJax elements
+			      	  renderMathInElement(this.buffer);
+				      if (typeof MathJax != "undefined" && MathJax.Hub && !MathJax.typesetPromise && $(this.buffer).children(".mj").length>0) {//has MathJax elements
 					      MathJax.Hub.Queue(["PreviewDone",this]);
 				      } else {
 					      this.PreviewDone();
@@ -679,13 +690,13 @@ function setupLivePreview(qn, skipinitial) {
 			  },
 
 			  DoFinalPreview: function() {
-          $("#pbtn"+qn).trigger("click");
+                $("#pbtn"+qn).trigger("click");
 			  },
 
 			  preformat: function(text) {
-          var qtype = allParams[qn].qtype;
-          var calcformat = allParams[qn].calcformat;
-          return preformat(qn, text, qtype, calcformat);
+                var qtype = allParams[qn].qtype;
+                var calcformat = allParams[qn].calcformat;
+                return preformat(qn, text, qtype, calcformat);
 			  },
 
 			  CreatePreview: function () {
@@ -694,8 +705,12 @@ function setupLivePreview(qn, skipinitial) {
 			    var text = document.getElementById("qn"+qn).value;
 			    if (text === this.oldtext) return;
 			    if (this.mjRunning) {
-			      this.mjPending = true;
-			      MathJax.Hub.Queue(["CreatePreview",this]);
+                  this.mjPending = true;
+                  if (this.mjPromise) {
+                    this.mjPromise = this.mjPromise.then(this.CreatePreview().bind(this));
+                  } else if (MathJax.Hub) {
+                    MathJax.Hub.Queue(["CreatePreview",this]);
+                  }
 			    } else {
 			      this.oldtext = text;
 			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
@@ -711,13 +726,13 @@ function setupLivePreview(qn, skipinitial) {
 			    updateehpos();
 			  }
 
-			};
-			if (typeof MathJax != "undefined") {
-				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+            };
+            if (typeof MathJax != "undefined" && !MathJax.typesetPromise) {
+                LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
 				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
-			} else {
-				LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
-			}
+            } else {
+                LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
+            }
 			LivePreviews[qn].Init(skipinitial);
 		} else {
 			LivePreviews[qn] = {

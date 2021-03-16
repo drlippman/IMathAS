@@ -175,8 +175,8 @@ function disableInputs(qn, disabled) {
    if (jsparams.disabled) {
      disableInputs(qn, jsparams.disabled);
    }
-
-   window.imathasAssess.init(jsparams, true, qwrap);
+   var useMQ = !jsparams.noMQ;
+   window.imathasAssess.init(jsparams, useMQ, qwrap);
 
    if (jsparams.helps && jsparams.helps.length > 0) {
      addHelps(qwrap, jsparams.helps);
