@@ -128,7 +128,7 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
 	}
 	echo "<script src=\"$staticroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
-} else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
+} else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3 || $_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">
