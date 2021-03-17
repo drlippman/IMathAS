@@ -11,7 +11,7 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry",
 	"matrixRandomSpan","matrixNumberOfRows","matrixNumberOfColumns",
 	"matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce",
-	"matrixnumsolutions","matrixround",
+	"matrixnumsolutions","matrixround","matrixCompare",
 	"matrixGetRank","arrayIsZeroVector","matrixFormMatrixFromEigValEigVec",
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
@@ -1533,6 +1533,45 @@ function matrixFormatEigenvecs($evecs) {
         }
     }
     return $out;
+}
+
+function matrixCompare($m,$n,$tol='.001') {
+	// $m stu, $n correct
+	if (!is_array($m) || !is_array($n) || !is_array($m[0]) || !is_array($n[0])) {
+		return false;
+	}
+	if (count($m) != count($n) || count($m[0]) != count($n[0])) {
+		return false;
+	}
+	$toltype = 'rel';
+	if ($tol[0]=='|') {
+		$toltype = 'abs';
+		$tol = substr($tol,1);
+	}
+	$isequiv = true;
+	for ($r = 0 ; $r < count($m); $r++) {
+		for ($c = 0; $c < count($m[0]); $c++) {
+			if ($toltype == 'rel') {
+				if (abs($n[$r][$c]) < 1E-12) {
+					if (abs($m[$r][$c] - $n[$r][$c]) > $tol/1000 + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				} else {
+					if (abs($m[$r][$c] - $n[$r][$c])/(abs($n[$r][$c])+1E-12) > $tol + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				}
+			} else {
+				if (abs($m[$r][$c] - $n[$r][$c]) > $tol + 1E-12) {
+					$isequiv = false;
+					break 2;
+				}
+			}
+		}
+	}
+	return $isequiv;
 }
 
 ?>

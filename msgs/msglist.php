@@ -351,10 +351,16 @@ If deleted on both ends, delete from DB
 				$message = '<br/><hr/>'.$qinfo.'<br/><br/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 				if (isset($parts[3]) && $parts[3] === 'reperr') {
-					$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
-					$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
-					$stm->execute(array(':id'=>$parts[1]));
-					$_GET['to'] = $stm->fetchColumn(0);
+                    $title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
+                    $query = 'SELECT iqs.ownerid,iu.lastaccess FROM imas_questionset AS iqs
+                        JOIN imas_users AS iu ON iqs.ownerid=iu.id WHERE iqs.id=:id';
+					$stm = $DBH->prepare($query);
+                    $stm->execute(array(':id'=>$parts[1]));
+                    $r = $stm->fetch(PDO::FETCH_ASSOC);
+                    $_GET['to'] = $r['ownerid'];
+                    if (!empty($CFG['GEN']['qerroronold']) && $r['lastaccess'] < time() - 60*60*24*$CFG['GEN']['qerroronold'][0]) {
+                        $_GET['to'] = $CFG['GEN']['qerroronold'][1];
+                    }
 				} else if (isset($parts[3]) && $parts[3]>0) {  //sending out of assessment instructor
 					$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$parts[3]));

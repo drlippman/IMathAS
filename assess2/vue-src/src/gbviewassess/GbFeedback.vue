@@ -1,6 +1,9 @@
 <template>
   <div v-show="show">
-    {{ $t('gradebook.feedback') }}:<br/>
+    {{ !username ?
+      $t('gradebook.feedback') :
+      $t('gradebook.feedback_for', {name: username})
+    }}:<br/>
     <textarea
       v-if="canedit && !useeditor"
       class="fbbox"
@@ -31,7 +34,7 @@ import TinymceInput from '@/components/TinymceInput.vue';
 
 export default {
   name: 'GbFeedback',
-  props: ['show', 'canedit', 'useeditor', 'value', 'qn'],
+  props: ['show', 'canedit', 'useeditor', 'value', 'qn', 'username'],
   components: {
     TinymceInput
   },

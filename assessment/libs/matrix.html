@@ -64,6 +64,7 @@ Matrix functions.  Version 1.6, Jan 19
 <li><a href="#matrixNumberOfRows">matrixNumberOfRows</a></li>
 <li><a href="#matrixNumberOfColumns">matrixNumberOfColumns</a></li>
 <li><a href="#matrixParseStuans">matrixParseStuans</a></li>
+<li><a href="#matrixCompare">matrixCompare</a></li>
 </ul>
 <h3><a name="matrix">matrix</a></h3>
 matrix(vals,rows,cols)
@@ -340,6 +341,13 @@ or one larger than the original matrix's number of rows.</p>
 questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for
 multi-part</p>
 
+<h3><a name="matrixCompare">matrixCompare</a></h3>
+<p>matrixCompare(test matrix, correct matrix, [tol])</p>
+<p>Compares the test matrix to the correct matrix, and returns  
+true if they are equivalent up to the tolerance.
+Set tol to specify the relative tolerance (defaults to .001), 
+or prefix with | for an absolute tolerance.</p>
+</p>
 <p>&nbsp;</p>
 <p><br>
 </p>

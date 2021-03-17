@@ -854,7 +854,9 @@ function showasciisvg($script, $width=200, $height=200, $alt="") {
     }
     $script = str_replace("'",'"',$script);
     $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />";
-    $out .= '<span class="sr-only">'.$alt.'</span>';
+    if (empty($GLOBALS['hide-sronly'])) {
+        $out .= '<span class="sr-only">'.$alt.'</span>';
+    }
     return $out;
 }
 
@@ -3017,7 +3019,7 @@ function intervaltoineq($str,$var) {
 
 function cleanbytoken($str,$funcs = array()) {
 	if (is_array($str)) { return $str;} //avoid errors by just skipping this if called with an array somehow
-	$str = str_replace('`', '', $str);
+	$str = str_replace(['`','\\'], '', $str);
 	$instr = 0;
 	$primeoff = 0;
 	while (($p = strpos($str, "'", $primeoff))!==false) {
@@ -4064,9 +4066,11 @@ function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,
 		$code = 8.3;
 	} else if ($type=='log') {
 		$code = 8.4;
-	} else if ($type=='circle') {
+	} else if ($type=='circle' || $type=='circlerad') {
 		$code = 7;
-	} else if ($type=='sin') {
+	} else if ($type=='ellipse' || $type=='ellipserad') {
+    $code = 7.2;
+  } else if ($type=='sin') {
 		$code = 9.1;
 	} else if ($type=='cos') {
 		$code = 9;
@@ -4089,6 +4093,13 @@ function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,
 			$pts[3] = ($pts[3] - $imgborder)/$pixelsperx + $xmin;
 			$pts[2] = ($h - $pts[2] - $imgborder)/$pixelspery + $ymin;
 			$pts[4] = ($h - $pts[4] - $imgborder)/$pixelspery + $ymin;
+      if ($type=='ellipserad') {
+        $pts[3] = abs($pts[3]-$pts[1]);
+        $pts[4] = abs($pts[4]-$pts[2]);
+      } else if ($type=='circlerad') {
+        $pts[3] = sqrt(pow($pts[3]-$pts[1],2)+pow($pts[4]-$pts[2],2));
+        unset($pts[4]);
+      }
 			$outpts[] = array($pts[1], $pts[2], $pts[3], $pts[4]);
 		}
 	}

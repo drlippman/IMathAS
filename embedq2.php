@@ -334,9 +334,13 @@ $placeinhead .= '<script type="text/javascript">
   if (mathRenderer == "Katex") {
      window.katexDoneCallback = sendresizemsg;
   } else if (typeof MathJax != "undefined") {
-      MathJax.Hub.Queue(function () {
-          sendresizemsg();
-      });
+    if (MathJax.startup) {
+        MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+    } elseif (MathJax.Hub) {
+        MathJax.Hub.Queue(function () {
+            sendresizemsg();
+        });
+    } 
   } else {
       $(function() {
           sendresizemsg();
@@ -358,14 +362,15 @@ $placeinhead .= '<script type="text/javascript">
       height: 0 !important;
   }
   </style>';
-if ($_SESSION['mathdisp'] == 1 || $_SESSION['mathdisp'] == 3) {
+  if ($_SESSION['mathdisp'] == 1 || $_SESSION['mathdisp'] == 3) {
     //in case MathJax isn't loaded yet
     $placeinhead .= '<script type="text/x-mathjax-config">
       MathJax.Hub.Queue(function () {
           sendresizemsg();
       });
-  </script>';
-}
+    </script>';
+  }
+
 $flexwidth = true; //tells header to use non _fw stylesheet
 $nologo = true;
 require "./header.php";

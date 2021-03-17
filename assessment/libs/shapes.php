@@ -35,7 +35,7 @@ function draw_angle() {
       if (isset($in[1])) {
         $rot = $in[1];
       } elseif (!isset($in[1])) {
-        $rot = rand(0,360);
+        $rot = $GLOBALS['RND']->rand(0,360);
       }
     }
     if ($in[0] == "size") {
@@ -818,8 +818,8 @@ function draw_triangle() {
   }
 
   if ($randomTriangle === true) {
-    $ang[0]=rand(25,70);
-    $ang[1]=rand(25,70);
+    $ang[0]=$GLOBALS['RND']->rand(25,70);
+    $ang[1]=$GLOBALS['RND']->rand(25,70);
     $ang[2]=180-$ang[0]-$ang[1];
     
     if (isset($argsArray[$sideKey][4])) {
@@ -862,7 +862,7 @@ function draw_triangle() {
       $noAngles = false;
     }
     if ($rotateTriangle === true) {
-      $rndNum = rand(0,360)*M_PI/180;
+      $rndNum = $GLOBALS['RND']->rand(0,360)*M_PI/180;
     } elseif ($rotateTriangle === false) {
       $rndNum = $ang[2]*M_PI/180 - M_PI/2;
     }
@@ -1009,7 +1009,7 @@ function draw_triangle() {
   if ($rotateTriangle === false) {
     $rndNum = $angRad[2] - M_PI/2;
   } elseif ($rotateTriangle === true) {
-    $rndNum = rand(0,360)*M_PI/180;
+    $rndNum = $GLOBALS['RND']->rand(0,360)*M_PI/180;
   }
   
   foreach ($ang as $key => $angle) {
@@ -1423,7 +1423,7 @@ function draw_triangle() {
 
 function draw_polygon() {
   
-  $randSides = rand(3,9);
+  $randSides = $GLOBALS['RND']->rand(3,9);
   $isRegular = false;
   $hasPoints = false;
   $hasSides = false;
@@ -1490,11 +1490,11 @@ function draw_polygon() {
     }
   } else {
     for ($i=0;$i<$n;$i++) {
-      $ang[] = rand($minAngle,$maxAngle)*M_PI/180;
+      $ang[] = $GLOBALS['RND']->rand($minAngle,$maxAngle)*M_PI/180;
     }
   }
   if ($rotatePolygon === true) {
-    $randAng = rand(0,360)*M_PI/180;
+    $randAng = $GLOBALS['RND']->rand(0,360)*M_PI/180;
   } else {
     $randAng = -($ang[0]/2+M_PI/2);
   }
@@ -1662,7 +1662,7 @@ function draw_cylinder() {
     if ($in[0] == "fill") {
       $hasFill = true;
       if (!is_numeric($in[1])) {
-        $fillPercent = rand(20,80);
+        $fillPercent = $GLOBALS['RND']->rand(20,80);
       } elseif (is_numeric($in[1])) {
         if ($in[1]<0 || $in[1]>100) {
           echo 'Eek! Fill percent must be between 0 and 100.';
