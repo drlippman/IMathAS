@@ -854,7 +854,9 @@ function showasciisvg($script, $width=200, $height=200, $alt="") {
     }
     $script = str_replace("'",'"',$script);
     $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />";
-    $out .= '<span class="sr-only">'.$alt.'</span>';
+    if (empty($GLOBALS['hide-sronly'])) {
+        $out .= '<span class="sr-only">'.$alt.'</span>';
+    }
     return $out;
 }
 
