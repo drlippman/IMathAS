@@ -405,7 +405,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
         document.getElementById("GB_frame").src.replace(/\/$/,'') !=
             url.replace(/\/$/,'')
     ) {
-		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'" data-noresize=1></iframe>';
 	} else {
         document.getElementById("GB_loading").style.display = 'none';
 	}
