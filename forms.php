@@ -364,7 +364,8 @@ switch($_GET['action']) {
 		showNewUserValidation("pageform", array('oldpw'), $requiredrules);
 
 		echo "<div class=submit><input type=submit value='",_('Update Info'),"'></div>\n";
-
+        echo '<script>function doSubmit() { document.getElementById("pageform").submit(); parent.GB_hide();}</script>';
+        
 		//echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
 		break;
