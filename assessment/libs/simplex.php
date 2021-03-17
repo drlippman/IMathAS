@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 31
+// File Version : 32
 //
 
 global $allowedmacros;
@@ -18,7 +18,17 @@ array_push($allowedmacros, "simplex", "simplexver", "simplexchecksolution", "sim
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 31;
+	return 32;
+}
+
+function fractiontodecimal1($f,$location)
+{
+    $retval = fractiontodecimal($f);
+	if(is_nan($retval)) {
+        echo "error occured at location: $location";
+    }
+
+	return $retval;
 }
 
 // function simplex(type, objective, constraints)
@@ -265,7 +275,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
 		for($c=0;$c<$LastAnswer;$c++) {
 		  // now check to see if this solution matches the student
 		  // need to evaluate  $solutionlist[$r][$c] to a decimal
-		  if(fractiontodecimal($solutionlist[$r][$c])!=fractiontodecimal($stuanswer[$c])) {
+            if(fractiontodecimal1($solutionlist[$r][$c],"simplexchecksolution1")!=fractiontodecimal1($stuanswer[$c],"simplexchecksolution2")) {
 			 $match = 0;  // not a solution
 			 break;
 		  }
@@ -293,7 +303,7 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
 		  $j = $start+$c;
 		  //echo "$c) [$r][$j] =".$solutionlist[$r][$j].",".$stuanswer[$c]."<br/>";
 
-		  if(fractiontodecimal($solutionlist[$r][$j])!=fractiontodecimal($stuanswer[$c])) {
+		  if(fractiontodecimal1($solutionlist[$r][$j],"simplexchecksolution3")!=fractiontodecimal1($stuanswer[$c],"simplexchecksolution4")) {
 			 $match = 0;  // not a solution
 			 //break;
 		  }
@@ -582,7 +592,7 @@ function simplexcreateinequalities() {
 					$simplexestring[0] .= fractionreduce($frac);
 				}
 				else {
-				$simplexestring[0] .= fractiontodecimal($frac);
+                    $simplexestring[0] .= fractiontodecimal1($frac,"simplexcreateinequalities1");
 				}
 			}
 			$simplexestring[0] .= $headers[$j];
@@ -626,7 +636,7 @@ function simplexcreateinequalities() {
 						$simplexestring[$row] .= fractionreduce($frac);
 					}
 					else {
-						$simplexestring[$row] .= fractiontodecimal($frac);
+						$simplexestring[$row] .= fractiontodecimal1($frac,"simplexcreateinequalities2");
 					}
 				}
 				$simplexestring[$row] .= $headers[$j];
@@ -651,7 +661,7 @@ function simplexconverttodecimals($sm){
 
   for($r=0,$size = count($sm);$r<$size;$r++) {
 	for($c=0;$c<count($sm[0]);$c++) {
-	  $sm[$r][$c] = fractiontodecimal($sm[$r][$c]);
+	  $sm[$r][$c] = fractiontodecimal1($sm[$r][$c],"simplexconverttodecimals");
 	}
   }
 
@@ -746,7 +756,6 @@ function simplexdefaultheaders($sm, $type){
 
 	return $headers;
 }
-
 
 //simplexdisplaycolortable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), tabletextcolor = "black", ShowObjectiveColumn=1])
 //
@@ -985,7 +994,7 @@ function simplexdisplaycolortable() {
 		  $Element = fractionreduce($sm[$rloop][$cloop]);   // convert to fraction
 		}
 		else {
-		  $Element = fractiontodecimal($sm[$rloop][$cloop]); // convert to decimal
+		  $Element = fractiontodecimal1($sm[$rloop][$cloop],"simplexdisplaycolortable1"); // convert to decimal
 		}
 
 		$TableElement = $tick.$Element.$tick;
@@ -1185,7 +1194,7 @@ function simplexdisplaylatex() {
 				}
 
 			} else {
-				$Element = fractiontodecimal($sm[$rloop][$cloop]); // convert to decimal
+				$Element = fractiontodecimal1($sm[$rloop][$cloop],"simplexdisplaycolortable2"); // convert to decimal
 			}
 
 			// allow multiple items to be circled
@@ -1665,7 +1674,7 @@ function simplexfindpivotpoint($sm) {
 
 	// In the last row find the largest negative value
 	for($c=0;$c<$pivotcolumncount;$c++){
-		$value = $sm[$lastrow][$c]; //fractiontodecimal($sm[$lastrow][$c]);
+		$value = $sm[$lastrow][$c];
 		if($value[0]<0) {
 			if($value[0]*$ColumnMinValue[1] < $value[1]*$ColumnMinValue[0]) {
 				// Set the smallest ratio
@@ -1882,11 +1891,11 @@ function simplexfindpivotpointmixed($sm) {
 
   	// Flag all columns that need to be checked.
   	for($r=0;$r<$lastrow;$r++){
-  		if(fractiontodecimal($sm[$r][$lastcol])<0) {
+  		if(fractiontodecimal1($sm[$r][$lastcol],"simplexfindpivotpoint1")<0) {
   			// now search each column to see if a negative entry is found
   			// if so set flag
   			for($c = 0; $c < $lastcol; $c++){
-			  	if(fractiontodecimal($sm[$r][$c])<0) {
+			  	if(fractiontodecimal1($sm[$r][$c],"simplexfindpivotpoint2")<0) {
 					$columnlist[$c] = "Y";  // found a pivot column
 				}
 			}
@@ -2179,7 +2188,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$debug=0) {
 	  				if($showfractions==1) {
 						$solution[$c] = fractionreduce($sma[$zerorow][$lastcol]);
 		  		  	} else {
-		  		  		$solution[$c] = fractiontodecimal($sma[$zerorow][$lastcol]);
+		  		  		$solution[$c] = fractiontodecimal1($sma[$zerorow][$lastcol],"simplexreadsolutionarray1");
 	  			  	}
 				}
 			}
@@ -2191,7 +2200,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$debug=0) {
 				$solution[$c] = fractionreduce($sma[$lastrow][$c]);
 			}
 			else {
-				$solution[$c] = fractiontodecimal($sma[$lastrow][$c]);
+				$solution[$c] = fractiontodecimal1($sma[$lastrow][$c],"simplexreadsolutionarray2");
 			}
 			if($debug==1) { echo "$c) ".$solution[$c]." <br/>";}
 		}
@@ -2216,7 +2225,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$debug=0) {
 						$solution[$c] = fractionreduce($sma[$zerorow][$lastcol]);
 					}
 					else {
-						$solution[$c] = fractiontodecimal($sma[$zerorow][$lastcol]);
+						$solution[$c] = fractiontodecimal1($sma[$zerorow][$lastcol],"simplexreadsolutionarray3");
 					}
 				}
 
@@ -2235,7 +2244,7 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1,$debug=0) {
 		$solution[$objectiveposition] = fractionreduce($optimizefrac);
 	}
 	else {
-		$solution[$objectiveposition] = fractiontodecimal($optimizefrac);
+		$solution[$objectiveposition] = fractiontodecimal1($optimizefrac,"simplexreadsolutionarray4");
 	}
 
 	if($debug==1) {echo "$objectiveposition) ".$solution[$objectiveposition]." <br/>";}
@@ -2798,7 +2807,7 @@ function simplexfindsolutioninlist($solutionlist,$solution) {
 	  for($c=0,$sizecol = count($solutionlist[0]);$c<$sizecol;$c++) {
 		  // now check to see if this solution matches the student
 		  // need to evaluate  $solutionlist[$r][$c] to a decimal
-		  if(fractiontodecimal($solutionlist[$r][$c])!=fractiontodecimal($solution[$c])) {
+		  if(fractiontodecimal1($solutionlist[$r][$c],"simplexfindsolutioninlist1")!=fractiontodecimal1($solution[$c],"simplexfindsolutioninlist1")) {
 			 $match = 0;  // not a solution
 			 break;
 		  }
@@ -2823,7 +2832,7 @@ function simplexhasmixedconstrants($sm){
   // now loop throught the last column and check for negatives
   for($i=0;$i<$lastrow;$i++)
   {
-	 if(fractiontodecimal($sm[$i][$lastcol]) < 0 ) {
+	 if(fractiontodecimal1($sm[$i][$lastcol],"simplexhasmixedconstrants") < 0 ) {
 	   return true;
 	 }
   }
@@ -3003,7 +3012,7 @@ function simplexdisplaytable() {
 		  $Element = fractionreduce($sm[$rloop][$cloop]);   // convert to fraction
 		}
 		else {
-		  $Element = fractiontodecimal($sm[$rloop][$cloop]); // convert to decimal
+		  $Element = fractiontodecimal1($sm[$rloop][$cloop],"simplexdisplaytable1"); // convert to decimal
 		}
 
 		$TableElement = $tick.$Element.$tick;
@@ -3167,6 +3176,9 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change Log
+// 2021-03-16 ver 32 - Attempt to avoid ' A non-numeric value encountered on line 115 in file /var/app/current/assessment/libs/fractions.php' I
+//                     beleive it is from the fractiontodecimal call. Added a debugging function as a first step to track this down.
+//
 // 2019-11-24 ver 30 - reworked the current point tpo not show debug information.
 //
 // 2019-10-28 ver 29 - Fixed bug in simplexsolve2 that added an extra row to some tableaus
