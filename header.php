@@ -179,7 +179,7 @@ if (!isset($_SESSION['mathdisp'])) {
             MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
             </script>';
     }
-	echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
+	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
