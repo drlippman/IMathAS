@@ -36,6 +36,7 @@ class StringScorePart implements ScorePart
         if (isset($options['strflags'])) {if (is_array($options['strflags'])) {$strflags = $options['strflags'][$partnum];} else {$strflags = $options['strflags'];}}
         if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $givenans = normalizemathunicode($givenans);
@@ -90,6 +91,15 @@ class StringScorePart implements ScorePart
             }
             foreach($gaarr as $j=>$givenans) {
                 $givenans = trim($givenans);
+
+                if ($answerformat == "logic") {
+                    if (comparelogic($givenans, $answer, $variables)) {
+                        $correct += 1;
+                        $foundloc = $j;
+                    } else {
+                        continue; // skip normal processing
+                    }
+                }
 
                 if (count($torem)>0) {
                     $givenans = str_replace($torem,' ',$givenans);

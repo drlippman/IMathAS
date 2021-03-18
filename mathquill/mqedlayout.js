@@ -522,7 +522,7 @@ var myMQeditor = (function($) {
         baselayout.tabs[3].tabcontent[0].contents.splice(4,3);
       }
     }
-    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal)/)) {
+    if (!calcformat.match(/(fraction|mixednumber|fracordec|\bdecimal|logic)/)) {
       baselayout.tabs[1].enabled = true;
       if (!calcformat.match(/notrig/)) {
         baselayout.tabs[2].enabled = true;
@@ -558,6 +558,21 @@ var myMQeditor = (function($) {
         contents: [{l:'\\left\\langle\\right\\rangle', c:'i', w:['\\left\\langle','\\right\\rangle']}]
       }, {s:.1});
     }
+    if (calcformat.match(/logic/)) {
+        baselayout.tabs[0].p = "Logic";
+        baselayout.tabs[0].tabcontent[0].contents = [
+            {l:'\\vee',pr:'<span class="mq-binary-operator">∨</span>'},
+            {l:'\\wedge',pr:'<span class="mq-binary-operator">∧</span>'},
+            {b:'~'},
+            {l:'\\left(\\right)', c:'i', w:'()',pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">(</span><span class="mq-non-leaf mq-empty"></span><span class="mq-scaled mq-paren" style="transform: scale(1, 1.2);">)</span></span>'},
+            {l:'\\implies',pr:'<span class="mq-binary-operator">⇒</span>'},
+            {l:'\\iff',pr:'<span class="mq-binary-operator">⇔</span>'}
+        ];
+        if (layoutstyle !== 'OSK') {
+            baselayout.tabs[0].tabcontent[0].s = 3;
+        }
+    }
+
     // for both
     if (vars.length > 0) {
         var varbtns = getVarsButtons2(vars,layoutstyle);
