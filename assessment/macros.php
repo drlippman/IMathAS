@@ -4683,7 +4683,7 @@ function comparelogic($a,$b,$vars) {
     if (!is_array($vars)) {
         $vars = array_map('trim', explode(',', $vars));
     }
-    if (trim($a) == '' || trim($b) == ''){
+    if ($a === null || $b === null || trim($a) == '' || trim($b) == '') {
         return false;
     }
     $varlist = implode(',', $vars);
