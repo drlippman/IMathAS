@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values");
+ "array_values","comparelogic");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -4677,6 +4677,44 @@ function formatcomplex($real,$imag) {
             return "$real+{$imag}i";
         }
     }
+}
+
+function comparelogic($a,$b,$vars) {
+    if (!is_array($vars)) {
+        $vars = array_map('trim', explode(',', $vars));
+    }
+    if (trim($a) == '' || trim($b) == ''){
+        return false;
+    }
+    $varlist = implode(',', $vars);
+    $a = str_replace(['^^','vv','~','->','=>','<->','<=>'],['La','Lo','!','Li','Li','Lb','Lb'], $a);
+    $b = str_replace(['^^','vv','~','->','=>','<->','<=>'],['La','Lo','!','Li','Li','Lb','Lb'], $b);
+    $afunc = makeMathFunction($a, $varlist);
+    if ($afunc === false) {
+        return false;
+    }
+    $bfunc = makeMathFunction($b, $varlist);
+    if ($bfunc === false) {
+        return false;
+    }
+    $n = count($vars);
+    $max = pow(2,$n);
+    $map = array_combine($vars, array_fill(0,count($vars),0));
+    for ($i=0; $i<$max; $i++) {
+        $aval = $afunc($map);
+        $bval = $bfunc($map);
+        if ($aval != $bval) { 
+            return false;
+        }
+        for ($j=0;$j<$n;$j++) {
+            if ($map[$vars[$j]] == 0) { // if it's 0, add 1 and stop
+                $map[$vars[$j]] = 1; break;
+            } else {
+                $map[$vars[$j]] = 0; // if it's 1, set to 0 and continue on to the next one
+            }
+        }
+    }
+    return true;
 }
 
 ?>
