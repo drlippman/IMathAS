@@ -419,7 +419,7 @@ class AssessRecord
    * @return int   New question ID
    */
   public function buildNewQuestionVersion($qn, $qid, $forceseed = -1) {
-    list($oldquestions, $oldseeds) = $this->getOldQuestions();
+    list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
     list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
     // build question data
     $newver = array(
@@ -3374,7 +3374,7 @@ class AssessRecord
           'score'=>$aver['questions'][$qn]['score']];
       }
       if (count($qvers) == 1) { // only 1 ver, so will need to rebuild it
-        list($oldquestions, $oldseeds) = $this->getOldQuestions();
+        list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
         list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qvers[0]['qid'], $oldseeds, $oldquestions);
         $qvers[0] = array(
           'qid' => $question,
