@@ -1915,7 +1915,10 @@ function syntaxcheckexpr(str,format,vl) {
 
 // returns [numval, errmsg]
 function singlevaleval(evalstr, format) {
-  evalstr = evalstr.replace(/,/g, '');
+  evalstr = evalstr.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  if (evalstr.match(/,/)) {
+    return [NaN, _("syntax incomplete")+". "];
+  }
   if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
     evalstr = evalstr.replace(/%/g,'') + '/100';
   }
@@ -1954,7 +1957,7 @@ function scopedeval(c) {
 function scopedmatheval(c) {
 	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
 		return '';
-	}
+    }
 	try {
 		return eval(prepWithMath(mathjs(c)));
 	} catch(e) {
