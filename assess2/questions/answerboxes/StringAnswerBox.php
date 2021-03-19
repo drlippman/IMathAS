@@ -66,7 +66,7 @@ class StringAnswerBox implements AnswerBox
                 $tip = $shorttip._(', like [(2,3,4),(1,4,5)]');
             } else if ($answerformat=='logic') {
                 $shorttip = _('Enter a logic statement');  
-                $tip = _('Enter a logic statement using the editor button, or vv for or, ^^ for and, ~ for not, => for conditional, <=> for biconditional');
+                $tip = _('Enter a logic statement using the editor buttons, or use "and", "or", "implies", and "iff"');
             } else {
     			$tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
     			$shorttip = _('Enter text');
@@ -166,7 +166,7 @@ class StringAnswerBox implements AnswerBox
     		if (strpos($strflags,'regex')!==false) {
     			$sa .= _('The answer must match a specified pattern');
     		} else if ($answerformat == "logic") {
-    			$sa .= '`'.$answer.'`';
+                $sa = '`'.str_replace(['and','or', 'implies', 'iff'], ['^^','vv','=>','<=>'], $answer).'`';
     		} else {
     			$sa .= $answer;
     		}
