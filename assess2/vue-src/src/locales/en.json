@@ -460,7 +460,8 @@
     "has_timeext": "Has a {n} minute time limit extension available",
     "used_timeext": "Used a {n} minute time limit extension",
     "attemptext": "Exception given for {n} additional versions",
-    "preview_files": "Preview All Files"
+    "preview_files": "Preview All Files",
+    "introtexts": "Intro and between-question text"
   },
   "work": {
     "add": "Add Work",

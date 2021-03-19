@@ -10,41 +10,15 @@
 </template>
 
 <script>
-import { store } from '../basicstore';
 import InterQuestionText from '@/components/InterQuestionText.vue';
 
 export default {
   name: 'InterQuestionTextList',
-  props: ['qn', 'pos', 'active', 'page'],
+  props: ['qn', 'pos', 'active', 'textlist', 'lastq'],
   components: {
     InterQuestionText
   },
   computed: {
-    textList () {
-      if (typeof this.page === 'undefined' || this.page < 0) {
-        if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
-          return [];
-        } else {
-          return store.assessInfo.interquestion_text;
-        }
-      } else {
-        if (!store.assessInfo.hasOwnProperty('interquestion_pages') ||
-          !store.assessInfo.interquestion_pages.hasOwnProperty(this.page)
-        ) {
-          return [];
-        } else {
-          return store.assessInfo.interquestion_pages[this.page];
-        }
-      }
-    },
-    lastQuestion () {
-      if (typeof this.page === 'undefined' || this.page < 0) {
-        return store.assessInfo.questions.length - 1;
-      } else {
-        const qlist = store.assessInfo.interquestion_pages[this.page][0].questions;
-        return qlist[qlist.length - 1];
-      }
-    },
     texts () {
       if (this.pos === 'all') {
         return this.allText;
@@ -56,8 +30,8 @@ export default {
     },
     allText () {
       const out = [];
-      for (const i in this.textList) {
-        const textObj = this.textList[i];
+      for (const i in this.textlist) {
+        const textObj = this.textlist[i];
         out.push({
           html: textObj.text,
           expanded: (textObj.forntype === true || this.qn === textObj.displayBefore)
@@ -67,8 +41,8 @@ export default {
     },
     preText () {
       const out = [];
-      for (const i in this.textList) {
-        const textObj = this.textList[i];
+      for (const i in this.textlist) {
+        const textObj = this.textlist[i];
         if ((this.pos === 'beforeexact' && this.qn === textObj.displayBefore) ||
           (this.pos !== 'beforeexact' && this.qn >= textObj.displayBefore && this.qn <= textObj.displayUntil)
         ) {
@@ -82,10 +56,10 @@ export default {
     },
     postText () {
       const out = [];
-      if (this.qn === this.lastQuestion) {
+      if (this.qn === this.lastq) {
         // only show post text if last question
-        for (const i in this.textList) {
-          const textObj = this.textList[i];
+        for (const i in this.textlist) {
+          const textObj = this.textlist[i];
           if (this.qn < textObj.displayBefore) {
             out.push({
               html: textObj.text,
