@@ -148,7 +148,7 @@ class MathParser
     $allwords = array_merge($this->functions, $this->variables, ['degree','degrees']);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
     $this->regex = '/^('.implode('|',array_map('preg_quote', $allwords)).')/';
-    $this->funcregex = '/^('.implode('|',array_map('preg_quote', $this->functions)).')/i';
+    $this->funcregex = '/('.implode('|',array_map('preg_quote', $this->functions)).')/i';
     $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', array_map('preg_quote', $this->variables)).')/';
 
     //define operators

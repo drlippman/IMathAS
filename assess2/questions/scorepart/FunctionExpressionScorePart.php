@@ -64,6 +64,12 @@ class FunctionExpressionScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         $givenans = normalizemathunicode(trim($givenans));
+
+        $givenans = preg_replace_callback(
+            '/(arcsinh|arccosh|arctanh|arcsin|arccos|arctan|arcsec|arccsc|arccot|root|sqrt|sign|sinh|cosh|tanh|sech|csch|coth|abs|sin|cos|tan|sec|csc|cot|exp|log|ln)[\(\[]/i',
+            function($m) { return strtolower($m[0]); },
+            $givenans
+        );
         $answer = normalizemathunicode($answer);
         
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
