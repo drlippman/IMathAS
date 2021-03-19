@@ -134,6 +134,7 @@ if (count($platforms)>0) {
         echo '<p class="noticetext">'._('Since you already have an existing platform registration, you should not need to add a New Platform unless you have changed LMSs').'</p>';
     }
 }
+echo '<p class="noticetext">'._('WARNING: If instructors are currently using course-level LTI connections, only add a new LTI 1.3 setup between terms. Sometimes the LTI 1.3 setup can override the course-level config causing duplicate student enrollments and other issues.').'</p>';
 echo '<p><label for=lms>'._('Select your LMS').'</label>: ';
 echo '<select id=lms name=lms>';
 echo  '<option value=other>'._('Other').'</option>';
