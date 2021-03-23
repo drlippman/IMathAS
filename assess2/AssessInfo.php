@@ -840,8 +840,8 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&4 || $this->assessData['shuffle']&2) {
-      //all students same seed or all questions same seed - don't regen
+    if ($this->assessData['shuffle']&2) {
+      //all questions same seed - don't regen
       $newseed = $oldseeds[0];
     } else {
       if ($this->questionData[$newq]['fixedseeds'] !== null) {
@@ -857,6 +857,9 @@ class AssessInfo
           }
           $newseed = $unused[array_rand($unused, 1)];
         }
+      } else if ($this->assessData['shuffle']&4) {
+        // all stu same seed - increment seed by 1
+        $newseed = max($oldseeds) + 1;
       } else {
         //regular seed pick
         $looplimit = 0;
