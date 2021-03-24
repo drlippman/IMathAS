@@ -208,7 +208,6 @@ if (isset($_GET['launch'])) {
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
     echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
-    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of "
             .Sanitize::encodeStringForJavascript($_SESSION['ltitlwrds'])
@@ -222,7 +221,8 @@ if (isset($_GET['launch'])) {
 
 	} else {
 		echo ">";
-	}
+    }
+    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>
@@ -1822,7 +1822,6 @@ if (isset($_GET['launch'])) {
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
     echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
-    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".</p>";
@@ -1833,7 +1832,8 @@ if (isset($_GET['launch'])) {
 		}
 	} else {
 		echo ">";
-	}
+    }
+    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>
