@@ -2,7 +2,6 @@
 //IMathAS: gradebook table generating function
 //(c) 2007 David Lippman
 
-
 require_once("../includes/exceptionfuncs.php");
 
 if ($GLOBALS['canviewall']) {
@@ -170,7 +169,6 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 ****/
 function flattenitems($items,&$addto,&$itemidsection,$sec='') {
 	global $canviewall,$secfilter,$studentinfo;
-
 	$now = time();
 	foreach ($items as $item) {
 		if (is_array($item)) {
@@ -201,6 +199,7 @@ function flattenitems($items,&$addto,&$itemidsection,$sec='') {
 }
 
 function gbtable() {
+
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
 	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs,$includeendmsg;
 	global $hidesection,$hidecode,$exceptionfuncs,$courseenddate, $includeemail;
@@ -1211,6 +1210,7 @@ function gbtable() {
             $countthisone = false;
             $gb[$row][1][$col][0] = ' ';
         }
+        
 		if ($countthisone) {
 			if ($cntingb[$i] == 1) {
 				if (isset($availstu[$row][$l['assessmentid']])) { //has per-stu avail override
@@ -1452,6 +1452,7 @@ function gbtable() {
             $countthisone = false;
             $gb[$row][1][$col][0] = ' ';
         }
+
 		if ($countthisone) {
 			if ($cntingb[$i] == 1) {
 				if (isset($availstu[$row][$l['assessmentid']])) { //has per-stu avail override
@@ -2050,6 +2051,11 @@ function gbtable() {
 				}
 			}
 			if (!empty($gb[$ln][1][$col][14]) && $gb[0][1][$col][4]==1) { //excused; remove from poss
+				for ($j=0;$j<4;$j++) {
+					unset($catpossstu[$j][$category[$i]][$col]);
+				}
+            }
+            if ($gb[$ln][1][$col][0] === 'N/A') { //score not avail yet; remove from poss
 				for ($j=0;$j<4;$j++) {
 					unset($catpossstu[$j][$category[$i]][$col]);
 				}
