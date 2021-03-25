@@ -90,20 +90,21 @@ class AssessInfo
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
     if (!$isstu && $this->assessData['date_by_lti'] > 0 && isset($_SESSION['lti_duedate'])) {
       // fake exception for teachers from LTI
-      $this->setException(array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $this->setException($uid, array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else if (!$isstu) {
-      $this->setException(false, $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $this->setException($uid, false, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else {
       $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
-      $this->setException($stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $this->setException($uid, $stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
     }
   }
 
   /**
    * Sets an exception
+   * @param  integer  $uid   The user ID
    * @param  array|false   $exception   array of exception data, or false for none.
    * @param  boolean  $isstu      Whether the user is a student
    * @param  integer $latepasses  The number of latepasses the user has
@@ -111,7 +112,7 @@ class AssessInfo
    * @param  integer $courseenddate The course end date
    * @return void
    */
-  public function setException($exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
+  public function setException($uid, $exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
 
     // resets, in case we're using setException multiple times
     $resetkeys = ['exceptionpenalty','original_enddate','extended_with',

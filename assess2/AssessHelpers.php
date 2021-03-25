@@ -51,6 +51,7 @@ class AssessHelpers
         $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             $assess_info->setException(
+                $row['userid'],
                 isset($exceptions[$row['userid']]) ? $exceptions[$row['userid']] : false,
                 true
             );
