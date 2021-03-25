@@ -2005,7 +2005,7 @@ function gbtable() {
                 (empty($stusection[$gb[$ln][4][0]]) || $stusection[$gb[$ln][4][0]] != $sectionlimit[$col])
             ) {
                 // assess is for diff sec; remove as avail
-                $availstu[$ln][$aid] = 3;
+                $availstu[$ln][$aid] = 4;
             }
 			if (isset($availstu[$ln][$aid]) && $availstu[$ln][$aid]!=$gb[0][1][$col][3]) {
 				//if we have a per-stu override of avail
