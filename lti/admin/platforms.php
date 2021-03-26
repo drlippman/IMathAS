@@ -348,7 +348,7 @@ echo '</form>';
 ?>
 <script type="text/javascript">
 $(function() {
-  $('.tocopy').each(function(i,eltocopy) {
+  /*$('.tocopy').each(function(i,eltocopy) {
     $(eltocopy).after($('<button>', {type: 'button', text: '<?php echo _('Copy');?>'})
       .on('click', function() {
         var el = document.createElement('textarea');
@@ -360,7 +360,7 @@ $(function() {
         document.execCommand('copy');
         document.body.removeChild(el);
       }));
-  });
+  });*/
   $('#lms').on('change', function() {
     var lms = this.value;
     $(".lmsinstr").hide();
