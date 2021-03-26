@@ -850,6 +850,10 @@ class AssessInfo
         if (count($this->questionData[$newq]['fixedseeds']) == 1) {
           //only one seed so use it
           $newseed = $this->questionData[$newq]['fixedseeds'][0];
+        } else if ($this->assessData['shuffle']&4) {
+          //all stu same seed using fixed seed list, pick next in list
+          $n = count($this->questionData[$newq]['fixedseeds']);
+          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds) + ($ispractice?1:0)) % $n];
         } else {
           $unused = array_diff($this->questionData[$newq]['fixedseeds'], $oldseeds);
           if (count($unused) == 0) {
