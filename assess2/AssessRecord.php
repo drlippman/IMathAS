@@ -1916,7 +1916,7 @@ class AssessRecord
         $correctAnswerWrongFormat[$pn] = 
           !empty($qver['tries'][$pn][$partattemptn[$pn] - 1]['wrongfmt']);
       }
-      if ($this->teacherInGb) {
+      if ($this->teacherInGb || $force_answers) {
         $seqPartDone[$pn] = true;
       } else if ($showscores) {
         // move on if correct or out of tries or manually graded
