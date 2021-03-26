@@ -204,18 +204,20 @@ echo '<li>'._('Click +App').'</li>';
 echo '<li>'._('For Configuration Type, select By Client ID. Paste in the Client ID you copied down above, and hit Submit.').'</li>';
 echo '</ul>';
 
-echo '<p>'._('Now enter the Client ID you copied down above from the Details column.').'</p>';
-echo '<ul>';
-echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
-echo '</ul>';
-echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.com"/>';
-echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
-echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
-echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
+if (empty($CFG['LTI']['autoreg'])) {
+    echo '<p>'._('Now enter the Client ID you copied down above from the Details column.').'</p>';
+    echo '<ul>';
+    echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
+    echo '</ul>';
+    echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.com"/>';
+    echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
+    echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
+    echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
 
-echo '<input type="hidden" name=canvas_uniqid value="" />';
+    echo '<input type="hidden" name=canvas_uniqid value="" />';
 
-echo '<button type=submit>'._('Add Platform').'</button></p>';
+    echo '<button type=submit>'._('Add Platform').'</button></p>';
+}
 echo '</div>';
 
 // Blackboard
