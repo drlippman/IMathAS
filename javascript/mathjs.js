@@ -136,7 +136,7 @@ function mathjs(st,varlist) {
   	  st = st.replace(/pi/g, "(pi)");
   }
   //temp store of scientific notation
-  st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
+  st = st.replace(/([0-9])(E|e)([\-0-9])/g,"$1(EE)$3");
 
   st = st.replace(/\*?\s*degrees?/g,"*((pi)/180)");
 
