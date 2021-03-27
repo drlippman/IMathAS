@@ -3581,6 +3581,8 @@ class AssessRecord
             $outstr .= " <br/><div><img id=\"img$qn-$pn-$tn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
           }*/
           $out[$pn][] = $outstr;
+        } else if ($qtype == 'essay') {
+          $out[$pn][] = $parttrydata[$tn]['stuans'];
         } else {
           $out[$pn][] = Sanitize::encodeStringForDisplay($parttrydata[$tn]['stuans']);
         }
