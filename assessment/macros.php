@@ -453,7 +453,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if (isNaN($x) || isNaN($y)) {
 					continue;
 				}
-				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
+				$x = round($x,$yrnd);//round(eval("return ($xfunc);"),3);
 				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
