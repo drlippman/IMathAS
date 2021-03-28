@@ -812,7 +812,7 @@ function togglevideoembed() {
 			var vidid = href.split('.com/')[1].split(/[#&]/)[0];
 			var vidsrc = 'player.vimeo.com/video/';
 		}
-		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s)?.*/);
+		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s?)?.*/);
 		if (m == null) {
 			var timeref = qsconn+'rel=0';
 			m = href.match(/.*start=(\d+)/);
