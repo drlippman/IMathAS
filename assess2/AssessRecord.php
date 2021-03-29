@@ -419,7 +419,7 @@ class AssessRecord
    * @return int   New question ID
    */
   public function buildNewQuestionVersion($qn, $qid, $forceseed = -1) {
-    list($oldquestions, $oldseeds) = $this->getOldQuestions();
+    list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
     list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qid, $oldseeds, $oldquestions);
     // build question data
     $newver = array(
@@ -1916,7 +1916,7 @@ class AssessRecord
         $correctAnswerWrongFormat[$pn] = 
           !empty($qver['tries'][$pn][$partattemptn[$pn] - 1]['wrongfmt']);
       }
-      if ($this->teacherInGb) {
+      if ($this->teacherInGb || $force_answers) {
         $seqPartDone[$pn] = true;
       } else if ($showscores) {
         // move on if correct or out of tries or manually graded
@@ -3374,7 +3374,7 @@ class AssessRecord
           'score'=>$aver['questions'][$qn]['score']];
       }
       if (count($qvers) == 1) { // only 1 ver, so will need to rebuild it
-        list($oldquestions, $oldseeds) = $this->getOldQuestions();
+        list($oldquestions, $oldseeds) = $this->getOldQuestions($qn);
         list($question, $seed) = $this->assess_info->regenQuestionAndSeed($qvers[0]['qid'], $oldseeds, $oldquestions);
         $qvers[0] = array(
           'qid' => $question,
@@ -3581,6 +3581,8 @@ class AssessRecord
             $outstr .= " <br/><div><img id=\"img$qn-$pn-$tn\" style=\"display:none;max-width:80%;\" aria-hidden=\"true\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
           }*/
           $out[$pn][] = $outstr;
+        } else if ($qtype == 'essay') {
+          $out[$pn][] = $parttrydata[$tn]['stuans'];
         } else {
           $out[$pn][] = Sanitize::encodeStringForDisplay($parttrydata[$tn]['stuans']);
         }

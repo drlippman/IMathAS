@@ -32,6 +32,13 @@ if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
+if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0
+  && $_SESSION['ltiitemid'] != $aid
+) {
+  echo '{"error": "need_relaunch"}';
+  exit;
+}
+
 $now = time();
 
 // option to reset assessment entirely

@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { mapInterquestionTexts } from '@/mixins/maptexts';
 
 export const store = Vue.observable({
   assessInfo: null,
@@ -108,6 +109,8 @@ export const actions = {
           ver = store.assessInfo.assess_versions.length - 1;
         }
         // set into store
+        Vue.delete(store.assessInfo, 'interquestion_text');
+        Vue.delete(store.assessInfo, 'intro');
         Vue.set(store.assessInfo.assess_versions, ver, response);
 
         // set current versions to scored versions
@@ -127,6 +130,50 @@ export const actions = {
         Vue.nextTick(() => {
           window.initAnswerboxHighlights();
         });
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
+  loadGbTexts (callback) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadGbTexts(callback), 20);
+      return;
+    }
+    store.inTransit = true;
+    store.errorMsg = null;
+    window.$.ajax({
+      url: store.APIbase + 'gbloadtexts.php' + store.queryString,
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        const qs = [];
+        for (let i = 0; i < store.assessInfo.assess_versions[store.curAver].questions.length; i++) {
+          qs[i] = {};
+          if (store.assessInfo.assess_versions[store.curAver].questions[i][store.curQver[i]].hasOwnProperty('text')) {
+            qs[i] = { text: store.assessInfo.assess_versions[store.curAver].questions[i][store.curQver[i]].text.slice() };
+          }
+        }
+        if (response.hasOwnProperty('interquestion_text')) {
+          mapInterquestionTexts(response, qs);
+        }
+
+        Vue.set(store.assessInfo, 'intro', response.intro);
+        Vue.set(store.assessInfo, 'interquestion_text', response.interquestion_text);
+        if (callback) {
+          Vue.nextTick(() => { callback(); });
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');

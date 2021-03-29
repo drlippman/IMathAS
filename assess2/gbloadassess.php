@@ -190,6 +190,10 @@ if ($isstudent) {
   $stm = $DBH->prepare($query);
   $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':typeid'=>$aid,
     ':type'=> $LPblockingView ? 'gbviewassess' : 'gbviewsafe', ':viewtime'=>$now));
+
+  if ($LPblockingView) {
+      $assess_info->overrideSetting('can_use_latepass', 0);
+  }
 }
 
 // indicate whether teacher/tutor can see all the answers and such

@@ -134,6 +134,7 @@ if (count($platforms)>0) {
         echo '<p class="noticetext">'._('Since you already have an existing platform registration, you should not need to add a New Platform unless you have changed LMSs').'</p>';
     }
 }
+echo '<p class="noticetext">'._('WARNING: If instructors are currently using course-level LTI connections, only add a new LTI 1.3 setup between terms. Sometimes the LTI 1.3 setup can override the course-level config causing duplicate student enrollments and other issues.').'</p>';
 echo '<p><label for=lms>'._('Select your LMS').'</label>: ';
 echo '<select id=lms name=lms>';
 echo  '<option value=other>'._('Other').'</option>';
@@ -203,18 +204,20 @@ echo '<li>'._('Click +App').'</li>';
 echo '<li>'._('For Configuration Type, select By Client ID. Paste in the Client ID you copied down above, and hit Submit.').'</li>';
 echo '</ul>';
 
-echo '<p>'._('Now enter the Client ID you copied down above from the Details column.').'</p>';
-echo '<ul>';
-echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
-echo '</ul>';
-echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.com"/>';
-echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
-echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
-echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
+if (empty($CFG['LTI']['autoreg'])) {
+    echo '<p>'._('Now enter the Client ID you copied down above from the Details column.').'</p>';
+    echo '<ul>';
+    echo '<li><label>'._('Details value (Client ID):').' <input name=canvas_clientid size=50/></label></li>';
+    echo '</ul>';
+    echo '<input type="hidden" name=canvas_issuer value="https://canvas.instructure.com"/>';
+    echo '<input type="hidden" name=canvas_keyseturl value="https://canvas.instructure.com/api/lti/security/jwks"/>';
+    echo '<input type="hidden" name=canvas_tokenurl value="https://canvas.instructure.com/login/oauth2/token"/>';
+    echo '<input type="hidden" name=canvas_authurl value="https://canvas.instructure.com/api/lti/authorize_redirect"/>';
 
-echo '<input type="hidden" name=canvas_uniqid value="" />';
+    echo '<input type="hidden" name=canvas_uniqid value="" />';
 
-echo '<button type=submit>'._('Add Platform').'</button></p>';
+    echo '<button type=submit>'._('Add Platform').'</button></p>';
+}
 echo '</div>';
 
 // Blackboard
@@ -347,7 +350,7 @@ echo '</form>';
 ?>
 <script type="text/javascript">
 $(function() {
-  $('.tocopy').each(function(i,eltocopy) {
+  /*$('.tocopy').each(function(i,eltocopy) {
     $(eltocopy).after($('<button>', {type: 'button', text: '<?php echo _('Copy');?>'})
       .on('click', function() {
         var el = document.createElement('textarea');
@@ -359,7 +362,7 @@ $(function() {
         document.execCommand('copy');
         document.body.removeChild(el);
       }));
-  });
+  });*/
   $('#lms').on('change', function() {
     var lms = this.value;
     $(".lmsinstr").hide();

@@ -2572,6 +2572,9 @@ These macros are used to test various conditions.  They typically return true or
 <li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Compares functions a and b to see if they are algebraically equivalent.  Set
   vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
   Set domain to "xmin,xmax" to specify a domain for comparison.</li>
+<li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
+ ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
+ vars should be a list or array of variables in the statements. </li>
 <li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
   to see if the words in the list/array "words" appear in the student's answer. If they all appear, it redefines
@@ -3339,15 +3342,21 @@ A student is asked to enter a string (a word or list of letters).
 	<dd>"takeanything" or "takeanythingorblank" sets the problem to give full credit
 		for any answer.  "takeanythingorblank" also counts blank answers as correct.
 	  "submitblank" will cause blank answers to get submitted for scoring (new system only).</dd>
-<dt>$answerformat = "list" </dt>
-	<dd>Specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with
-	partial_credit flag.  Duplicates are not ignored.</dd>
+<dt>$answerformat = "list" or "logic" </dt>
+	<dd>"list" specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with
+    partial_credit flag.  Duplicates are not ignored. <br><br>
+    "logic" enables a separate grading algorithm for logic statements, ignoring $strflags.  The $answer 
+    should be given using vv for or, ^^ for and, ~ for not, =&gt; for conditional, and &lt;=&gt; for biconditional.
+    Parens are supported, but no other symbols.  The variables used in the logic expression must be declared by 
+    defining $variables.</dd>
 <dt>$displayformat = "usepreview" or "typeahead" or "usepreviewnomq"</dt>
     <dd>"usepreview" enables mathquill entry for mathematical answers.<br/>
         "usepreviewnomq" adds a preview button for previewing mathematical answers in asciimath.<br/>
 	"typeahead" will enable an auto-suggest list of options once the student has typed at least
 	two letters of the word.  Provide the auto-suggest list in the variable $questions.
-	</dd>
+    </dd>
+<dt>$variables</dt>
+    <dd>When $answerformat="logic" is used, define the $variables in the logic statement, like "p,q"</dd>
 <dt>$ansprompt = string </dt>
 	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
 <dt>$answerboxsize = number </dt>

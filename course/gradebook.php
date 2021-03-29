@@ -829,7 +829,11 @@ function gbstudisp($stu) {
 			}
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
-			}
+            }
+            if (isset($gbt[0][1][$i][17]) && $gbt[0][1][$i][17] != $stusection) {
+                // is section limited, and this student isn't in the section
+                continue;
+            }
 
 			echo '<tr class="grid">';
 			if ($stu>0 && $isteacher) {

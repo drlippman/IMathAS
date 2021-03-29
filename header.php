@@ -101,13 +101,14 @@ if (!isset($_SESSION['mathdisp'])) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 		echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=090120\" type=\"text/javascript\"></script>\n";
     }
-
-    echo '<script type="text/x-mathjax-config">
-		MathJax.Hub.Queue(function () {
-			sendLTIresizemsg();
-		});
-		MathJax.Hub.Register.MessageHook("End Process", sendLTIresizemsg);
-         </script>';
+    if (isset($_SESSION['ltiitemtype'])) {
+        echo '<script type="text/x-mathjax-config">
+            MathJax.Hub.Queue(function () {
+                sendLTIresizemsg();
+            });
+            MathJax.Hub.Register.MessageHook("End Process", sendLTIresizemsg);
+            </script>';
+    }
     //Contrib not hosted in CDN yet
 	echo '<script type="text/x-mathjax-config">
         MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}});
@@ -178,7 +179,7 @@ if (!isset($_SESSION['mathdisp'])) {
             MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
             </script>';
     }
-	echo '<style type="text/css">span.AM { font-size: 105%;} .mq-editable-field.mq-math-mode var { font-style: normal;}</style>';
+	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';

@@ -174,19 +174,19 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/as
 if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=112020" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=031721" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=032721" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=021121" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100120" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=031621" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=032721" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=112020" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=031821">
   <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
 $placeinhead .= '<script>
@@ -452,7 +452,7 @@ if ($overwriteBody==1) {
 	}
 	echo '</p>';
 
-	echo '<p>'._('Question is in these libraries:');
+	echo '<p>'._('Question is in these libraries:').'</p>';
 	echo '<ul>';
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
@@ -465,7 +465,7 @@ if ($overwriteBody==1) {
 		}
 		echo '</li>';
 	}
-	echo '</ul></p>';
+	echo '</ul>';
 
 	if ($line['ancestors']!='') {
 		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);

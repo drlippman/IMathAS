@@ -183,7 +183,7 @@
           />
         </div>
 
-        <div v-if="canEdit">
+        <div v-if="canEdit && viewFull">
           <button @click = "showFilters = !showFilters">
             {{ $t('gradebook.filters') }}
           </button>
@@ -226,6 +226,12 @@
                   {{ $t('gradebook.hide_nowork') }}
                 </label>
               </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hidetexts" @change="loadTexts">
+                  {{ $t('gradebook.introtexts') }}
+                </label>
+              </li>
             </ul>
             <p>
               <button
@@ -250,52 +256,77 @@
         </div>
 
         <div v-if="viewFull">
+          <inter-question-text
+            v-if = "aData.hasOwnProperty('intro') && aData.intro !== ''"
+            v-show = "!hidetexts"
+            :active = "!hidetexts"
+            :textobj = "{html: aData.intro}"
+            class = "questionpane introtext"
+          />
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
-            class = "bigquestionwrap"
             :id = "'qwrap' + (qn+1)"
           >
-            <div class="headerpane">
-              <strong>
-                {{ $tc('question_n', qn+1) }}.
-              </strong>
-
-              <gb-question-select
-                v-if = "aData.submitby === 'by_question'"
-                :versions="qdata"
-                :selected="curQver[qn]"
-                :qn="qn"
-                @setversion = "changeQuestionVersion"
-                class = "med-left"
-              />
-              <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
-                {{ $t('gradebook.score') }}:
+            <inter-question-text-list
+              pos="beforeexact"
+              :qn="qn"
+              :key="'iqt'+qn"
+              v-show = "!hidetexts"
+              :active = "!hidetexts"
+              :lastq = "lastQ"
+              :textlist = "textList"
+            />
+            <div class = "bigquestionwrap">
+              <div class="headerpane">
                 <strong>
-                  {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
+                  {{ $tc('question_n', qn+1) }}.
                 </strong>
-              </span>
 
-            </div>
-            <div class="scrollpane">
-              <gb-question
-                :class = "{'inactive':!showQuestion[qn]}"
+                <gb-question-select
+                  v-if = "aData.submitby === 'by_question'"
+                  :versions="qdata"
+                  :selected="curQver[qn]"
+                  :qn="qn"
+                  @setversion = "changeQuestionVersion"
+                  class = "med-left"
+                />
+                <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
+                  {{ $t('gradebook.score') }}:
+                  <strong>
+                    {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
+                  </strong>
+                </span>
+
+              </div>
+              <div class="scrollpane">
+                <gb-question
+                  :class = "{'inactive':!showQuestion[qn]}"
+                  :qdata = "qdata[curQver[qn]]"
+                  :qn = "qn"
+                />
+                <gb-showwork
+                  :work = "qdata[curQver[qn]].work"
+                  :worktime = "qdata[curQver[qn]].worktime"
+                  :showall = "showAllWork"
+                />
+              </div>
+              <gb-score-details
+                :showfull = "showQuestion[qn]"
+                :canedit = "canEdit"
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
               />
-              <gb-showwork
-                :work = "qdata[curQver[qn]].work"
-                :worktime = "qdata[curQver[qn]].worktime"
-                :showall = "showAllWork"
-              />
             </div>
-            <gb-score-details
-              :showfull = "showQuestion[qn]"
-              :canedit = "canEdit"
-              :qdata = "qdata[curQver[qn]]"
-              :qn = "qn"
-            />
           </div>
+          <inter-question-text-list
+            pos="after"
+            :qn="lastQ"
+            :active = "!hidetexts"
+            v-show = "!hidetexts"
+            :lastq = "lastQ"
+            :textlist = "textList"
+          />
         </div>
         <gb-feedback
           qn="gen"
@@ -375,6 +406,9 @@ import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
 import GbFeedback from '@/gbviewassess/GbFeedback.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import InterQuestionText from '@/components/InterQuestionText.vue';
+
 import '../assess2.css';
 
 export default {
@@ -388,7 +422,9 @@ export default {
     SummaryCategories,
     ErrorDialog,
     GbFeedback,
-    ConfirmDialog
+    ConfirmDialog,
+    InterQuestionTextList,
+    InterQuestionText
   },
   data: function () {
     return {
@@ -403,7 +439,8 @@ export default {
       showFilters: false,
       showEndmsg: false,
       showExcused: false,
-      showAllWork: false
+      showAllWork: false,
+      hidetexts: true
     };
   },
   computed: {
@@ -601,6 +638,16 @@ export default {
     },
     confirmObj () {
       return store.confirmObj;
+    },
+    lastQ () {
+      return this.aData.assess_versions[store.curAver].questions.length - 1;
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
     }
   },
   methods: {
@@ -621,6 +668,7 @@ export default {
     },
     doChangeAssessVersion (val) {
       if (val !== store.curAver) {
+        this.hidetexts = true;
         if (this.aData.assess_versions[val].status === 3) {
           // requesting the practice version
           actions.loadGbAssessVersion(0, true);
@@ -722,8 +770,12 @@ export default {
     },
     previewFiles () {
       window.previewallfiles();
+    },
+    loadTexts () {
+      if (!store.assessInfo.hasOwnProperty('intro')) {
+        actions.loadGbTexts();
+      }
     }
-
   },
   created () {
     window.$(window).on('beforeunload', this.beforeUnload);

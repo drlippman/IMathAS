@@ -138,7 +138,12 @@ if (isset($_GET['launch'])) {
 	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
-	}
+    }
+    if ($_POST['orig_linkid'] != $_SESSION['lti_resource_link_id']) {
+        echo _('Uh oh, something went wrong.  Please go back and try again').'. ';
+        echo _('You may have launched too many assignments too quickly.');
+		exit;
+    }
 
 	require_once("$curdir/includes/userprefs.php");
 	generateuserprefs();
@@ -202,7 +207,7 @@ if (isset($_GET['launch'])) {
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
-	echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
+    echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
 	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of "
             .Sanitize::encodeStringForJavascript($_SESSION['ltitlwrds'])
@@ -216,7 +221,8 @@ if (isset($_GET['launch'])) {
 
 	} else {
 		echo ">";
-	}
+    }
+    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>
@@ -1735,7 +1741,12 @@ if (isset($_GET['launch'])) {
 	}
 	if (isset($_POST['tzname'])) {
 		$_SESSION['logintzname'] = $_POST['tzname'];
-	}
+    }
+    if ($_POST['orig_linkid'] != $_SESSION['lti_resource_link_id']) {
+        echo _('Uh oh, something went wrong.  Please go back and try again').'. ';
+        echo _('You may have launched too many assignments too quickly.');
+		exit;
+    }
 
 	require_once("$curdir/includes/userprefs.php");
 	generateuserprefs();
@@ -1810,7 +1821,7 @@ if (isset($_GET['launch'])) {
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 	require("header.php");
 	echo "<h3>Connecting to $installname</h3>";
-	echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
+    echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
 	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".</p>";
@@ -1821,7 +1832,8 @@ if (isset($_GET['launch'])) {
 		}
 	} else {
 		echo ">";
-	}
+    }
+    echo '<input type=hidden name="orig_linkid" value="'. Sanitize::encodeStringForDisplay($_SESSION['lti_resource_link_id']) . '"/>';
 	?>
 	<div id="settings"><noscript>JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.
 	Please enable JavaScript and reload this page</noscript></div>

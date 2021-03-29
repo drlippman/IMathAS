@@ -161,6 +161,8 @@ course list from the course browser options, so you must also have `$CFG['course
 - `$CFG['LTI']['usesendzeros']`: Set to true to enable the "send zeros after due date" course setting.  _This option requires additional setup._
     - To operate, the `/lti/admin/sendzeros.php` script needs to be called on a schedule, typically once or a few times a day.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to `/lti/admin/sendzeros.php?authcode=####` using the code you define.
 - `$CFG['LTI']['useradd13']`: Set to true to allow teacher users to add LTI1.3 platforms.
+- `$CFG['LTI']['autoreg']`: Set to true to allow known LTI1.3 platforms to be autoregistered on first 
+   launch, to avoid needing to record the client id. Currently only works for Canvas.
 
 ### Email
 By default, emails are sent using the built-in PHP `mail()` function.  This can sometimes have reliability issue, so there are options to override the mail sender or reduce the use of email in the system.
