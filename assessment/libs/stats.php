@@ -9,7 +9,8 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "tcdf","invnormalcdf","invtcdf","invtcdf2","linreg","expreg","countif","binomialpdf",
  "binomialcdf","chicdf","invchicdf","chi2cdf","invchi2cdf","fcdf","invfcdf","piechart",
  "mosaicplot","checklineagainstdata","chi2teststat","checkdrawnlineagainstdata",
- "csvdownloadlink");
+ "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
+ "anova1way_f","anova1way","anova2way","anova_table","anova2way_f");
 
 //nCr(n,r)
 //The Choose function
@@ -392,6 +393,43 @@ function median($a) {
 	return percentile($a,50);
 }
 
+function modes($arr) {
+  if (!is_array($arr)) {
+    echo "mode expects an array";
+    return 'DNE';
+  }
+  $arr = array_map('strval', $arr);
+  $freqs = array_count_values($arr);
+  $maxfreq = max($freqs);
+  $modes = array_keys($freqs, $maxfreq);
+  if (count($modes)==count($freqs)) {
+    return 'DNE';
+  } else {
+    return implode(',', $modes);
+  }
+}
+
+function forceonemode(&$arr) {
+  $modes = modes($arr);
+  if (is_numeric($modes)) {
+    return $modes;
+  }
+  if ($modes == 'DNE') {
+    $mode = $arr[0];
+  } else {
+    $mode = explode(',', $modes)[0];
+  }
+  // add a value after an existing one (in case sorted)
+  array_splice($arr, array_search($mode,$arr), 0, $mode);
+  foreach ($arr as $k=>$v) {
+    if ($v != $mode) {
+      array_splice($arr, $k, 1);
+      break;
+    }
+  }
+  return $mode;
+}
+
 //freqdist(array,label,start,classwidth)
 //display macro.  Returns an HTML table that is a frequency distribution of
 //the data
@@ -724,7 +762,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 function piechart($pcts,$labels,$w=250,$h=130) {
 	if ($_SESSION['graphdisp']==0) {
 		$out .= '<table><caption>'._('Pie Chart').'</caption>';
-		$out .= '<tr><th>'.Sanitize::encodeStringForDisplay($datalabel).'</th>';
+		$out .= '<tr><th>'._('Label').'</th>';
 		$out .= '<th>'._('Percent').'</th></tr>';
 		foreach ($labels as $k=>$label) {
 			$out .= '<tr><td>'.Sanitize::encodeStringForDisplay($label).'<td>';
@@ -795,32 +833,39 @@ function piechart($pcts,$labels,$w=250,$h=130) {
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
 //specify rnd to round to that many digits
-function normrand($mu,$sig,$n,$rnd=null) {
+function normrand($mu,$sig,$n,$rnd=null,$pos=false) {
 	if (!is_finite($mu) || !is_finite($sig) || !is_finite($n) || $n < 0 || $n > 5000 || $sig < 0) {
 		echo 'invalid inputs to normrand';
 		return array();
 	}
-	global $RND;
-	for ($i=0;$i<ceil($n/2);$i++) {
+    global $RND;
+    $icnt = 0;
+    $z = [];
+    while (count($z)<$n && $icnt < 2*$n) {
 		do {
 			$a = $RND->rand(-32768,32768)/32768;
 			$b = $RND->rand(-32768,32768)/32768;
 			$r = $a*$a+$b*$b;
 			$count++;
 		} while ($r==0||$r>1);
-		$r = sqrt(-2*log($r)/$r);
-		if ($rnd!==null) {
-			$z[] = round($sig*$a*$r + $mu, $rnd);
-			$z[] = round($sig*$b*$r + $mu, $rnd);
-		} else {
-			$z[] = $sig*$a*$r + $mu;
-			$z[] = $sig*$b*$r + $mu;
-		}
-	}
-	if ($n%2==0) {
+        $r = sqrt(-2*log($r)/$r);
+        $v1 = $sig*$a*$r + $mu;
+        $v2 = $sig*$b*$r + $mu;
+        if (!$pos || $v1 > 0) {
+            $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
+        }
+        if (!$pos || $v2 > 0) {
+            $z[] = ($rnd===null) ? $v2 : round($v2, $rnd);
+        }
+        $icnt++;
+    }
+    if ($icnt == 2*$n && count($z) < $n) {
+        echo "Error: unable to generate enough positive values";
+    }
+	if (count($z)==$n) {
 		return $z;
 	} else {
-		return (array_slice($z,0,count($z)-1));
+		return (array_slice($z,0,$n));
 	}
 }
 
@@ -1549,7 +1594,7 @@ function chi2cdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function chicdf($x,$a) {
@@ -1557,7 +1602,7 @@ function chicdf($x,$a) {
 		echo 'Invalid input to chi2cdf';
 		return 0;
 	}
-	return gamma_cdf(0.5*$x,0.0,1.0,0.5*$a);
+    return gamma_cdf(0.5*$x,0.5*$a,1.0,0.0);
 }
 
 function invchicdf($cdf,$a) {
@@ -1678,8 +1723,8 @@ function invchi2cdf($cdf,$a) {
   return $x;
 }
 
-function gamma_cdf($x,$a,$b,$c) {
-	return gamma_inc($c,($x-$a)/$b);
+function gamma_cdf($x, $shape, $scale=1, $offset=0) {
+    return gamma_inc($shape, ($x-$offset)/$scale);
 }
 function gamma_inc($p,$x,$dec=4) {
 	$exp_arg_min = -88.0;
@@ -1758,6 +1803,22 @@ function gamma_inc($p,$x,$dec=4) {
 	return $value;
 }
 
+function gamma_log($x) {
+    // from jStat
+    $cof = [
+        76.18009172947146, -86.50532032941677, 24.01409824083091,
+        -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
+    ];
+    $ser = 1.000000000190015;
+    $y = $xx = $x;
+    $tmp = $x + 5.5;
+    $tmp -= ($xx + 0.5) * log($tmp);
+    for ($j=0; $j < 6; $j++) {
+        $ser += $cof[$j] / (++$y);
+    }
+    return log(2.5066282746310005 * $ser / $xx) - $tmp;
+}
+/*
 function gamma_log($x) {
  $c = array(
     -1.910444077728E-03,
@@ -1894,6 +1955,63 @@ function gamma_log($x) {
   }
   return $res;
 }
+*/
+
+function gamma_inv($p,$a,$scale=1) {
+	//adapted from https://github.com/jstat/jstat/blob/65ce096a99f753d6a22482e5e74accbfc1c33767/src/special.js#L254
+    $a1 = $a - 1;
+	$EPS = 1e-8;
+	$gln = gamma_log($a);
+
+	if ($p >= 1) {
+		return $scale*max(100, $a + 100 * sqrt($a));
+	}
+	if ($p <= 0) {
+		return 0;
+	}
+	if ($a > 1) {
+		$lna1 = log($a1);
+		$afac = exp($a1 * ($lna1 - 1) - $gln);
+		$pp = ($p < 0.5) ? $p : (1 - $p);
+		$t = sqrt(-2 * log($pp));
+		$x = (2.30753 + $t * 0.27061) / (1 + $t * (0.99229 + $t * 0.04481)) - $t;
+		if ($p < 0.5) {
+            $x = -$x;
+        }
+		$x = max(1e-3, $a * pow(1 - 1 / (9 * $a) - $x / (3 * sqrt($a)), 3));
+	} else {
+		$t = 1 - $a * (0.253 + $a * 0.12);
+        if ($p < $t) {
+            $x = pow($p / $t, 1 / $a);
+        } else {
+            $x = 1 - log(1 - ($p - $t) / (1 - $t));
+        }
+    }
+
+	for($j=0; $j < 12; $j++) {
+		if ($x <= 0) {
+			return 0;
+        }
+        $err = gamma_inc($a, $x) - $p;
+		if ($a > 1) {
+			$t = $afac * exp(-($x - $a1) + $a1 * (log($x) - $lna1));
+		} else {
+			$t = exp(-$x + $a1 * log($x) - $gln);
+        }
+        if ($t==0) { 
+            break; 
+        }
+		$u = $err / $t;
+		$x -= ($t = $u / (1 - 0.5 * min(1, $u * (($a - 1) / $x - 1))));
+		if ($x <= 0) {
+			$x = 0.5 * ($x + $t);
+		}
+		if (abs($t) < $EPS * $x) {
+			break;
+		}
+	}
+	return $scale*$x;
+}
 
 //fcdf(f,df1,df2)
 //Returns the area to right of the F-value f for the f-distribution
@@ -1903,8 +2021,10 @@ function fcdf($x,$df1,$df2) {
 	if (!is_finite($x) || !is_finite($df1) || !is_finite($df2) || $df1 < 1 || $df2 < 1 || $x < 0) {
 		echo 'Invalid input to fcdf';
 		return 0;
-	}
-	$p1 = fcall(fspin($x,$df1,$df2));
+    }
+    //$p1 = fcall(fspin($x,$df1,$df2));
+    $p1 = 1-beta_cdf($df1*$x/($df1*$x + $df2), $df1/2, $df2/2);
+
 	return $p1;
 }
 
@@ -1961,6 +2081,136 @@ function LJspin($q,$i,$j,$b) {
 		$k += 2;
 	}
 	return $z;
+}
+
+function beta_cdf($x, $a, $b) {
+    // based on jStat.ibeta
+    if ($x > 1) { 
+        return 1;
+    } else if ($x < 0) { 
+        return 0;
+    }
+    $bt = ($x === 0 || $x === 1) ?  0 :
+     (exp(gamma_log($a + $b) - gamma_log($a) -
+     gamma_log($b) + $a * log($x) + $b * log(1 - $x)));
+    if ($x < 0 || $x > 1) {
+        return false;
+    }
+    if ($x < ($a + 1) / ($a + $b + 2)) {
+        // Use continued fraction directly.
+        return $bt * jstat_betacf($x, $a, $b) / $a;
+    }
+    // else use continued fraction after making the symmetry transformation.
+    return 1 - $bt * jstat_betacf(1 - $x, $b, $a) / $b;
+}
+
+function beta_inv($p, $a, $b) {
+    // based on jStat.ibetainv
+    $st = microtime(true);
+    $EPS = 1e-8;
+    $a1 = $a - 1;
+    $b1 = $b - 1;
+
+    if ($p <= 0) {
+        return 0;
+    }
+    if ($p >= 1) {
+        return 1;
+    }
+    if ($a >= 1 && $b >= 1) {
+        $pp = ($p < 0.5) ? $p : (1 - $p);
+        $t = sqrt(-2 * log($pp));
+        $x = (2.30753 + $t * 0.27061) / (1 + $t* (0.99229 + $t * 0.04481)) - $t;
+        if ($p < 0.5) {
+            $x = -$x;
+        }
+        $al = ($x * $x - 3) / 6;
+        $h = 2 / (1 / (2 * $a - 1)  + 1 / (2 * $b - 1));
+        $w = ($x * sqrt($al + $h) / $h) - (1 / (2 * $b - 1) - 1 / (2 * $a - 1)) *
+            ($al + 5 / 6 - 2 / (3 * $h));
+        $x = $a / ($a + $b * exp(2 * $w));
+    } else {
+        $lna = log($a / ($a + $b));
+        $lnb = log($b / ($a + $b));
+        $t = exp($a * $lna) / $a;
+        $u = exp($b * $lnb) / $b;
+        $w = $t + $u;
+        if ($p < $t / $w) {
+            $x = pow($a * $w * $p, 1 / $a);
+        }
+        else {
+            $x = 1 - pow($b * $w * (1 - $p), 1 / $b);
+        }
+    }
+    $afac = -gamma_log($a) - gamma_log($b) + gamma_log($a + $b);
+    for ($j=0; $j < 10; $j++) {
+        if ($x < 1e-10 || $x === 1) {
+            return round($x,10);
+        }
+        $err = beta_cdf($x, $a, $b) - $p;
+        $t = exp($a1 * log($x) + $b1 * log(1 - $x) + $afac);
+        $u = $err / $t;
+        $x -= ($t = $u / (1 - 0.5 * min(1, $u * ($a1 / $x - $b1 / (1 - $x)))));
+        if ($x <= 0) {
+            $x = 0.5 * ($x + $t);
+        }
+        if ($x >= 1) {
+            $x = 0.5 * ($x + $t + 1);
+        }
+        if (abs($t) < ($EPS * $x) && $j > 0) {
+            break;
+        }
+    }
+    return round($x,10);
+}
+
+function jstat_betacf($x,$a,$b) {
+    $fpmin = 1e-30;
+    $qab = $a + $b;
+    $qap = $a + 1;
+    $qam = $a - 1;
+    $c = 1;
+    $d = 1 - $qab * $x / $qap;
+  
+    // These q's will be used in factors that occur in the coefficients
+    if (abs($d) < $fpmin) {
+      $d = $fpmin;
+    }
+    $d = 1 / $d;
+    $h = $d;
+  
+    for ($m=1; $m <= 100; $m++) {
+      $m2 = 2 * $m;
+      $aa = $m * ($b - $m) * $x / (($qam + $m2) * ($a + $m2));
+      // One step (the even one) of the recurrence
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $h *= $d * $c;
+      $aa = -($a + $m) * ($qab + $m) * $x / (($a + $m2) * ($qap + $m2));
+      // Next step of the recurrence (the odd one)
+      $d = 1 + $aa * $d;
+      if (abs($d) < $fpmin) {
+        $d = $fpmin;
+      }
+      $c = 1 + $aa / $c;
+      if (abs($c) < $fpmin) {
+        $c = $fpmin;
+      }
+      $d = 1 / $d;
+      $del = $d * $c;
+      $h *= $del;
+      if (abs($del - 1.0) < 3e-7) {
+        break;
+      }
+    }
+    return $h;  
 }
 
 //invfcdf(p,df1,df2)
@@ -2037,6 +2287,10 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 //argument should be header,column,header,column,...
 function csvdownloadlink() {
   $alist = func_get_args();
+  $filename = "data";
+  if (count($alist)>1 && is_string($alist[1])) {
+      $filename = array_shift($alist);
+  }
   if (count($alist)==0 || count($alist)%2==1) {
     echo "invalid arguments to csvdownloadlink";
     return '';
@@ -2055,9 +2309,460 @@ function csvdownloadlink() {
     $rows[$i] = rtrim($row,',');
   }
   $str = implode("\n",$rows);
-  return '<a download="data.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
+  return '<a download="'.Sanitize::encodeStringForDisplay($filename).'.csv" href="data:text/csv;charset=UTF-8,'.urlencode($str).'">'
     . _('Download CSV').'</a>';
 }
 
+//dotplot(array,label,[dot spacing, axis spacing,width,height])
+//display macro.  Creates a dotplot from a data set
+// array: array of data values
+// label: title of the dotplot that will be placed below horizontal axis
+// dot spacing: spacing of dots; data will be rounded to nearest (def 1)
+// axis spacing: spacing of axis labels (defaults to dot spacing) 
+// width,height (optional): width and height in pixels of graph
+function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) {
+	if (!is_array($a)) {
+		echo 'dotplot expects an array';
+		return false;
+    }
+    if ($dotspace <= 0) {
+        $dotspace = 1;
+    }
+    if ($labelspace === null || $labelspace <= 0) {
+        $labelspace = $dotspace;
+    }
 
+	sort($a, SORT_NUMERIC);
+
+    $start = round($a[0]/$dotspace)*$dotspace;
+	
+	$x = $start;
+	$curr = 0;
+	$alt = "Dotplot for $label <table class=stats><thead><tr><th>Value of Each Dot</th><th>Number of Dots</th></tr></thead>\n<tbody>\n";
+	$maxfreq = 0;
+	
+	// 
+	$dx = $dotspace;
+
+    // Create the stack of dots 
+	while ($i < count($a)) {
+		$alt .= "<tr><td>$x</td>";
+		$i = $curr;
+		$j = 0.1;
+  
+		while (($a[$i] < $x+.5*$dx) && ($i < count($a))) {
+			$i++;
+			$j = $j + 0.6;
+			$st .= "dot([$x,$j]);";
+		}
+		
+		$x += $dx;
+		
+		if (($i-$curr)>$maxfreq) { 
+			$maxfreq = $i-$curr;
+		}
+			
+		$alt .= "<td>" . ($i-$curr) . "</td></tr>\n";
+		$curr = $i;
+	}
+  	
+	$alt .= "</tbody></table>\n";
+
+	if ($_SESSION['graphdisp']==0) {
+		return $alt;
+	}
+	
+
+	// Start tick marks at the start value
+	$x = $start;
+	
+	// y-values for the size of the tick mark lines
+	$tm = -0.025*$maxfreq;
+	$tx = 0.025*$maxfreq;
+
+	// initialize 
+	$outst = "";
+	 
+	// Draw the horizontal axes
+    // draws the tick marks for the axes.
+    $startlabel = floor($start/$labelspace+1e-12)*$labelspace;
+    $maxx = round($a[count($a)-1]/$dotspace)*$dotspace;
+    $endlabel = ceil($maxx/$labelspace-1e-12)*$labelspace;
+    for ($x=$startlabel; $x <=$endlabel; $x+=$labelspace) {
+        $outst .= "line([$x,$tm],[$x,$tx]); text([$x,0],\"$x\",\"below\");";
+    }  
+	
+	//initializes SVG frame and canvas.
+	$initst = "setBorder(20,40,20,10);initPicture($startlabel,$endlabel,0,$maxfreq);";
+  	
+	//xtick,ytick,{labels,xgrid,ygrid,dox,doy}
+	//,1,null,$step); fill=\"blue\";
+	//$initst .= "axes(null,null,null,null,null,0,0); fill=\"blue\"; textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$initst .="textabs([". ($width/2+15) .",0],\"$label\",\"above\");";
+	$x1 = $startlabel - .2*$labelspace;
+	$x2 = $endlabel + .2*$labelspace;
+	$initst .="line([$x1,0],[$x2,0]);";
+	$outst = $initst.$outst.$st;
+	return showasciisvg($outst,$width,$height);
+  }
+
+//---------------------------------------------ANOVA-Oneway F ratio-----------------------------------------
+// Function: anova1way_f(arr1,arr2, [arr3,...])
+// Returns F ratio and the corresponding P value as an array. 
+//
+// Parameters:
+// arr1, arr2, ...: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes. 
+//  
+// Returns:
+// F ratio and the corresponding P value as an array in the form [F ratio, P value].
+
+function anova1way_f(... $arr){
+    $out = anova1way(... $arr);
+    return [$out[0][3], $out[0][4]];
+}
+
+
+//---------------------------------------------ANOVA-Oneway array-------------------------------------------
+// Function: anova1way(arr1,arr2, [arr3,...])
+// Returns ANOVA table as an array with each row corresponding to Factor A, error (residual), and totals. 
+//
+// Parameters:
+// arr1, arr2, ...: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes. 
+//  
+// Returns:
+// ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
+// [[SS_A, df_A, MS_A, F_A, P_A],[SS_E,df_E,MS_E],[SS_T,df_T]] 
+// where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
+// And A, E, and T correspond to Factor A, error (residual), and total, respectively. 
+
+function anova1way(... $arr){
+	$n=array();  
+	foreach($arr as $a){
+		if (!is_array($a)) { $a = explode(',',$a);};
+		$n[]=count($a);
+	}
+	if (count($n)<3) {
+		echo "Error: ANOVA requires three or more arrays";
+		return false;
+	}
+	$N=array_sum($n);	
+	$numargs = func_num_args();
+    //$args=func_get_args();
+
+	$mean=array();
+	$ss=array();
+	for($i=0;$i<$numargs;$i++){
+		$mean[$i]=mean($arr[$i]);
+		$ss[$i]=variance($arr[$i])*(count($arr[$i])-1);
+		//$n[$i]=count($args[$i]);
+	}
+	
+	$total = array_map(function($x, $y) { return $x * $y; },
+                   $mean, $n);
+
+	$gmean=array_sum($total)/$N; //grand mean
+
+	//Sum of the square for Factor A uneequal sample sizes
+	$ssa=array();
+	for ($i=0;$i<$numargs;$i++){
+		$ssa[$i]=$n[$i]*($mean[$i]-$gmean)**2; 
+	}
+	$ssA=array_sum($ssa); //Sum of the square for Factor A uneequal sample sizes
+	$ssE=array_sum($ss); //Sum of the square for Residual (Error)
+	$ssT=$ssA+$ssE;
+	$dfA=$numargs-1;
+	$dfE=$N-$numargs;
+	$dfT=$dfA+$dfE;
+	
+	
+	$msA=$ssA/$dfA; //mean square of Factor A
+	$msE=$ssE/$dfE;    //pooled variance (residual or error)
+	$msT=$msA+$msE;  //total sum of the squares
+	$F_a=$msA/$msE;    //F Ratio
+    
+	$p_a=fcdf($F_a,$dfA,$dfE); //P value
+
+	return (array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssE,$dfE,$msE],[$ssT,$dfT]));//[$F_a,$p_a]
+	
+
+}
+
+
+//---------------------------------------------ANOVA-Twoway array--------------------------------------------
+// Function: anova2way(arr,[replication = False])
+// Returns ANOVA table as an array with each row corresponding to Factor A, Factor B, 
+// their interaction (only with replication), error (residual), and totals. 
+//
+// Parameters:
+// arr: An array in the follwing form: 
+//  for twoway WITH replication - example: $arr=[[[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]]
+//  for twoway WITHOUT replication - example: $arr=[[53,61,51],[47,55,51],[46,52,49],[50,58,54],[49,54,50]]
+// replication: Optional - boolean (true or false) it specifies whether the ANOVA with replication
+//             (multiple observations for each group) or without replication (one observation per group)
+//             is to be performed. The default is False - without replication.
+// Returns:
+// ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
+// [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T]] 
+// where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
+// And A, B, I, E, and T correspond to Factor A, Factor B, their interaction (only with replication), 
+// error (residual), and total, respectively.
+
+function anova2way($arr, $replication=False){
+	
+	//with replication:
+	if($replication==True){
+		$n_b=count($arr); //number of rows: Factor B	
+		$n_r=array();
+		$n_col=array();
+
+		foreach($arr as $a){
+			$n_col[]=count($a);
+			if (count(array_unique($n_col))!=1) {
+				echo "Error: ANOVA requires the same length for all arrays";
+				return false;
+			}
+		}
+		
+		for($i=0;$i<count($arr);++$i){
+			foreach($arr[$i] as $a){
+				$n_r[]=count($a);
+				if (count(array_unique($n_r))!=1) {
+					echo "Error: ANOVA requires the same number of replicates for all factors";
+					return false;
+				}
+			}
+		}
+				
+		$n_a=count($arr[0]); //number of columns: Factor A
+		$n_b=count($arr); //number of rows: Factor B
+		$n_r=count($arr[0][0]); //number of replicates
+
+		$m_r=array();
+		
+		//mean of the replicates
+		for($i=0;$i<count($arr);$i++){
+			for($j=0;$j<count($arr[0]);++$j){
+				$m_r[$i][$j]=mean($arr[$i][$j]);
+				//$g=mean($arr[$i][$j]);
+			}
+		}
+
+		$m_a=array(); //mean of the columns
+		$m_b=array(); //mean of the rows
+
+		for($i=0;$i<count($m_r);$i++){
+			$m_b[]=mean($m_r[$i]);
+		}
+		$m_r_t=array_map(null, ...$m_r);
+		
+		for($j=0;$j<count($m_r_t);$j++){
+			$m_a[]=mean($m_r_t[$j]);
+		}
+		$gmean=mean($m_a); //grand average
+
+		$ssA=variance($m_a)*($n_a-1)*$n_b*$n_r; //Sum of the square for Factor A
+		$ssB=variance($m_b)*($n_b-1)*$n_a*$n_r; //Sum of the square for Factor A
+		$dfA=($n_a-1);
+		$dfB=($n_b-1);
+		$msA=$ssA/$dfA; //mean square of Factor A
+		$msB=$ssB/$dfB; //mean square of Factor B
+
+		$ss=array(); //Residual
+		for($i=0;$i<$n_b;$i++){
+			for($j=0;$j<$n_a;$j++){
+				for($k=0;$k<$n_r;$k++){
+					$ss[]=($m_r[$i][$j]-$arr[$i][$j][$k])**2;
+				}
+				
+			}
+		}
+		$ssE=array_sum($ss);
+		$dfE=($n_r-1)*$n_b*$n_a;
+		$msE=$ssE/$dfE;    //pooled variance-within (residual or error)
+
+		$ss_i=array(); //SS of Interaction between two factors
+		for($i=0;$i<count($m_r);$i++){
+			for($j=0;$j<count($m_r[0]);$j++){
+				$ss_i[]=$n_r*($m_r[$i][$j]-$m_a[$j]-$m_b[$i]+$gmean)**2;
+			}
+		}
+
+		$ssI=array_sum($ss_i);	
+		$dfI=($n_a-1)*($n_b-1);
+		$msI=$ssI/$dfI;
+
+		$ssT=$ssA+$ssB+$ssI+$ssE;  //total sum of the squares
+		$dfT=($n_a*$n_b*$n_r)-1;
+
+		$F_a=$msA/$msE;    //F Ratio of Factor A
+		$F_b=$msB/$msE;    //F Ratio of Factor A
+		$F_i=$msI/$msE;    //F Ratio of the interaction of Factors A and B
+		
+		$p_a=fcdf($F_a,$dfA,$dfE); //P value of factor A
+		$p_b=fcdf($F_b,$dfB,$dfE); //P value of factor B
+		$p_i=fcdf($F_i,$dfI,$dfE); //P value of factor B
+		$ans=array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssB,$dfB,$msB,$F_b,$p_b],[$ssI,$dfI,$msI,$F_i,$p_i],[$ssE,$dfE,$msE],[$ssT,$dfT]);
+	
+	}
+
+	//without replication:
+	else{
+		$n_col=array();  
+		foreach($arr as $a){
+			$n_col[]=count($a);
+			if (count(array_unique($n_col))!=1) {
+				echo "Error: ANOVA requires the same length for all arrays";
+				return false;
+			}
+		}
+		$arr_t=array_map(null, ...$arr);
+
+		$n_a=count($arr[0]); //number of columns: Factor A
+		$n_b=count($arr); //number of rows: Factor B
+		$m_a=array();
+		$m_b=array();
+		for($i=0;$i<count($arr);$i++){
+			$m_b[]=mean($arr[$i]);
+		}
+
+		for($j=0;$j<count($arr_t);$j++){
+			$m_a[]=mean($arr_t[$j]);
+		}
+
+		$gmean=mean($m_a); //grand average
+		$ssA=variance($m_a)*$n_b*($n_a-1); //Sum of the square for Factor A
+		$ssB=variance($m_b)*$n_a*($n_b-1); //Sum of the square for Factor A
+		$dfA=($n_a-1);
+		$dfB=($n_b-1);
+		
+		$ss=array(); //Residual
+		for($i=0;$i<count($arr);$i++){
+			for($j=0;$j<count($arr[0]);$j++){
+				$ss[]=($arr[$i][$j]-$m_a[$j]-$m_b[$i]+$gmean)**2;
+			}
+		}
+		$ssE=array_sum($ss);
+		$dfE=($n_a-1)*($n_b-1);
+		$dfT=($n_a*$n_b)-1;
+		
+		$msA=$ssA/$dfA; //mean square of Factor A
+		$msB=$ssB/$dfB; //mean square of Factor B
+		$msE=$ssE/$dfE;    //pooled variance (residual or error)
+		$ssT=$ssA+$ssB+$ssE;  //total sum of the squares
+		$F_a=$msA/$msE;    //F Ratio of Factor A
+		$F_b=$msB/$msE;    //F Ratio of Factor A
+		
+		$p_a=fcdf($F_a,$dfA,$dfE); //P value of factor A
+		$p_b=fcdf($F_b,$dfB,$dfE); //P value of factor B
+		$ans=array([$ssA,$dfA,$msA,$F_a,$p_a],[$ssB,$dfB,$msB,$F_b,$p_b],[$ssE,$dfE,$msE],[$ssT,$dfT]);
+			
+	}
+	return ($ans);	
+}
+
+//---------------------------------------------ANOVA-Twoway F ratio-----------------------------------------
+// Function: anova2way_f(arr, [replication=False])
+// Returns F ratio and the corresponding P value for Factor A, Factor B and their interaction (if replication is true). 
+//
+// Parameters:
+// arr: An array in the follwing form: 
+//  for twoway WITH replication - example: $arr=[[[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]]
+//  for twoway WITHOUT replication - example: $arr=[[53,61,51],[47,55,51],[46,52,49],[50,58,54],[49,54,50]] 
+// replication: Optional - boolean (true or false) it specifies whether the ANOVA with replication
+//             (multiple observations for each group) or without replication (one observation per group)
+//             is to be performed. The default is False - without replication.
+//  
+// Returns:
+// F ratio and the corresponding P value for Factor A, Factor B and their Interaction (if replication is true)
+// as an array in the form  array([F_A,P_A],[F_B,P_B],[F_I,P_I]). 	
+
+function anova2way_f($arr, $replication=False){
+	$k=anova2way($arr,$replication);
+	if($replication==True){
+		$ans=[[$k[0][3],$k[0][4]],[$k[1][3],$k[1][4]],[$k[2][3],$k[2][4]]];
+	}
+		else{
+			$ans=[[$k[0][3],$k[0][4]],[$k[1][3],$k[1][4]]];
+	}
+	
+	return($ans);
+}
+
+
+
+//-----------------------------------------------ANOVA Table---------------------------------------------
+// Function: anova_table(arr,[factor=1, replication=False, roundto=12, nameA="factorA", nameB="factorB "])
+// Returns ANOVA table for both oneway and twoway ANOVA - display only. The output of anova1way_arr() and 
+// anova2way_arr() can be used as the input array for this function.
+//
+// Parameters:
+// arr: An array in the follwing form: 
+//   for oneway: [[SS_A, df_A, MS_A, F_A, P_A],[SS_E,df_E,MS_E],[SS_T,df_T]]
+//   for twoway WITHOUT replication: [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_E,df_E,MS_E],[SS_T,df_T]]
+//   for twoway WITH replication: [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T]]
+// factor: number of factors considered in ANOVA - 1 for one-way and 2 for two-way. The default is 1, one-way ANOVA.
+// replication: Optional - boolean (true or false) it specifies whether the ANOVA tewoway with replication
+//             (multiple observations for each group) or without replication (one observation per group)
+//             is performed. The default is False - without replication.
+// roundto: Optional - number of decimal places to which data should be rounded off; 
+//          default is 12 decimal places. 
+// NameA: Optional - the name of factor A as string to be displayed in the table. Default is "Factor A".
+// NameB: Optional - the name of factor B as string to be displayed in the table. Default is "Factor B".
+// Returns:
+// ANOVA table for displaying data. 
+
+
+function anova_table(array $array, int $factor = 1, $rep=False, int $roundto=12, string $f1="Factor A", string $f2="Factor B"){
+	if ($factor!=1 && $factor!=2) { echo 'error: the factor variable only expects 1 for one-way and 2 for two-way ANOVA'; return '';}
+	/*if (!function_exists('calconarray')) {
+       // require_once(__DIR__.'/assessment/macros.php');
+	}*/
+	array_walk_recursive($array, function(&$x) use ($roundto) { $x = round($x,$roundto);});
+	
+	if ($factor==1){
+		$r0=$array[0];
+		$r1=$array[1];
+		$r2=$array[2];
+		
+		$out = "<table class=stats><CAPTION><EM>Analysis of Variance: One-Way</EM></CAPTION><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F Ratio</th><th>P value</th></tr></thead>\n<tbody>\n";
+		$out .="<tr><td>$f1</td><td>$r0[0]</td><td>$r0[1]</td><td>$r0[2]</td><td>$r0[3]</td><td>$r0[4]</td></tr>";
+		$out .="<tr><td>Residual</td><td>$r1[0]</td><td>$r1[1]</td><td>$r1[2]</td></tr>"; //<td></td><td></td>
+		$out .="<tr><td>TOTAL</td><td>$r2[0]</td><td>$r2[1]</td></tr>"; //<td></td><td></td><td></td>
+		$out .= "</tbody></table>\n";
+
+	}
+		elseif($factor==2 && $rep==False){
+			$r0=$array[0];
+			$r1=$array[1];
+			$r2=$array[2];
+			$r3=$array[3];
+			$out = "<table class=stats><CAPTION><EM>Analysis of Variance: Two-way without Replication</EM></CAPTION><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F Ratio</th><th>P value</th></tr></thead>\n<tbody>\n";
+			$out .="<tr><td>$f1</td><td>$r0[0]</td><td>$r0[1]</td><td>$r0[2]</td><td>$r0[3]</td><td>$r0[4]</td></tr>";
+			$out .="<tr><td>$f2</td><td>$r1[0]</td><td>$r1[1]</td><td>$r1[2]</td><td>$r1[3]</td><td>$r1[4]</td></tr>";
+			$out .="<tr><td>Residual</td><td>$r2[0]</td><td>$r2[1]</td><td>$r2[2]</td></tr>"; //<td></td><td></td>
+			$out .="<tr><td>TOTAL</td><td>$r3[0]</td><td>$r3[1]</td></tr>"; //<td></td><td></td><td></td>
+			$out .= "</tbody></table>\n";
+
+		}
+
+		elseif($factor==2 && $rep==True){
+			$r0=$array[0];
+			$r1=$array[1];
+			$r2=$array[2];
+			$r3=$array[3];
+			$r4=$array[4];
+			$out = "<table class=stats><CAPTION><EM>Analysis of Variance: Two-way with Replication</EM></CAPTION><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F Ratio</th><th>P value</th></tr></thead>\n<tbody>\n";
+			$out .="<tr><td>$f1</td><td>$r0[0]</td><td>$r0[1]</td><td>$r0[2]</td><td>$r0[3]</td><td>$r0[4]</td></tr>";
+			$out .="<tr><td>$f2</td><td>$r1[0]</td><td>$r1[1]</td><td>$r1[2]</td><td>$r1[3]</td><td>$r1[4]</td></tr>";
+			$out .="<tr><td>Interaction</td><td>$r2[0]</td><td>$r2[1]</td><td>$r2[2]</td><td>$r2[3]</td><td>$r2[4]</td></tr>";
+			$out .="<tr><td>Residual</td><td>$r3[0]</td><td>$r3[1]</td><td>$r3[2]</td></tr>"; //<td></td><td></td>
+			$out .="<tr><td>TOTAL</td><td>$r4[0]</td><td>$r4[1]</td></tr>"; //<td></td><td></td><td></td>
+			$out .= "</tbody></table>\n";
+
+		}
+		
+	return $out;
+
+
+}
 ?>

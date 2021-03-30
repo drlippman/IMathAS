@@ -50,8 +50,22 @@ if ($istutor) {
   }
 }
 
+// get user info
+$query = 'SELECT iu.FirstName, iu.LastName, istu.latepass, istu.timelimitmult ';
+$query .= 'FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id ';
+$query .= 'WHERE iu.id=? AND istu.courseid=?';
+$stm = $DBH->prepare($query);
+$stm->execute(array($uid, $cid));
+$studata = $stm->fetch(PDO::FETCH_ASSOC);
+if ($studata === false) {
+  echo '{"error": "invalid_uid"}';
+  exit;
+}
+$assess_info->loadException($uid, true, $studata['latepass'], $latepasshrs, $courseenddate);
+$assess_info->applyTimelimitMultiplier($studata['timelimitmult']);
+
 // load question settings
-$assess_info->loadQuestionSettings('all', false);
+$assess_info->loadQuestionSettings('all', false, false);
 
 //load user's assessment record - start with scored data
 $assess_record = new AssessRecord($DBH, $assess_info, false);
@@ -83,11 +97,7 @@ if (!empty($changes)) {
 }
 
 // update LTI grade
-$lti_sourcedid = $assess_record->getLTIsourcedId();
-if (strlen($lti_sourcedid) > 1) {
-  require_once("../includes/ltioutcomes.php");
-  calcandupdateLTIgrade($lti_sourcedid,$aid,$uid,$out['gbscore'],true);
-}
+$assess_record->updateLTIscore();
 
 //prep date display
 prepDateDisp($assessInfoOut);

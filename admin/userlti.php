@@ -106,7 +106,7 @@ $curBreadcrumb .= '<a href="userdetails.php?id='.$uid.'">'._('User Details').'</
 $curBreadcrumb .= _('LTI Connections');
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 $placeinhead .= '<script type="text/javascript">
 function removeuserlti(el,id) {
   return removelti(el,"user",id);

@@ -13,7 +13,7 @@ include("file_manager/lang/lang_eng.php");
 
 //which images to use
 $delete_image 			= "file_manager/x.png";
-$update_image			= "../img/updating.gif";
+$update_image			= $staticroot . "/img/updating.gif";
 $file_small_image 		= "file_manager/file_small.png";
 
 //custom configuration from here on ..
@@ -82,7 +82,7 @@ if (isset($_REQUEST["action"]))
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-  if (!window.jQuery) {  document.write('<script src="../javascript/jquery.min.js"><\/script>');}
+  if (!window.jQuery) {  document.write('<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>');}
 </script>
 <link href="file_manager/styles.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">

@@ -24,13 +24,17 @@ function showeh(eln) {
 		//eh.style.left = p[0] + "px";
 		//eh.style.top = (p[1]-eh.offsetHeight) + "px"; // + el.offsetHeight
 		eh.style.left = offset.left + "px";
-		eh.style.top = (offset.top + el.offsetHeight) + "px";
+        eh.style.top = (offset.top + el.offsetHeight) + "px";
+        document.getElementById("ehdd").style.display = "none";
 	} else {
 		eh.style.display = "none";
 		ehcurel = null;
 	}
-
-	el.focus();
+    if (eln.match(/mqinput/)) {
+        MQ(el).focus();
+    } else {
+        el.focus();
+    }
 }
 
 function reshrinkeh(eln) {

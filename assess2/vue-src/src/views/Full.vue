@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+    <a href="#" class="sr-only" id="skipnav" @click.prevent="$refs.scrollpane.focus()">
       {{ $t('jumptocontent') }}
     </a>
     <assess-header></assess-header>
@@ -29,7 +29,7 @@
       :aria-label="$t('regions.questions')"
     >
       <intro-text
-        v-if = "intro !== ''"
+        v-if = "hasIntro"
         :active = "showTexts"
         :html = "intro"
       />
@@ -42,6 +42,8 @@
           pos="beforeexact"
           :qn="curqn"
           :key="'iqt'+curqn"
+          :textlist = "textList"
+          :lastq = "lastQ"
           :active = "showTexts"
         />
         <full-question-header :qn = "curqn" />
@@ -56,6 +58,8 @@
         v-show="showTexts"
         pos="after"
         :qn="lastQ"
+        :textlist = "textList"
+        :lastq = "lastQ"
         :active = "showTexts"
       />
     </div>
@@ -97,6 +101,9 @@ export default {
     intro () {
       return store.assessInfo.intro;
     },
+    hasIntro () {
+      return (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0);
+    },
     isPreviewAll () {
       return !!store.assessInfo.preview_all;
     },
@@ -115,6 +122,13 @@ export default {
     },
     textToggleLabel () {
       return this.showTexts ? this.$t('print.hide_text') : this.$t('print.show_text');
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
     }
   },
   methods: {

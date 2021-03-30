@@ -263,3 +263,43 @@ table.stats thead tr th {
 div.tips {
 	color: #000;
 }
+.questionpane>.question, .scrollpane {
+    background-image: none;
+}
+svg.svgicon {
+    stroke: #fff;
+}
+button svg.svgicon, .menubutton svg.svgicon {
+    stroke: #000;
+}
+.menubutton a {
+    color: #006;
+}
+.introtext {
+    background-color: #222;
+    border-color: #333;
+}
+.mqed-btn {
+    color: #000;
+}
+.scoreresult, .tooltip-pane {
+    color: #000;
+}
+button.plain {
+    background-color: #eee;
+}
+.dialog {
+    color: #000;
+}
+.bigquestionwrap .headerpane {
+    background-color: #222;
+}
+.fbbox {
+    background-color: #000;
+}
+.menubutton * {
+    color: #000;
+}
+.filealt-btn {
+    color: #000;
+}

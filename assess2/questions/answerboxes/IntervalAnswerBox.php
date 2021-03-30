@@ -23,7 +23,7 @@ class IntervalAnswerBox implements AnswerBox
 
     public function generate(): void
     {
-        global $RND, $myrights, $useeqnhelper, $showtips, $imasroot;
+        global $RND, $myrights, $useeqnhelper, $showtips, $imasroot, $staticroot;
 
         $anstype = $this->answerBoxParams->getAnswerType();
         $qn = $this->answerBoxParams->getQuestionNumber();
@@ -50,12 +50,11 @@ class IntervalAnswerBox implements AnswerBox
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        if (isset($ansprompt)) {
-          $out .= $ansprompt;
-        }
-
         $ansformats = array_map('trim',explode(',',$answerformat));
 
+        if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
+          $out .= $ansprompt;
+        }
     		if (in_array('normalcurve',$ansformats) && $_SESSION['graphdisp']!=0) {
     			$top = _('Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve');
     			$shorttip = _('Adjust the sliders');
@@ -86,9 +85,9 @@ class IntervalAnswerBox implements AnswerBox
     			//}
     			$out .=  '<div style="position: absolute; left:0; top:0; height:200px; width:0px; background:#00f;" id="normleft'.$qn.'">&nbsp;</div>';
     			$out .=  '<div style="position: absolute; right:0; top:0; height:200px; width:0px; background:#00f;" id="normright'.$qn.'">&nbsp;</div>';
-    			$out .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif" alt="Normal curve" />';
-    			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid1'.$qn.'" src="'.$imasroot.'/img/uppointer.gif" alt="Interval pointer"/>';
-    			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif" alt="Interval pointer"/>';
+    			$out .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$staticroot.'/img/normalcurve.gif" alt="Normal curve" />';
+    			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid1'.$qn.'" src="'.$staticroot.'/img/uppointer.gif" alt="Interval pointer"/>';
+    			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid2'.$qn.'" src="'.$staticroot.'/img/uppointer.gif" alt="Interval pointer"/>';
     			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid1txt'.$qn.'"></div>';
     			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid2txt'.$qn.'"></div>';
     			$out .=  '</div></div></div>';
@@ -112,7 +111,7 @@ class IntervalAnswerBox implements AnswerBox
     		];
     		$params['tip'] = $shorttip;
             $params['longtip'] = $tip;
-            $params['calcformat'] = 'decimal';
+            $params['calcformat'] = $answerformat . ($answerformat==''?'':',') . 'decimal';
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}
@@ -147,7 +146,7 @@ class IntervalAnswerBox implements AnswerBox
     				} else if (preg_match('/\(([\-\d\.]+),([\-\d\.]+)\)/',$answer,$matches)) {
     					$sa .=  '<div style="position: absolute; left:'.(250+60*$matches[1]).'px; top:0; height:200px; width:'.(60*($matches[2]-$matches[1])+1).'px; background:#00f;">&nbsp;</div>';
     				}
-    				$sa .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif" alt="Normal Curve"/>';
+    				$sa .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$staticroot.'/img/normalcurve.gif" alt="Normal Curve"/>';
     				$sa .=  '</div>';
     			} else {
     				$sa = $answer;
@@ -158,7 +157,7 @@ class IntervalAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

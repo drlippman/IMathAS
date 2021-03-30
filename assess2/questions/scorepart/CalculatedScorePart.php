@@ -40,14 +40,15 @@ class CalculatedScorePart implements ScorePart
         if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
         if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$partnum];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
 
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $hasNumVal = !empty($_POST["qn$qn-val"]);
 
         $givenans = normalizemathunicode($givenans);
+        $answer = normalizemathunicode($answer);
         $ansformats = array_map('trim',explode(',',$answerformat));
-
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
@@ -157,7 +158,7 @@ class CalculatedScorePart implements ScorePart
                         $matches[3] = evalMathParser($matches[3]);
                     }
                     $aarr[$j] = $matches;
-                } else if (!is_numeric($anans) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
+                } else if ((!is_numeric($anans) || $checkSameform) && $anans!='DNE' && $anans!='oo' && $anans!='+oo' && $anans!='-oo') {
                     if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$anans,$mnmatches)) {
                         $aarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                     } else {
@@ -165,7 +166,7 @@ class CalculatedScorePart implements ScorePart
                         if ($anfunc !== false) {
                             $aarr[$j] = $anfunc->evaluateQuiet();
                             if ($checkSameform) {
-                            $ansnorm[0][$j] = $anfunc->normalizeTreeString();
+                                $ansnorm[0][$j] = $anfunc->normalizeTreeString();
                             }
                         } else {
                             $aarr[$j] = '';
@@ -188,6 +189,13 @@ class CalculatedScorePart implements ScorePart
                     if ((in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats) || in_array("allowmixed",$ansformats)) && preg_match('/^\s*(\-?\s*\d+)\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$v,$mnmatches)) {
                         $numvalarr[$j] = $mnmatches[1] + (($mnmatches[1]<0)?-1:1)*($mnmatches[3]/$mnmatches[4]);
                     } else {
+                        if ($v[strlen($v)-1]=='%') {//single percent
+                            $val = substr($v,0,-1);
+                            if (is_numeric($val)) { // if is number%, eval
+                                $numvalarr[$j] = $val/100;
+                                continue;
+                            }
+                        }
                         $numvalarr[$j] = evalMathParser($v);
                         if (!is_finite($numvalarr[$j])) {
                           $numvalarr[$j] = '';
@@ -256,12 +264,16 @@ class CalculatedScorePart implements ScorePart
         if ($checkSameform) {
             $ganorm = array();
             foreach ($gaarr as $toevalGivenans) {
-              $givenansfunc = parseMathQuiet($toevalGivenans);
-              if ($givenansfunc !== false) {
-                $ganorm[] = $givenansfunc->normalizeTreeString();
-              } else {
-                $ganorm[] = '';
-              }
+                if ($toevalGivenans=='DNE' || $toevalGivenans=='oo' || $toevalGivenans=='+oo' || $toevalGivenans=='-oo') {
+                    $ganorm[] =  $toevalGivenans;
+                } else {
+                    $givenansfunc = parseMathQuiet($toevalGivenans);
+                    if ($givenansfunc !== false) {
+                        $ganorm[] = $givenansfunc->normalizeTreeString();
+                    } else {
+                        $ganorm[] = '';
+                    }
+                }
             }
         }
 
@@ -369,6 +381,10 @@ class CalculatedScorePart implements ScorePart
                 }
             }
         }
+        if (count($anarr) == 0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
         if (in_array('orderedlist',$ansformats)) {
             $score = $correct/count($anarr);
             $scorePartResult->setRawScore($score);
@@ -384,7 +400,9 @@ class CalculatedScorePart implements ScorePart
         }
         if ($score<0) { $scorePartResult->setRawScore(0); }
         if ($formatok != "all" && $correctanyformat>0) {
-            $scorePartResult->setCorrectAnswerWrongFormat(true);
+            if (!empty($formatfeedbackon)) {
+                $scorePartResult->setCorrectAnswerWrongFormat(true);
+            }
             if ($formatok == 'nowhole') {
                 $scorePartResult->setRawScore(0);
             }

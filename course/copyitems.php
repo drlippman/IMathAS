@@ -19,7 +19,11 @@ $body = "";
 $pagetitle = "Copy Course Items";
 $ctc = Sanitize::onlyInt($_POST['ctc']);
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Copy Course Items");
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= _("Copy Course Items");
 
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
@@ -427,9 +431,9 @@ if (!(isset($teacherid))) {
 /******* begin html output ********/
 
 if (!isset($_GET['loadothers']) && !isset($_GET['loadothergroup'])) {
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/libtree.js\"></script>\n";
-$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
-$placeinhead .= '<script src="../javascript/copyitemslist.js" type="text/javascript"></script>';
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/libtree.js\"></script>\n";
+$placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$staticroot/course/libtree.css\");\n-->\n</style>\n";
+$placeinhead .= '<script src="'.$staticroot.'/javascript/copyitemslist.js" type="text/javascript"></script>';
 require("../header.php");
 }
 if ($overwriteBody==1) {
@@ -447,7 +451,7 @@ if ($overwriteBody==1) {
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
 	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
-	<h3>Select Calendar Items to Copy</h3>
+	<h2>Select Calendar Items to Copy</h2>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 
 	<table cellpadding=5 class=gb>
@@ -524,9 +528,9 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<p><?php echo _("In most cases, you'll want to leave the options below set to their default	values"); ?> </p>
 	</div>
 	<div id="selectitemstocopy" <?php echo $excludeAssess?'':'style="display:none"';?>>
-	<h3><?php _('Select Items to Copy'); ?></h3>
+	
 
-	<?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a>
+	<p><?php echo _('Check'); ?>: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All'); ?></a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None'); ?></a></p>
 
 	<table cellpadding=5 class=gb>
 		<thead>
@@ -559,7 +563,7 @@ $excludeAssess = ($sourceUIver > $destUIver);
 		<?php
 			$tdpad = 16*strlen($prespace[$i]);
 
-			echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
+			echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$staticroot.'/img/';
 			switch ($types[$i]) {
 				case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
 				case 'InlineText': echo $CFG['CPS']['miniicons']['inline']; break;
@@ -629,7 +633,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 <?php
 	} else { //DEFAULT DISPLAY BLOCK
 ?>
-	<h3><?php echo _('Select a course to copy items from'); ?></h3>
+	<h2><?php echo _('Select a course to copy items from'); ?></h2>
 
 	<form method=post action="copyitems.php?cid=<?php echo $cid ?>&action=select">
 <?php
@@ -639,7 +643,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		if (isset($CFG['coursebrowsermsg'])) {
 			echo $CFG['coursebrowsermsg'];
 		} else {
-			echo _('Copy a template or promoted course');
+			echo _('Copy from a template or promoted course');
 		}
 		echo ' <button type="button" onclick="showCourseBrowser()">'._('Browse Courses').'</button>';
 		echo '<span id="coursebrowserout" style="display:none"><br/>';

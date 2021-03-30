@@ -137,7 +137,7 @@ if (isset($_POST['seed']) && isset($_POST['check'])) {
 $flexwidth = true; //tells header to use non _fw stylesheet
 $useeditor = 1;
 if (isset($_GET['resizer'])) {
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/iframeSizer_contentWindow_min.js"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/iframeSizer_contentWindow_min.js"></script>';
 }
 if (isset($_GET['frame_id'])) {
 	$frameid = preg_replace('/[^\w:.-]/','',$_GET['frame_id']);
@@ -159,23 +159,27 @@ if (isset($_GET['frame_id'])) {
 		if (mathRenderer == "Katex") {
 			window.katexDoneCallback = sendresizemsg;
 		} else if (typeof MathJax != "undefined") {
-			MathJax.Hub.Queue(function () {
-				sendresizemsg();
-			});
+            if (MathJax.startup) {
+                MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
+            } elseif (MathJax.Hub) {
+                MathJax.Hub.Queue(function () {
+                    sendresizemsg();
+                });
+            } 
 		} else {
 			$(function() {
 				sendresizemsg();
 			});
 		}
-		</script>';
-	if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
-		//in case MathJax isn't loaded yet
-		$placeinhead .= '<script type="text/x-mathjax-config">
-			MathJax.Hub.Queue(function () {
-				sendresizemsg();
-			});
-			</script>';
-	}
+        </script>';
+    if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3) {
+        //in case MathJax isn't loaded yet
+        $placeinhead .= '<script type="text/x-mathjax-config">
+            MathJax.Hub.Queue(function () {
+                sendresizemsg();
+            });
+            </script>';
+    }
 }
 
 
@@ -259,7 +263,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $DBH,$imasroot;
+	global $DBH,$imasroot,$staticroot;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
@@ -293,7 +297,7 @@ function printscore($sc,$qsetid,$seed) {
 			} else {
 				$pm = 'ychk'; $alt=_('Partially correct');
 			}
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" alt=\"$alt\"/>";
+			$bar = "<img src=\"$staticroot/img/$pm.gif\" alt=\"$alt\"/>";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);

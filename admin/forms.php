@@ -8,8 +8,8 @@ if (isset($CFG['hooks']['admin/forms'])) {
 	require($CFG['hooks']['admin/forms']);
 }
 
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 //call hook, if defined
 if (function_exists('getHeaderCode')) {
@@ -259,7 +259,7 @@ switch($_GET['action']) {
 			echo '<span id="newpwwrap" style="display:none">Set temporary password to: <input type=text size=20 name="newpassword" /></span></span><br class=form />';
 		}
 
-		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
+		echo "<BR><span class=form><img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
 		echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
 		echo "> Guest User <BR>\n";
@@ -325,6 +325,38 @@ switch($_GET['action']) {
 		echo '</span><br class="form"/>';
 
 		if ($myrights == 100 || ($myspecialrights&32)==32) {
+            if ($oldrights == 12) {
+                // account request pending
+                $stm = $DBH->prepare('SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?');
+                $stm->execute(array($_GET['id']));
+                $reqdata = json_decode($stm->fetchColumn(0), true);
+                $reqschool = '';
+                if (isset($reqdata['school'])) {
+                    $reqschool = $reqdata['school'];
+                } else if (isset($reqdata['ipeds']) && $reqdata['ipeds'] != '0') {
+                    list($ipedstype,$ipedsid) = explode('-', $reqdata['ipeds']);
+                    $query = 'SELECT ip.school,ip.agency,ip.country,ig.id,ig.name 
+                        FROM imas_ipeds AS ip 
+                        LEFT JOIN imas_ipeds_group AS ipg ON ip.type=ipg.type AND ip.ipedsid=ipg.ipedsid 
+                        LEFT JOIN imas_groups AS ig ON ipg.groupid=ig.id 
+                        WHERE ip.type=? and ip.ipedsid=? LIMIT 1';
+                    $stm2 = $DBH->prepare($query);
+                    $stm2->execute(array($ipedstype, $ipedsval));
+                    $ipedsgroups = array();
+                    while ($r2 = $stm2->fetch(PDO::FETCH_ASSOC)) {
+                        $reqschool = ($ipedstype == 'A') ? $r2['agency'] : $r2['school'];
+                        if ($r2['id'] !== null) {
+                            $oldgroup = $r2['id'];
+                        }
+                    }
+                } else if (isset($reqdata['ipeds']) && $reqdata['ipeds'] == '0') {
+                    $reqschool = $reqdata['otherschool'];
+                }
+                if ($reqschool != '') {
+                    echo '<span class=form>'._('Account request school:').'</span>';
+                    echo '<span class=formright>'.Sanitize::encodeStringForDisplay($reqschool).'</span><br class=form>';
+                }
+            }
 			echo "<span class=form>Group: </span>";
 			echo "<span class=formright>";
 			echo '<label for=\"grpsearch\">Search for Groups</label> <input id=grpsearch /> <button type=button onclick="searchgrps()">Search</button><br/>';
@@ -382,7 +414,11 @@ switch($_GET['action']) {
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");
 		$stm->execute(array($groupid));
 		$hasGroupLTI = ($stm->fetchColumn() !== false);
-
+        // look for LTI 1.3 connection
+        $stm = $DBH->prepare("SELECT deploymentid FROM imas_lti_groupassoc WHERE groupid=?");
+        $stm->execute(array($groupid));
+        $hasLTI13 = ($stm->fetchColumn() !== false);
+        $hasGroupLTI = $hasGroupLTI || $hasLTI13;
 		if ($_GET['action']=='modify' && ($myrights < 40 || ($line['ownerid']!=$userid && $myrights<75))) {
 			//show limited info version
 			$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=? AND userid=?");
@@ -393,7 +429,11 @@ switch($_GET['action']) {
 			}
 			if (isset($_GET['cid'])) {
 				$cid = Sanitize::courseId($_GET['cid']);
-				echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Course Settings</div>";
+                echo "<div class=breadcrumb>$breadcrumbbase ";
+                if (empty($_COOKIE['fromltimenu'])) {
+                    echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+                }
+                echo _('Course Settings') , '</div>';
 			}
 			echo '<div id="headerforms" class="pagetitle"><h1>';
 			echo _('Course Settings');
@@ -407,7 +447,7 @@ switch($_GET['action']) {
 			if (isset($enablebasiclti) && $enablebasiclti==true) {
 				//Start grouping: LMS Integration
 				echo '<div class="block grouptoggle">';
-				echo '<img class="mida" src="../img/expand.gif" /> ';
+				echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 				echo 'LMS Integration (LTI)';
 				echo '</div>';
 				echo '<div class="blockitems hidden">';
@@ -415,12 +455,20 @@ switch($_GET['action']) {
 				echo '<p>'._('For integration setup instructions, visit the Course Items: Export page inside your course').'</p>';
 
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
-					echo '<p>'._('Your school already has a school-wide LTI key and secret established, so no course level configuration is required.').'</p>';
+                    if ($hasLTI13) {
+                        echo '<p>'._('Your school already has a school-wide LTI 1.3 connection established, so no course level configuration is required.').'</p>';
+                    } else {
+                        echo '<p>'._('Your school already has a school-wide LTI key and secret established, so no course level configuration is required.').'</p>';
+                    }
 				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
 					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
 				} else {
 					if ($hasGroupLTI) {
-						echo '<p>'._('Your school may already have a school-wide LTI key and secret established. ');
+                        if ($hasLTI13) {
+                            echo '<p>'._('Your school may already have a school-wide LTI 1.3 connection established. ');
+                        } else {
+                            echo '<p>'._('Your school may already have a school-wide LTI key and secret established. ');
+                        }
 						echo _('If so, you will not need to set up a course-level configuration. ');
 						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">'._('Show course level key/secret').'</a></p>';
 						echo '<div id="courselevelkey" style="display:none">';
@@ -493,7 +541,8 @@ switch($_GET['action']) {
 			$deftime = $line['deftime'];
 			$latepasshrs = $line['latepasshrs'];
 			$jsondata = json_decode($line['jsondata'], true);
-			$dates_by_lti = $line['dates_by_lti'];
+            $dates_by_lti = $line['dates_by_lti'];
+            $ltisendzeros = $line['ltisendzeros'];
 			$courselevel = $line['level'];
 			if ($jsondata===null || !isset($jsondata['browser'])) {
 				$browser = array();
@@ -529,7 +578,8 @@ switch($_GET['action']) {
 			$courselevel = '';
 			$browser = array();
 			$blockLTICopyOfCopies = false;
-			$dates_by_lti = 0;
+            $dates_by_lti = 0;
+            $ltisendzeros = 0;
 			$startdate = 0;
 			$enddate = 2000000000;
 			$for = 0;
@@ -604,10 +654,14 @@ switch($_GET['action']) {
 			$defstimedisp = $deftimedisp;
 		}
 
-		if (isset($_GET['cid'])) {
-			$cid = Sanitize::courseId($_GET['cid']);
-			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; "._("Course Settings")."</div>";
-		}
+        if (isset($_GET['cid'])) {
+            $cid = Sanitize::courseId($_GET['cid']);
+            echo "<div class=breadcrumb>$breadcrumbbase ";
+            if (empty($_COOKIE['fromltimenu'])) {
+                echo " <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+            }
+            echo _('Course Settings') , '</div>';
+        }
 		echo '<div id="headerforms" class="pagetitle"><h1>';
 		if ($_GET['action']=='modify') {
 			echo _('Course Settings');
@@ -732,13 +786,19 @@ switch($_GET['action']) {
 		//Start grouping: copy options
 		if ($_GET['action']=='addcourse' && $ctc>0) {
 			if ($sourceUIver < 2) {
-				echo '<span class=form>'._('Upgrade assessment version').'</span>';
-				echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
-				echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
-				echo '</label></span><br class=form>';
+                if (!empty($CFG['assess_upgrade_optout'])) {
+                    echo '<span class=form>'._('Upgrade assessment version').'</span>';
+                    echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
+                    echo _('The source course is using an older format of assessments. Select this option to set your new course to use the new version of assessments, and convert copied assessments to the new format. You will want to review the settings after the copy.');
+                    echo '</label></span><br class=form>';
+                } else {
+                    echo '<p><input type=hidden name="newassessver" id="newassessver" value="1" />';
+                    echo _('The source course is using an older format of assessments, so they will be converted to the new format during the copy. You will want to review the settings after the copy.');
+                    echo '</p>';
+                }
 			}
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 			echo _('Course Copy Options');
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -754,17 +814,24 @@ switch($_GET['action']) {
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
 			echo '</span><br class=form>';
+			echo '<span class=form><label for=copyallcalitems>'._('Copy all calendar items?').'</label></span>';
+			echo '<span class=formright><input type=checkbox name="copyallcalitems" id="copyallcalitems" value="1"/>';
+			echo '</span><br class=form>';
 			echo '</div>';
 
 		} else if ($_GET['action']=='addcourse' && $ctc == 0) {
-			echo '<span class=form>'._('Assessment version').'</span>';
-			echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
-			echo _('Use the new version of assessments.');
-			echo '</label></span><br class=form>';
+            if (!empty($CFG['assess_upgrade_optout'])) {
+                echo '<span class=form>'._('Assessment version').'</span>';
+                echo '<span class=formright><label><input type=checkbox name="newassessver" id="newassessver" value="1" checked />';
+                echo _('Use the new version of assessments.');
+                echo '</label></span><br class=form>';
+            } else {
+                echo '<input type=hidden name="newassessver" id="newassessver" value="1" />';
+            }
 		}
 		//Start grouping: Availability and Access
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 		echo _('Availability and Access');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
@@ -807,10 +874,10 @@ switch($_GET['action']) {
 		}
 		echo 'Start: <input type=text size=10 name="sdate" value="'.$sdate.'">
 			<a href="#" onClick="displayDatePicker(\'sdate\', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
 		echo 'End: <input type=text size=10 name="edate" value="'.$edate.'">
 			<a href="#" onClick="displayDatePicker(\'edate\', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+			<img src="'.$staticroot.'/img/cal.gif" alt="Calendar"/></a> ';
 		echo '</span><br class=form />';
 
 		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
@@ -820,19 +887,20 @@ switch($_GET['action']) {
 			echo '</span><br class="form"/>';
 		}
 
-		if (!isset($CFG['CPS']['unenroll']) || $CFG['CPS']['unenroll'][1]==1) {
+        echo "<span class=form>",_("Self-enrollment"),"</span><span class=formright>";
+        echo ' <label><input type=checkbox name="allowenroll" value="1" ';
+        if (($allowunenroll&2)==0) { echo "checked=1";}
+        echo '/> ',_('Allow students to self-enroll using Course ID and Key'),'</label>';
+        echo '</span><br class=form />';
+
+        if ((isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==1) ||
+            ($myrights == 100 && ($istemplate&4)==4)
+        ) {
 			echo "<span class=form>",_("Allow students to self-<u>un</u>enroll"),"</span><span class=formright>";
 			echo '<input type=radio name="allowunenroll" value="0" ';
 			if (($allowunenroll&1)==0) { echo "checked=1";}
 			echo '/> ',_('No'),' <input type=radio name="allowunenroll" value="1" ';
 			if (($allowunenroll&1)==1) { echo "checked=1";}
-			echo '/> ',_('Yes'),' </span><br class=form />';
-
-			echo "<span class=form>",_("Allow students to self-enroll"),"</span><span class=formright>";
-			echo '<input type=radio name="allowenroll" value="2" ';
-			if (($allowunenroll&2)==2) { echo "checked=1";}
-			echo '/> ',_('No'),' <input type=radio name="allowenroll" value="0" ';
-			if (($allowunenroll&2)==0) { echo "checked=1";}
 			echo '/> ',_('Yes'),' </span><br class=form />';
 		}
 
@@ -852,7 +920,7 @@ switch($_GET['action']) {
 		if (isset($enablebasiclti) && $enablebasiclti==true) {
 			//Start grouping: LMS Integration
 			echo '<div class="block grouptoggle">';
-			echo '<img class="mida" src="../img/expand.gif" /> ';
+			echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 			echo 'LMS Integration (LTI)';
 			echo '</div>';
 			echo '<div class="blockitems hidden">';
@@ -861,12 +929,20 @@ switch($_GET['action']) {
 
 			if (isset($_GET['id'])) {
 				if ($hasGroupLTI && !empty($CFG['LTI']['noCourseLevel'])) {
-					echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+                    if ($hasLTI13) {
+                        echo '<p>Your school already has a school-wide LTI 1.3 connection established, so no course level configuration is required.</p>';
+                    } else {
+                        echo '<p>Your school already has a school-wide LTI key and secret established, so no course level configuration is required.</p>';
+                    }
 				} else if (!empty($CFG['LTI']['noCourseLevel']) && !empty($CFG['LTI']['noGlobalMsg'])) {
 					echo '<p>'.$CFG['LTI']['noGlobalMsg'].'</p>';
 				} else {
 					if ($hasGroupLTI) {
-						echo '<p>'._('Your school may already have a school-wide LTI key and secret established. ');
+                        if ($hasLTI13) {
+                            echo '<p>'._('Your school may already have a school-wide LTI 1.3 connection established. ');
+                        } else {
+                            echo '<p>'._('Your school may already have a school-wide LTI key and secret established. ');
+                        }
 						echo _('If so, you will not need to set up a course-level configuration. ');
 						echo '<a href="#" onclick="$(\'#courselevelkey\').slideDown();$(this).hide();return false;">'._('Show course level key/secret').'</a></p>';
 						echo '<div id="courselevelkey" style="display:none">';
@@ -891,15 +967,25 @@ switch($_GET['action']) {
 				}
 			}
 
-			echo '<span class="form">',_('Allow the LMS to set assessment due dates'),'?<br/><span class="small">(',_('Only supported by Canvas'),')</span></span>';
-			echo '<span class="formright"><input type="checkbox" name="setdatesbylti" value="1" ';
+			echo '<span class="form">',_('Due Dates'),'</span>';
+			echo '<span class="formright"><label><input type="checkbox" name="setdatesbylti" value="1" ';
 			if ($dates_by_lti>0) { echo 'checked="checked"';}
-			echo '/> </span><br class="form" />';
+            echo '/> '._('Allow the LMS to set assessment due dates');
+            echo ' <span class="small">(',_('Only supported by Canvas'),')</span></span><br class="form" />';
+            
+            if ($hasLTI13 && !empty($CFG['LTI']['usesendzeros'])) {
+                echo '<span class="form">',_('Send zeros'),'?<br/></span>';
+                echo '<span class="formright"><label><input type="checkbox" name="ltisendzeros" value="1" ';
+                if ($ltisendzeros>0) { echo 'checked="checked"';}
+                echo '/> '._('Send zeros to LMS after due date for unattempted assignments');
+                echo ' <span class="small">(',_('LTI 1.3 only'),')</span></label>';
+                echo '</span><br class="form" />';
+            }
 			if ($myrights>=75) {
-				echo '<span class="form">',_('LMS course copies always copy from this original course'),'</span>';
-				echo '<span class="formright"><input type="checkbox" name="blocklticopies" value="1" ';
+				echo '<span class="form">',_('Copies of Copies'),'</span>';
+				echo '<span class="formright"><label><input type="checkbox" name="blocklticopies" value="1" ';
 				if ($blockLTICopyOfCopies) { echo 'checked="checked"';}
-				echo '/> </span><br class="form" />';
+				echo '/> '._('LMS course copies always copy from this original course').'</label></span><br class="form" />';
 			}
 
 			echo '</div>'; //end LTI grouping
@@ -907,7 +993,7 @@ switch($_GET['action']) {
 
 		//Start grouping: Additional Options
 		echo '<div class="block grouptoggle">';
-		echo '<img class="mida" src="../img/expand.gif" /> ';
+		echo '<img class="mida" src="'.$staticroot.'/img/expand.gif" /> ';
 		echo _('Additional Options');
 		echo '</div>';
 		echo '<div class="blockitems hidden">';
@@ -1023,7 +1109,7 @@ switch($_GET['action']) {
 			if ($myrights==100) {
 				echo '<br/><input type=checkbox name="isselfenroll" value="4" ';
 				if (($istemplate&4)==4) {echo 'checked="checked"';};
-				echo ' /> ',_('Mark as self-enroll course');
+				echo ' /> ',_('Include in public self-enroll course list');
 				if (isset($CFG['GEN']['guesttempaccts'])) {
 					echo '<br/><input type=checkbox name="isguest" value="8" ';
 					if (($istemplate&8)==8) {echo 'checked="checked"';};

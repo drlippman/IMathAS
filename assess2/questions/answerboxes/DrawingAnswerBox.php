@@ -23,7 +23,7 @@ class DrawingAnswerBox implements AnswerBox
 
     public function generate(): void
     {
-        global $RND, $myrights, $useeqnhelper, $showtips, $imasroot;
+        global $RND, $myrights, $useeqnhelper, $showtips, $imasroot, $staticroot;
 
         $anstype = $this->answerBoxParams->getAnswerType();
         $qn = $this->answerBoxParams->getQuestionNumber();
@@ -214,7 +214,7 @@ class DrawingAnswerBox implements AnswerBox
     			$_SESSION['graphdisp']=2;
     		} else {
     			$revertgraphdisp = false;
-    		}
+            }
     		if (!is_array($backg) && substr($backg,0,5)=="draw:") {
     			$plot = showplot("",$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
@@ -251,9 +251,12 @@ class DrawingAnswerBox implements AnswerBox
                         (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '').'</p>';
     				$out .= '<p>'._('Graph to add drawings to:').'</p>';
     				$out .= '<p>'.$plot.'</p>';
-    				$out .= '<p>'._('Elements to draw:').'</p>';
-    				$out .= '<ul id="a11ydraw'.$qn.'"></ul>';
-    				$out .= '<p><button type="button" class="a11ydrawadd" data-qn="'.$qn.'">'._('Add new drawing element').'</button></p>';
+    				$out .= '<p tabindex="-1">'._('Elements to draw:').'</p>';
+                    $out .= '<ul class="a11ydraw" id="a11ydraw'.$qn.'"></ul>';
+                    $out .= '<p class="empty-state">'._('No elements have been added yet').'</p>';
+                    $out .= '<p><label>'._('Add new drawing element');
+                    $out .= ': <select id="a11ydrawnew'.$qn.'"></select></label> ';
+                    $out .= '<button type="button" class="a11ydrawadd" data-qn="'.$qn.'">'._('Add').'</button></p>';
     				if ($answerformat[0]=="polygon") {
     					$dotline = 1;
     				} else if ($answerformat[0]=="closedpolygon") {
@@ -279,148 +282,160 @@ class DrawingAnswerBox implements AnswerBox
     				$out .= _('Draw:') . " ";
     				if ($answerformat[0]=='inequality') {
     					if (in_array('both',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
-    						$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
-    						$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.3\" alt=\"Quadratic inequality, solid line\"/>";
-    						$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqparab.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.3\" alt=\"Quadratic inequality, solid line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
     						$def = 10;
+                        }
+                        if (in_array('line',$answerformat) || count($answerformat)==1) {
+    						$out .= "<img src=\"$staticroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
+                            if ($answerformat[1] == 'line' || count($answerformat)==1) {
+                                $def = 10;
+                            }
     					}
-    					else if (in_array('parab',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.3\" class=\"sel\" alt=\"Quadratic inequality, solid line\"/>";
-    						$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
-    						$def = 10.3;
+    					if (in_array('parab',$answerformat)) {
+    						$out .= "<img src=\"$staticroot/img/tpineqparab.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.3\" class=\"sel\" alt=\"Quadratic inequality, solid line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
+    						if ($answerformat[1] == 'parab') {
+                                $def = 10.3;
+                            }
+                        } 
+                        if (in_array('abs',$answerformat)) {
+    						$out .= "<img src=\"$staticroot/img/tpineqabs.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.5\" class=\"sel\" alt=\"Absolute Value inequality, solid line\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpineqabsdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.6\" alt=\"Absolute Value inequality, dashed line\"/>";
+    						if ($answerformat[1] == 'abs') {
+                                $def = 10.5;
+                            }
     					}
-    					else {
-    						$out .= "<img src=\"$imasroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
-    						$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
-    						$def = 10;
-    					}
+    					
     				} else if ($answerformat[0]=='twopoint') {
     					if (count($answerformat)==1 || in_array('line',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpline.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5\" ";
+    						$out .= "<img src=\"$staticroot/img/tpline.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5\" ";
     						if (count($answerformat)==1 || $answerformat[1]=='line') { $out .= 'class="sel" '; $def = 5;}
     						$out .= ' alt="Line"/>';
     					}
-    					//$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
+    					//$out .= "<img src=\"$staticroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
     					if (in_array('lineseg',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpline3.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.3\" ";
+    						$out .= "<img src=\"$staticroot/img/tpline3.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.3\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='lineseg') { $out .= 'class="sel" '; $def = 5.3;}
     						$out .= ' alt="Line segment"/>';
     					}
     					if (in_array('ray',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpline2.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.2\" ";
+    						$out .= "<img src=\"$staticroot/img/tpline2.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.2\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='ray') { $out .= 'class="sel" '; $def = 5.2;}
     						$out .= ' alt="Ray"/>';
     					}
     					if (in_array('vector',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpvec.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.4\" ";
+    						$out .= "<img src=\"$staticroot/img/tpvec.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.4\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='vector') { $out .= 'class="sel" '; $def = 5.4;}
     						$out .= ' alt="Vector"/>';
     					}
     					if (count($answerformat)==1 || in_array('parab',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6\" ";
+    						$out .= "<img src=\"$staticroot/img/tpparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='parab') { $out .= 'class="sel" '; $def = 6;}
     						$out .= ' alt="Parabola"/>';
     					}
     					if (in_array('horizparab',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tphorizparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.1\" ";
+    						$out .= "<img src=\"$staticroot/img/tphorizparab.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.1\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='horizparab') { $out .= 'class="sel" '; $def = 6.1;}
     						$out .= ' alt="Horizontal parabola"/>';
     					}
     					if (in_array('cubic',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpcubic.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.3\" ";
+    						$out .= "<img src=\"$staticroot/img/tpcubic.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.3\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='cubic') { $out .= 'class="sel" '; $def = 6.3;}
     						$out .= ' alt="Cubic"/>';
     					}
     					if (in_array('sqrt',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpsqrt.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.5\" ";
+    						$out .= "<img src=\"$staticroot/img/tpsqrt.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.5\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='sqrt') { $out .= 'class="sel" '; $def = 6.5;}
     						$out .= ' alt="Square root"/>';
     					}
     					if (in_array('cuberoot',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpcuberoot.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.6\" ";
+    						$out .= "<img src=\"$staticroot/img/tpcuberoot.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"6.6\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='cuberoot') { $out .= 'class="sel" '; $def = 6.6;}
     						$out .= ' alt="Cube Root"/>';
     					}
     					if (count($answerformat)==1 || in_array('abs',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpabs.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8\" ";
+    						$out .= "<img src=\"$staticroot/img/tpabs.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='abs') { $out .= 'class="sel" '; $def = 8;}
     						$out .= ' alt="Absolute value"/>';
     					}
     					if (in_array('rational',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tprat.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.2\" ";
+    						$out .= "<img src=\"$staticroot/img/tprat.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.2\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='rational') { $out .= 'class="sel" '; $def = 8.2;}
     						$out .= ' alt="Rational"/>';
     					}
     					if (in_array('exp',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpexp.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.3\" ";
+    						$out .= "<img src=\"$staticroot/img/tpexp.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.3\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='exp') { $out .= 'class="sel" '; $def = 8.3;}
     						$out .= ' alt="Exponential"/>';
     					}
     					if (in_array('genexp',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpgenexp.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.5\" ";
+    						$out .= "<img src=\"$staticroot/img/tpgenexp.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.5\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='genexp') { $out .= 'class="sel" '; $def = 8.5;}
     						$out .= ' alt="General Exponential"/>';
     					}
     					if (in_array('log',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tplog.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.4\" ";
+    						$out .= "<img src=\"$staticroot/img/tplog.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.4\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='log') { $out .= 'class="sel" '; $def = 8.4;}
     						$out .= ' alt="Logarithm"/>';
     					}
     					if (in_array('genlog',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpgenlog.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.6\" ";
+    						$out .= "<img src=\"$staticroot/img/tpgenlog.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"8.6\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='genlog') { $out .= 'class="sel" '; $def = 8.6;}
     						$out .= ' alt="General Logarithm"/>';
     					}
     					if ($settings[6]*($settings[3]-$settings[2]) == $settings[7]*($settings[1]-$settings[0])) {
     						//only circles if equal spacing in x and y
     						if (count($answerformat)==1 || in_array('circle',$answerformat)) {
-    							$out .= "<img src=\"$imasroot/img/tpcirc.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7\" ";
+    							$out .= "<img src=\"$staticroot/img/tpcirc.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7\" ";
     							if (count($answerformat)>1 && $answerformat[1]=='circle') { $out .= 'class="sel" '; $def = 7;}
     							$out .= ' alt="Circle"/>';
     						}
     					}
     					if (in_array('ellipse',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpellipse.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7.2\" ";
+    						$out .= "<img src=\"$staticroot/img/tpellipse.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7.2\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='ellipse') { $out .= 'class="sel" '; $def = 7.2;}
     						$out .= ' alt="Ellipse"/>';
     					}
     					if (in_array('hyperbola',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpverthyper.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7.4\" ";
+    						$out .= "<img src=\"$staticroot/img/tpverthyper.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7.4\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='hyperbola') { $out .= 'class="sel" '; $def = 7.4;}
     						$out .= ' alt="Vertical hyperbola"/>';
-    						$out .= "<img src=\"$imasroot/img/tphorizhyper.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7.5\" ";
+    						$out .= "<img src=\"$staticroot/img/tphorizhyper.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"7.5\" ";
     						$out .= ' alt="Horizontal hyperbola"/>';
     					}
     					if (in_array('trig',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpcos.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9\" ";
+    						$out .= "<img src=\"$staticroot/img/tpcos.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='trig') { $out .= 'class="sel" '; $def = 9;}
     						$out .= ' alt="Cosine"/>';
-    						$out .= "<img src=\"$imasroot/img/tpsin.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9.1\" alt=\"Sine\"/>";
+    						$out .= "<img src=\"$staticroot/img/tpsin.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9.1\" alt=\"Sine\"/>";
     					}
     					if (count($answerformat)==1 || in_array('dot',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpdot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"1\" ";
+    						$out .= "<img src=\"$staticroot/img/tpdot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"1\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='dot') { $out .= 'class="sel" '; $def = 1;}
     						$out .= ' alt="Dot"/>';
     					}
     					if (in_array('opendot',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpodot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"2\" ";
+    						$out .= "<img src=\"$staticroot/img/tpodot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"2\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
     						$out .= ' alt="Open dot"/>';
     					}
     				} else if ($answerformat[0]=='numberline') {
     					if (in_array('lineseg',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/numlines.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"0.5\" ";
+    						$out .= "<img src=\"$staticroot/img/numlines.png\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"0.5\" ";
     						if (count($answerformat)==1 || $answerformat[1]=='lineseg') { $out .= 'class="sel" '; $def = 0.5;}
     						$out .= ' alt="Line segments and rays" title="Line segments and rays"/>';
     					}
     					if (count($answerformat)==1 || in_array('dot',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpdot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"1\" ";
+    						$out .= "<img src=\"$staticroot/img/tpdot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"1\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='dot') { $out .= 'class="sel" '; $def = 1;}
     						$out .= ' alt="Closed dot" title="Closed dot"/>';
     					}
     					if (in_array('opendot',$answerformat)) {
-    						$out .= "<img src=\"$imasroot/img/tpodot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"2\" ";
+    						$out .= "<img src=\"$staticroot/img/tpodot.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"2\" ";
     						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
     						$out .= ' alt="Open dot" title="Open dot"/>';
     					}
@@ -512,7 +527,12 @@ class DrawingAnswerBox implements AnswerBox
     			foreach($answers as $ans) {
     				if (is_array($ans)) { continue;} //shouldn't happen, unless user forgot to set question to multipart
     				if ($ans=='') { continue;}
-    				$function = array_map('trim',explode(',',$ans));
+                    $function = array_map('trim',explode(',',$ans));
+                    $defcolor = 'blue';
+                    if ($function[0] == 'optional') {
+                        array_shift($function);
+                        $defcolor = 'grey';
+                    }
     				if ($answerformat[0]=='inequality') {
     					if ($function[0]{2}=='=') {
     						$type = 10;
@@ -525,7 +545,7 @@ class DrawingAnswerBox implements AnswerBox
     					$saarr[$k]  = makepretty($function[0]).','.$ineqcolors[$k%3];
     				} else {
     					if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-    						$saarr[$k] = $function[1].',blue,'.$function[0].','.$function[0];
+    						$saarr[$k] = $function[1].','.$defcolor.','.$function[0].','.$function[0];
     						if (count($function)==2 || $function[2]=='closed') {
     							$saarr[$k] .= ',closed';
     						} else {
@@ -545,11 +565,11 @@ class DrawingAnswerBox implements AnswerBox
     							$dy = $function[2];
     							$xs = 0; $ys = 0;
     						}
-    						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],blue,0,1,,arrow";
+    						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],$defcolor,0,1,,arrow";
     					} else if ($function[0]=='circle') { //is circle
-    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
+    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],$defcolor,0,6.31";
     					} else if ($function[0]=='ellipse') {
-    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[4]}*sin(t)+{$function[2]}],blue,0,6.31";
+    						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[4]}*sin(t)+{$function[2]}],$defcolor,0,6.31";
     					} else if ($function[0]=='verthyperbola') {
     						//(y-yc)^2/a^2 -  (x-xc)^2/b^2 = 1
     						$saarr[$k] = "sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2]";
@@ -561,9 +581,9 @@ class DrawingAnswerBox implements AnswerBox
     						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]-$function[3]*t],green,,,,,,dash";
     					} else if ($function[0]=='horizhyperbola') {
     						//(x-xc)^2/a^2 - (y-yc)^2/b^2 = 1
-    						$saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
+    						$saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],$defcolor,$settings[2],$settings[3]";
     						$k++;
-    						$saarr[$k] = "[-sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
+    						$saarr[$k] = "[-sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],$defcolor,$settings[2],$settings[3]";
     						$k++;
     						$saarr[$k] = "[$function[1]+$function[3]*t,$function[2]+$function[4]*t],green,,,,,,dash";
     						$k++;
@@ -572,16 +592,16 @@ class DrawingAnswerBox implements AnswerBox
     						if (count($function)==3) {
     							if ($function[1] == '-oo') { $function[1] = $settings[2]-.1*($settings[3]-$settings[2]);}
     							if ($function[2] == 'oo') { $function[2] = $settings[3]+.1*($settings[3]-$settings[2]);}
-    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.$function[1].','.$function[2];
+    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],'.$defcolor.','.$function[1].','.$function[2];
     						} else {
-    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+    							$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],'.$defcolor.','.($settings[2]-1).','.($settings[3]+1);
     						}
     					} else { //is function
-                			if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^(]|ln[^\(]|root[^\(]|root\(.*?\)[^\(])/', $function[0])) {
+                			if (preg_match('/(sin[^\(]|cos[^\(]|sqrt[^\(]|log[^\(_]|log_\d+[^(]|ln[^\(]|root[^\(]|root\([^\)]*?\)[^\(])/', $function[0], $m)) {
     							echo "Invalid notation on ".Sanitize::encodeStringForDisplay($function[0]).": missing function parens";
     							continue;
     						}
-    						$saarr[$k] = $function[0].',blue';
+    						$saarr[$k] = $function[0].','.$defcolor;
     						if (count($function)>2) {
     							if ($function[1] == '-oo') { $function[1] = $settings[0]-.1*($settings[1]-$settings[0]);}
     							if ($function[2] == 'oo') { $function[2] = $settings[1]+.1*($settings[1]-$settings[0]);}
@@ -643,11 +663,13 @@ class DrawingAnswerBox implements AnswerBox
     					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     					$insat = strpos($sa,');',strpos($sa,'axes'))+2;
     					$sa = substr($sa,0,$insat).str_replace("'",'"',substr($backg,5)).substr($sa,$insat);
-    				} else {
+    				} else if (!is_array($backg) && $backg=='none') {
+                        $sa = showasciisvg("initPicture(0,10,0,10);",$settings[6],$settings[7]);
+                    } else {
     					if (!is_array($backg)) {
     						settype($backg,"array");
     					}
-    					$saarr = array_merge($saarr,$backg);
+                        $saarr = array_merge($backg,$saarr);
     					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
     					if (isset($grid) && (strpos($xsclgridpts[0],'/')!==false || strpos($xsclgridpts[0],'pi')!==false)) {
     						$sa = addfractionaxislabels($sa,$xsclgridpts[0]);
@@ -677,7 +699,7 @@ class DrawingAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = '<div>'.$sa.'</div>';
         $this->previewLocation = $preview;
     }
 

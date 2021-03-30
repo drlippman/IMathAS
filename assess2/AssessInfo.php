@@ -19,6 +19,7 @@ class AssessInfo
   private $questionSetData = array();
   private $exception = null;
   private $exceptionfunc = null;
+  private $resetdata = array();
 
 
  /**
@@ -89,23 +90,56 @@ class AssessInfo
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
     if (!$isstu && $this->assessData['date_by_lti'] > 0 && isset($_SESSION['lti_duedate'])) {
       // fake exception for teachers from LTI
-      $this->exception = array(0, $_SESSION['lti_duedate'], 0, 1, 0);
+      $this->setException($uid, array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else if (!$isstu) {
-      $this->exception = false;
+      $this->setException($uid, false, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else {
-      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore ";
+      $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
-      $this->exception = $stm->fetch(PDO::FETCH_NUM);
+      $this->setException($uid, $stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
     }
+  }
+
+  /**
+   * Sets an exception
+   * @param  integer  $uid   The user ID
+   * @param  array|false   $exception   array of exception data, or false for none.
+   * @param  boolean  $isstu      Whether the user is a student
+   * @param  integer $latepasses  The number of latepasses the user has
+   * @param  integer $latepasshrs How many hours latepasses extend due dates
+   * @param  integer $courseenddate The course end date
+   * @return void
+   */
+  public function setException($uid, $exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
+
+    // resets, in case we're using setException multiple times
+    $resetkeys = ['exceptionpenalty','original_enddate','extended_with',
+        'timeext','attemptext', 'startdate', 'enddate', 'enddate_in',
+        'latepasses_avail', 'latepass_extendto'];
+    if (empty($this->resetdata)) { // set reset data on first run
+        foreach ($resetkeys as $key) {
+            $this->resetdata[$key] = isset($this->assessData[$key]) ? $this->assessData[$key] : null;
+        }
+    } else {
+        foreach ($resetkeys as $key) {
+            if ($this->resetdata[$key] === null) {
+                unset($this->assessData[$key]);
+            } else {
+                $this->assessData[$key] = $this->resetdata[$key];
+            }
+        }
+    }
+
+    $this->exception = $exception;
 
     $this->assessData['hasexception'] = ($this->exception !== false);
 
     if ($this->exception !== false && $this->exception[4] !== null) {
       //override default exception penalty
       $this->assessData['exceptionpenalty'] = $this->exception[4];
-    }
+    } 
 
     $this->exceptionfunc = new ExceptionFuncs($uid, $this->cid, $isstu, $latepasses, $latepasshrs);
 
@@ -115,6 +149,25 @@ class AssessInfo
     } else {
       $useexception = $this->exceptionfunc->getCanUseAssessException($this->exception, $this->assessData, true);
       $canuselatepass = false;
+    }
+
+    // use time limit extension even if rest of exception isn't used
+    if ($this->exception !== false && $this->exception[6] != 0) {
+        $this->assessData['timeext'] = intval($this->exception[6]);
+    }
+    if ($this->exception !== false && $this->exception[7] != 0) {
+        $this->assessData['attemptext'] = intval($this->exception[7]);
+        // apply additional attempts
+        if ($this->assessData['submitby'] == 'by_assessment') {
+            $this->assessData['allowed_attempts'] += $this->assessData['attemptext'];
+        } else {
+            // if question settings already loaded, apply extension
+            foreach ($this->questionData as $i=>$set) {
+                if ($set['regen'] != 1) {
+                    $this->questionData[$i]['regens_max'] += $this->assessData['attemptext'];
+                }
+            }
+        }
     }
 
     if ($useexception) {
@@ -172,7 +225,7 @@ class AssessInfo
    * Also sets assessData['latepass_blocked_by_practice']
    * @return boolean
    */
-  public function getLatePassBlockedByView() {
+  public function getLatePassStatus() {
     if ($this->assessData['hasexception']) {
       list($useexception,$LPblocked) =
         $this->exceptionfunc->getCanUseAssessException(
@@ -182,10 +235,11 @@ class AssessInfo
           true
         );
     } else {
-      $LPblocked = $this->exceptionfunc->getLatePassBlockedByView($this->assessData,0);
+      $LPblocked = $this->exceptionfunc->getCanUseAssessLatePass($this->assessData, 0, true);
+      //$this->exceptionfunc->getLatePassBlockedByView($this->assessData,0);
     }
-    $this->assessData['latepass_blocked_by_practice'] = $LPblocked;
-    return $this->assessData['latepass_blocked_by_practice'];
+    $this->assessData['latepass_status'] = $LPblocked;
+    return $this->assessData['latepass_status'];
   }
 
   /**
@@ -208,9 +262,10 @@ class AssessInfo
   *                      Default 'all'.
   * @param boolean $get_code  set True to load the question code and other fields
   *                           from imas_questionset.  Gets stored in $questionSetData
+  * @param boolean $get_cats  whether to load question category info (def true)
   * @return void
   */
-  public function loadQuestionSettings($qids = 'all', $get_code = false) {
+  public function loadQuestionSettings($qids = 'all', $get_code = false, $get_cats = true) {
     if (is_array($qids)) {
       $ph = Sanitize::generateQueryPlaceholders($qids);
       $stm = $this->DBH->prepare("SELECT * FROM imas_questions WHERE id IN ($ph)");
@@ -223,21 +278,28 @@ class AssessInfo
     $tolookupAids = array();
     $tolookupOutcomes = array();
     while ($qrow = $stm->fetch(PDO::FETCH_ASSOC)) {
+      if (!$get_cats) {
+        unset($qrow['category']);
+      }
       $this->questionData[$qrow['id']] = self::normalizeQuestionSettings($qrow, $this->assessData);
       $qsids[] = $qrow['questionsetid'];
-      $category = &$this->questionData[$qrow['id']]['category'];
-      if ($category === '') {
-        // do nothing
-      } else if (is_numeric($category)) {
-        if (intval($category) === 0) {
-          $category = $this->assessData['defoutcome'];
+      if ($get_cats) {
+        $this->questionData[$qrow['id']]['origcategory'] = $this->questionData[$qrow['id']]['category'];
+        $category = &$this->questionData[$qrow['id']]['category'];
+
+        if ($category === '') {
+            // do nothing
+        } else if (is_numeric($category)) {
+            if (intval($category) === 0) {
+            $category = $this->assessData['defoutcome'];
+            }
+            $tolookupOutcomes[$qrow['id']] = $category;
+        } else if (0==strncmp($category,"AID-",4)) {
+            $tolookupAids[$qrow['id']] = substr($category, 4);
         }
-        $tolookupOutcomes[$qrow['id']] = $category;
-      } else if (0==strncmp($category,"AID-",4)) {
-        $tolookupAids[$qrow['id']] = substr($category, 4);
       }
     }
-    if (count($tolookupAids) > 0) {
+    if (count($tolookupAids) > 0 && $get_cats) {
       $uniqAids = array_values(array_unique($tolookupAids));
       $ph = Sanitize::generateQueryPlaceholders($uniqAids);
       $stm = $this->DBH->prepare("SELECT id,name FROM imas_assessments WHERE id IN ($ph) AND courseid=?");
@@ -251,7 +313,7 @@ class AssessInfo
         $this->questionData[$qid]['category'] = $aidmap[$aid];
       }
     }
-    if (count($tolookupOutcomes) > 0) {
+    if (count($tolookupOutcomes) > 0 && $get_cats) {
       $uniqOutcomes = array_values(array_unique($tolookupOutcomes));
       $ph = Sanitize::generateQueryPlaceholders($uniqOutcomes);
       $stm = $this->DBH->prepare("SELECT id,name FROM imas_outcomes WHERE id IN ($ph) AND courseid=?");
@@ -291,6 +353,9 @@ class AssessInfo
   public function extractSettings($keys) {
     $out = array();
     foreach ($keys as $key) {
+      if ($key == 'interquestion_text' && !isset($this->assessData['textmap'])) {
+        $this->generateTextMap();
+      }
       if (isset($this->assessData[$key])) {
         $out[$key] = $this->assessData[$key];
       }
@@ -308,13 +373,26 @@ class AssessInfo
       'showans','showans_aftern','points_possible','questionsetid',
       'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
+    if (!isset($this->questionData[$id])) {
+        return false;
+    }
     foreach ($base as $field) {
-      $out[$field] = $this->questionData[$id][$field];
+        if (isset($this->questionData[$id][$field])) {
+            $out[$field] = $this->questionData[$id][$field];
+        } else {
+            $out[$field] = null;
+        }
     }
     if ($this->assessData['submitby'] == 'by_question') {
       foreach ($by_q as $field) {
         $out[$field] = $this->questionData[$id][$field];
       }
+    }
+    if (!isset($this->assessData['textmap'])) {
+        $this->generateTextMap();
+    }
+    if (isset($this->assessData['textmap'][$id])) {
+        $out['text'] = $this->assessData['textmap'][$id];
     }
     return $out;
   }
@@ -358,6 +436,14 @@ class AssessInfo
     $out = array();
     foreach ($this->questionData as $qid=>$v) {
       $out[$qid] = $v['points_possible'];
+    }
+    return $out;
+  }
+
+  public function getAllQuestionPointsAndCats() {
+    $out = array();
+    foreach ($this->questionData as $qid=>$v) {
+      $out[$qid] = ['points'=>$v['points_possible'], 'cat'=>$v['origcategory']];
     }
     return $out;
   }
@@ -628,14 +714,45 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&1) {
-      //shuffle all
-      $RND->shuffle($qout);
-    } else if ($this->assessData['shuffle']&16) {
-      //shuffle all but first
-      $firstq = array_shift($qout);
-      $RND->shuffle($qout);
+    if ($this->assessData['shuffle']&16) {
+        //shuffle all but first
+        $firstq = array_shift($qout);
+    }
+    if ($this->assessData['shuffle']&32) {
+        //shuffle all but last
+        $lastq = array_pop($qout);
+    }
+    if ($this->assessData['shuffle']&(1+16+32)) {
+          // has any shuffle flag set
+          if (!empty($this->assessData['pagebreaks'])) {
+            $shift = ($this->assessData['shuffle']&16)?1:0;
+            $lastgroupq = 0;
+            $newqout = [];
+            foreach ($this->assessData['pagebreaks'] as $breakn=>$breakq) {
+                if ($breakq === 0) { continue; }
+                $thisgroup = [];
+                for ($i=$lastgroupq; $i < $breakq - $shift; $i++) {
+                    $thisgroup[] = $qout[$i];
+                }
+                $lastgroupq = $breakq - $shift;
+                $RND->shuffle($thisgroup);
+                $newqout = array_merge($newqout, $thisgroup);
+            }
+            $thisgroup = [];
+            for ($i=$lastgroupq;$i < count($qout); $i++) {
+                $thisgroup[] = $qout[$i];
+            }
+            $RND->shuffle($thisgroup);
+            $qout = array_merge($newqout, $thisgroup);
+          } else {
+            $RND->shuffle($qout);
+          }
+    }
+    if ($this->assessData['shuffle']&16) {
       array_unshift($qout, $firstq);
+    }
+    if ($this->assessData['shuffle']&32) {
+        array_push($qout, $lastq);
     }
 
     //pick seeds
@@ -658,7 +775,7 @@ class AssessInfo
             $seeds[] = $this->questionData[$qid]['fixedseeds'][($ispractice?1:0) % $n];
           } else {
             //pick seed based on assessment ID
-            $seeds[] = $i + $this->curAid + $attempt + $ispractice?100:0;
+            $seeds[] = $i + $this->curAid + $attempt + ($ispractice?100:0);
           }
         }
       } else { //regular selection
@@ -704,8 +821,11 @@ class AssessInfo
       //the question must be in a grouping.  Find the group.
       foreach ($this->assessData['itemorder'] as $qid) {
         if (is_array($qid) && in_array($oldquestion, $qid['qids'])) {
-          $group = $qid['qids'];
-          $grouptype = $qid['type'];
+          if ($qid['type'] == 'pool' && $qid['n'] < count($qid['qids'])) {
+            // only do redraw if not picking n from n
+            $group = $qid['qids'];
+            $grouptype = $qid['type'];
+          }
           break;
         }
       }
@@ -721,8 +841,8 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&4 || $this->assessData['shuffle']&2) {
-      //all students same seed or all questions same seed - don't regen
+    if ($this->assessData['shuffle']&2) {
+      //all questions same seed - don't regen
       $newseed = $oldseeds[0];
     } else {
       if ($this->questionData[$newq]['fixedseeds'] !== null) {
@@ -730,6 +850,10 @@ class AssessInfo
         if (count($this->questionData[$newq]['fixedseeds']) == 1) {
           //only one seed so use it
           $newseed = $this->questionData[$newq]['fixedseeds'][0];
+        } else if ($this->assessData['shuffle']&4) {
+          //all stu same seed using fixed seed list, pick next in list
+          $n = count($this->questionData[$newq]['fixedseeds']);
+          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds) + ($ispractice?1:0)) % $n];
         } else {
           $unused = array_diff($this->questionData[$newq]['fixedseeds'], $oldseeds);
           if (count($unused) == 0) {
@@ -738,6 +862,9 @@ class AssessInfo
           }
           $newseed = $unused[array_rand($unused, 1)];
         }
+      } else if ($this->assessData['shuffle']&4) {
+        // all stu same seed - increment seed by 1
+        $newseed = max($oldseeds) + 1;
       } else {
         //regular seed pick
         $looplimit = 0;
@@ -761,9 +888,17 @@ class AssessInfo
     if ($this->assessData['displaymethod'] != 'video_cued') {
       $this->assessData['displaymethod'] = 'skip';
     }
+    if ($this->assessData['ansingb'] == 'never') {
+        $newshowans = 'never';
+    } else {
+        $newshowans = 'after_n';
+    }
     $this->assessData['submitby'] = 'by_question';
     $this->assessData['showscores'] = 'during';
-    $this->assessData['showans'] = 'with_score';
+    $this->assessData['showans'] = $newshowans;
+    if ($newshowans == 'after_n') {
+        $this->assessData['showans_aftern'] = 1;
+    }
     $this->assessData['deftries'] = 999; // unlimited
     $this->assessData['defregens'] = 999; // unlimited
     $this->assessData['shuffle'] &= ~4;  // disable "all stu same version"
@@ -774,7 +909,10 @@ class AssessInfo
       $this->questionData[$i]['tries_max'] = 999; // unlimited
       $this->questionData[$i]['regens_max'] = 999; // unlimited
       $this->questionData[$i]['retry_penalty'] = 0;
-      $this->questionData[$i]['showans'] = 'with_score';
+      $this->questionData[$i]['showans'] = $newshowans;
+      if ($newshowans == 'after_n') {
+        $this->questionData[$i]['showans_aftern'] = 1;
+      }
     }
   }
 
@@ -903,6 +1041,10 @@ class AssessInfo
       $settings['regens_max'] = 1;
     } else {
       $settings['regens_max'] = $defaults['defregens'];
+      if (!empty($defaults['attemptext'])) {
+          // extend attempts if exception set
+          $settings['regens_max'] += $defaults['attemptext'];
+      }
     }
 
     $settings['jump_to_answer'] = false;
@@ -1043,6 +1185,7 @@ class AssessInfo
 
     //unpack intro
     $introjson = json_decode($settings['intro'], true);
+    $pagebreaks = [];
     if ($introjson === null) {
       $settings['interquestion_text'] = array();
     } else {
@@ -1052,8 +1195,14 @@ class AssessInfo
         if (isset($v['pagetitle'])) {
           $settings['interquestion_text'][$k]['pagetitle'] = html_entity_decode($v['pagetitle']);
         }
+        if ($settings['displaymethod'] !== 'full') {
+            unset($settings['interquestion_text'][$k]['ispage']);
+        } else if (!empty($v['ispage'])) {
+            $pagebreaks[] = $v['displayBefore'];
+        }
       }
     }
+    $settings['pagebreaks'] = $pagebreaks;
 
     // decode entities in title
     $settings['name'] = html_entity_decode($settings['name']);
@@ -1097,10 +1246,16 @@ class AssessInfo
 
     //handle safe exam browser passwords
     if ($settings['password'] != '' && !empty($_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'])) {
-      $testhash = hash("sha256", 'https//'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($settings['password']));
+      $testhash = hash("sha256", $GLOBALS['urlmode'].$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] . trim($settings['password']));
       if ($testhash == $_SERVER['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH']) {
         $settings['password'] = '';
       }
+    }
+
+    // fix old-format reqscore "grey out"
+    if ($settings['reqscore'] < 0) {
+        $settings['reqscoretype'] |= 1;
+        $settings['reqscore'] = abs($settings['reqscore']);
     }
 
     //unpack itemorder
@@ -1145,7 +1300,71 @@ class AssessInfo
       }
     }
 
+    $settings['showworktype'] = ($settings['showwork'] & 4);
+    $settings['showwork'] = ($settings['showwork'] & 3);
+
     return $settings;
+  }
+
+  private function generateTextMap() {
+    if (($this->assessData['shuffle']&(1+16+32)) === 0) {
+        // no shuffling; skip textmap
+        return;
+    }
+    $textmap = [];
+    if (count($this->assessData['interquestion_text']) > 0) {
+        $curqn = 0;
+        $lastitemfirsttext = 0;
+        foreach ($this->assessData['itemorder'] as $item) {
+            $thistextmap = [];
+            $storedfirst = false;
+            for ($i=$lastitemfirsttext; $i < count($this->assessData['interquestion_text']); $i++) {
+                $curtext = $this->assessData['interquestion_text'][$i];
+                if ($curqn >= $curtext['displayBefore'] && $curqn <= $curtext['displayUntil']) {
+                    if (!empty($curtext['ispage'])) {
+                        foreach ($thistextmap as $v) {
+                            $this->assessData['interquestion_text'][$v]['beforebreak'] = true;
+                        }
+                        $thistextmap = [];
+                        $storedfirst = false;
+                        continue; 
+                    }
+                    $thistextmap[] = $i;
+                    if (!$storedfirst) {
+                        $lastitemfirsttext = $i;
+                        $storedfirst = true;
+                    }
+                } else if ($curtext['displayBefore'] > $curqn) { // getting too big; stop
+                    break;
+                }
+            }
+            if (is_array($item)) { // is a grouping
+                if (count($thistextmap) > 0) {
+                    foreach ($item['qids'] as $qid) {
+                        $textmap[$qid] = $thistextmap;
+                    }
+                }
+                $curqn += $item['n'];
+            } else {
+                if (count($thistextmap) > 0) {
+                    $textmap[$item] = $thistextmap;
+                }
+                $curqn++;
+            }
+        }
+        foreach ($this->assessData['interquestion_text'] as $k=>$v) {
+            if ($v['displayBefore'] >= $curqn) {
+                $this->assessData['interquestion_text'][$k]['atend'] = 1;
+            }
+            if (empty($v['ispage']) && empty($v['beforebreak'])) { 
+                // keep original position for pages and text before the break
+                unset($this->assessData['interquestion_text'][$k]['displayBefore']);
+                unset($this->assessData['interquestion_text'][$k]['displayUntil']);
+            }
+            unset($this->assessData['interquestion_text'][$k]['beforebreak']);
+        }
+    }
+    $this->assessData['textmap'] = $textmap;
   }
 
   /**

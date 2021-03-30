@@ -173,7 +173,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 }
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 require("../header.php");
 
 if ($overwriteBody==1) {

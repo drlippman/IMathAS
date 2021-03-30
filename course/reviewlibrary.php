@@ -310,7 +310,7 @@ if ($myrights<20) {
 /******* begin html output ********/
 $_SESSION['coursetheme'] = $coursetheme;
 if ($showtips==2) {
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/eqntips.js?v=012810\"></script>";
 }
 require("../assessment/header.php");
 

@@ -138,6 +138,11 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 	$assessUrl = "../assess2/";
 }
 
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+
 //HANDLE ANY POSTS
 if ($isteacher) {
 	if (isset($_GET['togglenewflag'])) {
@@ -175,8 +180,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Unenroll") || (isset($_GET['action']) && $_GET['action']=="unenroll" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Unenroll Students');
 		include("unenroll.php");
 		include("../footer.php");
@@ -184,8 +188,7 @@ if ($isteacher) {
 	}
 	if ((isset($_POST['posted']) && $_POST['posted']=="Lock") || (isset($_GET['action']) && $_GET['action']=="lock" )) {
 		$calledfrom='gb';
-		$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
+		$curBreadcrumb .= " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Confirm Change";
 		$pagetitle = _('Lock Students');
 		include("lockstu.php");
 		include("../footer.php");
@@ -292,7 +295,7 @@ $placeinhead .= '<style>
  ul.inlineul li:last-child::after { content: ""; }
  </style>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=052320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=052320"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -302,7 +305,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$includeduedate = true;
 	}
 	$pagetitle = _('Gradebook');
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=051820\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=051820\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type,uid) {
 			if (type=="all") {
@@ -320,14 +323,17 @@ if (isset($studentid) || $stu!=0) { //show student view
 
 	require("../header.php");
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt ", _('Student Grade Detail'), "</div>\n";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt ", _('Student Grade Detail'), "</div>\n";
 	} else if ($isteacher || $istutor) {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ", _('Student Detail'), "</div>";
 	} else {
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; ", _('Gradebook'), "</div>";
+        echo "<div class=breadcrumb>";
+        echo $curBreadcrumb;
+		echo _('Gradebook'), "</div>";
 	}
 	if ($stu==-1) {
 		echo '<div id="headergradebook" class="pagetitle"><h1>', _('Grade Book Averages'), ' </h1></div>';
@@ -389,8 +395,8 @@ if (isset($studentid) || $stu!=0) { //show student view
 	require("../footer.php");
 
 } else { //show instructor view
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=052320\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablescroller2.js?v=052320\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\">\n";
 	$placeinhead .= 'var ts = new tablescroller("myTable",';
 	if (isset($_COOKIE["gblhdr-$cid"]) && $_COOKIE["gblhdr-$cid"]==1) {
@@ -416,8 +422,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$placeinhead .= '<style type="text/css"> .dropdown-header {  font-size: inherit;  padding: 3px 10px;} </style>';
 
 	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; ", _('Gradebook'), "</div>";
+    echo "<div class=breadcrumb>";
+    echo $curBreadcrumb;
+    echo _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 
 	echo '<div id="headergradebook" class="pagetitle"><h1>', _('Gradebook'), ' <span class="noticetext" id="newflag" style="font-size: 70%" >';
@@ -448,8 +455,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	$togglehtml .= '<li><a data-pts="1">'._('Percents').'</a></li>';
 
 	$togglehtml .= '<li class="dropdown-header">'. _('Links'). '</li>';
-	$togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
-	$togglehtml .= '<li><a data-links="1">'. _('Scores'). '</a></li>';
+    $togglehtml .= '<li><a data-links="0">'. _('View/Edit'). '</a></li>';
+    if ($courseUIver>1) {
+        $togglehtml .= '<li><a data-links="1">'. _('Summary'). '</a></li>';
+    } else {
+        $togglehtml .= '<li><a data-links="1">'. _('Scores'). '</a></li>';
+    }
 
 	$togglehtml .= '<li class="dropdown-header">'. _('Pics'). '</li>';
 	$togglehtml .= '<li><a data-pics="0">'. _('None'). '</a></li>';
@@ -607,7 +618,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 function gbstudisp($stu) {
 	global $DBH,$CFG,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode;
 	global $includeduedate, $includelastchange,$latepasshrs,$latepasses,$hidelocked,$exceptionfuncs;
-	global $assessGbUrl, $assessUrl;
+	global $assessGbUrl, $assessUrl,$staticroot;
 
 	if ($availshow==4) {
 		$availshow=1;
@@ -665,7 +676,7 @@ function gbstudisp($stu) {
 			}
 			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid=:courseid ";
 			if ($hidelocked) {
-				$query .= "AND istu.locked=0 ";
+				$query .= "AND (istu.locked=0 OR iu.id=:uid) ";
 			}
 			if ($usersort==0) {
 				$query .= "ORDER BY istu.section,iu.LastName,iu.FirstName";
@@ -673,7 +684,11 @@ function gbstudisp($stu) {
 				$query .= "ORDER BY iu.LastName,iu.FirstName";
 			}
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid));
+			if ($hidelocked) {
+				$stm->execute(array(':courseid'=>$cid, ':uid'=>$stu));
+			} else {
+				$stm->execute(array(':courseid'=>$cid));
+			}
 
 			echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
 			$lastsec = '';
@@ -691,7 +706,7 @@ function gbstudisp($stu) {
 			}
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
-			echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif" alt="Updating..."/>';
+			echo '<img id="updatingicon" style="display:none" src="'.$staticroot.'/img/updating.gif" alt="Updating..."/>';
 			echo ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 		} else {
 			echo Sanitize::encodeStringForDisplay($gbt[1][0][0]) . ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
@@ -814,7 +829,11 @@ function gbstudisp($stu) {
 			}
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
-			}
+            }
+            if (isset($gbt[0][1][$i][17]) && $gbt[0][1][$i][17] != $stusection) {
+                // is section limited, and this student isn't in the section
+                continue;
+            }
 
 			echo '<tr class="grid">';
 			if ($stu>0 && $isteacher) {
@@ -1779,7 +1798,7 @@ function gbinstrdisp() {
 						} else if ($gbt[$i][1][$j][3]==5) {
 							echo ' (UA)';
 						} else if ($gbt[$i][1][$j][3]==3) {
-							echo ' (OT)';
+							// echo ' (OT)';
 						} else if ($gbt[$i][1][$j][3]==4) {
 							echo ' (PT)';
 						}

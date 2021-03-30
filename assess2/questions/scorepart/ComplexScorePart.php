@@ -157,6 +157,14 @@ class ComplexScorePart implements ScorePart
             }
             $ganumarr[] = $gaparts;
         }
+        if ($anstype=='calccomplex' && !$hasNumVal) {
+            $givenansval = [];
+            foreach ($ganumarr as $ganumval) {
+                $givenansval[] = $ganumval[0] . ($ganumval[1]<0?'':'+') . $ganumval[1] . 'i';
+            }
+            $givenansval = implode(',', $givenansval);
+            $scorePartResult->setLastAnswerAsNumber($givenansval);
+        }
 
         $anarr = array_map('trim',explode(',',$answer));
         $annumarr = array();
@@ -180,6 +188,7 @@ class ComplexScorePart implements ScorePart
             return $scorePartResult;
         }
         $extrapennum = count($ganumarr)+count($annumarr);
+        $gaarrcnt = count($ganumarr);
         $correct = 0;
         foreach ($annumarr as $i=>$ansparts) {
             $foundloc = -1;
@@ -208,7 +217,17 @@ class ComplexScorePart implements ScorePart
                 }
             }
         }
-        $score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
+        if (count($annumarr) == 0) {
+            $scorePartResult->setRawScore(0);
+            return $scorePartResult;
+        }
+        //$score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
+
+        if ($gaarrcnt<=count($annumarr)) {
+            $score = $correct/count($annumarr);
+        } else {
+            $score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;  //take off points for extranous stu answers
+        }
         if ($score<0) {
             $scorePartResult->setRawScore(0);
         } else {

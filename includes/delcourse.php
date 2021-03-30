@@ -4,6 +4,11 @@
 
 require_once(__DIR__."/filehandler.php");
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['delete'])) {
+	require($CFG['hooks']['delete']);
+}
+
 function deleteCourse($cid) {
 	global $DBH,$CFG;
 
@@ -13,7 +18,11 @@ function deleteCourse($cid) {
 		// hard delete, so also delete log entries
 		$stm = $DBH->prepare("DELETE FROM imas_teacher_audit_log WHERE courseid=:id");
 		$stm->execute(array(':id'=>$cid));
-	}
+    }
+    
+    if (function_exists('delete_custom_items_by_course')) {
+        delete_custom_items_by_course($cid);
+    }
 
 	$stm = $DBH->prepare("DELETE FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));

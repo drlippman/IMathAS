@@ -119,10 +119,24 @@ if (isset($_POST['message'])) {
 
 	if (isset($_GET['quoteq'])) {
 		$quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
-		require("../assessment/displayq2.php");
 		$parts = explode('-',$quoteq);
-		$GLOBALS['assessver'] = $parts[4];
-		$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+        $GLOBALS['assessver'] = $parts[4];
+        if ($courseUIver > 1) {
+            include('../assess2/AssessStandalone.php');
+            $a2 = new AssessStandalone($DBH);
+            $state = array(
+                'seeds' => array($parts[0] => $parts[2]),
+                'qsid' => array($parts[0] => $parts[1])
+            );
+            $a2->setState($state);
+            $a2->loadQuestionData();
+            $res = $a2->displayQuestion($parts[0], ['showhints'=>false]);
+            $message = $res['html'];
+            $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
+        } else {
+            require("../assessment/displayq2.php");
+            $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
+        }
 		$message = printfilter(forcefiltergraph($message));
 		if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
 			require_once("../includes/filehandler.php");
@@ -151,9 +165,15 @@ if (isset($_POST['message'])) {
 				}
 			}
 			if ($_GET['to'] == 0) {
-				$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
+                $query = 'SELECT iqs.ownerid,iu.lastaccess FROM imas_questionset AS iqs
+                    JOIN imas_users AS iu ON iqs.ownerid=iu.id WHERE iqs.id=:id';
+				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$parts[1]));
-				$_GET['to'] = $stm->fetchColumn(0);
+                $r = $stm->fetch(PDO::FETCH_ASSOC);
+                $_GET['to'] = $r['ownerid'];
+                if (!empty($CFG['GEN']['qerroronold']) && $r['lastaccess'] < time() - 60*60*24*$CFG['GEN']['qerroronold'][0]) {
+                    $_GET['to'] = $CFG['GEN']['qerroronold'][1];
+                }
 			}
 		} else if (isset($parts[3])) {  //sending to instructor
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");

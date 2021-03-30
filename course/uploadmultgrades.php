@@ -94,7 +94,7 @@ if (!(isset($teacherid))) {
 						//echo "breaking 2";
 						//print_r($line);
 						if ($feedback != '') {
-							$score = 'NULL';
+							$score = null;
 						} else {
 							continue;
 						}
@@ -195,14 +195,17 @@ if (!(isset($teacherid))) {
 		}
 	}
 
-	$curBreadcrumb ="$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	$curBreadcrumb .=" &gt; <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
+    $curBreadcrumb = $breadcrumbbase;
+    if (empty($_COOKIE['fromltimenu'])) {
+        $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+    }
+    $curBreadcrumb .=" <a href=\"gradebook.php?stu=0&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> ";
 	$curBreadcrumb .=" &gt; <a href=\"chgoffline.php?stu=0&cid=$cid\">Manage Offline Grades</a> &gt; Upload Multiple Grades";
 
 }
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 echo '<div id="headeruploadmultgrades" class="pagetitle"><h1>Upload Multiple Grades</h1></div>';
@@ -223,7 +226,7 @@ if ($overwriteBody==1) {
 		<span class=formright><input type=text name="sidcol" size=4 value="<?php echo $usernamecol+1; ?>"></span><br class=form />
 		<span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
 		<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo $sdate;?>">
-		<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
+		<a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 		at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
 
 		<p>Check: <a href="#" onclick="return chkAllNone('qform','addcol[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','addcol[]',false)">None</a></p>
@@ -275,7 +278,7 @@ if ($overwriteBody==1) {
 		<p>
 		<span class=form>Import File: </span>
 		<span class=formright>
-			<input type="hidden" name="MAX_FILE_SIZE" value="300000" />
+			<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
 			<input name="userfile" type="file" />
 		</span><br class=form />
 		<span class=form>File contains a header row:</span>

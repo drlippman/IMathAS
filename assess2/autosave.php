@@ -31,7 +31,6 @@ header('Content-Type: application/json; charset=utf-8');
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
-check_for_required('POST', array('tosaveqn', 'lastloaded'));
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 if ($isActualTeacher && isset($_GET['uid'])) {
@@ -40,13 +39,26 @@ if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
-$qns = json_decode($_POST['tosaveqn'], true);
-$lastloaded = json_decode($_POST['lastloaded'], true);
-$verification = json_decode($_POST['verification'], true);
-if ($_POST['timeactive'] == '') {
-  $timeactive = [];
-} else {
-  $timeactive = json_decode($_POST['timeactive'], true);
+if (isset($_POST['autosave-tosaveqn'])) {
+    check_for_required('POST', array('autosave-tosaveqn', 'autosave-lastloaded'));
+    $qns = json_decode($_POST['autosave-tosaveqn'], true);
+    $lastloaded = json_decode($_POST['autosave-lastloaded'], true);
+    $verification = json_decode($_POST['autosave-verification'], true);
+    if ($_POST['autosave-timeactive'] == '') {
+        $timeactive = [];
+    } else {
+        $timeactive = json_decode($_POST['autosave-timeactive'], true);
+    }
+} else { // deprecated
+    check_for_required('POST', array('tosaveqn', 'lastloaded'));
+    $qns = json_decode($_POST['tosaveqn'], true);
+    $lastloaded = json_decode($_POST['lastloaded'], true);
+    $verification = json_decode($_POST['verification'], true);
+    if ($_POST['timeactive'] == '') {
+        $timeactive = [];
+    } else {
+        $timeactive = json_decode($_POST['timeactive'], true);
+    }
 }
 
 if ($qns === null || $lastloaded === null || $timeactive === null) {
@@ -63,6 +75,8 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
   $in_practice = true;
@@ -72,7 +86,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes');
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -112,7 +126,7 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
 list($qids,$toloadqids) = $assess_record->getQuestionIds(array_keys($qns));
 
 // load question settings and code
-$assess_info->loadQuestionSettings($toloadqids, false);
+$assess_info->loadQuestionSettings($toloadqids, false, false);
 
 // If in practice, now we overwrite settings
 if ($in_practice) {
@@ -153,4 +167,9 @@ foreach ($qns as $qn=>$parts) {
 $assess_record->saveRecordIfNeeded();
 
 //output JSON object
-echo '{"autosave": "done"}';
+$out['autosave'] = 'done';
+if ($assess_record->hasActiveAttempt() && $assess_info->getSetting('timelimit') > 0) {
+    $out['timelimit_expiresin'] = $assess_record->getTimeLimitExpires() - $now;
+    $out['timelimit_gracein'] = max($assess_record->getTimeLimitGrace() - $now, 0);
+}
+echo json_encode($out);

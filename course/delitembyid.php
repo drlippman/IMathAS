@@ -2,6 +2,11 @@
 require_once("../includes/filehandler.php");
 require_once("../includes/TeacherAuditLog.php");
 
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['delete'])) {
+	require($CFG['hooks']['delete']);
+}
+
 function delitembyid($itemid) {
 	global $DBH, $cid;
 	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
@@ -172,7 +177,10 @@ function delitembyid($itemid) {
 		$stm->execute(array(':assessmentid'=>$typeid));
 
 		$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=0 WHERE reqscoreaid=:assessmentid AND courseid=:courseid");
-		$stm->execute(array(':assessmentid'=>$typeid, ':courseid'=>$cid));
+        $stm->execute(array(':assessmentid'=>$typeid, ':courseid'=>$cid));
+        
+        $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE typeid=:assessmentid AND placementtype='assess'");
+		$stm->execute(array(':assessmentid'=>$typeid));
 
 	} else if ($itemtype == "Drill") {
 		$stm = $DBH->prepare("SELECT name FROM imas_drillassess WHERE id=:id");
@@ -214,7 +222,9 @@ function delitembyid($itemid) {
 		$stm = $DBH->prepare("DELETE FROM imas_wiki_views WHERE wikiid=:wikiid");
 		$stm->execute(array(':wikiid'=>$typeid));
 
-	}
+	} else if (function_exists('delete_custom_item_by_id')) {
+        delete_custom_item_by_id($itemtype, $typeid);
+    }
 	$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
 	$stm->execute(array(':id'=>$itemid));
 

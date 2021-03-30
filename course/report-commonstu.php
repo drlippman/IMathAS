@@ -31,7 +31,7 @@ $defsdate = tzdate('n/j/Y', $now);
 $defedate = tzdate('n/j/Y', $now+7*24*60*60);
 
 $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}
  .rulebtngroup {
@@ -170,7 +170,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 			<span v-if="currentRule.timeframe=='since' || currentRule.timeframe=='between'">
 				<input type=text size=10 name="sdate" id="sdate" v-model="currentRule.sdate">
 				<a href="#" onClick="displayDatePicker('sdate', this); return false">
-				<img src="../img/cal.gif" alt="Calendar"/></a>
+				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			</span>
 			<span v-if="currentRule.timeframe=='thisweek' || currentRule.timeframe=='week'">
 				<select v-model="currentRule.dayofweek">
@@ -184,7 +184,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 				and
 				<input type=text size=10 name="edate" id="edate" v-model="currentRule.edate">
 				<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-				<img src="../img/cal.gif" alt="Calendar"/></a>
+				<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			</span>
 			<span v-if="currentRule.timeframe=='due'">
 				<input v-model="currentRule.innextDays" size=2> days

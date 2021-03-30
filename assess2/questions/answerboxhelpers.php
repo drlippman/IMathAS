@@ -14,11 +14,11 @@ function ltrimzero($v,$k) {
 }
 function checkreqtimes($tocheck,$rtimes) {
 	global $mathfuncs, $myrights;
-	if ($rtimes=='') {return 1;}
+    if ($rtimes=='') {return 1;}
 	if ($tocheck=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return 1;
 	}
-	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=]+/','',$tocheck);
+	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=\|<>_!]+/','',$tocheck);
 
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);
@@ -84,8 +84,8 @@ function checkreqtimes($tocheck,$rtimes) {
 					} else {
 						$nummatch = substr_count($cleanans,$lookfor);
 					}
-				}
-
+                }
+                
 				if ($comp == "=") {
 					if ($nummatch==$num) {
 						$okingroup = true;
@@ -126,13 +126,6 @@ function checkreqtimes($tocheck,$rtimes) {
 		}
 	}
 	return 1;
-}
-
-function parsesloppycomplex($v) {
-	$func = makeMathFunction($v, 'i');
-	$a = $func(['i'=>0]);
-	$apb = $func(['i'=>1]);
-	return array($a,$apb-$a);
 }
 
 //parses complex numbers.  Can handle anything, but only with
@@ -325,10 +318,11 @@ function ntupleToString($ntuples) {
 
 function parseInterval($str, $islist = false) {
 	if ($islist) {
-		$ints = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$str);
+		$ints = preg_split('/(?<=[\)\]])\s*,\s*(?=[\(\[])/',$str);
 	} else {
 		$ints = explode('U',$str);
-	}
+    }
+
 	$out = array();
 	foreach ($ints as $int) {
     $int = trim($int);
@@ -405,6 +399,11 @@ function checkanswerformat($tocheck,$ansformats) {
 		if (preg_match('/(sin|cos|tan|cot|csc|sec)/i',$tocheck)) {
 			return false;
 		}
+    }
+    if (!in_array("allowdegrees",$ansformats)) {
+        if (strpos($tocheck,'degree') !== false) {
+            return false;
+        }
 	}
 	if (in_array("nolongdec",$ansformats)) {
 		if (preg_match('/\.\d{6}/',$tocheck)) {
@@ -419,13 +418,13 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 	if (in_array("scinotordec",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!is_numeric($totest) && !preg_match('/^\-?[1-9](\.\d*)?(\*|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
+		if (!is_numeric($totest) && !preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
 			return false;
 		}
 	}
 	if (in_array("scinot",$ansformats)) {
 		$totest = str_replace(' ','',$tocheck);
-		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
+		if (!preg_match('/^\-?[1-9](\.\d*)?(\*|xx|x|X|×|✕)10\^(\(?\-?\d+\)?)$/',$totest)) {
 			return false;
 		}
 	}
@@ -552,6 +551,9 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 	}
 	if (in_array('notrig',$ansformats)) {
 		$tip .= "<br/>" . _('Trig functions (sin,cos,etc.) are not allowed');
+    }
+    if (in_array('allowdegrees',$ansformats)) {
+		$tip .= "<br/>" . _('Degrees are allowed');
 	}
 	if ($doshort) {
 		return array($tip,$shorttip);
@@ -561,18 +563,18 @@ function formathint($eword,$ansformats,$reqdecimals,$calledfrom, $islist=false,$
 }
 
 function getcolormark($c,$wrongformat=false) {
-	global $imasroot;
+	global $imasroot,$staticroot;
 
 	if (isset($GLOBALS['nocolormark'])) { return '';}
 
 	if ($c=='ansred') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/redx.gif" width="8" height="8" alt="'._('Incorrect').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/redx.gif" width="8" height="8" alt="'._('Incorrect').'"/>';
 	} else if ($c=='ansgrn') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/gchk.gif" width="10" height="8" alt="'._('Correct').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/gchk.gif" width="10" height="8" alt="'._('Correct').'"/>';
 	} else if ($c=='ansorg') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/orgx.gif" width="8" height="8" alt="'._('Correct answer, but wrong format').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/orgx.gif" width="8" height="8" alt="'._('Correct answer, but wrong format').'"/>';
 	} else if ($c=='ansyel') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/ychk.gif" width="10" height="8" alt="'._('Partially correct').'"/>';
+		return '<img class="scoreboxicon" src="'.$staticroot.'/img/ychk.gif" width="10" height="8" alt="'._('Partially correct').'"/>';
 	} else {
 		return '';
 	}
@@ -696,10 +698,11 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
 	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅','·'), array('(',')','oo','U','<=','>=','*','*'), $str);
 	//these are the slim vector unicodes: u2329 and u232a
-	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
-	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
-  $str = str_replace(array('√','∛'),array('sqrt','root(3)'), $str);
-	$str = preg_replace('/\bOO\b/i','oo', $str);
+    $str = str_replace(array('⟨','⟩'), array('<','>'), $str);
+    $str = str_replace(['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'], ['^0','^1','^2','^3','^4','^5','^6','^7','^8','^9'], $str);
+	$str = str_replace(array('₀','₁','₂','₃'), array('_0','_1','_2','_3'), $str);
+    $str = str_replace(array('√','∛','°'),array('sqrt','root(3)','degree'), $str);
+	$str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
   if (strtoupper(trim($str))==='DNE') {
     $str = 'DNE';
   }

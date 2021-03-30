@@ -28,7 +28,8 @@ $vueData = array(
 	'copyendmsg' => 'DNC',
 	'chgendmsg' => false,
 	'removeperq' => false,
-	'copyopts' => 'DNC',
+    'copyopts' => 'DNC',
+    'copyreqscore' => false,
 	'displaymethod' => 'DNC',
 	'defpoints' => '',
 	'gbcategory' => 'DNC',
@@ -38,7 +39,8 @@ $vueData = array(
 	'showcat' => 'DNC',
 	'samever' => 'DNC',
 	'noprint' => 'DNC',
-	'showwork' => 'DNC',
+    'showwork' => 'DNC',
+    'showworktype' => 0,
 	'allowlate' => 'DNC',
 	'timelimit' => '',
 	'allowovertime' => false,
@@ -169,13 +171,22 @@ $vueData = array(
 				</select>
 			</span><br class=form />
 		</div>
+        <div v-show="copyopts !== 'DNC'" :class="{highlight:copyreqscore != false}">
+            <span class="form"></span>
+            <span class=formright>
+                <label>
+                <input type="checkbox" name="copyreqscore" v-model="copyreqscore" />
+                <?php echo _('Also copy "show based on another assessment" setting');?>
+                </label>
+            </span><br class=form />
+        </div>
 		<div v-show="copyopts === 'DNC'" style="border-top: 3px double #ccc;">
 		<div style="padding-top:4px;">
 			<a href="#" onclick="groupToggleAll(1);return false;"><?php echo _('Expand All'); ?></a>
 	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All'); ?></a>
 		</div>
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/collapse.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/collapse.gif" />
 			<?php echo _('Core Options'); ?>
 		</div>
 		<div class="blockitems">
@@ -349,7 +360,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Additional Display Options'); ?>
 		</div>
 		<div class="blockitems hidden">
@@ -369,7 +380,9 @@ $vueData = array(
 						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option value="0"><?php echo _('No'); ?></option>
 						<option value="1"><?php echo _('All'); ?></option>
-						<option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="16"><?php echo _('All but first'); ?></option>
+                        <option value="32"><?php echo _('All but last');?></option>
+                        <option value="48"><?php echo _('All but first and last');?></option>
 					</select>
 				</span><br class=form />
 			</div>
@@ -383,7 +396,15 @@ $vueData = array(
 						<option value="1"><?php echo _('During assessment');?></option>
 						<option value="2"><?php echo _('After assessment');?></option>
 						<option value="3"><?php echo _('During or after assessment');?></option>
-					</select>
+                    </select>
+                    <span v-show="showwork != 'DNC'">
+                        <br>
+                        <label for="showworktype"><?php echo _('Work entry type');?>:</label>
+                        <select name="showworktype" id="showworktype" v-model="showworktype">
+                            <option value="0"><?php echo _('Essay');?></option>
+                            <option value="4"><?php echo _('File upload');?></option>
+                        </select>
+                    </span>
 				</span><br class=form />
 			</div>
 
@@ -430,7 +451,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Time Limit and Access Control'); ?>
 		</div>
 		<div class="blockitems hidden">
@@ -530,7 +551,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Help and Hints'); ?>
 		</div>
 		<div class="blockitems hidden">
@@ -612,7 +633,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Grading and Feedback'); ?>
 		</div>
 		<div class="blockitems hidden">
@@ -791,7 +812,7 @@ var app = new Vue({
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': '<?php echo _('Show with the score'); ?>'
+				'text': '<?php echo _('After the last try on a question');?>'
 			};
 
 			var out = [];
@@ -804,6 +825,10 @@ var app = new Vue({
 					{
 						'value': 'after_lastattempt',
 						'text': '<?php echo _('After the last try on a question'); ?>'
+                    },
+                    {
+						'value': 'jump_to_answer',
+						'text': '<?php echo _('After the last try or Jump to Answer button');?>'
 					},
 					never
 				];
@@ -932,7 +957,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never') {
 				this.ansingb = 'never';
  				return [];
  			} else {
@@ -945,10 +970,8 @@ var app = new Vue({
  						'value': 'never',
  						'text': '<?php echo _('Never'); ?>'
  					}
- 				];
- 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
-				 	&& this.subtype == 'by_assessment'
-				) {
+                ];
+                if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted'); ?>'

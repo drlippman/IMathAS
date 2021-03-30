@@ -119,8 +119,8 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     			} else {
     				$qnref = ($multi-1).'-'.($qn%1000);
     			}
-    			$shorttip = _('Enter your answer as a matrix, like ((2,3,4),(1,4,5))');
-    			$tip = $shorttip.'<br/>'.formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix');
+    			$shorttip = _('Enter your answer as a matrix');
+    			$tip = $shorttip._(', like [(2,3,4),(1,4,5)]').'<br/>'.formathint(_('each element of the matrix'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcmatrix');
     			if (!isset($sz)) { $sz = 20;}
 
     			$classes = ['text'];
@@ -144,8 +144,10 @@ class CalculatedMatrixAnswerBox implements AnswerBox
     							'" />';
     		}
     		if (!isset($hidepreview)) {
-    			$params['preview'] = 1;
-    			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";
+                $params['preview'] = 1;
+                $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                $preview .= '</button> &nbsp;';
     		}
     		$preview .= "<span id=p$qn></span> ";
     		$params['tip'] = $shorttip;
@@ -167,7 +169,7 @@ class CalculatedMatrixAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

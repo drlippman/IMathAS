@@ -12,7 +12,7 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ### Requirements
 IMathAS is designed for simple installation with minimal requirements.  The system
-requires PHP 7.1+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
+requires PHP 7.2+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
 - mbstring (required)
 - pdo_mysql (required)
 - gettext (required)
@@ -91,6 +91,9 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['noFileBrowser']`: Set this to true to prevent the use of the file and image uploads through the text editor.  Do not define this to allow use of the file browser.
 - `$CFG['GEN']['sendquestionproblemsthroughcourse']`:  By default, clicking the "Report problem with question" will open email.  To send using an IMathAS message instead, set this option to a course ID, ideally one that all instructors are participants in.
 - `$CFG['GEN']['qerrorsendto']`:  Normally question errors are reported to the question author.  To have them sent do a different user, set this option.  Set to a user ID to send to that user.  You can also force the delivery method by defining this is an array of `array(userid, sendmethod, title, alsosendtoowner)`, like `array(2, "email", "Contact Support", true)`.  The email address for the specified user ID will be used.  If alsosendtoowner is set to true, the message will be sent both to the question owner as well.
+- `$CFG['GEN']['qerroronold']`: Normally question errors are reported to the question author. To have them delivered
+ to a different user if the author hasn't logged in for a while, set this option.  Set it to `array(days, userid)`,
+where days is the number of days since last login to consider old, and userid is the userid to send to instead. 
 - `$CFG['GEN']['meanstogetcode']`:  To comply with the IMathAS Community License, a means to get a copy of question code must be provided.  By default the system says to email the `$sendfrom` email address.  You can define this variable to display a different message on the license info page.
 - `$CFG['GEN']['LTIorgid']`:  A value to use as the LTI organization ID when IMathAS is acting as an LTI consumer.  Defaults to the domain name.
 - `$CFG['UP']`:  An associative array overriding the default User Preference values.  See the `$prefdefaults` definition in `/includes/userprefs.php` for the appropriate format.
@@ -98,6 +101,9 @@ Many system defaults can be adjusted using config changes.
 - `$CFG['GEN']['vidextrefsize']`: Set to an array of (width,height) to set the popup size for Video question help buttons
 - `$CFG['GEN']['ratelimit']`: Set to a number of seconds (like 0.2) to limit the rate at
  which pages can be accessed/refreshed.
+- `$CFG['GEN']['COPPA']`: Set to enable an "I am 13 years old or older" checkbox on new student account creation. If not checked, requires a course ID and key to create an account.
+- `$CFG['assess_upgrade_optout']`: Set to true to allow users to opt out of an upgrade
+to the new assessment interface.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.
@@ -152,6 +158,11 @@ course list from the course browser options, so you must also have `$CFG['course
     - To operate properly, the `/admin/processltiqueue.php` script needs to be called regularly, ideally once a minute.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to  `/admin/processltiqueue.php?authcode=####` using the code you define.
     - `$CFG['LTI']['queuedelay']` defines the delay (in minutes) between the students' last submission and when the score is sent to the LMS.  Defaults to 5.
     - `$CFG['LTI']['logltiqueue']` set to true to log LTI queue results in /admin/import/ltiqueue.log
+- `$CFG['LTI']['usesendzeros']`: Set to true to enable the "send zeros after due date" course setting.  _This option requires additional setup._
+    - To operate, the `/lti/admin/sendzeros.php` script needs to be called on a schedule, typically once or a few times a day.  If running on a single server, you can set this up as a cron job.  Alternatively, you could define `$CFG['LTI']['authcode']` and make a scheduled web call to `/lti/admin/sendzeros.php?authcode=####` using the code you define.
+- `$CFG['LTI']['useradd13']`: Set to true to allow teacher users to add LTI1.3 platforms.
+- `$CFG['LTI']['autoreg']`: Set to true to allow known LTI1.3 platforms to be autoregistered on first 
+   launch, to avoid needing to record the client id. Currently only works for Canvas.
 
 ### Email
 By default, emails are sent using the built-in PHP `mail()` function.  This can sometimes have reliability issue, so there are options to override the mail sender or reduce the use of email in the system.
@@ -163,7 +174,10 @@ By default, emails are sent using the built-in PHP `mail()` function.  This can 
       - `$CFG['email']['SES_KEY_ID']` or an environment variable `SES_KEY_ID`
       -  `$CFG['email']['SES_SECRET_KEY']` or an environment variable `SES_SECRET_KEY`
       - `$CFG['email']['SES_SERVER']` or the default of `email.us-west-2.amazonaws.com` will be used.
+      - Optionally, but recommended: set `$CFG['email']['authcode']`, and set up SES to call
+         `/admin/handleSESbounce.php?authcode=####` on bounces or complaints.
     - `$CFG['email']['handlerpriority']` can be set to define a breakpoint between using the default `mail()` delivery and the custom handler.   See `/includes/email.php` for values.
+
 
 
 ### Push Notifications
@@ -179,6 +193,16 @@ If you wish to enable users to request browser push notifications (does not work
 
 The student side of the system is pretty well set up for i18n, but the instructor side is  not yet.  Currently the only translation pack available is `de` (German).  See `/i18n/translating.md` for more information about generating translations.  To enable a translation:
 - `$CFG['locale']`: Set this to the desired language code, like `de`
+
+### IPEDS / NCES 
+
+The system can create associations with IPEDS/NCES records. For this, you will need to manually 
+[populate the `imas_ipeds` table](https://github.com/drlippman/IMathAS-Extras/blob/master/ipeds/ipeds.md). 
+- `$CFG['use_ipeds']`: set to true to enable UI features for editing associations.
+
+Look to `newinstructor-ipeds.php.dist` for an example of how to collect ipeds data during 
+account request.  The account approval process will auto-create group associations when 
+account requests are collected with this data.
 
 ### Development
 - `$CFG['GEN']['uselocaljs']`: Set to true to use local javascript files instead of CDN versions.  Requires installing a local copy of MathJax in `/mathjax/`.

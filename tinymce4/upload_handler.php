@@ -1,13 +1,30 @@
 <?php
+
   //check credentials
   require("../init.php");
   require_once("../includes/filehandler.php");
 
-
+  if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    //to help with development, while vue runs on 8080
+    if (!empty($CFG['assess2-use-vue-dev'])) {
+      header('Access-Control-Allow-Origin: '. $CFG['assess2-use-vue-dev-address']);
+    }
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+    header("Access-Control-Allow-Headers: Origin");
+}
 
 
 ini_set("max_execution_time", "120");
 
+if (isset($_POST['remove'])) {
+    $res = false;
+    if (strpos($_POST['remove'], "ufiles/$userid/") !== false) {
+        $res = deleteuserfile($userid, basename($_POST['remove']));
+    }
+    echo '{"done": '.($res?'true':'false').'}';
+    exit;
+}
 
 
 
@@ -35,9 +52,14 @@ ini_set("max_execution_time", "120");
     }
 
     // Verify extension
+    $extension = strtolower(pathinfo($temp['name'], PATHINFO_EXTENSION));
+    if ($extension == 'dat' && $temp['type'] == 'image/svg+xml') {
+        $temp['name'] = str_replace('.dat','.svg', $temp['name']);
+        $extension = 'svg';
+    }
     if ($_POST['type'] == 'attach') {
       // already checked for blacklisted earlier
-    } else if (!in_array(strtolower(pathinfo($temp['name'], PATHINFO_EXTENSION)), array("gif", "jpg", "png"))) {
+    } else if (!in_array($extension, array("gif", "jpg", "png", "jpeg", "svg"))) {
         header("HTTP/1.0 500 Invalid extension.");
         return;
     }

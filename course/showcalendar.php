@@ -28,7 +28,7 @@
 	}
 
 	require("../includes/calendardisp.php");
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=070620\"></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=070620\"></script>";
 	if ($editingon) {
 		$placeinhead .= '<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 				<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>';
@@ -98,7 +98,7 @@
 					var droppedOn = $(this);
 					$(dropped).detach().css({top: 0,left: 0}).appendTo(droppedOn.find("div.center"));
 					if (droppedOn.attr("id") != $(dropped).data("originalParent")) {
-						$(".calupdatenotice").html('<img src="../img/updating.gif" alt="Saving"/> '+_("Saving..."));
+						$(".calupdatenotice").html('<img src="<?php echo $staticroot;?>/img/updating.gif" alt="Saving"/> '+_("Saving..."));
 						$.ajax({
 							"url": "savecalendardrag.php",
 							data: {

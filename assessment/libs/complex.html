@@ -1,0 +1,271 @@
+<html><body style="margin:30px;padding:0;font-size: 17px;font-family:Calibri, sans-serif">
+    <a name="top"></a>
+    <h1>Macro Library complex</h1>
+
+<p>Library name: complex</p>
+<p>Functions to handle operations for complex numbers.&nbsp; Version 1.&nbsp; October 2020</p>
+<p>Author:&nbsp; Amir Tavangar</p>
+<br /><br />
+<span>To import the library, include <em>loadlibrary("complex")</em> in the question's common control.</span>
+
+<p>The functions in this library can be used to handle operations for complex numbers such as</p>
+<ul>
+    <li>Converting from standard to polar form and vice versa</li>
+    <li>Finding modulus, argument, and conjugate</li>
+    <li>Multiplication, division, raising to a power, and taking the nth root</li>
+    <li>Finding real or complex roots of quadratic equations</li>
+</ul>
+<div>
+    <p><strong>List of functions:</strong></p>
+    <div style="padding-left: 28px;">
+    <li><a href="#arg">cx_arg: Argument (theta)</a></li>
+    <li><a href="#modul">cx_modul: Modulus</a></li>
+    <li><a href="#conj">cx_conj: Conjugate</a></li>
+    <li><a href="#std2pol">cx_std2pol: Standard to polar form</a></li>
+    <li><a href="#pol2std">cx_pol2std: Polar to standard form</a></li>
+    <li><a href="#polEu">cx_polEu: Polar-Euler notation</a></li>
+    <li><a href="#add">cx_add: Addition</a></li>
+    <li><a href="#sub">cx_sub: Subtraction</a></li>
+    <li><a href="#div">cx_div: Division</a></li>
+    <li><a href="#mul">cx_mul: Multiplication</a></li>
+    <li><a href="#pow">cx_pow: Power</a></li>
+    <li><a href="#root">cx_root: nth Roots</a></li>
+    <li><a href="#quad">cx_quadRoot: Quadratic roots</a></li>
+    <li><a href="#prquad">cx_prettyquadRoot: Formatted quadratic roots</a></li>
+    <li><a href="#format2std">cx_format2std: Display in standard form</a></li>
+    <li><a href="#format2pol">cx_format2pol: Display in polar form</a></li>
+    <li><a href="#plot">cx_plot: Plot z</a></li>
+    
+    </div>
+<p>&nbsp;</p>
+<p>&nbsp;<strong>Function output and question types:</strong></p>
+<p style="text-align: justify;">The output of most of the functions in this library is an array. Other than formatting functions, the element(s) of arrays are paired values in square brackets - for single-number output: [Re, Im], and for multi-number output: array([Re1, Im1], [Re2, Im2], ...).
+  The values can be accessed by indexing the array. Arrays are zero-indexed so, for example, the first element in array $A = array([2, 3], [-4, 0]) can be accessed by $A[0] = [2, 3]. N-tuple question-type accepts paired values as input for answers: $answer = $A[0]. Alternatively, Number question-type can be used if the values in the bracket are the answer(s). 
+  For example, the value in the array's first element can be accessed by $A[0][0] = 2, and the second value by $A[0][1] = 3. So if the answer is the first value in the first bracket, then $answer = $A[0][0]. 
+    <br /><br />
+ Formatting functions format2pol and format2std can be used for displaying answers ($showanswer) as well as the answer itself. If they are to be used as the answer, calculated complex question-type accepts both formats with $answerformat = "sloppycomplex" for the polar form. </p>
+<p>&nbsp;</p>
+<p>&nbsp;<strong>Functions:</strong></p>
+<p><a name="arg"></a><strong>cx_arg</strong>(num, [argin = "rad", roundto = 12])</p>
+<p>Function: cx_arg returns the argument (angle theta) of a complex number.</p>
+<p><em>&nbsp;Parameters:</em></p>
+<ul>
+  <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in the form: num = [Re, Im] or num = array(Re, Im).</li>
+  <li><strong>argin</strong>: Optional - Unit for the argument; default is "rad" for radian. For argument in degree, argin should be set to "deg".</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The agument of a complex number in radian (or degree) as a float.</p>
+<p>&nbsp;</p>
+
+<p><a name="modul"></a><strong>cx_modul</strong>(num, [roundto = 12])</p>
+<p>Function cx_modul returns the modulus (absolute value) of a complex number, which is sqrt(Re^2 + Im^2).</p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in the form: num = [Re, Im] or num = array(Re, Im).</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
+<p><em>Returns:</em></p>
+<p>The modulus of a complex number as a float.</p>
+<p>&nbsp;</p>
+
+<p><a name="conj"></a><strong>cx_conj</strong>(num, [roundto = 12])</p>
+<p>Function cx_conj returns the conjugate of a complex number; the conjugate of (a+bi) is (a-bi).</p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in the form: num = [Re, Im] or num = array(Re, Im).</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The conjugate of a complex number in an array (same format as the input).</p>
+<p>&nbsp;</p>
+
+<p><a name="std2pol"></a><strong>cx_std2pol</strong>(num, [argin = "rad", roundto = 12])</p>
+<p>Function cx_std2pol converts the standard form to polar form and returns the modulus and the argument as a paired value.</p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in the form: num = [Re, Im] or num = array(Re, Im).</li>
+    <li><strong>argin</strong>: Optional - Unit for the argument; default is "rad" for radian. For argument in degree, argin should be set to "deg".</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+ </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The modulus and the argument of the complex number as a paired value in an array: [mod, arg].</p>
+<p>&nbsp;</p>
+
+<p><a name="pol2std"></a><strong>cx_pol2std</strong>(num, [argin = "rad", roundto = 12])</p>
+<p>Function cx_pol2std converts the polar form to standard form and returns the real and imaginary parts as a paired value.</p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of modulus and argument of a complex number in polar form: num = [mod, arg] or array(mod, arg).</li>
+    <li><strong>argin</strong>: Optional - Unit for the argument; default is "rad" for radian. If the argument is in degree, argin should be set to "deg".</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p> The real and imaginary parts as a paired value in an array: [Re, Im].</p>
+<p>&nbsp;</p>
+
+<p><a name="polEu"></a><strong>cx_polEu</strong>(num, [argin = "rad", roundto = 12])</p>
+<p>Function cx_polEu returns the polar form of a complex number with the Euler's formula notation: z = r e^i*theta as a string for displaying answer.</p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im], [Re2, Im2], ...). A Single complex number can also be input in the form [Re, Im].</li>
+    <li><strong>argin</strong>: Optional - Unit for the argument; default is "rad" for radian. If the argument is in degree, argin should be set to "deg".</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+</ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The polar form with the Euler's formula notation as a string.If num has more than one complex number, 
+  the function returns an array of strings: array("r1*e^i*theta1", "r2*e^i*theta2", ...).</p>
+<p>&nbsp;</p>
+
+<p><a name="add"><strong>cx_add</strong>(num, [roundto = 12])</p>
+<p>Function cx_add returns the sum of input complex numbers in standard form as a paired value in an array.</p>
+<p>&nbsp;<em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of complex numbers given as paired values in square brackets. For example, to add 2-3i, -5i, and sqrt(2)-i, num = array([2,-3], [0,-5], [sqrt(2),-1]).</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The real and imaginary parts of the sum as a paired value in an array: [Re, Im].</p>
+<p>&nbsp;</p>
+
+<p><a name="sub"><strong>cx_sub</strong>(num, [roundto = 12])</p>
+<p>Function cx_sub returns the difference of input complex numbers in standard form as a paired value in an array.</p>
+<p>&nbsp;<em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of complex numbers given as paired values in square brackets. For example, to subtract -5i, and sqrt(2)-i from 2-3i, num = array([2,-3], [0,-5], [sqrt(2),-1]).</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+  </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The real and imaginary parts of the difference as a paired value in an array: [Re, Im].</p>
+<p>&nbsp;</p>
+
+<p><a name="div"><strong>cx_div</strong>(num, [roundto = 12])</p>
+<p>Function cx_div returns the quotient of two complex numbers in standard form as a paired values in an array.</p>
+<p><em>&nbsp;Parameters:</em></p>
+<ul>
+  <li><strong>num</strong>: An array of real and imaginary parts of two complex numbers (dividend, divisor) given as paired values in square brackets. For example, to divide 2-3i by sqrt(2)-i, num = array([2,-3], [sqrt(2),-1]).</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The quotient of two complex numbers in standard form as a paired values in an array: [Re, Im].</p>
+<p>&nbsp;</p>
+
+<p><a name="mul"><strong>cx_mul</strong>(num, [roundto = 12])</p>
+<p>Function cx_mul returns the product of input complex numbers in standard form as a paired value in an array.</p>
+<p>&nbsp;<em>Parameters:</em></p>
+<ul>
+  <li><strong>num</strong>: An array of real and imaginary parts of complex numbers given as paired values in square brackets. For example, to multiply 2-3i, -5i, and sqrt(2)-i, num = array([2,-3], [0,-5], [sqrt(2),-1]).</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The real and imaginary parts of the product as a paired value in an array: [Re, Im].</p>
+<p>&nbsp;</p>
+
+<p><a name="pow"></a><strong>cx_pow</strong>(num, exp, [roundto = 12])</p>
+<p>Function cx_pow returns the power of a complex number in standard form as a paired value in an array.</p>
+<p><em>Parameters:</em></p>
+<ul>
+  <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in the form: num = [Re, Im] or num = array(Re, Im).</li>
+  <li><strong>exp</strong>: exponent to which the complex number is raised.</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p><em>&nbsp;Returns:</em></p>
+<p>The real and imaginary parts of the power as a paired value in an array: [Re, Im].</p>
+<p>&nbsp;</p>
+
+<p><a name="root"></a><strong>cx_root</strong>(num, n, [roundto = 12])</p>
+<p>Function cx_root returns an array of a paired value of real and imaginary parts of the nth roots.</p>
+<p><em>Parameters:</em></p>
+<ul>
+  <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in the form: num = [Re, Im] or num = array(Re, Im).</li>
+  <li><strong>n</strong>: The nth roots. For example, for the cubic roots n=3.</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p><em>&nbsp;Returns:</em></p>
+<p>An array of a paired value of real and imaginary parts of the nth roots: array([Re1, Im1], [Re2, Im2], ...)</p>
+<p>&nbsp;</p>
+
+<p><a name="quad"></a><strong>cx_quadRoot</strong>(a, b, c, [roundto = 12])</p>
+<p>Function: cx_quadRoot returns an array of roots of the quadratic equation f(x) = ax^2 + bx + c. Real roots are returned as an array A = array([r1],[r2]) ordered from the smallest to largest, and the complex roots are returned as an array A = array([Re1,Im1], [Re2,Im2]). Question type Complex handles both types of solutions.</p>
+<p>&nbsp;<em>Parameters:</em></p>
+<ul>
+  <li><strong>a</strong>: The numerical coefficient of x^2</li>
+  <li><strong>b</strong>: The numerical coefficient of x</li>
+  <li><strong>c</strong>: The constant</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p><em>&nbsp;Returns:</em></p>
+<p></p>
+<p>An array of the two roots (either real or complex) of the quadratic equation.</p>
+<p>&nbsp;</p>
+
+<p><a name="prquad"></a><strong>cx_prettyquadRoot</strong>(a, b, c)</p>
+<p>Function: cx_prettyquadRoot returns an array of the formatted roots of the quadratic equation f(x) = ax^2 + bx + c as string. Real roots are returned as an array 
+  A = array("r1", "r2") ordered from the smallest to largest, and the complex roots are returned as an array A = array("a+bi", "a-bi") This function is suitable for displaying answer (i.e., $showanswer). </p>
+  
+<p>&nbsp;<em>Parameters:</em></p>
+<ul>
+  <li><strong>a</strong>: The numerical coefficient of x^2</li>
+  <li><strong>b</strong>: The numerical coefficient of x</li>
+  <li><strong>c</strong>: The constant</li>
+
+</ul>
+<p><em>&nbsp;Returns:</em></p>
+<p></p>
+<p>An array of formatted string of roots (either real or complex) of the quadratic equation.</p>
+<p>&nbsp;</p>
+
+<p><a name="format2std"></a><strong>cx_format2std</strong>(num, [roundto = 3])</p>
+<p>Function cx_format2std returns a string form of a complex number in standard form: a + b i.</p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im], [Re2, Im2], ...). A Single complex number can also be input in the form [Re, Im].</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 3 decimal places. </li>
+</ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The complex number in standard form a + bi as a string. If num has more than one complex number, the function returns
+    an array of the standard form of the complex numbers as strings and output = array("a1+b1 i", "a2+b2 i", ...).</p>
+<p>&nbsp;</p>
+
+<p><a name="format2pol"></a><strong>cx_format2pol</strong>(num, [argin="rad" , roundto = 3])</p>
+<p>Function cx_format2pol returns a string form of a complex number in polar form: r (cos(t) + i sin(t)).</p>
+<p><em>Parameters:</em></p>
+<ul>
+  <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = array([Re, Im], [Re2, Im2], ...). A Single complex number can also be input in the form [Re, Im].</li>
+  <li><strong>argin</strong>: Optional - unit for the argument; default is "rad" for degree. For argument in radian, argin = "deg".</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 3 decimal places. </li>
+
+ </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The complex number in polar form as a string. If num has more than one complex number, the function returns
+  an array of the polar forms as strings and output = array("r1 (cos(t1) + i sin(t1))", "r2 (cos(t2) + i sin(t2))", ...).</p>
+<p>&nbsp;</p>
+
+<p><a name="plot"></a><strong>cx_plot</strong>(num, [argin = "deg" , roundto = 3, showlabels = true])</p>
+<p>Function cx_plot returns the plot of a complex number.</p>
+<p><em>Parameters:</em></p>
+<ul>
+    <li><strong>num</strong>: An array of real and imaginary parts of a complex number given in square brackets: num = [Re, Im].</li>
+    <li><strong>argin</strong>: Optional - unit for the argument; default is "deg" for degree. For argument in radian, argin = "rad".</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 3 decimal places. </li>
+    <li><strong>showlabels</strong>: Optional - if true (default), labels for the real and imaginary parts, modulus, argument, and z are shown on the plot. If false, no label is displayed. </li>
+ </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>The plot of a complex number.</p>
+<p>&nbsp;</p>
+
+
+
+<a href="#top">Back to top of page</a>

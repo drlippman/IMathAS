@@ -6,8 +6,10 @@
   >
     <div
       v-for = "(ans,i) in sortedKeys"
-      :key = "i"
-      :class = "[showans ? (results.scoredata[ans] > 0 ? 'LPshowcorrect' : 'LPshowwrong') : '']"
+      :key = "ans"
+      :class = "[showans ? (results.scoredata[ans] > 0 ? (
+          results.scoredata[ans] < .99 ? 'LPshowpartial' : 'LPshowcorrect'
+        ) : 'LPshowwrong') : '']"
     >
       <canvas
         class="drawcanvas"
@@ -28,8 +30,10 @@
     <tbody>
       <tr
         v-for = "(ans,i) in sortedKeys"
-        :key = "i"
-        :class = "[showans ? (results.scoredata[ans] > 0 ? 'LPshowcorrect' : 'LPshowwrong') : '']"
+        :key = "ans"
+        :class = "[showans ? (results.scoredata[ans] > 0 ? (
+            results.scoredata[ans] < .99 ? 'LPshowpartial' : 'LPshowcorrect'
+          ) : 'LPshowwrong') : '']"
       >
         <td v-if="results.qtype === 'draw'">
           <canvas

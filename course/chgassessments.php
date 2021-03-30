@@ -16,8 +16,11 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Mass Change Assessment Settings";
 $cid = Sanitize::courseId($_GET['cid']);
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Assessment Settings";
-
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
+$curBreadcrumb .= _('Mass Change Assessment Settings');
 	// SECURITY CHECK DATA PROCESSING
 if (!(isset($teacherid))) {
 	$overwriteBody = 1;
@@ -617,7 +620,7 @@ $(function() {
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerchgassessments" class="pagetitle"><h1>Mass Change Assessment Settings
-		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+		<img src="<?php echo $staticroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h1></div>
 
 	<div class="cpmid">

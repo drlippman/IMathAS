@@ -39,6 +39,9 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 } else {
   $uid = $userid;
 }
+// is teacher/tutor and not acting as student
+$isTeacherPreview = ($canViewAll && $uid == $userid);
+
 // if toscoreqn is not an array, make it into one
 if ($_POST['toscoreqn'] == -1 || $_POST['toscoreqn'] === '') {
   $qns = array();
@@ -75,7 +78,7 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 } else if ($assess_info->getSetting('available') === 'yes' || $canViewAll) {
   $in_practice = false;
   if ($canViewAll) {
-    $assess_info->overrideAvailable('yes');
+    $assess_info->overrideAvailable('yes', $uid!=$userid || $preview_all);
   }
 } else {
   echo '{"error": "not_avail"}';
@@ -112,6 +115,11 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
   exit;
 }
 
+// If in practice, now we overwrite settings
+if ($in_practice) {
+    $assess_info->overridePracticeSettings();
+}
+
 // if livepoll, look up status and verify
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $stm = $DBH->prepare("SELECT * FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
@@ -129,12 +137,11 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $assess_info->overrideSetting('showans', 'never');
 }
 
-// If in practice, now we overwrite settings
-if ($in_practice) {
-  $assess_info->overridePracticeSettings();
-}
 if ($preview_all) {
   $assess_record->setTeacherInGb(true); // enables answers showing
+}
+if ($isTeacherPreview) {
+    $assess_record->setIsTeacherPreview(true); // disables saving student-only data
 }
 
 // grab any assessment info fields that may have updated:
@@ -160,7 +167,7 @@ if (count($qns) > 0) {
   list($qids, $toloadqids) = $assess_record->getQuestionIds($qns);
 
   // load question settings and code
-  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $toloadqids, true);
+  $assess_info->loadQuestionSettings($end_attempt ? 'all' : $toloadqids, true, false);
 
   // Verify confirmation values (to ensure it hasn't been submitted since)
   if (!$assess_record->checkVerification($verification)) {
@@ -233,8 +240,46 @@ if (count($qns) > 0) {
   $assess_record->reTotalAssess($qns);
 
 } else {
-  $assess_info->loadQuestionSettings('all', false);
+  $assess_info->loadQuestionSettings('all', false, false);
 }
+
+// save autosaves, if set 
+$assessInfoOut['saved_autosaves'] = false;
+if (!empty($_POST['autosave-tosaveqn'])) {
+    $autosave_qns = json_decode($_POST['autosave-tosaveqn'], true);
+    $autosave_lastloaded = json_decode($_POST['autosave-lastloaded'], true);
+    $autosave_verification = json_decode($_POST['autosave-verification'], true);
+    if ($_POST['autosave-timeactive'] == '') {
+        $autosave_timeactive = [];
+    } else {
+        $autosave_timeactive = json_decode($_POST['autosave-timeactive'], true);
+    }
+    if (!empty($autosave_qns) && $autosave_lastloaded !== null && $autosave_timeactive !== null) {
+        list($autosave_qids,$autosave_toloadqids) = $assess_record->getQuestionIds(array_keys($autosave_qns));
+
+        // load question settings and code
+        $assess_info->loadQuestionSettings($autosave_toloadqids, false, false);
+        if ($assess_record->checkVerification($autosave_verification)) {
+            // autosave the requested parts
+            foreach ($autosave_qns as $qn=>$parts) {
+                if (!isset($timeactive[$qn])) {
+                    $timeactive[$qn] = 0;
+                }
+                $ok_to_save = $assess_record->isSubmissionAllowed($qn, $autosave_qids[$qn], $parts);
+                foreach ($parts as $part) {
+                    if ($ok_to_save === true || $ok_to_save[$part]) {
+                     $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, $part);
+                    }
+                }
+                if (isset($_POST['sw' . $qn])) {  //autosaving work
+                    $assess_record->setAutoSave($now, $autosave_timeactive[$qn], $qn, 'work');
+                }
+            }
+            $assessInfoOut['saved_autosaves'] = true;
+        }
+    }
+}
+
 
 if ($end_attempt) {
   $assess_record->scoreAutosaves();
@@ -269,12 +314,13 @@ if ($end_attempt) {
   }
 
   // get endmsg
-    $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
+  $assessInfoOut['endmsg'] = AssessUtils::getEndMsg(
       $assess_info->getSetting('endmsg'),
       $totalScore,
       $assess_info->getSetting('points_possible')
-    );
+  );
 
+  $assessInfoOut['newexcused'] = $assess_record->get_new_excused();
 
 } else {
   if ($assess_info->getSetting('displaymethod') === 'livepoll') {
@@ -327,15 +373,8 @@ if ($end_attempt) {
 // Record record
 $assess_record->saveRecord();
 
-if ($assessInfoOut['submitby'] == 'by_question' || $end_attempt) {
-  // update LTI grade
-  $lti_sourcedid = $assess_record->getLTIsourcedId();
-  if (strlen($lti_sourcedid) > 1) {
-    $gbscore = $assess_record->getGbScore();
-    require_once("../includes/ltioutcomes.php");
-    $aidposs = $assess_info->getSetting('points_possible');
-    calcandupdateLTIgrade($lti_sourcedid, $aid, $uid, $gbscore['gbscore'], false, $aidposs);
-  }
+if (($assessInfoOut['submitby'] == 'by_question' && !$in_practice) || $end_attempt) {
+    $assess_record->updateLTIscore();
 }
 
 //prep date display

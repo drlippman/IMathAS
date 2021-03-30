@@ -49,6 +49,8 @@ class StringAnswerBox implements AnswerBox
         if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
         if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
         if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
+        if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}}
+
         if (!isset($answerformat)) { $answerformat = '';}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -59,18 +61,23 @@ class StringAnswerBox implements AnswerBox
     		if ($answerformat=='list') {
     			$tip = _('Enter your answer as a list of text separated by commas.  Example:  dog, cat, rabbit.') . "<br/>";
     			$shorttip = _('Enter a list of text');
-    		} else {
+    		} else if ($answerformat=='matrix') {
+                $shorttip = _('Enter your answer as a matrix');  
+                $tip = $shorttip._(', like [(2,3,4),(1,4,5)]');
+            } else if ($answerformat=='logic') {
+                $shorttip = _('Enter a logic statement');  
+                $tip = _('Enter a logic statement using the editor buttons, or use "and", "or", "implies", and "iff"');
+            } else {
     			$tip .= _('Enter your answer as letters.  Examples: A B C, linear, a cat');
     			$shorttip = _('Enter text');
     		}
     		if ($displayformat=='select') {
     			$out .= "<select name=\"qn$qn\" id=\"qn$qn\" style=\"margin-right:20px\" class=\"$colorbox\" ";
-          $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
-          $out .= '<option value=""> </option>';
+                $out .= 'aria-label="'.$this->answerBoxParams->getQuestionIdentifierString().'">';
+                $out .= '<option value=""> </option>';
     			foreach ($questions as $i=>$v) {
     				$out .= '<option value="'.htmlentities($v).'"';
-    				//This is a hack.  Need to figure a better way to deal with & in answers
-    				if (str_replace('&','',$v)==$la) {
+    				if ($v == $la) {
     					$out .= ' selected="selected"';
     				}
     				$out .= '>'.htmlentities($v).'</option>';
@@ -107,14 +114,16 @@ class StringAnswerBox implements AnswerBox
 
     			$params['tip'] = $shorttip;
     			$params['longtip'] = $tip;
-    			if ($useeqnhelper && $displayformat == 'usepreview') {
+    			if ($useeqnhelper && ($displayformat == 'usepreview' || $answerformat == 'logic')) {
     				$params['helper'] = 1;
     			}
-    			if (!isset($hidepreview) && $displayformat == 'usepreview' &&
-            $_SESSION['userprefs']['livepreview']==1
-          ) {
-    				$params['preview'] = 1;
-    			}
+                if (!isset($hidepreview) && ($displayformat == 'usepreview' || $displayformat == 'usepreviewnomq')) {
+                    $params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
+                }
+                if ($answerformat == 'logic') {
+                    $params['vars'] = $variables;
+                }
+
     			$params['calcformat'] = $answerformat;
 
     			if ($displayformat == 'typeahead') {
@@ -147,13 +156,17 @@ class StringAnswerBox implements AnswerBox
     							'class="'.implode(' ', $classes) .
     							'" />';
 
-    			if ($displayformat == 'usepreview') {
-    				$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" /> &nbsp;\n";
+    			if ($displayformat == 'usepreview' || $displayformat == 'usepreviewnomq') {
+                    $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                    $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                    $preview .= '</button> &nbsp;';
     				$preview .= "<span id=p$qn></span> ";
     			}
     		}
     		if (strpos($strflags,'regex')!==false) {
     			$sa .= _('The answer must match a specified pattern');
+    		} else if ($answerformat == "logic") {
+                $sa = '`'.str_replace(['and','or', 'implies', 'iff'], ['^^','vv','=>','<=>'], $answer).'`';
     		} else {
     			$sa .= $answer;
     		}
@@ -169,7 +182,7 @@ class StringAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

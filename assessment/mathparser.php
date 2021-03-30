@@ -141,14 +141,14 @@ class MathParser
     if (count($allowedfuncs) > 0) {
       $this->functions = $allowedfuncs;
     } else {
-      $this->functions = explode(',', 'arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
+      $this->functions = explode(',', 'funcvar,arcsinh,arccosh,arctanh,arcsin,arccos,arctan,arcsec,arccsc,arccot,root,sqrt,sign,sinh,cosh,tanh,sech,csch,coth,abs,sin,cos,tan,sec,csc,cot,exp,log,ln');
     }
 
     //build regex's for matching symbols
-    $allwords = array_merge($this->functions, $this->variables);
+    $allwords = array_merge($this->functions, $this->variables, ['degree','degrees']);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
     $this->regex = '/^('.implode('|',array_map('preg_quote', $allwords)).')/';
-    $this->funcregex = '/^('.implode('|',array_map('preg_quote', $this->functions)).')/i';
+    $this->funcregex = '/('.implode('|',array_map('preg_quote', $this->functions)).')/i';
     $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', array_map('preg_quote', $this->variables)).')/';
 
     //define operators
@@ -190,11 +190,27 @@ class MathParser
       '&&' => [
         'precedence'=>8,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a && $b;}],
+        'evalfunc'=>function($a,$b) {return ($a && $b);}],
       '||' => [
         'precedence'=>7,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a || $b;}],
+        'evalfunc'=>function($a,$b) {return ($a || $b);}],
+      'La' => [
+        'precedence'=>8,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a && $b);}],
+      'Lo' => [
+        'precedence'=>7,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a || $b);}],
+      'Li' => [
+        'precedence'=>6,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ((!$a) || $b);}],
+      'Lb' => [
+        'precedence'=>6,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return (($a && $b) || (!$a && !$b));}],
       '(' => true,
       ')' => true
     ];
@@ -218,7 +234,7 @@ class MathParser
       $str
     );
 
-    $str = str_replace(array('\\','[',']'), array('','(',')'), $str);
+    $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
@@ -319,7 +335,7 @@ class MathParser
         continue;
       } else if (ctype_digit($c) || $c=='.') {
         // if it's a number/decimal value
-        preg_match('/^(\d*\.?\d*(E-?\d+)?)/', substr($str,$n), $matches);
+        preg_match('/^(\d*\.?\d*(E\+?-?\d+)?)/', substr($str,$n), $matches);
         $tokens[] = [
           'type'=>'number',
           'symbol'=> $matches[1]
@@ -335,7 +351,7 @@ class MathParser
         ];
         $lastTokenType = 'operator';
         continue;
-      } else if (($c=='|' || $c=='&') &&
+      } else if (($c=='|' || $c=='&' || $c=='L') &&
         isset($this->operators[substr($str,$n,2)])
       ) {
         $tokens[] = [
@@ -372,6 +388,11 @@ class MathParser
                 'input'=>null,
                 'index'=>['type'=>'number', 'symbol'=>M_E]
               ];
+            } else if ($matches[1] == 'degree' || $matches[1] == 'degrees') {
+                $tokens[] = [
+                    'type'=>'number',
+                    'symbol'=> M_PI/180
+                ];
             } else {
               $tokens[] = [
                 'type'=>'function',
@@ -427,6 +448,26 @@ class MathParser
               } else {
                 throw new MathParserException("Invalid root index");
               }
+            } else if ($nextSymbol == 'funcvar') {
+                // handle variables acting as functions
+                if (preg_match('/^[\(\[](.+?)[\)\]]/', substr($str,$n+1), $sub)) {
+                    if (in_array($sub[1], $this->variables)) {
+                        $tokens[count($tokens)-1] = [
+                            'type' => 'function',
+                            'symbol' => 'funcvar',
+                            'input' => null,
+                            'index' => [
+                                'type'=>'variable',
+                                'symbol'=>$sub[1]
+                            ]
+                        ];
+                        $n += strlen($sub[0]);
+                    } else {
+                        throw new MathParserException("Invalid funcvar variable");
+                    }
+                  } else {
+                    throw new MathParserException("Invalid funcvar format");
+                  }
             }
           }
           continue ;
@@ -1219,6 +1260,10 @@ function nthroot($x,$n) {
 	} else { //root of positive base
 		return exp(1/$n*log(abs($x)));
 	}
+}
+
+function funcvar ($input, $v) {
+    return $v*sin($v + $input);
 }
 
 // a safer power function that can handle (-8)^(1/3)

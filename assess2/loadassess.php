@@ -32,6 +32,13 @@ if ($isActualTeacher && isset($_GET['uid'])) {
   $uid = $userid;
 }
 
+if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype'] == 0
+  && $_SESSION['ltiitemid'] != $aid
+) {
+  echo '{"error": "need_relaunch"}';
+  exit;
+}
+
 $now = time();
 
 // option to reset assessment entirely
@@ -62,10 +69,11 @@ $assess_record->loadRecord($uid);
 $include_from_assess_info = array(
   'name', 'summary', 'available', 'startdate', 'enddate', 'enddate_in',
   'original_enddate', 'extended_with', 'timelimit', 'timelimit_type', 'points_possible',
-  'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb',
+  'submitby', 'displaymethod', 'groupmax', 'isgroup', 'showscores', 'viewingb', 'scoresingb',
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
-  'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue'
+  'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue', 
+  'attemptext', 'showworktype'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -77,6 +85,13 @@ if ($assessInfoOut['displaymethod'] === 'livepoll') {
 // indicate if teacher or tutor user
 $assessInfoOut['can_view_all'] = $canViewAll;
 $assessInfoOut['is_teacher'] = $isteacher;
+if ($istutor && $assess_info->getSetting('tutoredit') < 2) {
+    // tutor can edit
+    $assessInfoOut['tutor_gblinks'] = [
+        $basesiteurl . '/course/isolateassessgrade.php?cid=' . $cid . '&aid=' . $aid,
+        $basesiteurl . '/course/gb-itemanalysis2.php?cid=' . $cid . '&aid=' . $aid
+    ];
+}
 if ($canViewAll && $userid !== $uid) {
   $assessInfoOut['view_as_stu'] = 1;
   $query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
@@ -107,6 +122,19 @@ $assessInfoOut['has_password'] = $assess_info->hasPassword();
 
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
+
+// get time limit extension info 
+if ($assessInfoOut['timelimit'] > 0 && !empty($assess_info->getSetting('timeext'))) {
+    $assessInfoOut['timelimit_ext'] = $assess_info->getSetting('timeext');
+    if (!$assessInfoOut['has_active_attempt'] && ($assess_record->getStatus()&64)==64 &&
+      $assessInfoOut['timelimit_ext'] > 0
+    ) {
+        // has a previously submitted attempt; mark as active since we have a time 
+        // limit extension available
+        $assessInfoOut['has_active_attempt'] = true;
+    }
+}
+
 //get time limit expiration of current attempt, if appropriate
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0) {
   $assessInfoOut['timelimit_expires'] = $assess_record->getTimeLimitExpires();
@@ -137,7 +165,8 @@ $assessInfoOut['showwork_after'] = $assess_record->getShowWorkAfter();
 // adjust output if time limit is expired in by_question mode
 if ($assessInfoOut['has_active_attempt'] && $assessInfoOut['timelimit'] > 0 &&
   $assessInfoOut['submitby'] == 'by_question' &&
-  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires'])
+  time() > max($assessInfoOut['timelimit_grace'],$assessInfoOut['timelimit_expires']) && 
+  intval($assess_info->getSetting('timeext')) <= 0
 ) {
   $assessInfoOut['has_active_attempt'] = false;
   $assessInfoOut['can_retake'] = false;
@@ -184,6 +213,15 @@ if ($assessInfoOut['is_diag']) {
 
 $assessInfoOut['useMQ'] = (!isset($_SESSION['userprefs']['useeqed']) ||
   $_SESSION['userprefs']['useeqed'] == 1);
+
+// get excused info
+if (!$canViewAll) {
+    $stm = $DBH->prepare("SELECT id FROM imas_excused WHERE type='A' AND typeid=? AND userid=?");
+    $stm->execute(array($aid,$uid));
+    if ($stm->fetchColumn(0) !== false) {
+        $assessInfoOut['excused'] = 1;
+    }
+}
 
 //prep date display
 prepDateDisp($assessInfoOut);

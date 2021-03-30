@@ -144,10 +144,26 @@
 
 		if (strpos($str,'[EMBED')!==false) {
 			$search = '/\[EMBED:\s*([^\]]+)\]/';
-
+            $zindex = 50;
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
-					$respt = explode(',',$resval[1]);
+                    $respt = explode(',',$resval[1]);
+                    
+                    if (substr($respt[0],0,3)=='QID') {
+                        $url = implode('&',$respt);
+                        $w = '100%';
+                        $h = '200';
+                        $qs = preg_replace('/[^\w=&]/','', trim(substr($url,3)));
+                        $uniqid = uniqid('eq2');
+                        $url = $GLOBALS['basesiteurl'] . '/embedq2.php?frame_id='.$uniqid.'&id='.$qs;
+                        $tag = '<div id="'.$uniqid.'wrap" class="embedwrap">';
+                        $tag .= "<iframe id=\"$uniqid\" width=\"$w\" height=\"$h\" src=\"$url\" style=\"z-index:$zindex\" frameborder=\"0\">";
+                        $tag .= '</iframe></div>';
+                        $str = str_replace($resval[0], $tag, $str);
+                        $zindex--;
+                        continue;
+                    }
+
 					if (isset($respt[3])) {
 						$nobord = true;
 						array_pop($respt);
@@ -165,8 +181,8 @@
 							list ($url,$w,$h) = $respt;
 						}
 					}
-					$url = trim(str_replace(array('"','&nbsp;'),'',$url));
-					if (substr($url,0,18)=='https://tegr.it/y/') {
+                    $url = trim(str_replace(array('"','&nbsp;'),'',$url));
+                    if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
 						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".Sanitize::encodeUrlParam($url);
@@ -259,15 +275,15 @@
 		global $imasroot;
 		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1" alt="Graph"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
-		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
+        $str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
 		if (isset($_POST['hidetxtboxes'])) {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','',$str);
 			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','',$str);
-			$str = preg_replace('/<select.*?\/select>/','',$str);
+			$str = preg_replace('/<select.*?\/select>/s','',$str);
 		} else {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','__________________',$str);
 			$str = preg_replace('/<input[^>]*(radio|checkbox)[^>]*>/','__',$str);
-			$str = preg_replace('/<select.*?\/select>/','____',$str);
+			$str = preg_replace('/<select.*?\/select>/s','____',$str);
 		}
 		$str = preg_replace('/<table/','<table cellspacing="0"',$str);
 		$str = preg_replace('/`\s*(\w)\s*`/','<i>$1</i>',$str);

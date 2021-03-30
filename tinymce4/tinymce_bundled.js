@@ -46679,6 +46679,7 @@ var paste = (function (domGlobals) {
 			//ed.on('PreProcess', function (o) {   //tiny 4 doesn't seem to use this anymore
 			//luckily, there is a special paste callback
 			ed.on('PastePostProcess', function(o) {
+                var AMtags, MJtags;
 				//if (o.get) {
 					AMtags = ed.dom.select('span.AM', o.node);
 					for (var i=0; i<AMtags.length; i++) {
@@ -46687,7 +46688,13 @@ var paste = (function (domGlobals) {
 					MJtags = ed.dom.select('span[data-asciimath]', o.node);
 					for (var i=0; i<MJtags.length; i++) {
 						t.mathjax2ascii(MJtags[i]);
-					}
+                    }
+                    MJtags = ed.dom.select('mjx-container[data-asciimath]', o.node);
+                    for (var i=0; i<MJtags.length; i++) {
+                        var newspan = ed.dom.create('span', {'data-asciimath': MJtags[i].getAttribute("data-asciimath")});
+                        MJtags[i].parentNode.replaceChild(newspan, MJtags[i]);
+						t.mathjax2ascii(newspan);
+                    }
 					/*AMtags = ed.dom.select('span.AMedit', o.node);
 					for (var i=0; i<AMtags.length; i++) {
 						var myAM = AMtags[i].innerHTML;
@@ -52131,8 +52138,9 @@ var modern = (function (domGlobals) {
           layoutRect = windows[i].layoutRect();
           var newy;
           if (inIframe()) {
-            var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
-            newy = contpos.y;
+            //var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
+            //newy = contpos.y;
+            newy = global$1.activeEditor.editorContainer.getBoundingClientRect().y;
           } else {
             newy = Math.max(0, rect.h / 2 - layoutRect.h / 2);
           }
@@ -52259,8 +52267,9 @@ var modern = (function (domGlobals) {
         layoutRect.x = self.settings.x || Math.max(0, rect.w / 2 - layoutRect.w / 2);
         layoutRect.y = self.settings.y || Math.max(0, rect.h / 2 - layoutRect.h / 2);
         if (inIframe()) {
-            var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
-            layoutRect.y = contpos.y;
+            //var contpos = global$3.DOM.getPos(global$1.activeEditor.editorContainer);
+            //layoutRect.y = contpos.y;
+            layoutRect.y = global$1.activeEditor.editorContainer.getBoundingClientRect().y;
         }
         return layoutRect;
       },

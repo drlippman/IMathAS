@@ -75,7 +75,8 @@ function addGeogebra($url,$width=400,$height=200,$commands=array(),$params=array
 	$out .= '  $("#geogebra_container'.$ggbid.'").on("keydown", function(e) {if (e.keyCode==13) { console.log("1");e.preventDefault(); return false;}});';
 	$out .= '  $(document).on("keydown", function(e) {if (e.keyCode==13) {window.lastEnterKeyPressed =  e.timeStamp;}});';
 	$out .= '  window.lastEnterKeyPressed = 0;
-	  $("input[type=submit]").on("click", function(e) { console.log(e);
+	  $("form").on("submit", function(e) { if (e.originalEvent.submitter.className.match(/gwt-/)) {e.preventDefault(); return false;}});
+	  $("input[type=submit]").on("click", function(e) {
 		if (e.detail==0 && (e.timeStamp - window.lastEnterKeyPressed)>20) {
 			e.preventDefault(); return false;
 		}

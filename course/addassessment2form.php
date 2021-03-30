@@ -32,7 +32,7 @@ $vueData = array(
 	'gbcategory' => $line['gbcategory'],
 	'gbcatOptions' => $gbcats,
 	'caltag' => $line['caltag'],
-	'shuffle' => ($line['shuffle']&(1+16)),
+	'shuffle' => ($line['shuffle']&(1+16+32)),
 	'noprint' => $line['noprint'] > 0,
 	'sameseed' => ($line['shuffle']&2) > 0,
 	'samever' => ($line['shuffle']&4) > 0,
@@ -50,7 +50,8 @@ $vueData = array(
 	'assmpassword' => $line['password'],
 	'revealpw' => false,
 	'showhints' => ($line['showhints']&1) > 0,
-	'showwork' => $line['showwork'],
+    'showwork' => ($line['showwork']&3),
+    'showworktype' => ($line['showwork']&4),
 	'showextrefs' => ($line['showhints']&2) > 0,
 	'msgtoinstr' => $line['msgtoinstr'] > 0,
 	'doposttoforum' => $line['posttoforum'] > 0,
@@ -129,7 +130,7 @@ $vueData = array(
 			</label>
 			<input type=text size=10 name="sdate" v-model="sdate">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a>
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=8 name=stime v-model="stime">
 		</span><br class="form"/>
 
@@ -144,8 +145,8 @@ $vueData = array(
 				<?php echo _('Due');?>
 			</label>
 			<input type=text size=10 name="edate" v-model="edate">
-			<a href="#" onClick="displayDatePicker('edate', this); return false">
-			<img src="../img/cal.gif" alt="Calendar"/></a>
+			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', '<?php echo _('Start date');?>'); return false">
+			<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></a>
 			<?php echo _('at') ?> <input type=text size=8 name=etime v-model="etime">
 		</span><br class="form"/>
 	</div>
@@ -211,7 +212,7 @@ $vueData = array(
 	 		<a href="#" onclick="groupToggleAll(0);return false;"><?php echo _('Collapse All');?></a>
 		</div>
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/collapse.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/collapse.gif" />
 			<?php echo _('Core Options');?>
 		</div>
 		<div class="blockitems">
@@ -376,7 +377,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Additional Display Options');?>
 		</div>
 		<div class="blockitems hidden">
@@ -392,7 +393,9 @@ $vueData = array(
 				<select name="shuffle" id="shuffle" v-model="shuffle">
 					<option value="0"><?php echo _('No');?></option>
 					<option value="1"><?php echo _('All');?></option>
-					<option value="16"><?php echo _('All but first');?></option>
+                    <option value="16"><?php echo _('All but first');?></option>
+                    <option value="32"><?php echo _('All but last');?></option>
+                    <option value="48"><?php echo _('All but first and last');?></option>
 				</select>
 			</span><br class=form />
 
@@ -403,8 +406,14 @@ $vueData = array(
 					<option value="1"><?php echo _('During assessment');?></option>
 					<option value="2"><?php echo _('After assessment');?></option>
 					<option value="3"><?php echo _('During or after assessment');?></option>
-				</select>
-			</span><br class=form />
+                </select>
+                <br>
+                <label for="showworktype"><?php echo _('Work entry type');?>:</label>
+                <select name="showworktype" id="showworktype" v-model="showworktype">
+                    <option value="0"><?php echo _('Essay');?></option>
+                    <option value="4"><?php echo _('File upload');?></option>
+                </select>
+            </span><br class=form />
 
 			<span class=form><?php echo _('Options');?></span>
 			<span class=formright>
@@ -436,7 +445,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Time Limit and Access Control');?>
 		</div>
 		<div class="blockitems hidden">
@@ -468,7 +477,7 @@ $vueData = array(
 						<?php echo _('No extensions past');?>
 						<input type=text size=10 name="lpdate" v-model="lpdate">
 						<a href="#" onClick="displayDatePicker('lpdate', this); return false">
-						<img src="../img/cal.gif" alt="Calendar"/></A>
+						<img src="<?php echo $staticroot;?>/img/cal.gif" alt="Calendar"/></A>
 						at <input type=text size=8 name=lptime v-model="lptime">
 					</span>
 				</span>
@@ -527,7 +536,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Help and Hints');?>
 		</div>
 		<div class="blockitems hidden">
@@ -552,8 +561,12 @@ $vueData = array(
 				</label>
 				<br/>
 				<label>
-					<input type="checkbox" name="doposttoforum" v-model="doposttoforum" />
-					<?php echo _('Show "Post this question to forum" links');?>
+                    <input type="checkbox" name="doposttoforum" v-model="doposttoforum" 
+                        :disabled="forumOptions.length == 0"/>
+                    <?php echo _('Show "Post this question to forum" links');?>
+                    <span v-if="forumOptions.length == 0" class="small">
+                        <?php echo _('(Create a forum first to enable this)'); ?>
+                    </span>
 				</label>
 			 	<span v-show="doposttoforum">
 					<?php echo _('to forum');?>
@@ -597,7 +610,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Grading and Feedback');?>
 		</div>
 		<div class="blockitems hidden">
@@ -668,7 +681,7 @@ $vueData = array(
 		</div>
 
 		<div class="block grouptoggle">
-			<img class="mida" src="../img/expand.gif" />
+			<img class="mida" src="<?php echo $staticroot;?>/img/expand.gif" />
 			<?php echo _('Group Assessment');?>
 		</div>
 		<div class="blockitems hidden">
@@ -791,7 +804,7 @@ var app = new Vue({
 			};
 			var with_score = {
 				'value': 'with_score',
-				'text': '<?php echo _('Show with the score');?>'
+				'text': '<?php echo _('After the last try on a question');?>'
 			};
 
 			var out = [];
@@ -929,7 +942,7 @@ var app = new Vue({
 			‘after_due’: After it’s due
 			‘never’: Never
 			 */
-			if (this.viewingb == 'never' || this.scoresingb == 'never') {
+			if (this.viewingb == 'never') {
 				this.ansingb = 'never';
  				return [];
  			} else {
@@ -943,9 +956,7 @@ var app = new Vue({
  						'text': '<?php echo _('Never');?>'
  					}
  				];
- 				if ((this.scoresingb === 'immediately' || this.scoresingb === 'after_take')
-				 	&& this.subtype == 'by_assessment'
-				) {
+ 				if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted');?>'

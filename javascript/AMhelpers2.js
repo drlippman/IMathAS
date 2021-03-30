@@ -80,7 +80,7 @@ function clearparams(paramarr) {
 }
 
 function toMQwVars(str, elid) {
-    var qn = elid.substr(2);
+    var qn = elid.substr(2).split(/-/)[0];
     var qtype = allParams[qn].qtype;
     if (qtype === 'numfunc') {
         str = AMnumfuncPrepVar(qn, str)[1];
@@ -110,7 +110,7 @@ function init(paramarr, enableMQ, baseel) {
     //save the params to the master record
     allParams[qn] = paramarr[qn];
     params = paramarr[qn];
-    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval)/)) { //want mathquill
+    if (params.helper && params.qtype.match(/^(calc|numfunc|string|interval|matrix)/)) { //want mathquill
       el = document.getElementById("qn"+qn);
       str = params.qtype;
       if (params.calcformat) {
@@ -139,9 +139,10 @@ function init(paramarr, enableMQ, baseel) {
       }
     }
     if (params.preview) { //setup preview TODO: check for userpref
-      var thisqn = qn;
-      document.getElementById("pbtn"+qn).addEventListener('click', function() {showPreview(thisqn)});
-      if (!params.qtype.match(/matrix/)) { //no live preview for matrix types
+      document.getElementById("pbtn"+qn).addEventListener('click', (function(thisqn) {
+          return function() {showPreview(thisqn);}
+        })(qn));
+      if (params.preview == 1 && !params.qtype.match(/matrix/)) { //no live preview for matrix types
         if (LivePreviews.hasOwnProperty(qn)) {
           delete LivePreviews[qn]; // want to reinit
         }
@@ -151,7 +152,13 @@ function init(paramarr, enableMQ, baseel) {
           showSyntaxCheckMQ(qn);
         }
         //document.getElementById("pbtn"+qn).style.display = 'none';
-      } //TODO: when matrix, clear preview on further input
+      }  //TODO: when matrix, clear preview on further input
+    } else if (params.matrixsize) {
+        $("input[id^=qn"+qn+"-]").on('input', (function(thisqn) { 
+          return function () {syntaxCheckMQ(thisqn) }; })(qn));
+    } else if (document.getElementById("qn"+qn)) {
+        document.getElementById("qn"+qn).addEventListener('keyup', (function(thisqn) { 
+            return function () {syntaxCheckMQ(thisqn) }; })(qn));
     } //TODO: for non-preview types, still check syntax
     if (params.format === 'debit') {
       document.getElementById("qn"+qn).addEventListener('keyup', editdebit);
@@ -292,9 +299,12 @@ function initqsclickchange() {
 function clearScoreMarkers(e) {
   var m;
   var target = e.currentTarget
-  if ((m = target.className.match(/(ansgrn|ansred|ansyel)/)) !== null) {
+  if ((m = target.className.match(/(ansgrn|ansred|ansyel|ansorg)/)) !== null) {
     $(target).removeClass(m[0]);
     $(target).nextAll('.scoremarker.sr-only').first().remove();
+    if (m[0]=='ansorg') {
+        $(target).nextAll('.scoremarker').first().remove();
+    }
     if (target.tagName.toLowerCase() == 'select') {
       $(target).nextAll('svg.scoremarker').first().remove();
     }
@@ -304,7 +314,7 @@ function clearScoreMarkers(e) {
   } else {
     var wrap = $(target).closest("[id^=qnwrap]");
     if (wrap.length > 0 &&
-      ((m = wrap[0].className.match(/(ansgrn|ansred|ansyel)/)) !== null)
+      ((m = wrap[0].className.match(/(ansgrn|ansred|ansyel|ansorg)/)) !== null)
     ) {
       wrap.removeClass(m[0]);
       wrap.find(".scoremarker").remove();
@@ -322,16 +332,34 @@ function setScoreMarkers(base) {
   var svgx = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(153,0,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
   svgx += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
   svgx += '<span class="sr-only scoremarker">' + _('Incorrect') + '</span>';
+  var svgox = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="rgb(255,85,0)" stroke-width="3" fill="none" role="img" aria-hidden=true>';
+  svgox += '<path d="M18 6 L6 18 M6 6 L18 18" /></svg>';
+  svgox += '<span class="sr-only scoremarker">' + _('Incorrect, wrong format') + '</span>';
   $(base).find('.scoremarker').remove();
   $(base).find('div.ansgrn,table.ansgrn').append(svgchk);
   $(base).find('div.ansyel,table.ansyel').append(svgychk);
   $(base).find('div.ansred,table.ansred').append(svgx);
+  $(base).find('div.ansorg,table.ansorg').append(svgox);
   $(base).find('select.ansgrn').after(svgchk);
   $(base).find('select.ansyel').after(svgychk);
   $(base).find('select.ansred').after(svgx);
+  $(base).find('select.ansorg').after(svgox);
   $(base).find('span[id^=mqinput-].ansgrn,input[type=text].ansgrn').after('<span class="scoremarker sr-only">' + _('Correct') + '</span>');
   $(base).find('span[id^=mqinput-].ansyel,input[type=text].ansyel').after('<span class="scoremarker sr-only">' + _('Partially correct') + '</span>');
   $(base).find('span[id^=mqinput-].ansred,input[type=text].ansred').after('<span class="scoremarker sr-only">' + _('Incorrect') + '</span>');
+  $(base).find('span[id^=mqinput-].ansorg,input[type=text].ansorg').after('<span class="scoremarker sr-only">' + _('Incorrect, wrong format') + '</span>');
+  $(base).find('span[id^=mqinput-].ansorg,input[type=text].ansorg').after(
+      $('<span>', {
+          role: "button",
+          class: "scoremarker",
+          tabindex: 0,
+          "aria-label": _('Incorrect, wrong format'),
+          "data-tip": _('Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format'),
+          "data-tooltipclass": "dropdown-pane tooltip-pane"
+      }).on('mouseover focus', function () {tipshow(this)})
+      .on('mouseleave blur', tipout)
+      .html('<svg style="vertical-align:middle;margin-left:3px;" viewBox="0 0 24 24" width="18" height="18" stroke="rgb(255,85,0)" stroke-width="2" stroke-linecap="round" fill="none" role="img" aria-hidden=true><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>')
+  );
 }
 
 function initClearScoreMarkers() {
@@ -348,12 +376,12 @@ function initEnterHandler(qn) {
 	  .on("keydown.enterhandler", function(e) {
 		if (e.which==13) {
 			var btn = $(this).closest(".questionwrap").find(".submitbtnwrap .primary");
-      if (btn.length>0) {
-        e.preventDefault();
-      }
-      if (!btn.is(':disabled')) {
-        btn.trigger('click');
-      }
+            if (btn.length>0) {
+                e.preventDefault();
+            }
+            if (!btn.is(':disabled')) {
+                btn.trigger('click');
+            }
 		}
 	});
 }
@@ -374,7 +402,7 @@ function initDupRubrics() {
       var pts = inref.split('-');
       inref = (pts[0]*1 + 1)*1000 + pts[1]*1;
     }
-    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref+",div.intro#qnwrap"+inref);
+    var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref+",div.introtext#qnwrap"+inref);
     if (inbox.length > 0) {
       inbox.after(el);
       $(el).show();
@@ -407,7 +435,7 @@ function initShowAnswer2() {
       }).on('click', function(e) {
           var curstate = (e.currentTarget.getAttribute('aria-expanded') == 'true');
           e.currentTarget.setAttribute('aria-expanded', curstate ? 'false' : 'true');
-          $("#ans"+qref).toggle(!curstate);
+          $("#ans"+qref).toggleClass("hidden", curstate);
         })
         .html(icon)
     );
@@ -415,7 +443,7 @@ function initShowAnswer2() {
       var wrap = $("#qnwrap"+inref);
       if (wrap.length > 0) {
         $(el).prev(".sabtn").remove();
-        key.append($(el).hide().removeClass("hidden"))
+        key.append($(el))
           .addClass("inwrap");
         wrap.append(key);
         return;
@@ -423,14 +451,14 @@ function initShowAnswer2() {
       var inbox = $("#mqinput-qn"+inref+",input[type=text]#qn"+inref+",select#qn"+inref+",textarea#qn"+inref);
       if (inbox.length > 0) {
         $(el).prev(".sabtn").remove();
-        key.append($(el).hide().removeClass("hidden"));
+        key.append($(el));
         inbox.after(key);
         return;
       }
     }
     // not in autoshowans or no match, so don't want to relocate, just refresh
     var parel = $(el).parent();
-    key.append($(el).hide().removeClass("hidden"));
+    key.append($(el));
     parel.empty().append(key);
   });
 
@@ -440,10 +468,11 @@ function initShowAnswer2() {
 		var idnext = $(this).siblings("div:first-of-type").attr("id");
 		$(this).attr("aria-expanded",false).attr("aria-controls",idnext)
 		  .off("click.sashow").on("click.sashow", function() {
-			$(this).attr("aria-expanded",true)
+            var curstate = ($(this).attr("aria-expanded") == 'true');
+			$(this).attr("aria-expanded",!curstate)
 		  	  .siblings("div:first-of-type")
-				.attr("aria-expanded",true).attr("aria-hidden",false)
-				.removeClass("hidden");
+				.attr("aria-expanded",!curstate).attr("aria-hidden",curstate)
+				.toggleClass("hidden",curstate);
 		});
 	});
 }
@@ -526,7 +555,7 @@ function setupDraw(qn) {
 }
 
 function initMultAns(qn) {
-  var hasnone = $("#qnwrap"+qn).find('label:last').text().match(/none\s+of/i);
+  var hasnone = $("#qnwrap"+qn).attr('data-multans') == 'hasnone';
   if (hasnone) {
     var boxes = $('input[name^="qn'+qn+'["]');
     boxes.on('change', function () {
@@ -544,7 +573,8 @@ function isBlank(str) {
 }
 function editdebit(e) {
   var el = e.target;
-	var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && descr.hasClass("iscredit")) {
     var leftpad = descr.css('padding-left');
 		if (descr.is('select')) {
@@ -558,7 +588,8 @@ function editdebit(e) {
 }
 function editcredit(e) {
   var el = e.target;
-	var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && !descr.hasClass("iscredit")) {
     var leftpad = parseInt(descr.css('padding-left'));
 		if (descr.is('select')) {
@@ -578,6 +609,11 @@ function initcreditboxes() {
 
 var LivePreviews = [];
 function setupLivePreview(qn, skipinitial) {
+    if (mathRenderer=="MathJax" && (!window.MathJax || (!window.MathJax.Hub && !window.MathJax.typesetPromise))) {
+        var thisqn = qn; var thisskipinitial = skipinitial;
+        setTimeout(100, function() { setupLivePreview(thisqn, thisskipinitial)});
+        return;
+    }
 	if (!LivePreviews.hasOwnProperty(qn)) {
 		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
 			LivePreviews[qn] = {
@@ -590,7 +626,8 @@ function setupLivePreview(qn, skipinitial) {
 			  finaltimeout: null,  // setTimeout id for clicking preview
 			  mjRunning: false,  // true when MathJax is processing
 			  mjPending: false,  // true when a typeset has been queued
-			  oldText: null,     // used to check if an update is needed
+              oldText: null,     // used to check if an update is needed
+              mjPromise: null,
 
 			  //
 			  //  Get the preview and buffer DIV's
@@ -601,9 +638,12 @@ function setupLivePreview(qn, skipinitial) {
   					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');
   				this.preview = document.getElementById("lpbuf1"+qn);
   				this.buffer = document.getElementById("lpbuf2"+qn);
-          if (!skipinitial) {
-            showPreview(qn);  //TODO: review this
-          }
+                if (mathRenderer=="MathJax" && MathJax.typesetPromise) {
+                    this.mjPromise = Promise.resolve();
+                }
+                if (!skipinitial) {
+                    showPreview(qn);  //TODO: review this
+                }
 			  },
 
 			  SwapBuffers: function () {
@@ -628,13 +668,20 @@ function setupLivePreview(qn, skipinitial) {
 			  },
 			  RenderBuffer: function() {
 			      if (mathRenderer=="MathJax") {
-				      MathJax.Hub.Queue(
-					      ["Typeset",MathJax.Hub,this.buffer],
-					      ["PreviewDone",this]
-				      );
+                      if (MathJax.typesetPromise) {
+                        this.mjPromise = this.mjPromise.then(function () {
+                            //MathJax.typesetClear([this.buffer]);
+                            MathJax.typesetPromise([this.buffer]).then(this.PreviewDone.bind(this));
+                        }.bind(this));
+                      } else {
+                        MathJax.Hub.Queue(
+                            ["Typeset",MathJax.Hub,this.buffer],
+                            ["PreviewDone",this]
+                        );
+                      }
 			      } else if (mathRenderer=="Katex") {
-			      	      renderMathInElement(this.buffer);
-				      if (typeof MathJax != "undefined" && MathJax.version && $(this.buffer).children(".mj").length>0) {//has MathJax elements
+			      	  renderMathInElement(this.buffer);
+				      if (typeof MathJax != "undefined" && MathJax.Hub && !MathJax.typesetPromise && $(this.buffer).children(".mj").length>0) {//has MathJax elements
 					      MathJax.Hub.Queue(["PreviewDone",this]);
 				      } else {
 					      this.PreviewDone();
@@ -643,13 +690,13 @@ function setupLivePreview(qn, skipinitial) {
 			  },
 
 			  DoFinalPreview: function() {
-          $("#pbtn"+qn).trigger("click");
+                $("#pbtn"+qn).trigger("click");
 			  },
 
 			  preformat: function(text) {
-          var qtype = allParams[qn].qtype;
-          var calcformat = allParams[qn].calcformat;
-          return preformat(qn, text, qtype, calcformat);
+                var qtype = allParams[qn].qtype;
+                var calcformat = allParams[qn].calcformat;
+                return preformat(qn, text, qtype, calcformat);
 			  },
 
 			  CreatePreview: function () {
@@ -658,8 +705,12 @@ function setupLivePreview(qn, skipinitial) {
 			    var text = document.getElementById("qn"+qn).value;
 			    if (text === this.oldtext) return;
 			    if (this.mjRunning) {
-			      this.mjPending = true;
-			      MathJax.Hub.Queue(["CreatePreview",this]);
+                  this.mjPending = true;
+                  if (this.mjPromise) {
+                    this.mjPromise = this.mjPromise.then(this.CreatePreview().bind(this));
+                  } else if (MathJax.Hub) {
+                    MathJax.Hub.Queue(["CreatePreview",this]);
+                  }
 			    } else {
 			      this.oldtext = text;
 			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
@@ -675,13 +726,13 @@ function setupLivePreview(qn, skipinitial) {
 			    updateehpos();
 			  }
 
-			};
-			if (typeof MathJax != "undefined") {
-				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+            };
+            if (typeof MathJax != "undefined" && !MathJax.typesetPromise) {
+                LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
 				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
-			} else {
-				LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
-			}
+            } else {
+                LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
+            }
 			LivePreviews[qn].Init(skipinitial);
 		} else {
 			LivePreviews[qn] = {
@@ -726,19 +777,19 @@ function normalizemathunicode(str) {
 	str = str.replace(/∞/g,"oo").replace(/≤/g,"<=").replace(/≥/g,">=").replace(/∪/g,"U");
 	str = str.replace(/±/g,"+-").replace(/÷/g,"/").replace(/·|✕|×|⋅/g,"*");
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
-	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
+	str = str.replace(/⁰/g,"^0").replace(/¹/g,"^1").replace(/²/g,"^2").replace(/³/g,"^3").replace(/⁴/g,"^4").replace(/⁵/g,"^5").replace(/⁶/g,"^6").replace(/⁷/g,"^7").replace(/⁸/g,"^8").replace(/⁹/g,"^9");
 	str = str.replace(/\u2329/g, "<").replace(/\u232a/g, ">");
 	str = str.replace(/₀/g,"_0").replace(/₁/g,"_1").replace(/₂/g,"_2").replace(/₃/g,"_3");
-	str = str.replace(/\bOO\b/i,"oo");
-	str = str.replace(/θ/,"theta").replace(/ϕ/,"phi").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu")
-	str = str.replace(/α/,"alpha").replace(/β/,"beta").replace(/γ/,"gamma").replace(/δ/,"delta").replace(/ε/,"epsilon").replace(/κ/,"kappa");
-	str = str.replace(/λ/,"lambda").replace(/ρ/,"rho").replace(/τ/,"tau").replace(/χ/,"chi").replace(/ω/,"omega");
-	str = str.replace(/Ω/,"Omega").replace(/Γ/,"Gamma").replace(/Φ/,"Phi").replace(/Δ/,"Delta").replace(/Σ/,"Sigma");
+	str = str.replace(/\b(OO|infty)\b/gi,"oo").replace(/°/g,'degree');
+	str = str.replace(/θ/g,"theta").replace(/ϕ/g,"phi").replace(/φ/g,"phi").replace(/π/g,"pi").replace(/σ/g,"sigma").replace(/μ/g,"mu")
+	str = str.replace(/α/g,"alpha").replace(/β/g,"beta").replace(/γ/g,"gamma").replace(/δ/g,"delta").replace(/ε/g,"epsilon").replace(/κ/g,"kappa");
+	str = str.replace(/λ/g,"lambda").replace(/ρ/g,"rho").replace(/τ/g,"tau").replace(/χ/g,"chi").replace(/ω/g,"omega");
+	str = str.replace(/Ω/g,"Omega").replace(/Γ/g,"Gamma").replace(/Φ/g,"Phi").replace(/Δ/g,"Delta").replace(/Σ/g,"Sigma");
 	return str;
 }
 
 function htmlEntities(str) {
-  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/&/g,'&amp;');
+  return str.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&/g,'&amp;');
 }
 
 /**
@@ -758,7 +809,6 @@ function showPreview(qn) {
   if (res.err && res.err != '' && res.str != '') {
     outstr += (outstr=='``')?'':'. ' + '<span class=noticetext>' + res.err + '</span>';
   }
-
   if (LivePreviews.hasOwnProperty(qn)) {
     LivePreviews[qn].RenderNow(outstr);
   } else {
@@ -791,26 +841,36 @@ var MQsyntaxtimer = null;
  */
 function syntaxCheckMQ(id, str) {
   clearTimeout(MQsyntaxtimer);
-  var qn = parseInt(id.replace(/\D/g,''));
+  var qn = parseInt(id.replace(/.*qn(\d+)\b.*/g,'$1'));
   MQsyntaxtimer = setTimeout(function() { showSyntaxCheckMQ(qn);}, 1000);
 }
 
 function showSyntaxCheckMQ(qn) {
+  var params = allParams[qn];
   var res = processByType(qn);
   var outstr = '';
+  if (res.dispvalstr && res.dispvalstr != '' && res.dispvalstr != 'NaN' && params.calcformat && params.calcformat.indexOf('showval')!=-1) {
+    outstr += ' = ' + htmlEntities(res.dispvalstr) + ' ';
+  }
   if (res.err && res.err != '' && res.str != '') {
     outstr += '<span class=noticetext>' + res.err + '</span>';
   }
-  if (LivePreviews.hasOwnProperty(qn)) {
+  if (LivePreviews.hasOwnProperty(qn) && (mathRenderer=="MathJax" || mathRenderer=="Katex")) {
     var previewel = document.getElementById('p'+qn).firstChild;
     previewel.innerHTML = outstr;
     previewel.style.visibility = '';
     previewel.style.position = '';
   } else {
     var previewel = document.getElementById('p'+qn);
-    previewel.innerHTML = outstr;
+    if (previewel) {
+        previewel.innerHTML = outstr;
+    }
   }
-  a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
+  if (document.getElementById("qn"+qn)) {
+    a11ypreview('`'+htmlEntities(document.getElementById("qn"+qn).value)+'` ' + outstr);
+  } else {
+    a11ypreview(outstr);
+  }
 }
 
 /**
@@ -898,10 +958,15 @@ function processByType(qn) {
       return {str: 'DNE', displvalstr: '', submitstr: 'DNE'};
     } else if (str.match(/^\s*oo\s*$/i)) {
       return {str: 'oo', displvalstr: '', submitstr: 'oo'};
+    } else if (str.match(/^\s*\+oo\s*$/i)) {
+      return {str: '+oo', displvalstr: '', submitstr: '+oo'};
     } else if (str.match(/^\s*-oo\s*$/i)) {
       return {str: '-oo', displvalstr: '', submitstr: '-oo'};
     }
     switch (params.qtype) {
+      case 'number':
+        res = processNumber(str, params.calcformat);
+        break;
       case 'calculated':
         res = processCalculated(str, params.calcformat);
         break;
@@ -909,9 +974,11 @@ function processByType(qn) {
       case 'calcinterval':
         res = processCalcInterval(str, params.calcformat, params.vars);
         break;
+      case 'ntuple':
       case 'calcntuple':
         res = processCalcNtuple(str, params.calcformat);
         break;
+      case 'complex':
       case 'calccomplex':
         res = processCalcComplex(str, params.calcformat);
         break;
@@ -922,8 +989,7 @@ function processByType(qn) {
         res = processNumfunc(qn, str, params.calcformat);
         break;
       case 'matrix':
-        res = processCalcMatrix(str, '');
-        res.dispvalstr = ''; // don't need to show for standard matrix
+        res = processCalcMatrix(str, 'decimal');
         break;
     }
     res.str = preformat(qn, str, params.qtype, params.calcformat);
@@ -985,9 +1051,8 @@ function AMnumfuncPrepVar(qn,str) {
     if (vars[i].match(/\(.+\)/)) { // variable has parens, not funcvar
       str = str.replace(/\(\((.*?)\)\)/g,'($1)');
     }
-  	if (vars[i] == "varE") {
-		  str = str.replace("E","varE");
-		  dispstr = dispstr.replace("E","varE");
+  	if (vars[i] == "E" || vars[i] == "e") {
+          foundaltcap[i] = true;  // always want to treat e and E as different
 	  } else {
 	  	foundaltcap[i] = false;
 	  	for (var j=0; j<vars.length; j++) {
@@ -1004,7 +1069,9 @@ function AMnumfuncPrepVar(qn,str) {
 		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
-	 }});
+     }
+     return p1;
+    });
   str = str.replace(/@v(\d+)@/g, function(match,contents) {
   	  return vars[contents];
        });
@@ -1013,7 +1080,9 @@ function AMnumfuncPrepVar(qn,str) {
 		if (vars[i]==p1 || (!foundaltcap[i] && vars[i].toLowerCase()==p1.toLowerCase())) {
 			return '@v'+i+'@';
 		}
-	 }});
+     }
+     return p1;
+    });
   // fix display of /n!
   dispstr = dispstr.replace(/(@v(\d+)@|\d+(\.\d+)?)!/g, '{:$&:}');
   dispstr = dispstr.replace(/@v(\d+)@/g, function(match,contents) {
@@ -1054,7 +1123,7 @@ function AMnumfuncPrepVar(qn,str) {
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
-		  } else if (!isgreek && vars[i]!="varE" && vars[i].replace(/[^\w_]/g,'').length>1) {
+		  } else if (!isgreek && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
       if (vars[i].match(/[^\w_]/) || vars[i].match(/^(break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|and with)$/)) {
@@ -1069,7 +1138,6 @@ function AMnumfuncPrepVar(qn,str) {
 	  var reg = new RegExp("("+vltq+")","g");
 	  dispstr = dispstr.replace(reg,"\"$1\"");
   }
-  dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
   str = str.replace(/@(\d+)@/g, indextofunc);
   submitstr = submitstr.replace(/@(\d+)@/g, indextofunc);
@@ -1093,6 +1161,66 @@ function AMnumfuncPrepVar(qn,str) {
  *   .dispvalstr: the evaluated string, formatted for display
  *   .submitstr: the evaluated answer, formatted for submission
  */
+
+function processNumber(origstr, format) {
+    var err = '';
+    if (format.indexOf('list')!== -1) {
+        var strs = origstr.split(/\s*,\s*/);
+    } else {
+        var strs = [origstr.replace(/,/g,'')];
+    }
+    var str;
+    for (var j=0;j<strs.length;j++) {
+        str = strs[j];
+        if (format.indexOf('units')!=-1) {
+            var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
+            if (!str.match(/^\s*(-?\s*\d+\.?\d*|-?\s*\.\d+|-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
+                err += _('Answer must start with a number. ');
+            }
+            // strip number
+            str = str.replace(/^\s*(-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+|-?\s*\d+\.?\d*|-?\s*\.\d+)\s*[\-\*]?\s*/,'');
+            str = str.replace(/\s*\-\s*([a-zA-Z])/g,'*$1');
+            str = str.replace(/\*\*/g,'^');
+            str = str.replace(/\s*(\/|\^|\-)\s*/g,'$1');
+            str = str.replace(/\(\s*(.*?)\s*\)\s*\//, '$1/').replace(/\/\s*\(\s*(.*?)\s*\)/,'/$1');
+            str = str.replace(/\s*[\*\s]\s*/g,'*');
+            // strip word^power since those are valid
+            str = str.replace(/([a-zA-Z]\w*)\^[\-\+]?\d+/g, '$1');
+            if (str.match(/\^/)) {
+                err += _('Invalid exponents. ');
+                str = str.replace(/\^/g,'');
+            }
+            if ((str.match(/\//g) || []).length > 1) {
+                err += _('Only one division symbol allowed in the units. ');
+            }
+            str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
+
+            if (str.length > 0) {
+                var pts = str.split(/\s*\*\s*/);
+                var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)$/;
+                for (var i=0; i<pts.length; i++) {
+                    if (!unitsregex.test(pts[i])) {
+                        err += _('Unknown unit ')+'"'+pts[i]+'". ';
+                    }
+                }
+            } else {
+                err += _("Missing units");
+            }
+        } else if (format.indexOf('integer')!=-1) {
+            if (!str.match(/^\s*\-?\d+\s*$/)) {
+                err += _('This is not an integer.');
+            }
+        } else {
+            if (!str.match(/^\s*\-?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
+                err += _('This is not a decimal or integer value.');
+            }
+        }
+    }
+    return {
+        err: err,
+        dispvalstr: origstr
+    };
+}
 
 function processCalculated(fullstr, format) {
   fullstr = fullstr.replace(/=/,'');
@@ -1140,6 +1268,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
   var strarr = [], submitstrarr = [], dispstrarr = [], joinchar = 'U';
   //split into array of intervals
   if (format.indexOf('list')!=-1) {
+    fullstr = fullstr.replace(/\s*,\s*/g,',');
     joinchar = ',';
     var lastpos = 0;
     for (var pos = 1; pos<fullstr.length-1; pos++) {
@@ -1179,7 +1308,7 @@ function processCalcInterval(fullstr, format, ineqvar) {
       }
       err += singlevalsyntaxcheck(vals[j], format);
       err += syntaxcheckexpr(vals[j], format);
-      if (vals[j].match(/^\s*\-?oo\s*$/)) {
+      if (vals[j].match(/^\s*\-?\+?oo\s*$/)) {
         calcvals[j] = vals[j];
       } else {
         res = singlevaleval(vals[j], format);
@@ -1254,7 +1383,7 @@ function processCalcNtuple(fullstr, format) {
 
     if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
       sub = fullstr.substring(lastcut,i).replace(/^\s+/,'').replace(/\s+$/,'');
-      if (sub=='oo' || sub=='-oo') {
+      if (sub=='oo' || sub=='+oo' || sub=='-oo') {
         outcalced += sub;
       } else {
         err += singlevalsyntaxcheck(sub, format);
@@ -1340,8 +1469,10 @@ function processSizedMatrix(qn) {
     for (var col=0; col<size[1]; col++) {
       str = document.getElementById('qn' + qn + '-' + count).value;
       str = normalizemathunicode(str);
-      err += syntaxcheckexpr(str,format);
-      err += singlevalsyntaxcheck(str,format);
+      if (str !== '') {
+        err += syntaxcheckexpr(str,format);
+        err += singlevalsyntaxcheck(str,format);
+      }
       out[row][col] = str;
       res = singlevaleval(str, format);
       err += res[1];
@@ -1434,7 +1565,7 @@ function processNumfunc(qn, fullstr, format) {
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
   var totesteqn = strprocess[0];
-  totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'');
+  totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
   var remapVars = strprocess[2].split('|');
 
   if (fullstr.match(/(<=|>=|<|>)/)) {
@@ -1491,7 +1622,7 @@ function processNumfunc(qn, fullstr, format) {
   if (successfulEvals === 0) {
     err += _("syntax error") + '. ';
   }
-  err += syntaxcheckexpr(strprocess[0], '', vars.map(escapeRegExp).join('|'));
+  err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   return {
     err: err
   };
@@ -1676,7 +1807,7 @@ function singlevalsyntaxcheck(str,format) {
   str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	if (str.match(/DNE/i)) {
 		 return '';
-	} else if (str.match(/-?oo$/) || str.match(/-?oo\W/)) {
+	} else if (str.match(/-?\+?oo$/) || str.match(/-?\+?oo\W/)) {
 		 return '';
 	} else if (str.match(/,/)) {
     return _("Invalid use of a comma.");
@@ -1702,7 +1833,7 @@ function singlevalsyntaxcheck(str,format) {
 		  str = str.replace(/_/,' ');
 	} else if (format.indexOf('scinot')!=-1) {
 		  str = str.replace(/\s/g,'');
-		  str = str.replace(/(x|X|\u00D7)/,"xx");
+		  str = str.replace(/(xx|x|X|\u00D7)/,"xx");
 		  if (!str.match(/^\-?[1-9](\.\d*)?(\*|xx)10\^(\(?\-?\d+\)?)$/)) {
 		  	if (format.indexOf('scinotordec')==-1) { //not scinotordec
 		  		return (_("not valid scientific notation")+". ");
@@ -1729,7 +1860,9 @@ function syntaxcheckexpr(str,format,vl) {
 	  } else if (format.indexOf('mixed')==-1 &&
 		str.match(/\-?\s*\d+\s*(_|\s)\s*(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/)) {
 		err += _("mixed numbers are not allowed")+". ";
-	  }
+	  } else if (format.indexOf('allowdegrees')==-1 && str.match(/degree/)) {
+        err += _("no degree symbols allowed")+". ";
+      } 
 	  var Pdepth = 0; var Bdepth = 0; var Adepth = 0;
 	  for (var i=0; i<str.length; i++) {
 		if (str.charAt(i)=='(') {
@@ -1760,7 +1893,7 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(repvars\\d+|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|"+vl+")", "ig");
+	  	  reg = new RegExp("(repvars\\d+|degree|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|"+vl+")", "ig");
 	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
 	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";
 	  	  }
@@ -1782,12 +1915,18 @@ function syntaxcheckexpr(str,format,vl) {
 
 // returns [numval, errmsg]
 function singlevaleval(evalstr, format) {
-  evalstr = evalstr.replace(/,/g, '');
+  evalstr = evalstr.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  if (evalstr.match(/,/)) {
+    return [NaN, _("syntax incomplete")+". "];
+  }
   if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
     evalstr = evalstr.replace(/%/g,'') + '/100';
   }
   if (format.indexOf('mixed')!=-1) {
     evalstr = evalstr.replace(/(\d+)\s+(\d+|\(\d+\))\s*\/\s*(\d+|\(\d+\))/g,"($1+$2/$3)");
+  }
+  if (format.indexOf('allowxtimes')!=-1) {
+    evalstr = evalstr.replace(/(xx|x|X|\u00D7)/,"*");  
   }
   if (format.indexOf('scinot')!=-1) {
       evalstr = evalstr.replace("xx","*");
@@ -1818,7 +1957,7 @@ function scopedeval(c) {
 function scopedmatheval(c) {
 	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
 		return '';
-	}
+    }
 	try {
 		return eval(prepWithMath(mathjs(c)));
 	} catch(e) {
@@ -1962,6 +2101,9 @@ function AutoSuggest(elem, suggestions)
 			break;
 
 			case ENTER:
+            if (me.highlighted > -1) {
+                ev.stopImmediatePropagation();
+            }
 			me.useSuggestion("enter");
 			return false;
 			break;
@@ -2029,7 +2171,8 @@ function AutoSuggest(elem, suggestions)
 		}
 	};
 	elem.onblur = function(ev) {
-		setTimeout(me.hideDiv,100);
+        //setTimeout(me.hideDiv,100);
+        me.hideDiv();
 	}
 
 
@@ -2134,8 +2277,8 @@ function AutoSuggest(elem, suggestions)
 		/********************************************************
 		mouseover handler for the dropdown ul
 		move the highlighted suggestion with the mouse
-		********************************************************/
-		ul.onmouseover = function(ev)
+        ********************************************************/
+        this.setHighlight = function(ev)
 		{
 			//Walk up from target until you find the LI.
 			var target = me.getEventSource(ev);
@@ -2157,14 +2300,17 @@ function AutoSuggest(elem, suggestions)
 				}
 			}
 			me.changeHighlight();
-		};
+        };
+        ul.onmouseover = me.setHighlight;
 
 		/********************************************************
 		click handler for the dropdown ul
 		insert the clicked suggestion into the input
-		********************************************************/
-		ul.onclick = function(ev)
+        ********************************************************/
+        
+		ul.onmousedown = ul.ontouchstart = function(ev)
 		{
+            me.setHighlight(ev);
 			me.useSuggestion("click");
 			me.hideDiv();
 			me.cancelEvent(ev);

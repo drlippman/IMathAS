@@ -59,10 +59,10 @@ $placeinhead = '
    }
    #homefullwidth { clear: both;}
   </style>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
 if ($myrights>15) {
 	$placeinhead .= '<script type="text/javascript">$(function() {
-  var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="img/gears.png" alt="Options"/></a>\';
+  var html = \'<div class="coursedd dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
   html += \'<ul role="menu" class="dropdown-menu dropdown-menu-right">\';
   $(".courselist-teach li[data-cid]:not(.coursegroup)").css("clear","both").each(function (i,el) {
   	var cid = $(el).attr("data-cid");
@@ -170,16 +170,24 @@ if ($myrights>10) {
 	$query .= "IF(UNIX_TIMESTAMP()<imas_courses.startdate OR UNIX_TIMESTAMP()>imas_courses.enddate,0,1) as active ";
 	$query .= "FROM imas_teachers,imas_courses ";
 	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid=:userid ";
-	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY active DESC,imas_courses.name";
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid));
+    $query .= "AND (imas_courses.available=0 OR imas_courses.available=1";
+    if ($myrights > 20) {
+        $query .= " OR (imas_courses.available=4 AND imas_courses.ownerid=:ownerid)";
+    }
+    $query .= ") ORDER BY active DESC,imas_courses.name";
+    $stm = $DBH->prepare($query);
+    if ($myrights > 20) {
+        $stm->execute(array(':userid'=>$userid, ':ownerid'=>$userid));
+    } else {
+        $stm->execute(array(':userid'=>$userid));
+    }
 	$teachhashiddencourses = false;
 	if ($stm->rowCount()==0) {
 		$noclass = true;
 	} else {
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if ($line['hidefromcourselist']==1) {
-				$teachhashiddencourses = true;
+			if ($line['hidefromcourselist']==1 || $line['available'] == 4) {
+                $teachhashiddencourses = true;
 			} else {
 				$noclass = false;
 				if (!empty($courseListOrder) && isset($courseListOrder['teach'])) {
@@ -518,11 +526,11 @@ function printCourses($data,$title,$type=null,$hashiddencourses=false) {
 			}
 		}
 		if ($hasCleanup) {
-			echo '<p class="small info"><span style="color:orange;">**</span> ';
+			echo '<p class="small info"><span class="warn">**</span> ';
 			echo _('course is scheduled for cleanup').'</p>';
 		}
 	}
-    if ($type=='take') {
+    if ($type=='take' && substr($username, 0, 4) != 'lti-') {
         echo '<div class="center"><a class="abutton" href="forms.php?action=enroll">', _('Enroll in a New Class'), '</a></div>';
     } else if ($type=='teach' && $myrights>39) {
         echo '<div class="center"><a class="abutton" href="admin/addcourse.php">', _('Add New Course'), '</a></div>';
@@ -662,11 +670,11 @@ function printMessagesGadget() {
 
 }
 function printPostsGadget() {
-	global $DBH,$page_newpostlist, $page_coursenames, $postthreads,$imasroot;
+	global $DBH,$page_newpostlist, $page_coursenames, $postthreads,$imasroot,$staticroot;
 	echo '<div role="complementary" aria-label="'._('New forum posts').'">';
 	echo '<div class="block">';
 	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
-	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"Settings\"/></a></span>";
+	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$staticroot/img/gears.png\" alt=\"Settings\"/></a></span>";
 
 	echo '<h2>', _('New forum posts'), '</h2></div>';
 	echo '<div class="blockitems">';

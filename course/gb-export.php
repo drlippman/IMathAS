@@ -25,8 +25,11 @@
 
 	if (!isset($_POST['commentloc'])) {
 		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
+        echo "<div class=breadcrumb>$breadcrumbbase ";
+        if (empty($_COOKIE['fromltimenu'])) {
+            echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+        }
+        echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; Export Gradebook</div>";
 		echo '<div id="headergb-export" class="pagetitle"><h1>Export Gradebook</h1></div>';
 
 		echo "<form method=post action=\"gb-export.php?cid=$cid&stu=" . Sanitize::encodeUrlParam($stu) . "&gbmode=" . Sanitize::encodeUrlParam($gbmode);
@@ -47,6 +50,7 @@
 
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
 		echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
+		echo '<span class="form">Include email address?</span><span class="formright"><input type="radio" name="emailcol" value="0" checked="checked"> No <input type="radio" name="emailcol" value="1" > Yes </span><br class="form" />';
 
 
 		if (isset($_GET['export'])) {
@@ -73,7 +77,8 @@
 	$commentloc = $_POST['commentloc'];  //0: interleve, 1: at end
 	$pointsln = $_POST['pointsln']; //0: on main, 1: separate line
 	$lastlogin = $_POST['lastlogin']; //0: no, 1 yes
-	$logincnt = $_POST['logincnt']; //0: no, 1 yes
+    $logincnt = $_POST['logincnt']; //0: no, 1 yes
+    $includeemail = !empty($_POST['emailcol']);
 	$hidelocked = ($_POST['locked']=='hide')?true:false;
 	$includetimes = intval($_POST['timestype']); //1 total time, 2 time on task
 
@@ -590,7 +595,7 @@ function gbinstrdisp() {
 				echo '</td>';
 				if ($commentloc==0) {
 					if (isset($gbt[$i][1][$j][1])) {
-						echo '<td>'.$gbt[$i][1][$j][1].'</td>';
+						echo '<td>'.strip_tags($gbt[$i][1][$j][1]).'</td>';
 					} else {
 						echo '<td></td>';
 					}
@@ -610,8 +615,8 @@ function gbinstrdisp() {
 			gbInstrCatCols($gbt, $i);
 		}
 		if (isset($gbcomments[$gbt[$i][4][0]])) {
-			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][0]) . '</td>';
-			echo '<td>' . Sanitize::encodeStringForDisplay($gbcomments[$gbt[$i][4][0]][1]) . '</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay(strip_tags($gbcomments[$gbt[$i][4][0]][0])) . '</td>';
+			echo '<td>' . Sanitize::encodeStringForDisplay(strip_tags($gbcomments[$gbt[$i][4][0]][1])) . '</td>';
 		} else {
 			echo '<td></td>';
 			echo '<td></td>';
@@ -632,7 +637,7 @@ function gbinstrdisp() {
 						continue;
 					}
 					if (isset($gbt[$i][1][$j][1])) {
-						echo '<td>'.$gbt[$i][1][$j][1].'</td>';
+						echo '<td>'.strip_tags($gbt[$i][1][$j][1]).'</td>';
 					} else {
 						echo '<td></td>';
 					}

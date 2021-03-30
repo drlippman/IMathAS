@@ -32,6 +32,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         $la = $this->answerBoxParams->getStudentLastAnswers();
         $options = $this->answerBoxParams->getQuestionWriterVars();
         $colorbox = $this->answerBoxParams->getColorboxKeyword();
+        $correctAnswerWrongFormat = $this->answerBoxParams->getCorrectAnswerWrongFormat();
 
         $out = '';
         $tip = '';
@@ -51,14 +52,12 @@ class FunctionExpressionAnswerBox implements AnswerBox
         if (!isset($sz)) { $sz = 20;}
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
-        $lap = explode('$f$',$la);
-        if (isset($lap[1]) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
+        if (!empty($correctAnswerWrongFormat)) {
             $rightanswrongformat = true;
             if ($colorbox=='ansred') {
                 $colorbox = 'ansorg';
             }
         }
-        $la = $lap[0];
 
         if (!isset($answerformat)) { $answerformat = '';}
     		$ansformats = array_map('trim',explode(',',$answerformat));
@@ -86,9 +85,6 @@ class FunctionExpressionAnswerBox implements AnswerBox
     				$ofunc[] = substr($variables[$i],0,strpos($variables[$i],'('));
     				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
     			}
-    		}
-    		if (($v = array_search('E', $variables))!==false) {
-    			$variables[$v] = 'varE';
     		}
 
     		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
@@ -142,8 +138,8 @@ class FunctionExpressionAnswerBox implements AnswerBox
     		if ($useeqnhelper) {
     			$params['helper'] = 1;
     		}
-    		if (!isset($hidepreview) && $_SESSION['userprefs']['livepreview']==1) {
-    			$params['preview'] = 1;
+    		if (!isset($hidepreview)) {
+    			$params['preview'] = $_SESSION['userprefs']['livepreview'] ? 1 : 2;
     		}
     		$params['calcformat'] = Sanitize::encodeStringForDisplay($answerformat);
     		$params['vars'] = $variables;
@@ -155,11 +151,10 @@ class FunctionExpressionAnswerBox implements AnswerBox
     						'class="'.implode(' ', $classes) .
     						'" />';
 
-    		if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
-    			$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
-    		}
     		if (!isset($hidepreview)) {
-    			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\"/> &nbsp;\n";
+                $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
+                $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+                $preview .= '</button> &nbsp;';
     		}
     		$preview .= "<span id=p$qn></span>\n";
 
@@ -174,7 +169,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
     			$greekletters = array('alpha','beta','chi','delta','epsilon','gamma','varphi','phi','psi','sigma','rho','theta','lambda','mu','nu','omega');
 
     			for ($i = 0; $i < count($variables); $i++) {
-    				if (strlen($variables[$i])>1 && $variables[$i]!='varE') {
+    				if (strlen($variables[$i])>1) {
     					$isgreek = false;
     					$varlower = strtolower($variables[$i]);
     					for ($j = 0; $j< count($greekletters);$j++) {
@@ -196,7 +191,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
                 if ($chg) {
                   $sa = str_replace($matches[0], $matches[1].'_'.$matches[2], $sa);
                 }
-    					} else if (!$isgreek && $variables[$i]!='varE') {
+    					} else if (!$isgreek) {
     						$sa = str_replace($variables[$i], '"'.$variables[$i].'"', $sa);
     					}
     				}
@@ -207,7 +202,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
         $this->answerBox = $out;
         $this->jsParams = $params;
         $this->entryTip = $tip;
-        $this->correctAnswerForPart = $sa;
+        $this->correctAnswerForPart = (string) $sa;
         $this->previewLocation = $preview;
     }
 

@@ -952,6 +952,7 @@ function AMstrarr2docFrag(arr, linebreaks) {
 }
 
 function AMprocessNodeR(n, linebreaks) {
+  if (typeof n === 'undefined' || n === null) { return; }
   var mtch, str, arr, frg, i;
   if (n.childNodes.length == 0) {
    if ((n.nodeType!=8 || linebreaks) &&
@@ -1001,6 +1002,7 @@ function AMprocessNodeR(n, linebreaks) {
 }
 
 function AMprocessNode(n, linebreaks, spanclassAM) {
+  if (typeof n === 'undefined' || n === null) { return; }
   var frag,st;
   if (spanclassAM!=null) {
     frag = document.getElementsByTagName("span");

@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { mapInterquestionTexts } from '@/mixins/maptexts';
 
 export const store = Vue.observable({
   assessInfo: null,
@@ -108,6 +109,8 @@ export const actions = {
           ver = store.assessInfo.assess_versions.length - 1;
         }
         // set into store
+        Vue.delete(store.assessInfo, 'interquestion_text');
+        Vue.delete(store.assessInfo, 'intro');
         Vue.set(store.assessInfo.assess_versions, ver, response);
 
         // set current versions to scored versions
@@ -127,6 +130,50 @@ export const actions = {
         Vue.nextTick(() => {
           window.initAnswerboxHighlights();
         });
+      })
+      .fail((xhr, textStatus, errorThrown) => {
+        this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
+  },
+  loadGbTexts (callback) {
+    if (store.inTransit) {
+      window.setTimeout(() => this.loadGbTexts(callback), 20);
+      return;
+    }
+    store.inTransit = true;
+    store.errorMsg = null;
+    window.$.ajax({
+      url: store.APIbase + 'gbloadtexts.php' + store.queryString,
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        const qs = [];
+        for (let i = 0; i < store.assessInfo.assess_versions[store.curAver].questions.length; i++) {
+          qs[i] = {};
+          if (store.assessInfo.assess_versions[store.curAver].questions[i][store.curQver[i]].hasOwnProperty('text')) {
+            qs[i] = { text: store.assessInfo.assess_versions[store.curAver].questions[i][store.curQver[i]].text.slice() };
+          }
+        }
+        if (response.hasOwnProperty('interquestion_text')) {
+          mapInterquestionTexts(response, qs);
+        }
+
+        Vue.set(store.assessInfo, 'intro', response.intro);
+        Vue.set(store.assessInfo, 'interquestion_text', response.interquestion_text);
+        if (callback) {
+          Vue.nextTick(() => { callback(); });
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -191,6 +238,15 @@ export const actions = {
       window.setTimeout(() => this.saveChanges(exit), 20);
       return;
     }
+    if (Object.keys(store.scoreOverrides).length === 0 &&
+      Object.keys(store.feedbacks).length === 0
+    ) {
+      store.saving = 'saved';
+      if (exit) {
+        window.location = window.exiturl;
+      }
+      return;
+    }
     const qs = store.queryString;
     store.inTransit = true;
     store.saving = 'saving';
@@ -245,12 +301,14 @@ export const actions = {
               Vue.delete(qdata.scoreoverride, pts[3]);
             }
           }
-          if (qdata.parts[pts[3]]) {
-            if (store.scoreOverrides[key] === '') {
-              Vue.delete(store.scoreOverrides, key);
-            } else {
-              qdata.parts[pts[3]].score = Math.round(1000 * store.scoreOverrides[key] * qdata.parts[pts[3]].points_possible) / 1000;
+          if (store.scoreOverrides[key]) { // set or re-set scoreoverride on question part
+            if (!qdata.scoreoverride) {
+              store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride = {};
             }
+            Vue.set(store.assessInfo.assess_versions[pts[0]].questions[pts[1]][pts[2]].scoreoverride,
+              pts[3],
+              store.scoreOverrides[key]
+            );
           }
         }
         // update question scores
@@ -359,7 +417,7 @@ export const actions = {
           // reload whole mess
           actions.loadGbAssessData();
         } else if (store.clearAttempts.type === 'practiceview') {
-          store.assessInfo.latepass_blocked_by_practice = data.latepass_blocked_by_practice;
+          store.assessInfo.latepass_status = data.latepass_status;
         } else {
           store.assessInfo.gbscore = response.gbscore;
           store.assessInfo.scored_version = response.scored_version;
@@ -477,7 +535,7 @@ export const actions = {
     } else {
       let scoreChanged = true;
       if (qdata.singlescore) {
-        scoreChanged = (Math.abs(score - qdata.rawscore) > 0.001);
+        scoreChanged = (Math.abs(score - qdata.score / qdata.points_possible) > 0.001);
       } else if (qdata.parts[pn]) {
         scoreChanged = (Math.abs(score - qdata.parts[pn].score / qdata.parts[pn].points_possible) > 0.001);
       }

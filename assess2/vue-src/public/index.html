@@ -21,6 +21,7 @@
   			}
       }
       var imasroot = '<%= process.env.VUE_APP_IMASROOT %>';
+      var staticroot = '<%= process.env.VUE_APP_IMASROOT %>';
       var APIbase = '<%= process.env.VUE_APP_IMASROOT %>/assess2/';
       var coursetheme = "<%= process.env.VUE_APP_IMASROOT %>/themes/modern.css?v=110918";
       var AMTcgiloc = 'https://www.myopenmath.com/cgi-bin/mimetex.cgi';
@@ -47,7 +48,7 @@
     <link rel="stylesheet" type="text/css" href="<%= process.env.VUE_APP_IMASROOT %>/assess2/print.css?v=110918" media="print">
     <title>vue-demo</title>
   </head>
-  <body>
+  <body class="fw1000">
   <div class="headerwrapper">
     <div id="navlistcont" role="navigation" aria-label="Course Navigation" style="font-family: &quot;Open Sans&quot;, &quot;Trebuchet MS&quot;, Arial, Helvetica, sans-serif; font-size: 14px;">
       <ul id="navlist">

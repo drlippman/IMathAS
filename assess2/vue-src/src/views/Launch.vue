@@ -36,13 +36,26 @@
         <icons name="alert" />
         {{ timeLimitExpired }}
         <br/>
-        <button
-          type="button"
-          class="primary"
-          @click="endAssess"
-        >
-          {{ $t('closed.submit_now') }}
-        </button>
+        <span v-if = "timeLimitExt !== ''">
+          <icons name="alert" />
+          {{ timeLimitExt }}
+        </span>
+        <span v-else>
+          <button
+            type="button"
+            class="primary"
+            @click="endAssess"
+          >
+            {{ $t('closed.submit_now') }}
+          </button>
+        </span>
+      </p>
+      <p
+        v-else-if="timeLimitExt !== ''"
+        class = "noticetext"
+      >
+        <icons name="alert" />
+        {{ timeLimitExt }}
       </p>
 
       <p v-if="canAddWork">
@@ -65,6 +78,11 @@
         >
           {{ $t('launch.doreset') }}
         </button>
+      </p>
+      <p v-if="showTutorLinks">
+        {{ $t('launch.gblinks') }}:
+        <a :href="aInfo.tutor_gblinks[0]" target="_blank">{{ $t('launch.scorelist') }}</a> &nbsp;
+        <a :href="aInfo.tutor_gblinks[1]" target="_blank">{{ $t('launch.itemanalysis') }}</a>
       </p>
       <p v-if="aInfo.view_as_stu" class="noticetext">
         {{ $t('launch.view_as_stu', {name: aInfo.stu_fullname}) }}
@@ -166,6 +184,15 @@ export default {
         return '';
       }
     },
+    timeLimitExt () {
+      if (this.aInfo.timelimit_ext && this.aInfo.timelimit_ext > 0 &&
+        this.aInfo.has_active_attempt
+      ) {
+        return this.$t('setlist.timelimit_ext', { n: this.aInfo.timelimit_ext });
+      } else {
+        return '';
+      }
+    },
     okToLaunch () {
       if (!this.canViewAll &&
         this.aInfo.isgroup === 3 &&
@@ -179,7 +206,8 @@ export default {
         ((store.timelimit_expired &&
         this.aInfo.timelimit_type === 'kick_out') ||
         (store.timelimit_grace_expired &&
-        this.aInfo.timelimit_type === 'allow_overtime'))
+        this.aInfo.timelimit_type === 'allow_overtime')) &&
+        this.timeLimitExt === ''
       ) {
         return false;
       }
@@ -204,6 +232,9 @@ export default {
         this.aInfo.submitby === 'by_question') &&
         this.aInfo.showwork_after
       );
+    },
+    showTutorLinks () {
+      return this.aInfo.hasOwnProperty('tutor_gblinks');
     }
   },
   methods: {
@@ -257,6 +288,7 @@ export default {
     }
     setTimeout(window.drawPics, 50);
     window.rendermathnode(this.$refs.summary);
+    window.initlinkmarkup(this.$refs.summary);
   }
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <a href="#" class="sr-only" @click.prevent="$refs.scrollpane.focus()">
+    <a href="#" class="sr-only" id="skipnav" @click.prevent="$refs.scrollpane.focus()">
       {{ $t('jumptocontent') }}
     </a>
     <assess-header />
@@ -13,7 +13,7 @@
       :aria-label="$t('regions.questions')"
     >
       <intro-text
-        :active = "page === -1 && intro !== ''"
+        :active = "page === -1 && hasIntro"
         :html = "intro"
       />
       <div
@@ -25,7 +25,8 @@
         <div v-if = "pageData[0].questions.length === 0">
           <inter-question-text-list
             pos="all"
-            :page="pagenum"
+            :textlist = "pageTexts"
+            :lastq = "lastQ"
             :active = "pagenum === page"
           />
         </div>
@@ -38,7 +39,8 @@
               pos="beforeexact"
               :qn="curqn"
               :key="'iqt'+curqn"
-              :page="pagenum"
+              :textlist = "pageTexts"
+              :lastq = "lastQ"
               :active = "pagenum === page"
             />
             <div>
@@ -55,7 +57,8 @@
           <inter-question-text-list
             pos="after"
             :qn="pageData[0].questions[pageData[0].questions.length - 1]"
-            :page="pagenum"
+            :textlist = "pageTexts"
+            :lastq = "lastQ"
             :active = "pagenum === page"
           />
         </div>
@@ -112,8 +115,28 @@ export default {
     intro () {
       return store.assessInfo.intro;
     },
+    hasIntro () {
+      return (store.assessInfo.intro !== '' || store.assessInfo.resources.length > 0);
+    },
     showSubmit () {
       return (store.assessInfo.submitby === 'by_assessment');
+    },
+    pageTexts () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_pages') ||
+        !store.assessInfo.interquestion_pages.hasOwnProperty(this.page)
+      ) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_pages[this.page];
+      }
+    },
+    lastQ () {
+      if (typeof this.page === 'undefined' || this.page < 0) {
+        return store.assessInfo.questions.length - 1;
+      } else {
+        const qlist = store.assessInfo.interquestion_pages[this.page][0].questions;
+        return qlist[qlist.length - 1];
+      }
     }
   },
   methods: {

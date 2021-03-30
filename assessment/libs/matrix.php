@@ -4,17 +4,17 @@
 //Contributors:  David Lippman, Larry Green
 
 global $allowedmacros;
-array_push($allowedmacros,"matrix","matrixformat","matrixsystemdisp","matrixsum",
+array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsystemdisp","matrixsum",
 	"matrixdiff","matrixscalar","matrixprod","matrixaugment","matrixrowscale",
 	"matrixrowswap","matrixrowcombine","matrixrowcombine3","matrixidentity",
 	"matrixtranspose","matrixrandinvertible","matrixrandunreduce","matrixinverse",
 	"matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry",
 	"matrixRandomSpan","matrixNumberOfRows","matrixNumberOfColumns",
 	"matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce",
-	"matrixnumsolutions","matrixround",
+	"matrixnumsolutions","matrixround","matrixCompare",
 	"matrixGetRank","arrayIsZeroVector","matrixFormMatrixFromEigValEigVec",
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
-	"matrixGetRowSpace","matrixGetColumnSpace",
+	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
 	"matrixAxbHasSolution","matrixAspansB","matrixAbasisForB",
 	"matrixGetMinor","matrixDet","matrixRandomMatrix","matrixParseStuans");
 
@@ -45,7 +45,7 @@ function matrix($vals,$rows,$cols) {
 
 //matrixformat(matrix)
 //Formats a matrix item into an ASCIIMath string for display or $answer
-function matrixformat($m, $bracket='[') {
+function matrixformat($m, $bracket='[', $asfraction=false) {
 	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
 	if ($bracket == '(') {
 		$rb = ')';
@@ -64,13 +64,21 @@ function matrixformat($m, $bracket='[') {
 		for ($j=0;$j<count($m[0]); $j++) {
 			if ($j!=0) {
 				$out .= ',';
-			}
-			$out.= $m[$i][$j];
+            }
+            if ($asfraction) {
+                $out .= decimaltofraction($m[$i][$j]);
+            } else {
+                $out.= $m[$i][$j];
+            }
 		}
 		$out .= ')';
 	}
 	$out .= $rb;
 	return $out;
+}
+
+function matrixformatfrac($m, $bracket='[') {
+    return matrixformat($m, $bracket, true);
 }
 
 //matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
@@ -87,12 +95,12 @@ function matrixformat($m, $bracket='[') {
 //                    table, either 0 or 1.  Use 0 if you are
 //                    building an answerbox matrix.
 //
-//                   0 do not use math ticks
-//           default 1        use math ticks
+//              def  0 do not use math ticks
+//                   1        use math ticks
 //
 // linemode: Show none, augments, or simplex style
-//           0 show no lines
-//   default 1 show aumented line
+//      def  0 show no lines
+//           1 show aumented line
 //           2 show simplex  lines
 //
 // headernames: list or array of the variables "x1,x2,x3" that are
@@ -130,7 +138,6 @@ function matrixdisplaytable() {
     return "";
   }
   $m = $args[0];
-	if (!isMatrix($m)) { echo 'error: input not a matrix'; return '';}
 
   // matrixname
   if($args[1]!=null) {
@@ -239,11 +246,13 @@ $Tableau .= "<tbody>\r\n";
     if($rloop==0) {
         if($matrixname!="") {
             if(!empty($headers)) { $matricnamerows = $rows+1; } else { $matricnamerows = $rows; }
+            // Accessible option added
             $Tableau.= "<td rowspan='$matricnamerows'> $matrixname </td>\r\n";
         }
 
         if(!empty($headers))  {
             if($rowheader!="") {
+                // Accessible option added
                 $Tableau.= "<th scope=\"col\">$rowheader</th>\r\n";
             } else {
                 if($rownames!=null) {
@@ -259,6 +268,7 @@ $Tableau .= "<tbody>\r\n";
                 }
                 if(($headers[$cloop]!=null)&&($headers[$cloop]!=""))
                 {
+                    // Accessible option added
                     $Tableau.= "<th scope=\"col\">".$headers[$cloop]."</th>\r\n";
                 }
                 else
@@ -271,6 +281,7 @@ $Tableau .= "<tbody>\r\n";
     }
 
     if(!empty($rownames))  {
+        // Accessible option added
         if(($rownames[$rloop]!=null)&&($rownames[$rloop]!="")) {
             $Tableau.= "<th scope=\"row\">".$rownames[$rloop]."</th>\r\n";
         } else {
@@ -279,17 +290,21 @@ $Tableau .= "<tbody>\r\n";
     }
 
     for ($cloop=0;$cloop<$cols; $cloop++) {
-        $index =$rloop*$ctemp + $cloop;
+        //$index =$rloop*$ctemp + $cloop;
 
-        $TableElement = "&nbsp;".$ticks.$m[$rloop][$cloop].$ticks."&nbsp;";
+        //$TableElement = "&nbsp;".$ticks.$m[$rloop][$cloop].$ticks."&nbsp;";
+        $TableElement = $ticks.$m[$rloop][$cloop].$ticks;
 
         if ($rloop==0) {
             if($rows==1)  {
                 // only 1 row
                 if ($cloop==0) { // R1C1
                     $Tableau.= "<td $onerowleftborder>&nbsp;</td>\r\n<td $pivotsyle>$TableElement</td>\r\n";
+                    if($cloop==$lastcol) {
+                        $Tableau.= "<td $onerowrightborder>&nbsp;</td>\r\n";
+                    }
                 }
-                elseif  ($cloop==$lastcol) { // R1C(Last)
+                elseif ($cloop==$lastcol) { // R1C(Last)
                     if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n";} // add augemented column
                     $Tableau.= "<td>$TableElement</td><td $onerowrightborder>&nbsp;</td>\r\n";
                 }
@@ -301,6 +316,9 @@ $Tableau .= "<tbody>\r\n";
                 // top row
                 if ($cloop==0) { // R1C1
                     $Tableau.= "<td $topleftborder>&nbsp;</td>\r\n<td>$TableElement</td>\r\n";
+                    if($cloop==$lastcol) {
+                        $Tableau.= "<td $toprightborder>&nbsp;</td>\r\n";
+                    }
                 }
                 elseif  ($cloop==$lastcol) { // R1C(Last)
                     if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n";} // add augemented column
@@ -319,6 +337,9 @@ $Tableau .= "<tbody>\r\n";
                 }
                 else {
                     $Tableau.= "<td>$TableElement</td>\r\n";
+                }
+                if  ($cloop==$lastcol){  // R(last)C(Last)
+                    $Tableau.= "<td $bottomrightborder>&nbsp;</td>\r\n";
                 }
             }
             elseif  ($cloop==$lastcol){  // R(last)C(Last)
@@ -344,6 +365,9 @@ $Tableau .= "<tbody>\r\n";
         else {
             if ($cloop==0) {
                 $Tableau.= "<td $leftborder>&nbsp;</td><td>$TableElement</td>\r\n";
+                if ($cloop==$lastcol) {
+                    $Tableau.= "<td $rightborder>&nbsp;</td>\r\n";
+                }
             }
             elseif ($cloop==$lastcol) {
                 if($mode>0) { $Tableau.= "<td $nopad>&nbsp;</td><td $leftborder >&nbsp;</td>\r\n"; }
@@ -1279,7 +1303,7 @@ function matrixAbasisForB($A,$B){
 	if(matrixAspansB($A,$B)==false){
 		$retVal = false;
 	}
-	if(matrixIsLinInd($A)==false){
+	if(matrixIsRowsLinInd($A)==false){
 		$retVal = false;
 	}
 	return($retVal);
@@ -1329,6 +1353,7 @@ function matrixDet($A){
 		return ($A[0][0]*$A[1][1] - $A[0][1]*$A[1][0]);
 	}
 	else{
+        $retVal = 0;
 		for($i=0;$i<count($A);$i++){
 			if ($A[0][$i]!=0) {
 				$retVal += pow(-1,$i)*$A[0][$i]*matrixDet(matrixGetMinor($A,0,$i));
@@ -1377,13 +1402,16 @@ function matrixNumberOfColumns($m){
 function matrixParseStuans($stu) {
 	if ($stu === null) {
 		return array(); 
-	} else if (substr($stu,0,2)=='[(') {
-		$ansr = substr($stu,2,-2);
-		$ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
-		return explode(',',$ansr);
 	} else {
-		return explode('|', $stu);
-	}
+        $start = substr($stu,0,2);
+        if ($start=='[(' || $start=='((' || $start=='|(') {
+            $ansr = substr($stu,2,-2);
+            $ansr = preg_replace('/\)\s*\,\s*\(/',',',$ansr);
+            return explode(',',$ansr);
+        } else {
+            return explode('|', $stu);
+        }
+    }
 }
 
 function isMatrix($m) {
@@ -1393,4 +1421,157 @@ function isMatrix($m) {
 		return false;
 	}
 }
+
+function matrixFromEigenvals($values) {
+    $size = 0;
+    foreach ($values as $v) {
+        $size += is_array($v) ? 2 : 1;
+    }
+    $m = matrixidentity($size);
+    $mi = matrixidentity($size);
+    $d = [];
+    $ops = array();
+    if ($size > 2) {
+        $ord = diffrands(0,$size-2,$size-1);
+    } else {
+        $ord = [0];
+    }
+    $ord[] = $size-1;
+    $mults = nonzerodiffrands(-3,3,$size*2,'def',true);
+	for ($i=1; $i<$size; $i++) {
+        $er = $ord[$i];
+        $sr = $ord[$i-1];
+        $ops[] = array($sr, $er, $mults[$i-1]);
+		$m = matrixrowcombine($m,$sr,$mults[$i-1],$er,1,$er);
+    }
+    
+    $n = 0;
+    // real evals will get one row as evec
+    // complex evals will get one row for imag, and next for real part
+    $realrows = [];
+    foreach ($values as $i=>$v) {
+        $d[$n] = array_fill(0,$size,0);
+        if (is_array($v)) {
+            // add multiple of last row to real rows
+            if ($n+1 != $size-1) {
+                $mult = abs($mults[$size+$i]);
+                $ops[] = array($size-1, $n+1, $mult);
+                $m = matrixrowcombine($m,$size-1,$mult,$n+1,1,$n+1);
+                $realrows[] = $n+1;
+            }
+            $d[$n+1] = array_fill(0,$size,0);
+            $d[$n][$n] = $values[$i][0];
+            $d[$n][$n+1] = -$values[$i][1];
+            $d[$n+1][$n] = $values[$i][1];
+            $d[$n+1][$n+1] = $values[$i][0];
+            $n += 2;
+        } else {
+            // add multiple of last row to real rows
+            if ($n != $size-1) {
+                $mult = $mults[$size+$i];
+                $ops[] = array($size-1, $n, $mult);
+                $m = matrixrowcombine($m,$size-1,$mult,$n,1,$n);
+                $realrows[] = $n;
+            }
+            $d[$n][$n] = $values[$i];
+            $n++;
+        }
+    }
+
+    $sr = randfrom($realrows);
+    $mult = $GLOBALS['RND']->rand(-1,1);
+    if (is_array($values[count($values)-1]) && $m[$sr][$size-1]*$mult < 0) {
+        $mult *= -1;
+    }
+    $ops[] = array($sr,$size-1, $mult);
+    $m = matrixrowcombine($m,$sr,$mult,$size-1,1,$size-1);
+
+    for ($i=count($ops)-1; $i>-1; $i--) {
+        $mi = matrixrowcombine($mi,$ops[$i][0],-1*$ops[$i][2],$ops[$i][1],1,$ops[$i][1]);
+    }
+    
+    $evecs = [];
+    $r = 0;
+    foreach ($values as $v) {
+        if (!is_array($v)) { // real: use row as e-vec
+            $evecs[] = $m[$r];
+            $r++;
+        } else { // complex: use two rows as real and complex
+            $vec = [];
+            for ($i=0; $i<$size; $i++) {
+                $vec[] = [$m[$r+1][$i], $m[$r][$i]];
+            }
+            $evecs[] = $vec;
+            $r += 2;
+        }
+    }
+
+    $p = matrixtranspose($m);
+    $pinv = matrixtranspose($mi);
+    $A = matrixprod(matrixprod($p, $d), $pinv);
+    return [$A,$evecs];
+}
+
+function matrixFormatEigenvecs($evecs) {
+    $out = [];
+    foreach ($evecs as $evec) {
+        $elpts = []; $elpts2 = [];
+        $iscomplex = false;
+        foreach ($evec as $v) {
+            if (is_array($v)) {
+                $elpts[] = formatcomplex($v[0], $v[1]);
+                $elpts2[] = formatcomplex($v[0], -1*$v[1]);
+                $iscomplex = true;
+            } else {
+                $elpts[] = $v;
+                $elpts2[] = $v;
+            }
+        }
+        $out[] = '[('.implode('),(', $elpts).')]';
+        if ($iscomplex) {
+            $out[] = '[('.implode('),(', $elpts2).')]';
+        }
+    }
+    return $out;
+}
+
+function matrixCompare($m,$n,$tol='.001') {
+	// $m stu, $n correct
+	if (!is_array($m) || !is_array($n) || !is_array($m[0]) || !is_array($n[0])) {
+		return false;
+	}
+	if (count($m) != count($n) || count($m[0]) != count($n[0])) {
+		return false;
+	}
+	$toltype = 'rel';
+	if ($tol[0]=='|') {
+		$toltype = 'abs';
+		$tol = substr($tol,1);
+	}
+	$isequiv = true;
+	for ($r = 0 ; $r < count($m); $r++) {
+		for ($c = 0; $c < count($m[0]); $c++) {
+			if ($toltype == 'rel') {
+				if (abs($n[$r][$c]) < 1E-12) {
+					if (abs($m[$r][$c] - $n[$r][$c]) > $tol/1000 + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				} else {
+					if (abs($m[$r][$c] - $n[$r][$c])/(abs($n[$r][$c])+1E-12) > $tol + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				}
+			} else {
+				if (abs($m[$r][$c] - $n[$r][$c]) > $tol + 1E-12) {
+					$isequiv = false;
+					break 2;
+				}
+			}
+		}
+	}
+	return $isequiv;
+}
+
 ?>

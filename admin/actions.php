@@ -66,7 +66,7 @@ switch($_POST['action']) {
 		}
 
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$_POST['adminname']));
+		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($_POST['SID'])));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		$chgSID = true;
 		if ($row != null) {
@@ -165,15 +165,23 @@ switch($_POST['action']) {
 		}
 
 		//if student being promoted, enroll in teacher enroll courses
-		if ($oldrights<=10 && $_POST['newrights']>=20 && isset($CFG['GEN']['enrollonnewinstructor'])) {
-			$valbits = array();
-			$valvals = array();
-			foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
-				$valbits[] = "(?,?)";
-				array_push($valvals, $_GET['id'], $ncid);
-			}
-			$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
-			$stm->execute($valvals);
+		if ($oldrights<=10 && $_POST['newrights']>=20) {
+            if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+                $stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
+                $stm->execute([$_GET['id']]);
+                $existingEnroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+                $toEnroll = array_diff($CFG['GEN']['enrollonnewinstructor'], $existingEnroll);
+                if (count($toEnroll) > 0) {
+                    $valbits = array();
+                    $valvals = array();
+                    foreach ($toEnroll as $ncid) {
+                        $valbits[] = "(?,?)";
+                        array_push($valvals, $_GET['id'], $ncid);
+                    }
+                    $stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits));
+                    $stm->execute($valvals);
+                }
+            }
 
 
 			//log new account
@@ -464,11 +472,13 @@ switch($_POST['action']) {
 			$theme = $_POST['theme'];
 		}
 
+        $unenroll = 0;
 		if (isset($CFG['CPS']['unenroll']) && $CFG['CPS']['unenroll'][1]==0) {
 			$unenroll = $CFG['CPS']['unenroll'][0];
-		} else {
-			$unenroll = $_POST['allowunenroll'] + $_POST['allowenroll'];
-		}
+		} else if (isset($CFG['CPS']['unenroll'])) {
+			$unenroll = $_POST['allowunenroll'];
+        }
+        $unenroll += empty($_POST['allowenroll']) ? 2 : 0;
 
 		if (isset($CFG['CPS']['copyrights']) && $CFG['CPS']['copyrights'][1]==0) {
 			$copyrights = $CFG['CPS']['copyrights'][0];
@@ -636,19 +646,28 @@ switch($_POST['action']) {
 			}
 		} else {
 			$_POST['courselevel'] = '';
-		}
+        }
+        $ltisendzeros = !empty($_POST['ltisendzeros']) ? 1 : 0;
 
 		if ($_POST['action']=='modify') {
 			$query = "UPDATE imas_courses SET name=:name,enrollkey=:enrollkey,available=:available,lockaid=:lockaid,showlatepass=:showlatepass,";
 			if ($updateJsonData) {
 				$query .= "jsondata=:jsondata,";
 			}
-			$query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,deftime=:deftime,deflatepass=:deflatepass,latepasshrs=:latepasshrs,dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate,cleanupdate=:cleanupdate,level=:level WHERE id=:id";
-			$qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
-				':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset,
-				':toolset'=>$toolset, ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':istemplate'=>$istemplate,
-				':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':latepasshrs'=>$latepasshrs, ':cleanupdate'=>$old_course_settings['cleanupdate'], ':level'=> $_POST['courselevel'], ':id'=>$_GET['id']);
+            $query .= "allowunenroll=:allowunenroll,copyrights=:copyrights,msgset=:msgset,
+                toolset=:toolset,theme=:theme,ltisecret=:ltisecret,istemplate=:istemplate,
+                deftime=:deftime,deflatepass=:deflatepass,latepasshrs=:latepasshrs,
+                dates_by_lti=:ltidates,startdate=:startdate,enddate=:enddate,
+                cleanupdate=:cleanupdate,level=:level,ltisendzeros=:ltisendzeros WHERE id=:id";
+            $qarr = array(':name'=>$_POST['coursename'], ':enrollkey'=>$_POST['ekey'], 
+                ':available'=>$avail, ':lockaid'=>$_POST['lockaid'],
+                ':showlatepass'=>$showlatepass, ':allowunenroll'=>$unenroll, 
+                ':copyrights'=>$copyrights, ':msgset'=>$msgset,	':toolset'=>$toolset, 
+                ':theme'=>$theme, ':ltisecret'=>$_POST['ltisecret'], ':istemplate'=>$istemplate,
+                ':deftime'=>$deftime, ':deflatepass'=>$deflatepass, ':ltidates'=>$setdatesbylti, 
+                ':startdate'=>$startdate, ':enddate'=>$enddate,	':latepasshrs'=>$latepasshrs, 
+                ':cleanupdate'=>$old_course_settings['cleanupdate'], ':level'=> $_POST['courselevel'], 
+                ':ltisendzeros'=>$ltisendzeros, ':id'=>$_GET['id']);
 			if ($myrights<75) {
 				$query .= " AND ownerid=:ownerid";
 				$qarr[':ownerid']=$userid;
@@ -747,13 +766,13 @@ switch($_POST['action']) {
 			}
 
 			$DBH->beginTransaction();
-			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,level,ltisecret,dates_by_lti,blockcnt,UIver) VALUES ";
-			$query .= "(:name, :ownerid, :enrollkey, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :level, :ltisecret, :ltidates, :blockcnt, :UIver);";
+			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,allowunenroll,copyrights,msgset,toolset,showlatepass,itemorder,available,startdate,enddate,istemplate,deftime,deflatepass,latepasshrs,theme,level,ltisecret,dates_by_lti,blockcnt,UIver,ltisendzeros) VALUES ";
+			$query .= "(:name, :ownerid, :enrollkey, :allowunenroll, :copyrights, :msgset, :toolset, :showlatepass, :itemorder, :available, :startdate, :enddate, :istemplate, :deftime, :deflatepass, :latepasshrs, :theme, :level, :ltisecret, :ltidates, :blockcnt, :UIver, :ltisendzeros);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':name'=>$_POST['coursename'], ':ownerid'=>$courseownerid, ':enrollkey'=>$_POST['ekey'],
 				':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':toolset'=>$toolset, ':showlatepass'=>$showlatepass,
 				':itemorder'=>$itemorder, ':available'=>$avail, ':istemplate'=>$istemplate, ':deftime'=>$deftime, ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':level'=>$_POST['courselevel'], ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt, ':UIver'=>$destUIver));
+				':deflatepass'=>$deflatepass, ':latepasshrs'=>$latepasshrs, ':theme'=>$theme, ':level'=>$_POST['courselevel'], ':ltisecret'=>$ltisecret, ':ltidates'=>$setdatesbylti, ':blockcnt'=>$blockcnt, ':UIver'=>$destUIver, ':ltisendzeros'=>$ltisendzeros));
 			$cid = $DBH->lastInsertId();
 
 			//call hook, if defined
@@ -894,6 +913,9 @@ switch($_POST['action']) {
 				}
 				if (!empty($_POST['copyrubrics'])) {
 					copyrubrics();
+				}
+				if (!empty($_POST['copyallcalitems'])) {
+					copyallcalitems($_POST['usetemplate'], $cid);
 				}
 			}
 			if ($setdatesbylti==1) {
@@ -1113,8 +1135,14 @@ switch($_POST['action']) {
 		$stm = $DBH->prepare('UPDATE imas_users SET groupid=? WHERE groupid=?');
 		$stm->execute(array($newgroup, $oldgroup));
 		$stm = $DBH->prepare("DELETE FROM imas_groups WHERE id=:id");
-		$stm->execute(array(':id'=>$oldgroup));
-		break;
+        $stm->execute(array(':id'=>$oldgroup));
+        // move over ipeds, skipping over duplicates
+        $stm = $DBH->prepare('UPDATE IGNORE imas_ipeds_group SET groupid=? WHERE groupid=?');
+        $stm->execute(array($newgroup, $oldgroup));
+        // if update failed, is a duplicate; delete them
+        $stm = $DBH->prepare('DELETE FROM imas_ipeds_group WHERE groupid=?');
+        $stm->execute(array($oldgroup));
+  		break;
 	case "delgroup":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
 		$stm = $DBH->prepare("DELETE FROM imas_groups WHERE id=:id");

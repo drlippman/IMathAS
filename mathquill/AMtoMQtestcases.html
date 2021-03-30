@@ -18,6 +18,7 @@
 <input type="button" onclick="loadcase(8)" value="testcase 9"/>
 <input type="button" onclick="loadcase(9)" value="testcase 10"/>
 <input type="button" onclick="loadcase(10)" value="testcase 11"/>
+<input type="button" onclick="loadcase(11)" value="testcase 12"/>
 <br/>
 
 
@@ -41,7 +42,8 @@ var testcases = [ //each is TeX, Asciimath
 	['2=4+2<9\\le10\\text{ or }3>5\\text{all real numbers}', '2=4+2<9<=10 or 3>5all real numbers', 'Equations and inequalities. '],  //equations and inequalities
 	['\\left(2,3\\right)+\\langle{\\frac{2}{3},4}+\\left\\{2,3,4\\right\\}', '(2,3)+<<2/3,4>>+{2,3,4}', 'Points and vectors.  To distinguish angle brackets from inequalities, I\'ll need to adjust the grader to accept &lt;&lt;2,3&gt;&gt; for vector input. MathQuill has a weird format for langle.  '], //points and vectors
 	['\\left(1,2\\right]\\cup\\left[2,3\\right)\\cup(3,4)\\cup[4,5]', '(1,2]U[2,3)U(3,4)U[4,5]', 'Intervals. IMathAS uses U as input for union, but that is not really AsciiMath, so this is a bit hacked up.'],
-	['\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}', '[(1,2),(3,4)]', 'Matrices.']
+    ['\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}', '[(1,2),(3,4)]', 'Matrices.'],
+    ['H^--3+A_-^3+C^{-2}-4', 'H^- -3+A_-^3+C^-2-4', 'Negative in subsup']
 ];
 var latexMath, latexSource, amSource, AMTsource, outMath;
 var MQ = MathQuill.getInterface(2);

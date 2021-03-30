@@ -1,0 +1,512 @@
+<?php
+
+$init_session_start = true;
+require("init_without_validate.php");
+require_once(__DIR__.'/includes/newusercommon.php');
+require_once(__DIR__."/includes/email.php");
+
+
+$pagetitle = "New instructor account request";
+$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/ipedssearch.js"></script>';
+$placeinhead .= '<style type="text/css">div { margin: 0px; padding: 0px;}</style>';
+$placeinhead .= '<style>
+span.form, span.formright {
+    width: 100%;
+    float: none;
+    text-align: left;
+    padding-right: 0;
+    margin-bottom: 2px;
+}
+span.formright {
+    margin-bottom: 15px;
+}
+br.form {
+    display:none;
+}
+input, select {
+    flex-grow: 1;
+}
+#newinstrform {
+    width: 500px;
+    margin: auto;
+}
+
+.tablist a.disabled {
+    cursor: default;
+    text-decoration: none;
+    color: #666;
+}
+
+</style>';
+$nologo = true;
+
+require("header.php");
+$pagetitle = "Instructor Account Request";
+require("infoheader.php");
+
+/**
+ * Handle postback:
+ *  - Create user account
+ *  - Enroll in teacher courses
+ *  - Send email
+ *  - Store upload if provided
+ *  - Create request data
+ *  - Adjust approvepending2
+ *    - display new info
+ *    - If ipeds linked to group, preselect group, or provide selector of just the linked groups
+ *    - If not, establish link to selected group on approval
+ *    - Create custom ipeds records for Intl requests
+ */
+if (isset($_POST['firstname'])) {
+    $error = '';
+    if ($_POST['challenge'] !== $_SESSION['challenge'] || !empty($_POST['hval'])) {
+        $error .= "<p>Invalid submission</p>";
+    }
+    if (!isset($_POST['agree'])) {
+        $error .= "<p>You must agree to the Terms and Conditions to set up an account</p>";
+    }
+    $required = array('SID','firstname','lastname','email','pw1','pw2',
+        'schooltype','schoolloc','vertype');
+    $error .= checkNewUserValidation($required);
+    $otherschool = '';
+    if ($_POST['schoolloc'] == 'us') {
+        if ($_POST['ipeds'] === '') {
+            $error .= '<p>Institution is required</p>';
+        } else {
+            $ipeds = $_POST['ipeds'];
+        }
+        if ($ipeds == '0') {
+            if (empty($_POST['otherschool'])) {
+                $error .= '<p>School name is required</p>';
+            } else {
+                $otherschool = $_POST['otherschool'];
+            }
+        }
+    } else {
+        if (empty($_POST['country'])) {
+            $error .= '<p>Country is required</p>';
+        } else {
+            $_POST['schoolloc'] = $_POST['country'];
+        }
+        if ($_POST['intlipeds'] === '') {
+            $error .= '<p>Institution is required</p>';
+        } else {
+            $ipeds = $_POST['intlipeds'];
+        }
+        if ($ipeds == '0') {
+            if (empty($_POST['otherschool'])) {
+                $error .= '<p>School name is required</p>';
+            } else {
+                $otherschool = $_POST['otherschool'];
+            }
+        }
+    }
+    if ($error == '') {
+        if ($_POST['vertype'] == 'url') {
+            if (empty($_POST['verurl'])) {
+                $error .= '<p>Verification URL is required</p>';
+            }
+            $verdata = $_POST['verurl'];
+            
+        } else if ($_POST['vertype'] == 'email') {
+            if (empty($_POST['veremail'])) {
+                $error .= '<p>Verification email is required</p>';
+            }
+            $verdata = $_POST['veremail'];
+        } else if ($_POST['vertype'] == 'upload') {
+            // handle upload 
+            require_once('./includes/filehandler.php');
+            // check file extension for OK
+            $extension = strtolower(pathinfo($_FILES['verupload']['name'], PATHINFO_EXTENSION));
+            if (in_array($extension, array("gif", "jpg", "png", "jpeg", "pdf"))) {
+                // change filename
+                $key = 'instrreq/'.uniqid('img').'.'.$extension;
+                if (storeuploadedfile('verupload', $key, 'private')) {
+                    $verdata = 'file:'.$key;
+                } else {
+                    $error .= '<p>Error with file upload</p>';
+                }
+            } else {
+                $error .= '<p>Error invalid file type</p>';
+            }
+        }
+    }
+    if ($error != '') {
+        echo $error;
+    } else {
+        $now = time();
+        $reqdata = array(
+            'reqmade'=>$now, 
+            'schooltype' => $_POST['schooltype'],
+            'schoolloc' => $_POST['schoolloc'],  // country
+            'ipeds' => $ipeds,
+            'otherschool' => $otherschool,
+            'vertype' => $_POST['vertype'],
+            'verdata' => $verdata
+        );
+
+        if (isset($CFG['GEN']['homelayout'])) {
+            $homelayout = $CFG['GEN']['homelayout'];
+        } else {
+            $homelayout = '|0,1,2||0,1';
+        }
+
+        if (isset($CFG['GEN']['newpasswords'])) {
+            require_once("./includes/password.php");
+            $md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
+        } else {
+            $md5pw = md5($_POST['pw1']);
+        }
+        $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
+        $query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :homelayout);";
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>12,
+            ':FirstName'=>Sanitize::stripHtmlTags($_POST['firstname']),
+            ':LastName'=>Sanitize::stripHtmlTags($_POST['lastname']),
+            ':email'=>Sanitize::emailAddress($_POST['email']),
+            ':homelayout'=>$homelayout));
+        $newuserid = $DBH->lastInsertId();
+        if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+            $valbits = array();
+            foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+              $ncid = intval($ncid);
+                $valbits[] = "($newuserid,$ncid)";
+            }
+            $stm = $DBH->query("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits)); //known INTs - safe
+        }
+        $headers  = 'MIME-Version: 1.0' . "\r\n";
+        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        $headers .= "From: $installname <$sendfrom>\r\n";
+        $subject = "New Instructor Account Request";
+        $message = "Name: {$_POST['firstname']} {$_POST['lastname']} <br/>\n";
+        $message .= "Email: {$_POST['email']} <br/>\n";
+        $message .= "Username: {$_POST['SID']} <br/>\n";
+        foreach ($reqdata as $k=>$v) {
+            $message .= $k . ': ' . Sanitize::encodeStringForDisplay($v) . "<br>\n";
+        }
+        send_email($accountapproval, $sendfrom, $subject, $message, array(), array(), 10);
+
+        $stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,0,?,?)");
+        $stm->execute(array($newuserid, $now, json_encode($reqdata, JSON_INVALID_UTF8_IGNORE)));
+
+        $message = "<p>Your new account request has been sent.</p>  ";
+        $message .= "<p>This request is processed by hand, so please be patient.</p>";
+        send_email(Sanitize::emailAddress($_POST['email']), $sendfrom, $subject, $message, array(), array(), 10);
+
+        echo $message;
+        require("footer.php");
+        exit;
+    }
+}
+
+if (isset($_POST['firstname'])) {$firstname=$_POST['firstname'];} else {$firstname='';}
+if (isset($_POST['lastname'])) {$lastname=$_POST['lastname'];} else {$lastname='';}
+if (isset($_POST['email'])) {$email=$_POST['email'];} else {$email='';}
+if (isset($_POST['phone'])) {$phone=$_POST['phone'];} else {$phone='';}
+if (isset($_POST['school'])) {$school=$_POST['school'];} else {$school='';}
+if (isset($_POST['verurl'])) {$verurl=$_POST['verurl'];} else {$verurl='';}
+if (isset($_POST['SID'])) {$username=$_POST['SID'];} else {$username='';}
+
+$_SESSION['challenge'] = uniqid();
+
+?>
+<form method=post id=newinstrform class="limitaftervalidate tabwrap" action="newinstructor-ipeds.php" enctype="multipart/form-data">
+<h1>New Instructor Account Request</h1>
+
+<ul class="tablist" role="tablist">
+    <li class="active">
+        <a href="#" role="tab" id="tab1" aria-controls="step1"
+            aria-selected="true" onclick="setActiveTab(this);return false;"
+        >
+            Step 1
+        </a>
+    </li>
+    <li>
+        <a href="#" role="tab" id="tab2" aria-controls="step2"
+            aria-selected="true" class="disabled" onclick="return false;"
+        >
+            Step 2
+        </a>
+    </li>
+    <li>
+        <a href="#" role="tab" id="tab3" aria-controls="step3"
+            aria-selected="true" class="disabled" onclick="return false;"
+        >
+            Step 3
+        </a>
+    </li>
+</ul>
+<div class="tabpanel" id="step1" aria-labelledby="tab1 tabhdr1">
+<h2 id="tabhdr1">School Affiliation</h2>
+<span class=form><label for="schooltype">What kind of institution do you work for?</label><br>
+    <span class=small>Note: We do not provide instructor accounts to 
+    parents, home-schools, or tutors</span></span>
+<span class=formright><select name=schooltype id=schooltype>
+    <option value="">Select...</option>
+    <option value="coll">A College or University</option>
+    <option value="pubk12">A Public K-12 School</option>
+    <option value="privk12">A Private K-12 School</option>
+    </select></span><br class=form>
+
+<div id=locwrap style="display:none">
+    <span class=form><label for=schooloc>Where is it located?</label></span>
+    <span class=formright><select name=schoolloc id=schoolloc>
+        <option value="">Select...</option>
+        <option value="us">United States or U.S. Territories</option>
+        <option value="intl">Outside the United States</option>
+        </select></span><br class=form>
+</div>
+
+<div id=ussel class=selopt style="display:none">
+    <span class=form>
+        <span class="collsrc locdesc" style="display:none">
+            Please enter the name of your institution or it's 5-digit ZIP code and click Search,
+            then select your institution from the list.
+        </span>
+        <span class="pubk12src locdesc" style="display:none">
+            Please enter the name of your school or school district and click Search,
+            then select your school from the list.
+        </span>
+        <span class="privk12src locdesc" style="display:none">
+            Please enter the name of your school and click Search,
+            then select your school from the list.
+        </span>
+        </span>
+    <span class=formright>
+        <input id=searchterms aria-label="school search terms">
+        <button type=button id=dosearch>Search</button>
+        </span><br class=form>
+    <div id=searchresultwrapper style="display:none">
+        <span class=form><label for=ipeds>Select your institution:</label></span>
+        <span class=formright><select name=ipeds id=ipeds></select></span><br class=form>
+    </div>
+</div>
+
+<div id=intlsel class=selopt style="display:none">
+    <p>MyOpenMath is based in the United States, and has policies designed to be compliant with US laws.
+      If you are located outside the US, it is your responsibility to ensure that use of MyOpenMath is 
+      acceptable in your jurisdication, and to gather any necessary consent from students.</p>
+
+    <span class=form><label for=country>Select your country</label></span>
+    <span class=formright><select id=country name=country>
+        <option value="">Select...</option>
+    <?php
+    $countries = [ 'AF'=>'Afghanistan', 'AL'=>'Albania', 'DZ'=>'Algeria', 'AD'=>'Andorra', 'AO'=>'Angola', 'AI'=>'Anguilla', 'AQ'=>'Antarctica', 'AG'=>'Antigua and Barbuda', 'AR'=>'Argentina', 'AM'=>'Armenia', 'AW'=>'Aruba', 'AU'=>'Australia', 'AT'=>'Austria', 'AZ'=>'Azerbaijan', 'BS'=>'Bahamas (the)', 'BH'=>'Bahrain', 'BD'=>'Bangladesh', 'BB'=>'Barbados', 'BY'=>'Belarus', 'BE'=>'Belgium', 'BZ'=>'Belize', 'BJ'=>'Benin', 'BM'=>'Bermuda', 'BT'=>'Bhutan', 'BO'=>'Bolivia (Plurinational State of)', 'BQ'=>'Bonaire, Sint Eustatius and Saba', 'BA'=>'Bosnia and Herzegovina', 'BW'=>'Botswana', 'BV'=>'Bouvet Island', 'BR'=>'Brazil', 'IO'=>'British Indian Ocean Territory (the)', 'BN'=>'Brunei Darussalam', 'BG'=>'Bulgaria', 'BF'=>'Burkina Faso', 'BI'=>'Burundi', 'CV'=>'Cabo Verde', 'KH'=>'Cambodia', 'CM'=>'Cameroon', 'CA'=>'Canada', 'KY'=>'Cayman Islands (the)', 'CF'=>'Central African Republic (the)', 'TD'=>'Chad', 'CL'=>'Chile', 'CN'=>'China', 'CX'=>'Christmas Island', 'CC'=>'Cocos (Keeling) Islands (the)', 'CO'=>'Colombia', 'KM'=>'Comoros (the)', 'CD'=>'Congo (the Democratic Republic of the)', 'CG'=>'Congo (the)', 'CK'=>'Cook Islands (the)', 'CR'=>'Costa Rica', 'HR'=>'Croatia', 'CU'=>'Cuba', 'CW'=>'Curaçao', 'CY'=>'Cyprus', 'CZ'=>'Czechia', 'CI'=>'Côte d\'Ivoire', 'DK'=>'Denmark', 'DJ'=>'Djibouti', 'DM'=>'Dominica', 'DO'=>'Dominican Republic (the)', 'EC'=>'Ecuador', 'EG'=>'Egypt', 'SV'=>'El Salvador', 'GQ'=>'Equatorial Guinea', 'ER'=>'Eritrea', 'EE'=>'Estonia', 'SZ'=>'Eswatini', 'ET'=>'Ethiopia', 'FK'=>'Falkland Islands (the) [Malvinas]', 'FO'=>'Faroe Islands (the)', 'FJ'=>'Fiji', 'FI'=>'Finland', 'FR'=>'France', 'GF'=>'French Guiana', 'PF'=>'French Polynesia', 'TF'=>'French Southern Territories (the)', 'GA'=>'Gabon', 'GM'=>'Gambia (the)', 'GE'=>'Georgia', 'DE'=>'Germany', 'GH'=>'Ghana', 'GI'=>'Gibraltar', 'GR'=>'Greece', 'GL'=>'Greenland', 'GD'=>'Grenada', 'GP'=>'Guadeloupe', 'GT'=>'Guatemala', 'GG'=>'Guernsey', 'GN'=>'Guinea', 'GW'=>'Guinea-Bissau', 'GY'=>'Guyana', 'HT'=>'Haiti', 'HM'=>'Heard Island and McDonald Islands', 'VA'=>'Holy See (the)', 'HN'=>'Honduras', 'HK'=>'Hong Kong', 'HU'=>'Hungary', 'IS'=>'Iceland', 'IN'=>'India', 'ID'=>'Indonesia', 'IR'=>'Iran (Islamic Republic of)', 'IQ'=>'Iraq', 'IE'=>'Ireland', 'IM'=>'Isle of Man', 'IL'=>'Israel', 'IT'=>'Italy', 'JM'=>'Jamaica', 'JP'=>'Japan', 'JE'=>'Jersey', 'JO'=>'Jordan', 'KZ'=>'Kazakhstan', 'KE'=>'Kenya', 'KI'=>'Kiribati', 'KP'=>'Korea (the Democratic People\'s Republic of)', 'KR'=>'Korea (the Republic of)', 'KW'=>'Kuwait', 'KG'=>'Kyrgyzstan', 'LA'=>'Lao People\'s Democratic Republic (the)', 'LV'=>'Latvia', 'LB'=>'Lebanon', 'LS'=>'Lesotho', 'LR'=>'Liberia', 'LY'=>'Libya', 'LI'=>'Liechtenstein', 'LT'=>'Lithuania', 'LU'=>'Luxembourg', 'MO'=>'Macao', 'MG'=>'Madagascar', 'MW'=>'Malawi', 'MY'=>'Malaysia', 'MV'=>'Maldives', 'ML'=>'Mali', 'MT'=>'Malta', 'MQ'=>'Martinique', 'MR'=>'Mauritania', 'MU'=>'Mauritius', 'YT'=>'Mayotte', 'MX'=>'Mexico', 'MD'=>'Moldova (the Republic of)', 'MC'=>'Monaco', 'MN'=>'Mongolia', 'ME'=>'Montenegro', 'MS'=>'Montserrat', 'MA'=>'Morocco', 'MZ'=>'Mozambique', 'MM'=>'Myanmar', 'NA'=>'Namibia', 'NR'=>'Nauru', 'NP'=>'Nepal', 'NL'=>'Netherlands (the)', 'NC'=>'New Caledonia', 'NZ'=>'New Zealand', 'NI'=>'Nicaragua', 'NE'=>'Niger (the)', 'NG'=>'Nigeria', 'NU'=>'Niue', 'NF'=>'Norfolk Island', 'NO'=>'Norway', 'OM'=>'Oman', 'PK'=>'Pakistan', 'PS'=>'Palestine, State of', 'PA'=>'Panama', 'PG'=>'Papua New Guinea', 'PY'=>'Paraguay', 'PE'=>'Peru', 'PH'=>'Philippines (the)', 'PN'=>'Pitcairn', 'PL'=>'Poland', 'PT'=>'Portugal', 'QA'=>'Qatar', 'MK'=>'Republic of North Macedonia', 'RO'=>'Romania', 'RU'=>'Russian Federation (the)', 'RW'=>'Rwanda', 'RE'=>'Réunion', 'BL'=>'Saint Barthélemy', 'SH'=>'Saint Helena, Ascension and Tristan da Cunha', 'KN'=>'Saint Kitts and Nevis', 'LC'=>'Saint Lucia', 'MF'=>'Saint Martin (French part)', 'PM'=>'Saint Pierre and Miquelon', 'VC'=>'Saint Vincent and the Grenadines', 'WS'=>'Samoa', 'SM'=>'San Marino', 'ST'=>'Sao Tome and Principe', 'SA'=>'Saudi Arabia', 'SN'=>'Senegal', 'RS'=>'Serbia', 'SC'=>'Seychelles', 'SL'=>'Sierra Leone', 'SG'=>'Singapore', 'SX'=>'Sint Maarten (Dutch part)', 'SK'=>'Slovakia', 'SI'=>'Slovenia', 'SB'=>'Solomon Islands', 'SO'=>'Somalia', 'ZA'=>'South Africa', 'GS'=>'South Georgia and the South Sandwich Islands', 'SS'=>'South Sudan', 'ES'=>'Spain', 'LK'=>'Sri Lanka', 'SD'=>'Sudan (the)', 'SR'=>'Suriname', 'SJ'=>'Svalbard and Jan Mayen', 'SE'=>'Sweden', 'CH'=>'Switzerland', 'SY'=>'Syrian Arab Republic', 'TW'=>'Taiwan', 'TJ'=>'Tajikistan', 'TZ'=>'Tanzania, United Republic of', 'TH'=>'Thailand', 'TL'=>'Timor-Leste', 'TG'=>'Togo', 'TK'=>'Tokelau', 'TO'=>'Tonga', 'TT'=>'Trinidad and Tobago', 'TN'=>'Tunisia', 'TR'=>'Turkey', 'TM'=>'Turkmenistan', 'TC'=>'Turks and Caicos Islands (the)', 'TV'=>'Tuvalu', 'UG'=>'Uganda', 'UA'=>'Ukraine', 'AE'=>'United Arab Emirates (the)', 'GB'=>'United Kingdom of Great Britain and Northern Ireland (the)', 'UM'=>'United States Minor Outlying Islands (the)', 'UY'=>'Uruguay', 'UZ'=>'Uzbekistan', 'VU'=>'Vanuatu', 'VE'=>'Venezuela (Bolivarian Republic of)', 'VN'=>'Viet Nam', 'VG'=>'Virgin Islands (British)', 'WF'=>'Wallis and Futuna', 'EH'=>'Western Sahara', 'YE'=>'Yemen', 'ZM'=>'Zambia', 'ZW'=>'Zimbabwe', 'AX'=>'Åland Islands'];
+    foreach ($countries as $code=>$name) {
+        echo '<option value='.$code.'>'.$name.'</option>';
+    }
+    ?>
+    </select></span><br class=form>
+    <div id=intlwrap style="display:none">
+        <span class=form><label for=intlipeds>Select your institution or affiliation:</label></span>
+        <span class=formright><select name=intlipeds id=intlipeds></select></span><br class=form>
+    </div>
+</div>
+
+<div id=otherschool style="display:none">
+    <span class=form><label for=otherschool>Please give the full name of your school (no initials like WSU please):</label></span>
+    <span class=formright><input id=otherschool name=otherschool size=40 /></span><br class=form>
+</div>
+
+<p><button type=button id=step1btn style="display:none">Continue</button></p>
+
+</div>
+
+<div class="tabpanel" id=step2 style="display:none" aria-labelledby="tab2 tabhdr2">
+    <h2 id="tabhdr2">Verification</h2>
+
+    <p>To verify you are an instructor, you will need to provide one of the following:</p>
+    <ol>
+        <li>A school website that lists you as a teacher. This could be a 
+            school directory, a class schedule, a department website, or a 
+            faculty website.</li>
+        <li>An email from a supervisor, colleague, or school HR verifying you are a teacher. 
+            Have that person send the email to 
+            <a href="mailto:support@myopenmath.com">support@myopenmath.com</a>.  
+            The person sending the email must be listed on a school website.</li>
+        <li>Upload a picture of a school ID indicating you are a teacher.</li>
+    </ol>
+
+    <span class=form><label for=vertype>What method would you like to use?</label></span>
+    <span class=formright><select id=vertype name=vertype>
+        <option value="">Select...</option>
+        <option value="url">Provide a website</option>
+        <option value="email">Send an email</option>
+        <option value="upload">Upload a school ID</option>
+        </select></span><br class=form>
+    
+    <div id=verurlwrap class=vertypes style="display:none">
+        <span class=form><label for=verurl>Website URL:</label><br>
+          <span class=small>This page should be accessible without login. No Facebook or LinkedIn pages.</span>
+        </span>
+        <span class=formright><input name=verurl id=verurl size=40 /></span><br class=form>
+    </div>
+    <div id=veremailwrap class=vertypes style="display:none">
+        <span class=form><label for=veremail>The person we should expect an email from:</label></span>
+        <span class=formright><input name=veremail id=veremail size=40 /></span><br class=form>
+    </div>
+    <div id=veruploadwrap class=vertypes style="display:none">
+        <span class=form><label for=verupload>Picture of school ID:</label></span>
+        <span class=formright><input type=file name=verupload id=verupload accept=".jpg,.pdf,.jpeg,.gif,.png"/></span><br class=form>
+    </div>
+
+    <p><button type=button id=step2btn style="display:none">Continue</button></p>
+</div>
+
+<div class="tabpanel" id=step3 style="display:none" aria-labelledby="tab3 tabhdr3">
+    <h2 id="tabhdr3">Account Details</h2>
+
+    <span class=form><label for=firstname>Given Name:</label></span>
+    <span class=formright>
+        <input id=firstname name=firstname autocomplete="given-name" size=40 
+        value="<?php echo Sanitize::encodeStringForDisplay($firstname);?>"/>
+    </span><br class=form>
+
+    <span class=form><label for=lstname>Family Name:</label></span>
+    <span class=formright>
+        <input id=lastname name=lastname autocomplete="family-name" size=40 
+            value="<?php echo Sanitize::encodeStringForDisplay($lastname);?>" />
+    </span><br class=form>
+
+    <span class=form><label for=email>Email:</label>
+        <span id=emailwarn v-if="vertype=='url'" class=small><br>This email <em>must</em> be the one listed 
+        on the verification website provided, or be an official college email address, or your request 
+        <em>will</em> be denied.</span>
+    </span>
+    <span class=formright>
+        <input id=email name=email autocomplete="email" size=40
+        value="<?php echo Sanitize::encodeStringForDisplay($email);?>" />
+    </span><br class=form>
+
+    <span class=form><label for=SID>Username:</label></span>
+    <span class=formright>
+        <input id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($SID);?>" size=40 />
+    </span><br class=form>
+
+    <span class=form><label for=pw1>Password:</label></span>
+    <span class=formright><input type=password id=pw1 name=pw1 size=40 /></span><br class=form>
+
+    <span class=form><label for=pw2>Reenter Password:</label></span>
+    <span class=formright><input type=password id=pw2 name=pw2 size=40 /></span><br class=form>
+
+    <span class=form><input type=checkbox name=agree id=agree>
+        <label for="agree">I have read and agree to the 
+        <a href="#" onclick="GB_show('Terms of Use','<?php echo $CFG['GEN']['TOSpage'];?>',700,500);return false;">
+        Terms of Use</a></label></span><br class=form />
+
+    <p><button type=submit id=step3btn disabled>Request Account</button></p>
+</div>
+
+<span style="display:none"><input name=hval></span>
+<input type=hidden name=challenge value="<?php echo Sanitize::encodeStringForDisplay($_SESSION['challenge']);?>"/>
+
+</form>
+
+<script type="text/javascript">
+$(function() {
+    $('#schooltype').on('change', function () {
+        var val = this.value;
+        if (val === '') {
+            $('#locwrap').slideUp();
+        } else {
+            $('#locwrap').slideDown();
+        }
+        $('.locdesc').hide();
+        $('#country').val('');
+        $('#intlwrap,#searchresultwrapper').hide();
+        $('.'+val+'src').slideDown();
+    });
+    $('#schoolloc').on('change', function () {
+        var val = this.value;
+        $('.selopt').hide();
+        $('#'+val+'sel').slideDown();
+    });
+    $('#searchterms').on('input', function () {
+        $('#searchresultwrapper').hide();
+    });
+    $('#dosearch').on('click', function () {
+        ipedssearch({
+            type: 'name',
+            ipedtypefield: 'schooltype',
+            searchfield: 'searchterms',
+            resultfield: 'ipeds',
+            wrapper: 'searchresultwrapper',
+            includeselect: true
+        });
+    });
+
+    $('#country').on('change', function () {
+        var country = this.value;
+        if (country != '') {
+            ipedssearch({
+                type: 'country',
+                ipedtypefield: 'schooltype',
+                searchfield: 'country',
+                resultfield: 'intlipeds',
+                wrapper: 'intlwrap',
+                includeselect: true
+            });
+        }
+    });
+
+    $("#ipeds,#intlipeds").on('change', function () {
+        var val = this.value;
+        if (val == '0') {
+            $('#otherschool').slideDown();
+            $('#step1btn').show();
+        } else {
+            $('#otherschool').slideUp();
+        }
+        $('#step1btn').show();
+    });
+
+    $('#step1btn').on('click', function() {
+        var tab = $("#tab2");
+        tab.removeClass("disabled").on('click', function(e) {
+            e.preventDefault();
+            setActiveTab(this);
+        });
+        setActiveTab(tab[0]);
+        $('#step2').get(0).scrollIntoView();
+    });
+    $('#vertype').on('change', function() {
+        $('.vertypes').hide();
+        var val = this.value;
+        $('#ver'+val+'wrap').slideDown();
+    });
+    $("#verurl,#veremail,#verupload").on('input change', function () {
+        $('#step2btn').show();
+    });
+    $('#step2btn').on('click', function() {
+        var tab = $("#tab3");
+        tab.removeClass("disabled").on('click', function(e) {
+            e.preventDefault();
+            setActiveTab(this);
+        });
+        setActiveTab(tab[0]);
+        $('#step3').get(0).scrollIntoView();
+    })
+    $('#agree').on('click change', function () {
+        $('#step3btn').prop('disabled', this.checked===false);
+    });
+
+})
+</script>
+<?php 
+$extrarequired = array('agree', 'schooltype', 'schooloc',
+    'ipeds', 'intlipeds', 'vertype', 'verurl','veremail', 'verupload');
+
+$requiredrules = array(
+    'ipeds' => 'function(){return document.getElementById("schoolloc").value == "us";}',
+    'intlipeds' => 'function(){return document.getElementById("schoolloc").value == "intl";}',
+    'otherschool' => 'function(){return document.getElementById("intlipeds").value == "0";}',
+    'verurl' => 'function(){return document.getElementById("vertype").value == "url";}',
+    'veremail' => 'function(){return document.getElementById("vertype").value == "email";}',
+    'verupload' => 'function(){return document.getElementById("vertype").value == "upload";}',
+);
+
+showNewUserValidation('newinstrform', $extrarequired, $requiredrules);
+
+require('footer.php');

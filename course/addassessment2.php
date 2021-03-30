@@ -37,17 +37,20 @@ if (isset($_GET['tb'])) {
 	$totb = 'b';
 }
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+$curBreadcrumb = $breadcrumbbase;
+if (empty($_COOKIE['fromltimenu'])) {
+    $curBreadcrumb .= " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+}
 if ($from=='gb') {
-	$curBreadcrumb .= "&gt; <a href=\"gradebook.php?cid=$cid\">Gradebook</a> ";
+	$curBreadcrumb .= "<a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; ";
 } else if ($from=='mcd') {
-	$curBreadcrumb .= "&gt; <a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a> ";
+	$curBreadcrumb .= "&gt; <a href=\"masschgdates.php?cid=$cid\">Mass Change Dates</a> &gt; ";
 }
 
 if (isset($_GET['id'])) {
-	$curBreadcrumb .= "&gt; Modify Assessment\n";
+	$curBreadcrumb .= "Modify Assessment\n";
 } else {
-	$curBreadcrumb .= "&gt; Add Assessment\n";
+	$curBreadcrumb .= "Add Assessment\n";
 }
 
 if (isset($_GET['id'])) {
@@ -85,45 +88,53 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
   $dates_by_lti = $stm->fetchColumn(0);
 
   if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
-      if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
-      	$DBH->beginTransaction();
-          require_once('../includes/filehandler.php');
-          deleteallaidfiles($assessmentId);
-          $grades = array();
-					$stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
-					$stm->execute(array(':assessmentid'=>$assessmentId));
-					while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-						$grades[$row['userid']]=$row["score"];
-					}
-					$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-					if ($stm->rowCount()>0) {
-		        TeacherAuditLog::addTracking(
-		          $cid,
-		          "Clear Attempts",
-		          $assessmentId,
-		          array('grades'=>$grades)
-		        );
-		      }
+      if (isset($_POST['clearattempts']) && $_POST['clearattempts'] == "confirmed") {
+        $DBH->beginTransaction();
+        require_once '../includes/filehandler.php';
+        deleteallaidfiles($assessmentId);
+        $grades = array();
+        $stm = $DBH->prepare("SELECT userid,score FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            $grades[$row['userid']] = $row["score"];
+        }
 
-					$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-          $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
-          $stm->execute(array(':assessmentid'=>$assessmentId));
-          $DBH->commit();
-          header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
-                  $cid, $assessmentId));
-          exit;
+        $stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        if ($stm->rowCount() > 0) {
+            TeacherAuditLog::addTracking(
+                $cid,
+                "Clear Attempts",
+                $assessmentId,
+                array('grades' => $grades)
+            );
+        }
+
+        $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
+        $stm->execute(array(':assessmentid' => $assessmentId));
+        // clear out time limit extensions
+        $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
+        $stm->execute(array($aid));
+        
+        $DBH->commit();
+        header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' . Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
+            $cid, $assessmentId));
+        exit;
       } else {
           $overwriteBody = 1;
           $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
           $stm->execute(array(':id'=>$assessmentId));
           $assessmentname = $stm->fetchColumn(0);
-          $body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
-              $cid, Sanitize::encodeStringForDisplay($coursename));
-          $body .= sprintf("&gt; <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
+          $body = '<div class=breadcrumb>'.$breadcrumbbase;
+          if (empty($_COOKIE['fromltimenu'])) {
+            $body .= sprintf(" <a href=\"course.php?cid=%s\">%s</a> &gt; ",
+                $cid, Sanitize::encodeStringForDisplay($coursename));
+          }
+          $body .= sprintf(" <a href=\"addassessment2.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
               $cid, $assessmentId);
-					$body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
+		  $body .= sprintf("<h2>%s</h2>", Sanitize::encodeStringForDisplay($assessmentname));
           $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
           $body .= '<form method="POST" action="'.sprintf('addassessment2.php?cid=%s&id=%d',$cid, $assessmentId).'">';
           $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
@@ -140,11 +151,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     if ($toset['name'] == '') {
     	$toset['name'] = _('Unnamed Assessment');
     }
+        $_POST['summary'] = Sanitize::trimEmptyPara($_POST['summary']);
 		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>' || $_POST['summary']=='<p></p>') {
 			$toset['summary'] = '';
 		} else {
 			$toset['summary'] = Sanitize::incomingHtml($_POST['summary']);
-		}
+        }
+        $_POST['intro'] = Sanitize::trimEmptyPara($_POST['intro']);
 		if ($_POST['intro']=='<p>Enter intro/instructions</p>' || $_POST['intro']=='<p></p>') {
 			$toset['intro']= '';
 		} else {
@@ -251,7 +264,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$toset['viewingb'] = Sanitize::simpleString($_POST['viewingb']);
 			$toset['scoresingb'] = Sanitize::simpleString($_POST['scoresingb']);
-			if ($toset['viewingb'] == 'never' || $toset['scoresingb'] == 'never') {
+			if ($toset['viewingb'] == 'never') {
 				$toset['ansingb'] = 'never';
 			} else {
 				$toset['ansingb'] = Sanitize::simpleString($_POST['ansingb']);
@@ -266,7 +279,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$toset['istutorial'] = empty($_POST['istutorial']) ? 0 : 1;
 			$toset['noprint'] = empty($_POST['noprint']) ? 0 : 1;
 			$toset['showcat'] = empty($_POST['showcat']) ? 0 : 1;
-			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']);
+			$toset['showwork'] = Sanitize::onlyInt($_POST['showwork']) + Sanitize::onlyInt($_POST['showworktype']);
 
 			// time limit and access control
 			$toset['allowlate'] = Sanitize::onlyInt($_POST['allowlate']);
@@ -507,25 +520,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array($cid, $assessmentId));
 
 			// Re-total any student attempts on this assessment
-			//need to re-score assessment attempts based on withdrawal
-			require_once('../assess2/AssessInfo.php');
-			require_once('../assess2/AssessRecord.php');
-			$assess_info = new AssessInfo($DBH, $assessmentId, $cid, false);
-			$assess_info->loadQuestionSettings();
-			$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
-			$stm->execute(array($assessmentId));
-			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-				$assess_record = new AssessRecord($DBH, $assess_info, false);
-				$assess_record->setRecord($row);
-				if ($toset['submitby']!=$curassess['submitby']) {
-					// convert data format
-					$assess_record->convertSubmitBy($toset['submitby']);
-				}
-				$assess_record->reTotalAssess();
-				// TODO: adjust deffb
-				// if ($toset['deffb']!=$curassess['deffeedbacktext']) {
-				$assess_record->saveRecord();
-			}
+            //need to re-score assessment attempts based on withdrawal
+            require_once('../assess2/AssessHelpers.php');
+            AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
+                ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 
 			$DBH->commit();
 			$rqp = Sanitize::randomQueryStringParam();
@@ -855,6 +853,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				'text' => _('Create new set of groups')
 			));
       while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+                if ($row[1] == '##autobysection##') { continue; }
 				$groupOptions[] = array(
 					'value' => $row[0],
 					'text' => $row[1]
@@ -879,7 +878,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
  /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js?v=080818\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 // $placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue"></script>';
 $placeinhead .= '<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>';
 

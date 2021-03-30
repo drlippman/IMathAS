@@ -272,6 +272,9 @@ ol.lalpha li { margin-top: .7em;}
 .drawtools {
   margin-left: 8px;
 }
+.drawtools > span {
+    display:inline-block;
+}
 .drawtools img {
   vertical-align: middle;
 }
@@ -302,6 +305,8 @@ input, .mq-editable-field, .mathquill-math-field {
   padding: 4px 6px;
   border-radius: 4px;
   margin: 1px 0;
+  background-color: #fff;
+  color: #000;
 }
 
 input[type=radio], input[type=checkbox] {
@@ -441,16 +446,23 @@ table.tchart {
 table.tchart td {
 	min-width: 3em;
 }
+table.tchart caption {
+    font-weight: bold;
+}
 table.acctstatement {
 	border-collapse: collapse;
 }
-table.acctstatement th, table.acctstatement td {
+table.acctstatement th, table.acctstatement td, table.acctstatement caption {
 	border: 1px solid #eee;
 	background-color: #fff;
 	padding: 1px 5px;
 }
+table.acctstatement tbody th {
+    font-weight: normal;
+}
 
-table.acctstatement thead th {
+
+table.acctstatement thead th, table.acctstatement caption {
 	text-align: center;
 	z-index: 20;
 	background-color: #eef;
@@ -493,4 +505,15 @@ span.inlinebtn:hover {
 .inlineheader {
   font-size: 1em;
   display: inline;
+}
+#GB_window {
+    box-shadow: 1px 3px 8px 0 rgba(0,0,0,0.65);
+    border: 0;
+    border-radius: 4px;
+}
+#GB_caption {
+    padding: 6px 6px;
+}
+#GB_title {
+    padding-left: 6px;
 }

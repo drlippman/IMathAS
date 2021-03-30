@@ -51,6 +51,8 @@
           pos = "before"
           :qn = "curqn"
           :active="curqn == qn"
+          :textlist = "textList"
+          :lastq = "lastQ"
         />
         <full-question-header
           v-show = "curqn == qn"
@@ -65,6 +67,8 @@
           pos = "after"
           :qn = "curqn"
           :active="curqn == qn"
+          :textlist = "textList"
+          :lastq = "lastQ"
         />
       </div>
     </div>
@@ -110,7 +114,6 @@ export default {
   },
   data: function () {
     return {
-      youtubeApiLoaded: false,
       videoWidth: 600,
       aspectRatioPercent: 56.2,
       ytplayer: null,
@@ -169,12 +172,31 @@ export default {
         qnArray[i] = i;
       }
       return qnArray;
+    },
+    lastQ () {
+      return store.assessInfo.questions.length - 1;
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
     }
   },
   methods: {
     createPlayer () {
       const supportsFullScreen = !!(document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen);
-      const pVarsInternal = { 'autoplay': 0, 'wmode': 'transparent', 'fs': supportsFullScreen ? 1 : 0, 'controls': 2, 'rel': 0, 'modestbranding': 1, 'showinfo': 0 };
+      const pVarsInternal = {
+        'autoplay': 0,
+        'wmode': 'transparent',
+        'fs': supportsFullScreen ? 1 : 0,
+        'controls': 2,
+        'rel': 0,
+        'modestbranding': 1,
+        'showinfo': 0,
+        'origin': window.location.protocol + '//' + window.location.host
+      };
       const ar = store.assessInfo.videoar.split(':');
       const videoHeight = window.innerHeight - 50;
       this.videoWidth = ar[0] / ar[1] * videoHeight;
@@ -259,6 +281,10 @@ export default {
           this.ytplayer.pauseVideo();
         }
       } else {
+        if (this.ytplayer === null || typeof this.ytplayer.seekTo !== 'function') {
+          store.errorMsg = 'ytnotready';
+          return;
+        }
         const newCue = store.assessInfo.videocues[newCueNum];
         let seektime = 0;
         if (newToshow === 'v') {
@@ -284,20 +310,25 @@ export default {
       this.toshow = newToshow;
     }
   },
+  mounted () {
+    if (window.YT) {
+      this.createPlayer();
+    } else {
+      window.onYouTubePlayerAPIReady = () => {
+        this.createPlayer();
+      };
+      // async load YouTube API
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/player_api';
+      document.head.appendChild(tag);
+    }
+  },
   created () {
     // don't show intro if it's empty
     if (store.assessInfo.intro !== '') {
       this.cue = -1;
       this.toshow = 'i';
     }
-    // async load YouTube API
-    window.onYouTubePlayerAPIReady = () => {
-      this.youtubeApiLoaded = true;
-      this.createPlayer();
-    };
-    const tag = document.createElement('script');
-    tag.src = '//www.youtube.com/player_api';
-    document.head.appendChild(tag);
   }
 };
 </script>

@@ -22,7 +22,31 @@ if ($myrights<20) {
 	$body = _("You need to log in as a teacher to access this page");
 } else {
 	//data manipulation here
-	$useeditor = 1;
+    $useeditor = 1;
+    
+    if (!empty($_POST['dellibitems']) && $myrights == 100) {
+        $libid = $_POST['libid'];
+        $uid = $_POST['uid'];
+        $query = 'UPDATE imas_library_items SET deleted=1,lastmoddate=? 
+            WHERE libid=? AND ownerid=?';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(time(), $libid, $uid));
+        
+        //now, resolve any unassigned issues
+        //first, try to undelete the unassigned library item for any question with no undeleted library items
+        $query = "UPDATE imas_library_items AS ili JOIN (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ON ili.qsetid=tofix.qsetid ";
+        $query .= "JOIN imas_questionset AS iq ON ili.qsetid=iq.id ";
+        $query .= "SET ili.deleted=0 WHERE ili.libid=0 AND iq.deleted=0";
+        $stm = $DBH->query($query);
+        
+        //if any still have no undeleted library items, then they must not have an unassigned entry to undelete, so add it
+        $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid,junkflag,deleted,lastmoddate) ";
+        $query .= "(SELECT 0,ili.qsetid,iq.ownerid,0,0,iq.lastmoddate FROM imas_library_items AS ili JOIN imas_questionset AS iq ON iq.id=ili.qsetid WHERE iq.deleted=0 GROUP BY ili.qsetid HAVING min(ili.deleted)=1)";
+        $stm = $DBH->query($query);
+    
+        echo 'OK';
+        exit;
+    }
 
 	if (isset($_GET['onlychk']) && $_GET['onlychk']==1) {
 		$onlychk = 1;
@@ -133,7 +157,7 @@ if ($myrights<20) {
 	} else {
 		$eqnhelper = 4;
 	}
-	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
+	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName,imas_libraries.id,imas_users.id FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
 	$resultLibNames->execute(array(':qsetid'=>$qsetid));
 }
 
@@ -144,25 +168,26 @@ $nologo = true;
 
 $useeqnhelper = $eqnhelper;
 $lastupdate = '20200422';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
-$placeinhead .= '<script src="'.$imasroot.'/mathquill/mathquill.min.js?v=022720" type="text/javascript"></script>';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {
-  $placeinhead .= '<script src="'.$imasroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$imasroot.'/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$imasroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$imasroot.'/javascript/mathjs.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$imasroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
-  $placeinhead .= '<script src="'.$imasroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.js?v=022720" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=031721" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/mathjs.js?v=032721" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/AMtoMQ.js?v=052120" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=021121" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
 } else {
-  $placeinhead .= '<script src="'.$imasroot.'/javascript/assess2_min.js?v=072520" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=100120" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=032721" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="'.$imasroot.'/javascript/assess2supp.js?v=050120" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mathquill-basic.css">
-  <link rel="stylesheet" type="text/css" href="'.$imasroot.'/mathquill/mqeditor.css">';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=112020" type="text/javascript"></script>';
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=031821">
+  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
 $placeinhead .= '<script>
   function loadNewVersion() {
@@ -173,6 +198,14 @@ $placeinhead .= '<script>
   }
   function showPartSteps(seed) {
     location.href = location.href.replace(/&seed=\w+/g,"").replace(/&showallparts=\w+/,"") + "&seed=" + seed;
+  }
+  function dellibitems(libid,uid,el) {
+      $.post({
+          url: window.location.href,
+          data: {dellibitems: 1, libid: libid, uid: uid}
+      }).done(function(msg) {
+          $(el).parent().slideUp();
+      });
   }
   </script>';
 require("../header.php");
@@ -280,7 +313,10 @@ if ($overwriteBody==1) {
 					numchked--;
 				}
 				document.getElementById(\"numchked\").innerHTML = numchked;
-			  }
+              }
+              if (parentcbox) {
+                  opener.$(parentcbox).trigger('change');
+              }
 		  }
 		  </script>";
 	}
@@ -330,6 +366,9 @@ if ($overwriteBody==1) {
     'showans' => true,
     'showallparts' => ($hasSeqParts && !empty($_GET['showallparts']))
   ]);
+  if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
+      $disp['jsparams']['noMQ'] = true;
+  }
   if (!empty($disp['errors'])) {
     echo '<ul class="small">';
     foreach ($disp['errors'] as $err) {
@@ -384,7 +423,7 @@ if ($overwriteBody==1) {
 	printf("<p>"._("Question ID:")." %s.  ", Sanitize::encodeStringForDisplay($qsetid));
 	echo '<span class="small subdued">'._('Seed:').' '.Sanitize::onlyInt($seed) . '.</span> ';
   if ($line['ownerid'] == $userid) {
-    echo '<a href="moddataset.php?cid='. Sanitize::courseId($sendcid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
+    echo '<a href="moddataset.php?cid='. Sanitize::courseId($cid) . '&id=' . Sanitize::onlyInt($qsetid).'" target="_blank">';
     echo _('Edit Question') . '</a>';
   } else {
 	  echo "<a href=\"#\" onclick=\"GB_show('$sendtitle','$imasroot/course/sendmsgmodal.php?sendtype=$sendtype&cid=" . Sanitize::courseId($sendcid) . '&quoteq='.Sanitize::encodeUrlParam("0-{$qsetid}-{$seed}-reperr-{$assessver}"). "',800,'auto')\">$sendtitle</a> "._("to report problems");
@@ -413,16 +452,20 @@ if ($overwriteBody==1) {
 	}
 	echo '</p>';
 
-	echo '<p>'._('Question is in these libraries:');
+	echo '<p>'._('Question is in these libraries:').'</p>';
 	echo '<ul>';
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
 		if ($myrights==100) {
-			printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+            printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+            echo ' <a class="small" href="#" onclick="dellibitems('.Sanitize::onlyInt($row[3]).',';
+            echo Sanitize::onlyInt($row[4]).',this);return false;">';
+            echo _('Remove all questions in this library added by this person');
+            echo '</a>';
 		}
 		echo '</li>';
 	}
-	echo '</ul></p>';
+	echo '</ul>';
 
 	if ($line['ancestors']!='') {
 		echo "<p>"._("Derived from:")." ".Sanitize::encodeStringForDisplay($line['ancestors']);

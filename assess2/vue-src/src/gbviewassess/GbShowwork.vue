@@ -6,6 +6,9 @@
       >
         {{ btnLabel }}
       </button>
+      <span class="small" v-if="show && worktime !== '0'">
+        {{ $t('gradebook.lastchange')}} {{ worktime }}
+      </span>
     </div>
     <transition name="fade">
       <div class="introtext" ref="workbox" v-show="show" v-html="work" />
@@ -16,7 +19,7 @@
 <script>
 export default {
   name: 'GbShowwork',
-  props: ['work'],
+  props: ['work', 'worktime', 'showall'],
   data: function () {
     return {
       show: false,
@@ -30,7 +33,7 @@ export default {
   },
   methods: {
     renderInit () {
-      if (this.rendered) {
+      if (this.rendered || !this.work) {
         return;
       }
       setTimeout(window.drawPics, 100);
@@ -49,6 +52,9 @@ export default {
         this.rendered = false;
         this.$nextTick(this.renderInit);
       }
+    },
+    showall: function (newVal, oldVal) {
+      this.show = newVal;
     }
   }
 };

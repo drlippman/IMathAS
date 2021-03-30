@@ -29,7 +29,7 @@
       </div>
       <timer
         v-if = "timelimit > 0 && starttime > 0"
-        :end = "starttime + timelimit"
+        :end = "1000*(starttime + timelimit)"
         :total = "timelimit"
       />
     </div>
@@ -62,9 +62,10 @@
 
       <livepoll-results
         v-if = "isTeacher"
-        :showresults = "showResults && curstate > 1"
+        :showresults = "showResults"
         :showans = "curstate === 4"
         :qn = "curqn"
+        :key = "curqn + '-' + curseed"
       />
 
     </div>
@@ -191,10 +192,16 @@ export default {
         this.showQuestion = store.livepollSettings.showQuestionDefault;
         this.showResults = store.livepollSettings.showResultsLiveDefault;
         this.showAnswers = store.livepollSettings.showAnswersAfter;
+        let nextState = 1;
+        if (store.livepollResults[qn] &&
+          Object.keys(store.livepollResults[qn]).length > 0
+        ) {
+          nextState = this.showAnswers ? 4 : 3;
+        }
         if (qn >= 0) {
           actions.setLivepollStatus({
             newquestion: dispqn,
-            newstate: 1
+            newstate: nextState
           });
         }
       }

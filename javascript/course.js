@@ -79,7 +79,7 @@ function toggleblock(event,bnum,folder) {
           $("#blockhead"+bnum+" *[aria-expanded=true]").attr("aria-expanded",false);
           //butn.value = 'Expand';
 	  if (img != null) {
-		  img.src = imasroot+'/img/expand.gif';
+		  img.src = staticroot+'/img/expand.gif';
 	  }
           if (loc>-1) {oblist.splice(loc,1);}
       } else {
@@ -95,7 +95,7 @@ function toggleblock(event,bnum,folder) {
           $("#blockhead"+bnum+" *[aria-expanded=false]").attr("aria-expanded",true);
           //butn.value = 'Collapse';
 	  if (img != null) {
-		  img.src = imasroot+'/img/collapse.gif';
+		  img.src = staticroot+'/img/collapse.gif';
 	  }
           if (loc==-1) {oblist.push(bnum);}
       }
@@ -186,7 +186,10 @@ function showcalcontentsid(elid) {
 				}
 				if (caleventsarr[elid].data[i].undolate==1) {
 					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
-				}
+                }
+                if (caleventsarr[elid].data[i].excused) {
+                    html += '<br><span class="small">'+_('You have been excused from this assignment. It will not be counted in your grade.')+'</span>';
+                }
 				if (caleventsarr[elid].data[i].editlink!=null) {
           if (caleventsarr[elid].data[i].ver > 1) {
             html += ' <a href="addassessment2.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
@@ -310,7 +313,7 @@ function showcalcontentsid(elid) {
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='CD') {
 				html += '<li><span class="calitem">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				html += caleventsarr[elid].data[i].name;
+				html += caleventsarr[elid].data[i].name.replace(/https?:\/\/[^\s<]*/g, '<a href="$&" target="_blank">$&</a>');
 				html += '</li>';
 			}
 		}

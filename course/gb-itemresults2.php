@@ -30,10 +30,10 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 //pull question data
 $qsdata = array();
 $query_placeholders = Sanitize::generateQueryPlaceholders($qsids);
-$stm = $DBH->prepare("SELECT id,qtype,control,description FROM imas_questionset WHERE id IN ($query_placeholders)");
+$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($query_placeholders)");
 $stm->execute(array_values($qsids)); //INT from DB
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$qsdata[$row[0]] = array($row[1],$row[2],$row[3]);
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	$qsdata[$row['id']] = $row;
 }
 
 //pull assessment_sessions data
@@ -144,17 +144,28 @@ foreach (explode(',',$itemorder) as $k=>$itel) {
 }
 echo '<p style="color:#f00;">Warning: Results are not accurate or meaningful for randomized questions</p>';
 
-require("../assessment/displayq2.php");
+include('../assess2/AssessStandalone.php');
+$a2 = new AssessStandalone($DBH);
+foreach ($qsdata as $k=>$v) {
+    $a2->setQuestionData($k, $v);
+}
+
 $questions = array_keys($qdata);
 foreach ($itemarr as $k=>$q) {
 	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
-	echo '<p><span style="float:right">(Question ID '.Sanitize::onlyInt($qsids[$q]).')</span><b>'.Sanitize::encodeStringForDisplay($qsdata[$qsids[$q]][2]).'</b></p>';
+	echo '<p><span style="float:right">(Question ID '.Sanitize::onlyInt($qsids[$q]).')</span><b>'.Sanitize::encodeStringForDisplay($qsdata[$qsids[$q]]['description']).'</b></p>';
 	echo '<br class="clear"/>';
 	echo '<div style="float:left;width:35%;">';
-	showresults($q,$qsdata[$qsids[$q]][0]);
+	showresults($q,$qsdata[$qsids[$q]]['qtype']);
 	echo '</div>';
 	echo '<div style="float:left;width:60%;margin-left:10px;">';
-	displayq($k,$qsids[$q],0,0,0,0);
+    $state = array(
+		'seeds' => array($k => 0),
+		'qsid' => array($k => $qsids[$q])
+	);
+	$a2->setState($state);
+    $res = $a2->displayQuestion($k, ['showhints'=>false]);
+    echo $res['html'];
 	echo '</div>';
 	echo '<br class="clear"/>';
 	echo '</div>';
@@ -202,7 +213,7 @@ function sandboxeval($control, $qtype) {
 function showresults($q,$qtype) {
 	global $qdata,$qsids,$qsdata;
 	//eval(interpret('control',$qtype,$qsdata[$qsids[$q]][1]));
-	list($anstypes, $questions, $answer, $answers) = sandboxeval($qsdata[$qsids[$q]][1], $qtype);
+	list($anstypes, $questions, $answer, $answers) = sandboxeval($qsdata[$qsids[$q]]['control'], $qtype);
 
 	if ($qtype=='choices' || $qtype=='multans' || $qtype=='multipart') {
 		if ($qtype=='multipart') {

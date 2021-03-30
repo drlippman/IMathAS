@@ -577,7 +577,7 @@ if ($myrights<20) {
 	} else { //DEFAULT DATA MANIPULATION
 		$curBreadcrumb .= " &gt; Manage Question Set";
 		$pagetitle = "Question Set Management";
-		$helpicon = "<img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=managequestionset','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>";
+		$helpicon = "<img src=\"$staticroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=managequestionset','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>";
 		if ($isadmin) {
 			$page_adminMsg =  "You are in Admin mode, which means actions will apply to all questions, regardless of owner";
 		} else if ($isgrpadmin) {
@@ -852,10 +852,10 @@ if ($myrights<20) {
 				}
 				$page_questionTable[$i]['extref'] = '';
 				if ($hasvid) {
-					$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
+					$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 				}
 				if ($hasother) {
-					$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
+					$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 				}
 			}
 
@@ -944,12 +944,12 @@ if ($myrights<20) {
 }
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '" . $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';";
 $placeinhead .= '$(function(){$(".wlf").attr("title","'.('Flag a question if it is in the wrong library').'");});</script>';
 if ($_POST['chglib']) {
-	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/course/libtree.css" type="text/css" />';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/libtree2.js?v=031111"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree2.js?v=031111"></script>';
 }
 require("../header.php");
 
@@ -1258,7 +1258,7 @@ function getnextprev(formn,loc) {
 		echo "<input type=button value=\"Add New Question\" onclick=\"window.location='moddataset.php?cid=$cid'\">\n";
 		echo "</form>";
 
-		echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=082913\"></script>\n";
+		echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=082913\"></script>\n";
 		echo "<form id=\"selform\" method=post action=\"manageqset.php?cid=$cid\">\n";
 		//echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
 		echo 'Check: <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',false)">None</a> ';
@@ -1313,9 +1313,9 @@ function getnextprev(formn,loc) {
 					echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
 				} else if ($searchall==0) {
 					if ($page_questionTable[$qid]['junkflag']==1) {
-						echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Flagged\"/></td>";
+						echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Flagged\"/></td>";
 					} else {
-						echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Not flagged\"/></td>";
+						echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$staticroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Not flagged\"/></td>";
 					}
 				}
 				$ln++;

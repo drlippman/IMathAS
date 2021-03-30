@@ -337,7 +337,15 @@ class Sanitize
 
 		//return filter_var($string, FILTER_SANITIZE_STRING);
 		return strip_tags($string);
-	}
+    }
+    
+    /**
+     * Remove blank lines the text editor may have inserted
+     */
+    public static function stripBlankLines($string) 
+    {
+        return preg_replace('/<p[^>]*>(&nbsp;|\s)*<\/p>\s*/','', $string);
+    }
 
 	/**
 	 * Sanitize data so it only contains an integer value.
@@ -576,6 +584,10 @@ class Sanitize
 	 */
 	public static function forRawExport($str) {
 		return $str;
-	}
+    }
+    
+    public static function trimEmptyPara($str) {
+        return preg_replace('/(<p>(&nbsp;)?<\/p>\s*)+$/','', $str);
+    }
 
 }

@@ -56,30 +56,32 @@ $stm->execute(array($cid));
 $forums = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 $forumsafe = implode(',',$forums);
 
-$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE userid=? AND forumid IN ($forumsafe) AND parent=0");
-$stm->execute(array($uid));
-$forumInstrInitiated = $stm->fetchColumn(0);
+if (count($forums) > 0) {
+    $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE userid=? AND forumid IN ($forumsafe) AND parent=0");
+    $stm->execute(array($uid));
+    $forumInstrInitiated = $stm->fetchColumn(0);
 
-$t4 = microtime(true);
+    $t4 = microtime(true);
 
-$stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE userid<>? AND forumid IN ($forumsafe) AND parent=0");
-$stm->execute(array($uid));
-$forumStuCnt = $stm->fetchColumn(0);
+    $stm = $DBH->prepare("SELECT count(id) FROM imas_forum_posts WHERE userid<>? AND forumid IN ($forumsafe) AND parent=0");
+    $stm->execute(array($uid));
+    $forumStuCnt = $stm->fetchColumn(0);
 
-$t5 = microtime(true);
+    $t5 = microtime(true);
 
-$query = 'SELECT min(c.postdate-p.postdate) AS diff ';
-$query .= 'FROM imas_forum_posts AS p JOIN imas_forum_posts AS c ';
-$query .= "ON c.userid=? AND c.parent>0 AND p.threadid=c.threadid AND c.forumid IN ($forumsafe) ";
-$query .= "WHERE p.forumid IN ($forumsafe) AND p.parent=0 GROUP BY p.id";
-$stm = $DBH->prepare($query);
-$stm->execute(array($uid));
-$diffs = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-sort($diffs);
-$forumRepliedCnt = count($diffs);
-$forumMedDelay = $diffs[ceil($forumRepliedCnt/2)-1];
-$forumP95Delay = $diffs[floor(.95*$forumRepliedCnt)-1];
 
+    $query = 'SELECT min(c.postdate-p.postdate) AS diff ';
+    $query .= 'FROM imas_forum_posts AS p JOIN imas_forum_posts AS c ';
+    $query .= "ON c.userid=? AND c.parent>0 AND p.threadid=c.threadid AND c.forumid IN ($forumsafe) ";
+    $query .= "WHERE p.forumid IN ($forumsafe) AND p.parent=0 GROUP BY p.id";
+    $stm = $DBH->prepare($query);
+    $stm->execute(array($uid));
+    $diffs = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+    sort($diffs);
+    $forumRepliedCnt = count($diffs);
+    $forumMedDelay = $diffs[ceil($forumRepliedCnt/2)-1];
+    $forumP95Delay = $diffs[floor(.95*$forumRepliedCnt)-1];
+}
 $t6 = microtime(true);
 
 if ($courseUIver > 1) {
@@ -125,17 +127,18 @@ echo '<br/>'._('Instructor replied to: ') . $msgRepliedCnt;
 echo '<br/>'._('Median response time: ') . round($msgMedDelay/3600,1) . _(' hours');
 echo '<br/>'._('95th percentile response time: ') . round($msgP95Delay/3600,1) . _(' hours');
 echo '</p>';
+if (count($forums) > 0) {
+    echo '<p>';
+    echo _('Instructor initiated forum posts: ') . $forumInstrInitiated;
+    echo '</p>';
 
-echo '<p>';
-echo _('Instructor initiated forum posts: ') . $forumInstrInitiated;
-echo '</p>';
-
-echo '<p>';
-echo _('Student forum posts: ') . $forumStuCnt;
-echo '<br/>'._('Instructor replied to: ') . $forumRepliedCnt;
-echo '<br/>'._('Median response time: ') . round($forumMedDelay/3600,1) . _(' hours');
-echo '<br/>'._('95th percentile response time: ') . round($forumP95Delay/3600,1) . _(' hours');
-echo '</p>';
+    echo '<p>';
+    echo _('Student forum posts: ') . $forumStuCnt;
+    echo '<br/>'._('Instructor replied to: ') . $forumRepliedCnt;
+    echo '<br/>'._('Median response time: ') . round($forumMedDelay/3600,1) . _(' hours');
+    echo '<br/>'._('95th percentile response time: ') . round($forumP95Delay/3600,1) . _(' hours');
+    echo '</p>';
+}
 
 echo '<p>';
 echo _('Feedback left on assessments: ') . $feedbackCnt;

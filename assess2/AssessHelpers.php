@@ -16,37 +16,117 @@ class AssessHelpers
    * @param  int $cid   The course ID
    * @param  int $aid   The assessment ID
    * @param  bool $updateLTI   Whether to send updated LTI grades
+   * @param  bool $forceresend  Whether to send LTI even if unchanged
+   * @param  string $convertsubmitby  Set non-empty to convert data for submitby change
+   * @param  bool $transaction  Whether to wrap in a transaction
    */
-  public static function retotalAll($cid, $aid, $updateLTI=true) {
+  public static function retotalAll($cid, $aid, $updateLTI=true, $forceresend=false, $convertsubmitby='',$transaction=true) {
     global $DBH;
     // Re-total any student attempts on this assessment
-  	//need to re-score assessment attempts based on withdrawal
-  	$DBH->beginTransaction();
+      //need to re-score assessment attempts based on withdrawal
+    if ($transaction) {
+          $DBH->beginTransaction();
+    }
+    $stm = $DBH->prepare("SELECT userid,timelimitmult FROM imas_students WHERE courseid=?");
+    $stm->execute(array($cid));
+    $timelimitmults = [];
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $timelimitmults[$row['userid']] = $row['timelimitmult'];
+    }
+    $stm = $DBH->prepare("SELECT imas_exceptions.* FROM imas_exceptions JOIN imas_assessment_records AS iar 
+        ON imas_exceptions.userid=iar.userid AND imas_exceptions.assessmentid=iar.assessmentid WHERE
+        iar.assessmentid=?");
+    $stm->execute(array($aid));
+    $exceptions = [];
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $exceptions[$row['userid']] = array($row['startdate'],$row['enddate'],
+            $row['islatepass'],$row['is_lti'],$row['exceptionpenalty'],
+            $row['waivereqscore'],$row['timeext'],$row['attemptext']);
+    }
   	$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");
   	$stm->execute(array($aid));
   	if ($stm->rowCount() > 0) {
-  		require_once('../assess2/AssessInfo.php');
-  		require_once('../assess2/AssessRecord.php');
   		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-  		$assess_info->loadQuestionSettings();
-      $submitby = $assess_info->getSetting('submitby');
+  		$assess_info->loadQuestionSettings('all', false, false);
+        $submitby = $assess_info->getSetting('submitby');
+  		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+            $assess_info->setException(
+                $row['userid'],
+                isset($exceptions[$row['userid']]) ? $exceptions[$row['userid']] : false,
+                true
+            );
+            $assess_info->applyTimelimitMultiplier($timelimitmults[$row['userid']]);
+  			$assess_record = new AssessRecord($DBH, $assess_info, false);
+            $assess_record->setRecord($row);
+            $orig_gb_score = $assess_record->getGbScore();
+            if ($convertsubmitby !== '') {
+                $assess_record->convertSubmitBy($convertsubmitby);
+            }
+  			$assess_record->reTotalAssess();
+            $assess_record->saveRecord();
+            if ($updateLTI) {
+                // update LTI grade
+                $lti_sourcedid = $assess_record->getLTIsourcedId();
+                if (strlen($lti_sourcedid) > 1 && ($submitby == 'by_question' ||
+                    ($assess_record->getStatus()&64)==64)
+                ) {
+                    $gbscore = $assess_record->getGbScore();
+                    if ($orig_gb_score['gbscore'] != $gbscore['gbscore']) {
+                        $aidposs = $assess_info->getSetting('points_possible');
+                        calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
+                    }
+                }
+            }
+  		}
+    }
+    if ($transaction) {  
+          $DBH->commit();
+    }
+  }
+
+    /**
+   * Recalculute score for one stu.  Only resends if changed.
+   * @param  int $cid   The course ID
+   * @param  int $aid   The assessment ID
+   * @param  int $uid   The user ID 
+   */
+  public static function retotalOne($cid, $aid, $uid) {
+    global $DBH;
+    // Re-total any student attempts on this assessment
+      //need to re-score assessment attempts based on withdrawal
+    $DBH->beginTransaction();
+    $stm = $DBH->prepare("SELECT timelimitmult FROM imas_students WHERE courseid=? AND userid=?");
+    $stm->execute(array($cid, $uid));
+    $timelimitmult = $stm->fetchColumn(0);
+
+  	$stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? AND userid=? FOR UPDATE");
+  	$stm->execute(array($aid, $uid));
+  	if ($stm->rowCount() > 0) {
+  		$assess_info = new AssessInfo($DBH, $aid, $cid, false);
+        $assess_info->loadException($uid, true);
+        $assess_info->applyTimelimitMultiplier($timelimitmult);
+        $assess_info->loadQuestionSettings('all', false, false);
+        $submitby = $assess_info->getSetting('submitby');
   		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
   			$assess_record = new AssessRecord($DBH, $assess_info, false);
-  			$assess_record->setRecord($row);
-  			$assess_record->reTotalAssess();
-  			$assess_record->saveRecord();
-        // update LTI grade
-        $lti_sourcedid = $assess_record->getLTIsourcedId();
-        if (strlen($lti_sourcedid) > 1 && ($submitby == 'by_question' ||
-          ($assess_record->getStatus()&64)==64)
-        ) {
-          $gbscore = $assess_record->getGbScore();
-          $aidposs = $assess_info->getSetting('points_possible');
-          calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
-        }
+            $assess_record->setRecord($row);
+            $orig_gb_score = $assess_record->getGbScore();
+            $assess_record->reTotalAssess();
+            $gbscore = $assess_record->getGbScore();
+            if ($orig_gb_score['gbscore'] != $gbscore['gbscore']) {  
+                $assess_record->saveRecord();
+                // update LTI grade
+                $lti_sourcedid = $assess_record->getLTIsourcedId();
+                if (strlen($lti_sourcedid) > 1 && ($submitby == 'by_question' ||
+                    ($assess_record->getStatus()&64)==64)
+                ) {
+                    $aidposs = $assess_info->getSetting('points_possible');
+                    calcandupdateLTIgrade($lti_sourcedid, $aid, $line['userid'], $gbscore['gbscore'], true, $aidposs);
+                }
+            }
   		}
-  	}
-  	$DBH->commit();
+    }
+    $DBH->commit();
   }
 
   /**
@@ -65,7 +145,7 @@ class AssessHelpers
       return 0;
     }
     // grab all questions settings
-    $assess_info->loadQuestionSettings('all', false);
+    $assess_info->loadQuestionSettings('all', false, false);
 
     $DBH->beginTransaction();
     $stm = $DBH->prepare("SELECT * FROM imas_assessment_records WHERE assessmentid=? FOR UPDATE");

@@ -280,8 +280,9 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$db_fields['questions'][$k] = 'imas_questions.'.$v;
 		}
 		$db_fields['questions'] = implode(',',$db_fields['questions']);
-		$query = "SELECT imas_questions.id,imas_questions.withdrawn,".$db_fields['questions']." FROM imas_questions ";
-		$query .= "JOIN imas_assessments ON imas_questions.assessmentid=imas_assessments.id ";
+		$query = "SELECT imas_questions.id,imas_questions.withdrawn,imas_questionset.license,".$db_fields['questions']." FROM imas_questions ";
+        $query .= "JOIN imas_assessments ON imas_questions.assessmentid=imas_assessments.id ";
+        $query .= "JOIN imas_questionset ON imas_questions.questionsetid=imas_questionset.id ";
 		$query .= "WHERE imas_assessments.id IN ($ph)";
 		$stm = $DBH->prepare($query);
 		$stm->execute($toget);
@@ -297,7 +298,16 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				continue;
 			} else {
 				unset($line['withdrawn']);
-			}
+            }
+            // skip if license type is excluded
+            if (!empty($_POST['excludecopyright']) && $line['license'] == 0) {
+                continue;
+            } else if (!empty($_POST['excludenc']) && $line['license'] == 3) {
+                continue;
+            } else {
+                unset($line['license']);
+            }
+
 			//unset category if outcome or aid
 			if ($line['category']!='' && (is_numeric($line['category']) || 0==strncmp($line['category'],"AID-",4))) {
 				$line['category'] = '';
@@ -623,7 +633,11 @@ if ($overwriteBody==1) {
 	<tr><td class="r">Export offline grade items?</td><td> <input type=checkbox name="exportoffline"  value="1"/></td></tr>
 	<tr><td class="r">Export calendar items?</td><td> <input type=checkbox name="exportcalitems"  value="1"/></td></tr>
 	<tr><td class="r">Export "display at top" instructor forum posts? </td><td><input type=checkbox name="exportstickyposts"  value="1" checked="checked"/></td></tr>
-	</tbody>
+    <tr><td class="r">Exclude questions? </td>
+      <td><input type=checkbox name="excludecopyright"  value="1" checked="checked"/> Exclude copywrited questions<br>
+          <input type=checkbox name="excludenc"  value="1" checked="checked"/> Exclude NC licensed questions</td></tr>
+
+    </tbody>
 	</table>
 	</fieldset>
 

@@ -177,7 +177,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
 	str = str.replace(/\u2329/g, "<").replace(/\u232a/g, ">");
 	str = str.replace(/₀/g,"_0").replace(/₁/g,"_1").replace(/₂/g,"_2").replace(/₃/g,"_3");
-	str = str.replace(/\bOO\b/i,"oo");
+	str = str.replace(/\b(OO|infty)\b/i,"oo");
 	str = str.replace(/θ/,"theta").replace(/ϕ/,"phi").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu")
 	str = str.replace(/α/,"alpha").replace(/β/,"beta").replace(/γ/,"gamma").replace(/δ/,"delta").replace(/ε/,"epsilon").replace(/κ/,"kappa");
 	str = str.replace(/λ/,"lambda").replace(/ρ/,"rho").replace(/τ/,"tau").replace(/χ/,"chi").replace(/ω/,"omega");
@@ -2174,7 +2174,8 @@ function isBlank(str) {
 }
 
 function editdebit(el) {
-	var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 1));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && descr.hasClass("iscredit")) {
 		if (descr.is('select')) {
 			descr.css('margin-right',20);
@@ -2186,7 +2187,8 @@ function editdebit(el) {
 	}
 }
 function editcredit(el) {
-	var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	//var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+	var descr = $(el).closest('tr').find("input").first();
 	if (!isBlank(el.value) && !descr.hasClass("iscredit")) {
 		if (descr.is('select')) {
 			descr.css('margin-right',0);
@@ -2200,7 +2202,8 @@ function editcredit(el) {
 function initcreditboxes() {
 	$('.creditbox').each(function(i, el) {
 		if (!isBlank(el.value) && $(el).css('padding-left')!=20) {
-			var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+			//var descr = $('#qn'+(el.id.substr(2)*1 - 2));
+			var descr = $(el).closest('tr').find("input").first();
 			if (descr.is('select')) {
 				descr.css('margin-right',0);
 			} else {

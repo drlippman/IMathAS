@@ -62,6 +62,9 @@ makejournal(journal array, start number, options, $anstypes, $questions, $answer
 <BR>options is an array of type-ahead values for the descriptions
 <BR>
 <BR>for $anstypes through $displayformat, just pass the variable through.
+<BR>
+<br>Set $journal[0]['haspostrefs'] to enable post ref. column, and add post ref
+<br>values to debits and credits arrays between description and value.
 <BR><h3><a name="scorejournal">scorejournal</a></h3>
 scorejournal($stuanswers[$thisq], $answer, $journal, start number)
 <BR>Call with $stuanswers, and $answer array
@@ -107,6 +110,8 @@ makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displa
 <BR><h3><a name="makeTchart">makeTchart</a></h3>
 makeTchart(title,numrows,leftentries,rightentries, start number, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize, [dofloat, showtotal])
 <BR>num rows, leftentries, and rightentries should not include the total - that will be automatically added
+<br>float (def false) set true to add display:float to table.
+<BR>showtotal (def true) to show total rows. Defaults to 0 total on right; set to 'zeroleft' to show 0 total on left.
 <BR><h3><a name="scoreTchart">scoreTchart</a></h3>
 function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn)
 <BR>returns a new answer array

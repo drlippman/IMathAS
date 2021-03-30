@@ -25,7 +25,7 @@ if (isset($_POST['options'])) {
 
 	//get assessment info
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings('all', $dobca); // only load code if we need answers
+	$assess_info->loadQuestionSettings('all', $dobca, false); // only load code if we need answers
 
 	$itemorder = $assess_info->getSetting('itemorder');
 	$itemarr = array();
@@ -203,12 +203,13 @@ if (isset($_POST['options'])) {
 			  $val = str_replace("\n", " ", $val);
 			  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
 			  $val = str_replace("&nbsp;"," ",$val);
-
+              $val = Sanitize::stripHtmlTags($val);
+              
 			  # if a deliminator char, a double quote char or a newline are in the field, add quotes
 			  if(preg_match("/[\,\"\n\r]/", $val)) {
 				  $val = '"'.str_replace('"', '""', $val).'"';
 			  }
-			  $line .= Sanitize::stripHtmlTags($val).',';
+			  $line .= $val.',';
 		}
 		# strip the last deliminator
 		$line = substr($line, 0, -1);

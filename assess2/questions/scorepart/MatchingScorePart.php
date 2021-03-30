@@ -40,6 +40,7 @@ class MatchingScorePart implements ScorePart
         else if (isset($options['answer'])) {if (is_array($options['answer'][$partnum])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
         if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$partnum];} else {$matchlist = $options['matchlist'];}
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
+        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
 
         if (!is_array($questions) || !is_array($answers)) {
             $scorePartResult->addScoreMessage(_('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.'));
@@ -67,7 +68,7 @@ class MatchingScorePart implements ScorePart
         for ($i=0;$i<count($questions);$i++) {
           if ($isRescore) {
             $origla = explode('|', $givenans);
-            if ($origla[$i] != '') {
+            if ($origla[$i] !== '') {
               if (isset($matchlist)) {
                 if ($matchlist[$i] != $origla[$i]) {
                   $score -= $deduct;
@@ -81,7 +82,7 @@ class MatchingScorePart implements ScorePart
               $score -= $deduct;
             }
           } else {
-            if ($_POST["qn$qn-$i"]!="" && $_POST["qn$qn-$i"]!="-") {
+            if ($_POST["qn$qn-$i"]!=="" && $_POST["qn$qn-$i"]!="-") {
                 $qa = Sanitize::onlyInt($_POST["qn$qn-$i"]);
                 $origla[$randqkeys[$i]] = $randakeys[$qa];
                 if (isset($matchlist)) {
@@ -100,6 +101,11 @@ class MatchingScorePart implements ScorePart
 
         // only store unrandomized
         $scorePartResult->setLastAnswerAsGiven(implode('|', $origla));
+        if (isset($scoremethod) && $scoremethod=='allornothing') {
+            if ($score<.99) {
+                $score = 0;
+            } 
+        }
         $scorePartResult->setRawScore($score);
         return $scorePartResult;
     }

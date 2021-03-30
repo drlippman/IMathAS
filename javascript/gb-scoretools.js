@@ -46,15 +46,21 @@ function hideNA() {
 	$(".notanswered").toggle();
 }
 function showallans() {
-	$("span[id^='ans']").removeClass("hidden").show();
-	$(".sabtn").replaceWith("<span>Answer: </span>");
+	$("span[id^='ans']").toggleClass("hidden", false).show();
+    $(".sabtn").replaceWith("<span>Answer: </span>");
+    $("div[id^=dsbox]").toggleClass("hidden", false).attr("aria-hidden", false)
+        .attr("aria-expanded", true);
+    $("button[aria-controls^=ans],input[aria-controls^=dsbox]").attr('aria-expanded', true);
 }
 function previewall() {
 	$('input[value="Preview"]').trigger('click').remove();
 }
 function previewallfiles() {
 	$("span.clickable").trigger("click");
-	$(".question span[id^=fileembedbtn]").trigger("click");
+	$(".question span[id^=fileembedbtn], .sidepreview span[id^=fileembedbtn], .viewworkwrap span[id^=fileembedbtn]").trigger("click");
+}
+function showallwork() {
+	$(".viewworkwrap > button").trigger("click");
 }
 function allvisfullcred() {
 	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
@@ -62,11 +68,20 @@ function allvisfullcred() {
 function allvisnocred() {
 	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
 }
+function updatefilters() {
+    $(".bigquestionwrap").show();
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork'];
+    for (var i=0; i<6; i++) {
+        if (document.getElementById('filter-' + filters[i]).checked) {
+            $(".bigquestionwrap.qfilter-" + filters[i]).hide();
+        }
+    }
+}
 function toggleWork(el) {
 	var next = $(el).next();
 	if (next.is(':hidden')) {
 		el.innerText = _('Hide Work');
-		next.show();
+        next.show();
 	} else {
 		el.innerText = _('Show Work');
 		next.hide();
@@ -80,7 +95,7 @@ function preprint() {
 }
 function quicksave() {
 	var url = $("#mainform").attr("action")+"&quick=true";
-	$("#quicksavenotice").html(_("Saving...") + ' <img src="../img/updating.gif"/>');
+	$("#quicksavenotice").html(_("Saving...") + ' <img src="'+staticroot+'/img/updating.gif"/>');
 	tinymce.triggerSave();
 	$.ajax({
 		url: url,

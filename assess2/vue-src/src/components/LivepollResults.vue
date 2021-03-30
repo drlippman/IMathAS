@@ -1,8 +1,8 @@
 <template>
-  <div v-if="qinfo.answeights">
+  <div v-if="qinfo && qinfo.answeights">
     <p>{{ $tc('livepoll.numresults', numResults) }}</p>
-    <div v-show="showresults">
-      <div v-for="(resdata,pn) in results" :key="pn" class="med-below">
+    <div v-show="showresults && numResults > 0">
+      <div v-for="(resdata,pn) in results" :key="qn + '-' + pn" class="med-below">
         <livepoll-results-choices
           v-if="resdata.hasOwnProperty('choices')"
           :results = "resdata"
@@ -141,6 +141,7 @@ export default {
   },
   methods: {
     condenseDraw (str) {
+      if (str === '') { return str; }
       var la = str.replace(/\(/g, '[').replace(/\)/g, ']');
       la = la.split(';;');
       if (la[0] !== '') {
@@ -254,6 +255,8 @@ export default {
   .LPshowcorrect td:first-child {background:#CCFFCC  no-repeat 8px center;}
   .LPshowwrong td {background-color:#FFCCCC;}
   .LPshowwrong td:first-child {background:#FFCCCC  no-repeat 8px center;}
+  .LPshowpartial td {background-color:#FFEEAA;}
+  .LPshowpartial td:first-child {background: #FFEEAA  no-repeat 8px center;}
   .LPresval {}
   .LPresbarwrap {display:inline-block; width:100%;}
   .LPresbar {display:inline-block; background-color: #CCCCCC; text-align:center; overflow:show; padding:5px 0px;}

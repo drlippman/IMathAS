@@ -219,7 +219,7 @@ function apportion_info($pop, $seats, $method) {
 			$other[$s] = sqrt($luq[$s]*($luq[$s]+1));
 			if ($q>$other[$s]) { $luq[$s]++;}
 		}
-		$toadd = $seats - array_sum($luq);
+        $toadd = $seats - array_sum($luq);
 		if ($toadd==0) {
 			$tochange = array();
 			foreach ($quotas as $s=>$q) {
@@ -233,16 +233,16 @@ function apportion_info($pop, $seats, $method) {
 			}
 			rsort($tochange);
 			$quotamin = $tochange[0];
-			$tochange = array();
+            $tochange = array();
 			foreach ($quotas as $s=>$q) {
 				if (floor($q)==0) {continue;}
-				for ($i=0;$i<min(floor($q),1);$i++) {
-					$newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1))-.000001); //what to get it under GM?
+				for ($i=0;$i<min(floor($q),2);$i++) {
+                    $newq = $pop[$s]/(sqrt((floor($q)-$i)*(floor($q)-$i+1))-.000001); //what to get it under GM?
 					if ($newq>$divisor) {
 						$tochange[] = $newq; 
 					}
 				}
-			}
+            }
 			sort($tochange);
 			$quotamax = $tochange[0];
 		} else if ($toadd>0) {

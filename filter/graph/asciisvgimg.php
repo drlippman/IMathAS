@@ -538,13 +538,13 @@ function ASaxes($arg) {
 	$fqonlyx = false; $fqonlyy = false;
 	$dox = true;
 	$doy = true;
-	if (is_numeric($arg[0])) {
+	if (!is_bool($arg[0])) {
 		$xscl = $this->evalifneeded($arg[0]);
 	} else {
 		$dolabels = true;
 	}
 	if (count($arg)>1) {
-		if (is_numeric($arg[1])) {
+		if (!is_bool($arg[1])) {
 			$yscl = $this->evalifneeded($arg[1]);
 		} else {
 			$dogrid = true;
@@ -1260,10 +1260,14 @@ function outputimage() {
 	}
 }
 function evalifneeded($str) {
-	$str = str_replace('pi','3.141593', $str);
+	//$str = str_replace('pi','3.141593', $str);
 	if (is_numeric($str)) {
 		return $str;
-	} else if (trim($str)=='' || preg_match('/[^\(\)\d+\-\/\*\.]/',$str)) {
+	} else {
+        $val = evalMathParser($str);
+        if (is_nan($val)) { return 0;}
+        return $val;
+    }/*else if (trim($str)=='' || preg_match('/[^\(\)\d+\-\/\*\.]/',$str)) {
 		return 0; //return a value to prevent errors
 	} else {
 		try {
@@ -1272,7 +1276,7 @@ function evalifneeded($str) {
 			return 1;
 		}
 		return $ret;
-	}
+	}*/
 }
 } //end AStoIMG class
 

@@ -112,25 +112,33 @@ function mathjs(st,varlist) {
   	  //search for alt capitalization to escape alt caps correctly
   	  var foundaltcap = [];
   	  for (var i=0; i<vararr.length; i++) {
-  	  	  foundaltcap[i] = false;
-  	  	  for (var j=0; j<vararr.length; j++) {
-  	  	  	  if (i!=j && vararr[j].toLowerCase()==vararr[i].toLowerCase() && vararr[j]!=vararr[i]) {
-	  			foundaltcap[i] = true;
-	  			break;
-	  		}
-	  	}
+        foundaltcap[i] = false;
+        if (vararr[i] == "E" || vararr[i] == "e") {
+            foundaltcap[i] = true;  // always want to treat e and E as different
+        } else {
+            for (var j=0; j<vararr.length; j++) {
+                if (i!=j && vararr[j].toLowerCase()==vararr[i].toLowerCase() && vararr[j]!=vararr[i]) {
+                    foundaltcap[i] = true;
+                    break;
+                }
+            } 
+        }
 	  }
 	  st = st.replace(new RegExp("("+varlist+")","gi"), function(match,p1) {
 		 for (var i=0; i<vararr.length;i++) {
 			if (vararr[i]==p1 || (!foundaltcap[i] && vararr[i].toLowerCase()==p1.toLowerCase())) {
 				return '(@v'+i+'@)';
 			}
-		 }});
+         }
+         return p1;
+        });
   } else {
   	  st = st.replace(/pi/g, "(pi)");
   }
   //temp store of scientific notation
-  st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
+  st = st.replace(/([0-9])(E|e)([\-0-9])/g,"$1(EE)$3");
+
+  st = st.replace(/\*?\s*degrees?/g,"*((pi)/180)");
 
   //convert named constants
   st = st.replace(/e/g, "(E)");
