@@ -13,7 +13,6 @@
 // - Angle value should be able to be put in an answerbox
 
 // - Mass create points
-// - Can I create suspendUpdate and unsuspendUpdate functions from the PHP?
 
 // - Allow user to indicate which function should be placed in the answerbox
 // - Is it possible to have a function that just takes a string input of javascript code to insert?
@@ -26,6 +25,7 @@ $allowedmacros[] = "jsxBoard";
 $allowedmacros[] = "jsxSlider";
 $allowedmacros[] = "jsxPoint";
 $allowedmacros[] = "jsxGlider";
+$allowedmacros[] = "jsxIntersection";
 $allowedmacros[] = "jsxFunction";
 $allowedmacros[] = "jsxParametric";
 $allowedmacros[] = "jsxPolar";
@@ -59,7 +59,7 @@ function jsx_validobjects() {
 	$ob1 = ['point', 'slider', 'function', 'circle', 'polygon'];
 	$ob2 = ['line', 'segment', 'ray', 'vector', 'text', 'angle'];
 	$ob3 = ['glider', 'tangent', 'polar', 'parametric', 'integral'];
-	$ob4 = ['riemannsum'];
+	$ob4 = ['riemannsum', 'intersection'];
 	return array_merge($ob1, $ob2, $ob3, $ob4);
 }
 
@@ -279,7 +279,7 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		// Set the attributes
 		
 		$out .= "{
-			highlight: {$fixed},
+			highlight: !{$fixed},
 			showInfobox: false,
 			fixed: {$fixed},
 			color: '{$color}',
@@ -347,6 +347,7 @@ function jsxGlider (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
+		$fixed = $ops['fixed'] !== null ? jsx_getbool($ops['fixed']) : 'false';
 		$color = $ops['color'] !== null ? $ops['color'] : 'black';
 		$size = $ops['size'] !== null ? $ops['size'] : 2;
 		$face = $ops['face'] !== null ? $ops['face'] : 'circle';
@@ -354,7 +355,15 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		$label = $ops['label'] !== null ? $ops['label'] : '';
 		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
 		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
+		$snapSizeX = $ops['xsnapsize'] !== null ? $ops['xsnapsize'] : 1;
+		$snapSizeY = $ops['ysnapsize'] !== null ? $ops['ysnapsize'] : 1;
 		$trace = $ops['trace'] !== null ? jsx_getbool($ops['trace']) : 'false';
+		
+		if (($ops['xsnapsize'] !== null) || ($ops['ysnapsize'] !== null)) {
+			$snapToGrid = 'true';
+		} else {
+			$snapToGrid = 'false';
+		}
 
 		// Begin object creation
 		$out = "var {$id} = board_{$boardID}.create('glider', [";
@@ -364,15 +373,18 @@ function jsxGlider (&$board, $param, $ops=array()) {
 
 		// Set attributes 
 		$out .= "{
-            highlight: true,
+            highlight: !{$fixed},
             showInfobox: false,
-            fixed: false,
+			fixed: {$fixed},
 			trace: {$trace},
             color: '{$color}',
             size: {$size},
             face: '{$face}',
 			name: '',
-            label: { color: '{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
+            label: { color: '{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
+			snapSizeX: {$snapSizeX},
+			snapSizeY: {$snapSizeY},
+			snapToGrid: {$snapToGrid}
         })";
 		
 		if ($ops['attributes'] !== null) { 
@@ -407,6 +419,79 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		echo "Eek! To attach a point on another object, you must provide a location, and the object.";
 	}
 
+}
+
+// Creats a point at the intersection of two objects
+
+function jsxIntersection(&$board, $param, $ops=array()) {
+	
+	$id = "intersection_".uniqid();
+	$boardID = jsx_getboardname($board);
+	$out = "";
+	
+	if (is_array($param) && (is_jsxcircleref($param[0]) || is_jsxcircleref($param[1]) || is_jsxlineref($param[0]) || is_jsxlineref($param[1]))) {
+		
+		$color = $ops['color'] !== null ? $ops['color'] : 'black';
+		$size = $ops['size'] !== null ? $ops['size'] : 2;
+		$face = $ops['face'] !== null ? $ops['face'] : 'circle';
+		$haslabel = $ops['label'] !== null ? 'true' : 'false';
+		$label = $ops['label'] !== null ? $ops['label'] : '';
+		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
+		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
+		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+		$trace = $ops['trace'] !== null ? jsx_getbool($ops['trace']) : 'false';
+		$negativeroot = $ops['negativeroot'] !== null ? jsx_getbool($ops['negativeroot']) : 'false';
+			
+		// Start making the point
+		$out = "var {$id} = board_{$boardID}.create('intersection', [{$param[0]}, {$param[1]}, ";
+		
+		$out .= $negativeroot == 'true' ? "1]," : "0],";
+		
+		// Set the attributes
+		
+		$out .= "{
+			showInfobox: false,
+			color: '{$color}',
+			size: {$size},
+			face: '{$face}',
+			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
+			name: '',
+			trace: {$trace},
+			visible: {$visible}
+		})";
+		
+		// Set any remaining paramenters specified by user
+		$out .= $ops['attributes'] !== null ? ".setAttribute( {$ops['attributes']} )" : "";
+		
+		// If answerbox option provided, set up box number
+		if ($ops['answerbox'] !== null) {
+			
+			if (count($ops['answerbox']) == 1) { 
+				$box = $ops['answerbox'][0] - 1;
+			} else {
+				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
+			}
+
+			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";
+			
+			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";  
+			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
+				
+		} else {
+			$out .= ";";
+		}     
+		
+		$out .= jsx_setlabel($id, $label);
+		
+	} else {
+		echo "Eek! parameters for an intersection must include the board to place it on
+			  and two parameters that are either circles or lines to intersect.<br>";
+	}
+	
+	// Append new output string to the board string
+	$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+	return $id;
+	
 }
 
 
@@ -696,12 +781,14 @@ function jsxSegment (&$board, $param, $ops=array()) {
 		$fontsize = $ops['fontsize'] !== null ? $ops['fontsize'] : 16;
 		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
 		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
+		$length = $ops['length'] !== null ? $ops['length'] : -1;
 
 		// Begin object creation
 
 		$out = "var {$id} = board_{$boardID}.create('segment', [";
 		$out .= jsx_pointToJS($param[0]).", ";
-		$out .= jsx_pointToJS($param[1])."],";
+		$out .= jsx_pointToJS($param[1]);
+		$out .= $length == -1 ? "]," : ",{$length}],";
 
 		//	name: '" .$label. "',
 
@@ -1136,7 +1223,7 @@ function jsxText (&$board, $param, $ops=array()) {
 		
 		if (is_array($param[0])) {
 			$out .= jsx_valueToJS($param[0][0]).", ".jsx_valueToJS($param[0][1]).", ";
-		} else if(is_jsxpointtref($param[0])) {
+		} else if(is_jsxpointref($param[0])) {
 			$out .= jsx_valueToJS("$param[0].X()").", ".jsx_valueToJS("$param[0].Y()").", ";
 		}
 		
@@ -2054,9 +2141,9 @@ function is_jsxobjectref($item, $strict = true) {
 // kind of point in JSX Graph. This can be a point, a glider, a midpoint,
 // the center of a circle, etc. 
 
-function is_jsxpointtref($item) {
+function is_jsxpointref($item) {
 	if ($item !== null && is_string($item)) {
-		$point_pattern = "/^\s*(point|glider)_\w{".jsx_idlen()."}/i";
+		$point_pattern = "/^\s*(point|glider|intersection)_\w{".jsx_idlen()."}/i";
 		return preg_match($point_pattern, $item);
 	}
 }
@@ -2078,7 +2165,7 @@ function is_jsxpoint($item) {
 	}
 	
 	// If $item is a reference to a jsx point, then is is valid too
-	if (is_jsxpointtref($item)) {
+	if (is_jsxpointref($item)) {
 		return true;
 	}
 		
@@ -2095,6 +2182,24 @@ function is_jsxvalue($item) {
 		return true;
 	} else {
 		return false;
+	}
+}
+
+// Returns true if the provided object is a circle reference
+
+function is_jsxcircleref($item) {
+	if ($item !== null && is_string($item)) {
+		$point_pattern = "/^\s*(circle)_\w{".jsx_idlen()."}/i";
+		return preg_match($point_pattern, $item);
+	}
+}
+
+// Returns true if the provided object is a line reference of some kind 
+
+function is_jsxlineref($item) {
+	if ($item !== null && is_string($item)) {
+		$point_pattern = "/^\s*(line|tangent|segment|ray|vector)_\w{".jsx_idlen()."}/i";
+		return preg_match($point_pattern, $item);
 	}
 }
 
@@ -2158,7 +2263,7 @@ function jsx_pointToJS($point) {
 	
 	if (is_array($point)) {
 		$js .= "[".jsx_valueToJS($point[0]).", ".jsx_valueToJS($point[1])."]";
-	} else if(is_jsxpointtref($point)) {
+	} else if(is_jsxpointref($point)) {
 		$js = $point;
 	}
 	return $js;
