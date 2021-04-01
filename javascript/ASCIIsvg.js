@@ -1005,6 +1005,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     svgpicture.appendChild(pnode);
   }
   pnode = myCreateElementSVG("path");
+  st="";
   if (dox) {
 	  st="M"+(fqonlyx?origin[0]:winxmin)+","+(height-origin[1])+" "+winxmax+","+
     (height-origin[1]);

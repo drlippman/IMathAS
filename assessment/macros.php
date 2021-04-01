@@ -141,7 +141,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$ymax = is_numeric($settings[3])?$settings[3]:5;
 	$plotwidth = is_numeric($settings[6])?$settings[6]:200;
 	$plotheight = is_numeric($settings[7])?$settings[7]:200;
-	$noyaxis = false;
+    $noyaxis = false;
+    $noxaxis = false;
 	if (is_numeric($ymin) && is_numeric($ymax) && $ymin==0 && $ymax==0) {
 		$ymin = -0.5;
 		$ymax = 0.5;
@@ -163,11 +164,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$lbl = explode(':',$settings[4]);
 		$lbl = array_map('evalbasic', $lbl);
 	} else {
-		$settings[4] = evalbasic($settings[4]);
+        $settings[4] = evalbasic($settings[4]);
+        $lbl = [];
 	}
 	if (is_numeric($settings[4]) && $settings[4]>0) {
 		$commands .= 'axes('.$settings[4].','.$settings[4].',1';
-	} else if (isset($lbl[0]) && is_numeric($lbl[0]) && $lbl[0]>0) {
+	} else if (isset($lbl[0]) && is_numeric($lbl[0])) {
+        if ($lbl[0]==0) {
+            $lbl[0] = 1;
+            $noxaxis = true;
+        }
 		if ($lbl[1]==0) {
 			$lbl[1] = 1;
 			$noyaxis = true;
@@ -197,8 +203,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		//$commands .= ');';
 	}
 
-	if ($noyaxis==true) {
-		$commands .= ',1,0,1);';
+	if ($noyaxis==true || $noxaxis==true) {
+		$commands .= ','.($noxaxis?0:1).','.($noyaxis?0:1).',1);';
 	} else if ($fqonlyx || $fqonlyy) {
 		$commands .= ','.($fqonlyx?'"fq"':1).','.($fqonlyy?'"fq"':1).');';
 	} else {
