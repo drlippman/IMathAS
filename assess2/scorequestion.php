@@ -298,6 +298,9 @@ if ($end_attempt) {
   // grab all questions settings and scores, based on end-of-assessment settings
   $showscores = $assess_info->showScoresAtEnd();
   $reshowQs = $assess_info->reshowQuestionsAtEnd() && $showscores;
+  if ($assess_record->getShowWorkAfter() && !$reshowQs) {
+    $reshowQs = $assess_info->reshowQuestionsInGb();
+  }
   $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores, true, $reshowQs, 'last');
   $assessInfoOut['score'] = $assess_record->getAttemptScore();
   $totalScore = $assessInfoOut['score'];
