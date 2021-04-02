@@ -809,7 +809,7 @@ switch($_GET['action']) {
 			echo '<span class=formright><input type=checkbox name="copyrubrics" id="copyrubrics" value="1" checked/>';
 			echo '</span><br class=form>';
 			echo '<span class=form><label for=copyoutcomes>'._('Copy outcomes?').'</label></span>';
-			echo '<span class=formright><input type=checkbox name="copyoutcomes" id="copyoutcomes" value="1"/>';
+			echo '<span class=formright><input type=checkbox name="copyoutcomes" id="copyoutcomes" value="1" checked/>';
 			echo '</span><br class=form>';
 			echo '<span class=form><label for=copystickyposts>'._('Copy "display at top" instructor forum posts?').'</label></span>';
 			echo '<span class=formright><input type=checkbox name="copystickyposts" id="copystickyposts" value="1" checked/>';
