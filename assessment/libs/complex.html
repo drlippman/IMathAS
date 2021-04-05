@@ -31,6 +31,7 @@
     <li><a href="#pow">cx_pow: Power</a></li>
     <li><a href="#root">cx_root: nth Roots</a></li>
     <li><a href="#quad">cx_quadRoot: Quadratic roots</a></li>
+    <li><a href="#cubic">cx_cubicRoot: Cubic roots</a></li>
     <li><a href="#prquad">cx_prettyquadRoot: Formatted quadratic roots</a></li>
     <li><a href="#format2std">cx_format2std: Display in standard form</a></li>
     <li><a href="#format2pol">cx_format2pol: Display in polar form</a></li>
@@ -209,6 +210,20 @@
 <p><em>&nbsp;Returns:</em></p>
 <p></p>
 <p>An array of the two roots (either real or complex) of the quadratic equation.</p>
+<p>&nbsp;</p>
+
+<p><a name="cubic"></a><strong>cx_cubicRoot</strong>(coeff, [disp = False, roundto = 12])</p>
+<p>Function: cx_cubicRoot Returns an array of roots of the cubic equation f(x) = ax^3 + bx^2 + cx + d. Real roots are returned as an array([r1],[r2],[r3]) and complex roots are return as an array([r1],[Re1,Im1], [Re1,Im1]).</p>
+<p>&nbsp;<em>Parameters:</em></p>
+<ul>
+  <li><strong>coeff</strong>: The array of numerical coefficients: [a,b,c,d]</li>
+  <li><strong>disp</strong>: If set to true, the function returns the string version of the roots for display in the form array("root1", "root2", "root3"), which should not be used in calculation.</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which the roots should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p><em>&nbsp;Returns:</em></p>
+<p></p>
+<p>An array of the three roots (either real or complex) of the cubic equation.</p>
 <p>&nbsp;</p>
 
 <p><a name="prquad"></a><strong>cx_prettyquadRoot</strong>(a, b, c)</p>
