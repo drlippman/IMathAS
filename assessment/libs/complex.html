@@ -36,6 +36,7 @@
     <li><a href="#format2std">cx_format2std: Display in standard form</a></li>
     <li><a href="#format2pol">cx_format2pol: Display in polar form</a></li>
     <li><a href="#plot">cx_plot: Plot z</a></li>
+    <li><a href="#matrixreduce">cx_matrixreduce: RREF of complex matrices</a></li>
     
     </div>
 <p>&nbsp;</p>
@@ -281,6 +282,20 @@
 <p>The plot of a complex number.</p>
 <p>&nbsp;</p>
 
+<p><a name="matrixreduce"></a><strong>cx_matrixreduce</strong>(A, [rref = False, disp = False, roundto = 4])</p>
+<p>Function cx_matrixreduce returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A; it handles matrices with both real and complex entries.</p>
+<p><em>Parameters:</em></p>
+<ul>
+  <li><strong>A</strong>: Matrix in the form array([row1],[row2],...) where each row can have real entries as a single value or complex entries in the form [Re, Im];
+    for example, the 2x2 matrix array([1, 2+3i], [-i, 5]) should be entered as A = array([1, [2,3]], [[0,-1], 5]) </li>
+  <li><strong>rref</strong>: Optional - If true, it returns the reduce row echelon form; the default is false, which returns the row echelon form (ref). </li>
+  <li><strong>disp</strong>: Optional - If set to true, the function returns the formatted matrix (with string entries) for display, which should not be used for calculation. </li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which the entries should be rounded off in display format (i.e. when disp = true); default is 4 decimal places.  </li>
 
+ </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>Returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A in the same format as A. The display format returns the formatted matrix.
+   See question 674661 on MOM for an example.</p>
+<p>&nbsp;</p>
 
 <a href="#top">Back to top of page</a>
