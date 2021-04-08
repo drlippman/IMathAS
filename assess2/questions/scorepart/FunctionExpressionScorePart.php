@@ -312,12 +312,12 @@ class FunctionExpressionScorePart implements ScorePart
                 if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {  //if equation, store ratios
                     if (isNaN($givenansvals[$i])) {
                         $stunan++;
-                    } elseif (abs($realans)>.000001 && is_numeric($givenansvals[$i])) {
+                    } elseif (abs($realans)>.00000001 && is_numeric($givenansvals[$i])) {
                         $ratios[] = $givenansvals[$i]/$realans;
                         if (abs($givenansvals[$i])<=.00000001 && $realans!=0) {
                             $cntzero++;
                         }
-                    } else if (abs($realans)<=.000001 && is_numeric($givenansvals[$i]) && abs($givenansvals[$i])<=.00000001) {
+                    } else if (abs($realans)<=.00000001 && is_numeric($givenansvals[$i]) && abs($givenansvals[$i])<=.00000001) {
                         $cntbothzero++;
                     }
                 } else if (in_array('toconst',$ansformats)) {
