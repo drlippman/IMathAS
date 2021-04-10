@@ -2571,7 +2571,7 @@ These macros are used to test various conditions.  They typically return true or
   tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
 <li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Compares functions a and b to see if they are algebraically equivalent.  Set
   vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
-  Set domain to "xmin,xmax" to specify a domain for comparison.</li>
+  Set domain to "xmin,xmax" to specify a domain for comparison, or "xmin,xmax,integers" to restrict domain to integer values.</li>
 <li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
  vars should be a list or array of variables in the statements. </li>
