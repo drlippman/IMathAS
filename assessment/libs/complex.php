@@ -15,7 +15,7 @@
     
 
 global $allowedmacros;
-array_push($allowedmacros,"cx_add","cx_arg", "cx_conj","cx_cubicRoot", "cx_div", "cx_format2pol", "cx_format2std", "cx_modul",
+array_push($allowedmacros,"cx_add","cx_arg", "cx_conj","cx_cubicRoot", "cx_div", "cx_format2pol", "cx_format2std", "cx_matrixreduce", "cx_modul",
                         "cx_mul", "cx_quadRoot", "cx_prettyquadRoot",  "cx_plot",
                         "cx_pow", "cx_polEu","cx_pol2std", "cx_root", "cx_std2pol", "cx_sub");
                          
@@ -810,5 +810,111 @@ function cx_plot(array $num, string $argin = "deg" ,int $roundto = 3, bool $show
     return $plot;
 }
 
-       
+/*-----------------------------------------------matrixreduce for complex entries-------------------------------------------------------
+ Function: cx_matrixreduce(A, [rref = False, disp = False, roundto = 4])
+ Returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A; it handles matrices with both real and complex entries. 
+ 
+ Parameters:
+ A: Matrix in the form array([row1],[row2],...) where each row can have real entries as a single value or complex entries in the form [Re, Im]
+    for example. the 2x2 matrix array([1, 2+3i], [-i, 5]) should be entered as A = array([1, [2,3]], [[0,-1], 5])
+
+ rref: Optional - If true, it returns the reduce row echelon form; the default is false, which returns the row echelon form (ref).
+ 
+ disp: Optional - If set to true, the function returns the string version of the entries for display, which should not be used for calculation. 
+
+ roundto: Optional - number of decimal places to which the entries should be rounded off to in display format (i.e. when disp = true); 
+          default is 4 decimal places. 
+   
+
+ Returns:
+ Returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A in the same format as A. 
+ The display format returns the string-formatted entries formatted as a matrix.
+*/  
+
+function cx_matrixreduce($A, $rref = False, $disp = False, $roundto = 4) {
+	
+    include_once("matrix.php");
+    if (!isMatrix($A)) { echo 'error: input not a matrix'; return '';}
+    
+	// number of rows
+    $N  = count($A);
+    // number of columns
+    $M = count($A[0]);
+    
+	for ($i=0; $i<$N; $i++){
+		for ($j=0; $j<$M; $j++){
+			if(!is_array($A[$i][$j])){
+				$A[$i][$j]=[$A[$i][$j],0];
+			}
+			if(count($A[$i][$j])==1){
+				$A[$i][$j]=[$A[$i][$j][0],0];
+			}
+		
+		}
+
+	}
+	
+    $r = 0;  $c = 0;
+    while ($r < $N && $c < $M) {
+		if (cx_modul($A[$r][$c]) == 0) { //swap only if there's a 0 entry $A[$r][$c]==0
+			$max = $r;
+			for ($i = $r+1; $i<$N; $i++) {
+				if (cx_modul($A[$i][$c]) > cx_modul($A[$max][$c])) {
+					$max = $i;
+				} 
+			}
+			if ($max != $r) {
+				$temp = $A[$r]; $A[$r] = $A[$max]; $A[$max] = $temp;
+			}
+		}	
+
+	    if (cx_modul($A[$r][$c]) < 1e-10){
+	    	$c++;
+	    	continue;
+	    }
+		
+	    //scale pivot rows
+	    if ($rref==True) {
+			if(cx_modul($A[$r][$c])!=0){
+		    	$divisor = $A[$r][$c];
+			} else {$divisor=[1,0];}
+		    for ($j = $c; $j < $M; $j++) {
+				$A[$r][$j] = cx_div([$A[$r][$j],$divisor]);
+			}
+	    }
+		
+	    for ($i = ($rref?0:$r+1); $i < $N; $i++) {
+	    	    if ($i==$r) {continue;}
+				if (cx_modul($A[$r][$c])!=0 && cx_modul($A[$i][$c])!=0){
+				
+					$mult = cx_div([$A[$i][$c],$A[$r][$c]]); 
+				} else {$mult=[0,0];}
+	    	    if ( cx_modul($mult)==0) {continue;}
+	    	    
+				for ($j = $c; $j < $M; $j++) {
+					if(cx_modul($mult)!=0 && cx_modul($A[$r][$j])!=0){
+
+						$A[$i][$j] = cx_sub([$A[$i][$j],cx_mul([$mult,$A[$r][$j]])]);  
+					} else {$A[$i][$j]=$A[$i][$j];}
+						
+						if (cx_modul($A[$i][$j]) <= 1e-10) {
+							$A[$i][$j] = [0,0]; //treat values close to 0 as 0
+								}		
+	    	    }
+	    }
+
+	    $r++; $c++;
+    }
+	
+	if($disp == True){
+    
+		for ($i=0; $i<$N; $i++){
+			
+			$A[$i] = cx_format2std($A[$i], $roundto);
+		}
+    $A = matrixformat($A);
+	}
+		
+    return ($A); 
+}	       
 ?>
