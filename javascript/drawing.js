@@ -126,8 +126,9 @@ function reset() {
 	curIneqcurve = null;
 }
 
-function clearcanvas(tarnum) {
-    if (targetOuts[tarnum].disabled) { return; }
+function clearcanvas(tarnum, overridedis) {
+    if (targetOuts[tarnum] && targetOuts[tarnum].disabled && !overridedis) { return; }
+    if (!lines.hasOwnProperty(tarnum)) { return; }
 	lines[tarnum].length = 0;
 	dots[tarnum].length = 0;
 	odots[tarnum].length = 0;
@@ -2441,7 +2442,9 @@ function initCanvases(k) {
 				if (drawla[i].length>5) {
 					thisdrawla = drawla[i][5];
 				}
-			}
+			} else if (drawla[i] != null && JSON.stringify(drawla[i])=='[[]]') {
+                clearcanvas(canvases[i][0], true);
+            } 
 			if (canvases[i][1].substr(0,8)=="a11ydraw") {
 				addA11yTarget(canvases[i], thisdrawla);
 			} else {

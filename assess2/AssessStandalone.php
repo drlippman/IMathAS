@@ -323,11 +323,18 @@ class AssessStandalone {
       }
       if ($parts_to_score === true || !empty($parts_to_score[$k]) ||
         (isset($this->state['rawscores'][$qn][$k]) &&
-        $this->state['rawscores'][$qn][$k] >= 0)
+        $this->state['rawscores'][$qn][$k] >= 0 && 
+        !empty($this->state['partattemptn'][$qn][$k]))
       ) { // rec if scored, and update existing
         $this->state['rawscores'][$qn][$k] = $rawparts[$k];
+      } else if (empty($this->state['rawscores'][$qn][$k])) {
+          // if we're not scoring this, and state doesn't have a score, 
+          // then zero out the score, since we haven't recorded it.
+          $rawparts[$k] = 0;
+          $scores[$k] = 0;
       }
     }
+
     $allPartsAns = (count($this->state['partattemptn'][$qn]) == count($scoreResult['answeights']));
     $score = array_sum($scores);
     if (count($partla) > 1) {

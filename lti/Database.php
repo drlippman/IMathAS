@@ -134,7 +134,41 @@ class Imathas_LTI_Database implements LTI\Database
         }
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row === false || $row === null) {
-            return null;
+            if (!empty($GLOBALS['CFG']['LTI']['autoreg']) && trim($client_id) != '') {
+                if ($iss === 'https://canvas.instructure.com') {
+                    $row = [
+                       'issuer' => $iss,
+                       'client_id' => trim($client_id),
+                       'auth_login_url' => 'https://canvas.instructure.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://canvas.instructure.com/login/oauth2/token',
+                       'key_set_url' => 'https://canvas.instructure.com/api/lti/security/jwks'
+                    ];
+                } else if ($iss === 'https://canvas.beta.instructure.com') {
+                    $row = [
+                       'issuer' => $iss,
+                       'client_id' => trim($client_id),
+                       'auth_login_url' => 'https://canvas.beta.instructure.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://canvas.beta.instructure.com/login/oauth2/token',
+                       'key_set_url' => 'https://canvas.beta.instructure.com/api/lti/security/jwks'
+                    ];
+                } else if ($iss === 'https://canvas.test.instructure.com') {
+                    $row = [
+                       'issuer' => $iss,
+                       'client_id' => trim($client_id),
+                       'auth_login_url' => 'https://canvas.test.instructure.com/api/lti/authorize_redirect',
+                       'auth_token_url' => 'https://canvas.test.instructure.com/login/oauth2/token',
+                       'key_set_url' => 'https://canvas.test.instructure.com/api/lti/security/jwks'
+                    ];
+                }
+                if (is_array($row)) { // set something above - create platform reg
+                    $stm = $this->dbh->prepare("INSERT INTO imas_lti_platforms (issuer,client_id,auth_login_url,auth_token_url,key_set_url) VALUES (?,?,?,?,?)");
+                    $stm->execute(array_values($row));
+                    $row['id'] = $this->dbh->lastInsertId();
+                } 
+            }
+            if ($row === false || $row === null) {
+                return null;
+            }
         }
         return LTI\LTI_Registration::new ()
             ->set_auth_login_url($row['auth_login_url'])

@@ -362,7 +362,8 @@
 	}
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
-	$listperpage = $line['listperpage'];
+    $listperpage = intval($line['listperpage']);
+    if ($listperpage < 1) { $listperpage = 20;}
 	$selfhasuserimg = $line['hasuserimg'];
 	/*$usertheme = $line['theme'];
 	if (isset($usertheme) && $usertheme!='') {

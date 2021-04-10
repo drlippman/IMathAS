@@ -6234,8 +6234,8 @@ optionProcessors.addCommands = function(cmds) {
     }
     if (cmds[str][0] == 'VanillaSymbol') {
       LatexCmds[str] = bind(VanillaSymbol, cmds[str][1], cmds[str][2]);
-    } else if (cmds[str][0] == 'BinarySymbol') {
-      LatexCmds[str] = bind(BinarySymbol, cmds[str][1], cmds[str][2]);
+    } else if (cmds[str][0] == 'BinaryOperator') {
+      LatexCmds[str] = bind(BinaryOperator, cmds[str][1], cmds[str][2]);
     } else if (cmds[str][0] == 'Variable') {
       LatexCmds[str] = bind(Variable, cmds[str][1], cmds[str][2]);
     } else {

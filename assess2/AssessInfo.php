@@ -90,20 +90,21 @@ class AssessInfo
   public function loadException($uid, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
     if (!$isstu && $this->assessData['date_by_lti'] > 0 && isset($_SESSION['lti_duedate'])) {
       // fake exception for teachers from LTI
-      $this->setException(array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $this->setException($uid, array(0, $_SESSION['lti_duedate'], 0, 1, 0), $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else if (!$isstu) {
-      $this->setException(false, $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $this->setException($uid, false, $isstu, $latepasses, $latepasshrs, $courseenddate);
     } else {
       $query = "SELECT startdate,enddate,islatepass,is_lti,exceptionpenalty,waivereqscore,timeext,attemptext ";
       $query .= "FROM imas_exceptions WHERE userid=? AND assessmentid=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->curAid));
-      $this->setException($stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
+      $this->setException($uid, $stm->fetch(PDO::FETCH_NUM), $isstu, $latepasses, $latepasshrs, $courseenddate);
     }
   }
 
   /**
    * Sets an exception
+   * @param  integer  $uid   The user ID
    * @param  array|false   $exception   array of exception data, or false for none.
    * @param  boolean  $isstu      Whether the user is a student
    * @param  integer $latepasses  The number of latepasses the user has
@@ -111,7 +112,7 @@ class AssessInfo
    * @param  integer $courseenddate The course end date
    * @return void
    */
-  public function setException($exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
+  public function setException($uid, $exception, $isstu, $latepasses=0, $latepasshrs=24, $courseenddate=2000000000) {
 
     // resets, in case we're using setException multiple times
     $resetkeys = ['exceptionpenalty','original_enddate','extended_with',
@@ -840,8 +841,8 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&4 || $this->assessData['shuffle']&2) {
-      //all students same seed or all questions same seed - don't regen
+    if ($this->assessData['shuffle']&2) {
+      //all questions same seed - don't regen
       $newseed = $oldseeds[0];
     } else {
       if ($this->questionData[$newq]['fixedseeds'] !== null) {
@@ -849,6 +850,10 @@ class AssessInfo
         if (count($this->questionData[$newq]['fixedseeds']) == 1) {
           //only one seed so use it
           $newseed = $this->questionData[$newq]['fixedseeds'][0];
+        } else if ($this->assessData['shuffle']&4) {
+          //all stu same seed using fixed seed list, pick next in list
+          $n = count($this->questionData[$newq]['fixedseeds']);
+          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds) + ($ispractice?1:0)) % $n];
         } else {
           $unused = array_diff($this->questionData[$newq]['fixedseeds'], $oldseeds);
           if (count($unused) == 0) {
@@ -857,6 +862,9 @@ class AssessInfo
           }
           $newseed = $unused[array_rand($unused, 1)];
         }
+      } else if ($this->assessData['shuffle']&4) {
+        // all stu same seed - increment seed by 1
+        $newseed = max($oldseeds) + 1;
       } else {
         //regular seed pick
         $looplimit = 0;

@@ -47,6 +47,8 @@
             :qn="curqn"
             :key="'iqt'+curqn"
             v-show = "showTexts"
+            :textlist = "textList"
+            :lastq = "lastQ"
             :active = "showTexts"
           />
           <full-question-header
@@ -68,6 +70,8 @@
           :qn="lastQ"
           :active = "showTexts"
           v-show = "showTexts"
+          :textlist = "textList"
+          :lastq = "lastQ"
         />
 
       </div>
@@ -118,6 +122,13 @@ export default {
     },
     qToggleLabel () {
       return this.showQs ? this.$t('print.hide_qs') : this.$t('print.show_qs');
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
     }
   },
   methods: {

@@ -531,14 +531,14 @@
 .mq-math-mode .mq-font,
 .mq-math-mode .mq-text-mode,
 .mq-math-mode .mq-operator-name {
-  font-family: KaTeX_Main, MJXZERO, MJXTEX, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;
+  font-family: KaTeX_Main, MJXc-TeX-main-R,MJXc-TeX-main-Rw, "Times New Roman", Symbola, serif;
 }
 
 .mq-math-mode .mq-nonSymbola {
-  font-family: KaTeX_Main, KaTeX_Math, MJXZERO, MJXTEX-I, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
+  font-family: KaTeX_Main, KaTeX_Math, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
 }
 .mq-math-mode var,
 .mq-math-mode i,
 .mq-math-mode i.mq-font {
-  font-family: KaTeX_Math, MJXZERO, MJXTEX-I, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
+  font-family: KaTeX_Math, MJXc-TeX-math-I, MJXc-TeX-math-Ix, MJXc-TeX-math-Iw, "Times New Roman", Symbola, serif;
 }

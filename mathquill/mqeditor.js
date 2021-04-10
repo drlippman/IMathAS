@@ -121,6 +121,9 @@ var MQeditor = (function($) {
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
             'ln log abs exp sin cos tan arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth arcsinh arccosh arctanh';
         thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
+        if (calcformat.match(/logic/)) {
+            thisMQconfig.autoCommands += ' or and implies iff';
+        }
         var vars = el.getAttribute("data-mq-vars") || '';
         var varpts;
         if (vars != '') {

@@ -1756,6 +1756,7 @@ class DrawingScorePart implements ScorePart
                     break;
                 }
             }
+
             $extrastuffpenalty = max((count($lines)-count($anslines))/(max(count($answers),count($anslines))),0);
 
         } else {
@@ -1982,6 +1983,7 @@ class DrawingScorePart implements ScorePart
 
         }
         if (!isset($partweights)) {
+            $scores = array_values($scores); // re-index so partweights applies right
             $partweights = array_fill(0,count($scores),1/count($scores));
         } else {
             if (!is_array($partweights)) {
