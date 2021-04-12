@@ -864,14 +864,14 @@ for ($i=0;$i<count($hdrs);$i++) {
 				//echo $assess[$ids[$i][$j]][$k];
 				echo "<span class=\"calitem\" id=\"".Sanitize::encodeStringForDisplay($itemidref[$k])."\" $style>";
 				if ($editingon) {
-					$type = $itemidref[$k]{1};
+					$type = $itemidref[$k][1];
 					if ($type=='S') {
 						echo '<span class="icon-startdate"></span>';
-					} else if ($type=='R' && $itemidref[$k]{0}=='A') {
+					} else if ($type=='R' && $itemidref[$k][0]=='A') {
 						echo '<span class="icon-eye2"></span>';
 					} else if ($type=='P') {
 						echo '<span class="icon-forumpost"></span>';
-					} else if ($type=='R' && $itemidref[$k]{0}=='F') {
+					} else if ($type=='R' && $itemidref[$k][0]=='F') {
 						echo '<span class="icon-forumreply"></span>';
 					}
 				}

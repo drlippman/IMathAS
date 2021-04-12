@@ -83,10 +83,8 @@ function getItemIcon($type, $alt, $faded = false, $status=-1, $scoremsg='') {
 		//$out .= ' onclick="tipshow(this, null, true, event);"';
 		//$out .= ' onmouseover="tipshow(this);" onmouseout="tipout()"';
 	}
-	$out .= '>';
-	if ($faded) {
-		$class = 'class="faded"';
-	}
+    $out .= '>';
+    $class = ($faded ? 'class="faded"' : '');
 	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $staticroot . '/img/' . $itemicons[$type] . '"/>';
 	if ($status>-1) {
 		switch ($status) {
@@ -162,7 +160,7 @@ function getDrillDD($i, $typeid, $parent, $itemid, $name) {
 	$out .= '</div>';
 	return $out;
 }
-function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats=true, $name) {
+function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $showstats, $name) {
 	global $cid, $staticroot;
 	$out = '<div class="itemhdrdd dropdown">';
 	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';

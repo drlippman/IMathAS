@@ -396,7 +396,7 @@ function gbtable() {
 		$isgroup[$kcnt] = ($line['groupsetid']!=0);
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb']; //0: ignore, 1: count, 2: extra credit, 3: no count but show
-		if ($deffeedback[0]=='Practice') { //set practice as no count in gb
+		if (isset($deffeedback[0]) && $deffeedback[0]=='Practice') { //set practice as no count in gb
 			$cntingb[$kcnt] = 3;
         }
         
@@ -610,7 +610,7 @@ function gbtable() {
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (in_array($row[0],$category)) { //define category if used
-			if ($row[1]{0}>='1' && $row[1]{0}<='9') {
+			if ($row[1][0]>='1' && $row[1][0]<='9') {
 				$row[1] = substr($row[1],1);
 			}
 			$cats[$row[0]] = array_slice($row,1);
@@ -766,7 +766,7 @@ function gbtable() {
 				if ((isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) || $allowlate[$k]>0) {
 					$gb[0][1][$pos][11] = $enddate[$k];
 				}
-				if ($allowlate[$k]>0) {
+				if (!empty($allowlate[$k]) && $allowlate[$k]>0) {
 					$gb[0][1][$pos][12] = $allowlate[$k];
 				}
 				if (isset($LPcutoff[$k])) {
@@ -2055,7 +2055,7 @@ function gbtable() {
 					unset($catpossstu[$j][$category[$i]][$col]);
 				}
             }
-            if ($gb[$ln][1][$col][0] === 'N/A') { //score not avail yet; remove from poss
+            if (!empty($gb[$ln][1][$col][0]) && $gb[$ln][1][$col][0] === 'N/A') { //score not avail yet; remove from poss
 				for ($j=0;$j<4;$j++) {
 					unset($catpossstu[$j][$category[$i]][$col]);
 				}
@@ -2308,7 +2308,7 @@ function gbtable() {
 
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
-					if ($gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
+					if (isset($gb[$i][1][$j][3]) && $gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
 						$avgs[] = $gb[$i][1][$j][0];
 						if ($limuser==-1 && $gb[0][1][$j][6]==0) { //for online, if showning avgs
 							$avgtime[] = $gb[$i][1][$j][7];
@@ -2415,7 +2415,7 @@ function gbtable() {
 
 		//tot avgs
 		for ($j=0;$j<4;$j++) {
-			if ($gb[1][3][$j]===null) {continue;}
+			if (!isset($gb[1][3][$j]) || $gb[1][3][$j]===null) {continue;}
 			$totavgs = array();
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if ($gb[$i][4][1]==0) { //if not locked

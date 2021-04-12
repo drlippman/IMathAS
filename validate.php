@@ -676,7 +676,7 @@
 				}
 			}
         }
-	} else if ($_GET['cid']=="admin") {
+	} else if (!empty($_GET['cid']) && $_GET['cid']=="admin") {
         $courseUIver = 2;
     }
 	$verified = true;

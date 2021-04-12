@@ -623,7 +623,9 @@ function gbstudisp($stu) {
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$equivavailshow = $availshow;
 	if ($availshow == 3) {
 		$equivavailshow = 1; // treat past & attempted like past & available
@@ -1426,8 +1428,12 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 	//total totals
 	$tot = '';
 	if ($catfilter<0) {
-		$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
-		if ($gbt[$i][3][4+$availshow]>0) {
+        if (isset($gbt[0][3][3+$availshow])) {
+            $fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
+        } else {
+            $fivenum = '<span>';
+        }
+		if (!empty($gbt[$i][3][4+$availshow]) && $gbt[$i][3][4+$availshow]>0) {
 			$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
 		} else {
 			$pct = 0;
@@ -1537,7 +1543,9 @@ function gbinstrdisp() {
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
-	}
+	} else {
+        $hidepast = false;
+    }
 	$equivavailshow = $availshow;
 	if ($availshow == 3) {
 		$equivavailshow = 1; // treat past & attempted like past & available
@@ -1707,25 +1715,29 @@ function gbinstrdisp() {
 			echo "<input type=\"checkbox\" name='checked[]' value='{$gbt[$i][4][0]}' />&nbsp;";
 		}
 		echo "<a href=\"gradebook.php?cid=$cid&amp;stu={$gbt[$i][4][0]}\">";
-		if ($gbt[$i][4][1]>0) {
+		if (!empty($gbt[$i][4][1]) && $gbt[$i][4][1]>0) {
 			echo '<span class="greystrike">'.$gbt[$i][0][0].'</span>';
 		} else {
 			echo Sanitize::encodeStringForDisplay($gbt[$i][0][0]);
 		}
 		echo '</a>';
-		if ($gbt[$i][4][3]==1) {
+		if (!empty($gbt[$i][4][3]) &&  $gbt[$i][4][3]==1) {
 			echo '<sup>*</sup>';
 		}
 		echo '</div></td>';
-		if ($showpics==1 && $gbt[$i][4][2]==1) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
+		if ($showpics==1 && !empty($gbt[$i][4][2])) { //file_exists("$curdir//files/userimg_sm{$gbt[$i][4][0]}.jpg")) {
 			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_sm{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
-		} else if ($showpics==2 && $gbt[$i][4][2]==1) {
+		} else if ($showpics==2 && !empty($gbt[$i][4][2])) {
 			echo "<td>{$insdiv}<div class=\"trld\"><img src=\"$userimgbase/userimg_{$gbt[$i][4][0]}.jpg\" alt=\"User picture\"/></div></td>";
 		} else {
 			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
 		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
+            if (isset($gbt[$i][0][$j])) {
+                echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
+            } else {
+                echo '<td class="c">'.$insdiv.$enddiv .'</td>';
+            }
 		}
 
 		if ($totonleft && !$hidepast) {
@@ -1752,7 +1764,11 @@ function gbinstrdisp() {
 					continue;
 				}
 				//if online, not average, and either score exists and active, or score doesn't exist and assess is current,
-				if ($gbt[0][1][$j][6]==0 && $gbt[$i][1][$j][4]!='average' && ((isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]>9) || (!isset($gbt[$i][1][$j][3]) && $gbt[0][1][$j][3]==1))) {
+                if (isset($gbt[$i][1][$j][4]) && $gbt[$i][1][$j][4]!='average' && 
+                    $gbt[0][1][$j][6]==0 && 
+                    ((isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]>9) || 
+                    (!isset($gbt[$i][1][$j][3]) && $gbt[0][1][$j][3]==1))
+                ) {
 					echo '<td class="c isact">'.$insdiv;
 				} else {
 					echo '<td class="c">'.$insdiv;
@@ -1788,22 +1804,25 @@ function gbinstrdisp() {
 
 						echo '</a>';
 
-						if ($gbt[$i][1][$j][3]>9) {
-							$gbt[$i][1][$j][3] -= 10;
-						}
-						if ($gbt[$i][1][$j][3]==1) {
-							echo ' (NC)';
-						} else if ($gbt[$i][1][$j][3]==2) {
-							echo ' (IP)';
-						} else if ($gbt[$i][1][$j][3]==5) {
-							echo ' (UA)';
-						} else if ($gbt[$i][1][$j][3]==3) {
-							// echo ' (OT)';
-						} else if ($gbt[$i][1][$j][3]==4) {
-							echo ' (PT)';
-						}
+						
+                        if (isset($gbt[$i][1][$j][3])) {
+                            if ($gbt[$i][1][$j][3]>9) {
+                                $gbt[$i][1][$j][3] -= 10;
+                            }
+                            if ($gbt[$i][1][$j][3]==1) {
+                                echo ' (NC)';
+                            } else if ($gbt[$i][1][$j][3]==2) {
+                                echo ' (IP)';
+                            } else if ($gbt[$i][1][$j][3]==5) {
+                                echo ' (UA)';
+                            } else if ($gbt[$i][1][$j][3]==3) {
+                                // echo ' (OT)';
+                            } else if ($gbt[$i][1][$j][3]==4) {
+                                echo ' (PT)';
+                            }
+                        }
 
-						if ($gbt[$i][1][$j][1]==1) {
+						if (!empty($gbt[$i][1][$j][1])) {
 							echo '<sup>*</sup>';
 						}
 
@@ -1834,7 +1853,7 @@ function gbinstrdisp() {
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
-							if ($gbt[0][1][$j][2]>0) {
+							if (!empty($gbt[0][1][$j][2]) && $gbt[0][1][$j][2]>0 && isset($gbt[$i][1][$j][0])) {
 								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
 							} else {
 								$avgtip = '';
@@ -1857,7 +1876,7 @@ function gbinstrdisp() {
 					if (isset($gbt[$i][1][$j][0])) {
 						echo $gbt[$i][1][$j][0];
 
-						if ($gbt[$i][1][$j][3]==1) {
+						if (isset($gbt[$i][1][$j][3]) && $gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
 						}
 					} else {
@@ -1866,7 +1885,7 @@ function gbinstrdisp() {
 					if ($isteacher || ($istutor && $gbt[0][1][$j][8]==1)) {
 						echo '</a>';
 					}
-					if ($gbt[$i][1][$j][1]==1) {
+					if (!empty($gbt[$i][1][$j][1])) {
 						echo '<sup>*</sup>';
 					}
 				} else if ($gbt[0][1][$j][6]==2) { //discuss
