@@ -46,7 +46,7 @@ function copyitem($itemid,$gbcats=false,$sethidden=false) {
 	if (!isset($outcomes)) {
 		$outcomes = array();
 	}
-	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
+	if (strlen($_POST['append'])>0 && $_POST['append'][0]!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];
 	}
 	$now = time();
@@ -609,7 +609,7 @@ function removeGrouplimits(&$items) {
 
 function copyallsub($items,$parent,&$addtoarr,$gbcats=false,$sethidden=false) {
 	global $blockcnt,$reqscoretrack,$assessnewid;;
-	if (strlen($_POST['append'])>0 && $_POST['append']{0}!=' ') {
+	if (strlen($_POST['append'])>0 && $_POST['append'][0]!=' ') {
 		$_POST['append'] = ' '.$_POST['append'];
 	}
 	foreach ($items as $k=>$item) {

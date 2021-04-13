@@ -729,21 +729,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
       /*
 			TODO: Do we need to keep supporting this?
-			if ($line['defpenalty']{0}==='L') {
+			if ($line['defpenalty'][0]==='L') {
           $line['defpenalty'] = substr($line['defpenalty'],1);
           $skippenalty=10;
       } else
 			*/
-			if ($line['defpenalty']{0}==='S') {
+			if ($line['defpenalty'][0]==='S') {
 				$defattemptpenalty = substr($line['defpenalty'],2);
-				$defattemptpenalty_aftern = $line['defpenalty']{1};
+				$defattemptpenalty_aftern = $line['defpenalty'][1];
       } else {
         $defattemptpenalty = $line['defpenalty'];
 				$defattemptpenalty_aftern = 1;
       }
-			if ($line['defregenpenalty']{0}==='S') {
+			if ($line['defregenpenalty'][0]==='S') {
 				$defregenpenalty = substr($line['defregenpenalty'],2);
-				$defregenpenalty_aftern = $line['defregenpenalty']{1};
+				$defregenpenalty_aftern = $line['defregenpenalty'][1];
       } else {
         $defregenpenalty = $line['defregenpenalty'];
 				$defregenpenalty_aftern = 1;

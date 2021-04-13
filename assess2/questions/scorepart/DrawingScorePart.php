@@ -1407,20 +1407,20 @@ class DrawingScorePart implements ScorePart
             foreach ($answers as $key=>$function) {
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
-                if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
+                if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
                     $isxequals = true;
                     $function[0] = substr($function[0],1);
                 } else {
                     $isxequals = false;
                 }
-                if ($function[0]{1}=='=') {
+                if ($function[0][1]=='=') {
                     $type = 10;
                     $c = 2;
                 } else {
                     $type = 10.2;
                     $c = 1;
                 }
-                $dir = $function[0]{0};
+                $dir = $function[0][0];
                 if ($isxequals) {
                     $anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
                 } else {

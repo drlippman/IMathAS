@@ -17,7 +17,7 @@ $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $stu = Sanitize::onlyInt($_GET['stu']);
 
-$from = $_GET['from'];
+$from = $_GET['from'] ?? '';
 if ($from=='isolate') {
   $exitUrl =  $GLOBALS['basesiteurl'] . "/course/isolateassessgrade.php?stu=$stu&cid=$cid&aid=$aid";
 } else if ($from=='gisolate') {

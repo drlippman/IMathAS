@@ -180,8 +180,8 @@ if (!(isset($teacherid))) {
 			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,showwork,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			if ($line['penalty']{0}==='S') {
-				$penalty_aftern = $line['penalty']{1};
+			if ($line['penalty'][0]==='S') {
+				$penalty_aftern = $line['penalty'][1];
 				$line['penalty'] = substr($line['penalty'],2);
 			} else {
 				$penalty_aftern = 1;
@@ -238,9 +238,9 @@ if (!(isset($teacherid))) {
         $defaults = $stm->fetch(PDO::FETCH_ASSOC);
         $defaults['showwork'] = ($defaults['showwork'] & 3);
 
-		if ($defaults['defpenalty']{0}==='S') {
+		if ($defaults['defpenalty'][0]==='S') {
 			$defaults['penalty'] = sprintf(_('%d%% after %d full-credit tries'),
-        substr($defaults['defpenalty'],2), $defaults['defpenalty']{1});
+        substr($defaults['defpenalty'],2), $defaults['defpenalty'][1]);
 		} else {
 			$defaults['penalty'] = $defaults['defpenalty'] . '%';
 		}

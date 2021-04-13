@@ -323,7 +323,7 @@ function outcometable() {
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (in_array($row[0],$category)) { //define category if used
-			if ($row[1]{0}>='1' && $row[1]{0}<='9') {
+			if ($row[1][0]>='1' && $row[1][0]<='9') {
 				$row[1] = substr($row[1],1);
 			}
 			$cats[$row[0]] = array_slice($row,1);

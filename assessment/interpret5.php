@@ -82,7 +82,7 @@ function interpretline($str,$anstype,$countcnt) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') {
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1][0]!='=') {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
@@ -108,7 +108,7 @@ function interpretline($str,$anstype,$countcnt) {
 		}
 
 
-		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1]{0}!='=' && $syms[$k+1]{0}!='>') {
+		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
 			//if equality equal (not comparison or array assn), and before if/where.
 			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
@@ -135,7 +135,7 @@ function interpretline($str,$anstype,$countcnt) {
 			if ($forloc>-1) {
 				//convert for($i=a..b) {todo}
 				$j = $forloc;
-				while ($bits[$j]{0}!='{' && $j<count($bits)) {
+				while ($bits[$j][0]!='{' && $j<count($bits)) {
 					$j++;
 				}
 				$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
@@ -151,7 +151,7 @@ function interpretline($str,$anstype,$countcnt) {
 			} else if ($ifloc == 0) {
 				//this is if at beginning of line, form:  if ($a==3) {todo}
 				$j = 0;
-				while ($bits[$j]{0}!='{' && $j<count($bits)) {
+				while ($bits[$j][0]!='{' && $j<count($bits)) {
 					$j++;
 				}
 				if ($j==count($bits)) {
@@ -167,7 +167,7 @@ function interpretline($str,$anstype,$countcnt) {
 				$out = "if ($cond) $todo";
 				for ($i=0; $i<count($elseloc); $i++) {
 					$j = $elseloc[$i][0];
-					while ($bits[$j]{0}!='{' && $j<count($bits)) {
+					while ($bits[$j][0]!='{' && $j<count($bits)) {
 						$j++;
 					}
 					if ($j==count($bits)) {

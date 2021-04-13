@@ -184,7 +184,7 @@ class FunctionExpressionAnswerBox implements AnswerBox
     							$matches[1] = '"'.$matches[1].'"';
                   $chg = true;
     						}
-    						if (strlen($matches[2])>1 && $matches[2]{0} != '(') {
+    						if (strlen($matches[2])>1 && $matches[2][0] != '(') {
     							$matches[2] = '"'.$matches[2].'"';
                   $chg = true;
     						}

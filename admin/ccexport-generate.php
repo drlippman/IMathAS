@@ -194,7 +194,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					$module_meta .= '<module identifier="BLOCK'.$blockid.'">'."\n";
 					$module_meta .= '  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$module_meta .= '  <workflow_state>'.($item['avail']==0?'unpublished':'active').'</workflow_state>'."\n";
-					if ($item['avail'] == 1 && $item['SH']{0} == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
+					if ($item['avail'] == 1 && $item['SH'][0] == 'H' && $item['startdate'] > 0 && isset($_POST['includestartdates'])) {
 						$module_meta .= '  <unlock_at>'.gmdate("Y-m-d\TH:i:s", $item['startdate']).'</unlock_at>'."\n";
 					}
 					$module_meta .= '  <items>';

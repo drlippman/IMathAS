@@ -13,7 +13,7 @@ if (($myspecialrights&4)!=4 && $myrights < 100) {
  	$overwriteBody = 1;
 	$body = "You don't have authority to view this page.";
 }  else {
-  if ($myrights<75 || (isset($_GET['show']) && $_GET['show']{0}=='u')) {  //only show own
+  if ($myrights<75 || (isset($_GET['show']) && $_GET['show'][0]=='u')) {  //only show own
     if ($myrights<75) {
       $showuser = $userid;
       $from = 'ld';
@@ -33,7 +33,7 @@ if (($myspecialrights&4)!=4 && $myrights < 100) {
     $userdisplayname = implode(', ',$stm->fetch(PDO::FETCH_NUM));
 
     $list = 'self';
-  } else if ($myrights<100 || (isset($_GET['show']) && $_GET['show']{0}=='g')) {  //show group's
+  } else if ($myrights<100 || (isset($_GET['show']) && $_GET['show'][0]=='g')) {  //show group's
     if ($myrights==100) {
       $showgroup = Sanitize::onlyInt(substr($_GET['show'],1));
     } else {

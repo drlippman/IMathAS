@@ -164,7 +164,7 @@ class DrawingAnswerBox implements AnswerBox
     			$settings[3] = 0;
     			if (strpos($settings[4],':')!==false) {
     				$settings[4] = explode(':',$settings[4]);
-    				if ($settings[4][0]{0}=='h') {
+    				if ($settings[4][0][0]=='h') {
     					$sclinglbl = substr($settings[4][0],1).':0:off';
     				} else {
     					$sclinglbl = $settings[4][0];
@@ -534,14 +534,14 @@ class DrawingAnswerBox implements AnswerBox
                         $defcolor = 'grey';
                     }
     				if ($answerformat[0]=='inequality') {
-    					if ($function[0]{2}=='=') {
+    					if ($function[0][2]=='=') {
     						$type = 10;
     						$c = 3;
     					} else {
     						$type = 10.2;
     						$c = 2;
     					}
-    					$dir = $function[0]{1};
+    					$dir = $function[0][1];
     					$saarr[$k]  = makepretty($function[0]).','.$ineqcolors[$k%3];
     				} else {
     					if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot

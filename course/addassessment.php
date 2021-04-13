@@ -707,11 +707,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $lptime = $deftime;
             }
 
-            if ($line['defpenalty']{0}==='L') {
+            if ($line['defpenalty'][0]==='L') {
                 $line['defpenalty'] = substr($line['defpenalty'],1);
                 $skippenalty=10;
-            } else if ($line['defpenalty']{0}==='S') {
-                $skippenalty = $line['defpenalty']{1};
+            } else if ($line['defpenalty'][0]==='S') {
+                $skippenalty = $line['defpenalty'][1];
                 $line['defpenalty'] = substr($line['defpenalty'],2);
             } else {
                 $skippenalty = 0;

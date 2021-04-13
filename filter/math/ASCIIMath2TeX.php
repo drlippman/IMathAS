@@ -528,7 +528,7 @@ function AMTparseSexpr($str) {
 		$this->AMnestingDepth--;
 		$leftchop = 0;
 		if (substr($result[0],0,6)=='\\right') {
-			$st = $result[0]{6};
+			$st = $result[0][6];
 			if ($st==")" || $st=="]" || $st=="}") {
 				$leftchop = 6;
 			} else if ($st==".") {

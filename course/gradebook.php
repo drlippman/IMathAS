@@ -1051,21 +1051,23 @@ function gbstudisp($stu) {
 				}
 			}
 			if (isset($gbt[1][1][$i][0])) {
-				if ($gbt[1][1][$i][3]>9) {
-					$gbt[1][1][$i][3] -= 10;
-				}
-				echo $gbt[1][1][$i][0];
-				if ($gbt[1][1][$i][3]==1) {
-					echo ' (NC)';
-				} else if ($gbt[1][1][$i][3]==2) {
-					echo ' (IP)';
-				} else if ($gbt[1][1][$i][3]==5) {
-					echo ' (UA)';
-				} else if ($gbt[1][1][$i][3]==3) {
-					echo ' (OT)';
-				} else if ($gbt[1][1][$i][3]==4) {
-					echo ' (PT)';
-				}
+                echo $gbt[1][1][$i][0];
+                if (isset($gbt[1][1][$i][3])) {
+                    if ($gbt[1][1][$i][3]>9) {
+                        $gbt[1][1][$i][3] -= 10;
+                    }
+                    if ($gbt[1][1][$i][3]==1) {
+                        echo ' (NC)';
+                    } else if ($gbt[1][1][$i][3]==2) {
+                        echo ' (IP)';
+                    } else if ($gbt[1][1][$i][3]==5) {
+                        echo ' (UA)';
+                    } else if ($gbt[1][1][$i][3]==3) {
+                        echo ' (OT)';
+                    } else if ($gbt[1][1][$i][3]==4) {
+                        echo ' (PT)';
+                    }
+                }
 			} else {
 				echo '-';
 			}
@@ -1108,13 +1110,13 @@ function gbstudisp($stu) {
 			echo '</td>';
 
 			if ($stu>0 && $isteacher) {
-				if ($gbt[1][1][$i][7] > -1) {
+				if (isset($gbt[1][1][$i][7]) && $gbt[1][1][$i][7] > -1) {
 					echo '<td>'.$gbt[1][1][$i][7].' min ('.$gbt[1][1][$i][8].' min)</td>';
 				} else {
 					echo '<td></td>';
 				}
 				if ($includelastchange) {
-					if ($gbt[1][1][$i][9]>0) {
+					if (!empty($gbt[1][1][$i][9]) && $gbt[1][1][$i][9]>0) {
 						echo '<td>'.tzdate('n/j/y g:ia', $gbt[1][1][$i][9]);
 					} else {
 						echo '<td></td>';
@@ -1138,7 +1140,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ($gbt[1][1][$i][1]==0 || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
+				if ((isset($gbt[1][1][$i][1]) && $gbt[1][1][$i][1]==0) || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2

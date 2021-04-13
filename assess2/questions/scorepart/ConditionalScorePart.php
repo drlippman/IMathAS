@@ -71,7 +71,7 @@ class ConditionalScorePart implements ScorePart
         }
         foreach ($answer as $ans) {
             if (is_array($ans)) {
-                if ($ans[0]{0}=='!') {
+                if ($ans[0][0]=='!') {
                     $flip = true;
                     $ans[0] = substr($ans[0],1);
                 } else {
