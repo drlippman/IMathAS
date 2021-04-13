@@ -478,7 +478,8 @@ var myMQeditor = (function($) {
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
             calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
-              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
+              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} :
+              (qtype.match(/complex/) ? {b:'+'} : {s:1})
           ]
         };
       } else {
