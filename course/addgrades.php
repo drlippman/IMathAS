@@ -173,7 +173,11 @@
 
 	if (isset($_POST['assesssnap'])) {
 		$assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
-		$post_points = Sanitize::onlyFloat($_POST['points']);
+        $post_points = Sanitize::onlyFloat($_POST['points']);
+        
+        $assesssnaptype = (int) Sanitize::onlyInt($_POST['assesssnaptype']);
+        $assesssnapatt = (float) Sanitize::onlyFloat($_POST['assesssnapatt']);
+        $assesssnappts = (float) Sanitize::onlyFloat($_POST['assesssnappts']);
 
 		//doing assessment snapshot
 		$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=:assessmentid");
@@ -196,27 +200,44 @@
 						$att++;
 					}
 					$tot += getpts($v);
-				}
+                }
+                $attper = $att/count($sc);
 			} else {
 				$tot = $row[1];
 				if ($assesssnaptype>0) {
-					//TODO-assessrecord: figure out $attper, the % of questions attempted
+                    $attper = 0;
+                    $att = 0;
+                    if ($row[2] !== '') {
+                        $data = json_decode(gzdecode($row[2]), true);
+                        if ($data !== false) {
+                            $av = $data['assess_versions'][$data['scored_version']];
+                            $qcnt = 0;
+                            $attcnt = 0;
+                            foreach ($av['questions'] as $q) {
+                                $qcnt++;
+                                $qver = $q['question_versions'][$q['scored_version']];
+                                if (!empty($qver['tries'])) {
+                                    $attcnt++;
+                                }
+                            }
+                            if ($qcnt > 0) {
+                                $attper = $attcnt/$qcnt;
+                            }
+                        }
+                    }
 				}
 			}
-			$assesssnaptype = (int) Sanitize::onlyInt($_POST['assesssnaptype']);
-			$assesssnapatt = (float) Sanitize::onlyFloat($_POST['assesssnapatt']);
-			$assesssnappts = (float) Sanitize::onlyFloat($_POST['assesssnappts']);
 
 			if ($assesssnaptype==0) {
 				$score = $tot;
 			} else {
-				$attper = $att/count($sc);
 				if ($attper>=$assesssnapatt/100-.001 && $tot>=$assesssnappts-.00001) {
 					$score = $post_points;
 				} else {
 					$score = 0;
 				}
-			}
+            }
+
 			$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 			$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 			$stm2 = $DBH->prepare($query);
