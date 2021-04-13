@@ -376,7 +376,7 @@ function gbtable() {
 		} else {
 			$deffeedback = explode('-',$line['deffeedback']);
 			$assessmenttype[$kcnt] = $deffeedback[0];
-			$sa[$kcnt] = $deffeedback[1];
+			$sa[$kcnt] = $deffeedback[1] ?? "N";
 		}
 		if ($line['avail']==2 || $line['date_by_lti']==1) {
 			$line['startdate'] = 0;
@@ -946,10 +946,10 @@ function gbtable() {
 		if ($isdiag) {
 			$selparts = explode('~',$line['SID']);
 			$gb[$ln][0][1] = $selparts[0];
-			$gb[$ln][0][2] = $selparts[1];
+			$gb[$ln][0][2] = $selparts[1] ?? '';
 			$selparts =  explode('@',$line['email']);
 			$gb[$ln][0][3] = $selparts[0];
-			$gb[$ln][0][4] = $selparts[1];
+			$gb[$ln][0][4] = $selparts[1] ?? '';
 		} else {
 			$gb[$ln][0][1] = $line['SID'];
 		}

@@ -149,7 +149,8 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	if (count($assessPreReqsToLookup)>0 && !$limited) {
 		//see which ones we already have data for
 		foreach (array_keys($assessPreReqsToLookup) as $tolookup) {
-			if (isset($itemshowdata[$typelookups['Assessment'][$tolookup]]) &&
+            if (isset($typelookups['Assessment'][$tolookup]) &&
+                isset($itemshowdata[$typelookups['Assessment'][$tolookup]]) &&
 				isset($itemshowdata[$typelookups['Assessment'][$tolookup]]['ptsposs'])) {
 				foreach ($assessPreReqsToLookup[$tolookup] as $aidtoupdate) {
 					$itemshowdata[$typelookups['Assessment'][$aidtoupdate]]['reqscorename'] = $itemshowdata[$typelookups['Assessment'][$tolookup]]['name'];

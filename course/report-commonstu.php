@@ -30,7 +30,7 @@ $now = time();
 $defsdate = tzdate('n/j/Y', $now);
 $defedate = tzdate('n/j/Y', $now+7*24*60*60);
 
-$placeinhead .= '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>';
+$placeinhead = '<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css">
  [v-cloak] { display: none;}

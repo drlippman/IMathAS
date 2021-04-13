@@ -705,6 +705,10 @@
 	}
  }
 
+ if (!isset($cid)) { 
+     $cid = 0;
+ }
+
  function tzdate($string,$time) {
 	  global $tzoffset, $tzname;
 	  //$dstoffset = date('I',time()) - date('I',$time);

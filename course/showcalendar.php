@@ -16,7 +16,7 @@
 	} else if (isset($_SESSION[$cid.'caledit'])) {
 		$editingon = $_SESSION[$cid.'caledit'];
 	} else {
-		$editington = false;
+		$editingon = false;
 	}
 
 	require_once("../includes/exceptionfuncs.php");

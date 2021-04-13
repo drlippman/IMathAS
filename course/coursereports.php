@@ -33,7 +33,7 @@ if ($overwriteBody==1) {
 	echo $body;
 } else {
 
-	$curBreadcrumb .= "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curname = Sanitize::encodeStringForDisplay($coursename);
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Course Reports</div>';
 	echo '<div class="pagetitle"><h1>Course Reports</h1></div>';

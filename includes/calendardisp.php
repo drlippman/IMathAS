@@ -683,14 +683,14 @@ $names = array();
 $itemidref = array();
 $k = 0;
 foreach ($itemsimporder as $item) {
-	if (isset($hiddenitems[$item]) && !$greyitems[$item] && !isset($teacherid)) {
+	if (isset($hiddenitems[$item]) && empty($greyitems[$item]) && !isset($teacherid)) {
 		//skip over any items in a hidden folder or future not-yet-open folder if it's a student
 		continue;
 	}
 	if ($itemsassoc[$item][0]=='Assessment') {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
-				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && $datetype=='S') {
+				if ($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && $datetype=='S') {
 					continue;  //always skip start date when not avail
 				}
 				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['A'.$datetype.$itemsassoc[$item][1]][5]==1 && !isset($teacherid)) {

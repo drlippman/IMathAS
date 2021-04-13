@@ -44,7 +44,8 @@
 		$searchtype = $_SESSION['forumsearchtype'.$cid];
 		$searchtag = $_SESSION['forumsearchtag'.$cid];
 	} else {
-		$searchtype = "none";
+        $searchtype = "none";
+        $searchstr = "";
 	}
 
 
@@ -561,7 +562,7 @@ if ($searchtype == 'thread') {
         } else {
             echo '</i> <i class="small info">'._('Hidden').'</i> ';
         }
-		if ($newcnt[$line['id']]>0) {
+		if (!empty($newcnt[$line['id']])) {
 			 echo "<a href=\"thread.php?cid=$cid&forum=" . Sanitize::onlyInt($line['id']) . "&page=-1\" class=noticetext >New Posts (" . Sanitize::encodeStringForDisplay($newcnt[$line['id']]) . ")</a>";
 		}
 		echo "</td>\n";

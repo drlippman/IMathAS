@@ -1140,7 +1140,7 @@ function gbstudisp($stu) {
 					echo $exceptionnote;
 					echo '</td>';
 				}
-				if ((isset($gbt[1][1][$i][1]) && $gbt[1][1][$i][1]==0) || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
+				if ((empty($gbt[1][1][$i][1])) || (isset($gbt[1][1][$i][0]) && $gbt[1][1][$i][0]==='N/A')) { //no feedback
 					echo '<td></td>';
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					if ($gbt[0][1][$i][15]>1) { //assess2
