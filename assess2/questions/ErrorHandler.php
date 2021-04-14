@@ -26,7 +26,7 @@ class ErrorHandler
      * @return bool
      */
     public static function evalErrorHandler(int $errno, string $errstr, string $errfile,
-                                            int $errline, array $errcontext): bool
+                                            int $errline, array $errcontext = []): bool
     {
       if (E_WARNING == $errno || E_ERROR == $errno) {
         error_log(sprintf('Caught error by QuestionGenerator in %s:%s -- %s',

@@ -69,11 +69,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-  $assessmentId = Sanitize::onlyInt($_GET['id']);
   $cid = Sanitize::courseId($_GET['cid']);
   $block = $_GET['block'];
 
-	if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
+    if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
+        $assessmentId = Sanitize::onlyInt($_GET['id']);
 		$query = "SELECT COUNT(iar.userid) FROM imas_assessment_records AS iar,imas_students WHERE ";
 		$query .= "iar.assessmentid=:assessmentid AND iar.userid=imas_students.userid AND imas_students.courseid=:courseid";
 		$stm = $DBH->prepare($query);
@@ -666,7 +666,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['groupsetid'] = 0;
 					$line['reqscore'] = 0;
           $line['reqscoreaid'] = 0;
-					$line['reqscoretype'] = 0;
+                    $line['reqscoretype'] = 0;
+                    $line['showcat'] = 0;
+                    $line['timelimit'] = 0;
 					$taken = false;
           $savetitle = _("Create Assessment");
 
@@ -734,14 +736,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
           $skippenalty=10;
       } else
 			*/
-			if ($line['defpenalty'][0]==='S') {
+			if (is_string($line['defpenalty']) && $line['defpenalty'][0]==='S') {
 				$defattemptpenalty = substr($line['defpenalty'],2);
 				$defattemptpenalty_aftern = $line['defpenalty'][1];
       } else {
         $defattemptpenalty = $line['defpenalty'];
 				$defattemptpenalty_aftern = 1;
       }
-			if ($line['defregenpenalty'][0]==='S') {
+			if (is_string($line['defpenalty']) &&$line['defregenpenalty'][0]==='S') {
 				$defregenpenalty = substr($line['defregenpenalty'],2);
 				$defregenpenalty_aftern = $line['defregenpenalty'][1];
       } else {
@@ -773,7 +775,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
       if (isset($_GET['id'])) {
           $page_formActionTag .= "&id=" . Sanitize::onlyInt($_GET['id']);
       }
-      $page_formActionTag .= sprintf("&folder=%s&from=%s", Sanitize::encodeUrlParam($_GET['folder']), Sanitize::encodeUrlParam($_GET['from']));
+      $page_formActionTag .= sprintf("&folder=%s&from=%s", Sanitize::encodeUrlParam($_GET['folder'] ?? '0'), Sanitize::encodeUrlParam($_GET['from'] ?? ''));
       $page_formActionTag .= "&tb=" . Sanitize::encodeUrlParam($totb);
 
 			$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");

@@ -91,7 +91,7 @@ class ComplexScorePart implements ScorePart
 
         if ($anstype=='calccomplex') {
             //test for correct format, if specified
-            if (($answer!='DNE'&&$answer!='oo') && checkreqtimes($givenans,$requiretimes)==0) {
+            if (($answer!='DNE'&&$answer!='oo') && !empty($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
@@ -307,11 +307,11 @@ class ComplexScorePart implements ScorePart
                     if ($R==$len) {// real + AiB
                         $real = substr($v,0,$L);
                         $imag = substr($v,$L,$p-$L);
-                        $imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
+                        $imag .= '*'.substr($v,$p+1+(($v[$p+1] ?? '')=='*'?1:0),$R-$p-1);
                     } else if ($L==0) { //AiB + real
                         $real = substr($v,$R);
                         $imag = substr($v,0,$p);
-                        $imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
+                        $imag .= '*'.substr($v,$p+1+(($v[$p+1] ?? '')=='*'?1:0),$R-$p-1);
                     } else {
                         return _('error - invalid form');
                     }

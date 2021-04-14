@@ -795,7 +795,7 @@ function printlist($parent) {
 	global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin,$federated;
 	$arr = $ltlibs[$parent];
 
-	if ($sortorder[$parent]==1) {
+	if (!empty($sortorder[$parent]) && $sortorder[$parent]==1) {
 		$orderarr = array();
 		foreach ($arr as $child) {
 			$orderarr[$child] = $names[$child];
@@ -890,6 +890,9 @@ function addupchildqs($p) {
 	global $qcount,$ltlibs;
 	if (isset($ltlibs[$p])) { //if library has children
 		foreach ($ltlibs[$p] as $child) {
+            if (!isset($qcount[$p])) {
+                $qcount[$p] = 0;
+            }
 			$qcount[$p] += addupchildqs($child);
 		}
 	}
@@ -898,8 +901,8 @@ function addupchildqs($p) {
 
 function setparentrights($alibid) {
 	global $rights,$parents;
-	if ($parents[$alibid]>0) {
-		if ($rights[$parents[$alibid]] < $rights[$alibid]) {
+	if (!empty($parents[$alibid])) {
+		if (!isset($rights[$parents[$alibid]]) || $rights[$parents[$alibid]] < $rights[$alibid]) {
 		//if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
 			$rights[$parents[$alibid]] = $rights[$alibid];
 		}

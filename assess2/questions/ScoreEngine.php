@@ -772,7 +772,7 @@ class ScoreEngine
      * @return bool
      */
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
-                                     int $errline, array $errcontext): bool
+                                     int $errline, array $errcontext = []): bool
     {
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 

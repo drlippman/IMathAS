@@ -251,7 +251,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$titletxt = "#000000";
 		$bi = "#EEEEFF";
 		$usedef = 1;
-		$fixedheight = 0;
+        $fixedheight = 0;
+        $innav = 0;
 		$grouplimit = array();
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));

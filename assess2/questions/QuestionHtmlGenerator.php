@@ -480,7 +480,7 @@ class QuestionHtmlGenerator
             $questionColor = $this->getAnswerColorFromRawScore(
                 $this->questionParams->getLastRawScores(), 0, 1);
 
-            $lastAnswer = $stuanswers[$thisq];
+            $lastAnswer = $stuanswers[$thisq] ?? '';
             if (isset($autosaves[$thisq])) {
               $lastAnswer = $autosaves[$thisq];
             }
@@ -505,7 +505,7 @@ class QuestionHtmlGenerator
                 ->setIsMultiPartQuestion(false)
                 ->setStudentLastAnswers($lastAnswer)
                 ->setColorboxKeyword($questionColor)
-                ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0]);
+                ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[0] ?? false);
 
             $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
             $answerBoxGenerator->generate();
@@ -1114,7 +1114,7 @@ class QuestionHtmlGenerator
               }
             }
             if (!is_array($answerBoxes) && count($showanswerloc) < 2) { //not a multipart question
-                $showanswerloc = str_replace($qnidx . '-0"', $qnidx . '"', $showanswerloc[0]);
+                $showanswerloc = str_replace($qnidx . '-0"', $qnidx . '"', $showanswerloc[0] ?? '');
             }
         }
 

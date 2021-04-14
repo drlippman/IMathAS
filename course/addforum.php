@@ -48,7 +48,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
 
-	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
+	if (!empty($_POST['name'])) { //FORM SUBMITTED, DATA PROCESSING
 		$DBH->beginTransaction();
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['avail']==1) {
@@ -345,14 +345,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$autopostpts = 0;
 			$autopostn = 0;
 			$autoreplypts = 0;
-			$autoreplyn = 0;
+            $autoreplyn = 0;
+            $defdisplay = 0;
 			$line['tutoredit'] = 0;
 			$savetitle = _("Create Forum");
 		}
 
 		list($posttag,$replytag) = explode('--',$line['caltag']);
 
-		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
+		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder'] ?? '0');
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $forumid : "";
 		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
@@ -430,7 +431,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$groupid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];

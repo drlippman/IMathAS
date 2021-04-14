@@ -524,7 +524,7 @@
 			}
 			$outputmsg .=  "<a href=\"$addq.php?cid=$cid&aid=".Sanitize::onlyInt($_GET['aid'])."\">"._("Return to Assessment")."</a>\n";
 		}
-		if ($_POST['test']=="Save and Test Question") {
+		if (!empty($_POST['test']) && $_POST['test']=="Save and Test Question") {
 			$outputmsg .= "<script>addr = '$imasroot/course/$testqpage?cid=$cid&qsetid=".Sanitize::encodeUrlParam($_GET['id'])."';";
 			//echo "function previewit() {";
 			$outputmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
