@@ -1005,9 +1005,8 @@ class Imathas_LTI_Database implements LTI\Database
         if ($launch->can_set_grades()) { // no need to proceed if we can't send back grades
             $lineitemstr = $launch->get_lineitem();
             $lineitem = LTI\LTI_Lineitem::new ()
-                ->set_resource_id($itemtype . '-' . $typeid)
-                ->set_score_maximum($info['ptsposs'])
-                ->set_label($info['name']);
+                ->set_resource_id($itemtype . '-' . $typeid);
+                
             if ($link->get_placementtype() == 'assess' ||
                 (function_exists('lti_is_reviewable') && lti_is_reviewable($link))
             ) {
@@ -1018,6 +1017,10 @@ class Imathas_LTI_Database implements LTI\Database
             if ($lineitemstr === false && $launch->can_create_lineitem()) {
                 // there wasn't a lineitem in the launch, so find or create one
                 $ags = $launch->get_ags();
+
+                // set score maximum and label of new lineitem
+                $lineitem->set_score_maximum($info['ptsposs'])
+                    ->set_label($info['name']); 
 
                 if ($link->get_placementtype() == 'assess') {
                     // TODO: figure this out.  Ideally we should link the lineitem to
