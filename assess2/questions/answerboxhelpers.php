@@ -586,7 +586,8 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$answerbox = str_replace('<table ','<table style="display:inline-table;vertical-align:middle" ', $answerbox);
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
-	$partnum = $qn%1000;
+    $partnum = $qn%1000;
+    $out = '';
 
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');

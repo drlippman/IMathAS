@@ -91,7 +91,7 @@ class MatrixAnswerBox implements AnswerBox
     						'size' => $sz,
     						'name' => "qn$qn-$count",
     						'id' => "qn$qn-$count",
-    						'value' => $las[$count],
+    						'value' => ($las[$count] ?? ''),
     						'autocomplete' => 'off'
     					];
 

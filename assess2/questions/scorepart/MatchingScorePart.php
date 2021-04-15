@@ -35,11 +35,11 @@ class MatchingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
-        if (isset($options['answers'])) {if (is_array($options['answers'][$partnum])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
+        if (isset($options['questions'][$partnum]) && is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
+        if (isset($options['answers'])) {if (isset($options['answers'][$partnum]) && is_array($options['answers'][$partnum])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
         else if (isset($options['answer'])) {if (is_array($options['answer'][$partnum])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
-        if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$partnum];} else {$matchlist = $options['matchlist'];}
-        if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
+        if (isset($options['matchlist'])) {if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$partnum];} else {$matchlist = $options['matchlist'];}}
+        if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = '';}
         if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
 
         if (!is_array($questions) || !is_array($answers)) {

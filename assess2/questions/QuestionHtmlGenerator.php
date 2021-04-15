@@ -162,7 +162,7 @@ class QuestionHtmlGenerator
           } else {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
-              if ($iidx==0) {
+              if ($iidx==0 || empty($scoreiscorrect[$thisq][$kidx])) {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = -1;
               } else {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = ($scoreiscorrect[$thisq][$kidx] < 0 ? -1 : ($scoreiscorrect[$thisq][$kidx]==1 ? 1 : 0));
@@ -417,9 +417,9 @@ class QuestionHtmlGenerator
                     ->setQuestionPartNumber($atIdx)
                     ->setQuestionPartCount(count($anstypes))
                     ->setAssessmentId($this->questionParams->getAssessmentId())
-                    ->setStudentLastAnswers($lastAnswersAllParts[$atIdx])
+                    ->setStudentLastAnswers($lastAnswersAllParts[$atIdx] ?? '')
                     ->setColorboxKeyword($questionColor)
-                    ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[$atIdx]);
+                    ->setCorrectAnswerWrongFormat($correctAnswerWrongFormat[$atIdx] ?? false);
 
                 try {
                   $answerBoxGenerator = AnswerBoxFactory::getAnswerBoxGenerator($answerBoxParams);
@@ -748,7 +748,7 @@ class QuestionHtmlGenerator
           $sadiv .= '<div>'.$showanswerloc.'</div>';
         } else if (is_array($showanswerloc)) {
           foreach ($showanswerloc as $iidx => $saloc) {
-            if (($doShowAnswer || (is_array($doShowAnswerParts) && $doShowAnswerParts[$iidx])) &&
+            if (($doShowAnswer || (is_array($doShowAnswerParts) && !empty($doShowAnswerParts[$iidx]))) &&
               strpos($toevalqtxt,'$showanswerloc['.$iidx.']')===false
             ) {
               $sadiv .= '<div>'.$saloc.'</div>';

@@ -76,7 +76,7 @@ class DrawingScorePart implements ScorePart
             }
         }
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
+        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}} else {$scoremethod = '';}
 
         if (!isset($reltolerance)) {
             if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {

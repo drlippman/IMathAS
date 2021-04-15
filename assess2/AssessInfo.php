@@ -310,7 +310,7 @@ class AssessInfo
       }
       foreach ($tolookupAids as $qid=>$aid) {
         // TODO: include enough for link to assessment too
-        $this->questionData[$qid]['category'] = $aidmap[$aid];
+        $this->questionData[$qid]['category'] = $aidmap[$aid] ?? null;
       }
     }
     if (count($tolookupOutcomes) > 0 && $get_cats) {
@@ -323,7 +323,7 @@ class AssessInfo
         $outcomemap[$row['id']] = $row['name'];
       }
       foreach ($tolookupOutcomes as $qid=>$oid) {
-        $this->questionData[$qid]['category'] = $outcomemap[$oid];
+        $this->questionData[$qid]['category'] = $outcomemap[$oid] ?? null;
       }
     }
     if ($get_code && count($qsids) > 0) {

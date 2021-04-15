@@ -464,7 +464,7 @@ class ScoreEngine
               list($randqkeys, $randakeys) = $_SESSION['choicemap'][$assessmentId][$qnidx];
               $mapped = array();
               foreach ($tmp as $k=>$v) {
-                $mapped[$randqkeys[$k]] = $randakeys[$v];
+                $mapped[$randqkeys[$k]] = $randakeys[$v] ?? '';
               }
               ksort($mapped);
               $stuanswers[$thisq] = implode('|', $mapped);
@@ -575,7 +575,7 @@ class ScoreEngine
             if (!$baseIsRescore && is_array($parts_to_score) && empty($parts_to_score[$partnum])) {
                 // not scoring it, so treat as rescore, using the stuanswer
                 $scoreQuestionParams->setIsRescore(true);
-                $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum]);  
+                $scoreQuestionParams->setGivenAnswer($stuanswers[$qnidx+1][$partnum] ?? '');  
             } else {
                 $scoreQuestionParams->setIsRescore($baseIsRescore);
                 $scoreQuestionParams->setGivenAnswer($_POST["qn$inputReferenceNumber"]);

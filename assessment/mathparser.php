@@ -236,7 +236,7 @@ class MathParser
 
     $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
     // attempt to handle |x| as best as possible
-    $str = preg_replace('/\|(.*?)\|/', 'abs($1)', $str);
+    $str = preg_replace('/\|(.+?)\|/', 'abs($1)', $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
@@ -582,6 +582,9 @@ class MathParser
             // get precedence info for the symbols
             $peekinfo = $this->operators[$peek['symbol']];
             $tokeninfo = $this->operators[$token['symbol']];
+            if (is_bool($peekinfo) || is_bool($tokeninfo)) {
+                break;
+            }
             //if lower precedence, or equal and left assoc
             if (
               $tokeninfo['precedence'] < $peekinfo['precedence'] ||

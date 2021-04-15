@@ -51,6 +51,8 @@ class FunctionExpressionScorePart implements ScorePart
             } else {
                 $requiretimes = $options['requiretimes'];
             }
+        } else {
+            $requiretimes = '';
         }
 
         if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
@@ -58,8 +60,9 @@ class FunctionExpressionScorePart implements ScorePart
         $ansformats = array_map('trim',explode(',',$answerformat));
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
-
-        if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        if (isset($options['partialcredit'])) {
+            if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 

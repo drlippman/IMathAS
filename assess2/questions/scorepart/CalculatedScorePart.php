@@ -78,7 +78,7 @@ class CalculatedScorePart implements ScorePart
         }
 
         $formatok = "all";
-        if (checkreqtimes($givenans, $requiretimes)==0) {
+        if (!empty($requiretimes) && checkreqtimes($givenans, $requiretimes)==0) {
             //return 0;
             $formatok = "nowhole";
         }

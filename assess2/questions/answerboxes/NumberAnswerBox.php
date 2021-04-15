@@ -212,7 +212,7 @@ class NumberAnswerBox implements AnswerBox
     		}
 
     		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-    			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+    			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt ?? '', $colorbox);
     			$answer = str_replace('"','',$answer);
     		}
     		if (isset($answer)) {

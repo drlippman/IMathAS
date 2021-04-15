@@ -33,10 +33,12 @@ class ChoicesScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
+        if (isset($options['questions'][$partnum]) && is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
         if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
         if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
-        if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        if (isset($options['partialcredit'])) {
+            if ((isset($options['partialcredit'][$partnum]) && is_array($options['partialcredit'][$partnum])) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        }
 
         if (isset($partialcredit)) {
             if (!is_array($partialcredit)) {

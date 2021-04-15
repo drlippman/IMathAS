@@ -628,7 +628,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$items = explode(",",$itemorder);
 	} else {
 		$items = array();
-	}
+    }
+    $alt = 0;
 	for ($i = 0; $i < count($items); $i++) {
 		if (isset($text_segments[$qncnt])) {
 			foreach ($text_segments[$qncnt] as $text_seg) {

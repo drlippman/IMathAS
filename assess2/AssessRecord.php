@@ -275,6 +275,7 @@ class AssessRecord
       'lti_sourcedid' => $lti_sourcedid,
       'ver' => 2,
       'timeontask' => 0,
+      'timelimitexp' => 0,
       'starttime' => $recordStart ? $this->now : 0,
       'lastchange' => 0,
       'score' => 0,
@@ -747,14 +748,14 @@ class AssessRecord
         if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)(-\d+)?/', $key, $match)) {
           $data[$qn]['post'][$key] = $val;
           $thisref = $match[2];
-          $subref = $match[3];
+          $subref = $match[3] ?? '';
         } else {
           continue;
         }
       } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b(-\d+)?/', $key, $match)) {
         $data[$qn]['post'][$key] = $val;
         $thisref = $qref;
-        $subref = $match[2];
+        $subref = $match[2] ?? '';
       } else {
         continue;
       }
@@ -1359,6 +1360,7 @@ class AssessRecord
     // set tries
     $parts = array();
     $score = -1;
+    $raw = -1;
     $try = 0;
     $lastsub = -1;
     $status = 'unattempted';
@@ -1563,7 +1565,7 @@ class AssessRecord
       $curq = &$question_versions[$ver];
     }
     $answeights = array_map('floatval', $answeights);
-    if ($answeights !== $curq['answeights']) {
+    if (empty($curq['answeights']) || $answeights !== $curq['answeights']) {
       $curq['answeights'] = $answeights;
       $this->need_to_record = true;
     }
@@ -1663,7 +1665,7 @@ class AssessRecord
       $max = isset($qver['tries'][$pn]) ? count($qver['tries'][$pn]) - 1 : -1;
       $min = ($try === 'last') ? $max : 0;
       for ($pa = $min; $pa <= $max; $pa++) {
-        if ($qver['tries'][$pn][$pa]['raw'] == -1 && $answeights[$pn] > 0) {
+        if (!empty($qver['tries'][$pn][$pa]) && $qver['tries'][$pn][$pa]['raw'] == -1 && !empty($answeights[$pn])) {
           // indicates it's a "don't count in score"
           $answeightTot -= $answeights[$pn];
           $answeights[$pn] = 0;
@@ -1920,10 +1922,10 @@ class AssessRecord
         $seqPartDone[$pn] = true;
       } else if ($showscores) {
         // move on if correct or out of tries or manually graded
-        $seqPartDone[$pn] = ($partattemptn[$pn] === $trylimit ||
+        $seqPartDone[$pn] = (!empty($partattemptn[$pn]) && ($partattemptn[$pn] === $trylimit ||
           $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] > .98 ||
           $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'] == -2
-        );
+        ));
       } else {
         // move on if attempted
         $seqPartDone[$pn] = ($partattemptn[$pn] > 0);
@@ -2060,7 +2062,7 @@ class AssessRecord
         ->setAssessmentId($this->assess_info->getSetting('id'))
         ->setDbQuestionSetId($qsettings['questionsetid'])
         ->setQuestionSeed($qver['seed'])
-        ->setGivenAnswer($_POST['qn'.$qn])
+        ->setGivenAnswer($_POST['qn'.$qn] ?? '')
         ->setProcessedStuans($processed_stuans)
         ->setAttemptNumber($attemptn)
         ->setAllQuestionAnswers($stuanswers)
@@ -2074,7 +2076,9 @@ class AssessRecord
     $rawparts = $scoreResult['rawScores'];
     $partla = $scoreResult['lastAnswerAsGiven'];
     $partlaNum = $scoreResult['lastAnswerAsNumber'];
-    if (is_array($scoreResult['answeights']) && $scoreResult['answeights'] !== $qver['answeights']) {
+    if (is_array($scoreResult['answeights']) && 
+        (empty($qver['answeights']) || $scoreResult['answeights'] !== $qver['answeights'])
+    ) {
       // answeights changed during scoring
       $this->setAnsweights($qn, $scoreResult['answeights']);
     }
@@ -2326,7 +2330,7 @@ class AssessRecord
         	($rescoreQs !== 'all' && $av < $lastAver)
         ) {
           $aVerScore += $curAver['questions'][$qn]['score'];
-          $verTime += $curAver['questions'][$qn]['time'];
+          $verTime += $curAver['questions'][$qn]['time'] ?? 0;
           continue;
         }
         // loop through the question versions

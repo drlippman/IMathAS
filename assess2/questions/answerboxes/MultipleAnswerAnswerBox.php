@@ -37,15 +37,16 @@ class MultipleAnswerAnswerBox implements AnswerBox
 		$out = '';
 		$tip = '';
 		$sa = '';
-		$preview = '';
+        $preview = '';
+        $style = '';
     $params = [];
 
-		if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
-		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
-		else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
-		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
-		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
-        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
+    if (isset($options['questions'][$partnum]) && is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
+    if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
+        else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
+    if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = '';}
+    if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$partnum];} else {$displayformat = $options['displayformat'];}}
+    if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
 
     if (!is_array($questions)) {
       echo _('Eeek!  $questions is not defined or needs to be an array');

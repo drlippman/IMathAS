@@ -42,7 +42,9 @@ class NumberScorePart implements ScorePart
         if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$partnum];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
         if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
         
-        if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        if (isset($options['partialcredit'])) {
+            if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
+        }
         if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
@@ -55,7 +57,7 @@ class NumberScorePart implements ScorePart
         $givenans = normalizemathunicode($givenans);
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
+            list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt ?? '');
         }
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
@@ -189,6 +191,7 @@ class NumberScorePart implements ScorePart
                 $anarr = array($answer);
             }
             $islist = false;
+            $gaarrcnt = 1;
         }
 
         if (in_array('orderedlist',$ansformats)) {
