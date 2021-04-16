@@ -17,7 +17,7 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
-$ctc = Sanitize::onlyInt($_POST['ctc']);
+$ctc = Sanitize::onlyInt($_POST['ctc'] ?? 0);
 
 $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {

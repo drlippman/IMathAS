@@ -316,7 +316,7 @@ class QuestionHtmlGenerator
             }
 
             // Get the answers to all parts of this question.
-            $lastAnswersAllParts = $stuanswers[$thisq];
+            $lastAnswersAllParts = $stuanswers[$thisq] ?? '';
             if (isset($autosaves[$thisq])) {
               if (is_array($autosaves[$thisq])) {
                 foreach ($autosaves[$thisq] as $iidx=>$kidx) {

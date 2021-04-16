@@ -259,7 +259,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$enddate = formatdate($items[$i]['enddate']);
 			}
 
-			$bnum = $i+1;
+            $bnum = $i+1;
 			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 			if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
 				$availbeh = _('Expanded');
@@ -276,7 +276,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 				$contentbehavior = 0;
 			}
 
-			if ($items[$i]['colors']=='') {
+			if (empty($items[$i]['colors'])) {
 				$titlebg = '';
 			} else {
 				list($titlebg,$titletxt,$bicolor) = explode(',',$items[$i]['colors']);
@@ -661,6 +661,10 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   continue;
 		   }
 
+           if (!isset($itemshowdata[$items[$i]])) {
+               // missing item?
+               continue;
+           }
 		   $line = $itemshowdata[$items[$i]];
 		   $typeid = Sanitize::onlyInt($line['id']);
 
