@@ -4755,7 +4755,7 @@ function comparentuples() {
     echo 'Eek! Comparentuples needs two nutples to compare.';
     return false;
   }
-  if (!preg_match('/^[\(\[\{\<]{1}.*[\)\]\}\>]{1}/',$utup) || !preg_match('/^[\(\[\{\<]{1}.*[\)\]\}\>]{1}/',$vtup)) {
+  if (!preg_match('/^[\(\[\{\<]{1}.*[\)\]\}\>]{1}$/',$utup) || !preg_match('/^[\(\[\{\<]{1}.*[\)\]\}\>]{1}$/',$vtup)) {
     return false;
   }
   if (!isset($args[2])) {
