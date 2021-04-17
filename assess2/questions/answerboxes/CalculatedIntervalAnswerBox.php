@@ -116,7 +116,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, in_array('inequality', $ansformats) ? 'inequality' : 'interval');
         }
 
-        if ($answer !== '') {
+        if ($answer !== '' && !is_array($answer)) {
             if (in_array('inequality', $ansformats) && strpos($answer, '"') === false) {
                 $sa = '`' . intervaltoineq($answer, $variables) . '`';
             } else {

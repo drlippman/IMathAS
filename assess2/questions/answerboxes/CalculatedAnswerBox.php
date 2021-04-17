@@ -161,7 +161,7 @@ class CalculatedAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
-        if ($answer !== '') {
+        if ($answer !== '' && !is_array($answer)) {
             if (!is_numeric($answer)) {
                 $sa = '`' . $answer . '`';
             } else if (in_array('mixednumber', $ansformats) || in_array("sloppymixednumber", $ansformats) || in_array("mixednumberorimproper", $ansformats)) {

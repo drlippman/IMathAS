@@ -176,7 +176,7 @@ class ChoicesAnswerBox implements AnswerBox
         }
 
         $tip = _('Select the best answer');
-        if ($answer !== '') {
+        if ($answer !== '' && !is_array($answer)) {
             $anss = explode(' or ', $answer);
             $sapt = array();
             foreach ($anss as $v) {

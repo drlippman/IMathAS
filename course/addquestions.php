@@ -717,9 +717,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$safesearch = trim($_SESSION['lastsearch'.$cid]); //str_replace("+"," ",$_SESSION['lastsearch'.$cid]);
 			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
-			$searchall = $_SESSION['searchall'.$cid];
-			$searchmine = $_SESSION['searchmine'.$cid];
-			$newonly = $_SESSION['searchnewonly'.$cid];
+			$searchall = $_SESSION['searchall'.$cid] ?? 0;
+			$searchmine = $_SESSION['searchmine'.$cid] ?? 0;
+			$newonly = $_SESSION['searchnewonly'.$cid] ?? 0;
 		} else {
 			$search = '';
 			$searchall = 0;
@@ -1081,7 +1081,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			$x=0;
-			$page_assessmentQuestions = array();
+			$page_assessmentQuestions = array('aiddesc' => []);
 			foreach ($_SESSION['aidstolist'.$aid] as $aidq) {
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
 				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid=:assessmentid";
@@ -1109,7 +1109,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 
-				$page_assessmentQuestions['aiddesc'][$x] = $aidnames[$aidq];
+				$page_assessmentQuestions['aiddesc'][] = $aidnames[$aidq];
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
 					if (strpos($qid,'|')!==false) { continue;}
@@ -1214,7 +1214,7 @@ if ($overwriteBody==1) {
 		var curaid = <?php echo $aid ?>;
 		var defpoints = <?php echo (int) Sanitize::onlyInt($defpoints); ?>;
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
-		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
+		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs ?? ''); ?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js"></script>
 
@@ -1378,7 +1378,7 @@ if ($overwriteBody==1) {
 			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
 				echo _("Must provide a search term when searching all libraries");
 			} elseif (isset($search)) {
-				if ($noSearchResults) {
+				if (!empty($noSearchResults)) {
 					echo "<p>",_("No Questions matched search"),"</p>\n";
 				} else {
 ?>

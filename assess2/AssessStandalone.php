@@ -172,7 +172,7 @@ class AssessStandalone {
 
     $showans = !empty($this->getOpVal($options, 'showans', false)) || $showans;
     $showhints = $this->getOpVal($options, 'showhints', 3);
-    $rawscores = $this->state['rawscores'][$qn];
+    $rawscores = $this->state['rawscores'][$qn] ?? [];
 
     if ($hidescoremarkers) {
         $rawscores = array();
@@ -306,10 +306,10 @@ class AssessStandalone {
             $this->state['stuanswersval'][$qn+1] = array();
           }
           $this->state['stuanswers'][$qn+1][$k] = $v;
-          $this->state['stuanswersval'][$qn+1][$k] = $partlaNum[$k];
+          $this->state['stuanswersval'][$qn+1][$k] = $partlaNum[$k] ?? '';
         } else {
           $this->state['stuanswers'][$qn+1] = $v;
-          $this->state['stuanswersval'][$qn+1] = $partlaNum[$k];
+          $this->state['stuanswersval'][$qn+1] = $partlaNum[$k] ?? '';
         }
         if (!empty($scoreResult['correctAnswerWrongFormat'][$k])) {
             if (!isset($this->state['wrongfmt'])) {
@@ -323,17 +323,19 @@ class AssessStandalone {
             unset($this->state['wrongfmt'][$qn][$k]);
         }
       }
-      if ($parts_to_score === true || !empty($parts_to_score[$k]) ||
-        (isset($this->state['rawscores'][$qn][$k]) &&
-        $this->state['rawscores'][$qn][$k] >= 0 && 
-        !empty($this->state['partattemptn'][$qn][$k]))
-      ) { // rec if scored, and update existing
-        $this->state['rawscores'][$qn][$k] = $rawparts[$k];
-      } else if (empty($this->state['rawscores'][$qn][$k])) {
-          // if we're not scoring this, and state doesn't have a score, 
-          // then zero out the score, since we haven't recorded it.
-          $rawparts[$k] = 0;
-          $scores[$k] = 0;
+      if (isset($rawparts[$k])) {
+        if ($parts_to_score === true || !empty($parts_to_score[$k]) ||
+            (isset($this->state['rawscores'][$qn][$k]) &&
+            $this->state['rawscores'][$qn][$k] >= 0 && 
+            !empty($this->state['partattemptn'][$qn][$k]))
+        ) { // rec if scored, and update existing
+            $this->state['rawscores'][$qn][$k] = $rawparts[$k];
+        } else if (empty($this->state['rawscores'][$qn][$k])) {
+            // if we're not scoring this, and state doesn't have a score, 
+            // then zero out the score, since we haven't recorded it.
+            $rawparts[$k] = 0;
+            $scores[$k] = 0;
+        }
       }
     }
 

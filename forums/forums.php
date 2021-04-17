@@ -22,7 +22,7 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['searchsubmit'])) {
-		if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
+		if (trim($_POST['search'])=='' && empty($_POST['tagfiltersel'])) {
 			$_GET['clearsearch'] = true;
 		}
 	}
@@ -35,7 +35,7 @@
 	} else if(isset($_POST['searchsubmit'])) {
 		$searchstr = trim($_POST['search']);
 		$searchtype = $_POST['searchtype'];
-		$searchtag = $_POST['tagfiltersel'];
+		$searchtag = $_POST['tagfiltersel'] ?? '';
 		$_SESSION['forumsearchstr'.$cid] = $searchstr;
 		$_SESSION['forumsearchtype'.$cid] = $searchtype;
 		$_SESSION['forumsearchtag'.$cid] = $searchtag;

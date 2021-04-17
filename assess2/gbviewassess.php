@@ -15,7 +15,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 }
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-$stu = Sanitize::onlyInt($_GET['stu']);
+$stu = Sanitize::onlyInt($_GET['stu'] ?? 0);
 
 $from = $_GET['from'] ?? '';
 if ($from=='isolate') {

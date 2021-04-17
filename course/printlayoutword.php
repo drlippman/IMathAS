@@ -185,13 +185,13 @@ if ($overwriteBody==1) {
 	for ($j=0; $j<$copies; $j++) {
 		$seeds[$j] = array();
 		if ($line['shuffle']&2) {  //all questions same random seed
-			if ($shuffle&4) { //all students same seed
+			if ($line['shuffle']&4) { //all students same seed
 				$seeds[$j] = array_fill(0,count($questions),$aid+$j);
 			} else {
 				$seeds[$j] = array_fill(0,count($questions),rand(1,9999));
 			}
 		} else {
-			if ($shuffle&4) { //all students same seed
+			if ($line['shuffle']&4) { //all students same seed
 				for ($i = 0; $i<count($questions);$i++) {
 					if (isset($fixedseeds[$questions[$i]])) {
 						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];

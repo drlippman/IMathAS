@@ -1410,7 +1410,7 @@ function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
 					echo '<br/>'.$gbt[0][2][$i][11].'%';
 				}
 			}
-			if ($collapsegbcat[$gbt[0][2][$i][1]]==0) {
+			if (isset($collapsegbcat[$gbt[0][2][$i][1]]) && $collapsegbcat[$gbt[0][2][$i][1]]==0) {
 				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=2\">", _('[Collapse]'), "</a>";
 			} else {
 				echo "<br/><a class=small href=\"gradebook.php?cid=$cid&amp;cat={$gbt[0][2][$i][10]}&amp;catcollapse=0\">", _('[Expand]'), "</a>";
@@ -1641,7 +1641,7 @@ function gbinstrdisp() {
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
 			}
-			if ($collapsegbcat[$gbt[0][1][$i][1]]==2) {
+			if (isset($collapsegbcat[$gbt[0][1][$i][1]]) && $collapsegbcat[$gbt[0][1][$i][1]]==2) {
 				continue;
 			}
 			//name and points
@@ -1762,7 +1762,7 @@ function gbinstrdisp() {
 				if ($hidepast && $gbt[0][1][$j][3]==0) {
 					continue;
 				}
-				if ($collapsegbcat[$gbt[0][1][$j][1]]==2) {
+				if (isset($collapsegbcat[$gbt[0][1][$j][1]]) && $collapsegbcat[$gbt[0][1][$j][1]]==2) {
 					continue;
 				}
 				//if online, not average, and either score exists and active, or score doesn't exist and assess is current,

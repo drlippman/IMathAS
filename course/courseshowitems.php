@@ -791,7 +791,7 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   $preReqNote = '';
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0) {
 			   	$preReqNote = '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
-				$preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
+                $preReqNote .= _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename'] ?? '').'</span>';
 			   }
 
                $excusedNote = '';

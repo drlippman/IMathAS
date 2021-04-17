@@ -148,7 +148,7 @@ if (!(isset($teacherid))) {
 					$defregenpenalty = 0;
 				}
 			}
-			if ($submitby == 'by_assessment' && $defregens > 1) {
+			if ($coreOK && $submitby == 'by_assessment' && $defregens > 1) {
 				if ($_POST['keepscore'] === 'DNC') {
 					$coreOK = false;
 				} else {

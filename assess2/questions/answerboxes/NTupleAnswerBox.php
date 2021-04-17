@@ -106,7 +106,7 @@ class NTupleAnswerBox implements AnswerBox
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
-        if ($answer !== '') {
+        if ($answer !== '' && !is_array($answer)) {
             $sa = $answer;
             if ($displayformat == 'vectorlist' || $displayformat == 'vector') {
                 $sa = str_replace(array('<', '>'), array('(:', ':)'), $sa);

@@ -211,7 +211,7 @@ class NumberAnswerBox implements AnswerBox
             list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt ?? '', $colorbox);
             $answer = str_replace('"', '', $answer);
         }
-        if ($answer !== '') {
+        if ($answer !== '' && !is_array($answer)) {
             if (in_array('parenneg', $ansformats) && $answer < 0) {
                 $sa = '(' . (-1 * $answer) . ')';
             } else if (is_numeric($answer) && $answer != 0 && abs($answer) < .001 && abs($answer) > 1e-9) {

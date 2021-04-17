@@ -2150,8 +2150,10 @@ class AssessRecord
         $curq = $question_versions[count($question_versions) - 1];
       } else if ($ver === 'scored') {
         $curq = $question_versions[$assessver['questions'][$qn]['scored_version']];
-      } else {
+      } else if (isset($question_versions[$ver])) {
         $curq = $question_versions[$ver];
+      } else { // fallback for gbloadquestionver
+        $curq = $question_versions[count($question_versions) - 1];
       }
       $stuansparts = array();
       $stuansvalparts = array();
@@ -2207,7 +2209,7 @@ class AssessRecord
     for ($qn = 0; $qn < count($assessver['questions']); $qn++) {
       $bcnt = 0;
       $question_versions = $assessver['questions'][$qn]['question_versions'];
-      if (!$by_question || !is_numeric($ver)) {
+      if (!$by_question || !is_numeric($ver) || !isset($question_versions[$ver])) { // !isset is fallback for gbloadquestionver
         $curq = $question_versions[count($question_versions) - 1];
       } else {
         $curq = $question_versions[$ver];
@@ -2920,7 +2922,7 @@ class AssessRecord
     }
     if ($getdetails) {
       $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-      $out['feedback'] = $aver['feedback'];
+      $out['feedback'] = $aver['feedback'] ?? '';
       if ($out['feedback'] == '') {
         $out['feedback'] = $this->assess_info->getSetting('deffeedbacktext');
       }
@@ -3052,7 +3054,7 @@ class AssessRecord
         $out['scoreoverride'] = $qdata['scoreoverride'];
       }
       $out['timeactive'] = $this->calcTimeActive($qdata);
-      $out['feedback'] = $qdata['feedback'];
+      $out['feedback'] = $qdata['feedback'] ?? '';
       $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $dispqn !== null ? $dispqn : $qn, $out);
       // include autosaves if teacher and last asssess & question version
       if ($this->teacherInGb &&
@@ -3208,7 +3210,7 @@ class AssessRecord
           }
           unset($qdata['scoreoverride'][$pn]);
         } else {
-          if (floatval($score) != $qdata['scoreoverride'][$pn]) {
+          if (isset($qdata['scoreoverride'][$pn]) && floatval($score) != $qdata['scoreoverride'][$pn]) {
             $changes[$chgkey] = ['old'=>$qdata['scoreoverride'][$pn], 'new'=>$score];
           }
           $qdata['scoreoverride'][$pn] = floatval($score);

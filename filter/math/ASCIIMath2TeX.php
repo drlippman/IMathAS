@@ -636,7 +636,7 @@ function AMTparseSexpr($str) {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$result = $this->AMTparseExpr($str,false);
 		$this->AMnestingDepth--;
-		$st = $result[0]{strlen($result[0])-1};
+		$st = $result[0][strlen($result[0])-1];
 		if ($st == '|') {
 			$node = '{\\left|'.$result[0].'}';
 			return array($node,$result[1]);

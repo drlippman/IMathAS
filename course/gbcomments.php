@@ -180,7 +180,7 @@
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
 	if ($comtype=='stu') {
-		echo " <a href=\"gradebook.php?stu=0&gbmode=". Sanitize::encodeUrlParam($_GET['gbmode'])."&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
+		echo " <a href=\"gradebook.php?stu=0&gbmode=". Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&cid=$cid\">Gradebook</a> &gt; Gradebook Comments</div>";
 		echo "<div class=\"cpmid\"><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=instr\">View/Edit Instructor notes</a></div>";
 		echo '<h1>Modify Gradebook Comments</h1>';
 		echo "<p>These comments will display at the top of the student's gradebook score list.</p>";
@@ -191,7 +191,7 @@
 		echo '<h1>Modify Instructor Notes</h1>';
 		echo "<p>These notes will only display on this page and gradebook exports.  They will not be visible to students.</p>";
 	}
-	echo "<p><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'])."&upload=true&comtype=".Sanitize::encodeUrlParam($comtype)."\">Upload comments</a></p>";
+	echo "<p><a href=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&gbmode=".Sanitize::encodeUrlParam($_GET['gbmode'] ?? '')."&upload=true&comtype=".Sanitize::encodeUrlParam($comtype)."\">Upload comments</a></p>";
 
 	echo "<form id=\"mainform\" method=post action=\"gbcomments.php?cid=$cid&stu=".Sanitize::encodeUrlParam($_GET['stu'])."&comtype=".Sanitize::encodeUrlParam($comtype)."&record=true\">";
 	echo "<span class=form>Add/Replace to all:</span><span class=formright><textarea cols=50 rows=3 id=\"toall\" ></textarea>";

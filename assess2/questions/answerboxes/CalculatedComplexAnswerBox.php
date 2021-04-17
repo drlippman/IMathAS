@@ -104,7 +104,7 @@ class CalculatedComplexAnswerBox implements AnswerBox
             list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
 
-        if ($answer !== '') {
+        if ($answer !== '' && !is_array($answer)) {
             $sa = makeprettydisp( $answer);
         }
 

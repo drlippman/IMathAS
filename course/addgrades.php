@@ -12,7 +12,6 @@
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
 	if (isset($teacherid)) { $isteacher = true;}
-	$gbItem = ($_GET['gbitem'] == 'new') ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
 	if ($istutor) {
 		$isok = false;
 		if (is_numeric($gbItem)) {
@@ -36,7 +35,7 @@
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
-	$from = Sanitize::simpleString($_GET['from']);
+	$from = Sanitize::simpleString($_GET['from'] ?? '');
 
 	if (isset($_GET['del']) && $isteacher) {
 		$delItem = Sanitize::onlyInt($_GET['del']);
@@ -95,7 +94,9 @@
 			exit;
 		}
 
-	}
+    }
+    
+	$gbItem = ($_GET['gbitem'] == 'new') ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
 
 	if ($gbItem != 'new') {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_gbitems WHERE id=?");
@@ -427,9 +428,9 @@
 	} else {
 		echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	}
-	if ($_GET['stu']>0) {
+	if (isset($_GET['stu']) && $_GET['stu']>0) {
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Student Detail</a> ";
-	} else if ($_GET['stu']==-1) {
+	} else if (isset($_GET['stu']) && $_GET['stu']==-1) {
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Averages</a> ";
 	}
 	echo "&gt; Offline Grades</div>";
@@ -441,7 +442,7 @@
 	}
 
     printf("<form id=\"mainform\" method=post action=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&gbitem=%s&grades=%s&from=%s\">",
-        Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid,
+        Sanitize::encodeUrlParam($_GET['stu'] ?? ''), Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid,
         Sanitize::encodeUrlParam($gbItem), Sanitize::encodeUrlParam($_GET['grades']), $from);
 
 	if ($_GET['grades']=='all') {
@@ -475,7 +476,7 @@
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$groupid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -577,7 +578,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 
 		if ($gbItem!='new') {
 			printf("<br class=form /><div class=\"submit\"><input type=submit value=\"Submit\"/> <a href=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&del=%s\">Delete Item</a> </div><br class=form />",
-                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($gbItem));
+                Sanitize::encodeUrlParam($_GET['stu'] ?? ''), Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid, Sanitize::encodeUrlParam($gbItem));
 		} else {
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
@@ -650,7 +651,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 
 		if ($_GET['grades']=='all' && $gbItem!='new' && $isteacher) {
 			printf("<p><a href=\"uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s\">Upload Grades</a></p>",
-                Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($gbItem));
+                Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid, Sanitize::encodeUrlParam($gbItem));
 		}
 		/*
 		if ($hassection && ($_GET['gbitem']=='new' || $_GET['grades']=='all')) {
@@ -721,7 +722,8 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			} else {
 				$stm2->execute(array(':gradetypeid'=>$gbItem));
 			}
-
+            $score = [];
+            $feedback = [];
 			while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 				if (isset($excused[$row[0]])) {
 					$score[$row[0]] = 'X';
@@ -795,7 +797,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			} else {
 				printf('<td><div class="fbbox" id="feedback%d">%s</div></td>',
 					Sanitize::encodeStringForDisplay($row[0]),
-					Sanitize::outgoingHtml($feedback[$row[0]]));
+					Sanitize::outgoingHtml($feedback[$row[0]] ?? ''));
 			}
 			echo '<td></td>';
 			echo "</tr>";

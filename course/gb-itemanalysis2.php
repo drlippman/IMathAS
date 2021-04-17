@@ -177,6 +177,7 @@
             if (!isset($qtotal[$questionId])) { $qtotal[$questionId] = 0; }
             if (!isset($attempts[$questionId])) { $attempts[$questionId] = 0; }
             if (!isset($timeontask[$questionId])) { $timeontask[$questionId] = 0; }
+            if (!isset($timeontaskperversion[$questionId])) { $timeontaskperversion[$questionId] = 0; }
 
             // How many times this question was displayed to all students.
             $qcnt[$questionId] += 1;
@@ -278,7 +279,7 @@
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
-		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail2.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
+		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail2.php?cid=$cid&aid=$aid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
 	}
 	echo '</p>';
 	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
