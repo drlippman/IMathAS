@@ -715,3 +715,39 @@ if (!function_exists('stripslashes_deep')) {
 		return (is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value));
 	}
 }
+
+function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=false) {
+    if (isset($options[$key])) {
+        if ($multi) {
+            if ($hasarrayval) { // the normal option value is an array, so we have to do more logic
+                if (is_array($options[$key])) {
+                    if (isset($options[$key][$partnum]) && is_array($options[$key][$partnum])) {
+                        // we have an array at the part index
+                        return $options[$key][$partnum];
+                    } else {
+                        // no array at part index, so array must be intended for all parts
+                        return $options[$key];
+                    }
+                } // else invalid value - should be array
+            } else {
+                if (is_array($options[$key])) {
+                    if (isset($options[$key][$partnum])) {
+                        return $options[$key][$partnum];
+                    } 
+                } else {
+                    return $options[$key];
+                }
+            }
+        } else {
+            return $options[$key];
+        }
+    }
+    // value not found
+    if ($key === 'answers') {
+        // common mistake to use $answer instead - look for that.
+        $altval = getOptionVal($options, 'answer', $multi, $partnum, $hasarrayval);
+        return $altval;
+    }
+    // no value - return empty string
+    return '';
+}

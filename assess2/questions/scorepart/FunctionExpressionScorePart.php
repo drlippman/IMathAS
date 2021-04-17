@@ -31,38 +31,14 @@ class FunctionExpressionScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-        if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}
-
-        if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$partnum];} else {$domain= $options['domain'];}}
-        if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
-
-        if (isset($options['requiretimes'])) {
-            if (is_array($options['requiretimes'])) {
-                if (is_array($options['requiretimes'][$partnum]) || $multi) {
-                    $requiretimes = $options['requiretimes'][$partnum];
-                } else {
-                    $requiretimes = $options['requiretimes'];
-                }
-            } else {
-                $requiretimes = $options['requiretimes'];
-            }
-        } else {
-            $requiretimes = '';
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+            'variables', 'domain', 'requiretimes', 'ansprompt', 'formatfeedbackon', 'partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (!isset($answerformat)) { $answerformat = '';}
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
+ 
         $ansformats = array_map('trim',explode(',',$answerformat));
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-        if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
-        if (isset($options['partialcredit'])) {
-            if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
-        }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
@@ -85,7 +61,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$givenans);
 
-        if (!isset($variables)) { $variables = "x";}
+        if (empty($variables)) { $variables = "x";}
         $variables = array_map('trim',explode(",",$variables));
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
@@ -103,7 +79,7 @@ class FunctionExpressionScorePart implements ScorePart
             }
         }
 
-        if (isset($domain)) {
+        if (!empty($domain)) {
             $fromto = array_map('trim',explode(",",$domain));
         } else {
             $fromto = array(-10, 10);
@@ -249,7 +225,7 @@ class FunctionExpressionScorePart implements ScorePart
         $ansarr = array_map('trim',explode(' or ',$answer));
         $partialpts = array_fill(0, count($ansarr), 1);
         $origanscnt = count($ansarr);
-        if (isset($partialcredit)) {
+        if (!empty($partialcredit)) {
             if (!is_array($partialcredit)) {$partialcredit = explode(',',$partialcredit);}
             for ($i=0;$i<count($partialcredit);$i+=2) {
                 if (!in_array($partialcredit[$i], $ansarr) || $partialcredit[$i+1]<1) {
@@ -332,7 +308,7 @@ class FunctionExpressionScorePart implements ScorePart
                 } else { //otherwise, compare points
                     if (isNaN($givenansvals[$i])) {
                         $stunan++;
-                    } else if (isset($abstolerance)) {
+                    } else if ($abstolerance !== '') {
                         if (abs($givenansvals[$i]-$realans) > $abstolerance+1E-12) { $correct = false; break;}
                     } else {
                         if ((abs($givenansvals[$i]-$realans)/(abs($realans)+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
@@ -367,7 +343,7 @@ class FunctionExpressionScorePart implements ScorePart
                             }
                         }
                         for ($i=0; $i<count($ratios); $i++) {
-                            if (isset($abstolerance)) {
+                            if ($abstolerance !== '') {
                                 if (abs($ratios[$i]-$meanratio) > $abstolerance+1E-12) {$correct = false; break;}
                             } else {
                                 if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
@@ -378,7 +354,7 @@ class FunctionExpressionScorePart implements ScorePart
                     $correct = false;
                 }
             } else if (in_array('toconst',$ansformats)) {
-                if (isset($abstolerance)) {
+                if ($abstolerance !== '') {
                     //if abs, use mean diff - will minimize error in abs diffs
                     $meandiff = array_sum($diffs)/count($diffs);
                 } else {
@@ -389,7 +365,7 @@ class FunctionExpressionScorePart implements ScorePart
                     $correct=false; continue;
                 }
                 for ($i=0; $i<count($diffs); $i++) {
-                    if (isset($abstolerance)) {
+                    if ($abstolerance !== '') {
                         if (abs($diffs[$i]-$meandiff) > $abstolerance+1E-12) {$correct = false; break;}
                     } else {
                         //if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}

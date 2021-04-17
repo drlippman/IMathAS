@@ -32,53 +32,13 @@ class DrawingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if ($multi) {
-            if (isset($options['grid'])) {
-                if (is_array($options['grid']) && isset($options['grid'][$partnum])) {
-                    $grid = $options['grid'][$partnum];
-                } else if (!is_array($options['grid'])) {
-                    $grid = $options['grid'];
-                }
-            }
-            if (isset($options['snaptogrid'])) {
-                if (is_array($options['snaptogrid']) && isset($options['snaptogrid'][$partnum])) {
-                    $snaptogrid = $options['snaptogrid'][$partnum];
-                } else if (!is_array($options['snaptogrid'])) {
-                    $snaptogrid = $options['snaptogrid'];
-                }
-            }
-            if (isset($options['answers'][$partnum])) {$answers = $options['answers'][$partnum];}
-            else if (isset($options['answer'][$partnum])) {$answers = $options['answer'][$partnum];}
-            if (isset($options['partweights'][$partnum])) {$partweights = $options['partweights'][$partnum];}
-        } else {
-            if (isset($options['grid'])) { $grid = $options['grid'];}
-            if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
-            if (isset($options['answers'])) {$answers = $options['answers'];}
-            else if (isset($options['answer'])) {$answers = $options['answer'];}
-            if (isset($options['partweights'])) {$partweights = $options['partweights'];}
+        $optionkeys = ['grid', 'snaptogrid', 'answers', 'partweights', 
+            'answerformat', 'scoremethod', 'reltolerance', 'abstolerance'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        if (isset($options['reltolerance'])) {
-            if (is_array($options['reltolerance'])) {
-                if (isset($options['reltolerance'][$partnum])) {
-                    $reltolerance = $options['reltolerance'][$partnum];
-                }
-            } else {
-                $reltolerance = $options['reltolerance'];
-            }
-        }
-        if (isset($options['abstolerance'])) {
-            if (is_array($options['abstolerance'])) {
-                if (isset($options['abstolerance'][$partnum])) {
-                    $abstolerance = $options['abstolerance'][$partnum];
-                }
-            } else {
-                $abstolerance = $options['abstolerance'];
-            }
-        }
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}} else {$scoremethod = '';}
 
-        if (!isset($reltolerance)) {
+        if ($reltolerance === '') {
             if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
                 $reltolerance =  $GLOBALS['CFG']['AMS']['defaultdrawtol'];
             } else {
@@ -89,7 +49,7 @@ class DrawingScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
-        if (isset($scoremethod) && $scoremethod=='takeanything') {
+        if (!empty($scoremethod) && $scoremethod=='takeanything') {
           if ($givenans==';;;;;;;;') {
               $scorePartResult->setRawScore(0);
               return $scorePartResult;
@@ -99,7 +59,7 @@ class DrawingScorePart implements ScorePart
           }
         }
         $imgborder = 5; $step = 5;
-        if (!isset($answerformat)) {
+        if (empty($answerformat)) {
             $answerformat = array('line','dot','opendot');
         } else if (!is_array($answerformat)) {
             $answerformat = explode(',',$answerformat);
@@ -109,7 +69,7 @@ class DrawingScorePart implements ScorePart
         } else {
             $settings = array(-5,5,-5,5,1,1,300,300);
         }
-        if (isset($grid)) {
+        if (!empty($grid)) {
             if (!is_array($grid)) {
                 $grid = array_map('trim',explode(',',$grid));
             } else if (strpos($grid[0],',')!==false) {//forgot to set as multipart?
@@ -139,7 +99,7 @@ class DrawingScorePart implements ScorePart
             $settings[2] = -0.5;
             $settings[3] = 0.5;
         }
-        if (!isset($snaptogrid)) {
+        if (empty($snaptogrid)) {
     			$snaptogrid = 0;
         } else {
           $snapparts = explode(':', $snaptogrid);
@@ -263,7 +223,7 @@ class DrawingScorePart implements ScorePart
             }
             //echo "Vals score: $vals, adj score: $adjv. </p>";
 
-            if (isset($abstolerance)) {
+            if ($abstolerance !== '') {
                 if ($totscore<$abstolerance) {
                     $scorePartResult->setRawScore(0);
                     return $scorePartResult;
@@ -1982,7 +1942,7 @@ class DrawingScorePart implements ScorePart
             }
 
         }
-        if (!isset($partweights)) {
+        if (empty($partweights)) {
             $scores = array_values($scores); // re-index so partweights applies right
             $partweights = array_fill(0,count($scores),1/count($scores));
         } else {
@@ -1997,7 +1957,7 @@ class DrawingScorePart implements ScorePart
         if ($extrastuffpenalty>0) {
             $totscore = max($totscore*(1-$extrastuffpenalty),0);
         }
-        if (isset($abstolerance)) {
+        if ($abstolerance !== '') {
             if ($totscore<$abstolerance) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;

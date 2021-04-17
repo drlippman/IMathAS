@@ -636,13 +636,16 @@ class AssessRecord
         }
       }
       // determine if any questions accept work after
-      $accept_work_after = (($this->assess_info->getSetting('showwork') & 2) == 2);
-      $lastver = count($this->data['assess_versions']) - 1;
-      $questions = $this->data['assess_versions'][$lastver]['questions'];
-      for ($k = 0; $k < count($questions); $k++) {
-        $qid = $questions[$k]['question_versions'][count($questions[$k]['question_versions']) - 1]['qid'];
-        $accept_work_after = $accept_work_after ||
-          (($this->assess_info->getQuestionSetting($qid, 'showwork') & 2) == 2);
+      // only determine if we're going to use it
+      if (($active && $submitby == 'by_question') || !$active && $submitby == 'by_assessment') {
+        $accept_work_after = (($this->assess_info->getSetting('showwork') & 2) == 2);
+        $lastver = count($this->data['assess_versions']) - 1;
+        $questions = $this->data['assess_versions'][$lastver]['questions'];
+        for ($k = 0; $k < count($questions); $k++) {
+            $qid = $questions[$k]['question_versions'][count($questions[$k]['question_versions']) - 1]['qid'];
+            $accept_work_after = $accept_work_after ||
+            (($this->assess_info->getQuestionSetting($qid, 'showwork') & 2) == 2);
+        }
       }
       if ($active && $submitby == 'by_question') {
         // for by-question, set "accept work after" status on start
@@ -2216,7 +2219,8 @@ class AssessRecord
       }
       $scorenonzeroparts = array();
       $scoreiscorrectparts = array();
-      foreach ($curq['tries'] as $pn => $v) {
+      $maxpn = max(array_keys($curq['tries']));
+      for ($pn = 0; $pn <= $maxpn; $pn++) {
         if (empty($curq['tries'][$pn])) {
           $scorenonzeroparts[$pn] = -1;
           $scoreiscorrectparts[$pn] = -1;
@@ -2233,7 +2237,6 @@ class AssessRecord
         $scorenonzero[$qn+1] = $scorenonzeroparts[0];
         $scoreiscorrect[$qn+1] = $scoreiscorrectparts[0];
       }
-
     }
     return array($scorenonzero, $scoreiscorrect);
   }
