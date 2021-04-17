@@ -280,7 +280,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['title']=='##hidden##') {
 			$hidetitle = true;
 			$line['title']='';
-		}
+		} else {
+            $hidetitle = false;
+        }
 		$startdate = $line['startdate'];
 		$enddate = $line['enddate'];
 		$fileorder = explode(',',$line['fileorder']);

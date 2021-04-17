@@ -254,10 +254,10 @@ class DrawingAnswerBox implements AnswerBox
                         $out .= "<img src=\"$staticroot/img/tpineqparabdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.4\" alt=\"Quadratic inequality, dashed line\"/>";
                         $def = 10;
                     }
-                    if (in_array('line', $answerformat) || count($answerformat) == 1) {
+                    if (count($answerformat) == 1 || in_array('line', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpineq.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
                         $out .= "<img src=\"$staticroot/img/tpineqdash.gif\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"10.2\" alt=\"Linear inequality, dashed line\"/>";
-                        if ($answerformat[1] == 'line' || count($answerformat) == 1) {
+                        if (count($answerformat) == 1 || $answerformat[1] == 'line') {
                             $def = 10;
                         }
                     }

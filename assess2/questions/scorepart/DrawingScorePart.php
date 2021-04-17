@@ -1771,7 +1771,6 @@ class DrawingScorePart implements ScorePart
                         $linepts++;
                     }
                 }
-                $linecnt++;
             }
             //break apart student entry
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
