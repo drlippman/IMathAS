@@ -44,8 +44,8 @@ if (!empty($_GET['from'])) {
 }
 
 //process transfer
-$ownerid = Sanitize::onlyInt($_POST['newowner']);
-if (!empty($ownerid)) {
+if (!empty($_POST['newowner'])) {
+    $ownerid = Sanitize::onlyInt($_POST['newowner']);
 	$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
 	$stm->execute(array(':ownerid'=>$ownerid, ':id'=>$cid));
 	if ($stm->rowCount()>0) {

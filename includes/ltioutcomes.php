@@ -81,7 +81,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
 		} else {
 			$logFile = fopen($logfilename, "a+");
 		}
-		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$userid,$grade,$sourcedid\n");
+		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$uid,$grade,$sourcedid\n");
 		fclose($logFile);
 	}
 	//if we're using the LTI message queue, and it's an update, queue it
