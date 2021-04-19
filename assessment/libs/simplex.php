@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 34
+// File Version : 34a
 //
 
 global $allowedmacros;
@@ -223,7 +223,7 @@ function simplex($type,$objective,$constraints) {
 //			etc.
 //			This is returned from simplexsolve
 //
-// ismixed: an optional flag for the function that tells the routine to read max values instead of min ones for mixed constraints
+// ismixed: an optional flag for the function that tells the routine that the solution is negative
 //		  default is  FALSE
 //
 // stuanswer: the answer the student submitted
@@ -251,13 +251,19 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
     //echo "<br/>LastStuColumn = $LastStuColumn<br/>";
     //echo "LastAnswer = $LastAnswer<br/>";
 
-    if(($type=="max")||($ismixed)) {
-        for($r=0, $size = count($solutionlist); $r<$size;$r++) {
+    if($type=="max") {
+        for($r=0; $r< count($solutionlist); $r++) {
             if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
                 $match = 1;  // found a possible solution
+				if($ismixed){
+                  $colvalue = -$solutionlist[$r][$OptimizedValuecol];
+                } else {
+                    $colvalue = $solutionlist[$r][$OptimizedValuecol];
+                }
+
                 // Check Objective
                 if($HasObjective==1) {
-                    if($solutionlist[$r][$OptimizedValuecol]!=$stuanswer[$LastStuColumn]) {
+                    if(abs($colvalue-$stuanswer[$LastStuColumn])>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -280,12 +286,18 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
             }
         }
     } else {
-        for($r=0,$size = count($solutionlist);$r<$size;$r++) {
+        for($r=0; $r< count($solutionlist); $r++) {
             if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
                 $match = 1;  // found a possible solution
+
+				if($ismixed){
+                    $colvalue = -$solutionlist[$r][$OptimizedValuecol];
+                } else {
+                    $colvalue = $solutionlist[$r][$OptimizedValuecol];
+                }
                 // Check Objective
                 if($HasObjective==1) {
-                    if($solutionlist[$r][$OptimizedValuecol]!=$stuanswer[$LastStuColumn]) {
+                    if(abs($colvalue-$stuanswer[$LastStuColumn])>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -3184,6 +3196,8 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 
 // Change Log
+//
+// 2021-04-19 ver 34a - simplexchecksolution bug fix.
 //
 // 2021-04-18 ver 34 - updated and fixed the mixed constraint logic.
 // through
