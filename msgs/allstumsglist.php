@@ -193,9 +193,15 @@ function chgfilter() {
 		echo "<tr><td><input type=checkbox name=\"checked[]\" value=\"" . Sanitize::onlyInt($line['id']) . "\"/></td><td>";
 		echo "<a href=\"viewmsg.php?page" . Sanitize::onlyInt($page) . "&cid=$cid&filterstu=" . Sanitize::encodeStringForDisplay($filterstu) . "&type=msg&msgid=" . Sanitize::onlyInt($line['id']) . "&type=allstu\">";
 		echo $line['title']; // sanitized above
-		echo "</a></td><td>";
-		echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
-		echo "</td><td>" . Sanitize::encodeStringForDisplay($stulist[$line['msgto']]) . "</td>";
+        echo "</a></td><td>";
+        if (isset($stulist[$line['msgfrom']])) {
+            echo Sanitize::encodeStringForDisplay($stulist[$line['msgfrom']]);
+        }
+        echo "</td><td>";
+        if (isset($stulist[$line['msgto']])) {
+            Sanitize::encodeStringForDisplay($stulist[$line['msgto']]);
+        }
+        echo "</td>";
 		$senddate = tzdate("F j, Y, g:i a",$line['senddate']);
 		echo "<td>$senddate</td></tr>";
 	}

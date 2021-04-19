@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 33
+// File Version : 34
 //
 
 global $allowedmacros;
@@ -70,8 +70,14 @@ function simplex($type,$objective,$constraints) {
 
 	$ismixed = hasmixedconstraints($constraints);
 
+	if($ismixed) {
+        // adjust constraints so that all constraints have <= as the inequality
+		$constraints= convertmixedconstraints($constraints);
+    }
+
 	// test for mixed constraint
-	if((!$ismixed)&&($type=="min")) {
+	//if((!$ismixed)&&($type=="min")) {
+	if($type=="min") {
 		$xcount = count($constraints);		// x variables
 		$lastrow = count($objective);		// y variables
 	}
@@ -159,17 +165,11 @@ function simplex($type,$objective,$constraints) {
 	else {
 		for($r=0;$r<$lastrow;$r++) {
 			$temp = $constraints[$r][0];
-			if($constraints[$r][1]=="<=") {
-				$inequality = 1;
-			}
-			else {
-				$inequality = -1;
-			}
 
 			for($c = 0; $c<$xcount; $c++){
 				$value = $temp[$c];
                 if(is_numeric($value)) {
-					$sm[$r][$c] = createsimplexelement($inequality*$value);
+					$sm[$r][$c] = createsimplexelement($value);
                 }
                 else {
 					echo "Simplex Error: constraints row = $r col = $c (".$value.") is not a number.<br/>\r\n";
@@ -179,7 +179,7 @@ function simplex($type,$objective,$constraints) {
 
 			$value = $constraints[$r][2];
 			if(is_numeric($value)) {
-				$sm[$r][$lastcol] = createsimplexelement($inequality*$value);
+				$sm[$r][$lastcol] = createsimplexelement($value);
             }
 			else {
 				echo "Simplex Error: constraints row = $r col = $lastcol (".$value.") is not a number.<br/>\r\n";
@@ -191,12 +191,12 @@ function simplex($type,$objective,$constraints) {
 		for($c = 0; $c<$xcount; $c++){
 			$value = $objective[$c];
 			if(is_numeric($value)) {
-                if(($ismixed)&&($type=="min")){
-					$sm[$lastrow][$c] = createsimplexelement($value);
-				}
-				else {
+                //if(($ismixed)&&($type=="min")){
+				//	$sm[$lastrow][$c] = createsimplexelement($value);
+				//}
+				//else {
 					$sm[$lastrow][$c] = createsimplexelement(-$value);
-				}
+				//}
             }
             else {
 				echo "Simplex Error: constraints row = $r col = $c (".$value.") is not a number.<br/>\r\n";
@@ -1883,106 +1883,66 @@ function simplexfindpivotpointmixed($sm) {
     $lastcol = $cols-1;					  // zero based
 
     // variables used for finding the pivot and return values
-    $columnlist = array_fill(0, $cols, "N"); // column flag where negative entry value was found
+    $pivotpointList = array();		// list of possible pivot point
+	$ratiolist = array();		// 2 dimensional array that holds all possible ratio values
 
-    $ratiolist = array();					// 2 dimensional array that holds all possible ratio values
-    $pivotpoints = array();				  // list of possible pivot point
+	$minratio = NULL;  // the smallest positive ratio
 
-    //$ColumnMinValue = array(1,1);			// not found as we need to find negatives
-
-	$pivotcondition = PivotPointNotMixedConstraint; // set to not a mixed constraint problem
-
-    if(!simplexhasmixedconstrants($sm)) return array($pivotcondition,NULL);
-
-    // Flag all columns that need to be checked.
+    // Flag all possible pivot points
     for($r=0;$r<$lastrow;$r++){
-        //if(fractiontodecimal($sm[$r][$lastcol])<0) {
-		if(($sm[$r][$lastcol][0]/$sm[$r][$lastcol][1])<0) {
+		$ratiolist[$r] = array();
+		$lastcolumn =  $sm[$r][$lastcol];
+
+		// is the last column negative?
+		if(($lastcolumn[0]/$lastcolumn[1])<0) {
             // now search each column to see if a negative entry is found
             // if so set flag
             for($c = 0; $c < $lastcol; $c++){
-                //if(fractiontodecimal($sm[$r][$c])<0) {
-				if(($sm[$r][$c][0]/$sm[$r][$c][1])<0) {
-					$columnlist[$c] = "Y";  // found a pivot column
-				}
-			}
-		}
-    }
-
-    $pivotcondition = PivotPointNoSolution;  // set to no solutions
-    $hasvalidpivot = FALSE;
-
-    // if all columns are "N" then no pivots exists and therfore no solutions exists.
-    for($c = 0; $c < $lastcol; $c++){
-        if($columnlist[$c] == "Y") {
-            $hasvalidpivot = TRUE;
-			break;
-		}
-	}
-
-    if(!$hasvalidpivot) return array($pivotcondition,NULL);
-
-    // now find all possible ratios
-
-    for($r=0;$r<$lastrow;$r++){
-        $ratiolist[$r] = array();
-        for($c = 0; $c < $lastcol; $c++){
-			if($columnlist[$c] == "Y") {
-				$lastcolumn =  $sm[$r][$lastcol];
 				$testcolumn =  $sm[$r][$c];
-				$top = $lastcolumn[0]*$testcolumn[1];
-				$bot = $lastcolumn[1]*$testcolumn[0];
-				if($bot < 0) {
-					$top*=-1;
-					$bot*=-1;  // make the denominator must always be positive
+
+				if(($sm[$r][$c][0]/$sm[$r][$c][1])<0) {
+					// save the point
+					$pivotpointList[] = array($r,$c);
+
+					// calculate the ratio
+                    $top = $lastcolumn[0]*$testcolumn[1];
+                    $bot = $lastcolumn[1]*$testcolumn[0];
+                    if($bot < 0) {
+                        $top*=-1;
+                        $bot*=-1;  // make the denominator must always be positive
+                    }
+                    $gcf = gcd($top,$bot);
+                    $top /= $gcf;
+                    $bot /= $gcf;
+                    $ratiolist[$r][$c] = array($top,$bot);
+					if(is_null($minratio)) {
+						$minratio = array($top,$bot);
+                    } elseif(($minratio[0]/$minratio[1]) > ($top/$bot)) {
+                        $minratio = array($top,$bot);
+                    }
 				}
-				$gcf = gcd($top,$bot);
-				$top /= $gcf;
-				$bot /= $gcf;
-				$ratiolist[$r][$c] = array($top,$bot);
 			}
 		}
     }
 
-    // There are at least 1 pivot point
+	$pivotcondition = PivotPointNoSolution; // set to no solution
+
+    if(is_null($minratio)) return array($pivotcondition,NULL);
+
+
+    // There are at least 1 possible pivot point(s)
     $pivotcondition = PivotPointFoundList;
 
     // Find the pivot point PER column
-    //
-	//
-	// Test if $ratiolist[$r][$c] < $minfraction
-	//
-	// $ratiolist[$r][$c][0]   $minfraction[0]
-	// --------------------- < ---------------
-	// $ratiolist[$r][$c][1]   $minfraction[1]
-	//
-	// As both denominator are POSITIVE - we need to test for the following:
-	//
-	// $ratiolist[$r][$c][0]*$minfraction[1] < $ratiolist[$r][$c][1]*$minfraction[0]
-	//
-    for($c = 0; $c < $lastcol; $c++){
-        if($columnlist[$c] == "Y") {
-            $minfraction = array(-1,1);			  // the smallest ratio - set to not found
-            for($r=0;$r<$lastrow;$r++){
-                // now save the smallest positive value
-				if($ratiolist[$r][$c][0] > 0) {
-                    if($minfraction[0] < 0) {
-                        $minfraction = $ratiolist[$r][$c];
-                    }
-                    elseif($ratiolist[$r][$c][0]*$minfraction[1] < $ratiolist[$r][$c][1]*$minfraction[0]) {
-                        $minfraction = $ratiolist[$r][$c];
-					}
-				}
-			}
+    // Create a list of pivot points
 
-			// min fraction for column has been found
-			for($r=0;$r<$lastrow;$r++) {
-				if($ratiolist[$r][$c]==$minfraction) {
-					// find a pivot point - add to the list
-					$pivotpoints[count($pivotpoints)] = array($r,$c);
-                }
-			}
-		}
+	$pivotpoints = array();
+    for($i = 0; $i < count($pivotpointList); $i++){
+        $r = $pivotpointList[$i][0];
+        $c = $pivotpointList[$i][1];
+        if(($minratio[0]==$ratiolist[$r][$c][0])&&($minratio[1]==$ratiolist[$r][$c][1])) {
+            $pivotpoints[] = $pivotpointList[$i];
+        }
     }
 
     // return the status and the list of points, if any.
@@ -2438,9 +2398,10 @@ function simplexsolve2() {
 		$objectivereached[count($objectivereached)] = $solution;
 	}
 
-    $hasmixedconstraints = simplexhasmixedconstrants($sm);
-
 	do {
+		// check for mixed constraints
+        $hasmixedconstraints = simplexhasmixedconstrants($sm);
+
 		// step 3
 		$pivots = NULL;
 
@@ -2771,6 +2732,35 @@ function verifyconstraints($type,$constraints) {
 
 	return $constraints;
 }
+
+//function convertmixedconstraints($type,constraints)
+// internal only
+//
+// This function returns true if mixed constraints are found
+//					   false if all are the same type
+function convertmixedconstraints($constraints) {
+
+	for ($r=0;$r<count($constraints);$r++)  {
+		// make the first part an array if it was given as a list
+		$arrow = $constraints[$r][1];
+
+		if ($arrow!="<=") {
+
+			// get the array
+			for ($n=0;$n<count($constraints[$r][0]);$n++)  {
+				$constraints[$r][0][$n]*=-1;
+            }
+			// fix the arrow
+			$constraints[$r][1] = "<=";
+
+			// fix the last column
+			$constraints[$r][2] *= -1;
+		}
+	}
+
+	return $constraints;
+}
+
 
 //function hasmixedconstraints(constraints)
 // internal only
@@ -3195,10 +3185,13 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 // Change Log
 //
+// 2021-04-18 ver 34 - updated and fixed the mixed constraint logic.
+// through
+// 2021-04-19
 //
 // 2021-03-29 ver 33 - Found a typo in simplexsolve 2 (around line 2481) and converted all fraction to decimals into a division.
 // through
-// 2021-03-16 ver 32 - created a local function for fractionto decimal - not a great idea - figured a better way to do it (ver 33) 
+// 2021-03-16 ver 32 - created a local function for fractionto decimal - not a great idea - figured a better way to do it (ver 33)
 //
 // 2019-11-24 ver 30 - reworked the current point tpo not show debug information.
 //

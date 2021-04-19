@@ -971,7 +971,9 @@ var app = new Vue({
  						'text': '<?php echo _('Never'); ?>'
  					}
                 ];
-                if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
+                if ((this.viewingb === 'after_take' || this.viewingb === 'immediately') && 
+                    this.subtype == 'by_assessment'
+                ) {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted'); ?>'

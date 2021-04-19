@@ -183,7 +183,7 @@ if (isset($QS['showscored'])) {
         $overrides['showans'] = 0;
     }
 } else {
-    if (isset($QS['showans'])) {
+    if (isset($QS['showans']) && !empty($QS['auth'])) {
         $state['showans'] = $QS['showans'];
     } else {
         $state['showans'] = 0;
@@ -336,7 +336,7 @@ $placeinhead .= '<script type="text/javascript">
   } else if (typeof MathJax != "undefined") {
     if (MathJax.startup) {
         MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
-    } elseif (MathJax.Hub) {
+    } else if (MathJax.Hub) {
         MathJax.Hub.Queue(function () {
             sendresizemsg();
         });

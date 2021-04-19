@@ -31,10 +31,12 @@
     <li><a href="#pow">cx_pow: Power</a></li>
     <li><a href="#root">cx_root: nth Roots</a></li>
     <li><a href="#quad">cx_quadRoot: Quadratic roots</a></li>
+    <li><a href="#cubic">cx_cubicRoot: Cubic roots</a></li>
     <li><a href="#prquad">cx_prettyquadRoot: Formatted quadratic roots</a></li>
     <li><a href="#format2std">cx_format2std: Display in standard form</a></li>
     <li><a href="#format2pol">cx_format2pol: Display in polar form</a></li>
     <li><a href="#plot">cx_plot: Plot z</a></li>
+    <li><a href="#matrixreduce">cx_matrixreduce: RREF of complex matrices</a></li>
     
     </div>
 <p>&nbsp;</p>
@@ -211,6 +213,20 @@
 <p>An array of the two roots (either real or complex) of the quadratic equation.</p>
 <p>&nbsp;</p>
 
+<p><a name="cubic"></a><strong>cx_cubicRoot</strong>(coeff, [disp = False, roundto = 12])</p>
+<p>Function: cx_cubicRoot Returns an array of roots of the cubic equation f(x) = ax^3 + bx^2 + cx + d. Real roots are returned as an array([r1],[r2],[r3]) and complex roots are return as an array([r1],[Re1,Im1], [Re1,Im1]).</p>
+<p>&nbsp;<em>Parameters:</em></p>
+<ul>
+  <li><strong>coeff</strong>: The array of numerical coefficients: [a,b,c,d]</li>
+  <li><strong>disp</strong>: If set to true, the function returns the string version of the roots for display in the form array("root1", "root2", "root3"), which should not be used in calculation.</li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which the roots should be rounded off; default is 12 decimal places. </li>
+
+</ul>
+<p><em>&nbsp;Returns:</em></p>
+<p></p>
+<p>An array of the three roots (either real or complex) of the cubic equation.</p>
+<p>&nbsp;</p>
+
 <p><a name="prquad"></a><strong>cx_prettyquadRoot</strong>(a, b, c)</p>
 <p>Function: cx_prettyquadRoot returns an array of the formatted roots of the quadratic equation f(x) = ax^2 + bx + c as string. Real roots are returned as an array 
   A = array("r1", "r2") ordered from the smallest to largest, and the complex roots are returned as an array A = array("a+bi", "a-bi") This function is suitable for displaying answer (i.e., $showanswer). </p>
@@ -266,6 +282,20 @@
 <p>The plot of a complex number.</p>
 <p>&nbsp;</p>
 
+<p><a name="matrixreduce"></a><strong>cx_matrixreduce</strong>(A, [rref = False, disp = False, roundto = 4])</p>
+<p>Function cx_matrixreduce returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A; it handles matrices with both real and complex entries.</p>
+<p><em>Parameters:</em></p>
+<ul>
+  <li><strong>A</strong>: Matrix in the form array([row1],[row2],...) where each row can have real entries as a single value or complex entries in the form [Re, Im];
+    for example, the 2x2 matrix array([1, 2+3i], [-i, 5]) should be entered as A = array([1, [2,3]], [[0,-1], 5]) </li>
+  <li><strong>rref</strong>: Optional - If true, it returns the reduce row echelon form; the default is false, which returns the row echelon form (ref). </li>
+  <li><strong>disp</strong>: Optional - If set to true, the function returns the formatted matrix (with string entries) for display, which should not be used for calculation. </li>
+  <li><strong>roundto</strong>: Optional - number of decimal places to which the entries should be rounded off in display format (i.e. when disp = true); default is 4 decimal places.  </li>
 
+ </ul>
+<p>&nbsp;<em>Returns:</em></p>
+<p>Returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A in the same format as A. The display format returns the formatted matrix.
+   See question 674661 on MOM for an example.</p>
+<p>&nbsp;</p>
 
 <a href="#top">Back to top of page</a>

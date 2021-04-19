@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic");
+ "array_values","comparelogic","stuansready");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -141,7 +141,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	$ymax = is_numeric($settings[3])?$settings[3]:5;
 	$plotwidth = is_numeric($settings[6])?$settings[6]:200;
 	$plotheight = is_numeric($settings[7])?$settings[7]:200;
-	$noyaxis = false;
+    $noyaxis = false;
+    $noxaxis = false;
 	if (is_numeric($ymin) && is_numeric($ymax) && $ymin==0 && $ymax==0) {
 		$ymin = -0.5;
 		$ymax = 0.5;
@@ -163,11 +164,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$lbl = explode(':',$settings[4]);
 		$lbl = array_map('evalbasic', $lbl);
 	} else {
-		$settings[4] = evalbasic($settings[4]);
+        $settings[4] = evalbasic($settings[4]);
+        $lbl = [];
 	}
 	if (is_numeric($settings[4]) && $settings[4]>0) {
 		$commands .= 'axes('.$settings[4].','.$settings[4].',1';
-	} else if (isset($lbl[0]) && is_numeric($lbl[0]) && $lbl[0]>0) {
+	} else if (isset($lbl[0]) && is_numeric($lbl[0])) {
+        if ($lbl[0]==0) {
+            $lbl[0] = 1;
+            $noxaxis = true;
+        }
 		if ($lbl[1]==0) {
 			$lbl[1] = 1;
 			$noyaxis = true;
@@ -197,8 +203,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		//$commands .= ');';
 	}
 
-	if ($noyaxis==true) {
-		$commands .= ',1,0,1);';
+	if ($noyaxis==true || $noxaxis==true) {
+		$commands .= ','.($noxaxis?0:1).','.($noyaxis?0:1).',1);';
 	} else if ($fqonlyx || $fqonlyy) {
 		$commands .= ','.($fqonlyx?'"fq"':1).','.($fqonlyy?'"fq"':1).');';
 	} else {
@@ -273,7 +279,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= sprintf(_('Text label, color %s, at %s reading: %s'), $function[4], $coord, $function[3]).'. ';
 			$commands .= $path;
 			continue; //skip the stuff below
-		} else if ($function[0]{0}=='[') { //strpos($function[0],"[")===0) {
+		} else if ($function[0][0]=='[') { //strpos($function[0],"[")===0) {
 			$isparametric = true;
 			$xfunc = makepretty(str_replace("[","",$function[0]));
 			$evalxfunc = makeMathFunction($xfunc, "t");
@@ -281,20 +287,20 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$evalyfunc = makeMathFunction($yfunc, "t");
 			array_shift($function);
 			if ($evalxfunc===false || $evalyfunc===false) {continue;}
-		} else if ($function[0]{0}=='<' || $function[0]{0}=='>') {
+		} else if ($function[0][0]=='<' || $function[0][0]=='>') {
 			$isineq = true;
-			if ($function[0]{1}=='=') {
+			if ($function[0][1]=='=') {
 				$ineqtype = substr($function[0],0,2);
 				$func = makepretty(substr($function[0],2));
 			} else {
-				$ineqtype = $function[0]{0};
+				$ineqtype = $function[0][0];
 				$func = makepretty(substr($function[0],1));
 			}
 			$evalfunc = makeMathFunction($func, "x");
 			if ($evalfunc===false) {continue;}
-		} else if (strlen($function[0])>1 && $function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>' || $function[0]{1}=='=')) {
+		} else if (strlen($function[0])>1 && $function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>' || $function[0][1]=='=')) {
 			$isxequals = true;
-			if ($function[0]{1}=='=') {
+			if ($function[0][1]=='=') {
 				$val = substr($function[0],2);
 				if (!is_numeric($val)) {
 					// convert to parametric
@@ -308,11 +314,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
 			} else {
 				$isineq = true;
-				if ($function[0]{2}=='=') {
+				if ($function[0][2]=='=') {
 					$ineqtype = substr($function[0],1,2);
 					$val= substr($function[0],3);
 				} else {
-					$ineqtype = $function[0]{1};
+					$ineqtype = $function[0][1];
 					$val = substr($function[0],2);
 				}
 			}
@@ -453,7 +459,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if (isNaN($x) || isNaN($y)) {
 					continue;
 				}
-				$x = round($x,$xrnd);//round(eval("return ($xfunc);"),3);
+				$x = round($x,$yrnd);//round(eval("return ($xfunc);"),3);
 				$y = round($y,$yrnd);//round(eval("return ($yfunc);"),3);
 				if ($xmax != $xmin && $y>$yyaltmin && $y<$yyaltmax) {
 					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
@@ -2364,12 +2370,21 @@ function fractowords($numer,$denom,$options='no') { //options can combine 'mixed
 $namearray[0] = explode(',',"Aaron,Ahmed,Aidan,Alan,Alex,Alfonso,Andres,Andrew,Antonio,Armando,Arturo,Austin,Ben,Bill,Blake,Bradley,Brayden,Brendan,Brian,Bryce,Caleb,Cameron,Carlos,Casey,Cesar,Chad,Chance,Chase,Chris,Cody,Collin,Colton,Conner,Corey,Dakota,Damien,Danny,Darius,David,Deandre,Demetrius,Derek,Devante,Devin,Devonte,Diego,Donald,Dustin,Dylan,Eduardo,Emanuel,Enrique,Erik,Ethan,Evan,Francisco,Frank,Gabriel,Garrett,Gerardo,Gregory,Ian,Isaac,Jacob,Jaime,Jake,Jamal,James,Jared,Jason,Jeff,Jeremy,Jesse,John,Jordan,Jose,Joseph,Josh,Juan,Julian,Julio,Justin,Juwan,Keegan,Ken,Kevin,Kyle,Landon,Levi,Logan,Lucas,Luis,Malik,Manuel,Marcus,Mark,Matt,Micah,Michael,Miguel,Nate,Nick,Noah,Omar,Paul,Quinn,Randall,Ricardo,Ricky,Roberto,Roy,Russell,Ryan,Salvador,Sam,Santos,Scott,Sergio,Shane,Shaun,Skyler,Spencer,Stephen,Taylor,Tevin,Todd,Tom,Tony,Travis,Trent,Trevor,Trey,Tristan,Tyler,Wade,Warren,Wyatt,Zach");
 $namearray[1] = explode(',',"Adriana,Adrianna,Alejandra,Alexandra,Alexis,Alice,Alicia,Alma,Amanda,Amber,Amy,Andrea,Angela,Anna,April,Ariana,Ashley,Ashton,Autumn,Bianca,Bria,Brianna,Brittany,Brooke,Caitlyn,Carissa,Carolyn,Carrie,Cassandra,Catherine,Chasity,Chelsea,Chloe,Christy,Ciara,Claudia,Colleen,Courtney,Cristina,Crystal,Dana,Danielle,Delaney,Destiny,Diana,Elizabeth,Emily,Emma,Erica,Erin,Esmeralda,Gabrielle,Guadalupe,Haley,Hanna,Heather,Hillary,Holly,Jacqueline,Jamie,Jane,Jasmine,Jenna,Jennifer,Jessica,Julia,Karen,Karina,Karissa,Karla,Kathryn,Katie,Kayla,Kelly,Kelsey,Kendra,Kimberly,Kori,Kristen,Kristina,Krystal,Kylie,Laura,Lauren,Leah,Linda,Lindsey,Mackenzie,Madison,Maggie,Mariah,Marissa,Megan,Melissa,Meredith,Michelle,Mikayla,Miranda,Molly,Monique,Morgan,Naomi,Natalie,Natasha,Nicole,Nina,Noelle,Paige,Patricia,Rachael,Raquel,Rebecca,Renee,Riley,Rosa,Samantha,Sarah,Savannah,Shannon,Shantel,Sierra,Sonya,Sophia,Stacy,Stephanie,Summer,Sydney,Tatiana,Taylor,Tiana,Tiffany,Valerie,Vanessa,Victoria,Vivian,Wendy,Whitney,Zoe");
 
-$cityarray = explode(',','Los Angeles,Dallas,Houston,Atlanta,Detroit,San Francisco,Minneapolis,St. Louis,Baltimore,Pittsburgh,Cincinnati,Cleveland,San Antonio,Las Vegas,Milwaukee,Oklahoma City,New Orleans,Tucson,New York City,Chicago,Philadelphia,Miami,Boston,Phoenix,Seattle,San Diego,Tampa,Denver,Portland,Sacramento,Orlando,Kansas City,Nashville,Memphis,Hartford,Salt Lake City');
+$cityarray_US = explode(',','Los Angeles,Dallas,Houston,Atlanta,Detroit,San Francisco,Minneapolis,St. Louis,Baltimore,Pittsburgh,Cincinnati,Cleveland,San Antonio,Las Vegas,Milwaukee,Oklahoma City,New Orleans,Tucson,New York City,Chicago,Philadelphia,Miami,Boston,Phoenix,Seattle,San Diego,Tampa,Denver,Portland,Sacramento,Orlando,Kansas City,Nashville,Memphis,Hartford,Salt Lake City');
+$cityarray_CA = explode(',','Toronto,Montreal,Calgary,Ottawa,Edmonton,Mississauga,Winnipeg,Vancouver,Brampton,Hamilton,Québec City,Surrey,Laval,Halifax,London,Gatineau,Saskatoon,Kitchener,Burnaby,Windsor,Regina,Victoria,Richmond,Fredericton,Saint John,Yellowknife,Sydney,Iqaluit,Charlottetown,Whitehorse');
 
 $countryarray = explode(',','Afghanistan,Albania,Algeria,Andorra,Angola,Antigua & Deps,Argentina,Armenia,Australia,Austria,Azerbaijan,Bahamas,Bahrain,Bangladesh,Barbados,Belarus,Belgium,Belize,Benin,Bhutan,Bolivia,Bosnia Herzegovina,Botswana,Brazil,Brunei,Bulgaria,Burkina,Burundi,Cambodia,Cameroon,Canada,Cape Verde,Central African Rep,Chad,Chile,China,Colombia,Comoros,Congo,Congo,Costa Rica,Croatia,Cuba,Cyprus,Czech Republic,Denmark,Djibouti,Dominica,Dominican Republic,East Timor,Ecuador,Egypt,El Salvador,Equatorial Guinea,Eritrea,Estonia,Ethiopia,Fiji,Finland,France,Gabon,Gambia,Georgia,Germany,Ghana,Greece,Grenada,Guatemala,Guinea,Guinea-Bissau,Guyana,Haiti,Honduras,Hungary,Iceland,India,Indonesia,Iran,Iraq,Ireland,Israel,Italy,Ivory Coast,Jamaica,Japan,Jordan,Kazakhstan,Kenya,Kiribati,North Korea,South Korea,Kosovo,Kuwait,Kyrgyzstan,Laos,Latvia,Lebanon,Lesotho,Liberia,Libya,Liechtenstein,Lithuania,Luxembourg,Macedonia,Madagascar,Malawi,Malaysia,Maldives,Mali,Malta,Marshall Islands,Mauritania,Mauritius,Mexico,Micronesia,Moldova,Monaco,Mongolia,Montenegro,Morocco,Mozambique,Myanmar,Namibia,Nauru,Nepal,Netherlands,New Zealand,Nicaragua,Niger,Nigeria,Norway,Oman,Pakistan,Palau,Panama,Papua New Guinea,Paraguay,Peru,Philippines,Poland,Portugal,Qatar,Romania,Russia,Rwanda,St Kitts & Nevis,St Lucia,Saint Vincent & the Grenadines,Samoa,San Marino,Sao Tome & Principe,Saudi Arabia,Senegal,Serbia,Seychelles,Sierra Leone,Singapore,Slovakia,Slovenia,Solomon Islands,Somalia,South Africa,South Sudan,Spain,Sri Lanka,Sudan,Suriname,Swaziland,Sweden,Switzerland,Syria,Taiwan,Tajikistan,Tanzania,Thailand,Togo,Tonga,Trinidad & Tobago,Tunisia,Turkey,Turkmenistan,Tuvalu,Uganda,Ukraine,United Arab Emirates,United Kingdom,United States,Uruguay,Uzbekistan,Vanuatu,Vatican City,Venezuela,Vietnam,Yemen,Zambia,Zimbabwe');
 
-function randcities($n=1) {
-	global $cityarray;
+function randcities($n=1, $country="USA") {
+	global $cityarray_US,$cityarray_CA;
+	
+	if ($country=="Canada"){
+		$cityarray = $cityarray_CA;
+	} elseif ($country == "USA") {
+		$cityarray = $cityarray_US;
+	} else { echo "randcity only accepts 'USA' and 'Canada' at the moment."; return "";}
+
+	
 	$c = count($cityarray);
 	if ($n==1) {
 		return $cityarray[$GLOBALS['RND']->rand(0,$c-1)];
@@ -2392,9 +2407,14 @@ function randcountries($n=1) {
 	}
 }
 
-function randstates($n=1) {
-	$states = array("Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Dist. of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming");
-
+function randstates($n=1, $country="USA") {
+	
+	if ($country=="Canada"){
+		$states = array("Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Northwest Territories","Nova Scotia","Nunavut","Ontario","Prince Edward Island","Quebec","Saskatchewan","Yukon");
+	} elseif ($country == "USA") {
+		$states = array("Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Dist. of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming");
+	} else { echo "randstate only accepts 'USA' and 'Canada'."; return "";}
+	
 	$c = count($states);
 	if ($n==1) {
 		return $states[$GLOBALS['RND']->rand(0,$c-1)];
@@ -2403,11 +2423,12 @@ function randstates($n=1) {
 		return array_slice($states,0,$n);
 	}
 }
-function randstate() {
-	return randstates(1);
+
+function randstate($country="USA") {
+	return randstates(1, $country);
 }
-function randcity() {
-	return randcities(1);
+function randcity($country="USA") {
+	return randcities(1, $country);
 }
 function randcountry() {
   return randcountries(1);
@@ -3440,7 +3461,7 @@ function cleantokenize($str,$funcs) {
 
 
 function comparenumbers($a,$b,$tol='.001') {
-	if ($tol[0]=='|') {
+	if (strval($tol)[0]=='|') {
 		$abstolerance = floatval(substr($tol,1));
 	}
 	if (!is_numeric($a)) {
@@ -3461,7 +3482,7 @@ function comparenumbers($a,$b,$tol='.001') {
 function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	if ($a=='' || $b=='') { return false;}
 	//echo "comparing $a and $b";
-	if ($tol[0]=='|') {
+	if (strval($tol)[0]=='|') {
 		$abstolerance = floatval(substr($tol,1));
 	}
 	$type = "expression";
@@ -3718,7 +3739,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	} else if (!is_numeric($stu)) {
 		return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
 	} else {
-		if ($tol[0]=='|') {
+		if (strval($tol)[0]=='|') {
 			$abstol = true;
 			$tol = substr($tol,1);
 		} else {
@@ -3756,7 +3777,7 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 	if ($stu===null) {
 		return " ";
 	} else {
-		if ($tol[0]=='|') {
+		if (strval($tol)[0]=='|') {
 			$abstol = true;
 			$tol = substr($tol,1);
 		} else {
@@ -3822,7 +3843,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 	if ($stu===null || trim($stu)==='') {
 		return " ";
 	} else {
-		if ($tol[0]=='|') {
+		if (strval($tol)[0]=='|') {
 			$abstol = true;
 			$tol = substr($tol,1);
 		} else {
@@ -4714,6 +4735,26 @@ function comparelogic($a,$b,$vars) {
             } else {
                 $map[$vars[$j]] = 0; // if it's 1, set to 0 and continue on to the next one
             }
+        }
+    }
+    return true;
+}
+
+function stuansready($stu, $qn, $parts) {
+    if (!isset($stu[$qn]) || !is_array($stu[$qn])) {
+        return false;
+    }
+    foreach ($parts as $part) {
+        $ors = explode(' or ', $part);
+        $partok = false;
+        foreach ($ors as $v) {
+            if (isset($stu[$qn][$v]) && trim($stu[$qn][$v]) !== '') {
+                $partok = true; 
+                break;
+            }
+        }
+        if ($partok === false) {
+            return false;
         }
     }
     return true;

@@ -22,9 +22,10 @@ $body = "";
 $useeditor = "text,summary";
 
 $cid = Sanitize::courseId($_GET['cid']);
-$linkid = Sanitize::onlyInt($_GET['id']);
+
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-if (!empty($linkid)) {
+if (!empty($_GET['id'])) {
+    $linkid = Sanitize::onlyInt($_GET['id']);
 	$curBreadcrumb .= "&gt; "._("Modify Link")."\n";
 	$pagetitle = _("Modify Link");
 } else {
@@ -55,14 +56,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$block = $_GET['block'];
 	$page_formActionTag = "addlinkedtext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
-            'cid' => $cid, 'folder' => $_GET['folder']));
+            'cid' => $cid, 'folder' => ($_GET['folder'] ?? '0')));
 	$page_formActionTag .= (!empty($linkid)) ? "&id=" . $linkid : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
-	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
+	
 	$points = 0;
 
-	if ($_POST['title']!= null) { //if the form has been submitted
+    if (!empty($_POST['title'])) { //if the form has been submitted
+        $caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 		$DBH->beginTransaction();
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -384,7 +386,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$cntingb = 1;
 			$gbcat = 0;
 			$tutoredit = 0;
-			$gradesecret = uniqid();
+            $gradesecret = uniqid();
+            $toolcustomurl = '';
 		}
 
 		$hr = floor($coursedeftime/60)%12;
@@ -573,7 +576,7 @@ if ($overwriteBody==1) {
 			}
 			if (!isset($CFG['GEN']['noInstrExternalTools'])) {
 				echo '<a href="../admin/externaltools.php?' . Sanitize::generateQueryStringFromMap(array('cid' => $cid,
-                        'ltfrom' => $linkid)) .'">'._('Add or edit an external tool').'</a>';
+                        'ltfrom' => ($linkid ?? 0))) .'">'._('Add or edit an external tool').'</a>';
 			}
 			?>
 			</span><br class="form"/>

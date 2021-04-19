@@ -310,7 +310,7 @@ class AssessInfo
       }
       foreach ($tolookupAids as $qid=>$aid) {
         // TODO: include enough for link to assessment too
-        $this->questionData[$qid]['category'] = $aidmap[$aid];
+        $this->questionData[$qid]['category'] = $aidmap[$aid] ?? null;
       }
     }
     if (count($tolookupOutcomes) > 0 && $get_cats) {
@@ -323,7 +323,7 @@ class AssessInfo
         $outcomemap[$row['id']] = $row['name'];
       }
       foreach ($tolookupOutcomes as $qid=>$oid) {
-        $this->questionData[$qid]['category'] = $outcomemap[$oid];
+        $this->questionData[$qid]['category'] = $outcomemap[$oid] ?? null;
       }
     }
     if ($get_code && count($qsids) > 0) {
@@ -853,7 +853,7 @@ class AssessInfo
         } else if ($this->assessData['shuffle']&4) {
           //all stu same seed using fixed seed list, pick next in list
           $n = count($this->questionData[$newq]['fixedseeds']);
-          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds) + ($ispractice?1:0)) % $n];
+          $newseed = $this->questionData[$newq]['fixedseeds'][(count($oldseeds)) % $n];
         } else {
           $unused = array_diff($this->questionData[$newq]['fixedseeds'], $oldseeds);
           if (count($unused) == 0) {

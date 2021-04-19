@@ -112,7 +112,6 @@ if (isset($_POST['tname'])) {
 	} else {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> \n";
 	}
-	$id = Sanitize::simpleString($_GET['id']); //can be ID int or string "new"
 	if (isset($_GET['delete'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Delete Tool</div>";
 		echo "<h1>Delete Tool</h1>";
@@ -127,7 +126,8 @@ if (isset($_POST['tname'])) {
 		echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
 		echo '</form>';
 
-	} else if (!empty($id)) {
+	} else if (!empty($_GET['id'])) {
+        $id = Sanitize::simpleString($_GET['id']); //can be ID int or string "new"
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Edit Tool</div>";
 		echo "<h1>Edit Tool</h1>";
 		if ($id=='new') {

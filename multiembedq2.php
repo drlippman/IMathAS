@@ -130,11 +130,8 @@ $state['hidescoremarkers'] = !$state['showscoredonsubmit'];
 if (isset($QS['hidescoremarkers'])) {
     $state['hidescoremarkers'] = $QS['hidescoremarkers'];
 }
-if (isset($QS['showans'])) {
-    $state['showans'] = $QS['showans'];
-} else {
-    $state['showans'] = 0;
-}
+$state['showans'] = 0;
+
 if (isset($QS['allowregen'])) {
     $state['allowregen'] = $QS['allowregen'];
 } else {

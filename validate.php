@@ -676,7 +676,7 @@
 				}
 			}
         }
-	} else if ($_GET['cid']=="admin") {
+	} else if (!empty($_GET['cid']) && $_GET['cid']=="admin") {
         $courseUIver = 2;
     }
 	$verified = true;
@@ -703,6 +703,10 @@
 		require($loginpage);
 		exit;
 	}
+ }
+
+ if (!isset($cid)) { 
+     $cid = 0;
  }
 
  function tzdate($string,$time) {

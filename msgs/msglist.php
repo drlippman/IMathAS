@@ -13,7 +13,7 @@ If deleted on both ends, delete from DB
 	require("../init.php");
 	require('../includes/getcourseopts.php');
 
-	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	if (isset($cid) && $cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
 	   require("../footer.php");
@@ -29,7 +29,7 @@ If deleted on both ends, delete from DB
 	$threadsperpage = intval($listperpage);
 
 	$cid = Sanitize::courseId($_GET['cid']);
-    $cidP = Sanitize::courseId($_POST['courseid']);
+    
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
@@ -57,7 +57,7 @@ If deleted on both ends, delete from DB
 	} else {
 		$filteruid = 0;
 	}
-	$type = $_GET['type'];
+	$type = $_GET['type'] ?? '';
 
 	if (isset($_GET['getstulist'])) {
 		$cid = intval($_GET['getstulist']);
@@ -131,7 +131,8 @@ If deleted on both ends, delete from DB
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
-			$msgToPost = Sanitize::onlyInt($_POST['to']);
+            $msgToPost = Sanitize::onlyInt($_POST['to']);
+            $cidP = Sanitize::courseId($_POST['courseid']);
 
 			// validate message settings allow this
 			$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");

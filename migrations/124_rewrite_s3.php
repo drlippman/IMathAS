@@ -95,5 +95,5 @@ if (isset($GLOBALS['AWSkey']) && isset($GLOBALS['AWSbucket'])) {
 	echo '<p>AWS S3 not used - no changes needed in this migration</p>';
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 return true;

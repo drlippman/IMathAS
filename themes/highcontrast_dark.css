@@ -260,6 +260,9 @@ table.stats thead tr th {
 .drawtools span {
 	color: #000;
 }
+.drawtools span, .drawtools img {
+    background-color: #fff;
+}
 div.tips {
 	color: #000;
 }

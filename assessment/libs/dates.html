@@ -9,8 +9,8 @@ use the current date and then some days or months into the future.</p>
 <a href="https://www.php.net/manual/en/datetime.formats.date.php">here</a>. A few useful formats include 'd-M-Y' for dates 
 like 4-Mar-2020 or 'F j, Y' for dates like March 4, 2020. The date format is optional and if left out will default to 'F j, Y'.
 The intention is that you will select a preferred date format and then pass that consistently to all functions. Finally, the 
-function formatDate can be used to get useful information from the date. For example, $today=today('d-M-Y') can be used to 
-retreive today's date. $weekday = formatDate($today,"l") will retrieve the day of the week. $month = formatDate($today,"F") will 
+function dates_dateformat can be used to get useful information from the date. For example, $today=today('d-M-Y') can be used to 
+retreive today's date. $weekday = dates_dateformat($today,"l") will retrieve the day of the week. $month = dates_dateformat($today,"F") will 
 retrive the name of the month. </p>
 <p>The question 601187 tests this macro library. If you make changes to the library please modify the test question to incorporate
 your changes and run to make sure that nothing is broken.</p>

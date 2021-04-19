@@ -15,7 +15,7 @@
     
 
 global $allowedmacros;
-array_push($allowedmacros,"cx_add","cx_arg", "cx_conj", "cx_div", "cx_format2pol", "cx_format2std", "cx_modul",
+array_push($allowedmacros,"cx_add","cx_arg", "cx_conj","cx_cubicRoot", "cx_div", "cx_format2pol", "cx_format2std", "cx_matrixreduce", "cx_modul",
                         "cx_mul", "cx_quadRoot", "cx_prettyquadRoot",  "cx_plot",
                         "cx_pow", "cx_polEu","cx_pol2std", "cx_root", "cx_std2pol", "cx_sub");
                          
@@ -512,6 +512,105 @@ function cx_quadRoot(float $a, float $b, float $c, int $roundto = 12, $disp = Fa
 
 }
 
+//---------------------------------------------------Cubic real and complex roots------------------------------------------
+// Function: cx_cubicRoot(poly, [disp = False, roundto = 12])
+// Returns an array of roots of the cubic equation f(x) = ax^3 + bx^2 + cx + d. Real roots are returned
+// as an array([r1],[r2],[r3]) and complex roots are return as an array([r1],[Re1,Im1], [Re1,Im1]).
+// 
+// Parameters:
+// poly: The array of coefficients: [a,b,c,d]
+// disp: If set to true, the function returns the string version of the roots for display, which should not be used for calculation.   
+// roundto: Optional - number of decimal places to which the roots should be rounded off; default is 12 decimal places. 
+//
+// Returns:
+// An array of roots (either real or complex) of the cubic equation.
+
+#internal function: long devision of a cubic function by x-a; used for cx_cubicRoot()
+function cubicdivide($divident, $divisor){
+
+	$q = [$divident[0],$divident[1]+$divisor[1]*$divident[0],$divident[2]+($divisor[1]*($divident[1]+$divisor[1]*$divident[0]))];
+	$r = $divident[3]+($divisor[1]*($divident[2]+$divisor[1]*($divident[1]+$divisor[1]*$divident[0])));
+	if (abs($r)<1e-9) {$r=0;}
+	return ([$q,$r]);
+}
+
+#internal function: cubic root of real numbers (negative and positive)
+function amirCube($num){
+	if ($num<0){
+		$num=-$num;
+		$cube=-$num**(1/3);
+	} else{
+		$cube=$num**(1/3);
+	}
+	return($cube);
+}
+
+# Finding roots of cubic polynomial
+function cx_cubicRoot( array $poly, $disp = False, int $roundto = 12){
+    
+    $ct = count($poly);
+        
+    if ($ct<3 || $ct>4) { echo 'error: The function must be either quadratic or cubic'; return '';}
+
+    //Cubic
+    if ($ct == 4) {
+
+        if ($poly[0]==0) { echo 'error: The leading coefficient must be nonzero'; return '';}
+        elseif ($poly[0]!=1){
+            $a0=1;
+            $a1=$poly[1]/$poly[0];
+            $a2=$poly[2]/$poly[0];
+            $a3=$poly[3]/$poly[0];
+        } else {
+            $a0=$poly[0];
+            $a1=$poly[1];
+            $a2=$poly[2];
+            $a3=$poly[3];
+        }
+
+        $Q = (3*($a2)-$a1**2)/9;
+        $R = (9*$a1*$a2-27*$a3-2*$a1**3)/54;
+        $delta = ($Q)**3 + ($R)**2;
+        
+        if ($delta<0) {
+
+            $dsq = sqrt(-$delta);
+            $Scube = [$R, $dsq];
+            $Tcube = [$R,-$dsq];
+            $S = cx_root($Scube,3);
+            $T = cx_root($Tcube,3);
+            $x1 = cx_add([$S[1],$T[1],[-$a1/3,0]])[0];
+            
+        } else{
+
+            $S = amirCube($R + sqrt($delta));       
+            $T = amirCube($R - sqrt($delta));   
+            $x1 = $S+$T-$a1/3;
+            }
+
+        $q1 = cubicdivide($poly,[1,$x1]);	
+        $xq = cx_quadRoot($q1[0][0],$q1[0][1],$q1[0][2],$roundto);
+        $x2 = $xq[0];
+        $x3 = $xq[1];
+        $x = [[round($x1,$roundto)],$x2,$x3];
+        
+
+        //Quadratic
+    } 	else {
+            if ($poly[0]==0) { echo 'error: The leading coefficient must be nonzero'; return '';}
+            $x = cx_quadRoot($poly[0],$poly[1],$poly[2],$roundto);
+    }
+
+    if ($disp==True){
+        $x = cx_format2std($x,$roundto);
+    }
+
+    return($x);
+    
+    }
+
+
+
 //------------------------------------------Formating to standard form-------------------------------------
 // Function: cx_format2std(num, [roundto=3])
 // Returns a string form of a complex number in standard form: a + b i. 
@@ -711,5 +810,111 @@ function cx_plot(array $num, string $argin = "deg" ,int $roundto = 3, bool $show
     return $plot;
 }
 
-       
+/*-----------------------------------------------matrixreduce for complex entries-------------------------------------------------------
+ Function: cx_matrixreduce(A, [rref = False, disp = False, roundto = 4])
+ Returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A; it handles matrices with both real and complex entries. 
+ 
+ Parameters:
+ A: Matrix in the form array([row1],[row2],...) where each row can have real entries as a single value or complex entries in the form [Re, Im]
+    for example. the 2x2 matrix array([1, 2+3i], [-i, 5]) should be entered as A = array([1, [2,3]], [[0,-1], 5])
+
+ rref: Optional - If true, it returns the reduce row echelon form; the default is false, which returns the row echelon form (ref).
+ 
+ disp: Optional - If set to true, the function returns the string version of the entries for display, which should not be used for calculation. 
+
+ roundto: Optional - number of decimal places to which the entries should be rounded off to in display format (i.e. when disp = true); 
+          default is 4 decimal places. 
+   
+
+ Returns:
+ Returns the row echelon (ref) or reduced row echelon form (rref) of the matrix A in the same format as A. 
+ The display format returns the string-formatted entries formatted as a matrix.
+*/  
+
+function cx_matrixreduce($A, $rref = False, $disp = False, $roundto = 4) {
+	
+    include_once("matrix.php");
+    if (!isMatrix($A)) { echo 'error: input not a matrix'; return '';}
+    
+	// number of rows
+    $N  = count($A);
+    // number of columns
+    $M = count($A[0]);
+    
+	for ($i=0; $i<$N; $i++){
+		for ($j=0; $j<$M; $j++){
+			if(!is_array($A[$i][$j])){
+				$A[$i][$j]=[$A[$i][$j],0];
+			}
+			if(count($A[$i][$j])==1){
+				$A[$i][$j]=[$A[$i][$j][0],0];
+			}
+		
+		}
+
+	}
+	
+    $r = 0;  $c = 0;
+    while ($r < $N && $c < $M) {
+		if (cx_modul($A[$r][$c]) == 0) { //swap only if there's a 0 entry $A[$r][$c]==0
+			$max = $r;
+			for ($i = $r+1; $i<$N; $i++) {
+				if (cx_modul($A[$i][$c]) > cx_modul($A[$max][$c])) {
+					$max = $i;
+				} 
+			}
+			if ($max != $r) {
+				$temp = $A[$r]; $A[$r] = $A[$max]; $A[$max] = $temp;
+			}
+		}	
+
+	    if (cx_modul($A[$r][$c]) < 1e-10){
+	    	$c++;
+	    	continue;
+	    }
+		
+	    //scale pivot rows
+	    if ($rref==True) {
+			if(cx_modul($A[$r][$c])!=0){
+		    	$divisor = $A[$r][$c];
+			} else {$divisor=[1,0];}
+		    for ($j = $c; $j < $M; $j++) {
+				$A[$r][$j] = cx_div([$A[$r][$j],$divisor]);
+			}
+	    }
+		
+	    for ($i = ($rref?0:$r+1); $i < $N; $i++) {
+	    	    if ($i==$r) {continue;}
+				if (cx_modul($A[$r][$c])!=0 && cx_modul($A[$i][$c])!=0){
+				
+					$mult = cx_div([$A[$i][$c],$A[$r][$c]]); 
+				} else {$mult=[0,0];}
+	    	    if ( cx_modul($mult)==0) {continue;}
+	    	    
+				for ($j = $c; $j < $M; $j++) {
+					if(cx_modul($mult)!=0 && cx_modul($A[$r][$j])!=0){
+
+						$A[$i][$j] = cx_sub([$A[$i][$j],cx_mul([$mult,$A[$r][$j]])]);  
+					} else {$A[$i][$j]=$A[$i][$j];}
+						
+						if (cx_modul($A[$i][$j]) <= 1e-10) {
+							$A[$i][$j] = [0,0]; //treat values close to 0 as 0
+								}		
+	    	    }
+	    }
+
+	    $r++; $c++;
+    }
+	
+	if($disp == True){
+    
+		for ($i=0; $i<$N; $i++){
+			
+			$A[$i] = cx_format2std($A[$i], $roundto);
+		}
+    $A = matrixformat($A);
+	}
+		
+    return ($A); 
+}	       
 ?>

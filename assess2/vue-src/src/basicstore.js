@@ -203,6 +203,7 @@ export const actions = {
       actions.clearAutosaveTimer();
       this.addAutosaveData(data);
     }
+
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
       type: 'POST',
@@ -230,14 +231,6 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
-        // clear drawing last answer if regen
-        if (regen && store.assessInfo.questions[qn].jsparams) {
-          for (const i in store.assessInfo.questions[qn].jsparams) {
-            if (store.assessInfo.questions[qn].jsparams[i].qtype === 'draw') {
-              window.imathasDraw.clearcanvas(i);
-            }
-          }
-        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');

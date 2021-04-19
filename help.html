@@ -2230,8 +2230,8 @@ can be omitted.</p>
 <li><strong>singleshuffle(list/array,[n])</strong>:  returns a shuffled version of a list/array.  If n is provided,
     it behaves identically to diffrandsfrom</li>
 <li><strong>randnames(n),randmalenames(n),randfemalenames(n)</strong>:  Returns n random first names</li>
-<li><strong>randcity(),randcities(n)</strong>:  Returns one or n random city names</li>
-<li><strong>randstate(),randstates(n)</strong>:  Returns one or n random US state names</li>
+<li><strong>randcity([country]),randcities(n, [country])</strong>:  Returns one or n random US or Canadian city names. Argument country can be set to "USA" or "Canada". The default is "USA".</li>
+<li><strong>randstate([country]),randstates(n, [country])</strong>:  Returns one or n random US state or Canadian province names. Argument country can be set to "USA" or "Canada". The default is "USA".</li>
 <li><strong>randcountry(),randcountries(n)</strong>:  Returns one or n random country names</li>
 <li><strong>randpythag([min,max])</strong>:  Return a Pythagorean triple.  min/max default to 1 to 100</li>
 </ul>
@@ -2567,11 +2567,23 @@ These macros are used for mathematical calculations:
 <h2 id="conditionalmacros">Conditional Test Macros</h2>
 These macros are used to test various conditions.  They typically return true or false, depending on whether the desired condition is met.
 <ul>
+<li><strong>getstuans($stuanswers, $thisq, [part number])</strong>: Pass this function the 
+  $stuanswers or $sutanswersval arrays, $thisq for the question number, and a part number (omit 
+  if it's a single part question) and this will return the corresponding value.  Use of this 
+  function is recommended over directly accessing the array, as this function accounts for 
+  undefined values in a way that won't trigger errors.</li>
+<li><strong>stuansready($stuanswers, $thisq, array of part numbers)</strong>: Before using 
+    student answers, you need to check to make sure the student has actually answered them.
+    Pass this function the $stuanswers or $sutanswersval arrays, $thisq for the question number,
+    and an array of part numbers, and it will check to make sure a non-blank answer has been 
+    provided for all of the part numbers.  A part number can also be given as "1 or 2" if answering
+    either part is sufficient.  It is good to wrap any code using student answers in an "if" block 
+    using this as the condition.</li>
 <li><strong>comparenumbers(a,b,[tol])</strong>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
   tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
 <li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Compares functions a and b to see if they are algebraically equivalent.  Set
   vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
-  Set domain to "xmin,xmax" to specify a domain for comparison.</li>
+  Set domain to "xmin,xmax" to specify a domain for comparison, or "xmin,xmax,integers" to restrict domain to integer values.</li>
 <li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
  ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
  vars should be a list or array of variables in the statements. </li>
@@ -2827,6 +2839,10 @@ Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enc
 <p>
 5) You can use the function getstuans($stuanswers,N,P) to retrieve a student answer value.  This method bypasses some strange things that happen
 when there is a multipart question with only one part, so is recommended.
+</p>
+<p>
+6) You can use the function stuansready($stuanswers,$thisq,[p1,p2,...]) to determine if the parts 
+have been answered, instead of checking for null.
 </p>
 
 <h3>Other Reference Variables</h3>
@@ -4081,10 +4097,11 @@ $a x + $ab + $c = $answerbox[1]
 </div> <!-- h3 -->
 <div class=h3>
 <h3 id="conditional">Conditional</h3>
-A variation on multipart questions, a conditional question can include multiple answer boxes, but assigns
+<p></p>A variation on multipart questions, a conditional question can include multiple answer boxes, but assigns
 a single score.  The score is based on applying some comparison or conditional test to the student answers, referenced through
 the <a href="#writingcommon">$stuanswers</a> array.  This allows the question writer to essentially create their
-own question type.
+own question type.</p>
+
 <p><strong>Required Variables</strong></p>
 <dl>
 <dt>$anstypes = an array or list of answer types</dt>

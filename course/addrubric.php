@@ -13,7 +13,8 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $cid = Sanitize::courseId($_GET['cid']);
-$from = $_GET['from'];
+$from = $_GET['from'] ?? '';
+$fromstr = '';
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if ($from=='modq') {
@@ -39,7 +40,7 @@ if (isset($_GET['id'])) {
 	if ($_GET['id']=='new') {
 		$curBreadcrumb .= "&gt; Add Rubric\n";
 		$pagetitle = "Add Rubric";
-	} else if ($_GET['do'] === 'delete') {
+	} else if (isset($_GET['do']) && $_GET['do'] === 'delete') {
 		$curBreadcrumb .= "&gt; Delete Rubric\n";
 		$pagetitle = "Delete Rubric";
 	} else {
@@ -187,7 +188,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 
 	}
 	echo '</p>';
-} else if ($_GET['do'] === 'delete') { // deleting
+} else if (isset($_GET['do']) && $_GET['do'] === 'delete') { // deleting
 	echo "<form method=\"post\" action=\"addrubric.php?cid=$cid&amp;id=" . Sanitize::encodeUrlParam($_GET['id']) . $fromstr . "\">";
 	echo '<p>Are you SURE you want to delete rubric <b>'.Sanitize::encodeStringForDisplay($rubname).'</b>?</p>';
 	echo '<input type="hidden" name="delete" value="1" />';

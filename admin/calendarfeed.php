@@ -50,7 +50,7 @@ list($coursename,$calevents) = getCalendarEventData($cid, $userid);
 
 //add alarms
 foreach ($calevents as $k=>$v) {
-	$type = $v[0]{0};
+	$type = $v[0][0];
 	switch ($type) {
 		case 'A':
 		case 'D':

@@ -89,7 +89,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') {
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1][0]!='=') {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;

@@ -148,14 +148,14 @@ class ExceptionFuncs {
         }
 
 		$useexception = ($exception!==null && $exception!==false); //use by default
-		if ($exception!==null && $exception!==false && !empty($exception[3])) {
+		if ($useexception && !empty($exception[3])) {
 			//is LTI-set - use the exception
 
-		} else if ($exception!==null && $exception[2]>0 && $exception[0]>=$adata['startdate'] && ($adata['enddate']>$exception[1] || $exception[1]>$this->courseenddate)) {
+		} else if ($useexception && $exception[2]>0 && $exception[0]>=$adata['startdate'] && ($adata['enddate']>$exception[1] || $exception[1]>$this->courseenddate)) {
 			//if latepass and assessment enddate is later than exception enddate, skip exception
 			//or, if latepass and exception would put it past the course end date, skip exception
 			$useexception = false;
-		} else if ($exception!==null && $exception!==false && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
+		} else if ($useexception && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
 			//if manual exception and start of exception is equal or after original startdate and asessment enddate is later than exception enddate, skip exception
 			//presumption: exception was made to extend due date, not start assignment early
 			$useexception = false;

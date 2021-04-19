@@ -17,7 +17,7 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
-$ctc = Sanitize::onlyInt($_POST['ctc']);
+$ctc = Sanitize::onlyInt($_POST['ctc'] ?? 0);
 
 $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
@@ -67,7 +67,7 @@ if (!(isset($teacherid))) {
 				}
 			}
 		}
-		if ($termsurl != '' && $_GET['action']=="select") {
+		if (!empty($termsurl) && $_GET['action']=="select") {
 			if (!isset($_POST['termsagree'])) {
 				$oktocopy = 0;
 				$overwriteBody = 1;
@@ -254,8 +254,8 @@ if (!(isset($teacherid))) {
 						}
 					}
 					$outcomesarr = unserialize($row[0]);
-					if (!is_array($outcomearr)) {
-						$outcomearr = array();
+					if (!is_array($outcomesarr)) {
+						$outcomesarr = array();
 					}
 					updateoutcomes($outcomesarr);
 				}
@@ -598,8 +598,8 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	<tr><td class="r"><?php echo _('Copy offline grade items?'); ?></td><td> <input type=checkbox name="copyoffline"  value="1"/></td></tr>
 	<tr><td class="r"><?php echo _('Remove any withdrawn questions from assessments?'); ?></td><td> <input type=checkbox name="removewithdrawn"  value="1" checked="checked"/></td></tr>
 	<tr><td class="r"><?php echo _('Use any suggested replacements for old questions?'); ?></td><td> <input type=checkbox name="usereplaceby"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r"><?php echo _('Copy rubrics?'); ?> </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked"/></td></tr>
-	<tr><td class="r"><?php echo _('Copy outcomes?'); ?> </td><td><input type=checkbox name="copyoutcomes"  value="1" /></td></tr>
+	<tr><td class="r"><?php echo _('Copy rubrics?'); ?> </td><td><input type=checkbox name="copyrubrics"  value="1" checked="checked" /></td></tr>
+	<tr><td class="r"><?php echo _('Copy outcomes?'); ?> </td><td><input type=checkbox name="copyoutcomes"  value="1" checked="checked" /></td></tr>
 	<tr><td class="r"><?php echo _('Select calendar items to copy?'); ?></td><td> <input type=checkbox name="selectcalitems"  value="1"/></td></tr>
 
 	<tr><td class="r"><?php echo _('Copy "display at top" instructor forum posts?'); ?> </td><td><input type=checkbox name="copystickyposts"  value="1" checked="checked"/></td></tr>

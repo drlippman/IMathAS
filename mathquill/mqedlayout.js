@@ -18,7 +18,7 @@ var myMQeditor = (function($) {
               {l:'x^{}', c:'t', w:'^', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf mq-sup-only"><span class="mq-sup mq-empty"></span></span>'},
               {l:'\\pi', nb:1, pr:'<span class="mq-nonSymbola">π</span>'},
               {l:'\\sqrt{}', c:'c', w:'sqrt', nb:1, pr:'<span class="mq-non-leaf"><span class="mq-scaled mq-sqrt-prefix" style="transform: scale(1, 0.955556);">√</span><span class="mq-non-leaf mq-sqrt-stem mq-empty"></span></span>'},
-              {l:'\\infty',pr:'<span>∞</span>'},
+              {l:'x_{}', c:'t', w:'_', nb:1, pr:'<var>x</var><span class="mq-supsub mq-non-leaf"><span class="mq-sub mq-empty"></span></span>'},
               {l:'\\sqrt[n]{}', c:'c', w:'nthroot', nb:1, pr:'<sup class="mq-nthroot mq-non-leaf"><var>n</var></sup><span class="mq-scaled"><span class="mq-sqrt-prefix mq-scaled" style="transform: scale(1, 0.955556);">√</span><span class="mq-sqrt-stem mq-non-leaf mq-empty"></span></span>'},
               {p:'DNE', 'sm':2},
               {l:'\\left|\\right|', c:'i', w:'||'},
@@ -191,7 +191,7 @@ var myMQeditor = (function($) {
               {l:'\\ge', pr:'<span class="mq-binary-operator">&ge;</span>'},
               {p:'%'},
               {p:','},
-              {p:'*'},
+              {l:'\\infty',pr:'<span>∞</span>'},
               {p:'!'},
               {p:'?'}
             ]
@@ -445,7 +445,8 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             {'b':'.'},
-            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            (calcformat.match(/(list|set)/) ||
+            qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
           ]
@@ -476,9 +477,11 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
-            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            (calcformat.match(/(list|set)/) ||
+             qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
-              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
+              calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} :
+              (qtype.match(/complex/) ? {b:'+'} : {s:1})
           ]
         };
       } else {

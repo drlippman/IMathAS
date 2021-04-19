@@ -199,7 +199,7 @@ if (!extension_loaded("pdo_mysql")) {
 	echo '<p><b>Warning</b>:  It appears your PHP does not have the pdo_mysql extension installed, and it is required.</p>';
 }
 if (!function_exists('gd_info')) {
-	echo '<p><b>Warning</b>:  It appears your PHP does not have the gb extension installed, which is needed for some functionality.</p>';
+	echo '<p><b>Warning</b>:  It appears your PHP does not have the gd extension installed, which is needed for some functionality.</p>';
 }
 if (!function_exists('curl_init')) {
 	echo '<p><b>Warning</b>:  It appears your PHP does not have the curl extension installed, which is needed for some functionality.</p>';

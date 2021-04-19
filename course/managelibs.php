@@ -187,7 +187,8 @@ if ($myrights<20) {
 				$overwriteBody = 1;
 				$body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
 			} else {
-				$tlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
+                $tlist = Sanitize::encodeStringForDisplay(implode(",",$_POST['nchecked']));
+                $rights = 0;
 				$page_libRights = array();
 				$page_libRights['val'][0] = 0;
 				$page_libRights['val'][1] = 1;
@@ -319,7 +320,8 @@ if ($myrights<20) {
 		} else {
 			$pagetitle = "Set Parent";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Set Parent ";
-			$parent1 = "";
+            $parent1 = "";
+            $parent = '';
 
 			if (!isset($_POST['nchecked'])) {
 				$overwriteBody = 1;
@@ -553,7 +555,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<script>
-	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1); ?>';
+	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1 ?? ''); ?>';
 	function libselect() {
 		window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&select=parent&selectrights=1&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 	}
@@ -795,7 +797,7 @@ function printlist($parent) {
 	global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin,$federated;
 	$arr = $ltlibs[$parent];
 
-	if ($sortorder[$parent]==1) {
+	if (!empty($sortorder[$parent]) && $sortorder[$parent]==1) {
 		$orderarr = array();
 		foreach ($arr as $child) {
 			$orderarr[$child] = $names[$child];
@@ -824,7 +826,12 @@ function printlist($parent) {
 			continue;
 		}
 		//if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
-		if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
+        if ($rights[$child]>2 || 
+            ($rights[$child]>0 && isset($groupids[$child]) && $groupids[$child]==$groupid) || 
+            (isset($ownerids[$child]) && $ownerids[$child]==$userid) || 
+            ($isgrpadmin && isset($groupids[$child]) && $groupids[$child]==$groupid) ||
+            $isadmin
+        ) {
 			if (!$isadmin) {
 				if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
 					$rights[$child]=4;  //adjust coloring
@@ -837,7 +844,7 @@ function printlist($parent) {
 					echo "<input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> ";
 				}
 				echo "<span class=hdr onClick=\"toggle('n" . Sanitize::encodeStringForJavascript($child) . "')\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) ;
-				if ($federated[$child]) {
+				if (!empty($federated[$child])) {
 					echo ' <span class=fedico title="Federated">&lrarr;</span>';
 				}
 				echo "</span> </span>\n";
@@ -890,6 +897,9 @@ function addupchildqs($p) {
 	global $qcount,$ltlibs;
 	if (isset($ltlibs[$p])) { //if library has children
 		foreach ($ltlibs[$p] as $child) {
+            if (!isset($qcount[$p])) {
+                $qcount[$p] = 0;
+            }
 			$qcount[$p] += addupchildqs($child);
 		}
 	}
@@ -898,8 +908,8 @@ function addupchildqs($p) {
 
 function setparentrights($alibid) {
 	global $rights,$parents;
-	if ($parents[$alibid]>0) {
-		if ($rights[$parents[$alibid]] < $rights[$alibid]) {
+	if (!empty($parents[$alibid])) {
+		if (!isset($rights[$parents[$alibid]]) || $rights[$parents[$alibid]] < $rights[$alibid]) {
 		//if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
 			$rights[$parents[$alibid]] = $rights[$alibid];
 		}

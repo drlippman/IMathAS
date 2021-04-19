@@ -35,7 +35,7 @@ if ($res===false) {
 }
 
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 echo '<p>LTI 1.3 columns for sending zeros created</p>';
 
 return true;

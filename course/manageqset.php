@@ -836,6 +836,7 @@ if ($myrights<20) {
 				$page_questionTable[$i]['desc'] = filter(Sanitize::encodeStringForDisplay($line['description']));
 			}
 
+            $page_questionTable[$i]['extref'] = '';
 			if ($line['extref']!='') {
 				$page_questionTable[$i]['cap'] = 0;
 				$extref = explode('~~',$line['extref']);
@@ -850,7 +851,6 @@ if ($myrights<20) {
 						$hasother = true;
 					}
 				}
-				$page_questionTable[$i]['extref'] = '';
 				if ($hasvid) {
 					$page_questionTable[$i]['extref'] .= "<img src=\"$staticroot/img/video_tiny.png\" alt=\"Video\"/>";
 				}
@@ -947,7 +947,7 @@ if ($myrights<20) {
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '" . $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';";
 $placeinhead .= '$(function(){$(".wlf").attr("title","'.('Flag a question if it is in the wrong library').'");});</script>';
-if ($_POST['chglib']) {
+if (!empty($_POST['chglib'])) {
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/course/libtree.css" type="text/css" />';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/libtree2.js?v=031111"></script>';
 }
@@ -1300,7 +1300,7 @@ function getnextprev(formn,loc) {
 				echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
 				echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
 				echo '<td class="nowrap"><div';
-				if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}
+				if (!empty($page_questionTable[$qid]['cap'])) {echo ' class="ccvid"';}
 				echo '>'.$page_questionTable[$qid]['extref'].'</div></td>';
 				echo '<td>'.$qid.'</td>';
 				echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';

@@ -35,7 +35,7 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 			 if (($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) ||
 				($viewall || ($item['SH'][0]=='S' && $item['avail']>0))) {
 					if ($onlyopen==1) {
-						if (in_array($item['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
+						if (!empty($item['id']) && in_array($item['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
 						if ($firstload && (strlen($item['SH'])==1 || $item['SH'][1]=='O')) {$isopen=true;}
 					}
 					if ($onlyopen==0 || ($onlyopen==-1 && $item['SH'][1]!='T') || ($onlyopen==1 && $isopen && $item['SH'][1]!='T' && $item['SH'][1]!='F')) {
@@ -105,7 +105,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Assessment';
 			$itemshowdata[$typelookups['Assessment'][$line['id']]] = $line;
-			if ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&3 || $viewall)) {
+			if (isset($line['reqscoreaid']) && ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&3 || $viewall))) {
 				if (!isset($assessPreReqsToLookup[$line['reqscoreaid']])) {
 					$assessPreReqsToLookup[$line['reqscoreaid']] = array();
 				}
@@ -149,7 +149,8 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 	if (count($assessPreReqsToLookup)>0 && !$limited) {
 		//see which ones we already have data for
 		foreach (array_keys($assessPreReqsToLookup) as $tolookup) {
-			if (isset($itemshowdata[$typelookups['Assessment'][$tolookup]]) &&
+            if (isset($typelookups['Assessment'][$tolookup]) &&
+                isset($itemshowdata[$typelookups['Assessment'][$tolookup]]) &&
 				isset($itemshowdata[$typelookups['Assessment'][$tolookup]]['ptsposs'])) {
 				foreach ($assessPreReqsToLookup[$tolookup] as $aidtoupdate) {
 					$itemshowdata[$typelookups['Assessment'][$aidtoupdate]]['reqscorename'] = $itemshowdata[$typelookups['Assessment'][$tolookup]]['name'];

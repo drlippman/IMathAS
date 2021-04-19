@@ -713,6 +713,14 @@ function removegrp(loc) {
     return false;
 }
 
+function fullungroup(loc) {
+    if (confirm_textseg_dirty()) {
+        itemarray = itemarray.slice(0,loc).concat(itemarray[loc][2]).concat(itemarray.slice(loc+1));
+        submitChanges();
+    }
+    return false;
+}
+
 function doremoveitem(loc) {
     if (loc.indexOf("-") > -1) {
         locparts = loc.split("-");
@@ -1274,12 +1282,23 @@ function generateTable() {
                         if (itemarray[i][0] > 1) {
                             html += "ea";
                         }
+
                         html +=
-                            '</td><td class=c><a href="#" onclick="return removegrp(\'' +
+                            '</td><td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                        html += '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
+
+                        html +=
+                            '<li><a href="#" onclick="return removegrp(\'' +
                             i +
                             "');\">" +
-                            _("Remove") +
-                            "</a></td></tr>";
+                            _("Remove Group and Questions") +
+                            "</a></li>";
+                        html +=
+                            '<li><a href="#" onclick="return fullungroup(' + i + ');">' +
+                            _("Ungroup all Questions") +
+                            "</a></li>";
+                        html += '</ul></div></tr>';
+
                         if (itemarray[i][3] == 0) {
                             //collapsed group
                             if (curitems[0][4] == 9999) {

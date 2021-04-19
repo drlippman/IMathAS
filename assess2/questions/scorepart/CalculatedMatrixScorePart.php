@@ -34,14 +34,12 @@ class CalculatedMatrixScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-        if (isset($options['answersize'])) {if (is_array($options['answersize'])) {$answersize = $options['answersize'][$partnum];} else {$answersize = $options['answersize'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
-        if (!isset($scoremethod)) {	$scoremethod = 'whole';	}
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+            'answersize', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $hasNumVal = !empty($_POST["qn$qn-val"]);
@@ -50,7 +48,6 @@ class CalculatedMatrixScorePart implements ScorePart
         }
         $givenans = normalizemathunicode($givenans);
 
-        if (!isset($answerformat)) { $answerformat = '';}
         $ansformats = array_map('trim',explode(',',$answerformat));
 
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
@@ -62,7 +59,7 @@ class CalculatedMatrixScorePart implements ScorePart
         //store answers
         if ($givenans==='oo' || $givenans==='DNE') {
             $scorePartResult->setLastAnswerAsGiven($givenans);
-        } else if (isset($answersize)) {
+        } else if (!empty($answersize)) {
             $sizeparts = explode(',',$answersize);
             $N = $sizeparts[0];
             $givenanslist = array();
@@ -126,7 +123,7 @@ class CalculatedMatrixScorePart implements ScorePart
         foreach ($answerlist as $k=>$v) {
             $answerlist[$k] = evalMathParser($v);
         }
-        if (isset($answersize)) {
+        if (!empty($answersize)) {
             for ($i=0; $i<count($answerlist); $i++) {
                 if (!checkanswerformat($givenanslist[$i],$ansformats)) {
                     //perhaps should just elim bad answer rather than all?
@@ -211,7 +208,7 @@ class CalculatedMatrixScorePart implements ScorePart
             if (!isset($givenanslistvals[$i]) || isNaN($givenanslistvals[$i])) {
                 $incorrect[$i] = 1;
                 continue;
-            } else if (isset($abstolerance)) {
+            } else if ($abstolerance !== '') {
                 if (abs($answerlist[$i] - $givenanslistvals[$i]) > $abstolerance+1E-12) {
                     $incorrect[$i] = 1;
                     continue;

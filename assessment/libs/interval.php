@@ -44,7 +44,7 @@ function linegraph($intvs) {
 		$commands .= 'line([';
 		$intv = str_replace(' ','',$intv);
 		$parts = explode(',',$intv);
-		$ssym = $parts[0]{0};
+		$ssym = $parts[0][0];
 		$min = substr($parts[0],1);
 		$esym = substr($parts[1],-1);
 		$max = substr($parts[1],0,strlen($parts[1])-1);
@@ -121,7 +121,7 @@ function linegraphbrackets($intvs) {
 		$commands .= 'line([';
 		$intv = str_replace(' ','',$intv);
 		$parts = explode(',',$intv);
-		$ssym = $parts[0]{0};
+		$ssym = $parts[0][0];
 		$min = substr($parts[0],1);
 		$esym = substr($parts[1],-1);
 		$max = substr($parts[1],0,strlen($parts[1])-1);
@@ -190,7 +190,7 @@ function intervalstodraw($intvs,$xmin=-5,$xmax=5) {
 	foreach ($intvs as $intv) {
 		$intv = str_replace(' ','',$intv);
 		$parts = explode(',',$intv);
-		$ssym = $parts[0]{0};
+		$ssym = $parts[0][0];
 		$min = substr($parts[0],1);
 		$esym = substr($parts[1],-1);
 		$max = substr($parts[1],0,strlen($parts[1])-1);

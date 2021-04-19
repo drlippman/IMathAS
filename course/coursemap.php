@@ -82,6 +82,9 @@ function showitemtree($items,$parent,$greyitems=0) {
 				}
 			 }
 		} else {
+            if (!isset($itemshowdata[$item])) {
+                continue; // missing item?
+            }
 			if ($itemshowdata[$item]['itemtype']=='Calendar') {
 				continue; //no need to show calendars in map
 			}
