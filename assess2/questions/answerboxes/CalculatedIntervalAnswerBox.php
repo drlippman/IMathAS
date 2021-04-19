@@ -2,7 +2,7 @@
 
 namespace IMathAS\assess2\questions\answerboxes;
 
-require_once(__DIR__ . '/AnswerBox.php');
+require_once __DIR__ . '/AnswerBox.php';
 
 use Sanitize;
 
@@ -39,93 +39,90 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         $preview = '';
         $params = [];
 
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-        if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$partnum];} else {$sz = $options['answerboxsize'];}}
-        if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$partnum];} else {$hidepreview = $options['hidepreview'];}}
-        if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
-        if (isset($options['reqdecimals'])) {if (is_array($options['reqdecimals'])) {$reqdecimals = $options['reqdecimals'][$partnum];} else {$reqdecimals = $options['reqdecimals'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}}
-        if (isset($options['readerlabel'])) {if (is_array($options['readerlabel'])) {$readerlabel = $options['readerlabel'][$partnum];} else {$readerlabel = $options['readerlabel'];}}
-        if (!isset($answerformat)) { $answerformat = '';}
-        if (!isset($variables)) { $variables = 'x';}
-        $ansformats = array_map('trim',explode(',',$answerformat));
-
-        if (!isset($sz)) { $sz = 20;}
-        if ($multi) { $qn = ($qn+1)*1000+$partnum; }
-        if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
-          $out .= $ansprompt;
+        $optionkeys = ['ansprompt', 'answerboxsize', 'hidepreview', 'answerformat',
+            'answer', 'reqdecimals', 'variables', 'readerlabel'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
 
-        if (in_array('inequality',$ansformats)) {
-    			$tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 &lt;= %s &lt; 4'), $variables) . " <br/>";
-    			$tip .= sprintf(_('Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3'), $variables, $variables) . "<br/>";
-    			$tip .= _('Enter <i>all real numbers</i> for solutions of that type') . "<br/>";
-    			$shorttip = _('Enter an interval using inequalities');
-    		} else {
-    			$tip = _('Enter your answer using interval notation.  Example: [2,5)') . " <br/>";
-    			if (in_array('list',$ansformats)) {
-    				$tip .= _('Separate intervals by a comma.  Example: (-oo,2],[4,oo)') . "<br/>";
-    				$shorttip = _('Enter a list of intervals using interval notation');
-    			} else {
-    				$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
-    				$shorttip = _('Enter an interval using interval notation');
-    			}
+        if (empty($variables)) {$variables = 'x';}
+        $ansformats = array_map('trim', explode(',', $answerformat));
 
-    		}
-    		//$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
-    		//$tip .= "Enter DNE for an empty set, oo for Infinity";
-    		$tip .= formathint(_('each value'),$ansformats,isset($reqdecimals)?$reqdecimals:null,'calcinterval');
+        if (empty($answerboxsize)) {$answerboxsize = 20;}
+        if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
+        if (!empty($ansprompt) && !in_array('nosoln', $ansformats) && !in_array('nosolninf', $ansformats)) {
+            $out .= $ansprompt;
+        }
 
-    		$classes = ['text'];
-    		if ($colorbox != '') {
-    			$classes[] = $colorbox;
-    		}
-    		$attributes = [
-    			'type' => 'text',
-    			'size' => $sz,
-    			'name' => "qn$qn",
-    			'id' => "qn$qn",
-    			'value' => $la,
-    			'autocomplete' => 'off',
-                'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() . 
-                    (!empty($readerlabel) ? ' '.Sanitize::encodeStringForDisplay($readerlabel) : '')
-    		];
-    		$params['tip'] = $shorttip;
-            $params['longtip'] = $tip;
-    		if ($useeqnhelper) {
-    			$params['helper'] = 1;
-    		}
-    		if (in_array('inequality',$ansformats)) {
-    			$params['vars'] = $variables;
-    		}
+        if (in_array('inequality', $ansformats)) {
+            $tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 &lt;= %s &lt; 4'), $variables) . " <br/>";
+            $tip .= sprintf(_('Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3'), $variables, $variables) . "<br/>";
+            $tip .= _('Enter <i>all real numbers</i> for solutions of that type') . "<br/>";
+            $shorttip = _('Enter an interval using inequalities');
+        } else {
+            $tip = _('Enter your answer using interval notation.  Example: [2,5)') . " <br/>";
+            if (in_array('list', $ansformats)) {
+                $tip .= _('Separate intervals by a comma.  Example: (-oo,2],[4,oo)') . "<br/>";
+                $shorttip = _('Enter a list of intervals using interval notation');
+            } else {
+                $tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
+                $shorttip = _('Enter an interval using interval notation');
+            }
 
-    		$params['calcformat'] = $answerformat;
+        }
+        //$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
+        //$tip .= "Enter DNE for an empty set, oo for Infinity";
+        $tip .= formathint(_('each value'), $ansformats, ($reqdecimals !== '') ? $reqdecimals : null, 'calcinterval');
 
-    		$out .= '<input ' .
-                Sanitize::generateAttributeString($attributes) .
-                'class="'.implode(' ', $classes) .
-                '" />';
+        $classes = ['text'];
+        if ($colorbox != '') {
+            $classes[] = $colorbox;
+        }
+        $attributes = [
+            'type' => 'text',
+            'size' => $answerboxsize,
+            'name' => "qn$qn",
+            'id' => "qn$qn",
+            'value' => $la,
+            'autocomplete' => 'off',
+            'aria-label' => $this->answerBoxParams->getQuestionIdentifierString() .
+            (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : ''),
+        ];
+        $params['tip'] = $shorttip;
+        $params['longtip'] = $tip;
+        if ($useeqnhelper) {
+            $params['helper'] = 1;
+        }
+        if (in_array('inequality', $ansformats)) {
+            $params['vars'] = $variables;
+        }
 
-    		if (!isset($hidepreview)) {
-                $params['preview'] = 1;
-                $preview .= '<button type=button class=btn id="pbtn'.$qn.'">';
-                $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
-                $preview .= '</button> &nbsp;';
-    		}
-    		$preview .= "<span id=p$qn></span> ";
+        $params['calcformat'] = $answerformat;
 
-    		if (in_array('nosoln',$ansformats)) {
-    			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, in_array('inequality',$ansformats)?'inequality':'interval');
-    		}
+        $out .= '<input ' .
+        Sanitize::generateAttributeString($attributes) .
+        'class="' . implode(' ', $classes) .
+            '" />';
 
-    		if (isset($answer)) {
-    			if (in_array('inequality',$ansformats) && strpos($answer,'"')===false) {
-    				$sa = '`'.intervaltoineq($answer,$variables).'`';
-    			} else {
-    				$sa = '`'.str_replace('U','uu',$answer).'`';
-    			}
-    		}
+        if (empty($hidepreview)) {
+            $params['preview'] = 1;
+            $preview .= '<button type=button class=btn id="pbtn' . $qn . '">';
+            $preview .= _('Preview') . ' <span class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() . '</span>';
+            $preview .= '</button> &nbsp;';
+        }
+        $preview .= "<span id=p$qn></span> ";
+
+        if (in_array('nosoln', $ansformats)) {
+            list($out, $answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, in_array('inequality', $ansformats) ? 'inequality' : 'interval');
+        }
+
+        if ($answer !== '' && !is_array($answer)) {
+            if (in_array('inequality', $ansformats) && strpos($answer, '"') === false) {
+                $sa = '`' . intervaltoineq($answer, $variables) . '`';
+            } else {
+                $sa = '`' . str_replace('U', 'uu', $answer) . '`';
+            }
+        }
 
         // Done!
         $this->answerBox = $out;

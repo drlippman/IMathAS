@@ -63,7 +63,7 @@ current options are (in order of code blocks below):
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif ($_POST['title']!= null) { //form posted to itself with new/modified data, update the block
+} elseif (!empty($_POST['title'])) { //form posted to itself with new/modified data, update the block
 	$DBH->beginTransaction();
 	require_once("../includes/parsedatetime.php");
 	if ($_POST['avail']==1) {
@@ -251,7 +251,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$titletxt = "#000000";
 		$bi = "#EEEEFF";
 		$usedef = 1;
-		$fixedheight = 0;
+        $fixedheight = 0;
+        $innav = 0;
 		$grouplimit = array();
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
@@ -371,7 +372,7 @@ if ($overwriteBody==1) {
 
 <?php echo $formTitle; ?>
 
-<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder']); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
+<form method=post action="addblock.php?cid=<?php echo $cid; if (isset($_GET['id'])) {echo "&id=".Sanitize::encodeUrlParam($_GET['id']);} if (isset($_GET['block'])) {echo "&block=".Sanitize::encodeUrlParam($_GET['block']);} ?>&folder=<?php echo Sanitize::encodeUrlParam($_GET['folder'] ?? 0); ?>&tb=<?php echo Sanitize::encodeUrlParam($totb); ?>">
 	<span class=form>Title: </span>
 	<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$title);?>" required></span>
 	<BR class=form>
@@ -441,7 +442,7 @@ if ($overwriteBody==1) {
 	</div>
 	<span class="form">Restrict access to students in section:</span>
 	<span class="formright">
-	<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,$grouplimit[0]); ?>
+	<?php writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,$grouplimit[0] ?? 'none'); ?>
 	</span><br class="form" />
 
 	<span class=form>Quick Links:</span>

@@ -183,7 +183,7 @@ if (isset($QS['showscored'])) {
         $overrides['showans'] = 0;
     }
 } else {
-    if (isset($QS['showans'])) {
+    if (isset($QS['showans']) && !empty($QS['auth'])) {
         $state['showans'] = $QS['showans'];
     } else {
         $state['showans'] = 0;

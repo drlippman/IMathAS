@@ -683,14 +683,14 @@ $names = array();
 $itemidref = array();
 $k = 0;
 foreach ($itemsimporder as $item) {
-	if (isset($hiddenitems[$item]) && !$greyitems[$item] && !isset($teacherid)) {
+	if (isset($hiddenitems[$item]) && empty($greyitems[$item]) && !isset($teacherid)) {
 		//skip over any items in a hidden folder or future not-yet-open folder if it's a student
 		continue;
 	}
 	if ($itemsassoc[$item][0]=='Assessment') {
 		foreach (array('S','E','R') as $datetype) {
 			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
-				if ($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && $datetype=='S') {
+				if ($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid) && $datetype=='S') {
 					continue;  //always skip start date when not avail
 				}
 				if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])==0 && $byid['A'.$datetype.$itemsassoc[$item][1]][5]==1 && !isset($teacherid)) {
@@ -864,14 +864,14 @@ for ($i=0;$i<count($hdrs);$i++) {
 				//echo $assess[$ids[$i][$j]][$k];
 				echo "<span class=\"calitem\" id=\"".Sanitize::encodeStringForDisplay($itemidref[$k])."\" $style>";
 				if ($editingon) {
-					$type = $itemidref[$k]{1};
+					$type = $itemidref[$k][1];
 					if ($type=='S') {
 						echo '<span class="icon-startdate"></span>';
-					} else if ($type=='R' && $itemidref[$k]{0}=='A') {
+					} else if ($type=='R' && $itemidref[$k][0]=='A') {
 						echo '<span class="icon-eye2"></span>';
 					} else if ($type=='P') {
 						echo '<span class="icon-forumpost"></span>';
-					} else if ($type=='R' && $itemidref[$k]{0}=='F') {
+					} else if ($type=='R' && $itemidref[$k][0]=='F') {
 						echo '<span class="icon-forumreply"></span>';
 					}
 				}

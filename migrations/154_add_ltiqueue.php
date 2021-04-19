@@ -13,7 +13,7 @@ $query = 'CREATE TABLE `imas_ltiqueue` (
 	  `sendon` INT(10) UNSIGNED NOT NULL,
 	  INDEX (`sendon`),
 	  INDEX (`failures`)
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -21,7 +21,7 @@ $query = 'CREATE TABLE `imas_ltiqueue` (
 	return false;
  }
 	 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ table imas_ltiqueue created.  See /admin/processltiqueue.php for config options to enable.</p>";		
 

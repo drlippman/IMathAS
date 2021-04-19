@@ -154,7 +154,7 @@ if (!$assess_record->hasRecord()) {
 
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(
-  'name', 'submitby', 'enddate', 'can_use_latepass', 'hasexception',
+  'name', 'submitby', 'enddate', 'available', 'can_use_latepass', 'hasexception',
   'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
   'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
   'scoresingb', 'viewingb', 'latepass_status', 'help_features', 'attemptext'

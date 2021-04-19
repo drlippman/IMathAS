@@ -75,7 +75,7 @@ require("../header.php");
 $curBreadcrumb .= '&gt; Enroll From Another Course';
 
 /***** page body *****/
-if ($overwriteBody==1) {
+if (!empty($overwriteBody)) {
 	if (strlen($body)<2) {
 		include("./$fileToInclude");
 	} else {

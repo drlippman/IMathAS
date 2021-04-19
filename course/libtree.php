@@ -183,7 +183,7 @@ END;
 			$arr = $ltlibs[$parent];
 		}
 		if (count($arr)==0) {return;}
-		if ($sortorder[$parent]==1) {
+		if (!empty($sortorder[$parent])) {
 			$orderarr = array();
 			foreach ($arr as $child) {
 				$orderarr[$child] = $names[$child];

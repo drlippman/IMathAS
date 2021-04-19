@@ -78,7 +78,7 @@
 	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
 
 
-	$placeinhead .= '<script type="text/javascript">
+	$placeinhead = '<script type="text/javascript">
 		function showfb(id,type) {
 			GB_show(_("Feedback"), "showfeedback.php?cid="+cid+"&type="+type+"&id="+id, 500, 500);
 			return false;
@@ -224,7 +224,9 @@
 			$line['useexception'] = $exceptionfuncs->getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate, 'LPcutoff'=>$LPcutoff), true);
 			if ($line['useexception']) {
 				$line['thisenddate'] = $exceptions[$line['userid']][1];
-			}
+			} else {
+                $line['thisenddate'] = $enddate;
+            }
 		} else {
 			$line['thisenddate'] = $enddate;
 		}

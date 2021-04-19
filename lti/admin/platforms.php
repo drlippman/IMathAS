@@ -24,8 +24,9 @@ if (isset($_POST['delete']) && $myrights == 100) {
   header('Location: ' . $basesiteurl . "/lti/admin/platforms.php");
   exit;
 }
-$lms = $_POST['lms'];
-if (!empty(trim($_POST[$lms.'_issuer'])) &&
+$lms = $_POST['lms'] ?? '';
+if (!empty($_POST['lms']) &&
+  !empty(trim($_POST[$lms.'_issuer'])) &&
   !empty(trim($_POST[$lms.'_clientid'])) &&
   !empty(trim($_POST[$lms.'_keyseturl'])) &&
   !empty(trim($_POST[$lms.'_tokenurl'])) &&

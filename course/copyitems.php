@@ -17,7 +17,7 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
-$ctc = Sanitize::onlyInt($_POST['ctc']);
+$ctc = Sanitize::onlyInt($_POST['ctc'] ?? 0);
 
 $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
@@ -67,7 +67,7 @@ if (!(isset($teacherid))) {
 				}
 			}
 		}
-		if ($termsurl != '' && $_GET['action']=="select") {
+		if (!empty($termsurl) && $_GET['action']=="select") {
 			if (!isset($_POST['termsagree'])) {
 				$oktocopy = 0;
 				$overwriteBody = 1;
@@ -254,8 +254,8 @@ if (!(isset($teacherid))) {
 						}
 					}
 					$outcomesarr = unserialize($row[0]);
-					if (!is_array($outcomearr)) {
-						$outcomearr = array();
+					if (!is_array($outcomesarr)) {
+						$outcomesarr = array();
 					}
 					updateoutcomes($outcomesarr);
 				}

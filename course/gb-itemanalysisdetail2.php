@@ -12,7 +12,7 @@ $isteacher = isset($teacherid);
 $istutor = isset($tutorid);
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-$qid = $_GET['qid'];
+$qid = $_GET['qid'] ?? '';
 $type = $_GET['type'];
 if (!$isteacher && !$istutor) {
 	echo "This page not available to students";

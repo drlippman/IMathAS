@@ -2,7 +2,7 @@
 //IMathAS:  Function used to show category breakdown of scores
 //Called from showtest and gradebook
 //(c) 2006 David Lippman
-function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
+function catscores($quests,$scores,$defptsposs,$defoutcome,$cid) {
 	global $DBH;
 	if (empty($quests)) {
 		return;
@@ -57,7 +57,11 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 	$catposs = array();
 	for ($i=0; $i<count($quests); $i++) {
 		$pts = getpts($scores[$i]);
-		if ($pts<0) { $pts = 0;}
+        if ($pts<0) { $pts = 0;}
+        if (!isset($catscore[$cat[$quests[$i]]])) {
+            $catscore[$cat[$quests[$i]]] = 0;
+            $catposs[$cat[$quests[$i]]] = 0;
+        }
 		$catscore[$cat[$quests[$i]]] += $pts;
 		$catposs[$cat[$quests[$i]]] += $pospts[$quests[$i]];
 	}

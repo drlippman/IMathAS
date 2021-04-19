@@ -2,8 +2,8 @@
 
 namespace IMathAS\assess2\questions\scorepart;
 
-require_once(__DIR__ . '/ScorePart.php');
-require_once(__DIR__ . '/../models/ScorePartResult.php');
+require_once __DIR__ . '/ScorePart.php';
+require_once __DIR__ . '/../models/ScorePartResult.php';
 
 use IMathAS\assess2\questions\models\ScorePartResult;
 use IMathAS\assess2\questions\models\ScoreQuestionParams;
@@ -33,52 +33,50 @@ class ComplexScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
-        if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$partnum];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance',
+            'answerformat', 'requiretimes', 'requiretimeslistpart', 'ansprompt'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        if ($reltolerance === '' && $abstolerance === '') {$reltolerance = $defaultreltol;}
 
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-        if ($multi) { $qn = ($qn+1)*1000+$partnum; }
+        if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
         $hasNumVal = !empty($_POST["qn$qn-val"]);
         if ($hasNumVal) {
-          $givenansval = $_POST["qn$qn-val"];
+            $givenansval = $_POST["qn$qn-val"];
         }
 
-        if (!isset($answerformat)) { $answerformat = '';}
-        $ansformats = array_map('trim',explode(',',$answerformat));
+        if (empty($answerformat)) {$answerformat = '';}
+        $ansformats = array_map('trim', explode(',', $answerformat));
 
-        if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+        if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
             if ($givenans === 'DNE' || $givenans === 'oo') {
-              $_POST["qn$qn-val"] = $givenans;
+                $_POST["qn$qn-val"] = $givenans;
             }
         }
         $givenans = normalizemathunicode($givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);
-        if ($anstype=='calccomplex' && $hasNumVal) {
+        if ($anstype == 'calccomplex' && $hasNumVal) {
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
         if ($givenans == null) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
-        $answer = str_replace(' ','',makepretty($answer));
+        $answer = str_replace(' ', '', makepretty($answer));
         $givenans = trim($givenans);
 
-        if ($answer=='DNE') {
-            if (strtoupper($givenans)=='DNE') {
+        if ($answer == 'DNE') {
+            if (strtoupper($givenans) == 'DNE') {
                 $scorePartResult->setRawScore(1);
                 return $scorePartResult;
             } else {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
-        } else if ($answer=='oo') {
-            if ($givenans=='oo') {
+        } else if ($answer == 'oo') {
+            if ($givenans == 'oo') {
                 $scorePartResult->setRawScore(1);
                 return $scorePartResult;
             } else {
@@ -87,23 +85,23 @@ class ComplexScorePart implements ScorePart
             }
         }
 
-        $gaarr = array_map('trim',explode(',',$givenans));
+        $gaarr = array_map('trim', explode(',', $givenans));
 
-        if ($anstype=='calccomplex') {
+        if ($anstype == 'calccomplex') {
             //test for correct format, if specified
-            if (($answer!='DNE'&&$answer!='oo') && checkreqtimes($givenans,$requiretimes)==0) {
+            if (($answer != 'DNE' && $answer != 'oo') && !empty($requiretimes) && checkreqtimes($givenans, $requiretimes) == 0) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
-            foreach ($gaarr as $i=>$tchk) {
+            foreach ($gaarr as $i => $tchk) {
 
-                if (in_array('sloppycomplex',$ansformats)) {
-                    $tchk = str_replace(array('sin','pi'),array('s$n','p$'),$tchk);
-                    if (substr_count($tchk,'i')>1) {
+                if (in_array('sloppycomplex', $ansformats)) {
+                    $tchk = str_replace(array('sin', 'pi'), array('s$n', 'p$'), $tchk);
+                    if (substr_count($tchk, 'i') > 1) {
                         $scorePartResult->setRawScore(0);
                         return $scorePartResult;
                     }
-                    $tchk = str_replace(array('s$n','p$'),array('sin','pi'),$tchk);
+                    $tchk = str_replace(array('s$n', 'p$'), array('sin', 'pi'), $tchk);
                 } else {
                     // TODO: rewrite using mathparser
                     $cpts = $this->parsecomplex($tchk);
@@ -116,18 +114,18 @@ class ComplexScorePart implements ScorePart
                     $cpts[1] = rtrim($cpts[1], '*');
 
                     //echo $cpts[0].','.$cpts[1].'<br/>';
-                    if ($answer!='DNE'&&$answer!='oo' && (!checkanswerformat($cpts[0],$ansformats) || !checkanswerformat($cpts[1],$ansformats))) {
+                    if ($answer != 'DNE' && $answer != 'oo' && (!checkanswerformat($cpts[0], $ansformats) || !checkanswerformat($cpts[1], $ansformats))) {
                         //return 0;
                         unset($gaarr[$i]);
                     }
-                    if ($answer!='DNE'&&$answer!='oo' && isset($requiretimeslistpart) && checkreqtimes($tchk,$requiretimeslistpart)==0) {
+                    if ($answer != 'DNE' && $answer != 'oo' && !empty($requiretimeslistpart) && checkreqtimes($tchk, $requiretimeslistpart) == 0) {
                         //return 0;
                         unset($gaarr[$i]);
                     }
                 }
             }
         } else { // if "complex"
-            foreach ($gaarr as $i=>$tchk) {
+            foreach ($gaarr as $i => $tchk) {
                 $cpts = $this->parsecomplex($tchk);
                 if (!is_array($cpts)) {
                     unset($gaarr[$i]);
@@ -140,42 +138,42 @@ class ComplexScorePart implements ScorePart
         }
 
         $ganumarr = array();
-        foreach ($gaarr as $j=>$givenans) {
+        foreach ($gaarr as $j => $givenans) {
             $gaparts = $this->parsesloppycomplex($givenans);
 
-            if ($gaparts === false) {  //invalid - skip it
-              continue;
+            if ($gaparts === false) { //invalid - skip it
+                continue;
             }
 
-            if (!in_array('exactlist',$ansformats)) {
+            if (!in_array('exactlist', $ansformats)) {
                 // don't add if we already have it in the list
                 foreach ($ganumarr as $prevvals) {
-                    if (abs($gaparts[0]-$prevvals[0])<1e-12 && abs($gaparts[1]-$prevvals[1])<1e-12) {
+                    if (abs($gaparts[0] - $prevvals[0]) < 1e-12 && abs($gaparts[1] - $prevvals[1]) < 1e-12) {
                         continue 2; //skip adding it to the list
                     }
                 }
             }
             $ganumarr[] = $gaparts;
         }
-        if ($anstype=='calccomplex' && !$hasNumVal) {
+        if ($anstype == 'calccomplex' && !$hasNumVal) {
             $givenansval = [];
             foreach ($ganumarr as $ganumval) {
-                $givenansval[] = $ganumval[0] . ($ganumval[1]<0?'':'+') . $ganumval[1] . 'i';
+                $givenansval[] = $ganumval[0] . ($ganumval[1] < 0 ? '' : '+') . $ganumval[1] . 'i';
             }
             $givenansval = implode(',', $givenansval);
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         }
 
-        $anarr = array_map('trim',explode(',',$answer));
+        $anarr = array_map('trim', explode(',', $answer));
         $annumarr = array();
-        foreach ($anarr as $i=>$answer) {
+        foreach ($anarr as $i => $answer) {
             $ansparts = $this->parsesloppycomplex($answer);
-            if ($ansparts === false) {  //invalid - skip it
-              continue;
+            if ($ansparts === false) { //invalid - skip it
+                continue;
             }
-            if (!in_array('exactlist',$ansformats)) {
+            if (!in_array('exactlist', $ansformats)) {
                 foreach ($annumarr as $prevvals) {
-                    if (abs($ansparts[0]-$prevvals[0])<1e-12 && abs($ansparts[1]-$prevvals[1])<1e-12) {
+                    if (abs($ansparts[0] - $prevvals[0]) < 1e-12 && abs($ansparts[1] - $prevvals[1]) < 1e-12) {
                         continue 2; //skip adding it to the list
                     }
                 }
@@ -183,36 +181,38 @@ class ComplexScorePart implements ScorePart
             $annumarr[] = $ansparts;
         }
 
-        if (count($ganumarr)==0) {
+        if (count($ganumarr) == 0) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;
         }
-        $extrapennum = count($ganumarr)+count($annumarr);
+        $extrapennum = count($ganumarr) + count($annumarr);
         $gaarrcnt = count($ganumarr);
         $correct = 0;
-        foreach ($annumarr as $i=>$ansparts) {
+        foreach ($annumarr as $i => $ansparts) {
             $foundloc = -1;
 
-            foreach ($ganumarr as $j=>$gaparts) {
-                if (count($ansparts)!=count($gaparts)) {
+            foreach ($ganumarr as $j => $gaparts) {
+                if (count($ansparts) != count($gaparts)) {
                     break;
                 }
-                for ($i=0; $i<count($ansparts); $i++) {
+                for ($i = 0; $i < count($ansparts); $i++) {
                     if (is_numeric($ansparts[$i]) && is_numeric($gaparts[$i])) {
-                        if (isset($abstolerance)) {
-                            if (abs($ansparts[$i]-$gaparts[$i]) >= $abstolerance + 1E-12) {break;}
+                        if ($abstolerance !== '') {
+                            if (abs($ansparts[$i] - $gaparts[$i]) >= $abstolerance + 1E-12) {break;}
                         } else {
-                            if (abs($ansparts[$i]-$gaparts[$i])/(abs($ansparts[$i])+.0001) >= $reltolerance+ 1E-12) {break;}
+                            if (abs($ansparts[$i] - $gaparts[$i]) / (abs($ansparts[$i]) + .0001) >= $reltolerance + 1E-12) {break;}
                         }
                     }
                 }
-                if ($i==count($ansparts)) {
-                    $correct += 1; $foundloc = $j; break;
+                if ($i == count($ansparts)) {
+                    $correct += 1;
+                    $foundloc = $j;
+                    break;
                 }
             }
-            if ($foundloc>-1) {
-                array_splice($ganumarr,$foundloc,1); // remove from list
-                if (count($ganumarr)==0) {
+            if ($foundloc > -1) {
+                array_splice($ganumarr, $foundloc, 1); // remove from list
+                if (count($ganumarr) == 0) {
                     break;
                 }
             }
@@ -223,12 +223,12 @@ class ComplexScorePart implements ScorePart
         }
         //$score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;
 
-        if ($gaarrcnt<=count($annumarr)) {
-            $score = $correct/count($annumarr);
+        if ($gaarrcnt <= count($annumarr)) {
+            $score = $correct / count($annumarr);
         } else {
-            $score = $correct/count($annumarr) - count($ganumarr)/$extrapennum;  //take off points for extranous stu answers
+            $score = $correct / count($annumarr) - count($ganumarr) / $extrapennum; //take off points for extranous stu answers
         }
-        if ($score<0) {
+        if ($score < 0) {
             $scorePartResult->setRawScore(0);
         } else {
             $scorePartResult->setRawScore($score);
@@ -236,65 +236,67 @@ class ComplexScorePart implements ScorePart
         return $scorePartResult;
     }
 
-    private function parsesloppycomplex($v) {
+    private function parsesloppycomplex($v)
+    {
         $func = makeMathFunction($v, 'i');
-        if ($func===false) {
-          return false;
+        if ($func === false) {
+            return false;
         }
-        $a = $func(['i'=>0]);
-        $apb = $func(['i'=>4]);
+        $a = $func(['i' => 0]);
+        $apb = $func(['i' => 4]);
         if (isNaN($a) || isNaN($apb)) {
             return false;
         }
-        return array($a,($apb-$a)/4);
+        return array($a, ($apb - $a) / 4);
     }
 
     /**
-	  * parses complex numbers.  Can handle anything, but only with
-      * one i in it.
-      */
-    private function parsecomplex($v) {
-        $v = str_replace(' ','',$v);
-        $v = str_replace(array('sin','pi'),array('s$n','p$'),$v);
-        $v = preg_replace('/\((\d+\*?i|i)\)\/(\d+)/','$1/$2',$v);
+     * parses complex numbers.  Can handle anything, but only with
+     * one i in it.
+     */
+    private function parsecomplex($v)
+    {
+        $v = str_replace(' ', '', $v);
+        $v = str_replace(array('sin', 'pi'), array('s$n', 'p$'), $v);
+        $v = preg_replace('/\((\d+\*?i|i)\)\/(\d+)/', '$1/$2', $v);
         $len = strlen($v);
         //preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
         //if (count($matches[0])>1) {
-        if (substr_count($v,'i')>1) {
+        if (substr_count($v, 'i') > 1) {
             return _('error - more than 1 i in expression');
         } else {
             //$p = $matches[0][0][1];
-            $p = strpos($v,'i');
-            if ($p===false) {
+            $p = strpos($v, 'i');
+            if ($p === false) {
                 $real = $v;
                 $imag = 0;
             } else {
                 //look left
                 $nd = 0;
-                for ($L=$p-1;$L>0;$L--) {
+                for ($L = $p - 1; $L > 0; $L--) {
                     $c = $v[$L];
-                    if ($c==')') {
+                    if ($c == ')') {
                         $nd++;
-                    } else if ($c=='(') {
+                    } else if ($c == '(') {
                         $nd--;
-                    } else if (($c=='+' || $c=='-') && $nd==0) {
+                    } else if (($c == '+' || $c == '-') && $nd == 0) {
                         break;
                     }
                 }
-                if ($L<0) {$L=0;}
+                if ($L < 0) {$L = 0;}
                 if ($nd != 0) {
                     return _('error - invalid form');
                 }
                 //look right
                 $nd = 0;
 
-                for ($R=$p+1;$R<$len;$R++) {
+                for ($R = $p + 1; $R < $len; $R++) {
                     $c = $v[$R];
-                    if ($c=='(') {
+                    if ($c == '(') {
                         $nd++;
-                    } else if ($c==')') {
+                    } else if ($c == ')') {
                         $nd--;
-                    } else if (($c=='+' || $c=='-') && $nd==0) {
+                    } else if (($c == '+' || $c == '-') && $nd == 0) {
                         break;
                     }
                 }
@@ -302,63 +304,63 @@ class ComplexScorePart implements ScorePart
                     return _('error - invalid form');
                 }
                 //which is bigger?
-                if ($p-$L>0 && $R-$p>0 && ($R==$len || $L==0)) {
+                if ($p - $L > 0 && $R - $p > 0 && ($R == $len || $L == 0)) {
                     //return _('error - invalid form');
-                    if ($R==$len) {// real + AiB
-                        $real = substr($v,0,$L);
-                        $imag = substr($v,$L,$p-$L);
-                        $imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
-                    } else if ($L==0) { //AiB + real
-                        $real = substr($v,$R);
-                        $imag = substr($v,0,$p);
-                        $imag .= '*'.substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
+                    if ($R == $len) { // real + AiB
+                        $real = substr($v, 0, $L);
+                        $imag = substr($v, $L, $p - $L);
+                        $imag .= '*' . substr($v, $p + 1 + (($v[$p + 1] ?? '') == '*' ? 1 : 0), $R - $p - 1);
+                    } else if ($L == 0) { //AiB + real
+                        $real = substr($v, $R);
+                        $imag = substr($v, 0, $p);
+                        $imag .= '*' . substr($v, $p + 1 + (($v[$p + 1] ?? '') == '*' ? 1 : 0), $R - $p - 1);
                     } else {
                         return _('error - invalid form');
                     }
-                    $imag = str_replace('-*','-1*',$imag);
-                    $imag = str_replace('+*','+1*',$imag);
-                } else if ($p-$L>1) {
-                    $imag = substr($v,$L,$p-$L);
-                    $real = substr($v,0,$L) . substr($v,$p+1);
-                } else if ($R-$p>1) {
-                    if ($p>0) {
-                        if ($v[$p-1]!='+' && $v[$p-1]!='-') {
+                    $imag = str_replace('-*', '-1*', $imag);
+                    $imag = str_replace('+*', '+1*', $imag);
+                } else if ($p - $L > 1) {
+                    $imag = substr($v, $L, $p - $L);
+                    $real = substr($v, 0, $L) . substr($v, $p + 1);
+                } else if ($R - $p > 1) {
+                    if ($p > 0) {
+                        if ($v[$p - 1] != '+' && $v[$p - 1] != '-') {
                             return _('error - invalid form');
                         }
-                        $imag = $v[$p-1].substr($v,$p+1+($v[$p+1]=='*'?1:0),$R-$p-1);
-                        $real = substr($v,0,$p-1) . substr($v,$R);
+                        $imag = $v[$p - 1] . substr($v, $p + 1 + ($v[$p + 1] == '*' ? 1 : 0), $R - $p - 1);
+                        $real = substr($v, 0, $p - 1) . substr($v, $R);
                     } else {
-                        $imag = substr($v,$p+1,$R-$p-1);
-                        $real = substr($v,0,$p) . substr($v,$R);
+                        $imag = substr($v, $p + 1, $R - $p - 1);
+                        $real = substr($v, 0, $p) . substr($v, $R);
                     }
                 } else { //i or +i or -i or 3i  (one digit)
-                    if ($v[$L]=='+') {
+                    if ($v[$L] == '+') {
                         $imag = 1;
-                    } else if ($v[$L]=='-') {
+                    } else if ($v[$L] == '-') {
                         $imag = -1;
-                    } else if ($p==0) {
+                    } else if ($p == 0) {
                         $imag = 1;
                     } else {
                         $imag = $v[$L];
                     }
-                    $real = ($p>0?substr($v,0,$L):'') . substr($v,$p+1);
+                    $real = ($p > 0 ? substr($v, 0, $L) : '') . substr($v, $p + 1);
                 }
-                if ($real=='') {
+                if ($real == '') {
                     $real = 0;
                 }
-                if ($imag[0]=='/') {
-                    $imag = '1'.$imag;
-                } else if (($imag[0]=='+' || $imag[0]=='-') && $imag[1]=='/') {
-                    $imag = $imag[0].'1'.substr($imag,1);
+                if ($imag[0] == '/') {
+                    $imag = '1' . $imag;
+                } else if (($imag[0] == '+' || $imag[0] == '-') && $imag[1] == '/') {
+                    $imag = $imag[0] . '1' . substr($imag, 1);
                 }
-                $imag = str_replace('*/','/',$imag);
-                if (substr($imag,-1)=='*') {
-                    $imag = substr($imag,0,-1);
+                $imag = str_replace('*/', '/', $imag);
+                if (substr($imag, -1) == '*') {
+                    $imag = substr($imag, 0, -1);
                 }
             }
-            $real = str_replace(array('s$n','p$'),array('sin','pi'),$real);
-            $imag = str_replace(array('s$n','p$'),array('sin','pi'),$imag);
-            return array($real,$imag);
+            $real = str_replace(array('s$n', 'p$'), array('sin', 'pi'), $real);
+            $imag = str_replace(array('s$n', 'p$'), array('sin', 'pi'), $imag);
+            return array($real, $imag);
         }
     }
 

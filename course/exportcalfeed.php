@@ -11,16 +11,16 @@ if (isset($_POST['textitemstype'])) {
 	//this is the AJAX callback to update the feed link
 	$payload = array('uid'=>$userid, 'cid'=>$cid);
 	if ($_POST['textitemstype']!='no') {
-		$payload['T'] = strtoupper($_POST['textitemstype']{0}).intval($_POST['textitems']);
+		$payload['T'] = strtoupper($_POST['textitemstype'][0]).intval($_POST['textitems']);
 	}
 	if ($_POST['assesstype']!='no') {
-		$payload['A'] = strtoupper($_POST['assesstype']{0}).intval($_POST['assess']);
+		$payload['A'] = strtoupper($_POST['assesstype'][0]).intval($_POST['assess']);
 	}
 	if ($_POST['forumtype']!='no') {
-		$payload['F'] = strtoupper($_POST['forumtype']{0}).intval($_POST['forum']);
+		$payload['F'] = strtoupper($_POST['forumtype'][0]).intval($_POST['forum']);
 	}
 	if ($_POST['caltype']!='no') {
-		$payload['C'] = strtoupper($_POST['caltype']{0}).intval($_POST['cal']);
+		$payload['C'] = strtoupper($_POST['caltype'][0]).intval($_POST['cal']);
 	}
 	$token = JWT::encode($payload, $key); //token is URL safe from JWT
 	$url = $GLOBALS['basesiteurl'] . '/admin/calendarfeed.php?t='.$token;

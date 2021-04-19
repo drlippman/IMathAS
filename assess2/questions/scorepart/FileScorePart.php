@@ -36,9 +36,10 @@ class FileScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
-        if (isset($options['answer'])) {if ($multi) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}}
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
+        $optionkeys = ['answer', 'answerformat', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
@@ -65,7 +66,7 @@ class FileScorePart implements ScorePart
                 $hasfile = true;
             } else {
                 $scorePartResult->setLastAnswerAsGiven('');
-                if (isset($scoremethod) && $scoremethod=='takeanythingorblank') {
+                if (!empty($scoremethod) && $scoremethod=='takeanythingorblank') {
                     $scorePartResult->setRawScore(1);
                     return $scorePartResult;
                 } else {
@@ -162,7 +163,7 @@ class FileScorePart implements ScorePart
                 return $scorePartResult;
             }
         }
-        if (isset($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
+        if (!empty($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         } else {

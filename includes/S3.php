@@ -977,11 +977,14 @@ final class S3Request {
 	* @param string &$data Data
 	* @return integer
 	*/
-	private function __responseWriteCallback(&$curl, &$data) {
-		if ($this->response->code == 200 && $this->fp !== false)
+	private function __responseWriteCallback($curl, $data) {
+		if ($this->response->code == 200 && $this->fp !== false) {
 			return fwrite($this->fp, $data);
-		else
-			$this->response->body .= $data;
+        } else if (isset($this->response->body)) {
+            $this->response->body .= $data;
+        } else {
+            $this->response->body = $data;
+        }
 		return strlen($data);
 	}
 
@@ -993,7 +996,7 @@ final class S3Request {
 	* @param string &$data Data
 	* @return integer
 	*/
-	private function __responseHeaderCallback(&$curl, &$data) {
+	private function __responseHeaderCallback($curl, $data) {
 		if (($strlen = strlen($data)) <= 2) return $strlen;
 		if (substr($data, 0, 4) == 'HTTP')
 			$this->response->code = (int)substr($data, 9, 3);

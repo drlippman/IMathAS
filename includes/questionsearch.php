@@ -432,7 +432,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 return ($a['junkflag'] < $b['junkflag']) ? -1 : 1;
             } else if (!empty($search['order']) && $search['order']=='newest') {
                 return ($b['lastmoddate'] - $a['lastmoddate']);
-            } else if ($sortorder[$a['libid']] == 1) { // alpha
+            } else if (!empty($sortorder[$a['libid']])) { // alpha
                 return strnatcasecmp($a['descr'], $b['descr']);
             } else {
                 return ($a['id'] < $b['id']) ? -1 : 1;

@@ -12,7 +12,7 @@ $DBH->beginTransaction();
 	return false;
  }
  
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added cleanupdate to imas_courses. See util/runcoursecleanup.php for setup and config.</p>";
 

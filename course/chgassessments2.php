@@ -148,7 +148,7 @@ if (!(isset($teacherid))) {
 					$defregenpenalty = 0;
 				}
 			}
-			if ($submitby == 'by_assessment' && $defregens > 1) {
+			if ($coreOK && $submitby == 'by_assessment' && $defregens > 1) {
 				if ($_POST['keepscore'] === 'DNC') {
 					$coreOK = false;
 				} else {
@@ -613,7 +613,7 @@ if (!(isset($teacherid))) {
 							$out .= '<ul class="assessnest">'.$sub.'</ul></li>';
 						}
 					}
-				} else if ($itemshowdata[$item]['itemtype'] == 'Assessment') {
+				} else if (isset($itemshowdata[$item]['itemtype']) && $itemshowdata[$item]['itemtype'] == 'Assessment') {
 					$aid = $itemshowdata[$item]['id'];
 					$out .= '<li>';
 					$out .= '<label><img src="'.$staticroot.'/img/assess_tiny.png"/> ';

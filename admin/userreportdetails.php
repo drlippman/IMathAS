@@ -125,7 +125,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       $newrow['stucnt'] = 0;
       $newrow['lastactivity'] = 0;
       $newrow['template'] = '';
-      $templatematches = array_intersect(explode(',', $row['ancestors']), $templateids);
+      $templatematches = array_values(array_intersect(explode(',', $row['ancestors']), $templateids));
       if (count($templatematches)>0) {
       	  $newrow['template'] = $templates[$templatematches[count($templatematches)-1]];
       }
@@ -223,10 +223,10 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
       $newrow['status'] = array(($row['available']==0)?_('Available to students'):_('Hidden from students'));
       $newrow['hidden'] = ($row['hidefromcourselist']==1);
       $newrow['canedit'] = ($myrights==100 || $row['groupid']==$groupid);
-      if ($newrow['lockaid']>0) {
+      if ($row['lockaid']>0) {
         $newrow['status'][] = _('Locked for Assessment');
       }
-      if ($newrow['hidefromcourselist']==1) {
+      if ($row['hidefromcourselist']==1) {
         $newrow['status'][] = '<span class="hocp">'._("Hidden on User's Home Page").'</span>';
       }
       $courses_taking[] = $newrow;

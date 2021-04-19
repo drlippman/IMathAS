@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","comparentuples");
+ "array_values","comparelogic","stuansready","comparentuples");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -279,7 +279,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$alt .= sprintf(_('Text label, color %s, at %s reading: %s'), $function[4], $coord, $function[3]).'. ';
 			$commands .= $path;
 			continue; //skip the stuff below
-		} else if ($function[0]{0}=='[') { //strpos($function[0],"[")===0) {
+		} else if ($function[0][0]=='[') { //strpos($function[0],"[")===0) {
 			$isparametric = true;
 			$xfunc = makepretty(str_replace("[","",$function[0]));
 			$evalxfunc = makeMathFunction($xfunc, "t");
@@ -287,20 +287,20 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$evalyfunc = makeMathFunction($yfunc, "t");
 			array_shift($function);
 			if ($evalxfunc===false || $evalyfunc===false) {continue;}
-		} else if ($function[0]{0}=='<' || $function[0]{0}=='>') {
+		} else if ($function[0][0]=='<' || $function[0][0]=='>') {
 			$isineq = true;
-			if ($function[0]{1}=='=') {
+			if ($function[0][1]=='=') {
 				$ineqtype = substr($function[0],0,2);
 				$func = makepretty(substr($function[0],2));
 			} else {
-				$ineqtype = $function[0]{0};
+				$ineqtype = $function[0][0];
 				$func = makepretty(substr($function[0],1));
 			}
 			$evalfunc = makeMathFunction($func, "x");
 			if ($evalfunc===false) {continue;}
-		} else if (strlen($function[0])>1 && $function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>' || $function[0]{1}=='=')) {
+		} else if (strlen($function[0])>1 && $function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>' || $function[0][1]=='=')) {
 			$isxequals = true;
-			if ($function[0]{1}=='=') {
+			if ($function[0][1]=='=') {
 				$val = substr($function[0],2);
 				if (!is_numeric($val)) {
 					// convert to parametric
@@ -314,11 +314,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				}
 			} else {
 				$isineq = true;
-				if ($function[0]{2}=='=') {
+				if ($function[0][2]=='=') {
 					$ineqtype = substr($function[0],1,2);
 					$val= substr($function[0],3);
 				} else {
-					$ineqtype = $function[0]{1};
+					$ineqtype = $function[0][1];
 					$val = substr($function[0],2);
 				}
 			}
@@ -3461,7 +3461,7 @@ function cleantokenize($str,$funcs) {
 
 
 function comparenumbers($a,$b,$tol='.001') {
-	if ($tol[0]=='|') {
+	if (strval($tol)[0]=='|') {
 		$abstolerance = floatval(substr($tol,1));
 	}
 	if (!is_numeric($a)) {
@@ -3482,7 +3482,7 @@ function comparenumbers($a,$b,$tol='.001') {
 function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	if ($a=='' || $b=='') { return false;}
 	//echo "comparing $a and $b";
-	if ($tol[0]=='|') {
+	if (strval($tol)[0]=='|') {
 		$abstolerance = floatval(substr($tol,1));
 	}
 	$type = "expression";
@@ -3739,7 +3739,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	} else if (!is_numeric($stu)) {
 		return '<div class="feedbackwrap incorrect"><img src="'.$staticroot.'/img/redx.gif" alt="Incorrect"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
 	} else {
-		if ($tol[0]=='|') {
+		if (strval($tol)[0]=='|') {
 			$abstol = true;
 			$tol = substr($tol,1);
 		} else {
@@ -3777,7 +3777,7 @@ function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incor
 	if ($stu===null) {
 		return " ";
 	} else {
-		if ($tol[0]=='|') {
+		if (strval($tol)[0]=='|') {
 			$abstol = true;
 			$tol = substr($tol,1);
 		} else {
@@ -3843,7 +3843,7 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 	if ($stu===null || trim($stu)==='') {
 		return " ";
 	} else {
-		if ($tol[0]=='|') {
+		if (strval($tol)[0]=='|') {
 			$abstol = true;
 			$tol = substr($tol,1);
 		} else {
@@ -4804,6 +4804,24 @@ function comparentuples() {
   }
 }
 
-
+function stuansready($stu, $qn, $parts) {
+    if (!isset($stu[$qn]) || !is_array($stu[$qn])) {
+        return false;
+    }
+    foreach ($parts as $part) {
+        $ors = explode(' or ', $part);
+        $partok = false;
+        foreach ($ors as $v) {
+            if (isset($stu[$qn][$v]) && trim($stu[$qn][$v]) !== '') {
+                $partok = true; 
+                break;
+            }
+        }
+        if ($partok === false) {
+            return false;
+        }
+    }
+    return true;
+}
 
 ?>

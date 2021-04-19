@@ -79,7 +79,7 @@
 
 	// Load new assess info class
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings('all', false, false);
+	$assess_info->loadQuestionSettings($qid, true, false);
 	$ptsposs = $assess_info->getQuestionSetting($qid, 'points_possible');
 
 	if (isset($_GET['update']) && $canedit) {
@@ -263,8 +263,12 @@
 
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
-	$sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-
+    $sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+    
+    $points = $assess_info->getQuestionSetting($qid, 'points_possible');
+    $rubric = $assess_info->getQuestionSetting($qid, 'rubric');
+    $qsetid = $assess_info->getQuestionSetting($qid, 'questionsetid');
+/*
 	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
@@ -279,7 +283,7 @@
 	if ($points==9999) {
 		$points = $defpoints;
 	}
-
+*/
 	$lastupdate = '051620';
 	function formatTry($try,$cnt,$pn,$tn) {
 		if (is_array($try) && $try[0] === 'draw') {
@@ -507,7 +511,7 @@
 
 		$groupdup = false;
 		if ($line['agroupid']>0) {
-			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
+			//$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
 			if (isset($onepergroup[$line['agroupid']])) {
 				$groupdup = true;
 			} else {
@@ -518,7 +522,7 @@
 			if ($isgroup) {
 				$groupdup = true;
 			}
-			$s3asid = $asid; // TODO: revisit this
+			//$s3asid = $asid; // TODO: revisit this
 		}
 
 		// get an array of qn=>qid
@@ -567,7 +571,7 @@
 			
 			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
 
-			if (!$groupdup) {
+			if ($isgroup > 0 && !$groupdup) {
 				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
 					echo '</b> ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</p>';
@@ -609,7 +613,7 @@
 			echo '</div>';
 			echo "<div class=scoredetails>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
-			if (!$groupdup) {
+			if ($isgroup > 0 && !$groupdup) {
 				echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
 			}
 			if ($isgroup) {

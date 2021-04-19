@@ -302,7 +302,7 @@ function getactivetab() {
 	}
 	return $a;
 }
-if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !isset($nocoursenav)) {
+if (!empty($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !isset($nocoursenav)) {
 	echo '<div id="navlistcont" role="navigation" aria-label="'._('Course Navigation').'">';
 	echo '<ul id="navlist">';
 	$a = array('course'=>'', 'msg'=>'', 'forum'=>'', 'cal'=>'', 'gb'=>'', 'roster'=>'');
@@ -310,11 +310,11 @@ if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !isset($no
 	$a[$c] = 'class="activetab"';
 
 	echo "<li><a {$a['course']} href=\"$imasroot/course/course.php?cid=$cid\">",_('Course'),"</a></li> ";
-	if ($coursemsgset<4) { //messages
+	if (isset($coursemsgset) && $coursemsgset<4) { //messages
 		echo "<li><a {$a['msg']} href=\"$imasroot/msgs/msglist.php?cid=$cid\">",_('Messages'),"</a></li> ";
 	}
 
-	if (($coursetoolset&2)==0) { //forums
+	if (isset($coursetoolset) && ($coursetoolset&2)==0) { //forums
 		echo "<li><a {$a['forum']} href=\"$imasroot/forums/forums.php?cid=$cid\">",_('Forums'),"</a></li>";
 	}
 
@@ -322,7 +322,7 @@ if (isset($cid) && !isset($flexwidth) && !isset($hideAllHeaderNav) && !isset($no
 		echo "<li><a {$a['roster']} href=\"$imasroot/course/listusers.php?cid=$cid\">",_('Roster'),"</a></li>\n";
 	}
 
-	if (($coursetoolset&1)==0) { //Calendar
+	if (isset($coursetoolset) && ($coursetoolset&1)==0) { //Calendar
 		echo "<li><a {$a['cal']} href=\"$imasroot/course/showcalendar.php?cid=$cid\">",_('Calendar'),"</a></li>\n";
 	}
 
@@ -350,7 +350,7 @@ require_once("$curdir/filter/filter.php");
 
 if (!isset($nologo)) {
 	echo '<div id="headerlogo" class="hideinmobile" ';
-	if ($myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
+	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
 		echo 'onclick="mopen(\'homemenu\',';
 		if (isset($cid) && is_numeric($cid)) {
 			echo $cid;
@@ -360,7 +360,7 @@ if (!isset($nologo)) {
 		echo ')" onmouseout="mclosetime()"';
 	}
 	echo '>'.$smallheaderlogo.'</div>';
-	if ($myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
+	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
 		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
 		echo '</div>';
 	}

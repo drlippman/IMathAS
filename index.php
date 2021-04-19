@@ -490,7 +490,7 @@ for ($i=0; $i<3; $i++) {
 require('footer.php');
 
 function printCourses($data,$title,$type=null,$hashiddencourses=false) {
-	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $courseListOrder;
+	global $myrights, $shownewmsgnote, $shownewpostnote, $imasroot, $userid, $username, $courseListOrder;
 	if (count($data)==0 && $type=='tutor' && !$hashiddencourses) {return;}
 
 	echo '<div role="navigation" aria-label="'.$title.'">';
