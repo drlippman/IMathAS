@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready");
+ "array_values","comparelogic","stuansready","comparentuples");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -4738,6 +4738,70 @@ function comparelogic($a,$b,$vars) {
         }
     }
     return true;
+}
+
+function comparentuples() {
+  $par = false;
+  $args = func_get_args();
+  if (in_array("ignoreparens",$args)) {
+    $par = true;
+    unset($args[array_search("ignoreparens",$args)]);
+    $args = array_values($args);
+  }
+  $utup = $args[0];
+  $vtup = $args[1];
+  
+  if (empty($utup) || empty($vtup)) {
+    echo 'Eek! Comparentuples needs two nutples to compare.';
+    return false;
+  }
+  if (!preg_match('/^[\(\[\{\<]{1}.*[\)\]\}\>]{1}$/',$utup) || !preg_match('/^[\(\[\{\<]{1}.*[\)\]\}\>]{1}$/',$vtup)) {
+    return false;
+  }
+  if (!isset($args[2])) {
+    $args[2] = '0.001';
+  }
+  $tol = $args[2];
+  $correct = 0;
+  $uparen = [$utup[0],$utup[strlen($utup)-1]];
+  $vparen = [$vtup[0],$vtup[strlen($vtup)-1]];
+  $u = listtoarray(substr($utup,1,-1));
+  $v = listtoarray(substr($vtup,1,-1));
+  
+  if (count($u) != count($v) || count($u) == 0 || count($v) == 0) {return false;}
+  $dim = count($u);
+  if (!is_array($tol)) {
+    $tol = listtoarray($tol);
+  }
+  // repeat single tol for every entry
+  if (count($tol) == 1) {
+    $tol = fillarray("$tol[0]",$dim);
+  }
+  // fill in missing values at end of tol array with default value
+  if (count($tol) < $dim) {
+    for ($i=count($tol); $i<$dim; $i++) {
+      $tol[$i] = '0.001';
+    }
+  }
+  foreach ($tol as $key => $in) {
+    // fill empty tol's in list with default value
+    if (empty($in)) {
+      $tol[$key] = '0.001';
+    }
+  }
+  for ($i=0; $i<$dim; $i++) {
+    if (comparenumbers($u[$i],$v[$i],"$tol[$i]")) {
+      $correct += 1;
+    }
+  }
+  if ($par == false) {
+    if ($uparen[0] != $vparen[0] || $uparen[1] != $vparen[1]) {
+      $correct += -1;
+    }
+  }
+  if ($correct == $dim) {
+    return true;
+  }
 }
 
 function stuansready($stu, $qn, $parts) {
