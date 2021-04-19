@@ -69,6 +69,13 @@ $tests = [
  ['3*e - 4', [], 3*M_E - 4],
  ['3e-4', [], 3*M_E - 4],
  ['3E-2', [], 0.03],
+ ['5>3', [], 1],
+ ['2>3', [], 0],
+ ['5>=3', [], 1],
+ ['2<=2', [], 1],
+ ['5+1>3', [], 1],
+ ['3<1+5', [], 1],
+ ['|-3|', [], 3]
 ];
 
 
@@ -84,6 +91,7 @@ foreach ($tests as $test) {
   } catch (Throwable $t) {
     echo "Test crashed on {$test[0]}: $out vs {$test[2]}<br>";
     echo $t->getMessage();
+    $p->printTokens();
   }
 }
 

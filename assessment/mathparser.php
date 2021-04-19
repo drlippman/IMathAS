@@ -211,6 +211,22 @@ class MathParser
         'precedence'=>6,
         'assoc'=>'right',
         'evalfunc'=>function($a,$b) {return (($a && $b) || (!$a && !$b));}],
+      '<' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a<$b)?1:0;}],
+      '>' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a>$b)?1:0;}],
+      '<=' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a<=$b)?1:0;}],
+      '>=' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a>=$b)?1:0;}],
       '(' => true,
       ')' => true
     ];
@@ -345,15 +361,7 @@ class MathParser
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
         continue;
-      } else if (isset($this->operators[$c])) {
-        // if the symbol matches an operator
-        $tokens[] = [
-          'type'=>'operator',
-          'symbol'=>$c
-        ];
-        $lastTokenType = 'operator';
-        continue;
-      } else if (($c=='|' || $c=='&' || $c=='L') &&
+      } else if (($c=='|' || $c=='&' || $c=='L' || $c=='<' || $c=='>') &&
         isset($this->operators[substr($str,$n,2)])
       ) {
         $tokens[] = [
@@ -361,6 +369,14 @@ class MathParser
           'symbol'=>substr($str,$n,2)
         ];
         $n++;
+        $lastTokenType = 'operator';
+        continue;
+      } else if (isset($this->operators[$c])) {
+        // if the symbol matches an operator
+        $tokens[] = [
+          'type'=>'operator',
+          'symbol'=>$c
+        ];
         $lastTokenType = 'operator';
         continue;
       } else {
