@@ -20,7 +20,7 @@ define("simplexTolerance", .001);
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 33;
+	return 34;
 }
 
 // function simplex(type, objective, constraints)
