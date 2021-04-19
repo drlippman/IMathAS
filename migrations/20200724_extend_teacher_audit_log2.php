@@ -45,7 +45,7 @@ if ($res===false) {
     return false;
 }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 echo '<p>add custom enum options to imas_teacher_audit_log</p>';
 
 return true;

@@ -22,7 +22,7 @@ $query = "CREATE TABLE `imas_assessment_records` (
 		PRIMARY KEY (`assessmentid`, `userid`),
 	  INDEX (`userid`),
 		INDEX (`agroupid`)
-	) ENGINE=InnoDB;";
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;";
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -30,7 +30,7 @@ $query = "CREATE TABLE `imas_assessment_records` (
 	return false;
  }
 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ table imas_assessment_records created.</p>";
 

@@ -571,8 +571,12 @@ switch($_POST['action']) {
 		if (!isset($CFG['coursebrowserRightsToPromote'])) {
 			$CFG['coursebrowserRightsToPromote'] = 40;
 		}
-		$updateJsonData = false;
-		$jsondata = json_decode($old_course_settings['jsondata'], true);
+        $updateJsonData = false;
+        if (isset($old_course_settings['jsondata'])) {
+            $jsondata = json_decode($old_course_settings['jsondata'], true);
+        } else {
+            $jsondata = null;
+        }
 		if ($jsondata===null) {
 			$jsondata = array();
 		}
@@ -630,7 +634,7 @@ switch($_POST['action']) {
 		} else {
 			$enddate = parsedatetime($_POST['edate'],'11:59pm',2000000000);
 		}
-		$_POST['ltisecret'] = trim($_POST['ltisecret']);
+		$_POST['ltisecret'] = trim($_POST['ltisecret'] ?? '');
 		if (isset($_POST['setdatesbylti']) && $_POST['setdatesbylti']==1) {
 			$setdatesbylti = 1;
 		} else {
