@@ -350,7 +350,7 @@ require_once("$curdir/filter/filter.php");
 
 if (!isset($nologo)) {
 	echo '<div id="headerlogo" class="hideinmobile" ';
-	if ($myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
+	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
 		echo 'onclick="mopen(\'homemenu\',';
 		if (isset($cid) && is_numeric($cid)) {
 			echo $cid;
@@ -360,7 +360,7 @@ if (!isset($nologo)) {
 		echo ')" onmouseout="mclosetime()"';
 	}
 	echo '>'.$smallheaderlogo.'</div>';
-	if ($myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
+	if (isset($myrights) && $myrights>10 && !$ispublic && !isset($_SESSION['ltiitemtype'])) {
 		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
 		echo '</div>';
 	}

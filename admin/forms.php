@@ -1200,7 +1200,7 @@ switch($_GET['action']) {
 								$ingroup = true;
 							} else {
 								echo '<option value="'.Sanitize::encodeStringForDisplay($k).'"';
-								if ($k==$browser[$propname]) { echo ' selected';}
+								if (isset($browser[$propname]) && $k==$browser[$propname]) { echo ' selected';}
 								echo '>';
 								echo Sanitize::encodeStringForDisplay($v).'</option>';
 							}
@@ -1211,14 +1211,14 @@ switch($_GET['action']) {
 						echo '</select>';
 
 						if (isset($propvals['options']['other'])) {
-							echo '<span id="browser'.$propname.'otherwrap" '.($browser[$propname]!='other'?'style="display:none"':'').'>';
-							echo '<br/>Other: <input type=text size=40 name="browser'.$propname.'other" value="'.($browser[$propname]=='other'?Sanitize::encodeStringForDisplay($browser[$propname.'other']):'').'"></span>';
+							echo '<span id="browser'.$propname.'otherwrap" '.(!isset($browser[$propname]) || $browser[$propname]!='other'?'style="display:none"':'').'>';
+							echo '<br/>Other: <input type=text size=40 name="browser'.$propname.'other" value="'.(isset($browser[$propname]) && $browser[$propname]=='other'?Sanitize::encodeStringForDisplay($browser[$propname.'other']):'').'"></span>';
 						}
 					}
 				} else if ($propvals['type']=='string') {
 					echo '<input type=text name="browser'.$propname.'" size=50 value="'.Sanitize::encodeStringForDisplay($browser[$propname]).'" />';
 				} else if ($propvals['type']=='textarea') {
-					echo '<textarea rows=6 cols=70 name=browser'.$propname.'>'.Sanitize::encodeStringForDisplay($browser[$propname], true).'</textarea>';
+					echo '<textarea rows=6 cols=70 name=browser'.$propname.'>'.Sanitize::encodeStringForDisplay($browser[$propname] ?? '', true).'</textarea>';
 				}
 				echo '</span><br class="form">';
 			}
@@ -1665,7 +1665,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Find Student'),'</h1></div>';
 		echo '<form method="post" action="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">';
 		echo '<p>',_('Enter all or part of the name, email, or username:'),' ';
-		echo '<input type=text size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo']).'"/></p>';
+		echo '<input type=text size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo'] ?? '').'"/></p>';
 		echo '<input type="submit">';
 		echo '</form>';
 		if (!empty($_POST['userinfo'])) {

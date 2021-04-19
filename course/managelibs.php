@@ -555,7 +555,7 @@ if ($overwriteBody==1) {
 } else {
 ?>
 	<script>
-	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1); ?>';
+	var curlibs = '<?php echo Sanitize::encodeStringForJavascript($parent1 ?? ''); ?>';
 	function libselect() {
 		window.open('libtree2.php?cid=<?php echo $cid ?>&libtree=popup&select=parent&selectrights=1&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 	}
@@ -826,7 +826,12 @@ function printlist($parent) {
 			continue;
 		}
 		//if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
-		if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
+        if ($rights[$child]>2 || 
+            ($rights[$child]>0 && isset($groupids[$child]) && $groupids[$child]==$groupid) || 
+            (isset($ownerids[$child]) && $ownerids[$child]==$userid) || 
+            ($isgrpadmin && isset($groupids[$child]) && $groupids[$child]==$groupid) ||
+            $isadmin
+        ) {
 			if (!$isadmin) {
 				if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
 					$rights[$child]=4;  //adjust coloring
@@ -839,7 +844,7 @@ function printlist($parent) {
 					echo "<input type=checkbox name=\"nchecked[]\" value=" . Sanitize::encodeStringForDisplay($child) . "> ";
 				}
 				echo "<span class=hdr onClick=\"toggle('n" . Sanitize::encodeStringForJavascript($child) . "')\"><span class=\"r" . Sanitize::encodeStringForDisplay($rights[$child]) . "\">" . Sanitize::encodeStringForDisplay($names[$child]) ;
-				if ($federated[$child]) {
+				if (!empty($federated[$child])) {
 					echo ' <span class=fedico title="Federated">&lrarr;</span>';
 				}
 				echo "</span> </span>\n";
