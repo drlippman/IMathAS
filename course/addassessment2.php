@@ -116,7 +116,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $stm->execute(array(':assessmentid' => $assessmentId));
         // clear out time limit extensions
         $stm = $DBH->prepare("UPDATE imas_exceptions SET timeext=0 WHERE timeext<>0 AND assessmentid=? AND itemtype='A'");
-        $stm->execute(array($aid));
+        $stm->execute(array($assessmentId));
         
         $DBH->commit();
         header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' . Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
