@@ -445,7 +445,8 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             {'b':'.'},
-            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            (calcformat.match(/(list|set)/) ||
+            qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} : {s:1}
           ]
@@ -476,7 +477,8 @@ var myMQeditor = (function($) {
             {b:'-'},
             {b:'0'},
             calcformat.match(/fracordec/) ? {'b':'.'} : {s:1},
-            calcformat.match(/(list|set)/) ? {'b':','} : {s:1},
+            (calcformat.match(/(list|set)/) ||
+             qtype.match(/(ntuple|interval)/)) ? {'b':','} : {s:1},
             ((qtype === 'calcntuple' && !calcformat.match(/vector/)) ||
               calcformat.match(/point/)) ? {l:'\\left(\\right)', c:'t', w:'('} :
               (qtype.match(/complex/) ? {b:'+'} : {s:1})
