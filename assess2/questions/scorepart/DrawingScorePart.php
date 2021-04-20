@@ -32,11 +32,12 @@ class DrawingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['grid', 'snaptogrid', 'answers', 'partweights', 
+        $optionkeys = ['grid', 'snaptogrid', 'partweights', 
             'answerformat', 'scoremethod', 'reltolerance', 'abstolerance'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
+        $answers = getOptionVal($options, 'answers', $multi, $partnum, true);
 
         if ($reltolerance === '') {
             if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
