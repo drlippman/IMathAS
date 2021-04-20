@@ -2577,8 +2577,9 @@ These macros are used to test various conditions.  They typically return true or
     Pass this function the $stuanswers or $sutanswersval arrays, $thisq for the question number,
     and an array of part numbers, and it will check to make sure a non-blank answer has been 
     provided for all of the part numbers.  A part number can also be given as "1 or 2" if answering
-    either part is sufficient.  It is good to wrap any code using student answers in an "if" block 
-    using this as the condition.</li>
+    either part is sufficient.  To allow a blank answer, prefix a part number with a tilde. 
+    It is good to wrap any multipart or conditional code using student answers in an "if" block 
+    using stuansready as the condition.</li>
 <li><strong>comparenumbers(a,b,[tol])</strong>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
   tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
 <li><strong>comparentuples(a,b,[tol],[option])</strong>:  Compares ntuples or calcntuples a and b to see if they are equivalent to the specified

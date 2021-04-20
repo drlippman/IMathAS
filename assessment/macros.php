@@ -4809,10 +4809,15 @@ function stuansready($stu, $qn, $parts) {
         return false;
     }
     foreach ($parts as $part) {
-        $ors = explode(' or ', $part);
+        $ors = array_map('trim', explode(' or ', $part));
         $partok = false;
         foreach ($ors as $v) {
-            if (isset($stu[$qn][$v]) && trim($stu[$qn][$v]) !== '') {
+            $blankok = false;
+            if (is_string($v) && $v[0]=='~') {
+                $blankok = true;
+                $v = substr($v,1);
+            }
+            if (isset($stu[$qn][$v]) && ($blankok || trim($stu[$qn][$v]) !== '')) {
                 $partok = true; 
                 break;
             }
