@@ -314,6 +314,7 @@ class DrawingScorePart implements ScorePart
                         $y3p = $ytopix($y3);
                         $func = makepretty(substr($function[0],2));
                         $func = makeMathFunction($func, 'y');
+                        if ($func === false) { continue; }
                         $Lx1p = $xtopix(@$func(['y'=>$y1]));
                         $Lx2p = $xtopix(@$func(['y'=>$y2]));
                         $Lx3p = $xtopix(@$func(['y'=>$y3]));
@@ -358,6 +359,7 @@ class DrawingScorePart implements ScorePart
                     }
                 } else if (count($function)==3) { //line segment or ray
                     $func = makeMathFunction(makepretty($function[0]), 'x');
+                    if ($func === false) { continue; }
                     if ($function[1]=='-oo') { //ray to left
                         $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
                         $y2p = $ytopix($func(['x'=>floatval($function[2])]));
@@ -378,6 +380,7 @@ class DrawingScorePart implements ScorePart
                     }
                 } else {
                     $func = makeMathFunction(makepretty($function[0]), 'x');
+                    if ($func === false) { continue; }
 
                     $y1 = @$func(['x'=>$x1]);
                     $y2 = @$func(['x'=>$x2]);
@@ -418,6 +421,7 @@ class DrawingScorePart implements ScorePart
                                         }
                                     }
                                     $inlogfunc = makeMathFunction(makepretty($loginside), 'x');
+                                    if ($func === false) { continue; }
                                     //We're going to assume inside is linear
                                     //Calculate (0,y0), (1,y1).  m=(y1-y0), y=(y1-y0)x+y0
                                     //solve for when this is =0
@@ -507,6 +511,7 @@ class DrawingScorePart implements ScorePart
                         if ($nested==0) {
                             $infunc = makepretty(substr($function[0],$p+5,$i-$p-5));
                             $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
                             $y0 = $infunc(['x'=>0]);
                             $y1 = $infunc(['x'=>1]);
                             $xint = -$y0/($y1-$y0);
@@ -530,6 +535,7 @@ class DrawingScorePart implements ScorePart
                         if ($nested==0) {
                             $infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
                             $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
                             $y0 = $infunc(['x'=>0]);
                             $y1 = $infunc(['x'=>1]);
                             $period = 2*M_PI/($y1-$y0); //slope of inside function
@@ -1387,6 +1393,7 @@ class DrawingScorePart implements ScorePart
                 } else {
                     $func = makepretty(substr($function[0],$c));
                     $func = makeMathFunction($func, 'x');
+                    if ($func === false) { continue; }
                     $y1 = $func(['x'=>$x1]);
                     $y2 = $func(['x'=>$x2]);
                     $y3 = $func(['x'=>$x3]);
@@ -1743,7 +1750,8 @@ class DrawingScorePart implements ScorePart
                 }
                 $anslines[$key] = array();
                 $func = makeMathFunction(makepretty($function[0]), 'x');
-
+                if ($func === false) { continue; }
+                
                 if (!isset($function[1])) {
                     $function[1] = $settings[0];
                 }

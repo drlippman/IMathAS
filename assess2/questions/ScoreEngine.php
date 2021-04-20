@@ -83,6 +83,7 @@ class ScoreEngine
         $GLOBALS['inquestiondisplay'] = false;
         $GLOBALS['assessver'] = 2;
 
+        $GLOBALS['curqsetid'] = $scoreQuestionParams->getDbQuestionSetId();
         set_error_handler(array($this, 'evalErrorHandler'));
         set_exception_handler(array($this, 'evalExceptionHandler'));
         ob_start();
@@ -265,6 +266,7 @@ class ScoreEngine
 
         restore_error_handler();
         restore_exception_handler();
+        unset($GLOBALS['curqsetid']);
         $errors = ob_get_clean();
         if ($errors != '') {
           $this->addError($errors);
