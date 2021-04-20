@@ -739,7 +739,15 @@ function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=false) {
                 }
             }
         } else {
-            return $options[$key];
+            if (empty($partnum)) { $partnum = 0;}
+            if ($hasarrayval || !is_array($options[$key])) { 
+                // the normal option value is an array, or option val is not array
+                // just return it
+                return $options[$key];
+            } else if (isset($options[$key][$partnum])) {
+                // shouldn't be an array but it is, so return part value
+                return $options[$key][$partnum];
+            }
         }
     }
     // value not found
