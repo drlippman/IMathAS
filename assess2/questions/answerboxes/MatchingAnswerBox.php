@@ -49,8 +49,8 @@ class MatchingAnswerBox implements AnswerBox
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        $questions = getOptionVal($options, 'questions', $multi, $partnum, true);
-        $answers = getOptionVal($options, 'answers', $multi, $partnum, true);
+        $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
+        $answers = getOptionVal($options, 'answers', $multi, $partnum, 2);
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 

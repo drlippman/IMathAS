@@ -39,7 +39,7 @@ class ChoicesScorePart implements ScorePart
         }
         $optionkeys = ['questions', 'partialcredit'];
         foreach ($optionkeys as $optionkey) {
-            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
         }
 
         if (!empty($partialcredit)) {

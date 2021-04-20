@@ -45,7 +45,7 @@ class DrawingAnswerBox implements AnswerBox
         }
         $optionkeys = ['answers','background'];
         foreach ($optionkeys as $optionkey) {
-            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 1);
         }
 
         if (!is_array($answers)) {

@@ -38,7 +38,7 @@ class DrawingScorePart implements ScorePart
         }
         $optionkeys = ['answers','partweights'];
         foreach ($optionkeys as $optionkey) {
-            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 1);
         }
 
         if ($reltolerance === '') {

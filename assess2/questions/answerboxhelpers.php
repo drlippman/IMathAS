@@ -716,10 +716,11 @@ if (!function_exists('stripslashes_deep')) {
 	}
 }
 
-function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=false) {
+// hasarrayval: 0 not array, 1 may be array, 2 must be array
+function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
     if (isset($options[$key])) {
         if ($multi) {
-            if ($hasarrayval) { // the normal option value is an array, so we have to do more logic
+            if ($hasarrayval == 2) { // the normal option value must be an array, so we have to do more logic
                 if (is_array($options[$key])) {
                     if (isset($options[$key][$partnum]) && is_array($options[$key][$partnum])) {
                         // we have an array at the part index
@@ -739,15 +740,12 @@ function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=false) {
                 }
             }
         } else {
-            if (empty($partnum)) { $partnum = 0;}
-            if ($hasarrayval || !is_array($options[$key])) { 
-                // the normal option value is an array, or option val is not array
+            // single part question.
+            if (!is_array($options[$key]) || $hasarrayval > 0) {
+                // the normal option value may be an array, or option val is not array
                 // just return it
                 return $options[$key];
-            } else if (isset($options[$key][$partnum])) {
-                // shouldn't be an array but it is, so return part value
-                return $options[$key][$partnum];
-            }
+            } 
         }
     }
     // value not found

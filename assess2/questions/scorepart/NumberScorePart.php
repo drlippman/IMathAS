@@ -40,7 +40,7 @@ class NumberScorePart implements ScorePart
         }
         $optionkeys = ['partialcredit'];
         foreach ($optionkeys as $optionkey) {
-            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
         }
         if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
 

@@ -39,8 +39,8 @@ class MatchingScorePart implements ScorePart
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        $questions = getOptionVal($options, 'questions', $multi, $partnum, true);
-        $answers = getOptionVal($options, 'answers', $multi, $partnum, true);
+        $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
+        $answers = getOptionVal($options, 'answers', $multi, $partnum, 2);
 
         if (!is_array($questions) || !is_array($answers)) {
             $scorePartResult->addScoreMessage(_('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.'));

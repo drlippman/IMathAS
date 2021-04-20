@@ -44,7 +44,7 @@ class StringAnswerBox implements AnswerBox
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        $questions = getOptionVal($options, 'questions', $multi, $partnum, true);
+        $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
 
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
