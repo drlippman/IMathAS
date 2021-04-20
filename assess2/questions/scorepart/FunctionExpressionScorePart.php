@@ -32,10 +32,15 @@ class FunctionExpressionScorePart implements ScorePart
         $defaultreltol = .0015;
 
         $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
-            'variables', 'domain', 'requiretimes', 'ansprompt', 'formatfeedbackon', 'partialcredit'];
+            'variables', 'domain', 'requiretimes', 'ansprompt', 'formatfeedbackon'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
+        $optionkeys = ['partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
+        }
+        
         if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
  
         $ansformats = array_map('trim',explode(',',$answerformat));

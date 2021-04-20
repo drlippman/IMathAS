@@ -34,9 +34,13 @@ class NumberScorePart implements ScorePart
 
         $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'reqdecimals',
             'reqsigfigs', 'answerformat', 'requiretimes', 'requiretimeslistpart', 
-            'ansprompt', 'partialcredit'];
+            'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $optionkeys = ['partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
         }
         if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
 

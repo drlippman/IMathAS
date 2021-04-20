@@ -39,12 +39,14 @@ class DrawingAnswerBox implements AnswerBox
         $preview = '';
         $params = [];
 
-        $optionkeys = ['grid', 'snaptogrid', 'background', 
-            'answerformat', 'readerlabel'];
+        $optionkeys = ['grid', 'snaptogrid', 'answerformat', 'readerlabel'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        $answers = getOptionVal($options, 'answers', $multi, $partnum, true);
+        $optionkeys = ['answers','background'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
+        }
 
         if (!is_array($answers)) {
             settype($answers, "array");

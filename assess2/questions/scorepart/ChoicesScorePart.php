@@ -33,11 +33,14 @@ class ChoicesScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'noshuffle', 'partialcredit'];
+        $optionkeys = ['answer', 'noshuffle'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        $questions = getOptionVal($options, 'questions', $multi, $partnum, true);
+        $optionkeys = ['questions', 'partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, true);
+        }
 
         if (!empty($partialcredit)) {
             if (!is_array($partialcredit)) {
