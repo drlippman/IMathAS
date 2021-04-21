@@ -45,7 +45,7 @@ class ChoicesAnswerBox implements AnswerBox
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        $questions = getOptionVal($options, 'questions', $multi, $partnum, true);
+        $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');
