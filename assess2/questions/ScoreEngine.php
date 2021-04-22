@@ -709,7 +709,7 @@ class ScoreEngine
 
         return array(
             'scores' => array(round($score, 3)),
-            'rawScores' => array(round($score, 2)),
+            'rawScores' => array(round($score, 3)),
             'lastAnswerAsGiven' => array($scorePartResult->getLastAnswerAsGiven()),
             'lastAnswerAsNumber' => array($scorePartResult->getLastAnswerAsNumber()),
             'correctAnswerWrongFormat' => array($scorePartResult->getCorrectAnswerWrongFormat()),
