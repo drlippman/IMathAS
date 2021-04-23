@@ -2294,7 +2294,8 @@ function jsx_valueToJS($value) {
 			} else {
 				$js .= "xs = xs.replace('{$obj}', '('+{$obj}+')' );";
 			}
-		}
+        }
+        $js .= "xs = xs.replace(/(\d)e(-?\d)/g, '$1E$2');";
 		$js .= "with (Math) var x = eval(mathjs(xs)); return x;";
 		$js .= "}";
 	}	
@@ -2348,7 +2349,8 @@ function jsx_functionToJS($rule, $var) {
 		} else {
 			$js .= "ts = ts.replace('{$obj}', '('+{$obj}+')');";
 		}
-	}
+    }
+    $js .= "ts = ts.replace(/(\d)e(-?\d)/g, '$1E$2');";
 	$js .= "with (Math) var result = eval(mathjs(ts, '{$var}'));
             return result; }"; 
 		
