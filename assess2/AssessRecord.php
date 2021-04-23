@@ -2545,7 +2545,11 @@ class AssessRecord
           // regrade it.
           $_POST = array(); // total hack job here.
           $partattemptn = array();
-          for ($pn = 0; $pn < count($curQver['answeights']); $pn++) {
+          $numParts = count($curQver['answeights']);
+          if (!empty($curQver['tries'])) {
+              $numParts = max($numParts, max(array_keys($curQver['tries']))+1);
+          }
+          for ($pn = 0; $pn < $numParts; $pn++) {
             if (!isset($curQver['tries'][$pn]) || count($curQver['tries'][$pn]) == 0) {
               $stuans = '';
               $partattemptn[$pn] = 0;
