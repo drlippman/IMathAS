@@ -2919,16 +2919,20 @@ class AssessRecord
       ($scoresInGb == 'after_due' && time() > $this->assess_info->getSetting('enddate'))
     ) {
       $out['score'] = $aver['score'];
+      $showScores = true;
     } else {
       if ($by_question) {
         $qVerToGet = 'last';
       }
+      $showScores = false;
     }
     if ($getdetails) {
       $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
-      $out['feedback'] = $aver['feedback'] ?? '';
-      if ($out['feedback'] == '') {
-        $out['feedback'] = $this->assess_info->getSetting('deffeedbacktext');
+      if ($showScores) {
+        $out['feedback'] = $aver['feedback'] ?? '';
+        if ($out['feedback'] == '') {
+            $out['feedback'] = $this->assess_info->getSetting('deffeedbacktext');
+        }
       }
       $out['starttime'] = $aver['starttime'];
       $out['questions'] = $this->getGbQuestionsData($qVerToGet);
@@ -3058,7 +3062,9 @@ class AssessRecord
         $out['scoreoverride'] = $qdata['scoreoverride'];
       }
       $out['timeactive'] = $this->calcTimeActive($qdata);
-      $out['feedback'] = $qdata['feedback'] ?? '';
+      if ($showScores) {
+        $out['feedback'] = $qdata['feedback'] ?? '';
+      }
       $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $dispqn !== null ? $dispqn : $qn, $out);
       // include autosaves if teacher and last asssess & question version
       if ($this->teacherInGb &&
