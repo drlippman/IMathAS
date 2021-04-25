@@ -92,8 +92,21 @@ function checkFormatAgainstRegex($val, $regexs) {
   return $isok;
 }
 
+function sidIsAlreadyUsed($sid) {
+  global $DBH;
+  $sid_value = Sanitize::stripHtmlTags($sid);
+  $stm = $DBH->prepare('SELECT id FROM imas_users WHERE SID=:sid');
+  $stm->execute(array(':sid'=>$sid_value));
+  return $stm->rowCount() > 0;
+}
+
 function checkNewUserValidation($required = array('SID','firstname','lastname','email','pw1','pw2')) {
-  global $loginformat, $CFG, $DBH;
+  global $loginformat, $loginprompt, $CFG, $DBH;
+
+  // remove SID field from $required, if using emailAsSID
+  if (isset($CFG['emailAsSID']) && ($req_sid_key = array_search('SID', $required)) !== false) {
+    unset($required[$req_sid_key]);
+  }
 
   $errors = array();
   foreach ($required as $v) {
@@ -103,23 +116,26 @@ function checkNewUserValidation($required = array('SID','firstname','lastname','
       $errors[] = "Field ".Sanitize::encodeStringForDisplay($v)." is required";
     }
   }
-	if (in_array('SID',$required)) {
-	  if ($loginformat != '' && !checkFormatAgainstRegex($_POST['SID'], $loginformat)) {
-	    $errors[] = "$loginprompt has invalid format";
-	  }
-	  $sid_value = Sanitize::stripHtmlTags($_POST['SID']);
-	  $stm = $DBH->prepare('SELECT id FROM imas_users WHERE SID=:sid');
-	  $stm->execute(array(':sid'=>$sid_value));
-	  if ($stm->rowCount()>0) {
-	    $errors[] =  "$loginprompt '" . Sanitize::encodeStringForDisplay($sid_value) . "' is already used. ";
-	  }
-	}
+  if (in_array('SID',$required)) {
+    if ($loginformat != '' && !checkFormatAgainstRegex($_POST['SID'], $loginformat)) {
+      $errors[] = "$loginprompt has invalid format";
+    }
+    if (sidIsAlreadyUsed($_POST['SID'])) {
+      $errors[] =  "$loginprompt '" . Sanitize::encodeStringForDisplay($sid_value) . "' is already used. ";
+    }
+  }
 	if (in_array('email',$required)) {
-		//if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email']) ||
-		if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ||
+	  //if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email']) ||
+	  if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ||
 	    (isset($CFG['acct']['emailFormat']) && !checkFormatAgainstRegex($_POST['email'], $CFG['acct']['emailFormat']))) {
 	    $errors[] = "Invalid email address.";
 	  }
+	  if (isset($CFG['emailAsSID'])) {
+        // perform additional validation of email to insure it is not an alread-registered SID, if using emailAsSID
+		  if (sidIsAlreadyUsed($_POST['email'])) {
+            $errors[] =  "$loginprompt '" . Sanitize::encodeStringForDisplay($sid_value) . "' is already used. ";
+          }
+      }
 	}
 	if (in_array('pw1',$required)) {
 	  if (isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($_POST['pw1'], $CFG['acct']['passwordFormat'])) {

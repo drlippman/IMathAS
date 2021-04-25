@@ -37,6 +37,12 @@
 			} else {
 				$md5pw = md5($_POST['pw1']);
 			}
+
+			if (isset($CFG['emailAsSID'])) {
+				// set SID, if using emailAsSID
+				$_POST['SID'] = $_POST['email'];
+			}
+
 			//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
 			//DB $query .= "VALUES ('{$_POST['username']}','$md5pw',0,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}','$homelayout');";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -103,7 +109,12 @@
 	echo "<span class=form>Email Address</span><span class=formright><input type=text id=email name=email value=\"$email\" size=40></span><br class=form />\n";
 	echo "<span class=form>Phone Number</span><span class=formright><input type=text id=phone name=phone value=\"$phone\" size=40></span><br class=form />\n";
 	echo "<span class=form>School/College</span><span class=formright><input type=text id=school name=school value=\"$school\" size=40></span><br class=form />\n";
-	echo "<span class=form>Requested Username</span><span class=formright><input type=text id=SID name=SID value=\"$username\" size=40></span><br class=form />\n";
+
+	if (isset($CFG['emailAsSID'])) {
+		// hide the SID field, when using emailAsSID
+	} else {
+        echo "<span class=form>Requested Username</span><span class=formright><input type=text id=SID name=SID value=\"$username\" size=40></span><br class=form />\n";
+	}
 	echo "<span class=form>Requested Password</span><span class=formright><input type=password id=pw1 name=pw1 size=40></span><br class=form />\n";
 	echo "<span class=form>Retype Password</span><span class=formright><input type=password id=pw2 name=pw2 size=40></span><br class=form />\n";
 	echo "<span class=form>I have read and agree to the Terms of Use (below)</span><span class=formright><input type=checkbox id=agree name=agree></span><br class=form />\n";

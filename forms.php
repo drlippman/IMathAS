@@ -45,12 +45,16 @@ switch($_GET['action']) {
 		}
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('New Student Signup'),'</h1></div>';
 		echo "<form id=\"newuserform\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
-		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
+		if (isset($CFG['emailAsSID'])) {
+			// hide the SID field, when using emailAsSID
+		} else {
+        		echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
+		}
+		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form\" type=\"text\" size=60 id=email name=email autocomplete=\"email\"><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">",_('Choose a password:'),"</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">",_('Confirm password:'),"</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"firstname\">",_('Enter First Name:'),"</label></span> <input class=\"form\" type=\"text\" size=20 id=firstname name=firstname autocomplete=\"given-name\"><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form\" type=\"text\" size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form\" type=\"text\" size=60 id=email name=email autocomplete=\"email\"><BR class=\"form\">\n";
 		echo "<span class=form><label for=\"msgnot\">",_('Notify me by email when I receive a new message:'),"</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot checked=\"checked\" /></span><BR class=form>\n";
         if (isset($CFG['GEN']['COPPA'])) {
 			echo "<span class=form><label for=\"over13\">",_('I am 13 years old or older'),"</label></span><span class=formright><input type=checkbox name=over13 id=over13 onchange=\"toggleOver13()\"></span><br class=form />\n";
@@ -478,20 +482,26 @@ switch($_GET['action']) {
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Username Lookup'),"</div>\n";
 		}
-		echo '<div id="headerforms" class="pagetitle"><h1>',_('Lookup Username'),'</h1></div>';
-		echo "<form id=\"pageform\" method=post action=\"actions.php?action=lookupusername$gb\">\n";
-		echo _("If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ");
-		echo "<p><label for=email>",_('Email'),"</label>: <input type=text name=\"email\" id=email /></p>";
-		echo '<script type="text/javascript">
-		$("#pageform").validate({
-			rules: {
-				email: { required: true, email: true}
-			},
-			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
-		);
-		</script>';
-		echo "<p><input type=submit value=\"",_('Submit'),"\" /></p>";
-		echo "</form>";
+		if (isset($CFG['emailAsSID'])) {
+			// just show a message when using emailAsSID
+			echo "<p>Your login username is the email address you entered when you registered with " . $installname . ".</p>";
+			echo "<p><a href=\"index.php\">Return to Login</a></p>";
+		} else {
+    		echo '<div id="headerforms" class="pagetitle"><h1>',_('Lookup Username'),'</h1></div>';
+    		echo "<form id=\"pageform\" method=post action=\"actions.php?action=lookupusername$gb\">\n";
+    		echo _("If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ");
+    		echo "<p><label for=email>",_('Email'),"</label>: <input type=text name=\"email\" id=email /></p>";
+    		echo '<script type="text/javascript">
+    		$("#pageform").validate({
+    			rules: {
+    				email: { required: true, email: true}
+    			},
+    			invalidHandler: function() {setTimeout(function(){$("#pageform").removeClass("submitted").removeClass("submitted2");}, 100)}}
+    		);
+    		</script>';
+    		echo "<p><input type=submit value=\"",_('Submit'),"\" /></p>";
+    		echo "</form>";
+		}
 		break;
 	case "forumwidgetsettings":
 		$stm = $DBH->prepare("SELECT hideonpostswidget FROM imas_users WHERE id=:id");

@@ -341,6 +341,10 @@ if (isset($_GET['launch'])) {
 						':email'=>Sanitize::emailAddress($_POST['email']),
 						':msgnotify'=>$msgnot,':groupid'=>$newgroupid));
 				} else {
+					if ($CFG['emailAsSID']) {
+						// set email to SID when using emailAsSID
+						$_POST['email'] = $_POST['SID'];
+					}
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify)';
@@ -428,9 +432,9 @@ if (isset($_GET['launch'])) {
 			//tying LTI to IMAthAS account
 			//give option to provide existing account info, or provide full new student info
 			if ($allow_acctcreation) {
-				echo "<p>".sprintf(_("If you already have an account on %s, enter your username and password below to enable automated signon from %s"),$installname,Sanitize::encodeStringForDisplay($ltiorgname))."</p>";
+				echo "<p>".sprintf(_("If you already have an account on %s, enter your " . ($CFG['emailAsSID'] ? 'email address' : 'username') . " and password below to enable automated signon from %s"),$installname,Sanitize::encodeStringForDisplay($ltiorgname))."</p>";
 			} else {
-				echo "<p>".sprintf(_("Enter your username and password for %s below to enable automated signon from %s"),$installname,Sanitize::encodeStringForDisplay($ltiorgname))."</p>";
+				echo "<p>".sprintf(_("Enter your " . ($CFG['emailAsSID'] ? 'email address' : 'username') . " and password for %s below to enable automated signon from %s"),$installname,Sanitize::encodeStringForDisplay($ltiorgname))."</p>";
 			}
 			echo "<span class=form><label for=\"curSID\">".Sanitize::encodeStringForDisplay($loginprompt).":</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
 			echo "<span class=form><label for=\"curPW\">"._("Password:")."</label></span><input class=form type=password size=20 id=\"curPW\" name=\"curPW\"><BR class=form>\n";
@@ -442,7 +446,12 @@ if (isset($_GET['launch'])) {
 				echo "<span class=form><label for=\"pw2\">"._("Confirm password:")."</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
 				echo "<span class=form><label for=\"firstname\">"._("Enter First Name:")."</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deffirst)."\" size=20 id=firstname name=firstname autocomplete=\"given-name\"><BR class=form>\n";
 				echo "<span class=form><label for=\"lastname\">"._("Enter Last Name:")."</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deflast)."\" size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=form>\n";
-				echo "<span class=form><label for=\"email\">"._("Enter E-mail address:")."</label></span>  <input class=form type=email value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email autocomplete=\"email\"><BR class=form>\n";
+				if ($CFG['emailAsSID']) {
+					// add dummy hidden email field when using emailAsSID
+					echo '<input type="hidden" value="' . Sanitize::encodeStringForDisplay($defemail) . '" id="email" name="email">';
+				} else {
+					echo "<span class=form><label for=\"email\">"._("Enter E-mail address:")."</label></span>  <input class=form type=email value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email autocomplete=\"email\"><BR class=form>\n";
+				}
 				echo "<span class=form><label for=\"msgnot\">"._("Notify me by email when I receive a new message:")."</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
 				echo "<div class=submit><input type=submit value='"._("Create Account")."'></div>\n";
 				require_once(__DIR__.'/includes/newusercommon.php');
@@ -1955,6 +1964,10 @@ if (isset($_GET['launch'])) {
 						':email'=>Sanitize::emailAddress($_POST['email']),
 						':msgnotify'=>$msgnot, ':groupid'=>$newgroupid));
 				} else {
+					if ($CFG['emailAsSID']) {
+						// set email to SID when using emailAsSID
+						$_POST['email'] = $_POST['SID'];
+					}
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					$query .= "(:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify)";

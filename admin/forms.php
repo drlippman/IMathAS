@@ -233,9 +233,18 @@ switch($_GET['action']) {
 			}
 			</script>
 		<?php
-		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=SID ";
+		if (isset($CFG['emailAsSID'])) {
+			// hide the SID field, when using emailAsSID
+		} else {
+    		echo "<span class=form>Username:</span>  <input class=form type=text size=40 name=SID ";
+    		if ($_GET['action'] != "newadmin") {
+    			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
+    		}
+    		echo "><BR class=form>\n";
+		}
+		echo "<span class=form>Email:</span> <input class=form type=email size=40 name=email ";
 		if ($_GET['action'] != "newadmin") {
-			echo 'value="'.Sanitize::encodeStringForDisplay($line['SID']).'"';
+			echo 'value="'.Sanitize::encodeStringForDisplay($line['email']).'"';
 		}
 		echo "><BR class=form>\n";
 		echo "<span class=form>First Name:</span> <input class=form type=text size=40 name=firstname ";
@@ -246,11 +255,6 @@ switch($_GET['action']) {
 		echo "<span class=form>Last Name:</span> <input class=form type=text size=40 name=lastname ";
 		if ($_GET['action'] != "newadmin") {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['LastName']).'"';
-		}
-		echo "><BR class=form>\n";
-		echo "<span class=form>Email:</span> <input class=form type=email size=40 name=email ";
-		if ($_GET['action'] != "newadmin") {
-			echo 'value="'.Sanitize::encodeStringForDisplay($line['email']).'"';
 		}
 		echo "><BR class=form>\n";
 		if ($_GET['action'] == "newadmin") {

@@ -223,7 +223,7 @@ foreach ($tutorlist as $tutor) {
 	</table>
 	<hr/>
 	<p>
-	<b>Add new tutors.</b>  Provide a list of usernames below, separated by commas, to add as tutors.
+	<b>Add new tutors.</b>  Provide a list of  <?php echo isset($CFG['emailAsSID']) ? 'email addresses' : 'usernames' ?> below, separated by commas, to add as tutors.
 	</p>
 	<p>
 	<textarea name="newtutors" rows="3" cols="60"></textarea>
