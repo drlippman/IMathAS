@@ -141,11 +141,13 @@ class MatrixScorePart implements ScorePart
               }
               $c++;
             }
+            /* Removed: Not all ref defs include leading 1's
             if ($c < $M) { // if there's a first non-zero entry, should be 1
               if (abs($givenanslist[$r*$M+$c] - 1) > 1e-10) {
                 $correct = false;
               }
             }
+            */
           }
           // now reduce given answer to rref
           if ($correct) {
