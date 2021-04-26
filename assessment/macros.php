@@ -2595,17 +2595,18 @@ function definefunc($func,$varlist) {
 }
 
 function getstuans($v,$q,$i=0,$blankasnull=true) {
+    if (!isset($v[$q])) { return null;}
 	if (is_array($v[$q])) {
-    if (!isset($v[$q][$i])) {
-      return null;
-    } else if ($blankasnull && ($v[$q][$i]==='' || $v[$q][$i]==='NA')) {
-      return null;
-    }
+        if (!isset($v[$q][$i])) {
+            return null;
+        } else if ($blankasnull && ($v[$q][$i]==='' || $v[$q][$i]==='NA')) {
+            return null;
+        }
 		return $v[$q][$i];
 	} else {
-    if ($blankasnull && ($v[$q]==='' || $v[$q]==='NA')) {
-      return null;
-    }
+        if ($blankasnull && ($v[$q]==='' || $v[$q]==='NA')) {
+            return null;
+        }
 		return $v[$q];
 	}
 }
@@ -3396,7 +3397,7 @@ function cleantokenize($str,$funcs) {
 			if ($j==$len) {
 				$i = $j;
 				echo "unmatched parens/brackets - likely will cause an error";
-			} else {
+			} else if ($i<$len) {
 				$c = $str[$i];
 			}
 		} else if ($c=='"' || $c=="'") { //string
@@ -3411,8 +3412,10 @@ function cleantokenize($str,$funcs) {
 			} while (!($c==$qtype && $lastc!='\\'));
 			$out .= $c;
 
-			$i++;
-			$c = $str[$i];
+            $i++;
+            if ($i<$len) {
+                $c = $str[$i];
+            }
 		}  else {
 			//no type - just append string.  Could be operators
 			$out .= $c;

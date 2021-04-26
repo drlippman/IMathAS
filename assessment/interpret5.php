@@ -314,11 +314,16 @@ function tokenize($str,$anstype,$countcnt) {
 		$len = strlen($str);
 		if ($c=='/' && $str[$i+1]=='/') { //comment
 			while ($c!="\n" && $i<$len) {
-				$i++;
-				$c = $str[$i];
-			}
-			$i++;
-			$c = $str[$i];
+                $i++;
+                if ($i<$len) {
+                    $c = $str[$i];
+                }
+            }
+            $i++;
+            if ($i<$len) {
+                $c = $str[$i];
+            }
+            if ($i >= $len) { break; }
 			$intype = 7;
 		} else if ($c=='$') { //is var
 			$intype = 1;
