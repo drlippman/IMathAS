@@ -252,7 +252,7 @@ class MathParser
 
     $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
     // attempt to handle |x| as best as possible
-    $str = preg_replace('/\|(.+?)\|/', 'abs($1)', $str);
+    $str = preg_replace('/(?<!\|)\|([^\|]+?)\|(?!\|)/', 'abs($1)', $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
