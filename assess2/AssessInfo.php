@@ -30,14 +30,15 @@ class AssessInfo
   * @param mixed $questions   questions to load settings for.
   *                           accepts false for no load, 'all' for all,
   *                           or an array of question IDs.
+  * @param bool $forcecodeload true to force load of question code
   */
-  function __construct($DBH, $aid, $cid, $questions = false) {
+  function __construct($DBH, $aid, $cid, $questions = false, $forcecodeload = false) {
     $this->DBH = $DBH;
     $this->curAid = $aid;
     $this->cid = $cid;
     $this->loadAssessSettings();
     if ($questions !== false) {
-      $get_code = ($this->assessData['displaymethod'] === 'full');
+      $get_code = ($this->assessData['displaymethod'] === 'full' || $forcecodeload);
       $this->loadQuestionSettings($questions, $get_code);
     }
   }
