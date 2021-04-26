@@ -728,8 +728,14 @@ function matrixrandinvertible($n) {
 function matrixrandunreduce($m,$c) {
 	$n = count($m);
 	for ($i=0;$i<$c; $i++) {
-		$r = diffrands(0,$n-1,3);
-		$m = matrixrowcombine3($m,$r[0],-1,$r[1],1,$r[2],2,$r[0]);
+        if ($n == 2) {
+            $r = diffrands(0,$n-1,2);
+            $t = nonzerodiffrands(-2,2,2);
+            $m = matrixrowcombine($m,$r[0],$t[0],$r[1],$t[1],$r[0]);
+        } else {
+            $r = diffrands(0,$n-1,3);
+            $m = matrixrowcombine3($m,$r[0],-1,$r[1],1,$r[2],2,$r[0]);
+        }
 	}
 	for ($i=0; $i<$c; $i++) {
 		list($sr,$er) = diffrands(0,$n-1,2);
@@ -737,9 +743,14 @@ function matrixrandunreduce($m,$c) {
 	}
 	$c = 0;
 	while (hasallzerorow($m) && $c<20) {
-		$r = diffrands(0,$n-1,3);
-		$m = matrixrowcombine3($m,$r[0],-2,$r[1],1,$r[2],3,$r[0]);
-		$c++;
+        if ($n == 2) {
+            $r = diffrands(0,$n-1,2);
+            $m = matrixrowcombine($m,$r[0],-2,$r[1],1,$r[0]);
+        } else {
+            $r = diffrands(0,$n-1,3);
+            $m = matrixrowcombine3($m,$r[0],-2,$r[1],1,$r[2],3,$r[0]);
+        }
+        $c++;
 	}
 	return $m;
 }
