@@ -768,10 +768,14 @@ function gbtable() {
 				}
 				if (!empty($allowlate[$k]) && $allowlate[$k]>0) {
 					$gb[0][1][$pos][12] = $allowlate[$k];
-				}
+				} else {
+                    $gb[0][1][$pos][12] = 0;
+                }
 				if (isset($LPcutoff[$k])) {
 					$gb[0][1][$pos][14] = $LPcutoff[$k];
-				}
+				} else {
+                    $gb[0][1][$pos][14] = 0;
+                }
 				if (isset($uiver[$k])) {
 					$gb[0][1][$pos][15] = $uiver[$k];
 				}
@@ -1493,7 +1497,9 @@ function gbtable() {
 
 		if (($l['status']&128)>0) { // accepting showwork after assess
 			$gb[$row][1][$col][16] = 1;
-		}
+		} else {
+            $gb[$row][1][$col][16] = 0;
+        }
 		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 			$gb[$row][1][$col][1] = buildFeedback2($l['scoreddata']);
 			if ($gb[$row][1][$col][1] == '') {

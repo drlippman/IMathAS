@@ -19,13 +19,9 @@
 
 require("../init.php");
 $cid = Sanitize::courseId($_GET['cid']);
-if (isset($teacherid)) {
-	$isteacher = true;
+$isteacher = isset($teacherid);
+$istutor = isset($tutorid);
 
-}
-if (isset($tutorid)) {
-	$istutor = true;
-}
 if (!$isteacher && !$istutor && !isset($studentid)) {
 	echo _('Error - you are not a student, teacher, or tutor for this course');
 	exit;
@@ -121,7 +117,8 @@ if ($canviewall) {
 	$showpercents = 0;
 	$lastlogin = false;
 	$includeduedate = false;
-	$includelastchange = false;
+    $includelastchange = false;
+    $gbmode = '';
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
@@ -900,7 +897,7 @@ function gbstudisp($stu) {
 			$afterduelatepass = false;
 			if (!$isteacher && !$istutor && $latepasses>0 && !isset($gbt[1][1][$i][10])) {
 				//not started, so no canuselatepass record
-				$gbt[1][1][$i][10] = $exceptionfuncs->getCanUseAssessLatePass(array('enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12], 'LPcutoff'=>$gbt[0][1][$i][14]));
+				$gbt[1][1][$i][10] = $exceptionfuncs->getCanUseAssessLatePass(array('id'=>$gbt[0][1][$i][7], 'enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12], 'LPcutoff'=>$gbt[0][1][$i][14]));
 			}
 			/*if (!$isteacher && !$istutor && $latepasses>0  &&	(
 				(isset($gbt[1][1][$i][10]) && $gbt[1][1][$i][10]>0 && !in_array($gbt[0][1][$i][7],$viewedassess)) ||  //started, and already figured it's ok
@@ -914,7 +911,7 @@ function gbstudisp($stu) {
 					$afterduelatepass = true;
 				}
 			}
-			if (!$isteacher && !$istutor && $gbt[1][1][$i][16] == 1) {
+			if (!$isteacher && !$istutor && !empty($gbt[1][1][$i][16])) {
 				echo ' <span class="small"><a href="'.$assessUrl.'?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'#/showwork">[';
 				echo _('Attach Work') .']</a></span>';
 			}
@@ -937,7 +934,7 @@ function gbstudisp($stu) {
 
 			$haslink = false;
 
-			if ($isteacher || $istutor || $gbt[1][1][$i][2]==1) { //show link
+			if ($isteacher || $istutor || !empty($gbt[1][1][$i][2])) { //show link
 				if ($gbt[0][1][$i][6]==0) {//online
 					if ($stu==-1) { //in averages
 						if (isset($gbt[1][1][$i][0])) { //has score
