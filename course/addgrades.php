@@ -11,7 +11,14 @@
 	$istutor = false;
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
-	if (isset($teacherid)) { $isteacher = true;}
+    if (isset($teacherid)) { $isteacher = true;}
+    
+    if (isset($_GET['gbitem'])) {
+        $gbItem = ($_GET['gbitem'] == 'new') ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
+    } else {
+        $gbItem = '';
+    }
+
 	if ($istutor) {
 		$isok = false;
 		if (is_numeric($gbItem)) {
@@ -96,8 +103,6 @@
 
     }
     
-	$gbItem = ($_GET['gbitem'] == 'new') ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
-
 	if ($gbItem != 'new') {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_gbitems WHERE id=?");
 		$stm->execute(array($gbItem));
