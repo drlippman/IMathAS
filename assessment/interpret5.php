@@ -323,7 +323,6 @@ function tokenize($str,$anstype,$countcnt) {
             if ($i<$len) {
                 $c = $str[$i];
             }
-            if ($i >= $len) { break; }
 			$intype = 7;
 		} else if ($c=='$') { //is var
 			$intype = 1;
