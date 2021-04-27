@@ -583,6 +583,9 @@ function draw_circlesector() {
         $in[2] = '';
       }
       $in[2] = preg_replace('/;/',',',$in[2]);
+      if (isset($in[2])) {
+        $altPointLabel = " labeled ".$in[2];
+      }
       $args = $args . "text([".(1.2*$xAngPt).",".(1.2*$yAngPt)."],'$in[2]');";
       $hasPoint = true;
       $altNumPts = $altNumPts + 1;
@@ -595,6 +598,8 @@ function draw_circlesector() {
       $in = preg_replace('/;/',',',$in);
       if (!isset($in[1])) {
         $in[1] = '';
+      } elseif (isset($in[1])) {
+        $altCenterLabel = $in[1];
       }
       if ($ang <= 180) {
         $lab = "text([0,0],'".$in[1]."',below);";
@@ -646,6 +651,7 @@ function draw_circlesector() {
             $degSymbol = '';
           }
         }
+        $altAngleLab = $in[2];
         $in[2] = str_replace($greekSpelled,$greekSymbol,$in[2]);
         // Rotate the label position away from the angle line
         $angLabOffset = [-30+$angLabRad*22,30-$angLabRad*22];
@@ -673,7 +679,10 @@ function draw_circlesector() {
       $lab = "";
       if (!isset($in[1])) {
         $in[1] = '';
+      } elseif (isset($in[1])) {
+        $altRadiusLabel = $in[1];
       }
+      // Really unnecessary way to replace pi with its Greek letter symbol
       if (preg_match('/(^\s*pi[^a-zA-Z]+)|([^a-zA-Z\s]+pi[^a-zA-Z])|([^a-zA-z]pi[^a-zA-Z\s]+)|(^\s*pi\s)|(\spi\s)|(\spi$)|([^a-zA-Z]pi$)|(^pi$)/',$in[1])) {
         $in[1] = str_replace("pi","&pi;",$in[1]);
       }
@@ -723,10 +732,21 @@ function draw_circlesector() {
   } elseif ($ang == 360) {
     $alt = "A complete circle";
   }
-  if ($hasAxes === true) {
-    $altAxes = ", with angle centered on the coordinate axes";
+  if (isset($altAngleLab)) {
+    $alt = $alt." and labeled ".$altAngleLab;
+    if ($degSymbol != '') {
+      $alt = $alt." degrees";
+    }
   }
-  $alt = $alt.$altAxes;
+  if ($hasAxes === true) {
+    $alt = $alt.", with angle centered on the coordinate axes";
+  }
+  if (isset($altCenterLabel)) {
+    $alt = $alt.", with center point labeled ".$altCenterLabel;
+  }
+  if (isset($altRadiusLabel)) {
+    $alt = $alt.", and with radius labeled ".$altRadiusLabel;
+  }
   
   if ($hasPoint === true) {
     foreach ($altPtsArray as $altPt) {
@@ -747,7 +767,7 @@ function draw_circlesector() {
       } elseif ($altPt[0] == 360) {
         $altPointLoc = " at the far right point on the circle";
       }
-      $alt = $alt.", and a point".$altPointLab.$altPointLoc;
+      $alt = $alt.", and a point".$altPointLab.$altPointLoc.$altPointLabel;
     }
   }
   echo $alt;
@@ -820,7 +840,10 @@ function draw_square() {
     $args = $args . "text([-1,1],'$pointLab[3]',above);";
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);rect([-1,-1],[1,1]);$args",$size,$size);
+  // Build alt text
+  $alt = "A square";
+  
+  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);rect([-1,-1],[1,1]);$args",$size,$size,"$alt");
   return $gr;
 }
 
