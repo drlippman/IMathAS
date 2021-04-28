@@ -750,7 +750,9 @@ function showitems($items,$parent,$inpublic=false,$greyitems=0) {
 			   }
 			   $nothidden = true;  $showgreyedout = false;
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
-			   	   && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)) {
+                      && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)
+                      && empty($excused['A'. $line['reqscoreaid']])
+               ) {
 			   	   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 			   	   	   $showgreyedout = true;
 			   	   }

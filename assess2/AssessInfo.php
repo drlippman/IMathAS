@@ -581,6 +581,13 @@ class AssessInfo
         $this->assessData['reqscoreaid'] > 0 &&
         !$this->waiveReqScore()
     ) {
+      $stm = $this->DBH->prepare("SELECT id FROM imas_excused WHERE userid=? AND type='A' AND typeid=?");
+      $stm->execute(array($uid, $this->assessData['reqscoreaid']));
+      if ($stm->rowCount() > 0) {
+          // has excusal for prereq - ignore prereq score
+          return;
+      }
+
       $query = "SELECT iar.score,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
 			$query .= "WHERE ia.id=?";
