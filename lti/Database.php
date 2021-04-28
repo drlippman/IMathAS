@@ -1248,7 +1248,7 @@ class Imathas_LTI_Database implements LTI\Database
 
     private function verify_migration_claim($claim) {
         $key = $claim['oauth_consumer_key'];
-        $query = "SELECT password FROM imas_users WHERE SID=:SID 
+        $query = "SELECT password FROM imas_users WHERE SID=? 
             AND (rights=11 OR rights=76 OR rights=77)";
         $stm = $this->dbh->prepare($query);
         $stm->execute(array($key));
