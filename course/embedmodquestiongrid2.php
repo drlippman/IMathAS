@@ -16,7 +16,12 @@
 		if ($_POST['action'] == 'add') { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
-			list($itemorder, $viddata, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+            list($itemorder, $viddata, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+            if (!isset($_POST['lastitemhash']) || $_POST['lastitemhash'] !== md5($itemorder)) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo '{"error": "Assessment content has changed since last loaded. Reload the page and try again"}';
+                exit;
+            }
 
 			$newitemorder = '';
 			if (isset($_POST['addasgroup'])) {
@@ -99,6 +104,11 @@
 			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$aid));
 			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+            if (!isset($_POST['lastitemhash']) || $_POST['lastitemhash'] !== md5($itemorder)) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo '{"error": "Assessment content has changed since last loaded. Reload the page and try again"}';
+                exit;
+            }
 
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
@@ -156,7 +166,8 @@
         list($jsarr,$existingqs) = getQuestionsAsJSON($cid, $aid);
         
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
+        echo json_encode(['itemarray'=>$jsarr, 'lastitemhash'=>md5($itemorder)], 
+            JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE);
         exit;
 
 	} else {
@@ -198,7 +209,7 @@
             '2' => _('After'),
             '3' => _('During &amp; After')
         ];
-        $defaults['showwork'] = $showworkoptions[$defaults['showwork']];
+        $defaults['showwork'] = $showworkoptions[$defaults['showwork'] & 3];
 
 		$pagetitle = "Question Settings";
 		$placeinhead = '<script type="text/javascript">
@@ -223,6 +234,10 @@
                         url: "embedmodquestiongrid2.php?cid='.$cid.'&aid='.$aid.'",
                         data: $("form").serialize()
                     }).done(function(msg) {
+                        if (msg.hasOwnProperty("error")) {
+                            alert(msg.error);
+                            return;
+                        }
                         window.parent.doneadding(msg);
 		                window.parent.GB_hide();
                     });
@@ -243,6 +258,7 @@
 <div id="headermodquestiongrid" class="pagetitle"><h1>Modify Question Settings</h1></div>
 <p>For more advanced settings, modify the settings for individual questions after adding.</p>
 <form>
+<input type=hidden name="lastitemhash" value="<?php echo Sanitize::encodeStringForDisplay($_GET['lih']);?>" />
 <p>Leave items blank to use the assessment's default values</p>
 <table class=gb>
 <thead><tr>

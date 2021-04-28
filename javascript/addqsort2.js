@@ -1825,7 +1825,8 @@ function submitChanges() {
     data = generateOutput();
     var outdata = {
         order: data[0],
-        text_order: JSON.stringify(data[1])
+        text_order: JSON.stringify(data[1]),
+        lastitemhash: lastitemhash
     };
     if (!beentaken) {
         outdata["pts"] = JSON.stringify(data[2]);
@@ -1846,6 +1847,7 @@ function submitChanges() {
             if (!beentaken) {
                 defpoints = $("#defpts").val();
             }
+            lastitemhash = msg;
             document.getElementById(target).innerHTML = "";
             refreshTable();
             updateInAssessMarkers();
@@ -1883,10 +1885,9 @@ function addusingdefaults(asgroup) {
         type: "POST",
         url: AHAHsaveurl,
         async: false,
-        data: {addnewdef: checked, asgroup: asgroup ? 1 : 0},
+        data: {addnewdef: checked, asgroup: asgroup ? 1 : 0, lastitemhash: lastitemhash},
         dataType: 'json'
     }).done(function (msg) {
-        console.log(msg);
         if (msg.hasOwnProperty('error')) {
             document.getElementById("submitnotice").innerHTML = msg.error;
         } else {
@@ -1898,7 +1899,8 @@ function addusingdefaults(asgroup) {
 }
 
 function doneadding(newq,addedqs) {
-    itemarray = newq;
+    itemarray = newq.itemarray;
+    lastitemhash = newq.lastitemhash;
     refreshTable();
     updateInAssessMarkers();
     $("#selq input[type=checkbox]:checked").prop("checked", false);
@@ -1911,7 +1913,7 @@ function addwithsettings() {
         checked.push(this.value);
     });
     if (checked.length == 0) { return; }
-    GB_show('Question Settings',qsettingsaddr + '&toaddqs=' + checked.join('-'),900,500);
+    GB_show('Question Settings',qsettingsaddr + '&toaddqs=' + checked.join('-') + '&lih=' + lastitemhash,900,500);
 }
 
 function modsettings() {
@@ -1920,7 +1922,7 @@ function modsettings() {
         checked.push(this.value);
     });
     if (checked.length == 0) { return; }
-    GB_show('Question Settings',qsettingsaddr + '&modqs=' + checked.join('-'),900,500);
+    GB_show('Question Settings',qsettingsaddr + '&modqs=' + checked.join('-') + '&lih=' + lastitemhash,900,500);
 }
 
 /*
