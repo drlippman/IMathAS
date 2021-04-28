@@ -331,7 +331,7 @@
         <gb-feedback
           qn="gen"
           :username="aData.userfullname"
-          :show="viewFull && assessFeedback !== ''"
+          :show="viewFull && (canEdit || assessFeedback !== '')"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
