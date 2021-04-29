@@ -1356,6 +1356,7 @@ function processCalcNtuple(fullstr, format) {
   var notationok = true;
   var res = NaN;
   var dec;
+  // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
   fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
   fullstr = fullstr.replace(/<<(.*)>>/, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
@@ -1371,7 +1372,9 @@ function processCalcNtuple(fullstr, format) {
           !fullstr.substring(0,i).match(/[\)\]\>\}]\s*$/)
         ) {
           notationok=false;
-        }
+        } 
+      } else if (i > 0 && fullstr.charAt(i-1) != ',') {
+        notationok=false;
       }
     }
     if (fullstr.charAt(i).match(/[\(\[\<\{]/)) {
