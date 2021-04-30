@@ -17,6 +17,9 @@
         :html = "intro"
         key = "-1"
       />
+      <div v-if="qn == -1">
+        {{ $t('question.intronext') }}
+      </div>
       <inter-question-text-skiplist
         pos = "before"
         :qn = "qn"
