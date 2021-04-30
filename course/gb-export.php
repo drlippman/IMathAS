@@ -39,7 +39,7 @@
 			echo "&emailgb=" . Sanitize::encodeUrlParam($_GET['emailgb']);
 		}
 		echo '" class="nolimit">';
-		if ($_GET['emailgb']=="ask") {
+		if (isset($_GET['emailgb']) && $_GET['emailgb']=="ask") {
 			echo "<span class=\"form\">Email Gradebook To:</span><span class=\"formright\"> <input type=text name=\"email\" size=\"30\"/></span> <br class=\"form\" />";
 		}
 

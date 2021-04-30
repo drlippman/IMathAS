@@ -1363,13 +1363,13 @@ function gbtable() {
 		$gb[$row][1][$col][10] = $canuselatepass;
 
         if (($l['status']&1)>0 && ($thised<$now ||  //unsubmitted by-assess, and due date passed
-            ($l['timelimitexp']>0 && $l['timelimitexp']<$now && !$hastimext)) // or time limit expired on last att
+            ($l['timelimitexp']>0 && $l['timelimitexp']<$now && !$hastimeext)) // or time limit expired on last att
         ) {
 			$IP=0;
 			$UA=1;
 		} else if (($l['status']&3)>0 && // unsubmitted attempt any mode
             ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && // and before due date
-            ($l['timelimitexp']==0 || $l['timelimitexp']>$now || $hastimext) // and time limit not expired
+            ($l['timelimitexp']==0 || $l['timelimitexp']>$now || $hastimeext) // and time limit not expired
         ) {
 			$IP=1;
 			$UA=0;
