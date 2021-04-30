@@ -97,6 +97,11 @@ if (!$assess_record->hasUnsubmittedAttempt()) {
   exit;
 }
 
+// If in practice, now we overwrite settings
+if ($in_practice) {
+    $assess_info->overridePracticeSettings();
+}
+
 // if livepoll, look up status and verify
 if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $stm = $DBH->prepare("SELECT * FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
@@ -111,11 +116,6 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
     $assess_info->overrideSetting('showscores', 'at_end');
     $assess_info->overrideSetting('showans', 'never');
   }
-}
-
-// If in practice, now we overwrite settings
-if ($in_practice) {
-  $assess_info->overridePracticeSettings();
 }
 
 // grab any assessment info fields that may have updated:
