@@ -34,7 +34,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("&&\n","<br/>",$str);
     $str = preg_replace('/&\s*\n/', ' ', $str);
-		$r =  interpretline($str.';',$anstype,$countcnt).';';
+        $r =  interpretline($str.';',$anstype,$countcnt).';';
 		return $r;
 	}
 }
@@ -66,7 +66,7 @@ function interpretline($str,$anstype,$countcnt) {
 	$closeparens = 0;
 	$symcnt = 0;
 	//get tokens from tokenizer
-	$syms = tokenize($str,$anstype,$countcnt);
+    $syms = tokenize($str,$anstype,$countcnt);
 	$k = 0;
 	$symlen = count($syms);
 	//$lines holds lines of code; $bits holds symbols for the current line.
@@ -633,7 +633,13 @@ function tokenize($str,$anstype,$countcnt) {
 				$connecttolast = 0;
 				if ($c=='[') {// multidim array ref?
 					$connecttolast = 1;
-				}
+                }
+                if ($connecttolast == 0 && 
+                    (substr($syms[count($syms)-1][0],0,12) == '$stuanswers[' ||
+                    substr($syms[count($syms)-1][0],0,15) == '$stuanswersval[')
+                ) {
+                    $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? null)';
+                }
 			}
 		} else {
 			//add to symbol list, avoid repeat end-of-lines.

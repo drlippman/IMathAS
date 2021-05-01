@@ -4811,6 +4811,9 @@ function stuansready($stu, $qn, $parts) {
     if (!isset($stu[$qn]) || !is_array($stu[$qn])) {
         return false;
     }
+    if (!is_array($parts) && is_numeric($parts)) {
+        $parts = [$parts];
+    }
     foreach ($parts as $part) {
         $ors = array_map('trim', explode(' or ', $part));
         $partok = false;
