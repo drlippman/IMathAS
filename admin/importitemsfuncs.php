@@ -104,7 +104,10 @@ public function importdata($data, $cid, $checked, $options) {
 	}
 	if (!isset($this->options['importlib'])) {
 		$this->options['importlib'] = 0;
-	}
+    }
+    if (!isset($this->options['skipcopyrighted'])) {
+		$this->options['skipcopyrighted'] = 1;
+    }
 
 	$stm = $DBH->prepare("SELECT itemorder,blockcnt,ownerid,dates_by_lti FROM imas_courses WHERE id=?");
 	$stm->execute(array($this->cid));
@@ -225,12 +228,12 @@ public function importdata($data, $cid, $checked, $options) {
 	return array(
 		'Questions Added'=>$this->qsadded,
 		'Questions Updated'=>$this->qmodcnt,
-		'InlineText Imported'=>ecount($this->typemap['InlineText']),
-		'Linked Imported'=>ecount($this->typemap['LinkedText']),
-		'Forums Imported'=>ecount($this->typemap['Forum']),
-		'Assessments Imported'=>ecount($this->typemap['Assessment']),
-		'Drills Imported'=>ecount($this->typemap['Drill']),
-		'Wikis Imported'=>ecount($this->typemap['Wiki'])
+		'InlineText Imported'=>ecount($this->typemap['InlineText'] ?? 0),
+		'Linked Imported'=>ecount($this->typemap['LinkedText'] ?? 0),
+		'Forums Imported'=>ecount($this->typemap['Forum'] ?? 0),
+		'Assessments Imported'=>ecount($this->typemap['Assessment'] ?? 0),
+		'Drills Imported'=>ecount($this->typemap['Drill'] ?? 0),
+		'Wikis Imported'=>ecount($this->typemap['Wiki'] ?? 0)
 		);
 }
 
@@ -376,7 +379,10 @@ private function importQuestionSet() {
 		if ($this->data['items'][$item]['type']=='Assessment') {
 			$qids = $this->getAssessQids($this->data['items'][$item]['data']['itemorder']);
 			foreach ($qids as $qid) {
-				$qsid = $this->data['questions'][$qid]['questionsetid'];
+                $qsid = $this->data['questions'][$qid]['questionsetid'];
+                if ($this->data['questionset'][$qsid]['license'] == 0 && $this->options['skipcopyrighted']) {
+                    continue; // skip it
+                }
 				$qstoimport[] = $qsid;
 				if (isset($this->data['questionset'][$qsid]['dependencies'])) {
 					$qstoimport = array_merge($qstoimport, $this->data['questionset'][$qsid]['dependencies']);
@@ -854,6 +860,10 @@ private function insertAssessment() {
 		$qids = $this->getAssessQids($this->data['items'][$toimport]['data']['itemorder']);
 		$exarr = array();
 		foreach ($qids as $qid) {
+            if (!isset($this->qsmap[$this->data['questions'][$qid]['questionsetid']])) {
+                // if question was skipped in import, skip here too
+                continue;
+            }
 			$tomap[] = $qid;
 			//remap questionsetid
 			$this->data['questions'][$qid]['questionsetid'] = $this->qsmap[$this->data['questions'][$qid]['questionsetid']];
@@ -902,25 +912,42 @@ private function insertAssessment() {
 		}
 		//remap itemorder and collapse
 		$mappedqpoints = array();
-		$aitems = $thisitemdata['itemorder'];
+        $aitems = $thisitemdata['itemorder'];
+        $newitems = [];
 		foreach ($aitems as $i=>$q) {
 			if (is_array($q)) {
+                $newsub = []; 
+                $haspreamble = false;
 				foreach ($q as $k=>$subq) {
-					if ($k==0 && strpos($subq,'|')!==false) {continue;}
+                    if ($k==0 && strpos($subq,'|')!==false) { // is start of group marker
+                        $newsub[] = $subq;
+                        $haspreamble = true;
+                        continue;
+                    }
 					if (isset($qpoints[$subq])) {
 						$mappedqpoints[$this->qmap[$subq]] = $qpoints[$subq];
-					}
-					$q[$k] = $this->qmap[$q[$k]];
-				}
-				$aitems[$i] = implode('~',$q);
-			} else {
-				$aitems[$i] = $this->qmap[$q];
+                    }
+                    if (isset($this->qmap[$q[$k]])) {
+                        $newsub[] = $this->qmap[$q[$k]];
+                    }
+                }
+                if (count($newsub) == 1) { // if only one in group, ungroup
+                    if (!$haspreamble) {
+                        $newitems[] = $newsub[0];
+                    }
+                } else if ($haspreamble && count($newsub) == 2) {
+                    $newitems[] = $newsub[1];
+                } else {
+                    $newitems[] = implode('~',$newsub);
+                }
+			} else if (isset($this->qmap[$q])) {
+				$newitems[] = $this->qmap[$q];
 				if (isset($qpoints[$q])) {
 					$mappedqpoints[$this->qmap[$q]] = $qpoints[$q];
 				}
 			}
 		}
-		$aitemorder = implode(',', $aitems);
+		$aitemorder = implode(',', $newitems);
 		if (!isset($thisitemdata['ptsposs']) || $thisitemdata['ptsposs']==-1) {
 			$thisitemdata['ptsposs'] = calcPointsPossible($aitemorder, $mappedqpoints, $thisitemdata['defpoints']);
 		}
