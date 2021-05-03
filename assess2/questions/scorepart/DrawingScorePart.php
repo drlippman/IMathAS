@@ -838,7 +838,7 @@ class DrawingScorePart implements ScorePart
                             $rats[] = array($pts[1],$pts[2],$yp);
                         }
                     } else if ($pts[0]==9 || $pts[0]==9.1) {
-                        if ($pts[0]==9.1) {
+                        if ($pts[0]==9.1) { // sine, convert to cos points
                             $pts[1] -= ($pts[3] - $pts[1]);
                             $pts[2] -= ($pts[4] - $pts[2]);
                         }
@@ -1309,14 +1309,15 @@ class DrawingScorePart implements ScorePart
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($coss); $i++) {
                     $per = abs($anscos[0] - $anscos[1])*2;
+                    // make sure horizontal shift is ok
                     $adjdiff = abs($anscos[0]-$coss[$i][0]);
                     $adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
                     if ($adjdiff>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $adjdiff = abs($anscos[1]-$coss[$i][1]);
-                    $adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
-                    if ($adjdiff>$defpttol*$reltolerance) {
+                    // check period is OK
+                    $per2 = abs($coss[$i][0] - $coss[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
                         continue;
                     }
                     if (abs($anscos[2]-$coss[$i][2])>$defpttol*$reltolerance) {
