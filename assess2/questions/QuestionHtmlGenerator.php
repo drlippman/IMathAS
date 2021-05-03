@@ -154,6 +154,15 @@ class QuestionHtmlGenerator
                 $doShowAnswer = true;
             }
         }
+        if ($quesData['qtype'] == "multipart") {
+            // if multipart only has one part, need to re-array scoreiscorrect
+            if (isset($scoreiscorrect[$thisq]) && !is_array($scoreiscorrect[$thisq])) {
+                $scoreiscorrect[$thisq] = array($scoreiscorrect[$thisq]);
+            }
+            if (isset($scorenonzero[$thisq]) && !is_array($scorenonzero[$thisq])) {
+                $scorenonzero[$thisq] = array($scorenonzero[$thisq]);
+            }
+        }
         if ($attemptn == 0) {
           $GLOBALS['assess2-curq-iscorrect'] = -1;
         } else {

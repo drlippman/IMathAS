@@ -3653,11 +3653,11 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 		return '';
 	}
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
-		$val = $GLOBALS['assess2-curq-iscorrect'];
-		if ($partn !== null && is_array($GLOBALS['assess2-curq-iscorrect'])) {
-			$res = $GLOBALS['assess2-curq-iscorrect'][$partn];
+		$val = $GLOBALS['assess2-curq-iscorrect'] ?? -1;
+		if ($partn !== null && is_array($val)) {
+			$res = $val[$partn];
 		} else {
-			$res = $GLOBALS['assess2-curq-iscorrect'];
+			$res = $val;
 		}
 		if ($res > 0 && $res < 1) {
 			$res = 0;

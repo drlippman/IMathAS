@@ -640,6 +640,12 @@ function tokenize($str,$anstype,$countcnt) {
                 ) {
                     $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? null)';
                 }
+                if ($connecttolast == 0 && 
+                    (substr($syms[count($syms)-1][0],0,16) == '$scoreiscorrect[' ||
+                    substr($syms[count($syms)-1][0],0,14) == '$scorenonzero[')
+                ) {
+                    $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? -1)';
+                }
 			}
 		} else {
 			//add to symbol list, avoid repeat end-of-lines.
