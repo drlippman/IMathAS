@@ -513,7 +513,7 @@ class DrawingAnswerBox implements AnswerBox
             $_SESSION['graphdisp'] = 0;
         }
         $tip = _('Enter your answer by drawing on the graph.');
-        if (!empty($answers)) {
+        if (is_array($answers) && (count($answers)>1 || $answers[0] !== '')) {
             $saarr = array();
             $ineqcolors = array("blue", "red", "green");
             $k = 0;
