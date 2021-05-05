@@ -646,6 +646,11 @@ function tokenize($str,$anstype,$countcnt) {
                 ) {
                     $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? -1)';
                 }
+                if ($connecttolast == 0 && 
+                    substr($syms[count($syms)-1][0],0,14) == '$partattemptn['
+                ) {
+                    $syms[count($syms)-1][0] = '('.$syms[count($syms)-1][0].' ?? 0)';
+                }
 			}
 		} else {
 			//add to symbol list, avoid repeat end-of-lines.

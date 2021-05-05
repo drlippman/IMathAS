@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples");
+ "array_values","comparelogic","stuansready","comparentuples","isset");
 
 function mergearrays() {
 	$args = func_get_args();

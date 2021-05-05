@@ -2865,6 +2865,8 @@ have been answered, instead of checking for null.
 <li><strong>$scoreiscorrect</strong>: This variable is only available on display, not during scoring. $scoreiscorrect[$thisq] (or $scoreiscorrect[$thisq][partindex] for multipart)
    will be -1 if the question is unanswered, 1 if the score (before any penalties) is perfect, and 0 otherwise.</li>
 <li><strong>$attemptn</strong>: This variable holds the attempt number of the current attempt.  0 is the initial attempt, 1 is the next attempt, etc.</li>
+<li><strong>$partattemptn[part number]</strong>: For multipart questions, this holds the attempt 
+    number on each part.</li>
 <li><strong>$requestclearla</strong>:  If you set $requestclearla=true in your code, it will request the display to clear out the student's last answer.
   This might be useful if your question branches based on attempt count.  Example: <code>$requestclearla = true if ($attemptn==2 &amp;&amp; !$scoreiscorrect[$thisq])</code></li>
 </ul>
