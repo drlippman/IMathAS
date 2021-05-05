@@ -2026,6 +2026,10 @@ $str = &quot;What is $a/$b&quot;
 In this example, $str now contains &quot;What is 3/5&quot;.
 </p>
 <p>Note that strings in single quotes will not interpolate variables</p>
+<p>As a warning, strings are interpolated literally, so if you had $a = -4 and 
+    then defined $b = "$a^2" you would end up with "-4^2", which may not be 
+    what you intended.  Use explicit parentheses in these cases.
+</p>
 
 <p><strong>Array assignment</strong></p>
 <p>
@@ -2044,6 +2048,9 @@ like $string = "there were {$ar[0]} people".
 </p><p>
 You can also literally define an array using the &quot;array&quot; function.
 Examples:  $ar = array(2,3,4,5), or $ar = array(&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;)
+</p>
+<p>You can also use a shorthand notation for an array, using square brackets. 
+    Example: $ar = [2,3,4,5].
 </p>
 
 <p><strong>Working with Strings</strong></p>
