@@ -2314,7 +2314,11 @@ function gbtable() {
 
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
-					if (isset($gb[$i][1][$j][3]) && $gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
+					if (is_numeric($gb[$i][1][$j][0]) && //if score is numeric
+						(!isset($gb[$i][1][$j][3]) || $gb[$i][1][$j][3]%10==0 || $gb[$i][1][$j][3]%10==3)
+						// and score status marker not set, or regular, or OT
+						// excludes NC, PT, UA
+					) {
 						$avgs[] = $gb[$i][1][$j][0];
 						if ($limuser==-1 && $gb[0][1][$j][6]==0) { //for online, if showning avgs
 							$avgtime[] = $gb[$i][1][$j][7];
