@@ -1331,7 +1331,7 @@ function gbstudisp($stu) {
 			$outcometype = 1;
 		}
 		if (($show&4)==4) {
-			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '</dd><br/>';
+			echo _('<dt>Past Due and Available:</dt> <dd> total includes items whose due date has passed as well as currently available items, even if you haven\'t started working on them yet.'), '</dd><br/>';
 		}
 		if (($show&8)==8) {
 			echo _('<dt>All:</dt> <dd> total includes all items: past, current, and future to-be-done items.'), '</dd><br/>';
