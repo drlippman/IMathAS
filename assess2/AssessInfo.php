@@ -30,14 +30,15 @@ class AssessInfo
   * @param mixed $questions   questions to load settings for.
   *                           accepts false for no load, 'all' for all,
   *                           or an array of question IDs.
+  * @param bool $forcecodeload true to force load of question code
   */
-  function __construct($DBH, $aid, $cid, $questions = false) {
+  function __construct($DBH, $aid, $cid, $questions = false, $forcecodeload = false) {
     $this->DBH = $DBH;
     $this->curAid = $aid;
     $this->cid = $cid;
     $this->loadAssessSettings();
     if ($questions !== false) {
-      $get_code = ($this->assessData['displaymethod'] === 'full');
+      $get_code = ($this->assessData['displaymethod'] === 'full' || $forcecodeload);
       $this->loadQuestionSettings($questions, $get_code);
     }
   }
@@ -580,6 +581,13 @@ class AssessInfo
         $this->assessData['reqscoreaid'] > 0 &&
         !$this->waiveReqScore()
     ) {
+      $stm = $this->DBH->prepare("SELECT id FROM imas_excused WHERE userid=? AND type='A' AND typeid=?");
+      $stm->execute(array($uid, $this->assessData['reqscoreaid']));
+      if ($stm->rowCount() > 0) {
+          // has excusal for prereq - ignore prereq score
+          return;
+      }
+
       $query = "SELECT iar.score,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
 			$query .= "WHERE ia.id=?";

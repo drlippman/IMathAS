@@ -751,7 +751,7 @@ function outcometable() {
 		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][2] = 0;  //no other info
-		} else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
+		}/* else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
 		//else if ($pts<$minscores[$i]) {
 			if ($canviewall) {
 				$gb[$row][1][$col][0] = $pts; //the score
@@ -760,7 +760,7 @@ function outcometable() {
 				$gb[$row][1][$col][0] = 'NC'; //score is No credit
 				$gb[$row][1][$col][2] = 1;  //no credit
 			}
-		} else if ($IP==1) {
+		}*/ else if ($IP==1) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][2] = 2;  //in progress
 			$countthisone =true;

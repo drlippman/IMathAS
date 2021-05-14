@@ -169,7 +169,7 @@ class MultipleAnswerAnswerBox implements AnswerBox
             $out .= "</div>";
         }
         $tip = _('Select all correct answers');
-        if (!empty($answers)) {
+        if ($answers !== '') {
             $ansor = explode(' or ', $answers);
             foreach ($ansor as $k => $answers) {
                 $akeys = array_map('trim', explode(',', $answers));

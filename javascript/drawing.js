@@ -53,8 +53,8 @@
 	8.4: log (unshifted)
 	8.5: exponential (shifted)
 	8.6: log (shifted)
-	9: sine
-	9.1: cosine
+	9: cosine
+	9.1: sine
    ineqtypes
    	10: linear >= or <=
    	10.2: linear < or >
@@ -248,7 +248,7 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"trig": [
 				{"mode":9, "descr":_("Cosine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point half a phase further")},
-				{"mode":9.2, "descr":_("Sine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point a quarter phase further")}
+				{"mode":9.1, "descr":_("Sine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point a quarter phase further")}
 			],
 			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
 		},

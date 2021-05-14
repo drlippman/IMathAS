@@ -29,7 +29,7 @@
 			if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {
 				$tex = '\\reverse '.$tex;
 			}
-			if ($GLOBALS['texdisp']==true) {
+			if (!empty($GLOBALS['texdisp'])) {
 				if (isset($GLOBALS['texdoubleescape'])) {
 					return ' \\\\('.htmlentities($tex).'\\\\) ';
 				} else {

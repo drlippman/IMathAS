@@ -36,7 +36,7 @@ array_push($GLOBALS['allowedmacros'],"exp","sec","csc","cot","sech","csch","coth
  "mergeplots","array_unique","ABarray","scoremultiorder","scorestring","randstate",
  "randstates","prettysmallnumber","makeprettynegative","rawurlencode","fractowords",
  "randcountry","randcountries","sorttwopointdata","addimageborder","formatcomplex",
- "array_values","comparelogic","stuansready","comparentuples");
+ "array_values","comparelogic","stuansready","comparentuples","isset");
 
 function mergearrays() {
 	$args = func_get_args();
@@ -2595,17 +2595,18 @@ function definefunc($func,$varlist) {
 }
 
 function getstuans($v,$q,$i=0,$blankasnull=true) {
+    if (!isset($v[$q])) { return null;}
 	if (is_array($v[$q])) {
-    if (!isset($v[$q][$i])) {
-      return null;
-    } else if ($blankasnull && ($v[$q][$i]==='' || $v[$q][$i]==='NA')) {
-      return null;
-    }
+        if (!isset($v[$q][$i])) {
+            return null;
+        } else if ($blankasnull && ($v[$q][$i]==='' || $v[$q][$i]==='NA')) {
+            return null;
+        }
 		return $v[$q][$i];
 	} else {
-    if ($blankasnull && ($v[$q]==='' || $v[$q]==='NA')) {
-      return null;
-    }
+        if ($blankasnull && ($v[$q]==='' || $v[$q]==='NA')) {
+            return null;
+        }
 		return $v[$q];
 	}
 }
@@ -3396,7 +3397,7 @@ function cleantokenize($str,$funcs) {
 			if ($j==$len) {
 				$i = $j;
 				echo "unmatched parens/brackets - likely will cause an error";
-			} else {
+			} else if ($i<$len) {
 				$c = $str[$i];
 			}
 		} else if ($c=='"' || $c=="'") { //string
@@ -3411,8 +3412,10 @@ function cleantokenize($str,$funcs) {
 			} while (!($c==$qtype && $lastc!='\\'));
 			$out .= $c;
 
-			$i++;
-			$c = $str[$i];
+            $i++;
+            if ($i<$len) {
+                $c = $str[$i];
+            }
 		}  else {
 			//no type - just append string.  Could be operators
 			$out .= $c;
@@ -3650,11 +3653,11 @@ function getfeedbackbasic($correct,$wrong,$thisq,$partn=null) {
 		return '';
 	}
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
-		$val = $GLOBALS['assess2-curq-iscorrect'];
-		if ($partn !== null && is_array($GLOBALS['assess2-curq-iscorrect'])) {
-			$res = $GLOBALS['assess2-curq-iscorrect'][$partn];
+		$val = $GLOBALS['assess2-curq-iscorrect'] ?? -1;
+		if ($partn !== null && is_array($val)) {
+			$res = $val[$partn];
 		} else {
-			$res = $GLOBALS['assess2-curq-iscorrect'];
+			$res = $val;
 		}
 		if ($res > 0 && $res < 1) {
 			$res = 0;
@@ -4807,6 +4810,9 @@ function comparentuples() {
 function stuansready($stu, $qn, $parts) {
     if (!isset($stu[$qn]) || !is_array($stu[$qn])) {
         return false;
+    }
+    if (!is_array($parts) && is_numeric($parts)) {
+        $parts = [$parts];
     }
     foreach ($parts as $part) {
         $ors = array_map('trim', explode(' or ', $part));

@@ -40,14 +40,16 @@ if ($isActualTeacher && isset($_GET['uid'])) {
 
 $now = time();
 
+$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 // load settings including question info
-$assess_info = new AssessInfo($DBH, $aid, $cid, 'all');
+$assess_info = new AssessInfo($DBH, $aid, $cid, 'all', $preview_all);
 $assess_info->loadException($uid, $isstudent);
 if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-$preview_all = ($canViewAll && !empty($_POST['preview_all']));
+
 
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {

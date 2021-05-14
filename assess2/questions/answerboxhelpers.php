@@ -726,8 +726,15 @@ function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
                         // we have an array at the part index
                         return $options[$key][$partnum];
                     } else {
-                        // no array at part index, so array must be intended for all parts
-                        return $options[$key];
+                        // no array at part index
+                        // check if entries that do exist are arrays
+                        if (is_array(current($options[$key]))) {
+                            // other entries are array, so this one just isn't defined
+                            // do nothing
+                        } else {
+                            // so array must be intended for all parts
+                            return $options[$key];
+                        }
                     }
                 } // else invalid value - should be array
             } else {

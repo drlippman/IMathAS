@@ -768,10 +768,14 @@ function gbtable() {
 				}
 				if (!empty($allowlate[$k]) && $allowlate[$k]>0) {
 					$gb[0][1][$pos][12] = $allowlate[$k];
-				}
+				} else {
+                    $gb[0][1][$pos][12] = 0;
+                }
 				if (isset($LPcutoff[$k])) {
 					$gb[0][1][$pos][14] = $LPcutoff[$k];
-				}
+				} else {
+                    $gb[0][1][$pos][14] = 0;
+                }
 				if (isset($uiver[$k])) {
 					$gb[0][1][$pos][15] = $uiver[$k];
 				}
@@ -1359,13 +1363,13 @@ function gbtable() {
 		$gb[$row][1][$col][10] = $canuselatepass;
 
         if (($l['status']&1)>0 && ($thised<$now ||  //unsubmitted by-assess, and due date passed
-            ($l['timelimitexp']>0 && $l['timelimitexp']<$now && !$hastimext)) // or time limit expired on last att
+            ($l['timelimitexp']>0 && $l['timelimitexp']<$now && !$hastimeext)) // or time limit expired on last att
         ) {
 			$IP=0;
 			$UA=1;
 		} else if (($l['status']&3)>0 && // unsubmitted attempt any mode
             ($thised>$now || !empty($GLOBALS['alwaysshowIP'])) && // and before due date
-            ($l['timelimitexp']==0 || $l['timelimitexp']>$now || $hastimext) // and time limit not expired
+            ($l['timelimitexp']==0 || $l['timelimitexp']>$now || $hastimeext) // and time limit not expired
         ) {
 			$IP=1;
 			$UA=0;
@@ -1493,7 +1497,9 @@ function gbtable() {
 
 		if (($l['status']&128)>0) { // accepting showwork after assess
 			$gb[$row][1][$col][16] = 1;
-		}
+		} else {
+            $gb[$row][1][$col][16] = 0;
+        }
 		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 			$gb[$row][1][$col][1] = buildFeedback2($l['scoreddata']);
 			if ($gb[$row][1][$col][1] == '') {
@@ -2308,7 +2314,11 @@ function gbtable() {
 
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
-					if (isset($gb[$i][1][$j][3]) && $gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
+					if (is_numeric($gb[$i][1][$j][0]) && //if score is numeric
+						(!isset($gb[$i][1][$j][3]) || $gb[$i][1][$j][3]%10==0 || $gb[$i][1][$j][3]%10==3)
+						// and score status marker not set, or regular, or OT
+						// excludes NC, PT, UA
+					) {
 						$avgs[] = $gb[$i][1][$j][0];
 						if ($limuser==-1 && $gb[0][1][$j][6]==0) { //for online, if showning avgs
 							$avgtime[] = $gb[$i][1][$j][7];
@@ -2455,12 +2465,14 @@ function gbtable() {
 				$k = $assessidx[$gbitem[7]];
 				$gb[1][1][$col][13] = 1;
 				if (isset($reqscores[$k]) && $reqscores[$k]['aid']>0) {
-					$colofprereq = $assesscol[$reqscores[$k]['aid']];
-					if (!isset($gb[1][1][$colofprereq][0]) ||
-					   ($reqscores[$k]['calctype']==0 && $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) ||
-					   ($reqscores[$k]['calctype']==2 && 100*$gb[1][1][$colofprereq][0]/$gb[0][1][$colofprereq][2]+1e-4 < $reqscores[$k]['score'])) {
-						$gb[1][1][$col][13] = 0;
-					}
+                    $colofprereq = $assesscol[$reqscores[$k]['aid']];
+                    if (empty($gb[1][1][$colofprereq][14])) {
+                        if (!isset($gb[1][1][$colofprereq][0]) ||
+                        ($reqscores[$k]['calctype']==0 && $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) ||
+                        ($reqscores[$k]['calctype']==2 && 100*$gb[1][1][$colofprereq][0]/$gb[0][1][$colofprereq][2]+1e-4 < $reqscores[$k]['score'])) {
+                            $gb[1][1][$col][13] = 0;
+                        }
+                    }
 				}
 			}
 		}

@@ -71,6 +71,9 @@ if (!(isset($teacherid))) {
     if (isset($adminasteacher) && $adminasteacher && isset($_POST['importasteacher'])) {
         $options['usecourseowner'] = true;
     }
+    if ($myrights == 100 && isset($_POST['importcopyrighted'])) {
+        $options['skipcopyrighted'] = false;
+    }
 
     $importer = new ImportItemClass();
     $res = $importer->importdata($data, $cid, $_POST['checked'], $options);
@@ -206,6 +209,11 @@ echo $curBreadcrumb;
 		</select>
 		<br/><input type="checkbox" name="reuseqrights" checked /> <?php echo _('Use rights in import, if available.'); ?>
 	</p>
+    <?php 
+        if ($myrights == 100) {
+            echo '<p><label><input type="checkbox" name="importcopyrighted" /> '._('Import copyrighted questions?').'</label></p>';
+        }
+    ?>
 	<p>
 	<?php echo _('Assign Added Questions to library:'); ?>
 	<span id="libnames">Unassigned</span>

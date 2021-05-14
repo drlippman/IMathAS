@@ -6737,11 +6737,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($adjdiff>$defpttol*$reltolerance) {
 						continue;
 					}
-					$adjdiff = abs($anscos[1]-$coss[$i][1]);
-					$adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
-					if ($adjdiff>$defpttol*$reltolerance) {
-						continue;
-					}
+					// check period is OK
+                    $per2 = abs($coss[$i][0] - $coss[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
+                        continue;
+                    }
 					if (abs($anscos[2]-$coss[$i][2])>$defpttol*$reltolerance) {
 						continue;
 					}

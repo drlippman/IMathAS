@@ -32,7 +32,7 @@ class ConditionalScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $answer = $options['answer'];
+        $answer = $options['answer'] ?? false;
         if (isset($options['abstolerance'])) {$abstolerance = $options['abstolerance'];}
         if (isset($options['reltolerance'])) {$reltolerance = $options['reltolerance'];}
         if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}

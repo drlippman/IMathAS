@@ -125,7 +125,8 @@
     "jump_warn": "This will use up your remaining tries at this version of the question.",
     "showwork": "Show work here by typing it or attaching a file or picture",
     "uploadwork": "Show work here by attaching a file or picture",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "intronext": "To begin, select a question using the selector above, or press the > Next button"
   },
   "header": {
     "score": "Score: {pts}/{poss}",
