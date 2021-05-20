@@ -3602,6 +3602,12 @@ class AssessRecord
           $out[$pn][] = $outstr;
         } else if ($qtype == 'essay') {
           $out[$pn][] = $parttrydata[$tn]['stuans'];
+        } else if (($qtype == 'matrix' || $qtype == 'calcmatrix') && isset($GLOBALS['answersize'][$partref])) {
+          $chunks = array_chunk(explode('|', $parttrydata[$tn]['stuans']), $GLOBALS['answersize'][$partref][1]);
+          foreach ($chunks as $k=>$v) {
+              $chunks[$k] = implode(',', $v);
+          }
+          $out[$pn][] = Sanitize::encodeStringForDisplay('`[(' . implode('),(', $chunks) . ')]`');
         } else {
           $out[$pn][] = Sanitize::encodeStringForDisplay($parttrydata[$tn]['stuans']);
         }

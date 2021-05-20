@@ -58,6 +58,9 @@ class CalculatedMatrixAnswerBox implements AnswerBox
 
             if (empty($answerboxsize)) {$answerboxsize = 3;}
             $answersize = explode(",", $answersize);
+            if (isset($GLOBALS['capturechoices'])) {
+                $GLOBALS['answersize'][$qn] = $answersize;
+            }
             if ($colorbox == '') {
                 $out .= '<div id="qnwrap' . $qn . '">';
             } else {
