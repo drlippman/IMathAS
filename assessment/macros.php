@@ -3161,6 +3161,7 @@ function cleanbytoken($str,$funcs = array()) {
                         //4+x^1 -> 4+x, 4x^1 -> 4x,   x/1 -> x
                         array_pop($out);
                         $dontuse = true;
+                        continue;
                     }
                 } else if ($out[$lastout]=='_') {
                     $out[] = 1;
