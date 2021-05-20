@@ -4808,12 +4808,15 @@ function comparentuples() {
   }
 }
 
-function stuansready($stu, $qn, $parts) {
+function stuansready($stu, $qn, $parts, $anstypes = null) {
     if (!isset($stu[$qn]) || !is_array($stu[$qn])) {
         return false;
     }
     if (!is_array($parts) && is_numeric($parts)) {
         $parts = [$parts];
+    }
+    if ($anstypes !== null && !is_array($anstypes)) {
+        $anstypes = array_map('trim', explode(',', $anstypes));
     }
     foreach ($parts as $part) {
         $ors = array_map('trim', explode(' or ', $part));
@@ -4823,6 +4826,14 @@ function stuansready($stu, $qn, $parts) {
             if (is_string($v) && $v[0]=='~') {
                 $blankok = true;
                 $v = substr($v,1);
+            }
+            echo $stu[$qn][$v];
+            if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
+                isset($stu[$qn][$v]) && (strpos($stu[$qn][$v],'||')!==false || 
+                $stu[$qn][$v][0] === '|' || $stu[$qn][$v][strlen($stu[$qn][$v])-1] === '|')
+            ) {
+                // empty looking matrix entry
+                continue;
             }
             if (isset($stu[$qn][$v]) && ($blankok || trim($stu[$qn][$v]) !== '')) {
                 $partok = true; 
