@@ -48,8 +48,8 @@
 	$haspoints = ($pointspos>0);
 
 	$canviewall = (isset($teacherid) || isset($tutorid));
-	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
-	$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit<2));
+	$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
+	$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit!=2));
 	$allowreply = ($canviewall || (time()<$replyby));
 
 	$caller = "byname";

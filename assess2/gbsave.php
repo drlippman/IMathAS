@@ -44,7 +44,7 @@ $feedbacks = json_decode($_POST['feedback'], true);
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 if ($istutor) {
   $tutoredit = $assess_info->getSetting('tutoredit');
-  if ($tutoredit != 1) { // no Access for editing scores
+  if (($tutoredit&1) != 1) { // no Access for editing scores
     echo '{"error": "no_access"}';
     exit;
   }

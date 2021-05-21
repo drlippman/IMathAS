@@ -29,7 +29,7 @@
         exit;
     }
 
-	if ($isteacher || ($istutor && ($tutoredit == 1 || $tutoredit == 3))) {
+	if ($isteacher || ($istutor && ($tutoredit&1) == 1 )) {
 		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
@@ -260,7 +260,7 @@
     echo '<p>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
     echo '<a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',false)">'.('None').'</a>. ';
     
-    if ($isteacher || ($istutor && ($tutoredit == 1 || $tutoredit == 3))) {
+    if ($isteacher || ($istutor && ($tutoredit&1) == 1)) {
         echo _('With selected:');
         echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
         echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
