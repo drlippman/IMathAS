@@ -17,8 +17,7 @@ if ($caller=="posts") {
 	$returnurl = "posts.php?view=$view&cid=$cid&page=$page&forum=$forumid&thread=$threadid";
 	$returnname = "Posts";
 } else if ($caller=="byname") {
-	$threadid = Sanitize::onlyInt($_GET['thread']);
-	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid&thread=$threadid";
+	$returnurl = "postsbyname.php?cid=$cid&forum=$forumid";
 	$returnname = "Posts by Name";
 
 } else if ($caller=='thread') {
