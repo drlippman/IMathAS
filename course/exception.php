@@ -63,7 +63,13 @@ if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 
 $curBreadcrumb .= "<a href=\"$backurl\">Assessment Detail</a> &gt Make Exception\n";
 
-if (!(isset($teacherid))) { // loaded by a NON-teacher
+if (isset($tutorid)) {
+    $stm = $DBH->prepare('SELECT tutoredit FROM imas_assessments WHERE id=?');
+    $stm->execute([$aid]);
+    $tutoredit = $stm->fetchColumn(0);
+}
+
+if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to log in as a teacher to access this page";
 } elseif (!(isset($_GET['cid']))) {
