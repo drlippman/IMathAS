@@ -172,7 +172,7 @@ export default {
         this.qn < store.assessInfo.questions.length - 1);
     },
     submitClass () {
-      return (store.assessInfo.submitby === 'by_assessment')
+      return (store.assessInfo.submitby === 'by_assessment' || !this.questionData.canretry_primary)
         ? 'secondary' : 'primary';
     },
     showScore () {

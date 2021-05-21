@@ -1150,6 +1150,7 @@ export const actions = {
         const thisq = data.questions[i];
 
         data.questions[i].canretry = (thisq.try < thisq.tries_max);
+        data.questions[i].canretry_primary = data.questions[i].canretry;
         data.questions[i].tries_remaining = thisq.tries_max - thisq.try;
         if (thisq.hasOwnProperty('parts')) {
           let trymin = 1e10;
@@ -1172,7 +1173,7 @@ export const actions = {
               canretrydet = true;
             }
           }
-          data.questions[i].canretry = canretrydet;
+          data.questions[i].canretry_primary = canretrydet;
           if (trymin !== trymax) {
             data.questions[i].tries_remaining_range = [trymin, trymax];
           }
