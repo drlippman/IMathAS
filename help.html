@@ -2579,14 +2579,15 @@ These macros are used to test various conditions.  They typically return true or
   if it's a single part question) and this will return the corresponding value.  Use of this 
   function is recommended over directly accessing the array, as this function accounts for 
   undefined values in a way that won't trigger errors.</li>
-<li><strong>stuansready($stuanswers, $thisq, array of part numbers)</strong>: Before using 
+<li><strong>stuansready($stuanswers, $thisq, array of part numbers, [anstypes])</strong>: Before using 
     student answers, you need to check to make sure the student has actually answered them.
     Pass this function the $stuanswers or $sutanswersval arrays, $thisq for the question number,
     and an array of part numbers, and it will check to make sure a non-blank answer has been 
     provided for all of the part numbers.  A part number can also be given as "1 or 2" if answering
     either part is sufficient.  To allow a blank answer, prefix a part number with a tilde. 
     It is good to wrap any multipart or conditional code using student answers in an "if" block 
-    using stuansready as the condition.</li>
+    using stuansready as the condition.  It is advisable to pass $anstypes as a 4th input, which 
+    allows the function to handle special cases like matrices better.</li>
 <li><strong>comparenumbers(a,b,[tol])</strong>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
   tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
 <li><strong>comparentuples(a,b,[tol],[option])</strong>:  Compares ntuples or calcntuples a and b to see if they are equivalent to the specified

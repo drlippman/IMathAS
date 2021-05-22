@@ -237,7 +237,10 @@ function initAnswerboxHighlights() {
 	});
 };
 
+var sidebysideenabled = false;
 function sidebysidegrading() {
+    if (sidebysideenabled) { return; }
+    sidebysideenabled = true;
 	$("body").removeClass("fw1000").removeClass("fw1920");
 	$(".scrollpane").wrap('<div class="sidebyside">');
 	$(".sidebyside").append('<div class="sidepreview">');

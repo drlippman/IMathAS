@@ -74,6 +74,9 @@ class MatrixAnswerBox implements AnswerBox
                 $out .= '<tr><td class="matrixleft">&nbsp;</td><td>';
             }
             $answersize = explode(",", $answersize);
+            if (isset($GLOBALS['capturechoices'])) {
+                $GLOBALS['answersize'][$qn] = $answersize;
+            }
             $out .= "<table>";
             $count = 0;
             $las = explode("|", $la);

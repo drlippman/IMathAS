@@ -45,7 +45,7 @@
           <icons name="retake" alt="" />
           {{ $t('scoreresult.trysimilar') }}
         </button>
-        <span v-if = "qdata.canretry">
+        <span v-if = "qdata.canretry_primary">
           {{ $t('scoreresult.retryq') }}
         </span>
       </p>

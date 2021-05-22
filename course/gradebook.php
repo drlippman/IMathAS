@@ -1828,14 +1828,12 @@ function gbinstrdisp() {
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
-						} else if ($isteacher) {
+						} else {
 							if ($gbt[0][1][$j][15] > 1) { // assess2
 								echo "<a href=\"$assessGbUrl?stu=$stu&amp;cid=$cid&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							} else {
 								echo "<a href=\"gb-viewasid.php?stu=$stu&amp;cid=$cid&amp;asid=new&amp;aid={$gbt[0][1][$j][7]}&amp;uid={$gbt[$i][4][0]}\">-</a>";
 							}
-						} else {
-							echo '-';
 						}
 					}
 					if (isset($gbt[$i][1][$j][6]) ) {
