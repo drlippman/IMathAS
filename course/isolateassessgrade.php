@@ -257,19 +257,20 @@
 	}
 
     echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-    echo '<p>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
-    echo '<a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',false)">'.('None').'</a>. ';
+    
     
     if ($isteacher || ($istutor && ($tutoredit&1) == 1)) {
+        echo '<p>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
+        echo '<a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',false)">'.('None').'</a>. ';
         echo _('With selected:');
         echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
         echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
         if ($isteacher || ($istutor && $tutoredit == 3)) {
             echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
         }
+        echo '</p>';
     }
 
-	echo '</p>';
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
 	if ($hassection && !$hidesection) {
 		echo '<th>Section</th>';

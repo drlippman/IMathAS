@@ -203,6 +203,7 @@ if ($isActualTeacher || $istutor) {
 // indicate whether teacher/tutor can edit scores or not
 if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
+  $assessInfoOut['can_make_exception'] = ($isActualTeacher || ($istutor && $tutoredit == 3));
   // get rubrics
   $assessInfoOut['rubrics'] = array();
   $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN

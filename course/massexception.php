@@ -9,7 +9,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	}
 
 	if (isset($_POST['clears'])) {
-		$clearlist = implode(',', array_map('intval', $_POST['clears']));
+        $clearlist = implode(',', array_map('intval', $_POST['clears']));
 		$stm = $DBH->query("DELETE FROM imas_exceptions WHERE id IN ($clearlist)");
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {

@@ -26,7 +26,7 @@
       <div>
         {{ $t('gradebook.due')}}: {{ aData.enddate_disp }}
           <button
-            v-if = "canEdit"
+            v-if = "canEdit && aData.can_make_exception"
             type="button"
             class="slim"
             @click = "makeException"
