@@ -296,7 +296,7 @@ echo '<p>'.('Once that is done, click View Deployments, then click New Deploymen
 echo '<ul>';
 echo '<li>'._('Select the tool you just added, and enter a Name.').'</li>';
 echo '<li>'._('Enable the Extensions: Assignment and Grade Services and Deep Linking.').'</li>';
-echo '<li>'._('Under Security Settings, enable Name (First and Last).').'</li>';
+echo '<li>'._('Under Security Settings, enable Name (First and Last).').' '._('Also enable the Org Unit Information.').'</li>';
 echo '<li>'._('Select the Org Units you want to make the tool available to.  For example, you could make it just available to the Math department.').'</li>';
 echo '</ul>';
 
