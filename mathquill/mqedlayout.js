@@ -619,7 +619,7 @@ var myMQeditor = (function($) {
       if (vars[i].length == 1) {
         btns.push({'b':vars[i], c:'w', v:1});
       } else {
-        btns.push({'b':vars[i], c:'w', r:1});
+        btns.push({'l':vars[i].replace(/([a-zA-Z0-9]{2,})/g,"\\text{$1}"), 'w':vars[i], c:'w', r:1});
       }
     }
     var perrow = Math.min(8,Math.max(4, Math.ceil(vars.length/4)));

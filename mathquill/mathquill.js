@@ -2971,7 +2971,13 @@ var MathCommand = P(MathElement, function(_, super_) {
             cursor.options.autoParenOperators.hasOwnProperty(str)
         ) {
             str += cmd.letter;
-            if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str) || issubsup) {
+            for (var opname in cursor.options.autoOperatorNames) {
+                if (opname.substring(0, str.length) === str) {
+                    partofop = true;
+                    break;
+                }
+            }
+            if (AutoOpNames._maxLength == 0 || !partofop || issubsup) {
                 cursor.parent.write(cursor, '(');
             }
         }
