@@ -4827,7 +4827,7 @@ function stuansready($stu, $qn, $parts, $anstypes = null) {
                 $blankok = true;
                 $v = substr($v,1);
             }
-            echo $stu[$qn][$v];
+            //echo $stu[$qn][$v];
             if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix') &&
                 isset($stu[$qn][$v]) && (strpos($stu[$qn][$v],'||')!==false || 
                 $stu[$qn][$v][0] === '|' || $stu[$qn][$v][strlen($stu[$qn][$v])-1] === '|')
