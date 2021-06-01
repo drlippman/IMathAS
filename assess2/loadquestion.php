@@ -118,6 +118,9 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   }
 }
 
+// get settings for LTI if needed
+$assess_info->loadLTIMsgPosts($userid, $canViewAll);
+
 // grab any assessment info fields that may have updated:
 // has_active_attempt, timelimit_expires,
 // prev_attempts (if we just closed out a version?)
@@ -125,7 +128,8 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
 // help_features, intro, resources, video_id, category_urls
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate', 'submitby',
-  'extended_with', 'allowed_attempts', 'showscores', 'enddate_in', 'timelimit'
+  'extended_with', 'allowed_attempts', 'showscores', 'enddate_in', 'timelimit',
+  'lti_showmsg', 'lti_msgcnt', 'lti_forumcnt'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 //get attempt info
