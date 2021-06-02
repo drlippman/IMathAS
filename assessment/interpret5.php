@@ -127,7 +127,8 @@ function interpretline($str,$anstype,$countcnt) {
 			}
 		} else if ($type==7) {//end of line
 			if ($lasttype=='7' || $lasttype==-1) {
-				//nothing exciting, so just continue
+                //nothing exciting, so just continue
+                $lines[] = '';
 				$k++;
 				continue;
 			}
@@ -571,9 +572,18 @@ function tokenize($str,$anstype,$countcnt) {
 		} else if ($c==';') {
 			//end of line
 			$intype = 7;
-			$i++;
+            $i++;
 			if ($i<$len) {
-				$c = $str[$i];
+                $c = $str[$i];
+                //eat whitespace
+                while ($c==' ') {
+                    $i++;
+                    $c = $str[$i];
+                }
+                if ($c=="\n") {
+                    $i++;
+                    $c = $str[$i];
+                }
 			}
 		} else {
 			//no type - just append string.  Could be operators
@@ -653,11 +663,9 @@ function tokenize($str,$anstype,$countcnt) {
                 }
 			}
 		} else {
-			//add to symbol list, avoid repeat end-of-lines.
-			if ($intype!=7 || $lastsym[1]!=7) {
-				$lastsym = array($out,$intype);
-				$syms[] =  array($out,$intype);
-			}
+			//add to symbol list.  avoid repeat end-of-lines.
+			$lastsym = array($out,$intype);
+			$syms[] =  array($out,$intype);
 		}
 
 	}
