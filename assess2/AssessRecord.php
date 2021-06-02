@@ -748,14 +748,14 @@ class AssessRecord
     $qref = ($qn+1)*1000 + $pn;
     foreach ($_POST as $key=>$val) {
       if ($pn == 0) {
-        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)(-\d+)?/', $key, $match)) {
+        if (preg_match('/^(qn|tc|qs)('.$qn.'\\b|'.$qref.'\\b)(-\d+|-val)?/', $key, $match)) {
           $data[$qn]['post'][$key] = $val;
           $thisref = $match[2];
           $subref = $match[3] ?? '';
         } else {
           continue;
         }
-      } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b(-\d+)?/', $key, $match)) {
+      } else if (preg_match('/^(qn|tc|qs)'.$qref.'\\b(-\d+|-val)?/', $key, $match)) {
         $data[$qn]['post'][$key] = $val;
         $thisref = $qref;
         $subref = $match[2] ?? '';

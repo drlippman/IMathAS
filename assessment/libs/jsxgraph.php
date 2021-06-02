@@ -45,7 +45,7 @@ $allowedmacros[] = "jsx_getYCoord";
 $allowedmacros[] = "jsx_getCoords";
 $allowedmacros[] = "jsxSuspendUpdate";
 $allowedmacros[] = "jsxUnsuspendUpdate";
-
+$allowedmacros[] = "jsxSetChild";
 
 function jsx_getlibrarylink() {
 	return "//cdn.jsdelivr.net/npm/jsxgraph@1.2.1/distrib/jsxgraphcore.js";
@@ -84,7 +84,7 @@ function jsxObject (&$board, $param, $ops=array()) {
 
 		// Begin object creation
 
-		$out = "var {$id} = board_{$boardID}.create('object', [";
+		$out = "window.{$id} = board_{$boardID}.create('object', [";
 		
 
 
@@ -186,7 +186,7 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		}
 		
 		// Create the slider
-		$out = "var {$id} = board_{$boardID}.create('slider', [";
+		$out = "window.{$id} = board_{$boardID}.create('slider', [";
 		
 		// Set the positioning
 		if ($relpos) {
@@ -274,7 +274,7 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		}
 			
 		// Start making the point
-		$out = "var {$id} = board_{$boardID}.create('point', ".jsx_pointToJS($param).",";
+		$out = "window.{$id} = board_{$boardID}.create('point', ".jsx_pointToJS($param).",";
 		
 		// Set the attributes
 		
@@ -366,7 +366,7 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		}
 
 		// Begin object creation
-		$out = "var {$id} = board_{$boardID}.create('glider', [";
+		$out = "window.{$id} = board_{$boardID}.create('glider', [";
 		$out .= jsx_valueToJS($param[0][0]).", ";
 		$out .= jsx_valueToJS($param[0][1]).", ";
 		$out .= "{$param[1]}], ";
@@ -443,7 +443,7 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 		$negativeroot = $ops['negativeroot'] !== null ? jsx_getbool($ops['negativeroot']) : 'false';
 			
 		// Start making the point
-		$out = "var {$id} = board_{$boardID}.create('intersection', [{$param[0]}, {$param[1]}, ";
+		$out = "window.{$id} = board_{$boardID}.create('intersection', [{$param[0]}, {$param[1]}, ";
 		
 		$out .= $negativeroot == 'true' ? "1]," : "0],";
 		
@@ -499,7 +499,7 @@ function jsxCircle(&$board, $param, $ops=array()) {
 	
 	$id = "circle_".uniqid();
 	$boardID = jsx_getboardname($board);
-	$out = "var {$id} = ";
+	$out = "window.{$id} = ";
 	$is_error = false;
 
     // attributes
@@ -617,7 +617,7 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 
 		// Begin object creation
 
-		$out .= "var {$id} = board_{$boardID}.create('polygon', [";
+		$out .= "window.{$id} = board_{$boardID}.create('polygon', [";
 		
 		$count = 1;
 		$total = count($param);
@@ -711,7 +711,7 @@ function jsxLine (&$board, $param, $ops=array()) {
 
 		// Begin object creation
 
-		$out = "var {$id} = board_{$boardID}.create('line', [";
+		$out = "window.{$id} = board_{$boardID}.create('line', [";
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1])."],";
 
@@ -785,7 +785,7 @@ function jsxSegment (&$board, $param, $ops=array()) {
 
 		// Begin object creation
 
-		$out = "var {$id} = board_{$boardID}.create('segment', [";
+		$out = "window.{$id} = board_{$boardID}.create('segment', [";
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1]);
 		$out .= $length == -1 ? "]," : ",{$length}],";
@@ -860,7 +860,7 @@ function jsxRay (&$board, $param, $ops=array()) {
 
 		// Begin object creation
 
-		$out = "var {$id} = board_{$boardID}.create('line', [";
+		$out = "window.{$id} = board_{$boardID}.create('line', [";
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1])."],";
 
@@ -941,7 +941,7 @@ function jsxVector (&$board, $param, $ops=array()) {
 		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
 
 		// Begin object creation
-		$out = "var {$id} = board_{$boardID}.create('arrow', [";
+		$out = "window.{$id} = board_{$boardID}.create('arrow', [";
 		$out .= jsx_pointToJS($point0).", ";
 		$out .= jsx_pointToJS($point1)."],";	
 
@@ -998,7 +998,7 @@ function jsxTangent(&$board, $param, $ops=array()) {
 		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
 		
 		// Begin object creation
-		$out = "var {$id} = board_{$boardID}.create('tangent', [ {$param} ], { ";
+		$out = "window.{$id} = board_{$boardID}.create('tangent', [ {$param} ], { ";
 
 		// Set Attributes
 		$out .= "
@@ -1060,7 +1060,7 @@ function jsxIntegral (&$board, $param, $ops=array()) {
 		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
 
 		// Begin object creation
-		$out = "var {$id} = board_{$boardID}.create('integral', [";
+		$out = "window.{$id} = board_{$boardID}.create('integral', [";
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= $param[1]."],";
 
@@ -1134,7 +1134,7 @@ function jsxRiemannSum (&$board, $param, $ops=array()) {
 
 		// Begin object creation
 
-		$out = "var {$id} = board_{$boardID}.create('riemannsum', [";
+		$out = "window.{$id} = board_{$boardID}.create('riemannsum', [";
 		
 		if(is_array($param[1])) {
 			if(strpos($param[1][0],"_") != false) {
@@ -1219,7 +1219,7 @@ function jsxText (&$board, $param, $ops=array()) {
 		
 		// Begin object creation
 
-		$out = "var {$id} = board_{$boardID}.create('text', [";
+		$out = "window.{$id} = board_{$boardID}.create('text', [";
 		
 		if (is_array($param[0])) {
 			$out .= jsx_valueToJS($param[0][0]).", ".jsx_valueToJS($param[0][1]).", ";
@@ -1349,7 +1349,7 @@ function jsxAngle (&$board, $param, $ops=array()) {
 		$fontcolor = $ops['fontcolor'] !== null ? $ops['fontcolor'] : $color;
 
 		// Begin object creation
-		$out = "var {$id} = board_{$boardID}.create('angle', [";
+		$out = "window.{$id} = board_{$boardID}.create('angle', [";
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1]).", ";
 		$out .= jsx_pointToJS($param[2])."],";	
@@ -1412,10 +1412,10 @@ function jsxFunction(&$board, $f, $ops=array()) {
   
 	// Here we preserve the text of the function so it can be used in other objects
 	// like Riemannsum
-	$out = "var {$id}_text = ".jsx_functionToJS($f, $inpVar).";";
+	$out = "window.{$id}_text = ".jsx_functionToJS($f, $inpVar).";";
   
 	// Start the output string
-	$out .= "var {$id} = board_{$boardID}.create('functiongraph', [";
+	$out .= "window.{$id} = board_{$boardID}.create('functiongraph', [";
 	$out .= jsx_functionToJS($f, $inpVar); 
   
 	// Handle domain restriction, if provided
@@ -1481,7 +1481,7 @@ function jsxParametric (&$board, $param, $ops=array()) {
 		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
 		
 		// Begin object creation
-		$out = "var {$id} = board_{$boardID}.create('curve', [";
+		$out = "window.{$id} = board_{$boardID}.create('curve', [";
 		$out .= jsx_functionToJS($param[0], $inpVar).", "; 
 		$out .= jsx_functionToJS($param[1], $inpVar).", ";
 		$out .= jsx_valueToJS($tStart).", ";
@@ -1547,7 +1547,7 @@ function jsxPolar (&$board, $rule, $ops = array()) {
 		$visible = $ops['visible'] !== null ? jsx_getbool($ops['visible']) : 'true';
 
 		// Begin object creation
-		$out = "var {$id} = board_{$boardID}.create('curve', [";
+		$out = "window.{$id} = board_{$boardID}.create('curve', [";
 		$out .= jsx_functionToJS($rule, $var).", [0, 0], ";
   
 		$out .= jsx_valueToJS($tStart).", ";
@@ -2107,6 +2107,13 @@ function jsx_getYCoord($point) {
 // the x and y coordinates of the point as an array
 function jsx_getCoords($point) {
 	return [jsx_getXCoord($point), jsx_getYCoord($point)];
+}
+
+function jsxSetChild($parentBoard, &$childBoard) {
+    $parentID = jsx_getboardname($parentBoard);
+    $childID = jsx_getboardname($childBoard);
+	$out = "board_{$parentID}.addChild(board_{$childID});";
+	$childBoard = substr_replace($childBoard, $out, strpos($childBoard, "/*INSERTHERE*/"), 0);
 }
 
 ###############################################################################

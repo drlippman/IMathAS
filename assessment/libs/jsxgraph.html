@@ -98,7 +98,8 @@
 	<li><a href="#jsxIntegral">jsxIntegral</a></li>
 	<li><a href="#jsxRiemannSum">jsxRiemannSum</a></li>
 	<li><a href="#jsxSuspendUpdate">jsxSuspendUpdate</a></li>
-	<li><a href="#jsxUnsuspendUpdate">jsxUnsuspendUpdate</a></li>
+    <li><a href="#jsxUnsuspendUpdate">jsxUnsuspendUpdate</a></li>
+    <li><a href="#jsxSetChild">jsxSetChild</a></li>
 	<li><a href="$jsx_getCoords">jsx_getCoords</li>
 	<li><a href="#jsx_getXCoord">jsx_getXCoord</a></li>
 	<li><a href="#jsx_getYCoord">jsx_getYCoord</a></li>
@@ -853,6 +854,12 @@ $sum = jsxRiemannSum($board, [["$a.X()", "$b.X()", $n], [$f, $g]])
   <h2><a style="color:blue" name="jsxUnsuspendUpdate">jsxUnsuspendUpdate($board)</a></h2>
   <p>Unpauses updates to a board object so that objects will become interactive again.</p>
   
+  <h2><a style="color:blue" name="jsxSetChild">jsxSetChild($parentBoard, $childBoard)</a></h2>
+  <p>Sets a relation between two boards so that changes to sliders/gliders in the parent board 
+     trigger updates in the child board.  Note that the parent board needs to be displayed first to
+     prevent errors.</p>
+
+
   <h2><a style="color:blue" name="jsx_getCoords">jsx_getCoords(string)</a></h2>
   <p>Takes a string that depicts a point and returns the x and y coordinates contained within, useful for grading questions
 	based on the location of a jsx point.</p>

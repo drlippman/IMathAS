@@ -171,7 +171,7 @@ class QuestionHtmlGenerator
           } else {
             $GLOBALS['assess2-curq-iscorrect'] = array();
             foreach ($partattemptn as $kidx=>$iidx) {
-              if ($iidx==0 || empty($scoreiscorrect[$thisq][$kidx])) {
+              if ($iidx==0 || !isset($scoreiscorrect[$thisq][$kidx])) {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = -1;
               } else {
                 $GLOBALS['assess2-curq-iscorrect'][$kidx] = ($scoreiscorrect[$thisq][$kidx] < 0 ? -1 : ($scoreiscorrect[$thisq][$kidx]==1 ? 1 : 0));

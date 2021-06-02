@@ -577,6 +577,7 @@ class AssessInfo
    * @return void
    */
   public function checkPrereq($uid) {
+    if ($this->assessData['available'] == 'practice') { return; } // don't block in practice mode
     if ($this->assessData['reqscore'] > 0 &&
         $this->assessData['reqscoreaid'] > 0 &&
         !$this->waiveReqScore()
