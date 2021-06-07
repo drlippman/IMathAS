@@ -216,6 +216,12 @@
               </li>
               <li>
                 <label>
+                  <input type=checkbox v-model="hide100">
+                  {{ $t('gradebook.hide_100') }}
+                </label>
+              </li>
+              <li>
+                <label>
                   <input type=checkbox v-model="hideFeedback">
                   {{ $t('gradebook.hide_fb') }}
                 </label>
@@ -430,6 +436,7 @@ export default {
     return {
       showOverride: false,
       assessOverride: '',
+      hide100: false,
       hidePerfect: false,
       hideNonzero: false,
       hideZero: false,
@@ -564,7 +571,9 @@ export default {
       for (let i = 0; i < this.curQuestions.length; i++) {
         const qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
-        if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
+        if (this.hide100 && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
+          showit = false;
+        } else if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;
         } else if (this.hideUnanswered && qdata.parts.reduce((a, c) => Math.max(a, c.try), 0) === 0) {
           showit = false;
@@ -580,21 +589,6 @@ export default {
         out[i] = showit;
       }
       return out;
-    },
-    hidePerfectLabel () {
-      return this.hidePerfect
-        ? this.$t('gradebook.show_perfect')
-        : this.$t('gradebook.hide_perfect');
-    },
-    hideCorrectLabel () {
-      return this.hideCorrect
-        ? this.$t('gradebook.show_correct')
-        : this.$t('gradebook.hide_correct');
-    },
-    hideUnansweredLabel () {
-      return this.hideUnanswered
-        ? this.$t('gradebook.show_unans')
-        : this.$t('gradebook.hide_unans');
     },
     exceptionActionLabel () {
       if (this.aData.hasexception) {
