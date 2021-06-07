@@ -126,7 +126,8 @@
     "showwork": "Show work here by typing it or attaching a file or picture",
     "uploadwork": "Show work here by attaching a file or picture",
     "uploading": "Uploading...",
-    "intronext": "To begin, select a question using the selector above, or press the > Next button"
+    "intronext": "To begin, navigate to a question using the selector or > Next button above.",
+    "firstq": "First Question"
   },
   "header": {
     "score": "Score: {pts}/{poss}",
