@@ -1225,7 +1225,7 @@ switch($_POST['action']) {
 			//check that code is valid and not a replay
 			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
 			   ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
-				$_SESSION['mfaverified'] = true;
+				$_SESSION['mfaadminverified'] = true;
 				$mfadata['last'] = $_POST['mfatoken'];
 				$mfadata['laston'] = time();
 				if (isset($_POST['mfatrust'])) {

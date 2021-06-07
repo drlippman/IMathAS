@@ -28,7 +28,7 @@ require_once("includes/sanitize.php");
 	}
 	require_once("includes/password.php");
 
-	if ($_GET['action']=="newuser") {
+	if (isset($_GET['action']) && $_GET['action']=="newuser") {
 		$init_session_start = true;
 		require_once("init_without_validate.php");
 		require_once("includes/newusercommon.php");
@@ -251,7 +251,7 @@ require_once("includes/sanitize.php");
 		}
 		//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 		exit;
-	} else if ($_GET['action']=="confirm") {
+	} else if (isset($_GET['action']) && $_GET['action']=="confirm") {
 		require_once("init_without_validate.php");
 
 		$query = "UPDATE imas_users SET rights=10 WHERE id=:id AND rights=0";
@@ -268,7 +268,7 @@ require_once("includes/sanitize.php");
 			echo _("Error").".\n";
 			require("footer.php");
 		}
-	} else if ($_GET['action']=="resetpw") {
+	} else if (isset($_GET['action']) && $_GET['action']=="resetpw") {
 		require_once("init_without_validate.php");
 		if (isset($_POST['username'])) {
 
@@ -366,7 +366,7 @@ require_once("includes/sanitize.php");
 			//moved to forms.php - keep redirect for to keep old links working for now.
 			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($code) . "&r=" . Sanitize::randomQueryStringParam());
 		}
-	} else if ($_GET['action']=="lookupusername") {
+	} else if (isset($_GET['action']) && $_GET['action']=="lookupusername") {
 		require_once("init_without_validate.php");
 
 		$query = "SELECT id,SID,lastaccess,lastemail FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
@@ -413,7 +413,7 @@ require_once("includes/sanitize.php");
 			}
 			exit;
 		}
-	} else if ($_GET['action']=="checkusername") {
+	} else if (isset($_GET['action']) && $_GET['action']=="checkusername") {
 		require_once("init_without_validate.php");
 		if (isset($_GET['originalSID']) && $_GET['originalSID']==$_GET['SID']) {
 			echo "true";
@@ -430,13 +430,13 @@ require_once("includes/sanitize.php");
 	}
 
 	require("init.php");
-	if ($_GET['action']=="logout") {
+	if (isset($_GET['action']) && $_GET['action']=="logout") {
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
 			setcookie(session_name(), '', time()-42000, '/', null, false, true);
 		}
 		session_destroy();
-	} else if ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd") {
+	} else if (isset($_GET['action']) && ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd")) {
 		$stm = $DBH->prepare("SELECT password,email,lastemail FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -483,7 +483,7 @@ require_once("includes/sanitize.php");
 			exit;
 		}
 
-	} else if ($_GET['action']=="enroll") {
+	} else if (isset($_GET['action']) && $_GET['action']=="enroll") {
 		if ($myrights < 6) {
 			echo "<html><body>\n",_("Error: Guests can't enroll in courses"),"</body></html";
 			exit;
@@ -599,7 +599,7 @@ require_once("includes/sanitize.php");
 				//mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-	} else if ($_POST['action']=="unenroll") {
+	} else if (isset($_POST['action']) && $_POST['action']=="unenroll") {
 		if ($myrights < 6) {
 			echo "<html><body>\n",_("Error: Guests can't unenroll from courses"),"</body></html>";
 			exit;
@@ -654,7 +654,7 @@ require_once("includes/sanitize.php");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
 
 		}
-	} else if ($_GET['action']=="chguserinfo") {
+	} else if (isset($_GET['action']) && $_GET['action']=="chguserinfo") {
 		$pagetopper = '';
 		if ($gb == '') {
 			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
@@ -724,9 +724,51 @@ require_once("includes/sanitize.php");
 
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 
-		$stm = $DBH->prepare("SELECT email,lastemail FROM imas_users WHERE id=?");
+		$stm = $DBH->prepare("SELECT email,lastemail,mfa,password FROM imas_users WHERE id=?");
 		$stm->execute(array($userid));
-		list($old_email,$lastemail) = $stm->fetch(PDO::FETCH_NUM);
+        list($old_email,$lastemail,$lastmfa,$oldpw) = $stm->fetch(PDO::FETCH_NUM);
+
+        if ($lastmfa !== '') {
+            $mfadata = json_decode($lastmfa, true);
+            if (!empty($mfadata['mfatype']) && $mfadata['mfatype'] == 'admin') {
+                $lastmfatype = 1;
+            } else {
+                $lastmfatype = 2;
+            }
+        } else {
+            $lastmfatype = 0;
+        }
+        
+        if (isset($_POST['dochgpw']) || 
+            $_POST['dochgmfa'] < $lastmfatype ||
+            trim($old_email) != trim($_POST['email'])
+        ) {
+            // these changes require security check
+            if ((md5($_POST['oldpw'])==$oldpw || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$oldpw))) && $myrights>5) {
+                // pw ok
+            } else {
+                require("header.php");
+                echo $pagetopper;
+                echo _("Password verification failed."),"  <a href=\"forms.php?action=chguserinfo$gb\">",_("Try Again"),"</a>\n";
+                require("footer.php");
+                exit;
+            }
+            if ($lastmfatype > 0) {
+                // also check MFA
+                require_once('includes/GoogleAuthenticator.php');
+                $MFA = new GoogleAuthenticator();
+   
+                if (!$MFA->verifyCode($mfadata['secret'], $_POST['oldmfa'])) {
+                    // MFA ok
+                    require("header.php");
+                    echo $pagetopper;
+                    echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+                    require("footer.php");
+                    exit;
+                }
+            }
+        }
+        // if we're here, then security checks for pw, email, and mfa change are OK
 
 		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
@@ -737,10 +779,7 @@ require_once("includes/sanitize.php");
 
 		$pwchanged = false;
 		if (isset($_POST['dochgpw'])) {
-			$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id = :uid");
-			$stm->execute(array(':uid'=>$userid));
-			$line = $stm->fetch(PDO::FETCH_ASSOC);
-			if ((md5($_POST['oldpw'])==$line['password'] || (isset($CFG['GEN']['newpasswords']) && password_verify($_POST['oldpw'],$line['password']))) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
+			if ($_POST['pw1'] == $_POST['pw2'] && $myrights>5) {
 				if (isset($CFG['GEN']['newpasswords'])) {
 					$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 				} else {
@@ -757,23 +796,34 @@ require_once("includes/sanitize.php");
 				exit;
 			}
 		}
-		if (isset($_POST['dochgmfa'])) {
-			require('includes/GoogleAuthenticator.php');
-			$MFA = new GoogleAuthenticator();
-			$mfasecret = $_POST['mfasecret'];
+		if ($_POST['dochgmfa'] > 0) {
+            if ($lastmfatype == 0) {
+                //enabling new
+                require_once('includes/GoogleAuthenticator.php');
+                $MFA = new GoogleAuthenticator();
+                $mfasecret = $_POST['mfasecret'];
 
-			if ($MFA->verifyCode($mfasecret, $_POST['mfaverify'])) {
-				$mfadata = array('secret'=>$mfasecret, 'last'=>'', 'laston'=>0);
-				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
-				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
-			} else {
-				require("header.php");
-				echo $pagetopper;
-				echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
-				require("footer.php");
-				exit;
-			}
-		} else if (isset($_POST['delmfa'])) {
+                if ($MFA->verifyCode($mfasecret, $_POST['mfaverify'])) {
+                    $mfadata = array(
+                        'secret'=>$mfasecret, 
+                        'last'=>'', 
+                        'laston'=>0, 
+                        'mfatype'=>($_POST['dochgmfa'] == 1 ? 'admin' : 'all')
+                    );
+                } else {
+                    require("header.php");
+                    echo $pagetopper;
+                    echo "Incorrect 2-factor authentication code.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+                    require("footer.php");
+                    exit;
+                }
+            } else {
+                $mfadata['mfatype'] = ($_POST['dochgmfa'] == 1 ? 'admin' : 'all');
+            }
+            $stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
+			$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
+		} else {
+            // disable MFA
 			$stm = $DBH->prepare("UPDATE imas_users SET mfa = '' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 		}
@@ -817,7 +867,21 @@ require_once("includes/sanitize.php");
 
 		}
 
-	} else if ($_GET['action']=="forumwidgetsettings") {
+	} else if (isset($_POST['action']) && $_POST['action'] == 'cleartrustedmfa') {
+        $stm = $DBH->prepare("SELECT mfa FROM imas_users WHERE id= :uid");
+        $stm->execute(array(':uid'=>$userid));
+        $mfadata = json_decode($stm->fetchColumn(0), true);
+        if ($mfadata !== false) {
+            unset($mfadata['trusted']);
+            unset($mfadata['logintrusted']);
+            $stm = $DBH->prepare("UPDATE imas_users SET mfa=:mfa WHERE id=:uid");
+            $stm->execute(array(':mfa'=>json_encode($mfadata), ':uid'=>$userid));
+            echo "OK";
+            exit;
+        }
+        echo "FAIL";
+        exit;
+    } else if (isset($_GET['action']) && $_GET['action']=="forumwidgetsettings") {
 		if (empty($_POST['checked'])) {
 			$checked = array();
 		} else {
@@ -831,7 +895,7 @@ require_once("includes/sanitize.php");
 		$hidelist = implode(',', $tohide);
 		$stm = $DBH->prepare("UPDATE imas_users SET hideonpostswidget=:hidelist WHERE id= :uid");
 		$stm->execute(array(':uid'=>$userid, ':hidelist'=>$hidelist));
-	} else if ($_GET['action']=="googlegadget") {
+	} else if (isset($_GET['action']) && $_GET['action']=="googlegadget") {
 		if (isset($_GET['clear'])) {
 			$stm = $DBH->prepare("UPDATE imas_users SET remoteaccess='' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));

@@ -40,14 +40,29 @@ if ($localuserid === false) {
     $role=='Instructor'
   )) {
     // check login
-    $stm = $DBH->prepare('SELECT password,id,groupid FROM imas_users WHERE SID=:sid');
+    $stm = $DBH->prepare('SELECT password,id,groupid,mfa FROM imas_users WHERE SID=:sid');
     $stm->execute(array(':sid'=>$_POST['curSID']));
     if ($stm->rowCount()==0) {
       $err = _('Existing username or password is not valid');
     } else {
-      list($realpw,$tmpuserid,$tmpgroupid) = $stm->fetch(PDO::FETCH_NUM);
+      list($realpw,$tmpuserid,$tmpgroupid,$mfadata) = $stm->fetch(PDO::FETCH_NUM);
       if (password_verify($_POST['curPW'],$realpw)) {
         // valid login
+        if ($mfadata !== '') {
+            $mfadata = json_decode($mfadata, true);
+            if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
+                $flexwidth = true;
+                $nologo = true;
+                require_once('../includes/mfa.php');
+                $formaction = $imasroot."/lti/finishlogin.php";
+                if (!isset($_POST['mfatoken'])) {
+                    mfa_showLoginEntryForm($formaction, '', false);
+                    exit;
+                } else if (!mfa_verify($mfadata, $formaction, $tmpuserid, false)) {
+                    exit;
+                }
+            }
+        }
         $localuserid = $tmpuserid;
         if ($role == 'Instructor') {
           // if teacher, make sure the deployment is associated with the groupid
