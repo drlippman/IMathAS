@@ -632,8 +632,9 @@
 				$locklibs = array();
 				$addmod = _("Add");
 				$stm = $DBH->prepare("SELECT qrightsdef FROM imas_users WHERE id=:id");
-				$stm->execute(array(':id'=>$userid));
-				$line['userights'] = $stm->fetchColumn(0);
+                $stm->execute(array(':id'=>$userid));
+                $qrightsdef = $stm->fetchColumn(0);
+				$line['userights'] = 0;
 
 			} else {
 				if ($isadmin) {
@@ -697,8 +698,9 @@
 			$myq = true;
 			$line['description'] = _("Enter description here");
 			$stm = $DBH->prepare("SELECT qrightsdef FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$userid));
-			$line['userights'] = $stm->fetchColumn(0);
+            $stm->execute(array(':id'=>$userid));
+            $qrightsdef = $stm->fetchColumn(0);
+			$line['userights'] = 0;
 
 			$line['license'] = isset($CFG['GEN']['deflicense'])?$CFG['GEN']['deflicense']:1;
 
@@ -1033,9 +1035,12 @@ Description:<BR>
 <p>
 Author: <?php echo Sanitize::encodeStringForDisplay($line['author']); ?> <input type="hidden" name="author" value="<?php echo Sanitize::encodeStringForDisplay($author); ?>">
 </p>
-<p>
 <?php
 if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$userid || ($line['userights']==3 && $line['groupid']==$groupid) || $isadmin || ($isgrpadmin && $line['groupid']==$groupid)) {
+    if (isset($qrightsdef) && $qrightsdef > 0) {
+        echo '<p class=noticetext>'._('Note: The "make questions public by default" setting has been removed. To make a question public you must now explicitly set the use rights.').'</p>';
+    }
+    echo '<p>';
 	echo _('Use Rights:').' <select name="userights" id="userights">';
 	echo "<option value=\"0\" ";
 	if ($line['userights']==0) {echo "SELECTED";}
@@ -1068,10 +1073,9 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 		echo '<br/><span class=noticetext style="font-size:80%">'._('You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution').'</span>';
 	}
 	echo '</span>';
-
+    echo '</p>';
 }
 ?>
-</p>
 <script>
 var curlibs = '<?php echo Sanitize::encodeStringForJavascript($inlibs);?>';
 var locklibs = '<?php echo Sanitize::encodeStringForJavascript($locklibs);?>';

@@ -368,9 +368,10 @@ switch($_GET['action']) {
 
 		if ($myrights>19) {
 			echo '<fieldset id="userinfoinstructor"><legend>',_('Instructor Options'),'</legend>';
-			echo "<span class=form><label for=\"qrd\">",_('Make new questions private by default?<br/>(recommended for new users):'),"</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
-			if ($line['qrightsdef']==0) {echo "checked=1";}
-			echo " /></span><BR class=form>\n";
+            // removed 6/7/21
+            //echo "<span class=form><label for=\"qrd\">",_('Make new questions private by default?<br/>(recommended for new users):'),"</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
+			//if ($line['qrightsdef']==0) {echo "checked=1";}
+			//echo " /></span><BR class=form>\n";
 			if ($line['deflib']==0) {
 				$lname = "Unassigned";
 			} else {
