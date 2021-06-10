@@ -365,7 +365,7 @@ function tokenize($str,$anstype,$countcnt) {
 					$out = 'elseif';
 					$i += 3;
 				}
-				if ($lastsym[1]==7) {
+				while ($lastsym[1]==7) {
 					array_pop($syms);
 					$lastsym = $syms[count($syms)-1];
 				}
@@ -663,9 +663,9 @@ function tokenize($str,$anstype,$countcnt) {
                 }
 			}
 		} else {
-			//add to symbol list.  avoid repeat end-of-lines.
-			$lastsym = array($out,$intype);
-			$syms[] =  array($out,$intype);
+            //add to symbol list.  avoid repeat end-of-lines.
+            $lastsym = array($out,$intype);
+            $syms[] =  array($out,$intype);
 		}
 
 	}
