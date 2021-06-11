@@ -236,7 +236,7 @@
 			if (toSage) {
 				formula=formula.replace(/=/g,"==");
 				//save this variables as a property for later
-				var imathas_variables_with_dups=formula.match(/\$([a-z][a-z0-9]*)/gi);
+				var imathas_variables_with_dups=formula.match(/\$([a-z][a-z0-9_]*)/gi);
 				this.imathas_variables=[];
 				if (imathas_variables_with_dups) {
 					imathas_variables_with_dups.forEach(function(value,index) {
@@ -248,7 +248,7 @@
 					});
 				}
 				//sage variables include MOM variables (rands) plus any MOM symbolic variables
-				var sage_variables_with_dups=formula.match(/([a-z][a-z0-9]*)/gi);
+				var sage_variables_with_dups=formula.match(/([a-z][a-z0-9_]*)/gi);
 				if (sage_variables_with_dups) {
 					//remove math function names from sage_variables
 					var sage_variables=sage_variables_with_dups.filter(function(variable,index,self) {

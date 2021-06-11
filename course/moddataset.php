@@ -958,7 +958,7 @@
 	   	}
 	   }
 	   </script>';
-	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
+	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
 		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
