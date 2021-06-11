@@ -266,7 +266,7 @@ if ($oktoshow) {
 			$points[$line['id']] = 1*$line['score'];
 			$feedback[$line['id']] = $line['feedback'];
 		} else {
-			$points[$line['id']] = $line['score'] ?? '';
+			$points[$line['id']] = $line['score'] ?? null;
 			$feedback[$line['id']] = null;
 		}
 		if ($line['isanon']==1) {
