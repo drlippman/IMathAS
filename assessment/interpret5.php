@@ -510,7 +510,15 @@ function tokenize($str,$anstype,$countcnt) {
 						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
-							$inside = interpretline(substr($str,$i+1,$j-$i-1),$anstype,$countcnt+1);
+                            $toprocess = substr($str,$i+1,$j-$i-1);
+                            $newcnt = 0;
+                            if ($intype == 4 || $intype == 11) { // parens - ignore newlines
+                                $newcnt = substr_count($toprocess, "\n");
+                                $toprocess = str_replace("\n", " ", $toprocess);
+                            }
+ 
+                            $inside = interpretline($toprocess,$anstype,$countcnt+1);
+
 							if ($inside=='error') {
 								//was an error, return error token
 								return array(array('',9));
@@ -520,8 +528,11 @@ function tokenize($str,$anstype,$countcnt) {
 							if ($rightb=='}' && $lastsym[0]!='$') {
 								$out .= $leftb.$inside.';'.$rightb;
 							} else {
-								$out .= $leftb.$inside.$rightb;
-							}
+                                $out .= $leftb.$inside.$rightb;
+                            }
+                            if ($newcnt > 0) {
+                                $out .= str_repeat("\n", $newcnt);
+                            }
 							$i= $j+1;
 							break;
 						}
