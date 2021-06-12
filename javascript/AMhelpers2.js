@@ -1567,65 +1567,75 @@ function processNumfunc(qn, fullstr, format) {
 
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
-  var totesteqn = strprocess[0];
-  totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
-  var remapVars = strprocess[2].split('|');
-
-  if (fullstr.match(/(<=|>=|<|>)/)) {
-    if (!isineq) {
-      if (iseqn) {
-        err += _("syntax error: you gave an inequality, not an equation");
-      } else {
-        err += _("syntax error: you gave an inequality, not an expression");
-      }
-    } else if (fullstr.match(/(<=|>=|<|>)/g).length>1) {
-      err += _("syntax error: your inequality should only contain one inequality symbol");
-    }
-    totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
-  } else if (fullstr.match(/=/)) {
-    if (isineq) {
-      err += _("syntax error: you gave an equation, not an inequality");
-    } else if (!iseqn) {
-      err += _("syntax error: you gave an equation, not an expression");
-    } else if (fullstr.match(/=/g).length>1) {
-      err += _("syntax error: your equation should only contain one equal sign");
-    }
-    totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
-  } else if (iseqn) {
-    err += _("syntax error: this is not an equation");
-  } else if (isineq) {
-    err += _("syntax error: this is not an inequality");
+  var totesteqn;
+  var totestarr;
+  if (format.match(/list/)) {
+      totestarr = strprocess[0].split(/,/);
+  } else {
+      totestarr = [strprocess[0]];
   }
-
-  if (fvars.length > 0) {
-	  reg = new RegExp("("+fvars.join('|')+")\\(","g");
-	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
-  }
-
-  totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-
   var i,j,totest,testval,res;
   var successfulEvals = 0;
-  for (j=0; j < 20; j++) {
-    totest = 'var DNE=1;';
-    for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-      if (domain[i][2]) { //integers
-        testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-      } else { //any real between min and max
-        testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
-      }
-      totest += 'var ' + remapVars[i] + '=' + testval + ';';
+  for (var tti=0; tti < totestarr.length; tti++) {
+    totesteqn = totestarr[tti];
+    totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
+    var remapVars = strprocess[2].split('|');
+
+    if (fullstr.match(/(<=|>=|<|>)/)) {
+        if (!isineq) {
+        if (iseqn) {
+            err += _("syntax error: you gave an inequality, not an equation") + '. ';
+        } else {
+            err += _("syntax error: you gave an inequality, not an expression")+ '. ';
+        }
+        } else if (fullstr.match(/(<=|>=|<|>)/g).length>1) {
+        err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
+        }
+        totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
+    } else if (fullstr.match(/=/)) {
+        if (isineq) {
+        err += _("syntax error: you gave an equation, not an inequality")+ '. ';
+        } else if (!iseqn) {
+        err += _("syntax error: you gave an equation, not an expression")+ '. ';
+        } else if (fullstr.match(/=/g).length>1) {
+        err += _("syntax error: your equation should only contain one equal sign")+ '. ';
+        }
+        totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
+    } else if (iseqn) {
+        err += _("syntax error: this is not an equation")+ '. ';
+    } else if (isineq) {
+        err += _("syntax error: this is not an inequality")+ '. ';
     }
-    res = scopedeval(totest + totesteqn);
-    if (res !== 'synerr') {
-      successfulEvals++;
-      break;
+
+    if (fvars.length > 0) {
+        reg = new RegExp("("+fvars.join('|')+")\\(","g");
+        totesteqn = totesteqn.replace(reg,"$1*sin($1+");
     }
+
+    totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+
+    successfulEvals = 0;
+    for (j=0; j < 20; j++) {
+        totest = 'var DNE=1;';
+        for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
+        if (domain[i][2]) { //integers
+            testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+        } else { //any real between min and max
+            testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
+        }
+        totest += 'var ' + remapVars[i] + '=' + testval + ';';
+        }
+        res = scopedeval(totest + totesteqn);
+        if (res !== 'synerr') {
+        successfulEvals++;
+        break;
+        }
+    }
+    if (successfulEvals === 0) {
+        err += _("syntax error") + '. ';
+    }
+    err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   }
-  if (successfulEvals === 0) {
-    err += _("syntax error") + '. ';
-  }
-  err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   return {
     err: err
   };
