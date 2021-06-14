@@ -1130,7 +1130,7 @@ class Imathas_LTI_Database implements LTI\Database
      */
     public function get_assess_grades($courseid, $aid, $platform_id, $isquiz, $includeempty) 
     {
-        $query = 'SELECT istu.userid,ilu.ltiuserid,iar.score,iar.status FROM 
+        $query = 'SELECT istu.userid,ilu.ltiuserid,iar.score,iar.status,istu.lticourseid FROM 
             imas_students AS istu 
             JOIN imas_ltiusers AS ilu ON istu.userid=ilu.userid AND ilu.org=?
             LEFT JOIN imas_assessment_records AS iar 
