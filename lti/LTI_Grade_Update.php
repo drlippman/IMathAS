@@ -181,7 +181,9 @@ class LTI_Grade_Update {
       'gradingProgress' => $gradingProgress,
       'comment' => $comment
     ];
-    $body = json_encode(array_filter($grade));
+    $body = json_encode(array_filter($grade, function($v) { // don't filter 0
+        return ($v !== null && $v !== '');
+    }));
 
     $headers = [
         'Authorization: Bearer ' . $token,
