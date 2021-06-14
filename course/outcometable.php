@@ -114,7 +114,7 @@ function outcometable() {
 	$query .= "AND cntingb>0 AND cntingb<3 ";
 	$qarr = array(':courseid'=>$cid);
 	if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory=:gbcategory ";
@@ -234,7 +234,7 @@ function outcometable() {
 	$qarr = array(':courseid'=>$cid, ':now'=>$now);
 
 	if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory=:gbcategory ";

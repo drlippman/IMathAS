@@ -87,7 +87,7 @@ $assess_record->loadRecord($uid);
 $assess_record->setInGb(true);
 if (!$assess_record->hasRecord()) {
   // if there's no record yet, and we're a teacher, create a record
-  if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+  if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
     $isGroup = $assess_info->getSetting('isgroup');
 
     // Check for LTI 1.3 lineitem
@@ -201,8 +201,9 @@ if ($isActualTeacher || $istutor) {
     $assess_record->setTeacherInGb(true);
 }
 // indicate whether teacher/tutor can edit scores or not
-if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
+  $assessInfoOut['can_make_exception'] = ($isActualTeacher || ($istutor && $tutoredit == 3));
   // get rubrics
   $assessInfoOut['rubrics'] = array();
   $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN

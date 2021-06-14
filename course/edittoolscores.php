@@ -30,7 +30,7 @@
 	}
 
 	if ($istutor) {
-		$isok = ($tutoredit==1);
+		$isok = (($tutoredit&1)==1);
 		if (!$isok) {
 			require("../header.php");
 			echo "You don't have authority for this action";

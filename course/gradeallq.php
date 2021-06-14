@@ -60,7 +60,7 @@
 		echo "You not have access to view scores for this assessment";
 		require("../footer.php");
 		exit;
-	} else if ($isteacher || ($istutor && $tutoredit==1)) {
+	} else if ($isteacher || ($istutor && ($tutoredit&1)==1)) {
 		$canedit = 1;
 	} else {
 		$canedit = 0;

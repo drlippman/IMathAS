@@ -653,7 +653,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 
 		$teacherreview = $get_uid;
 
-		if ($isteacher || ($istutor && $line['tutoredit']==1)) {
+		if ($isteacher || ($istutor && ($line['tutoredit']&1)==1)) {
 			$canedit = 1;
 		} else {
 			$canedit = 0;

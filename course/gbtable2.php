@@ -314,7 +314,7 @@ function gbtable() {
 		$query .= "AND cntingb>0 ";
 	}
 	if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	if (!$isteacher) {
 		//$query .= "AND startdate<$now ";
@@ -436,7 +436,7 @@ function gbtable() {
 		$query .= "AND cntingb>0 ";
 	}
 	if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	$query .= "ORDER BY showdate,name";
 	$stm = $DBH->prepare($query);
@@ -475,7 +475,7 @@ function gbtable() {
 		$query .= "AND startdate<$now ";
 	}
 	if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	$query .= "ORDER BY enddate,postby,replyby,startdate";
 	$stm = $DBH->prepare($query);
@@ -538,7 +538,7 @@ function gbtable() {
 		$query .= "AND startdate<$now ";
 	}
 	/*if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory='$catfilter' ";

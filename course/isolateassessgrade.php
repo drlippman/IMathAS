@@ -15,9 +15,21 @@
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	$now = time();
+    $now = time();
+    
+    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver,deffeedbacktext,tutoredit FROM imas_assessments WHERE id=:id AND courseid=:cid");
+	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
+	if ($stm->rowCount()==0) {
+		echo "Invalid ID";
+		exit;
+	}
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext,$tutoredit) = $stm->fetch(PDO::FETCH_NUM);
+    if ($istutor && $tutoredit == 2) {  // tutor, no access to view grades
+        echo 'No access';
+        exit;
+    }
 
-	if ($isteacher) {
+	if ($isteacher || ($istutor && ($tutoredit&1) == 1 )) {
 		if (isset($_POST['posted']) && $_POST['posted']=="Excuse Grade") {
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
@@ -26,20 +38,21 @@
 			$calledfrom='isolateassess';
 			include("gb-excuse.php");
         }
+        if (isset($_POST['submitua'])) {
+			require('../assess2/AssessHelpers.php');
+			AssessHelpers::submitAllUnsumitted($cid, $aid);
+			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
+				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
+			exit;
+        }
+    }
+    if ($isteacher || ($istutor && $tutoredit == 3)) {
         if ((isset($_POST['posted']) && $_POST['posted']=="Make Exception") || isset($_GET['massexception'])) {
             $calledfrom='isolateassess';
             $_POST['checked'] = $_POST['stus'];
             $_POST['assesschk'] = array($aid);
 			include("massexception.php");
         }
-        
-		if (isset($_POST['submitua'])) {
-			require('../assess2/AssessHelpers.php');
-			AssessHelpers::submitAllUnsumitted($cid, $aid);
-			header(sprintf('Location: %s/course/isolateassessgrade.php?cid=%s&aid=%s&r=%s',
-				$GLOBALS['basesiteurl'], $cid, $aid, Sanitize::randomQueryStringParam()));
-			exit;
-		}
 	}
 
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
@@ -68,15 +81,6 @@
 			$secfilter = -1;
 		}
 	}
-
-	$stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,defpoints,itemorder,ver,deffeedbacktext FROM imas_assessments WHERE id=:id AND courseid=:cid");
-	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-	if ($stm->rowCount()==0) {
-		echo "Invalid ID";
-		exit;
-	}
-	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$defpoints,$itemorder,$aver,$deffeedbacktext) = $stm->fetch(PDO::FETCH_NUM);
-
 
 	$placeinhead = '<script type="text/javascript">
 		function showfb(id,type) {
@@ -243,7 +247,7 @@
 		}
 	}
 
-	echo '<form method="post" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
+	echo '<form method="post" id="sform" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
 
 	if ($hasUA > 0) {
 		echo '<p>',_('One or more students has unsubmitted assessment attempts.');
@@ -252,13 +256,21 @@
 		echo '</span></p>';
 	}
 
-	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
-	echo '<p>',_('With selected:');
-	echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
-    echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
-    echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
+    echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
+    
+    
+    if ($isteacher || ($istutor && ($tutoredit&1) == 1)) {
+        echo '<p>'._('Check').': <a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',true)">'._('All').'</a> ';
+        echo '<a href="#" onclick="return chkAllNone(\'sform\',\'stus[]\',false)">'.('None').'</a>. ';
+        echo _('With selected:');
+        echo ' <button type="submit" value="Excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to excuse these grades?\')">',_('Excuse Grade'),'</button> ';
+        echo ' <button type="submit" value="Un-excuse Grade" name="posted" onclick="return confirm(\'Are you sure you want to un-excuse these grades?\')">',_('Un-excuse Grade'),'</button> ';
+        if ($isteacher || ($istutor && $tutoredit == 3)) {
+            echo ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> ';
+        }
+        echo '</p>';
+    }
 
-	echo '</p>';
 	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
 	if ($hassection && !$hidesection) {
 		echo '<th>Section</th>';

@@ -685,6 +685,7 @@ $vueData = array(
 						<option value="2"><?php echo _('No Access'); ?></option>
 						<option value="0"><?php echo _('View Scores'); ?></option>
 						<option value="1"><?php echo _('View and Edit Scores'); ?></option>
+                        <option value="3"><?php echo _('View and Edit Scores, Make Exceptions');?></option>
 					</select>
 				</span><br class=form />
 			</div>
