@@ -491,7 +491,8 @@ function tokenize($str,$anstype,$countcnt) {
 			$thisn = 1;
 			$inq = false;
 			$j = $i+1;
-			$len = strlen($str);
+            $len = strlen($str);
+            $newcnt = 0;
 			while ($j<$len) {
 				//read terms until we get to right bracket at same nesting level
 				//we have to avoid strings, as they might contain unmatched brackets
@@ -511,12 +512,7 @@ function tokenize($str,$anstype,$countcnt) {
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
                             $toprocess = substr($str,$i+1,$j-$i-1);
-                            $newcnt = 0;
-                            if ($intype == 4 || $intype == 11) { // parens - ignore newlines
-                                $newcnt = substr_count($toprocess, "\n");
-                                $toprocess = str_replace("\n", " ", $toprocess);
-                            }
- 
+
                             $inside = interpretline($toprocess,$anstype,$countcnt+1);
 
 							if ($inside=='error') {
@@ -533,6 +529,7 @@ function tokenize($str,$anstype,$countcnt) {
                             if ($newcnt > 0) {
                                 $out .= str_repeat("\n", $newcnt);
                             }
+                            $newcnt = 0;
 							$i= $j+1;
 							break;
 						}
@@ -543,7 +540,11 @@ function tokenize($str,$anstype,$countcnt) {
 							$d = $str[$j];
 						}
 					} else if ($d=="\n") {
-						//echo "unmatched parens/brackets - likely will cause an error";
+                        //echo "unmatched parens/brackets - likely will cause an error";
+                        if (!$inq && ($intype == 4 || $intype == 11)) {
+                            $str[$j] = ' ';
+                            $newcnt++;
+                        }
 					}
 				}
 				$j++;
