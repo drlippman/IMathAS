@@ -60,14 +60,22 @@ if ($myrights < 100) {
   exit;
 } else if (!empty($_GET['contextid'])) {
   $contextid = Sanitize::simpleString($_GET['contextid']);
+  $org = Sanitize::simpleASCII($_GET['org']);
+  if (substr($org,0,5)=='LTI13') {
+      $searchstr = 'ilp.org=? ';
+      $sorg = $org;
+  } else {
+      $searchstr = 'ilp.org LIKE ? ';
+      $sorg = $org . ':%';
+  }
   $query = "SELECT ilp.id,ilp.linkid,ilp.typeid,ilp.placementtype,ia.name FROM ";
   $query .= "imas_lti_placements AS ilp LEFT JOIN imas_assessments AS ia ON ilp.typeid=ia.id ";
-  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='assess' UNION ";
+  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='assess' AND $searchstr UNION ";
   $query .= "SELECT ilp.id,ilp.linkid,ilp.typeid,ilp.placementtype,ic.name FROM ";
   $query .= "imas_lti_placements AS ilp LEFT JOIN imas_courses AS ic ON ilp.typeid=ic.id ";
-  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='course'";
+  $query .= "WHERE ilp.contextid=? AND ilp.placementtype='course' AND $searchstr";
   $stm = $DBH->prepare($query);
-  $stm->execute(array($contextid, $contextid));
+  $stm->execute(array($contextid, $sorg, $contextid, $sorg));
   echo json_encode($stm->fetchAll(PDO::FETCH_ASSOC), JSON_HEX_TAG);
   exit;
 
@@ -142,9 +150,10 @@ function removelti(el,type,id) {
 $(function() {
   $(".contextid").on("click", function(event) {
     var contextid = $(event.target).html().split("<br")[0];
+    var org = $(event.target).prev().html().split(":")[0];
     $.ajax({
       url: "userlti.php",
-      data: "contextid="+contextid,
+      data: "contextid="+contextid+"&org="+org,
       dataType: "json"
     }).done(function(msg) {
       $("#placements tbody").empty();
