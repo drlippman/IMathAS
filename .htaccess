@@ -17,6 +17,7 @@ AddType application/vnd.ms-excel.sheet.macroEnabled.12 xlsm
 AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx
 AddType application/vnd.ms-excel.template.macroEnabled.12 xltm
 AddType application/vnd.openxmlformats-officedocument.spreadsheetml.template xltx
+AddType application/mathematica ma nb mb
 Options -Indexes
 
 <IfModule mod_php7.c>
