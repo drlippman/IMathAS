@@ -254,7 +254,7 @@ function updatePicture(obj) {
 //alert(src);
   try {
     eval(prepWithMath(src));
-  } catch(err) {alert(err+"\n"+src)}
+  } catch(err) {console.log(err+"\n"+src)}
 }
 
 
@@ -1285,7 +1285,7 @@ function drawPics(base) {
 					  if (!picture.hasAttribute("data-enlarged") && !picture.hasAttribute("data-nomag")) {
 					  	  addMagGlass();
 					  }
-				  } catch(err) {alert(err+"\n"+src)}
+				  } catch(err) {console.log(err+"\n"+src)}
 			  }
 		  }
 	  } else {
