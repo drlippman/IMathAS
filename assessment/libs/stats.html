@@ -146,11 +146,13 @@ freqdist(array,label,start,classwidth)
 <BR>&nbsp;start: first lower class limit
 <BR>&nbsp;classwidth: width of the classes
 <BR><h3><a name="frequency">frequency</a></h3>
-frequency(array,start,classwidth)
+frequency(array,start,classwidth, [end])
 <BR>Returns an array of frequencies for the data grouped into classes
 <BR>&nbsp;array: array of data values
 <BR>&nbsp;start: first lower class limit
 <BR>&nbsp;classwidth: width of the classes
+<BR>&nbsp;end: end of last class. optional, but recommended to ensure the resulting array 
+    includes the last class.
 <BR><h3><a name="countif">countif</a></h3>
 countif(array,condition)
 <BR>Returns count of items in array that meet condition
