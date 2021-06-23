@@ -18,7 +18,9 @@ if (isset($_POST['options'])) {
 	//ready to output
 	$outcol = 0;
 	if (isset($_POST['pts'])) { $dopts = true; $outcol++;}
-	if (isset($_POST['ptpts'])) { $doptpts = true; $outcol++;}
+    if (isset($_POST['ptpts'])) { $doptpts = true; $outcol++;}
+    if (isset($_POST['raw'])) { $doraw = true; $outcol++;}
+	if (isset($_POST['ptraw'])) { $doptraw = true; $outcol++;}
 	if (isset($_POST['ba'])) { $doba = true; $outcol++;}
 	if (isset($_POST['bca'])) { $dobca = true; $outcol++;}
 	if (isset($_POST['la'])) { $dola = true; $outcol++;}
@@ -78,6 +80,16 @@ if (isset($_POST['options'])) {
 			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
 			$gb[1][$initoffset + $outcol*$k + $offset] = "Part Points (".$qpts[$q]." possible)";
 			$offset++;
+        }
+        if ($doraw) {
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Raw";
+			$offset++;
+		}
+		if ($doptraw) {
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Part Raw";
+			$offset++;
 		}
 		if ($doba) {
 			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
@@ -123,14 +135,14 @@ if (isset($_POST['options'])) {
                 JOIN imas_students ON imas_students.userid = iar.userid
               WHERE iar.assessmentid = :assessmentid
                 AND imas_students.courseid = :courseid";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         $GLOBALS['assessver'] = $row['ver'];
 
-				$assess_record = new AssessRecord($DBH, $assess_info, false);
-				$assess_record->setRecord($row);
-				$assess_record->setTeacherInGb(true);
+        $assess_record = new AssessRecord($DBH, $assess_info, false);
+        $assess_record->setRecord($row);
+        $assess_record->setTeacherInGb(true);
 
         if (!isset($sturow[$row['userid']])) {
             continue;
@@ -138,40 +150,43 @@ if (isset($_POST['options'])) {
 
         $r = $sturow[$row['userid']];
 
-				// Get question objects.  This returns a lot more than we need.
-				// The 2 for generate_html tells it to tack on the 'ans' and 'stuans'
-				// to jsparams.
-				$question_objects = $assess_record->getAllQuestionObjects(true, true, $dobca ? 2 : false, 'scored');
-				list($questionIds, $toloadqids) = $assess_record->getQuestionIds(range(0,count($question_objects)-1), 'scored');
-				if (!$dobca && $doba) {
-					list($stuanswers, $stuanswersval) = $assess_record->getStuanswers('scored');
-				}
+        // Get question objects.  This returns a lot more than we need.
+        // The 2 for generate_html tells it to tack on the 'ans' and 'stuans'
+        // to jsparams.
+        $question_objects = $assess_record->getAllQuestionObjects(true, true, $dobca ? 2 : false, 'scored');
+        list($questionIds, $toloadqids) = $assess_record->getQuestionIds(range(0,count($question_objects)-1), 'scored');
+        if (!$dobca && $doba) {
+            list($stuanswers, $stuanswersval) = $assess_record->getStuanswers('scored');
+        }
         for ($qn = 0; $qn < count($question_objects); $qn++) {
-						$question_object = $question_objects[$qn];
+            $question_object = $question_objects[$qn];
 
-						if ($dobca) {
-							$correctAns = $question_object['jsparams']['ans'];
-							$stuAns = $question_object['jsparams']['stuans'];
-						} else if ($doba) {
-							$stuAns = $stuanswers[$qn+1];
-						}
+            if ($dobca) {
+                $correctAns = $question_object['jsparams']['ans'];
+                $stuAns = $question_object['jsparams']['stuans'];
+            } else if ($doba) {
+                $stuAns = $stuanswers[$qn+1];
+            }
 
             $qscore = array();
             $qatt = array();
 
-						if ($question_object['status'] == 'unattempted') {
-							$qscore = array(0);
-							$qatt = array('');
-						} else {
+            if ($question_object['status'] == 'unattempted') {
+                $qscore = array(0);
+                $raw = array(0);
+                $qatt = array('');
+            } else {
 	            for ($pn = 0; $pn < count($question_object['parts']); $pn++) {
 	                $partinfo = $question_object['parts'][$pn];
-									if ($partinfo['try'] == 0) {
-										$qscore[$pn] = 0;
-									} else {
-	                  $qscore[$pn] = $partinfo['score'];
+                    if ($partinfo['try'] == 0) {
+                        $qscore[$pn] = 0;
+                        $raw[$pn] = 0;
+                    } else {
+                        $qscore[$pn] = $partinfo['score'];
+                        $raw[$pn] = $partinfo['rawscore'];
 	                }
 	            }
-						}
+            }
 
             $c = $qcol[$questionIds[$qn]];
             $offset = 0;
@@ -181,6 +196,14 @@ if (isset($_POST['options'])) {
             }
             if ($doptpts) {
                 $gb[$r][$c + $offset] = implode('~', $qscore);
+                $offset++;
+            }
+            if ($doraw) {
+                $gb[$r][$c + $offset] = $question_object['rawscore'];
+                $offset++;
+            }
+            if ($doptraw) {
+                $gb[$r][$c + $offset] = implode('~', $raw);
                 $offset++;
             }
             if ($doba) {
@@ -229,7 +252,9 @@ if (isset($_POST['options'])) {
 	echo "<form method=\"post\" action=\"gb-aidexport2.php?aid=$aid&cid=$cid\">";
 	echo 'What do you want to include in the export:<br/>';
 	echo '<input type="checkbox" name="pts" value="1"/> Points earned<br/>';
-	echo '<input type="checkbox" name="ptpts" value="1"/> Multipart broken-down Points earned<br/>';
+    echo '<input type="checkbox" name="ptpts" value="1"/> Multipart broken-down Points earned<br/>';
+    echo '<input type="checkbox" name="raw" value="1"/> Raw score<br/>';
+	echo '<input type="checkbox" name="ptraw" value="1"/> Multipart broken-down raw score<br/>';
 	echo '<input type="checkbox" name="ba" value="1"/> Scored Attempt<br/>';
 	echo '<input type="checkbox" name="bca" value="1"/> Correct Answers for Scored Attempt<br/>';
 	echo '<input type="submit" name="options" value="Export" />';
