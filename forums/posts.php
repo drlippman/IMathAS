@@ -568,7 +568,7 @@ function printchildren($base,$restricttoowner=false) {
 			echo "</a>";
 		}
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
-			echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
+			echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_blank\">[GB]</a>";
 			if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
 				$query = "SELECT ia.ver,ia.id,ias.id AS asid FROM imas_assessments AS ia LEFT JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
 				$query .= "AND ias.userid=:ownerid WHERE ia.courseid=:courseid AND (ia.name=:name OR ia.name=:name2) ORDER BY asid DESC";
@@ -578,9 +578,9 @@ function printchildren($base,$restricttoowner=false) {
 					$qn = $matches[1];
 					$r = $stm->fetch(PDO::FETCH_ASSOC);
 					if ($r['ver'] > 1) {
-						echo " <a class=\"small\" href=\"$imasroot/assess2/gbviewassess.php?cid=$cid&uid={$ownerid[$child]}&aid={$r['id']}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
+						echo " <a class=\"small\" href=\"$imasroot/assess2/gbviewassess.php?cid=$cid&uid={$ownerid[$child]}&aid={$r['id']}#qwrap$qn\" target=\"_blank\">[assignment]</a>";
 					} else if ($r['asid'] !== null) {
-						echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r['asid']}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
+						echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r['asid']}#qwrap$qn\" target=\"_blank\">[assignment]</a>";
 					}
 				}
 			}

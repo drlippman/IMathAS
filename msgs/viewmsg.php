@@ -135,7 +135,7 @@
 	if (isset($teacherof[$line['courseid']])) {
 		if ($line['email'] !== null) {
 			echo " <a href=\"mailto:".Sanitize::emailAddress($line['email'])."\">email</a> | ";
-			echo " <a href=\"$imasroot/course/gradebook.php?cid=". Sanitize::courseId($line['courseid'])."&stu=".Sanitize::encodeUrlParam($line['msgfrom'])."\" target=\"_popoutgradebook\">gradebook</a>";
+			echo " <a href=\"$imasroot/course/gradebook.php?cid=". Sanitize::courseId($line['courseid'])."&stu=".Sanitize::encodeUrlParam($line['msgfrom'])."\" target=\"_blank\">gradebook</a>";
 		}
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$qn = $matches[1];
@@ -163,7 +163,7 @@
 					$stm = $DBH->prepare("SELECT userid FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
-						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_blank\">assignment</a>";
 						if ($due<2000000000) {
 							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
 						}
@@ -173,7 +173,7 @@
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
 						$asid = $stm->fetchColumn(0);
-						echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_blank\">assignment</a>";
 						if ($due<2000000000) {
 							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
 						}
