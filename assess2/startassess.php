@@ -49,7 +49,10 @@ if ($isstudent) {
   $assess_info->applyTimelimitMultiplier($studentinfo['timelimitmult']);
 }
 
-
+//check to see if prereq has been met
+if ($isstudent) {
+  $assess_info->checkPrereq($uid);
+}
 
 // reject if not available
 if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['practice'])) {
