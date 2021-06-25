@@ -34,6 +34,12 @@ class Redirect {
 
     public function do_js_redirect() {
         ?>
+        <div style="display:none">
+          <p><?php echo $installname; ?> needs permission to set a cookie to keep you logged in
+           while you work on your assignment.</p>
+          <p><button onclick="requestaccess()">Okay</button> (your browser may ask you for confirmation)</p>
+          <p>Alternatively, you can <a id="new-tab" target="_blank">open this assignment in a new tab</a></p>
+        </div>
         <a id="try-again" target="_blank">If you are not automatically redirected, click here to continue</a>
         <script>
 
@@ -42,8 +48,14 @@ class Redirect {
             echo 'window.location.href';
          } else {
             echo "window.location.origin + window.location.pathname + '?" . $this->referer_query . "'";
-        }
-        ?>;
+        }?>;
+
+        document.getElementById('new-tab').href=<?php
+        if (empty($this->referer_query)) {
+            echo 'window.location.href';
+         } else {
+            echo "window.location.origin + window.location.pathname + '?" . $this->referer_query . "'";
+        }?>;
 
         var canAccessCookies = function() {
             if (!navigator.cookieEnabled) {
@@ -64,14 +76,23 @@ class Redirect {
         if (canAccessCookies()) {
             // We have access, continue with redirect
             window.location = '<?php echo $this->location ?>';
+        } else if (typeof document.requestStorageAccess === 'function') {
+            document.hasStorageAccess().then(function(hasAccess) {
+                if (hasAccess) {
+                    window.location = '<?php echo $this->location ?>';
+                } else {
+                    document.getElementById('request-storageaccess').display = 'block';
+                    document.getElementById('try-again').display = 'none';
+                }
+            });
         } else {
             // We don't have access, reopen flow in a new window.
-            var opened = window.open(document.getElementById('try-again').href, '_blank');
-            if (opened) {
-                document.getElementById('try-again').innerText = "New window opened, click to reopen";
-            } else {
-                document.getElementById('try-again').innerText = "Popup blocked, click to open in a new window";
-            }
+            //var opened = window.open(document.getElementById('try-again').href, '_blank');
+            //if (opened) {
+            //    document.getElementById('try-again').innerText = "New window opened, click to reopen";
+            //} else {
+                document.getElementById('try-again').innerText = "Unable to set a cookie to keep you logged in here. Click to open in a new window";
+            //}
         }
 
         </script>
