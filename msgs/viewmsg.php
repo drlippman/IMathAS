@@ -28,7 +28,7 @@
 	}
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	$page = Sanitize::onlyInt($_GET['page']);
+	$page = Sanitize::onlyInt($_GET['page'] ?? 0);
 	$type = $_GET['type'];
 
 	$teacherof = array();
@@ -186,9 +186,10 @@
 	echo "</td></tr><tr><td><b>Sent:</b></td><td>$senddate</td></tr>";
 	echo "<tr><td><b>Subject:</b></td><td>".Sanitize::encodeStringForDisplay($line['title']);
 	if ($myrights>=20 && preg_match('/Question\s+ID\s+(\d+),\s+seed\s+(\d+)/',$line['message'],$matches)) {
-		$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
-		echo " <span class=small><a href=\"$imasroot/course/$testqpage?cid=0&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
-		echo " | <a href=\"$imasroot/course/moddataset.php?cid=0&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
+        $qcid = isset($teacherof[$line['courseid']]) ? intval($line['courseid']) : 0;
+        $testqpage = ($courseUIver>1 || $qcid == 0) ? 'testquestion2.php' : 'testquestion.php';
+		echo " <span class=small><a href=\"$imasroot/course/$testqpage?cid=$qcid&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
+		echo " | <a href=\"$imasroot/course/moddataset.php?cid=$qcid&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
 	}
 	echo "</td></tr>";
 	echo "</tbody></table>";
