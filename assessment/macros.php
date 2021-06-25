@@ -3734,10 +3734,10 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	global $imasroot,$staticroot;
 	if (isset($GLOBALS['testsettings']['testtype']) && ($GLOBALS['testsettings']['testtype']=='NoScores' || $GLOBALS['testsettings']['testtype']=='EndScore')) {
 		return '';
-	}
+    }
 	if ($stu !== null) {
-		$stu = preg_replace('/[^\-\d\.e]/','',$stu);
-	}
+		$stu = preg_replace('/[^\-\d\.eE]/','',$stu);
+    }
 	if ($stu===null) {
 		return " ";
 	} else if (!is_numeric($stu)) {
