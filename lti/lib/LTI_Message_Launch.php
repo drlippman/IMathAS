@@ -394,7 +394,9 @@ class LTI_Message_Launch {
     }
 
     public function get_migration_claim() {
-        if (!empty($this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/lti1p1'])) {
+        if (!empty($this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/lti1p1']) &&
+            !empty($this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/lti1p1']['oauth_consumer_key'])
+        ) {
             $claim = $this->jwt['body']['https://purl.imsglobal.org/spec/lti/claim/lti1p1'];
             $claim['signing_string'] = $claim['oauth_consumer_key'] . '&' .
                 $this->jwt['body']["https://purl.imsglobal.org/spec/lti/claim/deployment_id"]. '&' . 
