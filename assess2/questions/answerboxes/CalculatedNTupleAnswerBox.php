@@ -65,6 +65,9 @@ class CalculatedNTupleAnswerBox implements AnswerBox
         } else if ($displayformat == 'set') {
             $tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
             $shorttip = _('Enter a set');
+        } else if ($displayformat == 'setlist') {
+            $tip = _('Enter your answer as a list of sets separated with commas.  Example: {1,2,3},{4,5}') . "<br/>";
+            $shorttip = _('Enter a list of sets');
         } else if ($displayformat == 'list') {
             $tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5172,4)') . "<br/>";
             $shorttip = _('Enter a list of n-tuples');
