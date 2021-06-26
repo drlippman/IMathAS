@@ -171,6 +171,11 @@ require_once(__DIR__."/../includes/userprefs.php");
 generateuserprefs();
 
 if ($role == 'Instructor' && $localcourse === null) {
+    // try looking it up again, now that user connection is established
+    $localcourse = $db->get_local_course($contextid, $launch);
+}
+
+if ($role == 'Instructor' && $localcourse === null) {
   // no course connection yet
   require(__DIR__.'/connectcourse.php');
   connect_course($launch, $db, $localuserid);

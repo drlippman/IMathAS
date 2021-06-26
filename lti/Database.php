@@ -323,6 +323,7 @@ class Imathas_LTI_Database implements LTI\Database
             $contextid = $launch->get_platform_context_id();
             $migration_claim = $launch->get_migration_claim();
         }
+
         if ($userid === false && 
             !empty($migration_claim) && 
             $this->verify_migration_claim($migration_claim)
@@ -344,6 +345,7 @@ class Imathas_LTI_Database implements LTI\Database
             // look to see if we already have a user record with the same context id
             // from an LTI 1.1 connection
             $groups = $this->get_groups($platform_id, $launch->get_deployment_id());
+
             if (count($groups)==0) {
                 return false;
             }
@@ -355,14 +357,27 @@ class Imathas_LTI_Database implements LTI\Database
             $stm = $this->dbh->prepare($query);
             $stm->execute(array($contextid));
             $qarr = array($ltiuserid);
+
+            $old_userid = $launch->get_lti1p1_userid();
+            if ($old_userid !== false && $old_userid != $ltiuserid) {
+                $qarr[] = $old_userid;
+            }
+            $orgcnt = 0;
             while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                if (substr($row['org'],0,5) == 'LTI13') { continue; }
                 if (in_array($row['groupid'], $groups)) { // check course is in right group
                     $key = explode(':', $row['org'])[0];
                     $qarr[] = $key.':%';
+                    $orgcnt++;
                 }
             }
-            if (count($qarr)==2) { // only use if one matching association
-                $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org LIKE ?');
+
+            if ($orgcnt == 1) { // only use if one matching association
+                if ($old_userid !== false && $old_userid != $ltiuserid) {
+                    $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE (ltiuserid=? OR ltiuserid=?) AND org LIKE ?');
+                } else {
+                    $stm = $this->dbh->prepare('SELECT userid FROM imas_ltiusers WHERE ltiuserid=? AND org LIKE ?');
+                }
                 $stm->execute($qarr);
                 $userid = $stm->fetchColumn(0);
                 if ($userid !== false) {
