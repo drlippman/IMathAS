@@ -46942,7 +46942,13 @@ var paste = (function (domGlobals) {
                 .replace(/<([^>]*)>/g,"")
                 .replace(/&(m|n)dash;/g,"-")
                 .replace(/&?nbsp;?/g," ")
-                .replace(/&(.*?);/g,"$1");
+                .replace(/&(.*?);/g, function(m,p) {
+                    if (p=='lt' || p=='gt') {
+                        return m;
+                    } else {
+                        return p;
+                    }
+                });
         },
 
 		imgwrap : function(ed, imgnode) {
