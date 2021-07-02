@@ -161,7 +161,7 @@ if (isset($_GET['frame_id'])) {
 		} else if (typeof MathJax != "undefined") {
             if (MathJax.startup) {
                 MathJax.startup.promise = MathJax.startup.promise.then(sendLTIresizemsg);
-            } elseif (MathJax.Hub) {
+            } else if (MathJax.Hub) {
                 MathJax.Hub.Queue(function () {
                     sendresizemsg();
                 });
