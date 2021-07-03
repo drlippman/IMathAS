@@ -4092,14 +4092,14 @@ function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,
 	} else if ($type=='log') {
 		$code = 8.4;
 	} else if ($type=='genexp') {
-    $code = 8.5;
-  } else if ($type=='genlog') {
-    $code = 8.6;
-  } else if ($type=='circle' || $type=='circlerad') {
+        $code = 8.5;
+    } else if ($type=='genlog') {
+        $code = 8.6;
+    } else if ($type=='circle' || $type=='circlerad') {
 		$code = 7;
 	} else if ($type=='ellipse' || $type=='ellipserad') {
-    $code = 7.2;
-  } else if ($type=='sin') {
+        $code = 7.2;
+    } else if ($type=='sin') {
 		$code = 9.1;
 	} else if ($type=='cos') {
 		$code = 9;
@@ -4122,20 +4122,20 @@ function gettwopointdata($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=null,
 			$pts[3] = ($pts[3] - $imgborder)/$pixelsperx + $xmin;
 			$pts[2] = ($h - $pts[2] - $imgborder)/$pixelspery + $ymin;
 			$pts[4] = ($h - $pts[4] - $imgborder)/$pixelspery + $ymin;
-      $outpt = array($pts[1], $pts[2], $pts[3], $pts[4]);
-      if ($type=='ellipserad') {
-        $pts[3] = abs($pts[3]-$pts[1]);
-        $pts[4] = abs($pts[4]-$pts[2]);
-        $outpt = array($pts[1], $pts[2], $pts[3], $pts[4]);
-      } else if ($type=='circlerad') {
-        $pts[3] = sqrt(pow($pts[3]-$pts[1],2)+pow($pts[4]-$pts[2],2));
-        $outpt = array($pts[1], $pts[2], $pts[3]);
-      } else if ($type=='genexp' || $type=='genlog') {
-        $pts[5] = ($pts[5] - $imgborder)/$pixelsperx + $xmin;
-        $pts[6] = ($h - $pts[6] - $imgborder)/$pixelspery + $ymin;
-        // Last value is the asymptote: y val for genexp, x val for genlog
-        $outpt = ($type=='genexp') ? array($pts[3], $pts[4], $pts[5], $pts[6], $pts[2]) : array($pts[3], $pts[4], $pts[5], $pts[6], $pts[1]);
-      }
+            $outpt = array($pts[1], $pts[2], $pts[3], $pts[4]);
+            if ($type=='ellipserad') {
+                $pts[3] = abs($pts[3]-$pts[1]);
+                $pts[4] = abs($pts[4]-$pts[2]);
+                $outpt = array($pts[1], $pts[2], $pts[3], $pts[4]);
+            } else if ($type=='circlerad') {
+                $pts[3] = sqrt(pow($pts[3]-$pts[1],2)+pow($pts[4]-$pts[2],2));
+                $outpt = array($pts[1], $pts[2], $pts[3]);
+            } else if ($type=='genexp' || $type=='genlog') {
+                $pts[5] = ($pts[5] - $imgborder)/$pixelsperx + $xmin;
+                $pts[6] = ($h - $pts[6] - $imgborder)/$pixelspery + $ymin;
+                // Last value is the asymptote: y val for genexp, x val for genlog
+                $outpt = ($type=='genexp') ? array($pts[3], $pts[4], $pts[5], $pts[6], $pts[2]) : array($pts[3], $pts[4], $pts[5], $pts[6], $pts[1]);
+            }
 			$outpts[] = $outpt;
 		}
 	}
@@ -4168,7 +4168,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
   	} else if ($type=='parab') {
       foreach ($pts as $key => $pt) {
-    		if (abs($pt[0]-$pt[2]) > 1E-12) {
+        if (abs($pt[0]-$pt[2]) > 1E-12) {
           $k = ($pt[3]-$pt[1])/pow($pt[2]-$pt[0],2);
           $coef1 = -2*$pt[0]*$k;
           $coef2 = pow($pt[0],2)*$k + $pt[1];
@@ -4177,7 +4177,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
         }
       }
   	} else if ($type=='horizparab') {
-  		foreach ($pts as $key => $pt) {
+  	  foreach ($pts as $key => $pt) {
         if (abs($pt[1]-$pt[3]) > 1E-12) {
           $k = ($pt[2]-$pt[0])/pow($pt[3]-$pt[1],2);
           $coef1 = -2*$pt[1]*$k;
@@ -4188,7 +4188,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
   	} else if ($type=='cubic') {
       foreach ($pts as $key => $pt) {
-    		if (abs($pt[0]-$pt[2]) > 1E-12) {
+        if (abs($pt[0]-$pt[2]) > 1E-12) {
           $k = ($pt[3]-$pt[1])/pow($pt[2]-$pt[0],3);
           $coef1 = -3*$pt[0]*$k;
           $coef2 = 3*pow($pt[0],2)*$k;
@@ -4225,7 +4225,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
   	} else if ($type=='rational') {
       foreach ($pts as $key => $pt) {
-    		if (abs($pt[0]-$pt[2]) > 1E-12 && abs($pt[1]-$pt[3]) > 1E-12) {
+        if (abs($pt[0]-$pt[2]) > 1E-12 && abs($pt[1]-$pt[3]) > 1E-12) {
           $k = ($pt[3]-$pt[1])*($pt[2]-$pt[0]);
           $outexps[] = makexxpretty("$k/($x - $pt[0]) + $pt[1]");
           $outeqs[] = makexxpretty("$y = $k/($x - $pt[0]) + $pt[1]");
@@ -4247,7 +4247,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
   	} else if ($type=='log') {
       foreach ($pts as $key => $pt) {
-    		if (abs($pt[0]-$pt[2]) > 1E-12 && abs($pt[1]-$pt[3]) > 1E-12 && $pt[0]*$pt[2] > 0) {
+        if (abs($pt[0]-$pt[2]) > 1E-12 && abs($pt[1]-$pt[3]) > 1E-12 && $pt[0]*$pt[2] > 0) {
           $j = abs($pt[0])/$pt[0];
           $k = ($pt[3]-$pt[1])/(log($j*$pt[2])-log($j*$pt[0]));
           $b = $pt[1]-$k*log($j*$pt[0]);
@@ -4289,7 +4289,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
   	} else if ($type=='circle') {
       foreach ($pts as $key => $pt) {
-    		if (!(abs($pt[0]-$pt[2]) < 1E-12 && abs($pt[1]-$pt[3]) < 1E-12)) {
+        if (!(abs($pt[0]-$pt[2]) < 1E-12 && abs($pt[1]-$pt[3]) < 1E-12)) {
           $rs = pow($pt[2]-$pt[0],2) + pow($pt[3]-$pt[1],2);
           $xexp = ($pt[0]==0) ? "$x^2" : "($x-$pt[0])^2";
           $yexp = ($pt[1]==0) ? "$y^2" : "($y-$pt[1])^2";
@@ -4299,7 +4299,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
   	} else if ($type=='ellipse') {
       foreach ($pts as $key => $pt) {
-    		if (abs($pt[0]-$pt[2]) > 1E-12 && abs($pt[1]-$pt[3]) > 1E-12) {
+        if (abs($pt[0]-$pt[2]) > 1E-12 && abs($pt[1]-$pt[3]) > 1E-12) {
           $as = pow($pt[2]-$pt[0],2);
           $bs = pow($pt[3]-$pt[1],2);
           $xexp = ($pt[0]==0) ? "$x^2/$as" : "($x-$pt[0])^2/$as";
@@ -4310,7 +4310,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
     } else if ($type=='sin') {
       foreach ($pts as $key => $pt) {
-    		if (abs($pt[0]-$pt[2]) > 1E-12) {
+        if (abs($pt[0]-$pt[2]) > 1E-12) {
           if (abs($pt[1]-$pt[3]) > 1E-12) {
             $a = abs($pt[3]-$pt[1]);
             $b = M_PI/(2*abs($pt[2]-$pt[0]));
@@ -4328,7 +4328,7 @@ function gettwopointformulas($str,$type,$xmin=null,$xmax=null,$ymin=null,$ymax=n
       }
   	} else if ($type=='cos') {
       foreach ($pts as $key => $pt) {
-    		if (abs($pt[0]-$pt[2]) > 1E-12) {
+        if (abs($pt[0]-$pt[2]) > 1E-12) {
           if (abs($pt[1]-$pt[3]) > 1E-12) {
             $a = abs($pt[3]-$pt[1])/2;
             $b = M_PI/abs($pt[2]-$pt[0]);
