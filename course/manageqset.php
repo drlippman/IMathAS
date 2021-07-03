@@ -346,7 +346,7 @@ if ($myrights<20) {
 					foreach ($libarray as $qsetid) { //for each question
 						//determine which libraries to remove from; my lib assignments - newlibs
 						if (isset($mylibs[$qsetid])) {
-                            $toremove = array_diff($mylibs[$qsetid],$newlibs);
+                            $toremove = array_values(array_diff($mylibs[$qsetid],$newlibs));
                             if (count($toremove)==1 && $toremove[0] == 0) {
                                 // only in unassigned - nothing to do
                                 continue;
@@ -367,7 +367,7 @@ if ($myrights<20) {
 							}
 						}
 					}
-
+                    exit;
 				}
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
