@@ -367,7 +367,6 @@ if ($myrights<20) {
 							}
 						}
 					}
-                    exit;
 				}
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/manageqset.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
