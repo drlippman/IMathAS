@@ -392,7 +392,7 @@ if ($overwriteBody==1) {
   $(function() {
     var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.png" alt="Options"/></a>\';
     html += \'<ul role="menu" class="dropdown-menu">\';
-    $("tr td:first-child").css("clear","both").each(function (i,el) {
+    $("#courses-teaching tr td:first-child").css("clear","both").each(function (i,el) {
       var cid = $(el).attr("data-cid");
       var thishtml = html + \' <li class="unhide"><a href="#" onclick="unhidecourse(this);return false;">'._('Return to home page course list').'</a></li>\';
       thishtml += \' <li class="hide"><a href="#" onclick="hidecourse(this);return false;">'._('Hide from home page course list').'</a></li>\';
@@ -405,6 +405,15 @@ if ($overwriteBody==1) {
         thishtml += \'</ul></span> \';
         $(el).find("img").replaceWith(thishtml);
     });
+    $("#courses-taking tr td:first-child").css("clear","both").each(function (i,el) {
+        var cid = $(el).attr("data-cid");
+        var thishtml = html + \' <li class="unhide"><a href="#" onclick="unhidecourse(this);return false;">'._('Return to home page course list').'</a></li>\';
+        thishtml += \' <li class="hide"><a href="#" onclick="hidecourse(this);return false;">'._('Hide from home page course list').'</a></li>\';
+          thishtml += \' <li><a href="../course/listusers.php?action=lock&uid='.$uid.'&from=ud'.$uid.'&cid=\'+cid+\'">'._('Lock User').'</a></li>\';
+          thishtml += \' <li><a href="../course/listusers.php?action=unenroll&uid='.$uid.'&from=ud'.$uid.'&cid=\'+cid+\'">'._('Unenroll').'</a></li>\';
+          thishtml += \'</ul></span> \';
+          $(el).find("img").replaceWith(thishtml);
+      });
     $(".dropdown-toggle").dropdown();
     });
     </script>';
