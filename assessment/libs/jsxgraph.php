@@ -1289,10 +1289,12 @@ function jsxText (&$board, $param, $ops=array()) {
 			$out .= "anchor: {$anchor},"; 
 		}
 		if($anchorX !== false) {
-			$out .= "anchorX: {$anchorX},"; 
+            $anchorX = preg_replace('/[^\w\-]/','',$anchorX);
+			$out .= "anchorX: '{$anchorX}',"; 
 		}
 		if($anchorY !== false) {
-			$out .= "anchorY: {$anchorY},"; 
+            $anchorY = preg_replace('/[^\w\-]/','',$anchorY);
+			$out .= "anchorY: '{$anchorY}',"; 
 		}
         $out .= "})";
 		
