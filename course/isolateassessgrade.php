@@ -540,7 +540,11 @@
 	} else {
 		$timeavg = '-';
 	}
-	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
+	echo "</a></td><td>$pct</td><td></td>";
+    if ($includeduedate) {
+        echo '<td></td>';
+    }
+    echo "<td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
 	if ($hassection && !$hidesection && $hascodes && !$hidecode) {
 		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true,false);</script>";
