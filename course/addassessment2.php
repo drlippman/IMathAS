@@ -525,6 +525,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
             AssessHelpers::retotalAll($cid, $assessmentId, true, false, 
                 ($toset['submitby']==$curassess['submitby']) ? '' : $toset['submitby'], false);
 
+            // update "show work after" status flags
+            AssessHelpers::updateShowWorkStatus($assessmentId, $toset['showwork'], $toset['submitby']);
+            
 			$DBH->commit();
 			$rqp = Sanitize::randomQueryStringParam();
 			if ($from=='gb') {

@@ -2355,9 +2355,15 @@ The following macros create graphs or tables:
   of the two points used.</li>
 <li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointdata(stuans, type, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing question
   and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'lineseg', 'ray', 'parab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
-  'rational', 'exp', 'log', 'sin', 'cos', 'abs', 'vector', 'circle','ellipse'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
+  'rational', 'exp', 'genexp', 'log', 'genlog', 'sin', 'cos', 'abs', 'vector', 'circle','ellipse'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
   the two points used.  They are returned in the order clicked.  For example, with 'parab' type, the first point is the vertex and the
-  second point is an arbitrary point. Can use type 'circlerad' to return array(x-center,y-center,radius) or 'ellipserad' to return array(x-center,y-center,x-radius,y-radius).</li>
+  second point is an arbitrary point. Using 'genexp' or 'genlog' will return a 5th entry which is the value of the asymptote. Can use type 'circlerad' to return array(x-center,y-center,radius) or 'ellipserad' 
+	to return array(x-center,y-center,x-radius,y-radius).</li>
+<li><strong>gettwopointformulas(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointformulas(stuans, type, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing question
+  and returns formulas for curves drawn by the student.  Type should be one of 'line', 'lineseg', 'ray', 'parab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
+  'rational', 'exp', 'genexp', 'log', 'genlog', 'sin', 'cos', 'abs', 'circle','ellipse'.  Returns an array of expressions, each a function of x, for the curves drawn. They are returned in the order clicked.  For 
+	'horizparab', output will be in terms of y. For 'circle' and 'ellipse', output will be expression in x and y equaling 1. Can give a final optional argument 'showequation,[xvar,yvar]' to output implicit equations with optional custom x 
+	and y variables.</li>
 <li><strong>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getdotsdata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing
   question and pulls out the closed dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
   of the dot.</li>
@@ -3147,6 +3153,10 @@ of choices is automatically randomized.
 	for selecting the item corresponding with $questions[2].  All other answers would receive 0 credit.</dd>
 <dt>$readerlabel = string</dt>
     <dd>A string that will be used as a visually hidden label on the input box for screenreaders.</dd>
+<dt>$ansprompt = string</dt>
+    <dd>When $displayformat = "select" is used, this allows you to override the default "Select an answer" text 
+        that displays. Do not use this unless there's a really strong reason to.
+    </dd>
 <dt>$answerbox (In Question Text)</dt>
 	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
 <dt>$showanswer </dt>
@@ -3282,7 +3292,7 @@ A student is asked to enter a function
 	Include "ignore_case,false" to make the search case sensitive.
 	Include "ignore_symbol,$" (or some symbol other than $) at the beginning of the $requiretimes to ignore that symbol in the answer<br/>
 	Note that commas are ignored by default with Function type, and a basic exponent like x^(-3) is converted to x^-3 before the check.</dd>
-<dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" (can combine, like "equation,nosoln")</dt>
+<dt>$answerformat = "equation" or "inequality" or "toconst" or "scalarmult" or "nosoln" or "nosolninf" or "sameform" or "list" (can combine, like "equation,nosoln")</dt>
 	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
 	this behavior.<br/>
 	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
@@ -3290,7 +3300,9 @@ A student is asked to enter a function
 	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
 	"inequality": Specifies that the answer is expected to be an inequality rather than an expression.
 	The given answers should also be an inequality.  Be sure to specify all variables in the equation in $variables.  This may fail
-	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
+    on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
+    "list": Allow a list of expressions or equations to be entered. Does not ignore duplicates. You cannot
+       use this in combination with $partialcredit.  $requiretimes will apply to each element of the list.<br/>
 	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
 	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
     values or raise numbers to very large powers.<br/>
@@ -3592,9 +3604,15 @@ This can be used for coordinate points, vectors, or any other n-tuple of numbers
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" </dt>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list", "set", "setlist" </dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
-	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+    entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+<dt>$answerformat = "scalarmult", "anyorder", "nosoln", "nosolninf" </dt>
+    <dd>"scalarmult" will accept any answer that is a scalar multiple of the correct answer.  <br/>
+        "anyorder" will accept elements in any order, so (2,1) would be treated equivalent to (1,2)<br/>
+	    $answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	    $ansprompt = "One value, x=;No values;Many values"
+	</dd>
 <dt>$scoremethod = "byelement" </dt>
 	<dd>By default, the whole n-tuple must be correct to receive any credit.
 	Set $scoremethod = "byelement" to give partial credit if only some elements of
@@ -3638,11 +3656,12 @@ rather than just numbers, such as (5/3, 2/3).
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" </dt>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list", "set", "setlist" </dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
-<dt>$answerformat = "scalarmult", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf" </dt>
-	<dd>"scalarmult" will accept any answer that is a scalar multiple of the correct answer.  <br/>
+<dt>$answerformat = "scalarmult", "anyorder", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf" </dt>
+    <dd>"scalarmult" will accept any answer that is a scalar multiple of the correct answer.  <br/>
+        "anyorder" will accept elements in any order, so (2,1) would be treated equivalent to (1,2)<br/>
 	The other options require each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>

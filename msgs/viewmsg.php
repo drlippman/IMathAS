@@ -28,7 +28,7 @@
 	}
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	$page = Sanitize::onlyInt($_GET['page']);
+	$page = Sanitize::onlyInt($_GET['page'] ?? 0);
 	$type = $_GET['type'];
 
 	$teacherof = array();
@@ -135,7 +135,7 @@
 	if (isset($teacherof[$line['courseid']])) {
 		if ($line['email'] !== null) {
 			echo " <a href=\"mailto:".Sanitize::emailAddress($line['email'])."\">email</a> | ";
-			echo " <a href=\"$imasroot/course/gradebook.php?cid=". Sanitize::courseId($line['courseid'])."&stu=".Sanitize::encodeUrlParam($line['msgfrom'])."\" target=\"_popoutgradebook\">gradebook</a>";
+			echo " <a href=\"$imasroot/course/gradebook.php?cid=". Sanitize::courseId($line['courseid'])."&stu=".Sanitize::encodeUrlParam($line['msgfrom'])."\" target=\"_blank\">gradebook</a>";
 		}
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			$qn = $matches[1];
@@ -163,7 +163,7 @@
 					$stm = $DBH->prepare("SELECT userid FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
-						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						echo " | <a href=\"$imasroot/assess2/gbviewassess.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&aid=".Sanitize::onlyInt($adata['id'])."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_blank\">assignment</a>";
 						if ($due<2000000000) {
 							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
 						}
@@ -173,7 +173,7 @@
 					$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 					if ($stm->rowCount()>0) {
 						$asid = $stm->fetchColumn(0);
-						echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_popoutgradebook\">assignment</a>";
+						echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid=".Sanitize::courseId($line['courseid'])."&uid=".Sanitize::encodeUrlParam($line['msgfrom'])."&asid=".Sanitize::onlyInt($asid)."#qwrap".Sanitize::encodeUrlParam($qn)."\" target=\"_blank\">assignment</a>";
 						if ($due<2000000000) {
 							echo ' <span class="small">Due '.Sanitize::encodeStringForDisplay($duedate).'</span>';
 						}
@@ -186,9 +186,10 @@
 	echo "</td></tr><tr><td><b>Sent:</b></td><td>$senddate</td></tr>";
 	echo "<tr><td><b>Subject:</b></td><td>".Sanitize::encodeStringForDisplay($line['title']);
 	if ($myrights>=20 && preg_match('/Question\s+ID\s+(\d+),\s+seed\s+(\d+)/',$line['message'],$matches)) {
-		$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
-		echo " <span class=small><a href=\"$imasroot/course/$testqpage?cid=0&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
-		echo " | <a href=\"$imasroot/course/moddataset.php?cid=0&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
+        $qcid = isset($teacherof[$line['courseid']]) ? intval($line['courseid']) : 0;
+        $testqpage = ($courseUIver>1 || $qcid == 0) ? 'testquestion2.php' : 'testquestion.php';
+		echo " <span class=small><a href=\"$imasroot/course/$testqpage?cid=$qcid&qsetid=".Sanitize::encodeUrlParam($matches[1])."&seed=".Sanitize::encodeUrlParam($matches[2])."\" target=\"_blank\">Preview</a>";
+		echo " | <a href=\"$imasroot/course/moddataset.php?cid=$qcid&id=".Sanitize::encodeUrlParam($matches[1])."\" target=\"_blank\">Edit</a></span>";
 	}
 	echo "</td></tr>";
 	echo "</tbody></table>";

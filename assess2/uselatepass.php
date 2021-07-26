@@ -53,11 +53,17 @@ $studentinfo['latepasses'] -= $assess_info->getSetting('can_use_latepass');
 // reload exception info (hacky, but this doesn't happen often)
 $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $latepasshrs, $courseenddate);
 
+//check to see if prereq has been met
+if ($isstudent) {
+    $assess_info->checkPrereq($uid);
+}
+
 // grab any assessment info fields that may have updated
 $include_from_assess_info = array(
   'available', 'startdate', 'enddate', 'original_enddate',
   'extended_with', 'latepasses_avail', 'latepass_extendto',
-  'can_use_latepass', 'enddate_in', 'timelimit'
+  'can_use_latepass', 'enddate_in', 'timelimit',
+  'reqscorename', 'reqscorevalue' 
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 

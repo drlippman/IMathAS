@@ -1410,3 +1410,8 @@ a.dropdown-toggle.arrow-down:hover {
     border: none;
     width: 100%;
 }
+:not([class="mjx-var"][size="s"]) > [class="mjx-c2032"] {
+    vertical-align: 0.513em;
+    margin-left: 0.025em;
+    font-size: 70.7%;
+}

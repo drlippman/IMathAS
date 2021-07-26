@@ -9,7 +9,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 	}
 
 	if (isset($_POST['clears'])) {
-		$clearlist = implode(',', array_map('intval', $_POST['clears']));
+        $clearlist = implode(',', array_map('intval', $_POST['clears']));
 		$stm = $DBH->query("DELETE FROM imas_exceptions WHERE id IN ($clearlist)");
 	}
 	if (isset($_POST['addexc']) || isset($_POST['addfexc'])) {
@@ -371,9 +371,9 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		}
 		echo "</h1>";
 	}
-	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
+	$query = "(SELECT ie.id AS eid,iu.LastName,iu.FirstName,ia.name as itemname,iu.id AS userid,ia.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti,ia.tutoredit FROM imas_exceptions AS ie,imas_users AS iu,imas_assessments AS ia ";
 	$query .= "WHERE ie.itemtype='A' AND ie.assessmentid=ia.id AND ie.userid=iu.id AND ia.courseid=:courseid AND iu.id IN ($tolist) ) ";
-	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
+	$query .= "UNION (SELECT ie.id AS eid,iu.LastName,iu.FirstName,i_f.name as itemname,iu.id AS userid,i_f.id AS itemid,ie.startdate,ie.enddate,ie.waivereqscore,ie.timeext,ie.attemptext,ie.islatepass,ie.itemtype,ie.is_lti,2 AS tutoredit FROM imas_exceptions AS ie,imas_users AS iu,imas_forums AS i_f ";
 	$query .= "WHERE (ie.itemtype='F' OR ie.itemtype='P' OR ie.itemtype='R') AND ie.assessmentid=i_f.id AND ie.userid=iu.id AND i_f.courseid=:courseid2 AND iu.id IN ($tolist) )";
 	if ($isall) {
 		$query .= "ORDER BY itemname,LastName,FirstName";
@@ -394,6 +394,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		if ($isall) {
 			$lasta = 0;
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                if ($istutor && $row['tutoredit'] != 3) { continue; }
 				$sdate = tzdate("m/d/y g:i a", $row['startdate']);
 				$edate = tzdate("m/d/y g:i a", $row['enddate']);
 				if ($lasta!=$row['itemid']) {
@@ -442,6 +443,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 			$assessarr = array();
 			$notesarr = array();
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+                if ($istutor && $row['tutoredit'] != 3) { continue; }
 				$sdate = tzdate("m/d/y g:i a", $row['startdate']);
 				$edate = tzdate("m/d/y g:i a", $row['enddate']);
 				if ($lasts!=$row['userid']) {
@@ -524,16 +526,23 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$lpmsg = "These students all have $lpmin latepasses.";
 	} else {
 		$lpmsg = "These students have $lpmin-$lpmax latepasses.";
-	}
-	$query = "SELECT id,name FROM imas_forums WHERE courseid=:courseid AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000))";
-	$query .= ' ORDER BY name';
+    }
+    $forumarr = array();
+    if (!isset($tutorid)) {
+        $query = "SELECT id,name FROM imas_forums WHERE courseid=:courseid AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000))";
+        $query .= ' ORDER BY name';
+        $stm = $DBH->prepare($query);
+        $stm->execute(array(':courseid'=>$cid));
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $forumarr[$row[0]] = $row[1];
+        }
+    }
+    $query = "SELECT id,name,date_by_lti FROM imas_assessments WHERE courseid=:courseid ";
+    if (isset($tutorid)) {
+        $query .= "AND tutoredit=3 ";
+    }
+    $query .= "ORDER BY name";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid));
-	$forumarr = array();
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$forumarr[$row[0]] = $row[1];
-	}
-	$stm = $DBH->prepare("SELECT id,name,date_by_lti FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
 	$stm->execute(array(':courseid'=>$cid));
 	$assessarr = array();
 	$isDateByLTI = false;

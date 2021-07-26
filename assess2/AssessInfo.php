@@ -1399,4 +1399,38 @@ class AssessInfo
   	}
   }
 
+  /**
+   * Loads new message and forum post counts for LTI users
+   * @return void
+   */
+  public function loadLTIMsgPosts($uid, $canviewall) {
+    global $coursemsgset;
+
+    if (isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==0) {
+      if ($coursemsgset < 4 && $this->assessData['help_features']['message']==true) {
+        $this->assessData['lti_showmsg'] = 1;
+        // get msg count
+        $stm = $this->DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND viewed=0 AND deleted<2");
+            $stm->execute(array(':msgto'=>$uid, ':courseid'=>$this->cid));
+            $this->assessData['lti_msgcnt'] = intval($stm->fetchColumn(0));
+      }
+      if (!empty($this->assessData['help_features']['forum'])) {
+        // get new post count
+        $query = "SELECT COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+        $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
+        $query .= "WHERE imas_forum_threads.forumid=:forumid AND ";
+        $query .= "imas_forum_threads.lastposttime<:now AND ";
+        $query .= "(imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+        $qarr = array(':now'=>time(), ':forumid'=>$this->assessData['help_features']['forum'], ':userid'=>$uid);
+        if (!$canviewall) {
+            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2 )) ";
+            $qarr[':userid2']=$uid;
+        }
+        $stm = $this->DBH->prepare($query);
+        $stm->execute($qarr);
+        $this->assessData['lti_forumcnt'] = intval($stm->fetchColumn(0));
+      }
+    }
+  }
+
 }

@@ -467,7 +467,7 @@ function freqdist($a,$label,$start,$cw) {
 // array: array of data values
 // start: first lower class limit
 // classwidth: width of the classes
-function frequency($a,$start,$cw) {
+function frequency($a,$start,$cw,$end=null) {
 	if (!is_array($a)) {
 		echo 'frequency expects an array';
 		return false;
@@ -476,7 +476,7 @@ function frequency($a,$start,$cw) {
 	sort($a, SORT_NUMERIC);
 	$x = $start;
 	$curr = 0;
-	while ($x <= $a[count($a)-1]+1e-10) {
+	while ($x <= ($end!==null ? $end : $a[count($a)-1]+1e-10)) {
 		$x += $cw;
 		$i = $curr;
 		while (($a[$i] < $x) && ($i < count($a))) {

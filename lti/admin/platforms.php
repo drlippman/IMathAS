@@ -53,16 +53,17 @@ if (!empty($_POST['lms']) &&
 
 $bbclientid = false;
 $query = "SELECT ip.id,ip.issuer,ip.client_id,ip.created_at,
-  GROUP_CONCAT(CONCAT(ig.name,' (',DATE_FORMAT(iga.created_at,'%e %b %Y'),')') SEPARATOR ';;') AS groups FROM
+  GROUP_CONCAT(CONCAT(ig.name,' (',DATE_FORMAT(iga.created_at,'%e %b %Y'),')') SEPARATOR ';;') AS groupslist FROM
   imas_lti_platforms AS ip
-  LEFT JOIN imas_lti_deployments AS id ON id.platform=ip.id
-  LEFT JOIN imas_lti_groupassoc AS iga ON iga.deploymentid=id.id
+  LEFT JOIN imas_lti_deployments AS ild ON ild.platform=ip.id
+  LEFT JOIN imas_lti_groupassoc AS iga ON iga.deploymentid=ild.id
   LEFT JOIN imas_groups AS ig ON iga.groupid=ig.id ";
 if ($myrights < 100) {
     $query .= 'LEFT JOIN imas_users AS iu ON iu.id=ip.created_by ';
-    $query .= 'WHERE iga.groupid=? OR iu.groupid=?';
+    $query .= 'WHERE iga.groupid=? OR iu.groupid=? ';
 }
 $query .= "GROUP BY ip.id ORDER BY ip.issuer,ip.created_at";
+
 if ($myrights < 100) {
     $stm = $DBH->prepare($query);
     $stm->execute(array($groupid,$groupid));
@@ -117,7 +118,7 @@ if ($platforms === false) {
     echo '<td>'.Sanitize::encodeStringForDisplay($row['issuer']).'</td>';
     echo '<td>'.Sanitize::encodeStringForDisplay($row['client_id']).'</td>';
     echo '<td>'. date("j M Y ", strtotime($row['created_at'])).'</td>';
-    echo '<td>'. str_replace(';;','<br>',Sanitize::encodeStringForDisplay($row['groups'])).'</td>';
+    echo '<td>'. str_replace(';;','<br>',Sanitize::encodeStringForDisplay($row['groupslist'])).'</td>';
     if ($myrights == 100) {
         echo '<td><button type=submit name="delete" value="'.Sanitize::encodeStringForDisplay($row['id']).'" ';
         echo 'onclick="return confirm(\''._('Are you SURE you want to delete this platform?').'\');">';

@@ -22,7 +22,7 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=020721";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=072221";?>" type="text/css" />
 <?php
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
@@ -212,7 +212,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$staticroot/javascript/mathjs.js?ver=052016\" type=\"text/javascript\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=033121\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?ver=061521\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\" type=\"text/javascript\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {
@@ -221,8 +221,8 @@ if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
 
 
 if (isset($useeditor) && $_SESSION['useed']==1) {
-    echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=052821"></script>';
-    //echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.js?v=031421"></script>';
+    echo '<script type="text/javascript" src="'.$staticroot.'/tinymce4/tinymce_bundled.min.js?v=062821"></script>';
+    //echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.js?v=062821"></script>';
 
 	echo "\n";
 	echo '<script type="text/javascript">';

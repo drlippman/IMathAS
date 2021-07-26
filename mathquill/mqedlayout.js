@@ -616,10 +616,13 @@ var myMQeditor = (function($) {
         maxlen = vars[i].length;
       }
       vars[i] = vars[i].replace(/_(\w{2,})/,"_{$1}");
+
       if (vars[i].length == 1) {
         btns.push({'b':vars[i], c:'w', v:1});
       } else {
-        btns.push({'l':vars[i].replace(/([a-zA-Z0-9]{2,})/g,"\\text{$1}"), 'w':vars[i], c:'w', r:1});
+        btns.push({'l':vars[i].replace(/(\\)?([a-zA-Z0-9]{2,})/g, function(m,p1,p2) {
+            return p1 ? m : "\\text{"+p2+"}";
+        }), 'w':vars[i], c:'w', r:1});
       }
     }
     var perrow = Math.min(8,Math.max(4, Math.ceil(vars.length/4)));

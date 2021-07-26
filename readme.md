@@ -104,6 +104,7 @@ where days is the number of days since last login to consider old, and userid is
 - `$CFG['GEN']['COPPA']`: Set to enable an "I am 13 years old or older" checkbox on new student account creation. If not checked, requires a course ID and key to create an account.
 - `$CFG['assess_upgrade_optout']`: Set to true to allow users to opt out of an upgrade
 to the new assessment interface.
+- `$CFG['reqadminmfa']`: Require admins to enable two-factor authentication.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.

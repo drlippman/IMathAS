@@ -152,6 +152,16 @@ class DrawingScorePart implements ScorePart
                 $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
                 $ansdots[$key] = array($pixx,$pixy);
             }
+
+            if (!empty($ansdots)) {
+              for ($i=0; $i<count($ansdots)-1; $i++) {
+                if (isset($ansdots[$i+1]) && abs($ansdots[$i][0] - $ansdots[$i+1][0])<1E-9 && abs($ansdots[$i][1] - $ansdots[$i+1][1])<1E-9) {
+                    unset($ansdots[$i]);
+                }
+              }
+              $ansdots = array_values($ansdots);
+            }
+
             $isclosed = false;
             $stuclosed = false;
             if (abs($ansdots[0][0]-$ansdots[count($ansdots)-1][0])<.01 && abs($ansdots[0][1]-$ansdots[count($ansdots)-1][1])<.01) {

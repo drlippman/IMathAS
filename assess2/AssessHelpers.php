@@ -199,4 +199,38 @@ class AssessHelpers
     $DBH->commit();
     return $cnt;
   }
+
+  /**
+   * Updates the "Show work after" flag on assessment records
+   * @param  int $aid   The assessment ID
+   * @param  int $newshowwork  The new value for imas_assessments.showwork
+   * @param  string $submitby  The value for imas_assessments.submitby
+   * @return int      The number of assessments updated
+   */
+  public static function updateShowWorkStatus($aid, $newshowwork, $submitby) {
+    global $DBH;
+
+    $doShowWorkAfter = (($newshowwork&2) == 2);
+    if (!$doShowWorkAfter) {
+        // not "show work after" globally - check questions;
+        $stm = $DBH->prepare("SELECT count(id) FROM imas_questions WHERE assessmentid=? AND (showwork&2)=2");
+        $doShowWorkAfter = ($stm->fetchColumn(0) > 0);
+    }
+
+    $query = "UPDATE imas_assessment_records SET ";
+    if ($doShowWorkAfter) { // turn on accepts show work after
+        $query .= "status = (status | 128) ";
+    } else { // turn off
+        $query .= "status = (status & ~128) ";
+    }
+    $query .= "WHERE assessmentid = ? AND ";
+    if ($submitby == 'by_assessment') {
+        $query .=  "(status & 64) = 64";
+    } else {
+        $query .= "starttime > 0";
+    }
+    $stm = $DBH->prepare($query);
+    $stm->execute([$aid]);
+    return $stm->rowCount();
+  }
 }

@@ -490,7 +490,7 @@ if (!(isset($teacherid))) {
             $_POST['subtype'] !== 'DNC'
         ) {
             require_once("../includes/updateptsposs.php");
-            require("../assess2/AssessHelpers.php");
+            require_once("../assess2/AssessHelpers.php");
 			foreach ($checked as $aid) {
                 //update points possible
                 updatePointsPossible($aid);
@@ -502,7 +502,15 @@ if (!(isset($teacherid))) {
                     AssessHelpers::retotalAll($cid, $aid);
                 }
 			}
-		}
+        }
+        if ($_POST['showwork'] != 'DNC') {
+            require_once("../assess2/AssessHelpers.php");
+            // update "show work after" status flags
+            foreach ($checked as $aid) {
+                $thissubby = $coreOK ? $submitby : $cursumitby[$aid];
+                AssessHelpers::updateShowWorkStatus($aid, $_POST['showwork'], $thissubby);
+            }
+        }
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
 		} else {

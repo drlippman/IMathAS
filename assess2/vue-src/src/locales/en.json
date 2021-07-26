@@ -126,7 +126,8 @@
     "showwork": "Show work here by typing it or attaching a file or picture",
     "uploadwork": "Show work here by attaching a file or picture",
     "uploading": "Uploading...",
-    "intronext": "To begin, select a question using the selector above, or press the > Next button"
+    "intronext": "To begin, navigate to a question using the selector or > Next button above.",
+    "firstq": "First Question"
   },
   "header": {
     "score": "Score: {pts}/{poss}",
@@ -407,7 +408,8 @@
     "filters": "Filters and Options",
     "hide": "Hide",
     "hide_perfect": "Score = 100% (before penalties)",
-    "hide_nonzero": "0 < score < 100%",
+    "hide_100": "Score = 100% (after penalties)",
+    "hide_nonzero": "0 < score < 100% (before penalties)",
     "hide_zero": "Score = 0",
     "hide_fb": "Questions with Feedback",
     "hide_nowork": "Questions without Work",

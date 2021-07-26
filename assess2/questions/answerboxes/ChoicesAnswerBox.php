@@ -41,7 +41,7 @@ class ChoicesAnswerBox implements AnswerBox
         $style = '';
         $params = [];
 
-        $optionkeys = ['displayformat', 'answer', 'noshuffle', 'readerlabel'];
+        $optionkeys = ['displayformat', 'answer', 'noshuffle', 'readerlabel', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -111,7 +111,11 @@ class ChoicesAnswerBox implements AnswerBox
             foreach ($questions as $qv) {
                 if (is_array($qv)) {continue;}
                 if (mb_strlen(html_entity_decode($qv)) > 3) { //strlen($qv)>2 && !($qv[0]=='&' && $qv[strlen($qv)-1]==';')) {
-                    $msg = _('Select an answer');
+                    if ($ansprompt != '') {
+                        $msg = $ansprompt;
+                    } else {
+                        $msg = _('Select an answer');
+                    }
                     break;
                 }
             }

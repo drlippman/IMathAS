@@ -127,7 +127,8 @@ function interpretline($str,$anstype,$countcnt) {
 			}
 		} else if ($type==7) {//end of line
 			if ($lasttype=='7' || $lasttype==-1) {
-				//nothing exciting, so just continue
+                //nothing exciting, so just continue
+                $lines[] = '';
 				$k++;
 				continue;
 			}
@@ -364,7 +365,7 @@ function tokenize($str,$anstype,$countcnt) {
 					$out = 'elseif';
 					$i += 3;
 				}
-				if ($lastsym[1]==7) {
+				while ($lastsym[1]==7) {
 					array_pop($syms);
 					$lastsym = $syms[count($syms)-1];
 				}
@@ -490,7 +491,8 @@ function tokenize($str,$anstype,$countcnt) {
 			$thisn = 1;
 			$inq = false;
 			$j = $i+1;
-			$len = strlen($str);
+            $len = strlen($str);
+            $newcnt = 0;
 			while ($j<$len) {
 				//read terms until we get to right bracket at same nesting level
 				//we have to avoid strings, as they might contain unmatched brackets
@@ -509,7 +511,10 @@ function tokenize($str,$anstype,$countcnt) {
 						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
-							$inside = interpretline(substr($str,$i+1,$j-$i-1),$anstype,$countcnt+1);
+                            $toprocess = substr($str,$i+1,$j-$i-1);
+
+                            $inside = interpretline($toprocess,$anstype,$countcnt+1);
+
 							if ($inside=='error') {
 								//was an error, return error token
 								return array(array('',9));
@@ -519,8 +524,12 @@ function tokenize($str,$anstype,$countcnt) {
 							if ($rightb=='}' && $lastsym[0]!='$') {
 								$out .= $leftb.$inside.';'.$rightb;
 							} else {
-								$out .= $leftb.$inside.$rightb;
-							}
+                                $out .= $leftb.$inside.$rightb;
+                            }
+                            if ($newcnt > 0) {
+                                $out .= str_repeat("\n", $newcnt);
+                            }
+                            $newcnt = 0;
 							$i= $j+1;
 							break;
 						}
@@ -531,7 +540,11 @@ function tokenize($str,$anstype,$countcnt) {
 							$d = $str[$j];
 						}
 					} else if ($d=="\n") {
-						//echo "unmatched parens/brackets - likely will cause an error";
+                        //echo "unmatched parens/brackets - likely will cause an error";
+                        if (!$inq && ($intype == 4 || $intype == 11)) {
+                            $str[$j] = ' ';
+                            $newcnt++;
+                        }
 					}
 				}
 				$j++;
@@ -571,9 +584,18 @@ function tokenize($str,$anstype,$countcnt) {
 		} else if ($c==';') {
 			//end of line
 			$intype = 7;
-			$i++;
+            $i++;
 			if ($i<$len) {
-				$c = $str[$i];
+                $c = $str[$i];
+                //eat whitespace
+                while ($c==' ') {
+                    $i++;
+                    $c = $str[$i];
+                }
+                if ($c=="\n") {
+                    $i++;
+                    $c = $str[$i];
+                }
 			}
 		} else {
 			//no type - just append string.  Could be operators
@@ -653,11 +675,9 @@ function tokenize($str,$anstype,$countcnt) {
                 }
 			}
 		} else {
-			//add to symbol list, avoid repeat end-of-lines.
-			if ($intype!=7 || $lastsym[1]!=7) {
-				$lastsym = array($out,$intype);
-				$syms[] =  array($out,$intype);
-			}
+            //add to symbol list.  avoid repeat end-of-lines.
+            $lastsym = array($out,$intype);
+            $syms[] =  array($out,$intype);
 		}
 
 	}

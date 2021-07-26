@@ -567,7 +567,7 @@ function gbinstrdisp() {
 						} else {
 							echo '<sup>e</sup>';
 						}
-					}
+                    }
 				} else if ($gbt[0][1][$j][6]==1) { //offline
 
 					if (isset($gbt[$i][1][$j][0])) {
@@ -588,6 +588,9 @@ function gbinstrdisp() {
 					} else {
 						echo '-';
 					}
+                }
+                if (!empty($gbt[$i][1][$j][14])) { //excused
+					echo '<sup>x</sup>';
 				}
 				if (isset($gbt[$i][1][$j][5]) && ($gbt[$i][1][$j][5]&(1<<$availshow)) && !$hidepast) {
 					echo '<sub>d</sub></span>';

@@ -137,6 +137,17 @@ class NTupleScorePart implements ScorePart
         // parse and evaluate the answer, capturing "or"s
         $anarr = $this->parseNtuple($answer, true, true);
 
+        if (in_array('anyorder', $ansformats)) {
+            foreach ($anarr as $k=>$listans) {
+                foreach ($listans as $ork=>$orv) {
+                    sort($anarr[$k][$ork]['vals']);
+                }
+            }
+            foreach ($gaarr as $k=>$givenans) {
+                sort($gaarr[$k]['vals']);
+            }
+        }
+
         if (in_array('scalarmult',$ansformats)) {
             //normalize the vectors
             foreach ($anarr as $k=>$listans) {
@@ -188,11 +199,11 @@ class NTupleScorePart implements ScorePart
                     if (isset($matchedgivenans[$j])) {continue;}
 
                     if ($answer['lb']!=$givenans['lb'] || $answer['rb']!=$givenans['rb']) {
-                        break;
+                        continue;
                     }
 
                     if (count($answer['vals'])!=count($givenans['vals'])) {
-                        break;
+                        continue;
                     }
                     $matchedparts = 0;
                     foreach ($answer['vals'] as $i=>$ansval) {
