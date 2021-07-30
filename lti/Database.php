@@ -1265,8 +1265,13 @@ class Imathas_LTI_Database implements LTI\Database
                     }
                 }
                 // enroll in course
+                if (!empty($member['context_label'])) {
+                    $thissection = $member['context_label'];
+                } else {
+                    $thissection = $section;
+                }
                 $stm = $this->dbh->prepare('INSERT INTO imas_students (userid,courseid,section,latepass,lticourseid) VALUES (?,?,?,?,?)');
-                $stm->execute(array($localuserid, $localcourse->get_courseid(), $section, $deflatepass, $localcourse->get_id()));
+                $stm->execute(array($localuserid, $localcourse->get_courseid(), $thissection, $deflatepass, $localcourse->get_id()));
 
                 $enrollcnt++;
             } else {
