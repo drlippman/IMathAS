@@ -416,7 +416,7 @@ function printq2($qn,$qsetid,$seed,$pts,$showpts) {
 	);
 	$a2->setState($state);
 	// TODO: Some way to override or rewrite matrix answersize, and choices list numbering
-	$res = $a2->displayQuestion($qn, ['includeans'=>true, 'printformat'=>true, 'showallparts'=>true]);
+	$res = $a2->displayQuestion($qn, ['includeans'=>true, 'printformat'=>true, 'showallparts'=>true, 'hideans'=>true]);
 
 	$retstrout = "<div class=q>";
 	if ($isfinal) {
