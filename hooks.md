@@ -85,6 +85,13 @@ $itemtype is imas_items.itemtype
 $typeid id imas_items.typeid
 `delete_custom_item_by_id($itemtype, $typeid)`
 
+## header
+
+Include via `$CFG['hooks']['header']`
+
+Called to insert elements into the `<head>` element:
+`insertIntoHead()`
+
 ## ltihome
 
 Include via `$CFG['hooks']['ltihome']`
