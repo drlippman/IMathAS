@@ -1550,7 +1550,9 @@ function generateTable() {
                     //	html += "<td class=c><span class=noticehighlight>"+curpt+"</span></td>"; //points
                 } else {
                     if (beentaken) {
-                        html += "<td class=c>" + curpt + "</td>";
+                        html += "<td class=c>" + curpt +
+                        (curitems[j][9] > 0 ? _('EC') : '') +
+                        "</td>";
                     } else {
                         html +=
                             '<td><input size=2 id="pts-' +
@@ -1559,7 +1561,9 @@ function generateTable() {
                             curpt +
                             '" data-lastval="' +
                             curpt +
-                            '"/></td>'; //points
+                            '"/>' +
+                            (curitems[j][9] > 0 ? _('EC') : '') +
+                            '</td>'; //points
                     }
                 }
 
@@ -1707,7 +1711,9 @@ function generateTable() {
             ln++;
         }
         if (curistext == 0) {
-            pttotal += curpt * (curisgroup ? itemarray[i][0] : 1);
+            if (!curisgroup && itemarray[i][9] == 0) {
+                pttotal += curpt * (curisgroup ? itemarray[i][0] : 1);
+            }
             curqnum += curisgroup ? itemarray[i][0] : 1;
         }
         alt = 1 - alt;
