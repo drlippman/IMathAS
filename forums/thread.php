@@ -342,7 +342,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		    $name = sprintf("%s %s", Sanitize::encodeStringForDisplay($row[4]),
                 Sanitize::encodeStringForDisplay($row[5]));
 		}
-		printf("<br/>Posted by: %s, ", Sanitize::encodeStringForDisplay($name));
+		printf("<br/>Posted by: <span class='pii-full-name'>%s</span>, ", Sanitize::encodeStringForDisplay($name));
 		echo tzdate("F j, Y, g:i a",$row[6]);
 
 		echo "</div><div class=blockitems>";
@@ -782,7 +782,7 @@ echo "</p>";
 				if ($line['lastposttime']>$now) {
 					echo '</i>';
 				}
-				printf("<td>%s</td>\n", Sanitize::encodeStringForDisplay($name));
+				printf("<td><span class='pii-full-name'>%s</span></td>\n", Sanitize::encodeStringForDisplay($name));
 
 				if ($isteacher && $groupsetid>0 && !$dofilter) {
 					echo '<td class=c>'.Sanitize::encodeStringForDisplay($groupnames[$line['stugroupid']]).'</td>';

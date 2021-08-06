@@ -511,9 +511,9 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		if ($hasuserimg[$child]==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
+				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
 			} else {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
+				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
 			}
 		}
 		echo '</span>';
@@ -563,7 +563,7 @@ function printchildren($base,$restricttoowner=false) {
 			}
 			echo ">";
 		}
-		echo Sanitize::encodeStringForDisplay($poster[$child]); // This is the user's first and last name.
+		echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($poster[$child]).'</span>'; // This is the user's first and last name.
 		if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 			echo "</a>";
 		}

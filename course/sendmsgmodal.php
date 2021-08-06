@@ -212,7 +212,7 @@ if (isset($_POST['message'])) {
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
 	echo '<input type="hidden" name="sendtype" value="'.Sanitize::encodeStringForDisplay($_GET['sendtype']).'"/>';
-	echo _("To:")." $to<br/>\n";
+	echo _("To:")." <span class='pii-mixed'>$to</span><br/>\n";
 	echo _("Subject:")." <input type=text size=50 name=subject id=subject value=\"".Sanitize::encodeStringForDisplay($title)."\"><br/>\n";
 	echo _("Message:")." <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
 	echo htmlentities($message);

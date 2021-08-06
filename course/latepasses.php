@@ -159,7 +159,7 @@ function sendtoall(type) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</td>";
+			echo "<tr><td><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]) . "</span></td>";
 			if ($hassection) {
 				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}
