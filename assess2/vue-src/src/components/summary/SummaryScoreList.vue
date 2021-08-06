@@ -7,7 +7,7 @@
     <tr v-for="(question,index) in questions" :key="index">
       <td>
         <icons :name="question.status" />
-        {{ $t('question_n', {n: index+1}) }}
+        {{ $t((question.extracredit === 1 ? 'extracredit_n' : 'question_n'), {n: index+1}) }}
       </td>
       <td v-if="noTries[index]">
         {{ $t('scorelist.unattempted') }}

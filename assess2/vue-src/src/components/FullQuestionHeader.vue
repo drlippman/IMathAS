@@ -5,7 +5,7 @@
       <h2
         :class="{inlineheader: true, greystrike: curQData.withdrawn !==0}"
       >
-        {{ $t('question_n', { n: dispqn }) }}
+        {{ $t((curQData.extracredit === 1 ? 'extracredit_n' : 'question_n'), { n: dispqn }) }}
       </h2>
     </div>
     <question-header-icons

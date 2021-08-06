@@ -4,6 +4,9 @@
       {{ $t('qdetails.question_details') }}
     </div>
     <div class="pane-body">
+      <p v-if="qinfo.extracredit === 1">
+        {{ $t('qdetails.extracredit') }}
+      </p>
 
       <p v-if="showGBScore">
         {{ gbScoreString }}:

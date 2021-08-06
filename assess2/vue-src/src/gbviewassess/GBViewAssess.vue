@@ -286,7 +286,7 @@
             <div class = "bigquestionwrap">
               <div class="headerpane">
                 <strong>
-                  {{ $tc('question_n', qn+1) }}.
+                  {{ $tc((qdata[curQver[qn]].extracredit === 1 ? 'extracredit_n' : 'question_n'), qn+1) }}.
                 </strong>
 
                 <gb-question-select
