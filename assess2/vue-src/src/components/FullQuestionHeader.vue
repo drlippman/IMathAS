@@ -5,7 +5,10 @@
       <h2
         :class="{inlineheader: true, greystrike: curQData.withdrawn !==0}"
       >
-        {{ $t((curQData.extracredit === 1 ? 'extracredit_n' : 'question_n'), { n: dispqn }) }}
+        {{ $t('question_n', { n: dispqn }) }}
+        <em v-if="curQData.extracredit" class="small subdued">
+          {{ $t('extracredit') }}
+        </em>
       </h2>
     </div>
     <question-header-icons

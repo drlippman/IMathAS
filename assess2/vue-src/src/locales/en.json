@@ -9,7 +9,7 @@
   "next": "Next",
   "previous": "Previous",
   "question_n": "Question {n}",
-  "extracredit_n": "Extra Credit {n}",
+  "extracredit": "Extra Credit",
   "jumptocontent": "Skip Navigation",
   "launch": {
     "continue_assess": "Resume",

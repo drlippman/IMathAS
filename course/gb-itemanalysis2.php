@@ -309,7 +309,7 @@
 		//$qs = array_keys($qtotal);
 		$qslist = array_map('Sanitize::onlyInt',$itemarr);
 		$query_placeholders = Sanitize::generateQueryPlaceholders($qslist);
-		$query = "SELECT imas_questionset.description,imas_questions.id AS qid,imas_questions.points,imas_questionset.id AS qsid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref,imas_questions.showwork ";
+		$query = "SELECT imas_questionset.description,imas_questions.id AS qid,imas_questions.points,imas_questionset.id AS qsid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref,imas_questions.showwork,imas_questions.extracredit ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($query_placeholders)";
 		$stm = $DBH->prepare($query);
@@ -321,6 +321,7 @@
 		$needmanualgrade = array();
         $showextref = array();
         $showwork = array();
+        $extracredit = array();
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$descrips[$row['qid']] = $row['description'];
 			$points[$row['qid']] = $row['points'];
@@ -339,6 +340,7 @@
 				$showextref[$row['qid']] = false;
             }
             $showwork[$row['qid']] = (($row['showwork'] == -1 && $showworkdef > 0) || $row['showwork'] > 0);
+            $extracredit[$row['qid']] = $row['extracredit'];
 		}
 
 		$avgscore = array();
@@ -413,8 +415,12 @@
             }
             echo "</td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></td>",
+			echo sprintf("<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
+            if ($extracredit[$qid] == 1) {
+                echo ' <span onmouseover="tipshow(this,\'' . _('Extra Credit') . '\')" onmouseout="tipout()">' . _('EC') . '</span>';
+            }
+            echo '<td>';
 			if ($submitby == 'by_question') {
 				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));

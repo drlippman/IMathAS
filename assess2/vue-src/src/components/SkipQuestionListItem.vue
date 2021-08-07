@@ -7,6 +7,9 @@
         :title = "nameHover"
       >
         {{ nameDisp }}
+        <em v-if="option.extracredit" class="small subdued">
+          {{ $t('extracredit') }}
+        </em>
       </span>
     </span>
     <span v-if="scoreDisplay !== '' && !selected" class="subdued">
@@ -41,8 +44,6 @@ export default {
     nameDisp () {
       if (this.option.dispqn === 0) {
         return this.$t('intro');
-      } else if (this.option.extracredit === 1) {
-        return this.$t('extracredit_n', { n: this.option.dispqn });
       } else {
         return this.$t('question_n', { n: this.option.dispqn });
       }
