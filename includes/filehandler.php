@@ -273,6 +273,7 @@ function downsizeimage($fileinfo) {
 				$dst = imagecreatetruecolor($neww, $newh);
 				imagecopyresampled($dst, $image, 0, 0, 0, 0, $neww, $newh, $imgdata[0], $imgdata[1]);
 				imagedestroy($image);
+                $changed = true;
 			} else {
 				$dst = imagecreatefromjpeg($fileinfo['tmp_name']);
 			}
@@ -292,8 +293,10 @@ function downsizeimage($fileinfo) {
 					    break;
 				}
 			}
-			imagejpeg($dst, $fileinfo['tmp_name'], 90);
-			imagedestroy($dst);
+            if ($changed) {
+			    imagejpeg($dst, $fileinfo['tmp_name'], 90);
+			    imagedestroy($dst);
+            }
 		}
 	}
 }
@@ -916,6 +919,26 @@ function deletealluserfiles($uid) {
 		}
 	}
 	return $delcnt;
+}
+
+function getfilesize($type, $key) {
+    if ($type=='cfile') {
+        if (getfilehandlertype('filehandlertypecfiles') == 's3') {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, true)['size'];
+		} else {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+			return filesize($base.$key);
+		}
+    } else {
+        if (getfilehandlertype('filehandlertype') == 's3') {
+			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, true)['size'];
+		} else {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+			return filesize($base.$key);
+		}
+    }
 }
 
 function doesfileexist($type,$key) {

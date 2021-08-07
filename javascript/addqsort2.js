@@ -713,6 +713,14 @@ function removegrp(loc) {
     return false;
 }
 
+function fullungroup(loc) {
+    if (confirm_textseg_dirty()) {
+        itemarray = itemarray.slice(0,loc).concat(itemarray[loc][2]).concat(itemarray.slice(loc+1));
+        submitChanges();
+    }
+    return false;
+}
+
 function doremoveitem(loc) {
     if (loc.indexOf("-") > -1) {
         locparts = loc.split("-");
@@ -1274,12 +1282,23 @@ function generateTable() {
                         if (itemarray[i][0] > 1) {
                             html += "ea";
                         }
+
                         html +=
-                            '</td><td class=c><a href="#" onclick="return removegrp(\'' +
+                            '</td><td class=c><div class="dropdown"><button tabindex=0 class="dropdown-toggle plain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                        html += '⋮</button><ul role="menu" class="dropdown-menu dropdown-menu-right">';
+
+                        html +=
+                            '<li><a href="#" onclick="return removegrp(\'' +
                             i +
                             "');\">" +
-                            _("Remove") +
-                            "</a></td></tr>";
+                            _("Remove Group and Questions") +
+                            "</a></li>";
+                        html +=
+                            '<li><a href="#" onclick="return fullungroup(' + i + ');">' +
+                            _("Ungroup all Questions") +
+                            "</a></li>";
+                        html += '</ul></div></tr>';
+
                         if (itemarray[i][3] == 0) {
                             //collapsed group
                             if (curitems[0][4] == 9999) {
@@ -1806,7 +1825,8 @@ function submitChanges() {
     data = generateOutput();
     var outdata = {
         order: data[0],
-        text_order: JSON.stringify(data[1])
+        text_order: JSON.stringify(data[1]),
+        lastitemhash: lastitemhash
     };
     if (!beentaken) {
         outdata["pts"] = JSON.stringify(data[2]);
@@ -1827,6 +1847,7 @@ function submitChanges() {
             if (!beentaken) {
                 defpoints = $("#defpts").val();
             }
+            lastitemhash = msg;
             document.getElementById(target).innerHTML = "";
             refreshTable();
             updateInAssessMarkers();
@@ -1864,10 +1885,9 @@ function addusingdefaults(asgroup) {
         type: "POST",
         url: AHAHsaveurl,
         async: false,
-        data: {addnewdef: checked, asgroup: asgroup ? 1 : 0},
+        data: {addnewdef: checked, asgroup: asgroup ? 1 : 0, lastitemhash: lastitemhash},
         dataType: 'json'
     }).done(function (msg) {
-        console.log(msg);
         if (msg.hasOwnProperty('error')) {
             document.getElementById("submitnotice").innerHTML = msg.error;
         } else {
@@ -1879,7 +1899,8 @@ function addusingdefaults(asgroup) {
 }
 
 function doneadding(newq,addedqs) {
-    itemarray = newq;
+    itemarray = newq.itemarray;
+    lastitemhash = newq.lastitemhash;
     refreshTable();
     updateInAssessMarkers();
     $("#selq input[type=checkbox]:checked").prop("checked", false);
@@ -1892,7 +1913,7 @@ function addwithsettings() {
         checked.push(this.value);
     });
     if (checked.length == 0) { return; }
-    GB_show('Question Settings',qsettingsaddr + '&toaddqs=' + checked.join('-'),900,500);
+    GB_show('Question Settings',qsettingsaddr + '&toaddqs=' + checked.join('-') + '&lih=' + lastitemhash,900,500);
 }
 
 function modsettings() {
@@ -1901,7 +1922,7 @@ function modsettings() {
         checked.push(this.value);
     });
     if (checked.length == 0) { return; }
-    GB_show('Question Settings',qsettingsaddr + '&modqs=' + checked.join('-'),900,500);
+    GB_show('Question Settings',qsettingsaddr + '&modqs=' + checked.join('-') + '&lih=' + lastitemhash,900,500);
 }
 
 /*

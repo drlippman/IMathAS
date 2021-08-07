@@ -147,7 +147,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll a New Student";
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
 			require_once("../includes/newusercommon.php");
@@ -456,9 +456,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 //$pagetitle = "Student List";
 
 /******* begin html output ********/
-if ($fileToInclude==null || $fileToInclude=="") {
+if (empty($fileToInclude)) {
 
-$placeinhead .= "<script type=\"text/javascript\">";
+$placeinhead = "<script type=\"text/javascript\">";
 $placeinhead .= 'function chgsecfilter() { ';
 $placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
 $address = $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid";

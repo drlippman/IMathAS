@@ -32,53 +32,16 @@ class DrawingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if ($multi) {
-            if (isset($options['grid'])) {
-                if (is_array($options['grid']) && isset($options['grid'][$partnum])) {
-                    $grid = $options['grid'][$partnum];
-                } else if (!is_array($options['grid'])) {
-                    $grid = $options['grid'];
-                }
-            }
-            if (isset($options['snaptogrid'])) {
-                if (is_array($options['snaptogrid']) && isset($options['snaptogrid'][$partnum])) {
-                    $snaptogrid = $options['snaptogrid'][$partnum];
-                } else if (!is_array($options['snaptogrid'])) {
-                    $snaptogrid = $options['snaptogrid'];
-                }
-            }
-            if (isset($options['answers'][$partnum])) {$answers = $options['answers'][$partnum];}
-            else if (isset($options['answer'][$partnum])) {$answers = $options['answer'][$partnum];}
-            if (isset($options['partweights'][$partnum])) {$partweights = $options['partweights'][$partnum];}
-        } else {
-            if (isset($options['grid'])) { $grid = $options['grid'];}
-            if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
-            if (isset($options['answers'])) {$answers = $options['answers'];}
-            else if (isset($options['answer'])) {$answers = $options['answer'];}
-            if (isset($options['partweights'])) {$partweights = $options['partweights'];}
+        $optionkeys = ['grid', 'snaptogrid', 'answerformat', 'scoremethod', 'reltolerance', 'abstolerance'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
-        if (isset($options['reltolerance'])) {
-            if (is_array($options['reltolerance'])) {
-                if (isset($options['reltolerance'][$partnum])) {
-                    $reltolerance = $options['reltolerance'][$partnum];
-                }
-            } else {
-                $reltolerance = $options['reltolerance'];
-            }
+        $optionkeys = ['answers','partweights'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 1);
         }
-        if (isset($options['abstolerance'])) {
-            if (is_array($options['abstolerance'])) {
-                if (isset($options['abstolerance'][$partnum])) {
-                    $abstolerance = $options['abstolerance'][$partnum];
-                }
-            } else {
-                $abstolerance = $options['abstolerance'];
-            }
-        }
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (isset($options['scoremethod'])) {if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}}
 
-        if (!isset($reltolerance)) {
+        if ($reltolerance === '') {
             if (isset($GLOBALS['CFG']['AMS']['defaultdrawtol'])) {
                 $reltolerance =  $GLOBALS['CFG']['AMS']['defaultdrawtol'];
             } else {
@@ -89,7 +52,7 @@ class DrawingScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $scorePartResult->setLastAnswerAsGiven($givenans);
 
-        if (isset($scoremethod) && $scoremethod=='takeanything') {
+        if (!empty($scoremethod) && $scoremethod=='takeanything') {
           if ($givenans==';;;;;;;;') {
               $scorePartResult->setRawScore(0);
               return $scorePartResult;
@@ -99,7 +62,7 @@ class DrawingScorePart implements ScorePart
           }
         }
         $imgborder = 5; $step = 5;
-        if (!isset($answerformat)) {
+        if (empty($answerformat)) {
             $answerformat = array('line','dot','opendot');
         } else if (!is_array($answerformat)) {
             $answerformat = explode(',',$answerformat);
@@ -109,7 +72,7 @@ class DrawingScorePart implements ScorePart
         } else {
             $settings = array(-5,5,-5,5,1,1,300,300);
         }
-        if (isset($grid)) {
+        if (!empty($grid)) {
             if (!is_array($grid)) {
                 $grid = array_map('trim',explode(',',$grid));
             } else if (strpos($grid[0],',')!==false) {//forgot to set as multipart?
@@ -139,7 +102,7 @@ class DrawingScorePart implements ScorePart
             $settings[2] = -0.5;
             $settings[3] = 0.5;
         }
-        if (!isset($snaptogrid)) {
+        if (empty($snaptogrid)) {
     			$snaptogrid = 0;
         } else {
           $snapparts = explode(':', $snaptogrid);
@@ -189,6 +152,16 @@ class DrawingScorePart implements ScorePart
                 $pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;
                 $ansdots[$key] = array($pixx,$pixy);
             }
+
+            if (!empty($ansdots)) {
+              for ($i=0; $i<count($ansdots)-1; $i++) {
+                if (isset($ansdots[$i+1]) && abs($ansdots[$i][0] - $ansdots[$i+1][0])<1E-9 && abs($ansdots[$i][1] - $ansdots[$i+1][1])<1E-9) {
+                    unset($ansdots[$i]);
+                }
+              }
+              $ansdots = array_values($ansdots);
+            }
+
             $isclosed = false;
             $stuclosed = false;
             if (abs($ansdots[0][0]-$ansdots[count($ansdots)-1][0])<.01 && abs($ansdots[0][1]-$ansdots[count($ansdots)-1][1])<.01) {
@@ -263,7 +236,7 @@ class DrawingScorePart implements ScorePart
             }
             //echo "Vals score: $vals, adj score: $adjv. </p>";
 
-            if (isset($abstolerance)) {
+            if ($abstolerance !== '') {
                 if ($totscore<$abstolerance) {
                     $scorePartResult->setRawScore(0);
                     return $scorePartResult;
@@ -353,6 +326,7 @@ class DrawingScorePart implements ScorePart
                         $y3p = $ytopix($y3);
                         $func = makepretty(substr($function[0],2));
                         $func = makeMathFunction($func, 'y');
+                        if ($func === false) { continue; }
                         $Lx1p = $xtopix(@$func(['y'=>$y1]));
                         $Lx2p = $xtopix(@$func(['y'=>$y2]));
                         $Lx3p = $xtopix(@$func(['y'=>$y3]));
@@ -397,6 +371,7 @@ class DrawingScorePart implements ScorePart
                     }
                 } else if (count($function)==3) { //line segment or ray
                     $func = makeMathFunction(makepretty($function[0]), 'x');
+                    if ($func === false) { continue; }
                     if ($function[1]=='-oo') { //ray to left
                         $y1p = $ytopix($func(['x'=>floatval($function[2])-1]));
                         $y2p = $ytopix($func(['x'=>floatval($function[2])]));
@@ -417,6 +392,7 @@ class DrawingScorePart implements ScorePart
                     }
                 } else {
                     $func = makeMathFunction(makepretty($function[0]), 'x');
+                    if ($func === false) { continue; }
 
                     $y1 = @$func(['x'=>$x1]);
                     $y2 = @$func(['x'=>$x2]);
@@ -457,6 +433,7 @@ class DrawingScorePart implements ScorePart
                                         }
                                     }
                                     $inlogfunc = makeMathFunction(makepretty($loginside), 'x');
+                                    if ($func === false) { continue; }
                                     //We're going to assume inside is linear
                                     //Calculate (0,y0), (1,y1).  m=(y1-y0), y=(y1-y0)x+y0
                                     //solve for when this is =0
@@ -546,6 +523,7 @@ class DrawingScorePart implements ScorePart
                         if ($nested==0) {
                             $infunc = makepretty(substr($function[0],$p+5,$i-$p-5));
                             $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
                             $y0 = $infunc(['x'=>0]);
                             $y1 = $infunc(['x'=>1]);
                             $xint = -$y0/($y1-$y0);
@@ -569,6 +547,7 @@ class DrawingScorePart implements ScorePart
                         if ($nested==0) {
                             $infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
                             $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
                             $y0 = $infunc(['x'=>0]);
                             $y1 = $infunc(['x'=>1]);
                             $period = 2*M_PI/($y1-$y0); //slope of inside function
@@ -869,7 +848,7 @@ class DrawingScorePart implements ScorePart
                             $rats[] = array($pts[1],$pts[2],$yp);
                         }
                     } else if ($pts[0]==9 || $pts[0]==9.1) {
-                        if ($pts[0]==9.1) {
+                        if ($pts[0]==9.1) { // sine, convert to cos points
                             $pts[1] -= ($pts[3] - $pts[1]);
                             $pts[2] -= ($pts[4] - $pts[2]);
                         }
@@ -1340,14 +1319,15 @@ class DrawingScorePart implements ScorePart
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($coss); $i++) {
                     $per = abs($anscos[0] - $anscos[1])*2;
+                    // make sure horizontal shift is ok
                     $adjdiff = abs($anscos[0]-$coss[$i][0]);
                     $adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
                     if ($adjdiff>$defpttol*$reltolerance) {
                         continue;
                     }
-                    $adjdiff = abs($anscos[1]-$coss[$i][1]);
-                    $adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
-                    if ($adjdiff>$defpttol*$reltolerance) {
+                    // check period is OK
+                    $per2 = abs($coss[$i][0] - $coss[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
                         continue;
                     }
                     if (abs($anscos[2]-$coss[$i][2])>$defpttol*$reltolerance) {
@@ -1407,25 +1387,26 @@ class DrawingScorePart implements ScorePart
             foreach ($answers as $key=>$function) {
                 if ($function=='') { continue; }
                 $function = array_map('trim',explode(',',$function));
-                if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
+                if ($function[0][0]=='x' && ($function[0][1]=='<' || $function[0][1]=='>')) {
                     $isxequals = true;
                     $function[0] = substr($function[0],1);
                 } else {
                     $isxequals = false;
                 }
-                if ($function[0]{1}=='=') {
+                if ($function[0][1]=='=') {
                     $type = 10;
                     $c = 2;
                 } else {
                     $type = 10.2;
                     $c = 1;
                 }
-                $dir = $function[0]{0};
+                $dir = $function[0][0];
                 if ($isxequals) {
                     $anslines[$key] = array('x',$dir,$type,-10000,(substr($function[0],$c)- $settings[0])*$pixelsperx + $imgborder );
                 } else {
                     $func = makepretty(substr($function[0],$c));
                     $func = makeMathFunction($func, 'x');
+                    if ($func === false) { continue; }
                     $y1 = $func(['x'=>$x1]);
                     $y2 = $func(['x'=>$x2]);
                     $y3 = $func(['x'=>$x3]);
@@ -1756,6 +1737,7 @@ class DrawingScorePart implements ScorePart
                     break;
                 }
             }
+
             $extrastuffpenalty = max((count($lines)-count($anslines))/(max(count($answers),count($anslines))),0);
 
         } else {
@@ -1781,7 +1763,8 @@ class DrawingScorePart implements ScorePart
                 }
                 $anslines[$key] = array();
                 $func = makeMathFunction(makepretty($function[0]), 'x');
-
+                if ($func === false) { continue; }
+                
                 if (!isset($function[1])) {
                     $function[1] = $settings[0];
                 }
@@ -1810,7 +1793,6 @@ class DrawingScorePart implements ScorePart
                         $linepts++;
                     }
                 }
-                $linecnt++;
             }
             //break apart student entry
             list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
@@ -1981,7 +1963,8 @@ class DrawingScorePart implements ScorePart
             }
 
         }
-        if (!isset($partweights)) {
+        if (empty($partweights)) {
+            $scores = array_values($scores); // re-index so partweights applies right
             $partweights = array_fill(0,count($scores),1/count($scores));
         } else {
             if (!is_array($partweights)) {
@@ -1995,7 +1978,7 @@ class DrawingScorePart implements ScorePart
         if ($extrastuffpenalty>0) {
             $totscore = max($totscore*(1-$extrastuffpenalty),0);
         }
-        if (isset($abstolerance)) {
+        if ($abstolerance !== '') {
             if ($totscore<$abstolerance) {
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;

@@ -18,7 +18,8 @@
 	}
 
 	$forumid = Sanitize::onlyInt($_GET['forum']);
-	$cid = Sanitize::courseId($_GET['cid']);
+    $cid = Sanitize::courseId($_GET['cid']);
+    $page = Sanitize::onlyInt($_GET['page'] ?? 0);
 
 	if (isset($_GET['markallread'])) {
 		$stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid=:forumid");
@@ -47,8 +48,8 @@
 	$haspoints = ($pointspos>0);
 
 	$canviewall = (isset($teacherid) || isset($tutorid));
-	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
-	$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit<2));
+	$caneditscore = (isset($teacherid) || (isset($tutorid) && ($tutoredit&1)==1));
+	$canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit!=2));
 	$allowreply = ($canviewall || (time()<$replyby));
 
 	$caller = "byname";
@@ -268,10 +269,11 @@
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	function printuserposts($name, $uid, $content, $postcnt, $replycnt) {
+	function printuserposts($name, $uid, $content, $postcnt, $replycnt, $hasuserimg) {
+        global $imasroot, $urlmode;
 		printf("<b>%s</b> (", Sanitize::encodeStringForDisplay($name));
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
-		if ($line['hasuserimg']==1) {
+		if ($hasuserimg==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			} else {
@@ -280,14 +282,15 @@
 		}
 		echo '<div class="forumgrp">'.$content.'</div>';
 	}
-	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = '';
+	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = ''; $lasthasuserimg = 0;
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
-				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt);
+				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg);
 				$content = '';  $postcnt = 0; $replycnt = 0;
 			}
-			$laststu = $line['userid'];
+            $laststu = $line['userid'];
+            $lasthasuserimg = $line['hasuserimg'];
 			$lastname = Sanitize::encodeStringForDisplay($line['LastName']).", " . Sanitize::encodeStringForDisplay($line['FirstName']);
 		}
 
@@ -378,7 +381,7 @@
 		$content .= '</div></div>';
 		$cnt++;
 	}
-	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt);
+	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg);
 	echo "<script>var bcnt = $cnt;</script>";
 	if ($caneditscore && $haspoints) {
 		echo "<div><input type=submit value=\"Save Grades\" /></div>";

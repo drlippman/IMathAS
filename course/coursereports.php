@@ -33,7 +33,7 @@ if ($overwriteBody==1) {
 	echo $body;
 } else {
 
-	$curBreadcrumb .= "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	$curname = Sanitize::encodeStringForDisplay($coursename);
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Course Reports</div>';
 	echo '<div class="pagetitle"><h1>Course Reports</h1></div>';
@@ -42,7 +42,8 @@ if ($overwriteBody==1) {
 	echo '<li><a href="report-commonstu.php?cid='.$cid.'">Activity Report - Sort Students by Activity</a></li>';
 	echo '<li><a href="outcomereport.php?cid='.$cid.'">Outcome Report</a></li>';
 	echo '<li><a href="logingrid.php?cid='.$cid.'">Login Grid</a></li>';
-	echo '<li><a href="report-engagement.php?cid='.$cid.'">Instructor Engagement Report</a></li>';
+    echo '<li><a href="report-engagement.php?cid='.$cid.'">Instructor Engagement Report</a></li>';
+    echo '<li><a href="report-recentchg.php?cid='.$cid.'">Recent Submissions Report</a></li>';
 	echo '</ul>';
 
 	echo '<p>&nbsp;</p>';

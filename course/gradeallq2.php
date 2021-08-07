@@ -71,7 +71,7 @@
 		echo "You not have access to view scores for this assessment";
 		require("../footer.php");
 		exit;
-	} else if ($isteacher || ($istutor && $tutoredit==1)) {
+	} else if ($isteacher || ($istutor && ($tutoredit&1)==1)) {
 		$canedit = 1;
 	} else {
 		$canedit = 0;
@@ -79,7 +79,7 @@
 
 	// Load new assess info class
 	$assess_info = new AssessInfo($DBH, $aid, $cid, false);
-	$assess_info->loadQuestionSettings('all', false, false);
+	$assess_info->loadQuestionSettings($qid, true, false);
 	$ptsposs = $assess_info->getQuestionSetting($qid, 'points_possible');
 
 	if (isset($_GET['update']) && $canedit) {
@@ -263,8 +263,12 @@
 
 	$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
 	$stm->execute(array(':courseid'=>$cid));
-	$sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-
+    $sections = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+    
+    $points = $assess_info->getQuestionSetting($qid, 'points_possible');
+    $rubric = $assess_info->getQuestionSetting($qid, 'rubric');
+    $qsetid = $assess_info->getQuestionSetting($qid, 'questionsetid');
+/*
 	$query = "SELECT imas_questions.points,imas_questions.rubric,imas_questionset.* FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
 	$stm = $DBH->prepare($query);
@@ -279,7 +283,7 @@
 	if ($points==9999) {
 		$points = $defpoints;
 	}
-
+*/
 	$lastupdate = '051620';
 	function formatTry($try,$cnt,$pn,$tn) {
 		if (is_array($try) && $try[0] === 'draw') {
@@ -308,7 +312,7 @@
 
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=051120"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=121320"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060721"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/index.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/gbviewassess.css?v='.$lastupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
@@ -398,8 +402,9 @@
         echo _('Hide').':</p><ul style="list-style-type: none; margin:0; padding-left: 15px;">';
         echo '<li><label><input type=checkbox id="filter-unans" onchange="updatefilters()">'._('Unanswered Questions').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-zero" onchange="updatefilters()">'._('Score = 0').'</label></li>';
-        echo '<li><label><input type=checkbox id="filter-nonzero" onchange="updatefilters()">'._('0 &lt; score &lt 100%').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-nonzero" onchange="updatefilters()">'._('0 &lt; score &lt 100% (before penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-perfect" onchange="updatefilters()">'._('Score = 100% (before penalties)').'</label></li>';
+        echo '<li><label><input type=checkbox id="filter-100" onchange="updatefilters()">'._('Score = 100% (after penalties)').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-fb" onchange="updatefilters()">'._('Questions with Feedback').'</label></li>';
         echo '<li><label><input type=checkbox id="filter-nowork" onchange="updatefilters()">'._('Questions without Work').'</label></li>';
         echo '</ul>';
@@ -507,7 +512,7 @@
 
 		$groupdup = false;
 		if ($line['agroupid']>0) {
-			$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
+			//$s3asid = 'grp'.$line['agroupid'].'/'.$aid;
 			if (isset($onepergroup[$line['agroupid']])) {
 				$groupdup = true;
 			} else {
@@ -518,7 +523,7 @@
 			if ($isgroup) {
 				$groupdup = true;
 			}
-			$s3asid = $asid; // TODO: revisit this
+			//$s3asid = $asid; // TODO: revisit this
 		}
 
 		// get an array of qn=>qid
@@ -528,7 +533,6 @@
 		$lockeys = array_keys($questions,$qid);
 		foreach ($lockeys as $loc) {
 			$qdata = $assess_record->getGbQuestionVersionData($loc, true, 'scored', $cnt);
-
 			$answeightTot = array_sum($qdata['answeights']);
 			$qdata['answeights'] = array_map(function($v) use ($answeightTot) { return $v/$answeightTot;}, $qdata['answeights']);
 			if ($groupdup) {
@@ -557,6 +561,9 @@
                     $classes = 'qfilter-zero';
                 }
             }
+            if (abs($qdata['score'] - $qdata['points_possible']) < .002) {
+                $classes .= ' qfilter-100';
+            }
             if (trim($qdata['feedback']) !== '') {
                 $classes .= ' qfilter-fb';
             }
@@ -567,7 +574,7 @@
 			
 			echo "<div class=headerpane><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></div>';
 
-			if (!$groupdup) {
+			if ($isgroup > 0 && !$groupdup) {
 				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
 				if (isset($groupmembers[$line['agroupid']]) && count($groupmembers[$line['agroupid']])>0) {
 					echo '</b> ('.Sanitize::encodeStringForDisplay(implode(', ',$groupmembers[$line['agroupid']])).')</p>';
@@ -609,7 +616,7 @@
 			echo '</div>';
 			echo "<div class=scoredetails>";
 			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
-			if (!$groupdup) {
+			if ($isgroup > 0 && !$groupdup) {
 				echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
 			}
 			if ($isgroup) {

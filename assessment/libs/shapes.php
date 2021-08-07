@@ -1909,6 +1909,7 @@ function draw_triangle() {
 // "regular" Makes the polygon regular.
 // "rotate" Rotates the polygon to a random angle.
 function draw_polygon() {
+  
   $randSides = $GLOBALS['RND']->rand(3,9);
   $isRegular = false;
   $hasPoints = false;

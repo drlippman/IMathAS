@@ -3,7 +3,8 @@
 // Get existing questions in assessment as json
 // If called with data, include itemorder, showhints, showwork, intro
 function getQuestionsAsJSON($cid, $aid, $data=null)
-{   global $DBH, $userid, $groupid, $adminasteacher;
+{   
+    global $DBH, $userid, $groupid, $adminasteacher, $aver;
 
     if ($data === null) {
         $stm = $DBH->prepare("SELECT itemorder,showhints,showwork,intro FROM imas_assessments WHERE id=:id");
@@ -185,8 +186,6 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
             $jsarr[] = $questionjsarr[$items[$i]];
             $qncnt++;
         }
-
-        $alt = 1 - $alt;
     }
     if (isset($text_segments[$qncnt])) {
         foreach ($text_segments[$qncnt] as $j => $text_seg) {

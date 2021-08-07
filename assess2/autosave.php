@@ -160,11 +160,18 @@ foreach ($qns as $qn=>$parts) {
   if (isset($_POST['sw' . $qn])) {  //autosaving work
     $assess_record->setAutoSave($now, $timeactive[$qn], $qn, 'work');
   }
-  $k++;
 }
 
 // save record if needed
 $assess_record->saveRecordIfNeeded();
+
+// get settings for LTI if needed
+$assess_info->loadLTIMsgPosts($userid, $canViewAll);
+
+$include_from_assess_info = array(
+    'lti_showmsg', 'lti_msgcnt', 'lti_forumcnt'
+);
+$out = $assess_info->extractSettings($include_from_assess_info);
 
 //output JSON object
 $out['autosave'] = 'done';

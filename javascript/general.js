@@ -318,7 +318,7 @@ function GB_endresize(e) {
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
 var GB_sourceel = null;
-function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
+function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
     if (document.activeElement) {
         GB_sourceel = document.activeElement;
         if ($(GB_sourceel).closest(".dropdown-menu").length > 0) {
@@ -405,24 +405,21 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow) {
         document.getElementById("GB_frame").src.replace(/\/$/,'') !=
             url.replace(/\/$/,'')
     ) {
-		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'"></iframe>';
+		document.getElementById("GB_frameholder").innerHTML = '<iframe onload="GB_doneload()" id="GB_frame" src="'+url+'" title="'+caption+'" data-noresize=1></iframe>';
 	} else {
         document.getElementById("GB_loading").style.display = 'none';
 	}
     jQuery("#GB_frameholder").isolatedScroll();
     document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
 	if (url.match(/libtree/)) {
-		//var btnhtml = '<span class="floatright"><input type="button" value="Use Libraries" onClick="document.getElementById(\'GB_frame\').contentWindow.setlib()" /> ';
-		//btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Libraries</span><div class="clear"></div>';
-       // document.getElementById("GB_caption").innerHTML = btnhtml;
         document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setlib()">Use Libraries</button> <button type=button onclick="GB_hide()">Close</button>';
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
 	} else if (url.match(/assessselect/)) {
-		//var btnhtml = '<span class="floatright"><input type="button" value="Use Assessments" onClick="document.getElementById(\'GB_frame\').contentWindow.setassess()" /> ';
-		//btnhtml += '<a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a>&nbsp;</span><span id="GB_title">Select Assessments</span><div class="clear"></div>';
-       // document.getElementById("GB_caption").innerHTML = btnhtml;
         document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setassess()">Use Assessments</button> <button type=button onclick="GB_hide()">Close</button>';
 		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;
+	} else if (callback) {
+        document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.'+callback.func+'()">'+callback.label+'</button> <button type=button onclick="GB_hide()">Close</button>';
+		var h = self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight;		
 	} else {
         document.getElementById("GB_footer").innerHTML = '<button type=button class="primary" onclick="GB_hide()">Close</button>';
 		document.getElementById("GB_caption").onclick = GB_hide;
@@ -815,7 +812,7 @@ function togglevideoembed() {
 			var vidid = href.split('.com/')[1].split(/[#&]/)[0];
 			var vidsrc = 'player.vimeo.com/video/';
 		}
-		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s)?.*/);
+		var m = href.match(/.*\Wt=((\d+)m)?((\d+)s?)?.*/);
 		if (m == null) {
 			var timeref = qsconn+'rel=0';
 			m = href.match(/.*start=(\d+)/);

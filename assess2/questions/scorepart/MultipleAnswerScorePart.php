@@ -33,12 +33,11 @@ class MultipleAnswerScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['questions'][$partnum])) {$questions = $options['questions'][$partnum];} else {$questions = $options['questions'];}
-        if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$partnum];} else {$answers = $options['answers'];}}
-        else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$partnum];} else {$answers = $options['answer'];}}
-        if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$partnum];} else {$noshuffle = $options['noshuffle'];}}
-
-        if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$partnum];} else {$scoremethod = $options['scoremethod'];}
+        $optionkeys = ['answers', 'noshuffle', 'scoremethod'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
+        }
+        $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
 
         if (!is_array($questions)) {
             $scorePartResult->addScoreMessage(_('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.'));
@@ -93,7 +92,7 @@ class MultipleAnswerScorePart implements ScorePart
             // To not give credit for an unanswered question, set scoremethod to answers
             $scoremethod = 'answers';
             }
-            if (isset($scoremethod) && $scoremethod=='answers') {
+            if (!empty($scoremethod) && $scoremethod=='answers') {
                 $deduct = 1.0/count($akeys);
             } else {
                 $deduct = 1.0/$qcnt;
@@ -116,7 +115,7 @@ class MultipleAnswerScorePart implements ScorePart
         // just store unrandomized last answers
         sort($origla);
         $scorePartResult->setLastAnswerAsGiven(implode('|',$origla));
-        if (isset($scoremethod)) {
+        if (!empty($scoremethod)) {
             if ($scoremethod=='allornothing' && $bestscore<1) {
                 $bestscore = 0;
             } else if ($scoremethod == 'takeanything') {

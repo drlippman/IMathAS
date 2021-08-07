@@ -151,7 +151,7 @@ class AssessUtils
   }
 
   public static function getEndMsg($endmsg, $score, $possible) {
-    if ($endmsgs === '') {
+    if ($endmsg === '') {
       return '';
     }
     $average = round(100*$score/$possible,1);

@@ -23,10 +23,11 @@ if (isset($_POST['mathdisp'])) {
 	}
 } else {
 	echo '<div id="headerforms" class="pagetitle"><h1>'._('User Preferences').'</h1></div>';
-	echo "<form enctype=\"multipart/form-data\" method=post action=\"$action\">\n";
+	echo "<form id=\"pageform\" enctype=\"multipart/form-data\" method=post action=\"$action\">\n";
 	showUserPrefsForm();
 	echo "<div class=submit><input type=submit value='Update Info'></div>\n";
 	echo "</form>\n";
+    echo '<script>function doSubmit() { document.getElementById("pageform").submit(); parent.$("#GB_footer button.primary").hide();}</script>';
 }
 
 require('../footer.php');

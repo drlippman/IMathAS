@@ -28,7 +28,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 	$textid = Sanitize::onlyInt($_GET['id']);
 
-	if ($_POST['remove']=="really") {
+	if (isset($_POST['remove']) && $_POST['remove']=="really") {
 		require_once("../includes/filehandler.php");
 
 		$DBH->beginTransaction();

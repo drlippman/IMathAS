@@ -227,7 +227,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
-	}
+	} else {
+        $contentbehavior = 0;
+    }
 	//DEFAULT DISPLAY PROCESSING
 	//$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
 	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course/";
@@ -625,11 +627,12 @@ if ($overwriteBody==1) {
 		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
 		   echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
 		   echo 'var itemorderhash="'.md5(serialize($items)).'";';
+           echo 'var blockiconsrc="'.$staticroot.'/img/'.$CFG['CPS']['miniicons']['folder'].'";';
 		   echo "</script>";
-		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=050719\"></script>";
+		   echo "<script src=\"$staticroot/javascript/nestedjq.js?v=080521\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
-		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
-
+		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button> ';
+		   echo '<button type="button" onclick="addnewblock()">'._("Add Block").'</button></p>';
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';

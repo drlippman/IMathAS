@@ -169,9 +169,38 @@ switch($_GET['action']) {
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($myrights < 75 && substr($line['email'],0,7)==='BOUNCED') {
 			$line['email'] = '';
-		}
-		echo '<script type="text/javascript">function togglechgpw(val) { document.getElementById("pwinfo").style.display=val?"":"none"; } ';
-		echo 'function togglechgmfa(val) { document.getElementById("mfainfo").style.display = val?"":"none";}</script>';
+        }
+        $mfatype = 0;
+        if ($line['mfa'] !== '') {
+            $mfadata = json_decode($line['mfa'], true);
+            if (!empty($mfadata['mfatype']) && $mfadata['mfatype'] == 'admin') {
+                $mfatype = 1;
+            } else {
+                $mfatype = 2;
+            }
+        }
+        echo '<script type="text/javascript">
+            function togglechgpw(val) { 
+                document.getElementById("pwinfo").style.display=val?"":"none"; 
+            } 
+            function togglechgmfa(val) { 
+                $("#mfainfo").toggle(val>0);
+            }
+            var oldemail = "'.Sanitize::encodeStringForJavascript($line['email']).'";
+            $(function () {
+                $("#dochgpw,#email,#dochgmfa").on("input change keydown paste", function() {
+                    var needchk = $("#dochgpw").prop("checked") ||
+                        $("#email").val() != oldemail ||
+                        ($("#dochgmfa").val() < '.$mfatype.');
+                    $("#seccheck").toggle(needchk);
+                    $("#oldpw,#oldmfa").prop("required", needchk);
+                });
+            });
+            function cleartrustedmfa(el) {
+                $.post("actions.php", {action:"cleartrustedmfa"})
+                 .done(function(msg) { if (msg == "OK") { $(el).replaceWith("'._('Cleared').'");}});
+            }
+        </script>';
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Modify User Profile'),"</div>\n";
 		}
@@ -194,35 +223,53 @@ switch($_GET['action']) {
 		}
 		echo '<span class="form"><label for="dochgpw">',_('Change Password?'),'</label></span> <span class="formright"><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this.checked)" /></span><br class="form" />';
 		echo '<div style="display:none" id="pwinfo">';
-		echo "<span class=form><label for=\"oldpw\">",_('Enter old password:'),"</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw1\">",_('Enter new password:'),"</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">",_('Verify new password:'),"</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
-		echo '</div>';
-		if ($myrights>40 || $myspecialrights>0) {
-			if ($line['mfa']=='') {
-				require('includes/GoogleAuthenticator.php');
-				$MFA = new GoogleAuthenticator();
-				$mfasecret = $MFA->createSecret();
-				$mfaurl = $MFA->getOtpauthUrl($installname.':'.$line['SID'], $mfasecret, $installname);
-				echo '<span class=form><label for="dochgmfa">2-factor Authentication</label></span>';
-				echo '<span class="formright"><input type="checkbox" name="dochgmfa" id="dochgmfa" onclick="togglechgmfa(this.checked)" /> '._('Enable 2-factor authentication for admin actions').'</span><br class="form" />';
-				echo '<div style="display:none" id="mfainfo">';
-				echo '<script type="text/javascript" src="javascript/jquery.qrcode.min.js"></script>';
-				echo '<script type="text/javascript">$(function(){$("#mfaqrcode").qrcode({width:128,height:128,text:"'.Sanitize::encodeStringForJavascript($mfaurl).'"})});</script>';
-				echo '<input type=hidden name=mfasecret value="'.Sanitize::encodeStringForDisplay($mfasecret).'" />';
-				echo '<span class=form>Instructions:</span><span class=formright>To enable 2-factor authentication, you will need an app compatible with Google Authenticator. <a href="https://authy.com/">Authy</a> is recommended.';
-				echo 'Using the app, scan the QR code below. Once it is set up, enter the code provided in the box.</span><BR class=form>';
-				echo '<span class=form>QR Code:</span><span class=formright><span id="mfaqrcode"></span> </span><br class=form>';
-				echo "<span class=form><label for=\"mfaverify\">Enter code from app:</label></span> <input class=form id=mfaverify name=mfaverify size=8> <br class=form>\n";
-				echo '</div>';
-			} else {
-				echo '<span class=form><label for="delmfa">2-factor Authentication</label></span>';
-				echo '<span class="formright">2-factor authentication is currently enabled.  <input type="checkbox" name="delmfa" id="delmfa" /> '._('Disable').'</span><br class="form" />';
-			}
+        echo '</div>';
+        echo '<span class=form><label for="dochgmfa">'._('2-factor Authentication').'</label></span>';
+        echo '<span class="formright"><select name="dochgmfa" id="dochgmfa" onchange="togglechgmfa(this.value)" /> ';
+        echo '<option value=0 '.($mfatype == 0 ? 'selected':'').'>'._('Disable').'</option>';
+        if ($line['rights'] > 74) {
+            echo '<option value=1 '.($mfatype == 1 ? 'selected':'').'>'._('Enable for admin actions').'</option>';
+            echo '<option value=2 '.($mfatype == 2 ? 'selected':'').'>'._('Enable for login and admin actions').'</option>';
+        } else {
+            echo '<option value=2 '.($mfatype == 2 ? 'selected':'').'>'._('Enable').'</option>';
+        }
+        echo '</select></span><br class="form" />';
+				
+        if ($line['mfa']=='') {
+            require('includes/GoogleAuthenticator.php');
+            $MFA = new GoogleAuthenticator();
+            $mfasecret = $MFA->createSecret();
+            $mfaurl = $MFA->getOtpauthUrl($installname.':'.$line['SID'], $mfasecret, $installname);
+            echo '<div style="display:none" id="mfainfo">';
+            echo '<script type="text/javascript" src="javascript/jquery.qrcode.min.js"></script>';
+            echo '<script type="text/javascript">$(function(){$("#mfaqrcode").qrcode({width:128,height:128,text:"'.Sanitize::encodeStringForJavascript($mfaurl).'"})});</script>';
+            echo '<input type=hidden name=mfasecret value="'.Sanitize::encodeStringForDisplay($mfasecret).'" />';
+            echo '<span class=form>Instructions:</span><span class=formright>To enable 2-factor authentication, you will need an app compatible with Google Authenticator. <a href="https://authy.com/">Authy</a> is recommended. ';
+            echo 'Using the app, scan the QR code below, or manually enter the key code. Once it is set up, enter the token code provided in the box.</span><BR class=form>';
+            echo '<span class=form>QR Code:</span><span class=formright><span id="mfaqrcode"></span></span><br class=form>';
+            echo '<span class=form>Key Code:</span><span class=formright>'.Sanitize::encodeStringForDisplay($mfasecret).'</span><br class=form>';
+            echo "<span class=form><label for=\"mfaverify\">Enter token code from app:</label></span> <input class=form id=mfaverify name=mfaverify size=8> <br class=form>\n";
+            echo '</div>';
+        } else {
+            if (!empty($mfadata['trusted']) || !empty($mfadata['logintrusted'])) {
+                echo '<span class=form>'._('2-factor authentication trusted devices').':</span><span class=formright>';
+                echo '<a href="#" onclick="cleartrustedmfa(this)">'._('Clear trusted devices').'</a></span><br class=form>';
+            }
+        }
 
-		}
 		echo "<span class=form><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=form type=text size=60 id=email name=email autocomplete=\"email\" value=\"".Sanitize::emailAddress($line['email'])."\"><BR class=form>\n";
-		echo "<span class=form><label for=\"msgnot\">",_('Notify me by email when I receive a new message:'),"</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
+        
+        echo '<div style="display:none" id="seccheck">';
+        echo '<p class="noticetext">'._('The changes you are making require additional security verification.').'</p>';
+        echo "<span class=form><label for=\"oldpw\">",_('Enter current password:'),"</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
+        if ($line['mfa'] != '') {
+            echo "<span class=form><label for=\"oldmfa\">",_('Enter 2-factor Authentication code:'),"</label></span> <input class=form type=text id=oldmfa name=oldmfa size=10 /> <BR class=form>\n";
+        }
+        echo '</div>';
+
+        echo "<span class=form><label for=\"msgnot\">",_('Notify me by email when I receive a new message:'),"</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot ";
 		if ($line['msgnotify']==1) {echo "checked=1";}
 		echo " /></span><BR class=form>\n";
 		if (isset($CFG['FCM']) && isset($CFG['FCM']['webApiKey']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
@@ -321,9 +368,10 @@ switch($_GET['action']) {
 
 		if ($myrights>19) {
 			echo '<fieldset id="userinfoinstructor"><legend>',_('Instructor Options'),'</legend>';
-			echo "<span class=form><label for=\"qrd\">",_('Make new questions private by default?<br/>(recommended for new users):'),"</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
-			if ($line['qrightsdef']==0) {echo "checked=1";}
-			echo " /></span><BR class=form>\n";
+            // removed 6/7/21
+            //echo "<span class=form><label for=\"qrd\">",_('Make new questions private by default?<br/>(recommended for new users):'),"</label></span><span class=formright><input type=checkbox id=qrd name=qrd ";
+			//if ($line['qrightsdef']==0) {echo "checked=1";}
+			//echo " /></span><BR class=form>\n";
 			if ($line['deflib']==0) {
 				$lname = "Unassigned";
 			} else {
@@ -364,7 +412,8 @@ switch($_GET['action']) {
 		showNewUserValidation("pageform", array('oldpw'), $requiredrules);
 
 		echo "<div class=submit><input type=submit value='",_('Update Info'),"'></div>\n";
-
+        echo '<script>function doSubmit() { document.getElementById("pageform").submit(); parent.GB_hide();}</script>';
+        
 		//echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
 		echo "</form>\n";
 		break;
@@ -542,7 +591,13 @@ switch($_GET['action']) {
 		echo '<input type="hidden" name="allcourses" value="'.Sanitize::encodeStringForDisplay(implode(',',$allcourses)).'"/>';
 		echo '<input type="submit" value="',_('Save Changes'),'"/>';
 		echo '</form>';
-		break;
+        break;
+    case "adminmfanotice":
+        echo '<p>'._('For security, this site requires all admin-level accounts to enable Two-Factor Authentication. ');
+        echo sprintf(_('Please visit the <a href="%s">user profile page</a> and enable 2-factor authentication.'),
+            'forms.php?action=chguserinfo');
+        echo '</p>';
+        break;
 	case "googlegadget":
 		$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));

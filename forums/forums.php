@@ -8,12 +8,8 @@
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
 	   require("../footer.php");
 	   exit;
-	}
-	if (isset($teacherid)) {
-		$isteacher = true;
-	} else {
-		$isteacher = false;
-	}
+    }
+    $isteacher = isset($teacherid);
 
 	if (!isset($_GET['cid'])) {
 		exit;
@@ -22,7 +18,7 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 
 	if (isset($_POST['searchsubmit'])) {
-		if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
+		if (trim($_POST['search'])=='' && empty($_POST['tagfiltersel'])) {
 			$_GET['clearsearch'] = true;
 		}
 	}
@@ -35,7 +31,7 @@
 	} else if(isset($_POST['searchsubmit'])) {
 		$searchstr = trim($_POST['search']);
 		$searchtype = $_POST['searchtype'];
-		$searchtag = $_POST['tagfiltersel'];
+		$searchtag = $_POST['tagfiltersel'] ?? '';
 		$_SESSION['forumsearchstr'.$cid] = $searchstr;
 		$_SESSION['forumsearchtype'.$cid] = $searchtype;
 		$_SESSION['forumsearchtag'.$cid] = $searchtag;
@@ -44,7 +40,8 @@
 		$searchtype = $_SESSION['forumsearchtype'.$cid];
 		$searchtag = $_SESSION['forumsearchtag'.$cid];
 	} else {
-		$searchtype = "none";
+        $searchtype = "none";
+        $searchstr = "";
 	}
 
 
@@ -63,7 +60,7 @@
 	//get general forum info and page order
 	$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid=:courseid";
-	if (!$teacherid) {
+	if (!$isteacher) {
 		//check for avail or past startdate; we'll do an enddate check later
 		$query .= " AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now))";
 	}
@@ -561,7 +558,7 @@ if ($searchtype == 'thread') {
         } else {
             echo '</i> <i class="small info">'._('Hidden').'</i> ';
         }
-		if ($newcnt[$line['id']]>0) {
+		if (!empty($newcnt[$line['id']])) {
 			 echo "<a href=\"thread.php?cid=$cid&forum=" . Sanitize::onlyInt($line['id']) . "&page=-1\" class=noticetext >New Posts (" . Sanitize::encodeStringForDisplay($newcnt[$line['id']]) . ")</a>";
 		}
 		echo "</td>\n";

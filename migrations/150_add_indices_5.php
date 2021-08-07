@@ -33,7 +33,7 @@ $DBH->beginTransaction();
 	$DBH->rollBack();
 	return false;
  }
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ Added index for library groupid and to prevent duplicate grade records</p>";
 

@@ -586,7 +586,8 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$answerbox = str_replace('<table ','<table style="display:inline-table;vertical-align:middle" ', $answerbox);
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
-	$partnum = $qn%1000;
+    $partnum = $qn%1000;
+    $out = '';
 
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
@@ -713,4 +714,53 @@ if (!function_exists('stripslashes_deep')) {
 	function stripslashes_deep($value) {
 		return (is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value));
 	}
+}
+
+// hasarrayval: 0 not array, 1 may be array, 2 must be array
+function getOptionVal($options, $key, $multi, $partnum, $hasarrayval=0) {
+    if (isset($options[$key])) {
+        if ($multi) {
+            if ($hasarrayval == 2) { // the normal option value must be an array, so we have to do more logic
+                if (is_array($options[$key])) {
+                    if (isset($options[$key][$partnum]) && is_array($options[$key][$partnum])) {
+                        // we have an array at the part index
+                        return $options[$key][$partnum];
+                    } else {
+                        // no array at part index
+                        // check if entries that do exist are arrays
+                        if (is_array(current($options[$key]))) {
+                            // other entries are array, so this one just isn't defined
+                            // do nothing
+                        } else {
+                            // so array must be intended for all parts
+                            return $options[$key];
+                        }
+                    }
+                } // else invalid value - should be array
+            } else {
+                if (is_array($options[$key])) {
+                    if (isset($options[$key][$partnum])) {
+                        return $options[$key][$partnum];
+                    } 
+                } else {
+                    return $options[$key];
+                }
+            }
+        } else {
+            // single part question.
+            if (!is_array($options[$key]) || $hasarrayval > 0) {
+                // the normal option value may be an array, or option val is not array
+                // just return it
+                return $options[$key];
+            } 
+        }
+    }
+    // value not found
+    if ($key === 'answers') {
+        // common mistake to use $answer instead - look for that.
+        $altval = getOptionVal($options, 'answer', $multi, $partnum, $hasarrayval);
+        return $altval;
+    }
+    // no value - return empty string
+    return '';
 }

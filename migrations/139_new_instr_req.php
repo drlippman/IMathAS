@@ -21,7 +21,7 @@ $query = 'CREATE TABLE `imas_instr_acct_reqs` (
 	  `reqdate` INT(10) UNSIGNED NOT NULL,
 	  `reqdata` TEXT NOT NULL,
 	  INDEX (`status`)
-	) ENGINE=InnoDB;';
+	) ENGINE = InnoDB ROW_FORMAT=DYNAMIC ;';
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
@@ -29,7 +29,7 @@ $query = 'CREATE TABLE `imas_instr_acct_reqs` (
 	return false;
  }
 	 
-$DBH->commit();
+if ($DBH->inTransaction()) { $DBH->commit(); }
 
 echo "<p style='color: green;'>✓ table imas_instr_acct_reqs created.  You may want to update your newinstructor.php script.</p>";		
 

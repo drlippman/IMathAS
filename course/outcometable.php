@@ -114,7 +114,7 @@ function outcometable() {
 	$query .= "AND cntingb>0 AND cntingb<3 ";
 	$qarr = array(':courseid'=>$cid);
 	if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory=:gbcategory ";
@@ -181,7 +181,7 @@ function outcometable() {
 		} else {
 			$deffeedback = explode('-',$line['deffeedback']);
 			$assessmenttype[$kcnt] = $deffeedback[0];
-			$sa[$kcnt] = $deffeedback[1];
+			$sa[$kcnt] = $deffeedback[1] ?? 'N';
 		}
 
 		$aitems = explode(',',$line['itemorder']);
@@ -234,7 +234,7 @@ function outcometable() {
 	$qarr = array(':courseid'=>$cid, ':now'=>$now);
 
 	if ($istutor) {
-		$query .= "AND tutoredit<2 ";
+		$query .= "AND tutoredit<>2 ";
 	}
 	if ($catfilter>-1) {
 		$query .= "AND gbcategory=:gbcategory ";
@@ -323,7 +323,7 @@ function outcometable() {
 	$stm->execute(array(':courseid'=>$cid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (in_array($row[0],$category)) { //define category if used
-			if ($row[1]{0}>='1' && $row[1]{0}<='9') {
+			if ($row[1][0]>='1' && $row[1][0]<='9') {
 				$row[1] = substr($row[1],1);
 			}
 			$cats[$row[0]] = array_slice($row,1);
@@ -495,7 +495,8 @@ function outcometable() {
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 	$alt = 0;
-	$sturow = array();
+    $sturow = array();
+    $timelimitmult = [];
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		$cattotpast[$ln] = array();
@@ -512,7 +513,8 @@ function outcometable() {
 		$gb[$ln][0][2] = $line['locked'];
 
 
-		$sturow[$line['id']] = $ln;
+        $sturow[$line['id']] = $ln;
+        $timelimitmult[$line['id']] = $line['timelimitmult'];
 		$ln++;
 	}
 
@@ -524,8 +526,10 @@ function outcometable() {
 	$stm2->execute(array(':courseid'=>$cid));
 	while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 		if (!isset($sturow[$r[1]])) { continue;}
-		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3],$r[4]);
-		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][2] = 10; //will get overwritten later if assessment session exists
+        $exceptions[$r[0]][$r[1]] = array($r[2],$r[3],$r[4]);
+        if (isset($assesscol[$r[0]]) && isset($sturow[$r[1]])) {
+            $gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][2] = 10; //will get overwritten later if assessment session exists
+        }
 	}
 
 	//Get assessment scores
@@ -612,8 +616,7 @@ function outcometable() {
 		if ($assessmenttype[$i]=="NoScores" && $sa[$i]!="I" && $now<$thised && !$canviewall) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][2] = 0;  //no other info
-		} else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
-		//else if ($pts<$minscores[$i]) {
+		} /*else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
 			if ($canviewall) {
 				$gb[$row][1][$col][0] = $pts; //the score
 				$gb[$row][1][$col][2] = 1;  //no credit
@@ -621,14 +624,14 @@ function outcometable() {
 				$gb[$row][1][$col][0] = 'NC'; //score is No credit
 				$gb[$row][1][$col][2] = 1;  //no credit
 			}
-		} else 	if ($IP==1 && $thised>$now && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
+		} else if ($IP==1 && $thised>$now && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][2] = 2;  //in progress
 			$countthisone =true;
-		} else	if (($timelimits[$i]>0) && ($timeused > $timelimits[$i]*$timelimitmult[$l['userid']])) {
+		} else if (($timelimits[$i]>0) && ($timeused > $timelimits[$i]*$timelimitmult[$l['userid']])) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][2] = 3;  //over time
-		} else if ($assessmenttype[$i]=="Practice") {
+		}*/ else if ($assessmenttype[$i]=="Practice") {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][2] = 4;  //practice test
 		} else { //regular score available to students
@@ -748,7 +751,7 @@ function outcometable() {
 		)) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][2] = 0;  //no other info
-		} else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
+		}/* else if (($minscores[$i]<10000 && $pts<$minscores[$i]) || ($minscores[$i]>10000 && $pts<($minscores[$i]-10000)/100*$possible[$i])) {
 		//else if ($pts<$minscores[$i]) {
 			if ($canviewall) {
 				$gb[$row][1][$col][0] = $pts; //the score
@@ -757,7 +760,7 @@ function outcometable() {
 				$gb[$row][1][$col][0] = 'NC'; //score is No credit
 				$gb[$row][1][$col][2] = 1;  //no credit
 			}
-		} else if ($IP==1) {
+		}*/ else if ($IP==1) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][2] = 2;  //in progress
 			$countthisone =true;

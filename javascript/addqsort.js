@@ -699,6 +699,14 @@ function removegrp(loc) {
     return false;
 }
 
+function fullungroup(loc) {
+    if (confirm_textseg_dirty()) {
+        itemarray = itemarray.slice(0,loc).concat(itemarray[loc][2]).concat(itemarray.slice(loc+1));
+        submitChanges();
+    }
+    return false;
+}
+
 function doremoveitem(loc) {
     if (loc.indexOf("-") > -1) {
         locparts = loc.split("-");
@@ -1261,11 +1269,23 @@ function generateTable() {
                             html += "ea";
                         }
                         html +=
-                            '</td><td class=c><a href="#" onclick="return removegrp(\'' +
+                        '<td class=c><div class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle arrow-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                        html +=
+                            _("Action") +
+                            '</a><ul role="menu" class="dropdown-menu dropdown-menu-right">';
+                        html +=
+                            '<li><a href="#" onclick="return removegrp(\'' +
                             i +
                             "');\">" +
-                            _("Remove") +
-                            "</a></td></tr>";
+                            _("Remove Group and Questions") +
+                            "</a></li>";
+                        html +=
+                            '<li><a href="#" onclick="return fullungroup(' + i + ');">' +
+                            _("Ungroup all Questions") +
+                            "</a></li>";
+                        html += '</ul></div></tr>';
+
+                        
                         if (itemarray[i][3] == 0) {
                             //collapsed group
                             if (curitems[0][4] == 9999) {
@@ -1815,7 +1835,8 @@ function submitChanges() {
     data = generateOutput();
     var outdata = {
         order: data[0],
-        text_order: JSON.stringify(data[1])
+        text_order: JSON.stringify(data[1]),
+        lastitemhash: lastitemhash
     };
     if (!beentaken) {
         outdata["pts"] = JSON.stringify(data[2]);
@@ -1838,6 +1859,7 @@ function submitChanges() {
             if (!beentaken) {
                 defpoints = $("#defpts").val();
             }
+            lastitemhash = msg;
             document.getElementById(target).innerHTML = "";
             refreshTable();
             updateSaveButtonDimming();

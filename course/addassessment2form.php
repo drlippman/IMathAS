@@ -653,6 +653,7 @@ $vueData = array(
 						<option value="2"><?php echo _('No Access');?></option>
 						<option value="0"><?php echo _('View Scores');?></option>
 						<option value="1"><?php echo _('View and Edit Scores');?></option>
+                        <option value="3"><?php echo _('View and Edit Scores, Make Exceptions');?></option>
 					</select>
 				</span><br class="form" />
 			</div>
@@ -956,7 +957,9 @@ var app = new Vue({
  						'text': '<?php echo _('Never');?>'
  					}
  				];
- 				if (this.viewingb === 'after_take' && this.subtype == 'by_assessment') {
+                 if ((this.viewingb === 'after_take' || this.viewingb === 'immediately') && 
+                    this.subtype == 'by_assessment'
+                 ) {
  					out.unshift({
  						'value': 'after_take',
  						'text': '<?php echo _('After the assessment version is submitted');?>'

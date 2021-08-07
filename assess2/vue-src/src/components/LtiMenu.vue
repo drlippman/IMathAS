@@ -49,7 +49,8 @@ export default {
           window.GB_show(
             this.$t('lti.userprefs'),
             store.APIbase + '../admin/ltiuserprefs.php?cid=' + store.cid + '&greybox=true',
-            800, 'auto'
+            800, 'auto', true, 0, 0,
+            { label: 'Update Info', func: 'doSubmit' }
           );
         }
       });

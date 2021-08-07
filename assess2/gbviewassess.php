@@ -2,7 +2,7 @@
 // IMathAS: Assess2 gradebook details page
 // (c) 2019 David Lippman
 
-$lastupdate = '20210220';
+$lastupdate = '20210613';
 
 require('../init.php');
 if (empty($_GET['cid']) || empty($_GET['aid'])) {
@@ -15,9 +15,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 }
 $cid = Sanitize::onlyInt($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-$stu = Sanitize::onlyInt($_GET['stu']);
+$stu = Sanitize::onlyInt($_GET['stu'] ?? 0);
 
-$from = $_GET['from'];
+$from = $_GET['from'] ?? '';
 if ($from=='isolate') {
   $exitUrl =  $GLOBALS['basesiteurl'] . "/course/isolateassessgrade.php?stu=$stu&cid=$cid&aid=$aid";
 } else if ($from=='gisolate') {
@@ -49,7 +49,7 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/as
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/chunk-common.css?v='.$lastupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastupdate.'" media="print">';
 $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js" type="text/javascript"></script>';
-$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=021021" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v=040121" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/rubric_min.js?v=051120" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/gb-scoretools.js?v=112120" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css">

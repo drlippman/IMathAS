@@ -13,7 +13,7 @@ If deleted on both ends, delete from DB
 	require("../init.php");
 	require('../includes/getcourseopts.php');
 
-	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+	if (isset($cid) && $cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
 	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
 	   require("../footer.php");
@@ -29,7 +29,7 @@ If deleted on both ends, delete from DB
 	$threadsperpage = intval($listperpage);
 
 	$cid = Sanitize::courseId($_GET['cid']);
-    $cidP = Sanitize::courseId($_POST['courseid']);
+    
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
@@ -57,7 +57,7 @@ If deleted on both ends, delete from DB
 	} else {
 		$filteruid = 0;
 	}
-	$type = $_GET['type'];
+	$type = $_GET['type'] ?? '';
 
 	if (isset($_GET['getstulist'])) {
 		$cid = intval($_GET['getstulist']);
@@ -131,7 +131,8 @@ If deleted on both ends, delete from DB
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
-			$msgToPost = Sanitize::onlyInt($_POST['to']);
+            $msgToPost = Sanitize::onlyInt($_POST['to']);
+            $cidP = Sanitize::courseId($_POST['courseid']);
 
 			// validate message settings allow this
 			$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=:id");
@@ -351,10 +352,16 @@ If deleted on both ends, delete from DB
 				$message = '<br/><hr/>'.$qinfo.'<br/><br/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 				if (isset($parts[3]) && $parts[3] === 'reperr') {
-					$title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
-					$stm = $DBH->prepare("SELECT ownerid FROM imas_questionset WHERE id=:id");
-					$stm->execute(array(':id'=>$parts[1]));
-					$_GET['to'] = $stm->fetchColumn(0);
+                    $title = "Problem with question ID ".Sanitize::onlyInt($parts[1]);
+                    $query = 'SELECT iqs.ownerid,iu.lastaccess FROM imas_questionset AS iqs
+                        JOIN imas_users AS iu ON iqs.ownerid=iu.id WHERE iqs.id=:id';
+					$stm = $DBH->prepare($query);
+                    $stm->execute(array(':id'=>$parts[1]));
+                    $r = $stm->fetch(PDO::FETCH_ASSOC);
+                    $_GET['to'] = $r['ownerid'];
+                    if (!empty($CFG['GEN']['qerroronold']) && $r['lastaccess'] < time() - 60*60*24*$CFG['GEN']['qerroronold'][0]) {
+                        $_GET['to'] = $CFG['GEN']['qerroronold'][1];
+                    }
 				} else if (isset($parts[3]) && $parts[3]>0) {  //sending out of assessment instructor
 					$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 					$stm->execute(array(':id'=>$parts[3]));

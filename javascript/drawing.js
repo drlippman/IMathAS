@@ -53,8 +53,8 @@
 	8.4: log (unshifted)
 	8.5: exponential (shifted)
 	8.6: log (shifted)
-	9: sine
-	9.1: cosine
+	9: cosine
+	9.1: sine
    ineqtypes
    	10: linear >= or <=
    	10.2: linear < or >
@@ -126,8 +126,9 @@ function reset() {
 	curIneqcurve = null;
 }
 
-function clearcanvas(tarnum) {
-    if (targetOuts[tarnum].disabled) { return; }
+function clearcanvas(tarnum, overridedis) {
+    if (targetOuts[tarnum] && targetOuts[tarnum].disabled && !overridedis) { return; }
+    if (!lines.hasOwnProperty(tarnum)) { return; }
 	lines[tarnum].length = 0;
 	dots[tarnum].length = 0;
 	odots[tarnum].length = 0;
@@ -247,7 +248,7 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"trig": [
 				{"mode":9, "descr":_("Cosine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point half a phase further")},
-				{"mode":9.2, "descr":_("Sine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point a quarter phase further")}
+				{"mode":9.1, "descr":_("Sine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point a quarter phase further")}
 			],
 			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
 		},
@@ -1791,9 +1792,11 @@ function drawMouseDown(ev) {
 						tplines[curTarget][curTPcurve].push([mouseOff.x,mouseOff.y]);
 						if (tplines[curTarget][curTPcurve].length==tpModeN[targets[curTarget].mode]) {
 							//second point is set.  switch to drag and end line
-							dragObj = {mode: targets[curTarget].mode, num: curTPcurve, subnum: 1};
+							dragObj = {mode: targets[curTarget].mode, num: curTPcurve, subnum: (tpModeN[targets[curTarget].mode]-1)};
 							curTPcurve = null;
-						}
+						} else {
+                            mouseisdown = false; // treat like click and release
+                        }
 					}
 				} else if (targets[curTarget].mode>=10 && targets[curTarget].mode<11) {//in ineqline mode
 					if (curIneqcurve==null) { //start new tpline
@@ -1992,7 +1995,6 @@ function drawMouseUp(ev) {
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 		var releaseInTarget = (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height);
-
 		if (clickmightbenewcurve==true) {
 			if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {
 				tplines[curTarget].push([[mouseOff.x,mouseOff.y]]);
@@ -2026,15 +2028,17 @@ function drawMouseUp(ev) {
 				drawTarget();
 			}
 		}
-		if (curTPcurve!=null && tplines[curTarget][curTPcurve].length==1) {
+		if (curTPcurve!=null && tplines[curTarget][curTPcurve].length<tpModeN[targets[curTarget].mode]) {
 			if (didMultiTouch || !releaseInTarget) {
 				tplines[curTarget].splice(curTPcurve,1);
 				tptypes[curTarget].splice(curTPcurve,1);
 				curTPcurve = null;
 				drawTarget();
 			} else if (findnearpoint(curTarget,mouseOff)==null) {
-				tplines[curTarget][curTPcurve].push([mouseOff.x,mouseOff.y]);
-				curTPcurve = null;
+                tplines[curTarget][curTPcurve].push([mouseOff.x,mouseOff.y]);
+                if (tplines[curTarget][curTPcurve].length == tpModeN[targets[curTarget].mode]) {
+                    curTPcurve = null;
+                }
 				drawTarget();
 			}
 		}
@@ -2441,7 +2445,9 @@ function initCanvases(k) {
 				if (drawla[i].length>5) {
 					thisdrawla = drawla[i][5];
 				}
-			}
+			} else if (drawla[i] != null && JSON.stringify(drawla[i])=='[[]]') {
+                clearcanvas(canvases[i][0], true);
+            } 
 			if (canvases[i][1].substr(0,8)=="a11ydraw") {
 				addA11yTarget(canvases[i], thisdrawla);
 			} else {

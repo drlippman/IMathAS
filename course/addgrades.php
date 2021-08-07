@@ -11,8 +11,14 @@
 	$istutor = false;
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
-	if (isset($teacherid)) { $isteacher = true;}
-	$gbItem = ($_GET['gbitem'] == 'new') ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
+    if (isset($teacherid)) { $isteacher = true;}
+    
+    if (isset($_GET['gbitem'])) {
+        $gbItem = ($_GET['gbitem'] == 'new') ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
+    } else {
+        $gbItem = '';
+    }
+
 	if ($istutor) {
 		$isok = false;
 		if (is_numeric($gbItem)) {
@@ -36,7 +42,7 @@
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
-	$from = Sanitize::simpleString($_GET['from']);
+	$from = Sanitize::simpleString($_GET['from'] ?? '');
 
 	if (isset($_GET['del']) && $isteacher) {
 		$delItem = Sanitize::onlyInt($_GET['del']);
@@ -95,8 +101,8 @@
 			exit;
 		}
 
-	}
-
+    }
+    
 	if ($gbItem != 'new') {
 		$stm = $DBH->prepare("SELECT courseid FROM imas_gbitems WHERE id=?");
 		$stm->execute(array($gbItem));
@@ -173,7 +179,11 @@
 
 	if (isset($_POST['assesssnap'])) {
 		$assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
-		$post_points = Sanitize::onlyFloat($_POST['points']);
+        $post_points = Sanitize::onlyFloat($_POST['points']);
+        
+        $assesssnaptype = (int) Sanitize::onlyInt($_POST['assesssnaptype']);
+        $assesssnapatt = (float) Sanitize::onlyFloat($_POST['assesssnapatt']);
+        $assesssnappts = (float) Sanitize::onlyFloat($_POST['assesssnappts']);
 
 		//doing assessment snapshot
 		$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=:assessmentid");
@@ -196,27 +206,44 @@
 						$att++;
 					}
 					$tot += getpts($v);
-				}
+                }
+                $attper = $att/count($sc);
 			} else {
 				$tot = $row[1];
 				if ($assesssnaptype>0) {
-					//TODO-assessrecord: figure out $attper, the % of questions attempted
+                    $attper = 0;
+                    $att = 0;
+                    if ($row[2] !== '') {
+                        $data = json_decode(gzdecode($row[2]), true);
+                        if ($data !== false) {
+                            $av = $data['assess_versions'][$data['scored_version']];
+                            $qcnt = 0;
+                            $attcnt = 0;
+                            foreach ($av['questions'] as $q) {
+                                $qcnt++;
+                                $qver = $q['question_versions'][$q['scored_version']];
+                                if (!empty($qver['tries'])) {
+                                    $attcnt++;
+                                }
+                            }
+                            if ($qcnt > 0) {
+                                $attper = $attcnt/$qcnt;
+                            }
+                        }
+                    }
 				}
 			}
-			$assesssnaptype = (int) Sanitize::onlyInt($_POST['assesssnaptype']);
-			$assesssnapatt = (float) Sanitize::onlyFloat($_POST['assesssnapatt']);
-			$assesssnappts = (float) Sanitize::onlyFloat($_POST['assesssnappts']);
 
 			if ($assesssnaptype==0) {
 				$score = $tot;
 			} else {
-				$attper = $att/count($sc);
 				if ($attper>=$assesssnapatt/100-.001 && $tot>=$assesssnappts-.00001) {
 					$score = $post_points;
 				} else {
 					$score = 0;
 				}
-			}
+            }
+
 			$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 			$query .= "(:gradetype, :gradetypeid, :userid, :score, :feedback)";
 			$stm2 = $DBH->prepare($query);
@@ -406,9 +433,9 @@
 	} else {
 		echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	}
-	if ($_GET['stu']>0) {
+	if (isset($_GET['stu']) && $_GET['stu']>0) {
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Student Detail</a> ";
-	} else if ($_GET['stu']==-1) {
+	} else if (isset($_GET['stu']) && $_GET['stu']==-1) {
 		echo "&gt; <a href=\"gradebook.php?stu=".Sanitize::encodeUrlParam($_GET['stu'])."&cid=$cid\">Averages</a> ";
 	}
 	echo "&gt; Offline Grades</div>";
@@ -420,7 +447,7 @@
 	}
 
     printf("<form id=\"mainform\" method=post action=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&gbitem=%s&grades=%s&from=%s\">",
-        Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid,
+        Sanitize::encodeUrlParam($_GET['stu'] ?? ''), Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid,
         Sanitize::encodeUrlParam($gbItem), Sanitize::encodeUrlParam($_GET['grades']), $from);
 
 	if ($_GET['grades']=='all') {
@@ -454,7 +481,7 @@
 		$rubric_vals = array(0);
 		$rubric_names = array('None');
 		$stm = $DBH->prepare("SELECT id,name FROM imas_rubrics WHERE ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid ORDER BY name");
-		$stm->execute(array(':cid'=>$cid, ':groupid'=>$gropuid));
+		$stm->execute(array(':cid'=>$cid, ':groupid'=>$groupid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$rubric_vals[] = $row[0];
 			$rubric_names[] = $row[1];
@@ -556,7 +583,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 
 		if ($gbItem!='new') {
 			printf("<br class=form /><div class=\"submit\"><input type=submit value=\"Submit\"/> <a href=\"addgrades.php?stu=%s&gbmode=%s&cid=%s&del=%s\">Delete Item</a> </div><br class=form />",
-                Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($gbItem));
+                Sanitize::encodeUrlParam($_GET['stu'] ?? ''), Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid, Sanitize::encodeUrlParam($gbItem));
 		} else {
 			echo "<span class=form>Upload grades?</span><span class=formright><input type=checkbox name=\"doupload\" /> <input type=submit value=\"Submit\"/></span><br class=form />";
 		}
@@ -629,7 +656,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 
 		if ($_GET['grades']=='all' && $gbItem!='new' && $isteacher) {
 			printf("<p><a href=\"uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s\">Upload Grades</a></p>",
-                Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($gbItem));
+                Sanitize::encodeUrlParam($_GET['gbmode'] ?? ''), $cid, Sanitize::encodeUrlParam($gbItem));
 		}
 		/*
 		if ($hassection && ($_GET['gbitem']=='new' || $_GET['grades']=='all')) {
@@ -700,7 +727,8 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			} else {
 				$stm2->execute(array(':gradetypeid'=>$gbItem));
 			}
-
+            $score = [];
+            $feedback = [];
 			while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 				if (isset($excused[$row[0]])) {
 					$score[$row[0]] = 'X';
@@ -774,7 +802,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			} else {
 				printf('<td><div class="fbbox" id="feedback%d">%s</div></td>',
 					Sanitize::encodeStringForDisplay($row[0]),
-					Sanitize::outgoingHtml($feedback[$row[0]]));
+					Sanitize::outgoingHtml($feedback[$row[0]] ?? ''));
 			}
 			echo '<td></td>';
 			echo "</tr>";

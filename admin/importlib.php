@@ -548,7 +548,7 @@ if ($myrights < 100) {
 		$page_uploadSuccessMsg .= "New Library items: $newli.<br>";
 			$page_uploadSuccessMsg .=  "<a href=\"" . $GLOBALS['basesiteurl'] . "/admin/admin2.php\">Return to Admin page</a>";
 
-	} elseif ($_FILES['userfile']['name']!='') { // STEP 2 DATA MANIPULATION
+	} elseif (!empty($_FILES['userfile']['name'])) { // STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
 		if ($filekey = storeimportfile('userfile')) {
 	    $page_fileHiddenInput = "<input type=hidden name=\"filekey\" value=\"".Sanitize::encodeStringForDisplay($filekey)."\" />\n";
@@ -615,7 +615,7 @@ if ($overwriteBody==1) {
 	<form enctype="multipart/form-data" method=post action="importlib.php?cid=<?php echo $cid ?>">
 
 <?php
-		if ($_FILES['userfile']['name']=='') { //STEP 1 DISPLAY
+		if (empty($_FILES['userfile']['name'])) { //STEP 1 DISPLAY
 ?>
 			<input type="hidden" name="MAX_FILE_SIZE" value="9000000" />
 			<span class=form>Import file: </span>

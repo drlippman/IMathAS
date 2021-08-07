@@ -79,9 +79,9 @@ var AMQsymbols = [
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
-//{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
+{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge", ttype:CONST},
 //{input:"^^^", tag:"mo", output:"\u22C0", tex:"bigwedge", ttype:UNDEROVER},
-//{input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
+{input:"vv",  tag:"mo", output:"\u2228", tex:"vee", ttype:CONST},
 //{input:"vvv", tag:"mo", output:"\u22C1", tex:"bigvee", ttype:UNDEROVER},
 {input:"nn",  tag:"mo", output:"\u2229", tex:"cap", ttype:CONST},
 //{input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
@@ -135,6 +135,8 @@ var AMQsymbols = [
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
 {input:"rarr", tag:"mo", output:"\u2192", tex:"rightarrow", ttype:CONST},
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
+{input:"=>",  tag:"mo", output:"\u21D2", tex:"implies", ttype:CONST},
+{input:"<=>", tag:"mo", output:"\u21D4", tex:"iff", ttype:CONST},
 //{input:"CC",  tag:"mo", output:"\u2102", tex:"mathbb{C}", ttype:CONST, notexcopy:true},
 //{input:"NN",  tag:"mo", output:"\u2115", tex:"mathbb{N}", ttype:CONST, notexcopy:true},
 //{input:"QQ",  tag:"mo", output:"\u211A", tex:"mathbb{Q}", ttype:CONST, notexcopy:true},
@@ -771,7 +773,9 @@ function MQtoAM(tex,display) {
   tex = tex.replace(/\\pm/g,'+-');
 	tex = tex.replace(/\\approx/g,'~~');
 	tex = tex.replace(/(\\arrow|\\rightarrow)/g,'rarr');
-    tex = tex.replace(/\\cup/g,'U');
+    tex = tex.replace(/\\cup/g,'U').replace(/\\sim/g,'~');
+    tex = tex.replace(/\\vee/g,'vv').replace(/\\wedge/g,'^^');
+    tex = tex.replace(/\\Rightarrow/g,'=>').replace(/\\Leftrightarrow/g,'<=>');
     tex = tex.replace(/\\times/g,'xx');
 	tex = tex.replace(/\\left\\{/g,'lbrace').replace(/\\right\\}/g,'rbrace');
 	tex = tex.replace(/\\left/g,'');
@@ -824,5 +828,6 @@ function MQtoAM(tex,display) {
 	tex = tex.replace(/\(([\a-zA-Z])\^([\d\.]+)\)\//g,'$1^$2/');  //change (x^n)/ to x^n/
   tex = tex.replace(/\+\-/g,'+ -'); // ensure spacing so it doesn't interpret as +-
   tex = tex.replace(/text\(([^)]*)\)/g, '$1');
+  tex = tex.replace(/\(\s*(\w)/g,'($1').replace(/(\w)\s*\)/g,'$1)');
   return tex;
 }

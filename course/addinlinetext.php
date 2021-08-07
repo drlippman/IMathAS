@@ -69,10 +69,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::encodeStringForDisplay($_GET['block']);
 	$page_formActionTag = "addinlinetext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
-            'cid' => $cid, 'folder' => $_GET['folder']));
+            'cid' => $cid, 'folder' => ($_GET['folder'] ?? 0)));
 	$page_formActionTag .= "&tb=$totb";
-	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
-	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
+	
+    if (!empty($_POST['title']) || !empty($_POST['text']) || !empty($_POST['sdate'])) { //if the form has been submitted
+        $caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 		$DBH->beginTransaction();
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -265,7 +266,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 
-	if ($_POST['submitbtn']=='Submit') {
+	if (isset($_POST['submitbtn']) && $_POST['submitbtn']=='Submit') {
 		$btf = isset($_GET['btf']) ? '&folder=' . Sanitize::encodeUrlParam($_GET['btf']) : '';
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) .$btf."&r=" .Sanitize::randomQueryStringParam());
 		exit;
@@ -279,7 +280,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($line['title']=='##hidden##') {
 			$hidetitle = true;
 			$line['title']='';
-		}
+		} else {
+            $hidetitle = false;
+        }
 		$startdate = $line['startdate'];
 		$enddate = $line['enddate'];
 		$fileorder = explode(',',$line['fileorder']);
@@ -300,7 +303,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$line['text'] = "";
 		$line['avail'] = 1;
 		$line['oncal'] = 0;
-		$line['caltag'] = '!';
+        $line['caltag'] = '!';
+        $line['isplaylist'] = 0;
 		$altoncal = 0;
 		$startdate = time();
 		$enddate = time() + 7*24*60*60;

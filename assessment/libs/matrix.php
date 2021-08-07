@@ -11,7 +11,7 @@ array_push($allowedmacros,"matrix","matrixformat","matrixformatfrac","matrixsyst
 	"matrixinversefrac","matrixsolve","matrixsolvefrac","polyregression","matrixgetentry",
 	"matrixRandomSpan","matrixNumberOfRows","matrixNumberOfColumns",
 	"matrixgetrow","matrixgetcol","matrixgetsubmatrix","matrixdisplaytable","matrixreduce",
-	"matrixnumsolutions","matrixround",
+	"matrixnumsolutions","matrixround","matrixCompare",
 	"matrixGetRank","arrayIsZeroVector","matrixFormMatrixFromEigValEigVec",
 	"matrixIsRowsLinInd","matrixIsColsLinInd","matrixIsEigVec","matrixIsEigVal",
 	"matrixGetRowSpace","matrixGetColumnSpace","matrixFromEigenvals","matrixFormatEigenvecs",
@@ -728,8 +728,14 @@ function matrixrandinvertible($n) {
 function matrixrandunreduce($m,$c) {
 	$n = count($m);
 	for ($i=0;$i<$c; $i++) {
-		$r = diffrands(0,$n-1,3);
-		$m = matrixrowcombine3($m,$r[0],-1,$r[1],1,$r[2],2,$r[0]);
+        if ($n == 2) {
+            $r = diffrands(0,$n-1,2);
+            $t = nonzerodiffrands(-2,2,2);
+            $m = matrixrowcombine($m,$r[0],$t[0],$r[1],$t[1],$r[0]);
+        } else {
+            $r = diffrands(0,$n-1,3);
+            $m = matrixrowcombine3($m,$r[0],-1,$r[1],1,$r[2],2,$r[0]);
+        }
 	}
 	for ($i=0; $i<$c; $i++) {
 		list($sr,$er) = diffrands(0,$n-1,2);
@@ -737,9 +743,14 @@ function matrixrandunreduce($m,$c) {
 	}
 	$c = 0;
 	while (hasallzerorow($m) && $c<20) {
-		$r = diffrands(0,$n-1,3);
-		$m = matrixrowcombine3($m,$r[0],-2,$r[1],1,$r[2],3,$r[0]);
-		$c++;
+        if ($n == 2) {
+            $r = diffrands(0,$n-1,2);
+            $m = matrixrowcombine($m,$r[0],-2,$r[1],1,$r[0]);
+        } else {
+            $r = diffrands(0,$n-1,3);
+            $m = matrixrowcombine3($m,$r[0],-2,$r[1],1,$r[2],3,$r[0]);
+        }
+        $c++;
 	}
 	return $m;
 }
@@ -1533,6 +1544,45 @@ function matrixFormatEigenvecs($evecs) {
         }
     }
     return $out;
+}
+
+function matrixCompare($m,$n,$tol='.001') {
+	// $m stu, $n correct
+	if (!is_array($m) || !is_array($n) || !is_array($m[0]) || !is_array($n[0])) {
+		return false;
+	}
+	if (count($m) != count($n) || count($m[0]) != count($n[0])) {
+		return false;
+	}
+	$toltype = 'rel';
+	if ($tol[0]=='|') {
+		$toltype = 'abs';
+		$tol = substr($tol,1);
+	}
+	$isequiv = true;
+	for ($r = 0 ; $r < count($m); $r++) {
+		for ($c = 0; $c < count($m[0]); $c++) {
+			if ($toltype == 'rel') {
+				if (abs($n[$r][$c]) < 1E-12) {
+					if (abs($m[$r][$c] - $n[$r][$c]) > $tol/1000 + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				} else {
+					if (abs($m[$r][$c] - $n[$r][$c])/(abs($n[$r][$c])+1E-12) > $tol + 1E-12) {
+						$isequiv = false;
+						break 2;
+					}
+				}
+			} else {
+				if (abs($m[$r][$c] - $n[$r][$c]) > $tol + 1E-12) {
+					$isequiv = false;
+					break 2;
+				}
+			}
+		}
+	}
+	return $isequiv;
 }
 
 ?>

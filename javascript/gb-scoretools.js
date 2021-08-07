@@ -46,8 +46,11 @@ function hideNA() {
 	$(".notanswered").toggle();
 }
 function showallans() {
-	$("span[id^='ans']").removeClass("hidden").show();
-	$(".sabtn").replaceWith("<span>Answer: </span>");
+	$("span[id^='ans']").toggleClass("hidden", false).show();
+    $(".sabtn").replaceWith("<span>Answer: </span>");
+    $("div[id^=dsbox]").toggleClass("hidden", false).attr("aria-hidden", false)
+        .attr("aria-expanded", true);
+    $("button[aria-controls^=ans],input[aria-controls^=dsbox]").attr('aria-expanded', true);
 }
 function previewall() {
 	$('input[value="Preview"]').trigger('click').remove();
@@ -67,8 +70,8 @@ function allvisnocred() {
 }
 function updatefilters() {
     $(".bigquestionwrap").show();
-    var filters = ['unans','zero','nonzero','perfect','fb','nowork'];
-    for (var i=0; i<6; i++) {
+    var filters = ['unans','zero','nonzero','perfect','fb','nowork', '100'];
+    for (var i=0; i<7; i++) {
         if (document.getElementById('filter-' + filters[i]).checked) {
             $(".bigquestionwrap.qfilter-" + filters[i]).hide();
         }
@@ -234,7 +237,10 @@ function initAnswerboxHighlights() {
 	});
 };
 
+var sidebysideenabled = false;
 function sidebysidegrading() {
+    if (sidebysideenabled) { return; }
+    sidebysideenabled = true;
 	$("body").removeClass("fw1000").removeClass("fw1920");
 	$(".scrollpane").wrap('<div class="sidebyside">');
 	$(".sidebyside").append('<div class="sidepreview">');

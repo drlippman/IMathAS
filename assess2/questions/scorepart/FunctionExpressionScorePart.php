@@ -31,39 +31,30 @@ class FunctionExpressionScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        if (is_array($options['answer'])) {$answer = $options['answer'][$partnum];} else {$answer = $options['answer'];}
-        if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$partnum];} else {$reltolerance = $options['reltolerance'];}}
-        if (isset($options['abstolerance'])) {if (is_array($options['abstolerance'])) {$abstolerance = $options['abstolerance'][$partnum];} else {$abstolerance = $options['abstolerance'];}}
-
-        if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
-        if (is_array($options['variables'])) {$variables = $options['variables'][$partnum];} else {$variables = $options['variables'];}
-
-        if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$partnum];} else {$domain= $options['domain'];}}
-        if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$partnum];} else {$requiretimes = $options['requiretimes'];}}
-
-        if (isset($options['requiretimes'])) {
-            if (is_array($options['requiretimes'])) {
-                if (is_array($options['requiretimes'][$partnum]) || $multi) {
-                    $requiretimes = $options['requiretimes'][$partnum];
-                } else {
-                    $requiretimes = $options['requiretimes'];
-                }
-            } else {
-                $requiretimes = $options['requiretimes'];
-            }
+        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+            'variables', 'domain', 'ansprompt', 'formatfeedbackon'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
+        $optionkeys = ['partialcredit'];
+        foreach ($optionkeys as $optionkey) {
+            ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum, 2);
+        }
+        $requiretimes = getOptionVal($options, 'requiretimes', $multi, $partnum, 1);
 
-        if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$partnum];} else {$answerformat = $options['answerformat'];}}
-        if (!isset($answerformat)) { $answerformat = '';}
+        if ($reltolerance === '' && $abstolerance === '') { $reltolerance = $defaultreltol;}
+ 
         $ansformats = array_map('trim',explode(',',$answerformat));
-        if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$partnum];} else {$ansprompt = $options['ansprompt'];}}
-        if (isset($options['formatfeedbackon'])) {if (is_array($options['formatfeedbackon'])) {$formatfeedbackon = $options['formatfeedbackon'][$partnum];} else {$formatfeedbackon = $options['formatfeedbackon'];}}
-
-        if (is_array($options['partialcredit'][$partnum]) || ($multi && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$partnum];} else {$partialcredit = $options['partialcredit'];}
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         $givenans = normalizemathunicode(trim($givenans));
+
+        $givenans = preg_replace_callback(
+            '/(arcsinh|arccosh|arctanh|arcsin|arccos|arctan|arcsec|arccsc|arccot|root|sqrt|sign|sinh|cosh|tanh|sech|csch|coth|abs|sin|cos|tan|sec|csc|cot|exp|log|ln)[\(\[]/i',
+            function($m) { return strtolower($m[0]); },
+            $givenans
+        );
         $answer = normalizemathunicode($answer);
         
         if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
@@ -76,7 +67,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         $givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}(\D|\b))/','$1',$givenans);
 
-        if (!isset($variables)) { $variables = "x";}
+        if (empty($variables)) { $variables = "x";}
         $variables = array_map('trim',explode(",",$variables));
         $ofunc = array();
         for ($i = 0; $i < count($variables); $i++) {
@@ -94,7 +85,7 @@ class FunctionExpressionScorePart implements ScorePart
             }
         }
 
-        if (isset($domain)) {
+        if (!empty($domain)) {
             $fromto = array_map('trim',explode(",",$domain));
         } else {
             $fromto = array(-10, 10);
@@ -205,207 +196,257 @@ class FunctionExpressionScorePart implements ScorePart
             echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
         }
 
-        //build values for student answer
-        $givenansvals = array();
-        if (in_array('equation',$ansformats)) {
-            $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
-        } else if (in_array('inequality',$ansformats)) {
-            if (preg_match('/(.*)(<=|>=|<|>)(.*)/', $givenans, $matches)) {
-                $toevalGivenans = $matches[3] . '-(' . $matches[1] . ')';
-                $givenInequality = $matches[2];
-            } else {
-                $scorePartResult->setRawScore(0);
-                return $scorePartResult;
-            }
+        if (in_array('list',$ansformats)) {
+            $givenanslist = explode(',', $givenans);
         } else {
-            $toevalGivenans = $givenans;
+            $givenanslist = [$givenans];
         }
 
-        $givenansfunc = parseMathQuiet($toevalGivenans, $vlist);
-        if ($givenansfunc === false) { //parse error
-            $scorePartResult->setRawScore(0);
-            return $scorePartResult;
-        }
-        for ($i = 0; $i < 20; $i++) {
-            $varvals = array();
-            for($j=0; $j < count($variables); $j++) {
-                $varvals[$variables[$j]] = $tps[$i][$j];
-            }
-            $givenansvals[] = $givenansfunc->evaluateQuiet($varvals);
-        }
-        if (in_array('sameform',$ansformats)) {
-            $givenansnormalized = $givenansfunc->normalizeTreeString();
-        }
-
-        $ansarr = array_map('trim',explode(' or ',$answer));
-        $partialpts = array_fill(0, count($ansarr), 1);
-        $origanscnt = count($ansarr);
-        if (isset($partialcredit)) {
-            if (!is_array($partialcredit)) {$partialcredit = explode(',',$partialcredit);}
-            for ($i=0;$i<count($partialcredit);$i+=2) {
-                if (!in_array($partialcredit[$i], $ansarr) || $partialcredit[$i+1]<1) {
-                    $ansarr[] = $partialcredit[$i];
-                    $partialpts[] = $partialcredit[$i+1];
-                }
-            }
-        }
-
-        $rightanswrongformat = -1;
-        foreach ($ansarr as $ansidx=>$answer) {
-            if (is_array($requiretimes)) {
-                if ($ansidx<$origanscnt) {
-                    $thisreqtimes = $requiretimes[0];
-                } else {
-                    $thisreqtimes = $requiretimes[$ansidx-$origanscnt+1];
-                }
-            } else {
-                $thisreqtimes = $requiretimes;
-            }
-            $correct = true;
-            $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\'<>]+/','',$answer);
-
+        $givenanslistvals = array();
+        $givenanslistnormalized = array();
+        $givenansused = array();
+        foreach ($givenanslist as $givenans) {
+            //build values for student answer
+            $givenansvals = array();
             if (in_array('equation',$ansformats)) {
                 if (substr_count($givenans, '=')!=1) {
-                    $scorePartResult->setRawScore(0);
-                    return $scorePartResult;
+                    continue;
                 }
-                $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
+                $toevalGivenans = preg_replace('/(.*)=(.*)/','$1-($2)',$givenans);
             } else if (in_array('inequality',$ansformats)) {
-                preg_match('/(.*)(<=|>=|<|>)(.*)/', $answer, $matches);
-                $answer = $matches[3] . '-(' . $matches[1] . ')';
-                $answerInequality = $matches[2];
-            }
-            if ($answer == '') {
-                $scorePartResult->setRawScore(0);
-                return $scorePartResult;
-            }
-            $origanswer = $answer;
-            $answerfunc = parseMathQuiet(makepretty($answer), $vlist);
-            if ($answerfunc === false) {  // parse error on $answer - can't do much
-                $scorePartResult->setRawScore(0);
-                return $scorePartResult;
+                if (preg_match('/(.*)(<=|>=|<|>)(.*)/', $givenans, $matches)) {
+                    $toevalGivenans = $matches[3] . '-(' . $matches[1] . ')';
+                    $givenInequality = $matches[2];
+                } else {
+                    continue;
+                }
+            } else if (preg_match('/(=|<|>)/', $givenans)) {
+                continue;
+            } else {
+                $toevalGivenans = $givenans;
             }
 
-            $cntnan = 0;
-            $cntzero = 0;
-            $cntbothzero = 0;
-            $stunan = 0;
-            $ysqrtot = 0;
-            $reldifftot = 0;
-            $ratios = array();
-      			$diffs = array();
-      			$realanss = array();
+            $givenansfunc = parseMathQuiet($toevalGivenans, $vlist);
+            if ($givenansfunc === false) { //parse error
+                continue;
+            }
             for ($i = 0; $i < 20; $i++) {
                 $varvals = array();
                 for($j=0; $j < count($variables); $j++) {
                     $varvals[$variables[$j]] = $tps[$i][$j];
                 }
-                $realans = $answerfunc->evaluateQuiet($varvals);
-                //echo "$answer, real: $realans, my: {$givenansvals[$i]},rel: ". (abs(10^16*$givenansvals[$i]-10^16*$realans))  ."<br/>";
-                if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
-                if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {  //if equation, store ratios
-                    if (isNaN($givenansvals[$i])) {
-                        $stunan++;
-                    } elseif (abs($realans)>.000001 && is_numeric($givenansvals[$i])) {
-                        $ratios[] = $givenansvals[$i]/$realans;
-                        if (abs($givenansvals[$i])<=.00000001 && $realans!=0) {
-                            $cntzero++;
-                        }
-                    } else if (abs($realans)<=.000001 && is_numeric($givenansvals[$i]) && abs($givenansvals[$i])<=.00000001) {
-                        $cntbothzero++;
-                    }
-                } else if (in_array('toconst',$ansformats)) {
-                    $diffs[] = $givenansvals[$i] - $realans;
-                    $realanss[] = $realans;
-                    $ysqr = $realans*$realans;
-                    $ysqrtot += 1/($ysqr+.0001);
-                    $reldifftot += ($givenansvals[$i] - $realans)/($ysqr+.0001);
-                } else { //otherwise, compare points
-                    if (isNaN($givenansvals[$i])) {
-                        $stunan++;
-                    } else if (isset($abstolerance)) {
-                        if (abs($givenansvals[$i]-$realans) > $abstolerance+1E-12) { $correct = false; break;}
-                    } else {
-                        if ((abs($givenansvals[$i]-$realans)/(abs($realans)+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                $givenansvals[] = $givenansfunc->evaluateQuiet($varvals);
+            }
+            $givenanslistvals[] = $givenansvals;
+            if (in_array('sameform',$ansformats)) {
+                $givenanslistnormalized[] = $givenansfunc->normalizeTreeString();
+            }
+        }
+
+        if (in_array('list',$ansformats)) {
+            $answerlist = explode(',', $answer);
+        } else {
+            $answerlist = [$answer];
+        }
+        $correctscores = array();
+
+        foreach ($answerlist as $alidx => $answer) {
+
+            $ansarr = array_map('trim',explode(' or ',$answer));
+            $partialpts = array_fill(0, count($ansarr), 1);
+            $origanscnt = count($ansarr);
+            if (!empty($partialcredit) && !in_array('list',$ansformats)) { // partial credit only works for non-list answers
+                if (!is_array($partialcredit)) {$partialcredit = explode(',',$partialcredit);}
+                for ($i=0;$i<count($partialcredit);$i+=2) {
+                    if (!in_array($partialcredit[$i], $ansarr) || $partialcredit[$i+1]<1) {
+                        $ansarr[] = $partialcredit[$i];
+                        $partialpts[] = $partialcredit[$i+1];
                     }
                 }
             }
 
-            if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
-                echo "<p>", _('Debug info: function evaled to Not-a-number at all test points.  Check $domain'), "</p>";
-            }
-            if ($stunan>1) { //if more than 1 student NaN response
-                $correct = false; continue;
-            }
-            if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {
-                if ($cntbothzero>18) {
-                    $correct = true;
-                } else if (count($ratios)>1) {
-                    if (count($ratios)==$cntzero) {
-                        $correct = false; continue;
+            $rightanswrongformat = -1;
+
+            foreach ($ansarr as $ansidx=>$answer) {
+                if (is_array($requiretimes)) {
+                    if (in_array('list',$ansformats)) {
+                        if (isset($requiretimes[$alidx])) {
+                            $thisreqtimes = $requiretimes[$alidx];
+                        } else {
+                            $thisreqtimes = '';
+                        }
+                    } else if ($ansidx<$origanscnt) {
+                        $thisreqtimes = $requiretimes[0];
                     } else {
-                        $meanratio = array_sum($ratios)/count($ratios);
-                        if (in_array('inequality',$ansformats)) {
-                            if ($meanratio > 0) {
-                                if ($answerInequality != $givenInequality) {
-                                    $correct = false; continue;
-                                }
-                            } else {
-                                $flippedIneq = strtr($givenInequality, ['<'=>'>', '>'=>'<']);
-                                if ($answerInequality != $flippedIneq) {
-                                    $correct = false; continue;
-                                }
-                            }
-                        }
-                        for ($i=0; $i<count($ratios); $i++) {
-                            if (isset($abstolerance)) {
-                                if (abs($ratios[$i]-$meanratio) > $abstolerance+1E-12) {$correct = false; break;}
-                            } else {
-                                if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
-                            }
-                        }
+                        $thisreqtimes = $requiretimes[$ansidx-$origanscnt+1];
                     }
                 } else {
-                    $correct = false;
+                    $thisreqtimes = $requiretimes;
                 }
-            } else if (in_array('toconst',$ansformats)) {
-                if (isset($abstolerance)) {
-                    //if abs, use mean diff - will minimize error in abs diffs
-                    $meandiff = array_sum($diffs)/count($diffs);
-                } else {
-                    //if relative tol, use meandiff to minimize relative error
-                    $meandiff = $reldifftot/$ysqrtot;
+                $answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s\'<>]+/','',$answer);
+
+                if (in_array('equation',$ansformats)) {
+                    $answer = preg_replace('/(.*)=(.*)/','$1-($2)',$answer);
+                } else if (in_array('inequality',$ansformats)) {
+                    preg_match('/(.*)(<=|>=|<|>)(.*)/', $answer, $matches);
+                    $answer = $matches[3] . '-(' . $matches[1] . ')';
+                    $answerInequality = $matches[2];
                 }
-                if (is_nan($meandiff)) {
-                    $correct=false; continue;
-                }
-                for ($i=0; $i<count($diffs); $i++) {
-                    if (isset($abstolerance)) {
-                        if (abs($diffs[$i]-$meandiff) > $abstolerance+1E-12) {$correct = false; break;}
-                    } else {
-                        //if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
-                        if ((abs($diffs[$i]-$meandiff)/(abs($realanss[$i])+0.0001) > $reltolerance+1E-12)) {$correct = false; break;}
-                    }
-                }
-            }
-            if ($correct == true) {
-                //test for correct format, if specified
-                if ($thisreqtimes!='' && checkreqtimes(str_replace(',','',$givenans),$thisreqtimes)==0) {
-                    $rightanswrongformat = $ansidx;
+                if ($answer == '') {
                     continue;
-                    //$correct = false;
                 }
-                if (in_array('sameform',$ansformats)) {
-                    if ($answerfunc->normalizeTreeString() != $givenansnormalized) {
-                        $rightanswrongformat = $ansidx;
-                        continue;
+                $origanswer = $answer;
+                $answerfunc = parseMathQuiet(makepretty($answer), $vlist);
+                if ($answerfunc === false) {  // parse error on $answer - can't do much
+                    continue;
+                }
+
+                $realanstmp = array();
+                for ($i = 0; $i < 20; $i++) {
+                    $varvals = array();
+                    for($j=0; $j < count($variables); $j++) {
+                        $varvals[$variables[$j]] = $tps[$i][$j];
+                    }
+                    $realans = $answerfunc->evaluateQuiet($varvals);
+                    $realanstmp[] = $realans;
+                }
+                foreach ($givenanslistvals as $gaidx => $givenansvals) {
+                    if (isset($givenansused[$gaidx])) {
+                        continue; // already used this givenans
+                    }
+
+                    $givenansnormalized = $givenanslistnormalized[$gaidx];
+                    $correct = true;
+                    $cntnan = 0;
+                    $cntzero = 0;
+                    $cntbothzero = 0;
+                    $stunan = 0;
+                    $ysqrtot = 0;
+                    $reldifftot = 0;
+                    $ratios = array();
+                    $diffs = array();
+                    $realanss = array();
+
+                    foreach ($realanstmp as $i=>$realans) {
+                        //echo "$answer, real: $realans, my: {$givenansvals[$i]},rel: ". (abs(10^16*$givenansvals[$i]-10^16*$realans))  ."<br/>";
+                        if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
+                        if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {  //if equation, store ratios
+                            if (isNaN($givenansvals[$i])) {
+                                $stunan++;
+                            } elseif (abs($realans)>.00000001 && is_numeric($givenansvals[$i])) {
+                                $ratios[] = $givenansvals[$i]/$realans;
+                                if (abs($givenansvals[$i])<=.00000001 && $realans!=0) {
+                                    $cntzero++;
+                                }
+                            } else if (abs($realans)<=.00000001 && is_numeric($givenansvals[$i]) && abs($givenansvals[$i])<=.00000001) {
+                                $cntbothzero++;
+                            }
+                        } else if (in_array('toconst',$ansformats)) {
+                            $diffs[] = $givenansvals[$i] - $realans;
+                            $realanss[] = $realans;
+                            $ysqr = $realans*$realans;
+                            $ysqrtot += 1/($ysqr+.0001);
+                            $reldifftot += ($givenansvals[$i] - $realans)/($ysqr+.0001);
+                        } else { //otherwise, compare points
+                            if (isNaN($givenansvals[$i])) {
+                                $stunan++;
+                            } else if ($abstolerance !== '') {
+                                if (abs($givenansvals[$i]-$realans) > $abstolerance+1E-12) { $correct = false; break;}
+                            } else {
+                                if ((abs($givenansvals[$i]-$realans)/(abs($realans)+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                            }
+                        }
+                    }
+
+                    if ($cntnan==20 && isset($GLOBALS['teacherid'])) {
+                        echo "<p>", _('Debug info: function evaled to Not-a-number at all test points.  Check $domain'), "</p>";
+                    }
+                    if ($stunan>1) { //if more than 1 student NaN response
+                        $correct = false; continue;
+                    }
+                    if (in_array('equation',$ansformats) || in_array('inequality',$ansformats) || in_array('scalarmult',$ansformats)) {
+                        if ($cntbothzero>18) {
+                            $correct = true;
+                        } else if (count($ratios)>1) {
+                            if (count($ratios)==$cntzero) {
+                                $correct = false; continue;
+                            } else {
+                                $meanratio = array_sum($ratios)/count($ratios);
+                                if (in_array('inequality',$ansformats)) {
+                                    if ($meanratio > 0) {
+                                        if ($answerInequality != $givenInequality) {
+                                            $correct = false; continue;
+                                        }
+                                    } else {
+                                        $flippedIneq = strtr($givenInequality, ['<'=>'>', '>'=>'<']);
+                                        if ($answerInequality != $flippedIneq) {
+                                            $correct = false; continue;
+                                        }
+                                    }
+                                }
+                                for ($i=0; $i<count($ratios); $i++) {
+                                    if ($abstolerance !== '') {
+                                        if (abs($ratios[$i]-$meanratio) > $abstolerance+1E-12) {$correct = false; break;}
+                                    } else {
+                                        if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                                    }
+                                }
+                            }
+                        } else {
+                            $correct = false;
+                        }
+                    } else if (in_array('toconst',$ansformats)) {
+                        if ($abstolerance !== '') {
+                            //if abs, use mean diff - will minimize error in abs diffs
+                            $meandiff = array_sum($diffs)/count($diffs);
+                        } else {
+                            //if relative tol, use meandiff to minimize relative error
+                            $meandiff = $reldifftot/$ysqrtot;
+                        }
+                        if (is_nan($meandiff)) {
+                            $correct=false; continue;
+                        }
+                        for ($i=0; $i<count($diffs); $i++) {
+                            if ($abstolerance !== '') {
+                                if (abs($diffs[$i]-$meandiff) > $abstolerance+1E-12) {$correct = false; break;}
+                            } else {
+                                //if ((abs($diffs[$i]-$meandiff)/(abs($meandiff)+0.0001) > $reltolerance-1E-12)) {$correct = false; break;}
+                                if ((abs($diffs[$i]-$meandiff)/(abs($realanss[$i])+0.0001) > $reltolerance+1E-12)) {$correct = false; break;}
+                            }
+                        }
+                    }
+                    if ($correct == true) {
+                        //test for correct format, if specified
+                        if ($thisreqtimes!='' && checkreqtimes(str_replace(',','',$givenanslist[$gaidx]),$thisreqtimes)==0) {
+                            $rightanswrongformat = $ansidx;
+                            continue;
+                            //$correct = false;
+                        }
+                        if (in_array('sameform',$ansformats)) {
+                            if ($answerfunc->normalizeTreeString() != $givenanslistnormalized[$gaidx]) {
+                                $rightanswrongformat = $ansidx;
+                                continue;
+                            }
+                        }
+                        $correctscores[] = $partialpts[$ansidx];
+                        $givenansused[$gaidx] = 1;
+                        continue 3; // skip to next answer list entry
                     }
                 }
-                $scorePartResult->setRawScore($partialpts[$ansidx]);
-                return $scorePartResult;
             }
         }
-        if ($rightanswrongformat!=-1 && !empty($formatfeedbackon)) {
+    
+        if (in_array('list',$ansformats)) {
+            $score = array_sum($correctscores)/count($answerlist);
+            if (count($givenanslist) > count($answerlist)) {
+                $score -= (count($givenanslist) - count($answerlist))/(count($givenanslist) + count($answerlist));
+            }
+            $scorePartResult->setRawScore($score);
+            return $scorePartResult;
+        } else if (count($correctscores) > 0) {
+            $scorePartResult->setRawScore($correctscores[0]);
+            return $scorePartResult;
+        } else if ($rightanswrongformat!=-1 && !empty($formatfeedbackon)) {
             $scorePartResult->setCorrectAnswerWrongFormat(true);
         }
 

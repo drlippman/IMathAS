@@ -15,6 +15,10 @@ require_once(__DIR__ . "/../includes/htmLawed.php");
 require("../includes/safeunserialize.php");
 require_once("../includes/filehandler.php");
 
+if ($myrights < 100) {
+    echo "This page is only accessible by admins";
+}
+
 /*** pre-html data manipulation, including function code *******/
 function getsubinfo($items,$parent,$pre) {
 	global $ids,$types,$names,$item,$parents;

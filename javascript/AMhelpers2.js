@@ -609,7 +609,7 @@ function initcreditboxes() {
 
 var LivePreviews = [];
 function setupLivePreview(qn, skipinitial) {
-    if (mathRenderer=="MathJax" && !window.MathJax) {
+    if (mathRenderer=="MathJax" && (!window.MathJax || (!window.MathJax.Hub && !window.MathJax.typesetPromise))) {
         var thisqn = qn; var thisskipinitial = skipinitial;
         setTimeout(100, function() { setupLivePreview(thisqn, thisskipinitial)});
         return;
@@ -626,7 +626,8 @@ function setupLivePreview(qn, skipinitial) {
 			  finaltimeout: null,  // setTimeout id for clicking preview
 			  mjRunning: false,  // true when MathJax is processing
 			  mjPending: false,  // true when a typeset has been queued
-			  oldText: null,     // used to check if an update is needed
+              oldText: null,     // used to check if an update is needed
+              mjPromise: null,
 
 			  //
 			  //  Get the preview and buffer DIV's
@@ -637,9 +638,12 @@ function setupLivePreview(qn, skipinitial) {
   					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');
   				this.preview = document.getElementById("lpbuf1"+qn);
   				this.buffer = document.getElementById("lpbuf2"+qn);
-          if (!skipinitial) {
-            showPreview(qn);  //TODO: review this
-          }
+                if (mathRenderer=="MathJax" && MathJax.typesetPromise) {
+                    this.mjPromise = Promise.resolve();
+                }
+                if (!skipinitial) {
+                    showPreview(qn);  //TODO: review this
+                }
 			  },
 
 			  SwapBuffers: function () {
@@ -664,13 +668,20 @@ function setupLivePreview(qn, skipinitial) {
 			  },
 			  RenderBuffer: function() {
 			      if (mathRenderer=="MathJax") {
-				      MathJax.Hub.Queue(
-					      ["Typeset",MathJax.Hub,this.buffer],
-					      ["PreviewDone",this]
-				      );
+                      if (MathJax.typesetPromise) {
+                        this.mjPromise = this.mjPromise.then(function () {
+                            //MathJax.typesetClear([this.buffer]);
+                            MathJax.typesetPromise([this.buffer]).then(this.PreviewDone.bind(this));
+                        }.bind(this));
+                      } else {
+                        MathJax.Hub.Queue(
+                            ["Typeset",MathJax.Hub,this.buffer],
+                            ["PreviewDone",this]
+                        );
+                      }
 			      } else if (mathRenderer=="Katex") {
-			      	      renderMathInElement(this.buffer);
-				      if (typeof MathJax != "undefined" && MathJax.version && $(this.buffer).children(".mj").length>0) {//has MathJax elements
+			      	  renderMathInElement(this.buffer);
+				      if (typeof MathJax != "undefined" && MathJax.Hub && !MathJax.typesetPromise && $(this.buffer).children(".mj").length>0) {//has MathJax elements
 					      MathJax.Hub.Queue(["PreviewDone",this]);
 				      } else {
 					      this.PreviewDone();
@@ -679,13 +690,13 @@ function setupLivePreview(qn, skipinitial) {
 			  },
 
 			  DoFinalPreview: function() {
-          $("#pbtn"+qn).trigger("click");
+                $("#pbtn"+qn).trigger("click");
 			  },
 
 			  preformat: function(text) {
-          var qtype = allParams[qn].qtype;
-          var calcformat = allParams[qn].calcformat;
-          return preformat(qn, text, qtype, calcformat);
+                var qtype = allParams[qn].qtype;
+                var calcformat = allParams[qn].calcformat;
+                return preformat(qn, text, qtype, calcformat);
 			  },
 
 			  CreatePreview: function () {
@@ -694,8 +705,12 @@ function setupLivePreview(qn, skipinitial) {
 			    var text = document.getElementById("qn"+qn).value;
 			    if (text === this.oldtext) return;
 			    if (this.mjRunning) {
-			      this.mjPending = true;
-			      MathJax.Hub.Queue(["CreatePreview",this]);
+                  this.mjPending = true;
+                  if (this.mjPromise) {
+                    this.mjPromise = this.mjPromise.then(this.CreatePreview().bind(this));
+                  } else if (MathJax.Hub) {
+                    MathJax.Hub.Queue(["CreatePreview",this]);
+                  }
 			    } else {
 			      this.oldtext = text;
 			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
@@ -711,13 +726,13 @@ function setupLivePreview(qn, skipinitial) {
 			    updateehpos();
 			  }
 
-			};
-			if (typeof MathJax != "undefined") {
-				LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+            };
+            if (typeof MathJax != "undefined" && !MathJax.typesetPromise) {
+                LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
 				LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
-			} else {
-				LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
-			}
+            } else {
+                LivePreviews[qn].callback = function() { LivePreviews[qn].CreatePreview(); };
+            }
 			LivePreviews[qn].Init(skipinitial);
 		} else {
 			LivePreviews[qn] = {
@@ -1196,7 +1211,7 @@ function processNumber(origstr, format) {
                 err += _('This is not an integer.');
             }
         } else {
-            if (!str.match(/^\s*\-?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
+            if (!str.match(/^\s*(\+|\-)?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
                 err += _('This is not a decimal or integer value.');
             }
         }
@@ -1341,6 +1356,7 @@ function processCalcNtuple(fullstr, format) {
   var notationok = true;
   var res = NaN;
   var dec;
+  // Need to be able to handle (2,3),(4,5) and (2(2),3),(4,5) while avoiding (2)(3,4)
   fullstr = fullstr.replace(/(\s+,\s+|,\s+|\s+,)/, ',');
   fullstr = fullstr.replace(/<<(.*)>>/, '<$1>');
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
@@ -1356,7 +1372,9 @@ function processCalcNtuple(fullstr, format) {
           !fullstr.substring(0,i).match(/[\)\]\>\}]\s*$/)
         ) {
           notationok=false;
-        }
+        } 
+      } else if (i > 0 && fullstr.charAt(i-1) != ',') {
+        notationok=false;
       }
     }
     if (fullstr.charAt(i).match(/[\(\[\<\{]/)) {
@@ -1549,65 +1567,75 @@ function processNumfunc(qn, fullstr, format) {
 
   var strprocess = AMnumfuncPrepVar(qn, fullstr);
 
-  var totesteqn = strprocess[0];
-  totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
-  var remapVars = strprocess[2].split('|');
-
-  if (fullstr.match(/(<=|>=|<|>)/)) {
-    if (!isineq) {
-      if (iseqn) {
-        err += _("syntax error: you gave an inequality, not an equation");
-      } else {
-        err += _("syntax error: you gave an inequality, not an expression");
-      }
-    } else if (fullstr.match(/(<=|>=|<|>)/g).length>1) {
-      err += _("syntax error: your inequality should only contain one inequality symbol");
-    }
-    totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
-  } else if (fullstr.match(/=/)) {
-    if (isineq) {
-      err += _("syntax error: you gave an equation, not an inequality");
-    } else if (!iseqn) {
-      err += _("syntax error: you gave an equation, not an expression");
-    } else if (fullstr.match(/=/g).length>1) {
-      err += _("syntax error: your equation should only contain one equal sign");
-    }
-    totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
-  } else if (iseqn) {
-    err += _("syntax error: this is not an equation");
-  } else if (isineq) {
-    err += _("syntax error: this is not an inequality");
+  var totesteqn;
+  var totestarr;
+  if (format.match(/list/)) {
+      totestarr = strprocess[0].split(/,/);
+  } else {
+      totestarr = [strprocess[0]];
   }
-
-  if (fvars.length > 0) {
-	  reg = new RegExp("("+fvars.join('|')+")\\(","g");
-	  totesteqn = totesteqn.replace(reg,"$1*sin($1+");
-  }
-
-  totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
-
   var i,j,totest,testval,res;
   var successfulEvals = 0;
-  for (j=0; j < 20; j++) {
-    totest = 'var DNE=1;';
-    for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
-      if (domain[i][2]) { //integers
-        testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
-      } else { //any real between min and max
-        testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
-      }
-      totest += 'var ' + remapVars[i] + '=' + testval + ';';
+  for (var tti=0; tti < totestarr.length; tti++) {
+    totesteqn = totestarr[tti];
+    totesteqn = totesteqn.replace(/,/g,"").replace(/^\s+/,'').replace(/\s+$/,'').replace(/degree/g,'');
+    var remapVars = strprocess[2].split('|');
+
+    if (totesteqn.match(/(<=|>=|<|>)/)) {
+        if (!isineq) {
+            if (iseqn) {
+                err += _("syntax error: you gave an inequality, not an equation") + '. ';
+            } else {
+                err += _("syntax error: you gave an inequality, not an expression")+ '. ';
+            }
+        } else if (totesteqn.match(/(<=|>=|<|>)/g).length>1) {
+            err += _("syntax error: your inequality should only contain one inequality symbol")+ '. ';
+        }
+        totesteqn = totesteqn.replace(/(.*)(<=|>=|<|>)(.*)/,"$1-($3)");
+    } else if (totesteqn.match(/=/)) {
+        if (isineq) {
+            err += _("syntax error: you gave an equation, not an inequality")+ '. ';
+        } else if (!iseqn) {
+            err += _("syntax error: you gave an equation, not an expression")+ '. ';
+        } else if (totesteqn.match(/=/g).length>1) {
+            err += _("syntax error: your equation should only contain one equal sign")+ '. ';
+        }
+        totesteqn = totesteqn.replace(/(.*)=(.*)/,"$1-($2)");
+    } else if (iseqn) {
+        err += _("syntax error: this is not an equation")+ '. ';
+    } else if (isineq) {
+        err += _("syntax error: this is not an inequality")+ '. ';
     }
-    res = scopedeval(totest + totesteqn);
-    if (res !== 'synerr') {
-      successfulEvals++;
-      break;
+
+    if (fvars.length > 0) {
+        reg = new RegExp("("+fvars.join('|')+")\\(","g");
+        totesteqn = totesteqn.replace(reg,"$1*sin($1+");
     }
+
+    totesteqn = prepWithMath(mathjs(totesteqn,remapVars.join('|')));
+
+    successfulEvals = 0;
+    for (j=0; j < 20; j++) {
+        totest = 'var DNE=1;';
+        for (i=0; i < remapVars.length - 1; i++) {  // -1 to skip DNE pushed to end
+        if (domain[i][2]) { //integers
+            testval = Math.floor(Math.random()*(domain[i][0] - domain[i][1] + 1) + domain[i][0]);
+        } else { //any real between min and max
+            testval = Math.random()*(domain[i][0] - domain[i][1]) + domain[i][0];
+        }
+        totest += 'var ' + remapVars[i] + '=' + testval + ';';
+        }
+        res = scopedeval(totest + totesteqn);
+        if (res !== 'synerr') {
+        successfulEvals++;
+        break;
+        }
+    }
+    if (successfulEvals === 0) {
+        err += _("syntax error") + '. ';
+    }
+    err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   }
-  if (successfulEvals === 0) {
-    err += _("syntax error") + '. ';
-  }
-  err += syntaxcheckexpr(strprocess[0], format, vars.map(escapeRegExp).join('|'));
   return {
     err: err
   };
@@ -1878,7 +1906,9 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(repvars\\d+|degree|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo|"+vl+")", "ig");
+          var reglist = 'degree|arc|sqrt|root|ln|log|exp|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|sign|DNE|e|oo'.split('|').concat(vl.split('|'));
+          reglist.sort(function(x,y) { return y.length - x.length});
+	  	  reg = new RegExp("(repvars\\d+|"+reglist.join('|')+")", "ig");
 	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
 	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";
 	  	  }
@@ -1900,7 +1930,10 @@ function syntaxcheckexpr(str,format,vl) {
 
 // returns [numval, errmsg]
 function singlevaleval(evalstr, format) {
-  evalstr = evalstr.replace(/,/g, '');
+  evalstr = evalstr.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  if (evalstr.match(/,/)) {
+    return [NaN, _("syntax incomplete")+". "];
+  }
   if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
     evalstr = evalstr.replace(/%/g,'') + '/100';
   }
@@ -1939,7 +1972,7 @@ function scopedeval(c) {
 function scopedmatheval(c) {
 	if (c.match(/^\s*[a-df-zA-Z]\s*$/)) {
 		return '';
-	}
+    }
 	try {
 		return eval(prepWithMath(mathjs(c)));
 	} catch(e) {

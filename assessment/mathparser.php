@@ -148,7 +148,7 @@ class MathParser
     $allwords = array_merge($this->functions, $this->variables, ['degree','degrees']);
     usort($allwords, function ($a,$b) { return strlen($b) - strlen($a);});
     $this->regex = '/^('.implode('|',array_map('preg_quote', $allwords)).')/';
-    $this->funcregex = '/^('.implode('|',array_map('preg_quote', $this->functions)).')/i';
+    $this->funcregex = '/('.implode('|',array_map('preg_quote', $this->functions)).')/i';
     $this->numvarregex = '/^(\d+\.?\d*|'.implode('|', array_map('preg_quote', $this->variables)).')/';
 
     //define operators
@@ -190,11 +190,43 @@ class MathParser
       '&&' => [
         'precedence'=>8,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a && $b;}],
+        'evalfunc'=>function($a,$b) {return ($a && $b);}],
       '||' => [
         'precedence'=>7,
         'assoc'=>'left',
-        'evalfunc'=>function($a,$b) {return $a || $b;}],
+        'evalfunc'=>function($a,$b) {return ($a || $b);}],
+      'La' => [
+        'precedence'=>8,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a && $b);}],
+      'Lo' => [
+        'precedence'=>7,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ($a || $b);}],
+      'Li' => [
+        'precedence'=>6,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return ((!$a) || $b);}],
+      'Lb' => [
+        'precedence'=>6,
+        'assoc'=>'right',
+        'evalfunc'=>function($a,$b) {return (($a && $b) || (!$a && !$b));}],
+      '<' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a<$b)?1:0;}],
+      '>' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a>$b)?1:0;}],
+      '<=' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a<=$b)?1:0;}],
+      '>=' => [
+        'precedence'=>6,
+        'assoc'=>'left',
+        'evalfunc'=>function($a,$b) {return ($a>=$b)?1:0;}],
       '(' => true,
       ')' => true
     ];
@@ -219,6 +251,8 @@ class MathParser
     );
 
     $str = str_replace(array('\\','[',']','`'), array('','(',')',''), $str);
+    // attempt to handle |x| as best as possible
+    $str = preg_replace('/(?<!\|)\|([^\|]+?)\|(?!\|)/', 'abs($1)', $str);
     $this->tokenize($str);
     $this->handleImplicit();
     $this->buildTree();
@@ -327,15 +361,7 @@ class MathParser
         $lastTokenType = 'number';
         $n += strlen($matches[1]) - 1;
         continue;
-      } else if (isset($this->operators[$c])) {
-        // if the symbol matches an operator
-        $tokens[] = [
-          'type'=>'operator',
-          'symbol'=>$c
-        ];
-        $lastTokenType = 'operator';
-        continue;
-      } else if (($c=='|' || $c=='&') &&
+      } else if (($c=='|' || $c=='&' || $c=='L' || $c=='<' || $c=='>') &&
         isset($this->operators[substr($str,$n,2)])
       ) {
         $tokens[] = [
@@ -343,6 +369,14 @@ class MathParser
           'symbol'=>substr($str,$n,2)
         ];
         $n++;
+        $lastTokenType = 'operator';
+        continue;
+      } else if (isset($this->operators[$c])) {
+        // if the symbol matches an operator
+        $tokens[] = [
+          'type'=>'operator',
+          'symbol'=>$c
+        ];
         $lastTokenType = 'operator';
         continue;
       } else {
@@ -564,6 +598,9 @@ class MathParser
             // get precedence info for the symbols
             $peekinfo = $this->operators[$peek['symbol']];
             $tokeninfo = $this->operators[$token['symbol']];
+            if (is_bool($peekinfo) || is_bool($tokeninfo)) {
+                break;
+            }
             //if lower precedence, or equal and left assoc
             if (
               $tokeninfo['precedence'] < $peekinfo['precedence'] ||

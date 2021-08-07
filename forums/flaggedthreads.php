@@ -5,7 +5,7 @@ require("../init.php");
 
 
 $cid = Sanitize::courseId($_GET['cid']);
-$from = $_GET['from'];
+$from = $_GET['from'] ?? '';
 
 $now = time();
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";

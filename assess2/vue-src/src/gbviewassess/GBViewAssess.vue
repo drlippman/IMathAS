@@ -26,7 +26,7 @@
       <div>
         {{ $t('gradebook.due')}}: {{ aData.enddate_disp }}
           <button
-            v-if = "canEdit"
+            v-if = "canEdit && aData.can_make_exception"
             type="button"
             class="slim"
             @click = "makeException"
@@ -183,7 +183,7 @@
           />
         </div>
 
-        <div v-if="canEdit">
+        <div v-if="canEdit && viewFull">
           <button @click = "showFilters = !showFilters">
             {{ $t('gradebook.filters') }}
           </button>
@@ -216,6 +216,12 @@
               </li>
               <li>
                 <label>
+                  <input type=checkbox v-model="hide100">
+                  {{ $t('gradebook.hide_100') }}
+                </label>
+              </li>
+              <li>
+                <label>
                   <input type=checkbox v-model="hideFeedback">
                   {{ $t('gradebook.hide_fb') }}
                 </label>
@@ -224,6 +230,12 @@
                 <label>
                   <input type=checkbox v-model="hideNowork">
                   {{ $t('gradebook.hide_nowork') }}
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type=checkbox v-model="hidetexts" @change="loadTexts">
+                  {{ $t('gradebook.introtexts') }}
                 </label>
               </li>
             </ul>
@@ -250,56 +262,82 @@
         </div>
 
         <div v-if="viewFull">
+          <inter-question-text
+            v-if = "aData.hasOwnProperty('intro') && aData.intro !== ''"
+            v-show = "!hidetexts"
+            :active = "!hidetexts"
+            :textobj = "{html: aData.intro}"
+            class = "questionpane introtext"
+          />
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"
-            class = "bigquestionwrap"
             :id = "'qwrap' + (qn+1)"
           >
-            <div class="headerpane">
-              <strong>
-                {{ $tc('question_n', qn+1) }}.
-              </strong>
-
-              <gb-question-select
-                v-if = "aData.submitby === 'by_question'"
-                :versions="qdata"
-                :selected="curQver[qn]"
-                :qn="qn"
-                @setversion = "changeQuestionVersion"
-                class = "med-left"
-              />
-              <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
-                {{ $t('gradebook.score') }}:
+            <inter-question-text-list
+              pos="beforeexact"
+              :qn="qn"
+              :key="'iqt'+qn"
+              v-show = "!hidetexts"
+              :active = "!hidetexts"
+              :lastq = "lastQ"
+              :textlist = "textList"
+            />
+            <div class = "bigquestionwrap">
+              <div class="headerpane">
                 <strong>
-                  {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
+                  {{ $tc('question_n', qn+1) }}.
                 </strong>
-              </span>
 
-            </div>
-            <div class="scrollpane">
-              <gb-question
-                :class = "{'inactive':!showQuestion[qn]}"
+                <gb-question-select
+                  v-if = "aData.submitby === 'by_question'"
+                  :versions="qdata"
+                  :selected="curQver[qn]"
+                  :qn="qn"
+                  @setversion = "changeQuestionVersion"
+                  class = "med-left"
+                />
+                <span v-else-if = "qdata[curQver[qn]].hasOwnProperty('gbscore') && qdata[curQver[qn]].gbscore !== 'N/A'">
+                  {{ $t('gradebook.score') }}:
+                  <strong>
+                    {{ qdata[curQver[qn]].gbscore }}/{{ qdata[curQver[qn]].points_possible }}
+                  </strong>
+                </span>
+
+              </div>
+              <div class="scrollpane">
+                <gb-question
+                  :class = "{'inactive':!showQuestion[qn]}"
+                  :qdata = "qdata[curQver[qn]]"
+                  :qn = "qn"
+                />
+                <gb-showwork
+                  :work = "qdata[curQver[qn]].work"
+                  :worktime = "qdata[curQver[qn]].worktime"
+                  :showall = "showAllWork"
+                />
+              </div>
+              <gb-score-details
+                :showfull = "showQuestion[qn]"
+                :canedit = "canEdit"
                 :qdata = "qdata[curQver[qn]]"
                 :qn = "qn"
               />
-              <gb-showwork
-                :work = "qdata[curQver[qn]].work"
-                :worktime = "qdata[curQver[qn]].worktime"
-                :showall = "showAllWork"
-              />
             </div>
-            <gb-score-details
-              :showfull = "showQuestion[qn]"
-              :canedit = "canEdit"
-              :qdata = "qdata[curQver[qn]]"
-              :qn = "qn"
-            />
           </div>
+          <inter-question-text-list
+            pos="after"
+            :qn="lastQ"
+            :active = "!hidetexts"
+            v-show = "!hidetexts"
+            :lastq = "lastQ"
+            :textlist = "textList"
+          />
         </div>
         <gb-feedback
           qn="gen"
-          :show="viewFull"
+          :username="aData.userfullname"
+          :show="viewFull && (canEdit || assessFeedback !== '')"
           :canedit = "canEdit"
           :useeditor = "useEditor"
           :value = "assessFeedback"
@@ -374,6 +412,9 @@ import SummaryCategories from '@/components/summary/SummaryCategories.vue';
 import ErrorDialog from '@/components/ErrorDialog.vue';
 import GbFeedback from '@/gbviewassess/GbFeedback.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import InterQuestionText from '@/components/InterQuestionText.vue';
+
 import '../assess2.css';
 
 export default {
@@ -387,12 +428,15 @@ export default {
     SummaryCategories,
     ErrorDialog,
     GbFeedback,
-    ConfirmDialog
+    ConfirmDialog,
+    InterQuestionTextList,
+    InterQuestionText
   },
   data: function () {
     return {
       showOverride: false,
       assessOverride: '',
+      hide100: false,
       hidePerfect: false,
       hideNonzero: false,
       hideZero: false,
@@ -402,7 +446,8 @@ export default {
       showFilters: false,
       showEndmsg: false,
       showExcused: false,
-      showAllWork: false
+      showAllWork: false,
+      hidetexts: true
     };
   },
   computed: {
@@ -526,7 +571,9 @@ export default {
       for (let i = 0; i < this.curQuestions.length; i++) {
         const qdata = this.curQuestions[i][this.curQver[i]];
         let showit = true;
-        if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
+        if (this.hide100 && Math.abs(qdata.score - qdata.points_possible) < 0.002) {
+          showit = false;
+        } else if (this.hidePerfect && Math.abs(qdata.rawscore - 1) < 0.002) {
           showit = false;
         } else if (this.hideUnanswered && qdata.parts.reduce((a, c) => Math.max(a, c.try), 0) === 0) {
           showit = false;
@@ -542,21 +589,6 @@ export default {
         out[i] = showit;
       }
       return out;
-    },
-    hidePerfectLabel () {
-      return this.hidePerfect
-        ? this.$t('gradebook.show_perfect')
-        : this.$t('gradebook.hide_perfect');
-    },
-    hideCorrectLabel () {
-      return this.hideCorrect
-        ? this.$t('gradebook.show_correct')
-        : this.$t('gradebook.hide_correct');
-    },
-    hideUnansweredLabel () {
-      return this.hideUnanswered
-        ? this.$t('gradebook.show_unans')
-        : this.$t('gradebook.hide_unans');
     },
     exceptionActionLabel () {
       if (this.aData.hasexception) {
@@ -600,6 +632,16 @@ export default {
     },
     confirmObj () {
       return store.confirmObj;
+    },
+    lastQ () {
+      return this.aData.assess_versions[store.curAver].questions.length - 1;
+    },
+    textList () {
+      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
+        return [];
+      } else {
+        return store.assessInfo.interquestion_text;
+      }
     }
   },
   methods: {
@@ -620,6 +662,7 @@ export default {
     },
     doChangeAssessVersion (val) {
       if (val !== store.curAver) {
+        this.hidetexts = true;
         if (this.aData.assess_versions[val].status === 3) {
           // requesting the practice version
           actions.loadGbAssessVersion(0, true);
@@ -697,9 +740,12 @@ export default {
       window.location = url;
     },
     showAllAns () {
-      window.$("span[id^='ans']").removeClass('hidden').show();
+      window.$('span[id^=ans]').toggleClass('hidden', false).show();
       window.$('.sabtn').replaceWith('<span>Answer: </span>');
       window.$('.keybtn').attr('aria-expanded', 'true');
+      window.$('div[id^=dsbox]').toggleClass('hidden', false).attr('aria-hidden', false)
+        .attr('aria-expanded', true);
+      window.$('input[aria-controls^=dsbox]').attr('aria-expanded', true);
     },
     beforeUnload (evt) {
       if (Object.keys(store.scoreOverrides).length > 0 ||
@@ -718,8 +764,12 @@ export default {
     },
     previewFiles () {
       window.previewallfiles();
+    },
+    loadTexts () {
+      if (!store.assessInfo.hasOwnProperty('intro')) {
+        actions.loadGbTexts();
+      }
     }
-
   },
   created () {
     window.$(window).on('beforeunload', this.beforeUnload);

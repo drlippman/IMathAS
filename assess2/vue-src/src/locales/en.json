@@ -125,7 +125,9 @@
     "jump_warn": "This will use up your remaining tries at this version of the question.",
     "showwork": "Show work here by typing it or attaching a file or picture",
     "uploadwork": "Show work here by attaching a file or picture",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "intronext": "To begin, navigate to a question using the selector or > Next button above.",
+    "firstq": "First Question"
   },
   "header": {
     "score": "Score: {pts}/{poss}",
@@ -385,6 +387,7 @@
     "full_credit": "Full credit",
     "add_feedback": "Add feedback",
     "feedback": "Feedback",
+    "feedback_for": "Feedback for {name}",
     "general_feedback": "General feedback",
     "use_in_msg": "Use in Message",
     "clear_hdr": "Delete confirmation",
@@ -405,7 +408,8 @@
     "filters": "Filters and Options",
     "hide": "Hide",
     "hide_perfect": "Score = 100% (before penalties)",
-    "hide_nonzero": "0 < score < 100%",
+    "hide_100": "Score = 100% (after penalties)",
+    "hide_nonzero": "0 < score < 100% (before penalties)",
     "hide_zero": "Score = 0",
     "hide_fb": "Questions with Feedback",
     "hide_nowork": "Questions without Work",
@@ -459,7 +463,8 @@
     "has_timeext": "Has a {n} minute time limit extension available",
     "used_timeext": "Used a {n} minute time limit extension",
     "attemptext": "Exception given for {n} additional versions",
-    "preview_files": "Preview All Files"
+    "preview_files": "Preview All Files",
+    "introtexts": "Intro and between-question text"
   },
   "work": {
     "add": "Add Work",

@@ -2971,7 +2971,13 @@ var MathCommand = P(MathElement, function(_, super_) {
             cursor.options.autoParenOperators.hasOwnProperty(str)
         ) {
             str += cmd.letter;
-            if (AutoOpNames._maxLength == 0 || !AutoOpNames.hasOwnProperty(str) || issubsup) {
+            for (var opname in cursor.options.autoOperatorNames) {
+                if (opname.substring(0, str.length) === str) {
+                    partofop = true;
+                    break;
+                }
+            }
+            if (AutoOpNames._maxLength == 0 || !partofop || issubsup) {
                 cursor.parent.write(cursor, '(');
             }
         }
@@ -6234,8 +6240,8 @@ optionProcessors.addCommands = function(cmds) {
     }
     if (cmds[str][0] == 'VanillaSymbol') {
       LatexCmds[str] = bind(VanillaSymbol, cmds[str][1], cmds[str][2]);
-    } else if (cmds[str][0] == 'BinarySymbol') {
-      LatexCmds[str] = bind(BinarySymbol, cmds[str][1], cmds[str][2]);
+    } else if (cmds[str][0] == 'BinaryOperator') {
+      LatexCmds[str] = bind(BinaryOperator, cmds[str][1], cmds[str][2]);
     } else if (cmds[str][0] == 'Variable') {
       LatexCmds[str] = bind(Variable, cmds[str][1], cmds[str][2]);
     } else {

@@ -87,7 +87,7 @@ $assess_record->loadRecord($uid);
 $assess_record->setInGb(true);
 if (!$assess_record->hasRecord()) {
   // if there's no record yet, and we're a teacher, create a record
-  if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+  if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
     $isGroup = $assess_info->getSetting('isgroup');
 
     // Check for LTI 1.3 lineitem
@@ -154,7 +154,7 @@ if (!$assess_record->hasRecord()) {
 
 //fields to extract from assess info for inclusion in output
 $include_from_assess_info = array(
-  'name', 'submitby', 'enddate', 'can_use_latepass', 'hasexception',
+  'name', 'submitby', 'enddate', 'available', 'can_use_latepass', 'hasexception',
   'original_enddate', 'extended_with', 'latepasses_avail', 'points_possible',
   'latepass_extendto', 'allowed_attempts', 'keepscore', 'timelimit', 'ver',
   'scoresingb', 'viewingb', 'latepass_status', 'help_features', 'attemptext'
@@ -190,6 +190,10 @@ if ($isstudent) {
   $stm = $DBH->prepare($query);
   $stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':typeid'=>$aid,
     ':type'=> $LPblockingView ? 'gbviewassess' : 'gbviewsafe', ':viewtime'=>$now));
+
+  if ($LPblockingView) {
+      $assess_info->overrideSetting('can_use_latepass', 0);
+  }
 }
 
 // indicate whether teacher/tutor can see all the answers and such
@@ -197,8 +201,9 @@ if ($isActualTeacher || $istutor) {
     $assess_record->setTeacherInGb(true);
 }
 // indicate whether teacher/tutor can edit scores or not
-if ($isActualTeacher || ($istutor && $tutoredit == 1)) {
+if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
   $assessInfoOut['can_edit_scores'] = true;
+  $assessInfoOut['can_make_exception'] = ($isActualTeacher || ($istutor && $tutoredit == 3));
   // get rubrics
   $assessInfoOut['rubrics'] = array();
   $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from './router';
+import { mapInterquestionTexts, mapInterquestionPages } from '@/mixins/maptexts';
 
 export const store = Vue.observable({
   assessInfo: null,
@@ -202,6 +203,7 @@ export const actions = {
       actions.clearAutosaveTimer();
       this.addAutosaveData(data);
     }
+
     window.$.ajax({
       url: store.APIbase + 'loadquestion.php' + store.queryString,
       type: 'POST',
@@ -229,14 +231,6 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
-        // clear drawing last answer if regen
-        if (regen && store.assessInfo.questions[qn].jsparams) {
-          for (const i in store.assessInfo.questions[qn].jsparams) {
-            if (store.assessInfo.questions[qn].jsparams[i].qtype === 'draw') {
-              window.imathasDraw.clearcanvas(i);
-            }
-          }
-        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');
@@ -630,13 +624,22 @@ export const actions = {
     // adds autosave data to existing FormData
     const lastLoaded = {};
     const tosaveqn = {};
+    let valstr;
     for (const qn in store.autosaveQueue) {
       if (skip.indexOf(qn) !== -1) {
         continue; // skip it
       }
       tosaveqn[qn] = store.autosaveQueue[qn];
+      if (store.autosaveQueue[qn].length === 1 && store.autosaveQueue[qn][0] === 0) {
+        // one part, might be single part
+        valstr = window.imathasAssess.preSubmit(qn);
+        if (valstr !== false) {
+          data.append('qn' + qn + '-val', valstr);
+        }
+      }
       // build up regex to match the inputs for all the parts we want to save
       const regexpts = [];
+      let subqn;
       for (const k in store.autosaveQueue[qn]) {
         const pn = store.autosaveQueue[qn][k];
         if (pn === 'sw') {
@@ -646,7 +649,12 @@ export const actions = {
         if (pn === 0) {
           regexpts.push(qn);
         }
-        regexpts.push((qn * 1 + 1) * 1000 + pn * 1);
+        subqn = (qn * 1 + 1) * 1000 + pn * 1;
+        regexpts.push(subqn);
+        valstr = window.imathasAssess.preSubmit(subqn);
+        if (valstr !== false) {
+          data.append('qn' + subqn + '-val', valstr);
+        }
       }
       var regex = new RegExp('^(qn|tc|qs)(' + regexpts.join('\\b|') + '\\b)');
       window.$('#questionwrap' + qn).find('input,select,textarea').each(function (i, el) {
@@ -1156,6 +1164,7 @@ export const actions = {
         const thisq = data.questions[i];
 
         data.questions[i].canretry = (thisq.try < thisq.tries_max);
+        data.questions[i].canretry_primary = data.questions[i].canretry;
         data.questions[i].tries_remaining = thisq.tries_max - thisq.try;
         if (thisq.hasOwnProperty('parts')) {
           let trymin = 1e10;
@@ -1178,7 +1187,7 @@ export const actions = {
               canretrydet = true;
             }
           }
-          data.questions[i].canretry = canretrydet;
+          data.questions[i].canretry_primary = canretrydet;
           if (trymin !== trymax) {
             data.questions[i].tries_remaining_range = [trymin, trymax];
           }
@@ -1274,88 +1283,10 @@ export const actions = {
     }
     if (data.hasOwnProperty('questions') && data.hasOwnProperty('interquestion_text')) {
       // map and override previous interquestion_text, if map defined
-      let lasttext = -1;
-      const origtexts = data.interquestion_text;
-      const newtexts = [];
-      for (const i in data.questions) {
-        if (data.questions[i].hasOwnProperty('text')) {
-          const thistext = data.questions[i].text;
-          if (JSON.stringify(thistext) === JSON.stringify(lasttext)) { // same one
-            for (let j = 0; j < thistext.length; j++) {
-              newtexts[newtexts.length - 1 - j].displayUntil = i;
-            }
-          } else {
-            for (let j = 0; j < thistext.length; j++) {
-              newtexts.push(Object.assign({ orig: 1e5 }, origtexts[thistext[j]]));
-              newtexts[newtexts.length - 1].displayBefore = i;
-              newtexts[newtexts.length - 1].displayUntil = i;
-            }
-            lasttext = thistext.slice();
-          }
-        } else {
-          lasttext = -1;
-        }
-      }
-      for (const i in origtexts) {
-        if (origtexts[i].hasOwnProperty('displayBefore')) {
-          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
-        }
-        if (origtexts[i].hasOwnProperty('atend')) {
-          newtexts.push(Object.assign({ orig: i }, origtexts[i]));
-          newtexts[newtexts.length - 1].displayBefore = data.questions.length;
-          newtexts[newtexts.length - 1].displayUntil = data.questions.length;
-        }
-      }
-      if (newtexts.length > 0) {
-        newtexts.sort(function (a, b) {
-          if (parseInt(a.displayBefore) === parseInt(b.displayBefore)) {
-            return (a.orig - b.orig);
-          } else {
-            return a.displayBefore - b.displayBefore;
-          }
-        });
-        data.interquestion_text = newtexts;
-      }
+      mapInterquestionTexts(data, data.questions);
     }
     if (data.hasOwnProperty('interquestion_text')) {
-      data.interquestion_pages = [];
-      let lastDisplayBefore = 0;
-      // ensure proper data type on these
-      for (const i in data.interquestion_text) {
-        data.interquestion_text[i].displayBefore = parseInt(data.interquestion_text[i].displayBefore);
-        data.interquestion_text[i].displayUntil = parseInt(data.interquestion_text[i].displayUntil);
-        data.interquestion_text[i].forntype = (parseInt(data.interquestion_text[i].forntype) > 0);
-        data.interquestion_text[i].ispage = (parseInt(data.interquestion_text[i].ispage) > 0);
-        if (data.interquestion_text[i].ispage) {
-          // if a new page, start a new array in interquestion_pages
-          // first, add a question list to the previous page
-          if (data.interquestion_pages.length > 0) {
-            const qs = [];
-            for (let j = lastDisplayBefore; j < data.interquestion_text[i].displayBefore; j++) {
-              qs.push(j);
-            }
-            lastDisplayBefore = data.interquestion_text[i].displayBefore;
-            data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
-          }
-          // now start new page
-          data.interquestion_pages.push([data.interquestion_text[i]]);
-        } else if (data.interquestion_pages.length > 0) {
-          // if we've already started pages, push this to the current page
-          data.interquestion_pages[data.interquestion_pages.length - 1].push(data.interquestion_text[i]);
-        }
-      }
-      // if we have pages, add a question list to the last page
-      if (data.interquestion_pages.length > 0) {
-        const qs = [];
-        for (let j = lastDisplayBefore; j < data.questions.length; j++) {
-          qs.push(j);
-        }
-        data.interquestion_pages[data.interquestion_pages.length - 1][0].questions = qs;
-        // don't delete, as we may use it for print version
-        // delete data.interquestion_text;
-      } else {
-        delete data.interquestion_pages;
-      }
+      mapInterquestionPages(data, data.questions);
     }
     if (data.hasOwnProperty('noprint') && data.noprint === 1) {
       // want to block printing - inject print styles

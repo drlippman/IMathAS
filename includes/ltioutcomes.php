@@ -21,7 +21,7 @@ function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false) {
 
 	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon) ';
 	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon) ON DUPLICATE KEY UPDATE ';
-	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),failures=0 ';
+	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),sourcedid=VALUES(sourcedid),failures=0 ';
 
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(
@@ -81,7 +81,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
 		} else {
 			$logFile = fopen($logfilename, "a+");
 		}
-		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$userid,$grade,$sourcedid\n");
+		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$uid,$grade,$sourcedid\n");
 		fclose($logFile);
 	}
 	//if we're using the LTI message queue, and it's an update, queue it

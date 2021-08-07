@@ -14,8 +14,8 @@ if (!isset($_GET['item']) || !isset($_GET['dest'])) {
 	exit;
 }
 
-$itemtype = $_GET['item']{0};
-$itempart = $_GET['item']{1};
+$itemtype = $_GET['item'][0];
+$itempart = $_GET['item'][1];
 $itemid = intval(substr($_GET['item'],2));
 if ($itemid==0) {
 	echo '{"res":"error", "error":"invalid item id"}';

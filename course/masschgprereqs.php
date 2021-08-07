@@ -85,7 +85,7 @@ function flattenitems($items, &$itemmap, &$assessorder) {
 $assessorder = array();
 flattenitems($itemorder, $itemmap, $assessorder);
 
-$from = Sanitize::simpleString($_GET['from']);
+$from = Sanitize::simpleString($_GET['from'] ?? '');
 
 // HTML display
 

@@ -1,6 +1,6 @@
 <?php
 require("../init.php");
-$tohide = Sanitize::courseId($_GET['tohide']);
+
 if (!isset($_GET['type'])) {
 	$type = 'take';
 } else {
@@ -18,7 +18,7 @@ if ($type=='teach') {
 	$type = 'take';
 }
 $actionuserid = $userid;
-$userIdInt = Sanitize::onlyInt(trim($_GET['user']));
+$userIdInt = Sanitize::onlyInt($_GET['user'] ?? 0);
  if ($myrights==100 && !empty($userIdInt)) {
 	$actionuserid = $userIdInt;
 } else if ($myrights>=75 && !empty($userIdInt)) {
@@ -29,6 +29,7 @@ $userIdInt = Sanitize::onlyInt(trim($_GET['user']));
 	}
 }
 if (isset($_GET['tohide'])) {
+    $tohide = Sanitize::courseId($_GET['tohide']);
 	if ($tohide>0) {
 		$stm = $DBH->prepare("UPDATE $table SET hidefromcourselist=0 WHERE courseid=:courseid AND userid=:userid");
 		$stm->execute(array(':courseid'=>$tohide, ':userid'=>$actionuserid));

@@ -383,7 +383,7 @@ $placeinhead = "<style type=\"text/css\">\n@import url(\"$staticroot/forums/foru
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/thread.js?v=050220\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';";
 $placeinhead .= '$(function() {$("img[src*=\'flag\']").attr("title","Flag Message");});';
-$placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$pages&cid=$cid&forum=$forumid';</script>";
+$placeinhead .= "var tagfilterurl = '" . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid';</script>";
 require("../header.php");
 
 
@@ -796,7 +796,7 @@ echo "</p>";
 					echo '<td class="c">';
 				}
 				echo Sanitize::encodeStringForDisplay($line['tviews']) ." (".Sanitize::encodeStringForDisplay($uniqviews[$line['id']]).")</td><td class=c>".Sanitize::encodeStringForDisplay($lastpost);
-				if ($lastpost=='' || $maxdate[$line['id']]>$lastview[$line['id']]) {
+				if ($lastpost=='' || !isset($lastview[$line['id']]) || $maxdate[$line['id']]>$lastview[$line['id']]) {
 					echo " <span class=\"noticetext\">New</span>";
 				}
 				echo "</td></tr>\n";

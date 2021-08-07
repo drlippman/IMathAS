@@ -50,6 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $defpoints = $row['defpoints'];
     $assessmentname = $row['name'];
     $displaymethod = $row['displaymethod'];
+    $itemorder = $row['itemorder'];
     $row['showwork'] = ($row['showwork'] & 3);
 
 	if (isset($_GET['grp'])) { $_SESSION['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']);}
@@ -383,7 +384,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
         var assessver = '$aver';
 		</script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=100820\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=042821\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=092820\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
@@ -588,7 +589,8 @@ if ($overwriteBody==1) {
 	<script>
 		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_INVALID_UTF8_IGNORE); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
+        var lastitemhash = "<?php echo md5($itemorder); ?>";
 		//$(refreshTable);
 		refreshTable();
 	</script>

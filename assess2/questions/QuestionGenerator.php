@@ -81,6 +81,7 @@ class QuestionGenerator
             $this->questionParams->setQuestionData($this->loadQuestionData());
         }
 
+        $GLOBALS['curqsetid'] = $this->questionParams->getDbQuestionSetId();
         set_error_handler(array($this, 'evalErrorHandler'));
         set_exception_handler(array($this, 'evalExceptionHandler'));
 
@@ -93,6 +94,7 @@ class QuestionGenerator
 
         restore_error_handler();
         restore_exception_handler();
+        unset($GLOBALS['curqsetid']);
 
         return $question;
     }
@@ -181,7 +183,7 @@ class QuestionGenerator
      * @return bool
      */
     public function evalErrorHandler(int $errno, string $errstr, string $errfile,
-                                     int $errline, array $errcontext): bool
+                                     int $errline, array $errcontext = []): bool
     {
         ErrorHandler::evalErrorHandler($errno, $errstr, $errfile, $errline, $errcontext);
 
