@@ -465,7 +465,12 @@ if ($hasusername) {
     if (isset($_GET['graphdisp'])) {
         $_SESSION['graphdisp'] = $_GET['graphdisp'];
     }
-    if (isset($_SESSION['isdiag'])) { // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+    if (!function_exists('isDiagnostic')) {
+        function isDiagnostic() {
+            return isset($_SESSION['isdiag']); // && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+        }
+    }
+    if (isDiagnostic()) {
         $urlparts = parse_url($_SERVER['PHP_SELF']);
         if ($_SESSION['diag_aver'][0] == 1 &&
             !in_array(basename($urlparts['path']), array('showtest.php', 'ltiuserprefs.php'))
