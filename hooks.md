@@ -133,6 +133,9 @@ Called when checking if LTI user can access the requested page
 return an array of base filenames that are allowed to be accessed by a user
 accessing an assessment via LTI.  This is merged with the default list.
 
+Called to determine if a user should be redirected to a diagnostic assessment
+`isDiagnostic()`
+
 ## util/batchcreateinstr
 
 Include via `$CFG['hooks']['util/batchcreateinstr']`
