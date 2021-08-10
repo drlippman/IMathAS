@@ -215,6 +215,7 @@ if (!(isset($teacherid))) {
         if (isset($_GET['loc'])) {
             $qdescrip = $_GET['loc'] . ': ' . $qdescrip;
         }
+        $qingroup = (strpos($_GET['loc'],'-') !== false);
 
         $rubric_vals = array(0);
         $rubric_names = array('None');
@@ -379,11 +380,15 @@ writeHtmlSelect('rubric', $rubric_vals, $rubric_names, $line['rubric']);
     echo "| <a href=\"addrubric.php?cid=$cid&amp;from=modq&amp;aid=" . Sanitize::encodeUrlParam($aid) . "&amp;qid=" . Sanitize::encodeUrlParam($_GET['id']) . "\">" . _("Edit rubrics") . "</a> ";
     ?>
     </span><br class="form"/>
+<?php
+if (!$qingroup) {
+?>
 <span class="form"><label for="ec"><?php echo _('Count as extra credit?');?></label></span>
 <span class=formright>
     <input type=checkbox value=1 name=ec id=ec <?php if ($line['extracredit'] > 0) { echo 'checked';} ?>>
 </span><br class="form"/>
 <?php
+}
 if (isset($_GET['qsetid'])) { //adding new question
         echo "<span class=form>" . _("Number of copies of question to add:") . "</span><span class=formright><input type=text size=4 name=copies value=\"1\"/></span><br class=form />";
     } else if (!$beentaken) {
