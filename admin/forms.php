@@ -155,13 +155,16 @@ switch($_GET['action']) {
             $oldrights = 10;
             $oldspecialrights = 0;
 		} else {
-			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights FROM imas_users WHERE id=:id");
+			$stm = $DBH->prepare("SELECT SID,FirstName,LastName,email,rights,groupid,specialrights,jsondata FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($myrights < 100 && ($myspecialrights&32)!=32 && $line['groupid']!=$groupid) {
 				echo "You do not have access to edit this user";
 				break;
 			}
+            if (($myrights >= 75 || ($myspecialrights&48)>0) && isset($CFG['GEN']['COPPA'])) {
+                $line['jsondata'] = json_decode($line['jsondata'], true);
+            }
 			printf("<div class=pagetitle><h1>%s %s</h1></div>\n", Sanitize::encodeStringForDisplay($line['FirstName']),
 				Sanitize::encodeStringForDisplay($line['LastName']));
 			$oldgroup = $line['groupid'];
@@ -253,6 +256,14 @@ switch($_GET['action']) {
 			echo 'value="'.Sanitize::encodeStringForDisplay($line['email']).'"';
 		}
 		echo "><BR class=form>\n";
+        if (($myrights >= 75 || ($myspecialrights&48)>0) && isset($CFG['GEN']['COPPA'])) {
+            echo "<span class=form><label for=\"over13\">",_('13 years old or older'),"</label></span>";
+            echo "<span class=formright><input type=checkbox name=over13 id=over13 ";
+            if (empty($line['jsondata']) || empty($line['jsondata']['under13'])) {
+                echo 'checked';
+            }
+            echo "></span><br class=form />\n";
+        }
 		if ($_GET['action'] == "newadmin") {
 			echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="pw1"/><br class="form"/>';
 		} else {
