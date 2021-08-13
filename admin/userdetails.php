@@ -166,7 +166,9 @@ if ($overwriteBody==1) {
 } else {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
 	echo '<div id="headeruserdetail" class="pagetitle"><h1>'._('User Detail').': ';
+  echo '<span class="pii-full-name">';
   echo Sanitize::encodeStringForDisplay($userinfo['LastName'].', '.$userinfo['FirstName']);
+  echo '</span>';
   echo '</h1></div>';
 
 
@@ -194,7 +196,7 @@ if ($overwriteBody==1) {
       echo ' ('._('Subgroup of').': '.Sanitize::encodeStringForDisplay(trim($userinfo['parentgroup'])).')';
     }
   }
-  echo '<br/>'._('Email').': '.Sanitize::encodeStringForDisplay($userinfo['email']);
+  echo '<br/>'._('Email').': <span class="pii-email">'.Sanitize::encodeStringForDisplay($userinfo['email']).'</span>';
   echo '<br/>'._('Last Login').': '.Sanitize::encodeStringForDisplay($userinfo['lastaccess']).'</p>';
 
   if ((count($courses_teaching)>0 || count($courses_tutoring)>0) && count($courses_taking)>0) {
@@ -248,7 +250,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
@@ -288,7 +290,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
@@ -329,7 +331,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';

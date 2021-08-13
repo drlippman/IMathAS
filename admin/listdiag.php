@@ -105,7 +105,7 @@ if ($overwriteBody==1) {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
   echo '<div id="headerdiaglist" class="pagetitle"><h1>'._('Diagnostics');
   if ($list=='self') {
-    echo ': '.Sanitize::encodeStringForDisplay($userdisplayname);
+    echo ': <span class="pii-full-name">'.Sanitize::encodeStringForDisplay($userdisplayname) . '</span>';
   } else if ($list=='group') {
     echo ': '.Sanitize::encodeStringForDisplay($groupname);
   }
@@ -138,7 +138,7 @@ if ($overwriteBody==1) {
       echo '<td><a href="../course/course.php?cid='.Sanitize::encodeUrlParam($diag['cid']).'">';
       echo Sanitize::encodeStringForDisplay($diag['cname']).'</a></td>';
       if ($list=='group' || $list=='all') {
-        echo '<td>',Sanitize::encodeStringForDisplay($diag['LastName'].', '.$diag['FirstName']),'</td>';
+        echo '<td><span class="pii-full-name">',Sanitize::encodeStringForDisplay($diag['LastName'].', '.$diag['FirstName']),'</span></td>';
       }
       if ($list=='all') {
       	if ($diag['gname']===null) {

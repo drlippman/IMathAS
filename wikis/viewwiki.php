@@ -330,7 +330,7 @@ if (isset($teacherid)) {
 }
 echo '<p><span id="revisioninfo">Revision '.$numrevisions;
 if ($numrevisions>0) {
-	echo ".  Last edited by $lasteditedby on $lastedittime.";
+	echo ".  Last edited by <span class='pii-full-name'>$lasteditedby</span> on $lastedittime.";
 }
 echo '</span>';
 

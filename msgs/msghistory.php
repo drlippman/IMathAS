@@ -252,11 +252,13 @@
 			echo "</span>\n";
 			echo "<b>{$subject[$child]}</b><br/>Posted by: ";
 			if ($isteacher && $ownerid[$child]!=0) {
-				echo "<a href=\"mailto:" . Sanitize::emailAddress($email[$child]) . "\">";
+				echo "<a class=\"pii-email\" href=\"mailto:" . Sanitize::emailAddress($email[$child]) . "\">";
 			} else if ($allowmsg && $ownerid[$child]!=0) {
 				echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to=" . Sanitize::encodeUrlParam($ownerid[$child]) . "\">";
 			}
+			echo '<span class="pii-full-name">';
 			echo Sanitize::encodeStringForDisplay($poster[$child]); // This is a user's first and last name.
+            echo '</span>';
 			if (($isteacher || $allowmsg) && $ownerid[$child]!=0) {
 				echo "</a>";
 			}

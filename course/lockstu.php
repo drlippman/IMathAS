@@ -57,7 +57,7 @@ ini_set("max_execution_time", "600");
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$get_uid));
 			$row = $stm->fetch(PDO::FETCH_NUM);
-			$lockConfirm =  "Are you SURE you want to lock {$row[0]} {$row[1]} ($row[2]) out of the course?";
+			$lockConfirm =  "Are you SURE you want to lock <span class='pii-full-name'>{$row[0]} {$row[1]}</span> (<span class='pii-username'>$row[2]</span>) out of the course?";
 		}
 
 		/**** confirmation page body *****/
@@ -82,7 +82,7 @@ ini_set("max_execution_time", "600");
 		<ul>
 <?php
 					while ($row = $resultUserList->fetch(PDO::FETCH_NUM)) {
-						printf("			<li>%s, %s (%s)</li>",
+						printf("			<li><span class='pii-full-name'>%s, %s</span> (<span class='pii-username'>%s</span>)</li>",
                             Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]),
                             Sanitize::encodeStringForDisplay($row[2]));
 					}

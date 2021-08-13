@@ -770,7 +770,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 			} else {
 				echo '<tr><td>';
 			}
-			printf("%s, %s", Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+			printf("<span class='pii-full-name'>%s, %s</span>", Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
 			echo '</td>';
 			if ($hassection) {
 				echo "<td>".Sanitize::encodeStringForDisplay($row[3])."</td>";

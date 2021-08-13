@@ -137,31 +137,31 @@ if (!(isset($teacherid)) && $myrights<100) {
 			}
 			if (isset($CFG['acct']['importLoginformat'])) {
 				if (!checkFormatAgainstRegex($arr[0], $CFG['acct']['importLoginformat'])) {
-					echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." is invalid; skipping<br/>\n";
+					echo "Username <span class='pii-username'>".Sanitize::encodeStringForDisplay($arr[0])."</span> is invalid; skipping<br/>\n";
 					continue;
 				}
 			} else if (isset($loginformat) && !checkFormatAgainstRegex($arr[0], $loginformat)) {
-				echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." is invalid; skipping<br/>\n";
+				echo "Username <span class='pii-username'>".Sanitize::encodeStringForDisplay($arr[0])."</span> is invalid; skipping<br/>\n";
 				continue;
 			}
 			if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$arr[3]) ||
 					(isset($CFG['acct']['emailFormat']) && !checkFormatAgainstRegex($arr[3], $CFG['acct']['emailFormat']))) {
-				echo "Email ".Sanitize::encodeStringForDisplay($arr[3])." is invalid; skipping<br/>\n";
+				echo "Email <span class='pii-email'>".Sanitize::encodeStringForDisplay($arr[3])."</span> is invalid; skipping<br/>\n";
 				continue;
 			}
 			if (strlen($arr[6]) < (isset($CFG['acct']['passwordMinlength'])?$CFG['acct']['passwordMinlength']:6)) {
-				echo "Password for username ".Sanitize::encodeStringForDisplay($arr[0])." is too short; skipping<br/>\n";
+				echo "Password for username <span class='pii-username'>".Sanitize::encodeStringForDisplay($arr[0])."</span> is too short; skipping<br/>\n";
 				continue;
 			}
 			if (isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($arr[6], $CFG['acct']['passwordFormat'])) {
-				echo "Password for username ".Sanitize::encodeStringForDisplay($arr[0])." is invalid format; skipping<br/>\n";
+				echo "Password for username <span class='pii-username'>".Sanitize::encodeStringForDisplay($arr[0])."</span> is invalid format; skipping<br/>\n";
 				continue;
 			}
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
 			$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($arr[0])));
 			if ($stm->rowCount()>0) {
 				$id = $stm->fetchColumn(0);
-				echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." already existed in system; using existing<br/>\n";
+				echo "Username <span class='pii-username'>".Sanitize::encodeStringForDisplay($arr[0])."</span> already existed in system; using existing<br/>\n";
 			} else {
 				if (isset($CFG['GEN']['newpasswords'])) {
 					$pw = password_hash($arr[6], PASSWORD_DEFAULT);
@@ -176,7 +176,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid));
 				if ($stm->rowCount()>0) {
-					echo "Username ".Sanitize::encodeStringForDisplay($arr[0])." already enrolled in course.  Skipping<br/>";
+					echo "Username <span class='pii-username'>".Sanitize::encodeStringForDisplay($arr[0])."</span> already enrolled in course.  Skipping<br/>";
 					continue;
 				}
 
@@ -290,10 +290,10 @@ if ($overwriteBody==1) {
 		for ($i=0; $i<count($page_sampleImport); $i++) {
 ?>
 				<tr>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col1']); ?></td>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col2']); ?></td>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col3']); ?></td>
-					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col4']); ?></td>
+                    <td><span class="pii-username"><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col1']); ?></span></td>
+                    <td><span class="pii-first-name"><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col2']); ?></span></td>
+                    <td><span class="pii-last-name"><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col3']); ?></span></td>
+                    <td><span class="pii-email"><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col4']); ?></span></td>
 					<td><?php echo Sanitize::encodeStringForDisplay($page_sampleImport[$i]['col5']); ?></td>
 				</tr>
 

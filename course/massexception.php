@@ -365,7 +365,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$stm = $DBH->prepare("SELECT iu.LastName,iu.FirstName,istu.section FROM imas_users AS iu JOIN imas_students AS istu ON iu.id=istu.userid WHERE iu.id=:id AND istu.courseid=:courseid");
 		$stm->execute(array(':id'=>$tolist, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<h1>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]);
+		echo "<h1><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]) . '</span>';
 		if ($row[2]!='') {
 			echo ' <span class="small">(Section: '.Sanitize::encodeStringForDisplay($row[2]).')</span>';
 		}
@@ -404,7 +404,7 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 					echo "<li>" . Sanitize::encodeStringForDisplay($row['itemname']) ." <ul>";
 					$lasta = $row['itemid'];
 				}
-				printf('<li><input type=checkbox name="clears[]" value="%s" />%s, %s ',
+				printf('<li><input type=checkbox name="clears[]" value="%s" /><span class="pii-full-name">%s, %s</span> ',
 					Sanitize::encodeStringForDisplay($row['eid']), Sanitize::encodeStringForDisplay($row['LastName']),
 					Sanitize::encodeStringForDisplay($row['FirstName']));
 				if ($row['itemtype']=='A') {
@@ -459,8 +459,10 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 						echo "</ul></li>";
 						$assessarr = array();
 					}
-					printf("<li>%s, %s <ul>", Sanitize::encodeStringForDisplay($row['LastName']),
-						Sanitize::encodeStringForDisplay($row['FirstName']));
+					printf("<li><span class='pii-full-name'>%s, %s</span> <ul>",
+						Sanitize::encodeStringForDisplay($row['LastName']),
+						Sanitize::encodeStringForDisplay($row['FirstName'])
+					);
 					$lasts = $row['userid'];
 				}
 				$assessarr[$row['eid']] = "{$row['itemname']} ";
@@ -679,8 +681,10 @@ require_once(__DIR__."/../includes/TeacherAuditLog.php");
 		$stm = $DBH->query("SELECT LastName,FirstName FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");
 		echo "<ul>";
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf("<li>%s, %s</li>", Sanitize::encodeStringForDisplay($row[0]),
-				Sanitize::encodeStringForDisplay($row[1]));
+			printf("<li><span class='pii-full-name'>%s, %s</span></li>",
+				Sanitize::encodeStringForDisplay($row[0]),
+				Sanitize::encodeStringForDisplay($row[1])
+			);
 		}
 		echo '</ul>';
 		echo '</fieldset>';

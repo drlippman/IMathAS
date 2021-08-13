@@ -198,7 +198,7 @@ if (count($tutorlist)==0) {
 }
 foreach ($tutorlist as $tutor) {
 	echo '<tr>';
-	echo '<td>'.Sanitize::encodeStringForDisplay($tutor['name']).'</td>';
+	echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($tutor['name']).'</span></td>';
 	echo '<td>';
 	//section
 	echo '<select name="section['.Sanitize::encodeStringForDisplay($tutor['id']).']">';
