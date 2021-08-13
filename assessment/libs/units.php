@@ -335,6 +335,7 @@ function parseunits($unitsExpression) {
       'zepto' => ['zepto',1E-21],
       'yocto' => ['yocto',1E-24]
     ];
+    $unitKeys = array_keys($units);
     
     //Search string for metric prefixes.
     $unitPrefixPattern = '/yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto/';
@@ -347,6 +348,7 @@ function parseunits($unitsExpression) {
     //Special case of unit "cmH2O".
     $unitsExpression = preg_replace('/cmH2O/','cmWater',$unitsExpression);
     
+    $unitsExpression = preg_replace('/\sper\s/',' / ',$unitsExpression); // interpret "ft per s" as "ft/s"
     $unitsExpression = preg_replace('/\s{2,}/',' ',$unitsExpression); //no double spaces
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*([\-]?\d+)/','$1*10^$2',$unitsExpression); //scientific notation
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*[\+]?(\d+)/','$1*10^$2',$unitsExpression);
@@ -359,8 +361,17 @@ function parseunits($unitsExpression) {
     $unitsExpression = preg_replace('/([a-zA-Z])(\s*\-\s*)/','$1*',$unitsExpression); //Not sure if this is standard notation.
     $unitsExpression = preg_replace('/\(\s*(.*?)\s*\)\s*\//', '$1/', $unitsExpression); // strip paren around numerator
     $unitsExpression = preg_replace('/\/\s*\(\s*(.*?)\s*\)/', '/$1', $unitsExpression); // strip paren around denom
+    
+    // Change "ft sq" to "ft*ft" and "cu yd" to "yd*yd*yd"
+    foreach ($unitKeys as $key) {
+      $unitsExpression = preg_replace("~(^|[^a-zA-Z])(?:sq|square)\s+($key)([^a-zA-Z]|$)~",'$1$2*$2$3',$unitsExpression);
+      $unitsExpression = preg_replace("~(^|[^a-zA-Z])(?:cu|cubic)\s+($key)([^a-zA-Z]|$)~",'$1$2*$2*$2$3',$unitsExpression);
+      $unitsExpression = preg_replace("~(^|[^a-zA-Z])($key)\s+(?:squared)([^a-zA-Z]*)~",'$1$2*$2$3',$unitsExpression);
+      $unitsExpression = preg_replace("~(^|[^a-zA-Z])($key)\s+(?:cubed)([^a-zA-Z]*)~",'$1$2*$2*$2$3',$unitsExpression);
+    }
     $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol, spaces become *
-
+    echo $unitsExpression;
+    
     // unconvert E so is_numeric will recognize it
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*\*\s*10\s*\^\s*([\-]?\d+)/','$1E$2',$unitsExpression);
 
@@ -696,4 +707,4 @@ function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $r
 }
 
 // regex of all units, for possible JS use later:
-// \b(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|hr|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)\b
+// \b(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|hr|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O|sq|squared?|cu|cubic|cubed|per)\b
