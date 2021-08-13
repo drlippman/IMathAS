@@ -8,7 +8,7 @@ require_once(__DIR__."/copyiteminc.php");
 function copycourse($sourcecid, $name, $newUIver) {
   global $DBH, $CFG, $imasroot, $defaultcoursetheme, $userid, $myrights, $groupid;
   global $copystickyposts, $gbcats, $replacebyarr, $datesbylti, $convertAssessVer;
-  global $removewithdrawn, $usereplaceby, $cid;
+  global $removewithdrawn, $usereplaceby, $cid, $blockcnt;
 
   $blockcnt = 1;
   $itemorder = serialize(array());
