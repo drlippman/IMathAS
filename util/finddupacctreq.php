@@ -98,9 +98,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     } else {
         echo '<td></td>';
     }
-    echo '<td>'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</td>';
-    echo '<td>'.Sanitize::encodeStringForDisplay($row['SID']).'</td>';
-    echo '<td>'.Sanitize::encodeStringForDisplay($row['email']).'</td>';
+    echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></td>';
+    echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['SID']).'</span></td>';
+    echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($row['email']).'</span></td>';
     $userdata = json_decode($row['reqdata'], true);
     if (isset($userdata['ipeds'])) {
         // handle requests with ipeds info 
@@ -122,9 +122,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     echo '<td>'.Sanitize::encodeStringForDisplay($schoolname).'</td>';
     echo '<td>'.$status[$row['status']].'</td>';
 
-    echo '<td>'.Sanitize::encodeStringForDisplay($row['extLast'].', '.$row['extFirst']).'</td>';
-    echo '<td>'.Sanitize::encodeStringForDisplay($row['extSID']).'</td>';
-    echo '<td>'.Sanitize::encodeStringForDisplay($row['extemail']).'</td>';
+    echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['extLast'].', '.$row['extFirst']).'</span></td>';
+    echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['extSID']).'</span></td>';
+    echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($row['extemail']).'</span></td>';
     echo '<td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
     echo '</tr>';
 }

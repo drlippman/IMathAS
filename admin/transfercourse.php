@@ -143,7 +143,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 <p v-if="searchResults !== null && searchResults.length==0">No teachers found</p>
 <transition-group name="fade" tag="ul" class="nomark" v-if="searchResults !== null && searchResults.length>0">
 	<li v-for="teacher in searchResults" :key="teacher.id">
-		<input type=radio name=newowner :value="teacher.id" v-model="selectedTeacher"> {{teacher.name}}
+        <input type=radio name=newowner :value="teacher.id" v-model="selectedTeacher"> <span class="pii-full-name">{{teacher.name}}</span>
 	</li>
 </transition-group>
 </div>

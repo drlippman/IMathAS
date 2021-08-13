@@ -5,7 +5,7 @@
     </div>
     <div v-else class="gbmainview">
       <h1>{{ $t('gradebook.detail_title')}}</h1>
-      <h2>{{ aData.userfullname }}</h2>
+      <h2><span class="pii-full-name">{{ aData.userfullname }}</span></h2>
       <h3>{{ aData.name }}</h3>
 
       <div>

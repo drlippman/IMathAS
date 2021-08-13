@@ -534,7 +534,7 @@ if ($overwriteBody==1) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 ?>
 			<tr>
-				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?>
+                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></span>
                     <input type="hidden" name="uid[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" />
                 </td>
 				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>

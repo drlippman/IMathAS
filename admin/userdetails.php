@@ -166,7 +166,7 @@ if ($overwriteBody==1) {
 } else {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
 	echo '<div id="headeruserdetail" class="pagetitle"><h1>'._('User Detail').': ';
-	echo '<span class="pii-full-name">';
+  echo '<span class="pii-full-name">';
   echo Sanitize::encodeStringForDisplay($userinfo['LastName'].', '.$userinfo['FirstName']);
   echo '</span>';
   echo '</h1></div>';

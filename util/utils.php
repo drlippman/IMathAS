@@ -250,7 +250,7 @@ if (isset($_GET['form'])) {
 				$teach_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
 				$lti_stm = $DBH->prepare("SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=:userid");
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					echo '<p><b>'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</b></p>';
+					echo '<p><b><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName']).', '.Sanitize::encodeStringForDisplay($row['FirstName']).'</span></b></p>';
 					echo '<form method="post" action="../admin/actions.php?id='.Sanitize::encodeUrlParam($row['id']).'">';
 					echo '<input type=hidden name=action value="resetpwd" />';
 					echo '<ul><li>Username: <a href="../admin/admin2.php?showcourses='.Sanitize::encodeUrlParam($row['id']).'"><span class="pii-username">'.Sanitize::encodeStringForDisplay($row['SID']).'</span></a></li>';
@@ -325,7 +325,7 @@ if (isset($_GET['form'])) {
 
 		} else {
 			echo '<form method="post" action="utils.php?form=lookup">';
-			echo 'Look up user:  LastName: <input type="text" name="LastName" />, FirstName: <input type="text" name="FirstName" />, or username: <input type="text" name="SID"/>, or email: <input type="text" name="email"/>';
+			echo 'Look up user:  LastName: <input type="text" class="pii-last-name" name="LastName" />, FirstName: <input type="text" class="pii-first-name" name="FirstName" />, or username: <input type="text" class="pii-username" name="SID"/>, or email: <input type="text" class="pii-email" name="email"/>';
 			echo '<input type="submit" value="Go"/>';
 			echo '</form>';
 		}

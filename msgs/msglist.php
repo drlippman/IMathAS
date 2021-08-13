@@ -122,8 +122,8 @@ If deleted on both ends, delete from DB
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$opts[] = sprintf('<option value="%d">%s, %s</option>', $row[0],
-					Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
+				$opts[] = sprintf('<option value="%d"><span class="pii-first-name">%s, %s</span></option>',
+                    $row[0], Sanitize::encodeStringForDisplay($row[2]), Sanitize::encodeStringForDisplay($row[1]));
 			}
 		}
 		echo json_encode($opts, JSON_INVALID_UTF8_IGNORE);
@@ -421,9 +421,9 @@ If deleted on both ends, delete from DB
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				if (isset($_GET['to']) && $row[4]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-						echo " <img style=\"vertical-align: middle;\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+						echo " <img class='pii-image' style=\"vertical-align: middle;\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					} else {
-						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+						echo " <img class='pii-image' style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm$to.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					}
 				}
 				echo "<input type=hidden name=courseid value=\"".Sanitize::courseId($courseid)."\"/>\n";
@@ -852,7 +852,7 @@ function chgfilter() {
 		}
 		echo '</a>';
 		echo '</td>';
-		printf('<td class="pii-full-name">%s</td>', Sanitize::encodeStringForDisplay($line['fullname']));
+		printf('<td><span class="pii-full-name">%s</span></td>', Sanitize::encodeStringForDisplay($line['fullname']));
 
 
 		if ($line['name']==null) {

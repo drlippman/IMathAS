@@ -27,7 +27,7 @@ if (isset($_POST['search'])) {
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$thisperson = $row['LastName'].', '.$row['FirstName'];
 		if ($thisperson != $lastperson) {
-			echo '<br/><input type="checkbox" name="checked[]" value="'.Sanitize::encodeStringForDisplay($row['id']).'" checked="checked"> '.Sanitize::encodeStringForDisplay($thisperson) .' ('.Sanitize::encodeStringForDisplay($row['groupname']).')';
+			echo '<br/><input type="checkbox" name="checked[]" value="'.Sanitize::encodeStringForDisplay($row['id']).'" checked="checked"> <span class="pii-full-name">'.Sanitize::encodeStringForDisplay($thisperson) .'</span> ('.Sanitize::encodeStringForDisplay($row['groupname']).')';
 			$lastperson= $thisperson;
 		}
 		echo ' <a href="../course/course.php?cid='.Sanitize::courseId($row['cid']).'" target="_blank">'.Sanitize::courseId($row['cid']).'</a>';

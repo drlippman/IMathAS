@@ -26,9 +26,9 @@ if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_GET['for']) && $_G
 	$stm->execute(array($_GET['for']));
 	$forinfo = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($myrights==100 || ($myspecialrights&32)==32 || $forinfo['groupid']==$groupid) {
-		echo '<p>'._('Adding Course For').': ';
+		echo '<p>'._('Adding Course For').': <span class="pii-full-name">';
 		echo Sanitize::encodeStringforDisplay($forinfo['LastName'].', '.$forinfo['FirstName']);
-		echo '<input type=hidden name=for value="'.Sanitize::onlyInt($_GET['for']).'" />';
+		echo '</span><input type=hidden name=for value="'.Sanitize::onlyInt($_GET['for']).'" />';
 		echo '</p>';
 		$dispgroup = $forinfo['groupid'];
 	}

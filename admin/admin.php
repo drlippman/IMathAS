@@ -215,7 +215,7 @@ $placeinhead .= '</script>';
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<div id="headeradmin" class="pagetitle"><h1><?php echo $installname ?> Administration</h1></div>
-	<b>Hello <?php echo $username ?></b>
+    <b>Hello <span class="pii-username"><?php echo $username ?></span></b>
 
 <?php //WRITE OUT COURSES BLOCK ?>
 	<h2>Courses</h2>
