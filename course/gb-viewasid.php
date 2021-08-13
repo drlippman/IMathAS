@@ -637,7 +637,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$stm = $DBH->prepare("SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult,imas_students.latepass FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id=:id AND imas_students.courseid=:courseid");
 		$stm->execute(array(':id'=>$get_uid, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		echo "<h2>{$row[1]}, {$row[0]}</h2>\n";
+		echo "<h2><span class='pii-full-name'>{$row[1]}, {$row[0]}</span></h2>\n";
 
 
 		//do time limit mult
@@ -692,7 +692,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				$stm->execute(array(':assessmentid'=>$aid, ':agroupid'=>$line['agroupid']));
 				echo "<p>Group members: <ul>";
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					echo "<li>{$row[0]}, {$row[1]}</li>";
+					echo "<li><span class='pii-full-name'>{$row[0]}, {$row[1]}</span></li>";
 				}
 				echo "</ul></p>";
 			}
@@ -1160,7 +1160,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 				$result = mysql_query($q2) or die("Query failed : " . mysql_error());
 				echo "Group members: <ul>";
 				while ($row = mysql_fetch_row($result)) {
-					echo "<li>{$row[0]}, {$row[1]}</li>";
+					echo "<li><span class='pii-full-name'>{$row[0]}, {$row[1]}</span></li>";
 				}
 				echo "</ul>";
 			}
@@ -1223,10 +1223,10 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			$ID = $selparts[0];
 			$term = $selparts[1];
 			echo "<h1>Score Report</h1>\n";
-			echo "<h2>{$row[1]}, {$row[0]}<br/>($ID)</h2>\n";
+			echo "<h2><span class='pii-full-name'>{$row[1]}, {$row[0]}</span><br/>(<span class='pii-username'>$ID</span>)</h2>\n";
 		} else {
 			echo "<h1>Grade Book Summary</h1>\n";
-			echo "<h2>{$row[1]}, {$row[0]}</h2>\n";
+			echo "<h2><span class='pii-full-name'>{$row[1]}, {$row[0]}</span></h2>\n";
 		}
 		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessments.endmsg,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";

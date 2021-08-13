@@ -494,7 +494,7 @@
 				echo '</select></p>';
 			}
 
-			echo "<p class=\"person\"><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></p>';
+			echo "<p class=\"person\"><span class='pii-full-name'><b>".Sanitize::encodeStringForDisplay($line['LastName'].', '.$line['FirstName']).'</b></span></p>';
 
 			if (!$groupdup) {
 				echo '<p class="group" style="display:none"><b>'.Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]);
@@ -551,7 +551,7 @@
 
 
 			echo "<div class=review>";
-			echo '<span class="person">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
+			echo '<span class="person pii-full-name">'.Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']).': </span>';
 			if (!$groupdup) {
 				echo '<span class="group" style="display:none">' . Sanitize::encodeStringForDisplay($groupnames[$line['agroupid']]) . ': </span>';
 			}

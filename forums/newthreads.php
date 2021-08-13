@@ -121,7 +121,7 @@ if (count($lastpost)>0) {
     echo '<tr>';
     echo '<td><input type=checkbox name="checked[]" value="'.Sanitize::onlyInt($line['threadid']).'"/></td>';
     echo "<td><a href=\"posts.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."&thread=".Sanitize::onlyInt($line['threadid'])."&page=-3\">".Sanitize::encodeStringForDisplay($line['subject'])."</a></td>";
-    printf("<td>%s</td>", Sanitize::encodeStringForDisplay($name));
+    printf("<td><span class='pii-full-name'>%s</span></td>", Sanitize::encodeStringForDisplay($name));
     echo "<td><a href=\"thread.php?cid=$cid&forum=".Sanitize::onlyInt($forumids[$line['threadid']])."\">".Sanitize::encodeStringForDisplay($forumname[$line['threadid']]).'</a></td>';
     echo "<td>".Sanitize::encodeStringForDisplay($lastpost[$line['threadid']])."</td></tr>";
   }

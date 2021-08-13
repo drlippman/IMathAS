@@ -271,13 +271,13 @@
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	function printuserposts($name, $uid, $content, $postcnt, $replycnt, $hasuserimg) {
         global $imasroot, $urlmode;
-		printf("<b>%s</b> (", Sanitize::encodeStringForDisplay($name));
+		printf("<b><pii class='pii-full-name'>%s</span></b> (", Sanitize::encodeStringForDisplay($name));
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
 		if ($hasuserimg==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			} else {
-				echo "<img src=\"$imasroot/course/files/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
+				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm".Sanitize::onlyInt($uid).".jpg\"  onclick=\"togglepic(this)\" alt=\"Expand\"/>";
 			}
 		}
 		echo '<div class="forumgrp">'.$content.'</div>';

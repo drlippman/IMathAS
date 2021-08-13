@@ -36,7 +36,8 @@ echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.'">V
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);
-printf('<h2>Login Log for %s, %s</h2>', Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
+printf('<h2>Login Log for <span class="pii-full-name">%s, %s</span></h2>',
+	Sanitize::encodeStringForDisplay($row[0]), Sanitize::encodeStringForDisplay($row[1]));
 echo '<ul class="nomark">';
 $stm = $DBH->prepare("SELECT logintime,lastaction FROM imas_login_log WHERE userid=:userid AND courseid=:courseid ORDER BY logintime DESC");
 $stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));

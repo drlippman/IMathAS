@@ -185,9 +185,9 @@ if ($haslocked) {
 		if ($alt==0) {echo '<tr class="even">'; $alt=1;} else {echo '<tr class="odd">'; $alt=0;}
         echo '<td class="left"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($stu[1]).'">';
         if ($stu[2] > 0) {
-            echo '<span class=greystrike>'.Sanitize::encodeStringForDisplay($stu[0]).'</span>';
+            echo '<span class="greystrike pii-full-name">'.Sanitize::encodeStringForDisplay($stu[0]).'</span>';
         } else {
-            echo Sanitize::encodeStringForDisplay($stu[0]);
+            echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($stu[0]).'</span>';
         }
         echo '</a></td>';
 		for ($i=0;$i<$n;$i++) {

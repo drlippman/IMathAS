@@ -430,7 +430,8 @@ if ($overwriteBody==1) {
   }
   echo '</p>';
 
-	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." %s</p>", Sanitize::encodeStringForDisplay($line['description']),
+	printf("<p>"._("Description:")." %s</p><p>"._("Author:")." <span class='pii-full-name'>%s</span></p>",
+        Sanitize::encodeStringForDisplay($line['description']),
         Sanitize::encodeStringForDisplay($line['author']));
 	echo "<p>"._("Last Modified:")." $lastmod</p>";
 	if ($line['deleted']==1) {
@@ -457,7 +458,8 @@ if ($overwriteBody==1) {
 	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.Sanitize::encodeStringForDisplay($row[0]);
 		if ($myrights==100) {
-            printf(' (%s, %s)', Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+            printf(' (<span class="pii-full-name">%s, %s</span>)',
+                Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
             echo ' <a class="small" href="#" onclick="dellibitems('.Sanitize::onlyInt($row[3]).',';
             echo Sanitize::onlyInt($row[4]).',this);return false;">';
             echo _('Remove all questions in this library added by this person');

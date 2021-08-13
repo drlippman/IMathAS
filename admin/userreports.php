@@ -163,10 +163,10 @@ if ($overwriteBody==1) {
         foreach ($possible_users as $user) {
           $priorityclass = "p".Sanitize::onlyInt($user['priority']);
           if ($alt==0) {echo "<tr class=\"even $priorityclass\">"; $alt=1;} else {echo "<tr class=\"odd $priorityclass\">"; $alt=0;}
-          echo '<td><a href="userreportdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'">';
-          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']) . '</a></td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['SID']).'</td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['email']).'</td>';
+          echo '<td><a href="userreportdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'"><span class="pii-full-name">';
+          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']) . '</span></a></td>';
+          echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($user['SID']).'</span></td>';
+          echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($user['email']).'</span></td>';
           echo '<td>'.Sanitize::encodeStringForDisplay(getRoleNameByRights($user['rights'])).'</td>';
           if ($user['name']===null) {
           	  echo '<td></td>';
@@ -233,9 +233,10 @@ if ($overwriteBody==1) {
           } else {
             echo '<td><a href="userdetails.php?id='.Sanitize::encodeUrlParam($user['id']).'">';
           }
-          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']).'</a></td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['SID']).'</td>';
-          echo '<td>'.Sanitize::encodeStringForDisplay($user['email']).'</td>';
+          echo '<span class="pii-full-name">';
+          echo Sanitize::encodeStringForDisplay($user['LastName'].', '.$user['FirstName']).'</span></a></td>';
+          echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($user['SID']).'</span></td>';
+          echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($user['email']).'</span></td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['role']).'</td>';
           echo '<td>'.Sanitize::encodeStringForDisplay($user['lastaccess']).'</td>';
           echo '</tr>';
