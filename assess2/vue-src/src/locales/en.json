@@ -9,6 +9,7 @@
   "next": "Next",
   "previous": "Previous",
   "question_n": "Question {n}",
+  "extracredit": "Extra Credit",
   "jumptocontent": "Skip Navigation",
   "launch": {
     "continue_assess": "Resume",
@@ -260,7 +261,8 @@
     "gbscore": "Recorded score",
     "bestpractice": "Best practice score",
     "lastscore": "Score on last try",
-    "license": "License"
+    "license": "License",
+    "extracredit": "This question is extra credit"
   },
   "timer": {
     "hrs": "hr | hrs",

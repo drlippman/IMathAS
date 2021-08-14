@@ -1006,6 +1006,7 @@ function generateOutput() {
     var out = "";
     var text_segments = [];
     var pts = {};
+    var extracredit = {};
     var qcnt = 0;
 
     for (var i = 0; i < itemarray.length; i++) {
@@ -1029,6 +1030,8 @@ function generateOutput() {
             for (var j = 0; j < itemarray[i][2].length; j++) {
                 out += "~" + itemarray[i][2][j][0];
                 pts["qn" + itemarray[i][2][j][0]] = itemarray[i][2][j][4];
+                itemarray[i][2][j][9] = 0;
+                extracredit["qn" + itemarray[i][2][j][0]] = 0; // no EC in groups
             }
             qcnt += itemarray[i][0];
         } else {
@@ -1037,6 +1040,7 @@ function generateOutput() {
             }
             out += itemarray[i][0];
             pts["qn" + itemarray[i][0]] = itemarray[i][4];
+            extracredit["qn" + itemarray[i][0]] = itemarray[i][9];
             qcnt++;
         }
     }
@@ -1115,6 +1119,7 @@ function generateTable() {
     var badgrppoints = false;
     var badthisgrppoints = false;
     var grppoints = -1;
+    var ECmark = ' <span onmouseover="tipshow(this,\'' + _('Extra Credit') + '\')" onmouseout="tipout()">' + _('EC') + '</span>';
     for (var i = 0; i < itemcount; i++) {
         curistext = 0;
         curisgroup = 0;
@@ -1561,16 +1566,20 @@ function generateTable() {
                     //	html += "<td class=c><span class=noticehighlight>"+curpt+"</span></td>"; //points
                 } else {
                     if (beentaken) {
-                        html += "<td class=c>" + curpt + "</td>";
+                        html += "<td>" + curpt + 
+                            (curitems[j][9] > 0 ? ECmark : '') +
+                            "</td>";
                     } else {
                         html +=
-                            '<td class=c><input size=2 id="pts-' +
+                            '<td><input size=2 id="pts-' +
                             i +
                             '" value="' +
                             curpt +
                             '" data-lastval="' +
                             curpt +
-                            '"/></td>'; //points
+                            '"/>' +
+                            (curitems[j][9] > 0 ? ECmark : '') +
+                            '</td>'; //points
                     }
                 }
 
@@ -1697,7 +1706,9 @@ function generateTable() {
             ln++;
         }
         if (curistext == 0) {
-            pttotal += curpt * (curisgroup ? itemarray[i][0] : 1);
+            if (!curisgroup && itemarray[i][9] == 0) {
+                pttotal += curpt * (curisgroup ? itemarray[i][0] : 1);
+            }
             curqnum += curisgroup ? itemarray[i][0] : 1;
         }
         alt = 1 - alt;
@@ -1830,6 +1841,7 @@ function submitChanges() {
     };
     if (!beentaken) {
         outdata["pts"] = JSON.stringify(data[2]);
+        outdata["extracredit"] = JSON.stringify(data[3]);
         outdata["defpts"] = $("#defpts").val();
     }
     $.ajax({

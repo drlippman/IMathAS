@@ -288,6 +288,9 @@
                 <strong>
                   {{ $tc('question_n', qn+1) }}.
                 </strong>
+                <em v-if="qdata[curQver[qn]].extracredit" class="small subdued">
+                  {{ $t('extracredit') }}
+                </em>
 
                 <gb-question-select
                   v-if = "aData.submitby === 'by_question'"
