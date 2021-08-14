@@ -156,9 +156,14 @@ function clearlastline(tarnum) {
 	dragObj = null;
 }
 
-function addA11yTarget(canvdata, thisdrawla) {
+function addA11yTarget(canvdata, thisdrawla, imgpath) {
 	var tarnum = canvdata[0];
-	var ansformats = canvdata[1].substr(9).split(',');
+	var ansformats = canvdata[13].split(',');
+    var vispreview = true;
+    if (ansformats[ansformats.length - 1] == 'noprev') {
+        vispreview = false;
+        ansformats.pop();
+    }
 	var xmin = canvdata[2];
 	var xmax = canvdata[3];
 	var ymin = canvdata[4];
@@ -172,20 +177,26 @@ function addA11yTarget(canvdata, thisdrawla) {
 	var tarel = document.getElementById("a11ydraw"+tarnum);
 	if (tarel == null) {
 		var canvel = document.getElementById("canvas"+tarnum);
-		if (canvel) { // non-interactive previous attempt display
+		if (canvel && !vispreview) { // non-interactive previous attempt display
 			var newdiv = $("<div>").append($("<p>", {text: _('Drawn Elements:')}));
-			var tarel = document.createElement("ul");
+			tarel = document.createElement("ul");
 			tarel.setAttribute("id", "allydraw" + tarnum);
 			newdiv.append(tarel);
 			$(canvel).replaceWith(newdiv);
 		}
 	}
     targetOuts[tarnum] = document.getElementById('qn'+tarnum);
+    var activedraw = !!document.getElementById("a11ydrawnew"+tarnum);
     if (targetOuts[tarnum].disabled) {
-        document.getElementById("a11ydrawnew"+tarnum).disabled = true;
+        if (activedraw) {
+            document.getElementById("a11ydrawnew"+tarnum).disabled = true;
+        }
         $(".a11ydrawadd[data-qn="+tarnum+"]").prop('disabled', true);
     }
-	targets[tarnum] = {type:'a11y', el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
+	targets[tarnum] = {type:'a11y', el: tarel, vispreview: vispreview, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
+    if (vispreview) {
+        targets[tarnum].canv = document.getElementById("canvas"+tarnum);
+    } 
 	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
 	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
 	var afgroup;
@@ -263,6 +274,14 @@ function addA11yTarget(canvdata, thisdrawla) {
 		}
 	};
 
+    if (lines[tarnum]==null) {lines[tarnum] = new Array();}
+	if (dots[tarnum]==null) {dots[tarnum] = new Array();}
+	if (odots[tarnum]==null) {odots[tarnum] = new Array();}
+	if (tplines[tarnum]==null) {tplines[tarnum] = new Array();}
+	if (tptypes[tarnum]==null) {tptypes[tarnum] = new Array();}
+	if (ineqlines[tarnum]==null) {ineqlines[tarnum] = new Array();}
+	if (ineqtypes[tarnum]==null) {ineqtypes[tarnum] = new Array();}
+
 	var defmode, inputmodes = [], selects = [], input, moderef=[],op;
 	for (var i=0;i<ansformats.length;i++) {
 		if (types[afgroup].hasOwnProperty(ansformats[i])) {
@@ -278,7 +297,9 @@ function addA11yTarget(canvdata, thisdrawla) {
 			}
 		}
     }
-    document.getElementById("a11ydrawnew"+tarnum).innerHTML = selects;
+    if (activedraw) {
+        document.getElementById("a11ydrawnew"+tarnum).innerHTML = selects;
+    }
 	targets[tarnum].defmode = defmode;
 	targets[tarnum].inputmodes = inputmodes;
 	targets[tarnum].selects = selects;
@@ -290,29 +311,34 @@ function addA11yTarget(canvdata, thisdrawla) {
 	//maybe new drawla[5] for that purpose?
 	//need to be able to get acccess to drawla from here
     //TODO:  Check if thisdrawla was defined
-	if (thisdrawla == null && lines.hasOwnProperty(tarnum)) {
-		for (var i=0;i<lines[tarnum].length;i++) {
-			adda11ydraw(tarnum, 0, pixcoordstopointlist(lines[tarnum][i], tarnum));
-		}
-		for (var i=0;i<dots[tarnum].length;i++) {
-			adda11ydraw(tarnum, 1, pixcoordstopointlist(dots[tarnum][i], tarnum));
-		}
-		for (var i=0;i<odots[tarnum].length;i++) {
-			adda11ydraw(tarnum, 2, pixcoordstopointlist(odots[tarnum][i], tarnum));
-		}
-		for (var i=0;i<tplines[tarnum].length;i++) {
-			adda11ydraw(tarnum, tptypes[tarnum][i], pixcoordstopointlist(tplines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(tplines[tarnum][i][1], tarnum));
-		}
-		for (var i=0;i<ineqlines[tarnum].length;i++) {
-			adda11ydraw(tarnum, ineqtypes[tarnum][i], pixcoordstopointlist(ineqlines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][1], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][2], tarnum));
-		}
-	} else if (thisdrawla != null) {
-		for (var i=0;i<thisdrawla.length;i++) {
-			//format:  mode, "entered answer"
-			//but somehow have to preserve parens in the entered answer??
-			adda11ydraw(tarnum, thisdrawla[i][0], thisdrawla[i][1].replace(/\[/g,"(").replace(/\]/g,")"));
-		}
-	}
+    if (activedraw || !vispreview) {
+        if (thisdrawla == null && lines.hasOwnProperty(tarnum)) {
+            for (var i=0;i<lines[tarnum].length;i++) {
+                adda11ydraw(tarnum, 0, pixcoordstopointlist(lines[tarnum][i], tarnum));
+            }
+            for (var i=0;i<dots[tarnum].length;i++) {
+                adda11ydraw(tarnum, 1, pixcoordstopointlist(dots[tarnum][i], tarnum));
+            }
+            for (var i=0;i<odots[tarnum].length;i++) {
+                adda11ydraw(tarnum, 2, pixcoordstopointlist(odots[tarnum][i], tarnum));
+            }
+            for (var i=0;i<tplines[tarnum].length;i++) {
+                adda11ydraw(tarnum, tptypes[tarnum][i], pixcoordstopointlist(tplines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(tplines[tarnum][i][1], tarnum));
+            }
+            for (var i=0;i<ineqlines[tarnum].length;i++) {
+                adda11ydraw(tarnum, ineqtypes[tarnum][i], pixcoordstopointlist(ineqlines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][1], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][2], tarnum));
+            }
+        } else if (thisdrawla != null) {
+            for (var i=0;i<thisdrawla.length;i++) {
+                //format:  mode, "entered answer"
+                //but somehow have to preserve parens in the entered answer??
+                adda11ydraw(tarnum, thisdrawla[i][0], thisdrawla[i][1].replace(/\[/g,"(").replace(/\]/g,")"));
+            }
+        }
+    }
+    if (vispreview) {
+        initBackground(targets[tarnum].canv, tarnum, imgpath, imgwidth, imgheight, true);
+    }
 
 }
 
@@ -417,14 +443,25 @@ function encodea11ydraw(qn) {
         qn = -1;
     }
 	for (var tarnum in targets) {
+        lines[tarnum].length = 0;
+        dots[tarnum].length = 0;
+        odots[tarnum].length = 0;
+        tplines[tarnum].length = 0;
+        tptypes[tarnum].length = 0;
+        ineqlines[tarnum].length = 0;
+        ineqtypes[tarnum].length = 0;
+    
         if (qn > -1 && qn != tarnum) { continue; }
+        if (qn > -1 && qn == tarnum) {
+            curTarget = tarnum;
+        }
         var thistarg = targets[tarnum];
         if (thistarg.type != 'a11y') { continue; }
-		var lines = [];
-		var dots = [];
-		var odots = [];
-		var tplines = [];
-		var tpineq = [];
+		var enclines = [];
+		var encdots = [];
+		var encodots = [];
+		var enctplines = [];
+		var enctpineq = [];
 		var saveinput = [];
 		var afgroup = targets[tarnum].afgroup;
 		$("#a11ydraw"+tarnum).find(".a11ydrawrow").each(function(i,el) {
@@ -433,6 +470,7 @@ function encodea11ydraw(qn) {
 			saveinput.push("["+mode+',"'+input+'"]');
 			input = input.replace(/[\(\)]/g,'').split(/\s*,\s*/);
 			var outpts = [];
+            var outptsraw = [];
 			for (var i=1;i<input.length;i+=2) {
 				try {
 					input[i-1] = eval(prepWithMath(mathjs(input[i-1])));
@@ -447,22 +485,34 @@ function encodea11ydraw(qn) {
 				input[i-1] = (input[i-1] - thistarg.xmin)*thistarg.pixperx + thistarg.imgborder;
 				input[i] = thistarg.imgheight - (input[i] - thistarg.ymin)*thistarg.pixpery - thistarg.imgborder;
 				outpts.push(Math.round(input[i-1])+','+Math.round(input[i]));
+                outptsraw.push([input[i-1], input[i]]);
 			}
 			if (mode==1) {
-				dots.push('('+outpts.join('),(')+')');
+				encdots.push('('+outpts.join('),(')+')');
+                dots[tarnum].push(outptsraw);
 			} else if (mode==2) {
-				odots.push('('+outpts.join('),(')+')');
+				encodots.push('('+outpts.join('),(')+')');
+                odots[tarnum].push(outptsraw);
 			} else if (mode<1) {
-				lines.push('('+outpts.join('),(')+')');
+				enclines.push('('+outpts.join('),(')+')');
+                lines[tarnum].push(outptsraw);
 			} else if (mode>=5 && mode<10 && outpts.length==2) {
-				tplines.push('('+mode+','+outpts.join(',')+')');
+				enctplines.push('('+mode+','+outpts.join(',')+')');
+                tplines[tarnum].push(outptsraw);
+                tptypes[tarnum].push(mode);
 			} else if (mode>=10 && outpts.length==3) {
-				tpineq.push('('+mode+','+outpts.join(',')+')');
+				enctpineq.push('('+mode+','+outpts.join(',')+')');
+                ineqlines[tarnum].push(outptsraw);
+                ineqtypes[tarnum].push(mode);
 			}
 		});
-		targetOuts[tarnum].value = lines.join(';')+';;'+dots.join(',')+';;'+odots.join(',')+';;'+tplines.join(',')+';;'+tpineq.join(',')+';;'+saveinput.join(',');
+		targetOuts[tarnum].value = enclines.join(';')+';;'+encdots.join(',')+';;'+encodots.join(',')+';;'+enctplines.join(',')+';;'+enctpineq.join(',')+';;'+saveinput.join(',');
 		$(targetOuts[tarnum]).trigger("input").trigger("change");
 	}
+    if (qn > -1 && targets[qn].vispreview) {
+        drawTarget(null,null,true);
+    }
+    curTarget = null;
 }
 
 function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky,snaptogrid) {
@@ -507,7 +557,11 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		drawstyle[tarnum] = 0;
 	}
     drawlocky[tarnum] = locky;
-	if (imgpath.match(/initPicture/)) {
+	initBackground(tarel, tarnum, imgpath, imgwidth, imgheight, false);
+}
+
+function initBackground(tarel, tarnum, imgpath, imgwidth, imgheight, skipencode) {
+    if (imgpath.match(/initPicture/)) {
 		if ($(tarel).closest('.drawcanvasholder').length == 0) {
 			$(tarel).removeClass("drawcanvas").wrap($("<div>", {
 				class: "drawcanvas",
@@ -531,7 +585,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		imgs[tarnum] = null;
 		var oldcurTarget = curTarget;
 		curTarget = tarnum;
-		drawTarget();
+		drawTarget(null,null,skipencode);
 		setTimeout(function() { window.drawPics($(tarel).closest('.drawcanvas')[0]);}, 30);
 		curTarget = oldcurTarget;
 	} else if (imgpath !== '') {
@@ -539,7 +593,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		imgs[tarnum].onload = function() {
 			var oldcurTarget = curTarget;
 			curTarget = tarnum;
-			drawTarget();
+			drawTarget(null,null,skipencode);
 			curTarget = oldcurTarget;
 		};
 		imgs[tarnum].src = imgpath;
@@ -547,7 +601,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 		imgs[tarnum] = null;
 		var oldcurTarget = curTarget;
 		curTarget = tarnum;
-		drawTarget();
+		drawTarget(null,null,skipencode);
 		curTarget = oldcurTarget;
 	}
 }
@@ -575,9 +629,13 @@ function setDotLine(tarnum,onoff) {
 	targets[tarnum].dotline = onoff;
 }
 
-function drawTarget(x,y) {
+function drawTarget(x,y,skipencode) {
 	try {
-		var ctx = targets[curTarget].el.getContext('2d');
+        if (targets[curTarget].canv) {
+            var ctx = targets[curTarget].canv.getContext('2d');
+        } else {
+		    var ctx = targets[curTarget].el.getContext('2d');
+        }
 	} catch(e) {
 		if (!nocanvaswarning) {
 			nocanvaswarning = true;
@@ -1586,8 +1644,9 @@ function drawTarget(x,y) {
 			ctx.fillStyle = "rgb(0,0,255)";
 		}
 	}
-
-	encodeDraw();
+    if (skipencode !== true) {
+	    encodeDraw();
+    }
 	//targetOuts[curTarget].value =  php_serialize(lines[curTarget]) + ';;'+php_serialize(dots[curTarget])+ ';;'+php_serialize(odots[curTarget]);
 
 }
@@ -1706,7 +1765,7 @@ function drawMouseDown(ev) {
 	//see if mouse click is inside a target; if so, select it (unless currently in a line from another target)
 	if (curTarget==null || (curLine==null && curTPcurve==null && curIneqcurve==null)) {
 		for (i in targets) {
-			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
+			if ($(targets[i].el).is(':hidden') || targets[i].type != 'canvas') {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) &&
 				tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y) &&
@@ -2142,7 +2201,7 @@ function drawMouseMove(ev) {
 	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
 	//if (curTarget==null) {
 		for (i in targets) {
-			if ($(targets[i].el).is(':hidden')) {continue;} // skip hidden
+			if ($(targets[i].el).is(':hidden') || targets[i].type != 'canvas') {continue;} // skip hidden
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) &&
 				tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y) &&
@@ -2448,15 +2507,15 @@ function initCanvases(k) {
 			} else if (drawla[i] != null && JSON.stringify(drawla[i])=='[[]]') {
                 clearcanvas(canvases[i][0], true);
             } 
-			if (canvases[i][1].substr(0,8)=="a11ydraw") {
-				addA11yTarget(canvases[i], thisdrawla);
+            var bgpath = '';
+            if (canvases[i][1].match(/initPicture/)) {
+                bgpath = canvases[i][1];
+            } else if (canvases[i][1] !== '') {
+                bgpath = imasroot+'/filter/graph/imgs/'+canvases[i][1];
+            }
+			if (canvases[i][13] !== '') {
+				addA11yTarget(canvases[i], thisdrawla, bgpath);
 			} else {
-				var bgpath = '';
-				if (canvases[i][1].match(/initPicture/)) {
-					bgpath = canvases[i][1];
-				} else if (canvases[i][1] !== '') {
-					bgpath = imasroot+'/filter/graph/imgs/'+canvases[i][1];
-				}
 				addTarget(canvases[i][0],'canvas'+canvases[i][0],bgpath,'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 			}
 		}
