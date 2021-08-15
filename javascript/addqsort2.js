@@ -1706,7 +1706,7 @@ function generateTable() {
             ln++;
         }
         if (curistext == 0) {
-            if (!curisgroup && itemarray[i][9] == 0) {
+            if (curisgroup || itemarray[i][9] == 0) {
                 pttotal += curpt * (curisgroup ? itemarray[i][0] : 1);
             }
             curqnum += curisgroup ? itemarray[i][0] : 1;
