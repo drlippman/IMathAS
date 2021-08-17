@@ -420,7 +420,7 @@
             if ($extracredit[$qid] == 1) {
                 echo ' <span onmouseover="tipshow(this,\'' . _('Extra Credit') . '\')" onmouseout="tipout()">' . _('EC') . '</span>';
             }
-            echo '<td>';
+            echo '</td>';
 			if ($submitby == 'by_question') {
 				echo sprintf("<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=attr',500,500);return false;\">%s (%s)</td>",
                 $cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($avgatt), Sanitize::encodeStringForDisplay($avgreg));
