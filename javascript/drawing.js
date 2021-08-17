@@ -442,7 +442,13 @@ function encodea11ydraw(qn) {
     if (typeof qn == 'undefined') {
         qn = -1;
     }
-	for (var tarnum in targets) {
+	for (var tarnum in targets) {  
+        if (qn > -1 && qn != tarnum) { continue; }
+        var thistarg = targets[tarnum];
+        if (thistarg.type != 'a11y') { continue; }
+        if (qn > -1 && qn == tarnum) {
+            curTarget = tarnum;
+        }
         lines[tarnum].length = 0;
         dots[tarnum].length = 0;
         odots[tarnum].length = 0;
@@ -450,13 +456,7 @@ function encodea11ydraw(qn) {
         tptypes[tarnum].length = 0;
         ineqlines[tarnum].length = 0;
         ineqtypes[tarnum].length = 0;
-    
-        if (qn > -1 && qn != tarnum) { continue; }
-        if (qn > -1 && qn == tarnum) {
-            curTarget = tarnum;
-        }
-        var thistarg = targets[tarnum];
-        if (thistarg.type != 'a11y') { continue; }
+        
 		var enclines = [];
 		var encdots = [];
 		var encodots = [];
