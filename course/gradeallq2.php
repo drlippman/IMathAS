@@ -747,6 +747,16 @@
 					'cid' => $cid, 'add' => 'new', 'quoteq' => "{$loc}-{$qsetid}-{$qdata['seed']}-$aid-{$line['ver']}",
                     'to' => $line['userid'])) . "\">Use in Message</a>";
             echo ' <span class="subdued small">'._('Question ID ').$qsetid.'</span>';
+            if (!empty($qdata['timeactive']['total']) || !empty($qdata['lastchange'])) {
+                echo '<br/>';
+                if (!empty($qdata['timeactive']['total'])) {
+                    echo _('Time spent on this version').': ';
+                    echo round($qdata['timeactive']['total']/60, 1)._(' minutes').'. ';
+                }
+                if (!empty($qdata['lastchange'])) {
+                    echo _('Last Changed').' '.$qdata['lastchange'];
+                }
+            }
 			echo "</div>\n"; //end review div
 			echo '</div>'; //end wrapper div
 			if ($groupdup) {
