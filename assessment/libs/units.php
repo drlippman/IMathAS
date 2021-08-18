@@ -373,7 +373,6 @@ function parseunits($unitsExpression) {
     }
     
     $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol, spaces become *
-    echo $unitsExpression;
     
     // unconvert E so is_numeric will recognize it
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*\*\s*10\s*\^\s*([\-]?\d+)/','$1E$2',$unitsExpression);
