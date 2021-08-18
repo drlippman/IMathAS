@@ -363,12 +363,15 @@ function parseunits($unitsExpression) {
     $unitsExpression = preg_replace('/\/\s*\(\s*(.*?)\s*\)/', '/$1', $unitsExpression); // strip paren around denom
     
     // Change "ft sq" to "ft*ft" and "cu yd" to "yd*yd*yd"
-    foreach ($unitKeys as $key) {
-      $unitsExpression = preg_replace("~(^|[^a-zA-Z])(?:sq|square)\s+($key)([^a-zA-Z]|$)~",'$1$2*$2$3',$unitsExpression);
-      $unitsExpression = preg_replace("~(^|[^a-zA-Z])(?:cu|cubic)\s+($key)([^a-zA-Z]|$)~",'$1$2*$2*$2$3',$unitsExpression);
-      $unitsExpression = preg_replace("~(^|[^a-zA-Z])($key)\s+(?:squared)([^a-zA-Z]*)~",'$1$2*$2$3',$unitsExpression);
-      $unitsExpression = preg_replace("~(^|[^a-zA-Z])($key)\s+(?:cubed)([^a-zA-Z]*)~",'$1$2*$2*$2$3',$unitsExpression);
+    if (preg_match('/(sq\b|square|cu\b|cubed|cubic)/', $unitsExpression)) {
+      foreach ($unitKeys as $key) {
+        $unitsExpression = preg_replace("~(^|[^a-zA-Z])(?:sq|square)\s+($key)([^a-zA-Z]|$)~",'$1$2*$2$3',$unitsExpression);
+        $unitsExpression = preg_replace("~(^|[^a-zA-Z])(?:cu|cubic)\s+($key)([^a-zA-Z]|$)~",'$1$2*$2*$2$3',$unitsExpression);
+        $unitsExpression = preg_replace("~(^|[^a-zA-Z])($key)\s+(?:squared)([^a-zA-Z]*)~",'$1$2*$2$3',$unitsExpression);
+        $unitsExpression = preg_replace("~(^|[^a-zA-Z])($key)\s+(?:cubed)([^a-zA-Z]*)~",'$1$2*$2*$2$3',$unitsExpression);
+      }
     }
+    
     $unitsExpression = preg_replace('/\s*[\*\s]\s*/','*',$unitsExpression); //trims space around multiplication symbol, spaces become *
     echo $unitsExpression;
     
