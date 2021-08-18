@@ -230,8 +230,9 @@
 			} else {
 				echo '<tr><td>';
 			}
+			echo '<span class="pii-full-name">';
 			echo Sanitize::encodeStringForDisplay($row[1]) . ", " . Sanitize::encodeStringForDisplay($row[2]);
-			echo '</td>';
+			echo '</span></td>';
 			if ($hassection) {
 				echo "<td>" . Sanitize::encodeStringForDisplay($row[3]) . "</td>";
 			}

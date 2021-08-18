@@ -130,7 +130,7 @@
 			}
 			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
 			// $_POST['message'] is sanitized by htmlLawed near line 40.
-			$message = $messagePost . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".$sentto." </p>\n";
+			$message = $messagePost . "<p>Instructor note: Message sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> <span class='pii-full-name'>".$sentto."</span> </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_tutors,imas_users WHERE imas_tutors.courseid=:courseid AND imas_tutors.userid=imas_users.id ");
@@ -192,7 +192,7 @@
 			}
 
 			$sentto = implode('<br/>', array_map('Sanitize::encodeStringForDisplay',$fullnames));
-			$message .= "<p>Instructor note: Email sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> ".$sentto." </p>\n";
+			$message .= "<p>Instructor note: Email sent to these students from course ".Sanitize::encodeStringForDisplay($coursename).": <br/> <span class='pii-full-name'>".$sentto."</span> </p>\n";
 			if (isset($_POST['tutorcopy'])) {
 				$message .= '<p>A copy was sent to all tutors.</p>';
 			}
@@ -340,8 +340,11 @@
 			echo '<p>Unless limited, message will be sent to:<ul>';
 		}
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			printf("<li>%s, %s (%s)</li>", Sanitize::encodeStringForDisplay($row[0]),
-				Sanitize::encodeStringForDisplay($row[1]), Sanitize::encodeStringForDisplay($row[2]));
+			printf("<li><span class='pii-full-name'>%s, %s</span> (<span class='pii-username'>%s</span>)</li>",
+				Sanitize::encodeStringForDisplay($row[0]),
+				Sanitize::encodeStringForDisplay($row[1]),
+				Sanitize::encodeStringForDisplay($row[2])
+			);
 		}
 		echo '</ul>';
 		require("../footer.php");

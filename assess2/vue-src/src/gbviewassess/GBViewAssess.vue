@@ -5,7 +5,7 @@
     </div>
     <div v-else class="gbmainview">
       <h1>{{ $t('gradebook.detail_title')}}</h1>
-      <h2>{{ aData.userfullname }}</h2>
+      <h2><span class="pii-full-name">{{ aData.userfullname }}</span></h2>
       <h3>{{ aData.name }}</h3>
 
       <div>
@@ -288,6 +288,9 @@
                 <strong>
                   {{ $tc('question_n', qn+1) }}.
                 </strong>
+                <em v-if="qdata[curQver[qn]].extracredit" class="small subdued">
+                  {{ $t('extracredit') }}
+                </em>
 
                 <gb-question-select
                   v-if = "aData.submitby === 'by_question'"

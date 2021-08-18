@@ -5,7 +5,7 @@
         {{ ainfo.name }}
       </h1>
       <div>
-        {{ ainfo.userfullname }}
+        <span class="pii-full-name">{{ ainfo.userfullname }}</span>
       </div>
     </div>
     <p class="hideonprint headerpane">

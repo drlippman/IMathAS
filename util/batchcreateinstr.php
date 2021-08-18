@@ -53,7 +53,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     $stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
     $stm->execute(array(':SID'=>Sanitize::stripHtmlTags($data[0])));
     if ($stm->rowCount()>0) {
-      echo "Username ".Sanitize::encodeStringForDisplay($data[0])." already in use - skipping user<br/>";
+      echo "Username <span class='pii-username'>".Sanitize::encodeStringForDisplay($data[0])."</span> already in use - skipping user<br/>";
       continue;
     }
 

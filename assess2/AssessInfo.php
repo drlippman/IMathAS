@@ -371,7 +371,7 @@ class AssessInfo
   public function getQuestionSettings($id) {
     $by_q = array('regens_max');
     $base = array('tries_max','retry_penalty','retry_penalty_after',
-      'showans','showans_aftern','points_possible','questionsetid',
+      'showans','showans_aftern','points_possible','extracredit','questionsetid',
       'category', 'withdrawn', 'jump_to_answer','showwork');
     $out = array();
     if (!isset($this->questionData[$id])) {

@@ -74,7 +74,7 @@ if ($type=='notstart') {
 	natsort($stunames);
 	echo '<h2>Students who have not started this assessment</h2><ul>';
 	foreach ($stunames as $name) {
-		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
+		echo sprintf('<li><span class="pii-full-name">%s</span></li>', Sanitize::encodeStringForDisplay($name));
 	}
 	echo '</ul>';
 } else if ($type=='help') {
@@ -95,7 +95,7 @@ if ($type=='notstart') {
 	natsort($stunames);
 	echo '<h2>Students who clicked on help for this question</h2><ul>';
 	foreach ($stunames as $name) {
-		echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
+		echo sprintf('<li><span class="pii-full-name">%s</span></li>', Sanitize::encodeStringForDisplay($name));
 	}
 	echo '</ul>';
 } else {
@@ -146,7 +146,7 @@ if ($type=='notstart') {
 		natsort($stunames);
 		echo '<h2>Students who have started the assignment, but have not completed this question</h2><ul>';
 		foreach ($stunames as $name) {
-			echo sprintf('<li>%s</li>', Sanitize::encodeStringForDisplay($name));
+			echo sprintf('<li><span class="pii-full-name">%s</span></li>', Sanitize::encodeStringForDisplay($name));
 		}
 		echo '</ul>';
 	} else if ($type=='score') {
@@ -154,7 +154,8 @@ if ($type=='notstart') {
 		asort($stuscores);
 		echo '<h2>Students with lowest scores</h2><table class="gb"><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody>';
 		foreach ($stuscores as $uid=>$sc) {
-			echo sprintf('<tr><td>%s</td><td>%s</td></tr>', Sanitize::encodeStringForDisplay($stunames[$uid]),
+			echo sprintf('<tr><td><span class="pii-full-name">%s</span></td><td>%s</td></tr>',
+				Sanitize::encodeStringForDisplay($stunames[$uid]),
 				Sanitize::encodeStringForDisplay($sc));
 		}
 		echo '</tbody></table>';
@@ -166,12 +167,13 @@ if ($type=='notstart') {
 
 		$rows = array();
 		foreach ($stuatt as $uid=>$sc) {
-			$rows[] = sprintf('<tr><td>%s</td><td>%s</td><td style="border-right:1px solid">&nbsp;</td>',
+			$rows[] = sprintf('<tr><td><span class="pii-full-name">%s</span></td><td>%s</td><td style="border-right:1px solid">&nbsp;</td>',
 				Sanitize::encodeStringForDisplay($stunames[$uid]), Sanitize::encodeStringForDisplay($sc));
 		}
 		$rrc = 0;
 		foreach ($sturegens as $uid=>$sc) {
-			$rows[$rrc] .= sprintf('<td>%s</td><td>%s</td></tr>', Sanitize::encodeStringForDisplay($stunames[$uid]),
+			$rows[$rrc] .= sprintf('<td><span class="pii-full-name">%s</span></td><td>%s</td></tr>',
+				Sanitize::encodeStringForDisplay($stunames[$uid]),
 				Sanitize::encodeStringForDisplay($sc));
 			$rrc++;
 		}
@@ -186,7 +188,9 @@ if ($type=='notstart') {
 		arsort($stutimes);
 		echo '<h2>Students with most time spent on this question</h2><table class="gb"><thead><tr><th>Name</th><th>Time</th></tr></thead><tbody>';
 		foreach ($stutimes as $uid=>$sc) {
-			echo sprintf('<tr><td>%s</td><td>', Sanitize::encodeStringForDisplay($stunames[$uid]));
+			echo sprintf('<tr><td><span class="pii-full-name">%s</span></td><td>',
+				Sanitize::encodeStringForDisplay($stunames[$uid])
+			);
 			if ($sc<60) {
 				$sc .= ' sec';
 			} else {

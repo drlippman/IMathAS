@@ -111,9 +111,9 @@
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($line['hasuserimg']==1) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			echo " <img style=\"float:left;\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+			echo " <img style=\"float:left;\" class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 		} else {
-			echo " <img style=\"float:left;\" src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
+			echo " <img style=\"float:left;\" class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 		}
 	}
 	echo "<table class=gb ><tbody>";
@@ -123,7 +123,8 @@
 		echo '<tr><td><b>'._('From').':</b></td>';
 	}
 	if ($line['FirstName']!==null) {
-		printf("<td>%s, %s", Sanitize::encodeStringForDisplay($line['LastName']),Sanitize::encodeStringForDisplay($line['FirstName']));
+		printf("<td><span class='pii-full-name'>%s, %s</span>",
+			Sanitize::encodeStringForDisplay($line['LastName']),Sanitize::encodeStringForDisplay($line['FirstName']));
 	} else if ($type!='sent' && $line['msgfrom']==0) {
 		echo '<td>'._('[System Message]');
 	} else {
@@ -134,7 +135,7 @@
 	}
 	if (isset($teacherof[$line['courseid']])) {
 		if ($line['email'] !== null) {
-			echo " <a href=\"mailto:".Sanitize::emailAddress($line['email'])."\">email</a> | ";
+			echo " <a class=\"pii-email\" href=\"mailto:".Sanitize::emailAddress($line['email'])."\"><span class='pii-safe'>email</span></a> | ";
 			echo " <a href=\"$imasroot/course/gradebook.php?cid=". Sanitize::courseId($line['courseid'])."&stu=".Sanitize::encodeUrlParam($line['msgfrom'])."\" target=\"_blank\">gradebook</a>";
 		}
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {

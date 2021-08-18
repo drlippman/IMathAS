@@ -164,7 +164,7 @@ function chgfilter() {
 	echo ">All courses</option>";
 	echo getCourseOpts(false, $filtercid);
 	echo "</select> ";
-	echo '<label for="filteruid">By recipient</label>: <select id="filteruid" onchange="chgfilter()"><option value="0" ';
+	echo '<label for="filteruid">By recipient</label>: <select id="filteruid" class="pii-full-name" onchange="chgfilter()"><option value="0" ';
 	if ($filteruid==0) {
 		echo 'selected="selected" ';
 	}
@@ -246,7 +246,7 @@ function chgfilter() {
 		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid=".Sanitize::onlyInt($line['id'])."\">";
 		echo $line['title'];
 		echo "</a></td>";
-		printf("<td>%s, %s</td>", Sanitize::encodeStringForDisplay($line['LastName']),
+		printf("<td><span class='pii-full-name'>%s, %s</span></td>", Sanitize::encodeStringForDisplay($line['LastName']),
             Sanitize::encodeStringForDisplay($line['FirstName']));
 		if ($line['viewed']==1) {
 			echo "<td>Yes</td>";

@@ -79,7 +79,7 @@ if (count($lastpost)>0) {
     }
     echo '<tr id="tr'.$line['threadid'].'" class="tagged">';
     echo "<td><span class=\"right\"><img class=\"pointer\" id=\"tag{$line['threadid']}\" src=\"$staticroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['threadid']});return false;\" alt=\"Flagged\" /></span>";
-    echo "<a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "&thread=" . Sanitize::encodeUrlParam($line['threadid']) . "&page=-5\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></td><td>" . Sanitize::encodeStringForDisplay($name) . "</td>";
+    echo "<a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "&thread=" . Sanitize::encodeUrlParam($line['threadid']) . "&page=-5\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></td><td><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($name) . "</span></td>";
     echo "<td><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($forumids[$line['threadid']]) . "\">" . Sanitize::encodeStringForDisplay($forumname[$line['threadid']]) . '</a></td>';
     echo "<td>{$lastpost[$line['threadid']]}</td></tr>";
   }

@@ -228,7 +228,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 					$updateusername = false;
 				}
 				if ($updateusername) {
-					$msgout .= '<p>Username changed to '.Sanitize::encodeStringForDisplay($un).'</p>';
+					$msgout .= '<p>Username changed to <span class="pii-username">'.Sanitize::encodeStringForDisplay($un).'</span></p>';
 				} else {
 					$msgout .= '<p>Username left unchanged</p>';
 				}
@@ -534,7 +534,7 @@ if ($overwriteBody==1) {
 		while ($line=$resultStudentList->fetch(PDO::FETCH_ASSOC)) {
 ?>
 			<tr>
-				<td><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?>
+                <td><span class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']); ?></span>
                     <input type="hidden" name="uid[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" />
                 </td>
 				<td><input type=text name="sec[<?php echo Sanitize::onlyInt($line['id']); ?>]" value="<?php echo Sanitize::encodeStringForDisplay($line['section']); ?>"/></td>
@@ -552,7 +552,7 @@ if ($overwriteBody==1) {
 ?>
 	<form method=post action="listusers.php?enroll=student&cid=<?php echo $cid ?>">
 		<span class=form>Username to enroll:</span>
-		<span class=formright><input type="text" name="username"></span><br class=form>
+		<span class=formright><input type="text" class="pii-username" name="username"></span><br class=form>
 		<span class=form>Section (optional):</span>
 		<span class=formright><input type="text" name="section"></span><br class=form>
 		<span class=form>Code (optional):</span>
@@ -564,11 +564,11 @@ if ($overwriteBody==1) {
 ?>
 
 	<form method=post id=pageform class=limitaftervalidate action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
-		<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>
-	<span class=form><label for="pw1">Choose a password:</label></span><input class=form type=text size=20 id=pw1 name=pw1><BR class=form>
-	<span class=form><label for="firstname">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname><BR class=form>
-	<span class=form><label for="lastname">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname><BR class=form>
-	<span class=form><label for="email">Enter E-mail address:</label></span>  <input class=form type=text size=60 id=email name=email><BR class=form>
+		<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class="form pii-username" type=text size=12 id=SID name=SID><BR class=form>
+	<span class=form><label for="pw1">Choose a password:</label></span><input class="form pii-security" type=text size=20 id=pw1 name=pw1><BR class=form>
+	<span class=form><label for="firstname">Enter First Name:</label></span> <input class="form pii-first-name" type=text size=20 id=firstname name=firstname><BR class=form>
+	<span class=form><label for="lastname">Enter Last Name:</label></span> <input class="form pii-last-name" type=text size=20 id=lastname name=lastname><BR class=form>
+	<span class=form><label for="email">Enter E-mail address:</label></span>  <input class="form pii-email" type=text size=60 id=email name=email><BR class=form>
 	<span class=form>Section (optional):</span>
 		<span class=formright><input type="text" name="section"></span><br class=form>
 	<span class=form>Code (optional):</span>
@@ -596,23 +596,23 @@ if ($overwriteBody==1) {
 ?>
 		<form enctype="multipart/form-data" id=pageform method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo Sanitize::onlyInt($_GET['uid']) ?>" class="limitaftervalidate"/>
 			<span class=form><label for="SID">User Name (login name):</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=20 id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
+			<input <?php echo $disabled;?> class="form pii-username" type=text size=20 id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
 			<span class=form><label for="firstname">First Name:</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
+			<input <?php echo $disabled;?> class="form pii-first-name" type=text size=20 id=firstname name=firstname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['FirstName']); ?>"/><br class=form>
 			<span class=form><label for="lastname">Last Name:</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=20 id=lastname name=lastname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['LastName']); ?>"/><BR class=form>
+			<input <?php echo $disabled;?> class="form pii-last-name" type=text size=20 id=lastname name=lastname value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['LastName']); ?>"/><BR class=form>
 			<span class=form><label for="email">E-mail address:</label></span>
-			<input <?php echo $disabled;?> class=form type=text size=60 id=email name=email value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['email']); ?>"/><BR class=form>
+			<input <?php echo $disabled;?> class="form pii-email" type=text size=60 id=email name=email value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['email']); ?>"/><BR class=form>
 			<span class=form><label for="stupic">Picture:</label></span>
 			<span class="formright">
 			<?php
 		if ($lineStudent['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			} else {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				$galleryPath = "$curdir/course/files/";
-				echo "<img src=\"$imasroot/course/files/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_" . Sanitize::onlyInt($_GET['uid']) . ".jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			}
 		} else {
 			echo "No Pic ";
@@ -800,9 +800,9 @@ if ($overwriteBody==1) {
 
 	if ($line['hasuserimg']==1) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			echo "<img src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
+			echo "<img class=\"pii-image\" src=\"{$urlmode}{$GLOBALS['AWSbucket']}.s3.amazonaws.com/cfiles/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		} else {
-			echo "<img src=\"$imasroot/course/files/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
+			echo "<img class=\"pii-image\" src=\"$imasroot/course/files/userimg_sm" . Sanitize::onlyInt($line['userid']) . ".jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		}
 	}
 ?>
@@ -814,23 +814,23 @@ if ($overwriteBody==1) {
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
 				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="'.$staticroot.'/img/gears.png"/> ';
 				if ($line['locked']>0) {
-					echo '<span class="greystrike">'.$nameline.'</span></td>';
+					echo '<span class="greystrike pii-full-name">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
-						echo '<td><span class="greystrike">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
+						echo '<td><span class="greystrike pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
 					}
 					if ($showemail) {
 						echo '<td><span class="greystrike">'.Sanitize::emailAddress($line['email']).'</span></td>';
 					}
 					echo '<td><span class="greystrike"><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></span></td>';
 				} else {
-					echo $nameline.'</td>';
+					echo '<span class="pii-full-name">'.$nameline.'</span></td>';
 					echo '<td>'.$icons.'</td>';
 					if ($showSID) {
-						echo '<td>'.Sanitize::encodeStringForDisplay($line['SID']).'</td>';
+						echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($line['SID']).'</span></td>';
 					}
 					if ($showemail) {
-						echo '<td>'.Sanitize::emailAddress($line['email']).'</td>';
+						echo '<td><span class="pii-email">'.Sanitize::emailAddress($line['email']).'</span></td>';
 					}
 					echo '<td><a href="viewloginlog.php?cid='.$cid.'&uid='.Sanitize::onlyInt($line['userid']).'" class="lal">'.$lastaccess.'</a></td>';
 				}
