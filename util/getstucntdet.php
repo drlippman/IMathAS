@@ -65,7 +65,7 @@ ul {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1].', '.$row[2]!=$lastuser) {
 			if ($lastuser != '') {
-				$grpdata .= '<li><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b><ul>';
+				$grpdata .= '<li><span class="pii-full-name"><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b></span><ul>';
 				$grpdata .= $userdata;
 				$grpdata .= '</ul></li>';
 			}
@@ -91,7 +91,7 @@ ul {
 		}
 		$userdata .= "</li>";
 	}
-	$grpdata .= '<li><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b><ul>';
+	$grpdata .= '<li><span class="pii-full-name"><b>'.Sanitize::encodeStringForDisplay($lastuser).'</b></span><ul>';
 	$grpdata .= $userdata;
 	$grpdata .= '</ul></li>';
     $grpinstrcnt++;

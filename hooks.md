@@ -85,6 +85,13 @@ $itemtype is imas_items.itemtype
 $typeid id imas_items.typeid
 `delete_custom_item_by_id($itemtype, $typeid)`
 
+## header
+
+Include via `$CFG['hooks']['header']`
+
+Called to insert elements into the `<head>` element:
+`insertIntoHead()`
+
 ## ltihome
 
 Include via `$CFG['hooks']['ltihome']`
@@ -125,6 +132,9 @@ Called when checking if LTI user can access the requested page
 `allowedInAssessment()`
 return an array of base filenames that are allowed to be accessed by a user
 accessing an assessment via LTI.  This is merged with the default list.
+
+Called to determine if a user should be redirected to a diagnostic assessment
+`isDiagnostic()`
 
 ## util/batchcreateinstr
 

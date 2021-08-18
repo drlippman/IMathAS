@@ -5,6 +5,10 @@
 } else {
 	echo '<html lang="en">';
 }
+//Look to see if a hook file is defined, and include if it is
+if (isset($CFG['hooks']['header'])) {
+    require_once($CFG['hooks']['header']);
+}
 ?>
 <head>
 <title><?php echo $installname; if (isset($pagetitle)) { echo " - $pagetitle";}?></title>
@@ -248,6 +252,9 @@ if (isset($placeinhead)) {
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
 	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
+}
+if (function_exists('insertIntoHead')) {
+    insertIntoHead();
 }
 if (isset($coursetheme)) {
 	echo '<link rel="stylesheet" href="'. $staticroot . "/themes/$coursetheme?v=042217\" type=\"text/css\" />";

@@ -11,9 +11,9 @@
     />
     <div
       class = "subheader"
-      v-if = "isTeacher && curstate > 0 && curqn > -1"
+      v-if = "curstate > 0 && curqn > -1 && (isTeacher || timelimit>0)"
     >
-      <div id="livepoll_qsettings" style="flex-grow:1">
+      <div v-if = "isTeacher" id="livepoll_qsettings" style="flex-grow:1">
         <label>
           <input type="checkbox" v-model="showQuestion" />
           {{ $t('livepoll.show_question') }}
@@ -26,6 +26,8 @@
           <input type="checkbox" v-model="showAnswers" @change="updateShowAnswers"/>
           {{ showAnswersLabel }}
         </label>
+      </div>
+      <div v-else style="flex-grow:1">
       </div>
       <timer
         v-if = "timelimit > 0 && starttime > 0"
@@ -125,6 +127,8 @@ export default {
     timelimit () {
       if (store.livepollSettings.useTimer) {
         return parseInt(store.livepollSettings.questionTimelimit);
+      } else if (store.assessInfo.livepoll_status.timelimit) {
+        return parseInt(store.assessInfo.livepoll_status.timelimit);
       } else {
         return 0;
       }
@@ -160,11 +164,20 @@ export default {
         // On question show, server sends as data:
         //  action: "showq", qn: qn, seed: seed, startt:startt
         actions.clearInitValue(data.qn);
+        if (data.startt.indexOf('-') !== -1) {
+          // startt might be startt-timelimit
+          const pts = data.startt.split('-');
+          data.startt = pts[0];
+          data.timelimit = pts[1];
+        } else {
+          data.timelimit = 0;
+        }
         this.$set(store.assessInfo, 'livepoll_status', {
           curstate: 2,
           curquestion: parseInt(data.qn) + 1,
           seed: parseInt(data.seed),
-          startt: parseInt(data.startt)
+          startt: parseInt(data.startt),
+          timelimit: parseInt(data.timelimit)
         });
       } else {
         // On question stop, server sends as data:
@@ -172,7 +185,8 @@ export default {
         this.$set(store.assessInfo, 'livepoll_status',
           Object.assign(store.assessInfo.livepoll_status, {
             curquestion: parseInt(data.qn) + 1,
-            curstate: parseInt(data.action)
+            curstate: parseInt(data.action),
+            timelimit: 0
           }));
       }
     },
@@ -209,7 +223,8 @@ export default {
     openInput () {
       actions.setLivepollStatus({
         newquestion: this.curqn + 1,
-        newstate: 2
+        newstate: 2,
+        timelimit: this.timelimit
       });
       if (this.timelimit > 0) {
         this.livepollTimer = window.setTimeout(

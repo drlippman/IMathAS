@@ -35,7 +35,7 @@ echo '<div class="cpmid"><a href="viewloginlog.php?cid='.$cid.'&uid='.$uid.'">Vi
 $stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
 $stm->execute(array(':id'=>$uid));
 $row = $stm->fetch(PDO::FETCH_NUM);
-echo '<h2>Activity Log for '.Sanitize::encodeStringForDisplay($row[0]).', '.Sanitize::encodeStringForDisplay($row[1]).'</h2>';
+echo '<h2>Activity Log for <span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row[0]).', '.Sanitize::encodeStringForDisplay($row[1]).'</span></h2>';
 
 
 $actions = array();

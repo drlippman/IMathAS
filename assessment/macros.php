@@ -4750,12 +4750,14 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 		$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
 	}
 	$epsilon = (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12));
-	if ($sigfigscoretype[0]=='abs') {
+	/*  Adjustment not needed now due to rounding later
+    if ($sigfigscoretype[0]=='abs') {
 		$sigfigscoretype[1] = max(pow(10,$v)/2, $sigfigscoretype[1]);
 	} else if ($sigfigscoretype[1]/100 * $anans < pow(10,$v)/2) {
         // relative tolerance, but too small
         $sigfigscoretype = ['abs', pow(10,$v)/2];
     }
+    */
 	if (strpos($givenans,'E')!==false) {  //handle computer-style scientific notation
 		preg_match('/^-?[1-9]\.?(\d*)E/', $givenans, $matches);
 		$gasigfig = 1+strlen($matches[1]);
@@ -4771,24 +4773,32 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			if ($gadploc===false) { // no decimal place
                 if ($anans != 0 && strlen($givenans) < $reqsigfigs) { return false; } //not enough digits
                 if ($anans != 0 && $reqsigfigoffset>0 && strlen(rtrim($givenans,'0')) > $reqsigfigs + $reqsigfigoffset) {return false;} //too many sigfigs
+                $gasigfig = strlen(rtrim($givenans,'0'));
             } else {
                 if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { return false; } //not enough decimal places
                 if ($anans != 0 && $reqsigfigoffset>0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
+                $gasigfig = strlen($givenans) - 1;
             }
 		} else {
 			$absgivenans = str_replace('-','',$givenans);
 			$gadploc = strpos($absgivenans,'.');
 			if ($gadploc===false) { //no decimal place
 				if (strlen(rtrim($absgivenans,'0')) > $reqsigfigs) { return false;}
+                $gasigfig = strlen(rtrim($givenans,'0'));
 			} else {
 				if (abs($givenans)<1) {
 					if (strlen(ltrim(substr($absgivenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
 				} else {
 					if (strlen(ltrim($absgivenans,'0'))-1 != $reqsigfigs) { return false;}
 				}
+                $gasigfig = strlen($givenans) - 1;
 			}
 		}
 	}
+    // We've confirmed the sigfigs on givenans are acceptable, so
+    // now round anans to givenans's sigfigs for numeric comparison
+    $anans = roundsigfig($anans, $gasigfig);
+
     //checked format, now check value
 	if ($sigfigscoretype[0]=='abs') {
 		if (abs($anans-$givenans)< $sigfigscoretype[1]+$epsilon) {return true;}

@@ -107,7 +107,9 @@ class FileUploadAnswerBox implements AnswerBox
             $out .= _('No file submitted');
         }
         $tip .= _('Select a file to upload');
-        $sa .= $answer;
+        if ($scoremethod != 'filesize') {
+            $sa .= $answer;
+        }
 
         if ($scoremethod == 'takeanythingorblank' && !$hasPrevSubmittedFile) {
             $params['submitblank'] = 1;

@@ -300,7 +300,7 @@ if ($overwriteBody==1) {
 	<div id="headerexception" class="pagetitle"><h1>Make Start/Due Date Exception</h1></div>
 
 <?php
-	echo '<h2>'.Sanitize::encodeStringForDisplay($stuname).'</h2>';
+	echo '<h2><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($stuname).'</span></h2>';
 	echo $page_isExceptionMsg;
 	echo '<p><span class="form">Assessment:</span><span class="formright">';
 	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],Sanitize::onlyInt($_GET['aid']),"Select an assessment","", " onchange='nextpage()'");

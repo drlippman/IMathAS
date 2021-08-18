@@ -195,10 +195,10 @@ if (isset($_GET['loadothers'])) { //loading others subblock
 					<span class=btn id="b<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">+</span>
 				</span>
 				<span class=hdr onClick="toggle(<?php echo Sanitize::encodeStringForJavascript($line['userid']); ?>)">
-					<span id="n<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" ><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
+					<span id="n<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>" class="pii-full-name"><?php echo Sanitize::encodeStringForDisplay($line['LastName']) . ", " . Sanitize::encodeStringForDisplay($line['FirstName']) . "\n" ?>
 					</span>
 				</span>
-				<a href="mailto:<?php echo Sanitize::emailAddress($line['email']); ?>">Email</a>
+                <a class="pii-email" href="mailto:<?php echo Sanitize::emailAddress($line['email']); ?>"><span class="pii-safe">Email</span></a>
 				<ul class=hide id="<?php echo Sanitize::encodeStringForDisplay($line['userid']); ?>">
 <?php
 					$lastteacher = $line['userid'];

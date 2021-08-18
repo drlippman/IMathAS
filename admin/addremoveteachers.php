@@ -168,7 +168,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	</p>
 	<transition-group name="fade" tag="ul" class="nomark">
 		<li v-for="teacher in existingTeachers" :key="teacher.id">
-			<input type=checkbox :value="teacher.id" :disabled="teacher.id==courseOwner"> {{teacher.name}}
+            <input type=checkbox :value="teacher.id" :disabled="teacher.id==courseOwner"> <span class="pii-full-name">{{teacher.name}}</span>
 		</li>
 	</transition-group>
 </div>
@@ -186,7 +186,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	</p>
 	<transition-group name="fade" tag="ul" class="nomark" v-if="searchResults !== null && searchResults.length>0">
 		<li v-for="teacher in searchResults" :key="teacher.id">
-			<input type=checkbox :value="teacher.id"> {{teacher.name}}
+            <input type=checkbox :value="teacher.id"> <span class="pii-full-name">{{teacher.name}}</span>
 		</li>
 	</transition-group>
 </div>

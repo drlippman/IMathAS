@@ -298,8 +298,8 @@ if ($searchtype == 'thread') {
 			} else {
 				$name = "{$line['LastName']}, {$line['FirstName']}";
 			}
-			echo "<b><a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($line['forumid']) . "&thread=" . Sanitize::encodeUrlParam($line['id']) . "&page=-4\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></b>: " . Sanitize::encodeStringForDisplay($name);
-			echo "</td>\n";
+			echo "<b><a href=\"posts.php?cid=$cid&forum=" . Sanitize::encodeUrlParam($line['forumid']) . "&thread=" . Sanitize::encodeUrlParam($line['id']) . "&page=-4\">" . Sanitize::encodeStringForDisplay($line['subject']) . "</a></b>: <span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($name);
+			echo "</span></td>\n";
 			echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum=" . Sanitize::encodeStringForDisplay($line['forumid']) . "\">" . Sanitize::encodeStringForDisplay($line['name']) . "</a></td>";
 			echo "<td class=c>$posts</td><td class=c>" . Sanitize::encodeStringForDisplay($line['views']) . " </td><td class=c>$lastpost ";
 			echo "</td></tr>\n";
@@ -380,7 +380,7 @@ if ($searchtype == 'thread') {
 		} else {
 			$name = "{$line['LastName']}, {$line['FirstName']}";
 		}
-		echo "<br/>Posted by: " . Sanitize::encodeStringForDisplay($name) . ", ";
+		echo "<br/>Posted by: <span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($name) . "</span>, ";
 		echo tzdate("F j, Y, g:i a",$line['postdate']);
 
 		echo "</div><div class=blockitems>";

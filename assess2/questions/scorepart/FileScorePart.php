@@ -64,6 +64,9 @@ class FileScorePart implements ScorePart
                     }*/
                 }
                 $hasfile = true;
+                if ($scoremethod == 'filesize') {
+                    $filesize = getfilesize('adata', 'adata/'.substr($givenans,6,-1));
+                }
             } else {
                 $scorePartResult->setLastAnswerAsGiven('');
                 if (!empty($scoremethod) && $scoremethod=='takeanythingorblank') {
@@ -138,6 +141,9 @@ class FileScorePart implements ScorePart
                 }
 
                 $s3object = "adata/$s3asid/$filename";
+                if (is_uploaded_file($_FILES["qn$qn"]['tmp_name'])) {
+                    $filesize = $_FILES["qn$qn"]['size'];
+                }
                 if (storeuploadedfile("qn$qn",$s3object)) {
                     $scorePartResult->setLastAnswerAsGiven("@FILE:$s3asid/$filename@");
                     $scorePartResult->addScoreMessage(_("Successful"));
@@ -164,6 +170,9 @@ class FileScorePart implements ScorePart
             }
         }
         if (!empty($scoremethod) && ($scoremethod=='takeanything' || $scoremethod=='takeanythingorblank')) {
+            $scorePartResult->setRawScore(1);
+            return $scorePartResult;
+        } else if ($scoremethod=='filesize' && $filesize == $answer) {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         } else {

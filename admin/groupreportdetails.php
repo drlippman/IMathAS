@@ -234,10 +234,10 @@ if ($overwriteBody==1) {
     $alt = 0;
     foreach ($groupdata as $r) {
     	if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-    	echo '<td><a href="userreportdetails.php?id='.Sanitize::onlyInt($r['id']).'">';
-    	echo Sanitize::encodeStringForDisplay($r['LastName'].', '.$r['FirstName']).'</a></td>';
-    	echo '<td>'.Sanitize::encodeStringForDisplay($r['SID']).'</td>';
-    	echo '<td>'.Sanitize::encodeStringForDisplay($r['email']).'</td>';
+    	echo '<td><a href="userreportdetails.php?id='.Sanitize::onlyInt($r['id']).'"><span class="pii-full-name">';
+    	echo Sanitize::encodeStringForDisplay($r['LastName'].', '.$r['FirstName']).'</span></a></td>';
+    	echo '<td><span class="pii-username">'.Sanitize::encodeStringForDisplay($r['SID']).'</span></td>';
+    	echo '<td><span class="pii-email">'.Sanitize::encodeStringForDisplay($r['email']).'</span></td>';
     	echo '<td>'.Sanitize::encodeStringForDisplay($r['role']).'</td>';
     	echo '<td>'.Sanitize::encodeStringForDisplay($r['lastaccess']).'</td>';
     	echo '<td>'.Sanitize::onlyInt($r['coursecnt']);

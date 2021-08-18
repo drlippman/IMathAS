@@ -359,11 +359,11 @@ if ($overwriteBody==1) {
       echo '<form method="get" action="admin2.php">';
       echo '<p>';
       echo '<span class="form"><label for="findteacher">',_('Find teacher'),'</lable>:</span>';
-      echo '<span class="formright"><input name="findteacher" id="findteacher" size=30 /> ';
+      echo '<span class="formright"><input class="pii-mixed" name="findteacher" id="findteacher" size=30 /> ';
       echo '<button type="submit">',_('Go'),'</button> </span> <br class="form" />';
 
       echo '<span class="form"><label for="finduser">',_('Find user'),'</lable>:</span>';
-      echo '<span class="formright"><input name="finduser" size=30 /> ';
+      echo '<span class="formright"><input class="pii-mixed" name="finduser" size=30 /> ';
       echo '<button type="submit">',_('Go'),'</button> ';
       echo '<input type=button value="',_('Add New User'),'" onclick="window.location=\'forms.php?from=admin2&action=newadmin\'">';
       echo '</span> <br class="form" />';

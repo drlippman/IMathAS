@@ -254,14 +254,14 @@ if ($overwriteBody==1) {
  echo $body;
 } else {
   echo '<div class=breadcrumb>',$curBreadcrumb, '</div>';
-	echo '<div id="headeruserdetail" class="pagetitle"><h1>'._('User Detail').': ';
+	echo '<div id="headeruserdetail" class="pagetitle"><h1>'._('User Detail').': <span class="pii-full-name">';
   echo Sanitize::encodeStringForDisplay($userinfo['LastName'].', '.$userinfo['FirstName']);
-  echo '</h1></div>';
+  echo '</span></h1></div>';
 
 
   //basic user info
   echo '<p>';
-  echo _('Username').': '.Sanitize::encodeStringForDisplay($userinfo['SID']).'<br/>';
+  echo _('Username').': <span class="pii-username">'.Sanitize::encodeStringForDisplay($userinfo['SID']).'</span><br/>';
   echo _('Role').': '.Sanitize::encodeStringForDisplay($userinfo['role']);
   if ($userinfo['gname']!==null) {
     echo '<br/>'._('Group').': ';
@@ -272,7 +272,7 @@ if ($overwriteBody==1) {
       echo ' ('._('Subgroup of').': '.Sanitize::encodeStringForDisplay(trim($userinfo['parentgroup'])).')';
     }
   }
-  echo '<br/>'._('Email').': '.Sanitize::encodeStringForDisplay($userinfo['email']);
+  echo '<br/>'._('Email').': <span class="pii-email">'.Sanitize::encodeStringForDisplay($userinfo['email']).'</span>';
   echo '<br/>'._('Last Login').': '.Sanitize::encodeStringForDisplay($userinfo['lastaccess']);
   echo '<br/>'._('Active Courses').': '.Sanitize::onlyInt($totalactivecourses);
   echo '<br/>'._('Total Active Students').': ';
@@ -287,7 +287,7 @@ if ($overwriteBody==1) {
   echo '<p><a href="#" onclick="$(\'#pwreset\').show();return false;">';
   echo _('Reset Password').'</a>';
   echo ' <span style="display:none;" id="pwreset"><label>'._('Set temporary password to: ');
-  echo '<input id="pw1" name="pw1" type="text" /></label> ';
+  echo '<input id="pw1" class="pii-security" name="pw1" type="text" /></label> ';
   echo '<input type=submit><span>';
   echo '</p></form>';
   showNewUserValidation('pwform');
@@ -366,7 +366,7 @@ if ($overwriteBody==1) {
       }
       echo '<td>'.(!empty($course['isLTI'])?_('LTI'):_('No')).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['template']).'</td>';
       echo '</tr>';
     }
@@ -407,7 +407,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';
@@ -448,7 +448,7 @@ if ($overwriteBody==1) {
       echo '</td>';
       echo '<td>'.Sanitize::encodeStringForDisplay($course['id']).'</td>';
       echo '<td>'.implode('<br/>',$course['status']).'</td>';
-      echo '<td>'.Sanitize::encodeStringForDisplay($course['owner']).'</td>';
+      echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($course['owner']).'</span></td>';
       echo '</tr>';
     }
     echo '</tbody></table>';

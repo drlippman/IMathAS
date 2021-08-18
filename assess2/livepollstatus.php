@@ -36,6 +36,7 @@ $uid = $userid;
 $newQuestion = Sanitize::onlyInt($_POST['newquestion']);
 $qn = $newQuestion - 1;
 $newState = Sanitize::onlyInt($_POST['newstate']);
+$timelimit = Sanitize::onlyInt($_POST['timelimit']);
 
 // this page is only for teachers
 if (!$isteacher) {
@@ -140,7 +141,8 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     'curquestion' => $newQuestion,
     'curstate' => $newState,
     'seed' => $seed,
-    'startt' => $now
+    'startt' => $now,
+    'timelimit' => $timelimit
   );
 
   // call the livepoll server
@@ -153,7 +155,7 @@ if ($newQuestion !== $livepollStatus['curquestion'] ||
     'aid' => $aid,
     'qn' => $qn,
     'seed' => $seed,
-    'startt' => $now,
+    'startt' => $now . '-' . $timelimit,
     'now' => $now,
     'sig' => $livepollsig
   ));

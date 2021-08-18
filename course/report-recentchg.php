@@ -87,7 +87,7 @@ if ($stm->rowCount()==0) {
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         $qs = 'cid='.intval($cid).'&aid='.intval($row['assessmentid']).'&uid='.intval($row['userid']);
         echo '<tr><td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
-        echo '<td>'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</td>';
+        echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></td>';
         echo '<td><a href="../assess2/gbviewassess.php?'.$qs.'" target="_blank">';
         echo Sanitize::encodeStringForDisplay($row['score']).'</a></td>';
         echo '<td>'.tzdate('n/j/y g:ia', $row['lastchange']).'</td>';

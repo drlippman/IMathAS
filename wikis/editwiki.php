@@ -220,7 +220,7 @@ if ($inconflict) {
 <?php
 }
 if (isset($lasteditedby)) {
-	printf("<p>Last Edited by %s on %s</p>", Sanitize::encodeStringForDisplay($lasteditedby), $lastedittime);
+	printf("<p>Last Edited by <span class='pii-full-name'>%s</span> on %s</p>", Sanitize::encodeStringForDisplay($lasteditedby), $lastedittime);
 }
 ?>
 	<form method=post action="editwiki.php?cid=<?php echo $cid;?>&id=<?php echo Sanitize::onlyInt($id); ?>&grp=<?php echo Sanitize::onlyInt($groupid) . Sanitize::encodeUrlParam($framed); ?>">

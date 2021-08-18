@@ -264,15 +264,16 @@
 	$ptschanged = false;
 	if (isset($_POST['pts'])) {
 		$newpts = json_decode($_POST['pts'], true);
-		$upd_pts = $DBH->prepare("UPDATE imas_questions SET points=? WHERE id=?");
-		$stm = $DBH->prepare("SELECT id,points FROM imas_questions WHERE assessmentid=?");
+        $newextracredit = json_decode($_POST['extracredit'], true);
+		$upd_pts = $DBH->prepare("UPDATE imas_questions SET points=?,extracredit=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,points,extracredit FROM imas_questions WHERE assessmentid=?");
 		$stm->execute(array($aid));
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($newpts['qn'.$row['id']])) {
 				continue;  //shouldn't happen
 			}
-			if ($row['points'] != $newpts['qn'.$row['id']]) {
-				$upd_pts->execute(array($newpts['qn'.$row['id']], $row['id']));
+			if ($row['points'] != $newpts['qn'.$row['id']] || $row['extracredit'] != $newextracredit['qn'.$row['id']]) {
+				$upd_pts->execute(array($newpts['qn'.$row['id']], $newextracredit['qn'.$row['id']], $row['id']));
 				$ptschanged = true;
 			}
 		}
