@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 //
-// File Version : 35
+// File Version : 36
 
 global $allowedmacros;
 
@@ -19,7 +19,7 @@ define("simplexTolerance", .001);
 include_once("fractions.php");  // fraction routine
 
 function simplexver() {
-	return 35;
+	return 36;
 }
 
 // function simplex(type, objective, constraints)
@@ -65,7 +65,6 @@ function simplex($type,$objective,$constraints) {
 	// create zero and one elements
 	$zero = array(0,1);		// createsimplexelement(0);
 	$one = array(1,1);		// createsimplexelement(1);
-	$negone = array(-1,1);	// createsimplexelement(-1);
 
 	$ismixed = hasmixedconstraints($constraints);
 
@@ -295,14 +294,21 @@ function simplexchecksolution($type,$HasObjective,$solutionlist,$stuanswer,$ismi
             if($solutionlist[$r][$IsOptimizedcol]=="Yes") {
                 $match = 1;  // found a possible solution
 
-				if($ismixed){
-                    $colvalue = -$solutionlist[$r][$OptimizedValuecol];
+				$dec1 = $solutionlist[$r][$OptimizedValuecol][0]/$solutionlist[$r][$OptimizedValuecol][1];
+                if(is_array($stuanswer[$LastStuColumn])) {
+                    $dec2 = $stuanswer[$LastStuColumn][0]/$stuanswer[$LastStuColumn][1];
                 } else {
-                    $colvalue = $solutionlist[$r][$OptimizedValuecol];
+                    $dec2 = $stuanswer[$LastStuColumn];
                 }
+
+                //if($ismixed){
+                //    $colvalue = -$solutionlist[$r][$OptimizedValuecol];
+                //} else {
+                //    $colvalue = $solutionlist[$r][$OptimizedValuecol];
+                //}
                 // Check Objective
                 if($HasObjective==1) {
-                    if(abs($colvalue-$stuanswer[$LastStuColumn])>simplexTolerance) {
+                    if(abs($dec1-$dec2)>simplexTolerance) {
                         $match = 0;  // not a solution
                         break;
                     }
@@ -596,7 +602,7 @@ function simplexcreateinequalities() {
 
 			// take care of +1,-1 case
 			if($objective[$j]==-1) {
-				$simplexestring[0] .= $objective[$j]."-";
+				$simplexestring[0] .= "-";
 			}
 			elseif ($objective[$j]==1) {
 				// do nothing
@@ -1692,7 +1698,7 @@ function simplexfindpivotpoint($sm) {
 	$pivotpoints = array();					// list of possible pivot point
 	$pivotcondition = PivotPointNoSolution;	// set to no solutions
 	$minfraction = array(-1,1);				// the smallest ratio - set to not found
-	$ColumnMinValue = array(1,1);			// not found as we need to find negatives
+	$ColumnMinValue =  array(1,1);			// not found as we need to find negatives
 
 	// In the last row find the largest negative value
 	for($c=0;$c<$pivotcolumncount;$c++){
@@ -1715,23 +1721,23 @@ function simplexfindpivotpoint($sm) {
 		// Find all columns that are equal with the maximum negative values
 		for($c=0;$c<$cols;$c++) {
 			if($ColumnMinValue==$sm[$lastrow][$c]) {
-				$k = count($ColumnMinIndexList);
-				$ColumnMinIndexList[$k] = $c;  // save the column index that is equal to the minimum column value
+				//$k = count($ColumnMinIndexList);
+				$ColumnMinIndexList[] = $c;  // save the column index that is equal to the minimum column value
 			}
 		}
+
+		$minfraction = null;
 
 		for ($m=0;$m<count($ColumnMinIndexList); $m++) {
 			$ratiotest[$m] = array();	 // create an array of ratios
 			$c = $ColumnMinIndexList[$m]; // for column c index m
+
 			for ($r=0;$r<$lastrow; $r++) {
 				$lastcolumn =  $sm[$r][$lastcol];
 				$testcolumn =  $sm[$r][$c];
 
 				// test column must be positive and last column must be non-negative 3-30-2016
-				if(($testcolumn[0]<=0)||($lastcolumn[0]<0)) {
-					$value = array(-1,1);
-				}
-				else {
+				if(($testcolumn[0]>0)&&($testcolumn[1]>0)&&($lastcolumn[0]>=0)) {
 					$top = $lastcolumn[0]*$testcolumn[1];
 					$bot = $lastcolumn[1]*$testcolumn[0];
 					if($bot < 0) {
@@ -1743,22 +1749,23 @@ function simplexfindpivotpoint($sm) {
 					$top /= $gcf;
 					$bot /= $gcf;
 					$value = array($top,$bot);
-				}
+					$ratiotest[$m][] = $value;
 
-				if($value[0] >= 0) {
-					// test for the smallest non-negative value to find the pivot points - fixed 2-2-2016
-					if($minfraction[0] == -1) {
-						$minfraction = $value;
-					}
-					elseif($value[0]*$minfraction[1] < $value[1]*$minfraction[0]) { // $value <$minfraction
-						$minfraction = $value;
-					}
-				}
-				$ratiotest[$m][$r] = $value;
+                    if($value[0] >= 0) {
+						if ($minfraction===null) {
+							$minfraction = $value;
+                        } elseif($value[0]*$minfraction[1] < $value[1]*$minfraction[0]) { // $value <$minfraction
+                            $minfraction = $value;
+                        }
+                    }
+                } else {
+                    $ratiotest[$m][$r] = null;
+                }
+
 			}
 		}
 
-		if($minfraction[0] == -1) {
+		if($minfraction === null) {
             // no more pivot points - set to no solutions as there are negative in the objective row
             $pivotcondition = PivotPointNoSolution;
 		}
@@ -2350,6 +2357,22 @@ function simplexsolutiontolatex($solution){
 	return $returnvalue;
 }
 
+function simplexsolutionconverttofraction($objectivereached){
+
+	$sizerow = count($objectivereached);
+	$sizecol = count($objectivereached[0])-1;
+
+    for($r=0;$r<$sizerow;$r++) {
+        for($c=0;$c<$sizecol;$c++) {
+          $sol[$r][$c] = fractionreduce($objectivereached[$r][$c]);
+        }
+		$sol[$r][$c] = "Yes";
+    }
+
+    return $sol;
+}
+
+
 //simplexsolve2(simplexmatrix,type,[showfractions=1])
 //
 // Mixed constraints
@@ -2366,7 +2389,7 @@ function simplexsolutiontolatex($solution){
 //				0 shows decimals
 //		default 1 shows fractions
 //
-// RETURNS (simplexsets[][], $objectivereachedsolutionlist, runtime)
+// RETURNS (simplexsets[][], $objectivereachedsolutionlist(in fraction form), runtime, $objectivereachedsolutionlist (array form))
 //
 //  simplexsets[][] = a 2 dimensional array used to build an output for the various paths that could be used to solve the simple
 //
@@ -2443,7 +2466,7 @@ function simplexsolve2() {
 	// step 2
 	// is this a objective reached?
 	if($solution[(count($solution)-1)]=="Yes") {
-		$objectivereached[count($objectivereached)] = $solution;
+		$objectivereached[] = $solution;
 	}
 
 	do {
@@ -2622,7 +2645,9 @@ function simplexsolve2() {
 		}
 	}
 
-	return array($simplexsets, $objectivereached, (microtime(true)-$starttime));
+
+
+	return array($simplexsets, simplexsolutionconverttofraction($objectivereached), (microtime(true)-$starttime), $objectivereached);
 }
 
 // *********************************************************************************************************************************
@@ -3239,7 +3264,10 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 // Change Log
 //
-
+// 2021-xx-xx ver 36  - Fixed bug in the simplexsolve2 return value
+//
+// 2021-04-29 ver 35  - Bug fixes
+//
 // 2021-04-20 ver 35  - found division by zero bug in simplexfindsolutioninlist the last column was Yes/No not a number
 //
 // 2021-04-19 ver 34a - simplexchecksolution bug fix.
