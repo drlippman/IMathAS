@@ -1162,65 +1162,88 @@ function AMnumfuncPrepVar(qn,str) {
  *   .submitstr: the evaluated answer, formatted for submission
  */
 
-function processNumber(origstr, format) {
-    var err = '';
-    if (format.indexOf('list')!== -1) {
-        var strs = origstr.split(/\s*,\s*/);
-    } else {
-        var strs = [origstr.replace(/,/g,'')];
-    }
-    var str;
-    for (var j=0;j<strs.length;j++) {
-        str = strs[j];
-        if (format.indexOf('units')!=-1) {
-            var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
-            if (!str.match(/^\s*(-?\s*\d+\.?\d*|-?\s*\.\d+|-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
-                err += _('Answer must start with a number. ');
-            }
-            // strip number
-            str = str.replace(/^\s*(-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+|-?\s*\d+\.?\d*|-?\s*\.\d+)\s*[\-\*]?\s*/,'');
-            str = str.replace(/\s*\-\s*([a-zA-Z])/g,'*$1');
-            str = str.replace(/\*\*/g,'^');
-            str = str.replace(/\s*(\/|\^|\-)\s*/g,'$1');
-            str = str.replace(/\(\s*(.*?)\s*\)\s*\//, '$1/').replace(/\/\s*\(\s*(.*?)\s*\)/,'/$1');
-            str = str.replace(/\s*[\*\s]\s*/g,'*');
-            // strip word^power since those are valid
-            str = str.replace(/([a-zA-Z]\w*)\^[\-\+]?\d+/g, '$1');
-            if (str.match(/\^/)) {
-                err += _('Invalid exponents. ');
-                str = str.replace(/\^/g,'');
-            }
-            if ((str.match(/\//g) || []).length > 1) {
-                err += _('Only one division symbol allowed in the units. ');
-            }
-            str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
+ function processNumber(origstr, format) {
+     var err = '';
+     if (format.indexOf('list')!== -1) {
+         var strs = origstr.split(/\s*,\s*/);
+     } else {
+         var strs = [origstr.replace(/,/g,'')];
+     }
+     var str;
+     for (var j=0;j<strs.length;j++) {
+         str = strs[j];
+         if (format.indexOf('units')!=-1) {
+             var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
+             if (!str.match(/^\s*(-?\s*\d+\.?\d*|-?\s*\.\d+|-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {
+                 err += _('Answer must start with a number. ');
+             }
+             // disallow (sq|cu|square|cubic|squared|cubed)^power
+             if (str.match(/\b(sq|square|cu|cubic|squared|cubed)\s*\^\s*[\-\+]?\s*\d+/)) {
+               err += _('Invalid base for exponent. ');
+               str = str.replace(/\^/,'');
+             }
+             // disallow (sq|square|cu|cubic)per
+             if (str.match(/\b(sq|square|cu|cubic)\s+per\b/)) {
+               err += _('Missing unit before "per". ');
+               str = str.replace(/per\b/,'');
+             }
+             // disallow per(squared|cubed)
+             if (str.match(/\bper\s+(squared|cubed)/)) {
+               err += _('Missing unit after "per". ');
+               str = str.replace(/\bper/,'');
+             }
+             // strip unit^number (squared|cubed)
+             str = str.replace(/([a-zA-Z]\w*\s*)(\^\s*[\-\+]?\s*\d+\s*)(?:squared|cubed)\b/g, '$1');
+             // strip (sq|cu|square|cubic) unit and unit (squared|cubed) since those are valid
+             str = str.replace(/(?:sq|square|cu|cubic)\s+([a-zA-Z]\w*)/g,'$1');
+             str = str.replace(/([a-zA-Z]\w*)\s+(?:squared|cubed)/g,'$1');
+             // "this per that" => this/that
+             str = str.replace(/\sper\s/g,'/');
+             // strip number
+             str = str.replace(/^\s*(-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+|-?\s*\d+\.?\d*|-?\s*\.\d+)\s*[\-\*]?\s*/,'');
+             str = str.replace(/\s*\-\s*([a-zA-Z])/g,'*$1');
+             str = str.replace(/\*\*/g,'^');
+             str = str.replace(/\s*(\/|\^|\-)\s*/g,'$1');
+             str = str.replace(/\(\s*(.*?)\s*\)\s*\//, '$1/').replace(/\/\s*\(\s*(.*?)\s*\)/,'/$1');
+             str = str.replace(/\s*[\*\s]\s*/g,'*');
+             // strip word^power since those are valid
+             str = str.replace(/([a-zA-Z]\w*)\^[\-\+]?\d+/g, '$1');
+             if (str.match(/\^/)) {
+                 err += _('Invalid exponents. ');
+                 str = str.replace(/\^/g,'');
+             }
+             if ((str.match(/\//g) || []).length > 1) {
+                 err += _('Only one division symbol allowed in the units. ');
+             }
+             
+             str = str.replace(/\//g,'*').replace(/^\s*\*/,'').trim();
 
-            if (str.length > 0) {
-                var pts = str.split(/\s*\*\s*/);
-                var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)$/;
-                for (var i=0; i<pts.length; i++) {
-                    if (!unitsregex.test(pts[i])) {
-                        err += _('Unknown unit ')+'"'+pts[i]+'". ';
-                    }
-                }
-            } else {
-                err += _("Missing units");
-            }
-        } else if (format.indexOf('integer')!=-1) {
-            if (!str.match(/^\s*\-?\d+\s*$/)) {
-                err += _('This is not an integer.');
-            }
-        } else {
-            if (!str.match(/^\s*(\+|\-)?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
-                err += _('This is not a decimal or integer value.');
-            }
-        }
-    }
-    return {
-        err: err,
-        dispvalstr: origstr
-    };
-}
+             if (str.length > 0) {
+                 var pts = str.split(/\s*\*\s*/);
+                 var unitsregex = /^(yotta|zetta|exa|peta|tera|giga|mega|kilo|hecto|deka|deci|centi|milli|micro|nano|pico|fempto|atto|zepto|yocto)?(m|meters?|km|cm|mm|um|microns?|nm|[aA]ngstroms?|pm|fm|fermi|in|inch|inches|ft|foot|feet|mi|miles?|furlongs?|yd|yards?|s|sec|seconds?|ms|us|ns|min|minutes?|h|hrs?|hours?|days?|weeks?|mo|months?|yr|years?|fortnights?|acres?|ha|hectares?|b|barns?|l|L|liters?|litres?|dL|ml|mL|cc|gal|gallons?|cups?|pints?|quarts?|tbsp|tablespoons?|tsp|teaspoons?|rad|radians?|deg|degrees?|gradians?|knots?|kt|c|mph|kph|kg|g|grams?|mg|tonnes?|k?[hH]z|[hH]ertz|revs?|revolutions?|cycles?|N|[nN]ewtons?|kips?|dynes?|lbs?|pounds?|tons?|[kK]?J|[jJ]oules?|ergs?|lbf|lbft|ftlb|cal|calories?|kcal|eV|electronvolts?|k[wW]h|btu|BTU|W|[wW]atts?|kW|hp|horsepower|Pa|[pP]ascals?|kPa|MPa|GPa|atms?|atmospheres?|bars?|barometers?|mbars?|[tT]orr|mmHg|cmWater|psi|C|[cC]oulombs?|V|[vV]olts?|mV|MV|[fF]arads?|F|ohms?|ohms|amps?|[aA]mperes?|A|T|[tT]eslas?|G|Gauss|Wb|Weber|H|Henry|lm|lumens?|lx|lux|amu|[dD]altons?|me|mol|mole|Ci|curies?|R|roentgens?|sr|steradians?|Bq|bequerel|ls|lightsecond|ly|lightyears?|AU|au|parsecs?|kpc|solarmass|solarradius|degF|degC|degK|K|microns?|cmH2O)$/;
+                 for (var i=0; i<pts.length; i++) {
+                     if (!unitsregex.test(pts[i])) {
+                         err += _('Unknown unit ')+'"'+pts[i]+'". ';
+                     }
+                 }
+             } else {
+                 err += _("Missing units");
+             }
+         } else if (format.indexOf('integer')!=-1) {
+             if (!str.match(/^\s*\-?\d+\s*$/)) {
+                 err += _('This is not an integer.');
+             }
+         } else {
+             if (!str.match(/^\s*(\+|\-)?(\d+\.?\d*|\.\d+|\d*\.?\d*\s*E\s*[\-\+]?\d+)\s*$/)) {
+                 err += _('This is not a decimal or integer value.');
+             }
+         }
+     }
+     return {
+         err: err,
+         dispvalstr: origstr
+     };
+ }
 
 function processCalculated(fullstr, format) {
   fullstr = fullstr.replace(/=/,'');
