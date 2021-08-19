@@ -63,10 +63,14 @@ function showallwork() {
 	$(".viewworkwrap > button").trigger("click");
 }
 function allvisfullcred() {
-	$(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    if (confirm(_('Are you SURE you want to give all students full credit?'))) {
+	    $(".fullcredlink").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).trigger("click");
+    }
 }
 function allvisnocred() {
-	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
+    if (confirm(_('Are you SURE you want to give all students zero credit?'))) {
+    	$("input[name^=ud]").not(function() {return !$(this).closest(".bigquestionwrap").is(":visible")}).val("0");
+    }
 }
 function updatefilters() {
     $(".bigquestionwrap").show();
