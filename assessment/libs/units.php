@@ -348,7 +348,7 @@ function parseunits($unitsExpression) {
     $unitsExpression = preg_replace('/cmH2O/','cmWater',$unitsExpression);
     
     $unitsExpression = preg_replace('/\sper\s/',' / ',$unitsExpression); // interpret "ft per s" as "ft/s"
-    // Change "ft sq" to "ft*ft" and "cu yd" to "yd*yd*yd"
+    // Change "sq ft" to "ft*ft" and "cu yd" to "yd*yd*yd"
     if (preg_match('/(sq\b|square\b|squared|cu\b|cubed|cubic\b)/', $unitsExpression)) {
       // cubic ft squared => cubic ft^2
       $unitsExpression = preg_replace("~(square|sq|cubic|cu)\s+(\s*[a-zA-Z]\w*\s+)(?:squared)~",'$1 $2^2',$unitsExpression);
