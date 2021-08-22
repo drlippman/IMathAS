@@ -2066,11 +2066,11 @@ function makescinot($n,$d=8,$f="x") {
 		$mant = number_format($n/pow(10,$exp),$d);
 	}
 	if ($f=="*") {
-		return "$isneg $mant * 10^($exp)";
+		return "$isneg$mant*10^($exp)";
 	} else if ($f=="E") {
-		return "$isneg $mant E $exp";
+		return "$isneg{$mant}E$exp";
 	} else {
-		return "$isneg $mant xx 10^($exp)";
+		return "$isneg$mant xx 10^($exp)";
 	}
 }
 
