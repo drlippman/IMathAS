@@ -347,6 +347,24 @@ function parseunits($unitsExpression) {
     //Special case of unit "cmH2O".
     $unitsExpression = preg_replace('/cmH2O/','cmWater',$unitsExpression);
     
+    $unitsExpression = preg_replace('/\sper\s/',' / ',$unitsExpression); // interpret "ft per s" as "ft/s"
+    // Change "sq ft" to "ft*ft" and "cu yd" to "yd*yd*yd"
+    if (preg_match('/(sq\b|square\b|squared|cu\b|cubed|cubic\b)/', $unitsExpression)) {
+      // cubic ft squared => cubic ft^2
+      $unitsExpression = preg_replace("~(square|sq|cubic|cu)\s+(\s*[a-zA-Z]\w*\s+)(?:squared)~",'$1 $2^2',$unitsExpression);
+      // sq ft cubed => sq ft^3
+      $unitsExpression = preg_replace("~(square|sq|cubic|cu)\s+(\s*[a-zA-Z]\w*\s+)(?:cubed)~",'$1 $2^3',$unitsExpression);
+      // sq ft^3 => ft^3*ft^3
+      $unitsExpression = preg_replace("~(?:sq|square)\s+(\s*[a-zA-Z]\w*\s*)(\s*\^\s*[\+|\-]?\s*\d+)?([^a-zA-Z]|$)~",'$1$2*$1$2$3',$unitsExpression);
+      // cu ft^2 => ft^2*ft^2*ft^2
+      $unitsExpression = preg_replace("~(?:cu|cubic)\s+(\s*[a-zA-Z]\w*\s*)(\s*\^\s*[\+|\-]?\s*\d+)?([^a-zA-Z]|$)~",'$1$2*$1$2*$1$2$3',$unitsExpression);
+      // ft squared => ft*ft or ft^3 squared => ft^3*ft^3
+      $unitsExpression = preg_replace("~([a-zA-Z]\w*\s*)(\s*\^\s*[\+|\-]?\s*\d+\s*)?(?:squared)([^a-zA-Z]*)~",'$1 $2*$1 $2$3',$unitsExpression);
+      // ft cubed => ft*ft*ft or ft^2 cubed => ft^2*ft^2*ft^2
+      $unitsExpression = preg_replace("~([a-zA-Z]\w*\s*)(\s*\^\s*[\+|\-]?\s*\d+\s*)?(?:cubed)([^a-zA-Z]*)~",'$1$2*$1$2*$1$2$3',$unitsExpression);
+    }
+    $unitsExpression = trim($unitsExpression);
+    
     $unitsExpression = preg_replace('/\s{2,}/',' ',$unitsExpression); //no double spaces
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*([\-]?\d+)/','$1*10^$2',$unitsExpression); //scientific notation
     $unitsExpression = preg_replace('/(\d+\.?\d*|\.\d+)\s*E\s*[\+]?(\d+)/','$1*10^$2',$unitsExpression);
