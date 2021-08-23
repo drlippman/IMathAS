@@ -11,12 +11,14 @@ function updatePointsPossible($aid, $itemorder = null, $defpoints = null) {
 		list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
 	}
 	
-	$stm = $DBH->prepare("SELECT id,points,extracredit FROM imas_questions WHERE assessmentid=? AND points<9999");
+	$stm = $DBH->prepare("SELECT id,points,extracredit FROM imas_questions WHERE assessmentid=? AND (points < 9999 OR extracredit > 0)");
 	$stm->execute(array($aid));
 	$questionpointdata = array();
     $questionecdata = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$questionpointdata[$row['id']] = $row['points'];
+        if ($row['points'] < 9999) {
+		    $questionpointdata[$row['id']] = $row['points'];
+        }
         $questionecdata[$row['id']] = $row['extracredit'];
 	}
 	$poss = calcPointsPossible($itemorder, $questionpointdata, $questionecdata, $defpoints);
@@ -59,5 +61,6 @@ function calcPointsPossible($itemorder, $questionpointdata, $questionecdata, $de
             }
 		}
 	}	
+
 	return $totalpossible;
 }

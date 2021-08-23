@@ -17,6 +17,7 @@ if (!$isteacher) {
 if (isset($_POST['options'])) {
 	//ready to output
 	$outcol = 0;
+    if (isset($_POST['email'])) { $doemail = true;}
 	if (isset($_POST['pts'])) { $dopts = true; $outcol++;}
     if (isset($_POST['ptpts'])) { $doptpts = true; $outcol++;}
     if (isset($_POST['raw'])) { $doraw = true; $outcol++;}
@@ -65,6 +66,11 @@ if (isset($_POST['options'])) {
 	} else {
 		$initoffset = 1;
 	}
+    if ($doemail) {
+        $gb[0][$initoffset] = "Email";
+        $gb[1][$initoffset] = "";
+        $initoffset++;
+    }
 
 	$qpts = $assess_info->getAllQuestionPoints();
 	$qcol = array();
@@ -109,7 +115,7 @@ if (isset($_POST['options'])) {
 	}
 
 	//create row headers
-	$query = "SELECT iu.id,iu.FirstName,iu.LastName,imas_students.section FROM imas_users AS iu JOIN ";
+	$query = "SELECT iu.id,iu.FirstName,iu.LastName,imas_students.section,iu.email FROM imas_users AS iu JOIN ";
 	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid ";
 	if ($hassection) {
 		$query .= "ORDER BY imas_students.section,iu.LastName, iu.FirstName";
@@ -126,6 +132,9 @@ if (isset($_POST['options'])) {
 		if ($hassection) {
 			$gb[$r][1] = $row[3];
 		}
+        if ($doemail) {
+            $gb[$r][2] = $row[4];
+        }
 		$sturow[$row[0]] = $r;
 		$r++;
 	}
@@ -257,6 +266,7 @@ if (isset($_POST['options'])) {
 	echo '<input type="checkbox" name="ptraw" value="1"/> Multipart broken-down raw score<br/>';
 	echo '<input type="checkbox" name="ba" value="1"/> Scored Attempt<br/>';
 	echo '<input type="checkbox" name="bca" value="1"/> Correct Answers for Scored Attempt<br/>';
+    echo '<input type="checkbox" name="email" value="1"/> Email Addresses<br/>';
 	echo '<input type="submit" name="options" value="Export" />';
 	echo '<p>Export will be a commas separated values (.CSV) file, which can be opened in Excel</p>';
 	//echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
